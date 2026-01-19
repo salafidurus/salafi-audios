@@ -4,6 +4,9 @@
   "packageManager": "pnpm@10.28.1",
   "scripts": {
     "dev": "turbo dev",
+    "dev:api": "pnpm --filter api dev",
+    "dev:web": "pnpm --filter web dev",
+    "dev:mobile": "pnpm --filter mobile dev",
     "build": "turbo build",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
