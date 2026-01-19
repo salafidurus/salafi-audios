@@ -5,6 +5,7 @@
 Salafi Durus is built around clearly defined user roles. These roles are not merely permission sets; they reflect distinct responsibilities, expectations, and trust boundaries within the platform.
 
 Clear role separation is essential to maintaining:
+
 - Content authenticity
 - Editorial accountability
 - A predictable and secure system
@@ -18,6 +19,7 @@ This document outlines the primary roles within Salafi Durus and explains why th
 Salafi Durus follows a principle of **explicit responsibility**.
 
 Each role:
+
 - Has a clearly defined purpose
 - Is granted only the permissions necessary to fulfill that purpose
 - Operates within well-defined boundaries
@@ -25,6 +27,7 @@ Each role:
 This prevents ambiguity, reduces misuse, and ensures that trust is preserved at every level of the system.
 
 The platform currently defines three core roles:
+
 - Listener
 - Administrator
 - Scholar / Content Editor
@@ -38,6 +41,7 @@ The platform currently defines three core roles:
 The Listener is the primary beneficiary of Salafi Durus.
 
 Listeners engage with the platform to:
+
 - Access authentic Salafi lectures
 - Follow structured series
 - Study at their own pace
@@ -46,6 +50,7 @@ Listeners engage with the platform to:
 ### Capabilities
 
 Listeners can:
+
 - Browse scholars, series, and lectures
 - Stream and download lectures for offline listening
 - Resume playback from their last position
@@ -57,6 +62,7 @@ These capabilities are focused entirely on consumption and learning.
 ### Limitations
 
 Listeners cannot:
+
 - Publish or modify content
 - Upload media
 - Influence public visibility of lectures
@@ -73,6 +79,7 @@ This limitation is intentional. It preserves clarity and avoids the risks associ
 Administrators are the custodians of the platform.
 
 They are responsible for:
+
 - Maintaining content quality
 - Ensuring methodological consistency
 - Managing the overall integrity of Salafi Durus
@@ -82,6 +89,7 @@ Administrators hold the highest level of trust and authority within the system.
 ### Capabilities
 
 Administrators can:
+
 - Create, edit, and manage scholars
 - Create, edit, and manage series
 - Upload, replace, and organize lectures
@@ -97,6 +105,7 @@ Administrative tools are designed for speed, clarity, and reliability rather tha
 With elevated permissions comes responsibility.
 
 Administrative actions:
+
 - Are authoritative
 - Affect public-facing content
 - Must be reversible when errors occur
@@ -114,6 +123,7 @@ Scholar / Content Editors represent a scoped administrative role.
 They are entrusted to manage content related to specific scholars or subject areas without having unrestricted control over the entire platform.
 
 This role exists to:
+
 - Enable direct involvement from scholars or their representatives
 - Distribute content management responsibility
 - Preserve central oversight while allowing autonomy
@@ -121,6 +131,7 @@ This role exists to:
 ### Capabilities
 
 Scholar Editors can:
+
 - Manage their assigned scholar profiles
 - Create and edit series under their scope
 - Upload and manage lectures within their scope
@@ -128,12 +139,14 @@ Scholar Editors can:
 - Replace audio files when necessary
 
 Depending on policy, they may:
+
 - Publish content directly
 - Or submit content for administrative review before publication
 
 ### Limitations
 
 Scholar Editors cannot:
+
 - Manage scholars outside their assigned scope
 - Deactivate other scholars
 - Access platform-wide administrative controls
@@ -148,6 +161,7 @@ These limitations ensure that distributed management does not compromise consist
 The separation between Listener, Administrator, and Scholar Editor is foundational.
 
 It ensures that:
+
 - Consumption remains simple and distraction-free
 - Editorial control remains accountable
 - Authority is granted intentionally, not implicitly
@@ -161,6 +175,7 @@ Blurring these roles would increase risk, reduce clarity, and undermine confiden
 The current role model is intentionally minimal.
 
 Future roles may be introduced as the platform evolves, but only if they:
+
 - Serve a clear purpose
 - Preserve existing trust boundaries
 - Do not dilute accountability

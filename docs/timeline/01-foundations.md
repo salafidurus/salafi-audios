@@ -5,6 +5,7 @@
 The Foundations phase establishes the technical and operational baseline for Salafi Durus.
 
 The goal of this phase is **not** to deliver user-facing features. Instead, it ensures that:
+
 - The repository structure is correct
 - Tooling and workflows are reliable
 - Deployment paths are safe and repeatable
@@ -31,6 +32,7 @@ Nothing in this phase should be “temporary”.
 ## Scope
 
 ### Included
+
 - Repository setup
 - Tooling configuration
 - Environment scaffolding
@@ -38,6 +40,7 @@ Nothing in this phase should be “temporary”.
 - Skeleton applications
 
 ### Explicitly Excluded
+
 - End-user features
 - Authentication flows
 - Content management
@@ -211,7 +214,6 @@ No secrets are committed.
 - Build and dev modes work
 
 ---
-
 
 ## Mobile Skeleton
 

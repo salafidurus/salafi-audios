@@ -5,6 +5,7 @@
 This directory contains the **authoritative documentation** for the Salafi Durus platform.
 
 These documents are not supplementary or optional. They define:
+
 - Product vision and philosophy
 - Architectural intent
 - Implementation boundaries
@@ -18,9 +19,9 @@ All design and implementation decisions should align with the content in this di
 
 The documentation is organized into **three major sections**, each serving a distinct purpose:
 
-1. **Product Overview** — *What we are building and why*
-2. **Implementation Guide** — *How we are building it*
-3. **Timeline** — *In what order we are building it*
+1. **Product Overview** — _What we are building and why_
+2. **Implementation Guide** — _How we are building it_
+3. **Timeline** — _In what order we are building it_
 
 New contributors are strongly encouraged to read the documents **in order**.
 
@@ -32,7 +33,7 @@ New contributors are strongly encouraged to read the documents **in order**.
 
 This section defines the **vision, philosophy, and architectural principles** of Salafi Durus.
 
-It explains *why* the system is designed the way it is, and what values guide technical decisions.
+It explains _why_ the system is designed the way it is, and what values guide technical decisions.
 
 ### Files
 
@@ -157,6 +158,7 @@ Skipping phases or reordering them increases risk.
 This documentation is part of the system.
 
 Rules:
+
 - Architectural changes require documentation updates
 - Undocumented behavior is considered incomplete
 - If implementation diverges from docs, the docs must be updated or the change reconsidered
@@ -170,6 +172,7 @@ Documentation reflects **intent**, not just implementation.
 Salafi Durus is designed for longevity, trust, and clarity.
 
 These documents exist to ensure that:
+
 - Decisions are explicit
 - Boundaries are respected
 - The system remains understandable as it grows

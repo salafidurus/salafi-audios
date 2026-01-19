@@ -52,6 +52,7 @@ Unstructured libraries may feel flexible, but they often degrade the learning ex
 Salafi Durus is designed for real-world listening conditions.
 
 Many users experience:
+
 - Intermittent connectivity
 - Limited data access
 - Long listening sessions away from stable networks
@@ -77,6 +78,7 @@ This approach ensures:
 - Predictable behavior as the system scales
 
 Clients are still empowered to behave intelligently:
+
 - Caching data for offline use
 - Resolving playback locally when possible
 - Syncing changes efficiently when online
@@ -121,6 +123,7 @@ This restraint is essential to preserving focus and preventing the system from b
 Salafi Durus is designed with time in mind.
 
 Content should remain:
+
 - Accessible
 - Discoverable
 - Meaningful
@@ -128,6 +131,7 @@ Content should remain:
 Years into the future.
 
 This philosophy affects:
+
 - Data modeling choices
 - Storage decisions
 - Naming conventions
@@ -142,6 +146,7 @@ The system is built not just to function today, but to endure without constant r
 Finally, Salafi Durus embraces constraints.
 
 Clear boundaries exist between:
+
 - Listening and publishing
 - Consumption and moderation
 - Public access and editorial control

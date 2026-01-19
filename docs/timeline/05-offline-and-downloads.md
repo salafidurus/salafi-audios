@@ -5,6 +5,7 @@
 The Offline and Downloads phase introduces **offline-first listening** to Salafi Durus.
 
 The goal is to allow users to:
+
 - Download lectures for offline playback
 - Continue listening without connectivity
 - Preserve progress recorded offline
@@ -31,6 +32,7 @@ Offline listening becomes a reliable, trusted experience.
 ## Scope
 
 ### Included
+
 - Download management (mobile)
 - Offline playback
 - Offline progress recording
@@ -38,6 +40,7 @@ Offline listening becomes a reliable, trusted experience.
 - Conflict-tolerant reconciliation
 
 ### Explicitly Excluded
+
 - Admin/editor actions offline
 - Bulk media management
 - Analytics ingestion
@@ -56,6 +59,7 @@ The backend must support:
 - Deterministic conflict resolution
 
 Backend endpoints must assume:
+
 - Delayed delivery
 - Duplicate requests
 - Out-of-order submissions
@@ -86,6 +90,7 @@ The mobile application must support:
 - Resolving playback source (local vs remote)
 
 Downloads are:
+
 - Stored locally
 - Indexed in local persistence
 - Associated with specific lectures
@@ -113,6 +118,7 @@ While offline:
 - No network calls are attempted
 
 Progress updates must:
+
 - Be timestamped
 - Be mergeable
 - Be durable across app restarts
@@ -131,6 +137,7 @@ When connectivity is restored:
 4. Successfully applied entries are removed
 
 Outbox processing:
+
 - Retries on failure
 - Uses backoff
 - Does not block UI
@@ -171,6 +178,7 @@ Offline-related errors must:
 - Surface only when action is required
 
 Common failure scenarios include:
+
 - Partial downloads
 - Interrupted sync
 - Temporary backend unavailability

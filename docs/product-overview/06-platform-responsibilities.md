@@ -5,6 +5,7 @@
 Salafi Durus is a multi-platform system composed of a mobile application, a web application, and a backend service. Each platform exists for a specific purpose and is intentionally constrained in scope.
 
 Clear responsibility boundaries are essential to:
+
 - Maintain consistency
 - Prevent duplication of logic
 - Reduce security risks
@@ -33,6 +34,7 @@ No platform attempts to do everything. Instead, each does a limited set of thing
 The mobile application is the **primary listening interface** for Salafi Durus.
 
 It is designed to support:
+
 - Frequent, long-form listening
 - Offline usage
 - Personal study routines
@@ -70,6 +72,7 @@ All authoritative decisions are delegated to the backend.
 ### Primary Purpose
 
 The web application serves as both:
+
 - A **public discovery and listening interface**
 - A **powerful administrative and editorial workspace**
 
@@ -176,6 +179,7 @@ Salafi Durus intentionally enforces boundaries between platforms.
 Violations of these boundaries—such as embedding business rules in clients or bypassing backend authorization—are treated as architectural defects, not shortcuts.
 
 These boundaries protect:
+
 - Security
 - Maintainability
 - Trust

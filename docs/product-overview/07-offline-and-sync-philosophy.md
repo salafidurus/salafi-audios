@@ -15,6 +15,7 @@ This document explains how Salafi Durus thinks about offline behavior, synchroni
 Salafi Durus treats offline listening as a **primary use case**, not a fallback.
 
 Offline capability exists to ensure that:
+
 - Learning is not interrupted by connectivity
 - Users can plan and manage their listening intentionally
 - The platform remains usable in diverse environments
@@ -33,6 +34,7 @@ Offline support includes:
 - Recording progress and user actions locally
 
 Offline does **not** mean:
+
 - Independent publishing
 - Local authority over platform state
 - Permanent divergence from the backend
@@ -46,6 +48,7 @@ Offline is about continuity, not autonomy.
 When operating offline, the client maintains local state to preserve user experience.
 
 This local state:
+
 - Exists to bridge periods without connectivity
 - Is considered temporary and reconcilable
 - Is designed to be safely replaced by authoritative data
@@ -59,6 +62,7 @@ Local data is trusted for usability, but never for authority.
 Synchronization in Salafi Durus is not about mirroring every action instantly. It is about **reconciling intent**.
 
 When connectivity is restored:
+
 - Local actions are submitted to the backend
 - The backend evaluates and applies them according to rules
 - The client adapts to the resolved state
@@ -72,11 +76,13 @@ This process prioritizes correctness and consistency over immediacy.
 Salafi Durus embraces **eventual consistency** for non-critical user state.
 
 This means:
+
 - Temporary differences between devices are acceptable
 - State converges over time rather than instantly
 - The system remains predictable even when delays occur
 
 This trade-off allows the platform to:
+
 - Operate reliably offline
 - Scale without excessive coordination
 - Avoid fragile real-time dependencies
@@ -88,6 +94,7 @@ Eventual consistency is acceptable because the domain does not require immediate
 ## Conflict Resolution Philosophy
 
 Conflicts may occur when:
+
 - A user listens on multiple devices
 - Progress is updated offline and online simultaneously
 - Devices reconnect after extended offline periods
@@ -127,6 +134,7 @@ These non-guarantees are conscious trade-offs to preserve simplicity, reliabilit
 ## Sync Without Disruption
 
 Synchronization is designed to be:
+
 - Quiet
 - Incremental
 - Non-blocking
@@ -142,6 +150,7 @@ Errors in synchronization should degrade gracefully without interrupting playbac
 Offline capability does not weaken trust boundaries.
 
 Even while offline:
+
 - Users cannot publish or modify content
 - Permissions are not elevated
 - Editorial authority remains centralized

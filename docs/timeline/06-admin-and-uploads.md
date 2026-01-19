@@ -5,6 +5,7 @@
 The Admin and Uploads phase introduces **content management and moderation workflows** into Salafi Durus.
 
 The goal is to enable trusted administrators and scholar editors to:
+
 - Create and manage scholars, series, and lectures
 - Upload and replace media safely
 - Control publication state
@@ -31,6 +32,7 @@ The platform becomes self-sustaining from a content perspective.
 ## Scope
 
 ### Included
+
 - Admin and scholar editor roles
 - Content CRUD (scholars, series, lectures)
 - Single and bulk uploads
@@ -39,6 +41,7 @@ The platform becomes self-sustaining from a content perspective.
 - Admin capabilities on both mobile and web
 
 ### Explicitly Excluded
+
 - Public user submissions
 - Automated ingestion pipelines
 - Offline admin actions
@@ -57,6 +60,7 @@ The backend must enforce:
 - Explicit permission checks on every admin action
 
 Authorization failures must:
+
 - Reject the action
 - Produce no side effects
 
@@ -74,6 +78,7 @@ Implement full content lifecycle control:
 Only published content is visible publicly.
 
 Lifecycle transitions:
+
 - Are explicit API actions
 - Are validated centrally
 - Are auditable
@@ -100,6 +105,7 @@ Media ingestion must never bypass backend coordination.
 The web application is the **primary editorial workspace**.
 
 It must support:
+
 - Scholar management
 - Series management
 - Lecture management
@@ -108,6 +114,7 @@ It must support:
 - Publishing and archiving actions
 
 The web UI prioritizes:
+
 - Visibility
 - Efficiency
 - Accuracy
@@ -134,12 +141,14 @@ Bulk workflows are web-only.
 The mobile application supports **fast, focused admin actions**.
 
 Mobile admin features include:
+
 - Editing metadata
 - Publishing or archiving content
 - Replacing media
 - Emergency moderation actions
 
 Mobile admin does **not** support:
+
 - Large bulk uploads
 - Complex batch editing
 - High-volume content creation
@@ -151,6 +160,7 @@ Mobile administration prioritizes speed and correctness.
 ### Single Upload Workflow
 
 Mobile uploads:
+
 - Are single-item only
 - Are explicitly initiated
 - Are reliable under intermittent connectivity
@@ -165,6 +175,7 @@ Uploads may retry safely if interrupted.
 Replacing media is an explicit editorial action.
 
 Rules include:
+
 - Replacement requires elevated permissions
 - Old media references are retained or archived
 - Replacement does not affect unrelated metadata
@@ -184,6 +195,7 @@ Admin workflows must support:
 - Clear visibility into publication state
 
 Moderation actions must be:
+
 - Fast
 - Reversible
 - Clearly scoped

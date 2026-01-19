@@ -5,6 +5,7 @@
 The mobile application of Salafi Durus is the primary listening interface and a critical administrative surface.
 
 It must support:
+
 - Long-form audio playback
 - Offline-first usage
 - Reliable synchronization
@@ -19,6 +20,7 @@ This document defines how the mobile application is structured, how responsibili
 The mobile application is organized around **separation by responsibility**, not by technical type.
 
 The structure emphasizes:
+
 - Feature isolation
 - Clear ownership of logic
 - Minimal coupling between unrelated concerns
@@ -112,6 +114,7 @@ The `core/` directory includes:
   - Constants
 
 ### Rules
+
 - `core/` contains no UI
 - `core/` contains no feature-specific logic
 - Features depend on `core/`, not the other way around
@@ -125,6 +128,7 @@ The `core/` directory includes:
 The `features/` directory contains vertical slices of user-facing functionality.
 
 Each feature:
+
 - Owns its screens
 - Owns its hooks and state
 - Encapsulates its domain logic
@@ -151,7 +155,6 @@ features/<feature-name>/
 - Stores manage local UI state where necessary
 - Components are feature-specific and reusable within the feature
 - Types describe feature-local data models
-
 
 Features do not:
 
@@ -190,6 +193,7 @@ If something is tied to a single domain concept, it belongs in a feature.
 ## Data Flow in the Mobile App
 
 Read Flow
+
 1. Screen renders
 2. Feature hook requests data via API client
 3. API client handles authentication and refresh

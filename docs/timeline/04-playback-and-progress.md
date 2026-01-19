@@ -5,6 +5,7 @@
 The Playback and Progress phase introduces the **core listening experience** of Salafi Durus.
 
 The goal is to allow users to:
+
 - Play lectures reliably
 - Track listening progress
 - Resume where they left off
@@ -31,6 +32,7 @@ Listening becomes a first-class, stateful experience.
 ## Scope
 
 ### Included
+
 - Audio playback
 - Progress tracking
 - Resume functionality
@@ -38,6 +40,7 @@ Listening becomes a first-class, stateful experience.
 - Basic playback error handling
 
 ### Explicitly Excluded
+
 - Offline downloads
 - Offline progress writes
 - Outbox synchronization
@@ -51,6 +54,7 @@ Listening becomes a first-class, stateful experience.
 ### Playback Metadata
 
 The backend provides:
+
 - Lecture audio references
 - Duration metadata (when available)
 - Playback-safe URLs
@@ -69,6 +73,7 @@ Implement progress-related endpoints that:
 - Resolve conflicts deterministically
 
 Progress updates must:
+
 - Be idempotent
 - Be tolerant of repeated submissions
 - Never corrupt authoritative state
@@ -78,6 +83,7 @@ Progress updates must:
 ### Progress Visibility Rules
 
 Progress data:
+
 - Is private to the user
 - Is never exposed publicly
 - Is accessible only to the authenticated owner
@@ -97,6 +103,7 @@ The mobile application must:
 - Expose basic playback controls (play, pause, seek)
 
 Playback logic:
+
 - Is isolated in core infrastructure
 - Is independent of UI screens
 - Emits progress events to the application layer
@@ -119,6 +126,7 @@ Progress recording is throttled and deliberate.
 ### Resume Behavior
 
 When a user opens a lecture:
+
 - The app requests the last known progress
 - Playback resumes from that position
 - Resume behavior is explicit and predictable
@@ -144,6 +152,7 @@ Web playback does not support background playback.
 ### Progress Synchronization
 
 While online:
+
 - Web playback updates progress in real time or near real time
 - Progress is synced with backend
 - State remains consistent across sessions
@@ -173,6 +182,7 @@ Playback errors must:
 - Not corrupt progress data
 
 Progress update failures:
+
 - Do not block playback
 - May retry opportunistically
 - Never result in partial or invalid state

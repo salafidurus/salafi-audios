@@ -15,6 +15,7 @@ This document explains how Salafi Durus approaches growth, change, and long-term
 Salafi Durus does not pursue growth for its own sake.
 
 Scalability is treated as the ability to:
+
 - Support more users without degrading experience
 - Manage more content without losing structure
 - Introduce new features without increasing fragility
@@ -84,6 +85,7 @@ This allows the platform to remain operable even under partial failures or incre
 Salafi Durus is designed so that new capabilities can be added incrementally.
 
 Examples include:
+
 - Additional user roles
 - New organizational layers (e.g., topics or collections)
 - Enhanced analytics
@@ -100,6 +102,7 @@ Evolution occurs by extension, not replacement.
 Some features are intentionally deferred to preserve focus and simplicity.
 
 These may include:
+
 - Open user-generated content
 - Social interaction features
 - Real-time collaborative functionality
@@ -114,6 +117,7 @@ Deferring these features is not a limitation; it is a conscious choice to protec
 When evaluating new features, Salafi Durus applies a consistent framework:
 
 A feature should be added only if it:
+
 - Supports learning, continuity, or content integrity
 - Respects existing trust boundaries
 - Fits within the established architecture
@@ -128,6 +132,7 @@ Features that conflict with these criteria should be reconsidered or rejected.
 As teams grow and contributors change, principles can erode if they are not explicitly documented.
 
 This Product Overview exists to ensure that:
+
 - Architectural intent is preserved
 - Trade-offs remain visible
 - Short-term decisions do not override long-term goals
@@ -141,6 +146,7 @@ Scalability without principle leads to fragility. Salafi Durus chooses the oppos
 Salafi Durus is built to endure.
 
 Its success is measured not only by adoption, but by:
+
 - Consistency of experience
 - Reliability of content
 - Confidence of users and administrators

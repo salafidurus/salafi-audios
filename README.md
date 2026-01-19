@@ -73,6 +73,7 @@ docs/           # Authoritative documentation
 📘 **All architectural decisions for Salafi Durus are documented in `/docs`.**
 
 This documentation is not supplementary. It defines:
+
 - What the system is
 - Why it is designed this way
 - How it must be implemented
@@ -118,6 +119,7 @@ Salafi Durus uses a **promotion-based deployment model**, not a push-based one.
 - No developer pushes deployment commits from a local machine
 
 This ensures deployments are:
+
 - Auditable
 - Reproducible
 - Reversible
@@ -136,6 +138,7 @@ The platform runs in three environments:
 - **production** — live environment
 
 Environment behavior is consistent across:
+
 - Mobile
 - Web
 - Backend
@@ -145,7 +148,7 @@ Configuration and secrets are strictly isolated by environment.
 
 ---
 
-## What This Repository Is *Not*
+## What This Repository Is _Not_
 
 This repository intentionally does **not** aim to be:
 
@@ -155,6 +158,7 @@ This repository intentionally does **not** aim to be:
 - A real-time collaborative system
 
 These are conscious non-goals, chosen to preserve:
+
 - Trust
 - Clarity
 - Editorial responsibility
@@ -173,6 +177,7 @@ Contributions are welcome **only if** they:
 - Update documentation when intent or behavior changes
 
 If a change conflicts with the documentation, either:
+
 - the documentation must be updated, or
 - the change must be reconsidered
 

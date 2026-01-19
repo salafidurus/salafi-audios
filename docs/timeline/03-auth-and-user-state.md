@@ -5,6 +5,7 @@
 The Authentication and User State phase introduces **identity** into Salafi Durus.
 
 The goal is to allow users to:
+
 - Identify themselves to the platform
 - Maintain personal state
 - Begin forming a personal library
@@ -30,6 +31,7 @@ Authentication is optional for browsing but required for personalization.
 ## Scope
 
 ### Included
+
 - Authentication flows
 - Session management
 - Role-aware access control
@@ -37,6 +39,7 @@ Authentication is optional for browsing but required for personalization.
 - Basic user library state
 
 ### Explicitly Excluded
+
 - Playback progress
 - Offline behavior
 - Downloads
@@ -57,6 +60,7 @@ Implement authentication endpoints that:
 - Enforce session boundaries
 
 Authentication must:
+
 - Be token-based
 - Support revocable sessions
 - Distinguish identity from authority
@@ -84,6 +88,7 @@ Implement core user-owned state:
 - Basic library views
 
 This state:
+
 - Belongs only to the user
 - Is isolated from global content
 - Can be created, updated, and removed
@@ -101,6 +106,7 @@ Implement authentication flows on web:
 - Session refresh
 
 Web authentication must:
+
 - Use secure token handling
 - Protect against token leakage
 - Resolve session state before rendering protected routes
@@ -115,6 +121,7 @@ Implement basic authenticated views:
 - User-specific library page
 
 These views:
+
 - Are inaccessible to anonymous users
 - Reflect backend-authoritative state
 - Do not include playback progress yet
@@ -132,6 +139,7 @@ Implement authentication flows on mobile:
 - Session persistence
 
 Mobile authentication must:
+
 - Store tokens securely
 - Tolerate intermittent connectivity
 - Defer refresh when offline
@@ -147,6 +155,7 @@ Mobile users can:
 - View their favorites list
 
 Favorite actions:
+
 - Require authentication
 - Are synchronized with the backend when online
 - Do not support offline writes yet
@@ -156,11 +165,13 @@ Favorite actions:
 ## Anonymous vs Authenticated Behavior
 
 Anonymous users:
+
 - Can browse all public content
 - Cannot save state
 - Are encouraged—but not forced—to authenticate
 
 Authenticated users:
+
 - Can save favorites
 - Have persistent identity
 - Prepare the groundwork for playback state
@@ -179,6 +190,7 @@ This phase validates:
 - Safe failure behavior
 
 If authentication fails:
+
 - Requests are rejected
 - No partial state is created
 
@@ -239,6 +251,6 @@ Only after this checklist is complete should playback state be introduced.
 
 ## Closing Note
 
-Phase 03 introduces *who* the user is, not *what* they do.
+Phase 03 introduces _who_ the user is, not _what_ they do.
 
 By establishing identity and basic personalization cleanly, Salafi Durus prepares for richer listening features without compromising security or architectural clarity.

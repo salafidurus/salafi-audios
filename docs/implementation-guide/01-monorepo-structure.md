@@ -1,14 +1,8 @@
 # Monorepo Structure
 
-
-
 ## Introduction
 
-
-
 Salafi Durus is developed as a single monorepo containing all client applications, backend services, and shared packages.
-
-
 
 This structure is intentional. It exists to:
 
@@ -20,23 +14,13 @@ This structure is intentional. It exists to:
 
 - Support coordinated evolution across platforms
 
-
-
 This document defines the monorepo layout, explains the responsibilities of each part, and establishes rules that prevent architectural drift over time.
-
-
 
 ---
 
-
-
 ## Why a Monorepo
 
-
-
 A monorepo is chosen because Salafi Durus is a **single system**, not a collection of unrelated applications.
-
-
 
 The mobile app, web app, and backend:
 
@@ -46,31 +30,19 @@ The mobile app, web app, and backend:
 
 - Evolve together
 
-
-
 Keeping them in one repository ensures that changes remain aligned and reduces the risk of silent incompatibilities.
-
-
 
 ---
 
-
-
 ## High-Level Structure
 
-
-
 At the root of the repository, the structure is divided into three primary areas:
-
-
 
 - `apps/` — deployable applications
 
 - `packages/` — shared libraries and configuration
 
 - `docs/` — architectural and product documentation
-
-
 
 ```txt
 
@@ -90,7 +62,7 @@ At the root of the repository, the structure is divided into three primary areas
 ```
 
 Each area has a clearly defined purpose and boundary.
- 
+
 ---
 
 ## Applications (apps/)
@@ -98,10 +70,10 @@ Each area has a clearly defined purpose and boundary.
 The `apps/` directory contains deployable runtime applications.
 
 Each application:
+
 - Has its own lifecycle
 - Is built and deployed independently
 - Consumes shared packages but does not export them
-
 
 ### Applications in Salafi Durus
 

@@ -5,6 +5,7 @@
 Salafi Durus runs across multiple platforms, environments, and deployment targets. Without a clear configuration and promotion strategy, even a well-designed system becomes fragile and error-prone.
 
 This document defines:
+
 - How environments are named
 - How configuration is structured
 - Where secrets live
@@ -27,6 +28,7 @@ The system defines three environments:
 - **production**
 
 These environment names are shared across:
+
 - Mobile
 - Web
 - Backend
@@ -41,18 +43,21 @@ A single environment identifier (`APP_ENV`) is used to determine behavior.
 Each environment serves a specific purpose:
 
 ### Development
+
 - Continuous integration target
 - Latest merged code from `main`
 - Debug-friendly settings
 - Test data and non-critical integrations
 
 ### Preview
+
 - Staging-like environment
 - Production-like configuration
 - Internal testing and validation
 - Safe place to verify releases before production
 
 ### Production
+
 - Live user traffic
 - Real data
 - Strict security controls
@@ -69,6 +74,7 @@ Configuration is owned according to responsibility.
 ### Backend Configuration
 
 The backend owns:
+
 - Database credentials
 - Authentication secrets
 - Media storage credentials
@@ -82,12 +88,14 @@ Backend configuration is **never** exposed to clients.
 ### Client Configuration
 
 Mobile and web clients receive only:
+
 - API base URLs
 - Media base URLs
 - Environment identifiers
 - Non-sensitive feature flags
 
 Clients do not receive:
+
 - Secrets
 - Credentials
 - Infrastructure access
@@ -99,10 +107,12 @@ Clients do not receive:
 ### Backend
 
 Backend configuration is sourced from:
+
 - Environment variables
 - Secure secret stores (where available)
 
 Configuration is:
+
 - Loaded at startup
 - Validated explicitly
 - Treated as immutable at runtime
@@ -114,6 +124,7 @@ Invalid configuration must cause startup failure.
 ### Mobile Application
 
 Mobile configuration is provided through:
+
 - Build-time environment injection
 - Platform-specific configuration files
 - Explicit public environment variables
@@ -125,6 +136,7 @@ Only variables explicitly marked as public are accessible at runtime.
 ### Web Application
 
 Web configuration is provided through:
+
 - Build-time environment variables
 - Server-side runtime configuration
 - Explicit public variable prefixes
@@ -138,6 +150,7 @@ Public variables are limited strictly to non-sensitive values.
 ### Public Configuration
 
 Public configuration may include:
+
 - API endpoints
 - Media endpoints
 - Environment identifiers
@@ -150,12 +163,14 @@ Public configuration must be safe to expose.
 ### Private Configuration
 
 Private configuration includes:
+
 - Secrets
 - Credentials
 - Tokens
 - Internal service URLs
 
 Private configuration:
+
 - Exists only on the backend
 - Is never committed to source control
 - Is never transmitted to clients
@@ -167,6 +182,7 @@ Private configuration:
 To prevent misconfiguration, Salafi Durus uses shared configuration schemas.
 
 These schemas:
+
 - Define required variables
 - Enforce types and formats
 - Provide early failure on misconfiguration
@@ -204,6 +220,7 @@ Clients must never infer environment from URL patterns. The environment identifi
 ## Configuration and Builds
 
 Configuration is resolved at:
+
 - Build time (for static configuration)
 - Startup time (for backend services)
 
@@ -218,6 +235,7 @@ Build artifacts are environment-specific and must not be reused across environme
 Configuration failures are treated as critical.
 
 If configuration is:
+
 - Missing
 - Invalid
 - Inconsistent
@@ -231,6 +249,7 @@ Silent fallback behavior is explicitly avoided.
 ## Auditing and Rotation
 
 Secrets and credentials:
+
 - Are rotated periodically
 - Are revocable
 - Are scoped to the minimum required access
@@ -259,6 +278,7 @@ These patterns lead to fragile systems.
 Salafi Durus uses a **tag-based promotion model** to manage deployments in a monorepo while keeping the `main` branch fully protected.
 
 This model ensures that:
+
 - All code changes go through pull requests
 - No one pushes directly to `main`
 - Deployments are explicit, auditable, and reversible
@@ -307,11 +327,13 @@ Promotion is performed by:
 Immutable tags capture a snapshot of the repository at a point in time.
 
 Format:
+
 ```txt
 release/YYYY-MM-DD.N
 ```
 
 Example:
+
 ```txt
 release/2026-01-19.1
 ```
@@ -385,7 +407,7 @@ This approach provides:
 - Clear separation between integration and promotion
 - Compatibility with monorepo tooling
 - Strong auditability and traceability
- 
+
 ---
 
 ## Closing Note

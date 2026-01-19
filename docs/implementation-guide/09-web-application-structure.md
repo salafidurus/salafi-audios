@@ -16,6 +16,7 @@ This document defines how the web application is structured, how responsibilitie
 The web application is organized around **audience and responsibility separation**.
 
 It must:
+
 - Be search-engine friendly
 - Support deep linking and sharing
 - Provide rich editorial tooling
@@ -56,7 +57,7 @@ The app/ directory defines:
 - Page layouts
 - Route-level access control
 - Server-side rendering behavior
-  
+
 It does not:
 
 - Contain business logic
@@ -73,6 +74,7 @@ It does not:
 This keeps routing declarative and predictable.
 
 ---
+
 ## Public Web Area
 
 ### Purpose

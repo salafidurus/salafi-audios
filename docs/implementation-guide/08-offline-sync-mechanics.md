@@ -45,6 +45,7 @@ Offline-readable data includes:
 - Cached scholar and series information
 
 This data is:
+
 - Read-only while offline
 - Safe to cache
 - Replaceable when online data is refreshed
@@ -58,11 +59,13 @@ Offline-readable data improves continuity but does not alter platform state.
 Offline-writable data represents **user intent** recorded while offline.
 
 Examples include:
+
 - Listening progress updates
 - Marking a lecture as completed
 - Adding or removing favorites
 
 This data:
+
 - Is recorded locally
 - Is queued for synchronization
 - Does not immediately affect backend state
@@ -80,6 +83,7 @@ Offline-only data includes:
 - Retry counters and sync metadata
 
 This data:
+
 - Is never synchronized
 - Has no backend representation
 - May be discarded at any time
@@ -91,6 +95,7 @@ This data:
 The mobile application uses local persistence to support offline behavior.
 
 Local storage is responsible for:
+
 - Tracking downloaded media
 - Storing cached metadata
 - Recording offline actions
@@ -107,6 +112,7 @@ Local persistence is **not** a mirror of the backend database. It is a working s
 Offline synchronization is implemented using an **outbox pattern**.
 
 The outbox records:
+
 - What action occurred
 - What entity it affected
 - When it occurred
@@ -119,6 +125,7 @@ This ensures that offline actions are not lost and can be retried safely.
 ### Outbox Characteristics
 
 Outbox entries:
+
 - Are append-only
 - Represent intent, not result
 - Are processed in order where necessary
@@ -162,6 +169,7 @@ Failures at any step do not corrupt state.
 ### Nature of Conflicts
 
 Conflicts may occur when:
+
 - Multiple devices update progress independently
 - Offline updates overlap with online updates
 - Sync is delayed for extended periods
@@ -175,6 +183,7 @@ Conflicts are expected and handled explicitly.
 Conflict resolution is backend-driven.
 
 Typical strategies include:
+
 - Last-write-wins based on timestamps
 - Completion overrides partial progress
 - Backend state supersedes stale client data
@@ -188,6 +197,7 @@ Clients never attempt to resolve conflicts independently.
 Offline synchronization must be idempotent.
 
 This means:
+
 - Replaying the same action multiple times has the same effect
 - Duplicate submissions do not corrupt state
 - Network retries are safe
@@ -199,11 +209,13 @@ Backend endpoints handling offline sync must be designed accordingly.
 ## Progress Synchronization
 
 Listening progress:
+
 - Is recorded locally at regular intervals
 - Is queued for synchronization periodically
 - Is reconciled with backend state
 
 Progress updates are:
+
 - Throttled
 - Collapsed when possible
 - Treated as eventually consistent
@@ -215,6 +227,7 @@ Perfect accuracy is less important than continuity.
 ## Favorites and Library Sync
 
 Favorites and similar actions:
+
 - Are recorded as discrete events
 - Are synchronized in order
 - Resolve deterministically on the backend
@@ -226,6 +239,7 @@ If conflicts occur, backend rules define the final state.
 ## Error Handling and Retries
 
 Synchronization failures:
+
 - Do not block playback
 - Do not surface intrusive errors to users
 - Are retried with backoff
@@ -265,6 +279,7 @@ These trade-offs preserve simplicity and robustness.
 Offline mode does not elevate privileges.
 
 While offline:
+
 - No administrative actions are executed
 - No publication state changes occur
 - No backend authority is assumed
@@ -278,6 +293,7 @@ All authoritative changes require backend validation.
 Synchronization systems should be observable.
 
 The backend should:
+
 - Log synchronization failures
 - Track retry patterns
 - Monitor conflict frequency

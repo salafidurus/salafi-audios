@@ -43,6 +43,7 @@ Each category follows the same fundamental handling model, with differences only
 All uploads are authorized by the backend.
 
 The backend:
+
 - Validates the uploader’s identity and role
 - Confirms the purpose of the upload
 - Issues time-limited upload permissions
@@ -66,6 +67,7 @@ The conceptual flow is:
 6. Backend records the media reference
 
 This approach:
+
 - Avoids routing large files through the backend
 - Reduces server load and cost
 - Improves upload reliability
@@ -78,12 +80,14 @@ This approach:
 ### Single Uploads
 
 Single uploads are used for:
+
 - Individual lecture creation
 - Media replacement
 - Quick administrative actions
 - Mobile-based uploads
 
 Single uploads:
+
 - Are optimized for speed and simplicity
 - Require explicit metadata submission
 - Default to draft or review states
@@ -95,11 +99,13 @@ This workflow is especially important for mobile administration.
 ### Bulk Uploads
 
 Bulk uploads are optimized for:
+
 - Large lecture series
 - Initial content ingestion
 - Desktop-based editorial workflows
 
 Bulk upload workflows:
+
 - Group multiple files under a single session
 - Allow metadata editing after upload
 - Support ordering and batch publishing
@@ -116,6 +122,7 @@ Bulk operations remain coordinated by the backend to preserve consistency.
 The database stores **references to media**, not the media itself.
 
 A media reference includes:
+
 - Storage identifier or key
 - Media type
 - Associated entity (lecture, scholar, series)
@@ -130,6 +137,7 @@ Media references are immutable by default.
 Replacing media is an explicit editorial action.
 
 Rules for replacement:
+
 - Replacement requires elevated permissions
 - The new media reference supersedes the old one
 - The old media may be retained or archived
@@ -146,10 +154,12 @@ This prevents accidental data loss and supports correction workflows.
 Media delivery is optimized for read-heavy usage.
 
 Audio and images are delivered through:
+
 - Object storage
 - A content delivery network (CDN)
 
 This ensures:
+
 - Low latency
 - Global availability
 - Reduced load on backend services
@@ -161,6 +171,7 @@ The backend never streams media directly.
 ### Access Control for Media
 
 Media access is controlled through:
+
 - Backend-issued references
 - Publication state of associated content
 - Optional signed access for restricted assets
@@ -174,6 +185,7 @@ Public content may be delivered via stable URLs. Restricted or unpublished conte
 ### Mobile Upload Considerations
 
 Mobile uploads:
+
 - Favor single-file workflows
 - Prioritize reliability over speed
 - Must tolerate intermittent connectivity
@@ -185,6 +197,7 @@ Mobile clients rely heavily on resumable or retryable uploads where possible.
 ### Web Upload Considerations
 
 Web uploads:
+
 - Support bulk operations
 - Provide richer metadata editing
 - Optimize for throughput and visibility
@@ -198,11 +211,13 @@ The same backend authorization rules apply to both platforms.
 Media upload failures are expected and handled explicitly.
 
 If an upload fails:
+
 - No database records are created
 - Partial uploads are ignored or cleaned up
 - Clients may retry with new authorization
 
 Media delivery failures:
+
 - Do not affect core metadata access
 - Degrade playback gracefully
 - Do not corrupt platform state
@@ -212,6 +227,7 @@ Media delivery failures:
 ## Cost and Scalability Considerations
 
 The media architecture is designed to:
+
 - Minimize backend bandwidth usage
 - Reduce unnecessary data transfer
 - Scale independently from application logic

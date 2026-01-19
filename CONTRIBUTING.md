@@ -105,6 +105,7 @@ The repository follows strict structural boundaries:
 - Documentation lives in `docs/`
 
 Rules:
+
 - Apps must not depend on other apps
 - Shared packages must not depend on apps
 - Circular dependencies are forbidden
@@ -126,6 +127,7 @@ src/
 ```
 
 Rules:
+
 - `shared/` contains pure, reusable primitives
 - `core/` may import from `shared/`
 - `features/` may import from `core/` and `shared/`
@@ -149,6 +151,7 @@ The web application follows a similar separation of concerns:
 The web application is a **client of the backend**, not a backend itself.
 
 Use of Next.js route handlers (`app/api/`) is restricted to:
+
 - thin proxy endpoints
 - integrations or webhooks
 
@@ -269,4 +272,3 @@ Salafi Durus is designed to preserve knowledge with responsibility.
 Every contribution affects not just the codebase, but the trust users place in the platform. Please contribute with care, discipline, and respect for the system’s design.
 
 Thank you for helping build Salafi Durus correctly.
-

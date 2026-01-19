@@ -5,6 +5,7 @@
 As Salafi Durus grows, the greatest risks are not technical limitations, but **architectural drift**, **implicit decisions**, and **scope creep**.
 
 This document defines:
+
 - Explicit guardrails that must not be violated
 - Non-goals that the platform intentionally avoids
 - Red flags that indicate design erosion
@@ -115,6 +116,7 @@ Non-goals are as important as goals. They prevent dilution of purpose.
 ## No Open User-Generated Content (for now)
 
 Salafi Durus does not support:
+
 - Public comments
 - User-submitted lectures
 - Social interaction features
@@ -126,6 +128,7 @@ This preserves trust, clarity, and moderation control.
 ## No Real-Time Collaboration
 
 The platform does not aim to provide:
+
 - Live multi-user editing
 - Real-time shared playback
 - Instant cross-device synchronization
@@ -137,6 +140,7 @@ Eventual consistency is sufficient for the domain.
 ## No Client-Owned State Authority
 
 Clients do not:
+
 - Decide publication state
 - Resolve conflicts independently
 - Define canonical ordering
@@ -149,6 +153,7 @@ Client intelligence never replaces backend authority.
 ## No Over-Engineering Early
 
 The platform intentionally avoids:
+
 - Premature microservices
 - Overly abstract frameworks
 - Excessive indirection
@@ -161,6 +166,7 @@ Complexity is earned, not assumed.
 ## No Hidden Business Logic
 
 Business rules must be:
+
 - Explicit
 - Centralized
 - Documented
@@ -215,6 +221,7 @@ This prevents knowledge from becoming implicit or tribal.
 Salafi Durus is not a short-term project.
 
 Its success depends on:
+
 - Consistency over time
 - Discipline in decision-making
 - Willingness to say “no” to misaligned features

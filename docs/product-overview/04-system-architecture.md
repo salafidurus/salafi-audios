@@ -37,6 +37,7 @@ Each layer has a clearly defined role and communicates with others through well-
 The mobile application is the primary listening interface for Salafi Durus.
 
 It is responsible for:
+
 - User interaction and navigation
 - Audio playback
 - Offline downloads
@@ -69,6 +70,7 @@ Like the mobile application, the web client does not contain business rules or a
 At the center of the system is a single backend API.
 
 This API is responsible for:
+
 - Enforcing business rules
 - Managing user authentication and authorization
 - Handling content visibility and moderation
@@ -80,6 +82,7 @@ The backend is the **single source of truth** for all platform state.
 ### Role-Based Control
 
 All client requests are evaluated through:
+
 - Authentication checks
 - Role-based permissions
 - Scope enforcement for editors
@@ -95,6 +98,7 @@ This ensures that authority is centralized, auditable, and consistent regardless
 Core platform data—such as users, scholars, series, lectures, and listening progress—is stored in a relational database.
 
 This choice reflects the structured nature of the domain and supports:
+
 - Clear relationships between entities
 - Predictable querying
 - Long-term data integrity
@@ -104,6 +108,7 @@ This choice reflects the structured nature of the domain and supports:
 Audio files and images are stored in object storage and delivered through a content delivery network (CDN).
 
 This separation ensures:
+
 - Efficient streaming and downloads
 - Reduced load on backend services
 - Scalable and cost-effective media delivery
@@ -115,6 +120,7 @@ Clients receive media URLs from the backend but do not manage storage directly.
 Usage events and analytics data are intentionally separated from core platform data.
 
 This allows:
+
 - High-volume event ingestion without impacting core functionality
 - Independent scaling and retention policies
 - Future analysis without compromising primary data integrity
@@ -126,6 +132,7 @@ This allows:
 All communication between clients and the backend occurs through structured API requests.
 
 Key characteristics of this model include:
+
 - Stateless client-server interactions
 - Explicit authentication on protected routes
 - Consistent data formats across platforms
@@ -143,6 +150,7 @@ A defining characteristic of the Salafi Durus architecture is **clear separation
 - Infrastructure focuses on durability, scalability, and performance
 
 This separation:
+
 - Simplifies reasoning about the system
 - Reduces coupling between components
 - Enables independent evolution of each layer
@@ -166,6 +174,7 @@ By isolating responsibilities and avoiding tight coupling, failures in one area 
 The architecture of Salafi Durus is intentionally conservative.
 
 It favors:
+
 - Predictability over experimentation
 - Explicit boundaries over implicit coupling
 - Long-term maintainability over short-term shortcuts

@@ -86,8 +86,8 @@ This document, and the platform it describes, are expected to evolve.
 
 However, the vision outlined here is intended to remain stable:
 
-- Knowledge should be preserved with care  
-- Access should be reliable and inclusive  
-- Technology should serve the content, not overshadow it  
+- Knowledge should be preserved with care
+- Access should be reliable and inclusive
+- Technology should serve the content, not overshadow it
 
 All subsequent architectural, implementation, and timeline decisions are guided by this foundation.

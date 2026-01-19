@@ -6,7 +6,7 @@ Data modeling is foundational to the correctness, scalability, and longevity of 
 
 This document defines how data is structured, stored, and evolved across the platform. It establishes clear rules for what belongs in the primary database, what does not, and how different categories of data are separated to preserve integrity and performance.
 
-This is not a low-level schema specification. It is an implementation guide that defines *principles, responsibilities, and constraints* for all persistence-related decisions.
+This is not a low-level schema specification. It is an implementation guide that defines _principles, responsibilities, and constraints_ for all persistence-related decisions.
 
 ---
 
@@ -29,6 +29,7 @@ Each category has different requirements and must be handled independently.
 The primary relational database represents the **authoritative state of the platform**.
 
 It stores data that defines:
+
 - What content exists
 - Who owns or manages it
 - What users have done
@@ -76,6 +77,7 @@ At a minimum, it includes:
   - No derived or inferred state stored here
 
 Optional extensions may include:
+
 - Topics or categories
 - Editorial notes
 - Audit metadata
@@ -110,11 +112,13 @@ Core relational data must follow these principles:
 The relational database **does not store media files**.
 
 Instead, it stores **references to media assets**, such as:
+
 - Audio file identifiers
 - Image identifiers
 - Media variants (if applicable)
 
 This separation ensures that:
+
 - The database remains lightweight
 - Media delivery scales independently
 - Storage infrastructure can change without schema rewrites
@@ -137,9 +141,10 @@ Replacing a media asset is a deliberate operation and does not occur implicitly 
 
 ### Purpose
 
-Analytics and event data captures *behavior*, not *state*.
+Analytics and event data captures _behavior_, not _state_.
 
 Examples include:
+
 - Playback start events
 - Progress updates
 - Completion events
@@ -154,6 +159,7 @@ This data is useful for analysis and improvement, but it is **not authoritative*
 Analytics data must never be stored in the core relational database.
 
 Reasons include:
+
 - High write volume
 - Different retention requirements
 - Different query patterns
@@ -166,6 +172,7 @@ Analytics data is stored in a separate system designed for append-only, high-thr
 ### Modeling Rules for Analytics
 
 Analytics data:
+
 - Is append-only
 - Does not enforce relational constraints
 - Is not required for core functionality
@@ -180,12 +187,14 @@ The platform must remain fully functional even if analytics systems are unavaila
 ### Local Data on Clients
 
 Clients may store local data to support:
+
 - Offline playback
 - Cached metadata
 - Temporary progress
 - Pending synchronization actions
 
 However:
+
 - Client-side data is never authoritative
 - It may be replaced or invalidated at any time
 - It must reconcile with backend state upon synchronization
@@ -201,6 +210,7 @@ Client persistence exists for usability, not ownership.
 The relational schema is expected to evolve.
 
 Schema changes must:
+
 - Be explicit and versioned
 - Be forward-compatible where possible
 - Avoid destructive changes without migration paths
@@ -212,6 +222,7 @@ Migrations are treated as part of the application lifecycle, not ad-hoc operatio
 ### Backward Compatibility
 
 When possible:
+
 - New columns should be additive
 - Existing data should remain valid
 - Clients should tolerate missing or additional fields
@@ -237,6 +248,7 @@ Violations of this rule indicate architectural drift.
 ## Data Integrity and Trust
 
 The database enforces integrity through:
+
 - Constraints
 - Explicit state modeling
 - Backend-only write access
@@ -252,6 +264,7 @@ All writes to authoritative data occur through validated backend workflows.
 Data modeling decisions are made with longevity in mind.
 
 The schema should:
+
 - Remain understandable years later
 - Reflect real domain concepts
 - Avoid transient or trend-driven structures

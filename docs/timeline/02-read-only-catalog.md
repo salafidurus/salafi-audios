@@ -5,6 +5,7 @@
 The Read-Only Catalog phase delivers the **first end-user–visible value** of Salafi Durus.
 
 The goal is to make scholars, series, and lectures:
+
 - Discoverable
 - Navigable
 - Consistently structured
@@ -30,6 +31,7 @@ Users can explore content, but not yet interact with it.
 ## Scope
 
 ### Included
+
 - Core domain entities (read-only)
 - Public backend APIs
 - Mobile browsing UI
@@ -37,6 +39,7 @@ Users can explore content, but not yet interact with it.
 - SEO-ready web pages
 
 ### Explicitly Excluded
+
 - Authentication
 - Playback progress
 - Favorites or library
@@ -57,6 +60,7 @@ Implement the core domain entities:
 - Lectures
 
 Each entity must have:
+
 - Stable identifiers
 - Clear relationships
 - Explicit publication state
@@ -76,6 +80,7 @@ Expose read-only public endpoints for:
 - Viewing lecture metadata
 
 These endpoints:
+
 - Require no authentication
 - Perform no writes
 - Enforce publication visibility strictly
@@ -85,6 +90,7 @@ These endpoints:
 ### Data Validation
 
 The backend must ensure:
+
 - Draft or archived content is never exposed
 - Relationships are consistent
 - Ordering is deterministic
@@ -105,6 +111,7 @@ Implement public pages for:
 - Lecture detail (metadata only)
 
 These pages:
+
 - Are accessible without login
 - Use semantic URLs
 - Are server-rendered or statically generated where appropriate
@@ -114,6 +121,7 @@ These pages:
 ### SEO and Discoverability
 
 The web app must:
+
 - Generate correct metadata
 - Use canonical URLs
 - Support sharing
@@ -134,6 +142,7 @@ Implement mobile screens for:
 - Lecture detail
 
 The mobile app:
+
 - Fetches data from the public API
 - Displays structured content
 - Does not store persistent state
@@ -143,6 +152,7 @@ The mobile app:
 ### Navigation Validation
 
 This phase validates:
+
 - Feature-based navigation structure
 - Routing stability
 - Screen composition patterns
@@ -161,6 +171,7 @@ This phase is critical for validating:
 - Loading and empty states
 
 Clients must handle:
+
 - Slow responses
 - Missing content
 - Empty lists

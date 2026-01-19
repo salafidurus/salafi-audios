@@ -44,6 +44,7 @@ Each layer has a defined role and must not assume responsibilities belonging to 
 The interface layer defines how external systems interact with the backend.
 
 It is responsible for:
+
 - Accepting requests
 - Validating input shape
 - Authenticating identity
@@ -67,6 +68,7 @@ This layer exists to translate external intent into internal actions.
 The application layer orchestrates use cases.
 
 It is responsible for:
+
 - Coordinating domain operations
 - Enforcing high-level workflows
 - Managing transactions
@@ -81,7 +83,7 @@ It is responsible for:
 - Calls domain logic explicitly
 - Does not know about HTTP or transport details
 
-This layer answers the question: *What should happen next?*
+This layer answers the question: _What should happen next?_
 
 ---
 
@@ -92,6 +94,7 @@ This layer answers the question: *What should happen next?*
 The domain layer represents the core business concepts of Salafi Durus.
 
 It defines:
+
 - Entities (e.g., Scholar, Series, Lecture)
 - Value objects
 - Invariants and constraints
@@ -104,7 +107,7 @@ It defines:
 - Enforces correctness at the model level
 - Does not depend on persistence or networking
 
-This layer answers the question: *What is allowed?*
+This layer answers the question: _What is allowed?_
 
 ---
 
@@ -115,6 +118,7 @@ This layer answers the question: *What is allowed?*
 The infrastructure layer provides technical capabilities required by the domain and application layers.
 
 It includes:
+
 - Database access
 - Media storage integration
 - Analytics/event storage
@@ -126,7 +130,7 @@ It includes:
 - Can be swapped or extended without rewriting business logic
 - Contains no decision-making authority
 
-This layer answers the question: *How is it done technically?*
+This layer answers the question: _How is it done technically?_
 
 ---
 
@@ -135,6 +139,7 @@ This layer answers the question: *How is it done technically?*
 The backend is organized into modules aligned with domain boundaries.
 
 Each module:
+
 - Encapsulates a specific responsibility
 - Owns its data access
 - Exposes clear interfaces
@@ -161,6 +166,7 @@ Modules communicate through explicit interfaces, not shared state.
 Authentication and authorization span multiple layers but remain centralized.
 
 Key principles:
+
 - Authentication establishes identity
 - Authorization determines permission
 - Role and scope checks occur before state changes
@@ -180,6 +186,7 @@ The backend is responsible for managing the full content lifecycle:
 - Archived
 
 Only the backend may:
+
 - Change publication state
 - Expose or hide content
 - Resolve conflicting edits
@@ -193,6 +200,7 @@ This ensures that content visibility remains predictable and auditable.
 The backend does not store media files directly.
 
 Instead, it:
+
 - Authorizes uploads
 - Issues time-bound upload permissions
 - Records references to media assets
@@ -207,6 +215,7 @@ Media is treated as external infrastructure governed by backend-issued authority
 Analytics and event ingestion are architecturally isolated.
 
 Characteristics:
+
 - High write volume
 - Non-authoritative
 - Failure-tolerant
@@ -237,6 +246,7 @@ The backend is designed to evolve through:
 - Additional integrations
 
 Evolution should occur without:
+
 - Rewriting core logic
 - Weakening trust boundaries
 - Introducing duplicated rules

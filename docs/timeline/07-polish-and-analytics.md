@@ -5,6 +5,7 @@
 The Polish and Analytics phase prepares Salafi Durus for sustained real-world use.
 
 The goal is to:
+
 - Observe how the platform is actually used
 - Improve performance and reliability
 - Refine user experience
@@ -31,6 +32,7 @@ The platform is ready for real users and continuous improvement.
 ## Scope
 
 ### Included
+
 - Analytics ingestion
 - Observability and monitoring
 - Performance optimization
@@ -38,6 +40,7 @@ The platform is ready for real users and continuous improvement.
 - Operational readiness
 
 ### Explicitly Excluded
+
 - New domain features
 - Social or recommendation systems
 - Major architectural changes
@@ -59,6 +62,7 @@ Implement analytics ingestion that captures:
 - Error events (non-sensitive)
 
 Analytics events:
+
 - Are append-only
 - Do not modify authoritative state
 - Are tolerant of loss and duplication
@@ -70,11 +74,13 @@ Failure to record analytics must not affect user experience.
 ### Analytics Scope
 
 Analytics are used to understand:
+
 - Usage patterns
 - Performance bottlenecks
 - Feature adoption
 
 Analytics are **not** used for:
+
 - Authorization decisions
 - Content visibility
 - User-facing behavior changes
@@ -96,6 +102,7 @@ The backend must log:
 - Unexpected exceptions
 
 Logs:
+
 - Are structured
 - Avoid sensitive data
 - Support tracing and debugging
@@ -112,6 +119,7 @@ Implement monitoring for:
 - Resource usage
 
 Health endpoints must reflect:
+
 - Service readiness
 - Dependency availability
 
@@ -128,6 +136,7 @@ Mobile and web clients should:
 - Associate reports with environment and version
 
 Error reporting must:
+
 - Respect user privacy
 - Avoid sensitive data
 - Be actionable
@@ -151,6 +160,7 @@ These signals guide UX and performance improvements.
 ### Backend
 
 Focus on:
+
 - Query efficiency
 - Caching where appropriate
 - Rate limiting for abuse prevention
@@ -162,6 +172,7 @@ Backend optimizations must not change API semantics.
 ### Web
 
 Focus on:
+
 - Page load time
 - Server-side rendering efficiency
 - Asset optimization
@@ -173,6 +184,7 @@ SEO and performance go hand-in-hand.
 ### Mobile
 
 Focus on:
+
 - Startup performance
 - Playback reliability
 - Download efficiency
@@ -187,6 +199,7 @@ Mobile performance directly impacts user trust.
 ### Refinement Areas
 
 Polish includes:
+
 - Clear loading states
 - Meaningful error messages
 - Consistent visual hierarchy
@@ -199,6 +212,7 @@ Small improvements here have outsized impact.
 ### Consistency
 
 Ensure consistency across:
+
 - Mobile and web terminology
 - Icons and actions
 - Error handling patterns
@@ -212,6 +226,7 @@ Consistency reduces cognitive load.
 ### Deployment Confidence
 
 By this phase:
+
 - Promotions via tags are routine
 - Rollbacks are tested and understood
 - CI/CD failures are rare and actionable
@@ -223,6 +238,7 @@ Deployments should no longer feel risky.
 ### Documentation Updates
 
 Update documentation to reflect:
+
 - Real-world learnings
 - Clarified assumptions
 - Adjusted best practices
