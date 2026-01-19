@@ -1,0 +1,22 @@
+# <type>(<scope>): <subject>
+#
+# Types:
+# feat     A new feature
+# fix      A bug fix
+# docs     Documentation only changes
+# style    Formatting, no logic changes
+# refactor Code change without feature or bug fix
+# perf     Performance improvement
+# test     Tests only
+# build    Build system or dependencies
+# ci       CI configuration
+# chore    Maintenance tasks
+# revert   Revert a previous commit
+#
+# Example:
+# feat(api): add lectures list endpoint
+#
+# Rules:
+# - Use imperative, present tense
+# - Subject <= 72 characters
+# - Blank line after subject

@@ -10,13 +10,19 @@
     "test": "turbo test",
     "format": "prettier -w .",
     "format:check": "prettier -c .",
-    "clean": "turbo clean && rimraf node_modules"
+    "clean": "turbo clean && rimraf node_modules",
+    "prepare": "husky",
+    "lint:staged": "lint-staged"
   },
   "devDependencies": {
-    "turbo": "^2.0.0",
-    "prettier": "^3.3.3",
+    "@commitlint/cli": "^20.3.1",
+    "@commitlint/config-conventional": "^20.3.1",
     "eslint": "^9.0.0",
-    "typescript": "^5.9.0",
-    "rimraf": "^6.0.0"
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.3.3",
+    "rimraf": "^6.0.0",
+    "turbo": "^2.0.0",
+    "typescript": "^5.9.0"
   }
 }
