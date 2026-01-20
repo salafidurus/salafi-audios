@@ -9,7 +9,7 @@
     "dev:mobile": "pnpm --filter mobile dev",
     "build": "turbo build",
     "lint": "turbo lint",
-    "typecheck": "turbo typecheck",
+    "typecheck": "turbo typecheck --concurrency 1",
     "test": "turbo test",
     "format": "prettier -w .",
     "format:check": "prettier -c .",
@@ -23,13 +23,19 @@
   "devDependencies": {
     "@commitlint/cli": "^20.3.1",
     "@commitlint/config-conventional": "^20.3.1",
+    "@types/react": "^19.2.9",
+    "@typescript-eslint/eslint-plugin": "^8.53.1",
+    "@typescript-eslint/parser": "^8.53.1",
     "eslint": "^9.0.0",
+    "eslint-config-expo": "~10.0.0",
+    "eslint-plugin-import": "^2.32.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "prettier": "^3.3.3",
     "rimraf": "^6.0.0",
     "tsx": "^4.21.0",
     "turbo": "^2.0.0",
-    "typescript": "^5.9.0"
+    "typescript": "^5.9.0",
+    "typescript-eslint": "^8.53.1"
   }
 }

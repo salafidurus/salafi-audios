@@ -6,3 +6,6 @@ build
 expo-env.d.ts
 coverage
 pnpm-lock.yaml
+.turbo
+apps/api/openapi.json
+packages/api-client/generated

@@ -8,5 +8,9 @@
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@sd/config": "workspace:*",
+    "typescript": "^5.9.0"
   }
 }
