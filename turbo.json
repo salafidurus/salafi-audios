@@ -20,6 +20,10 @@
       "dependsOn": ["^test"],
       "outputs": ["coverage/**"]
     },
+    "test:prepush": {
+      "dependsOn": ["^test:prepush"],
+      "outputs": ["coverage/**"]
+    },
     "openapi": {
       "dependsOn": ["^openapi"],
       "outputs": ["openapi.json"]
