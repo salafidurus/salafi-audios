@@ -12,6 +12,9 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
@@ -20,6 +23,7 @@
     "react-dom": "19.2.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.57.0",
     "@sd/config": "workspace:*",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
