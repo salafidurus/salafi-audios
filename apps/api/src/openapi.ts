@@ -6,6 +6,8 @@ import { AppModule } from './app.module';
 async function generate() {
   const app = await NestFactory.create(AppModule, { logger: false });
 
+  await app.init();
+
   const config = new DocumentBuilder()
     .setTitle('Salafi Durus API')
     .setDescription('Backend API for Salafi Durus')

@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "paths": {
-    "/": {
+    "/v1": {
       "get": {
         "operationId": "AppController_getHello",
         "parameters": [],
@@ -11,6 +11,27 @@
           }
         },
         "tags": ["App"]
+      }
+    },
+    "/v1/health": {
+      "get": {
+        "operationId": "HealthController_getHealth",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "API health check",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "status": "ok"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Health"]
       }
     }
   },
