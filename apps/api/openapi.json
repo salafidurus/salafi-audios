@@ -21,9 +21,17 @@
         "parameters": [],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponseDto"
+                }
+              }
+            }
           }
         },
+        "summary": "Health check",
         "tags": [
           "Health"
         ]
@@ -46,6 +54,40 @@
         "type": "http"
       }
     },
-    "schemas": {}
+    "schemas": {
+      "HealthResponseDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok"
+            ],
+            "example": "ok",
+            "description": "Overall service status"
+          },
+          "timestamp": {
+            "type": "string",
+            "example": "2026-01-21T20:18:36.123Z",
+            "description": "Server timestamp in ISO 8601 format",
+            "format": "date-time"
+          },
+          "service": {
+            "type": "string",
+            "example": "salafi-durus-api",
+            "description": "Service name"
+          },
+          "environment": {
+            "type": "string",
+            "example": "development",
+            "description": "Node environment"
+          }
+        },
+        "required": [
+          "status",
+          "timestamp"
+        ]
+      }
+    }
   }
 }

@@ -128,7 +128,7 @@ export function useAppControllerGetHello<
 }
 
 export const healthControllerGetHealth = (signal?: AbortSignal) => {
-  return httpClient<unknown>({ url: `/health`, method: "GET", signal });
+  return httpClient<void>({ url: `/health`, method: "GET", signal });
 };
 
 export const getHealthControllerGetHealthQueryKey = () => {
