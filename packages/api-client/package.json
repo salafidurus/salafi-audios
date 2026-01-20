@@ -1,0 +1,21 @@
+{
+  "name": "@sd/api-client",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "codegen": "orval --config ./orval.config.cjs",
+    "lint": "eslint .",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "orval": "^7.10.0",
+    "typescript": "^5.9.0"
+  },
+  "peerDependencies": {
+    "@tanstack/react-query": "^5",
+    "react": ">=18"
+  }
+}

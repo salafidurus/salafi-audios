@@ -15,7 +15,10 @@
     "format:check": "prettier -c .",
     "clean": "turbo clean && rimraf node_modules",
     "prepare": "husky",
-    "lint:staged": "lint-staged"
+    "lint:staged": "lint-staged",
+    "openapi": "turbo openapi",
+    "codegen": "turbo codegen",
+    "codegen:all": "turbo openapi codegen"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.3.1",
