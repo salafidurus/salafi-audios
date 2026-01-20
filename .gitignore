@@ -2,3 +2,5 @@ node_modules/
 .turbo/
 **/.turbo/
 **/node_modules/
+coverage/
+**/coverage/
