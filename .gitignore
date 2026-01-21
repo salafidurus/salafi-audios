@@ -12,3 +12,10 @@ coverage/
 **/.env.test.local
 **/.env.production.local
 **/.env.local
+
+# infra env files (never commit)
+infra/envs/.env.*
+infra/envs/*.env
+
+# temp deploy files
+.deploy_tmp/

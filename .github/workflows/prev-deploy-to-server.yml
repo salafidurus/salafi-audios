@@ -20,12 +20,7 @@ jobs:
       DEPLOY_DIR: ${{ vars.DEPLOY_DIR }}
       SERVER_USER: ${{ vars.SERVER_USER }}
       SERVER_HOST: ${{ vars.SERVER_HOST }}
-      # repo-level variable (global)
-      NEST_PORT: ${{ vars.NEST_PORT }}
-      # environment-level variables (define these under Settings > Environments > preview → Variables)
-      PREVIEW_NODE_ENV: ${{ vars.NODE_ENV }}
-      PREVIEW_DB_USER: ${{ vars.DB_USER }}
-      PREVIEW_DB_NAME: ${{ vars.DB_NAME }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -63,26 +58,18 @@ jobs:
           R2_SECRET_ACCESS_KEY=${{ secrets.R2_SECRET_ACCESS_KEY }}
           R2_BUCKET=${{ secrets.R2_BUCKET }}
           EOF
-          # for safety show non-secret lines (optional)
-          echo "Preview env generated (secrets suppressed):"
-          sed -n '1,10p' .deploy_tmp/env.preview
 
-      - name: Rsync monorepo to server (/code)
+      - name: Rsync repo to server
         run: |
-          ssh -o StrictHostKeyChecking=no "${{ vars.SERVER_USER }}@${{ vars.SERVER_HOST }}" "mkdir -p ${DEPLOY_DIR}/code && chmod 755 ${DEPLOY_DIR}/code"
-          rsync -az --delete --exclude='.git' --exclude='node_modules' ./ "${{ vars.SERVER_USER }}@${{ vars.SERVER_HOST }}:${DEPLOY_DIR}/code/"
-
-      - name: Rsync infra folder to server (/infra)
-        run: |
-          ssh -o StrictHostKeyChecking=no "${{ vars.SERVER_USER }}@${{ vars.SERVER_HOST }}" "mkdir -p ${DEPLOY_DIR}/infra && chmod 700 ${DEPLOY_DIR}/infra"
-          rsync -az --delete infra/ "${{ vars.SERVER_USER }}@${{ vars.SERVER_HOST }}:${DEPLOY_DIR}/infra/"
+          ssh -o StrictHostKeyChecking=no "${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}" "mkdir -p ${DEPLOY_DIR}/repo && chmod 755 ${DEPLOY_DIR}/repo"
+          rsync -az --delete --exclude='.git' --exclude='node_modules' ./ "${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:${DEPLOY_DIR}/repo/"
 
       - name: Rsync env file to server (secure)
         run: |
-          # ensure envs folder exists and has correct perms
-          ssh -o StrictHostKeyChecking=no "${{ vars.SERVER_USER }}@${{ vars.SERVER_HOST }}" "mkdir -p ${DEPLOY_DIR}/infra/envs && chmod 700 ${DEPLOY_DIR}/infra/envs"
-          rsync -az --chmod=600 .deploy_tmp/env.preview "${{ vars.SERVER_USER }}@${{ vars.SERVER_HOST }}:${DEPLOY_DIR}/infra/envs/.env.preview"
+          ssh -o StrictHostKeyChecking=no "${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}" "mkdir -p ${DEPLOY_DIR}/repo/infra/envs && chmod 700 ${DEPLOY_DIR}/repo/infra/envs"
+          rsync -az --chmod=600 .deploy_tmp/env.preview "${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:${DEPLOY_DIR}/repo/infra/envs/.env.preview"
 
       - name: Deploy and run preview migrations
         run: |
-          ssh -o StrictHostKeyChecking=no "${{ vars.SERVER_USER }}@${{ vars.SERVER_HOST }}" bash -lc "cd ${DEPLOY_DIR}/infra && ./scripts/deploy.sh && ./scripts/migrate_preview.sh"
+          ssh -o StrictHostKeyChecking=no "${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}" \
+            bash -lc "cd ${DEPLOY_DIR}/repo/infra && ./scripts/deploy.sh && ./scripts/migrate_preview.sh"
