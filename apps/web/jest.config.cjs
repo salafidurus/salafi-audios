@@ -15,7 +15,7 @@ const customJestConfig = {
   },
 
   // Typical ignores
-  testPathIgnorePatterns: ["<rootDir>/.next/", "<rootDir>/node_modules/"],
+  testPathIgnorePatterns: ["<rootDir>/.next/", "<rootDir>/node_modules/", "<rootDir>/e2e/"],
 
   collectCoverageFrom: [
     "src/**/*.{ts,tsx,js,jsx}",

@@ -8,7 +8,7 @@
     },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", "build/**", ".next/**"]
+      "outputs": ["dist/**", "build/**", ".next/**", "lib/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]
@@ -18,15 +18,14 @@
     },
     "test": {
       "dependsOn": ["^test"],
-      "outputs": ["coverage/**"]
+      "cache": true
     },
     "test:e2e": {
       "dependsOn": ["^test:e2e"],
       "cache": false
     },
     "test:prepush": {
-      "dependsOn": ["^test:prepush"],
-      "outputs": ["coverage/**"]
+      "dependsOn": ["^test:prepush"]
     },
     "openapi": {
       "dependsOn": ["^openapi"],
