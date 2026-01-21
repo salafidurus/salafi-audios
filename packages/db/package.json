@@ -11,10 +11,21 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prisma:generate": "prisma generate --schema=./prisma/schema.prisma",
+    "migrate:dev": "prisma migrate dev --schema=./prisma/schema.prisma",
+    "migrate:deploy": "prisma migrate deploy --schema=./prisma/schema.prisma",
+    "apply:postsql": "node ./scripts/run_post_migration_sql.js",
+    "apply:migrations": "./scripts/apply_migrations.sh",
+    "cron:hard-delete": "node ./scripts/hard_delete_cron.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.0.0"
   },
   "devDependencies": {
     "@sd/config": "workspace:*",
+    "prisma": "^5.0.0",
+    "pg": "^8.0.0",
     "@types/jest": "^30.0.0",
     "jest": "^30.2.0",
     "ts-jest": "^29.4.6",

@@ -8,6 +8,8 @@
   "scripts": {
     "codegen": "orval --config ./orval.config.cjs",
     "lint": "eslint .",
+    "test": "echo \"@sd/api-client: skipped (generated)\"",
+    "test:prepush": "echo \"@sd/api-client: skipped (generated)\"",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {

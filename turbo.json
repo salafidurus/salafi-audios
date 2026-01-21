@@ -29,10 +29,12 @@
     },
     "openapi": {
       "dependsOn": ["^openapi"],
+      "inputs": ["src/**", "package.json", "tsconfig.json"],
       "outputs": ["openapi.json"]
     },
     "codegen": {
       "dependsOn": ["openapi"],
+      "inputs": ["openapi.json", "orval.config.cjs"],
       "outputs": ["src/generated/**"]
     },
     "clean": {

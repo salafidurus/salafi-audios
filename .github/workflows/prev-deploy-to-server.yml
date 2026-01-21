@@ -1,0 +1,88 @@
+name: Deploy Preview on tag
+
+on:
+  push:
+    tags:
+      - "preview/*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-preview-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment: preview
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_DIR: ${{ vars.DEPLOY_DIR }}
+      SERVER_USER: ${{ vars.SERVER_USER }}
+      SERVER_HOST: ${{ vars.SERVER_HOST }}
+      # repo-level variable (global)
+      NEST_PORT: ${{ vars.NEST_PORT }}
+      # environment-level variables (define these under Settings > Environments > preview → Variables)
+      PREVIEW_NODE_ENV: ${{ vars.NODE_ENV }}
+      PREVIEW_DB_USER: ${{ vars.DB_USER }}
+      PREVIEW_DB_NAME: ${{ vars.DB_NAME }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup ssh-agent
+        uses: webfactory/ssh-agent@v0.9.1
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Ensure rsync available
+        run: sudo apt-get update && sudo apt-get install -y rsync
+
+      - name: Create preview env file (locally on runner)
+        run: |
+          mkdir -p .deploy_tmp
+          cat > .deploy_tmp/env.preview <<EOF
+          NODE_ENV=${{ vars.NODE_ENV }}
+          PORT=${{ vars.NEST_PORT }}
+          HOST_API_PORT=${{ vars.HOST_API_PORT }}
+
+          DATABASE_URL=postgresql://${{ vars.DB_USER }}:${{ secrets.DB_PASSWORD }}@postgres_preview:5432/${{ vars.DB_NAME }}
+
+          DB_USER=${{ vars.DB_USER }}
+          DB_NAME=${{ vars.DB_NAME }}
+          DB_HOST=postgres_preview
+          DB_PORT=5432
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+
+          R2_ACCOUNT_ID=${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID=${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY=${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET=${{ secrets.R2_BUCKET }}
+          EOF
+          # for safety show non-secret lines (optional)
+          echo "Preview env generated (secrets suppressed):"
+          sed -n '1,10p' .deploy_tmp/env.preview
+
+      - name: Rsync monorepo to server (/code)
+        run: |
+          ssh -o StrictHostKeyChecking=no "${{ vars.SERVER_USER }}@${{ vars.SERVER_HOST }}" "mkdir -p ${DEPLOY_DIR}/code && chmod 755 ${DEPLOY_DIR}/code"
+          rsync -az --delete --exclude='.git' --exclude='node_modules' ./ "${{ vars.SERVER_USER }}@${{ vars.SERVER_HOST }}:${DEPLOY_DIR}/code/"
+
+      - name: Rsync infra folder to server (/infra)
+        run: |
+          ssh -o StrictHostKeyChecking=no "${{ vars.SERVER_USER }}@${{ vars.SERVER_HOST }}" "mkdir -p ${DEPLOY_DIR}/infra && chmod 700 ${DEPLOY_DIR}/infra"
+          rsync -az --delete infra/ "${{ vars.SERVER_USER }}@${{ vars.SERVER_HOST }}:${DEPLOY_DIR}/infra/"
+
+      - name: Rsync env file to server (secure)
+        run: |
+          # ensure envs folder exists and has correct perms
+          ssh -o StrictHostKeyChecking=no "${{ vars.SERVER_USER }}@${{ vars.SERVER_HOST }}" "mkdir -p ${DEPLOY_DIR}/infra/envs && chmod 700 ${DEPLOY_DIR}/infra/envs"
+          rsync -az --chmod=600 .deploy_tmp/env.preview "${{ vars.SERVER_USER }}@${{ vars.SERVER_HOST }}:${DEPLOY_DIR}/infra/envs/.env.preview"
+
+      - name: Deploy and run preview migrations
+        run: |
+          ssh -o StrictHostKeyChecking=no "${{ vars.SERVER_USER }}@${{ vars.SERVER_HOST }}" bash -lc "cd ${DEPLOY_DIR}/infra && ./scripts/deploy.sh && ./scripts/migrate_preview.sh"
