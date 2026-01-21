@@ -88,6 +88,12 @@ jobs:
           EOF
           chmod 600 "${DEPLOY_DIR}/infra/envs/.env.preview"
 
+      - name: Make infra scripts executable
+        shell: bash
+        run: |
+          set -euo pipefail
+          chmod +x "${DEPLOY_DIR}/code/infra/scripts/"*.sh
+
       - name: Deploy preview containers
         shell: bash
         run: |
