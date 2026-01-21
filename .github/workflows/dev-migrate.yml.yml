@@ -13,11 +13,26 @@ concurrency:
 jobs:
   migrate-dev:
     environment: development
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, ubuntu-salafi-durus-preview-app]
+
     env:
+      # repo-level variables (Settings → Variables)
       DEPLOY_DIR: ${{ vars.DEPLOY_DIR }}
-      SERVER_USER: ${{ vars.SERVER_USER }}
-      SERVER_HOST: ${{ vars.SERVER_HOST }}
+
+      # environment-level variables (Settings → Environments → development → Variables)
+      NODE_ENV: ${{ vars.NODE_ENV }}
+      NEST_PORT: ${{ vars.NEST_PORT }}
+      HOST_API_PORT: ${{ vars.HOST_API_PORT }}
+      DB_USER: ${{ vars.DB_USER }}
+      DB_NAME: ${{ vars.DB_NAME }}
+
+      # environment-level secrets (Settings → Environments → development → Secrets)
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
 
     steps:
       - name: Checkout
@@ -25,44 +40,53 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Setup ssh-agent
-        uses: webfactory/ssh-agent@v0.9.1
-        with:
-          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
-
-      - name: Ensure rsync available
-        run: sudo apt-get update && sudo apt-get install -y rsync
-
-      - name: Create dev env file (locally on runner)
+      - name: Ensure deploy folder exists
+        shell: bash
         run: |
-          mkdir -p .deploy_tmp
-          cat > .deploy_tmp/env.dev <<EOF
-          NODE_ENV=${{ vars.NODE_ENV }}
-          PORT=${{ vars.NEST_PORT }}
-          HOST_API_PORT=${{ vars.HOST_API_PORT }}
+          set -euo pipefail
+          mkdir -p "${DEPLOY_DIR}"
+          mkdir -p "${DEPLOY_DIR}/infra/envs"
+          chmod 700 "${DEPLOY_DIR}/infra/envs"
 
-          DATABASE_URL=postgresql://${{ vars.DB_USER }}:${{ secrets.DB_PASSWORD }}@localhost:5433/${{ vars.DB_NAME }}
+      - name: Sync repo into DEPLOY_DIR (local)
+        shell: bash
+        run: |
+          set -euo pipefail
+          rsync -az --delete \
+            --exclude='.git' \
+            --exclude='node_modules' \
+            ./ "${DEPLOY_DIR}/code/"
 
-          DB_USER=${{ vars.DB_USER }}
-          DB_NAME=${{ vars.DB_NAME }}
+      - name: Write development env file (server-local)
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > "${DEPLOY_DIR}/infra/envs/.env.dev" <<EOF
+          NODE_ENV=${NODE_ENV}
+          PORT=${NEST_PORT}
+          HOST_API_PORT=${HOST_API_PORT}
+
+          # Dev DB exposed on host port 5433 (postgres_dev container)
+          DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@localhost:5433/${DB_NAME}
+
+          DB_USER=${DB_USER}
+          DB_NAME=${DB_NAME}
           DB_HOST=localhost
           DB_PORT=5433
-          DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+          DB_PASSWORD=${DB_PASSWORD}
 
-          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          JWT_SECRET=${JWT_SECRET}
 
-          R2_ACCOUNT_ID=${{ secrets.R2_ACCOUNT_ID }}
-          R2_ACCESS_KEY_ID=${{ secrets.R2_ACCESS_KEY_ID }}
-          R2_SECRET_ACCESS_KEY=${{ secrets.R2_SECRET_ACCESS_KEY }}
-          R2_BUCKET=${{ secrets.R2_BUCKET }}
+          R2_ACCOUNT_ID=${R2_ACCOUNT_ID}
+          R2_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID}
+          R2_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY}
+          R2_BUCKET=${R2_BUCKET}
           EOF
+          chmod 600 "${DEPLOY_DIR}/infra/envs/.env.dev"
 
-      - name: Rsync env file to server
+      - name: Run dev migrations
+        shell: bash
         run: |
-          ssh -o StrictHostKeyChecking=no "${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}" "mkdir -p ${DEPLOY_DIR}/repo/infra/envs && chmod 700 ${DEPLOY_DIR}/repo/infra/envs"
-          rsync -az --chmod=600 .deploy_tmp/env.dev "${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:${DEPLOY_DIR}/repo/infra/envs/.env.dev"
-
-      - name: Run dev migration script on server
-        run: |
-          ssh -o StrictHostKeyChecking=no "${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}" \
-            bash -lc "cd ${DEPLOY_DIR}/repo/infra && ./scripts/migrate_dev.sh"
+          set -euo pipefail
+          cd "${DEPLOY_DIR}/code/infra"
+          ./scripts/migrate_dev.sh
