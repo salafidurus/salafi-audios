@@ -15,7 +15,9 @@ concurrency:
 jobs:
   deploy:
     environment: preview
-    runs-on: [self-hosted, ubuntu-salafi-durus-preview-app]
+    runs-on:
+      - self-hosted
+      - ubuntu-salafi-durus-preview-app
 
     env:
       # repo-level variables (Settings → Variables)

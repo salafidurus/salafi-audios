@@ -13,7 +13,9 @@ concurrency:
 jobs:
   migrate-dev:
     environment: development
-    runs-on: [self-hosted, ubuntu-salafi-durus-preview-app]
+    runs-on:
+      - self-hosted
+      - ubuntu-salafi-durus-preview-app
 
     env:
       # repo-level variables (Settings → Variables)
