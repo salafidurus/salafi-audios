@@ -48,9 +48,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p "${DEPLOY_DIR}"
-          mkdir -p "${DEPLOY_DIR}/infra/envs"
-          chmod 700 "${DEPLOY_DIR}/infra/envs"
+          mkdir -p "${DEPLOY_DIR}/code"
+          mkdir -p "${DEPLOY_DIR}/code/infra/envs"
+          chmod 700 "${DEPLOY_DIR}/code/infra/envs"
 
       - name: Sync repo into DEPLOY_DIR (local)
         shell: bash
@@ -65,7 +65,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat > "${DEPLOY_DIR}/infra/envs/.env.preview" <<EOF
+          cat > "${DEPLOY_DIR}/code/infra/envs/.env.preview" <<EOF
           NODE_ENV=${NODE_ENV}
           PORT=${NEST_PORT}
           HOST_API_PORT=${HOST_API_PORT}
@@ -86,7 +86,7 @@ jobs:
           R2_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY}
           R2_BUCKET=${R2_BUCKET}
           EOF
-          chmod 600 "${DEPLOY_DIR}/infra/envs/.env.preview"
+          chmod 600 "${DEPLOY_DIR}/code/infra/envs/.env.preview"
 
       - name: Make infra scripts executable
         shell: bash
