@@ -99,7 +99,7 @@ jobs:
         run: |
           set -euo pipefail
           cd "${DEPLOY_DIR}/code/infra"
-          ./scripts/deploy.sh
+          ./scripts/deploy_preview.sh
 
       - name: Run preview migrations
         shell: bash

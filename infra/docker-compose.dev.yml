@@ -1,0 +1,22 @@
+services:
+  postgres_dev:
+    image: postgres:15
+    container_name: salafi_postgres_dev
+    restart: unless-stopped
+    env_file:
+      - ./envs/.env.dev
+    environment:
+      - POSTGRES_DB=${DB_NAME:-dev_db}
+      - POSTGRES_USER=${DB_USER:-dev_user}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - pgdata_dev:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - salafi_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-dev_user} -d ${DB_NAME:-dev_db} || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

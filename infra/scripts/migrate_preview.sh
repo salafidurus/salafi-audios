@@ -2,15 +2,19 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-# ensure env exists
-if [ ! -f ./envs/.env.preview ]; then
-  echo "Missing envs/.env.preview"
-  exit 2
-fi
+[ -f ./envs/.env.preview ] || { echo "Missing envs/.env.preview"; exit 2; }
 
-# source envs (safely)
-export $(grep -v '^#' ./envs/.env.preview | xargs)
+set -a
+. ./envs/.env.preview
+set +a
 
-# run migration inside api container (works if prisma is available inside image)
-docker compose exec -T api \
-  sh -lc "DATABASE_URL='${DATABASE_URL}' npx prisma migrate deploy --schema=/usr/src/app/packages/db/prisma/schema.prisma"
+# Ensure preview stack (and network) is up before running migrations
+./scripts/deploy_preview.sh
+
+docker run --rm \
+  --network salafi_salafi_net \
+  -v "$(pwd)/..:/work" \
+  -w /work/packages/db \
+  -e DATABASE_URL="${DATABASE_URL}" \
+  node:20-slim \
+  bash -lc "corepack enable && pnpm -v >/dev/null 2>&1 || npm i -g pnpm && pnpm i --frozen-lockfile && pnpm prisma migrate deploy"

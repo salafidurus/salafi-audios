@@ -1,0 +1,9 @@
+services: {}
+
+volumes:
+  pgdata_preview:
+  pgdata_dev:
+
+networks:
+  salafi_net:
+    driver: bridge
