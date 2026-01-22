@@ -44,32 +44,33 @@ enum ScholarRole {
 
 model User {
   // primary id (cuid)
-  id                String    @id @default(cuid())
+  id                 String    @id @default(cuid())
   // optional email (nullable); we normalize it to emailNormalized for unique checks
-  email             String?
-  emailNormalized   String?   // should be set by app code (lowercase + trim)
-  emailVerifiedAt   DateTime?
-  name              String?
-  preferredLanguage String?
+  email              String?
+  emailNormalized    String? // should be set by app code (lowercase + trim)
+  emailVerifiedAt    DateTime?
+  name               String?
+  preferredLanguage  String?
   // auth
-  passwordHash      String?   // nullable to support social-only accounts
-  passwordUpdatedAt DateTime?
-  lastLoginAt       DateTime?
+  passwordHash       String? // nullable to support social-only accounts
+  passwordUpdatedAt  DateTime?
+  lastLoginAt        DateTime?
   // create / update timestamps
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime? // null = never edited
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime? // null = never edited
   // deletion / erasure flow
-  deactivatedAt     DateTime? // user self-deactivated (soft)
+  deactivatedAt      DateTime? // user self-deactivated (soft)
   erasureRequestedAt DateTime? // user requested full erasure (explicit email flow)
-  erasedAt          DateTime? // actual erasure timestamp (after admin job)
+  erasedAt           DateTime? // actual erasure timestamp (after admin job)
   // moderation
-  isBanned          Boolean   @default(false)
+  isBanned           Boolean   @default(false)
 
   // relations
-  globalRoles       UserGlobalRole[]
-  scholarRoles      UserScholarRole[]
-  progress          UserLectureProgress[]
-  favorites         FavoriteLecture[]
+  globalRoles         UserGlobalRole[]
+  scholarRoles        UserScholarRole[]
+  createdScholarRoles UserScholarRole[]     @relation("createdByUser")
+  progress            UserLectureProgress[]
+  favorites           FavoriteLecture[]
 
   @@index([emailNormalized], map: "idx_user_emailnorm")
   @@index([deactivatedAt], map: "idx_user_deactivated")
@@ -81,7 +82,7 @@ model UserGlobalRole {
   // global roles like 'admin' or 'listener'
   userId    String
   role      GlobalRole
-  createdAt DateTime @default(now())
+  createdAt DateTime   @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Restrict)
 
@@ -91,16 +92,16 @@ model UserGlobalRole {
 
 model UserScholarRole {
   // scoped role: a user can be scholar or scholar_editor for a given scholar
-  userId         String
-  scholarId      String
-  role           ScholarRole
-  createdAt      DateTime @default(now())
+  userId          String
+  scholarId       String
+  role            ScholarRole
+  createdAt       DateTime    @default(now())
   createdByUserId String? // who created this mapping (admin / scholar)
 
-  user    User    @relation(fields: [userId], references: [id], onDelete: Restrict)
-  scholar Scholar @relation(fields: [scholarId], references: [id], onDelete: Restrict)
+  user          User    @relation(fields: [userId], references: [id], onDelete: Restrict)
+  scholar       Scholar @relation(fields: [scholarId], references: [id], onDelete: Restrict)
   // optionally link creator (audit)
-  createdByUser User? @relation("createdByUser", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  createdByUser User?   @relation("createdByUser", fields: [createdByUserId], references: [id], onDelete: SetNull)
 
   @@id([userId, scholarId, role])
   @@index([scholarId, role], map: "idx_user_scholar_role_scholar_role")
@@ -112,22 +113,22 @@ model UserScholarRole {
 //////////////////////////
 
 model Scholar {
-  id           String   @id @default(cuid())
-  slug         String   // e.g. ibn-baz
+  id           String    @id @default(cuid())
+  slug         String // e.g. ibn-baz
   name         String
   bio          String?
   country      String?
   mainLanguage String?
   imageUrl     String?
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
   updatedAt    DateTime?
 
   // relations
-  collections  Collection[]
-  series       Series[]
-  lectures     Lecture[]
-  userRoles    UserScholarRole[]
+  collections Collection[]
+  series      Series[]
+  lectures    Lecture[]
+  userRoles   UserScholarRole[]
 
   @@unique([slug], map: "uq_scholar_slug")
   @@index([isActive], map: "idx_scholar_active")
@@ -138,26 +139,26 @@ model Scholar {
 //////////////////////////
 
 model Collection {
-  id           String   @id @default(cuid())
-  scholarId    String
-  slug         String
-  title        String
-  description  String?
+  id            String    @id @default(cuid())
+  scholarId     String
+  slug          String
+  title         String
+  description   String?
   coverImageUrl String?
-  language     String?
-  status       Status   @default(draft) // now includes 'review'
-  orderIndex   Int?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime?
+  language      String?
+  status        Status    @default(draft) // now includes 'review'
+  orderIndex    Int?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime?
 
   // soft-delete fields for the 30-day grace period
-  deletedAt    DateTime?
+  deletedAt     DateTime?
   deleteAfterAt DateTime?
 
   // relations
-  scholar  Scholar @relation(fields: [scholarId], references: [id], onDelete: Restrict)
-  series   Series[]
-  topics   CollectionTopic[]
+  scholar Scholar           @relation(fields: [scholarId], references: [id], onDelete: Restrict)
+  series  Series[]
+  topics  CollectionTopic[]
 
   @@unique([scholarId, slug], map: "uq_collection_scholar_slug")
   @@index([scholarId, status], map: "idx_collection_scholar_status")
@@ -171,27 +172,27 @@ model Collection {
 //////////////////////////
 
 model Series {
-  id           String   @id @default(cuid())
-  scholarId    String
-  collectionId String?  // nullable: series can be standalone or in a collection
-  slug         String
-  title        String
-  description  String?
+  id            String    @id @default(cuid())
+  scholarId     String
+  collectionId  String? // nullable: series can be standalone or in a collection
+  slug          String
+  title         String
+  description   String?
   coverImageUrl String?
-  language     String?
-  status       Status  @default(draft)
-  orderIndex   Int?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime?
+  language      String?
+  status        Status    @default(draft)
+  orderIndex    Int?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime?
 
-  deletedAt    DateTime?
+  deletedAt     DateTime?
   deleteAfterAt DateTime?
 
   // relations
-  scholar  Scholar @relation(fields: [scholarId], references: [id], onDelete: Restrict)
-  collection Collection? @relation(fields: [collectionId], references: [id], onDelete: Restrict)
-  lectures Lecture[]
-  topics   SeriesTopic[]
+  scholar    Scholar       @relation(fields: [scholarId], references: [id], onDelete: Restrict)
+  collection Collection?   @relation(fields: [collectionId], references: [id], onDelete: Restrict)
+  lectures   Lecture[]
+  topics     SeriesTopic[]
 
   @@unique([scholarId, slug], map: "uq_series_scholar_slug")
   @@index([collectionId, orderIndex], map: "idx_series_collection_order")
@@ -205,30 +206,30 @@ model Series {
 //////////////////////////
 
 model Lecture {
-  id             String   @id @default(cuid())
-  scholarId      String
-  seriesId       String?
-  slug           String
-  title          String
-  description    String?
-  language       String?
-  status         Status  @default(draft)
-  publishedAt    DateTime?
-  orderIndex     Int?
+  id              String    @id @default(cuid())
+  scholarId       String
+  seriesId        String?
+  slug            String
+  title           String
+  description     String?
+  language        String?
+  status          Status    @default(draft)
+  publishedAt     DateTime?
+  orderIndex      Int?
   durationSeconds Int?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime?
 
-  deletedAt      DateTime?
-  deleteAfterAt  DateTime?
+  deletedAt     DateTime?
+  deleteAfterAt DateTime?
 
   // relations
-  scholar  Scholar @relation(fields: [scholarId], references: [id], onDelete: Restrict)
-  series   Series? @relation(fields: [seriesId], references: [id], onDelete: Restrict)
+  scholar     Scholar               @relation(fields: [scholarId], references: [id], onDelete: Restrict)
+  series      Series?               @relation(fields: [seriesId], references: [id], onDelete: Restrict)
   audioAssets AudioAsset[]
-  topics     LectureTopic[]
-  progress   UserLectureProgress[]
-  favorites  FavoriteLecture[]
+  topics      LectureTopic[]
+  progress    UserLectureProgress[]
+  favorites   FavoriteLecture[]
 
   @@unique([scholarId, slug], map: "uq_lecture_scholar_slug")
   @@index([seriesId, orderIndex], map: "idx_lecture_series_order")
@@ -244,22 +245,22 @@ model Lecture {
 //////////////////////////
 
 model AudioAsset {
-  id             String   @id @default(cuid())
-  lectureId      String
-  url            String
-  format         String?
-  bitrateKbps    Int?
-  sizeBytes      BigInt?
+  id              String   @id @default(cuid())
+  lectureId       String
+  url             String
+  format          String?
+  bitrateKbps     Int?
+  sizeBytes       BigInt?
   durationSeconds Int?
-  source         String?
-  isPrimary      Boolean  @default(false)
-  createdAt      DateTime @default(now())
+  source          String?
+  isPrimary       Boolean  @default(false)
+  createdAt       DateTime @default(now())
 
   lecture Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
-
-  @@index([lectureId], map: "idx_audioasset_lecture")
   // partial unique index for primary must be created via raw SQL after migration:
   //   CREATE UNIQUE INDEX uq_audioasset_lecture_primary ON "AudioAsset"("lectureId") WHERE (isPrimary);
+
+  @@index([lectureId], map: "idx_audioasset_lecture")
 }
 
 //////////////////////////
@@ -273,10 +274,10 @@ model Topic {
   parentId  String?
   createdAt DateTime @default(now())
 
-  parent    Topic?   @relation("TopicToParent", fields: [parentId], references: [id], onDelete: SetNull)
-  children  Topic[]  @relation("TopicToParent")
-  lectureTopics  LectureTopic[]
-  seriesTopics   SeriesTopic[]
+  parent           Topic?            @relation("TopicToParent", fields: [parentId], references: [id], onDelete: SetNull)
+  children         Topic[]           @relation("TopicToParent")
+  lectureTopics    LectureTopic[]
+  seriesTopics     SeriesTopic[]
   collectionTopics CollectionTopic[]
 
   @@unique([slug], map: "uq_topic_slug")
@@ -324,11 +325,11 @@ model CollectionTopic {
 //////////////////////////
 
 model UserLectureProgress {
-  userId         String
-  lectureId      String
-  positionSeconds Int    @default(0)
-  isCompleted    Boolean @default(false)
-  updatedAt      DateTime @default(now())
+  userId          String
+  lectureId       String
+  positionSeconds Int      @default(0)
+  isCompleted     Boolean  @default(false)
+  updatedAt       DateTime @default(now())
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Restrict)
   lecture Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
