@@ -3,7 +3,9 @@ name: Deploy Preview on tag
 on:
   push:
     tags:
-      - "preview/*"
+      - "v*-preview"
+      - "v*-preview-all"
+      - "v*-preview*api*"
 
 permissions:
   contents: read
