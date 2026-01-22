@@ -71,7 +71,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          DB_PASSWORD_ENC="$(node -p 'encodeURIComponent(process.env.DB_PASSWORD)')"
+          DB_PASSWORD_ENC="$(python3 -c 'import os, urllib.parse; print(urllib.parse.quote(os.environ["DB_PASSWORD"], safe=""))')"
           cat > "${DEPLOY_DIR}/code/infra/envs/.env.dev" <<EOF
           NODE_ENV=${NODE_ENV}
           PORT=${NEST_PORT}
