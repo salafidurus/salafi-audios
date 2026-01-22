@@ -57,6 +57,12 @@ jobs:
           rsync -az --delete \
             --exclude='.git' \
             --exclude='node_modules' \
+            --exclude='.pnpm-store' \
+            --exclude='.pnpm-store/**' \
+            --exclude='.turbo' \
+            --exclude='.turbo/**' \
+            --exclude='dist' \
+            --exclude='dist/**' \
             ./ "${DEPLOY_DIR}/code/"
 
       - name: Write development env file (server-local)
