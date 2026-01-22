@@ -38,6 +38,8 @@ jobs:
       R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
       R2_BUCKET: ${{ secrets.R2_BUCKET }}
 
+      PNPM_STORE_PATH: /home/github-runner/.pnpm-store
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
