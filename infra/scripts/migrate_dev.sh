@@ -13,7 +13,7 @@ set +a
 
 # For migrations we must use the docker network DB host (postgres_dev) rather than localhost:5433.
 # Build a DATABASE_URL usable from inside the docker network:
-MIGRATE_DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@postgres_dev:5432/${DB_NAME}"
+MIGRATE_DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD_ENC}@postgres_dev:5432/${DB_NAME}"
 
 docker run --rm \
   --network salafi_salafi_net \

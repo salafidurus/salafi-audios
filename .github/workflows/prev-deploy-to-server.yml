@@ -75,19 +75,21 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          DB_PASSWORD_ENC="$(node -p 'encodeURIComponent(process.env.DB_PASSWORD)')"
           cat > "${DEPLOY_DIR}/code/infra/envs/.env.preview" <<EOF
           NODE_ENV=${NODE_ENV}
           PORT=${NEST_PORT}
           HOST_API_PORT=${HOST_API_PORT}
 
           # Preview DB inside docker network (postgres_preview service)
-          DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres_preview:5432/${DB_NAME}
+          DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD_ENC}@postgres_preview:5432/${DB_NAME}
 
           DB_USER=${DB_USER}
           DB_NAME=${DB_NAME}
           DB_HOST=postgres_preview
           DB_PORT=5432
           DB_PASSWORD=${DB_PASSWORD}
+          DB_PASSWORD_ENC=${DB_PASSWORD_ENC}
 
           JWT_SECRET=${JWT_SECRET}
 

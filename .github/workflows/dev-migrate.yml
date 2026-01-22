@@ -71,19 +71,21 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          DB_PASSWORD_ENC="$(node -p 'encodeURIComponent(process.env.DB_PASSWORD)')"
           cat > "${DEPLOY_DIR}/code/infra/envs/.env.dev" <<EOF
           NODE_ENV=${NODE_ENV}
           PORT=${NEST_PORT}
           HOST_API_PORT=${HOST_API_PORT}
 
           # Dev DB exposed on host port 5433 (postgres_dev container)
-          DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@localhost:5433/${DB_NAME}
+          DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD_ENC}@localhost:5433/${DB_NAME}
 
           DB_USER=${DB_USER}
           DB_NAME=${DB_NAME}
           DB_HOST=localhost
           DB_PORT=5433
           DB_PASSWORD=${DB_PASSWORD}
+          DB_PASSWORD_ENC=${DB_PASSWORD_ENC}
 
           JWT_SECRET=${JWT_SECRET}
 

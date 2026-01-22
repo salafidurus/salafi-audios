@@ -12,7 +12,7 @@ set +a
 ./scripts/deploy_preview.sh
 
 # Use the docker network hostname for the preview DB service
-MIGRATE_DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@postgres_preview:5432/${DB_NAME}"
+MIGRATE_DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD_ENC}@postgres_preview:5432/${DB_NAME}"
 
 docker run --rm \
   --network salafi_salafi_net \
