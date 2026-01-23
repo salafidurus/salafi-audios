@@ -31,7 +31,7 @@ COPY apps/api/package.json ./apps/api/package.json
 COPY packages/db/package.json ./packages/db/package.json
 
 # Install only production deps (workspace aware)
-RUN pnpm install --frozen-lockfile --prod
+RUN pnpm install --frozen-lockfile --prod --ignore-scripts
 
 # Copy built output
 COPY --from=builder /usr/src/app/apps/api/dist ./dist
