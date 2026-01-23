@@ -11,4 +11,5 @@ set +a
 docker compose -p salafi \
   -f docker-compose.base.yml \
   -f docker-compose.preview.yml \
+  -f docker-compose.caddy.preview.yml \
   up -d --build

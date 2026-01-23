@@ -31,8 +31,6 @@ services:
     depends_on:
       postgres_preview:
         condition: service_healthy
-    ports:
-      - "${HOST_API_PORT:-4000}:${PORT:-4000}"
     networks:
       - salafi_net
     healthcheck:

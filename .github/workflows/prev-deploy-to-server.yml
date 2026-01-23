@@ -31,6 +31,7 @@ jobs:
       HOST_API_PORT: ${{ vars.HOST_API_PORT }}
       DB_USER: ${{ vars.DB_USER }}
       DB_NAME: ${{ vars.DB_NAME }}
+      CADDY_DOMAIN: ${{ vars.CADDY_DOMAIN }}
 
       # environment-level secrets (Settings → Environments → preview → Secrets)
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
@@ -80,6 +81,7 @@ jobs:
           NODE_ENV=${NODE_ENV}
           PORT=${NEST_PORT}
           HOST_API_PORT=${HOST_API_PORT}
+          CADDY_DOMAIN=${CADDY_DOMAIN}
 
           # Preview DB inside docker network (postgres_preview service)
           DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD_ENC}@postgres_preview:5432/${DB_NAME}
