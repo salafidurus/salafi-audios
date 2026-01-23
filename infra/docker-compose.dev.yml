@@ -12,7 +12,7 @@ services:
     volumes:
       - pgdata_dev:/var/lib/postgresql/data
     ports:
-      - "5433:5432"
+      - "127.0.0.1:5433:5432"
     networks:
       - salafi_net
     healthcheck:
