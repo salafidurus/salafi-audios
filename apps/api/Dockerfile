@@ -38,7 +38,7 @@ RUN pnpm build --filter=api...
 
 # Prune to production-only deps (to save space in final image)
 # We run this in a separate step so we can copy it cleanly later
-RUN pnpm prune --prod --no-optional --ignore-scripts
+RUN CI=true pnpm prune --prod --no-optional --ignore-scripts
 
 # ---------------------------------------------------------
 # 3. Target: Migrator (The solution to your 2nd request)
