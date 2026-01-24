@@ -1,6 +1,7 @@
 FROM node:20-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
+RUN apt-get update -y && apt-get install -y openssl ca-certificates
 RUN corepack enable && corepack prepare pnpm@10.28.1 --activate
 
 # ---------------------------------------------------------
@@ -37,7 +38,7 @@ RUN pnpm build --filter=api...
 
 # Prune to production-only deps (to save space in final image)
 # We run this in a separate step so we can copy it cleanly later
-RUN CI=true pnpm prune --prod --no-optional
+RUN pnpm prune --prod --no-optional --ignore-scripts
 
 # ---------------------------------------------------------
 # 3. Target: Migrator (The solution to your 2nd request)
