@@ -30,7 +30,7 @@ RUN pnpm install --frozen-lockfile
 COPY --from=pruner /app/out/full/ .
 
 # Generate Prisma Client (Critical for both API and Migrator)
-RUN pnpm prisma:generate
+RUN pnpm --filter=@sd/db prisma:generate
 
 # Build the API
 RUN pnpm build --filter=api...
