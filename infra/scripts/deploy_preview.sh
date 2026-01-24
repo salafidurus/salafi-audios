@@ -8,6 +8,13 @@ set -a
 . ./envs/.env.preview
 set +a
 
+echo "Building Migrator Image..."
+docker build \
+  -f apps/api/Dockerfile \
+  --target migrator \
+  -t salafi-migrator:preview \
+  .
+
 docker compose -p salafi \
   -f docker-compose.base.yml \
   -f docker-compose.preview.yml \

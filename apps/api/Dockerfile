@@ -1,45 +1,77 @@
-# apps/api/Dockerfile
-FROM node:20-slim AS builder
-WORKDIR /usr/src/app
-
+FROM node:20-slim AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable && corepack prepare pnpm@10.28.1 --activate
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY packages/db/package.json ./packages/db/package.json
-COPY apps/api/package.json ./apps/api/package.json
+# ---------------------------------------------------------
+# 1. Prune Stage: Slice the monorepo
+# ---------------------------------------------------------
+FROM base AS pruner
+WORKDIR /app
+RUN pnpm add -g turbo
+COPY . .
+# Generates a partial monorepo in /app/out/json and /app/out/full
+RUN turbo prune api --docker
 
+# ---------------------------------------------------------
+# 2. Builder Stage: Install deps & Build
+# ---------------------------------------------------------
+FROM base AS builder
+WORKDIR /app
+
+# Copy lockfile and package.json's from the pruned slice
+COPY --from=pruner /app/out/json/ .
+COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+
+# Install ALL dependencies (including devDeps for building)
 RUN pnpm install --frozen-lockfile
 
-COPY . .
+# Copy full source code from the pruned slice
+COPY --from=pruner /app/out/full/ .
 
-WORKDIR /usr/src/app/packages/db
+# Generate Prisma Client (Critical for both API and Migrator)
 RUN pnpm prisma:generate
 
-WORKDIR /usr/src/app/apps/api
-RUN pnpm build
+# Build the API
+RUN pnpm build --filter=api...
+
+# Prune to production-only deps (to save space in final image)
+# We run this in a separate step so we can copy it cleanly later
+RUN pnpm prune --prod --no-optional
+
+# ---------------------------------------------------------
+# 3. Target: Migrator (The solution to your 2nd request)
+# ---------------------------------------------------------
+FROM base AS migrator
+WORKDIR /app
+
+# Copy production node_modules (contains Prisma CLI)
+COPY --from=builder /app/node_modules ./node_modules
+# Copy DB package (contains schema.prisma and migrations folder)
+COPY --from=builder /app/packages/db ./packages/db
+
+# Set working directory to where schema.prisma usually lives
+WORKDIR /app/packages/db
+
+# Default command (can be overridden)
+CMD ["pnpm", "prisma", "migrate", "deploy"]
 
 
-FROM node:20-slim AS runner
-WORKDIR /usr/src/app
+# ---------------------------------------------------------
+# 4. Target: Runner (The API)
+# ---------------------------------------------------------
+FROM base AS runner
+WORKDIR /app
 ENV NODE_ENV=production
 
-RUN corepack enable && corepack prepare pnpm@10.28.1 --activate
+# Copy production dependencies
+COPY --from=builder /app/node_modules ./node_modules
 
-# Copy manifests needed to install prod deps for api (workspace aware)
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/api/package.json ./apps/api/package.json
-COPY packages/db/package.json ./packages/db/package.json
+# Copy built application
+COPY --from=builder /app/apps/api/dist ./apps/api/dist
+COPY --from=builder /app/apps/api/package.json ./apps/api/package.json
 
-# Install only production deps (workspace aware)
-RUN pnpm install --frozen-lockfile --prod --ignore-scripts
+# Copy Prisma Engines/Client (often located in node_modules or package folder)
+COPY --from=builder /app/packages/db/node_modules ./packages/db/node_modules
 
-# Copy built output
-COPY --from=builder /usr/src/app/apps/api/dist ./dist
-
-# If your runtime needs prisma files at runtime (often yes)
-COPY --from=builder /usr/src/app/packages/db/prisma ./packages/db/prisma
-# If your app imports generated prisma client from packages/db, copy it too:
-COPY --from=builder /usr/src/app/packages/db/node_modules/.prisma ./packages/db/node_modules/.prisma
-COPY --from=builder /usr/src/app/packages/db/node_modules/@prisma ./packages/db/node_modules/@prisma
-
-CMD ["node", "dist/main.js"]
+CMD ["node", "apps/api/dist/main.js"]
