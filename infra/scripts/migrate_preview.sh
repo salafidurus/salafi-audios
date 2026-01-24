@@ -18,4 +18,4 @@ docker run --rm \
   --network salafi_salafi_net \
   -e DATABASE_URL="${MIGRATE_DATABASE_URL}" \
   salafi-migrator:preview \
-  pnpm prisma migrate deploy
+  pnpm migrate:deploy
