@@ -1,4 +1,4 @@
-# Phase 07 — Polish and Analytics
+# Phase 08 — Polish and Analytics
 
 ## Purpose of This Phase
 
@@ -290,7 +290,7 @@ Once these are met, the platform is ready for iteration.
 
 ## Closing Note
 
-Phase 07 completes the initial journey of Salafi Durus.
+Phase 08 completes the initial journey of Salafi Durus.
 
 From foundations to offline listening to administration and observation, the platform is now positioned for responsible growth. Future work can proceed with confidence, guided by real usage and protected by the guardrails already established.
 

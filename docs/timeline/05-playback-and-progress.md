@@ -1,4 +1,4 @@
-# Phase 04 — Playback and Progress
+# Phase 05 — Playback and Progress
 
 ## Purpose of This Phase
 
@@ -55,11 +55,13 @@ Listening becomes a first-class, stateful experience.
 
 The backend provides:
 
-- Lecture audio references
+- The lecture’s **primary audio asset** reference
 - Duration metadata (when available)
-- Playback-safe URLs
+- Playback-safe URLs (or time-limited URLs if required by policy)
 
 The backend does not stream audio itself.
+
+Playback always resolves through the lecture’s primary audio asset.
 
 ---
 
@@ -89,6 +91,18 @@ Progress data:
 - Is accessible only to the authenticated owner
 
 The backend enforces strict ownership.
+
+---
+
+### Progress Identity Rules
+
+Progress is stored per:
+
+userId + lectureId
+
+Progress must never be scoped to audio assets.
+
+Audio replacement must not reset, duplicate, or fragment progress.
 
 ---
 
@@ -234,6 +248,9 @@ Errors here are easier to correct before offline support is added.
 - Treating playback state as authoritative
 - Allowing progress updates without authentication
 - Coupling playback logic to UI components
+- Tracking progress per audio file or audio variant
+- Treating audio replacement as a new lecture
+- Letting playback logic infer authoritative state
 
 Playback is infrastructure, not UI logic.
 
@@ -241,7 +258,7 @@ Playback is infrastructure, not UI logic.
 
 ## Exit Criteria Checklist
 
-Before moving to Phase 05, confirm:
+Before moving to Phase 06, confirm:
 
 - [ ] Audio plays reliably on mobile and web
 - [ ] Progress persists correctly
@@ -256,6 +273,6 @@ Only after this checklist is complete should offline support be introduced.
 
 ## Closing Note
 
-Phase 04 delivers the heart of Salafi Durus.
+Phase 05 delivers the heart of Salafi Durus.
 
 If playback and progress do not feel reliable at this stage, offline support will only amplify the problems. Taking the time to validate listening behavior now ensures that the platform can confidently move toward offline-first capabilities next.

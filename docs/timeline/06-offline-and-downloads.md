@@ -1,4 +1,4 @@
-# Phase 05 — Offline and Downloads
+# Phase 06 — Offline and Downloads
 
 ## Purpose of This Phase
 
@@ -93,7 +93,7 @@ Downloads are:
 
 - Stored locally
 - Indexed in local persistence
-- Associated with specific lectures
+- Associated with a specific **audio asset** (the lecture’s primary at download time)
 
 ---
 
@@ -153,6 +153,12 @@ When syncing progress:
 - Client updates local state accordingly
 
 Clients never attempt to reconcile conflicts independently.
+
+### Download vs Progress Separation
+
+- Downloads reference a **specific audio asset**
+- Progress remains **lecture-scoped**
+- Backend reconciliation preserves lecture continuity even if audio assets are replaced
 
 ---
 
@@ -226,7 +232,7 @@ Offline support must never weaken trust boundaries.
 
 ## Exit Criteria Checklist
 
-Before moving to Phase 06, confirm:
+Before moving to Phase 07, confirm:
 
 - [ ] Downloads work reliably
 - [ ] Offline playback functions correctly
@@ -241,6 +247,6 @@ Only after this checklist is complete should admin workflows be introduced.
 
 ## Closing Note
 
-Phase 05 fulfills the promise of Salafi Durus as an offline-first platform.
+Phase 06 fulfills the promise of Salafi Durus as an offline-first platform.
 
 By carefully activating downloads and synchronization only after playback correctness is established, the platform ensures that offline support strengthens—rather than undermines—the listening experience.

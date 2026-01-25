@@ -1,4 +1,4 @@
-# Phase 06 — Admin and Uploads
+# Phase 07 — Admin and Uploads
 
 ## Purpose of This Phase
 
@@ -34,7 +34,7 @@ The platform becomes self-sustaining from a content perspective.
 ### Included
 
 - Admin and scholar editor roles
-- Content CRUD (scholars, series, lectures)
+- Content CRUD (scholars, collections, series, lectures)
 - Single and bulk uploads
 - Media replacement
 - Publishing and moderation workflows
@@ -43,7 +43,7 @@ The platform becomes self-sustaining from a content perspective.
 ### Explicitly Excluded
 
 - Public user submissions
-- Automated ingestion pipelines
+- New ingestion pipeline development (the ingestion path already exists; this phase focuses on human editorial workflows)
 - Offline admin actions
 - Advanced analytics dashboards
 
@@ -82,6 +82,12 @@ Lifecycle transitions:
 - Are explicit API actions
 - Are validated centrally
 - Are auditable
+
+Lifecycle rules apply uniformly to:
+
+- Collections
+- Series
+- Lectures
 
 ---
 
@@ -177,8 +183,10 @@ Replacing media is an explicit editorial action.
 Rules include:
 
 - Replacement requires elevated permissions
-- Old media references are retained or archived
-- Replacement does not affect unrelated metadata
+- Replacement creates a new `AudioAsset` and updates which asset is primary
+- Old audio assets are retained or archived according to policy
+- Replacement does not change lecture identity
+- Replacement does not reset progress or favorites
 - Replacement actions are auditable
 
 Media replacement must never occur implicitly.
@@ -254,7 +262,7 @@ Editorial shortcuts undermine trust.
 
 ## Exit Criteria Checklist
 
-Before moving to Phase 07, confirm:
+Before moving to Phase 08, confirm:
 
 - [ ] Admin and editor roles work correctly
 - [ ] Content can be created and published safely
@@ -269,6 +277,6 @@ Only after this checklist is complete should analytics and polish be added.
 
 ## Closing Note
 
-Phase 06 completes the **content loop** of Salafi Durus.
+Phase 07 completes the **content loop** of Salafi Durus.
 
 With reliable administration, moderation, and uploads in place, the platform is no longer dependent on manual data seeding and is ready to scale responsibly.

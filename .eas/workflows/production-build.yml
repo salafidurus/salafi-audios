@@ -1,0 +1,40 @@
+name: Production Release Build
+
+on:
+  pull_request:
+    branches:
+      - "production"
+    types:
+      - labeled
+    paths:
+      - apps/mobile/src/**
+      - apps/mobile/app.config.ts
+      - apps/mobile/package.json
+      - apps/mobile/assets/**
+
+concurrency:
+  cancel_in_progress: true
+  group: ${{ workflow.filename }}-${{ github.ref }}
+
+jobs:
+  build_android_if_labeled:
+    name: Build Android (production)
+    if: ${{ github.event.label.name == 'build-all' || github.event.label.name == 'build-android' }}
+    type: build
+    environment: production
+    env:
+      EXPO_DEBUG: "1"
+    params:
+      platform: android
+      profile: production
+
+  # build_ios_if_labeled:
+  #   name: Build iOS (production)
+  #   if: ${{ github.event.label.name == 'build-all' || github.event.label.name == 'build-ios' }}
+  #   type: build
+  #   environment: production
+  #   env:
+  #     EXPO_DEBUG: "1"
+  #   params:
+  #     platform: ios
+  #     profile: production

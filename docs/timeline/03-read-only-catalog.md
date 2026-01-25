@@ -1,10 +1,10 @@
-# Phase 02 — Read-Only Catalog
+# Phase 03 — Read-Only Catalog
 
 ## Purpose of This Phase
 
 The Read-Only Catalog phase delivers the **first end-user–visible value** of Salafi Durus.
 
-The goal is to make scholars, series, and lectures:
+The goal is to make scholars, collections, series, and lectures:
 
 - Discoverable
 - Navigable
@@ -56,6 +56,7 @@ Users can explore content, but not yet interact with it.
 Implement the core domain entities:
 
 - Scholars
+- Collections
 - Series
 - Lectures
 
@@ -75,9 +76,11 @@ Expose read-only public endpoints for:
 
 - Listing scholars
 - Viewing a single scholar
-- Listing series (optionally scoped by scholar)
+- Listing collections (optionally scoped by scholar)
+- Viewing a collection and its ordered series
+- Listing series (optionally scoped by scholar or collection)
 - Viewing a series and its ordered lectures
-- Viewing lecture metadata
+- Viewing lecture metadata (including primary audio asset metadata when available)
 
 These endpoints:
 
@@ -106,7 +109,8 @@ This phase validates backend correctness under real client usage.
 Implement public pages for:
 
 - Scholar listing
-- Scholar detail (with series and lectures)
+- Scholar detail (with collections and/or standalone series)
+- Collection detail (ordered series)
 - Series detail (ordered lectures)
 - Lecture detail (metadata only)
 
@@ -138,6 +142,7 @@ Implement mobile screens for:
 
 - Scholar list
 - Scholar detail
+- Collection detail
 - Series detail
 - Lecture detail
 
@@ -221,7 +226,7 @@ These undermine the phase’s purpose.
 
 ## Exit Criteria Checklist
 
-Before moving to Phase 03, confirm:
+Before moving to Phase 04, confirm:
 
 - [ ] Backend exposes stable public APIs
 - [ ] Web pages render correctly and are shareable
@@ -229,6 +234,8 @@ Before moving to Phase 03, confirm:
 - [ ] Only published content is visible
 - [ ] No client writes exist
 - [ ] No auth assumptions exist
+- [ ] Collections are browsable where present
+- [ ] Series outside collections are supported
 
 Only after this checklist is complete should user state be introduced.
 
@@ -236,6 +243,6 @@ Only after this checklist is complete should user state be introduced.
 
 ## Closing Note
 
-Phase 02 establishes the **spine of Salafi Durus**.
+Phase 03 establishes the **spine of Salafi Durus**.
 
 If browsing, structure, and data flow are not correct here, every later feature will suffer. Taking the time to validate the read-only experience ensures that subsequent phases build on a solid, well-understood foundation.

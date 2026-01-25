@@ -1,4 +1,4 @@
-# Phase 03 — Authentication and User State
+# Phase 04 — Authentication and User State
 
 ## Purpose of This Phase
 
@@ -92,6 +92,16 @@ This state:
 - Belongs only to the user
 - Is isolated from global content
 - Can be created, updated, and removed
+
+---
+
+### Lecture-Centric User State
+
+All user-owned state is scoped to **lectures**, not audio assets.
+
+- Favorites are lecture-level
+- Library state is lecture-level
+- Audio variants must not affect identity or user state
 
 ---
 
@@ -251,6 +261,6 @@ Only after this checklist is complete should playback state be introduced.
 
 ## Closing Note
 
-Phase 03 introduces _who_ the user is, not _what_ they do.
+Phase 04 introduces _who_ the user is, not _what_ they do.
 
 By establishing identity and basic personalization cleanly, Salafi Durus prepares for richer listening features without compromising security or architectural clarity.

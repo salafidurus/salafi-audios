@@ -1,0 +1,76 @@
+name: Production Hotfix OTA
+
+on:
+  pull_request:
+    branches:
+      - "production"
+    types:
+      - opened
+      - synchronize
+      - reopened
+    paths:
+      - apps/mobile/src/**
+      - apps/mobile/assets/**
+
+concurrency:
+  cancel_in_progress: true
+  group: ${{ workflow.filename }}-${{ github.ref }}
+
+jobs:
+  fingerprint:
+    name: Compute fingerprint (Android/iOS)
+    if: ${{ startsWith(github.event.pull_request.head.ref, 'hotfix/') }}
+    type: fingerprint
+    environment: production
+    env:
+      EXPO_DEBUG: "1"
+
+  get_android_build:
+    name: Find production Android build matching fingerprint
+    needs: [fingerprint]
+    if: ${{ needs.fingerprint.result == 'success' }}
+    type: get-build
+    params:
+      platform: android
+      profile: production
+      fingerprint_hash: ${{ needs.fingerprint.outputs.android_fingerprint_hash }}
+
+  update_android_hotfix_if_build:
+    name: Publish production OTA (Android hotfix, only if build exists)
+    needs: [get_android_build]
+    if: ${{ needs.get_android_build.outputs.build_id }}
+    type: update
+    environment: production
+    env:
+      EXPO_DEBUG: "1"
+    params:
+      platform: android
+      channel: production
+      message: "Hotfix PR #${{ github.event.pull_request.number }}"
+
+  # ---------------------------
+  # iOS (kept commented for later)
+  # ---------------------------
+
+  # get_ios_build:
+  #   name: Find production iOS build matching fingerprint
+  #   needs: [fingerprint]
+  #   if: ${{ needs.fingerprint.result == 'success' }}
+  #   type: get-build
+  #   params:
+  #     platform: ios
+  #     profile: production
+  #     fingerprint_hash: ${{ needs.fingerprint.outputs.ios_fingerprint_hash }}
+
+  # update_ios_hotfix_if_build:
+  #   name: Publish production OTA (iOS hotfix, only if build exists)
+  #   needs: [get_ios_build]
+  #   if: ${{ needs.get_ios_build.outputs.build_id }}
+  #   type: update
+  #   environment: production
+  #   env:
+  #     EXPO_DEBUG: "1"
+  #   params:
+  #     platform: ios
+  #     channel: production
+  #     message: "Hotfix PR #${{ github.event.pull_request.number }}"
