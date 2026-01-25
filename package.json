@@ -23,12 +23,13 @@
     "test:prepush": "turbo test:prepush",
     "format": "prettier -w .",
     "format:check": "prettier -c .",
-    "clean": "turbo clean && rimraf node_modules",
+    "clean": "turbo clean",
+    "clean:hard": "turbo clean && rimraf node_modules **/node_modules **/.next **/dist **/build **/coverage .turbo",
     "prepare": "husky",
     "lint:staged": "lint-staged",
-    "openapi": "turbo openapi",
-    "codegen": "turbo codegen",
-    "codegen:all": "turbo openapi codegen"
+    "openapi": "pnpm --filter api openapi",
+    "codegen": "pnpm --filter @sd/api-client codegen",
+    "contract": "pnpm openapi && pnpm codegen"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.3.1",

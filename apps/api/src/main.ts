@@ -1,9 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { getApiEnv } from '@sd/env/api';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const env = getApiEnv();
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Salafi Durus API')
@@ -18,7 +20,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('docs', app, document);
 
-  await app.listen(process.env.PORT ?? 4000);
+  await app.listen(env.PORT);
 }
 
 void bootstrap();
