@@ -18,6 +18,8 @@ import type {
   UseQueryResult,
 } from "@tanstack/react-query";
 
+import type { HealthResponseDto } from "./schemas";
+
 import { httpClient } from "../src/http";
 
 export const appControllerGetHello = (signal?: AbortSignal) => {
@@ -127,8 +129,11 @@ export function useAppControllerGetHello<
   return query;
 }
 
+/**
+ * @summary Health check
+ */
 export const healthControllerGetHealth = (signal?: AbortSignal) => {
-  return httpClient<void>({ url: `/health`, method: "GET", signal });
+  return httpClient<HealthResponseDto>({ url: `/health`, method: "GET", signal });
 };
 
 export const getHealthControllerGetHealthQueryKey = () => {
@@ -212,6 +217,9 @@ export function useHealthControllerGetHealth<
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary Health check
+ */
 
 export function useHealthControllerGetHealth<
   TData = Awaited<ReturnType<typeof healthControllerGetHealth>>,

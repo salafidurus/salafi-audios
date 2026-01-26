@@ -5,3 +5,6 @@
  * Backend API for Salafi Durus
  * OpenAPI spec version: 1.0.0
  */
+
+export * from "./healthResponseDto";
+export * from "./healthResponseDtoStatus";
