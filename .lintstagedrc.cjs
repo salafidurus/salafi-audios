@@ -2,7 +2,8 @@
 module.exports = {
   "*.{js,jsx,ts,tsx}": [
     "eslint --fix",
-    "prettier -w"
+    "prettier -w",
+    "tsc --noEmit"
   ],
   "*.{json,md,yml,yaml}": [
     "prettier -w"

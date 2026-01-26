@@ -45,7 +45,7 @@ jobs:
           cache: pnpm
 
       - name: Install
-        run: pnpm -w install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Lint
         run: pnpm lint
@@ -68,7 +68,7 @@ jobs:
           cache: pnpm
 
       - name: Install
-        run: pnpm -w install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Typecheck
         run: pnpm typecheck
@@ -91,7 +91,7 @@ jobs:
           cache: pnpm
 
       - name: Install
-        run: pnpm -w install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Unit tests
         run: pnpm test
@@ -114,7 +114,7 @@ jobs:
           cache: pnpm
 
       - name: Install
-        run: pnpm -w install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Build
         run: pnpm build
@@ -146,7 +146,7 @@ jobs:
             ${{ runner.os }}-playwright-
 
       - name: Install
-        run: pnpm -w install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Install Playwright browsers
         if: steps.pw-cache.outputs.cache-hit != 'true'
@@ -180,7 +180,7 @@ jobs:
           cache: pnpm
 
       - name: Install
-        run: pnpm -w install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Generate OpenAPI and client
         run: pnpm contract

@@ -1,0 +1,47 @@
+name: DB Migrate (Neon)
+
+on:
+  push:
+    branches:
+      - main
+      - preview
+    paths:
+      - packages/db/prisma/**
+      - packages/db/prisma.config.ts
+      - packages/db/package.json
+      - pnpm-lock.yaml
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    environment: ${{ github.ref_name == 'main' && 'development' || 'preview' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node + pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply migrations
+        env:
+          DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
+        run: pnpm --filter @sd/db run migrate:deploy
+
+      - name: Generate Prisma client
+        env:
+          DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
+        run: pnpm --filter @sd/db run prisma:generate
