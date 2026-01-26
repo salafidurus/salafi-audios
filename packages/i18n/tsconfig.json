@@ -1,5 +1,9 @@
 {
   "extends": "../config/tsconfig/packages.json",
-  "compilerOptions": { "noEmit": true },
+  "compilerOptions": {
+    "noEmit": true,
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM"]
+  },
   "include": ["src"]
 }
