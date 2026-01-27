@@ -49,9 +49,11 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build deps needed for typecheck
-        run: pnpm turbo build --filter=@sd/db^...
+        run: pnpm build --filter=@sd/db^...
 
       - name: Validate Prisma schema
+        env:
+          DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
         run: pnpm --filter @sd/db run prisma:validate
 
       - name: Apply migrations
