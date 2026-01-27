@@ -1,7 +1,7 @@
-name: DB Migrate (Neon)
+name: db-migrate-neon
 
 on:
-  push:
+  pull_request:
     branches:
       - main
       - preview
@@ -11,9 +11,17 @@ on:
       - packages/db/package.json
       - pnpm-lock.yaml
 
+concurrency:
+  group: db-${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
   migrate:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name == github.repository
     permissions:
       contents: read
 
@@ -35,6 +43,9 @@ jobs:
 
       - name: Install
         run: pnpm install --frozen-lockfile
+
+      - name: Validate Prisma schema
+        run: pnpm --filter @sd/db run prisma:validate
 
       - name: Apply migrations
         env:

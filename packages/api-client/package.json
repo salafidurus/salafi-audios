@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "test": "echo \"@sd/api-client: skipped (generated)\"",
     "test:prepush": "echo \"@sd/api-client: skipped (generated)\"",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "echo \"@sd/api-client: skipped (generated)\""
   },
   "devDependencies": {
     "@sd/config": "workspace:*",

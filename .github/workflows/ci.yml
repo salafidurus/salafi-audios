@@ -150,6 +150,9 @@ jobs:
         if: steps.pw-cache.outputs.cache-hit != 'true'
         run: pnpm --filter web exec playwright install --with-deps
 
+      - name: Build deps needed by web
+        run: pnpm turbo build --filter web^...
+
       - name: Run Playwright
         run: pnpm --filter web test:e2e
 

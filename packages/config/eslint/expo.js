@@ -9,6 +9,7 @@ export default [
       "import/resolver": {
         typescript: {
           project: ["./tsconfig.json"],
+          tsconfigRootDir: "./",
         },
         node: { extensions: [".js", ".jsx", ".ts", ".tsx"] },
       },
