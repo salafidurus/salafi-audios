@@ -1,0 +1,67 @@
+name: db-migrate-neon
+
+on:
+  pull_request:
+    branches:
+      - main
+      - preview
+    paths:
+      - packages/db/prisma/**
+      - packages/db/prisma.config.ts
+      - packages/db/package.json
+      - pnpm-lock.yaml
+
+concurrency:
+  group: db-${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "20"
+  PNPM_VERSION: "10"
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    permissions:
+      contents: read
+
+    environment: ${{ github.ref_name == 'main' && 'development' || 'preview' }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build deps needed for typecheck
+        run: pnpm build --filter=@sd/db^...
+
+      - name: Validate Prisma schema
+        env:
+          DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
+        run: pnpm --filter @sd/db run prisma:validate
+
+      - name: Apply migrations
+        env:
+          DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
+        run: pnpm --filter @sd/db run migrate:deploy
+
+      - name: Generate Prisma client
+        env:
+          DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
+        run: pnpm --filter @sd/db run prisma:generate

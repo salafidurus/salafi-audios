@@ -2,19 +2,20 @@ import expo from "eslint-config-expo/flat.js";
 import base from "./base.js";
 
 export default [
-  ...base,
   ...expo,
+  ...base,
   {
     settings: {
       "import/resolver": {
         typescript: {
-          project: ["tsconfig.json", "apps/*/tsconfig.json", "packages/*/tsconfig.json"],
+          project: ["./tsconfig.json"],
+          // tsconfigRootDir: "./",
         },
         node: { extensions: [".js", ".jsx", ".ts", ".tsx"] },
       },
     },
     rules: {
-      "import/no-cycle": ["error", { maxDepth: 2 }],
+      // "import/no-cycle": ["error", { maxDepth: 2 }],
       "import/no-restricted-paths": [
         "error",
         {

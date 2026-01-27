@@ -12,25 +12,24 @@
     "test:cov": "jest --coverage",
     "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "prisma:generate": "prisma generate --schema=./prisma/schema.prisma",
-    "prisma:format": "prisma format --schema=./prisma/schema.prisma",
-    "prisma:validate": "prisma validate --schema=./prisma/schema.prisma",
-    "migrate:dev": "prisma migrate dev --schema=./prisma/schema.prisma",
-    "migrate:deploy": "prisma migrate deploy --schema=./prisma/schema.prisma",
-    "apply:postsql": "node ./scripts/run_post_migration_sql.js",
-    "apply:migrations": "./scripts/apply_migrations.sh",
-    "cron:hard-delete": "node ./scripts/hard_delete_cron.js"
+    "prisma:generate": "prisma generate --schema=./prisma/schema.prisma --config=./prisma.config.ts",
+    "prisma:format": "prisma format --schema=./prisma/schema.prisma --config=./prisma.config.ts",
+    "prisma:validate": "prisma validate --schema=./prisma/schema.prisma --config=./prisma.config.ts",
+    "migrate:create-only": "node ./scripts/migrate-with-auto-name.js",
+    "migrate:deploy": "prisma migrate deploy --schema=./prisma/schema.prisma --config=./prisma.config.ts"
   },
   "dependencies": {
-    "@prisma/client": "^5.0.0"
+    "@prisma/client": "^7.3.0"
   },
   "devDependencies": {
     "@sd/config": "workspace:*",
-    "prisma": "^5.0.0",
+    "@sd/env": "workspace:*",
+    "prisma": "^7.3.0",
     "pg": "^8.0.0",
     "@types/jest": "^30.0.0",
     "jest": "^30.2.0",
     "ts-jest": "^29.4.6",
-    "typescript": "^5.9.0"
+    "typescript": "^5.9.0",
+    "dotenv": "^16.4.5"
   }
 }

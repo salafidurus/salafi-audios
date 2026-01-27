@@ -22,13 +22,11 @@ permissions:
 env:
   NODE_VERSION: "20"
   PNPM_VERSION: "10"
-  PLAYWRIGHT_BROWSERS_PATH: ~/.cache/ms-playwright
-  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
-  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/ms-playwright
 
 jobs:
-  lint:
-    name: lint
+  build_deps:
+    name: build:deps
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -45,13 +43,58 @@ jobs:
           cache: pnpm
 
       - name: Install
-        run: pnpm -w install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
+
+      - name: Build (all)
+        run: pnpm build
+
+      - name: Upload build outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-outputs
+          if-no-files-found: error
+          path: |
+            apps/**/dist/**
+            packages/**/dist/**
+            packages/**/build/**
+            packages/**/.next/**
+            packages/**/.generated/**
+            packages/**/generated/**
+            packages/**/node_modules/.prisma/**
+            packages/**/node_modules/@prisma/**
+
+  lint:
+    name: lint
+    needs: build_deps
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Download build outputs
+        uses: actions/download-artifact@v4
+        with:
+          name: build-outputs
 
       - name: Lint
         run: pnpm lint
 
   typecheck:
     name: typecheck
+    needs: build_deps
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -68,7 +111,12 @@ jobs:
           cache: pnpm
 
       - name: Install
-        run: pnpm -w install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
+
+      - name: Download build outputs
+        uses: actions/download-artifact@v4
+        with:
+          name: build-outputs
 
       - name: Typecheck
         run: pnpm typecheck
@@ -91,36 +139,14 @@ jobs:
           cache: pnpm
 
       - name: Install
-        run: pnpm -w install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Unit tests
         run: pnpm test
 
-  build:
-    name: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: pnpm/action-setup@v3
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-
-      - name: Install
-        run: pnpm -w install --frozen-lockfile
-
-      - name: Build
-        run: pnpm build
-
   e2e_web:
     name: e2e:web
+    needs: build_deps
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -146,11 +172,16 @@ jobs:
             ${{ runner.os }}-playwright-
 
       - name: Install
-        run: pnpm -w install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Install Playwright browsers
         if: steps.pw-cache.outputs.cache-hit != 'true'
         run: pnpm --filter web exec playwright install --with-deps
+
+      - name: Download build outputs
+        uses: actions/download-artifact@v4
+        with:
+          name: build-outputs
 
       - name: Run Playwright
         run: pnpm --filter web test:e2e
@@ -180,7 +211,7 @@ jobs:
           cache: pnpm
 
       - name: Install
-        run: pnpm -w install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Generate OpenAPI and client
         run: pnpm contract

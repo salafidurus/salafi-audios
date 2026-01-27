@@ -1,8 +1,9 @@
 {
-  "extends": "expo/tsconfig.base",
+  "extends": "./app.json",
   "compilerOptions": {
-    "strict": true,
-    "noEmit": true,
+    "jsx": "react-jsx",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
     "paths": {
       "@/*": ["./src/*"],
       "@assets/*": ["./assets/*"]

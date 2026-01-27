@@ -36,11 +36,21 @@
         "types": "./dist/mobile.d.ts",
         "default": "./dist/mobile.js"
       }
+    },
+    "./db": {
+      "import": {
+        "types": "./dist/db.d.mts",
+        "default": "./dist/db.mjs"
+      },
+      "require": {
+        "types": "./dist/db.d.ts",
+        "default": "./dist/db.js"
+      }
     }
   },
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "tsup src/index.ts src/api.ts src/web.ts src/mobile.ts --format esm,cjs --dts --out-dir dist",
+    "build": "tsup src/index.ts src/api.ts src/web.ts src/mobile.ts src/db.ts --format esm,cjs --dts --out-dir dist",
     "dev": "pnpm build --watch",
     "lint": "eslint .",
     "test": "jest --passWithNoTests",
@@ -55,6 +65,7 @@
   "devDependencies": {
     "@sd/config": "workspace:*",
     "@types/jest": "^30.0.0",
+    "@types/node": "^22.0.0",
     "jest": "^30.2.0",
     "ts-jest": "^29.4.6",
     "tsup": "^8.0.0",
