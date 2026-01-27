@@ -45,6 +45,9 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
+      - name: Build deps needed for typecheck
+        run: pnpm turbo build --filter=...^...
+
       - name: Lint
         run: pnpm lint
 
@@ -67,6 +70,9 @@ jobs:
 
       - name: Install
         run: pnpm install --frozen-lockfile
+
+      - name: Build deps needed for typecheck
+        run: pnpm turbo build --filter=...^...
 
       - name: Typecheck
         run: pnpm typecheck
