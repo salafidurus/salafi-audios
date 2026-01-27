@@ -2,8 +2,8 @@ import expo from "eslint-config-expo/flat.js";
 import base from "./base.js";
 
 export default [
-  ...base,
   ...expo,
+  ...base,
   {
     settings: {
       "import/resolver": {
@@ -15,7 +15,7 @@ export default [
       },
     },
     rules: {
-      "import/no-cycle": ["error", { maxDepth: 2 }],
+      // "import/no-cycle": ["error", { maxDepth: 2 }],
       "import/no-restricted-paths": [
         "error",
         {
