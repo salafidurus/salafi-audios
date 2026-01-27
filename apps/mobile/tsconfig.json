@@ -3,7 +3,6 @@
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
   "compilerOptions": {
     "baseUrl": ".",
-    "resolveJsonModule": true,
     "paths": {
       "@/*": ["src/*"],
       "@/assets/*": ["./assets/*"]
