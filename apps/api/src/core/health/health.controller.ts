@@ -1,8 +1,12 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { HealthResponseDto, HealthStatus } from './dto/health.dto';
+import { SkipThrottle } from '@nestjs/throttler';
+import { ApiCommonErrors } from '@/shared/decorators/api-common-errors.decorator';
 
+@SkipThrottle()
 @ApiTags('Health')
+@ApiCommonErrors()
 @Controller('health')
 export class HealthController {
   @Get()

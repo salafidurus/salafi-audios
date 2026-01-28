@@ -13,5 +13,13 @@ export class ConfigService {
     return this.env.NODE_ENV;
   }
 
-  // add more as you need them later (e.g., DATABASE_URL, CORS_ORIGINS, etc.)
+  get CORS_ORIGINS_RAW(): string {
+    return this.env.CORS_ORIGIN;
+  }
+
+  get CORS_ORIGINS(): string[] {
+    return this.env.CORS_ORIGIN.split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
 }

@@ -6,6 +6,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { ConfigService } from '@/shared/config/config.service';
+import type { Request, Response } from 'express';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -13,10 +14,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const req = ctx.getRequest();
-    const res = ctx.getResponse();
+    const req = ctx.getRequest<Request>();
+    const res = ctx.getResponse<Response>();
 
-    const requestId = String(req.headers['x-request-id'] ?? '');
+    const requestId = req.id ?? res.getHeader('x-request-id') ?? '';
     const timestamp = new Date().toISOString();
 
     let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;

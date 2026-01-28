@@ -7,10 +7,7 @@ export class ErrorResponseDto {
   @ApiProperty({ example: 'Validation failed' })
   message!: string;
 
-  @ApiPropertyOptional({
-    description: 'Optional error details (e.g. validation errors)',
-    example: ['name must be a string'],
-  })
+  @ApiPropertyOptional()
   details?: unknown;
 
   @ApiProperty({
