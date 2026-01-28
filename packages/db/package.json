@@ -2,9 +2,25 @@
   "name": "@sd/db",
   "version": "0.0.0",
   "private": true,
-  "type": "module",
-  "main": "src/index.ts",
-  "types": "src/index.ts",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      }
+    }
+  },
   "scripts": {
     "lint": "eslint .",
     "test": "jest --passWithNoTests",
@@ -16,7 +32,9 @@
     "prisma:format": "prisma format --schema=./prisma/schema.prisma --config=./prisma.config.ts",
     "prisma:validate": "prisma validate --schema=./prisma/schema.prisma --config=./prisma.config.ts",
     "migrate:create-only": "node ./scripts/migrate-with-auto-name.js",
-    "migrate:deploy": "prisma migrate deploy --schema=./prisma/schema.prisma --config=./prisma.config.ts"
+    "migrate:deploy": "prisma migrate deploy --schema=./prisma/schema.prisma --config=./prisma.config.ts",
+    "build": "pnpm prisma:generate && tsup src/index.ts --format esm,cjs --out-dir dist && tsc -p tsconfig.build.json",
+    "dev": "pnpm build --watch"
   },
   "dependencies": {
     "@prisma/client": "^7.3.0"
@@ -30,6 +48,7 @@
     "jest": "^30.2.0",
     "ts-jest": "^29.4.6",
     "typescript": "^5.9.0",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "tsup": "^8.0.0"
   }
 }
