@@ -1,3 +1,4 @@
+import '@/shared/utils/env.bootstrap';
 import { ConfigService } from '@/shared/config/config.service';
 import { AllExceptionsFilter } from '@/shared/errors/http-exception.filter';
 import { ValidationPipe } from '@nestjs/common';
@@ -33,7 +34,11 @@ async function bootstrap() {
     .setDescription('Backend API for Salafi Durus')
     .setVersion('1.0.0')
     .addBearerAuth(
-      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
       'bearer',
     )
     .build();

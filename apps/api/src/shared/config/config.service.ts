@@ -3,7 +3,7 @@ import { getApiEnv } from '@sd/env/api';
 
 @Injectable()
 export class ConfigService {
-  private readonly env = getApiEnv();
+  private readonly env = getApiEnv(process.env);
 
   get PORT() {
     return this.env.PORT;
