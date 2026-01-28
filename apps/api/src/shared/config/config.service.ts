@@ -22,4 +22,8 @@ export class ConfigService {
       .map((s) => s.trim())
       .filter(Boolean);
   }
+
+  get DATABASE_URL() {
+    return this.env.DATABASE_URL;
+  }
 }
