@@ -8,6 +8,11 @@ This Next.js app is a client of the backend API, not an authority.
 - Admin/editor workflows with efficient UI and safe UX.
 - Strict adherence to backend contracts and permissions.
 
+## Agent skills scope
+
+- Project-local OpenCode skills live in `.opencode/skills/`.
+- Keep Next.js and web-specific skills scoped to this app directory.
+
 ## Non-negotiables
 
 - Never move business rules from API into web.

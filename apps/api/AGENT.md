@@ -8,6 +8,11 @@ This service is the authority for business rules, permissions, and state transit
 - Expose stable API contracts for web/mobile.
 - Coordinate DB, media, and non-authoritative analytics safely.
 
+## Agent skills scope
+
+- Project-local OpenCode skills live in `.opencode/skills/`.
+- Keep backend/NestJS skills scoped to this app directory.
+
 ## Layering rules
 
 - Keep layering explicit:

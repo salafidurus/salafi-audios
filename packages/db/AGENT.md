@@ -39,3 +39,4 @@ This package owns Prisma schema, migrations, and DB client utilities.
 
 - Do not embed environment values in source or migrations.
 - Keep generated output derived from schema, not hand-edited.
+- Never commit generated DB artifacts under `packages/db/src/generated/`.

@@ -8,6 +8,11 @@ This Expo/React Native app prioritizes offline listening and resilient sync.
 - Queue user intent locally and sync safely.
 - Reflect backend-authoritative state after sync.
 
+## Agent skills scope
+
+- Project-local OpenCode skills live in `.opencode/skills/`.
+- Keep mobile-specific skills scoped to this app directory.
+
 ## Non-negotiables
 
 - Mobile is never the authority for protected state transitions.
