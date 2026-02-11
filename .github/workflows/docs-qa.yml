@@ -42,7 +42,6 @@ jobs:
           fail: true
           args: >-
             --offline
-            --glob
             --no-progress
             --include-fragments
             README.md
