@@ -53,6 +53,7 @@ jobs:
         with:
           name: build-outputs
           if-no-files-found: error
+          include-hidden-files: true
           path: |
             apps/api/dist/**
             apps/web/.next/**
@@ -193,6 +194,8 @@ jobs:
   db_generated_policy:
     name: db:generated-policy
     runs-on: ubuntu-latest
+    env:
+      DIRECT_DB_URL: postgresql://postgres:postgres@localhost:5432/sd_ci?schema=public
     steps:
       - uses: actions/checkout@v4
         with:

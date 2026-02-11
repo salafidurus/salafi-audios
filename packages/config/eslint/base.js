@@ -8,6 +8,7 @@ export default [
       "**/build/**",
       "**/.next/**",
       "**/.expo/**",
+      "**/.opencode/**",
       "**/coverage/**",
       "**/generated/**",
     ],

@@ -32,6 +32,8 @@
     "clean:hard": "turbo clean && rimraf node_modules **/node_modules **/.next **/dist **/build **/coverage .turbo",
     "prepare": "husky",
     "lint:staged": "lint-staged",
+    "docs:quality": "markdownlint-cli2 README.md **/README.md docs/**/*.md AGENT.md AGENTS.md .github/copilot-instructions.md",
+    "ci:local": "pnpm lint && pnpm typecheck && pnpm test:prepush && pnpm --filter web build && pnpm docs:quality",
     "openapi": "pnpm --filter api openapi",
     "codegen": "pnpm --filter @sd/api-client codegen",
     "contract": "pnpm openapi && pnpm codegen"
@@ -47,6 +49,7 @@
     "eslint-plugin-import": "^2.32.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
+    "markdownlint-cli2": "^0.18.1",
     "prettier": "^3.3.3",
     "rimraf": "^6.0.0",
     "tsx": "^4.21.0",
