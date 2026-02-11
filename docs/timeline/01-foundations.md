@@ -263,13 +263,13 @@ These shortcuts undermine everything that follows.
 
 Before moving to Phase 02, confirm:
 
-- [] Monorepo structure is stable
-- [] CI runs on PRs
-- [] Environments are clearly separated
-- [] Main branch is protected
-- [] Apps boot independently
-- [] Environments are defined
-- [] Documentation is up to date
+- [ ] Monorepo structure is stable
+- [ ] CI runs on PRs
+- [ ] Environments are clearly separated
+- [ ] Main branch is protected
+- [ ] Apps boot independently
+- [ ] Environments are defined
+- [ ] Documentation is up to date
 
 Only after this checklist is complete should feature development begin.
 

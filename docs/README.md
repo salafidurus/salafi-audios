@@ -130,22 +130,25 @@ Each phase builds on the previous one and delivers a meaningful, testable outcom
 - [`01-foundations.md`](./timeline/01-foundations.md)  
   Repository setup, CI/CD, environments, and skeleton apps.
 
-- [`02-read-only-catalog.md`](./timeline/02-read-only-catalog.md)  
-  Public browsing of scholars, series, and lectures (no auth).
+- [`02-model-and-ingestion.md`](./timeline/02-model-and-ingestion.md)  
+  Canonical domain model, media assets, and structured ingestion pipeline.
 
-- [`03-auth-and-user-state.md`](./timeline/03-auth-and-user-state.md)  
+- [`03-read-only-catalog.md`](./timeline/03-read-only-catalog.md)  
+  Public browsing of scholars, collections, series, and lectures (no auth).
+
+- [`04-auth-and-user-state.md`](./timeline/04-auth-and-user-state.md)  
   Authentication, sessions, and user-owned state.
 
-- [`04-playback-and-progress.md`](./timeline/04-playback-and-progress.md)  
+- [`05-playback-and-progress.md`](./timeline/05-playback-and-progress.md)  
   Audio playback, progress tracking, and resume behavior (online).
 
-- [`05-offline-and-downloads.md`](./timeline/05-offline-and-downloads.md)  
+- [`06-offline-and-downloads.md`](./timeline/06-offline-and-downloads.md)  
   Offline playback, downloads, and outbox synchronization.
 
-- [`06-admin-and-uploads.md`](./timeline/06-admin-and-uploads.md)  
+- [`07-admin-and-uploads.md`](./timeline/07-admin-and-uploads.md)  
   Admin workflows, single and bulk uploads, moderation.
 
-- [`07-polish-and-analytics.md`](./timeline/07-polish-and-analytics.md)  
+- [`08-polish-and-analytics.md`](./timeline/08-polish-and-analytics.md)  
   Analytics, performance, UX polish, and operational readiness.
 
 📌 **Use this section as the execution roadmap.**  

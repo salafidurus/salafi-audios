@@ -1,217 +1,107 @@
 # Salafi Durus
 
-**Salafi Durus** is a curated, offline-first lecture platform designed to preserve, organize, and deliver authentic Salafi knowledge in a structured, reliable, and long-term manner.
+Salafi Durus is a curated, offline-first lecture platform for preserving and delivering authentic Salafi knowledge with structure, trust, and long-term maintainability.
 
-This repository contains the **entire system**:
+This monorepo contains the full system:
 
-- Mobile application
-- Web application
-- Backend API
-- Shared packages
-- Authoritative documentation
+- `apps/mobile` - offline-first listener experience + focused admin actions
+- `apps/web` - public discovery + primary editorial workflows
+- `apps/api` - authoritative backend and API contract
+- `packages/*` - shared libraries, schemas, config, and generated client
+- `docs/` - architectural source of truth
 
-The project prioritizes **trust, clarity, and longevity** over novelty or short-term convenience.
+## Start Here
 
----
+- Read `docs/README.md` first, then `AGENT.md`, then the target workspace `AGENT.md`.
+- Treat `docs/` as authoritative for product intent and implementation boundaries.
+- Keep backend authority absolute: clients never own policy or authorization decisions.
 
-## Project Goals
+## Quick Start
 
-Salafi Durus exists to solve several real problems:
+Prerequisites:
 
-- Fragmentation of authentic lectures across platforms
-- Lack of structured learning paths (scholars → series → lessons)
-- Poor offline support for long-form audio
-- Weak moderation and trust boundaries on open platforms
-- Loss of continuity across devices
+- Node.js 22+
+- `pnpm@10.x` (repo pins `pnpm@10.28.1`)
 
-The platform is intentionally:
+Install and run:
 
-- **Curated**, not crowdsourced
-- **Structured**, not flat
-- **Offline-first**, not always-online
-- **Server-authoritative**, not client-owned
-
----
-
-## High-Level Architecture
-
-Salafi Durus is built as a **monorepo** with clear separation of responsibilities:
-
-- **Mobile app** — primary listening experience + fast admin actions
-- **Web app** — public discovery + powerful admin/editor workflows
-- **Backend API** — single source of truth and authority
-- **Shared packages** — types, schemas, and utilities
-- **Documentation** — architectural intent and execution plan
-
-The backend enforces all business rules, authorization, and data ownership.  
-Clients are intelligent consumers, not authorities.
-
----
-
-## Repository Structure
-
-```txt
-apps/
-├── api/        # Backend API (authoritative core)
-├── web/        # Web application (public + admin)
-└── mobile/     # Mobile application (offline-first)
-
-packages/
-├── db/         # Database schema and migrations
-├── api-client/ # Typed API client
-├── auth-shared/# Shared auth types
-├── config/     # Shared config schemas
-└── i18n/       # Internationalization
-
-docs/           # Authoritative documentation
+```bash
+pnpm i
+pnpm dev
 ```
 
----
+Useful scoped dev commands:
 
-## Documentation (Start Here)
+```bash
+pnpm dev:api
+pnpm dev:web
+pnpm dev:mobile
+```
 
-📘 **All architectural decisions for Salafi Durus are documented in `/docs`.**
+## Monorepo Commands
 
-This documentation is not supplementary. It defines:
+Run from repo root:
 
-- What the system is
-- Why it is designed this way
-- How it must be implemented
-- In what order features should be built
+- Build: `pnpm build`
+- Lint: `pnpm lint`
+- Typecheck: `pnpm typecheck`
+- Test: `pnpm test`
+- E2E: `pnpm test:e2e`
+- Pre-push suite: `pnpm test:prepush`
+- Contract/codegen: `pnpm contract`
 
-If something in the codebase is unclear, the documentation is the **source of truth**.
+Scoped examples:
 
-### Recommended Reading Order
+- API only: `pnpm --filter api <script>`
+- Web only: `pnpm --filter web <script>`
+- Mobile only: `pnpm --filter mobile <script>`
 
-1. **Product Overview** — vision, philosophy, and architecture  
-   `docs/product-overview/`
+## Architecture Guardrails
 
-2. **Implementation Guide** — concrete, enforceable design rules  
-   `docs/implementation-guide/`
+- Backend is authoritative for business rules and state transitions.
+- Authorization is backend-only; UI checks are UX only.
+- Offline mode queues intent; it does not create authoritative state.
+- Media are stored as references/metadata, never blobs in core relational tables.
+- Dependency boundaries are strict:
+  - apps -> packages allowed
+  - packages -> packages allowed
+  - app -> app forbidden
+  - package -> app forbidden
+  - no circular dependencies
 
-3. **Timeline** — phased execution plan  
-   `docs/timeline/`
+## Documentation Map
 
-👉 Entry point: [`docs/README.md`](./docs/README.md)
+Use `docs/README.md` as the primary index:
 
----
+1. `docs/product-overview/` - what we are building and why
+2. `docs/implementation-guide/` - how we are building it
+3. `docs/timeline/` - in what order we are building it
 
-## Development Workflow
+If implementation and docs diverge, update docs intentionally or reconsider the change.
 
-### Branching and Merging
+## Delivery Model
 
-- `main` is the only long-lived branch
-- All changes enter via pull requests
-- Direct pushes to `main` are blocked
-- Required checks must pass before merge
+- `main` is protected and is the only long-lived branch.
+- Changes enter through pull requests with required checks.
+- Deployments are promotion/tag based (not branch-push based).
+- Environment isolation is strict (`development`, `preview`, `production`).
 
-Pull requests are the **only** way code enters the system.
+See `docs/implementation-guide/10-environments-and-configuration.md` for deployment and environment policy.
 
----
+## Contributing
 
-### CI/CD and Deployment
+Contributions must preserve documented architecture and guardrails.
 
-Salafi Durus uses a **promotion-based deployment model**, not a push-based one.
+- Do not bypass backend authorization in clients.
+- Do not hand-edit generated API client output in `packages/api-client/generated/`.
+- Do not add app-to-app imports.
+- Update docs when behavior or architectural intent changes.
 
-- Merging into `main` integrates code
-- Deployments to preview and production are triggered explicitly
-- Promotions are controlled via **tags**, not branches
-- No developer pushes deployment commits from a local machine
-
-This ensures deployments are:
-
-- Auditable
-- Reproducible
-- Reversible
-
-See:  
-`docs/implementation-guide/10-environments-and-configuration.md`
-
----
-
-## Environments
-
-The platform runs in three environments:
-
-- **development** — continuous integration from `main`
-- **preview** — staging-like environment for validation
-- **production** — live environment
-
-Environment behavior is consistent across:
-
-- Mobile
-- Web
-- Backend
-- Infrastructure
-
-Configuration and secrets are strictly isolated by environment.
-
----
-
-## What This Repository Is _Not_
-
-This repository intentionally does **not** aim to be:
-
-- A social platform
-- A user-generated content portal
-- A recommendation or engagement-driven feed
-- A real-time collaborative system
-
-These are conscious non-goals, chosen to preserve:
-
-- Trust
-- Clarity
-- Editorial responsibility
-- Long-term maintainability
-
----
-
-## Contribution Philosophy
-
-Contributions are welcome **only if** they:
-
-- Respect the documented architecture
-- Preserve backend authority
-- Maintain clear responsibility boundaries
-- Avoid undocumented behavior
-- Update documentation when intent or behavior changes
-
-If a change conflicts with the documentation, either:
-
-- the documentation must be updated, or
-- the change must be reconsidered
-
-Undocumented shortcuts are treated as defects.
-
----
-
-## Project Status
-
-At this stage, the project has:
-
-- ✅ Complete architectural documentation
-- ✅ Clear execution roadmap
-- ⏳ Active implementation following the Timeline
-
-Current work should always align with the **current phase** in:
-
-`docs/timeline/`
-
----
+Undocumented shortcuts are defects.
 
 ## License and Usage
 
-License and usage terms will be defined explicitly prior to public release.
+This repository is currently private/internal.
 
-Until then:
-
-- This repository is considered **private / internal**
-- Redistribution, deployment, or reuse without permission is not allowed
-
----
-
-## Final Note
-
-Salafi Durus is designed to endure.
-
-This repository exists not merely to ship features, but to preserve authentic knowledge with responsibility and care. Every technical and product decision should serve that purpose.
+- Redistribution, deployment, or reuse without permission is not allowed.
+- Public licensing terms will be documented before release.

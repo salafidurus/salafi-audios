@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Web App (`apps/web`)
 
-## Getting Started
+This is the Next.js client for public discovery and web-based editorial workflows.
 
-First, run the development server:
+- Public catalog browsing and SEO-friendly pages
+- Authenticated admin/editor flows
+- Strict consumer of backend API contracts
+
+## Run
+
+From monorepo root:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm dev:web
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Or scoped directly:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm --filter web dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Common Commands
 
-## Learn More
+Run from repo root:
 
-To learn more about Next.js, take a look at the following resources:
+- Build: `pnpm --filter web build`
+- Lint: `pnpm --filter web lint`
+- Typecheck: `pnpm --filter web typecheck`
+- Unit/integration tests: `pnpm --filter web test`
+- E2E tests (Playwright): `pnpm --filter web test:e2e`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Targeted testing examples:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Jest by name: `pnpm --filter web test -- -t "renders heading"`
+- Playwright file: `pnpm --filter web test:e2e -- e2e/catalog.spec.ts`
+- Playwright grep: `pnpm --filter web test:e2e -- --grep "catalog list"`
 
-## Deploy on Vercel
+## Guardrails
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Never move business rules from backend into web.
+- Authorization remains backend-only; UI checks are UX only.
+- Use explicit backend transition endpoints (publish/archive/reorder/replace).
+- Keep app structure aligned with `app/`, `features/`, `core/`, `shared/` boundaries.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See `apps/web/AGENT.md` and `docs/implementation-guide/09-web-application-structure.md` for architecture details.
