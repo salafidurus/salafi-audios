@@ -1,59 +1,61 @@
-# AGENT.md — apps/mobile (Offline-First Client)
+# AGENT.md - apps/mobile (Offline-First Client)
 
-Expo / React Native mobile app. Primary listening experience.
+This Expo/React Native app prioritizes offline listening and resilient sync.
 
-## Core responsibility
+## Core responsibilities
 
-- Offline-first playback + continuity.
-- Record user intent safely while offline.
-- Sync with backend as connectivity permits.
+- Deliver reliable playback and offline continuity.
+- Queue user intent locally and sync safely.
+- Reflect backend-authoritative state after sync.
 
 ## Non-negotiables
 
-- Mobile is a **client**. Backend remains source of truth.
-- Offline records **intent**, not authority.
-- **No administrative/editorial actions offline.**
-- Conflicts are resolved **on the backend**, deterministically.
+- Mobile is never the authority for protected state transitions.
+- Offline mode records intent only.
+- No admin/editorial authority while offline.
+- Backend resolves conflicts deterministically.
 
-## Offline sync mechanics (outbox)
+## Offline sync rules
 
-- Offline-writable actions (progress, favorites, etc.) are queued in an **outbox**.
-- Outbox entries are append-only, retryable, idempotent.
-- Sync triggers: connectivity restore, foreground, periodic task, explicit refresh.
-- Client never “decides” final state; backend returns authoritative state.
+- Use an outbox pattern for offline-writable intents.
+- Outbox entries must be idempotent and retry-safe.
+- Sync on reconnect, foreground, periodic triggers, and explicit refresh.
+- Reconcile to backend truth after sync completion.
 
-## App structure (enforced)
+## Structure and dependency direction
 
-Top-level structure:
+- `app/` - routing and composition
+- `features/` - domain UX slices
+- `core/` - API/auth/playback/persistence/sync infrastructure
+- `shared/` - primitives/utilities
 
-- `app/` routing + composition only (no business logic)
-- `core/` infrastructure (api, auth, playback, persistence, sync)
-- `features/` domain-oriented vertical slices
-- `shared/` reusable primitives (domain-agnostic)
-
-Dependency direction:
+Direction:
 
 - features -> core/shared
 - core -> shared
-- shared -> (nothing)
-  No circular dependencies.
+- shared -> no inward deps
 
-## Media
+## Media rules
 
-- Playback uses backend-provided references / URLs.
-- Offline downloads are for continuity, not ownership.
-- Never embed storage credentials.
+- Consume backend-provided media references.
+- Never ship storage credentials in app code.
+- Treat downloads as continuity cache, not ownership.
 
-## Commands
-
-From repo root:
+## Commands (run from repo root)
 
 - Dev: `pnpm dev:mobile`
-- Lint: `pnpm lint --filter=mobile`
-- Typecheck: `pnpm typecheck --filter=mobile`
-- Test: `pnpm test --filter=mobile`
+- Lint: `pnpm --filter mobile lint`
+- Typecheck: `pnpm --filter mobile typecheck`
+- Test: `pnpm --filter mobile test`
 
-## Quality
+## Single-test commands
 
-- Fail safely and explicitly; no silent failures.
-- Treat caching/persistence as replaceable working set, not canonical truth.
+- Jest file: `pnpm --filter mobile test -- src/path/to/file.test.tsx`
+- Jest by name: `pnpm --filter mobile test -- -t "renders heading"`
+- Jest watch: `pnpm --filter mobile test:watch -- src/path/to/file.test.tsx`
+
+## Quality expectations
+
+- Fail safely and explicitly; avoid silent drops.
+- Keep persistence/cache replaceable and non-authoritative.
+- Add tests for outbox behavior, retry semantics, and reconciliation paths.

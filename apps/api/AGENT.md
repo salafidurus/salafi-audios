@@ -1,68 +1,77 @@
-# AGENT.md — apps/api (Authoritative Backend)
+# AGENT.md - apps/api (Authoritative Backend)
 
-This backend is the authoritative core of Salafi Durus.
+This service is the authority for business rules, permissions, and state transitions.
 
-## Core responsibility
+## Core responsibilities
 
-- Enforce **business rules**, **data integrity**, **authorization**, and **state transitions**.
-- Coordinate database, media, and analytics access.
-- Provide a stable, explicit API contract for all clients (mobile + web).
+- Enforce business invariants and authorization before side effects.
+- Expose stable API contracts for web/mobile.
+- Coordinate DB, media, and non-authoritative analytics safely.
 
-## Layering (must remain clean)
+## Layering rules
 
-Backend is layered:
+- Keep layering explicit:
+  1. Interface (controllers/DTO validation/auth guards)
+  2. Application (use-case orchestration, transactions)
+  3. Domain (invariants and transition rules)
+  4. Infrastructure (DB/media/adapters; no policy decisions)
+- Do not leak persistence into controllers.
+- Do not put business decisions in infrastructure adapters.
 
-1. Interface layer: request acceptance, shape validation, authentication, routing.
-2. Application layer: use-case orchestration, authorization decisions, transactions.
-3. Domain layer: entities, invariants, allowed transitions (framework-agnostic).
-4. Infrastructure layer: DB/media/analytics adapters; no policy.
+## Authorization and trust model
 
-Rules:
+- Authentication identifies caller; authorization grants/denies action.
+- Re-check authorization on each protected endpoint.
+- UI-level restrictions are never security controls.
+- Reject invalid/unauthorized requests before mutating state.
 
-- Interface layer contains **no business rules** and **no direct DB access**.
-- Domain layer contains **no infrastructure concerns**.
-- Infrastructure contains **no decision-making authority**.
+## API design rules
 
-## Authorization rules
+- Keep contracts explicit and stable.
+- Prefer intent-driven actions for transitions (publish/archive/reorder/replace).
+- Validate all boundary input with DTO/class-validator.
+- Keep error responses structured and consistent.
 
-- Authentication establishes identity.
-- Authorization determines permission (role + scope), evaluated on every protected request.
-- Reject before side effects; fail safely.
-- UI restrictions are not security; never assume client intent is safe.
+## Commands (run from repo root)
 
-## API design discipline
+- Dev: `pnpm dev:api`
+- Build: `pnpm --filter api build`
+- Lint: `pnpm --filter api lint`
+- Typecheck: `pnpm --filter api typecheck`
+- Test: `pnpm --filter api test`
+- E2E: `pnpm --filter api test:e2e`
+- OpenAPI: `pnpm openapi`
 
-- API is a contract: explicit meaning, stable semantics, backwards-compatible where possible.
-- Prefer resource-oriented endpoints and **explicit intent-driven actions**:
-  - publish / archive
-  - reorder
-  - replace media
-- Validation at boundary; errors must be structured and consistent.
+## Single-test commands
+
+- One test file: `pnpm --filter api test -- src/modules/topics/topics.service.spec.ts`
+- One test name: `pnpm --filter api test -- src/modules/topics/topics.service.spec.ts -t "returns topic by slug"`
+- Watch one file: `pnpm --filter api test:watch -- src/modules/topics/topics.service.spec.ts`
+- E2E file: `pnpm --filter api test:e2e -- test/health.e2e-spec.ts`
+
+## Contract/codegen workflow
+
+- Generate OpenAPI: `pnpm openapi`
+- Regenerate client package: `pnpm codegen`
+- If client types are wrong, fix API/OpenAPI source first.
 
 ## Data and media rules
 
-- Core DB stores authoritative state only.
-- DB stores **references to media**, not media.
-- Media uploads are backend-coordinated (presigned + time-limited perms).
-- Media replacement is explicit, permissioned, auditable.
-
-## Analytics isolation
-
-- Analytics is non-authoritative and failure-tolerant.
-- Analytics failures must not impact core operations.
-
-## Commands
-
-From repo root:
-
-- Dev: `pnpm dev:api`
-- Lint: `pnpm lint --filter=api`
-- Typecheck: `pnpm typecheck --filter=api`
-- Test: `pnpm test --filter=api`
-- OpenAPI (root): `pnpm openapi`
-- Codegen clients (root): `pnpm codegen`
+- Persist only authoritative state in relational DB.
+- Store media references/metadata, never blobs.
+- Keep replacement/upload actions explicit and permissioned.
 
 ## Testing expectations
 
-- Add tests for domain invariants, auth boundaries, and state transitions.
-- Treat “temporary shortcuts” and client-side rules as defects.
+- Prioritize:
+  - domain invariants
+  - authorization boundaries
+  - transition semantics (publish/archive/reorder/replace)
+- Add regression tests for bug fixes.
+- Update tests when contracts change.
+
+## Common pitfalls to avoid
+
+- Client-authoritative logic hidden in endpoints.
+- Silent fallback for invalid config or invalid state.
+- Unstructured errors or inconsistent status semantics.

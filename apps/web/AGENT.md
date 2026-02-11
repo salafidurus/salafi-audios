@@ -1,52 +1,62 @@
-# AGENT.md — apps/web (Public + Admin Client)
+# AGENT.md - apps/web (Public + Admin Client)
 
-Next.js web app for:
+This Next.js app is a client of the backend API, not an authority.
 
-1. Public discovery / SEO-friendly pages
-2. Administrative/editorial power tools (bulk workflows)
+## Core responsibilities
 
-## Core responsibility
-
-- Remain a pure client of the backend API.
-- Provide SEO, deep linking, sharing previews.
-- Provide admin/editor workflows without bypassing backend authority.
+- Public discovery (SEO-friendly pages, deep links, shareable routes).
+- Admin/editor workflows with efficient UI and safe UX.
+- Strict adherence to backend contracts and permissions.
 
 ## Non-negotiables
 
-- Web app is never authoritative.
-- **Authorization is enforced on the backend** (UI gating is not security).
-- No duplication of backend business rules.
+- Never move business rules from API into web.
+- Authorization is backend-only; UI gating is convenience only.
+- Never bypass explicit API transition endpoints.
 
-## Structure (enforced)
+## Structure and dependency direction
 
-- `app/` routing/layout/SEO composition (no domain logic)
-- `core/` web infrastructure (auth/session, api wiring, caching, error normalization)
-- `features/` domain-oriented UI and hooks
-- `shared/` primitives (domain-agnostic)
+- `app/` - routing/layout/composition only
+- `features/` - domain-facing UI/hooks
+- `core/` - platform concerns (API wiring, session, caching, error normalization)
+- `shared/` - primitives/utilities with no inward deps
 
-Dependency direction:
+Direction:
 
 - features -> core/shared
 - core -> shared
 - app composes features
-- shared is pure (no feature/core imports)
 
-## Data fetching rules
+## Data-fetching guidance
 
-- Public pages: SSR/SSG when beneficial; cacheable; published-only.
-- Authenticated/admin: client-side interactive flows; always backend-authorized.
+- Public pages: SSR/SSG as appropriate; respect publication status.
+- Auth/admin flows: interactive client paths, backend-authorized.
+- Keep client state derived from authoritative API responses.
 
-## Admin/editor actions
-
-- Express state transitions explicitly via backend endpoints (publish/archive/reorder/replace).
-- Never implement “hidden rules” client-side.
-
-## Commands
-
-From repo root:
+## Commands (run from repo root)
 
 - Dev: `pnpm dev:web`
-- Lint: `pnpm lint --filter=web`
-- Typecheck: `pnpm typecheck --filter=web`
-- Test: `pnpm test --filter=web`
-- E2E: `pnpm test:e2e`
+- Build: `pnpm --filter web build`
+- Lint: `pnpm --filter web lint`
+- Typecheck: `pnpm --filter web typecheck`
+- Unit/integration tests: `pnpm --filter web test`
+- E2E (Playwright): `pnpm --filter web test:e2e`
+
+## Single-test commands
+
+- Jest file: `pnpm --filter web test -- src/path/to/file.test.tsx`
+- Jest by name: `pnpm --filter web test -- -t "renders heading"`
+- Playwright file: `pnpm --filter web test:e2e -- e2e/catalog.spec.ts`
+- Playwright by title: `pnpm --filter web test:e2e -- --grep "catalog list"`
+- Playwright project: `pnpm --filter web test:e2e -- --project chromium`
+
+## API contract and codegen
+
+- Do not hand-edit generated API client code.
+- Regenerate client from source contracts (`pnpm contract`) when API changes.
+
+## Quality expectations
+
+- Preserve clear separation between UX logic and policy logic.
+- Keep errors explicit and user-safe; do not swallow failures.
+- Add tests for admin actions and permission-sensitive views.
