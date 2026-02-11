@@ -20,7 +20,7 @@ This monorepo contains the full system:
 
 Prerequisites:
 
-- Node.js 22+
+- Node.js 22.x
 - `pnpm@10.x` (repo pins `pnpm@10.28.1`)
 
 Install and run:
@@ -94,6 +94,7 @@ Contributions must preserve documented architecture and guardrails.
 
 - Do not bypass backend authorization in clients.
 - Do not hand-edit generated API client output in `packages/api-client/generated/`.
+- Do not commit generated DB artifacts from `packages/db/src/generated/`.
 - Do not add app-to-app imports.
 - Update docs when behavior or architectural intent changes.
 

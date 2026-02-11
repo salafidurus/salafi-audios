@@ -28,7 +28,7 @@ Purpose: give an AI coding agent just-enough context to be immediately productiv
 - Run all in dev: `pnpm dev`
 - Run single app: `pnpm dev:api`, `pnpm dev:web`, `pnpm dev:mobile`
 - Build / Test / Lint / Typecheck: `pnpm build`, `pnpm test`, `pnpm lint`, `pnpm typecheck` (use Turbo filters to scope)
-- API-only tests: `pnpm test --filter=api`
+- API-only tests: `pnpm --filter api test`
 - E2E (Playwright): `pnpm test:e2e`
 - OpenAPI + client generation: `pnpm openapi` then `pnpm codegen` (or `pnpm contract`)
 
@@ -37,6 +37,7 @@ Purpose: give an AI coding agent just-enough context to be immediately productiv
 - Never modify generated clients by hand. If types are wrong, fix the OpenAPI source in `apps/api` and regenerate (`pnpm openapi && pnpm codegen`).
 - Orval config lives at `packages/api-client/orval.config.cjs` and targets `../../apps/api/openapi.json`.
 - Generated client output: `packages/api-client/generated/` (treat as derived).
+- Generated DB output: `packages/db/src/generated/` (derived, ignored, and never committed).
 
 ## Testing guidance 🔍
 

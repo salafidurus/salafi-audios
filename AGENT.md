@@ -88,6 +88,7 @@ Turbo grouped scripts:
 - Keep media as references only.
 - Keep analytics/events out of authoritative core tables.
 - Treat migrations as first-class and reviewable.
+- Treat `packages/db/src/generated/` as derived output; keep it untracked and regenerate locally when needed.
 
 ## Quality and style
 
