@@ -28,7 +28,7 @@ This guide is for coding agents operating in this monorepo.
 - Package manager: pnpm (`pnpm@10.x`)
 - Task runner: Turbo
 - Apps: `apps/api`, `apps/web`, `apps/mobile`
-- Packages: `packages/db`, `packages/env`, `packages/i18n`, `packages/auth-shared`, `packages/api-client`, `packages/config`
+- Packages: `packages/db`, `packages/env`, `packages/i18n`, `packages/auth-shared`, `packages/api-client`, `packages/config`, `packages/ingest`
 
 ## Root commands
 
@@ -41,6 +41,8 @@ This guide is for coding agents operating in this monorepo.
 - Test: `pnpm test`
 - E2E: `pnpm test:e2e`
 - Prepush suite: `pnpm test:prepush`
+- Ingest content: `pnpm ingest:content`
+- Remove ingested: `pnpm ingest:remove`
 - Format: `pnpm format`
 - Format check: `pnpm format:check`
 
@@ -56,6 +58,7 @@ Use pnpm filters:
 - I18n: `pnpm --filter @sd/i18n <script>`
 - Auth shared: `pnpm --filter @sd/auth-shared <script>`
 - API client: `pnpm --filter @sd/api-client <script>`
+- Ingest: `pnpm --filter @sd/ingest <script>`
   Turbo convenience scripts:
 - `pnpm lint:api+web`, `pnpm lint:api+mobile`
 - `pnpm typecheck:api+web`, `pnpm typecheck:api+mobile`

@@ -53,6 +53,25 @@ pnpm contract
 
 Never hand-edit generated files in `packages/api-client/generated/`.
 
+## Content Ingestion (Phase 02)
+
+Content ingestion is implemented in `packages/ingest`.
+
+Run from repo root:
+
+```bash
+pnpm ingest:content
+```
+
+Or scoped directly:
+
+```bash
+pnpm --filter @sd/ingest ingest:content
+```
+
+For audio assets stored as relative object keys, set `ASSET_CDN_BASE_URL` in API env so
+responses expose stable CDN URLs without storing CDN hostnames in DB.
+
 ## Guardrails
 
 - Backend is authoritative; clients are consumers.

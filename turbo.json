@@ -37,7 +37,8 @@
       "cache": false
     },
     "test:prepush": {
-      "dependsOn": ["^test:prepush"]
+      "dependsOn": ["^test:prepush"],
+      "cache": true
     },
     "openapi": {
       "dependsOn": ["^openapi"],

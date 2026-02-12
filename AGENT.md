@@ -42,6 +42,8 @@ This repository is one system. The monorepo is an enforcement tool, not a conven
 - Test: `pnpm test`
 - E2E: `pnpm test:e2e`
 - Prepush suite: `pnpm test:prepush`
+- Ingest content: `pnpm ingest:content`
+- Remove ingested: `pnpm ingest:remove`
 - Format: `pnpm format`
 - Format check: `pnpm format:check`
 
@@ -55,6 +57,7 @@ This repository is one system. The monorepo is an enforcement tool, not a conven
 - I18n: `pnpm --filter @sd/i18n <script>`
 - Auth shared: `pnpm --filter @sd/auth-shared <script>`
 - API client: `pnpm --filter @sd/api-client <script>`
+- Ingest: `pnpm --filter @sd/ingest <script>`
 
 Turbo grouped scripts:
 

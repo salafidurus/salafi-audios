@@ -1,12 +1,15 @@
+import 'reflect-metadata';
+import '@/shared/utils/env.bootstrap';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { writeFileSync } from 'node:fs';
 import { AppModule } from './app.module';
 
 async function generate() {
-  const app = await NestFactory.create(AppModule, { logger: false });
-
-  await app.init();
+  const app = await NestFactory.create(AppModule, {
+    logger: false,
+    abortOnError: false,
+  });
 
   const config = new DocumentBuilder()
     .setTitle('Salafi Durus API')
@@ -26,4 +29,12 @@ async function generate() {
   await app.close();
 }
 
-generate();
+void generate().catch((error: unknown) => {
+  const output =
+    error instanceof Error
+      ? `${error.stack ?? error.message}`
+      : JSON.stringify(error, null, 2);
+
+  process.stderr.write(`${output}\n`);
+  process.exit(1);
+});

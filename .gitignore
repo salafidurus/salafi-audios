@@ -7,6 +7,9 @@ coverage/
 dist/
 **/dist/
 
+generated/
+**/generated/
+
 
 # dotenv environment variable files
 **/.env

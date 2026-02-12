@@ -36,7 +36,9 @@
     "ci:local": "pnpm lint && pnpm typecheck && pnpm test:prepush && pnpm --filter web build && pnpm docs:quality",
     "openapi": "pnpm --filter api openapi",
     "codegen": "pnpm --filter @sd/api-client codegen",
-    "contract": "pnpm openapi && pnpm codegen"
+    "contract": "pnpm openapi && pnpm codegen",
+    "ingest:content": "pnpm --filter @sd/ingest ingest:content",
+    "ingest:remove": "pnpm --filter @sd/ingest ingest:remove"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.3.1",

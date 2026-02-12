@@ -1,17 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export enum HealthStatus {
-  OK = 'ok',
-}
+export const HEALTH_STATUS_VALUES = ['ok'] as const;
 
 export class HealthResponseDto {
   @ApiProperty({
-    enum: HealthStatus,
-    example: HealthStatus.OK,
+    enum: HEALTH_STATUS_VALUES,
+    example: HEALTH_STATUS_VALUES[0],
     description: 'Overall service status',
     type: String,
   })
-  status!: HealthStatus;
+  status!: string;
 
   @ApiProperty({
     example: '2026-01-21T20:18:36.123Z',
