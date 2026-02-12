@@ -4,9 +4,7 @@ module.exports = {
   rootDir: '.',
 
   // Find both unit + e2e tests
-  testMatch: [
-    '<rootDir>/src/**/*.spec.ts'
-  ],
+  testMatch: ['<rootDir>/src/**/*.spec.ts'],
 
   moduleFileExtensions: ['js', 'json', 'ts'],
 
@@ -21,9 +19,7 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
 
-  collectCoverageFrom: [
-    '<rootDir>/src/**/*.(t|j)s',
-  ],
+  collectCoverageFrom: ['<rootDir>/src/**/*.(t|j)s'],
 
   coverageDirectory: '<rootDir>/../coverage',
 

@@ -37,6 +37,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
+    "pretypecheck": "pnpm prisma:generate",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "prisma:generate": "prisma generate --schema=./prisma/schema.prisma --config=./prisma.config.ts",
     "prisma:format": "prisma format --schema=./prisma/schema.prisma --config=./prisma.config.ts",
