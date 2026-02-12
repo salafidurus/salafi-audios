@@ -27,6 +27,38 @@ env:
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
 
 jobs:
+  changes:
+    name: detect:changes
+    runs-on: ubuntu-latest
+    outputs:
+      db_generated_policy: ${{ steps.filter.outputs.db_generated_policy }}
+      contract: ${{ steps.filter.outputs.contract }}
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            db_generated_policy:
+              - "packages/db/prisma/**"
+              - "packages/db/prisma.config.ts"
+              - "packages/db/package.json"
+              - "package.json"
+              - "pnpm-lock.yaml"
+              - "pnpm-workspace.yaml"
+              - ".github/workflows/ci.yml"
+            contract:
+              - "apps/api/src/**"
+              - "apps/api/openapi.json"
+              - "apps/api/package.json"
+              - "packages/api-client/orval.config.cjs"
+              - "packages/api-client/package.json"
+              - "packages/db/prisma/**"
+              - "packages/db/src/**"
+              - "package.json"
+              - "pnpm-lock.yaml"
+              - "pnpm-workspace.yaml"
+              - ".github/workflows/ci.yml"
+
   build_deps:
     name: build:deps
     runs-on: ubuntu-latest
@@ -208,6 +240,8 @@ jobs:
 
   db_generated_policy:
     name: db:generated-policy
+    needs: changes
+    if: needs.changes.outputs.db_generated_policy == 'true'
     runs-on: ubuntu-latest
     environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
     env:
@@ -248,7 +282,10 @@ jobs:
 
   contract:
     name: contract (openapi + codegen)
-    needs: typecheck
+    needs:
+      - typecheck
+      - changes
+    if: needs.changes.outputs.contract == 'true'
     runs-on: ubuntu-latest
     environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
     env:
