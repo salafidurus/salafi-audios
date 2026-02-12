@@ -1,0 +1,101 @@
+name: promote-branches
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Promotion target"
+        required: true
+        type: choice
+        options:
+          - preview
+          - production
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create promotion PR
+        id: promote
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const target = core.getInput("target", { required: true });
+
+            const routes = {
+              preview: { head: "main", base: "preview" },
+              production: { head: "preview", base: "production" },
+            };
+
+            const route = routes[target];
+            if (!route) {
+              core.setFailed(`Unsupported target: ${target}`);
+              return;
+            }
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const headRef = `${owner}:${route.head}`;
+
+            const openPulls = await github.paginate(github.rest.pulls.list, {
+              owner,
+              repo,
+              state: "open",
+              base: route.base,
+              head: headRef,
+              per_page: 100,
+            });
+
+            if (openPulls.length > 0) {
+              const existing = openPulls[0];
+              core.notice(`Open promotion PR already exists: ${existing.html_url}`);
+              core.setOutput("pr_url", existing.html_url);
+              return;
+            }
+
+            const comparison = await github.rest.repos.compareCommitsWithBasehead({
+              owner,
+              repo,
+              basehead: `${route.base}...${route.head}`,
+            });
+
+            if (comparison.data.ahead_by === 0) {
+              core.notice(`${route.head} is already fully merged into ${route.base}; no PR created.`);
+              core.setOutput("pr_url", "");
+              return;
+            }
+
+            const title = `chore(release): promote ${route.head} to ${route.base}`;
+            const body = [
+              "## Promotion",
+              `- Source: \\`${route.head}\\``,
+              `- Target: \\`${route.base}\\``,
+              `- Commits ahead: ${comparison.data.ahead_by}`,
+              "",
+              "Created automatically by the promotion workflow.",
+            ].join("\n");
+
+            const created = await github.rest.pulls.create({
+              owner,
+              repo,
+              title,
+              head: route.head,
+              base: route.base,
+              body,
+              maintainer_can_modify: false,
+            });
+
+            core.notice(`Created promotion PR: ${created.data.html_url}`);
+            core.setOutput("pr_url", created.data.html_url);
+
+      - name: Promotion result
+        run: |
+          if [ -n "${{ steps.promote.outputs.pr_url }}" ]; then
+            echo "Promotion PR: ${{ steps.promote.outputs.pr_url }}"
+          else
+            echo "No promotion PR created."
+          fi
