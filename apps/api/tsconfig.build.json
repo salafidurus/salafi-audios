@@ -1,9 +1,11 @@
 {
-  "extends": "../../packages/config/tsconfig/nest.json",
+  "extends": "./tsconfig.json",
   "compilerOptions": {
     "noEmit": false,
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "module": "Node16",
+    "moduleResolution": "node16"
   },
   "exclude": ["node_modules", "dist", "test", "**/*.spec.ts"],
   "include": ["src/**/*.ts"]

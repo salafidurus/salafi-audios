@@ -41,9 +41,7 @@ If a piece of data affects platform behavior or user-visible state, it belongs h
 
 ### Core Domain Entities
 
-The relational database must model the core domain explicitly and relationally.
-
-At a minimum, it includes:
+At a minimum, the relational database includes:
 
 - **Users**
   - Identity
@@ -56,18 +54,37 @@ At a minimum, it includes:
   - Active/inactive state
   - Ownership or editorial scope
 
+- **Collections**
+  - Large, scholar-scoped groupings of series
+  - Ordered within a scholar
+  - Publication lifecycle state
+  - Soft-delete and grace-period semantics
+
 - **Series**
   - Association to a scholar
+  - Optional association to a collection
   - Ordered grouping of lectures
-  - Publication state
+  - Publication lifecycle state
+  - Soft-delete and grace-period semantics
 
 - **Lectures**
   - Association to scholar and optional series
   - Metadata (title, description, language)
-  - Publication lifecycle state
-  - Media references
+  - Publication lifecycle state and publishedAt
+  - Ordering within a series
+  - Relations to audio assets
 
-- **User Progress**
+- **Audio Assets**
+  - One or more audio variants per lecture
+  - Storage/delivery URLs or keys
+  - Format, bitrate, size, duration metadata
+  - Single primary asset per lecture
+
+- **Topics and Tagging**
+  - Topic hierarchy
+  - Many-to-many links from collections, series, and lectures
+
+- **Progress**
   - Per-user, per-lecture listening state
   - Completion indicators
   - Last updated timestamps
@@ -75,12 +92,6 @@ At a minimum, it includes:
 - **Favorites and Library State**
   - Explicit user-curated relationships
   - No derived or inferred state stored here
-
-Optional extensions may include:
-
-- Topics or categories
-- Editorial notes
-- Audit metadata
 
 ---
 

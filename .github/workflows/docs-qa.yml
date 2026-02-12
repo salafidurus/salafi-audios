@@ -1,0 +1,51 @@
+name: docs-qa
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+    paths:
+      - "README.md"
+      - "**/README.md"
+      - "docs/**/*.md"
+      - "AGENT.md"
+      - "AGENTS.md"
+      - ".github/copilot-instructions.md"
+
+permissions:
+  contents: read
+
+jobs:
+  docs_quality:
+    name: docs:quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Markdown lint
+        uses: DavidAnson/markdownlint-cli2-action@v20
+        with:
+          globs: |
+            README.md
+            **/README.md
+            docs/**/*.md
+            AGENT.md
+            AGENTS.md
+            .github/copilot-instructions.md
+
+      - name: Check internal markdown links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          fail: true
+          args: >-
+            --offline
+            --no-progress
+            --include-fragments
+            README.md
+            docs
+            AGENT.md
+            AGENTS.md
+            .github/copilot-instructions.md

@@ -18,11 +18,12 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@sd/api-client": "workspace:*",
+    "@sd/env": "workspace:*",
+    "@sd/i18n": "workspace:*",
     "next": "16.1.3",
     "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "@sd/i18n": "workspace:*",
-    "@sd/api-client": "workspace:*"
+    "react-dom": "19.2.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",

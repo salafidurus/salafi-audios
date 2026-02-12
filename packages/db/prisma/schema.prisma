@@ -1,24 +1,18 @@
 // packages/db/prisma/schema.prisma
-// Prisma schema for Dars Player v1 (packages/db).
-// IDs use cuid(); timestamps use timestamptz.
-// Comments explain purpose of fields / constraints.
-
 generator client {
-  provider = "prisma-client-js"
-  // Prisma client will be generated under packages/db/node_modules/.prisma/client
-  output   = "../node_modules/.prisma/client"
+  provider     = "prisma-client-js"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 //////////////////////////
 // Enums
 //////////////////////////
 
-// content lifecycle status
 enum Status {
   draft
   review
@@ -26,16 +20,36 @@ enum Status {
   archived
 }
 
-// global roles like admin/listener
 enum GlobalRole {
   admin
   listener
 }
 
-// scholar-scoped roles
 enum ScholarRole {
   scholar
   scholar_editor
+}
+
+//////////////////////////
+// Ingestion batch (for seed/dummy dataset lifecycle)
+//////////////////////////
+
+model IngestionBatch {
+  id          String   @id @default(cuid())
+  tag         String
+  environment String
+  createdAt   DateTime @default(now())
+
+  // optional relations for easier cleanup (not required)
+  scholars    Scholar[]    @relation("IngestBatchScholars")
+  collections Collection[] @relation("IngestBatchCollections")
+  series      Series[]     @relation("IngestBatchSeries")
+  lectures    Lecture[]    @relation("IngestBatchLectures")
+  audioAssets AudioAsset[] @relation("IngestBatchAudioAssets")
+
+  @@unique([tag, environment])
+  @@index([tag])
+  @@index([environment])
 }
 
 //////////////////////////
@@ -43,29 +57,22 @@ enum ScholarRole {
 //////////////////////////
 
 model User {
-  // primary id (cuid)
   id                 String    @id @default(cuid())
-  // optional email (nullable); we normalize it to emailNormalized for unique checks
   email              String?
-  emailNormalized    String? // should be set by app code (lowercase + trim)
+  emailNormalized    String?
   emailVerifiedAt    DateTime?
   name               String?
   preferredLanguage  String?
-  // auth
-  passwordHash       String? // nullable to support social-only accounts
+  passwordHash       String?
   passwordUpdatedAt  DateTime?
   lastLoginAt        DateTime?
-  // create / update timestamps
   createdAt          DateTime  @default(now())
-  updatedAt          DateTime? // null = never edited
-  // deletion / erasure flow
-  deactivatedAt      DateTime? // user self-deactivated (soft)
-  erasureRequestedAt DateTime? // user requested full erasure (explicit email flow)
-  erasedAt           DateTime? // actual erasure timestamp (after admin job)
-  // moderation
+  updatedAt          DateTime?
+  deactivatedAt      DateTime?
+  erasureRequestedAt DateTime?
+  erasedAt           DateTime?
   isBanned           Boolean   @default(false)
 
-  // relations
   globalRoles         UserGlobalRole[]
   scholarRoles        UserScholarRole[]
   createdScholarRoles UserScholarRole[]     @relation("createdByUser")
@@ -79,7 +86,6 @@ model User {
 }
 
 model UserGlobalRole {
-  // global roles like 'admin' or 'listener'
   userId    String
   role      GlobalRole
   createdAt DateTime   @default(now())
@@ -91,16 +97,14 @@ model UserGlobalRole {
 }
 
 model UserScholarRole {
-  // scoped role: a user can be scholar or scholar_editor for a given scholar
   userId          String
   scholarId       String
   role            ScholarRole
   createdAt       DateTime    @default(now())
-  createdByUserId String? // who created this mapping (admin / scholar)
+  createdByUserId String?
 
   user          User    @relation(fields: [userId], references: [id], onDelete: Restrict)
   scholar       Scholar @relation(fields: [scholarId], references: [id], onDelete: Restrict)
-  // optionally link creator (audit)
   createdByUser User?   @relation("createdByUser", fields: [createdByUserId], references: [id], onDelete: SetNull)
 
   @@id([userId, scholarId, role])
@@ -114,7 +118,7 @@ model UserScholarRole {
 
 model Scholar {
   id           String    @id @default(cuid())
-  slug         String // e.g. ibn-baz
+  slug         String
   name         String
   bio          String?
   country      String?
@@ -124,7 +128,9 @@ model Scholar {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime?
 
-  // relations
+  ingestionBatchId String?
+  ingestionBatch   IngestionBatch? @relation("IngestBatchScholars", fields: [ingestionBatchId], references: [id])
+
   collections Collection[]
   series      Series[]
   lectures    Lecture[]
@@ -146,16 +152,17 @@ model Collection {
   description   String?
   coverImageUrl String?
   language      String?
-  status        Status    @default(draft) // now includes 'review'
+  status        Status    @default(draft)
   orderIndex    Int?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime?
 
-  // soft-delete fields for the 30-day grace period
   deletedAt     DateTime?
   deleteAfterAt DateTime?
 
-  // relations
+  ingestionBatchId String?
+  ingestionBatch   IngestionBatch? @relation("IngestBatchCollections", fields: [ingestionBatchId], references: [id])
+
   scholar Scholar           @relation(fields: [scholarId], references: [id], onDelete: Restrict)
   series  Series[]
   topics  CollectionTopic[]
@@ -174,7 +181,7 @@ model Collection {
 model Series {
   id            String    @id @default(cuid())
   scholarId     String
-  collectionId  String? // nullable: series can be standalone or in a collection
+  collectionId  String?
   slug          String
   title         String
   description   String?
@@ -188,7 +195,9 @@ model Series {
   deletedAt     DateTime?
   deleteAfterAt DateTime?
 
-  // relations
+  ingestionBatchId String?
+  ingestionBatch   IngestionBatch? @relation("IngestBatchSeries", fields: [ingestionBatchId], references: [id])
+
   scholar    Scholar       @relation(fields: [scholarId], references: [id], onDelete: Restrict)
   collection Collection?   @relation(fields: [collectionId], references: [id], onDelete: Restrict)
   lectures   Lecture[]
@@ -223,7 +232,9 @@ model Lecture {
   deletedAt     DateTime?
   deleteAfterAt DateTime?
 
-  // relations
+  ingestionBatchId String?
+  ingestionBatch   IngestionBatch? @relation("IngestBatchLectures", fields: [ingestionBatchId], references: [id])
+
   scholar     Scholar               @relation(fields: [scholarId], references: [id], onDelete: Restrict)
   series      Series?               @relation(fields: [seriesId], references: [id], onDelete: Restrict)
   audioAssets AudioAsset[]
@@ -241,7 +252,6 @@ model Lecture {
 
 //////////////////////////
 // AudioAssets (one or many per lecture)
-// (per your rule: no soft-delete for audio assets; if lecture is removed, cascade will delete assets)
 //////////////////////////
 
 model AudioAsset {
@@ -256,9 +266,12 @@ model AudioAsset {
   isPrimary       Boolean  @default(false)
   createdAt       DateTime @default(now())
 
+  ingestionBatchId String?
+  ingestionBatch   IngestionBatch? @relation("IngestBatchAudioAssets", fields: [ingestionBatchId], references: [id])
+
   lecture Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
   // partial unique index for primary must be created via raw SQL after migration:
-  //   CREATE UNIQUE INDEX uq_audioasset_lecture_primary ON "AudioAsset"("lectureId") WHERE (isPrimary);
+  // CREATE UNIQUE INDEX uq_audioasset_lecture_primary ON "AudioAsset"("lectureId") WHERE (isPrimary);
 
   @@index([lectureId], map: "idx_audioasset_lecture")
 }

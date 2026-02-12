@@ -5,18 +5,50 @@
  * Backend API for Salafi Durus
  * OpenAPI spec version: 1.0.0
  */
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
   DataTag,
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
+  MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
+
+import type {
+  AttachTopicDto,
+  AudioAssetViewDto,
+  CatalogControllerCollectionsParams,
+  CatalogControllerLecturesParams,
+  CatalogControllerSeriesParams,
+  CollectionCatalogPageDto,
+  CollectionViewDto,
+  ErrorResponseDto,
+  HealthDbResponseDto,
+  HealthResponseDto,
+  LectureCatalogPageDto,
+  LectureTopicViewDto,
+  LectureViewDto,
+  ScholarViewDto,
+  SeriesCatalogPageDto,
+  SeriesViewDto,
+  TopicDetailDto,
+  TopicLectureViewDto,
+  TopicViewDto,
+  TopicsControllerListLecturesParams,
+  UpsertAudioAssetDto,
+  UpsertCollectionDto,
+  UpsertLectureDto,
+  UpsertScholarDto,
+  UpsertSeriesDto,
+  UpsertTopicDto,
+} from "./schemas";
 
 import { httpClient } from "../src/http";
 
@@ -127,8 +159,11 @@ export function useAppControllerGetHello<
   return query;
 }
 
+/**
+ * @summary Health check
+ */
 export const healthControllerGetHealth = (signal?: AbortSignal) => {
-  return httpClient<void>({ url: `/health`, method: "GET", signal });
+  return httpClient<HealthResponseDto>({ url: `/health`, method: "GET", signal });
 };
 
 export const getHealthControllerGetHealthQueryKey = () => {
@@ -137,7 +172,7 @@ export const getHealthControllerGetHealthQueryKey = () => {
 
 export const getHealthControllerGetHealthQueryOptions = <
   TData = Awaited<ReturnType<typeof healthControllerGetHealth>>,
-  TError = unknown,
+  TError = ErrorResponseDto,
 >(options?: {
   query?: Partial<
     UseQueryOptions<Awaited<ReturnType<typeof healthControllerGetHealth>>, TError, TData>
@@ -161,11 +196,11 @@ export const getHealthControllerGetHealthQueryOptions = <
 export type HealthControllerGetHealthQueryResult = NonNullable<
   Awaited<ReturnType<typeof healthControllerGetHealth>>
 >;
-export type HealthControllerGetHealthQueryError = unknown;
+export type HealthControllerGetHealthQueryError = ErrorResponseDto;
 
 export function useHealthControllerGetHealth<
   TData = Awaited<ReturnType<typeof healthControllerGetHealth>>,
-  TError = unknown,
+  TError = ErrorResponseDto,
 >(
   options: {
     query: Partial<
@@ -184,7 +219,7 @@ export function useHealthControllerGetHealth<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
 export function useHealthControllerGetHealth<
   TData = Awaited<ReturnType<typeof healthControllerGetHealth>>,
-  TError = unknown,
+  TError = ErrorResponseDto,
 >(
   options?: {
     query?: Partial<
@@ -203,7 +238,7 @@ export function useHealthControllerGetHealth<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
 export function useHealthControllerGetHealth<
   TData = Awaited<ReturnType<typeof healthControllerGetHealth>>,
-  TError = unknown,
+  TError = ErrorResponseDto,
 >(
   options?: {
     query?: Partial<
@@ -212,10 +247,13 @@ export function useHealthControllerGetHealth<
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary Health check
+ */
 
 export function useHealthControllerGetHealth<
   TData = Awaited<ReturnType<typeof healthControllerGetHealth>>,
-  TError = unknown,
+  TError = ErrorResponseDto,
 >(
   options?: {
     query?: Partial<
@@ -234,3 +272,4365 @@ export function useHealthControllerGetHealth<
 
   return query;
 }
+
+export const healthControllerGetDbHealth = (signal?: AbortSignal) => {
+  return httpClient<HealthDbResponseDto>({ url: `/health/db`, method: "GET", signal });
+};
+
+export const getHealthControllerGetDbHealthQueryKey = () => {
+  return [`/health/db`] as const;
+};
+
+export const getHealthControllerGetDbHealthQueryOptions = <
+  TData = Awaited<ReturnType<typeof healthControllerGetDbHealth>>,
+  TError = ErrorResponseDto,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof healthControllerGetDbHealth>>, TError, TData>
+  >;
+}) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getHealthControllerGetDbHealthQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof healthControllerGetDbHealth>>> = ({
+    signal,
+  }) => healthControllerGetDbHealth(signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof healthControllerGetDbHealth>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type HealthControllerGetDbHealthQueryResult = NonNullable<
+  Awaited<ReturnType<typeof healthControllerGetDbHealth>>
+>;
+export type HealthControllerGetDbHealthQueryError = ErrorResponseDto;
+
+export function useHealthControllerGetDbHealth<
+  TData = Awaited<ReturnType<typeof healthControllerGetDbHealth>>,
+  TError = ErrorResponseDto,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof healthControllerGetDbHealth>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof healthControllerGetDbHealth>>,
+          TError,
+          Awaited<ReturnType<typeof healthControllerGetDbHealth>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useHealthControllerGetDbHealth<
+  TData = Awaited<ReturnType<typeof healthControllerGetDbHealth>>,
+  TError = ErrorResponseDto,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof healthControllerGetDbHealth>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof healthControllerGetDbHealth>>,
+          TError,
+          Awaited<ReturnType<typeof healthControllerGetDbHealth>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useHealthControllerGetDbHealth<
+  TData = Awaited<ReturnType<typeof healthControllerGetDbHealth>>,
+  TError = ErrorResponseDto,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof healthControllerGetDbHealth>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+export function useHealthControllerGetDbHealth<
+  TData = Awaited<ReturnType<typeof healthControllerGetDbHealth>>,
+  TError = ErrorResponseDto,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof healthControllerGetDbHealth>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getHealthControllerGetDbHealthQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary List active scholars
+ */
+export const scholarsControllerList = (signal?: AbortSignal) => {
+  return httpClient<ScholarViewDto[]>({ url: `/scholars`, method: "GET", signal });
+};
+
+export const getScholarsControllerListQueryKey = () => {
+  return [`/scholars`] as const;
+};
+
+export const getScholarsControllerListQueryOptions = <
+  TData = Awaited<ReturnType<typeof scholarsControllerList>>,
+  TError = ErrorResponseDto,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof scholarsControllerList>>, TError, TData>
+  >;
+}) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getScholarsControllerListQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof scholarsControllerList>>> = ({ signal }) =>
+    scholarsControllerList(signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof scholarsControllerList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type ScholarsControllerListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof scholarsControllerList>>
+>;
+export type ScholarsControllerListQueryError = ErrorResponseDto;
+
+export function useScholarsControllerList<
+  TData = Awaited<ReturnType<typeof scholarsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof scholarsControllerList>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof scholarsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof scholarsControllerList>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useScholarsControllerList<
+  TData = Awaited<ReturnType<typeof scholarsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof scholarsControllerList>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof scholarsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof scholarsControllerList>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useScholarsControllerList<
+  TData = Awaited<ReturnType<typeof scholarsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof scholarsControllerList>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary List active scholars
+ */
+
+export function useScholarsControllerList<
+  TData = Awaited<ReturnType<typeof scholarsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof scholarsControllerList>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getScholarsControllerListQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Get an active scholar by slug
+ */
+export const scholarsControllerGetBySlug = (slug: string, signal?: AbortSignal) => {
+  return httpClient<ScholarViewDto>({ url: `/scholars/${slug}`, method: "GET", signal });
+};
+
+export const getScholarsControllerGetBySlugQueryKey = (slug?: string) => {
+  return [`/scholars/${slug}`] as const;
+};
+
+export const getScholarsControllerGetBySlugQueryOptions = <
+  TData = Awaited<ReturnType<typeof scholarsControllerGetBySlug>>,
+  TError = ErrorResponseDto,
+>(
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof scholarsControllerGetBySlug>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getScholarsControllerGetBySlugQueryKey(slug);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof scholarsControllerGetBySlug>>> = ({
+    signal,
+  }) => scholarsControllerGetBySlug(slug, signal);
+
+  return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof scholarsControllerGetBySlug>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type ScholarsControllerGetBySlugQueryResult = NonNullable<
+  Awaited<ReturnType<typeof scholarsControllerGetBySlug>>
+>;
+export type ScholarsControllerGetBySlugQueryError = ErrorResponseDto;
+
+export function useScholarsControllerGetBySlug<
+  TData = Awaited<ReturnType<typeof scholarsControllerGetBySlug>>,
+  TError = ErrorResponseDto,
+>(
+  slug: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof scholarsControllerGetBySlug>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof scholarsControllerGetBySlug>>,
+          TError,
+          Awaited<ReturnType<typeof scholarsControllerGetBySlug>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useScholarsControllerGetBySlug<
+  TData = Awaited<ReturnType<typeof scholarsControllerGetBySlug>>,
+  TError = ErrorResponseDto,
+>(
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof scholarsControllerGetBySlug>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof scholarsControllerGetBySlug>>,
+          TError,
+          Awaited<ReturnType<typeof scholarsControllerGetBySlug>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useScholarsControllerGetBySlug<
+  TData = Awaited<ReturnType<typeof scholarsControllerGetBySlug>>,
+  TError = ErrorResponseDto,
+>(
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof scholarsControllerGetBySlug>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary Get an active scholar by slug
+ */
+
+export function useScholarsControllerGetBySlug<
+  TData = Awaited<ReturnType<typeof scholarsControllerGetBySlug>>,
+  TError = ErrorResponseDto,
+>(
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof scholarsControllerGetBySlug>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getScholarsControllerGetBySlugQueryOptions(slug, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Upsert scholar by slug
+ */
+export const scholarsControllerUpsert = (
+  upsertScholarDto: UpsertScholarDto,
+  signal?: AbortSignal,
+) => {
+  return httpClient<ScholarViewDto>({
+    url: `/scholars/upsert`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: upsertScholarDto,
+    signal,
+  });
+};
+
+export const getScholarsControllerUpsertMutationOptions = <
+  TError = ErrorResponseDto,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof scholarsControllerUpsert>>,
+    TError,
+    { data: UpsertScholarDto },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof scholarsControllerUpsert>>,
+  TError,
+  { data: UpsertScholarDto },
+  TContext
+> => {
+  const mutationKey = ["scholarsControllerUpsert"];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof scholarsControllerUpsert>>,
+    { data: UpsertScholarDto }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return scholarsControllerUpsert(data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ScholarsControllerUpsertMutationResult = NonNullable<
+  Awaited<ReturnType<typeof scholarsControllerUpsert>>
+>;
+export type ScholarsControllerUpsertMutationBody = UpsertScholarDto;
+export type ScholarsControllerUpsertMutationError = ErrorResponseDto;
+
+/**
+ * @summary Upsert scholar by slug
+ */
+export const useScholarsControllerUpsert = <TError = ErrorResponseDto, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof scholarsControllerUpsert>>,
+      TError,
+      { data: UpsertScholarDto },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof scholarsControllerUpsert>>,
+  TError,
+  { data: UpsertScholarDto },
+  TContext
+> => {
+  const mutationOptions = getScholarsControllerUpsertMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary List published collections for a scholar
+ */
+export const collectionsControllerList = (scholarSlug: string, signal?: AbortSignal) => {
+  return httpClient<CollectionViewDto[]>({
+    url: `/scholars/${scholarSlug}/collections`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getCollectionsControllerListQueryKey = (scholarSlug?: string) => {
+  return [`/scholars/${scholarSlug}/collections`] as const;
+};
+
+export const getCollectionsControllerListQueryOptions = <
+  TData = Awaited<ReturnType<typeof collectionsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof collectionsControllerList>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getCollectionsControllerListQueryKey(scholarSlug);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof collectionsControllerList>>> = ({
+    signal,
+  }) => collectionsControllerList(scholarSlug, signal);
+
+  return { queryKey, queryFn, enabled: !!scholarSlug, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof collectionsControllerList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type CollectionsControllerListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof collectionsControllerList>>
+>;
+export type CollectionsControllerListQueryError = ErrorResponseDto;
+
+export function useCollectionsControllerList<
+  TData = Awaited<ReturnType<typeof collectionsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof collectionsControllerList>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof collectionsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof collectionsControllerList>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useCollectionsControllerList<
+  TData = Awaited<ReturnType<typeof collectionsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof collectionsControllerList>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof collectionsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof collectionsControllerList>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useCollectionsControllerList<
+  TData = Awaited<ReturnType<typeof collectionsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof collectionsControllerList>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary List published collections for a scholar
+ */
+
+export function useCollectionsControllerList<
+  TData = Awaited<ReturnType<typeof collectionsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof collectionsControllerList>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getCollectionsControllerListQueryOptions(scholarSlug, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Get a published collection by slug
+ */
+export const collectionsControllerGet = (
+  scholarSlug: string,
+  slug: string,
+  signal?: AbortSignal,
+) => {
+  return httpClient<CollectionViewDto>({
+    url: `/scholars/${scholarSlug}/collections/${slug}`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getCollectionsControllerGetQueryKey = (scholarSlug?: string, slug?: string) => {
+  return [`/scholars/${scholarSlug}/collections/${slug}`] as const;
+};
+
+export const getCollectionsControllerGetQueryOptions = <
+  TData = Awaited<ReturnType<typeof collectionsControllerGet>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof collectionsControllerGet>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getCollectionsControllerGetQueryKey(scholarSlug, slug);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof collectionsControllerGet>>> = ({
+    signal,
+  }) => collectionsControllerGet(scholarSlug, slug, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!(scholarSlug && slug),
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof collectionsControllerGet>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+};
+
+export type CollectionsControllerGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof collectionsControllerGet>>
+>;
+export type CollectionsControllerGetQueryError = ErrorResponseDto;
+
+export function useCollectionsControllerGet<
+  TData = Awaited<ReturnType<typeof collectionsControllerGet>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  slug: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof collectionsControllerGet>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof collectionsControllerGet>>,
+          TError,
+          Awaited<ReturnType<typeof collectionsControllerGet>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useCollectionsControllerGet<
+  TData = Awaited<ReturnType<typeof collectionsControllerGet>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof collectionsControllerGet>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof collectionsControllerGet>>,
+          TError,
+          Awaited<ReturnType<typeof collectionsControllerGet>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useCollectionsControllerGet<
+  TData = Awaited<ReturnType<typeof collectionsControllerGet>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof collectionsControllerGet>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary Get a published collection by slug
+ */
+
+export function useCollectionsControllerGet<
+  TData = Awaited<ReturnType<typeof collectionsControllerGet>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof collectionsControllerGet>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getCollectionsControllerGetQueryOptions(scholarSlug, slug, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Upsert collection by slug (per scholar)
+ */
+export const collectionsControllerUpsert = (
+  scholarSlug: string,
+  upsertCollectionDto: UpsertCollectionDto,
+  signal?: AbortSignal,
+) => {
+  return httpClient<CollectionViewDto>({
+    url: `/scholars/${scholarSlug}/collections/upsert`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: upsertCollectionDto,
+    signal,
+  });
+};
+
+export const getCollectionsControllerUpsertMutationOptions = <
+  TError = ErrorResponseDto,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof collectionsControllerUpsert>>,
+    TError,
+    { scholarSlug: string; data: UpsertCollectionDto },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof collectionsControllerUpsert>>,
+  TError,
+  { scholarSlug: string; data: UpsertCollectionDto },
+  TContext
+> => {
+  const mutationKey = ["collectionsControllerUpsert"];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof collectionsControllerUpsert>>,
+    { scholarSlug: string; data: UpsertCollectionDto }
+  > = (props) => {
+    const { scholarSlug, data } = props ?? {};
+
+    return collectionsControllerUpsert(scholarSlug, data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CollectionsControllerUpsertMutationResult = NonNullable<
+  Awaited<ReturnType<typeof collectionsControllerUpsert>>
+>;
+export type CollectionsControllerUpsertMutationBody = UpsertCollectionDto;
+export type CollectionsControllerUpsertMutationError = ErrorResponseDto;
+
+/**
+ * @summary Upsert collection by slug (per scholar)
+ */
+export const useCollectionsControllerUpsert = <TError = ErrorResponseDto, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof collectionsControllerUpsert>>,
+      TError,
+      { scholarSlug: string; data: UpsertCollectionDto },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof collectionsControllerUpsert>>,
+  TError,
+  { scholarSlug: string; data: UpsertCollectionDto },
+  TContext
+> => {
+  const mutationOptions = getCollectionsControllerUpsertMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Get a published collection by id
+ */
+export const collectionsPublicControllerGetById = (id: string, signal?: AbortSignal) => {
+  return httpClient<CollectionViewDto>({ url: `/collections/${id}`, method: "GET", signal });
+};
+
+export const getCollectionsPublicControllerGetByIdQueryKey = (id?: string) => {
+  return [`/collections/${id}`] as const;
+};
+
+export const getCollectionsPublicControllerGetByIdQueryOptions = <
+  TData = Awaited<ReturnType<typeof collectionsPublicControllerGetById>>,
+  TError = ErrorResponseDto,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof collectionsPublicControllerGetById>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getCollectionsPublicControllerGetByIdQueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof collectionsPublicControllerGetById>>> = ({
+    signal,
+  }) => collectionsPublicControllerGetById(id, signal);
+
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof collectionsPublicControllerGetById>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type CollectionsPublicControllerGetByIdQueryResult = NonNullable<
+  Awaited<ReturnType<typeof collectionsPublicControllerGetById>>
+>;
+export type CollectionsPublicControllerGetByIdQueryError = ErrorResponseDto;
+
+export function useCollectionsPublicControllerGetById<
+  TData = Awaited<ReturnType<typeof collectionsPublicControllerGetById>>,
+  TError = ErrorResponseDto,
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof collectionsPublicControllerGetById>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof collectionsPublicControllerGetById>>,
+          TError,
+          Awaited<ReturnType<typeof collectionsPublicControllerGetById>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useCollectionsPublicControllerGetById<
+  TData = Awaited<ReturnType<typeof collectionsPublicControllerGetById>>,
+  TError = ErrorResponseDto,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof collectionsPublicControllerGetById>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof collectionsPublicControllerGetById>>,
+          TError,
+          Awaited<ReturnType<typeof collectionsPublicControllerGetById>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useCollectionsPublicControllerGetById<
+  TData = Awaited<ReturnType<typeof collectionsPublicControllerGetById>>,
+  TError = ErrorResponseDto,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof collectionsPublicControllerGetById>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary Get a published collection by id
+ */
+
+export function useCollectionsPublicControllerGetById<
+  TData = Awaited<ReturnType<typeof collectionsPublicControllerGetById>>,
+  TError = ErrorResponseDto,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof collectionsPublicControllerGetById>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getCollectionsPublicControllerGetByIdQueryOptions(id, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary List published series for a scholar
+ */
+export const seriesControllerList = (scholarSlug: string, signal?: AbortSignal) => {
+  return httpClient<SeriesViewDto[]>({
+    url: `/scholars/${scholarSlug}/series`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getSeriesControllerListQueryKey = (scholarSlug?: string) => {
+  return [`/scholars/${scholarSlug}/series`] as const;
+};
+
+export const getSeriesControllerListQueryOptions = <
+  TData = Awaited<ReturnType<typeof seriesControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof seriesControllerList>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getSeriesControllerListQueryKey(scholarSlug);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof seriesControllerList>>> = ({ signal }) =>
+    seriesControllerList(scholarSlug, signal);
+
+  return { queryKey, queryFn, enabled: !!scholarSlug, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof seriesControllerList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type SeriesControllerListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof seriesControllerList>>
+>;
+export type SeriesControllerListQueryError = ErrorResponseDto;
+
+export function useSeriesControllerList<
+  TData = Awaited<ReturnType<typeof seriesControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof seriesControllerList>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof seriesControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof seriesControllerList>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useSeriesControllerList<
+  TData = Awaited<ReturnType<typeof seriesControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof seriesControllerList>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof seriesControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof seriesControllerList>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useSeriesControllerList<
+  TData = Awaited<ReturnType<typeof seriesControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof seriesControllerList>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary List published series for a scholar
+ */
+
+export function useSeriesControllerList<
+  TData = Awaited<ReturnType<typeof seriesControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof seriesControllerList>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getSeriesControllerListQueryOptions(scholarSlug, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Get a published series by slug
+ */
+export const seriesControllerGet = (scholarSlug: string, slug: string, signal?: AbortSignal) => {
+  return httpClient<SeriesViewDto>({
+    url: `/scholars/${scholarSlug}/series/${slug}`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getSeriesControllerGetQueryKey = (scholarSlug?: string, slug?: string) => {
+  return [`/scholars/${scholarSlug}/series/${slug}`] as const;
+};
+
+export const getSeriesControllerGetQueryOptions = <
+  TData = Awaited<ReturnType<typeof seriesControllerGet>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof seriesControllerGet>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getSeriesControllerGetQueryKey(scholarSlug, slug);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof seriesControllerGet>>> = ({ signal }) =>
+    seriesControllerGet(scholarSlug, slug, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!(scholarSlug && slug),
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof seriesControllerGet>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+};
+
+export type SeriesControllerGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof seriesControllerGet>>
+>;
+export type SeriesControllerGetQueryError = ErrorResponseDto;
+
+export function useSeriesControllerGet<
+  TData = Awaited<ReturnType<typeof seriesControllerGet>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  slug: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof seriesControllerGet>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof seriesControllerGet>>,
+          TError,
+          Awaited<ReturnType<typeof seriesControllerGet>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useSeriesControllerGet<
+  TData = Awaited<ReturnType<typeof seriesControllerGet>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof seriesControllerGet>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof seriesControllerGet>>,
+          TError,
+          Awaited<ReturnType<typeof seriesControllerGet>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useSeriesControllerGet<
+  TData = Awaited<ReturnType<typeof seriesControllerGet>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof seriesControllerGet>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary Get a published series by slug
+ */
+
+export function useSeriesControllerGet<
+  TData = Awaited<ReturnType<typeof seriesControllerGet>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof seriesControllerGet>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getSeriesControllerGetQueryOptions(scholarSlug, slug, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Upsert a series by slug for a scholar
+ */
+export const seriesControllerUpsert = (
+  scholarSlug: string,
+  upsertSeriesDto: UpsertSeriesDto,
+  signal?: AbortSignal,
+) => {
+  return httpClient<SeriesViewDto>({
+    url: `/scholars/${scholarSlug}/series/upsert`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: upsertSeriesDto,
+    signal,
+  });
+};
+
+export const getSeriesControllerUpsertMutationOptions = <
+  TError = ErrorResponseDto,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof seriesControllerUpsert>>,
+    TError,
+    { scholarSlug: string; data: UpsertSeriesDto },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof seriesControllerUpsert>>,
+  TError,
+  { scholarSlug: string; data: UpsertSeriesDto },
+  TContext
+> => {
+  const mutationKey = ["seriesControllerUpsert"];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof seriesControllerUpsert>>,
+    { scholarSlug: string; data: UpsertSeriesDto }
+  > = (props) => {
+    const { scholarSlug, data } = props ?? {};
+
+    return seriesControllerUpsert(scholarSlug, data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SeriesControllerUpsertMutationResult = NonNullable<
+  Awaited<ReturnType<typeof seriesControllerUpsert>>
+>;
+export type SeriesControllerUpsertMutationBody = UpsertSeriesDto;
+export type SeriesControllerUpsertMutationError = ErrorResponseDto;
+
+/**
+ * @summary Upsert a series by slug for a scholar
+ */
+export const useSeriesControllerUpsert = <TError = ErrorResponseDto, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof seriesControllerUpsert>>,
+      TError,
+      { scholarSlug: string; data: UpsertSeriesDto },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof seriesControllerUpsert>>,
+  TError,
+  { scholarSlug: string; data: UpsertSeriesDto },
+  TContext
+> => {
+  const mutationOptions = getSeriesControllerUpsertMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary List published series for a given collection (scoped by scholar + collection)
+ */
+export const seriesByCollectionControllerListForCollection = (
+  scholarSlug: string,
+  collectionSlug: string,
+  signal?: AbortSignal,
+) => {
+  return httpClient<SeriesViewDto[]>({
+    url: `/scholars/${scholarSlug}/collections/${collectionSlug}/series`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getSeriesByCollectionControllerListForCollectionQueryKey = (
+  scholarSlug?: string,
+  collectionSlug?: string,
+) => {
+  return [`/scholars/${scholarSlug}/collections/${collectionSlug}/series`] as const;
+};
+
+export const getSeriesByCollectionControllerListForCollectionQueryOptions = <
+  TData = Awaited<ReturnType<typeof seriesByCollectionControllerListForCollection>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  collectionSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof seriesByCollectionControllerListForCollection>>,
+        TError,
+        TData
+      >
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getSeriesByCollectionControllerListForCollectionQueryKey(scholarSlug, collectionSlug);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof seriesByCollectionControllerListForCollection>>
+  > = ({ signal }) =>
+    seriesByCollectionControllerListForCollection(scholarSlug, collectionSlug, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!(scholarSlug && collectionSlug),
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof seriesByCollectionControllerListForCollection>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type SeriesByCollectionControllerListForCollectionQueryResult = NonNullable<
+  Awaited<ReturnType<typeof seriesByCollectionControllerListForCollection>>
+>;
+export type SeriesByCollectionControllerListForCollectionQueryError = ErrorResponseDto;
+
+export function useSeriesByCollectionControllerListForCollection<
+  TData = Awaited<ReturnType<typeof seriesByCollectionControllerListForCollection>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  collectionSlug: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof seriesByCollectionControllerListForCollection>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof seriesByCollectionControllerListForCollection>>,
+          TError,
+          Awaited<ReturnType<typeof seriesByCollectionControllerListForCollection>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useSeriesByCollectionControllerListForCollection<
+  TData = Awaited<ReturnType<typeof seriesByCollectionControllerListForCollection>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  collectionSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof seriesByCollectionControllerListForCollection>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof seriesByCollectionControllerListForCollection>>,
+          TError,
+          Awaited<ReturnType<typeof seriesByCollectionControllerListForCollection>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useSeriesByCollectionControllerListForCollection<
+  TData = Awaited<ReturnType<typeof seriesByCollectionControllerListForCollection>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  collectionSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof seriesByCollectionControllerListForCollection>>,
+        TError,
+        TData
+      >
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary List published series for a given collection (scoped by scholar + collection)
+ */
+
+export function useSeriesByCollectionControllerListForCollection<
+  TData = Awaited<ReturnType<typeof seriesByCollectionControllerListForCollection>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  collectionSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof seriesByCollectionControllerListForCollection>>,
+        TError,
+        TData
+      >
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getSeriesByCollectionControllerListForCollectionQueryOptions(
+    scholarSlug,
+    collectionSlug,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Get a published series by id
+ */
+export const seriesPublicControllerGetById = (id: string, signal?: AbortSignal) => {
+  return httpClient<SeriesViewDto>({ url: `/series/${id}`, method: "GET", signal });
+};
+
+export const getSeriesPublicControllerGetByIdQueryKey = (id?: string) => {
+  return [`/series/${id}`] as const;
+};
+
+export const getSeriesPublicControllerGetByIdQueryOptions = <
+  TData = Awaited<ReturnType<typeof seriesPublicControllerGetById>>,
+  TError = ErrorResponseDto,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof seriesPublicControllerGetById>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getSeriesPublicControllerGetByIdQueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof seriesPublicControllerGetById>>> = ({
+    signal,
+  }) => seriesPublicControllerGetById(id, signal);
+
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof seriesPublicControllerGetById>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type SeriesPublicControllerGetByIdQueryResult = NonNullable<
+  Awaited<ReturnType<typeof seriesPublicControllerGetById>>
+>;
+export type SeriesPublicControllerGetByIdQueryError = ErrorResponseDto;
+
+export function useSeriesPublicControllerGetById<
+  TData = Awaited<ReturnType<typeof seriesPublicControllerGetById>>,
+  TError = ErrorResponseDto,
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof seriesPublicControllerGetById>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof seriesPublicControllerGetById>>,
+          TError,
+          Awaited<ReturnType<typeof seriesPublicControllerGetById>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useSeriesPublicControllerGetById<
+  TData = Awaited<ReturnType<typeof seriesPublicControllerGetById>>,
+  TError = ErrorResponseDto,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof seriesPublicControllerGetById>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof seriesPublicControllerGetById>>,
+          TError,
+          Awaited<ReturnType<typeof seriesPublicControllerGetById>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useSeriesPublicControllerGetById<
+  TData = Awaited<ReturnType<typeof seriesPublicControllerGetById>>,
+  TError = ErrorResponseDto,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof seriesPublicControllerGetById>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary Get a published series by id
+ */
+
+export function useSeriesPublicControllerGetById<
+  TData = Awaited<ReturnType<typeof seriesPublicControllerGetById>>,
+  TError = ErrorResponseDto,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof seriesPublicControllerGetById>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getSeriesPublicControllerGetByIdQueryOptions(id, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary List published lectures for a scholar
+ */
+export const lecturesControllerList = (scholarSlug: string, signal?: AbortSignal) => {
+  return httpClient<LectureViewDto[]>({
+    url: `/scholars/${scholarSlug}/lectures`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getLecturesControllerListQueryKey = (scholarSlug?: string) => {
+  return [`/scholars/${scholarSlug}/lectures`] as const;
+};
+
+export const getLecturesControllerListQueryOptions = <
+  TData = Awaited<ReturnType<typeof lecturesControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof lecturesControllerList>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getLecturesControllerListQueryKey(scholarSlug);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof lecturesControllerList>>> = ({ signal }) =>
+    lecturesControllerList(scholarSlug, signal);
+
+  return { queryKey, queryFn, enabled: !!scholarSlug, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof lecturesControllerList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type LecturesControllerListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof lecturesControllerList>>
+>;
+export type LecturesControllerListQueryError = ErrorResponseDto;
+
+export function useLecturesControllerList<
+  TData = Awaited<ReturnType<typeof lecturesControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof lecturesControllerList>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof lecturesControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof lecturesControllerList>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useLecturesControllerList<
+  TData = Awaited<ReturnType<typeof lecturesControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof lecturesControllerList>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof lecturesControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof lecturesControllerList>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useLecturesControllerList<
+  TData = Awaited<ReturnType<typeof lecturesControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof lecturesControllerList>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary List published lectures for a scholar
+ */
+
+export function useLecturesControllerList<
+  TData = Awaited<ReturnType<typeof lecturesControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof lecturesControllerList>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getLecturesControllerListQueryOptions(scholarSlug, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Get a published lecture by slug
+ */
+export const lecturesControllerGet = (scholarSlug: string, slug: string, signal?: AbortSignal) => {
+  return httpClient<LectureViewDto>({
+    url: `/scholars/${scholarSlug}/lectures/${slug}`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getLecturesControllerGetQueryKey = (scholarSlug?: string, slug?: string) => {
+  return [`/scholars/${scholarSlug}/lectures/${slug}`] as const;
+};
+
+export const getLecturesControllerGetQueryOptions = <
+  TData = Awaited<ReturnType<typeof lecturesControllerGet>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof lecturesControllerGet>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getLecturesControllerGetQueryKey(scholarSlug, slug);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof lecturesControllerGet>>> = ({ signal }) =>
+    lecturesControllerGet(scholarSlug, slug, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!(scholarSlug && slug),
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof lecturesControllerGet>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+};
+
+export type LecturesControllerGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof lecturesControllerGet>>
+>;
+export type LecturesControllerGetQueryError = ErrorResponseDto;
+
+export function useLecturesControllerGet<
+  TData = Awaited<ReturnType<typeof lecturesControllerGet>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  slug: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof lecturesControllerGet>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof lecturesControllerGet>>,
+          TError,
+          Awaited<ReturnType<typeof lecturesControllerGet>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useLecturesControllerGet<
+  TData = Awaited<ReturnType<typeof lecturesControllerGet>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof lecturesControllerGet>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof lecturesControllerGet>>,
+          TError,
+          Awaited<ReturnType<typeof lecturesControllerGet>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useLecturesControllerGet<
+  TData = Awaited<ReturnType<typeof lecturesControllerGet>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof lecturesControllerGet>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary Get a published lecture by slug
+ */
+
+export function useLecturesControllerGet<
+  TData = Awaited<ReturnType<typeof lecturesControllerGet>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof lecturesControllerGet>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getLecturesControllerGetQueryOptions(scholarSlug, slug, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Upsert a lecture by slug for a scholar
+ */
+export const lecturesControllerUpsert = (
+  scholarSlug: string,
+  upsertLectureDto: UpsertLectureDto,
+  signal?: AbortSignal,
+) => {
+  return httpClient<LectureViewDto>({
+    url: `/scholars/${scholarSlug}/lectures/upsert`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: upsertLectureDto,
+    signal,
+  });
+};
+
+export const getLecturesControllerUpsertMutationOptions = <
+  TError = ErrorResponseDto,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof lecturesControllerUpsert>>,
+    TError,
+    { scholarSlug: string; data: UpsertLectureDto },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof lecturesControllerUpsert>>,
+  TError,
+  { scholarSlug: string; data: UpsertLectureDto },
+  TContext
+> => {
+  const mutationKey = ["lecturesControllerUpsert"];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof lecturesControllerUpsert>>,
+    { scholarSlug: string; data: UpsertLectureDto }
+  > = (props) => {
+    const { scholarSlug, data } = props ?? {};
+
+    return lecturesControllerUpsert(scholarSlug, data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type LecturesControllerUpsertMutationResult = NonNullable<
+  Awaited<ReturnType<typeof lecturesControllerUpsert>>
+>;
+export type LecturesControllerUpsertMutationBody = UpsertLectureDto;
+export type LecturesControllerUpsertMutationError = ErrorResponseDto;
+
+/**
+ * @summary Upsert a lecture by slug for a scholar
+ */
+export const useLecturesControllerUpsert = <TError = ErrorResponseDto, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof lecturesControllerUpsert>>,
+      TError,
+      { scholarSlug: string; data: UpsertLectureDto },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof lecturesControllerUpsert>>,
+  TError,
+  { scholarSlug: string; data: UpsertLectureDto },
+  TContext
+> => {
+  const mutationOptions = getLecturesControllerUpsertMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary List published lectures for a given series (scoped by scholar + series)
+ */
+export const lecturesBySeriesControllerListForSeries = (
+  scholarSlug: string,
+  seriesSlug: string,
+  signal?: AbortSignal,
+) => {
+  return httpClient<LectureViewDto[]>({
+    url: `/scholars/${scholarSlug}/series/${seriesSlug}/lectures`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getLecturesBySeriesControllerListForSeriesQueryKey = (
+  scholarSlug?: string,
+  seriesSlug?: string,
+) => {
+  return [`/scholars/${scholarSlug}/series/${seriesSlug}/lectures`] as const;
+};
+
+export const getLecturesBySeriesControllerListForSeriesQueryOptions = <
+  TData = Awaited<ReturnType<typeof lecturesBySeriesControllerListForSeries>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  seriesSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof lecturesBySeriesControllerListForSeries>>,
+        TError,
+        TData
+      >
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getLecturesBySeriesControllerListForSeriesQueryKey(scholarSlug, seriesSlug);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof lecturesBySeriesControllerListForSeries>>
+  > = ({ signal }) => lecturesBySeriesControllerListForSeries(scholarSlug, seriesSlug, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!(scholarSlug && seriesSlug),
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof lecturesBySeriesControllerListForSeries>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type LecturesBySeriesControllerListForSeriesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof lecturesBySeriesControllerListForSeries>>
+>;
+export type LecturesBySeriesControllerListForSeriesQueryError = ErrorResponseDto;
+
+export function useLecturesBySeriesControllerListForSeries<
+  TData = Awaited<ReturnType<typeof lecturesBySeriesControllerListForSeries>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  seriesSlug: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof lecturesBySeriesControllerListForSeries>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof lecturesBySeriesControllerListForSeries>>,
+          TError,
+          Awaited<ReturnType<typeof lecturesBySeriesControllerListForSeries>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useLecturesBySeriesControllerListForSeries<
+  TData = Awaited<ReturnType<typeof lecturesBySeriesControllerListForSeries>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  seriesSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof lecturesBySeriesControllerListForSeries>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof lecturesBySeriesControllerListForSeries>>,
+          TError,
+          Awaited<ReturnType<typeof lecturesBySeriesControllerListForSeries>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useLecturesBySeriesControllerListForSeries<
+  TData = Awaited<ReturnType<typeof lecturesBySeriesControllerListForSeries>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  seriesSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof lecturesBySeriesControllerListForSeries>>,
+        TError,
+        TData
+      >
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary List published lectures for a given series (scoped by scholar + series)
+ */
+
+export function useLecturesBySeriesControllerListForSeries<
+  TData = Awaited<ReturnType<typeof lecturesBySeriesControllerListForSeries>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  seriesSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof lecturesBySeriesControllerListForSeries>>,
+        TError,
+        TData
+      >
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getLecturesBySeriesControllerListForSeriesQueryOptions(
+    scholarSlug,
+    seriesSlug,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Get a published lecture by id
+ */
+export const lecturesPublicControllerGetById = (id: string, signal?: AbortSignal) => {
+  return httpClient<LectureViewDto>({ url: `/lectures/${id}`, method: "GET", signal });
+};
+
+export const getLecturesPublicControllerGetByIdQueryKey = (id?: string) => {
+  return [`/lectures/${id}`] as const;
+};
+
+export const getLecturesPublicControllerGetByIdQueryOptions = <
+  TData = Awaited<ReturnType<typeof lecturesPublicControllerGetById>>,
+  TError = ErrorResponseDto,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof lecturesPublicControllerGetById>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getLecturesPublicControllerGetByIdQueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof lecturesPublicControllerGetById>>> = ({
+    signal,
+  }) => lecturesPublicControllerGetById(id, signal);
+
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof lecturesPublicControllerGetById>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type LecturesPublicControllerGetByIdQueryResult = NonNullable<
+  Awaited<ReturnType<typeof lecturesPublicControllerGetById>>
+>;
+export type LecturesPublicControllerGetByIdQueryError = ErrorResponseDto;
+
+export function useLecturesPublicControllerGetById<
+  TData = Awaited<ReturnType<typeof lecturesPublicControllerGetById>>,
+  TError = ErrorResponseDto,
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof lecturesPublicControllerGetById>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof lecturesPublicControllerGetById>>,
+          TError,
+          Awaited<ReturnType<typeof lecturesPublicControllerGetById>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useLecturesPublicControllerGetById<
+  TData = Awaited<ReturnType<typeof lecturesPublicControllerGetById>>,
+  TError = ErrorResponseDto,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof lecturesPublicControllerGetById>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof lecturesPublicControllerGetById>>,
+          TError,
+          Awaited<ReturnType<typeof lecturesPublicControllerGetById>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useLecturesPublicControllerGetById<
+  TData = Awaited<ReturnType<typeof lecturesPublicControllerGetById>>,
+  TError = ErrorResponseDto,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof lecturesPublicControllerGetById>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary Get a published lecture by id
+ */
+
+export function useLecturesPublicControllerGetById<
+  TData = Awaited<ReturnType<typeof lecturesPublicControllerGetById>>,
+  TError = ErrorResponseDto,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof lecturesPublicControllerGetById>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getLecturesPublicControllerGetByIdQueryOptions(id, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary List audio assets for a lecture
+ */
+export const audioAssetsControllerList = (lectureId: string, signal?: AbortSignal) => {
+  return httpClient<AudioAssetViewDto[]>({
+    url: `/lectures/${lectureId}/audio-assets`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getAudioAssetsControllerListQueryKey = (lectureId?: string) => {
+  return [`/lectures/${lectureId}/audio-assets`] as const;
+};
+
+export const getAudioAssetsControllerListQueryOptions = <
+  TData = Awaited<ReturnType<typeof audioAssetsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  lectureId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof audioAssetsControllerList>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getAudioAssetsControllerListQueryKey(lectureId);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof audioAssetsControllerList>>> = ({
+    signal,
+  }) => audioAssetsControllerList(lectureId, signal);
+
+  return { queryKey, queryFn, enabled: !!lectureId, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof audioAssetsControllerList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type AudioAssetsControllerListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof audioAssetsControllerList>>
+>;
+export type AudioAssetsControllerListQueryError = ErrorResponseDto;
+
+export function useAudioAssetsControllerList<
+  TData = Awaited<ReturnType<typeof audioAssetsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  lectureId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof audioAssetsControllerList>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof audioAssetsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof audioAssetsControllerList>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useAudioAssetsControllerList<
+  TData = Awaited<ReturnType<typeof audioAssetsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  lectureId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof audioAssetsControllerList>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof audioAssetsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof audioAssetsControllerList>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useAudioAssetsControllerList<
+  TData = Awaited<ReturnType<typeof audioAssetsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  lectureId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof audioAssetsControllerList>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary List audio assets for a lecture
+ */
+
+export function useAudioAssetsControllerList<
+  TData = Awaited<ReturnType<typeof audioAssetsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  lectureId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof audioAssetsControllerList>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getAudioAssetsControllerListQueryOptions(lectureId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Get audio asset by id
+ */
+export const audioAssetsControllerGetById = (
+  lectureId: string,
+  id: string,
+  signal?: AbortSignal,
+) => {
+  return httpClient<AudioAssetViewDto>({
+    url: `/lectures/${lectureId}/audio-assets/${id}`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getAudioAssetsControllerGetByIdQueryKey = (lectureId?: string, id?: string) => {
+  return [`/lectures/${lectureId}/audio-assets/${id}`] as const;
+};
+
+export const getAudioAssetsControllerGetByIdQueryOptions = <
+  TData = Awaited<ReturnType<typeof audioAssetsControllerGetById>>,
+  TError = ErrorResponseDto,
+>(
+  lectureId: string,
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof audioAssetsControllerGetById>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getAudioAssetsControllerGetByIdQueryKey(lectureId, id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof audioAssetsControllerGetById>>> = ({
+    signal,
+  }) => audioAssetsControllerGetById(lectureId, id, signal);
+
+  return { queryKey, queryFn, enabled: !!(lectureId && id), ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof audioAssetsControllerGetById>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type AudioAssetsControllerGetByIdQueryResult = NonNullable<
+  Awaited<ReturnType<typeof audioAssetsControllerGetById>>
+>;
+export type AudioAssetsControllerGetByIdQueryError = ErrorResponseDto;
+
+export function useAudioAssetsControllerGetById<
+  TData = Awaited<ReturnType<typeof audioAssetsControllerGetById>>,
+  TError = ErrorResponseDto,
+>(
+  lectureId: string,
+  id: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof audioAssetsControllerGetById>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof audioAssetsControllerGetById>>,
+          TError,
+          Awaited<ReturnType<typeof audioAssetsControllerGetById>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useAudioAssetsControllerGetById<
+  TData = Awaited<ReturnType<typeof audioAssetsControllerGetById>>,
+  TError = ErrorResponseDto,
+>(
+  lectureId: string,
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof audioAssetsControllerGetById>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof audioAssetsControllerGetById>>,
+          TError,
+          Awaited<ReturnType<typeof audioAssetsControllerGetById>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useAudioAssetsControllerGetById<
+  TData = Awaited<ReturnType<typeof audioAssetsControllerGetById>>,
+  TError = ErrorResponseDto,
+>(
+  lectureId: string,
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof audioAssetsControllerGetById>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary Get audio asset by id
+ */
+
+export function useAudioAssetsControllerGetById<
+  TData = Awaited<ReturnType<typeof audioAssetsControllerGetById>>,
+  TError = ErrorResponseDto,
+>(
+  lectureId: string,
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof audioAssetsControllerGetById>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getAudioAssetsControllerGetByIdQueryOptions(lectureId, id, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Upsert audio asset by (lectureId + url)
+ */
+export const audioAssetsControllerUpsert = (
+  lectureId: string,
+  upsertAudioAssetDto: UpsertAudioAssetDto,
+  signal?: AbortSignal,
+) => {
+  return httpClient<AudioAssetViewDto>({
+    url: `/lectures/${lectureId}/audio-assets/upsert`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: upsertAudioAssetDto,
+    signal,
+  });
+};
+
+export const getAudioAssetsControllerUpsertMutationOptions = <
+  TError = ErrorResponseDto,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof audioAssetsControllerUpsert>>,
+    TError,
+    { lectureId: string; data: UpsertAudioAssetDto },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof audioAssetsControllerUpsert>>,
+  TError,
+  { lectureId: string; data: UpsertAudioAssetDto },
+  TContext
+> => {
+  const mutationKey = ["audioAssetsControllerUpsert"];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof audioAssetsControllerUpsert>>,
+    { lectureId: string; data: UpsertAudioAssetDto }
+  > = (props) => {
+    const { lectureId, data } = props ?? {};
+
+    return audioAssetsControllerUpsert(lectureId, data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AudioAssetsControllerUpsertMutationResult = NonNullable<
+  Awaited<ReturnType<typeof audioAssetsControllerUpsert>>
+>;
+export type AudioAssetsControllerUpsertMutationBody = UpsertAudioAssetDto;
+export type AudioAssetsControllerUpsertMutationError = ErrorResponseDto;
+
+/**
+ * @summary Upsert audio asset by (lectureId + url)
+ */
+export const useAudioAssetsControllerUpsert = <TError = ErrorResponseDto, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof audioAssetsControllerUpsert>>,
+      TError,
+      { lectureId: string; data: UpsertAudioAssetDto },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof audioAssetsControllerUpsert>>,
+  TError,
+  { lectureId: string; data: UpsertAudioAssetDto },
+  TContext
+> => {
+  const mutationOptions = getAudioAssetsControllerUpsertMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Browse published collections (catalog root)
+ */
+export const catalogControllerCollections = (
+  params?: CatalogControllerCollectionsParams,
+  signal?: AbortSignal,
+) => {
+  return httpClient<CollectionCatalogPageDto>({
+    url: `/catalog/collections`,
+    method: "GET",
+    params,
+    signal,
+  });
+};
+
+export const getCatalogControllerCollectionsQueryKey = (
+  params?: CatalogControllerCollectionsParams,
+) => {
+  return [`/catalog/collections`, ...(params ? [params] : [])] as const;
+};
+
+export const getCatalogControllerCollectionsQueryOptions = <
+  TData = Awaited<ReturnType<typeof catalogControllerCollections>>,
+  TError = ErrorResponseDto,
+>(
+  params?: CatalogControllerCollectionsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof catalogControllerCollections>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getCatalogControllerCollectionsQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof catalogControllerCollections>>> = ({
+    signal,
+  }) => catalogControllerCollections(params, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof catalogControllerCollections>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type CatalogControllerCollectionsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof catalogControllerCollections>>
+>;
+export type CatalogControllerCollectionsQueryError = ErrorResponseDto;
+
+export function useCatalogControllerCollections<
+  TData = Awaited<ReturnType<typeof catalogControllerCollections>>,
+  TError = ErrorResponseDto,
+>(
+  params: undefined | CatalogControllerCollectionsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof catalogControllerCollections>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof catalogControllerCollections>>,
+          TError,
+          Awaited<ReturnType<typeof catalogControllerCollections>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useCatalogControllerCollections<
+  TData = Awaited<ReturnType<typeof catalogControllerCollections>>,
+  TError = ErrorResponseDto,
+>(
+  params?: CatalogControllerCollectionsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof catalogControllerCollections>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof catalogControllerCollections>>,
+          TError,
+          Awaited<ReturnType<typeof catalogControllerCollections>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useCatalogControllerCollections<
+  TData = Awaited<ReturnType<typeof catalogControllerCollections>>,
+  TError = ErrorResponseDto,
+>(
+  params?: CatalogControllerCollectionsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof catalogControllerCollections>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary Browse published collections (catalog root)
+ */
+
+export function useCatalogControllerCollections<
+  TData = Awaited<ReturnType<typeof catalogControllerCollections>>,
+  TError = ErrorResponseDto,
+>(
+  params?: CatalogControllerCollectionsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof catalogControllerCollections>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getCatalogControllerCollectionsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Browse published root series only (collectionId = null)
+ */
+export const catalogControllerSeries = (
+  params?: CatalogControllerSeriesParams,
+  signal?: AbortSignal,
+) => {
+  return httpClient<SeriesCatalogPageDto>({
+    url: `/catalog/series`,
+    method: "GET",
+    params,
+    signal,
+  });
+};
+
+export const getCatalogControllerSeriesQueryKey = (params?: CatalogControllerSeriesParams) => {
+  return [`/catalog/series`, ...(params ? [params] : [])] as const;
+};
+
+export const getCatalogControllerSeriesQueryOptions = <
+  TData = Awaited<ReturnType<typeof catalogControllerSeries>>,
+  TError = ErrorResponseDto,
+>(
+  params?: CatalogControllerSeriesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof catalogControllerSeries>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getCatalogControllerSeriesQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof catalogControllerSeries>>> = ({
+    signal,
+  }) => catalogControllerSeries(params, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof catalogControllerSeries>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type CatalogControllerSeriesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof catalogControllerSeries>>
+>;
+export type CatalogControllerSeriesQueryError = ErrorResponseDto;
+
+export function useCatalogControllerSeries<
+  TData = Awaited<ReturnType<typeof catalogControllerSeries>>,
+  TError = ErrorResponseDto,
+>(
+  params: undefined | CatalogControllerSeriesParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof catalogControllerSeries>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof catalogControllerSeries>>,
+          TError,
+          Awaited<ReturnType<typeof catalogControllerSeries>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useCatalogControllerSeries<
+  TData = Awaited<ReturnType<typeof catalogControllerSeries>>,
+  TError = ErrorResponseDto,
+>(
+  params?: CatalogControllerSeriesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof catalogControllerSeries>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof catalogControllerSeries>>,
+          TError,
+          Awaited<ReturnType<typeof catalogControllerSeries>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useCatalogControllerSeries<
+  TData = Awaited<ReturnType<typeof catalogControllerSeries>>,
+  TError = ErrorResponseDto,
+>(
+  params?: CatalogControllerSeriesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof catalogControllerSeries>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary Browse published root series only (collectionId = null)
+ */
+
+export function useCatalogControllerSeries<
+  TData = Awaited<ReturnType<typeof catalogControllerSeries>>,
+  TError = ErrorResponseDto,
+>(
+  params?: CatalogControllerSeriesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof catalogControllerSeries>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getCatalogControllerSeriesQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Browse published root lectures only (seriesId = null)
+ */
+export const catalogControllerLectures = (
+  params?: CatalogControllerLecturesParams,
+  signal?: AbortSignal,
+) => {
+  return httpClient<LectureCatalogPageDto>({
+    url: `/catalog/lectures`,
+    method: "GET",
+    params,
+    signal,
+  });
+};
+
+export const getCatalogControllerLecturesQueryKey = (params?: CatalogControllerLecturesParams) => {
+  return [`/catalog/lectures`, ...(params ? [params] : [])] as const;
+};
+
+export const getCatalogControllerLecturesQueryOptions = <
+  TData = Awaited<ReturnType<typeof catalogControllerLectures>>,
+  TError = ErrorResponseDto,
+>(
+  params?: CatalogControllerLecturesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof catalogControllerLectures>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getCatalogControllerLecturesQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof catalogControllerLectures>>> = ({
+    signal,
+  }) => catalogControllerLectures(params, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof catalogControllerLectures>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type CatalogControllerLecturesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof catalogControllerLectures>>
+>;
+export type CatalogControllerLecturesQueryError = ErrorResponseDto;
+
+export function useCatalogControllerLectures<
+  TData = Awaited<ReturnType<typeof catalogControllerLectures>>,
+  TError = ErrorResponseDto,
+>(
+  params: undefined | CatalogControllerLecturesParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof catalogControllerLectures>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof catalogControllerLectures>>,
+          TError,
+          Awaited<ReturnType<typeof catalogControllerLectures>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useCatalogControllerLectures<
+  TData = Awaited<ReturnType<typeof catalogControllerLectures>>,
+  TError = ErrorResponseDto,
+>(
+  params?: CatalogControllerLecturesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof catalogControllerLectures>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof catalogControllerLectures>>,
+          TError,
+          Awaited<ReturnType<typeof catalogControllerLectures>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useCatalogControllerLectures<
+  TData = Awaited<ReturnType<typeof catalogControllerLectures>>,
+  TError = ErrorResponseDto,
+>(
+  params?: CatalogControllerLecturesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof catalogControllerLectures>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary Browse published root lectures only (seriesId = null)
+ */
+
+export function useCatalogControllerLectures<
+  TData = Awaited<ReturnType<typeof catalogControllerLectures>>,
+  TError = ErrorResponseDto,
+>(
+  params?: CatalogControllerLecturesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof catalogControllerLectures>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getCatalogControllerLecturesQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary List topics
+ */
+export const topicsControllerList = (signal?: AbortSignal) => {
+  return httpClient<TopicDetailDto[]>({ url: `/topics`, method: "GET", signal });
+};
+
+export const getTopicsControllerListQueryKey = () => {
+  return [`/topics`] as const;
+};
+
+export const getTopicsControllerListQueryOptions = <
+  TData = Awaited<ReturnType<typeof topicsControllerList>>,
+  TError = ErrorResponseDto,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof topicsControllerList>>, TError, TData>>;
+}) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getTopicsControllerListQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof topicsControllerList>>> = ({ signal }) =>
+    topicsControllerList(signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof topicsControllerList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type TopicsControllerListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof topicsControllerList>>
+>;
+export type TopicsControllerListQueryError = ErrorResponseDto;
+
+export function useTopicsControllerList<
+  TData = Awaited<ReturnType<typeof topicsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof topicsControllerList>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof topicsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof topicsControllerList>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useTopicsControllerList<
+  TData = Awaited<ReturnType<typeof topicsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof topicsControllerList>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof topicsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof topicsControllerList>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useTopicsControllerList<
+  TData = Awaited<ReturnType<typeof topicsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof topicsControllerList>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary List topics
+ */
+
+export function useTopicsControllerList<
+  TData = Awaited<ReturnType<typeof topicsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof topicsControllerList>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getTopicsControllerListQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Get topic by slug
+ */
+export const topicsControllerGetBySlug = (slug: string, signal?: AbortSignal) => {
+  return httpClient<TopicDetailDto>({ url: `/topics/${slug}`, method: "GET", signal });
+};
+
+export const getTopicsControllerGetBySlugQueryKey = (slug?: string) => {
+  return [`/topics/${slug}`] as const;
+};
+
+export const getTopicsControllerGetBySlugQueryOptions = <
+  TData = Awaited<ReturnType<typeof topicsControllerGetBySlug>>,
+  TError = ErrorResponseDto,
+>(
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof topicsControllerGetBySlug>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getTopicsControllerGetBySlugQueryKey(slug);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof topicsControllerGetBySlug>>> = ({
+    signal,
+  }) => topicsControllerGetBySlug(slug, signal);
+
+  return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof topicsControllerGetBySlug>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type TopicsControllerGetBySlugQueryResult = NonNullable<
+  Awaited<ReturnType<typeof topicsControllerGetBySlug>>
+>;
+export type TopicsControllerGetBySlugQueryError = ErrorResponseDto;
+
+export function useTopicsControllerGetBySlug<
+  TData = Awaited<ReturnType<typeof topicsControllerGetBySlug>>,
+  TError = ErrorResponseDto,
+>(
+  slug: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof topicsControllerGetBySlug>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof topicsControllerGetBySlug>>,
+          TError,
+          Awaited<ReturnType<typeof topicsControllerGetBySlug>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useTopicsControllerGetBySlug<
+  TData = Awaited<ReturnType<typeof topicsControllerGetBySlug>>,
+  TError = ErrorResponseDto,
+>(
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof topicsControllerGetBySlug>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof topicsControllerGetBySlug>>,
+          TError,
+          Awaited<ReturnType<typeof topicsControllerGetBySlug>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useTopicsControllerGetBySlug<
+  TData = Awaited<ReturnType<typeof topicsControllerGetBySlug>>,
+  TError = ErrorResponseDto,
+>(
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof topicsControllerGetBySlug>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary Get topic by slug
+ */
+
+export function useTopicsControllerGetBySlug<
+  TData = Awaited<ReturnType<typeof topicsControllerGetBySlug>>,
+  TError = ErrorResponseDto,
+>(
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof topicsControllerGetBySlug>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getTopicsControllerGetBySlugQueryOptions(slug, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Upsert topic by slug
+ */
+export const topicsControllerUpsert = (upsertTopicDto: UpsertTopicDto, signal?: AbortSignal) => {
+  return httpClient<TopicDetailDto>({
+    url: `/topics/upsert`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: upsertTopicDto,
+    signal,
+  });
+};
+
+export const getTopicsControllerUpsertMutationOptions = <
+  TError = ErrorResponseDto,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof topicsControllerUpsert>>,
+    TError,
+    { data: UpsertTopicDto },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof topicsControllerUpsert>>,
+  TError,
+  { data: UpsertTopicDto },
+  TContext
+> => {
+  const mutationKey = ["topicsControllerUpsert"];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof topicsControllerUpsert>>,
+    { data: UpsertTopicDto }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return topicsControllerUpsert(data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type TopicsControllerUpsertMutationResult = NonNullable<
+  Awaited<ReturnType<typeof topicsControllerUpsert>>
+>;
+export type TopicsControllerUpsertMutationBody = UpsertTopicDto;
+export type TopicsControllerUpsertMutationError = ErrorResponseDto;
+
+/**
+ * @summary Upsert topic by slug
+ */
+export const useTopicsControllerUpsert = <TError = ErrorResponseDto, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof topicsControllerUpsert>>,
+      TError,
+      { data: UpsertTopicDto },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof topicsControllerUpsert>>,
+  TError,
+  { data: UpsertTopicDto },
+  TContext
+> => {
+  const mutationOptions = getTopicsControllerUpsertMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary List direct children of a topic
+ */
+export const topicsControllerListChildren = (slug: string, signal?: AbortSignal) => {
+  return httpClient<TopicViewDto[]>({ url: `/topics/${slug}/children`, method: "GET", signal });
+};
+
+export const getTopicsControllerListChildrenQueryKey = (slug?: string) => {
+  return [`/topics/${slug}/children`] as const;
+};
+
+export const getTopicsControllerListChildrenQueryOptions = <
+  TData = Awaited<ReturnType<typeof topicsControllerListChildren>>,
+  TError = ErrorResponseDto,
+>(
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof topicsControllerListChildren>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getTopicsControllerListChildrenQueryKey(slug);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof topicsControllerListChildren>>> = ({
+    signal,
+  }) => topicsControllerListChildren(slug, signal);
+
+  return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof topicsControllerListChildren>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type TopicsControllerListChildrenQueryResult = NonNullable<
+  Awaited<ReturnType<typeof topicsControllerListChildren>>
+>;
+export type TopicsControllerListChildrenQueryError = ErrorResponseDto;
+
+export function useTopicsControllerListChildren<
+  TData = Awaited<ReturnType<typeof topicsControllerListChildren>>,
+  TError = ErrorResponseDto,
+>(
+  slug: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof topicsControllerListChildren>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof topicsControllerListChildren>>,
+          TError,
+          Awaited<ReturnType<typeof topicsControllerListChildren>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useTopicsControllerListChildren<
+  TData = Awaited<ReturnType<typeof topicsControllerListChildren>>,
+  TError = ErrorResponseDto,
+>(
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof topicsControllerListChildren>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof topicsControllerListChildren>>,
+          TError,
+          Awaited<ReturnType<typeof topicsControllerListChildren>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useTopicsControllerListChildren<
+  TData = Awaited<ReturnType<typeof topicsControllerListChildren>>,
+  TError = ErrorResponseDto,
+>(
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof topicsControllerListChildren>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary List direct children of a topic
+ */
+
+export function useTopicsControllerListChildren<
+  TData = Awaited<ReturnType<typeof topicsControllerListChildren>>,
+  TError = ErrorResponseDto,
+>(
+  slug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof topicsControllerListChildren>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getTopicsControllerListChildrenQueryOptions(slug, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary List published lectures tagged with this topic
+ */
+export const topicsControllerListLectures = (
+  slug: string,
+  params: TopicsControllerListLecturesParams,
+  signal?: AbortSignal,
+) => {
+  return httpClient<TopicLectureViewDto[]>({
+    url: `/topics/${slug}/lectures`,
+    method: "GET",
+    params,
+    signal,
+  });
+};
+
+export const getTopicsControllerListLecturesQueryKey = (
+  slug?: string,
+  params?: TopicsControllerListLecturesParams,
+) => {
+  return [`/topics/${slug}/lectures`, ...(params ? [params] : [])] as const;
+};
+
+export const getTopicsControllerListLecturesQueryOptions = <
+  TData = Awaited<ReturnType<typeof topicsControllerListLectures>>,
+  TError = ErrorResponseDto,
+>(
+  slug: string,
+  params: TopicsControllerListLecturesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof topicsControllerListLectures>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getTopicsControllerListLecturesQueryKey(slug, params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof topicsControllerListLectures>>> = ({
+    signal,
+  }) => topicsControllerListLectures(slug, params, signal);
+
+  return { queryKey, queryFn, enabled: !!slug, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof topicsControllerListLectures>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type TopicsControllerListLecturesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof topicsControllerListLectures>>
+>;
+export type TopicsControllerListLecturesQueryError = ErrorResponseDto;
+
+export function useTopicsControllerListLectures<
+  TData = Awaited<ReturnType<typeof topicsControllerListLectures>>,
+  TError = ErrorResponseDto,
+>(
+  slug: string,
+  params: TopicsControllerListLecturesParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof topicsControllerListLectures>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof topicsControllerListLectures>>,
+          TError,
+          Awaited<ReturnType<typeof topicsControllerListLectures>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useTopicsControllerListLectures<
+  TData = Awaited<ReturnType<typeof topicsControllerListLectures>>,
+  TError = ErrorResponseDto,
+>(
+  slug: string,
+  params: TopicsControllerListLecturesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof topicsControllerListLectures>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof topicsControllerListLectures>>,
+          TError,
+          Awaited<ReturnType<typeof topicsControllerListLectures>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useTopicsControllerListLectures<
+  TData = Awaited<ReturnType<typeof topicsControllerListLectures>>,
+  TError = ErrorResponseDto,
+>(
+  slug: string,
+  params: TopicsControllerListLecturesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof topicsControllerListLectures>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary List published lectures tagged with this topic
+ */
+
+export function useTopicsControllerListLectures<
+  TData = Awaited<ReturnType<typeof topicsControllerListLectures>>,
+  TError = ErrorResponseDto,
+>(
+  slug: string,
+  params: TopicsControllerListLecturesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof topicsControllerListLectures>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getTopicsControllerListLecturesQueryOptions(slug, params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary List topics attached to a lecture
+ */
+export const lectureTopicsControllerList = (
+  scholarSlug: string,
+  lectureSlug: string,
+  signal?: AbortSignal,
+) => {
+  return httpClient<LectureTopicViewDto[]>({
+    url: `/scholars/${scholarSlug}/lectures/${lectureSlug}/topics`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getLectureTopicsControllerListQueryKey = (
+  scholarSlug?: string,
+  lectureSlug?: string,
+) => {
+  return [`/scholars/${scholarSlug}/lectures/${lectureSlug}/topics`] as const;
+};
+
+export const getLectureTopicsControllerListQueryOptions = <
+  TData = Awaited<ReturnType<typeof lectureTopicsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  lectureSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof lectureTopicsControllerList>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getLectureTopicsControllerListQueryKey(scholarSlug, lectureSlug);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof lectureTopicsControllerList>>> = ({
+    signal,
+  }) => lectureTopicsControllerList(scholarSlug, lectureSlug, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!(scholarSlug && lectureSlug),
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof lectureTopicsControllerList>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+};
+
+export type LectureTopicsControllerListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof lectureTopicsControllerList>>
+>;
+export type LectureTopicsControllerListQueryError = ErrorResponseDto;
+
+export function useLectureTopicsControllerList<
+  TData = Awaited<ReturnType<typeof lectureTopicsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  lectureSlug: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof lectureTopicsControllerList>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof lectureTopicsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof lectureTopicsControllerList>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useLectureTopicsControllerList<
+  TData = Awaited<ReturnType<typeof lectureTopicsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  lectureSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof lectureTopicsControllerList>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof lectureTopicsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof lectureTopicsControllerList>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useLectureTopicsControllerList<
+  TData = Awaited<ReturnType<typeof lectureTopicsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  lectureSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof lectureTopicsControllerList>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary List topics attached to a lecture
+ */
+
+export function useLectureTopicsControllerList<
+  TData = Awaited<ReturnType<typeof lectureTopicsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  lectureSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof lectureTopicsControllerList>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getLectureTopicsControllerListQueryOptions(
+    scholarSlug,
+    lectureSlug,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Attach a topic to a lecture (idempotent)
+ */
+export const lectureTopicsControllerAttach = (
+  scholarSlug: string,
+  lectureSlug: string,
+  attachTopicDto: AttachTopicDto,
+  signal?: AbortSignal,
+) => {
+  return httpClient<LectureTopicViewDto>({
+    url: `/scholars/${scholarSlug}/lectures/${lectureSlug}/topics`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: attachTopicDto,
+    signal,
+  });
+};
+
+export const getLectureTopicsControllerAttachMutationOptions = <
+  TError = ErrorResponseDto,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof lectureTopicsControllerAttach>>,
+    TError,
+    { scholarSlug: string; lectureSlug: string; data: AttachTopicDto },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof lectureTopicsControllerAttach>>,
+  TError,
+  { scholarSlug: string; lectureSlug: string; data: AttachTopicDto },
+  TContext
+> => {
+  const mutationKey = ["lectureTopicsControllerAttach"];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof lectureTopicsControllerAttach>>,
+    { scholarSlug: string; lectureSlug: string; data: AttachTopicDto }
+  > = (props) => {
+    const { scholarSlug, lectureSlug, data } = props ?? {};
+
+    return lectureTopicsControllerAttach(scholarSlug, lectureSlug, data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type LectureTopicsControllerAttachMutationResult = NonNullable<
+  Awaited<ReturnType<typeof lectureTopicsControllerAttach>>
+>;
+export type LectureTopicsControllerAttachMutationBody = AttachTopicDto;
+export type LectureTopicsControllerAttachMutationError = ErrorResponseDto;
+
+/**
+ * @summary Attach a topic to a lecture (idempotent)
+ */
+export const useLectureTopicsControllerAttach = <TError = ErrorResponseDto, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof lectureTopicsControllerAttach>>,
+      TError,
+      { scholarSlug: string; lectureSlug: string; data: AttachTopicDto },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof lectureTopicsControllerAttach>>,
+  TError,
+  { scholarSlug: string; lectureSlug: string; data: AttachTopicDto },
+  TContext
+> => {
+  const mutationOptions = getLectureTopicsControllerAttachMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Detach a topic from a lecture (idempotent)
+ */
+export const lectureTopicsControllerDetach = (
+  scholarSlug: string,
+  lectureSlug: string,
+  topicSlug: string,
+) => {
+  return httpClient<unknown>({
+    url: `/scholars/${scholarSlug}/lectures/${lectureSlug}/topics/${topicSlug}`,
+    method: "DELETE",
+  });
+};
+
+export const getLectureTopicsControllerDetachMutationOptions = <
+  TError = ErrorResponseDto,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof lectureTopicsControllerDetach>>,
+    TError,
+    { scholarSlug: string; lectureSlug: string; topicSlug: string },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof lectureTopicsControllerDetach>>,
+  TError,
+  { scholarSlug: string; lectureSlug: string; topicSlug: string },
+  TContext
+> => {
+  const mutationKey = ["lectureTopicsControllerDetach"];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof lectureTopicsControllerDetach>>,
+    { scholarSlug: string; lectureSlug: string; topicSlug: string }
+  > = (props) => {
+    const { scholarSlug, lectureSlug, topicSlug } = props ?? {};
+
+    return lectureTopicsControllerDetach(scholarSlug, lectureSlug, topicSlug);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type LectureTopicsControllerDetachMutationResult = NonNullable<
+  Awaited<ReturnType<typeof lectureTopicsControllerDetach>>
+>;
+
+export type LectureTopicsControllerDetachMutationError = ErrorResponseDto;
+
+/**
+ * @summary Detach a topic from a lecture (idempotent)
+ */
+export const useLectureTopicsControllerDetach = <TError = ErrorResponseDto, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof lectureTopicsControllerDetach>>,
+      TError,
+      { scholarSlug: string; lectureSlug: string; topicSlug: string },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof lectureTopicsControllerDetach>>,
+  TError,
+  { scholarSlug: string; lectureSlug: string; topicSlug: string },
+  TContext
+> => {
+  const mutationOptions = getLectureTopicsControllerDetachMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary List topics attached to a series
+ */
+export const seriesTopicsControllerList = (
+  scholarSlug: string,
+  seriesSlug: string,
+  signal?: AbortSignal,
+) => {
+  return httpClient<LectureTopicViewDto[]>({
+    url: `/scholars/${scholarSlug}/series/${seriesSlug}/topics`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getSeriesTopicsControllerListQueryKey = (
+  scholarSlug?: string,
+  seriesSlug?: string,
+) => {
+  return [`/scholars/${scholarSlug}/series/${seriesSlug}/topics`] as const;
+};
+
+export const getSeriesTopicsControllerListQueryOptions = <
+  TData = Awaited<ReturnType<typeof seriesTopicsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  seriesSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof seriesTopicsControllerList>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getSeriesTopicsControllerListQueryKey(scholarSlug, seriesSlug);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof seriesTopicsControllerList>>> = ({
+    signal,
+  }) => seriesTopicsControllerList(scholarSlug, seriesSlug, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!(scholarSlug && seriesSlug),
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof seriesTopicsControllerList>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+};
+
+export type SeriesTopicsControllerListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof seriesTopicsControllerList>>
+>;
+export type SeriesTopicsControllerListQueryError = ErrorResponseDto;
+
+export function useSeriesTopicsControllerList<
+  TData = Awaited<ReturnType<typeof seriesTopicsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  seriesSlug: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof seriesTopicsControllerList>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof seriesTopicsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof seriesTopicsControllerList>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useSeriesTopicsControllerList<
+  TData = Awaited<ReturnType<typeof seriesTopicsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  seriesSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof seriesTopicsControllerList>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof seriesTopicsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof seriesTopicsControllerList>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useSeriesTopicsControllerList<
+  TData = Awaited<ReturnType<typeof seriesTopicsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  seriesSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof seriesTopicsControllerList>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary List topics attached to a series
+ */
+
+export function useSeriesTopicsControllerList<
+  TData = Awaited<ReturnType<typeof seriesTopicsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  seriesSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof seriesTopicsControllerList>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getSeriesTopicsControllerListQueryOptions(scholarSlug, seriesSlug, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Attach a topic to a series (idempotent)
+ */
+export const seriesTopicsControllerAttach = (
+  scholarSlug: string,
+  seriesSlug: string,
+  attachTopicDto: AttachTopicDto,
+  signal?: AbortSignal,
+) => {
+  return httpClient<LectureTopicViewDto>({
+    url: `/scholars/${scholarSlug}/series/${seriesSlug}/topics`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: attachTopicDto,
+    signal,
+  });
+};
+
+export const getSeriesTopicsControllerAttachMutationOptions = <
+  TError = ErrorResponseDto,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof seriesTopicsControllerAttach>>,
+    TError,
+    { scholarSlug: string; seriesSlug: string; data: AttachTopicDto },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof seriesTopicsControllerAttach>>,
+  TError,
+  { scholarSlug: string; seriesSlug: string; data: AttachTopicDto },
+  TContext
+> => {
+  const mutationKey = ["seriesTopicsControllerAttach"];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof seriesTopicsControllerAttach>>,
+    { scholarSlug: string; seriesSlug: string; data: AttachTopicDto }
+  > = (props) => {
+    const { scholarSlug, seriesSlug, data } = props ?? {};
+
+    return seriesTopicsControllerAttach(scholarSlug, seriesSlug, data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SeriesTopicsControllerAttachMutationResult = NonNullable<
+  Awaited<ReturnType<typeof seriesTopicsControllerAttach>>
+>;
+export type SeriesTopicsControllerAttachMutationBody = AttachTopicDto;
+export type SeriesTopicsControllerAttachMutationError = ErrorResponseDto;
+
+/**
+ * @summary Attach a topic to a series (idempotent)
+ */
+export const useSeriesTopicsControllerAttach = <TError = ErrorResponseDto, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof seriesTopicsControllerAttach>>,
+      TError,
+      { scholarSlug: string; seriesSlug: string; data: AttachTopicDto },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof seriesTopicsControllerAttach>>,
+  TError,
+  { scholarSlug: string; seriesSlug: string; data: AttachTopicDto },
+  TContext
+> => {
+  const mutationOptions = getSeriesTopicsControllerAttachMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Detach a topic from a series (idempotent)
+ */
+export const seriesTopicsControllerDetach = (
+  scholarSlug: string,
+  seriesSlug: string,
+  topicSlug: string,
+) => {
+  return httpClient<unknown>({
+    url: `/scholars/${scholarSlug}/series/${seriesSlug}/topics/${topicSlug}`,
+    method: "DELETE",
+  });
+};
+
+export const getSeriesTopicsControllerDetachMutationOptions = <
+  TError = ErrorResponseDto,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof seriesTopicsControllerDetach>>,
+    TError,
+    { scholarSlug: string; seriesSlug: string; topicSlug: string },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof seriesTopicsControllerDetach>>,
+  TError,
+  { scholarSlug: string; seriesSlug: string; topicSlug: string },
+  TContext
+> => {
+  const mutationKey = ["seriesTopicsControllerDetach"];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof seriesTopicsControllerDetach>>,
+    { scholarSlug: string; seriesSlug: string; topicSlug: string }
+  > = (props) => {
+    const { scholarSlug, seriesSlug, topicSlug } = props ?? {};
+
+    return seriesTopicsControllerDetach(scholarSlug, seriesSlug, topicSlug);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SeriesTopicsControllerDetachMutationResult = NonNullable<
+  Awaited<ReturnType<typeof seriesTopicsControllerDetach>>
+>;
+
+export type SeriesTopicsControllerDetachMutationError = ErrorResponseDto;
+
+/**
+ * @summary Detach a topic from a series (idempotent)
+ */
+export const useSeriesTopicsControllerDetach = <TError = ErrorResponseDto, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof seriesTopicsControllerDetach>>,
+      TError,
+      { scholarSlug: string; seriesSlug: string; topicSlug: string },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof seriesTopicsControllerDetach>>,
+  TError,
+  { scholarSlug: string; seriesSlug: string; topicSlug: string },
+  TContext
+> => {
+  const mutationOptions = getSeriesTopicsControllerDetachMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary List topics attached to a collection
+ */
+export const collectionTopicsControllerList = (
+  scholarSlug: string,
+  collectionSlug: string,
+  signal?: AbortSignal,
+) => {
+  return httpClient<LectureTopicViewDto[]>({
+    url: `/scholars/${scholarSlug}/collections/${collectionSlug}/topics`,
+    method: "GET",
+    signal,
+  });
+};
+
+export const getCollectionTopicsControllerListQueryKey = (
+  scholarSlug?: string,
+  collectionSlug?: string,
+) => {
+  return [`/scholars/${scholarSlug}/collections/${collectionSlug}/topics`] as const;
+};
+
+export const getCollectionTopicsControllerListQueryOptions = <
+  TData = Awaited<ReturnType<typeof collectionTopicsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  collectionSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof collectionTopicsControllerList>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getCollectionTopicsControllerListQueryKey(scholarSlug, collectionSlug);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof collectionTopicsControllerList>>> = ({
+    signal,
+  }) => collectionTopicsControllerList(scholarSlug, collectionSlug, signal);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!(scholarSlug && collectionSlug),
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof collectionTopicsControllerList>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type CollectionTopicsControllerListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof collectionTopicsControllerList>>
+>;
+export type CollectionTopicsControllerListQueryError = ErrorResponseDto;
+
+export function useCollectionTopicsControllerList<
+  TData = Awaited<ReturnType<typeof collectionTopicsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  collectionSlug: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof collectionTopicsControllerList>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof collectionTopicsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof collectionTopicsControllerList>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useCollectionTopicsControllerList<
+  TData = Awaited<ReturnType<typeof collectionTopicsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  collectionSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof collectionTopicsControllerList>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof collectionTopicsControllerList>>,
+          TError,
+          Awaited<ReturnType<typeof collectionTopicsControllerList>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useCollectionTopicsControllerList<
+  TData = Awaited<ReturnType<typeof collectionTopicsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  collectionSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof collectionTopicsControllerList>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary List topics attached to a collection
+ */
+
+export function useCollectionTopicsControllerList<
+  TData = Awaited<ReturnType<typeof collectionTopicsControllerList>>,
+  TError = ErrorResponseDto,
+>(
+  scholarSlug: string,
+  collectionSlug: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof collectionTopicsControllerList>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getCollectionTopicsControllerListQueryOptions(
+    scholarSlug,
+    collectionSlug,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Attach a topic to a collection (idempotent)
+ */
+export const collectionTopicsControllerAttach = (
+  scholarSlug: string,
+  collectionSlug: string,
+  attachTopicDto: AttachTopicDto,
+  signal?: AbortSignal,
+) => {
+  return httpClient<LectureTopicViewDto>({
+    url: `/scholars/${scholarSlug}/collections/${collectionSlug}/topics`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: attachTopicDto,
+    signal,
+  });
+};
+
+export const getCollectionTopicsControllerAttachMutationOptions = <
+  TError = ErrorResponseDto,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof collectionTopicsControllerAttach>>,
+    TError,
+    { scholarSlug: string; collectionSlug: string; data: AttachTopicDto },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof collectionTopicsControllerAttach>>,
+  TError,
+  { scholarSlug: string; collectionSlug: string; data: AttachTopicDto },
+  TContext
+> => {
+  const mutationKey = ["collectionTopicsControllerAttach"];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof collectionTopicsControllerAttach>>,
+    { scholarSlug: string; collectionSlug: string; data: AttachTopicDto }
+  > = (props) => {
+    const { scholarSlug, collectionSlug, data } = props ?? {};
+
+    return collectionTopicsControllerAttach(scholarSlug, collectionSlug, data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CollectionTopicsControllerAttachMutationResult = NonNullable<
+  Awaited<ReturnType<typeof collectionTopicsControllerAttach>>
+>;
+export type CollectionTopicsControllerAttachMutationBody = AttachTopicDto;
+export type CollectionTopicsControllerAttachMutationError = ErrorResponseDto;
+
+/**
+ * @summary Attach a topic to a collection (idempotent)
+ */
+export const useCollectionTopicsControllerAttach = <TError = ErrorResponseDto, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof collectionTopicsControllerAttach>>,
+      TError,
+      { scholarSlug: string; collectionSlug: string; data: AttachTopicDto },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof collectionTopicsControllerAttach>>,
+  TError,
+  { scholarSlug: string; collectionSlug: string; data: AttachTopicDto },
+  TContext
+> => {
+  const mutationOptions = getCollectionTopicsControllerAttachMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * @summary Detach a topic from a collection (idempotent)
+ */
+export const collectionTopicsControllerDetach = (
+  scholarSlug: string,
+  collectionSlug: string,
+  topicSlug: string,
+) => {
+  return httpClient<unknown>({
+    url: `/scholars/${scholarSlug}/collections/${collectionSlug}/topics/${topicSlug}`,
+    method: "DELETE",
+  });
+};
+
+export const getCollectionTopicsControllerDetachMutationOptions = <
+  TError = ErrorResponseDto,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof collectionTopicsControllerDetach>>,
+    TError,
+    { scholarSlug: string; collectionSlug: string; topicSlug: string },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof collectionTopicsControllerDetach>>,
+  TError,
+  { scholarSlug: string; collectionSlug: string; topicSlug: string },
+  TContext
+> => {
+  const mutationKey = ["collectionTopicsControllerDetach"];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof collectionTopicsControllerDetach>>,
+    { scholarSlug: string; collectionSlug: string; topicSlug: string }
+  > = (props) => {
+    const { scholarSlug, collectionSlug, topicSlug } = props ?? {};
+
+    return collectionTopicsControllerDetach(scholarSlug, collectionSlug, topicSlug);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CollectionTopicsControllerDetachMutationResult = NonNullable<
+  Awaited<ReturnType<typeof collectionTopicsControllerDetach>>
+>;
+
+export type CollectionTopicsControllerDetachMutationError = ErrorResponseDto;
+
+/**
+ * @summary Detach a topic from a collection (idempotent)
+ */
+export const useCollectionTopicsControllerDetach = <TError = ErrorResponseDto, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof collectionTopicsControllerDetach>>,
+      TError,
+      { scholarSlug: string; collectionSlug: string; topicSlug: string },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof collectionTopicsControllerDetach>>,
+  TError,
+  { scholarSlug: string; collectionSlug: string; topicSlug: string },
+  TContext
+> => {
+  const mutationOptions = getCollectionTopicsControllerDetachMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};

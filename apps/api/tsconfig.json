@@ -1,7 +1,13 @@
 {
   "extends": "../../packages/config/tsconfig/nest.json",
   "compilerOptions": {
-    "noEmit": true
+    "baseUrl": ".",
+    "noEmit": true,
+    "module": "es2015",
+    "moduleResolution": "Bundler",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
   "include": ["src/**/*.ts", "test/**/*.ts"]
 }

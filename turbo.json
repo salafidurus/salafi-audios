@@ -1,6 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
+  "globalPassThroughEnv": ["DIRECT_DB_URL", "DATABASE_URL"],
   "tasks": {
     "dev": {
       "cache": false,
@@ -8,34 +9,47 @@
     },
     "build": {
       "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*", "tsconfig*.json", "next.config.*"],
       "outputs": ["dist/**", "build/**", ".next/**", "lib/**"]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["^lint"],
+      "inputs": ["$TURBO_DEFAULT$", ".eslintrc*", "eslint.config.*", "packages/config/eslint/**"],
+      "outputs": []
     },
     "typecheck": {
-      "dependsOn": ["^typecheck"]
+      "dependsOn": ["^typecheck"],
+      "inputs": ["$TURBO_DEFAULT$", "tsconfig*.json", "packages/config/tsconfig/**"],
+      "outputs": []
     },
     "test": {
       "dependsOn": ["^test"],
-      "cache": true
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "**/*.spec.*",
+        "**/*.test.*",
+        "jest.config.*",
+        "**/jest.config.*"
+      ],
+      "outputs": ["coverage/**"]
     },
     "test:e2e": {
       "dependsOn": ["^test:e2e"],
       "cache": false
     },
     "test:prepush": {
-      "dependsOn": ["^test:prepush"]
+      "dependsOn": ["^test:prepush"],
+      "cache": true
     },
     "openapi": {
       "dependsOn": ["^openapi"],
-      "inputs": ["src/**", "package.json", "tsconfig.json"],
+      "inputs": ["$TURBO_DEFAULT$", "src/**", "package.json", "tsconfig*.json"],
       "outputs": ["openapi.json"]
     },
     "codegen": {
-      "dependsOn": ["openapi"],
-      "inputs": ["openapi.json", "orval.config.cjs"],
-      "outputs": ["src/generated/**"]
+      "dependsOn": ["openapi", "^codegen"],
+      "inputs": ["$TURBO_DEFAULT$", "openapi.json", "orval.config.*"],
+      "outputs": ["generated/**"]
     },
     "clean": {
       "cache": false

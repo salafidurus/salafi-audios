@@ -4,6 +4,11 @@ node_modules/
 **/node_modules/
 coverage/
 **/coverage/
+dist/
+**/dist/
+
+generated/
+**/generated/
 
 
 # dotenv environment variable files
@@ -19,3 +24,6 @@ infra/envs/*.env
 
 # temp deploy files
 .deploy_tmp/
+
+# generated DB artifacts (derived, never committed)
+packages/db/src/generated/

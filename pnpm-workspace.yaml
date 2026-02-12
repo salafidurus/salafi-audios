@@ -1,3 +1,12 @@
 packages:
   - apps/*
   - packages/*
+
+onlyBuiltDependencies:
+  - "@nestjs/core"
+  - "@prisma/engines"
+  - "@scarf/scarf"
+  - esbuild
+  - prisma
+  - sharp
+  - unrs-resolver

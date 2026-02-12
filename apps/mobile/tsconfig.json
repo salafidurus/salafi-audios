@@ -1,12 +1,11 @@
 {
-  "extends": "../../packages/config/tsconfig/expo.json",
+  "extends": ["expo/tsconfig.base", "../../packages/config/tsconfig/expo.json"],
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
-  "exclude": ["node_modules"],
   "compilerOptions": {
+    "baseUrl": ".",
     "paths": {
-      "@/hooks/*": ["./hooks/*"],
-      "@/components/*": ["./components/*"],
-      "@/constants/*": ["./constants/*"]
+      "@/*": ["src/*"],
+      "@/assets/*": ["./assets/*"]
     }
   }
 }

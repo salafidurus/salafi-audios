@@ -1,0 +1,101 @@
+name: Staging PR Preview (EAS)
+
+on:
+  pull_request:
+    branches:
+      - "staging"
+    paths:
+      - apps/mobile/src/**
+      - apps/mobile/app.config.ts
+      - apps/mobile/package.json
+      - apps/mobile/assets/**
+
+concurrency:
+  cancel_in_progress: true
+  group: ${{ workflow.filename }}-${{ github.ref }}
+
+jobs:
+  fingerprint:
+    name: Compute fingerprint (Android/iOS)
+    type: fingerprint
+    environment: preview
+    env:
+      EXPO_DEBUG: "1"
+
+  # 1) Check if an Android build exists that matches this fingerprint runtime
+  get_android_build:
+    name: Check for existing Android build (fingerprint runtime)
+    needs: [fingerprint]
+    type: get-build
+    params:
+      platform: android
+      profile: preview
+      fingerprint_hash: ${{ needs.fingerprint.outputs.android_fingerprint_hash }}
+
+  # 2) If Android build exists => push OTA update
+  update_android_if_build:
+    name: Publish preview update (Android, if build exists)
+    needs: [get_android_build]
+    if: ${{ needs.get_android_build.outputs.build_id }}
+    type: update
+    environment: preview
+    env:
+      EXPO_DEBUG: "1"
+    params:
+      platform: android
+      channel: preview
+      message: "Preview update for PR #${{ github.event.pull_request.number }}"
+
+  # 3) If Android build missing => create one
+  build_android_if_missing:
+    name: Build Android (if no build matches this fingerprint runtime)
+    needs: [get_android_build]
+    if: ${{ !needs.get_android_build.outputs.build_id }}
+    type: build
+    environment: preview
+    env:
+      EXPO_DEBUG: "1"
+    params:
+      platform: android
+      profile: preview
+
+  # ---------------------------
+  # iOS (kept commented for later)
+  # ---------------------------
+
+  # # 1) Check if an iOS build exists that matches this fingerprint runtime
+  # get_ios_build:
+  #   name: Check for existing iOS build (fingerprint runtime)
+  #   needs: [fingerprint]
+  #   type: get-build
+  #   params:
+  #     platform: ios
+  #     profile: preview
+  #     fingerprint_hash: ${{ needs.fingerprint.outputs.ios_fingerprint_hash }}
+
+  # # 2) If iOS build exists => push OTA update
+  # update_ios_if_build:
+  #   name: Publish preview update (iOS, if build exists)
+  #   needs: [get_ios_build]
+  #   if: ${{ needs.get_ios_build.outputs.build_id }}
+  #   type: update
+  #   environment: preview
+  #   env:
+  #     EXPO_DEBUG: "1"
+  #   params:
+  #     platform: ios
+  #     channel: preview
+  #     message: "Preview update for PR #${{ github.event.pull_request.number }}"
+
+  # # 3) If iOS build missing => create one
+  # build_ios_if_missing:
+  #   name: Build iOS (if no build matches this fingerprint runtime)
+  #   needs: [get_ios_build]
+  #   if: ${{ !needs.get_ios_build.outputs.build_id }}
+  #   type: build
+  #   environment: preview
+  #   env:
+  #     EXPO_DEBUG: "1"
+  #   params:
+  #     platform: ios
+  #     profile: preview

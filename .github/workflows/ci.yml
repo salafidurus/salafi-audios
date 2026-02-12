@@ -2,7 +2,15 @@ name: ci
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+    branches:
+      - main
+      - preview
+      - production
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.event.pull_request.number }}
@@ -12,27 +20,24 @@ permissions:
   contents: read
 
 env:
-  NODE_VERSION: "20"
+  NODE_VERSION: "22"
   PNPM_VERSION: "10"
-  PLAYWRIGHT_BROWSERS_PATH: ~/.cache/ms-playwright
+  PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/ms-playwright
+  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
 
 jobs:
-  lint:
-    name: lint
+  build_deps:
+    name: build:deps
     runs-on: ubuntu-latest
+    environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
+    env:
+      DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
+      DATABASE_URL: ${{ secrets.DIRECT_DB_URL }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Cache turbo
-        uses: actions/cache@v4
-        with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-${{ hashFiles('pnpm-lock.yaml') }}-
-            ${{ runner.os }}-turbo-
 
       - uses: pnpm/action-setup@v3
         with:
@@ -44,27 +49,63 @@ jobs:
           cache: pnpm
 
       - name: Install
-        run: pnpm -w install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
+
+      - name: Build (all)
+        run: pnpm build
+
+      - name: Upload build outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-outputs
+          if-no-files-found: error
+          include-hidden-files: true
+          path: |
+            apps/api/dist/**
+            apps/web/.next/**
+            packages/env/dist/**
+
+  lint:
+    name: lint
+    needs: build_deps
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Download build outputs
+        uses: actions/download-artifact@v4
+        with:
+          name: build-outputs
 
       - name: Lint
         run: pnpm lint
 
   typecheck:
     name: typecheck
+    needs: build_deps
     runs-on: ubuntu-latest
+    environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
+    env:
+      DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
+      DATABASE_URL: ${{ secrets.DIRECT_DB_URL }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Cache turbo
-        uses: actions/cache@v4
-        with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-${{ hashFiles('pnpm-lock.yaml') }}-
-            ${{ runner.os }}-turbo-
 
       - uses: pnpm/action-setup@v3
         with:
@@ -76,27 +117,28 @@ jobs:
           cache: pnpm
 
       - name: Install
-        run: pnpm -w install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
+
+      - name: Download build outputs
+        uses: actions/download-artifact@v4
+        with:
+          name: build-outputs
 
       - name: Typecheck
         run: pnpm typecheck
 
   test:
     name: test
+    needs: typecheck
     runs-on: ubuntu-latest
+    environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
+    env:
+      DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
+      DATABASE_URL: ${{ secrets.DIRECT_DB_URL }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Cache turbo
-        uses: actions/cache@v4
-        with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-${{ hashFiles('pnpm-lock.yaml') }}-
-            ${{ runner.os }}-turbo-
 
       - uses: pnpm/action-setup@v3
         with:
@@ -108,59 +150,19 @@ jobs:
           cache: pnpm
 
       - name: Install
-        run: pnpm -w install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Unit tests
         run: pnpm test
 
-  build:
-    name: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Cache turbo
-        uses: actions/cache@v4
-        with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-${{ hashFiles('pnpm-lock.yaml') }}-
-            ${{ runner.os }}-turbo-
-
-      - uses: pnpm/action-setup@v3
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-
-      - name: Install
-        run: pnpm -w install --frozen-lockfile
-
-      - name: Build
-        run: pnpm build
-
   e2e_web:
     name: e2e:web
+    needs: build_deps
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Cache turbo
-        uses: actions/cache@v4
-        with:
-          path: .turbo
-          key: ${{ runner.os }}-turbo-${{ hashFiles('pnpm-lock.yaml') }}-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-turbo-${{ hashFiles('pnpm-lock.yaml') }}-
-            ${{ runner.os }}-turbo-
 
       - uses: pnpm/action-setup@v3
         with:
@@ -181,13 +183,20 @@ jobs:
             ${{ runner.os }}-playwright-
 
       - name: Install
-        run: pnpm -w install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Install Playwright browsers
         if: steps.pw-cache.outputs.cache-hit != 'true'
         run: pnpm --filter web exec playwright install --with-deps
 
+      - name: Download build outputs
+        uses: actions/download-artifact@v4
+        with:
+          name: build-outputs
+
       - name: Run Playwright
+        env:
+          PW_SKIP_WEB_BUILD: "1"
         run: pnpm --filter web test:e2e
 
       - name: Upload Playwright report
@@ -196,3 +205,77 @@ jobs:
         with:
           name: playwright-report
           path: apps/web/playwright-report
+
+  db_generated_policy:
+    name: db:generated-policy
+    runs-on: ubuntu-latest
+    environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
+    env:
+      DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter @sd/db prisma:generate
+
+      - name: Enforce generated DB artifact policy
+        run: |
+          if [ -n "$(git ls-files -- packages/db/src/generated)" ]; then
+            echo "::error::Forbidden tracked files found in packages/db/src/generated"
+            git ls-files -- packages/db/src/generated
+            exit 1
+          fi
+
+          if [ -n "$(git status --porcelain --untracked-files=all -- packages/db/src/generated)" ]; then
+            echo "::error::packages/db/src/generated must remain git-clean after generation"
+            git status --porcelain --untracked-files=all -- packages/db/src/generated
+            exit 1
+          fi
+
+  contract:
+    name: contract (openapi + codegen)
+    needs: typecheck
+    runs-on: ubuntu-latest
+    environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
+    env:
+      DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
+      DATABASE_URL: ${{ secrets.DIRECT_DB_URL }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate OpenAPI and client
+        run: pnpm contract
+
+      # Optional but strongly recommended: ensure generated output is committed
+      - name: Ensure no uncommitted changes after codegen
+        run: |
+          git status --porcelain
+          test -z "$(git status --porcelain)"
