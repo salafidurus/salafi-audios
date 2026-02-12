@@ -1,12 +1,38 @@
-if git rev-parse --verify origin/main > /dev/null 2>&1; then
-  BASE_REF="origin/main"
-else
-  BASE_REF="HEAD~1"
+ZERO_SHA="0000000000000000000000000000000000000000"
+BASE_SHA=""
+LOCAL_SHA=""
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  if [ -z "$local_sha" ] || [ "$local_sha" = "$ZERO_SHA" ]; then
+    continue
+  fi
+
+  LOCAL_SHA="$local_sha"
+
+  if [ -n "$remote_sha" ] && [ "$remote_sha" != "$ZERO_SHA" ]; then
+    BASE_SHA="$remote_sha"
+  elif git rev-parse --verify origin/main > /dev/null 2>&1; then
+    BASE_SHA="$(git merge-base "$LOCAL_SHA" origin/main)"
+  else
+    BASE_SHA="$(git rev-parse "$LOCAL_SHA^" 2> /dev/null || printf "%s" "$LOCAL_SHA")"
+  fi
+
+  break
+done
+
+if [ -z "$LOCAL_SHA" ]; then
+  printf "pre-push: no branch updates to validate\n"
+  exit 0
 fi
 
-RANGE="${BASE_REF}...HEAD"
+if [ "$BASE_SHA" = "$LOCAL_SHA" ]; then
+  printf "pre-push: no new commits to validate\n"
+  exit 0
+fi
 
-pnpm turbo lint typecheck test:prepush --filter="...[${BASE_REF}]"
+RANGE="${BASE_SHA}...${LOCAL_SHA}"
+
+pnpm turbo lint typecheck test:prepush --filter="...[${BASE_SHA}]"
 
 if git diff --quiet "$RANGE" -- README.md ':(glob)docs/**/*.md' AGENT.md AGENTS.md .github/copilot-instructions.md; then
   printf "pre-push: skipping docs:quality (no docs changes)\n"
