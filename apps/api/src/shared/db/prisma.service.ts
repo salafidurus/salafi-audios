@@ -10,8 +10,6 @@ export class PrismaService
   implements OnModuleInit, OnModuleDestroy
 {
   private isConnected = false;
-  private static readonly DEFAULT_DB_URL =
-    'postgresql://postgres:postgres@localhost:5432/sd_ci?schema=public';
 
   constructor(
     private readonly config: ConfigService,
@@ -20,8 +18,13 @@ export class PrismaService
     const connectionString =
       config?.DATABASE_URL ??
       process.env.DATABASE_URL ??
-      process.env.DIRECT_DB_URL ??
-      PrismaService.DEFAULT_DB_URL;
+      process.env.DIRECT_DB_URL;
+
+    if (!connectionString) {
+      throw new Error(
+        'DATABASE_URL is required and no DB fallback is allowed.',
+      );
+    }
 
     const adapter = new PrismaPg({ connectionString });
     super({
