@@ -45,7 +45,7 @@ jobs:
             --no-progress
             --include-fragments
             README.md
-            docs/**/*.md
+            docs
             AGENT.md
             AGENTS.md
             .github/copilot-instructions.md
