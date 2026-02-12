@@ -48,7 +48,7 @@ Each directory has a strict and intentional purpose.
 
 ## `app/` — Routing and Composition
 
-### Purpose
+### Core Purpose
 
 The `app/` directory is responsible only for routing and high-level composition.
 

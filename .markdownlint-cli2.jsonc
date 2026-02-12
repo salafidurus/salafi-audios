@@ -1,0 +1,20 @@
+{
+  "ignores": [
+    "**/node_modules/**",
+    "**/.pnpm/**",
+    "**/.turbo/**",
+    "**/.next/**",
+    "**/.expo/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/coverage/**",
+    "**/generated/**",
+  ],
+  "config": {
+    "default": true,
+    "MD013": false,
+    "MD024": {
+      "siblings_only": true,
+    },
+  },
+}

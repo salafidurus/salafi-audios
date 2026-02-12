@@ -1,1 +1,2 @@
-pnpm test:prepush
+pnpm ci:local
+DIRECT_DB_URL=postgresql://postgres:postgres@localhost:5432/sd_local?schema=public pnpm --filter @sd/db prisma:generate

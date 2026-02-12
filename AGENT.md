@@ -1,82 +1,129 @@
-# AGENT.md — Salafi Durus Monorepo
+# AGENT.md - Salafi Durus Monorepo
 
-This repository is a single system. The monorepo is an enforcement mechanism.
+This repository is one system. The monorepo is an enforcement tool, not a convenience.
 
 ## Source of truth
 
-- Architecture + intent live in `docs/` and are authoritative.
-- If code conflicts with docs, either the code is wrong or docs must be updated.
+- Architecture and intent live in `docs/` and are authoritative.
+- Read in order: `docs/README.md` -> this file -> target workspace `AGENT.md` -> `.github/copilot-instructions.md`.
+- If code and docs conflict, reconcile intentionally (do not silently drift).
 
 ## Non-negotiable guardrails
 
-- **Backend authority is absolute.** Clients record intent, never authority.
-- **Authorization is enforced only on the backend.** UI gating is not security.
-- **Offline does not grant authority.** No admin/editorial actions offline.
-- **Monorepo boundaries are strict.**
-  - Apps may depend on packages
-  - Packages may depend on packages
-  - Apps must not depend on other apps
-  - Packages must not import from apps
-  - No circular dependencies
-- **Configuration isolation.**
-  - Secrets live only on the backend
-  - Shared packages contain schemas, not secret values
-  - Misconfiguration must fail fast
-- **Analytics is non-authoritative.** Failure must not break core workflows.
+- Backend authority is absolute; clients are consumers.
+- Authorization is backend-only; UI checks are UX, not security.
+- Offline means queued intent, never authoritative state transitions.
+- Media are references/metadata; do not store blobs in primary DB.
+- Monorepo boundaries are strict:
+  - apps -> packages allowed
+  - packages -> packages allowed
+  - app -> app forbidden
+  - package -> app forbidden
+  - no circular dependencies
+- Misconfiguration must fail fast.
+- Non-authoritative analytics failures must never break core workflows.
 
 ## Repo layout
 
-- `apps/api` — authoritative backend core (rules + state transitions)
-- `apps/web` — public discovery + admin/editor UI (client only)
-- `apps/mobile` — offline-first listening + quick admin actions when online/authorized
-- `packages/*` — shared libraries/config (platform-agnostic)
-- `docs/` — architectural intent + implementation guide
+- `apps/api` - authoritative backend core
+- `apps/web` - public/admin web client
+- `apps/mobile` - offline-first mobile client
+- `packages/*` - shared libraries and configs
+- `docs/` - product + implementation authority
 
-## Development commands (pnpm + turbo)
+## Commands (root)
 
 - Install: `pnpm i`
 - Dev: `pnpm dev`
-- Dev (api): `pnpm dev:api`
-- Dev (web): `pnpm dev:web`
-- Dev (mobile): `pnpm dev:mobile`
+- Dev one app: `pnpm dev:api`, `pnpm dev:web`, `pnpm dev:mobile`
 - Build: `pnpm build`
 - Lint: `pnpm lint`
 - Typecheck: `pnpm typecheck`
 - Test: `pnpm test`
 - E2E: `pnpm test:e2e`
-- OpenAPI: `pnpm openapi`
-- Codegen: `pnpm codegen` (runs OpenAPI then client generation)
+- Prepush suite: `pnpm test:prepush`
+- Format: `pnpm format`
+- Format check: `pnpm format:check`
 
-## API contract discipline
+## Scoped execution
 
-- API is a long-lived contract: explicit meaning, stable semantics.
-- Versioning is explicit (URL versioning). Avoid silent behavior changes.
-- Use **intent-driven actions** for state transitions (publish/archive/replace/reorder).
+- API: `pnpm --filter api <script>`
+- Web: `pnpm --filter web <script>`
+- Mobile: `pnpm --filter mobile <script>`
+- DB: `pnpm --filter @sd/db <script>`
+- Env: `pnpm --filter @sd/env <script>`
+- I18n: `pnpm --filter @sd/i18n <script>`
+- Auth shared: `pnpm --filter @sd/auth-shared <script>`
+- API client: `pnpm --filter @sd/api-client <script>`
 
-## Data model discipline
+Turbo grouped scripts:
 
-- Primary relational DB stores authoritative state only.
-- DB stores **media references**, never raw media.
-- Analytics/events are append-only and stored separately; never in core DB.
-- Clients may cache and persist locally for offline usability, but never as authority.
+- `pnpm lint:api+web`, `pnpm lint:api+mobile`
+- `pnpm typecheck:api+web`, `pnpm typecheck:api+mobile`
+- `pnpm test:api+web`, `pnpm test:api+mobile`
 
-## Deployment + environments
+## Single-test quick reference
 
-- Environments: `development`, `preview`, `production` (consistent across platforms).
-- Deployments are **promotion-based** (tag-driven), not push-based:
-  - `main` is protected; PRs only
-  - Preview/production are promoted via tags (release tags immutable; env tags may move)
-- No local-machine deployment commits.
+- Jest file (API): `pnpm --filter api test -- src/modules/topics/topics.service.spec.ts`
+- Jest file (Web): `pnpm --filter web test -- src/path/to/file.test.tsx`
+- Jest file (Mobile): `pnpm --filter mobile test -- src/path/to/file.test.tsx`
+- Jest by name: `pnpm --filter api test -- src/modules/topics/topics.service.spec.ts -t "returns topic by slug"`
+- Jest watch file: `pnpm --filter api test:watch -- src/modules/topics/topics.service.spec.ts`
+- Playwright file: `pnpm --filter web test:e2e -- e2e/catalog.spec.ts`
+- Playwright by title: `pnpm --filter web test:e2e -- --grep "catalog list"`
 
-## How to make changes safely
+## Contract and data discipline
 
-Before implementing:
+- API is a stable contract with explicit intent-driven actions (publish/archive/reorder/replace).
+- OpenAPI + client generation flow:
+  - `pnpm openapi`
+  - `pnpm codegen`
+  - `pnpm contract` (both)
+- Never hand-edit `packages/api-client/generated/`.
+- If generated types are wrong, fix API/OpenAPI source first, then regenerate.
 
-1. Identify relevant docs section(s) and current timeline phase.
-2. Confirm the change does not violate guardrails/non-goals.
-3. Implement with explicit error handling + tests for sensitive rules.
-4. Update docs if intent/guarantees change.
+## DB and migration discipline
 
-## Commits
+- Primary DB stores authoritative relational state.
+- Keep media as references only.
+- Keep analytics/events out of authoritative core tables.
+- Treat migrations as first-class and reviewable.
+- Treat `packages/db/src/generated/` as derived output; keep it untracked and regenerate locally when needed.
 
-Use Conventional Commits.
+## Quality and style
+
+- Prettier is mandatory; root `.prettierrc` is authoritative.
+- API has a local Prettier override (`apps/api/.prettierrc`: single quotes).
+- ESLint flat configs come from `@sd/config/eslint/*`.
+- `no-console` is an error unless explicitly allowed.
+- TypeScript strict mode is required (`strict: true`, `noEmit: true`).
+- Prefer explicit return types for exported services/repos.
+- Prefer `unknown` over `any`, then narrow.
+- File naming uses kebab-case.
+- DTO naming uses `PascalCase` + `Dto`.
+- Keep API errors structured and consistent.
+
+## Commits and hooks
+
+- Conventional Commits are enforced (`commitlint`).
+- Pre-commit runs `pnpm lint:staged`.
+- Pre-push runs `pnpm test:prepush`.
+
+## Copilot/Cursor notes
+
+- Cursor rules files are not present (`.cursorrules`, `.cursor/rules/`).
+- Follow `.github/copilot-instructions.md`:
+  - backend authority
+  - backend-only authorization
+  - offline intent queueing
+  - media as references
+  - strict monorepo boundaries
+  - generated client is derived
+
+## Safety checklist
+
+- Do not bypass backend authorization with client logic.
+- Do not introduce app-to-app imports.
+- Do not commit secrets or env values.
+- Do not hand-edit generated API client output.
+- Update docs when architecture intent or guarantees change.

@@ -21,3 +21,6 @@ infra/envs/*.env
 
 # temp deploy files
 .deploy_tmp/
+
+# generated DB artifacts (derived, never committed)
+packages/db/src/generated/

@@ -246,7 +246,7 @@ Identity does not imply authority.
 
 ## Exit Criteria Checklist
 
-Before moving to Phase 04, confirm:
+Before moving to Phase 05, confirm:
 
 - [ ] Authentication works on mobile and web
 - [ ] Sessions are revocable

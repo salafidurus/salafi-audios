@@ -1,42 +1,42 @@
-# AGENT.md — packages/db
+# AGENT.md - packages/db
 
-Database schema, migrations, and DB utilities.
+This package owns Prisma schema, migrations, and DB client utilities.
 
-## Core rules (authoritative data)
+## Core data rules
 
-- Core relational DB stores authoritative platform state.
-- Never store:
-  - raw media files
-  - analytics/event streams
-  - derived/cached values (unless explicitly justified)
-  - client UI state
-  - secrets/credentials
+- Store authoritative relational state only.
+- Do not store media blobs, analytics/event streams, UI state, or secrets.
+- Keep state transitions explicit (do not infer lifecycle implicitly).
 
-## Modeling principles
+## Modeling discipline
 
-- Explicit relationships (FKs), normalized by default.
-- State is explicit (publication lifecycle is not inferred).
-- Identifiers are stable and opaque; public slugs are separate.
-- Avoid destructive schema changes without a migration path.
+- Favor explicit foreign keys and normalized models.
+- Separate opaque internal IDs from public slugs.
+- Avoid destructive changes without migration strategy.
+- Keep migrations reproducible and review-friendly.
 
-## Media references
+## Prisma workflow (root commands)
 
-- Store media references only (keys/ids/metadata), not media binaries.
-- Replacement is explicit and permissioned (editorial action).
+- Generate client: `pnpm --filter @sd/db prisma:generate`
+- Validate schema: `pnpm --filter @sd/db prisma:validate`
+- Format schema: `pnpm --filter @sd/db prisma:format`
+- Create migration: `pnpm --filter @sd/db migrate:create-only`
+- Deploy migrations: `pnpm --filter @sd/db migrate:deploy`
 
-## Analytics isolation
+## Build/lint/test commands
 
-- Analytics/event data does not belong in core DB.
+- Build: `pnpm --filter @sd/db build`
+- Lint: `pnpm --filter @sd/db lint`
+- Typecheck: `pnpm --filter @sd/db typecheck`
+- Test: `pnpm --filter @sd/db test`
 
-## Commands
+## Single-test commands
 
-From repo root:
+- Jest file: `pnpm --filter @sd/db test -- src/path/to/file.spec.ts`
+- Jest by name: `pnpm --filter @sd/db test -- src/path/to/file.spec.ts -t "creates record"`
 
-- Lint: `pnpm lint --filter=db`
-- Typecheck: `pnpm typecheck --filter=db`
-- Test: `pnpm test --filter=db`
+## Safety notes
 
-## Operational discipline
-
-- Treat migrations as first-class artifacts.
-- Keep migrations reproducible and reviewable.
+- Do not embed environment values in source or migrations.
+- Keep generated output derived from schema, not hand-edited.
+- Never commit generated DB artifacts under `packages/db/src/generated/`.

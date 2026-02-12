@@ -1,31 +1,27 @@
-# AGENT.md — packages/api-client
+# AGENT.md - packages/api-client
 
-Typed API client shared by mobile and web.
+This package provides generated, typed API client code for web/mobile.
 
-## Contract rules
+## Core rules
 
-- API client reflects backend contracts.
-- Generated output is derived; do not hand-edit unless explicitly documented.
-- Prefer explicit, stable exports; avoid app-specific assumptions.
+- Treat generated client output as derived artifacts.
+- Do not hand-edit `generated/` output.
+- Fix source contracts in API/OpenAPI, then regenerate.
 
-## Generation workflow
+## Generation workflow (root)
 
-- Backend produces OpenAPI.
-- Root tasks:
-  - `pnpm openapi`
-  - `pnpm codegen` (openapi + codegen)
-- If types are wrong, fix the API/OpenAPI source and regenerate.
+- Generate OpenAPI from API: `pnpm openapi`
+- Generate client: `pnpm codegen`
+- Combined flow: `pnpm contract`
 
-## Dependency rules
+## Commands (root)
 
-- Packages must not import from apps.
-- Keep runtime dependencies minimal and platform-agnostic.
+- Codegen: `pnpm --filter @sd/api-client codegen`
+- Lint: `pnpm --filter @sd/api-client lint`
+- Test/typecheck scripts are intentionally skipped in this workspace.
 
-## Commands
+## Integration notes
 
-From repo root:
-
-- Lint: `pnpm lint --filter=api-client`
-- Typecheck: `pnpm typecheck --filter=api-client`
-- Test: `pnpm test --filter=api-client` (if defined)
-- Regenerate: `pnpm codegen`
+- Keep exports stable and app-agnostic.
+- Avoid introducing assumptions tied to one consumer app.
+- Regenerate whenever API contracts change.
