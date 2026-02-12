@@ -1,5 +1,5 @@
 import { Prisma } from "@sd/db/client";
-import { TopicDef } from "./content-schema";
+import { TopicDef } from "../schema/content-schema";
 
 export async function upsertTopics(
   tx: Prisma.TransactionClient,

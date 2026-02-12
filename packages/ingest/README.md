@@ -4,19 +4,20 @@ Deterministic Phase 02 content ingestion tooling.
 
 Core modules:
 
-- `src/cli.ts` CLI arg parsing and input resolution
-- `src/content-schema.ts` schema validation and typed content model
-- `src/run-ingestion.ts` orchestration and DB upsert flow
-- `src/topic-sync.ts` topic + join-table synchronization
-- `src/audio-assets.ts` audio asset normalization and upsert logic
-- `src/r2.ts` R2 upload adapter
+- `src/commands/` command entrypoints
+- `src/cli/` CLI arg parsing and input resolution
+- `src/schema/content-schema.ts` schema validation and typed content model
+- `src/core/run-ingestion.ts` orchestration and DB upsert flow
+- `src/core/topic-sync.ts` topic + join-table synchronization
+- `src/core/audio-assets.ts` audio asset normalization and upsert logic
+- `src/storage/r2.ts` R2 upload adapter
 
 ## Run
 
 From repo root:
 
 ```bash
-pnpm ingest:content
+pnpm ingest:content -- --tag phase-02-seed
 ```
 
 Remove a tagged ingestion batch:
@@ -28,13 +29,13 @@ pnpm ingest:remove -- --tag phase-02-seed --environment development
 Or scoped directly:
 
 ```bash
-pnpm --filter @sd/ingest ingest:content
+pnpm --filter @sd/ingest ingest:content -- --tag phase-02-seed
 ```
 
 ## Options
 
 - `--file <path>`: JSON content definition path
-- `--tag <name>`: ingestion batch tag (default: `phase-02-seed`)
+- `--tag <name>`: ingestion batch tag (required)
 - `--environment <name>`: ingestion environment label
 - `--dry-run`: validate and execute ingestion transaction, then rollback
 - `--strict-audio-upload`: fail if an audio asset needs upload and R2 is not configured
@@ -50,9 +51,10 @@ Default local audio directory convention:
 
 ## Environment
 
-Required:
+Required (one of):
 
 - `DATABASE_URL`
+- `DIRECT_DB_URL`
 
 Used by API responses (in `apps/api` env):
 

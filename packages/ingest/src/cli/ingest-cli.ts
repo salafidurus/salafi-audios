@@ -16,10 +16,23 @@ function parseBooleanFlag(value: string | undefined): boolean {
   return value === "1" || value === "true";
 }
 
+function readFlagValue(
+  arg: string,
+  argv: string[],
+  index: number,
+): { value?: string; nextIndex: number } {
+  const equalIndex = arg.indexOf("=");
+  if (equalIndex > -1) {
+    return { value: arg.slice(equalIndex + 1), nextIndex: index };
+  }
+
+  return { value: argv[index + 1], nextIndex: index + 1 };
+}
+
 export function parseArgs(argv: string[]): IngestCliArgs {
   const result: IngestCliArgs = {
     filePath: undefined,
-    tag: process.env.INGEST_TAG ?? "phase-02-seed",
+    tag: process.env.INGEST_TAG ?? "",
     environment: process.env.INGEST_ENVIRONMENT ?? process.env.NODE_ENV ?? "development",
     dryRun: parseBooleanFlag(process.env.INGEST_DRY_RUN),
     strictAudioUpload: parseBooleanFlag(process.env.INGEST_STRICT_AUDIO_UPLOAD),
@@ -30,23 +43,24 @@ export function parseArgs(argv: string[]): IngestCliArgs {
     const arg = argv[index];
     if (!arg) continue;
 
-    if (arg === "--file") {
-      result.filePath = argv[index + 1];
-      index += 1;
+    if (arg === "--file" || arg.startsWith("--file=")) {
+      const { value, nextIndex } = readFlagValue(arg, argv, index);
+      if (value) result.filePath = value;
+      index = nextIndex;
       continue;
     }
 
-    if (arg === "--tag") {
-      const value = argv[index + 1];
+    if (arg === "--tag" || arg.startsWith("--tag=")) {
+      const { value, nextIndex } = readFlagValue(arg, argv, index);
       if (value) result.tag = value;
-      index += 1;
+      index = nextIndex;
       continue;
     }
 
-    if (arg === "--environment") {
-      const value = argv[index + 1];
+    if (arg === "--environment" || arg.startsWith("--environment=")) {
+      const { value, nextIndex } = readFlagValue(arg, argv, index);
       if (value) result.environment = value;
-      index += 1;
+      index = nextIndex;
       continue;
     }
 
@@ -60,10 +74,15 @@ export function parseArgs(argv: string[]): IngestCliArgs {
       continue;
     }
 
-    if (arg === "--audio-dir") {
-      result.audioDir = argv[index + 1];
-      index += 1;
+    if (arg === "--audio-dir" || arg.startsWith("--audio-dir=")) {
+      const { value, nextIndex } = readFlagValue(arg, argv, index);
+      if (value) result.audioDir = value;
+      index = nextIndex;
     }
+  }
+
+  if (!result.tag.trim()) {
+    throw new Error("Missing required --tag. Example: pnpm ingest:content -- --tag phase-02-seed");
   }
 
   return result;

@@ -543,6 +543,12 @@ importers:
       '@sd/db':
         specifier: workspace:*
         version: link:../db
+      '@sd/env':
+        specifier: workspace:*
+        version: link:../env
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.6.1
       zod:
         specifier: ^3.25.17
         version: 3.25.76

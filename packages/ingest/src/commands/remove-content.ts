@@ -1,18 +1,26 @@
+import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@sd/db/client";
-import { parseRemoveArgs } from "./remove-cli";
-import { runRemoval } from "./run-removal";
+import { getDbEnv } from "@sd/env/db";
+import { parseRemoveArgs } from "../cli/remove-cli";
+import { runRemoval } from "../core/run-removal";
 
 async function main(): Promise<void> {
   const args = parseRemoveArgs(process.argv.slice(2));
 
-  const databaseUrl = process.env.DATABASE_URL;
-  if (!databaseUrl) {
-    throw new Error("DATABASE_URL is required to run content removal.");
-  }
+  const { DATABASE_URL: databaseUrl } = getDbEnv({
+    ...process.env,
+    DATABASE_URL: process.env.DATABASE_URL ?? process.env.DIRECT_DB_URL,
+  });
 
   const adapter = new PrismaPg({ connectionString: databaseUrl });
-  const prisma = new PrismaClient({ adapter });
+  const prisma = new PrismaClient({
+    adapter,
+    transactionOptions: {
+      maxWait: 20_000,
+      timeout: 300_000,
+    },
+  });
   await prisma.$connect();
 
   try {

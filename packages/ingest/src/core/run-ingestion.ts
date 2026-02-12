@@ -1,9 +1,9 @@
 import { PrismaClient, Prisma, Status } from "@sd/db/client";
 import { S3Client } from "@aws-sdk/client-s3";
-import { ContentDefinition, LectureDef } from "./content-schema";
+import { ContentDefinition, LectureDef } from "../schema/content-schema";
 import { syncLectureAudioAssets } from "./audio-assets";
 import { DryRunRollbackError } from "./errors";
-import { createR2Client, parseR2Config, R2Config } from "./r2";
+import { createR2Client, parseR2Config, R2Config } from "../storage/r2";
 import {
   syncCollectionTopics,
   syncLectureTopics,
