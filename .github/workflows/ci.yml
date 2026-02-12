@@ -11,6 +11,13 @@ on:
       - main
       - preview
       - production
+    paths-ignore:
+      - "README.md"
+      - "**/README.md"
+      - "docs/**"
+      - "AGENT.md"
+      - "AGENTS.md"
+      - ".github/copilot-instructions.md"
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.event.pull_request.number }}
@@ -31,6 +38,10 @@ jobs:
     name: detect:changes
     runs-on: ubuntu-latest
     outputs:
+      lint: ${{ steps.filter.outputs.lint }}
+      typecheck: ${{ steps.filter.outputs.typecheck }}
+      test: ${{ steps.filter.outputs.test }}
+      web_e2e: ${{ steps.filter.outputs.web_e2e }}
       db_generated_policy: ${{ steps.filter.outputs.db_generated_policy }}
       contract: ${{ steps.filter.outputs.contract }}
     steps:
@@ -38,6 +49,30 @@ jobs:
         id: filter
         with:
           filters: |
+            lint:
+              - "apps/**/*.{js,jsx,ts,tsx,mjs,cjs}"
+              - "packages/**/*.{js,jsx,ts,tsx,mjs,cjs}"
+              - "eslint.config.*"
+              - "**/eslint.config.*"
+            typecheck:
+              - "apps/**/*.{ts,tsx,mts,cts}"
+              - "packages/**/*.{ts,tsx,mts,cts}"
+              - "tsconfig*.json"
+              - "**/tsconfig*.json"
+              - "packages/db/prisma/**"
+            test:
+              - "apps/**/*.{js,jsx,ts,tsx,mjs,cjs}"
+              - "packages/**/*.{js,jsx,ts,tsx,mjs,cjs}"
+              - "apps/**/*.{spec,test}.{js,jsx,ts,tsx,mjs,cjs}"
+              - "packages/**/*.{spec,test}.{js,jsx,ts,tsx,mjs,cjs}"
+              - "jest.config.*"
+              - "**/jest.config.*"
+              - "packages/db/prisma/**"
+            web_e2e:
+              - "apps/web/**"
+              - "packages/api-client/**"
+              - "packages/env/**"
+              - "packages/i18n/**"
             db_generated_policy:
               - "packages/db/prisma/**"
               - "packages/db/prisma.config.ts"
@@ -50,6 +85,8 @@ jobs:
 
   build_deps:
     name: build:deps
+    needs: changes
+    if: needs.changes.outputs.lint == 'true' || needs.changes.outputs.typecheck == 'true' || needs.changes.outputs.web_e2e == 'true' || needs.changes.outputs.contract == 'true'
     runs-on: ubuntu-latest
     environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
     env:
@@ -88,7 +125,10 @@ jobs:
 
   lint:
     name: lint
-    needs: build_deps
+    needs:
+      - build_deps
+      - changes
+    if: needs.changes.outputs.lint == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -117,7 +157,10 @@ jobs:
 
   typecheck:
     name: typecheck
-    needs: build_deps
+    needs:
+      - build_deps
+      - changes
+    if: needs.changes.outputs.typecheck == 'true' || needs.changes.outputs.contract == 'true'
     runs-on: ubuntu-latest
     environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
     env:
@@ -150,7 +193,10 @@ jobs:
 
   test:
     name: test
-    needs: typecheck
+    needs:
+      - typecheck
+      - changes
+    if: needs.changes.outputs.test == 'true'
     runs-on: ubuntu-latest
     environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
     env:
@@ -178,7 +224,10 @@ jobs:
 
   e2e_web:
     name: e2e:web
-    needs: build_deps
+    needs:
+      - build_deps
+      - changes
+    if: needs.changes.outputs.web_e2e == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
