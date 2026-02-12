@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Status } from '@sd/db/client';
+import { STATUS_VALUES, type StatusValue } from '@/shared/enums/status-values';
 
 export class SeriesViewDto {
   @ApiProperty()
@@ -28,8 +28,8 @@ export class SeriesViewDto {
   @ApiPropertyOptional()
   language?: string;
 
-  @ApiProperty({ enum: Status })
-  status!: Status;
+  @ApiProperty({ type: String, enum: STATUS_VALUES })
+  status!: StatusValue;
 
   @ApiPropertyOptional()
   orderIndex?: number;

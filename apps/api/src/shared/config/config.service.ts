@@ -24,7 +24,11 @@ export class ConfigService {
   }
 
   get DATABASE_URL() {
-    return this.env.DATABASE_URL;
+    return (
+      this.env.DATABASE_URL ??
+      process.env.DIRECT_DB_URL ??
+      'postgresql://postgres:postgres@localhost:5432/sd_ci?schema=public'
+    );
   }
 
   get ASSET_CDN_BASE_URL(): string | undefined {

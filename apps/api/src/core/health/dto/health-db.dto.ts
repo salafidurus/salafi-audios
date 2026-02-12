@@ -1,12 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class HealthDbResponseDto {
-  @ApiProperty({ example: 'ok' })
-  status!: 'ok';
+  @ApiProperty({ type: String, example: 'ok' })
+  status!: string;
 
-  @ApiProperty({ example: 'postgresql' })
-  provider!: 'postgresql';
+  @ApiProperty({ type: String, example: 'postgresql' })
+  provider!: string;
 
-  @ApiProperty({ example: '2026-01-28T04:24:43.557Z' })
+  @ApiProperty({ type: String, example: '2026-01-28T04:24:43.557Z' })
   timestamp!: string;
 }

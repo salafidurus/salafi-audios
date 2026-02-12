@@ -4,7 +4,7 @@ import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import { HealthDbResponseDto } from './dto/health-db.dto';
-import { HealthResponseDto, HealthStatus } from './dto/health.dto';
+import { HEALTH_STATUS_VALUES, HealthResponseDto } from './dto/health.dto';
 
 @SkipThrottle()
 @ApiTags('Health')
@@ -18,7 +18,7 @@ export class HealthController {
   @ApiOkResponse({ type: HealthResponseDto })
   getHealth(): HealthResponseDto {
     return {
-      status: HealthStatus.OK,
+      status: HEALTH_STATUS_VALUES[0],
       timestamp: new Date().toISOString(),
       service: process.env.SERVICE_NAME ?? undefined,
       environment: process.env.NODE_ENV ?? undefined,

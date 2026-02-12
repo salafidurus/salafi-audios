@@ -23,7 +23,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "openapi:json": "node --import tsx src/openapi.ts",
+    "openapi:json": "pnpm build && node dist/openapi.js",
     "preopenapi:json": "pnpm --filter @sd/db prisma:generate",
     "openapi": "pnpm openapi:json"
   },

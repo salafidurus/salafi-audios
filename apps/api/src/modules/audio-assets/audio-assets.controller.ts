@@ -23,7 +23,10 @@ export class AudioAssetsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get audio asset by id' })
   @ApiOkResponse({ type: AudioAssetViewDto })
-  getById(@Param('id') id: string): Promise<AudioAssetViewDto> {
+  getById(
+    @Param('lectureId') _lectureId: string,
+    @Param('id') id: string,
+  ): Promise<AudioAssetViewDto> {
     return this.assets.getById(id);
   }
 

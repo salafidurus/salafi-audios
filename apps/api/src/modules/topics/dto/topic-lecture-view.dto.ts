@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Status } from '@sd/db/client';
+import { STATUS_VALUES, type StatusValue } from '@/shared/enums/status-values';
 
 export class TopicLectureViewDto {
   @ApiProperty() id!: string;
@@ -9,7 +9,7 @@ export class TopicLectureViewDto {
   @ApiProperty() title!: string;
   @ApiPropertyOptional() description?: string;
   @ApiPropertyOptional() language?: string;
-  @ApiProperty() status!: Status;
+  @ApiProperty({ type: String, enum: STATUS_VALUES }) status!: StatusValue;
   @ApiPropertyOptional() publishedAt?: string;
   @ApiPropertyOptional() durationSeconds?: number;
 }

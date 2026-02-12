@@ -4,7 +4,12 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { ApiCommonErrors } from '@/shared/decorators/api-common-errors.decorator';
 import { CatalogService } from './catalog.service';
 import { CatalogListQueryDto } from './dto/catalog-list.query.dto';
-import { CatalogPageDto } from './dto/catalog-page.dto';
+import {
+  CatalogPageDto,
+  CollectionCatalogPageDto,
+  LectureCatalogPageDto,
+  SeriesCatalogPageDto,
+} from './dto/catalog-page.dto';
 import { CollectionViewDto } from '../collections/dto/collection-view.dto';
 import { SeriesViewDto } from '../series/dto/series-view.dto';
 import { LectureViewDto } from '../lectures/dto/lecture-view.dto';
@@ -18,7 +23,7 @@ export class CatalogController {
 
   @Get('collections')
   @ApiOperation({ summary: 'Browse published collections (catalog root)' })
-  @ApiOkResponse({ type: CatalogPageDto<CollectionViewDto> })
+  @ApiOkResponse({ type: CollectionCatalogPageDto })
   collections(
     @Query() query: CatalogListQueryDto,
   ): Promise<CatalogPageDto<CollectionViewDto>> {
@@ -29,7 +34,7 @@ export class CatalogController {
   @ApiOperation({
     summary: 'Browse published root series only (collectionId = null)',
   })
-  @ApiOkResponse({ type: CatalogPageDto<SeriesViewDto> })
+  @ApiOkResponse({ type: SeriesCatalogPageDto })
   series(
     @Query() query: CatalogListQueryDto,
   ): Promise<CatalogPageDto<SeriesViewDto>> {
@@ -40,7 +45,7 @@ export class CatalogController {
   @ApiOperation({
     summary: 'Browse published root lectures only (seriesId = null)',
   })
-  @ApiOkResponse({ type: CatalogPageDto<LectureViewDto> })
+  @ApiOkResponse({ type: LectureCatalogPageDto })
   lectures(
     @Query() query: CatalogListQueryDto,
   ): Promise<CatalogPageDto<LectureViewDto>> {

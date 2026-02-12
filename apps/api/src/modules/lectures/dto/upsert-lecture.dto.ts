@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Status } from '@sd/db/client';
+import { STATUS_VALUES, type StatusValue } from '@/shared/enums/status-values';
 import {
-  IsEnum,
+  IsIn,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -30,10 +30,14 @@ export class UpsertLectureDto {
   @IsOptional()
   language?: string;
 
-  @ApiPropertyOptional({ enum: Status, default: Status.draft })
-  @IsEnum(Status)
+  @ApiPropertyOptional({
+    type: String,
+    enum: STATUS_VALUES,
+    default: STATUS_VALUES[0],
+  })
+  @IsIn(STATUS_VALUES)
   @IsOptional()
-  status?: Status;
+  status?: StatusValue;
 
   @ApiPropertyOptional({ description: 'ISO string if published' })
   @IsString()

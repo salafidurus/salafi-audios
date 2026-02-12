@@ -47,7 +47,8 @@
     "dev": "pnpm build --watch"
   },
   "dependencies": {
-    "@prisma/client": "^7.3.0"
+    "@prisma/client": "^7.3.0",
+    "@prisma/client-runtime-utils": "^7.3.0"
   },
   "devDependencies": {
     "@sd/config": "workspace:*",
