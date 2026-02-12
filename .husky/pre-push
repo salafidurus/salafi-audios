@@ -1,2 +1,21 @@
-pnpm ci:local
-DIRECT_DB_URL=postgresql://postgres:postgres@localhost:5432/sd_local?schema=public pnpm --filter @sd/db prisma:generate
+if git rev-parse --verify origin/main > /dev/null 2>&1; then
+  BASE_REF="origin/main"
+else
+  BASE_REF="HEAD~1"
+fi
+
+RANGE="${BASE_REF}...HEAD"
+
+pnpm turbo lint typecheck test:prepush --filter="...[${BASE_REF}]"
+
+if git diff --quiet "$RANGE" -- README.md ':(glob)docs/**/*.md' AGENT.md AGENTS.md .github/copilot-instructions.md; then
+  printf "pre-push: skipping docs:quality (no docs changes)\n"
+else
+  pnpm docs:quality
+fi
+
+if git diff --quiet "$RANGE" -- packages/db/prisma/schema.prisma packages/db/prisma.config.ts packages/db/package.json; then
+  printf "pre-push: skipping prisma:generate (no db schema/config changes)\n"
+else
+  DIRECT_DB_URL=postgresql://postgres:postgres@localhost:5432/sd_local?schema=public pnpm --filter @sd/db prisma:generate
+fi
