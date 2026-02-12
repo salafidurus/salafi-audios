@@ -43,5 +43,5 @@ fi
 if git diff --quiet "$RANGE" -- packages/db/prisma/schema.prisma packages/db/prisma.config.ts packages/db/package.json; then
   printf "pre-push: skipping prisma:generate (no db schema/config changes)\n"
 else
-  DIRECT_DB_URL=postgresql://postgres:postgres@localhost:5432/sd_local?schema=public pnpm --filter @sd/db prisma:generate
+  pnpm --filter @sd/db prisma:generate
 fi
