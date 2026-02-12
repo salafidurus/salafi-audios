@@ -1,10 +1,12 @@
+import "dotenv/config";
 import { readFile } from "node:fs/promises";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@sd/db/client";
-import { parseArgs, resolveInputPath } from "./cli";
-import { parseContentDefinition } from "./content-schema";
-import { DryRunRollbackError } from "./errors";
-import { runIngestion } from "./run-ingestion";
+import { getDbEnv } from "@sd/env/db";
+import { parseArgs, resolveInputPath } from "../cli/ingest-cli";
+import { parseContentDefinition } from "../schema/content-schema";
+import { DryRunRollbackError } from "../core/errors";
+import { runIngestion } from "../core/run-ingestion";
 
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
@@ -13,13 +15,19 @@ async function main(): Promise<void> {
   const parsedJson = JSON.parse(rawFile) as unknown;
   const definition = parseContentDefinition(parsedJson);
 
-  const databaseUrl = process.env.DATABASE_URL;
-  if (!databaseUrl) {
-    throw new Error("DATABASE_URL is required to run content ingestion.");
-  }
+  const { DATABASE_URL: databaseUrl } = getDbEnv({
+    ...process.env,
+    DATABASE_URL: process.env.DATABASE_URL ?? process.env.DIRECT_DB_URL,
+  });
 
   const adapter = new PrismaPg({ connectionString: databaseUrl });
-  const prisma = new PrismaClient({ adapter });
+  const prisma = new PrismaClient({
+    adapter,
+    transactionOptions: {
+      maxWait: 20_000,
+      timeout: 300_000,
+    },
+  });
   await prisma.$connect();
 
   try {

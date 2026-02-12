@@ -6,8 +6,11 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "scripts": {
-    "ingest:content": "tsx src/ingest-content.ts",
-    "ingest:remove": "tsx src/remove-content.ts",
+    "preingest:content": "pnpm --filter @sd/env build",
+    "ingest:content": "tsx src/commands/ingest-content.ts",
+    "preingest:remove": "pnpm --filter @sd/env build",
+    "ingest:remove": "tsx src/commands/remove-content.ts",
+    "pretypecheck": "pnpm --filter @sd/db prisma:generate",
     "lint": "eslint .",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
@@ -19,6 +22,8 @@
     "@aws-sdk/client-s3": "^3.922.0",
     "@prisma/adapter-pg": "^7.3.0",
     "@sd/db": "workspace:*",
+    "@sd/env": "workspace:*",
+    "dotenv": "^16.4.5",
     "zod": "^3.25.17"
   },
   "devDependencies": {

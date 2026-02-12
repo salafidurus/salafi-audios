@@ -1,54 +1,90 @@
 {
   "version": 1,
   "topics": [
-    { "slug": "hadith", "name": "Hadith" },
-    { "slug": "aqidah", "name": "Aqidah" },
-    { "slug": "manhaj", "name": "Manhaj" },
     { "slug": "fiqh", "name": "Fiqh" },
-    { "slug": "adab", "name": "Adab" },
-    { "slug": "muhadarat", "name": "Muhadarat" },
-    { "slug": "sahih-muslim", "name": "Sahih Muslim", "parentSlug": "hadith" },
-    { "slug": "umdah", "name": "Umdatul-Ahkam", "parentSlug": "hadith" }
+    { "slug": "aqidah", "name": "Aqidah" },
+    { "slug": "usul-fiqh", "name": "Usul al-Fiqh" }
   ],
   "scholars": [
     {
-      "slug": "abdul-aziz-ibn-baz",
-      "name": "Shaykh Abdul Aziz Ibn Baz",
-      "country": "Saudi Arabia",
+      "slug": "arafat-al-muhammadi",
+      "name": "Shaykh Arafat al-Muhammadi",
+      "country": "Yemen",
       "mainLanguage": "ar",
       "isActive": true,
       "collections": [
         {
-          "slug": "explanation-of-sahih-muslim",
-          "title": "Explanation of Sahih Muslim",
+          "slug": "manhaj-saalikin",
+          "title": "Manhaj al-Salikin",
           "language": "ar",
           "status": "published",
           "orderIndex": 1,
-          "topicSlugs": ["hadith", "sahih-muslim"],
+          "topicSlugs": ["fiqh"],
           "series": [
             {
-              "slug": "kitab-al-iman",
-              "title": "Kitab al-Iman",
+              "slug": "taharah",
+              "title": "Taharah",
               "language": "ar",
               "status": "published",
               "orderIndex": 1,
-              "topicSlugs": ["hadith", "aqidah"],
+              "topicSlugs": ["fiqh"],
               "lectures": [
                 {
-                  "slug": "kitab-al-iman-lesson-01",
-                  "title": "Kitab al-Iman - Lesson 01",
+                  "slug": "manhaj-saalikin-taharah-01",
+                  "title": "Manhaj al-Salikin - Taharah 01",
                   "language": "ar",
                   "status": "published",
                   "orderIndex": 1,
-                  "durationSeconds": 2340,
-                  "topicSlugs": ["hadith", "aqidah"],
+                  "topicSlugs": ["fiqh"],
                   "audioAssets": [
                     {
-                      "url": "https://cdn.example.com/audio/abdul-aziz-ibn-baz/kitab-al-iman-lesson-01.mp3",
+                      "file": "packages/ingest/content/audio/arafat-al-muhammadi/manhaj-saalikin/01-Taharah/01.mp3",
                       "format": "mp3",
-                      "bitrateKbps": 96,
-                      "durationSeconds": 2340,
-                      "source": "seed-url",
+                      "isPrimary": true
+                    }
+                  ]
+                },
+                {
+                  "slug": "manhaj-saalikin-taharah-02",
+                  "title": "Manhaj al-Salikin - Taharah 02",
+                  "language": "ar",
+                  "status": "published",
+                  "orderIndex": 2,
+                  "topicSlugs": ["fiqh"],
+                  "audioAssets": [
+                    {
+                      "file": "packages/ingest/content/audio/arafat-al-muhammadi/manhaj-saalikin/01-Taharah/02.mp3",
+                      "format": "mp3",
+                      "isPrimary": true
+                    }
+                  ]
+                },
+                {
+                  "slug": "manhaj-saalikin-taharah-03",
+                  "title": "Manhaj al-Salikin - Taharah 03",
+                  "language": "ar",
+                  "status": "published",
+                  "orderIndex": 3,
+                  "topicSlugs": ["fiqh"],
+                  "audioAssets": [
+                    {
+                      "file": "packages/ingest/content/audio/arafat-al-muhammadi/manhaj-saalikin/01-Taharah/03.mp3",
+                      "format": "mp3",
+                      "isPrimary": true
+                    }
+                  ]
+                },
+                {
+                  "slug": "manhaj-saalikin-taharah-04",
+                  "title": "Manhaj al-Salikin - Taharah 04",
+                  "language": "ar",
+                  "status": "published",
+                  "orderIndex": 4,
+                  "topicSlugs": ["fiqh"],
+                  "audioAssets": [
+                    {
+                      "file": "packages/ingest/content/audio/arafat-al-muhammadi/manhaj-saalikin/01-Taharah/04.mp3",
+                      "format": "mp3",
                       "isPrimary": true
                     }
                   ]
@@ -56,65 +92,174 @@
               ]
             },
             {
-              "slug": "kitab-al-taharah",
-              "title": "Kitab al-Taharah",
+              "slug": "salah",
+              "title": "Salah",
               "language": "ar",
               "status": "published",
               "orderIndex": 2,
-              "topicSlugs": ["hadith", "fiqh"],
+              "topicSlugs": ["fiqh"],
               "lectures": [
                 {
-                  "slug": "kitab-al-taharah-lesson-01",
-                  "title": "Kitab al-Taharah - Lesson 01",
+                  "slug": "manhaj-saalikin-salah-01",
+                  "title": "Manhaj al-Salikin - Salah 01",
                   "language": "ar",
                   "status": "published",
                   "orderIndex": 1,
-                  "durationSeconds": 2190,
-                  "topicSlugs": ["hadith", "fiqh"],
+                  "topicSlugs": ["fiqh"],
                   "audioAssets": [
                     {
-                      "url": "https://cdn.example.com/audio/abdul-aziz-ibn-baz/kitab-al-taharah-lesson-01.mp3",
+                      "file": "packages/ingest/content/audio/arafat-al-muhammadi/manhaj-saalikin/02 الصلاة/منهج السالكين 05 الصلاة 01.mp3",
                       "format": "mp3",
-                      "bitrateKbps": 96,
-                      "durationSeconds": 2190,
-                      "source": "seed-url",
                       "isPrimary": true
                     }
                   ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "slug": "explanation-of-umdatu-al-ahkam",
-          "title": "Explanation of Umdatul-Ahkam",
-          "language": "ar",
-          "status": "published",
-          "orderIndex": 2,
-          "topicSlugs": ["hadith", "umdah"],
-          "series": [
-            {
-              "slug": "umdah-kitab-al-taharah",
-              "title": "Kitab al-Taharah",
-              "status": "published",
-              "orderIndex": 1,
-              "topicSlugs": ["hadith", "fiqh"],
-              "lectures": [
+                },
                 {
-                  "slug": "umdah-taharah-lesson-01",
-                  "title": "Umdah - Taharah Lesson 01",
+                  "slug": "manhaj-saalikin-salah-02",
+                  "title": "Manhaj al-Salikin - Salah 02",
+                  "language": "ar",
                   "status": "published",
-                  "orderIndex": 1,
-                  "durationSeconds": 1980,
-                  "topicSlugs": ["hadith", "fiqh"],
+                  "orderIndex": 2,
+                  "topicSlugs": ["fiqh"],
                   "audioAssets": [
                     {
-                      "url": "https://cdn.example.com/audio/abdul-aziz-ibn-baz/umdah-taharah-lesson-01.mp3",
+                      "file": "packages/ingest/content/audio/arafat-al-muhammadi/manhaj-saalikin/02 الصلاة/منهج السالكين 06 الصلاة 02.mp3",
                       "format": "mp3",
-                      "bitrateKbps": 96,
-                      "durationSeconds": 1980,
-                      "source": "seed-url",
+                      "isPrimary": true
+                    }
+                  ]
+                },
+                {
+                  "slug": "manhaj-saalikin-salah-03",
+                  "title": "Manhaj al-Salikin - Salah 03",
+                  "language": "ar",
+                  "status": "published",
+                  "orderIndex": 3,
+                  "topicSlugs": ["fiqh"],
+                  "audioAssets": [
+                    {
+                      "file": "packages/ingest/content/audio/arafat-al-muhammadi/manhaj-saalikin/02 الصلاة/منهج السالكين 07 الصلاة 03.mp3",
+                      "format": "mp3",
+                      "isPrimary": true
+                    }
+                  ]
+                },
+                {
+                  "slug": "manhaj-saalikin-salah-04",
+                  "title": "Manhaj al-Salikin - Salah 04",
+                  "language": "ar",
+                  "status": "published",
+                  "orderIndex": 4,
+                  "topicSlugs": ["fiqh"],
+                  "audioAssets": [
+                    {
+                      "file": "packages/ingest/content/audio/arafat-al-muhammadi/manhaj-saalikin/02 الصلاة/منهج السالكين 08 الصلاة 04.mp3",
+                      "format": "mp3",
+                      "isPrimary": true
+                    }
+                  ]
+                },
+                {
+                  "slug": "manhaj-saalikin-salah-05",
+                  "title": "Manhaj al-Salikin - Salah 05",
+                  "language": "ar",
+                  "status": "published",
+                  "orderIndex": 5,
+                  "topicSlugs": ["fiqh"],
+                  "audioAssets": [
+                    {
+                      "file": "packages/ingest/content/audio/arafat-al-muhammadi/manhaj-saalikin/02 الصلاة/منهج السالكين 09 الصلاة 05.mp3",
+                      "format": "mp3",
+                      "isPrimary": true
+                    }
+                  ]
+                },
+                {
+                  "slug": "manhaj-saalikin-salah-06",
+                  "title": "Manhaj al-Salikin - Salah 06",
+                  "language": "ar",
+                  "status": "published",
+                  "orderIndex": 6,
+                  "topicSlugs": ["fiqh"],
+                  "audioAssets": [
+                    {
+                      "file": "packages/ingest/content/audio/arafat-al-muhammadi/manhaj-saalikin/02 الصلاة/منهج السالكين 10 الصلاة 06.mp3",
+                      "format": "mp3",
+                      "isPrimary": true
+                    }
+                  ]
+                },
+                {
+                  "slug": "manhaj-saalikin-salah-07",
+                  "title": "Manhaj al-Salikin - Salah 07",
+                  "language": "ar",
+                  "status": "published",
+                  "orderIndex": 7,
+                  "topicSlugs": ["fiqh"],
+                  "audioAssets": [
+                    {
+                      "file": "packages/ingest/content/audio/arafat-al-muhammadi/manhaj-saalikin/02 الصلاة/منهج السالكين 11 الصلاة 07.mp3",
+                      "format": "mp3",
+                      "isPrimary": true
+                    }
+                  ]
+                },
+                {
+                  "slug": "manhaj-saalikin-salah-08",
+                  "title": "Manhaj al-Salikin - Salah 08",
+                  "language": "ar",
+                  "status": "published",
+                  "orderIndex": 8,
+                  "topicSlugs": ["fiqh"],
+                  "audioAssets": [
+                    {
+                      "file": "packages/ingest/content/audio/arafat-al-muhammadi/manhaj-saalikin/02 الصلاة/منهج السالكين 12 الصلاة 08.mp3",
+                      "format": "mp3",
+                      "isPrimary": true
+                    }
+                  ]
+                },
+                {
+                  "slug": "manhaj-saalikin-salah-09",
+                  "title": "Manhaj al-Salikin - Salah 09",
+                  "language": "ar",
+                  "status": "published",
+                  "orderIndex": 9,
+                  "topicSlugs": ["fiqh"],
+                  "audioAssets": [
+                    {
+                      "file": "packages/ingest/content/audio/arafat-al-muhammadi/manhaj-saalikin/02 الصلاة/منهج السالكين 13 الصلاة 09.mp3",
+                      "format": "mp3",
+                      "isPrimary": true
+                    }
+                  ]
+                },
+                {
+                  "slug": "manhaj-saalikin-salah-10",
+                  "title": "Manhaj al-Salikin - Salah 10",
+                  "language": "ar",
+                  "status": "published",
+                  "orderIndex": 10,
+                  "topicSlugs": ["fiqh"],
+                  "audioAssets": [
+                    {
+                      "file": "packages/ingest/content/audio/arafat-al-muhammadi/manhaj-saalikin/02 الصلاة/منهج السالكين 14 الصلاة 10.mp3",
+                      "format": "mp3",
+                      "isPrimary": true
+                    }
+                  ]
+                },
+                {
+                  "slug": "manhaj-saalikin-salah-11",
+                  "title": "Manhaj al-Salikin - Salah 11",
+                  "language": "ar",
+                  "status": "published",
+                  "orderIndex": 11,
+                  "topicSlugs": ["fiqh"],
+                  "audioAssets": [
+                    {
+                      "file": "packages/ingest/content/audio/arafat-al-muhammadi/manhaj-saalikin/02 الصلاة/منهج السالكين 15 الصلاة 11.mp3",
+                      "format": "mp3",
                       "isPrimary": true
                     }
                   ]
@@ -122,237 +267,24 @@
               ]
             },
             {
-              "slug": "umdah-kitab-al-salah",
-              "title": "Kitab al-Salah",
+              "slug": "janaiz",
+              "title": "Janaiz",
+              "language": "ar",
               "status": "published",
-              "orderIndex": 2,
-              "topicSlugs": ["hadith", "fiqh"],
+              "orderIndex": 3,
+              "topicSlugs": ["fiqh"],
               "lectures": [
                 {
-                  "slug": "umdah-salah-lesson-01",
-                  "title": "Umdah - Salah Lesson 01",
-                  "status": "review",
-                  "orderIndex": 1,
-                  "durationSeconds": 2050,
-                  "topicSlugs": ["hadith", "fiqh"],
-                  "audioAssets": [
-                    {
-                      "url": "https://cdn.example.com/audio/abdul-aziz-ibn-baz/umdah-salah-lesson-01.mp3",
-                      "format": "mp3",
-                      "bitrateKbps": 96,
-                      "durationSeconds": 2050,
-                      "source": "seed-url",
-                      "isPrimary": true
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "series": [
-        {
-          "slug": "sharh-haiyah-ibn-abi-dawud",
-          "title": "Sharh Haiyah Ibn Abi Dawud",
-          "status": "published",
-          "orderIndex": 1,
-          "topicSlugs": ["aqidah"],
-          "lectures": [
-            {
-              "slug": "haiyah-lesson-01",
-              "title": "Haiyah Lesson 01",
-              "status": "published",
-              "orderIndex": 1,
-              "durationSeconds": 1720,
-              "topicSlugs": ["aqidah"],
-              "audioAssets": [
-                {
-                  "url": "https://cdn.example.com/audio/abdul-aziz-ibn-baz/haiyah-lesson-01.mp3",
-                  "format": "mp3",
-                  "bitrateKbps": 96,
-                  "durationSeconds": 1720,
-                  "source": "seed-url",
-                  "isPrimary": true
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "slug": "sharh-laamiyah-ibn-taymiyyah",
-          "title": "Sharh Laamiyah Ibn Taymiyyah",
-          "status": "published",
-          "orderIndex": 2,
-          "topicSlugs": ["aqidah", "manhaj"],
-          "lectures": [
-            {
-              "slug": "laamiyah-lesson-01",
-              "title": "Laamiyah Lesson 01",
-              "status": "published",
-              "orderIndex": 1,
-              "durationSeconds": 1680,
-              "topicSlugs": ["aqidah", "manhaj"],
-              "audioAssets": [
-                {
-                  "url": "https://cdn.example.com/audio/abdul-aziz-ibn-baz/laamiyah-lesson-01.mp3",
-                  "format": "mp3",
-                  "bitrateKbps": 96,
-                  "durationSeconds": 1680,
-                  "source": "seed-url",
-                  "isPrimary": true
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "lectures": [
-        {
-          "slug": "muhadarah-on-seeking-knowledge",
-          "title": "Muhadarah on Seeking Knowledge",
-          "status": "published",
-          "orderIndex": 1,
-          "durationSeconds": 1920,
-          "topicSlugs": ["muhadarat", "adab"],
-          "audioAssets": [
-            {
-              "url": "https://cdn.example.com/audio/abdul-aziz-ibn-baz/muhadarah-on-seeking-knowledge.mp3",
-              "format": "mp3",
-              "bitrateKbps": 96,
-              "durationSeconds": 1920,
-              "source": "seed-url",
-              "isPrimary": true
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "slug": "salih-al-fawzan",
-      "name": "Shaykh Salih al-Fawzan",
-      "country": "Saudi Arabia",
-      "mainLanguage": "ar",
-      "isActive": true,
-      "collections": [
-        {
-          "slug": "explanation-of-sahih-muslim",
-          "title": "Explanation of Sahih Muslim",
-          "status": "published",
-          "orderIndex": 1,
-          "topicSlugs": ["hadith", "sahih-muslim"],
-          "series": [
-            {
-              "slug": "kitab-al-iman",
-              "title": "Kitab al-Iman",
-              "status": "published",
-              "orderIndex": 1,
-              "topicSlugs": ["hadith", "aqidah"],
-              "lectures": [
-                {
-                  "slug": "kitab-al-iman-lesson-01",
-                  "title": "Kitab al-Iman - Lesson 01",
+                  "slug": "manhaj-saalikin-janaiz-01",
+                  "title": "Manhaj al-Salikin - Janaiz 01",
+                  "language": "ar",
                   "status": "published",
                   "orderIndex": 1,
-                  "durationSeconds": 2280,
-                  "topicSlugs": ["hadith", "aqidah"],
+                  "topicSlugs": ["fiqh"],
                   "audioAssets": [
                     {
-                      "url": "https://cdn.example.com/audio/salih-al-fawzan/kitab-al-iman-lesson-01.mp3",
+                      "file": "packages/ingest/content/audio/arafat-al-muhammadi/manhaj-saalikin/03-Janaiz/منهج السالكين 16 الجنائز 01.mp3",
                       "format": "mp3",
-                      "bitrateKbps": 96,
-                      "durationSeconds": 2280,
-                      "source": "seed-url",
-                      "isPrimary": true
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "slug": "kitab-al-taharah",
-              "title": "Kitab al-Taharah",
-              "status": "published",
-              "orderIndex": 2,
-              "topicSlugs": ["hadith", "fiqh"],
-              "lectures": [
-                {
-                  "slug": "kitab-al-taharah-lesson-01",
-                  "title": "Kitab al-Taharah - Lesson 01",
-                  "status": "published",
-                  "orderIndex": 1,
-                  "durationSeconds": 2100,
-                  "topicSlugs": ["hadith", "fiqh"],
-                  "audioAssets": [
-                    {
-                      "url": "https://cdn.example.com/audio/salih-al-fawzan/kitab-al-taharah-lesson-01.mp3",
-                      "format": "mp3",
-                      "bitrateKbps": 96,
-                      "durationSeconds": 2100,
-                      "source": "seed-url",
-                      "isPrimary": true
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "slug": "explanation-of-umdatu-al-ahkam",
-          "title": "Explanation of Umdatul-Ahkam",
-          "status": "published",
-          "orderIndex": 2,
-          "topicSlugs": ["hadith", "umdah"],
-          "series": [
-            {
-              "slug": "umdah-kitab-al-taharah",
-              "title": "Kitab al-Taharah",
-              "status": "published",
-              "orderIndex": 1,
-              "topicSlugs": ["hadith", "fiqh"],
-              "lectures": [
-                {
-                  "slug": "umdah-taharah-lesson-01",
-                  "title": "Umdah - Taharah Lesson 01",
-                  "status": "published",
-                  "orderIndex": 1,
-                  "durationSeconds": 2010,
-                  "topicSlugs": ["hadith", "fiqh"],
-                  "audioAssets": [
-                    {
-                      "url": "https://cdn.example.com/audio/salih-al-fawzan/umdah-taharah-lesson-01.mp3",
-                      "format": "mp3",
-                      "bitrateKbps": 96,
-                      "durationSeconds": 2010,
-                      "source": "seed-url",
-                      "isPrimary": true
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "slug": "umdah-kitab-al-salah",
-              "title": "Kitab al-Salah",
-              "status": "published",
-              "orderIndex": 2,
-              "topicSlugs": ["hadith", "fiqh"],
-              "lectures": [
-                {
-                  "slug": "umdah-salah-lesson-01",
-                  "title": "Umdah - Salah Lesson 01",
-                  "status": "published",
-                  "orderIndex": 1,
-                  "durationSeconds": 2140,
-                  "topicSlugs": ["hadith", "fiqh"],
-                  "audioAssets": [
-                    {
-                      "url": "https://cdn.example.com/audio/salih-al-fawzan/umdah-salah-lesson-01.mp3",
-                      "format": "mp3",
-                      "bitrateKbps": 96,
-                      "durationSeconds": 2140,
-                      "source": "seed-url",
                       "isPrimary": true
                     }
                   ]
@@ -362,585 +294,8 @@
           ]
         }
       ],
-      "series": [
-        {
-          "slug": "sharh-haiyah-ibn-abi-dawud",
-          "title": "Sharh Haiyah Ibn Abi Dawud",
-          "status": "published",
-          "orderIndex": 1,
-          "topicSlugs": ["aqidah"],
-          "lectures": [
-            {
-              "slug": "haiyah-lesson-01",
-              "title": "Haiyah Lesson 01",
-              "status": "published",
-              "orderIndex": 1,
-              "durationSeconds": 1760,
-              "topicSlugs": ["aqidah"],
-              "audioAssets": [
-                {
-                  "url": "https://cdn.example.com/audio/salih-al-fawzan/haiyah-lesson-01.mp3",
-                  "format": "mp3",
-                  "bitrateKbps": 96,
-                  "durationSeconds": 1760,
-                  "source": "seed-url",
-                  "isPrimary": true
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "slug": "sharh-laamiyah-ibn-taymiyyah",
-          "title": "Sharh Laamiyah Ibn Taymiyyah",
-          "status": "archived",
-          "orderIndex": 2,
-          "topicSlugs": ["aqidah", "manhaj"],
-          "lectures": [
-            {
-              "slug": "laamiyah-lesson-01",
-              "title": "Laamiyah Lesson 01",
-              "status": "archived",
-              "orderIndex": 1,
-              "durationSeconds": 1600,
-              "topicSlugs": ["aqidah", "manhaj"],
-              "audioAssets": [
-                {
-                  "url": "https://cdn.example.com/audio/salih-al-fawzan/laamiyah-lesson-01.mp3",
-                  "format": "mp3",
-                  "bitrateKbps": 96,
-                  "durationSeconds": 1600,
-                  "source": "seed-url",
-                  "isPrimary": true
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "lectures": [
-        {
-          "slug": "muhadarah-on-fear-of-allah",
-          "title": "Muhadarah on Fear of Allah",
-          "status": "published",
-          "orderIndex": 1,
-          "durationSeconds": 1830,
-          "topicSlugs": ["muhadarat", "adab"],
-          "audioAssets": [
-            {
-              "url": "https://cdn.example.com/audio/salih-al-fawzan/muhadarah-on-fear-of-allah.mp3",
-              "format": "mp3",
-              "bitrateKbps": 96,
-              "durationSeconds": 1830,
-              "source": "seed-url",
-              "isPrimary": true
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "slug": "muhammad-ibn-salih-al-uthaymin",
-      "name": "Shaykh Muhammad Ibn Salih al-Uthaymin",
-      "country": "Saudi Arabia",
-      "mainLanguage": "ar",
-      "isActive": true,
-      "collections": [
-        {
-          "slug": "explanation-of-sahih-muslim",
-          "title": "Explanation of Sahih Muslim",
-          "status": "published",
-          "orderIndex": 1,
-          "topicSlugs": ["hadith", "sahih-muslim"],
-          "series": [
-            {
-              "slug": "kitab-al-iman",
-              "title": "Kitab al-Iman",
-              "status": "published",
-              "orderIndex": 1,
-              "topicSlugs": ["hadith", "aqidah"],
-              "lectures": [
-                {
-                  "slug": "kitab-al-iman-lesson-01",
-                  "title": "Kitab al-Iman - Lesson 01",
-                  "status": "published",
-                  "orderIndex": 1,
-                  "durationSeconds": 2450,
-                  "topicSlugs": ["hadith", "aqidah"],
-                  "audioAssets": [
-                    {
-                      "url": "https://cdn.example.com/audio/muhammad-ibn-salih-al-uthaymin/kitab-al-iman-lesson-01.mp3",
-                      "format": "mp3",
-                      "bitrateKbps": 96,
-                      "durationSeconds": 2450,
-                      "source": "seed-url",
-                      "isPrimary": true
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "slug": "kitab-al-taharah",
-              "title": "Kitab al-Taharah",
-              "status": "published",
-              "orderIndex": 2,
-              "topicSlugs": ["hadith", "fiqh"],
-              "lectures": [
-                {
-                  "slug": "kitab-al-taharah-lesson-01",
-                  "title": "Kitab al-Taharah - Lesson 01",
-                  "status": "published",
-                  "orderIndex": 1,
-                  "durationSeconds": 2240,
-                  "topicSlugs": ["hadith", "fiqh"],
-                  "audioAssets": [
-                    {
-                      "url": "https://cdn.example.com/audio/muhammad-ibn-salih-al-uthaymin/kitab-al-taharah-lesson-01.mp3",
-                      "format": "mp3",
-                      "bitrateKbps": 96,
-                      "durationSeconds": 2240,
-                      "source": "seed-url",
-                      "isPrimary": true
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "slug": "explanation-of-umdatu-al-ahkam",
-          "title": "Explanation of Umdatul-Ahkam",
-          "status": "published",
-          "orderIndex": 2,
-          "topicSlugs": ["hadith", "umdah"],
-          "series": [
-            {
-              "slug": "umdah-kitab-al-taharah",
-              "title": "Kitab al-Taharah",
-              "status": "published",
-              "orderIndex": 1,
-              "topicSlugs": ["hadith", "fiqh"],
-              "lectures": [
-                {
-                  "slug": "umdah-taharah-lesson-01",
-                  "title": "Umdah - Taharah Lesson 01",
-                  "status": "published",
-                  "orderIndex": 1,
-                  "durationSeconds": 2030,
-                  "topicSlugs": ["hadith", "fiqh"],
-                  "audioAssets": [
-                    {
-                      "url": "https://cdn.example.com/audio/muhammad-ibn-salih-al-uthaymin/umdah-taharah-lesson-01.mp3",
-                      "format": "mp3",
-                      "bitrateKbps": 96,
-                      "durationSeconds": 2030,
-                      "source": "seed-url",
-                      "isPrimary": true
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "slug": "umdah-kitab-al-salah",
-              "title": "Kitab al-Salah",
-              "status": "draft",
-              "orderIndex": 2,
-              "topicSlugs": ["hadith", "fiqh"],
-              "lectures": [
-                {
-                  "slug": "umdah-salah-lesson-01",
-                  "title": "Umdah - Salah Lesson 01",
-                  "status": "draft",
-                  "orderIndex": 1,
-                  "durationSeconds": 1900,
-                  "topicSlugs": ["hadith", "fiqh"],
-                  "audioAssets": [
-                    {
-                      "url": "https://cdn.example.com/audio/muhammad-ibn-salih-al-uthaymin/umdah-salah-lesson-01.mp3",
-                      "format": "mp3",
-                      "bitrateKbps": 96,
-                      "durationSeconds": 1900,
-                      "source": "seed-url",
-                      "isPrimary": true
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "series": [
-        {
-          "slug": "sharh-haiyah-ibn-abi-dawud",
-          "title": "Sharh Haiyah Ibn Abi Dawud",
-          "status": "published",
-          "orderIndex": 1,
-          "topicSlugs": ["aqidah"],
-          "lectures": [
-            {
-              "slug": "haiyah-lesson-01",
-              "title": "Haiyah Lesson 01",
-              "status": "published",
-              "orderIndex": 1,
-              "durationSeconds": 1860,
-              "topicSlugs": ["aqidah"],
-              "audioAssets": [
-                {
-                  "url": "https://cdn.example.com/audio/muhammad-ibn-salih-al-uthaymin/haiyah-lesson-01.mp3",
-                  "format": "mp3",
-                  "bitrateKbps": 96,
-                  "durationSeconds": 1860,
-                  "source": "seed-url",
-                  "isPrimary": true
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "slug": "sharh-laamiyah-ibn-taymiyyah",
-          "title": "Sharh Laamiyah Ibn Taymiyyah",
-          "status": "published",
-          "orderIndex": 2,
-          "topicSlugs": ["aqidah", "manhaj"],
-          "lectures": [
-            {
-              "slug": "laamiyah-lesson-01",
-              "title": "Laamiyah Lesson 01",
-              "status": "published",
-              "orderIndex": 1,
-              "durationSeconds": 1690,
-              "topicSlugs": ["aqidah", "manhaj"],
-              "audioAssets": [
-                {
-                  "url": "https://cdn.example.com/audio/muhammad-ibn-salih-al-uthaymin/laamiyah-lesson-01.mp3",
-                  "format": "mp3",
-                  "bitrateKbps": 96,
-                  "durationSeconds": 1690,
-                  "source": "seed-url",
-                  "isPrimary": true
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "lectures": [
-        {
-          "slug": "muhadarah-on-steadfastness",
-          "title": "Muhadarah on Steadfastness",
-          "status": "published",
-          "orderIndex": 1,
-          "durationSeconds": 1770,
-          "topicSlugs": ["muhadarat", "manhaj"],
-          "audioAssets": [
-            {
-              "url": "https://cdn.example.com/audio/muhammad-ibn-salih-al-uthaymin/muhadarah-on-steadfastness.mp3",
-              "format": "mp3",
-              "bitrateKbps": 96,
-              "durationSeconds": 1770,
-              "source": "seed-url",
-              "isPrimary": true
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "slug": "rabee-ibn-hadi-al-madkhali",
-      "name": "Shaykh Rabee ibn Hadi al-Madkhali",
-      "country": "Saudi Arabia",
-      "mainLanguage": "ar",
-      "isActive": true,
-      "collections": [],
-      "series": [
-        {
-          "slug": "sharh-laamiyah-ibn-taymiyyah",
-          "title": "Sharh Laamiyah Ibn Taymiyyah",
-          "status": "published",
-          "orderIndex": 1,
-          "topicSlugs": ["aqidah", "manhaj"],
-          "lectures": [
-            {
-              "slug": "laamiyah-lesson-01",
-              "title": "Laamiyah Lesson 01",
-              "status": "published",
-              "orderIndex": 1,
-              "durationSeconds": 1580,
-              "topicSlugs": ["aqidah", "manhaj"],
-              "audioAssets": [
-                {
-                  "url": "https://cdn.example.com/audio/rabee-ibn-hadi-al-madkhali/laamiyah-lesson-01.mp3",
-                  "format": "mp3",
-                  "bitrateKbps": 96,
-                  "durationSeconds": 1580,
-                  "source": "seed-url",
-                  "isPrimary": true
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "lectures": [
-        {
-          "slug": "muhadarah-on-manhaj",
-          "title": "Muhadarah on Manhaj",
-          "status": "published",
-          "orderIndex": 1,
-          "durationSeconds": 1710,
-          "topicSlugs": ["muhadarat", "manhaj"],
-          "audioAssets": [
-            {
-              "url": "https://cdn.example.com/audio/rabee-ibn-hadi-al-madkhali/muhadarah-on-manhaj.mp3",
-              "format": "mp3",
-              "bitrateKbps": 96,
-              "durationSeconds": 1710,
-              "source": "seed-url",
-              "isPrimary": true
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "slug": "ubayd-al-jabiri",
-      "name": "Shaykh Ubayd al-Jabiri",
-      "country": "Saudi Arabia",
-      "mainLanguage": "ar",
-      "isActive": true,
-      "collections": [],
-      "series": [
-        {
-          "slug": "sharh-haiyah-ibn-abi-dawud",
-          "title": "Sharh Haiyah Ibn Abi Dawud",
-          "status": "published",
-          "orderIndex": 1,
-          "topicSlugs": ["aqidah"],
-          "lectures": [
-            {
-              "slug": "haiyah-lesson-01",
-              "title": "Haiyah Lesson 01",
-              "status": "published",
-              "orderIndex": 1,
-              "durationSeconds": 1660,
-              "topicSlugs": ["aqidah"],
-              "audioAssets": [
-                {
-                  "url": "https://cdn.example.com/audio/ubayd-al-jabiri/haiyah-lesson-01.mp3",
-                  "format": "mp3",
-                  "bitrateKbps": 96,
-                  "durationSeconds": 1660,
-                  "source": "seed-url",
-                  "isPrimary": true
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "lectures": [
-        {
-          "slug": "muhadarah-on-akhlaq",
-          "title": "Muhadarah on Akhlaq",
-          "status": "published",
-          "orderIndex": 1,
-          "durationSeconds": 1620,
-          "topicSlugs": ["muhadarat", "adab"],
-          "audioAssets": [
-            {
-              "url": "https://cdn.example.com/audio/ubayd-al-jabiri/muhadarah-on-akhlaq.mp3",
-              "format": "mp3",
-              "bitrateKbps": 96,
-              "durationSeconds": 1620,
-              "source": "seed-url",
-              "isPrimary": true
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "slug": "abdullah-al-bukhari",
-      "name": "Shaykh Abdullah al-Bukhari",
-      "country": "Saudi Arabia",
-      "mainLanguage": "ar",
-      "isActive": true,
-      "collections": [
-        {
-          "slug": "explanation-of-umdatu-al-ahkam",
-          "title": "Explanation of Umdatul-Ahkam",
-          "status": "published",
-          "orderIndex": 1,
-          "topicSlugs": ["hadith", "umdah"],
-          "series": [
-            {
-              "slug": "umdah-kitab-al-taharah",
-              "title": "Kitab al-Taharah",
-              "status": "published",
-              "orderIndex": 1,
-              "topicSlugs": ["hadith", "fiqh"],
-              "lectures": [
-                {
-                  "slug": "umdah-taharah-lesson-01",
-                  "title": "Umdah - Taharah Lesson 01",
-                  "status": "published",
-                  "orderIndex": 1,
-                  "durationSeconds": 1870,
-                  "topicSlugs": ["hadith", "fiqh"],
-                  "audioAssets": [
-                    {
-                      "url": "https://cdn.example.com/audio/abdullah-al-bukhari/umdah-taharah-lesson-01.mp3",
-                      "format": "mp3",
-                      "bitrateKbps": 96,
-                      "durationSeconds": 1870,
-                      "source": "seed-url",
-                      "isPrimary": true
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "slug": "umdah-kitab-al-salah",
-              "title": "Kitab al-Salah",
-              "status": "published",
-              "orderIndex": 2,
-              "topicSlugs": ["hadith", "fiqh"],
-              "lectures": [
-                {
-                  "slug": "umdah-salah-lesson-01",
-                  "title": "Umdah - Salah Lesson 01",
-                  "status": "published",
-                  "orderIndex": 1,
-                  "durationSeconds": 1990,
-                  "topicSlugs": ["hadith", "fiqh"],
-                  "audioAssets": [
-                    {
-                      "url": "https://cdn.example.com/audio/abdullah-al-bukhari/umdah-salah-lesson-01.mp3",
-                      "format": "mp3",
-                      "bitrateKbps": 96,
-                      "durationSeconds": 1990,
-                      "source": "seed-url",
-                      "isPrimary": true
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "series": [
-        {
-          "slug": "sharh-laamiyah-ibn-taymiyyah",
-          "title": "Sharh Laamiyah Ibn Taymiyyah",
-          "status": "published",
-          "orderIndex": 1,
-          "topicSlugs": ["aqidah", "manhaj"],
-          "lectures": [
-            {
-              "slug": "laamiyah-lesson-01",
-              "title": "Laamiyah Lesson 01",
-              "status": "published",
-              "orderIndex": 1,
-              "durationSeconds": 1540,
-              "topicSlugs": ["aqidah", "manhaj"],
-              "audioAssets": [
-                {
-                  "url": "https://cdn.example.com/audio/abdullah-al-bukhari/laamiyah-lesson-01.mp3",
-                  "format": "mp3",
-                  "bitrateKbps": 96,
-                  "durationSeconds": 1540,
-                  "source": "seed-url",
-                  "isPrimary": true
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "lectures": [
-        {
-          "slug": "muhadarah-on-sunnah",
-          "title": "Muhadarah on Sunnah",
-          "status": "published",
-          "orderIndex": 1,
-          "durationSeconds": 1750,
-          "topicSlugs": ["muhadarat", "manhaj"],
-          "audioAssets": [
-            {
-              "url": "https://cdn.example.com/audio/abdullah-al-bukhari/muhadarah-on-sunnah.mp3",
-              "format": "mp3",
-              "bitrateKbps": 96,
-              "durationSeconds": 1750,
-              "source": "seed-url",
-              "isPrimary": true
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "slug": "arafat-bin-hasan-al-muhammadi",
-      "name": "Shaykh Arafat bin Hasan al-Muhammadi",
-      "country": "India",
-      "mainLanguage": "ar",
-      "isActive": true,
-      "collections": [],
-      "series": [
-        {
-          "slug": "sharh-haiyah-ibn-abi-dawud",
-          "title": "Sharh Haiyah Ibn Abi Dawud",
-          "status": "published",
-          "orderIndex": 1,
-          "topicSlugs": ["aqidah"],
-          "lectures": [
-            {
-              "slug": "haiyah-lesson-01",
-              "title": "Haiyah Lesson 01",
-              "status": "published",
-              "orderIndex": 1,
-              "durationSeconds": 1520,
-              "topicSlugs": ["aqidah"],
-              "audioAssets": [
-                {
-                  "url": "https://cdn.example.com/audio/arafat-bin-hasan-al-muhammadi/haiyah-lesson-01.mp3",
-                  "format": "mp3",
-                  "bitrateKbps": 96,
-                  "durationSeconds": 1520,
-                  "source": "seed-url",
-                  "isPrimary": true
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      "lectures": [
-        {
-          "slug": "muhadarah-on-dawah",
-          "title": "Muhadarah on Dawah",
-          "status": "published",
-          "orderIndex": 1,
-          "durationSeconds": 1470,
-          "topicSlugs": ["muhadarat", "manhaj"],
-          "audioAssets": [
-            {
-              "url": "https://cdn.example.com/audio/arafat-bin-hasan-al-muhammadi/muhadarah-on-dawah.mp3",
-              "format": "mp3",
-              "bitrateKbps": 96,
-              "durationSeconds": 1470,
-              "source": "seed-url",
-              "isPrimary": true
-            }
-          ]
-        }
-      ]
+      "series": [],
+      "lectures": []
     },
     {
       "slug": "mustafa-mubram",
@@ -951,26 +306,234 @@
       "collections": [],
       "series": [
         {
-          "slug": "sharh-laamiyah-ibn-taymiyyah",
-          "title": "Sharh Laamiyah Ibn Taymiyyah",
+          "slug": "waraqat",
+          "title": "Sharh Matn al-Waraqat",
+          "language": "ar",
           "status": "published",
           "orderIndex": 1,
-          "topicSlugs": ["aqidah", "manhaj"],
+          "topicSlugs": ["usul-fiqh"],
           "lectures": [
             {
-              "slug": "laamiyah-lesson-01",
-              "title": "Laamiyah Lesson 01",
+              "slug": "waraqat-001",
+              "title": "Waraqat 001",
+              "language": "ar",
               "status": "published",
               "orderIndex": 1,
-              "durationSeconds": 1590,
-              "topicSlugs": ["aqidah", "manhaj"],
+              "topicSlugs": ["usul-fiqh"],
               "audioAssets": [
                 {
-                  "url": "https://cdn.example.com/audio/mustafa-mubram/laamiyah-lesson-01.mp3",
+                  "file": "packages/ingest/content/audio/mustafa-mubram/waraqat/001CharhMatnWarakat.mp3",
                   "format": "mp3",
-                  "bitrateKbps": 96,
-                  "durationSeconds": 1590,
-                  "source": "seed-url",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "waraqat-002",
+              "title": "Waraqat 002",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 2,
+              "topicSlugs": ["usul-fiqh"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/mustafa-mubram/waraqat/002CharhMatnWarakat.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "waraqat-003",
+              "title": "Waraqat 003",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 3,
+              "topicSlugs": ["usul-fiqh"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/mustafa-mubram/waraqat/003CharhMatnWarakat.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "waraqat-004",
+              "title": "Waraqat 004",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 4,
+              "topicSlugs": ["usul-fiqh"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/mustafa-mubram/waraqat/004CharhMatnWarakat.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "waraqat-005",
+              "title": "Waraqat 005",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 5,
+              "topicSlugs": ["usul-fiqh"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/mustafa-mubram/waraqat/005CharhMatnWarakat.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "waraqat-006",
+              "title": "Waraqat 006",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 6,
+              "topicSlugs": ["usul-fiqh"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/mustafa-mubram/waraqat/006CharhMatnWarakat.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "waraqat-007",
+              "title": "Waraqat 007",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 7,
+              "topicSlugs": ["usul-fiqh"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/mustafa-mubram/waraqat/007CharhMatnWarakat.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "waraqat-008",
+              "title": "Waraqat 008",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 8,
+              "topicSlugs": ["usul-fiqh"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/mustafa-mubram/waraqat/008CharhMatnWarakat.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "waraqat-009",
+              "title": "Waraqat 009",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 9,
+              "topicSlugs": ["usul-fiqh"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/mustafa-mubram/waraqat/009CharhMatnWarakat.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "waraqat-010",
+              "title": "Waraqat 010",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 10,
+              "topicSlugs": ["usul-fiqh"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/mustafa-mubram/waraqat/010CharhMatnWarakat.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "waraqat-011",
+              "title": "Waraqat 011",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 11,
+              "topicSlugs": ["usul-fiqh"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/mustafa-mubram/waraqat/011CharhMatnWarakat.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "waraqat-012",
+              "title": "Waraqat 012",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 12,
+              "topicSlugs": ["usul-fiqh"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/mustafa-mubram/waraqat/012CharhMatnWarakat.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "waraqat-013",
+              "title": "Waraqat 013",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 13,
+              "topicSlugs": ["usul-fiqh"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/mustafa-mubram/waraqat/013CharhMatnWarakat.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "waraqat-014",
+              "title": "Waraqat 014",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 14,
+              "topicSlugs": ["usul-fiqh"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/mustafa-mubram/waraqat/014CharhMatnWarakat.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "waraqat-015",
+              "title": "Waraqat 015",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 15,
+              "topicSlugs": ["usul-fiqh"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/mustafa-mubram/waraqat/015CharhMatnWarakat.mp3",
+                  "format": "mp3",
                   "isPrimary": true
                 }
               ]
@@ -978,46 +541,214 @@
           ]
         }
       ],
-      "lectures": [
+      "lectures": []
+    },
+    {
+      "slug": "ubayd-al-jabiri",
+      "name": "Shaykh Ubayd al-Jabiri",
+      "country": "Saudi Arabia",
+      "mainLanguage": "ar",
+      "isActive": true,
+      "collections": [],
+      "series": [
         {
-          "slug": "muhadarah-on-tafakkur",
-          "title": "Muhadarah on Tafakkur",
+          "slug": "aqeedah-arraziyayn",
+          "title": "Sharh Aqidah al-Imamayn al-Raziyayn",
+          "language": "ar",
           "status": "published",
           "orderIndex": 1,
-          "durationSeconds": 1490,
-          "topicSlugs": ["muhadarat", "adab"],
-          "audioAssets": [
+          "topicSlugs": ["aqidah"],
+          "lectures": [
             {
-              "url": "https://cdn.example.com/audio/mustafa-mubram/muhadarah-on-tafakkur.mp3",
-              "format": "mp3",
-              "bitrateKbps": 96,
-              "durationSeconds": 1490,
-              "source": "seed-url",
-              "isPrimary": true
-            }
-          ]
-        },
-        {
-          "slug": "muhadarah-on-akhlaq-2",
-          "title": "Muhadarah on Akhlaq",
-          "status": "published",
-          "orderIndex": 2,
-          "durationSeconds": 1400,
-          "topicSlugs": ["muhadarat", "adab"],
-          "deletedAt": "2026-01-20T10:00:00.000Z",
-          "deleteAfterAt": "2026-03-20T10:00:00.000Z",
-          "audioAssets": [
+              "slug": "aqeedah-arraziyayn-01",
+              "title": "Sharh Aqidah al-Raziyayn 01",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 1,
+              "topicSlugs": ["aqidah"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/ubayd-al-jabiri/aqeedah-arraziyayn/شرح عقيدة الإمامين الرازيين (1-8)  الشيخ عبيد بن عبد الله الجابري.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
             {
-              "url": "https://cdn.example.com/audio/mustafa-mubram/muhadarah-on-akhlaq-2.mp3",
-              "format": "mp3",
-              "bitrateKbps": 96,
-              "durationSeconds": 1400,
-              "source": "seed-url",
-              "isPrimary": true
+              "slug": "aqeedah-arraziyayn-02",
+              "title": "Sharh Aqidah al-Raziyayn 02",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 2,
+              "topicSlugs": ["aqidah"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/ubayd-al-jabiri/aqeedah-arraziyayn/شرح عقيدة الإمامين الرازيين (2-8)  الشيخ عبيد بن عبد الله الجابري.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "aqeedah-arraziyayn-03",
+              "title": "Sharh Aqidah al-Raziyayn 03",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 3,
+              "topicSlugs": ["aqidah"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/ubayd-al-jabiri/aqeedah-arraziyayn/شرح عقيدة الإمامين الرازيين (3-8)  الشيخ عبيد بن عبد الله الجابري.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "aqeedah-arraziyayn-04",
+              "title": "Sharh Aqidah al-Raziyayn 04",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 4,
+              "topicSlugs": ["aqidah"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/ubayd-al-jabiri/aqeedah-arraziyayn/شرح عقيدة الإمامين الرازيين (4-8)  الشيخ عبيد بن عبد الله الجابري.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "aqeedah-arraziyayn-05",
+              "title": "Sharh Aqidah al-Raziyayn 05",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 5,
+              "topicSlugs": ["aqidah"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/ubayd-al-jabiri/aqeedah-arraziyayn/شرح عقيدة الإمامين الرازيين (5-8)  الشيخ عبيد بن عبد الله الجابري.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "aqeedah-arraziyayn-06",
+              "title": "Sharh Aqidah al-Raziyayn 06",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 6,
+              "topicSlugs": ["aqidah"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/ubayd-al-jabiri/aqeedah-arraziyayn/شرح عقيدة الإمامين الرازيين (6-8)  الشيخ عبيد بن عبد الله الجابري.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "aqeedah-arraziyayn-07",
+              "title": "Sharh Aqidah al-Raziyayn 07",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 7,
+              "topicSlugs": ["aqidah"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/ubayd-al-jabiri/aqeedah-arraziyayn/شرح عقيدة الإمامين الرازيين (7-8)  الشيخ عبيد بن عبد الله الجابري.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "aqeedah-arraziyayn-08",
+              "title": "Sharh Aqidah al-Raziyayn 08",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 8,
+              "topicSlugs": ["aqidah"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/ubayd-al-jabiri/aqeedah-arraziyayn/شرح عقيدة الإمامين الرازيين (8-8)  الشيخ عبيد بن عبد الله الجابري.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
             }
           ]
         }
-      ]
+      ],
+      "lectures": []
+    },
+    {
+      "slug": "muhammad-ibn-salih-al-uthaymin",
+      "name": "Shaykh Muhammad Ibn Salih al-Uthaymin",
+      "country": "Saudi Arabia",
+      "mainLanguage": "ar",
+      "isActive": true,
+      "collections": [],
+      "series": [
+        {
+          "slug": "usul-thalatha",
+          "title": "Sharh al-Usul al-Thalatha",
+          "language": "ar",
+          "status": "published",
+          "orderIndex": 1,
+          "topicSlugs": ["aqidah"],
+          "lectures": [
+            {
+              "slug": "usul-thalatha-01",
+              "title": "Usul al-Thalatha 01",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 1,
+              "topicSlugs": ["aqidah"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/al-uthaymin/usul-thalatha/01.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "usul-thalatha-02",
+              "title": "Usul al-Thalatha 02",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 2,
+              "topicSlugs": ["aqidah"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/al-uthaymin/usul-thalatha/02.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "usul-thalatha-03",
+              "title": "Usul al-Thalatha 03",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 3,
+              "topicSlugs": ["aqidah"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/al-uthaymin/usul-thalatha/03.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "lectures": []
     }
   ]
 }

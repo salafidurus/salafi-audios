@@ -10,7 +10,6 @@ on:
       - packages/db/prisma/**
       - packages/db/prisma.config.ts
       - packages/db/package.json
-      - pnpm-lock.yaml
 
 concurrency:
   group: db-${{ github.workflow }}-${{ github.event.pull_request.number }}

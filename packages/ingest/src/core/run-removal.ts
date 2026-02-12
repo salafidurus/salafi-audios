@@ -1,5 +1,5 @@
 import { PrismaClient } from "@sd/db/client";
-import { createR2Client, deleteKeys, listKeysByPrefix, parseR2Config } from "./r2";
+import { createR2Client, deleteKeys, listKeysByPrefix, parseR2Config } from "../storage/r2";
 
 export type RemovalOptions = {
   tag: string;
