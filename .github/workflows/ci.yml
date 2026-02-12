@@ -20,9 +20,11 @@ permissions:
   contents: read
 
 env:
-  NODE_VERSION: "20"
+  NODE_VERSION: "22"
   PNPM_VERSION: "10"
   PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/ms-playwright
+  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
 
 jobs:
   build_deps:
@@ -53,15 +55,11 @@ jobs:
         with:
           name: build-outputs
           if-no-files-found: error
+          include-hidden-files: true
           path: |
-            apps/**/dist/**
-            packages/**/dist/**
-            packages/**/build/**
-            packages/**/.next/**
-            packages/**/.generated/**
-            packages/**/generated/**
-            packages/**/node_modules/.prisma/**
-            packages/**/node_modules/@prisma/**
+            apps/api/dist/**
+            apps/web/.next/**
+            packages/env/dist/**
 
   lint:
     name: lint
@@ -184,6 +182,8 @@ jobs:
           name: build-outputs
 
       - name: Run Playwright
+        env:
+          PW_SKIP_WEB_BUILD: "1"
         run: pnpm --filter web test:e2e
 
       - name: Upload Playwright report
@@ -193,7 +193,46 @@ jobs:
           name: playwright-report
           path: apps/web/playwright-report
 
-  contact:
+  db_generated_policy:
+    name: db:generated-policy
+    runs-on: ubuntu-latest
+    env:
+      DIRECT_DB_URL: postgresql://postgres:postgres@localhost:5432/sd_ci?schema=public
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter @sd/db prisma:generate
+
+      - name: Enforce generated DB artifact policy
+        run: |
+          if [ -n "$(git ls-files -- packages/db/src/generated)" ]; then
+            echo "::error::Forbidden tracked files found in packages/db/src/generated"
+            git ls-files -- packages/db/src/generated
+            exit 1
+          fi
+
+          if [ -n "$(git status --porcelain --untracked-files=all -- packages/db/src/generated)" ]; then
+            echo "::error::packages/db/src/generated must remain git-clean after generation"
+            git status --porcelain --untracked-files=all -- packages/db/src/generated
+            exit 1
+          fi
+
+  contract:
     name: contract (openapi + codegen)
     runs-on: ubuntu-latest
     steps:

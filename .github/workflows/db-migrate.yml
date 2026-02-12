@@ -19,7 +19,7 @@ permissions:
   contents: read
 
 env:
-  NODE_VERSION: "20"
+  NODE_VERSION: "22"
   PNPM_VERSION: "10"
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
     permissions:
       contents: read
 
-    environment: ${{ github.ref_name == 'main' && 'development' || 'preview' }}
+    environment: ${{ github.base_ref == 'main' && 'development' || 'preview' }}
 
     steps:
       - uses: actions/checkout@v4

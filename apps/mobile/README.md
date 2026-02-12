@@ -1,50 +1,46 @@
-# Welcome to your Expo app 👋
+# Mobile App (`apps/mobile`)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+This Expo/React Native app is the offline-first listening client.
 
-## Get started
+- Reliable playback and continuity
+- Offline intent queueing + sync
+- Backend-authoritative reconciliation after reconnect
 
-1. Install dependencies
+## Run
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+From monorepo root:
 
 ```bash
-npm run reset-project
+pnpm dev:mobile
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Or scoped directly:
 
-## Learn more
+```bash
+pnpm --filter mobile dev
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+## Common Commands
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Run from repo root:
 
-## Join the community
+- Start: `pnpm --filter mobile start`
+- Android: `pnpm --filter mobile android`
+- iOS: `pnpm --filter mobile ios`
+- Lint: `pnpm --filter mobile lint`
+- Typecheck: `pnpm --filter mobile typecheck`
+- Test: `pnpm --filter mobile test`
 
-Join our community of developers creating universal apps.
+Targeted tests:
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- One file: `pnpm --filter mobile test -- src/path/to/file.test.tsx`
+- By name: `pnpm --filter mobile test -- -t "renders heading"`
+
+## Guardrails
+
+- Offline mode queues intent; it does not authoritatively mutate protected state.
+- Never bypass backend authorization or conflict resolution.
+- No offline admin/editor authority.
+- Treat downloaded media as continuity cache, not ownership.
+
+See `apps/mobile/AGENT.md` and `docs/implementation-guide/07-mobile-application-structure.md` for implementation constraints.

@@ -271,7 +271,7 @@ These patterns lead to fragile systems.
 
 ---
 
-# Deployment Promotion in a Monorepo (Tags-Based Workflow)
+## Deployment Promotion in a Monorepo (Tags-Based Workflow)
 
 ## Overview
 
