@@ -54,8 +54,8 @@ If a change introduces ambiguity, it is likely not acceptable.
 
 ### Branching Rules
 
-- `main` is the only long-lived branch
-- Direct pushes to `main` are not allowed
+- Protected deployment branches are `main`, `preview`, and `production`
+- Direct pushes to protected branches are not allowed
 - All changes must be introduced via pull requests
 
 Create feature branches off `main`:
@@ -230,11 +230,11 @@ Do not suppress errors to make tests pass.
 
 Contributors must **not**:
 
-- Push directly to `main`
-- Create or move deployment tags
-- Deploy to preview or production environments
+- Push directly to protected branches (`main`, `preview`, `production`)
+- Bypass required pull-request checks for deployment branches
+- Deploy outside approved branch-deploy workflows
 
-Deployment promotion is restricted and handled via controlled workflows.
+Deployment is restricted and handled via controlled branch-deploy workflows.
 
 ---
 

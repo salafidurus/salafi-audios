@@ -120,8 +120,7 @@ This is required for a monorepo of this size.
 
 CI must run on:
 
-- Every pull request
-- Every merge to `main`
+- Every pull request targeting protected branches (`main`, `preview`, `production`)
 
 CI responsibilities:
 
@@ -135,9 +134,9 @@ No deployment occurs during CI.
 
 ---
 
-## Protected Main Branch
+## Protected Branches
 
-- `main` is fully protected
+- `main`, `preview`, and `production` are protected
 - No direct pushes allowed
 - All changes enter via pull requests
 - Required checks must pass before merge
@@ -146,13 +145,13 @@ This is mandatory.
 
 ---
 
-## Deployment Promotion Skeleton
+## Promotion Workflow Skeleton
 
 Set up—but do not yet fully automate—the promotion workflow:
 
-- Manual promotion workflow exists
-- Tag creation is controlled
-- No one needs to push commits to `main` locally
+- Manual promotion workflow exists in GitHub Actions
+- Promotion opens pull requests between protected branches (`main` -> `preview`, `preview` -> `production`)
+- No one needs to push commits directly to protected branches
 
 At this stage, it is acceptable for deployments to be stubbed or no-op.
 
@@ -263,13 +262,13 @@ These shortcuts undermine everything that follows.
 
 Before moving to Phase 02, confirm:
 
-- [ ] Monorepo structure is stable
-- [ ] CI runs on PRs
-- [ ] Environments are clearly separated
-- [ ] Main branch is protected
-- [ ] Apps boot independently
-- [ ] Environments are defined
-- [ ] Documentation is up to date
+- [x] Monorepo structure is stable
+- [x] CI runs on PRs
+- [x] Environments are clearly separated
+- [x] Protected branches are enforced
+- [x] Apps boot independently
+- [x] Environments are defined
+- [x] Documentation is up to date
 
 Only after this checklist is complete should feature development begin.
 

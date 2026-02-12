@@ -271,35 +271,43 @@ These patterns lead to fragile systems.
 
 ---
 
-## Deployment Promotion in a Monorepo (Tags-Based Workflow)
+## Deployment Model in a Monorepo (Branch-Deploy Workflow)
 
 ## Overview
 
-Salafi Durus uses a **tag-based promotion model** to manage deployments in a monorepo while keeping the `main` branch fully protected.
+Salafi Durus uses a **branch-deploy model** to manage deployments in a monorepo while keeping protected branches locked down.
 
 This model ensures that:
 
 - All code changes go through pull requests
-- No one pushes directly to `main`
-- Deployments are explicit, auditable, and reversible
-- Preview and production are pinned to exact commits
+- No one pushes directly to protected branches
+- Deployments are explicit and environment-scoped
+- Development, preview, and production are isolated by branch and environment
 
 ---
 
-## Protected Main Branch
+## Protected Deployment Branches
 
-The `main` branch is protected with the following guarantees:
+The deployment branches are protected with the following guarantees:
+
+- `main` (development)
+- `preview` (staging/validation)
+- `production` (live)
+
+Each protected branch enforces:
 
 - All changes enter via pull requests
 - Required checks must pass before merge
 - Direct pushes are blocked
 - Force pushes are disabled
 
-`main` always represents the latest integrated development state.
+Each branch represents the latest approved state for its corresponding environment.
 
 ---
 
 ## Deployment Strategy
+
+Deployment execution may be handled by external platform dashboards (for example, Render, Vercel, and EAS), while GitHub remains the source of promotion state via protected branches.
 
 ### Development
 
@@ -308,87 +316,32 @@ The `main` branch is protected with the following guarantees:
 
 ---
 
-### Preview and Production (Manual Promotion)
+### Preview and Production (Branch Promotion)
 
-Preview and production deployments occur **only through manual promotion**, not automatically on merge.
+Preview and production deployments occur when changes are promoted via pull requests into their protected branches.
 
 Promotion is performed by:
 
-- Creating or moving specific Git tags
-- Using a controlled GitHub workflow or UI
+- Opening pull requests from the currently approved source branch
+- Merging only after required checks pass
 - Never pushing commits directly
-
----
-
-## Tag Types
-
-### Immutable Release Tags (Snapshots)
-
-Immutable tags capture a snapshot of the repository at a point in time.
-
-Format:
-
-```txt
-release/YYYY-MM-DD.N
-```
-
-Example:
-
-```txt
-release/2026-01-19.1
-```
-
-These tags:
-
-- Never move
-- Represent exact release candidates
-- Enable easy rollback and audit
-
----
-
-## Environment Promotion Tags (Moving Pointers)
-
-Promotion tags indicate what is currently deployed to an environment.
-
-Environment-wide tags:
-
-```txt
-env/preview
-env/production
-```
-
-Targeted tags (optional):
-
-```txt
-env/preview/api
-env/preview/web
-env/preview/mobile
-```
-
-```txt
-env/production/api
-env/production/web
-env/production/mobile
-```
 
 ---
 
 ## Promotion Rules
 
-- Promotion tags must point to commits already on main
-- Promotion occurs only after CI has passed
-- Environment-wide tags imply compatibility across all apps
-- Targeted tags deploy only the specified app
+- Pull requests into protected deployment branches must pass required CI
+- Promotion into `preview` or `production` must come from approved upstream branch state
+- Environment branches imply compatibility across all deployable apps in that branch
+- Optional path-aware deploy logic may deploy only affected apps
 
-Promotion tags may move over time; release tags must not.
+Branch history provides the promotion trail.
 
 ---
 
 ## Rollback Strategy
 
-Rollback is performed by moving promotion tags back to a previous release tag commit.
-
-No code changes or reverts are required.
+Rollback is performed by reverting or restoring the protected branch to a previously known-good commit via pull request.
 
 This makes rollback:
 
@@ -398,13 +351,13 @@ This makes rollback:
 
 ---
 
-## Why Tags Are Preferred
+## Why Branch-Deploy Is Preferred
 
 This approach provides:
 
 - Explicit control over deployments
-- No reliance on long-lived environment branches
-- Clear separation between integration and promotion
+- Clear branch-to-environment mapping
+- Pull-request-based audit trail for promotions and rollbacks
 - Compatibility with monorepo tooling
 - Strong auditability and traceability
 
@@ -412,8 +365,8 @@ This approach provides:
 
 ## Closing Note
 
-Environment configuration and deployment promotion are first-class architectural concerns in Salafi Durus.
+Environment configuration and deployment workflows are first-class architectural concerns in Salafi Durus.
 
-By combining protected branches, explicit configuration ownership, and tag-based promotion, the platform achieves safety without sacrificing flexibility.
+By combining protected branches, explicit configuration ownership, and branch-based deployment, the platform achieves safety without sacrificing flexibility.
 
 All deployment processes must adhere to the rules defined in this document.

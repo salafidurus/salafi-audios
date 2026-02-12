@@ -81,9 +81,9 @@ If implementation and docs diverge, update docs intentionally or reconsider the 
 
 ## Delivery Model
 
-- `main` is protected and is the only long-lived branch.
-- Changes enter through pull requests with required checks.
-- Deployments are promotion/tag based (not branch-push based).
+- Protected branches map to environments: `main` -> development, `preview` -> preview, `production` -> production.
+- Changes enter protected branches through pull requests with required checks.
+- Deployments are branch-based from protected branch updates.
 - Environment isolation is strict (`development`, `preview`, `production`).
 
 See `docs/implementation-guide/10-environments-and-configuration.md` for deployment and environment policy.

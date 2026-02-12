@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - preview
+      - production
     paths:
       - packages/db/prisma/**
       - packages/db/prisma.config.ts
@@ -29,7 +30,7 @@ jobs:
     permissions:
       contents: read
 
-    environment: ${{ github.base_ref == 'main' && 'development' || 'preview' }}
+    environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
 
     steps:
       - uses: actions/checkout@v4
