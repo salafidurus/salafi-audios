@@ -30,6 +30,10 @@ jobs:
   build_deps:
     name: build:deps
     runs-on: ubuntu-latest
+    environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
+    env:
+      DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
+      DATABASE_URL: ${{ secrets.DIRECT_DB_URL }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -122,6 +126,10 @@ jobs:
   test:
     name: test
     runs-on: ubuntu-latest
+    environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
+    env:
+      DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
+      DATABASE_URL: ${{ secrets.DIRECT_DB_URL }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -196,8 +204,9 @@ jobs:
   db_generated_policy:
     name: db:generated-policy
     runs-on: ubuntu-latest
+    environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
     env:
-      DIRECT_DB_URL: postgresql://postgres:postgres@localhost:5432/sd_ci?schema=public
+      DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -235,6 +244,10 @@ jobs:
   contract:
     name: contract (openapi + codegen)
     runs-on: ubuntu-latest
+    environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
+    env:
+      DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
+      DATABASE_URL: ${{ secrets.DIRECT_DB_URL }}
     steps:
       - uses: actions/checkout@v4
         with:
