@@ -26,4 +26,8 @@ export class ConfigService {
   get DATABASE_URL() {
     return this.env.DATABASE_URL;
   }
+
+  get ASSET_CDN_BASE_URL(): string | undefined {
+    return this.env.ASSET_CDN_BASE_URL;
+  }
 }

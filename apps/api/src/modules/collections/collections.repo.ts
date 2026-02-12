@@ -31,8 +31,8 @@ export class CollectionRepository {
   async listPublishedByScholarSlug(
     scholarSlug: string,
   ): Promise<CollectionViewDto[]> {
-    const scholar = await this.prisma.scholar.findUnique({
-      where: { slug: scholarSlug },
+    const scholar = await this.prisma.scholar.findFirst({
+      where: { slug: scholarSlug, isActive: true },
       select: { id: true },
     });
 
@@ -63,8 +63,8 @@ export class CollectionRepository {
     scholarSlug: string,
     slug: string,
   ): Promise<CollectionViewDto | null> {
-    const scholar = await this.prisma.scholar.findUnique({
-      where: { slug: scholarSlug },
+    const scholar = await this.prisma.scholar.findFirst({
+      where: { slug: scholarSlug, isActive: true },
       select: { id: true },
     });
 

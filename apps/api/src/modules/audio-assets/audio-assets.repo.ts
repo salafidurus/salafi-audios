@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/shared/db/prisma.service';
+import { ConfigService } from '@/shared/config/config.service';
 import { Prisma } from '@sd/db/client';
 import { AudioAssetViewDto } from './dto/audio-asset-view.dto';
 import { UpsertAudioAssetDto } from './dto/upsert-audio-asset.dto';
@@ -23,7 +24,10 @@ type AudioAssetViewRecord = Prisma.AudioAssetGetPayload<{
 
 @Injectable()
 export class AudioAssetsRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly config: ConfigService,
+  ) {}
 
   async listByLectureId(
     lectureId: string,
@@ -121,7 +125,7 @@ export class AudioAssetsRepository {
     return {
       id: record.id,
       lectureId: record.lectureId,
-      url: record.url,
+      url: this.toPublicUrl(record.url),
       format: record.format ?? undefined,
       bitrateKbps: record.bitrateKbps ?? undefined,
       sizeBytes:
@@ -131,5 +135,18 @@ export class AudioAssetsRepository {
       isPrimary: record.isPrimary,
       createdAt: record.createdAt.toISOString(),
     };
+  }
+
+  private toPublicUrl(value: string): string {
+    if (/^[a-z]+:\/\//i.test(value)) {
+      return value;
+    }
+
+    const base = this.config.ASSET_CDN_BASE_URL;
+    if (!base) {
+      return value;
+    }
+
+    return `${base.replace(/\/$/, '')}/${value.replace(/^\//, '')}`;
   }
 }

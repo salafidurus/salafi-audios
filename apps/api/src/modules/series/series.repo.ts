@@ -32,8 +32,8 @@ export class SeriesRepository {
   async listPublishedByScholarSlug(
     scholarSlug: string,
   ): Promise<SeriesViewDto[]> {
-    const scholar = await this.prisma.scholar.findUnique({
-      where: { slug: scholarSlug },
+    const scholar = await this.prisma.scholar.findFirst({
+      where: { slug: scholarSlug, isActive: true },
       select: { id: true },
     });
     if (!scholar) return [];
@@ -43,6 +43,17 @@ export class SeriesRepository {
         scholarId: scholar.id,
         deletedAt: null,
         status: Status.published,
+        OR: [
+          { collectionId: null },
+          {
+            collection: {
+              is: {
+                deletedAt: null,
+                status: Status.published,
+              },
+            },
+          },
+        ],
       },
       orderBy: [{ orderIndex: 'asc' }, { title: 'asc' }],
       select: seriesViewSelect,
@@ -55,8 +66,8 @@ export class SeriesRepository {
     scholarSlug: string,
     slug: string,
   ): Promise<SeriesViewDto | null> {
-    const scholar = await this.prisma.scholar.findUnique({
-      where: { slug: scholarSlug },
+    const scholar = await this.prisma.scholar.findFirst({
+      where: { slug: scholarSlug, isActive: true },
       select: { id: true },
     });
     if (!scholar) return null;
@@ -67,6 +78,17 @@ export class SeriesRepository {
         slug,
         deletedAt: null,
         status: Status.published,
+        OR: [
+          { collectionId: null },
+          {
+            collection: {
+              is: {
+                deletedAt: null,
+                status: Status.published,
+              },
+            },
+          },
+        ],
       },
       select: seriesViewSelect,
     });
@@ -80,6 +102,20 @@ export class SeriesRepository {
         id,
         deletedAt: null,
         status: Status.published,
+        scholar: {
+          isActive: true,
+        },
+        OR: [
+          { collectionId: null },
+          {
+            collection: {
+              is: {
+                deletedAt: null,
+                status: Status.published,
+              },
+            },
+          },
+        ],
       },
       select: seriesViewSelect,
     });
@@ -147,8 +183,8 @@ export class SeriesRepository {
     scholarSlug: string,
     collectionSlug: string,
   ): Promise<SeriesViewDto[] | null> {
-    const scholar = await this.prisma.scholar.findUnique({
-      where: { slug: scholarSlug },
+    const scholar = await this.prisma.scholar.findFirst({
+      where: { slug: scholarSlug, isActive: true },
       select: { id: true },
     });
 

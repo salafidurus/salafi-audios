@@ -5,6 +5,7 @@ const ApiEnvSchema = z.object({
   PORT: z.coerce.number().int().min(1).max(65535).default(3001),
   CORS_ORIGIN: z.string().default("http://localhost:3001"),
   DATABASE_URL: z.string().url().optional(),
+  ASSET_CDN_BASE_URL: z.string().url().optional(),
 });
 
 export type ApiEnv = z.infer<typeof ApiEnvSchema>;

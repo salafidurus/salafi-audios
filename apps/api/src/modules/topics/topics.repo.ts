@@ -61,6 +61,31 @@ export class TopicsRepository {
       where: {
         deletedAt: null,
         status: Status.published,
+        scholar: {
+          isActive: true,
+        },
+        OR: [
+          { seriesId: null },
+          {
+            series: {
+              is: {
+                deletedAt: null,
+                status: Status.published,
+                OR: [
+                  { collectionId: null },
+                  {
+                    collection: {
+                      is: {
+                        deletedAt: null,
+                        status: Status.published,
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        ],
         topics: { some: { topicId: topic.id } },
       },
       orderBy: [{ publishedAt: 'desc' }, { title: 'asc' }],
