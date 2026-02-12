@@ -98,6 +98,10 @@ jobs:
     name: typecheck
     needs: build_deps
     runs-on: ubuntu-latest
+    environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
+    env:
+      DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
+      DATABASE_URL: ${{ secrets.DIRECT_DB_URL }}
     steps:
       - uses: actions/checkout@v4
         with:
