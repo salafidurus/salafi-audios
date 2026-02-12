@@ -41,23 +41,12 @@ jobs:
             db_generated_policy:
               - "packages/db/prisma/**"
               - "packages/db/prisma.config.ts"
-              - "packages/db/package.json"
-              - "package.json"
-              - "pnpm-lock.yaml"
-              - "pnpm-workspace.yaml"
-              - ".github/workflows/ci.yml"
             contract:
               - "apps/api/src/**"
               - "apps/api/openapi.json"
-              - "apps/api/package.json"
               - "packages/api-client/orval.config.cjs"
-              - "packages/api-client/package.json"
               - "packages/db/prisma/**"
               - "packages/db/src/**"
-              - "package.json"
-              - "pnpm-lock.yaml"
-              - "pnpm-workspace.yaml"
-              - ".github/workflows/ci.yml"
 
   build_deps:
     name: build:deps
