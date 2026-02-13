@@ -57,6 +57,11 @@ Styling policy:
 - Avoid one-off hardcoded colors/spacing/radius/shadows in feature components.
 - Keep green-accent catalog language calm, structured, and readable.
 
+## Brand assets
+
+- Favicons/app icons live in `apps/web/src/app/favicon.ico` and `apps/web/public/icons/*`; wire them via Next metadata in `apps/web/src/app/layout.tsx`.
+- Logos live in `apps/web/public/logo/*`; reference them as `/logo/<file>` in UI (e.g. with `next/image`).
+
 Information architecture:
 
 - Web route IA can diverge from backend endpoint shapes when UX/SEO benefits.

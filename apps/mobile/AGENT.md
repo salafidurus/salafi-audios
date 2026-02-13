@@ -48,6 +48,11 @@ Direction:
 - Never ship storage credentials in app code.
 - Treat downloads as continuity cache, not ownership.
 
+## Brand assets
+
+- App icons/splash are configured in `apps/mobile/app.config.ts` and sourced from `apps/mobile/assets/images/*`.
+- In UI, use the brand logos from `apps/mobile/assets/images/logo/*` (avoid starter/template React logos).
+
 ## Commands (run from repo root)
 
 - Dev: `pnpm dev:mobile`

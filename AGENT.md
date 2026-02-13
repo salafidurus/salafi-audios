@@ -15,6 +15,14 @@ This repository is one system. The monorepo is an enforcement tool, not a conven
 - Adaptation must apply `docs/`, root/workspace `AGENT.md`, and `.github/copilot-instructions.md`.
 - Place generated code only in the target workspace (`apps/web` or `apps/mobile`) and keep monorepo boundaries intact.
 
+## Brand assets
+
+- Web favicon/app icons: `apps/web/src/app/favicon.ico`, `apps/web/public/icons/*`
+- Web logos: `apps/web/public/logo/*`
+- Mobile app icon/splash: `apps/mobile/assets/images/icon.png`, `apps/mobile/assets/images/splash-icon.png`
+- Mobile logos: `apps/mobile/assets/images/logo/*`
+- When implementing UI, use these assets (avoid starter/template logos).
+
 ## Non-negotiable guardrails
 
 - Backend authority is absolute; clients are consumers.
