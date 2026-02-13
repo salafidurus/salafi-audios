@@ -1,4 +1,5 @@
 import Link from "next/link";
+import "./scholar-avatar-card.css";
 
 type ScholarAvatarCardProps = {
   href?: string;
@@ -17,18 +18,18 @@ export function ScholarAvatarCard({
 
   const content = (
     <>
-      <div className={`home-scholar-avatar${featured ? " is-featured" : ""}`}>{initial}</div>
-      <p className="home-scholar-name">{name}</p>
-      {subtitle ? <p className="home-scholar-subtitle">{subtitle}</p> : null}
+      <div className={featured ? "avatarFeatured" : "avatar"}>{initial}</div>
+      <p className="name">{name}</p>
+      {subtitle ? <p className="subtitle">{subtitle}</p> : null}
     </>
   );
 
   if (!href) {
-    return <article className="home-scholar-card is-static">{content}</article>;
+    return <article className="cardStatic">{content}</article>;
   }
 
   return (
-    <Link href={href} className="home-scholar-card">
+    <Link href={href} className="card">
       {content}
     </Link>
   );

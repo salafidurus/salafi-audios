@@ -1,14 +1,15 @@
 import type { ReactNode } from "react";
+import styles from "./detail-list.module.css";
 
 export function DetailList({ children }: { children: ReactNode }) {
-  return <dl className="catalog-detail-list">{children}</dl>;
+  return <dl className={styles["catalog-detail-list"]}>{children}</dl>;
 }
 
 export function DetailRow({ label, value }: { label: string; value?: string }) {
   return (
-    <div className="catalog-detail-row">
-      <dt className="catalog-detail-label">{label}</dt>
-      <dd className="catalog-detail-value">{value ?? "-"}</dd>
+    <div className={styles["catalog-detail-row"]}>
+      <dt className={styles["catalog-detail-label"]}>{label}</dt>
+      <dd className={styles["catalog-detail-value"]}>{value ?? "-"}</dd>
     </div>
   );
 }

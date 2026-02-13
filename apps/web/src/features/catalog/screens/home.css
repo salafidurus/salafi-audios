@@ -1,0 +1,114 @@
+/* Home screen layout styles - minimal assembly styles only */
+
+.shell {
+  width: min(84rem, 100%);
+  margin-inline: auto;
+  padding: 0 var(--space-page-x) 0;
+}
+
+/* Hero Section */
+.hero {
+  margin-top: var(--space-gap-xl);
+  border-radius: calc(var(--radius-panel) + 0.2rem);
+  border: 1px solid var(--color-border);
+  min-height: 22rem;
+  padding: clamp(1.2rem, 3vw, 2rem);
+  color: #f6fcf8;
+  background:
+    linear-gradient(90deg, rgb(5 16 10 / 0.82), rgb(5 16 10 / 0.36)),
+    radial-gradient(circle at 0% 0%, rgb(87 216 118 / 0.25), transparent 40%),
+    linear-gradient(135deg, #173123, #31523f);
+  background-size: cover;
+  background-position: center;
+  box-shadow: var(--shadow-panel);
+}
+
+.heroPill {
+  display: inline-block;
+  background: var(--color-primary);
+  color: var(--color-primary-ink);
+  border-radius: var(--radius-chip);
+  padding: 0.25rem 0.65rem;
+  font-size: var(--font-size-caption);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.heroTitle {
+  margin: 0.8rem 0 0;
+  max-width: 16ch;
+  font-family: var(--font-display), serif;
+  font-size: clamp(2rem, 5.5vw, 4rem);
+  line-height: 0.98;
+}
+
+.heroCopy {
+  margin-top: 0.9rem;
+  max-width: 58ch;
+  color: rgb(239 249 244 / 0.92);
+  font-size: clamp(1rem, 1.7vw, 1.35rem);
+}
+
+.heroCta {
+  display: inline-flex;
+  margin-top: 1rem;
+  text-decoration: none;
+  border-radius: var(--radius-chip);
+  background: var(--color-primary);
+  color: var(--color-primary-ink);
+  font-weight: 700;
+  padding: 0.7rem 1.15rem;
+}
+
+.heroCtaDisabled {
+  composes: heroCta;
+  opacity: 0.85;
+  cursor: default;
+}
+
+/* Sections */
+.section {
+  margin-top: 1.7rem;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+.sectionHead h2 {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+/* Grids */
+.mediaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--space-gap-lg);
+}
+
+.scholarsRow {
+  display: flex;
+  gap: var(--space-gap-lg);
+  overflow-x: auto;
+  padding-bottom: 0.3rem;
+}
+
+/* Meta */
+.metaNote {
+  margin: 0;
+  padding: 0.5rem 0 1.1rem;
+  color: transparent;
+  font-size: 1px;
+}
+
+/* Responsive */
+@media (max-width: 960px) {
+  .shell {
+    padding-inline: clamp(1rem, 4.5vw, 1.75rem);
+  }
+}

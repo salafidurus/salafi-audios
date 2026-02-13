@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useCatalogUi } from "@/features/catalog/hooks/use-catalog-ui";
+import styles from "./catalog-preferences.client.module.css";
 
 export function CatalogPreferences() {
   const { density, setDensity } = useCatalogUi();
@@ -11,19 +12,26 @@ export function CatalogPreferences() {
   }, [density]);
 
   return (
-    <section className="catalog-preferences-panel" aria-label="Catalog display preferences">
-      <span className="catalog-detail-label">View density</span>
-      <div className="catalog-chip-row">
+    <section
+      className={styles["catalog-preferences-panel"]}
+      aria-label="Catalog display preferences"
+    >
+      <span className={styles["catalog-detail-label"]}>View density</span>
+      <div className={styles["catalog-chip-row"]}>
         <button
           type="button"
-          className={density === "comfortable" ? "catalog-chip is-active" : "catalog-chip"}
+          className={`${styles["catalog-chip"]} ${
+            density === "comfortable" ? styles["catalog-chip-active"] : ""
+          }`.trim()}
           onClick={() => setDensity("comfortable")}
         >
           Comfortable
         </button>
         <button
           type="button"
-          className={density === "compact" ? "catalog-chip is-active" : "catalog-chip"}
+          className={`${styles["catalog-chip"]} ${
+            density === "compact" ? styles["catalog-chip-active"] : ""
+          }`.trim()}
           onClick={() => setDensity("compact")}
         >
           Compact

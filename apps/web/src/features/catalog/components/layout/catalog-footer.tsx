@@ -1,24 +1,25 @@
 import Link from "next/link";
+import "./catalog-footer.css";
 
 export function CatalogFooter() {
   return (
-    <footer className="home-footer">
-      <div className="home-footer-grid">
-        <div className="home-footer-brand-block">
-          <p className="home-footer-brand">Salafi Durus</p>
-          <p className="home-footer-copy">
+    <footer className="footer">
+      <div className="grid">
+        <div className="brandBlock">
+          <p className="brand">Salafi Durus</p>
+          <p className="copy">
             Providing authentic knowledge based on the Quran and Sunnah with an editorial, calm, and
             structured listening experience.
           </p>
-          <div className="home-footer-social" aria-hidden="true">
-            <span className="home-footer-social-item">x</span>
-            <span className="home-footer-social-item">@</span>
-            <span className="home-footer-social-item">rss</span>
+          <div className="social" aria-hidden="true">
+            <span className="socialItem">x</span>
+            <span className="socialItem">@</span>
+            <span className="socialItem">rss</span>
           </div>
         </div>
         <div>
-          <p className="home-footer-heading">Resources</p>
-          <div className="home-footer-links">
+          <p className="heading">Resources</p>
+          <div className="links">
             <Link href="/">Lecture Library</Link>
             <Link href="/">PDF Books</Link>
             <Link href="/">Scholar Profiles</Link>
@@ -26,8 +27,8 @@ export function CatalogFooter() {
           </div>
         </div>
         <div>
-          <p className="home-footer-heading">About Us</p>
-          <div className="home-footer-links">
+          <p className="heading">About Us</p>
+          <div className="links">
             <Link href="/">Our Mission</Link>
             <Link href="/">Donation Support</Link>
             <Link href="/">Contact Support</Link>
@@ -35,19 +36,15 @@ export function CatalogFooter() {
           </div>
         </div>
         <div>
-          <p className="home-footer-heading">Newsletter</p>
-          <p className="home-footer-copy is-small">
-            Get weekly updates on new series and live events.
-          </p>
-          <div className="home-footer-newsletter" aria-hidden="true">
+          <p className="heading">Newsletter</p>
+          <p className="copySmall">Get weekly updates on new series and live events.</p>
+          <div className="newsletter" aria-hidden="true">
             <input type="email" value="" placeholder="Email address" readOnly />
             <button type="button">&gt;</button>
           </div>
         </div>
       </div>
-      <p className="home-footer-meta">
-        Copyright 2026 Salafi Durus. Read-only public catalog preview.
-      </p>
+      <p className="meta">Copyright 2026 Salafi Durus. Read-only public catalog preview.</p>
     </footer>
   );
 }

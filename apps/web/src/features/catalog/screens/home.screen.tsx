@@ -5,6 +5,7 @@ import { LectureMediaCard } from "@/features/catalog/components/cards/lecture-me
 import { ScholarAvatarCard } from "@/features/catalog/components/cards/scholar-avatar-card";
 import { CatalogFooter } from "@/features/catalog/components/layout/catalog-footer";
 import { CatalogTopNav } from "@/features/catalog/components/navigation/catalog-top-nav";
+import "./home.css";
 import { formatDuration } from "@/features/catalog/utils/catalog-format";
 import { canonical } from "@/features/catalog/utils/catalog-seo";
 
@@ -121,73 +122,33 @@ export async function HomeScreen() {
   const leadLecture = model.recentLectures[0] ?? null;
 
   return (
-    <main className="home-shell">
+    <main className="shell">
       <CatalogTopNav searchPlaceholder="Search for lectures, books, or scholars..." />
 
       <section
-        className="home-hero"
+        className="hero"
         style={
           model.featuredSeries?.coverImageUrl
             ? { backgroundImage: `url(${model.featuredSeries.coverImageUrl})` }
             : undefined
         }
       >
-        <span className="home-hero-nav home-hero-nav-prev" aria-hidden="true">
-          &lt;
-        </span>
-        <div className="home-hero-content">
-          <span className="home-hero-pill">Featured Series</span>
-          <h1 className="home-hero-title">
-            {model.featuredSeries?.title ?? "Begin your learning journey"}
-          </h1>
-          <p className="home-hero-copy">
-            {model.featuredSeries?.description ??
-              "Explore published lectures organized by scholars, collections, and thematic series."}
-          </p>
-          <div className="home-hero-actions">
-            <span className="home-hero-cta is-disabled">Start Learning</span>
-            <span className="home-hero-bookmark" aria-hidden="true">
-              Save
-            </span>
-          </div>
-          <div className="home-hero-metrics" aria-label="Catalog preview metrics">
-            <span>{model.scholars.length} scholars</span>
-            <span>{model.recentLectures.length} fresh lectures</span>
-            <span>Read-only catalog</span>
-          </div>
-        </div>
-        <aside className="home-hero-aside" aria-label="Featured lecture preview">
-          {model.recentLectures.slice(0, 2).map((lecture) => (
-            <article key={lecture.title} className="home-hero-aside-card">
-              <p className="home-hero-aside-kicker">Preview</p>
-              <p className="home-hero-aside-title">{lecture.title}</p>
-              <p className="home-hero-aside-meta">{lecture.scholarName}</p>
-            </article>
-          ))}
-        </aside>
-        <span className="home-hero-nav home-hero-nav-next" aria-hidden="true">
-          &gt;
-        </span>
-        <div className="home-hero-indicators" aria-hidden="true">
-          <span className="home-hero-indicator is-active" />
-          <span className="home-hero-indicator" />
-          <span className="home-hero-indicator" />
-        </div>
+        <span className="heroPill">Featured Series</span>
+        <h1 className="heroTitle">
+          {model.featuredSeries?.title ?? "Begin your learning journey"}
+        </h1>
+        <p className="heroCopy">
+          {model.featuredSeries?.description ??
+            "Explore published lectures organized by scholars, collections, and thematic series."}
+        </p>
+        <span className="heroCtaDisabled">Start Learning</span>
       </section>
 
-      <div className="home-rail-tabs" aria-label="Catalog rails">
-        <span className="home-rail-tab is-active">Home</span>
-        <span className="home-rail-tab">Latest</span>
-        <span className="home-rail-tab">Trending</span>
-        <span className="home-rail-tab">Series</span>
-        <span className="home-rail-view-all">View All &gt;</span>
-      </div>
-
-      <section className="home-section">
-        <div className="home-section-head">
+      <section className="section">
+        <div className="sectionHead">
           <h2>New Arrivals</h2>
         </div>
-        <div className="home-media-grid">
+        <div className="mediaGrid">
           {model.recentLectures.slice(0, 4).map((lecture) => (
             <LectureMediaCard
               key={lecture.title}
@@ -209,15 +170,11 @@ export async function HomeScreen() {
         />
       ) : null}
 
-      <section className="home-section">
-        <div className="home-section-head">
+      <section className="section">
+        <div className="sectionHead">
           <h2>Eminent Scholars</h2>
-          <div className="home-arrow-pair" aria-hidden="true">
-            <span className="home-arrow-button">&lt;</span>
-            <span className="home-arrow-button">&gt;</span>
-          </div>
         </div>
-        <div className="home-scholars-row">
+        <div className="scholarsRow">
           {model.scholars.slice(0, 8).map((scholar) => (
             <ScholarAvatarCard
               key={scholar.id}
@@ -229,41 +186,11 @@ export async function HomeScreen() {
         </div>
       </section>
 
-      <section className="home-section">
-        <div className="home-section-head">
-          <h2>Trending Now</h2>
-          <p className="home-refresh-note">Auto-update in 5m</p>
-        </div>
-        <div className="home-trending-grid">
-          {model.trendingLectures.map((lecture, index) => (
-            <article key={lecture.title} className="home-trending-card">
-              <div
-                className="home-trending-cover"
-                style={
-                  lecture.coverImageUrl
-                    ? { backgroundImage: `url(${lecture.coverImageUrl})` }
-                    : undefined
-                }
-                aria-hidden="true"
-              >
-                {lecture.duration ? (
-                  <span className="home-trending-duration">{lecture.duration}</span>
-                ) : null}
-              </div>
-              <p className="home-trending-rank">#{index + 1}</p>
-              <p className="home-trending-title">{lecture.title}</p>
-              <p className="home-trending-subtitle">{lecture.scholarName}</p>
-              <p className="home-trending-plays">{lecture.plays}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="home-section">
-        <div className="home-section-head">
+      <section className="section">
+        <div className="sectionHead">
           <h2>Recently Added</h2>
         </div>
-        <div className="home-media-grid">
+        <div className="mediaGrid">
           {model.recentLectures.slice(4, 8).map((lecture) => (
             <LectureMediaCard
               key={`${lecture.title}-recent`}
@@ -279,7 +206,7 @@ export async function HomeScreen() {
 
       <CatalogFooter />
 
-      <p className="home-meta-note">Featured instructor: {model.featuredScholarName}</p>
+      <p className="metaNote">Featured instructor: {model.featuredScholarName}</p>
     </main>
   );
 }

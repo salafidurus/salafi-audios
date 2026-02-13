@@ -1,4 +1,5 @@
 import Link from "next/link";
+import "./lecture-media-card.css";
 
 type LectureMediaCardProps = {
   href?: string;
@@ -20,23 +21,23 @@ export function LectureMediaCard({
   const content = (
     <>
       <div
-        className="home-media-cover"
+        className="cover"
         style={coverImageUrl ? { backgroundImage: `url(${coverImageUrl})` } : undefined}
       >
-        {duration ? <span className="home-media-duration">{duration}</span> : null}
+        {duration ? <span className="duration">{duration}</span> : null}
       </div>
-      <p className="home-media-title">{title}</p>
-      <p className="home-media-subtitle">{subtitle}</p>
-      {tag ? <span className="home-media-tag">{tag}</span> : null}
+      <p className="title">{title}</p>
+      <p className="subtitle">{subtitle}</p>
+      {tag ? <span className="tag">{tag}</span> : null}
     </>
   );
 
   if (!href) {
-    return <article className="home-media-card is-static">{content}</article>;
+    return <article className="cardStatic">{content}</article>;
   }
 
   return (
-    <Link href={href} className="home-media-card">
+    <Link href={href} className="card">
       {content}
     </Link>
   );

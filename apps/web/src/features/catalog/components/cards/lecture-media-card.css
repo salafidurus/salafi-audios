@@ -1,0 +1,56 @@
+.card {
+  text-decoration: none;
+  color: inherit;
+}
+
+.cardStatic {
+  composes: card;
+  cursor: default;
+}
+
+.cover {
+  position: relative;
+  border-radius: 0.8rem;
+  height: 8rem;
+  border: 1px solid var(--color-border);
+  background:
+    linear-gradient(120deg, rgb(16 34 25 / 0.84), rgb(16 34 25 / 0.44)),
+    linear-gradient(140deg, #d9e9dd, #f8faf9);
+  background-size: cover;
+  background-position: center;
+}
+
+.duration {
+  position: absolute;
+  right: 0.45rem;
+  bottom: 0.45rem;
+  border-radius: var(--radius-chip);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.16rem 0.45rem;
+  color: #f7fcfa;
+  background: rgb(4 14 10 / 0.72);
+}
+
+.title {
+  margin: 0.55rem 0 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+
+.subtitle {
+  margin: 0.24rem 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+}
+
+.tag {
+  display: inline-flex;
+  margin-top: 0.4rem;
+  padding: 0.15rem 0.52rem;
+  border-radius: var(--radius-chip);
+  background: var(--color-primary-soft);
+  color: var(--color-link);
+  font-size: 0.72rem;
+  font-weight: 700;
+}

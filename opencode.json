@@ -16,9 +16,14 @@
       "url": "https://stitch.googleapis.com/mcp",
       "enabled": true,
       "headers": {
-        "X-Goog-Api-Key": "AQ.Ab8RN6JdQY2PX9zbuYp8e7_8DIKdt4DIwcV3SKIsBMr_ldZZ1Q",
+        "X-Goog-Api-Key": "AQ.Ab8RN6IclJGSxvO9Gmn6WSU-D51RroTuecT02IZoRT_zuKP7JQ",
         "Accept": "application/json"
       }
+    },
+    "antigravity": {
+      "type": "local",
+      "command": ["opencode-antigravity-auth"],
+      "enabled": true
     }
   }
 }

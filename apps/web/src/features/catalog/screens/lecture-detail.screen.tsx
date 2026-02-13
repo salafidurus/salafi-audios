@@ -4,6 +4,7 @@ import { catalogApi, CatalogApiError } from "@/features/catalog/api/catalog-publ
 import { PrimaryAudioPanel } from "@/features/catalog/components/audio/primary-audio-panel";
 import { CatalogShell } from "@/features/catalog/components/layout/catalog-shell";
 import { DetailList, DetailRow } from "@/features/catalog/components/states/detail-list";
+import styles from "./lecture-detail.screen.module.css";
 import { formatDate, formatDuration } from "@/features/catalog/utils/catalog-format";
 import { canonical } from "@/features/catalog/utils/catalog-seo";
 
@@ -58,7 +59,7 @@ export async function LectureDetailScreen({ params }: LectureRouteProps) {
         { href: `/lectures/${scholarSlug}/${lectureSlug}`, label: lecture.title },
       ]}
     >
-      <section className="catalog-detail-panel">
+      <section className={styles["catalog-detail-panel"]}>
         <DetailList>
           <DetailRow label="Language" value={lecture.language} />
           <DetailRow label="Duration" value={formatDuration(lecture.durationSeconds)} />

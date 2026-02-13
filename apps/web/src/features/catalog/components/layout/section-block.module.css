@@ -1,0 +1,16 @@
+.catalog-section-block {
+  margin-bottom: var(--space-section-y);
+}
+
+.catalog-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.catalog-section-title {
+  margin-top: 0;
+  margin-bottom: var(--space-gap-md);
+  font-size: var(--font-size-h2);
+  line-height: 1.25;
+}
