@@ -3,7 +3,7 @@ import type {
   LectureViewDto,
   ScholarViewDto,
   SeriesViewDto,
-} from "@sd/api-client/schemas";
+} from "@sd/api-client";
 
 export type Scholar = ScholarViewDto;
 export type Collection = CollectionViewDto;
