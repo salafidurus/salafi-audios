@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/shared/db/prisma.service';
+import { ConfigService } from '@/shared/config/config.service';
 import { Prisma, Status } from '@sd/db/client';
 import { UpsertLectureDto } from './dto/upsert-lecture.dto';
 import { LectureViewDto } from './dto/lecture-view.dto';
+import { AudioAssetViewDto } from '../audio-assets/dto/audio-asset-view.dto';
 
 const lectureViewSelect = {
   id: true,
@@ -20,6 +22,23 @@ const lectureViewSelect = {
   deleteAfterAt: true,
   createdAt: true,
   updatedAt: true,
+  audioAssets: {
+    where: { isPrimary: true },
+    orderBy: [{ createdAt: 'asc' }],
+    take: 1,
+    select: {
+      id: true,
+      lectureId: true,
+      url: true,
+      format: true,
+      bitrateKbps: true,
+      sizeBytes: true,
+      durationSeconds: true,
+      source: true,
+      isPrimary: true,
+      createdAt: true,
+    },
+  },
 } satisfies Prisma.LectureSelect;
 
 type LectureViewRecord = Prisma.LectureGetPayload<{
@@ -28,7 +47,10 @@ type LectureViewRecord = Prisma.LectureGetPayload<{
 
 @Injectable()
 export class LecturesRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly config: ConfigService,
+  ) {}
 
   async listPublishedByScholarSlug(
     scholarSlug: string,
@@ -290,6 +312,8 @@ export class LecturesRepository {
   }
 
   private toViewDto(record: LectureViewRecord): LectureViewDto {
+    const primaryAudioAsset = record.audioAssets[0];
+
     return {
       id: record.id,
       scholarId: record.scholarId,
@@ -302,10 +326,44 @@ export class LecturesRepository {
       publishedAt: record.publishedAt?.toISOString(),
       orderIndex: record.orderIndex ?? undefined,
       durationSeconds: record.durationSeconds ?? undefined,
+      primaryAudioAsset: primaryAudioAsset
+        ? this.toPrimaryAudioAssetDto(primaryAudioAsset)
+        : undefined,
       deletedAt: record.deletedAt?.toISOString(),
       deleteAfterAt: record.deleteAfterAt?.toISOString(),
       createdAt: record.createdAt.toISOString(),
       updatedAt: record.updatedAt?.toISOString(),
     };
+  }
+
+  private toPrimaryAudioAssetDto(
+    asset: LectureViewRecord['audioAssets'][number],
+  ): AudioAssetViewDto {
+    return {
+      id: asset.id,
+      lectureId: asset.lectureId,
+      url: this.toPublicUrl(asset.url),
+      format: asset.format ?? undefined,
+      bitrateKbps: asset.bitrateKbps ?? undefined,
+      sizeBytes:
+        asset.sizeBytes !== null ? asset.sizeBytes.toString() : undefined,
+      durationSeconds: asset.durationSeconds ?? undefined,
+      source: asset.source ?? undefined,
+      isPrimary: asset.isPrimary,
+      createdAt: asset.createdAt.toISOString(),
+    };
+  }
+
+  private toPublicUrl(value: string): string {
+    if (/^[a-z]+:\/\//i.test(value)) {
+      return value;
+    }
+
+    const base = this.config.ASSET_CDN_BASE_URL;
+    if (!base) {
+      return value;
+    }
+
+    return `${base.replace(/\/$/, '')}/${value.replace(/^\//, '')}`;
   }
 }

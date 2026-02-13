@@ -1,9 +1,8 @@
 import { ApiCommonErrors } from '@/shared/decorators/api-common-errors.decorator';
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import { TopicDetailDto } from './dto/topic-detail.dto';
-import { UpsertTopicDto } from './dto/upsert-topic.dto';
 import { TopicsService } from './topics.service';
 import { TopicViewDto } from '../lecture-topics/dto/topic-view.dto';
 import { TopicLectureViewDto } from './dto/topic-lecture-view.dto';
@@ -27,13 +26,6 @@ export class TopicsController {
   @ApiOkResponse({ type: TopicDetailDto })
   getBySlug(@Param('slug') slug: string): Promise<TopicDetailDto> {
     return this.topics.getBySlug(slug);
-  }
-
-  @Post('upsert')
-  @ApiOperation({ summary: 'Upsert topic by slug' })
-  @ApiOkResponse({ type: TopicDetailDto })
-  upsert(@Body() dto: UpsertTopicDto): Promise<TopicDetailDto> {
-    return this.topics.upsert(dto);
   }
 
   @Get(':slug/children')
