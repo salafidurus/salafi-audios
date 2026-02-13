@@ -12,6 +12,8 @@ This Next.js app is a client of the backend API, not an authority.
 
 - Project-local OpenCode skills live in `.opencode/skills/`.
 - Keep Next.js and web-specific skills scoped to this app directory.
+- For image-driven UI tasks, run root `google-stitch` first, then adapt output using this file and web-local skills.
+- After Stitch baseline generation, enforce web structure (`app/`, `features/`, `core/`, `shared/`) and tokenized styling rules.
 
 ## Non-negotiables
 
@@ -25,6 +27,40 @@ This Next.js app is a client of the backend API, not an authority.
 - `features/` - domain-facing UI/hooks
 - `core/` - platform concerns (API wiring, session, caching, error normalization)
 - `shared/` - primitives/utilities with no inward deps
+
+Route wrappers in `src/app/**/page.tsx` must:
+
+- Import screen + metadata helpers from `features/*/screens/*`.
+- Avoid domain data fetching and feature business logic.
+- Keep routing declarative and minimal.
+
+Feature ownership rules:
+
+- Feature folders are vertical slices (`api/`, `screens/`, `components/`, `hooks/`, `store/`, `types/`, `utils/`).
+- A feature owns its domain-specific formatting, SEO helpers, UI state, and API wrappers.
+- Do not place catalog-specific code in `core/` or `shared/`.
+
+Shared promotion rules:
+
+- Promote code to `shared/` only when at least two features need the same behavior.
+- `shared/` stays domain-agnostic (no catalog semantics, no API route knowledge).
+- When in doubt, keep code inside the feature until reuse is proven.
+
+API client import policy:
+
+- Import API types/clients only from `@sd/api-client` public exports.
+- Never import from `@sd/api-client/generated/*` directly.
+
+Styling policy:
+
+- Use tokenized design primitives from `src/app/globals.css` (light + dark tokens).
+- Avoid one-off hardcoded colors/spacing/radius/shadows in feature components.
+- Keep green-accent catalog language calm, structured, and readable.
+
+Information architecture:
+
+- Web route IA can diverge from backend endpoint shapes when UX/SEO benefits.
+- Backend remains authoritative; web IA is a presentation concern.
 
 Direction:
 

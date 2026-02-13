@@ -23,6 +23,11 @@ This package owns Prisma schema, migrations, and DB client utilities.
 - Create migration: `pnpm --filter @sd/db migrate:create-only`
 - Deploy migrations: `pnpm --filter @sd/db migrate:deploy`
 
+Env file precedence for local DB commands:
+
+- `.env` -> `.env.local` -> `.env.<NODE_ENV>` -> `.env.<NODE_ENV>.local`
+- Existing process env vars (for CI/secrets) are never overridden by env files.
+
 ## Build/lint/test commands
 
 - Build: `pnpm --filter @sd/db build`

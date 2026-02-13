@@ -6,7 +6,6 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export * from "./attachTopicDto";
 export * from "./audioAssetViewDto";
 export * from "./catalogControllerCollectionsParams";
 export * from "./catalogControllerLecturesParams";
@@ -32,12 +31,3 @@ export * from "./topicLectureViewDto";
 export * from "./topicLectureViewDtoStatus";
 export * from "./topicViewDto";
 export * from "./topicsControllerListLecturesParams";
-export * from "./upsertAudioAssetDto";
-export * from "./upsertCollectionDto";
-export * from "./upsertCollectionDtoStatus";
-export * from "./upsertLectureDto";
-export * from "./upsertLectureDtoStatus";
-export * from "./upsertScholarDto";
-export * from "./upsertSeriesDto";
-export * from "./upsertSeriesDtoStatus";
-export * from "./upsertTopicDto";

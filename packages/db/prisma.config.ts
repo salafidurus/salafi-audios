@@ -1,5 +1,7 @@
-import "dotenv/config";
 import { defineConfig } from "prisma/config";
+import { loadDbEnvFiles } from "./scripts/load-db-env.js";
+
+loadDbEnvFiles(process.cwd());
 
 const directDbUrl = process.env.DIRECT_DB_URL ?? process.env.DATABASE_URL;
 

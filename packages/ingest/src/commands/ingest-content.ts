@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { readFile } from "node:fs/promises";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@sd/db/client";
@@ -7,6 +6,9 @@ import { parseArgs, resolveInputPath } from "../cli/ingest-cli";
 import { parseContentDefinition } from "../schema/content-schema";
 import { DryRunRollbackError } from "../core/errors";
 import { runIngestion } from "../core/run-ingestion";
+import { bootstrapEnv } from "../shared/env.bootstrap";
+
+bootstrapEnv();
 
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));

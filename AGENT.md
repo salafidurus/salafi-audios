@@ -8,6 +8,13 @@ This repository is one system. The monorepo is an enforcement tool, not a conven
 - Read in order: `docs/README.md` -> this file -> target workspace `AGENT.md` -> `.github/copilot-instructions.md`.
 - If code and docs conflict, reconcile intentionally (do not silently drift).
 
+## Image-to-code workflow
+
+- For design image requests, use root skill `google-stitch` with a Stitch-first flow.
+- Sequence is mandatory: image -> Stitch baseline -> repo adaptation.
+- Adaptation must apply `docs/`, root/workspace `AGENT.md`, and `.github/copilot-instructions.md`.
+- Place generated code only in the target workspace (`apps/web` or `apps/mobile`) and keep monorepo boundaries intact.
+
 ## Non-negotiable guardrails
 
 - Backend authority is absolute; clients are consumers.
@@ -147,3 +154,9 @@ Turbo grouped scripts:
 - Do not commit secrets or env values.
 - Do not hand-edit generated API client output.
 - Update docs when architecture intent or guarantees change.
+
+## MCP usage policy
+
+- Use Playwright MCP only for web UI verification.
+- For mobile app work, use Playwright MCP only for responsive/mobile web-view checks in `apps/web`.
+- Do not use Playwright MCP to validate native mobile views in `apps/mobile`; use Expo/native tooling for that.
