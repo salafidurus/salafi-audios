@@ -31,6 +31,16 @@ This repository is one system. The monorepo is an enforcement tool, not a conven
 - `packages/*` - shared libraries and configs
 - `docs/` - product + implementation authority
 
+### Package Map
+
+- `packages/db` - Database schema and client
+- `packages/env` - Environment variable schemas
+- `packages/i18n` - Internationalization config and keys
+- `packages/auth-shared` - Shared auth types
+- `packages/api-client` - Generated API client
+- `packages/config` - Shared lint/build config
+- `packages/ingest` - Content ingestion
+
 ## Commands (root)
 
 - Install: `pnpm i`
@@ -70,8 +80,9 @@ Turbo grouped scripts:
 - Jest file (API): `pnpm --filter api test -- src/modules/topics/topics.service.spec.ts`
 - Jest file (Web): `pnpm --filter web test -- src/path/to/file.test.tsx`
 - Jest file (Mobile): `pnpm --filter mobile test -- src/path/to/file.test.tsx`
+- Jest file (DB): `pnpm --filter @sd/db test -- src/path/to/file.spec.ts`
 - Jest by name: `pnpm --filter api test -- src/modules/topics/topics.service.spec.ts -t "returns topic by slug"`
-- Jest watch file: `pnpm --filter api test:watch -- src/modules/topics/topics.service.spec.ts`
+- Jest watch file (API): `pnpm --filter api test:watch -- src/modules/topics/topics.service.spec.ts`
 - Playwright file: `pnpm --filter web test:e2e -- e2e/catalog.spec.ts`
 - Playwright by title: `pnpm --filter web test:e2e -- --grep "catalog list"`
 
@@ -92,6 +103,12 @@ Turbo grouped scripts:
 - Keep analytics/events out of authoritative core tables.
 - Treat migrations as first-class and reviewable.
 - Treat `packages/db/src/generated/` as derived output; keep it untracked and regenerate locally when needed.
+- Prisma commands (scoped to `@sd/db`):
+  - `pnpm --filter @sd/db prisma:generate`
+  - `pnpm --filter @sd/db prisma:validate`
+  - `pnpm --filter @sd/db prisma:format`
+  - `pnpm --filter @sd/db migrate:create-only`
+  - `pnpm --filter @sd/db migrate:deploy`
 
 ## Quality and style
 
