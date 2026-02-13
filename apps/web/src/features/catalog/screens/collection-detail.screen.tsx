@@ -8,11 +8,20 @@ import { SectionBlock } from "@/features/catalog/components/layout/section-block
 import { EmptyState } from "@/features/catalog/components/states/empty-state";
 import { canonical } from "@/features/catalog/utils/catalog-seo";
 
+type CollectionPageData = {
+  scholar: Awaited<ReturnType<typeof catalogApi.getScholar>>;
+  collection: Awaited<ReturnType<typeof catalogApi.getScholarCollection>>;
+  series: Awaited<ReturnType<typeof catalogApi.listCollectionSeries>>;
+};
+
 type CollectionRouteProps = {
   params: Promise<{ scholarSlug: string; collectionSlug: string }>;
 };
 
-async function loadCollectionPage(scholarSlug: string, collectionSlug: string) {
+async function loadCollectionPage(
+  scholarSlug: string,
+  collectionSlug: string,
+): Promise<CollectionPageData> {
   try {
     const [scholar, collection, series] = await Promise.all([
       catalogApi.getScholar(scholarSlug),
@@ -65,7 +74,7 @@ export async function CollectionDetailScreen({ params }: CollectionRouteProps) {
           <EmptyState message="No published series found in this collection." />
         ) : (
           <CardGrid>
-            {series.map((item) => (
+            {series.map((item: CollectionPageData["series"][number]) => (
               <EntityCard
                 key={item.id}
                 href={`/series/${scholarSlug}/${item.slug}`}
