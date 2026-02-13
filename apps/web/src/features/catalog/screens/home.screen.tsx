@@ -3,20 +3,25 @@ import { catalogApi } from "@/features/catalog/api/catalog-public.api";
 import { NowPlayingBar } from "@/features/catalog/components/audio/now-playing-bar";
 import { LectureMediaCard } from "@/features/catalog/components/cards/lecture-media-card";
 import { ScholarAvatarCard } from "@/features/catalog/components/cards/scholar-avatar-card";
+import { TrendingCard } from "@/features/catalog/components/cards/trending-card";
 import { CatalogFooter } from "@/features/catalog/components/layout/catalog-footer";
 import { CatalogTopNav } from "@/features/catalog/components/navigation/catalog-top-nav";
+import { HomeHero } from "@/features/catalog/components/hero/home-hero";
+import { HomeContentNav } from "@/features/catalog/components/content-nav/home-content-nav";
 import "./home.css";
 import { formatDuration } from "@/features/catalog/utils/catalog-format";
 import { canonical } from "@/features/catalog/utils/catalog-seo";
+import { Button } from "@/shared/components/button/button";
+import { ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 
 type HomeViewModel = {
   scholars: Awaited<ReturnType<typeof catalogApi.listScholars>>;
   featuredScholarName: string;
-  featuredSeries: {
+  heroSeries: Array<{
     title: string;
     description?: string;
     coverImageUrl?: string;
-  } | null;
+  }>;
   recentLectures: Array<{
     title: string;
     scholarName: string;
@@ -49,7 +54,7 @@ async function loadHomeViewModel(): Promise<HomeViewModel> {
     return {
       scholars: [],
       featuredScholarName: "Salafi Durus",
-      featuredSeries: null,
+      heroSeries: [],
       recentLectures: [],
       trendingLectures: [],
     };
@@ -65,6 +70,16 @@ async function loadHomeViewModel(): Promise<HomeViewModel> {
   const featuredBundle = scholarSeriesBundles.find((bundle) => bundle.series.length > 0) ?? null;
   const featuredScholar = featuredBundle?.scholar ?? scholars[0];
   const featuredSeriesCandidate = featuredBundle?.series[0] ?? null;
+
+  const heroSeries = scholarSeriesBundles
+    .flatMap((bundle) => bundle.series)
+    .filter((series) => Boolean(series.coverImageUrl) || Boolean(series.description))
+    .slice(0, 3)
+    .map((series) => ({
+      title: series.title,
+      description: series.description,
+      coverImageUrl: series.coverImageUrl,
+    }));
 
   const lectureSourceSeries = scholarSeriesBundles
     .flatMap((bundle) =>
@@ -105,13 +120,18 @@ async function loadHomeViewModel(): Promise<HomeViewModel> {
   return {
     scholars,
     featuredScholarName: featuredScholar.name,
-    featuredSeries: featuredSeriesCandidate
-      ? {
-          title: featuredSeriesCandidate.title,
-          description: featuredSeriesCandidate.description,
-          coverImageUrl: featuredSeriesCandidate.coverImageUrl,
-        }
-      : null,
+    heroSeries:
+      heroSeries.length > 0
+        ? heroSeries
+        : featuredSeriesCandidate
+          ? [
+              {
+                title: featuredSeriesCandidate.title,
+                description: featuredSeriesCandidate.description,
+                coverImageUrl: featuredSeriesCandidate.coverImageUrl,
+              },
+            ]
+          : [],
     recentLectures,
     trendingLectures,
   };
@@ -122,91 +142,108 @@ export async function HomeScreen() {
   const leadLecture = model.recentLectures[0] ?? null;
 
   return (
-    <main className="shell">
+    <div className="pageRoot">
       <CatalogTopNav searchPlaceholder="Search for lectures, books, or scholars..." />
+      <main className="shell">
+        <HomeHero items={model.heroSeries} />
+        <HomeContentNav />
 
-      <section
-        className="hero"
-        style={
-          model.featuredSeries?.coverImageUrl
-            ? { backgroundImage: `url(${model.featuredSeries.coverImageUrl})` }
-            : undefined
-        }
-      >
-        <span className="heroPill">Featured Series</span>
-        <h1 className="heroTitle">
-          {model.featuredSeries?.title ?? "Begin your learning journey"}
-        </h1>
-        <p className="heroCopy">
-          {model.featuredSeries?.description ??
-            "Explore published lectures organized by scholars, collections, and thematic series."}
-        </p>
-        <span className="heroCtaDisabled">Start Learning</span>
-      </section>
+        <section className="section">
+          <div className="sectionHead">
+            <h2>Recently Added</h2>
+          </div>
+          <div className="mediaGrid">
+            {model.recentLectures.slice(0, 4).map((lecture) => (
+              <LectureMediaCard
+                key={lecture.title}
+                title={lecture.title}
+                subtitle={lecture.scholarName}
+                duration={lecture.duration}
+                coverImageUrl={lecture.coverImageUrl}
+                tag={lecture.language}
+              />
+            ))}
+          </div>
+        </section>
 
-      <section className="section">
-        <div className="sectionHead">
-          <h2>New Arrivals</h2>
-        </div>
-        <div className="mediaGrid">
-          {model.recentLectures.slice(0, 4).map((lecture) => (
-            <LectureMediaCard
-              key={lecture.title}
-              title={lecture.title}
-              subtitle={lecture.scholarName}
-              duration={lecture.duration}
-              coverImageUrl={lecture.coverImageUrl}
-              tag={lecture.language}
-            />
-          ))}
-        </div>
-      </section>
+        {leadLecture ? (
+          <NowPlayingBar
+            title={leadLecture.title}
+            scholar={leadLecture.scholarName}
+            progressPercent={42}
+          />
+        ) : null}
 
-      {leadLecture ? (
-        <NowPlayingBar
-          title={leadLecture.title}
-          scholar={leadLecture.scholarName}
-          progressPercent={42}
-        />
-      ) : null}
+        <section className="section">
+          <div className="sectionHead">
+            <h2>Eminent Scholars</h2>
+            <div className="sectionActions" aria-hidden="true">
+              <Button variant="surface" size="icon" aria-disabled="true" aria-label="Previous">
+                <ChevronLeft size={18} aria-hidden="true" />
+              </Button>
+              <Button variant="surface" size="icon" aria-disabled="true" aria-label="Next">
+                <ChevronRight size={18} aria-hidden="true" />
+              </Button>
+            </div>
+          </div>
+          <div className="scholarsRow">
+            {model.scholars.slice(0, 8).map((scholar) => (
+              <ScholarAvatarCard
+                key={scholar.id}
+                name={scholar.name}
+                subtitle="Published"
+                featured={scholar.name === model.featuredScholarName}
+              />
+            ))}
+          </div>
+        </section>
 
-      <section className="section">
-        <div className="sectionHead">
-          <h2>Eminent Scholars</h2>
-        </div>
-        <div className="scholarsRow">
-          {model.scholars.slice(0, 8).map((scholar) => (
-            <ScholarAvatarCard
-              key={scholar.id}
-              name={scholar.name}
-              subtitle="Published"
-              featured={scholar.name === model.featuredScholarName}
-            />
-          ))}
-        </div>
-      </section>
+        <section className="section">
+          <div className="sectionHead">
+            <h2>Trending Now</h2>
+            <div className="autoUpdateNote" aria-hidden="true">
+              Auto-update in 5m
+              <span className="autoUpdateIcon" aria-hidden="true">
+                <RefreshCw size={16} aria-hidden="true" />
+              </span>
+            </div>
+          </div>
+          <div className="mediaGrid-trending">
+            {model.trendingLectures.slice(0, 3).map((lecture, index) => (
+              <TrendingCard
+                key={lecture.title}
+                rank={index + 1}
+                title={lecture.title}
+                scholarName={lecture.scholarName}
+                plays={lecture.plays}
+                coverImageUrl={lecture.coverImageUrl}
+              />
+            ))}
+          </div>
+        </section>
 
-      <section className="section">
-        <div className="sectionHead">
-          <h2>Recently Added</h2>
-        </div>
-        <div className="mediaGrid">
-          {model.recentLectures.slice(4, 8).map((lecture) => (
-            <LectureMediaCard
-              key={`${lecture.title}-recent`}
-              title={lecture.title}
-              subtitle={lecture.scholarName}
-              duration={lecture.duration}
-              coverImageUrl={lecture.coverImageUrl}
-              tag={lecture.language}
-            />
-          ))}
-        </div>
-      </section>
+        <section className="section">
+          <div className="sectionHead">
+            <h2>New Arrivals</h2>
+          </div>
+          <div className="mediaGrid">
+            {model.recentLectures.slice(4, 8).map((lecture) => (
+              <LectureMediaCard
+                key={`${lecture.title}-recent`}
+                title={lecture.title}
+                subtitle={lecture.scholarName}
+                duration={lecture.duration}
+                coverImageUrl={lecture.coverImageUrl}
+                tag={lecture.language}
+              />
+            ))}
+          </div>
+        </section>
+
+        <p className="metaNote">Featured instructor: {model.featuredScholarName}</p>
+      </main>
 
       <CatalogFooter />
-
-      <p className="metaNote">Featured instructor: {model.featuredScholarName}</p>
-    </main>
+    </div>
   );
 }

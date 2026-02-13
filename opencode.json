@@ -24,6 +24,11 @@
       "type": "local",
       "command": ["opencode-antigravity-auth"],
       "enabled": true
+    },
+    "hugeicons": {
+      "type": "local",
+      "command": ["@hugeicons/mcp-server"],
+      "enabled": true
     }
   }
 }

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import "./scholar-avatar-card.css";
+import styles from "./scholar-avatar-card.module.css";
 
 type ScholarAvatarCardProps = {
   href?: string;
@@ -18,18 +18,18 @@ export function ScholarAvatarCard({
 
   const content = (
     <>
-      <div className={featured ? "avatarFeatured" : "avatar"}>{initial}</div>
-      <p className="name">{name}</p>
-      {subtitle ? <p className="subtitle">{subtitle}</p> : null}
+      <div className={featured ? styles.avatarFeatured : styles.avatar}>{initial}</div>
+      <p className={styles.name}>{name}</p>
+      {subtitle ? <p className={styles.subtitle}>{subtitle}</p> : null}
     </>
   );
 
   if (!href) {
-    return <article className="cardStatic">{content}</article>;
+    return <article className={styles.cardStatic}>{content}</article>;
   }
 
   return (
-    <Link href={href} className="card">
+    <Link href={href} className={styles.card}>
       {content}
     </Link>
   );

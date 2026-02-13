@@ -107,44 +107,8 @@
   margin-left: auto;
 }
 
-.home-auth-link {
-  border: 0;
-  background: transparent;
-  padding: 0;
-  color: var(--color-text);
-  font-size: 0.92rem;
-  font-weight: 600;
-  cursor: default;
-}
-
-.home-auth-cta {
-  border: 1px solid rgb(46 178 82 / 0.45);
-  color: #052212;
-  background:
-    radial-gradient(circle at 20% 20%, rgb(152 250 175 / 0.55), transparent 40%),
-    linear-gradient(135deg, #5ee283, #37bf61);
-  border-radius: var(--radius-chip);
-  font-weight: 700;
-  font-size: 0.92rem;
-  line-height: 1;
-  letter-spacing: 0.01em;
-  padding: 0.64rem 1.1rem;
-  cursor: pointer;
-  box-shadow:
-    0 8px 20px -14px rgb(25 88 45 / 0.7),
-    inset 0 1px 0 rgb(242 255 248 / 0.58);
-  transition:
-    transform 180ms ease,
-    box-shadow 180ms ease,
-    filter 180ms ease;
-}
-
-.home-auth-cta:hover {
-  transform: translateY(-1px);
-  filter: saturate(1.05);
-  box-shadow:
-    0 12px 22px -14px rgb(25 88 45 / 0.78),
-    inset 0 1px 0 rgb(242 255 248 / 0.62);
+.home-auth-hide-mobile {
+  display: inline-flex;
 }
 
 @media (max-width: 1180px) {
@@ -200,13 +164,8 @@
     display: none;
   }
 
-  .home-auth-link {
+  .home-auth-hide-mobile {
     display: none;
-  }
-
-  .home-auth-cta {
-    padding: 0.52rem 0.84rem;
-    font-size: 0.86rem;
   }
 
   .home-nav-links {

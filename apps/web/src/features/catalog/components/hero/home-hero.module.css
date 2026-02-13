@@ -1,0 +1,203 @@
+/* Home hero: calm editorial, green accent */
+
+.hero {
+  margin-top: var(--space-gap-xl);
+  border-radius: calc(var(--radius-panel) + 0.3rem);
+  border: 1px solid color-mix(in srgb, var(--color-border) 86%, transparent);
+  min-height: clamp(18rem, 34vw, 25.5rem);
+  color: #f6fcf8;
+  background:
+    radial-gradient(circle at 18% 22%, rgb(87 216 118 / 0.18), transparent 46%),
+    linear-gradient(135deg, #173123, #102419);
+  box-shadow: var(--shadow-panel);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.media {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: saturate(0.98) contrast(1.02);
+  transform: scale(1.03);
+  opacity: 0.95;
+  z-index: -2;
+  animation: heroMediaIn 420ms ease both;
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgb(6 18 12 / 0.92) 0%, rgb(6 18 12 / 0.66) 44%, rgb(6 18 12 / 0.1) 76%),
+    radial-gradient(circle at 10% 10%, rgb(87 216 118 / 0.18), transparent 45%);
+  z-index: -1;
+}
+
+.inner {
+  position: relative;
+  padding: clamp(1.2rem, 3vw, 2.15rem);
+  max-width: 46rem;
+  animation: heroIn 420ms ease both;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-gap-md);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: var(--radius-chip);
+  padding: 0.28rem 0.72rem;
+  font-size: var(--font-size-caption);
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #08170f;
+  background:
+    radial-gradient(circle at 20% 20%, rgb(242 255 248 / 0.7), transparent 60%),
+    linear-gradient(135deg, #8ef3a4, var(--color-primary));
+  box-shadow: 0 12px 18px -18px rgb(0 0 0 / 0.55);
+}
+
+.pillIcon {
+  width: 1.1em;
+  height: 1.1em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+}
+
+.title {
+  margin: 0.95rem 0 0;
+  max-width: 17ch;
+  font-family: var(--font-display), serif;
+  font-size: clamp(2.1rem, 5.6vw, 4.25rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.copy {
+  margin-top: 0.95rem;
+  max-width: 60ch;
+  color: rgb(239 249 244 / 0.92);
+  font-size: clamp(1rem, 1.7vw, 1.25rem);
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-gap-md);
+  margin-top: 1.15rem;
+}
+
+.heroIconBtn {
+  --btn-bg: rgb(6 18 12 / 0.38);
+  --btn-fg: rgb(246 252 248 / 0.92);
+  --btn-border: rgb(233 248 239 / 0.18);
+  --btn-shadow: 0 12px 18px -18px rgb(0 0 0 / 0.6);
+}
+
+.chrome {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(0.7rem, 2.4vw, 1.1rem);
+  pointer-events: none;
+}
+
+.heroArrowBtn {
+  pointer-events: auto;
+  --btn-bg: rgb(6 18 12 / 0.4);
+  --btn-fg: rgb(246 252 248 / 0.92);
+  --btn-border: rgb(233 248 239 / 0.16);
+  --btn-shadow: 0 18px 24px -22px rgb(0 0 0 / 0.66);
+}
+
+.dots {
+  position: absolute;
+  left: 50%;
+  bottom: 1.2rem;
+  transform: translateX(-50%);
+  display: inline-flex;
+  gap: 0.55rem;
+  align-items: center;
+}
+
+.dot,
+.dotActive {
+  height: 0.48rem;
+  border-radius: 999px;
+  background: rgb(246 252 248 / 0.34);
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.dot {
+  width: 0.48rem;
+}
+
+.dotActive {
+  width: 1.55rem;
+  background: linear-gradient(90deg, var(--color-primary), rgb(151 239 173 / 0.92));
+  box-shadow: 0 10px 18px -16px rgb(0 0 0 / 0.7);
+}
+
+@keyframes heroMediaIn {
+  from {
+    opacity: 0.5;
+    transform: scale(1.06);
+  }
+
+  to {
+    opacity: 0.95;
+    transform: scale(1.03);
+  }
+}
+
+@keyframes heroIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inner {
+    animation: none;
+  }
+
+  .media {
+    animation: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .chrome {
+    display: none;
+  }
+
+  .dots {
+    bottom: 0.95rem;
+  }
+
+  .title {
+    max-width: 20ch;
+  }
+}

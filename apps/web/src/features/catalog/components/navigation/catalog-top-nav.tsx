@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import styles from "@/features/catalog/components/navigation/catalog-top-nav.module.css";
 import { CatalogSearchInput } from "@/features/catalog/components/navigation/catalog-search-input";
+import { Button } from "@/shared/components/button/button";
 
 type CatalogTopNavProps = {
   searchPlaceholder: string;
@@ -57,12 +58,17 @@ export function CatalogTopNav({ searchPlaceholder }: CatalogTopNavProps) {
         />
 
         <div className={styles["home-auth-actions"]}>
-          <button type="button" className={styles["home-auth-link"]} aria-disabled="true">
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-disabled="true"
+            className={styles["home-auth-hide-mobile"]}
+          >
             Sign In
-          </button>
-          <button type="button" className={styles["home-auth-cta"]} aria-disabled="true">
+          </Button>
+          <Button variant="primary" size="sm" aria-disabled="true">
             Get Started
-          </button>
+          </Button>
         </div>
       </div>
     </header>
