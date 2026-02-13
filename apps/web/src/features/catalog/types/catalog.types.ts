@@ -1,5 +1,4 @@
 import type {
-  AudioAssetViewDto,
   CollectionViewDto,
   LectureViewDto,
   ScholarViewDto,
@@ -9,9 +8,7 @@ import type {
 export type Scholar = ScholarViewDto;
 export type Collection = CollectionViewDto;
 export type Series = SeriesViewDto;
-export type Lecture = LectureViewDto & {
-  primaryAudioAsset?: AudioAssetViewDto;
-};
+export type Lecture = LectureViewDto;
 
 export type BreadCrumb = {
   href: string;
