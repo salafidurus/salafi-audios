@@ -1,9 +1,11 @@
-import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@sd/db/client";
 import { getDbEnv } from "@sd/env/db";
 import { parseRemoveArgs } from "../cli/remove-cli";
 import { runRemoval } from "../core/run-removal";
+import { bootstrapEnv } from "../shared/env.bootstrap";
+
+bootstrapEnv();
 
 async function main(): Promise<void> {
   const args = parseRemoveArgs(process.argv.slice(2));

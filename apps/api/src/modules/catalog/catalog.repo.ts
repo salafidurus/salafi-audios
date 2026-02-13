@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/shared/db/prisma.service';
+import { ConfigService } from '@/shared/config/config.service';
 import { Prisma, Status } from '@sd/db/client';
 import { decodeCursor, encodeCursor } from './utils/catalog.cursor';
 import { CatalogListQueryDto } from './dto/catalog-list.query.dto';
@@ -65,13 +66,33 @@ const lectureSelect = {
   deleteAfterAt: true,
   createdAt: true,
   updatedAt: true,
+  audioAssets: {
+    where: { isPrimary: true },
+    orderBy: [{ createdAt: 'asc' }],
+    take: 1,
+    select: {
+      id: true,
+      lectureId: true,
+      url: true,
+      format: true,
+      bitrateKbps: true,
+      sizeBytes: true,
+      durationSeconds: true,
+      source: true,
+      isPrimary: true,
+      createdAt: true,
+    },
+  },
 } satisfies Prisma.LectureSelect;
 
 type LectureRecord = Prisma.LectureGetPayload<{ select: typeof lectureSelect }>;
 
 @Injectable()
 export class CatalogRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly config: ConfigService,
+  ) {}
 
   async listCollections(
     query: CatalogListQueryDto,
@@ -267,6 +288,8 @@ export class CatalogRepository {
   }
 
   private toLectureViewDto(r: LectureRecord): LectureViewDto {
+    const primaryAudioAsset = r.audioAssets[0];
+
     return {
       id: r.id,
       scholarId: r.scholarId,
@@ -279,6 +302,23 @@ export class CatalogRepository {
       publishedAt: r.publishedAt ? r.publishedAt.toISOString() : undefined,
       orderIndex: r.orderIndex ?? undefined,
       durationSeconds: r.durationSeconds ?? undefined,
+      primaryAudioAsset: primaryAudioAsset
+        ? {
+            id: primaryAudioAsset.id,
+            lectureId: primaryAudioAsset.lectureId,
+            url: this.toPublicUrl(primaryAudioAsset.url),
+            format: primaryAudioAsset.format ?? undefined,
+            bitrateKbps: primaryAudioAsset.bitrateKbps ?? undefined,
+            sizeBytes:
+              primaryAudioAsset.sizeBytes !== null
+                ? primaryAudioAsset.sizeBytes.toString()
+                : undefined,
+            durationSeconds: primaryAudioAsset.durationSeconds ?? undefined,
+            source: primaryAudioAsset.source ?? undefined,
+            isPrimary: primaryAudioAsset.isPrimary,
+            createdAt: primaryAudioAsset.createdAt.toISOString(),
+          }
+        : undefined,
       deletedAt: r.deletedAt ? r.deletedAt.toISOString() : undefined,
       deleteAfterAt: r.deleteAfterAt
         ? r.deleteAfterAt.toISOString()
@@ -286,5 +326,18 @@ export class CatalogRepository {
       createdAt: r.createdAt.toISOString(),
       updatedAt: r.updatedAt ? r.updatedAt.toISOString() : undefined,
     };
+  }
+
+  private toPublicUrl(value: string): string {
+    if (/^[a-z]+:\/\//i.test(value)) {
+      return value;
+    }
+
+    const base = this.config.ASSET_CDN_BASE_URL;
+    if (!base) {
+      return value;
+    }
+
+    return `${base.replace(/\/$/, '')}/${value.replace(/^\//, '')}`;
   }
 }

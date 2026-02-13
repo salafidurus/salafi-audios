@@ -1,14 +1,13 @@
 import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import dotenv from "dotenv";
 import { getDbEnv } from "@sd/env/db";
+import { loadDbEnvFiles } from "./load-db-env.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// loads packages/db/.env
-dotenv.config({ path: path.resolve(__dirname, "..", ".env") });
+loadDbEnvFiles(path.resolve(__dirname, ".."));
 
 function run(cmd, args) {
   const r = spawnSync(cmd, args, { stdio: "inherit", env: process.env });

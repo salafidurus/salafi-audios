@@ -12,6 +12,8 @@ This Expo/React Native app prioritizes offline listening and resilient sync.
 
 - Project-local OpenCode skills live in `.opencode/skills/`.
 - Keep mobile-specific skills scoped to this app directory.
+- For image-driven UI tasks, run root `google-stitch` first, then adapt output using this file and mobile-local skills.
+- After Stitch baseline generation, enforce mobile structure (`app/`, `features/`, `core/`, `shared/`) and offline-first constraints.
 
 ## Non-negotiables
 
