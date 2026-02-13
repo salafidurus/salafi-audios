@@ -101,3 +101,7 @@ Direction:
 - Preserve clear separation between UX logic and policy logic.
 - Keep errors explicit and user-safe; do not swallow failures.
 - Add tests for admin actions and permission-sensitive views.
+- TypeScript strictness is non-negotiable: do not allow implicit `any`.
+- For screen loaders/view-model builders, add explicit return types (especially around `Promise.all` results).
+- For `map`/`filter`/`reduce` callbacks that can lose inference in CI, add explicit element types.
+- Before finishing web changes, run `pnpm --filter web typecheck` and `pnpm --filter web build` locally to mirror CI.

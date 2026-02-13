@@ -8,11 +8,17 @@ import { SectionBlock } from "@/features/catalog/components/layout/section-block
 import { EmptyState } from "@/features/catalog/components/states/empty-state";
 import { canonical } from "@/features/catalog/utils/catalog-seo";
 
+type ScholarPageData = {
+  scholar: Awaited<ReturnType<typeof catalogApi.getScholar>>;
+  collections: Awaited<ReturnType<typeof catalogApi.listScholarCollections>>;
+  standaloneSeries: Awaited<ReturnType<typeof catalogApi.listScholarSeries>>;
+};
+
 type ScholarRouteProps = {
   params: Promise<{ scholarSlug: string }>;
 };
 
-async function loadScholarPage(scholarSlug: string) {
+async function loadScholarPage(scholarSlug: string): Promise<ScholarPageData> {
   try {
     const [scholar, collections, series] = await Promise.all([
       catalogApi.getScholar(scholarSlug),
@@ -23,7 +29,10 @@ async function loadScholarPage(scholarSlug: string) {
     return {
       scholar,
       collections,
-      standaloneSeries: series.filter((item) => !item.collectionId),
+      standaloneSeries: series.filter(
+        (item: Awaited<ReturnType<typeof catalogApi.listScholarSeries>>[number]) =>
+          !item.collectionId,
+      ),
     };
   } catch (error) {
     if (error instanceof CatalogApiError && error.status === 404) {

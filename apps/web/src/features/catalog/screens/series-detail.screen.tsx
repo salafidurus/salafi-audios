@@ -8,11 +8,17 @@ import { SectionBlock } from "@/features/catalog/components/layout/section-block
 import { EmptyState } from "@/features/catalog/components/states/empty-state";
 import { canonical } from "@/features/catalog/utils/catalog-seo";
 
+type SeriesPageData = {
+  scholar: Awaited<ReturnType<typeof catalogApi.getScholar>>;
+  series: Awaited<ReturnType<typeof catalogApi.getScholarSeries>>;
+  lectures: Awaited<ReturnType<typeof catalogApi.listSeriesLectures>>;
+};
+
 type SeriesRouteProps = {
   params: Promise<{ scholarSlug: string; seriesSlug: string }>;
 };
 
-async function loadSeriesPage(scholarSlug: string, seriesSlug: string) {
+async function loadSeriesPage(scholarSlug: string, seriesSlug: string): Promise<SeriesPageData> {
   try {
     const [scholar, series, lectures] = await Promise.all([
       catalogApi.getScholar(scholarSlug),
