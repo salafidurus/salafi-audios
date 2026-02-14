@@ -134,6 +134,9 @@ Turbo grouped scripts:
 - If `apps/web` fails with `Module '"@sd/api-client"' has no exported member '<X>ViewDto'`: it usually means `@sd/api-client` codegen didn't run (or Turbo cached the build but didn't restore `packages/api-client/generated/**`).
 - Fix: ensure `@sd/api-client` has a `build` script that runs Orval codegen, and that Turbo `build.outputs` includes `generated/**` so remote cache restores it.
 
+- If `pnpm typecheck` (Turbo typecheck) fails with missing exports from `@sd/api-client` or `packages/api-client/generated/schemas/*` not found: Turbo's `typecheck` pipeline does not imply `build`, so generated API client files may be absent.
+- Fix: make `@sd/api-client`'s `typecheck` run `pnpm codegen` so downstream workspaces (like `apps/web`) can typecheck.
+
 - If `apps/web` fails during `next build` with `Invalid WEB PUBLIC environment variables: NEXT_PUBLIC_API_URL Required`: the web app validated env at module import during prerender.
 - Fix: make env parsing lazy (don’t parse at module top-level) and make pages tolerate missing API env during CI builds by catching fetch errors and returning empty view models.
 

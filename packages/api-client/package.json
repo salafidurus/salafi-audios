@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "test": "echo \"@sd/api-client: skipped (generated)\"",
     "test:prepush": "echo \"@sd/api-client: skipped (generated)\"",
-    "typecheck": "echo \"@sd/api-client: skipped (generated)\""
+    "typecheck": "pnpm codegen"
   },
   "devDependencies": {
     "@sd/config": "workspace:*",
