@@ -22,8 +22,6 @@ const collectionSelect = {
   language: true,
   status: true,
   orderIndex: true,
-  publishedLectureCount: true,
-  publishedDurationSeconds: true,
   deletedAt: true,
   deleteAfterAt: true,
   createdAt: true,
@@ -45,8 +43,6 @@ const seriesSelect = {
   language: true,
   status: true,
   orderIndex: true,
-  publishedLectureCount: true,
-  publishedDurationSeconds: true,
   deletedAt: true,
   deleteAfterAt: true,
   createdAt: true,
@@ -296,10 +292,14 @@ export class CatalogRepository {
 
     const featuredSeriesSelect = {
       ...seriesSelect,
+      publishedLectureCount: true,
+      publishedDurationSeconds: true,
       scholar: { select: { name: true, slug: true } },
     } satisfies Prisma.SeriesSelect;
     const featuredCollectionSelect = {
       ...collectionSelect,
+      publishedLectureCount: true,
+      publishedDurationSeconds: true,
       scholar: { select: { name: true, slug: true } },
     } satisfies Prisma.CollectionSelect;
     const featuredLectureSelect = {
