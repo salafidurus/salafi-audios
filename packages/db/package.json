@@ -22,12 +22,12 @@
     },
     "./client": {
       "import": {
-        "types": "./src/generated/prisma/client.d.ts",
-        "default": "./src/generated/prisma/client.js"
+        "types": "./dist/generated/prisma/client.d.ts",
+        "default": "./dist/generated/prisma/client.js"
       },
       "require": {
-        "types": "./src/generated/prisma/client.d.ts",
-        "default": "./src/generated/prisma/client.js"
+        "types": "./dist/generated/prisma/client.d.ts",
+        "default": "./dist/generated/prisma/client.js"
       }
     }
   },
@@ -44,7 +44,7 @@
     "prisma:validate": "prisma validate --schema=./prisma/schema.prisma --config=./prisma.config.ts",
     "migrate:create-only": "node ./scripts/migrate-with-auto-name.js",
     "migrate:deploy": "prisma migrate deploy --schema=./prisma/schema.prisma --config=./prisma.config.ts",
-    "build": "pnpm prisma:generate && tsup src/index.ts --format esm,cjs --out-dir dist && tsc -p tsconfig.build.json",
+    "build": "pnpm prisma:generate && tsup src/index.ts --format esm,cjs --out-dir dist && node ./scripts/copy-generated-to-dist.js && tsc -p tsconfig.build.json",
     "dev": "pnpm build --watch"
   },
   "dependencies": {

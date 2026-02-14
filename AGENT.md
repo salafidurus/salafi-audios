@@ -118,12 +118,18 @@ Turbo grouped scripts:
 - Keep analytics/events out of authoritative core tables.
 - Treat migrations as first-class and reviewable.
 - Treat `packages/db/src/generated/` as derived output; keep it untracked and regenerate locally when needed.
+- `pnpm --filter @sd/db build` copies Prisma client output into `packages/db/dist/generated/` so Turbo remote cache restores it in CI.
 - Prisma commands (scoped to `@sd/db`):
   - `pnpm --filter @sd/db prisma:generate`
   - `pnpm --filter @sd/db prisma:validate`
   - `pnpm --filter @sd/db prisma:format`
   - `pnpm --filter @sd/db migrate:create-only`
   - `pnpm --filter @sd/db migrate:deploy`
+
+## CI troubleshooting
+
+- If `apps/api` fails with `Cannot find module '@sd/db/client'` and follow-on PrismaService type errors (`$connect`, `$disconnect`, model delegates like `prisma.lecture`): it usually means Prisma Client artifacts were not present in the workspace when TypeScript compiled.
+- Fix: build `@sd/db` so it runs `prisma generate` and produces `packages/db/dist/generated/prisma/*` (Turbo restores `dist/**` from cache, but does not restore `src/generated/**`).
 
 ## Quality and style
 
