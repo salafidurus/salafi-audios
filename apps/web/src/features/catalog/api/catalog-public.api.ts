@@ -1,6 +1,20 @@
 import { webEnv } from "@/shared/utils/env";
 import type { Collection, Lecture, Scholar, Series } from "@/features/catalog/types/catalog.types";
 
+export type FeaturedHomeItem = {
+  kind: "series" | "collection" | "lecture";
+  entityId: string;
+  entitySlug: string;
+  headline: string;
+  title: string;
+  description?: string;
+  coverImageUrl?: string;
+  lessonCount?: number;
+  totalDurationSeconds?: number;
+  presentedBy: string;
+  presentedBySlug?: string;
+};
+
 const CATALOG_REVALIDATE_SECONDS = 120;
 
 export class CatalogApiError extends Error {
@@ -29,6 +43,7 @@ async function requestCatalog<T>(path: string): Promise<T> {
 }
 
 export const catalogApi = {
+  listFeaturedHome: () => requestCatalog<FeaturedHomeItem[]>("/catalog/featured"),
   listScholars: () => requestCatalog<Scholar[]>("/scholars"),
   getScholar: (scholarSlug: string) => requestCatalog<Scholar>(`/scholars/${scholarSlug}`),
   listScholarCollections: (scholarSlug: string) =>

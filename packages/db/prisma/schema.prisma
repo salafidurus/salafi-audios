@@ -154,6 +154,8 @@ model Collection {
   language      String?
   status        Status    @default(draft)
   orderIndex    Int?
+  publishedLectureCount    Int?
+  publishedDurationSeconds Int?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime?
 
@@ -189,6 +191,8 @@ model Series {
   language      String?
   status        Status    @default(draft)
   orderIndex    Int?
+  publishedLectureCount    Int?
+  publishedDurationSeconds Int?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime?
 

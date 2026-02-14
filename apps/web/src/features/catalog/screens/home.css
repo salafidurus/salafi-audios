@@ -9,7 +9,7 @@
 .shell {
   width: min(var(--space-content-max), 100%);
   margin-inline: auto;
-  padding: 0 var(--space-page-x) 2.25rem;
+  padding: var(--home-top-nav-h, 0px) var(--space-page-x) 2.25rem;
   flex: 1;
 }
 

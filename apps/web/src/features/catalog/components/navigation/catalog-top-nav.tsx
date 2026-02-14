@@ -12,14 +12,14 @@ type CatalogTopNavProps = {
 };
 
 export function CatalogTopNav({ searchPlaceholder }: CatalogTopNavProps) {
-  const [isMobileCondensed, setIsMobileCondensed] = useState(false);
+  const [isCondensed, setIsCondensed] = useState(false);
   const headerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const media = window.matchMedia("(max-width: 700px)");
 
     const update = () => {
-      setIsMobileCondensed(media.matches && window.scrollY > 36);
+      setIsCondensed(media.matches && window.scrollY > 36);
     };
 
     update();
@@ -64,7 +64,7 @@ export function CatalogTopNav({ searchPlaceholder }: CatalogTopNavProps) {
     >
       <div
         className={`${styles["home-top-nav-main"]} ${
-          isMobileCondensed ? styles["home-top-nav-main-condensed"] : ""
+          isCondensed ? styles["home-top-nav-main-condensed"] : ""
         }`.trim()}
       >
         <Link href="/" className={styles["home-brand-wrap"]} aria-label="Salafi Durus">

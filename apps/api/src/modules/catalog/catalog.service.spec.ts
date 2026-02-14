@@ -17,6 +17,7 @@ describe('CatalogService', () => {
             listCollections: jest.fn(),
             listRootSeries: jest.fn(),
             listRootLectures: jest.fn(),
+            listFeaturedHomeItems: jest.fn(),
           } satisfies Partial<jest.Mocked<CatalogRepository>>,
         },
       ],
@@ -72,5 +73,12 @@ describe('CatalogService', () => {
     });
 
     expect(repo.listRootLectures).toHaveBeenCalledWith(query);
+  });
+
+  it('delegates listFeaturedHomeItems', async () => {
+    repo.listFeaturedHomeItems.mockResolvedValue([] as never);
+
+    await expect(service.listFeaturedHomeItems()).resolves.toEqual([]);
+    expect(repo.listFeaturedHomeItems).toHaveBeenCalledWith(3);
   });
 });

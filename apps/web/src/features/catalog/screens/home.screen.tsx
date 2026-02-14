@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { catalogApi } from "@/features/catalog/api/catalog-public.api";
+import type { FeaturedHomeItem } from "@/features/catalog/api/catalog-public.api";
 import { NowPlayingBar } from "@/features/catalog/components/audio/now-playing-bar";
 import { LectureMediaCard } from "@/features/catalog/components/cards/lecture-media-card";
 import { ScholarAvatarCard } from "@/features/catalog/components/cards/scholar-avatar-card";
@@ -17,11 +18,7 @@ import { ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 type HomeViewModel = {
   scholars: Awaited<ReturnType<typeof catalogApi.listScholars>>;
   featuredScholarName: string;
-  heroSeries: Array<{
-    title: string;
-    description?: string;
-    coverImageUrl?: string;
-  }>;
+  heroItems: FeaturedHomeItem[];
   recentLectures: Array<{
     title: string;
     scholarName: string;
@@ -48,13 +45,20 @@ export function getHomeMetadata(): Metadata {
 }
 
 async function loadHomeViewModel(): Promise<HomeViewModel> {
+  const heroItems = await (async () => {
+    try {
+      return await catalogApi.listFeaturedHome();
+    } catch {
+      return [];
+    }
+  })();
   const scholars = await catalogApi.listScholars();
 
   if (scholars.length === 0) {
     return {
       scholars: [],
       featuredScholarName: "Salafi Durus",
-      heroSeries: [],
+      heroItems,
       recentLectures: [],
       trendingLectures: [],
     };
@@ -69,17 +73,7 @@ async function loadHomeViewModel(): Promise<HomeViewModel> {
 
   const featuredBundle = scholarSeriesBundles.find((bundle) => bundle.series.length > 0) ?? null;
   const featuredScholar = featuredBundle?.scholar ?? scholars[0];
-  const featuredSeriesCandidate = featuredBundle?.series[0] ?? null;
-
-  const heroSeries = scholarSeriesBundles
-    .flatMap((bundle) => bundle.series)
-    .filter((series) => Boolean(series.coverImageUrl) || Boolean(series.description))
-    .slice(0, 3)
-    .map((series) => ({
-      title: series.title,
-      description: series.description,
-      coverImageUrl: series.coverImageUrl,
-    }));
+  // Featured hero items come from the dedicated endpoint.
 
   const lectureSourceSeries = scholarSeriesBundles
     .flatMap((bundle) =>
@@ -120,18 +114,7 @@ async function loadHomeViewModel(): Promise<HomeViewModel> {
   return {
     scholars,
     featuredScholarName: featuredScholar.name,
-    heroSeries:
-      heroSeries.length > 0
-        ? heroSeries
-        : featuredSeriesCandidate
-          ? [
-              {
-                title: featuredSeriesCandidate.title,
-                description: featuredSeriesCandidate.description,
-                coverImageUrl: featuredSeriesCandidate.coverImageUrl,
-              },
-            ]
-          : [],
+    heroItems,
     recentLectures,
     trendingLectures,
   };
@@ -145,7 +128,7 @@ export async function HomeScreen() {
     <div className="pageRoot">
       <CatalogTopNav searchPlaceholder="Search for lectures, books, or scholars..." />
       <main className="shell">
-        <HomeHero items={model.heroSeries} />
+        <HomeHero items={model.heroItems} />
         <HomeContentNav />
 
         <section className="section">

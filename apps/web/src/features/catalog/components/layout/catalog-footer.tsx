@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import styles from "./catalog-footer.module.css";
 import { Button } from "@/shared/components/button/button";
@@ -8,12 +9,18 @@ export function CatalogFooter() {
     <footer className={styles.footer} aria-label="Site footer">
       <div className={styles.inner}>
         <div className={styles.topRow}>
-          <div className={styles.brand} aria-label="Salafi Durus">
+          <Link href="/" className={styles.brand} aria-label="Salafi Durus">
             <span className={styles.mark} aria-hidden="true">
-              SD
+              <Image
+                src="/logo/logo_72.png"
+                alt=""
+                width={36}
+                height={36}
+                className={styles.brandImg}
+              />
             </span>
             <span className={styles.brandName}>Salafi Durus</span>
-          </div>
+          </Link>
 
           <nav className={styles.links} aria-label="Footer links">
             <Link href="/">Privacy Policy</Link>

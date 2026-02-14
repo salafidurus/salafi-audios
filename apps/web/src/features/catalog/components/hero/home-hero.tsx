@@ -1,18 +1,22 @@
 "use client";
 
-import styles from "./home-hero.module.css";
-import React, { useEffect, useMemo, useState } from "react";
-import { Bookmark, ChevronLeft, ChevronRight, Play } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Bookmark,
+  ChevronLeft,
+  ChevronRight,
+  Clock3,
+  ListVideo,
+  Play,
+  Sparkle,
+} from "lucide-react";
+import type { FeaturedHomeItem } from "@/features/catalog/api/catalog-public.api";
 import { Button } from "@/shared/components/button/button";
-
-type HomeHeroItem = {
-  title: string;
-  description?: string;
-  coverImageUrl?: string;
-};
+import styles from "./home-hero.module.css";
 
 type HomeHeroProps = {
-  items: HomeHeroItem[];
+  items: FeaturedHomeItem[];
 };
 
 function clampIndex(value: number, length: number) {
@@ -20,130 +24,255 @@ function clampIndex(value: number, length: number) {
   return ((value % length) + length) % length;
 }
 
+function formatDuration(seconds: number) {
+  const totalMinutes = Math.max(0, Math.round(seconds / 60));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+
+  if (hours <= 0) return `${totalMinutes}m`;
+  if (minutes <= 0) return `${hours}h`;
+  return `${hours}h ${minutes}m`;
+}
+
 export function HomeHero({ items }: HomeHeroProps) {
-  const slides = useMemo<HomeHeroItem[]>(() => {
-    if (items.length > 0) return items;
+  const slides = useMemo<FeaturedHomeItem[]>(() => {
+    if (items.length > 0) return items.slice(0, 3);
 
     return [
       {
-        title: "Begin your learning journey",
+        kind: "series",
+        entityId: "fallback",
+        entitySlug: "fallback",
+        headline: "Tawhid First",
+        title: "Featured study",
         description:
           "Explore published lectures organized by scholars, collections, and thematic series.",
+        lessonCount: 0,
+        totalDurationSeconds: 0,
+        presentedBy: "Salafi Durus",
       },
     ];
   }, [items]);
 
+  const hasCarousel = slides.length > 1;
   const [index, setIndex] = useState(0);
-  const [reduceMotion, setReduceMotion] = useState(false);
+  const [dir, setDir] = useState<1 | -1>(1);
+  const heroRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => setReduceMotion(media.matches);
-    update();
+    const node = heroRef.current;
+    if (!node) return;
 
-    media.addEventListener("change", update);
-    return () => media.removeEventListener("change", update);
+    const html = document.documentElement;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (!entry) return;
+
+        if (entry.isIntersecting) {
+          html.dataset.heroInview = "true";
+        } else {
+          delete html.dataset.heroInview;
+        }
+      },
+      { threshold: 0.35 },
+    );
+
+    obs.observe(node);
+    return () => {
+      obs.disconnect();
+      delete html.dataset.heroInview;
+    };
   }, []);
 
   useEffect(() => {
-    if (slides.length <= 1) return;
-    if (reduceMotion) return;
+    if (!hasCarousel) return;
 
     const id = window.setInterval(() => {
-      setIndex((current) => clampIndex(current + 1, slides.length));
+      setIndex((current) => {
+        const next = current + dir;
+
+        if (next >= slides.length) {
+          setDir(-1);
+          return Math.max(0, current - 1);
+        }
+
+        if (next < 0) {
+          setDir(1);
+          return Math.min(slides.length - 1, current + 1);
+        }
+
+        return next;
+      });
     }, 8200);
 
     return () => window.clearInterval(id);
-  }, [reduceMotion, slides.length]);
+  }, [dir, hasCarousel, slides.length]);
 
   const active = slides[clampIndex(index, slides.length)]!;
-  const title = active.title;
-  const description =
-    active.description ??
-    "Explore published lectures organized by scholars, collections, and thematic series.";
-  const hasCarousel = slides.length > 1;
+
+  const goPrev = () => {
+    setDir(-1);
+    setIndex((v) => clampIndex(v - 1, slides.length));
+  };
+
+  const goNext = () => {
+    setDir(1);
+    setIndex((v) => clampIndex(v + 1, slides.length));
+  };
+
+  const featuredLabel = (() => {
+    if (active.kind === "lecture") return "Featured lecture";
+    if (active.kind === "collection") return "Featured collection";
+    return "Featured series";
+  })();
 
   return (
-    <section className={styles.hero} aria-label="Featured series">
-      <div
-        key={active.coverImageUrl ?? active.title}
-        className={styles.media}
-        style={
-          active.coverImageUrl ? { backgroundImage: `url(${active.coverImageUrl})` } : undefined
-        }
-        aria-hidden="true"
-      />
-      <div className={styles.scrim} aria-hidden="true" />
-
+    <section
+      ref={(el) => {
+        heroRef.current = el;
+      }}
+      className={styles.hero}
+      aria-label="Featured study"
+    >
       <div className={styles.inner}>
-        <div className={styles.header}>
-          <span className={styles.pill}>
-            <span className={styles.pillIcon} aria-hidden="true">
-              *
-            </span>
-            Featured Series
-          </span>
-        </div>
+        <motion.div
+          className={styles.stage}
+          drag={hasCarousel ? "x" : false}
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.06}
+          dragDirectionLock
+          style={hasCarousel ? { cursor: "grab" } : undefined}
+          onDragEnd={(_, info) => {
+            if (!hasCarousel) return;
 
-        <h1 className={styles.title}>{title}</h1>
-        <p className={styles.copy}>{description}</p>
+            if (info.offset.x > 80) {
+              goPrev();
+            } else if (info.offset.x < -80) {
+              goNext();
+            }
+          }}
+        >
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={active.entityId}
+              className={styles.slide}
+              initial={{ opacity: 0, x: dir === 1 ? 36 : -36 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: dir === 1 ? -32 : 32 }}
+              transition={{ duration: 0.42, ease: "easeOut" }}
+            >
+              <div className={styles.coverWrap}>
+                <div
+                  className={styles.cover}
+                  style={
+                    active.coverImageUrl
+                      ? { backgroundImage: `url(${active.coverImageUrl})` }
+                      : undefined
+                  }
+                  aria-hidden="true"
+                />
+                <div className={styles.coverGlow} aria-hidden="true" />
+              </div>
 
-        <div className={styles.actions}>
-          <Button variant="primary" size="lg" aria-disabled="true">
-            <Play size={18} aria-hidden="true" />
-            Start learning
-          </Button>
+              <div className={styles.content}>
+                <div className={styles.kickerRow}>
+                  <span className={styles.pill}>
+                    <span className={styles.pillIcon} aria-hidden="true">
+                      <Sparkle size={14} aria-hidden="true" />
+                    </span>
+                    {featuredLabel}
+                  </span>
+                </div>
 
-          <Button
-            variant="outline"
-            size="icon"
-            aria-label="Save"
-            aria-disabled="true"
-            className={styles.heroIconBtn}
-          >
-            <Bookmark size={18} aria-hidden="true" />
-          </Button>
-        </div>
+                <div className={styles.tagline}>{active.headline}</div>
+
+                <h1 className={styles.title}>{active.title}</h1>
+
+                <div className={styles.scholarName}>{active.presentedBy}</div>
+
+                <div className={styles.meta}>
+                  {active.lessonCount > 0 ? (
+                    <span className={styles.metaItem}>
+                      <ListVideo size={16} aria-hidden="true" />
+                      {active.lessonCount} {active.lessonCount === 1 ? "lesson" : "lessons"}
+                    </span>
+                  ) : null}
+                  {active.totalDurationSeconds > 0 ? (
+                    <span className={styles.metaItem}>
+                      <Clock3 size={16} aria-hidden="true" />
+                      {formatDuration(active.totalDurationSeconds)}
+                    </span>
+                  ) : null}
+                </div>
+
+                {active.description ? (
+                  <p className={styles.description}>{active.description}</p>
+                ) : null}
+
+                <div className={styles.actions}>
+                  <Button variant="primary" size="lg" aria-disabled="true">
+                    <Play size={18} aria-hidden="true" />
+                    Start learning
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    aria-label="Save"
+                    aria-disabled="true"
+                    className={styles.heroIconBtn}
+                  >
+                    <Bookmark size={18} aria-hidden="true" />
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </motion.div>
+
+        {hasCarousel ? (
+          <div className={styles.dots} aria-label="Hero slide navigation">
+            {slides.map((slide, slideIndex) => (
+              <button
+                key={slide.entityId}
+                type="button"
+                className={
+                  slideIndex === clampIndex(index, slides.length) ? styles.dotActive : styles.dot
+                }
+                aria-label={`Go to slide ${slideIndex + 1}`}
+                aria-current={slideIndex === clampIndex(index, slides.length) ? "true" : undefined}
+                onClick={() => {
+                  setDir(slideIndex > index ? 1 : -1);
+                  setIndex(slideIndex);
+                }}
+              />
+            ))}
+          </div>
+        ) : null}
       </div>
 
       {hasCarousel ? (
-        <div className={styles.chrome} aria-hidden="true">
+        <>
           <Button
             variant="ghost"
             size="icon"
-            className={styles.heroArrowBtn}
-            aria-label="Previous slide"
-            onClick={() => setIndex((current) => clampIndex(current - 1, slides.length))}
+            className={`${styles.edgeBtn} ${styles.edgeBtnLeft}`}
+            aria-label="Previous"
+            onClick={goPrev}
           >
             <ChevronLeft size={18} aria-hidden="true" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            className={styles.heroArrowBtn}
-            aria-label="Next slide"
-            onClick={() => setIndex((current) => clampIndex(current + 1, slides.length))}
+            className={`${styles.edgeBtn} ${styles.edgeBtnRight}`}
+            aria-label="Next"
+            onClick={goNext}
           >
             <ChevronRight size={18} aria-hidden="true" />
           </Button>
-        </div>
-      ) : null}
-
-      {hasCarousel ? (
-        <div className={styles.dots} aria-label="Hero slide navigation">
-          {slides.map((_, slideIndex) => (
-            <button
-              key={slideIndex}
-              type="button"
-              className={
-                slideIndex === clampIndex(index, slides.length) ? styles.dotActive : styles.dot
-              }
-              aria-label={`Go to slide ${slideIndex + 1}`}
-              aria-current={slideIndex === clampIndex(index, slides.length) ? "true" : undefined}
-              onClick={() => setIndex(slideIndex)}
-            />
-          ))}
-        </div>
+        </>
       ) : null}
     </section>
   );

@@ -22,8 +22,8 @@
           "topicSlugs": ["fiqh"],
           "series": [
             {
-              "slug": "taharah",
-              "title": "Taharah",
+              "slug": "kitab-ut-taharah",
+              "title": "Kitab ut-Taharah",
               "language": "ar",
               "status": "published",
               "orderIndex": 1,
@@ -553,7 +553,7 @@
       "series": [
         {
           "slug": "aqeedah-arraziyayn",
-          "title": "Sharh Aqidah al-Imamayn al-Raziyayn",
+          "title": "Aqeedah ar-Raziyayn",
           "language": "ar",
           "status": "published",
           "orderIndex": 1,
@@ -561,7 +561,7 @@
           "lectures": [
             {
               "slug": "aqeedah-arraziyayn-01",
-              "title": "Sharh Aqidah al-Raziyayn 01",
+              "title": "Aqeedah ar-Raziyayn 01",
               "language": "ar",
               "status": "published",
               "orderIndex": 1,
@@ -576,7 +576,7 @@
             },
             {
               "slug": "aqeedah-arraziyayn-02",
-              "title": "Sharh Aqidah al-Raziyayn 02",
+              "title": "Aqeedah ar-Raziyayn 02",
               "language": "ar",
               "status": "published",
               "orderIndex": 2,
@@ -591,7 +591,7 @@
             },
             {
               "slug": "aqeedah-arraziyayn-03",
-              "title": "Sharh Aqidah al-Raziyayn 03",
+              "title": "Aqeedah ar-Raziyayn 03",
               "language": "ar",
               "status": "published",
               "orderIndex": 3,
@@ -606,7 +606,7 @@
             },
             {
               "slug": "aqeedah-arraziyayn-04",
-              "title": "Sharh Aqidah al-Raziyayn 04",
+              "title": "Aqeedah ar-Raziyayn 04",
               "language": "ar",
               "status": "published",
               "orderIndex": 4,
@@ -621,7 +621,7 @@
             },
             {
               "slug": "aqeedah-arraziyayn-05",
-              "title": "Sharh Aqidah al-Raziyayn 05",
+              "title": "Aqeedah ar-Raziyayn 05",
               "language": "ar",
               "status": "published",
               "orderIndex": 5,
@@ -636,7 +636,7 @@
             },
             {
               "slug": "aqeedah-arraziyayn-06",
-              "title": "Sharh Aqidah al-Raziyayn 06",
+              "title": "Aqeedah ar-Raziyayn 06",
               "language": "ar",
               "status": "published",
               "orderIndex": 6,
@@ -651,7 +651,7 @@
             },
             {
               "slug": "aqeedah-arraziyayn-07",
-              "title": "Sharh Aqidah al-Raziyayn 07",
+              "title": "Aqeedah ar-Raziyayn 07",
               "language": "ar",
               "status": "published",
               "orderIndex": 7,
@@ -666,7 +666,7 @@
             },
             {
               "slug": "aqeedah-arraziyayn-08",
-              "title": "Sharh Aqidah al-Raziyayn 08",
+              "title": "Aqeedah ar-Raziyayn 08",
               "language": "ar",
               "status": "published",
               "orderIndex": 8,
@@ -733,6 +733,61 @@
             {
               "slug": "usul-thalatha-03",
               "title": "Usul al-Thalatha 03",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 3,
+              "topicSlugs": ["aqidah"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/al-uthaymin/usul-thalatha/03.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "kitab-ut-tawhid",
+          "title": "Kitab ut-Tawhid",
+          "language": "ar",
+          "status": "published",
+          "orderIndex": 2,
+          "topicSlugs": ["aqidah"],
+          "lectures": [
+            {
+              "slug": "kitab-ut-tawhid-01",
+              "title": "Kitab ut-Tawhid 01",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 1,
+              "topicSlugs": ["aqidah"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/al-uthaymin/usul-thalatha/01.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "kitab-ut-tawhid-02",
+              "title": "Kitab ut-Tawhid 02",
+              "language": "ar",
+              "status": "published",
+              "orderIndex": 2,
+              "topicSlugs": ["aqidah"],
+              "audioAssets": [
+                {
+                  "file": "packages/ingest/content/audio/al-uthaymin/usul-thalatha/02.mp3",
+                  "format": "mp3",
+                  "isPrimary": true
+                }
+              ]
+            },
+            {
+              "slug": "kitab-ut-tawhid-03",
+              "title": "Kitab ut-Tawhid 03",
               "language": "ar",
               "status": "published",
               "orderIndex": 3,

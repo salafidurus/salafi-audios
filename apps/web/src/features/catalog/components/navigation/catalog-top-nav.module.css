@@ -3,10 +3,12 @@
   top: 0;
   left: 0;
   z-index: 40;
-  width: 100vw;
-  margin-inline: calc(50% - 50vw);
-  padding: 0.68rem clamp(1.4rem, 4.8vw, 3.25rem);
+  right: 0;
+  width: 100%;
+  padding: 0.72rem 0;
   background: var(--color-surface);
+  box-sizing: border-box;
+  overflow-x: clip;
   box-shadow:
     0 1px 0 color-mix(in srgb, var(--color-border) 86%, transparent),
     0 10px 24px -24px rgb(20 47 33 / 0.42);
@@ -57,10 +59,11 @@
   grid-template-columns: auto auto minmax(16rem, 26rem) auto;
   align-items: center;
   column-gap: clamp(1rem, 2.4vw, 2.1rem);
-  row-gap: var(--space-gap-md);
+  row-gap: 0;
   width: min(var(--space-content-max), 100%);
   margin-inline: auto;
-  padding: 0;
+  padding-inline: clamp(1.4rem, 4.8vw, 3.25rem);
+  padding-block: 0;
 }
 
 .home-brand-wrap {
@@ -98,6 +101,10 @@
   font-size: 1.2rem;
   font-weight: 700;
   line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 14rem;
 }
 
 :global(html[data-hero-inview="true"]) .home-brand {
@@ -109,6 +116,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-gap-xl);
+  min-width: 0;
 }
 
 .home-nav-link {
@@ -150,13 +158,11 @@
   grid-area: search;
   min-width: 0;
   width: 100%;
+  max-width: 26rem;
 }
 
 .home-top-nav-main-condensed {
-  grid-template-areas:
-    "brand actions"
-    "search search"
-    "nav nav";
+  /* Mobile-only: see @media (max-width: 700px) */
 }
 
 .home-auth-actions {
@@ -178,14 +184,22 @@
       "search search"
       "nav nav";
     grid-template-columns: minmax(0, 1fr) auto;
-    row-gap: var(--space-gap-md);
+    row-gap: 0.75rem;
+  }
+
+  .home-search-slot {
+    max-width: none;
   }
 
   .home-nav-links {
+    width: 100%;
     justify-content: center;
-    gap: var(--space-gap-lg);
-    padding-top: 0;
-    border-top: 0;
+    gap: clamp(1rem, 2.2vw, 1.4rem);
+  }
+
+  .home-nav-link {
+    text-align: center;
+    padding: 0.15rem 0;
   }
 
   .home-nav-link-active::after {
@@ -195,11 +209,7 @@
 
 @media (max-width: 960px) {
   .home-top-nav {
-    padding: 0.7rem 1.2rem;
-  }
-
-  .home-top-nav-main {
-    row-gap: var(--space-gap-md);
+    padding: 0.72rem 0;
   }
 
   .home-nav-links {
@@ -216,8 +226,9 @@
 }
 
 @media (max-width: 700px) {
-  .home-top-nav {
-    padding: 0.72rem 1rem;
+  .home-top-nav-main {
+    padding-inline: 1rem;
+    row-gap: 0.7rem;
   }
 
   .home-brand {
@@ -229,11 +240,11 @@
   }
 
   .home-nav-links {
-    justify-content: center;
-    flex-wrap: wrap;
-    white-space: normal;
-    padding-bottom: 0;
-    gap: var(--space-gap-lg);
+    gap: 0.95rem;
+  }
+
+  .home-nav-link {
+    font-size: 0.84rem;
   }
 
   .home-top-nav-main-condensed {
