@@ -13,7 +13,6 @@ import {
 import { CollectionViewDto } from '../collections/dto/collection-view.dto';
 import { SeriesViewDto } from '../series/dto/series-view.dto';
 import { LectureViewDto } from '../lectures/dto/lecture-view.dto';
-import { FeaturedHomeItemDto } from './dto/featured-home-item.dto';
 
 @SkipThrottle()
 @ApiTags('Catalog')
@@ -21,13 +20,6 @@ import { FeaturedHomeItemDto } from './dto/featured-home-item.dto';
 @Controller('catalog')
 export class CatalogController {
   constructor(private readonly catalog: CatalogService) {}
-
-  @Get('featured')
-  @ApiOperation({ summary: 'Get featured home carousel items (max 3)' })
-  @ApiOkResponse({ type: FeaturedHomeItemDto, isArray: true })
-  featured(): Promise<FeaturedHomeItemDto[]> {
-    return this.catalog.listFeaturedHomeItems();
-  }
 
   @Get('collections')
   @ApiOperation({ summary: 'Browse published collections (catalog root)' })

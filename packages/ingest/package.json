@@ -24,6 +24,7 @@
     "ingest:content": "tsx src/commands/ingest-content.ts",
     "preingest:remove": "pnpm --filter @sd/env build",
     "ingest:remove": "tsx src/commands/remove-content.ts",
+    "convert:supabase": "tsx src/commands/convert-supabase.ts",
     "pretypecheck": "pnpm --filter @sd/db prisma:generate",
     "lint": "eslint .",
     "test": "jest --passWithNoTests",

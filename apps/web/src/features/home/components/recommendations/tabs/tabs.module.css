@@ -19,6 +19,7 @@
   scrollbar-width: none;
   width: fit-content;
   max-width: 100%;
+  margin-inline: auto;
 }
 
 .tabs::-webkit-scrollbar {

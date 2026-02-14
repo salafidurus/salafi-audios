@@ -11,17 +11,17 @@ import {
   Play,
   Sparkle,
 } from "lucide-react";
-import type { FeaturedItem } from "@/features/home/api/public-api";
+import type { RecommendationHeroItem } from "@/features/home/api/public-api";
 import { Button } from "@/shared/components/button/button";
 import styles from "./hero.module.css";
 
 type HeroProps = {
-  items: FeaturedItem[];
+  items: RecommendationHeroItem[];
 };
 
 function clampIndex(value: number, length: number) {
-  if (length <= 0) return 0;
-  return ((value % length) + length) % length;
+  if (length <= 1) return 0;
+  return Math.min(Math.max(value, 0), length - 1);
 }
 
 function formatDuration(seconds: number) {
@@ -35,7 +35,7 @@ function formatDuration(seconds: number) {
 }
 
 export function Hero({ items }: HeroProps) {
-  const slides = useMemo<FeaturedItem[]>(() => {
+  const slides = useMemo<RecommendationHeroItem[]>(() => {
     if (items.length > 0) return items.slice(0, 3);
 
     return [
@@ -90,19 +90,9 @@ export function Hero({ items }: HeroProps) {
 
     const id = window.setInterval(() => {
       setIndex((current) => {
-        const next = current + dir;
-
-        if (next >= slides.length) {
-          setDir(-1);
-          return Math.max(0, current - 1);
-        }
-
-        if (next < 0) {
-          setDir(1);
-          return Math.min(slides.length - 1, current + 1);
-        }
-
-        return next;
+        if (dir === 1 && current >= slides.length - 1) return current;
+        if (dir === -1 && current <= 0) return current;
+        return clampIndex(current + dir, slides.length);
       });
     }, 8200);
 
@@ -110,13 +100,17 @@ export function Hero({ items }: HeroProps) {
   }, [dir, hasCarousel, slides.length]);
 
   const active = slides[clampIndex(index, slides.length)]!;
+  const canPrev = index > 0;
+  const canNext = index < slides.length - 1;
 
   const goPrev = () => {
+    if (!canPrev) return;
     setDir(-1);
     setIndex((v) => clampIndex(v - 1, slides.length));
   };
 
   const goNext = () => {
+    if (!canNext) return;
     setDir(1);
     setIndex((v) => clampIndex(v + 1, slides.length));
   };
@@ -149,9 +143,9 @@ export function Hero({ items }: HeroProps) {
           onDragEnd={(_, info) => {
             if (!hasCarousel) return;
 
-            if (info.offset.x > 80) {
+            if (info.offset.x > 80 && canPrev) {
               goPrev();
-            } else if (info.offset.x < -80) {
+            } else if (info.offset.x < -80 && canNext) {
               goNext();
             }
           }}
@@ -240,11 +234,9 @@ export function Hero({ items }: HeroProps) {
               <button
                 key={slide.entityId}
                 type="button"
-                className={
-                  slideIndex === clampIndex(index, slides.length) ? styles.dotActive : styles.dot
-                }
+                className={slideIndex === index ? styles.dotActive : styles.dot}
                 aria-label={`Go to slide ${slideIndex + 1}`}
-                aria-current={slideIndex === clampIndex(index, slides.length) ? "true" : undefined}
+                aria-current={slideIndex === index ? "true" : undefined}
                 onClick={() => {
                   setDir(slideIndex > index ? 1 : -1);
                   setIndex(slideIndex);
@@ -262,6 +254,8 @@ export function Hero({ items }: HeroProps) {
             size="icon"
             className={`${styles.edgeBtn} ${styles.edgeBtnLeft}`}
             aria-label="Previous"
+            disabled={!canPrev}
+            aria-disabled={!canPrev}
             onClick={goPrev}
           >
             <ChevronLeft size={18} aria-hidden="true" />
@@ -271,6 +265,8 @@ export function Hero({ items }: HeroProps) {
             size="icon"
             className={`${styles.edgeBtn} ${styles.edgeBtnRight}`}
             aria-label="Next"
+            disabled={!canNext}
+            aria-disabled={!canNext}
             onClick={goNext}
           >
             <ChevronRight size={18} aria-hidden="true" />

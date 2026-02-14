@@ -22,6 +22,10 @@ export type HomeContentContext = {
   lectureBuckets: Lecture[][];
   preferredTopic: TopicDetail | null;
   topicLectures: TopicLecture[];
+  kibarItems?: RecommendationItem[];
+  topicItems?: RecommendationItem[];
+  kibarCursor?: string;
+  topicCursor?: string;
 };
 
 const DEFAULT_TOPIC_SLUGS = ["hadith", "fiqh", "mustalah"];
@@ -51,7 +55,17 @@ export function buildHomeContent(context: HomeContentContext): {
   tabs: Tab[];
   leadLecture: { title: string; scholarName: string } | null;
 } {
-  const { scholars, scholarBundles, lectureBuckets, preferredTopic, topicLectures } = context;
+  const {
+    scholars,
+    scholarBundles,
+    lectureBuckets,
+    preferredTopic,
+    topicLectures,
+    kibarItems: kibarOverride,
+    topicItems: topicOverride,
+    kibarCursor,
+    topicCursor,
+  } = context;
   const scholarById = new Map<string, Scholar>(scholars.map((scholar) => [scholar.id, scholar]));
   const seriesIndex = new Map<string, Series>();
 
@@ -95,6 +109,8 @@ export function buildHomeContent(context: HomeContentContext): {
       subtitle: scholar.name,
       href: `/lectures/${scholar.slug}/${lecture.slug}`,
       coverImageUrl: series?.coverImageUrl,
+      lessonCount: 1,
+      totalDurationSeconds: lecture.durationSeconds ?? undefined,
       meta,
     };
   };
@@ -125,39 +141,45 @@ export function buildHomeContent(context: HomeContentContext): {
         bundle.lectures.length > 0 || bundle.series.length > 0 || bundle.collections.length > 0,
     ) ?? null;
 
-  const kibarItems: RecommendationItem[] = [];
+  const kibarItems: RecommendationItem[] = kibarOverride?.length ? kibarOverride : [];
 
-  if (featuredBundle?.lectures[0]) {
-    kibarItems.push(buildLectureItem(featuredBundle.lectures[0], featuredBundle.scholar));
+  if (kibarItems.length === 0) {
+    if (featuredBundle?.lectures[0]) {
+      kibarItems.push(buildLectureItem(featuredBundle.lectures[0], featuredBundle.scholar));
+    }
+    if (featuredBundle?.series[0]) {
+      kibarItems.push(buildSeriesItem(featuredBundle.series[0], featuredBundle.scholar));
+    }
+    if (featuredBundle?.collections[0]) {
+      kibarItems.push(buildCollectionItem(featuredBundle.collections[0], featuredBundle.scholar));
+    }
   }
-  if (featuredBundle?.series[0]) {
-    kibarItems.push(buildSeriesItem(featuredBundle.series[0], featuredBundle.scholar));
-  }
-  if (featuredBundle?.collections[0]) {
-    kibarItems.push(buildCollectionItem(featuredBundle.collections[0], featuredBundle.scholar));
-  }
 
-  const topicItems = topicLectures
-    .map((lecture) => {
-      const scholar = scholarById.get(lecture.scholarId);
-      if (!scholar) return null;
+  const topicItems = topicOverride?.length
+    ? topicOverride
+    : (topicLectures
+        .map((lecture) => {
+          const scholar = scholarById.get(lecture.scholarId);
+          if (!scholar) return null;
 
-      const series = lecture.seriesId ? seriesIndex.get(lecture.seriesId) : undefined;
-      const meta = lecture.durationSeconds
-        ? formatDuration(lecture.durationSeconds)
-        : (lecture.language ?? undefined);
+          const series = lecture.seriesId ? seriesIndex.get(lecture.seriesId) : undefined;
+          const meta = lecture.durationSeconds
+            ? formatDuration(lecture.durationSeconds)
+            : (lecture.language ?? undefined);
 
-      return {
-        id: lecture.id,
-        kind: "lecture",
-        title: lecture.title,
-        subtitle: scholar.name,
-        href: `/lectures/${scholar.slug}/${lecture.slug}`,
-        coverImageUrl: series?.coverImageUrl,
-        meta,
-      } satisfies RecommendationItem;
-    })
-    .filter((item) => item !== null) as RecommendationItem[];
+          return {
+            id: lecture.id,
+            kind: "lecture",
+            title: lecture.title,
+            subtitle: scholar.name,
+            href: `/lectures/${scholar.slug}/${lecture.slug}`,
+            coverImageUrl: series?.coverImageUrl,
+            lessonCount: 1,
+            totalDurationSeconds: lecture.durationSeconds ?? undefined,
+            meta,
+          } satisfies RecommendationItem;
+        })
+        .filter((item) => item !== null) as RecommendationItem[]);
 
   const recentLectureItems = recentLectureEntries
     .map(({ lecture, scholar }) => buildLectureItem(lecture, scholar))
@@ -194,11 +216,16 @@ export function buildHomeContent(context: HomeContentContext): {
           id: "kibar",
           title: "Recommended from Kibar ul-Ulama",
           items: kibarItems,
+          variant: "featured",
+          cursor: kibarCursor,
+          source: { kind: "kibar" },
         },
         {
           id: "topic",
           title: preferredTopic ? `Recommended in ${preferredTopic.name}` : "Topic focus",
           items: topicItems,
+          cursor: topicCursor,
+          source: preferredTopic ? { kind: "topic", topicSlug: preferredTopic.slug } : undefined,
         },
         {
           id: "popular",

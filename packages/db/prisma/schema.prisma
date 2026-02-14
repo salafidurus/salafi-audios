@@ -20,6 +20,11 @@ enum Status {
   archived
 }
 
+enum RecommendationRecurrence {
+  none
+  yearly
+}
+
 enum GlobalRole {
   admin
   listener
@@ -125,6 +130,7 @@ model Scholar {
   mainLanguage String?
   imageUrl     String?
   isActive     Boolean   @default(true)
+  isKibar      Boolean   @default(false)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime?
 
@@ -145,18 +151,22 @@ model Scholar {
 //////////////////////////
 
 model Collection {
-  id                       String    @id @default(cuid())
+  id                       String                    @id @default(cuid())
   scholarId                String
   slug                     String
   title                    String
   description              String?
   coverImageUrl            String?
   language                 String?
-  status                   Status    @default(draft)
+  status                   Status                    @default(draft)
   orderIndex               Int?
   publishedLectureCount    Int?
   publishedDurationSeconds Int?
-  createdAt                DateTime  @default(now())
+  recommendationOverride   Boolean                   @default(false)
+  recommendationStartAt    DateTime?
+  recommendationEndAt      DateTime?
+  recommendationRecurrence RecommendationRecurrence? @default(none)
+  createdAt                DateTime                  @default(now())
   updatedAt                DateTime?
 
   deletedAt     DateTime?
@@ -181,7 +191,7 @@ model Collection {
 //////////////////////////
 
 model Series {
-  id                       String    @id @default(cuid())
+  id                       String                    @id @default(cuid())
   scholarId                String
   collectionId             String?
   slug                     String
@@ -189,11 +199,15 @@ model Series {
   description              String?
   coverImageUrl            String?
   language                 String?
-  status                   Status    @default(draft)
+  status                   Status                    @default(draft)
   orderIndex               Int?
   publishedLectureCount    Int?
   publishedDurationSeconds Int?
-  createdAt                DateTime  @default(now())
+  recommendationOverride   Boolean                   @default(false)
+  recommendationStartAt    DateTime?
+  recommendationEndAt      DateTime?
+  recommendationRecurrence RecommendationRecurrence? @default(none)
+  createdAt                DateTime                  @default(now())
   updatedAt                DateTime?
 
   deletedAt     DateTime?
@@ -219,19 +233,23 @@ model Series {
 //////////////////////////
 
 model Lecture {
-  id              String    @id @default(cuid())
-  scholarId       String
-  seriesId        String?
-  slug            String
-  title           String
-  description     String?
-  language        String?
-  status          Status    @default(draft)
-  publishedAt     DateTime?
-  orderIndex      Int?
-  durationSeconds Int?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime?
+  id                       String                    @id @default(cuid())
+  scholarId                String
+  seriesId                 String?
+  slug                     String
+  title                    String
+  description              String?
+  language                 String?
+  status                   Status                    @default(draft)
+  publishedAt              DateTime?
+  orderIndex               Int?
+  durationSeconds          Int?
+  recommendationOverride   Boolean                   @default(false)
+  recommendationStartAt    DateTime?
+  recommendationEndAt      DateTime?
+  recommendationRecurrence RecommendationRecurrence? @default(none)
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime?
 
   deletedAt     DateTime?
   deleteAfterAt DateTime?

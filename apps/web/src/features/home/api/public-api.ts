@@ -8,7 +8,7 @@ import type {
   TopicLecture,
 } from "@/features/library/types/library.types";
 
-export type FeaturedItem = {
+export type RecommendationHeroItem = {
   kind: "series" | "collection" | "lecture";
   entityId: string;
   entitySlug: string;
@@ -20,9 +20,32 @@ export type FeaturedItem = {
   totalDurationSeconds?: number;
   presentedBy: string;
   presentedBySlug?: string;
+  workAuthor?: string;
+};
+
+export type RecommendationItem = {
+  kind: "series" | "collection" | "lecture";
+  entityId: string;
+  entitySlug: string;
+  title: string;
+  coverImageUrl?: string;
+  lessonCount?: number;
+  totalDurationSeconds?: number;
+  scholarName: string;
+  scholarSlug?: string;
+};
+
+export type RecommendationPage = {
+  items: RecommendationItem[];
+  nextCursor?: string;
 };
 
 const PUBLIC_REVALIDATE_SECONDS = 120;
+
+type RequestOptions = {
+  cache?: RequestCache;
+  revalidateSeconds?: number;
+};
 
 export class PublicApiError extends Error {
   readonly status: number;
@@ -33,11 +56,12 @@ export class PublicApiError extends Error {
   }
 }
 
-async function requestPublic<T>(path: string): Promise<T> {
+async function requestPublic<T>(path: string, options?: RequestOptions): Promise<T> {
   const base = getWebEnv().NEXT_PUBLIC_API_URL.replace(/\/$/, "");
+  const revalidateSeconds = options?.revalidateSeconds ?? PUBLIC_REVALIDATE_SECONDS;
 
   const response = await fetch(`${base}${path}`, {
-    next: { revalidate: PUBLIC_REVALIDATE_SECONDS },
+    ...(options?.cache ? { cache: options.cache } : { next: { revalidate: revalidateSeconds } }),
     headers: { Accept: "application/json" },
   });
 
@@ -50,28 +74,60 @@ async function requestPublic<T>(path: string): Promise<T> {
 }
 
 export const publicApi = {
-  listFeatured: () => requestPublic<FeaturedItem[]>("/catalog/featured"),
-  listScholars: () => requestPublic<Scholar[]>("/scholars"),
-  getScholar: (scholarSlug: string) => requestPublic<Scholar>(`/scholars/${scholarSlug}`),
-  listScholarCollections: (scholarSlug: string) =>
-    requestPublic<Collection[]>(`/scholars/${scholarSlug}/collections`),
-  getScholarCollection: (scholarSlug: string, collectionSlug: string) =>
-    requestPublic<Collection>(`/scholars/${scholarSlug}/collections/${collectionSlug}`),
-  listScholarSeries: (scholarSlug: string) =>
-    requestPublic<Series[]>(`/scholars/${scholarSlug}/series`),
-  getScholarSeries: (scholarSlug: string, seriesSlug: string) =>
-    requestPublic<Series>(`/scholars/${scholarSlug}/series/${seriesSlug}`),
-  listScholarLectures: (scholarSlug: string) =>
-    requestPublic<Lecture[]>(`/scholars/${scholarSlug}/lectures`),
-  listCollectionSeries: (scholarSlug: string, collectionSlug: string) =>
-    requestPublic<Series[]>(`/scholars/${scholarSlug}/collections/${collectionSlug}/series`),
-  listSeriesLectures: (scholarSlug: string, seriesSlug: string) =>
-    requestPublic<Lecture[]>(`/scholars/${scholarSlug}/series/${seriesSlug}/lectures`),
-  getScholarLecture: (scholarSlug: string, lectureSlug: string) =>
-    requestPublic<Lecture>(`/scholars/${scholarSlug}/lectures/${lectureSlug}`),
-  listTopics: () => requestPublic<TopicDetail[]>("/topics"),
-  listTopicLectures: (topicSlug: string, limit?: number) =>
+  listRecommendationHero: (limit?: number, options?: RequestOptions) =>
+    requestPublic<RecommendationHeroItem[]>(
+      `/recommendations/hero${typeof limit === "number" ? `?limit=${limit}` : ""}`,
+      options,
+    ),
+  listRecommendationKibar: (limit?: number, cursor?: string, options?: RequestOptions) =>
+    requestPublic<RecommendationPage>(
+      `/recommendations/kibar${buildPageQuery(limit, cursor)}`,
+      options,
+    ),
+  listRecommendationTopic: (
+    topicSlug: string,
+    limit?: number,
+    cursor?: string,
+    options?: RequestOptions,
+  ) =>
+    requestPublic<RecommendationPage>(
+      `/recommendations/topics/${topicSlug}${buildPageQuery(limit, cursor)}`,
+      options,
+    ),
+  listScholars: (options?: RequestOptions) => requestPublic<Scholar[]>("/scholars", options),
+  getScholar: (scholarSlug: string, options?: RequestOptions) =>
+    requestPublic<Scholar>(`/scholars/${scholarSlug}`, options),
+  listScholarCollections: (scholarSlug: string, options?: RequestOptions) =>
+    requestPublic<Collection[]>(`/scholars/${scholarSlug}/collections`, options),
+  getScholarCollection: (scholarSlug: string, collectionSlug: string, options?: RequestOptions) =>
+    requestPublic<Collection>(`/scholars/${scholarSlug}/collections/${collectionSlug}`, options),
+  listScholarSeries: (scholarSlug: string, options?: RequestOptions) =>
+    requestPublic<Series[]>(`/scholars/${scholarSlug}/series`, options),
+  getScholarSeries: (scholarSlug: string, seriesSlug: string, options?: RequestOptions) =>
+    requestPublic<Series>(`/scholars/${scholarSlug}/series/${seriesSlug}`, options),
+  listScholarLectures: (scholarSlug: string, options?: RequestOptions) =>
+    requestPublic<Lecture[]>(`/scholars/${scholarSlug}/lectures`, options),
+  listCollectionSeries: (scholarSlug: string, collectionSlug: string, options?: RequestOptions) =>
+    requestPublic<Series[]>(
+      `/scholars/${scholarSlug}/collections/${collectionSlug}/series`,
+      options,
+    ),
+  listSeriesLectures: (scholarSlug: string, seriesSlug: string, options?: RequestOptions) =>
+    requestPublic<Lecture[]>(`/scholars/${scholarSlug}/series/${seriesSlug}/lectures`, options),
+  getScholarLecture: (scholarSlug: string, lectureSlug: string, options?: RequestOptions) =>
+    requestPublic<Lecture>(`/scholars/${scholarSlug}/lectures/${lectureSlug}`, options),
+  listTopics: (options?: RequestOptions) => requestPublic<TopicDetail[]>("/topics", options),
+  listTopicLectures: (topicSlug: string, limit?: number, options?: RequestOptions) =>
     requestPublic<TopicLecture[]>(
       `/topics/${topicSlug}/lectures${typeof limit === "number" ? `?limit=${limit}` : ""}`,
+      options,
     ),
 };
+
+function buildPageQuery(limit?: number, cursor?: string) {
+  const params = new URLSearchParams();
+  if (typeof limit === "number") params.set("limit", String(limit));
+  if (cursor) params.set("cursor", cursor);
+  const query = params.toString();
+  return query ? `?${query}` : "";
+}

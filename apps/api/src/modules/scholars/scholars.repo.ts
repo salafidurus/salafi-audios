@@ -11,6 +11,7 @@ const scholarViewSelect = {
   name: true,
   bio: true,
   isActive: true,
+  isKibar: true,
 } satisfies Prisma.ScholarSelect;
 
 type ScholarViewRecord = Prisma.ScholarGetPayload<{
@@ -26,6 +27,7 @@ const scholarDetailSelect = {
   mainLanguage: true,
   imageUrl: true,
   isActive: true,
+  isKibar: true,
   createdAt: true,
   updatedAt: true,
 } satisfies Prisma.ScholarSelect;
@@ -50,6 +52,7 @@ export class ScholarRepository {
         mainLanguage: input.mainLanguage,
         imageUrl: input.imageUrl,
         isActive: input.isActive ?? true,
+        isKibar: input.isKibar ?? false,
       },
       update: {
         name: input.name,
@@ -58,6 +61,7 @@ export class ScholarRepository {
         mainLanguage: input.mainLanguage,
         imageUrl: input.imageUrl,
         isActive: input.isActive ?? true,
+        isKibar: input.isKibar ?? false,
       },
     });
 
@@ -83,6 +87,19 @@ export class ScholarRepository {
     return records.map((r) => this.toViewDto(r));
   }
 
+  async updateKibarById(
+    id: string,
+    isKibar: boolean,
+  ): Promise<ScholarDetailDto | null> {
+    const record = await this.prisma.scholar.update({
+      where: { id },
+      select: scholarDetailSelect,
+      data: { isKibar },
+    });
+
+    return record ? this.toDetailDto(record) : null;
+  }
+
   // ------------------------
   // Mapping (repo-owned)
   // ------------------------
@@ -93,6 +110,7 @@ export class ScholarRepository {
       name: record.name,
       bio: record.bio ?? undefined,
       isActive: record.isActive,
+      isKibar: record.isKibar,
     };
   }
 
@@ -106,6 +124,7 @@ export class ScholarRepository {
       mainLanguage: record.mainLanguage ?? undefined,
       imageUrl: record.imageUrl ?? undefined,
       isActive: record.isActive,
+      isKibar: record.isKibar,
       createdAt: record.createdAt.toISOString(),
       updatedAt: record.updatedAt?.toISOString(),
     };

@@ -7,6 +7,8 @@ export type RecommendationItem = {
   subtitle: string;
   href: string;
   coverImageUrl?: string;
+  lessonCount?: number;
+  totalDurationSeconds?: number;
   meta?: string;
 };
 
@@ -14,6 +16,16 @@ export type RecommendationRow = {
   id: string;
   title: string;
   items: RecommendationItem[];
+  variant?: "featured";
+  cursor?: string;
+  source?:
+    | {
+        kind: "kibar";
+      }
+    | {
+        kind: "topic";
+        topicSlug: string;
+      };
 };
 
 export type Tab = {

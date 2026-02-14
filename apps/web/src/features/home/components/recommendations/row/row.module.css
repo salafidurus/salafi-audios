@@ -35,8 +35,13 @@
   gap: var(--space-gap-lg);
   overflow-x: auto;
   padding-bottom: 0.35rem;
-  scroll-snap-type: x mandatory;
+  scroll-snap-type: x proximity;
+  scroll-behavior: smooth;
   scrollbar-width: none;
+}
+
+.scrollerFeatured {
+  grid-auto-columns: minmax(24rem, 1fr);
 }
 
 .scroller::-webkit-scrollbar {
@@ -49,4 +54,34 @@
   padding: var(--space-gap-lg);
   color: var(--color-text-tertiary);
   font-size: var(--font-size-sm);
+}
+
+.skeletonCard {
+  min-width: 15.5rem;
+  height: 14.5rem;
+  border-radius: var(--radius-panel);
+  background:
+    linear-gradient(90deg, transparent, rgb(255 255 255 / 0.12), transparent),
+    color-mix(in srgb, var(--color-fill-secondary) 78%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent);
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+.skeletonCardFeatured {
+  min-width: 24rem;
+  height: 12.5rem;
+}
+
+.loadMoreSentinel {
+  width: 1px;
+  height: 1px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 200% 0%;
+  }
 }

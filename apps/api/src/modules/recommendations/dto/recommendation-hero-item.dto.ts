@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class FeaturedHomeItemDto {
+export class RecommendationHeroItemDto {
   @ApiProperty({ enum: ['series', 'collection', 'lecture'] })
   kind!: 'series' | 'collection' | 'lecture';
 
@@ -34,8 +34,7 @@ export class FeaturedHomeItemDto {
   lessonCount?: number;
 
   @ApiPropertyOptional({
-    description:
-      'Total duration in seconds for the featured entity. Optional when not precomputed.',
+    description: 'Total duration in seconds for the featured entity.',
   })
   totalDurationSeconds?: number;
 

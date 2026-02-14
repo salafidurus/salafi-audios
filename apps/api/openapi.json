@@ -354,6 +354,107 @@
         ]
       }
     },
+    "/admin/scholars/{id}/kibar": {
+      "patch": {
+        "operationId": "AdminScholarsController_setKibar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetKibarDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScholarDetailDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Set Kibar ul-Ulama flag for a scholar",
+        "tags": [
+          "Admin Scholars"
+        ]
+      }
+    },
     "/scholars/{scholarSlug}/collections": {
       "get": {
         "operationId": "CollectionsController_list",
@@ -1603,91 +1704,6 @@
         ]
       }
     },
-    "/catalog/featured": {
-      "get": {
-        "operationId": "CatalogController_featured",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/FeaturedHomeItemDto"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Get featured home carousel items (max 3)",
-        "tags": [
-          "Catalog"
-        ]
-      }
-    },
     "/catalog/collections": {
       "get": {
         "operationId": "CatalogController_collections",
@@ -2114,6 +2130,326 @@
         "summary": "Browse published root lectures only (seriesId = null)",
         "tags": [
           "Catalog"
+        ]
+      }
+    },
+    "/recommendations/hero": {
+      "get": {
+        "operationId": "RecommendationsController_hero",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "maximum": 24,
+              "default": 8,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination (opaque string)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RecommendationHeroItemDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get hero recommendations (max 3)",
+        "tags": [
+          "Recommendations"
+        ]
+      }
+    },
+    "/recommendations/kibar": {
+      "get": {
+        "operationId": "RecommendationsController_kibar",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "maximum": 24,
+              "default": 8,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination (opaque string)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get Kibar ul-Ulama recommendations",
+        "tags": [
+          "Recommendations"
+        ]
+      }
+    },
+    "/recommendations/topics/{slug}": {
+      "get": {
+        "operationId": "RecommendationsController_topic",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "maximum": 24,
+              "default": 8,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination (opaque string)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get topic recommendations by slug",
+        "tags": [
+          "Recommendations"
         ]
       }
     },
@@ -2922,13 +3258,80 @@
           },
           "isActive": {
             "type": "boolean"
+          },
+          "isKibar": {
+            "type": "boolean"
           }
         },
         "required": [
           "id",
           "slug",
           "name",
-          "isActive"
+          "isActive",
+          "isKibar"
+        ]
+      },
+      "SetKibarDto": {
+        "type": "object",
+        "properties": {
+          "isKibar": {
+            "type": "boolean",
+            "description": "Whether the scholar is marked as Kibar ul-Ulama"
+          }
+        },
+        "required": [
+          "isKibar"
+        ]
+      },
+      "ScholarDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string",
+            "nullable": true
+          },
+          "country": {
+            "type": "string",
+            "nullable": true
+          },
+          "mainLanguage": {
+            "type": "string",
+            "nullable": true
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "isKibar": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "isActive",
+          "isKibar",
+          "createdAt"
         ]
       },
       "CollectionViewDto": {
@@ -3163,68 +3566,6 @@
           "createdAt"
         ]
       },
-      "FeaturedHomeItemDto": {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "type": "string",
-            "enum": [
-              "series",
-              "collection",
-              "lecture"
-            ]
-          },
-          "entityId": {
-            "type": "string",
-            "description": "The backing entity id (series/collection/lecture)"
-          },
-          "entitySlug": {
-            "type": "string",
-            "description": "The backing entity slug (used by clients to build canonical URLs)"
-          },
-          "headline": {
-            "type": "string",
-            "description": "Hero message to display"
-          },
-          "title": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "coverImageUrl": {
-            "type": "string"
-          },
-          "lessonCount": {
-            "type": "number",
-            "description": "Number of lessons (for series/collection) or 1 (lecture). Optional when not precomputed."
-          },
-          "totalDurationSeconds": {
-            "type": "number",
-            "description": "Total duration in seconds for the featured entity. Optional when not precomputed."
-          },
-          "presentedBy": {
-            "type": "string",
-            "description": "Scholar/teacher presenting the study"
-          },
-          "presentedBySlug": {
-            "type": "string",
-            "description": "Slug for the scholar/teacher"
-          },
-          "workAuthor": {
-            "type": "string",
-            "description": "Optional author of the studied work (if known)"
-          }
-        },
-        "required": [
-          "kind",
-          "entityId",
-          "entitySlug",
-          "headline",
-          "title",
-          "presentedBy"
-        ]
-      },
       "CollectionCatalogPageDto": {
         "type": "object",
         "properties": {
@@ -3276,6 +3617,136 @@
           "nextCursor": {
             "type": "string",
             "description": "Next cursor if more results exist"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "RecommendationHeroItemDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "series",
+              "collection",
+              "lecture"
+            ]
+          },
+          "entityId": {
+            "type": "string",
+            "description": "The backing entity id (series/collection/lecture)"
+          },
+          "entitySlug": {
+            "type": "string",
+            "description": "The backing entity slug (used by clients to build canonical URLs)"
+          },
+          "headline": {
+            "type": "string",
+            "description": "Hero message to display"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "coverImageUrl": {
+            "type": "string"
+          },
+          "lessonCount": {
+            "type": "number",
+            "description": "Number of lessons (for series/collection) or 1 (lecture). Optional when not precomputed."
+          },
+          "totalDurationSeconds": {
+            "type": "number",
+            "description": "Total duration in seconds for the featured entity."
+          },
+          "presentedBy": {
+            "type": "string",
+            "description": "Scholar/teacher presenting the study"
+          },
+          "presentedBySlug": {
+            "type": "string",
+            "description": "Slug for the scholar/teacher"
+          },
+          "workAuthor": {
+            "type": "string",
+            "description": "Optional author of the studied work (if known)"
+          }
+        },
+        "required": [
+          "kind",
+          "entityId",
+          "entitySlug",
+          "headline",
+          "title",
+          "presentedBy"
+        ]
+      },
+      "RecommendationItemDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "series",
+              "collection",
+              "lecture"
+            ]
+          },
+          "entityId": {
+            "type": "string",
+            "description": "The backing entity id"
+          },
+          "entitySlug": {
+            "type": "string",
+            "description": "The backing entity slug"
+          },
+          "title": {
+            "type": "string"
+          },
+          "coverImageUrl": {
+            "type": "string"
+          },
+          "lessonCount": {
+            "type": "number",
+            "description": "Number of lessons (series/collection) or 1 (lecture)."
+          },
+          "totalDurationSeconds": {
+            "type": "number",
+            "description": "Total duration in seconds for the recommended entity."
+          },
+          "scholarName": {
+            "type": "string",
+            "description": "Scholar/teacher presenting the study"
+          },
+          "scholarSlug": {
+            "type": "string",
+            "description": "Slug for the scholar/teacher"
+          }
+        },
+        "required": [
+          "kind",
+          "entityId",
+          "entitySlug",
+          "title",
+          "scholarName"
+        ]
+      },
+      "RecommendationPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecommendationItemDto"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "description": "Cursor for fetching the next page"
           }
         },
         "required": [
