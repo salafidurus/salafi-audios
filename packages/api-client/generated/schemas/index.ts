@@ -15,6 +15,8 @@ export * from "./collectionViewDto";
 export * from "./collectionViewDtoStatus";
 export * from "./errorResponseDto";
 export * from "./errorResponseDtoDetails";
+export * from "./featuredHomeItemDto";
+export * from "./featuredHomeItemDtoKind";
 export * from "./healthDbResponseDto";
 export * from "./healthResponseDto";
 export * from "./healthResponseDtoStatus";

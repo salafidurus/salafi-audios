@@ -26,6 +26,7 @@ import type {
   CollectionCatalogPageDto,
   CollectionViewDto,
   ErrorResponseDto,
+  FeaturedHomeItemDto,
   HealthDbResponseDto,
   HealthResponseDto,
   LectureCatalogPageDto,
@@ -2328,6 +2329,120 @@ export function useAudioAssetsControllerGetById<
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
   const queryOptions = getAudioAssetsControllerGetByIdQueryOptions(lectureId, id, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Get featured home carousel items (max 3)
+ */
+export const catalogControllerFeatured = (signal?: AbortSignal) => {
+  return httpClient<FeaturedHomeItemDto[]>({ url: `/catalog/featured`, method: "GET", signal });
+};
+
+export const getCatalogControllerFeaturedQueryKey = () => {
+  return [`/catalog/featured`] as const;
+};
+
+export const getCatalogControllerFeaturedQueryOptions = <
+  TData = Awaited<ReturnType<typeof catalogControllerFeatured>>,
+  TError = ErrorResponseDto,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof catalogControllerFeatured>>, TError, TData>
+  >;
+}) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getCatalogControllerFeaturedQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof catalogControllerFeatured>>> = ({
+    signal,
+  }) => catalogControllerFeatured(signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof catalogControllerFeatured>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type CatalogControllerFeaturedQueryResult = NonNullable<
+  Awaited<ReturnType<typeof catalogControllerFeatured>>
+>;
+export type CatalogControllerFeaturedQueryError = ErrorResponseDto;
+
+export function useCatalogControllerFeatured<
+  TData = Awaited<ReturnType<typeof catalogControllerFeatured>>,
+  TError = ErrorResponseDto,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof catalogControllerFeatured>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof catalogControllerFeatured>>,
+          TError,
+          Awaited<ReturnType<typeof catalogControllerFeatured>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useCatalogControllerFeatured<
+  TData = Awaited<ReturnType<typeof catalogControllerFeatured>>,
+  TError = ErrorResponseDto,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof catalogControllerFeatured>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof catalogControllerFeatured>>,
+          TError,
+          Awaited<ReturnType<typeof catalogControllerFeatured>>
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useCatalogControllerFeatured<
+  TData = Awaited<ReturnType<typeof catalogControllerFeatured>>,
+  TError = ErrorResponseDto,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof catalogControllerFeatured>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+/**
+ * @summary Get featured home carousel items (max 3)
+ */
+
+export function useCatalogControllerFeatured<
+  TData = Awaited<ReturnType<typeof catalogControllerFeatured>>,
+  TError = ErrorResponseDto,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof catalogControllerFeatured>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getCatalogControllerFeaturedQueryOptions(options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData>;
