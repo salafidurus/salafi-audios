@@ -6,7 +6,7 @@ import { AtSign, Rss, Share2 } from "lucide-react";
 
 export function CatalogFooter() {
   return (
-    <footer className={styles.footer} aria-label="Site footer">
+    <footer className={styles.footer} aria-label="Site footer" data-site-footer="true">
       <div className={styles.inner}>
         <div className={styles.topRow}>
           <Link href="/" className={styles.brand} aria-label="Salafi Durus">

@@ -1,10 +1,24 @@
 /* Now playing preview: in-flow, premium */
 
+.floatingWrap {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  pointer-events: none;
+  will-change: bottom;
+}
+
 .bar {
-  margin: 1.1rem auto 0;
-  width: min(62rem, 100%);
-  border-radius: calc(var(--radius-panel) + 0.15rem);
-  padding: 0.85rem 1rem;
+  pointer-events: auto;
+  margin: 0 auto;
+  width: 100%;
+  border-radius: 0;
+  padding: 0.85rem;
+  padding-bottom: calc(0.85rem + env(safe-area-inset-bottom, 0px));
+  padding-left: max(var(--space-page-x), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--space-page-x), env(safe-area-inset-right, 0px));
   display: grid;
   grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.4fr) auto;
   gap: 0.9rem;
@@ -15,6 +29,7 @@
     linear-gradient(90deg, #133423, #0f2a1c);
   box-shadow: var(--shadow-panel);
   border: 1px solid rgb(151 239 173 / 0.18);
+  border-top: 0;
 }
 
 .left {
