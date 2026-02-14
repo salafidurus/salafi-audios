@@ -6,6 +6,7 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
   const seriesFindMany = jest.fn();
   const collectionFindMany = jest.fn();
   const lectureFindMany = jest.fn();
+  // keep for compatibility with repo constructor shape; featured no longer queries counts
   const lectureCount = jest.fn();
 
   const prisma = {
@@ -82,11 +83,6 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
         scholar: { name: 'Shaykh C', slug: 'shaykh-c' },
       });
 
-    lectureCount
-      .mockResolvedValueOnce(42)
-      .mockResolvedValueOnce(8)
-      .mockResolvedValueOnce(4);
-
     const items = await repo.listFeaturedHomeItems(3);
 
     expect(items).toHaveLength(3);
@@ -97,7 +93,8 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
         entitySlug: 'kitab-ut-tawhid',
         headline: 'Tawhid First',
         title: 'Kitab ut-Tawhid',
-        lessonCount: 42,
+        lessonCount: undefined,
+        totalDurationSeconds: undefined,
         presentedBy: 'Shaykh A',
         presentedBySlug: 'shaykh-a',
       }),
@@ -109,7 +106,8 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
         entitySlug: 'aqeedah-arraziyayn',
         headline: 'Learn Iman before Quran',
         title: 'Aqeedah ar-Raziyayn',
-        lessonCount: 8,
+        lessonCount: undefined,
+        totalDurationSeconds: undefined,
         presentedBy: 'Shaykh B',
       }),
     );
@@ -120,7 +118,8 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
         entitySlug: 'kitab-ut-taharah',
         headline: 'Oh Allah, grant him Fiqh in the religion',
         title: 'Kitab ut-Taharah',
-        lessonCount: 4,
+        lessonCount: undefined,
+        totalDurationSeconds: undefined,
         presentedBy: 'Shaykh C',
       }),
     );
@@ -183,8 +182,6 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
       },
     ]);
 
-    lectureCount.mockResolvedValueOnce(11).mockResolvedValueOnce(99);
-
     const items = await repo.listFeaturedHomeItems(3);
 
     expect(items).toHaveLength(3);
@@ -193,7 +190,8 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
         kind: 'series',
         headline: 'Tawhid First',
         title: 'Some Series',
-        lessonCount: 11,
+        lessonCount: undefined,
+        totalDurationSeconds: undefined,
       }),
     );
     expect(items[1]).toEqual(
@@ -201,7 +199,8 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
         kind: 'collection',
         headline: 'Learn Iman before Quran',
         title: 'Some Collection',
-        lessonCount: 99,
+        lessonCount: undefined,
+        totalDurationSeconds: undefined,
       }),
     );
     expect(items[2]).toEqual(
@@ -211,6 +210,7 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
         title: 'Some Lecture',
         coverImageUrl: 'https://cdn.test/cover.jpg',
         lessonCount: 1,
+        totalDurationSeconds: undefined,
       }),
     );
   });

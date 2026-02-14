@@ -493,60 +493,26 @@ export class CatalogRepository {
       }
     }
 
-    const [lessonCounts, durationSums] = await Promise.all([
-      Promise.all(
-        picked.slice(0, limit).map((p) => {
-          if (p.kind === 'lecture') return Promise.resolve(1);
+    const computed = picked.slice(0, limit).map((p) => {
+      if (p.kind === 'lecture') {
+        return {
+          lessonCount: 1,
+          totalDurationSeconds: p.row.durationSeconds ?? undefined,
+        };
+      }
 
-          if (p.kind === 'collection') {
-            return this.prisma.lecture.count({
-              where: {
-                status: Status.published,
-                deletedAt: null,
-                series: { collectionId: p.row.id },
-              },
-            });
-          }
+      if (p.kind === 'collection') {
+        return {
+          lessonCount: p.row.publishedLectureCount ?? undefined,
+          totalDurationSeconds: p.row.publishedDurationSeconds ?? undefined,
+        };
+      }
 
-          return this.prisma.lecture.count({
-            where: {
-              seriesId: p.row.id,
-              status: Status.published,
-              deletedAt: null,
-            },
-          });
-        }),
-      ),
-      Promise.all(
-        picked.slice(0, limit).map(async (p) => {
-          if (p.kind === 'lecture') return p.row.durationSeconds ?? 0;
-
-          if (p.kind === 'collection') {
-            const result = await this.prisma.lecture.aggregate({
-              where: {
-                status: Status.published,
-                deletedAt: null,
-                series: { collectionId: p.row.id },
-              },
-              _sum: { durationSeconds: true },
-            });
-
-            return result._sum.durationSeconds ?? 0;
-          }
-
-          const result = await this.prisma.lecture.aggregate({
-            where: {
-              status: Status.published,
-              deletedAt: null,
-              seriesId: p.row.id,
-            },
-            _sum: { durationSeconds: true },
-          });
-
-          return result._sum.durationSeconds ?? 0;
-        }),
-      ),
-    ]);
+      return {
+        lessonCount: p.row.publishedLectureCount ?? undefined,
+        totalDurationSeconds: p.row.publishedDurationSeconds ?? undefined,
+      };
+    });
 
     return picked.slice(0, limit).map((p, idx) => {
       if (p.kind === 'collection') {
@@ -558,8 +524,8 @@ export class CatalogRepository {
           title: p.row.title,
           description: p.row.description ?? undefined,
           coverImageUrl: p.row.coverImageUrl ?? undefined,
-          lessonCount: lessonCounts[idx] ?? 0,
-          totalDurationSeconds: durationSums[idx] ?? 0,
+          lessonCount: computed[idx]?.lessonCount,
+          totalDurationSeconds: computed[idx]?.totalDurationSeconds,
           presentedBy: p.row.scholar.name,
           presentedBySlug: p.row.scholar.slug,
         };
@@ -574,8 +540,8 @@ export class CatalogRepository {
           title: p.row.title,
           description: p.row.description ?? undefined,
           coverImageUrl: p.row.series?.coverImageUrl ?? undefined,
-          lessonCount: lessonCounts[idx] ?? 1,
-          totalDurationSeconds: durationSums[idx] ?? 0,
+          lessonCount: computed[idx]?.lessonCount,
+          totalDurationSeconds: computed[idx]?.totalDurationSeconds,
           presentedBy: p.row.scholar.name,
           presentedBySlug: p.row.scholar.slug,
         };
@@ -589,8 +555,8 @@ export class CatalogRepository {
         title: p.row.title,
         description: p.row.description ?? undefined,
         coverImageUrl: p.row.coverImageUrl ?? undefined,
-        lessonCount: lessonCounts[idx] ?? 0,
-        totalDurationSeconds: durationSums[idx] ?? 0,
+        lessonCount: computed[idx]?.lessonCount,
+        totalDurationSeconds: computed[idx]?.totalDurationSeconds,
         presentedBy: p.row.scholar.name,
         presentedBySlug: p.row.scholar.slug,
       };

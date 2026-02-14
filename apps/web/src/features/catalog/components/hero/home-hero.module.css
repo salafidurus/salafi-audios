@@ -154,6 +154,7 @@
   color: rgb(222 242 232 / 0.76);
   font-size: 0.95rem;
   font-weight: 700;
+  min-height: 2.2rem;
 }
 
 .metaItem {

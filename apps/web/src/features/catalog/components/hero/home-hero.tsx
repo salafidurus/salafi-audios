@@ -25,7 +25,7 @@ function clampIndex(value: number, length: number) {
 }
 
 function formatDuration(seconds: number) {
-  const totalMinutes = Math.max(0, Math.round(seconds / 60));
+  const totalMinutes = Math.max(0, Math.ceil(seconds / 60));
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
 
@@ -47,8 +47,8 @@ export function HomeHero({ items }: HomeHeroProps) {
         title: "Featured study",
         description:
           "Explore published lectures organized by scholars, collections, and thematic series.",
-        lessonCount: 0,
-        totalDurationSeconds: 0,
+        lessonCount: undefined,
+        totalDurationSeconds: undefined,
         presentedBy: "Salafi Durus",
       },
     ];
@@ -127,6 +127,9 @@ export function HomeHero({ items }: HomeHeroProps) {
     return "Featured series";
   })();
 
+  const lessonCount = active.lessonCount ?? 0;
+  const totalDurationSeconds = active.totalDurationSeconds ?? 0;
+
   return (
     <section
       ref={(el) => {
@@ -192,16 +195,16 @@ export function HomeHero({ items }: HomeHeroProps) {
                 <div className={styles.scholarName}>{active.presentedBy}</div>
 
                 <div className={styles.meta}>
-                  {active.lessonCount > 0 ? (
+                  {lessonCount > 0 ? (
                     <span className={styles.metaItem}>
                       <ListVideo size={16} aria-hidden="true" />
-                      {active.lessonCount} {active.lessonCount === 1 ? "lesson" : "lessons"}
+                      {lessonCount} {lessonCount === 1 ? "lesson" : "lessons"}
                     </span>
                   ) : null}
-                  {active.totalDurationSeconds > 0 ? (
+                  {totalDurationSeconds > 0 ? (
                     <span className={styles.metaItem}>
                       <Clock3 size={16} aria-hidden="true" />
-                      {formatDuration(active.totalDurationSeconds)}
+                      {formatDuration(totalDurationSeconds)}
                     </span>
                   ) : null}
                 </div>
