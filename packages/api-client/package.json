@@ -7,7 +7,7 @@
   "types": "src/index.ts",
   "scripts": {
     "build": "pnpm codegen",
-    "codegen": "orval --config ./orval.config.cjs",
+    "codegen": "orval --config ./orval.config.cjs && node ./scripts/postprocess-generated.cjs",
     "lint": "eslint .",
     "test": "echo \"@sd/api-client: skipped (generated)\"",
     "test:prepush": "echo \"@sd/api-client: skipped (generated)\"",

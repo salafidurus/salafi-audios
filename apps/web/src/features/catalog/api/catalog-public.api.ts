@@ -1,4 +1,4 @@
-import { webEnv } from "@/shared/utils/env";
+import { getWebEnv } from "@/shared/utils/env";
 import type { Collection, Lecture, Scholar, Series } from "@/features/catalog/types/catalog.types";
 
 export type FeaturedHomeItem = {
@@ -27,7 +27,7 @@ export class CatalogApiError extends Error {
 }
 
 async function requestCatalog<T>(path: string): Promise<T> {
-  const base = webEnv.NEXT_PUBLIC_API_URL.replace(/\/$/, "");
+  const base = getWebEnv().NEXT_PUBLIC_API_URL.replace(/\/$/, "");
 
   const response = await fetch(`${base}${path}`, {
     next: { revalidate: CATALOG_REVALIDATE_SECONDS },

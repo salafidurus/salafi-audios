@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { catalogApi, CatalogApiError } from "@/features/catalog/api/catalog-public.api";
+import { tryGetWebEnv } from "@/shared/utils/env";
 import { PrimaryAudioPanel } from "@/features/catalog/components/audio/primary-audio-panel";
 import { CatalogShell } from "@/features/catalog/components/layout/catalog-shell";
 import { DetailList, DetailRow } from "@/features/catalog/components/states/detail-list";
@@ -13,6 +14,10 @@ type LectureRouteProps = {
 };
 
 async function loadLecturePage(scholarSlug: string, lectureSlug: string) {
+  if (!tryGetWebEnv()) {
+    notFound();
+  }
+
   try {
     const [scholar, lecture] = await Promise.all([
       catalogApi.getScholar(scholarSlug),
@@ -24,12 +29,19 @@ async function loadLecturePage(scholarSlug: string, lectureSlug: string) {
     if (error instanceof CatalogApiError && error.status === 404) {
       notFound();
     }
-    throw error;
+    notFound();
   }
 }
 
 export async function getLectureMetadata({ params }: LectureRouteProps): Promise<Metadata> {
   const { scholarSlug, lectureSlug } = await params;
+
+  if (!tryGetWebEnv()) {
+    return {
+      title: "Lecture",
+      alternates: { canonical: canonical(`/lectures/${scholarSlug}/${lectureSlug}`) },
+    };
+  }
 
   try {
     const lecture = await catalogApi.getScholarLecture(scholarSlug, lectureSlug);

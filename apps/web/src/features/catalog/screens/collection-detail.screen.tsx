@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { catalogApi, CatalogApiError } from "@/features/catalog/api/catalog-public.api";
+import { tryGetWebEnv } from "@/shared/utils/env";
 import { CardGrid } from "@/features/catalog/components/cards/card-grid";
 import { EntityCard } from "@/features/catalog/components/cards/entity-card";
 import { CatalogShell } from "@/features/catalog/components/layout/catalog-shell";
@@ -22,6 +23,10 @@ async function loadCollectionPage(
   scholarSlug: string,
   collectionSlug: string,
 ): Promise<CollectionPageData> {
+  if (!tryGetWebEnv()) {
+    notFound();
+  }
+
   try {
     const [scholar, collection, series] = await Promise.all([
       catalogApi.getScholar(scholarSlug),
@@ -34,12 +39,19 @@ async function loadCollectionPage(
     if (error instanceof CatalogApiError && error.status === 404) {
       notFound();
     }
-    throw error;
+    notFound();
   }
 }
 
 export async function getCollectionMetadata({ params }: CollectionRouteProps): Promise<Metadata> {
   const { scholarSlug, collectionSlug } = await params;
+
+  if (!tryGetWebEnv()) {
+    return {
+      title: "Collection",
+      alternates: { canonical: canonical(`/collections/${scholarSlug}/${collectionSlug}`) },
+    };
+  }
 
   try {
     const collection = await catalogApi.getScholarCollection(scholarSlug, collectionSlug);

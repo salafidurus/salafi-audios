@@ -45,14 +45,17 @@ export function getHomeMetadata(): Metadata {
 }
 
 async function loadHomeViewModel(): Promise<HomeViewModel> {
-  const heroItems = await (async () => {
+  // Intentionally tolerate missing NEXT_PUBLIC_API_URL in CI build environments.
+  const safe = async <T,>(fn: () => Promise<T>, fallback: T): Promise<T> => {
     try {
-      return await catalogApi.listFeaturedHome();
+      return await fn();
     } catch {
-      return [];
+      return fallback;
     }
-  })();
-  const scholars = await catalogApi.listScholars();
+  };
+
+  const heroItems = await safe(() => catalogApi.listFeaturedHome(), []);
+  const scholars = await safe(() => catalogApi.listScholars(), []);
 
   if (scholars.length === 0) {
     return {
@@ -67,7 +70,7 @@ async function loadHomeViewModel(): Promise<HomeViewModel> {
   const scholarSeriesBundles = await Promise.all(
     scholars.slice(0, 6).map(async (scholar) => ({
       scholar,
-      series: await catalogApi.listScholarSeries(scholar.slug),
+      series: await safe(() => catalogApi.listScholarSeries(scholar.slug), []),
     })),
   );
 
@@ -85,7 +88,7 @@ async function loadHomeViewModel(): Promise<HomeViewModel> {
     lectureSourceSeries.map(async ({ scholar, series }) => ({
       scholar,
       series,
-      lectures: await catalogApi.listSeriesLectures(scholar.slug, series.slug),
+      lectures: await safe(() => catalogApi.listSeriesLectures(scholar.slug, series.slug), []),
     })),
   );
 

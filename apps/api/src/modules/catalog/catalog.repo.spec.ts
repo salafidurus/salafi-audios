@@ -6,8 +6,8 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
   const seriesFindMany = jest.fn();
   const collectionFindMany = jest.fn();
   const lectureFindMany = jest.fn();
-  // keep for compatibility with repo constructor shape; featured no longer queries counts
   const lectureCount = jest.fn();
+  const lectureAggregate = jest.fn();
 
   const prisma = {
     series: {
@@ -20,6 +20,7 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
     lecture: {
       findMany: lectureFindMany,
       count: lectureCount,
+      aggregate: lectureAggregate,
     },
   };
 
@@ -46,6 +47,8 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
         deleteAfterAt: null,
         createdAt: new Date('2026-02-01T00:00:00.000Z'),
         updatedAt: null,
+        publishedLectureCount: 42,
+        publishedDurationSeconds: 3600,
         scholar: { name: 'Shaykh A', slug: 'shaykh-a' },
       })
       .mockResolvedValueOnce({
@@ -63,6 +66,8 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
         deleteAfterAt: null,
         createdAt: new Date('2026-02-01T00:00:00.000Z'),
         updatedAt: null,
+        publishedLectureCount: 8,
+        publishedDurationSeconds: 1800,
         scholar: { name: 'Shaykh B', slug: 'shaykh-b' },
       })
       .mockResolvedValueOnce({
@@ -80,6 +85,8 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
         deleteAfterAt: null,
         createdAt: new Date('2026-02-01T00:00:00.000Z'),
         updatedAt: null,
+        publishedLectureCount: 4,
+        publishedDurationSeconds: 600,
         scholar: { name: 'Shaykh C', slug: 'shaykh-c' },
       });
 
@@ -93,8 +100,8 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
         entitySlug: 'kitab-ut-tawhid',
         headline: 'Tawhid First',
         title: 'Kitab ut-Tawhid',
-        lessonCount: undefined,
-        totalDurationSeconds: undefined,
+        lessonCount: 42,
+        totalDurationSeconds: 3600,
         presentedBy: 'Shaykh A',
         presentedBySlug: 'shaykh-a',
       }),
@@ -106,8 +113,8 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
         entitySlug: 'aqeedah-arraziyayn',
         headline: 'Learn Iman before Quran',
         title: 'Aqeedah ar-Raziyayn',
-        lessonCount: undefined,
-        totalDurationSeconds: undefined,
+        lessonCount: 8,
+        totalDurationSeconds: 1800,
         presentedBy: 'Shaykh B',
       }),
     );
@@ -118,8 +125,8 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
         entitySlug: 'kitab-ut-taharah',
         headline: 'Oh Allah, grant him Fiqh in the religion',
         title: 'Kitab ut-Taharah',
-        lessonCount: undefined,
-        totalDurationSeconds: undefined,
+        lessonCount: 4,
+        totalDurationSeconds: 600,
         presentedBy: 'Shaykh C',
       }),
     );
@@ -144,6 +151,8 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
         deleteAfterAt: null,
         createdAt: new Date('2026-02-01T00:00:00.000Z'),
         updatedAt: null,
+        publishedLectureCount: null,
+        publishedDurationSeconds: null,
         scholar: { name: 'Shaykh A', slug: 'shaykh-a' },
       },
     ]);
@@ -163,6 +172,8 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
         deleteAfterAt: null,
         createdAt: new Date('2026-02-01T00:00:00.000Z'),
         updatedAt: null,
+        publishedLectureCount: null,
+        publishedDurationSeconds: null,
         scholar: { name: 'Shaykh B', slug: 'shaykh-b' },
       },
     ]);
@@ -175,12 +186,18 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
         description: null,
         createdAt: new Date('2026-02-01T00:00:00.000Z'),
         publishedAt: new Date('2026-02-01T00:00:00.000Z'),
+        durationSeconds: null,
         status: Status.published,
         deletedAt: null,
         scholar: { name: 'Shaykh C', slug: 'shaykh-c' },
         series: { coverImageUrl: 'https://cdn.test/cover.jpg' },
       },
     ]);
+
+    lectureCount.mockResolvedValueOnce(11).mockResolvedValueOnce(99);
+    lectureAggregate
+      .mockResolvedValueOnce({ _sum: { durationSeconds: 1111 } })
+      .mockResolvedValueOnce({ _sum: { durationSeconds: 2222 } });
 
     const items = await repo.listFeaturedHomeItems(3);
 
@@ -190,8 +207,8 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
         kind: 'series',
         headline: 'Tawhid First',
         title: 'Some Series',
-        lessonCount: undefined,
-        totalDurationSeconds: undefined,
+        lessonCount: 11,
+        totalDurationSeconds: 1111,
       }),
     );
     expect(items[1]).toEqual(
@@ -199,8 +216,8 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
         kind: 'collection',
         headline: 'Learn Iman before Quran',
         title: 'Some Collection',
-        lessonCount: undefined,
-        totalDurationSeconds: undefined,
+        lessonCount: 99,
+        totalDurationSeconds: 2222,
       }),
     );
     expect(items[2]).toEqual(

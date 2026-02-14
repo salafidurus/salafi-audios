@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { catalogApi, CatalogApiError } from "@/features/catalog/api/catalog-public.api";
+import { tryGetWebEnv } from "@/shared/utils/env";
 import { CardGrid } from "@/features/catalog/components/cards/card-grid";
 import { LectureCard } from "@/features/catalog/components/cards/lecture-card";
 import { CatalogShell } from "@/features/catalog/components/layout/catalog-shell";
@@ -19,6 +20,10 @@ type SeriesRouteProps = {
 };
 
 async function loadSeriesPage(scholarSlug: string, seriesSlug: string): Promise<SeriesPageData> {
+  if (!tryGetWebEnv()) {
+    notFound();
+  }
+
   try {
     const [scholar, series, lectures] = await Promise.all([
       catalogApi.getScholar(scholarSlug),
@@ -31,12 +36,19 @@ async function loadSeriesPage(scholarSlug: string, seriesSlug: string): Promise<
     if (error instanceof CatalogApiError && error.status === 404) {
       notFound();
     }
-    throw error;
+    notFound();
   }
 }
 
 export async function getSeriesMetadata({ params }: SeriesRouteProps): Promise<Metadata> {
   const { scholarSlug, seriesSlug } = await params;
+
+  if (!tryGetWebEnv()) {
+    return {
+      title: "Series",
+      alternates: { canonical: canonical(`/series/${scholarSlug}/${seriesSlug}`) },
+    };
+  }
 
   try {
     const series = await catalogApi.getScholarSeries(scholarSlug, seriesSlug);

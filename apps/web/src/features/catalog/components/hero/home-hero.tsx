@@ -127,8 +127,8 @@ export function HomeHero({ items }: HomeHeroProps) {
     return "Featured series";
   })();
 
-  const lessonCount = active.lessonCount ?? 0;
-  const totalDurationSeconds = active.totalDurationSeconds ?? 0;
+  const lessonCount = active.lessonCount;
+  const totalDurationSeconds = active.totalDurationSeconds;
 
   return (
     <section
@@ -195,13 +195,13 @@ export function HomeHero({ items }: HomeHeroProps) {
                 <div className={styles.scholarName}>{active.presentedBy}</div>
 
                 <div className={styles.meta}>
-                  {lessonCount > 0 ? (
+                  {typeof lessonCount === "number" ? (
                     <span className={styles.metaItem}>
                       <ListVideo size={16} aria-hidden="true" />
                       {lessonCount} {lessonCount === 1 ? "lesson" : "lessons"}
                     </span>
                   ) : null}
-                  {totalDurationSeconds > 0 ? (
+                  {typeof totalDurationSeconds === "number" && totalDurationSeconds > 0 ? (
                     <span className={styles.metaItem}>
                       <Clock3 size={16} aria-hidden="true" />
                       {formatDuration(totalDurationSeconds)}

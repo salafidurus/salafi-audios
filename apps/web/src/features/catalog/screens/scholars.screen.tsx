@@ -18,7 +18,13 @@ export function getScholarsMetadata(): Metadata {
 }
 
 export async function ScholarsScreen() {
-  const scholars = await catalogApi.listScholars();
+  const scholars = await (async () => {
+    try {
+      return await catalogApi.listScholars();
+    } catch {
+      return [];
+    }
+  })();
 
   return (
     <CatalogShell

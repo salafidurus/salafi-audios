@@ -493,26 +493,80 @@ export class CatalogRepository {
       }
     }
 
-    const computed = picked.slice(0, limit).map((p) => {
-      if (p.kind === 'lecture') {
-        return {
-          lessonCount: 1,
-          totalDurationSeconds: p.row.durationSeconds ?? undefined,
-        };
-      }
+    const computed = await Promise.all(
+      picked.slice(0, limit).map(async (p) => {
+        if (p.kind === 'lecture') {
+          return {
+            lessonCount: 1,
+            totalDurationSeconds: p.row.durationSeconds ?? undefined,
+          };
+        }
 
-      if (p.kind === 'collection') {
-        return {
-          lessonCount: p.row.publishedLectureCount ?? undefined,
-          totalDurationSeconds: p.row.publishedDurationSeconds ?? undefined,
-        };
-      }
+        if (p.kind === 'collection') {
+          let lessonCount = p.row.publishedLectureCount ?? undefined;
+          let totalDurationSeconds =
+            p.row.publishedDurationSeconds ?? undefined;
 
-      return {
-        lessonCount: p.row.publishedLectureCount ?? undefined,
-        totalDurationSeconds: p.row.publishedDurationSeconds ?? undefined,
-      };
-    });
+          if (lessonCount === undefined) {
+            lessonCount = await this.prisma.lecture.count({
+              where: {
+                status: Status.published,
+                deletedAt: null,
+                series: { collectionId: p.row.id },
+              },
+            });
+          }
+
+          if (totalDurationSeconds === undefined) {
+            const agg = await this.prisma.lecture.aggregate({
+              where: {
+                status: Status.published,
+                deletedAt: null,
+                series: { collectionId: p.row.id },
+              },
+              _sum: { durationSeconds: true },
+            });
+            totalDurationSeconds = agg._sum.durationSeconds ?? undefined;
+          }
+
+          return {
+            lessonCount,
+            totalDurationSeconds,
+          };
+        }
+
+        // series
+        let lessonCount = p.row.publishedLectureCount ?? undefined;
+        let totalDurationSeconds = p.row.publishedDurationSeconds ?? undefined;
+
+        if (lessonCount === undefined) {
+          lessonCount = await this.prisma.lecture.count({
+            where: {
+              status: Status.published,
+              deletedAt: null,
+              seriesId: p.row.id,
+            },
+          });
+        }
+
+        if (totalDurationSeconds === undefined) {
+          const agg = await this.prisma.lecture.aggregate({
+            where: {
+              status: Status.published,
+              deletedAt: null,
+              seriesId: p.row.id,
+            },
+            _sum: { durationSeconds: true },
+          });
+          totalDurationSeconds = agg._sum.durationSeconds ?? undefined;
+        }
+
+        return {
+          lessonCount,
+          totalDurationSeconds,
+        };
+      }),
+    );
 
     return picked.slice(0, limit).map((p, idx) => {
       if (p.kind === 'collection') {
