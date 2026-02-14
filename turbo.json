@@ -21,7 +21,7 @@
     "typecheck": {
       "dependsOn": ["^typecheck"],
       "inputs": ["$TURBO_DEFAULT$", "tsconfig*.json", "packages/config/tsconfig/**"],
-      "outputs": []
+      "outputs": ["src/generated/**"]
     },
     "test": {
       "dependsOn": ["^test"],
