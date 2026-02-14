@@ -26,6 +26,7 @@ export type HomeContentContext = {
   topicItems?: RecommendationItem[];
   kibarCursor?: string;
   topicCursor?: string;
+  tabOverrides?: Tab[];
 };
 
 const DEFAULT_TOPIC_SLUGS = ["hadith", "fiqh", "mustalah"];
@@ -65,6 +66,7 @@ export function buildHomeContent(context: HomeContentContext): {
     topicItems: topicOverride,
     kibarCursor,
     topicCursor,
+    tabOverrides,
   } = context;
   const scholarById = new Map<string, Scholar>(scholars.map((scholar) => [scholar.id, scholar]));
   const seriesIndex = new Map<string, Series>();
@@ -74,13 +76,6 @@ export function buildHomeContent(context: HomeContentContext): {
   });
 
   const allLectures = lectureBuckets.flat();
-  const allSeries = scholarBundles.flatMap((bundle) =>
-    bundle.series.map((series) => ({ series, scholar: bundle.scholar })),
-  );
-  const allCollections = scholarBundles.flatMap((bundle) =>
-    bundle.collections.map((collection) => ({ collection, scholar: bundle.scholar })),
-  );
-
   const lecturesWithScholars = allLectures
     .map((lecture) => ({
       lecture,
@@ -189,115 +184,81 @@ export function buildHomeContent(context: HomeContentContext): {
     .map(({ lecture, scholar }) => buildLectureItem(lecture, scholar))
     .slice(0, 6);
 
-  const latestSeriesItems = [...allSeries]
-    .sort((a, b) => b.series.createdAt.localeCompare(a.series.createdAt))
-    .slice(0, 8)
-    .map(({ series, scholar }) => buildSeriesItem(series, scholar));
-
-  const latestCollectionItems = [...allCollections]
-    .sort((a, b) => b.collection.createdAt.localeCompare(a.collection.createdAt))
-    .slice(0, 8)
-    .map(({ collection, scholar }) => buildCollectionItem(collection, scholar));
-
-  const seriesHighlights = allSeries
-    .slice(0, 8)
-    .map(({ series, scholar }) => buildSeriesItem(series, scholar));
-
-  const collectionHighlights = allCollections
-    .slice(0, 8)
-    .map(({ collection, scholar }) => buildCollectionItem(collection, scholar));
-
-  const tabs: Tab[] = [
-    {
-      id: "home",
-      label: "Home",
-      rows: [
-        {
-          id: "kibar",
-          title: "Recommended from Kibar ul-Ulama",
-          items: kibarItems,
-          variant: "featured",
-          cursor: kibarCursor,
-          source: { kind: "kibar" },
-        },
-        {
-          id: "topic",
-          title: preferredTopic ? `Recommended in ${preferredTopic.name}` : "Topic focus",
-          items: topicItems,
-          cursor: topicCursor,
-          source: preferredTopic ? { kind: "topic", topicSlug: preferredTopic.slug } : undefined,
-        },
-        {
-          id: "popular",
-          title: "Recommended by Popular Listening",
-          items: popularLectureItems,
-        },
-      ],
-    },
-    {
-      id: "latest",
-      label: "Latest",
-      rows: [
-        {
-          id: "latest-lectures",
-          title: "Newly published lectures",
-          items: recentLectureItems,
-        },
-        {
-          id: "latest-series",
-          title: "New series releases",
-          items: latestSeriesItems,
-        },
-        {
-          id: "latest-collections",
-          title: "New collections",
-          items: latestCollectionItems,
-        },
-      ],
-    },
-    {
-      id: "trending",
-      label: "Trending",
-      rows: [
-        {
-          id: "trending-lectures",
-          title: "Popular listening",
-          items: popularLectureItems,
-        },
-        {
-          id: "trending-series",
-          title: "Series gaining momentum",
-          items: seriesHighlights,
-        },
-        {
-          id: "trending-collections",
-          title: "Collections in focus",
-          items: collectionHighlights,
-        },
-      ],
-    },
-    {
-      id: "series",
-      label: "Series",
-      rows: [
-        {
-          id: "series-featured",
-          title: "Featured series",
-          items: seriesHighlights,
-        },
-        {
-          id: "series-from-collections",
-          title: "From curated collections",
-          items: collectionHighlights,
-        },
-        {
-          id: "series-lectures",
-          title: "Lecture sequences",
-          items: recentLectureItems,
-        },
-      ],
-    },
-  ];
+  const tabs: Tab[] =
+    tabOverrides && tabOverrides.length > 0
+      ? tabOverrides
+      : [
+          {
+            id: "recommended",
+            label: "Recommended",
+            rows: [
+              {
+                id: "kibar",
+                title: "Lessons by Senior Scholars",
+                items: kibarItems,
+                variant: "featured",
+                cursor: kibarCursor,
+                source: { kind: "recommended-kibar" },
+              },
+              {
+                id: "topic",
+                title: "Recommended topics",
+                items: topicItems,
+                cursor: topicCursor,
+                source: { kind: "recommended-topics" },
+                density: "tight",
+              },
+              {
+                id: "recent-play",
+                title: "Related to Recently Played Lectures",
+                items: popularLectureItems,
+                source: { kind: "recommended-recent-play" },
+              },
+            ],
+          },
+          {
+            id: "following",
+            label: "Following",
+            rows: [
+              {
+                id: "following-scholars",
+                title: "From your scholars",
+                items: [],
+                source: { kind: "following-scholars" },
+              },
+              {
+                id: "following-topics",
+                title: "Lessons on topics you follow",
+                items: [],
+                source: { kind: "following-topics" },
+              },
+            ],
+          },
+          {
+            id: "latest",
+            label: "Latest",
+            rows: [
+              {
+                id: "latest-all",
+                title: "Latest lessons",
+                items: recentLectureItems,
+                source: { kind: "latest" },
+              },
+            ],
+          },
+          {
+            id: "popular",
+            label: "Popular",
+            rows: [
+              {
+                id: "popular-all",
+                title: "Popular right now",
+                items: popularLectureItems,
+                source: { kind: "popular" },
+              },
+            ],
+          },
+        ];
 
   return {
     tabs,

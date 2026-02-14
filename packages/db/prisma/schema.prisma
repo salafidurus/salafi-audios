@@ -20,6 +20,26 @@ enum Status {
   archived
 }
 
+enum AnalyticsContentKind {
+  lecture
+  series
+  collection
+}
+
+enum AnalyticsEventType {
+  view
+  play
+  complete
+  save
+  share
+}
+
+enum AnalyticsSource {
+  web
+  mobile
+  api
+}
+
 enum RecommendationRecurrence {
   none
   yearly
@@ -184,6 +204,35 @@ model Collection {
   @@index([scholarId, orderIndex], map: "idx_collection_scholar_order")
   @@index([deletedAt], map: "idx_collection_deleted")
   @@index([deleteAfterAt], map: "idx_collection_deleteafter")
+}
+
+model RecommendationHero {
+  id         String               @id @default(cuid())
+  entityKind AnalyticsContentKind
+  entityId   String
+  headline   String
+  orderIndex Int                  @default(0)
+  isActive   Boolean              @default(true)
+  startAt    DateTime?
+  endAt      DateTime?
+  createdAt  DateTime             @default(now())
+
+  @@index([isActive, orderIndex], map: "idx_recommendationhero_active_order")
+  @@index([entityKind, entityId], map: "idx_recommendationhero_entity")
+}
+
+model AnalyticsEvent {
+  id          String               @id @default(cuid())
+  contentKind AnalyticsContentKind
+  contentId   String
+  eventType   AnalyticsEventType
+  weight      Int
+  occurredAt  DateTime             @default(now())
+  source      AnalyticsSource
+  createdAt   DateTime             @default(now())
+
+  @@index([contentKind, contentId, occurredAt], map: "idx_analytics_content_time")
+  @@index([eventType, occurredAt], map: "idx_analytics_event_time")
 }
 
 //////////////////////////

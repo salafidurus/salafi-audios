@@ -114,6 +114,31 @@
   font-weight: 700;
 }
 
+.cardFeatured .title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: calc(2 * 1.2em);
+  line-height: 1.2;
+}
+
+.cardFeatured .subtitle {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.25;
+}
+
+.cardFeatured .meta {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.25;
+}
+
 .title {
   margin: 0;
   font-weight: 650;

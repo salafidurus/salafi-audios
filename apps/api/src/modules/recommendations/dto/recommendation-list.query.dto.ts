@@ -15,4 +15,19 @@ export class RecommendationListQueryDto {
   @IsString()
   @IsOptional()
   cursor?: string;
+
+  @ApiPropertyOptional({
+    description: 'Comma-separated topic slugs for topic-scoped recommendations',
+  })
+  @IsString()
+  @IsOptional()
+  topics?: string;
+
+  @ApiPropertyOptional({ description: 'Window in days (default 30)' })
+  @Transform(({ value }) => (value === undefined ? undefined : Number(value)))
+  @IsInt()
+  @Min(1)
+  @Max(365)
+  @IsOptional()
+  windowDays?: number;
 }

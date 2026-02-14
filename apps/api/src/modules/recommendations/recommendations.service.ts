@@ -11,15 +11,69 @@ export class RecommendationsService {
     return this.repo.listHeroItems(limit);
   }
 
-  listKibar(limit?: number, cursor?: string): Promise<RecommendationPageDto> {
-    return this.repo.listKibarItems(limit, cursor);
-  }
-
-  listTopic(
-    topicSlug: string,
+  listRecommendedKibar(
     limit?: number,
     cursor?: string,
   ): Promise<RecommendationPageDto> {
-    return this.repo.listTopicItems(topicSlug, limit, cursor);
+    return this.repo.listRecommendedKibar(limit, cursor);
+  }
+
+  listRecommendedRecentPlay(
+    limit?: number,
+    cursor?: string,
+  ): Promise<RecommendationPageDto> {
+    return this.repo.listRecommendedRecentPlay(limit, cursor);
+  }
+
+  listRecommendedTopics(
+    topicsCsv: string | undefined,
+    limit?: number,
+    cursor?: string,
+  ): Promise<RecommendationPageDto> {
+    return this.repo.listRecommendedTopics(topicsCsv, limit, cursor);
+  }
+
+  listFollowingScholars(
+    limit?: number,
+    cursor?: string,
+  ): Promise<RecommendationPageDto> {
+    return this.repo.listFollowingScholars(limit, cursor);
+  }
+
+  listFollowingTopics(
+    topicsCsv: string | undefined,
+    limit?: number,
+    cursor?: string,
+  ): Promise<RecommendationPageDto> {
+    return this.repo.listFollowingTopics(topicsCsv, limit, cursor);
+  }
+
+  listLatest(limit?: number, cursor?: string): Promise<RecommendationPageDto> {
+    return this.repo.listLatest(limit, cursor);
+  }
+
+  listLatestTopics(
+    topicsCsv: string | undefined,
+    limit?: number,
+    cursor?: string,
+  ): Promise<RecommendationPageDto> {
+    return this.repo.listLatestTopics(topicsCsv, limit, cursor);
+  }
+
+  listPopular(
+    windowDays: number | undefined,
+    limit?: number,
+    cursor?: string,
+  ): Promise<RecommendationPageDto> {
+    return this.repo.listPopular(windowDays, limit, cursor);
+  }
+
+  listPopularTopics(
+    topicsCsv: string | undefined,
+    windowDays: number | undefined,
+    limit?: number,
+    cursor?: string,
+  ): Promise<RecommendationPageDto> {
+    return this.repo.listPopularTopics(topicsCsv, windowDays, limit, cursor);
   }
 }

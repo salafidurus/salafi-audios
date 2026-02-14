@@ -10,6 +10,17 @@
   justify-content: space-between;
 }
 
+.navButtons {
+  display: inline-flex;
+  gap: 0.4rem;
+}
+
+.navBtn {
+  --btn-bg: color-mix(in srgb, var(--color-surface) 75%, transparent);
+  --btn-fg: var(--color-text-secondary);
+  --btn-border: color-mix(in srgb, var(--color-border) 70%, transparent);
+}
+
 .head h2 {
   margin: 0;
   font-size: var(--font-size-h2);
@@ -29,19 +40,27 @@
 }
 
 .scroller {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(15.5rem, 1fr);
+  display: flex;
   gap: var(--space-gap-lg);
   overflow-x: auto;
   padding-bottom: 0.35rem;
   scroll-snap-type: x proximity;
   scroll-behavior: smooth;
   scrollbar-width: none;
+  cursor: grab;
+  justify-content: start;
+}
+
+.scroller:active {
+  cursor: grabbing;
 }
 
 .scrollerFeatured {
-  grid-auto-columns: minmax(24rem, 1fr);
+  gap: var(--space-gap-lg);
+}
+
+.scrollerTight {
+  gap: var(--space-gap-md);
 }
 
 .scroller::-webkit-scrollbar {
@@ -54,10 +73,32 @@
   padding: var(--space-gap-lg);
   color: var(--color-text-tertiary);
   font-size: var(--font-size-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.emptyCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-chip);
+  border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
+  background: var(--color-surface);
+  color: var(--color-link);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.emptyCta:hover {
+  background: color-mix(in srgb, var(--color-primary-soft) 65%, var(--color-surface));
 }
 
 .skeletonCard {
   min-width: 15.5rem;
+  max-width: 17.5rem;
   height: 14.5rem;
   border-radius: var(--radius-panel);
   background:
@@ -69,12 +110,14 @@
 
 .skeletonCardFeatured {
   min-width: 24rem;
+  max-width: 32rem;
   height: 12.5rem;
 }
 
 .loadMoreSentinel {
   width: 1px;
   height: 1px;
+  flex: 0 0 1px;
 }
 
 @keyframes shimmer {

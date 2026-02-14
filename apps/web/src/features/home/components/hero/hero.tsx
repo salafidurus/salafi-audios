@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import {
   Bookmark,
   ChevronLeft,
@@ -13,6 +14,7 @@ import {
 } from "lucide-react";
 import type { RecommendationHeroItem } from "@/features/home/api/public-api";
 import { Button } from "@/shared/components/button/button";
+import buttonStyles from "@/shared/components/button/button.module.css";
 import styles from "./hero.module.css";
 
 type HeroProps = {
@@ -34,9 +36,23 @@ function formatDuration(seconds: number) {
   return `${hours}h ${minutes}m`;
 }
 
+function buildHeroHref(item: RecommendationHeroItem): string | null {
+  if (!item.presentedBySlug) return null;
+
+  if (item.kind === "lecture") {
+    return `/lectures/${item.presentedBySlug}/${item.entitySlug}`;
+  }
+
+  if (item.kind === "series") {
+    return `/series/${item.presentedBySlug}/${item.entitySlug}`;
+  }
+
+  return `/collections/${item.presentedBySlug}/${item.entitySlug}`;
+}
+
 export function Hero({ items }: HeroProps) {
   const slides = useMemo<RecommendationHeroItem[]>(() => {
-    if (items.length > 0) return items.slice(0, 3);
+    if (items.length > 0) return items.slice(0, 10);
 
     return [
       {
@@ -102,6 +118,7 @@ export function Hero({ items }: HeroProps) {
   const active = slides[clampIndex(index, slides.length)]!;
   const canPrev = index > 0;
   const canNext = index < slides.length - 1;
+  const heroHref = buildHeroHref(active);
 
   const goPrev = () => {
     if (!canPrev) return;
@@ -186,7 +203,13 @@ export function Hero({ items }: HeroProps) {
 
                 <h1 className={styles.title}>{active.title}</h1>
 
-                <div className={styles.scholarName}>{active.presentedBy}</div>
+                {active.presentedBySlug ? (
+                  <Link href={`/scholars/${active.presentedBySlug}`} className={styles.scholarName}>
+                    {active.presentedBy}
+                  </Link>
+                ) : (
+                  <div className={styles.scholarName}>{active.presentedBy}</div>
+                )}
 
                 <div className={styles.meta}>
                   {typeof lessonCount === "number" ? (
@@ -208,10 +231,20 @@ export function Hero({ items }: HeroProps) {
                 ) : null}
 
                 <div className={styles.actions}>
-                  <Button variant="primary" size="lg" aria-disabled="true">
-                    <Play size={18} aria-hidden="true" />
-                    Start learning
-                  </Button>
+                  {heroHref ? (
+                    <Link
+                      href={heroHref}
+                      className={`${buttonStyles.button} ${buttonStyles["variant-primary"]} ${buttonStyles["size-lg"]}`}
+                    >
+                      <Play size={18} aria-hidden="true" />
+                      Start learning
+                    </Link>
+                  ) : (
+                    <Button variant="primary" size="lg" aria-disabled="true">
+                      <Play size={18} aria-hidden="true" />
+                      Start learning
+                    </Button>
+                  )}
 
                   <Button
                     variant="outline"

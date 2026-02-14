@@ -5,14 +5,16 @@ import { Clock3, Home, Layers, TrendingUp } from "lucide-react";
 import type { Tab } from "@/features/home/types/home.types";
 import type { RecommendationItem as ApiRecommendationItem } from "@/features/home/api/public-api";
 import { publicApi } from "@/features/home/api/public-api";
+import Link from "next/link";
 import { RecommendationRow } from "@/features/home/components/recommendations/row/row";
+import buttonStyles from "@/shared/components/button/button.module.css";
 import styles from "./tabs.module.css";
 
 const tabIcons = {
-  home: Home,
+  recommended: Home,
+  following: Layers,
   latest: Clock3,
-  trending: TrendingUp,
-  series: Layers,
+  popular: TrendingUp,
 } as const;
 
 type TabsProps = {
@@ -57,8 +59,9 @@ function mapRecommendationItem(item: ApiRecommendationItem): Tab["rows"][number]
 }
 
 export function Tabs({ tabs, defaultTabId }: TabsProps) {
-  const initialTabId = defaultTabId ?? tabs[0]?.id ?? "home";
+  const initialTabId = defaultTabId ?? tabs[0]?.id ?? "recommended";
   const [activeTabId, setActiveTabId] = useState(initialTabId);
+  const isAuthenticated = false;
 
   const [rowState, setRowState] = useState<Record<string, RowState>>({});
 
@@ -66,7 +69,7 @@ export function Tabs({ tabs, defaultTabId }: TabsProps) {
     const nextState: Record<string, RowState> = {};
     tabs.forEach((tab) => {
       tab.rows.forEach((row) => {
-        const baseCount = row.variant === "featured" ? 2 : 6;
+        const baseCount = row.variant === "featured" ? 4 : 8;
         nextState[row.id] = {
           items: row.items,
           nextCursor: row.cursor,
@@ -94,7 +97,7 @@ export function Tabs({ tabs, defaultTabId }: TabsProps) {
       const current = rowState[rowId];
       if (!current || current.isLoading) return;
 
-      const pageSize = current.source?.kind === "kibar" ? 8 : current.pageSize;
+      const pageSize = current.pageSize;
       const hasLocalMore = current.visibleCount < current.items.length;
       const hasRemoteMore = Boolean(current.source && current.nextCursor);
       if (!hasLocalMore && !hasRemoteMore) return;
@@ -117,8 +120,8 @@ export function Tabs({ tabs, defaultTabId }: TabsProps) {
           return;
         }
 
-        if (current.source?.kind === "kibar" && current.nextCursor) {
-          const page = await publicApi.listRecommendationKibar(pageSize, current.nextCursor, {
+        if (current.source?.kind === "recommended-kibar" && current.nextCursor) {
+          const page = await publicApi.listRecommendedKibar(pageSize, current.nextCursor, {
             cache: "no-store",
           });
           setRowState((prev) => ({
@@ -134,9 +137,100 @@ export function Tabs({ tabs, defaultTabId }: TabsProps) {
           return;
         }
 
-        if (current.source?.kind === "topic" && current.nextCursor) {
-          const page = await publicApi.listRecommendationTopic(
-            current.source.topicSlug,
+        if (current.source?.kind === "recommended-recent-play" && current.nextCursor) {
+          const page = await publicApi.listRecommendedRecentPlay(pageSize, current.nextCursor, {
+            cache: "no-store",
+          });
+          setRowState((prev) => ({
+            ...prev,
+            [rowId]: {
+              ...prev[rowId],
+              items: [...prev[rowId].items, ...page.items.map(mapRecommendationItem)],
+              nextCursor: page.nextCursor ?? undefined,
+              visibleCount: prev[rowId].visibleCount + page.items.length,
+              isLoading: false,
+            },
+          }));
+          return;
+        }
+
+        if (current.source?.kind === "recommended-topics" && current.nextCursor) {
+          const page = await publicApi.listRecommendedTopics(
+            current.source.topicsCsv,
+            pageSize,
+            current.nextCursor,
+            { cache: "no-store" },
+          );
+          setRowState((prev) => ({
+            ...prev,
+            [rowId]: {
+              ...prev[rowId],
+              items: [...prev[rowId].items, ...page.items.map(mapRecommendationItem)],
+              nextCursor: page.nextCursor ?? undefined,
+              visibleCount: prev[rowId].visibleCount + page.items.length,
+              isLoading: false,
+            },
+          }));
+          return;
+        }
+
+        if (current.source?.kind === "latest" && current.nextCursor) {
+          const page = await publicApi.listLatest(pageSize, current.nextCursor, {
+            cache: "no-store",
+          });
+          setRowState((prev) => ({
+            ...prev,
+            [rowId]: {
+              ...prev[rowId],
+              items: [...prev[rowId].items, ...page.items.map(mapRecommendationItem)],
+              nextCursor: page.nextCursor ?? undefined,
+              visibleCount: prev[rowId].visibleCount + page.items.length,
+              isLoading: false,
+            },
+          }));
+          return;
+        }
+
+        if (current.source?.kind === "popular" && current.nextCursor) {
+          const page = await publicApi.listPopular(pageSize, current.nextCursor, {
+            cache: "no-store",
+          });
+          setRowState((prev) => ({
+            ...prev,
+            [rowId]: {
+              ...prev[rowId],
+              items: [...prev[rowId].items, ...page.items.map(mapRecommendationItem)],
+              nextCursor: page.nextCursor ?? undefined,
+              visibleCount: prev[rowId].visibleCount + page.items.length,
+              isLoading: false,
+            },
+          }));
+          return;
+        }
+
+        if (current.source?.kind === "popular-topics" && current.nextCursor) {
+          const page = await publicApi.listPopularTopics(
+            current.source.topicsCsv,
+            pageSize,
+            current.nextCursor,
+            { cache: "no-store" },
+          );
+          setRowState((prev) => ({
+            ...prev,
+            [rowId]: {
+              ...prev[rowId],
+              items: [...prev[rowId].items, ...page.items.map(mapRecommendationItem)],
+              nextCursor: page.nextCursor ?? undefined,
+              visibleCount: prev[rowId].visibleCount + page.items.length,
+              isLoading: false,
+            },
+          }));
+          return;
+        }
+
+        if (current.source?.kind === "latest-topics" && current.nextCursor) {
+          const page = await publicApi.listLatestTopics(
+            current.source.topicsCsv,
             pageSize,
             current.nextCursor,
             { cache: "no-store" },
@@ -195,7 +289,30 @@ export function Tabs({ tabs, defaultTabId }: TabsProps) {
         aria-labelledby={`recommendations-tab-${activeTab.id}`}
         className={styles.panel}
       >
-        {activeTab.rows.length === 0 ? (
+        {activeTab.id === "following" && !isAuthenticated ? (
+          <div className={styles.followingCta}>
+            <div>
+              <p className={styles.followingTitle}>Follow scholars and topics you trust.</p>
+              <p className={styles.followingSubtitle}>
+                Save your favorites and get recommendations tailored to your learning path.
+              </p>
+            </div>
+            <div className={styles.followingActions}>
+              <Link
+                href="/get-started"
+                className={`${buttonStyles.button} ${buttonStyles["variant-primary"]} ${buttonStyles["size-lg"]} ${styles.followingPrimary}`}
+              >
+                Get started
+              </Link>
+              <Link
+                href="/signup"
+                className={`${buttonStyles.button} ${buttonStyles["variant-outline"]} ${buttonStyles["size-lg"]} ${styles.followingSecondary}`}
+              >
+                Sign up
+              </Link>
+            </div>
+          </div>
+        ) : activeTab.rows.length === 0 ? (
           <div className={styles.emptyState}>No recommendations yet.</div>
         ) : (
           activeTab.rows.map((row) => {
@@ -207,6 +324,8 @@ export function Tabs({ tabs, defaultTabId }: TabsProps) {
               Boolean(state?.nextCursor) ||
               (state ? state.visibleCount < state.items.length : false);
             const isLoading = state?.isLoading ?? false;
+            const isFollowingRow =
+              row.source?.kind === "following-scholars" || row.source?.kind === "following-topics";
 
             return (
               <RecommendationRow
@@ -214,10 +333,18 @@ export function Tabs({ tabs, defaultTabId }: TabsProps) {
                 title={row.title}
                 items={visibleItems}
                 variant={row.variant}
+                density={row.density}
                 hasMore={hasMore}
                 isLoading={isLoading}
                 onLoadMore={() => loadMore(row.id)}
-                pageSize={row.variant === "featured" ? 2 : 6}
+                pageSize={row.variant === "featured" ? 4 : 8}
+                emptyMessage={
+                  isFollowingRow
+                    ? "Sign in to follow scholars and topics you care about."
+                    : undefined
+                }
+                ctaLabel={isFollowingRow ? "Sign in" : undefined}
+                ctaHref={isFollowingRow ? "/sign-in" : undefined}
               />
             );
           })

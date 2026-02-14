@@ -1,26 +1,4 @@
-.header {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
-  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent);
-}
-
-.headerInner {
-  width: min(var(--space-content-max), 100%);
-  margin-inline: auto;
-  padding: 0.9rem var(--space-page-x);
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: var(--space-gap-lg);
-}
-
-.brand,
-.search,
-.actions,
 .hero,
-.tabs,
 .rowTitle,
 .card,
 .stats {
@@ -35,29 +13,16 @@
   animation: shimmer 1.4s ease-in-out infinite;
 }
 
-.brand {
-  width: 10rem;
-  height: 2rem;
-}
-
-.search {
-  height: 2.2rem;
-}
-
-.actions {
-  width: 7.5rem;
-  height: 2rem;
-}
-
 .hero {
   margin-top: var(--space-gap-xl);
   height: clamp(14rem, 24vw, 19rem);
 }
 
-.tabs {
+.tabsShell {
   margin-top: var(--space-gap-lg);
-  height: 2.2rem;
-  width: clamp(12rem, 30vw, 26rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-gap-xl);
 }
 
 .row {
@@ -67,15 +32,21 @@
   gap: var(--space-gap-md);
 }
 
+.rowHeading {
+  margin: 0;
+  font-size: var(--font-size-h2);
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
 .rowTitle {
   width: clamp(12rem, 32vw, 22rem);
   height: 1.6rem;
 }
 
 .rowCards {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(15.5rem, 1fr);
+  display: flex;
   gap: var(--space-gap-lg);
   overflow: hidden;
 }
@@ -96,16 +67,5 @@
   }
   100% {
     background-position: -200% 0%;
-  }
-}
-
-@media (max-width: 720px) {
-  .headerInner {
-    grid-template-columns: 1fr;
-    gap: var(--space-gap-md);
-  }
-
-  .actions {
-    width: 100%;
   }
 }

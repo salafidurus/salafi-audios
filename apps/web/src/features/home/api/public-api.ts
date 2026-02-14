@@ -79,19 +79,70 @@ export const publicApi = {
       `/recommendations/hero${typeof limit === "number" ? `?limit=${limit}` : ""}`,
       options,
     ),
-  listRecommendationKibar: (limit?: number, cursor?: string, options?: RequestOptions) =>
+  listRecommendedKibar: (limit?: number, cursor?: string, options?: RequestOptions) =>
     requestPublic<RecommendationPage>(
-      `/recommendations/kibar${buildPageQuery(limit, cursor)}`,
+      `/recommendations/recommended/kibar${buildPageQuery(limit, cursor)}`,
       options,
     ),
-  listRecommendationTopic: (
-    topicSlug: string,
+  listRecommendedRecentPlay: (limit?: number, cursor?: string, options?: RequestOptions) =>
+    requestPublic<RecommendationPage>(
+      `/recommendations/recommended/recent-play${buildPageQuery(limit, cursor)}`,
+      options,
+    ),
+  listRecommendedTopics: (
+    topicsCsv?: string,
     limit?: number,
     cursor?: string,
     options?: RequestOptions,
   ) =>
     requestPublic<RecommendationPage>(
-      `/recommendations/topics/${topicSlug}${buildPageQuery(limit, cursor)}`,
+      `/recommendations/recommended/topics${buildPageQuery(limit, cursor, topicsCsv)}`,
+      options,
+    ),
+  listFollowingScholars: (limit?: number, cursor?: string, options?: RequestOptions) =>
+    requestPublic<RecommendationPage>(
+      `/recommendations/following/scholars${buildPageQuery(limit, cursor)}`,
+      options,
+    ),
+  listFollowingTopics: (
+    topicsCsv?: string,
+    limit?: number,
+    cursor?: string,
+    options?: RequestOptions,
+  ) =>
+    requestPublic<RecommendationPage>(
+      `/recommendations/following/topics${buildPageQuery(limit, cursor, topicsCsv)}`,
+      options,
+    ),
+  listLatest: (limit?: number, cursor?: string, options?: RequestOptions) =>
+    requestPublic<RecommendationPage>(
+      `/recommendations/latest${buildPageQuery(limit, cursor)}`,
+      options,
+    ),
+  listLatestTopics: (
+    topicsCsv?: string,
+    limit?: number,
+    cursor?: string,
+    options?: RequestOptions,
+  ) =>
+    requestPublic<RecommendationPage>(
+      `/recommendations/latest/topics${buildPageQuery(limit, cursor, topicsCsv)}`,
+      options,
+    ),
+  listPopular: (limit?: number, cursor?: string, options?: RequestOptions, windowDays?: number) =>
+    requestPublic<RecommendationPage>(
+      `/recommendations/popular${buildPageQuery(limit, cursor, undefined, windowDays)}`,
+      options,
+    ),
+  listPopularTopics: (
+    topicsCsv?: string,
+    limit?: number,
+    cursor?: string,
+    options?: RequestOptions,
+    windowDays?: number,
+  ) =>
+    requestPublic<RecommendationPage>(
+      `/recommendations/popular/topics${buildPageQuery(limit, cursor, topicsCsv, windowDays)}`,
       options,
     ),
   listScholars: (options?: RequestOptions) => requestPublic<Scholar[]>("/scholars", options),
@@ -124,10 +175,12 @@ export const publicApi = {
     ),
 };
 
-function buildPageQuery(limit?: number, cursor?: string) {
+function buildPageQuery(limit?: number, cursor?: string, topics?: string, windowDays?: number) {
   const params = new URLSearchParams();
   if (typeof limit === "number") params.set("limit", String(limit));
   if (cursor) params.set("cursor", cursor);
+  if (topics) params.set("topics", topics);
+  if (typeof windowDays === "number") params.set("windowDays", String(windowDays));
   const query = params.toString();
   return query ? `?${query}` : "";
 }

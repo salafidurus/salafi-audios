@@ -2156,6 +2156,24 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "topics",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated topic slugs for topic-scoped recommendations",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "windowDays",
+            "required": false,
+            "in": "query",
+            "description": "Window in days (default 30)",
+            "schema": {
+              "type": "number"
+            }
           }
         ],
         "responses": {
@@ -2239,7 +2257,7 @@
         ]
       }
     },
-    "/recommendations/kibar": {
+    "/recommendations/recommended/kibar": {
       "get": {
         "operationId": "RecommendationsController_kibar",
         "parameters": [
@@ -2262,6 +2280,24 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "topics",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated topic slugs for topic-scoped recommendations",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "windowDays",
+            "required": false,
+            "in": "query",
+            "description": "Window in days (default 30)",
+            "schema": {
+              "type": "number"
+            }
           }
         ],
         "responses": {
@@ -2336,24 +2372,16 @@
             }
           }
         },
-        "summary": "Get Kibar ul-Ulama recommendations",
+        "summary": "Get recommended Kibar ul-Ulama items",
         "tags": [
           "Recommendations"
         ]
       }
     },
-    "/recommendations/topics/{slug}": {
+    "/recommendations/recommended/recent-play": {
       "get": {
-        "operationId": "RecommendationsController_topic",
+        "operationId": "RecommendationsController_recentPlay",
         "parameters": [
-          {
-            "name": "slug",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "limit",
             "required": false,
@@ -2373,6 +2401,24 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "topics",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated topic slugs for topic-scoped recommendations",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "windowDays",
+            "required": false,
+            "in": "query",
+            "description": "Window in days (default 30)",
+            "schema": {
+              "type": "number"
+            }
           }
         ],
         "responses": {
@@ -2447,9 +2493,820 @@
             }
           }
         },
-        "summary": "Get topic recommendations by slug",
+        "summary": "Get recommended items from recent plays",
         "tags": [
           "Recommendations"
+        ]
+      }
+    },
+    "/recommendations/recommended/topics": {
+      "get": {
+        "operationId": "RecommendationsController_recommendedTopics",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "maximum": 24,
+              "default": 8,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination (opaque string)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topics",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated topic slugs for topic-scoped recommendations",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "windowDays",
+            "required": false,
+            "in": "query",
+            "description": "Window in days (default 30)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get recommended items for topics",
+        "tags": [
+          "Recommendations"
+        ]
+      }
+    },
+    "/recommendations/following/scholars": {
+      "get": {
+        "operationId": "RecommendationsController_followingScholars",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "maximum": 24,
+              "default": 8,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination (opaque string)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topics",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated topic slugs for topic-scoped recommendations",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "windowDays",
+            "required": false,
+            "in": "query",
+            "description": "Window in days (default 30)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get recommendations from followed scholars",
+        "tags": [
+          "Recommendations"
+        ]
+      }
+    },
+    "/recommendations/following/topics": {
+      "get": {
+        "operationId": "RecommendationsController_followingTopics",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "maximum": 24,
+              "default": 8,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination (opaque string)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topics",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated topic slugs for topic-scoped recommendations",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "windowDays",
+            "required": false,
+            "in": "query",
+            "description": "Window in days (default 30)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get recommendations from followed topics",
+        "tags": [
+          "Recommendations"
+        ]
+      }
+    },
+    "/recommendations/latest": {
+      "get": {
+        "operationId": "RecommendationsController_latest",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "maximum": 24,
+              "default": 8,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination (opaque string)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topics",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated topic slugs for topic-scoped recommendations",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "windowDays",
+            "required": false,
+            "in": "query",
+            "description": "Window in days (default 30)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get latest recommendations",
+        "tags": [
+          "Recommendations"
+        ]
+      }
+    },
+    "/recommendations/popular": {
+      "get": {
+        "operationId": "RecommendationsController_popular",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "maximum": 24,
+              "default": 8,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination (opaque string)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topics",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated topic slugs for topic-scoped recommendations",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "windowDays",
+            "required": false,
+            "in": "query",
+            "description": "Window in days (default 30)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get popular recommendations (analytics) ",
+        "tags": [
+          "Recommendations"
+        ]
+      }
+    },
+    "/recommendations/popular/topics": {
+      "get": {
+        "operationId": "RecommendationsController_popularTopics",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "maximum": 24,
+              "default": 8,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination (opaque string)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topics",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated topic slugs for topic-scoped recommendations",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "windowDays",
+            "required": false,
+            "in": "query",
+            "description": "Window in days (default 30)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get popular recommendations by topic (analytics)",
+        "tags": [
+          "Recommendations"
+        ]
+      }
+    },
+    "/analytics/events": {
+      "post": {
+        "operationId": "AnalyticsController_record",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAnalyticsEventDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Record an analytics event",
+        "tags": [
+          "Analytics"
         ]
       }
     },
@@ -3751,6 +4608,46 @@
         },
         "required": [
           "items"
+        ]
+      },
+      "CreateAnalyticsEventDto": {
+        "type": "object",
+        "properties": {
+          "contentKind": {
+            "type": "string",
+            "enum": [
+              "lecture",
+              "series",
+              "collection"
+            ]
+          },
+          "contentId": {
+            "type": "string"
+          },
+          "eventType": {
+            "type": "string",
+            "enum": [
+              "view",
+              "play",
+              "complete",
+              "save",
+              "share"
+            ]
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "web",
+              "mobile",
+              "api"
+            ],
+            "default": "web"
+          }
+        },
+        "required": [
+          "contentKind",
+          "contentId",
+          "eventType"
         ]
       },
       "TopicDetailDto": {

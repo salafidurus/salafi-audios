@@ -17,15 +17,18 @@ export type RecommendationRow = {
   title: string;
   items: RecommendationItem[];
   variant?: "featured";
+  density?: "tight" | "default";
   cursor?: string;
   source?:
-    | {
-        kind: "kibar";
-      }
-    | {
-        kind: "topic";
-        topicSlug: string;
-      };
+    | { kind: "recommended-kibar" }
+    | { kind: "recommended-recent-play" }
+    | { kind: "recommended-topics"; topicsCsv?: string }
+    | { kind: "following-scholars" }
+    | { kind: "following-topics"; topicsCsv?: string }
+    | { kind: "latest" }
+    | { kind: "latest-topics"; topicsCsv?: string }
+    | { kind: "popular" }
+    | { kind: "popular-topics"; topicsCsv?: string };
 };
 
 export type Tab = {

@@ -22,8 +22,6 @@
     "dev": "pnpm build --watch",
     "prefix:series-collections": "pnpm --filter @sd/env build",
     "fix:series-collections": "tsx src/commands/fix-series-collections.ts",
-    "prefix:recommendation-hero": "pnpm --filter @sd/env build",
-    "fix:recommendation-hero": "tsx src/commands/fix-recommendation-hero.ts",
     "preingest:content": "pnpm --filter @sd/env build",
     "ingest:content": "tsx src/commands/ingest-content.ts",
     "preingest:remove": "pnpm --filter @sd/env build",
