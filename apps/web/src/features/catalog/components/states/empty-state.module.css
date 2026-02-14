@@ -1,8 +1,0 @@
-.catalog-empty-state {
-  border: 1px dashed var(--color-border);
-  border-radius: var(--radius-panel);
-  background: var(--color-surface-soft);
-  color: var(--color-text-muted);
-  padding: 1.4rem 1rem;
-  text-align: center;
-}

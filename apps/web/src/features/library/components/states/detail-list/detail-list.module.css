@@ -1,0 +1,35 @@
+.list {
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-gap-lg);
+  padding: var(--space-gap-md) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.row:last-child {
+  border-bottom: 0;
+}
+
+.label {
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: var(--font-size-caption);
+  font-weight: 700;
+}
+
+.value {
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .row {
+    flex-direction: column;
+    gap: 0.2rem;
+    align-items: flex-start;
+  }
+}

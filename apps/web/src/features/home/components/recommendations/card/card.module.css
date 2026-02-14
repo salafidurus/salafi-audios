@@ -1,0 +1,90 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+  border-radius: var(--radius-panel);
+  outline: none;
+  min-width: 15.5rem;
+  max-width: 17.5rem;
+  scroll-snap-align: start;
+}
+
+.card:focus-visible {
+  box-shadow: var(--shadow-focus);
+}
+
+.cover {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background:
+    radial-gradient(
+      circle at 25% 18%,
+      color-mix(in srgb, var(--color-primary) 32%, transparent),
+      transparent 58%
+    ),
+    linear-gradient(135deg, var(--color-fill-tertiary), var(--color-fill-secondary));
+  border-radius: calc(var(--radius-panel) + 0.1rem);
+  border: 1px solid color-mix(in srgb, var(--color-border) 84%, transparent);
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 0.55rem;
+  box-shadow: var(--shadow-card);
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    filter 200ms ease;
+}
+
+.card:hover .cover {
+  transform: translateY(-2px);
+  filter: saturate(1.02);
+  box-shadow: var(--shadow-panel);
+}
+
+.typeChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border-radius: var(--radius-chip);
+  padding: 0.2rem 0.55rem;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
+  color: var(--color-text);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-top: 0.6rem;
+}
+
+.title {
+  margin: 0;
+  font-weight: 650;
+  line-height: 1.3;
+  font-size: var(--font-size-md);
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.meta {
+  margin: 0;
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
