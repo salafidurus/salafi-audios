@@ -6,6 +6,7 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "scripts": {
+    "build": "pnpm codegen",
     "codegen": "orval --config ./orval.config.cjs",
     "lint": "eslint .",
     "test": "echo \"@sd/api-client: skipped (generated)\"",

@@ -10,7 +10,7 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*", "tsconfig*.json", "next.config.*"],
-      "outputs": ["dist/**", "build/**", ".next/**", "lib/**"]
+      "outputs": ["dist/**", "build/**", ".next/**", "lib/**", "generated/**"]
     },
     "lint": {
       "dependsOn": ["^lint"],
