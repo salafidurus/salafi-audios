@@ -1,33 +1,29 @@
 {
   "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "CONTRIBUTING.md",
+    "docs/**",
+    ".opencode/**",
+    "**/AGENT.md",
+    ".github/copilot-instructions.md"
+  ],
   "mcp": {
     "tailwindcss": {
-      "type": "local",
-      "command": ["npx", "-y", "tailwindcss-mcp-server@0.1.1"],
       "enabled": true
     },
     "playwright": {
-      "type": "local",
-      "command": ["npx", "-y", "playwright-mcp"],
       "enabled": true
     },
     "stitch": {
-      "type": "remote",
-      "url": "https://stitch.googleapis.com/mcp",
-      "enabled": true,
-      "headers": {
-        "X-Goog-Api-Key": "AQ.Ab8RN6IclJGSxvO9Gmn6WSU-D51RroTuecT02IZoRT_zuKP7JQ",
-        "Accept": "application/json"
-      }
+      "enabled": true
     },
     "antigravity": {
-      "type": "local",
-      "command": ["opencode-antigravity-auth"],
       "enabled": true
     },
     "hugeicons": {
-      "type": "local",
-      "command": ["@hugeicons/mcp-server"],
+      "enabled": true
+    },
+    "server-github": {
       "enabled": true
     }
   }
