@@ -21,8 +21,8 @@
     "hugeicons": {
       "enabled": false
     },
-    // "server-github": {
-    //   "enabled": false
-    // }
+    "server-github": {
+      "enabled": true
+    }
   }
 }
