@@ -1,4 +1,4 @@
-import { getWebPublicEnv, type WebPublicEnv } from "@sd/env/web";
+import { getWebPublicEnv, type WebPublicEnv } from "@sd/env";
 
 let cached: WebPublicEnv | null = null;
 

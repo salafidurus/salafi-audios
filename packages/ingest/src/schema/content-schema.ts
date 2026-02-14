@@ -1,4 +1,4 @@
-import { Status } from "@sd/db/client";
+import { Status } from "@sd/db";
 import { z } from "zod";
 
 export const topicSchema = z.object({

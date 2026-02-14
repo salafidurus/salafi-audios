@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma, Status } from "@sd/db/client";
+import { PrismaClient, Prisma, Status } from "@sd/db";
 import { S3Client } from "@aws-sdk/client-s3";
 import { ContentDefinition, LectureDef } from "../schema/content-schema";
 import { syncLectureAudioAssets } from "./audio-assets";

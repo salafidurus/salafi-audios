@@ -1,4 +1,4 @@
-import { Status } from '@sd/db/client';
+import { Status } from '@sd/db';
 import { CatalogRepository } from './catalog.repo';
 
 describe('CatalogRepository.listFeaturedHomeItems', () => {

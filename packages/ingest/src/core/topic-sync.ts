@@ -1,4 +1,4 @@
-import { Prisma } from "@sd/db/client";
+import { Prisma } from "@sd/db";
 import { TopicDef } from "../schema/content-schema";
 
 export async function upsertTopics(

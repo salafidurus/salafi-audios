@@ -1,6 +1,6 @@
 import { PrismaService } from '@/shared/db/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { Prisma, Status } from '@sd/db/client';
+import { Prisma, Status } from '@sd/db';
 import { TopicDetailDto } from './dto/topic-detail.dto';
 import { UpsertTopicDto } from './dto/upsert-topic.dto';
 import { TopicLectureViewDto } from './dto/topic-lecture-view.dto';

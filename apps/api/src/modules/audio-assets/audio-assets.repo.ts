@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/shared/db/prisma.service';
 import { ConfigService } from '@/shared/config/config.service';
-import { Prisma } from '@sd/db/client';
+import { Prisma } from '@sd/db';
 import { AudioAssetViewDto } from './dto/audio-asset-view.dto';
 import { UpsertAudioAssetDto } from './dto/upsert-audio-asset.dto';
 

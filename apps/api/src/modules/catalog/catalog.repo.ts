@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/shared/db/prisma.service';
 import { ConfigService } from '@/shared/config/config.service';
-import { Prisma, Status } from '@sd/db/client';
+import { Prisma, Status } from '@sd/db';
 import { decodeCursor, encodeCursor } from './utils/catalog.cursor';
 import { CatalogListQueryDto } from './dto/catalog-list.query.dto';
 import { CatalogPageDto } from './dto/catalog-page.dto';

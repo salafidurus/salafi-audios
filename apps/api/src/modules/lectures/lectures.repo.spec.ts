@@ -1,4 +1,4 @@
-import { Status } from '@sd/db/client';
+import { Status } from '@sd/db';
 import { ConfigService } from '@/shared/config/config.service';
 import { LecturesRepository } from './lectures.repo';
 

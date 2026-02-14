@@ -1,7 +1,7 @@
 import * as path from "node:path";
 import { access } from "node:fs/promises";
 import { S3Client } from "@aws-sdk/client-s3";
-import { Prisma } from "@sd/db/client";
+import { Prisma } from "@sd/db";
 import { z } from "zod";
 import { LectureDef, audioAssetSchema } from "../schema/content-schema";
 import { R2Config, uploadAudioFile } from "../storage/r2";
