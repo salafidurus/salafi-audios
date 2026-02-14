@@ -131,6 +131,9 @@ Turbo grouped scripts:
 - If `apps/api` fails with `Cannot find module '@sd/db/client'` and follow-on PrismaService type errors (`$connect`, `$disconnect`, model delegates like `prisma.lecture`): it usually means Prisma Client artifacts were not present in the workspace when TypeScript compiled.
 - Fix: build `@sd/db` so it runs `prisma generate` and produces `packages/db/dist/generated/prisma/*` (Turbo restores `dist/**` from cache, but does not restore `src/generated/**`).
 
+- If `@sd/ingest` fails in `turbo typecheck` with `Cannot find module '@sd/db/client'`: `typecheck` does not run `@sd/db build`, so `dist/generated/**` may be missing.
+- Fix: make `@sd/db prisma:generate` also copy generated Prisma client into `packages/db/dist/generated/` (so `@sd/db/client` resolves during typecheck).
+
 - If `apps/web` fails with `Module '"@sd/api-client"' has no exported member '<X>ViewDto'`: it usually means `@sd/api-client` codegen didn't run (or Turbo cached the build but didn't restore `packages/api-client/generated/**`).
 - Fix: ensure `@sd/api-client` has a `build` script that runs Orval codegen, and that Turbo `build.outputs` includes `generated/**` so remote cache restores it.
 
