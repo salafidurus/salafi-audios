@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "@sd/db/client";
-import { getDbEnv } from "@sd/env/db";
+import { PrismaClient } from "@sd/db";
+import { getDbEnv } from "@sd/env";
 import { parseArgs, resolveInputPath } from "../cli/ingest-cli";
 import { parseContentDefinition } from "../schema/content-schema";
 import { DryRunRollbackError } from "../core/errors";

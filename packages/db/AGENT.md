@@ -45,3 +45,9 @@ Env file precedence for local DB commands:
 - Do not embed environment values in source or migrations.
 - Keep generated output derived from schema, not hand-edited.
 - Never commit generated DB artifacts under `packages/db/src/generated/`.
+
+## Common CI failure
+
+- Symptom: `Cannot find module '@sd/db/client'` during `apps/api` build, followed by many PrismaService type errors.
+- Cause: Turbo remote cache restores `dist/**` outputs but not `src/generated/**` (Prisma Client is generated output).
+- Fix: ensure `@sd/db` build produces Prisma client under `packages/db/dist/generated/prisma/` (this package's `build` script copies it there).

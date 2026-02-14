@@ -1,6 +1,6 @@
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "@sd/db/client";
-import { getDbEnv } from "@sd/env/db";
+import { PrismaClient } from "@sd/db";
+import { getDbEnv } from "@sd/env";
 import { parseRemoveArgs } from "../cli/remove-cli";
 import { runRemoval } from "../core/run-removal";
 import { bootstrapEnv } from "../shared/env.bootstrap";

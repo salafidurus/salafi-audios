@@ -1,0 +1,28 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "CONTRIBUTING.md",
+    "**/AGENT.md",
+    ".github/copilot-instructions.md"
+  ],
+  "mcp": {
+    "tailwindcss": {
+      "enabled": true
+    },
+    "playwright": {
+      "enabled": true
+    },
+    "stitch": {
+      "enabled": true
+    },
+    "antigravity": {
+      "enabled": false
+    },
+    "hugeicons": {
+      "enabled": false
+    },
+    // "server-github": {
+    //   "enabled": false
+    // }
+  }
+}

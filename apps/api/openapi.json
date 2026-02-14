@@ -1603,6 +1603,91 @@
         ]
       }
     },
+    "/catalog/featured": {
+      "get": {
+        "operationId": "CatalogController_featured",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FeaturedHomeItemDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get featured home carousel items (max 3)",
+        "tags": [
+          "Catalog"
+        ]
+      }
+    },
     "/catalog/collections": {
       "get": {
         "operationId": "CatalogController_collections",
@@ -3076,6 +3161,68 @@
           "title",
           "status",
           "createdAt"
+        ]
+      },
+      "FeaturedHomeItemDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "series",
+              "collection",
+              "lecture"
+            ]
+          },
+          "entityId": {
+            "type": "string",
+            "description": "The backing entity id (series/collection/lecture)"
+          },
+          "entitySlug": {
+            "type": "string",
+            "description": "The backing entity slug (used by clients to build canonical URLs)"
+          },
+          "headline": {
+            "type": "string",
+            "description": "Hero message to display"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "coverImageUrl": {
+            "type": "string"
+          },
+          "lessonCount": {
+            "type": "number",
+            "description": "Number of lessons (for series/collection) or 1 (lecture). Optional when not precomputed."
+          },
+          "totalDurationSeconds": {
+            "type": "number",
+            "description": "Total duration in seconds for the featured entity. Optional when not precomputed."
+          },
+          "presentedBy": {
+            "type": "string",
+            "description": "Scholar/teacher presenting the study"
+          },
+          "presentedBySlug": {
+            "type": "string",
+            "description": "Slug for the scholar/teacher"
+          },
+          "workAuthor": {
+            "type": "string",
+            "description": "Optional author of the studied work (if known)"
+          }
+        },
+        "required": [
+          "kind",
+          "entityId",
+          "entitySlug",
+          "headline",
+          "title",
+          "presentedBy"
         ]
       },
       "CollectionCatalogPageDto": {

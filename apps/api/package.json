@@ -16,7 +16,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "jest --passWithNoTests",
-    "pretest": "pnpm --filter @sd/env build && pnpm --filter @sd/db prisma:generate",
+    "pretest": "pnpm --filter @sd/env build && pnpm --filter @sd/db build",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
@@ -24,7 +24,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "pretypecheck": "pnpm --filter @sd/env build",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "prebuild": "pnpm --filter @sd/env build",
+    "prebuild": "pnpm --filter @sd/env build && pnpm --filter @sd/db build",
     "openapi:json": "pnpm build && node dist/openapi.js",
     "preopenapi:json": "pnpm --filter @sd/db prisma:generate",
     "openapi": "pnpm openapi:json"

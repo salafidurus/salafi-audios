@@ -4,7 +4,7 @@ import { LecturesService } from './lectures.service';
 import { LecturesRepository } from './lectures.repo';
 import { LectureViewDto } from './dto/lecture-view.dto';
 import { UpsertLectureDto } from './dto/upsert-lecture.dto';
-import { Status } from '@sd/db/client';
+import { Status } from '@sd/db';
 
 describe('LecturesService', () => {
   let service: LecturesService;

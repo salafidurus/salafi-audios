@@ -145,17 +145,19 @@ model Scholar {
 //////////////////////////
 
 model Collection {
-  id            String    @id @default(cuid())
-  scholarId     String
-  slug          String
-  title         String
-  description   String?
-  coverImageUrl String?
-  language      String?
-  status        Status    @default(draft)
-  orderIndex    Int?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime?
+  id                       String    @id @default(cuid())
+  scholarId                String
+  slug                     String
+  title                    String
+  description              String?
+  coverImageUrl            String?
+  language                 String?
+  status                   Status    @default(draft)
+  orderIndex               Int?
+  publishedLectureCount    Int?
+  publishedDurationSeconds Int?
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime?
 
   deletedAt     DateTime?
   deleteAfterAt DateTime?
@@ -179,18 +181,20 @@ model Collection {
 //////////////////////////
 
 model Series {
-  id            String    @id @default(cuid())
-  scholarId     String
-  collectionId  String?
-  slug          String
-  title         String
-  description   String?
-  coverImageUrl String?
-  language      String?
-  status        Status    @default(draft)
-  orderIndex    Int?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime?
+  id                       String    @id @default(cuid())
+  scholarId                String
+  collectionId             String?
+  slug                     String
+  title                    String
+  description              String?
+  coverImageUrl            String?
+  language                 String?
+  status                   Status    @default(draft)
+  orderIndex               Int?
+  publishedLectureCount    Int?
+  publishedDurationSeconds Int?
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime?
 
   deletedAt     DateTime?
   deleteAfterAt DateTime?

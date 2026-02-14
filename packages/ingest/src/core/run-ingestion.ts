@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma, Status } from "@sd/db/client";
+import { PrismaClient, Prisma, Status } from "@sd/db";
 import { S3Client } from "@aws-sdk/client-s3";
 import { ContentDefinition, LectureDef } from "../schema/content-schema";
 import { syncLectureAudioAssets } from "./audio-assets";
@@ -35,6 +35,33 @@ function computePublishedAt(status: Status, publishedAt?: string): Date | null {
   if (publishedAt) return new Date(publishedAt);
   if (status === Status.published) return new Date();
   return null;
+}
+
+function isTruthyDate(input?: string): boolean {
+  return Boolean(input && input.trim().length > 0);
+}
+
+function computePublishedLectureAggregates(lectures: LectureDef[]): {
+  publishedLectureCount: number;
+  publishedDurationSeconds: number | null;
+} {
+  const published = lectures.filter(
+    (l) => l.status === Status.published && !isTruthyDate(l.deletedAt),
+  );
+
+  const publishedLectureCount = published.length;
+  if (publishedLectureCount === 0) {
+    return { publishedLectureCount: 0, publishedDurationSeconds: 0 };
+  }
+
+  const durations = published.map((l) => l.durationSeconds);
+  const hasAllDurations = durations.every((d) => typeof d === "number" && Number.isFinite(d));
+  if (!hasAllDurations) {
+    return { publishedLectureCount, publishedDurationSeconds: null };
+  }
+
+  const publishedDurationSeconds = durations.reduce<number>((sum, d) => sum + (d as number), 0);
+  return { publishedLectureCount, publishedDurationSeconds };
 }
 
 async function upsertLecture(
@@ -169,6 +196,10 @@ export async function runIngestion(
       counters.scholars += 1;
 
       for (const collection of scholar.collections) {
+        const collectionLectureAgg = computePublishedLectureAggregates(
+          collection.series.flatMap((s) => s.lectures),
+        );
+
         const collectionRecord = await tx.collection.upsert({
           where: {
             scholarId_slug: {
@@ -185,6 +216,8 @@ export async function runIngestion(
             language: collection.language,
             status: collection.status,
             orderIndex: collection.orderIndex,
+            publishedLectureCount: collectionLectureAgg.publishedLectureCount,
+            publishedDurationSeconds: collectionLectureAgg.publishedDurationSeconds,
             deletedAt: parseDate(collection.deletedAt),
             deleteAfterAt: parseDate(collection.deleteAfterAt),
             ingestionBatchId: batch.id,
@@ -196,6 +229,8 @@ export async function runIngestion(
             language: collection.language,
             status: collection.status,
             orderIndex: collection.orderIndex,
+            publishedLectureCount: collectionLectureAgg.publishedLectureCount,
+            publishedDurationSeconds: collectionLectureAgg.publishedDurationSeconds,
             deletedAt: parseDate(collection.deletedAt),
             deleteAfterAt: parseDate(collection.deleteAfterAt),
             ingestionBatchId: batch.id,
@@ -207,6 +242,7 @@ export async function runIngestion(
         await syncCollectionTopics(tx, collectionRecord.id, collection.topicSlugs, topicIdBySlug);
 
         for (const series of collection.series) {
+          const seriesLectureAgg = computePublishedLectureAggregates(series.lectures);
           const seriesRecord = await tx.series.upsert({
             where: {
               scholarId_slug: {
@@ -224,6 +260,8 @@ export async function runIngestion(
               language: series.language,
               status: series.status,
               orderIndex: series.orderIndex,
+              publishedLectureCount: seriesLectureAgg.publishedLectureCount,
+              publishedDurationSeconds: seriesLectureAgg.publishedDurationSeconds,
               deletedAt: parseDate(series.deletedAt),
               deleteAfterAt: parseDate(series.deleteAfterAt),
               ingestionBatchId: batch.id,
@@ -236,6 +274,8 @@ export async function runIngestion(
               language: series.language,
               status: series.status,
               orderIndex: series.orderIndex,
+              publishedLectureCount: seriesLectureAgg.publishedLectureCount,
+              publishedDurationSeconds: seriesLectureAgg.publishedDurationSeconds,
               deletedAt: parseDate(series.deletedAt),
               deleteAfterAt: parseDate(series.deleteAfterAt),
               ingestionBatchId: batch.id,
@@ -264,6 +304,7 @@ export async function runIngestion(
       }
 
       for (const series of scholar.series) {
+        const seriesLectureAgg = computePublishedLectureAggregates(series.lectures);
         const seriesRecord = await tx.series.upsert({
           where: {
             scholarId_slug: {
@@ -281,6 +322,8 @@ export async function runIngestion(
             language: series.language,
             status: series.status,
             orderIndex: series.orderIndex,
+            publishedLectureCount: seriesLectureAgg.publishedLectureCount,
+            publishedDurationSeconds: seriesLectureAgg.publishedDurationSeconds,
             deletedAt: parseDate(series.deletedAt),
             deleteAfterAt: parseDate(series.deleteAfterAt),
             ingestionBatchId: batch.id,
@@ -293,6 +336,8 @@ export async function runIngestion(
             language: series.language,
             status: series.status,
             orderIndex: series.orderIndex,
+            publishedLectureCount: seriesLectureAgg.publishedLectureCount,
+            publishedDurationSeconds: seriesLectureAgg.publishedDurationSeconds,
             deletedAt: parseDate(series.deletedAt),
             deleteAfterAt: parseDate(series.deleteAfterAt),
             ingestionBatchId: batch.id,

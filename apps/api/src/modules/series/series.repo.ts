@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/shared/db/prisma.service';
-import { Prisma, Status } from '@sd/db/client';
+import { Prisma, Status } from '@sd/db';
 import { UpsertSeriesDto } from './dto/upsert-series.dto';
 import { SeriesViewDto } from './dto/series-view.dto';
 

@@ -1,0 +1,130 @@
+/* Home screen layout styles - minimal assembly styles only */
+
+.pageRoot {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.shell {
+  width: min(var(--space-content-max), 100%);
+  margin-inline: auto;
+  padding: var(--home-top-nav-h, 0px) var(--space-page-x) 2.25rem;
+  flex: 1;
+}
+
+/* Sections */
+.section {
+  margin-top: var(--space-section-y);
+}
+
+.sectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.9rem;
+}
+
+.sectionHead h2 {
+  margin: 0;
+  font-size: var(--font-size-h2);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.sectionHead h2::after {
+  content: "";
+  display: inline-block;
+  width: 0.38rem;
+  height: 0.38rem;
+  border-radius: 999px;
+  margin-left: 0.6rem;
+  background: var(--color-primary);
+  box-shadow: 0 10px 18px -16px rgb(20 47 33 / 0.5);
+}
+
+/* Grids */
+.mediaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--space-gap-lg);
+}
+
+.mediaGrid-trending {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: var(--space-gap-lg);
+}
+
+.scholarsRow {
+  display: flex;
+  gap: var(--space-gap-lg);
+  overflow-x: auto;
+  padding-bottom: 0.3rem;
+  scroll-snap-type: x mandatory;
+}
+
+.scholarsRow > * {
+  scroll-snap-align: start;
+}
+
+/* Meta */
+.metaNote {
+  margin: 0;
+  padding: 0.5rem 0 1.1rem;
+  color: transparent;
+  font-size: 1px;
+}
+
+.autoUpdateNote {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.autoUpdateIcon {
+  display: inline-flex;
+  color: color-mix(in srgb, var(--color-primary) 45%, var(--color-text-tertiary));
+}
+
+.autoUpdateIcon svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.sectionActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 960px) {
+  .shell {
+    padding-inline: clamp(1rem, 4.5vw, 1.75rem);
+  }
+}
+
+@media (max-width: 720px) {
+  .sectionHead {
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+
+  .mediaGrid,
+  .mediaGrid-trending {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(15.5rem, 1fr);
+    overflow-x: auto;
+    padding-bottom: 0.35rem;
+    scroll-snap-type: x mandatory;
+  }
+
+  .mediaGrid > *,
+  .mediaGrid-trending > * {
+    scroll-snap-align: start;
+  }
+}

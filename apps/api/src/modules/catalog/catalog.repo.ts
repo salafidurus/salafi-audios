@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/shared/db/prisma.service';
 import { ConfigService } from '@/shared/config/config.service';
-import { Prisma, Status } from '@sd/db/client';
+import { Prisma, Status } from '@sd/db';
 import { decodeCursor, encodeCursor } from './utils/catalog.cursor';
 import { CatalogListQueryDto } from './dto/catalog-list.query.dto';
 import { CatalogPageDto } from './dto/catalog-page.dto';
 import { CollectionViewDto } from '../collections/dto/collection-view.dto';
 import { SeriesViewDto } from '../series/dto/series-view.dto';
 import { LectureViewDto } from '../lectures/dto/lecture-view.dto';
+import { FeaturedHomeItemDto } from './dto/featured-home-item.dto';
 
 const DEFAULT_LIMIT = 20;
 
@@ -240,6 +241,423 @@ export class CatalogRepository {
       : undefined;
 
     return { items, nextCursor };
+  }
+
+  async listFeaturedHomeItems(limit = 3): Promise<FeaturedHomeItemDto[]> {
+    type FeaturedKind = 'series' | 'collection' | 'lecture';
+    type DesiredHero = {
+      kind?: FeaturedKind;
+      matchAny: string[];
+      headline: string;
+    };
+
+    const desired: DesiredHero[] = [
+      {
+        kind: 'series',
+        matchAny: [
+          'Kitab ut-Tawhid',
+          'Kitab at-Tawhid',
+          'Kitaab ut-Tawhid',
+          'Kitaab at-Tawhid',
+          'Tawhid',
+          'Tawheed',
+        ],
+        headline: 'Tawhid First',
+      },
+      {
+        kind: 'series',
+        matchAny: [
+          'Aqeedah ar-Raziyayn',
+          'Aqidah ar-Raziyayn',
+          'Aqidah al-Raziyayn',
+          'Raziyayn',
+          'Imamayn',
+          'الرازيين',
+        ],
+        headline: 'Learn Iman before Quran',
+      },
+      {
+        kind: 'series',
+        matchAny: [
+          'Kitab ut-Taharah',
+          'Kitab at-Taharah',
+          'Taharah',
+          'الطهارة',
+        ],
+        headline: 'Oh Allah, grant him Fiqh in the religion',
+      },
+    ];
+
+    const fallbackHeadlines = desired.map((d) => d.headline);
+
+    const featuredSeriesSelect = {
+      ...seriesSelect,
+      publishedLectureCount: true,
+      publishedDurationSeconds: true,
+      scholar: { select: { name: true, slug: true } },
+    } satisfies Prisma.SeriesSelect;
+    const featuredCollectionSelect = {
+      ...collectionSelect,
+      publishedLectureCount: true,
+      publishedDurationSeconds: true,
+      scholar: { select: { name: true, slug: true } },
+    } satisfies Prisma.CollectionSelect;
+    const featuredLectureSelect = {
+      id: true,
+      slug: true,
+      title: true,
+      description: true,
+      createdAt: true,
+      publishedAt: true,
+      durationSeconds: true,
+      status: true,
+      deletedAt: true,
+      scholar: { select: { name: true, slug: true } },
+      series: { select: { coverImageUrl: true } },
+    } satisfies Prisma.LectureSelect;
+
+    type PickedItem =
+      | {
+          kind: 'series';
+          headline: string;
+          row: Prisma.SeriesGetPayload<{ select: typeof featuredSeriesSelect }>;
+        }
+      | {
+          kind: 'collection';
+          headline: string;
+          row: Prisma.CollectionGetPayload<{
+            select: typeof featuredCollectionSelect;
+          }>;
+        }
+      | {
+          kind: 'lecture';
+          headline: string;
+          row: Prisma.LectureGetPayload<{
+            select: typeof featuredLectureSelect;
+          }>;
+        };
+
+    const picked: PickedItem[] = [];
+    const pickedIds = new Set<string>();
+
+    const pickDesired = async (d: DesiredHero): Promise<void> => {
+      const whereBase = {
+        status: Status.published,
+        deletedAt: null,
+        OR: d.matchAny.map((term) => ({
+          title: { contains: term, mode: 'insensitive' as const },
+        })),
+        scholar: { isActive: true },
+      };
+
+      const kindOrder: FeaturedKind[] = d.kind
+        ? [d.kind]
+        : ['series', 'collection', 'lecture'];
+
+      for (const kind of kindOrder) {
+        if (kind === 'series') {
+          const row = await this.prisma.series.findFirst({
+            where: whereBase,
+            select: featuredSeriesSelect,
+            orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+          });
+          if (row && !pickedIds.has(row.id)) {
+            picked.push({
+              kind: 'series',
+              headline: d.headline,
+              row,
+            });
+            pickedIds.add(row.id);
+            return;
+          }
+        }
+
+        if (kind === 'collection') {
+          const row = await this.prisma.collection.findFirst({
+            where: whereBase,
+            select: featuredCollectionSelect,
+            orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+          });
+          if (row && !pickedIds.has(row.id)) {
+            picked.push({
+              kind: 'collection',
+              headline: d.headline,
+              row,
+            });
+            pickedIds.add(row.id);
+            return;
+          }
+        }
+
+        if (kind === 'lecture') {
+          const row = await this.prisma.lecture.findFirst({
+            where: whereBase,
+            select: featuredLectureSelect,
+            orderBy: [
+              { publishedAt: 'desc' },
+              { createdAt: 'desc' },
+              { id: 'desc' },
+            ],
+          });
+          if (row && !pickedIds.has(row.id)) {
+            picked.push({
+              kind: 'lecture',
+              headline: d.headline,
+              row,
+            });
+            pickedIds.add(row.id);
+            return;
+          }
+        }
+      }
+    };
+
+    for (const d of desired) {
+      // sequential to preserve ordering and avoid over-querying
+      await pickDesired(d);
+    }
+
+    if (picked.length < limit) {
+      const remaining = Math.max(0, limit - picked.length);
+
+      const [fallbackSeries, fallbackCollections, fallbackLectures] =
+        await Promise.all([
+          this.prisma.series.findMany({
+            where: {
+              status: Status.published,
+              deletedAt: null,
+              scholar: { isActive: true },
+              ...(pickedIds.size > 0
+                ? { id: { notIn: Array.from(pickedIds) } }
+                : {}),
+            },
+            select: featuredSeriesSelect,
+            orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+            take: remaining,
+          }),
+          this.prisma.collection.findMany({
+            where: {
+              status: Status.published,
+              deletedAt: null,
+              scholar: { isActive: true },
+              ...(pickedIds.size > 0
+                ? { id: { notIn: Array.from(pickedIds) } }
+                : {}),
+            },
+            select: featuredCollectionSelect,
+            orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+            take: remaining,
+          }),
+          this.prisma.lecture.findMany({
+            where: {
+              status: Status.published,
+              deletedAt: null,
+              scholar: { isActive: true },
+              ...(pickedIds.size > 0
+                ? { id: { notIn: Array.from(pickedIds) } }
+                : {}),
+            },
+            select: featuredLectureSelect,
+            orderBy: [
+              { publishedAt: 'desc' },
+              { createdAt: 'desc' },
+              { id: 'desc' },
+            ],
+            take: remaining,
+          }),
+        ]);
+
+      const merged: PickedItem[] = [
+        ...fallbackSeries.map((row) => ({
+          kind: 'series' as const,
+          headline: fallbackHeadlines[0] ?? 'Featured',
+          row,
+        })),
+        ...fallbackCollections.map((row) => ({
+          kind: 'collection' as const,
+          headline: fallbackHeadlines[1] ?? fallbackHeadlines[0] ?? 'Featured',
+          row,
+        })),
+        ...fallbackLectures.map((row) => ({
+          kind: 'lecture' as const,
+          headline: fallbackHeadlines[2] ?? fallbackHeadlines[0] ?? 'Featured',
+          row,
+        })),
+      ];
+
+      for (const item of merged) {
+        if (picked.length >= limit) break;
+        if (pickedIds.has(item.row.id)) continue;
+        picked.push(item);
+        pickedIds.add(item.row.id);
+      }
+    }
+
+    const computed = await Promise.all(
+      picked.slice(0, limit).map(async (p) => {
+        if (p.kind === 'lecture') {
+          let totalDurationSeconds = p.row.durationSeconds ?? undefined;
+
+          if (totalDurationSeconds === undefined) {
+            const agg = await this.prisma.audioAsset.aggregate({
+              where: {
+                lectureId: p.row.id,
+                isPrimary: true,
+              },
+              _sum: { durationSeconds: true },
+            });
+            totalDurationSeconds = agg._sum.durationSeconds ?? undefined;
+          }
+
+          return {
+            lessonCount: 1,
+            totalDurationSeconds,
+          };
+        }
+
+        if (p.kind === 'collection') {
+          let lessonCount = p.row.publishedLectureCount ?? undefined;
+          let totalDurationSeconds =
+            p.row.publishedDurationSeconds ?? undefined;
+
+          if (lessonCount === undefined) {
+            lessonCount = await this.prisma.lecture.count({
+              where: {
+                status: Status.published,
+                deletedAt: null,
+                series: { collectionId: p.row.id },
+              },
+            });
+          }
+
+          if (totalDurationSeconds === undefined) {
+            const agg = await this.prisma.lecture.aggregate({
+              where: {
+                status: Status.published,
+                deletedAt: null,
+                series: { collectionId: p.row.id },
+              },
+              _sum: { durationSeconds: true },
+            });
+            totalDurationSeconds = agg._sum.durationSeconds ?? undefined;
+          }
+
+          if (totalDurationSeconds === undefined) {
+            const agg = await this.prisma.audioAsset.aggregate({
+              where: {
+                isPrimary: true,
+                lecture: {
+                  status: Status.published,
+                  deletedAt: null,
+                  series: { collectionId: p.row.id },
+                },
+              },
+              _sum: { durationSeconds: true },
+            });
+            totalDurationSeconds = agg._sum.durationSeconds ?? undefined;
+          }
+
+          return {
+            lessonCount,
+            totalDurationSeconds,
+          };
+        }
+
+        // series
+        let lessonCount = p.row.publishedLectureCount ?? undefined;
+        let totalDurationSeconds = p.row.publishedDurationSeconds ?? undefined;
+
+        if (lessonCount === undefined) {
+          lessonCount = await this.prisma.lecture.count({
+            where: {
+              status: Status.published,
+              deletedAt: null,
+              seriesId: p.row.id,
+            },
+          });
+        }
+
+        if (totalDurationSeconds === undefined) {
+          const agg = await this.prisma.lecture.aggregate({
+            where: {
+              status: Status.published,
+              deletedAt: null,
+              seriesId: p.row.id,
+            },
+            _sum: { durationSeconds: true },
+          });
+          totalDurationSeconds = agg._sum.durationSeconds ?? undefined;
+        }
+
+        if (totalDurationSeconds === undefined) {
+          const agg = await this.prisma.audioAsset.aggregate({
+            where: {
+              isPrimary: true,
+              lecture: {
+                status: Status.published,
+                deletedAt: null,
+                seriesId: p.row.id,
+              },
+            },
+            _sum: { durationSeconds: true },
+          });
+          totalDurationSeconds = agg._sum.durationSeconds ?? undefined;
+        }
+
+        return {
+          lessonCount,
+          totalDurationSeconds,
+        };
+      }),
+    );
+
+    return picked.slice(0, limit).map((p, idx) => {
+      if (p.kind === 'collection') {
+        return {
+          kind: 'collection',
+          entityId: p.row.id,
+          entitySlug: p.row.slug,
+          headline: p.headline,
+          title: p.row.title,
+          description: p.row.description ?? undefined,
+          coverImageUrl: p.row.coverImageUrl ?? undefined,
+          lessonCount: computed[idx]?.lessonCount,
+          totalDurationSeconds: computed[idx]?.totalDurationSeconds,
+          presentedBy: p.row.scholar.name,
+          presentedBySlug: p.row.scholar.slug,
+        };
+      }
+
+      if (p.kind === 'lecture') {
+        return {
+          kind: 'lecture',
+          entityId: p.row.id,
+          entitySlug: p.row.slug,
+          headline: p.headline,
+          title: p.row.title,
+          description: p.row.description ?? undefined,
+          coverImageUrl: p.row.series?.coverImageUrl ?? undefined,
+          lessonCount: computed[idx]?.lessonCount,
+          totalDurationSeconds: computed[idx]?.totalDurationSeconds,
+          presentedBy: p.row.scholar.name,
+          presentedBySlug: p.row.scholar.slug,
+        };
+      }
+
+      return {
+        kind: 'series',
+        entityId: p.row.id,
+        entitySlug: p.row.slug,
+        headline: p.headline,
+        title: p.row.title,
+        description: p.row.description ?? undefined,
+        coverImageUrl: p.row.coverImageUrl ?? undefined,
+        lessonCount: computed[idx]?.lessonCount,
+        totalDurationSeconds: computed[idx]?.totalDurationSeconds,
+        presentedBy: p.row.scholar.name,
+        presentedBySlug: p.row.scholar.slug,
+      };
+    });
   }
 
   // ------------------------

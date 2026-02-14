@@ -1,7 +1,20 @@
-import { getWebPublicEnv } from "@sd/env/web";
+import { getWebPublicEnv, type WebPublicEnv } from "@sd/env";
+
+let cached: WebPublicEnv | null = null;
 
 /**
  * Web environment (client-safe).
- * Evaluated once per module load.
+ * Lazy so CI builds can compile without NEXT_PUBLIC_* values.
  */
-export const webEnv = getWebPublicEnv();
+export function getWebEnv(): WebPublicEnv {
+  cached ??= getWebPublicEnv();
+  return cached;
+}
+
+export function tryGetWebEnv(): WebPublicEnv | null {
+  try {
+    return getWebEnv();
+  } catch {
+    return null;
+  }
+}

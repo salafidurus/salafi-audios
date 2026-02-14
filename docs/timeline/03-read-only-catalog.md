@@ -82,6 +82,16 @@ Expose read-only public endpoints for:
 - Viewing a series and its ordered lectures
 - Viewing lecture metadata (including primary audio asset metadata when available)
 
+#### Featured Home Content (Planned)
+
+The home hero carousel should be powered by a dedicated, fast endpoint returning **exactly 3** featured items.
+
+- Items must be schedulable via date ranges (start/end timestamps)
+- Items must support multiple kinds: `collection`, `series`, or `lecture`
+- Each item should include a short headline/message used in the UI (e.g. "Tawhid First")
+
+Admin tooling to manage these items is intentionally deferred to a later phase, but the data model should live in the database so clients can fetch featured content without expensive ad-hoc queries.
+
 These endpoints:
 
 - Require no authentication

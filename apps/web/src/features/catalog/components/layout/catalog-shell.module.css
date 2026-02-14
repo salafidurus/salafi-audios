@@ -1,0 +1,14 @@
+.catalog-page-shell {
+  padding: var(--space-page-y) var(--space-page-x) 4rem;
+}
+
+.catalog-container {
+  width: min(74rem, 100%);
+  margin-inline: auto;
+}
+
+@media (max-width: 640px) {
+  .catalog-page-shell {
+    padding-bottom: 3rem;
+  }
+}

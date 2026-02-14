@@ -1,0 +1,12 @@
+.catalog-card-grid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: var(--space-gap-lg);
+}
+
+:global(:root[data-catalog-density="compact"]) .catalog-card-grid {
+  gap: var(--space-gap-sm);
+}

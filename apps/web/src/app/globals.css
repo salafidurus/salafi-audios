@@ -1,26 +1,158 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-bg: #f3f8f5;
+  --color-bg-elevated: #edf5f0;
+  --color-surface: #ffffff;
+  --color-surface-soft: #f7fbf8;
+  --color-text: #13231c;
+  --color-text-muted: #567067;
+  --color-text-primary: var(--color-text);
+  --color-text-secondary: var(--color-text-muted);
+  --color-text-tertiary: color-mix(in srgb, var(--color-text-muted) 70%, var(--color-border));
+  --color-fill-secondary: var(--color-surface-soft);
+  --color-fill-tertiary: color-mix(in srgb, var(--color-surface-soft) 55%, var(--color-border));
+  --color-border: #d2e1d9;
+  --color-primary: #57d876;
+  --color-primary-strong: #2cae4d;
+  --color-primary-soft: #e3f8e9;
+  --color-primary-alt: var(--color-primary-soft);
+  --color-primary-ink: #0d2014;
+  --color-link: #17783a;
+  --color-danger: #d64d4d;
+
+  --space-page-x: clamp(1.15rem, 3.8vw, 2.75rem);
+  --space-page-y: clamp(1.25rem, 3vw, 2rem);
+  --space-section-y: clamp(1.2rem, 2vw, 1.8rem);
+  --space-card-p: 1.05rem;
+  --space-panel-p: 1.15rem;
+  --space-chip-x: 0.72rem;
+  --space-chip-y: 0.32rem;
+  --space-gap-sm: 0.5rem;
+  --space-gap-md: 0.75rem;
+  --space-gap-lg: 1rem;
+  --space-gap-xl: 1.4rem;
+
+  --radius-panel: 1rem;
+  --radius-panel-sm: 0.75rem;
+  --radius-card: 0.9rem;
+  --radius-chip: 999px;
+
+  --shadow-panel: 0 16px 36px -30px rgb(20 47 33 / 0.38);
+  --shadow-card: 0 10px 24px -20px rgb(20 47 33 / 0.3);
+  --shadow-panel-top: 0 -20px 42px -30px rgb(20 47 33 / 0.55);
+  --shadow-inline: 0 8px 20px -18px rgb(20 47 33 / 0.35);
+  --shadow-focus: 0 0 0 3px rgb(76 227 110 / 0.25);
+
+  --space-content-max: 84rem;
+
+  --font-size-h1: clamp(1.85rem, 3vw, 2.45rem);
+  --font-size-h2: clamp(1.2rem, 2vw, 1.65rem);
+  --font-size-body: 1rem;
+  --font-size-caption: 0.8rem;
+  --font-size-xs: 0.76rem;
+  --font-size-sm: 0.9rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.1rem;
+  --font-size-label: 0.92rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+[data-theme="dark"] {
+  --color-bg: #08110d;
+  --color-bg-elevated: #0f1e17;
+  --color-surface: #13221b;
+  --color-surface-soft: #1a2a22;
+  --color-text: #dff0e7;
+  --color-text-muted: #99b8aa;
+  --color-text-primary: var(--color-text);
+  --color-text-secondary: var(--color-text-muted);
+  --color-text-tertiary: color-mix(in srgb, var(--color-text-muted) 68%, var(--color-border));
+  --color-fill-secondary: color-mix(
+    in srgb,
+    var(--color-surface-soft) 78%,
+    var(--color-surface) 22%
+  );
+  --color-fill-tertiary: color-mix(in srgb, var(--color-surface-soft) 55%, var(--color-border));
+  --color-border: #284035;
+  --color-primary: #57d876;
+  --color-primary-strong: #6fe38c;
+  --color-primary-soft: #173a26;
+  --color-primary-alt: color-mix(in srgb, var(--color-primary) 14%, var(--color-surface) 86%);
+  --color-primary-ink: #0c1d13;
+  --color-link: #97efad;
+  --color-danger: #ff8f8f;
+  --shadow-panel: 0 20px 42px -30px rgb(0 0 0 / 0.65);
+  --shadow-card: 0 14px 26px -20px rgb(0 0 0 / 0.58);
+  --shadow-panel-top: 0 -24px 52px -36px rgb(0 0 0 / 0.72);
+  --shadow-inline: 0 10px 26px -22px rgb(0 0 0 / 0.62);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --color-bg: #08110d;
+    --color-bg-elevated: #0f1e17;
+    --color-surface: #13221b;
+    --color-surface-soft: #1a2a22;
+    --color-text: #dff0e7;
+    --color-text-muted: #99b8aa;
+    --color-text-primary: var(--color-text);
+    --color-text-secondary: var(--color-text-muted);
+    --color-text-tertiary: color-mix(in srgb, var(--color-text-muted) 68%, var(--color-border));
+    --color-fill-secondary: color-mix(
+      in srgb,
+      var(--color-surface-soft) 78%,
+      var(--color-surface) 22%
+    );
+    --color-fill-tertiary: color-mix(in srgb, var(--color-surface-soft) 55%, var(--color-border));
+    --color-border: #284035;
+    --color-primary: #57d876;
+    --color-primary-strong: #6fe38c;
+    --color-primary-soft: #173a26;
+    --color-primary-alt: color-mix(in srgb, var(--color-primary) 14%, var(--color-surface) 86%);
+    --color-primary-ink: #0c1d13;
+    --color-link: #97efad;
+    --color-danger: #ff8f8f;
+    --shadow-panel: 0 20px 42px -30px rgb(0 0 0 / 0.65);
+    --shadow-card: 0 14px 26px -20px rgb(0 0 0 / 0.58);
+    --shadow-panel-top: 0 -24px 52px -36px rgb(0 0 0 / 0.72);
+    --shadow-inline: 0 10px 26px -22px rgb(0 0 0 / 0.62);
   }
 }
 
+@theme inline {
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-text);
+  --color-surface: var(--color-surface);
+  --color-primary: var(--color-primary);
+  --color-border: var(--color-border);
+  --spacing-page-x: var(--space-page-x);
+  --spacing-page-y: var(--space-page-y);
+  --spacing-section-y: var(--space-section-y);
+  --spacing-card-p: var(--space-card-p);
+  --radius-panel: var(--radius-panel);
+  --radius-chip: var(--radius-chip);
+  --shadow-panel: var(--shadow-panel);
+  --text-h1: var(--font-size-h1);
+  --text-h2: var(--font-size-h2);
+  --text-caption: var(--font-size-caption);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--color-text);
+  font-family: var(--font-body), sans-serif;
+  background:
+    radial-gradient(circle at 9% -6%, rgb(87 216 118 / 0.28), transparent 36%),
+    radial-gradient(circle at 92% -5%, rgb(38 162 90 / 0.18), transparent 30%),
+    linear-gradient(180deg, var(--color-bg-elevated) 0%, var(--color-bg) 38%);
+  min-height: 100vh;
+  font-size: var(--font-size-body);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display), serif;
 }
