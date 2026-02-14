@@ -496,9 +496,22 @@ export class CatalogRepository {
     const computed = await Promise.all(
       picked.slice(0, limit).map(async (p) => {
         if (p.kind === 'lecture') {
+          let totalDurationSeconds = p.row.durationSeconds ?? undefined;
+
+          if (totalDurationSeconds === undefined) {
+            const agg = await this.prisma.audioAsset.aggregate({
+              where: {
+                lectureId: p.row.id,
+                isPrimary: true,
+              },
+              _sum: { durationSeconds: true },
+            });
+            totalDurationSeconds = agg._sum.durationSeconds ?? undefined;
+          }
+
           return {
             lessonCount: 1,
-            totalDurationSeconds: p.row.durationSeconds ?? undefined,
+            totalDurationSeconds,
           };
         }
 
@@ -523,6 +536,21 @@ export class CatalogRepository {
                 status: Status.published,
                 deletedAt: null,
                 series: { collectionId: p.row.id },
+              },
+              _sum: { durationSeconds: true },
+            });
+            totalDurationSeconds = agg._sum.durationSeconds ?? undefined;
+          }
+
+          if (totalDurationSeconds === undefined) {
+            const agg = await this.prisma.audioAsset.aggregate({
+              where: {
+                isPrimary: true,
+                lecture: {
+                  status: Status.published,
+                  deletedAt: null,
+                  series: { collectionId: p.row.id },
+                },
               },
               _sum: { durationSeconds: true },
             });
@@ -555,6 +583,21 @@ export class CatalogRepository {
               status: Status.published,
               deletedAt: null,
               seriesId: p.row.id,
+            },
+            _sum: { durationSeconds: true },
+          });
+          totalDurationSeconds = agg._sum.durationSeconds ?? undefined;
+        }
+
+        if (totalDurationSeconds === undefined) {
+          const agg = await this.prisma.audioAsset.aggregate({
+            where: {
+              isPrimary: true,
+              lecture: {
+                status: Status.published,
+                deletedAt: null,
+                seriesId: p.row.id,
+              },
             },
             _sum: { durationSeconds: true },
           });

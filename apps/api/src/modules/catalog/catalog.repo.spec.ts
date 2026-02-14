@@ -8,6 +8,7 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
   const lectureFindMany = jest.fn();
   const lectureCount = jest.fn();
   const lectureAggregate = jest.fn();
+  const audioAssetAggregate = jest.fn();
 
   const prisma = {
     series: {
@@ -22,12 +23,16 @@ describe('CatalogRepository.listFeaturedHomeItems', () => {
       count: lectureCount,
       aggregate: lectureAggregate,
     },
+    audioAsset: {
+      aggregate: audioAssetAggregate,
+    },
   };
 
   const repo = new CatalogRepository(prisma as never, {} as never);
 
   beforeEach(() => {
     jest.clearAllMocks();
+    audioAssetAggregate.mockResolvedValue({ _sum: { durationSeconds: null } });
   });
 
   it('returns curated series items with headline as message and correct lesson counts', async () => {
