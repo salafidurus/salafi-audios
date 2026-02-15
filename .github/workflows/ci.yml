@@ -216,6 +216,12 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
 
+      - name: Download build outputs
+        uses: actions/download-artifact@v4
+        with:
+          name: build-outputs
+          path: .
+
       - name: Install
         run: pnpm install --frozen-lockfile
 

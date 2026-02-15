@@ -356,6 +356,9 @@ importers:
         specifier: ^5.0.11
         version: 5.0.11(@types/react@19.1.17)(immer@9.0.21)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
     devDependencies:
+      '@jest/globals':
+        specifier: ^29.7.0
+        version: 29.7.0
       '@playwright/test':
         specifier: ^1.57.0
         version: 1.57.0

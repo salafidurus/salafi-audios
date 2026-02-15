@@ -233,11 +233,31 @@ export async function loadHomeStatsAndLeadLecture(): Promise<{
   stats: Stats;
   leadLecture: { title: string; scholarName: string } | null;
 }> {
-  const scholars = await safe(() => publicApi.listScholars(noStore), []);
+  const [scholars, platformStats] = await Promise.all([
+    safe(() => publicApi.listScholars(noStore), [] as Scholar[]),
+    safe(
+      () => import("@/features/navigation/api/public-stats").then((m) => m.getPlatformStats()),
+      null,
+    ),
+  ]);
+
   const lectureBuckets = await Promise.all(
-    scholars.map((scholar) => safe(() => publicApi.listScholarLectures(scholar.slug, noStore), [])),
+    scholars.map((scholar: Scholar) =>
+      safe(() => publicApi.listScholarLectures(scholar.slug, noStore), []),
+    ),
   );
-  const stats = buildHomeStats(scholars, lectureBuckets);
+
+  const calculatedStats = buildHomeStats(scholars, lectureBuckets);
+
+  // Use platform stats when available (from DB), fallback to calculated stats
+  const stats: Stats = platformStats
+    ? {
+        totalScholars: platformStats.totalScholars,
+        totalLectures: platformStats.totalLectures,
+        lecturesPublishedLast30Days: platformStats.lecturesPublishedLast30Days,
+      }
+    : calculatedStats;
+
   const leadLecture = buildLeadLecture(scholars, lectureBuckets);
 
   return {

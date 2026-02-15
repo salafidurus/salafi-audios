@@ -1,19 +1,18 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "instructions": [
-    "CONTRIBUTING.md",
     "**/AGENT.md",
-    ".github/copilot-instructions.md"
+    ".opencode/skills/project-guardrails/SKILL.md"
   ],
   "mcp": {
     "tailwindcss": {
       "enabled": true
     },
     "playwright": {
-      "enabled": true
+      "enabled": false
     },
     "stitch": {
-      "enabled": true
+      "enabled": false
     },
     "antigravity": {
       "enabled": false
@@ -21,8 +20,17 @@
     "hugeicons": {
       "enabled": false
     },
-    // "server-github": {
-    //   "enabled": false
-    // }
+    "server-github": {
+      "enabled": true
+    },
+    "in-memoria": {
+      "enabled": true
+    },
+    "sequential-thinking": {
+      "enabled": true
+    },
+    "kratos": {
+      "enabled": false
+    }
   }
 }

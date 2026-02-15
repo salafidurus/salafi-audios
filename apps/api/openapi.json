@@ -3431,6 +3431,88 @@
         ]
       }
     },
+    "/analytics/stats": {
+      "get": {
+        "operationId": "AnalyticsController_stats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformStatsDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Platform analytics statistics",
+        "tags": [
+          "Analytics"
+        ]
+      }
+    },
     "/topics": {
       "get": {
         "operationId": "TopicsController_list",
@@ -4769,6 +4851,28 @@
           "contentKind",
           "contentId",
           "eventType"
+        ]
+      },
+      "PlatformStatsDto": {
+        "type": "object",
+        "properties": {
+          "totalScholars": {
+            "type": "number",
+            "description": "Total number of active scholars"
+          },
+          "totalLectures": {
+            "type": "number",
+            "description": "Total number of published lectures"
+          },
+          "lecturesPublishedLast30Days": {
+            "type": "number",
+            "description": "Number of lectures published in the last 30 days"
+          }
+        },
+        "required": [
+          "totalScholars",
+          "totalLectures",
+          "lecturesPublishedLast30Days"
         ]
       },
       "TopicDetailDto": {
