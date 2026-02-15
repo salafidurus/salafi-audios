@@ -6,6 +6,7 @@ import { Preferences } from "@/features/library/components/controls/preferences/
 import { Shell } from "@/features/library/components/layout/shell/shell";
 import { EmptyState } from "@/features/library/components/states/empty-state/empty-state";
 import { canonical } from "@/features/library/utils/seo";
+import styles from "./scholars.screen.module.css";
 
 export function getScholarsMetadata(): Metadata {
   return {
@@ -31,6 +32,7 @@ export async function ScholarsScreen() {
       title="Scholars"
       subtitle="Browse active scholars and follow their collections, standalone series, and lectures."
     >
+      <p className={styles.devNote}>Dev mode: the scholar directory is still in progress.</p>
       <Preferences />
       {scholars.length === 0 ? (
         <EmptyState message="No scholars are published yet." />

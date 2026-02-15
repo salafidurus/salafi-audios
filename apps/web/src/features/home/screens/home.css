@@ -6,6 +6,14 @@
   padding: var(--top-nav-height, 0px) var(--space-page-x) 0;
 }
 
+.shell > * + * {
+  margin-top: clamp(2.6rem, 6vw, 4.8rem);
+}
+
+.shell > *:first-child + * {
+  margin-top: 0;
+}
+
 /* Responsive */
 @media (max-width: 960px) {
   .shell {

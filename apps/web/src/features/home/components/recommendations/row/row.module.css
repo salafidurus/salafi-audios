@@ -1,7 +1,7 @@
 .row {
   display: flex;
   flex-direction: column;
-  gap: var(--space-gap-md);
+  gap: clamp(1.1rem, 2.6vw, 1.8rem);
 }
 
 .head {
@@ -41,7 +41,7 @@
 
 .scroller {
   display: flex;
-  gap: var(--space-gap-lg);
+  gap: clamp(2.4rem, 5.6vw, 4.2rem);
   overflow-x: auto;
   padding-bottom: 0.35rem;
   scroll-snap-type: x proximity;
@@ -56,11 +56,11 @@
 }
 
 .scrollerFeatured {
-  gap: var(--space-gap-lg);
+  gap: clamp(2.6rem, 5.8vw, 4.4rem);
 }
 
 .scrollerTight {
-  gap: var(--space-gap-md);
+  gap: clamp(2rem, 4.8vw, 3.6rem);
 }
 
 .scroller::-webkit-scrollbar {
@@ -97,9 +97,9 @@
 }
 
 .skeletonCard {
-  min-width: 15.5rem;
-  max-width: 17.5rem;
-  height: 14.5rem;
+  min-width: 23.25rem;
+  max-width: 26.25rem;
+  height: 21.75rem;
   border-radius: var(--radius-panel);
   background:
     linear-gradient(90deg, transparent, rgb(255 255 255 / 0.12), transparent),
@@ -109,15 +109,42 @@
 }
 
 .skeletonCardFeatured {
-  min-width: 24rem;
-  max-width: 32rem;
-  height: 12.5rem;
+  min-width: 36rem;
+  max-width: 48rem;
+  height: 18.75rem;
 }
 
 .loadMoreSentinel {
   width: 1px;
   height: 1px;
   flex: 0 0 1px;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 640px) {
+  .scroller {
+    gap: 1.2rem;
+  }
+
+  .scrollerFeatured {
+    gap: 1.4rem;
+  }
+
+  .scrollerTight {
+    gap: 1rem;
+  }
+
+  .skeletonCard {
+    min-width: 16rem;
+    max-width: 18rem;
+    height: 20rem;
+  }
+
+  .skeletonCardFeatured {
+    min-width: 18rem;
+    max-width: 100%;
+    height: 24rem;
+  }
 }
 
 @keyframes shimmer {

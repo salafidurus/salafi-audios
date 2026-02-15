@@ -13,6 +13,11 @@
   outline: none;
 }
 
+.cardLarge {
+  composes: card;
+  width: 12.2rem;
+}
+
 .card:focus-visible {
   box-shadow: var(--shadow-focus);
   border-radius: var(--radius-panel);
@@ -38,6 +43,24 @@
   transition:
     transform 180ms ease,
     box-shadow 180ms ease;
+}
+
+.avatarLarge {
+  composes: avatar;
+  width: 9rem;
+  aspect-ratio: 4 / 5;
+  height: auto;
+  font-size: 0;
+  border-radius: calc(var(--radius-panel) + 0.25rem);
+}
+
+.avatarFeaturedLarge {
+  composes: avatarFeatured;
+  width: 9rem;
+  aspect-ratio: 4 / 5;
+  height: auto;
+  font-size: 0;
+  border-radius: calc(var(--radius-panel) + 0.25rem);
 }
 
 .card:hover .avatar {
@@ -67,6 +90,27 @@
   line-height: 1.3;
   font-size: var(--font-size-md);
   text-align: center;
+}
+
+.nameLarge {
+  composes: name;
+  font-size: 1.05rem;
+}
+
+.action {
+  margin-top: 0.55rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-chip);
+  border: 1px solid color-mix(in srgb, var(--color-border) 75%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 86%, transparent);
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.action:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .subtitle {

@@ -40,9 +40,9 @@
 }
 
 .art {
-  width: 2.7rem;
-  height: 2.7rem;
-  border-radius: 999px;
+  width: 3.2rem;
+  height: 4rem;
+  border-radius: calc(var(--radius-panel) + 0.15rem);
   background: radial-gradient(circle at 28% 20%, #eff9f4, #97efad 58%, #2cae4d);
   flex-shrink: 0;
   box-shadow: 0 18px 26px -26px rgb(0 0 0 / 0.6);
