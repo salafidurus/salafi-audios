@@ -6,50 +6,36 @@
   "files": [
     "dist"
   ],
+  "types": "./src/index.ts",
   "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
     "./api": {
-      "import": {
-        "types": "./dist/api.d.mts",
-        "default": "./dist/api.mjs"
-      },
-      "require": {
-        "types": "./dist/api.d.ts",
-        "default": "./dist/api.js"
-      }
+      "types": "./src/api.ts",
+      "import": "./dist/api.mjs",
+      "require": "./dist/api.js"
     },
     "./web": {
-      "import": {
-        "types": "./dist/web.d.mts",
-        "default": "./dist/web.mjs"
-      },
-      "require": {
-        "types": "./dist/web.d.ts",
-        "default": "./dist/web.js"
-      }
+      "types": "./src/web.ts",
+      "import": "./dist/web.mjs",
+      "require": "./dist/web.js"
     },
     "./mobile": {
-      "import": {
-        "types": "./dist/mobile.d.mts",
-        "default": "./dist/mobile.mjs"
-      },
-      "require": {
-        "types": "./dist/mobile.d.ts",
-        "default": "./dist/mobile.js"
-      }
+      "types": "./src/mobile.ts",
+      "import": "./dist/mobile.mjs",
+      "require": "./dist/mobile.js"
     },
     "./db": {
-      "import": {
-        "types": "./dist/db.d.mts",
-        "default": "./dist/db.mjs"
-      },
-      "require": {
-        "types": "./dist/db.d.ts",
-        "default": "./dist/db.js"
-      }
+      "types": "./src/db.ts",
+      "import": "./dist/db.mjs",
+      "require": "./dist/db.js"
     }
   },
   "scripts": {
-    "clean": "rm -rf dist",
+    "clean": "rimraf dist",
     "build": "tsup src/index.ts src/api.ts src/web.ts src/mobile.ts src/db.ts --format esm,cjs --dts --out-dir dist",
     "dev": "pnpm build --watch",
     "lint": "eslint .",
@@ -69,6 +55,7 @@
     "jest": "^30.2.0",
     "ts-jest": "^29.4.6",
     "tsup": "^8.0.0",
+    "rimraf": "^6.0.0",
     "typescript": "^5.9.0"
   }
 }

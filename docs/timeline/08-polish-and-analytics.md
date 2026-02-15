@@ -227,7 +227,7 @@ Consistency reduces cognitive load.
 
 By this phase:
 
-- Promotions via tags are routine
+- Promotions via protected-branch pull requests are routine
 - Rollbacks are tested and understood
 - CI/CD failures are rare and actionable
 

@@ -79,11 +79,19 @@ Use `docs/README.md` as the primary index:
 
 If implementation and docs diverge, update docs intentionally or reconsider the change.
 
+## Tooling & MCP Configuration
+
+This project uses **OpenCode** with various MCP servers (GitHub, Playwright, Tailwind, etc.). To maintain security:
+
+- **Sensitive Configs**: All API keys and Personal Access Tokens (PATs) are stored in your **Global OpenCode Config** (`~/.config/opencode/opencode.json`).
+- **Project Config**: The `opencode.json` in this repo root is committed but contains **no secrets**. It only toggles features `on` or `off`.
+- **Setup Requirement**: To use the GitHub MCP features, you must manually add the `server-github` headers to your global config file. Do not attempt to add them to the project-level file.
+
 ## Delivery Model
 
-- `main` is protected and is the only long-lived branch.
-- Changes enter through pull requests with required checks.
-- Deployments are promotion/tag based (not branch-push based).
+- Protected branches map to environments: `main` -> development, `preview` -> preview, `production` -> production.
+- Changes enter protected branches through pull requests with required checks.
+- Deployments are branch-based from protected branch updates.
 - Environment isolation is strict (`development`, `preview`, `production`).
 
 See `docs/implementation-guide/10-environments-and-configuration.md` for deployment and environment policy.

@@ -1,0 +1,48 @@
+.page {
+  min-height: 100vh;
+  padding: var(--top-nav-height, 0px) var(--space-page-x) 3rem;
+}
+
+.container {
+  width: min(var(--space-content-max), 100%);
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.6rem, 2.4vw, 2.1rem);
+  font-weight: 700;
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--color-text-tertiary);
+  max-width: 36rem;
+}
+
+.notice {
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius-panel);
+  border: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-inline);
+}
+
+.noticeTitle {
+  margin: 0 0 0.4rem;
+  font-weight: 700;
+}
+
+.noticeBody {
+  margin: 0;
+  color: var(--color-text-tertiary);
+}
+
+@media (max-width: 960px) {
+  .page {
+    padding-inline: clamp(1rem, 4.5vw, 1.75rem);
+  }
+}

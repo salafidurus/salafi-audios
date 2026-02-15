@@ -48,7 +48,7 @@ Purpose: give an AI coding agent just-enough context to be immediately productiv
 ## Repo & CI conventions 🔁
 
 - Commits: Conventional Commits enforced via commitlint + Husky.
-- Branches/Deploys: `main` is protected; deployments are promotion-based and tag-driven (see `README.md` and `docs/implementation-guide/10-environments-and-configuration.md`).
+- Branches/Deploys: protected branches map to deployment environments (`main` -> development, `preview` -> preview, `production` -> production); deployments are branch-based via PR merges (see `README.md` and `docs/implementation-guide/10-environments-and-configuration.md`).
 
 ## Safety & non-goals ⚠️
 

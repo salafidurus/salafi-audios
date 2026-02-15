@@ -6,6 +6,7 @@ import { z } from "zod";
  */
 const WebPublicEnvSchema = z.object({
   NEXT_PUBLIC_API_URL: z.string().url(),
+  NEXT_PUBLIC_WEB_URL: z.string().url().optional(),
 });
 
 export type WebPublicEnv = z.infer<typeof WebPublicEnvSchema>;

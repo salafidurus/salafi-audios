@@ -15,4 +15,7 @@ export class ScholarViewDto {
 
   @ApiProperty()
   isActive!: boolean;
+
+  @ApiProperty()
+  isKibar!: boolean;
 }

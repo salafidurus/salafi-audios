@@ -1,10 +1,9 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiCommonErrors } from '@/shared/decorators/api-common-errors.decorator';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CollectionService } from './collections.service';
 import { CollectionViewDto } from './dto/collection-view.dto';
-import { UpsertCollectionDto } from './dto/upsert-collection.dto';
 
 @SkipThrottle()
 @ApiTags('Collections')
@@ -30,15 +29,5 @@ export class CollectionsController {
     @Param('slug') slug: string,
   ): Promise<CollectionViewDto> {
     return this.collections.getPublished(scholarSlug, slug);
-  }
-
-  @Post('upsert')
-  @ApiOperation({ summary: 'Upsert collection by slug (per scholar)' })
-  @ApiOkResponse({ type: CollectionViewDto })
-  upsert(
-    @Param('scholarSlug') scholarSlug: string,
-    @Body() dto: UpsertCollectionDto,
-  ): Promise<CollectionViewDto> {
-    return this.collections.upsert(scholarSlug, dto);
   }
 }

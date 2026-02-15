@@ -9,7 +9,7 @@ module.exports = {
   moduleFileExtensions: ['js', 'json', 'ts'],
 
   transform: {
-    '^.+\\.(t|j)s$': 'ts-jest',
+    '^.+\\.ts$': 'ts-jest',
   },
 
   testEnvironment: 'node',
@@ -19,7 +19,7 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
 
-  collectCoverageFrom: ['<rootDir>/src/**/*.(t|j)s'],
+  collectCoverageFrom: ['<rootDir>/src/**/*.ts'],
 
   coverageDirectory: '<rootDir>/../coverage',
 

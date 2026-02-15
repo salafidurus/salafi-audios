@@ -2,10 +2,24 @@
   "name": "@sd/i18n",
   "version": "0.0.0",
   "private": true,
-  "type": "module",
-  "main": "src/index.ts",
-  "types": "src/index.ts",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
   "scripts": {
+    "clean": "rimraf dist",
+    "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist",
+    "dev": "pnpm build --watch",
     "lint": "eslint .",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
@@ -17,7 +31,9 @@
     "@sd/config": "workspace:*",
     "@types/jest": "^30.0.0",
     "jest": "^30.2.0",
+    "rimraf": "^6.0.0",
     "ts-jest": "^29.4.6",
+    "tsup": "^8.0.0",
     "typescript": "^5.9.0"
   }
 }

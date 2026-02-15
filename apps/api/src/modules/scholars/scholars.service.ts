@@ -25,4 +25,14 @@ export class ScholarService {
   async listActiveScholars(): Promise<ScholarViewDto[]> {
     return this.repo.listActive();
   }
+
+  async setKibarById(id: string, isKibar: boolean): Promise<ScholarDetailDto> {
+    const scholar = await this.repo.updateKibarById(id, isKibar);
+
+    if (!scholar) {
+      throw new NotFoundException(`Scholar "${id}" not found`);
+    }
+
+    return scholar;
+  }
 }

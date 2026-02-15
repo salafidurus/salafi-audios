@@ -9,6 +9,8 @@
     "**/build/**",
     "**/coverage/**",
     "**/generated/**",
+    "**/.opencode/**",
+    "**/SKILL.md"
   ],
   "config": {
     "default": true,

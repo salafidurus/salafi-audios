@@ -3,6 +3,10 @@ export type HttpClientConfig = {
   getAccessToken?: () => string | undefined | null;
 };
 
+type QueryParamValue = string | number | boolean | null | undefined;
+
+type QueryParams = Record<string, QueryParamValue | QueryParamValue[]>;
+
 let config: HttpClientConfig | null = null;
 
 export function configureApiClient(next: HttpClientConfig) {
@@ -12,8 +16,10 @@ export function configureApiClient(next: HttpClientConfig) {
 export async function httpClient<T>(options: {
   url: string;
   method: string;
+  params?: QueryParams;
   headers?: Record<string, string>;
   body?: unknown;
+  data?: unknown;
   signal?: AbortSignal;
 }): Promise<T> {
   if (!config) {
@@ -24,14 +30,35 @@ export async function httpClient<T>(options: {
 
   const token = config.getAccessToken?.() ?? undefined;
 
-  const res = await fetch(`${config.baseUrl}${options.url}`, {
+  const endpoint = new URL(`${config.baseUrl}${options.url}`);
+
+  if (options.params) {
+    for (const [key, raw] of Object.entries(options.params)) {
+      if (Array.isArray(raw)) {
+        for (const item of raw) {
+          if (item !== undefined && item !== null) {
+            endpoint.searchParams.append(key, String(item));
+          }
+        }
+        continue;
+      }
+
+      if (raw !== undefined && raw !== null) {
+        endpoint.searchParams.set(key, String(raw));
+      }
+    }
+  }
+
+  const payload = options.body ?? options.data;
+
+  const res = await fetch(endpoint.toString(), {
     method: options.method,
     headers: {
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers ?? {}),
     },
-    body: options.body ? JSON.stringify(options.body) : undefined,
+    body: payload ? JSON.stringify(payload) : undefined,
     signal: options.signal,
   });
 

@@ -1,0 +1,71 @@
+.hero,
+.rowTitle,
+.card,
+.stats {
+  border-radius: var(--radius-panel-sm);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-fill-tertiary) 80%, transparent),
+    color-mix(in srgb, var(--color-surface) 60%, transparent),
+    color-mix(in srgb, var(--color-fill-tertiary) 80%, transparent)
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.hero {
+  margin-top: var(--space-gap-xl);
+  height: clamp(14rem, 24vw, 19rem);
+}
+
+.tabsShell {
+  margin-top: var(--space-gap-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-gap-xl);
+}
+
+.row {
+  margin-top: var(--space-section-y);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-gap-md);
+}
+
+.rowHeading {
+  margin: 0;
+  font-size: var(--font-size-h2);
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.rowTitle {
+  width: clamp(12rem, 32vw, 22rem);
+  height: 1.6rem;
+}
+
+.rowCards {
+  display: flex;
+  gap: var(--space-gap-lg);
+  overflow: hidden;
+}
+
+.card {
+  height: 11rem;
+}
+
+.stats {
+  margin-top: var(--space-section-y);
+  height: 5.5rem;
+  border-radius: var(--radius-panel);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: -200% 0%;
+  }
+}

@@ -5,11 +5,11 @@ on:
     branches:
       - main
       - preview
+      - production
     paths:
       - packages/db/prisma/**
       - packages/db/prisma.config.ts
       - packages/db/package.json
-      - pnpm-lock.yaml
 
 concurrency:
   group: db-${{ github.workflow }}-${{ github.event.pull_request.number }}
@@ -29,7 +29,7 @@ jobs:
     permissions:
       contents: read
 
-    environment: ${{ github.base_ref == 'main' && 'development' || 'preview' }}
+    environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
 
     steps:
       - uses: actions/checkout@v4

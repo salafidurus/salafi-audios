@@ -354,16 +354,25 @@
         ]
       }
     },
-    "/scholars/upsert": {
-      "post": {
-        "operationId": "ScholarsController_upsert",
-        "parameters": [],
+    "/admin/scholars/{id}/kibar": {
+      "patch": {
+        "operationId": "AdminScholarsController_setKibar",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UpsertScholarDto"
+                "$ref": "#/components/schemas/SetKibarDto"
               }
             }
           }
@@ -374,7 +383,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ScholarViewDto"
+                  "$ref": "#/components/schemas/ScholarDetailDto"
                 }
               }
             }
@@ -440,9 +449,9 @@
             }
           }
         },
-        "summary": "Upsert scholar by slug",
+        "summary": "Set Kibar ul-Ulama flag for a scholar",
         "tags": [
-          "Scholars"
+          "Admin Scholars"
         ]
       }
     },
@@ -634,107 +643,6 @@
           }
         },
         "summary": "Get a published collection by slug",
-        "tags": [
-          "Collections"
-        ]
-      }
-    },
-    "/scholars/{scholarSlug}/collections/upsert": {
-      "post": {
-        "operationId": "CollectionsController_upsert",
-        "parameters": [
-          {
-            "name": "scholarSlug",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertCollectionDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CollectionViewDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Upsert collection by slug (per scholar)",
         "tags": [
           "Collections"
         ]
@@ -1019,107 +927,6 @@
           }
         },
         "summary": "Get a published series by slug",
-        "tags": [
-          "Series"
-        ]
-      }
-    },
-    "/scholars/{scholarSlug}/series/upsert": {
-      "post": {
-        "operationId": "SeriesController_upsert",
-        "parameters": [
-          {
-            "name": "scholarSlug",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertSeriesDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SeriesViewDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Upsert a series by slug for a scholar",
         "tags": [
           "Series"
         ]
@@ -1511,107 +1318,6 @@
         ]
       }
     },
-    "/scholars/{scholarSlug}/lectures/upsert": {
-      "post": {
-        "operationId": "LecturesController_upsert",
-        "parameters": [
-          {
-            "name": "scholarSlug",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertLectureDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LectureViewDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Upsert a lecture by slug for a scholar",
-        "tags": [
-          "Lectures"
-        ]
-      }
-    },
     "/scholars/{scholarSlug}/series/{seriesSlug}/lectures": {
       "get": {
         "operationId": "LecturesBySeriesController_listForSeries",
@@ -1993,107 +1699,6 @@
           }
         },
         "summary": "Get audio asset by id",
-        "tags": [
-          "AudioAssets"
-        ]
-      }
-    },
-    "/lectures/{lectureId}/audio-assets/upsert": {
-      "post": {
-        "operationId": "AudioAssetsController_upsert",
-        "parameters": [
-          {
-            "name": "lectureId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertAudioAssetDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AudioAssetViewDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Upsert audio asset by (lectureId + url)",
         "tags": [
           "AudioAssets"
         ]
@@ -2528,6 +2133,1386 @@
         ]
       }
     },
+    "/recommendations/hero": {
+      "get": {
+        "operationId": "RecommendationsController_hero",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "maximum": 24,
+              "default": 8,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination (opaque string)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topics",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated topic slugs for topic-scoped recommendations",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "windowDays",
+            "required": false,
+            "in": "query",
+            "description": "Window in days (default 30)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RecommendationHeroItemDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get hero recommendations (max 3)",
+        "tags": [
+          "Recommendations"
+        ]
+      }
+    },
+    "/recommendations/recommended/kibar": {
+      "get": {
+        "operationId": "RecommendationsController_kibar",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "maximum": 24,
+              "default": 8,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination (opaque string)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topics",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated topic slugs for topic-scoped recommendations",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "windowDays",
+            "required": false,
+            "in": "query",
+            "description": "Window in days (default 30)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get recommended Kibar ul-Ulama items",
+        "tags": [
+          "Recommendations"
+        ]
+      }
+    },
+    "/recommendations/recommended/recent-play": {
+      "get": {
+        "operationId": "RecommendationsController_recentPlay",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "maximum": 24,
+              "default": 8,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination (opaque string)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topics",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated topic slugs for topic-scoped recommendations",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "windowDays",
+            "required": false,
+            "in": "query",
+            "description": "Window in days (default 30)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get recommended items from recent plays",
+        "tags": [
+          "Recommendations"
+        ]
+      }
+    },
+    "/recommendations/recommended/topics": {
+      "get": {
+        "operationId": "RecommendationsController_recommendedTopics",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "maximum": 24,
+              "default": 8,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination (opaque string)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topics",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated topic slugs for topic-scoped recommendations",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "windowDays",
+            "required": false,
+            "in": "query",
+            "description": "Window in days (default 30)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get recommended items for topics",
+        "tags": [
+          "Recommendations"
+        ]
+      }
+    },
+    "/recommendations/following/scholars": {
+      "get": {
+        "operationId": "RecommendationsController_followingScholars",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "maximum": 24,
+              "default": 8,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination (opaque string)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topics",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated topic slugs for topic-scoped recommendations",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "windowDays",
+            "required": false,
+            "in": "query",
+            "description": "Window in days (default 30)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get recommendations from followed scholars",
+        "tags": [
+          "Recommendations"
+        ]
+      }
+    },
+    "/recommendations/following/topics": {
+      "get": {
+        "operationId": "RecommendationsController_followingTopics",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "maximum": 24,
+              "default": 8,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination (opaque string)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topics",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated topic slugs for topic-scoped recommendations",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "windowDays",
+            "required": false,
+            "in": "query",
+            "description": "Window in days (default 30)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get recommendations from followed topics",
+        "tags": [
+          "Recommendations"
+        ]
+      }
+    },
+    "/recommendations/latest": {
+      "get": {
+        "operationId": "RecommendationsController_latest",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "maximum": 24,
+              "default": 8,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination (opaque string)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topics",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated topic slugs for topic-scoped recommendations",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "windowDays",
+            "required": false,
+            "in": "query",
+            "description": "Window in days (default 30)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get latest recommendations",
+        "tags": [
+          "Recommendations"
+        ]
+      }
+    },
+    "/recommendations/latest/topics": {
+      "get": {
+        "operationId": "RecommendationsController_latestTopics",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "maximum": 24,
+              "default": 8,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination (opaque string)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topics",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated topic slugs for topic-scoped recommendations",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "windowDays",
+            "required": false,
+            "in": "query",
+            "description": "Window in days (default 30)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get latest recommendations by topic",
+        "tags": [
+          "Recommendations"
+        ]
+      }
+    },
+    "/recommendations/popular": {
+      "get": {
+        "operationId": "RecommendationsController_popular",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "maximum": 24,
+              "default": 8,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination (opaque string)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topics",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated topic slugs for topic-scoped recommendations",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "windowDays",
+            "required": false,
+            "in": "query",
+            "description": "Window in days (default 30)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get popular recommendations (analytics) ",
+        "tags": [
+          "Recommendations"
+        ]
+      }
+    },
+    "/recommendations/popular/topics": {
+      "get": {
+        "operationId": "RecommendationsController_popularTopics",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Page size",
+            "schema": {
+              "maximum": 24,
+              "default": 8,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination (opaque string)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "topics",
+            "required": false,
+            "in": "query",
+            "description": "Comma-separated topic slugs for topic-scoped recommendations",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "windowDays",
+            "required": false,
+            "in": "query",
+            "description": "Window in days (default 30)",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecommendationPageDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get popular recommendations by topic (analytics)",
+        "tags": [
+          "Recommendations"
+        ]
+      }
+    },
+    "/analytics/events": {
+      "post": {
+        "operationId": "AnalyticsController_record",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAnalyticsEventDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Record an analytics event",
+        "tags": [
+          "Analytics"
+        ]
+      }
+    },
+    "/analytics/stats": {
+      "get": {
+        "operationId": "AnalyticsController_stats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlatformStatsDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Platform analytics statistics",
+        "tags": [
+          "Analytics"
+        ]
+      }
+    },
     "/topics": {
       "get": {
         "operationId": "TopicsController_list",
@@ -2699,98 +3684,6 @@
           }
         },
         "summary": "Get topic by slug",
-        "tags": [
-          "Topics"
-        ]
-      }
-    },
-    "/topics/upsert": {
-      "post": {
-        "operationId": "TopicsController_upsert",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpsertTopicDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TopicDetailDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Upsert topic by slug",
         "tags": [
           "Topics"
         ]
@@ -3092,222 +3985,6 @@
         "tags": [
           "Lecture Topics"
         ]
-      },
-      "post": {
-        "operationId": "LectureTopicsController_attach",
-        "parameters": [
-          {
-            "name": "scholarSlug",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "lectureSlug",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AttachTopicDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LectureTopicViewDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Attach a topic to a lecture (idempotent)",
-        "tags": [
-          "Lecture Topics"
-        ]
-      }
-    },
-    "/scholars/{scholarSlug}/lectures/{lectureSlug}/topics/{topicSlug}": {
-      "delete": {
-        "operationId": "LectureTopicsController_detach",
-        "parameters": [
-          {
-            "name": "scholarSlug",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "lectureSlug",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "topicSlug",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "example": {
-                    "ok": true
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Detach a topic from a lecture (idempotent)",
-        "tags": [
-          "Lecture Topics"
-        ]
       }
     },
     "/scholars/{scholarSlug}/series/{seriesSlug}/topics": {
@@ -3410,222 +4087,6 @@
         "tags": [
           "Series Topics"
         ]
-      },
-      "post": {
-        "operationId": "SeriesTopicsController_attach",
-        "parameters": [
-          {
-            "name": "scholarSlug",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "seriesSlug",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AttachTopicDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LectureTopicViewDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Attach a topic to a series (idempotent)",
-        "tags": [
-          "Series Topics"
-        ]
-      }
-    },
-    "/scholars/{scholarSlug}/series/{seriesSlug}/topics/{topicSlug}": {
-      "delete": {
-        "operationId": "SeriesTopicsController_detach",
-        "parameters": [
-          {
-            "name": "scholarSlug",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "seriesSlug",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "topicSlug",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "example": {
-                    "ok": true
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Detach a topic from a series (idempotent)",
-        "tags": [
-          "Series Topics"
-        ]
       }
     },
     "/scholars/{scholarSlug}/collections/{collectionSlug}/topics": {
@@ -3725,222 +4186,6 @@
           }
         },
         "summary": "List topics attached to a collection",
-        "tags": [
-          "Collection Topics"
-        ]
-      },
-      "post": {
-        "operationId": "CollectionTopicsController_attach",
-        "parameters": [
-          {
-            "name": "scholarSlug",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "collectionSlug",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AttachTopicDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LectureTopicViewDto"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Attach a topic to a collection (idempotent)",
-        "tags": [
-          "Collection Topics"
-        ]
-      }
-    },
-    "/scholars/{scholarSlug}/collections/{collectionSlug}/topics/{topicSlug}": {
-      "delete": {
-        "operationId": "CollectionTopicsController_detach",
-        "parameters": [
-          {
-            "name": "scholarSlug",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "collectionSlug",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "topicSlug",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "example": {
-                    "ok": true
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponseDto"
-                }
-              }
-            }
-          }
-        },
-        "summary": "Detach a topic from a collection (idempotent)",
         "tags": [
           "Collection Topics"
         ]
@@ -4073,56 +4318,80 @@
           },
           "isActive": {
             "type": "boolean"
+          },
+          "isKibar": {
+            "type": "boolean"
           }
         },
         "required": [
           "id",
           "slug",
           "name",
-          "isActive"
+          "isActive",
+          "isKibar"
         ]
       },
-      "UpsertScholarDto": {
+      "SetKibarDto": {
         "type": "object",
         "properties": {
-          "slug": {
-            "type": "string",
-            "description": "Stable, URL-safe slug for the scholar (unique)",
-            "example": "shaykh-ibn-baz"
-          },
-          "name": {
-            "type": "string",
-            "description": "Display name of the scholar",
-            "example": "Shaykh Abdul Aziz ibn Baz"
-          },
-          "bio": {
-            "type": "string",
-            "description": "Short bio or description"
-          },
-          "country": {
-            "type": "string",
-            "description": "Country of the scholar",
-            "example": "Saudi Arabia"
-          },
-          "mainLanguage": {
-            "type": "string",
-            "description": "Primary language of the scholar",
-            "example": "ar"
-          },
-          "imageUrl": {
-            "type": "string",
-            "description": "URL to the scholar profile image",
-            "example": "https://cdn.example.com/scholars/ibn-baz.jpg"
-          },
-          "isActive": {
+          "isKibar": {
             "type": "boolean",
-            "description": "Whether this scholar is currently active",
-            "default": true
+            "description": "Whether the scholar is marked as Kibar ul-Ulama"
           }
         },
         "required": [
+          "isKibar"
+        ]
+      },
+      "ScholarDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string",
+            "nullable": true
+          },
+          "country": {
+            "type": "string",
+            "nullable": true
+          },
+          "mainLanguage": {
+            "type": "string",
+            "nullable": true
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "isKibar": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "updatedAt": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
           "slug",
-          "name"
+          "name",
+          "isActive",
+          "isKibar",
+          "createdAt"
         ]
       },
       "CollectionViewDto": {
@@ -4183,56 +4452,6 @@
           "title",
           "status",
           "createdAt"
-        ]
-      },
-      "UpsertCollectionDto": {
-        "type": "object",
-        "properties": {
-          "slug": {
-            "type": "string",
-            "example": "lessons-on-tawheed"
-          },
-          "title": {
-            "type": "string",
-            "example": "Lessons on Tawheed"
-          },
-          "description": {
-            "type": "string"
-          },
-          "coverImageUrl": {
-            "type": "string",
-            "example": "https://cdn.example.com/covers/tawheed.jpg"
-          },
-          "language": {
-            "type": "string",
-            "example": "ar"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "draft",
-              "review",
-              "published",
-              "archived"
-            ],
-            "default": "draft"
-          },
-          "orderIndex": {
-            "type": "number",
-            "example": 10
-          },
-          "deletedAt": {
-            "type": "string",
-            "description": "Soft delete timestamp (ISO). Use only if you need it now."
-          },
-          "deleteAfterAt": {
-            "type": "string",
-            "description": "Auto delete after timestamp (ISO)"
-          }
-        },
-        "required": [
-          "slug",
-          "title"
         ]
       },
       "SeriesViewDto": {
@@ -4297,58 +4516,47 @@
           "createdAt"
         ]
       },
-      "UpsertSeriesDto": {
+      "AudioAssetViewDto": {
         "type": "object",
         "properties": {
-          "slug": {
-            "type": "string",
-            "description": "Stable, URL-safe slug unique per scholar"
-          },
-          "title": {
-            "type": "string",
-            "description": "Series title"
-          },
-          "description": {
-            "type": "string",
-            "description": "Series description"
-          },
-          "coverImageUrl": {
+          "id": {
             "type": "string"
           },
-          "language": {
+          "lectureId": {
             "type": "string"
           },
-          "status": {
-            "type": "string",
-            "enum": [
-              "draft",
-              "review",
-              "published",
-              "archived"
-            ],
-            "default": "draft"
+          "url": {
+            "type": "string"
           },
-          "orderIndex": {
-            "type": "number",
-            "description": "Optional ordering within scholar/collection"
+          "format": {
+            "type": "string"
           },
-          "collectionSlug": {
-            "type": "string",
-            "description": "Optional parent collection slug (belongs to same scholar)",
-            "example": "selected-fatawa"
+          "bitrateKbps": {
+            "type": "number"
           },
-          "deletedAt": {
+          "sizeBytes": {
             "type": "string",
-            "description": "Soft delete time ISO string"
+            "description": "BigInt as string"
           },
-          "deleteAfterAt": {
-            "type": "string",
-            "description": "Auto delete time ISO string"
+          "durationSeconds": {
+            "type": "number"
+          },
+          "source": {
+            "type": "string"
+          },
+          "isPrimary": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string"
           }
         },
         "required": [
-          "slug",
-          "title"
+          "id",
+          "lectureId",
+          "url",
+          "isPrimary",
+          "createdAt"
         ]
       },
       "LectureViewDto": {
@@ -4393,6 +4601,9 @@
           "durationSeconds": {
             "type": "number"
           },
+          "primaryAudioAsset": {
+            "$ref": "#/components/schemas/AudioAssetViewDto"
+          },
           "deletedAt": {
             "type": "string"
           },
@@ -4413,135 +4624,6 @@
           "title",
           "status",
           "createdAt"
-        ]
-      },
-      "UpsertLectureDto": {
-        "type": "object",
-        "properties": {
-          "slug": {
-            "type": "string",
-            "description": "Stable, URL-safe slug unique per scholar"
-          },
-          "title": {
-            "type": "string",
-            "description": "Lecture title"
-          },
-          "description": {
-            "type": "string"
-          },
-          "language": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "draft",
-              "review",
-              "published",
-              "archived"
-            ],
-            "default": "draft"
-          },
-          "publishedAt": {
-            "type": "string",
-            "description": "ISO string if published"
-          },
-          "orderIndex": {
-            "type": "number"
-          },
-          "durationSeconds": {
-            "type": "number"
-          },
-          "seriesSlug": {
-            "type": "string",
-            "description": "Optional parent series slug (belongs to same scholar)",
-            "example": "kitab-al-tawhid"
-          },
-          "deletedAt": {
-            "type": "string"
-          },
-          "deleteAfterAt": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "slug",
-          "title"
-        ]
-      },
-      "AudioAssetViewDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "lectureId": {
-            "type": "string"
-          },
-          "url": {
-            "type": "string"
-          },
-          "format": {
-            "type": "string"
-          },
-          "bitrateKbps": {
-            "type": "number"
-          },
-          "sizeBytes": {
-            "type": "string",
-            "description": "BigInt as string"
-          },
-          "durationSeconds": {
-            "type": "number"
-          },
-          "source": {
-            "type": "string"
-          },
-          "isPrimary": {
-            "type": "boolean"
-          },
-          "createdAt": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "lectureId",
-          "url",
-          "isPrimary",
-          "createdAt"
-        ]
-      },
-      "UpsertAudioAssetDto": {
-        "type": "object",
-        "properties": {
-          "url": {
-            "type": "string",
-            "description": "Stable ID is generated by DB; this is upsert by (lectureId + url)"
-          },
-          "format": {
-            "type": "string"
-          },
-          "bitrateKbps": {
-            "type": "number"
-          },
-          "sizeBytes": {
-            "type": "string",
-            "description": "Bytes as string to avoid precision issues"
-          },
-          "durationSeconds": {
-            "type": "number"
-          },
-          "source": {
-            "type": "string"
-          },
-          "isPrimary": {
-            "type": "boolean",
-            "default": false
-          }
-        },
-        "required": [
-          "url"
         ]
       },
       "CollectionCatalogPageDto": {
@@ -4601,6 +4683,198 @@
           "items"
         ]
       },
+      "RecommendationHeroItemDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "series",
+              "collection",
+              "lecture"
+            ]
+          },
+          "entityId": {
+            "type": "string",
+            "description": "The backing entity id (series/collection/lecture)"
+          },
+          "entitySlug": {
+            "type": "string",
+            "description": "The backing entity slug (used by clients to build canonical URLs)"
+          },
+          "headline": {
+            "type": "string",
+            "description": "Hero message to display"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "coverImageUrl": {
+            "type": "string"
+          },
+          "lessonCount": {
+            "type": "number",
+            "description": "Number of lessons (for series/collection) or 1 (lecture). Optional when not precomputed."
+          },
+          "totalDurationSeconds": {
+            "type": "number",
+            "description": "Total duration in seconds for the featured entity."
+          },
+          "presentedBy": {
+            "type": "string",
+            "description": "Scholar/teacher presenting the study"
+          },
+          "presentedBySlug": {
+            "type": "string",
+            "description": "Slug for the scholar/teacher"
+          },
+          "workAuthor": {
+            "type": "string",
+            "description": "Optional author of the studied work (if known)"
+          }
+        },
+        "required": [
+          "kind",
+          "entityId",
+          "entitySlug",
+          "headline",
+          "title",
+          "presentedBy"
+        ]
+      },
+      "RecommendationItemDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "series",
+              "collection",
+              "lecture"
+            ]
+          },
+          "entityId": {
+            "type": "string",
+            "description": "The backing entity id"
+          },
+          "entitySlug": {
+            "type": "string",
+            "description": "The backing entity slug"
+          },
+          "title": {
+            "type": "string"
+          },
+          "coverImageUrl": {
+            "type": "string"
+          },
+          "lessonCount": {
+            "type": "number",
+            "description": "Number of lessons (series/collection) or 1 (lecture)."
+          },
+          "totalDurationSeconds": {
+            "type": "number",
+            "description": "Total duration in seconds for the recommended entity."
+          },
+          "scholarName": {
+            "type": "string",
+            "description": "Scholar/teacher presenting the study"
+          },
+          "scholarSlug": {
+            "type": "string",
+            "description": "Slug for the scholar/teacher"
+          }
+        },
+        "required": [
+          "kind",
+          "entityId",
+          "entitySlug",
+          "title",
+          "scholarName"
+        ]
+      },
+      "RecommendationPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecommendationItemDto"
+            }
+          },
+          "nextCursor": {
+            "type": "string",
+            "description": "Cursor for fetching the next page"
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "CreateAnalyticsEventDto": {
+        "type": "object",
+        "properties": {
+          "contentKind": {
+            "type": "string",
+            "enum": [
+              "lecture",
+              "series",
+              "collection"
+            ]
+          },
+          "contentId": {
+            "type": "string"
+          },
+          "eventType": {
+            "type": "string",
+            "enum": [
+              "view",
+              "play",
+              "complete",
+              "save",
+              "share"
+            ]
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "web",
+              "mobile",
+              "api"
+            ],
+            "default": "web"
+          }
+        },
+        "required": [
+          "contentKind",
+          "contentId",
+          "eventType"
+        ]
+      },
+      "PlatformStatsDto": {
+        "type": "object",
+        "properties": {
+          "totalScholars": {
+            "type": "number",
+            "description": "Total number of active scholars"
+          },
+          "totalLectures": {
+            "type": "number",
+            "description": "Total number of published lectures"
+          },
+          "lecturesPublishedLast30Days": {
+            "type": "number",
+            "description": "Number of lectures published in the last 30 days"
+          }
+        },
+        "required": [
+          "totalScholars",
+          "totalLectures",
+          "lecturesPublishedLast30Days"
+        ]
+      },
       "TopicDetailDto": {
         "type": "object",
         "properties": {
@@ -4625,27 +4899,6 @@
           "slug",
           "name",
           "createdAt"
-        ]
-      },
-      "UpsertTopicDto": {
-        "type": "object",
-        "properties": {
-          "slug": {
-            "type": "string",
-            "description": "Stable, URL-safe slug (unique)"
-          },
-          "name": {
-            "type": "string",
-            "description": "Display name"
-          },
-          "parentSlug": {
-            "type": "string",
-            "description": "Optional parent topic slug"
-          }
-        },
-        "required": [
-          "slug",
-          "name"
         ]
       },
       "TopicViewDto": {
@@ -4729,19 +4982,6 @@
         "required": [
           "topic",
           "attachedAt"
-        ]
-      },
-      "AttachTopicDto": {
-        "type": "object",
-        "properties": {
-          "topicSlug": {
-            "type": "string",
-            "example": "tawheed",
-            "description": "Topic slug to attach"
-          }
-        },
-        "required": [
-          "topicSlug"
         ]
       }
     }

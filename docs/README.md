@@ -107,7 +107,7 @@ It explains how the system should be structured, where logic belongs, and what p
   Web app structure, public vs admin areas, SEO responsibilities.
 
 - [`10-environments-and-configuration.md`](./implementation-guide/10-environments-and-configuration.md)  
-  Environment model, configuration ownership, and tag-based deployment promotion.
+  Environment model, configuration ownership, and branch-based deployment workflow.
 
 - [`11-guardrails-and-non-goals.md`](./implementation-guide/11-guardrails-and-non-goals.md)  
   Explicit rules, forbidden shortcuts, and scope boundaries.

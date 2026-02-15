@@ -23,6 +23,11 @@ This package owns Prisma schema, migrations, and DB client utilities.
 - Create migration: `pnpm --filter @sd/db migrate:create-only`
 - Deploy migrations: `pnpm --filter @sd/db migrate:deploy`
 
+Env file precedence for local DB commands:
+
+- `.env` -> `.env.local` -> `.env.<NODE_ENV>` -> `.env.<NODE_ENV>.local`
+- Existing process env vars (for CI/secrets) are never overridden by env files.
+
 ## Build/lint/test commands
 
 - Build: `pnpm --filter @sd/db build`
@@ -40,3 +45,9 @@ This package owns Prisma schema, migrations, and DB client utilities.
 - Do not embed environment values in source or migrations.
 - Keep generated output derived from schema, not hand-edited.
 - Never commit generated DB artifacts under `packages/db/src/generated/`.
+
+## Common CI failure
+
+- Symptom: `Cannot find module '@sd/db/client'` during `apps/api` build, followed by many PrismaService type errors.
+- Cause: Turbo remote cache restores `dist/**` outputs but not `src/generated/**` (Prisma Client is generated output).
+- Fix: ensure `@sd/db` build produces Prisma client under `packages/db/dist/generated/prisma/` (this package's `build` script copies it there).

@@ -12,6 +12,8 @@ This Next.js app is a client of the backend API, not an authority.
 
 - Project-local OpenCode skills live in `.opencode/skills/`.
 - Keep Next.js and web-specific skills scoped to this app directory.
+- For image-driven UI tasks, run root `google-stitch` first, then adapt output using this file and web-local skills.
+- After Stitch baseline generation, enforce web structure (`app/`, `features/`, `core/`, `shared/`) and tokenized styling rules.
 
 ## Non-negotiables
 
@@ -25,6 +27,45 @@ This Next.js app is a client of the backend API, not an authority.
 - `features/` - domain-facing UI/hooks
 - `core/` - platform concerns (API wiring, session, caching, error normalization)
 - `shared/` - primitives/utilities with no inward deps
+
+Route wrappers in `src/app/**/page.tsx` must:
+
+- Import screen + metadata helpers from `features/*/screens/*`.
+- Avoid domain data fetching and feature business logic.
+- Keep routing declarative and minimal.
+
+Feature ownership rules:
+
+- Feature folders are vertical slices (`api/`, `screens/`, `components/`, `hooks/`, `store/`, `types/`, `utils/`).
+- A feature owns its domain-specific formatting, SEO helpers, UI state, and API wrappers.
+- Do not place catalog-specific code in `core/` or `shared/`.
+
+Shared promotion rules:
+
+- Promote code to `shared/` only when at least two features need the same behavior.
+- `shared/` stays domain-agnostic (no catalog semantics, no API route knowledge).
+- When in doubt, keep code inside the feature until reuse is proven.
+
+API client import policy:
+
+- Import API types/clients only from `@sd/api-client` public exports.
+- Never import from `@sd/api-client/generated/*` directly.
+
+Styling policy:
+
+- Use tokenized design primitives from `src/app/globals.css` (light + dark tokens).
+- Avoid one-off hardcoded colors/spacing/radius/shadows in feature components.
+- Keep green-accent catalog language calm, structured, and readable.
+
+## Brand assets
+
+- Favicons/app icons live in `apps/web/src/app/favicon.ico` and `apps/web/public/icons/*`; wire them via Next metadata in `apps/web/src/app/layout.tsx`.
+- Logos live in `apps/web/public/logo/*`; reference them as `/logo/<file>` in UI (e.g. with `next/image`).
+
+Information architecture:
+
+- Web route IA can diverge from backend endpoint shapes when UX/SEO benefits.
+- Backend remains authoritative; web IA is a presentation concern.
 
 Direction:
 
@@ -65,3 +106,7 @@ Direction:
 - Preserve clear separation between UX logic and policy logic.
 - Keep errors explicit and user-safe; do not swallow failures.
 - Add tests for admin actions and permission-sensitive views.
+- TypeScript strictness is non-negotiable: do not allow implicit `any`.
+- For screen loaders/view-model builders, add explicit return types (especially around `Promise.all` results).
+- For `map`/`filter`/`reduce` callbacks that can lose inference in CI, add explicit element types.
+- Before finishing web changes, run `pnpm --filter web typecheck` and `pnpm --filter web build` locally to mirror CI.

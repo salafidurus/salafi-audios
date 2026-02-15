@@ -2,9 +2,18 @@
 
 Place local audio files here before running ingestion.
 
+Notes:
+
+- This directory is git-ignored except for `README.md` and `.gitignore`.
+- Use `audioAssets[].file` in `phase-02-sample.json` when files are stored in nested folders.
+
 Folder layout:
 
 - `packages/ingest/content/audio/<scholar-slug>/<lecture-slug>.mp3`
+
+Optional nested layout (when using explicit `audioAssets[].file`):
+
+- `packages/ingest/content/audio/<scholar-slug>/<series-slug>/<file>.mp3`
 
 Examples:
 

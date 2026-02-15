@@ -1,6 +1,6 @@
 import type { ConfigContext, ExpoConfig } from "expo/config";
 import { version } from "./package.json";
-import { getMobileBuildEnv, type AppEnv } from "@sd/env/mobile";
+import { getMobileBuildEnv, type AppEnv } from "@sd/env";
 
 const OWNER = "basmalabs";
 const PROJECT_ID = "f943688f-bb4a-4f22-af5a-60dc5bafb485";

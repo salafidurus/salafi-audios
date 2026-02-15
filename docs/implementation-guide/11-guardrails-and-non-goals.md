@@ -96,12 +96,12 @@ The monorepo is an enforcement mechanism, not a convenience.
 
 ---
 
-## CI/CD Is Promotion-Based, Not Push-Based
+## CI/CD Is PR-Gated and Branch-Deploy
 
 - Code enters `main` only via pull requests
-- Deployments occur via explicit promotion
-- Tags represent deployment intent
-- Rollbacks move tags, not code
+- CI is required on pull requests before merge
+- Deployments are driven by protected branch updates
+- Rollbacks are performed through reviewed branch changes
 
 Any process that bypasses this is unsafe.
 

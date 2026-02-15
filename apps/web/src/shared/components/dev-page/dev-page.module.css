@@ -1,0 +1,54 @@
+.page {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: calc(var(--top-nav-height, 0px) + clamp(2rem, 6vw, 4rem)) var(--space-page-x);
+}
+
+.card {
+  width: min(42rem, 100%);
+  border-radius: var(--radius-panel);
+  border: 1px solid color-mix(in srgb, var(--color-border) 75%, transparent);
+  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+  box-shadow: var(--shadow-panel);
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  text-align: center;
+}
+
+.kicker {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  font-weight: 700;
+}
+
+.title {
+  margin: 0.6rem 0 0;
+  font-size: clamp(1.7rem, 3vw, 2.4rem);
+  letter-spacing: -0.02em;
+}
+
+.description {
+  margin: 0.8rem auto 0;
+  color: var(--color-text-secondary);
+  max-width: 50ch;
+}
+
+.link {
+  display: inline-flex;
+  margin-top: 1.4rem;
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius-chip);
+  border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
+  background: var(--color-surface);
+  color: var(--color-link);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.link:hover {
+  background: color-mix(in srgb, var(--color-primary-soft) 65%, var(--color-surface));
+}

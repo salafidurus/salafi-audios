@@ -26,6 +26,9 @@ export class ScholarDetailDto {
   isActive!: boolean;
 
   @ApiProperty()
+  isKibar!: boolean;
+
+  @ApiProperty()
   createdAt!: string; // ISO
 
   @ApiProperty({ required: false, nullable: true })

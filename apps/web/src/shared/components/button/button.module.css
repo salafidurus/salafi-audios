@@ -1,0 +1,119 @@
+/* Shared button: consistent base + variants */
+
+.button {
+  --btn-bg: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  --btn-fg: var(--color-text);
+  --btn-border: color-mix(in srgb, var(--color-border) 84%, transparent);
+  --btn-shadow: 0 14px 22px -22px rgb(20 47 33 / 0.42);
+
+  appearance: none;
+  border: 1px solid var(--btn-border);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  font-weight: 750;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: var(--btn-shadow);
+  transition:
+    transform 160ms ease,
+    filter 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+.button:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.button:hover {
+  transform: translateY(-1px);
+  filter: saturate(1.02);
+}
+
+.button:active {
+  transform: translateY(0);
+}
+
+.button:disabled,
+.button[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  filter: none;
+}
+
+.size-sm {
+  padding: 0.52rem 0.82rem;
+  font-size: 0.9rem;
+}
+
+.size-md {
+  padding: 0.62rem 1rem;
+  font-size: 0.92rem;
+}
+
+.size-lg {
+  padding: 0.74rem 1.12rem;
+  font-size: 0.98rem;
+}
+
+.size-icon {
+  width: 2.55rem;
+  height: 2.55rem;
+  padding: 0;
+}
+
+.variant-primary {
+  --btn-bg:
+    radial-gradient(circle at 18% 22%, rgb(242 255 248 / 0.58), transparent 60%),
+    linear-gradient(135deg, #64e787, #37bf61);
+  --btn-fg: #052212;
+  --btn-border: rgb(46 178 82 / 0.45);
+  --btn-shadow: 0 18px 26px -24px rgb(0 0 0 / 0.55), inset 0 1px 0 rgb(242 255 248 / 0.62);
+}
+
+.variant-surface {
+  --btn-bg: color-mix(in srgb, var(--color-surface) 65%, transparent);
+  --btn-fg: var(--color-text);
+  --btn-border: color-mix(in srgb, var(--color-border) 84%, transparent);
+}
+
+.variant-outline {
+  --btn-bg: transparent;
+  --btn-fg: var(--color-text);
+  --btn-border: color-mix(in srgb, var(--color-border) 84%, transparent);
+}
+
+.variant-ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--color-text);
+  --btn-border: transparent;
+  --btn-shadow: none;
+}
+
+.variant-ghost:hover {
+  background: color-mix(in srgb, var(--color-primary-soft) 46%, transparent);
+}
+
+.variant-danger {
+  --btn-bg:
+    radial-gradient(circle at 18% 22%, rgb(255 245 245 / 0.7), transparent 62%),
+    linear-gradient(135deg, #ff8f8f, #d64d4d);
+  --btn-fg: #2b0b0b;
+  --btn-border: color-mix(in srgb, #d64d4d 65%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}

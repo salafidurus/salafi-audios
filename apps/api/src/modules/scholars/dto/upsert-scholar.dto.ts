@@ -56,4 +56,12 @@ export class UpsertScholarDto {
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Whether this scholar is marked as Kibar ul-Ulama',
+    default: false,
+  })
+  @IsBoolean()
+  @IsOptional()
+  isKibar?: boolean;
 }
