@@ -2,9 +2,7 @@
 module.exports = {
   testEnvironment: "node",
 
-  testMatch: [
-    "<rootDir>/**/?(*.)+(spec|test).[tj]s?(x)",
-  ],
+  testMatch: ["<rootDir>/**/?(*.)+(spec|test).[tj]s?(x)"],
 
   transform: {
     "^.+\\.(t|j)sx?$": [
@@ -17,6 +15,8 @@ module.exports = {
   },
 
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json"],
+
+  modulePathIgnorePatterns: ["<rootDir>/dist/"],
 
   collectCoverageFrom: [
     "src/**/*.{ts,tsx,js,jsx}",

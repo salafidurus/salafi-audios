@@ -31,7 +31,14 @@ describe('ScholarService', () => {
 
   it('listActiveScholars returns repo results', async () => {
     const data: ScholarViewDto[] = [
-      { id: '1', slug: 'a', name: 'A', bio: undefined, isActive: true },
+      {
+        id: '1',
+        slug: 'a',
+        name: 'A',
+        bio: undefined,
+        isActive: true,
+        isKibar: false,
+      },
     ];
     repo.listActive.mockResolvedValue(data);
 
@@ -58,6 +65,7 @@ describe('ScholarService', () => {
       mainLanguage: undefined,
       imageUrl: undefined,
       isActive: true,
+      isKibar: false,
       createdAt: new Date('2026-01-01T00:00:00.000Z').toISOString(),
       updatedAt: undefined,
     };
