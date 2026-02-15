@@ -1,0 +1,17 @@
+/* Home screen layout styles - minimal assembly styles only */
+
+.shell {
+  width: min(var(--space-content-max), 100%);
+  margin-inline: auto;
+  padding: var(--top-nav-height, 0px) var(--space-page-x) 0;
+}
+
+/* Responsive */
+@media (max-width: 960px) {
+  .shell {
+    padding-inline: clamp(1rem, 4.5vw, 1.75rem);
+  }
+}
+
+@media (max-width: 720px) {
+}

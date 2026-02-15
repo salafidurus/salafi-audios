@@ -150,6 +150,18 @@ body {
   font-size: var(--font-size-body);
 }
 
+.appFrame {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.appMain {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
 h1,
 h2,
 h3,

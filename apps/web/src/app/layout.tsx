@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Fraunces, Manrope } from "next/font/google";
 import "./globals.css";
+import { Header } from "@/features/navigation/components/header/header";
+import { Footer } from "@/features/navigation/components/footer/footer";
 
 const displayFont = Fraunces({
   variable: "--font-display",
@@ -26,7 +28,7 @@ export const metadata: Metadata = {
     template: "%s | Salafi Durus",
   },
   description:
-    "Browse published scholars, collections, series, and lectures in the Salafi Durus catalog.",
+    "Browse published scholars, collections, series, and lectures in the Salafi Durus library.",
   icons: {
     icon: [
       { url: "/icons/favicon-32x32.png", sizes: "32x32", type: "image/png" },
@@ -44,7 +46,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${displayFont.variable} ${bodyFont.variable} antialiased`}>{children}</body>
+      <body className={`${displayFont.variable} ${bodyFont.variable} antialiased`}>
+        <div className="appFrame">
+          <Header searchPlaceholder="Search for lectures, books, or scholars..." />
+          <div className="appMain">{children}</div>
+          <Footer />
+        </div>
+      </body>
     </html>
   );
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getHomeMetadata, HomeScreen } from "@/features/catalog/screens/home.screen";
+import { getHomeMetadata, HomeScreen } from "@/features/home/screens/home.screen";
 
 export const metadata: Metadata = getHomeMetadata();
 

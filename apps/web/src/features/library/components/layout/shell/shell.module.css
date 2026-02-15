@@ -1,0 +1,14 @@
+.page {
+  padding: calc(var(--top-nav-height, 0px) + var(--space-page-y)) var(--space-page-x) 4rem;
+}
+
+.container {
+  width: min(74rem, 100%);
+  margin-inline: auto;
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding-bottom: 3rem;
+  }
+}

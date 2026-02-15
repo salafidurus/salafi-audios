@@ -20,6 +20,18 @@ From repo root:
 pnpm ingest:content -- --tag phase-02-seed
 ```
 
+Fix grouped series collections:
+
+```bash
+pnpm --filter @sd/ingest fix:series-collections -- --tag phase-02-series-fix
+```
+
+Optional prefixes override:
+
+```bash
+pnpm --filter @sd/ingest fix:series-collections -- --tag phase-02-series-fix --prefixes shAbadSB,shBnBazSB
+```
+
 Remove a tagged ingestion batch:
 
 ```bash

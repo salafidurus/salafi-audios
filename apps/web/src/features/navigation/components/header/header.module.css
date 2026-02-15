@@ -1,0 +1,260 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 40;
+  right: 0;
+  width: 100%;
+  padding: 0.72rem 0;
+  background: var(--color-surface);
+  box-sizing: border-box;
+  overflow-x: clip;
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--color-border) 86%, transparent),
+    0 10px 24px -24px rgb(20 47 33 / 0.42);
+}
+
+:global(html[data-hero-inview="true"]) .header {
+  background: rgb(6 18 12 / 0.42);
+  box-shadow: none;
+  --nav-border: rgb(233 248 239 / 0.16);
+  --nav-surface: rgb(6 18 12 / 0.18);
+  --nav-surface-soft: rgb(4 20 13 / 0.22);
+  --nav-text: rgb(246 252 248 / 0.95);
+  --nav-text-muted: rgb(233 248 239 / 0.7);
+  --nav-link: rgb(151 239 173 / 0.92);
+  border-bottom: 1px solid rgb(151 239 173 / 0.12);
+}
+
+@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  :global(html[data-hero-inview="true"]) .header {
+    -webkit-backdrop-filter: blur(14px) saturate(1.15);
+    backdrop-filter: blur(14px) saturate(1.15);
+    background: rgb(6 18 12 / 0.34);
+  }
+}
+
+.authGhost {
+  --btn-fg: var(--color-text);
+}
+
+.authPrimary {
+  /* keep primary default */
+}
+
+:global(html[data-hero-inview="true"]) .authGhost {
+  --btn-fg: rgb(246 252 248 / 0.92);
+  --btn-bg: transparent;
+  --btn-border: transparent;
+  --btn-shadow: none;
+}
+
+:global(html[data-hero-inview="true"]) .authPrimary {
+  filter: saturate(1.03);
+}
+
+.headerMain {
+  display: grid;
+  grid-template-areas: "brand nav search actions";
+  grid-template-columns: auto auto minmax(16rem, 26rem) auto;
+  align-items: center;
+  column-gap: clamp(1rem, 2.4vw, 2.1rem);
+  row-gap: 0;
+  width: min(var(--space-content-max), 100%);
+  margin-inline: auto;
+  padding-inline: clamp(1.4rem, 4.8vw, 3.25rem);
+  padding-block: 0;
+}
+
+.brand {
+  grid-area: brand;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-gap-sm);
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.brandMark {
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-chip);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-inline);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.brandImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.brandText {
+  margin: 0;
+  font-family: var(--font-display), serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 14rem;
+}
+
+:global(html[data-hero-inview="true"]) .brandText {
+  color: var(--nav-text);
+}
+
+.navLinks {
+  grid-area: nav;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-gap-xl);
+  min-width: 0;
+}
+
+.navLink {
+  position: relative;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.15rem 0;
+  cursor: default;
+}
+
+:global(html[data-hero-inview="true"]) .navLink {
+  color: var(--nav-text-muted);
+}
+
+.navLinkActive,
+.navLink:hover {
+  color: var(--color-link);
+}
+
+:global(html[data-hero-inview="true"]) .navLinkActive,
+:global(html[data-hero-inview="true"]) .navLink:hover {
+  color: var(--nav-link);
+}
+
+.navLinkActive::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.6rem;
+  height: 2px;
+  border-radius: var(--radius-chip);
+  background: var(--color-primary);
+}
+
+.searchSlot {
+  grid-area: search;
+  min-width: 0;
+  width: 100%;
+  max-width: 26rem;
+}
+
+.headerMainCondensed {
+  /* Mobile-only: see @media (max-width: 700px) */
+}
+
+.authActions {
+  grid-area: actions;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-gap-md);
+  margin-left: auto;
+}
+
+.authHideMobile {
+  display: inline-flex;
+}
+
+@media (max-width: 1180px) {
+  .headerMain {
+    grid-template-areas:
+      "brand actions"
+      "search search"
+      "nav nav";
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 0.75rem;
+  }
+
+  .searchSlot {
+    max-width: none;
+  }
+
+  .navLinks {
+    width: 100%;
+    justify-content: center;
+    gap: clamp(1rem, 2.2vw, 1.4rem);
+  }
+
+  .navLink {
+    text-align: center;
+    padding: 0.15rem 0;
+  }
+
+  .navLinkActive::after {
+    bottom: -0.45rem;
+  }
+}
+
+@media (max-width: 960px) {
+  .header {
+    padding: 0.72rem 0;
+  }
+
+  .navLinks {
+    gap: var(--space-gap-md);
+  }
+
+  .navLink {
+    font-size: 0.88rem;
+  }
+
+  .searchSlot {
+    max-width: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .headerMain {
+    padding-inline: 1rem;
+    row-gap: 0.7rem;
+  }
+
+  .brandText {
+    display: none;
+  }
+
+  .authHideMobile {
+    display: none;
+  }
+
+  .navLinks {
+    gap: 0.95rem;
+  }
+
+  .navLink {
+    font-size: 0.84rem;
+  }
+
+  .headerMainCondensed {
+    grid-template-areas: "brand actions";
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 0;
+  }
+
+  .headerMainCondensed .searchSlot,
+  .headerMainCondensed .navLinks {
+    display: none;
+  }
+}

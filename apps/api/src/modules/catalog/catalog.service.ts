@@ -5,7 +5,6 @@ import { CatalogPageDto } from './dto/catalog-page.dto';
 import { CollectionViewDto } from '../collections/dto/collection-view.dto';
 import { SeriesViewDto } from '../series/dto/series-view.dto';
 import { LectureViewDto } from '../lectures/dto/lecture-view.dto';
-import { FeaturedHomeItemDto } from './dto/featured-home-item.dto';
 
 @Injectable()
 export class CatalogService {
@@ -27,9 +26,5 @@ export class CatalogService {
     query: CatalogListQueryDto,
   ): Promise<CatalogPageDto<LectureViewDto>> {
     return this.repo.listRootLectures(query);
-  }
-
-  listFeaturedHomeItems(): Promise<FeaturedHomeItemDto[]> {
-    return this.repo.listFeaturedHomeItems(3);
   }
 }

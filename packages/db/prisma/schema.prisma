@@ -20,6 +20,31 @@ enum Status {
   archived
 }
 
+enum AnalyticsContentKind {
+  lecture
+  series
+  collection
+}
+
+enum AnalyticsEventType {
+  view
+  play
+  complete
+  save
+  share
+}
+
+enum AnalyticsSource {
+  web
+  mobile
+  api
+}
+
+enum RecommendationRecurrence {
+  none
+  yearly
+}
+
 enum GlobalRole {
   admin
   listener
@@ -125,6 +150,7 @@ model Scholar {
   mainLanguage String?
   imageUrl     String?
   isActive     Boolean   @default(true)
+  isKibar      Boolean   @default(false)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime?
 
@@ -145,18 +171,22 @@ model Scholar {
 //////////////////////////
 
 model Collection {
-  id                       String    @id @default(cuid())
+  id                       String                    @id @default(cuid())
   scholarId                String
   slug                     String
   title                    String
   description              String?
   coverImageUrl            String?
   language                 String?
-  status                   Status    @default(draft)
+  status                   Status                    @default(draft)
   orderIndex               Int?
   publishedLectureCount    Int?
   publishedDurationSeconds Int?
-  createdAt                DateTime  @default(now())
+  recommendationOverride   Boolean                   @default(false)
+  recommendationStartAt    DateTime?
+  recommendationEndAt      DateTime?
+  recommendationRecurrence RecommendationRecurrence? @default(none)
+  createdAt                DateTime                  @default(now())
   updatedAt                DateTime?
 
   deletedAt     DateTime?
@@ -176,12 +206,41 @@ model Collection {
   @@index([deleteAfterAt], map: "idx_collection_deleteafter")
 }
 
+model RecommendationHero {
+  id         String               @id @default(cuid())
+  entityKind AnalyticsContentKind
+  entityId   String
+  headline   String
+  orderIndex Int                  @default(0)
+  isActive   Boolean              @default(true)
+  startAt    DateTime?
+  endAt      DateTime?
+  createdAt  DateTime             @default(now())
+
+  @@index([isActive, orderIndex], map: "idx_recommendationhero_active_order")
+  @@index([entityKind, entityId], map: "idx_recommendationhero_entity")
+}
+
+model AnalyticsEvent {
+  id          String               @id @default(cuid())
+  contentKind AnalyticsContentKind
+  contentId   String
+  eventType   AnalyticsEventType
+  weight      Int
+  occurredAt  DateTime             @default(now())
+  source      AnalyticsSource
+  createdAt   DateTime             @default(now())
+
+  @@index([contentKind, contentId, occurredAt], map: "idx_analytics_content_time")
+  @@index([eventType, occurredAt], map: "idx_analytics_event_time")
+}
+
 //////////////////////////
 // Series
 //////////////////////////
 
 model Series {
-  id                       String    @id @default(cuid())
+  id                       String                    @id @default(cuid())
   scholarId                String
   collectionId             String?
   slug                     String
@@ -189,11 +248,15 @@ model Series {
   description              String?
   coverImageUrl            String?
   language                 String?
-  status                   Status    @default(draft)
+  status                   Status                    @default(draft)
   orderIndex               Int?
   publishedLectureCount    Int?
   publishedDurationSeconds Int?
-  createdAt                DateTime  @default(now())
+  recommendationOverride   Boolean                   @default(false)
+  recommendationStartAt    DateTime?
+  recommendationEndAt      DateTime?
+  recommendationRecurrence RecommendationRecurrence? @default(none)
+  createdAt                DateTime                  @default(now())
   updatedAt                DateTime?
 
   deletedAt     DateTime?
@@ -219,19 +282,23 @@ model Series {
 //////////////////////////
 
 model Lecture {
-  id              String    @id @default(cuid())
-  scholarId       String
-  seriesId        String?
-  slug            String
-  title           String
-  description     String?
-  language        String?
-  status          Status    @default(draft)
-  publishedAt     DateTime?
-  orderIndex      Int?
-  durationSeconds Int?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime?
+  id                       String                    @id @default(cuid())
+  scholarId                String
+  seriesId                 String?
+  slug                     String
+  title                    String
+  description              String?
+  language                 String?
+  status                   Status                    @default(draft)
+  publishedAt              DateTime?
+  orderIndex               Int?
+  durationSeconds          Int?
+  recommendationOverride   Boolean                   @default(false)
+  recommendationStartAt    DateTime?
+  recommendationEndAt      DateTime?
+  recommendationRecurrence RecommendationRecurrence? @default(none)
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime?
 
   deletedAt     DateTime?
   deleteAfterAt DateTime?

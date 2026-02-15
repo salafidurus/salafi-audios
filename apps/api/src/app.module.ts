@@ -16,6 +16,8 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CatalogModule } from './modules/catalog/catalog.module';
+import { RecommendationsModule } from './modules/recommendations/recommendations.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
 
 @Module({
   imports: [
@@ -33,6 +35,8 @@ import { CatalogModule } from './modules/catalog/catalog.module';
     LecturesModule,
     AudioAssetsModule,
     CatalogModule,
+    RecommendationsModule,
+    AnalyticsModule,
 
     // Topics Modules
     TopicsModule,
