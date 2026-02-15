@@ -1,4 +1,4 @@
-import React from "react";
+import React, { act } from "react";
 import { render, screen } from "@testing-library/react";
 import { Hero } from "./hero";
 
@@ -19,8 +19,10 @@ describe("Hero", () => {
     mockIntersectionObserver();
   });
 
-  afterEach(() => {
-    jest.runOnlyPendingTimers();
+  afterEach(async () => {
+    await act(async () => {
+      jest.runOnlyPendingTimers();
+    });
     jest.useRealTimers();
   });
 
