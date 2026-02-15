@@ -19,6 +19,7 @@ export async function httpClient<T>(options: {
   params?: QueryParams;
   headers?: Record<string, string>;
   body?: unknown;
+  data?: unknown;
   signal?: AbortSignal;
 }): Promise<T> {
   if (!config) {
@@ -48,6 +49,8 @@ export async function httpClient<T>(options: {
     }
   }
 
+  const payload = options.body ?? options.data;
+
   const res = await fetch(endpoint.toString(), {
     method: options.method,
     headers: {
@@ -55,7 +58,7 @@ export async function httpClient<T>(options: {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(options.headers ?? {}),
     },
-    body: options.body ? JSON.stringify(options.body) : undefined,
+    body: payload ? JSON.stringify(payload) : undefined,
     signal: options.signal,
   });
 
