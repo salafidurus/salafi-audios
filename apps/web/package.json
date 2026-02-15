@@ -30,6 +30,7 @@
     "zustand": "^5.0.11"
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
     "@playwright/test": "^1.57.0",
     "@sd/config": "workspace:*",
     "@tailwindcss/postcss": "^4",
