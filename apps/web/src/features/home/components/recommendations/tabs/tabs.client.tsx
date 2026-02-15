@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Clock3, Home, Layers, TrendingUp } from "lucide-react";
 import type { Tab } from "@/features/home/types/home.types";
 import type { RecommendationItem as ApiRecommendationItem } from "@/features/home/api/public-api";
@@ -58,39 +58,49 @@ function mapRecommendationItem(item: ApiRecommendationItem): Tab["rows"][number]
   };
 }
 
+function buildRowState(tabs: Tab[]): Record<string, RowState> {
+  const nextState: Record<string, RowState> = {};
+
+  tabs.forEach((tab) => {
+    tab.rows.forEach((row) => {
+      const baseCount = row.variant === "featured" ? 4 : 8;
+      nextState[row.id] = {
+        items: row.items,
+        nextCursor: row.cursor,
+        isLoading: false,
+        source: row.source,
+        visibleCount: Math.max(baseCount, row.items.length > 0 ? baseCount : 0),
+        pageSize: baseCount,
+      };
+    });
+  });
+
+  return nextState;
+}
+
 export function Tabs({ tabs, defaultTabId }: TabsProps) {
   const initialTabId = defaultTabId ?? tabs[0]?.id ?? "recommended";
   const [activeTabId, setActiveTabId] = useState(initialTabId);
   const isAuthenticated = false;
 
-  const [rowState, setRowState] = useState<Record<string, RowState>>({});
+  const baseRowState = useMemo(() => buildRowState(tabs), [tabs]);
+  const [rowOverrides, setRowOverrides] = useState<Record<string, RowState>>({});
+  const rowState = useMemo(() => {
+    const merged: Record<string, RowState> = { ...baseRowState };
 
-  useEffect(() => {
-    const nextState: Record<string, RowState> = {};
-    tabs.forEach((tab) => {
-      tab.rows.forEach((row) => {
-        const baseCount = row.variant === "featured" ? 4 : 8;
-        nextState[row.id] = {
-          items: row.items,
-          nextCursor: row.cursor,
-          isLoading: false,
-          source: row.source,
-          visibleCount: Math.max(baseCount, row.items.length > 0 ? baseCount : 0),
-          pageSize: baseCount,
-        };
-      });
-    });
-    setRowState(nextState);
-  }, [tabs]);
+    for (const [rowId, override] of Object.entries(rowOverrides)) {
+      if (merged[rowId]) {
+        merged[rowId] = override;
+      }
+    }
+
+    return merged;
+  }, [baseRowState, rowOverrides]);
 
   const activeTab = useMemo(
     () => tabs.find((tab) => tab.id === activeTabId) ?? tabs[0],
     [activeTabId, tabs],
   );
-
-  if (!activeTab) {
-    return null;
-  }
 
   const loadMore = useCallback(
     async (rowId: string) => {
@@ -102,21 +112,25 @@ export function Tabs({ tabs, defaultTabId }: TabsProps) {
       const hasRemoteMore = Boolean(current.source && current.nextCursor);
       if (!hasLocalMore && !hasRemoteMore) return;
 
-      setRowState((prev) => ({
+      setRowOverrides((prev) => ({
         ...prev,
-        [rowId]: { ...prev[rowId], isLoading: true },
+        [rowId]: { ...rowState[rowId], isLoading: true },
       }));
 
       try {
         if (hasLocalMore) {
-          setRowState((prev) => ({
-            ...prev,
-            [rowId]: {
-              ...prev[rowId],
-              visibleCount: Math.min(prev[rowId].visibleCount + pageSize, prev[rowId].items.length),
-              isLoading: false,
-            },
-          }));
+          setRowOverrides((prev) => {
+            const target = rowState[rowId];
+            if (!target) return prev;
+            return {
+              ...prev,
+              [rowId]: {
+                ...target,
+                visibleCount: Math.min(target.visibleCount + pageSize, target.items.length),
+                isLoading: false,
+              },
+            };
+          });
           return;
         }
 
@@ -124,16 +138,20 @@ export function Tabs({ tabs, defaultTabId }: TabsProps) {
           const page = await publicApi.listRecommendedKibar(pageSize, current.nextCursor, {
             cache: "no-store",
           });
-          setRowState((prev) => ({
-            ...prev,
-            [rowId]: {
-              ...prev[rowId],
-              items: [...prev[rowId].items, ...page.items.map(mapRecommendationItem)],
-              nextCursor: page.nextCursor ?? undefined,
-              visibleCount: prev[rowId].visibleCount + page.items.length,
-              isLoading: false,
-            },
-          }));
+          setRowOverrides((prev) => {
+            const target = rowState[rowId];
+            if (!target) return prev;
+            return {
+              ...prev,
+              [rowId]: {
+                ...target,
+                items: [...target.items, ...page.items.map(mapRecommendationItem)],
+                nextCursor: page.nextCursor ?? undefined,
+                visibleCount: target.visibleCount + page.items.length,
+                isLoading: false,
+              },
+            };
+          });
           return;
         }
 
@@ -141,16 +159,20 @@ export function Tabs({ tabs, defaultTabId }: TabsProps) {
           const page = await publicApi.listRecommendedRecentPlay(pageSize, current.nextCursor, {
             cache: "no-store",
           });
-          setRowState((prev) => ({
-            ...prev,
-            [rowId]: {
-              ...prev[rowId],
-              items: [...prev[rowId].items, ...page.items.map(mapRecommendationItem)],
-              nextCursor: page.nextCursor ?? undefined,
-              visibleCount: prev[rowId].visibleCount + page.items.length,
-              isLoading: false,
-            },
-          }));
+          setRowOverrides((prev) => {
+            const target = rowState[rowId];
+            if (!target) return prev;
+            return {
+              ...prev,
+              [rowId]: {
+                ...target,
+                items: [...target.items, ...page.items.map(mapRecommendationItem)],
+                nextCursor: page.nextCursor ?? undefined,
+                visibleCount: target.visibleCount + page.items.length,
+                isLoading: false,
+              },
+            };
+          });
           return;
         }
 
@@ -161,16 +183,20 @@ export function Tabs({ tabs, defaultTabId }: TabsProps) {
             current.nextCursor,
             { cache: "no-store" },
           );
-          setRowState((prev) => ({
-            ...prev,
-            [rowId]: {
-              ...prev[rowId],
-              items: [...prev[rowId].items, ...page.items.map(mapRecommendationItem)],
-              nextCursor: page.nextCursor ?? undefined,
-              visibleCount: prev[rowId].visibleCount + page.items.length,
-              isLoading: false,
-            },
-          }));
+          setRowOverrides((prev) => {
+            const target = rowState[rowId];
+            if (!target) return prev;
+            return {
+              ...prev,
+              [rowId]: {
+                ...target,
+                items: [...target.items, ...page.items.map(mapRecommendationItem)],
+                nextCursor: page.nextCursor ?? undefined,
+                visibleCount: target.visibleCount + page.items.length,
+                isLoading: false,
+              },
+            };
+          });
           return;
         }
 
@@ -178,16 +204,20 @@ export function Tabs({ tabs, defaultTabId }: TabsProps) {
           const page = await publicApi.listLatest(pageSize, current.nextCursor, {
             cache: "no-store",
           });
-          setRowState((prev) => ({
-            ...prev,
-            [rowId]: {
-              ...prev[rowId],
-              items: [...prev[rowId].items, ...page.items.map(mapRecommendationItem)],
-              nextCursor: page.nextCursor ?? undefined,
-              visibleCount: prev[rowId].visibleCount + page.items.length,
-              isLoading: false,
-            },
-          }));
+          setRowOverrides((prev) => {
+            const target = rowState[rowId];
+            if (!target) return prev;
+            return {
+              ...prev,
+              [rowId]: {
+                ...target,
+                items: [...target.items, ...page.items.map(mapRecommendationItem)],
+                nextCursor: page.nextCursor ?? undefined,
+                visibleCount: target.visibleCount + page.items.length,
+                isLoading: false,
+              },
+            };
+          });
           return;
         }
 
@@ -195,16 +225,20 @@ export function Tabs({ tabs, defaultTabId }: TabsProps) {
           const page = await publicApi.listPopular(pageSize, current.nextCursor, {
             cache: "no-store",
           });
-          setRowState((prev) => ({
-            ...prev,
-            [rowId]: {
-              ...prev[rowId],
-              items: [...prev[rowId].items, ...page.items.map(mapRecommendationItem)],
-              nextCursor: page.nextCursor ?? undefined,
-              visibleCount: prev[rowId].visibleCount + page.items.length,
-              isLoading: false,
-            },
-          }));
+          setRowOverrides((prev) => {
+            const target = rowState[rowId];
+            if (!target) return prev;
+            return {
+              ...prev,
+              [rowId]: {
+                ...target,
+                items: [...target.items, ...page.items.map(mapRecommendationItem)],
+                nextCursor: page.nextCursor ?? undefined,
+                visibleCount: target.visibleCount + page.items.length,
+                isLoading: false,
+              },
+            };
+          });
           return;
         }
 
@@ -215,16 +249,20 @@ export function Tabs({ tabs, defaultTabId }: TabsProps) {
             current.nextCursor,
             { cache: "no-store" },
           );
-          setRowState((prev) => ({
-            ...prev,
-            [rowId]: {
-              ...prev[rowId],
-              items: [...prev[rowId].items, ...page.items.map(mapRecommendationItem)],
-              nextCursor: page.nextCursor ?? undefined,
-              visibleCount: prev[rowId].visibleCount + page.items.length,
-              isLoading: false,
-            },
-          }));
+          setRowOverrides((prev) => {
+            const target = rowState[rowId];
+            if (!target) return prev;
+            return {
+              ...prev,
+              [rowId]: {
+                ...target,
+                items: [...target.items, ...page.items.map(mapRecommendationItem)],
+                nextCursor: page.nextCursor ?? undefined,
+                visibleCount: target.visibleCount + page.items.length,
+                isLoading: false,
+              },
+            };
+          });
           return;
         }
 
@@ -235,26 +273,38 @@ export function Tabs({ tabs, defaultTabId }: TabsProps) {
             current.nextCursor,
             { cache: "no-store" },
           );
-          setRowState((prev) => ({
-            ...prev,
-            [rowId]: {
-              ...prev[rowId],
-              items: [...prev[rowId].items, ...page.items.map(mapRecommendationItem)],
-              nextCursor: page.nextCursor ?? undefined,
-              visibleCount: prev[rowId].visibleCount + page.items.length,
-              isLoading: false,
-            },
-          }));
+          setRowOverrides((prev) => {
+            const target = rowState[rowId];
+            if (!target) return prev;
+            return {
+              ...prev,
+              [rowId]: {
+                ...target,
+                items: [...target.items, ...page.items.map(mapRecommendationItem)],
+                nextCursor: page.nextCursor ?? undefined,
+                visibleCount: target.visibleCount + page.items.length,
+                isLoading: false,
+              },
+            };
+          });
         }
       } catch {
-        setRowState((prev) => ({
-          ...prev,
-          [rowId]: { ...prev[rowId], isLoading: false },
-        }));
+        setRowOverrides((prev) => {
+          const target = rowState[rowId];
+          if (!target) return prev;
+          return {
+            ...prev,
+            [rowId]: { ...target, isLoading: false },
+          };
+        });
       }
     },
     [rowState],
   );
+
+  if (!activeTab) {
+    return null;
+  }
 
   return (
     <section className={styles.contentNav} aria-label="Home content navigation">

@@ -60,7 +60,6 @@ export function buildHomeContent(context: HomeContentContext): {
     scholars,
     scholarBundles,
     lectureBuckets,
-    preferredTopic,
     topicLectures,
     kibarItems: kibarOverride,
     topicItems: topicOverride,
