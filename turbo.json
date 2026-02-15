@@ -10,7 +10,7 @@
     },
     "build": {
       "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*", "tsconfig*.json", "next.config.*"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*", "tsconfig*.json", "next.config.*", "**/openapi.json"],
       "outputs": ["dist/**", "build/**", ".next/**", "lib/**", "generated/**", "src/generated/**"]
     },
     "lint": {
