@@ -39,6 +39,7 @@ The platform becomes self-sustaining from a content perspective.
 - Media replacement
 - Publishing and moderation workflows
 - Admin capabilities on both mobile and web
+- Live lessons directory page and bot integration (Telegram/YouTube)
 
 ### Explicitly Excluded
 

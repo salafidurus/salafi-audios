@@ -138,6 +138,11 @@
   color: var(--color-link);
 }
 
+.navLinkDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 :global(html[data-hero-inview="true"]) .navLinkActive,
 :global(html[data-hero-inview="true"]) .navLink:hover {
   color: var(--nav-link);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import { Clock3, Home, Layers, TrendingUp } from "lucide-react";
 import type { Tab } from "@/features/home/types/home.types";
 import type { RecommendationItem as ApiRecommendationItem } from "@/features/home/api/public-api";
@@ -82,6 +82,30 @@ export function Tabs({ tabs, defaultTabId }: TabsProps) {
   const initialTabId = defaultTabId ?? tabs[0]?.id ?? "recommended";
   const [activeTabId, setActiveTabId] = useState(initialTabId);
   const isAuthenticated = false;
+  const tabsContainerRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
+  // Scroll active tab into view on mobile
+  useEffect(() => {
+    const activeTabElement = tabRefs.current[activeTabId];
+    const container = tabsContainerRef.current;
+    if (activeTabElement && container) {
+      const containerRect = container.getBoundingClientRect();
+      const tabRect = activeTabElement.getBoundingClientRect();
+
+      // Check if tab is partially or fully outside the container
+      const isPartiallyHidden =
+        tabRect.left < containerRect.left || tabRect.right > containerRect.right;
+
+      if (isPartiallyHidden) {
+        activeTabElement.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+          inline: "center",
+        });
+      }
+    }
+  }, [activeTabId]);
 
   const baseRowState = useMemo(() => buildRowState(tabs), [tabs]);
   const [rowOverrides, setRowOverrides] = useState<Record<string, RowState>>({});
@@ -308,7 +332,12 @@ export function Tabs({ tabs, defaultTabId }: TabsProps) {
 
   return (
     <section className={styles.contentNav} aria-label="Home content navigation">
-      <div className={styles.tabs} role="tablist" aria-label="Home content tabs">
+      <div
+        ref={tabsContainerRef}
+        className={styles.tabs}
+        role="tablist"
+        aria-label="Home content tabs"
+      >
         {tabs.map((tab) => {
           const Icon = tabIcons[tab.id as keyof typeof tabIcons] ?? Home;
           const isActive = tab.id === activeTab.id;
@@ -319,6 +348,9 @@ export function Tabs({ tabs, defaultTabId }: TabsProps) {
               id={`recommendations-tab-${tab.id}`}
               type="button"
               role="tab"
+              ref={(el) => {
+                tabRefs.current[tab.id] = el;
+              }}
               aria-selected={isActive}
               aria-controls={`recommendations-panel-${tab.id}`}
               className={`${styles.tab} ${isActive ? styles.tabActive : ""}`}

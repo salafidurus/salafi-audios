@@ -144,6 +144,8 @@
   font-size: 1.02rem;
   font-weight: 700;
   color: rgb(142 243 164 / 0.9);
+  display: block;
+  width: fit-content;
 }
 
 .meta {
@@ -210,11 +212,11 @@
 }
 
 .edgeBtnLeft {
-  left: clamp(0.65rem, 1.8vw, 1.6rem);
+  left: calc(50% - min(var(--space-content-max), 100%) / 2 - 3.5rem);
 }
 
 .edgeBtnRight {
-  right: clamp(0.65rem, 1.8vw, 1.6rem);
+  right: calc(50% - min(var(--space-content-max), 100%) / 2 - 3.5rem);
 }
 
 .dot,

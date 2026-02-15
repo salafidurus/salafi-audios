@@ -60,6 +60,16 @@ export async function loadHomeHeroItems(): Promise<RecommendationHeroItem[]> {
   return safe(() => publicApi.listRecommendationHero(), []);
 }
 
+export async function loadHomeSeniorScholars(): Promise<Scholar[]> {
+  const scholars = await safe(() => publicApi.listScholars(), []);
+  return scholars
+    .filter((scholar) => {
+      const isKibar = (scholar as { isKibar?: boolean }).isKibar;
+      return scholar.isActive && Boolean(isKibar);
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
 export async function loadHomeTabs(): Promise<Tab[]> {
   const topics = await safe(() => publicApi.listTopics(), []);
   const kibarPage = await safe<RecommendationPage>(() => publicApi.listRecommendedKibar(8), {

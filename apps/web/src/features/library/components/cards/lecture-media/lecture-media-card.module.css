@@ -21,7 +21,7 @@
 
 .cover {
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 4 / 5;
   background:
     radial-gradient(circle at 30% 20%, rgb(87 216 118 / 0.18), transparent 55%),
     linear-gradient(135deg, var(--color-fill-tertiary), var(--color-fill-secondary));

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import styles from "@/features/navigation/components/header/header.module.css";
 import { SearchInput } from "@/features/navigation/components/search-input/search-input";
 import { Button } from "@/shared/components/button/button";
@@ -16,6 +16,10 @@ export function Header({ searchPlaceholder }: HeaderProps) {
   const [isCondensed, setIsCondensed] = useState(false);
   const headerRef = useRef<HTMLElement | null>(null);
   const router = useRouter();
+  const pathname = usePathname();
+  const libraryDisabled = true;
+
+  const isActive = (path: string) => pathname === path || pathname.startsWith(`${path}/`);
 
   useEffect(() => {
     const media = window.matchMedia("(max-width: 700px)");
@@ -82,10 +86,34 @@ export function Header({ searchPlaceholder }: HeaderProps) {
         </Link>
 
         <nav className={styles.navLinks} aria-label="Primary navigation">
-          <span className={`${styles.navLink} ${styles.navLinkActive}`}>Browse</span>
-          <span className={styles.navLink}>Scholars</span>
-          <span className={styles.navLink}>Library</span>
-          <span className={styles.navLink}>Live</span>
+          <Link
+            href="/scholars"
+            className={`${styles.navLink} ${isActive("/scholars") ? styles.navLinkActive : ""}`.trim()}
+          >
+            Scholars
+          </Link>
+          {libraryDisabled ? (
+            <span
+              className={`${styles.navLink} ${styles.navLinkDisabled}`.trim()}
+              title="Sign in required"
+              aria-disabled="true"
+            >
+              Library
+            </span>
+          ) : (
+            <Link
+              href="/library"
+              className={`${styles.navLink} ${isActive("/library") ? styles.navLinkActive : ""}`.trim()}
+            >
+              Library
+            </Link>
+          )}
+          <Link
+            href="/live"
+            className={`${styles.navLink} ${isActive("/live") ? styles.navLinkActive : ""}`.trim()}
+          >
+            Live
+          </Link>
         </nav>
 
         <SearchInput placeholder={searchPlaceholder} className={styles.searchSlot} />
