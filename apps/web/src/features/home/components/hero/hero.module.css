@@ -144,7 +144,8 @@
   font-size: 1.02rem;
   font-weight: 700;
   color: rgb(142 243 164 / 0.9);
-  display: inline-block;
+  display: block;
+  width: fit-content;
 }
 
 .meta {
