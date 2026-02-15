@@ -49,7 +49,12 @@
     },
     "codegen": {
       "dependsOn": ["api#openapi", "^codegen"],
-      "inputs": ["$TURBO_DEFAULT$", "openapi.json", "orval.config.*"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "openapi.json",
+        "orval.config.*",
+        "../../apps/api/openapi.json"
+      ],
       "outputs": ["generated/**"]
     },
     "clean": {
