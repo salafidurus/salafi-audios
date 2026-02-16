@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/shared/db/prisma.service';
+import { Injectable } from '@nestjs/common';
 import {
   AnalyticsContentKind,
   AnalyticsEventType,
@@ -443,6 +443,77 @@ export class RecommendationsRepository {
     return this.paginate(items, limit, cursor);
   }
 
+  async listPopularForScholar(
+    scholarId: string,
+    windowDays: number | undefined,
+    limit = DEFAULT_LIMIT,
+    cursor?: string,
+  ): Promise<RecommendationPageDto> {
+    const allowedIds = await this.fetchContentIdsByScholar(scholarId);
+
+    const items = await this.listByAnalytics({
+      eventTypes: [
+        AnalyticsEventType.view,
+        AnalyticsEventType.play,
+        AnalyticsEventType.complete,
+        AnalyticsEventType.save,
+        AnalyticsEventType.share,
+      ],
+      windowDays: windowDays ?? DEFAULT_WINDOW_DAYS,
+      allowedIds,
+    });
+
+    if (items.length > 0) {
+      return this.paginate(items, limit, cursor);
+    }
+
+    // No analytics yet for this scholar's content; fall back to latest standalone items.
+    const [seriesRows, collectionRows, lectureRows] = await Promise.all([
+      this.prisma.series.findMany({
+        where: {
+          status: Status.published,
+          deletedAt: null,
+          scholarId,
+          collectionId: null,
+        },
+        select: seriesSelect,
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      }),
+      this.prisma.collection.findMany({
+        where: {
+          status: Status.published,
+          deletedAt: null,
+          scholarId,
+        },
+        select: collectionSelect,
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      }),
+      this.prisma.lecture.findMany({
+        where: {
+          status: Status.published,
+          deletedAt: null,
+          scholarId,
+          seriesId: null,
+        },
+        select: lectureSelect,
+        orderBy: [
+          { publishedAt: 'desc' },
+          { createdAt: 'desc' },
+          { id: 'desc' },
+        ],
+      }),
+    ]);
+
+    const fallbackItems = await this.buildRecommendationList({
+      seriesRows,
+      collectionRows,
+      lectureRows,
+      limit,
+    });
+
+    return this.paginate(fallbackItems, limit, cursor);
+  }
+
   async listPopularTopics(
     topicsCsv: string | undefined,
     windowDays: number | undefined,
@@ -738,10 +809,16 @@ export class RecommendationsRepository {
     eventTypes,
     windowDays,
     topicSlugs,
+    allowedIds,
   }: {
     eventTypes: AnalyticsEventType[];
     windowDays: number;
     topicSlugs?: string[];
+    allowedIds?: {
+      lectureIds: string[];
+      seriesIds: string[];
+      collectionIds: string[];
+    };
   }): Promise<RecommendationItemDto[]> {
     const now = new Date();
     const since = new Date(now);
@@ -755,9 +832,11 @@ export class RecommendationsRepository {
         })
       : [];
 
-    const allowedIds = topicIds.length
+    const topicAllowedIds = topicIds.length
       ? await this.fetchContentIdsByTopics(topicIds.map((t) => t.id))
       : null;
+
+    const effectiveAllowedIds = allowedIds ?? topicAllowedIds;
 
     const [lectureScores, seriesScores, collectionScores] = await Promise.all([
       this.prisma.analyticsEvent.groupBy({
@@ -766,8 +845,8 @@ export class RecommendationsRepository {
           contentKind: AnalyticsContentKind.lecture,
           eventType: { in: eventTypes },
           occurredAt: { gte: since },
-          ...(allowedIds?.lectureIds?.length
-            ? { contentId: { in: allowedIds.lectureIds } }
+          ...(effectiveAllowedIds?.lectureIds?.length
+            ? { contentId: { in: effectiveAllowedIds.lectureIds } }
             : {}),
         },
         _sum: { weight: true },
@@ -784,8 +863,8 @@ export class RecommendationsRepository {
           contentKind: AnalyticsContentKind.series,
           eventType: { in: eventTypes },
           occurredAt: { gte: since },
-          ...(allowedIds?.seriesIds?.length
-            ? { contentId: { in: allowedIds.seriesIds } }
+          ...(effectiveAllowedIds?.seriesIds?.length
+            ? { contentId: { in: effectiveAllowedIds.seriesIds } }
             : {}),
         },
         _sum: { weight: true },
@@ -802,8 +881,8 @@ export class RecommendationsRepository {
           contentKind: AnalyticsContentKind.collection,
           eventType: { in: eventTypes },
           occurredAt: { gte: since },
-          ...(allowedIds?.collectionIds?.length
-            ? { contentId: { in: allowedIds.collectionIds } }
+          ...(effectiveAllowedIds?.collectionIds?.length
+            ? { contentId: { in: effectiveAllowedIds.collectionIds } }
             : {}),
         },
         _sum: { weight: true },
@@ -1013,6 +1092,47 @@ export class RecommendationsRepository {
       lectureIds: lectureTopics.map((row) => row.lectureId),
       seriesIds: seriesTopics.map((row) => row.seriesId),
       collectionIds: collectionTopics.map((row) => row.collectionId),
+    };
+  }
+
+  private async fetchContentIdsByScholar(scholarId: string): Promise<{
+    lectureIds: string[];
+    seriesIds: string[];
+    collectionIds: string[];
+  }> {
+    const [lectures, series, collections] = await Promise.all([
+      this.prisma.lecture.findMany({
+        where: {
+          status: Status.published,
+          deletedAt: null,
+          scholarId,
+          seriesId: null,
+        },
+        select: { id: true },
+      }),
+      this.prisma.series.findMany({
+        where: {
+          status: Status.published,
+          deletedAt: null,
+          scholarId,
+          collectionId: null,
+        },
+        select: { id: true },
+      }),
+      this.prisma.collection.findMany({
+        where: {
+          status: Status.published,
+          deletedAt: null,
+          scholarId,
+        },
+        select: { id: true },
+      }),
+    ]);
+
+    return {
+      lectureIds: lectures.map((row) => row.id),
+      seriesIds: series.map((row) => row.id),
+      collectionIds: collections.map((row) => row.id),
     };
   }
 
