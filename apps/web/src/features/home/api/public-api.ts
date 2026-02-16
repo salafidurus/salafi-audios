@@ -1,4 +1,3 @@
-import { getWebEnv } from "@/shared/utils/env";
 import type {
   Collection,
   Lecture,
@@ -7,6 +6,7 @@ import type {
   TopicDetail,
   TopicLecture,
 } from "@/features/library/types/library.types";
+import { getWebEnv } from "@/shared/utils/env";
 
 export type RecommendationHeroItem = {
   kind: "series" | "collection" | "lecture";
