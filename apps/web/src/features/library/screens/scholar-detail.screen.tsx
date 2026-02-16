@@ -1,18 +1,21 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { publicApi, PublicApiError } from "@/features/home/api/public-api";
-import { tryGetWebEnv } from "@/shared/utils/env";
-import { CardGrid } from "@/features/library/components/cards/grid/grid";
-import { EntityCard } from "@/features/library/components/cards/entity/entity-card";
-import { Shell } from "@/features/library/components/layout/shell/shell";
-import { SectionBlock } from "@/features/library/components/layout/section-block/section-block";
-import { EmptyState } from "@/features/library/components/states/empty-state/empty-state";
+import { ScholarProfileHeader } from "@/features/library/components/scholar-profile/scholar-profile-header";
+import { ScholarSidebar } from "@/features/library/components/scholar-sidebar/scholar-sidebar";
 import { canonical } from "@/features/library/utils/seo";
+import { tryGetWebEnv } from "@/shared/utils/env";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { ScholarDetailClient } from "./scholar-detail.client";
+import styles from "./scholar-detail.screen.module.css";
 
 type ScholarPageData = {
   scholar: Awaited<ReturnType<typeof publicApi.getScholar>>;
+  stats: Awaited<ReturnType<typeof publicApi.getScholarStats>>;
   collections: Awaited<ReturnType<typeof publicApi.listScholarCollections>>;
-  standaloneSeries: Awaited<ReturnType<typeof publicApi.listScholarSeries>>;
+  series: Awaited<ReturnType<typeof publicApi.listScholarSeries>>;
+  lectures: Awaited<ReturnType<typeof publicApi.listScholarLectures>>;
+  popular: Awaited<ReturnType<typeof publicApi.listScholarPopular>>;
 };
 
 type ScholarRouteProps = {
@@ -25,19 +28,25 @@ async function loadScholarPage(scholarSlug: string): Promise<ScholarPageData> {
   }
 
   try {
-    const [scholar, collections, series] = await Promise.all([
+    const [scholar, stats, collections, series, lectures, popular] = await Promise.all([
       publicApi.getScholar(scholarSlug),
+      publicApi.getScholarStats(scholarSlug),
       publicApi.listScholarCollections(scholarSlug),
       publicApi.listScholarSeries(scholarSlug),
+      publicApi.listScholarLectures(scholarSlug),
+      publicApi.listScholarPopular(scholarSlug, 5),
     ]);
 
     return {
       scholar,
+      stats,
       collections,
-      standaloneSeries: series.filter(
+      series: series.filter(
         (item: Awaited<ReturnType<typeof publicApi.listScholarSeries>>[number]) =>
           !item.collectionId,
       ),
+      lectures,
+      popular,
     };
   } catch (error) {
     if (error instanceof PublicApiError && error.status === 404) {
@@ -76,45 +85,47 @@ export async function getScholarMetadata({ params }: ScholarRouteProps): Promise
 
 export async function ScholarDetailScreen({ params }: ScholarRouteProps) {
   const { scholarSlug } = await params;
-  const { scholar, collections, standaloneSeries } = await loadScholarPage(scholarSlug);
+  const { scholar, stats, collections, series, lectures, popular } =
+    await loadScholarPage(scholarSlug);
 
   return (
-    <Shell title={scholar.name} subtitle={scholar.bio ?? undefined}>
-      <SectionBlock title="Collections">
-        {collections.length === 0 ? (
-          <EmptyState message="This scholar has no published collections." />
-        ) : (
-          <CardGrid>
-            {collections.map((collection) => (
-              <EntityCard
-                key={collection.id}
-                href={`/collections/${scholar.slug}/${collection.slug}`}
-                title={collection.title}
-                description={collection.description}
-                meta={collection.language}
-              />
-            ))}
-          </CardGrid>
-        )}
-      </SectionBlock>
+    <div className={styles.page}>
+      {/* Breadcrumb */}
+      <nav className={styles.breadcrumb} aria-label="Breadcrumb">
+        <ol className={styles.breadcrumbList}>
+          <li>
+            <Link href="/" className={styles.breadcrumbLink}>
+              Home
+            </Link>
+          </li>
+          <li className={styles.breadcrumbSeparator}>/</li>
+          <li>
+            <Link href="/scholars" className={styles.breadcrumbLink}>
+              Scholars
+            </Link>
+          </li>
+          <li className={styles.breadcrumbSeparator}>/</li>
+          <li className={styles.breadcrumbCurrent}>{scholar.name}</li>
+        </ol>
+      </nav>
 
-      <SectionBlock title="Standalone Series">
-        {standaloneSeries.length === 0 ? (
-          <EmptyState message="This scholar has no standalone published series." />
-        ) : (
-          <CardGrid>
-            {standaloneSeries.map((series) => (
-              <EntityCard
-                key={series.id}
-                href={`/series/${scholar.slug}/${series.slug}`}
-                title={series.title}
-                description={series.description}
-                meta={series.language}
-              />
-            ))}
-          </CardGrid>
-        )}
-      </SectionBlock>
-    </Shell>
+      {/* Profile Header */}
+      <ScholarProfileHeader scholar={scholar} stats={stats} />
+
+      {/* Main Content with Sidebar */}
+      <div className={styles.contentLayout}>
+        <main className={styles.mainContent}>
+          <ScholarDetailClient
+            scholar={scholar}
+            collections={collections}
+            series={series}
+            lectures={lectures}
+          />
+        </main>
+        <aside className={styles.sidebar}>
+          <ScholarSidebar scholar={scholar} popularItems={popular.items} />
+        </aside>
+      </div>
+    </div>
   );
 }
