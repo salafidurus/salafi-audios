@@ -154,6 +154,12 @@ model Scholar {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime?
 
+  // Social links
+  socialTwitter  String?
+  socialTelegram String?
+  socialYoutube  String?
+  socialWebsite  String?
+
   ingestionBatchId String?
   ingestionBatch   IngestionBatch? @relation("IngestBatchScholars", fields: [ingestionBatchId], references: [id])
 
