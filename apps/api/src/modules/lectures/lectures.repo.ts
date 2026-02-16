@@ -96,6 +96,58 @@ export class LecturesRepository {
     return records.map((r) => this.toViewDto(r));
   }
 
+  async listPublishedByScholarSlugPaginated(
+    scholarSlug: string,
+    limit = 20,
+    cursor?: string,
+  ): Promise<LectureViewDto[]> {
+    const scholar = await this.prisma.scholar.findFirst({
+      where: { slug: scholarSlug, isActive: true },
+      select: { id: true },
+    });
+
+    if (!scholar) {
+      return [];
+    }
+
+    const records = await this.prisma.lecture.findMany({
+      where: {
+        scholarId: scholar.id,
+        deletedAt: null,
+        status: Status.published,
+        OR: [
+          { seriesId: null },
+          {
+            series: {
+              is: {
+                deletedAt: null,
+                status: Status.published,
+                OR: [
+                  { collectionId: null },
+                  {
+                    collection: {
+                      is: {
+                        deletedAt: null,
+                        status: Status.published,
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      },
+      orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
+      take: limit,
+      skip: cursor ? 1 : 0,
+      cursor: cursor ? { id: cursor } : undefined,
+      select: lectureViewSelect,
+    });
+
+    return records.map((r) => this.toViewDto(r));
+  }
+
   async findPublishedByScholarSlugAndSlug(
     scholarSlug: string,
     slug: string,

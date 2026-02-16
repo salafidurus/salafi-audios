@@ -1218,12 +1218,30 @@
     },
     "/scholars/{scholarSlug}/lectures": {
       "get": {
-        "operationId": "LecturesController_list",
+        "operationId": "LecturesByScholarController_listByScholar",
         "parameters": [
           {
             "name": "scholarSlug",
             "required": true,
             "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of items to return (default: 20)",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination",
             "schema": {
               "type": "string"
             }
@@ -1304,7 +1322,7 @@
             }
           }
         },
-        "summary": "List published lectures for a scholar",
+        "summary": "List published lectures for a scholar (paginated)",
         "tags": [
           "Lectures"
         ]

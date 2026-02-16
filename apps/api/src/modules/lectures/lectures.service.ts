@@ -58,4 +58,16 @@ export class LecturesService {
 
     return result;
   }
+
+  async listPublishedByScholarSlugPaginated(
+    scholarSlug: string,
+    limit = 20,
+    cursor?: string,
+  ): Promise<LectureViewDto[]> {
+    return this.repo.listPublishedByScholarSlugPaginated(
+      scholarSlug,
+      limit,
+      cursor,
+    );
+  }
 }
