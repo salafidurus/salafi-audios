@@ -4,6 +4,7 @@ import { Prisma } from '@sd/db';
 import { UpsertScholarDto } from './dto/upsert-scholar.dto';
 import { ScholarViewDto } from './dto/scholar-view.dto';
 import { ScholarDetailDto } from './dto/scholar-detail.dto';
+import { ScholarStatsDto } from './dto/scholar-stats.dto';
 
 const scholarViewSelect = {
   id: true,
@@ -28,6 +29,10 @@ const scholarDetailSelect = {
   imageUrl: true,
   isActive: true,
   isKibar: true,
+  socialTwitter: true,
+  socialTelegram: true,
+  socialYoutube: true,
+  socialWebsite: true,
   createdAt: true,
   updatedAt: true,
 } satisfies Prisma.ScholarSelect;
@@ -125,8 +130,40 @@ export class ScholarRepository {
       imageUrl: record.imageUrl ?? undefined,
       isActive: record.isActive,
       isKibar: record.isKibar,
+      socialTwitter: record.socialTwitter ?? undefined,
+      socialTelegram: record.socialTelegram ?? undefined,
+      socialYoutube: record.socialYoutube ?? undefined,
+      socialWebsite: record.socialWebsite ?? undefined,
       createdAt: record.createdAt.toISOString(),
       updatedAt: record.updatedAt?.toISOString(),
+    };
+  }
+
+  async getScholarStats(scholarId: string): Promise<ScholarStatsDto> {
+    const [seriesCount, lecturesCount] = await Promise.all([
+      this.prisma.series.count({
+        where: {
+          scholarId,
+          status: 'published',
+          deletedAt: null,
+        },
+      }),
+      this.prisma.lecture.count({
+        where: {
+          scholarId,
+          status: 'published',
+          deletedAt: null,
+        },
+      }),
+    ]);
+
+    // TODO: Compute follower count from analytics
+    const followerCount = 0;
+
+    return {
+      seriesCount,
+      lecturesCount,
+      followerCount,
     };
   }
 }

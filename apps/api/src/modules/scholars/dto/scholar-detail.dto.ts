@@ -28,9 +28,21 @@ export class ScholarDetailDto {
   @ApiProperty()
   isKibar!: boolean;
 
-  @ApiProperty()
-  createdAt!: string; // ISO
+  @ApiProperty({ required: false, nullable: true })
+  socialTwitter?: string;
 
   @ApiProperty({ required: false, nullable: true })
-  updatedAt?: string; // ISO
+  socialTelegram?: string;
+
+  @ApiProperty({ required: false, nullable: true })
+  socialYoutube?: string;
+
+  @ApiProperty({ required: false, nullable: true })
+  socialWebsite?: string;
+
+  @ApiProperty()
+  createdAt!: string;
+
+  @ApiProperty({ required: false, nullable: true })
+  updatedAt?: string;
 }
