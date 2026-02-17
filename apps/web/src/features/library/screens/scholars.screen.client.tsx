@@ -76,20 +76,20 @@ export function ScholarsScreenClient({ scholars, topics }: ScholarsScreenClientP
 
   return (
     <Shell title="Scholars" hideHeader>
+      <div className={styles.heroSection}>
+        <h2 className={styles.heroHeading}>
+          Learn from the <span className={styles.heroEmphasis}>Best Scholars</span>
+        </h2>
+        <p className={styles.heroSubheading}>
+          Connect with world-renowned senior scholars in Islamic sciences. Knowledge is sought from
+          those who possess it.
+        </p>
+      </div>
+
       {scholars.length === 0 ? (
         <EmptyState message="No scholars are published yet." />
       ) : (
         <>
-          <div className={styles.heroSection}>
-            <h2 className={styles.heroHeading}>
-              Learn from the <span className={styles.heroEmphasis}>Best Scholars</span>
-            </h2>
-            <p className={styles.heroSubheading}>
-              Connect with world-renowned senior scholars in Islamic sciences. Knowledge is sought
-              from those who possess it.
-            </p>
-          </div>
-
           {featuredScholars.length > 0 && (
             <section className={styles.featuredSection}>
               <div className={styles.sectionHeader}>
