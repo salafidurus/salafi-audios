@@ -1,4 +1,4 @@
-import { CollectionViewDto } from "@sd/api-client";
+import { CollectionViewDto } from "@sd/contracts";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./collection-card.module.css";

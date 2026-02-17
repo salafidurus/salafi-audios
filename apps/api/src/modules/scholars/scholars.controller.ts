@@ -1,12 +1,14 @@
+import {
+  ScholarDetailDto,
+  ScholarStatsDto,
+  ScholarViewDto,
+} from '@sd/contracts';
 import { ApiCommonErrors } from '@/shared/decorators/api-common-errors.decorator';
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RecommendationListQueryDto } from '../recommendations/dto/recommendation-list.query.dto';
 import { RecommendationPageDto } from '../recommendations/dto/recommendation-page.dto';
 import { RecommendationsRepository } from '../recommendations/recommendations.repo';
-import { ScholarDetailDto } from './dto/scholar-detail.dto';
-import { ScholarStatsDto } from './dto/scholar-stats.dto';
-import { ScholarViewDto } from './dto/scholar-view.dto';
 import { ScholarService } from './scholars.service';
 
 @ApiTags('Scholars')
@@ -20,14 +22,14 @@ export class ScholarsController {
 
   @Get()
   @ApiOperation({ summary: 'List active scholars' })
-  @ApiOkResponse({ type: [ScholarViewDto] })
+  @ApiOkResponse({ description: 'List of active scholars' })
   list(): Promise<ScholarViewDto[]> {
     return this.scholars.listActiveScholars();
   }
 
   @Get(':slug')
   @ApiOperation({ summary: 'Get an active scholar by slug' })
-  @ApiOkResponse({ type: ScholarViewDto })
+  @ApiOkResponse({ description: 'Scholar details' })
   getBySlug(@Param('slug') slug: string): Promise<ScholarDetailDto> {
     return this.scholars.getActiveScholarBySlug(slug);
   }
@@ -36,7 +38,7 @@ export class ScholarsController {
   @ApiOperation({
     summary: 'Get scholar statistics (series, lectures, followers)',
   })
-  @ApiOkResponse({ type: ScholarStatsDto })
+  @ApiOkResponse({ description: 'Scholar statistics' })
   getStats(@Param('slug') slug: string): Promise<ScholarStatsDto> {
     return this.scholars.getScholarStats(slug);
   }

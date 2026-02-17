@@ -2,7 +2,7 @@ import { Body, Controller, Param, Patch } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiCommonErrors } from '@/shared/decorators/api-common-errors.decorator';
 import { ScholarService } from './scholars.service';
-import { ScholarDetailDto } from './dto/scholar-detail.dto';
+import type { ScholarDetailDto } from '@sd/contracts';
 import { SetKibarDto } from './dto/set-kibar.dto';
 
 @ApiTags('Admin Scholars')
@@ -13,7 +13,7 @@ export class AdminScholarsController {
 
   @Patch(':id/kibar')
   @ApiOperation({ summary: 'Set Kibar ul-Ulama flag for a scholar' })
-  @ApiOkResponse({ type: ScholarDetailDto })
+  @ApiOkResponse({ description: 'The updated scholar details' })
   setKibar(
     @Param('id') id: string,
     @Body() body: SetKibarDto,

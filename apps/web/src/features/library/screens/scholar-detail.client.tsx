@@ -9,7 +9,7 @@ import type {
   LectureViewDto,
   ScholarDetailDto,
   SeriesViewDto,
-} from "@sd/api-client";
+} from "@sd/contracts";
 import { useMemo, useState } from "react";
 import styles from "./scholar-detail.client.module.css";
 

@@ -1,10 +1,23 @@
 {
-  "extends": "../../packages/config/tsconfig/nest.json",
+  "extends": "@sd/config/tsconfig/base.json",
   "compilerOptions": {
-    "baseUrl": ".",
-    "noEmit": true,
-    "module": "es2015",
-    "moduleResolution": "Bundler",
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2022",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "strictBindCallApply": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
     "paths": {
       "@/*": ["src/*"]
     }

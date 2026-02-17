@@ -3,8 +3,7 @@ import { PrismaService } from '@/shared/db/prisma.service';
 import { ConfigService } from '@/shared/config/config.service';
 import { Prisma, Status } from '@sd/db';
 import { UpsertLectureDto } from './dto/upsert-lecture.dto';
-import { LectureViewDto } from './dto/lecture-view.dto';
-import { AudioAssetViewDto } from '../audio-assets/dto/audio-asset-view.dto';
+import type { LectureViewDto, AudioAssetViewDto } from '@sd/contracts';
 
 const lectureViewSelect = {
   id: true,
@@ -397,8 +396,7 @@ export class LecturesRepository {
       url: this.toPublicUrl(asset.url),
       format: asset.format ?? undefined,
       bitrateKbps: asset.bitrateKbps ?? undefined,
-      sizeBytes:
-        asset.sizeBytes !== null ? asset.sizeBytes.toString() : undefined,
+      sizeBytes: asset.sizeBytes !== null ? Number(asset.sizeBytes) : undefined,
       durationSeconds: asset.durationSeconds ?? undefined,
       source: asset.source ?? undefined,
       isPrimary: asset.isPrimary,

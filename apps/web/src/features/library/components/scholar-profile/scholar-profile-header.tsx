@@ -1,4 +1,4 @@
-import { ScholarDetailDto, ScholarStatsDto } from "@sd/api-client";
+import { ScholarDetailDto, ScholarStatsDto } from "@sd/contracts";
 import Image from "next/image";
 import styles from "./scholar-profile-header.module.css";
 

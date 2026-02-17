@@ -1,9 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ScholarViewDto,
+  ScholarStatsDto,
+  ScholarDetailDto,
+} from '@sd/contracts';
 import { ScholarRepository } from './scholars.repo';
 import { UpsertScholarDto } from './dto/upsert-scholar.dto';
-import { ScholarViewDto } from './dto/scholar-view.dto';
-import { ScholarDetailDto } from './dto/scholar-detail.dto';
-import { ScholarStatsDto } from './dto/scholar-stats.dto';
 
 @Injectable()
 export class ScholarService {

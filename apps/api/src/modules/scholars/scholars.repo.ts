@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/shared/db/prisma.service';
 import { Prisma } from '@sd/db';
+import {
+  ScholarViewDto,
+  ScholarDetailDto,
+  ScholarStatsDto,
+} from '@sd/contracts';
 import { UpsertScholarDto } from './dto/upsert-scholar.dto';
-import { ScholarViewDto } from './dto/scholar-view.dto';
-import { ScholarDetailDto } from './dto/scholar-detail.dto';
-import { ScholarStatsDto } from './dto/scholar-stats.dto';
 
 const scholarViewSelect = {
   id: true,

@@ -1,5 +1,5 @@
 import type { RecommendationItem } from "@/features/home/api/public-api";
-import { ScholarDetailDto } from "@sd/api-client";
+import { ScholarDetailDto } from "@sd/contracts";
 import { Globe, Send, Twitter, Youtube } from "lucide-react";
 import Link from "next/link";
 import styles from "./scholar-sidebar.module.css";

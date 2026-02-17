@@ -6,7 +6,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { LecturesService } from './lectures.service';
-import { LectureViewDto } from './dto/lecture-view.dto';
+import type { LectureViewDto } from '@sd/contracts';
 import { ApiCommonErrors } from '@/shared/decorators/api-common-errors.decorator';
 
 @ApiTags('Lectures')
@@ -19,7 +19,7 @@ export class LecturesByScholarController {
   @ApiOperation({
     summary: 'List published lectures for a scholar (paginated)',
   })
-  @ApiOkResponse({ type: [LectureViewDto] })
+  @ApiOkResponse({ description: 'List of published lectures for the scholar' })
   @ApiQuery({
     name: 'limit',
     required: false,

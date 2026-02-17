@@ -1,9 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { TopicDetailDto } from './dto/topic-detail.dto';
+import {
+  TopicDetailDto,
+  TopicViewDto,
+  TopicLectureViewDto,
+} from '@sd/contracts';
 import { UpsertTopicDto } from './dto/upsert-topic.dto';
 import { TopicsRepository } from './topics.repo';
-import { TopicViewDto } from '../lecture-topics/dto/topic-view.dto';
-import { TopicLectureViewDto } from './dto/topic-lecture-view.dto';
 
 @Injectable()
 export class TopicsService {

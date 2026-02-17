@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { TopicViewDto } from './topic-view.dto';
+import type { TopicViewDto } from '@sd/contracts';
 
 export class LectureTopicViewDto {
-  @ApiProperty({ type: TopicViewDto })
+  @ApiProperty({ description: 'The attached topic' })
   topic!: TopicViewDto;
 
   @ApiProperty({

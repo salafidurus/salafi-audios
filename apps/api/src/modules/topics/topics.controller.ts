@@ -2,10 +2,12 @@ import { ApiCommonErrors } from '@/shared/decorators/api-common-errors.decorator
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
-import { TopicDetailDto } from './dto/topic-detail.dto';
+import type {
+  TopicDetailDto,
+  TopicViewDto,
+  TopicLectureViewDto,
+} from '@sd/contracts';
 import { TopicsService } from './topics.service';
-import { TopicViewDto } from '../lecture-topics/dto/topic-view.dto';
-import { TopicLectureViewDto } from './dto/topic-lecture-view.dto';
 
 @SkipThrottle()
 @ApiTags('Topics')
@@ -16,28 +18,28 @@ export class TopicsController {
 
   @Get()
   @ApiOperation({ summary: 'List topics' })
-  @ApiOkResponse({ type: [TopicDetailDto] })
+  @ApiOkResponse({ description: 'List of topics with their details' })
   list(): Promise<TopicDetailDto[]> {
     return this.topics.list();
   }
 
   @Get(':slug')
   @ApiOperation({ summary: 'Get topic by slug' })
-  @ApiOkResponse({ type: TopicDetailDto })
+  @ApiOkResponse({ description: 'Topic details' })
   getBySlug(@Param('slug') slug: string): Promise<TopicDetailDto> {
     return this.topics.getBySlug(slug);
   }
 
   @Get(':slug/children')
   @ApiOperation({ summary: 'List direct children of a topic' })
-  @ApiOkResponse({ type: [TopicViewDto] })
+  @ApiOkResponse({ description: 'List of child topics' })
   listChildren(@Param('slug') slug: string): Promise<TopicViewDto[]> {
     return this.topics.listChildren(slug);
   }
 
   @Get(':slug/lectures')
   @ApiOperation({ summary: 'List published lectures tagged with this topic' })
-  @ApiOkResponse({ type: [TopicLectureViewDto] })
+  @ApiOkResponse({ description: 'List of lectures for this topic' })
   listLectures(
     @Param('slug') slug: string,
     @Query('limit') limit?: string,
