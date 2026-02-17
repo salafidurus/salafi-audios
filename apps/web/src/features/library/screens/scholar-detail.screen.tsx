@@ -1,21 +1,20 @@
-import { publicApi, PublicApiError } from "@/features/home/api/public-api";
-import { ScholarProfileHeader } from "@/features/library/components/scholar-profile/scholar-profile-header";
-import { ScholarSidebar } from "@/features/library/components/scholar-sidebar/scholar-sidebar";
-import { canonical } from "@/features/library/utils/seo";
-import { tryGetWebEnv } from "@/shared/utils/env";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ScholarDetailClient } from "./scholar-detail.client";
-import styles from "./scholar-detail.screen.module.css";
+import { publicApi, PublicApiError } from "@/features/home/api/public-api";
+import type { ScholarStats, RecommendationItem } from "@/features/home/api/public-api";
+import { tryGetWebEnv } from "@/shared/utils/env";
+import { ScholarDetailContent } from "@/features/library/components/scholar-detail-content/scholar-detail-content";
+import { Shell } from "@/features/library/components/layout/shell/shell";
+import { canonical } from "@/features/library/utils/seo";
 
+type SeriesItem = Awaited<ReturnType<typeof publicApi.listScholarSeries>>[number];
 type ScholarPageData = {
   scholar: Awaited<ReturnType<typeof publicApi.getScholar>>;
-  stats: Awaited<ReturnType<typeof publicApi.getScholarStats>>;
+  stats: ScholarStats | null;
   collections: Awaited<ReturnType<typeof publicApi.listScholarCollections>>;
-  series: Awaited<ReturnType<typeof publicApi.listScholarSeries>>;
-  lectures: Awaited<ReturnType<typeof publicApi.listScholarLectures>>;
-  popular: Awaited<ReturnType<typeof publicApi.listScholarPopular>>;
+  seriesInCollections: SeriesItem[];
+  standaloneSeries: SeriesItem[];
+  popularLectures: RecommendationItem[];
 };
 
 type ScholarRouteProps = {
@@ -28,32 +27,30 @@ async function loadScholarPage(scholarSlug: string): Promise<ScholarPageData> {
   }
 
   try {
-    const [scholar, stats, collections, series, lectures, popular] = await Promise.all([
+    const [scholar, statsResult, collections, series, popularResult] = await Promise.all([
       publicApi.getScholar(scholarSlug),
-      publicApi.getScholarStats(scholarSlug),
+      publicApi.getScholarStats(scholarSlug).catch(() => null),
       publicApi.listScholarCollections(scholarSlug),
       publicApi.listScholarSeries(scholarSlug),
-      publicApi.listScholarLectures(scholarSlug),
-      publicApi.listScholarPopular(scholarSlug, 5),
+      publicApi.listScholarPopular(scholarSlug, 5).catch(() => ({ items: [] })),
     ]);
+
+    const seriesInCollections = series.filter((item: SeriesItem) => Boolean(item.collectionId));
+    const standaloneSeries = series.filter((item: SeriesItem) => !item.collectionId);
 
     return {
       scholar,
-      stats,
+      stats: statsResult,
       collections,
-      series: series.filter(
-        (item: Awaited<ReturnType<typeof publicApi.listScholarSeries>>[number]) =>
-          !item.collectionId,
-      ),
-      lectures,
-      popular,
+      seriesInCollections,
+      standaloneSeries,
+      popularLectures: popularResult.items,
     };
   } catch (error) {
     if (error instanceof PublicApiError && error.status === 404) {
       notFound();
     }
 
-    // Treat non-404 errors (including missing API env) as not-found for build/runtime resilience.
     notFound();
   }
 }
@@ -85,47 +82,19 @@ export async function getScholarMetadata({ params }: ScholarRouteProps): Promise
 
 export async function ScholarDetailScreen({ params }: ScholarRouteProps) {
   const { scholarSlug } = await params;
-  const { scholar, stats, collections, series, lectures, popular } =
+  const { scholar, stats, collections, seriesInCollections, standaloneSeries, popularLectures } =
     await loadScholarPage(scholarSlug);
 
   return (
-    <div className={styles.page}>
-      {/* Breadcrumb */}
-      <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-        <ol className={styles.breadcrumbList}>
-          <li>
-            <Link href="/" className={styles.breadcrumbLink}>
-              Home
-            </Link>
-          </li>
-          <li className={styles.breadcrumbSeparator}>/</li>
-          <li>
-            <Link href="/scholars" className={styles.breadcrumbLink}>
-              Scholars
-            </Link>
-          </li>
-          <li className={styles.breadcrumbSeparator}>/</li>
-          <li className={styles.breadcrumbCurrent}>{scholar.name}</li>
-        </ol>
-      </nav>
-
-      {/* Profile Header */}
-      <ScholarProfileHeader scholar={scholar} stats={stats} />
-
-      {/* Main Content with Sidebar */}
-      <div className={styles.contentLayout}>
-        <main className={styles.mainContent}>
-          <ScholarDetailClient
-            scholar={scholar}
-            collections={collections}
-            series={series}
-            lectures={lectures}
-          />
-        </main>
-        <aside className={styles.sidebar}>
-          <ScholarSidebar scholar={scholar} popularItems={popular.items} />
-        </aside>
-      </div>
-    </div>
+    <Shell title={scholar.name}>
+      <ScholarDetailContent
+        scholar={scholar}
+        stats={stats}
+        collections={collections}
+        seriesInCollections={seriesInCollections}
+        standaloneSeries={standaloneSeries}
+        popularLectures={popularLectures}
+      />
+    </Shell>
   );
 }

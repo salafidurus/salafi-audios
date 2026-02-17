@@ -9,14 +9,15 @@ type ShellProps = {
   subtitle?: string;
   breadcrumbs?: BreadCrumb[];
   children: ReactNode;
+  hideHeader?: boolean;
 };
 
-export function Shell({ title, subtitle, breadcrumbs, children }: ShellProps) {
+export function Shell({ title, subtitle, breadcrumbs, children, hideHeader = false }: ShellProps) {
   return (
     <main className={styles.page}>
       <div className={styles.container}>
-        <Breadcrumbs items={breadcrumbs} />
-        <PageHeader title={title} subtitle={subtitle} />
+        {breadcrumbs && !hideHeader && <Breadcrumbs items={breadcrumbs} />}
+        {!hideHeader && <PageHeader title={title} subtitle={subtitle} />}
         {children}
       </div>
     </main>

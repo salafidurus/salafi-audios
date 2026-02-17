@@ -2,7 +2,7 @@
    position: relative;
    display: grid;
    grid-template-columns: clamp(9.5rem, 22vw, 12.5rem) minmax(0, 1fr) auto;
-   align-items: stretch;
+  align-items: center;
    background: color-mix(in srgb, var(--color-surface) 94%, transparent);
    border: 1px solid color-mix(in srgb, var(--color-border) 82%, transparent);
    border-radius: calc(var(--radius-panel) + 0.15rem);
@@ -27,9 +27,10 @@
 
  .cover {
    position: relative;
-   z-index: 0;
-   width: 100%;
+  z-index: 0;
    aspect-ratio: 4 / 5;
+  height: clamp(6.75rem, 11vw, 8.5rem);
+    width: auto;
    background:
      radial-gradient(circle at 24% 18%,
        color-mix(in srgb, var(--color-primary) 22%, transparent),
@@ -60,7 +61,7 @@
  .body {
    position: relative;
    z-index: 0;
-   padding: 1.05rem 1.15rem;
+  padding: 0.9rem 1rem;
    min-width: 0;
    display: flex;
    flex-direction: column;
@@ -126,8 +127,8 @@
    align-items: stretch;
    justify-content: flex-start;
    gap: 0.6rem;
-   padding: 1.05rem 1.05rem;
-   min-width: 10.5rem;
+  padding: 0.9rem 0.9rem;
+    min-width: 9.5rem;
    justify-self: end;
  }
 
@@ -138,15 +139,18 @@
  @media (max-width: 700px) {
    .card {
      grid-template-columns: 1fr;
+    align-items: stretch;
    }
 
    .cover {
      border-right: 0;
      border-bottom: 1px solid color-mix(in srgb, var(--color-border) 72%, transparent);
+    width: 100%;
+      height: auto;
    }
 
    .actions {
      min-width: 0;
-     padding: 0 1rem 1.05rem;
+    padding: 0 1rem 1rem;
    }
  }

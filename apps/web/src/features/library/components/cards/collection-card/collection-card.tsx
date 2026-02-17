@@ -1,6 +1,6 @@
 import { CollectionViewDto } from "@sd/api-client";
 import Image from "next/image";
-import React from "react";
+import Link from "next/link";
 import styles from "./collection-card.module.css";
 
 interface CollectionCardProps {
@@ -8,29 +8,33 @@ interface CollectionCardProps {
   scholarSlug: string;
 }
 
-export const CollectionCard: React.FC<CollectionCardProps> = ({ collection, scholarSlug }) => {
+export function CollectionCard({ collection, scholarSlug }: CollectionCardProps) {
   return (
-    <a href={`/collections/${scholarSlug}/${collection.slug}`} className={styles.card}>
-      <div className={styles.imageWrapper}>
+    <Link href={`/collections/${scholarSlug}/${collection.slug}`} className={styles.card}>
+      <div className={styles.coverContainer}>
         {collection.coverImageUrl ? (
           <Image
             src={collection.coverImageUrl}
             alt={collection.title}
             fill
-            className={styles.image}
+            className={styles.coverImage}
           />
         ) : (
-          <div className={styles.placeholder}>
-            <span className={styles.placeholderText}>{collection.title.charAt(0)}</span>
+          <div className={styles.placeholder} aria-hidden="true">
+            <span>{collection.title.charAt(0).toUpperCase()}</span>
           </div>
         )}
-        {collection.status === "published" && <span className={styles.badge}>Published</span>}
       </div>
       <div className={styles.content}>
         <h3 className={styles.title}>{collection.title}</h3>
-        {collection.description && <p className={styles.description}>{collection.description}</p>}
-        <span className={styles.viewCollection}>View Collection</span>
+        {collection.description ? (
+          <p className={styles.description}>{collection.description}</p>
+        ) : null}
+        <div className={styles.footer}>
+          <span className={styles.seriesCount} />
+          <span className={styles.viewLink}>View Collection</span>
+        </div>
       </div>
-    </a>
+    </Link>
   );
-};
+}
