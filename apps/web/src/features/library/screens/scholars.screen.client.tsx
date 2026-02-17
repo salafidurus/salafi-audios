@@ -82,7 +82,7 @@ export function ScholarsScreenClient({ scholars, topics }: ScholarsScreenClientP
         <>
           <div className={styles.heroSection}>
             <h2 className={styles.heroHeading}>
-              Learn from the <span className={styles.heroEmphasis}>Best</span>
+              Learn from the <span className={styles.heroEmphasis}>Best Scholars</span>
             </h2>
             <p className={styles.heroSubheading}>
               Connect with world-renowned senior scholars in Islamic sciences. Knowledge is sought
