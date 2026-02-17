@@ -33,7 +33,7 @@
     "lint": "eslint .",
     "test": "echo \"@sd/contracts: manual verification required\"",
     "test:prepush": "echo \"@sd/contracts: manual verification required\"",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "pnpm build && tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.69.0"
