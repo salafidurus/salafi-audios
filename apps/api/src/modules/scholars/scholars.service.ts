@@ -1,8 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ScholarViewDto,
+  ScholarStatsDto,
+  ScholarDetailDto,
+} from '@sd/contracts';
 import { ScholarRepository } from './scholars.repo';
 import { UpsertScholarDto } from './dto/upsert-scholar.dto';
-import { ScholarViewDto } from './dto/scholar-view.dto';
-import { ScholarDetailDto } from './dto/scholar-detail.dto';
 
 @Injectable()
 export class ScholarService {
@@ -34,5 +37,15 @@ export class ScholarService {
     }
 
     return scholar;
+  }
+
+  async getScholarStats(slug: string): Promise<ScholarStatsDto> {
+    const scholar = await this.repo.findActiveDetailBySlug(slug);
+
+    if (!scholar) {
+      throw new NotFoundException(`Scholar "${slug}" not found`);
+    }
+
+    return this.repo.getScholarStats(scholar.id);
   }
 }

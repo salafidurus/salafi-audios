@@ -1,0 +1,125 @@
+.twoColumn {
+  display: grid;
+  grid-template-columns: 1fr minmax(12rem, 18rem);
+  gap: var(--space-gap-xl);
+  align-items: start;
+}
+
+.mainColumn {
+  min-width: 0;
+}
+
+.sidebar {
+  padding: var(--space-panel-p);
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  position: sticky;
+  top: calc(var(--top-nav-height, 0px) + var(--space-gap-lg));
+}
+
+.sidebarTitle {
+  margin: 0 0 var(--space-gap-md);
+  font-size: var(--font-size-caption);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.sidebarNav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-gap-sm);
+}
+
+.sidebarLink,
+.sidebarLinkActive {
+  display: block;
+  width: 100%;
+  padding: var(--space-gap-sm) var(--space-gap-md);
+  border: none;
+  border-radius: var(--radius-panel-sm);
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--font-size-label);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background 180ms ease, color 180ms ease;
+}
+
+.sidebarLink:hover {
+  background: var(--color-fill-tertiary);
+  color: var(--color-link);
+}
+
+.sidebarLinkActive {
+  background: var(--color-primary-soft);
+  color: var(--color-link);
+}
+
+.sidebarLink:focus-visible,
+.sidebarLinkActive:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+@media (max-width: 960px) {
+  .twoColumn {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+  }
+}
+
+.wrapper {
+  margin-bottom: var(--space-section-y);
+}
+
+.tabList {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--space-gap-lg);
+}
+
+.tab,
+.tabActive {
+  padding: var(--space-gap-md) var(--space-gap-lg);
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-label);
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+  margin-bottom: -1px;
+  border-bottom: 2px solid transparent;
+  transition: color 180ms ease, border-color 180ms ease;
+}
+
+.tab:hover {
+  color: var(--color-text);
+}
+
+.tabActive {
+  color: var(--color-link);
+  border-bottom-color: var(--color-primary-strong);
+}
+
+.tab:focus-visible,
+.tabActive:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.panel {
+  min-height: 2rem;
+}
+
+.panel[hidden] {
+  display: none;
+}

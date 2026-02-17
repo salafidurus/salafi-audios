@@ -47,15 +47,10 @@
       "inputs": ["$TURBO_DEFAULT$", "src/**", "package.json", "tsconfig*.json"],
       "outputs": ["openapi.json"]
     },
-    "codegen": {
-      "dependsOn": ["api#openapi", "^codegen"],
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        "openapi.json",
-        "orval.config.*",
-        "../../apps/api/openapi.json"
-      ],
-      "outputs": ["generated/**"]
+    "contract": {
+      "dependsOn": ["^contract"],
+      "inputs": ["$TURBO_DEFAULT$", "src/**", "package.json", "tsconfig*.json"],
+      "outputs": ["dist/**"]
     },
     "clean": {
       "cache": false

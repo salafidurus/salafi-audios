@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/shared/db/prisma.service';
+import { Injectable } from '@nestjs/common';
 import { Prisma, Status } from '@sd/db';
-import { UpsertSeriesDto } from './dto/upsert-series.dto';
 import { SeriesViewDto } from './dto/series-view.dto';
+import { UpsertSeriesDto } from './dto/upsert-series.dto';
 
 const seriesViewSelect = {
   id: true,
@@ -12,6 +12,8 @@ const seriesViewSelect = {
   title: true,
   description: true,
   coverImageUrl: true,
+  publishedLectureCount: true,
+  publishedDurationSeconds: true,
   language: true,
   status: true,
   orderIndex: true,
@@ -247,6 +249,14 @@ export class SeriesRepository {
       title: record.title,
       description: record.description ?? undefined,
       coverImageUrl: record.coverImageUrl ?? undefined,
+      publishedLectureCount:
+        typeof record.publishedLectureCount === 'number'
+          ? record.publishedLectureCount
+          : undefined,
+      publishedDurationSeconds:
+        typeof record.publishedDurationSeconds === 'number'
+          ? record.publishedDurationSeconds
+          : undefined,
       language: record.language ?? undefined,
       status: record.status,
       orderIndex: record.orderIndex ?? undefined,

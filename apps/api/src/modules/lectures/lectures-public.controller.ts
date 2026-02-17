@@ -3,7 +3,7 @@ import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ApiCommonErrors } from '@/shared/decorators/api-common-errors.decorator';
 import { LecturesService } from './lectures.service';
-import { LectureViewDto } from './dto/lecture-view.dto';
+import type { LectureViewDto } from '@sd/contracts';
 
 @SkipThrottle()
 @ApiTags('Lectures')
@@ -14,7 +14,7 @@ export class LecturesPublicController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a published lecture by id' })
-  @ApiOkResponse({ type: LectureViewDto })
+  @ApiOkResponse({ description: 'The published lecture details' })
   getById(@Param('id') id: string): Promise<LectureViewDto> {
     return this.lectures.getPublishedById(id);
   }

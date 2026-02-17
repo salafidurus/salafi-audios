@@ -9,7 +9,12 @@ describe('CollectionTopicsService', () => {
   let repo: jest.Mocked<CollectionTopicsRepository>;
 
   const sample: LectureTopicViewDto = {
-    topic: { id: 't1', slug: 'tawheed', name: 'Tawheed' },
+    topic: {
+      id: 't1',
+      slug: 'tawheed',
+      name: 'Tawheed',
+      createdAt: '2026-01-01T00:00:00.000Z',
+    },
     attachedAt: new Date('2026-01-01T00:00:00.000Z').toISOString(),
   };
 

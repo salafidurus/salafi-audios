@@ -1,5 +1,10 @@
-import { analyticsControllerStats, type PlatformStatsDto } from "@sd/api-client";
+import { httpClient, type PlatformStatsDto } from "@sd/contracts";
 
 export async function getPlatformStats(): Promise<PlatformStatsDto> {
-  return analyticsControllerStats();
+  const response = await httpClient<PlatformStatsDto>({
+    url: "/analytics/stats",
+    method: "GET",
+  });
+
+  return response;
 }

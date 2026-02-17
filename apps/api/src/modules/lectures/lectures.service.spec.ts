@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { LecturesService } from './lectures.service';
 import { LecturesRepository } from './lectures.repo';
-import { LectureViewDto } from './dto/lecture-view.dto';
+import { LectureViewDto } from '@sd/contracts';
 import { UpsertLectureDto } from './dto/upsert-lecture.dto';
 import { Status } from '@sd/db';
 

@@ -354,6 +354,97 @@
         ]
       }
     },
+    "/scholars/{slug}/stats": {
+      "get": {
+        "operationId": "ScholarsController_getStats",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScholarStatsDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get scholar statistics (series, lectures, followers)",
+        "tags": [
+          "Scholars"
+        ]
+      }
+    },
     "/admin/scholars/{id}/kibar": {
       "patch": {
         "operationId": "AdminScholarsController_setKibar",
@@ -1127,12 +1218,30 @@
     },
     "/scholars/{scholarSlug}/lectures": {
       "get": {
-        "operationId": "LecturesController_list",
+        "operationId": "LecturesByScholarController_listByScholar",
         "parameters": [
           {
             "name": "scholarSlug",
             "required": true,
             "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Number of items to return (default: 20)",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Cursor for pagination",
             "schema": {
               "type": "string"
             }
@@ -1213,7 +1322,7 @@
             }
           }
         },
-        "summary": "List published lectures for a scholar",
+        "summary": "List published lectures for a scholar (paginated)",
         "tags": [
           "Lectures"
         ]
@@ -4331,6 +4440,28 @@
           "isKibar"
         ]
       },
+      "ScholarStatsDto": {
+        "type": "object",
+        "properties": {
+          "seriesCount": {
+            "type": "number",
+            "description": "Total number of series by this scholar"
+          },
+          "lecturesCount": {
+            "type": "number",
+            "description": "Total number of lectures by this scholar"
+          },
+          "followerCount": {
+            "type": "number",
+            "description": "Total number of followers (computed from analytics)"
+          }
+        },
+        "required": [
+          "seriesCount",
+          "lecturesCount",
+          "followerCount"
+        ]
+      },
       "SetKibarDto": {
         "type": "object",
         "properties": {
@@ -4376,6 +4507,22 @@
           },
           "isKibar": {
             "type": "boolean"
+          },
+          "socialTwitter": {
+            "type": "string",
+            "nullable": true
+          },
+          "socialTelegram": {
+            "type": "string",
+            "nullable": true
+          },
+          "socialYoutube": {
+            "type": "string",
+            "nullable": true
+          },
+          "socialWebsite": {
+            "type": "string",
+            "nullable": true
           },
           "createdAt": {
             "type": "string"

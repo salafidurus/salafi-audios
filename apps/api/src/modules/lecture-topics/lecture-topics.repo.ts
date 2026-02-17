@@ -7,6 +7,7 @@ const topicSelect = {
   id: true,
   slug: true,
   name: true,
+  createdAt: true,
 } satisfies Prisma.TopicSelect;
 
 const lectureTopicSelect = {
@@ -143,6 +144,7 @@ export class LectureTopicsRepository {
         id: r.topic.id,
         slug: r.topic.slug,
         name: r.topic.name,
+        createdAt: r.topic.createdAt.toISOString(),
       },
       attachedAt: r.createdAt.toISOString(),
     };

@@ -3,9 +3,11 @@ import { CatalogService } from './catalog.service';
 import { CatalogRepository } from './catalog.repo';
 import { CatalogListQueryDto } from './dto/catalog-list.query.dto';
 import { CatalogPageDto } from './dto/catalog-page.dto';
-import { CollectionViewDto } from '@/modules/collections/dto/collection-view.dto';
-import { SeriesViewDto } from '@/modules/series/dto/series-view.dto';
-import { LectureViewDto } from '@/modules/lectures/dto/lecture-view.dto';
+import {
+  CollectionViewDto,
+  SeriesViewDto,
+  LectureViewDto,
+} from '@sd/contracts';
 
 describe('CatalogService', () => {
   let service: CatalogService;

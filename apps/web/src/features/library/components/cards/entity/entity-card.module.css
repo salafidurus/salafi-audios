@@ -3,11 +3,12 @@
 }
 
 .card {
-  display: block;
+  display: flex;
+  flex-direction: column;
   height: 100%;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
-  padding: var(--space-card-p);
+  overflow: hidden;
   background: linear-gradient(160deg, var(--color-surface) 0%, var(--color-surface-soft) 130%);
   box-shadow: var(--shadow-card);
   transition:
@@ -15,6 +16,54 @@
     border-color 180ms ease,
     box-shadow 180ms ease;
   text-decoration: none;
+}
+
+.coverWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  flex-shrink: 0;
+  background: var(--color-fill-tertiary);
+}
+
+.cover {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.coverPlaceholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    var(--color-fill-secondary),
+    var(--color-fill-tertiary)
+  );
+}
+
+.tag {
+  position: absolute;
+  top: var(--space-gap-sm);
+  left: var(--space-gap-sm);
+  padding: var(--space-chip-y) var(--space-chip-x);
+  border-radius: var(--radius-chip);
+  background: var(--color-primary-soft);
+  color: var(--color-link);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-card-p);
+  min-width: 0;
 }
 
 .card:hover {
@@ -35,6 +84,10 @@
   line-height: 1.25;
 }
 
+.card:not(:has(.coverWrap)) .title {
+  margin-top: 0;
+}
+
 .description {
   margin-top: var(--space-gap-sm);
   margin-bottom: 0;
@@ -53,7 +106,8 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-gap-md);
-  margin-top: var(--space-gap-lg);
+  margin-top: auto;
+  padding-top: var(--space-gap-lg);
 }
 
 .cta {

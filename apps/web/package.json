@@ -15,11 +15,12 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
+    "pretypecheck": "pnpm --filter @sd/contracts build",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@hugeicons/react": "^1.1.5",
-    "@sd/api-client": "workspace:*",
+    "@sd/contracts": "workspace:*",
     "@sd/env": "workspace:*",
     "@sd/i18n": "workspace:*",
     "framer-motion": "^12.34.0",

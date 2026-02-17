@@ -129,7 +129,7 @@ export class AudioAssetsRepository {
       format: record.format ?? undefined,
       bitrateKbps: record.bitrateKbps ?? undefined,
       sizeBytes:
-        record.sizeBytes !== null ? record.sizeBytes.toString() : undefined,
+        record.sizeBytes !== null ? Number(record.sizeBytes) : undefined,
       durationSeconds: record.durationSeconds ?? undefined,
       source: record.source ?? undefined,
       isPrimary: record.isPrimary,

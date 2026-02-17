@@ -2,9 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { CatalogRepository } from './catalog.repo';
 import { CatalogListQueryDto } from './dto/catalog-list.query.dto';
 import { CatalogPageDto } from './dto/catalog-page.dto';
-import { CollectionViewDto } from '../collections/dto/collection-view.dto';
-import { SeriesViewDto } from '../series/dto/series-view.dto';
-import { LectureViewDto } from '../lectures/dto/lecture-view.dto';
+import type {
+  CollectionViewDto,
+  SeriesViewDto,
+  LectureViewDto,
+} from '@sd/contracts';
 
 @Injectable()
 export class CatalogService {
