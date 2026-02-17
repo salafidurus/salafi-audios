@@ -48,8 +48,9 @@ Shared promotion rules:
 
 API client import policy:
 
-- Import API types/clients only from `@sd/api-client` public exports.
-- Never import from `@sd/api-client/generated/*` directly.
+- Import API types from `@sd/contracts` public exports.
+- Use query hooks from `@sd/contracts/query/hooks` for data fetching.
+- Initialize the API client once per app with `initApiClient()`.
 
 Styling policy:
 
@@ -96,10 +97,11 @@ Direction:
 - Playwright by title: `pnpm --filter web test:e2e -- --grep "catalog list"`
 - Playwright project: `pnpm --filter web test:e2e -- --project chromium`
 
-## API contract and codegen
+## API contracts
 
-- Do not hand-edit generated API client code.
-- Regenerate client from source contracts (`pnpm contract`) when API changes.
+- Import shared types from `@sd/contracts`.
+- Types are hand-written and stable - no codegen required.
+- When API changes, update `packages/contracts/src/types/` manually.
 
 ## Quality expectations
 
