@@ -129,6 +129,9 @@ importers:
       '@sd/config':
         specifier: workspace:*
         version: link:../../packages/config
+      '@sd/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       '@sd/db':
         specifier: workspace:*
         version: link:../../packages/db
