@@ -1,14 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import type { ScholarStats, RecommendationItem } from "@/features/home/api/public-api";
+import type { RecommendationItem, ScholarStats } from "@/features/home/api/public-api";
 import { ScholarAvatarCard } from "@/features/library/components/cards/scholar-avatar/scholar-avatar-card";
-import { ScholarTabs } from "@/features/library/components/scholar-tabs/scholar-tabs";
 import { ShareButton } from "@/features/library/components/controls/share-button/share-button";
-import { ScholarSidebar } from "@/features/library/components/scholar-sidebar/scholar-sidebar";
-import { formatCompactNumber } from "@/shared/utils/format";
+import { ScholarTabs } from "@/features/library/components/scholar-tabs/scholar-tabs";
 import { Button } from "@/shared/components/button/button";
+import { formatCompactNumber } from "@/shared/utils/format";
 import { Globe, Send, Twitter, Youtube } from "lucide-react";
+import { useState } from "react";
 import styles from "./scholar-detail-content.module.css";
 
 type Scholar = {

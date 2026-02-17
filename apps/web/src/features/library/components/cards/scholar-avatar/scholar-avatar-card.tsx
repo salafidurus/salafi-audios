@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { Bookmark } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import styles from "./scholar-avatar-card.module.css";
 
 type ScholarAvatarCardProps = {
@@ -61,7 +62,7 @@ export function ScholarAvatarCard({
       )}
       <div className={avatarClass}>
         {imageUrl ? (
-          <img
+          <Image
             src={imageUrl}
             alt=""
             className={styles.avatarImage}

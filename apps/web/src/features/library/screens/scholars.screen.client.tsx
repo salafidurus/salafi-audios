@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo, useRef } from "react";
 import { ScholarAvatarCard } from "@/features/library/components/cards/scholar-avatar/scholar-avatar-card";
 import { Shell } from "@/features/library/components/layout/shell/shell";
 import { EmptyState } from "@/features/library/components/states/empty-state/empty-state";
-import { X, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
 import styles from "./scholars.screen.module.css";
 
 type Scholar = {
@@ -32,7 +32,6 @@ type ScholarsScreenClientProps = {
 export function ScholarsScreenClient({ scholars, topics }: ScholarsScreenClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
-  const [topicSearchQuery, setTopicSearchQuery] = useState("");
   const carouselRef = useRef<HTMLDivElement>(null);
 
   const featuredScholars = scholars.filter((s) => s.isKibar).slice(0, 10);
@@ -46,14 +45,6 @@ export function ScholarsScreenClient({ scholars, topics }: ScholarsScreenClientP
       carouselRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
     }
   };
-
-  const filteredTopics = useMemo(() => {
-    if (!topicSearchQuery.trim()) return [];
-    const query = topicSearchQuery.toLowerCase();
-    return topics
-      .filter((t) => t.name.toLowerCase().includes(query) && !selectedTopics.includes(t.slug))
-      .slice(0, 8);
-  }, [topicSearchQuery, topics, selectedTopics]);
 
   const filteredScholars = useMemo(() => {
     let result = allScholars;
@@ -81,17 +72,6 @@ export function ScholarsScreenClient({ scholars, topics }: ScholarsScreenClientP
       }
       return [...prev, topicSlug];
     });
-  };
-
-  const removeTopic = (topicSlug: string) => {
-    setSelectedTopics((prev) => prev.filter((t) => t !== topicSlug));
-  };
-
-  const addTopicFromSearch = (topicSlug: string) => {
-    if (!selectedTopics.includes(topicSlug) && selectedTopics.length < 3) {
-      setSelectedTopics((prev) => [...prev, topicSlug]);
-    }
-    setTopicSearchQuery("");
   };
 
   return (

@@ -1,4 +1,5 @@
 import { ScholarDetailDto, ScholarStatsDto } from "@sd/api-client";
+import Image from "next/image";
 import styles from "./scholar-profile-header.module.css";
 
 interface ScholarProfileHeaderProps {
@@ -24,7 +25,13 @@ export function ScholarProfileHeader({
         {/* Avatar */}
         <div className={styles.avatarSection}>
           {scholar.imageUrl ? (
-            <img src={scholar.imageUrl} alt={scholar.name} className={styles.avatar} />
+            <Image
+              src={scholar.imageUrl}
+              alt={scholar.name}
+              className={styles.avatar}
+              width={96}
+              height={96}
+            />
           ) : (
             <div className={styles.avatarPlaceholder}>
               <span>{scholar.name.charAt(0).toUpperCase()}</span>
