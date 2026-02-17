@@ -16,7 +16,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "jest --passWithNoTests",
-    "pretest": "pnpm --filter @sd/env build && pnpm --filter @sd/db build",
+    "pretest": "pnpm --filter @sd/env build && pnpm --filter @sd/db build && pnpm --filter @sd/contracts build",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
