@@ -52,7 +52,7 @@ This repository is one system. The monorepo is an enforcement tool, not a conven
 - `packages/env` - Environment variable schemas
 - `packages/i18n` - Internationalization config and keys
 - `packages/auth-shared` - Shared auth types
-- `packages/api-client` - Generated API client
+- `packages/contracts` - Shared TypeScript contracts (DTOs, types, query hooks)
 - `packages/config` - Shared lint/build config
 - `packages/ingest` - Content ingestion
 
@@ -81,7 +81,7 @@ This repository is one system. The monorepo is an enforcement tool, not a conven
 - Env: `pnpm --filter @sd/env <script>`
 - I18n: `pnpm --filter @sd/i18n <script>`
 - Auth shared: `pnpm --filter @sd/auth-shared <script>`
-- API client: `pnpm --filter @sd/api-client <script>`
+- Contracts: `pnpm --filter @sd/contracts <script>`
 - Ingest: `pnpm --filter @sd/ingest <script>`
 
 Turbo grouped scripts:
@@ -104,12 +104,10 @@ Turbo grouped scripts:
 ## Contract and data discipline
 
 - API is a stable contract with explicit intent-driven actions (publish/archive/reorder/replace).
-- OpenAPI + client generation flow:
-  - `pnpm openapi`
-  - `pnpm codegen`
-  - `pnpm contract` (both)
-- Never hand-edit `packages/api-client/generated/`.
-- If generated types are wrong, fix API/OpenAPI source first, then regenerate.
+- Shared types are defined in `packages/contracts` - hand-written and stable.
+- All apps (api, web, mobile) import shared types from `@sd/contracts`.
+- When API response shapes change, update `packages/contracts/src/types/` manually.
+- Never hand-edit generated code; this package eliminates codegen friction.
 
 ## DB and migration discipline
 
@@ -134,11 +132,11 @@ Turbo grouped scripts:
 - If `@sd/ingest` fails in `turbo typecheck` with `Cannot find module '@sd/db/client'`: `typecheck` does not run `@sd/db build`, so `dist/generated/**` may be missing.
 - Fix: make `@sd/db prisma:generate` also copy generated Prisma client into `packages/db/dist/generated/` (so `@sd/db/client` resolves during typecheck).
 
-- If `apps/web` fails with `Module '"@sd/api-client"' has no exported member '<X>ViewDto'`: it usually means `@sd/api-client` codegen didn't run (or Turbo cached the build but didn't restore `packages/api-client/generated/**`).
-- Fix: ensure `@sd/api-client` has a `build` script that runs Orval codegen, and that Turbo `build.outputs` includes `generated/**` so remote cache restores it.
+- If `apps/web` or `apps/api` fails with `Cannot find module '@sd/contracts'`: it means `@sd/contracts` hasn't been built yet.
+- Fix: ensure `@sd/contracts` is built before dependent packages (check `prebuild`, `pretypecheck`, `pretest` scripts).
 
-- If `pnpm typecheck` (Turbo typecheck) fails with missing exports from `@sd/api-client` or `packages/api-client/generated/schemas/*` not found: Turbo's `typecheck` pipeline does not imply `build`, so generated API client files may be absent.
-- Fix: make `@sd/api-client`'s `typecheck` run `pnpm codegen` so downstream workspaces (like `apps/web`) can typecheck.
+- If `pnpm typecheck` fails with missing exports from `@sd/contracts`: the contracts package typecheck/build hasn't run.
+- Fix: run `pnpm --filter @sd/contracts build` first, or check that turbo pipeline builds contracts before typechecking dependent apps.
 
 - If `apps/web` fails during `next build` with `Invalid WEB PUBLIC environment variables: NEXT_PUBLIC_API_URL Required`: the web app validated env at module import during prerender.
 - Fix: make env parsing lazy (don’t parse at module top-level) and make pages tolerate missing API env during CI builds by catching fetch errors and returning empty view models.

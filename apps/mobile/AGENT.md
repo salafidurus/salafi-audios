@@ -42,6 +42,12 @@ Direction:
 - core -> shared
 - shared -> no inward deps
 
+## API contracts
+
+- Import shared types from `@sd/contracts`.
+- Use query hooks from `@sd/contracts/query/hooks` for data fetching.
+- Initialize the API client once with `initApiClient()`.
+
 ## Media rules
 
 - Consume backend-provided media references.
