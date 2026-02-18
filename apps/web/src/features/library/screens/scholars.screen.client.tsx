@@ -86,11 +86,11 @@ export function ScholarsScreenClient({
 
   return (
     <Shell title="Scholars" hideHeader>
+      <h1 className={styles.pageHeading}>Scholars</h1>
       {scholars.length === 0 ? (
         <EmptyState message="No scholars are published yet." />
       ) : (
         <>
-          <h1 className={styles.pageHeading}>Scholars</h1>
           {featuredScholars.length > 0 && (
             <ScholarHero
               items={featuredScholars}
