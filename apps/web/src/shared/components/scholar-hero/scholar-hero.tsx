@@ -3,22 +3,42 @@
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   Bookmark,
   ChevronLeft,
   ChevronRight,
-  Clock3,
+  Layers3,
+  LibraryBig,
   ListVideo,
-  Play,
   Sparkle,
 } from "lucide-react";
-import type { RecommendationHeroItem } from "@/features/home/api/public-api";
 import { Button } from "@/shared/components/button/button";
 import buttonStyles from "@/shared/components/button/button.module.css";
-import styles from "./hero.module.css";
+import styles from "./scholar-hero.module.css";
 
-type HeroProps = {
-  items: RecommendationHeroItem[];
+const FALLBACK_IMAGE = "/dev-mock/template-4-to-5-image.jpg";
+const MAX_NAME_LENGTH = 25;
+
+export type ScholarHeroItem = {
+  id: string;
+  slug: string;
+  name: string;
+  subtitle?: string;
+  bio?: string;
+  imageUrl?: string;
+  collectionsCount: number;
+  standaloneSeriesCount: number;
+  standaloneLecturesCount: number;
+  isKibar?: boolean;
+};
+
+type ScholarHeroProps = {
+  items: ScholarHeroItem[];
+  title?: string;
+  description?: string;
+  singleMode?: boolean;
+  onBookmarkClick?: (item: ScholarHeroItem) => void;
 };
 
 function clampIndex(value: number, length: number) {
@@ -26,51 +46,20 @@ function clampIndex(value: number, length: number) {
   return Math.min(Math.max(value, 0), length - 1);
 }
 
-function formatDuration(seconds: number) {
-  const totalMinutes = Math.max(0, Math.ceil(seconds / 60));
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
+export function ScholarHero({
+  items,
+  title,
+  description,
+  singleMode = false,
+  onBookmarkClick,
+}: ScholarHeroProps) {
+  const slides = useMemo<ScholarHeroItem[]>(() => {
+    if (items.length > 0) return singleMode ? items.slice(0, 1) : items.slice(0, 10);
 
-  if (hours <= 0) return `${totalMinutes}m`;
-  if (minutes <= 0) return `${hours}h`;
-  return `${hours}h ${minutes}m`;
-}
+    return [];
+  }, [items, singleMode]);
 
-function buildHeroHref(item: RecommendationHeroItem): string | null {
-  if (!item.presentedBySlug) return null;
-
-  if (item.kind === "lecture") {
-    return `/lectures/${item.presentedBySlug}/${item.entitySlug}`;
-  }
-
-  if (item.kind === "series") {
-    return `/series/${item.presentedBySlug}/${item.entitySlug}`;
-  }
-
-  return `/collections/${item.presentedBySlug}/${item.entitySlug}`;
-}
-
-export function Hero({ items }: HeroProps) {
-  const slides = useMemo<RecommendationHeroItem[]>(() => {
-    if (items.length > 0) return items.slice(0, 10);
-
-    return [
-      {
-        kind: "series",
-        entityId: "fallback",
-        entitySlug: "fallback",
-        headline: "Tawhid First",
-        title: "Featured study",
-        description:
-          "Explore published lectures organized by scholars, collections, and thematic series.",
-        lessonCount: undefined,
-        totalDurationSeconds: undefined,
-        presentedBy: "Salafi Durus",
-      },
-    ];
-  }, [items]);
-
-  const hasCarousel = slides.length > 1;
+  const hasCarousel = slides.length > 1 && !singleMode;
   const [index, setIndex] = useState(0);
   const [dir, setDir] = useState<1 | -1>(1);
   const heroRef = useRef<HTMLElement | null>(null);
@@ -118,7 +107,6 @@ export function Hero({ items }: HeroProps) {
   const active = slides[clampIndex(index, slides.length)]!;
   const canPrev = index > 0;
   const canNext = index < slides.length - 1;
-  const heroHref = buildHeroHref(active);
 
   const goPrev = () => {
     if (!canPrev) return;
@@ -132,24 +120,21 @@ export function Hero({ items }: HeroProps) {
     setIndex((v) => clampIndex(v + 1, slides.length));
   };
 
-  const featuredLabel = (() => {
-    if (active.kind === "lecture") return "Featured lecture";
-    if (active.kind === "collection") return "Featured collection";
-    return "Featured series";
-  })();
-
-  const lessonCount = active.lessonCount;
-  const totalDurationSeconds = active.totalDurationSeconds;
-
   return (
     <section
       ref={(el) => {
         heroRef.current = el;
       }}
       className={styles.hero}
-      aria-label="Featured study"
+      aria-label={singleMode ? "Scholar profile" : "Senior Salafi Scholars"}
     >
-      <div className={styles.inner}>
+      {title && description && (
+        <div className={styles.textBlock}>
+          <h2 className={styles.textBlockTitle}>{title}</h2>
+          <p className={styles.textBlockDescription}>{description}</p>
+        </div>
+      )}
+      <div className={`${styles.inner} ${title && description ? styles.innerWithTextBlock : ""}`}>
         <motion.div
           className={styles.stage}
           drag={hasCarousel ? "x" : false}
@@ -169,7 +154,7 @@ export function Hero({ items }: HeroProps) {
         >
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
-              key={active.entityId}
+              key={active.id}
               className={styles.slide}
               initial={{ opacity: 0, x: dir === 1 ? 36 : -36 }}
               animate={{ opacity: 1, x: 0 }}
@@ -177,13 +162,16 @@ export function Hero({ items }: HeroProps) {
               transition={{ duration: 0.42, ease: "easeOut" }}
             >
               <div className={styles.coverWrap}>
-                <div
-                  className={styles.cover}
-                  style={{
-                    backgroundImage: `url(${active.coverImageUrl || "/dev-mock/template-4-to-5-image.jpg"})`,
-                  }}
-                  aria-hidden="true"
-                />
+                <div className={styles.cover} aria-hidden="true">
+                  <Image
+                    src={active.imageUrl || FALLBACK_IMAGE}
+                    alt={active.name}
+                    fill
+                    className={styles.coverImage}
+                    sizes="(max-width: 820px) 280px, 352px"
+                    priority={index === 0}
+                  />
+                </div>
                 <div className={styles.coverGlow} aria-hidden="true" />
               </div>
 
@@ -193,77 +181,82 @@ export function Hero({ items }: HeroProps) {
                     <span className={styles.pillIcon} aria-hidden="true">
                       <Sparkle size={14} aria-hidden="true" />
                     </span>
-                    {featuredLabel}
+                    {active.isKibar ? "Senior Salafi Scholar" : "Salafi Scholar"}
                   </span>
                 </div>
 
-                <div className={styles.tagline}>{active.headline}</div>
+                {active.subtitle && <div className={styles.tagline}>{active.subtitle}</div>}
 
-                <h1 className={styles.title}>{active.title}</h1>
-
-                {active.presentedBySlug ? (
-                  <Link href={`/scholars/${active.presentedBySlug}`} className={styles.scholarName}>
-                    {active.presentedBy}
-                  </Link>
-                ) : (
-                  <div className={styles.scholarName}>{active.presentedBy}</div>
-                )}
+                <h1 className={styles.title} title={active.name}>
+                  {active.name.length > MAX_NAME_LENGTH ? (
+                    <span className={styles.marquee}>
+                      <span className={styles.marqueeInner}>{active.name}</span>
+                    </span>
+                  ) : (
+                    active.name
+                  )}
+                </h1>
 
                 <div className={styles.meta}>
-                  {typeof lessonCount === "number" ? (
+                  {active.collectionsCount > 0 && (
+                    <span className={styles.metaItem}>
+                      <LibraryBig size={16} aria-hidden="true" />
+                      {active.collectionsCount}{" "}
+                      {active.collectionsCount === 1 ? "Collection" : "Collections"}
+                    </span>
+                  )}
+                  {active.standaloneSeriesCount > 0 && (
+                    <span className={styles.metaItem}>
+                      <Layers3 size={16} aria-hidden="true" />
+                      {active.standaloneSeriesCount}{" "}
+                      {active.standaloneSeriesCount === 1 ? "Series" : "Series"}
+                    </span>
+                  )}
+                  {active.standaloneLecturesCount > 0 && (
                     <span className={styles.metaItem}>
                       <ListVideo size={16} aria-hidden="true" />
-                      {lessonCount} {lessonCount === 1 ? "lesson" : "lessons"}
+                      {active.standaloneLecturesCount}{" "}
+                      {active.standaloneLecturesCount === 1 ? "Lecture" : "Lectures"}
                     </span>
-                  ) : null}
-                  {typeof totalDurationSeconds === "number" && totalDurationSeconds > 0 ? (
-                    <span className={styles.metaItem}>
-                      <Clock3 size={16} aria-hidden="true" />
-                      {formatDuration(totalDurationSeconds)}
-                    </span>
-                  ) : null}
+                  )}
                 </div>
 
-                {active.description ? (
-                  <p className={styles.description}>{active.description}</p>
+                {active.bio ? (
+                  <p className={styles.description}>
+                    {active.bio.length > 150 ? `${active.bio.substring(0, 150)}...` : active.bio}
+                  </p>
                 ) : null}
 
-                <div className={styles.actions}>
-                  {heroHref ? (
+                {!singleMode && (
+                  <div className={styles.actions}>
                     <Link
-                      href={heroHref}
+                      href={`/scholars/${active.slug}`}
                       className={`${buttonStyles.button} ${buttonStyles["variant-primary"]} ${buttonStyles["size-lg"]}`}
                     >
-                      <Play size={18} aria-hidden="true" />
-                      Start learning
+                      View Details
                     </Link>
-                  ) : (
-                    <Button variant="primary" size="lg" aria-disabled="true">
-                      <Play size={18} aria-hidden="true" />
-                      Start learning
-                    </Button>
-                  )}
 
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    aria-label="Save"
-                    aria-disabled="true"
-                    className={styles.heroIconBtn}
-                  >
-                    <Bookmark size={18} aria-hidden="true" />
-                  </Button>
-                </div>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      aria-label="Bookmark scholar"
+                      className={styles.heroIconBtn}
+                      onClick={() => onBookmarkClick?.(active)}
+                    >
+                      <Bookmark size={18} aria-hidden="true" />
+                    </Button>
+                  </div>
+                )}
               </div>
             </motion.div>
           </AnimatePresence>
         </motion.div>
 
         {hasCarousel ? (
-          <div className={styles.dots} aria-label="Hero slide navigation">
+          <div className={styles.dots} aria-label="Scholar slide navigation">
             {slides.map((slide, slideIndex) => (
               <button
-                key={slide.entityId}
+                key={slide.id}
                 type="button"
                 className={slideIndex === index ? styles.dotActive : styles.dot}
                 aria-label={`Go to slide ${slideIndex + 1}`}

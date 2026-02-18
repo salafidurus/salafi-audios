@@ -46,7 +46,9 @@
   font-weight: 600;
   text-align: left;
   cursor: pointer;
-  transition: background 180ms ease, color 180ms ease;
+  transition:
+    background 180ms ease,
+    color 180ms ease;
 }
 
 .sidebarLink:hover {
@@ -81,33 +83,48 @@
 
 .tabList {
   display: flex;
-  gap: 0;
-  border-bottom: 1px solid var(--color-border);
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
   margin-bottom: var(--space-gap-lg);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tabList::-webkit-scrollbar {
+  display: none;
 }
 
 .tab,
 .tabActive {
-  padding: var(--space-gap-md) var(--space-gap-lg);
+  flex-shrink: 0;
+  padding: 0.5rem 1rem;
   border: none;
+  border-radius: 999px;
   background: transparent;
   color: var(--color-text-muted);
-  font-size: var(--font-size-label);
+  font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  position: relative;
-  margin-bottom: -1px;
-  border-bottom: 2px solid transparent;
-  transition: color 180ms ease, border-color 180ms ease;
+  white-space: nowrap;
+  transition: all 200ms ease;
 }
 
 .tab:hover {
   color: var(--color-text);
+  background: var(--color-fill-tertiary);
 }
 
 .tabActive {
-  color: var(--color-link);
-  border-bottom-color: var(--color-primary-strong);
+  color: var(--color-surface);
+  background: radial-gradient(
+    circle at 30% 20%,
+    color-mix(in srgb, var(--color-primary-strong) 20%, var(--color-primary)),
+    var(--color-primary)
+  );
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .tab:focus-visible,
@@ -122,4 +139,12 @@
 
 .panel[hidden] {
   display: none;
+}
+
+@media (max-width: 640px) {
+  .tab,
+  .tabActive {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+  }
 }

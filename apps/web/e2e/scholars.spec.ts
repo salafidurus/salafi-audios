@@ -5,7 +5,7 @@ test("scholars page loads with heading and content", async ({ page }) => {
 
   await expect(page).toHaveTitle(/scholars/i);
 
-  const heading = page.getByRole("heading", { name: /scholars/i });
+  const heading = page.getByRole("heading", { name: /scholars/i }).first();
   await expect(heading).toBeVisible();
 
   const main = page.locator("main").first();

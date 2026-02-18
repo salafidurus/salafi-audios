@@ -142,7 +142,13 @@ export class ScholarRepository {
   }
 
   async getScholarStats(scholarId: string): Promise<ScholarStatsDto> {
-    const [seriesCount, lecturesCount] = await Promise.all([
+    const [
+      seriesCount,
+      lecturesCount,
+      collectionsCount,
+      standaloneSeriesCount,
+      standaloneLecturesCount,
+    ] = await Promise.all([
       this.prisma.series.count({
         where: {
           scholarId,
@@ -157,6 +163,29 @@ export class ScholarRepository {
           deletedAt: null,
         },
       }),
+      this.prisma.collection.count({
+        where: {
+          scholarId,
+          status: 'published',
+          deletedAt: null,
+        },
+      }),
+      this.prisma.series.count({
+        where: {
+          scholarId,
+          status: 'published',
+          deletedAt: null,
+          collectionId: null,
+        },
+      }),
+      this.prisma.lecture.count({
+        where: {
+          scholarId,
+          status: 'published',
+          deletedAt: null,
+          seriesId: null,
+        },
+      }),
     ]);
 
     // TODO: Compute follower count from analytics
@@ -166,6 +195,9 @@ export class ScholarRepository {
       seriesCount,
       lecturesCount,
       followerCount,
+      collectionsCount,
+      standaloneSeriesCount,
+      standaloneLecturesCount,
     };
   }
 }

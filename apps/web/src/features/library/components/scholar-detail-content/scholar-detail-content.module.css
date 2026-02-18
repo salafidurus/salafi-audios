@@ -1,8 +1,130 @@
+.page {
+  min-height: 100vh;
+}
+
+.featuredSection {
+  padding: var(--space-section-y) var(--space-page-x);
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+}
+
+.featuredTitle {
+  margin: 0 0 var(--space-gap-lg);
+  font-size: var(--font-size-h2);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.featuredGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-gap-lg);
+}
+
+@media (max-width: 1280px) {
+  .featuredGrid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .featuredGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .featuredGrid {
+    display: flex;
+    overflow-x: auto;
+    gap: var(--space-gap-md);
+    padding-bottom: var(--space-gap-sm);
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .featuredGrid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .featuredCard {
+    flex: 0 0 240px;
+    scroll-snap-align: start;
+  }
+}
+
+.featuredCard {
+  display: block;
+  border-radius: var(--radius-panel);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.featuredCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-panel);
+}
+
+.featuredImageWrap {
+  position: relative;
+  aspect-ratio: 4/5;
+  overflow: hidden;
+  border-radius: var(--radius-panel);
+  background: linear-gradient(135deg, var(--color-fill-tertiary), var(--color-fill-secondary));
+}
+
+.featuredImage {
+  object-fit: cover;
+}
+
+.featuredOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 40%,
+    rgba(0, 0, 0, 0.4) 60%,
+    rgba(0, 0, 0, 0.8) 100%
+  );
+  padding: 1rem;
+}
+
+.featuredCardTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.3;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.featuredMeta {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
 .layout {
   display: grid;
   grid-template-columns: 1fr 20rem;
   gap: var(--space-gap-xl);
   align-items: start;
+  padding: 0 var(--space-page-x);
+  max-width: var(--max-content-width);
+  margin: 0 auto;
 }
 
 .mainContent {
@@ -229,34 +351,42 @@
 .popularList {
   display: flex;
   flex-direction: column;
-  gap: var(--space-gap-sm);
+  gap: 0.5rem;
 }
 
 .popularItem {
   display: flex;
-  gap: var(--space-gap-md);
-  padding: var(--space-gap-sm);
-  border-radius: var(--radius-panel-sm);
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: var(--radius-chip);
   text-decoration: none;
-  transition: background 180ms ease;
+  transition: all 180ms ease;
+  border: 1px solid transparent;
 }
 
 .popularItem:hover {
   background: var(--color-fill-tertiary);
+  border-color: var(--color-border);
 }
 
 .popularRank {
   flex-shrink: 0;
-  width: 2rem;
-  height: 2rem;
+  width: 1.75rem;
+  height: 1.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--font-size-sm);
+  font-size: 0.7rem;
   font-weight: 700;
+  color: var(--color-text-muted);
+  background: var(--color-surface-soft);
+  border-radius: 50%;
+}
+
+.popularItem:hover .popularRank {
   color: var(--color-primary-strong);
   background: var(--color-primary-soft);
-  border-radius: 50%;
 }
 
 .popularInfo {
@@ -265,29 +395,24 @@
 }
 
 .popularTitle {
-  margin: 0 0 0.25rem;
-  font-size: var(--font-size-sm);
+  margin: 0;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--color-text);
   overflow: hidden;
   text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  white-space: nowrap;
 }
 
 .popularMeta {
-  font-size: var(--font-size-xs);
+  font-size: 0.7rem;
   color: var(--color-text-muted);
+  font-weight: 500;
 }
 
 .resourceCard {
   padding: var(--space-panel-p);
-  background: linear-gradient(
-    135deg,
-    var(--color-primary-soft) 0%,
-    var(--color-surface-soft) 100%
-  );
+  background: linear-gradient(135deg, var(--color-primary-soft) 0%, var(--color-surface-soft) 100%);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-panel);
   text-align: center;
@@ -319,6 +444,10 @@
 }
 
 @media (max-width: 960px) {
+  .page {
+    min-height: 100vh;
+  }
+
   .layout {
     grid-template-columns: 1fr;
   }

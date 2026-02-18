@@ -38,12 +38,12 @@ type ScholarTabsProps = {
   onTabChange?: (tab: TabId) => void;
 };
 
-type TabId = "collections" | "series" | "standalone";
+type TabId = "collections" | "series" | "lectures";
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "collections", label: "Collections" },
   { id: "series", label: "Series" },
-  { id: "standalone", label: "Standalone" },
+  { id: "lectures", label: "Lectures" },
 ];
 
 export function ScholarTabs({
@@ -158,14 +158,14 @@ export function ScholarTabs({
       </div>
 
       <div
-        id={`${idPrefix}-panel-standalone`}
+        id={`${idPrefix}-panel-lectures`}
         role="tabpanel"
-        aria-labelledby={`${idPrefix}-tab-standalone`}
-        hidden={activeTab !== "standalone"}
+        aria-labelledby={`${idPrefix}-tab-lectures`}
+        hidden={activeTab !== "lectures"}
         className={styles.panel}
       >
         {standaloneSeries.length === 0 ? (
-          <EmptyState message="This scholar has no standalone published series." />
+          <EmptyState message="This scholar has no standalone published lectures." />
         ) : (
           <CardGrid>
             {standaloneSeries.map((series) => (
@@ -215,10 +215,10 @@ export function ScholarTabs({
           </button>
           <button
             type="button"
-            className={activeTab === "standalone" ? styles.sidebarLinkActive : styles.sidebarLink}
-            onClick={() => setActiveTab("standalone")}
+            className={activeTab === "lectures" ? styles.sidebarLinkActive : styles.sidebarLink}
+            onClick={() => setActiveTab("lectures")}
           >
-            Standalone
+            Lectures
           </button>
         </nav>
       </aside>

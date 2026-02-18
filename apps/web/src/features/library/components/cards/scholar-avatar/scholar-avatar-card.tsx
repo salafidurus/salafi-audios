@@ -61,17 +61,17 @@ export function ScholarAvatarCard({
         </button>
       )}
       <div className={avatarClass}>
-        {imageUrl ? (
+        {imageUrl || !showInitial ? (
           <Image
-            src={imageUrl}
+            src={imageUrl || "/dev-mock/template-4-to-5-image.jpg"}
             alt=""
             className={styles.avatarImage}
             width={size === "lg" ? 176 : 88}
             height={size === "lg" ? 220 : 88}
           />
-        ) : showInitial ? (
+        ) : (
           initial
-        ) : null}
+        )}
       </div>
       <p className={nameClass}>{name}</p>
       {subtitle ? <p className={styles.subtitle}>{subtitle}</p> : null}
