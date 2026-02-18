@@ -29,4 +29,7 @@ export type ScholarStatsDto = {
   seriesCount: number;
   lecturesCount: number;
   followerCount: number;
+  collectionsCount: number;
+  standaloneSeriesCount: number;
+  standaloneLecturesCount: number;
 };

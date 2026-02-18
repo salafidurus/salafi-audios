@@ -1,7 +1,28 @@
 .heroSection {
+  margin-bottom: var(--space-section-y);
+}
+
+.heroText {
   text-align: center;
-  margin-bottom: calc(var(--space-section-y) * 2);
-  padding: var(--space-section-y) 0;
+  margin-bottom: var(--space-gap-xl);
+  padding: 0 var(--space-page-x);
+}
+
+.heroTitle {
+  margin: 0 0 var(--space-gap-md);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+}
+
+.heroDescription {
+  margin: 0 auto;
+  max-width: 48rem;
+  font-size: clamp(1rem, 1.5vw, 1.2rem);
+  line-height: 1.6;
+  color: var(--color-text-muted);
 }
 
 .heroHeading {
@@ -111,11 +132,8 @@
 .featuredPlaceholder {
   position: absolute;
   inset: 0;
-  background: radial-gradient(
-      circle at 32% 26%,
-      rgb(255 255 255 / 0.7),
-      transparent 62%
-    ),
+  background:
+    radial-gradient(circle at 32% 26%, rgb(255 255 255 / 0.7), transparent 62%),
     radial-gradient(circle at 70% 80%, rgb(87 216 118 / 0.25), transparent 62%),
     linear-gradient(135deg, var(--color-fill-tertiary), var(--color-fill-secondary));
   display: flex;
@@ -180,43 +198,19 @@
 }
 
 .allScholarsSection {
+  margin-top: var(--space-section-y);
   margin-bottom: var(--space-section-y);
 }
 
-.searchContainer {
-  position: relative;
+.searchWrapper {
   display: flex;
-  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-gap-xl);
+}
+
+.searchWrapper [class*="search"] {
   max-width: 42rem;
-  margin: 0 auto var(--space-gap-xl);
-}
-
-.searchIcon {
-  position: absolute;
-  left: var(--space-gap-lg);
-  color: var(--color-text-muted);
-  pointer-events: none;
-}
-
-.searchInput {
   width: 100%;
-  padding: var(--space-gap-md) var(--space-gap-lg) var(--space-gap-md) 3rem;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-panel);
-  color: var(--color-text);
-  font-size: var(--font-size-md);
-  transition: all 180ms ease;
-}
-
-.searchInput::placeholder {
-  color: var(--color-text-muted);
-}
-
-.searchInput:focus {
-  outline: none;
-  border-color: var(--color-primary-strong);
-  box-shadow: var(--shadow-focus);
 }
 
 .filterSection {
@@ -228,44 +222,64 @@
 }
 
 .filterTabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-gap-sm);
-  justify-content: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
+  box-shadow: var(--shadow-inline);
+  overflow-x: auto;
+  scrollbar-width: none;
   max-width: 100%;
+}
+
+.filterTabs::-webkit-scrollbar {
+  display: none;
 }
 
 .filterTab,
 .filterTabActive {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: var(--space-gap-sm) var(--space-gap-lg);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-chip);
-  background: var(--color-surface);
+  border: 0;
+  background: transparent;
   color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
+  font-size: var(--font-size-label);
+  font-weight: 650;
+  padding: 0.55rem 0.85rem;
+  border-radius: 999px;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 180ms ease;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
 }
 
 .filterTab:hover:not(:disabled) {
-  background: var(--color-fill-tertiary);
   color: var(--color-text);
-  border-color: var(--color-border-strong);
+  background: color-mix(in srgb, var(--color-primary-soft) 42%, transparent);
 }
 
 .filterTab:disabled {
   cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .filterTabActive {
-  background: var(--color-primary-strong);
-  color: var(--color-surface);
-  border-color: var(--color-primary-strong);
+  color: var(--color-text);
+  background:
+    radial-gradient(
+      circle at 20% 20%,
+      color-mix(in srgb, var(--color-primary) 34%, transparent),
+      transparent 58%
+    ),
+    linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 70%, transparent), transparent);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 44%, var(--color-border));
+  transform: translateY(-1px);
 }
 
 .removeIcon {
@@ -341,19 +355,21 @@
 }
 
 .scholarsGrid {
-  margin: 0;
-  padding: 0;
-  list-style: none;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
   gap: var(--space-gap-xl);
-  place-items: start center;
+  padding: 0;
 }
 
 .scholarCard {
   width: 100%;
-  display: flex;
-  justify-content: center;
+}
+
+@media (max-width: 1024px) {
+  .scholarsGrid {
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    gap: var(--space-gap-lg);
+  }
 }
 
 @media (max-width: 768px) {
@@ -375,7 +391,7 @@
   }
 
   .scholarsGrid {
-    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
     gap: var(--space-gap-lg);
   }
 }
@@ -394,7 +410,7 @@
   }
 
   .scholarsGrid {
-    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
-    gap: var(--space-gap-md);
+    grid-template-columns: 1fr;
+    gap: var(--space-gap-lg);
   }
 }

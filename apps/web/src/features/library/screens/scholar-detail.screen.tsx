@@ -86,7 +86,7 @@ export async function ScholarDetailScreen({ params }: ScholarRouteProps) {
     await loadScholarPage(scholarSlug);
 
   return (
-    <Shell title={scholar.name}>
+    <Shell title={scholar.name} hideHeader>
       <ScholarDetailContent
         scholar={scholar}
         stats={stats}

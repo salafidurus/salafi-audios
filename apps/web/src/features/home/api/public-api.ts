@@ -44,6 +44,9 @@ export type ScholarStats = {
   seriesCount: number;
   lecturesCount: number;
   followerCount: number;
+  collectionsCount: number;
+  standaloneSeriesCount: number;
+  standaloneLecturesCount: number;
 };
 
 const PUBLIC_REVALIDATE_SECONDS = 120;

@@ -1,10 +1,12 @@
 "use client";
 
-import { ScholarAvatarCard } from "@/features/library/components/cards/scholar-avatar/scholar-avatar-card";
 import { Shell } from "@/features/library/components/layout/shell/shell";
 import { EmptyState } from "@/features/library/components/states/empty-state/empty-state";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { SearchBar } from "@/shared/components/search-bar";
+import { ScholarCard, type ScholarCardItem } from "@/shared/components/scholar-card";
+import { ScholarHero, type ScholarHeroItem } from "@/shared/components/scholar-hero/scholar-hero";
+import { X } from "lucide-react";
+import { useMemo, useState } from "react";
 import styles from "./scholars.screen.module.css";
 
 type Scholar = {
@@ -16,6 +18,9 @@ type Scholar = {
   imageUrl?: string | null;
   isKibar: boolean;
   isActive: boolean;
+  collectionsCount?: number;
+  standaloneSeriesCount?: number;
+  standaloneLecturesCount?: number;
 };
 
 type Topic = {
@@ -27,26 +32,21 @@ type Topic = {
 type ScholarsScreenClientProps = {
   scholars: Scholar[];
   topics: Topic[];
+  featuredScholars: ScholarHeroItem[];
 };
 
-export function ScholarsScreenClient({ scholars, topics }: ScholarsScreenClientProps) {
+export function ScholarsScreenClient({
+  scholars,
+  topics,
+  featuredScholars,
+}: ScholarsScreenClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
-  const carouselRef = useRef<HTMLDivElement>(null);
 
-  const featuredScholars = scholars.filter((s) => s.isKibar).slice(0, 10);
   const allScholars = scholars.filter((s) => s.isActive);
-
   const popularTopics = topics.slice(0, 12);
 
-  const scrollCarousel = (direction: "left" | "right") => {
-    if (carouselRef.current) {
-      const scrollAmount = direction === "left" ? -400 : 400;
-      carouselRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
-    }
-  };
-
-  const filteredScholars = useMemo(() => {
+  const scholarCards: ScholarCardItem[] = useMemo(() => {
     let result = allScholars;
 
     if (searchQuery.trim()) {
@@ -59,7 +59,17 @@ export function ScholarsScreenClient({ scholars, topics }: ScholarsScreenClientP
       );
     }
 
-    return result;
+    return result.map((s) => ({
+      id: s.id,
+      slug: s.slug,
+      name: s.name,
+      bio: s.bio,
+      imageUrl: s.imageUrl,
+      isKibar: s.isKibar,
+      collectionsCount: s.collectionsCount ?? 0,
+      standaloneSeriesCount: s.standaloneSeriesCount ?? 0,
+      standaloneLecturesCount: s.standaloneLecturesCount ?? 0,
+    }));
   }, [allScholars, searchQuery]);
 
   const toggleTopic = (topicSlug: string) => {
@@ -76,108 +86,24 @@ export function ScholarsScreenClient({ scholars, topics }: ScholarsScreenClientP
 
   return (
     <Shell title="Scholars" hideHeader>
-      <div className={styles.heroSection}>
-        <h2 className={styles.heroHeading}>
-          Learn from the <span className={styles.heroEmphasis}>Best Scholars</span>
-        </h2>
-        <p className={styles.heroSubheading}>
-          Connect with world-renowned senior scholars in Islamic sciences. Knowledge is sought from
-          those who possess it.
-        </p>
-      </div>
-
       {scholars.length === 0 ? (
         <EmptyState message="No scholars are published yet." />
       ) : (
         <>
           {featuredScholars.length > 0 && (
-            <section className={styles.featuredSection}>
-              <div className={styles.sectionHeader}>
-                <h3 className={styles.sectionTitle}>Featured Scholars</h3>
-                <div className={styles.carouselControls}>
-                  <button
-                    type="button"
-                    className={styles.carouselButton}
-                    onClick={() => scrollCarousel("left")}
-                    aria-label="Scroll left"
-                  >
-                    <ChevronLeft size={20} />
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.carouselButton}
-                    onClick={() => scrollCarousel("right")}
-                    aria-label="Scroll right"
-                  >
-                    <ChevronRight size={20} />
-                  </button>
-                </div>
-              </div>
-              <div className={styles.carouselWrapper}>
-                <div className={styles.featuredCarousel} ref={carouselRef}>
-                  {featuredScholars.map((scholar) => {
-                    const bioPreview = scholar.bio
-                      ? scholar.bio.length > 80
-                        ? `${scholar.bio.substring(0, 80)}...`
-                        : scholar.bio
-                      : "A leading authority in Islamic sciences with decades of teaching.";
-
-                    return (
-                      <a
-                        key={scholar.id}
-                        href={`/scholars/${scholar.slug}`}
-                        className={styles.featuredCard}
-                        style={
-                          scholar.imageUrl
-                            ? {
-                                backgroundImage: `url(${scholar.imageUrl})`,
-                                backgroundSize: "cover",
-                                backgroundPosition: "center",
-                              }
-                            : undefined
-                        }
-                      >
-                        {!scholar.imageUrl && (
-                          <div className={styles.featuredPlaceholder}>
-                            <span className={styles.featuredInitial}>
-                              {scholar.name.charAt(0).toUpperCase()}
-                            </span>
-                          </div>
-                        )}
-                        <div className={styles.featuredOverlay}>
-                          <span className={styles.featuredBadge}>Prominent Scholar</span>
-                          <h4 className={styles.featuredName}>{scholar.name}</h4>
-                          <p className={styles.featuredBio}>{bioPreview}</p>
-                        </div>
-                      </a>
-                    );
-                  })}
-                </div>
-              </div>
-            </section>
+            <ScholarHero
+              items={featuredScholars}
+              title="Learn from the Best Scholars"
+              description="Connect with world-renowned senior scholars in Islamic sciences. Knowledge is sought from those who possess it."
+            />
           )}
 
           <section className={styles.allScholarsSection}>
-            <div className={styles.searchContainer}>
-              <svg
-                className={styles.searchIcon}
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <path d="m21 21-4.35-4.35" />
-              </svg>
-              <input
-                type="search"
+            <div className={styles.searchWrapper}>
+              <SearchBar
                 placeholder="Search by name, specialization, or country..."
-                className={styles.searchInput}
-                aria-label="Search scholars"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={setSearchQuery}
               />
             </div>
 
@@ -203,32 +129,11 @@ export function ScholarsScreenClient({ scholars, topics }: ScholarsScreenClientP
               </div>
             </div>
 
-            <ul className={styles.scholarsGrid} aria-label="Scholars directory">
-              {filteredScholars.map((scholar) => {
-                const bioPreview = scholar.bio
-                  ? scholar.bio.length > 100
-                    ? `${scholar.bio.substring(0, 100)}...`
-                    : scholar.bio
-                  : undefined;
-
-                return (
-                  <li key={scholar.id} className={styles.scholarCard}>
-                    <ScholarAvatarCard
-                      href={`/scholars/${scholar.slug}`}
-                      name={scholar.name}
-                      subtitle={scholar.country ?? undefined}
-                      size="lg"
-                      showInitial={true}
-                      imageUrl={scholar.imageUrl ?? undefined}
-                      actionLabel="View Lessons"
-                      showBio={!!bioPreview}
-                      bioText={bioPreview}
-                      showFollowButton={true}
-                    />
-                  </li>
-                );
-              })}
-            </ul>
+            <div className={styles.scholarsGrid} role="list" aria-label="Scholars directory">
+              {scholarCards.map((scholar) => (
+                <ScholarCard key={scholar.id} scholar={scholar} />
+              ))}
+            </div>
           </section>
         </>
       )}

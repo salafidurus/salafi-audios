@@ -72,7 +72,9 @@ export function RecommendationCard({ item, variant }: CardProps) {
     <>
       <div
         className={`${styles.cover} ${styles.coverFeatured}`.trim()}
-        style={item.coverImageUrl ? { backgroundImage: `url(${item.coverImageUrl})` } : undefined}
+        style={{
+          backgroundImage: `url(${item.coverImageUrl || "/dev-mock/template-4-to-5-image.jpg"})`,
+        }}
       />
       <div className={`${styles.body} ${styles.bodyFeatured}`.trim()}>
         <div className={styles.typeLabelRow}>
@@ -87,7 +89,9 @@ export function RecommendationCard({ item, variant }: CardProps) {
   ) : (
     <div
       className={styles.cover}
-      style={item.coverImageUrl ? { backgroundImage: `url(${item.coverImageUrl})` } : undefined}
+      style={{
+        backgroundImage: `url(${item.coverImageUrl || "/dev-mock/template-4-to-5-image.jpg"})`,
+      }}
     >
       <span className={styles.typeChip}>
         <KindIcon className={styles.typeIcon} aria-hidden="true" />
