@@ -90,6 +90,7 @@ export function ScholarsScreenClient({
         <EmptyState message="No scholars are published yet." />
       ) : (
         <>
+          <h1 className={styles.pageHeading}>Scholars</h1>
           {featuredScholars.length > 0 && (
             <ScholarHero
               items={featuredScholars}
