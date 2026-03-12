@@ -17,8 +17,8 @@
   border-radius: 0;
   padding: 0.85rem;
   padding-bottom: calc(0.85rem + env(safe-area-inset-bottom, 0px));
-  padding-left: max(var(--space-page-x), env(safe-area-inset-left, 0px));
-  padding-right: max(var(--space-page-x), env(safe-area-inset-right, 0px));
+  padding-left: max(var(--space-layout-page-x), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--space-layout-page-x), env(safe-area-inset-right, 0px));
   display: grid;
   grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.4fr) auto;
   gap: 0.9rem;
@@ -27,7 +27,7 @@
   background:
     radial-gradient(circle at 18% 22%, rgb(87 216 118 / 0.16), transparent 55%),
     linear-gradient(90deg, #133423, #0f2a1c);
-  box-shadow: var(--shadow-panel);
+  box-shadow: var(--shadow-lg);
   border: 1px solid rgb(151 239 173 / 0.18);
   border-top: 0;
 }
@@ -42,7 +42,7 @@
 .art {
   width: 3.2rem;
   height: 4rem;
-  border-radius: calc(var(--radius-panel) + 0.15rem);
+  border-radius: calc(var(--radius-component-panel) + 0.15rem);
   background: radial-gradient(circle at 28% 20%, #eff9f4, #97efad 58%, #2cae4d);
   flex-shrink: 0;
   box-shadow: 0 18px 26px -26px rgb(0 0 0 / 0.6);
@@ -160,7 +160,7 @@
 .fill {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, var(--color-primary), #97efad);
+  background: linear-gradient(90deg, var(--action-primary), #97efad);
 }
 
 .right {

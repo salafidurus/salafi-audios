@@ -1,5 +1,5 @@
 .page {
-  padding: calc(var(--top-nav-height, 0px) + var(--space-page-y)) var(--space-page-x) 4rem;
+  padding: calc(var(--top-nav-height, 0px) + var(--space-layout-page-y)) var(--space-layout-page-x) 4rem;
 }
 
 .container {

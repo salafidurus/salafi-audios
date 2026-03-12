@@ -1,7 +1,8 @@
 import { Link, type Href } from "expo-router";
 import { openBrowserAsync, WebBrowserPresentationStyle } from "expo-web-browser";
 import { useState } from "react";
-import { ActivityIndicator, Platform, StyleSheet, View, ViewStyle } from "react-native";
+import { ActivityIndicator, Platform, View, ViewStyle } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 
 type ExternalLinkProps = {
   href: Href;
@@ -32,7 +33,7 @@ export function ExternalLink({ href, loading, children, style }: ExternalLinkPro
   if (isLoadingState) {
     return (
       <View style={[styles.container, style]}>
-        <ActivityIndicator size="small" />
+        <ActivityIndicator size="small" color={styles.indicator.color} />
       </View>
     );
   }
@@ -44,10 +45,13 @@ export function ExternalLink({ href, loading, children, style }: ExternalLinkPro
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   container: {
     alignItems: "center",
     justifyContent: "center",
-    padding: 8,
+    padding: theme.spacing.scale.sm,
   },
-});
+  indicator: {
+    color: theme.colors.content.muted,
+  },
+}));

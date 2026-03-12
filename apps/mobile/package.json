@@ -6,6 +6,8 @@
   "scripts": {
     "start": "expo start --dev-client",
     "dev": "expo start --dev-client",
+    "prebuild": "expo prebuild --clean",
+    "prebuild:clean": "expo prebuild --clean",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "dev:build:android": "expo run:android",
@@ -27,6 +29,7 @@
     "@sd/design-tokens": "workspace:*",
     "@sd/env": "workspace:*",
     "expo": "~55.0.6",
+    "expo-blur": "~55.0.6",
     "expo-constants": "~55.0.7",
     "expo-dev-client": "^55.0.16",
     "expo-doctor": "^1.17.14",

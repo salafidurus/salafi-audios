@@ -1,111 +1,50 @@
-import { sharedColors } from "./colors";
-import { spacing } from "./spacing";
-import { radius } from "./radius";
-import { shadows, shadowsWeb, shadowsMobile } from "./shadows";
-import { typography } from "./typography";
+import { createColors, type AppColors } from "./colors";
+import { createSpacing, type SpacingMobile, type SpacingWeb } from "./spacing";
+import { createRadius, type RadiusMobile, type RadiusWeb } from "./radius";
+import { createShadows, type ShadowsMobileTheme, type ShadowsWebTheme } from "./shadows";
+import { createTypography, type TypographyMobile, type TypographyWeb } from "./typography";
 
-export const createTheme = (mode: "light" | "dark") => {
-  const c = sharedColors;
+export type AppThemeWeb = {
+  colors: AppColors;
+  spacing: SpacingWeb;
+  radius: RadiusWeb;
+  shadows: ShadowsWebTheme;
+  typography: TypographyWeb;
+};
 
-  if (mode === "light") {
+export type AppThemeMobile = {
+  colors: AppColors;
+  spacing: SpacingMobile;
+  radius: RadiusMobile;
+  shadows: ShadowsMobileTheme;
+  typography: TypographyMobile;
+};
+
+export function createTheme(mode: "light" | "dark", platform: "web"): AppThemeWeb;
+export function createTheme(mode: "light" | "dark", platform: "mobile"): AppThemeMobile;
+export function createTheme(mode: "light" | "dark", platform: "web" | "mobile") {
+  if (platform === "web") {
     return {
-      colors: {
-        bg: c.white[200],
-        bgElevated: c.white[100],
-        surface: c.white[50],
-        surfaceSoft: c.green[50],
-        surfaceElevated: c.white[100],
-        surfaceHover: c.green[100],
-        text: c.slate[900],
-        textMuted: c.slate[500],
-        textPrimary: c.slate[900],
-        textSecondary: c.slate[500],
-        textTertiary: c.slate[400],
-        fillSecondary: c.green[50],
-        fillTertiary: c.green[100],
-        border: c.slate[300],
-        borderSubtle: c.slate[200],
-        borderStrong: c.slate[400],
-        primary: c.green[500],
-        primaryStrong: c.green[600],
-        primarySoft: c.green[100],
-        primaryHover: c.green[600],
-        primaryAlt: c.green[50],
-        primaryInk: c.green[900],
-        link: c.green[700],
-        danger: c.red[500],
-      },
-      spacing: spacing,
-      radius: radius,
-      shadows: {
-        focus: shadows.focus.light,
-        ...shadowsWeb,
-        ...shadowsMobile,
-      },
-      fontSize: typography.fontSize,
-      fontFamily: typography.fontFamily,
+      colors: createColors(mode),
+      spacing: createSpacing("web"),
+      radius: createRadius("web"),
+      shadows: createShadows(mode, "web"),
+      typography: createTypography("web"),
     };
   }
 
   return {
-    colors: {
-      bg: c.black[500],
-      bgElevated: c.slate[800],
-      surface: c.slate[800],
-      surfaceSoft: c.slate[800],
-      surfaceElevated: c.slate[800],
-      surfaceHover: c.slate[700],
-      text: c.slate[100],
-      textMuted: c.slate[400],
-      textPrimary: c.slate[100],
-      textSecondary: c.slate[400],
-      textTertiary: c.slate[500],
-      fillSecondary: c.slate[700],
-      fillTertiary: c.slate[700],
-      border: c.slate[700],
-      borderSubtle: c.slate[700],
-      borderStrong: c.slate[600],
-      primary: c.green[500],
-      primaryStrong: c.green[400],
-      primarySoft: c.green[900],
-      primaryHover: c.green[400],
-      primaryAlt: c.green[900],
-      primaryInk: c.green[900],
-      link: c.green[400],
-      danger: c.red[400],
-    },
-    spacing: spacing,
-    radius: radius,
-    shadows: {
-      focus: shadows.focus.dark,
-      ...shadowsWeb,
-      ...shadowsMobile,
-    },
-    fontSize: typography.fontSize,
-    fontFamily: typography.fontFamily,
+    colors: createColors(mode),
+    spacing: createSpacing("mobile"),
+    radius: createRadius("mobile"),
+    shadows: createShadows(mode, "mobile"),
+    typography: createTypography("mobile"),
   };
-};
+}
 
-export const lightTheme = createTheme("light");
-export const darkTheme = createTheme("dark");
-
-export const Colors = {
-  light: {
-    text: lightTheme.colors.text,
-    background: lightTheme.colors.bg,
-    tint: lightTheme.colors.primary,
-    icon: lightTheme.colors.textMuted,
-    tabIconDefault: lightTheme.colors.textMuted,
-    tabIconSelected: lightTheme.colors.primary,
-  },
-  dark: {
-    text: darkTheme.colors.text,
-    background: darkTheme.colors.bg,
-    tint: darkTheme.colors.primary,
-    icon: darkTheme.colors.textMuted,
-    tabIconDefault: darkTheme.colors.textMuted,
-    tabIconSelected: darkTheme.colors.primary,
-  },
-} as const;
+export const lightWebTheme = createTheme("light", "web");
+export const darkWebTheme = createTheme("dark", "web");
+export const lightMobileTheme = createTheme("light", "mobile");
+export const darkMobileTheme = createTheme("dark", "mobile");
 
 export type AppTheme = ReturnType<typeof createTheme>;

@@ -9,17 +9,17 @@
     radial-gradient(circle at 20% 20%, rgb(226 252 236 / 0.7), transparent 55%),
     radial-gradient(circle at 80% 0%, rgb(255 255 255 / 0.5), transparent 45%),
     linear-gradient(180deg, rgb(246 252 248 / 0.9), rgb(240 249 245 / 0.96));
-  border-top: 1px solid color-mix(in srgb, var(--color-border) 90%, transparent);
-  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--border-default) 90%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--border-default) 80%, transparent);
   box-shadow:
     inset 0 1px 0 rgb(255 255 255 / 0.8),
     0 -1px 0 rgb(12 28 20 / 0.04);
 }
 
 .inner {
-  width: min(var(--space-content-max), 100%);
+  width: min(var(--space-layout-content-max), 100%);
   margin-inline: auto;
-  padding-inline: var(--space-page-x);
+  padding-inline: var(--space-layout-page-x);
 }
 
 .header {
@@ -41,12 +41,12 @@
   font-size: clamp(1.55rem, 2.3vw, 2.1rem);
   font-weight: 700;
   margin: 0;
-  color: var(--color-text);
+  color: var(--content-default);
 }
 
 .subtitle {
   margin: 0.35rem 0 0;
-  color: var(--color-text-tertiary);
+  color: var(--content-subtle);
   font-size: 1rem;
   max-width: 44rem;
 }
@@ -56,9 +56,9 @@
 }
 
 .navBtn {
-  --btn-bg: color-mix(in srgb, var(--color-surface) 86%, transparent);
-  --btn-fg: var(--color-text-secondary);
-  --btn-border: color-mix(in srgb, var(--color-border) 70%, transparent);
+  --btn-bg: color-mix(in srgb, var(--surface-default) 86%, transparent);
+  --btn-fg: var(--content-muted);
+  --btn-border: color-mix(in srgb, var(--border-default) 70%, transparent);
   position: absolute;
   top: 45%;
   transform: translateY(-50%);

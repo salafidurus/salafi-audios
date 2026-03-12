@@ -3,15 +3,15 @@
   min-height: 0;
   display: grid;
   place-items: center;
-  padding: calc(var(--top-nav-height, 0px) + clamp(2rem, 6vw, 4rem)) var(--space-page-x);
+  padding: calc(var(--top-nav-height, 0px) + clamp(2rem, 6vw, 4rem)) var(--space-layout-page-x);
 }
 
 .card {
   width: min(42rem, 100%);
-  border-radius: var(--radius-panel);
-  border: 1px solid color-mix(in srgb, var(--color-border) 75%, transparent);
-  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
-  box-shadow: var(--shadow-panel);
+  border-radius: var(--radius-component-panel);
+  border: 1px solid color-mix(in srgb, var(--border-default) 75%, transparent);
+  background: color-mix(in srgb, var(--surface-default) 92%, transparent);
+  box-shadow: var(--shadow-lg);
   padding: clamp(1.5rem, 4vw, 2.5rem);
   text-align: center;
 }
@@ -20,8 +20,8 @@
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  font-size: var(--font-size-xs);
-  color: var(--color-text-tertiary);
+  font-size: var(--typo-xs-font-size);
+  color: var(--content-subtle);
   font-weight: 700;
 }
 
@@ -33,7 +33,7 @@
 
 .description {
   margin: 0.8rem auto 0;
-  color: var(--color-text-secondary);
+  color: var(--content-muted);
   max-width: 50ch;
 }
 
@@ -41,14 +41,14 @@
   display: inline-flex;
   margin-top: 1.4rem;
   padding: 0.55rem 1rem;
-  border-radius: var(--radius-chip);
-  border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
-  background: var(--color-surface);
-  color: var(--color-link);
+  border-radius: var(--radius-component-chip);
+  border: 1px solid color-mix(in srgb, var(--border-default) 80%, transparent);
+  background: var(--surface-default);
+  color: var(--content-primary);
   font-weight: 700;
   text-decoration: none;
 }
 
 .link:hover {
-  background: color-mix(in srgb, var(--color-primary-soft) 65%, var(--color-surface));
+  background: color-mix(in srgb, var(--surface-primary-subtle) 65%, var(--surface-default));
 }

@@ -1,12 +1,12 @@
 .band {
-  margin-top: var(--space-section-y);
+  margin-top: var(--space-layout-section-y);
   margin-bottom: 0;
-  padding: clamp(1.35rem, 2.6vw, 2.4rem) var(--space-page-x);
+  padding: clamp(1.35rem, 2.6vw, 2.4rem) var(--space-layout-page-x);
   border-radius: 0;
-  border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border-default) 85%, transparent);
   border-left: 0;
   border-right: 0;
-  background: color-mix(in srgb, var(--color-surface) 85%, transparent);
+  background: color-mix(in srgb, var(--surface-default) 85%, transparent);
   box-shadow: none;
   width: 100vw;
   margin-left: calc(50% - 50vw);
@@ -14,17 +14,17 @@
 }
 
 .inner {
-  width: min(var(--space-content-max), 100%);
+  width: min(var(--space-layout-content-max), 100%);
   margin-inline: auto;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-  gap: var(--space-gap-lg);
+  gap: var(--space-component-gap-lg);
   text-align: center;
 }
 
 .stat {
   position: relative;
-  padding-right: var(--space-gap-lg);
+  padding-right: var(--space-component-gap-lg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -37,7 +37,7 @@
   right: 0;
   width: 1px;
   height: calc(100% - 0.7rem);
-  background: color-mix(in srgb, var(--color-border) 75%, transparent);
+  background: color-mix(in srgb, var(--border-default) 75%, transparent);
 }
 
 .stat:last-child::after {
@@ -53,8 +53,8 @@
 
 .label {
   margin: 0.35rem 0 0;
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
+  color: var(--content-muted);
+  font-size: var(--typo-body-sm-font-size);
 }
 
 @media (max-width: 720px) {

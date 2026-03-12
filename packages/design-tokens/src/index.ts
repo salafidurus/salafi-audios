@@ -1,51 +1,43 @@
-export { sharedColors, type SharedColors } from "./colors";
+export { sharedColors, createColors, type SharedColors, type AppColors } from "./colors";
 
 export {
-  spacingShared,
+  createSpacing,
   spacingWeb,
   spacingMobile,
-  spacing,
-  type Spacing,
-  type SpacingShared,
   type SpacingWeb,
   type SpacingMobile,
+  type AppSpacing,
 } from "./spacing";
 
 export {
-  radiusShared,
+  createRadius,
   radiusWeb,
   radiusMobile,
-  radius,
-  type Radius,
-  type RadiusShared,
   type RadiusWeb,
   type RadiusMobile,
+  type AppRadius,
 } from "./radius";
 
 export {
-  shadowsShared,
-  shadowsWeb,
-  shadowsMobile,
-  shadows,
-  type Shadows,
-  type ShadowsShared,
-  type ShadowsWeb,
-  type ShadowsMobile,
-} from "./shadows";
-
-export {
-  fontSizeShared,
-  fontSizeWeb,
-  fontSizeMobile,
-  fontSize,
-  fontFamilyWeb,
-  fontFamilyMobile,
-  fontFamily,
-  fonts,
-  typography,
-  type Typography,
-  type FontSize,
-  type FontFamily,
+  fontWeight,
+  createTypography,
+  createTypographyWeb,
+  createTypographyMobile,
+  typographyWeb,
+  typographyMobile,
+  type TypographyVariant,
+  type TypographyWeb,
+  type TypographyMobile,
+  type AppTypography,
 } from "./typography";
 
-export { createTheme, lightTheme, darkTheme, Colors, type AppTheme } from "./theme";
+export {
+  createTheme,
+  lightWebTheme,
+  darkWebTheme,
+  lightMobileTheme,
+  darkMobileTheme,
+  type AppThemeWeb,
+  type AppThemeMobile,
+  type AppTheme,
+} from "./theme";

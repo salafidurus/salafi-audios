@@ -1,5 +1,6 @@
-import { View, StyleSheet, ViewStyle } from "react-native";
+import { View, type ViewStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { StyleSheet } from "react-native-unistyles";
 
 interface ScreenViewProps {
   children: React.ReactNode;
@@ -17,7 +18,7 @@ export function ScreenView({ children, style, center }: ScreenViewProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((_theme) => ({
   container: {
     flex: 1,
   },
@@ -28,4 +29,4 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-});
+}));

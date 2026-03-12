@@ -79,13 +79,13 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     userInterfaceStyle: "automatic",
     assetBundlePatterns: ["**/*"],
 
-    icon: "./assets/images/icon.png",
+    icon: "./assets/icons/ios-light.png",
     splash: {
-      image: "./assets/images/splash-icon.png",
+      image: "./assets/icons/splash-icon-light.png",
       resizeMode: "contain",
       backgroundColor: "#ffffff",
       dark: {
-        image: "./assets/images/splash-icon.png",
+        image: "./assets/icons/splash-icon-dark.png",
         backgroundColor: "#000000",
       },
     },
@@ -104,9 +104,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       package: androidPackage,
       adaptiveIcon: {
         backgroundColor: "#ffffff",
-        foregroundImage: "./assets/images/android-icon-foreground.png",
-        backgroundImage: "./assets/images/android-icon-background.png",
-        monochromeImage: "./assets/images/android-icon-monochrome.png",
+        foregroundImage: "./assets/icons/adaptive-icon.png",
+        backgroundImage: "./assets/icons/adaptive-icon.png",
+        monochromeImage: "./assets/icons/adaptive-icon.png",
       },
     },
 

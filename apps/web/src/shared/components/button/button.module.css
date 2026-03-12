@@ -1,9 +1,9 @@
 /* Shared button: consistent base + variants */
 
 .button {
-  --btn-bg: color-mix(in srgb, var(--color-surface) 70%, transparent);
-  --btn-fg: var(--color-text);
-  --btn-border: color-mix(in srgb, var(--color-border) 84%, transparent);
+  --btn-bg: color-mix(in srgb, var(--surface-default) 70%, transparent);
+  --btn-fg: var(--content-default);
+  --btn-border: color-mix(in srgb, var(--border-default) 84%, transparent);
   --btn-shadow: 0 14px 22px -22px rgb(20 47 33 / 0.42);
 
   appearance: none;
@@ -82,26 +82,26 @@
 }
 
 .variant-surface {
-  --btn-bg: color-mix(in srgb, var(--color-surface) 65%, transparent);
-  --btn-fg: var(--color-text);
-  --btn-border: color-mix(in srgb, var(--color-border) 84%, transparent);
+  --btn-bg: color-mix(in srgb, var(--surface-default) 65%, transparent);
+  --btn-fg: var(--content-default);
+  --btn-border: color-mix(in srgb, var(--border-default) 84%, transparent);
 }
 
 .variant-outline {
   --btn-bg: transparent;
-  --btn-fg: var(--color-text);
-  --btn-border: color-mix(in srgb, var(--color-border) 84%, transparent);
+  --btn-fg: var(--content-default);
+  --btn-border: color-mix(in srgb, var(--border-default) 84%, transparent);
 }
 
 .variant-ghost {
   --btn-bg: transparent;
-  --btn-fg: var(--color-text);
+  --btn-fg: var(--content-default);
   --btn-border: transparent;
   --btn-shadow: none;
 }
 
 .variant-ghost:hover {
-  background: color-mix(in srgb, var(--color-primary-soft) 46%, transparent);
+  background: color-mix(in srgb, var(--surface-primary-subtle) 46%, transparent);
 }
 
 .variant-danger {

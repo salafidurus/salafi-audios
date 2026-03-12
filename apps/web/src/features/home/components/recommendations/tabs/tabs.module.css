@@ -12,9 +12,9 @@
   gap: 0.35rem;
   padding: 0.35rem;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--color-surface) 70%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
-  box-shadow: var(--shadow-inline);
+  background: color-mix(in srgb, var(--surface-default) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border-default) 80%, transparent);
+  box-shadow: var(--shadow-sm);
   overflow-x: auto;
   scrollbar-width: none;
   width: fit-content;
@@ -32,8 +32,8 @@
   gap: 0.45rem;
   border: 0;
   background: transparent;
-  color: var(--color-text-muted);
-  font-size: var(--font-size-label);
+  color: var(--content-muted);
+  font-size: var(--typo-label-md-font-size);
   font-weight: 650;
   padding: 0.55rem 0.85rem;
   border-radius: 999px;
@@ -45,20 +45,20 @@
 }
 
 .tab:hover {
-  color: var(--color-text);
-  background: color-mix(in srgb, var(--color-primary-soft) 42%, transparent);
+  color: var(--content-default);
+  background: color-mix(in srgb, var(--surface-primary-subtle) 42%, transparent);
 }
 
 .tabActive {
-  color: var(--color-text);
+  color: var(--content-default);
   background:
     radial-gradient(
       circle at 20% 20%,
-      color-mix(in srgb, var(--color-primary) 34%, transparent),
+      color-mix(in srgb, var(--action-primary) 34%, transparent),
       transparent 58%
     ),
-    linear-gradient(180deg, color-mix(in srgb, var(--color-surface) 70%, transparent), transparent);
-  border: 1px solid color-mix(in srgb, var(--color-primary) 44%, var(--color-border));
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-default) 70%, transparent), transparent);
+  border: 1px solid color-mix(in srgb, var(--action-primary) 44%, var(--border-default));
   transform: translateY(-1px);
 }
 
@@ -68,7 +68,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: color-mix(in srgb, var(--color-link) 75%, var(--color-text-muted));
+  color: color-mix(in srgb, var(--content-primary) 75%, var(--content-muted));
 }
 
 .panel {
@@ -82,10 +82,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 2rem;
-  border: 1px solid color-mix(in srgb, var(--color-border) 85%, transparent);
-  border-radius: var(--radius-panel);
+  border: 1px solid color-mix(in srgb, var(--border-default) 85%, transparent);
+  border-radius: var(--radius-component-panel);
   padding: clamp(1.6rem, 3.6vw, 2.4rem);
-  background: color-mix(in srgb, var(--color-surface) 80%, transparent);
+  background: color-mix(in srgb, var(--surface-default) 80%, transparent);
   min-height: clamp(7.5rem, 16vw, 10rem);
 }
 
@@ -93,12 +93,12 @@
   margin: 0;
   font-size: clamp(1.25rem, 2.4vw, 1.6rem);
   font-weight: 720;
-  color: var(--color-text);
+  color: var(--content-default);
 }
 
 .followingSubtitle {
   margin: 0.5rem 0 0;
-  color: var(--color-text-secondary);
+  color: var(--content-muted);
   max-width: 46ch;
   font-size: 1rem;
 }
@@ -141,11 +141,11 @@
 }
 
 .emptyState {
-  border: 1px dashed color-mix(in srgb, var(--color-border) 85%, transparent);
-  border-radius: var(--radius-panel-sm);
-  padding: var(--space-gap-lg);
-  color: var(--color-text-tertiary);
-  font-size: var(--font-size-sm);
+  border: 1px dashed color-mix(in srgb, var(--border-default) 85%, transparent);
+  border-radius: var(--radius-component-panel-sm);
+  padding: var(--space-component-gap-lg);
+  color: var(--content-subtle);
+  font-size: var(--typo-body-sm-font-size);
 }
 
 @media (max-width: 700px) {

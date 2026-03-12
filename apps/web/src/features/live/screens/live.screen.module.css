@@ -1,10 +1,10 @@
 .page {
   min-height: 100vh;
-  padding: var(--top-nav-height, 0px) var(--space-page-x) 3rem;
+  padding: var(--top-nav-height, 0px) var(--space-layout-page-x) 3rem;
 }
 
 .container {
-  width: min(var(--space-content-max), 100%);
+  width: min(var(--space-layout-content-max), 100%);
   margin-inline: auto;
   display: flex;
   flex-direction: column;
@@ -19,16 +19,16 @@
 
 .subtitle {
   margin: 0;
-  color: var(--color-text-tertiary);
+  color: var(--content-subtle);
   max-width: 36rem;
 }
 
 .notice {
   padding: 1rem 1.1rem;
-  border-radius: var(--radius-panel);
-  border: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-inline);
+  border-radius: var(--radius-component-panel);
+  border: 1px solid color-mix(in srgb, var(--border-default) 70%, transparent);
+  background: var(--surface-default);
+  box-shadow: var(--shadow-sm);
 }
 
 .noticeTitle {
@@ -38,7 +38,7 @@
 
 .noticeBody {
   margin: 0;
-  color: var(--color-text-tertiary);
+  color: var(--content-subtle);
 }
 
 @media (max-width: 960px) {

@@ -4,7 +4,7 @@
 
 .tabContent {
   animation: fadeIn 0.3s ease;
-  padding-top: var(--space-2);
+  padding-top: var(--space-scale-sm);
 }
 
 @keyframes fadeIn {
@@ -23,35 +23,35 @@
 .collectionsList {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-scale-xl);
 }
 
 /* Series List */
 .seriesList {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-scale-xl);
 }
 
 /* Lectures List */
 .lecturesList {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-scale-xl);
 }
 
 /* Biography */
 .biography {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-panel);
-  padding: var(--space-6);
+  background: var(--surface-default);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-component-panel);
+  padding: var(--space-scale-2xl);
 }
 
 .biography p {
   font-size: var(--text-base);
   line-height: 1.7;
-  color: var(--color-text-secondary);
+  color: var(--content-muted);
   margin: 0;
 }
 
@@ -59,7 +59,7 @@
 .loadMore {
   display: flex;
   justify-content: center;
-  margin-top: var(--space-6);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--color-border-subtle);
+  margin-top: var(--space-scale-2xl);
+  padding-top: var(--space-scale-lg);
+  border-top: 1px solid var(--border-subtle);
 }

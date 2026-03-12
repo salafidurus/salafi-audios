@@ -1,32 +1,32 @@
 .panel {
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  border-radius: var(--radius-panel);
-  box-shadow: var(--shadow-panel);
-  margin-top: var(--space-gap-lg);
-  padding: var(--space-gap-lg) var(--space-card-p);
+  border: 1px solid var(--border-default);
+  background: var(--surface-default);
+  border-radius: var(--radius-component-panel);
+  box-shadow: var(--shadow-lg);
+  margin-top: var(--space-component-gap-lg);
+  padding: var(--space-component-gap-lg) var(--space-component-card-padding);
 }
 
 .title {
   margin-top: 0;
-  margin-bottom: var(--space-gap-md);
-  font-size: var(--font-size-h2);
+  margin-bottom: var(--space-component-gap-md);
+  font-size: var(--typo-title-lg-font-size);
   line-height: 1.25;
 }
 
 .player {
   width: 100%;
-  margin-top: var(--space-gap-sm);
+  margin-top: var(--space-component-gap-sm);
 }
 
 .linkWrap {
-  margin-top: var(--space-gap-sm);
+  margin-top: var(--space-component-gap-sm);
   margin-bottom: 0;
   word-break: break-all;
 }
 
 .link {
-  color: var(--color-link);
+  color: var(--content-primary);
   text-decoration: none;
   font-weight: 600;
 }

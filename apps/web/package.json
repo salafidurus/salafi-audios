@@ -23,6 +23,7 @@
     "@sd/contracts": "workspace:*",
     "@sd/env": "workspace:*",
     "@sd/i18n": "workspace:*",
+    "@sd/design-tokens": "workspace:*",
     "framer-motion": "^12.34.0",
     "lucide-react": "^0.564.0",
     "next": "16.1.3",
