@@ -1,4 +1,4 @@
-import type { ConfigContext, ExpoConfig } from "expo/config";
+import { ConfigContext, ExpoConfig } from "expo/config";
 import { version } from "./package.json";
 import { getMobileBuildEnv, type AppEnv } from "@sd/env";
 
