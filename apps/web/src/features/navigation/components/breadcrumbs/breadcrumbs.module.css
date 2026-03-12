@@ -1,24 +1,24 @@
 .breadcrumbs {
-  margin-bottom: var(--space-gap-lg);
+  margin-bottom: var(--space-component-gap-lg);
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-gap-sm);
-  color: var(--color-text-muted);
-  font-size: var(--font-size-caption);
+  gap: var(--space-component-gap-sm);
+  color: var(--content-muted);
+  font-size: var(--typo-caption-font-size);
 }
 
 .breadcrumbItem {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-gap-sm);
+  gap: var(--space-component-gap-sm);
 }
 
 .breadcrumbSeparator {
-  color: var(--color-border);
+  color: var(--border-default);
 }
 
 .link {
-  color: var(--color-link);
+  color: var(--content-primary);
   text-decoration: none;
   font-weight: 600;
 }

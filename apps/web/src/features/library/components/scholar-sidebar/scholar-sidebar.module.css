@@ -1,62 +1,62 @@
 .sidebar {
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: var(--space-scale-2xl);
 }
 
 .section {
-  background: var(--color-surface);
-  border-radius: var(--radius-panel);
-  padding: var(--space-5);
-  border: 1px solid var(--color-border);
+  background: var(--surface-default);
+  border-radius: var(--radius-component-panel);
+  padding: var(--space-scale-xl);
+  border: 1px solid var(--border-default);
 }
 
 .sectionHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-scale-lg);
 }
 
 .sectionTitle {
-  font-family: var(--font-display);
+  font-family: var(--typo-display-lg-font-family);
   font-size: var(--text-sm);
   font-weight: 600;
-  color: var(--color-text-secondary);
+  color: var(--content-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0;
 }
 
 .trendingIcon {
-  color: var(--color-primary);
+  color: var(--action-primary);
 }
 
 /* Social Links Grid */
 .socialGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-3);
+  gap: var(--space-scale-md);
 }
 
 .socialLink {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-4);
-  background: var(--color-fill-secondary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
+  gap: var(--space-scale-sm);
+  padding: var(--space-scale-lg);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-component-card);
   text-decoration: none;
-  color: var(--color-text-secondary);
+  color: var(--content-muted);
   transition: all 0.2s ease;
 }
 
 .socialLink:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  background: var(--color-fill-tertiary);
+  border-color: var(--action-primary);
+  color: var(--action-primary);
+  background: var(--surface-hover);
 }
 
 .socialLink span {
@@ -68,30 +68,30 @@
 .lecturesList {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-scale-lg);
 }
 
 .lectureItem {
   display: flex;
-  gap: var(--space-3);
+  gap: var(--space-scale-md);
   align-items: flex-start;
   text-decoration: none;
   color: inherit;
-  border-radius: var(--radius-card);
-  padding: var(--space-2);
-  margin: calc(var(--space-2) * -1);
+  border-radius: var(--radius-component-card);
+  padding: var(--space-scale-sm);
+  margin: calc(var(--space-scale-sm) * -1);
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .lectureItem:hover {
-  background: color-mix(in srgb, var(--color-primary-soft) 40%, transparent);
+  background: color-mix(in srgb, var(--surface-primary-subtle) 40%, transparent);
 }
 
 .rank {
-  font-family: var(--font-display);
+  font-family: var(--typo-display-lg-font-family);
   font-size: var(--text-xl);
   font-weight: 700;
-  color: var(--color-text-tertiary);
+  color: var(--content-subtle);
   line-height: 1;
   min-width: 28px;
 }
@@ -102,11 +102,11 @@
 }
 
 .lectureTitle {
-  font-family: var(--font-body);
+  font-family: var(--typo-body-md-font-family);
   font-size: var(--text-sm);
   font-weight: 500;
-  color: var(--color-text-primary);
-  margin: 0 0 var(--space-1);
+  color: var(--content-default);
+  margin: 0 0 var(--space-scale-xs);
   line-height: 1.4;
   display: -webkit-box;
   line-clamp: 2;
@@ -117,17 +117,17 @@
 
 .lectureMeta {
   font-size: var(--text-xs);
-  color: var(--color-text-tertiary);
+  color: var(--content-subtle);
 }
 
 .showMore {
   width: 100%;
-  margin-top: var(--space-4);
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-card);
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-text-secondary);
+  margin-top: var(--space-scale-lg);
+  padding: var(--space-scale-md) var(--space-scale-lg);
+  border-radius: var(--radius-component-card);
+  border: 1px solid var(--border-default);
+  background: var(--surface-default);
+  color: var(--content-muted);
   font-size: var(--text-sm);
   font-weight: 600;
   text-transform: uppercase;
@@ -138,9 +138,9 @@
 
 /* Resource Library Card */
 .resourceCard {
-  background: linear-gradient(135deg, var(--color-primary-strong) 0%, var(--color-primary) 100%);
-  border-radius: var(--radius-panel);
-  padding: var(--space-6);
+  background: linear-gradient(135deg, var(--action-primary-hover) 0%, var(--action-primary) 100%);
+  border-radius: var(--radius-component-panel);
+  padding: var(--space-scale-2xl);
   color: white;
   position: relative;
   overflow: hidden;
@@ -168,26 +168,26 @@
   letter-spacing: 1px;
   opacity: 0.8;
   display: block;
-  margin-bottom: var(--space-2);
+  margin-bottom: var(--space-scale-sm);
 }
 
 .resourceTitle {
-  font-family: var(--font-display);
+  font-family: var(--typo-display-lg-font-family);
   font-size: var(--text-lg);
   font-weight: 600;
-  margin: 0 0 var(--space-4);
+  margin: 0 0 var(--space-scale-lg);
   line-height: 1.3;
 }
 
 .resourceButton {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-scale-sm);
   background: rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-chip);
+  padding: var(--space-scale-sm) var(--space-scale-lg);
+  border-radius: var(--radius-component-chip);
   font-size: var(--text-sm);
   font-weight: 500;
   cursor: pointer;

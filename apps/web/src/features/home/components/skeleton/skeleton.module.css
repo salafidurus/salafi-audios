@@ -2,41 +2,41 @@
 .rowTitle,
 .card,
 .stats {
-  border-radius: var(--radius-panel-sm);
+  border-radius: var(--radius-component-panel-sm);
   background: linear-gradient(
     90deg,
-    color-mix(in srgb, var(--color-fill-tertiary) 80%, transparent),
-    color-mix(in srgb, var(--color-surface) 60%, transparent),
-    color-mix(in srgb, var(--color-fill-tertiary) 80%, transparent)
+    color-mix(in srgb, var(--surface-hover) 80%, transparent),
+    color-mix(in srgb, var(--surface-default) 60%, transparent),
+    color-mix(in srgb, var(--surface-hover) 80%, transparent)
   );
   background-size: 200% 100%;
   animation: shimmer 1.4s ease-in-out infinite;
 }
 
 .hero {
-  margin-top: var(--space-gap-xl);
+  margin-top: var(--space-component-gap-xl);
   height: clamp(14rem, 24vw, 19rem);
 }
 
 .tabsShell {
-  margin-top: var(--space-gap-lg);
+  margin-top: var(--space-component-gap-lg);
   display: flex;
   flex-direction: column;
-  gap: var(--space-gap-xl);
+  gap: var(--space-component-gap-xl);
 }
 
 .row {
-  margin-top: var(--space-section-y);
+  margin-top: var(--space-layout-section-y);
   display: flex;
   flex-direction: column;
-  gap: var(--space-gap-md);
+  gap: var(--space-component-gap-md);
 }
 
 .rowHeading {
   margin: 0;
-  font-size: var(--font-size-h2);
+  font-size: var(--typo-title-lg-font-size);
   font-weight: 700;
-  color: var(--color-text);
+  color: var(--content-default);
   line-height: 1.2;
 }
 
@@ -47,7 +47,7 @@
 
 .rowCards {
   display: flex;
-  gap: var(--space-gap-lg);
+  gap: var(--space-component-gap-lg);
   overflow: hidden;
 }
 
@@ -56,9 +56,9 @@
 }
 
 .stats {
-  margin-top: var(--space-section-y);
+  margin-top: var(--space-layout-section-y);
   height: 5.5rem;
-  border-radius: var(--radius-panel);
+  border-radius: var(--radius-component-panel);
 }
 
 @keyframes shimmer {

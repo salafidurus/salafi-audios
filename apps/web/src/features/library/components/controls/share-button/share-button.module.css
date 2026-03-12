@@ -1,18 +1,18 @@
 .button {
-  padding: var(--space-chip-y) var(--space-chip-x);
-  border-radius: var(--radius-chip);
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-text);
-  font-size: var(--font-size-caption);
+  padding: var(--space-component-chip-y) var(--space-component-chip-x);
+  border-radius: var(--radius-component-chip);
+  border: 1px solid var(--border-default);
+  background: var(--surface-default);
+  color: var(--content-default);
+  font-size: var(--typo-caption-font-size);
   font-weight: 600;
   cursor: pointer;
   transition: border-color 180ms ease, background 180ms ease;
 }
 
 .button:hover {
-  border-color: var(--color-primary-strong);
-  background: var(--color-surface-soft);
+  border-color: var(--action-primary-hover);
+  background: var(--surface-subtle);
 }
 
 .button:focus-visible {

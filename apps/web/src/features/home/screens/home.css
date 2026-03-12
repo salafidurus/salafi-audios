@@ -1,9 +1,9 @@
 /* Home screen layout styles - minimal assembly styles only */
 
 .shell {
-  width: min(var(--space-content-max), 100%);
+  width: min(var(--space-layout-content-max), 100%);
   margin-inline: auto;
-  padding: var(--top-nav-height, 0px) var(--space-page-x) 0;
+  padding: var(--top-nav-height, 0px) var(--space-layout-page-x) 0;
 }
 
 .shell > * + * {

@@ -16,14 +16,14 @@
 }
 
 .navBtn {
-  --btn-bg: color-mix(in srgb, var(--color-surface) 75%, transparent);
-  --btn-fg: var(--color-text-secondary);
-  --btn-border: color-mix(in srgb, var(--color-border) 70%, transparent);
+  --btn-bg: color-mix(in srgb, var(--surface-default) 75%, transparent);
+  --btn-fg: var(--content-muted);
+  --btn-border: color-mix(in srgb, var(--border-default) 70%, transparent);
 }
 
 .head h2 {
   margin: 0;
-  font-size: var(--font-size-h2);
+  font-size: var(--typo-title-lg-font-size);
   line-height: 1.2;
   letter-spacing: -0.01em;
 }
@@ -35,8 +35,8 @@
   height: 0.35rem;
   border-radius: 999px;
   margin-left: 0.6rem;
-  background: var(--color-primary);
-  box-shadow: var(--shadow-inline);
+  background: var(--action-primary);
+  box-shadow: var(--shadow-sm);
 }
 
 .scroller {
@@ -68,11 +68,11 @@
 }
 
 .empty {
-  border: 1px dashed color-mix(in srgb, var(--color-border) 85%, transparent);
-  border-radius: var(--radius-panel-sm);
-  padding: var(--space-gap-lg);
-  color: var(--color-text-tertiary);
-  font-size: var(--font-size-sm);
+  border: 1px dashed color-mix(in srgb, var(--border-default) 85%, transparent);
+  border-radius: var(--radius-component-panel-sm);
+  padding: var(--space-component-gap-lg);
+  color: var(--content-subtle);
+  font-size: var(--typo-body-sm-font-size);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -84,27 +84,27 @@
   align-items: center;
   justify-content: center;
   padding: 0.45rem 0.85rem;
-  border-radius: var(--radius-chip);
-  border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
-  background: var(--color-surface);
-  color: var(--color-link);
+  border-radius: var(--radius-component-chip);
+  border: 1px solid color-mix(in srgb, var(--border-default) 80%, transparent);
+  background: var(--surface-default);
+  color: var(--content-primary);
   font-weight: 700;
   text-decoration: none;
 }
 
 .emptyCta:hover {
-  background: color-mix(in srgb, var(--color-primary-soft) 65%, var(--color-surface));
+  background: color-mix(in srgb, var(--surface-primary-subtle) 65%, var(--surface-default));
 }
 
 .skeletonCard {
   min-width: 23.25rem;
   max-width: 26.25rem;
   height: 21.75rem;
-  border-radius: var(--radius-panel);
+  border-radius: var(--radius-component-panel);
   background:
     linear-gradient(90deg, transparent, rgb(255 255 255 / 0.12), transparent),
-    color-mix(in srgb, var(--color-fill-secondary) 78%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent);
+    color-mix(in srgb, var(--surface-subtle) 78%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border-default) 70%, transparent);
   animation: shimmer 1.6s ease-in-out infinite;
 }
 

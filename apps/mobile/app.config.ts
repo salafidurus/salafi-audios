@@ -1,4 +1,4 @@
-import type { ConfigContext, ExpoConfig } from "expo/config";
+import { ConfigContext, ExpoConfig } from "expo/config";
 import { version } from "./package.json";
 import { getMobileBuildEnv, type AppEnv } from "@sd/env";
 
@@ -49,7 +49,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     scheme,
     version,
 
-    newArchEnabled: true,
     platforms: ["ios", "android"],
     orientation: "default",
 
@@ -58,7 +57,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       [
         "expo-splash-screen",
         {
-          image: "./assets/images/splash-icon.png",
+          image: "./assets/icons/splash-icon-light.png",
           imageWidth: 200,
           resizeMode: "contain",
           backgroundColor: "#ffffff",
@@ -69,6 +68,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       ],
       "expo-localization",
       "expo-font",
+      "expo-web-browser",
     ],
 
     experiments: {
@@ -79,13 +79,13 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     userInterfaceStyle: "automatic",
     assetBundlePatterns: ["**/*"],
 
-    icon: "./assets/images/icon.png",
+    icon: "./assets/icons/ios-light.png",
     splash: {
-      image: "./assets/images/splash-icon.png",
+      image: "./assets/icons/splash-icon-light.png",
       resizeMode: "contain",
       backgroundColor: "#ffffff",
       dark: {
-        image: "./assets/images/splash-icon.png",
+        image: "./assets/icons/splash-icon-dark.png",
         backgroundColor: "#000000",
       },
     },
@@ -102,12 +102,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     android: {
       ...config.android,
       package: androidPackage,
-      edgeToEdgeEnabled: true,
       adaptiveIcon: {
         backgroundColor: "#ffffff",
-        foregroundImage: "./assets/images/android-icon-foreground.png",
-        backgroundImage: "./assets/images/android-icon-background.png",
-        monochromeImage: "./assets/images/android-icon-monochrome.png",
+        foregroundImage: "./assets/icons/adaptive-icon.png",
+        backgroundImage: "./assets/icons/adaptive-icon.png",
+        monochromeImage: "./assets/icons/adaptive-icon.png",
       },
     },
 

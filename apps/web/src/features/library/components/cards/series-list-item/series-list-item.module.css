@@ -3,11 +3,11 @@
    display: grid;
    grid-template-columns: clamp(9.5rem, 22vw, 12.5rem) minmax(0, 1fr) auto;
   align-items: center;
-   background: color-mix(in srgb, var(--color-surface) 94%, transparent);
-   border: 1px solid color-mix(in srgb, var(--color-border) 82%, transparent);
-   border-radius: calc(var(--radius-panel) + 0.15rem);
+   background: color-mix(in srgb, var(--surface-default) 94%, transparent);
+   border: 1px solid color-mix(in srgb, var(--border-default) 82%, transparent);
+   border-radius: calc(var(--radius-component-panel) + 0.15rem);
    overflow: hidden;
-   box-shadow: var(--shadow-inline);
+   box-shadow: var(--shadow-sm);
  }
 
  .rowLink {
@@ -17,8 +17,8 @@
  }
 
  .card:hover {
-   box-shadow: var(--shadow-card);
-   border-color: color-mix(in srgb, var(--color-border) 92%, transparent);
+   box-shadow: var(--shadow-md);
+   border-color: color-mix(in srgb, var(--border-default) 92%, transparent);
  }
 
  .card:focus-within {
@@ -33,12 +33,12 @@
     width: auto;
    background:
      radial-gradient(circle at 24% 18%,
-       color-mix(in srgb, var(--color-primary) 22%, transparent),
+       color-mix(in srgb, var(--action-primary) 22%, transparent),
        transparent 58%),
-     linear-gradient(135deg, var(--color-fill-tertiary), var(--color-fill-secondary));
+     linear-gradient(135deg, var(--surface-hover), var(--surface-subtle));
    background-size: cover;
    background-position: center;
-   border-right: 1px solid color-mix(in srgb, var(--color-border) 72%, transparent);
+   border-right: 1px solid color-mix(in srgb, var(--border-default) 72%, transparent);
  }
 
  .typeChip {
@@ -47,15 +47,15 @@
    left: 0.85rem;
    display: inline-flex;
    align-items: center;
-   border-radius: var(--radius-chip);
+   border-radius: var(--radius-component-chip);
    padding: 0.22rem 0.55rem;
    font-size: 0.82rem;
    font-weight: 800;
    letter-spacing: 0.06em;
    text-transform: uppercase;
-   background: color-mix(in srgb, var(--color-surface) 72%, transparent);
-   border: 1px solid color-mix(in srgb, var(--color-border) 78%, transparent);
-   color: var(--color-text);
+   background: color-mix(in srgb, var(--surface-default) 72%, transparent);
+   border: 1px solid color-mix(in srgb, var(--border-default) 78%, transparent);
+   color: var(--content-default);
  }
 
  .body {
@@ -65,14 +65,14 @@
    min-width: 0;
    display: flex;
    flex-direction: column;
-   gap: var(--space-2);
+   gap: var(--space-scale-sm);
  }
 
  .title {
-   font-family: var(--font-body);
+   font-family: var(--typo-body-md-font-family);
    font-size: 1.22rem;
    font-weight: 750;
-   color: var(--color-text-primary);
+   color: var(--content-default);
    margin: 0;
    letter-spacing: -0.01em;
    line-height: 1.2;
@@ -85,7 +85,7 @@
 
  .description {
    margin: 0;
-   color: var(--color-text-secondary);
+   color: var(--content-muted);
    font-size: 1.02rem;
    line-height: 1.45;
    display: -webkit-box;
@@ -106,7 +106,7 @@
    display: inline-flex;
    align-items: center;
    gap: 0.4rem;
-   color: var(--color-text-tertiary);
+   color: var(--content-subtle);
    font-size: 0.95rem;
    text-transform: uppercase;
    letter-spacing: 0.05em;
@@ -116,7 +116,7 @@
  .metaIcon {
    width: 0.95rem;
    height: 0.95rem;
-   color: color-mix(in srgb, var(--color-text-tertiary) 88%, var(--color-border));
+   color: color-mix(in srgb, var(--content-subtle) 88%, var(--border-default));
  }
 
  .actions {
@@ -144,7 +144,7 @@
 
    .cover {
      border-right: 0;
-     border-bottom: 1px solid color-mix(in srgb, var(--color-border) 72%, transparent);
+     border-bottom: 1px solid color-mix(in srgb, var(--border-default) 72%, transparent);
     width: 100%;
       height: auto;
    }

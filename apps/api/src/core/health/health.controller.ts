@@ -1,58 +1,49 @@
-import { PrismaService } from '@/shared/db/prisma.service';
 import { ApiCommonErrors } from '@/shared/decorators/api-common-errors.decorator';
 import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  HealthCheck,
+  HealthCheckResult,
+  HealthCheckService,
+} from '@nestjs/terminus';
 import { SkipThrottle } from '@nestjs/throttler';
-import { HealthDbResponseDto } from './dto/health-db.dto';
-import { HEALTH_STATUS_VALUES, HealthResponseDto } from './dto/health.dto';
+import { PrismaHealthIndicator } from './prisma-health.indicator';
 
 @SkipThrottle()
 @ApiTags('Health')
 @ApiCommonErrors()
 @Controller('health')
 export class HealthController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly health: HealthCheckService,
+    private readonly prismaHealth: PrismaHealthIndicator,
+  ) {}
 
   @Get()
-  @ApiOperation({ summary: 'Health check' })
-  @ApiOkResponse({ type: HealthResponseDto })
-  getHealth(): HealthResponseDto {
-    return {
-      status: HEALTH_STATUS_VALUES[0],
-      timestamp: new Date().toISOString(),
-      service: process.env.SERVICE_NAME ?? undefined,
-      environment: process.env.NODE_ENV ?? undefined,
-    };
+  @ApiOperation({ summary: 'Health check (full)' })
+  @ApiOkResponse({ description: 'Health check result' })
+  @HealthCheck()
+  getHealth(): Promise<HealthCheckResult> {
+    return this.health.check([
+      () => this.prismaHealth.pingCheck('database', { timeout: 300 }),
+    ]);
   }
 
-  @Get('db')
-  @ApiOkResponse({ type: HealthDbResponseDto })
-  async getDbHealth(): Promise<HealthDbResponseDto> {
-    try {
-      // Try to reconnect if connection is closed
-      await this.prisma.$connect();
+  @Get('live')
+  @ApiOperation({ summary: 'Liveness probe' })
+  @ApiOkResponse({ description: 'Liveness check result' })
+  @HealthCheck()
+  getLive(): Promise<HealthCheckResult> {
+    return this.health.check([]);
+  }
 
-      // simplest + fastest: SELECT 1
-      await this.prisma.$queryRawUnsafe('SELECT 1');
-
-      return {
-        status: 'ok',
-        provider: 'postgresql',
-        timestamp: new Date().toISOString(),
-      };
-    } catch {
-      // Attempt to reconnect
-      await this.prisma.$disconnect();
-      await this.prisma.$connect();
-
-      // Retry the query
-      await this.prisma.$queryRawUnsafe('SELECT 1');
-
-      return {
-        status: 'ok',
-        provider: 'postgresql',
-        timestamp: new Date().toISOString(),
-      };
-    }
+  @Get('ready')
+  @ApiOperation({ summary: 'Readiness probe' })
+  @ApiOkResponse({ description: 'Readiness check result' })
+  @HealthCheck()
+  getReady(): Promise<HealthCheckResult> {
+    return this.health.check([
+      () => this.prismaHealth.pingCheck('database', { timeout: 300 }),
+    ]);
   }
 }

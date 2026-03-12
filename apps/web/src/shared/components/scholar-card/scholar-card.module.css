@@ -2,7 +2,7 @@
   display: block;
   text-decoration: none;
   color: inherit;
-  border-radius: var(--radius-panel);
+  border-radius: var(--radius-component-panel);
   outline: none;
   min-width: 17.5rem;
   max-width: 23.5rem;
@@ -26,7 +26,7 @@
   width: 100%;
   aspect-ratio: 4 / 5;
   overflow: hidden;
-  border-radius: var(--radius-panel);
+  border-radius: var(--radius-component-panel);
 }
 
 .coverImage {
@@ -34,10 +34,10 @@
   background:
     radial-gradient(
       circle at 25% 18%,
-      color-mix(in srgb, var(--color-primary) 32%, transparent),
+      color-mix(in srgb, var(--action-primary) 32%, transparent),
       transparent 58%
     ),
-    linear-gradient(135deg, var(--color-fill-tertiary), var(--color-fill-secondary));
+    linear-gradient(135deg, var(--surface-hover), var(--surface-subtle));
 }
 
 .coverOverlay {
@@ -66,7 +66,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  border-radius: var(--radius-chip);
+  border-radius: var(--radius-component-chip);
   padding: 0.25rem 0.55rem;
   font-size: 0.65rem;
   font-weight: 700;
@@ -145,7 +145,7 @@
   height: 1.75rem;
   border: 1px solid rgba(255, 255, 255, 0.4);
   background: rgba(0, 0, 0, 0.3);
-  border-radius: var(--radius-chip);
+  border-radius: var(--radius-component-chip);
   cursor: pointer;
   backdrop-filter: blur(4px);
   transition:
@@ -178,13 +178,13 @@
 .viewBtn {
   display: inline-flex;
   align-items: center;
-  border-radius: var(--radius-chip);
+  border-radius: var(--radius-component-chip);
   padding: 0.35rem 0.6rem;
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  background: var(--color-primary);
+  background: var(--action-primary);
   color: #ffffff;
   backdrop-filter: blur(4px);
   transition:
@@ -193,7 +193,7 @@
 }
 
 .card:hover .viewBtn {
-  background: var(--color-primary-strong);
+  background: var(--action-primary-hover);
   transform: scale(1.02);
 }
 

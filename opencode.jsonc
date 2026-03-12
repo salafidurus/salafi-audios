@@ -31,6 +31,12 @@
     },
     "kratos": {
       "enabled": false
+    },
+    "context7": {
+      "enabled": true
+    },
+    "server-memory": {
+      "enabled": true
     }
   }
 }
