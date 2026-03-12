@@ -49,7 +49,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     scheme,
     version,
 
-    newArchEnabled: true,
     platforms: ["ios", "android"],
     orientation: "default",
 
@@ -102,7 +101,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     android: {
       ...config.android,
       package: androidPackage,
-      edgeToEdgeEnabled: true,
       adaptiveIcon: {
         backgroundColor: "#ffffff",
         foregroundImage: "./assets/images/android-icon-foreground.png",
