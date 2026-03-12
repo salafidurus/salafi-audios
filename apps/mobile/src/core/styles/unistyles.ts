@@ -2,7 +2,7 @@
 import { StyleSheet } from "react-native-unistyles";
 
 import { breakpoints } from "./breakpoints";
-import { lightTheme, darkTheme } from "./theme";
+import { lightTheme, darkTheme } from "@sd/design-tokens";
 
 type AppBreakpoints = typeof breakpoints;
 

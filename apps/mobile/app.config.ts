@@ -57,7 +57,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       [
         "expo-splash-screen",
         {
-          image: "./assets/images/splash-icon.png",
+          image: "./assets/icons/splash-icon-light.png",
           imageWidth: 200,
           resizeMode: "contain",
           backgroundColor: "#ffffff",
@@ -68,6 +68,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       ],
       "expo-localization",
       "expo-font",
+      "expo-web-browser",
     ],
 
     experiments: {
