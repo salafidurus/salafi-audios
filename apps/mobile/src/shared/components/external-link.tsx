@@ -1,22 +1,33 @@
 import { Link, type Href } from "expo-router";
 import { openBrowserAsync, WebBrowserPresentationStyle } from "expo-web-browser";
-import { useState } from "react";
+import { useState, type ComponentProps, type ReactNode } from "react";
 import { ActivityIndicator, Platform, View, ViewStyle } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+
+type LinkProps = ComponentProps<typeof Link>;
 
 type ExternalLinkProps = {
   href: Href;
   loading?: boolean;
-  style?: ViewStyle;
-  children?: React.ReactNode;
+  containerStyle?: ViewStyle;
+  linkStyle?: LinkProps["style"];
+  children?: ReactNode;
 };
 
-export function ExternalLink({ href, loading, children, style }: ExternalLinkProps) {
+export function ExternalLink({
+  href,
+  loading,
+  children,
+  containerStyle,
+  linkStyle,
+}: ExternalLinkProps) {
   const [isLoading, setIsLoading] = useState(false);
 
-  const handlePress = async (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+  const handlePress: NonNullable<LinkProps["onPress"]> = async (event) => {
     if (Platform.OS !== "web") {
-      event.preventDefault();
+      if ("preventDefault" in event) {
+        event.preventDefault();
+      }
       setIsLoading(true);
       try {
         await openBrowserAsync(href.toString(), {
@@ -32,14 +43,14 @@ export function ExternalLink({ href, loading, children, style }: ExternalLinkPro
 
   if (isLoadingState) {
     return (
-      <View style={[styles.container, style]}>
+      <View style={[styles.container, containerStyle]}>
         <ActivityIndicator size="small" color={styles.indicator.color} />
       </View>
     );
   }
 
   return (
-    <Link target="_blank" href={href} onPress={handlePress as any} style={style as any}>
+    <Link target="_blank" href={href} onPress={handlePress} style={linkStyle}>
       {children}
     </Link>
   );
