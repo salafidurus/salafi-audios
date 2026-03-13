@@ -12,7 +12,7 @@ done || {
   exit 0
 }
 
-pnpm turbo lint typecheck test:prepush --affected --base=origin/main
+pnpm turbo lint typecheck test:prepush --affected
 
 if git diff --quiet origin/main...HEAD -- README.md ':(glob)docs/**/*.md' AGENT.md AGENTS.md .github/copilot-instructions.md; then
   printf "pre-push: skipping docs:quality (no docs changes)\n"
