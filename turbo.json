@@ -51,6 +51,11 @@
       "inputs": ["$TURBO_DEFAULT$", "src/**", "package.json", "tsconfig*.json"],
       "outputs": ["dist/**"]
     },
+    "dev:mobile:prebuild": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    },
     "clean": {
       "cache": false
     }
