@@ -1,24 +1,35 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
+import { useUnistyles } from "react-native-unistyles";
+import { Providers } from "@/shared/components/Providers";
+import { initIntegrations, getWrappedLayout } from "@/core/config/integrations";
 
-import { useColorScheme } from "../hooks/use-color-scheme";
+initIntegrations();
 
-export const unstable_settings = {
-  anchor: "(tabs)",
-};
-
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
+function RootLayout() {
+  const { theme } = useUnistyles();
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+    <Providers>
+      <StatusBar style="auto" />
+      <Stack
+        initialRouteName="(tabs)"
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: theme.colors.surface.default,
+          },
+          headerTitleStyle: {
+            color: theme.colors.content.default,
+          },
+          headerTintColor: theme.colors.content.default,
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name="(tabs)" />
         <Stack.Screen name="modal" options={{ presentation: "modal", title: "Modal" }} />
       </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    </Providers>
   );
 }
+
+export default getWrappedLayout(RootLayout);

@@ -1,5 +1,5 @@
 .section {
-  margin-bottom: var(--space-section-y);
+  margin-bottom: var(--space-layout-section-y);
 }
 
 .heading {
@@ -10,7 +10,7 @@
 
 .title {
   margin-top: 0;
-  margin-bottom: var(--space-gap-md);
-  font-size: var(--font-size-h2);
+  margin-bottom: var(--space-component-gap-md);
+  font-size: var(--typo-title-lg-font-size);
   line-height: 1.25;
 }

@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
-import { getScholarsMetadata, ScholarsScreen } from "@/features/library/screens/scholars.screen";
+import { ScholarsScreen } from "@/features/library/screens/scholars.screen";
+import { canonical } from "@/features/library/utils/seo";
 
-export const metadata: Metadata = getScholarsMetadata();
+export const metadata: Metadata = {
+  title: "Scholars",
+  description: "Browse active scholars in the published Salafi Durus library.",
+  alternates: {
+    canonical: canonical("/scholars"),
+  },
+};
 
 export default async function ScholarsPage() {
   return <ScholarsScreen />;

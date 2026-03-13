@@ -10,6 +10,11 @@ export type AppEnv = z.infer<typeof AppEnvSchema>;
 const MobileBuildEnvSchema = z.object({
   APP_ENV: AppEnvSchema.default("development"),
   EXPO_PUBLIC_API_URL: z.string().url(),
+  SENTRY_AUTH_TOKEN: z.string().optional(),
+  EXPO_PUBLIC_SENTRY_DSN: z.string().url(),
+  EXPO_PUBLIC_SENTRY_ORG: z.string(),
+  EXPO_PUBLIC_SENTRY_PROJECT: z.string(),
+  EXPO_PUBLIC_VEXO_PROJECT_ID: z.string(),
 });
 
 export type MobileBuildEnv = z.infer<typeof MobileBuildEnvSchema>;
@@ -35,6 +40,10 @@ export function getMobileBuildEnv(raw: NodeJS.ProcessEnv = process.env): MobileB
 const MobileRuntimeExtraSchema = z.object({
   appEnv: AppEnvSchema,
   apiUrl: z.string().url(),
+  sentryDsn: z.string().url().optional(),
+  sentryOrg: z.string().optional(),
+  sentryProject: z.string().optional(),
+  vexoProjectId: z.string().optional(),
 });
 
 export type MobileRuntimeExtra = z.infer<typeof MobileRuntimeExtraSchema>;

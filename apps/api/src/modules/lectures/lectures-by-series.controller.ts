@@ -3,7 +3,7 @@ import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ApiCommonErrors } from '@/shared/decorators/api-common-errors.decorator';
 import { LecturesService } from './lectures.service';
-import { LectureViewDto } from './dto/lecture-view.dto';
+import type { LectureViewDto } from '@sd/contracts';
 
 @SkipThrottle()
 @ApiTags('Lectures')
@@ -17,7 +17,7 @@ export class LecturesBySeriesController {
     summary:
       'List published lectures for a given series (scoped by scholar + series)',
   })
-  @ApiOkResponse({ type: [LectureViewDto] })
+  @ApiOkResponse({ description: 'List of published lectures for the series' })
   listForSeries(
     @Param('scholarSlug') scholarSlug: string,
     @Param('seriesSlug') seriesSlug: string,

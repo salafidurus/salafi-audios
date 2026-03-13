@@ -1,19 +1,87 @@
 import type { Metadata } from "next";
-import { Fraunces, Manrope } from "next/font/google";
+import Script from "next/script";
+import localFont from "next/font/local";
+
 import "./globals.css";
+import { themeCss } from "./theme-css";
+
 import { Header } from "@/features/navigation/components/header/header";
 import { Footer } from "@/features/navigation/components/footer/footer";
 
-const displayFont = Fraunces({
+const fraunces = localFont({
   variable: "--font-display",
-  subsets: ["latin"],
-  weight: ["500", "700"],
+  display: "swap",
+  src: [
+    {
+      path: "../../public/fonts/Fraunces-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Fraunces-SemiBold.ttf",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Fraunces-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
 });
 
-const bodyFont = Manrope({
+const manrope = localFont({
   variable: "--font-body",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  src: [
+    {
+      path: "../../public/fonts/Manrope-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Manrope-Medium.ttf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Manrope-SemiBold.ttf",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Manrope-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+});
+
+const geistMono = localFont({
+  variable: "--font-mono",
+  display: "swap",
+  src: [
+    {
+      path: "../../public/fonts/GeistMono-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/GeistMono-Medium.ttf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/GeistMono-SemiBold.ttf",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/GeistMono-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
 });
 
 const metadataBase =
@@ -46,7 +114,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${displayFont.variable} ${bodyFont.variable} antialiased`}>
+      <body
+        className={`${fraunces.variable} ${manrope.variable} ${geistMono.variable} antialiased`}
+      >
+        <Script src="https://www.vexo.co/analytics.js" strategy="afterInteractive" />
+        <style>{themeCss}</style>
         <div className="appFrame">
           <Header searchPlaceholder="Search for lectures, books, or scholars..." />
           <div className="appMain">{children}</div>

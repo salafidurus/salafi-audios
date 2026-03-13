@@ -3,7 +3,7 @@ name: Production Hotfix OTA
 on:
   pull_request:
     branches:
-      - "production"
+      - production
     types:
       - opened
       - synchronize

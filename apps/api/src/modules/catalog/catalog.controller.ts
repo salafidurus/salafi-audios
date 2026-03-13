@@ -10,9 +10,11 @@ import {
   LectureCatalogPageDto,
   SeriesCatalogPageDto,
 } from './dto/catalog-page.dto';
-import { CollectionViewDto } from '../collections/dto/collection-view.dto';
-import { SeriesViewDto } from '../series/dto/series-view.dto';
-import { LectureViewDto } from '../lectures/dto/lecture-view.dto';
+import type {
+  CollectionViewDto,
+  SeriesViewDto,
+  LectureViewDto,
+} from '@sd/contracts';
 
 @SkipThrottle()
 @ApiTags('Catalog')

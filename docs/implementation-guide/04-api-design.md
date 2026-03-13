@@ -287,6 +287,26 @@ Silent changes in behavior are avoided.
 
 ---
 
+## Shared Contracts Package
+
+Shared TypeScript types for API contracts are maintained in `packages/contracts`.
+
+This package:
+
+- Exports type definitions for all shared DTOs
+- Provides TanStack Query hooks for data fetching
+- Is the single source of truth for types shared across web, mobile, and API
+
+When API response shapes change:
+
+1. Update types in `packages/contracts/src/types/`
+2. Run `pnpm --filter @sd/contracts build`
+3. All client apps automatically receive updated types
+
+Types are hand-written and stable - no code generation is used.
+
+---
+
 ## Closing Note
 
 The API of Salafi Durus is a foundational asset.

@@ -17,9 +17,9 @@ export class AudioAssetViewDto {
   bitrateKbps?: number;
 
   @ApiPropertyOptional({
-    description: 'BigInt as string',
+    description: 'File size in bytes',
   })
-  sizeBytes?: string;
+  sizeBytes?: number;
 
   @ApiPropertyOptional()
   durationSeconds?: number;

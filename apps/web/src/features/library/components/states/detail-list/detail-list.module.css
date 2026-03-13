@@ -5,9 +5,9 @@
 .row {
   display: flex;
   justify-content: space-between;
-  gap: var(--space-gap-lg);
-  padding: var(--space-gap-md) 0;
-  border-bottom: 1px solid var(--color-border);
+  gap: var(--space-component-gap-lg);
+  padding: var(--space-component-gap-md) 0;
+  border-bottom: 1px solid var(--border-default);
 }
 
 .row:last-child {
@@ -15,10 +15,10 @@
 }
 
 .label {
-  color: var(--color-text-muted);
+  color: var(--content-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  font-size: var(--font-size-caption);
+  font-size: var(--typo-caption-font-size);
   font-weight: 700;
 }
 

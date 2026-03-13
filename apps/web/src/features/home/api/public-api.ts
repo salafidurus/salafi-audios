@@ -1,4 +1,3 @@
-import { getWebEnv } from "@/shared/utils/env";
 import type {
   Collection,
   Lecture,
@@ -7,6 +6,7 @@ import type {
   TopicDetail,
   TopicLecture,
 } from "@/features/library/types/library.types";
+import { getWebEnv } from "@/shared/utils/env";
 
 export type RecommendationHeroItem = {
   kind: "series" | "collection" | "lecture";
@@ -38,6 +38,15 @@ export type RecommendationItem = {
 export type RecommendationPage = {
   items: RecommendationItem[];
   nextCursor?: string;
+};
+
+export type ScholarStats = {
+  seriesCount: number;
+  lecturesCount: number;
+  followerCount: number;
+  collectionsCount: number;
+  standaloneSeriesCount: number;
+  standaloneLecturesCount: number;
 };
 
 const PUBLIC_REVALIDATE_SECONDS = 120;
@@ -134,6 +143,17 @@ export const publicApi = {
       `/recommendations/popular${buildPageQuery(limit, cursor, undefined, windowDays)}`,
       options,
     ),
+  listScholarPopular: (
+    scholarSlug: string,
+    limit?: number,
+    cursor?: string,
+    options?: RequestOptions,
+    windowDays?: number,
+  ) =>
+    requestPublic<RecommendationPage>(
+      `/scholars/${scholarSlug}/popular${buildPageQuery(limit, cursor, undefined, windowDays)}`,
+      options,
+    ),
   listPopularTopics: (
     topicsCsv?: string,
     limit?: number,
@@ -148,6 +168,8 @@ export const publicApi = {
   listScholars: (options?: RequestOptions) => requestPublic<Scholar[]>("/scholars", options),
   getScholar: (scholarSlug: string, options?: RequestOptions) =>
     requestPublic<Scholar>(`/scholars/${scholarSlug}`, options),
+  getScholarStats: (scholarSlug: string, options?: RequestOptions) =>
+    requestPublic<ScholarStats>(`/scholars/${scholarSlug}/stats`, options),
   listScholarCollections: (scholarSlug: string, options?: RequestOptions) =>
     requestPublic<Collection[]>(`/scholars/${scholarSlug}/collections`, options),
   getScholarCollection: (scholarSlug: string, collectionSlug: string, options?: RequestOptions) =>

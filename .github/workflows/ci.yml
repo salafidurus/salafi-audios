@@ -43,7 +43,6 @@ jobs:
       test: ${{ steps.filter.outputs.test }}
       web_e2e: ${{ steps.filter.outputs.web_e2e }}
       db_generated_policy: ${{ steps.filter.outputs.db_generated_policy }}
-      contract: ${{ steps.filter.outputs.contract }}
     steps:
       - uses: dorny/paths-filter@v3
         id: filter
@@ -76,17 +75,11 @@ jobs:
             db_generated_policy:
               - "packages/db/prisma/**"
               - "packages/db/prisma.config.ts"
-            contract:
-              - "apps/api/src/**"
-              - "apps/api/openapi.json"
-              - "packages/api-client/orval.config.cjs"
-              - "packages/db/prisma/**"
-              - "packages/db/src/**"
 
   build_deps:
     name: build:deps
     needs: changes
-    if: needs.changes.outputs.lint == 'true' || needs.changes.outputs.typecheck == 'true' || needs.changes.outputs.web_e2e == 'true' || needs.changes.outputs.contract == 'true'
+    if: needs.changes.outputs.lint == 'true' || needs.changes.outputs.typecheck == 'true' || needs.changes.outputs.web_e2e == 'true'
     runs-on: ubuntu-latest
     environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
     env:
@@ -160,7 +153,7 @@ jobs:
     needs:
       - build_deps
       - changes
-    if: needs.changes.outputs.typecheck == 'true' || needs.changes.outputs.contract == 'true'
+    if: needs.changes.outputs.typecheck == 'true'
     runs-on: ubuntu-latest
     environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
     env:
@@ -323,40 +316,3 @@ jobs:
             git status --porcelain --untracked-files=all -- packages/db/src/generated
             exit 1
           fi
-
-  contract:
-    name: contract (openapi + codegen)
-    needs:
-      - typecheck
-      - changes
-    if: needs.changes.outputs.contract == 'true'
-    runs-on: ubuntu-latest
-    environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
-    env:
-      DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
-      DATABASE_URL: ${{ secrets.DIRECT_DB_URL }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - uses: pnpm/action-setup@v3
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-
-      - name: Install
-        run: pnpm install --frozen-lockfile
-
-      - name: Generate OpenAPI and client
-        run: pnpm contract
-
-      # Optional but strongly recommended: ensure generated output is committed
-      - name: Ensure no uncommitted changes after codegen
-        run: |
-          git status --porcelain
-          test -z "$(git status --porcelain)"

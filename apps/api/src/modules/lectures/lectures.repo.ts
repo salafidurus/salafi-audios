@@ -3,8 +3,7 @@ import { PrismaService } from '@/shared/db/prisma.service';
 import { ConfigService } from '@/shared/config/config.service';
 import { Prisma, Status } from '@sd/db';
 import { UpsertLectureDto } from './dto/upsert-lecture.dto';
-import { LectureViewDto } from './dto/lecture-view.dto';
-import { AudioAssetViewDto } from '../audio-assets/dto/audio-asset-view.dto';
+import type { LectureViewDto, AudioAssetViewDto } from '@sd/contracts';
 
 const lectureViewSelect = {
   id: true,
@@ -90,6 +89,58 @@ export class LecturesRepository {
         ],
       },
       orderBy: [{ orderIndex: 'asc' }, { title: 'asc' }],
+      select: lectureViewSelect,
+    });
+
+    return records.map((r) => this.toViewDto(r));
+  }
+
+  async listPublishedByScholarSlugPaginated(
+    scholarSlug: string,
+    limit = 20,
+    cursor?: string,
+  ): Promise<LectureViewDto[]> {
+    const scholar = await this.prisma.scholar.findFirst({
+      where: { slug: scholarSlug, isActive: true },
+      select: { id: true },
+    });
+
+    if (!scholar) {
+      return [];
+    }
+
+    const records = await this.prisma.lecture.findMany({
+      where: {
+        scholarId: scholar.id,
+        deletedAt: null,
+        status: Status.published,
+        OR: [
+          { seriesId: null },
+          {
+            series: {
+              is: {
+                deletedAt: null,
+                status: Status.published,
+                OR: [
+                  { collectionId: null },
+                  {
+                    collection: {
+                      is: {
+                        deletedAt: null,
+                        status: Status.published,
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      },
+      orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
+      take: limit,
+      skip: cursor ? 1 : 0,
+      cursor: cursor ? { id: cursor } : undefined,
       select: lectureViewSelect,
     });
 
@@ -345,8 +396,7 @@ export class LecturesRepository {
       url: this.toPublicUrl(asset.url),
       format: asset.format ?? undefined,
       bitrateKbps: asset.bitrateKbps ?? undefined,
-      sizeBytes:
-        asset.sizeBytes !== null ? asset.sizeBytes.toString() : undefined,
+      sizeBytes: asset.sizeBytes !== null ? Number(asset.sizeBytes) : undefined,
       durationSeconds: asset.durationSeconds ?? undefined,
       source: asset.source ?? undefined,
       isPrimary: asset.isPrimary,

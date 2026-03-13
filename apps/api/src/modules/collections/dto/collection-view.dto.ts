@@ -1,5 +1,5 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { STATUS_VALUES, type StatusValue } from '@/shared/enums/status-values';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CollectionViewDto {
   @ApiProperty() id!: string;
@@ -12,6 +12,18 @@ export class CollectionViewDto {
 
   @ApiPropertyOptional() description?: string;
   @ApiPropertyOptional() coverImageUrl?: string;
+
+  @ApiPropertyOptional({
+    description: 'Number of published lectures that belong to this collection',
+  })
+  publishedLectureCount?: number;
+
+  @ApiPropertyOptional({
+    description:
+      'Total duration (seconds) across published lectures in this collection',
+  })
+  publishedDurationSeconds?: number;
+
   @ApiPropertyOptional() language?: string;
 
   @ApiProperty({ type: String, enum: STATUS_VALUES })

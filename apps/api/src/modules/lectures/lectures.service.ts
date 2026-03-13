@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { LecturesRepository } from './lectures.repo';
-import { LectureViewDto } from './dto/lecture-view.dto';
+import type { LectureViewDto } from '@sd/contracts';
 import { UpsertLectureDto } from './dto/upsert-lecture.dto';
 
 @Injectable()
@@ -57,5 +57,17 @@ export class LecturesService {
     }
 
     return result;
+  }
+
+  async listPublishedByScholarSlugPaginated(
+    scholarSlug: string,
+    limit = 20,
+    cursor?: string,
+  ): Promise<LectureViewDto[]> {
+    return this.repo.listPublishedByScholarSlugPaginated(
+      scholarSlug,
+      limit,
+      cursor,
+    );
   }
 }

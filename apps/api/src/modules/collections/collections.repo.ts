@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/shared/db/prisma.service';
+import { Injectable } from '@nestjs/common';
 import { Prisma, Status } from '@sd/db';
 import { CollectionViewDto } from './dto/collection-view.dto';
 import { UpsertCollectionDto } from './dto/upsert-collection.dto';
@@ -11,6 +11,8 @@ const collectionViewSelect = {
   title: true,
   description: true,
   coverImageUrl: true,
+  publishedLectureCount: true,
+  publishedDurationSeconds: true,
   language: true,
   status: true,
   orderIndex: true,
@@ -139,6 +141,14 @@ export class CollectionRepository {
       title: record.title,
       description: record.description ?? undefined,
       coverImageUrl: record.coverImageUrl ?? undefined,
+      publishedLectureCount:
+        typeof record.publishedLectureCount === 'number'
+          ? record.publishedLectureCount
+          : undefined,
+      publishedDurationSeconds:
+        typeof record.publishedDurationSeconds === 'number'
+          ? record.publishedDurationSeconds
+          : undefined,
       language: record.language ?? undefined,
       status: record.status,
       orderIndex: record.orderIndex ?? undefined,

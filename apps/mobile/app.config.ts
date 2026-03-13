@@ -1,4 +1,5 @@
-import type { ConfigContext, ExpoConfig } from "expo/config";
+import { ConfigContext, ExpoConfig } from "expo/config";
+import { withSentry } from "@sentry/react-native/expo";
 import { version } from "./package.json";
 import { getMobileBuildEnv, type AppEnv } from "@sd/env";
 
@@ -42,14 +43,13 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
   const { name, iosBundleId, androidPackage, scheme } = ids(appEnv);
 
-  return {
+  const expoConfig: ExpoConfig = {
     ...config,
     name,
     slug: "salafi-durus",
     scheme,
     version,
 
-    newArchEnabled: true,
     platforms: ["ios", "android"],
     orientation: "default",
 
@@ -58,7 +58,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       [
         "expo-splash-screen",
         {
-          image: "./assets/images/splash-icon.png",
+          image: "./assets/icons/splash-icon-light.png",
           imageWidth: 200,
           resizeMode: "contain",
           backgroundColor: "#ffffff",
@@ -69,6 +69,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       ],
       "expo-localization",
       "expo-font",
+      "expo-web-browser",
     ],
 
     experiments: {
@@ -79,13 +80,13 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     userInterfaceStyle: "automatic",
     assetBundlePatterns: ["**/*"],
 
-    icon: "./assets/images/icon.png",
+    icon: "./assets/icons/ios-light.png",
     splash: {
-      image: "./assets/images/splash-icon.png",
+      image: "./assets/icons/splash-icon-light.png",
       resizeMode: "contain",
       backgroundColor: "#ffffff",
       dark: {
-        image: "./assets/images/splash-icon.png",
+        image: "./assets/icons/splash-icon-dark.png",
         backgroundColor: "#000000",
       },
     },
@@ -102,12 +103,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     android: {
       ...config.android,
       package: androidPackage,
-      edgeToEdgeEnabled: true,
       adaptiveIcon: {
         backgroundColor: "#ffffff",
-        foregroundImage: "./assets/images/android-icon-foreground.png",
-        backgroundImage: "./assets/images/android-icon-background.png",
-        monochromeImage: "./assets/images/android-icon-monochrome.png",
+        foregroundImage: "./assets/icons/adaptive-icon.png",
+        backgroundImage: "./assets/icons/adaptive-icon.png",
+        monochromeImage: "./assets/icons/adaptive-icon.png",
       },
     },
 
@@ -127,8 +127,18 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       },
       appEnv,
       apiUrl: buildEnv.EXPO_PUBLIC_API_URL,
+      sentryDsn: buildEnv.EXPO_PUBLIC_SENTRY_DSN,
+      sentryOrg: buildEnv.EXPO_PUBLIC_SENTRY_ORG,
+      sentryProject: buildEnv.EXPO_PUBLIC_SENTRY_PROJECT,
+      vexoProjectId: buildEnv.EXPO_PUBLIC_VEXO_PROJECT_ID,
     },
 
     owner: OWNER,
   };
+
+  return withSentry(expoConfig, {
+    url: "https://sentry.io/",
+    project: buildEnv.EXPO_PUBLIC_SENTRY_PROJECT,
+    organization: buildEnv.EXPO_PUBLIC_SENTRY_ORG,
+  });
 };

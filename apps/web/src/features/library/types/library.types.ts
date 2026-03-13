@@ -1,13 +1,13 @@
 import type {
   CollectionViewDto,
   LectureViewDto,
-  ScholarViewDto,
+  ScholarDetailDto,
   SeriesViewDto,
   TopicDetailDto,
   TopicLectureViewDto,
-} from "@sd/api-client";
+} from "@sd/contracts";
 
-export type Scholar = ScholarViewDto;
+export type Scholar = ScholarDetailDto;
 export type Collection = CollectionViewDto;
 export type Series = SeriesViewDto;
 export type Lecture = LectureViewDto;

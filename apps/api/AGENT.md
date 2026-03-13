@@ -36,6 +36,8 @@ This service is the authority for business rules, permissions, and state transit
 - Prefer intent-driven actions for transitions (publish/archive/reorder/replace).
 - Validate all boundary input with DTO/class-validator.
 - Keep error responses structured and consistent.
+- Import shared response types from `@sd/contracts`.
+- Keep API-only request DTOs local (for validation decorators).
 
 ## Commands (run from repo root)
 
@@ -54,11 +56,11 @@ This service is the authority for business rules, permissions, and state transit
 - Watch one file: `pnpm --filter api test:watch -- src/modules/topics/topics.service.spec.ts`
 - E2E file: `pnpm --filter api test:e2e -- test/health.e2e-spec.ts`
 
-## Contract/codegen workflow
+## Contract workflow
 
-- Generate OpenAPI: `pnpm openapi`
-- Regenerate client package: `pnpm codegen`
-- If client types are wrong, fix API/OpenAPI source first.
+- Shared types are defined in `@sd/contracts` - import from there.
+- When API response shapes change, update `packages/contracts/src/types/` manually.
+- Run `pnpm --filter @sd/contracts build` after updating contracts.
 
 ## Data and media rules
 

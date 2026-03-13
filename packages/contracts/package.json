@@ -1,0 +1,50 @@
+{
+  "name": "@sd/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./query": {
+      "types": "./dist/query/index.d.ts",
+      "default": "./dist/query/index.js"
+    },
+    "./query/hooks": {
+      "types": "./dist/query/hooks/index.d.ts",
+      "default": "./dist/query/hooks/index.js"
+    },
+    "./http": {
+      "types": "./dist/http.d.ts",
+      "default": "./dist/http.js"
+    }
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsc -p tsconfig.build.json --watch",
+    "lint": "eslint .",
+    "test": "echo \"@sd/contracts: manual verification required\"",
+    "test:prepush": "echo \"@sd/contracts: manual verification required\"",
+    "typecheck": "pnpm build && tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.69.0"
+  },
+  "devDependencies": {
+    "@sd/config": "workspace:*",
+    "@types/react": "^19.2.9",
+    "rimraf": "^6.0.0",
+    "typescript": "^5.9.0"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  }
+}

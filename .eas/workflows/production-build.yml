@@ -3,7 +3,7 @@ name: Production Release Build
 on:
   pull_request:
     branches:
-      - "production"
+      - production
     types:
       - labeled
     paths:

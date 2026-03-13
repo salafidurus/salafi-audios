@@ -4,9 +4,9 @@
   list-style: none;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-  gap: var(--space-gap-lg);
+  gap: var(--space-component-gap-lg);
 }
 
 :global(:root[data-library-density="compact"]) .cardGrid {
-  gap: var(--space-gap-sm);
+  gap: var(--space-component-gap-sm);
 }

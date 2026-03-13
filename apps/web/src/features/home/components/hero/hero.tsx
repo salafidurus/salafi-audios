@@ -179,11 +179,9 @@ export function Hero({ items }: HeroProps) {
               <div className={styles.coverWrap}>
                 <div
                   className={styles.cover}
-                  style={
-                    active.coverImageUrl
-                      ? { backgroundImage: `url(${active.coverImageUrl})` }
-                      : undefined
-                  }
+                  style={{
+                    backgroundImage: `url(${active.coverImageUrl || "/dev-mock/template-4-to-5-image.jpg"})`,
+                  }}
                   aria-hidden="true"
                 />
                 <div className={styles.coverGlow} aria-hidden="true" />

@@ -5,9 +5,11 @@ import { Prisma, Status } from '@sd/db';
 import { decodeCursor, encodeCursor } from './utils/catalog.cursor';
 import { CatalogListQueryDto } from './dto/catalog-list.query.dto';
 import { CatalogPageDto } from './dto/catalog-page.dto';
-import { CollectionViewDto } from '../collections/dto/collection-view.dto';
-import { SeriesViewDto } from '../series/dto/series-view.dto';
-import { LectureViewDto } from '../lectures/dto/lecture-view.dto';
+import type {
+  CollectionViewDto,
+  SeriesViewDto,
+  LectureViewDto,
+} from '@sd/contracts';
 
 const DEFAULT_LIMIT = 20;
 
@@ -311,7 +313,7 @@ export class CatalogRepository {
             bitrateKbps: primaryAudioAsset.bitrateKbps ?? undefined,
             sizeBytes:
               primaryAudioAsset.sizeBytes !== null
-                ? primaryAudioAsset.sizeBytes.toString()
+                ? Number(primaryAudioAsset.sizeBytes)
                 : undefined,
             durationSeconds: primaryAudioAsset.durationSeconds ?? undefined,
             source: primaryAudioAsset.source ?? undefined,

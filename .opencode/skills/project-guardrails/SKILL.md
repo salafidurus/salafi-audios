@@ -111,6 +111,93 @@ Infrastructure → DB, media, adapters (no policy)
 - Media = references/metadata, NEVER blobs in DB
 - Analytics/events OUT of authoritative core tables
 
+## Design Token Usage Guide: `spacing`, `radius`, and `typography`
+
+Use tokens by **semantic role**, not by guessing what looks nice.
+
+Prefer:
+
+- consistent rhythm
+- reuse of existing semantic tokens
+- predictable hierarchy
+- fewer arbitrary one-off values
+
+### 1. `spacing` tokens
+
+Core rule:
+
+- `spacing.layout.*` = page and section-level spacing
+- `spacing.component.*` = component padding and common UI gaps
+- `spacing.scale.*` = low-level spacing steps for fine control
+
+Prefer `layout` and `component` first. Use `scale` when no semantic token fits.
+
+#### Spacing decision rules
+
+- page padding X -> `spacing.layout.pageX`
+- page padding Y -> `spacing.layout.pageY`
+- section gap -> `spacing.layout.sectionY`
+- card padding -> `spacing.component.cardPadding`
+- panel padding -> `spacing.component.panelPadding`
+- chip padding -> `spacing.component.chipX` + `spacing.component.chipY`
+- standard gap -> `spacing.component.gapMd`
+
+#### Spacing anti-patterns
+
+- do not use arbitrary values when a token exists
+- do not use `layout.*` inside small components
+- do not use component padding as section spacing
+
+### 2. `radius` tokens
+
+Core rule:
+
+- `radius.component.*` = preferred radius for named UI patterns
+- `radius.scale.*` = low-level radius steps
+- `radius.scale.full` = fully rounded / pill / circular edges
+
+Prefer `component` first. Use `scale` when no component token fits.
+
+#### Radius decision rules
+
+- chip/tag/badge -> `radius.component.chip`
+- standard card -> `radius.component.card`
+- small panel/popover -> `radius.component.panelSm`
+- large panel/modal/drawer -> `radius.component.panel`
+
+#### Radius anti-patterns
+
+- do not mix many radii in one component family
+- do not use `full` unless shape should read as pill/circle
+- do not invent custom radius values outside tokens
+
+### 3. `typography` tokens
+
+Core rule:
+
+- display = hero, prominent headline text
+- title = section and card headings
+- body = readable content text
+- label = compact UI labels and controls
+- caption = supporting metadata
+- xs = very small supporting text only
+
+Use typography by purpose, not by size.
+
+#### Typography rules
+
+- prefer full variant tokens over manual font property composition
+- do not use display styles for ordinary UI
+- do not use xs for standard readable text
+
+### Practical defaults
+
+- page shell padding -> `spacing.layout.pageX` + `spacing.layout.pageY`
+- section gap -> `spacing.layout.sectionY`
+- card -> padding `spacing.component.cardPadding`, radius `radius.component.card`, title `typography.titleMd`, body `typography.bodyMd`, metadata `typography.caption`
+- panel -> padding `spacing.component.panelPadding`, radius `radius.component.panel`, title `typography.titleLg`
+- chip -> padding `spacing.component.chipX` + `chipY`, radius `radius.component.chip`, text `typography.labelMd`
+
 ## API Contract
 
 - `packages/api-client/generated/` is DERIVED - never hand-edit
