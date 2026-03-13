@@ -134,7 +134,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
   return withSentry(expoConfig, {
     url: "https://sentry.io/",
-    project: "salafi-durus",
+    project: "salafi-durus-mobile",
     organization: "salafidevs",
   });
 };
