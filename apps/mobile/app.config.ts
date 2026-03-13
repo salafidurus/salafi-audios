@@ -127,6 +127,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       },
       appEnv,
       apiUrl: buildEnv.EXPO_PUBLIC_API_URL,
+      sentryDsn: buildEnv.EXPO_PUBLIC_SENTRY_DSN,
+      sentryOrg: buildEnv.EXPO_PUBLIC_SENTRY_ORG,
+      sentryProject: buildEnv.EXPO_PUBLIC_SENTRY_PROJECT,
     },
 
     owner: OWNER,
@@ -134,7 +137,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
   return withSentry(expoConfig, {
     url: "https://sentry.io/",
-    project: "salafi-durus-mobile",
-    organization: "salafidevs",
+    project: buildEnv.EXPO_PUBLIC_SENTRY_PROJECT,
+    organization: buildEnv.EXPO_PUBLIC_SENTRY_ORG,
   });
 };
