@@ -18,9 +18,10 @@ export function ScreenView({ children, style, center }: ScreenViewProps) {
   );
 }
 
-const styles = StyleSheet.create((_theme) => ({
+const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
+    paddingHorizontal: theme.spacing.layout.pageX,
   },
   content: {
     flex: 1,
