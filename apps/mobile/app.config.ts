@@ -1,4 +1,5 @@
 import { ConfigContext, ExpoConfig } from "expo/config";
+import { withSentry } from "@sentry/react-native/expo";
 import { version } from "./package.json";
 import { getMobileBuildEnv, type AppEnv } from "@sd/env";
 
@@ -42,7 +43,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
   const { name, iosBundleId, androidPackage, scheme } = ids(appEnv);
 
-  return {
+  const expoConfig: ExpoConfig = {
     ...config,
     name,
     slug: "salafi-durus",
@@ -130,4 +131,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
     owner: OWNER,
   };
+
+  return withSentry(expoConfig, {
+    url: "https://sentry.io/",
+    project: "salafi-durus",
+    organization: "salafidevs",
+  });
 };
