@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import localFont from "next/font/local";
 
 import "./globals.css";
@@ -116,6 +117,7 @@ export default function RootLayout({
       <body
         className={`${fraunces.variable} ${manrope.variable} ${geistMono.variable} antialiased`}
       >
+        <Script src="https://www.vexo.co/analytics.js" strategy="afterInteractive" />
         <style>{themeCss}</style>
         <div className="appFrame">
           <Header searchPlaceholder="Search for lectures, books, or scholars..." />

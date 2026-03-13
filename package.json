@@ -21,7 +21,7 @@
     "lint:api+web": "turbo lint --filter=api --filter=web",
     "lint:api+mobile": "turbo lint --filter=api --filter=mobile",
     "typecheck": "turbo typecheck",
-    "typecheck:affected": "turbo typecheck --filter=...[origin/main]",
+    "typecheck:affected": "turbo typecheck --affected",
     "typecheck:api+web": "turbo typecheck --filter=api --filter=web",
     "typecheck:api+mobile": "turbo typecheck --filter=api --filter=mobile",
     "test": "turbo test",

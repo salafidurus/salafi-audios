@@ -3,8 +3,11 @@ import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 import { useUnistyles } from "react-native-unistyles";
 import { Providers } from "@/shared/components/Providers";
+import { initIntegrations, getWrappedLayout } from "@/core/config/integrations";
 
-export default function RootLayout() {
+initIntegrations();
+
+function RootLayout() {
   const { theme } = useUnistyles();
   return (
     <Providers>
@@ -28,3 +31,5 @@ export default function RootLayout() {
     </Providers>
   );
 }
+
+export default getWrappedLayout(RootLayout);

@@ -112,10 +112,10 @@ export const createColors = (mode: "light" | "dark") => {
 
     content: isLight
       ? {
-          default: c.slate[700],
-          muted: c.slate[500],
+          default: c.slate[800],
+          muted: c.slate[400],
           subtle: c.slate[600],
-          strong: c.slate[900],
+          strong: c.slate[950],
           inverse: c.slate[50],
 
           primary: c.primary[700],

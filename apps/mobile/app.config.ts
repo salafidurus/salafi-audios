@@ -1,4 +1,5 @@
 import { ConfigContext, ExpoConfig } from "expo/config";
+import { withSentry } from "@sentry/react-native/expo";
 import { version } from "./package.json";
 import { getMobileBuildEnv, type AppEnv } from "@sd/env";
 
@@ -42,7 +43,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
   const { name, iosBundleId, androidPackage, scheme } = ids(appEnv);
 
-  return {
+  const expoConfig: ExpoConfig = {
     ...config,
     name,
     slug: "salafi-durus",
@@ -126,8 +127,18 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       },
       appEnv,
       apiUrl: buildEnv.EXPO_PUBLIC_API_URL,
+      sentryDsn: buildEnv.EXPO_PUBLIC_SENTRY_DSN,
+      sentryOrg: buildEnv.EXPO_PUBLIC_SENTRY_ORG,
+      sentryProject: buildEnv.EXPO_PUBLIC_SENTRY_PROJECT,
+      vexoProjectId: buildEnv.EXPO_PUBLIC_VEXO_PROJECT_ID,
     },
 
     owner: OWNER,
   };
+
+  return withSentry(expoConfig, {
+    url: "https://sentry.io/",
+    project: buildEnv.EXPO_PUBLIC_SENTRY_PROJECT,
+    organization: buildEnv.EXPO_PUBLIC_SENTRY_ORG,
+  });
 };
