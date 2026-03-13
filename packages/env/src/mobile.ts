@@ -14,6 +14,7 @@ const MobileBuildEnvSchema = z.object({
   EXPO_PUBLIC_SENTRY_DSN: z.string().url(),
   EXPO_PUBLIC_SENTRY_ORG: z.string(),
   EXPO_PUBLIC_SENTRY_PROJECT: z.string(),
+  EXPO_PUBLIC_VEXO_PROJECT_ID: z.string(),
 });
 
 export type MobileBuildEnv = z.infer<typeof MobileBuildEnvSchema>;
@@ -42,6 +43,7 @@ const MobileRuntimeExtraSchema = z.object({
   sentryDsn: z.string().url().optional(),
   sentryOrg: z.string().optional(),
   sentryProject: z.string().optional(),
+  vexoProjectId: z.string().optional(),
 });
 
 export type MobileRuntimeExtra = z.infer<typeof MobileRuntimeExtraSchema>;

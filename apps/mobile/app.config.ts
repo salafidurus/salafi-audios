@@ -130,6 +130,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       sentryDsn: buildEnv.EXPO_PUBLIC_SENTRY_DSN,
       sentryOrg: buildEnv.EXPO_PUBLIC_SENTRY_ORG,
       sentryProject: buildEnv.EXPO_PUBLIC_SENTRY_PROJECT,
+      vexoProjectId: buildEnv.EXPO_PUBLIC_VEXO_PROJECT_ID,
     },
 
     owner: OWNER,

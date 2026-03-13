@@ -3,19 +3,9 @@ import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 import { useUnistyles } from "react-native-unistyles";
 import { Providers } from "@/shared/components/Providers";
+import { initIntegrations, getWrappedLayout } from "@/core/config/integrations";
 
-// Initialize Sentry for error tracking and performance monitoring
-import * as Sentry from "@sentry/react-native";
-import { mobileEnv } from "@/shared/utils/env";
-
-const shouldInitSentry = mobileEnv.appEnv !== "development";
-
-if (shouldInitSentry && mobileEnv.sentryDsn) {
-  Sentry.init({
-    dsn: mobileEnv.sentryDsn,
-    sendDefaultPii: true,
-  });
-}
+initIntegrations();
 
 function RootLayout() {
   const { theme } = useUnistyles();
@@ -42,4 +32,4 @@ function RootLayout() {
   );
 }
 
-export default Sentry.wrap(RootLayout);
+export default getWrappedLayout(RootLayout);
