@@ -3,7 +3,7 @@ name: Staging PR Preview (EAS)
 on:
   pull_request:
     branches:
-      - "staging"
+      - preview
     paths:
       - apps/mobile/src/**
       - apps/mobile/app.config.ts
