@@ -6,6 +6,7 @@ onlyBuiltDependencies:
   - "@nestjs/core"
   - "@prisma/engines"
   - "@scarf/scarf"
+  - "@sentry/cli"
   - esbuild
   - prisma
   - sharp
