@@ -7,11 +7,13 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "channel": "development"
+      "channel": "development",
+      "node": "22.13.1"
     },
     "preview": {
       "distribution": "internal",
       "channel": "preview",
+      "node": "22.13.1",
       "android": {
         "buildType": "apk"
       }
@@ -20,6 +22,7 @@
       "autoIncrement": true,
       "channel": "production",
       "distribution": "store",
+      "node": "22.13.1",
       "android": {
         "buildType": "app-bundle"
       }
