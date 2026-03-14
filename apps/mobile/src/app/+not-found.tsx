@@ -1,45 +1,55 @@
-import { Href, Link, Stack } from "expo-router";
-
+import { Href, Stack, useRouter } from "expo-router";
 import { Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import { ScreenView } from "@/shared/components/ScreenView";
+import { Button } from "@/shared/components/Button";
 
 export default function NotFoundScreen() {
+  const router = useRouter();
+
   return (
     <>
       <Stack.Screen options={{ title: "Oops!" }} />
-      <View style={styles.container}>
-        <Text style={styles.title}>{"This screen doesn't exist."}</Text>
-        <Link href={"/(tabs)" as Href} style={styles.link}>
-          <Text style={styles.linkText}>Go to home screen!</Text>
-        </Link>
-      </View>
+      <ScreenView center contentStyle={styles.content}>
+        <View style={styles.group}>
+          <Text style={styles.title}>{"Page not found"}</Text>
+          <Text style={styles.subtitle}>
+            {"The desired screen doesn't exist or may have moved."}
+          </Text>
+        </View>
+        <View style={styles.group}>
+          <Button
+            variant="primary"
+            size="md"
+            label="Return to home screen"
+            onPress={() => router.replace("/(tabs)" as Href)}
+            style={styles.button}
+          />
+        </View>
+      </ScreenView>
     </>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  container: {
-    flex: 1,
+  content: {
+    gap: theme.spacing.component.gapXl,
+  },
+  group: {
     alignItems: "center",
-    justifyContent: "center",
-    padding: theme.spacing.layout.pageX,
+    gap: theme.spacing.component.gapSm,
   },
   title: {
-    fontFamily: theme.typography.titleLg.fontFamily,
-    fontSize: theme.typography.titleLg.fontSize,
-    lineHeight: theme.typography.titleLg.lineHeight,
-    letterSpacing: theme.typography.titleLg.letterSpacing,
+    ...theme.typography.displayMd,
     color: theme.colors.content.strong,
+    textAlign: "center",
   },
-  link: {
-    marginTop: theme.spacing.scale.lg,
-    paddingVertical: theme.spacing.scale.lg,
+  subtitle: {
+    ...theme.typography.bodyMd,
+    color: theme.colors.content.muted,
+    textAlign: "center",
   },
-  linkText: {
-    fontFamily: theme.typography.bodySm.fontFamily,
-    fontSize: theme.typography.bodySm.fontSize,
-    lineHeight: theme.typography.bodySm.lineHeight,
-    letterSpacing: theme.typography.bodySm.letterSpacing,
-    color: theme.colors.content.primary,
+  button: {
+    alignSelf: "center",
   },
 }));
