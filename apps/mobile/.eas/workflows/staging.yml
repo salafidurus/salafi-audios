@@ -55,6 +55,7 @@ jobs:
     environment: preview
     env:
       EXPO_DEBUG: "1"
+      EAS_BUILD_GRADLE_ARGS: "--stacktrace"
     params:
       platform: android
       profile: preview
