@@ -2,6 +2,7 @@ import { ConfigContext, ExpoConfig } from "expo/config";
 import { withSentry } from "@sentry/react-native/expo";
 import { version } from "./package.json";
 import { getMobileBuildEnv, type AppEnv } from "@sd/env";
+import path from "path";
 
 const OWNER = "basmalabs";
 const PROJECT_ID = "f943688f-bb4a-4f22-af5a-60dc5bafb485";
@@ -57,7 +58,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     version,
 
     autolinking: {
-      searchPaths: ["../../node_modules", "./node_modules"],
+      searchPaths: [
+        path.resolve(__dirname, "../../node_modules"),
+        path.resolve(__dirname, "./node_modules"),
+      ],
     },
 
     platforms: ["ios", "android"],
