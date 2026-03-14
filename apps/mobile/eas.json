@@ -15,7 +15,8 @@
       "channel": "preview",
       "node": "22.13.1",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleRelease --stacktrace"
       }
     },
     "production": {
@@ -24,7 +25,8 @@
       "distribution": "store",
       "node": "22.13.1",
       "android": {
-        "buildType": "app-bundle"
+        "buildType": "app-bundle",
+        "gradleCommand": ":app:bundleRelease --stacktrace"
       }
     }
   },
