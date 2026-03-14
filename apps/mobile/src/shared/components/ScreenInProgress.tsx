@@ -18,6 +18,7 @@ const styles = StyleSheet.create((theme) => ({
     lineHeight: theme.typography.titleLg.lineHeight,
     letterSpacing: theme.typography.titleLg.letterSpacing,
     color: theme.colors.content.strong,
+    textAlign: "center",
   },
   subtitle: {
     fontFamily: theme.typography.bodySm.fontFamily,
@@ -25,5 +26,7 @@ const styles = StyleSheet.create((theme) => ({
     lineHeight: theme.typography.bodySm.lineHeight,
     letterSpacing: theme.typography.bodySm.letterSpacing,
     color: theme.colors.content.muted,
+    textAlign: "center",
+    marginTop: theme.spacing.component.gapSm,
   },
 }));

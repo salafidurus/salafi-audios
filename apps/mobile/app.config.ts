@@ -57,11 +57,21 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     scheme,
     version,
 
+    // autolinking: {
+    //   searchPaths: [
+    //     path.resolve(__dirname, "../../node_modules"),
+    //     path.resolve(__dirname, "./node_modules"),
+    //   ],
+    // },
+
     autolinking: {
-      searchPaths: [
-        path.resolve(__dirname, "../../node_modules"),
-        path.resolve(__dirname, "./node_modules"),
-      ],
+      searchPaths:
+        appEnv === "development"
+          ? ["../../node_modules", "./node_modules"]
+          : [
+              path.resolve(__dirname, "../../node_modules"),
+              path.resolve(__dirname, "./node_modules"),
+            ],
     },
 
     platforms: ["ios", "android"],
