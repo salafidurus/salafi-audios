@@ -17,13 +17,16 @@ export default function TabLayout() {
   const horizontalPadding = theme.spacing.layout.pageX;
   const verticalPadding = Platform.OS === "ios" ? theme.spacing.scale.md : theme.spacing.scale.sm;
   const baseHeight = Platform.OS === "ios" ? 68 : 62;
-  const safeBottomInset =
+
+  const floatingBarBottomInset =
     insets.bottom > 0 ? Math.round(insets.bottom * 0.5) : theme.spacing.scale.sm;
-  const tabBarHeight = baseHeight + safeBottomInset;
+
+  const tabBarHeight = baseHeight + floatingBarBottomInset;
 
   const blurIntensity = Platform.OS === "ios" ? 35 : 25;
   const blurTint = isDark ? "dark" : "light";
-  const fallbackColor = theme.colors.surface.elevated;
+
+  const fallbackColor = theme.colors.surface.default;
 
   return (
     <BlurTargetView ref={blurTargetRef} style={styles.container}>
@@ -40,7 +43,7 @@ export default function TabLayout() {
               right: horizontalPadding,
               bottom: verticalPadding,
               height: tabBarHeight,
-              paddingBottom: safeBottomInset,
+              paddingBottom: floatingBarBottomInset,
               backgroundColor: fallbackColor,
             },
           ],

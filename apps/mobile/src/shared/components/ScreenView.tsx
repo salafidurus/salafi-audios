@@ -12,7 +12,16 @@ export function ScreenView({ children, style, center }: ScreenViewProps) {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }, style]}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: insets.top,
+          paddingBottom: insets.bottom,
+        },
+        style,
+      ]}
+    >
       <View style={[styles.content, center && styles.center]}>{children}</View>
     </View>
   );

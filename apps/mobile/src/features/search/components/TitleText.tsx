@@ -11,10 +11,10 @@ export function TitleText({ children }: TitleTextProps) {
 
 const styles = StyleSheet.create((theme) => ({
   title: {
-    fontFamily: theme.typography.titleLg.fontFamily,
-    fontSize: theme.typography.displayLg.fontSize,
-    lineHeight: theme.typography.titleLg.lineHeight,
-    letterSpacing: theme.typography.titleLg.letterSpacing,
-    color: theme.colors.content.primaryStrong,
+    fontFamily: theme.typography.displayMd.fontFamily,
+    fontSize: theme.typography.displayMd.fontSize,
+    lineHeight: theme.typography.displayMd.lineHeight,
+    letterSpacing: theme.typography.displayMd.letterSpacing,
+    color: theme.colors.content.strong,
   },
 }));
