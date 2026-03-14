@@ -7,21 +7,26 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "channel": "development"
+      "channel": "development",
+      "node": "22.14.0"
     },
     "preview": {
       "distribution": "internal",
       "channel": "preview",
+      "node": "22.14.0",
       "android": {
         "buildType": "apk"
+        // "gradleCommand": ":app:assembleRelease --stacktrace --info"
       }
     },
     "production": {
       "autoIncrement": true,
       "channel": "production",
       "distribution": "store",
+      "node": "22.14.0",
       "android": {
         "buildType": "app-bundle"
+        // "gradleCommand": ":app:bundleRelease --stacktrace --info"
       }
     }
   },

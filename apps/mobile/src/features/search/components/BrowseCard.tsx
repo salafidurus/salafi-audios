@@ -29,10 +29,10 @@ export function BrowseCard({ name }: BrowseCardProps) {
 const styles = StyleSheet.create((theme) => ({
   container: {
     backgroundColor: theme.colors.surface.default,
-    borderWidth: 1,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: theme.colors.border.default,
     borderRadius: theme.radius.component.card,
-    paddingVertical: theme.spacing.component.cardPadding,
+    paddingVertical: theme.spacing.component.gapLg,
     paddingHorizontal: theme.spacing.component.cardPadding,
     alignItems: "center",
     justifyContent: "center",

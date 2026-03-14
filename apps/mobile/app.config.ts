@@ -2,6 +2,7 @@ import { ConfigContext, ExpoConfig } from "expo/config";
 import { withSentry } from "@sentry/react-native/expo";
 import { version } from "./package.json";
 import { getMobileBuildEnv, type AppEnv } from "@sd/env";
+import path from "path";
 
 const OWNER = "basmalabs";
 const PROJECT_ID = "f943688f-bb4a-4f22-af5a-60dc5bafb485";
@@ -37,18 +38,41 @@ function ids(env: AppEnv) {
   };
 }
 
+type ExpoConfigWithAutolinking = ExpoConfig & {
+  autolinking?: {
+    searchPaths?: string[];
+  };
+};
+
 export default ({ config }: ConfigContext): ExpoConfig => {
   const buildEnv = getMobileBuildEnv(process.env);
   const appEnv = buildEnv.APP_ENV;
 
   const { name, iosBundleId, androidPackage, scheme } = ids(appEnv);
 
-  const expoConfig: ExpoConfig = {
+  const expoConfig: ExpoConfigWithAutolinking = {
     ...config,
     name,
     slug: "salafi-durus",
     scheme,
     version,
+
+    // autolinking: {
+    //   searchPaths: [
+    //     path.resolve(__dirname, "../../node_modules"),
+    //     path.resolve(__dirname, "./node_modules"),
+    //   ],
+    // },
+
+    autolinking: {
+      searchPaths:
+        appEnv === "development"
+          ? ["../../node_modules", "./node_modules"]
+          : [
+              path.resolve(__dirname, "../../node_modules"),
+              path.resolve(__dirname, "./node_modules"),
+            ],
+    },
 
     platforms: ["ios", "android"],
     orientation: "default",
@@ -70,6 +94,14 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       "expo-localization",
       "expo-font",
       "expo-web-browser",
+      [
+        "@sentry/react-native/expo",
+        {
+          url: "https://sentry.io/",
+          project: buildEnv.EXPO_PUBLIC_SENTRY_PROJECT,
+          organization: buildEnv.EXPO_PUBLIC_SENTRY_ORG,
+        },
+      ],
     ],
 
     experiments: {
