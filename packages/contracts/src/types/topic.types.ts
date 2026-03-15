@@ -1,4 +1,4 @@
-import type { StatusValue } from "./common.types";
+import type { StatusValue } from "@/types/common.types";
 
 export type TopicSlug = string;
 

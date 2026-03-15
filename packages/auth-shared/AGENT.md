@@ -15,16 +15,20 @@ This package contains shared authentication/authorization types.
 - Package-to-package dependencies only.
 - No imports from apps.
 
+## Path aliases
+
+- Use `@/` for package-local imports (maps to `src/*`).
+
 ## Build/lint/test commands (root)
 
-- Lint: `pnpm --filter @sd/auth-shared lint`
-- Typecheck: `pnpm --filter @sd/auth-shared typecheck`
-- Test: `pnpm --filter @sd/auth-shared test`
+- Lint: `pnpm --filter auth-shared lint`
+- Typecheck: `pnpm --filter auth-shared typecheck`
+- Test: `pnpm --filter auth-shared test`
 
 ## Single-test commands
 
-- Jest file: `pnpm --filter @sd/auth-shared test -- src/path/to/file.spec.ts`
-- Jest by name: `pnpm --filter @sd/auth-shared test -- src/path/to/file.spec.ts -t "valid role"`
+- Jest file: `pnpm --filter auth-shared test -- src/path/to/file.spec.ts`
+- Jest by name: `pnpm --filter auth-shared test -- src/path/to/file.spec.ts -t "valid role"`
 
 ## Quality notes
 

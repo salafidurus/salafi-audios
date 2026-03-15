@@ -16,6 +16,10 @@ This package defines shared TypeScript contracts (DTOs, types) and query infrast
 - **Stability first**: Contract changes require explicit review and versioning
 - **Cross-platform**: Contracts work for web (Next.js), mobile (Expo), and backend (NestJS)
 
+## Path aliases
+
+- Use `@/` for package-local imports (maps to `src/*`).
+
 ## Package dependencies
 
 - `@tanstack/react-query`: Query client library
@@ -68,8 +72,8 @@ const response = await httpClient({
 2. Update query hooks in `src/query/hooks/` if needed
 3. Update `src/query/query-keys.ts` if endpoints changed
 4. Update `src/http.ts` for any HTTP client changes
-5. Run `pnpm --filter @sd/contracts typecheck` to verify
-6. Run `pnpm --filter @sd/contracts lint` for style compliance
+5. Run `pnpm --filter contracts typecheck` to verify
+6. Run `pnpm --filter contracts lint` for style compliance
 7. Deploy updates across all apps (web, mobile, api)
 
 ## Quality rules
@@ -84,10 +88,10 @@ const response = await httpClient({
 
 ## Build/lint/test commands
 
-- Build: `pnpm --filter @sd/contracts build`
-- Lint: `pnpm --filter @sd/contracts lint`
-- Typecheck: `pnpm --filter @sd/contracts typecheck`
-- Test: `pnpm --filter @sd/contracts test`
+- Build: `pnpm --filter contracts build`
+- Lint: `pnpm --filter contracts lint`
+- Typecheck: `pnpm --filter contracts typecheck`
+- Test: `pnpm --filter contracts test`
 
 ## Safety checklist
 
@@ -96,3 +100,7 @@ const response = await httpClient({
 - Keep exports stable across minor versions
 - Document breaking changes in changelog
 - Test type changes with downstream apps before merging
+
+## Troubleshooting
+
+- If build outputs still contain `@/` path aliases, add `tsc-alias` to the package and run it after `tsc` (example: `tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json`).

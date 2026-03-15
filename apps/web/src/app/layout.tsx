@@ -7,6 +7,7 @@ import { themeCss } from "./theme-css";
 
 import { Header } from "@/features/navigation/components/header/header";
 import { Footer } from "@/features/navigation/components/footer/footer";
+import { Providers } from "./providers";
 
 const fraunces = localFont({
   variable: "--font-display",
@@ -119,11 +120,13 @@ export default function RootLayout({
       >
         <Script src="https://www.vexo.co/analytics.js" strategy="afterInteractive" />
         <style>{themeCss}</style>
-        <div className="appFrame">
-          <Header searchPlaceholder="Search for lectures, books, or scholars..." />
-          <div className="appMain">{children}</div>
-          <Footer />
-        </div>
+        <Providers>
+          <div className="appFrame">
+            <Header searchPlaceholder="Search for lectures, books, or scholars..." />
+            <div className="appMain">{children}</div>
+            <Footer />
+          </div>
+        </Providers>
       </body>
     </html>
   );

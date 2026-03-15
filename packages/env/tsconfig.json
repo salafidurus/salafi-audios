@@ -5,7 +5,11 @@
     "moduleResolution": "NodeNext",
     "declaration": true,
     "emitDeclarationOnly": false,
-    "types": ["node"]
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
   "include": ["src/**/*.ts"]
 }

@@ -4,13 +4,16 @@ import { SkipThrottle } from '@nestjs/throttler';
 import { ApiCommonErrors } from '@/shared/decorators/api-common-errors.decorator';
 import { CatalogService } from './catalog.service';
 import { CatalogListQueryDto } from './dto/catalog-list.query.dto';
+import { CatalogSearchQueryDto } from './dto/catalog-search.query.dto';
 import {
   CatalogPageDto,
   CollectionCatalogPageDto,
   LectureCatalogPageDto,
   SeriesCatalogPageDto,
 } from './dto/catalog-page.dto';
+import { CatalogSearchResultsDto } from './dto/catalog-search.dto';
 import type {
+  CatalogSearchResultsDto as CatalogSearchResultsContractDto,
   CollectionViewDto,
   SeriesViewDto,
   LectureViewDto,
@@ -52,5 +55,16 @@ export class CatalogController {
     @Query() query: CatalogListQueryDto,
   ): Promise<CatalogPageDto<LectureViewDto>> {
     return this.catalog.listRootLectures(query);
+  }
+
+  @Get('search')
+  @ApiOperation({
+    summary: 'Search catalog across collections, series, and lectures',
+  })
+  @ApiOkResponse({ type: CatalogSearchResultsDto })
+  search(
+    @Query() query: CatalogSearchQueryDto,
+  ): Promise<CatalogSearchResultsContractDto> {
+    return this.catalog.search(query);
   }
 }

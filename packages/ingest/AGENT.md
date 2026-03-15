@@ -16,8 +16,12 @@ This package owns deterministic content ingestion workflows.
 - Prefer explicit, reproducible batch tagging for operational safety.
 - Fail clearly on invalid input or missing required environment variables.
 
+## Path aliases
+
+- Use `@/` for package-local imports (maps to `src/*`).
+
 ## Commands
 
-- Run ingestion: `pnpm --filter @sd/ingest ingest:content`
-- Lint: `pnpm --filter @sd/ingest lint`
-- Typecheck: `pnpm --filter @sd/ingest typecheck`
+- Run ingestion: `pnpm --filter ingest ingest:content`
+- Lint: `pnpm --filter ingest lint`
+- Typecheck: `pnpm --filter ingest typecheck`

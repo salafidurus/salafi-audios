@@ -1,4 +1,5 @@
-import { AppFontsProvider } from "./app-fonts-provider";
+"use client";
+
 import { ReactNode, useEffect } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { initApiClient } from "@/core/api/client";
@@ -13,9 +14,5 @@ export function Providers({ children }: Props) {
     initApiClient();
   }, []);
 
-  return (
-    <QueryClientProvider client={queryClient}>
-      <AppFontsProvider>{children}</AppFontsProvider>
-    </QueryClientProvider>
-  );
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }
