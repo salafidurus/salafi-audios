@@ -2,7 +2,7 @@ import type { CollectionViewDto } from "@/types/collection.types";
 import type { LectureViewDto } from "@/types/lecture.types";
 import type { SeriesViewDto } from "@/types/series.types";
 
-export type CatalogSearchParams = {
+export type SearchCatalogParams = {
   q: string;
   limit?: number;
   language?: string;
@@ -10,7 +10,7 @@ export type CatalogSearchParams = {
   scholarSlug?: string;
 };
 
-export type CatalogSearchResultsDto = {
+export type SearchCatalogResultsDto = {
   collections: CollectionViewDto[];
   series: SeriesViewDto[];
   lectures: LectureViewDto[];

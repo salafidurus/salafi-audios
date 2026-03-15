@@ -1,5 +1,6 @@
 export const endpoints = {
-  catalog: {
-    search: "/catalog/search",
+  search: {
+    general: "/search",
+    extended: "/search/extended",
   },
 } as const;

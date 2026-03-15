@@ -2,20 +2,20 @@ import {
   endpoints,
   queryKeys,
   useApiQuery,
-  type CatalogSearchParams,
-  type CatalogSearchResultsDto,
+  type SearchCatalogParams,
+  type SearchCatalogResultsDto,
 } from "@sd/contracts";
 import { apiRequest } from "@/core/api/client";
 
 export function useSearchCatalog(
-  params: CatalogSearchParams,
-  options?: Parameters<typeof useApiQuery<CatalogSearchResultsDto>>[2],
+  params: SearchCatalogParams,
+  options?: Parameters<typeof useApiQuery<SearchCatalogResultsDto>>[2],
 ) {
   return useApiQuery(
     queryKeys.search.catalog(params),
     () =>
-      apiRequest<CatalogSearchResultsDto>({
-        url: endpoints.catalog.search,
+      apiRequest<SearchCatalogResultsDto>({
+        url: endpoints.search.extended,
         method: "GET",
         params,
       }),

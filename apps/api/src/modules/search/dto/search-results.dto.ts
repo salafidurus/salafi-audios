@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CatalogSearchResultsDto {
+export class SearchResultsDto {
   @ApiProperty({ description: 'Matching collections', isArray: true })
   collections!: Record<string, unknown>[];
 

@@ -1,5 +1,5 @@
 import { QueryClient, QueryKey } from "@tanstack/react-query";
-import type { CatalogSearchParams } from "@/types";
+import type { SearchCatalogParams } from "@/types";
 
 // Centralized query client configuration
 export const createQueryClient = () =>
@@ -77,7 +77,7 @@ export const queryKeys = {
   },
   search: {
     all: ["search"] as const,
-    catalog: (params: CatalogSearchParams) => [...queryKeys.search.all, "catalog", params] as const,
+    catalog: (params: SearchCatalogParams) => [...queryKeys.search.all, "catalog", params] as const,
   },
 } as const;
 

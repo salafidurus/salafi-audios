@@ -4,10 +4,10 @@ import { configureApiClient, httpClient } from "@/http";
 import { endpoints } from "@/endpoints";
 import { queryKeys } from "@/query";
 import type {
-  CatalogSearchParams,
-  CatalogSearchResultsDto,
   ScholarStatsDto,
   PlatformStatsDto,
+  SearchCatalogParams,
+  SearchCatalogResultsDto,
 } from "@/types";
 
 // Re-export hooks for convenience
@@ -55,14 +55,14 @@ export function usePlatformStats() {
 }
 
 export function useCatalogSearch(
-  params: CatalogSearchParams,
-  options?: Parameters<typeof useQuery<CatalogSearchResultsDto, Error>>[0],
+  params: SearchCatalogParams,
+  options?: Parameters<typeof useQuery<SearchCatalogResultsDto, Error>>[0],
 ) {
   return useApiQuery(
     queryKeys.search.catalog(params),
     () =>
-      httpClient<CatalogSearchResultsDto>({
-        url: endpoints.catalog.search,
+      httpClient<SearchCatalogResultsDto>({
+        url: endpoints.search.extended,
         method: "GET",
         params,
       }),

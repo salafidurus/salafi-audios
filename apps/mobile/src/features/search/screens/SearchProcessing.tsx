@@ -6,9 +6,9 @@ import { SearchResultsList } from "../components/SearchResultsList";
 import { type SearchFilterValue } from "../components/SearchFilter";
 import { useSearchCatalog } from "../api/search.api";
 import type {
-  CatalogSearchResultsDto,
   CollectionViewDto,
   LectureViewDto,
+  SearchCatalogResultsDto,
   SeriesViewDto,
 } from "@sd/contracts";
 
@@ -59,7 +59,7 @@ export function SearchProcessing({ prefill }: SearchProcessingProps) {
 }
 
 function buildResultItems(
-  data: CatalogSearchResultsDto | undefined,
+  data: SearchCatalogResultsDto | undefined,
   filter: SearchFilterValue,
 ): SearchResultRow[] {
   if (!data) return [];

@@ -37,6 +37,8 @@ This service is the authority for business rules, permissions, and state transit
 - Validate all boundary input with DTO/class-validator.
 - Keep error responses structured and consistent.
 - Import shared response types from `@sd/contracts`.
+- If a DTO is used by web or mobile, define it in `@sd/contracts` and import it here.
+- If a DTO is API-only, keep it local to this app.
 - Keep API-only request DTOs local (for validation decorators).
 
 ## Commands (run from repo root)
