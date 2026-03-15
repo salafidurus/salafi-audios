@@ -1,6 +1,13 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import {
+  IsArray,
+  IsInt,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 
 export class SearchQueryDto {
   @ApiPropertyOptional({
@@ -23,6 +30,22 @@ export class SearchQueryDto {
   @IsString()
   @IsOptional()
   topicSlug?: string;
+
+  @ApiPropertyOptional({
+    description: 'Filter by multiple topic slugs (OR match)',
+    example: ['aqeedah', 'fiqh'],
+  })
+  @Transform(({ value }) => {
+    if (value === undefined || value === null || value === '') {
+      return undefined;
+    }
+
+    return Array.isArray(value) ? value : [value];
+  })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  topicSlugs?: string[];
 
   @ApiPropertyOptional({
     description: 'Filter by scholar slug',

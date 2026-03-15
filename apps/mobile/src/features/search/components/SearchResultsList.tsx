@@ -1,8 +1,8 @@
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { StyleSheet } from "react-native-unistyles";
-import { SearchFilter, type SearchFilterValue } from "./SearchFilter";
 import { SearchResultItem, type SearchResultKind } from "./SearchResultItem";
+import { SearchResultEmpty } from "./SearchResultEmpty";
 
 export type SearchResultRow = {
   id: string;
@@ -13,22 +13,23 @@ export type SearchResultRow = {
 
 type SearchResultsListProps = {
   items: SearchResultRow[];
-  filter: SearchFilterValue;
-  onFilterChange: (value: SearchFilterValue) => void;
   isFetching: boolean;
   shouldSearch: boolean;
+  errorMessage?: string;
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
 };
 
 export function SearchResultsList({
   items,
-  filter,
-  onFilterChange,
   isFetching,
   shouldSearch,
+  errorMessage,
+  onRefresh,
+  isRefreshing,
 }: SearchResultsListProps) {
   return (
     <View style={styles.resultsContainer}>
-      {shouldSearch ? <SearchFilter value={filter} onChange={onFilterChange} /> : null}
       <FlashList
         data={items}
         keyExtractor={(item) => item.id}
@@ -36,15 +37,15 @@ export function SearchResultsList({
           <SearchResultItem kind={item.kind} title={item.title} description={item.description} />
         )}
         contentContainerStyle={styles.listContent}
-        ListEmptyComponent={
-          shouldSearch
-            ? () => (
-                <Text style={styles.emptyText}>
-                  {isFetching ? "Searching..." : "No results found."}
-                </Text>
-              )
-            : () => <Text style={styles.emptyText}>Start typing to search.</Text>
-        }
+        onRefresh={onRefresh}
+        refreshing={isRefreshing ?? false}
+        ListEmptyComponent={() => (
+          <SearchResultEmpty
+            shouldSearch={shouldSearch}
+            isFetching={isFetching}
+            errorMessage={errorMessage}
+          />
+        )}
       />
     </View>
   );
@@ -53,16 +54,10 @@ export function SearchResultsList({
 const styles = StyleSheet.create((theme) => ({
   resultsContainer: {
     flex: 1,
-    marginTop: theme.spacing.component.gapLg,
+    // marginTop: theme.spacing.component.gapLg,
   },
   listContent: {
     gap: theme.spacing.component.gapMd,
     paddingBottom: theme.spacing.layout.pageY,
-  },
-  emptyText: {
-    ...theme.typography.bodyMd,
-    color: theme.colors.content.muted,
-    textAlign: "center",
-    marginTop: theme.spacing.component.gapLg,
   },
 }));

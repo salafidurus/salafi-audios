@@ -3,4 +3,7 @@ export const endpoints = {
     general: "/search",
     extended: "/search/extended",
   },
+  topics: {
+    list: "/topics",
+  },
 } as const;

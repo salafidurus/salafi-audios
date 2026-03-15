@@ -51,16 +51,22 @@ export async function httpClient<T>(options: {
 
   const payload = options.body ?? options.data;
 
-  const res = await fetch(endpoint.toString(), {
-    method: options.method,
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers ?? {}),
-    },
-    body: payload ? JSON.stringify(payload) : undefined,
-    signal: options.signal,
-  });
+  let res: Response;
+
+  try {
+    res = await fetch(endpoint.toString(), {
+      method: options.method,
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(options.headers ?? {}),
+      },
+      body: payload ? JSON.stringify(payload) : undefined,
+      signal: options.signal,
+    });
+  } catch (error) {
+    throw new Error("Network request failed. Check API availability and base URL configuration.");
+  }
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");

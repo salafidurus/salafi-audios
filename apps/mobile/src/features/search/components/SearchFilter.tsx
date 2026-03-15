@@ -1,31 +1,32 @@
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { EaseView } from "react-native-ease";
 import { useMemo, useState } from "react";
+import type { TopicDetailDto, TopicSlug } from "@sd/contracts";
 
-export type SearchFilterValue = "all" | "lectures" | "series" | "collections";
+export type SearchFilterValue = TopicSlug[];
 
 type FilterOption = {
-  id: SearchFilterValue;
+  id: "all" | TopicSlug;
   label: string;
 };
 
 export type SearchFilterProps = {
   value: SearchFilterValue;
   onChange: (value: SearchFilterValue) => void;
+  topics: TopicDetailDto[];
 };
 
-export function SearchFilter({ value, onChange }: SearchFilterProps) {
-  const { theme } = useUnistyles();
-  const options = useMemo<FilterOption[]>(
-    () => [
+export function SearchFilter({ value, onChange, topics }: SearchFilterProps) {
+  const options = useMemo<FilterOption[]>(() => {
+    const sortedTopics = [...topics].sort((a, b) => a.name.localeCompare(b.name));
+    return [
       { id: "all", label: "All" },
-      { id: "lectures", label: "Lectures" },
-      { id: "series", label: "Series" },
-      { id: "collections", label: "Collections" },
-    ],
-    [],
-  );
+      ...sortedTopics.map((topic) => ({ id: topic.slug, label: topic.name })),
+    ];
+  }, [topics]);
+
+  const selected = useMemo(() => new Set(value), [value]);
 
   return (
     <ScrollView
@@ -37,8 +38,22 @@ export function SearchFilter({ value, onChange }: SearchFilterProps) {
         <FilterChip
           key={option.id}
           label={option.label}
-          isActive={value === option.id}
-          onPress={() => onChange(option.id)}
+          isActive={option.id === "all" ? value.length === 0 : selected.has(option.id)}
+          onPress={() => {
+            if (option.id === "all") {
+              onChange([]);
+              return;
+            }
+
+            const next = new Set(value);
+            if (next.has(option.id)) {
+              next.delete(option.id);
+            } else {
+              next.add(option.id);
+            }
+
+            onChange(Array.from(next));
+          }}
         />
       ))}
     </ScrollView>

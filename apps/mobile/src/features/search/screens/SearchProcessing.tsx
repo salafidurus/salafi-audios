@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 import type { SearchResultRow } from "../components/SearchResultsList";
 import { SearchInput, type SearchInputRef } from "../components/SearchInput";
 import { ScreenView } from "@/shared/components/ScreenView";
 import { SearchResultsList } from "../components/SearchResultsList";
-import { type SearchFilterValue } from "../components/SearchFilter";
-import { useSearchCatalog } from "../api/search.api";
+import { SearchFilter, type SearchFilterValue } from "../components/SearchFilter";
+import { useSearchCatalog, useTopicsList } from "../api/search.api";
 import type {
   CollectionViewDto,
   LectureViewDto,
@@ -19,7 +21,7 @@ export type SearchProcessingProps = {
 export function SearchProcessing({ prefill }: SearchProcessingProps) {
   const [query, setQuery] = useState(prefill || "");
   const [debouncedQuery, setDebouncedQuery] = useState(prefill || "");
-  const [filter, setFilter] = useState<SearchFilterValue>("all");
+  const [filter, setFilter] = useState<SearchFilterValue>([]);
   const inputRef = useRef<SearchInputRef>(null);
 
   useEffect(() => {
@@ -35,33 +37,51 @@ export function SearchProcessing({ prefill }: SearchProcessingProps) {
   }, [query]);
 
   const shouldSearch = debouncedQuery.length > 0;
-  const { data, isFetching } = useSearchCatalog(
-    { q: debouncedQuery, limit: 20 },
+  const { data, isFetching, error, refetch } = useSearchCatalog(
+    {
+      q: debouncedQuery,
+      limit: 20,
+      topicSlugs: filter.length ? filter : undefined,
+    },
     { enabled: shouldSearch },
   );
+  const { data: topics = [] } = useTopicsList();
 
   const items = useMemo(() => {
-    return buildResultItems(data, filter);
-  }, [data, filter]);
+    return buildResultItems(data);
+  }, [data]);
+
+  const errorMessage = useMemo(() => {
+    if (!error) return undefined;
+    if (error instanceof Error) return error.message;
+    return "Unable to reach the server.";
+  }, [error]);
 
   return (
     <ScreenView>
-      <SearchInput ref={inputRef} placeholder="Search" value={query} onChange={setQuery} />
+      <View style={styles.searchGroup}>
+        <SearchInput ref={inputRef} placeholder="Search" value={query} onChange={setQuery} />
+        {shouldSearch ? <SearchFilter value={filter} onChange={setFilter} topics={topics} /> : null}
+      </View>
       <SearchResultsList
         items={items}
-        filter={filter}
-        onFilterChange={setFilter}
         isFetching={isFetching}
         shouldSearch={shouldSearch}
+        errorMessage={errorMessage}
+        onRefresh={shouldSearch ? refetch : undefined}
+        isRefreshing={isFetching}
       />
     </ScreenView>
   );
 }
 
-function buildResultItems(
-  data: SearchCatalogResultsDto | undefined,
-  filter: SearchFilterValue,
-): SearchResultRow[] {
+const styles = StyleSheet.create((theme) => ({
+  searchGroup: {
+    gap: theme.spacing.component.gapSm,
+  },
+}));
+
+function buildResultItems(data: SearchCatalogResultsDto | undefined): SearchResultRow[] {
   if (!data) return [];
 
   const collections = data.collections.map((item: CollectionViewDto) => ({
@@ -84,10 +104,6 @@ function buildResultItems(
     title: item.title,
     description: item.description,
   }));
-
-  if (filter === "collections") return collections;
-  if (filter === "series") return series;
-  if (filter === "lectures") return lectures;
 
   return [...collections, ...series, ...lectures];
 }

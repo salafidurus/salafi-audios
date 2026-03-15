@@ -141,6 +141,8 @@ export class SearchRepository {
     query: SearchQueryDto,
     includeRelated: boolean,
   ): Prisma.CollectionWhereInput {
+    const topicFilter = this.collectionTopicFilter(query);
+
     return {
       status: Status.published,
       deletedAt: null,
@@ -151,9 +153,7 @@ export class SearchRepository {
       ...(query.q
         ? { OR: this.buildCollectionSearchOr(query.q, includeRelated) }
         : {}),
-      ...(query.topicSlug
-        ? { topics: { some: { topic: { slug: query.topicSlug } } } }
-        : {}),
+      ...(topicFilter ?? {}),
     };
   }
 
@@ -161,6 +161,8 @@ export class SearchRepository {
     query: SearchQueryDto,
     includeRelated: boolean,
   ): Prisma.SeriesWhereInput {
+    const topicFilter = this.seriesTopicFilter(query);
+
     return {
       status: Status.published,
       deletedAt: null,
@@ -172,9 +174,7 @@ export class SearchRepository {
       ...(query.q
         ? { OR: this.buildSeriesSearchOr(query.q, includeRelated) }
         : {}),
-      ...(query.topicSlug
-        ? { topics: { some: { topic: { slug: query.topicSlug } } } }
-        : {}),
+      ...(topicFilter ?? {}),
     };
   }
 
@@ -182,6 +182,8 @@ export class SearchRepository {
     query: SearchQueryDto,
     includeRelated: boolean,
   ): Prisma.LectureWhereInput {
+    const topicFilter = this.lectureTopicFilter(query);
+
     return {
       status: Status.published,
       deletedAt: null,
@@ -193,10 +195,50 @@ export class SearchRepository {
       ...(query.q
         ? { OR: this.buildLectureSearchOr(query.q, includeRelated) }
         : {}),
-      ...(query.topicSlug
-        ? { topics: { some: { topic: { slug: query.topicSlug } } } }
-        : {}),
+      ...(topicFilter ?? {}),
     };
+  }
+
+  private collectionTopicFilter(
+    query: SearchQueryDto,
+  ): Prisma.CollectionWhereInput | undefined {
+    const topicSlugs = this.resolveTopicSlugs(query);
+
+    if (!topicSlugs.length) return undefined;
+
+    return { topics: { some: { topic: { slug: { in: topicSlugs } } } } };
+  }
+
+  private seriesTopicFilter(
+    query: SearchQueryDto,
+  ): Prisma.SeriesWhereInput | undefined {
+    const topicSlugs = this.resolveTopicSlugs(query);
+
+    if (!topicSlugs.length) return undefined;
+
+    return { topics: { some: { topic: { slug: { in: topicSlugs } } } } };
+  }
+
+  private lectureTopicFilter(
+    query: SearchQueryDto,
+  ): Prisma.LectureWhereInput | undefined {
+    const topicSlugs = this.resolveTopicSlugs(query);
+
+    if (!topicSlugs.length) return undefined;
+
+    return { topics: { some: { topic: { slug: { in: topicSlugs } } } } };
+  }
+
+  private resolveTopicSlugs(query: SearchQueryDto): string[] {
+    if (query.topicSlugs && query.topicSlugs.length) {
+      return query.topicSlugs;
+    }
+
+    if (query.topicSlug) {
+      return [query.topicSlug];
+    }
+
+    return [];
   }
 
   private buildCollectionSearchOr(
