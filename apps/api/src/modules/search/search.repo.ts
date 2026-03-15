@@ -5,89 +5,7 @@ import { ConfigService } from '@/shared/config/config.service';
 import { PrismaService } from '@/shared/db/prisma.service';
 import type { SearchQueryDto } from './dto/search-query.dto';
 
-const collectionSelect = {
-  id: true,
-  scholarId: true,
-  slug: true,
-  title: true,
-  description: true,
-  coverImageUrl: true,
-  publishedLectureCount: true,
-  publishedDurationSeconds: true,
-  language: true,
-  status: true,
-  orderIndex: true,
-  deletedAt: true,
-  deleteAfterAt: true,
-  createdAt: true,
-  updatedAt: true,
-  scholar: {
-    select: {
-      name: true,
-      slug: true,
-      imageUrl: true,
-    },
-  },
-} satisfies Prisma.CollectionSelect;
-
-type CollectionRecord = Prisma.CollectionGetPayload<{
-  select: typeof collectionSelect;
-}>;
-
-const seriesSelect = {
-  id: true,
-  scholarId: true,
-  collectionId: true,
-  slug: true,
-  title: true,
-  description: true,
-  coverImageUrl: true,
-  publishedLectureCount: true,
-  publishedDurationSeconds: true,
-  language: true,
-  status: true,
-  orderIndex: true,
-  deletedAt: true,
-  deleteAfterAt: true,
-  createdAt: true,
-  updatedAt: true,
-  scholar: {
-    select: {
-      name: true,
-      slug: true,
-      imageUrl: true,
-    },
-  },
-} satisfies Prisma.SeriesSelect;
-
-type SeriesRecord = Prisma.SeriesGetPayload<{ select: typeof seriesSelect }>;
-
-const lectureSelect = {
-  id: true,
-  scholarId: true,
-  seriesId: true,
-  slug: true,
-  title: true,
-  description: true,
-  language: true,
-  status: true,
-  publishedAt: true,
-  orderIndex: true,
-  durationSeconds: true,
-  deletedAt: true,
-  deleteAfterAt: true,
-  createdAt: true,
-  updatedAt: true,
-  scholar: {
-    select: {
-      name: true,
-      slug: true,
-      imageUrl: true,
-    },
-  },
-} satisfies Prisma.LectureSelect;
-
-type LectureRecord = Prisma.LectureGetPayload<{ select: typeof lectureSelect }>;
+const SIMILARITY_THRESHOLD = 0.12;
 
 @Injectable()
 export class SearchRepository {
@@ -101,14 +19,33 @@ export class SearchRepository {
     take: number,
     includeRelated: boolean,
   ): Promise<SearchCatalogItemDto[]> {
-    const rows = await this.prisma.collection.findMany({
-      where: this.collectionWhere(query, includeRelated),
-      select: collectionSelect,
-      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-      take,
-    });
+    const topicSlugs = this.resolveTopicSlugs(query);
+    const orderBySql = this.collectionOrderBySql(query.q ?? '', includeRelated);
+    const rows = await this.prisma.$queryRaw<SearchCatalogItemDto[]>(Prisma.sql`
+      SELECT
+        c."id",
+        c."slug",
+        c."title",
+        s."name" AS "scholarName",
+        s."slug" AS "scholarSlug",
+        c."coverImageUrl",
+        s."imageUrl" AS "scholarImageUrl",
+        COALESCE(c."publishedLectureCount", 0) AS "lectureCount",
+        c."publishedDurationSeconds" AS "durationSeconds"
+      FROM "Collection" c
+      JOIN "Scholar" s ON s."id" = c."scholarId"
+      WHERE c."status" = ${Status.published}
+        AND c."deletedAt" IS NULL
+        AND s."isActive" = true
+        ${query.language ? Prisma.sql`AND c."language" = ${query.language}` : Prisma.sql``}
+        ${query.scholarSlug ? Prisma.sql`AND s."slug" = ${query.scholarSlug}` : Prisma.sql``}
+        AND (${this.collectionMatchSql(query.q ?? '', includeRelated)})
+        ${this.collectionTopicFilterSql(topicSlugs)}
+      ORDER BY ${orderBySql}
+      LIMIT ${take}
+    `);
 
-    return rows.map((row) => this.toCollectionSearchItem(row));
+    return rows.map((row) => this.normalizeSearchItem(row));
   }
 
   async listRootSeries(
@@ -116,14 +53,34 @@ export class SearchRepository {
     take: number,
     includeRelated: boolean,
   ): Promise<SearchCatalogItemDto[]> {
-    const rows = await this.prisma.series.findMany({
-      where: this.seriesWhere(query, includeRelated),
-      select: seriesSelect,
-      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-      take,
-    });
+    const topicSlugs = this.resolveTopicSlugs(query);
+    const orderBySql = this.seriesOrderBySql(query.q ?? '', includeRelated);
+    const rows = await this.prisma.$queryRaw<SearchCatalogItemDto[]>(Prisma.sql`
+      SELECT
+        se."id",
+        se."slug",
+        se."title",
+        s."name" AS "scholarName",
+        s."slug" AS "scholarSlug",
+        se."coverImageUrl",
+        s."imageUrl" AS "scholarImageUrl",
+        COALESCE(se."publishedLectureCount", 0) AS "lectureCount",
+        se."publishedDurationSeconds" AS "durationSeconds"
+      FROM "Series" se
+      JOIN "Scholar" s ON s."id" = se."scholarId"
+      WHERE se."status" = ${Status.published}
+        AND se."deletedAt" IS NULL
+        AND se."collectionId" IS NULL
+        AND s."isActive" = true
+        ${query.language ? Prisma.sql`AND se."language" = ${query.language}` : Prisma.sql``}
+        ${query.scholarSlug ? Prisma.sql`AND s."slug" = ${query.scholarSlug}` : Prisma.sql``}
+        AND (${this.seriesMatchSql(query.q ?? '', includeRelated)})
+        ${this.seriesTopicFilterSql(topicSlugs)}
+      ORDER BY ${orderBySql}
+      LIMIT ${take}
+    `);
 
-    return rows.map((row) => this.toSeriesSearchItem(row));
+    return rows.map((row) => this.normalizeSearchItem(row));
   }
 
   async listRootLectures(
@@ -131,106 +88,34 @@ export class SearchRepository {
     take: number,
     includeRelated: boolean,
   ): Promise<SearchCatalogItemDto[]> {
-    const rows = await this.prisma.lecture.findMany({
-      where: this.lectureWhere(query, includeRelated),
-      select: lectureSelect,
-      orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }, { id: 'desc' }],
-      take,
-    });
-
-    return rows.map((row) => this.toLectureSearchItem(row));
-  }
-
-  private collectionWhere(
-    query: SearchQueryDto,
-    includeRelated: boolean,
-  ): Prisma.CollectionWhereInput {
-    const topicFilter = this.collectionTopicFilter(query);
-
-    return {
-      status: Status.published,
-      deletedAt: null,
-      ...(query.language ? { language: query.language } : {}),
-      ...(query.scholarSlug
-        ? { scholar: { isActive: true, slug: query.scholarSlug } }
-        : { scholar: { isActive: true } }),
-      ...(query.q
-        ? { OR: this.buildCollectionSearchOr(query.q, includeRelated) }
-        : {}),
-      ...(topicFilter ?? {}),
-    };
-  }
-
-  private seriesWhere(
-    query: SearchQueryDto,
-    includeRelated: boolean,
-  ): Prisma.SeriesWhereInput {
-    const topicFilter = this.seriesTopicFilter(query);
-
-    return {
-      status: Status.published,
-      deletedAt: null,
-      collectionId: null,
-      ...(query.language ? { language: query.language } : {}),
-      ...(query.scholarSlug
-        ? { scholar: { isActive: true, slug: query.scholarSlug } }
-        : { scholar: { isActive: true } }),
-      ...(query.q
-        ? { OR: this.buildSeriesSearchOr(query.q, includeRelated) }
-        : {}),
-      ...(topicFilter ?? {}),
-    };
-  }
-
-  private lectureWhere(
-    query: SearchQueryDto,
-    includeRelated: boolean,
-  ): Prisma.LectureWhereInput {
-    const topicFilter = this.lectureTopicFilter(query);
-
-    return {
-      status: Status.published,
-      deletedAt: null,
-      seriesId: null,
-      ...(query.language ? { language: query.language } : {}),
-      ...(query.scholarSlug
-        ? { scholar: { isActive: true, slug: query.scholarSlug } }
-        : { scholar: { isActive: true } }),
-      ...(query.q
-        ? { OR: this.buildLectureSearchOr(query.q, includeRelated) }
-        : {}),
-      ...(topicFilter ?? {}),
-    };
-  }
-
-  private collectionTopicFilter(
-    query: SearchQueryDto,
-  ): Prisma.CollectionWhereInput | undefined {
     const topicSlugs = this.resolveTopicSlugs(query);
+    const orderBySql = this.lectureOrderBySql(query.q ?? '', includeRelated);
+    const rows = await this.prisma.$queryRaw<SearchCatalogItemDto[]>(Prisma.sql`
+      SELECT
+        l."id",
+        l."slug",
+        l."title",
+        s."name" AS "scholarName",
+        s."slug" AS "scholarSlug",
+        NULL AS "coverImageUrl",
+        s."imageUrl" AS "scholarImageUrl",
+        1 AS "lectureCount",
+        l."durationSeconds" AS "durationSeconds"
+      FROM "Lecture" l
+      JOIN "Scholar" s ON s."id" = l."scholarId"
+      WHERE l."status" = ${Status.published}
+        AND l."deletedAt" IS NULL
+        AND l."seriesId" IS NULL
+        AND s."isActive" = true
+        ${query.language ? Prisma.sql`AND l."language" = ${query.language}` : Prisma.sql``}
+        ${query.scholarSlug ? Prisma.sql`AND s."slug" = ${query.scholarSlug}` : Prisma.sql``}
+        AND (${this.lectureMatchSql(query.q ?? '', includeRelated)})
+        ${this.lectureTopicFilterSql(topicSlugs)}
+      ORDER BY ${orderBySql}
+      LIMIT ${take}
+    `);
 
-    if (!topicSlugs.length) return undefined;
-
-    return { topics: { some: { topic: { slug: { in: topicSlugs } } } } };
-  }
-
-  private seriesTopicFilter(
-    query: SearchQueryDto,
-  ): Prisma.SeriesWhereInput | undefined {
-    const topicSlugs = this.resolveTopicSlugs(query);
-
-    if (!topicSlugs.length) return undefined;
-
-    return { topics: { some: { topic: { slug: { in: topicSlugs } } } } };
-  }
-
-  private lectureTopicFilter(
-    query: SearchQueryDto,
-  ): Prisma.LectureWhereInput | undefined {
-    const topicSlugs = this.resolveTopicSlugs(query);
-
-    if (!topicSlugs.length) return undefined;
-
-    return { topics: { some: { topic: { slug: { in: topicSlugs } } } } };
+    return rows.map((row) => this.normalizeSearchItem(row));
   }
 
   private resolveTopicSlugs(query: SearchQueryDto): string[] {
@@ -245,130 +130,295 @@ export class SearchRepository {
     return [];
   }
 
-  private buildCollectionSearchOr(
+  private collectionMatchSql(
     query: string,
     includeRelated: boolean,
-  ): Prisma.CollectionWhereInput[] {
-    const clauses: Prisma.CollectionWhereInput[] = [
-      { title: { contains: query, mode: 'insensitive' } },
-      { description: { contains: query, mode: 'insensitive' } },
+  ): Prisma.Sql {
+    const queryText = Prisma.sql`CAST(${query} AS TEXT)`;
+    const clauses: Prisma.Sql[] = [
+      Prisma.sql`c."title" % ${queryText}`,
+      Prisma.sql`similarity(c."title", ${queryText}) > ${SIMILARITY_THRESHOLD}`,
+      Prisma.sql`COALESCE(c."description", '') % ${queryText}`,
+      Prisma.sql`
+        similarity(COALESCE(c."description", ''), ${queryText}) > ${SIMILARITY_THRESHOLD}
+      `,
     ];
 
     if (includeRelated) {
       clauses.push(
-        { scholar: { name: { contains: query, mode: 'insensitive' } } },
-        {
-          topics: {
-            some: { topic: { name: { contains: query, mode: 'insensitive' } } },
-          },
-        },
-        {
-          topics: {
-            some: { topic: { slug: { contains: query, mode: 'insensitive' } } },
-          },
-        },
+        Prisma.sql`s."name" % ${queryText}`,
+        Prisma.sql`similarity(s."name", ${queryText}) > ${SIMILARITY_THRESHOLD}`,
+        Prisma.sql`
+          EXISTS (
+            SELECT 1
+            FROM "CollectionTopic" ct
+            JOIN "Topic" t ON t."id" = ct."topicId"
+            WHERE ct."collectionId" = c."id"
+              AND (
+                t."name" % ${queryText}
+                OR similarity(t."name", ${queryText}) > ${SIMILARITY_THRESHOLD}
+                OR t."slug" % ${queryText}
+                OR similarity(t."slug", ${queryText}) > ${SIMILARITY_THRESHOLD}
+              )
+          )
+        `,
       );
     }
 
-    return clauses;
+    return Prisma.sql`${Prisma.join(clauses, ' OR ')}`;
   }
 
-  private buildSeriesSearchOr(
-    query: string,
-    includeRelated: boolean,
-  ): Prisma.SeriesWhereInput[] {
-    const clauses: Prisma.SeriesWhereInput[] = [
-      { title: { contains: query, mode: 'insensitive' } },
-      { description: { contains: query, mode: 'insensitive' } },
+  private seriesMatchSql(query: string, includeRelated: boolean): Prisma.Sql {
+    const queryText = Prisma.sql`CAST(${query} AS TEXT)`;
+    const clauses: Prisma.Sql[] = [
+      Prisma.sql`se."title" % ${queryText}`,
+      Prisma.sql`similarity(se."title", ${queryText}) > ${SIMILARITY_THRESHOLD}`,
+      Prisma.sql`COALESCE(se."description", '') % ${queryText}`,
+      Prisma.sql`
+        similarity(COALESCE(se."description", ''), ${queryText}) > ${SIMILARITY_THRESHOLD}
+      `,
     ];
 
     if (includeRelated) {
       clauses.push(
-        { scholar: { name: { contains: query, mode: 'insensitive' } } },
-        {
-          topics: {
-            some: { topic: { name: { contains: query, mode: 'insensitive' } } },
-          },
-        },
-        {
-          topics: {
-            some: { topic: { slug: { contains: query, mode: 'insensitive' } } },
-          },
-        },
+        Prisma.sql`s."name" % ${queryText}`,
+        Prisma.sql`similarity(s."name", ${queryText}) > ${SIMILARITY_THRESHOLD}`,
+        Prisma.sql`
+          EXISTS (
+            SELECT 1
+            FROM "SeriesTopic" st
+            JOIN "Topic" t ON t."id" = st."topicId"
+            WHERE st."seriesId" = se."id"
+              AND (
+                t."name" % ${queryText}
+                OR similarity(t."name", ${queryText}) > ${SIMILARITY_THRESHOLD}
+                OR t."slug" % ${queryText}
+                OR similarity(t."slug", ${queryText}) > ${SIMILARITY_THRESHOLD}
+              )
+          )
+        `,
       );
     }
 
-    return clauses;
+    return Prisma.sql`${Prisma.join(clauses, ' OR ')}`;
   }
 
-  private buildLectureSearchOr(
-    query: string,
-    includeRelated: boolean,
-  ): Prisma.LectureWhereInput[] {
-    const clauses: Prisma.LectureWhereInput[] = [
-      { title: { contains: query, mode: 'insensitive' } },
-      { description: { contains: query, mode: 'insensitive' } },
+  private lectureMatchSql(query: string, includeRelated: boolean): Prisma.Sql {
+    const queryText = Prisma.sql`CAST(${query} AS TEXT)`;
+    const clauses: Prisma.Sql[] = [
+      Prisma.sql`l."title" % ${queryText}`,
+      Prisma.sql`similarity(l."title", ${queryText}) > ${SIMILARITY_THRESHOLD}`,
+      Prisma.sql`COALESCE(l."description", '') % ${queryText}`,
+      Prisma.sql`
+        similarity(COALESCE(l."description", ''), ${queryText}) > ${SIMILARITY_THRESHOLD}
+      `,
     ];
 
     if (includeRelated) {
       clauses.push(
-        { scholar: { name: { contains: query, mode: 'insensitive' } } },
-        {
-          topics: {
-            some: { topic: { name: { contains: query, mode: 'insensitive' } } },
-          },
-        },
-        {
-          topics: {
-            some: { topic: { slug: { contains: query, mode: 'insensitive' } } },
-          },
-        },
+        Prisma.sql`s."name" % ${queryText}`,
+        Prisma.sql`similarity(s."name", ${queryText}) > ${SIMILARITY_THRESHOLD}`,
+        Prisma.sql`
+          EXISTS (
+            SELECT 1
+            FROM "LectureTopic" lt
+            JOIN "Topic" t ON t."id" = lt."topicId"
+            WHERE lt."lectureId" = l."id"
+              AND (
+                t."name" % ${queryText}
+                OR similarity(t."name", ${queryText}) > ${SIMILARITY_THRESHOLD}
+                OR t."slug" % ${queryText}
+                OR similarity(t."slug", ${queryText}) > ${SIMILARITY_THRESHOLD}
+              )
+          )
+        `,
       );
     }
 
-    return clauses;
+    return Prisma.sql`${Prisma.join(clauses, ' OR ')}`;
   }
 
-  private toCollectionSearchItem(
-    record: CollectionRecord,
+  private collectionTopicFilterSql(topicSlugs: string[]): Prisma.Sql {
+    if (!topicSlugs.length) return Prisma.sql``;
+
+    const clauses = topicSlugs.map(
+      (slug) => Prisma.sql`
+      EXISTS (
+        SELECT 1
+        FROM "CollectionTopic" ct
+        JOIN "Topic" t ON t."id" = ct."topicId"
+        WHERE ct."collectionId" = c."id"
+          AND t."slug" = ${slug}
+      )
+    `,
+    );
+
+    return Prisma.sql`
+      AND (${Prisma.join(clauses, ' OR ')})
+    `;
+  }
+
+  private seriesTopicFilterSql(topicSlugs: string[]): Prisma.Sql {
+    if (!topicSlugs.length) return Prisma.sql``;
+
+    const clauses = topicSlugs.map(
+      (slug) => Prisma.sql`
+      EXISTS (
+        SELECT 1
+        FROM "SeriesTopic" st
+        JOIN "Topic" t ON t."id" = st."topicId"
+        WHERE st."seriesId" = se."id"
+          AND t."slug" = ${slug}
+      )
+    `,
+    );
+
+    return Prisma.sql`
+      AND (${Prisma.join(clauses, ' OR ')})
+    `;
+  }
+
+  private lectureTopicFilterSql(topicSlugs: string[]): Prisma.Sql {
+    if (!topicSlugs.length) return Prisma.sql``;
+
+    const clauses = topicSlugs.map(
+      (slug) => Prisma.sql`
+      EXISTS (
+        SELECT 1
+        FROM "LectureTopic" lt
+        JOIN "Topic" t ON t."id" = lt."topicId"
+        WHERE lt."lectureId" = l."id"
+          AND t."slug" = ${slug}
+      )
+    `,
+    );
+
+    return Prisma.sql`
+      AND (${Prisma.join(clauses, ' OR ')})
+    `;
+  }
+
+  private collectionOrderBySql(
+    query: string,
+    includeRelated: boolean,
+  ): Prisma.Sql {
+    const queryText = Prisma.sql`CAST(${query} AS TEXT)`;
+    const clauses: Prisma.Sql[] = [
+      Prisma.sql`similarity(c."title", ${queryText}) DESC`,
+    ];
+
+    if (includeRelated) {
+      clauses.push(Prisma.sql`similarity(s."name", ${queryText}) DESC`);
+    }
+
+    clauses.push(
+      Prisma.sql`similarity(COALESCE(c."description", ''), ${queryText}) DESC`,
+    );
+
+    if (includeRelated) {
+      clauses.push(
+        Prisma.sql`
+          COALESCE((
+            SELECT MAX(GREATEST(
+              similarity(t."name", ${queryText}),
+              similarity(t."slug", ${queryText})
+            ))
+            FROM "CollectionTopic" ct
+            JOIN "Topic" t ON t."id" = ct."topicId"
+            WHERE ct."collectionId" = c."id"
+          ), 0) DESC
+        `,
+      );
+    }
+
+    clauses.push(Prisma.sql`c."id" ASC`);
+
+    return Prisma.sql`${Prisma.join(clauses, ', ')}`;
+  }
+
+  private seriesOrderBySql(query: string, includeRelated: boolean): Prisma.Sql {
+    const queryText = Prisma.sql`CAST(${query} AS TEXT)`;
+    const clauses: Prisma.Sql[] = [
+      Prisma.sql`similarity(se."title", ${queryText}) DESC`,
+    ];
+
+    if (includeRelated) {
+      clauses.push(Prisma.sql`similarity(s."name", ${queryText}) DESC`);
+    }
+
+    clauses.push(
+      Prisma.sql`similarity(COALESCE(se."description", ''), ${queryText}) DESC`,
+    );
+
+    if (includeRelated) {
+      clauses.push(
+        Prisma.sql`
+          COALESCE((
+            SELECT MAX(GREATEST(
+              similarity(t."name", ${queryText}),
+              similarity(t."slug", ${queryText})
+            ))
+            FROM "SeriesTopic" st
+            JOIN "Topic" t ON t."id" = st."topicId"
+            WHERE st."seriesId" = se."id"
+          ), 0) DESC
+        `,
+      );
+    }
+
+    clauses.push(Prisma.sql`se."id" ASC`);
+
+    return Prisma.sql`${Prisma.join(clauses, ', ')}`;
+  }
+
+  private lectureOrderBySql(
+    query: string,
+    includeRelated: boolean,
+  ): Prisma.Sql {
+    const queryText = Prisma.sql`CAST(${query} AS TEXT)`;
+    const clauses: Prisma.Sql[] = [
+      Prisma.sql`similarity(l."title", ${queryText}) DESC`,
+    ];
+
+    if (includeRelated) {
+      clauses.push(Prisma.sql`similarity(s."name", ${queryText}) DESC`);
+    }
+
+    clauses.push(
+      Prisma.sql`similarity(COALESCE(l."description", ''), ${queryText}) DESC`,
+    );
+
+    if (includeRelated) {
+      clauses.push(
+        Prisma.sql`
+          COALESCE((
+            SELECT MAX(GREATEST(
+              similarity(t."name", ${queryText}),
+              similarity(t."slug", ${queryText})
+            ))
+            FROM "LectureTopic" lt
+            JOIN "Topic" t ON t."id" = lt."topicId"
+            WHERE lt."lectureId" = l."id"
+          ), 0) DESC
+        `,
+      );
+    }
+
+    clauses.push(
+      Prisma.sql`l."publishedAt" DESC NULLS LAST`,
+      Prisma.sql`l."id" ASC`,
+    );
+
+    return Prisma.sql`${Prisma.join(clauses, ', ')}`;
+  }
+
+  private normalizeSearchItem(
+    item: SearchCatalogItemDto,
   ): SearchCatalogItemDto {
     return {
-      id: record.id,
-      slug: record.slug,
-      title: record.title,
-      scholarName: record.scholar.name,
-      scholarSlug: record.scholar.slug,
-      coverImageUrl: this.toOptionalPublicUrl(record.coverImageUrl),
-      scholarImageUrl: this.toOptionalPublicUrl(record.scholar.imageUrl),
-      lectureCount: record.publishedLectureCount ?? 0,
-      durationSeconds: record.publishedDurationSeconds ?? undefined,
-    };
-  }
-
-  private toSeriesSearchItem(record: SeriesRecord): SearchCatalogItemDto {
-    return {
-      id: record.id,
-      slug: record.slug,
-      title: record.title,
-      scholarName: record.scholar.name,
-      scholarSlug: record.scholar.slug,
-      coverImageUrl: this.toOptionalPublicUrl(record.coverImageUrl),
-      scholarImageUrl: this.toOptionalPublicUrl(record.scholar.imageUrl),
-      lectureCount: record.publishedLectureCount ?? 0,
-      durationSeconds: record.publishedDurationSeconds ?? undefined,
-    };
-  }
-
-  private toLectureSearchItem(record: LectureRecord): SearchCatalogItemDto {
-    return {
-      id: record.id,
-      slug: record.slug,
-      title: record.title,
-      scholarName: record.scholar.name,
-      scholarSlug: record.scholar.slug,
-      scholarImageUrl: this.toOptionalPublicUrl(record.scholar.imageUrl),
-      lectureCount: 1,
-      durationSeconds: record.durationSeconds ?? undefined,
+      ...item,
+      coverImageUrl: this.toOptionalPublicUrl(item.coverImageUrl),
+      scholarImageUrl: this.toOptionalPublicUrl(item.scholarImageUrl),
     };
   }
 

@@ -38,6 +38,7 @@ export class SearchService {
       limit,
       language: query.language,
       topicSlug: query.topicSlug,
+      topicSlugs: query.topicSlugs,
       scholarSlug: query.scholarSlug,
     };
 

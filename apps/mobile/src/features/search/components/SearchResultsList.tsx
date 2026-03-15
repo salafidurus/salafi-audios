@@ -18,8 +18,6 @@ type SearchResultsListProps = {
   isFetching: boolean;
   shouldSearch: boolean;
   errorMessage?: string;
-  onRefresh?: () => void;
-  isRefreshing?: boolean;
 };
 
 export function SearchResultsList({
@@ -27,8 +25,6 @@ export function SearchResultsList({
   isFetching,
   shouldSearch,
   errorMessage,
-  onRefresh,
-  isRefreshing,
 }: SearchResultsListProps) {
   return (
     <View style={styles.resultsContainer}>
@@ -45,8 +41,8 @@ export function SearchResultsList({
           />
         )}
         contentContainerStyle={styles.listContent}
-        onRefresh={onRefresh}
-        refreshing={isRefreshing ?? false}
+        showsVerticalScrollIndicator={false}
+        ItemSeparatorComponent={ListSeparator}
         ListEmptyComponent={() => (
           <SearchResultEmpty
             shouldSearch={shouldSearch}
@@ -65,7 +61,13 @@ const styles = StyleSheet.create((theme) => ({
     // marginTop: theme.spacing.component.gapLg,
   },
   listContent: {
-    gap: theme.spacing.component.gapMd,
     paddingBottom: theme.spacing.layout.pageY,
   },
+  separator: {
+    height: theme.spacing.component.gapSm,
+  },
 }));
+
+function ListSeparator() {
+  return <View style={styles.separator} />;
+}

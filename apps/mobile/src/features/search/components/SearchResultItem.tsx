@@ -6,6 +6,7 @@ import { HeadsetIcon } from "@hugeicons/core-free-icons";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { EaseView } from "react-native-ease";
 import { useState } from "react";
+import { MarqueeText } from "./MarqueeText";
 
 export type SearchResultItemProps = {
   title: string;
@@ -27,6 +28,7 @@ export function SearchResultItem({
   const { theme } = useUnistyles();
   const [isPressed, setIsPressed] = useState(false);
   const resolvedImage = imageUrl ? { uri: imageUrl } : null;
+  const durationLabel = formatDuration(durationSeconds);
 
   return (
     <EaseView
@@ -50,12 +52,8 @@ export function SearchResultItem({
           )}
         </View>
         <View style={styles.body}>
-          <Text style={styles.title} numberOfLines={1}>
-            {title}
-          </Text>
-          <Text style={styles.scholarName} numberOfLines={1}>
-            {scholarName}
-          </Text>
+          <MarqueeText key={title} text={title} textStyle={styles.title} />
+          <MarqueeText key={scholarName} text={scholarName} textStyle={styles.scholarName} />
           <View style={styles.metaRow}>
             <View style={styles.metaItem}>
               <HugeiconsIcon
@@ -66,10 +64,12 @@ export function SearchResultItem({
               />
               <Text style={styles.metaText}>{formatLectureCount(lectureCount)}</Text>
             </View>
-            <View style={styles.metaItem}>
-              <Clock size={16} color={theme.colors.content.muted} strokeWidth={2} />
-              <Text style={styles.metaText}>{formatDuration(durationSeconds)}</Text>
-            </View>
+            {durationLabel ? (
+              <View style={styles.metaItem}>
+                <Clock size={16} color={theme.colors.content.muted} strokeWidth={2} />
+                <Text style={styles.metaText}>{durationLabel}</Text>
+              </View>
+            ) : null}
           </View>
         </View>
       </Pressable>
@@ -88,7 +88,7 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.component.gapMd,
   },
   media: {
-    width: theme.spacing.scale["4xl"],
+    width: "20%",
     aspectRatio: 4 / 5,
     borderRadius: theme.radius.component.panelSm,
     overflow: "hidden",
@@ -134,13 +134,12 @@ function formatLectureCount(count: number): string {
   if (count === 1) {
     return "1 lecture";
   }
-
   return `${count} lectures`;
 }
 
 function formatDuration(durationSeconds?: number): string {
   if (!durationSeconds || durationSeconds <= 0) {
-    return "0m";
+    return "";
   }
 
   const hours = Math.floor(durationSeconds / 3600);
@@ -148,6 +147,9 @@ function formatDuration(durationSeconds?: number): string {
 
   if (hours > 0) {
     return `${hours}hr ${String(minutes).padStart(2, "0")}m`;
+  }
+  if (minutes <= 0) {
+    return "";
   }
 
   return `${minutes}m`;

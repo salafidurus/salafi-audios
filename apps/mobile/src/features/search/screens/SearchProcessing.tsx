@@ -32,7 +32,7 @@ export function SearchProcessing({ prefill }: SearchProcessingProps) {
   }, [query]);
 
   const shouldSearch = debouncedQuery.length > 0;
-  const { data, isFetching, error, refetch } = useSearchCatalog(
+  const { data, isFetching, error } = useSearchCatalog(
     {
       q: debouncedQuery,
       limit: 20,
@@ -63,8 +63,6 @@ export function SearchProcessing({ prefill }: SearchProcessingProps) {
         isFetching={isFetching}
         shouldSearch={shouldSearch}
         errorMessage={errorMessage}
-        onRefresh={shouldSearch ? refetch : undefined}
-        isRefreshing={isFetching}
       />
     </ScreenView>
   );
