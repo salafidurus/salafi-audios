@@ -1,6 +1,8 @@
 import { Pressable, Text } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useRouter } from "expo-router";
+import { EaseView } from "react-native-ease";
+import { useState } from "react";
 
 export type BrowseCardProps = {
   name: string;
@@ -8,6 +10,8 @@ export type BrowseCardProps = {
 
 export function BrowseCard({ name }: BrowseCardProps) {
   const router = useRouter();
+  const { theme } = useUnistyles();
+  const [isPressed, setIsPressed] = useState(false);
 
   const handlePress = () => {
     router.push({
@@ -17,20 +21,34 @@ export function BrowseCard({ name }: BrowseCardProps) {
   };
 
   return (
-    <Pressable
-      onPress={handlePress}
-      style={({ pressed }) => [styles.container, pressed && styles.pressed]}
+    <EaseView
+      animate={{
+        scale: isPressed ? 0.95 : 1,
+      }}
+      transition={{ type: "spring", damping: 10, stiffness: 150 }}
+      style={[
+        styles.container,
+        {
+          backgroundColor: isPressed ? theme.colors.surface.hover : theme.colors.surface.default,
+          borderColor: isPressed ? theme.colors.border.primary : theme.colors.border.default,
+        },
+      ]}
     >
-      <Text style={styles.name}>{name}</Text>
-    </Pressable>
+      <Pressable
+        onPress={handlePress}
+        onPressIn={() => setIsPressed(true)}
+        onPressOut={() => setIsPressed(false)}
+        style={styles.pressable}
+      >
+        <Text style={styles.name}>{name}</Text>
+      </Pressable>
+    </EaseView>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
   container: {
-    backgroundColor: theme.colors.surface.default,
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border.default,
     borderRadius: theme.radius.component.card,
     paddingVertical: theme.spacing.component.gapLg,
     paddingHorizontal: theme.spacing.component.cardPadding,
@@ -38,8 +56,11 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: "center",
     minHeight: 100,
   },
-  pressed: {
-    backgroundColor: theme.colors.surface.hover,
+  pressable: {
+    flex: 1,
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
   },
   name: {
     fontFamily: theme.typography.labelMd.fontFamily,
