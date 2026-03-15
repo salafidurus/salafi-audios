@@ -7,12 +7,7 @@ import { ScreenView } from "@/shared/components/ScreenView";
 import { SearchResultsList } from "../components/SearchResultsList";
 import { SearchFilter, type SearchFilterValue } from "../components/SearchFilter";
 import { useSearchCatalog, useTopicsList } from "../api/search.api";
-import type {
-  CollectionViewDto,
-  LectureViewDto,
-  SearchCatalogResultsDto,
-  SeriesViewDto,
-} from "@sd/contracts";
+import type { SearchCatalogItemDto, SearchCatalogResultsDto } from "@sd/contracts";
 
 export type SearchProcessingProps = {
   prefill?: string;
@@ -84,25 +79,31 @@ const styles = StyleSheet.create((theme) => ({
 function buildResultItems(data: SearchCatalogResultsDto | undefined): SearchResultRow[] {
   if (!data) return [];
 
-  const collections = data.collections.map((item: CollectionViewDto) => ({
+  const collections = data.collections.map((item: SearchCatalogItemDto) => ({
     id: `collection:${item.id}`,
-    kind: "collection" as const,
     title: item.title,
-    description: item.description,
+    scholarName: item.scholarName,
+    imageUrl: item.coverImageUrl ?? item.scholarImageUrl,
+    lectureCount: item.lectureCount,
+    durationSeconds: item.durationSeconds,
   }));
 
-  const series = data.series.map((item: SeriesViewDto) => ({
+  const series = data.series.map((item: SearchCatalogItemDto) => ({
     id: `series:${item.id}`,
-    kind: "series" as const,
     title: item.title,
-    description: item.description,
+    scholarName: item.scholarName,
+    imageUrl: item.coverImageUrl ?? item.scholarImageUrl,
+    lectureCount: item.lectureCount,
+    durationSeconds: item.durationSeconds,
   }));
 
-  const lectures = data.lectures.map((item: LectureViewDto) => ({
+  const lectures = data.lectures.map((item: SearchCatalogItemDto) => ({
     id: `lecture:${item.id}`,
-    kind: "lecture" as const,
     title: item.title,
-    description: item.description,
+    scholarName: item.scholarName,
+    imageUrl: item.coverImageUrl ?? item.scholarImageUrl,
+    lectureCount: item.lectureCount,
+    durationSeconds: item.durationSeconds,
   }));
 
   return [...collections, ...series, ...lectures];

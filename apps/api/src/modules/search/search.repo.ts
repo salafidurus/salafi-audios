@@ -1,10 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, Status } from '@sd/db';
-import type {
-  CollectionViewDto,
-  LectureViewDto,
-  SeriesViewDto,
-} from '@sd/contracts';
+import type { SearchCatalogItemDto } from '@sd/contracts';
 import { ConfigService } from '@/shared/config/config.service';
 import { PrismaService } from '@/shared/db/prisma.service';
 import type { SearchQueryDto } from './dto/search-query.dto';
@@ -16,6 +12,8 @@ const collectionSelect = {
   title: true,
   description: true,
   coverImageUrl: true,
+  publishedLectureCount: true,
+  publishedDurationSeconds: true,
   language: true,
   status: true,
   orderIndex: true,
@@ -23,6 +21,13 @@ const collectionSelect = {
   deleteAfterAt: true,
   createdAt: true,
   updatedAt: true,
+  scholar: {
+    select: {
+      name: true,
+      slug: true,
+      imageUrl: true,
+    },
+  },
 } satisfies Prisma.CollectionSelect;
 
 type CollectionRecord = Prisma.CollectionGetPayload<{
@@ -37,6 +42,8 @@ const seriesSelect = {
   title: true,
   description: true,
   coverImageUrl: true,
+  publishedLectureCount: true,
+  publishedDurationSeconds: true,
   language: true,
   status: true,
   orderIndex: true,
@@ -44,6 +51,13 @@ const seriesSelect = {
   deleteAfterAt: true,
   createdAt: true,
   updatedAt: true,
+  scholar: {
+    select: {
+      name: true,
+      slug: true,
+      imageUrl: true,
+    },
+  },
 } satisfies Prisma.SeriesSelect;
 
 type SeriesRecord = Prisma.SeriesGetPayload<{ select: typeof seriesSelect }>;
@@ -64,21 +78,11 @@ const lectureSelect = {
   deleteAfterAt: true,
   createdAt: true,
   updatedAt: true,
-  audioAssets: {
-    where: { isPrimary: true },
-    orderBy: [{ createdAt: 'asc' }],
-    take: 1,
+  scholar: {
     select: {
-      id: true,
-      lectureId: true,
-      url: true,
-      format: true,
-      bitrateKbps: true,
-      sizeBytes: true,
-      durationSeconds: true,
-      source: true,
-      isPrimary: true,
-      createdAt: true,
+      name: true,
+      slug: true,
+      imageUrl: true,
     },
   },
 } satisfies Prisma.LectureSelect;
@@ -96,7 +100,7 @@ export class SearchRepository {
     query: SearchQueryDto,
     take: number,
     includeRelated: boolean,
-  ): Promise<CollectionViewDto[]> {
+  ): Promise<SearchCatalogItemDto[]> {
     const rows = await this.prisma.collection.findMany({
       where: this.collectionWhere(query, includeRelated),
       select: collectionSelect,
@@ -104,14 +108,14 @@ export class SearchRepository {
       take,
     });
 
-    return rows.map((row) => this.toCollectionViewDto(row));
+    return rows.map((row) => this.toCollectionSearchItem(row));
   }
 
   async listRootSeries(
     query: SearchQueryDto,
     take: number,
     includeRelated: boolean,
-  ): Promise<SeriesViewDto[]> {
+  ): Promise<SearchCatalogItemDto[]> {
     const rows = await this.prisma.series.findMany({
       where: this.seriesWhere(query, includeRelated),
       select: seriesSelect,
@@ -119,14 +123,14 @@ export class SearchRepository {
       take,
     });
 
-    return rows.map((row) => this.toSeriesViewDto(row));
+    return rows.map((row) => this.toSeriesSearchItem(row));
   }
 
   async listRootLectures(
     query: SearchQueryDto,
     take: number,
     includeRelated: boolean,
-  ): Promise<LectureViewDto[]> {
+  ): Promise<SearchCatalogItemDto[]> {
     const rows = await this.prisma.lecture.findMany({
       where: this.lectureWhere(query, includeRelated),
       select: lectureSelect,
@@ -134,7 +138,7 @@ export class SearchRepository {
       take,
     });
 
-    return rows.map((row) => this.toLectureViewDto(row));
+    return rows.map((row) => this.toLectureSearchItem(row));
   }
 
   private collectionWhere(
@@ -325,87 +329,46 @@ export class SearchRepository {
     return clauses;
   }
 
-  private toCollectionViewDto(record: CollectionRecord): CollectionViewDto {
+  private toCollectionSearchItem(
+    record: CollectionRecord,
+  ): SearchCatalogItemDto {
     return {
       id: record.id,
-      scholarId: record.scholarId,
       slug: record.slug,
       title: record.title,
-      description: record.description ?? undefined,
-      coverImageUrl: record.coverImageUrl ?? undefined,
-      language: record.language ?? undefined,
-      status: record.status,
-      orderIndex: record.orderIndex ?? undefined,
-      deletedAt: record.deletedAt ? record.deletedAt.toISOString() : undefined,
-      deleteAfterAt: record.deleteAfterAt
-        ? record.deleteAfterAt.toISOString()
-        : undefined,
-      createdAt: record.createdAt.toISOString(),
-      updatedAt: record.updatedAt ? record.updatedAt.toISOString() : undefined,
+      scholarName: record.scholar.name,
+      scholarSlug: record.scholar.slug,
+      coverImageUrl: this.toOptionalPublicUrl(record.coverImageUrl),
+      scholarImageUrl: this.toOptionalPublicUrl(record.scholar.imageUrl),
+      lectureCount: record.publishedLectureCount ?? 0,
+      durationSeconds: record.publishedDurationSeconds ?? undefined,
     };
   }
 
-  private toSeriesViewDto(record: SeriesRecord): SeriesViewDto {
+  private toSeriesSearchItem(record: SeriesRecord): SearchCatalogItemDto {
     return {
       id: record.id,
-      scholarId: record.scholarId,
-      collectionId: record.collectionId ?? undefined,
       slug: record.slug,
       title: record.title,
-      description: record.description ?? undefined,
-      coverImageUrl: record.coverImageUrl ?? undefined,
-      language: record.language ?? undefined,
-      status: record.status,
-      orderIndex: record.orderIndex ?? undefined,
-      deletedAt: record.deletedAt ? record.deletedAt.toISOString() : undefined,
-      deleteAfterAt: record.deleteAfterAt
-        ? record.deleteAfterAt.toISOString()
-        : undefined,
-      createdAt: record.createdAt.toISOString(),
-      updatedAt: record.updatedAt ? record.updatedAt.toISOString() : undefined,
+      scholarName: record.scholar.name,
+      scholarSlug: record.scholar.slug,
+      coverImageUrl: this.toOptionalPublicUrl(record.coverImageUrl),
+      scholarImageUrl: this.toOptionalPublicUrl(record.scholar.imageUrl),
+      lectureCount: record.publishedLectureCount ?? 0,
+      durationSeconds: record.publishedDurationSeconds ?? undefined,
     };
   }
 
-  private toLectureViewDto(record: LectureRecord): LectureViewDto {
-    const primaryAudioAsset = record.audioAssets[0];
-
+  private toLectureSearchItem(record: LectureRecord): SearchCatalogItemDto {
     return {
       id: record.id,
-      scholarId: record.scholarId,
-      seriesId: record.seriesId ?? undefined,
       slug: record.slug,
       title: record.title,
-      description: record.description ?? undefined,
-      language: record.language ?? undefined,
-      status: record.status,
-      publishedAt: record.publishedAt
-        ? record.publishedAt.toISOString()
-        : undefined,
-      orderIndex: record.orderIndex ?? undefined,
+      scholarName: record.scholar.name,
+      scholarSlug: record.scholar.slug,
+      scholarImageUrl: this.toOptionalPublicUrl(record.scholar.imageUrl),
+      lectureCount: 1,
       durationSeconds: record.durationSeconds ?? undefined,
-      primaryAudioAsset: primaryAudioAsset
-        ? {
-            id: primaryAudioAsset.id,
-            lectureId: primaryAudioAsset.lectureId,
-            url: this.toPublicUrl(primaryAudioAsset.url),
-            format: primaryAudioAsset.format ?? undefined,
-            bitrateKbps: primaryAudioAsset.bitrateKbps ?? undefined,
-            sizeBytes:
-              primaryAudioAsset.sizeBytes !== null
-                ? Number(primaryAudioAsset.sizeBytes)
-                : undefined,
-            durationSeconds: primaryAudioAsset.durationSeconds ?? undefined,
-            source: primaryAudioAsset.source ?? undefined,
-            isPrimary: primaryAudioAsset.isPrimary,
-            createdAt: primaryAudioAsset.createdAt.toISOString(),
-          }
-        : undefined,
-      deletedAt: record.deletedAt ? record.deletedAt.toISOString() : undefined,
-      deleteAfterAt: record.deleteAfterAt
-        ? record.deleteAfterAt.toISOString()
-        : undefined,
-      createdAt: record.createdAt.toISOString(),
-      updatedAt: record.updatedAt ? record.updatedAt.toISOString() : undefined,
     };
   }
 
@@ -420,5 +383,10 @@ export class SearchRepository {
     }
 
     return `${base.replace(/\/$/, '')}/${value.replace(/^\//, '')}`;
+  }
+
+  private toOptionalPublicUrl(value?: string | null): string | undefined {
+    if (!value) return undefined;
+    return this.toPublicUrl(value);
   }
 }

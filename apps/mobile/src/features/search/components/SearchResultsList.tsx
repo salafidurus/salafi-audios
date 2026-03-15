@@ -1,14 +1,16 @@
 import { View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import { StyleSheet } from "react-native-unistyles";
-import { SearchResultItem, type SearchResultKind } from "./SearchResultItem";
+import { SearchResultItem } from "./SearchResultItem";
 import { SearchResultEmpty } from "./SearchResultEmpty";
 
 export type SearchResultRow = {
   id: string;
-  kind: SearchResultKind;
   title: string;
-  description?: string;
+  scholarName: string;
+  imageUrl?: string;
+  lectureCount: number;
+  durationSeconds?: number;
 };
 
 type SearchResultsListProps = {
@@ -34,7 +36,13 @@ export function SearchResultsList({
         data={items}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <SearchResultItem kind={item.kind} title={item.title} description={item.description} />
+          <SearchResultItem
+            title={item.title}
+            scholarName={item.scholarName}
+            imageUrl={item.imageUrl}
+            lectureCount={item.lectureCount}
+            durationSeconds={item.durationSeconds}
+          />
         )}
         contentContainerStyle={styles.listContent}
         onRefresh={onRefresh}

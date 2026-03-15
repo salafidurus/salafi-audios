@@ -19,4 +19,8 @@ export {
 export { type CollectionViewDto } from "@/types/collection.types";
 export { type SeriesViewDto } from "@/types/series.types";
 export { type PlatformStatsDto } from "@/types/analytics.types";
-export { type SearchCatalogParams, type SearchCatalogResultsDto } from "@/types/search.types";
+export {
+  type SearchCatalogParams,
+  type SearchCatalogItemDto,
+  type SearchCatalogResultsDto,
+} from "@/types/search.types";
