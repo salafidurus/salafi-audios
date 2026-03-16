@@ -1,5 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useState } from "react";
-import { TextInput, View, Pressable } from "react-native";
+import { TextInput, Pressable } from "react-native";
 import { ArrowLeft, X } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";

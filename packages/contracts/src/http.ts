@@ -64,7 +64,7 @@ export async function httpClient<T>(options: {
       body: payload ? JSON.stringify(payload) : undefined,
       signal: options.signal,
     });
-  } catch (error) {
+  } catch {
     throw new Error("Network request failed. Check API availability and base URL configuration.");
   }
 

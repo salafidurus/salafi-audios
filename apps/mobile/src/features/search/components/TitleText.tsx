@@ -1,5 +1,5 @@
 import { Text } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 import { EaseView } from "react-native-ease";
 import { useEffect, useState } from "react";
 
@@ -9,7 +9,6 @@ export type TitleTextProps = {
 };
 
 export function TitleText({ children, delay = 0 }: TitleTextProps) {
-  const { theme } = useUnistyles();
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
