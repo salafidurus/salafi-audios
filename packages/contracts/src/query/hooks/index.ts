@@ -1,8 +1,14 @@
-import { useQuery, useMutation, type QueryKey } from "@tanstack/react-query";
-import type { HttpClientConfig } from "../../http";
-import { configureApiClient, httpClient } from "../../http";
-import { queryKeys } from "../index";
-import type { ScholarStatsDto, PlatformStatsDto } from "../../types";
+import { useQuery, useMutation, type QueryKey, type UseQueryOptions } from "@tanstack/react-query";
+import type { HttpClientConfig } from "@/http";
+import { configureApiClient, httpClient } from "@/http";
+import { endpoints } from "@/endpoints";
+import { queryKeys } from "@/query";
+import type {
+  ScholarStatsDto,
+  PlatformStatsDto,
+  SearchCatalogParams,
+  SearchCatalogResultsDto,
+} from "@/types";
 
 // Re-export hooks for convenience
 export { useQuery, useMutation };
@@ -11,7 +17,7 @@ export { useQuery, useMutation };
 export function useApiQuery<TData, TError = Error>(
   key: QueryKey,
   fn: () => Promise<TData>,
-  options?: Parameters<typeof useQuery<TData, TError>>[0],
+  options?: Omit<UseQueryOptions<TData, TError, TData, QueryKey>, "queryKey" | "queryFn">,
 ) {
   return useQuery<TData, TError>({
     queryKey: key,
@@ -45,6 +51,22 @@ export function usePlatformStats() {
       url: `/analytics/stats`,
       method: "GET",
     }),
+  );
+}
+
+export function useCatalogSearch(
+  params: SearchCatalogParams,
+  options?: Parameters<typeof useQuery<SearchCatalogResultsDto, Error>>[0],
+) {
+  return useApiQuery(
+    queryKeys.search.catalog(params),
+    () =>
+      httpClient<SearchCatalogResultsDto>({
+        url: endpoints.search.extended,
+        method: "GET",
+        params,
+      }),
+    options,
   );
 }
 

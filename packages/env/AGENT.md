@@ -20,14 +20,18 @@ This package defines runtime environment schemas and parsers.
 - Avoid app-specific dependencies.
 - Prefer explicit schema evolution over permissive parsing.
 
+## Path aliases
+
+- Use `@/` for package-local imports (maps to `src/*`).
+
 ## Build/lint/test commands (root)
 
-- Build: `pnpm --filter @sd/env build`
-- Lint: `pnpm --filter @sd/env lint`
-- Typecheck: `pnpm --filter @sd/env typecheck`
-- Test: `pnpm --filter @sd/env test`
+- Build: `pnpm --filter env build`
+- Lint: `pnpm --filter env lint`
+- Typecheck: `pnpm --filter env typecheck`
+- Test: `pnpm --filter env test`
 
 ## Single-test commands
 
-- Jest file: `pnpm --filter @sd/env test -- src/path/to/file.spec.ts`
-- Jest by name: `pnpm --filter @sd/env test -- src/path/to/file.spec.ts -t "parses env"`
+- Jest file: `pnpm --filter env test -- src/path/to/file.spec.ts`
+- Jest by name: `pnpm --filter env test -- src/path/to/file.spec.ts -t "parses env"`

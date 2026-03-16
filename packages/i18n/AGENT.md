@@ -14,8 +14,12 @@ This package handles internationalization logic and translation keys for the Sal
 - Updates to keys must be propagated to all client apps.
 - Keep the package pure; avoid framework-specific dependencies (Next.js/Expo) where possible to maximize sharing.
 
+## Path aliases
+
+- Use `@/` for package-local imports (maps to `src/*`).
+
 ## Commands (root)
 
-- Lint: `pnpm --filter @sd/i18n lint`
-- Test: `pnpm --filter @sd/i18n test`
-- Typecheck: `pnpm --filter @sd/i18n typecheck`
+- Lint: `pnpm --filter i18n lint`
+- Test: `pnpm --filter i18n test`
+- Typecheck: `pnpm --filter i18n typecheck`

@@ -1,7 +1,0 @@
-.detailPanel {
-  border: 1px solid var(--border-default);
-  background: var(--surface-default);
-  border-radius: var(--radius-component-panel);
-  box-shadow: var(--shadow-lg);
-  padding: var(--space-component-gap-lg) var(--space-component-card-padding);
-}

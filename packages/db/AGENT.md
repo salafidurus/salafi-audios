@@ -15,13 +15,17 @@ This package owns Prisma schema, migrations, and DB client utilities.
 - Avoid destructive changes without migration strategy.
 - Keep migrations reproducible and review-friendly.
 
+## Path aliases
+
+- Use `@/` for package-local imports (maps to `src/*`).
+
 ## Prisma workflow (root commands)
 
-- Generate client: `pnpm --filter @sd/db prisma:generate`
-- Validate schema: `pnpm --filter @sd/db prisma:validate`
-- Format schema: `pnpm --filter @sd/db prisma:format`
-- Create migration: `pnpm --filter @sd/db migrate:create-only`
-- Deploy migrations: `pnpm --filter @sd/db migrate:deploy`
+- Generate client: `pnpm --filter db prisma:generate`
+- Validate schema: `pnpm --filter db prisma:validate`
+- Format schema: `pnpm --filter db prisma:format`
+- Create migration: `pnpm --filter db migrate:create-only`
+- Deploy migrations: `pnpm --filter db migrate:deploy`
 
 Env file precedence for local DB commands:
 
@@ -30,15 +34,15 @@ Env file precedence for local DB commands:
 
 ## Build/lint/test commands
 
-- Build: `pnpm --filter @sd/db build`
-- Lint: `pnpm --filter @sd/db lint`
-- Typecheck: `pnpm --filter @sd/db typecheck`
-- Test: `pnpm --filter @sd/db test`
+- Build: `pnpm --filter db build`
+- Lint: `pnpm --filter db lint`
+- Typecheck: `pnpm --filter db typecheck`
+- Test: `pnpm --filter db test`
 
 ## Single-test commands
 
-- Jest file: `pnpm --filter @sd/db test -- src/path/to/file.spec.ts`
-- Jest by name: `pnpm --filter @sd/db test -- src/path/to/file.spec.ts -t "creates record"`
+- Jest file: `pnpm --filter db test -- src/path/to/file.spec.ts`
+- Jest by name: `pnpm --filter db test -- src/path/to/file.spec.ts -t "creates record"`
 
 ## Safety notes
 

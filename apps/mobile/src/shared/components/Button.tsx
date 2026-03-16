@@ -8,12 +8,8 @@ import {
   type TextStyle,
 } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-  interpolate,
-} from "react-native-reanimated";
+import { EaseView } from "react-native-ease";
+import { useState } from "react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -33,7 +29,7 @@ export type ButtonProps = PressableProps & {
 // ─── Animation constants ──────────────────────────────────────────────────────
 
 const PRESS_SCALE = 0.97;
-const PRESS_DURATION = 120;
+const PRESS_OPACITY = 0.88;
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -52,20 +48,7 @@ export function Button({
   ...props
 }: ButtonProps) {
   const { theme } = useUnistyles();
-  const pressed = useSharedValue(0);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [
-      {
-        scale: withTiming(interpolate(pressed.value, [0, 1], [1, PRESS_SCALE]), {
-          duration: PRESS_DURATION,
-        }),
-      },
-    ],
-    opacity: withTiming(interpolate(pressed.value, [0, 1], [1, 0.88]), {
-      duration: PRESS_DURATION,
-    }),
-  }));
+  const [isPressed, setIsPressed] = useState(false);
 
   const isDisabled = disabled || loading;
 
@@ -80,8 +63,17 @@ export function Button({
   const sizeLabel = getSizeLabel(size, theme);
 
   return (
-    <Animated.View
-      style={[animatedStyle, fullWidth ? base.stretch : base.shrink, isDisabled && base.disabled]}
+    <EaseView
+      animate={{
+        scale: isPressed ? PRESS_SCALE : 1,
+        opacity: isPressed ? PRESS_OPACITY : 1,
+      }}
+      transition={{
+        type: "spring",
+        damping: 10,
+        stiffness: 100,
+      }}
+      style={[fullWidth ? base.stretch : base.shrink, isDisabled && base.disabled]}
     >
       <Pressable
         accessibilityRole="button"
@@ -89,11 +81,11 @@ export function Button({
         accessibilityState={{ disabled: isDisabled, busy: loading }}
         disabled={isDisabled}
         onPressIn={(e) => {
-          pressed.value = 1;
+          setIsPressed(true);
           onPressIn?.(e);
         }}
         onPressOut={(e) => {
-          pressed.value = 0;
+          setIsPressed(false);
           onPressOut?.(e);
         }}
         style={[
@@ -118,7 +110,7 @@ export function Button({
           </>
         )}
       </Pressable>
-    </Animated.View>
+    </EaseView>
   );
 }
 
