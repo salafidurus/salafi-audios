@@ -5,8 +5,9 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { themeCss } from "./theme-css";
 
-import { Header } from "@/features/navigation/components/header/header";
 import { Footer } from "@/features/navigation/components/footer/footer";
+import { Sidebar } from "@/features/navigation/components/sidebar/sidebar";
+import { TopAuthStrip } from "@/features/navigation/components/top-auth-strip/top-auth-strip";
 import { Providers } from "./providers";
 
 const fraunces = localFont({
@@ -122,9 +123,14 @@ export default function RootLayout({
         <style>{themeCss}</style>
         <Providers>
           <div className="appFrame">
-            <Header searchPlaceholder="Search for lectures, books, or scholars..." />
-            <div className="appMain">{children}</div>
-            <Footer />
+            <div className="appShell">
+              <Sidebar />
+              <div className="appMain">
+                <TopAuthStrip />
+                <div className="appContent">{children}</div>
+                <Footer />
+              </div>
+            </div>
           </div>
         </Providers>
       </body>

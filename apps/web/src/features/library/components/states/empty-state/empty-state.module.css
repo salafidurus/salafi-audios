@@ -1,8 +1,0 @@
-.empty {
-  border: 1px dashed var(--border-default);
-  border-radius: var(--radius-component-panel);
-  background: var(--surface-subtle);
-  color: var(--content-muted);
-  padding: 1.4rem 1rem;
-  text-align: center;
-}
