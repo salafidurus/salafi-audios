@@ -1,19 +1,21 @@
+const path = require("node:path");
+
 module.exports = function (api) {
   api.cache(true);
 
   return {
-    presets: ['babel-preset-expo'],
+    presets: ["babel-preset-expo"],
 
     plugins: [
       [
-        'react-native-unistyles/plugin',
+        "react-native-unistyles/plugin",
         {
-          root: 'src',
-          // autoProcessRoot: 'src/app',
-          autoProcessImports: ['@/src/shared/components'],
+          root: "src",
+          autoProcessImports: ["@sd/ui-mobile"],
+          autoProcessPaths: [path.resolve(__dirname, "../../packages/ui-mobile/src")],
         },
       ],
-      'react-native-worklets/plugin',
+      "react-native-worklets/plugin",
     ],
   };
 };

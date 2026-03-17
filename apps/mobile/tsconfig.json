@@ -3,6 +3,7 @@
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
   "compilerOptions": {
     "baseUrl": ".",
+    "moduleSuffixes": [".native", ".web", ""],
     "paths": {
       "@/*": ["src/*"],
       "@/assets/*": ["./assets/*"]

@@ -10,7 +10,9 @@
     "**/coverage/**",
     "**/generated/**",
     "**/.opencode/**",
-    "**/SKILL.md"
+    "**/.claude/**",
+    "**/SKILL.md",
+    "**/CLAUDE.md"
   ],
   "config": {
     "default": true,

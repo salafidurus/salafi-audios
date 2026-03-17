@@ -1,0 +1,62 @@
+{
+  "name": "@sd/ui-mobile",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.web.ts",
+  "types": "./src/index.web.ts",
+  "exports": {
+    ".": {
+      "react-native": "./src/index.native.ts",
+      "default": "./src/index.web.ts"
+    }
+  },
+  "scripts": {
+    "dev": "tsc -p tsconfig.json --noEmit --watch",
+    "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@sd/contracts": "workspace:*",
+    "@sd/design-tokens": "workspace:*",
+    "@sd/env": "workspace:*",
+    "lucide-react": "^0.564.0",
+    "lucide-react-native": "^0.564.0",
+    "react-native-reanimated": "~4.2.1"
+  },
+  "peerDependencies": {
+    "@shopify/flash-list": "*",
+    "framer-motion": "*",
+    "react": "*",
+    "react-native": "*",
+    "react-native-ease": "*",
+    "react-native-safe-area-context": "*",
+    "react-native-unistyles": "*"
+  },
+  "peerDependenciesMeta": {
+    "@shopify/flash-list": {
+      "optional": true
+    },
+    "framer-motion": {
+      "optional": true
+    },
+    "react-native-ease": {
+      "optional": true
+    },
+    "react-native-safe-area-context": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@shopify/flash-list": "2.0.2",
+    "@types/react": "~19.2.14",
+    "framer-motion": "^12.34.0",
+    "react": "19.2.0",
+    "react-native": "0.83.2",
+    "react-native-ease": "^0.2.0",
+    "react-native-safe-area-context": "~5.6.2",
+    "react-native-unistyles": "^3.1.1",
+    "tsc-alias": "^1.8.16",
+    "typescript": "^5.9.2"
+  }
+}

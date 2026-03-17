@@ -29,7 +29,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
-    "dev": "tsc -p tsconfig.build.json --watch",
+    "dev": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "lint": "eslint .",
     "test": "echo \"@sd/contracts: manual verification required\"",
     "test:prepush": "echo \"@sd/contracts: manual verification required\"",

@@ -1,6 +1,7 @@
 import { useUnistyles } from "react-native-unistyles";
 import { Cloud, Search, Mic, Settings, CassetteTape } from "lucide-react-native";
 import { EaseView } from "react-native-ease";
+import type { ComponentType } from "react";
 
 export type TabIconName = "feed" | "live" | "search" | "library" | "account";
 
@@ -21,7 +22,11 @@ type TabIconProps = {
 export function TabIcon({ name, focused, size = 24 }: TabIconProps) {
   const { theme } = useUnistyles();
 
-  const Icon = ICONS[name];
+  const Icon = ICONS[name] as ComponentType<{
+    size?: number;
+    strokeWidth?: number;
+    color?: string;
+  }>;
   const color = focused ? theme.colors.content.primary : theme.colors.content.muted;
 
   return (

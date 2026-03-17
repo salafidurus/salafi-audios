@@ -21,9 +21,14 @@ export function useResponsive(): ResponsiveState {
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  const isMobile = width !== null ? width <= MOBILE_MAX : false;
-  const isTablet = width !== null ? width > MOBILE_MAX && width <= TABLET_MAX : false;
-  const isWeb = width !== null ? width > TABLET_MAX : true;
+  // During SSR and initial hydration, always return mobile
+  if (width === null) {
+    return { isMobile: true, isTablet: false, isWeb: false };
+  }
+
+  const isMobile = width <= MOBILE_MAX;
+  const isTablet = width > MOBILE_MAX && width <= TABLET_MAX;
+  const isWeb = width > TABLET_MAX;
 
   return { isMobile, isTablet, isWeb };
 }

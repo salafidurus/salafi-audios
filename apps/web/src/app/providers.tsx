@@ -1,16 +1,21 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { initApiClient } from "@/core/api/client";
-import { queryClient } from "@/core/api/query-client";
+import { initApiClient } from "@sd/ui-mobile";
+import { createQueryClient } from "@sd/contracts/query";
 
 type Props = {
   children: ReactNode;
 };
 
+const queryClient = createQueryClient();
+
 export function Providers({ children }: Props) {
-  initApiClient();
+  useEffect(() => {
+    // Initialize API client once on mount — pass env var directly so Next.js inlines it
+    initApiClient({ baseUrl: process.env.NEXT_PUBLIC_API_URL ?? "" });
+  }, []);
 
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }

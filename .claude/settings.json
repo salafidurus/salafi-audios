@@ -1,0 +1,89 @@
+{
+  "mcpServers": {
+    "tailwindcss": {},
+    "server-github": {},
+    "in-memoria": {},
+    "sequential-thinking": {},
+    "context7": {},
+    "server-memory": {},
+    "next-devtools": {
+      "command": "npx",
+      "args": ["-y", "next-devtools-mcp@latest"]
+    },
+    "prisma": {
+      "command": "npx",
+      "args": ["-y", "prisma", "mcp"]
+    }
+  },
+  "instructions": [
+    "Read the relevant AGENT.md file before working in any workspace (apps/api/AGENT.md, apps/web/AGENT.md, apps/mobile/AGENT.md, or packages/*/AGENT.md)"
+  ],
+  "permissions": {
+    "allow": [
+      "Read(*)",
+      "Write(**/*.ts)",
+      "Write(**/*.tsx)",
+      "Write(**/*.js)",
+      "Write(**/*.jsx)",
+      "Write(**/*.json)",
+      "Write(**/*.css)",
+      "Write(**/*.md)",
+      "Write(**/*.mdx)",
+      "Bash(grep:*)",
+      "Bash(cat:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(echo:*)",
+      "Bash(pwd:*)",
+      "Bash(which:*)",
+      "Bash(whoami:*)",
+      "Bash(wc:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(sort:*)",
+      "Bash(uniq:*)",
+      "Bash(cut:*)",
+      "Bash(awk:*)",
+      "Bash(sed:*)",
+      "Bash(tr:*)",
+      "Bash(diff:*)",
+      "Bash(stat:*)",
+      "Bash(file:*)",
+      "Bash(type:*)",
+      "Bash(env:*)",
+      "Bash(printenv:*)",
+      "Bash(date:*)",
+      "Bash(tree:*)",
+      "Bash(du:*)",
+      "Bash(df:*)",
+      "Bash(ps:*)",
+      "Bash(git:*)",
+      "Bash(node:*)",
+      "Bash(npm:*)",
+      "Bash(tsc:*)",
+      "Bash(cd:*)",
+      "Bash(npx:*)",
+      "Bash(netstat:*)",
+      "Bash(jobs:*)",
+      "Bash(curl:*)",
+      "Bash(rm -rf **/.next*)",
+      "Bash(rm -rf **/.expo*)",
+      "Bash(rm -rf **/node_modules*)",
+      "Bash(rm -rf **/.turbo*)",
+      "Bash(rm -rf **/dist*)",
+      "Bash(rm -rf **/.cache*)",
+      "Bash(rm -rf **/out*)",
+      "Bash(rm -rf **/build*)",
+      "Bash(rm -rf **/coverage*)"
+    ],
+    "ask": ["Bash(npx kill-port*)", "Bash(git push:*)", "Bash(rm:*)", "Write(**/*.env*)"],
+    "deny": [
+      "Bash(curl * -d *)",
+      "Bash(curl * --data*)",
+      "Bash(curl * -X POST*)",
+      "Bash(curl * -X PUT*)",
+      "Bash(curl * -X DELETE*)",
+      "Bash(curl * -T *)"
+    ]
+  }
+}
