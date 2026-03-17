@@ -20,9 +20,11 @@ export function ScreenView({ children, style, contentStyle, center }: ScreenView
 const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
-    paddingHorizontal: theme.spacing.layout.pageX,
-    paddingVertical: theme.spacing.layout.pageY,
     backgroundColor: theme.colors.surface.canvas,
+    _web: {
+      paddingHorizontal: theme.spacing.layout.pageX,
+      paddingVertical: theme.spacing.layout.pageY,
+    },
   },
   content: {
     flex: 1,

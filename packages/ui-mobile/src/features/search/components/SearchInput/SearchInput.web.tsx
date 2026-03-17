@@ -81,16 +81,22 @@ const styles = StyleSheet.create((theme) => ({
     borderWidth: 1,
     borderColor: theme.colors.border.default,
     borderRadius: theme.radius.component.panelSm,
-    paddingHorizontal: theme.spacing.scale.lg,
-    paddingVertical: theme.spacing.scale.md,
+    _web: {
+      paddingHorizontal: theme.spacing.scale.lg,
+      paddingVertical: theme.spacing.scale.md,
+    },
   },
   iconButton: {
-    paddingVertical: theme.spacing.scale.xs,
+    _web: {
+      paddingVertical: theme.spacing.scale.xs,
+    },
   },
   input: {
     flex: 1,
-    ...theme.typography.bodyMd,
     padding: 0,
     color: theme.colors.content.default,
+    _web: {
+      ...theme.typography.bodyMd,
+    },
   },
 }));

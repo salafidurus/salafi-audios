@@ -57,9 +57,13 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
   },
   listContent: {
-    paddingBottom: theme.spacing.layout.pageY,
+    _web: {
+      paddingBottom: theme.spacing.layout.pageY,
+    },
   },
   separator: {
-    height: theme.spacing.component.gapSm,
+    _web: {
+      height: theme.spacing.component.gapSm,
+    },
   },
 }));

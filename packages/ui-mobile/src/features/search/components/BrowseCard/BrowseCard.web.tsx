@@ -54,8 +54,10 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: "center",
   },
   name: {
-    ...theme.typography.labelMd,
     color: theme.colors.content.default,
     textAlign: "center",
+    _web: {
+      ...theme.typography.labelMd,
+    },
   },
 }));

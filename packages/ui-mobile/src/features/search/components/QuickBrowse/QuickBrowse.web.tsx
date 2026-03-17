@@ -36,9 +36,11 @@ export function QuickBrowse({ onSelectCategory }: QuickBrowseProps) {
 
 const styles = StyleSheet.create((theme) => ({
   header: {
-    ...theme.typography.titleMd,
     color: theme.colors.content.strong,
-    marginBottom: theme.spacing.component.gapMd,
+    _web: {
+      ...theme.typography.titleMd,
+      marginBottom: theme.spacing.component.gapMd,
+    },
   },
   grid: {
     flexDirection: "row",
@@ -46,8 +48,8 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.component.gapMd,
   },
   cardWrapper: {
-    padding: theme.spacing.scale.xs,
     _web: {
+      padding: theme.spacing.scale.xs,
       // 2 columns on mobile, 4 columns on tablet+
       width: { xs: "48%", md: "23%" },
     },

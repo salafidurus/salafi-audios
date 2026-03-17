@@ -13,9 +13,12 @@ export function TitleText({ children }: TitleTextProps) {
 const styles = StyleSheet.create((theme) => ({
   title: {
     fontFamily: theme.typography.displayMd.fontFamily,
-    fontSize: theme.typography.displayMd.fontSize,
     lineHeight: theme.typography.displayMd.lineHeight,
-    letterSpacing: theme.typography.displayMd.letterSpacing,
     color: theme.colors.content.strong,
+    _web: {
+      fontSize: theme.typography.displayMd.fontSize,
+      letterSpacing: theme.typography.displayMd.letterSpacing,
+      fontWeight: theme.typography.displayMd.fontWeight,
+    },
   },
 }));

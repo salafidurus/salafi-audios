@@ -94,7 +94,13 @@ export function SearchProcessingScreen({ prefill, onBackPress }: SearchProcessin
 const styles = StyleSheet.create((theme) => ({
   searchGroup: {
     gap: theme.spacing.component.gapSm,
-    marginBottom: theme.spacing.component.gapMd,
+    _web: {
+      position: "sticky",
+      top: 0,
+      zIndex: 10,
+      backgroundColor: theme.colors.surface.canvas,
+      paddingBottom: theme.spacing.component.gapMd,
+    },
   },
 }));
 

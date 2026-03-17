@@ -106,7 +106,9 @@ function FilterChip({ label, isActive, onPress }: FilterChipProps) {
 const styles = StyleSheet.create((theme) => ({
   container: {
     gap: theme.spacing.component.gapSm,
-    paddingVertical: theme.spacing.component.gapSm,
+    _web: {
+      paddingVertical: theme.spacing.component.gapSm,
+    },
   },
   chipWrap: {
     borderRadius: theme.radius.component.chip,
@@ -114,10 +116,14 @@ const styles = StyleSheet.create((theme) => ({
   chip: {
     borderWidth: 1,
     borderRadius: theme.radius.component.chip,
-    paddingHorizontal: theme.spacing.component.chipX,
-    paddingVertical: theme.spacing.component.chipY,
+    _web: {
+      paddingHorizontal: theme.spacing.component.chipX,
+      paddingVertical: theme.spacing.component.chipY,
+    },
   },
   chipLabel: {
-    ...theme.typography.labelMd,
+    _web: {
+      ...theme.typography.labelMd,
+    },
   },
 }));

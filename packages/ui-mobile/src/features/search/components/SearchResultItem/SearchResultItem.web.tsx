@@ -61,10 +61,12 @@ const styles = StyleSheet.create((theme) => ({
     borderWidth: 1,
     borderColor: theme.colors.border.subtle,
     borderRadius: theme.radius.component.card,
-    padding: theme.spacing.component.cardPadding,
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing.component.gapMd,
+    _web: {
+      padding: theme.spacing.component.cardPadding,
+    },
   },
   media: {
     width: "20%",
@@ -86,16 +88,22 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.scale.xs,
   },
   title: {
-    ...theme.typography.titleMd,
     color: theme.colors.content.strong,
+    _web: {
+      ...theme.typography.titleMd,
+    },
   },
   scholarName: {
-    ...theme.typography.bodySm,
     color: theme.colors.content.muted,
+    _web: {
+      ...theme.typography.bodySm,
+    },
   },
   metaText: {
-    ...theme.typography.caption,
     color: theme.colors.content.muted,
+    _web: {
+      ...theme.typography.caption,
+    },
   },
 }));
 

@@ -43,8 +43,10 @@ const styles = StyleSheet.create((theme) => ({
     borderWidth: 1,
     borderColor: theme.colors.border.default,
     borderRadius: theme.radius.component.panelSm,
-    paddingHorizontal: theme.spacing.scale.lg,
-    paddingVertical: theme.spacing.scale.md,
+    _web: {
+      paddingHorizontal: theme.spacing.scale.lg,
+      paddingVertical: theme.spacing.scale.md,
+    },
   },
   pressable: {
     flex: 1,
@@ -54,7 +56,9 @@ const styles = StyleSheet.create((theme) => ({
   },
   placeholder: {
     flex: 1,
-    ...theme.typography.bodyMd,
     color: theme.colors.content.muted,
+    _web: {
+      ...theme.typography.bodyMd,
+    },
   },
 }));
