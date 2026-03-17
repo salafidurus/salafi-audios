@@ -1,8 +1,9 @@
+import { type CSSProperties } from "react";
 import React from "react";
 import { View } from "react-native-unistyles/components/native/View";
-import { ScrollView } from "react-native-unistyles/components/native/ScrollView";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { SearchResultEmpty } from "../SearchResultEmpty";
+import { useDragScroll } from "../../../../shared/hooks/useDragScroll";
 
 export type SearchResultRow = {
   id: string;
@@ -28,39 +29,43 @@ export function SearchResultsList({
   errorMessage,
   renderItem,
 }: SearchResultsListProps) {
+  const { theme } = useUnistyles();
+  const scrollRef = useDragScroll("vertical");
+
   return (
-    <ScrollView
-      style={styles.scroll}
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={styles.listContent}
+    <div
+      ref={scrollRef}
+      style={
+        {
+          flex: 1,
+          minHeight: 0,
+          overflowY: "auto",
+          overflowX: "hidden",
+          cursor: "grab",
+        } satisfies CSSProperties
+      }
     >
-      {items.length === 0 ? (
-        <SearchResultEmpty
-          shouldSearch={shouldSearch}
-          isFetching={isFetching}
-          errorMessage={errorMessage}
-        />
-      ) : (
-        items.map((item, index) => (
-          <React.Fragment key={item.id}>
-            {index > 0 && <View style={styles.separator} />}
-            {renderItem(item)}
-          </React.Fragment>
-        ))
-      )}
-    </ScrollView>
+      <div style={{ paddingBottom: theme.spacing.layout.pageY }}>
+        {items.length === 0 ? (
+          <SearchResultEmpty
+            shouldSearch={shouldSearch}
+            isFetching={isFetching}
+            errorMessage={errorMessage}
+          />
+        ) : (
+          items.map((item, index) => (
+            <React.Fragment key={item.id}>
+              {index > 0 && <View style={styles.separator} />}
+              {renderItem(item)}
+            </React.Fragment>
+          ))
+        )}
+      </div>
+    </div>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  scroll: {
-    flex: 1,
-  },
-  listContent: {
-    _web: {
-      paddingBottom: theme.spacing.layout.pageY,
-    },
-  },
   separator: {
     _web: {
       height: theme.spacing.component.gapSm,

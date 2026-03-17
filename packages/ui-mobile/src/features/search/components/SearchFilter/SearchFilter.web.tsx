@@ -1,10 +1,10 @@
-import { useMemo, useState } from "react";
+import { type CSSProperties, useMemo, useState } from "react";
 import { View } from "react-native-unistyles/components/native/View";
 import { Text } from "react-native-unistyles/components/native/Text";
 import { Pressable } from "react-native-unistyles/components/native/Pressable";
-import { ScrollView } from "react-native-unistyles/components/native/ScrollView";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import type { TopicDetailDto, TopicSlug } from "@sd/contracts";
+import { useDragScroll } from "../../../../shared/hooks/useDragScroll";
 
 export type SearchFilterValue = TopicSlug[];
 
@@ -21,6 +21,8 @@ export type SearchFilterProps = {
 
 export function SearchFilter({ value, onChange, topics }: SearchFilterProps) {
   const { theme } = useUnistyles();
+  const scrollRef = useDragScroll("horizontal");
+
   const options = useMemo<FilterOption[]>(() => {
     const sortedTopics = [...topics].sort((a, b) => a.name.localeCompare(b.name));
     return [
@@ -32,10 +34,21 @@ export function SearchFilter({ value, onChange, topics }: SearchFilterProps) {
   const selected = useMemo(() => new Set(value), [value]);
 
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.container}
+    <div
+      ref={scrollRef}
+      style={
+        {
+          display: "flex",
+          flexDirection: "row",
+          overflowX: "auto",
+          overflowY: "hidden",
+          gap: theme.spacing.component.gapSm,
+          paddingTop: theme.spacing.component.gapSm,
+          paddingBottom: theme.spacing.component.gapSm,
+          scrollbarWidth: "none",
+          cursor: "grab",
+        } satisfies CSSProperties
+      }
     >
       {options.map((option) => {
         const isActive = option.id === "all" ? value.length === 0 : selected.has(option.id);
@@ -62,7 +75,7 @@ export function SearchFilter({ value, onChange, topics }: SearchFilterProps) {
           />
         );
       })}
-    </ScrollView>
+    </div>
   );
 }
 
@@ -104,12 +117,6 @@ function FilterChip({ label, isActive, onPress }: FilterChipProps) {
 }
 
 const styles = StyleSheet.create((theme) => ({
-  container: {
-    gap: theme.spacing.component.gapSm,
-    _web: {
-      paddingVertical: theme.spacing.component.gapSm,
-    },
-  },
   chipWrap: {
     borderRadius: theme.radius.component.chip,
   },

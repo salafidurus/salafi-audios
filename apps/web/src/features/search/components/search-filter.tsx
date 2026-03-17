@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import clsx from "clsx";
 import type { TopicDetailDto } from "@sd/contracts";
+import { useDragScroll } from "@/shared/hooks/useDragScroll";
 
 const chipStyle = {
   fontFamily: "var(--typo-label-md-font-family)",
@@ -28,24 +28,12 @@ type SearchFilterProps = {
 
 export function SearchFilter({ topics, active, onToggle, onClearAll }: SearchFilterProps) {
   const isAllActive = active.length === 0;
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const onWheel = (e: WheelEvent) => {
-      if (e.deltaY === 0) return;
-      e.preventDefault();
-      el.scrollLeft += e.deltaY;
-    };
-    el.addEventListener("wheel", onWheel, { passive: false });
-    return () => el.removeEventListener("wheel", onWheel);
-  }, []);
+  const scrollRef = useDragScroll("horizontal");
 
   return (
     <div
       ref={scrollRef}
-      className="flex overflow-x-auto gap-[var(--space-component-gap-sm)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      className="flex overflow-x-auto cursor-grab gap-[var(--space-component-gap-sm)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
       <button
         type="button"

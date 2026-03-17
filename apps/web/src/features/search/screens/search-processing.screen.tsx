@@ -5,7 +5,7 @@ import { SearchProcessingScreen as MobileSearchProcessingScreen } from "@sd/ui-m
 import { useRouter, useSearchParams } from "next/navigation";
 import { SearchInput } from "@/features/search/components/search-input";
 import { SearchFilter } from "@/features/search/components/search-filter";
-import { SearchResults } from "@/features/search/components/search-results";
+import { SearchResultList } from "@/features/search/components/search-result-list";
 import { Activity } from "@/shared/components/activity/activity";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import {
@@ -93,7 +93,7 @@ function DesktopSearchProcessingScreen() {
       </div>
       <section className="mx-auto w-full max-w-[70rem] px-[var(--space-layout-page-x)] pb-[var(--space-layout-page-y)]">
         <Suspense fallback={<Activity label="Loading results" />}>
-          <SearchResults
+          <SearchResultList
             results={results}
             isFetching={isFetching}
             shouldSearch={shouldSearch}
