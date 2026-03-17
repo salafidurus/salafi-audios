@@ -12,6 +12,8 @@ dist/
 generated/
 **/generated/
 
+.claude/settings.local.json
+
 
 # dotenv environment variable files
 **/.env
