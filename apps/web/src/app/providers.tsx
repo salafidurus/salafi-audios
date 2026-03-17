@@ -14,7 +14,7 @@ const queryClient = createQueryClient();
 export function Providers({ children }: Props) {
   useEffect(() => {
     // Initialize API client once on mount — pass env var directly so Next.js inlines it
-    initApiClient({ baseUrl: process.env.NEXT_PUBLIC_API_URL });
+    initApiClient({ baseUrl: process.env.NEXT_PUBLIC_API_URL ?? "" });
   }, []);
 
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;

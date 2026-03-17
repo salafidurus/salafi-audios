@@ -14,7 +14,7 @@
     "dev:mobile:prebuild": "pnpm --filter mobile prebuild:clean && pnpm --filter mobile android",
     "dev:mobile:prebuild:android": "pnpm --filter mobile prebuild:clean && pnpm --filter mobile android",
     "dev:mobile:prebuild:ios": "pnpm --filter mobile prebuild:clean && pnpm --filter mobile ios",
-    "dev:api+web": "turbo run dev --filter=api... --filter=web...",
+    "dev:api+web": "pnpm --filter @sd/contracts build && turbo run dev --filter=api... --filter=web...",
     "dev:api+mobile": "turbo run dev --filter=api... --filter=mobile...",
     "build": "turbo run build",
     "build:api": "turbo run build --filter=api...",

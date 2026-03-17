@@ -39,11 +39,13 @@ const styles = StyleSheet.create((theme) => ({
   container: {
     borderWidth: StyleSheet.hairlineWidth,
     borderRadius: theme.radius.component.card,
-    paddingVertical: theme.spacing.component.gapLg,
-    paddingHorizontal: theme.spacing.component.cardPadding,
     alignItems: "center",
     justifyContent: "center",
     minHeight: 100,
+    _web: {
+      paddingVertical: theme.spacing.component.gapLg,
+      paddingHorizontal: theme.spacing.component.cardPadding,
+    },
   },
   pressable: {
     flex: 1,
