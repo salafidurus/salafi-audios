@@ -67,6 +67,7 @@ body {
 .appContent {
   flex: 1;
   min-height: 0;
+  overflow-x: clip;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
