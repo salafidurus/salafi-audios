@@ -19,7 +19,7 @@ const navItems: NavItem[] = [
   {
     label: "Search",
     Icon: Search,
-    href: "/searchprocessing",
+    href: "/",
     activeMatches: ["/", "/searchprocessing"],
   },
   { label: "Lessons", Icon: CassetteTape, href: "/library", activeMatches: ["/library"] },

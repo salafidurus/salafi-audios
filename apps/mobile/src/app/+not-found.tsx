@@ -1,8 +1,7 @@
 import { Href, Stack, useRouter } from "expo-router";
 import { Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { ScreenView } from "@/shared/components/ScreenView";
-import { Button } from "@/shared/components/Button";
+import { Button, ScreenView } from "@sd/ui-mobile";
 
 export default function NotFoundScreen() {
   const router = useRouter();

@@ -8,6 +8,7 @@ import { themeCss } from "./theme-css";
 import { Footer } from "@/features/navigation/components/footer/footer";
 import { Sidebar } from "@/features/navigation/components/sidebar/sidebar";
 import { TopAuthStrip } from "@/features/navigation/components/top-auth-strip/top-auth-strip";
+import { UnistylesStyle } from "@/core/styles/unistyles-style";
 import { Providers } from "./providers";
 
 const fraunces = localFont({
@@ -115,24 +116,26 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${fraunces.variable} ${manrope.variable} ${geistMono.variable} antialiased`}
       >
         <Script src="https://www.vexo.co/analytics.js" strategy="afterInteractive" />
         <style>{themeCss}</style>
-        <Providers>
-          <div className="appFrame">
-            <div className="appShell">
-              <Sidebar />
-              <div className="appMain">
-                <TopAuthStrip />
-                <div className="appContent">{children}</div>
-                <Footer />
+        <UnistylesStyle>
+          <Providers>
+            <div className="appFrame">
+              <div className="appShell">
+                <Sidebar />
+                <div className="appMain">
+                  <TopAuthStrip />
+                  <div className="appContent">{children}</div>
+                  <Footer />
+                </div>
               </div>
             </div>
-          </div>
-        </Providers>
+          </Providers>
+        </UnistylesStyle>
       </body>
     </html>
   );

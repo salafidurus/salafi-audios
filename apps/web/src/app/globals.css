@@ -78,6 +78,7 @@ body {
 
   .appMain {
     padding-left: 0;
+    padding-bottom: var(--bottom-tab-height, 4.25rem);
   }
 }
 
@@ -86,4 +87,11 @@ h2,
 h3,
 h4 {
   font-family: var(--typo-display-lg-font-family), serif;
+}
+
+/* Remove default browser focus ring from RNW TextInput on web */
+[data-focusable="true"]:focus,
+input:focus,
+textarea:focus {
+  outline: none;
 }

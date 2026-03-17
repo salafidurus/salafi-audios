@@ -2,6 +2,7 @@
 node_modules/
 .turbo/
 **/.turbo/
+**/.playwright-mcp/
 **/node_modules/
 coverage/
 **/coverage/

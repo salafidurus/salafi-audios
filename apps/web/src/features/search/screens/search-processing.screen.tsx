@@ -1,10 +1,13 @@
 "use client";
 
 import { Suspense, useMemo, useState } from "react";
+import { SearchProcessingScreen as MobileSearchProcessingScreen } from "@sd/ui-mobile";
+import { useRouter, useSearchParams } from "next/navigation";
 import { SearchInput } from "@/features/search/components/search-input";
 import { SearchFilter } from "@/features/search/components/search-filter";
 import { SearchResults } from "@/features/search/components/search-results";
 import { Activity } from "@/shared/components/activity/activity";
+import { useResponsive } from "@/shared/hooks/use-responsive";
 import {
   type SearchCatalogResultsDto,
   type SearchCatalogItemDto,
@@ -19,6 +22,26 @@ import { httpClient } from "@sd/contracts/http";
 type SearchResultRow = SearchCatalogItemDto & { group: string };
 
 export function SearchProcessingScreen() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { isMobile, isTablet } = useResponsive();
+
+  if (isMobile || isTablet) {
+    const prefill = searchParams.get("searchKey") ?? undefined;
+    return (
+      <MobileSearchProcessingScreen
+        prefill={prefill}
+        onBackPress={() => {
+          router.back();
+        }}
+      />
+    );
+  }
+
+  return <DesktopSearchProcessingScreen />;
+}
+
+function DesktopSearchProcessingScreen() {
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState<string[]>([]);
 

@@ -4,6 +4,12 @@
   margin-top: auto;
 }
 
+@media (max-width: 767px) {
+  .footer {
+    display: none;
+  }
+}
+
 .inner {
   width: min(var(--space-layout-content-max), 100%);
   margin-inline: auto;
