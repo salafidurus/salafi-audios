@@ -7,7 +7,6 @@ import { SearchInput, type SearchInputRef } from "../components/SearchInput";
 import { SearchResultItem } from "../components/SearchResultItem";
 import { SearchResultsList, type SearchResultRow } from "../components/SearchResultsList";
 import { useSearchCatalog, useTopicsList } from "../api/search.api";
-import { ScreenView } from "../../../shared/components/ScreenView";
 
 export type SearchProcessingScreenProps = {
   prefill?: string;
@@ -61,7 +60,7 @@ export function SearchProcessingScreen({ prefill, onBackPress }: SearchProcessin
   }, [error]);
 
   return (
-    <ScreenView>
+    <View style={styles.screen}>
       <View style={styles.searchGroup}>
         <SearchInput
           ref={inputRef}
@@ -87,18 +86,22 @@ export function SearchProcessingScreen({ prefill, onBackPress }: SearchProcessin
           />
         )}
       />
-    </ScreenView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
+  screen: {
+    flex: 1,
+    backgroundColor: theme.colors.surface.canvas,
+    _web: {
+      paddingHorizontal: theme.spacing.layout.pageX,
+    },
+  },
   searchGroup: {
     gap: theme.spacing.component.gapSm,
     _web: {
-      position: "sticky",
-      top: 0,
-      zIndex: 10,
-      backgroundColor: theme.colors.surface.canvas,
+      paddingTop: theme.spacing.layout.pageY,
       paddingBottom: theme.spacing.component.gapMd,
     },
   },
