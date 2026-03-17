@@ -12,11 +12,9 @@ type ResponsiveState = {
 };
 
 export function useResponsive(): ResponsiveState {
-  const [mounted, setMounted] = useState(false);
-  const [width, setWidth] = useState<number>(MOBILE_MAX); // Default mobile
+  const [width, setWidth] = useState<number | null>(null);
 
   useEffect(() => {
-    setMounted(true);
     const update = () => setWidth(window.innerWidth);
     update();
     window.addEventListener("resize", update);
@@ -24,11 +22,10 @@ export function useResponsive(): ResponsiveState {
   }, []);
 
   // During SSR and initial hydration, always return mobile
-  if (!mounted) {
+  if (width === null) {
     return { isMobile: true, isTablet: false, isWeb: false };
   }
 
-  // After mount, use actual width
   const isMobile = width <= MOBILE_MAX;
   const isTablet = width > MOBILE_MAX && width <= TABLET_MAX;
   const isWeb = width > TABLET_MAX;

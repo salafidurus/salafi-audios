@@ -53,6 +53,7 @@ export function SearchResults({ results, isFetching, shouldSearch, error }: Sear
               {/* Left: cover image */}
               <div className="w-[20%] xl:w-[10%] shrink-0 aspect-[4/5] overflow-hidden rounded-[var(--radius-component-panel-sm)] bg-[var(--surface-subtle)] flex items-center justify-center">
                 {imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img src={imageUrl} alt="" className="h-full w-full object-cover" />
                 ) : (
                   <Headphones size={22} style={{ color: "var(--content-subtle)" }} aria-hidden />
