@@ -1,0 +1,138 @@
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-width, 16.5rem);
+  padding: var(--space-component-gap-md) var(--space-component-gap-lg);
+  background: var(--surface-default);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-lg);
+}
+
+.brandRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-component-gap-sm);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-component-gap-sm);
+  text-decoration: none;
+  color: var(--content-strong);
+  font-family: var(--typo-title-md-font-family), serif;
+  font-size: var(--typo-title-md-font-size);
+  line-height: var(--typo-title-md-line-height);
+  letter-spacing: var(--typo-title-md-letter-spacing);
+  font-weight: var(--typo-title-md-font-weight);
+}
+
+.brandMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: var(--radius-component-chip);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+}
+
+.brandImg {
+  width: 1.55rem;
+  height: 1.55rem;
+  object-fit: contain;
+}
+
+.brandText {
+  white-space: nowrap;
+}
+
+.collapseButton {
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--content-muted);
+  border-radius: var(--radius-component-chip);
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.collapseButton:hover {
+  color: var(--content-strong);
+  border-color: var(--border-default);
+  background: var(--surface-subtle);
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-md);
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-component-gap-sm);
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-component-chip);
+  text-decoration: none;
+  color: var(--content-muted);
+  font-family: var(--typo-label-md-font-family), sans-serif;
+  font-size: var(--typo-label-md-font-size);
+  line-height: var(--typo-label-md-line-height);
+  letter-spacing: var(--typo-label-md-letter-spacing);
+  font-weight: var(--typo-label-md-font-weight);
+  transition: color 150ms ease;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  color: inherit;
+}
+
+.label {
+  white-space: nowrap;
+}
+
+.link:hover {
+  color: var(--content-strong);
+}
+
+.active {
+  color: var(--content-primary);
+}
+
+.collapsed {
+  padding: var(--space-component-gap-md);
+  align-items: center;
+}
+
+.collapsed .brand,
+.collapsed .brandText,
+.collapsed .label {
+  display: none;
+}
+
+.collapsed .nav {
+  width: 100%;
+}
+
+.collapsed .brandRow {
+  width: 100%;
+  justify-content: flex-end;
+}
+
+.collapsed .collapseButton {
+  position: static;
+}

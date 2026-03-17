@@ -15,6 +15,10 @@ This package provides shared configuration for the monorepo, including ESLint an
 - Do not introduce circular dependencies.
 - Changes here affect the entire repository; test impact found globally.
 
+## Path aliases
+
+- Use `@/` for package-local imports (maps to `src/*`).
+
 ## Available Configs
 
 - `eslint/base`: Base TypeScript/JS config.
@@ -24,4 +28,4 @@ This package provides shared configuration for the monorepo, including ESLint an
 
 ## Commands (root)
 
-- Lint: `pnpm --filter @sd/config lint`
+- Lint: `pnpm --filter config lint`

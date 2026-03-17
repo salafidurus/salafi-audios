@@ -2,6 +2,7 @@
   "extends": "../../packages/config/tsconfig/next.json",
   "compilerOptions": {
     "baseUrl": ".",
+    "moduleSuffixes": ["", ".web", ".native"],
     "paths": {
       "@/*": ["./src/*"]
     }

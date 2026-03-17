@@ -66,6 +66,117 @@ Direction:
 - Prefer design tokens from `@sd/design-tokens` for colors, spacing, radius, shadows, and typography.
 - If a required token is missing, make a small, deliberate update in `packages/design-tokens`.
 
+## Animation rules (react-native-ease)
+
+This app uses `react-native-ease` for declarative, performant animations. Always prefer EaseView over react-native-reanimated for state-driven animations.
+
+### When to use animations
+
+Add animations to interactive elements to create a lively, tactile feel:
+
+- **Press/click feedback**: Buttons, cards, list items — scale down + opacity change
+- **Focus states**: Tab icons, selected items — scale up + opacity change
+- **Icon interactions**: Back buttons, clear buttons, toggles — subtle scale changes
+- **Entering elements**: Cards appearing, modals opening — fade + scale/translate
+
+### Use spring physics, not timing
+
+Spring animations feel more natural and tactile. Use spring for:
+
+```typescript
+// Spring (preferred) — natural, tactile feel
+transition={{ type: "spring", damping: 10, stiffness: 100 }}
+
+transition={{ type: "spring", damping: 12, stiffness: 120 }}
+```
+
+Only use timing when you need precise, deterministic animations:
+
+```typescript
+// Timing — use sparingly, only when precision matters
+transition={{ type: "timing", duration: 200 }}
+```
+
+### Animation patterns
+
+**Press animation (buttons, cards):**
+
+```typescript
+const [isPressed, setIsPressed] = useState(false);
+
+<EaseView
+  animate={{
+    scale: isPressed ? 0.97 : 1,
+    opacity: isPressed ? 0.88 : 1,
+  }}
+  transition={{ type: "spring", damping: 10, stiffness: 100 }}
+>
+  <Pressable
+    onPressIn={() => setIsPressed(true)}
+    onPressOut={() => setIsPressed(false)}
+    ...
+  />
+</EaseView>
+```
+
+**Focus animation (tabs, selected items):**
+
+```typescript
+<EaseView
+  animate={{
+    scale: focused ? 1.08 : 1,
+    opacity: focused ? 1 : 0.6,
+  }}
+  transition={{ type: "spring", damping: 12, stiffness: 120 }}
+/>
+```
+
+**Icon press animation:**
+
+```typescript
+const [isPressed, setIsPressed] = useState(false);
+
+<EaseView
+  animate={{
+    scale: isPressed ? 0.9 : 1,
+    opacity: isPressed ? 0.7 : 1,
+  }}
+  transition={{ type: "spring", damping: 10, stiffness: 200 }}
+>
+  <Pressable
+    onPressIn={() => setIsPressed(true)}
+    onPressOut={() => setIsPressed(false)}
+    ...
+  />
+</EaseView>
+```
+
+### Default spring values
+
+| Use case              | damping | stiffness | Feel              |
+| --------------------- | ------- | --------- | ----------------- |
+| Buttons, cards        | 10      | 100       | Tactile, snappy   |
+| Icons, small elements | 10      | 200       | Quick, responsive |
+| Tabs, selected items  | 12      | 120       | Smooth, balanced  |
+
+### Supported properties
+
+EaseView supports: `opacity`, `translateX`, `translateY`, `scale`, `scaleX`, `scaleY`, `rotate`, `rotateX`, `rotateY`, `borderRadius`, `backgroundColor`
+
+### Import
+
+```typescript
+import { EaseView } from "react-native-ease";
+import { useState } from "react";
+```
+
+### Anti-patterns
+
+- Don't use `withTiming` for press animations — springs feel better
+- Don't animate layout properties (width, height, margin) — only use supported properties
+- Don't use react-native-reanimated for simple state-driven animations — use EaseView
+- Don't forget to add `useState` import when adding press animations
+
 // USAGE
 // import { StyleSheet } from "react-native-unistyles";
 //

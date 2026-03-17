@@ -3,7 +3,7 @@ import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 import { useUnistyles } from "react-native-unistyles";
 import { Providers } from "@/shared/components/Providers";
-import { initIntegrations, getWrappedLayout } from "@/core/config/integrations";
+import { getWrappedLayout, initIntegrations } from "@sd/ui-mobile";
 
 initIntegrations();
 

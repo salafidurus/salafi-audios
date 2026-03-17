@@ -18,6 +18,7 @@ import { AppService } from './app.service';
 import { CatalogModule } from './modules/catalog/catalog.module';
 import { RecommendationsModule } from './modules/recommendations/recommendations.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { SearchModule } from './modules/search/search.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { AnalyticsModule } from './modules/analytics/analytics.module';
     CatalogModule,
     RecommendationsModule,
     AnalyticsModule,
+    SearchModule,
 
     // Topics Modules
     TopicsModule,

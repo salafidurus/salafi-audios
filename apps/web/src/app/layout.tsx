@@ -5,8 +5,11 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { themeCss } from "./theme-css";
 
-import { Header } from "@/features/navigation/components/header/header";
 import { Footer } from "@/features/navigation/components/footer/footer";
+import { Sidebar } from "@/features/navigation/components/sidebar/sidebar";
+import { TopAuthStrip } from "@/features/navigation/components/top-auth-strip/top-auth-strip";
+import { UnistylesStyle } from "@/core/styles/unistyles-style";
+import { Providers } from "./providers";
 
 const fraunces = localFont({
   variable: "--font-display",
@@ -113,17 +116,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${fraunces.variable} ${manrope.variable} ${geistMono.variable} antialiased`}
-      >
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${fraunces.variable} ${manrope.variable} ${geistMono.variable}`}
+    >
+      <body className="antialiased">
         <Script src="https://www.vexo.co/analytics.js" strategy="afterInteractive" />
         <style>{themeCss}</style>
-        <div className="appFrame">
-          <Header searchPlaceholder="Search for lectures, books, or scholars..." />
-          <div className="appMain">{children}</div>
-          <Footer />
-        </div>
+        <UnistylesStyle>
+          <Providers>
+            <div className="appFrame">
+              <div className="appShell">
+                <Sidebar />
+                <div className="appMain">
+                  <TopAuthStrip />
+                  <div className="appContent">{children}</div>
+                  <Footer />
+                </div>
+              </div>
+            </div>
+          </Providers>
+        </UnistylesStyle>
       </body>
     </html>
   );

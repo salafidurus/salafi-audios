@@ -15,6 +15,10 @@ This package defines the design tokens used across web and mobile.
 - If a required token is missing, make a small, deliberate update here (do not hardcode in apps).
 - Changes here affect multiple apps; keep updates minimal and well-scoped.
 
+## Path aliases
+
+- Use `@/` for package-local imports (maps to `src/*`).
+
 ## Design Token Usage Guide: `surface`, `border`, and `content`
 
 Use these token groups by **role**, not by visual preference.
@@ -344,3 +348,9 @@ Use typography by purpose, not by size.
 - card -> padding `spacing.component.cardPadding`, radius `radius.component.card`, title `typography.titleMd`, body `typography.bodyMd`, metadata `typography.caption`
 - panel -> padding `spacing.component.panelPadding`, radius `radius.component.panel`, title `typography.titleLg`
 - chip -> padding `spacing.component.chipX` + `chipY`, radius `radius.component.chip`, text `typography.labelMd`
+
+## Build/lint/test commands
+
+- Build: `pnpm --filter design-tokens build`
+- Lint: `pnpm --filter design-tokens lint`
+- Typecheck: `pnpm --filter design-tokens typecheck`
