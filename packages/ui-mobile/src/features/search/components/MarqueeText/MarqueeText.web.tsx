@@ -1,4 +1,5 @@
-import { Text, type StyleProp, type TextStyle } from "react-native";
+import { type StyleProp, type TextStyle } from "react-native";
+import { Text } from "react-native-unistyles/components/native/Text";
 
 export type MarqueeTextProps = {
   text: string;

@@ -58,6 +58,7 @@ const styles = StyleSheet.create((theme) => ({
     textAlign: "center",
     _web: {
       ...theme.typography.labelMd,
+      lineHeight: String(theme.typography.labelMd.lineHeight),
     },
   },
 }));

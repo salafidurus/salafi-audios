@@ -39,6 +39,7 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.content.strong,
     _web: {
       ...theme.typography.titleMd,
+      lineHeight: String(theme.typography.titleMd.lineHeight),
       marginBottom: theme.spacing.component.gapMd,
     },
   },

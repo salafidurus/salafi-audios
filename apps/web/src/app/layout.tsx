@@ -116,10 +116,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${fraunces.variable} ${manrope.variable} ${geistMono.variable} antialiased`}
-      >
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${fraunces.variable} ${manrope.variable} ${geistMono.variable}`}
+    >
+      <body className="antialiased">
         <Script src="https://www.vexo.co/analytics.js" strategy="afterInteractive" />
         <style>{themeCss}</style>
         <UnistylesStyle>

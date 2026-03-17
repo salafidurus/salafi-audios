@@ -91,18 +91,21 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.content.strong,
     _web: {
       ...theme.typography.titleMd,
+      lineHeight: String(theme.typography.titleMd.lineHeight),
     },
   },
   scholarName: {
     color: theme.colors.content.muted,
     _web: {
       ...theme.typography.bodySm,
+      lineHeight: String(theme.typography.bodySm.lineHeight),
     },
   },
   metaText: {
     color: theme.colors.content.muted,
     _web: {
       ...theme.typography.caption,
+      lineHeight: String(theme.typography.caption.lineHeight),
     },
   },
 }));

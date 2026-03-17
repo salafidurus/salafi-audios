@@ -97,6 +97,7 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.content.default,
     _web: {
       ...theme.typography.bodyMd,
+      lineHeight: String(theme.typography.bodyMd.lineHeight),
     },
   },
 }));

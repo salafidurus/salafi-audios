@@ -28,10 +28,9 @@ body {
 
 body {
   color: var(--content-default);
-  font-family: var(--typo-body-md-font-family), sans-serif;
+  font-family: var(--font-body), sans-serif;
   background: var(--surface-canvas);
   min-height: 100%;
-  font-size: var(--typo-body-md-font-size);
 }
 
 *,

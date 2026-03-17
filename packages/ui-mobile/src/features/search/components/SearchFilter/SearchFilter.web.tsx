@@ -124,6 +124,7 @@ const styles = StyleSheet.create((theme) => ({
   chipLabel: {
     _web: {
       ...theme.typography.labelMd,
+      lineHeight: String(theme.typography.labelMd.lineHeight),
     },
   },
 }));
