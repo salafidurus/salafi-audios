@@ -4,6 +4,7 @@ import { Text } from "react-native-unistyles/components/native/Text";
 import { Pressable } from "react-native-unistyles/components/native/Pressable";
 import { Image } from "react-native-unistyles/components/native/Image";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { Headphones, Clock } from "lucide-react";
 import { MarqueeText } from "../MarqueeText";
 
 export type SearchResultItemProps = {
@@ -41,16 +42,25 @@ export function SearchResultItem({
         {imageUrl ? (
           <Image source={{ uri: imageUrl }} style={styles.cover} resizeMode="cover" />
         ) : (
-          <View style={styles.coverFallback} />
+          <View style={styles.coverFallback}>
+            <Headphones size={20} color={theme.colors.content.subtle} />
+          </View>
         )}
       </View>
       <View style={styles.body}>
         <MarqueeText text={title} textStyle={styles.title} />
         <MarqueeText text={scholarName} textStyle={styles.scholarName} />
-        <Text style={styles.metaText}>
-          {formatLectureCount(lectureCount)}
-          {durationLabel ? ` • ${durationLabel}` : ""}
-        </Text>
+        <View style={styles.metaRow}>
+          <Headphones size={11} color={theme.colors.content.muted} />
+          <Text style={styles.metaText}>{formatLectureCount(lectureCount)}</Text>
+          {durationLabel ? (
+            <>
+              <Text style={styles.metaText}> · </Text>
+              <Clock size={11} color={theme.colors.content.muted} />
+              <Text style={styles.metaText}>{durationLabel}</Text>
+            </>
+          ) : null}
+        </View>
       </View>
     </Pressable>
   );
@@ -74,6 +84,8 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.radius.component.panelSm,
     overflow: "hidden",
     backgroundColor: theme.colors.surface.subtle,
+    alignItems: "center",
+    justifyContent: "center",
   },
   cover: {
     width: "100%",
@@ -81,11 +93,15 @@ const styles = StyleSheet.create((theme) => ({
   },
   coverFallback: {
     flex: 1,
+    width: "100%",
     backgroundColor: theme.colors.surface.subtle,
+    alignItems: "center",
+    justifyContent: "center",
   },
   body: {
     flex: 1,
     gap: theme.spacing.scale.xs,
+    overflow: "hidden",
   },
   title: {
     color: theme.colors.content.strong,
@@ -100,6 +116,11 @@ const styles = StyleSheet.create((theme) => ({
       ...theme.typography.bodySm,
       lineHeight: String(theme.typography.bodySm.lineHeight),
     },
+  },
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.scale.xs,
   },
   metaText: {
     color: theme.colors.content.muted,
