@@ -27,8 +27,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import styles from "@/features/navigation/components/sidebar/sidebar.module.css";
-import { SECTION_TABS, SECTION_ROUTES, type Section } from "@/features/navigation/types";
-import { getCurrentSection } from "@/features/navigation/utils/get-current-section";
+import { SECTION_TABS, SECTION_ROUTES, getCurrentSection, type Section } from "@sd/ui-mobile";
 
 const TAB_ICONS: Record<string, LucideIcon> = {
   flame: Flame,

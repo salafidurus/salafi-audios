@@ -2,7 +2,7 @@ import { Pressable, View, Text } from "react-native";
 import * as Haptics from "expo-haptics";
 import { EaseView } from "react-native-ease";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import type { TabConfig } from "../types";
+import type { TabConfig } from "../../types";
 
 type Props = {
   tabs: TabConfig[];

@@ -1,4 +1,4 @@
-import { AdaptiveShell } from "@/features/navigation/components/adaptive-shell";
+import { AdaptiveShell } from "@sd/ui-mobile";
 import { BlurTargetView } from "expo-blur";
 import { Slot } from "expo-router";
 import { View } from "react-native";

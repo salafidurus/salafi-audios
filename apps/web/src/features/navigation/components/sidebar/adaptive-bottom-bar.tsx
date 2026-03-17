@@ -29,13 +29,11 @@ import {
   SECTION_TABS,
   SECTION_LABELS,
   SECTION_ROUTES,
-  type Section,
-} from "@/features/navigation/types";
-import { useNavigationStore } from "@/features/navigation/store/navigation-store";
-import {
+  useNavigationStore,
   getCurrentSection,
   getActiveTabFromPath,
-} from "@/features/navigation/utils/get-current-section";
+  type Section,
+} from "@sd/ui-mobile";
 
 const SECTION_ICONS: Record<Section, LucideIcon> = {
   feed: Cloud,

@@ -3,8 +3,8 @@ import * as Haptics from "expo-haptics";
 import { Search, Cloud, Mic, CassetteTape, Settings } from "lucide-react-native";
 import { EaseView } from "react-native-ease";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { SectionTabBar } from "./section-tab-bar";
-import type { Section, TabConfig } from "../types";
+import { SectionTabBar } from "../SectionTabBar";
+import type { Section, TabConfig } from "../../types";
 import type { ComponentType } from "react";
 
 type IconComponent = ComponentType<{ size?: number; strokeWidth?: number; color?: string }>;

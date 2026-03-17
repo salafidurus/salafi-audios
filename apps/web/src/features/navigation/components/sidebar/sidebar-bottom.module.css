@@ -128,9 +128,10 @@
 
 .tab {
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.25rem;
+  gap: 0.15rem;
   padding: 0.35rem 0.75rem;
   border-radius: var(--radius-component-chip);
   text-decoration: none;

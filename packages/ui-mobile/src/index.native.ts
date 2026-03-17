@@ -69,6 +69,22 @@ export type { SearchProcessingScreenProps } from "./features/search/screens/Sear
 
 export { useSearchCatalog, useTopicsList } from "./features/search/api/search.api";
 
+export type { Section, TabConfig } from "./features/navigation/types";
+export {
+  SECTION_TABS,
+  DEFAULT_TABS,
+  SECTION_LABELS,
+  SECTION_ROUTES,
+} from "./features/navigation/types";
+export { useNavigationStore } from "./features/navigation/store/navigation-store.native";
+export { getCurrentSection } from "./features/navigation/utils/get-current-section.native";
+
+export { AdaptiveShell } from "./features/navigation/components/AdaptiveShell";
+export { SectionLauncher } from "./features/navigation/components/SectionLauncher";
+export { SectionModeBar } from "./features/navigation/components/SectionModeBar";
+export { SectionTabBar } from "./features/navigation/components/SectionTabBar";
+export { SectionSwitcherSheet } from "./features/navigation/components/SectionSwitcherSheet";
+
 export * as coreApi from "./core/api/client";
 export * as coreEnv from "./core/config/env.native";
 export * as coreIntegrations from "./core/config/integrations.native";

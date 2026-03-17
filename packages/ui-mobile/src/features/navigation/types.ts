@@ -33,9 +33,9 @@ export const DEFAULT_TABS: Record<Section, string> = {
 };
 
 export const SECTION_LABELS: Record<Section, string> = {
-  feed: "Feeds",
+  feed: "Feed",
   live: "Live",
-  library: "Lessons",
+  library: "Library",
   account: "Account",
 };
 

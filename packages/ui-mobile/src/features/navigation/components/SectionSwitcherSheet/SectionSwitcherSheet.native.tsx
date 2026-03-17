@@ -4,7 +4,7 @@ import * as Haptics from "expo-haptics";
 import BottomSheet, { BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { Cloud, Mic, CassetteTape, Settings, Search } from "lucide-react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import type { Section } from "../types";
+import type { Section } from "../../types";
 
 type IconComponent = ComponentType<{ size?: number; strokeWidth?: number; color?: string }>;
 

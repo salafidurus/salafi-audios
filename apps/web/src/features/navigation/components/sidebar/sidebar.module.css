@@ -140,7 +140,7 @@
 .subNav {
   display: flex;
   flex-direction: column;
-  padding-left: 2.75rem;
+  padding-left: 1.75rem;
   gap: var(--space-component-gap-xs);
   max-height: 12rem;
   opacity: 1;
@@ -153,7 +153,7 @@
 .subLink {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-component-gap-xs);
+  gap: var(--space-component-gap-sm);
   padding: 0.35rem 0.75rem;
   border-radius: var(--radius-component-chip);
   text-decoration: none;

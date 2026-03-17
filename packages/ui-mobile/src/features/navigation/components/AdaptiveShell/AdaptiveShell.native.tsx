@@ -6,13 +6,13 @@ import { EaseView } from "react-native-ease";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import BottomSheet from "@gorhom/bottom-sheet";
-import { SectionLauncher } from "./section-launcher";
-import { SectionModeBar } from "./section-mode-bar";
-import { SectionSwitcherSheet } from "./section-switcher-sheet";
-import { useNavigationStore } from "../store/navigation-store";
-import { getCurrentSection } from "../utils/get-current-section";
-import { SECTION_TABS } from "../types";
-import type { Section } from "../types";
+import { SectionLauncher } from "../SectionLauncher";
+import { SectionModeBar } from "../SectionModeBar";
+import { SectionSwitcherSheet } from "../SectionSwitcherSheet";
+import { useNavigationStore } from "../../store/navigation-store";
+import { getCurrentSection } from "../../utils/get-current-section";
+import { SECTION_TABS } from "../../types";
+import type { Section } from "../../types";
 
 type Props = {
   blurTargetRef: React.RefObject<InstanceType<typeof View> | null>;

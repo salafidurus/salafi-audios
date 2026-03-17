@@ -22,10 +22,16 @@
     "@sd/env": "workspace:*",
     "lucide-react": "^0.564.0",
     "lucide-react-native": "^0.564.0",
-    "react-native-reanimated": "~4.2.1"
+    "react-native-reanimated": "~4.2.1",
+    "zustand": "^5.0.11"
   },
   "peerDependencies": {
+    "@gorhom/bottom-sheet": "*",
+    "@react-native-async-storage/async-storage": "*",
     "@shopify/flash-list": "*",
+    "expo-blur": "*",
+    "expo-haptics": "*",
+    "expo-router": "*",
     "framer-motion": "*",
     "react": "*",
     "react-native": "*",
@@ -34,7 +40,22 @@
     "react-native-unistyles": "*"
   },
   "peerDependenciesMeta": {
+    "@gorhom/bottom-sheet": {
+      "optional": true
+    },
+    "@react-native-async-storage/async-storage": {
+      "optional": true
+    },
     "@shopify/flash-list": {
+      "optional": true
+    },
+    "expo-blur": {
+      "optional": true
+    },
+    "expo-haptics": {
+      "optional": true
+    },
+    "expo-router": {
       "optional": true
     },
     "framer-motion": {
