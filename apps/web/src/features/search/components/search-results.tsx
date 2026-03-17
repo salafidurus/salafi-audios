@@ -53,8 +53,8 @@ export function SearchResults({ results, isFetching, shouldSearch, error }: Sear
               key={`${item.group}-${item.id}`}
               className="flex items-center gap-[var(--space-component-gap-md)] py-3 transition hover:bg-[var(--surface-hover)] rounded-[var(--radius-component-card)] px-2 cursor-pointer"
             >
-              {/* Left: 20% cover image */}
-              <div className="w-[20%] shrink-0 aspect-[4/5] overflow-hidden rounded-[var(--radius-component-panel-sm)] bg-[var(--surface-subtle)] flex items-center justify-center">
+              {/* Left: cover image */}
+              <div className="w-[10%] shrink-0 aspect-[4/5] overflow-hidden rounded-[var(--radius-component-panel-sm)] bg-[var(--surface-subtle)] flex items-center justify-center">
                 {imageUrl ? (
                   <img src={imageUrl} alt="" className="h-full w-full object-cover" />
                 ) : (
