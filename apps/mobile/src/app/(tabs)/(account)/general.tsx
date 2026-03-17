@@ -1,5 +1,5 @@
 import { ScreenInProgress } from "@sd/ui-mobile";
 
-export default function AccountIndex() {
+export default function AccountGeneral() {
   return <ScreenInProgress />;
 }

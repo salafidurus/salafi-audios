@@ -1,5 +1,5 @@
 import { ScreenInProgress } from "@sd/ui-mobile";
 
-export default function FeedIndex() {
+export default function LibrarySaved() {
   return <ScreenInProgress />;
 }

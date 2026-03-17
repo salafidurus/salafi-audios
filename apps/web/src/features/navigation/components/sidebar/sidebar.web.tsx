@@ -12,28 +12,65 @@ import {
   Mic,
   CassetteTape,
   Settings,
+  Flame,
+  Clock,
+  Heart,
+  Calendar,
+  Radio,
+  CircleCheck,
+  Bookmark,
+  Play,
+  CheckCircle,
+  User,
+  SlidersHorizontal,
+  Scale,
   type LucideIcon,
 } from "lucide-react";
 import styles from "@/features/navigation/components/sidebar/sidebar.module.css";
+import { SECTION_TABS, SECTION_ROUTES, type Section } from "@/features/navigation/types";
+import { getCurrentSection } from "@/features/navigation/utils/get-current-section";
+
+const TAB_ICONS: Record<string, LucideIcon> = {
+  flame: Flame,
+  clock: Clock,
+  heart: Heart,
+  calendar: Calendar,
+  radio: Radio,
+  "circle-check": CircleCheck,
+  bookmark: Bookmark,
+  play: Play,
+  "check-circle": CheckCircle,
+  user: User,
+  "sliders-horizontal": SlidersHorizontal,
+  scale: Scale,
+};
 
 type NavItem = {
   label: string;
   Icon: LucideIcon;
   href: string;
   activeMatch: string;
+  section: Section;
 };
 
 const navItems: NavItem[] = [
-  { label: "Feeds", Icon: Cloud, href: "/feed", activeMatch: "/feed" },
-  { label: "Live", Icon: Mic, href: "/live", activeMatch: "/live" },
-  { label: "Lessons", Icon: CassetteTape, href: "/library", activeMatch: "/library" },
+  { label: "Feeds", Icon: Cloud, href: "/feed/popular", activeMatch: "/feed", section: "feed" },
+  { label: "Live", Icon: Mic, href: "/live/scheduled", activeMatch: "/live", section: "live" },
+  {
+    label: "Lessons",
+    Icon: CassetteTape,
+    href: "/library/saved",
+    activeMatch: "/library",
+    section: "library",
+  },
 ];
 
 export function SidebarWeb() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const isAuthenticated = false;
-  const accountHref = isAuthenticated ? "/account" : "/sign-in";
+  const accountHref = isAuthenticated ? "/account/profile" : "/sign-in";
+  const currentSection = getCurrentSection(pathname);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -73,17 +110,43 @@ export function SidebarWeb() {
         {navItems.map((item) => {
           const isActive =
             pathname === item.activeMatch || pathname.startsWith(`${item.activeMatch}/`);
+          const tabs = SECTION_TABS[item.section];
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={clsx(styles.link, isActive && styles.active)}
-            >
-              <span className={styles.icon} aria-hidden="true">
-                <item.Icon size={18} />
-              </span>
-              <span className={styles.label}>{item.label}</span>
-            </Link>
+            <div key={item.href}>
+              <Link href={item.href} className={clsx(styles.link, isActive && styles.active)}>
+                <span className={styles.icon} aria-hidden="true">
+                  <item.Icon size={18} />
+                </span>
+                <span className={styles.label}>{item.label}</span>
+              </Link>
+              {isActive && !collapsed && (
+                <div className={styles.subNav} role="tablist">
+                  {tabs.map((tab) => {
+                    const tabPath = `${SECTION_ROUTES[item.section]}/${tab.id}`;
+                    const isTabActive = pathname === tabPath;
+                    return (
+                      <Link
+                        key={tab.id}
+                        href={tabPath}
+                        className={clsx(styles.subLink, isTabActive && styles.subActive)}
+                        role="tab"
+                        aria-selected={isTabActive}
+                      >
+                        {TAB_ICONS[tab.icon] && (
+                          <span className={styles.subIcon} aria-hidden="true">
+                            {(() => {
+                              const TabIcon = TAB_ICONS[tab.icon];
+                              return <TabIcon size={14} />;
+                            })()}
+                          </span>
+                        )}
+                        {tab.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           );
         })}
         <Link
@@ -95,6 +158,25 @@ export function SidebarWeb() {
           </span>
           <span className={styles.label}>Account</span>
         </Link>
+        {currentSection === "account" && !collapsed && (
+          <div className={styles.subNav} role="tablist">
+            {SECTION_TABS.account.map((tab) => {
+              const tabPath = `/account/${tab.id}`;
+              const isTabActive = pathname === tabPath;
+              return (
+                <Link
+                  key={tab.id}
+                  href={tabPath}
+                  className={clsx(styles.subLink, isTabActive && styles.subActive)}
+                  role="tab"
+                  aria-selected={isTabActive}
+                >
+                  {tab.label}
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </nav>
     </aside>
   );
