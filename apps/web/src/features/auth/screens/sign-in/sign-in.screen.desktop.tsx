@@ -1,37 +1,44 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { authClient } from "@/core/auth/auth-client";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { useState } from "react";
 
-export function SignUpScreen() {
+export function SignInDesktopScreen() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("from") ?? "/";
-  const [name, setName] = useState("");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleEmailSignIn(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError("");
-    const { error: err } = await authClient.signUp.email({ name, email, password });
+    const { error: err } = await authClient.signIn.email({ email, password });
     setLoading(false);
     if (err) {
-      setError(err.message ?? "Sign up failed");
+      setError(err.message ?? "Sign in failed");
       return;
     }
     router.push(redirectTo);
   }
 
+  async function handleGoogleSignIn() {
+    await authClient.signIn.social({ provider: "google", callbackURL: redirectTo });
+  }
+
+  async function handleAppleSignIn() {
+    await authClient.signIn.social({ provider: "apple", callbackURL: redirectTo });
+  }
+
   return (
     <div>
-      <form onSubmit={handleSubmit}>
-        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" required />
+      <form onSubmit={handleEmailSignIn}>
         <input
           type="email"
           value={email}
@@ -48,10 +55,12 @@ export function SignUpScreen() {
         />
         {error && <p>{error}</p>}
         <button type="submit" disabled={loading}>
-          Create account
+          Sign in
         </button>
       </form>
-      <Link href="/sign-in">Already have an account?</Link>
+      <button onClick={handleGoogleSignIn}>Continue with Google</button>
+      <button onClick={handleAppleSignIn}>Continue with Apple</button>
+      <Link href="/sign-up">Create account</Link>
     </div>
   );
 }
