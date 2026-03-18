@@ -46,7 +46,7 @@ export function TopAuthStripWeb() {
               <Button variant="ghost" size="sm" onClick={() => router.push("/sign-in")}>
                 Sign In
               </Button>
-              <Button variant="primary" size="sm" onClick={() => router.push("/signup")}>
+              <Button variant="primary" size="sm" onClick={() => router.push("/sign-up")}>
                 Create Free Account
               </Button>
             </>
