@@ -30,6 +30,7 @@
     "@gorhom/bottom-sheet": "*",
     "@react-native-async-storage/async-storage": "*",
     "@shopify/flash-list": "*",
+    "expo-apple-authentication": "*",
     "expo-blur": "*",
     "expo-haptics": "*",
     "expo-router": "*",
@@ -38,6 +39,7 @@
     "react-native": "*",
     "react-native-ease": "*",
     "react-native-safe-area-context": "*",
+    "react-native-keyboard-controller": "*",
     "react-native-unistyles": "*"
   },
   "peerDependenciesMeta": {
@@ -48,6 +50,9 @@
       "optional": true
     },
     "@shopify/flash-list": {
+      "optional": true
+    },
+    "expo-apple-authentication": {
       "optional": true
     },
     "expo-blur": {
@@ -63,6 +68,9 @@
       "optional": true
     },
     "react-native-ease": {
+      "optional": true
+    },
+    "react-native-keyboard-controller": {
       "optional": true
     },
     "react-native-safe-area-context": {

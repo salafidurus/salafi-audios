@@ -79,6 +79,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
     plugins: [
       "expo-router",
+      "react-native-keyboard-controller",
       [
         "expo-splash-screen",
         {

@@ -20,6 +20,12 @@ export function SignUpScreen() {
           if (error) throw new Error(error.message ?? "Sign up failed");
           router.push(redirectTo);
         }}
+        onSignUpWithGoogle={() =>
+          authClient.signIn.social({ provider: "google", callbackURL: redirectTo })
+        }
+        onSignUpWithApple={() =>
+          authClient.signIn.social({ provider: "apple", callbackURL: redirectTo })
+        }
         onNavigateToSignIn={() => router.push("/sign-in")}
       />
     );

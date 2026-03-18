@@ -7,6 +7,7 @@ export default function SignInPage() {
 
   return (
     <SignInScreen
+      googleLogoSource={require("../../../assets/auth/google-logo-light-1x.png")}
       onSignIn={async (email, password) => {
         const { error } = await authClient.signIn.email({ email, password });
         if (error) throw new Error(error.message ?? "Sign in failed");

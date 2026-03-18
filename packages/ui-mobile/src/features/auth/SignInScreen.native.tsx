@@ -3,12 +3,15 @@ import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   ActivityIndicator,
-  StyleSheet,
-  ScrollView,
   Platform,
+  Image,
+  type ImageSourcePropType,
 } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import * as AppleAuthentication from "expo-apple-authentication";
+import { StyleSheet } from "react-native-unistyles";
 import { Controller, useForm } from "react-hook-form";
 
 type FormValues = {
@@ -21,6 +24,7 @@ export type SignInScreenProps = {
   onSignInWithGoogle: () => void;
   onSignInWithApple: () => void;
   onNavigateToSignUp: () => void;
+  googleLogoSource?: ImageSourcePropType;
 };
 
 export function SignInScreen({
@@ -28,12 +32,18 @@ export function SignInScreen({
   onSignInWithGoogle,
   onSignInWithApple,
   onNavigateToSignUp,
+  googleLogoSource,
 }: SignInScreenProps) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const { control, handleSubmit } = useForm<FormValues>({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isValid },
+  } = useForm<FormValues>({
     defaultValues: { email: "", password: "" },
+    mode: "onChange",
   });
 
   async function onSubmit({ email, password }: FormValues) {
@@ -48,38 +58,65 @@ export function SignInScreen({
     }
   }
 
+  const { styles: s } = useStyles();
+
   return (
-    <ScrollView contentContainerStyle={s.container} keyboardShouldPersistTaps="handled">
+    <KeyboardAwareScrollView
+      contentContainerStyle={s.container}
+      keyboardShouldPersistTaps="handled"
+      bottomOffset={16}
+    >
       <View style={s.inner}>
         <Text style={s.title}>Sign In</Text>
 
         {Platform.OS === "ios" && (
-          <TouchableOpacity style={s.socialBtn} onPress={onSignInWithApple}>
-            <Text style={s.socialBtnText}>Continue with Apple</Text>
-          </TouchableOpacity>
+          <AppleAuthentication.AppleAuthenticationButton
+            buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+            buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+            cornerRadius={8}
+            style={s.appleBtn}
+            onPress={onSignInWithApple}
+          />
         )}
 
-        <TouchableOpacity style={s.socialBtn} onPress={onSignInWithGoogle}>
-          <Text style={s.socialBtnText}>Continue with Google</Text>
-        </TouchableOpacity>
+        <Pressable
+          style={({ pressed }) => [s.googleBtn, pressed && s.pressed]}
+          onPress={onSignInWithGoogle}
+        >
+          {googleLogoSource && (
+            <Image source={googleLogoSource} style={s.googleLogo} resizeMode="contain" />
+          )}
+          <Text style={s.googleBtnText}>Continue with Google</Text>
+        </Pressable>
 
         <Text style={s.divider}>or sign in with email</Text>
 
         <Controller
           control={control}
           name="email"
-          rules={{ required: true }}
+          rules={{
+            required: true,
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: "Please enter a valid email address.",
+            },
+          }}
           render={({ field: { value, onChange, onBlur } }) => (
-            <TextInput
-              style={s.input}
-              placeholder="Email"
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              textContentType="emailAddress"
-            />
+            <>
+              <TextInput
+                style={[s.input, errors.email ? s.inputError : undefined]}
+                placeholder="Email"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                textContentType="emailAddress"
+              />
+              {errors.email?.message ? (
+                <Text style={s.fieldError}>{errors.email.message}</Text>
+              ) : null}
+            </>
           )}
         />
 
@@ -105,55 +142,93 @@ export function SignInScreen({
         {loading ? (
           <ActivityIndicator style={s.loader} />
         ) : (
-          <TouchableOpacity style={s.btn} onPress={handleSubmit(onSubmit)}>
+          <Pressable
+            style={({ pressed }) => [
+              s.btn,
+              !isValid && s.btnDisabled,
+              pressed && isValid && s.pressed,
+            ]}
+            onPress={isValid ? handleSubmit(onSubmit) : undefined}
+          >
             <Text style={s.btnText}>Sign In</Text>
-          </TouchableOpacity>
+          </Pressable>
         )}
 
-        <TouchableOpacity onPress={onNavigateToSignUp}>
+        <Pressable onPress={onNavigateToSignUp}>
           <Text style={s.link}>Don't have an account? Create one</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 }
 
-const s = StyleSheet.create({
+const useStyles = StyleSheet.createMemoized((theme) => ({
   container: { flexGrow: 1, justifyContent: "center" },
-  inner: { padding: 24 },
-  title: { fontSize: 24, fontWeight: "700", marginBottom: 24 },
-  socialBtn: {
+  inner: { padding: theme.spacing.layout.pageX },
+  title: {
+    fontSize: 24,
+    fontWeight: "700",
+    marginBottom: theme.spacing.component.gapXl,
+    color: theme.colors.content.strong,
+  },
+  appleBtn: { width: "100%", height: 48, marginBottom: theme.spacing.component.gapSm },
+  googleBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: theme.spacing.component.gapSm,
     borderWidth: 1,
-    borderColor: "#d1d5db",
+    borderColor: "#747775",
     borderRadius: 8,
     padding: 14,
-    alignItems: "center",
-    marginBottom: 12,
+    marginBottom: theme.spacing.component.gapSm,
+    backgroundColor: "#FFFFFF",
   },
-  socialBtnText: { fontSize: 16, fontWeight: "500" },
+  googleLogo: { width: 22, height: 22 },
+  googleBtnText: { fontSize: 16, fontWeight: "500", color: "#1F1F1F" },
   divider: {
     textAlign: "center",
-    color: "#9ca3af",
+    color: theme.colors.content.muted,
     fontSize: 14,
-    marginVertical: 16,
+    marginVertical: theme.spacing.component.gapMd,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#d1d5db",
+    borderColor: theme.colors.border.default,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    marginBottom: 12,
+    marginBottom: theme.spacing.component.gapSm,
+    backgroundColor: theme.colors.surface.subtle,
+    color: theme.colors.content.default,
   },
-  error: { color: "#dc2626", fontSize: 14, marginBottom: 8 },
+  error: {
+    color: theme.colors.state.danger,
+    fontSize: 14,
+    marginBottom: theme.spacing.component.gapSm,
+  },
   loader: { marginTop: 4 },
   btn: {
-    backgroundColor: "#2563eb",
+    backgroundColor: theme.colors.action.primary,
     borderRadius: 8,
     padding: 14,
     alignItems: "center",
     marginTop: 4,
   },
-  btnText: { color: "#fff", fontSize: 16, fontWeight: "600" },
-  link: { textAlign: "center", color: "#2563eb", marginTop: 16, fontSize: 14 },
-});
+  btnText: { color: theme.colors.content.onPrimary, fontSize: 16, fontWeight: "600" },
+  link: {
+    textAlign: "center",
+    color: theme.colors.content.primary,
+    marginTop: theme.spacing.component.gapMd,
+    fontSize: 14,
+  },
+  pressed: { opacity: 0.75 },
+  inputError: { borderColor: theme.colors.state.danger },
+  fieldError: {
+    color: theme.colors.state.danger,
+    fontSize: 12,
+    marginTop: -4,
+    marginBottom: theme.spacing.component.gapSm,
+  },
+  btnDisabled: { opacity: 0.45 },
+}));
