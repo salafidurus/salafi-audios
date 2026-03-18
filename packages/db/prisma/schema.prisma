@@ -45,11 +45,6 @@ enum RecommendationRecurrence {
   yearly
 }
 
-enum GlobalRole {
-  admin
-  listener
-}
-
 enum ScholarRole {
   scholar
   scholar_editor
@@ -82,43 +77,28 @@ model IngestionBatch {
 //////////////////////////
 
 model User {
-  id                 String    @id @default(cuid())
-  email              String?
-  emailNormalized    String?
-  emailVerifiedAt    DateTime?
-  name               String?
-  preferredLanguage  String?
-  passwordHash       String?
-  passwordUpdatedAt  DateTime?
-  lastLoginAt        DateTime?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime?
-  deactivatedAt      DateTime?
-  erasureRequestedAt DateTime?
-  erasedAt           DateTime?
-  isBanned           Boolean   @default(false)
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  role          String    @default("user")
+  banned        Boolean?
+  banReason     String?
+  banExpires    DateTime?
 
-  globalRoles         UserGlobalRole[]
+  // Domain extensions
+  preferredLanguage String?
+
+  // Relations
+  sessions            Session[]
+  accounts            Account[]
   scholarRoles        UserScholarRole[]
   createdScholarRoles UserScholarRole[]     @relation("createdByUser")
   progress            UserLectureProgress[]
   favorites           FavoriteLecture[]
-
-  @@index([emailNormalized], map: "idx_user_emailnorm")
-  @@index([deactivatedAt], map: "idx_user_deactivated")
-  @@index([erasureRequestedAt], map: "idx_user_erasure_requested")
-  @@index([lastLoginAt], map: "idx_user_last_login")
-}
-
-model UserGlobalRole {
-  userId    String
-  role      GlobalRole
-  createdAt DateTime   @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
-
-  @@id([userId, role])
-  @@index([role, userId], map: "idx_globalrole_role_user")
 }
 
 model UserScholarRole {
@@ -440,4 +420,48 @@ model FavoriteLecture {
   @@id([userId, lectureId])
   @@index([userId, createdAt], map: "idx_fav_user_createdat")
   @@index([lectureId], map: "idx_fav_lecture")
+}
+
+//////////////////////////
+// better-auth tables
+//////////////////////////
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([providerId, accountId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
