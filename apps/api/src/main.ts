@@ -9,7 +9,7 @@ import { AppModule } from './app.module';
 import { initAuth, getAuth } from './modules/auth/auth.instance';
 import { toNodeHandler } from 'better-auth/node';
 import helmet from 'helmet';
-import * as cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });

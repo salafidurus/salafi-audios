@@ -84,8 +84,14 @@ export function SearchProcessingDesktopScreen() {
 
 function buildResultItems(data: SearchCatalogResultsDto | undefined): SearchResultRow[] {
   if (!data) return [];
-  const collections = data.collections.map((item) => ({ ...item, group: "Collection" }));
-  const series = data.series.map((item) => ({ ...item, group: "Series" }));
-  const lectures = data.lectures.map((item) => ({ ...item, group: "Lecture" }));
+  const collections = data.collections.map((item: SearchCatalogItemDto) => ({
+    ...item,
+    group: "Collection",
+  }));
+  const series = data.series.map((item: SearchCatalogItemDto) => ({ ...item, group: "Series" }));
+  const lectures = data.lectures.map((item: SearchCatalogItemDto) => ({
+    ...item,
+    group: "Lecture",
+  }));
   return [...collections, ...series, ...lectures];
 }
