@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
+import { useAuth } from "@/core/auth/use-auth";
 import {
   PanelLeftOpen,
   PanelRightOpen,
@@ -67,7 +68,7 @@ const navItems: NavItem[] = [
 export function SidebarWeb() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
-  const isAuthenticated = false;
+  const { isAuthenticated } = useAuth();
   const accountHref = isAuthenticated ? "/account/profile" : "/sign-in";
   const currentSection = getCurrentSection(pathname);
 

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
+import { useAuth } from "@/core/auth/use-auth";
 import {
   Cloud,
   Mic,
@@ -69,7 +70,7 @@ export function AdaptiveBottomBar() {
   const currentSection = getCurrentSection(pathname);
   const isHub = currentSection === "home";
 
-  const isAuthenticated = false;
+  const { isAuthenticated } = useAuth();
 
   // Sync active tab from URL
   useEffect(() => {
