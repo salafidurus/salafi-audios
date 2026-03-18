@@ -57,13 +57,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     scheme,
     version,
 
-    // autolinking: {
-    //   searchPaths: [
-    //     path.resolve(__dirname, "../../node_modules"),
-    //     path.resolve(__dirname, "./node_modules"),
-    //   ],
-    // },
-
     autolinking: {
       searchPaths:
         appEnv === "development"
@@ -79,7 +72,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
     plugins: [
       "expo-router",
-      "react-native-keyboard-controller",
       [
         "expo-splash-screen",
         {

@@ -4,7 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { initApiClient } from "@sd/ui-mobile";
-import { createQueryClient } from "@sd/contracts/query";
+import { createQueryClient } from "@sd/contracts";
 const queryClient = createQueryClient();
 
 type Props = {
