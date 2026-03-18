@@ -39,25 +39,6 @@ This Next.js app is a client of the backend API, not an authority.
   - **Tablets/mobile (≤900px):** render `@sd/ui-mobile` components (native feel)
   - **Desktop (>900px):** render web-specific layouts or skip ui-mobile
 - Breakpoints: `MOBILE_MAX = 640px`, `TABLET_MAX = 900px`
-- Example:
-
-```typescript
-import { useResponsive } from '@/shared/hooks/use-responsive';
-import { SearchHomeScreen } from '@sd/ui-mobile';
-import { DesktopSearchLayout } from '@/features/search/components/desktop-search-layout';
-
-export function SearchScreen() {
-  const { isMobile, isTablet } = useResponsive();
-
-  // Render native-style UI on mobile/tablet
-  if (isMobile || isTablet) {
-    return <SearchHomeScreen />;
-  }
-
-  // Render web-specific layout on desktop
-  return <DesktopSearchLayout />;
-}
-```
 
 **Web-specific CSS properties in ui-mobile components:**
 
@@ -65,6 +46,70 @@ export function SearchScreen() {
 - Import `View`/`Text`/`Pressable` from `react-native-unistyles/components/native/*` to enable `_web` key
 - These are automatically applied on web, ignored on native
 - See `packages/ui-mobile/AGENT.md` for details
+
+---
+
+## Responsive Routing Architecture
+
+**CRITICAL — this is how all feature screens are structured:**
+
+```text
+app/(feature)/page.tsx                         ← server component, metadata only
+features/<feature>/screens/<name>/
+  <name>.screen.tsx                            ← responsive router (client component)
+  <name>.screen.desktop.tsx                    ← desktop-only implementation
+```
+
+### Rules
+
+- **`app/**/page.tsx`\*\* — server component, no hooks, imports one screen component, adds metadata
+- **`features/**/screens/<name>/<name>.screen.tsx`\*\* — responsive router only:
+  - Contains `useResponsive()`, decides mobile vs desktop
+  - For mobile/tablet: renders the `@sd/ui-mobile` screen component with callback props wired to `authClient` / `router`
+  - For desktop: renders `<NameDesktopScreen />`
+- **`features/**/screens/<name>/<name>.screen.desktop.tsx`\*\* — desktop-only UI:
+  - Uses Tailwind + CSS variables (`var(--token-name)`)
+  - No `useResponsive()`, no mobile imports
+  - All styles use design token CSS variables — never hardcode colors/spacing
+
+```typescript
+// features/auth/screens/sign-in/sign-in.screen.tsx — responsive router
+"use client";
+import { useRouter, useSearchParams } from "next/navigation";
+import { SignInScreen as MobileSignInScreen } from "@sd/ui-mobile";
+import { SignInDesktopScreen } from "./sign-in.screen.desktop";
+import { useResponsive } from "@/shared/hooks/use-responsive";
+import { authClient } from "@/core/auth/auth-client";
+
+export function SignInScreen() {
+  const router = useRouter();
+  const { isMobile, isTablet } = useResponsive();
+
+  if (isMobile || isTablet) {
+    return (
+      <MobileSignInScreen
+        onSignIn={async (email, password) => { ... }}
+        onSignInWithGoogle={() => authClient.signIn.social({ provider: "google" })}
+        onSignInWithApple={() => authClient.signIn.social({ provider: "apple" })}
+        onNavigateToSignUp={() => router.push("/sign-up")}
+      />
+    );
+  }
+
+  return <SignInDesktopScreen />;
+}
+```
+
+### Naming Conventions
+
+- Feature screen folders: `features/<feature>/screens/<name>/` (kebab-case)
+- Responsive router: `<name>.screen.tsx`
+- Desktop file: `<name>.screen.desktop.tsx`
+
+### Top Auth Strip
+
+- `TopAuthStrip` is hidden on auth routes (`/sign-in`, `/sign-up`) via `usePathname` check at the component level
+- Add new auth routes to the `AUTH_ROUTES` constant in `top-auth-strip.tsx` if needed
 
 ---
 

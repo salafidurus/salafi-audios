@@ -56,10 +56,62 @@ shared → no inward deps
 Most feature screens and shared UI components come from `@sd/ui-mobile`:
 
 - Search, browse, and results screens
+- Auth screens (`SignInScreen`, `SignUpScreen`)
 - Navigation shells (AdaptiveShell, SectionTabBar, etc.)
 - Form/list primitives (Button, SearchInput, etc.)
 
 See `packages/ui-mobile/AGENT.md` for the complete component inventory and styling patterns.
+
+---
+
+## Route Wrapper Pattern
+
+`app/(auth)/` and other route files are **thin wrappers** — they import the screen from `@sd/ui-mobile` and wire callback props to `authClient` and `router`. No UI logic lives here.
+
+```typescript
+// apps/mobile/src/app/(auth)/sign-in.tsx
+import { useRouter } from "expo-router";
+import { SignInScreen } from "@sd/ui-mobile";
+import { authClient } from "@/core/auth/auth-client";
+
+export default function SignInPage() {
+  const router = useRouter();
+  return (
+    <SignInScreen
+      googleLogoSource={require("@/assets/auth/google-logo-light-1x.png")}
+      onSignIn={async (email, password) => {
+        const { error } = await authClient.signIn.email({ email, password });
+        if (error) throw new Error(error.message ?? "Sign in failed");
+        router.replace("/");
+      }}
+      onSignInWithGoogle={() => authClient.signIn.social({ provider: "google" })}
+      onSignInWithApple={() => authClient.signIn.social({ provider: "apple" })}
+      onNavigateToSignUp={() => router.push("/sign-up")}
+    />
+  );
+}
+```
+
+**Key rules:**
+
+- Never import `authClient` inside `@sd/ui-mobile` — auth wiring belongs in the app route wrapper
+- Never import `expo-router` inside `@sd/ui-mobile` — navigation callbacks are passed as props
+- Asset paths use the `@/assets` alias (e.g., `require("@/assets/auth/google-logo-light-1x.png")`)
+
+---
+
+## Keyboard Handling
+
+`KeyboardProvider` from `react-native-keyboard-controller` is mounted in `Providers.tsx` at app root. Any screen with form inputs **must** use `KeyboardAwareScrollView` from `react-native-keyboard-controller` (not plain `ScrollView`). This is already done for `SignInScreen` and `SignUpScreen` inside `@sd/ui-mobile`.
+
+---
+
+## Brand Assets
+
+- App icons/splash are configured in `apps/mobile/app.config.ts` and sourced from `apps/mobile/assets/images/*`
+- In UI, use the brand logos from `apps/mobile/assets/images/logo/*` (avoid starter/template React logos)
+- Auth logos live in `apps/mobile/assets/auth/`:
+  - `google-logo-light-1x.png` — Google "G" logo (light background variant)
 
 ---
 
@@ -76,13 +128,6 @@ See `packages/ui-mobile/AGENT.md` for the complete component inventory and styli
 - Consume backend-provided media references
 - Never ship storage credentials in app code
 - Treat downloads as continuity cache, not ownership
-
----
-
-## Brand Assets
-
-- App icons/splash are configured in `apps/mobile/app.config.ts` and sourced from `apps/mobile/assets/images/*`
-- In UI, use the brand logos from `apps/mobile/assets/images/logo/*` (avoid starter/template React logos)
 
 ---
 

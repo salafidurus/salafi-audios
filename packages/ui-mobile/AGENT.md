@@ -157,8 +157,9 @@ const SearchIcon = Search as IconComponent;
 - **Lists:** `FlashList` from `@shopify/flash-list`
 - **Blur:** `BlurView` from `expo-blur`
 - **Haptics:** `expo-haptics` for tactile feedback
+- **Keyboard:** `KeyboardAwareScrollView` from `react-native-keyboard-controller` — **always use this instead of `ScrollView` for any screen with form inputs**
 - **OS branching:** `Platform.OS === "ios"` only for OS-level differences within native context (status bar colors, etc.)
-- **Primitives:** `View`, `Text`, `Pressable`, `Image`, `ScrollView` from `react-native`
+- **Primitives:** `View`, `Text`, `Pressable`, `Image` from `react-native` — **always use `Pressable`, never `TouchableOpacity`**
 
 ### `.web.tsx` stable imports
 
@@ -225,6 +226,64 @@ Mobile navigation used by native and web (mobile/tablet viewports):
 - Native: Always use these components
 - Web: Render these components for mobile/tablet viewports (≤900px via `useResponsive`); use web sidebar for desktop
 - All navigation state is managed in `src/features/navigation/store/navigation.store.ts` (shared between mobile and web)
+
+---
+
+## Auth Screens
+
+`SignInScreen` and `SignUpScreen` are in `src/features/auth/` with `.native.tsx` and `.web.tsx` variants. They follow the **callback-prop pattern** — no direct imports of `authClient` or router.
+
+### Props interface (both screens)
+
+```typescript
+// SignInScreen
+type SignInScreenProps = {
+  onSignIn: (email: string, password: string) => Promise<void>;
+  onSignInWithGoogle: () => void;
+  onSignInWithApple: () => void;
+  onNavigateToSignUp: () => void;
+  googleLogoSource?: ImageSourcePropType; // native only — pass require("@/assets/auth/google-logo-light-1x.png")
+};
+
+// SignUpScreen
+type SignUpScreenProps = {
+  onSignUp: (name: string, email: string, password: string) => Promise<void>;
+  onSignUpWithGoogle: () => void;
+  onSignUpWithApple: () => void;
+  onNavigateToSignIn: () => void;
+  googleLogoSource?: ImageSourcePropType; // native only
+};
+```
+
+### Platform implementations
+
+**`.native.tsx`:**
+
+- Uses `react-hook-form` (`Controller` + `useForm`, `mode: "onChange"`)
+- Uses `KeyboardAwareScrollView` from `react-native-keyboard-controller` (never plain `ScrollView`)
+- Apple sign-in uses `AppleAuthentication.AppleAuthenticationButton` from `expo-apple-authentication` (iOS only via `Platform.OS === "ios"`)
+- Google logo passed as `googleLogoSource` prop — app passes `require("@/assets/auth/google-logo-light-1x.png")`
+- All buttons are `Pressable` (never `TouchableOpacity`)
+- Styles via `StyleSheet.create((theme) => ...)` from `react-native-unistyles`
+
+**`.web.tsx`:**
+
+- Standard HTML form with inline styles using CSS variables (`var(--action-primary)`, `var(--border-default)`, etc.)
+- Uses `react-hook-form` (`register` + `useForm`, `mode: "onChange"`)
+- Google logo: `/auth/google-logo-light-1x.png` (srcSet with 4x) — 22×22px
+- Apple logo: `/auth/apple-logo-dark-1x.png` (srcSet with 3x) — 20×24px
+- These paths resolve to `apps/web/public/auth/` since `.web.tsx` in ui-mobile is bundled by Next.js
+
+### Sign-up specific: Terms & Conditions
+
+Both sign-up implementations include a T&C checkbox that must be checked before any buttons (social or submit) are enabled.
+
+### Form validation
+
+- Email validated with `/^[^\s@]+@[^\s@]+\.[^\s@]+$/` via RHF `pattern` rule
+- All fields required; submit disabled via `isValid` from `formState`
+- Invalid email highlights input border in `var(--state-danger)` / `theme.colors.state.danger`
+- Field error shown below input in danger color
 
 ---
 
