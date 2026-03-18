@@ -26,6 +26,8 @@ This package provides shared configuration for the monorepo, including ESLint an
 - `eslint/nest`: Config for NestJS apps (`apps/api`).
 - `eslint/expo`: Config for Expo apps (`apps/mobile`).
 
-## Commands (root)
+## Commands (run from repo root)
 
+- Build: `pnpm --filter config build`
 - Lint: `pnpm --filter config lint`
+- Typecheck: `pnpm --filter config typecheck`

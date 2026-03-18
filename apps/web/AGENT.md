@@ -10,10 +10,9 @@ This Next.js app is a client of the backend API, not an authority.
 
 ## Agent skills scope
 
-- Project-local OpenCode skills live in `.opencode/skills/`.
-- Keep Next.js and web-specific skills scoped to this app directory.
-- For image-driven UI tasks, run root `google-stitch` first, then adapt output using this file and web-local skills.
-- After Stitch baseline generation, enforce web structure (`app/`, `features/`, `core/`, `shared/`) and tokenized styling rules.
+- If using Claude Code: Skills are defined at the root and listed in CLAUDE.md.
+- If using OpenCode: Project-local skills live in `.opencode/skills/`.
+- Keep web/Next.js skills scoped to this app directory.
 
 ## Non-negotiables
 
@@ -21,267 +20,225 @@ This Next.js app is a client of the backend API, not an authority.
 - Authorization is backend-only; UI gating is convenience only.
 - Never bypass explicit API transition endpoints.
 
-## Structure and dependency direction
+---
 
-- `app/` - routing/layout/composition only
-- `features/` - domain-facing UI/hooks
-- `core/` - platform concerns (API wiring, session, caching, error normalization)
-- `shared/` - primitives/utilities with no inward deps
+## ui-mobile Integration
 
-Route wrappers in `src/app/**/page.tsx` must:
+`@sd/ui-mobile` is a direct dependency used via cross-platform component transpilation.
 
-- Import screen + metadata helpers from `features/*/screens/*`.
-- Avoid domain data fetching and feature business logic.
-- Keep routing declarative and minimal.
+**How it works:**
 
-Feature ownership rules:
+- `next.config.ts` has `transpilePackages: ["@sd/ui-mobile"]` — Next.js transpiles the package directly instead of importing pre-built bundles
+- `@sd/ui-mobile` exports `.native.ts`, `.web.ts`, and fallback `.ts` files
+- Next.js resolves `.web.ts` variants automatically
+- `react-native` is aliased to `react-native-web` via module resolver in Next config
 
-- Feature folders are vertical slices (`api/`, `screens/`, `components/`, `hooks/`, `store/`, `types/`, `utils/`).
-- A feature owns its domain-specific formatting, SEO helpers, UI state, and API wrappers.
-- Do not place catalog-specific code in `core/` or `shared/`.
+**When to use ui-mobile components:**
 
-Shared promotion rules:
+- Use `useResponsive()` hook (from `src/shared/hooks/use-responsive.ts`) for breakpoint-aware rendering:
+  - **Tablets/mobile (≤900px):** render `@sd/ui-mobile` components (native feel)
+  - **Desktop (>900px):** render web-specific layouts or skip ui-mobile
+- Breakpoints: `MOBILE_MAX = 640px`, `TABLET_MAX = 900px`
+- Example:
 
-- Promote code to `shared/` only when at least two features need the same behavior.
-- `shared/` stays domain-agnostic (no catalog semantics, no API route knowledge).
-- When in doubt, keep code inside the feature until reuse is proven.
+```typescript
+import { useResponsive } from '@/shared/hooks/use-responsive';
+import { SearchHomeScreen } from '@sd/ui-mobile';
+import { DesktopSearchLayout } from '@/features/search/components/desktop-search-layout';
 
-API client import policy:
+export function SearchScreen() {
+  const { isMobile, isTablet } = useResponsive();
 
-- Import API types from `@sd/contracts` public exports.
-- Use query hooks from `@sd/contracts/query/hooks` for data fetching.
-- Initialize the API client once per app with `initApiClient()`.
+  // Render native-style UI on mobile/tablet
+  if (isMobile || isTablet) {
+    return <SearchHomeScreen />;
+  }
 
-Styling policy:
+  // Render web-specific layout on desktop
+  return <DesktopSearchLayout />;
+}
+```
 
-- Use design tokens from `@sd/design-tokens` as the single source of truth for CSS variables (emitted via `src/app/theme-css.ts`).
-- Use tokenized design primitives from `src/app/globals.css` and component styles (no legacy hardcoded values).
-- Avoid one-off hardcoded colors/spacing/radius/shadows in feature components.
-- If a required token is missing, make a small, deliberate update in `packages/design-tokens`.
-- Keep green-accent catalog language calm, structured, and readable.
-
-## Design Token Usage Guide: `surface`, `border`, and `content`
+**Web-specific CSS properties in ui-mobile components:**
 
-Use these token groups by **role**, not by visual preference.
+- `.web.tsx` files in ui-mobile use `_web` key inside `StyleSheet.create()` for CSS-only properties
+- Import `View`/`Text`/`Pressable` from `react-native-unistyles/components/native/*` to enable `_web` key
+- These are automatically applied on web, ignored on native
+- See `packages/ui-mobile/AGENT.md` for details
 
-### Core rule
+---
 
-- `surface` = backgrounds and fills
-- `border` = outlines, separators, rings
-- `content` = text, icons, and foreground elements placed on top of surfaces
-
-Never use a `content` token as a background.
-Never use a `surface` token for text.
-Never use a `border` token for main text.
-
-### 1. `surface` tokens
-
-Use `surface.*` for anything that forms the visual layer a user sees **behind content**.
+## Structure and Dependency Direction
 
-Use `surface` for:
-
-- page backgrounds
-- cards
-- panels
-- containers
-- hover fills
-- subtle selected fills
-- disabled fills
-- tinted backgrounds for primary/secondary emphasis
-
-#### Meaning of each surface token
-
-- `surface.canvas` -> app/page background
-- `surface.default` -> default background of components
-- `surface.subtle` -> softer background than default
-- `surface.elevated` -> lifted surfaces (modals, popovers)
-- `surface.hover` -> hover/pressed background on neutral surfaces
-- `surface.inverse` -> reversed surface relative to main theme
-- `surface.primarySubtle` -> soft primary-tinted surfaces
-- `surface.secondarySubtle` -> soft secondary-tinted surfaces
-- `surface.selected` -> selected state backgrounds
-- `surface.disabled` -> disabled backgrounds only
+- `app/` — routing/layout/composition only
+- `features/` — domain-facing UI/hooks
+- `core/` — platform concerns (API wiring, session, caching, error normalization)
+- `shared/` — primitives/utilities with no inward deps
 
-### 2. `border` tokens
-
-Use `border.*` only for edges, dividers, separators, outlines, and focus treatments.
+**Route wrappers** in `src/app/**/page.tsx`:
 
-Use `border` for:
+- Import screen + metadata helpers from `features/*/screens/*`
+- Avoid domain data fetching and feature business logic
+- Keep routing declarative and minimal
 
-- component outlines
-- separators
-- dividers
-- input borders
-- hover border emphasis
-- focus rings
-- accent borders
-- disabled borders
-
-#### Meaning of each border token
-
-- `border.default` -> normal component borders
-- `border.subtle` -> soft separators
-- `border.strong` -> emphasized borders
-- `border.muted` -> barely visible boundaries
-- `border.hover` -> hover border changes
-- `border.focus` -> focus-visible treatment
-- `border.primary` -> soft primary-accent borders
-- `border.primaryStrong` -> emphasized primary borders
-- `border.secondary` -> soft secondary borders
-- `border.secondaryStrong` -> strong secondary borders
-- `border.disabled` -> disabled borders
-
-### 3. `content` tokens
-
-Use `content.*` for any foreground element shown on top of a surface.
-
-Use `content` for:
-
-- text
-- icons
-- glyphs
-- foreground indicators
-- inline metadata
-
-#### Meaning of each content token
-
-- `content.default` -> normal body content
-- `content.muted` -> secondary content
-- `content.subtle` -> quiet tertiary content
-- `content.strong` -> headings/high emphasis
-- `content.inverse` -> text on inverse surfaces
-- `content.primary` -> primary-accent foreground
-- `content.primaryStrong` -> stronger primary foreground
-- `content.secondary` -> secondary foreground
-- `content.secondaryStrong` -> stronger secondary foreground
-- `content.onPrimary` -> text/icons on strong primary background
-- `content.onSecondary` -> text/icons on strong secondary background
-- `content.onDanger` -> text/icons on danger backgrounds
-- `content.onSuccess` -> text/icons on success backgrounds
-- `content.disabled` -> disabled foreground content
-
-### 4. Practical pairing rules
-
-- neutral container -> surface.default + border.default + content.default + content.strong
-- subtle container -> surface.subtle + border.subtle + content.default
-- elevated container -> surface.elevated + border.default (or none) + content.default
-- selected item -> surface.selected + border.primary/primaryStrong + content.strong
-- primary tinted block -> surface.primarySubtle + border.primary + content.primaryStrong + content.default
-- inverse block -> surface.inverse + content.inverse
-- disabled component -> surface.disabled + border.disabled + content.disabled
-- primary button -> action.primary + content.onPrimary
-- secondary button -> action.secondary + content.onSecondary
-
-### 5. Decision rules for the agent
-
-1. Determine the layer
-
-- background/container -> surface
-- outline/separator -> border
-- text/icon/foreground -> content
-
-1. Determine emphasis
-
-- standard -> default
-- quieter -> subtle/muted
-- stronger -> strong
-- disabled -> disabled
-- selected/accented -> primary/secondary
-- on colored fill -> onPrimary/onSecondary/inverse
-
-1. Preserve contrast and semantics
-
-- Foreground must remain readable against its background
-- Prefer semantic pairing over visual guessing
-- Do not swap token groups across roles
-
-### 6. Anti-patterns
-
-- use content tokens as backgrounds
-- use surface tokens as text colors
-- use border tokens as primary text colors
-- use content.inverse on normal light surfaces
-- use content.onPrimary unless on strong primary fill
-- use surface.hover as resting background
-- use border.focus as permanent border
-
-### 7. Preferred defaults
-
-- page background -> surface.canvas
-- standard container -> surface.default
-- muted container -> surface.subtle
-- default text -> content.default
-- heading text -> content.strong
-- helper text -> content.muted
-- default border -> border.default
-- subtle divider -> border.subtle
-- focus ring -> border.focus
-- disabled UI -> surface.disabled + border.disabled + content.disabled
-
-### 8. Short version
-
-Token usage:
-
-- surface.\* = backgrounds and fills
-- border.\* = outlines, dividers, separators, focus rings
-- content.\* = text, icons, and other foreground elements
-
-Defaults:
-
-- page bg -> surface.canvas
-- container bg -> surface.default
-- subtle bg -> surface.subtle
-- elevated bg -> surface.elevated
-- default border -> border.default
-- subtle divider -> border.subtle
-- focus ring -> border.focus
-- body text -> content.default
-- heading text -> content.strong
-- secondary text -> content.muted
-- inverse text -> content.inverse
-- disabled fg -> content.disabled
-
-Pairings:
-
-- selected item -> surface.selected + border.primary + content.strong
-- primary-tinted section -> surface.primarySubtle + border.primary + content.primaryStrong
-- inverse section -> surface.inverse + content.inverse
-- disabled component -> surface.disabled + border.disabled + content.disabled
-- primary button -> action.primary + content.onPrimary
-- secondary button -> action.secondary + content.onSecondary
-
-Never:
-
-- use content tokens as backgrounds
-- use surface tokens as text colors
-- use border tokens as primary text colors
-- use onPrimary/onSecondary unless text is on a strong action/accent fill
-
-## Design Token Usage Guide: `spacing`, `radius`, and `typography`
-
-Use the shared guide in `packages/design-tokens/AGENT.md` to avoid duplication and keep rules consistent.
-
-## Brand assets
-
-- Favicons/app icons live in `apps/web/src/app/favicon.ico` and `apps/web/public/icons/*`; wire them via Next metadata in `apps/web/src/app/layout.tsx`.
-- Logos live in `apps/web/public/logo/*`; reference them as `/logo/<file>` in UI (e.g. with `next/image`).
-
-Information architecture:
-
-- Web route IA can diverge from backend endpoint shapes when UX/SEO benefits.
-- Backend remains authoritative; web IA is a presentation concern.
-
-Direction:
-
-- features -> core/shared
-- core -> shared
-- app composes features
-
-## Data-fetching guidance
-
-- Public pages: SSR/SSG as appropriate; respect publication status.
-- Auth/admin flows: interactive client paths, backend-authorized.
-- Keep client state derived from authoritative API responses.
+**Feature ownership:**
+
+- Feature folders are vertical slices (`api/`, `screens/`, `components/`, `hooks/`, `store/`, `types/`, `utils/`)
+- A feature owns its domain-specific formatting, SEO helpers, UI state, and API wrappers
+- Do not place catalog-specific code in `core/` or `shared/`
+
+**Shared promotion:**
+
+- Promote code to `shared/` only when at least two features need the same behavior
+- `shared/` stays domain-agnostic (no catalog semantics, no API route knowledge)
+- When in doubt, keep code inside the feature until reuse is proven
+
+**API client:**
+
+- Import API types from `@sd/contracts` public exports
+- Use query hooks from `@sd/contracts/query/hooks` for data fetching
+- Initialize the API client once per app with `initApiClient()`
+
+---
+
+## Styling Rules
+
+**Web-own components:**
+
+- Use CSS Modules + design tokens via CSS variables (e.g., `var(--surface-canvas)`)
+- Theme tokens are injected as CSS variables in `src/app/theme-css.ts` and applied in `src/app/layout.tsx`
+- Never hardcode color/spacing/radius values — always reference a design token
+
+**For ui-mobile components rendered in web context:**
+
+- Styling happens via unistyles theme factory (see `packages/ui-mobile/AGENT.md`)
+- Web-specific CSS properties use `_web` key inside `StyleSheet.create()`
+- You don't need to override these — they're already set up in ui-mobile
+
+**Design tokens (complete reference):**
+See `packages/design-tokens/AGENT.md` for the authoritative token guide covering surface, border, content, spacing, radius, and typography.
+
+---
+
+## Icons
+
+Two icon libraries available:
+
+- **`lucide-react`** — primary icon library (consistent, minimal designs)
+- **`huge-icons`** (from `'huge-icons/react'`) — alternative/distinctive icons
+
+**Web-own components:** Use `lucide-react` or `huge-icons` depending on design needs.
+
+**ui-mobile components rendered in web context:**
+
+- The `.web.tsx` variants automatically import `lucide-react` (not lucide-react-native)
+- They also support `huge-icons` via the same import paths
+- No manual override needed — ui-mobile components handle the correct imports
+
+**Icon selection:**
+
+- Prefer lucide-react for consistency
+- Use huge-icons when lucide lacks an icon or for distinctive branding
+
+---
+
+## Animations
+
+Use `framer-motion` for web animations.
+
+```typescript
+import { motion } from 'framer-motion';
+
+<motion.div
+  animate={{ scale: isHovered ? 1.05 : 1, opacity: isHovered ? 1 : 0.8 }}
+  transition={{ type: 'spring', damping: 10, stiffness: 100 }}
+  onMouseEnter={() => setIsHovered(true)}
+  onMouseLeave={() => setIsHovered(false)}
+/>
+```
+
+**⚠️ CRITICAL WARNING:** framer-motion does **NOT** work with react-native-web.
+
+- Only use framer-motion in web-own components
+- Never use framer-motion in shared ui-mobile components
+- For cross-platform animations in ui-mobile, use react-native-ease (native) only
+
+---
+
+## Navigation
+
+**Web sidebar:**
+
+- Lives in `src/features/navigation/components/sidebar/`
+- Not an `@sd/ui-mobile` component (web-specific layout)
+
+**Shared navigation types + store:**
+
+- All navigation types, routes, and state come from `@sd/ui-mobile`:
+  - `SECTION_TABS`, `SECTION_ROUTES`, `SECTION_LABELS` — constants
+  - `getCurrentSection()`, `getActiveTabFromPath()` — utilities
+  - `useNavigationStore()` — Zustand store for active section/tab
+- Web sidebar consumes these shared utilities to stay in sync with mobile
+
+**Mobile navigation:**
+
+- `AdaptiveShell` + `SectionTabBar` from `@sd/ui-mobile` (native-only)
+- Uses the same shared store and types as web
+
+---
+
+## Data-Fetching Guidance
+
+- Public pages: SSR/SSG as appropriate; respect publication status
+- Auth/admin flows: interactive client paths, backend-authorized
+- Keep client state derived from authoritative API responses
+
+---
+
+## Brand Assets
+
+- Favicons/app icons live in `apps/web/src/app/favicon.ico` and `apps/web/public/icons/*`; wire them via Next metadata in `apps/web/src/app/layout.tsx`
+- Logos live in `apps/web/public/logo/*`; reference them as `/logo/<file>` in UI (e.g. with `next/image`)
+
+---
+
+## Information Architecture
+
+- Web route IA can diverge from backend endpoint shapes when UX/SEO benefits
+- Backend remains authoritative; web IA is a presentation concern
+
+---
+
+## Dependency Direction
+
+```file
+app → features/*/screens
+features/*/screens → features/*/components
+features/*/components → core/shared
+core → shared
+```
+
+---
+
+## API Contracts
+
+- Import shared types from `@sd/contracts`
+- Types are hand-written and stable — no codegen required
+- When API changes, update `packages/contracts/src/types/` manually
+
+---
+
+## Quality Expectations
+
+- Preserve clear separation between UX logic and policy logic
+- Keep errors explicit and user-safe; do not swallow failures
+- Add tests for admin actions and permission-sensitive views
+- TypeScript strictness is non-negotiable: do not allow implicit `any`
+- For screen loaders/view-model builders, add explicit return types (especially around `Promise.all` results)
+- For `map`/`filter`/`reduce` callbacks that can lose inference in CI, add explicit element types
+- Before finishing web changes, run `pnpm --filter web typecheck` and `pnpm --filter web build` locally to mirror CI
+
+---
 
 ## Commands (run from repo root)
 
@@ -292,7 +249,7 @@ Direction:
 - Unit/integration tests: `pnpm --filter web test`
 - E2E (Playwright): `pnpm --filter web test:e2e`
 
-## Single-test commands
+### Single-test commands
 
 - Jest file: `pnpm --filter web test -- src/path/to/file.test.tsx`
 - Jest by name: `pnpm --filter web test -- -t "renders heading"`
@@ -300,18 +257,11 @@ Direction:
 - Playwright by title: `pnpm --filter web test:e2e -- --grep "catalog list"`
 - Playwright project: `pnpm --filter web test:e2e -- --project chromium`
 
-## API contracts
+---
 
-- Import shared types from `@sd/contracts`.
-- Types are hand-written and stable - no codegen required.
-- When API changes, update `packages/contracts/src/types/` manually.
+## Documentation Sync
 
-## Quality expectations
+When implementing features, update:
 
-- Preserve clear separation between UX logic and policy logic.
-- Keep errors explicit and user-safe; do not swallow failures.
-- Add tests for admin actions and permission-sensitive views.
-- TypeScript strictness is non-negotiable: do not allow implicit `any`.
-- For screen loaders/view-model builders, add explicit return types (especially around `Promise.all` results).
-- For `map`/`filter`/`reduce` callbacks that can lose inference in CI, add explicit element types.
-- Before finishing web changes, run `pnpm --filter web typecheck` and `pnpm --filter web build` locally to mirror CI.
+- `docs/product-overview/AGENT.md` - Update gap analysis status
+- Relevant implementation-guide file - If patterns change

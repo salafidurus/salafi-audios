@@ -1,5 +1,7 @@
 # Catalog Routing, Recommendations, and Stats
 
+> **Note**: The recommendations module was developed prematurely with 9 endpoints spanning Phases 04-08. For Phase 03, only the hero endpoint (`GET /recommendations/hero`) is needed. Personalization endpoints (following/\*, recent-play) require auth (Phase 04) and playback history (Phase 05). Popular endpoints require analytics (Phase 08). Consider simplifying to hero-only for MVP.
+
 ## Purpose
 
 This document defines Phase 03 public routing expectations, the recommendations contract,

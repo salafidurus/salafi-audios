@@ -25,3 +25,4 @@ This package owns deterministic content ingestion workflows.
 - Run ingestion: `pnpm --filter ingest ingest:content`
 - Lint: `pnpm --filter ingest lint`
 - Typecheck: `pnpm --filter ingest typecheck`
+- Test: `pnpm --filter ingest test`

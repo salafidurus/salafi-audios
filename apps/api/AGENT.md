@@ -10,7 +10,8 @@ This service is the authority for business rules, permissions, and state transit
 
 ## Agent skills scope
 
-- Project-local OpenCode skills live in `.opencode/skills/`.
+- If using Claude Code: Skills are defined at the root and listed in CLAUDE.md.
+- If using OpenCode: Project-local skills live in `.opencode/skills/`.
 - Keep backend/NestJS skills scoped to this app directory.
 
 ## Layering rules
@@ -62,7 +63,7 @@ This service is the authority for business rules, permissions, and state transit
 
 - Shared types are defined in `@sd/contracts` - import from there.
 - When API response shapes change, update `packages/contracts/src/types/` manually.
-- Run `pnpm --filter @sd/contracts build` after updating contracts.
+- Run `pnpm --filter contracts build` after updating contracts.
 
 ## Data and media rules
 
@@ -84,3 +85,12 @@ This service is the authority for business rules, permissions, and state transit
 - Client-authoritative logic hidden in endpoints.
 - Silent fallback for invalid config or invalid state.
 - Unstructured errors or inconsistent status semantics.
+
+---
+
+## Documentation Sync
+
+When implementing features, update:
+
+- `docs/product-overview/AGENT.md` - Update gap analysis status
+- Relevant implementation-guide file - If patterns change
