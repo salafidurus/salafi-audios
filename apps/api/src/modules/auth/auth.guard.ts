@@ -21,11 +21,11 @@ export class AuthGuard implements CanActivate {
 
     // Lazy import so jest.mock('./auth.instance', factory) works correctly in tests.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { auth } =
+    const { getAuth } =
       require('./auth.instance') as typeof import('./auth.instance');
 
     const request = context.switchToHttp().getRequest<Request>();
-    const session = await auth.api.getSession({
+    const session = await getAuth().api.getSession({
       headers: new Headers(request.headers as Record<string, string>),
     });
 
@@ -36,14 +36,15 @@ export class AuthGuard implements CanActivate {
       [context.getHandler(), context.getClass()],
     );
 
-    const userRole = session.user.role ?? 'user';
-    if (requiredRoles?.length && !requiredRoles.includes(userRole)) {
+    if (!session.user.role) throw new UnauthorizedException();
+
+    if (requiredRoles?.length && !requiredRoles.includes(session.user.role)) {
       throw new UnauthorizedException();
     }
 
     request.user = {
       ...session.user,
-      role: userRole,
+      role: session.user.role,
     };
     return true;
   }

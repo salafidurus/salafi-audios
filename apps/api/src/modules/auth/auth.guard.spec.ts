@@ -4,7 +4,7 @@ import { Reflector } from '@nestjs/core';
 import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
 
 const mockAuth = { api: { getSession: jest.fn() } };
-jest.mock('./auth.instance', () => ({ auth: mockAuth }));
+jest.mock('./auth.instance', () => ({ getAuth: () => mockAuth }));
 
 function mockContext(headers: Record<string, string> = {}): ExecutionContext {
   return {

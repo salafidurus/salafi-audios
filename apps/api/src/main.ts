@@ -6,7 +6,7 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
-import { auth } from './modules/auth/auth.instance';
+import { initAuth, getAuth } from './modules/auth/auth.instance';
 import { toNodeHandler } from 'better-auth/node';
 import helmet from 'helmet';
 import * as cookieParser from 'cookie-parser';
@@ -14,6 +14,7 @@ import * as cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
   const config = app.get(ConfigService);
+  initAuth(config);
 
   app.useLogger(app.get(Logger));
   app.use(helmet({ contentSecurityPolicy: false }));
@@ -45,7 +46,7 @@ async function bootstrap() {
 
   // Mount better-auth as Express middleware — handles all /api/auth/* routes
   // before NestJS routing, bypassing ValidationPipe and wildcard issues.
-  app.use('/api/auth', toNodeHandler(auth));
+  app.use('/api/auth', toNodeHandler(getAuth()));
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Salafi Durus API')
