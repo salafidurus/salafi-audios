@@ -85,6 +85,12 @@ export { SectionModeBar } from "./features/navigation/components/SectionModeBar"
 export { SectionTabBar } from "./features/navigation/components/SectionTabBar";
 export { SectionSwitcherSheet } from "./features/navigation/components/SectionSwitcherSheet";
 
+export { SignInScreen } from "./features/auth/SignInScreen";
+export type { SignInScreenProps } from "./features/auth/SignInScreen";
+
+export { SignUpScreen } from "./features/auth/SignUpScreen";
+export type { SignUpScreenProps } from "./features/auth/SignUpScreen";
+
 export * as coreApi from "./core/api/client";
 export * as coreEnv from "./core/config/env.native";
 export * as coreIntegrations from "./core/config/integrations.native";
