@@ -29,7 +29,10 @@ async function bootstrap() {
   app.use(cookieParser());
 
   app.enableCors({
-    origin: (origin, callback) => {
+    origin: (
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void,
+    ) => {
       if (!origin) return callback(null, true);
       if (config.CORS_ORIGINS.includes(origin)) return callback(null, true);
       return callback(new Error(`CORS blocked origin: ${origin}`), false);

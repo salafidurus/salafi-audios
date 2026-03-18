@@ -1,6 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
+import { Public } from '@/modules/auth/decorators';
 import { ApiCommonErrors } from '@/shared/decorators/api-common-errors.decorator';
 import type { SearchCatalogResultsDto as CatalogSearchResultsContractDto } from '@sd/contracts';
 import { SearchService } from './search.service';
@@ -10,6 +11,7 @@ import { SearchResultsDto } from './dto/search-results.dto';
 @SkipThrottle()
 @ApiTags('Search')
 @ApiCommonErrors()
+@Public()
 @Controller('search')
 export class SearchController {
   constructor(private readonly searchService: SearchService) {}
