@@ -1,15 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/core/auth/auth-client";
 import { GoogleSignInButton, AppleSignInButton } from "@/features/auth/components/social-buttons";
 
-export function SignUpDesktopScreen() {
+type SignUpDesktopScreenProps = {
+  redirectTo: string;
+};
+
+export function SignUpDesktopScreen({ redirectTo }: SignUpDesktopScreenProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("from") ?? "/";
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -27,12 +29,16 @@ export function SignUpDesktopScreen() {
     e.preventDefault();
     setLoading(true);
     setError("");
+
     const { error: err } = await authClient.signUp.email({ name, email, password });
+
     setLoading(false);
+
     if (err) {
       setError(err.message ?? "Sign up failed");
       return;
     }
+
     router.push(redirectTo);
   }
 
@@ -100,6 +106,7 @@ export function SignUpDesktopScreen() {
             className="w-full rounded-md border border-[var(--border-default)] bg-[var(--surface-subtle)] px-3 py-2.5 text-[var(--content-default)] placeholder:text-[var(--content-muted)] focus:border-[var(--border-focus)] focus:outline-none"
             style={{ fontSize: "var(--typo-body-md-font-size)" }}
           />
+
           <div className="flex flex-col gap-1">
             <input
               type="email"
@@ -108,7 +115,11 @@ export function SignUpDesktopScreen() {
               onBlur={() => setEmailTouched(true)}
               placeholder="Email"
               required
-              className={`w-full rounded-md border bg-[var(--surface-subtle)] px-3 py-2.5 text-[var(--content-default)] placeholder:text-[var(--content-muted)] focus:outline-none ${showEmailError ? "border-[var(--state-danger)] focus:border-[var(--state-danger)]" : "border-[var(--border-default)] focus:border-[var(--border-focus)]"}`}
+              className={`w-full rounded-md border bg-[var(--surface-subtle)] px-3 py-2.5 text-[var(--content-default)] placeholder:text-[var(--content-muted)] focus:outline-none ${
+                showEmailError
+                  ? "border-[var(--state-danger)] focus:border-[var(--state-danger)]"
+                  : "border-[var(--border-default)] focus:border-[var(--border-focus)]"
+              }`}
               style={{ fontSize: "var(--typo-body-md-font-size)" }}
             />
             {showEmailError && (
@@ -121,6 +132,7 @@ export function SignUpDesktopScreen() {
               </p>
             )}
           </div>
+
           <input
             type="password"
             value={password}

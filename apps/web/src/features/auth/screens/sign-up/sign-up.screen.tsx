@@ -1,15 +1,17 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { SignUpScreen as MobileSignUpScreen } from "@sd/ui-mobile";
 import { SignUpDesktopScreen } from "./sign-up.screen.desktop";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { authClient } from "@/core/auth/auth-client";
 
-export function SignUpScreen() {
+type SignUpScreenProps = {
+  redirectTo: string;
+};
+
+export function SignUpScreen({ redirectTo }: SignUpScreenProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("from") ?? "/";
   const { isMobile, isTablet } = useResponsive();
 
   if (isMobile || isTablet) {
@@ -31,5 +33,5 @@ export function SignUpScreen() {
     );
   }
 
-  return <SignUpDesktopScreen />;
+  return <SignUpDesktopScreen redirectTo={redirectTo} />;
 }

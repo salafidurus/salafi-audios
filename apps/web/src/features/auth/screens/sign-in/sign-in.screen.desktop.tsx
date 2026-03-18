@@ -1,15 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/core/auth/auth-client";
 import { GoogleSignInButton, AppleSignInButton } from "@/features/auth/components/social-buttons";
 
-export function SignInDesktopScreen() {
+type SignInDesktopScreenProps = {
+  redirectTo: string;
+};
+
+export function SignInDesktopScreen({ redirectTo }: SignInDesktopScreenProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("from") ?? "/";
 
   const [email, setEmail] = useState("");
   const [emailTouched, setEmailTouched] = useState(false);
@@ -25,12 +27,16 @@ export function SignInDesktopScreen() {
     e.preventDefault();
     setLoading(true);
     setError("");
+
     const { error: err } = await authClient.signIn.email({ email, password });
+
     setLoading(false);
+
     if (err) {
       setError(err.message ?? "Sign in failed");
       return;
     }
+
     router.push(redirectTo);
   }
 
@@ -80,7 +86,11 @@ export function SignInDesktopScreen() {
               onBlur={() => setEmailTouched(true)}
               placeholder="Email"
               required
-              className={`w-full rounded-md border bg-[var(--surface-subtle)] px-3 py-2.5 text-[var(--content-default)] placeholder:text-[var(--content-muted)] focus:outline-none ${showEmailError ? "border-[var(--state-danger)] focus:border-[var(--state-danger)]" : "border-[var(--border-default)] focus:border-[var(--border-focus)]"}`}
+              className={`w-full rounded-md border bg-[var(--surface-subtle)] px-3 py-2.5 text-[var(--content-default)] placeholder:text-[var(--content-muted)] focus:outline-none ${
+                showEmailError
+                  ? "border-[var(--state-danger)] focus:border-[var(--state-danger)]"
+                  : "border-[var(--border-default)] focus:border-[var(--border-focus)]"
+              }`}
               style={{ fontSize: "var(--typo-body-md-font-size)" }}
             />
             {showEmailError && (
@@ -93,6 +103,7 @@ export function SignInDesktopScreen() {
               </p>
             )}
           </div>
+
           <input
             type="password"
             value={password}
