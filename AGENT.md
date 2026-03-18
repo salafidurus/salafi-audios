@@ -150,6 +150,13 @@ Turbo grouped scripts:
 
 - If a package build emits `@/` path aliases in `dist` output: add `tsc-alias` to that package and run it after `tsc` (example: `tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json`).
 
+## Markdown authoring rules
+
+All AGENT.md and documentation files are linted with markdownlint. Two rules are commonly violated:
+
+- **MD040** — Every fenced code block must declare a language. Use ` ```typescript `, ` ```bash `, ` ```text `, ` ```file `, etc. A bare ` ``` ` will fail the commit hook.
+- **MD032** — Bullet lists must have a blank line before and after them. A heading or paragraph directly followed by `- item` with no blank line will fail.
+
 ## Quality and style
 
 - Prettier is mandatory; root `.prettierrc` is authoritative.
