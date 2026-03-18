@@ -91,3 +91,29 @@ However, the vision outlined here is intended to remain stable:
 - Technology should serve the content, not overshadow it
 
 All subsequent architectural, implementation, and timeline decisions are guided by this foundation.
+
+---
+
+## Current State
+
+**Phase**: 03 (Read-Only Catalog) - PARTIAL
+
+**Completed**:
+
+- Foundations, data model, ingestion pipeline
+- Backend APIs for scholars, collections, series, lectures, search
+- Web/mobile search landing and search processing
+
+**In Progress**:
+
+- Catalog detail pages (scholar, collection, series, lecture) on web and mobile
+
+**Not Started**:
+
+- Authentication (Phase 04)
+- Audio playback (Phase 05)
+- Offline sync (Phase 06)
+- Admin workflows (Phase 07)
+- Analytics integration (Phase 08)
+
+See [AGENT.md](./AGENT.md) for detailed gap analysis.

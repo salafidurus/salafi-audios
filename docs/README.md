@@ -1,183 +1,44 @@
 # Salafi Durus — Documentation Index
 
-## Purpose of This Documentation
+This directory contains authoritative documentation for the Salafi Durus platform.
 
-This directory contains the **authoritative documentation** for the Salafi Durus platform.
+## Quick Navigation
 
-These documents are not supplementary or optional. They define:
+- **[AGENT.md](./AGENT.md)** - Documentation index + timeline summary
+- **[Product Overview](./product-overview/AGENT.md)** - Philosophy + gap analysis
+- **[Implementation Guide](./implementation-guide/)** - How to build
+- **[Guardrails](./implementation-guide/11-guardrails-and-non-goals.md)** - Non-negotiable rules
 
-- Product vision and philosophy
-- Architectural intent
-- Implementation boundaries
-- Execution order
+## Documentation Hierarchy
 
-All design and implementation decisions should align with the content in this directory.
+1. `AGENT.md` files (root, docs, workspaces) - concise reference
+2. `product-overview/` - vision and philosophy
+3. `implementation-guide/` - concrete guidance
+4. `.github/copilot-instructions.md` - quick reference
 
----
+## Reading Order
 
-## How to Read These Docs
+New contributors should read:
 
-The documentation is organized into **three major sections**, each serving a distinct purpose:
+1. [Root AGENT.md](../AGENT.md) - Monorepo orientation
+2. [docs/AGENT.md](./AGENT.md) - Documentation index
+3. [product-overview/AGENT.md](./product-overview/AGENT.md) - Philosophy + gap analysis
+4. Target workspace `AGENT.md` (e.g., `apps/api/AGENT.md`)
 
-1. **Product Overview** — _What we are building and why_
-2. **Implementation Guide** — _How we are building it_
-3. **Timeline** — _In what order we are building it_
+## Sections
 
-New contributors are strongly encouraged to read the documents **in order**.
+### Product Overview
 
----
+Vision, philosophy, and architectural principles. Defines _why_ the system is designed this way.
 
-## 1. Product Overview
+### Implementation Guide
 
-📁 `docs/product-overview/`
+Concrete, enforceable guidance. Defines _how_ to build the system while respecting architectural boundaries.
 
-This section defines the **vision, philosophy, and architectural principles** of Salafi Durus.
-
-It explains _why_ the system is designed the way it is, and what values guide technical decisions.
-
-### Files
-
-- [`01-vision-and-purpose.md`](./product-overview/01-vision-and-purpose.md)  
-  The mission, goals, and problem Salafi Durus solves.
-
-- [`02-product-philosophy.md`](./product-overview/02-product-philosophy.md)  
-  Core principles such as curation, structure, offline-first design, and longevity.
-
-- [`03-user-roles.md`](./product-overview/03-user-roles.md)  
-  Definition of listeners, administrators, and scholar editors.
-
-- [`04-system-architecture.md`](./product-overview/04-system-architecture.md)  
-  High-level system structure and responsibility separation.
-
-- [`05-data-and-media-ownership.md`](./product-overview/05-data-and-media-ownership.md)  
-  How data, media, and analytics are categorized and owned.
-
-- [`06-platform-responsibilities.md`](./product-overview/06-platform-responsibilities.md)  
-  Clear boundaries between mobile, web, backend, and infrastructure.
-
-- [`07-offline-and-sync-philosophy.md`](./product-overview/07-offline-and-sync-philosophy.md)  
-  Conceptual approach to offline usage and eventual consistency.
-
-- [`08-security-and-trust-boundaries.md`](./product-overview/08-security-and-trust-boundaries.md)  
-  Trust model, authorization philosophy, and security boundaries.
-
-- [`09-scalability-and-evolution.md`](./product-overview/09-scalability-and-evolution.md)  
-  How the platform grows without losing its principles.
-
-📌 **Read this section first.**  
-It defines the intent that everything else enforces.
-
----
-
-## 2. Implementation Guide
-
-📁 `docs/implementation-guide/`
-
-This section translates philosophy into **concrete, enforceable guidance**.
-
-It explains how the system should be structured, where logic belongs, and what patterns must be followed — without diving into framework-specific code.
-
-### Files
-
-- [`01-monorepo-structure.md`](./implementation-guide/01-monorepo-structure.md)  
-  Repository layout, workspace rules, and dependency boundaries.
-
-- [`02-backend-architecture.md`](./implementation-guide/02-backend-architecture.md)  
-  Backend layering, module structure, and authority enforcement.
-
-- [`03-database-and-data-modeling.md`](./implementation-guide/03-database-and-data-modeling.md)  
-  Core data modeling principles, schema responsibilities, and migrations.
-
-- [`04-api-design.md`](./implementation-guide/04-api-design.md)  
-  API contracts, versioning, public vs private endpoints, and stability rules.
-
-- [`05-authentication-and-authorization.md`](./implementation-guide/05-authentication-and-authorization.md)  
-  Identity, sessions, roles, scopes, and enforcement strategy.
-
-- [`06-media-upload-and-delivery.md`](./implementation-guide/06-media-upload-and-delivery.md)  
-  Presigned uploads, media replacement, CDN delivery, and constraints.
-
-- [`07-mobile-application-structure.md`](./implementation-guide/07-mobile-application-structure.md)  
-  Mobile app architecture (`app / core / features / shared`) and offline responsibilities.
-
-- [`08-offline-sync-mechanics.md`](./implementation-guide/08-offline-sync-mechanics.md)  
-  Outbox pattern, synchronization flow, conflict handling, and guarantees.
-
-- [`09-web-application-structure.md`](./implementation-guide/09-web-application-structure.md)  
-  Web app structure, public vs admin areas, SEO responsibilities.
-
-- [`10-environments-and-configuration.md`](./implementation-guide/10-environments-and-configuration.md)  
-  Environment model, configuration ownership, and branch-based deployment workflow.
-
-- [`11-guardrails-and-non-goals.md`](./implementation-guide/11-guardrails-and-non-goals.md)  
-  Explicit rules, forbidden shortcuts, and scope boundaries.
-
-📌 **Read this section before implementing features.**  
-It exists to prevent architectural drift.
-
----
-
-## 3. Timeline
-
-📁 `docs/timeline/`
-
-This section defines the **phased execution plan**.
-
-Each phase builds on the previous one and delivers a meaningful, testable outcome. Phases must be completed **in order**.
-
-### Files
-
-- [`01-foundations.md`](./timeline/01-foundations.md)  
-  Repository setup, CI/CD, environments, and skeleton apps.
-
-- [`02-model-and-ingestion.md`](./timeline/02-model-and-ingestion.md)  
-  Canonical domain model, media assets, and structured ingestion pipeline.
-
-- [`03-read-only-catalog.md`](./timeline/03-read-only-catalog.md)  
-  Public browsing of scholars, collections, series, and lectures (no auth).
-
-- [`04-auth-and-user-state.md`](./timeline/04-auth-and-user-state.md)  
-  Authentication, sessions, and user-owned state.
-
-- [`05-playback-and-progress.md`](./timeline/05-playback-and-progress.md)  
-  Audio playback, progress tracking, and resume behavior (online).
-
-- [`06-offline-and-downloads.md`](./timeline/06-offline-and-downloads.md)  
-  Offline playback, downloads, and outbox synchronization.
-
-- [`07-admin-and-uploads.md`](./timeline/07-admin-and-uploads.md)  
-  Admin workflows, single and bulk uploads, moderation.
-
-- [`08-polish-and-analytics.md`](./timeline/08-polish-and-analytics.md)  
-  Analytics, performance, UX polish, and operational readiness.
-
-📌 **Use this section as the execution roadmap.**  
-Skipping phases or reordering them increases risk.
-
----
-
-## Documentation as a First-Class Artifact
-
-This documentation is part of the system.
-
-Rules:
+## Documentation as Enforcement
 
 - Architectural changes require documentation updates
-- Undocumented behavior is considered incomplete
-- If implementation diverges from docs, the docs must be updated or the change reconsidered
+- Undocumented behavior is incomplete
+- Docs reflect intent, not just implementation
 
-Documentation reflects **intent**, not just implementation.
-
----
-
-## Final Note
-
-Salafi Durus is designed for longevity, trust, and clarity.
-
-These documents exist to ensure that:
-
-- Decisions are explicit
-- Boundaries are respected
-- The system remains understandable as it grows
-
-When in doubt, return to these docs before writing code.
+If code and docs conflict, reconcile intentionally.

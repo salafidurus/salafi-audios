@@ -50,6 +50,132 @@
   color: var(--content-primary);
 }
 
+/* Hub mode — 4 section icons evenly spaced */
+.hubNav {
+  justify-content: space-around;
+}
+
+/* Section mode — icon | tabs | search */
+.sectionNav {
+  justify-content: stretch;
+  gap: var(--space-component-gap-sm);
+}
+
+.sectionIconWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.sectionIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: none;
+  background: transparent;
+  color: var(--content-primary);
+  cursor: pointer;
+  border-radius: var(--radius-component-chip);
+  transition: background-color 150ms ease;
+}
+
+.sectionIcon:hover {
+  background: var(--surface-subtle);
+}
+
+.sectionMenu {
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  left: 0;
+  min-width: 10rem;
+  padding: var(--space-component-gap-sm);
+  background: var(--surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-component-panel);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-xs);
+  z-index: 20;
+}
+
+.sectionMenuItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-component-gap-sm);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-component-chip);
+  text-decoration: none;
+  color: var(--content-primary);
+  font-family: var(--typo-label-md-font-family), sans-serif;
+  font-size: var(--typo-label-md-font-size);
+  transition: background-color 150ms ease;
+}
+
+.sectionMenuItem:hover {
+  background: var(--surface-subtle);
+}
+
+.tabGroup {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  justify-content: center;
+  gap: var(--space-component-gap-xs);
+}
+
+.tab {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-component-chip);
+  text-decoration: none;
+  color: var(--content-muted);
+  font-family: var(--typo-label-md-font-family), sans-serif;
+  font-size: var(--typo-caption-font-size);
+  line-height: var(--typo-caption-line-height);
+  font-weight: 400;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--content-strong);
+}
+
+.tabActive {
+  color: var(--content-primary);
+  background: var(--surface-subtle);
+  font-weight: 500;
+}
+
+.searchBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  color: var(--content-muted);
+  text-decoration: none;
+  border-radius: var(--radius-component-chip);
+  transition:
+    color 150ms ease,
+    background-color 150ms ease;
+}
+
+.searchBtn:hover {
+  color: var(--content-strong);
+  background: var(--surface-subtle);
+}
+
 @media (max-width: 640px) {
   .sidebar {
     padding-inline: var(--space-component-gap-md);
@@ -57,5 +183,10 @@
 
   .link {
     font-size: var(--typo-caption-font-size);
+  }
+
+  .tab {
+    padding: 0.3rem 0.5rem;
+    font-size: var(--typo-xs-font-size);
   }
 }

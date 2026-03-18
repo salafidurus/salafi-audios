@@ -1,5 +1,5 @@
-import { LibraryScreen } from "@/features/library/screens/library.screen";
+import { redirect } from "next/navigation";
 
 export default function LibraryPage() {
-  return <LibraryScreen />;
+  redirect("/library/saved");
 }

@@ -1,5 +1,5 @@
-import { LiveScreen } from "@/features/live/screens/live.screen";
+import { redirect } from "next/navigation";
 
 export default function LivePage() {
-  return <LiveScreen />;
+  redirect("/live/scheduled");
 }

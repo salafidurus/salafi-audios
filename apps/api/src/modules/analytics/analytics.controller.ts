@@ -6,6 +6,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
+import { Public } from '@/modules/auth/decorators';
 import { ApiCommonErrors } from '@/shared/decorators/api-common-errors.decorator';
 import { AnalyticsService } from './analytics.service';
 import { CreateAnalyticsEventDto } from './dto/create-analytics-event.dto';
@@ -14,6 +15,7 @@ import { PlatformStatsDto } from './dto/platform-stats.dto';
 @SkipThrottle()
 @ApiTags('Analytics')
 @ApiCommonErrors()
+@Public()
 @Controller('analytics')
 export class AnalyticsController {
   constructor(private readonly analytics: AnalyticsService) {}

@@ -1,13 +1,5 @@
-import { Stack } from "expo-router";
+import { Slot } from "expo-router";
 
 export default function FeedLayout() {
-  return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen name="feed" />
-    </Stack>
-  );
+  return <Slot />;
 }

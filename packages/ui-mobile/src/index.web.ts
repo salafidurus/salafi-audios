@@ -69,7 +69,26 @@ export type { SearchProcessingScreenProps } from "./features/search/screens/Sear
 
 export { useSearchCatalog, useTopicsList } from "./features/search/api/search.api";
 
+export type { Section, TabConfig } from "./features/navigation/types";
+export {
+  SECTION_TABS,
+  DEFAULT_TABS,
+  SECTION_LABELS,
+  SECTION_ROUTES,
+} from "./features/navigation/types";
+export { useNavigationStore } from "./features/navigation/store/navigation-store.web";
+export {
+  getCurrentSection,
+  getActiveTabFromPath,
+} from "./features/navigation/utils/get-current-section.web";
+
 export * as coreApi from "./core/api/client";
 export * as coreEnv from "./core/config/env.web";
 export * as coreIntegrations from "./core/config/integrations.web";
 export * as searchApi from "./features/search/api/search.api";
+
+export { SignInScreen } from "./features/auth/SignInScreen";
+export type { SignInScreenProps } from "./features/auth/SignInScreen";
+
+export { SignUpScreen } from "./features/auth/SignUpScreen";
+export type { SignUpScreenProps } from "./features/auth/SignUpScreen";

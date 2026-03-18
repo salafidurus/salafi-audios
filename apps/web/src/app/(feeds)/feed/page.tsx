@@ -1,5 +1,5 @@
-import { FeedScreen } from "@/features/feed/screens/feed.screen";
+import { redirect } from "next/navigation";
 
 export default function FeedPage() {
-  return <FeedScreen />;
+  redirect("/feed/popular");
 }

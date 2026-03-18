@@ -7,10 +7,12 @@ import {
 } from '@nestjs/swagger';
 import { LecturesService } from './lectures.service';
 import type { LectureViewDto } from '@sd/contracts';
+import { Public } from '@/modules/auth/decorators';
 import { ApiCommonErrors } from '@/shared/decorators/api-common-errors.decorator';
 
 @ApiTags('Lectures')
 @ApiCommonErrors()
+@Public()
 @Controller('scholars/:scholarSlug/lectures')
 export class LecturesByScholarController {
   constructor(private readonly lectures: LecturesService) {}

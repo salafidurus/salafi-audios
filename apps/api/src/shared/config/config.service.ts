@@ -23,19 +23,36 @@ export class ConfigService {
       .filter(Boolean);
   }
 
-  get DATABASE_URL() {
-    if (this.env.DATABASE_URL) {
-      return this.env.DATABASE_URL;
-    }
-
-    if (process.env.DIRECT_DB_URL) {
-      return process.env.DIRECT_DB_URL;
-    }
-
-    throw new Error('DATABASE_URL is required and no DB fallback is allowed.');
+  get DATABASE_URL(): string {
+    return this.env.DATABASE_URL;
   }
 
   get ASSET_CDN_BASE_URL(): string | undefined {
     return this.env.ASSET_CDN_BASE_URL;
+  }
+
+  // better-auth
+  get BETTER_AUTH_SECRET(): string {
+    return this.env.BETTER_AUTH_SECRET;
+  }
+
+  get BETTER_AUTH_URL(): string {
+    return this.env.BETTER_AUTH_URL;
+  }
+
+  get GOOGLE_CLIENT_ID(): string {
+    return this.env.GOOGLE_CLIENT_ID;
+  }
+
+  get GOOGLE_CLIENT_SECRET(): string {
+    return this.env.GOOGLE_CLIENT_SECRET;
+  }
+
+  get APPLE_CLIENT_ID(): string {
+    return this.env.APPLE_CLIENT_ID;
+  }
+
+  get APPLE_CLIENT_SECRET(): string {
+    return this.env.APPLE_CLIENT_SECRET;
   }
 }

@@ -1,6 +1,7 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
+import { Public } from '@/modules/auth/decorators';
 import { ApiCommonErrors } from '@/shared/decorators/api-common-errors.decorator';
 import { SeriesService } from './series.service';
 import { SeriesViewDto } from './dto/series-view.dto';
@@ -8,6 +9,7 @@ import { SeriesViewDto } from './dto/series-view.dto';
 @SkipThrottle()
 @ApiTags('Series')
 @ApiCommonErrors()
+@Public()
 @Controller('series')
 export class SeriesPublicController {
   constructor(private readonly series: SeriesService) {}

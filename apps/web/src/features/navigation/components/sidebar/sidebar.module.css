@@ -136,3 +136,51 @@
 .collapsed .collapseButton {
   position: static;
 }
+
+.subNav {
+  display: flex;
+  flex-direction: column;
+  padding-left: 1.75rem;
+  gap: var(--space-component-gap-xs);
+  max-height: 12rem;
+  opacity: 1;
+  overflow: hidden;
+  transition:
+    max-height 200ms ease-out,
+    opacity 200ms ease-out;
+}
+
+.subLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-component-gap-sm);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-component-chip);
+  text-decoration: none;
+  color: var(--content-muted);
+  font-family: var(--typo-label-md-font-family), sans-serif;
+  font-size: var(--typo-caption-font-size);
+  line-height: var(--typo-caption-line-height);
+  letter-spacing: var(--typo-caption-letter-spacing);
+  transition: color 150ms ease;
+}
+
+.subLink:hover {
+  color: var(--content-strong);
+}
+
+.subActive {
+  color: var(--content-primary);
+  font-weight: 500;
+}
+
+.subIcon {
+  display: inline-flex;
+  align-items: center;
+  color: inherit;
+  flex-shrink: 0;
+}
+
+.collapsed .subNav {
+  display: none;
+}

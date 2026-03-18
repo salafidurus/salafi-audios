@@ -1,6 +1,7 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
+import { Public } from '@/modules/auth/decorators';
 import { ApiCommonErrors } from '@/shared/decorators/api-common-errors.decorator';
 import { RecommendationsService } from './recommendations.service';
 import { RecommendationHeroItemDto } from './dto/recommendation-hero-item.dto';
@@ -10,6 +11,7 @@ import { RecommendationPageDto } from './dto/recommendation-page.dto';
 @SkipThrottle()
 @ApiTags('Recommendations')
 @ApiCommonErrors()
+@Public()
 @Controller('recommendations')
 export class RecommendationsController {
   constructor(private readonly recommendations: RecommendationsService) {}

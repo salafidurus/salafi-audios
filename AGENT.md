@@ -53,8 +53,12 @@ This repository is one system. The monorepo is an enforcement tool, not a conven
 - `packages/i18n` - Internationalization config and keys
 - `packages/auth-shared` - Shared auth types
 - `packages/contracts` - Shared TypeScript contracts (DTOs, types, query hooks)
+- `packages/design-tokens` - Design tokens (colors, spacing, radius, typography) — authoritative source
+- `packages/ui-mobile` - Cross-platform UI components and feature library (used by mobile via react-native, web via react-native-web transpilation)
 - `packages/config` - Shared lint/build config
 - `packages/ingest` - Content ingestion
+
+**Note:** `packages/ui-mobile` requires `transpilePackages: ["@sd/ui-mobile"]` in `next.config.ts` for web integration.
 
 ## Commands (root)
 
@@ -77,12 +81,15 @@ This repository is one system. The monorepo is an enforcement tool, not a conven
 - API: `pnpm --filter api <script>`
 - Web: `pnpm --filter web <script>`
 - Mobile: `pnpm --filter mobile <script>`
-- DB: `pnpm --filter @sd/db <script>`
-- Env: `pnpm --filter @sd/env <script>`
-- I18n: `pnpm --filter @sd/i18n <script>`
-- Auth shared: `pnpm --filter @sd/auth-shared <script>`
-- Contracts: `pnpm --filter @sd/contracts <script>`
-- Ingest: `pnpm --filter @sd/ingest <script>`
+- DB: `pnpm --filter db <script>`
+- Env: `pnpm --filter env <script>`
+- I18n: `pnpm --filter i18n <script>`
+- Auth shared: `pnpm --filter auth-shared <script>`
+- Contracts: `pnpm --filter contracts <script>`
+- Design tokens: `pnpm --filter design-tokens <script>`
+- UI Mobile: `pnpm --filter ui-mobile <script>`
+- Config: `pnpm --filter config <script>`
+- Ingest: `pnpm --filter ingest <script>`
 
 Turbo grouped scripts:
 
@@ -95,7 +102,7 @@ Turbo grouped scripts:
 - Jest file (API): `pnpm --filter api test -- src/modules/topics/topics.service.spec.ts`
 - Jest file (Web): `pnpm --filter web test -- src/path/to/file.test.tsx`
 - Jest file (Mobile): `pnpm --filter mobile test -- src/path/to/file.test.tsx`
-- Jest file (DB): `pnpm --filter @sd/db test -- src/path/to/file.spec.ts`
+- Jest file (DB): `pnpm --filter db test -- src/path/to/file.spec.ts`
 - Jest by name: `pnpm --filter api test -- src/modules/topics/topics.service.spec.ts -t "returns topic by slug"`
 - Jest watch file (API): `pnpm --filter api test:watch -- src/modules/topics/topics.service.spec.ts`
 - Playwright file: `pnpm --filter web test:e2e -- e2e/catalog.spec.ts`
@@ -116,13 +123,13 @@ Turbo grouped scripts:
 - Keep analytics/events out of authoritative core tables.
 - Treat migrations as first-class and reviewable.
 - Treat `packages/db/src/generated/` as derived output; keep it untracked and regenerate locally when needed.
-- `pnpm --filter @sd/db build` copies Prisma client output into `packages/db/dist/generated/` so Turbo remote cache restores it in CI.
-- Prisma commands (scoped to `@sd/db`):
-  - `pnpm --filter @sd/db prisma:generate`
-  - `pnpm --filter @sd/db prisma:validate`
-  - `pnpm --filter @sd/db prisma:format`
-  - `pnpm --filter @sd/db migrate:create-only`
-  - `pnpm --filter @sd/db migrate:deploy`
+- `pnpm --filter db build` copies Prisma client output into `packages/db/dist/generated/` so Turbo remote cache restores it in CI.
+- Prisma commands (scoped to db):
+  - `pnpm --filter db prisma:generate`
+  - `pnpm --filter db prisma:validate`
+  - `pnpm --filter db prisma:format`
+  - `pnpm --filter db migrate:create-only`
+  - `pnpm --filter db migrate:deploy`
 
 ## CI troubleshooting
 
@@ -136,12 +143,19 @@ Turbo grouped scripts:
 - Fix: ensure `@sd/contracts` is built before dependent packages (check `prebuild`, `pretypecheck`, `pretest` scripts).
 
 - If `pnpm typecheck` fails with missing exports from `@sd/contracts`: the contracts package typecheck/build hasn't run.
-- Fix: run `pnpm --filter @sd/contracts build` first, or check that turbo pipeline builds contracts before typechecking dependent apps.
+- Fix: run `pnpm --filter contracts build` first, or check that turbo pipeline builds contracts before typechecking dependent apps.
 
 - If `apps/web` fails during `next build` with `Invalid WEB PUBLIC environment variables: NEXT_PUBLIC_API_URL Required`: the web app validated env at module import during prerender.
 - Fix: make env parsing lazy (don’t parse at module top-level) and make pages tolerate missing API env during CI builds by catching fetch errors and returning empty view models.
 
 - If a package build emits `@/` path aliases in `dist` output: add `tsc-alias` to that package and run it after `tsc` (example: `tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json`).
+
+## Markdown authoring rules
+
+All AGENT.md and documentation files are linted with markdownlint. Two rules are commonly violated:
+
+- **MD040** — Every fenced code block must declare a language. Use ` ```typescript `, ` ```bash `, ` ```text `, ` ```file `, etc. A bare ` ``` ` will fail the commit hook.
+- **MD032** — Bullet lists must have a blank line before and after them. A heading or paragraph directly followed by `- item` with no blank line will fail.
 
 ## Quality and style
 

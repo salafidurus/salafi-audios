@@ -1,4 +1,5 @@
 import { ApiCommonErrors } from '@/shared/decorators/api-common-errors.decorator';
+import { Public } from '@/modules/auth/decorators';
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
@@ -8,6 +9,7 @@ import { LectureTopicsService } from './lecture-topics.service';
 @SkipThrottle()
 @ApiTags('Lecture Topics')
 @ApiCommonErrors()
+@Public()
 @Controller('scholars/:scholarSlug/lectures/:lectureSlug/topics')
 export class LectureTopicsController {
   constructor(private readonly topics: LectureTopicsService) {}

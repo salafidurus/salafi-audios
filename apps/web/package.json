@@ -23,6 +23,7 @@
     "@sd/contracts": "workspace:*",
     "@sd/design-tokens": "workspace:*",
     "@sd/ui-mobile": "workspace:*",
+    "@sd/auth-shared": "workspace:*",
     "@sd/env": "workspace:*",
     "@sd/i18n": "workspace:*",
     "clsx": "^2.1.1",

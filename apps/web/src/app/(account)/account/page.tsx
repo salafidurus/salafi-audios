@@ -1,5 +1,5 @@
-import { AccountScreen } from "@/features/account/screens/account.screen";
+import { redirect } from "next/navigation";
 
 export default function AccountPage() {
-  return <AccountScreen />;
+  redirect("/account/profile");
 }
