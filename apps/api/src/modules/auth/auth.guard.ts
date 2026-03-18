@@ -20,9 +20,7 @@ export class AuthGuard implements CanActivate {
     if (isPublic) return true;
 
     // Lazy import so jest.mock('./auth.instance', factory) works correctly in tests.
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { getAuth } =
-      require('./auth.instance') as typeof import('./auth.instance');
+    const { getAuth } = await import('./auth.instance');
 
     const request = context.switchToHttp().getRequest<Request>();
     const session = await getAuth().api.getSession({
