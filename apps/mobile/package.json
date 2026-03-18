@@ -22,6 +22,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@better-auth/expo": "^1.5.5",
     "@expo/vector-icons": "^15.0.3",
     "@gorhom/bottom-sheet": "^5.2.8",
     "@hugeicons/core-free-icons": "^4.0.0",
@@ -30,6 +31,7 @@
     "@react-navigation/bottom-tabs": "^7.10.1",
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.28",
+    "@sd/auth-shared": "workspace:*",
     "@sd/contracts": "workspace:*",
     "@sd/design-tokens": "workspace:*",
     "@sd/env": "workspace:*",
@@ -37,6 +39,7 @@
     "@sentry/react-native": "^7.11.0",
     "@shopify/flash-list": "2.0.2",
     "expo": "~55.0.6",
+    "expo-apple-authentication": "^55.0.9",
     "expo-blur": "~55.0.9",
     "expo-constants": "~55.0.7",
     "expo-dev-client": "^55.0.16",
@@ -48,6 +51,7 @@
     "expo-linking": "~55.0.7",
     "expo-localization": "~55.0.8",
     "expo-router": "~55.0.5",
+    "expo-secure-store": "^55.0.9",
     "expo-splash-screen": "~55.0.10",
     "expo-status-bar": "~55.0.4",
     "expo-symbols": "~55.0.5",

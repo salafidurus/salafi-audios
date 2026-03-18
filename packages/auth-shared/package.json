@@ -28,7 +28,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "zod": "^3.25.17"
+    "better-auth": "^1.5.5",
+    "zod": "^3.25.17",
+    "zustand": "^5.0.0"
   },
   "devDependencies": {
     "@sd/config": "workspace:*",
