@@ -1,5 +1,7 @@
 import { HealthModule } from '@/core/health/health.module';
 import { AudioAssetsModule } from '@/modules/audio-assets/audio-assets.module';
+import { AuthModule } from '@/modules/auth/auth.module';
+import { AuthGuard } from '@/modules/auth/auth.guard';
 import { CollectionTopicsModule } from '@/modules/collection-topics/collection-topics.module';
 import { CollectionsModule } from '@/modules/collections/collections.module';
 import { LectureTopicsModule } from '@/modules/lecture-topics/lecture-topics.module';
@@ -13,6 +15,7 @@ import { DbModule } from '@/shared/db/db.module';
 import { AppLoggerModule } from '@/shared/logger/logger.module';
 import { AppThrottlerModule } from '@/shared/security/throttler.module';
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { CatalogModule } from './modules/catalog/catalog.module';
@@ -22,14 +25,12 @@ import { SearchModule } from './modules/search/search.module';
 
 @Module({
   imports: [
-    // Setup Modules
     ConfigModule,
     HealthModule,
     AppLoggerModule,
     AppThrottlerModule,
     DbModule,
-
-    // Main Content Modules
+    AuthModule,
     ScholarsModule,
     CollectionsModule,
     SeriesModule,
@@ -39,14 +40,12 @@ import { SearchModule } from './modules/search/search.module';
     RecommendationsModule,
     AnalyticsModule,
     SearchModule,
-
-    // Topics Modules
     TopicsModule,
     LectureTopicsModule,
     SeriesTopicsModule,
     CollectionTopicsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, { provide: APP_GUARD, useClass: AuthGuard }],
 })
 export class AppModule {}

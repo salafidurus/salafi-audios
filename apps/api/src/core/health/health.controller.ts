@@ -1,4 +1,5 @@
 import { ApiCommonErrors } from '@/shared/decorators/api-common-errors.decorator';
+import { Public } from '@/modules/auth/decorators';
 import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
@@ -12,6 +13,7 @@ import { PrismaHealthIndicator } from './prisma-health.indicator';
 @SkipThrottle()
 @ApiTags('Health')
 @ApiCommonErrors()
+@Public()
 @Controller('health')
 export class HealthController {
   constructor(
