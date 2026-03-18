@@ -58,38 +58,36 @@ export function SignInScreen({
     }
   }
 
-  const { styles: s } = useStyles();
-
   return (
     <KeyboardAwareScrollView
-      contentContainerStyle={s.container}
+      contentContainerStyle={styles.container}
       keyboardShouldPersistTaps="handled"
       bottomOffset={16}
     >
-      <View style={s.inner}>
-        <Text style={s.title}>Sign In</Text>
+      <View style={styles.inner}>
+        <Text style={styles.title}>Sign In</Text>
 
         {Platform.OS === "ios" && (
           <AppleAuthentication.AppleAuthenticationButton
             buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
             buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
             cornerRadius={8}
-            style={s.appleBtn}
+            style={styles.appleBtn}
             onPress={onSignInWithApple}
           />
         )}
 
         <Pressable
-          style={({ pressed }) => [s.googleBtn, pressed && s.pressed]}
+          style={({ pressed }) => [styles.googleBtn, pressed && styles.pressed]}
           onPress={onSignInWithGoogle}
         >
           {googleLogoSource && (
-            <Image source={googleLogoSource} style={s.googleLogo} resizeMode="contain" />
+            <Image source={googleLogoSource} style={styles.googleLogo} resizeMode="contain" />
           )}
-          <Text style={s.googleBtnText}>Continue with Google</Text>
+          <Text style={styles.googleBtnText}>Continue with Google</Text>
         </Pressable>
 
-        <Text style={s.divider}>or sign in with email</Text>
+        <Text style={styles.divider}>or sign in with email</Text>
 
         <Controller
           control={control}
@@ -104,7 +102,7 @@ export function SignInScreen({
           render={({ field: { value, onChange, onBlur } }) => (
             <>
               <TextInput
-                style={[s.input, errors.email ? s.inputError : undefined]}
+                style={[styles.input, errors.email ? styles.inputError : undefined]}
                 placeholder="Email"
                 value={value}
                 onChangeText={onChange}
@@ -114,7 +112,7 @@ export function SignInScreen({
                 textContentType="emailAddress"
               />
               {errors.email?.message ? (
-                <Text style={s.fieldError}>{errors.email.message}</Text>
+                <Text style={styles.fieldError}>{errors.email.message}</Text>
               ) : null}
             </>
           )}
@@ -126,7 +124,7 @@ export function SignInScreen({
           rules={{ required: true }}
           render={({ field: { value, onChange, onBlur } }) => (
             <TextInput
-              style={s.input}
+              style={styles.input}
               placeholder="Password"
               value={value}
               onChangeText={onChange}
@@ -137,32 +135,32 @@ export function SignInScreen({
           )}
         />
 
-        {!!error && <Text style={s.error}>{error}</Text>}
+        {!!error && <Text style={styles.error}>{error}</Text>}
 
         {loading ? (
-          <ActivityIndicator style={s.loader} />
+          <ActivityIndicator style={styles.loader} />
         ) : (
           <Pressable
             style={({ pressed }) => [
-              s.btn,
-              !isValid && s.btnDisabled,
-              pressed && isValid && s.pressed,
+              styles.btn,
+              !isValid && styles.btnDisabled,
+              pressed && isValid && styles.pressed,
             ]}
             onPress={isValid ? handleSubmit(onSubmit) : undefined}
           >
-            <Text style={s.btnText}>Sign In</Text>
+            <Text style={styles.btnText}>Sign In</Text>
           </Pressable>
         )}
 
         <Pressable onPress={onNavigateToSignUp}>
-          <Text style={s.link}>Don't have an account? Create one</Text>
+          <Text style={styles.link}>Don't have an account? Create one</Text>
         </Pressable>
       </View>
     </KeyboardAwareScrollView>
   );
 }
 
-const useStyles = StyleSheet.createMemoized((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   container: { flexGrow: 1, justifyContent: "center" },
   inner: { padding: theme.spacing.layout.pageX },
   title: {

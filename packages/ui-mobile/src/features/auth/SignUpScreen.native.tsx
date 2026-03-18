@@ -60,24 +60,22 @@ export function SignUpScreen({
     }
   }
 
-  const { styles: s } = useStyles();
-
   return (
     <KeyboardAwareScrollView
-      contentContainerStyle={s.container}
+      contentContainerStyle={styles.container}
       keyboardShouldPersistTaps="handled"
       bottomOffset={16}
     >
-      <View style={s.inner}>
-        <Text style={s.title}>Create Account</Text>
+      <View style={styles.inner}>
+        <Text style={styles.title}>Create Account</Text>
 
-        <Pressable style={s.termsRow} onPress={() => setTermsAccepted((v) => !v)}>
-          <View style={[s.checkbox, termsAccepted && s.checkboxChecked]}>
-            {termsAccepted && <Text style={s.checkmark}>✓</Text>}
+        <Pressable style={styles.termsRow} onPress={() => setTermsAccepted((v) => !v)}>
+          <View style={[styles.checkbox, termsAccepted && styles.checkboxChecked]}>
+            {termsAccepted && <Text style={styles.checkmark}>✓</Text>}
           </View>
-          <Text style={s.termsText}>
-            I agree to the <Text style={s.termsLink}>Terms of Service</Text> and{" "}
-            <Text style={s.termsLink}>Privacy Policy</Text>
+          <Text style={styles.termsText}>
+            I agree to the <Text style={styles.termsLink}>Terms of Service</Text> and{" "}
+            <Text style={styles.termsLink}>Privacy Policy</Text>
           </Text>
         </Pressable>
 
@@ -90,26 +88,28 @@ export function SignUpScreen({
                 : AppleAuthentication.AppleAuthenticationButtonStyle.WHITE_OUTLINE
             }
             cornerRadius={8}
-            style={[s.appleBtn, !termsAccepted && s.btnDisabled]}
-            onPress={termsAccepted ? onSignUpWithApple : undefined}
+            style={[styles.appleBtn, !termsAccepted && styles.btnDisabled]}
+            onPress={() => {
+              if (termsAccepted) onSignUpWithApple();
+            }}
           />
         )}
 
         <Pressable
           style={({ pressed }) => [
-            s.googleBtn,
-            !termsAccepted && s.btnDisabled,
-            pressed && termsAccepted && s.pressed,
+            styles.googleBtn,
+            !termsAccepted && styles.btnDisabled,
+            pressed && termsAccepted && styles.pressed,
           ]}
           onPress={termsAccepted ? onSignUpWithGoogle : undefined}
         >
           {googleLogoSource && (
-            <Image source={googleLogoSource} style={s.googleLogo} resizeMode="contain" />
+            <Image source={googleLogoSource} style={styles.googleLogo} resizeMode="contain" />
           )}
-          <Text style={s.googleBtnText}>Continue with Google</Text>
+          <Text style={styles.googleBtnText}>Continue with Google</Text>
         </Pressable>
 
-        <Text style={s.divider}>or sign up with email</Text>
+        <Text style={styles.divider}>or sign up with email</Text>
 
         <Controller
           control={control}
@@ -117,7 +117,7 @@ export function SignUpScreen({
           rules={{ required: true }}
           render={({ field: { value, onChange, onBlur } }) => (
             <TextInput
-              style={s.input}
+              style={styles.input}
               placeholder="Name"
               value={value}
               onChangeText={onChange}
@@ -140,7 +140,7 @@ export function SignUpScreen({
           render={({ field: { value, onChange, onBlur } }) => (
             <>
               <TextInput
-                style={[s.input, errors.email ? s.inputError : undefined]}
+                style={[styles.input, errors.email ? styles.inputError : undefined]}
                 placeholder="Email"
                 value={value}
                 onChangeText={onChange}
@@ -150,7 +150,7 @@ export function SignUpScreen({
                 textContentType="emailAddress"
               />
               {errors.email?.message ? (
-                <Text style={s.fieldError}>{errors.email.message}</Text>
+                <Text style={styles.fieldError}>{errors.email.message}</Text>
               ) : null}
             </>
           )}
@@ -162,7 +162,7 @@ export function SignUpScreen({
           rules={{ required: true }}
           render={({ field: { value, onChange, onBlur } }) => (
             <TextInput
-              style={s.input}
+              style={styles.input}
               placeholder="Password"
               value={value}
               onChangeText={onChange}
@@ -173,32 +173,32 @@ export function SignUpScreen({
           )}
         />
 
-        {!!error && <Text style={s.error}>{error}</Text>}
+        {!!error && <Text style={styles.error}>{error}</Text>}
 
         {loading ? (
-          <ActivityIndicator style={s.loader} />
+          <ActivityIndicator style={styles.loader} />
         ) : (
           <Pressable
             style={({ pressed }) => [
-              s.btn,
-              (!termsAccepted || !isValid) && s.btnDisabled,
-              pressed && termsAccepted && isValid && s.pressed,
+              styles.btn,
+              (!termsAccepted || !isValid) && styles.btnDisabled,
+              pressed && termsAccepted && isValid && styles.pressed,
             ]}
             onPress={termsAccepted && isValid ? handleSubmit(onSubmit) : undefined}
           >
-            <Text style={s.btnText}>Create Account</Text>
+            <Text style={styles.btnText}>Create Account</Text>
           </Pressable>
         )}
 
         <Pressable onPress={onNavigateToSignIn}>
-          <Text style={s.link}>Already have an account? Sign in</Text>
+          <Text style={styles.link}>Already have an account? Sign in</Text>
         </Pressable>
       </View>
     </KeyboardAwareScrollView>
   );
 }
 
-const useStyles = StyleSheet.createMemoized((theme) => ({
+const styles = StyleSheet.create((theme) => ({
   container: { flexGrow: 1, justifyContent: "center" },
   inner: { padding: theme.spacing.layout.pageX },
   title: {
