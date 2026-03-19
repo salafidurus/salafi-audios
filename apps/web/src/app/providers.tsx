@@ -3,7 +3,7 @@
 import { ReactNode, useEffect } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { initApiClient } from "@sd/ui-mobile";
-import { createQueryClient } from "@sd/contracts/query";
+import { createQueryClient } from "@sd/contracts";
 
 type Props = {
   children: ReactNode;
