@@ -146,7 +146,7 @@ const styles = StyleSheet.create((theme) => ({
     overflow: "hidden",
   },
   modeContainer: {
-    ...RNStyleSheet.absoluteFillObject,
+    ...RNStyleSheet.absoluteFill,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: theme.spacing.component.gapMd,
