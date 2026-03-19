@@ -50,6 +50,7 @@
     "expo-insights": "~55.0.10",
     "expo-linking": "~55.0.7",
     "expo-localization": "~55.0.8",
+    "expo-network": "~55.0.9",
     "expo-router": "~55.0.5",
     "expo-secure-store": "^55.0.9",
     "expo-splash-screen": "~55.0.10",
