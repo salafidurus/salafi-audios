@@ -12,7 +12,14 @@ type ResponsiveState = {
 };
 
 export function useResponsive(): ResponsiveState {
-  const [width, setWidth] = useState<number | null>(null);
+  const [width, setWidth] = useState<number>(() => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth;
+    }
+
+    // Default to desktop during SSR so web routes render stable semantic markup.
+    return TABLET_MAX + 1;
+  });
 
   useEffect(() => {
     const update = () => setWidth(window.innerWidth);
@@ -20,11 +27,6 @@ export function useResponsive(): ResponsiveState {
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, []);
-
-  // During SSR and initial hydration, always return mobile
-  if (width === null) {
-    return { isMobile: true, isTablet: false, isWeb: false };
-  }
 
   const isMobile = width <= MOBILE_MAX;
   const isTablet = width > MOBILE_MAX && width <= TABLET_MAX;

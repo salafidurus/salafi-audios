@@ -7,5 +7,9 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  return <SearchHomeScreen />;
+  return (
+    <main>
+      <SearchHomeScreen />
+    </main>
+  );
 }

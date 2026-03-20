@@ -1,7 +1,7 @@
 "use client";
 
-export { SearchHomeScreen } from "./screens/SearchHomeScreen";
-export { SearchProcessingScreen } from "./screens/SearchProcessingScreen";
+export { SearchHomeScreen } from "./screens/search-home/search-home.screen";
+export { SearchProcessingScreen } from "./screens/search-processing/search-processing.screen";
 export { SearchResultItem } from "./components/SearchResultItem";
 export { SearchResultsList } from "./components/SearchResultsList";
 export { SearchInput } from "./components/SearchInput";
