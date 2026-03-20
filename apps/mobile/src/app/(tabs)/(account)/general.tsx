@@ -1,4 +1,4 @@
-import { ScreenInProgress } from "@sd/ui-mobile";
+import { ScreenInProgress } from "@sd/shared";
 
 export default function AccountGeneral() {
   return <ScreenInProgress />;

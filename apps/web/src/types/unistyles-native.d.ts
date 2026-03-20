@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Ambient declarations for react-native-unistyles native component subpaths.
 // These subpaths have no "types" entry in the package exports map, so TypeScript
-// cannot resolve them. Declaring them here lets the web build compile code from
-// @sd/ui-mobile that imports these subpaths.
+// cannot resolve them. Declaring them here lets the web build compile shared
+// package code that imports these subpaths.
 
 declare module "react-native-unistyles/components/native/View" {
   export const View: any;

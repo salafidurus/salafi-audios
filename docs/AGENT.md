@@ -30,46 +30,51 @@ This directory contains the authoritative documentation for Salafi Durus.
 
 ### Backend (apps/api)
 
-| Module          | Status      | MVP        | Notes                                         |
-| --------------- | ----------- | ---------- | --------------------------------------------- |
-| scholars        | IMPLEMENTED | CRITICAL   | API complete; needs web/mobile screens        |
-| collections     | IMPLEMENTED | CRITICAL   | API complete; needs web/mobile screens        |
-| series          | IMPLEMENTED | CRITICAL   | API complete; needs web/mobile screens        |
-| lectures        | IMPLEMENTED | CRITICAL   | API complete; needs web/mobile screens        |
-| audio-assets    | IMPLEMENTED | CRITICAL   | Required for playback (Phase 05)              |
-| catalog         | IMPLEMENTED | CRITICAL   | Browse endpoints exist                        |
-| health          | IMPLEMENTED | SUPPORTING | Deployment and monitoring                     |
-| search          | INTEGRATED  | CRITICAL   | Active in web/mobile                          |
-| topics          | IMPLEMENTED | SUPPORTING | Used in search filter                         |
-| analytics       | PARTIAL     | SUPPORTING | Stats endpoint used; event ingestion deferred |
+| Module          | Status      | MVP        | Notes                                           |
+| --------------- | ----------- | ---------- | ----------------------------------------------- |
+| scholars        | IMPLEMENTED | CRITICAL   | API complete; needs web/mobile screens          |
+| collections     | IMPLEMENTED | CRITICAL   | API complete; needs web/mobile screens          |
+| series          | IMPLEMENTED | CRITICAL   | API complete; needs web/mobile screens          |
+| lectures        | IMPLEMENTED | CRITICAL   | API complete; needs web/mobile screens          |
+| audio-assets    | IMPLEMENTED | CRITICAL   | Required for playback (Phase 05)                |
+| catalog         | IMPLEMENTED | CRITICAL   | Browse endpoints exist                          |
+| health          | IMPLEMENTED | SUPPORTING | Deployment and monitoring                       |
+| search          | INTEGRATED  | CRITICAL   | Active in web/mobile                            |
+| topics          | IMPLEMENTED | SUPPORTING | Used in search filter                           |
+| analytics       | PARTIAL     | SUPPORTING | Stats endpoint used; event ingestion deferred   |
 | recommendations | IMPLEMENTED | SUPPORTING | Multiple endpoints exist; may be narrowed later |
 
 ### Web (apps/web)
 
-| Route                 | Status      | MVP        | Notes                  |
-| --------------------- | ----------- | ---------- | ---------------------- |
-| `/`                   | IMPLEMENTED | CRITICAL   | Search landing         |
-| `/searchprocessing`   | IMPLEMENTED | CRITICAL   | Active search          |
-| `/scholars/[slug]`    | MISSING     | CRITICAL   | Scholar detail page    |
-| `/collections/[id]`   | MISSING     | CRITICAL   | Collection detail page |
-| `/series/[id]`        | MISSING     | CRITICAL   | Series detail page     |
-| `/lectures/[id]`      | MISSING     | CRITICAL   | Lecture detail page    |
-| `/feed/*`             | PLACEHOLDER | SUPPORTING | Feed pages exist but are early   |
-| `/library/*`          | PLACEHOLDER | SUPPORTING | Library routes exist but are early |
-| `/account/*`          | PLACEHOLDER | SUPPORTING | Account routes exist but are early |
-| `/sign-in`, `/sign-up` | IMPLEMENTED | SUPPORTING | Using `@sd/feature-auth`        |
+| Route                  | Status      | MVP        | Notes                              |
+| ---------------------- | ----------- | ---------- | ---------------------------------- |
+| `/`                    | IMPLEMENTED | CRITICAL   | Search landing                     |
+| `/searchprocessing`    | IMPLEMENTED | CRITICAL   | Active search                      |
+| `/scholars/[slug]`     | MISSING     | CRITICAL   | Scholar detail page                |
+| `/collections/[id]`    | MISSING     | CRITICAL   | Collection detail page             |
+| `/series/[id]`         | MISSING     | CRITICAL   | Series detail page                 |
+| `/lectures/[id]`       | MISSING     | CRITICAL   | Lecture detail page                |
+| `/feed/*`              | PLACEHOLDER | SUPPORTING | Feed pages exist but are early     |
+| `/library/*`           | PLACEHOLDER | SUPPORTING | Library routes exist but are early |
+| `/account/*`           | PLACEHOLDER | SUPPORTING | Account routes exist but are early |
+| `/sign-in`, `/sign-up` | IMPLEMENTED | SUPPORTING | Using `@sd/feature-auth`           |
 
 ### Mobile (apps/mobile)
 
-| Feature           | Status      | MVP      | Notes                 |
-| ----------------- | ----------- | -------- | --------------------- |
+| Feature           | Status      | MVP      | Notes                     |
+| ----------------- | ----------- | -------- | ------------------------- |
 | Search home       | IMPLEMENTED | CRITICAL | Uses `@sd/feature-search` |
 | Search processing | IMPLEMENTED | CRITICAL | Uses `@sd/feature-search` |
-| Catalog browsing  | MISSING     | CRITICAL | Detail screens needed |
-| Audio playback    | NOT STARTED | CRITICAL | Planned for Phase 05  |
-| Progress tracking | NOT STARTED | CRITICAL | Planned for Phase 05  |
-| Offline sync      | NOT STARTED | CRITICAL | Phase 06              |
-| Downloads         | NOT STARTED | CRITICAL | Phase 06              |
+| Catalog browsing  | MISSING     | CRITICAL | Detail screens needed     |
+| Audio playback    | NOT STARTED | CRITICAL | Planned for Phase 05      |
+| Progress tracking | NOT STARTED | CRITICAL | Planned for Phase 05      |
+| Offline sync      | NOT STARTED | CRITICAL | Phase 06                  |
+| Downloads         | NOT STARTED | CRITICAL | Phase 06                  |
+
+### Current Mobile Runtime Guardrail
+
+- Packages consumed by mobile through root imports must expose a `react-native` package export and, when needed, a native root entry file such as `src/index.native.ts`.
+- Using web-root package entries in native caused Expo Dev Client runtime failures in March 2026 by statically pulling `.web` and `.desktop.web` exports into the Android bundle graph.
 
 ---
 

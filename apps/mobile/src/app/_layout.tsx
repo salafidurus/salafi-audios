@@ -2,13 +2,17 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 import { useUnistyles } from "react-native-unistyles";
-import { Providers } from "@/shared/components/Providers";
-import { getWrappedLayout, initIntegrations } from "@sd/ui-mobile";
-
-initIntegrations();
+import { Providers } from "@sd/shared";
+import { getWrappedLayout, initIntegrations } from "@sd/core-config";
+import { useEffect } from "react";
 
 function RootLayout() {
   const { theme } = useUnistyles();
+
+  useEffect(() => {
+    initIntegrations();
+  }, []);
+
   return (
     <Providers>
       <StatusBar style="auto" />

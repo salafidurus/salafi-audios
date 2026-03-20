@@ -1,8 +1,8 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
-import { Public } from '@/modules/auth/decorators';
-import { ApiCommonErrors } from '@/shared/decorators/api-common-errors.decorator';
+import { Public } from '../../modules/auth/decorators';
+import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CatalogService } from './catalog.service';
 import { CatalogListQueryDto } from './dto/catalog-list.query.dto';
 import {

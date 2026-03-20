@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SearchHomeScreen } from "@/features/search/screens/search-home/search-home.screen";
+import { SearchHomeScreen } from "@sd/feature-search";
 
 export const metadata: Metadata = {
   title: "Home",

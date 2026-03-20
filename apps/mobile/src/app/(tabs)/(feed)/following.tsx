@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
-import { useAuth } from "@/core/auth/use-auth";
-import { ScreenInProgress } from "@sd/ui-mobile";
+import { useAuth } from "@sd/core-auth";
+import { ScreenInProgress } from "@sd/shared";
 
 export default function FeedFollowing() {
   const { isAuthenticated, isLoading } = useAuth();

@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { PrismaClient } from '@sd/db';
-import { ConfigService } from '@/shared/config/config.service';
+import { ConfigService } from '../../shared/config/config.service';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PinoLogger } from 'nestjs-pino';
 

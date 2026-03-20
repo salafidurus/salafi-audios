@@ -1,14 +1,14 @@
 import { useQuery, useMutation, type QueryKey, type UseQueryOptions } from "@tanstack/react-query";
-import type { HttpClientConfig } from "@/http";
-import { configureApiClient, httpClient } from "@/http";
-import { endpoints } from "@/endpoints";
-import { queryKeys } from "@/query";
+import type { HttpClientConfig } from "../../http";
+import { configureApiClient, httpClient } from "../../http";
+import { endpoints } from "../../endpoints";
+import { queryKeys } from "../../query";
 import type {
   ScholarStatsDto,
   PlatformStatsDto,
   SearchCatalogParams,
   SearchCatalogResultsDto,
-} from "@/types";
+} from "../../types";
 
 // Re-export hooks for convenience
 export { useQuery, useMutation };

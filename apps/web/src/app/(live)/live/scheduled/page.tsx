@@ -1,4 +1,4 @@
-import { LiveScreen } from "@/features/live/screens/live.screen";
+import { LiveScreen } from "@sd/feature-live";
 
 export default function LiveScheduledPage() {
   return <LiveScreen />;

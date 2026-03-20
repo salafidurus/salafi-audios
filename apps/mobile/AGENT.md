@@ -49,6 +49,13 @@ core → shared
 shared → no inward deps
 ```
 
+## Native Package Entrypoints
+
+- Any package imported from mobile via its root specifier, for example `@sd/shared` or `@sd/feature-search`, must expose a `react-native` export in `package.json`.
+- If a package root needs platform-specific behavior, add `src/index.native.ts` and route the `react-native` export to it.
+- Do not rely on a web-first root `src/index.ts` for native, especially when that file statically re-exports `.web` or `.desktop.web` modules.
+- A missing native root export caused Expo Dev Client runtime bundle failures in March 2026 by pulling web-only package entrypoints into the Android graph.
+
 ---
 
 ## UI Components
@@ -112,6 +119,7 @@ export default function SignInPage() {
 - In UI, use the brand logos from `apps/mobile/assets/images/logo/*` (avoid starter/template React logos)
 - Auth logos live in `apps/mobile/assets/auth/`:
   - `google-logo-light-1x.png` — Google "G" logo (light background variant)
+- App-local aliases like `@/assets/*` must not be imported from shared packages. If a package imports an asset directly, that asset must live in the owning package or be passed in from the app.
 
 ---
 

@@ -1,5 +1,5 @@
 import { Status } from '@sd/db';
-import { ConfigService } from '@/shared/config/config.service';
+import { ConfigService } from '../../shared/config/config.service';
 import { LecturesRepository } from './lectures.repo';
 
 describe('LecturesRepository', () => {

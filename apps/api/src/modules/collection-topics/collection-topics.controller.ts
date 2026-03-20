@@ -1,5 +1,5 @@
-import { ApiCommonErrors } from '@/shared/decorators/api-common-errors.decorator';
-import { Public } from '@/modules/auth/decorators';
+import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
+import { Public } from '../../modules/auth/decorators';
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';

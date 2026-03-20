@@ -7,7 +7,7 @@ import {
   ApiUnauthorizedResponse,
   ApiForbiddenResponse,
 } from '@nestjs/swagger';
-import { ErrorResponseDto } from '@/shared/errors/error-response.dto';
+import { ErrorResponseDto } from '../../shared/errors/error-response.dto';
 
 export function ApiCommonErrors() {
   return applyDecorators(
