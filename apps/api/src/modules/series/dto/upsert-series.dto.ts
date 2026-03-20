@@ -1,5 +1,8 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { STATUS_VALUES, type StatusValue } from '@/shared/enums/status-values';
+import {
+  STATUS_VALUES,
+  type StatusValue,
+} from '../../../shared/enums/status-values';
 import {
   IsIn,
   IsInt,

@@ -5,10 +5,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { themeCss } from "./theme-css";
 
-import { Footer } from "@/features/navigation/components/footer/footer";
-import { Sidebar } from "@/features/navigation/components/sidebar/sidebar";
-import { TopAuthStrip } from "@/features/navigation/components/top-auth-strip/top-auth-strip";
-import { UnistylesStyle } from "@/core/styles/unistyles-style";
+import { Footer, Sidebar, TopAuthStrip } from "@sd/feature-navigation";
+import { UnistylesStyle } from "@sd/core-styles";
 import { Providers } from "./providers";
 
 const fraunces = localFont({

@@ -50,7 +50,7 @@ This service is the authority for business rules, permissions, and state transit
 - Typecheck: `pnpm --filter api typecheck`
 - Test: `pnpm --filter api test`
 - E2E: `pnpm --filter api test:e2e`
-- OpenAPI: `pnpm openapi`
+- Contracts: `pnpm --filter contracts build`
 
 ## Single-test commands
 
@@ -92,5 +92,5 @@ This service is the authority for business rules, permissions, and state transit
 
 When implementing features, update:
 
-- `docs/product-overview/AGENT.md` - Update gap analysis status
-- Relevant implementation-guide file - If patterns change
+- `docs/AGENT.md` - Update implementation gap analysis and phase status when needed
+- Relevant top-level docs file in `docs/` - If architecture, API, data, or environment rules change

@@ -7,9 +7,7 @@
     "emitDeclarationOnly": false,
     "types": ["node"],
     "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    }
+    "moduleSuffixes": [".desktop.web", ".mobile.web", ".native", ".web", ""]
   },
   "include": ["src/**/*.ts"]
 }

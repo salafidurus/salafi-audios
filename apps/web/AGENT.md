@@ -22,30 +22,30 @@ This Next.js app is a client of the backend API, not an authority.
 
 ---
 
-## ui-mobile Integration
+## Shared Package Integration
 
-`@sd/ui-mobile` is a direct dependency used via cross-platform component transpilation.
+The web app consumes the split shared packages directly: `@sd/shared`, `@sd/core-*`, and `@sd/feature-*`.
 
 **How it works:**
 
-- `next.config.ts` has `transpilePackages: ["@sd/ui-mobile"]` — Next.js transpiles the package directly instead of importing pre-built bundles
-- `@sd/ui-mobile` exports `.native.ts`, `.web.ts`, and fallback `.ts` files
-- Next.js resolves `.web.ts` variants automatically
+- `next.config.ts` transpiles the shared `@sd/*` UI packages directly instead of importing pre-built bundles
+- The repo now uses `.desktop.web.tsx`, `.web.tsx`, `.native.tsx`, and fallback `.tsx` variants
+- Next.js resolves `.desktop.web` and `.web` variants first
 - `react-native` is aliased to `react-native-web` via module resolver in Next config
 
-**When to use ui-mobile components:**
+**When to use shared package components:**
 
-- Use `useResponsive()` hook (from `src/shared/hooks/use-responsive.ts`) for breakpoint-aware rendering:
-  - **Tablets/mobile (≤900px):** render `@sd/ui-mobile` components (native feel)
-  - **Desktop (>900px):** render web-specific layouts or skip ui-mobile
+- Use `useResponsive()` from `@sd/shared` for breakpoint-aware rendering:
+  - **Tablets/mobile (≤900px):** render package-provided mobile/tablet variants when they exist
+  - **Desktop (>900px):** render desktop-specific layouts or `.desktop.web` variants
 - Breakpoints: `MOBILE_MAX = 640px`, `TABLET_MAX = 900px`
 
-**Web-specific CSS properties in ui-mobile components:**
+**Web-specific CSS properties in shared package components:**
 
-- `.web.tsx` files in ui-mobile use `_web` key inside `StyleSheet.create()` for CSS-only properties
+- `.web.tsx` files in shared packages use `_web` key inside `StyleSheet.create()` for CSS-only properties
 - Import `View`/`Text`/`Pressable` from `react-native-unistyles/components/native/*` to enable `_web` key
 - These are automatically applied on web, ignored on native
-- See `packages/ui-mobile/AGENT.md` for details
+- Prefer colocating platform-specific files inside the owning package
 
 ---
 
@@ -65,7 +65,7 @@ features/<feature>/screens/<name>/
 - **`app/**/page.tsx`\*\* — server component, no hooks, imports one screen component, adds metadata
 - **`features/**/screens/<name>/<name>.screen.tsx`\*\* — responsive router only:
   - Contains `useResponsive()`, decides mobile vs desktop
-  - For mobile/tablet: renders the `@sd/ui-mobile` screen component with callback props wired to `authClient` / `router`
+  - For mobile/tablet: renders the package-provided shared screen component with callback props wired to `authClient` / `router`
   - For desktop: renders `<NameDesktopScreen />`
 - **`features/**/screens/<name>/<name>.screen.desktop.tsx`\*\* — desktop-only UI:
   - Uses Tailwind + CSS variables (`var(--token-name)`)
@@ -76,10 +76,10 @@ features/<feature>/screens/<name>/
 // features/auth/screens/sign-in/sign-in.screen.tsx — responsive router
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
-import { SignInScreen as MobileSignInScreen } from "@sd/ui-mobile";
+import { SignInScreen as MobileSignInScreen } from "@sd/feature-auth";
 import { SignInDesktopScreen } from "./sign-in.screen.desktop";
-import { useResponsive } from "@/shared/hooks/use-responsive";
-import { authClient } from "@/core/auth/auth-client";
+import { useResponsive } from "@sd/shared";
+import { authClient } from "@sd/core-auth";
 
 export function SignInScreen() {
   const router = useRouter();
@@ -154,11 +154,11 @@ export function SignInScreen() {
 - Theme tokens are injected as CSS variables in `src/app/theme-css.ts` and applied in `src/app/layout.tsx`
 - Never hardcode color/spacing/radius values — always reference a design token
 
-**For ui-mobile components rendered in web context:**
+**For shared package components rendered in web context:**
 
-- Styling happens via unistyles theme factory (see `packages/ui-mobile/AGENT.md`)
+- Styling happens via the shared unistyles theme factory in `@sd/core-styles`
 - Web-specific CSS properties use `_web` key inside `StyleSheet.create()`
-- You don't need to override these — they're already set up in ui-mobile
+- You don't need to override these when the package already owns the platform variant
 
 **Design tokens (complete reference):**
 See `packages/design-tokens/AGENT.md` for the authoritative token guide covering surface, border, content, spacing, radius, and typography.
@@ -174,11 +174,11 @@ Two icon libraries available:
 
 **Web-own components:** Use `lucide-react` or `huge-icons` depending on design needs.
 
-**ui-mobile components rendered in web context:**
+**Shared package components rendered in web context:**
 
 - The `.web.tsx` variants automatically import `lucide-react` (not lucide-react-native)
 - They also support `huge-icons` via the same import paths
-- No manual override needed — ui-mobile components handle the correct imports
+- No manual override needed when the shared package already provides the web variant
 
 **Icon selection:**
 
@@ -205,8 +205,8 @@ import { motion } from 'framer-motion';
 **⚠️ CRITICAL WARNING:** framer-motion does **NOT** work with react-native-web.
 
 - Only use framer-motion in web-own components
-- Never use framer-motion in shared ui-mobile components
-- For cross-platform animations in ui-mobile, use react-native-ease (native) only
+- Never use framer-motion in shared cross-platform package components
+- For cross-platform animations in shared packages, use react-native-ease (native) only
 
 ---
 
@@ -215,11 +215,11 @@ import { motion } from 'framer-motion';
 **Web sidebar:**
 
 - Lives in `src/features/navigation/components/sidebar/`
-- Not an `@sd/ui-mobile` component (web-specific layout)
+- Not a shared cross-platform package component (web-specific layout)
 
 **Shared navigation types + store:**
 
-- All navigation types, routes, and state come from `@sd/ui-mobile`:
+- Shared navigation types, routes, and state come from `@sd/feature-navigation`:
   - `SECTION_TABS`, `SECTION_ROUTES`, `SECTION_LABELS` — constants
   - `getCurrentSection()`, `getActiveTabFromPath()` — utilities
   - `useNavigationStore()` — Zustand store for active section/tab
@@ -227,7 +227,7 @@ import { motion } from 'framer-motion';
 
 **Mobile navigation:**
 
-- `AdaptiveShell` + `SectionTabBar` from `@sd/ui-mobile` (native-only)
+- `AdaptiveShell` + `SectionTabBar` from `@sd/feature-navigation` (native-only)
 - Uses the same shared store and types as web
 
 ---
@@ -308,5 +308,5 @@ core → shared
 
 When implementing features, update:
 
-- `docs/product-overview/AGENT.md` - Update gap analysis status
-- Relevant implementation-guide file - If patterns change
+- `docs/AGENT.md` - Update implementation gap analysis and phase status when needed
+- Relevant top-level docs file in `docs/` - If web architecture, routing, SEO, or platform boundaries change

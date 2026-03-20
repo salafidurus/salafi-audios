@@ -1,18 +1,17 @@
-import { AdaptiveShell } from "@sd/ui-mobile";
-import { BlurTargetView } from "expo-blur";
+import { AdaptiveShell } from "@sd/feature-navigation";
 import { Slot } from "expo-router";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { useRef } from "react";
 
 export default function TabLayout() {
-  const blurTargetRef = useRef<InstanceType<typeof View>>(null);
+  const containerRef = useRef<View>(null);
 
   return (
-    <BlurTargetView ref={blurTargetRef} style={styles.container}>
+    <View ref={containerRef} style={styles.container}>
       <Slot />
-      <AdaptiveShell blurTargetRef={blurTargetRef} />
-    </BlurTargetView>
+      <AdaptiveShell blurTargetRef={containerRef} />
+    </View>
   );
 }
 

@@ -1,4 +1,4 @@
-import { SupportScreen } from "@/features/support/screens/support.screen";
+import { SupportScreen } from "@sd/feature-support";
 
 export default function SupportPage() {
   return <SupportScreen />;

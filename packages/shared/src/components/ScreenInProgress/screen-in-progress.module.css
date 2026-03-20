@@ -1,0 +1,51 @@
+.wrapper {
+  width: min(var(--space-layout-content-max), 100%);
+  margin-inline: auto;
+  padding: var(--space-layout-page-y) var(--space-layout-page-x) var(--space-layout-section-y);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 0;
+}
+
+.content {
+  width: min(36rem, 100%);
+  text-align: left;
+  padding: clamp(1.5rem, 2.5vw, 2rem);
+  border: 1px solid color-mix(in srgb, var(--border-default) 76%, transparent);
+  border-radius: var(--radius-component-panel);
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, var(--surface-selected) 64%, transparent), transparent 46%),
+    linear-gradient(180deg, color-mix(in srgb, var(--surface-default) 96%, transparent), color-mix(in srgb, var(--surface-subtle) 100%, transparent));
+  box-shadow: var(--shadow-lg);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--typo-title-md-font-family), serif;
+  font-size: var(--typo-title-md-font-size);
+  line-height: var(--typo-title-md-line-height);
+  letter-spacing: var(--typo-title-md-letter-spacing);
+  font-weight: var(--typo-title-md-font-weight);
+  color: var(--content-strong);
+}
+
+.description {
+  margin: var(--space-component-gap-sm) 0 0;
+  font-family: var(--typo-body-md-font-family), sans-serif;
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  letter-spacing: var(--typo-body-md-letter-spacing);
+  color: var(--content-muted);
+  max-width: 32rem;
+}
+
+@media (max-width: 900px) {
+  .wrapper {
+    padding-top: var(--space-component-gap-lg);
+  }
+
+  .content {
+    text-align: center;
+  }
+}

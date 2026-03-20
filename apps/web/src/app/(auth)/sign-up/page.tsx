@@ -1,4 +1,4 @@
-import { SignUpScreen } from "@/features/auth/screens/sign-up/sign-up.screen";
+import { SignUpScreen } from "@sd/feature-auth";
 
 type SignUpPageProps = {
   searchParams: Promise<{

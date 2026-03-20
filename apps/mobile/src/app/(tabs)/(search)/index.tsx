@@ -1,4 +1,4 @@
-import { SearchHomeScreen } from "@sd/ui-mobile";
+import { SearchHomeScreen } from "@sd/feature-search";
 import { useRouter } from "expo-router";
 
 export default function SearchIndex() {
@@ -6,9 +6,9 @@ export default function SearchIndex() {
 
   return (
     <SearchHomeScreen
-      onOpenSearch={() => router.push("/(tabs)/(search)/searchprocessing")}
+      onOpenSearch={() => router.push("/(tabs)/(search)/search")}
       onSelectCategory={(searchKey) =>
-        router.push({ pathname: "/(tabs)/(search)/searchprocessing", params: { searchKey } })
+        router.push({ pathname: "/(tabs)/(search)/search", params: { searchKey } })
       }
     />
   );

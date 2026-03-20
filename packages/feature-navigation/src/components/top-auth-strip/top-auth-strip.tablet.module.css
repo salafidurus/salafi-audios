@@ -1,0 +1,48 @@
+.strip {
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  min-height: var(--top-strip-height, 3.5rem);
+  border-bottom: 1px solid color-mix(in srgb, var(--border-subtle) 78%, transparent);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--surface-canvas) 96%, transparent),
+      color-mix(in srgb, var(--surface-canvas) 88%, transparent)
+    );
+  backdrop-filter: blur(14px);
+}
+
+.inner {
+  width: 100%;
+  max-width: min(calc(var(--space-layout-content-max) + (var(--space-layout-page-x) * 2)), 100%);
+  margin-inline: auto;
+  min-height: var(--top-strip-height, 3.5rem);
+  padding: var(--space-component-gap-sm) var(--space-layout-page-x);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-component-gap-md);
+}
+
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-component-gap-sm);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+.actions > * {
+  flex-shrink: 0;
+}
+
+.actionsHome {
+  margin-left: auto;
+}
+
+.miniSearch {
+  max-width: 12rem;
+}

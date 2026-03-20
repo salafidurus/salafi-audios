@@ -1,7 +1,7 @@
 "use client";
 
-import { useAuth } from "@/core/auth/use-auth";
-import { FeedScreen } from "@/features/feed/screens/feed.screen";
+import { useAuth } from "@sd/feature-auth";
+import { FeedScreen } from "@sd/feature-feed";
 import Link from "next/link";
 
 export default function FeedFollowingPage() {

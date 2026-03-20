@@ -5,9 +5,7 @@
     "declaration": true,
     "declarationDir": "./dist",
     "moduleResolution": "bundler",
-    "paths": {
-      "@/*": ["src/*"]
-    }
+    "moduleSuffixes": [".desktop.web", ".mobile.web", ".native", ".web", ""]
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]

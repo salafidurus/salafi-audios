@@ -1,6 +1,6 @@
-import '@/shared/utils/env.bootstrap';
-import { ConfigService } from '@/shared/config/config.service';
-import { AllExceptionsFilter } from '@/shared/errors/http-exception.filter';
+import './shared/utils/env.bootstrap';
+import { ConfigService } from './shared/config/config.service';
+import { AllExceptionsFilter } from './shared/errors/http-exception.filter';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';

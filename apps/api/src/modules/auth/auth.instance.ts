@@ -2,18 +2,33 @@ import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { admin } from 'better-auth/plugins';
 import { PrismaClient } from '@sd/db';
-import type { ConfigService } from '@/shared/config/config.service';
+import { PrismaPg } from '@prisma/adapter-pg';
+import type { ConfigService } from '../../shared/config/config.service';
 
-// Dedicated plain PrismaClient for better-auth.
-// Does NOT use PrismaPg driver adapter to ensure full prismaAdapter compatibility.
-const prisma = new PrismaClient();
+let prisma: PrismaClient | undefined;
+
+function getAuthPrisma(config: ConfigService): PrismaClient {
+  if (prisma) {
+    return prisma;
+  }
+
+  const connectionString = config.DATABASE_URL;
+
+  if (!connectionString) {
+    throw new Error('DATABASE_URL is required for Better Auth Prisma client.');
+  }
+
+  const adapter = new PrismaPg({ connectionString });
+  prisma = new PrismaClient({ adapter });
+  return prisma;
+}
 
 function createAuthInstance(config: ConfigService) {
   return betterAuth({
     secret: config.BETTER_AUTH_SECRET,
     baseURL: config.BETTER_AUTH_URL,
     basePath: '/api/auth',
-    database: prismaAdapter(prisma, { provider: 'postgresql' }),
+    database: prismaAdapter(getAuthPrisma(config), { provider: 'postgresql' }),
     trustedOrigins: config.CORS_ORIGINS,
     emailAndPassword: { enabled: true },
     socialProviders: {

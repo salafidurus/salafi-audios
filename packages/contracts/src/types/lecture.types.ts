@@ -1,4 +1,4 @@
-import type { StatusValue } from "@/types/common.types";
+import type { StatusValue } from "../types/common.types";
 
 export type AudioAssetViewDto = {
   id: string;

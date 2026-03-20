@@ -1,4 +1,7 @@
-import { STATUS_VALUES, type StatusValue } from '@/shared/enums/status-values';
+import {
+  STATUS_VALUES,
+  type StatusValue,
+} from '../../../shared/enums/status-values';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class SeriesViewDto {

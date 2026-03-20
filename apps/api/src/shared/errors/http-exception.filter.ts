@@ -5,7 +5,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
-import { ConfigService } from '@/shared/config/config.service';
+import { ConfigService } from '../../shared/config/config.service';
 import type { Request, Response } from 'express';
 
 @Catch()

@@ -1,4 +1,4 @@
-import type { TopicSlug } from "@/types/topic.types";
+import type { TopicSlug } from "../types/topic.types";
 
 export type SearchCatalogParams = {
   q: string;

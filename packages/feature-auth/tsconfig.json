@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "react-native",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "moduleSuffixes": [".desktop.web", ".mobile.web", ".native", ".web", ""],
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  },
+  "include": ["src"]
+}

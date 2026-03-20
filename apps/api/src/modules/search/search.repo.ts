@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, Status } from '@sd/db';
 import type { SearchCatalogItemDto } from '@sd/contracts';
-import { ConfigService } from '@/shared/config/config.service';
-import { PrismaService } from '@/shared/db/prisma.service';
+import { ConfigService } from '../../shared/config/config.service';
+import { PrismaService } from '../../shared/db/prisma.service';
 import type { SearchQueryDto } from './dto/search-query.dto';
 
 const SIMILARITY_THRESHOLD = 0.12;

@@ -1,6 +1,6 @@
 /* global jest */
 import "react-native-unistyles/mocks";
-import "./src/core/styles/unistyles";
+import "@sd/core-styles";
 
 jest.mock("react-native/Libraries/EventEmitter/NativeEventEmitter");
 

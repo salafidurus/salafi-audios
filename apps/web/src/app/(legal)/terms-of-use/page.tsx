@@ -1,4 +1,4 @@
-import { TermsOfUseScreen } from "@/features/legal/screens/terms-of-use.screen";
+import { TermsOfUseScreen } from "@sd/feature-legal";
 
 export default function TermsOfUsePage() {
   return <TermsOfUseScreen />;

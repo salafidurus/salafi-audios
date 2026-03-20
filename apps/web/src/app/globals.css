@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@source "../../../packages/**/*.{js,jsx,ts,tsx}";
 
 @theme inline {
   --surface-default: var(--surface-default);

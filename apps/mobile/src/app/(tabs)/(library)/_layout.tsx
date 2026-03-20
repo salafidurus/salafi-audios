@@ -1,19 +1,19 @@
 import { useEffect } from "react";
 import { Slot, useRouter } from "expo-router";
-import { useAuth } from "@/core/auth/use-auth";
+import { useAuth } from "@sd/core-auth";
 import { ActivityIndicator, View } from "react-native";
 
 export default function LibraryLayout() {
-  const { status } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "unauthenticated") {
+    if (!isLoading && !isAuthenticated) {
       router.replace("/sign-in");
     }
-  }, [status, router]);
+  }, [isLoading, isAuthenticated, router]);
 
-  if (status === "loading") {
+  if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator />

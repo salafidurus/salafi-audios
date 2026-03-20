@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@/shared/db/prisma.service';
-import { ConfigService } from '@/shared/config/config.service';
+import { PrismaService } from '../../shared/db/prisma.service';
+import { ConfigService } from '../../shared/config/config.service';
 import { Prisma, Status } from '@sd/db';
 import { UpsertLectureDto } from './dto/upsert-lecture.dto';
 import type { LectureViewDto, AudioAssetViewDto } from '@sd/contracts';
