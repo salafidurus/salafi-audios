@@ -1,9 +1,7 @@
 "use client";
 
 import { type CSSProperties, useMemo, useState } from "react";
-import { View } from "react-native-unistyles/components/native/View";
-import { Text } from "react-native-unistyles/components/native/Text";
-import { Pressable } from "react-native-unistyles/components/native/Pressable";
+import { Pressable, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import type { TopicDetailDto, TopicSlug } from "@sd/contracts";
 import { useDragScroll } from "@sd/shared";

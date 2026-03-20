@@ -1,6 +1,6 @@
 import { type CSSProperties } from "react";
 import React from "react";
-import { View } from "react-native-unistyles/components/native/View";
+import { View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { SearchResultEmpty } from "../SearchResultEmpty";
 import { useDragScroll } from "@sd/shared";

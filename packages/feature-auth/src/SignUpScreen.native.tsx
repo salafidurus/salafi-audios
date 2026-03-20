@@ -214,7 +214,7 @@ const styles = StyleSheet.create((theme) => ({
   inner: { padding: theme.spacing.layout.pageX },
   backButton: {
     alignSelf: "flex-start",
-    paddingVertical: theme.spacing.component.gapXs,
+    paddingVertical: theme.spacing.scale.xs,
     marginBottom: theme.spacing.component.gapLg,
   },
   backButtonText: {

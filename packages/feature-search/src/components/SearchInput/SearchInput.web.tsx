@@ -1,10 +1,7 @@
 "use client";
 
 import React, { forwardRef, useImperativeHandle, useState } from "react";
-import { type TextInput as RNTextInput } from "react-native";
-import { View } from "react-native-unistyles/components/native/View";
-import { Pressable } from "react-native-unistyles/components/native/Pressable";
-import { TextInput } from "react-native-unistyles/components/native/TextInput";
+import { Pressable, TextInput, type TextInput as RNTextInput, View } from "react-native";
 import { ChevronLeft, X } from "lucide-react";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 

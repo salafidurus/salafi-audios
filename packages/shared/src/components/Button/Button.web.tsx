@@ -1,6 +1,6 @@
 "use client";
 
-import { ActivityIndicator, type PressableProps } from "react-native";
+import { ActivityIndicator, type GestureResponderEvent, type PressableProps } from "react-native";
 import { useState } from "react";
 import { View } from "react-native-unistyles/components/native/View";
 import { Text } from "react-native-unistyles/components/native/Text";
@@ -52,11 +52,11 @@ export function Button({
         accessibilityLabel={label}
         accessibilityState={{ disabled: isDisabled, busy: loading }}
         disabled={isDisabled}
-        onPressIn={(e) => {
+        onPressIn={(e: GestureResponderEvent) => {
           setIsPressed(true);
           onPressIn?.(e);
         }}
-        onPressOut={(e) => {
+        onPressOut={(e: GestureResponderEvent) => {
           setIsPressed(false);
           onPressOut?.(e);
         }}

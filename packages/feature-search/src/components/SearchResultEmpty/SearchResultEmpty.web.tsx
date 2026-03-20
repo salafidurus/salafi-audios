@@ -1,6 +1,5 @@
 import { type ViewStyle } from "react-native";
-import { View } from "react-native-unistyles/components/native/View";
-import { Text } from "react-native-unistyles/components/native/Text";
+import { Text, View } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
 
 export type SearchResultEmptyProps = {

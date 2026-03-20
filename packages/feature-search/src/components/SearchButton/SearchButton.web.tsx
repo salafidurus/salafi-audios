@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { View } from "react-native-unistyles/components/native/View";
-import { Text } from "react-native-unistyles/components/native/Text";
-import { Pressable } from "react-native-unistyles/components/native/Pressable";
+import { Pressable, Text, View } from "react-native";
 import { Search } from "lucide-react";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 

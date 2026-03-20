@@ -1,4 +1,4 @@
-import { Text } from "react-native-unistyles/components/native/Text";
+import { Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 export type TitleTextProps = {
