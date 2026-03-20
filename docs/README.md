@@ -1,44 +1,35 @@
-# Salafi Durus — Documentation Index
+# Salafi Durus Documentation
 
-This directory contains authoritative documentation for the Salafi Durus platform.
+This directory contains the standard, top-level documentation for Salafi Durus. It is intentionally compact: the docs here define product intent, architecture, and system rules, while workspace `AGENT.md` files hold package- or app-specific implementation guidance.
 
-## Quick Navigation
+## Standard Set
 
-- **[AGENT.md](./AGENT.md)** - Documentation index + timeline summary
-- **[Product Overview](./product-overview/AGENT.md)** - Philosophy + gap analysis
-- **[Implementation Guide](./implementation-guide/)** - How to build
-- **[Guardrails](./implementation-guide/11-guardrails-and-non-goals.md)** - Non-negotiable rules
-
-## Documentation Hierarchy
-
-1. `AGENT.md` files (root, docs, workspaces) - concise reference
-2. `product-overview/` - vision and philosophy
-3. `implementation-guide/` - concrete guidance
-4. `.github/copilot-instructions.md` - quick reference
+- **[AGENT.md](./AGENT.md)**: Current implementation status, phase summary, and quick navigation.
+- **[prd.md](./prd.md)**: Product vision, principles, user roles, trust model, and non-goals.
+- **[architecture.md](./architecture.md)**: System architecture, monorepo boundaries, and platform responsibilities.
+- **[api.md](./api.md)**: Backend architecture, API contract rules, auth/authz, and media/API boundaries.
+- **[database.md](./database.md)**: Data ownership, relational modeling, media references, and migration rules.
+- **[mobile.md](./mobile.md)**: Mobile structure, current capabilities, and target offline/sync architecture.
+- **[web.md](./web.md)**: Web structure, SEO/discovery responsibilities, and admin/public boundaries.
+- **[dev-ops.md](./dev-ops.md)**: Environment model, configuration rules, and branch-deploy workflow.
 
 ## Reading Order
 
-New contributors should read:
+1. [Root AGENT.md](../AGENT.md)
+2. [docs/AGENT.md](./AGENT.md)
+3. [prd.md](./prd.md)
+4. [architecture.md](./architecture.md)
+5. The relevant technical document in this folder
+6. The target workspace `AGENT.md` such as `apps/api/AGENT.md` or `apps/web/AGENT.md`
 
-1. [Root AGENT.md](../AGENT.md) - Monorepo orientation
-2. [docs/AGENT.md](./AGENT.md) - Documentation index
-3. [product-overview/AGENT.md](./product-overview/AGENT.md) - Philosophy + gap analysis
-4. Target workspace `AGENT.md` (e.g., `apps/api/AGENT.md`)
+## How These Docs Work
 
-## Sections
-
-### Product Overview
-
-Vision, philosophy, and architectural principles. Defines _why_ the system is designed this way.
-
-### Implementation Guide
-
-Concrete, enforceable guidance. Defines _how_ to build the system while respecting architectural boundaries.
+- These files capture cross-cutting rules and durable architectural intent.
+- Workspace `AGENT.md` files capture operational detail, local conventions, and package-specific commands.
+- If a detail is only relevant to one app or package, prefer the workspace `AGENT.md` over expanding this folder.
 
 ## Documentation as Enforcement
 
-- Architectural changes require documentation updates
-- Undocumented behavior is incomplete
-- Docs reflect intent, not just implementation
-
-If code and docs conflict, reconcile intentionally.
+- Architectural changes require documentation updates.
+- Undocumented behavior is considered incomplete.
+- If code and docs diverge, reconcile them intentionally.
