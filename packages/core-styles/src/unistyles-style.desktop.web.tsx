@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type PropsWithChildren } from "react";
+import { useEffect, useRef, type PropsWithChildren, type ReactElement } from "react";
 import { useServerInsertedHTML } from "next/navigation";
 import {
   getServerUnistyles,
@@ -9,7 +9,7 @@ import {
 } from "react-native-unistyles/server";
 import "./unistyles.desktop.web";
 
-export function UnistylesStyle({ children }: PropsWithChildren) {
+export function UnistylesStyle({ children }: PropsWithChildren): ReactElement {
   const isServerInserted = useRef(false);
 
   useServerInsertedHTML(() => {
