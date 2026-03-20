@@ -2,11 +2,12 @@ import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { admin } from 'better-auth/plugins';
 import { PrismaClient } from '@sd/db';
-import type { ConfigService } from '@/shared/config/config.service';
+import type { ConfigService } from '../../shared/config/config.service';
 
 // Dedicated plain PrismaClient for better-auth.
 // Does NOT use PrismaPg driver adapter to ensure full prismaAdapter compatibility.
-const prisma = new PrismaClient();
+// Prisma 7's generated client now expects an explicit options object at construction time.
+const prisma = new PrismaClient({});
 
 function createAuthInstance(config: ConfigService) {
   return betterAuth({

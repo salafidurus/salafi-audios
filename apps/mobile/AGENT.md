@@ -53,26 +53,26 @@ shared → no inward deps
 
 ## UI Components
 
-Most feature screens and shared UI components come from `@sd/ui-mobile`:
+Most feature screens and shared UI components now come from `@sd/shared`, `@sd/feature-*`, and `@sd/core-*` packages:
 
 - Search, browse, and results screens
 - Auth screens (`SignInScreen`, `SignUpScreen`)
 - Navigation shells (AdaptiveShell, SectionTabBar, etc.)
 - Form/list primitives (Button, SearchInput, etc.)
 
-See `packages/ui-mobile/AGENT.md` for the complete component inventory and styling patterns.
+Use the owning package `AGENT.md` and source folder for the current component inventory and styling patterns.
 
 ---
 
 ## Route Wrapper Pattern
 
-`app/(auth)/` and other route files are **thin wrappers** — they import the screen from `@sd/ui-mobile` and wire callback props to `authClient` and `router`. No UI logic lives here.
+`app/(auth)/` and other route files are **thin wrappers** — they import screens from the relevant `@sd/feature-*` package and wire callback props to `authClient` and `router`. No UI logic lives here.
 
 ```typescript
 // apps/mobile/src/app/(auth)/sign-in.tsx
 import { useRouter } from "expo-router";
-import { SignInScreen } from "@sd/ui-mobile";
-import { authClient } from "@/core/auth/auth-client";
+import { SignInScreen } from "@sd/feature-auth";
+import { authClient } from "@sd/core-auth";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -94,15 +94,15 @@ export default function SignInPage() {
 
 **Key rules:**
 
-- Never import `authClient` inside `@sd/ui-mobile` — auth wiring belongs in the app route wrapper
-- Never import `expo-router` inside `@sd/ui-mobile` — navigation callbacks are passed as props
+- Never import `authClient` inside shared feature packages when the app wrapper owns auth wiring
+- Never import `expo-router` inside shared feature packages when navigation callbacks can be passed as props
 - Asset paths use the `@/assets` alias (e.g., `require("@/assets/auth/google-logo-light-1x.png")`)
 
 ---
 
 ## Keyboard Handling
 
-`KeyboardProvider` from `react-native-keyboard-controller` is mounted in `Providers.tsx` at app root. Any screen with form inputs **must** use `KeyboardAwareScrollView` from `react-native-keyboard-controller` (not plain `ScrollView`). This is already done for `SignInScreen` and `SignUpScreen` inside `@sd/ui-mobile`.
+`KeyboardProvider` from `react-native-keyboard-controller` is mounted in `Providers.tsx` at app root. Any screen with form inputs **must** use `KeyboardAwareScrollView` from `react-native-keyboard-controller` (not plain `ScrollView`). This is already done for the shared auth screens in `@sd/feature-auth`.
 
 ---
 
@@ -345,5 +345,5 @@ import { useState } from "react";
 
 When implementing features, update:
 
-- `docs/product-overview/AGENT.md` - Update gap analysis status
-- Relevant implementation-guide file - If patterns change
+- `docs/AGENT.md` - Update implementation gap analysis and phase status when needed
+- Relevant top-level docs file in `docs/` - If mobile architecture, offline rules, or platform boundaries change

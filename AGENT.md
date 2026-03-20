@@ -2,6 +2,46 @@
 
 This repository is one system. The monorepo is an enforcement tool, not a convenience.
 
+## Repository agent file policy
+
+This repository uses a single canonical instruction source per directory:
+
+- `AGENT.md` is the only file that should be authored or edited by agents or humans.
+- `AGENTS.md`, `CLAUDE.md`, and `GEMINI.md` are compatibility aliases only.
+- Never manually create, edit, or delete `AGENTS.md`, `CLAUDE.md`, or `GEMINI.md` directly, except when restoring aliases through the repository normalization script.
+- Any instruction change must be made in the sibling `AGENT.md` file only.
+- If an alias file is missing or broken, recreate the symlink/junction; do not fork its contents.
+
+### Skill location policy
+
+- The canonical shared skills directory is `/.agents/skills/`.
+- Add new shared skills only under `/.agents/skills/<skill-name>/`.
+- Do not add shared skills under `/.opencode/skills/`, `/.claude/skills/`, or `/.gemini/skills/`; those paths are compatibility links only.
+- If a tool-specific skills path exists, treat it as a mirror/alias of `/.agents/skills/`, not as an authoring location.
+
+### Nested scope policy
+
+- Directory-local `AGENT.md` files refine behavior for that subtree only.
+- When working in a subdirectory, read in order: root `AGENT.md` -> nearest local `AGENT.md`.
+- Never duplicate instructions across alias files; update the relevant `AGENT.md` instead.
+
+### Change discipline
+
+Before editing agent instructions or skills:
+
+1. Check whether you are touching an alias path (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.opencode/skills`, `.claude/skills`, `.gemini/skills`).
+2. If yes, stop and redirect the change to the canonical path:
+   - instructions -> `AGENT.md`
+   - skills -> `/.agents/skills/`
+3. Prefer fixing links over editing alias content.
+
+### Alias repair
+
+- If an alias file or tool-specific skills folder is missing, broken, or replaced with a real file/folder, repair it by rerunning the repository normalization script from the repo root.
+- Preferred repair command: `./sync-agents.ps1`
+- Do not manually rewrite alias files to match `AGENT.md`; restore the link instead.
+- Do not create new canonical skill locations outside `/.agents/skills/`.
+
 ## Source of truth
 
 - Architecture and intent live in `docs/` and are authoritative.
@@ -51,14 +91,15 @@ This repository is one system. The monorepo is an enforcement tool, not a conven
 - `packages/db` - Database schema and client
 - `packages/env` - Environment variable schemas
 - `packages/i18n` - Internationalization config and keys
-- `packages/auth-shared` - Shared auth types
 - `packages/contracts` - Shared TypeScript contracts (DTOs, types, query hooks)
 - `packages/design-tokens` - Design tokens (colors, spacing, radius, typography) — authoritative source
-- `packages/ui-mobile` - Cross-platform UI components and feature library (used by mobile via react-native, web via react-native-web transpilation)
+- `packages/shared` - Shared UI primitives, hooks, and generic utilities
+- `packages/core-*` - Shared platform infrastructure (auth, API, config, styling)
+- `packages/feature-*` - Domain feature packages with platform-specific UI and data wiring
 - `packages/config` - Shared lint/build config
 - `packages/ingest` - Content ingestion
 
-**Note:** `packages/ui-mobile` requires `transpilePackages: ["@sd/ui-mobile"]` in `next.config.ts` for web integration.
+**Note:** `apps/web` transpiles the new `@sd/shared`, `@sd/core-*`, and `@sd/feature-*` packages directly in `next.config.ts`.
 
 ## Commands (root)
 
@@ -84,10 +125,11 @@ This repository is one system. The monorepo is an enforcement tool, not a conven
 - DB: `pnpm --filter db <script>`
 - Env: `pnpm --filter env <script>`
 - I18n: `pnpm --filter i18n <script>`
-- Auth shared: `pnpm --filter auth-shared <script>`
 - Contracts: `pnpm --filter contracts <script>`
 - Design tokens: `pnpm --filter design-tokens <script>`
-- UI Mobile: `pnpm --filter ui-mobile <script>`
+- Shared UI: `pnpm --filter @sd/shared <script>`
+- Core packages: `pnpm --filter @sd/core-* <script>`
+- Feature packages: `pnpm --filter @sd/feature-* <script>`
 - Config: `pnpm --filter config <script>`
 - Ingest: `pnpm --filter ingest <script>`
 
