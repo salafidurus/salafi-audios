@@ -22,7 +22,6 @@
     "@sd/core-config": "workspace:*",
     "@sd/core-styles": "workspace:*",
     "@sd/design-tokens": "workspace:*",
-    "@sd/core-env": "workspace:*",
     "@sd/shared": "workspace:*",
     "clsx": "^2.1.1",
     "lucide-react": "^0.564.0",

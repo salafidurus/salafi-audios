@@ -18,7 +18,6 @@
   },
   "dependencies": {
     "@better-auth/expo": "^1.5.5",
-    "@sd/core-env": "workspace:*",
     "@sd/core-contracts": "workspace:*",
     "@sd/design-tokens": "workspace:*",
     "better-auth": "^1.5.5",

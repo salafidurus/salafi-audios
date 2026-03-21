@@ -25,7 +25,6 @@
     "@sd/core-config": "workspace:*",
     "@sd/core-styles": "workspace:*",
     "@sd/design-tokens": "workspace:*",
-    "@sd/core-env": "workspace:*",
     "@sd/feature-account": "workspace:*",
     "@sd/feature-auth": "workspace:*",
     "@sd/feature-feed": "workspace:*",

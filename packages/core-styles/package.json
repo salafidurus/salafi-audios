@@ -17,7 +17,6 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@sd/core-env": "workspace:*",
     "@sd/core-contracts": "workspace:*",
     "@sd/design-tokens": "workspace:*",
     "next": "16.1.3"

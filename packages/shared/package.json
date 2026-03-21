@@ -22,7 +22,6 @@
     "@sd/core-config": "workspace:*",
     "@sd/core-styles": "workspace:*",
     "@sd/design-tokens": "workspace:*",
-    "@sd/core-env": "workspace:*",
     "@tanstack/react-query": "^5.69.0",
     "lucide-react": "^0.564.0",
     "lucide-react-native": "^0.564.0",

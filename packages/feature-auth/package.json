@@ -23,7 +23,6 @@
     "@sd/core-config": "workspace:*",
     "@sd/core-styles": "workspace:*",
     "@sd/design-tokens": "workspace:*",
-    "@sd/core-env": "workspace:*",
     "@sd/shared": "workspace:*",
     "expo-apple-authentication": "^55.0.9",
     "lucide-react": "^0.564.0",
