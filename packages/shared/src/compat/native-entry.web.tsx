@@ -134,6 +134,7 @@ export type TextInputMobileNativeProps = {
   autoCapitalize?: "none" | "sentences" | "words" | "characters";
   keyboardType?: string;
   secureTextEntry?: boolean;
+  textContentType?: string;
   style?: unknown;
 };
 
