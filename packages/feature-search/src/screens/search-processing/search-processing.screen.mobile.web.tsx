@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { View } from "react-native-unistyles/components/native/View";
 import type { SearchCatalogItemDto, SearchCatalogResultsDto } from "@sd/core-contracts";
 import { StyleSheet } from "react-native-unistyles";
+import { ScreenViewWeb } from "@sd/shared";
 import {
   SearchFilter,
   type SearchFilterValue,
@@ -71,7 +72,7 @@ export function SearchProcessingMobileWebScreen({
   }, [error]);
 
   return (
-    <View style={styles.screen}>
+    <ScreenViewWeb backgroundVariant="primaryWash" contentStyle={styles.screenContent}>
       <View style={styles.searchGroup}>
         <SearchInput
           ref={inputRef}
@@ -97,17 +98,13 @@ export function SearchProcessingMobileWebScreen({
           />
         )}
       />
-    </View>
+    </ScreenViewWeb>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  screen: {
+  screenContent: {
     flex: 1,
-    backgroundColor: theme.colors.surface.canvas,
-    _web: {
-      paddingHorizontal: theme.spacing.layout.pageX,
-    },
   },
   searchGroup: {
     gap: theme.spacing.component.gapSm,

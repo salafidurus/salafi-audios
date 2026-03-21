@@ -6,10 +6,7 @@ import {
   SearchFilter,
   type SearchFilterValue,
 } from "../../components/SearchFilter/SearchFilter.native";
-import {
-  SearchInput,
-  type SearchInputRef,
-} from "../../components/SearchInput/SearchInput.native";
+import { SearchInput, type SearchInputRef } from "../../components/SearchInput/SearchInput.native";
 import { SearchResultItem } from "../../components/SearchResultItem/SearchResultItem.native";
 import {
   SearchResultsList,
@@ -73,7 +70,7 @@ export function SearchProcessingMobileNativeScreen({
   }, [error]);
 
   return (
-    <ScreenViewMobileNative>
+    <ScreenViewMobileNative backgroundVariant="primaryWash">
       <View style={styles.searchGroup}>
         <SearchInput
           ref={inputRef}

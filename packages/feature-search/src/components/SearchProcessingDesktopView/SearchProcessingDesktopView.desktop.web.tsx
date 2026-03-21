@@ -35,8 +35,8 @@ export function SearchProcessingDesktopWebView({
   error,
 }: Props) {
   return (
-    <main className="flex flex-1 flex-col">
-      <div className="sticky top-0 z-10 bg-[var(--surface-canvas)] px-[var(--space-layout-page-x)] pt-[var(--space-layout-page-y)] pb-[var(--space-component-gap-md)]">
+    <main className="flex flex-1 flex-col bg-[radial-gradient(circle_at_12%_14%,var(--surface-primary-subtle),transparent_42%)]">
+      <div className="sticky top-0 z-10 bg-[color-mix(in_srgb,var(--surface-canvas)_86%,transparent)] px-[var(--space-layout-page-x)] pt-[var(--space-layout-page-y)] pb-[var(--space-component-gap-md)] backdrop-blur-sm">
         <div className="mx-auto flex w-full max-w-[52rem] flex-col gap-[var(--space-component-gap-md)]">
           <SearchInputDesktopWeb
             ref={inputRef}

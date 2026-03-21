@@ -5,13 +5,7 @@
   z-index: 30;
   min-height: var(--top-strip-height, 3.5rem);
   border-bottom: 1px solid color-mix(in srgb, var(--border-subtle) 78%, transparent);
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--surface-canvas) 96%, transparent),
-      color-mix(in srgb, var(--surface-canvas) 88%, transparent)
-    );
-  backdrop-filter: blur(14px);
+  background: transparent;
 }
 
 .inner {

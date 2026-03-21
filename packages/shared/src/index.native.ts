@@ -10,6 +10,8 @@ export type { NotFoundStateProps } from "./components/NotFoundState/NotFoundStat
 export { ButtonMobileNative } from "./components/Button/Button.native";
 export type { ButtonMobileNativeProps } from "./components/Button/Button.native";
 export { AccentGradientFill } from "./components/AccentGradientFill/AccentGradientFill.native";
+export { TextInputMobileNative } from "./components/TextInput/TextInput.native";
+export type { TextInputMobileNativeProps } from "./components/TextInput/TextInput.native";
 
 export { UniversalListMobileNative } from "./components/UniversalList/UniversalList.native";
 export type { UniversalListMobileNativeProps } from "./components/UniversalList/UniversalList.native";

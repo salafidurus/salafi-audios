@@ -15,7 +15,7 @@ export function SearchHomeMobileWebScreen({
   onSelectCategory,
 }: SearchHomeScreenProps) {
   return (
-    <ScreenViewWeb center backgroundVariant="primaryWash">
+    <ScreenViewWeb center>
       <View style={styles.content}>
         <View style={styles.searchGroup}>
           <View style={styles.header}>

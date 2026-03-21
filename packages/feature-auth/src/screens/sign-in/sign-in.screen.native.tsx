@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   View,
   Text,
-  TextInput,
   Pressable,
   ActivityIndicator,
   Platform,
@@ -13,7 +12,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Controller, useForm } from "react-hook-form";
-import { AccentGradientFill, ButtonMobileNative } from "@sd/shared";
+import { AccentGradientFill, ButtonMobileNative, TextInputMobileNative } from "@sd/shared";
 
 type FormValues = {
   email: string;
@@ -129,8 +128,9 @@ export function SignInMobileNativeScreen({
           }}
           render={({ field: { value, onChange, onBlur } }) => (
             <>
-              <TextInput
-                style={[styles.input, errors.email ? styles.inputError : undefined]}
+              <TextInputMobileNative
+                style={styles.input}
+                invalid={Boolean(errors.email)}
                 placeholder="Email"
                 value={value}
                 onChangeText={onChange}
@@ -151,7 +151,7 @@ export function SignInMobileNativeScreen({
           name="password"
           rules={{ required: true }}
           render={({ field: { value, onChange, onBlur } }) => (
-            <TextInput
+            <TextInputMobileNative
               style={styles.input}
               placeholder="Password"
               value={value}
@@ -240,14 +240,7 @@ const styles = StyleSheet.create((theme) => ({
     marginVertical: theme.spacing.component.gapMd,
   },
   input: {
-    borderWidth: 1,
-    borderColor: theme.colors.border.default,
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
     marginBottom: theme.spacing.component.gapSm,
-    backgroundColor: theme.colors.surface.subtle,
-    color: theme.colors.content.default,
   },
   error: {
     color: theme.colors.state.danger,
@@ -262,7 +255,6 @@ const styles = StyleSheet.create((theme) => ({
     fontSize: 14,
   },
   pressed: { opacity: 0.75 },
-  inputError: { borderColor: theme.colors.state.danger },
   fieldError: {
     color: theme.colors.state.danger,
     fontSize: 12,

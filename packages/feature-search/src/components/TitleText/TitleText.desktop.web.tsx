@@ -9,7 +9,7 @@ type Props = {
 export function TitleTextDesktopWeb({ children }: Props) {
   return (
     <p
-      className="text-[var(--content-strong)]"
+      className="text-[var(--content-primary)]"
       style={{
         fontFamily: "var(--typo-display-md-font-family)",
         fontSize: "var(--typo-display-md-font-size)",

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { TextInputWeb } from "@sd/shared";
 import { AuthProviderButtonWeb } from "../../components/provider-button.web";
 
 type FormValues = {
@@ -24,7 +25,6 @@ export function SignInMobileWebScreen({
 }: SignInScreenProps) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [focusedField, setFocusedField] = useState<keyof FormValues | null>(null);
 
   const {
     register,
@@ -78,33 +78,24 @@ export function SignInMobileWebScreen({
           style={{ display: "flex", flexDirection: "column", gap: 12 }}
         >
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <input
+            <TextInputWeb
               type="email"
               placeholder="Email"
               autoComplete="email"
               autoCapitalize="none"
-              style={getInputStyle(focusedField === "email", Boolean(errors.email))}
-              onFocus={() => setFocusedField("email")}
-              onBlur={(event) => {
-                setFocusedField(null);
-                emailField.onBlur(event);
-              }}
+              invalid={Boolean(errors.email)}
+              onBlur={emailField.onBlur}
               name={emailField.name}
               ref={emailField.ref}
               onChange={emailField.onChange}
             />
             {errors.email?.message && <p style={fieldErrorStyle}>{errors.email.message}</p>}
           </div>
-          <input
+          <TextInputWeb
             type="password"
             placeholder="Password"
             autoComplete="current-password"
-            style={getInputStyle(focusedField === "password", false)}
-            onFocus={() => setFocusedField("password")}
-            onBlur={(event) => {
-              setFocusedField(null);
-              passwordField.onBlur(event);
-            }}
+            onBlur={passwordField.onBlur}
             name={passwordField.name}
             ref={passwordField.ref}
             onChange={passwordField.onChange}
@@ -181,40 +172,6 @@ const dividerTextStyle: React.CSSProperties = {
   color: "var(--content-primary)",
   whiteSpace: "nowrap",
 };
-
-const inputStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "10px 12px",
-  border: "1px solid var(--border-default)",
-  borderRadius: 14,
-  fontSize: 16,
-  outline: "none",
-  boxSizing: "border-box",
-  background: "var(--accent-primary-subtle-surface, var(--surface-subtle))",
-  color: "var(--content-default)",
-  transition: "border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease",
-};
-
-function getInputStyle(isFocused: boolean, hasError: boolean): React.CSSProperties {
-  if (hasError) {
-    return {
-      ...inputStyle,
-      borderColor: "var(--state-danger)",
-      boxShadow: "0 0 0 3px color-mix(in srgb, var(--state-danger) 18%, transparent)",
-    };
-  }
-
-  if (isFocused) {
-    return {
-      ...inputStyle,
-      borderColor: "var(--border-focus)",
-      boxShadow: "0 0 0 3px var(--accent-focus-ring)",
-      background: "var(--surface-default)",
-    };
-  }
-
-  return inputStyle;
-}
 
 const errorStyle: React.CSSProperties = {
   color: "var(--state-danger)",

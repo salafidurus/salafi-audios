@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@sd/core-auth";
+import { TextInputWeb } from "@sd/shared";
 import { GoogleSignInButton, AppleSignInButton } from "../../components/social-buttons";
 import styles from "../auth-form.module.css";
 
@@ -64,7 +65,7 @@ export function SignInDesktopScreen({ redirectTo }: SignInDesktopScreenProps) {
 
           <form onSubmit={handleEmailSignIn} className={styles.form}>
             <div className={styles.inputGroup}>
-              <input
+              <TextInputWeb
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -81,7 +82,7 @@ export function SignInDesktopScreen({ redirectTo }: SignInDesktopScreenProps) {
               )}
             </div>
 
-            <input
+            <TextInputWeb
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
