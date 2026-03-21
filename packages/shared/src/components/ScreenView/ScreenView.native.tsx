@@ -9,7 +9,7 @@ export interface ScreenViewProps {
   center?: boolean;
 }
 
-export function ScreenView({ children, style, contentStyle, center }: ScreenViewProps) {
+export function ScreenViewMobileNative({ children, style, contentStyle, center }: ScreenViewProps) {
   const insets = useSafeAreaInsets();
 
   return (

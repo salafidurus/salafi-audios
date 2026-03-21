@@ -1,13 +1,13 @@
-export { SearchHomeScreen } from "./screens/SearchHomeScreen";
-export { SearchProcessingScreen } from "./screens/SearchProcessingScreen";
-export { SearchResultItem } from "./components/SearchResultItem";
-export { SearchResultsList } from "./components/SearchResultsList";
-export { SearchInput } from "./components/SearchInput";
-export { SearchButton } from "./components/SearchButton";
-export { SearchFilter } from "./components/SearchFilter";
-export { QuickBrowse } from "./components/QuickBrowse";
-export { BrowseCard } from "./components/BrowseCard";
-export { MarqueeText } from "./components/MarqueeText";
-export { SearchResultEmpty } from "./components/SearchResultEmpty";
-export { TitleText } from "./components/TitleText";
+export {
+  SearchHomeMobileNativeScreen,
+  type SearchHomeScreenProps,
+} from "./screens/search-home/search-home.screen.native";
+export {
+  SearchProcessingMobileNativeScreen,
+  type SearchProcessingScreenProps,
+} from "./screens/search-processing/search-processing.screen.native";
+export { QuickBrowse } from "./components/QuickBrowse/QuickBrowse.native";
+export { BrowseCard } from "./components/BrowseCard/BrowseCard.native";
+export { MarqueeText } from "./components/MarqueeText/MarqueeText.native";
+export { SearchResultEmpty } from "./components/SearchResultEmpty/SearchResultEmpty.native";
 export { useSearchCatalog, useTopicsList } from "./api/search.api";

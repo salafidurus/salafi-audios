@@ -1,5 +1,5 @@
-import { ScreenInProgress } from "@sd/shared";
+import { ScreenInProgressMobileNative } from "@sd/shared";
 
 export default function Modal() {
-  return <ScreenInProgress />;
+  return <ScreenInProgressMobileNative />;
 }

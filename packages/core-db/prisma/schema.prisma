@@ -1,0 +1,467 @@
+// packages/core-db/prisma/schema.prisma
+generator client {
+  provider     = "prisma-client-js"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+//////////////////////////
+// Enums
+//////////////////////////
+
+enum Status {
+  draft
+  review
+  published
+  archived
+}
+
+enum AnalyticsContentKind {
+  lecture
+  series
+  collection
+}
+
+enum AnalyticsEventType {
+  view
+  play
+  complete
+  save
+  share
+}
+
+enum AnalyticsSource {
+  web
+  mobile
+  api
+}
+
+enum RecommendationRecurrence {
+  none
+  yearly
+}
+
+enum ScholarRole {
+  scholar
+  scholar_editor
+}
+
+//////////////////////////
+// Ingestion batch (for seed/dummy dataset lifecycle)
+//////////////////////////
+
+model IngestionBatch {
+  id          String   @id @default(cuid())
+  tag         String
+  environment String
+  createdAt   DateTime @default(now())
+
+  // optional relations for easier cleanup (not required)
+  scholars    Scholar[]    @relation("IngestBatchScholars")
+  collections Collection[] @relation("IngestBatchCollections")
+  series      Series[]     @relation("IngestBatchSeries")
+  lectures    Lecture[]    @relation("IngestBatchLectures")
+  audioAssets AudioAsset[] @relation("IngestBatchAudioAssets")
+
+  @@unique([tag, environment])
+  @@index([tag])
+  @@index([environment])
+}
+
+//////////////////////////
+// Users & Roles
+//////////////////////////
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  role          String    @default("user")
+  banned        Boolean?
+  banReason     String?
+  banExpires    DateTime?
+
+  // Domain extensions
+  preferredLanguage String?
+
+  // Relations
+  sessions            Session[]
+  accounts            Account[]
+  scholarRoles        UserScholarRole[]
+  createdScholarRoles UserScholarRole[]     @relation("createdByUser")
+  progress            UserLectureProgress[]
+  favorites           FavoriteLecture[]
+}
+
+model UserScholarRole {
+  userId          String
+  scholarId       String
+  role            ScholarRole
+  createdAt       DateTime    @default(now())
+  createdByUserId String?
+
+  user          User    @relation(fields: [userId], references: [id], onDelete: Restrict)
+  scholar       Scholar @relation(fields: [scholarId], references: [id], onDelete: Restrict)
+  createdByUser User?   @relation("createdByUser", fields: [createdByUserId], references: [id], onDelete: SetNull)
+
+  @@id([userId, scholarId, role])
+  @@index([scholarId, role], map: "idx_user_scholar_role_scholar_role")
+  @@index([userId], map: "idx_user_scholar_role_user")
+}
+
+//////////////////////////
+// Scholars
+//////////////////////////
+
+model Scholar {
+  id           String    @id @default(cuid())
+  slug         String
+  name         String
+  bio          String?
+  country      String?
+  mainLanguage String?
+  imageUrl     String?
+  isActive     Boolean   @default(true)
+  isKibar      Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime?
+
+  // Social links
+  socialTwitter  String?
+  socialTelegram String?
+  socialYoutube  String?
+  socialWebsite  String?
+
+  ingestionBatchId String?
+  ingestionBatch   IngestionBatch? @relation("IngestBatchScholars", fields: [ingestionBatchId], references: [id])
+
+  collections Collection[]
+  series      Series[]
+  lectures    Lecture[]
+  userRoles   UserScholarRole[]
+
+  @@unique([slug], map: "uq_scholar_slug")
+  @@index([isActive], map: "idx_scholar_active")
+}
+
+//////////////////////////
+// Collections (big containers)
+//////////////////////////
+
+model Collection {
+  id                       String                    @id @default(cuid())
+  scholarId                String
+  slug                     String
+  title                    String
+  description              String?
+  coverImageUrl            String?
+  language                 String?
+  status                   Status                    @default(draft)
+  orderIndex               Int?
+  publishedLectureCount    Int?
+  publishedDurationSeconds Int?
+  recommendationOverride   Boolean                   @default(false)
+  recommendationStartAt    DateTime?
+  recommendationEndAt      DateTime?
+  recommendationRecurrence RecommendationRecurrence? @default(none)
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime?
+
+  deletedAt     DateTime?
+  deleteAfterAt DateTime?
+
+  ingestionBatchId String?
+  ingestionBatch   IngestionBatch? @relation("IngestBatchCollections", fields: [ingestionBatchId], references: [id])
+
+  scholar Scholar           @relation(fields: [scholarId], references: [id], onDelete: Restrict)
+  series  Series[]
+  topics  CollectionTopic[]
+
+  @@unique([scholarId, slug], map: "uq_collection_scholar_slug")
+  @@index([scholarId, status], map: "idx_collection_scholar_status")
+  @@index([scholarId, orderIndex], map: "idx_collection_scholar_order")
+  @@index([deletedAt], map: "idx_collection_deleted")
+  @@index([deleteAfterAt], map: "idx_collection_deleteafter")
+}
+
+model RecommendationHero {
+  id         String               @id @default(cuid())
+  entityKind AnalyticsContentKind
+  entityId   String
+  headline   String
+  orderIndex Int                  @default(0)
+  isActive   Boolean              @default(true)
+  startAt    DateTime?
+  endAt      DateTime?
+  createdAt  DateTime             @default(now())
+
+  @@index([isActive, orderIndex], map: "idx_recommendationhero_active_order")
+  @@index([entityKind, entityId], map: "idx_recommendationhero_entity")
+}
+
+model AnalyticsEvent {
+  id          String               @id @default(cuid())
+  contentKind AnalyticsContentKind
+  contentId   String
+  eventType   AnalyticsEventType
+  weight      Int
+  occurredAt  DateTime             @default(now())
+  source      AnalyticsSource
+  createdAt   DateTime             @default(now())
+
+  @@index([contentKind, contentId, occurredAt], map: "idx_analytics_content_time")
+  @@index([eventType, occurredAt], map: "idx_analytics_event_time")
+}
+
+//////////////////////////
+// Series
+//////////////////////////
+
+model Series {
+  id                       String                    @id @default(cuid())
+  scholarId                String
+  collectionId             String?
+  slug                     String
+  title                    String
+  description              String?
+  coverImageUrl            String?
+  language                 String?
+  status                   Status                    @default(draft)
+  orderIndex               Int?
+  publishedLectureCount    Int?
+  publishedDurationSeconds Int?
+  recommendationOverride   Boolean                   @default(false)
+  recommendationStartAt    DateTime?
+  recommendationEndAt      DateTime?
+  recommendationRecurrence RecommendationRecurrence? @default(none)
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime?
+
+  deletedAt     DateTime?
+  deleteAfterAt DateTime?
+
+  ingestionBatchId String?
+  ingestionBatch   IngestionBatch? @relation("IngestBatchSeries", fields: [ingestionBatchId], references: [id])
+
+  scholar    Scholar       @relation(fields: [scholarId], references: [id], onDelete: Restrict)
+  collection Collection?   @relation(fields: [collectionId], references: [id], onDelete: Restrict)
+  lectures   Lecture[]
+  topics     SeriesTopic[]
+
+  @@unique([scholarId, slug], map: "uq_series_scholar_slug")
+  @@index([collectionId, orderIndex], map: "idx_series_collection_order")
+  @@index([scholarId, status], map: "idx_series_scholar_status")
+  @@index([deletedAt], map: "idx_series_deleted")
+  @@index([deleteAfterAt], map: "idx_series_deleteafter")
+}
+
+//////////////////////////
+// Lectures (playable units)
+//////////////////////////
+
+model Lecture {
+  id                       String                    @id @default(cuid())
+  scholarId                String
+  seriesId                 String?
+  slug                     String
+  title                    String
+  description              String?
+  language                 String?
+  status                   Status                    @default(draft)
+  publishedAt              DateTime?
+  orderIndex               Int?
+  durationSeconds          Int?
+  recommendationOverride   Boolean                   @default(false)
+  recommendationStartAt    DateTime?
+  recommendationEndAt      DateTime?
+  recommendationRecurrence RecommendationRecurrence? @default(none)
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime?
+
+  deletedAt     DateTime?
+  deleteAfterAt DateTime?
+
+  ingestionBatchId String?
+  ingestionBatch   IngestionBatch? @relation("IngestBatchLectures", fields: [ingestionBatchId], references: [id])
+
+  scholar     Scholar               @relation(fields: [scholarId], references: [id], onDelete: Restrict)
+  series      Series?               @relation(fields: [seriesId], references: [id], onDelete: Restrict)
+  audioAssets AudioAsset[]
+  topics      LectureTopic[]
+  progress    UserLectureProgress[]
+  favorites   FavoriteLecture[]
+
+  @@unique([scholarId, slug], map: "uq_lecture_scholar_slug")
+  @@index([seriesId, orderIndex], map: "idx_lecture_series_order")
+  @@index([scholarId, status], map: "idx_lecture_scholar_status")
+  @@index([publishedAt], map: "idx_lecture_publishedat")
+  @@index([deletedAt], map: "idx_lecture_deleted")
+  @@index([deleteAfterAt], map: "idx_lecture_deleteafter")
+}
+
+//////////////////////////
+// AudioAssets (one or many per lecture)
+//////////////////////////
+
+model AudioAsset {
+  id              String   @id @default(cuid())
+  lectureId       String
+  url             String
+  format          String?
+  bitrateKbps     Int?
+  sizeBytes       BigInt?
+  durationSeconds Int?
+  source          String?
+  isPrimary       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  ingestionBatchId String?
+  ingestionBatch   IngestionBatch? @relation("IngestBatchAudioAssets", fields: [ingestionBatchId], references: [id])
+
+  lecture Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+  // partial unique index for primary must be created via raw SQL after migration:
+  // CREATE UNIQUE INDEX uq_audioasset_lecture_primary ON "AudioAsset"("lectureId") WHERE (isPrimary);
+
+  @@index([lectureId], map: "idx_audioasset_lecture")
+}
+
+//////////////////////////
+// Topics & join tables (lecture, series, collection)
+//////////////////////////
+
+model Topic {
+  id        String   @id @default(cuid())
+  slug      String
+  name      String
+  parentId  String?
+  createdAt DateTime @default(now())
+
+  parent           Topic?            @relation("TopicToParent", fields: [parentId], references: [id], onDelete: SetNull)
+  children         Topic[]           @relation("TopicToParent")
+  lectureTopics    LectureTopic[]
+  seriesTopics     SeriesTopic[]
+  collectionTopics CollectionTopic[]
+
+  @@unique([slug], map: "uq_topic_slug")
+  @@index([parentId], map: "idx_topic_parent")
+}
+
+model LectureTopic {
+  lectureId String
+  topicId   String
+  createdAt DateTime @default(now())
+
+  lecture Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+  topic   Topic   @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@id([lectureId, topicId])
+  @@index([topicId, lectureId], map: "idx_lecturetopic_topic_lecture")
+}
+
+model SeriesTopic {
+  seriesId  String
+  topicId   String
+  createdAt DateTime @default(now())
+
+  series Series @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  topic  Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@id([seriesId, topicId])
+  @@index([topicId, seriesId], map: "idx_seriestopic_topic_series")
+}
+
+model CollectionTopic {
+  collectionId String
+  topicId      String
+  createdAt    DateTime @default(now())
+
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  topic      Topic      @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@id([collectionId, topicId])
+  @@index([topicId, collectionId], map: "idx_collectiontopic_topic_collection")
+}
+
+//////////////////////////
+// Progress & Favorites
+//////////////////////////
+
+model UserLectureProgress {
+  userId          String
+  lectureId       String
+  positionSeconds Int      @default(0)
+  isCompleted     Boolean  @default(false)
+  updatedAt       DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Restrict)
+  lecture Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+
+  @@id([userId, lectureId])
+  @@index([userId, updatedAt], map: "idx_progress_user_updatedat")
+  @@index([lectureId], map: "idx_progress_lecture")
+}
+
+model FavoriteLecture {
+  userId    String
+  lectureId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Restrict)
+  lecture Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+
+  @@id([userId, lectureId])
+  @@index([userId, createdAt], map: "idx_fav_user_createdat")
+  @@index([lectureId], map: "idx_fav_lecture")
+}
+
+//////////////////////////
+// better-auth tables
+//////////////////////////
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([providerId, accountId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}

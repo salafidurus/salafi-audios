@@ -11,7 +11,7 @@ import type { ViewStyle } from "react-native";
 type ButtonVariant = "primary" | "surface" | "outline" | "ghost" | "danger";
 type ButtonSize = "sm" | "md" | "lg";
 
-export type ButtonProps = Omit<PressableProps, "style"> & {
+export type ButtonMobileWebProps = Omit<PressableProps, "style"> & {
   variant?: ButtonVariant;
   size?: ButtonSize;
   label: string;
@@ -22,7 +22,7 @@ export type ButtonProps = Omit<PressableProps, "style"> & {
   style?: ViewStyle;
 };
 
-export function Button({
+export function ButtonMobileWeb({
   variant = "surface",
   size = "md",
   label,
@@ -35,7 +35,7 @@ export function Button({
   onPressOut,
   style,
   ...props
-}: ButtonProps) {
+}: ButtonMobileWebProps) {
   const { theme } = useUnistyles();
   const [isPressed, setIsPressed] = useState(false);
   const isDisabled = disabled || loading;

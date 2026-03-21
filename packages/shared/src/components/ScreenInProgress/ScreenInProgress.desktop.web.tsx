@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ScreenInProgress as MobileScreenInProgress } from "./ScreenInProgress.web";
-import { ScreenInProgressDesktop } from "./screen-in-progress.desktop";
+import { ScreenInProgressMobileWeb } from "./ScreenInProgress.web";
+import { ScreenInProgressDesktopWeb } from "./screen-in-progress.desktop";
 import { useResponsive } from "../../hooks/use-responsive.desktop.web";
 
 type ScreenInProgressProps = {
@@ -10,7 +10,7 @@ type ScreenInProgressProps = {
   description?: string;
 };
 
-export function ScreenInProgress({ title, description }: ScreenInProgressProps) {
+export function ScreenInProgressResponsive({ title, description }: ScreenInProgressProps) {
   const [isHydrated, setIsHydrated] = useState(false);
   const { isMobile, isTablet } = useResponsive();
 
@@ -23,8 +23,8 @@ export function ScreenInProgress({ title, description }: ScreenInProgressProps) 
   }
 
   if (isMobile || isTablet) {
-    return <MobileScreenInProgress />;
+    return <ScreenInProgressMobileWeb />;
   }
 
-  return <ScreenInProgressDesktop title={title} description={description} />;
+  return <ScreenInProgressDesktopWeb title={title} description={description} />;
 }

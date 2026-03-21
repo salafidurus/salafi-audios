@@ -2,9 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { LecturesService } from './lectures.service';
 import { LecturesRepository } from './lectures.repo';
-import { LectureViewDto } from '@sd/contracts';
+import { LectureViewDto } from '@sd/core-contracts';
 import { UpsertLectureDto } from './dto/upsert-lecture.dto';
-import { Status } from '@sd/db';
+import { Status } from '@sd/core-db';
 
 describe('LecturesService', () => {
   let service: LecturesService;

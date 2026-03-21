@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { SignUpScreen, authClient } from "@sd/feature-auth";
+import { SignUpMobileNativeScreen, authClient } from "@sd/feature-auth";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -13,7 +13,7 @@ export default function SignUpPage() {
   };
 
   return (
-    <SignUpScreen
+    <SignUpMobileNativeScreen
       googleLogoSource={require("../../../assets/auth/google-logo-light-1x.png")}
       onBack={handleBack}
       onSignUp={async (name, email, password) => {

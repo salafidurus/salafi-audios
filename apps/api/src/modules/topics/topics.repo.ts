@@ -1,11 +1,11 @@
 import { PrismaService } from '../../shared/db/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { Prisma, Status } from '@sd/db';
+import { Prisma, Status } from '@sd/core-db';
 import {
   TopicDetailDto,
   TopicViewDto,
   TopicLectureViewDto,
-} from '@sd/contracts';
+} from '@sd/core-contracts';
 import { UpsertTopicDto } from './dto/upsert-topic.dto';
 
 const topicViewSelect = {

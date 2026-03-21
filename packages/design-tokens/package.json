@@ -24,7 +24,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
-    "@sd/config": "workspace:*",
+    "@sd/util-config": "workspace:*",
     "rimraf": "^6.0.0",
     "tsup": "^8.0.0",
     "typescript": "^5.9.0"

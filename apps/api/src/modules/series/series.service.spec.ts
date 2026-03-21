@@ -4,7 +4,7 @@ import { SeriesService } from './series.service';
 import { SeriesRepository } from './series.repo';
 import { SeriesViewDto } from './dto/series-view.dto';
 import { UpsertSeriesDto } from './dto/upsert-series.dto';
-import { Status } from '@sd/db';
+import { Status } from '@sd/core-db';
 
 describe('SeriesService', () => {
   let service: SeriesService;

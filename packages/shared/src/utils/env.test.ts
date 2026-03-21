@@ -1,5 +1,5 @@
 import { jest } from "@jest/globals";
-import type { WebPublicEnv } from "@sd/env";
+import type { WebPublicEnv } from "@sd/core-env";
 
 describe("env utils", () => {
   beforeEach(() => {
@@ -13,7 +13,7 @@ describe("env utils", () => {
       ASSET_CDN_BASE_URL: "https://cdn.example.com",
     } as WebPublicEnv;
 
-    jest.doMock("@sd/env", () => ({
+    jest.doMock("@sd/core-env", () => ({
       getWebPublicEnv: jest.fn().mockReturnValue(mockEnv),
     }));
 
@@ -31,7 +31,7 @@ describe("env utils", () => {
       NEXT_PUBLIC_API_URL: "https://api.example.com",
     } as WebPublicEnv;
 
-    jest.doMock("@sd/env", () => ({
+    jest.doMock("@sd/core-env", () => ({
       getWebPublicEnv: jest.fn().mockReturnValue(mockEnv),
     }));
 
@@ -43,7 +43,7 @@ describe("env utils", () => {
   });
 
   it("tryGetWebEnv returns null when getWebPublicEnv throws", async () => {
-    jest.doMock("@sd/env", () => ({
+    jest.doMock("@sd/core-env", () => ({
       getWebPublicEnv: jest.fn().mockImplementation(() => {
         throw new Error("Missing env");
       }),

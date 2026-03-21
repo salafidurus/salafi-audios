@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import { View } from "react-native-unistyles/components/native/View";
 
-export type UniversalListProps<TItem> = {
+export type UniversalListWebProps<TItem> = {
   items: TItem[];
   keyExtractor: (item: TItem) => string;
   renderItem: (item: TItem) => React.ReactElement | null;
@@ -10,14 +10,14 @@ export type UniversalListProps<TItem> = {
   emptyComponent?: React.ComponentType;
 };
 
-export function UniversalList<TItem>({
+export function UniversalListWeb<TItem>({
   items,
   keyExtractor,
   renderItem,
   contentContainerStyle,
   itemSeparator: ItemSeparator,
   emptyComponent: EmptyComponent,
-}: UniversalListProps<TItem>) {
+}: UniversalListWebProps<TItem>) {
   if (items.length === 0) {
     return EmptyComponent ? <EmptyComponent /> : null;
   }

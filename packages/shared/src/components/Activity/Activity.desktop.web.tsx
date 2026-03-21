@@ -2,7 +2,7 @@ type ActivityProps = {
   label?: string;
 };
 
-export function Activity({ label = "Loading" }: ActivityProps) {
+export function ActivityDesktopWeb({ label = "Loading" }: ActivityProps) {
   return (
     <div
       className="flex items-center justify-center gap-2 text-[var(--content-muted)]"

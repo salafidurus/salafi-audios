@@ -20,7 +20,7 @@ The backend follows a layered NestJS architecture.
 - Controllers do not own business decisions.
 - Business rules live in services and domain logic.
 - Infrastructure provides capabilities but does not decide policy.
-- Shared DTOs and response types are defined in `@sd/contracts`.
+- Shared DTOs and response types are defined in `@sd/core-contracts`.
 
 ## 3. API Design Rules
 
@@ -74,7 +74,7 @@ Authentication and authorization are centralized in the backend.
 
 ## 7. Contracts and Documentation
 
-- `@sd/contracts` is the shared TypeScript contract package for clients and server.
+- `@sd/core-contracts` is the shared TypeScript contract package for clients and server.
 - Swagger/OpenAPI may be exposed in development at `/api/docs` when enabled.
 - Public client base URLs are configured via `NEXT_PUBLIC_API_URL` for web and `EXPO_PUBLIC_API_URL` for mobile.
 
@@ -82,4 +82,4 @@ Authentication and authorization are centralized in the backend.
 
 - Prefer extending contracts over replacing them.
 - Deprecate intentionally rather than letting clients drift.
-- If API behavior changes materially, update docs and `@sd/contracts` together.
+- If API behavior changes materially, update docs and `@sd/core-contracts` together.

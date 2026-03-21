@@ -6,7 +6,7 @@ import type {
   CollectionViewDto,
   SeriesViewDto,
   LectureViewDto,
-} from '@sd/contracts';
+} from '@sd/core-contracts';
 
 @Injectable()
 export class CatalogService {

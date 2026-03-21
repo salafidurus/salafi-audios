@@ -1,6 +1,6 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { TopicDetailDto } from '@sd/contracts';
+import { TopicDetailDto } from '@sd/core-contracts';
 import { UpsertTopicDto } from './dto/upsert-topic.dto';
 import { TopicsRepository } from './topics.repo';
 import { TopicsService } from './topics.service';

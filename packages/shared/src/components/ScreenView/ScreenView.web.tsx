@@ -9,7 +9,7 @@ export interface ScreenViewProps {
   center?: boolean;
 }
 
-export function ScreenView({ children, style, contentStyle, center }: ScreenViewProps) {
+export function ScreenViewWeb({ children, style, contentStyle, center }: ScreenViewProps) {
   return (
     <View style={[styles.container, style]}>
       <View style={[styles.content, center && styles.center, contentStyle]}>{children}</View>

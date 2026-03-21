@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Pressable, ScrollView, Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import type { TopicDetailDto, TopicSlug } from "@sd/contracts";
+import type { TopicDetailDto, TopicSlug } from "@sd/core-contracts";
 
 export type SearchFilterValue = TopicSlug[];
 

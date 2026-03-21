@@ -35,7 +35,7 @@ This Expo/React Native app prioritizes offline listening and resilient sync.
 ## Structure and Dependency Direction
 
 - `app/` — routing and composition
-- `app/(shell)/` — persistent adaptive shell boundary for the main signed-in and public app surface
+- `app/(tabs)/` — Expo Router tabs boundary for the main signed-in and public app surface
 - `features/` — domain UX slices
 - `core/` — API/auth/playback/persistence/sync infrastructure
 - `shared/` — primitives/utilities
@@ -65,7 +65,7 @@ Most feature screens and shared UI components now come from `@sd/shared`, `@sd/f
 
 - Search, browse, and results screens
 - Auth screens (`SignInScreen`, `SignUpScreen`)
-- Navigation shells (AdaptiveShell, SectionTabBar, etc.)
+- Navigation surfaces (custom tab bar, subsection bar, and related components)
 - Form/list primitives (Button, SearchInput, etc.)
 
 Use the owning package `AGENT.md` and source folder for the current component inventory and styling patterns.
@@ -126,8 +126,8 @@ export default function SignInPage() {
 
 ## API Contracts
 
-- Import shared types from `@sd/contracts`
-- Use query hooks from `@sd/contracts/query/hooks` for data fetching
+- Import shared types from `@sd/core-contracts`
+- Use query hooks from `@sd/core-contracts/query/hooks` for data fetching
 - Initialize the API client once with `initApiClient()`
 
 ---

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { LecturesRepository } from './lectures.repo';
-import type { LectureViewDto } from '@sd/contracts';
+import type { LectureViewDto } from '@sd/core-contracts';
 import { UpsertLectureDto } from './dto/upsert-lecture.dto';
 
 @Injectable()

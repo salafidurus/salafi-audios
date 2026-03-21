@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useResponsive } from "@sd/shared";
 import { SidebarWeb } from "./sidebar.web";
-import { SidebarTablet } from "./sidebar.tablet";
-import { SidebarMobile } from "./sidebar.mobile";
+import { SidebarTablet } from "./sidebar.tablet.web";
+import { SidebarMobile } from "./sidebar.mobile.web";
 
 export function Sidebar() {
   const [isHydrated, setIsHydrated] = useState(false);

@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Prisma, Status } from '@sd/db';
-import type { SearchCatalogItemDto } from '@sd/contracts';
+import { Prisma, Status } from '@sd/core-db';
+import type { SearchCatalogItemDto } from '@sd/core-contracts';
 import { ConfigService } from '../../shared/config/config.service';
 import { PrismaService } from '../../shared/db/prisma.service';
 import type { SearchQueryDto } from './dto/search-query.dto';

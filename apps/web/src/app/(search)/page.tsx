@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SearchHomeScreen } from "@sd/feature-search";
+import { SearchHomeResponsiveScreen } from "@sd/feature-search";
 
 export const metadata: Metadata = {
   title: "Home",
@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <main className="flex flex-1 min-h-full flex-col">
-      <SearchHomeScreen />
+      <SearchHomeResponsiveScreen />
     </main>
   );
 }

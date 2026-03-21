@@ -1,4 +1,4 @@
-import type { Section } from "../types";
+import { DEFAULT_TABS, type Section } from "../types";
 
 const PATH_TO_SECTION: Record<string, Section> = {
   "/feed": "feed",
@@ -18,6 +18,16 @@ export function getCurrentSection(pathname: string): Section | "home" {
 
 export function getActiveTabFromPath(pathname: string): string | null {
   const parts = pathname.split("/").filter(Boolean);
-  // e.g. /feed/popular → ["feed", "popular"]
+  // e.g. /feed/recent → ["feed", "recent"]
   return parts.length >= 2 ? parts[1] : null;
+}
+
+export function buildSectionTabPath(section: Section, tabId?: string): string {
+  const activeTab = tabId ?? DEFAULT_TABS[section];
+
+  if (activeTab === DEFAULT_TABS[section]) {
+    return `/${section}`;
+  }
+
+  return `/${section}/${activeTab}`;
 }

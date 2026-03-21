@@ -6,7 +6,7 @@ import "./globals.css";
 import { themeCss } from "./theme-css";
 
 import { Footer, Sidebar, TopAuthStrip } from "@sd/feature-navigation";
-import { UnistylesStyle } from "@sd/core-styles";
+import { UnistylesStyleDesktopWeb } from "@sd/core-styles";
 import { Providers } from "./providers";
 
 const fraunces = localFont({
@@ -126,7 +126,7 @@ export default function RootLayout({
           <Script src="https://www.vexo.co/analytics.js" strategy="afterInteractive" />
         ) : null}
         <style>{themeCss}</style>
-        <UnistylesStyle>
+        <UnistylesStyleDesktopWeb>
           <Providers apiBaseUrl={apiBaseUrl}>
             <div className="appFrame">
               <div className="appShell">
@@ -139,7 +139,7 @@ export default function RootLayout({
               </div>
             </div>
           </Providers>
-        </UnistylesStyle>
+        </UnistylesStyleDesktopWeb>
       </body>
     </html>
   );

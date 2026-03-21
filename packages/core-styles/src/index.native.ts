@@ -1,3 +1,3 @@
-import "./unistyles.native";
+import "./utils/unistyles.native";
 
-export { breakpoints } from "./breakpoints.native";
+export { breakpoints } from "./utils/breakpoints";

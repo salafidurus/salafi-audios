@@ -1,5 +1,5 @@
-import { TermsOfUseScreen } from "@sd/feature-legal";
+import { TermsOfUseResponsiveScreen } from "@sd/feature-legal";
 
 export default function TermsOfUsePage() {
-  return <TermsOfUseScreen />;
+  return <TermsOfUseResponsiveScreen />;
 }

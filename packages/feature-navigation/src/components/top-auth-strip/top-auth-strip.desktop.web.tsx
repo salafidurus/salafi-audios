@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useResponsive } from "@sd/shared";
-import { TopAuthStripTablet } from "./top-auth-strip.tablet";
+import { TopAuthStripTablet } from "./top-auth-strip.tablet.web";
 import { TopAuthStripWeb } from "./top-auth-strip.web";
 
 const AUTH_ROUTES = ["/sign-in", "/sign-up"];

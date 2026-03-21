@@ -4,14 +4,14 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { initApiClient } from "@sd/core-api";
-import { createQueryClient } from "@sd/contracts";
+import { createQueryClient } from "@sd/core-contracts";
 const queryClient = createQueryClient();
 
 type Props = {
   children: ReactNode;
 };
 
-export function Providers({ children }: Props) {
+export function ProvidersMobileNative({ children }: Props) {
   useEffect(() => {
     initApiClient();
   }, []);

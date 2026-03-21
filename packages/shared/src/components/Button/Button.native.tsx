@@ -14,7 +14,7 @@ import { useState } from "react";
 type ButtonVariant = "primary" | "surface" | "outline" | "ghost" | "danger";
 type ButtonSize = "sm" | "md" | "lg";
 
-export type ButtonProps = PressableProps & {
+export type ButtonMobileNativeProps = PressableProps & {
   variant?: ButtonVariant;
   size?: ButtonSize;
   label: string;
@@ -24,7 +24,7 @@ export type ButtonProps = PressableProps & {
   fullWidth?: boolean;
 };
 
-export function Button({
+export function ButtonMobileNative({
   variant = "surface",
   size = "md",
   label,
@@ -37,7 +37,7 @@ export function Button({
   onPressOut,
   style,
   ...props
-}: ButtonProps) {
+}: ButtonMobileNativeProps) {
   const { theme } = useUnistyles();
   const [isPressed, setIsPressed] = useState(false);
 

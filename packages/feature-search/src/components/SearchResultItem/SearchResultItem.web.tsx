@@ -7,7 +7,7 @@ import { Pressable } from "react-native-unistyles/components/native/Pressable";
 import { Text } from "react-native-unistyles/components/native/Text";
 import { View } from "react-native-unistyles/components/native/View";
 import { Headphones, Clock } from "lucide-react";
-import { MarqueeText } from "../MarqueeText";
+import { MarqueeText } from "../MarqueeText/MarqueeText.web";
 
 export type SearchResultItemProps = {
   title: string;

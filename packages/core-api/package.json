@@ -6,7 +6,6 @@
   "types": "./src/index.ts",
   "exports": {
     ".": {
-      "react-native": "./src/index.native.ts",
       "default": "./src/index.ts"
     }
   },
@@ -17,7 +16,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@sd/contracts": "workspace:*",
+    "@sd/core-contracts": "workspace:*",
     "@sd/core-config": "workspace:*"
   },
   "devDependencies": {

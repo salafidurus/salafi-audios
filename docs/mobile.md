@@ -23,16 +23,16 @@ The mobile app (`apps/mobile`) is the listening-first client. It prioritizes con
 
 Current mobile work is centered on search and auth flows. Offline sync, downloads, and canonical playback/progress systems are still planned rather than complete.
 
-The navigation shell has been reworked into a stack-owned adaptive shell:
+The navigation surface has been reworked into a tabs-owned structure:
 
-- the main app surface lives under `apps/mobile/src/app/(shell)/`
-- the shared shell boundary is `apps/mobile/src/app/(shell)/_layout.tsx`
-- top-level sections are peer roots: search, feed, live, library, and account
-- shell UI is rendered by `@sd/feature-navigation`
-- route state is the source of truth for active section and subsection
-- remembered subsection state is retained only as section re-entry memory
+- the main app surface lives under `apps/mobile/src/app/(tabs)/`
+- the shared tabs boundary is `apps/mobile/src/app/(tabs)/_layout.tsx`
+- top-level sections are real tabs: feed, live, search, library, and account
+- tab chrome UI is rendered by `@sd/feature-navigation`
+- route state is the source of truth for active tab and subsection
+- subsection selection happens inside each tab stack rather than through a shell-owned navigation store
 
-This means mobile no longer treats the primary app surface as a tab navigator. It uses Expo Router stacks plus a persistent adaptive shell that changes by route state.
+This means mobile now uses Expo Router tabs for peer-root navigation, with custom package-owned chrome layered over them for product-specific visuals.
 
 ## 4. Offline and Sync Principles
 
@@ -77,32 +77,35 @@ This is the intended architecture for Phase 06, not a statement that it is alrea
 - It must not duplicate backend policy.
 - It must not invent alternative sync semantics outside the documented outbox model.
 
-## 9. Navigation Shell
+## 9. Navigation Surface
 
-The adaptive shell is a product-specific navigation surface, not a standard tab bar.
+The tab bar is a product-specific navigation surface layered over a standard Expo Router `Tabs` navigator.
 
 ### Current Rules
 
-- The shell mounts once at the shared `(shell)` layout boundary.
-- Top-level section switches are peer-root transitions.
-- Re-entering a section restores the last remembered subsection for that section.
+- The tab chrome mounts once at the shared `(tabs)` layout boundary.
+- Top-level section switches are owned by Expo Router tabs.
+- Subsection routes live inside each tab stack.
 - Current route state is authoritative for the active location.
-- Remembered subsection state only supplies the destination when the user intentionally re-enters a section.
-
-### Shell Modes
-
-- `launcher` mode for search-home style routes
-- `section` mode for section routes with subsection controls
+- Default subsection routes are canonical bare paths like `/feed` and `/live`.
 
 ### Ownership
 
-- Route parsing and shell href building live in `packages/feature-navigation/src/utils/shell-navigation.native.ts`
-- Route-derived shell state lives in `packages/feature-navigation/src/hooks/use-active-navigation-state.native.ts`
-- Shell rendering primitives live in `packages/feature-navigation/src/components/*`
+- Top-level tab chrome lives in `packages/feature-navigation/src/components/CustomTabBar/`
+- Subsection chrome lives in `packages/feature-navigation/src/components/SubsectionBarHost/`
+- Shared route helpers for tabs live in `packages/feature-navigation/src/utils/tab-route-config.native.ts`
+
+### Package Discipline
+
+- Route files in `apps/mobile/src/app/` stay thin and assemble package-owned screens.
+- Feature packages own reusable mobile-native UI and route-facing screen components.
+- Shared and core packages must not hide native-only code behind generic filenames or generic root exports.
+- If code is mobile-native only, it must live in an explicit `.native.*` file and be exported through `index.native.ts`.
+- If code is shared between native and web, it belongs in a platform-agnostic file and may be re-exported from both platform root entrypoints.
 
 ### Verification Status
 
-- Section re-entry memory is implemented
-- The `(tabs)` route group has been removed in favor of `(shell)`
-- Focused route tests cover grouped/internal href parsing, normalized pathname parsing, launcher mode, and remembered subsection fallback
-- Native back-navigation and deep-link verification still require continued device-level smoke coverage as the app grows
+- The `(tabs)` route group is restored as the main app boundary
+- Mobile and web route defaults now align on `/feed`, `/live`, `/library`, and `/account`
+- Mobile and web typecheck/lint pass on the tabs migration
+- Native runtime smoke coverage is still required to confirm the old shell-era crash is gone on device

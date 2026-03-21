@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import styles from "../../features/navigation/components/header/header.module.css";
-import { Button } from "@sd/shared";
+import { ButtonDesktopWeb } from "@sd/shared";
 
 export function Header() {
   const headerRef = useRef<HTMLElement | null>(null);
@@ -57,12 +57,12 @@ export function Header() {
         </Link>
 
         <div className={styles.actions}>
-          <Button variant="ghost" size="sm" onClick={() => router.push("/sign-in")}>
+          <ButtonDesktopWeb variant="ghost" size="sm" onClick={() => router.push("/sign-in")}>
             Sign In
-          </Button>
-          <Button variant="primary" size="sm" onClick={() => router.push("/signup")}>
+          </ButtonDesktopWeb>
+          <ButtonDesktopWeb variant="primary" size="sm" onClick={() => router.push("/signup")}>
             Create Free Account
-          </Button>
+          </ButtonDesktopWeb>
         </div>
       </div>
     </header>

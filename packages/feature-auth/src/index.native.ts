@@ -1,5 +1,4 @@
-export { SignInScreen } from "./SignInScreen";
-export { SignUpScreen } from "./SignUpScreen";
-export { authClient } from "@sd/core-auth";
-export { useAuth } from "@sd/core-auth";
+export { SignInMobileNativeScreen } from "./screens/sign-in/sign-in.screen.native";
+export { SignUpMobileNativeScreen } from "./screens/sign-up/sign-up.screen.native";
+export { authClient, useAuth } from "@sd/core-auth";
 export type { Session, User } from "@sd/core-auth";

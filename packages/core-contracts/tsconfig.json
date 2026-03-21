@@ -1,0 +1,12 @@
+{
+  "extends": "@sd/util-config/tsconfig/base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "declaration": true,
+    "declarationDir": "./dist",
+    "moduleResolution": "bundler",
+    "moduleSuffixes": [".desktop.web", ".mobile.web", ".native", ".web", ""]
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

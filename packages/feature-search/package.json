@@ -2,12 +2,12 @@
   "name": "@sd/feature-search",
   "version": "0.0.0",
   "private": true,
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./src/index.web.ts",
+  "types": "./src/index.web.ts",
   "exports": {
     ".": {
       "react-native": "./src/index.native.ts",
-      "default": "./src/index.ts"
+      "default": "./src/index.web.ts"
     }
   },
   "scripts": {
@@ -17,15 +17,17 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@sd/contracts": "workspace:*",
+    "@sd/core-contracts": "workspace:*",
     "@sd/core-api": "workspace:*",
     "@sd/core-config": "workspace:*",
     "@sd/core-styles": "workspace:*",
     "@sd/design-tokens": "workspace:*",
-    "@sd/env": "workspace:*",
+    "@sd/core-env": "workspace:*",
     "@sd/shared": "workspace:*",
+    "clsx": "^2.1.1",
     "lucide-react": "^0.564.0",
     "lucide-react-native": "^0.564.0",
+    "next": "16.1.3",
     "react-hook-form": "^7.71.2",
     "react-native-reanimated": "~4.2.1",
     "zustand": "^5.0.11"

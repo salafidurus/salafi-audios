@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { LibraryResponsiveScreen } from "@sd/feature-library";
 
 export default function LibraryPage() {
-  redirect("/library/saved");
+  return <LibraryResponsiveScreen />;
 }

@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { LiveResponsiveScreen } from "@sd/feature-live";
 
 export default function LivePage() {
-  redirect("/live/scheduled");
+  return <LiveResponsiveScreen />;
 }

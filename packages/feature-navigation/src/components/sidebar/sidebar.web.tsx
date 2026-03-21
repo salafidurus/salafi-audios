@@ -13,38 +13,12 @@ import {
   Mic,
   CassetteTape,
   Settings,
-  Flame,
-  Clock,
-  Heart,
-  Calendar,
-  Radio,
-  CircleCheck,
-  Bookmark,
-  Play,
-  CheckCircle,
-  User,
-  SlidersHorizontal,
-  Scale,
   type LucideIcon,
 } from "lucide-react";
 import styles from "./sidebar.module.css";
-import { SECTION_TABS, SECTION_ROUTES, type Section } from "../../types";
-import { getCurrentSection } from "../../utils/get-current-section.web";
-
-const TAB_ICONS: Record<string, LucideIcon> = {
-  flame: Flame,
-  clock: Clock,
-  heart: Heart,
-  calendar: Calendar,
-  radio: Radio,
-  "circle-check": CircleCheck,
-  bookmark: Bookmark,
-  play: Play,
-  "check-circle": CheckCircle,
-  user: User,
-  "sliders-horizontal": SlidersHorizontal,
-  scale: Scale,
-};
+import { SECTION_TABS, type Section } from "../../types";
+import { buildSectionTabPath, getCurrentSection } from "../../utils/get-current-section.web";
+import { getSectionTabIcon } from "../../utils/section-tab-icons.web";
 
 type NavItem = {
   label: string;
@@ -55,12 +29,12 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { label: "Feeds", Icon: Cloud, href: "/feed/popular", activeMatch: "/feed", section: "feed" },
-  { label: "Live", Icon: Mic, href: "/live/scheduled", activeMatch: "/live", section: "live" },
+  { label: "Feeds", Icon: Cloud, href: "/feed", activeMatch: "/feed", section: "feed" },
+  { label: "Live", Icon: Mic, href: "/live", activeMatch: "/live", section: "live" },
   {
     label: "Lessons",
     Icon: CassetteTape,
-    href: "/library/saved",
+    href: "/library",
     activeMatch: "/library",
     section: "library",
   },
@@ -70,7 +44,7 @@ export function SidebarWeb() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const { isAuthenticated } = useAuth();
-  const accountHref = isAuthenticated ? "/account/profile" : "/sign-in";
+  const accountHref = isAuthenticated ? "/account" : "/sign-in";
   const currentSection = getCurrentSection(pathname);
 
   useEffect(() => {
@@ -123,7 +97,7 @@ export function SidebarWeb() {
               {isActive && !collapsed && (
                 <div className={styles.subNav} role="tablist">
                   {tabs.map((tab) => {
-                    const tabPath = `${SECTION_ROUTES[item.section]}/${tab.id}`;
+                    const tabPath = buildSectionTabPath(item.section, tab.id);
                     const isTabActive = pathname === tabPath;
                     return (
                       <Link
@@ -133,10 +107,13 @@ export function SidebarWeb() {
                         role="tab"
                         aria-selected={isTabActive}
                       >
-                        {TAB_ICONS[tab.icon] && (
+                        {getSectionTabIcon(item.section, tab.id) && (
                           <span className={styles.subIcon} aria-hidden="true">
                             {(() => {
-                              const TabIcon = TAB_ICONS[tab.icon];
+                              const TabIcon = getSectionTabIcon(item.section, tab.id);
+                              if (!TabIcon) {
+                                return null;
+                              }
                               return <TabIcon size={14} />;
                             })()}
                           </span>
@@ -162,7 +139,7 @@ export function SidebarWeb() {
         {currentSection === "account" && !collapsed && (
           <div className={styles.subNav} role="tablist">
             {SECTION_TABS.account.map((tab) => {
-              const tabPath = `/account/${tab.id}`;
+              const tabPath = buildSectionTabPath("account", tab.id);
               const isTabActive = pathname === tabPath;
               return (
                 <Link

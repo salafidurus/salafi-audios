@@ -5,7 +5,7 @@ import Link from "next/link";
 import clsx from "clsx";
 import { useAuth } from "@sd/core-auth";
 import { authClient } from "@sd/core-auth";
-import { Button } from "@sd/shared";
+import { ButtonDesktopWeb } from "@sd/shared";
 import { Search } from "lucide-react";
 import styles from "./top-auth-strip.web.module.css";
 import searchStyles from "./search-action.module.css";
@@ -33,22 +33,22 @@ export function TopAuthStripWeb() {
               <span style={{ fontSize: "0.875rem", color: "#6b7280" }}>
                 {user.name ?? user.email ?? "Account"}
               </span>
-              <Button
+              <ButtonDesktopWeb
                 variant="ghost"
                 size="sm"
                 onClick={() => void authClient.signOut().then(() => router.push("/"))}
               >
                 Sign Out
-              </Button>
+              </ButtonDesktopWeb>
             </>
           ) : !isAuthenticated && !isLoading ? (
             <>
-              <Button variant="ghost" size="sm" onClick={() => router.push("/sign-in")}>
+              <ButtonDesktopWeb variant="ghost" size="sm" onClick={() => router.push("/sign-in")}>
                 Sign In
-              </Button>
-              <Button variant="primary" size="sm" onClick={() => router.push("/sign-up")}>
+              </ButtonDesktopWeb>
+              <ButtonDesktopWeb variant="primary" size="sm" onClick={() => router.push("/sign-up")}>
                 Create Free Account
-              </Button>
+              </ButtonDesktopWeb>
             </>
           ) : null}
         </div>

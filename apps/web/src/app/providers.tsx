@@ -1,6 +1,6 @@
 "use client";
 
-import { Providers as SharedProviders } from "@sd/shared";
+import { ProvidersWeb } from "@sd/shared";
 import { type ReactNode } from "react";
 
 type Props = {
@@ -9,5 +9,5 @@ type Props = {
 };
 
 export function Providers({ children, apiBaseUrl }: Props) {
-  return <SharedProviders apiBaseUrl={apiBaseUrl}>{children}</SharedProviders>;
+  return <ProvidersWeb apiBaseUrl={apiBaseUrl}>{children}</ProvidersWeb>;
 }

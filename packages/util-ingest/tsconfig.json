@@ -1,0 +1,12 @@
+{
+  "extends": "../util-config/tsconfig/packages.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "types": ["node"],
+    "baseUrl": ".",
+    "moduleSuffixes": [".desktop.web", ".mobile.web", ".native", ".web", ""]
+  },
+  "include": ["src"]
+}

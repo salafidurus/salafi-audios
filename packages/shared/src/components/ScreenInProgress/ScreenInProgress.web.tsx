@@ -1,17 +1,17 @@
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Text } from "react-native-unistyles/components/native/Text";
-import { ScreenView } from "../ScreenView";
+import { ScreenViewWeb } from "../ScreenView/ScreenView.web";
 
-export function ScreenInProgress() {
+export function ScreenInProgressMobileWeb() {
   const { theme } = useUnistyles();
 
   return (
-    <ScreenView center>
+    <ScreenViewWeb center>
       <Text style={[styles.title, { color: theme.colors.content.strong }]}>Coming Soon</Text>
       <Text style={[styles.subtitle, { color: theme.colors.content.muted }]}>
         This feature is under development
       </Text>
-    </ScreenView>
+    </ScreenViewWeb>
   );
 }
 

@@ -2,8 +2,8 @@ import { type CSSProperties } from "react";
 import React from "react";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { View } from "react-native-unistyles/components/native/View";
-import { SearchResultEmpty } from "../SearchResultEmpty";
-import { useDragScroll } from "@sd/shared";
+import { SearchResultEmpty } from "../SearchResultEmpty/SearchResultEmpty.web";
+import { useDragScrollWeb } from "@sd/shared";
 
 export type SearchResultRow = {
   id: string;
@@ -30,7 +30,7 @@ export function SearchResultsList({
   renderItem,
 }: SearchResultsListProps) {
   const { theme } = useUnistyles();
-  const scrollRef = useDragScroll("vertical");
+  const scrollRef = useDragScrollWeb("vertical");
 
   return (
     <div

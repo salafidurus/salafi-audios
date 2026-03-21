@@ -140,8 +140,8 @@ export function SignInScreen() {
 
 **API client:**
 
-- Import API types from `@sd/contracts` public exports
-- Use query hooks from `@sd/contracts/query/hooks` for data fetching
+- Import API types from `@sd/core-contracts` public exports
+- Use query hooks from `@sd/core-contracts/query/hooks` for data fetching
 - Initialize the API client once per app with `initApiClient()`
 
 ---
@@ -227,8 +227,9 @@ import { motion } from 'framer-motion';
 
 **Mobile navigation:**
 
-- `AdaptiveShell` + `SectionTabBar` from `@sd/feature-navigation` (native-only)
-- Uses the same shared store and types as web
+- Expo Router `Tabs` owns top-level mobile navigation
+- Mobile renders an app-owned custom tab bar and subsection bar over tab state
+- Shared section constants and helpers in `@sd/feature-navigation` still keep web and mobile aligned
 
 ---
 
@@ -267,9 +268,9 @@ core → shared
 
 ## API Contracts
 
-- Import shared types from `@sd/contracts`
+- Import shared types from `@sd/core-contracts`
 - Types are hand-written and stable — no codegen required
-- When API changes, update `packages/contracts/src/types/` manually
+- When API changes, update `packages/core-contracts/src/types/` manually
 
 ---
 

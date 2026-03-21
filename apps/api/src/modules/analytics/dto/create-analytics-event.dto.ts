@@ -4,7 +4,7 @@ import {
   AnalyticsContentKind,
   AnalyticsEventType,
   AnalyticsSource,
-} from '@sd/db';
+} from '@sd/core-db';
 
 export class CreateAnalyticsEventDto {
   @ApiProperty({ enum: AnalyticsContentKind })

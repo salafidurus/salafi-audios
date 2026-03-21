@@ -3,7 +3,7 @@ import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import { Public } from '../../modules/auth/decorators';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
-import type { SearchCatalogResultsDto as CatalogSearchResultsContractDto } from '@sd/contracts';
+import type { SearchCatalogResultsDto as CatalogSearchResultsContractDto } from '@sd/core-contracts';
 import { SearchService } from './search.service';
 import { SearchQueryDto } from './dto/search-query.dto';
 import { SearchResultsDto } from './dto/search-results.dto';

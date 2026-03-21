@@ -1,6 +1,6 @@
 import { FlashList } from "@shopify/flash-list";
 
-export type UniversalListProps<TItem> = {
+export type UniversalListMobileNativeProps<TItem> = {
   items: TItem[];
   keyExtractor: (item: TItem) => string;
   renderItem: (item: TItem) => React.ReactElement | null;
@@ -9,14 +9,14 @@ export type UniversalListProps<TItem> = {
   emptyComponent?: React.ComponentType;
 };
 
-export function UniversalList<TItem>({
+export function UniversalListMobileNative<TItem>({
   items,
   keyExtractor,
   renderItem,
   contentContainerStyle,
   itemSeparator,
   emptyComponent,
-}: UniversalListProps<TItem>) {
+}: UniversalListMobileNativeProps<TItem>) {
   return (
     <FlashList
       data={items}

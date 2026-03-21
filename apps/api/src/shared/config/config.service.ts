@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { getApiEnv } from '@sd/env';
+import { getApiEnv } from '@sd/core-env';
 
 @Injectable()
 export class ConfigService {

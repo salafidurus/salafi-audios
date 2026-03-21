@@ -7,15 +7,15 @@
     "pnpm": ">=10 <11"
   },
   "scripts": {
-    "dev": "pnpm --filter @sd/env build && pnpm --filter @sd/design-tokens build && pnpm --filter @sd/contracts build && turbo run dev --concurrency=25 --filter=api --filter=web --filter=mobile",
-    "dev:api": "pnpm --filter @sd/env build && pnpm --filter @sd/db build && pnpm --filter @sd/contracts build && turbo run dev --concurrency=25 --filter=api",
-    "dev:web": "pnpm --filter @sd/env build && pnpm --filter @sd/design-tokens build && pnpm --filter @sd/contracts build && turbo run dev --concurrency=25 --filter=web",
-    "dev:mobile": "pnpm --filter @sd/env build && pnpm --filter @sd/design-tokens build && pnpm --filter @sd/contracts build && turbo run dev --concurrency=25 --filter=mobile",
+    "dev": "pnpm --filter @sd/core-env build && pnpm --filter @sd/design-tokens build && pnpm --filter @sd/core-contracts build && turbo run dev --concurrency=25 --filter=api --filter=web --filter=mobile",
+    "dev:api": "pnpm --filter @sd/core-env build && pnpm --filter @sd/core-db build && pnpm --filter @sd/core-contracts build && turbo run dev --concurrency=25 --filter=api",
+    "dev:web": "pnpm --filter @sd/core-env build && pnpm --filter @sd/design-tokens build && pnpm --filter @sd/core-contracts build && turbo run dev --concurrency=25 --filter=web",
+    "dev:mobile": "pnpm --filter @sd/core-env build && pnpm --filter @sd/design-tokens build && pnpm --filter @sd/core-contracts build && turbo run dev --concurrency=25 --filter=mobile",
     "dev:mobile:prebuild": "pnpm --filter mobile prebuild:clean && pnpm --filter mobile android",
     "dev:mobile:prebuild:android": "pnpm --filter mobile prebuild:clean && pnpm --filter mobile android",
     "dev:mobile:prebuild:ios": "pnpm --filter mobile prebuild:clean && pnpm --filter mobile ios",
-    "dev:api+web": "pnpm --filter @sd/env build && pnpm --filter @sd/design-tokens build && pnpm --filter @sd/db build && pnpm --filter @sd/contracts build && turbo run dev --concurrency=25 --filter=api --filter=web",
-    "dev:api+mobile": "pnpm --filter @sd/env build && pnpm --filter @sd/design-tokens build && pnpm --filter @sd/db build && pnpm --filter @sd/contracts build && turbo run dev --concurrency=25 --filter=api --filter=mobile",
+    "dev:api+web": "pnpm --filter @sd/core-env build && pnpm --filter @sd/design-tokens build && pnpm --filter @sd/core-db build && pnpm --filter @sd/core-contracts build && turbo run dev --concurrency=25 --filter=api --filter=web",
+    "dev:api+mobile": "pnpm --filter @sd/core-env build && pnpm --filter @sd/design-tokens build && pnpm --filter @sd/core-db build && pnpm --filter @sd/core-contracts build && turbo run dev --concurrency=25 --filter=api --filter=mobile",
     "build": "turbo run build",
     "build:api": "turbo run build --filter=api...",
     "build:web": "turbo run build --filter=web...",
@@ -40,12 +40,12 @@
     "clean": "turbo clean",
     "clean:hard": "turbo clean && rimraf node_modules **/node_modules **/.next **/dist **/build **/coverage .turbo",
     "prepare": "husky",
-    "postinstall": "pnpm --filter @sd/env build && pnpm --filter @sd/design-tokens build && pnpm --filter @sd/contracts build && pnpm --filter @sd/i18n build",
+    "postinstall": "pnpm --filter @sd/core-env build && pnpm --filter @sd/design-tokens build && pnpm --filter @sd/core-contracts build && pnpm --filter @sd/core-i18n build",
     "lint:staged": "lint-staged",
     "docs:quality": "markdownlint-cli2 README.md **/README.md docs/**/*.md AGENT.md .github/copilot-instructions.md",
     "ci:local": "pnpm lint && pnpm typecheck && pnpm test:prepush && pnpm --filter web build && pnpm docs:quality",
-    "ingest:content": "pnpm --filter @sd/ingest ingest:content",
-    "ingest:remove": "pnpm --filter @sd/ingest ingest:remove"
+    "ingest:content": "pnpm --filter @sd/util-ingest ingest:content",
+    "ingest:remove": "pnpm --filter @sd/util-ingest ingest:remove"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.3.1",

@@ -1,4 +1,4 @@
-import { Prisma } from '@sd/db';
+import { Prisma } from '@sd/core-db';
 
 const TRIGRAM_ERROR_PATTERNS = [
   /pg_trgm/i,

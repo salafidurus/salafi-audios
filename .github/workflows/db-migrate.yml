@@ -7,9 +7,9 @@ on:
       - preview
       - production
     paths:
-      - packages/db/prisma/**
-      - packages/db/prisma.config.ts
-      - packages/db/package.json
+      - packages/core-db/prisma/**
+      - packages/core-db/prisma.config.ts
+      - packages/core-db/package.json
 
 concurrency:
   group: db-${{ github.workflow }}-${{ github.event.pull_request.number }}
@@ -49,19 +49,19 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build deps needed for typecheck
-        run: pnpm build --filter=@sd/db^...
+        run: pnpm build --filter=@sd/core-db^...
 
       - name: Validate Prisma schema
         env:
           DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
-        run: pnpm --filter @sd/db run prisma:validate
+        run: pnpm --filter @sd/core-db run prisma:validate
 
       - name: Apply migrations
         env:
           DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
-        run: pnpm --filter @sd/db run migrate:deploy
+        run: pnpm --filter @sd/core-db run migrate:deploy
 
       - name: Generate Prisma client
         env:
           DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
-        run: pnpm --filter @sd/db run prisma:generate
+        run: pnpm --filter @sd/core-db run prisma:generate

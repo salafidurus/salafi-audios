@@ -7,7 +7,7 @@ import type {
   TopicDetailDto,
   TopicViewDto,
   TopicLectureViewDto,
-} from '@sd/contracts';
+} from '@sd/core-contracts';
 import { TopicsService } from './topics.service';
 
 @SkipThrottle()

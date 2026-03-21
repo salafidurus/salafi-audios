@@ -1,7 +1,7 @@
 import React from "react";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { SearchResultEmpty } from "../SearchResultEmpty";
+import { SearchResultEmpty } from "../SearchResultEmpty/SearchResultEmpty.native";
 
 export type SearchResultRow = {
   id: string;

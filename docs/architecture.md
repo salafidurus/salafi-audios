@@ -35,9 +35,9 @@ The monorepo exists because the web app, mobile app, and backend are one coordin
 - **`@sd/shared`**: generic UI primitives and utilities.
 - **`@sd/core-*`**: cross-cutting infrastructure such as auth, API, config, and styling.
 - **`@sd/feature-*`**: domain-oriented feature packages for reusable app behavior.
-- **`@sd/contracts`**: shared public API contracts and query helpers.
-- **`@sd/db`**: schema, migrations, and generated database client.
-- **`@sd/env`**: environment parsing and validation.
+- **`@sd/core-contracts`**: shared public API contracts and query helpers.
+- **`@sd/core-db`**: schema, migrations, and generated database client.
+- **`@sd/core-env`**: environment parsing and validation.
 - **`@sd/design-tokens`**: authoritative visual tokens.
 
 ## 4. Dependency and Boundary Rules
@@ -58,8 +58,8 @@ These rules are enforcement rules, not style preferences.
 - Playback-focused listening experience.
 - Local persistence for continuity and planned offline support.
 - No backend authority, no hidden business rules.
-- Expo Router owns route structure through a stack-based app shell under `apps/mobile/src/app/(shell)`.
-- The bottom navigation surface is a custom adaptive shell layered on top of route state, not a tab navigator primitive.
+- Expo Router owns route structure through a tab-based main app boundary under `apps/mobile/src/app/(tabs)`.
+- The bottom navigation surface is package-owned custom chrome layered on top of real Expo Router tabs, with a subsection bar for in-tab route switching.
 
 ### Web
 
@@ -96,18 +96,46 @@ The repo uses platform-specific module extensions to colocate a feature while ke
 - `.ios.tsx` / `.android.tsx`
 - base `.tsx`
 
+### Package Entrypoint Rules
+
+- Use plain `index.ts` only when the package public surface is fully platform-agnostic and there is no real web/native split.
+- If a package has distinct platform behavior, use `index.web.ts` and `index.native.ts` as the only public entrypoints.
+- `index.web.ts` is reserved for code that is intended for `apps/web`.
+- `index.native.ts` is reserved for code that is intended for `apps/mobile`.
+- Intermediate barrel files inside `src/` are not allowed. Export only from the package root entrypoint files.
+
+### Package Structure Rules
+
+- Use explicit folders such as `components/`, `screens/`, `hooks/`, `utils/`, `types/`, `api/`, and `store/`.
+- Do not leave platform implementation files loose in `src/` if they belong to one of those categories.
+- Route-level or app-level assembly belongs in apps, not inside low-level shared packages.
+
+### Platform Naming Rules
+
+- Use plain `.ts` / `.tsx` only for platform-agnostic files.
+- Use `.native.ts` / `.native.tsx` for mobile native files.
+- Use `.web.ts` / `.web.tsx` for web files shared by mobile web and desktop web.
+- Use `.desktop.web.ts` / `.desktop.web.tsx` for desktop-web-only implementations.
+- Use `.mobile.web.ts` / `.mobile.web.tsx` for mobile-web-only implementations.
+- Prefer explicit exported names such as `ButtonMobileNative`, `AuthRequiredStateResponsive`, or `UnistylesStyleDesktopWeb` instead of generic component names for platform-bound code.
+
+### Dependency Rules
+
+- Every package must declare the external libraries it imports directly.
+- Do not rely on app-level installs to satisfy package-level imports.
+- If a package imports `next/*`, `expo-*`, `better-auth/*`, `clsx`, or any other non-workspace module, that package manifest must declare it in `dependencies` or `peerDependencies`.
+
 ## 8. Navigation Architecture
 
 ### Mobile App Shell
 
-The mobile app uses a stack-owned adaptive shell instead of tab-owned navigation semantics.
+The mobile app uses Expo Router `Tabs` for top-level sections, with a custom tab bar and subsection bar supplied by `@sd/feature-navigation`.
 
-- Top-level sections are peer route-group roots.
-- Shell state is derived from route state rather than duplicated in UI stores.
-- Remembered subsection state is treated as UX memory for section re-entry, not as competing navigation authority.
-- Shared shell behavior lives in `@sd/feature-navigation`.
+- Top-level sections are real tab roots.
+- Subsections are route-owned within each tab stack.
+- Shared tab chrome and section constants live in `@sd/feature-navigation`.
 
-This keeps Expo Router responsible for route structure and screen lifecycle while preserving a product-specific navigation surface.
+This keeps Expo Router responsible for tab state, route structure, and screen lifecycle while preserving a product-specific navigation surface.
 
 ### Web Navigation
 

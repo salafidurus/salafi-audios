@@ -1,4 +1,4 @@
-import { SignInScreen } from "@sd/feature-auth";
+import { SignInResponsiveScreen } from "@sd/feature-auth";
 
 type SignInPageProps = {
   searchParams: Promise<{
@@ -10,5 +10,5 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
   const params = await searchParams;
   const redirectTo = params.from ?? "/";
 
-  return <SignInScreen redirectTo={redirectTo} />;
+  return <SignInResponsiveScreen redirectTo={redirectTo} />;
 }

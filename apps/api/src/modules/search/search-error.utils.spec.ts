@@ -1,4 +1,4 @@
-import { Prisma } from '@sd/db';
+import { Prisma } from '@sd/core-db';
 import { isTrigramSearchFailure } from './search-error.utils';
 
 describe('isTrigramSearchFailure', () => {

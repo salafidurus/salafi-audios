@@ -1,13 +1,21 @@
 import { Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { ScreenView } from "../ScreenView";
+import { ScreenViewMobileNative } from "../ScreenView/ScreenView.native";
 
-export function ScreenInProgress() {
+type ScreenInProgressMobileNativeProps = {
+  title?: string;
+  description?: string;
+};
+
+export function ScreenInProgressMobileNative({
+  title = "Coming Soon",
+  description = "This feature is under development",
+}: ScreenInProgressMobileNativeProps) {
   return (
-    <ScreenView center>
-      <Text style={styles.title}>Coming Soon</Text>
-      <Text style={styles.subtitle}>This feature is under development</Text>
-    </ScreenView>
+    <ScreenViewMobileNative center>
+      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.subtitle}>{description}</Text>
+    </ScreenViewMobileNative>
   );
 }
 

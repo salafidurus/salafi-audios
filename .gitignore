@@ -13,7 +13,6 @@ generated/
 **/generated/
 
 .claude/settings.local.json
-# .agents/plans
 
 
 # dotenv environment variable files
