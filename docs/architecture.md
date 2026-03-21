@@ -58,6 +58,8 @@ These rules are enforcement rules, not style preferences.
 - Playback-focused listening experience.
 - Local persistence for continuity and planned offline support.
 - No backend authority, no hidden business rules.
+- Expo Router owns route structure through a stack-based app shell under `apps/mobile/src/app/(shell)`.
+- The bottom navigation surface is a custom adaptive shell layered on top of route state, not a tab navigator primitive.
 
 ### Web
 
@@ -94,7 +96,24 @@ The repo uses platform-specific module extensions to colocate a feature while ke
 - `.ios.tsx` / `.android.tsx`
 - base `.tsx`
 
-## 8. Technology Stack
+## 8. Navigation Architecture
+
+### Mobile App Shell
+
+The mobile app uses a stack-owned adaptive shell instead of tab-owned navigation semantics.
+
+- Top-level sections are peer route-group roots.
+- Shell state is derived from route state rather than duplicated in UI stores.
+- Remembered subsection state is treated as UX memory for section re-entry, not as competing navigation authority.
+- Shared shell behavior lives in `@sd/feature-navigation`.
+
+This keeps Expo Router responsible for route structure and screen lifecycle while preserving a product-specific navigation surface.
+
+### Web Navigation
+
+The shipped web app currently preserves the same high-level section model and section re-entry behavior, but it still uses its own web navigation surface rather than the mobile shell implementation as a shared source of truth.
+
+## 9. Technology Stack
 
 - Monorepo: PNPM, Turborepo
 - Backend: NestJS, Prisma, PostgreSQL

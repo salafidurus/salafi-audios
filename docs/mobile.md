@@ -23,6 +23,17 @@ The mobile app (`apps/mobile`) is the listening-first client. It prioritizes con
 
 Current mobile work is centered on search and auth flows. Offline sync, downloads, and canonical playback/progress systems are still planned rather than complete.
 
+The navigation shell has been reworked into a stack-owned adaptive shell:
+
+- the main app surface lives under `apps/mobile/src/app/(shell)/`
+- the shared shell boundary is `apps/mobile/src/app/(shell)/_layout.tsx`
+- top-level sections are peer roots: search, feed, live, library, and account
+- shell UI is rendered by `@sd/feature-navigation`
+- route state is the source of truth for active section and subsection
+- remembered subsection state is retained only as section re-entry memory
+
+This means mobile no longer treats the primary app surface as a tab navigator. It uses Expo Router stacks plus a persistent adaptive shell that changes by route state.
+
 ## 4. Offline and Sync Principles
 
 Offline support is a product requirement, but the architecture must be described as target-state until implemented.
@@ -65,3 +76,33 @@ This is the intended architecture for Phase 06, not a statement that it is alrea
 - The mobile app may cache and persist aggressively for usability.
 - It must not duplicate backend policy.
 - It must not invent alternative sync semantics outside the documented outbox model.
+
+## 9. Navigation Shell
+
+The adaptive shell is a product-specific navigation surface, not a standard tab bar.
+
+### Current Rules
+
+- The shell mounts once at the shared `(shell)` layout boundary.
+- Top-level section switches are peer-root transitions.
+- Re-entering a section restores the last remembered subsection for that section.
+- Current route state is authoritative for the active location.
+- Remembered subsection state only supplies the destination when the user intentionally re-enters a section.
+
+### Shell Modes
+
+- `launcher` mode for search-home style routes
+- `section` mode for section routes with subsection controls
+
+### Ownership
+
+- Route parsing and shell href building live in `packages/feature-navigation/src/utils/shell-navigation.native.ts`
+- Route-derived shell state lives in `packages/feature-navigation/src/hooks/use-active-navigation-state.native.ts`
+- Shell rendering primitives live in `packages/feature-navigation/src/components/*`
+
+### Verification Status
+
+- Section re-entry memory is implemented
+- The `(tabs)` route group has been removed in favor of `(shell)`
+- Focused route tests cover grouped/internal href parsing, normalized pathname parsing, launcher mode, and remembered subsection fallback
+- Native back-navigation and deep-link verification still require continued device-level smoke coverage as the app grows
