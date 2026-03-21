@@ -15,7 +15,6 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "pretypecheck": "pnpm --filter @sd/core-contracts build",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

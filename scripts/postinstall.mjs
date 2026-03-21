@@ -5,7 +5,6 @@ const buildTargets = [
   // Only build the workspace packages that must exist as install-time
   // prerequisites for downstream package resolution.
   "@sd/core-env",
-  "@sd/core-contracts",
   "@sd/design-tokens",
 ];
 

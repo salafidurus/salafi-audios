@@ -4,26 +4,27 @@
   "private": true,
   "sideEffects": false,
   "files": [
+    "src",
     "dist"
   ],
-  "types": "./dist/index.d.ts",
-  "main": "./dist/index.js",
+  "types": "./src/index.ts",
+  "main": "./src/index.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
     },
     "./query": {
-      "types": "./dist/query/index.d.ts",
-      "default": "./dist/query/index.js"
+      "types": "./src/query/index.ts",
+      "default": "./src/query/index.ts"
     },
     "./query/hooks": {
-      "types": "./dist/query/hooks/index.d.ts",
-      "default": "./dist/query/hooks/index.js"
+      "types": "./src/query/hooks/index.ts",
+      "default": "./src/query/hooks/index.ts"
     },
     "./http": {
-      "types": "./dist/http.d.ts",
-      "default": "./dist/http.js"
+      "types": "./src/http.ts",
+      "default": "./src/http.ts"
     }
   },
   "scripts": {
@@ -33,7 +34,7 @@
     "lint": "eslint .",
     "test": "echo \"@sd/core-contracts: manual verification required\"",
     "test:prepush": "echo \"@sd/core-contracts: manual verification required\"",
-    "typecheck": "pnpm build && tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.69.0"
