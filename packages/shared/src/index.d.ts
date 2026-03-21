@@ -1,3 +1,4 @@
+/// <reference path="./unistyles-native-components.d.ts" />
 export * from "./index.web";
 
 import type * as React from "react";

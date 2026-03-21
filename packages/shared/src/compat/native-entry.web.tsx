@@ -27,8 +27,21 @@ export function ScreenViewMobileNative({
   );
 }
 
-export function ScreenInProgressMobileNative() {
-  return null;
+export interface ScreenInProgressMobileNativeProps {
+  title?: string;
+  description?: string;
+}
+
+export function ScreenInProgressMobileNative({
+  title = "Coming Soon",
+  description = "This feature is under development",
+}: ScreenInProgressMobileNativeProps) {
+  return (
+    <div style={{ display: "grid", gap: "0.35rem", textAlign: "center" }}>
+      <strong>{title}</strong>
+      <span>{description}</span>
+    </div>
+  );
 }
 
 export interface AuthRequiredStateProps {

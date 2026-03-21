@@ -1,3 +1,4 @@
+/// <reference path="./unistyles-native-components.d.ts" />
 "use client";
 
 export { ScreenViewWeb } from "./components/ScreenView/ScreenView.web";
