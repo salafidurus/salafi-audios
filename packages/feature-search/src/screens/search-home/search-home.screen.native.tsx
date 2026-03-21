@@ -15,7 +15,7 @@ export function SearchHomeMobileNativeScreen({
   onSelectCategory,
 }: SearchHomeScreenProps) {
   return (
-    <ScreenViewMobileNative center>
+    <ScreenViewMobileNative center backgroundVariant="primaryWash">
       <View style={styles.content}>
         <View style={styles.searchGroup}>
           <View style={styles.header}>

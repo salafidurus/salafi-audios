@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { AuthProviderButtonWeb } from "../../components/provider-button.web";
 
 type FormValues = {
   email: string;
@@ -23,6 +24,7 @@ export function SignInMobileWebScreen({
 }: SignInScreenProps) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [focusedField, setFocusedField] = useState<keyof FormValues | null>(null);
 
   const {
     register,
@@ -45,36 +47,23 @@ export function SignInMobileWebScreen({
     }
   }
 
+  const emailField = register("email", {
+    required: true,
+    pattern: {
+      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      message: "Please enter a valid email address.",
+    },
+  });
+  const passwordField = register("password", { required: true });
+
   return (
     <div style={wrapperStyle}>
       <div style={cardStyle}>
         <h1 style={titleStyle}>Sign In</h1>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <button type="button" onClick={onSignInWithApple} style={appleBtnStyle}>
-            <img
-              src="/auth/apple-logo-dark-1x.png"
-              srcSet="/auth/apple-logo-dark-1x.png 1x, /auth/apple-logo-dark-3x.png 3x"
-              width={24}
-              height={28}
-              alt=""
-              aria-hidden
-              style={providerIconStyle}
-            />
-            Continue with Apple
-          </button>
-          <button type="button" onClick={onSignInWithGoogle} style={googleBtnStyle}>
-            <img
-              src="/auth/google-logo-light-1x.png"
-              srcSet="/auth/google-logo-light-1x.png 1x, /auth/google-logo-light-4x.png 4x"
-              width={24}
-              height={24}
-              alt=""
-              aria-hidden
-              style={providerIconStyle}
-            />
-            Continue with Google
-          </button>
+          <AuthProviderButtonWeb provider="apple" onClick={onSignInWithApple} />
+          <AuthProviderButtonWeb provider="google" onClick={onSignInWithGoogle} />
         </div>
 
         <div style={dividerStyle}>
@@ -94,17 +83,15 @@ export function SignInMobileWebScreen({
               placeholder="Email"
               autoComplete="email"
               autoCapitalize="none"
-              style={{
-                ...inputStyle,
-                borderColor: errors.email ? "var(--state-danger)" : "var(--border-default)",
+              style={getInputStyle(focusedField === "email", Boolean(errors.email))}
+              onFocus={() => setFocusedField("email")}
+              onBlur={(event) => {
+                setFocusedField(null);
+                emailField.onBlur(event);
               }}
-              {...register("email", {
-                required: true,
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "Please enter a valid email address.",
-                },
-              })}
+              name={emailField.name}
+              ref={emailField.ref}
+              onChange={emailField.onChange}
             />
             {errors.email?.message && <p style={fieldErrorStyle}>{errors.email.message}</p>}
           </div>
@@ -112,8 +99,15 @@ export function SignInMobileWebScreen({
             type="password"
             placeholder="Password"
             autoComplete="current-password"
-            style={inputStyle}
-            {...register("password", { required: true })}
+            style={getInputStyle(focusedField === "password", false)}
+            onFocus={() => setFocusedField("password")}
+            onBlur={(event) => {
+              setFocusedField(null);
+              passwordField.onBlur(event);
+            }}
+            name={passwordField.name}
+            ref={passwordField.ref}
+            onChange={passwordField.onChange}
           />
           {error && <p style={errorStyle}>{error}</p>}
           <button
@@ -144,6 +138,8 @@ const wrapperStyle: React.CSSProperties = {
   justifyContent: "center",
   padding: "24px 16px",
   minHeight: "100%",
+  background:
+    "radial-gradient(circle at 12% 14%, var(--surface-primary-subtle), transparent 42%), var(--surface-canvas)",
 };
 
 const cardStyle: React.CSSProperties = {
@@ -152,6 +148,11 @@ const cardStyle: React.CSSProperties = {
   gap: 24,
   width: "100%",
   maxWidth: 360,
+  padding: 20,
+  borderRadius: 24,
+  background: "var(--accent-mixed-surface, var(--surface-default))",
+  border: "1px solid var(--accent-mixed-border, var(--border-default))",
+  boxShadow: "var(--shadow-md)",
 };
 
 const titleStyle: React.CSSProperties = {
@@ -160,46 +161,7 @@ const titleStyle: React.CSSProperties = {
   fontFamily: "var(--typo-title-md-font-family)",
   textAlign: "center",
   margin: 0,
-  color: "var(--content-strong)",
-};
-
-const appleBtnStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: 10,
-  width: "100%",
-  padding: "12px 16px",
-  background: "#000",
-  color: "#fff",
-  border: "none",
-  borderRadius: 8,
-  fontSize: 16,
-  fontWeight: 500,
-  cursor: "pointer",
-};
-
-const googleBtnStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: 10,
-  width: "100%",
-  padding: "12px 16px",
-  background: "#fff",
-  color: "#1F1F1F",
-  border: "1px solid #747775",
-  borderRadius: 8,
-  fontSize: 16,
-  fontFamily: "Roboto, sans-serif",
-  fontWeight: 500,
-  cursor: "pointer",
-};
-
-const providerIconStyle: React.CSSProperties = {
-  display: "block",
-  flexShrink: 0,
-  objectFit: "contain",
+  color: "var(--content-primary)",
 };
 
 const dividerStyle: React.CSSProperties = {
@@ -216,7 +178,7 @@ const hrStyle: React.CSSProperties = {
 
 const dividerTextStyle: React.CSSProperties = {
   fontSize: 13,
-  color: "var(--content-muted)",
+  color: "var(--content-primary)",
   whiteSpace: "nowrap",
 };
 
@@ -224,13 +186,35 @@ const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "10px 12px",
   border: "1px solid var(--border-default)",
-  borderRadius: 8,
+  borderRadius: 14,
   fontSize: 16,
   outline: "none",
   boxSizing: "border-box",
-  background: "var(--surface-subtle)",
+  background: "var(--accent-primary-subtle-surface, var(--surface-subtle))",
   color: "var(--content-default)",
+  transition: "border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease",
 };
+
+function getInputStyle(isFocused: boolean, hasError: boolean): React.CSSProperties {
+  if (hasError) {
+    return {
+      ...inputStyle,
+      borderColor: "var(--state-danger)",
+      boxShadow: "0 0 0 3px color-mix(in srgb, var(--state-danger) 18%, transparent)",
+    };
+  }
+
+  if (isFocused) {
+    return {
+      ...inputStyle,
+      borderColor: "var(--border-focus)",
+      boxShadow: "0 0 0 3px var(--accent-focus-ring)",
+      background: "var(--surface-default)",
+    };
+  }
+
+  return inputStyle;
+}
 
 const errorStyle: React.CSSProperties = {
   color: "var(--state-danger)",
@@ -248,10 +232,10 @@ const submitBtnStyle: React.CSSProperties = {
   width: "100%",
   padding: "12px 16px",
   background: "var(--accent-primary-bg, var(--action-primary))",
-  color: "var(--content-on-primary)",
+  color: "var(--accent-primary-fg, var(--content-on-primary))",
   border: "1px solid var(--accent-primary-border, var(--action-primary))",
   boxShadow: "var(--shadow-sm)",
-  borderRadius: 8,
+  borderRadius: 14,
   fontSize: 16,
   fontWeight: 600,
   cursor: "pointer",

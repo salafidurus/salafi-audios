@@ -11,8 +11,9 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import * as AppleAuthentication from "expo-apple-authentication";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Controller, useForm } from "react-hook-form";
+import { AccentGradientFill, ButtonMobileNative } from "@sd/shared";
 
 type FormValues = {
   email: string;
@@ -36,6 +37,7 @@ export function SignInMobileNativeScreen({
   onBack,
   googleLogoSource,
 }: SignInScreenProps) {
+  const { theme } = useUnistyles();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -60,6 +62,8 @@ export function SignInMobileNativeScreen({
     }
   }
 
+  const heroRecipe = theme.recipes.mixedHeroSurface;
+
   return (
     <KeyboardAwareScrollView
       contentContainerStyle={styles.container}
@@ -76,7 +80,20 @@ export function SignInMobileNativeScreen({
           </Pressable>
         ) : null}
 
-        <Text style={styles.title}>Sign In</Text>
+        <View style={styles.heroPanel}>
+          <AccentGradientFill
+            borderRadius={theme.radius.component.panel}
+            linearColors={heroRecipe.linear.colors}
+            linearStart={heroRecipe.linear.start}
+            linearEnd={heroRecipe.linear.end}
+            radialCenter={heroRecipe.radial.center}
+            radialRadius={heroRecipe.radial.radius}
+            radialCenterColor={heroRecipe.radial.centerColor}
+            radialEdgeColor={heroRecipe.radial.edgeColor}
+          />
+          <Text style={styles.kicker}>Welcome Back</Text>
+          <Text style={styles.title}>Sign In</Text>
+        </View>
 
         {Platform.OS === "ios" && (
           <AppleAuthentication.AppleAuthenticationButton
@@ -151,20 +168,18 @@ export function SignInMobileNativeScreen({
         {loading ? (
           <ActivityIndicator style={styles.loader} />
         ) : (
-          <Pressable
-            style={({ pressed }) => [
-              styles.btn,
-              !isValid && styles.btnDisabled,
-              pressed && isValid && styles.pressed,
-            ]}
+          <ButtonMobileNative
+            variant="primary"
+            size="md"
+            label="Sign In"
+            fullWidth
+            disabled={!isValid}
             onPress={isValid ? handleSubmit(onSubmit) : undefined}
-          >
-            <Text style={styles.btnText}>Sign In</Text>
-          </Pressable>
+          />
         )}
 
         <Pressable onPress={onNavigateToSignUp}>
-          <Text style={styles.link}>Don't have an account? Create one</Text>
+          <Text style={styles.link}>Don&apos;t have an account? Create one</Text>
         </Pressable>
       </View>
     </KeyboardAwareScrollView>
@@ -174,6 +189,22 @@ export function SignInMobileNativeScreen({
 const styles = StyleSheet.create((theme) => ({
   container: { flexGrow: 1, justifyContent: "center" },
   inner: { padding: theme.spacing.layout.pageX },
+  heroPanel: {
+    position: "relative",
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: theme.recipes.mixedHeroSurface.borderColor,
+    borderRadius: theme.radius.component.panel,
+    backgroundColor: theme.recipes.mixedHeroSurface.backgroundColor,
+    padding: theme.spacing.component.panelPadding,
+    marginBottom: theme.spacing.component.gapXl,
+    ...theme.shadows.sm,
+  },
+  kicker: {
+    color: theme.colors.content.primary,
+    marginBottom: theme.spacing.scale.xs,
+    ...theme.typography.labelMd,
+  },
   backButton: {
     alignSelf: "flex-start",
     paddingVertical: theme.spacing.scale.xs,
@@ -184,10 +215,8 @@ const styles = StyleSheet.create((theme) => ({
     ...theme.typography.labelMd,
   },
   title: {
-    fontSize: 24,
-    fontWeight: "700",
-    marginBottom: theme.spacing.component.gapXl,
     color: theme.colors.content.strong,
+    ...theme.typography.displayMd,
   },
   appleBtn: { width: "100%", height: 48, marginBottom: theme.spacing.component.gapSm },
   googleBtn: {
@@ -206,7 +235,7 @@ const styles = StyleSheet.create((theme) => ({
   googleBtnText: { fontSize: 16, fontWeight: "500", color: "#1F1F1F" },
   divider: {
     textAlign: "center",
-    color: theme.colors.content.muted,
+    color: theme.colors.content.primary,
     fontSize: 14,
     marginVertical: theme.spacing.component.gapMd,
   },
@@ -226,14 +255,6 @@ const styles = StyleSheet.create((theme) => ({
     marginBottom: theme.spacing.component.gapSm,
   },
   loader: { marginTop: 4 },
-  btn: {
-    backgroundColor: theme.colors.action.primary,
-    borderRadius: 8,
-    padding: 14,
-    alignItems: "center",
-    marginTop: 4,
-  },
-  btnText: { color: theme.colors.content.onPrimary, fontSize: 16, fontWeight: "600" },
   link: {
     textAlign: "center",
     color: theme.colors.content.primary,
@@ -248,5 +269,4 @@ const styles = StyleSheet.create((theme) => ({
     marginTop: -4,
     marginBottom: theme.spacing.component.gapSm,
   },
-  btnDisabled: { opacity: 0.45 },
 }));

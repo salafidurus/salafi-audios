@@ -11,7 +11,7 @@ export type SearchButtonDesktopWebProps = {
 };
 
 const baseClass =
-  "flex w-full items-center gap-3 rounded-[var(--radius-scale-full)] border border-[var(--border-default)] bg-[var(--surface-default)] text-[var(--content-default)] transition hover:border-[var(--border-primary)] hover:bg-[var(--surface-subtle)]";
+  "flex w-full items-center gap-3 rounded-[var(--radius-scale-full)] border text-[var(--content-default)] transition hover:-translate-y-px hover:saturate-[1.01]";
 
 const sizeClass: Record<NonNullable<SearchButtonDesktopWebProps["size"]>, string> = {
   lg: "px-5 py-3",
@@ -44,10 +44,15 @@ export function SearchButtonDesktopWeb({
 }: SearchButtonDesktopWebProps) {
   const classes = clsx(baseClass, sizeClass[size], className);
   const style = textStyle[size];
+  const accentStyle: CSSProperties = {
+    borderColor: "var(--accent-primary-subtle-border, var(--border-default))",
+    background: "var(--accent-primary-subtle-surface, var(--surface-default))",
+    boxShadow: "var(--shadow-sm)",
+  };
 
   if (href) {
     return (
-      <Link href={href} className={classes} style={style} aria-label={label}>
+      <Link href={href} className={classes} style={{ ...style, ...accentStyle }} aria-label={label}>
         <SearchGlyph />
         <span>{label}</span>
       </Link>
@@ -55,7 +60,12 @@ export function SearchButtonDesktopWeb({
   }
 
   return (
-    <button type="button" className={classes} style={style} onClick={onClick}>
+    <button
+      type="button"
+      className={classes}
+      style={{ ...style, ...accentStyle }}
+      onClick={onClick}
+    >
       <SearchGlyph />
       <span>{label}</span>
     </button>

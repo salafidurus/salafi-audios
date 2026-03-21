@@ -99,16 +99,26 @@ function FilterChip({ label, isActive, onPress }: FilterChipProps) {
         onPressOut={() => setIsPressed(false)}
         style={[
           styles.chip,
-          {
-            backgroundColor: isActive ? theme.colors.surface.default : theme.colors.surface.subtle,
-            borderColor: theme.colors.border.subtle,
-          },
+          isActive
+            ? {
+                backgroundColor: theme.recipes.primarySubtleSurface.backgroundColor,
+                borderColor: theme.recipes.primarySubtleSurface.borderColor,
+              }
+            : {
+                backgroundColor: theme.colors.surface.subtle,
+                borderColor: theme.colors.border.subtle,
+              },
+          isPressed && styles.chipPressed,
         ]}
       >
         <Text
           style={[
             styles.chipLabel,
-            { color: isActive ? theme.colors.content.strong : theme.colors.content.muted },
+            {
+              color: isActive
+                ? theme.recipes.primarySubtleSurface.textColor
+                : theme.colors.content.muted,
+            },
           ]}
         >
           {label}
@@ -135,5 +145,8 @@ const styles = StyleSheet.create((theme) => ({
       ...theme.typography.labelMd,
       lineHeight: String(theme.typography.labelMd.lineHeight),
     },
+  },
+  chipPressed: {
+    opacity: 0.85,
   },
 }));

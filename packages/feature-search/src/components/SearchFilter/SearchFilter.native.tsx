@@ -80,7 +80,8 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing.component.chipY,
   },
   chipActive: {
-    backgroundColor: theme.colors.surface.default,
+    backgroundColor: theme.recipes.primarySubtleSurface.backgroundColor,
+    borderColor: theme.recipes.primarySubtleSurface.borderColor,
   },
   chipPressed: {
     opacity: 0.85,
@@ -90,6 +91,6 @@ const styles = StyleSheet.create((theme) => ({
     ...theme.typography.labelMd,
   },
   chipLabelActive: {
-    color: theme.colors.content.strong,
+    color: theme.recipes.primarySubtleSurface.textColor,
   },
 }));

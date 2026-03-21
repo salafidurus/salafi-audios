@@ -12,7 +12,7 @@ export function TitleText({ children }: TitleTextProps) {
 
 const styles = StyleSheet.create((theme) => ({
   title: {
-    color: theme.colors.content.strong,
+    color: theme.colors.content.primary,
     _web: {
       ...theme.typography.displayMd,
       lineHeight: String(theme.typography.displayMd.lineHeight),

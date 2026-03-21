@@ -10,9 +10,12 @@ export type SearchHomeScreenProps = {
   onSelectCategory?: (searchKey: string) => void;
 };
 
-export function SearchHomeMobileWebScreen({ onOpenSearch, onSelectCategory }: SearchHomeScreenProps) {
+export function SearchHomeMobileWebScreen({
+  onOpenSearch,
+  onSelectCategory,
+}: SearchHomeScreenProps) {
   return (
-    <ScreenViewWeb center>
+    <ScreenViewWeb center backgroundVariant="primaryWash">
       <View style={styles.content}>
         <View style={styles.searchGroup}>
           <View style={styles.header}>

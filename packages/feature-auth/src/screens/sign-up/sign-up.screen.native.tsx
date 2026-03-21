@@ -11,8 +11,9 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import * as AppleAuthentication from "expo-apple-authentication";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Controller, useForm } from "react-hook-form";
+import { AccentGradientFill, ButtonMobileNative } from "@sd/shared";
 
 type FormValues = {
   name: string;
@@ -37,6 +38,7 @@ export function SignUpMobileNativeScreen({
   onBack,
   googleLogoSource,
 }: SignUpScreenProps) {
+  const { theme } = useUnistyles();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -62,6 +64,8 @@ export function SignUpMobileNativeScreen({
     }
   }
 
+  const heroRecipe = theme.recipes.mixedHeroSurface;
+
   return (
     <KeyboardAwareScrollView
       contentContainerStyle={styles.container}
@@ -78,9 +82,22 @@ export function SignUpMobileNativeScreen({
           </Pressable>
         ) : null}
 
-        <Text style={styles.title}>Create Account</Text>
+        <View style={styles.heroPanel}>
+          <AccentGradientFill
+            borderRadius={theme.radius.component.panel}
+            linearColors={heroRecipe.linear.colors}
+            linearStart={heroRecipe.linear.start}
+            linearEnd={heroRecipe.linear.end}
+            radialCenter={heroRecipe.radial.center}
+            radialRadius={heroRecipe.radial.radius}
+            radialCenterColor={heroRecipe.radial.centerColor}
+            radialEdgeColor={heroRecipe.radial.edgeColor}
+          />
+          <Text style={styles.kicker}>Start Listening</Text>
+          <Text style={styles.title}>Create Account</Text>
+        </View>
 
-        <Pressable style={styles.termsRow} onPress={() => setTermsAccepted((v) => !v)}>
+        <Pressable style={styles.termsRow} onPress={() => setTermsAccepted((value) => !value)}>
           <View style={[styles.checkbox, termsAccepted && styles.checkboxChecked]}>
             {termsAccepted && <Text style={styles.checkmark}>✓</Text>}
           </View>
@@ -189,16 +206,14 @@ export function SignUpMobileNativeScreen({
         {loading ? (
           <ActivityIndicator style={styles.loader} />
         ) : (
-          <Pressable
-            style={({ pressed }) => [
-              styles.btn,
-              (!termsAccepted || !isValid) && styles.btnDisabled,
-              pressed && termsAccepted && isValid && styles.pressed,
-            ]}
+          <ButtonMobileNative
+            variant="primary"
+            size="md"
+            label="Create Account"
+            fullWidth
+            disabled={!termsAccepted || !isValid}
             onPress={termsAccepted && isValid ? handleSubmit(onSubmit) : undefined}
-          >
-            <Text style={styles.btnText}>Create Account</Text>
-          </Pressable>
+          />
         )}
 
         <Pressable onPress={onNavigateToSignIn}>
@@ -212,6 +227,22 @@ export function SignUpMobileNativeScreen({
 const styles = StyleSheet.create((theme) => ({
   container: { flexGrow: 1, justifyContent: "center" },
   inner: { padding: theme.spacing.layout.pageX },
+  heroPanel: {
+    position: "relative",
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: theme.recipes.mixedHeroSurface.borderColor,
+    borderRadius: theme.radius.component.panel,
+    backgroundColor: theme.recipes.mixedHeroSurface.backgroundColor,
+    padding: theme.spacing.component.panelPadding,
+    marginBottom: theme.spacing.component.gapXl,
+    ...theme.shadows.sm,
+  },
+  kicker: {
+    color: theme.colors.content.secondaryStrong,
+    marginBottom: theme.spacing.scale.xs,
+    ...theme.typography.labelMd,
+  },
   backButton: {
     alignSelf: "flex-start",
     paddingVertical: theme.spacing.scale.xs,
@@ -222,10 +253,8 @@ const styles = StyleSheet.create((theme) => ({
     ...theme.typography.labelMd,
   },
   title: {
-    fontSize: 24,
-    fontWeight: "700",
-    marginBottom: theme.spacing.component.gapXl,
     color: theme.colors.content.strong,
+    ...theme.typography.displayMd,
   },
   appleBtn: { width: "100%", height: 48, marginBottom: theme.spacing.component.gapSm },
   googleBtn: {
@@ -244,7 +273,7 @@ const styles = StyleSheet.create((theme) => ({
   googleBtnText: { fontSize: 16, fontWeight: "500", color: "#1F1F1F" },
   divider: {
     textAlign: "center",
-    color: theme.colors.content.muted,
+    color: theme.colors.content.secondary,
     fontSize: 14,
     marginVertical: theme.spacing.component.gapMd,
   },
@@ -264,14 +293,6 @@ const styles = StyleSheet.create((theme) => ({
     marginBottom: theme.spacing.component.gapSm,
   },
   loader: { marginTop: 4 },
-  btn: {
-    backgroundColor: theme.colors.action.primary,
-    borderRadius: 8,
-    padding: 14,
-    alignItems: "center",
-    marginTop: 4,
-  },
-  btnText: { color: theme.colors.content.onPrimary, fontSize: 16, fontWeight: "600" },
   link: {
     textAlign: "center",
     color: theme.colors.content.primary,
@@ -297,11 +318,11 @@ const styles = StyleSheet.create((theme) => ({
     flexShrink: 0,
   },
   checkboxChecked: {
-    backgroundColor: theme.colors.action.primary,
-    borderColor: theme.colors.action.primary,
+    backgroundColor: theme.recipes.primaryCta.backgroundColor,
+    borderColor: theme.recipes.primaryCta.borderColor,
   },
   checkmark: {
-    color: theme.colors.content.onPrimary,
+    color: theme.recipes.primaryCta.textColor,
     fontSize: 12,
     lineHeight: 16,
     fontWeight: "700",
