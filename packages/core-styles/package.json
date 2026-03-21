@@ -19,7 +19,7 @@
   "dependencies": {
     "@sd/core-contracts": "workspace:*",
     "@sd/design-tokens": "workspace:*",
-    "next": "16.1.3"
+    "next": "16.1.7"
   },
   "peerDependencies": {
     "react": "*",
