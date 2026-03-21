@@ -3,9 +3,11 @@
   margin-inline: auto;
   padding: var(--space-layout-page-y) var(--space-layout-page-x) var(--space-layout-section-y);
   display: flex;
-  align-items: flex-start;
+  /* Fill the scrollable content area so the empty state can center vertically. */
+  flex: 1;
+  min-height: 100%;
+  align-items: center;
   justify-content: center;
-  min-height: 0;
 }
 
 .content {
