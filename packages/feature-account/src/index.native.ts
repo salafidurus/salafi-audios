@@ -1,1 +1,1 @@
-export { AccountScreen } from "./screens/account.screen";
+export { AccountMobileNativeScreen } from "./screens/account.screen.native";

@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Pressable, ScrollView, Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import type { TopicDetailDto, TopicSlug } from "@sd/contracts";
+import type { TopicDetailDto, TopicSlug } from "@sd/core-contracts";
 
 export type SearchFilterValue = TopicSlug[];
 
@@ -16,7 +16,13 @@ export type SearchFilterProps = {
   topics: TopicDetailDto[];
 };
 
-export function SearchFilter({ value, onChange, topics }: SearchFilterProps) {
+export type SearchFilterMobileNativeProps = SearchFilterProps;
+
+export function SearchFilterMobileNative({
+  value,
+  onChange,
+  topics,
+}: SearchFilterMobileNativeProps) {
   const options = useMemo<FilterOption[]>(() => {
     const sortedTopics = [...topics].sort((a, b) => a.name.localeCompare(b.name));
     return [
@@ -80,16 +86,17 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing.component.chipY,
   },
   chipActive: {
-    backgroundColor: theme.colors.surface.default,
+    backgroundColor: theme.recipes.primarySubtleSurface.backgroundColor,
+    borderColor: theme.recipes.primarySubtleSurface.borderColor,
   },
   chipPressed: {
-    opacity: 0.85,
+    opacity: 0.9,
   },
   chipLabel: {
     color: theme.colors.content.muted,
     ...theme.typography.labelMd,
   },
   chipLabelActive: {
-    color: theme.colors.content.strong,
+    color: theme.recipes.primarySubtleSurface.textColor,
   },
 }));

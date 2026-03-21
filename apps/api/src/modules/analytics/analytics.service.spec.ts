@@ -7,7 +7,7 @@ import {
   AnalyticsEventType,
   AnalyticsSource,
   AnalyticsContentKind,
-} from '@sd/db';
+} from '@sd/core-db';
 
 describe('AnalyticsService', () => {
   let service: AnalyticsService;

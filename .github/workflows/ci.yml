@@ -58,7 +58,7 @@ jobs:
               - "packages/**/*.{ts,tsx,mts,cts}"
               - "tsconfig*.json"
               - "**/tsconfig*.json"
-              - "packages/db/prisma/**"
+              - "packages/core-db/prisma/**"
             test:
               - "apps/**/*.{js,jsx,ts,tsx,mjs,cjs}"
               - "packages/**/*.{js,jsx,ts,tsx,mjs,cjs}"
@@ -66,15 +66,15 @@ jobs:
               - "packages/**/*.{spec,test}.{js,jsx,ts,tsx,mjs,cjs}"
               - "jest.config.*"
               - "**/jest.config.*"
-              - "packages/db/prisma/**"
+              - "packages/core-db/prisma/**"
             web_e2e:
               - "apps/web/**"
               - "packages/api-client/**"
-              - "packages/env/**"
-              - "packages/i18n/**"
+              - "packages/core-env/**"
+              - "packages/core-i18n/**"
             db_generated_policy:
-              - "packages/db/prisma/**"
-              - "packages/db/prisma.config.ts"
+              - "packages/core-db/prisma/**"
+              - "packages/core-db/prisma.config.ts"
 
   build_deps:
     name: build:deps
@@ -114,7 +114,7 @@ jobs:
           path: |
             apps/api/dist/**
             apps/web/.next/**
-            packages/env/dist/**
+            packages/core-env/dist/**
 
   lint:
     name: lint
@@ -301,18 +301,18 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
-        run: pnpm --filter @sd/db prisma:generate
+        run: pnpm --filter @sd/core-db prisma:generate
 
       - name: Enforce generated DB artifact policy
         run: |
-          if [ -n "$(git ls-files -- packages/db/src/generated)" ]; then
-            echo "::error::Forbidden tracked files found in packages/db/src/generated"
-            git ls-files -- packages/db/src/generated
+          if [ -n "$(git ls-files -- packages/core-db/src/generated)" ]; then
+            echo "::error::Forbidden tracked files found in packages/core-db/src/generated"
+            git ls-files -- packages/core-db/src/generated
             exit 1
           fi
 
-          if [ -n "$(git status --porcelain --untracked-files=all -- packages/db/src/generated)" ]; then
-            echo "::error::packages/db/src/generated must remain git-clean after generation"
-            git status --porcelain --untracked-files=all -- packages/db/src/generated
+          if [ -n "$(git status --porcelain --untracked-files=all -- packages/core-db/src/generated)" ]; then
+            echo "::error::packages/core-db/src/generated must remain git-clean after generation"
+            git status --porcelain --untracked-files=all -- packages/core-db/src/generated
             exit 1
           fi

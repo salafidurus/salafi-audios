@@ -4,7 +4,7 @@ import styles from "./button.module.css";
 type ButtonVariant = "primary" | "surface" | "outline" | "ghost" | "danger";
 type ButtonSize = "sm" | "md" | "lg" | "icon";
 
-export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+export type ButtonDesktopWebProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;
   size?: ButtonSize;
 };
@@ -13,13 +13,13 @@ function cx(...values: Array<string | undefined | false>) {
   return values.filter(Boolean).join(" ");
 }
 
-export function Button({
+export function ButtonDesktopWeb({
   variant = "surface",
   size = "md",
   className,
   type,
   ...props
-}: ButtonProps) {
+}: ButtonDesktopWebProps) {
   return (
     <button
       type={type ?? "button"}

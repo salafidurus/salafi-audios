@@ -4,7 +4,7 @@ import { CollectionService } from './collections.service';
 import { CollectionRepository } from './collections.repo';
 import { UpsertCollectionDto } from './dto/upsert-collection.dto';
 import { CollectionViewDto } from './dto/collection-view.dto';
-import { Status } from '@sd/db';
+import { Status } from '@sd/core-db';
 
 describe('CollectionService', () => {
   let service: CollectionService;

@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { AccountResponsiveScreen } from "@sd/feature-account";
 
 export default function AccountPage() {
-  redirect("/account/profile");
+  return <AccountResponsiveScreen />;
 }

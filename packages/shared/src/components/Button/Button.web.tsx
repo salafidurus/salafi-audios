@@ -7,11 +7,12 @@ import { Text } from "react-native-unistyles/components/native/Text";
 import { Pressable } from "react-native-unistyles/components/native/Pressable";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import type { ViewStyle } from "react-native";
+import { AccentGradientFill } from "../AccentGradientFill/AccentGradientFill";
 
 type ButtonVariant = "primary" | "surface" | "outline" | "ghost" | "danger";
 type ButtonSize = "sm" | "md" | "lg";
 
-export type ButtonProps = Omit<PressableProps, "style"> & {
+export type ButtonMobileWebProps = Omit<PressableProps, "style"> & {
   variant?: ButtonVariant;
   size?: ButtonSize;
   label: string;
@@ -22,7 +23,7 @@ export type ButtonProps = Omit<PressableProps, "style"> & {
   style?: ViewStyle;
 };
 
-export function Button({
+export function ButtonMobileWeb({
   variant = "surface",
   size = "md",
   label,
@@ -35,7 +36,7 @@ export function Button({
   onPressOut,
   style,
   ...props
-}: ButtonProps) {
+}: ButtonMobileWebProps) {
   const { theme } = useUnistyles();
   const [isPressed, setIsPressed] = useState(false);
   const isDisabled = disabled || loading;
@@ -70,6 +71,18 @@ export function Button({
         ]}
         {...props}
       >
+        {variant === "primary" ? (
+          <AccentGradientFill
+            borderRadius={theme.radius.component.chip}
+            linearColors={theme.recipes.primaryCta.linear.colors}
+            linearStart={theme.recipes.primaryCta.linear.start}
+            linearEnd={theme.recipes.primaryCta.linear.end}
+            radialCenter={theme.recipes.primaryCta.radial.center}
+            radialRadius={theme.recipes.primaryCta.radial.radius}
+            radialCenterColor={theme.recipes.primaryCta.radial.centerColor}
+            radialEdgeColor={theme.recipes.primaryCta.radial.edgeColor}
+          />
+        ) : null}
         {loading ? (
           <ActivityIndicator size="small" color={getIndicatorColor(variant, theme)} />
         ) : (
@@ -110,8 +123,8 @@ function getVariantContainer(variant: ButtonVariant, t: Theme) {
   switch (variant) {
     case "primary":
       return {
-        backgroundColor: t.colors.action.primary,
-        borderColor: t.colors.border.primaryStrong,
+        backgroundColor: t.recipes.primaryCta.backgroundColor,
+        borderColor: t.recipes.primaryCta.borderColor,
       };
     case "surface":
       return {
@@ -133,7 +146,7 @@ function getVariantContainer(variant: ButtonVariant, t: Theme) {
 function getVariantLabel(variant: ButtonVariant, t: Theme) {
   switch (variant) {
     case "primary":
-      return { color: t.colors.content.onPrimary };
+      return { color: t.recipes.primaryCta.textColor };
     case "surface":
       return { color: t.colors.content.default };
     case "outline":
@@ -148,7 +161,7 @@ function getVariantLabel(variant: ButtonVariant, t: Theme) {
 function getIndicatorColor(variant: ButtonVariant, t: Theme) {
   switch (variant) {
     case "primary":
-      return t.colors.content.onPrimary;
+      return t.recipes.primaryCta.textColor;
     case "surface":
       return t.colors.content.muted;
     case "outline":

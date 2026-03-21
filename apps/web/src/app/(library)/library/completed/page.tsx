@@ -1,5 +1,5 @@
-import { LibraryScreen } from "@sd/feature-library";
+import { LibraryResponsiveScreen } from "@sd/feature-library";
 
 export default function LibraryCompletedPage() {
-  return <LibraryScreen />;
+  return <LibraryResponsiveScreen />;
 }

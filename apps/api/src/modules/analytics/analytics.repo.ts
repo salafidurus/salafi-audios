@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../shared/db/prisma.service';
-import { Status, AnalyticsSource } from '@sd/db';
+import { Status, AnalyticsSource } from '@sd/core-db';
 import { PlatformStatsDto } from './dto/platform-stats.dto';
 import { CreateAnalyticsEventDto } from './dto/create-analytics-event.dto';
 

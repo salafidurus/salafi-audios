@@ -1,22 +1,31 @@
-import { AdaptiveShell } from "@sd/feature-navigation";
-import { Slot } from "expo-router";
-import { View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import { useRef } from "react";
+import {
+  CustomTabBarMobileNative,
+  SubsectionBarHostMobileNative,
+  getSceneBottomInsetForPath,
+} from "@sd/feature-navigation";
+import { Tabs, usePathname } from "expo-router";
 
-export default function TabLayout() {
-  const containerRef = useRef<View>(null);
+export default function TabsLayout() {
+  const pathname = usePathname();
 
   return (
-    <View ref={containerRef} style={styles.container}>
-      <Slot />
-      <AdaptiveShell blurTargetRef={containerRef} />
-    </View>
+    <>
+      <Tabs
+        tabBar={(props) => <CustomTabBarMobileNative {...props} />}
+        screenOptions={{
+          headerShown: false,
+          sceneStyle: {
+            paddingBottom: getSceneBottomInsetForPath(pathname),
+          },
+        }}
+      >
+        <Tabs.Screen name="feed" options={{ title: "Feed" }} />
+        <Tabs.Screen name="live" options={{ title: "Live" }} />
+        <Tabs.Screen name="(search)" options={{ title: "Search" }} />
+        <Tabs.Screen name="library" options={{ title: "Library" }} />
+        <Tabs.Screen name="account" options={{ title: "Account" }} />
+      </Tabs>
+      <SubsectionBarHostMobileNative />
+    </>
   );
 }
-
-const styles = StyleSheet.create(() => ({
-  container: {
-    flex: 1,
-  },
-}));

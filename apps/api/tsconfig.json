@@ -1,5 +1,5 @@
 {
-  "extends": "@sd/config/tsconfig/base.json",
+  "extends": "@sd/util-config/tsconfig/base.json",
   "compilerOptions": {
     "module": "commonjs",
     "declaration": true,

@@ -6,7 +6,7 @@ import "./globals.css";
 import { themeCss } from "./theme-css";
 
 import { Footer, Sidebar, TopAuthStrip } from "@sd/feature-navigation";
-import { UnistylesStyle } from "@sd/core-styles";
+import { UnistylesStyleDesktopWeb } from "@sd/core-styles";
 import { Providers } from "./providers";
 
 const fraunces = localFont({
@@ -113,6 +113,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
+
   return (
     <html
       lang="en"
@@ -120,10 +122,12 @@ export default function RootLayout({
       className={`${fraunces.variable} ${manrope.variable} ${geistMono.variable}`}
     >
       <body className="antialiased">
-        <Script src="https://www.vexo.co/analytics.js" strategy="afterInteractive" />
+        {process.env.NODE_ENV === "production" ? (
+          <Script src="https://www.vexo.co/analytics.js" strategy="afterInteractive" />
+        ) : null}
         <style>{themeCss}</style>
-        <UnistylesStyle>
-          <Providers>
+        <UnistylesStyleDesktopWeb>
+          <Providers apiBaseUrl={apiBaseUrl}>
             <div className="appFrame">
               <div className="appShell">
                 <Sidebar />
@@ -135,7 +139,7 @@ export default function RootLayout({
               </div>
             </div>
           </Providers>
-        </UnistylesStyle>
+        </UnistylesStyleDesktopWeb>
       </body>
     </html>
   );

@@ -6,7 +6,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { LecturesService } from './lectures.service';
-import type { LectureViewDto } from '@sd/contracts';
+import type { LectureViewDto } from '@sd/core-contracts';
 import { Public } from '../../modules/auth/decorators';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 

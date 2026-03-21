@@ -1,1 +1,1 @@
-export { SupportScreen } from "./screens/support.screen";
+export { SupportMobileNativeScreen } from "./screens/support.screen.native";

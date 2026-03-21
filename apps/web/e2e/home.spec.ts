@@ -11,6 +11,6 @@ test("home page loads search landing", async ({ page }) => {
   const heading = page.getByText("Find a lesson");
   await expect(heading).toBeVisible();
 
-  const searchButton = page.getByRole("link", { name: "What do you want to listen to?" });
+  const searchButton = page.getByRole("button", { name: "What do you want to listen to?" });
   await expect(searchButton).toBeVisible();
 });

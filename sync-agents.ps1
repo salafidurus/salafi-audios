@@ -2,6 +2,7 @@
 
 $root = (Get-Location).Path
 $agents = Join-Path $root ".agents\skills"
+$plans  = Join-Path $root ".agents\plans"
 
 function Test-ReparsePoint($path) {
     if (-not (Test-Path -LiteralPath $path)) { return $false }
@@ -46,6 +47,7 @@ function New-DirectoryLink($link, $target) {
 }
 
 New-Item -ItemType Directory -Force -Path ".\.agents\skills" | Out-Null
+New-Item -ItemType Directory -Force -Path ".\.agents\plans"  | Out-Null
 
 New-FileLink ".\AGENTS.md" ".\AGENT.md"
 New-FileLink ".\CLAUDE.md" ".\AGENT.md"
@@ -54,6 +56,10 @@ New-FileLink ".\GEMINI.md" ".\AGENT.md"
 New-DirectoryLink ".\.opencode\skills" $agents
 New-DirectoryLink ".\.claude\skills" $agents
 New-DirectoryLink ".\.gemini\skills" $agents
+
+New-DirectoryLink ".\.opencode\plans" $plans
+New-DirectoryLink ".\.claude\plans" $plans
+New-DirectoryLink ".\.gemini\plans" $plans
 
 Get-ChildItem -Recurse -Filter "AGENT.md" | ForEach-Object {
     $dir = $_.DirectoryName
@@ -72,6 +78,10 @@ foreach ($app in $appDirs) {
     New-DirectoryLink (Join-Path $full ".opencode\skills") $agents
     New-DirectoryLink (Join-Path $full ".claude\skills") $agents
     New-DirectoryLink (Join-Path $full ".gemini\skills") $agents
+
+    New-DirectoryLink (Join-Path $full ".opencode\plans") $plans
+    New-DirectoryLink (Join-Path $full ".claude\plans") $plans
+    New-DirectoryLink (Join-Path $full ".gemini\plans") $plans
 }
 
 Write-Host "[OK] Repo normalized"

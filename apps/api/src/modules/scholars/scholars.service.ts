@@ -3,7 +3,7 @@ import {
   ScholarViewDto,
   ScholarStatsDto,
   ScholarDetailDto,
-} from '@sd/contracts';
+} from '@sd/core-contracts';
 import { ScholarRepository } from './scholars.repo';
 import { UpsertScholarDto } from './dto/upsert-scholar.dto';
 

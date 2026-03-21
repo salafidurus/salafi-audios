@@ -2,7 +2,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 import { useUnistyles } from "react-native-unistyles";
-import { Providers } from "@sd/shared";
+import { ProvidersMobileNative } from "@sd/shared";
 import { getWrappedLayout, initIntegrations } from "@sd/core-config";
 import { useEffect } from "react";
 
@@ -14,7 +14,7 @@ function RootLayout() {
   }, []);
 
   return (
-    <Providers>
+    <ProvidersMobileNative>
       <StatusBar style="auto" />
       <Stack
         initialRouteName="(tabs)"
@@ -33,7 +33,7 @@ function RootLayout() {
         <Stack.Screen name="(auth)" options={{ headerShown: false, presentation: "modal" }} />
         <Stack.Screen name="modal" options={{ presentation: "modal", title: "Modal" }} />
       </Stack>
-    </Providers>
+    </ProvidersMobileNative>
   );
 }
 

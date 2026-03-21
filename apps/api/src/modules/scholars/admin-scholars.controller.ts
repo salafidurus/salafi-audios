@@ -3,7 +3,7 @@ import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../../modules/auth/decorators';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { ScholarService } from './scholars.service';
-import type { ScholarDetailDto } from '@sd/contracts';
+import type { ScholarDetailDto } from '@sd/core-contracts';
 import { SetKibarDto } from './dto/set-kibar.dto';
 
 @ApiTags('Admin Scholars')

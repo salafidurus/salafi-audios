@@ -1,13 +1,21 @@
 import { Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { ScreenView } from "../ScreenView";
+import { ScreenViewMobileNative } from "../ScreenView/ScreenView.native";
 
-export function ScreenInProgress() {
+type ScreenInProgressMobileNativeProps = {
+  title?: string;
+  description?: string;
+};
+
+export function ScreenInProgressMobileNative({
+  title = "Coming Soon",
+  description = "This feature is under development",
+}: ScreenInProgressMobileNativeProps) {
   return (
-    <ScreenView center>
-      <Text style={styles.title}>Coming Soon</Text>
-      <Text style={styles.subtitle}>This feature is under development</Text>
-    </ScreenView>
+    <ScreenViewMobileNative center backgroundVariant="mixedWash">
+      <Text style={styles.title}>{title}</Text>
+      <Text style={styles.subtitle}>{description}</Text>
+    </ScreenViewMobileNative>
   );
 }
 
@@ -17,7 +25,7 @@ const styles = StyleSheet.create((theme) => ({
     fontSize: theme.typography.titleLg.fontSize,
     lineHeight: theme.typography.titleLg.lineHeight,
     letterSpacing: theme.typography.titleLg.letterSpacing,
-    color: theme.colors.content.strong,
+    color: theme.colors.content.primary,
     textAlign: "center",
   },
   subtitle: {
@@ -25,7 +33,7 @@ const styles = StyleSheet.create((theme) => ({
     fontSize: theme.typography.bodySm.fontSize,
     lineHeight: theme.typography.bodySm.lineHeight,
     letterSpacing: theme.typography.bodySm.letterSpacing,
-    color: theme.colors.content.muted,
+    color: theme.colors.content.default,
     textAlign: "center",
     marginTop: theme.spacing.component.gapSm,
   },

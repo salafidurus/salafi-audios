@@ -3,7 +3,7 @@ import {
   TopicDetailDto,
   TopicViewDto,
   TopicLectureViewDto,
-} from '@sd/contracts';
+} from '@sd/core-contracts';
 import { UpsertTopicDto } from './dto/upsert-topic.dto';
 import { TopicsRepository } from './topics.repo';
 

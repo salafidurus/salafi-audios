@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { BrowseCard } from "../BrowseCard";
+import { BrowseCard } from "../BrowseCard/BrowseCard.native";
 
 const browseCategories = [
   { name: "Senior Scholars", searchKey: "Senior Scholars" },

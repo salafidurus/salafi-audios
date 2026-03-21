@@ -1,7 +1,9 @@
 .footer {
   width: 100%;
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid color-mix(in srgb, var(--border-default) 82%, transparent);
   margin-top: auto;
+  background: color-mix(in srgb, var(--surface-canvas) 88%, transparent);
+  backdrop-filter: blur(10px);
 }
 
 @media (max-width: 767px) {
@@ -22,7 +24,7 @@
 }
 
 .meta {
-  color: var(--content-muted);
+  color: var(--content-default);
   font-family: var(--typo-caption-font-family), sans-serif;
   font-size: var(--typo-caption-font-size);
   line-height: var(--typo-caption-line-height);
@@ -39,7 +41,7 @@
   line-height: var(--typo-caption-line-height);
   letter-spacing: var(--typo-caption-letter-spacing);
   font-weight: var(--typo-caption-font-weight);
-  color: var(--content-muted);
+  color: var(--content-default);
 }
 
 .links a {
@@ -48,5 +50,5 @@
 }
 
 .links a:hover {
-  color: var(--content-strong);
+  color: var(--content-primary);
 }

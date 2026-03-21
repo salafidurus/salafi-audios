@@ -3,22 +3,33 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: var(--bottom-tab-height, 4.25rem);
-  padding: var(--space-component-gap-sm) var(--space-layout-page-x);
-  background: var(--surface-default);
-  border-top: 1px solid var(--border-subtle);
+  padding:
+    var(--space-component-gap-sm)
+    var(--space-layout-page-x)
+    calc(var(--space-component-gap-sm) + env(safe-area-inset-bottom, 0px));
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: center;
   z-index: 11;
+  pointer-events: none;
 }
 
 .nav {
   width: 100%;
+  max-width: 42rem;
+  min-height: var(--bottom-tab-height, 4.5rem);
   display: flex;
   align-items: center;
   justify-content: stretch;
-  gap: 0;
+  gap: var(--space-component-gap-sm);
+  padding: 0.5rem 0.75rem;
+  background: color-mix(in srgb, var(--surface-elevated) 92%, white 8%);
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 88%, white 12%);
+  border-radius: var(--radius-component-panel);
+  box-shadow: var(--shadow-lg);
+  pointer-events: auto;
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
 }
 
 .link {
@@ -115,6 +126,11 @@
 
 .sectionMenuItem:hover {
   background: var(--surface-subtle);
+}
+
+.sectionMenuItemActive {
+  background: var(--surface-subtle);
+  font-weight: 600;
 }
 
 .tabGroup {

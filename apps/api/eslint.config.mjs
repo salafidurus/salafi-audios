@@ -1,2 +1,2 @@
-import nestConfig from '@sd/config/eslint/nest';
+import nestConfig from '@sd/util-config/eslint/nest';
 export default nestConfig;

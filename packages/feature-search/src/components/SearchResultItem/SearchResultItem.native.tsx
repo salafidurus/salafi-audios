@@ -1,7 +1,7 @@
 import { Image, Pressable, Text, View } from "react-native";
 import { Clock3, Headphones } from "lucide-react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { MarqueeText } from "../MarqueeText";
+import { MarqueeText } from "../MarqueeText/MarqueeText.native";
 import type { ComponentType } from "react";
 
 export type SearchResultItemProps = {
@@ -13,14 +13,16 @@ export type SearchResultItemProps = {
   onPress?: () => void;
 };
 
-export function SearchResultItem({
+export type SearchResultItemMobileNativeProps = SearchResultItemProps;
+
+export function SearchResultItemMobileNative({
   title,
   scholarName,
   imageUrl,
   lectureCount,
   durationSeconds,
   onPress,
-}: SearchResultItemProps) {
+}: SearchResultItemMobileNativeProps) {
   const { theme } = useUnistyles();
   const durationLabel = formatDuration(durationSeconds);
   const HeadphonesIcon = Headphones as ComponentType<{

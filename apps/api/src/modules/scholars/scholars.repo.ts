@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../shared/db/prisma.service';
-import { Prisma } from '@sd/db';
+import { Prisma } from '@sd/core-db';
 import {
   ScholarViewDto,
   ScholarDetailDto,
   ScholarStatsDto,
-} from '@sd/contracts';
+} from '@sd/core-contracts';
 import { UpsertScholarDto } from './dto/upsert-scholar.dto';
 
 const scholarViewSelect = {

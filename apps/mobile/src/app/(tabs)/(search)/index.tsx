@@ -1,14 +1,15 @@
-import { SearchHomeScreen } from "@sd/feature-search";
-import { useRouter } from "expo-router";
+import { SearchHomeMobileNativeScreen } from "@sd/feature-search";
+import { type Href, useRouter } from "expo-router";
 
 export default function SearchIndex() {
   const router = useRouter();
+  const searchRoute = "/(tabs)/(search)/search" as Href;
 
   return (
-    <SearchHomeScreen
-      onOpenSearch={() => router.push("/(tabs)/(search)/search")}
+    <SearchHomeMobileNativeScreen
+      onOpenSearch={() => router.push(searchRoute)}
       onSelectCategory={(searchKey) =>
-        router.push({ pathname: "/(tabs)/(search)/search", params: { searchKey } })
+        router.push({ pathname: searchRoute, params: { searchKey } } as Href)
       }
     />
   );

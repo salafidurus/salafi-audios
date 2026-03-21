@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../shared/db/prisma.service';
-import { Prisma, Status } from '@sd/db';
+import { Prisma, Status } from '@sd/core-db';
 import { LectureTopicViewDto } from '../lecture-topics/dto/lecture-topic-view.dto';
 
 const topicSelect = {

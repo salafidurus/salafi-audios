@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../shared/db/prisma.service';
 import { ConfigService } from '../../shared/config/config.service';
-import { Prisma, Status } from '@sd/db';
+import { Prisma, Status } from '@sd/core-db';
 import { decodeCursor, encodeCursor } from './utils/catalog.cursor';
 import { CatalogListQueryDto } from './dto/catalog-list.query.dto';
 import { CatalogPageDto } from './dto/catalog-page.dto';
@@ -9,7 +9,7 @@ import type {
   CollectionViewDto,
   SeriesViewDto,
   LectureViewDto,
-} from '@sd/contracts';
+} from '@sd/core-contracts';
 
 const DEFAULT_LIMIT = 20;
 

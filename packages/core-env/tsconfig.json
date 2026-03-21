@@ -1,0 +1,13 @@
+{
+  "extends": "../util-config/tsconfig/base.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "declaration": true,
+    "emitDeclarationOnly": false,
+    "types": ["node"],
+    "baseUrl": ".",
+    "moduleSuffixes": [".desktop.web", ".mobile.web", ".native", ".web", ""]
+  },
+  "include": ["src/**/*.ts"]
+}

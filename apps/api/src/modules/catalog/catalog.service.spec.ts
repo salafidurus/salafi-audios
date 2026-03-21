@@ -7,7 +7,7 @@ import {
   CollectionViewDto,
   SeriesViewDto,
   LectureViewDto,
-} from '@sd/contracts';
+} from '@sd/core-contracts';
 
 describe('CatalogService', () => {
   let service: CatalogService;

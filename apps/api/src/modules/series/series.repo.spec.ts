@@ -1,4 +1,4 @@
-import { Status } from '@sd/db';
+import { Status } from '@sd/core-db';
 import { SeriesRepository } from './series.repo';
 
 describe('SeriesRepository', () => {

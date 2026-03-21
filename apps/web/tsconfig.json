@@ -1,5 +1,5 @@
 {
-  "extends": "../../packages/config/tsconfig/next.json",
+  "extends": "../../packages/util-config/tsconfig/next.json",
   "compilerOptions": {
     "baseUrl": ".",
     "moduleSuffixes": [".desktop.web", ".web", "", ".native"]

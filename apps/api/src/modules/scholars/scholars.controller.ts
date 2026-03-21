@@ -2,7 +2,7 @@ import {
   ScholarDetailDto,
   ScholarStatsDto,
   ScholarViewDto,
-} from '@sd/contracts';
+} from '@sd/core-contracts';
 import { Public } from '../../modules/auth/decorators';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { Controller, Get, Param, Query } from '@nestjs/common';

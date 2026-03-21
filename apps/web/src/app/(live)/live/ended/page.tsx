@@ -1,5 +1,5 @@
-import { LiveScreen } from "@sd/feature-live";
+import { LiveResponsiveScreen } from "@sd/feature-live";
 
 export default function LiveEndedPage() {
-  return <LiveScreen />;
+  return <LiveResponsiveScreen />;
 }

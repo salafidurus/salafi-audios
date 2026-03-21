@@ -1,7 +1,7 @@
 import { ConfigContext, ExpoConfig } from "expo/config";
 import { withSentry } from "@sentry/react-native/expo";
 import { version } from "./package.json";
-import { getMobileBuildEnv, type AppEnv } from "@sd/env";
+import { getMobileBuildEnv, type AppEnv } from "@sd/core-env";
 import path from "path";
 
 const OWNER = "basmalabs";

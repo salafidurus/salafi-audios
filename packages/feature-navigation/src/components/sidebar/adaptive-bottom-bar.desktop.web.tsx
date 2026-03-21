@@ -11,45 +11,23 @@ import {
   Search,
   CassetteTape,
   Settings,
-  Flame,
-  Clock,
-  Heart,
-  Calendar,
-  Radio,
-  CircleCheck,
-  Bookmark,
-  Play,
-  CheckCircle,
-  User,
-  SlidersHorizontal,
-  Scale,
   type LucideIcon,
 } from "lucide-react";
 import styles from "./sidebar-bottom.module.css";
-import { SECTION_TABS, SECTION_LABELS, SECTION_ROUTES, type Section } from "../../types";
+import { DEFAULT_TABS, SECTION_TABS, SECTION_LABELS, type Section } from "../../types";
 import { useNavigationStore } from "../../store/navigation-store.web";
-import { getCurrentSection, getActiveTabFromPath } from "../../utils/get-current-section.web";
+import {
+  buildSectionTabPath,
+  getCurrentSection,
+  getActiveTabFromPath,
+} from "../../utils/get-current-section.web";
+import { getSectionTabIcon } from "../../utils/section-tab-icons.web";
 
 const SECTION_ICONS: Record<Section, LucideIcon> = {
   feed: Cloud,
   live: Mic,
   library: CassetteTape,
   account: Settings,
-};
-
-const TAB_ICONS: Record<string, LucideIcon> = {
-  flame: Flame,
-  clock: Clock,
-  heart: Heart,
-  calendar: Calendar,
-  radio: Radio,
-  "circle-check": CircleCheck,
-  bookmark: Bookmark,
-  play: Play,
-  "check-circle": CheckCircle,
-  user: User,
-  "sliders-horizontal": SlidersHorizontal,
-  scale: Scale,
 };
 
 const SECTION_ORDER: Section[] = ["feed", "live", "library", "account"];
@@ -69,10 +47,7 @@ export function AdaptiveBottomBar() {
   // Sync active tab from URL
   useEffect(() => {
     if (currentSection !== "home") {
-      const tabFromPath = getActiveTabFromPath(pathname);
-      if (tabFromPath) {
-        setActiveTab(currentSection, tabFromPath);
-      }
+      setActiveTab(currentSection, getActiveTabFromPath(pathname) ?? DEFAULT_TABS[currentSection]);
     }
   }, [pathname, currentSection, setActiveTab]);
 
@@ -96,9 +71,7 @@ export function AdaptiveBottomBar() {
             const Icon = SECTION_ICONS[section];
             const tab = sectionTabs[section];
             const href =
-              section === "account" && !isAuthenticated
-                ? "/sign-in"
-                : `${SECTION_ROUTES[section]}/${tab}`;
+              section === "account" && !isAuthenticated ? "/sign-in" : buildSectionTabPath(section, tab);
             return (
               <Link
                 key={section}
@@ -136,22 +109,27 @@ export function AdaptiveBottomBar() {
           </button>
           {menuOpen && (
             <div className={styles.sectionMenu}>
-              <Link href="/" className={styles.sectionMenuItem} onClick={() => setMenuOpen(false)}>
+              <Link
+                href="/"
+                className={styles.sectionMenuItem}
+                onClick={() => setMenuOpen(false)}
+              >
                 <Search size={16} />
                 <span>Home</span>
               </Link>
-              {SECTION_ORDER.filter((s) => s !== currentSection).map((section) => {
+              {SECTION_ORDER.map((section) => {
                 const Icon = SECTION_ICONS[section];
                 const tab = sectionTabs[section];
                 const href =
-                  section === "account" && !isAuthenticated
-                    ? "/sign-in"
-                    : `${SECTION_ROUTES[section]}/${tab}`;
+                  section === "account" && !isAuthenticated ? "/sign-in" : buildSectionTabPath(section, tab);
                 return (
                   <Link
                     key={section}
                     href={href}
-                    className={styles.sectionMenuItem}
+                    className={clsx(
+                      styles.sectionMenuItem,
+                      section === currentSection && styles.sectionMenuItemActive,
+                    )}
                     onClick={() => setMenuOpen(false)}
                   >
                     <Icon size={16} />
@@ -165,7 +143,7 @@ export function AdaptiveBottomBar() {
 
         <div className={styles.tabGroup} role="tablist">
           {tabs.map((tab) => {
-            const tabPath = `${SECTION_ROUTES[currentSection]}/${tab.id}`;
+            const tabPath = buildSectionTabPath(currentSection, tab.id);
             const isActive = tab.id === activeTab;
             return (
               <Link
@@ -175,9 +153,12 @@ export function AdaptiveBottomBar() {
                 role="tab"
                 aria-selected={isActive}
               >
-                {TAB_ICONS[tab.icon] &&
+                {getSectionTabIcon(currentSection, tab.id) &&
                   (() => {
-                    const TabIcon = TAB_ICONS[tab.icon];
+                    const TabIcon = getSectionTabIcon(currentSection, tab.id);
+                    if (!TabIcon) {
+                      return null;
+                    }
                     return <TabIcon size={14} />;
                   })()}
                 {tab.label}

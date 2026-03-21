@@ -1,1 +1,1 @@
-export { LibraryScreen } from "./screens/library.screen";
+export { LibraryMobileNativeScreen } from "./screens/library.screen.native";

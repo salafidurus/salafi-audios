@@ -3,7 +3,7 @@ import { NotFoundException } from '@nestjs/common';
 import { ScholarService } from './scholars.service';
 import { ScholarRepository } from './scholars.repo';
 import { UpsertScholarDto } from './dto/upsert-scholar.dto';
-import { ScholarDetailDto, ScholarViewDto } from '@sd/contracts';
+import { ScholarDetailDto, ScholarViewDto } from '@sd/core-contracts';
 
 describe('ScholarService', () => {
   let service: ScholarService;

@@ -14,12 +14,12 @@
     },
     "lint": {
       "dependsOn": ["^lint"],
-      "inputs": ["$TURBO_DEFAULT$", ".eslintrc*", "eslint.config.*", "packages/config/eslint/**"],
+      "inputs": ["$TURBO_DEFAULT$", ".eslintrc*", "eslint.config.*", "packages/util-config/eslint/**"],
       "outputs": []
     },
     "typecheck": {
       "dependsOn": ["^typecheck"],
-      "inputs": ["$TURBO_DEFAULT$", "tsconfig*.json", "packages/config/tsconfig/**"],
+      "inputs": ["$TURBO_DEFAULT$", "tsconfig*.json", "packages/util-config/tsconfig/**"],
       "outputs": ["generated/**", "src/generated/**"]
     },
     "test": {

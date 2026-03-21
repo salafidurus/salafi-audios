@@ -1,4 +1,3 @@
-export { authClient } from "./auth-client";
-export type { Session, User } from "./auth-client";
-export { useAuth } from "./use-auth";
-export * from "./use-require-auth";
+export { authClient } from "./utils/auth-client.native";
+export type { Session, User } from "./utils/auth-client.native";
+export { useAuth, useRequireAuth } from "./hooks/use-auth.native";

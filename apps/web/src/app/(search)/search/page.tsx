@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { SearchProcessingScreen } from "@sd/feature-search";
+import { SearchProcessingResponsiveScreen } from "@sd/feature-search";
 
 export const metadata: Metadata = {
   title: "Search",
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function SearchPage() {
   return (
     <Suspense fallback={null}>
-      <SearchProcessingScreen />
+      <SearchProcessingResponsiveScreen />
     </Suspense>
   );
 }

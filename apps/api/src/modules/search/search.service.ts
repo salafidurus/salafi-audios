@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import type { SearchCatalogResultsDto } from '@sd/contracts';
+import type { SearchCatalogResultsDto } from '@sd/core-contracts';
 import { SearchRepository } from './search.repo';
 import { SearchQueryDto } from './dto/search-query.dto';
 

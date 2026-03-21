@@ -1,2 +1,2 @@
-export { PrivacyScreen } from "./screens/privacy.screen";
-export { TermsOfUseScreen } from "./screens/terms-of-use.screen";
+export { PrivacyMobileNativeScreen } from "./screens/privacy.screen.native";
+export { TermsOfUseMobileNativeScreen } from "./screens/terms-of-use.screen.native";

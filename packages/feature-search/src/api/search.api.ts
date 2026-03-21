@@ -6,7 +6,7 @@ import {
   type SearchCatalogParams,
   type SearchCatalogResultsDto,
   type TopicDetailDto,
-} from "@sd/contracts";
+} from "@sd/core-contracts";
 
 export function useSearchCatalog(
   params: SearchCatalogParams,

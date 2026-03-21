@@ -1,5 +1,6 @@
 @import "tailwindcss";
-@source "../../../packages/**/*.{js,jsx,ts,tsx}";
+/* Include shared package sources so desktop-web utility classes are emitted in the app build. */
+@source "../../../../packages/**/*.{js,jsx,ts,tsx}";
 
 @theme inline {
   --surface-default: var(--surface-default);

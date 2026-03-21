@@ -6,7 +6,7 @@ import {
   Prisma,
   RecommendationRecurrence,
   Status,
-} from '@sd/db';
+} from '@sd/core-db';
 import { RecommendationHeroItemDto } from './dto/recommendation-hero-item.dto';
 import { RecommendationItemDto } from './dto/recommendation-item.dto';
 import { RecommendationPageDto } from './dto/recommendation-page.dto';
