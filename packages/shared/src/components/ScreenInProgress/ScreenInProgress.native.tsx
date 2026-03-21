@@ -12,7 +12,7 @@ export function ScreenInProgressMobileNative({
   description = "This feature is under development",
 }: ScreenInProgressMobileNativeProps) {
   return (
-    <ScreenViewMobileNative center>
+    <ScreenViewMobileNative center backgroundVariant="mixedWash">
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.subtitle}>{description}</Text>
     </ScreenViewMobileNative>
@@ -25,7 +25,7 @@ const styles = StyleSheet.create((theme) => ({
     fontSize: theme.typography.titleLg.fontSize,
     lineHeight: theme.typography.titleLg.lineHeight,
     letterSpacing: theme.typography.titleLg.letterSpacing,
-    color: theme.colors.content.strong,
+    color: theme.colors.content.primary,
     textAlign: "center",
   },
   subtitle: {
@@ -33,7 +33,7 @@ const styles = StyleSheet.create((theme) => ({
     fontSize: theme.typography.bodySm.fontSize,
     lineHeight: theme.typography.bodySm.lineHeight,
     letterSpacing: theme.typography.bodySm.letterSpacing,
-    color: theme.colors.content.muted,
+    color: theme.colors.content.default,
     textAlign: "center",
     marginTop: theme.spacing.component.gapSm,
   },

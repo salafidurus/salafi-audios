@@ -83,7 +83,7 @@
   --btn-bg: var(--accent-primary-bg, var(--action-primary));
   --btn-bg-hover: var(--accent-primary-bg-hover, var(--action-primary-hover));
   --btn-bg-active: var(--accent-primary-bg-active, var(--action-primary-active));
-  --btn-fg: var(--content-on-primary);
+  --btn-fg: var(--accent-primary-fg, var(--content-on-primary));
   --btn-border: var(--accent-primary-border, var(--action-primary));
   --btn-border-hover: var(--accent-primary-border-hover, var(--action-primary-hover));
   --btn-shadow: var(--shadow-sm);

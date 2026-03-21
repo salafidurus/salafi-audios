@@ -13,6 +13,7 @@ export { ButtonDesktopWeb } from "./components/Button/Button.desktop.web";
 export type { ButtonDesktopWebProps } from "./components/Button/Button.desktop.web";
 export { ButtonMobileWeb } from "./components/Button/Button.web";
 export type { ButtonMobileWebProps } from "./components/Button/Button.web";
+export { AccentGradientFill } from "./components/AccentGradientFill/AccentGradientFill.web";
 
 export { UniversalListWeb } from "./components/UniversalList/UniversalList.web";
 export type { UniversalListWebProps } from "./components/UniversalList/UniversalList.web";

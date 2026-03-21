@@ -1,4 +1,5 @@
 import { createColors, type AppColors } from "../colors/shared";
+import { createAccentRecipesNative, type AccentRecipesNative } from "../recipes/native";
 import { spacingMobile, type SpacingMobile } from "../spacing/native";
 import { radiusMobile, type RadiusMobile } from "../radius/native";
 import { createShadowsMobile, type ShadowsMobileTheme } from "../shadows/native";
@@ -6,6 +7,7 @@ import { typographyMobile, type TypographyMobile } from "../typography/native";
 
 export type AppThemeMobile = {
   colors: AppColors;
+  recipes: AccentRecipesNative;
   spacing: SpacingMobile;
   radius: RadiusMobile;
   shadows: ShadowsMobileTheme;
@@ -13,8 +15,11 @@ export type AppThemeMobile = {
 };
 
 export const createThemeMobile = (mode: "light" | "dark"): AppThemeMobile => {
+  const colors = createColors(mode);
+
   return {
-    colors: createColors(mode),
+    colors,
+    recipes: createAccentRecipesNative(colors, colors.border.focus),
     spacing: spacingMobile,
     radius: radiusMobile,
     shadows: createShadowsMobile(mode),

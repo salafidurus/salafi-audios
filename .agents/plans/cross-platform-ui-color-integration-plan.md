@@ -2,451 +2,524 @@
 
 ## Goal
 
-Integrate the product's primary and secondary colors into the UI across desktop web, mobile web, and native mobile without reducing clarity, accessibility, or platform fit.
+Integrate the product's primary and secondary colors into desktop web, mobile web, and native mobile in a way that is branded, reusable, accessible, and maintainable from one source of truth.
 
-The current issue is not isolated to one button. Most screens lean almost entirely on white, black, and neutral surfaces, so the product palette is not doing enough work in visual hierarchy, emphasis, focus states, or brand recognition.
+The current UI leans too heavily on neutral surfaces and isolated color usage. The fix is not to hand-color a few screens. The fix is to add a semantic accent system to `@sd/design-tokens`, project it into web CSS variables and native theme objects, and consume it through shared UI primitives.
 
-This plan defines how to introduce color systematically rather than through one-off overrides.
+## Non-Negotiable Architecture
 
-## Core Principles
+The color system must originate in `packages/design-tokens` and only there.
 
-- Keep the base UI readable and calm. Neutral surfaces remain the default foundation.
-- Use primary color for main actions, active states, and promoted emphasis.
-- Use secondary color as a supporting accent, not a competing CTA color.
-- Use radial and linear gradients as a deliberate part of the brand language, especially on promoted surfaces and primary actions.
-- Favor radial-led compositions for visual warmth and depth, with linear gradients as structural support rather than the only effect.
-- Prefer subtle tinted surfaces and borders over large saturated fills.
-- Keep Apple and Google provider buttons brand-authentic.
-- Encode reusable patterns in theme tokens and shared components before touching many screens.
-- Preserve parity in intent across desktop web, mobile web, and native mobile even if the exact implementation differs by platform.
+- Base tokens stay in `@sd/design-tokens`:
+  - color ramps
+  - surface roles
+  - border roles
+  - content roles
+  - spacing, radius, typography, shadows
+- Semantic accent recipes also live in `@sd/design-tokens`.
+- `apps/web` must not invent accent semantics in `theme-css.ts`.
+- `apps/web/src/app/theme-css.ts` should only project semantic tokens from `@sd/design-tokens` into CSS custom properties.
+- Native mobile should consume the same semantic recipes directly from the theme object.
+- `packages/shared` should consume semantic recipes and expose reusable UI primitives and variants.
+- Feature packages should consume shared primitives and recipe helpers, not define their own color systems.
 
-## Gradient Direction
+This resolves the biggest architectural risk: web and native semantics drifting apart.
+
+## External Guidance Informing This Plan
 
-Gradients should be treated as a first-class visual pattern in the system, not as an isolated button effect.
+This plan follows the repo guardrails and is also shaped by official platform guidance.
 
-### Preferred gradient language
+- Material 3 says primary is for prominent buttons, active states, and elevated-surface tint; secondary is for less-prominent UI such as chips; tertiary is for contrasting accents and balance.
+- Apple HIG emphasizes clear hierarchy, harmony, and accessibility, and warns against relying on color alone to communicate meaning.
+- Expo officially supports `expo-linear-gradient` as a universal gradient component for Android, iOS, tvOS, and web.
+- `react-native-svg` officially supports SVG across React Native and web, but its own docs note a known issue with RadialGradient focus points on Android.
 
-- radial gradients provide the most distinctive and appealing branded feel
-- linear gradients provide directional structure and help anchor the composition
-- the strongest branded surfaces should usually combine both:
-  - a radial highlight or glow layer
-  - a linear base gradient underneath
+These references support the following decisions:
 
-### Where gradients should appear
+- primary remains the main action color
+- secondary is supporting, not competing
+- gradients are allowed, but only on promoted surfaces
+- native radial effects should be constrained and simple
+
+## Monorepo Decision
+
+The best fit for this monorepo is:
+
+1. semantic accent recipes in `@sd/design-tokens`
+2. shared primitives in `@sd/shared`
+3. CSS projection for web
+4. theme-object consumption for native
 
-- primary CTAs
-- promoted cards and hero panels
-- highlighted empty and error state actions
-- selected or featured surfaces where we want stronger brand presence
+For native gradients:
+
+- use `expo-linear-gradient` for all native directional fills
+- use `react-native-svg` only for a small static radial glow primitive when needed
+- do not add a third gradient package
+- do not use image assets, masks, or complex SVG filters for accent surfaces
+
+This is the best fit because:
+
+- Expo officially supports `expo-linear-gradient`
+- the repo already includes `react-native-svg`
+- `react-native-svg` can provide a controlled radial overlay
+- using only these two tools minimizes dependency churn and keeps the system understandable
+
+## Design Standards For This System
+
+### Color role standards
+
+- `primary` = prominent actions, active states, selected emphasis, elevated tint
+- `secondary` = supporting emphasis, chips, informational accents, balance
+- `neutral` = foundation for canvas, cards, dense content, forms at rest
+
+### Gradient standards
+
+- radial gradients are the signature accent language
+- linear gradients provide directional structure underneath
+- promoted surfaces can use both
+- standard surfaces should not
+
+### Accessibility standards
+
+- never rely on color alone to express state
+- every selected, focused, error, success, or destructive state must also have shape, icon, label, border, or motion support
+- light and dark mode recipes must be validated independently
+
+## Proposed Token Architecture
 
-### Where gradients should not dominate
+Keep the existing base token categories. Add a new semantic recipe category in `@sd/design-tokens`.
+
+Recommended structure:
+
+```text
+packages/design-tokens/src/
+  colors/
+    shared.ts
+  spacing/
+    web.ts
+    native.ts
+  radius/
+    web.ts
+    native.ts
+  shadows/
+    shared.ts
+    web.ts
+    native.ts
+  typography/
+    shared.ts
+    web.ts
+    native.ts
+  recipes/
+    shared.ts
+    web.ts
+    native.ts
+  theme/
+    web.ts
+    native.ts
+  index.web.ts
+  index.native.ts
+```
+
+Why `recipes/`:
+
+- base tokens answer "what colors exist"
+- recipes answer "how brand emphasis is composed"
+- this keeps gradients and promoted surfaces from being scattered across app files
+
+## Semantic Recipe Model
+
+The semantic recipe layer should define reusable accent treatments instead of raw values.
 
-- long reading surfaces
-- dense forms and data-heavy panels
-- default list rows and generic containers
-- provider-auth buttons
+### Required recipes
+
+- `accent.primary.cta`
+- `accent.primary.ctaHover`
+- `accent.primary.ctaActive`
+- `accent.primary.subtleSurface`
+- `accent.primary.focusRing`
+- `accent.secondary.subtleSurface`
+- `accent.secondary.supportingBadge`
+- `accent.mixed.heroSurface`
+- `accent.mixed.promotedPanel`
+- `accent.selected.surface`
+- `accent.selected.content`
+- `accent.divider`
 
-The visual goal is to make gradients feel intentional and premium, not decorative for decoration's sake.
+### Web recipe fields
 
-## Color Usage Model
+Web recipes can expose CSS-ready values:
 
-### Primary
+- `background`
+- `backgroundHover`
+- `backgroundActive`
+- `borderColor`
+- `borderColorHover`
+- `textColor`
+- `shadow`
+- `radial`
+- `linear`
 
-Use primary for:
+### Native recipe fields
 
-- primary CTAs
-- focused inputs and active form controls
-- selected states
-- promoted links
-- subtle highlighted surfaces
-- branded section kickers and emphasis labels
+Native recipes should expose composition-ready values:
 
-Do not use primary for:
+- `baseColor`
+- `borderColor`
+- `textColor`
+- `shadowVariant`
+- `linearGradient.colors`
+- `linearGradient.start`
+- `linearGradient.end`
+- `radialGlow.centerColor`
+- `radialGlow.edgeColor`
+- `radialGlow.center`
+- `radialGlow.radius`
 
-- long body text
-- full-screen backgrounds
-- default borders on neutral UI
+## Native Gradient Strategy
 
-### Secondary
+This is the part that needs to be explicit.
 
-Use secondary for:
+### Approved native implementation
 
-- supportive highlights
-- badges and informational accents
-- decorative counterbalance in hero or panel backgrounds
-- secondary emphasis surfaces
+- Base fill: `expo-linear-gradient`
+- Optional radial glow overlay: a small shared `react-native-svg` primitive
 
-Do not use secondary for:
+### Disallowed native implementation paths
 
-- the main submit path on auth and core flows unless intentionally designed
-- generic hover states across the whole app
+- no gradient image assets
+- no filter-heavy SVG effects
+- no per-screen custom gradient implementations
+- no adding another gradient package unless this strategy fails in production
 
-### Neutral
+### Why this strategy
 
-Keep neutral for:
+- `expo-linear-gradient` is the official Expo path and works on Android, iOS, tvOS, and web
+- `react-native-svg` already exists in the repo and supports RN plus web
+- `react-native-svg` documents a known Android limitation for RadialGradient focus points, so we should not rely on advanced focal-point behavior
 
-- page canvases
-- default cards and panels
-- standard inputs at rest
-- long-form reading surfaces
-- provider button containers
+### Native radial rule
 
-## Phase 1: Theme Foundation
+The radial overlay must be:
 
-Create reusable semantic accent variables and theme fields first so color usage is consistent across all platforms.
+- static
+- simple
+- low-opacity
+- one overlay per promoted surface
+- limited to 2 or 3 stops
+- not animated unless profiling proves it is safe
 
-### Web theme additions
+## Web Strategy
 
-Extend `apps/web/src/app/theme-css.ts` with semantic custom properties derived from existing design tokens.
-
-Add or formalize variables for:
-
-- `--accent-primary-bg`
-- `--accent-primary-bg-hover`
-- `--accent-primary-bg-active`
-- `--accent-primary-radial`
-- `--accent-primary-linear`
-- `--accent-primary-border`
-- `--accent-primary-border-hover`
-- `--accent-primary-text`
-- `--accent-primary-subtle-bg`
-- `--accent-secondary-radial`
-- `--accent-secondary-linear`
-- `--accent-secondary-subtle-bg`
-- `--accent-secondary-border`
-- `--accent-secondary-text`
-- `--accent-mixed-surface`
-- `--accent-mixed-radial`
-- `--accent-mixed-linear`
-- `--accent-focus-ring`
-
-These should be derived only from theme token values, never raw hex literals.
-
-### Native theme additions
-
-Expose equivalent semantic values from `packages/design-tokens` for native consumption, likely via theme helpers rather than CSS variables.
-
-Add semantic fields or helpers for:
-
-- promoted CTA background
-- promoted CTA pressed background
-- promoted CTA radial highlight
-- promoted CTA linear base
-- promoted CTA border
-- subtle primary surface
-- subtle secondary surface
-- mixed accent surface
-- mixed accent radial overlay
-- mixed accent linear fill
-- branded focus or active ring equivalent
-
-If adding new token groups feels too heavy, add a small semantic helper layer that composes existing tokens into reusable visual treatments.
-
-## Phase 2: Shared Cross-Platform Patterns
-
-Before updating many screens, define a small set of reusable color recipes.
-
-### Required shared recipes
-
-- Primary CTA
-- Secondary CTA or supporting action
-- Tinted panel
-- Mixed accent hero surface
-- Selected pill or chip
-- Focused input
-- Branded kicker or section label
-- Accent divider
-- Highlight banner
-- Gradient surface recipe
-- Gradient overlay recipe
-
-### Web implementation
-
-Implement these through shared CSS classes or shared primitives in `packages/shared`.
-
-For web, the default promoted recipe should support layered backgrounds such as:
-
-- radial highlight layer
-- optional secondary radial support layer
-- linear gradient base layer
-
-Shared primitives should expose these recipes so features can opt into them without recreating gradient strings.
-
-### Native implementation
-
-Implement these through shared style helpers or component variants in `packages/shared` using the theme object.
-
-For native, gradients should be supported through a shared abstraction rather than ad hoc per-screen code. The implementation may use:
-
-- Expo `LinearGradient` for directional fills
-- a radial-like highlight approximation using layered translucent shapes, masked overlays, image assets, or a supported gradient solution already accepted by the codebase
-
-Native does not need pixel-identical parity with web. It should preserve the same visual intent:
-
-- soft radial emphasis
-- directional base fill
-- restrained saturation
-
-The goal is to avoid every screen hardcoding its own accent treatment.
-
-## Phase 3: Button Strategy
-
-Buttons are the most visible place where brand color should appear consistently.
-
-### Desktop web
-
-- Keep `ButtonDesktopWeb` as the primary source of truth for generic actions.
-- Ensure `primary`, `danger`, `ghost`, `outline`, and `surface` all use semantic tokens rather than local color mixes.
-- Apply the branded gradient or promoted accent treatment only to `primary`, not to all variants.
-- The primary button recipe should continue to use a radial highlight over a linear base, with hover and active states preserving that layered feel.
-
-### Mobile web
-
-- Audit inline button styles in mobile web feature screens.
-- Replace flat `action.primary` fills with the same semantic accent treatment used on desktop web where appropriate.
-- Where screens use local inline style objects, migrate button visuals into reusable constants or CSS modules if repetition grows.
-- Keep the gradient treatment lighter than desktop where space is tighter, but preserve the radial-plus-linear feel on promoted CTAs.
-
-### Native mobile
-
-- Update `ButtonMobileNative` to reflect the same emphasis model as web.
-- Use primary fills, subtle primary surfaces, and active borders driven by the native theme.
-- Support a native promoted CTA recipe that uses a soft highlight plus directional fill. Do not mimic web gradients literally if it looks unnatural on native. Match the intent, not the exact rendering.
-- Use pressed states to reinforce the accent rather than heavy visual effects.
-
-## Phase 4: Surface Hierarchy
-
-The screens currently rely too heavily on plain white and black surfaces.
-
-Introduce color through layered surfaces rather than saturating entire pages.
-
-### Desktop web and mobile web
-
-Apply accent surfaces to:
-
-- auth cards
-- hero panels
-- empty states
-- error callout shells
-- promoted search entry points
-
-Preferred treatments:
-
-- subtle primary-tinted wash
-- subtle secondary-tinted wash
-- mixed primary-secondary panel backgrounds for hero or promotional contexts
-- accent border on selected or promoted panels
-- radial highlight overlays on promoted surfaces where visual depth helps
-
-Keep most page backgrounds neutral.
-
-### Native mobile
-
-Use:
-
-- subtle tinted sections
-- softly accented cards
-- selected chips and tabs
-- active container borders
-- restrained layered fills for promoted surfaces when supported cleanly
-
-Avoid strong multi-layer gradients on every native surface. Native should stay cleaner and more material.
-
-## Phase 5: Typography and Content Accent
-
-Branded color should participate in text hierarchy, but in a controlled way.
-
-### Apply brand color to
-
-- section kickers
-- important inline links
-- selected navigation labels
-- supporting microcopy on promoted surfaces
-- badge text on tinted surfaces
-
-### Keep neutral for
-
-- body paragraphs
-- dense form instructions
-- long descriptions
-- default titles unless paired with an accent device
-
-### Recommended pattern
-
-Use neutral headings with one accent companion:
-
-- colored kicker above the title
-- colored underline or rule
-- colored badge or chip next to the title
-
-This gives identity without making the UI noisy.
-
-## Phase 6: Forms and Inputs
-
-Forms are currently one of the biggest missed opportunities for brand integration.
-
-### Desktop web and mobile web
-
-Update:
-
-- input focus borders to primary
-- focus shadows to branded focus treatment
-- checkbox and radio selected states to primary
-- helper links to branded content colors
-- section dividers and legal text links to subtle accent roles
-
-Keep rest states neutral. Branded color should appear when a field is active, selected, or promoted.
-
-### Native mobile
-
-Update:
-
-- `TextInput` focus and active border treatments
-- checkbox and switch selected states
-- segmented or tab-like controls
-- selected row affordances
-
-Avoid converting all input backgrounds to tinted fills. Focus and active states should carry most of the color.
-
-## Phase 7: Auth Screens Rollout
-
-Auth screens are the clearest current example of the palette being underused.
-
-### Desktop web
-
-Planned updates:
-
-- keep the form card mostly neutral but add a subtle mixed accent wash
-- use branded kicker or subtitle above the main title
-- keep provider buttons branded to provider
-- keep the submit button strongly branded
-- tint divider and link treatments with primary or secondary accents
-- use subtle accent treatment around terms and support links
-
-### Mobile web
-
-Planned updates:
-
-- mirror the same intent as desktop with lighter weight treatments
-- branded primary submit action
-- subtle accent in dividers and headings
-- restrained tinted sections around the form or header area
-
-### Native mobile
-
-Planned updates:
-
-- introduce a soft branded top section or panel behind the title area
-- use tinted chips or labels rather than dense gradients
-- keep inputs neutral until focus
-- keep CTA clearly primary
-- let secondary color appear in supporting links, helper notes, or badges
-
-## Phase 8: Search, Navigation, Empty, and Error States
-
-After auth, update the other high-visibility shared areas.
+Web should use CSS gradients generated from recipe tokens.
+
+`apps/web/src/app/theme-css.ts` should map recipe values from `@sd/design-tokens` into CSS variables such as:
+
+- `--accent-primary-cta-bg`
+- `--accent-primary-cta-bg-hover`
+- `--accent-primary-cta-border`
+- `--accent-primary-subtle-surface`
+- `--accent-mixed-hero-surface`
+
+Web should not compute recipe logic locally.
+
+## Shared Primitive Strategy
+
+`packages/shared` should become the main consumer-facing layer for accent usage.
+
+### Shared abstractions to add
+
+- button variants using semantic recipes
+- promoted panel or accent panel primitive
+- branded section header or kicker primitive
+- highlighted empty-state container
+- focus-ring helper for web and native
+- optional native `RadialGlow` helper
+
+This is the correct abstraction boundary for the monorepo:
+
+- `@sd/design-tokens` defines recipe data
+- `@sd/shared` defines reusable UI usage
+- feature packages compose screens from those pieces
+
+## Usage Constraints
+
+This is the restraint model that was missing from the previous plan.
+
+### Per-screen limits
+
+- max one strong promoted gradient surface per screen above the fold
+- max two secondary accent zones on a screen
+- do not stack multiple promoted gradients in the same viewport section
+- if a CTA already uses strong primary emphasis, nearby supporting controls should usually stay neutral or subtle
+
+### Where secondary is allowed
+
+- chips
+- supporting badges
+- hero balance accents
+- educational or informational panels
+
+### Where secondary is not allowed
+
+- main auth submit path
+- dominant nav chrome
+- dense form controls by default
+
+### Where gradients must degrade to subtle fills
+
+- dense form shells
+- long text content
+- list-heavy screens
+- low-end performance hotspots on native
+
+## Concrete Rollout
+
+### Phase 1: Add semantic recipes in `@sd/design-tokens`
+
+Tasks:
+
+- add `recipes/shared.ts`, `recipes/web.ts`, `recipes/native.ts`
+- define CTA, subtle surface, mixed hero, selected, and divider recipes
+- export recipes from `index.web.ts` and `index.native.ts`
+- keep `theme/web.ts` and `theme/native.ts` projecting recipe data into the final theme objects
+
+### Code example: recipe shape
+
+```typescript
+// packages/design-tokens/src/recipes/shared.ts
+export const accentRecipeNames = {
+  primaryCta: "primaryCta",
+  primarySubtleSurface: "primarySubtleSurface",
+  mixedHeroSurface: "mixedHeroSurface",
+} as const;
+```
+
+```typescript
+// packages/design-tokens/src/recipes/web.ts
+export const webAccentRecipes = {
+  primaryCta: {
+    background:
+      "radial-gradient(circle at 18% 22%, var(--accent-primary-radial), transparent 60%), linear-gradient(135deg, var(--action-primary), var(--action-primary-hover))",
+    borderColor: "color-mix(in srgb, var(--border-primary-strong) 58%, transparent)",
+    textColor: "var(--content-on-primary)",
+    shadow: "var(--shadow-sm)",
+  },
+} as const;
+```
+
+```typescript
+// packages/design-tokens/src/recipes/native.ts
+export const nativeAccentRecipes = {
+  primaryCta: {
+    textColorToken: "content.onPrimary",
+    borderColorToken: "border.primaryStrong",
+    shadowToken: "sm",
+    linearGradient: {
+      start: { x: 0, y: 0 },
+      end: { x: 1, y: 1 },
+      colorTokens: ["action.primary", "action.primaryHover"],
+    },
+    radialGlow: {
+      center: { x: 0.18, y: 0.22 },
+      radius: 0.58,
+      centerColorToken: "border.primaryStrong",
+      edgeColorToken: "transparent",
+    },
+  },
+} as const;
+```
+
+### Phase 2: Project web recipe tokens into CSS vars
+
+Tasks:
+
+- import recipe values from `@sd/design-tokens`
+- assign CSS vars only
+- avoid app-local recipe generation
+
+### Code example: web projection
+
+```typescript
+// apps/web/src/app/theme-css.ts
+import { lightWebTheme, darkWebTheme } from "@sd/design-tokens";
+
+const createThemeCss = (selector: string, theme: typeof lightWebTheme) => `
+${selector} {
+  --accent-primary-cta-bg: ${theme.recipes.primaryCta.background};
+  --accent-primary-cta-border: ${theme.recipes.primaryCta.borderColor};
+  --accent-primary-cta-text: ${theme.recipes.primaryCta.textColor};
+}
+`;
+```
+
+### Phase 3: Build shared UI consumers
+
+Tasks:
+
+- update `ButtonDesktopWeb`
+- update `ButtonMobileNative`
+- add shared promoted panel
+- add shared accent header
+
+### Code example: shared button on web
+
+```css
+.variant-primary {
+  --btn-bg: var(--accent-primary-cta-bg);
+  --btn-border: var(--accent-primary-cta-border);
+  --btn-fg: var(--accent-primary-cta-text);
+}
+```
+
+### Code example: shared button on native
+
+```tsx
+import { LinearGradient } from "expo-linear-gradient";
+import { useUnistyles } from "react-native-unistyles";
+
+export function PrimaryButtonBackground() {
+  const { theme } = useUnistyles();
+  const recipe = theme.recipes.primaryCta;
+
+  return (
+    <LinearGradient
+      colors={recipe.linearGradient.colors}
+      start={recipe.linearGradient.start}
+      end={recipe.linearGradient.end}
+      style={{ ...StyleSheet.absoluteFillObject }}
+    />
+  );
+}
+```
+
+### Phase 4: Add a shared native radial glow primitive
+
+This should be a very small primitive in `@sd/shared`, not a general-purpose graphics system.
+
+### Code example: native radial glow
+
+```tsx
+import Svg, { Defs, RadialGradient, Rect, Stop } from "react-native-svg";
+
+export function RadialGlow({ centerColor, edgeColor }: { centerColor: string; edgeColor: string }) {
+  return (
+    <Svg pointerEvents="none" width="100%" height="100%">
+      <Defs>
+        <RadialGradient id="glow" cx="18%" cy="22%" rx="58%" ry="58%">
+          <Stop offset="0%" stopColor={centerColor} stopOpacity="0.56" />
+          <Stop offset="100%" stopColor={edgeColor} stopOpacity="0" />
+        </RadialGradient>
+      </Defs>
+      <Rect x="0" y="0" width="100%" height="100%" fill="url(#glow)" />
+    </Svg>
+  );
+}
+```
+
+Important constraint:
+
+- do not use `fx` or `fy`
+- the `react-native-svg` docs note Android limitations around RadialGradient focus points
+
+### Phase 5: Screen rollout
+
+Rollout order:
+
+1. shared CTA and promoted panel recipes
+2. auth desktop web
+3. auth mobile web
+4. auth native mobile
+5. search entry points
+6. nav active states and auth CTAs
+7. empty and error states
+8. informational panels and badges
+
+## Screen-Level Intent
+
+### Auth
+
+- primary CTA uses full promoted recipe
+- provider buttons remain provider-branded
+- headings remain mostly neutral with accented kicker or divider
+- cards may use subtle mixed accent wash, not full saturation
 
 ### Search
 
-- add a promoted variant for search entry points using subtle primary surface
-- use selected and hover states that draw from primary and secondary accents
+- selected chips and promoted search entry points may use primary and secondary supporting accents
+- list-heavy results remain mostly neutral
 
 ### Navigation
 
-- active nav items should use branded text and subtle accent backgrounds
-- auth CTAs in headers should align with the shared button recipes
-- avoid coloring the entire nav chrome
+- active item = subtle branded surface plus branded content
+- nav shell stays neutral
 
 ### Empty and error states
 
-- use subtle accent surfaces around primary actions
-- use branded CTA treatment for the main recovery action
-- add small branded kickers or labels where appropriate
+- one promoted action zone
+- one supporting accent zone
+- no full-screen gradient backgrounds
 
-### Informational panels and badges
+## Verification Strategy
 
-- use secondary subtle surfaces for supportive or educational messages
-- reserve primary for the main task path
+This is the solution to the system-level verification problem.
 
-## Phase 9: Platform-Specific Rules
+Do not verify only at screen level. Verify at recipe, primitive, and screen level.
 
-### Desktop web
+### Layer 1: token and recipe verification
 
-- can support richer surface treatments such as layered gradients and glow-based accents
-- use the most expressive accent rendering here
-- maintain strong contrast and restrained saturation
-- radial gradients can be used more freely here, especially in hero panels, CTAs, and promoted cards
+- typecheck `@sd/design-tokens`
+- snapshot or unit-test recipe objects where practical
+- verify light and dark variants exist for each recipe
 
-### Mobile web
+### Layer 2: shared primitive verification
 
-- should stay visually close to desktop web but lighter and less dense
-- use fewer layered effects
-- prioritize clarity and tap target emphasis
-- preserve the same gradient language, but simplify the number and intensity of layers
+- visual review for shared button, promoted panel, accent header
+- ensure each primitive renders correctly on desktop web, mobile web, iOS, and Android
+- test disabled, focused, pressed, and selected states
 
-### Native mobile
+### Layer 3: screen verification
 
-- should not mechanically copy desktop gradients
-- use theme-driven fills, borders, pressed states, subtle tinted sections, and a shared promoted-gradient pattern where feasible
-- rely more on spacing, hierarchy, and active states than on decorative gradients
-- radial effects on native should be approximated carefully so they feel natural and performant
+- auth, search, navigation, empty, error
+- verify screen-level restraint rules are respected
 
-## Phase 10: Refactor and Consolidation
+### Layer 4: performance verification on native
 
-The current codebase still contains many screen-local style decisions.
+- profile screens using native promoted surfaces
+- if SVG radial overlays regress performance, fall back to linear-only subtle treatment on those screens
 
-Refactor goals:
+## Internal Review Harness
 
-- move repeated visual treatments into `packages/shared`
-- reduce inline color styling in mobile web and desktop web screens
-- prefer semantic variables and helper functions over direct token usage in screen files
-- keep feature packages consuming shared color recipes instead of re-defining them
+To keep this maintainable, create a small internal recipe showcase.
 
-This is necessary to keep future color work maintainable.
+Recommended:
 
-## Phase 11: Accessibility and QA
+- one internal web route showing all accent recipes
+- one internal native screen showing the same recipe set
 
-Every phase should include accessibility checks.
+This gives the team a single place to review:
 
-### Required checks
+- primary CTA
+- subtle surface
+- mixed hero
+- selected chip
+- focus state
+- disabled state
+- dark mode
 
-- contrast on tinted surfaces in light and dark themes
-- CTA text contrast against primary fills
-- link contrast in body contexts
-- focus visibility on all platforms
-- selected state clarity for chips, tabs, and list items
-- pressed and disabled differentiation
+This is the professional solution to the verification gap because it turns a vague visual system into a reviewable surface.
 
-### Verification steps
+## Final Recommendation
 
-- `pnpm --filter web typecheck`
-- targeted visual review of desktop web
-- responsive visual review for mobile web
-- native simulator review for iOS and Android
-- confirm no raw brand hex values are introduced in feature code where theme tokens should be used
+Implement the system with this boundary:
 
-## Rollout Order
+- `@sd/design-tokens`: base tokens plus semantic accent recipes
+- `apps/web`: projection of recipe values into CSS vars only
+- `@sd/shared`: reusable components and primitives that consume recipes
+- feature packages: screen composition only
 
-Implement in this order:
+Implement native gradients with:
 
-1. Theme semantic accent variables and native semantic helpers
-2. Shared button, panel, focus, and gradient recipes
-3. Auth desktop web
-4. Auth mobile web
-5. Auth native mobile
-6. Search and navigation accents
-7. Empty states and error states
-8. Supporting informational panels and badges
-9. Final dark-mode tuning and accessibility sweep
+- `expo-linear-gradient` for all directional fills
+- `react-native-svg` only for a constrained, static radial glow helper
 
-## Deliverables
-
-By the end of the rollout, the UI should show clear brand presence through:
-
-- primary CTAs that feel consistent everywhere
-- subtle branded surfaces around promoted content
-- visible primary focus and selected states
-- strategic secondary accents in supporting UI
-- shared recipes reused across desktop web, mobile web, and native mobile
-
-The result should feel branded and intentional without turning the product into a saturated marketing page.
+This is the most suitable option for the monorepo because it keeps design authority centralized, minimizes dependencies, respects Expo and React Native constraints, and gives both web and native a coherent branded system without forcing identical rendering.

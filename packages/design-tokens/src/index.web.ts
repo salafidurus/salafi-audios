@@ -2,6 +2,14 @@ export { sharedColors, createColors, type SharedColors, type AppColors } from ".
 
 export { spacingWeb, type SpacingWeb } from "./spacing/web";
 export { radiusWeb, type RadiusWeb } from "./radius/web";
+export { createAccentRecipesWeb, type AccentRecipesWeb } from "./recipes/web";
+export type {
+  AccentLinearRecipe,
+  AccentPrimaryCtaRecipe,
+  AccentRadialRecipe,
+  AccentRecipesShared,
+  AccentSurfaceRecipe,
+} from "./recipes/shared";
 
 export {
   fontWeight,

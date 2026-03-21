@@ -9,6 +9,7 @@ export type { NotFoundStateProps } from "./components/NotFoundState/NotFoundStat
 
 export { ButtonMobileNative } from "./components/Button/Button.native";
 export type { ButtonMobileNativeProps } from "./components/Button/Button.native";
+export { AccentGradientFill } from "./components/AccentGradientFill/AccentGradientFill.native";
 
 export { UniversalListMobileNative } from "./components/UniversalList/UniversalList.native";
 export type { UniversalListMobileNativeProps } from "./components/UniversalList/UniversalList.native";

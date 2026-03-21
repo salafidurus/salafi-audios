@@ -6,9 +6,9 @@ export function ScreenInProgressMobileWeb() {
   const { theme } = useUnistyles();
 
   return (
-    <ScreenViewWeb center>
-      <Text style={[styles.title, { color: theme.colors.content.strong }]}>Coming Soon</Text>
-      <Text style={[styles.subtitle, { color: theme.colors.content.muted }]}>
+    <ScreenViewWeb center backgroundVariant="mixedWash">
+      <Text style={[styles.title, { color: theme.colors.content.primary }]}>Coming Soon</Text>
+      <Text style={[styles.subtitle, { color: theme.colors.content.default }]}>
         This feature is under development
       </Text>
     </ScreenViewWeb>
