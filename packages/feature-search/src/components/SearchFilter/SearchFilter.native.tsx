@@ -16,7 +16,13 @@ export type SearchFilterProps = {
   topics: TopicDetailDto[];
 };
 
-export function SearchFilter({ value, onChange, topics }: SearchFilterProps) {
+export type SearchFilterMobileNativeProps = SearchFilterProps;
+
+export function SearchFilterMobileNative({
+  value,
+  onChange,
+  topics,
+}: SearchFilterMobileNativeProps) {
   const options = useMemo<FilterOption[]>(() => {
     const sortedTopics = [...topics].sort((a, b) => a.name.localeCompare(b.name));
     return [
@@ -84,7 +90,7 @@ const styles = StyleSheet.create((theme) => ({
     borderColor: theme.recipes.primarySubtleSurface.borderColor,
   },
   chipPressed: {
-    opacity: 0.85,
+    opacity: 0.9,
   },
   chipLabel: {
     color: theme.colors.content.muted,

@@ -22,13 +22,15 @@ export type SearchResultsListProps = {
   renderItem: (item: SearchResultRow) => React.ReactElement | null;
 };
 
-export function SearchResultsList({
+export type SearchResultsListMobileWebProps = SearchResultsListProps;
+
+export function SearchResultsListMobileWeb({
   items,
   isFetching,
   shouldSearch,
   errorMessage,
   renderItem,
-}: SearchResultsListProps) {
+}: SearchResultsListMobileWebProps) {
   const { theme } = useUnistyles();
   const scrollRef = useDragScrollWeb("vertical");
 

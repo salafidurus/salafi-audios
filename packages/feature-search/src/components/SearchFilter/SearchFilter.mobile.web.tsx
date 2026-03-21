@@ -21,7 +21,9 @@ export type SearchFilterProps = {
   topics: TopicDetailDto[];
 };
 
-export function SearchFilter({ value, onChange, topics }: SearchFilterProps) {
+export type SearchFilterMobileWebProps = SearchFilterProps;
+
+export function SearchFilterMobileWeb({ value, onChange, topics }: SearchFilterMobileWebProps) {
   const { theme } = useUnistyles();
   const scrollRef = useDragScrollWeb("horizontal");
 

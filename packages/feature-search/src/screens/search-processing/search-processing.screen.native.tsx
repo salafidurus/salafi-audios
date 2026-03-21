@@ -3,13 +3,13 @@ import { View } from "react-native";
 import type { SearchCatalogItemDto, SearchCatalogResultsDto } from "@sd/core-contracts";
 import { StyleSheet } from "react-native-unistyles";
 import {
-  SearchFilter,
+  SearchFilterMobileNative,
   type SearchFilterValue,
 } from "../../components/SearchFilter/SearchFilter.native";
 import { SearchInput, type SearchInputRef } from "../../components/SearchInput/SearchInput.native";
-import { SearchResultItem } from "../../components/SearchResultItem/SearchResultItem.native";
+import { SearchResultItemMobileNative } from "../../components/SearchResultItem/SearchResultItem.native";
 import {
-  SearchResultsList,
+  SearchResultsListMobileNative,
   type SearchResultRow,
 } from "../../components/SearchResultsList/SearchResultsList.native";
 import { useSearchCatalog, useTopicsList } from "../../api/search.api";
@@ -79,15 +79,17 @@ export function SearchProcessingMobileNativeScreen({
           onChange={setQuery}
           onBackPress={onBackPress}
         />
-        {shouldSearch ? <SearchFilter value={filter} onChange={setFilter} topics={topics} /> : null}
+        {shouldSearch ? (
+          <SearchFilterMobileNative value={filter} onChange={setFilter} topics={topics} />
+        ) : null}
       </View>
-      <SearchResultsList
+      <SearchResultsListMobileNative
         items={items}
         isFetching={isFetching}
         shouldSearch={shouldSearch}
         errorMessage={errorMessage}
         renderItem={(item: SearchResultRow) => (
-          <SearchResultItem
+          <SearchResultItemMobileNative
             title={item.title}
             scholarName={item.scholarName}
             imageUrl={item.imageUrl}

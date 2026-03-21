@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense } from "react";
 import {
   type SearchCatalogResultsDto,
   type SearchCatalogParams,
@@ -10,7 +11,10 @@ import {
 } from "@sd/core-contracts";
 import { useApiQuery } from "@sd/core-contracts/query/hooks";
 import { httpClient } from "@sd/core-contracts/http";
-import { SearchProcessingDesktopWebView } from "../../components/SearchProcessingDesktopView/SearchProcessingDesktopView.desktop.web";
+import { SearchFilterDesktopWeb } from "../../components/SearchFilter/SearchFilter.desktop.web";
+import { SearchInputDesktopWeb } from "../../components/SearchInput/SearchInput.desktop.web";
+import { SearchResultItemDesktopWeb } from "../../components/SearchResultItem/SearchResultItem.desktop.web";
+import { SearchResultsListDesktopWeb } from "../../components/SearchResultsList/SearchResultsList.desktop.web";
 import { buildSearchResultItems } from "../../utils/build-search-result-items";
 
 export function SearchProcessingDesktopWebScreen() {
@@ -51,18 +55,34 @@ export function SearchProcessingDesktopWebScreen() {
     inputRef.current?.focus();
   }, []);
 
+  const errorMessage =
+    error instanceof Error ? error.message : error ? "Unable to reach the server." : undefined;
+
   return (
-    <SearchProcessingDesktopWebView
-      inputRef={inputRef}
-      query={query}
-      onQueryChange={setQuery}
-      filters={filters}
-      onFiltersChange={setFilters}
-      topics={topics ?? []}
-      results={results}
-      isFetching={isFetching}
-      shouldSearch={shouldSearch}
-      error={error}
-    />
+    <main className="flex flex-1 flex-col">
+      <div className="sticky top-0 z-10 bg-[color-mix(in_srgb,var(--surface-canvas)_86%,transparent)] px-[var(--space-layout-page-x)] pt-[var(--space-layout-page-y)] pb-[var(--space-component-gap-md)] backdrop-blur-sm">
+        <div className="mx-auto flex w-full max-w-[52rem] flex-col gap-[var(--space-component-gap-md)]">
+          <SearchInputDesktopWeb
+            ref={inputRef}
+            placeholder="Search"
+            value={query}
+            onChange={setQuery}
+            autoFocus
+          />
+          <SearchFilterDesktopWeb value={filters} onChange={setFilters} topics={topics ?? []} />
+        </div>
+      </div>
+      <section className="mx-auto w-full max-w-[70rem] px-[var(--space-layout-page-x)] pb-[var(--space-layout-page-y)]">
+        <Suspense fallback={<p className="text-[var(--content-muted)]">Loading results…</p>}>
+          <SearchResultsListDesktopWeb
+            items={results}
+            isFetching={isFetching}
+            shouldSearch={shouldSearch}
+            errorMessage={errorMessage}
+            renderItem={(item) => <SearchResultItemDesktopWeb {...item} />}
+          />
+        </Suspense>
+      </section>
+    </main>
   );
 }

@@ -1,11 +1,13 @@
-import type { SearchCatalogItemDto } from "@sd/core-contracts";
-import { SearchResultItemDesktopWeb } from "../SearchResultItem/SearchResultItem.desktop.web";
+import type React from "react";
+
+import type { SearchResultRow } from "../../utils/build-search-result-items";
 
 export type SearchResultsListDesktopWebProps = {
-  results: Array<SearchCatalogItemDto & { group: string }>;
+  items: SearchResultRow[];
   isFetching: boolean;
   shouldSearch: boolean;
-  error: unknown;
+  errorMessage?: string;
+  renderItem: (item: SearchResultRow) => React.ReactElement | null;
 };
 
 const captionStyle = {
@@ -15,10 +17,11 @@ const captionStyle = {
 } as const;
 
 export function SearchResultsListDesktopWeb({
-  results,
+  items,
   isFetching,
   shouldSearch,
-  error,
+  errorMessage,
+  renderItem,
 }: SearchResultsListDesktopWebProps) {
   return (
     <div className="flex flex-col gap-[var(--space-component-gap-md)]">
@@ -27,19 +30,19 @@ export function SearchResultsListDesktopWeb({
           Searching…
         </p>
       ) : null}
-      {error ? (
+      {errorMessage ? (
         <p className="text-center text-[var(--content-muted)]" style={captionStyle}>
-          Something went wrong. Please try again.
+          {errorMessage}
         </p>
       ) : null}
-      {!isFetching && shouldSearch && results.length === 0 ? (
+      {!isFetching && shouldSearch && items.length === 0 ? (
         <p className="text-center text-[var(--content-muted)]" style={captionStyle}>
           No results yet.
         </p>
       ) : null}
       <div className="flex flex-col divide-y divide-[var(--border-subtle)]">
-        {results.map((item) => (
-          <SearchResultItemDesktopWeb key={`${item.group}-${item.id}`} {...item} />
+        {items.map((item) => (
+          <div key={item.id}>{renderItem(item)}</div>
         ))}
       </div>
     </div>

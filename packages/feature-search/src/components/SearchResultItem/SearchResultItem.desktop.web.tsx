@@ -1,7 +1,14 @@
 import { Play, Headphones, Clock } from "lucide-react";
-import type { SearchCatalogItemDto } from "@sd/core-contracts";
 
-export type SearchResultItemDesktopWebProps = SearchCatalogItemDto & { group: string };
+export type SearchResultItemDesktopWebProps = {
+  title: string;
+  scholarName: string;
+  coverImageUrl?: string;
+  scholarImageUrl?: string;
+  lectureCount: number;
+  durationSeconds?: number;
+  group: string;
+};
 
 const captionStyle = {
   fontFamily: "var(--typo-caption-font-family)",
@@ -21,18 +28,12 @@ const titleMdStyle = {
   fontWeight: "var(--typo-title-md-font-weight)",
 } as const;
 
-export function SearchResultItemDesktopWeb({
-  group,
-  ...item
-}: SearchResultItemDesktopWebProps) {
+export function SearchResultItemDesktopWeb({ group, ...item }: SearchResultItemDesktopWebProps) {
   const imageUrl = item.coverImageUrl ?? item.scholarImageUrl;
   const durationLabel = formatDuration(item.durationSeconds);
 
   return (
-    <article
-      key={`${group}-${item.id}`}
-      className="flex items-center gap-[var(--space-component-gap-md)] py-3 transition hover:bg-[var(--surface-hover)] rounded-[var(--radius-component-card)] px-2 cursor-pointer"
-    >
+    <article className="flex cursor-pointer items-center gap-[var(--space-component-gap-md)] rounded-[var(--radius-component-card)] border border-transparent px-3 py-3 transition hover:border-[var(--accent-primary-subtle-border)] hover:bg-[var(--accent-primary-subtle-surface)] hover:shadow-[0_18px_36px_-30px_var(--accent-primary-border)]">
       <div className="w-[20%] xl:w-[10%] shrink-0 aspect-[4/5] overflow-hidden rounded-[var(--radius-component-panel-sm)] bg-[var(--surface-subtle)] flex items-center justify-center">
         {imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element

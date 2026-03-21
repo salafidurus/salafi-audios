@@ -6,15 +6,15 @@ import type { SearchCatalogItemDto, SearchCatalogResultsDto } from "@sd/core-con
 import { StyleSheet } from "react-native-unistyles";
 import { ScreenViewWeb } from "@sd/shared";
 import {
-  SearchFilter,
+  SearchFilterMobileWeb,
   type SearchFilterValue,
-} from "../../components/SearchFilter/SearchFilter.web";
+} from "../../components/SearchFilter/SearchFilter.mobile.web";
 import { SearchInput, type SearchInputRef } from "../../components/SearchInput/SearchInput.web";
-import { SearchResultItem } from "../../components/SearchResultItem/SearchResultItem.web";
+import { SearchResultItemMobileWeb } from "../../components/SearchResultItem/SearchResultItem.mobile.web";
 import {
-  SearchResultsList,
+  SearchResultsListMobileWeb,
   type SearchResultRow,
-} from "../../components/SearchResultsList/SearchResultsList.web";
+} from "../../components/SearchResultsList/SearchResultsList.mobile.web";
 import { useSearchCatalog, useTopicsList } from "../../api/search.api";
 
 export type SearchProcessingScreenProps = {
@@ -72,7 +72,7 @@ export function SearchProcessingMobileWebScreen({
   }, [error]);
 
   return (
-    <ScreenViewWeb backgroundVariant="primaryWash" contentStyle={styles.screenContent}>
+    <ScreenViewWeb contentStyle={styles.screenContent}>
       <View style={styles.searchGroup}>
         <SearchInput
           ref={inputRef}
@@ -81,15 +81,17 @@ export function SearchProcessingMobileWebScreen({
           onChange={setQuery}
           onBackPress={onBackPress}
         />
-        {shouldSearch ? <SearchFilter value={filter} onChange={setFilter} topics={topics} /> : null}
+        {shouldSearch ? (
+          <SearchFilterMobileWeb value={filter} onChange={setFilter} topics={topics} />
+        ) : null}
       </View>
-      <SearchResultsList
+      <SearchResultsListMobileWeb
         items={items}
         isFetching={isFetching}
         shouldSearch={shouldSearch}
         errorMessage={errorMessage}
         renderItem={(item: SearchResultRow) => (
-          <SearchResultItem
+          <SearchResultItemMobileWeb
             title={item.title}
             scholarName={item.scholarName}
             imageUrl={item.imageUrl}

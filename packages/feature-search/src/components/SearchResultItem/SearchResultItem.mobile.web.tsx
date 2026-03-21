@@ -18,14 +18,16 @@ export type SearchResultItemProps = {
   onPress?: () => void;
 };
 
-export function SearchResultItem({
+export type SearchResultItemMobileWebProps = SearchResultItemProps;
+
+export function SearchResultItemMobileWeb({
   title,
   scholarName,
   imageUrl,
   lectureCount,
   durationSeconds,
   onPress,
-}: SearchResultItemProps) {
+}: SearchResultItemMobileWebProps) {
   const { theme } = useUnistyles();
   const [isPressed, setIsPressed] = useState(false);
   const durationLabel = formatDuration(durationSeconds);
