@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native-unistyles";
 import { Text } from "react-native-unistyles/components/native/Text";
 import { View } from "react-native-unistyles/components/native/View";
-import { BrowseCard } from "../BrowseCard/BrowseCard.web";
+import { BrowseCardMobileWeb } from "../BrowseCard/BrowseCard.mobile.web";
 
 const browseCategories = [
   { name: "Senior Scholars", searchKey: "Senior Scholars" },
@@ -12,18 +12,18 @@ const browseCategories = [
   { name: "Farah", searchKey: "Farah" },
 ] as const;
 
-export type QuickBrowseProps = {
+export type QuickBrowseMobileWebProps = {
   onSelectCategory?: (searchKey: string) => void;
 };
 
-export function QuickBrowse({ onSelectCategory }: QuickBrowseProps) {
+export function QuickBrowseMobileWeb({ onSelectCategory }: QuickBrowseMobileWebProps) {
   return (
     <View>
       <Text style={styles.header}>Browse all</Text>
       <View style={styles.grid}>
         {browseCategories.map((category) => (
           <View key={category.name} style={styles.cardWrapper}>
-            <BrowseCard
+            <BrowseCardMobileWeb
               name={category.name}
               onPress={() => onSelectCategory?.(category.searchKey)}
             />

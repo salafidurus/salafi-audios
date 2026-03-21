@@ -2,7 +2,7 @@ import { type CSSProperties } from "react";
 import React from "react";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { View } from "react-native-unistyles/components/native/View";
-import { SearchResultEmpty } from "../SearchResultEmpty/SearchResultEmpty.web";
+import { SearchResultEmptyMobileWeb } from "../SearchResultEmpty/SearchResultEmpty.mobile.web";
 import { useDragScrollWeb } from "@sd/shared";
 
 export type SearchResultRow = {
@@ -49,7 +49,7 @@ export function SearchResultsListMobileWeb({
     >
       <div style={{ paddingBottom: theme.spacing.layout.pageY }}>
         {items.length === 0 ? (
-          <SearchResultEmpty
+          <SearchResultEmptyMobileWeb
             shouldSearch={shouldSearch}
             isFetching={isFetching}
             errorMessage={errorMessage}

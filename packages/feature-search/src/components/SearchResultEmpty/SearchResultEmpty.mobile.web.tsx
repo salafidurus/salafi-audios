@@ -2,17 +2,17 @@ import { type ViewStyle } from "react-native";
 import { Text, View } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
 
-export type SearchResultEmptyProps = {
+export type SearchResultEmptyMobileWebProps = {
   shouldSearch: boolean;
   isFetching: boolean;
   errorMessage?: string;
 };
 
-export function SearchResultEmpty({
+export function SearchResultEmptyMobileWeb({
   shouldSearch,
   isFetching,
   errorMessage,
-}: SearchResultEmptyProps) {
+}: SearchResultEmptyMobileWebProps) {
   const { theme } = useUnistyles();
 
   const message = shouldSearch

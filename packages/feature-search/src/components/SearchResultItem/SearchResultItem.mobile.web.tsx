@@ -7,7 +7,7 @@ import { Pressable } from "react-native-unistyles/components/native/Pressable";
 import { Text } from "react-native-unistyles/components/native/Text";
 import { View } from "react-native-unistyles/components/native/View";
 import { Headphones, Clock } from "lucide-react";
-import { MarqueeText } from "../MarqueeText/MarqueeText.web";
+import { MarqueeTextMobileWeb } from "../MarqueeText/MarqueeText.mobile.web";
 
 export type SearchResultItemProps = {
   title: string;
@@ -52,8 +52,8 @@ export function SearchResultItemMobileWeb({
         )}
       </View>
       <View style={styles.body}>
-        <MarqueeText text={title} textStyle={styles.title} />
-        <MarqueeText text={scholarName} textStyle={styles.scholarName} />
+        <MarqueeTextMobileWeb text={title} textStyle={styles.title} />
+        <MarqueeTextMobileWeb text={scholarName} textStyle={styles.scholarName} />
         <View style={styles.metaRow}>
           <Headphones size={11} color={theme.colors.content.muted} />
           <Text style={styles.metaText}>{formatLectureCount(lectureCount)}</Text>

@@ -9,7 +9,10 @@ import {
   SearchFilterMobileWeb,
   type SearchFilterValue,
 } from "../../components/SearchFilter/SearchFilter.mobile.web";
-import { SearchInput, type SearchInputRef } from "../../components/SearchInput/SearchInput.web";
+import {
+  SearchInputMobileWeb,
+  type SearchInputMobileWebRef,
+} from "../../components/SearchInput/SearchInput.mobile.web";
 import { SearchResultItemMobileWeb } from "../../components/SearchResultItem/SearchResultItem.mobile.web";
 import {
   SearchResultsListMobileWeb,
@@ -29,7 +32,7 @@ export function SearchProcessingMobileWebScreen({
   const [query, setQuery] = useState(prefill || "");
   const [debouncedQuery, setDebouncedQuery] = useState(prefill || "");
   const [filter, setFilter] = useState<SearchFilterValue>([]);
-  const inputRef = useRef<SearchInputRef>(null);
+  const inputRef = useRef<SearchInputMobileWebRef>(null);
 
   useEffect(() => {
     setQuery(prefill || "");
@@ -74,7 +77,7 @@ export function SearchProcessingMobileWebScreen({
   return (
     <ScreenViewWeb contentStyle={styles.screenContent}>
       <View style={styles.searchGroup}>
-        <SearchInput
+        <SearchInputMobileWeb
           ref={inputRef}
           placeholder="Search"
           value={query}

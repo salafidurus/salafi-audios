@@ -23,3 +23,12 @@ export { shadowsShared, type ShadowsShared } from "./shadows/shared";
 export { shadowsWeb, createShadowsWeb, type ShadowsWeb, type ShadowsWebTheme } from "./shadows/web";
 
 export { createThemeWeb, lightWebTheme, darkWebTheme, type AppThemeWeb } from "./theme/web";
+// Keep the mobile themes available from the default entry as well.
+// Some workspace package builds resolve @sd/design-tokens through the default
+// export path even when compiling native-only sources.
+export {
+  createThemeMobile,
+  lightMobileTheme,
+  darkMobileTheme,
+  type AppThemeMobile,
+} from "./theme/native";

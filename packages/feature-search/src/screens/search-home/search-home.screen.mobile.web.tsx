@@ -1,8 +1,8 @@
 import { View } from "react-native-unistyles/components/native/View";
 import { StyleSheet } from "react-native-unistyles";
-import { QuickBrowse } from "../../components/QuickBrowse/QuickBrowse.web";
-import { SearchButton } from "../../components/SearchButton/SearchButton.web";
-import { TitleText } from "../../components/TitleText/TitleText.web";
+import { QuickBrowseMobileWeb } from "../../components/QuickBrowse/QuickBrowse.mobile.web";
+import { SearchButtonMobileWeb } from "../../components/SearchButton/SearchButton.mobile.web";
+import { TitleTextMobileWeb } from "../../components/TitleText/TitleText.mobile.web";
 import { ScreenViewWeb } from "@sd/shared";
 
 export type SearchHomeScreenProps = {
@@ -19,11 +19,14 @@ export function SearchHomeMobileWebScreen({
       <View style={styles.content}>
         <View style={styles.searchGroup}>
           <View style={styles.header}>
-            <TitleText>Find a lesson</TitleText>
+            <TitleTextMobileWeb>Find a lesson</TitleTextMobileWeb>
           </View>
-          <SearchButton placeholder="What do you want to listen to?" onPress={onOpenSearch} />
+          <SearchButtonMobileWeb
+            placeholder="What do you want to listen to?"
+            onPress={onOpenSearch}
+          />
         </View>
-        <QuickBrowse onSelectCategory={onSelectCategory} />
+        <QuickBrowseMobileWeb onSelectCategory={onSelectCategory} />
       </View>
     </ScreenViewWeb>
   );

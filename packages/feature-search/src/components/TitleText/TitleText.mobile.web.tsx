@@ -1,12 +1,12 @@
 import { StyleSheet } from "react-native-unistyles";
 import { Text } from "react-native-unistyles/components/native/Text";
 
-export type TitleTextProps = {
+export type TitleTextMobileWebProps = {
   children: string;
   delay?: number;
 };
 
-export function TitleText({ children }: TitleTextProps) {
+export function TitleTextMobileWeb({ children }: TitleTextMobileWebProps) {
   return <Text style={styles.title}>{children}</Text>;
 }
 

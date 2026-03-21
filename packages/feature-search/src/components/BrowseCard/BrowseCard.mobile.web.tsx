@@ -6,12 +6,12 @@ import { Pressable } from "react-native-unistyles/components/native/Pressable";
 import { Text } from "react-native-unistyles/components/native/Text";
 import { View } from "react-native-unistyles/components/native/View";
 
-export type BrowseCardProps = {
+export type BrowseCardMobileWebProps = {
   name: string;
   onPress?: (name: string) => void;
 };
 
-export function BrowseCard({ name, onPress }: BrowseCardProps) {
+export function BrowseCardMobileWeb({ name, onPress }: BrowseCardMobileWebProps) {
   const { theme } = useUnistyles();
   const [isPressed, setIsPressed] = useState(false);
 
