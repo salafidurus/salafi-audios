@@ -51,14 +51,17 @@
   justify-content: center;
   padding: 0.55rem 1rem;
   border-radius: var(--radius-component-chip);
-  border: 1px solid color-mix(in srgb, var(--border-default) 80%, transparent);
-  background: var(--action-primary);
+  border: 1px solid var(--accent-primary-border, var(--action-primary));
+  background: var(--accent-primary-bg, var(--action-primary));
   color: var(--content-on-primary);
   font-weight: 700;
   cursor: pointer;
+  box-shadow: var(--shadow-sm);
 }
 
 .button:hover {
+  background: var(--accent-primary-bg-hover, var(--action-primary-hover));
+  border-color: var(--accent-primary-border-hover, var(--action-primary-hover));
   filter: saturate(1.05);
 }
 

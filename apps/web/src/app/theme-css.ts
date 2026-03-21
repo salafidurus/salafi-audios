@@ -44,6 +44,12 @@ ${selector} {
   --action-primary: ${theme.colors.action.primary};
   --action-primary-hover: ${theme.colors.action.primaryHover};
   --action-primary-active: ${theme.colors.action.primaryActive};
+  --accent-primary-glow: color-mix(in srgb, ${theme.colors.border.primaryStrong} 58%, transparent);
+  --accent-primary-bg: radial-gradient(circle at 18% 22%, var(--accent-primary-glow), transparent 60%), linear-gradient(135deg, ${theme.colors.action.primary}, ${theme.colors.action.primaryHover});
+  --accent-primary-bg-hover: radial-gradient(circle at 18% 22%, color-mix(in srgb, ${theme.colors.border.primaryStrong} 68%, transparent), transparent 60%), linear-gradient(135deg, ${theme.colors.action.primaryHover}, ${theme.colors.action.primaryActive});
+  --accent-primary-bg-active: radial-gradient(circle at 18% 22%, color-mix(in srgb, ${theme.colors.border.primaryStrong} 72%, transparent), transparent 60%), linear-gradient(135deg, ${theme.colors.action.primaryHover}, ${theme.colors.action.primaryActive});
+  --accent-primary-border: color-mix(in srgb, ${theme.colors.border.primaryStrong} 58%, transparent);
+  --accent-primary-border-hover: color-mix(in srgb, ${theme.colors.border.primaryStrong} 72%, transparent);
   --action-secondary: ${theme.colors.action.secondary};
   --action-secondary-hover: ${theme.colors.action.secondaryHover};
   --action-secondary-active: ${theme.colors.action.secondaryActive};

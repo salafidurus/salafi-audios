@@ -117,28 +117,36 @@
   width: 100%;
   min-height: 2.9rem;
   padding: 0.78rem 1rem;
-  border: 1px solid color-mix(in srgb, var(--action-primary) 54%, transparent);
+  border: 1px solid var(--accent-primary-border, var(--action-primary));
   border-radius: calc(var(--radius-component-chip) + 0.2rem);
-  background:
-    radial-gradient(circle at 18% 22%, rgb(242 255 248 / 0.6), transparent 60%),
-    linear-gradient(135deg, #64e787, #37bf61);
-  color: #052212;
+  background: var(--accent-primary-bg, var(--action-primary));
+  color: var(--content-on-primary);
   font-family: var(--typo-label-md-font-family), sans-serif;
   font-size: var(--typo-label-md-font-size);
   line-height: 1;
   letter-spacing: var(--typo-label-md-letter-spacing);
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 18px 26px -24px rgb(0 0 0 / 0.55), inset 0 1px 0 rgb(242 255 248 / 0.62);
+  box-shadow: var(--shadow-sm);
   transition:
+    background 160ms ease,
+    border-color 160ms ease,
     opacity 160ms ease,
     transform 160ms ease,
     filter 160ms ease;
 }
 
 .submitButton:hover:not(:disabled) {
+  background: var(--accent-primary-bg-hover, var(--action-primary-hover));
+  border-color: var(--accent-primary-border-hover, var(--action-primary-hover));
   transform: translateY(-1px);
   filter: saturate(1.02);
+}
+
+.submitButton:active:not(:disabled) {
+  background: var(--accent-primary-bg-active, var(--action-primary-active));
+  border-color: var(--accent-primary-border-hover, var(--action-primary-hover));
+  transform: translateY(0);
 }
 
 .submitButton:disabled {

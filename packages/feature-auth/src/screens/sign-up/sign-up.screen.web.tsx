@@ -286,9 +286,10 @@ const fieldErrorStyle: React.CSSProperties = {
 const submitBtnStyle: React.CSSProperties = {
   width: "100%",
   padding: "12px 16px",
-  background: "var(--action-primary)",
-  color: "var(--content-on-primary,#fff)",
-  border: "none",
+  background: "var(--accent-primary-bg, var(--action-primary))",
+  color: "var(--content-on-primary)",
+  border: "1px solid var(--accent-primary-border, var(--action-primary))",
+  boxShadow: "var(--shadow-sm)",
   borderRadius: 8,
   fontSize: 16,
   fontWeight: 600,

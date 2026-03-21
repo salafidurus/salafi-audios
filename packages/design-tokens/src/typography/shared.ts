@@ -20,7 +20,7 @@ export type TypographyVariant =
   | "caption"
   | "xs";
 
-const typographyBase = {
+export const typographyBase = {
   displayLg: {
     fontRole: "display" as FontRole,
     fontSize: { web: "clamp(1.85rem, 3vw, 2.45rem)", mobile: 32 },
@@ -93,102 +93,9 @@ const typographyBase = {
   },
 } as const;
 
-const webFontFamily = {
-  display: "var(--font-display), serif",
-  body: "var(--font-body), sans-serif",
-  mono: "var(--font-mono), monospace",
-} as const;
-
-/**
- * Fraunces does not have a Medium file in your setup.
- * We intentionally fall back medium -> semibold for display.
- */
-const mobileFontFamily = {
-  display: {
-    regular: "Fraunces-Regular",
-    medium: "Fraunces-SemiBold",
-    semibold: "Fraunces-SemiBold",
-    bold: "Fraunces-Bold",
-  },
-  body: {
-    regular: "Manrope-Regular",
-    medium: "Manrope-Medium",
-    semibold: "Manrope-SemiBold",
-    bold: "Manrope-Bold",
-  },
-  mono: {
-    regular: "GeistMono-Regular",
-    medium: "GeistMono-Medium",
-    semibold: "GeistMono-SemiBold",
-    bold: "GeistMono-Bold",
-  },
-} as const satisfies Record<FontRole, Record<FontWeightKey, string>>;
-
-const weightToKey: Record<number, FontWeightKey> = {
+export const weightToKey: Record<number, FontWeightKey> = {
   400: "regular",
   500: "medium",
   600: "semibold",
   700: "bold",
 };
-
-export const createTypographyWeb = () => {
-  return Object.fromEntries(
-    Object.entries(typographyBase).map(([variant, token]) => [
-      variant,
-      {
-        fontFamily: webFontFamily[token.fontRole],
-        fontSize: token.fontSize.web,
-        lineHeight: token.lineHeight.web,
-        fontWeight: token.fontWeight,
-        letterSpacing: token.letterSpacing.web,
-      },
-    ]),
-  ) as Record<
-    TypographyVariant,
-    {
-      fontFamily: string;
-      fontSize: string;
-      lineHeight: number;
-      fontWeight: number;
-      letterSpacing: string;
-    }
-  >;
-};
-
-export const createTypographyMobile = () => {
-  return Object.fromEntries(
-    Object.entries(typographyBase).map(([variant, token]) => {
-      const weightKey = weightToKey[token.fontWeight];
-      return [
-        variant,
-        {
-          fontFamily: mobileFontFamily[token.fontRole][weightKey],
-          fontSize: token.fontSize.mobile,
-          lineHeight: token.lineHeight.mobile,
-          letterSpacing: token.letterSpacing.mobile,
-        },
-      ];
-    }),
-  ) as Record<
-    TypographyVariant,
-    {
-      fontFamily: string;
-      fontSize: number;
-      lineHeight: number;
-      letterSpacing: number;
-    }
-  >;
-};
-
-export const typographyWeb = createTypographyWeb();
-export const typographyMobile = createTypographyMobile();
-
-export function createTypography(platform: "web"): TypographyWeb;
-export function createTypography(platform: "mobile"): TypographyMobile;
-export function createTypography(platform: "web" | "mobile") {
-  return platform === "web" ? typographyWeb : typographyMobile;
-}
-
-export type TypographyWeb = typeof typographyWeb;
-export type TypographyMobile = typeof typographyMobile;
-export type AppTypography = ReturnType<typeof createTypography>;

@@ -6,19 +6,17 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./src/index.ts",
+  "main": "./src/index.web.ts",
+  "types": "./src/index.web.ts",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "react-native": "./src/index.native.ts",
+      "default": "./src/index.web.ts"
     }
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist",
+    "build": "tsc -p tsconfig.build.json",
     "dev": "pnpm build --watch",
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit"
@@ -26,7 +24,6 @@
   "devDependencies": {
     "@sd/util-config": "workspace:*",
     "rimraf": "^6.0.0",
-    "tsup": "^8.0.0",
     "typescript": "^5.9.0"
   }
 }
