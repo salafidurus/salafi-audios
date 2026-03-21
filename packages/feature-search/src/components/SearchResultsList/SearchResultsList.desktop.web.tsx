@@ -1,6 +1,6 @@
 import type React from "react";
 
-import type { SearchResultRow } from "../../utils/build-search-result-items";
+import type { SearchResultRow } from "../../utils/build-search-result-rows";
 import { SearchResultEmptyDesktopWeb } from "../SearchResultEmpty/SearchResultEmpty.desktop.web";
 
 export type SearchResultsListDesktopWebProps = {

@@ -14,6 +14,13 @@ done || {
 
 pnpm turbo lint typecheck test:prepush --affected
 
+if git diff --quiet origin/main...HEAD -- ':(glob)apps/web/**' ':(glob)packages/shared/**' ':(glob)packages/design-tokens/**' ':(glob)packages/core-config/**' ':(glob)packages/core-styles/**' ':(glob)packages/core-auth/**' ':(glob)packages/feature-auth/**' ':(glob)packages/feature-navigation/**' ':(glob)packages/feature-search/**'; then
+  printf "pre-push: skipping web e2e (no web-affecting changes)\n"
+else
+  printf "pre-push: running web e2e\n"
+  pnpm --filter web test:e2e
+fi
+
 if git diff --quiet origin/main...HEAD -- README.md ':(glob)docs/**/*.md' AGENT.md AGENTS.md .github/copilot-instructions.md; then
   printf "pre-push: skipping docs:quality (no docs changes)\n"
 else

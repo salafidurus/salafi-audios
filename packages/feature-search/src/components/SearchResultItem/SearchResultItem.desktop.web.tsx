@@ -2,13 +2,12 @@ import { Play, Headphones, Clock } from "lucide-react";
 import { MarqueeTextDesktopWeb } from "../MarqueeText/MarqueeText.desktop.web";
 
 export type SearchResultItemDesktopWebProps = {
+  id: string;
   title: string;
   scholarName: string;
-  coverImageUrl?: string;
-  scholarImageUrl?: string;
+  imageUrl?: string;
   lectureCount: number;
   durationSeconds?: number;
-  group: string;
 };
 
 const captionStyle = {
@@ -29,8 +28,8 @@ const titleMdStyle = {
   fontWeight: "var(--typo-title-md-font-weight)",
 } as const;
 
-export function SearchResultItemDesktopWeb({ group, ...item }: SearchResultItemDesktopWebProps) {
-  const imageUrl = item.coverImageUrl ?? item.scholarImageUrl;
+export function SearchResultItemDesktopWeb(item: SearchResultItemDesktopWebProps) {
+  const imageUrl = item.imageUrl;
   const durationLabel = formatDuration(item.durationSeconds);
 
   return (
