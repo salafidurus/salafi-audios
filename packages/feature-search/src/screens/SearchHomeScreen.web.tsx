@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { View } from "react-native-unistyles/components/native/View";
 import { StyleSheet } from "react-native-unistyles";
 import { QuickBrowse } from "../components/QuickBrowse";
 import { SearchButton } from "../components/SearchButton";

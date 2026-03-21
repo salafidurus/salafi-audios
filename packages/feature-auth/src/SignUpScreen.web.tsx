@@ -79,10 +79,11 @@ export function SignUpScreen({
             <img
               src="/auth/apple-logo-dark-1x.png"
               srcSet="/auth/apple-logo-dark-1x.png 1x, /auth/apple-logo-dark-3x.png 3x"
-              width={20}
-              height={24}
+              width={24}
+              height={28}
               alt=""
               aria-hidden
+              style={providerIconStyle}
             />
             Continue with Apple
           </button>
@@ -99,10 +100,11 @@ export function SignUpScreen({
             <img
               src="/auth/google-logo-light-1x.png"
               srcSet="/auth/google-logo-light-1x.png 1x, /auth/google-logo-light-4x.png 4x"
-              width={22}
-              height={22}
+              width={24}
+              height={24}
               alt=""
               aria-hidden
+              style={providerIconStyle}
             />
             Continue with Google
           </button>
@@ -116,13 +118,20 @@ export function SignUpScreen({
 
         <form
           onSubmit={handleSubmit(onSubmit)}
+          autoComplete="on"
           style={{ display: "flex", flexDirection: "column", gap: 12 }}
         >
-          <input placeholder="Name" style={inputStyle} {...register("name", { required: true })} />
+          <input
+            placeholder="Name"
+            autoComplete="name"
+            style={inputStyle}
+            {...register("name", { required: true })}
+          />
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             <input
               type="email"
               placeholder="Email"
+              autoComplete="email"
               autoCapitalize="none"
               style={{
                 ...inputStyle,
@@ -141,6 +150,7 @@ export function SignUpScreen({
           <input
             type="password"
             placeholder="Password"
+            autoComplete="new-password"
             style={inputStyle}
             {...register("password", { required: true })}
           />
@@ -223,6 +233,12 @@ const googleBtnStyle: React.CSSProperties = {
   fontFamily: "Roboto, sans-serif",
   fontWeight: 500,
   cursor: "pointer",
+};
+
+const providerIconStyle: React.CSSProperties = {
+  display: "block",
+  flexShrink: 0,
+  objectFit: "contain",
 };
 
 const dividerStyle: React.CSSProperties = {

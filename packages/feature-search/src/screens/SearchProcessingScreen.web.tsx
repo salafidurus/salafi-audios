@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { View } from "react-native";
+import { View } from "react-native-unistyles/components/native/View";
 import type { SearchCatalogItemDto, SearchCatalogResultsDto } from "@sd/contracts";
 import { StyleSheet } from "react-native-unistyles";
 import { SearchFilter, type SearchFilterValue } from "../components/SearchFilter";

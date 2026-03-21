@@ -136,11 +136,15 @@ export function AdaptiveBottomBar() {
           </button>
           {menuOpen && (
             <div className={styles.sectionMenu}>
-              <Link href="/" className={styles.sectionMenuItem} onClick={() => setMenuOpen(false)}>
+              <Link
+                href="/"
+                className={styles.sectionMenuItem}
+                onClick={() => setMenuOpen(false)}
+              >
                 <Search size={16} />
                 <span>Home</span>
               </Link>
-              {SECTION_ORDER.filter((s) => s !== currentSection).map((section) => {
+              {SECTION_ORDER.map((section) => {
                 const Icon = SECTION_ICONS[section];
                 const tab = sectionTabs[section];
                 const href =
@@ -151,7 +155,10 @@ export function AdaptiveBottomBar() {
                   <Link
                     key={section}
                     href={href}
-                    className={styles.sectionMenuItem}
+                    className={clsx(
+                      styles.sectionMenuItem,
+                      section === currentSection && styles.sectionMenuItemActive,
+                    )}
                     onClick={() => setMenuOpen(false)}
                   >
                     <Icon size={16} />

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SignInScreen as MobileSignInScreen } from "../../SignInScreen.web";
 import { SignInDesktopScreen } from "./sign-in.screen.desktop";
@@ -12,7 +13,16 @@ type SignInScreenProps = {
 
 export function SignInScreen({ redirectTo }: SignInScreenProps) {
   const router = useRouter();
+  const [isHydrated, setIsHydrated] = useState(false);
   const { isMobile, isTablet } = useResponsive();
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  if (!isHydrated) {
+    return null;
+  }
 
   if (isMobile || isTablet) {
     return (

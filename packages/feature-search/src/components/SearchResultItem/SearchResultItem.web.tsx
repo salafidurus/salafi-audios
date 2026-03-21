@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Image, Pressable, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { Image } from "react-native-unistyles/components/native/Image";
+import { Pressable } from "react-native-unistyles/components/native/Pressable";
+import { Text } from "react-native-unistyles/components/native/Text";
+import { View } from "react-native-unistyles/components/native/View";
 import { Headphones, Clock } from "lucide-react";
 import { MarqueeText } from "../MarqueeText";
 

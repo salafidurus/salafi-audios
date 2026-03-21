@@ -21,7 +21,7 @@ export default function NotFoundScreen() {
             variant="primary"
             size="md"
             label="Return to home screen"
-            onPress={() => router.replace("/(tabs)" as Href)}
+            onPress={() => router.replace("/(shell)" as Href)}
             style={styles.button}
           />
         </View>

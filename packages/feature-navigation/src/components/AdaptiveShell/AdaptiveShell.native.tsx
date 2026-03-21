@@ -1,6 +1,5 @@
 import { useRef } from "react";
 import { Platform, View, StyleSheet as RNStyleSheet } from "react-native";
-import { useRouter, useSegments } from "expo-router";
 import { BlurView } from "expo-blur";
 import { EaseView } from "react-native-ease";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -9,27 +8,20 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import { SectionLauncher } from "../SectionLauncher";
 import { SectionModeBar } from "../SectionModeBar";
 import { SectionSwitcherSheet } from "../SectionSwitcherSheet";
-import { useNavigationStore } from "../../store/navigation-store";
-import { getCurrentSection } from "../../utils/get-current-section";
 import { SECTION_TABS } from "../../types";
-import type { Section } from "../../types";
+import type { ActiveNavigationState, Section } from "../../types";
 
 type Props = {
   blurTargetRef: React.RefObject<InstanceType<typeof View> | null>;
+  shellState: ActiveNavigationState;
+  onSelectSection: (target: Section | "home") => void;
+  onTabChange: (tabId: string) => void;
 };
 
-export function AdaptiveShell({ blurTargetRef }: Props) {
+export function AdaptiveShell({ blurTargetRef, shellState, onSelectSection, onTabChange }: Props) {
   const { theme } = useUnistyles();
-  const router = useRouter();
-  const segments = useSegments();
   const insets = useSafeAreaInsets();
   const bottomSheetRef = useRef<BottomSheet>(null);
-
-  const sectionTabs = useNavigationStore((s) => s.sectionTabs);
-  const setActiveTab = useNavigationStore((s) => s.setActiveTab);
-
-  const currentSection = getCurrentSection(segments as string[]);
-  const isHub = currentSection === "home";
 
   const horizontalPadding = theme.spacing.layout.pageX;
   const verticalPadding = Platform.OS === "ios" ? theme.spacing.scale.md : theme.spacing.scale.sm;
@@ -40,27 +32,16 @@ export function AdaptiveShell({ blurTargetRef }: Props) {
 
   const androidTint = theme.colors.surface.canvas === "#0D0D0D" ? "dark" : "light";
 
-  const handleTabChange = (tabId: string) => {
-    if (currentSection === "home") return;
-    setActiveTab(currentSection, tabId);
-    router.push(`/(tabs)/(${currentSection})/${tabId}` as never);
-  };
-
   const handleSectionPress = () => {
+    if (!shellState.canOpenSectionSwitcher) {
+      return;
+    }
+
     bottomSheetRef.current?.snapToIndex(0);
   };
 
-  const handleSearchPress = () => {
-    router.push("/(tabs)/(search)/" as never);
-  };
-
   const handleSwitcherSelect = (target: Section | "home") => {
-    if (target === "home") {
-      router.push("/(tabs)/(search)/" as never);
-    } else {
-      const tab = sectionTabs[target];
-      router.push(`/(tabs)/(${target})/${tab}` as never);
-    }
+    onSelectSection(target);
   };
 
   return (
@@ -97,34 +78,34 @@ export function AdaptiveShell({ blurTargetRef }: Props) {
         )}
 
         <EaseView
-          animate={{ opacity: isHub ? 1 : 0 }}
+          animate={{ opacity: shellState.showSectionLauncher ? 1 : 0 }}
           transition={{ type: "timing", duration: 200 }}
-          style={[styles.modeContainer, !isHub && styles.hidden]}
+          style={[styles.modeContainer, !shellState.showSectionLauncher && styles.hidden]}
         >
-          <SectionLauncher />
+          <SectionLauncher onSelectSection={onSelectSection} />
         </EaseView>
 
         <EaseView
-          animate={{ opacity: isHub ? 0 : 1 }}
+          animate={{ opacity: shellState.shellMode === "section" ? 1 : 0 }}
           transition={{ type: "timing", duration: 200 }}
-          style={[styles.modeContainer, isHub && styles.hidden]}
+          style={[styles.modeContainer, shellState.shellMode !== "section" && styles.hidden]}
         >
-          {!isHub && (
+          {shellState.activeSection && shellState.activeTab && (
             <SectionModeBar
-              currentSection={currentSection}
-              tabs={SECTION_TABS[currentSection]}
-              activeTab={sectionTabs[currentSection]}
-              onTabChange={handleTabChange}
+              currentSection={shellState.activeSection}
+              tabs={SECTION_TABS[shellState.activeSection]}
+              activeTab={shellState.activeTab}
+              onTabChange={onTabChange}
               onSectionPress={handleSectionPress}
-              onSearchPress={handleSearchPress}
+              onSearchPress={() => onSelectSection("home")}
             />
           )}
         </EaseView>
       </View>
 
-      {!isHub && (
+      {shellState.showSectionSwitcher && shellState.activeSection && (
         <SectionSwitcherSheet
-          currentSection={currentSection}
+          currentSection={shellState.activeSection}
           bottomSheetRef={bottomSheetRef}
           onSelect={handleSwitcherSelect}
         />

@@ -35,6 +35,7 @@ This Expo/React Native app prioritizes offline listening and resilient sync.
 ## Structure and Dependency Direction
 
 - `app/` — routing and composition
+- `app/(shell)/` — persistent adaptive shell boundary for the main signed-in and public app surface
 - `features/` — domain UX slices
 - `core/` — API/auth/playback/persistence/sync infrastructure
 - `shared/` — primitives/utilities

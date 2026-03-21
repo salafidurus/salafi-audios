@@ -1,4 +1,17 @@
 export type Section = "feed" | "live" | "library" | "account";
+export type ShellMode = "launcher" | "section";
+
+export type ActiveNavigationState = {
+  pathname: string;
+  activeSection: Section | null;
+  activeSubsection: string | null;
+  activeTab: string | null;
+  shellMode: ShellMode;
+  showSectionLauncher: boolean;
+  showSectionSwitcher: boolean;
+  showSearchShortcut: boolean;
+  canOpenSectionSwitcher: boolean;
+};
 
 export type TabConfig = { id: string; label: string; icon: string };
 

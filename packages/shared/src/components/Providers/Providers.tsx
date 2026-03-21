@@ -9,12 +9,13 @@ const queryClient = createQueryClient();
 
 type Props = {
   children: ReactNode;
+  apiBaseUrl?: string;
 };
 
-export function Providers({ children }: Props) {
+export function Providers({ children, apiBaseUrl }: Props) {
   useEffect(() => {
-    initApiClient();
-  }, []);
+    initApiClient(apiBaseUrl ? { baseUrl: apiBaseUrl } : undefined);
+  }, [apiBaseUrl]);
 
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }

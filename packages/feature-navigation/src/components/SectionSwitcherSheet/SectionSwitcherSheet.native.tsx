@@ -31,8 +31,6 @@ type Props = {
 export function SectionSwitcherSheet({ currentSection, bottomSheetRef, onSelect }: Props) {
   const { theme } = useUnistyles();
 
-  const items = ALL_ITEMS.filter((item) => item.id !== currentSection);
-
   const renderBackdrop = useCallback(
     (props: React.ComponentProps<typeof BottomSheetBackdrop>) => (
       <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} />
@@ -64,20 +62,39 @@ export function SectionSwitcherSheet({ currentSection, bottomSheetRef, onSelect 
     >
       <View style={styles.content}>
         <Text style={[styles.title, { color: theme.colors.content.strong }]}>Switch to</Text>
-        {items.map((item) => (
-          <Pressable
-            key={item.id}
-            onPress={() => handleSelect(item.id)}
-            style={styles.item}
-            accessibilityLabel={`Navigate to ${item.label}`}
-            accessibilityRole="button"
-          >
-            <item.Icon color={theme.colors.content.muted} size={20} strokeWidth={2} />
-            <Text style={[styles.itemLabel, { color: theme.colors.content.primary }]}>
-              {item.label}
-            </Text>
-          </Pressable>
-        ))}
+        {ALL_ITEMS.map((item) => {
+          const isActive = item.id === currentSection;
+
+          return (
+            <Pressable
+              key={item.id}
+              onPress={() => handleSelect(item.id)}
+              style={[
+                styles.item,
+                isActive && {
+                  backgroundColor: theme.colors.surface.subtle,
+                  borderColor: theme.colors.border.default,
+                },
+              ]}
+              accessibilityLabel={isActive ? `${item.label}, current section` : `Navigate to ${item.label}`}
+              accessibilityRole="button"
+            >
+              <item.Icon
+                color={isActive ? theme.colors.content.primary : theme.colors.content.muted}
+                size={20}
+                strokeWidth={2}
+              />
+              <Text
+                style={[
+                  styles.itemLabel,
+                  { color: isActive ? theme.colors.content.strong : theme.colors.content.primary },
+                ]}
+              >
+                {item.label}
+              </Text>
+            </Pressable>
+          );
+        })}
       </View>
     </BottomSheet>
   );
@@ -101,6 +118,8 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing.scale.md,
     paddingHorizontal: theme.spacing.scale.sm,
     borderRadius: theme.radius.component.chip,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "transparent",
   },
   itemLabel: {
     fontSize: 15,

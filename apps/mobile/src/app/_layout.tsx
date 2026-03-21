@@ -17,7 +17,7 @@ function RootLayout() {
     <Providers>
       <StatusBar style="auto" />
       <Stack
-        initialRouteName="(tabs)"
+        initialRouteName="(shell)"
         screenOptions={{
           headerStyle: {
             backgroundColor: theme.colors.surface.default,
@@ -29,7 +29,7 @@ function RootLayout() {
           headerShown: false,
         }}
       >
-        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="(shell)" />
         <Stack.Screen name="(auth)" options={{ headerShown: false, presentation: "modal" }} />
         <Stack.Screen name="modal" options={{ presentation: "modal", title: "Modal" }} />
       </Stack>

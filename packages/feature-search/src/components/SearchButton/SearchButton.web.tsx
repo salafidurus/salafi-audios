@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
 import { Search } from "lucide-react";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { Pressable } from "react-native-unistyles/components/native/Pressable";
+import { Text } from "react-native-unistyles/components/native/Text";
+import { View } from "react-native-unistyles/components/native/View";
 
 export type SearchButtonProps = {
   placeholder?: string;

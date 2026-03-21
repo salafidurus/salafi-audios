@@ -1,5 +1,5 @@
-import { Text } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { Text } from "react-native-unistyles/components/native/Text";
 import { ScreenView } from "../ScreenView";
 
 export function ScreenInProgress() {

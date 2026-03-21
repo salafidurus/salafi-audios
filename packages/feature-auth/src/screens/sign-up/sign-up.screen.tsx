@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { SignUpScreen as MobileSignUpScreen } from "../../SignUpScreen.web";
 import { SignUpDesktopScreen } from "./sign-up.screen.desktop";
@@ -12,7 +13,16 @@ type SignUpScreenProps = {
 
 export function SignUpScreen({ redirectTo }: SignUpScreenProps) {
   const router = useRouter();
+  const [isHydrated, setIsHydrated] = useState(false);
   const { isMobile, isTablet } = useResponsive();
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  if (!isHydrated) {
+    return null;
+  }
 
   if (isMobile || isTablet) {
     return (

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <main>
+    <main className="flex flex-1 min-h-full flex-col">
       <SearchHomeScreen />
     </main>
   );

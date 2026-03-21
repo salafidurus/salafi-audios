@@ -5,8 +5,9 @@ import { type ReactNode } from "react";
 
 type Props = {
   children: ReactNode;
+  apiBaseUrl?: string;
 };
 
-export function Providers({ children }: Props) {
-  return <SharedProviders>{children}</SharedProviders>;
+export function Providers({ children, apiBaseUrl }: Props) {
+  return <SharedProviders apiBaseUrl={apiBaseUrl}>{children}</SharedProviders>;
 }

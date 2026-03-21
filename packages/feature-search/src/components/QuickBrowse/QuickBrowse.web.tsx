@@ -1,5 +1,6 @@
-import { Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import { Text } from "react-native-unistyles/components/native/Text";
+import { View } from "react-native-unistyles/components/native/View";
 import { BrowseCard } from "../BrowseCard";
 
 const browseCategories = [

@@ -37,12 +37,11 @@ export function GoogleSignInButton({ onClick, disabled }: Props) {
       }}
     >
       <img
-        src="/auth/google-logo-light-1x.png"
+        src="/auth/google-logo-light-4x.png"
         srcSet="/auth/google-logo-light-1x.png 1x, /auth/google-logo-light-4x.png 4x"
-        width={18}
-        height={18}
         alt=""
         aria-hidden="true"
+        style={{ display: "block", flexShrink: 0, objectFit: "contain" }}
       />
       Continue with Google
     </button>
@@ -80,12 +79,11 @@ export function AppleSignInButton({ onClick, disabled }: Props) {
       }}
     >
       <img
-        src="/auth/apple-logo-dark-1x.png"
+        src="/auth/apple-logo-dark-3x.png"
         srcSet="/auth/apple-logo-dark-1x.png 1x, /auth/apple-logo-dark-3x.png 3x"
-        width={16}
-        height={20}
         alt=""
         aria-hidden="true"
+        style={{ display: "block", flexShrink: 0, objectFit: "contain" }}
       />
       Continue with Apple
     </button>

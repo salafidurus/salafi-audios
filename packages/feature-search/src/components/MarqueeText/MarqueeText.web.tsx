@@ -2,8 +2,9 @@
 
 import { useRef, useEffect } from "react";
 import { type StyleProp, type TextStyle } from "react-native";
-import { Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+import { Text } from "react-native-unistyles/components/native/Text";
+import { View } from "react-native-unistyles/components/native/View";
 
 export type MarqueeTextProps = {
   text: string;

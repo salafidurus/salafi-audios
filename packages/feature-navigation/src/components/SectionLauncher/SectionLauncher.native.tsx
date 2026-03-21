@@ -1,10 +1,8 @@
 import { Pressable, View } from "react-native";
-import { useRouter } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { Cloud, Mic, CassetteTape, Settings } from "lucide-react-native";
 import { EaseView } from "react-native-ease";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { useNavigationStore } from "../../store/navigation-store";
 import type { Section } from "../../types";
 import type { ComponentType } from "react";
 
@@ -16,6 +14,10 @@ type SectionItem = {
   Icon: IconComponent;
 };
 
+type Props = {
+  onSelectSection: (section: Section) => void;
+};
+
 const SECTIONS: SectionItem[] = [
   { section: "feed", label: "Feed", Icon: Cloud as IconComponent },
   { section: "live", label: "Live", Icon: Mic as IconComponent },
@@ -23,17 +25,14 @@ const SECTIONS: SectionItem[] = [
   { section: "account", label: "Account", Icon: Settings as IconComponent },
 ];
 
-export function SectionLauncher() {
+export function SectionLauncher({ onSelectSection }: Props) {
   const { theme } = useUnistyles();
-  const router = useRouter();
-  const sectionTabs = useNavigationStore((s) => s.sectionTabs);
 
   const handlePress = (section: Section) => {
     if (process.env.EXPO_OS === "ios") {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
-    const tab = sectionTabs[section];
-    router.push(`/(tabs)/(${section})/${tab}` as never);
+    onSelectSection(section);
   };
 
   return (
