@@ -1,6 +1,7 @@
 import type React from "react";
 
 import type { SearchResultRow } from "../../utils/build-search-result-items";
+import { SearchResultEmptyDesktopWeb } from "../SearchResultEmpty/SearchResultEmpty.desktop.web";
 
 export type SearchResultsListDesktopWebProps = {
   items: SearchResultRow[];
@@ -10,12 +11,6 @@ export type SearchResultsListDesktopWebProps = {
   renderItem: (item: SearchResultRow) => React.ReactElement | null;
 };
 
-const captionStyle = {
-  fontFamily: "var(--typo-caption-font-family)",
-  lineHeight: "var(--typo-caption-line-height)",
-  letterSpacing: "var(--typo-caption-letter-spacing)",
-} as const;
-
 export function SearchResultsListDesktopWeb({
   items,
   isFetching,
@@ -23,22 +18,16 @@ export function SearchResultsListDesktopWeb({
   errorMessage,
   renderItem,
 }: SearchResultsListDesktopWebProps) {
+  const shouldShowEmpty = items.length === 0 || Boolean(errorMessage);
+
   return (
     <div className="flex flex-col gap-[var(--space-component-gap-md)]">
-      {isFetching && shouldSearch ? (
-        <p className="text-center text-[var(--content-muted)]" style={captionStyle}>
-          Searching…
-        </p>
-      ) : null}
-      {errorMessage ? (
-        <p className="text-center text-[var(--content-muted)]" style={captionStyle}>
-          {errorMessage}
-        </p>
-      ) : null}
-      {!isFetching && shouldSearch && items.length === 0 ? (
-        <p className="text-center text-[var(--content-muted)]" style={captionStyle}>
-          No results yet.
-        </p>
+      {shouldShowEmpty ? (
+        <SearchResultEmptyDesktopWeb
+          shouldSearch={shouldSearch}
+          isFetching={isFetching}
+          errorMessage={errorMessage}
+        />
       ) : null}
       <div className="flex flex-col divide-y divide-[var(--border-subtle)]">
         {items.map((item) => (

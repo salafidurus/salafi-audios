@@ -1,4 +1,5 @@
 import { Play, Headphones, Clock } from "lucide-react";
+import { MarqueeTextDesktopWeb } from "../MarqueeText/MarqueeText.desktop.web";
 
 export type SearchResultItemDesktopWebProps = {
   title: string;
@@ -44,18 +45,16 @@ export function SearchResultItemDesktopWeb({ group, ...item }: SearchResultItemD
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-[var(--space-scale-xs)]">
-        <p
+        <MarqueeTextDesktopWeb
+          text={item.title}
           className="truncate text-[var(--content-strong)] [font-size:var(--typo-title-md-font-size)] xl:[font-size:var(--typo-title-lg-font-size)]"
           style={titleMdStyle}
-        >
-          {item.title}
-        </p>
-        <p
+        />
+        <MarqueeTextDesktopWeb
+          text={item.scholarName}
           className="truncate text-[var(--content-muted)] [font-size:var(--typo-body-sm-font-size)] xl:[font-size:var(--typo-body-md-font-size)]"
           style={bodySmStyle}
-        >
-          {item.scholarName}
-        </p>
+        />
         <div
           className="flex items-center gap-[var(--space-scale-xs)] text-[var(--content-muted)] [font-size:var(--typo-caption-font-size)] xl:[font-size:var(--typo-body-sm-font-size)]"
           style={captionStyle}
