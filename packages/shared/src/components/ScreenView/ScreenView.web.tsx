@@ -46,23 +46,23 @@ function getBackgroundVariant(variant: ScreenViewProps["backgroundVariant"]) {
     case "primaryWash":
       return {
         _web: {
-          backgroundImage:
-            "radial-gradient(circle at 12% 14%, var(--surface-primary-subtle), transparent 42%)",
+          backgroundImage: "var(--screen-wash-primary)",
+          backgroundRepeat: "no-repeat",
         },
       };
     case "secondaryWash":
       return {
         _web: {
-          backgroundImage:
-            "radial-gradient(circle at 14% 14%, var(--surface-secondary-subtle), transparent 40%)",
+          backgroundImage: "var(--screen-wash-secondary)",
+          backgroundRepeat: "no-repeat",
         },
       };
     case "mixedWash":
       return {
         backgroundColor: "var(--accent-mixed-surface, var(--surface-canvas))",
         _web: {
-          backgroundImage:
-            "radial-gradient(circle at 14% 12%, var(--surface-primary-subtle), transparent 38%), radial-gradient(circle at 88% 10%, var(--surface-secondary-subtle), transparent 32%)",
+          backgroundImage: "var(--screen-wash-mixed)",
+          backgroundRepeat: "no-repeat",
         },
       };
     case "canvas":

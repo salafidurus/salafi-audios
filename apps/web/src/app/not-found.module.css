@@ -9,8 +9,8 @@
 .card {
   width: min(40rem, 100%);
   border-radius: var(--radius-component-panel);
-  border: 1px solid color-mix(in srgb, var(--border-default) 75%, transparent);
-  background: color-mix(in srgb, var(--surface-default) 92%, transparent);
+  border: 1px solid var(--chrome-border-strong);
+  background: var(--chrome-surface-strong);
   box-shadow: var(--shadow-lg);
   padding: clamp(1.5rem, 4vw, 2.3rem);
   text-align: center;
@@ -41,7 +41,7 @@
   margin-top: 1.4rem;
   padding: 0.55rem 1rem;
   border-radius: var(--radius-component-chip);
-  border: 1px solid color-mix(in srgb, var(--border-default) 80%, transparent);
+  border: 1px solid var(--chrome-border);
   background: var(--surface-default);
   color: var(--content-primary);
   font-weight: 700;
@@ -49,5 +49,5 @@
 }
 
 .link:hover {
-  background: color-mix(in srgb, var(--surface-primary-subtle) 65%, var(--surface-default));
+  background: var(--hover-accent-surface);
 }

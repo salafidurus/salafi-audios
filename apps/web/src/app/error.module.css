@@ -9,7 +9,7 @@
 .card {
   width: min(40rem, 100%);
   border-radius: var(--radius-component-panel);
-  border: 1px solid var(--accent-mixed-border, color-mix(in srgb, var(--border-default) 75%, transparent));
+  border: 1px solid var(--accent-mixed-border, var(--chrome-border-strong));
   background: var(--accent-mixed-surface);
   box-shadow: var(--shadow-lg);
   padding: clamp(1.5rem, 4vw, 2.3rem);
@@ -69,7 +69,7 @@
   display: inline-flex;
   padding: 0.55rem 1rem;
   border-radius: var(--radius-component-chip);
-  border: 1px solid color-mix(in srgb, var(--border-default) 80%, transparent);
+  border: 1px solid var(--chrome-border);
   background: var(--surface-default);
   color: var(--content-primary);
   font-weight: 700;
@@ -77,5 +77,5 @@
 }
 
 .link:hover {
-  background: color-mix(in srgb, var(--surface-primary-subtle) 65%, var(--surface-default));
+  background: var(--hover-accent-surface);
 }

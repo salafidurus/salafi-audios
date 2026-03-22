@@ -25,7 +25,7 @@ export type SignInScreenProps = {
   onSignInWithApple: () => void;
   onNavigateToSignUp: () => void;
   onBack?: () => void;
-  googleLogoSource?: ImageSourcePropType;
+  googleButtonSource?: ImageSourcePropType;
 };
 
 export function SignInMobileNativeScreen({
@@ -34,7 +34,7 @@ export function SignInMobileNativeScreen({
   onSignInWithApple,
   onNavigateToSignUp,
   onBack,
-  googleLogoSource,
+  googleButtonSource,
 }: SignInScreenProps) {
   const { theme } = useUnistyles();
   const [error, setError] = useState("");
@@ -108,10 +108,9 @@ export function SignInMobileNativeScreen({
           style={({ pressed }) => [styles.googleBtn, pressed && styles.pressed]}
           onPress={onSignInWithGoogle}
         >
-          {googleLogoSource && (
-            <Image source={googleLogoSource} style={styles.googleLogo} resizeMode="contain" />
+          {googleButtonSource && (
+            <Image source={googleButtonSource} style={styles.googleButtonImage} resizeMode="cover" />
           )}
-          <Text style={styles.googleBtnText}>Continue with Google</Text>
         </Pressable>
 
         <Text style={styles.divider}>or sign in with email</Text>
@@ -220,19 +219,12 @@ const styles = StyleSheet.create((theme) => ({
   },
   appleBtn: { width: "100%", height: 48, marginBottom: theme.spacing.component.gapSm },
   googleBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: theme.spacing.component.gapSm,
-    borderWidth: 1,
-    borderColor: "#747775",
     borderRadius: 8,
-    padding: 14,
+    overflow: "hidden",
     marginBottom: theme.spacing.component.gapSm,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "transparent",
   },
-  googleLogo: { width: 22, height: 22 },
-  googleBtnText: { fontSize: 16, fontWeight: "500", color: "#1F1F1F" },
+  googleButtonImage: { width: "100%", height: 48 },
   divider: {
     textAlign: "center",
     color: theme.colors.content.primary,

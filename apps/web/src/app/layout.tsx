@@ -90,6 +90,22 @@ const metadataBase =
     ? new URL(process.env.NEXT_PUBLIC_WEB_URL)
     : new URL("http://localhost:3000");
 
+const themeInitScript = `
+(() => {
+  try {
+    const root = document.documentElement;
+    const explicitTheme = root.getAttribute("data-theme");
+    if (explicitTheme === "light" || explicitTheme === "dark") {
+      return;
+    }
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    root.setAttribute("data-theme", prefersDark ? "dark" : "light");
+  } catch {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+`;
+
 export const metadata: Metadata = {
   metadataBase,
   title: {
@@ -122,6 +138,9 @@ export default function RootLayout({
       className={`${fraunces.variable} ${manrope.variable} ${geistMono.variable}`}
     >
       <body className="antialiased">
+        <Script id="theme-init" strategy="beforeInteractive">
+          {themeInitScript}
+        </Script>
         {process.env.NODE_ENV === "production" ? (
           <Script src="https://www.vexo.co/analytics.js" strategy="afterInteractive" />
         ) : null}

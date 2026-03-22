@@ -4,15 +4,13 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-layout-page-y) var(--space-layout-page-x);
-  background:
-    radial-gradient(circle at 12% 14%, var(--surface-primary-subtle), transparent 42%),
-    var(--surface-canvas);
+  background: var(--screen-wash-primary), var(--surface-canvas);
 }
 
 .card {
   width: min(30rem, 100%);
   padding: clamp(1.5rem, 2.5vw, 2rem);
-  border: 1px solid var(--accent-mixed-border, color-mix(in srgb, var(--border-default) 76%, transparent));
+  border: 1px solid var(--accent-mixed-border, var(--chrome-border-strong));
   border-radius: var(--radius-component-panel);
   background: var(--accent-mixed-surface);
   box-shadow: var(--shadow-lg);
@@ -59,7 +57,7 @@
 .divider::after {
   content: "";
   height: 1px;
-  background: var(--accent-divider, color-mix(in srgb, var(--border-default) 82%, transparent));
+  background: var(--accent-divider);
 }
 
 .inputGroup {
@@ -72,9 +70,9 @@
   width: 100%;
   min-height: 2.9rem;
   padding: 0.78rem 0.95rem;
-  border: 1px solid color-mix(in srgb, var(--border-default) 84%, transparent);
+  border: 1px solid var(--input-border-rest, var(--border-default));
   border-radius: calc(var(--radius-component-chip) + 0.2rem);
-  background: color-mix(in srgb, var(--surface-default) 90%, transparent);
+  background: var(--input-surface-rest, var(--surface-subtle));
   color: var(--content-default);
   font-family: var(--typo-body-md-font-family), sans-serif;
   font-size: var(--typo-body-md-font-size);
@@ -92,9 +90,9 @@
 
 .input:focus-visible {
   outline: none;
-  border-color: var(--border-primary);
-  box-shadow: var(--shadow-focus);
-  background: var(--surface-default);
+  border-color: var(--input-border-focus, var(--border-primary));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-focus-ring) 24%, transparent);
+  background: var(--input-surface-focus, var(--surface-default));
 }
 
 .inputError {

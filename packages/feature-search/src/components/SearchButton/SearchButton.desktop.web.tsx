@@ -47,6 +47,7 @@ export function SearchButtonDesktopWeb({
   const accentStyle: CSSProperties = {
     borderColor: "var(--accent-primary-subtle-border, var(--border-default))",
     background: "var(--accent-primary-subtle-surface, var(--surface-default))",
+    color: "var(--accent-primary-subtle-fg, var(--content-default))",
     boxShadow: "var(--shadow-sm)",
   };
 

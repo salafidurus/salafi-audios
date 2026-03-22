@@ -245,6 +245,8 @@ import { motion } from 'framer-motion';
 
 - Favicons/app icons live in `apps/web/src/app/favicon.ico` and `apps/web/public/icons/*`; wire them via Next metadata in `apps/web/src/app/layout.tsx`
 - Logos live in `apps/web/public/logo/*`; reference them as `/logo/<file>` in UI (e.g. with `next/image`)
+- Auth provider button assets live in `apps/web/public/auth/*`
+- Web auth provider buttons should stay provider-branded; use the full branded button assets rather than recoloring them into app-brand CTAs
 
 ---
 

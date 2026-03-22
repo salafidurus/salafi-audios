@@ -23,10 +23,10 @@
   justify-content: stretch;
   gap: var(--space-component-gap-sm);
   padding: 0.5rem 0.75rem;
-  background: color-mix(in srgb, var(--surface-elevated) 92%, white 8%);
-  border: 1px solid color-mix(in srgb, var(--border-subtle) 88%, white 12%);
+  background: var(--chrome-surface-strong);
+  border: 1px solid var(--chrome-border);
   border-radius: var(--radius-component-panel);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--chrome-shadow);
   pointer-events: auto;
   backdrop-filter: blur(18px) saturate(140%);
   -webkit-backdrop-filter: blur(18px) saturate(140%);
@@ -92,7 +92,7 @@
 }
 
 .sectionIcon:hover {
-  background: var(--surface-subtle);
+  background: var(--hover-accent-surface);
 }
 
 .sectionMenu {
@@ -101,14 +101,16 @@
   left: 0;
   min-width: 10rem;
   padding: var(--space-component-gap-sm);
-  background: var(--surface-elevated);
-  border: 1px solid var(--border-subtle);
+  background: var(--chrome-surface-strong);
+  border: 1px solid var(--chrome-border);
   border-radius: var(--radius-component-panel);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--chrome-shadow);
   display: flex;
   flex-direction: column;
   gap: var(--space-component-gap-xs);
   z-index: 20;
+  backdrop-filter: blur(18px) saturate(135%);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
 }
 
 .sectionMenuItem {
@@ -125,11 +127,11 @@
 }
 
 .sectionMenuItem:hover {
-  background: var(--surface-subtle);
+  background: var(--hover-accent-surface);
 }
 
 .sectionMenuItemActive {
-  background: var(--surface-subtle);
+  background: var(--hover-accent-surface);
   font-weight: 600;
 }
 
@@ -168,7 +170,7 @@
 
 .tabActive {
   color: var(--content-primary);
-  background: var(--surface-subtle);
+  background: var(--hover-accent-surface);
   font-weight: 500;
 }
 
@@ -189,7 +191,7 @@
 
 .searchBtn:hover {
   color: var(--content-strong);
-  background: var(--surface-subtle);
+  background: var(--hover-accent-surface);
 }
 
 @media (max-width: 640px) {

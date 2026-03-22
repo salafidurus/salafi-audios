@@ -4,7 +4,7 @@
   top: 0;
   z-index: 30;
   height: var(--top-strip-height, 3.5rem);
-  border-bottom: 1px solid color-mix(in srgb, var(--border-subtle) 80%, transparent);
+  border-bottom: 1px solid var(--chrome-border);
   background: transparent;
 }
 

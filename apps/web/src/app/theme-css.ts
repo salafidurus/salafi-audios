@@ -1,6 +1,19 @@
 import { lightWebTheme, darkWebTheme } from "@sd/design-tokens";
 
-const createThemeCss = (selector: string, theme: typeof lightWebTheme) => {
+const createThemeCss = (selector: string, theme: typeof lightWebTheme, isDark: boolean) => {
+  const chromeSurface = `color-mix(in srgb, ${theme.colors.surface.elevated} ${isDark ? "92%" : "88%"}, transparent)`;
+  const chromeSurfaceStrong = `color-mix(in srgb, ${theme.colors.surface.elevated} ${isDark ? "96%" : "93%"}, transparent)`;
+  const chromeBorder = `color-mix(in srgb, ${theme.colors.border.subtle} ${isDark ? "82%" : "88%"}, transparent)`;
+  const chromeBorderStrong = `color-mix(in srgb, ${theme.colors.border.default} ${isDark ? "84%" : "82%"}, transparent)`;
+  const inputSurfaceRest = theme.colors.surface.subtle;
+  const inputSurfaceFocus = theme.colors.surface.default;
+  const inputBorderRest = `color-mix(in srgb, ${theme.colors.border.default} ${isDark ? "76%" : "84%"}, transparent)`;
+  const inputBorderFocus = theme.colors.border.primary;
+  const hoverAccentSurface = `color-mix(in srgb, ${theme.colors.surface.primarySubtle} ${isDark ? "54%" : "72%"}, ${theme.colors.surface.subtle})`;
+  const screenWashPrimary = `radial-gradient(circle at 12% 14%, color-mix(in srgb, ${theme.colors.surface.primarySubtle} ${isDark ? "70%" : "100%"}, transparent), transparent 42%)`;
+  const screenWashSecondary = `radial-gradient(circle at 14% 14%, color-mix(in srgb, ${theme.colors.surface.secondarySubtle} ${isDark ? "70%" : "100%"}, transparent), transparent 40%)`;
+  const screenWashMixed = `radial-gradient(circle at 14% 12%, color-mix(in srgb, ${theme.colors.surface.primarySubtle} ${isDark ? "64%" : "94%"}, transparent), transparent 38%), radial-gradient(circle at 88% 10%, color-mix(in srgb, ${theme.colors.surface.secondarySubtle} ${isDark ? "62%" : "90%"}, transparent), transparent 32%)`;
+
   return `
 ${selector} {
   --surface-canvas: ${theme.colors.surface.canvas};
@@ -60,6 +73,19 @@ ${selector} {
   --accent-mixed-border: ${theme.recipes.mixedHeroSurface.borderColor};
   --accent-divider: ${theme.recipes.dividerColor};
   --accent-focus-ring: ${theme.recipes.focusRingColor};
+  --chrome-surface: ${chromeSurface};
+  --chrome-surface-strong: ${chromeSurfaceStrong};
+  --chrome-border: ${chromeBorder};
+  --chrome-border-strong: ${chromeBorderStrong};
+  --chrome-shadow: ${theme.shadows.lg};
+  --input-surface-rest: ${inputSurfaceRest};
+  --input-surface-focus: ${inputSurfaceFocus};
+  --input-border-rest: ${inputBorderRest};
+  --input-border-focus: ${inputBorderFocus};
+  --hover-accent-surface: ${hoverAccentSurface};
+  --screen-wash-primary: ${screenWashPrimary};
+  --screen-wash-secondary: ${screenWashSecondary};
+  --screen-wash-mixed: ${screenWashMixed};
   --action-secondary: ${theme.colors.action.secondary};
   --action-secondary-hover: ${theme.colors.action.secondaryHover};
   --action-secondary-active: ${theme.colors.action.secondaryActive};
@@ -187,6 +213,6 @@ ${selector} {
 };
 
 export const themeCss = `
-${createThemeCss(":root", lightWebTheme)}
-${createThemeCss('[data-theme="dark"]', darkWebTheme)}
+${createThemeCss(":root", lightWebTheme, false)}
+${createThemeCss('[data-theme="dark"]', darkWebTheme, true)}
 `;

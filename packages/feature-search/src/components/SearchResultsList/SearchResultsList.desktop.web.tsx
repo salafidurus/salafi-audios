@@ -29,7 +29,7 @@ export function SearchResultsListDesktopWeb({
           errorMessage={errorMessage}
         />
       ) : null}
-      <div className="flex flex-col divide-y divide-[var(--border-subtle)]">
+      <div className="flex flex-col gap-[var(--space-component-gap-sm)]">
         {items.map((item) => (
           <div key={item.id}>{renderItem(item)}</div>
         ))}
