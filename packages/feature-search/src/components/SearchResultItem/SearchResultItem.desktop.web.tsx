@@ -33,7 +33,7 @@ export function SearchResultItemDesktopWeb(item: SearchResultItemDesktopWebProps
   const durationLabel = formatDuration(item.durationSeconds);
 
   return (
-    <article className="flex cursor-pointer items-center gap-[var(--space-component-gap-md)] rounded-[var(--radius-component-card)] border border-transparent px-3 py-3 transition hover:border-[var(--accent-primary-subtle-border)] hover:bg-[var(--accent-primary-subtle-surface)] hover:shadow-[0_18px_36px_-30px_var(--accent-primary-border)]">
+    <article className="flex cursor-pointer items-center gap-[var(--space-component-gap-md)] rounded-[var(--radius-component-card)] border border-[var(--border-subtle)] bg-[var(--surface-default)] px-3 py-3 transition hover:border-[var(--accent-primary-subtle-border)] hover:bg-[var(--accent-primary-subtle-surface)] hover:shadow-[0_18px_36px_-30px_var(--accent-primary-border)]">
       <div className="w-[20%] xl:w-[10%] shrink-0 aspect-[4/5] overflow-hidden rounded-[var(--radius-component-panel-sm)] bg-[var(--surface-subtle)] flex items-center justify-center">
         {imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -76,7 +76,7 @@ export function SearchResultItemDesktopWeb(item: SearchResultItemDesktopWebProps
         <button
           type="button"
           aria-label={`Play ${item.title}`}
-          className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--surface-default)] text-[var(--content-muted)] transition hover:border-[var(--border-primary)] hover:bg-[var(--surface-selected)] hover:text-[var(--content-primary)]"
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--surface-subtle)] text-[var(--content-muted)] transition hover:border-[var(--border-primary)] hover:bg-[var(--surface-selected)] hover:text-[var(--content-primary)]"
         >
           <Play size={16} fill="currentColor" />
         </button>

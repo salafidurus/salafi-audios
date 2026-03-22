@@ -10,7 +10,7 @@ export type SearchInputDesktopWebProps = {
 };
 
 const shellClass =
-  "flex w-full items-center gap-3 rounded-[var(--radius-scale-full)] border border-[var(--border-default)] bg-[var(--surface-default)] px-5 py-3 transition focus-within:border-[var(--border-primary)] focus-within:bg-[var(--surface-default)]";
+  "flex w-full items-center gap-3 rounded-[var(--radius-scale-full)] border px-5 py-3 transition focus-within:border-[var(--input-border-focus)] focus-within:bg-[var(--input-surface-focus)] focus-within:shadow-[0_0_0_3px_color-mix(in_srgb,var(--accent-focus-ring)_24%,transparent)]";
 
 const inputClass =
   "w-full bg-transparent text-[var(--content-default)] outline-none placeholder:text-[var(--content-muted)]";
@@ -25,22 +25,28 @@ const inputStyle: CSSProperties = {
 
 export const SearchInputDesktopWeb = forwardRef<HTMLInputElement, SearchInputDesktopWebProps>(
   ({ placeholder, className, value, onChange, autoFocus }, ref) => {
-  return (
-    <label className={clsx(shellClass, className)} aria-label="Search library" style={inputStyle}>
-      <SearchGlyph />
-      <input
-        ref={ref}
-        type="search"
-        placeholder={placeholder}
-        className={inputClass}
-        aria-label={placeholder}
-        value={value}
-        onChange={(e) => onChange?.(e.target.value)}
-        autoFocus={autoFocus}
-        style={inputStyle}
-      />
-    </label>
-  );
+    const shellStyle: CSSProperties = {
+      ...inputStyle,
+      borderColor: "var(--input-border-rest)",
+      background: "var(--input-surface-rest)",
+    };
+
+    return (
+      <label className={clsx(shellClass, className)} aria-label="Search library" style={shellStyle}>
+        <SearchGlyph />
+        <input
+          ref={ref}
+          type="search"
+          placeholder={placeholder}
+          className={inputClass}
+          aria-label={placeholder}
+          value={value}
+          onChange={(e) => onChange?.(e.target.value)}
+          autoFocus={autoFocus}
+          style={inputStyle}
+        />
+      </label>
+    );
   },
 );
 

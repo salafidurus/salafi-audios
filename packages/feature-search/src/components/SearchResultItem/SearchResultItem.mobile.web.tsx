@@ -39,7 +39,15 @@ export function SearchResultItemMobileWeb({
       onPressOut={() => setIsPressed(false)}
       style={({ pressed }: { pressed: boolean }) => [
         styles.card,
-        { backgroundColor: pressed ? theme.colors.surface.hover : theme.colors.surface.default },
+        pressed
+          ? {
+              backgroundColor: theme.recipes.primarySubtleSurface.backgroundColor,
+              borderColor: theme.recipes.primarySubtleSurface.borderColor,
+            }
+          : {
+              backgroundColor: theme.colors.surface.default,
+              borderColor: theme.colors.border.subtle,
+            },
       ]}
     >
       <View style={styles.media}>

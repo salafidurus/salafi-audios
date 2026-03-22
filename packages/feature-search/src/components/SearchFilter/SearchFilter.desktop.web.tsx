@@ -18,7 +18,7 @@ const chipBase =
 const chipInactive =
   "border-[var(--border-subtle)] bg-[var(--surface-subtle)] text-[var(--content-muted)] hover:opacity-90";
 const chipActive =
-  "border-[var(--accent-primary-subtle-border)] bg-[var(--accent-primary-subtle-surface)] text-[var(--content-primary)]";
+  "border-[var(--accent-primary-subtle-border)] bg-[var(--accent-primary-subtle-surface)] text-[var(--accent-primary-subtle-fg)]";
 
 export type SearchFilterDesktopWebProps = {
   value: string[];

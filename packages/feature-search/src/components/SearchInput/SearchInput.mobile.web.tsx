@@ -25,13 +25,22 @@ export const SearchInputMobileWeb = forwardRef<SearchInputMobileWebRef, SearchIn
     const inputRef = React.useRef<RNTextInput>(null);
     const [backPressed, setBackPressed] = useState(false);
     const [clearPressed, setClearPressed] = useState(false);
+    const [isFocused, setIsFocused] = useState(false);
 
     useImperativeHandle(ref, () => ({
       focus: () => inputRef.current?.focus(),
     }));
 
     return (
-      <View style={styles.container}>
+      <View
+        style={[
+          styles.container,
+          isFocused && {
+            borderColor: theme.colors.border.primary,
+            backgroundColor: theme.colors.surface.default,
+          },
+        ]}
+      >
         <Pressable
           onPress={onBackPress}
           onPressIn={() => setBackPressed(true)}
@@ -51,6 +60,8 @@ export const SearchInputMobileWeb = forwardRef<SearchInputMobileWebRef, SearchIn
           placeholderTextColor={theme.colors.content.muted}
           value={value}
           onChangeText={onChange}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
           autoFocus
         />
 
@@ -79,7 +90,7 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing.component.gapMd,
-    backgroundColor: theme.colors.surface.default,
+    backgroundColor: theme.colors.surface.subtle,
     borderWidth: 1,
     borderColor: theme.colors.border.default,
     borderRadius: theme.radius.component.panelSm,
