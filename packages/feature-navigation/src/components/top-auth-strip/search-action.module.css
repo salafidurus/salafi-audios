@@ -4,12 +4,12 @@
   gap: 0.6rem;
   min-height: 2.5rem;
   padding: 0.58rem 0.9rem;
-  border: 1px solid color-mix(in srgb, var(--border-default) 82%, transparent);
+  border: 1px solid var(--chrome-border);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--surface-default) 84%, transparent);
+  background: var(--chrome-surface);
   color: var(--content-default);
   text-decoration: none;
-  box-shadow: 0 14px 24px -24px rgb(15 23 42 / 0.45);
+  box-shadow: var(--shadow-sm);
   transition:
     background 160ms ease,
     border-color 160ms ease,
@@ -18,7 +18,7 @@
 
 .searchLink:hover {
   border-color: var(--border-primary);
-  background: color-mix(in srgb, var(--surface-selected) 72%, transparent);
+  background: var(--hover-accent-surface);
   transform: translateY(-1px);
 }
 

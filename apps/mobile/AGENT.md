@@ -78,15 +78,25 @@ Use the owning package `AGENT.md` and source folder for the current component in
 
 ```typescript
 // apps/mobile/src/app/(auth)/sign-in.tsx
+import { Platform, useColorScheme } from "react-native";
 import { useRouter } from "expo-router";
 import { SignInScreen } from "@sd/feature-auth";
 import { authClient } from "@sd/core-auth";
 
 export default function SignInPage() {
   const router = useRouter();
+  const colorScheme = useColorScheme();
   return (
     <SignInScreen
-      googleLogoSource={require("@/assets/auth/google-logo-light-1x.png")}
+      googleButtonSource={
+        Platform.OS === "android"
+          ? colorScheme === "dark"
+            ? require("@/assets/auth/google-continue-dark-1x-android.png")
+            : require("@/assets/auth/google-continue-light-1x-android.png")
+          : colorScheme === "dark"
+            ? require("@/assets/auth/google-continue-dark-1x-ios.png")
+            : require("@/assets/auth/google-continue-light-1x-ios.png")
+      }
       onSignIn={async (email, password) => {
         const { error } = await authClient.signIn.email({ email, password });
         if (error) throw new Error(error.message ?? "Sign in failed");
@@ -104,7 +114,8 @@ export default function SignInPage() {
 
 - Never import `authClient` inside shared feature packages when the app wrapper owns auth wiring
 - Never import `expo-router` inside shared feature packages when navigation callbacks can be passed as props
-- Asset paths use the `@/assets` alias (e.g., `require("@/assets/auth/google-logo-light-1x.png")`)
+- Asset paths use the `@/assets` alias
+- Native auth button assets should be selected in the app wrapper by platform and theme, then passed into the shared screen via `googleButtonSource`
 
 ---
 
@@ -118,8 +129,16 @@ export default function SignInPage() {
 
 - App icons/splash are configured in `apps/mobile/app.config.ts` and sourced from `apps/mobile/assets/images/*`
 - In UI, use the brand logos from `apps/mobile/assets/images/logo/*` (avoid starter/template React logos)
-- Auth logos live in `apps/mobile/assets/auth/`:
-  - `google-logo-light-1x.png` — Google "G" logo (light background variant)
+- Auth button assets live in `apps/mobile/assets/auth/`:
+  - `google-continue-light-1x-ios.png`
+  - `google-continue-light-4x-ios.png`
+  - `google-continue-dark-1x-ios.png`
+  - `google-continue-dark-4x-ios.png`
+  - `google-continue-light-1x-android.png`
+  - `google-continue-light-4x-android.png`
+  - `google-continue-dark-1x-android.png`
+  - `google-continue-dark-4x-android.png`
+- Keep Apple native on `AppleAuthenticationButton`; do not replace it with local image assets
 - App-local aliases like `@/assets/*` must not be imported from shared packages. If a package imports an asset directly, that asset must live in the owning package or be passed in from the app.
 
 ---

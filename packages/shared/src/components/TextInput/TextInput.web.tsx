@@ -43,9 +43,9 @@ const baseStyle: CSSProperties = {
   width: "100%",
   minHeight: "2.9rem",
   padding: "0.78rem 0.95rem",
-  border: "1px solid color-mix(in srgb, var(--border-default) 84%, transparent)",
+  border: "1px solid var(--input-border-rest, var(--border-default))",
   borderRadius: "calc(var(--radius-component-chip) + 0.2rem)",
-  background: "var(--accent-primary-subtle-surface, var(--surface-subtle))",
+  background: "var(--input-surface-rest, var(--surface-subtle))",
   color: "var(--content-default)",
   fontFamily: "var(--typo-body-md-font-family), sans-serif",
   fontSize: "var(--typo-body-md-font-size)",
@@ -57,9 +57,9 @@ const baseStyle: CSSProperties = {
 };
 
 const focusedStyle: CSSProperties = {
-  borderColor: "var(--border-primary)",
-  boxShadow: "var(--shadow-focus)",
-  background: "var(--surface-default)",
+  borderColor: "var(--input-border-focus, var(--border-primary))",
+  boxShadow: "0 0 0 3px color-mix(in srgb, var(--accent-focus-ring) 24%, transparent)",
+  background: "var(--input-surface-focus, var(--surface-default))",
 };
 
 const invalidStyle: CSSProperties = {

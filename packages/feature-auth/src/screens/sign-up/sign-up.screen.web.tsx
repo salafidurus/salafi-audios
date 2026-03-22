@@ -161,8 +161,7 @@ const wrapperStyle: React.CSSProperties = {
   justifyContent: "center",
   padding: "24px 16px",
   minHeight: "100%",
-  background:
-    "radial-gradient(circle at 12% 14%, var(--surface-primary-subtle), transparent 42%), var(--surface-canvas)",
+  background: "var(--screen-wash-primary), var(--surface-canvas)",
 };
 
 const cardStyle: React.CSSProperties = {
@@ -196,12 +195,12 @@ const dividerStyle: React.CSSProperties = {
 const hrStyle: React.CSSProperties = {
   flex: 1,
   border: "none",
-  borderTop: "1px solid var(--border-default)",
+  borderTop: "1px solid var(--accent-divider, var(--border-default))",
 };
 
 const dividerTextStyle: React.CSSProperties = {
   fontSize: 13,
-  color: "var(--content-primary)",
+  color: "var(--content-muted)",
   whiteSpace: "nowrap",
 };
 
