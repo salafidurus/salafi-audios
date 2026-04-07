@@ -62,3 +62,9 @@ export type {
   GrantPermissionDto,
 } from "./admin.types";
 export { ADMIN_PERMISSIONS } from "./admin.types";
+export {
+  type ScholarChipDto,
+  type ContentSuggestionDto,
+  type RecentProgressDto,
+  type QuickBrowseDto,
+} from "../types/home.types";

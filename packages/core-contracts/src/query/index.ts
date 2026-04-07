@@ -106,4 +106,29 @@ export const queryKeys = {
     lecture: (lectureId: string) => [...queryKeys.progress.all, "lecture", lectureId] as const,
     history: () => [...queryKeys.progress.all, "history"] as const,
   },
+  home: {
+    all: ["home"] as const,
+    quickbrowse: (params?: Record<string, unknown>) =>
+      [...queryKeys.home.all, "quickbrowse", params] as const,
+  },
+  admin: {
+    all: ["admin"] as const,
+    permissions: {
+      all: () => [...queryKeys.admin.all, "permissions"] as const,
+      me: () => [...queryKeys.admin.all, "permissions", "me"] as const,
+      user: (userId: string) => [...queryKeys.admin.all, "permissions", userId] as const,
+    },
+    scholars: {
+      all: () => [...queryKeys.admin.all, "scholars"] as const,
+      list: () => [...queryKeys.admin.all, "scholars", "list"] as const,
+    },
+    topics: {
+      all: () => [...queryKeys.admin.all, "topics"] as const,
+      list: () => [...queryKeys.admin.all, "topics", "list"] as const,
+    },
+    live: {
+      all: () => [...queryKeys.admin.all, "live"] as const,
+      sessions: () => [...queryKeys.admin.all, "live", "sessions"] as const,
+    },
+  },
 } as const;

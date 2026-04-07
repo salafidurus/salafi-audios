@@ -55,6 +55,14 @@ export {
   ADMIN_PERMISSIONS,
 } from "./types";
 
+// Export home types
+export type {
+  ScholarChipDto,
+  ContentSuggestionDto,
+  RecentProgressDto,
+  QuickBrowseDto,
+} from "./types";
+
 // Export route constants
 export { routes } from "./routes";
 

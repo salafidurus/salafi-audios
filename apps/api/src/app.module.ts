@@ -17,6 +17,7 @@ import { ScholarsModule } from './modules/scholars/scholars.module';
 import { LiveModule } from './modules/live/live.module';
 import { LibraryModule } from './modules/library/library.module';
 import { ProgressModule } from './modules/progress/progress.module';
+import { HomeModule } from './modules/home/home.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ProgressModule } from './modules/progress/progress.module';
     LiveModule,
     LibraryModule,
     ProgressModule,
+    HomeModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: AuthGuard }],
 })

@@ -47,4 +47,27 @@ export const endpoints = {
     history: "/progress/history",
     sync: "/me/progress/sync",
   },
+  home: {
+    quickbrowse: "/home/quickbrowse",
+  },
+  admin: {
+    permissions: {
+      me: "/admin/permissions/me",
+      list: "/admin/permissions",
+      grant: "/admin/permissions",
+      revoke: (id: string) => `/admin/permissions/${id}`,
+    },
+    scholars: {
+      create: "/admin/scholars",
+      update: (id: string) => `/admin/scholars/${id}`,
+    },
+    topics: {
+      create: "/admin/topics",
+      update: (slug: string) => `/admin/topics/${slug}`,
+      delete: (slug: string) => `/admin/topics/${slug}`,
+    },
+    live: {
+      updateStatus: (id: string) => `/admin/live/sessions/${id}/status`,
+    },
+  },
 } as const;
