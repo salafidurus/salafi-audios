@@ -1,9 +1,6 @@
 import { useQuery, type QueryKey, type UseQueryOptions } from "@tanstack/react-query";
 import type { HttpClientConfig } from "../../http";
-import { configureApiClient, httpClient } from "../../http";
-import { endpoints } from "../../endpoints";
-import { queryKeys } from "../../query";
-import type { SearchCatalogResultsDto } from "../../types";
+import { configureApiClient } from "../../http";
 
 export function useApiQuery<TData, TError = Error>(
   key: QueryKey,
