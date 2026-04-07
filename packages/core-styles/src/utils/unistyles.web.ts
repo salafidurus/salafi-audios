@@ -20,10 +20,13 @@ const webBreakpoints = {
 } as const;
 
 StyleSheet.configure({
-  breakpoints: webBreakpoints,
+  // This bootstrap is imported from web entrypoints across packages.
+  // Package-local Unistyles module augmentation may describe native-only themes,
+  // so keep the runtime config explicit instead of coupling it to the caller's TS view.
+  breakpoints: webBreakpoints as never,
   themes: {
-    light: lightWebTheme,
-    dark: darkWebTheme,
+    light: lightWebTheme as never,
+    dark: darkWebTheme as never,
   },
   settings: {
     initialTheme: "light",
