@@ -32,6 +32,11 @@ export {
   type LiveSessionPageDto,
   type LectureProgressDto,
   type ProgressUpdateDto,
+  type AdminPermission,
+  type AdminPermissionDto,
+  type AdminPermissionsListDto,
+  type GrantPermissionDto,
+  ADMIN_PERMISSIONS,
 } from "./types";
 
 // Export route constants

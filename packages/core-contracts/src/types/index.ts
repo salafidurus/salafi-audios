@@ -33,3 +33,10 @@ export {
   type LiveSessionPageDto,
 } from "../types/live.types";
 export { type LectureProgressDto, type ProgressUpdateDto } from "../types/progress.types";
+export type {
+  AdminPermission,
+  AdminPermissionDto,
+  AdminPermissionsListDto,
+  GrantPermissionDto,
+} from "./admin.types";
+export { ADMIN_PERMISSIONS } from "./admin.types";

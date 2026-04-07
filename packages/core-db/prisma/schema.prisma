@@ -99,6 +99,23 @@ model User {
   createdScholarRoles UserScholarRole[]     @relation("createdByUser")
   progress            UserLectureProgress[]
   favorites           FavoriteLecture[]
+
+  adminPermissions        AdminPermission[]
+  adminPermissionsGranted AdminPermission[] @relation("AdminPermissionGranter")
+}
+
+model AdminPermission {
+  userId      String
+  permission  String
+  grantedAt   DateTime @default(now())
+  grantedById String?
+
+  user      User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grantedBy User? @relation("AdminPermissionGranter", fields: [grantedById], references: [id], onDelete: SetNull)
+
+  @@id([userId, permission])
+  @@index([userId])
+  @@index([permission])
 }
 
 model UserScholarRole {
