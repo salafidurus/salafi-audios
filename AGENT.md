@@ -291,6 +291,46 @@ Red → Green → Commit (test + impl together)
   - strict monorepo boundaries
   - generated client is derived
 
+## Documentation standards
+
+### When to add workspace README.md
+
+A workspace-level `README.md` is required when:
+
+- The workspace is directly executable or deployable.
+- The workspace has its own build, test, or runtime expectations.
+- The workspace exposes a public internal API used by multiple other workspaces.
+- The workspace has platform-specific entrypoints.
+- The workspace contains non-obvious codegen, caching, CI, or build constraints.
+
+### When inline comments are expected
+
+Add comments to files containing:
+
+- CI cache logic or workflow conditionals.
+- Unusual TypeScript or build configuration.
+- Source-vs-dist export map decisions.
+- Platform-specific entrypoint indirection.
+- Generated-code constraints.
+- Backend authority or security invariants.
+- Offline/outbox semantics.
+- Non-obvious query or cache invalidation behavior.
+
+### When inline comments should NOT be added
+
+Do not add comments to:
+
+- Straightforward presentational components.
+- Simple DTO or type definitions.
+- Obvious utility functions.
+- Boilerplate config that mirrors defaults.
+
+### AGENT.md vs README.md
+
+- `AGENT.md` defines contributor and AI agent behavior rules.
+- `README.md` explains structure, purpose, and operational guidance for humans.
+- These must not duplicate each other.
+
 ## Safety checklist
 
 - Do not bypass backend authorization with client logic.
