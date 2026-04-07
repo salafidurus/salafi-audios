@@ -1,7 +1,6 @@
 {
   "extends": "../../packages/util-config/tsconfig/next.json",
   "compilerOptions": {
-    "baseUrl": ".",
     "moduleSuffixes": [".desktop.web", ".web", "", ".native"]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
