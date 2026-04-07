@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { routes } from "@sd/core-contracts";
 import styles from "./not-found.module.css";
 
 export default function NotFound() {
@@ -10,7 +11,7 @@ export default function NotFound() {
         <p className={styles.description}>
           The page you are looking for does not exist or has been moved.
         </p>
-        <Link href="/" className={styles.link}>
+        <Link href={routes.home} className={styles.link}>
           Back to home
         </Link>
       </div>

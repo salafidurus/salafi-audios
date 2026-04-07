@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useResponsive } from "@sd/shared";
+import { routes } from "@sd/core-contracts";
 import { TopAuthStripTablet } from "./top-auth-strip.tablet.web";
 import { TopAuthStripWeb } from "./top-auth-strip.web";
 
-const AUTH_ROUTES = ["/sign-in", "/sign-up"];
+const AUTH_ROUTES = [routes.signIn, routes.signUp];
 
 export function TopAuthStrip() {
   const pathname = usePathname();

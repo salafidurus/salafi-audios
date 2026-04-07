@@ -39,9 +39,11 @@ export const SECTION_LABELS: Record<Section, string> = {
   account: "Account",
 };
 
+import { routes } from "@sd/core-contracts";
+
 export const SECTION_ROUTES: Record<Section, string> = {
-  feed: "/feed",
-  live: "/live",
-  library: "/library",
-  account: "/account",
+  feed: routes.feed.root,
+  live: routes.live.root,
+  library: routes.library.root,
+  account: routes.account.root,
 };

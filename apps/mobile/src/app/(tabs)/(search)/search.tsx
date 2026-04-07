@@ -1,5 +1,6 @@
 import { SearchProcessingMobileNativeScreen } from "@sd/feature-search";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { routes } from "@sd/core-contracts";
 
 export default function SearchRoute() {
   const router = useRouter();
@@ -13,7 +14,7 @@ export default function SearchRoute() {
           router.back();
           return;
         }
-        router.replace("/");
+        router.replace(routes.home);
       }}
     />
   );

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { routes } from "@sd/core-contracts";
 import styles from "../../features/navigation/components/header/header.module.css";
 import { ButtonDesktopWeb } from "@sd/shared";
 
@@ -42,7 +43,7 @@ export function Header() {
       className={styles.header}
     >
       <div className={styles.inner}>
-        <Link href="/" className={styles.brand} aria-label="Salafi Durus">
+        <Link href={routes.home} className={styles.brand} aria-label="Salafi Durus">
           <span className={styles.brandMark} aria-hidden="true">
             <Image
               src="/logo/logo_72.png"
@@ -57,10 +58,10 @@ export function Header() {
         </Link>
 
         <div className={styles.actions}>
-          <ButtonDesktopWeb variant="ghost" size="sm" onClick={() => router.push("/sign-in")}>
+          <ButtonDesktopWeb variant="ghost" size="sm" onClick={() => router.push(routes.signIn)}>
             Sign In
           </ButtonDesktopWeb>
-          <ButtonDesktopWeb variant="primary" size="sm" onClick={() => router.push("/signup")}>
+          <ButtonDesktopWeb variant="primary" size="sm" onClick={() => router.push(routes.signUp)}>
             Create Free Account
           </ButtonDesktopWeb>
         </div>

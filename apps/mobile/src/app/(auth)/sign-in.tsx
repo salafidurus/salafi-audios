@@ -1,6 +1,7 @@
 import { Platform, useColorScheme } from "react-native";
 import { useRouter } from "expo-router";
 import { SignInMobileNativeScreen, authClient } from "@sd/feature-auth";
+import { routes } from "@sd/core-contracts";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -11,7 +12,7 @@ export default function SignInPage() {
       return;
     }
 
-    router.replace("/");
+    router.replace(routes.home);
   };
 
   return (
@@ -29,11 +30,11 @@ export default function SignInPage() {
       onSignIn={async (email, password) => {
         const { error } = await authClient.signIn.email({ email, password });
         if (error) throw new Error(error.message ?? "Sign in failed");
-        router.replace("/");
+        router.replace(routes.home);
       }}
       onSignInWithGoogle={() => authClient.signIn.social({ provider: "google" })}
       onSignInWithApple={() => authClient.signIn.social({ provider: "apple" })}
-      onNavigateToSignUp={() => router.push("/sign-up")}
+      onNavigateToSignUp={() => router.push(routes.signUp)}
     />
   );
 }

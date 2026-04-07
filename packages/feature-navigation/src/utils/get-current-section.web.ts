@@ -1,10 +1,11 @@
 import { DEFAULT_TABS, type Section } from "../types";
+import { routes } from "@sd/core-contracts";
 
 const PATH_TO_SECTION: Record<string, Section> = {
-  "/feed": "feed",
-  "/live": "live",
-  "/library": "library",
-  "/account": "account",
+  [routes.feed.root]: "feed",
+  [routes.live.root]: "live",
+  [routes.library.root]: "library",
+  [routes.account.root]: "account",
 };
 
 export function getCurrentSection(pathname: string): Section | "home" {
