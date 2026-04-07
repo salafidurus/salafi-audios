@@ -3,333 +3,670 @@
 > **For agentic workers:** Use superpowers:executing-plans or superpowers:subagent-driven-development to implement this plan.
 > **Status:** FINAL — ready to execute.
 
-**Goal:** Establish meaningful test coverage for core functionalities across the monorepo. Not brittle snapshot testing — behavior-driven tests that catch real regressions without requiring constant maintenance.
+**Goal:** Establish meaningful test coverage for core functionality across all apps and packages. The focus is behaviour — not implementation details. Tests must survive refactors as long as the behaviour contract holds.
 
 **Philosophy:**
 
-- Unit test pure logic: stores, utilities, service invariants, data transforms.
-- Integration test module boundaries: service + mocked repo, guard + real NestJS module.
-- E2E test critical user flows only: public content access, auth protection, navigation.
-- **Never** test: presentational-only React/RN components, trivial getters/setters, or framework-provided behavior.
+- Unit test pure logic: stores, utilities, data transforms, service invariants.
+- Integration test module and auth boundaries: service + mocked repo, guard + real NestJS testing module.
+- E2E test only critical user flows: public content access, auth enforcement, navigation landmarks.
+- **Never** test: presentational-only UI components, trivial getters/setters, framework-provided wiring.
 
 ---
 
-## TDD Workflow (Red → Green → Commit)
+## TDD Workflow
 
-Every new feature or bug fix follows this sequence:
+```text
+Red → Green → Commit  (test + implementation in the same commit)
+```
 
-1. Write a failing test that describes the desired behavior or reproduces the bug.
-2. Run it: confirm it fails with the expected error, not a setup error.
-3. Write the minimal implementation to make it pass.
-4. Run again: confirm it passes.
-5. Commit: test and implementation together.
+1. Write the failing test describing the expected behaviour.
+2. Run it — confirm it fails with the _expected_ message, not a setup error.
+3. Implement the minimum code to make it pass.
+4. Run again — confirm it passes.
+5. Commit test and implementation together.
+
+Bug fixes always start with a failing regression test.
 
 ---
 
 ## Current Coverage Baseline
 
-| Area                      | Files                                   | State          |
-| ------------------------- | --------------------------------------- | -------------- |
-| `apps/api` auth guard     | `auth.guard.spec.ts`                    | ✅ covered     |
-| `apps/api` topics service | `topics.service.spec.ts`                | ✅ covered     |
-| `apps/api` search utils   | `search-error.utils.spec.ts`            | ✅ covered     |
-| `apps/api` topics utils   | `topics-error.utils.spec.ts`            | ✅ covered     |
-| `apps/web` E2E smoke      | `e2e/smoke.spec.ts`, `e2e/home.spec.ts` | ✅ minimal     |
-| Everything else           | —                                       | ❌ not covered |
+| Area                                | File                                    | State      |
+| ----------------------------------- | --------------------------------------- | ---------- |
+| `apps/api` — auth guard             | `auth.guard.spec.ts`                    | ✅         |
+| `apps/api` — topics service         | `topics.service.spec.ts`                | ✅         |
+| `apps/api` — search utils           | `search-error.utils.spec.ts`            | ✅         |
+| `apps/api` — topics utils           | `topics-error.utils.spec.ts`            | ✅         |
+| `apps/web` — E2E smoke              | `e2e/smoke.spec.ts`, `e2e/home.spec.ts` | ✅ minimal |
+| All packages, mobile, remaining API | —                                       | ❌         |
 
 ---
 
-## Packages Needing Jest Setup (Before Tests Can Run)
+## Packages Requiring Jest Setup
 
-The following packages need a `jest.config.cjs` and a test script before any tests can be added. Copy the pattern from `packages/core-env/jest.config.cjs`.
+These packages have no `jest.config.cjs` yet. Add one before writing tests for them. Copy the pattern from `packages/core-env/jest.config.cjs` (node environment) or `packages/core-db/jest.config.cjs` (jsdom for Zustand stores).
 
 ```text
-packages/domain-progress/
-packages/domain-playback/
-packages/feature-navigation/
-packages/core-contracts/
+packages/domain-playback/      → jsdom  (Zustand)
+packages/domain-progress/      → jsdom  (Zustand)
+packages/domain-search/        → jsdom
+packages/feature-downloads/    → jsdom  (Zustand)
+packages/feature-navigation/   → node   (string utils only; store tests use jsdom)
+packages/shared/               → node   (pure functions; format.desktop.web.ts has no DOM deps)
+packages/util-ingest/          → node   (already has jest setup; no test files yet)
+packages/core-contracts/       → node
 ```
 
-Each needs:
+Each needs these additions to `package.json`:
 
-- `jest.config.cjs` with `testEnvironment: "node"` (or `jsdom` for Zustand stores)
-- `"test": "jest --passWithNoTests"` in `package.json` scripts
+```json
+{
+  "scripts": {
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch --passWithNoTests",
+    "test:cov": "jest --coverage --passWithNoTests",
+    "test:prepush": "jest --passWithNoTests --testPathPattern"
+  }
+}
+```
 
 ---
 
-## Tier 1: API — Service Invariants (Unit, `apps/api`)
+## Section 1 — `apps/api` (NestJS Backend)
 
-These are the highest-ROI tests. They protect authorization boundaries and domain rules without a running database.
+### 1.1 Scholars Service
 
-### `scholars.service.spec.ts`
+**File:** `apps/api/src/modules/scholars/scholars.service.spec.ts`
 
-File: `apps/api/src/modules/scholars/scholars.service.spec.ts`
-Pattern: same as `topics.service.spec.ts` — mock `ScholarsRepository`, test service in isolation.
-
-Tests:
-
-- `getBySlug` resolves with DTO when scholar is found
-- `getBySlug` throws `NotFoundException` when `repo.findBySlug` returns null
-- `getStats` throws `NotFoundException` when scholar not found
-- `getContent` returns grouped content DTO from repo response
-
-### `library.service.spec.ts`
-
-File: `apps/api/src/modules/library/library.service.spec.ts`
+Setup: `Test.createTestingModule` with `ScholarsService` + mocked `ScholarsRepository`.
 
 Tests:
 
-- `getSaved` calls repo with the authenticated user's ID
-- `getCompleted` calls repo with the authenticated user's ID
-- `saveLecture` calls `repo.save` with correct lectureId and userId
-- `unsaveLecture` calls `repo.remove` with correct lectureId and userId
+- `getBySlug` resolves with DTO when scholar exists
+- `getBySlug` throws `NotFoundException` when `repo.findBySlug` returns `null`
+- `getStats` throws `NotFoundException` when scholar is not found
+- `getStats` returns the stats DTO when found
+- `getContent` returns grouped content (collections, standalone series, standalone lectures) from the repo response
+- `list` returns the array from `repo.list`
+
+### 1.2 Library Service
+
+**File:** `apps/api/src/modules/library/library.service.spec.ts`
+
+Setup: mock `LibraryRepository`.
+
+Tests:
+
+- `getSaved` calls repo with the authenticated user's `userId`
+- `getCompleted` calls repo with the authenticated user's `userId`
 - `getProgress` returns progress entries for the user
+- `saveLecture(userId, lectureId)` calls `repo.save` with correct arguments
+- `unsaveLecture(userId, lectureId)` calls `repo.remove` with correct arguments
 
-### `live.service.spec.ts`
+### 1.3 Live Service
 
-File: `apps/api/src/modules/live/live.service.spec.ts`
+**File:** `apps/api/src/modules/live/live.service.spec.ts`
 
-Tests:
-
-- `getActive` returns only sessions with `status = LIVE`
-- `updateStatus` transitions `UPCOMING → LIVE` successfully
-- `updateStatus` transitions `LIVE → ENDED` successfully
-- `updateStatus` throws `BadRequestException` for invalid transition (e.g., `ENDED → LIVE`)
-
-### `admin-permissions.service.spec.ts`
-
-File: `apps/api/src/modules/admin-permissions/admin-permissions.service.spec.ts`
+Setup: mock `LiveRepository`.
 
 Tests:
 
-- `hasPermission(userId, 'manage:scholars')` returns `true` when record exists
-- `hasPermission(userId, 'manage:scholars')` returns `false` when record absent
-- `grantPermission` creates a permission record via repo
-- `revokePermission` deletes the permission record via repo
-- `revokePermission` throws `NotFoundException` when record does not exist
+- `getActive` delegates to `repo.getActive` and returns sessions
+- `getUpcoming` delegates to `repo.getUpcoming`
+- `getEnded(cursor)` delegates with cursor and returns paginated result
+- `updateStatus(id, UPCOMING → LIVE)` calls `repo.updateStatus` and returns updated session
+- `updateStatus(id, LIVE → ENDED)` succeeds
+- `updateStatus(id, ENDED → LIVE)` throws `BadRequestException` (invalid transition)
+- `updateStatus` for a non-existent session throws `NotFoundException`
 
-### `progress.service.spec.ts`
+### 1.4 Feed Service
 
-File: `apps/api/src/modules/progress/progress.service.spec.ts`
+**File:** `apps/api/src/modules/feed/feed.service.spec.ts`
 
-Tests:
-
-- `update` creates a new progress record when none exists
-- `update` updates `positionSeconds` on existing record
-- `bulkSync` upserts all provided entries and returns the saved array
-
----
-
-## Tier 2: API — Auth Boundary (Integration, `apps/api`)
-
-These tests boot the NestJS module and fire HTTP requests against it. They use `supertest` and a mocked `PrismaService`. They verify that the auth layer is wired correctly — not just the guard in isolation.
-
-### `auth-boundary.spec.ts`
-
-File: `apps/api/src/modules/auth/auth-boundary.spec.ts`
-Setup: spin up a minimal NestJS `Test.createTestingModule` that includes `AuthModule` + one protected controller. Mock `getAuth` to return no session by default.
+Setup: mock `FeedRepository`.
 
 Tests:
 
-- `GET /scholars` (public endpoint) returns 200 without an auth token
+- `getList(cursor, topicSlugs, scholarSlugs)` delegates to repo with correct params
+- `getList` with no filters passes empty arrays (not `undefined`) to repo
+- `getRecent(cursor)` delegates to `repo.getRecent`
+- `getFollowing(userId, cursor)` delegates to `repo.getFollowing` with userId
+- `getScholars()` delegates to `repo.getScholars` and returns chip array
+
+### 1.5 Progress Service
+
+**File:** `apps/api/src/modules/progress/progress.service.spec.ts`
+
+Setup: mock `ProgressRepository`.
+
+Tests:
+
+- `update(userId, lectureId, dto)` calls `repo.upsert` with correct payload
+- `bulkSync(userId, items)` calls `repo.bulkUpsert` with the items array and returns results
+- `getForUser(userId, cursor)` delegates to `repo.list` with userId and cursor
+
+### 1.6 Admin Permissions Service
+
+**File:** `apps/api/src/modules/admin-permissions/admin-permissions.service.spec.ts`
+
+Setup: mock `AdminPermissionsRepository`.
+
+Tests:
+
+- `hasPermission(userId, 'manage:scholars')` returns `true` when record exists in repo
+- `hasPermission(userId, 'manage:scholars')` returns `false` when repo returns null/undefined
+- `getMyPermissions(userId)` returns the permissions array from repo
+- `grantPermission(granterId, targetId, permission)` calls `repo.create` with correct args
+- `revokePermission(id)` calls `repo.delete(id)`
+- `revokePermission` on a non-existent id throws `NotFoundException`
+
+### 1.7 Home Service
+
+**File:** `apps/api/src/modules/home/home.service.spec.ts`
+
+Setup: mock `HomeRepository`.
+
+Tests:
+
+- `getQuickBrowse(userId?)` returns DTO from repo
+- `getQuickBrowse` called without userId returns anonymous form (no recentProgress)
+- `getQuickBrowse` called with userId returns DTO with recentProgress populated
+
+### 1.8 Auth Boundary Integration
+
+**File:** `apps/api/src/modules/auth/auth-boundary.integration.spec.ts`
+
+Setup: `Test.createTestingModule` that boots a minimal NestJS app including `AuthModule` + mock controllers for each auth tier. Mock `getAuth` to return null/session based on the test case.
+
+Tests:
+
+- `GET /scholars` (marked `@Public()`) returns 200 without any auth token
 - `GET /me/library/saved` returns 401 when no session is present
-- `GET /me/library/saved` returns 200 when a valid session is injected
-- `POST /admin/scholars` returns 403 when user has no `manage:scholars` permission
-- `POST /admin/scholars` returns 201 when user has `manage:scholars` permission
+- `GET /me/library/saved` returns 200 when a valid session is injected into the request
+- `POST /admin/scholars` returns 403 when authenticated user has no `manage:scholars` permission
+- `POST /admin/scholars` returns 201 when authenticated user has `manage:scholars` permission
+- Guard correctly reads `@Public()`, `@Roles()` decorators in combination
 
 ---
 
-## Tier 3: Domain Package — Progress Store (Unit, `domain-progress`)
+## Section 2 — `packages/domain-playback`
 
-The Zustand store is pure state logic — no network, no side effects. Test via the store's action functions directly.
+### 2.1 Playback Store
 
-### `progress.store.spec.ts`
+**File:** `packages/domain-playback/src/store/playback.store.spec.ts`
 
-File: `packages/domain-progress/src/store/progress.store.spec.ts`
-Environment: `jsdom` (Zustand `create` works in jsdom).
-Reset store state between tests with `useProgressStore.setState({ progressMap: {}, savedMap: {} })`.
+Environment: `jsdom`. Reset state between tests with `usePlaybackStore.setState(initialState)`.
+
+Tests for `play`:
+
+- Sets `currentTrack` to the supplied track
+- Sets `status` to `"loading"`
+- Resets `positionSeconds` to `0`
+- Sets `durationSeconds` from `track.durationSeconds`; defaults to `0` when undefined
+
+Tests for `pause` / `resume`:
+
+- `pause` transitions status to `"paused"` without clearing the track
+- `resume` transitions status to `"playing"` without clearing the track
+
+Tests for `seek`:
+
+- Updates `positionSeconds` to the given value
+
+Tests for `stop`:
+
+- Clears `currentTrack` to `null`
+- Resets `status` to `"idle"`, `positionSeconds` to `0`, `durationSeconds` to `0`
+
+Tests for `setError`:
+
+- Sets `status` to `"error"` and `error` to the supplied string
+
+Tests for queue operations:
+
+- `enqueue(track)` adds a `QueueItem` to the end of `queue`
+- `enqueue` twice → two items in order
+- `dequeue(trackId)` removes the matching item; queue length decreases by 1
+- `dequeue` for a non-existent trackId leaves the queue unchanged
+- `clearQueue` sets `queue` to `[]`
+
+Tests for `skipToNext`:
+
+- When queue is empty, calls `stop()` (status becomes `"idle"`, currentTrack becomes `null`)
+- When queue has one item, plays that item and empties the queue
+- When queue has multiple items, plays the first item and the remaining stay in queue (FIFO order preserved)
+
+---
+
+## Section 3 — `packages/domain-progress`
+
+### 3.1 Progress Store
+
+**File:** `packages/domain-progress/src/store/progress.store.spec.ts`
+
+Environment: `jsdom`. Reset state between tests.
 
 Tests:
 
-- `setProgress` creates a new entry with correct `positionSeconds` and `durationSeconds`
+- `setProgress(id, 120, 3600)` creates entry with correct `positionSeconds` and `durationSeconds`
 - `setProgress` preserves `completedAt` when updating an existing entry
-- `setProgress` updates `updatedAt` to a new ISO timestamp
-- `markCompleted` sets `completedAt` to an ISO string on an existing entry
-- `markCompleted` is a no-op when the lectureId does not exist in `progressMap`
+- `setProgress` updates `updatedAt` to a new ISO timestamp on each call
+- `markCompleted(id)` sets `completedAt` to a truthy ISO string
+- `markCompleted` on an unknown lectureId is a no-op (no entry created)
 - `addSaved(id)` + `isSaved(id)` → `true`
-- `removeSaved(id)` + `isSaved(id)` → `false`
-- `getSavedIds` returns all keys in `savedMap`
-- `loadSaved` merges entries without clobbering entries already in `savedMap`
-- `loadProgress` merges entries without clobbering existing `progressMap` entries
+- `addSaved` then `removeSaved` + `isSaved` → `false`
+- `removeSaved` on an id that was never saved is a no-op (no error thrown)
+- `getSavedIds` returns exactly the keys in `savedMap`
+- `loadSaved([{lectureId, savedAt}])` merges into `savedMap` without clobbering existing entries
+- `loadProgress(entries)` merges into `progressMap` without clobbering existing entries
+
+### 3.2 Progress Sync
+
+**File:** `packages/domain-progress/src/sync/progress.sync.spec.ts`
+
+Environment: `node`. Use `jest.useFakeTimers()` for debounce tests. Mock `httpClient`.
+
+Tests for `syncProgressToBackend`:
+
+- First call for a lectureId starts a 5-second debounce timer
+- Second call for the same lectureId within the window resets (collapses) the timer — only one HTTP call is made
+- Two calls for different lectureIds within the window result in two entries sent in one flush
+- After the debounce fires, `httpClient` is called with the correct endpoint and body
+- On HTTP failure, the pending update is re-enqueued (retried on next flush)
+
+Tests for `syncLocalToServer`:
+
+- With progress entries in the store, calls `POST /me/progress/sync` with all entries
+- With saved ids in the store, calls `POST /me/library/saved/sync` with all ids
+- With empty store, makes no HTTP calls
+- Fires both requests concurrently (not sequentially)
+
+Tests for `saveLecture` / `unsaveLecture`:
+
+- `saveLecture(id)` adds id to the store's `savedMap` immediately (optimistic)
+- `saveLecture(id)` fires `POST /me/library/saved/:id`
+- `unsaveLecture(id)` removes id from `savedMap` immediately (optimistic)
+- `unsaveLecture(id)` fires `DELETE /me/library/saved/:id`
+- On HTTP failure, `unsaveLecture` re-adds the id to `savedMap` (rollback)
 
 ---
 
-## Tier 4: Domain Package — Progress Sync (Unit, `domain-progress`)
+## Section 4 — `packages/domain-search`
 
-### `progress.sync.spec.ts`
+### 4.1 Search Result Transformer
 
-File: `packages/domain-progress/src/sync/progress.sync.spec.ts`
+**File:** `packages/domain-search/src/utils/build-search-result-rows.spec.ts`
+
+Environment: `node`.
 
 Tests:
 
-- Sync payload contains all progress entries from `progressMap`
-- Sync payload is empty `[]` when `progressMap` is empty
-- Sync payload contains all `savedMap` entries under `saved`
-- `mergeSyncResponse` upserts server entries (server wins on conflict for position)
+- `buildSearchResultRows(undefined)` returns `[]`
+- `buildSearchResultRows({ collections: [], series: [], lectures: [] })` returns `[]`
+- Collections are prefixed `"collection:<id>"` in the `id` field
+- Series are prefixed `"series:<id>"`
+- Lectures are prefixed `"lecture:<id>"`
+- Result order: collections first, then series, then lectures
+- `coverImageUrl` is used as `imageUrl` when present; falls back to `scholarImageUrl`
+- When both `coverImageUrl` and `scholarImageUrl` are absent, `imageUrl` is `undefined`
+- `lectureCount`, `durationSeconds`, `scholarName`, `title` are passed through unchanged
 
 ---
 
-## Tier 5: Navigation Utilities (Unit, `feature-navigation`)
+## Section 5 — `packages/shared`
 
-These are pure string-manipulation functions. No DOM, no React. Fast and robust.
+### 5.1 Duration Formatter
 
-### `get-current-section.web.spec.ts`
+**File:** `packages/shared/src/utils/format.spec.ts`
 
-File: `packages/feature-navigation/src/utils/get-current-section.web.spec.ts`
+Environment: `node`. Tests for `formatDuration`:
+
+- `formatDuration(undefined)` → `""`
+- `formatDuration(0)` → `""`
+- `formatDuration(-1)` → `""`
+- `formatDuration(30)` → `""` (less than one minute rounds to empty)
+- `formatDuration(60)` → `"1m"`
+- `formatDuration(90)` → `"1m"` (partial minutes floor)
+- `formatDuration(3600)` → `"1hr 00m"`
+- `formatDuration(3660)` → `"1hr 01m"`
+- `formatDuration(7322)` → `"2hr 02m"` (2h + 122s = 2h2m)
+- `formatDuration(59)` → `""` (under one minute)
+
+Tests for `formatCompactNumber`:
+
+- `formatCompactNumber(0)` → `"0"`
+- `formatCompactNumber(1)` → `"1"`
+- `formatCompactNumber(999)` → `"999"`
+- `formatCompactNumber(1000)` → `"1k"`
+- `formatCompactNumber(1500)` → `"1.5k"`
+- `formatCompactNumber(1100)` → `"1.1k"`
+- `formatCompactNumber(10000)` → `"10k"` (whole thousands omit decimal)
+- `formatCompactNumber(999999)` → `"1000k"` — or whatever the formula produces (document the boundary behaviour exactly)
+- `formatCompactNumber(1_000_000)` → `"1M"`
+- `formatCompactNumber(2_500_000)` → `"2.5M"`
+
+---
+
+## Section 6 — `packages/core-contracts`
+
+### 6.1 HTTP Client
+
+**File:** `packages/core-contracts/src/http.spec.ts`
+
+Environment: `node`. Use `jest.spyOn(global, 'fetch')` or `msw` to intercept requests.
 
 Tests:
 
-- `/feed` → `"feed"`
-- `/feed/recent` → `"feed"` (sub-route still maps to section)
-- `/library/saved` → `"library"`
-- `/account/profile` → `"account"`
-- `/account/legal` → `"account"`
-- `/` → `"home"`
-- `/scholars/some-slug` → `"home"` (not a main section)
+- Throws `"API client is not configured"` when called before `configureApiClient`
+- After `configureApiClient({ baseUrl })`, constructs the correct full URL
+- Appends scalar query params as `?key=value`
+- Appends array query params by repeating the key (`?tags=a&tags=b`)
+- Omits params that are `undefined` or `null`
+- Sets `Content-Type: application/json` header on every request
+- Injects `Authorization: Bearer <token>` when `getAccessToken` returns a string
+- Omits `Authorization` header when `getAccessToken` returns `undefined`
+- Throws `"Network request failed"` on fetch rejection (network error)
+- Throws `"API 404"` error on 4xx response
+- Throws `"API 500"` error on 5xx response
+- Returns parsed JSON for `Content-Type: application/json` responses
+- Returns raw text for non-JSON responses (e.g., `Content-Type: text/plain`)
 
-### `build-section-tab-path.spec.ts`
+### 6.2 Route Smoke Tests
 
-File: `packages/feature-navigation/src/utils/build-section-tab-path.spec.ts`
-(Tests `buildSectionTabPath` from `get-current-section.web.ts`)
+**File:** `packages/core-contracts/src/routes.spec.ts`
+
+Environment: `node`.
 
 Tests:
 
-- `("feed", "popular")` → `"/feed"` (default tab collapses to root)
+- Every leaf string value in the `routes` object starts with `"/"`
+- No two leaf string values are identical (no accidental duplicate paths)
+- `Object.keys(routeAuth)` matches `Object.keys(routes)` exactly — every route section has an auth mode, no extras
+- Every key in `routeAuthOverrides` (Phase 15) is a valid leaf path present in the `routes` object
+
+---
+
+## Section 7 — `packages/core-env`
+
+### 7.1 Environment Validation
+
+**File:** `packages/core-env/src/index.spec.ts`
+
+Environment: `node`. Manipulate `process.env` in `beforeEach`/`afterEach`.
+
+Tests (API env):
+
+- Parsing with all required API vars present → returns typed config object
+- Missing `DATABASE_URL` → throws a validation error mentioning the var name
+- Invalid `DATABASE_URL` format (not a URL) → throws a descriptive error
+
+Tests (Web env):
+
+- `NEXT_PUBLIC_API_URL` present → parsed correctly
+- `NEXT_PUBLIC_API_URL` missing → throws or returns `undefined` depending on schema strictness (document the expected behaviour)
+
+---
+
+## Section 8 — `packages/feature-downloads`
+
+### 8.1 Downloads Store
+
+**File:** `packages/feature-downloads/src/store/downloads.store.spec.ts`
+
+Environment: `jsdom`. Reset store between tests.
+
+Tests for state machine transitions:
+
+- `startDownload(id)` creates entry with `status: "pending"` and `progress: 0`
+- `startDownload` twice for the same id overwrites (not duplicates) the entry
+- `setProgress(id, 50)` transitions to `status: "downloading"` and sets `progress: 50`
+- `setProgress` for an unknown id is a no-op (no entry created, no error thrown)
+- `setComplete(id, "/path/file.mp3")` transitions to `status: "complete"`, `progress: 100`, sets `localUri`
+- `setComplete` for an unknown id is a no-op
+- `setError(id, "timeout")` transitions to `status: "error"`, preserves other fields
+- `setError` for an unknown id is a no-op
+- `removeDownload(id)` removes the entry; `getDownload(id)` returns `undefined` after removal
+- `removeDownload` for an unknown id is a no-op
+
+Tests for `getDownload`:
+
+- Returns the correct entry when it exists
+- Returns `undefined` when the id has never been added
+
+---
+
+## Section 9 — `packages/feature-navigation`
+
+### 9.1 Section Detection (`get-current-section.web.ts`)
+
+**File:** `packages/feature-navigation/src/utils/get-current-section.web.spec.ts`
+
+Environment: `node`.
+
+Tests:
+
+- `getCurrentSection("/feed")` → `"feed"`
+- `getCurrentSection("/feed/recent")` → `"feed"` (sub-route still resolves to section)
+- `getCurrentSection("/feed/following")` → `"feed"`
+- `getCurrentSection("/library")` → `"library"`
+- `getCurrentSection("/library/saved")` → `"library"`
+- `getCurrentSection("/library/completed")` → `"library"`
+- `getCurrentSection("/live")` → `"live"`
+- `getCurrentSection("/account")` → `"account"`
+- `getCurrentSection("/account/profile")` → `"account"`
+- `getCurrentSection("/account/legal")` → `"account"`
+- `getCurrentSection("/")` → `"home"`
+- `getCurrentSection("/scholars/some-slug")` → `"home"` (not a section)
+- `getCurrentSection("/sign-in")` → `"home"` (auth routes are not sections)
+
+### 9.2 Tab Path Builder (`get-current-section.web.ts`)
+
+**File:** `packages/feature-navigation/src/utils/build-section-tab-path.spec.ts`
+
+Tests for `buildSectionTabPath`:
+
+- `("feed", "popular")` → `"/feed"` (default tab collapses to section root)
 - `("feed", "recent")` → `"/feed/recent"`
-- `("account", "general")` → `"/account"` (default tab collapses to root)
+- `("feed", "following")` → `"/feed/following"`
+- `("library", "started")` → `"/library"` (default)
+- `("library", "saved")` → `"/library/saved"`
+- `("library", "completed")` → `"/library/completed"`
+- `("account", "general")` → `"/account"` (default)
 - `("account", "profile")` → `"/account/profile"`
 - `("account", "legal")` → `"/account/legal"`
 - Called without `tabId` → falls back to `DEFAULT_TABS[section]`
 
-### `tab-route-config.native.spec.ts`
+### 9.3 Native Route Resolution (`tab-route-config.native.ts`)
 
-File: `packages/feature-navigation/src/utils/tab-route-config.native.spec.ts`
-(Tests `getRootTabFromPathname` and `getActiveSubsection`)
+**File:** `packages/feature-navigation/src/utils/tab-route-config.native.spec.ts`
 
 Tests for `getRootTabFromPathname`:
 
-- `/feed` → `"feed"`
-- `/feed/recent` → `"feed"`
-- `/library/saved` → `"library"`
-- `/account/legal` → `"account"`
-- `/` → `"search"` (home maps to search on mobile)
-- `/search` → `"search"`
+- `"/feed"` → `"feed"`
+- `"/feed/recent"` → `"feed"`
+- `"/library/saved"` → `"library"`
+- `"/account/legal"` → `"account"`
+- `"/"` → `"search"` (home is the search tab on mobile)
+- `"/search"` → `"search"`
+- `"/live"` → `"live"`
+- `"/unknown/path"` → `"search"` (default)
 
 Tests for `getActiveSubsection`:
 
-- `("/feed", "feed")` → `"popular"` (falls back to default)
+- `("/feed", "feed")` → `"popular"` (falls back to default when at section root)
 - `("/feed/recent", "feed")` → `"recent"`
-- `("/feed/unknown-tab", "feed")` → `"popular"` (unknown tab → default)
+- `("/feed/following", "feed")` → `"following"`
+- `("/feed/not-a-real-tab", "feed")` → `"popular"` (unknown segment → default)
+- `("/library/saved", "library")` → `"saved"`
+- `("/library", "library")` → `"started"` (default)
 
 ---
 
-## Tier 6: Core Contracts — Route Smoke Tests (Unit, `core-contracts`)
+## Section 10 — `packages/util-ingest`
 
-These tests are not about logic — they guard against accidental typos in route constants that would silently break navigation.
+### 10.1 Aggregate Computation
 
-### `routes.spec.ts`
+**File:** `packages/util-ingest/src/core/run-ingestion.spec.ts`
 
-File: `packages/core-contracts/src/routes.spec.ts`
+Environment: `node`. Test the pure helper functions exported or extractable from `run-ingestion.ts`.
 
-Tests:
+Tests for `computePublishedLectureAggregates` (extract or test via the exported pipeline):
 
-- Every leaf string value in `routes` starts with `"/"`
-- No two leaf strings in `routes` are identical (no duplicate paths)
-- `Object.keys(routeAuth)` matches `Object.keys(routes)` exactly (no missing or extra keys)
-- `routeAuthOverrides` (Phase 15) — every key in `routeAuthOverrides` is a valid path in the `routes` object
+- All lectures unpublished → `{ publishedLectureCount: 0, publishedDurationSeconds: 0 }`
+- All lectures published with known durations → correct sum
+- Some lectures published, some not → counts only published ones
+- Published lectures with missing duration → `publishedDurationSeconds` is `null`
+- Deleted lectures (`deletedAt` set) are excluded from published count
 
----
+Tests for `parseDate`:
 
-## Tier 7: Env Validation (Unit, `core-env`)
+- `parseDate(undefined)` → `null`
+- `parseDate("")` → `null`
+- `parseDate("2024-01-15")` → a `Date` instance
+- `parseDate("invalid")` → an invalid `Date` (behaviour documentation test)
 
-### `index.spec.ts`
+Tests for `computePublishedAt`:
 
-File: `packages/core-env/src/index.spec.ts`
+- `computePublishedAt("published", "2024-01-01")` → uses the provided date string
+- `computePublishedAt("published", undefined)` → returns `new Date()` (auto-stamp)
+- `computePublishedAt("draft", undefined)` → `null`
 
-Tests:
+### 10.2 Topic Sync
 
-- Parsing with all required API vars present → returns typed config object
-- Parsing with `NEXT_PUBLIC_API_URL` missing → throws a validation error (fails fast)
-- Parsing with an invalid URL format → throws a descriptive validation error
+**File:** `packages/util-ingest/src/core/topic-sync.spec.ts`
 
----
+Environment: `node`. Mock the Prisma `TransactionClient` (typed as `jest.Mocked<Prisma.TransactionClient>`).
 
-## Tier 8: E2E — Web Critical Flows (Playwright, `apps/web`)
+Tests for `upsertTopics`:
 
-These tests run against a production build. Keep them to the flows that cannot be verified by unit tests.
+- Root topics (no `parentSlug`) are upserted first
+- Child topics are only upserted after their parent is resolved
+- `topicIdBySlug` map is returned with all slugs → IDs
+- Circular dependency (A's parent is B, B's parent is A) throws `"Unable to resolve topic parent relationships"`
+- Missing parent (child references a slug not in the input list) also throws after one full loop pass
 
-### `auth.spec.ts` (new)
+Tests for `resolveTopicIds` (via `syncLectureTopics`):
 
-File: `apps/web/e2e/auth.spec.ts`
+- Unknown topic slug throws `"Unknown topic slug referenced by lecture: <slug>"`
 
-Tests:
+Tests for `syncCollectionTopics` / `syncSeriesTopics` / `syncLectureTopics`:
 
-- `GET /sign-in` page renders the sign-in form
-- `GET /sign-up` page renders the sign-up form
-- Navigating to `/account` while unauthenticated redirects to `/sign-in`
-
-### `catalog.spec.ts` (new)
-
-File: `apps/web/e2e/catalog.spec.ts`
-
-Tests:
-
-- `GET /feed` renders without JS errors (public)
-- `GET /live` renders without JS errors (public)
-- `GET /library` renders without crashing (local-first, anon works)
-
-### `navigation.spec.ts` (new)
-
-File: `apps/web/e2e/navigation.spec.ts`
-
-Tests:
-
-- On desktop viewport, sidebar is visible
-- Clicking the Feed nav item navigates to `/feed`
-- Clicking the Library nav item navigates to `/library`
+- With empty `topicSlugs`: calls `deleteMany` (removing all) and skips `createMany`
+- With topics: calls `deleteMany` excluding the new ids, then `createMany` with the resolved ids
+- `skipDuplicates: true` is passed to `createMany` (idempotent sync)
 
 ---
 
-## Execution Order (Migration Priority)
+## Section 11 — `apps/web` E2E (Playwright)
 
-| Phase | What                                                                        | Where              | Type        | Prerequisite |
-| ----- | --------------------------------------------------------------------------- | ------------------ | ----------- | ------------ |
-| T1    | Add jest setup to `domain-progress`, `feature-navigation`, `core-contracts` | packages           | Setup       | —            |
-| T2    | `progress.store.spec.ts`                                                    | domain-progress    | Unit        | T1           |
-| T3    | `scholars.service.spec.ts`                                                  | apps/api           | Unit        | —            |
-| T4    | `library.service.spec.ts`                                                   | apps/api           | Unit        | —            |
-| T5    | `live.service.spec.ts`                                                      | apps/api           | Unit        | —            |
-| T6    | `admin-permissions.service.spec.ts`                                         | apps/api           | Unit        | —            |
-| T7    | `progress.service.spec.ts`                                                  | apps/api           | Unit        | —            |
-| T8    | Navigation utility tests                                                    | feature-navigation | Unit        | T1           |
-| T9    | `routes.spec.ts`                                                            | core-contracts     | Unit        | T1           |
-| T10   | `index.spec.ts`                                                             | core-env           | Unit        | —            |
-| T11   | `auth-boundary.spec.ts`                                                     | apps/api           | Integration | T3–T7        |
-| T12   | `progress.sync.spec.ts`                                                     | domain-progress    | Unit        | T2           |
-| T13   | E2E: `auth.spec.ts`, `catalog.spec.ts`, `navigation.spec.ts`                | apps/web           | E2E         | —            |
+All tests use the production build. `baseURL: http://localhost:3000`.
 
-T1–T10 are independent and can run in parallel. T11 benefits from the service specs existing first. T12 can run alongside T2.
+### 11.1 Auth Flows
+
+**File:** `apps/web/e2e/auth.spec.ts`
+
+Tests:
+
+- `GET /sign-in` renders without errors; the email input is present
+- `GET /sign-up` renders without errors; the form is present
+- Navigating to `/account` without a session redirects to `/sign-in`
+- Navigating to `/account/legal` without a session renders the page (public route, no redirect)
+
+### 11.2 Public Content
+
+**File:** `apps/web/e2e/catalog.spec.ts`
+
+Tests:
+
+- `GET /` loads without a console error or crash
+- `GET /feed` loads and is not a redirect
+- `GET /live` loads and is not a redirect
+- `GET /library` loads (local-first — works without auth)
+- `GET /search` loads the search home
+
+### 11.3 Navigation
+
+**File:** `apps/web/e2e/navigation.spec.ts`
+
+Tests:
+
+- On a desktop viewport (`1280 × 800`), the sidebar is visible (`[aria-label="Primary sidebar"]`)
+- On a mobile viewport (`375 × 812`), the sidebar is not visible
+- Clicking the Feed sidebar item navigates to `/feed`
+- Clicking the Library sidebar item navigates to `/library`
+- The page title changes appropriately on navigation
 
 ---
 
-## TDD Going Forward
+## Section 12 — `apps/mobile` Unit Tests
 
-Every new service, hook, store action, or utility function added to the repo must follow this rule:
+The mobile app is UI composition — route files delegate to feature packages. There is no business logic in `apps/mobile/src/app/`. However, hook integrations wired in `features/` and `core/` are worth testing when they contain branching logic.
 
-- **New API service method** → service spec test first
-- **New domain store action** → store spec test first
-- **New navigation/util function** → util spec test first
-- **New auth boundary** → integration test that verifies 401/403 before the feature is wired
-- **New E2E-visible page** → a Playwright test that the page loads without errors
+### 12.1 Tab Route Configuration
 
-Bug fixes always start with a failing test that reproduces the bug.
+These utilities are in `@sd/feature-navigation` and already covered in Section 9.3. No duplication needed in `apps/mobile`.
+
+### 12.2 Provider Wiring Smoke Test
+
+**File:** `apps/mobile/src/providers.spec.tsx`
+
+Environment: `jsdom`. Uses `@testing-library/react-native`.
+
+Test:
+
+- `<ProvidersMobileNative>` renders without throwing (validates provider chain)
+- Children are rendered inside the providers
+
+---
+
+## Execution Order
+
+Phases are independent unless noted. Run T1–T5 first (unblocks everything else).
+
+| Phase   | Scope                                                                                                                                          | Type              | Blocks  |
+| ------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- | ------- |
+| **T1**  | Add jest setup to `domain-playback`, `domain-progress`, `domain-search`, `feature-downloads`, `feature-navigation`, `shared`, `core-contracts` | Setup             | T2–T11  |
+| **T2**  | `playback.store.spec.ts`                                                                                                                       | Unit              | —       |
+| **T3**  | `progress.store.spec.ts`                                                                                                                       | Unit              | T6      |
+| **T4**  | `build-search-result-rows.spec.ts`                                                                                                             | Unit              | —       |
+| **T5**  | `format.spec.ts` (formatDuration, formatCompactNumber)                                                                                         | Unit              | —       |
+| **T6**  | `progress.sync.spec.ts`                                                                                                                        | Unit              | T3      |
+| **T7**  | `downloads.store.spec.ts`                                                                                                                      | Unit              | T1      |
+| **T8**  | `get-current-section.web.spec.ts`, `build-section-tab-path.spec.ts`, `tab-route-config.native.spec.ts`                                         | Unit              | T1      |
+| **T9**  | `http.spec.ts`                                                                                                                                 | Unit              | T1      |
+| **T10** | `routes.spec.ts`                                                                                                                               | Unit              | T1      |
+| **T11** | `core-env/src/index.spec.ts`                                                                                                                   | Unit              | —       |
+| **T12** | `scholars.service.spec.ts`                                                                                                                     | Unit (API)        | —       |
+| **T13** | `library.service.spec.ts`                                                                                                                      | Unit (API)        | —       |
+| **T14** | `live.service.spec.ts`                                                                                                                         | Unit (API)        | —       |
+| **T15** | `feed.service.spec.ts`                                                                                                                         | Unit (API)        | —       |
+| **T16** | `progress.service.spec.ts`                                                                                                                     | Unit (API)        | —       |
+| **T17** | `admin-permissions.service.spec.ts`                                                                                                            | Unit (API)        | —       |
+| **T18** | `home.service.spec.ts`                                                                                                                         | Unit (API)        | —       |
+| **T19** | `run-ingestion.spec.ts`                                                                                                                        | Unit (ingest)     | —       |
+| **T20** | `topic-sync.spec.ts`                                                                                                                           | Unit (ingest)     | —       |
+| **T21** | `auth-boundary.integration.spec.ts`                                                                                                            | Integration (API) | T12–T17 |
+| **T22** | E2E: `auth.spec.ts`, `catalog.spec.ts`, `navigation.spec.ts`                                                                                   | E2E (web)         | —       |
+| **T23** | `providers.spec.tsx` (mobile smoke)                                                                                                            | Unit (mobile)     | —       |
+
+T2–T5, T11–T20 are fully independent after T1 and can run in parallel.
+
+---
+
+## Coverage Summary by Layer
+
+| Layer                         | Files to Create                      | Target                                                |
+| ----------------------------- | ------------------------------------ | ----------------------------------------------------- |
+| `apps/api` services           | 7 service specs + 1 integration spec | All service public methods + auth tiers               |
+| `packages/domain-playback`    | 1 store spec                         | All store actions                                     |
+| `packages/domain-progress`    | 1 store spec + 1 sync spec           | All store actions + debounce/sync logic               |
+| `packages/domain-search`      | 1 util spec                          | Transformer correctness                               |
+| `packages/shared`             | 1 util spec                          | All `formatDuration` + `formatCompactNumber` branches |
+| `packages/core-contracts`     | 1 http spec + 1 routes spec          | HTTP client behaviour + route constant integrity      |
+| `packages/core-env`           | 1 env spec                           | Required var validation                               |
+| `packages/feature-downloads`  | 1 store spec                         | All download state transitions                        |
+| `packages/feature-navigation` | 3 util specs                         | Section detection, tab path building, native routing  |
+| `packages/util-ingest`        | 2 specs                              | Aggregate computation + topic sync algorithm          |
+| `apps/web` E2E                | 3 Playwright specs                   | Auth redirect, public content, sidebar navigation     |
+| `apps/mobile`                 | 1 provider smoke test                | Provider chain integrity                              |
