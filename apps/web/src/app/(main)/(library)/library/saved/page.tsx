@@ -1,5 +1,5 @@
-import { LibraryResponsiveScreen } from "@sd/feature-library";
+import { LibrarySavedResponsiveScreen } from "@sd/feature-library";
 
 export default function LibrarySavedPage() {
-  return <LibraryResponsiveScreen />;
+  return <LibrarySavedResponsiveScreen />;
 }

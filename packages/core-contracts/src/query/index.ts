@@ -84,4 +84,9 @@ export const queryKeys = {
     recent: (cursor?: string) => [...queryKeys.feed.all, "recent", cursor] as const,
     following: (cursor?: string) => [...queryKeys.feed.all, "following", cursor] as const,
   },
+  library: {
+    all: ["library"] as const,
+    saved: (cursor?: string) => [...queryKeys.library.all, "saved", cursor] as const,
+    completed: (cursor?: string) => [...queryKeys.library.all, "completed", cursor] as const,
+  },
 } as const;

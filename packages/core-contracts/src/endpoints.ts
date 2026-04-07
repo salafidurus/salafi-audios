@@ -24,4 +24,8 @@ export const endpoints = {
     recent: "/feed/recent",
     following: "/feed/following",
   },
+  library: {
+    saved: "/library/saved",
+    completed: "/library/completed",
+  },
 } as const;

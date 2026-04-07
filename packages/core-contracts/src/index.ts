@@ -24,6 +24,8 @@ export {
   type SearchCatalogResultsDto,
   type FeedItemDto,
   type FeedPageDto,
+  type LibraryItemDto,
+  type LibraryPageDto,
 } from "./types";
 
 // Export route constants

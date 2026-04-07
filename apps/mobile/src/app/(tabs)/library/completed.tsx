@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useAuth } from "@sd/core-auth";
-import { LibraryMobileNativeScreen } from "@sd/feature-library";
+import { LibraryCompletedMobileNativeScreen } from "@sd/feature-library";
 import { AuthRequiredStateMobileNative } from "@sd/shared";
 import { routes } from "@sd/core-contracts";
 
@@ -22,5 +22,5 @@ export default function LibraryCompleted() {
     );
   }
 
-  return <LibraryMobileNativeScreen />;
+  return <LibraryCompletedMobileNativeScreen />;
 }

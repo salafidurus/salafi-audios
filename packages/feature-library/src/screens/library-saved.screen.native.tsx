@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, FlatList } from "react-native";
 import type { LibraryItemDto } from "@sd/core-contracts";
 import { useLibrarySavedScreen } from "../hooks/use-library-saved";
 
-export type LibraryMobileNativeScreenProps = {
+export type LibrarySavedMobileNativeScreenProps = {
   onNavigateToLecture?: (id: string) => void;
 };
 
@@ -30,13 +30,15 @@ function LibraryItem({ item, onPress }: { item: LibraryItemDto; onPress?: () => 
   );
 }
 
-export function LibraryMobileNativeScreen({ onNavigateToLecture }: LibraryMobileNativeScreenProps) {
+export function LibrarySavedMobileNativeScreen({
+  onNavigateToLecture,
+}: LibrarySavedMobileNativeScreenProps) {
   const { items, isFetching } = useLibrarySavedScreen();
 
   if (isFetching && items.length === 0) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Loading your library...</Text>
+        <Text>Loading saved lectures...</Text>
       </View>
     );
   }
@@ -45,7 +47,7 @@ export function LibraryMobileNativeScreen({ onNavigateToLecture }: LibraryMobile
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 16 }}>
         <Text style={{ color: "#666", textAlign: "center" }}>
-          Your library is empty. Save lectures to listen to later.
+          No saved lectures yet. Save lectures to listen to later.
         </Text>
       </View>
     );
