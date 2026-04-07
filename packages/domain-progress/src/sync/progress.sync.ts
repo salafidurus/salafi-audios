@@ -1,5 +1,5 @@
 import { httpClient, endpoints } from "@sd/core-contracts";
-import type { ProgressUpdateDto } from "@sd/core-contracts";
+import type { ProgressUpdateDto, ProgressSyncDto, SavedSyncDto } from "@sd/core-contracts";
 import { useProgressStore } from "../store/progress.store";
 
 let syncTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -13,11 +13,10 @@ function flushPending() {
 
   for (const update of updates) {
     httpClient({
-      url: endpoints.progress.update,
+      url: endpoints.progress.update(update.lectureId),
       method: "POST",
       body: update,
     }).catch(() => {
-      // Re-queue on failure for next flush
       pendingUpdates.set(update.lectureId, update);
     });
   }
@@ -49,5 +48,68 @@ export function connectPlaybackToProgress(
     const { actions } = useProgressStore.getState();
     actions.setProgress(lectureId, position, duration);
     syncProgressToBackend({ lectureId, positionSeconds: position, durationSeconds: duration });
+  });
+}
+
+/**
+ * Bulk-sync all local progress and saved lectures to the server.
+ * Sends progress entries to POST /me/progress/sync and
+ * saved lecture IDs to POST /me/library/saved/sync.
+ */
+export async function syncLocalToServer(): Promise<void> {
+  const state = useProgressStore.getState();
+
+  const progressEntries = Object.values(state.progressMap);
+  const savedIds = state.actions.getSavedIds();
+
+  const promises: Promise<unknown>[] = [];
+
+  if (progressEntries.length > 0) {
+    const body: ProgressSyncDto = {
+      items: progressEntries.map((p) => ({
+        lectureId: p.lectureId,
+        positionSeconds: p.positionSeconds,
+        durationSeconds: p.durationSeconds,
+        completedAt: p.completedAt,
+        updatedAt: p.updatedAt,
+      })),
+    };
+    promises.push(httpClient({ url: endpoints.progress.sync, method: "POST", body }));
+  }
+
+  if (savedIds.length > 0) {
+    const body: SavedSyncDto = { lectureIds: savedIds };
+    promises.push(httpClient({ url: endpoints.library.syncSaved, method: "POST", body }));
+  }
+
+  await Promise.all(promises);
+}
+
+/**
+ * Save a lecture locally and sync to backend.
+ */
+export function saveLecture(lectureId: string) {
+  const { actions } = useProgressStore.getState();
+  actions.addSaved(lectureId);
+  httpClient({
+    url: endpoints.library.saveLecture(lectureId),
+    method: "POST",
+  }).catch(() => {
+    // Keep local state; will sync on next bulk sync
+  });
+}
+
+/**
+ * Unsave a lecture locally and sync to backend.
+ */
+export function unsaveLecture(lectureId: string) {
+  const { actions } = useProgressStore.getState();
+  actions.removeSaved(lectureId);
+  httpClient({
+    url: endpoints.library.saveLecture(lectureId),
+    method: "DELETE",
+  }).catch(() => {
+    // Re-add on failure; will correct on next sync
+    actions.addSaved(lectureId);
   });
 }
