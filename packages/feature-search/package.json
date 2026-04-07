@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@sd/core-contracts": "workspace:*",
+    "@sd/domain-search": "workspace:*",
     "@sd/core-api": "workspace:*",
     "@sd/core-config": "workspace:*",
     "@sd/core-styles": "workspace:*",

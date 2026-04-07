@@ -5,9 +5,7 @@ import type { SearchCatalogItemDto, SearchCatalogResultsDto } from "@sd/core-con
 import { StyleSheet } from "react-native-unistyles";
 import { View } from "react-native-unistyles/components/native/View";
 import { ScreenViewWeb } from "@sd/shared";
-import {
-  SearchFilterMobileWeb,
-} from "../../components/SearchFilter/SearchFilter.mobile.web";
+import { SearchFilterMobileWeb } from "../../components/SearchFilter/SearchFilter.mobile.web";
 import {
   SearchInputMobileWeb,
   type SearchInputMobileWebRef,
@@ -17,7 +15,7 @@ import {
   SearchResultsListMobileWeb,
   type SearchResultRow,
 } from "../../components/SearchResultsList/SearchResultsList.mobile.web";
-import { useSearchProcessing } from "../../hooks/use-search-processing";
+import { useSearchProcessing } from "@sd/domain-search";
 
 export type SearchProcessingScreenProps = {
   prefill?: string;
@@ -29,8 +27,17 @@ export function SearchProcessingMobileWebScreen({
   onBackPress,
 }: SearchProcessingScreenProps) {
   const inputRef = useRef<SearchInputMobileWebRef>(null);
-  const { query, setQuery, filter, setFilter, topics, items, isFetching, shouldSearch, errorMessage } =
-    useSearchProcessing({ prefill });
+  const {
+    query,
+    setQuery,
+    filter,
+    setFilter,
+    topics,
+    items,
+    isFetching,
+    shouldSearch,
+    errorMessage,
+  } = useSearchProcessing({ prefill });
 
   useEffect(() => {
     inputRef.current?.focus();

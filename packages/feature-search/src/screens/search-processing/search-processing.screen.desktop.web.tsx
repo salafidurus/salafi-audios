@@ -6,12 +6,21 @@ import { SearchFilterDesktopWeb } from "../../components/SearchFilter/SearchFilt
 import { SearchInputDesktopWeb } from "../../components/SearchInput/SearchInput.desktop.web";
 import { SearchResultItemDesktopWeb } from "../../components/SearchResultItem/SearchResultItem.desktop.web";
 import { SearchResultsListDesktopWeb } from "../../components/SearchResultsList/SearchResultsList.desktop.web";
-import { useSearchProcessing } from "../../hooks/use-search-processing";
+import { useSearchProcessing } from "@sd/domain-search";
 
 export function SearchProcessingDesktopWebScreen() {
   const inputRef = useRef<HTMLInputElement>(null);
-  const { query, setQuery, filter, setFilter, topics, items, isFetching, shouldSearch, errorMessage } =
-    useSearchProcessing();
+  const {
+    query,
+    setQuery,
+    filter,
+    setFilter,
+    topics,
+    items,
+    isFetching,
+    shouldSearch,
+    errorMessage,
+  } = useSearchProcessing();
 
   useEffect(() => {
     inputRef.current?.focus();

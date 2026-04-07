@@ -796,6 +796,19 @@ importers:
         specifier: ^5.9.0
         version: 5.9.3
 
+  packages/domain-search:
+    dependencies:
+      '@sd/core-contracts':
+        specifier: workspace:*
+        version: link:../core-contracts
+      react:
+        specifier: ^19.0.0
+        version: 19.2.0
+    devDependencies:
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.3
+
   packages/feature-account:
     dependencies:
       '@sd/core-api':
@@ -1183,6 +1196,9 @@ importers:
       '@sd/design-tokens':
         specifier: workspace:*
         version: link:../design-tokens
+      '@sd/domain-search':
+        specifier: workspace:*
+        version: link:../domain-search
       '@sd/shared':
         specifier: workspace:*
         version: link:../shared
