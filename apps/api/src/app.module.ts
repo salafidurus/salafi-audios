@@ -12,6 +12,11 @@ import { AuthGuard } from './modules/auth/auth.guard';
 import { SearchModule } from './modules/search/search.module';
 import { TopicsModule } from './modules/topics/topics.module';
 import { AdminPermissionsModule } from './modules/admin-permissions/admin-permissions.module';
+import { LecturesModule } from './modules/lectures/lectures.module';
+import { ScholarsModule } from './modules/scholars/scholars.module';
+import { LiveModule } from './modules/live/live.module';
+import { LibraryModule } from './modules/library/library.module';
+import { ProgressModule } from './modules/progress/progress.module';
 
 @Module({
   imports: [
@@ -24,6 +29,11 @@ import { AdminPermissionsModule } from './modules/admin-permissions/admin-permis
     SearchModule,
     TopicsModule,
     AdminPermissionsModule,
+    LecturesModule,
+    ScholarsModule,
+    LiveModule,
+    LibraryModule,
+    ProgressModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: AuthGuard }],
 })

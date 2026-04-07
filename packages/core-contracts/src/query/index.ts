@@ -37,6 +37,7 @@ export const queryKeys = {
     list: () => [...queryKeys.scholars.all, "list"] as const,
     detail: (slug: string) => [...queryKeys.scholars.all, "detail", slug] as const,
     stats: (slug: string) => [...queryKeys.scholars.all, "stats", slug] as const,
+    content: (slug: string) => [...queryKeys.scholars.all, "content", slug] as const,
   },
   series: {
     all: ["series"] as const,
@@ -88,6 +89,7 @@ export const queryKeys = {
     all: ["library"] as const,
     saved: (cursor?: string) => [...queryKeys.library.all, "saved", cursor] as const,
     completed: (cursor?: string) => [...queryKeys.library.all, "completed", cursor] as const,
+    progress: (cursor?: string) => [...queryKeys.library.all, "progress", cursor] as const,
   },
   account: {
     all: ["account"] as const,

@@ -10,6 +10,7 @@ export const endpoints = {
     list: "/scholars",
     detail: (slug: string) => `/scholars/${slug}`,
     stats: (slug: string) => `/scholars/${slug}/stats`,
+    content: (slug: string) => `/scholars/${slug}/content`,
   },
   collections: {
     detail: (id: string) => `/collections/${id}`,
@@ -25,20 +26,25 @@ export const endpoints = {
     following: "/feed/following",
   },
   library: {
-    saved: "/library/saved",
-    completed: "/library/completed",
+    saved: "/me/library/saved",
+    completed: "/me/library/completed",
+    progress: "/me/library/progress",
+    saveLecture: (lectureId: string) => `/me/library/saved/${lectureId}`,
+    syncSaved: "/me/library/saved/sync",
   },
   account: {
     profile: "/account/profile",
   },
   live: {
     active: "/live/active",
-    scheduled: "/live/scheduled",
+    upcoming: "/live/upcoming",
+    scheduled: "/live/scheduled", // keep backward compat alias
     ended: "/live/ended",
   },
   progress: {
     get: (lectureId: string) => `/progress/${lectureId}`,
-    update: "/progress",
+    update: (lectureId: string) => `/me/progress/${lectureId}`,
     history: "/progress/history",
+    sync: "/me/progress/sync",
   },
 } as const;
