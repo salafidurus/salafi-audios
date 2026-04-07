@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { SearchProcessingMobileWebScreen } from "./search-processing.screen.mobile.web";
 import { SearchProcessingDesktopWebScreen } from "./search-processing.screen.desktop.web";
-import { useResponsive } from "@sd/shared";
+import styles from "../responsive.module.css";
 
 export type SearchProcessingResponsiveScreenProps = {
   searchKey?: string;
@@ -14,20 +13,14 @@ export function SearchProcessingResponsiveScreen({
   searchKey,
   onBackPress,
 }: SearchProcessingResponsiveScreenProps) {
-  const [isHydrated, setIsHydrated] = useState(false);
-  const { isMobile, isTablet } = useResponsive();
-
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
-
-  if (!isHydrated) {
-    return null;
-  }
-
-  if (isMobile || isTablet) {
-    return <SearchProcessingMobileWebScreen prefill={searchKey} onBackPress={onBackPress} />;
-  }
-
-  return <SearchProcessingDesktopWebScreen />;
+  return (
+    <>
+      <div className={styles.mobileOnly}>
+        <SearchProcessingMobileWebScreen prefill={searchKey} onBackPress={onBackPress} />
+      </div>
+      <div className={styles.desktopOnly}>
+        <SearchProcessingDesktopWebScreen />
+      </div>
+    </>
+  );
 }
