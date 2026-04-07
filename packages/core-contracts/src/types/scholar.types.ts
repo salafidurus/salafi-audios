@@ -33,3 +33,43 @@ export type ScholarStatsDto = {
   standaloneSeriesCount: number;
   standaloneLecturesCount: number;
 };
+
+export type ScholarListItemDto = {
+  id: string;
+  slug: string;
+  name: string;
+  imageUrl?: string;
+  mainLanguage?: string;
+  isKibar: boolean;
+  lectureCount: number;
+};
+
+export type ScholarContentDto = {
+  collections: CollectionSummaryDto[];
+  standaloneSeries: SeriesSummaryDto[];
+  standaloneLectures: LectureSummaryDto[];
+};
+
+export type CollectionSummaryDto = {
+  id: string;
+  slug: string;
+  title: string;
+  coverImageUrl?: string;
+  lectureCount: number;
+};
+
+export type SeriesSummaryDto = {
+  id: string;
+  slug: string;
+  title: string;
+  coverImageUrl?: string;
+  lectureCount: number;
+};
+
+export type LectureSummaryDto = {
+  id: string;
+  slug: string;
+  title: string;
+  durationSeconds?: number;
+  publishedAt?: string;
+};
