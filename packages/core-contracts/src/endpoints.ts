@@ -36,4 +36,9 @@ export const endpoints = {
     scheduled: "/live/scheduled",
     ended: "/live/ended",
   },
+  progress: {
+    get: (lectureId: string) => `/progress/${lectureId}`,
+    update: "/progress",
+    history: "/progress/history",
+  },
 } as const;

@@ -99,4 +99,9 @@ export const queryKeys = {
     scheduled: () => [...queryKeys.live.all, "scheduled"] as const,
     ended: (cursor?: string) => [...queryKeys.live.all, "ended", cursor] as const,
   },
+  progress: {
+    all: ["progress"] as const,
+    lecture: (lectureId: string) => [...queryKeys.progress.all, "lecture", lectureId] as const,
+    history: () => [...queryKeys.progress.all, "history"] as const,
+  },
 } as const;

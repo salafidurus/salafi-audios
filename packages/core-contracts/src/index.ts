@@ -30,6 +30,8 @@ export {
   type LiveSessionStatus,
   type LiveSessionDto,
   type LiveSessionPageDto,
+  type LectureProgressDto,
+  type ProgressUpdateDto,
 } from "./types";
 
 // Export route constants

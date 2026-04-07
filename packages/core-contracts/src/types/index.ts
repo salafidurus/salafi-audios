@@ -32,3 +32,4 @@ export {
   type LiveSessionDto,
   type LiveSessionPageDto,
 } from "../types/live.types";
+export { type LectureProgressDto, type ProgressUpdateDto } from "../types/progress.types";
