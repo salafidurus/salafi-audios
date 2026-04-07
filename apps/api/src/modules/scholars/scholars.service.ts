@@ -5,6 +5,8 @@ import type {
   ScholarContentDto,
 } from '@sd/core-contracts';
 import { ScholarsRepository } from './scholars.repo';
+import type { CreateScholarDto } from './dto/create-scholar.dto';
+import type { UpdateScholarDto } from './dto/update-scholar.dto';
 
 @Injectable()
 export class ScholarsService {
@@ -30,5 +32,15 @@ export class ScholarsService {
     const content = await this.repo.getContent(slug);
     if (!content) throw new NotFoundException(`Scholar "${slug}" not found`);
     return content;
+  }
+
+  async create(dto: CreateScholarDto) {
+    return this.repo.create(dto);
+  }
+
+  async update(id: string, dto: UpdateScholarDto) {
+    const existing = await this.repo.findById(id);
+    if (!existing) throw new NotFoundException(`Scholar "${id}" not found`);
+    return this.repo.update(id, dto);
   }
 }

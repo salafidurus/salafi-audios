@@ -46,4 +46,10 @@ export class TopicsService {
     if (result === null) throw new NotFoundException('Topic not found');
     return result;
   }
+
+  async remove(slug: string): Promise<void> {
+    const found = await this.repo.findBySlug(slug);
+    if (!found) throw new NotFoundException(`Topic "${slug}" not found`);
+    await this.repo.deleteBySlug(slug);
+  }
 }

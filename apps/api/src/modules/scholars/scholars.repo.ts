@@ -9,6 +9,8 @@ import type {
   SeriesSummaryDto,
   LectureSummaryDto,
 } from '@sd/core-contracts';
+import type { CreateScholarDto } from './dto/create-scholar.dto';
+import type { UpdateScholarDto } from './dto/update-scholar.dto';
 
 @Injectable()
 export class ScholarsRepository {
@@ -139,6 +141,42 @@ export class ScholarsRepository {
       ]);
 
     return { collections, standaloneSeries, standaloneLectures };
+  }
+
+  async findById(id: string) {
+    return this.prisma.scholar.findUnique({
+      where: { id },
+    });
+  }
+
+  async create(dto: CreateScholarDto) {
+    return this.prisma.scholar.create({
+      data: {
+        name: dto.name,
+        slug: dto.slug,
+        bio: dto.bio,
+        imageUrl: dto.imageUrl,
+        isKibar: dto.isKibar ?? false,
+        isFeatured: dto.isFeatured ?? false,
+        isActive: dto.isActive ?? true,
+      },
+    });
+  }
+
+  async update(id: string, dto: UpdateScholarDto) {
+    return this.prisma.scholar.update({
+      where: { id },
+      data: {
+        ...(dto.name !== undefined && { name: dto.name }),
+        ...(dto.slug !== undefined && { slug: dto.slug }),
+        ...(dto.bio !== undefined && { bio: dto.bio }),
+        ...(dto.imageUrl !== undefined && { imageUrl: dto.imageUrl }),
+        ...(dto.isKibar !== undefined && { isKibar: dto.isKibar }),
+        ...(dto.isFeatured !== undefined && { isFeatured: dto.isFeatured }),
+        ...(dto.isActive !== undefined && { isActive: dto.isActive }),
+        updatedAt: new Date(),
+      },
+    });
   }
 
   private async getCollections(

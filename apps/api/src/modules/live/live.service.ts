@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { LiveRepository } from './live.repo';
 
 type LiveSessionPublicDto = {
@@ -63,6 +63,14 @@ export class LiveService {
       deletedIds,
       fetchedAt: new Date().toISOString(),
     };
+  }
+
+  async updateSessionStatus(id: string, status: string) {
+    const session = await this.repo.findSessionById(id);
+    if (!session) {
+      throw new NotFoundException(`Live session "${id}" not found`);
+    }
+    return this.repo.updateSessionStatus(id, status);
   }
 
   private mapSession(session: any): LiveSessionPublicDto {

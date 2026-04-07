@@ -22,8 +22,13 @@ export class AdminPermissionsService {
     };
   }
 
-  async getMyPermissions(userId: string) {
-    return this.getPermissions(userId);
+  async getMyPermissions(
+    userId: string,
+  ): Promise<{ permissions: AdminPermission[] }> {
+    const strings = await this.repo.findPermissionStringsByUserId(userId);
+    return {
+      permissions: strings as AdminPermission[],
+    };
   }
 
   async grant(userId: string, permission: string, grantedById: string) {

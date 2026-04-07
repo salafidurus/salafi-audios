@@ -100,4 +100,24 @@ export class LiveRepository {
     });
     return sessions.map((s) => s.id);
   }
+
+  async findSessionById(id: string) {
+    return this.prisma.liveSession.findUnique({
+      where: { id },
+      select: { id: true, status: true },
+    });
+  }
+
+  async updateSessionStatus(id: string, status: string) {
+    const now = new Date();
+    const data: Record<string, unknown> = { status: status as any };
+
+    if (status === 'live') data.startedAt = now;
+    if (status === 'ended') data.endedAt = now;
+
+    return this.prisma.liveSession.update({
+      where: { id },
+      data,
+    });
+  }
 }

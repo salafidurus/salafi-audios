@@ -26,6 +26,15 @@ export class AdminPermissionsRepository {
     });
   }
 
+  async findPermissionStringsByUserId(userId: string): Promise<string[]> {
+    const perms = await this.prisma.adminPermission.findMany({
+      where: { userId },
+      select: { permission: true },
+      orderBy: { grantedAt: 'desc' },
+    });
+    return perms.map((p) => p.permission);
+  }
+
   async hasPermission(userId: string, permission: string): Promise<boolean> {
     const found = await this.prisma.adminPermission.findUnique({
       where: { userId_permission: { userId, permission } },

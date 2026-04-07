@@ -157,6 +157,12 @@ export class TopicsRepository {
     return this.toViewDto(record);
   }
 
+  async deleteBySlug(slug: string): Promise<void> {
+    await this.prisma.topic.delete({
+      where: { slug },
+    });
+  }
+
   private async resolveOptionalParentId(
     parentSlug?: string,
   ): Promise<string | null> {
