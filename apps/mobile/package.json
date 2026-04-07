@@ -46,6 +46,7 @@
     "@sd/feature-library": "workspace:*",
     "@sd/feature-live": "workspace:*",
     "@sd/feature-navigation": "workspace:*",
+    "@sd/feature-playback": "workspace:*",
     "@sd/feature-search": "workspace:*",
     "@sd/shared": "workspace:*",
     "@sentry/react-native": "^7.11.0",

@@ -34,6 +34,7 @@
     "@sd/feature-library": "workspace:*",
     "@sd/feature-live": "workspace:*",
     "@sd/feature-navigation": "workspace:*",
+    "@sd/feature-playback": "workspace:*",
     "@sd/feature-search": "workspace:*",
     "@sd/feature-support": "workspace:*",
     "@sd/shared": "workspace:*",

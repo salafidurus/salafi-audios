@@ -1,4 +1,5 @@
 import { Footer, Sidebar, TopAuthStrip } from "@sd/feature-navigation";
+import { MiniPlayerWeb } from "@sd/feature-playback";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -8,6 +9,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         <div className="appMain">
           <TopAuthStrip />
           <div className="appContent">{children}</div>
+          <MiniPlayerWeb />
           <Footer />
         </div>
       </div>
