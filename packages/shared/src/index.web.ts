@@ -18,3 +18,6 @@ export { TextInputMobileNative } from "./compat/native-entry.web";
 
 export { useResponsive } from "./hooks/use-responsive.desktop.web";
 export { useDragScrollWeb } from "./hooks/use-drag-scroll.web";
+
+export { AppTextWeb as AppText } from "./components/AppText/AppText.web";
+export type { AppTextProps } from "./components/AppText/AppText.web";

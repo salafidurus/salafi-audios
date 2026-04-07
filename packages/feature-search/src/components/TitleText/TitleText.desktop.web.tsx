@@ -15,7 +15,7 @@ export function TitleTextDesktopWeb({ children }: Props) {
         fontSize: "var(--typo-display-md-font-size)",
         lineHeight: "var(--typo-display-md-line-height)",
         letterSpacing: "var(--typo-display-md-letter-spacing)",
-        fontWeight: "var(--typo-display-md-font-weight)",
+        fontWeight: "var(--typo-display-md-font-weight)" as unknown as number,
       }}
     >
       {children}

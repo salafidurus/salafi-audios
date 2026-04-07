@@ -7,3 +7,6 @@ export { NotFoundStateMobileNative } from "./components/NotFoundState/NotFoundSt
 export { ButtonMobileNative } from "./components/Button/Button.native";
 export { AccentGradientFill } from "./components/AccentGradientFill/AccentGradientFill.native";
 export { TextInputMobileNative } from "./components/TextInput/TextInput.native";
+
+export { AppText } from "./components/AppText/AppText.native";
+export type { AppTextProps } from "./components/AppText/AppText.native";
