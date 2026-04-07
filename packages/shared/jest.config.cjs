@@ -2,10 +2,9 @@
 module.exports = {
   testEnvironment: "node",
 
-  testMatch: [
-    "<rootDir>/**/*.spec.[tj]s?(x)",
-    "<rootDir>/**/*.test.[tj]s?(x)",
-  ],
+  testRegex: "src/.*\\.spec\\.[tj]sx?$",
+
+  testPathIgnorePatterns: ["/node_modules/", "/dist/", "/build/"],
 
   transform: {
     "^.+\\.(t|j)sx?$": [
