@@ -18,7 +18,7 @@ export function useLiveActive() {
 export function useLiveScheduled() {
   return useApiQuery(queryKeys.live.scheduled(), () =>
     httpClient<LiveSessionPageDto>({
-      url: endpoints.live.scheduled,
+      url: endpoints.live.upcoming,
       method: "GET",
     }),
   );
