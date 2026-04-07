@@ -1,73 +1,82 @@
 "use client";
 
-import type { LiveSessionDto } from "@sd/core-contracts";
-import { useLiveActiveScreen } from "../hooks/use-live-active";
+import { ScreenViewWeb, AppText } from "@sd/shared";
+import type { LiveSessionPublicDto } from "@sd/core-contracts";
+import { useLiveSessions } from "../hooks/use-live-sessions";
+import { LiveSessionCardWeb } from "../components/live-session-card/live-session-card.web";
+import styles from "./live.screen.module.css";
 
-export type LiveDesktopWebScreenProps = {
-  onNavigateToSession?: (id: string) => void;
-};
+export type LiveDesktopWebScreenProps = Record<string, never>;
 
-function LiveSessionItem({ session, onPress }: { session: LiveSessionDto; onPress?: () => void }) {
+function Section({
+  title,
+  sessions,
+  isLoading,
+  emptyMessage,
+}: {
+  title: string;
+  sessions: LiveSessionPublicDto[];
+  isLoading: boolean;
+  emptyMessage: string;
+}) {
   return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={onPress}
-      onKeyDown={(e) => e.key === "Enter" && onPress?.()}
-      style={{
-        padding: 16,
-        borderBottom: "1px solid #eee",
-        cursor: "pointer",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span
-          style={{
-            width: 8,
-            height: 8,
-            borderRadius: 4,
-            backgroundColor: "#dc2626",
-            display: "inline-block",
-          }}
-        />
-        <span style={{ fontSize: 16, fontWeight: 600 }}>{session.title}</span>
-      </div>
-      <div style={{ fontSize: 13, color: "#666", marginTop: 4 }}>
-        {session.scholarName}
-        {session.viewerCount !== undefined && ` · ${session.viewerCount} watching`}
-      </div>
-      {session.description && (
-        <div style={{ fontSize: 13, color: "#888", marginTop: 4 }}>{session.description}</div>
+    <div className={styles.section}>
+      <AppText variant="titleMd">{title}</AppText>
+      {isLoading && sessions.length === 0 ? (
+        <AppText variant="bodyMd" style={{ color: "var(--content-subtle, #666)" }}>
+          Loading…
+        </AppText>
+      ) : sessions.length === 0 ? (
+        <AppText variant="bodyMd" style={{ color: "var(--content-subtle, #666)" }}>
+          {emptyMessage}
+        </AppText>
+      ) : (
+        <div className={styles.cardList}>
+          {sessions.map((s) => (
+            <LiveSessionCardWeb key={s.id} session={s} />
+          ))}
+        </div>
       )}
     </div>
   );
 }
 
-export function LiveDesktopWebScreen({ onNavigateToSession }: LiveDesktopWebScreenProps) {
-  const { sessions, isFetching } = useLiveActiveScreen();
-
-  if (isFetching && sessions.length === 0) {
-    return <div style={{ padding: 32 }}>Loading live sessions...</div>;
-  }
-
-  if (sessions.length === 0) {
-    return (
-      <div style={{ padding: 32, color: "#666" }}>
-        No live sessions right now. Check the schedule for upcoming sessions.
-      </div>
-    );
-  }
+export function LiveDesktopWebScreen(_props: LiveDesktopWebScreenProps) {
+  const { active, upcoming, ended } = useLiveSessions();
 
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto", padding: 24 }}>
-      <h2 style={{ margin: 0, fontSize: 22, marginBottom: 16 }}>Live Now</h2>
-      {sessions.map((session) => (
-        <LiveSessionItem
-          key={session.id}
-          session={session}
-          onPress={() => onNavigateToSession?.(session.id)}
-        />
-      ))}
-    </div>
+    <ScreenViewWeb>
+      <div className={styles.page}>
+        <div className={styles.container}>
+          <AppText variant="displayMd">Live Sessions</AppText>
+
+          <div className={styles.twoColumn}>
+            <div className={styles.columnMain}>
+              <Section
+                title="🔴 Live Now"
+                sessions={active.sessions}
+                isLoading={active.isLoading}
+                emptyMessage="No live sessions right now."
+              />
+            </div>
+
+            <div className={styles.columnSide}>
+              <Section
+                title="Upcoming"
+                sessions={upcoming.sessions}
+                isLoading={upcoming.isLoading}
+                emptyMessage="No upcoming sessions scheduled."
+              />
+              <Section
+                title="Recently Ended"
+                sessions={ended.sessions}
+                isLoading={ended.isLoading}
+                emptyMessage="No recent sessions."
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </ScreenViewWeb>
   );
 }

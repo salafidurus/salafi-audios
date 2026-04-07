@@ -4,18 +4,16 @@ import styles from "./responsive.module.css";
 import { LiveDesktopWebScreen } from "./live.screen.desktop.web";
 import { LiveMobileWebScreen } from "./live.screen.mobile.web";
 
-export type LiveResponsiveScreenProps = {
-  onNavigateToSession?: (id: string) => void;
-};
+export type LiveResponsiveScreenProps = Record<string, never>;
 
-export function LiveResponsiveScreen(props: LiveResponsiveScreenProps) {
+export function LiveResponsiveScreen(_props: LiveResponsiveScreenProps) {
   return (
     <>
       <div className={styles.mobileOnly}>
-        <LiveMobileWebScreen {...props} />
+        <LiveMobileWebScreen />
       </div>
       <div className={styles.desktopOnly}>
-        <LiveDesktopWebScreen {...props} />
+        <LiveDesktopWebScreen />
       </div>
     </>
   );

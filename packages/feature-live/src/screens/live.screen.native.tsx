@@ -1,58 +1,84 @@
-import { View, Text, TouchableOpacity, FlatList } from "react-native";
-import type { LiveSessionDto } from "@sd/core-contracts";
-import { useLiveActiveScreen } from "../hooks/use-live-active";
+import { View, ScrollView } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { ScreenViewMobileNative, AppText } from "@sd/shared";
+import type { LiveSessionPublicDto } from "@sd/core-contracts";
+import { useLiveSessions } from "../hooks/use-live-sessions";
+import { LiveSessionCardNative } from "../components/live-session-card/live-session-card.native";
 
-export type LiveMobileNativeScreenProps = {
-  onNavigateToSession?: (id: string) => void;
-};
+export type LiveMobileNativeScreenProps = Record<string, never>;
 
-function LiveSessionItem({ session, onPress }: { session: LiveSessionDto; onPress?: () => void }) {
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      style={{ padding: 12, borderBottomWidth: 1, borderBottomColor: "#eee" }}
-    >
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-        <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: "#dc2626" }} />
-        <Text style={{ fontSize: 15, fontWeight: "600" }}>{session.title}</Text>
-      </View>
-      <Text style={{ fontSize: 12, color: "#666", marginTop: 2 }}>
-        {session.scholarName}
-        {session.viewerCount !== undefined ? ` · ${session.viewerCount} watching` : ""}
-      </Text>
-    </TouchableOpacity>
-  );
-}
-
-export function LiveMobileNativeScreen({ onNavigateToSession }: LiveMobileNativeScreenProps) {
-  const { sessions, isFetching } = useLiveActiveScreen();
-
-  if (isFetching && sessions.length === 0) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Loading live sessions...</Text>
-      </View>
-    );
-  }
-
-  if (sessions.length === 0) {
-    return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 16 }}>
-        <Text style={{ color: "#666", textAlign: "center" }}>
-          No live sessions right now. Check the schedule for upcoming sessions.
-        </Text>
-      </View>
-    );
-  }
+function Section({
+  title,
+  sessions,
+  isLoading,
+  emptyMessage,
+}: {
+  title: string;
+  sessions: LiveSessionPublicDto[];
+  isLoading: boolean;
+  emptyMessage: string;
+}) {
+  const { theme } = useUnistyles();
 
   return (
-    <FlatList
-      data={sessions}
-      keyExtractor={(session) => session.id}
-      renderItem={({ item: session }) => (
-        <LiveSessionItem session={session} onPress={() => onNavigateToSession?.(session.id)} />
+    <View style={nativeStyles.section}>
+      <AppText variant="titleMd">{title}</AppText>
+      {isLoading && sessions.length === 0 ? (
+        <AppText variant="bodyMd" style={{ color: theme.colors.content.subtle }}>
+          Loading…
+        </AppText>
+      ) : sessions.length === 0 ? (
+        <AppText variant="bodyMd" style={{ color: theme.colors.content.subtle }}>
+          {emptyMessage}
+        </AppText>
+      ) : (
+        <View>
+          {sessions.map((s) => (
+            <LiveSessionCardNative key={s.id} session={s} />
+          ))}
+        </View>
       )}
-      contentContainerStyle={{ padding: 8 }}
-    />
+    </View>
   );
 }
+
+export function LiveMobileNativeScreen(_props: LiveMobileNativeScreenProps) {
+  const { active, upcoming, ended } = useLiveSessions();
+
+  return (
+    <ScreenViewMobileNative>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={nativeStyles.scroll}>
+        <AppText variant="titleLg">Live Sessions</AppText>
+
+        <Section
+          title="🔴 Live Now"
+          sessions={active.sessions}
+          isLoading={active.isLoading}
+          emptyMessage="No live sessions right now."
+        />
+        <Section
+          title="Upcoming"
+          sessions={upcoming.sessions}
+          isLoading={upcoming.isLoading}
+          emptyMessage="No upcoming sessions scheduled."
+        />
+        <Section
+          title="Recently Ended"
+          sessions={ended.sessions}
+          isLoading={ended.isLoading}
+          emptyMessage="No recent sessions."
+        />
+      </ScrollView>
+    </ScreenViewMobileNative>
+  );
+}
+
+const nativeStyles = StyleSheet.create((theme) => ({
+  scroll: {
+    paddingBottom: theme.spacing.layout.sectionY,
+    gap: theme.spacing.layout.sectionY,
+  },
+  section: {
+    gap: theme.spacing.component.gapMd,
+  },
+}));

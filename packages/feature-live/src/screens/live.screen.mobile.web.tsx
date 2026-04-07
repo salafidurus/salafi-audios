@@ -1,66 +1,75 @@
 "use client";
 
-import type { LiveSessionDto } from "@sd/core-contracts";
-import { useLiveActiveScreen } from "../hooks/use-live-active";
+import { ScreenViewWeb, AppText } from "@sd/shared";
+import type { LiveSessionPublicDto } from "@sd/core-contracts";
+import { useLiveSessions } from "../hooks/use-live-sessions";
+import { LiveSessionCardWeb } from "../components/live-session-card/live-session-card.web";
+import styles from "./live.screen.module.css";
 
-export type LiveMobileWebScreenProps = {
-  onNavigateToSession?: (id: string) => void;
-};
+export type LiveMobileWebScreenProps = Record<string, never>;
 
-function LiveSessionItem({ session, onPress }: { session: LiveSessionDto; onPress?: () => void }) {
+function Section({
+  title,
+  sessions,
+  isLoading,
+  emptyMessage,
+}: {
+  title: string;
+  sessions: LiveSessionPublicDto[];
+  isLoading: boolean;
+  emptyMessage: string;
+}) {
   return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={onPress}
-      onKeyDown={(e) => e.key === "Enter" && onPress?.()}
-      style={{
-        padding: 12,
-        borderBottom: "1px solid #eee",
-        cursor: "pointer",
-      }}
-    >
-      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-        <span
-          style={{
-            width: 6,
-            height: 6,
-            borderRadius: 3,
-            backgroundColor: "#dc2626",
-            display: "inline-block",
-          }}
-        />
-        <span style={{ fontSize: 15, fontWeight: 600 }}>{session.title}</span>
-      </div>
-      <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>
-        {session.scholarName}
-        {session.viewerCount !== undefined && ` · ${session.viewerCount} watching`}
-      </div>
+    <div className={styles.section}>
+      <AppText variant="titleMd">{title}</AppText>
+      {isLoading && sessions.length === 0 ? (
+        <AppText variant="bodyMd" style={{ color: "var(--content-subtle, #666)" }}>
+          Loading…
+        </AppText>
+      ) : sessions.length === 0 ? (
+        <AppText variant="bodyMd" style={{ color: "var(--content-subtle, #666)" }}>
+          {emptyMessage}
+        </AppText>
+      ) : (
+        <div className={styles.cardList}>
+          {sessions.map((s) => (
+            <LiveSessionCardWeb key={s.id} session={s} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-export function LiveMobileWebScreen({ onNavigateToSession }: LiveMobileWebScreenProps) {
-  const { sessions, isFetching } = useLiveActiveScreen();
-
-  if (isFetching && sessions.length === 0) {
-    return <div style={{ padding: 16 }}>Loading live sessions...</div>;
-  }
-
-  if (sessions.length === 0) {
-    return <div style={{ padding: 16, color: "#666" }}>No live sessions right now.</div>;
-  }
+export function LiveMobileWebScreen(_props: LiveMobileWebScreenProps) {
+  const { active, upcoming, ended } = useLiveSessions();
 
   return (
-    <div style={{ padding: 12 }}>
-      <h2 style={{ margin: 0, fontSize: 18, marginBottom: 12 }}>Live Now</h2>
-      {sessions.map((session) => (
-        <LiveSessionItem
-          key={session.id}
-          session={session}
-          onPress={() => onNavigateToSession?.(session.id)}
-        />
-      ))}
-    </div>
+    <ScreenViewWeb>
+      <div className={styles.page}>
+        <div className={styles.container}>
+          <AppText variant="titleLg">Live Sessions</AppText>
+
+          <Section
+            title="🔴 Live Now"
+            sessions={active.sessions}
+            isLoading={active.isLoading}
+            emptyMessage="No live sessions right now."
+          />
+          <Section
+            title="Upcoming"
+            sessions={upcoming.sessions}
+            isLoading={upcoming.isLoading}
+            emptyMessage="No upcoming sessions scheduled."
+          />
+          <Section
+            title="Recently Ended"
+            sessions={ended.sessions}
+            isLoading={ended.isLoading}
+            emptyMessage="No recent sessions."
+          />
+        </div>
+      </div>
+    </ScreenViewWeb>
   );
 }
