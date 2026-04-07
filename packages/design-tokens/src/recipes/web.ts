@@ -1,5 +1,5 @@
 import type { AppColors } from "../colors/shared";
-import type { AccentRecipesShared } from "./shared";
+import type { AccentRecipesShared, ScreenWashRecipe, ChromeRecipe } from "./shared";
 
 export type AccentRecipesWeb = AccentRecipesShared & {
   primaryCta: AccentRecipesShared["primaryCta"] & {
@@ -16,6 +16,11 @@ export type AccentRecipesWeb = AccentRecipesShared & {
   mixedHeroSurface: AccentRecipesShared["mixedHeroSurface"] & {
     background: string;
   };
+  mixedPromotedPanel: AccentRecipesShared["mixedPromotedPanel"] & {
+    background: string;
+  };
+  screen: ScreenWashRecipe;
+  chrome: ChromeRecipe;
 };
 
 const createLayeredBackground = (
@@ -31,7 +36,9 @@ const createLayeredBackground = (
 export const createAccentRecipesWeb = (
   colors: AppColors,
   focusRingColor: string,
+  mode: "light" | "dark",
 ): AccentRecipesWeb => {
+  const isDark = mode === "dark";
   const primaryCta = {
     backgroundColor: colors.action.primary,
     borderColor: colors.border.primaryStrong,
@@ -112,6 +119,26 @@ export const createAccentRecipesWeb = (
     },
   };
 
+  const mixedPromotedPanel = {
+    backgroundColor: colors.surface.default,
+    borderColor: colors.border.primary,
+    textColor: colors.content.strong,
+    linear: {
+      colors: [
+        `color-mix(in srgb, ${colors.surface.primarySubtle} 62%, ${colors.surface.default})`,
+        `color-mix(in srgb, ${colors.surface.secondarySubtle} 42%, ${colors.surface.default})`,
+      ] as [string, string],
+      start: { x: 0, y: 0 },
+      end: { x: 1, y: 1 },
+    },
+    radial: {
+      center: { x: 0.86, y: 0.14 },
+      radius: 0.66,
+      centerColor: `color-mix(in srgb, ${colors.border.primaryStrong} 18%, transparent)`,
+      edgeColor: "transparent",
+    },
+  };
+
   return {
     primaryCta: {
       ...primaryCta,
@@ -146,7 +173,34 @@ export const createAccentRecipesWeb = (
       ...mixedHeroSurface,
       background: createLayeredBackground(mixedHeroSurface.radial, mixedHeroSurface.linear),
     },
+    selectedSurface: {
+      backgroundColor: colors.surface.selected,
+      contentColor: colors.content.primaryStrong,
+    },
+    selectedContent: colors.content.primaryStrong,
+    secondarySupportingBadge: {
+      surfaceColor: colors.surface.secondarySubtle,
+      borderColor: colors.border.secondary,
+      foregroundColor: colors.content.secondaryStrong,
+    },
+    mixedPromotedPanel: {
+      ...mixedPromotedPanel,
+      background: createLayeredBackground(mixedPromotedPanel.radial, mixedPromotedPanel.linear),
+    },
     dividerColor: `color-mix(in srgb, ${colors.border.default} 82%, transparent)`,
     focusRingColor,
+    screen: {
+      washPrimary: `radial-gradient(circle at 12% 14%, color-mix(in srgb, ${colors.surface.primarySubtle} ${isDark ? "70%" : "100%"}, transparent), transparent 42%)`,
+      washSecondary: `radial-gradient(circle at 14% 14%, color-mix(in srgb, ${colors.surface.secondarySubtle} ${isDark ? "70%" : "100%"}, transparent), transparent 40%)`,
+      washMixed: `radial-gradient(circle at 14% 12%, color-mix(in srgb, ${colors.surface.primarySubtle} ${isDark ? "64%" : "94%"}, transparent), transparent 38%), radial-gradient(circle at 88% 10%, color-mix(in srgb, ${colors.surface.secondarySubtle} ${isDark ? "62%" : "90%"}, transparent), transparent 32%)`,
+    },
+    chrome: {
+      surface: `color-mix(in srgb, ${colors.surface.elevated} ${isDark ? "92%" : "88%"}, transparent)`,
+      surfaceStrong: `color-mix(in srgb, ${colors.surface.elevated} ${isDark ? "96%" : "93%"}, transparent)`,
+      border: `color-mix(in srgb, ${colors.border.subtle} ${isDark ? "82%" : "88%"}, transparent)`,
+      borderStrong: `color-mix(in srgb, ${colors.border.default} ${isDark ? "84%" : "82%"}, transparent)`,
+      hoverAccentSurface: `color-mix(in srgb, ${colors.surface.primarySubtle} ${isDark ? "54%" : "72%"}, ${colors.surface.subtle})`,
+      inputBorderRest: `color-mix(in srgb, ${colors.border.default} ${isDark ? "76%" : "84%"}, transparent)`,
+    },
   };
 };

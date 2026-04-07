@@ -4,3 +4,15 @@ export { lightWebTheme, darkWebTheme } from "./theme/web";
 // export path even when compiling native-only sources.
 export { lightMobileTheme, darkMobileTheme } from "./theme/native";
 export type { TypographyVariant } from "./typography/shared";
+export type {
+  AccentLinearRecipe,
+  AccentRadialRecipe,
+  AccentPrimaryCtaRecipe,
+  AccentSurfaceRecipe,
+  AccentSelectedSurfaceRecipe,
+  AccentBadgeRecipe,
+  AccentRecipesShared,
+  ScreenWashRecipe,
+  ChromeRecipe,
+} from "./recipes/shared";
+export type { AccentRecipesWeb } from "./recipes/web";
