@@ -183,6 +183,28 @@ export const createAccentRecipesWeb = (
       borderColor: colors.border.secondary,
       foregroundColor: colors.content.secondaryStrong,
     },
+    badge: {
+      primary: {
+        surfaceColor: colors.surface.primarySubtle,
+        borderColor: colors.border.primary,
+        foregroundColor: colors.content.primaryStrong,
+      },
+      secondary: {
+        surfaceColor: colors.surface.secondarySubtle,
+        borderColor: colors.border.secondary,
+        foregroundColor: colors.content.secondaryStrong,
+      },
+      success: {
+        surfaceColor: `color-mix(in srgb, ${colors.action.primaryHover} 20%, ${colors.surface.default})`,
+        borderColor: `color-mix(in srgb, ${colors.action.primary} 40%, ${colors.border.default})`,
+        foregroundColor: `color-mix(in srgb, ${colors.action.primary} 80%, ${colors.content.strong})`,
+      },
+      danger: {
+        surfaceColor: `color-mix(in srgb, #ef4444 20%, ${colors.surface.default})`,
+        borderColor: `color-mix(in srgb, #ef4444 40%, ${colors.border.default})`,
+        foregroundColor: `color-mix(in srgb, #ef4444 80%, ${colors.content.strong})`,
+      },
+    },
     mixedPromotedPanel: {
       ...mixedPromotedPanel,
       background: createLayeredBackground(mixedPromotedPanel.radial, mixedPromotedPanel.linear),

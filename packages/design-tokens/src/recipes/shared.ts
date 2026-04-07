@@ -56,6 +56,13 @@ export type AccentBadgeRecipe = {
   foregroundColor: string;
 };
 
+export type BadgeVariantRecipes = {
+  primary: AccentBadgeRecipe;
+  secondary: AccentBadgeRecipe;
+  success: AccentBadgeRecipe;
+  danger: AccentBadgeRecipe;
+};
+
 export type AccentRecipesShared = {
   primaryCta: AccentPrimaryCtaRecipe;
   primarySubtleSurface: AccentSurfaceRecipe;
@@ -64,6 +71,7 @@ export type AccentRecipesShared = {
   selectedSurface: AccentSelectedSurfaceRecipe;
   selectedContent: string;
   secondarySupportingBadge: AccentBadgeRecipe;
+  badge: BadgeVariantRecipes;
   mixedPromotedPanel: AccentSurfaceRecipe;
   dividerColor: string;
   focusRingColor: string;

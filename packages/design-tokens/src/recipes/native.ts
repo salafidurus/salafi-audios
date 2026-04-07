@@ -85,6 +85,28 @@ export const createAccentRecipesNative = (
       borderColor: colors.border.secondary,
       foregroundColor: colors.content.secondaryStrong,
     },
+    badge: {
+      primary: {
+        surfaceColor: colors.surface.primarySubtle,
+        borderColor: colors.border.primary,
+        foregroundColor: colors.content.primaryStrong,
+      },
+      secondary: {
+        surfaceColor: colors.surface.secondarySubtle,
+        borderColor: colors.border.secondary,
+        foregroundColor: colors.content.secondaryStrong,
+      },
+      success: {
+        surfaceColor: colors.surface.primarySubtle,
+        borderColor: colors.border.primary,
+        foregroundColor: colors.content.primaryStrong,
+      },
+      danger: {
+        surfaceColor: colors.surface.default,
+        borderColor: colors.border.default,
+        foregroundColor: colors.content.strong,
+      },
+    },
     mixedPromotedPanel: {
       backgroundColor: colors.surface.default,
       borderColor: colors.border.primary,

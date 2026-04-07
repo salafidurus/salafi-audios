@@ -7,6 +7,7 @@ export type {
   AccentSurfaceRecipe,
   AccentSelectedSurfaceRecipe,
   AccentBadgeRecipe,
+  BadgeVariantRecipes,
   AccentRecipesShared,
   ScreenWashRecipe,
   ChromeRecipe,
