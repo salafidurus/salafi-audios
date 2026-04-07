@@ -1,5 +1,5 @@
-import { AccountResponsiveScreen } from "@sd/feature-account";
+import { AccountProfileResponsiveScreen } from "@sd/feature-account";
 
 export default function AccountProfilePage() {
-  return <AccountResponsiveScreen />;
+  return <AccountProfileResponsiveScreen />;
 }

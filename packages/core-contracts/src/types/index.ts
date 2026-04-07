@@ -26,3 +26,9 @@ export {
 } from "../types/search.types";
 export { type FeedItemDto, type FeedPageDto } from "../types/feed.types";
 export { type LibraryItemDto, type LibraryPageDto } from "../types/library.types";
+export { type UserProfileDto } from "../types/account.types";
+export {
+  type LiveSessionStatus,
+  type LiveSessionDto,
+  type LiveSessionPageDto,
+} from "../types/live.types";

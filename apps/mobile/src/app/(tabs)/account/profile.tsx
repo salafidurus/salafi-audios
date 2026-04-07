@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useAuth } from "@sd/core-auth";
-import { AccountMobileNativeScreen } from "@sd/feature-account";
+import { AccountProfileMobileNativeScreen } from "@sd/feature-account";
 import { AuthRequiredStateMobileNative } from "@sd/shared";
 import { routes } from "@sd/core-contracts";
 
@@ -22,5 +22,5 @@ export default function AccountProfile() {
     );
   }
 
-  return <AccountMobileNativeScreen />;
+  return <AccountProfileMobileNativeScreen />;
 }

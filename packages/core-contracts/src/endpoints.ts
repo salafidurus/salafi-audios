@@ -28,4 +28,12 @@ export const endpoints = {
     saved: "/library/saved",
     completed: "/library/completed",
   },
+  account: {
+    profile: "/account/profile",
+  },
+  live: {
+    active: "/live/active",
+    scheduled: "/live/scheduled",
+    ended: "/live/ended",
+  },
 } as const;

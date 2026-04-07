@@ -1,5 +1,5 @@
-import { LiveResponsiveScreen } from "@sd/feature-live";
+import { LiveScheduledResponsiveScreen } from "@sd/feature-live";
 
 export default function LiveScheduledPage() {
-  return <LiveResponsiveScreen />;
+  return <LiveScheduledResponsiveScreen />;
 }

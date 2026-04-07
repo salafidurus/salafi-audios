@@ -89,4 +89,14 @@ export const queryKeys = {
     saved: (cursor?: string) => [...queryKeys.library.all, "saved", cursor] as const,
     completed: (cursor?: string) => [...queryKeys.library.all, "completed", cursor] as const,
   },
+  account: {
+    all: ["account"] as const,
+    profile: () => [...queryKeys.account.all, "profile"] as const,
+  },
+  live: {
+    all: ["live"] as const,
+    active: () => [...queryKeys.live.all, "active"] as const,
+    scheduled: () => [...queryKeys.live.all, "scheduled"] as const,
+    ended: (cursor?: string) => [...queryKeys.live.all, "ended", cursor] as const,
+  },
 } as const;

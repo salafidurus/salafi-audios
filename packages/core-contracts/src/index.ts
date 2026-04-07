@@ -26,6 +26,10 @@ export {
   type FeedPageDto,
   type LibraryItemDto,
   type LibraryPageDto,
+  type UserProfileDto,
+  type LiveSessionStatus,
+  type LiveSessionDto,
+  type LiveSessionPageDto,
 } from "./types";
 
 // Export route constants
