@@ -3,14 +3,14 @@ import {
   httpClient,
   queryKeys,
   useApiQuery,
-  type LectureViewDto,
+  type LectureDetailDto,
 } from "@sd/core-contracts";
 
 export function useLectureDetail(id: string) {
   return useApiQuery(
     queryKeys.lectures.detail(id, id),
     () =>
-      httpClient<LectureViewDto>({
+      httpClient<LectureDetailDto>({
         url: endpoints.lectures.detail(id),
         method: "GET",
       }),

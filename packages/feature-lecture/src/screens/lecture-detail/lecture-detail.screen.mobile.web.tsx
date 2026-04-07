@@ -1,55 +1,79 @@
 "use client";
 
+import { ScreenViewWeb, AppText, ButtonDesktopWeb } from "@sd/shared";
 import { useLectureDetailScreen } from "../../hooks/use-lecture-detail";
+import { LectureMetaWeb } from "../../components/lecture-meta/lecture-meta.web";
+import { TopicChipsWeb } from "../../components/topic-chips/topic-chips.web";
+import { SeriesContextBarWeb } from "../../components/series-context-bar/series-context-bar.web";
 
 export type LectureDetailMobileWebScreenProps = {
   id: string;
   onPlay?: (audioAssetId: string) => void;
 };
 
+function formatDuration(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m} min`;
+}
+
 export function LectureDetailMobileWebScreen({ id, onPlay }: LectureDetailMobileWebScreenProps) {
   const { lecture, isFetching } = useLectureDetailScreen(id);
 
   if (isFetching) {
-    return <div style={{ padding: 16 }}>Loading lecture...</div>;
+    return (
+      <ScreenViewWeb center>
+        <AppText variant="bodyMd">Loading lecture...</AppText>
+      </ScreenViewWeb>
+    );
   }
 
   if (!lecture) {
-    return <div style={{ padding: 16 }}>Lecture not found</div>;
+    return (
+      <ScreenViewWeb center>
+        <AppText variant="titleMd">Lecture not found</AppText>
+      </ScreenViewWeb>
+    );
   }
 
+  const audioDuration = lecture.primaryAudioAsset?.durationSeconds ?? lecture.durationSeconds;
+
   return (
-    <div style={{ padding: 16 }}>
-      <h1 style={{ margin: 0, fontSize: 22 }}>{lecture.title}</h1>
-      {lecture.scholarId && (
-        <p style={{ color: "#666", fontSize: 13, marginTop: 4 }}>Scholar: {lecture.scholarId}</p>
-      )}
-      {lecture.description && <p style={{ fontSize: 14, marginTop: 12 }}>{lecture.description}</p>}
+    <ScreenViewWeb>
+      <AppText variant="titleLg">{lecture.title}</AppText>
+      <LectureMetaWeb lecture={lecture} />
+      <TopicChipsWeb topics={lecture.topics} />
+
       {lecture.primaryAudioAsset && (
         <div style={{ marginTop: 20 }}>
-          <button
-            type="button"
+          <ButtonDesktopWeb
+            variant="primary"
+            size="lg"
             onClick={() => onPlay?.(lecture.primaryAudioAsset!.id)}
-            style={{
-              width: "100%",
-              padding: "12px 0",
-              fontSize: 16,
-              borderRadius: 8,
-              border: "none",
-              background: "#2563eb",
-              color: "#fff",
-              cursor: "pointer",
-            }}
+            style={{ width: "100%" }}
           >
-            Play Lecture
-          </button>
-          <div style={{ fontSize: 12, color: "#888", marginTop: 6, textAlign: "center" }}>
-            {lecture.primaryAudioAsset.durationSeconds
-              ? `${Math.round(lecture.primaryAudioAsset.durationSeconds / 60)} min`
-              : "Duration unknown"}
-          </div>
+            ▶ Play Lecture
+          </ButtonDesktopWeb>
+          {audioDuration != null && (
+            <div style={{ textAlign: "center", marginTop: 8 }}>
+              <AppText variant="caption" style={{ color: "var(--content-muted, #888)" }}>
+                {formatDuration(audioDuration)}
+              </AppText>
+            </div>
+          )}
         </div>
       )}
-    </div>
+
+      {lecture.description && (
+        <div style={{ marginTop: 16 }}>
+          <AppText variant="bodyMd" style={{ lineHeight: "1.7" }}>
+            {lecture.description}
+          </AppText>
+        </div>
+      )}
+
+      {lecture.seriesContext && <SeriesContextBarWeb seriesContext={lecture.seriesContext} />}
+    </ScreenViewWeb>
   );
 }
