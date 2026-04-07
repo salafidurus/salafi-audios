@@ -242,21 +242,36 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
 
-      - name: Cache Playwright browsers
-        id: pw-cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
-          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
-
       - name: Install
         run: pnpm install --frozen-lockfile
 
+      - name: Get Playwright version
+        id: pw-version
+        run: echo "version=$(pnpm --filter web exec playwright --version)" >> $GITHUB_OUTPUT
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
+          key: ${{ runner.os }}-playwright-${{ steps.pw-version.outputs.version }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
       - name: Install Playwright browsers
-        if: steps.pw-cache.outputs.cache-hit != 'true'
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: pnpm --filter web exec playwright install --with-deps
+
+      - name: Playwright cache diagnostics
+        if: always()
+        run: |
+          echo "::group::Playwright diagnostics"
+          echo "Playwright version: $(pnpm --filter web exec playwright --version)"
+          echo "Cache key: ${{ runner.os }}-playwright-${{ steps.pw-version.outputs.version }}"
+          echo "Cache hit: ${{ steps.playwright-cache.outputs.cache-hit }}"
+          echo "Browser path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}"
+          ls -la ${{ env.PLAYWRIGHT_BROWSERS_PATH }} 2>/dev/null || echo "No browser cache directory found"
+          echo "::endgroup::"
 
       - name: Download build outputs
         uses: actions/download-artifact@v4
