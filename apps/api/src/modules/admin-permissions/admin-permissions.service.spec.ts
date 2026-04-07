@@ -10,7 +10,7 @@ describe('AdminPermissionsService', () => {
 
   const mockPermissionRecord = {
     userId: 'user1',
-    permission: 'MANAGE_SCHOLARS' as AdminPermission,
+    permission: 'manage:scholars' as AdminPermission,
     grantedAt: new Date('2023-01-01'),
     grantedById: 'admin1',
   };
@@ -24,8 +24,8 @@ describe('AdminPermissionsService', () => {
           useValue: {
             findByUserId: jest.fn(),
             findPermissionStringsByUserId: jest.fn(),
-            grant: jest.fn(),
-            revoke: jest.fn(),
+            grant: jest.fn().mockResolvedValue(mockPermissionRecord),
+            revoke: jest.fn().mockResolvedValue(mockPermissionRecord),
             hasPermission: jest.fn(),
           } satisfies Partial<jest.Mocked<AdminPermissionsRepository>>,
         },
@@ -52,7 +52,7 @@ describe('AdminPermissionsService', () => {
         permissions: [
           {
             userId: 'user1',
-            permission: 'MANAGE_SCHOLARS',
+            permission: 'manage:scholars',
             grantedAt: '2023-01-01T00:00:00.000Z',
             grantedById: 'admin1',
           },
@@ -73,14 +73,14 @@ describe('AdminPermissionsService', () => {
   describe('getMyPermissions', () => {
     it('should return permission strings for user', async () => {
       repo.findPermissionStringsByUserId.mockResolvedValue([
-        'MANAGE_SCHOLARS',
-        'MANAGE_LECTURES',
+        'manage:scholars',
+        'manage:content',
       ]);
 
       const result = await service.getMyPermissions('user1');
 
       expect(result).toEqual({
-        permissions: ['MANAGE_SCHOLARS', 'MANAGE_LECTURES'],
+        permissions: ['manage:scholars', 'manage:content'],
       });
       expect(repo.findPermissionStringsByUserId).toHaveBeenCalledWith('user1');
     });
@@ -96,8 +96,7 @@ describe('AdminPermissionsService', () => {
 
   describe('grant', () => {
     it('should grant valid permission and return updated permissions', async () => {
-      const permission = 'MANAGE_SCHOLARS';
-      repo.grant.mockResolvedValue(undefined);
+      const permission = 'manage:scholars';
       repo.findByUserId.mockResolvedValue([mockPermissionRecord]);
 
       const result = await service.grant('user1', permission, 'admin1');
@@ -106,7 +105,7 @@ describe('AdminPermissionsService', () => {
         permissions: [
           {
             userId: 'user1',
-            permission: 'MANAGE_SCHOLARS',
+            permission: 'manage:scholars',
             grantedAt: '2023-01-01T00:00:00.000Z',
             grantedById: 'admin1',
           },
@@ -131,7 +130,6 @@ describe('AdminPermissionsService', () => {
     it('should handle all valid admin permissions', async () => {
       // Test that all permissions in ADMIN_PERMISSIONS are accepted
       for (const permission of ADMIN_PERMISSIONS) {
-        repo.grant.mockResolvedValue(undefined);
         repo.findByUserId.mockResolvedValue([]);
 
         await expect(
@@ -145,9 +143,8 @@ describe('AdminPermissionsService', () => {
 
   describe('revoke', () => {
     it('should revoke permission when user has it', async () => {
-      const permission = 'MANAGE_SCHOLARS';
+      const permission = 'manage:scholars';
       repo.hasPermission.mockResolvedValue(true);
-      repo.revoke.mockResolvedValue(undefined);
       repo.findByUserId.mockResolvedValue([]);
 
       const result = await service.revoke('user1', permission);
@@ -170,7 +167,7 @@ describe('AdminPermissionsService', () => {
     });
 
     it('should throw NotFoundException when user does not have permission', async () => {
-      const permission = 'MANAGE_SCHOLARS';
+      const permission = 'manage:scholars';
       repo.hasPermission.mockResolvedValue(false);
 
       await expect(service.revoke('user1', permission)).rejects.toThrow(
