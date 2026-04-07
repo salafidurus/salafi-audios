@@ -1,4 +1,4 @@
-import { View, Text, ScrollView } from "react-native";
+"use client";
 
 const SUPPORT_SECTIONS = [
   {
@@ -25,36 +25,41 @@ const SUPPORT_SECTIONS = [
   {
     title: "Contact",
     items: [
-      { q: "Email", a: "support@salafidurus.com" },
-      { q: "Response time", a: "We aim to respond within 48 hours." },
+      {
+        q: "Email",
+        a: "support@salafidurus.com",
+      },
+      {
+        q: "Response time",
+        a: "We aim to respond within 48 hours.",
+      },
     ],
   },
 ];
 
-export function SupportMobileNativeScreen() {
+export function SupportMobileWebScreen() {
   return (
-    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16 }}>
-      <Text style={{ fontSize: 22, fontWeight: "700", marginBottom: 16 }}>Support</Text>
+    <div style={{ padding: "16px 12px" }}>
+      <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 16 }}>Support</h1>
       {SUPPORT_SECTIONS.map((section) => (
-        <View key={section.title} style={{ marginBottom: 24 }}>
-          <Text style={{ fontSize: 17, fontWeight: "600", marginBottom: 8 }}>{section.title}</Text>
+        <div key={section.title} style={{ marginBottom: 24 }}>
+          <h2 style={{ fontSize: 17, fontWeight: 600, marginBottom: 8 }}>{section.title}</h2>
           {section.items.map((item) => (
-            <View
+            <div
               key={item.q}
               style={{
                 marginBottom: 12,
                 padding: 12,
                 borderRadius: 8,
-                borderWidth: 1,
-                borderColor: "#e5e7eb",
+                border: "1px solid #e5e7eb",
               }}
             >
-              <Text style={{ fontWeight: "600", marginBottom: 2 }}>{item.q}</Text>
-              <Text style={{ color: "#555", lineHeight: 20 }}>{item.a}</Text>
-            </View>
+              <p style={{ fontWeight: 600, marginBottom: 2, fontSize: 14 }}>{item.q}</p>
+              <p style={{ color: "#555", fontSize: 13, lineHeight: 1.4 }}>{item.a}</p>
+            </div>
           ))}
-        </View>
+        </div>
       ))}
-    </ScrollView>
+    </div>
   );
 }

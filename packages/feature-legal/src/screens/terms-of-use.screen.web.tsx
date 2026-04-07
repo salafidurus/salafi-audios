@@ -1,7 +1,18 @@
-import { ScreenInProgressResponsive } from "@sd/shared";
+"use client";
+
+import styles from "./responsive.module.css";
+import { TermsOfUseDesktopWebScreen } from "./terms-of-use.screen.desktop.web";
+import { TermsOfUseMobileWebScreen } from "./terms-of-use.screen.mobile.web";
 
 export function TermsOfUseResponsiveScreen() {
   return (
-    <ScreenInProgressResponsive title="Terms of Service" description="Legal content is being prepared." />
+    <>
+      <div className={styles.mobileOnly}>
+        <TermsOfUseMobileWebScreen />
+      </div>
+      <div className={styles.desktopOnly}>
+        <TermsOfUseDesktopWebScreen />
+      </div>
+    </>
   );
 }
