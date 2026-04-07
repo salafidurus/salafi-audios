@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { View, Text, Pressable, ScrollView } from "react-native";
 import { useAccountScreen } from "../hooks/use-account";
 
 export type AccountMobileNativeScreenProps = {
@@ -34,7 +34,7 @@ export function AccountMobileNativeScreen({
         </View>
       )}
       <View style={{ marginTop: 24, gap: 8 }}>
-        <TouchableOpacity
+        <Pressable
           onPress={onNavigateToProfile}
           style={{
             padding: 12,
@@ -45,8 +45,8 @@ export function AccountMobileNativeScreen({
           }}
         >
           <Text style={{ fontSize: 15 }}>Edit Profile</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
+        </Pressable>
+        <Pressable
           onPress={onNavigateToLegal}
           style={{
             padding: 12,
@@ -57,8 +57,8 @@ export function AccountMobileNativeScreen({
           }}
         >
           <Text style={{ fontSize: 15 }}>Legal</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
+        </Pressable>
+        <Pressable
           onPress={onSignOut}
           style={{
             padding: 12,
@@ -69,7 +69,7 @@ export function AccountMobileNativeScreen({
           }}
         >
           <Text style={{ fontSize: 15, color: "#dc2626" }}>Sign Out</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </ScrollView>
   );

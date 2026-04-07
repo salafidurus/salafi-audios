@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, Text, ActivityIndicator } from "react-native";
+import { View, Pressable, Text, ActivityIndicator } from "react-native";
 import { useDownload } from "../../hooks/use-download";
 
 type DownloadButtonNativeProps = {
@@ -12,7 +12,7 @@ export function DownloadButtonNative({ lectureId }: DownloadButtonNativeProps) {
 
   if (isDownloaded) {
     return (
-      <TouchableOpacity
+      <Pressable
         onPress={removeDownload}
         style={{
           paddingHorizontal: 12,
@@ -23,7 +23,7 @@ export function DownloadButtonNative({ lectureId }: DownloadButtonNativeProps) {
         accessibilityLabel="Remove download"
       >
         <Text style={{ fontSize: 13, color: "#16a34a", fontWeight: "600" }}>✓ Downloaded</Text>
-      </TouchableOpacity>
+      </Pressable>
     );
   }
 
@@ -47,7 +47,7 @@ export function DownloadButtonNative({ lectureId }: DownloadButtonNativeProps) {
   }
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={startDownload}
       disabled={status === "error"}
       style={{
@@ -62,6 +62,6 @@ export function DownloadButtonNative({ lectureId }: DownloadButtonNativeProps) {
       <Text style={{ fontSize: 13, color: "#374151" }}>
         {status === "error" ? "⚠ Retry" : "↓ Download"}
       </Text>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
