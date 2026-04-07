@@ -40,9 +40,11 @@
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "lint": "eslint .",
-    "test": "echo \"@sd/core-contracts: manual verification required\"",
-    "test:prepush": "echo \"@sd/core-contracts: manual verification required\"",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "test": "jest --passWithNoTests",
+    "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:watch": "jest --watch --passWithNoTests",
+    "test:cov": "jest --coverage --passWithNoTests"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.69.0"
@@ -51,6 +53,9 @@
     "@sd/util-config": "workspace:*",
     "@types/react": "^19.2.9",
     "rimraf": "^6.0.0",
+    "@types/jest": "^30.0.0",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
     "typescript": "^5.9.0"
   },
   "peerDependencies": {

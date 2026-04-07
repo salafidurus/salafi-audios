@@ -20,7 +20,7 @@ export const createThemeWeb = (mode: "light" | "dark"): AppThemeWeb => {
 
   return {
     colors,
-    recipes: createAccentRecipesWeb(colors, shadows.focus),
+    recipes: createAccentRecipesWeb(colors, shadows.focus, mode),
     spacing: spacingWeb,
     radius: radiusWeb,
     shadows,

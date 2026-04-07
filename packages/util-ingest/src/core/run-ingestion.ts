@@ -26,12 +26,12 @@ export type IngestionCounters = {
   lectures: number;
 };
 
-function parseDate(input?: string): Date | null {
+export function parseDate(input?: string): Date | null {
   if (!input) return null;
   return new Date(input);
 }
 
-function computePublishedAt(status: Status, publishedAt?: string): Date | null {
+export function computePublishedAt(status: Status, publishedAt?: string): Date | null {
   if (publishedAt) return new Date(publishedAt);
   if (status === Status.published) return new Date();
   return null;
@@ -41,7 +41,7 @@ function isTruthyDate(input?: string): boolean {
   return Boolean(input && input.trim().length > 0);
 }
 
-function computePublishedLectureAggregates(lectures: LectureDef[]): {
+export function computePublishedLectureAggregates(lectures: LectureDef[]): {
   publishedLectureCount: number;
   publishedDurationSeconds: number | null;
 } {

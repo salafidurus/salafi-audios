@@ -21,7 +21,5 @@
     "@sentry/react-native": "^7.11.0",
     "vexo-analytics": "^1.5.4"
   },
-  "devDependencies": {
-    "typescript": "^5.9.2"
-  }
+  "devDependencies": {}
 }

@@ -13,6 +13,7 @@ export { NotFoundStateMobileNative } from "./compat/native-entry.web";
 export { ButtonDesktopWeb } from "./components/Button/Button.desktop.web";
 export { ButtonMobileNative } from "./compat/native-entry.web";
 export { AccentGradientFill } from "./components/AccentGradientFill/AccentGradientFill.web";
+export { AccentGradientFillFromRecipe } from "./components/AccentGradientFill/AccentGradientFillFromRecipe.web";
 export { TextInputWeb } from "./components/TextInput/TextInput.web";
 export { TextInputMobileNative } from "./compat/native-entry.web";
 
@@ -21,3 +22,5 @@ export { useDragScrollWeb } from "./hooks/use-drag-scroll.web";
 
 export { AppTextWeb as AppText } from "./components/AppText/AppText.web";
 export type { AppTextProps } from "./components/AppText/AppText.web";
+
+export { ComponentErrorBoundary } from "./components/error-boundary/ComponentErrorBoundary";

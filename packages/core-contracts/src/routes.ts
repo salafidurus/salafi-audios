@@ -86,3 +86,20 @@ export const routeAuth = {
   library: "local-first",
   account: "auth",
 } as const satisfies Record<keyof typeof routes, RouteAuthMode>;
+
+/**
+ * Per-path overrides that take precedence over section-level routeAuth.
+ * Use when an individual route within an auth-guarded section should
+ * have a different auth mode (e.g. /account/legal is public content).
+ */
+export const routeAuthOverrides = {
+  [routes.account.legal]: "public",
+} as const satisfies Partial<Record<string, RouteAuthMode>>;
+
+/** Resolve the effective auth mode for a given pathname. */
+export function getEffectiveAuthMode(pathname: string, sectionAuth: RouteAuthMode): RouteAuthMode {
+  if (pathname in routeAuthOverrides) {
+    return routeAuthOverrides[pathname as keyof typeof routeAuthOverrides];
+  }
+  return sectionAuth;
+}

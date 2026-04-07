@@ -161,7 +161,6 @@ const wrapperStyle: React.CSSProperties = {
   justifyContent: "center",
   padding: "24px 16px",
   minHeight: "100%",
-  background: "var(--screen-wash-primary), var(--surface-canvas)",
 };
 
 const cardStyle: React.CSSProperties = {

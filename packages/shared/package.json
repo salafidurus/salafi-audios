@@ -15,7 +15,11 @@
     "dev": "tsc -p tsconfig.json --noEmit --watch",
     "build": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch --passWithNoTests",
+    "test:cov": "jest --coverage --passWithNoTests",
+    "test:prepush": "jest --changedSince=origin/main --passWithNoTests"
   },
   "dependencies": {
     "@sd/core-contracts": "workspace:*",
@@ -91,6 +95,9 @@
     "react-native-ease": "^0.2.0",
     "react-native-safe-area-context": "~5.6.2",
     "react-native-unistyles": "^3.1.1",
+    "@types/jest": "^30.0.0",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
     "typescript": "^5.9.2"
   }
 }

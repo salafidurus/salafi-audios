@@ -1,8 +1,10 @@
 {
   "extends": "./app.json",
   "compilerOptions": {
+    // "react-jsx" uses the automatic runtime (React 17+) — no manual React import needed
     "jsx": "react-jsx",
     "moduleResolution": "bundler",
+    // Many React Native / Expo packages only ship CJS — esModuleInterop enables default imports from them
     "esModuleInterop": true,
     "paths": {
       "@/*": ["./src/*"],

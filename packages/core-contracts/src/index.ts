@@ -67,7 +67,7 @@ export type {
 } from "./types";
 
 // Export route constants
-export { routes, routeAuth } from "./routes";
+export { routes, routeAuth, routeAuthOverrides, getEffectiveAuthMode } from "./routes";
 export type { RouteAuthMode } from "./routes";
 
 // Export query utilities (client, keys, hooks)

@@ -6,7 +6,7 @@ import { TopAuthStripWeb } from "./top-auth-strip.web";
 
 export function TopAuthStrip() {
   const [isHydrated, setIsHydrated] = useState(false);
-  const { isMobile, isTablet } = useResponsive();
+  const { isWeb } = useResponsive();
 
   useEffect(() => {
     setIsHydrated(true);
@@ -17,7 +17,7 @@ export function TopAuthStrip() {
   }
 
   // Mobile and tablet use Expo Router navigation, no top auth strip needed
-  if (isMobile || isTablet) {
+  if (!isWeb) {
     return null;
   }
 

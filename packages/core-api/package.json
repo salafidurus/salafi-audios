@@ -19,7 +19,5 @@
     "@sd/core-contracts": "workspace:*",
     "@sd/core-config": "workspace:*"
   },
-  "devDependencies": {
-    "typescript": "^5.9.2"
-  }
+  "devDependencies": {}
 }

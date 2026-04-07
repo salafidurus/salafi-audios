@@ -62,5 +62,5 @@ export type {
   QuickBrowseDto,
 } from "./types";
 
-export { routes, routeAuth } from "./routes";
+export { routes, routeAuth, routeAuthOverrides, getEffectiveAuthMode } from "./routes";
 export type { RouteAuthMode } from "./routes";

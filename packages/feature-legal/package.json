@@ -26,7 +26,5 @@
     "react-native": "*",
     "react-native-unistyles": "*"
   },
-  "devDependencies": {
-    "typescript": "^5.9.2"
-  }
+  "devDependencies": {}
 }

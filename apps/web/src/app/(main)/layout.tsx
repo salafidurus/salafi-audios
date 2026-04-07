@@ -1,13 +1,18 @@
 import { Footer, Sidebar, TopAuthStrip } from "@sd/feature-navigation";
 import { MiniPlayerWeb } from "@sd/feature-playback";
+import { ComponentErrorBoundary } from "@sd/shared";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="appFrame">
       <div className="appShell">
-        <Sidebar />
+        <ComponentErrorBoundary fallback={null}>
+          <Sidebar />
+        </ComponentErrorBoundary>
         <div className="appMain">
-          <TopAuthStrip />
+          <ComponentErrorBoundary fallback={null}>
+            <TopAuthStrip />
+          </ComponentErrorBoundary>
           <div className="appContent">{children}</div>
           <MiniPlayerWeb />
           <Footer />
