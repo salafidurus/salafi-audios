@@ -1,22 +1,25 @@
 import { Pressable, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { ScreenViewMobileNative } from "@sd/shared";
+import { QuickBrowse } from "../../components/QuickBrowse/QuickBrowse.native";
+import { useQuickBrowse } from "../../hooks/use-quickbrowse";
 
 export type SearchHomeScreenProps = {
   onOpenSearch?: () => void;
   onSelectCategory?: (searchKey: string) => void;
+  onSelectScholar?: (slug: string) => void;
+  onSelectSuggestion?: (slug: string) => void;
+  onContinueListening?: (lectureSlug: string) => void;
 };
 
 export function SearchHomeMobileNativeScreen({
   onOpenSearch,
   onSelectCategory,
+  onSelectScholar,
+  onSelectSuggestion,
+  onContinueListening,
 }: SearchHomeScreenProps) {
-  const quickLinks = [
-    { label: "Senior Scholars", searchKey: "Senior Scholars" },
-    { label: "Hadith", searchKey: "Hadith" },
-    { label: "Fiqh", searchKey: "Fiqh" },
-    { label: "Tafsir", searchKey: "Tafsir" },
-  ] as const;
+  const { data } = useQuickBrowse();
 
   return (
     <ScreenViewMobileNative center>
@@ -33,20 +36,15 @@ export function SearchHomeMobileNativeScreen({
             <Text style={styles.searchButtonText}>What do you want to listen to?</Text>
           </Pressable>
         </View>
-        <View style={styles.quickBrowse}>
-          <Text style={styles.quickBrowseTitle}>Browse all</Text>
-          <View style={styles.quickBrowseGrid}>
-            {quickLinks.map((item) => (
-              <Pressable
-                key={item.searchKey}
-                onPress={() => onSelectCategory?.(item.searchKey)}
-                style={({ pressed }) => [styles.quickBrowseCard, pressed && styles.pressed]}
-              >
-                <Text style={styles.quickBrowseCardText}>{item.label}</Text>
-              </Pressable>
-            ))}
-          </View>
-        </View>
+        <QuickBrowse
+          scholars={data?.scholars}
+          suggestions={data?.suggestions}
+          recentProgress={data?.recentProgress}
+          onSelectScholar={onSelectScholar}
+          onSelectSuggestion={onSelectSuggestion}
+          onContinueListening={onContinueListening}
+          onSelectCategory={onSelectCategory}
+        />
       </View>
     </ScreenViewMobileNative>
   );
@@ -88,36 +86,6 @@ const styles = StyleSheet.create((theme) => ({
   searchButtonText: {
     color: theme.colors.content.muted,
     ...theme.typography.bodyMd,
-  },
-  quickBrowse: {
-    width: "100%",
-    gap: theme.spacing.component.gapMd,
-  },
-  quickBrowseTitle: {
-    color: theme.colors.content.strong,
-    ...theme.typography.titleMd,
-  },
-  quickBrowseGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: theme.spacing.component.gapMd,
-  },
-  quickBrowseCard: {
-    width: "48%",
-    minHeight: 96,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: theme.radius.component.card,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: theme.colors.border.default,
-    backgroundColor: theme.colors.surface.default,
-    paddingHorizontal: theme.spacing.component.cardPadding,
-    paddingVertical: theme.spacing.component.gapLg,
-  },
-  quickBrowseCardText: {
-    color: theme.colors.content.default,
-    textAlign: "center",
-    ...theme.typography.labelMd,
   },
   pressed: {
     opacity: 0.82,
