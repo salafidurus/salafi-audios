@@ -13,6 +13,17 @@ generated/
 **/generated/
 
 .claude/settings.local.json
+.codex/
+.claude/
+.gemini/
+.opencode/
+**/.codex/
+**/.claude/
+**/.gemini/
+**/.opencode/
+**/AGENTS.md
+**/CLAUDE.md
+**/GEMINI.md
 
 
 # dotenv environment variable files
