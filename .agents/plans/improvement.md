@@ -1360,50 +1360,117 @@ Extend existing modules with admin-gated endpoints:
 
 ## Phase 14: Granular Error Boundaries
 
-**Problem:** There is only one `apps/web/src/app/error.tsx` at the root. Any runtime error in a page crashes the entire app including the sidebar and TopAuthStrip. Similarly, if the Sidebar or TopAuthStrip themselves error, the whole shell breaks.
+**Problem:** Web has only one root `error.tsx` — any page crash takes down the sidebar and TopAuthStrip. Mobile has no error boundaries at all — a single screen crash kills the entire tab view including the tab bar.
 
-**Goal:** Errors are scoped to the component that threw them. Chrome (sidebar, top strip) stays visible on page errors; if chrome crashes it only takes down the affected chrome piece.
+**Goal:** Errors are scoped to the component that threw them. On web, chrome stays visible on page errors. On mobile, a crashed screen shows an inline error while the tab bar and other tabs stay functional. If a chrome piece itself (sidebar, mini player, tab bar) crashes, it only takes down that piece.
+
+### Shared primitive — `@sd/shared`
+
+`ComponentErrorBoundary` is pure React (no platform-specific APIs), so it lives in `@sd/shared` and is used by both apps.
+
+```
+packages/shared/src/components/error-boundary/
+  ComponentErrorBoundary.tsx   ← React class component, cross-platform
+```
+
+```tsx
+// ComponentErrorBoundary.tsx
+import { Component, type ReactNode } from "react";
+
+type Props = { children: ReactNode; fallback?: ReactNode };
+type State = { hasError: boolean };
+
+export class ComponentErrorBoundary extends Component<Props, State> {
+  state: State = { hasError: false };
+
+  static getDerivedStateFromError(): State {
+    return { hasError: true };
+  }
+
+  componentDidCatch() {
+    // hook up error reporting here when available
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback ?? null;
+    }
+    return this.props.children;
+  }
+}
+```
+
+Export from `packages/shared/src/index.ts` (and `index.native.ts` if split).
 
 ### Web — Next.js App Router
 
-Next.js `error.tsx` files are scoped to their segment's `children`, not the segment's own `layout.tsx`. This means:
+Next.js `error.tsx` is scoped to the segment's `children`, not the segment's own `layout.tsx`. So:
 
-- `app/(main)/error.tsx` — catches errors in the `(main)` layout's `children` (the page). Chrome (Sidebar, TopAuthStrip) from `(main)/layout.tsx` remains visible.
-- `app/error.tsx` — catches catastrophic root layout errors (fonts, providers). This is already the right level.
+- `app/error.tsx` — already correct for catastrophic root failures (providers, fonts).
+- Add `app/(main)/error.tsx` — catches page-level errors inside the shell. Chrome (`(main)/layout.tsx`) stays visible.
+- Wrap `<Sidebar />` and `<TopAuthStrip />` independently in `<ComponentErrorBoundary>` inside `(main)/layout.tsx` so a crash in one chrome piece doesn't affect the other.
 
-Additionally, Sidebar and TopAuthStrip need their own React error boundaries so a crash in one doesn't take down the other.
-
-### Approach
-
-1. **Add `apps/web/src/app/(main)/error.tsx`** — identical UI to the existing root `error.tsx` but renders as an inline panel inside the shell (not a full-page crash). The chrome stays.
-2. **Create `apps/web/src/core/error/component-error-boundary.tsx`** — a reusable React class component error boundary (React's class-based API is required for `componentDidCatch`). Accepts `fallback?: ReactNode` prop; defaults to a minimal inline error panel.
-3. **Update `apps/web/src/app/(main)/layout.tsx`** to wrap `<Sidebar />` and `<TopAuthStrip />` in `<ComponentErrorBoundary>` independently. A sidebar crash shows a minimal fallback; TopAuthStrip crash shows nothing (the strip disappears but the page renders).
-
-### Mobile — Expo (future)
-
-React Native doesn't have Next.js-style route-level error boundaries. On mobile, use `react-native-error-boundary` or a class-based boundary around screen content. Sidebar equivalent (tab bar) is owned by Expo Router — not wrappable. Post-MVP.
-
-### Files
+**Files:**
 
 - Create: `apps/web/src/app/(main)/error.tsx`
-- Create: `apps/web/src/core/error/component-error-boundary.tsx`
 - Modify: `apps/web/src/app/(main)/layout.tsx`
+
+### Mobile — Expo Router
+
+Expo Router supports an `ErrorBoundary` named export on any route or layout file. The boundary wraps that segment's rendered output. Key property: an `ErrorBoundary` on a screen file only replaces that screen's content — the parent `(tabs)/_layout.tsx` (which owns the tab bar) continues rendering normally.
+
+**Strategy:**
+
+1. **Per-screen `ErrorBoundary` exports** on each `app/(tabs)/*/index.tsx` — a crash in one tab shows an inline error card in that tab; the other tabs and the tab bar remain alive.
+2. **`ComponentErrorBoundary` on chrome pieces** in `app/(tabs)/_layout.tsx` — wrap `<MiniPlayerNative />` and `<CustomTabBarMobileNative />` independently inside the `tabBar` render prop. A mini player crash doesn't take down the tab bar and vice versa.
+3. **Root `ErrorBoundary` export** in `app/_layout.tsx` — catastrophic provider/setup failure fallback.
+
+The `ErrorBoundary` prop signature from Expo Router:
+
+```tsx
+import type { ErrorBoundaryProps } from "expo-router";
+
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  return (
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Text>Something went wrong</Text>
+      <Pressable onPress={retry}>
+        <Text>Try again</Text>
+      </Pressable>
+    </View>
+  );
+}
+```
+
+Each screen exports this alongside its default route component. Style using `useUnistyles()` for theme tokens.
+
+**Files:**
+
+- Modify: `apps/mobile/src/app/_layout.tsx` — add `ErrorBoundary` export
+- Modify: `apps/mobile/src/app/(tabs)/_layout.tsx` — wrap `<MiniPlayerNative />` and `<CustomTabBarMobileNative />` in `<ComponentErrorBoundary>`
+- Modify each: `apps/mobile/src/app/(tabs)/(search)/index.tsx`, `feed/index.tsx`, `live/index.tsx`, `library/index.tsx`, `account/index.tsx` — add `ErrorBoundary` export
 
 ### Steps
 
-- [ ] Create `apps/web/src/core/error/component-error-boundary.tsx`:
-  - Class component extending `React.Component<{ children: ReactNode; fallback?: ReactNode }, { hasError: boolean }>`
-  - `static getDerivedStateFromError` sets `hasError = true`
-  - `componentDidCatch` is a no-op (hook up logging when available)
-  - If `hasError`: renders `fallback ?? null`
-- [ ] Create `apps/web/src/app/(main)/error.tsx`:
-  - Same `"use client"` boundary
-  - Renders inline error card (not full-page) — smaller, uses `--surface-raised` background, shows "Something went wrong" + Try again button. Does NOT render a `<main>` wrapper.
-- [ ] Update `apps/web/src/app/(main)/layout.tsx`:
+- [ ] Create `packages/shared/src/components/error-boundary/ComponentErrorBoundary.tsx` (code above)
+- [ ] Export `ComponentErrorBoundary` from `packages/shared/src/index.ts` (and `index.native.ts` if the barrel is split)
+- [ ] **Web** — Create `apps/web/src/app/(main)/error.tsx`:
+  - `"use client"`, same shape as existing root `error.tsx`
+  - Renders an inline error card (not full-page `<main>`) — uses `--surface-raised`, shows "Something went wrong" + Try again button
+- [ ] **Web** — Update `apps/web/src/app/(main)/layout.tsx`:
+  - Import `ComponentErrorBoundary` from `@sd/shared`
   - Wrap `<Sidebar />` in `<ComponentErrorBoundary fallback={null}>` (fail silent — sidebar disappears, page is usable)
   - Wrap `<TopAuthStrip />` in `<ComponentErrorBoundary fallback={null}>`
-- [ ] Verify: a thrown error in a page renders the inline error inside the shell with sidebar still visible
-- [ ] Commit: `feat(web): add granular error boundaries for chrome and page content`
+- [ ] **Mobile** — Add `ErrorBoundary` export to `apps/mobile/src/app/_layout.tsx`
+- [ ] **Mobile** — Update `apps/mobile/src/app/(tabs)/_layout.tsx`:
+  - Import `ComponentErrorBoundary` from `@sd/shared`
+  - In the `tabBar` render prop, wrap `<MiniPlayerNative />` and `<CustomTabBarMobileNative />` individually in `<ComponentErrorBoundary fallback={null}>`
+- [ ] **Mobile** — Add `ErrorBoundary` named export to each tab screen (`(search)/index.tsx`, `feed/index.tsx`, `live/index.tsx`, `library/index.tsx`, `account/index.tsx`)
+  - Inline error card styled with `useUnistyles()` tokens (`theme.colors.surface.raised`, `theme.colors.content.default`)
+  - Shows "Something went wrong" + "Try again" Pressable that calls `retry`
+- [ ] Verify web: throw in a page → inline error card, sidebar visible
+- [ ] Verify mobile: throw in feed screen → error card in that tab, tab bar and other tabs unaffected
+- [ ] Commit: `feat(shared,web,mobile): add granular error boundaries across platforms`
 
 ---
 
