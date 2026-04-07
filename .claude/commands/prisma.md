@@ -12,10 +12,10 @@ Local Prisma MCP provides database workflow tools:
 
 ## Project Structure (This Project)
 
-Database package: `packages/db/`
+Database package: `packages/core-db/`
 
 ```
-packages/db/
+packages/core-db/
 ├── prisma/
 │   ├── schema.prisma      # Schema definition
 │   └── migrations/        # Migration files
@@ -61,26 +61,26 @@ enum Status {
 }
 ```
 
-## Commands (scoped to @sd/db)
+## Commands (scoped to @sd/core-db)
 
 ```bash
 # Generate Prisma Client
-pnpm --filter @sd/db prisma:generate
+pnpm --filter @sd/core-db prisma:generate
 
 # Validate schema
-pnpm --filter @sd/db prisma:validate
+pnpm --filter @sd/core-db prisma:validate
 
 # Format schema
-pnpm --filter @sd/db prisma:format
+pnpm --filter @sd/core-db prisma:format
 
 # Create migration (without applying)
-pnpm --filter @sd/db migrate:create-only
+pnpm --filter @sd/core-db migrate:create-only
 
 # Apply migrations
-pnpm --filter @sd/db migrate:deploy
+pnpm --filter @sd/core-db migrate:deploy
 
 # Open Prisma Studio
-pnpm --filter @sd/db prisma studio
+pnpm --filter @sd/core-db prisma studio
 ```
 
 ## Common Queries
@@ -157,15 +157,15 @@ await prisma.$transaction(async (tx) => {
 - Media = references/metadata, NEVER blobs in DB
 - Analytics/events OUT of authoritative core tables
 - Migrations are first-class and reviewable
-- `packages/db/src/generated/` is derived (gitignored)
-- `packages/db/dist/generated/` is cached for CI
+- `packages/core-db/src/generated/` is derived (gitignored)
+- `packages/core-db/dist/generated/` is cached for CI
 
 ## CI Notes
 
-If `Cannot find module '@sd/db/client'`:
+If `Cannot find module '@sd/core-db/client'`:
 
 ```bash
-pnpm --filter @sd/db build
+pnpm --filter @sd/core-db build
 ```
 
 This runs `prisma generate` and copies output to `dist/generated/`.
