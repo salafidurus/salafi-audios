@@ -8,7 +8,7 @@ test("home page loads search landing", async ({ page }) => {
   const main = page.locator("main").first();
   await expect(main).toBeAttached();
 
-  const heading = page.getByText("Find a lesson");
+  const heading = main.locator("p").filter({ hasText: "Find a lesson" });
   await expect(heading).toBeVisible();
 
   const searchButton = page.getByRole("button", { name: "What do you want to listen to?" });
