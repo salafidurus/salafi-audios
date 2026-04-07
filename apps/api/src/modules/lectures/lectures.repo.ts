@@ -103,7 +103,6 @@ export class LecturesRepository {
   private async resolveSeriesContext(
     seriesId: string | null,
     lectureId: string,
-    currentOrderIndex: number | null,
   ): Promise<LectureDetailDto['seriesContext']> {
     if (!seriesId) return null;
 

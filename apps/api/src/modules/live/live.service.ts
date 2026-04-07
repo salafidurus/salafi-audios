@@ -1,26 +1,36 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import type {
+  LiveSessionDeltaDto,
+  LiveSessionPublicDto,
+  LiveSessionStatus,
+} from '@sd/core-contracts';
 import { LiveRepository } from './live.repo';
+import type { Prisma } from '@sd/core-db';
 
-type LiveSessionPublicDto = {
-  id: string;
-  status: string;
-  channelDisplayName: string;
-  telegramSlug?: string;
-  scholarName?: string;
-  scholarSlug?: string;
-  scholarImageUrl?: string;
-  title?: string;
-  scheduledAt?: string;
-  startedAt?: string;
-  endedAt?: string;
-  updatedAt: string;
-};
-
-type LiveSessionDeltaDto = {
-  sessions: LiveSessionPublicDto[];
-  deletedIds: string[];
-  fetchedAt: string;
-};
+type LiveSessionPublicRecord = Prisma.LiveSessionGetPayload<{
+  select: {
+    id: true;
+    status: true;
+    title: true;
+    scheduledAt: true;
+    startedAt: true;
+    endedAt: true;
+    updatedAt: true;
+    channel: {
+      select: {
+        displayName: true;
+        telegramSlug: true;
+        scholar: {
+          select: {
+            name: true;
+            slug: true;
+            imageUrl: true;
+          };
+        };
+      };
+    };
+  };
+}>;
 
 @Injectable()
 export class LiveService {
@@ -65,7 +75,7 @@ export class LiveService {
     };
   }
 
-  async updateSessionStatus(id: string, status: string) {
+  async updateSessionStatus(id: string, status: LiveSessionStatus) {
     const session = await this.repo.findSessionById(id);
     if (!session) {
       throw new NotFoundException(`Live session "${id}" not found`);
@@ -73,7 +83,7 @@ export class LiveService {
     return this.repo.updateSessionStatus(id, status);
   }
 
-  private mapSession(session: any): LiveSessionPublicDto {
+  private mapSession(session: LiveSessionPublicRecord): LiveSessionPublicDto {
     return {
       id: session.id,
       status: session.status,

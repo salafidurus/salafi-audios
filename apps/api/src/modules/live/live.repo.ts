@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../shared/db/prisma.service';
+import type { Prisma, LiveSessionStatus } from '@sd/core-db';
 
 const sessionPublicSelect = {
   id: true,
@@ -29,7 +30,9 @@ export class LiveRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findActive(since?: Date) {
-    const where: any = { status: 'live' as any };
+    const where: Prisma.LiveSessionWhereInput = {
+      status: 'live' satisfies LiveSessionStatus,
+    };
     if (since) where.updatedAt = { gt: since };
     return this.prisma.liveSession.findMany({
       where,
@@ -40,8 +43,8 @@ export class LiveRepository {
 
   async findUpcoming(since?: Date) {
     const sevenDaysFromNow = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-    const where: any = {
-      status: 'scheduled' as any,
+    const where: Prisma.LiveSessionWhereInput = {
+      status: 'scheduled' satisfies LiveSessionStatus,
       scheduledAt: { lte: sevenDaysFromNow },
     };
     if (since) where.updatedAt = { gt: since };
@@ -54,8 +57,8 @@ export class LiveRepository {
 
   async findEnded(since?: Date) {
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    const where: any = {
-      status: 'ended' as any,
+    const where: Prisma.LiveSessionWhereInput = {
+      status: 'ended' satisfies LiveSessionStatus,
       endedAt: { gte: twentyFourHoursAgo },
     };
     if (since) where.updatedAt = { gt: since };
@@ -70,7 +73,7 @@ export class LiveRepository {
     const sessions = await this.prisma.liveSession.findMany({
       where: {
         updatedAt: { gt: since },
-        status: { not: 'live' as any },
+        status: { not: 'live' satisfies LiveSessionStatus },
       },
       select: { id: true },
     });
@@ -81,7 +84,7 @@ export class LiveRepository {
     const sessions = await this.prisma.liveSession.findMany({
       where: {
         updatedAt: { gt: since },
-        status: { not: 'scheduled' as any },
+        status: { not: 'scheduled' satisfies LiveSessionStatus },
       },
       select: { id: true },
     });
@@ -92,7 +95,7 @@ export class LiveRepository {
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     const sessions = await this.prisma.liveSession.findMany({
       where: {
-        status: 'ended' as any,
+        status: 'ended' satisfies LiveSessionStatus,
         endedAt: { lt: twentyFourHoursAgo },
         updatedAt: { gt: since },
       },
@@ -108,9 +111,9 @@ export class LiveRepository {
     });
   }
 
-  async updateSessionStatus(id: string, status: string) {
+  async updateSessionStatus(id: string, status: LiveSessionStatus) {
     const now = new Date();
-    const data: Record<string, unknown> = { status: status as any };
+    const data: Prisma.LiveSessionUpdateInput = { status };
 
     if (status === 'live') data.startedAt = now;
     if (status === 'ended') data.endedAt = now;

@@ -1,8 +1,4 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ADMIN_PERMISSIONS, type AdminPermission } from '@sd/core-contracts';
 import { AdminPermissionsRepository } from './admin-permissions.repo';
 
