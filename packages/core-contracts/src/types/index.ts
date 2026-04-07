@@ -38,7 +38,13 @@ export {
   type SearchCatalogItemDto,
   type SearchCatalogResultsDto,
 } from "../types/search.types";
-export { type FeedItemDto, type FeedPageDto } from "../types/feed.types";
+export {
+  type FeedContentItemDto,
+  type FeedScholarRowDto,
+  type FeedTopicRowDto,
+  type FeedItemDto,
+  type FeedPageDto,
+} from "../types/feed.types";
 export {
   type LibraryItemDto,
   type LibraryPageDto,

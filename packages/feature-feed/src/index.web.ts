@@ -1,6 +1,15 @@
 export { FeedResponsiveScreen } from "./screens/feed.screen.web";
 export type { FeedResponsiveScreenProps } from "./screens/feed.screen.web";
+export { FeedDesktopWebScreen } from "./screens/feed-recent.screen.desktop.web";
+export type { FeedDesktopWebScreenProps } from "./screens/feed-recent.screen.desktop.web";
+export { FeedMobileWebScreen } from "./screens/feed-recent.screen.mobile.web";
+export type { FeedMobileWebScreenProps } from "./screens/feed-recent.screen.mobile.web";
 export { FeedRecentResponsiveScreen } from "./screens/feed-recent.screen.responsive.web";
 export type { FeedRecentResponsiveScreenProps } from "./screens/feed-recent.screen.responsive.web";
 export { FeedFollowingResponsiveScreen } from "./screens/feed-following.screen.responsive.web";
 export type { FeedFollowingResponsiveScreenProps } from "./screens/feed-following.screen.responsive.web";
+export { FeedFollowingDesktopWebScreen } from "./screens/feed-following.screen.desktop.web";
+export type { FeedFollowingDesktopWebScreenProps } from "./screens/feed-following.screen.desktop.web";
+export { FeedFollowingMobileWebScreen } from "./screens/feed-following.screen.mobile.web";
+export type { FeedFollowingMobileWebScreenProps } from "./screens/feed-following.screen.mobile.web";
+export { useFeed, useFeedScholars } from "./hooks/use-feed";

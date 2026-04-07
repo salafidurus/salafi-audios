@@ -1,37 +1,51 @@
-import { View, Text, TouchableOpacity, FlatList } from "react-native";
-import type { FeedItemDto } from "@sd/core-contracts";
-import { useFeedRecentScreen } from "../hooks/use-feed-recent";
+import { View, Text, FlatList } from "react-native";
+import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
+import { FeedContentCardNative } from "../components/feed-content-card/feed-content-card.native";
+import { FeedScholarRowNative } from "../components/feed-scholar-row/feed-scholar-row.native";
+import { useFeed } from "../hooks/use-feed";
 
 export type FeedMobileNativeScreenProps = {
-  onNavigateToLecture?: (id: string) => void;
+  onNavigateToLecture?: (slug: string) => void;
+  onNavigateToScholar?: (slug: string) => void;
 };
 
-function FeedItem({ item, onPress }: { item: FeedItemDto; onPress?: () => void }) {
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      style={{ padding: 12, borderBottomWidth: 1, borderBottomColor: "#eee" }}
-    >
-      <Text style={{ fontSize: 15, fontWeight: "600" }}>{item.lectureTitle}</Text>
-      <Text style={{ fontSize: 12, color: "#666", marginTop: 2 }}>
-        {item.scholarName}
-        {item.seriesTitle ? ` · ${item.seriesTitle}` : ""}
-      </Text>
-      <Text style={{ fontSize: 11, color: "#999", marginTop: 2 }}>
-        {item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""}
-        {item.publishedAt ? ` · ${new Date(item.publishedAt).toLocaleDateString()}` : ""}
-      </Text>
-    </TouchableOpacity>
-  );
+function renderFeedItem(
+  item: FeedItemDto,
+  onNavigateToLecture?: (slug: string) => void,
+  onNavigateToScholar?: (slug: string) => void,
+) {
+  switch (item.kind) {
+    case "scholar_row":
+      return <FeedScholarRowNative scholars={item.scholars} onScholarPress={onNavigateToScholar} />;
+    case "topic_row":
+      return null;
+    default:
+      return (
+        <FeedContentCardNative
+          item={item as FeedContentItemDto}
+          onPress={() => onNavigateToLecture?.((item as FeedContentItemDto).slug)}
+        />
+      );
+  }
 }
 
-export function FeedMobileNativeScreen({ onNavigateToLecture }: FeedMobileNativeScreenProps) {
-  const { items, isFetching } = useFeedRecentScreen();
+function getItemKey(item: FeedItemDto, index: number): string {
+  if (item.kind === "scholar_row") return `scholar-row-${index}`;
+  if (item.kind === "topic_row") return `topic-row-${index}`;
+  return item.id;
+}
+
+export function FeedMobileNativeScreen({
+  onNavigateToLecture,
+  onNavigateToScholar,
+}: FeedMobileNativeScreenProps) {
+  const { data, isFetching, hasNextPage, fetchNextPage } = useFeed();
+  const items = data?.pages.flatMap((p) => p.items) ?? [];
 
   if (isFetching && items.length === 0) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Loading recent lectures...</Text>
+        <Text>Loading feed...</Text>
       </View>
     );
   }
@@ -39,7 +53,7 @@ export function FeedMobileNativeScreen({ onNavigateToLecture }: FeedMobileNative
   if (items.length === 0) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 16 }}>
-        <Text style={{ color: "#666" }}>No recent lectures yet. Check back soon.</Text>
+        <Text style={{ color: "#666" }}>No content yet. Check back soon.</Text>
       </View>
     );
   }
@@ -47,11 +61,18 @@ export function FeedMobileNativeScreen({ onNavigateToLecture }: FeedMobileNative
   return (
     <FlatList
       data={items}
-      keyExtractor={(item) => item.id}
-      renderItem={({ item }) => (
-        <FeedItem item={item} onPress={() => onNavigateToLecture?.(item.lectureId)} />
-      )}
+      keyExtractor={getItemKey}
+      renderItem={({ item }) => renderFeedItem(item, onNavigateToLecture, onNavigateToScholar)}
+      onEndReached={() => hasNextPage && fetchNextPage()}
+      onEndReachedThreshold={0.5}
       contentContainerStyle={{ padding: 8 }}
+      ListFooterComponent={
+        isFetching ? (
+          <View style={{ padding: 16, alignItems: "center" }}>
+            <Text style={{ color: "#999" }}>Loading more...</Text>
+          </View>
+        ) : null
+      }
     />
   );
 }

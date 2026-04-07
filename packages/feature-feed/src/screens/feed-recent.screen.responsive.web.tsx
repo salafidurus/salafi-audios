@@ -1,21 +1,22 @@
 "use client";
 
+import { FeedDesktopWebScreen } from "./feed-recent.screen.desktop.web";
+import { FeedMobileWebScreen } from "./feed-recent.screen.mobile.web";
 import styles from "./responsive.module.css";
-import { FeedRecentDesktopWebScreen } from "./feed-recent.screen.desktop.web";
-import { FeedRecentMobileWebScreen } from "./feed-recent.screen.mobile.web";
 
 export type FeedRecentResponsiveScreenProps = {
-  onNavigateToLecture?: (id: string) => void;
+  onNavigateToLecture?: (slug: string) => void;
+  onNavigateToScholar?: (slug: string) => void;
 };
 
 export function FeedRecentResponsiveScreen(props: FeedRecentResponsiveScreenProps) {
   return (
     <>
       <div className={styles.mobileOnly}>
-        <FeedRecentMobileWebScreen {...props} />
+        <FeedMobileWebScreen {...props} />
       </div>
       <div className={styles.desktopOnly}>
-        <FeedRecentDesktopWebScreen {...props} />
+        <FeedDesktopWebScreen {...props} />
       </div>
     </>
   );

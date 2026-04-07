@@ -5,7 +5,6 @@ export function useFeedRecentScreen() {
 
   return {
     items: data?.items ?? [],
-    hasMore: data?.hasMore ?? false,
     nextCursor: data?.nextCursor,
     isFetching,
     error,

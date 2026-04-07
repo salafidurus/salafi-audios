@@ -4,3 +4,4 @@ export { FeedRecentMobileNativeScreen } from "./screens/feed-recent.screen.nativ
 export type { FeedRecentMobileNativeScreenProps } from "./screens/feed-recent.screen.native";
 export { FeedFollowingMobileNativeScreen } from "./screens/feed-following.screen.native";
 export type { FeedFollowingMobileNativeScreenProps } from "./screens/feed-following.screen.native";
+export { useFeed, useFeedScholars } from "./hooks/use-feed";

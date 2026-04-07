@@ -1,19 +1,31 @@
-export type FeedItemDto = {
+import type { ScholarChipDto, ContentSuggestionDto } from "./home.types";
+
+export type FeedContentItemDto = {
+  kind: "lecture" | "series" | "collection";
   id: string;
-  lectureId: string;
-  lectureTitle: string;
-  lectureSlug: string;
-  scholarId: string;
-  scholarSlug: string;
+  title: string;
+  slug: string;
   scholarName: string;
-  seriesTitle?: string;
-  collectionTitle?: string;
-  durationSeconds?: number;
+  scholarSlug: string;
+  thumbnailUrl: string | null;
+  durationSeconds: number | null;
   publishedAt: string;
 };
+
+export type FeedScholarRowDto = {
+  kind: "scholar_row";
+  scholars: ScholarChipDto[];
+};
+
+export type FeedTopicRowDto = {
+  kind: "topic_row";
+  topicName: string;
+  items: ContentSuggestionDto[];
+};
+
+export type FeedItemDto = FeedContentItemDto | FeedScholarRowDto | FeedTopicRowDto;
 
 export type FeedPageDto = {
   items: FeedItemDto[];
   nextCursor?: string;
-  hasMore: boolean;
 };

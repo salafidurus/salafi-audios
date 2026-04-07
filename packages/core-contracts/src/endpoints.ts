@@ -22,6 +22,8 @@ export const endpoints = {
     detail: (id: string) => `/lectures/${id}`,
   },
   feed: {
+    list: "/feed",
+    scholars: "/feed/scholars",
     recent: "/feed/recent",
     following: "/feed/following",
   },

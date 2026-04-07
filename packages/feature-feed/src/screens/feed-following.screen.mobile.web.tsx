@@ -1,42 +1,48 @@
 "use client";
 
-import type { FeedItemDto } from "@sd/core-contracts";
-import { useFeedFollowingScreen } from "../hooks/use-feed-following";
+import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
+import { FeedContentCardWeb } from "../components/feed-content-card/feed-content-card.web";
+import { FeedScholarRowWeb } from "../components/feed-scholar-row/feed-scholar-row.web";
+import { useFeed } from "../hooks/use-feed";
 
 export type FeedFollowingMobileWebScreenProps = {
-  onNavigateToLecture?: (id: string) => void;
+  onNavigateToLecture?: (slug: string) => void;
+  onNavigateToScholar?: (slug: string) => void;
 };
 
-function FeedItem({ item, onPress }: { item: FeedItemDto; onPress?: () => void }) {
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={onPress}
-      onKeyDown={(e) => e.key === "Enter" && onPress?.()}
-      style={{
-        padding: 12,
-        borderBottom: "1px solid #eee",
-        cursor: "pointer",
-      }}
-    >
-      <div style={{ fontSize: 15, fontWeight: 600 }}>{item.lectureTitle}</div>
-      <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>
-        {item.scholarName}
-        {item.seriesTitle && ` · ${item.seriesTitle}`}
-      </div>
-      <div style={{ fontSize: 11, color: "#999", marginTop: 2 }}>
-        {item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""}
-        {item.publishedAt && ` · ${new Date(item.publishedAt).toLocaleDateString()}`}
-      </div>
-    </div>
-  );
+function renderFeedItem(
+  item: FeedItemDto,
+  onNavigateToLecture?: (slug: string) => void,
+  onNavigateToScholar?: (slug: string) => void,
+) {
+  switch (item.kind) {
+    case "scholar_row":
+      return (
+        <FeedScholarRowWeb
+          key="scholar-row"
+          scholars={item.scholars}
+          onScholarPress={onNavigateToScholar}
+        />
+      );
+    case "topic_row":
+      return null;
+    default:
+      return (
+        <FeedContentCardWeb
+          key={item.id}
+          item={item as FeedContentItemDto}
+          onPress={() => onNavigateToLecture?.(item.slug)}
+        />
+      );
+  }
 }
 
 export function FeedFollowingMobileWebScreen({
   onNavigateToLecture,
+  onNavigateToScholar,
 }: FeedFollowingMobileWebScreenProps) {
-  const { items, isFetching } = useFeedFollowingScreen();
+  const { data, isFetching, hasNextPage, fetchNextPage } = useFeed();
+  const items = data?.pages.flatMap((p) => p.items) ?? [];
 
   if (isFetching && items.length === 0) {
     return <div style={{ padding: 16 }}>Loading followed scholars...</div>;
@@ -53,9 +59,24 @@ export function FeedFollowingMobileWebScreen({
   return (
     <div style={{ padding: 12 }}>
       <h2 style={{ margin: 0, fontSize: 18, marginBottom: 12 }}>Following</h2>
-      {items.map((item) => (
-        <FeedItem key={item.id} item={item} onPress={() => onNavigateToLecture?.(item.lectureId)} />
-      ))}
+      {items.map((item) => renderFeedItem(item, onNavigateToLecture, onNavigateToScholar))}
+      {hasNextPage && (
+        <div style={{ padding: 12, textAlign: "center" }}>
+          <button
+            type="button"
+            onClick={() => fetchNextPage()}
+            style={{
+              padding: "8px 20px",
+              border: "1px solid #ccc",
+              borderRadius: 6,
+              cursor: "pointer",
+              background: "#fff",
+            }}
+          >
+            {isFetching ? "Loading..." : "Load more"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

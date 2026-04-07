@@ -18,6 +18,7 @@ import { LiveModule } from './modules/live/live.module';
 import { LibraryModule } from './modules/library/library.module';
 import { ProgressModule } from './modules/progress/progress.module';
 import { HomeModule } from './modules/home/home.module';
+import { FeedModule } from './modules/feed/feed.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { HomeModule } from './modules/home/home.module';
     LibraryModule,
     ProgressModule,
     HomeModule,
+    FeedModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: AuthGuard }],
 })
