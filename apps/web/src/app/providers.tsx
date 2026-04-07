@@ -1,7 +1,11 @@
 "use client";
 
-import { ProvidersWeb } from "@sd/shared";
-import { type ReactNode } from "react";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { useEffect, type ReactNode } from "react";
+import { initApiClient } from "@sd/core-api";
+import { createQueryClient } from "@sd/core-contracts/query";
+
+const queryClient = createQueryClient();
 
 type Props = {
   children: ReactNode;
@@ -9,5 +13,9 @@ type Props = {
 };
 
 export function Providers({ children, apiBaseUrl }: Props) {
-  return <ProvidersWeb apiBaseUrl={apiBaseUrl}>{children}</ProvidersWeb>;
+  useEffect(() => {
+    initApiClient(apiBaseUrl ? { baseUrl: apiBaseUrl } : undefined);
+  }, [apiBaseUrl]);
+
+  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }

@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "main": "./src/index.web.ts",
+  "react-native": "./src/index.native.ts",
   "types": "./src/index.d.ts",
   "exports": {
     ".": {
@@ -18,8 +19,6 @@
   },
   "dependencies": {
     "@sd/core-contracts": "workspace:*",
-    "@sd/core-api": "workspace:*",
-    "@sd/core-config": "workspace:*",
     "@sd/core-styles": "workspace:*",
     "@sd/design-tokens": "workspace:*",
     "@tanstack/react-query": "^5.69.0",

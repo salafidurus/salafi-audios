@@ -246,6 +246,9 @@ importers:
       '@sd/core-config':
         specifier: workspace:*
         version: link:../../packages/core-config
+      '@sd/core-contracts':
+        specifier: workspace:*
+        version: link:../../packages/core-contracts
       '@sd/core-env':
         specifier: workspace:*
         version: link:../../packages/core-env
@@ -1278,12 +1281,6 @@ importers:
       '@react-native-async-storage/async-storage':
         specifier: '*'
         version: 2.2.0(react-native@0.83.2(@babel/core@7.28.6)(@types/react@19.2.14)(react@19.2.0))
-      '@sd/core-api':
-        specifier: workspace:*
-        version: link:../core-api
-      '@sd/core-config':
-        specifier: workspace:*
-        version: link:../core-config
       '@sd/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
