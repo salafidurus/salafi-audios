@@ -63,7 +63,6 @@ export class LecturesRepository {
     const seriesContext = await this.resolveSeriesContext(
       lecture.seriesId,
       lecture.id,
-      lecture.orderIndex,
     );
 
     const primaryAudio = lecture.audioAssets[0] ?? null;

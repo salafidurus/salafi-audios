@@ -1,5 +1,6 @@
 import { Controller, Patch, Param, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import type { LiveSessionStatus } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { RequiresPermission } from '../../shared/decorators/requires-permission.decorator';
 import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
@@ -17,7 +18,7 @@ export class AdminLiveController {
   @ApiOperation({ summary: 'Update a live session status' })
   updateSessionStatus(
     @Param('id') id: string,
-    @Body() body: { status: string },
+    @Body() body: { status: LiveSessionStatus },
   ) {
     return this.service.updateSessionStatus(id, body.status);
   }
