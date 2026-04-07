@@ -145,7 +145,8 @@ export function QuickBrowseMobileWeb({
   );
 }
 
-const styles = StyleSheet.create((theme) => ({
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const styles = StyleSheet.create((theme: any) => ({
   root: {
     width: "100%",
     gap: theme.spacing.component.gapXl,
@@ -316,7 +317,7 @@ const styles = StyleSheet.create((theme) => ({
   cardWrapper: {
     _web: {
       padding: theme.spacing.scale.xs,
-      width: { xs: "48%", md: "23%" },
+      width: "48%",
     },
   },
 }));
