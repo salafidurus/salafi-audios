@@ -5,7 +5,6 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "types": ["node"],
-    "baseUrl": ".",
     "moduleSuffixes": [".desktop.web", ".mobile.web", ".native", ".web", ""]
   },
   "include": ["src"]

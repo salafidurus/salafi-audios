@@ -1,25 +1,37 @@
-import { Body, Controller, Param, Patch } from '@nestjs/common';
-import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Roles } from '../../modules/auth/decorators';
+import {
+  Controller,
+  Post,
+  Patch,
+  Param,
+  Body,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
-import { ScholarService } from './scholars.service';
-import type { ScholarDetailDto } from '@sd/core-contracts';
-import { SetKibarDto } from './dto/set-kibar.dto';
+import { RequiresPermission } from '../../shared/decorators/requires-permission.decorator';
+import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
+import { ScholarsService } from './scholars.service';
+import { CreateScholarDto } from './dto/create-scholar.dto';
+import { UpdateScholarDto } from './dto/update-scholar.dto';
 
 @ApiTags('Admin Scholars')
 @ApiCommonErrors()
-@Roles('admin')
 @Controller('admin/scholars')
+@UseGuards(AdminPermissionGuard)
 export class AdminScholarsController {
-  constructor(private readonly scholars: ScholarService) {}
+  constructor(private readonly service: ScholarsService) {}
 
-  @Patch(':id/kibar')
-  @ApiOperation({ summary: 'Set Kibar ul-Ulama flag for a scholar' })
-  @ApiOkResponse({ description: 'The updated scholar details' })
-  setKibar(
-    @Param('id') id: string,
-    @Body() body: SetKibarDto,
-  ): Promise<ScholarDetailDto> {
-    return this.scholars.setKibarById(id, body.isKibar);
+  @Post()
+  @RequiresPermission('manage:scholars')
+  @ApiOperation({ summary: 'Create a scholar' })
+  create(@Body() dto: CreateScholarDto) {
+    return this.service.create(dto);
+  }
+
+  @Patch(':id')
+  @RequiresPermission('manage:scholars')
+  @ApiOperation({ summary: 'Update a scholar' })
+  update(@Param('id') id: string, @Body() dto: UpdateScholarDto) {
+    return this.service.update(id, dto);
   }
 }

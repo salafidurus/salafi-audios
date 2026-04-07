@@ -4,16 +4,25 @@ import { QuickBrowseMobileWeb } from "../../components/QuickBrowse/QuickBrowse.m
 import { SearchButtonMobileWeb } from "../../components/SearchButton/SearchButton.mobile.web";
 import { TitleTextMobileWeb } from "../../components/TitleText/TitleText.mobile.web";
 import { ScreenViewWeb } from "@sd/shared";
+import { useQuickBrowse } from "../../hooks/use-quickbrowse";
 
 export type SearchHomeScreenProps = {
   onOpenSearch?: () => void;
   onSelectCategory?: (searchKey: string) => void;
+  onSelectScholar?: (slug: string) => void;
+  onSelectSuggestion?: (slug: string) => void;
+  onContinueListening?: (lectureSlug: string) => void;
 };
 
 export function SearchHomeMobileWebScreen({
   onOpenSearch,
   onSelectCategory,
+  onSelectScholar,
+  onSelectSuggestion,
+  onContinueListening,
 }: SearchHomeScreenProps) {
+  const { data } = useQuickBrowse();
+
   return (
     <ScreenViewWeb center>
       <View style={styles.content}>
@@ -26,7 +35,15 @@ export function SearchHomeMobileWebScreen({
             onPress={onOpenSearch}
           />
         </View>
-        <QuickBrowseMobileWeb onSelectCategory={onSelectCategory} />
+        <QuickBrowseMobileWeb
+          scholars={data?.scholars}
+          suggestions={data?.suggestions}
+          recentProgress={data?.recentProgress}
+          onSelectScholar={onSelectScholar}
+          onSelectSuggestion={onSelectSuggestion}
+          onContinueListening={onContinueListening}
+          onSelectCategory={onSelectCategory}
+        />
       </View>
     </ScreenViewWeb>
   );

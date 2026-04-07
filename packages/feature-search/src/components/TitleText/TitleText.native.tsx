@@ -1,5 +1,4 @@
-import { Text } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { AppText } from "@sd/shared";
 
 export type TitleTextProps = {
   children: string;
@@ -7,12 +6,5 @@ export type TitleTextProps = {
 };
 
 export function TitleText({ children }: TitleTextProps) {
-  return <Text style={styles.title}>{children}</Text>;
+  return <AppText variant="displayMd">{children}</AppText>;
 }
-
-const styles = StyleSheet.create((theme) => ({
-  title: {
-    color: theme.colors.content.primary,
-    ...theme.typography.displayMd,
-  },
-}));

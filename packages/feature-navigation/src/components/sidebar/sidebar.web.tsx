@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { useAuth } from "@sd/core-auth";
+import { routes } from "@sd/core-contracts";
 import {
   PanelLeftOpen,
   PanelRightOpen,
@@ -29,13 +30,25 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { label: "Feeds", Icon: Cloud, href: "/feed", activeMatch: "/feed", section: "feed" },
-  { label: "Live", Icon: Mic, href: "/live", activeMatch: "/live", section: "live" },
+  {
+    label: "Feeds",
+    Icon: Cloud,
+    href: routes.feed.index,
+    activeMatch: routes.feed.index,
+    section: "feed",
+  },
+  {
+    label: "Live",
+    Icon: Mic,
+    href: routes.live.index,
+    activeMatch: routes.live.index,
+    section: "live",
+  },
   {
     label: "Lessons",
     Icon: CassetteTape,
-    href: "/library",
-    activeMatch: "/library",
+    href: routes.library.index,
+    activeMatch: routes.library.index,
     section: "library",
   },
 ];
@@ -44,7 +57,7 @@ export function SidebarWeb() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const { isAuthenticated } = useAuth();
-  const accountHref = isAuthenticated ? "/account" : "/sign-in";
+  const accountHref = isAuthenticated ? routes.account.index : routes.signIn;
   const currentSection = getCurrentSection(pathname);
 
   useEffect(() => {
@@ -59,7 +72,7 @@ export function SidebarWeb() {
       data-collapsed={collapsed}
     >
       <div className={styles.brandRow}>
-        <Link href="/" className={styles.brand} aria-label="Salafi Durus">
+        <Link href={routes.home} className={styles.brand} aria-label="Salafi Durus">
           <span className={styles.brandMark} aria-hidden="true">
             <Image
               src="/logo/logo_72.png"
@@ -129,7 +142,7 @@ export function SidebarWeb() {
         })}
         <Link
           href={accountHref}
-          className={clsx(styles.link, pathname.startsWith("/account") && styles.active)}
+          className={clsx(styles.link, pathname.startsWith(routes.account.index) && styles.active)}
         >
           <span className={styles.icon} aria-hidden="true">
             <Settings size={18} />

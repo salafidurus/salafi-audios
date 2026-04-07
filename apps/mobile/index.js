@@ -1,2 +1,2 @@
-import "expo-router/entry";
 import "@sd/core-styles";
+import "expo-router/entry";

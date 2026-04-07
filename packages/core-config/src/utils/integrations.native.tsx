@@ -1,14 +1,16 @@
 import * as Sentry from "@sentry/react-native";
 import type { ComponentType } from "react";
 import { vexo } from "vexo-analytics";
-import { isDev, mobileEnv } from "./env.native";
+import { getMobileRuntimeEnv, isDev } from "./env.native";
 
 export function initIntegrations(): void {
-  if (isDev) {
+  if (isDev()) {
     return;
   }
 
-  if (mobileEnv.sentryDsn) {
+  const mobileEnv = getMobileRuntimeEnv();
+
+  if (mobileEnv?.sentryDsn) {
     Sentry.init({
       dsn: mobileEnv.sentryDsn,
       sendDefaultPii: true,
@@ -16,7 +18,7 @@ export function initIntegrations(): void {
     });
   }
 
-  if (mobileEnv.vexoProjectId) {
+  if (mobileEnv?.vexoProjectId) {
     vexo(mobileEnv.vexoProjectId);
   }
 }
@@ -24,7 +26,9 @@ export function initIntegrations(): void {
 export function getWrappedLayout<T extends ComponentType<unknown>>(
   Layout: T,
 ): T | ReturnType<typeof Sentry.wrap> {
-  if (isDev || !mobileEnv.sentryDsn) {
+  const mobileEnv = getMobileRuntimeEnv();
+
+  if (isDev() || !mobileEnv?.sentryDsn) {
     return Layout;
   }
   return Sentry.wrap(Layout) as T;

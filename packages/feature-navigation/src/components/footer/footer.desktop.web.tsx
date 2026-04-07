@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { routes } from "@sd/core-contracts";
 import styles from "./footer.module.css";
 
 export function Footer() {
@@ -9,9 +10,9 @@ export function Footer() {
       <div className={styles.inner}>
         <span className={styles.meta}>© {year} Salafi Durus</span>
         <div className={styles.links}>
-          <Link href="/privacy">Privacy Policy</Link>
-          <Link href="/terms-of-use">Terms of Service</Link>
-          <Link href="/support">Support</Link>
+          <Link href={routes.privacy}>Privacy Policy</Link>
+          <Link href={routes.termsOfUse}>Terms of Service</Link>
+          <Link href={routes.support}>Support</Link>
         </div>
       </div>
     </footer>

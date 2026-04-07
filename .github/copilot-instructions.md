@@ -37,11 +37,76 @@ Purpose: give an AI coding agent just-enough context to be immediately productiv
 - Never hand-edit generated Prisma client output in `packages/core-db/src/generated/`; regenerate it from the Prisma schema.
 - Shared API types are hand-written in `packages/core-contracts`; if types are wrong, fix them there and update backend usage to match.
 
-## Testing guidance 🔍
+## TDD policy — non-negotiable 🧪
 
-- Priorities: domain invariants, authorization boundaries, and state transitions (publish/archive/replace/reorder).
-- Unit & domain tests: `apps/api/test` (jest). Integration/E2E: `apps/web/e2e` (Playwright).
-- If backend response shapes change, update `packages/core-contracts` and adjust client tests accordingly.
+This repo is TDD. **Write a failing test before writing implementation.** No exceptions.
+
+### Workflow
+
+```text
+Red → Green → Commit  (test + implementation together, always)
+```
+
+Bug fixes start with a failing test that reproduces the bug.
+
+### What to test
+
+| Layer                              | Test type                          | Location                                           |
+| ---------------------------------- | ---------------------------------- | -------------------------------------------------- |
+| API service methods                | Unit — mock the repo               | `apps/api/src/modules/<mod>/<mod>.service.spec.ts` |
+| Auth guard + permission boundaries | Unit + Integration                 | `apps/api/src/modules/auth/`                       |
+| Domain store actions (Zustand)     | Unit — reset store state each test | `packages/domain-*/src/**/*.spec.ts`               |
+| Pure utilities / helpers           | Unit                               | Co-located `.spec.ts` next to source file          |
+| Route constant smoke tests         | Unit                               | `packages/core-contracts/src/routes.spec.ts`       |
+| Critical user flows                | E2E (Playwright)                   | `apps/web/e2e/`                                    |
+
+### What NOT to test
+
+- Presentational-only React/RN components (no logic, no state).
+- Trivial getters/setters or passthrough methods.
+- Framework-provided wiring (NestJS DI, Expo Router file-based nav).
+- Third-party library internals.
+
+### Layer-specific rules
+
+**API (NestJS):**
+
+- Every service method that can throw a domain exception must have a unit test for that throw path.
+- Every auth boundary (public vs. auth vs. admin permission) must have an integration test that verifies the correct HTTP status without a session vs. with one.
+- Use `@nestjs/testing` + mocked repositories. Never connect to a real database in unit tests.
+
+**Domain packages (`domain-progress`, `domain-playback`):**
+
+- Zustand store actions are pure state machines — test every action with before/after state assertions.
+- Reset the store between tests: `useStore.setState(initialState)`.
+
+**Feature packages:**
+
+- Only test exported utility functions and hooks that contain real logic.
+- Do not test components purely for rendering; test behavior (e.g., a hook that computes a derived value).
+
+**Web E2E (Playwright):**
+
+- Cover: public pages load without errors, auth redirect fires for protected routes, sidebar navigates correctly.
+- Do not cover: visual layout, font rendering, or UI polish.
+
+### Test commands
+
+```bash
+pnpm test                                                     # all
+pnpm --filter api test                                        # API only
+pnpm --filter api test -- src/modules/scholars/scholars.service.spec.ts
+pnpm --filter api test:watch -- src/modules/scholars/scholars.service.spec.ts
+pnpm test:e2e                                                 # Playwright
+pnpm test:prepush                                             # CI gate (changed files only)
+```
+
+### Coverage minimums
+
+- All public API service methods → tested.
+- All domain store actions → tested.
+- Every auth tier (public / auth / admin) → at least one integration test per category.
+- Routes smoke test (`routes.spec.ts`) → exists and passes.
 
 ## Repo & CI conventions 🔁
 
@@ -58,10 +123,12 @@ Purpose: give an AI coding agent just-enough context to be immediately productiv
 
 Add `POST /lectures/:id/publish` →
 
-1. Implement domain + application logic in `apps/api/src` and add domain tests (`apps/api/test`).
-2. Add or update the API interface in `apps/api/src` and keep request/response DTOs explicit.
-3. Update `packages/core-contracts` to keep shared response types in sync.
-4. Add integration/e2e tests as needed and run `pnpm test`.
+1. **Write the failing test first** — `lectures.service.spec.ts`: `publish throws NotFoundException when lecture missing`, `publish throws BadRequestException when already published`.
+2. Implement domain + application logic in `apps/api/src` to make the tests pass.
+3. Add or update the API interface in `apps/api/src` and keep request/response DTOs explicit.
+4. Update `packages/core-contracts` to keep shared response types in sync.
+5. Add an integration test that verifies `POST /lectures/:id/publish` returns 401 without auth.
+6. Run `pnpm test` — all tests pass, commit.
 
 ---
 

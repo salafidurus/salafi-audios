@@ -1,34 +1,44 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { SearchHomeMobileWebScreen } from "./search-home.screen.mobile.web";
 import { SearchHomeDesktopWebScreen } from "./search-home.screen.desktop.web";
-import { useResponsive } from "@sd/shared";
+import styles from "../responsive.module.css";
 
-export function SearchHomeResponsiveScreen() {
-  const router = useRouter();
-  const [isHydrated, setIsHydrated] = useState(false);
-  const { isMobile, isTablet } = useResponsive();
+export type SearchHomeResponsiveScreenProps = {
+  onOpenSearch?: () => void;
+  onSelectCategory?: (searchKey: string) => void;
+  onSelectScholar?: (slug: string) => void;
+  onSelectSuggestion?: (slug: string) => void;
+  onContinueListening?: (lectureSlug: string) => void;
+};
 
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
-
-  if (!isHydrated) {
-    return null;
-  }
-
-  if (isMobile || isTablet) {
-    return (
-      <SearchHomeMobileWebScreen
-        onOpenSearch={() => router.push("/search")}
-        onSelectCategory={(searchKey) =>
-          router.push(`/search?searchKey=${encodeURIComponent(searchKey)}`)
-        }
-      />
-    );
-  }
-
-  return <SearchHomeDesktopWebScreen />;
+export function SearchHomeResponsiveScreen({
+  onOpenSearch,
+  onSelectCategory,
+  onSelectScholar,
+  onSelectSuggestion,
+  onContinueListening,
+}: SearchHomeResponsiveScreenProps) {
+  return (
+    <>
+      <div className={styles.mobileOnly}>
+        <SearchHomeMobileWebScreen
+          onOpenSearch={onOpenSearch}
+          onSelectCategory={onSelectCategory}
+          onSelectScholar={onSelectScholar}
+          onSelectSuggestion={onSelectSuggestion}
+          onContinueListening={onContinueListening}
+        />
+      </div>
+      <div className={styles.desktopOnly}>
+        <SearchHomeDesktopWebScreen
+          onOpenSearch={onOpenSearch}
+          onSelectCategory={onSelectCategory}
+          onSelectScholar={onSelectScholar}
+          onSelectSuggestion={onSelectSuggestion}
+          onContinueListening={onContinueListening}
+        />
+      </div>
+    </>
+  );
 }

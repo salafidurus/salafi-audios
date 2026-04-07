@@ -50,6 +50,12 @@ enum ScholarRole {
   scholar_editor
 }
 
+enum LiveSessionStatus {
+  scheduled
+  live
+  ended
+}
+
 //////////////////////////
 // Ingestion batch (for seed/dummy dataset lifecycle)
 //////////////////////////
@@ -99,6 +105,23 @@ model User {
   createdScholarRoles UserScholarRole[]     @relation("createdByUser")
   progress            UserLectureProgress[]
   favorites           FavoriteLecture[]
+
+  adminPermissions        AdminPermission[]
+  adminPermissionsGranted AdminPermission[] @relation("AdminPermissionGranter")
+}
+
+model AdminPermission {
+  userId      String
+  permission  String
+  grantedAt   DateTime @default(now())
+  grantedById String?
+
+  user      User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grantedBy User? @relation("AdminPermissionGranter", fields: [grantedById], references: [id], onDelete: SetNull)
+
+  @@id([userId, permission])
+  @@index([userId])
+  @@index([permission])
 }
 
 model UserScholarRole {
@@ -131,6 +154,7 @@ model Scholar {
   imageUrl     String?
   isActive     Boolean   @default(true)
   isKibar      Boolean   @default(false)
+  isFeatured   Boolean   @default(false)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime?
 
@@ -147,6 +171,7 @@ model Scholar {
   series      Series[]
   lectures    Lecture[]
   userRoles   UserScholarRole[]
+  livestreamChannels LivestreamChannel[]
 
   @@unique([slug], map: "uq_scholar_slug")
   @@index([isActive], map: "idx_scholar_active")
@@ -420,6 +445,48 @@ model FavoriteLecture {
   @@id([userId, lectureId])
   @@index([userId, createdAt], map: "idx_fav_user_createdat")
   @@index([lectureId], map: "idx_fav_lecture")
+}
+
+//////////////////////////
+// Livestreams
+//////////////////////////
+
+model LivestreamChannel {
+  id           String   @id @default(cuid())
+  scholarId    String?
+  telegramId   String   @unique
+  telegramSlug String?
+  displayName  String
+  language     String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  scholar  Scholar?      @relation(fields: [scholarId], references: [id], onDelete: SetNull)
+  sessions LiveSession[]
+
+  @@index([isActive])
+  @@index([scholarId])
+}
+
+model LiveSession {
+  id            String            @id @default(cuid())
+  channelId     String
+  status        LiveSessionStatus @default(scheduled)
+  title         String?
+  scheduledAt   DateTime?
+  startedAt     DateTime?
+  endedAt       DateTime?
+  telegramMsgId String?
+  viewerCount   Int?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  channel LivestreamChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@index([channelId, status])
+  @@index([status, scheduledAt])
+  @@index([status, startedAt])
 }
 
 //////////////////////////

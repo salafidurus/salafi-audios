@@ -6,12 +6,21 @@ import { SearchFilterDesktopWeb } from "../../components/SearchFilter/SearchFilt
 import { SearchInputDesktopWeb } from "../../components/SearchInput/SearchInput.desktop.web";
 import { SearchResultItemDesktopWeb } from "../../components/SearchResultItem/SearchResultItem.desktop.web";
 import { SearchResultsListDesktopWeb } from "../../components/SearchResultsList/SearchResultsList.desktop.web";
-import { useSearchProcessing } from "../../hooks/use-search-processing";
+import { useSearchProcessing } from "@sd/domain-search";
 
 export function SearchProcessingDesktopWebScreen() {
   const inputRef = useRef<HTMLInputElement>(null);
-  const { query, setQuery, filter, setFilter, topics, items, isFetching, shouldSearch, errorMessage } =
-    useSearchProcessing();
+  const {
+    query,
+    setQuery,
+    filter,
+    setFilter,
+    topics,
+    items,
+    isFetching,
+    shouldSearch,
+    errorMessage,
+  } = useSearchProcessing();
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -19,7 +28,14 @@ export function SearchProcessingDesktopWebScreen() {
 
   return (
     <main className="flex flex-1 flex-col">
-      <div className="sticky top-0 z-10 border-b border-[var(--chrome-border)] bg-[var(--chrome-surface)] px-[var(--space-layout-page-x)] pt-[var(--space-layout-page-y)] pb-[var(--space-component-gap-md)] backdrop-blur-sm">
+      <div
+        className="sticky top-0 z-10 border-b border-[var(--chrome-border)] px-[var(--space-layout-page-x)] pt-[var(--space-layout-page-y)] pb-[var(--space-component-gap-md)]"
+        style={{
+          background: "color-mix(in srgb, var(--surface-canvas) 80%, transparent)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+        }}
+      >
         <div className="mx-auto flex w-full max-w-[52rem] flex-col gap-[var(--space-component-gap-md)]">
           <SearchInputDesktopWeb
             ref={inputRef}

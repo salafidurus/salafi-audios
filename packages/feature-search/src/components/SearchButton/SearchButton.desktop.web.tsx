@@ -1,4 +1,3 @@
-import Link from "next/link";
 import clsx from "clsx";
 import type { CSSProperties } from "react";
 
@@ -53,10 +52,10 @@ export function SearchButtonDesktopWeb({
 
   if (href) {
     return (
-      <Link href={href} className={classes} style={{ ...style, ...accentStyle }} aria-label={label}>
+      <a href={href} className={classes} style={{ ...style, ...accentStyle }} aria-label={label}>
         <SearchGlyph />
         <span>{label}</span>
-      </Link>
+      </a>
     );
   }
 

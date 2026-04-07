@@ -1,0 +1,33 @@
+{
+  "name": "@sd/feature-scholar",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.web.ts",
+  "react-native": "./src/index.native.ts",
+  "types": "./src/index.web.ts",
+  "exports": {
+    ".": {
+      "react-native": "./src/index.native.ts",
+      "default": "./src/index.web.ts"
+    }
+  },
+  "scripts": {
+    "dev": "tsc -p tsconfig.json --noEmit --watch",
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@sd/core-contracts": "workspace:*",
+    "@sd/design-tokens": "workspace:*",
+    "@sd/shared": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "react-native-unistyles": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}

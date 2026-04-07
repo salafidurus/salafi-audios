@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import { routes } from "@sd/core-contracts";
 import styles from "./error.module.css";
 
 type ErrorProps = {
@@ -27,7 +28,7 @@ export default function Error({ error, reset }: ErrorProps) {
           <button type="button" className={styles.button} onClick={reset}>
             Try again
           </button>
-          <Link href="/" className={styles.link}>
+          <Link href={routes.home} className={styles.link}>
             Back to home
           </Link>
         </div>

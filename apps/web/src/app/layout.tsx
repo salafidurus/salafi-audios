@@ -5,7 +5,6 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { themeCss } from "./theme-css";
 
-import { Footer, Sidebar, TopAuthStrip } from "@sd/feature-navigation";
 import { UnistylesStyleDesktopWeb } from "@sd/core-styles";
 import { Providers } from "./providers";
 
@@ -146,18 +145,7 @@ export default function RootLayout({
         ) : null}
         <style>{themeCss}</style>
         <UnistylesStyleDesktopWeb>
-          <Providers apiBaseUrl={apiBaseUrl}>
-            <div className="appFrame">
-              <div className="appShell">
-                <Sidebar />
-                <div className="appMain">
-                  <TopAuthStrip />
-                  <div className="appContent">{children}</div>
-                  <Footer />
-                </div>
-              </div>
-            </div>
-          </Providers>
+          <Providers apiBaseUrl={apiBaseUrl}>{children}</Providers>
         </UnistylesStyleDesktopWeb>
       </body>
     </html>

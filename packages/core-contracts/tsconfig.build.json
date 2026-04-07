@@ -5,6 +5,8 @@
     "emitDeclarationOnly": false,
     "declaration": true,
     "declarationMap": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
     "outDir": "./dist",
     "rootDir": "./src"
   },

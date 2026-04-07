@@ -1,0 +1,31 @@
+{
+  "name": "@sd/feature-playback",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.web.ts",
+  "types": "./src/index.web.ts",
+  "exports": {
+    ".": {
+      "react-native": "./src/index.native.ts",
+      "default": "./src/index.web.ts"
+    }
+  },
+  "scripts": {
+    "dev": "tsc -p tsconfig.json --noEmit --watch",
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@sd/domain-playback": "workspace:*",
+    "@sd/design-tokens": "workspace:*",
+    "@sd/shared": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}

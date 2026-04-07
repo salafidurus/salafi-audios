@@ -1,7 +1,8 @@
 import { useRouter } from "expo-router";
 import { useAuth } from "@sd/core-auth";
-import { AccountMobileNativeScreen } from "@sd/feature-account";
+import { AccountProfileMobileNativeScreen } from "@sd/feature-account";
 import { AuthRequiredStateMobileNative } from "@sd/shared";
+import { routes } from "@sd/core-contracts";
 
 export default function AccountProfile() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -16,10 +17,10 @@ export default function AccountProfile() {
       <AuthRequiredStateMobileNative
         title="Sign in to access your account"
         description="Manage your profile, preferences, and account details after signing in."
-        onPress={() => router.push("/sign-in")}
+        onPress={() => router.push(routes.signIn)}
       />
     );
   }
 
-  return <AccountMobileNativeScreen />;
+  return <AccountProfileMobileNativeScreen />;
 }

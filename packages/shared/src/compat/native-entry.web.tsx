@@ -9,10 +9,7 @@ export interface ScreenViewMobileNativeProps {
   backgroundVariant?: "canvas" | "primaryWash" | "secondaryWash" | "mixedWash";
 }
 
-export function ScreenViewMobileNative({
-  children,
-  center = false,
-}: ScreenViewMobileNativeProps) {
+export function ScreenViewMobileNative({ children, center = false }: ScreenViewMobileNativeProps) {
   return (
     <div
       style={{
@@ -184,10 +181,6 @@ export function UniversalListMobileNative<TItem>({
       ))}
     </>
   );
-}
-
-export function ProvidersMobileNative({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
 }
 
 type HapticStyle = "light" | "medium" | "heavy" | "soft" | "rigid";

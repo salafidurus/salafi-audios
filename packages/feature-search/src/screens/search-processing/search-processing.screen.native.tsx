@@ -1,19 +1,14 @@
 import { useEffect, useRef } from "react";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import {
-  SearchFilterMobileNative,
-} from "../../components/SearchFilter/SearchFilter.native";
-import {
-  SearchInput,
-  type SearchInputRef,
-} from "../../components/SearchInput/SearchInput.native";
+import { SearchFilterMobileNative } from "../../components/SearchFilter/SearchFilter.native";
+import { SearchInput, type SearchInputRef } from "../../components/SearchInput/SearchInput.native";
 import { SearchResultItemMobileNative } from "../../components/SearchResultItem/SearchResultItem.native";
 import {
   SearchResultsListMobileNative,
   type SearchResultRow,
 } from "../../components/SearchResultsList/SearchResultsList.native";
-import { useSearchProcessing } from "../../hooks/use-search-processing";
+import { useSearchProcessing } from "@sd/domain-search";
 import { ScreenViewMobileNative } from "@sd/shared";
 
 export type SearchProcessingScreenProps = {
@@ -26,8 +21,17 @@ export function SearchProcessingMobileNativeScreen({
   onBackPress,
 }: SearchProcessingScreenProps) {
   const inputRef = useRef<SearchInputRef>(null);
-  const { query, setQuery, filter, setFilter, topics, items, isFetching, shouldSearch, errorMessage } =
-    useSearchProcessing({ prefill });
+  const {
+    query,
+    setQuery,
+    filter,
+    setFilter,
+    topics,
+    items,
+    isFetching,
+    shouldSearch,
+    errorMessage,
+  } = useSearchProcessing({ prefill });
 
   useEffect(() => {
     inputRef.current?.focus();

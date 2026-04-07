@@ -4,7 +4,6 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-layout-page-y) var(--space-layout-page-x);
-  background: var(--screen-wash-primary), var(--surface-canvas);
 }
 
 .card {

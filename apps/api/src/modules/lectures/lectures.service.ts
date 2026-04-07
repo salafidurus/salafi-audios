@@ -1,73 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import type { LectureDetailDto } from '@sd/core-contracts';
 import { LecturesRepository } from './lectures.repo';
-import type { LectureViewDto } from '@sd/core-contracts';
-import { UpsertLectureDto } from './dto/upsert-lecture.dto';
 
 @Injectable()
 export class LecturesService {
   constructor(private readonly repo: LecturesRepository) {}
 
-  listPublished(scholarSlug: string): Promise<LectureViewDto[]> {
-    return this.repo.listPublishedByScholarSlug(scholarSlug);
-  }
-
-  async getPublished(
-    scholarSlug: string,
-    slug: string,
-  ): Promise<LectureViewDto> {
-    const found = await this.repo.findPublishedByScholarSlugAndSlug(
-      scholarSlug,
-      slug,
-    );
-    if (!found) throw new NotFoundException(`Lecture "${slug}" not found`);
-    return found;
-  }
-
-  async getPublishedById(id: string): Promise<LectureViewDto> {
-    const found = await this.repo.findPublishedById(id);
-    if (!found) {
-      throw new NotFoundException('Lecture not found');
+  async getById(id: string): Promise<LectureDetailDto> {
+    const lecture = await this.repo.findDetailById(id);
+    if (!lecture) {
+      throw new NotFoundException(`Lecture "${id}" not found`);
     }
-    return found;
-  }
-
-  async upsert(
-    scholarSlug: string,
-    dto: UpsertLectureDto,
-  ): Promise<LectureViewDto> {
-    const result = await this.repo.upsertByScholarSlug(scholarSlug, dto);
-    if (!result)
-      throw new NotFoundException(
-        `Scholar "${scholarSlug}" (or parent series) not found`,
-      );
-    return result;
-  }
-
-  async listPublishedForSeries(
-    scholarSlug: string,
-    seriesSlug: string,
-  ): Promise<LectureViewDto[]> {
-    const result = await this.repo.listPublishedByScholarAndSeriesSlug(
-      scholarSlug,
-      seriesSlug,
-    );
-
-    if (!result) {
-      throw new NotFoundException('Series not found');
-    }
-
-    return result;
-  }
-
-  async listPublishedByScholarSlugPaginated(
-    scholarSlug: string,
-    limit = 20,
-    cursor?: string,
-  ): Promise<LectureViewDto[]> {
-    return this.repo.listPublishedByScholarSlugPaginated(
-      scholarSlug,
-      limit,
-      cursor,
-    );
+    return lecture;
   }
 }

@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "main": "./src/index.web.ts",
+  "react-native": "./src/index.native.ts",
   "types": "./src/index.web.ts",
   "exports": {
     ".": {
@@ -18,16 +19,8 @@
   },
   "dependencies": {
     "@sd/core-contracts": "workspace:*",
-    "@sd/core-api": "workspace:*",
-    "@sd/core-config": "workspace:*",
-    "@sd/core-styles": "workspace:*",
     "@sd/design-tokens": "workspace:*",
-    "@sd/shared": "workspace:*",
-    "lucide-react": "^0.564.0",
-    "lucide-react-native": "^0.564.0",
-    "react-hook-form": "^7.71.2",
-    "react-native-reanimated": "~4.2.1",
-    "zustand": "^5.0.11"
+    "@sd/shared": "workspace:*"
   },
   "peerDependencies": {
     "react": "*",

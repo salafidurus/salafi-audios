@@ -1,0 +1,27 @@
+{
+  "name": "@sd/feature-downloads",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.native.ts",
+  "types": "./src/index.native.ts",
+  "exports": {
+    ".": "./src/index.native.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@sd/core-contracts": "workspace:*",
+    "@sd/domain-playback": "workspace:*",
+    "zustand": "^5.0.5"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "expo-file-system": "*",
+    "@react-native-async-storage/async-storage": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}

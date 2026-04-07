@@ -1,51 +1,46 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import {
-  ScholarViewDto,
-  ScholarStatsDto,
+import type {
+  ScholarListItemDto,
   ScholarDetailDto,
+  ScholarContentDto,
 } from '@sd/core-contracts';
-import { ScholarRepository } from './scholars.repo';
-import { UpsertScholarDto } from './dto/upsert-scholar.dto';
+import { ScholarsRepository } from './scholars.repo';
+import type { CreateScholarDto } from './dto/create-scholar.dto';
+import type { UpdateScholarDto } from './dto/update-scholar.dto';
 
 @Injectable()
-export class ScholarService {
-  constructor(private readonly repo: ScholarRepository) {}
+export class ScholarsService {
+  constructor(private readonly repo: ScholarsRepository) {}
 
-  async upsertScholar(dto: UpsertScholarDto): Promise<ScholarDetailDto> {
-    return this.repo.upsertBySlug(dto);
+  list(): Promise<{ scholars: ScholarListItemDto[] }> {
+    return this.repo.list();
   }
 
-  async getActiveScholarBySlug(slug: string): Promise<ScholarDetailDto> {
-    const scholar = await this.repo.findActiveDetailBySlug(slug);
-
-    if (!scholar) {
-      throw new NotFoundException(`Scholar "${slug}" not found`);
+  async getBySlug(slug: string): Promise<
+    ScholarDetailDto & {
+      lectureCount: number;
+      seriesCount: number;
+      totalDurationSeconds: number;
     }
-
-    return scholar;
+  > {
+    const found = await this.repo.findBySlug(slug);
+    if (!found) throw new NotFoundException(`Scholar "${slug}" not found`);
+    return found;
   }
 
-  async listActiveScholars(): Promise<ScholarViewDto[]> {
-    return this.repo.listActive();
+  async getContent(slug: string): Promise<ScholarContentDto> {
+    const content = await this.repo.getContent(slug);
+    if (!content) throw new NotFoundException(`Scholar "${slug}" not found`);
+    return content;
   }
 
-  async setKibarById(id: string, isKibar: boolean): Promise<ScholarDetailDto> {
-    const scholar = await this.repo.updateKibarById(id, isKibar);
-
-    if (!scholar) {
-      throw new NotFoundException(`Scholar "${id}" not found`);
-    }
-
-    return scholar;
+  async create(dto: CreateScholarDto) {
+    return this.repo.create(dto);
   }
 
-  async getScholarStats(slug: string): Promise<ScholarStatsDto> {
-    const scholar = await this.repo.findActiveDetailBySlug(slug);
-
-    if (!scholar) {
-      throw new NotFoundException(`Scholar "${slug}" not found`);
-    }
-
-    return this.repo.getScholarStats(scholar.id);
+  async update(id: string, dto: UpdateScholarDto) {
+    const existing = await this.repo.findById(id);
+    if (!existing) throw new NotFoundException(`Scholar "${id}" not found`);
+    return this.repo.update(id, dto);
   }
 }

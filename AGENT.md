@@ -199,6 +199,68 @@ All AGENT.md and documentation files are linted with markdownlint. Two rules are
 - **MD040** — Every fenced code block must declare a language. Use ` ```typescript `, ` ```bash `, ` ```text `, ` ```file `, etc. A bare ` ``` ` will fail the commit hook.
 - **MD032** — Bullet lists must have a blank line before and after them. A heading or paragraph directly followed by `- item` with no blank line will fail.
 
+## TDD policy
+
+This repo follows Test-Driven Development. The rule is non-negotiable:
+
+**Write a failing test before writing implementation.** No exceptions for new service methods, store actions, utility functions, or auth boundaries.
+
+### What to test
+
+| Layer                                                                          | Test type                        | Where                                                    |
+| ------------------------------------------------------------------------------ | -------------------------------- | -------------------------------------------------------- |
+| API service methods (domain invariants, NotFoundException, status transitions) | Unit — mock the repo             | `apps/api/src/modules/<module>/<module>.service.spec.ts` |
+| Auth guard and permission checks                                               | Unit + Integration               | `apps/api/src/modules/auth/`                             |
+| Domain store actions (Zustand)                                                 | Unit — reset store between tests | `packages/domain-*/src/**/*.spec.ts`                     |
+| Pure utility / helper functions                                                | Unit                             | co-located `.spec.ts` next to the source file            |
+| Route/contract smoke tests                                                     | Unit                             | `packages/core-contracts/src/routes.spec.ts`             |
+| Critical user flows (auth redirect, public page load)                          | E2E — Playwright                 | `apps/web/e2e/`                                          |
+
+### What NOT to test
+
+- Presentational React/RN components with no logic.
+- Trivial getters, setters, or passthrough methods.
+- Framework-provided behavior (NestJS DI wiring, Expo Router navigation).
+- Third-party library internals.
+
+### TDD workflow
+
+```text
+Red → Green → Commit (test + impl together)
+```
+
+1. Write the failing test — describe the behavior, not the implementation.
+2. Run it: confirm it fails with the expected error, not a setup error.
+3. Write the minimal code to make it pass.
+4. Run again: confirm it passes.
+5. Commit: test and implementation in the same commit.
+
+**Bug fixes always start with a failing test** that reproduces the bug. The test is the regression guard.
+
+### Test file placement
+
+- API: `apps/api/src/modules/<module>/<module>.service.spec.ts` (co-located)
+- Web E2E: `apps/web/e2e/<flow>.spec.ts`
+- Packages: co-located `.spec.ts` next to the source file being tested
+- Integration tests: `apps/api/src/modules/<module>/<module>.integration.spec.ts`
+
+### Coverage targets (minimum)
+
+| Area                       | Target                                                |
+| -------------------------- | ----------------------------------------------------- |
+| API service methods        | All public methods tested                             |
+| Auth/permission boundaries | Every endpoint category (public, auth, admin) covered |
+| Domain store actions       | All actions in `domain-*/src/store/*.store.ts`        |
+| Route constants            | `routes.spec.ts` smoke test exists                    |
+
+### Running tests
+
+- All: `pnpm test`
+- API only: `pnpm --filter api test`
+- Single file: `pnpm --filter api test -- src/modules/scholars/scholars.service.spec.ts`
+- Watch: `pnpm --filter api test:watch -- src/modules/scholars/scholars.service.spec.ts`
+- E2E: `pnpm test:e2e`
+
 ## Quality and style
 
 - Prettier is mandatory; root `.prettierrc` is authoritative.

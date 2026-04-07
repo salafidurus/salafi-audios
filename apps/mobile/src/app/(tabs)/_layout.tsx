@@ -1,31 +1,26 @@
-import {
-  CustomTabBarMobileNative,
-  SubsectionBarHostMobileNative,
-  getSceneBottomInsetForPath,
-} from "@sd/feature-navigation";
-import { Tabs, usePathname } from "expo-router";
+import { View } from "react-native";
+import { Tabs } from "expo-router";
+import { CustomTabBarMobileNative } from "@sd/feature-navigation";
+import { MiniPlayerNative } from "@sd/feature-playback";
 
 export default function TabsLayout() {
-  const pathname = usePathname();
-
   return (
-    <>
+    <View style={{ flex: 1 }}>
       <Tabs
-        tabBar={(props) => <CustomTabBarMobileNative {...props} />}
-        screenOptions={{
-          headerShown: false,
-          sceneStyle: {
-            paddingBottom: getSceneBottomInsetForPath(pathname),
-          },
-        }}
+        tabBar={(props) => (
+          <>
+            <MiniPlayerNative />
+            <CustomTabBarMobileNative {...props} />
+          </>
+        )}
+        screenOptions={{ headerShown: false }}
       >
-        <Tabs.Screen name="feed" options={{ title: "Feed" }} />
-        <Tabs.Screen name="live" options={{ title: "Live" }} />
-        <Tabs.Screen name="(search)" options={{ title: "Search" }} />
-        <Tabs.Screen name="library" options={{ title: "Library" }} />
-        <Tabs.Screen name="account" options={{ title: "Account" }} />
+        <Tabs.Screen name="(search)" />
+        <Tabs.Screen name="feed" />
+        <Tabs.Screen name="live" />
+        <Tabs.Screen name="library" />
+        <Tabs.Screen name="account" />
       </Tabs>
-      <SubsectionBarHostMobileNative />
-    </>
+    </View>
   );
 }

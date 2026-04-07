@@ -1,5 +1,4 @@
-import { StyleSheet } from "react-native-unistyles";
-import { Text } from "react-native-unistyles/components/native/Text";
+import { AppText } from "@sd/shared";
 
 export type TitleTextMobileWebProps = {
   children: string;
@@ -7,15 +6,5 @@ export type TitleTextMobileWebProps = {
 };
 
 export function TitleTextMobileWeb({ children }: TitleTextMobileWebProps) {
-  return <Text style={styles.title}>{children}</Text>;
+  return <AppText variant="displayMd">{children}</AppText>;
 }
-
-const styles = StyleSheet.create((theme) => ({
-  title: {
-    color: theme.colors.content.primary,
-    _web: {
-      ...theme.typography.displayMd,
-      lineHeight: String(theme.typography.displayMd.lineHeight),
-    },
-  },
-}));

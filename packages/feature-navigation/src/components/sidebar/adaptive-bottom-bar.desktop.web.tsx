@@ -5,14 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { useAuth } from "@sd/core-auth";
-import {
-  Cloud,
-  Mic,
-  Search,
-  CassetteTape,
-  Settings,
-  type LucideIcon,
-} from "lucide-react";
+import { routes } from "@sd/core-contracts";
+import { Cloud, Mic, Search, CassetteTape, Settings, type LucideIcon } from "lucide-react";
 import styles from "./sidebar-bottom.module.css";
 import { DEFAULT_TABS, SECTION_TABS, SECTION_LABELS, type Section } from "../../types";
 import { useNavigationStore } from "../../store/navigation-store.web";
@@ -71,7 +65,9 @@ export function AdaptiveBottomBar() {
             const Icon = SECTION_ICONS[section];
             const tab = sectionTabs[section];
             const href =
-              section === "account" && !isAuthenticated ? "/sign-in" : buildSectionTabPath(section, tab);
+              section === "account" && !isAuthenticated
+                ? routes.signIn
+                : buildSectionTabPath(section, tab);
             return (
               <Link
                 key={section}
@@ -110,7 +106,7 @@ export function AdaptiveBottomBar() {
           {menuOpen && (
             <div className={styles.sectionMenu}>
               <Link
-                href="/"
+                href={routes.home}
                 className={styles.sectionMenuItem}
                 onClick={() => setMenuOpen(false)}
               >
@@ -121,7 +117,9 @@ export function AdaptiveBottomBar() {
                 const Icon = SECTION_ICONS[section];
                 const tab = sectionTabs[section];
                 const href =
-                  section === "account" && !isAuthenticated ? "/sign-in" : buildSectionTabPath(section, tab);
+                  section === "account" && !isAuthenticated
+                    ? routes.signIn
+                    : buildSectionTabPath(section, tab);
                 return (
                   <Link
                     key={section}
@@ -167,7 +165,7 @@ export function AdaptiveBottomBar() {
           })}
         </div>
 
-        <Link href="/search" className={styles.searchBtn} aria-label="Open search">
+        <Link href={routes.search} className={styles.searchBtn} aria-label="Open search">
           <Search size={18} />
         </Link>
       </nav>

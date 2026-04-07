@@ -8,41 +8,47 @@
   margin-inline: auto;
   display: flex;
   flex-direction: column;
+  gap: 2rem;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cardList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.twoColumn {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.columnMain {
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
 }
 
-.title {
-  margin: 0;
-  font-size: clamp(1.6rem, 2.4vw, 2.1rem);
-  font-weight: 700;
-}
-
-.subtitle {
-  margin: 0;
-  color: var(--content-subtle);
-  max-width: 36rem;
-}
-
-.notice {
-  padding: 1rem 1.1rem;
-  border-radius: var(--radius-component-panel);
-  border: 1px solid color-mix(in srgb, var(--border-default) 70%, transparent);
-  background: var(--surface-default);
-  box-shadow: var(--shadow-sm);
-}
-
-.noticeTitle {
-  margin: 0 0 0.4rem;
-  font-weight: 700;
-}
-
-.noticeBody {
-  margin: 0;
-  color: var(--content-subtle);
+.columnSide {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
 @media (max-width: 960px) {
   .page {
     padding-inline: clamp(1rem, 4.5vw, 1.75rem);
+  }
+
+  .twoColumn {
+    grid-template-columns: 1fr;
+    gap: 2rem;
   }
 }
