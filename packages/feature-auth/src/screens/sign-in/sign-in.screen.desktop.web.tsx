@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { authClient } from "@sd/core-auth";
 import { TextInputWeb } from "@sd/shared";
 import { GoogleSignInButton, AppleSignInButton } from "../../components/social-buttons";
@@ -10,11 +8,15 @@ import styles from "../auth-form.module.css";
 
 type SignInDesktopScreenProps = {
   redirectTo: string;
+  onSignInSuccess: () => void;
+  onNavigateToSignUp: () => void;
 };
 
-export function SignInDesktopScreen({ redirectTo }: SignInDesktopScreenProps) {
-  const router = useRouter();
-
+export function SignInDesktopScreen({
+  redirectTo,
+  onSignInSuccess,
+  onNavigateToSignUp,
+}: SignInDesktopScreenProps) {
   const [email, setEmail] = useState("");
   const [emailTouched, setEmailTouched] = useState(false);
   const [password, setPassword] = useState("");
@@ -39,7 +41,7 @@ export function SignInDesktopScreen({ redirectTo }: SignInDesktopScreenProps) {
       return;
     }
 
-    router.push(redirectTo);
+    onSignInSuccess();
   }
 
   return (
@@ -105,9 +107,16 @@ export function SignInDesktopScreen({ redirectTo }: SignInDesktopScreenProps) {
 
           <p className={styles.footerText}>
             Don&apos;t have an account?{" "}
-            <Link href="/sign-up" className={styles.footerLink}>
+            <a
+              href="/sign-up"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigateToSignUp();
+              }}
+              className={styles.footerLink}
+            >
               Create one
-            </Link>
+            </a>
           </p>
         </div>
       </div>

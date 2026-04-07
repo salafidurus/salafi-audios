@@ -1,16 +1,23 @@
-import type { Metadata } from "next";
+"use client";
+
 import { Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { SearchProcessingResponsiveScreen } from "@sd/feature-search";
 
-export const metadata: Metadata = {
-  title: "Search",
-  description: "Search the Salafi Durus library.",
-};
+function SearchPageInner() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const searchKey = searchParams.get("searchKey") ?? undefined;
+
+  return (
+    <SearchProcessingResponsiveScreen searchKey={searchKey} onBackPress={() => router.back()} />
+  );
+}
 
 export default function SearchPage() {
   return (
     <Suspense fallback={null}>
-      <SearchProcessingResponsiveScreen />
+      <SearchPageInner />
     </Suspense>
   );
 }

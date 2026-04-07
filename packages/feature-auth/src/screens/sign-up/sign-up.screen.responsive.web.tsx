@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { SignUpMobileWebScreen } from "./sign-up.screen.web";
 import { SignUpDesktopScreen } from "./sign-up.screen.desktop.web";
 import { useResponsive } from "@sd/shared";
@@ -9,10 +8,15 @@ import { authClient } from "@sd/core-auth";
 
 type SignUpScreenProps = {
   redirectTo: string;
+  onSignUpSuccess: () => void;
+  onNavigateToSignIn: () => void;
 };
 
-export function SignUpResponsiveScreen({ redirectTo }: SignUpScreenProps) {
-  const router = useRouter();
+export function SignUpResponsiveScreen({
+  redirectTo,
+  onSignUpSuccess,
+  onNavigateToSignIn,
+}: SignUpScreenProps) {
   const [isHydrated, setIsHydrated] = useState(false);
   const { isMobile, isTablet } = useResponsive();
 
@@ -30,7 +34,7 @@ export function SignUpResponsiveScreen({ redirectTo }: SignUpScreenProps) {
         onSignUp={async (name, email, password) => {
           const { error } = await authClient.signUp.email({ name, email, password });
           if (error) throw new Error(error.message ?? "Sign up failed");
-          router.push(redirectTo);
+          onSignUpSuccess();
         }}
         onSignUpWithGoogle={() =>
           authClient.signIn.social({ provider: "google", callbackURL: redirectTo })
@@ -38,10 +42,16 @@ export function SignUpResponsiveScreen({ redirectTo }: SignUpScreenProps) {
         onSignUpWithApple={() =>
           authClient.signIn.social({ provider: "apple", callbackURL: redirectTo })
         }
-        onNavigateToSignIn={() => router.push("/sign-in")}
+        onNavigateToSignIn={onNavigateToSignIn}
       />
     );
   }
 
-  return <SignUpDesktopScreen redirectTo={redirectTo} />;
+  return (
+    <SignUpDesktopScreen
+      redirectTo={redirectTo}
+      onSignUpSuccess={onSignUpSuccess}
+      onNavigateToSignIn={onNavigateToSignIn}
+    />
+  );
 }

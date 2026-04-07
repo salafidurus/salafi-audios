@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { authClient } from "@sd/core-auth";
 import { TextInputWeb } from "@sd/shared";
 import { GoogleSignInButton, AppleSignInButton } from "../../components/social-buttons";
@@ -10,11 +8,15 @@ import styles from "../auth-form.module.css";
 
 type SignUpDesktopScreenProps = {
   redirectTo: string;
+  onSignUpSuccess: () => void;
+  onNavigateToSignIn: () => void;
 };
 
-export function SignUpDesktopScreen({ redirectTo }: SignUpDesktopScreenProps) {
-  const router = useRouter();
-
+export function SignUpDesktopScreen({
+  redirectTo,
+  onSignUpSuccess,
+  onNavigateToSignIn,
+}: SignUpDesktopScreenProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [emailTouched, setEmailTouched] = useState(false);
@@ -41,7 +43,7 @@ export function SignUpDesktopScreen({ redirectTo }: SignUpDesktopScreenProps) {
       return;
     }
 
-    router.push(redirectTo);
+    onSignUpSuccess();
   }
 
   return (
@@ -59,13 +61,13 @@ export function SignUpDesktopScreen({ redirectTo }: SignUpDesktopScreenProps) {
             />
             <span>
               I agree to the{" "}
-              <Link href="/terms-of-use" className={styles.inlineLink}>
+              <a href="/terms-of-use" className={styles.inlineLink}>
                 Terms of Service
-              </Link>{" "}
+              </a>{" "}
               and{" "}
-              <Link href="/privacy" className={styles.inlineLink}>
+              <a href="/privacy" className={styles.inlineLink}>
                 Privacy Policy
-              </Link>
+              </a>
             </span>
           </label>
 
@@ -137,9 +139,16 @@ export function SignUpDesktopScreen({ redirectTo }: SignUpDesktopScreenProps) {
 
           <p className={styles.footerText}>
             Already have an account?{" "}
-            <Link href="/sign-in" className={styles.footerLink}>
+            <a
+              href="/sign-in"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigateToSignIn();
+              }}
+              className={styles.footerLink}
+            >
               Sign in
-            </Link>
+            </a>
           </p>
         </div>
       </div>

@@ -1,14 +1,18 @@
+"use client";
+
+import { useRouter, useSearchParams } from "next/navigation";
 import { SignInResponsiveScreen } from "@sd/feature-auth";
 
-type SignInPageProps = {
-  searchParams: Promise<{
-    from?: string;
-  }>;
-};
+export default function SignInPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("from") ?? "/";
 
-export default async function SignInPage({ searchParams }: SignInPageProps) {
-  const params = await searchParams;
-  const redirectTo = params.from ?? "/";
-
-  return <SignInResponsiveScreen redirectTo={redirectTo} />;
+  return (
+    <SignInResponsiveScreen
+      redirectTo={redirectTo}
+      onSignInSuccess={() => router.push(redirectTo)}
+      onNavigateToSignUp={() => router.push("/sign-up")}
+    />
+  );
 }

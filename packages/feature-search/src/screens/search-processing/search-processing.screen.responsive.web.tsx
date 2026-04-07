@@ -1,14 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { SearchProcessingMobileWebScreen } from "./search-processing.screen.mobile.web";
 import { SearchProcessingDesktopWebScreen } from "./search-processing.screen.desktop.web";
 import { useResponsive } from "@sd/shared";
 
-export function SearchProcessingResponsiveScreen() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+export type SearchProcessingResponsiveScreenProps = {
+  searchKey?: string;
+  onBackPress?: () => void;
+};
+
+export function SearchProcessingResponsiveScreen({
+  searchKey,
+  onBackPress,
+}: SearchProcessingResponsiveScreenProps) {
   const [isHydrated, setIsHydrated] = useState(false);
   const { isMobile, isTablet } = useResponsive();
 
@@ -21,8 +26,7 @@ export function SearchProcessingResponsiveScreen() {
   }
 
   if (isMobile || isTablet) {
-    const prefill = searchParams.get("searchKey") ?? undefined;
-    return <SearchProcessingMobileWebScreen prefill={prefill} onBackPress={() => router.back()} />;
+    return <SearchProcessingMobileWebScreen prefill={searchKey} onBackPress={onBackPress} />;
   }
 
   return <SearchProcessingDesktopWebScreen />;

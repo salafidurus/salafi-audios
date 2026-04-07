@@ -1,13 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { SearchHomeMobileWebScreen } from "./search-home.screen.mobile.web";
 import { SearchHomeDesktopWebScreen } from "./search-home.screen.desktop.web";
 import { useResponsive } from "@sd/shared";
 
-export function SearchHomeResponsiveScreen() {
-  const router = useRouter();
+export type SearchHomeResponsiveScreenProps = {
+  onOpenSearch?: () => void;
+  onSelectCategory?: (searchKey: string) => void;
+};
+
+export function SearchHomeResponsiveScreen({
+  onOpenSearch,
+  onSelectCategory,
+}: SearchHomeResponsiveScreenProps) {
   const [isHydrated, setIsHydrated] = useState(false);
   const { isMobile, isTablet } = useResponsive();
 
@@ -21,14 +27,11 @@ export function SearchHomeResponsiveScreen() {
 
   if (isMobile || isTablet) {
     return (
-      <SearchHomeMobileWebScreen
-        onOpenSearch={() => router.push("/search")}
-        onSelectCategory={(searchKey) =>
-          router.push(`/search?searchKey=${encodeURIComponent(searchKey)}`)
-        }
-      />
+      <SearchHomeMobileWebScreen onOpenSearch={onOpenSearch} onSelectCategory={onSelectCategory} />
     );
   }
 
-  return <SearchHomeDesktopWebScreen />;
+  return (
+    <SearchHomeDesktopWebScreen onOpenSearch={onOpenSearch} onSelectCategory={onSelectCategory} />
+  );
 }

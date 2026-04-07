@@ -1,15 +1,19 @@
-import type { Metadata } from "next";
+"use client";
+
+import { useRouter } from "next/navigation";
 import { SearchHomeResponsiveScreen } from "@sd/feature-search";
 
-export const metadata: Metadata = {
-  title: "Home",
-  description: "Find a lesson in the Salafi Durus library.",
-};
-
 export default function HomePage() {
+  const router = useRouter();
+
   return (
     <main className="flex flex-1 min-h-full flex-col">
-      <SearchHomeResponsiveScreen />
+      <SearchHomeResponsiveScreen
+        onOpenSearch={() => router.push("/search")}
+        onSelectCategory={(searchKey) =>
+          router.push(`/search?searchKey=${encodeURIComponent(searchKey)}`)
+        }
+      />
     </main>
   );
 }
