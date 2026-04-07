@@ -47,16 +47,17 @@ afterEach(() => {
 /* ------------------------------------------------------------------ */
 
 describe("httpClient – unconfigured", () => {
-  // Force a fresh module with no prior configureApiClient call.
-  // Because `config` is module-level state, we need to isolate here.
   beforeEach(() => {
     jest.resetModules();
   });
 
   it("throws when called before configureApiClient", async () => {
-    // Re-import to get a fresh module with config = null
-    const { httpClient: fresh } = await import("./http");
-    await expect(fresh({ url: "/test", method: "GET" })).rejects.toThrow(/not configured/i);
+    // Use jest.isolateModules + require to get a fresh module with config = null
+    let fresh: typeof httpClient;
+    jest.isolateModules(() => {
+      fresh = require("./http").httpClient;
+    });
+    await expect(fresh!({ url: "/test", method: "GET" })).rejects.toThrow(/not configured/i);
   });
 });
 
