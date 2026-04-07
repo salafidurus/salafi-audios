@@ -24,3 +24,4 @@ export {
   type SearchCatalogItemDto,
   type SearchCatalogResultsDto,
 } from "../types/search.types";
+export { type FeedItemDto, type FeedPageDto } from "../types/feed.types";

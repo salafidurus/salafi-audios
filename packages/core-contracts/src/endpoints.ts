@@ -20,4 +20,8 @@ export const endpoints = {
   lectures: {
     detail: (id: string) => `/lectures/${id}`,
   },
+  feed: {
+    recent: "/feed/recent",
+    following: "/feed/following",
+  },
 } as const;

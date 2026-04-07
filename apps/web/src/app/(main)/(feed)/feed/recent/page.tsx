@@ -1,5 +1,5 @@
-import { FeedResponsiveScreen } from "@sd/feature-feed";
+import { FeedRecentResponsiveScreen } from "@sd/feature-feed";
 
 export default function FeedRecentPage() {
-  return <FeedResponsiveScreen />;
+  return <FeedRecentResponsiveScreen />;
 }

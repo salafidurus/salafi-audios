@@ -1,4 +1,4 @@
-import { QueryClient, QueryKey } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
 import type { SearchCatalogParams } from "../types";
 
 // Centralized query client configuration
@@ -79,7 +79,9 @@ export const queryKeys = {
     all: ["search"] as const,
     catalog: (params: SearchCatalogParams) => [...queryKeys.search.all, "catalog", params] as const,
   },
+  feed: {
+    all: ["feed"] as const,
+    recent: (cursor?: string) => [...queryKeys.feed.all, "recent", cursor] as const,
+    following: (cursor?: string) => [...queryKeys.feed.all, "following", cursor] as const,
+  },
 } as const;
-
-// Helper type for query key inference
-export type QueryKeyOf<T extends (...args: unknown[]) => QueryKey> = ReturnType<T>;

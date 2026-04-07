@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useAuth } from "@sd/feature-auth";
-import { FeedResponsiveScreen } from "@sd/feature-feed";
+import { FeedFollowingResponsiveScreen } from "@sd/feature-feed";
 import { AuthRequiredStateResponsive } from "@sd/shared";
 import { routes } from "@sd/core-contracts";
 
@@ -22,5 +22,5 @@ export default function FeedFollowingPage() {
     );
   }
 
-  return <FeedResponsiveScreen />;
+  return <FeedFollowingResponsiveScreen />;
 }
