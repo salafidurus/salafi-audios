@@ -2,16 +2,13 @@
 module.exports = {
   testEnvironment: "node",
 
-  testMatch: [
-    "<rootDir>/**/?(*.)+(spec|test).[tj]s?(x)",
-  ],
+  testRegex: ".*\\.(spec|test)\\.(ts|tsx|js|jsx)$",
 
   transform: {
     "^.+\\.(t|j)sx?$": [
       "ts-jest",
       {
         tsconfig: "tsconfig.json",
-        isolatedModules: true,
       },
     ],
   },

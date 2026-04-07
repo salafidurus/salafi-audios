@@ -2,9 +2,7 @@
 module.exports = {
   testEnvironment: "jsdom",
 
-  testMatch: [
-    "<rootDir>/**/?(*.)+(spec|test).[tj]s?(x)",
-  ],
+  testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
 
   transform: {
     "^.+\\.(t|j)sx?$": [
