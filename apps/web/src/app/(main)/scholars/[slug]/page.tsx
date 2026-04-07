@@ -1,5 +1,9 @@
-import { ScreenInProgressResponsive } from "@sd/shared";
+"use client";
+
+import { useParams } from "next/navigation";
+import { ScholarDetailResponsiveScreen } from "@sd/feature-scholar";
 
 export default function ScholarPage() {
-  return <ScreenInProgressResponsive />;
+  const params = useParams<{ slug: string }>();
+  return <ScholarDetailResponsiveScreen slug={params.slug} />;
 }

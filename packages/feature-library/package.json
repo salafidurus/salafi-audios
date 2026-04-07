@@ -20,6 +20,7 @@
   "dependencies": {
     "@sd/core-contracts": "workspace:*",
     "@sd/design-tokens": "workspace:*",
+    "@sd/domain-progress": "workspace:*",
     "@sd/shared": "workspace:*"
   },
   "peerDependencies": {

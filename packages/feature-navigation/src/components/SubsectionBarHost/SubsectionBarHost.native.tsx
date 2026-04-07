@@ -15,6 +15,7 @@ export function SubsectionBarHostMobileNative() {
   const pathname = usePathname();
   const router = useRouter();
   const activeRootTab = getRootTabFromPathname(pathname);
+  const supportsEaseView = typeof EaseView === "function";
 
   if (activeRootTab === "search") {
     return null;
@@ -40,10 +41,23 @@ export function SubsectionBarHostMobileNative() {
               accessibilityState={{ selected: isActive }}
               style={styles.itemPressable}
             >
-              <EaseView
-                animate={{ scale: isActive ? 1 : 0.98, opacity: isActive ? 1 : 0.82 }}
-                transition={{ type: "spring", damping: 12, stiffness: 150 }}
-              >
+              {supportsEaseView ? (
+                <EaseView
+                  animate={{ scale: isActive ? 1 : 0.98, opacity: isActive ? 1 : 0.82 }}
+                  transition={{ type: "spring", damping: 12, stiffness: 150 }}
+                >
+                  <View style={[styles.item, isActive && styles.itemActive]}>
+                    {Icon ? (
+                      <Icon
+                        size={14}
+                        strokeWidth={1.8}
+                        color={isActive ? styles.labelActive.color : styles.label.color}
+                      />
+                    ) : null}
+                    <Text style={[styles.label, isActive && styles.labelActive]}>{tab.label}</Text>
+                  </View>
+                </EaseView>
+              ) : (
                 <View style={[styles.item, isActive && styles.itemActive]}>
                   {Icon ? (
                     <Icon
@@ -54,7 +68,7 @@ export function SubsectionBarHostMobileNative() {
                   ) : null}
                   <Text style={[styles.label, isActive && styles.labelActive]}>{tab.label}</Text>
                 </View>
-              </EaseView>
+              )}
             </Pressable>
           );
         })}

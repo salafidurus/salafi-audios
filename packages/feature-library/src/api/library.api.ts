@@ -25,3 +25,13 @@ export function useLibraryCompleted(cursor?: string) {
     }),
   );
 }
+
+export function useLibraryProgress(cursor?: string) {
+  return useApiQuery(queryKeys.library.progress(cursor), () =>
+    httpClient<LibraryPageDto>({
+      url: endpoints.library.progress,
+      method: "GET",
+      params: cursor ? { cursor } : undefined,
+    }),
+  );
+}

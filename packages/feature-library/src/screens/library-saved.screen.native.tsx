@@ -25,6 +25,7 @@ function LibraryItem({ item, onPress }: { item: LibraryItemDto; onPress?: () => 
       <Text style={{ fontSize: 11, color: "#999", marginTop: 2 }}>
         {item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""}
         {progress !== null ? ` · ${progress}% listened` : ""}
+        {item.savedAt ? ` · Saved ${new Date(item.savedAt).toLocaleDateString()}` : ""}
       </Text>
     </TouchableOpacity>
   );
