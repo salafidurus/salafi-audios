@@ -22,7 +22,6 @@
     "@sd/core-api": "workspace:*",
     "@sd/core-auth": "workspace:*",
     "@sd/core-config": "workspace:*",
-    "@sd/feature-search": "workspace:*",
     "@sd/core-styles": "workspace:*",
     "@sd/design-tokens": "workspace:*",
     "@sd/shared": "workspace:*",

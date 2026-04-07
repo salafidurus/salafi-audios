@@ -1122,9 +1122,6 @@ importers:
       '@sd/design-tokens':
         specifier: workspace:*
         version: link:../design-tokens
-      '@sd/feature-search':
-        specifier: workspace:*
-        version: link:../feature-search
       '@sd/shared':
         specifier: workspace:*
         version: link:../shared
