@@ -39,6 +39,7 @@
     "@sd/core-env": "workspace:*",
     "@sd/feature-auth": "workspace:*",
     "@sd/feature-catalog": "workspace:*",
+    "@sd/feature-downloads": "workspace:*",
     "@sd/feature-lecture": "workspace:*",
     "@sd/feature-account": "workspace:*",
     "@sd/feature-feed": "workspace:*",
