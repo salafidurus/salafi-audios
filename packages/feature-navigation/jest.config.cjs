@@ -3,7 +3,8 @@ module.exports = {
   testEnvironment: "node",
 
   testMatch: [
-    "<rootDir>/**/?(*.)+(spec|test).[tj]s?(x)",
+    "<rootDir>/**/*.spec.[tj]s?(x)",
+    "<rootDir>/**/*.test.[tj]s?(x)",
   ],
 
   transform: {
