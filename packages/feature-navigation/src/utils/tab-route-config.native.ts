@@ -38,19 +38,19 @@ export function getRootTabFromPathname(pathname: string): RootTab {
     return "search";
   }
 
-  if (pathname.startsWith(routes.feed.root)) {
+  if (pathname.startsWith(routes.feed.index)) {
     return "feed";
   }
 
-  if (pathname.startsWith(routes.live.root)) {
+  if (pathname.startsWith(routes.live.index)) {
     return "live";
   }
 
-  if (pathname.startsWith(routes.library.root)) {
+  if (pathname.startsWith(routes.library.index)) {
     return "library";
   }
 
-  if (pathname.startsWith(routes.account.root)) {
+  if (pathname.startsWith(routes.account.index)) {
     return "account";
   }
 

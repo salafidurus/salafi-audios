@@ -33,22 +33,22 @@ const navItems: NavItem[] = [
   {
     label: "Feeds",
     Icon: Cloud,
-    href: routes.feed.root,
-    activeMatch: routes.feed.root,
+    href: routes.feed.index,
+    activeMatch: routes.feed.index,
     section: "feed",
   },
   {
     label: "Live",
     Icon: Mic,
-    href: routes.live.root,
-    activeMatch: routes.live.root,
+    href: routes.live.index,
+    activeMatch: routes.live.index,
     section: "live",
   },
   {
     label: "Lessons",
     Icon: CassetteTape,
-    href: routes.library.root,
-    activeMatch: routes.library.root,
+    href: routes.library.index,
+    activeMatch: routes.library.index,
     section: "library",
   },
 ];
@@ -57,7 +57,7 @@ export function SidebarWeb() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const { isAuthenticated } = useAuth();
-  const accountHref = isAuthenticated ? routes.account.root : routes.signIn;
+  const accountHref = isAuthenticated ? routes.account.index : routes.signIn;
   const currentSection = getCurrentSection(pathname);
 
   useEffect(() => {
@@ -142,7 +142,7 @@ export function SidebarWeb() {
         })}
         <Link
           href={accountHref}
-          className={clsx(styles.link, pathname.startsWith(routes.account.root) && styles.active)}
+          className={clsx(styles.link, pathname.startsWith(routes.account.index) && styles.active)}
         >
           <span className={styles.icon} aria-hidden="true">
             <Settings size={18} />

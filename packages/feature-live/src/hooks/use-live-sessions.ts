@@ -1,3 +1,5 @@
+"use client";
+
 import { useLiveSection } from "./use-live-section";
 import { endpoints, queryKeys } from "@sd/core-contracts";
 

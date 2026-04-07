@@ -40,13 +40,10 @@ export const endpoints = {
   live: {
     active: "/live/active",
     upcoming: "/live/upcoming",
-    scheduled: "/live/scheduled", // keep backward compat alias
     ended: "/live/ended",
   },
   progress: {
-    get: (lectureId: string) => `/progress/${lectureId}`,
     update: (lectureId: string) => `/me/progress/${lectureId}`,
-    history: "/progress/history",
     sync: "/me/progress/sync",
   },
   home: {

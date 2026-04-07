@@ -1,3 +1,5 @@
+"use client";
+
 export { LiveResponsiveScreen } from "./screens/live.screen.web";
 export type { LiveResponsiveScreenProps } from "./screens/live.screen.web";
 export { LiveScheduledResponsiveScreen } from "./screens/live-scheduled.screen.responsive.web";
