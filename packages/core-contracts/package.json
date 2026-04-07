@@ -8,23 +8,31 @@
     "dist"
   ],
   "types": "./src/index.ts",
-  "main": "./src/index.ts",
+  "main": "./dist/index.node.js",
   "exports": {
     ".": {
       "types": "./src/index.ts",
+      "import": "./src/index.ts",
+      "require": "./dist/index.node.js",
       "default": "./src/index.ts"
     },
     "./query": {
       "types": "./src/query/index.ts",
-      "default": "./src/query/index.ts"
+      "import": "./dist/query/index.js",
+      "require": "./dist/query/index.js",
+      "default": "./dist/query/index.js"
     },
     "./query/hooks": {
       "types": "./src/query/hooks/index.ts",
-      "default": "./src/query/hooks/index.ts"
+      "import": "./dist/query/hooks/index.js",
+      "require": "./dist/query/hooks/index.js",
+      "default": "./dist/query/hooks/index.js"
     },
     "./http": {
       "types": "./src/http.ts",
-      "default": "./src/http.ts"
+      "import": "./dist/http.js",
+      "require": "./dist/http.js",
+      "default": "./dist/http.js"
     }
   },
   "scripts": {
