@@ -2,6 +2,7 @@ import { View, Text, FlatList } from "react-native";
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
 import { FeedContentCardNative } from "../components/feed-content-card/feed-content-card.native";
 import { FeedScholarRowNative } from "../components/feed-scholar-row/feed-scholar-row.native";
+import { FeedTopicRowNative } from "../components/feed-topic-row/feed-topic-row.native";
 import { useFeed } from "../hooks/use-feed";
 
 export type FeedMobileNativeScreenProps = {
@@ -18,7 +19,13 @@ function renderFeedItem(
     case "scholar_row":
       return <FeedScholarRowNative scholars={item.scholars} onScholarPress={onNavigateToScholar} />;
     case "topic_row":
-      return null;
+      return (
+        <FeedTopicRowNative
+          topicName={item.topicName}
+          items={item.items}
+          onItemPress={onNavigateToLecture}
+        />
+      );
     default:
       return (
         <FeedContentCardNative

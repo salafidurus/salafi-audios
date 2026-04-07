@@ -19,6 +19,9 @@ export {
   type LectureRefDto,
   type SeriesContextDto,
   type LectureDetailDto,
+  type RelatedLectureDto,
+  type AdminLectureUpdateDto,
+  type AdminLectureActionDto,
 } from "../types/lecture.types";
 export {
   type ScholarViewDto,

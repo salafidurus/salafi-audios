@@ -6,10 +6,9 @@ test.describe("Scholar browsing", () => {
     // These tests verify the page shell renders without crashing; real content
     // depends on a seeded database.
 
-    test.skip(
-      "scholar detail page loads for a known slug",
-      "Requires seeded database with a known scholar slug",
-    );
+    test("scholar detail page loads for a known slug", async () => {
+      test.skip(true, "Requires seeded database with a known scholar slug");
+    });
 
     test("navigating to a non-existent scholar shows not-found state", async ({ page }) => {
       await page.goto("/scholars/non-existent-scholar-slug-12345");
@@ -31,9 +30,8 @@ test.describe("Scholar browsing", () => {
       await expect(page.locator("main").first()).toBeAttached();
     });
 
-    test.skip(
-      "clicking a scholar card navigates to /scholars/:slug",
-      "Requires seeded database with scholars in quick-browse",
-    );
+    test("clicking a scholar card navigates to /scholars/:slug", async () => {
+      test.skip(true, "Requires seeded database with scholars in quick-browse");
+    });
   });
 });

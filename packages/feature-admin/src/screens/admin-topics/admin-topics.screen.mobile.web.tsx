@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { TopicDetailDto } from "@sd/core-contracts";
+import { ScreenViewWeb } from "@sd/shared";
 import { createTopic, updateTopic, deleteTopic, type AdminTopicInput } from "../../api/admin.api";
 
 export function AdminTopicsMobileWebScreen() {
@@ -38,40 +39,45 @@ export function AdminTopicsMobileWebScreen() {
   };
 
   if (isFetching) {
-    return <div style={{ padding: 16 }}>Loading topics...</div>;
+    return (
+      <ScreenViewWeb>
+        <div style={{ textAlign: "center" }}>Loading topics...</div>
+      </ScreenViewWeb>
+    );
   }
 
   const topics = data ?? [];
 
   return (
-    <div style={{ padding: 16 }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16,
-        }}
-      >
-        <h1 style={{ fontSize: 22, fontWeight: 700 }}>Topics</h1>
-        <button
-          onClick={() => {
-            setCreating(true);
-            setEditing(null);
-            setFormData({ slug: "", name: "" });
-          }}
+    <ScreenViewWeb>
+      <div>
+        <div
           style={{
-            padding: "6px 12px",
-            borderRadius: 6,
-            border: "none",
-            background: "#2563eb",
-            color: "#fff",
-            fontSize: 13,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 16,
           }}
         >
-          + Add
-        </button>
-      </div>
+          <h1 style={{ fontSize: 22, fontWeight: 700 }}>Topics</h1>
+          <button
+            onClick={() => {
+              setCreating(true);
+              setEditing(null);
+              setFormData({ slug: "", name: "" });
+            }}
+            style={{
+              padding: "6px 12px",
+              borderRadius: 6,
+              border: "none",
+              background: "#2563eb",
+              color: "#fff",
+              fontSize: 13,
+            }}
+          >
+            + Add
+          </button>
+        </div>
 
       {(creating || editing) && (
         <div
@@ -196,6 +202,7 @@ export function AdminTopicsMobileWebScreen() {
           </div>
         </div>
       ))}
-    </div>
+      </div>
+    </ScreenViewWeb>
   );
 }

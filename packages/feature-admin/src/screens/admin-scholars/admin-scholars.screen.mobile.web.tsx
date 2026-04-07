@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { ScholarListItemDto } from "@sd/core-contracts";
+import { ScreenViewWeb } from "@sd/shared";
 import { createScholar, updateScholar, type AdminScholarInput } from "../../api/admin.api";
 
 type ScholarsListDto = { scholars: ScholarListItemDto[] };
@@ -35,40 +36,45 @@ export function AdminScholarsMobileWebScreen() {
   };
 
   if (isFetching) {
-    return <div style={{ padding: 16 }}>Loading scholars...</div>;
+    return (
+      <ScreenViewWeb>
+        <div style={{ textAlign: "center" }}>Loading scholars...</div>
+      </ScreenViewWeb>
+    );
   }
 
   const scholars = data?.scholars ?? [];
 
   return (
-    <div style={{ padding: 16 }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16,
-        }}
-      >
-        <h1 style={{ fontSize: 22, fontWeight: 700 }}>Scholars</h1>
-        <button
-          onClick={() => {
-            setCreating(true);
-            setEditing(null);
-            setFormData({ name: "", slug: "" });
-          }}
+    <ScreenViewWeb>
+      <div>
+        <div
           style={{
-            padding: "6px 12px",
-            borderRadius: 6,
-            border: "none",
-            background: "#2563eb",
-            color: "#fff",
-            fontSize: 13,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 16,
           }}
         >
-          + Add
-        </button>
-      </div>
+          <h1 style={{ fontSize: 22, fontWeight: 700 }}>Scholars</h1>
+          <button
+            onClick={() => {
+              setCreating(true);
+              setEditing(null);
+              setFormData({ name: "", slug: "" });
+            }}
+            style={{
+              padding: "6px 12px",
+              borderRadius: 6,
+              border: "none",
+              background: "#2563eb",
+              color: "#fff",
+              fontSize: 13,
+            }}
+          >
+            + Add
+          </button>
+        </div>
 
       {(creating || editing) && (
         <div
@@ -192,6 +198,7 @@ export function AdminScholarsMobileWebScreen() {
           </button>
         </div>
       ))}
-    </div>
+      </div>
+    </ScreenViewWeb>
   );
 }

@@ -3,7 +3,7 @@ import { Public } from '../../modules/auth/decorators';
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
-import type { LectureDetailDto } from '@sd/core-contracts';
+import type { LectureDetailDto, RelatedLectureDto } from '@sd/core-contracts';
 import { LecturesService } from './lectures.service';
 
 @SkipThrottle()
@@ -22,5 +22,14 @@ export class LecturesController {
   })
   getById(@Param('id') id: string): Promise<LectureDetailDto> {
     return this.lectures.getById(id);
+  }
+
+  @Get(':id/related')
+  @ApiOperation({ summary: 'Get related lectures' })
+  @ApiOkResponse({
+    description: 'Related lectures based on scholar, topics, and series',
+  })
+  getRelated(@Param('id') id: string): Promise<RelatedLectureDto[]> {
+    return this.lectures.getRelated(id);
   }
 }

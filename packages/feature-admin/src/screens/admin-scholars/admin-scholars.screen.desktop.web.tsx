@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { ScholarListItemDto } from "@sd/core-contracts";
+import { ScreenViewWeb } from "@sd/shared";
 import { createScholar, updateScholar, type AdminScholarInput } from "../../api/admin.api";
 
 type ScholarsListDto = { scholars: ScholarListItemDto[] };
@@ -35,40 +36,45 @@ export function AdminScholarsDesktopWebScreen() {
   };
 
   if (isFetching) {
-    return <div style={{ padding: 32 }}>Loading scholars...</div>;
+    return (
+      <ScreenViewWeb>
+        <div style={{ textAlign: "center" }}>Loading scholars...</div>
+      </ScreenViewWeb>
+    );
   }
 
   const scholars = data?.scholars ?? [];
 
   return (
-    <div style={{ padding: 32, maxWidth: 1100, margin: "0 auto" }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 24,
-        }}
-      >
-        <h1 style={{ fontSize: 28, fontWeight: 700 }}>Manage Scholars</h1>
-        <button
-          onClick={() => {
-            setCreating(true);
-            setEditing(null);
-            setFormData({ name: "", slug: "" });
-          }}
+    <ScreenViewWeb>
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <div
           style={{
-            padding: "8px 16px",
-            borderRadius: 8,
-            border: "none",
-            background: "#2563eb",
-            color: "#fff",
-            cursor: "pointer",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 24,
           }}
         >
-          + Add Scholar
-        </button>
-      </div>
+          <h1 style={{ fontSize: 28, fontWeight: 700 }}>Manage Scholars</h1>
+          <button
+            onClick={() => {
+              setCreating(true);
+              setEditing(null);
+              setFormData({ name: "", slug: "" });
+            }}
+            style={{
+              padding: "8px 16px",
+              borderRadius: 8,
+              border: "none",
+              background: "#2563eb",
+              color: "#fff",
+              cursor: "pointer",
+            }}
+          >
+            + Add Scholar
+          </button>
+        </div>
 
       {(creating || editing) && (
         <div
@@ -202,6 +208,7 @@ export function AdminScholarsDesktopWebScreen() {
           ))}
         </tbody>
       </table>
-    </div>
+      </div>
+    </ScreenViewWeb>
   );
 }

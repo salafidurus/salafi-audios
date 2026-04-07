@@ -1,9 +1,12 @@
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Text } from "react-native-unistyles/components/native/Text";
+import type { lightMobileTheme } from "@sd/design-tokens";
 import { ScreenViewWeb } from "../ScreenView/ScreenView.web";
 
+type SharedTheme = typeof lightMobileTheme;
+
 export function ScreenInProgressMobileWeb() {
-  const { theme } = useUnistyles();
+  const { theme } = useUnistyles() as unknown as { theme: SharedTheme };
 
   return (
     <ScreenViewWeb center backgroundVariant="mixedWash">

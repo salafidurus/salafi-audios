@@ -80,3 +80,25 @@ export type LectureDetailDto = {
   primaryAudioAsset: AudioAssetDto | null;
   seriesContext: SeriesContextDto | null;
 };
+
+export type RelatedLectureDto = {
+  id: string;
+  slug: string;
+  title: string;
+  durationSeconds?: number;
+  scholar: ScholarRefDto;
+  primaryAudioAsset: AudioAssetDto | null;
+};
+
+export type AdminLectureUpdateDto = {
+  title?: string;
+  description?: string;
+  language?: string;
+  orderIndex?: number;
+  status?: StatusValue;
+};
+
+export type AdminLectureActionDto = {
+  success: boolean;
+  message: string;
+};

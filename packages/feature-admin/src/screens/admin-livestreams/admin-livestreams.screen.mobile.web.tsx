@@ -2,6 +2,7 @@
 
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { LiveSessionDeltaDto } from "@sd/core-contracts";
+import { ScreenViewWeb } from "@sd/shared";
 import { updateLiveSessionStatus } from "../../api/admin.api";
 
 export function AdminLivestreamsMobileWebScreen() {
@@ -31,7 +32,11 @@ export function AdminLivestreamsMobileWebScreen() {
   };
 
   if (loadingActive || loadingScheduled) {
-    return <div style={{ padding: 16 }}>Loading...</div>;
+    return (
+      <ScreenViewWeb>
+        <div style={{ textAlign: "center" }}>Loading...</div>
+      </ScreenViewWeb>
+    );
   }
 
   const active = activeData?.sessions ?? [];
@@ -83,22 +88,24 @@ export function AdminLivestreamsMobileWebScreen() {
   );
 
   return (
-    <div style={{ padding: 16 }}>
-      <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 16 }}>Livestreams</h1>
-      {active.length > 0 && (
-        <>
-          <h2 style={{ fontSize: 16, fontWeight: 600, color: "#16a34a", marginBottom: 8 }}>
-            Active ({active.length})
-          </h2>
-          {active.map(renderSession)}
-        </>
-      )}
-      <h2
-        style={{ fontSize: 16, fontWeight: 600, color: "#2563eb", marginBottom: 8, marginTop: 16 }}
-      >
-        Scheduled ({scheduled.length})
-      </h2>
-      {scheduled.map(renderSession)}
-    </div>
+    <ScreenViewWeb>
+      <div>
+        <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 16 }}>Livestreams</h1>
+        {active.length > 0 && (
+          <>
+            <h2 style={{ fontSize: 16, fontWeight: 600, color: "#16a34a", marginBottom: 8 }}>
+              Active ({active.length})
+            </h2>
+            {active.map(renderSession)}
+          </>
+        )}
+        <h2
+          style={{ fontSize: 16, fontWeight: 600, color: "#2563eb", marginBottom: 8, marginTop: 16 }}
+        >
+          Scheduled ({scheduled.length})
+        </h2>
+        {scheduled.map(renderSession)}
+      </div>
+    </ScreenViewWeb>
   );
 }

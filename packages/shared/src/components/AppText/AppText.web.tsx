@@ -1,6 +1,6 @@
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Text } from "react-native-unistyles/components/native/Text";
-import type { TypographyVariant } from "@sd/design-tokens";
+import type { TypographyVariant, lightMobileTheme } from "@sd/design-tokens";
 
 export type AppTextProps = {
   variant: TypographyVariant;
@@ -9,8 +9,10 @@ export type AppTextProps = {
   numberOfLines?: number;
 };
 
+type SharedTheme = typeof lightMobileTheme;
+
 export function AppTextWeb({ variant, children, style, numberOfLines }: AppTextProps) {
-  const { theme } = useUnistyles();
+  const { theme } = useUnistyles() as unknown as { theme: SharedTheme };
   return (
     <Text
       style={[

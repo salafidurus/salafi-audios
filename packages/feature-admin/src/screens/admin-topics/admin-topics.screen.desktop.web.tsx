@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { TopicDetailDto } from "@sd/core-contracts";
+import { ScreenViewWeb } from "@sd/shared";
 import { createTopic, updateTopic, deleteTopic, type AdminTopicInput } from "../../api/admin.api";
 
 export function AdminTopicsDesktopWebScreen() {
@@ -38,40 +39,45 @@ export function AdminTopicsDesktopWebScreen() {
   };
 
   if (isFetching) {
-    return <div style={{ padding: 32 }}>Loading topics...</div>;
+    return (
+      <ScreenViewWeb>
+        <div style={{ textAlign: "center" }}>Loading topics...</div>
+      </ScreenViewWeb>
+    );
   }
 
   const topics = data ?? [];
 
   return (
-    <div style={{ padding: 32, maxWidth: 1100, margin: "0 auto" }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 24,
-        }}
-      >
-        <h1 style={{ fontSize: 28, fontWeight: 700 }}>Manage Topics</h1>
-        <button
-          onClick={() => {
-            setCreating(true);
-            setEditing(null);
-            setFormData({ slug: "", name: "" });
-          }}
+    <ScreenViewWeb>
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <div
           style={{
-            padding: "8px 16px",
-            borderRadius: 8,
-            border: "none",
-            background: "#2563eb",
-            color: "#fff",
-            cursor: "pointer",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 24,
           }}
         >
-          + Add Topic
-        </button>
-      </div>
+          <h1 style={{ fontSize: 28, fontWeight: 700 }}>Manage Topics</h1>
+          <button
+            onClick={() => {
+              setCreating(true);
+              setEditing(null);
+              setFormData({ slug: "", name: "" });
+            }}
+            style={{
+              padding: "8px 16px",
+              borderRadius: 8,
+              border: "none",
+              background: "#2563eb",
+              color: "#fff",
+              cursor: "pointer",
+            }}
+          >
+            + Add Topic
+          </button>
+        </div>
 
       {(creating || editing) && (
         <div
@@ -193,6 +199,7 @@ export function AdminTopicsDesktopWebScreen() {
           ))}
         </tbody>
       </table>
-    </div>
+      </div>
+    </ScreenViewWeb>
   );
 }

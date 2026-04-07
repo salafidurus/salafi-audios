@@ -1,7 +1,7 @@
 "use client";
 
 import { View, Pressable, Linking } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 import { AppText } from "@sd/shared";
 import { useActiveSession } from "../../hooks/use-active-session";
 
@@ -13,7 +13,6 @@ export type CurrentlyLiveIndicatorNativeProps = {
 export function CurrentlyLiveIndicatorNative({
   compact = false,
 }: CurrentlyLiveIndicatorNativeProps) {
-  const { theme } = useUnistyles();
   const { activeSession, isLoading } = useActiveSession();
 
   if (isLoading || !activeSession) {

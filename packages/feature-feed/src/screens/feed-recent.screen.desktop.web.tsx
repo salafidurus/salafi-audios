@@ -3,8 +3,8 @@
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
 import { FeedContentCardWeb } from "../components/feed-content-card/feed-content-card.web";
 import { FeedScholarRowWeb } from "../components/feed-scholar-row/feed-scholar-row.web";
+import { FeedTopicRowWeb } from "../components/feed-topic-row/feed-topic-row.web";
 import { useFeed } from "../hooks/use-feed";
-import styles from "./responsive.module.css";
 
 export type FeedDesktopWebScreenProps = {
   onNavigateToLecture?: (slug: string) => void;
@@ -13,6 +13,7 @@ export type FeedDesktopWebScreenProps = {
 
 function renderFeedItem(
   item: FeedItemDto,
+  index: number,
   onNavigateToLecture?: (slug: string) => void,
   onNavigateToScholar?: (slug: string) => void,
 ) {
@@ -20,13 +21,20 @@ function renderFeedItem(
     case "scholar_row":
       return (
         <FeedScholarRowWeb
-          key="scholar-row"
+          key={`scholar-row-${index}`}
           scholars={item.scholars}
           onScholarPress={onNavigateToScholar}
         />
       );
     case "topic_row":
-      return null;
+      return (
+        <FeedTopicRowWeb
+          key={`topic-row-${index}`}
+          topicName={item.topicName}
+          items={item.items}
+          onItemPress={onNavigateToLecture}
+        />
+      );
     default:
       return (
         <FeedContentCardWeb
@@ -56,7 +64,7 @@ export function FeedDesktopWebScreen({
   return (
     <div style={{ maxWidth: 720, margin: "0 auto", padding: 24 }}>
       <h2 style={{ margin: 0, fontSize: 22, marginBottom: 16 }}>Feed</h2>
-      {items.map((item) => renderFeedItem(item, onNavigateToLecture, onNavigateToScholar))}
+      {items.map((item, index) => renderFeedItem(item, index, onNavigateToLecture, onNavigateToScholar))}
       {hasNextPage && (
         <div style={{ padding: 16, textAlign: "center" }}>
           <button

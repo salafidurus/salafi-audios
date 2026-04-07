@@ -1,4 +1,5 @@
-import { View, ScrollView, Text } from "react-native";
+import { View, ScrollView } from "react-native";
+import { ScreenViewMobileNative, AppText } from "@sd/shared";
 import { useScholarDetailScreen } from "../../hooks/use-scholar-detail";
 import { ScholarHeaderNative } from "../../components/scholar-header/scholar-header.native";
 import { ScholarContentListNative } from "../../components/scholar-content-list/scholar-content-list.native";
@@ -12,26 +13,28 @@ export function ScholarDetailMobileNativeScreen({ slug }: ScholarDetailMobileNat
 
   if (isFetching) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Loading scholar...</Text>
-      </View>
+      <ScreenViewMobileNative center>
+        <AppText variant="bodyMd">Loading scholar...</AppText>
+      </ScreenViewMobileNative>
     );
   }
 
   if (!scholar) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Scholar not found</Text>
-      </View>
+      <ScreenViewMobileNative center>
+        <AppText variant="titleMd">Scholar not found</AppText>
+      </ScreenViewMobileNative>
     );
   }
 
   return (
-    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16 }}>
-      <ScholarHeaderNative scholar={scholar} />
-      <View style={{ marginTop: 24 }}>
-        {content && <ScholarContentListNative content={content} />}
-      </View>
-    </ScrollView>
+    <ScreenViewMobileNative>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingVertical: 16 }}>
+        <ScholarHeaderNative scholar={scholar} />
+        <View style={{ marginTop: 24 }}>
+          {content && <ScholarContentListNative content={content} />}
+        </View>
+      </ScrollView>
+    </ScreenViewMobileNative>
   );
 }

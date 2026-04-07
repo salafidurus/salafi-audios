@@ -37,15 +37,13 @@ test.describe("Search", () => {
     await expect(main).toBeAttached();
   });
 
-  test.skip(
-    "typing in search input shows results",
-    "Requires running backend with indexed content",
-  );
+  test("typing in search input shows results", async () => {
+    test.skip(true, "Requires running backend with indexed content");
+  });
 
-  test.skip(
-    "clicking a search result navigates to detail page",
-    "Requires running backend with indexed content",
-  );
+  test("clicking a search result navigates to detail page", async () => {
+    test.skip(true, "Requires running backend with indexed content");
+  });
 
   test("empty search page shows appropriate state", async ({ page }) => {
     // Navigate directly to search without a query

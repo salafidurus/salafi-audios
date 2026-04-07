@@ -24,22 +24,38 @@ export function ScreenViewWeb({
   );
 }
 
-const styles = StyleSheet.create((theme) => ({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.surface.canvas,
-    _web: {
-      paddingHorizontal: theme.spacing.layout.pageX,
-      paddingVertical: theme.spacing.layout.pageY,
+const styles = StyleSheet.create((theme) => {
+  const sharedTheme = theme as unknown as {
+    colors: {
+      surface: {
+        canvas: string;
+      };
+    };
+    spacing: {
+      layout: {
+        pageX: number | string;
+        pageY: number | string;
+      };
+    };
+  };
+
+  return {
+    container: {
+      flex: 1,
+      backgroundColor: sharedTheme.colors.surface.canvas,
+      _web: {
+        paddingHorizontal: sharedTheme.spacing.layout.pageX,
+        paddingVertical: sharedTheme.spacing.layout.pageY,
+      },
     },
-  },
-  content: {
-    flex: 1,
-  },
-  center: {
-    justifyContent: "center",
-  },
-}));
+    content: {
+      flex: 1,
+    },
+    center: {
+      justifyContent: "center",
+    },
+  };
+});
 
 function getBackgroundVariant(variant: ScreenViewProps["backgroundVariant"]) {
   switch (variant) {
