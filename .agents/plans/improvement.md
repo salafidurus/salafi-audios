@@ -1358,6 +1358,108 @@ Extend existing modules with admin-gated endpoints:
 
 ---
 
+## Phase 14: Granular Error Boundaries
+
+**Problem:** There is only one `apps/web/src/app/error.tsx` at the root. Any runtime error in a page crashes the entire app including the sidebar and TopAuthStrip. Similarly, if the Sidebar or TopAuthStrip themselves error, the whole shell breaks.
+
+**Goal:** Errors are scoped to the component that threw them. Chrome (sidebar, top strip) stays visible on page errors; if chrome crashes it only takes down the affected chrome piece.
+
+### Web — Next.js App Router
+
+Next.js `error.tsx` files are scoped to their segment's `children`, not the segment's own `layout.tsx`. This means:
+
+- `app/(main)/error.tsx` — catches errors in the `(main)` layout's `children` (the page). Chrome (Sidebar, TopAuthStrip) from `(main)/layout.tsx` remains visible.
+- `app/error.tsx` — catches catastrophic root layout errors (fonts, providers). This is already the right level.
+
+Additionally, Sidebar and TopAuthStrip need their own React error boundaries so a crash in one doesn't take down the other.
+
+### Approach
+
+1. **Add `apps/web/src/app/(main)/error.tsx`** — identical UI to the existing root `error.tsx` but renders as an inline panel inside the shell (not a full-page crash). The chrome stays.
+2. **Create `apps/web/src/core/error/component-error-boundary.tsx`** — a reusable React class component error boundary (React's class-based API is required for `componentDidCatch`). Accepts `fallback?: ReactNode` prop; defaults to a minimal inline error panel.
+3. **Update `apps/web/src/app/(main)/layout.tsx`** to wrap `<Sidebar />` and `<TopAuthStrip />` in `<ComponentErrorBoundary>` independently. A sidebar crash shows a minimal fallback; TopAuthStrip crash shows nothing (the strip disappears but the page renders).
+
+### Mobile — Expo (future)
+
+React Native doesn't have Next.js-style route-level error boundaries. On mobile, use `react-native-error-boundary` or a class-based boundary around screen content. Sidebar equivalent (tab bar) is owned by Expo Router — not wrappable. Post-MVP.
+
+### Files
+
+- Create: `apps/web/src/app/(main)/error.tsx`
+- Create: `apps/web/src/core/error/component-error-boundary.tsx`
+- Modify: `apps/web/src/app/(main)/layout.tsx`
+
+### Steps
+
+- [ ] Create `apps/web/src/core/error/component-error-boundary.tsx`:
+  - Class component extending `React.Component<{ children: ReactNode; fallback?: ReactNode }, { hasError: boolean }>`
+  - `static getDerivedStateFromError` sets `hasError = true`
+  - `componentDidCatch` is a no-op (hook up logging when available)
+  - If `hasError`: renders `fallback ?? null`
+- [ ] Create `apps/web/src/app/(main)/error.tsx`:
+  - Same `"use client"` boundary
+  - Renders inline error card (not full-page) — smaller, uses `--surface-raised` background, shows "Something went wrong" + Try again button. Does NOT render a `<main>` wrapper.
+- [ ] Update `apps/web/src/app/(main)/layout.tsx`:
+  - Wrap `<Sidebar />` in `<ComponentErrorBoundary fallback={null}>` (fail silent — sidebar disappears, page is usable)
+  - Wrap `<TopAuthStrip />` in `<ComponentErrorBoundary fallback={null}>`
+- [ ] Verify: a thrown error in a page renders the inline error inside the shell with sidebar still visible
+- [ ] Commit: `feat(web): add granular error boundaries for chrome and page content`
+
+---
+
+## Phase 15: Account Route Auth Granularity
+
+**Problem:** `routeAuth.account = "auth"` in `core-contracts` marks the entire account section as requiring authentication. But `/account/legal` (terms of service, app-level legal links) is public content — it should be accessible without signing in.
+
+**Design:** Keep `routeAuth` as section-level (its primary use is middleware/redirect logic per section). Add a `routeAuthOverrides` map for path-specific exceptions. The route middleware checks `routeAuthOverrides` first, falls back to `routeAuth[section]`.
+
+### Changes
+
+**`packages/core-contracts/src/routes.ts`**:
+
+```ts
+// Per-path overrides — checked before section-level routeAuth
+export const routeAuthOverrides = {
+  [routes.account.legal]: "public",
+} as const satisfies Partial<Record<string, RouteAuthMode>>;
+```
+
+Export it from `packages/core-contracts/src/index.ts`.
+
+**`apps/web`** — the auth middleware / layout guard for `(account)` reads `routeAuthOverrides` before redirecting:
+
+```ts
+import { routeAuth, routeAuthOverrides, routes } from "@sd/core-contracts";
+
+function getEffectiveAuthMode(pathname: string): RouteAuthMode {
+  if (pathname in routeAuthOverrides) {
+    return routeAuthOverrides[pathname as keyof typeof routeAuthOverrides];
+  }
+  // fall back to section-level
+  if (pathname.startsWith(routes.account.index)) return routeAuth.account;
+  // ... etc
+}
+```
+
+**Mobile** — the account screen stack should render `AccountLegalScreen` without an auth guard. No redirect.
+
+### Files
+
+- Modify: `packages/core-contracts/src/routes.ts` — add `routeAuthOverrides`
+- Modify: `packages/core-contracts/src/index.ts` — export `routeAuthOverrides`
+- Modify: `apps/web/src/app/(main)/(account)/layout.tsx` (or wherever the account auth guard lives) — apply `getEffectiveAuthMode` helper
+- Modify: mobile account screen stack — remove auth guard from legal screen
+
+### Steps
+
+- [ ] Add `routeAuthOverrides` to `packages/core-contracts/src/routes.ts`
+- [ ] Export `routeAuthOverrides` from `packages/core-contracts/src/index.ts`
+- [ ] Find the account auth guard in `apps/web` (likely `app/(main)/(account)/layout.tsx`) and update it to check `routeAuthOverrides` before the section-level redirect
+- [ ] On mobile, confirm `AccountLegalScreen` is not behind an auth check; remove if it is
+- [ ] Commit: `feat(contracts): add routeAuthOverrides; account/legal is public`
+
+---
+
 ## Execution Order
 
 | Phase | Description                          | Risk   | Prerequisite       |
@@ -1375,8 +1477,10 @@ Extend existing modules with admin-gated endpoints:
 | 11    | Livestreams service                  | High   | Phase 5            |
 | 12    | Live feature screens                 | Low    | Phase 11           |
 | 13    | Admin screens                        | Medium | Phases 5, 6, 7, 11 |
+| 14    | Granular error boundaries (web)      | Low    | —                  |
+| 15    | Account route auth granularity       | Low    | —                  |
 
-Phases 1–4 are pure fixes, no dependencies, can all run in parallel. Phases 6 and 7 can run in parallel. Phase 11 can start as soon as Phase 5 is done (independent of 6/7).
+Phases 1–4 are pure fixes, no dependencies, can all run in parallel. Phases 6 and 7 can run in parallel. Phase 11 can start as soon as Phase 5 is done (independent of 6/7). Phases 14 and 15 are also independent and can run any time.
 
 ---
 
