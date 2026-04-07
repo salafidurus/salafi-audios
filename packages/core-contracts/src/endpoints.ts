@@ -20,6 +20,7 @@ export const endpoints = {
   },
   lectures: {
     detail: (id: string) => `/lectures/${id}`,
+    related: (id: string) => `/lectures/${id}/related`,
   },
   feed: {
     list: "/feed",
@@ -38,6 +39,8 @@ export const endpoints = {
     profile: "/account/profile",
   },
   live: {
+    channels: "/live/channels",
+    channelBySlug: (slug: string) => `/live/channels/${slug}`,
     active: "/live/active",
     upcoming: "/live/upcoming",
     ended: "/live/ended",
@@ -65,6 +68,11 @@ export const endpoints = {
       create: "/admin/topics",
       update: (slug: string) => `/admin/topics/${slug}`,
       delete: (slug: string) => `/admin/topics/${slug}`,
+    },
+    lectures: {
+      update: (id: string) => `/admin/lectures/${id}`,
+      publish: (id: string) => `/admin/lectures/${id}/publish`,
+      archive: (id: string) => `/admin/lectures/${id}/archive`,
     },
     live: {
       updateStatus: (id: string) => `/admin/live/sessions/${id}/status`,

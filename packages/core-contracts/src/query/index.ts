@@ -99,6 +99,8 @@ export const queryKeys = {
   },
   live: {
     all: ["live"] as const,
+    channels: () => [...queryKeys.live.all, "channels"] as const,
+    channelBySlug: (slug: string) => [...queryKeys.live.all, "channel", slug] as const,
     active: () => [...queryKeys.live.all, "active"] as const,
     scheduled: () => [...queryKeys.live.all, "scheduled"] as const,
     ended: (cursor?: string) => [...queryKeys.live.all, "ended", cursor] as const,

@@ -1,12 +1,12 @@
-import { useLiveActive } from "../api/live.api";
+"use client";
 
-export function useLiveActiveScreen() {
-  const { data, isFetching, error } = useLiveActive();
+import { useLiveSection } from "./use-live-section";
+import { endpoints, queryKeys } from "@sd/core-contracts";
 
-  return {
-    sessions: data?.items ?? [],
-    hasMore: data?.hasMore ?? false,
-    isFetching,
-    error,
-  };
+/**
+ * Hook for active live sessions using delta fetching.
+ * Different from the old API hook with the same name.
+ */
+export function useLiveActiveDelta() {
+  return useLiveSection(endpoints.live.active, queryKeys.live.active(), 20_000);
 }
