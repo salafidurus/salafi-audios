@@ -59,7 +59,7 @@ export class LibraryController {
     return this.library.bulkSave(user.id, body.lectureIds ?? []);
   }
 
-  @Post('saved/:lectureId')
+  @Post('save/:lectureId')
   @ApiOperation({ summary: 'Save a lecture' })
   @ApiOkResponse({ description: 'Lecture saved' })
   saveLecture(
@@ -69,7 +69,7 @@ export class LibraryController {
     return this.library.saveLecture(user.id, lectureId);
   }
 
-  @Delete('saved/:lectureId')
+  @Delete('save/:lectureId')
   @ApiOperation({ summary: 'Unsave a lecture' })
   @ApiOkResponse({ description: 'Lecture unsaved' })
   unsaveLecture(

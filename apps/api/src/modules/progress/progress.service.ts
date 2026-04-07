@@ -1,10 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import type { ProgressSyncItemDto } from '@sd/core-contracts';
+import type {
+  ProgressSyncItemDto,
+  LectureProgressDto,
+} from '@sd/core-contracts';
 import { ProgressRepository } from './progress.repo';
 
 @Injectable()
 export class ProgressService {
   constructor(private readonly repo: ProgressRepository) {}
+
+  async getUserProgress(userId: string): Promise<LectureProgressDto[]> {
+    return this.repo.getUserProgress(userId);
+  }
 
   async upsertProgress(
     userId: string,

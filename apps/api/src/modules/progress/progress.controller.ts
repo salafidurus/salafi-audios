@@ -1,8 +1,8 @@
-import { Controller, Post, Param, Body } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Query, Put } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CurrentUser } from '../../modules/auth/decorators';
-import type { ProgressSyncDto } from '@sd/core-contracts';
+import type { ProgressSyncDto, LectureProgressDto } from '@sd/core-contracts';
 import { ProgressService } from './progress.service';
 
 @ApiTags('Progress')
@@ -10,6 +10,15 @@ import { ProgressService } from './progress.service';
 @Controller('me/progress')
 export class ProgressController {
   constructor(private readonly progress: ProgressService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'Get all progress entries for user' })
+  @ApiOkResponse({ description: 'User progress entries' })
+  getProgress(
+    @CurrentUser() user: { id: string },
+  ): Promise<LectureProgressDto[]> {
+    return this.progress.getUserProgress(user.id);
+  }
 
   @Post('sync')
   @ApiOperation({ summary: 'Bulk sync progress from client' })
@@ -21,8 +30,8 @@ export class ProgressController {
     return this.progress.bulkSync(user.id, body.items ?? []);
   }
 
-  @Post(':lectureId')
-  @ApiOperation({ summary: 'Upsert lecture progress' })
+  @Put(':lectureId')
+  @ApiOperation({ summary: 'Update lecture progress' })
   @ApiOkResponse({ description: 'Progress updated' })
   upsertProgress(
     @CurrentUser() user: { id: string },

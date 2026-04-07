@@ -31,7 +31,7 @@ export const endpoints = {
     saved: "/me/library/saved",
     completed: "/me/library/completed",
     progress: "/me/library/progress",
-    saveLecture: (lectureId: string) => `/me/library/saved/${lectureId}`,
+    saveLecture: (lectureId: string) => `/me/library/save/${lectureId}`,
     syncSaved: "/me/library/saved/sync",
   },
   account: {
@@ -43,6 +43,7 @@ export const endpoints = {
     ended: "/live/ended",
   },
   progress: {
+    list: "/me/progress",
     update: (lectureId: string) => `/me/progress/${lectureId}`,
     sync: "/me/progress/sync",
   },

@@ -25,9 +25,4 @@ module.exports = {
 
   // Recommended for NestJS + TS
   clearMocks: true,
-
-  // Mock external dependencies that cause compilation issues
-  moduleNameMapping: {
-    '@sd/core-db': '<rootDir>/test/__mocks__/@sd/core-db.ts',
-  },
 };

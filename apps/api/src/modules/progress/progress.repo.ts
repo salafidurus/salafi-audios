@@ -1,10 +1,37 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../shared/db/prisma.service';
-import type { ProgressSyncItemDto } from '@sd/core-contracts';
+import type {
+  ProgressSyncItemDto,
+  LectureProgressDto,
+} from '@sd/core-contracts';
 
 @Injectable()
 export class ProgressRepository {
   constructor(private readonly prisma: PrismaService) {}
+
+  async getUserProgress(userId: string): Promise<LectureProgressDto[]> {
+    const progressRecords = await this.prisma.userLectureProgress.findMany({
+      where: { userId },
+      orderBy: { updatedAt: 'desc' },
+      include: {
+        lecture: {
+          select: {
+            durationSeconds: true,
+          },
+        },
+      },
+    });
+
+    return progressRecords.map((record) => ({
+      lectureId: record.lectureId,
+      positionSeconds: record.positionSeconds,
+      durationSeconds: record.lecture.durationSeconds || 0,
+      completedAt: record.isCompleted
+        ? record.updatedAt.toISOString()
+        : undefined,
+      updatedAt: record.updatedAt.toISOString(),
+    }));
+  }
 
   async upsertProgress(
     userId: string,
