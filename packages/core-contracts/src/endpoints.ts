@@ -17,4 +17,7 @@ export const endpoints = {
   series: {
     detail: (id: string) => `/series/${id}`,
   },
+  lectures: {
+    detail: (id: string) => `/lectures/${id}`,
+  },
 } as const;

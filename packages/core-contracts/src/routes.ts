@@ -36,6 +36,9 @@ export const routes = {
   series: {
     detail: (id: string) => `/series/${id}` as const,
   },
+  lectures: {
+    detail: (id: string) => `/lectures/${id}` as const,
+  },
   signIn: "/sign-in",
   signUp: "/sign-up",
   support: "/support",
