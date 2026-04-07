@@ -26,6 +26,16 @@ export const routes = {
     profile: "/account/profile",
     legal: "/account/legal",
   },
+  scholars: {
+    root: "/scholars",
+    detail: (slug: string) => `/scholars/${slug}` as const,
+  },
+  collections: {
+    detail: (id: string) => `/collections/${id}` as const,
+  },
+  series: {
+    detail: (id: string) => `/series/${id}` as const,
+  },
   signIn: "/sign-in",
   signUp: "/sign-up",
   support: "/support",

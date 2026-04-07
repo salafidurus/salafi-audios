@@ -38,6 +38,7 @@
     "@sd/design-tokens": "workspace:*",
     "@sd/core-env": "workspace:*",
     "@sd/feature-auth": "workspace:*",
+    "@sd/feature-catalog": "workspace:*",
     "@sd/feature-account": "workspace:*",
     "@sd/feature-feed": "workspace:*",
     "@sd/feature-legal": "workspace:*",

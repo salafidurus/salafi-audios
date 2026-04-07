@@ -6,4 +6,15 @@ export const endpoints = {
   topics: {
     list: "/topics",
   },
+  scholars: {
+    list: "/scholars",
+    detail: (slug: string) => `/scholars/${slug}`,
+    stats: (slug: string) => `/scholars/${slug}/stats`,
+  },
+  collections: {
+    detail: (id: string) => `/collections/${id}`,
+  },
+  series: {
+    detail: (id: string) => `/series/${id}`,
+  },
 } as const;
