@@ -83,8 +83,14 @@ const styles = StyleSheet.create((theme) => ({
   searchGroup: {
     gap: theme.spacing.component.gapSm,
     _web: {
+      position: "sticky" as const,
+      top: 0,
+      zIndex: 10,
       paddingTop: theme.spacing.layout.pageY,
       paddingBottom: theme.spacing.component.gapMd,
+      background: "color-mix(in srgb, var(--surface-canvas) 80%, transparent)",
+      backdropFilter: "blur(8px)",
+      WebkitBackdropFilter: "blur(8px)",
     },
   },
 }));

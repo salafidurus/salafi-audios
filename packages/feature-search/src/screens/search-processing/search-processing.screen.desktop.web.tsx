@@ -28,7 +28,14 @@ export function SearchProcessingDesktopWebScreen() {
 
   return (
     <main className="flex flex-1 flex-col">
-      <div className="sticky top-0 z-10 border-b border-[var(--chrome-border)] bg-[var(--chrome-surface)] px-[var(--space-layout-page-x)] pt-[var(--space-layout-page-y)] pb-[var(--space-component-gap-md)] backdrop-blur-sm">
+      <div
+        className="sticky top-0 z-10 border-b border-[var(--chrome-border)] px-[var(--space-layout-page-x)] pt-[var(--space-layout-page-y)] pb-[var(--space-component-gap-md)]"
+        style={{
+          background: "color-mix(in srgb, var(--surface-canvas) 80%, transparent)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+        }}
+      >
         <div className="mx-auto flex w-full max-w-[52rem] flex-col gap-[var(--space-component-gap-md)]">
           <SearchInputDesktopWeb
             ref={inputRef}
