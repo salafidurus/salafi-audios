@@ -264,12 +264,15 @@ importers:
       '@sd/feature-auth':
         specifier: workspace:*
         version: link:../../packages/feature-auth
-      '@sd/feature-catalog':
+      '@sd/feature-downloads':
         specifier: workspace:*
-        version: link:../../packages/feature-catalog
+        version: link:../../packages/feature-downloads
       '@sd/feature-feed':
         specifier: workspace:*
         version: link:../../packages/feature-feed
+      '@sd/feature-lecture':
+        specifier: workspace:*
+        version: link:../../packages/feature-lecture
       '@sd/feature-legal':
         specifier: workspace:*
         version: link:../../packages/feature-legal
@@ -282,6 +285,9 @@ importers:
       '@sd/feature-navigation':
         specifier: workspace:*
         version: link:../../packages/feature-navigation
+      '@sd/feature-playback':
+        specifier: workspace:*
+        version: link:../../packages/feature-playback
       '@sd/feature-search':
         specifier: workspace:*
         version: link:../../packages/feature-search
@@ -475,12 +481,12 @@ importers:
       '@sd/feature-auth':
         specifier: workspace:*
         version: link:../../packages/feature-auth
-      '@sd/feature-catalog':
-        specifier: workspace:*
-        version: link:../../packages/feature-catalog
       '@sd/feature-feed':
         specifier: workspace:*
         version: link:../../packages/feature-feed
+      '@sd/feature-lecture':
+        specifier: workspace:*
+        version: link:../../packages/feature-lecture
       '@sd/feature-legal':
         specifier: workspace:*
         version: link:../../packages/feature-legal
@@ -493,6 +499,9 @@ importers:
       '@sd/feature-navigation':
         specifier: workspace:*
         version: link:../../packages/feature-navigation
+      '@sd/feature-playback':
+        specifier: workspace:*
+        version: link:../../packages/feature-playback
       '@sd/feature-search':
         specifier: workspace:*
         version: link:../../packages/feature-search
@@ -802,6 +811,38 @@ importers:
         specifier: ^5.9.0
         version: 5.9.3
 
+  packages/domain-playback:
+    dependencies:
+      '@sd/core-contracts':
+        specifier: workspace:*
+        version: link:../core-contracts
+      react:
+        specifier: '*'
+        version: 19.2.0
+      zustand:
+        specifier: ^5.0.5
+        version: 5.0.11(@types/react@19.2.14)(immer@9.0.21)(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0))
+    devDependencies:
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.3
+
+  packages/domain-progress:
+    dependencies:
+      '@sd/core-contracts':
+        specifier: workspace:*
+        version: link:../core-contracts
+      react:
+        specifier: '*'
+        version: 19.2.0
+      zustand:
+        specifier: ^5.0.5
+        version: 5.0.11(@types/react@19.2.14)(immer@9.0.21)(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0))
+    devDependencies:
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.3
+
   packages/domain-search:
     dependencies:
       '@sd/core-contracts':
@@ -817,6 +858,9 @@ importers:
 
   packages/feature-account:
     dependencies:
+      '@sd/core-contracts':
+        specifier: workspace:*
+        version: link:../core-contracts
       '@sd/design-tokens':
         specifier: workspace:*
         version: link:../design-tokens
@@ -898,7 +942,35 @@ importers:
         specifier: ^5.9.2
         version: 5.9.3
 
-  packages/feature-catalog:
+  packages/feature-downloads:
+    dependencies:
+      '@react-native-async-storage/async-storage':
+        specifier: '*'
+        version: 2.2.0(react-native@0.83.2(@babel/core@7.28.6)(@types/react@19.2.14)(react@19.2.0))
+      '@sd/core-contracts':
+        specifier: workspace:*
+        version: link:../core-contracts
+      '@sd/domain-playback':
+        specifier: workspace:*
+        version: link:../domain-playback
+      expo-file-system:
+        specifier: '*'
+        version: 55.0.10(expo@55.0.6)(react-native@0.83.2(@babel/core@7.28.6)(@types/react@19.2.14)(react@19.2.0))
+      react:
+        specifier: '*'
+        version: 19.2.0
+      react-native:
+        specifier: '*'
+        version: 0.83.2(@babel/core@7.28.6)(@types/react@19.2.14)(react@19.2.0)
+      zustand:
+        specifier: ^5.0.5
+        version: 5.0.11(@types/react@19.2.14)(immer@9.0.21)(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0))
+    devDependencies:
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.3
+
+  packages/feature-feed:
     dependencies:
       '@sd/core-contracts':
         specifier: workspace:*
@@ -923,8 +995,11 @@ importers:
         specifier: ^5.9.2
         version: 5.9.3
 
-  packages/feature-feed:
+  packages/feature-lecture:
     dependencies:
+      '@sd/core-contracts':
+        specifier: workspace:*
+        version: link:../core-contracts
       '@sd/design-tokens':
         specifier: workspace:*
         version: link:../design-tokens
@@ -969,6 +1044,9 @@ importers:
 
   packages/feature-library:
     dependencies:
+      '@sd/core-contracts':
+        specifier: workspace:*
+        version: link:../core-contracts
       '@sd/design-tokens':
         specifier: workspace:*
         version: link:../design-tokens
@@ -991,6 +1069,9 @@ importers:
 
   packages/feature-live:
     dependencies:
+      '@sd/core-contracts':
+        specifier: workspace:*
+        version: link:../core-contracts
       '@sd/design-tokens':
         specifier: workspace:*
         version: link:../design-tokens
@@ -1070,6 +1151,47 @@ importers:
       zustand:
         specifier: ^5.0.11
         version: 5.0.11(@types/react@19.2.14)(immer@9.0.21)(react@19.2.0)(use-sync-external-store@1.6.0(react@19.2.0))
+    devDependencies:
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.3
+
+  packages/feature-playback:
+    dependencies:
+      '@sd/design-tokens':
+        specifier: workspace:*
+        version: link:../design-tokens
+      '@sd/domain-playback':
+        specifier: workspace:*
+        version: link:../domain-playback
+      '@sd/shared':
+        specifier: workspace:*
+        version: link:../shared
+      react:
+        specifier: '*'
+        version: 19.2.0
+      react-native:
+        specifier: '*'
+        version: 0.83.2(@babel/core@7.28.6)(@types/react@19.2.14)(react@19.2.0)
+    devDependencies:
+      typescript:
+        specifier: ^5.9.2
+        version: 5.9.3
+
+  packages/feature-progress:
+    dependencies:
+      '@sd/design-tokens':
+        specifier: workspace:*
+        version: link:../design-tokens
+      '@sd/domain-progress':
+        specifier: workspace:*
+        version: link:../domain-progress
+      react:
+        specifier: '*'
+        version: 19.2.0
+      react-native:
+        specifier: '*'
+        version: 0.83.2(@babel/core@7.28.6)(@types/react@19.2.14)(react@19.2.0)
     devDependencies:
       typescript:
         specifier: ^5.9.2

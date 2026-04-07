@@ -1,8 +1,5 @@
-import { useLocalSearchParams } from "expo-router";
-import { SeriesDetailMobileNativeScreen } from "@sd/feature-catalog";
+import { ScreenInProgressMobileNative } from "@sd/shared";
 
-export default function SeriesRoute() {
-  const { id } = useLocalSearchParams<{ id: string }>();
-
-  return <SeriesDetailMobileNativeScreen id={id} />;
+export default function SeriesScreen() {
+  return <ScreenInProgressMobileNative />;
 }

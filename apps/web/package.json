@@ -27,7 +27,6 @@
     "@sd/design-tokens": "workspace:*",
     "@sd/feature-account": "workspace:*",
     "@sd/feature-auth": "workspace:*",
-    "@sd/feature-catalog": "workspace:*",
     "@sd/feature-lecture": "workspace:*",
     "@sd/feature-feed": "workspace:*",
     "@sd/feature-legal": "workspace:*",

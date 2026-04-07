@@ -1,10 +1,5 @@
-"use client";
+import { ScreenInProgressResponsive } from "@sd/shared";
 
-import { useParams } from "next/navigation";
-import { SeriesDetailResponsiveScreen } from "@sd/feature-catalog";
-
-export default function SeriesDetailPage() {
-  const params = useParams<{ id: string }>();
-
-  return <SeriesDetailResponsiveScreen id={params.id} />;
+export default function SeriesPage() {
+  return <ScreenInProgressResponsive />;
 }
