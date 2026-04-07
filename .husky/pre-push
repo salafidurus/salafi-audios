@@ -12,7 +12,9 @@ done || {
   exit 0
 }
 
+pnpm verify:build-configs
 pnpm turbo lint typecheck test:prepush --affected
+pnpm turbo build --affected
 
 if git diff --quiet origin/main...HEAD -- ':(glob)apps/web/**' ':(glob)packages/shared/**' ':(glob)packages/design-tokens/**' ':(glob)packages/core-config/**' ':(glob)packages/core-styles/**' ':(glob)packages/core-auth/**' ':(glob)packages/feature-auth/**' ':(glob)packages/feature-navigation/**' ':(glob)packages/feature-search/**'; then
   printf "pre-push: skipping web e2e (no web-affecting changes)\n"
