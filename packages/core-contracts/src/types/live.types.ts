@@ -41,3 +41,48 @@ export type LiveSessionPageDto = {
   nextCursor?: string;
   hasMore: boolean;
 };
+
+// Livestream Channel Types
+export type LivestreamChannelDto = {
+  id: string;
+  displayName: string;
+  telegramSlug?: string;
+  language?: string;
+  isActive: boolean;
+  scholarName?: string;
+  scholarSlug?: string;
+  scholarImageUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CreateLivestreamChannelDto = {
+  telegramId: string;
+  telegramSlug?: string;
+  displayName: string;
+  language?: string;
+  scholarId?: string;
+};
+
+export type UpdateLivestreamChannelDto = {
+  telegramSlug?: string;
+  displayName?: string;
+  language?: string;
+  isActive?: boolean;
+  scholarId?: string;
+};
+
+export type CreateLiveSessionDto = {
+  channelId: string;
+  title?: string;
+  scheduledAt?: string;
+  telegramMsgId?: string;
+};
+
+export type UpdateLiveSessionDto = {
+  title?: string;
+  scheduledAt?: string;
+  status?: LiveSessionStatus;
+  telegramMsgId?: string;
+  viewerCount?: number;
+};

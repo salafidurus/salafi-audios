@@ -59,6 +59,11 @@ export {
   type LiveSessionDeltaDto,
   type LiveSessionDto,
   type LiveSessionPageDto,
+  type LivestreamChannelDto,
+  type CreateLivestreamChannelDto,
+  type UpdateLivestreamChannelDto,
+  type CreateLiveSessionDto,
+  type UpdateLiveSessionDto,
 } from "../types/live.types";
 export { type LectureProgressDto, type ProgressUpdateDto } from "../types/progress.types";
 export type {
