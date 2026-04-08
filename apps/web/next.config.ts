@@ -8,7 +8,6 @@ const nextConfig: NextConfig = {
     "@sd/core-auth",
     "@sd/core-config",
     "@sd/core-styles",
-    "@sd/feature-live",
   ],
   webpack(config) {
     // Define React Native's __DEV__ global for webpack builds

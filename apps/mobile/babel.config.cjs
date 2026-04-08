@@ -13,12 +13,10 @@ module.exports = function (api) {
           root: "src",
           autoProcessImports: [
             "@sd/shared",
-            "@sd/feature-live",
             "@sd/core-styles",
           ],
           autoProcessPaths: [
             path.resolve(__dirname, "../../packages/shared/src"),
-            path.resolve(__dirname, "../../packages/feature-live/src"),
             path.resolve(__dirname, "../../packages/core-styles/src"),
           ],
         },
