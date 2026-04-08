@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { SignUpResponsiveScreen } from "@sd/feature-auth";
+import { SignUpResponsiveScreen } from "../../../../features/auth/screens/sign-up/sign-up.screen";
 import { routes } from "@sd/core-contracts";
 
 function SignUpPageInner() {

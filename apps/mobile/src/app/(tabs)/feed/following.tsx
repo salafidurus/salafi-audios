@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useAuth } from "@sd/core-auth";
-import { FeedFollowingMobileNativeScreen } from "@sd/feature-feed";
+import { FeedFollowingMobileNativeScreen } from "../../../features/feed/screens/feed-following.screen";
 import { AuthRequiredStateMobileNative } from "../../../shared/components/AuthRequiredState/AuthRequiredState";
 import { routes } from "@sd/core-contracts";
 

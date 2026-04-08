@@ -1,0 +1,125 @@
+"use client";
+
+import { useState } from "react";
+import { authClient } from "@sd/core-auth";
+import { TextInputWeb } from "../../../../shared/components/TextInput/TextInput";
+import { GoogleSignInButton, AppleSignInButton } from "../../components/social-buttons";
+import styles from "../auth-form.module.css";
+
+type SignInDesktopScreenProps = {
+  redirectTo: string;
+  onSignInSuccess: () => void;
+  onNavigateToSignUp: () => void;
+};
+
+export function SignInDesktopScreen({
+  redirectTo,
+  onSignInSuccess,
+  onNavigateToSignUp,
+}: SignInDesktopScreenProps) {
+  const [email, setEmail] = useState("");
+  const [emailTouched, setEmailTouched] = useState(false);
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const showEmailError = emailTouched && email.length > 0 && !isEmailValid;
+  const canSubmit = isEmailValid && password.length > 0;
+
+  async function handleEmailSignIn(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    const { error: err } = await authClient.signIn.email({ email, password });
+
+    setLoading(false);
+
+    if (err) {
+      setError(err.message ?? "Sign in failed");
+      return;
+    }
+
+    onSignInSuccess();
+  }
+
+  return (
+    <main className={styles.page}>
+      <div className={styles.card}>
+        <h1 className={styles.title}>Sign In</h1>
+
+        <div className={styles.stack}>
+          <div className={styles.socialStack}>
+            <AppleSignInButton
+              onClick={() =>
+                authClient.signIn.social({ provider: "apple", callbackURL: redirectTo })
+              }
+            />
+            <GoogleSignInButton
+              onClick={() =>
+                authClient.signIn.social({ provider: "google", callbackURL: redirectTo })
+              }
+            />
+          </div>
+
+          <div className={styles.divider}>or continue with email</div>
+
+          <form onSubmit={handleEmailSignIn} className={styles.form}>
+            <div className={styles.inputGroup}>
+              <TextInputWeb
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onBlur={() => setEmailTouched(true)}
+                placeholder="Email"
+                required
+                autoComplete="email"
+                className={`${styles.input} ${showEmailError ? styles.inputError : ""}`}
+              />
+              {showEmailError && (
+                <p className={styles.errorText} role="alert">
+                  Please enter a valid email address.
+                </p>
+              )}
+            </div>
+
+            <TextInputWeb
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              required
+              autoComplete="current-password"
+              className={styles.input}
+            />
+
+            {error ? (
+              <p className={styles.errorText} role="alert">
+                {error}
+              </p>
+            ) : null}
+
+            <button type="submit" disabled={loading || !canSubmit} className={styles.submitButton}>
+              {loading ? "Signing in…" : "Sign In"}
+            </button>
+          </form>
+
+          <p className={styles.footerText}>
+            Don&apos;t have an account?{" "}
+            <a
+              href="/sign-up"
+              onClick={(e) => {
+                e.preventDefault();
+                onNavigateToSignUp();
+              }}
+              className={styles.footerLink}
+            >
+              Create one
+            </a>
+          </p>
+        </div>
+      </div>
+    </main>
+  );
+}

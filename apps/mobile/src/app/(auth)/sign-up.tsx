@@ -1,6 +1,7 @@
 import { Platform, useColorScheme } from "react-native";
 import { useRouter } from "expo-router";
-import { SignUpMobileNativeScreen, authClient } from "@sd/feature-auth";
+import { SignUpMobileNativeScreen } from "../../features/auth/screens/sign-up/sign-up.screen";
+import { authClient } from "@sd/core-auth";
 import { routes } from "@sd/core-contracts";
 
 export default function SignUpPage() {

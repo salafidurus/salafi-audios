@@ -1,0 +1,89 @@
+"use client";
+
+import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
+import { FeedContentCardWeb } from "../components/feed-content-card/feed-content-card";
+import { FeedScholarRowWeb } from "../components/feed-scholar-row/feed-scholar-row";
+import { FeedTopicRowWeb } from "../components/feed-topic-row/feed-topic-row";
+import { useFeed } from "@sd/domain-content";
+
+export type FeedDesktopWebScreenProps = {
+  onNavigateToLecture?: (slug: string) => void;
+  onNavigateToScholar?: (slug: string) => void;
+};
+
+function renderFeedItem(
+  item: FeedItemDto,
+  index: number,
+  onNavigateToLecture?: (slug: string) => void,
+  onNavigateToScholar?: (slug: string) => void,
+) {
+  switch (item.kind) {
+    case "scholar_row":
+      return (
+        <FeedScholarRowWeb
+          key={`scholar-row-${index}`}
+          scholars={item.scholars}
+          onScholarPress={onNavigateToScholar}
+        />
+      );
+    case "topic_row":
+      return (
+        <FeedTopicRowWeb
+          key={`topic-row-${index}`}
+          topicName={item.topicName}
+          items={item.items}
+          onItemPress={onNavigateToLecture}
+        />
+      );
+    default:
+      return (
+        <FeedContentCardWeb
+          key={item.id}
+          item={item as FeedContentItemDto}
+          onPress={() => onNavigateToLecture?.(item.slug)}
+        />
+      );
+  }
+}
+
+export function FeedDesktopWebScreen({
+  onNavigateToLecture,
+  onNavigateToScholar,
+}: FeedDesktopWebScreenProps) {
+  const { data, isFetching, hasNextPage, fetchNextPage } = useFeed();
+  const items = data?.pages.flatMap((p) => p.items) ?? [];
+
+  if (isFetching && items.length === 0) {
+    return <div style={{ padding: 32 }}>Loading feed...</div>;
+  }
+
+  if (items.length === 0) {
+    return <div style={{ padding: 32, color: "#666" }}>No content yet. Check back soon.</div>;
+  }
+
+  return (
+    <div style={{ maxWidth: 720, margin: "0 auto", padding: 24 }}>
+      <h2 style={{ margin: 0, fontSize: 22, marginBottom: 16 }}>Feed</h2>
+      {items.map((item, index) =>
+        renderFeedItem(item, index, onNavigateToLecture, onNavigateToScholar),
+      )}
+      {hasNextPage && (
+        <div style={{ padding: 16, textAlign: "center" }}>
+          <button
+            type="button"
+            onClick={() => fetchNextPage()}
+            style={{
+              padding: "8px 24px",
+              border: "1px solid #ccc",
+              borderRadius: 6,
+              cursor: "pointer",
+              background: "#fff",
+            }}
+          >
+            {isFetching ? "Loading..." : "Load more"}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}

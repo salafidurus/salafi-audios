@@ -9,17 +9,12 @@ Provides the low-level auth client wiring (Better Auth integration) and shared a
 ## Boundaries
 
 - **Depends on:** `better-auth`, `@better-auth/expo`, `expo-secure-store`, `@sd/core-contracts`, `@sd/design-tokens`
-- **Consumed by:** `@sd/feature-auth`, `@sd/feature-navigation`, `apps/web`, `apps/mobile`
+- **Consumed by:** `@sd/feature-navigation`, `apps/web`, `apps/mobile`
 
 ## Structure
 
-```
-src/
-├── utils/              # Auth client implementations (platform-specific)
-├── hooks/              # Auth hooks (useSession, useAuth, etc.)
-├── types/              # Package-local type definitions
-├── index.web.ts        # Web entrypoint
-└── index.native.ts     # React Native entrypoint
+```text
+
 ```
 
 ## Key Commands
@@ -31,5 +26,5 @@ src/
 
 - This package has a **real platform split**: `index.web.ts` and `index.native.ts` — do not reintroduce a plain `index.ts`.
 - Use `.web.ts` for web implementations, `.native.ts` for mobile native — don't hide platform-specific code behind generic filenames.
-- App route wrappers and auth screens do **not** belong here — those live in `@sd/feature-auth`.
+- App route wrappers and auth screens do **not** belong here — those live in app-local `features/auth/` slices.
 - All native dependencies (`better-auth`, `@better-auth/expo`, `expo-secure-store`) must be declared in this package's manifest.

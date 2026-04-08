@@ -80,7 +80,7 @@ Use the owning package `AGENT.md` and source folder for the current component in
 // apps/mobile/src/app/(auth)/sign-in.tsx
 import { Platform, useColorScheme } from "react-native";
 import { useRouter } from "expo-router";
-import { SignInScreen } from "@sd/feature-auth";
+import { SignInMobileNativeScreen } from "../../features/auth/screens/sign-in/sign-in.screen";
 import { authClient } from "@sd/core-auth";
 
 export default function SignInPage() {
@@ -121,7 +121,7 @@ export default function SignInPage() {
 
 ## Keyboard Handling
 
-`KeyboardProvider` from `react-native-keyboard-controller` is mounted in `Providers.tsx` at app root. Any screen with form inputs **must** use `KeyboardAwareScrollView` from `react-native-keyboard-controller` (not plain `ScrollView`). This is already done for the shared auth screens in `@sd/feature-auth`.
+`KeyboardProvider` from `react-native-keyboard-controller` is mounted in `Providers.tsx` at app root. Any screen with form inputs **must** use `KeyboardAwareScrollView` from `react-native-keyboard-controller` (not plain `ScrollView`). This is already done for the auth screens in `features/auth/`.
 
 ---
 

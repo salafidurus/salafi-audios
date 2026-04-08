@@ -1,6 +1,6 @@
 import type { ErrorBoundaryProps } from "expo-router";
 import { View, Text, Pressable } from "react-native";
-import { AccountMobileNativeScreen } from "@sd/feature-account";
+import { AccountMobileNativeScreen } from "../../../features/account/screens/account.screen";
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
   return (

@@ -76,7 +76,7 @@ features/<feature>/screens/<name>/
 // features/auth/screens/sign-in/sign-in.screen.tsx — responsive router
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
-import { SignInScreen as MobileSignInScreen } from "@sd/feature-auth";
+import { SignInMobileWebScreen } from "./sign-in.screen.mobile";
 import { SignInDesktopScreen } from "./sign-in.screen.desktop";
 import { useResponsive } from "@sd/shared";
 import { authClient } from "@sd/core-auth";

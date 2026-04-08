@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { SignInResponsiveScreen } from "@sd/feature-auth";
+import { SignInResponsiveScreen } from "../../../../features/auth/screens/sign-in/sign-in.screen";
 import { routes } from "@sd/core-contracts";
 
 function SignInPageInner() {

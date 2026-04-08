@@ -57,7 +57,7 @@ This directory contains the authoritative documentation for Salafi Durus.
 | `/feed/*`              | PLACEHOLDER | SUPPORTING | Feed pages exist but are early     |
 | `/library/*`           | PLACEHOLDER | SUPPORTING | Library routes exist but are early |
 | `/account/*`           | PLACEHOLDER | SUPPORTING | Account routes exist but are early |
-| `/sign-in`, `/sign-up` | IMPLEMENTED | SUPPORTING | Using `@sd/feature-auth`           |
+| `/sign-in`, `/sign-up` | IMPLEMENTED | SUPPORTING | App-local `features/auth/` slices  |
 
 ### Mobile (apps/mobile)
 
