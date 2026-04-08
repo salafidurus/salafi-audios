@@ -81,25 +81,53 @@ Before editing agent instructions or skills:
 ## Repo layout
 
 - `apps/api` - authoritative backend core
-- `apps/web` - public/admin web client
-- `apps/mobile` - offline-first mobile client
-- `packages/*` - shared libraries and configs
+- `apps/web` - public/admin web client (Next.js, CSS-responsive — no React Native Web)
+- `apps/mobile` - offline-first native client (iOS + Android — no Expo Web)
+- `packages/*` - shared libraries: core infra, domain state, design tokens, cross-app utilities
 - `docs/` - product + implementation authority
 
-### Package Map
+### App source structure
+
+Both apps follow this layout:
+
+```text
+src/
+  app/        ← routing ONLY — imports screen components from ../features or ../shared
+  features/   ← one folder per feature; each owns components, hooks, screens, utils
+  shared/     ← components and hooks used across 2+ features within this app
+```
+
+### Platform file extensions
+
+Mobile (`apps/mobile`):
+
+- `.tsx` — base native component (iOS + Android)
+- `.ios.tsx` — iOS-only override (only when behavior truly diverges)
+- `.android.tsx` — Android-only override (only when behavior truly diverges)
+
+Web (`apps/web`):
+
+- `.tsx` — base component, fully responsive via CSS (default)
+- `.desktop.tsx` — desktop-only layout variant (only when truly needed)
+- `.mobile.tsx` — mobile-web layout variant (only when truly needed)
+
+### Package map
 
 - `packages/core-db` - Database schema and client
 - `packages/core-env` - Environment variable schemas
 - `packages/core-i18n` - Internationalization config and keys
 - `packages/core-contracts` - Shared TypeScript contracts (DTOs, types, query hooks)
 - `packages/design-tokens` - Design tokens (colors, spacing, radius, typography) — authoritative source
-- `packages/shared` - Shared UI primitives, hooks, and generic utilities
+- `packages/shared` - Cross-app utilities only (no platform-specific UI primitives)
 - `packages/core-*` - Shared platform infrastructure (auth, API, config, styling)
-- `packages/feature-*` - Domain feature packages with platform-specific UI and data wiring
+- `packages/domain-content` - Lectures, scholars, series, feed, library data hooks
+- `packages/domain-account` - User profile and auth state hooks
+- `packages/domain-live` - Live session and channel hooks
+- `packages/domain-playback` - Playback engine and player state
+- `packages/domain-progress` - Progress tracking state
+- `packages/domain-search` - Search and quick-browse hooks
 - `packages/util-config` - Shared lint/build config
 - `packages/util-ingest` - Content ingestion
-
-**Note:** `apps/web` transpiles the new `@sd/shared`, `@sd/core-*`, and `@sd/feature-*` packages directly in `next.config.ts`.
 
 ## Commands (root)
 
@@ -129,7 +157,7 @@ Before editing agent instructions or skills:
 - Design tokens: `pnpm --filter design-tokens <script>`
 - Shared UI: `pnpm --filter @sd/shared <script>`
 - Core packages: `pnpm --filter @sd/core-* <script>`
-- Feature packages: `pnpm --filter @sd/feature-* <script>`
+- Domain packages: `pnpm --filter @sd/domain-* <script>`
 - Config: `pnpm --filter util-config <script>`
 - Ingest: `pnpm --filter util-ingest <script>`
 
@@ -201,20 +229,53 @@ All AGENT.md and documentation files are linted with markdownlint. Two rules are
 
 ## TDD policy
 
-This repo follows Test-Driven Development. The rule is non-negotiable:
+This repo follows strict Test-Driven Development. **No exceptions.**
 
-**Write a failing test before writing implementation.** No exceptions for new service methods, store actions, utility functions, or auth boundaries.
+### The workflow (non-negotiable)
+
+1. Write the failing test — describe the behavior, not the implementation.
+2. Run it: confirm it fails with the expected error, not a setup error.
+3. Write the minimal code to make it pass.
+4. Run it again: confirm it passes.
+5. Run all tests: confirm nothing else broke.
+6. Commit: test and implementation in the same commit.
 
 ### What to test
 
-| Layer                                                                          | Test type                        | Where                                                    |
-| ------------------------------------------------------------------------------ | -------------------------------- | -------------------------------------------------------- |
-| API service methods (domain invariants, NotFoundException, status transitions) | Unit — mock the repo             | `apps/api/src/modules/<module>/<module>.service.spec.ts` |
-| Auth guard and permission checks                                               | Unit + Integration               | `apps/api/src/modules/auth/`                             |
-| Domain store actions (Zustand)                                                 | Unit — reset store between tests | `packages/domain-*/src/**/*.spec.ts`                     |
-| Pure utility / helper functions                                                | Unit                             | co-located `.spec.ts` next to the source file            |
-| Route/contract smoke tests                                                     | Unit                             | `packages/core-contracts/src/routes.spec.ts`             |
-| Critical user flows (auth redirect, public page load)                          | E2E — Playwright                 | `apps/web/e2e/`                                          |
+Test everything: screens, components, hooks, utils, stores, guards, services.
+The only exceptions are:
+
+- Framework-provided behavior (NestJS DI wiring, Expo Router navigation internals).
+- Third-party library internals.
+- Generated code artifacts.
+
+Testing everything prevents duplication — you will not write the same test twice if
+everything is already covered.
+
+### Test placement
+
+| Location                                   | Test file                     |
+| ------------------------------------------ | ----------------------------- |
+| `apps/mobile/src/features/<f>/screens/`    | co-located `.spec.tsx`        |
+| `apps/mobile/src/features/<f>/components/` | co-located `.spec.tsx`        |
+| `apps/mobile/src/features/<f>/hooks/`      | co-located `.spec.ts`         |
+| `apps/web/src/features/<f>/screens/`       | co-located `.spec.tsx`        |
+| `apps/web/src/features/<f>/components/`    | co-located `.spec.tsx`        |
+| `apps/web/src/features/<f>/hooks/`         | co-located `.spec.ts`         |
+| `apps/mobile/src/shared/`                  | co-located `.spec.tsx`        |
+| `apps/web/src/shared/`                     | co-located `.spec.tsx`        |
+| `packages/domain-*/src/`                   | co-located `.spec.ts`         |
+| `apps/api/src/modules/<m>/`                | co-located `.service.spec.ts` |
+
+### Running tests
+
+- All: `pnpm test`
+- Mobile only: `pnpm --filter mobile test`
+- Web only: `pnpm --filter web test`
+- API only: `pnpm --filter api test`
+- Single file: `pnpm --filter mobile test -- src/features/feed/screens/feed.screen.spec.tsx`
+- Watch: `pnpm --filter api test:watch -- src/modules/scholars/scholars.service.spec.ts`
+- E2E: `pnpm test:e2e`
 
 ### What NOT to test
 
@@ -222,27 +283,6 @@ This repo follows Test-Driven Development. The rule is non-negotiable:
 - Trivial getters, setters, or passthrough methods.
 - Framework-provided behavior (NestJS DI wiring, Expo Router navigation).
 - Third-party library internals.
-
-### TDD workflow
-
-```text
-Red → Green → Commit (test + impl together)
-```
-
-1. Write the failing test — describe the behavior, not the implementation.
-2. Run it: confirm it fails with the expected error, not a setup error.
-3. Write the minimal code to make it pass.
-4. Run again: confirm it passes.
-5. Commit: test and implementation in the same commit.
-
-**Bug fixes always start with a failing test** that reproduces the bug. The test is the regression guard.
-
-### Test file placement
-
-- API: `apps/api/src/modules/<module>/<module>.service.spec.ts` (co-located)
-- Web E2E: `apps/web/e2e/<flow>.spec.ts`
-- Packages: co-located `.spec.ts` next to the source file being tested
-- Integration tests: `apps/api/src/modules/<module>/<module>.integration.spec.ts`
 
 ### Coverage targets (minimum)
 
@@ -252,14 +292,6 @@ Red → Green → Commit (test + impl together)
 | Auth/permission boundaries | Every endpoint category (public, auth, admin) covered |
 | Domain store actions       | All actions in `domain-*/src/store/*.store.ts`        |
 | Route constants            | `routes.spec.ts` smoke test exists                    |
-
-### Running tests
-
-- All: `pnpm test`
-- API only: `pnpm --filter api test`
-- Single file: `pnpm --filter api test -- src/modules/scholars/scholars.service.spec.ts`
-- Watch: `pnpm --filter api test:watch -- src/modules/scholars/scholars.service.spec.ts`
-- E2E: `pnpm test:e2e`
 
 ## Quality and style
 
