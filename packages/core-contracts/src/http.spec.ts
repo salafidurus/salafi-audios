@@ -52,10 +52,11 @@ describe("httpClient – unconfigured", () => {
   });
 
   it("throws when called before configureApiClient", async () => {
-    // Use jest.isolateModules + require to get a fresh module with config = null
+    // Use isolated module loading so config is reset to null for this test only.
     let fresh: typeof httpClient;
-    jest.isolateModules(() => {
-      fresh = require("./http").httpClient;
+    await jest.isolateModulesAsync(async () => {
+      const httpModule = await import("./http");
+      fresh = httpModule.httpClient;
     });
     await expect(fresh!({ url: "/test", method: "GET" })).rejects.toThrow(/not configured/i);
   });
