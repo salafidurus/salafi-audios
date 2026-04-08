@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Body, Query, Put } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Put } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CurrentUser } from '../../modules/auth/decorators';

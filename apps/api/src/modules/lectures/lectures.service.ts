@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import type { LectureDetailDto, RelatedLectureDto, AdminLectureUpdateDto, AdminLectureActionDto } from '@sd/core-contracts';
 import { Status } from '@sd/core-db';
 import { LecturesRepository } from './lectures.repo';
