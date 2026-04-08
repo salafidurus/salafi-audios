@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { ScholarDetailResponsiveScreen } from "@sd/feature-scholar";
+import { ScholarDetailResponsiveScreen } from "../../../../features/scholar/screens/scholar-detail/scholar-detail.screen";
 
 export default function ScholarPage() {
   const params = useParams<{ slug: string }>();

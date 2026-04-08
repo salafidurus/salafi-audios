@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { LectureDetailResponsiveScreen } from "@sd/feature-lecture";
+import { LectureDetailResponsiveScreen } from "../../../../features/lecture/screens/lecture-detail/lecture-detail.screen";
 
 export default function LectureDetailPage() {
   const params = useParams<{ id: string }>();

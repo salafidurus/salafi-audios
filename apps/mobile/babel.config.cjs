@@ -14,14 +14,12 @@ module.exports = function (api) {
           autoProcessImports: [
             "@sd/shared",
             "@sd/feature-search",
-            "@sd/feature-library",
             "@sd/feature-live",
             "@sd/core-styles",
           ],
           autoProcessPaths: [
             path.resolve(__dirname, "../../packages/shared/src"),
             path.resolve(__dirname, "../../packages/feature-search/src"),
-            path.resolve(__dirname, "../../packages/feature-library/src"),
             path.resolve(__dirname, "../../packages/feature-live/src"),
             path.resolve(__dirname, "../../packages/core-styles/src"),
           ],

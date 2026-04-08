@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { useAuth } from "@sd/core-auth";
-import { LibraryCompletedMobileNativeScreen } from "@sd/feature-library";
+import { LibraryCompletedMobileNativeScreen } from "../../../features/library/screens/library-completed.screen";
 import { AuthRequiredStateMobileNative } from "../../../shared/components/AuthRequiredState/AuthRequiredState";
 import { routes } from "@sd/core-contracts";
 

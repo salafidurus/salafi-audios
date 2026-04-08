@@ -9,7 +9,6 @@ const nextConfig: NextConfig = {
     "@sd/core-config",
     "@sd/core-styles",
     "@sd/feature-search",
-    "@sd/feature-library",
     "@sd/feature-live",
   ],
   webpack(config) {
