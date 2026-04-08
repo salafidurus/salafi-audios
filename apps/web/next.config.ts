@@ -8,7 +8,6 @@ const nextConfig: NextConfig = {
     "@sd/core-auth",
     "@sd/core-config",
     "@sd/core-styles",
-    "@sd/feature-search",
     "@sd/feature-live",
   ],
   webpack(config) {

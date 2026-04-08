@@ -1,7 +1,7 @@
 import type { ErrorBoundaryProps } from "expo-router";
 import { useRouter } from "expo-router";
 import { View, Text, Pressable } from "react-native";
-import { SearchHomeMobileNativeScreen } from "@sd/feature-search";
+import { SearchHomeMobileNativeScreen } from "../../../../features/search/screens/search-home/search-home.screen";
 import { routes } from "@sd/core-contracts";
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {

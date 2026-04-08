@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { SearchProcessingResponsiveScreen } from "@sd/feature-search";
+import { SearchProcessingResponsiveScreen } from "../../../../../features/search/screens/search-processing/search-processing.screen";
 
 function SearchPageInner() {
   const router = useRouter();

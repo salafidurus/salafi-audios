@@ -1,7 +1,7 @@
 import { View } from "react-native";
 import { Tabs } from "expo-router";
 import { CustomTabBarMobileNative } from "../../features/navigation/components/CustomTabBar/CustomTabBar";
-import { MiniPlayerNative } from "@sd/feature-playback";
+import { MiniPlayerNative } from "../../features/playback/components/mini-player/mini-player";
 import { ComponentErrorBoundary } from "../../shared/components/error-boundary/ComponentErrorBoundary";
 
 export default function TabsLayout() {

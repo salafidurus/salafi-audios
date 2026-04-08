@@ -28,8 +28,6 @@
     "@sd/domain-content": "workspace:*",
     "@sd/feature-admin": "workspace:*",
     "@sd/feature-live": "workspace:*",
-    "@sd/feature-playback": "workspace:*",
-    "@sd/feature-search": "workspace:*",
     "@sd/shared": "workspace:*",
     "@sd/core-i18n": "workspace:*",
     "clsx": "^2.1.1",
