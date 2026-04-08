@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { useAuth } from "@sd/core-auth";
 import { AccountProfileMobileNativeScreen } from "@sd/feature-account";
-import { AuthRequiredStateMobileNative } from "@sd/shared";
+import { AuthRequiredStateMobileNative } from "../../../shared/components/AuthRequiredState/AuthRequiredState";
 import { routes } from "@sd/core-contracts";
 
 export default function AccountProfile() {

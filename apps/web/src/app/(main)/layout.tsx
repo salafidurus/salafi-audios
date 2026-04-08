@@ -1,6 +1,6 @@
 import { Footer, Sidebar, TopAuthStrip } from "@sd/feature-navigation";
 import { MiniPlayerWeb } from "@sd/feature-playback";
-import { ComponentErrorBoundary } from "@sd/shared";
+import { ComponentErrorBoundary } from "../../../shared/components/error-boundary/ComponentErrorBoundary";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
