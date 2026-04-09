@@ -1,11 +1,11 @@
 {
-  "extends": "../util-config/tsconfig/packages.json",
+  // util-ingest runs directly in Node.js — use NodeNext for correct CJS/ESM interop
+  "extends": "../util-config/tsconfig/base.json",
   "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "noEmit": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "types": ["node", "jest"],
-    "moduleSuffixes": [".desktop.web", ".mobile.web", ".native", ".web", ""]
+    "types": ["node", "jest"]
   },
   "include": ["src"]
 }
