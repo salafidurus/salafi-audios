@@ -8,13 +8,12 @@ Owns the authoritative data model via Prisma schema and provides the generated `
 
 ## Boundaries
 
-- **Depends on:** `@prisma/client`, `@sd/core-env` (dev), `prisma` (dev)
+- **Depends on:** `@prisma/client`, `prisma` (dev)
 - **Consumed by:** `apps/api`
 
 ## Structure
 
-```
-prisma/
+```text
 ├── schema.prisma       # Authoritative data model
 ├── migrations/         # Ordered migration files
 └── prisma.config.ts    # Prisma configuration

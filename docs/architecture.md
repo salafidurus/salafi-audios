@@ -33,11 +33,11 @@ The monorepo exists because the web app, mobile app, and backend are one coordin
 ### Package Roles
 
 - **`@sd/shared`**: generic cross-app utilities (no platform-specific UI primitives).
-- **`@sd/core-*`**: cross-cutting infrastructure such as auth and API. Note: `core-styles` and `core-config` have been dissolved — styling bootstrap and environment config now live in each app's `src/core/` directory.
+- **`@sd/core-*`**: cross-cutting infrastructure such as auth and API. Note: `core-styles`, `core-config`, and `core-env` have been dissolved — styling bootstrap, environment config, and env validation now live in each app's `src/core/` directory (or the consuming package's `src/env.ts`).
 - **`@sd/domain-*`**: shared data and state hooks organized by bounded context (`domain-content`, `domain-account`, `domain-live`, `domain-playback`, `domain-progress`, `domain-search`).
 - **`@sd/core-contracts`**: shared public API contracts and query helpers.
 - **`@sd/core-db`**: schema, migrations, and generated database client.
-- **`@sd/core-env`**: environment parsing and validation.
+- **`@sd/core-env`**: ~~environment parsing and validation~~ dissolved — each consumer owns its local `env.ts`.
 - **`@sd/design-tokens`**: authoritative visual tokens.
 
 ## 4. Dependency and Boundary Rules

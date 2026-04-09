@@ -4,7 +4,6 @@ const buildTargets = [
   // Keep postinstall minimal for EAS and local fresh installs.
   // Only build the workspace packages that must exist as install-time
   // prerequisites for downstream package resolution.
-  "@sd/core-env",
   "@sd/design-tokens",
 ];
 

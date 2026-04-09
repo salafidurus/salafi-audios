@@ -43,7 +43,6 @@
   },
   "devDependencies": {
     "@sd/util-config": "workspace:*",
-    "@sd/core-env": "workspace:*",
     "prisma": "^7.3.0",
     "pg": "^8.0.0",
     "@types/jest": "^30.0.0",

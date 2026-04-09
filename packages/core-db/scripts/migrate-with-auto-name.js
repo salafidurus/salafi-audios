@@ -1,7 +1,7 @@
 import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { getDbEnv } from "@sd/core-env";
+import { getDbEnv } from "./db-env.js";
 import { loadDbEnvFiles } from "./load-db-env.js";
 
 const __filename = fileURLToPath(import.meta.url);

@@ -1,10 +1,9 @@
-// packages/core-env/src/db.ts
 import { z } from "zod";
 
 const DbEnvSchema = z.object({
-  DATABASE_URL: z.string().url(), // MUST be direct Neon URL for migrations
-  DIRECT_DB_URL: z.string().url().optional(), // runtime apps can use this
-  SHADOW_DATABASE_URL: z.string().url().optional(), // only needed if prisma demands shadow db
+  DATABASE_URL: z.string().url(),
+  DIRECT_DB_URL: z.string().url().optional(),
+  SHADOW_DATABASE_URL: z.string().url().optional(),
 });
 
 export type DbEnv = z.infer<typeof DbEnvSchema>;

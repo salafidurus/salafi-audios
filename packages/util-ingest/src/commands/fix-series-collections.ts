@@ -1,6 +1,6 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient, Status } from "@sd/core-db";
-import { getDbEnv } from "@sd/core-env";
+import { getDbEnv } from "../env";
 import { DryRunRollbackError } from "../core/errors";
 import { bootstrapEnv } from "../shared/env.bootstrap";
 

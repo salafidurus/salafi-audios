@@ -1,5 +1,31 @@
 import Constants from "expo-constants";
-import { parseMobileRuntimeExtra } from "@sd/core-env";
+import { z } from "zod";
+import { AppEnvSchema } from "./build-env";
+
+const MobileRuntimeExtraSchema = z.object({
+  appEnv: AppEnvSchema,
+  apiUrl: z.string().url(),
+  sentryDsn: z.string().url().optional(),
+  sentryOrg: z.string().optional(),
+  sentryProject: z.string().optional(),
+  vexoProjectId: z.string().optional(),
+});
+
+export type MobileRuntimeExtra = z.infer<typeof MobileRuntimeExtraSchema>;
+
+function parseMobileRuntimeExtra(extra: unknown): MobileRuntimeExtra {
+  const parsed = MobileRuntimeExtraSchema.safeParse(extra);
+  if (!parsed.success) {
+    throw new Error(
+      [
+        "Invalid MOBILE runtime extra.",
+        "Make sure app.config.ts sets extra.appEnv and extra.apiUrl correctly.",
+        parsed.error.message,
+      ].join("\n"),
+    );
+  }
+  return parsed.data;
+}
 
 type ConstantsWithLegacyManifests = typeof Constants & {
   manifest?: {
