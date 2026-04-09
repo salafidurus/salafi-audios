@@ -7,38 +7,24 @@ import {
 } from "./topic-sync";
 import { TopicDef } from "../schema/content-schema";
 
-type MockTopicDelegate = Pick<Prisma.TransactionClient["topic"], "upsert">;
-type MockCollectionTopicDelegate = Pick<
-  Prisma.TransactionClient["collectionTopic"],
-  "deleteMany" | "createMany"
->;
-type MockSeriesTopicDelegate = Pick<
-  Prisma.TransactionClient["seriesTopic"],
-  "deleteMany" | "createMany"
->;
-type MockLectureTopicDelegate = Pick<
-  Prisma.TransactionClient["lectureTopic"],
-  "deleteMany" | "createMany"
->;
-
 // Mock transaction client
 const createMockTx = () => {
   const mockTx: Partial<Prisma.TransactionClient> = {
     topic: {
       upsert: jest.fn(),
-    } as MockTopicDelegate,
+    } as unknown as Prisma.TransactionClient["topic"],
     collectionTopic: {
       deleteMany: jest.fn(),
       createMany: jest.fn(),
-    } as MockCollectionTopicDelegate,
+    } as unknown as Prisma.TransactionClient["collectionTopic"],
     seriesTopic: {
       deleteMany: jest.fn(),
       createMany: jest.fn(),
-    } as MockSeriesTopicDelegate,
+    } as unknown as Prisma.TransactionClient["seriesTopic"],
     lectureTopic: {
       deleteMany: jest.fn(),
       createMany: jest.fn(),
-    } as MockLectureTopicDelegate,
+    } as unknown as Prisma.TransactionClient["lectureTopic"],
   };
   return mockTx as Prisma.TransactionClient;
 };
