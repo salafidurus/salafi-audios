@@ -1,3 +1,5 @@
+export const domainLiveVersion = "0.0.1";
+
 export { useLiveActive, useLiveScheduled, useLiveEnded } from "./live.api";
 export { useLiveSection } from "./use-live-section";
 export { useActiveSession } from "./use-active-session";
