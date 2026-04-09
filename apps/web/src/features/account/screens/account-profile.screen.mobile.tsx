@@ -28,7 +28,7 @@ export function AccountProfileMobileWebScreen({ onBack }: AccountProfileMobileWe
             border: "none",
             cursor: "pointer",
             fontSize: 13,
-            color: "#2563eb",
+            color: "var(--action-primary)",
             marginBottom: 12,
           }}
         >
@@ -45,7 +45,7 @@ export function AccountProfileMobileWebScreen({ onBack }: AccountProfileMobileWe
             placeholder="Your display name"
             style={{
               padding: "8px 10px",
-              border: "1px solid #d4d4d4",
+              border: "1px solid var(--border-default)",
               borderRadius: 6,
               fontSize: 14,
             }}
@@ -59,10 +59,10 @@ export function AccountProfileMobileWebScreen({ onBack }: AccountProfileMobileWe
             disabled
             style={{
               padding: "8px 10px",
-              border: "1px solid #d4d4d4",
+              border: "1px solid var(--border-default)",
               borderRadius: 6,
               fontSize: 14,
-              background: "#f5f5f5",
+              background: "var(--surface-subtle)",
             }}
           />
         </label>

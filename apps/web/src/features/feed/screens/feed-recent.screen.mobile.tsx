@@ -49,7 +49,11 @@ export function FeedMobileWebScreen({
   }
 
   if (items.length === 0) {
-    return <div style={{ padding: 16, color: "#666" }}>No content yet. Check back soon.</div>;
+    return (
+      <div style={{ padding: 16, color: "var(--content-muted)" }}>
+        No content yet. Check back soon.
+      </div>
+    );
   }
 
   return (
@@ -63,10 +67,10 @@ export function FeedMobileWebScreen({
             onClick={() => fetchNextPage()}
             style={{
               padding: "8px 20px",
-              border: "1px solid #ccc",
+              border: "1px solid var(--border-default)",
               borderRadius: 6,
               cursor: "pointer",
-              background: "#fff",
+              background: "var(--surface-default)",
             }}
           >
             {isFetching ? "Loading..." : "Load more"}

@@ -14,7 +14,7 @@ export function FeedScholarRowWeb({ scholars, onScholarPress }: FeedScholarRowWe
         style={{
           fontSize: 14,
           fontWeight: 600,
-          color: "#333",
+          color: "var(--content-strong)",
           marginBottom: 8,
           paddingLeft: 4,
         }}
@@ -49,7 +49,7 @@ export function FeedScholarRowWeb({ scholars, onScholarPress }: FeedScholarRowWe
                 width: 48,
                 height: 48,
                 borderRadius: 24,
-                backgroundColor: "#e0e0e0",
+                backgroundColor: "var(--surface-hover)",
                 marginBottom: 4,
                 overflow: "hidden",
               }}
@@ -65,7 +65,7 @@ export function FeedScholarRowWeb({ scholars, onScholarPress }: FeedScholarRowWe
             <div
               style={{
                 fontSize: 11,
-                color: "#555",
+                color: "var(--content-default)",
                 textAlign: "center",
                 maxWidth: 72,
                 overflow: "hidden",

@@ -19,7 +19,7 @@ export function FeedTopicRowWeb({ topicName, items, onItemPress }: FeedTopicRowW
           marginBottom: 12,
           fontSize: 16,
           fontWeight: 600,
-          color: "#333",
+          color: "var(--content-strong)",
         }}
       >
         New in {topicName}
@@ -39,15 +39,15 @@ export function FeedTopicRowWeb({ topicName, items, onItemPress }: FeedTopicRowW
             style={{
               minWidth: 200,
               padding: 12,
-              border: "1px solid #e0e0e0",
+              border: "1px solid var(--border-default)",
               borderRadius: 8,
-              backgroundColor: "#fff",
+              backgroundColor: "var(--surface-default)",
               cursor: "pointer",
               transition: "box-shadow 0.2s ease",
             }}
             onClick={() => onItemPress?.(item.slug)}
             onMouseOver={(e) => {
-              e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.1)";
+              e.currentTarget.style.boxShadow = "var(--shadow-sm)";
             }}
             onMouseOut={(e) => {
               e.currentTarget.style.boxShadow = "none";
@@ -69,14 +69,14 @@ export function FeedTopicRowWeb({ topicName, items, onItemPress }: FeedTopicRowW
             <div
               style={{
                 fontSize: 12,
-                color: "#666",
+                color: "var(--content-muted)",
                 marginBottom: 4,
               }}
             >
               {item.scholarName}
             </div>
             {item.durationSeconds && (
-              <div style={{ fontSize: 11, color: "#999" }}>
+              <div style={{ fontSize: 11, color: "var(--content-subtle)" }}>
                 {Math.floor(item.durationSeconds / 60)}m
               </div>
             )}

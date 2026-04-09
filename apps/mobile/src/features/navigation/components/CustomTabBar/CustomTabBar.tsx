@@ -130,7 +130,7 @@ const styles = StyleSheet.create((theme) => ({
     paddingTop: theme.spacing.scale.sm,
     borderRadius: theme.radius.component.panel,
     backgroundColor: theme.colors.surface.elevated,
-    boxShadow: "0 16px 32px rgba(15, 23, 42, 0.16)",
+    ...theme.shadows.elevated,
     borderWidth: 1,
     borderColor: theme.colors.border.subtle,
   },

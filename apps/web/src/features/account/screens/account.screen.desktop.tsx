@@ -34,7 +34,7 @@ export function AccountDesktopWebScreen({
             )}
             <div>
               <div style={{ fontSize: 18, fontWeight: 600 }}>{profile.displayName || "User"}</div>
-              <div style={{ fontSize: 14, color: "#666" }}>{profile.email}</div>
+              <div style={{ fontSize: 14, color: "var(--content-muted)" }}>{profile.email}</div>
             </div>
           </div>
         </div>
@@ -46,9 +46,9 @@ export function AccountDesktopWebScreen({
           style={{
             padding: "12px 16px",
             textAlign: "left",
-            border: "1px solid #e5e5e5",
+            border: "1px solid var(--border-default)",
             borderRadius: 8,
-            background: "#fff",
+            background: "var(--surface-default)",
             cursor: "pointer",
             fontSize: 15,
           }}
@@ -61,9 +61,9 @@ export function AccountDesktopWebScreen({
           style={{
             padding: "12px 16px",
             textAlign: "left",
-            border: "1px solid #e5e5e5",
+            border: "1px solid var(--border-default)",
             borderRadius: 8,
-            background: "#fff",
+            background: "var(--surface-default)",
             cursor: "pointer",
             fontSize: 15,
           }}
@@ -76,12 +76,12 @@ export function AccountDesktopWebScreen({
           style={{
             padding: "12px 16px",
             textAlign: "left",
-            border: "1px solid #e5e5e5",
+            border: "1px solid var(--border-default)",
             borderRadius: 8,
-            background: "#fff",
+            background: "var(--surface-default)",
             cursor: "pointer",
             fontSize: 15,
-            color: "#dc2626",
+            color: "var(--action-danger)",
           }}
         >
           Sign Out

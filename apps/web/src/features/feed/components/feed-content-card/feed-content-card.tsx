@@ -16,16 +16,16 @@ export function FeedContentCardWeb({ item, onPress }: FeedContentCardWebProps) {
       onKeyDown={(e) => e.key === "Enter" && onPress?.()}
       style={{
         padding: 16,
-        borderBottom: "1px solid #eee",
+        borderBottom: "1px solid var(--border-subtle)",
         cursor: "pointer",
       }}
     >
       <div style={{ fontSize: 16, fontWeight: 600 }}>{item.title}</div>
-      <div style={{ fontSize: 13, color: "#666", marginTop: 4 }}>
+      <div style={{ fontSize: 13, color: "var(--content-muted)", marginTop: 4 }}>
         {item.scholarName}
         {item.kind !== "lecture" && ` · ${item.kind}`}
       </div>
-      <div style={{ fontSize: 12, color: "#999", marginTop: 4 }}>
+      <div style={{ fontSize: 12, color: "var(--content-subtle)", marginTop: 4 }}>
         {item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""}
         {item.publishedAt && ` · ${new Date(item.publishedAt).toLocaleDateString()}`}
       </div>

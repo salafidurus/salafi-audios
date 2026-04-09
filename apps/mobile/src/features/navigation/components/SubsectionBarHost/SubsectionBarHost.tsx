@@ -103,7 +103,7 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.surface.elevated,
     borderWidth: 1,
     borderColor: theme.colors.border.subtle,
-    boxShadow: "0 12px 24px rgba(15, 23, 42, 0.12)",
+    ...theme.shadows.lg,
   },
   itemPressable: {
     flex: 1,

@@ -58,7 +58,11 @@ export function FeedDesktopWebScreen({
   }
 
   if (items.length === 0) {
-    return <div style={{ padding: 32, color: "#666" }}>No content yet. Check back soon.</div>;
+    return (
+      <div style={{ padding: 32, color: "var(--content-muted)" }}>
+        No content yet. Check back soon.
+      </div>
+    );
   }
 
   return (
@@ -74,10 +78,10 @@ export function FeedDesktopWebScreen({
             onClick={() => fetchNextPage()}
             style={{
               padding: "8px 24px",
-              border: "1px solid #ccc",
+              border: "1px solid var(--border-default)",
               borderRadius: 6,
               cursor: "pointer",
-              background: "#fff",
+              background: "var(--surface-default)",
             }}
           >
             {isFetching ? "Loading..." : "Load more"}

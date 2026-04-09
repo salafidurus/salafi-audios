@@ -28,7 +28,7 @@ export function AccountProfileDesktopWebScreen({ onBack }: AccountProfileDesktop
             border: "none",
             cursor: "pointer",
             fontSize: 14,
-            color: "#2563eb",
+            color: "var(--action-primary)",
             marginBottom: 16,
           }}
         >
@@ -45,7 +45,7 @@ export function AccountProfileDesktopWebScreen({ onBack }: AccountProfileDesktop
             placeholder="Your display name"
             style={{
               padding: "8px 12px",
-              border: "1px solid #d4d4d4",
+              border: "1px solid var(--border-default)",
               borderRadius: 6,
               fontSize: 15,
             }}
@@ -59,10 +59,10 @@ export function AccountProfileDesktopWebScreen({ onBack }: AccountProfileDesktop
             disabled
             style={{
               padding: "8px 12px",
-              border: "1px solid #d4d4d4",
+              border: "1px solid var(--border-default)",
               borderRadius: 6,
               fontSize: 15,
-              background: "#f5f5f5",
+              background: "var(--surface-subtle)",
             }}
           />
         </label>

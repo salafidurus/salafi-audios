@@ -50,7 +50,7 @@ export function FeedFollowingMobileWebScreen({
 
   if (items.length === 0) {
     return (
-      <div style={{ padding: 16, color: "#666" }}>
+      <div style={{ padding: 16, color: "var(--content-muted)" }}>
         Follow scholars to see their latest lectures here.
       </div>
     );
@@ -67,10 +67,10 @@ export function FeedFollowingMobileWebScreen({
             onClick={() => fetchNextPage()}
             style={{
               padding: "8px 20px",
-              border: "1px solid #ccc",
+              border: "1px solid var(--border-default)",
               borderRadius: 6,
               cursor: "pointer",
-              background: "#fff",
+              background: "var(--surface-default)",
             }}
           >
             {isFetching ? "Loading..." : "Load more"}

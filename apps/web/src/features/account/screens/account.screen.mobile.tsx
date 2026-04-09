@@ -33,7 +33,7 @@ export function AccountMobileWebScreen({
           )}
           <div>
             <div style={{ fontSize: 16, fontWeight: 600 }}>{profile.displayName || "User"}</div>
-            <div style={{ fontSize: 13, color: "#666" }}>{profile.email}</div>
+            <div style={{ fontSize: 13, color: "var(--content-muted)" }}>{profile.email}</div>
           </div>
         </div>
       )}
@@ -44,9 +44,9 @@ export function AccountMobileWebScreen({
           style={{
             padding: "10px 14px",
             textAlign: "left",
-            border: "1px solid #e5e5e5",
+            border: "1px solid var(--border-default)",
             borderRadius: 8,
-            background: "#fff",
+            background: "var(--surface-default)",
             cursor: "pointer",
             fontSize: 14,
           }}
@@ -59,9 +59,9 @@ export function AccountMobileWebScreen({
           style={{
             padding: "10px 14px",
             textAlign: "left",
-            border: "1px solid #e5e5e5",
+            border: "1px solid var(--border-default)",
             borderRadius: 8,
-            background: "#fff",
+            background: "var(--surface-default)",
             cursor: "pointer",
             fontSize: 14,
           }}
@@ -74,12 +74,12 @@ export function AccountMobileWebScreen({
           style={{
             padding: "10px 14px",
             textAlign: "left",
-            border: "1px solid #e5e5e5",
+            border: "1px solid var(--border-default)",
             borderRadius: 8,
-            background: "#fff",
+            background: "var(--surface-default)",
             cursor: "pointer",
             fontSize: 14,
-            color: "#dc2626",
+            color: "var(--action-danger)",
           }}
         >
           Sign Out
