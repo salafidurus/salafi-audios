@@ -36,6 +36,10 @@
   - `packages/design-tokens/src/recipes/native.ts`
   - `packages/design-tokens/src/theme/web.ts` (with recipe projections)
   - `packages/design-tokens/src/theme/native.ts` (with recipe projections)
+- **Stage 0 — Cross-platform UI color integration — complete** ✅:
+  - `packages/design-tokens` exports `createAccentRecipesWeb` + `createAccentRecipesNative`
+  - `apps/web/src/app/theme-css.ts` is a pure projector — all CSS vars emitted from recipes
+  - Feature color audit done — all ad hoc hex/rgba replaced with CSS vars / theme tokens
 - `AccentGradientFill` web + native — in `apps/web/src/shared/` and `apps/mobile/src/shared/`
 - Button primary variant web + native — in `apps/web/src/shared/` and `apps/mobile/src/shared/`
 - API service specs: auth guard, topics, search utils, scholars, library, admin-permissions,
@@ -43,17 +47,12 @@
 
 ## Blocked / Uncertain
 
-- Stage 0 partial: `apps/web/src/app/theme-css.ts` still computes `chromeSurface`,
-  `chromeSurfaceStrong`, `chromeBorder`, `chromeBorderStrong`, `hoverAccentSurface`,
-  `screenWashPrimary`, `screenWashSecondary`, `screenWashMixed` locally — must be projected
-  from design-token recipes. See cross-platform UI color plan for full detail.
-- Missing recipes: `selectedSurface`, `selectedContent`, `secondarySupportingBadge`,
-  `mixedPromotedPanel` — see Stage 0.
+- None currently identified.
 
 ## Immediate Next Step
 
-Complete Stage 0: add missing recipes and refactor `theme-css.ts` to be a pure projector.
-Full detail in `2026-04-07-cross-platform-ui-color-integration-plan.md`.
+Stage 0 complete. See `.agents/plans/completed/2026-04-07-cross-platform-ui-color-integration-plan.md`
+for the full record. Next: proceed with remaining feature implementation phases.
 
 ---
 

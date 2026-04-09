@@ -1,7 +1,7 @@
 # Metadata
 
 - **Date:** 2026-04-07
-- **Status:** In Progress
+- **Status:** Completed
 - **Scope:** `packages/design-tokens`, `apps/web/src/app/theme-css.ts`, `apps/web/src/features/*`,
   `apps/mobile/src/features/*`, `apps/web/src/core/styles/unistyles.ts`,
   `apps/mobile/src/core/styles/unistyles.ts`, `apps/web/src/shared/`, `apps/mobile/src/shared/`
@@ -31,15 +31,18 @@
 - Button primary variant web + native — in `apps/web/src/shared/` and `apps/mobile/src/shared/`
 - `apps/web/src/core/styles/unistyles.ts` — Unistyles bootstrap for web
 - `apps/mobile/src/core/styles/unistyles.ts` — Unistyles bootstrap for mobile
+- `packages/design-tokens/src/index.web.ts` — exports `createAccentRecipesWeb` ✅
+- `packages/design-tokens/src/index.native.ts` — exports `createAccentRecipesNative` ✅
+- `apps/web/src/app/theme-css.ts` — pure projector, all recipe CSS vars emitted ✅
+- Feature color audit complete — all ad hoc hex/rgba replaced with CSS vars / theme tokens ✅
 
 ## Blocked / Uncertain
 
-- None currently identified.
+- None.
 
 ## Immediate Next Step
 
-Execute Stage 1: add the four missing semantic recipes (`selectedSurface`, `selectedContent`,
-`secondarySupportingBadge`, `mixedPromotedPanel`) to `packages/design-tokens/src/recipes/`.
+Plan complete — all stages Done. File moved to `.agents/plans/completed/`.
 
 ---
 
@@ -129,7 +132,7 @@ screen.washMixed                 — full-screen mixed wash
 
 ## Stage 1: Add Missing Recipes to design-tokens
 
-**Status:** Pending
+**Status:** Done
 
 **Goal:** Add the four missing semantic recipes — `selectedSurface`, `selectedContent`,
 `secondarySupportingBadge`, and `mixedPromotedPanel` — to the existing recipe files in
@@ -173,7 +176,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 2: Export Recipe Types from design-tokens Index Files
 
-**Status:** Pending
+**Status:** Done
 
 **Goal:** Ensure `packages/design-tokens/src/index.native.ts` and `index.web.ts` export the
 recipe types so consuming packages can import them without drilling into internal paths.
@@ -212,7 +215,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 3: Refactor theme-css.ts to Project from Design-Token Recipes
 
-**Status:** Pending
+**Status:** Done
 
 **Goal:** Remove all local color computations from `apps/web/src/app/theme-css.ts`. The file
 becomes a pure projector: it imports recipe values from `@sd/design-tokens` and writes CSS
@@ -256,7 +259,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 4: Audit and Update Feature Usage
 
-**Status:** Pending
+**Status:** Done
 
 **Goal:** Audit all feature code in `apps/web/src/features/` and `apps/mobile/src/features/`
 for ad hoc color treatments that should instead use the theme system. Update any violations.
@@ -308,7 +311,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 5: Final Verification
 
-**Status:** Pending
+**Status:** Done
 
 **Goal:** Run all validation commands across the full monorepo and confirm no regressions.
 
