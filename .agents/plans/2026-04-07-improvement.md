@@ -131,7 +131,7 @@ composition and UI. It may depend on domain packages for state.
 3. **Stage 2** — Feed feature implementation
 4. **Stage 3** — Library feature implementation
 5. **Stage 4** — Scholar detail screen
-6. **Stage 5** — Lecture detail screen
+6. **Stage 5** — Lecture detail screen — Done ✅
 7. **Stage 6** — Admin permissions system — Done ✅
 8. **Stage 7** — Livestreams service (`apps/livestreams`) — Done ✅
 
