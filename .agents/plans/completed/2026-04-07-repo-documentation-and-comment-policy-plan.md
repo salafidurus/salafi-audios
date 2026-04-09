@@ -3,7 +3,7 @@
 # Metadata
 
 - **Date:** 2026-04-07
-- **Status:** In Progress
+- **Status:** Completed
 - **Scope:** Improve README coverage across all packages, define and enforce an inline comment
   policy, and extend `AGENT.md` files with explicit documentation expectations.
 - **Summary:** Some package READMEs exist (core-api, core-contracts, core-db, design-tokens,
@@ -45,7 +45,7 @@
 
 ## Stage 1: Add README to Packages Missing Them
 
-- **Status:** Pending
+- **Status:** Done
 
 - **Goal:** Create a minimal, useful `README.md` for each package that currently lacks one.
   Each README must answer: what the workspace owns, what it depends on conceptually, key
@@ -105,7 +105,7 @@
 
 ## Stage 2: Document Policy in AGENT.md Files
 
-- **Status:** Pending
+- **Status:** Done
 
 - **Goal:** Add a clear documentation policy section to the root `AGENT.md` so that future
   contributors and agents know when to add README files, when to add inline comments, and
@@ -162,7 +162,7 @@
 
 ## Stage 3: Verify and Update Inline Comment Coverage in Complex Modules
 
-- **Status:** Pending
+- **Status:** Done
 
 - **Goal:** Run a focused review pass on high-risk files and add inline comments only where
   intent is currently implicit. Prefer fewer, sharper comments over dense annotation.
