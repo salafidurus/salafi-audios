@@ -357,6 +357,28 @@ Do not add comments to:
 - Obvious utility functions.
 - Boilerplate config that mirrors defaults.
 
+### When file-level documentation is expected
+
+Add a file-level comment block to:
+
+- CI workflow files that contain non-obvious job dependencies or cache strategy.
+- Root scripts whose purpose is not clear from the file name alone.
+- Complex `tsconfig` files that deviate from the base in non-trivial ways.
+- Package entrypoints that perform platform selection (e.g., `.web.ts` vs `.native.ts`
+  dispatch logic that is not self-evident).
+
+### When docs updates are mandatory
+
+Update `docs/` when making any of the following changes:
+
+- Architectural boundary change (new package, new app, changed dependency direction).
+- API surface change that affects the shared contract in `packages/core-contracts`.
+- Mobile offline or outbox pattern change.
+- Web app structure change (new routing pattern, new shared primitive layer).
+
+Docs and code must not drift. If a change makes `docs/` inaccurate, update `docs/` in the
+same commit.
+
 ### AGENT.md vs README.md
 
 - `AGENT.md` defines contributor and AI agent behavior rules.
