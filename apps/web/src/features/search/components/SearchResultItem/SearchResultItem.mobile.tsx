@@ -1,13 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { Image } from "react-native-unistyles/components/native/Image";
-import { Pressable } from "react-native-unistyles/components/native/Pressable";
-import { Text } from "react-native-unistyles/components/native/Text";
-import { View } from "react-native-unistyles/components/native/View";
 import { Headphones, Clock } from "lucide-react";
 import { MarqueeTextMobile } from "../MarqueeText/MarqueeText.mobile";
+import styles from "./SearchResultItem.mobile.module.css";
 
 export type SearchResultItemProps = {
   title: string;
@@ -28,120 +24,45 @@ export function SearchResultItemMobile({
   durationSeconds,
   onPress,
 }: SearchResultItemMobileProps) {
-  const { theme } = useUnistyles();
   const [isPressed, setIsPressed] = useState(false);
   const durationLabel = formatDuration(durationSeconds);
 
   return (
-    <Pressable
-      onPress={onPress}
-      onPressIn={() => setIsPressed(true)}
-      onPressOut={() => setIsPressed(false)}
-      style={({ pressed }: { pressed: boolean }) => [
-        styles.card,
-        pressed
-          ? {
-              backgroundColor: theme.recipes.primarySubtleSurface.backgroundColor,
-              borderColor: theme.recipes.primarySubtleSurface.borderColor,
-            }
-          : {
-              backgroundColor: theme.colors.surface.default,
-              borderColor: theme.colors.border.subtle,
-            },
-      ]}
+    <button
+      type="button"
+      onClick={onPress}
+      onMouseDown={() => setIsPressed(true)}
+      onMouseUp={() => setIsPressed(false)}
+      onMouseLeave={() => setIsPressed(false)}
+      className={`${styles.card} ${isPressed ? styles.cardPressed : ""}`}
     >
-      <View style={styles.media}>
+      <div className={styles.media}>
         {imageUrl ? (
-          <Image source={{ uri: imageUrl }} style={styles.cover} resizeMode="cover" />
+          <img src={imageUrl} alt="" className={styles.cover} />
         ) : (
-          <View style={styles.coverFallback}>
-            <Headphones size={20} color={theme.colors.content.subtle} />
-          </View>
+          <div className={styles.coverFallback}>
+            <Headphones size={20} color="var(--content-subtle)" />
+          </div>
         )}
-      </View>
-      <View style={styles.body}>
+      </div>
+      <div className={styles.body}>
         <MarqueeTextMobile text={title} textStyle={styles.title} />
         <MarqueeTextMobile text={scholarName} textStyle={styles.scholarName} />
-        <View style={styles.metaRow}>
-          <Headphones size={11} color={theme.colors.content.muted} />
-          <Text style={styles.metaText}>{formatLectureCount(lectureCount)}</Text>
+        <div className={styles.metaRow}>
+          <Headphones size={11} color="var(--content-muted)" />
+          <span className={styles.metaText}>{formatLectureCount(lectureCount)}</span>
           {durationLabel ? (
             <>
-              <Text style={styles.metaText}> · </Text>
-              <Clock size={11} color={theme.colors.content.muted} />
-              <Text style={styles.metaText}>{durationLabel}</Text>
+              <span className={styles.metaText}> · </span>
+              <Clock size={11} color="var(--content-muted)" />
+              <span className={styles.metaText}>{durationLabel}</span>
             </>
           ) : null}
-        </View>
-      </View>
-    </Pressable>
+        </div>
+      </div>
+    </button>
   );
 }
-
-const styles = StyleSheet.create((theme) => ({
-  card: {
-    borderWidth: 1,
-    borderColor: theme.colors.border.subtle,
-    borderRadius: theme.radius.component.card,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.component.gapMd,
-    _web: {
-      padding: theme.spacing.component.cardPadding,
-    },
-  },
-  media: {
-    width: "20%",
-    aspectRatio: 4 / 5,
-    borderRadius: theme.radius.component.panelSm,
-    overflow: "hidden",
-    backgroundColor: theme.colors.surface.subtle,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  cover: {
-    width: "100%",
-    height: "100%",
-  },
-  coverFallback: {
-    flex: 1,
-    width: "100%",
-    backgroundColor: theme.colors.surface.subtle,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  body: {
-    flex: 1,
-    gap: theme.spacing.scale.xs,
-    overflow: "hidden",
-  },
-  title: {
-    color: theme.colors.content.strong,
-    _web: {
-      ...theme.typography.titleMd,
-      lineHeight: String(theme.typography.titleMd.lineHeight),
-    },
-  },
-  scholarName: {
-    color: theme.colors.content.muted,
-    _web: {
-      ...theme.typography.bodySm,
-      lineHeight: String(theme.typography.bodySm.lineHeight),
-    },
-  },
-  metaRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.scale.xs,
-  },
-  metaText: {
-    color: theme.colors.content.muted,
-    _web: {
-      ...theme.typography.caption,
-      lineHeight: String(theme.typography.caption.lineHeight),
-    },
-  },
-}));
 
 function formatLectureCount(count: number): string {
   if (count === 1) {

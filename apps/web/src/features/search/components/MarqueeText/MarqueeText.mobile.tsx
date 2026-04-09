@@ -1,24 +1,21 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import { type StyleProp, type TextStyle } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import { Text } from "react-native-unistyles/components/native/Text";
-import { View } from "react-native-unistyles/components/native/View";
+import styles from "./MarqueeText.mobile.module.css";
 
 export type MarqueeTextMobileProps = {
   text: string;
-  textStyle?: StyleProp<TextStyle>;
+  textStyle?: string;
 };
 
 export function MarqueeTextMobile({ text, textStyle }: MarqueeTextMobileProps) {
-  const containerRef = useRef<any>(null);
-  const textRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLSpanElement>(null);
   const animRef = useRef<Animation | null>(null);
 
   useEffect(() => {
-    const container = containerRef.current as HTMLElement | null;
-    const textEl = textRef.current as HTMLElement | null;
+    const container = containerRef.current;
+    const textEl = textRef.current;
     if (!container || !textEl) return;
 
     animRef.current?.cancel();
@@ -48,23 +45,10 @@ export function MarqueeTextMobile({ text, textStyle }: MarqueeTextMobileProps) {
   }, [text]);
 
   return (
-    <View ref={containerRef} style={styles.container}>
-      <Text ref={textRef} style={[styles.marqueeText, textStyle]}>
+    <div ref={containerRef} className={styles.container}>
+      <span ref={textRef} className={`${styles.text}${textStyle ? ` ${textStyle}` : ""}`}>
         {text}
-      </Text>
-    </View>
+      </span>
+    </div>
   );
 }
-
-const styles = StyleSheet.create(() => ({
-  container: {
-    overflow: "hidden",
-    flexShrink: 1,
-  },
-  marqueeText: {
-    _web: {
-      whiteSpace: "nowrap",
-      display: "inline-block",
-    },
-  },
-}));

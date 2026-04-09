@@ -1,12 +1,8 @@
 "use client";
 
 import React, { forwardRef, useImperativeHandle, useState } from "react";
-import { type TextInput as RNTextInput } from "react-native";
 import { ChevronLeft, X } from "lucide-react";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { Pressable } from "react-native-unistyles/components/native/Pressable";
-import { TextInput } from "react-native-unistyles/components/native/TextInput";
-import { View } from "react-native-unistyles/components/native/View";
+import styles from "./SearchInput.mobile.module.css";
 
 export type SearchInputMobileProps = {
   placeholder: string;
@@ -21,8 +17,7 @@ export type SearchInputMobileRef = {
 
 export const SearchInputMobile = forwardRef<SearchInputMobileRef, SearchInputMobileProps>(
   ({ placeholder, value, onChange, onBackPress }, ref) => {
-    const { theme } = useUnistyles();
-    const inputRef = React.useRef<RNTextInput>(null);
+    const inputRef = React.useRef<HTMLInputElement>(null);
     const [backPressed, setBackPressed] = useState(false);
     const [clearPressed, setClearPressed] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
@@ -32,85 +27,51 @@ export const SearchInputMobile = forwardRef<SearchInputMobileRef, SearchInputMob
     }));
 
     return (
-      <View
-        style={[
-          styles.container,
-          isFocused && {
-            borderColor: theme.colors.border.primary,
-            backgroundColor: theme.colors.surface.default,
-          },
-        ]}
-      >
-        <Pressable
-          onPress={onBackPress}
-          onPressIn={() => setBackPressed(true)}
-          onPressOut={() => setBackPressed(false)}
-          style={styles.iconButton}
+      <div className={`${styles.container} ${isFocused ? styles.containerFocused : ""}`}>
+        <button
+          type="button"
+          onClick={onBackPress}
+          onMouseDown={() => setBackPressed(true)}
+          onMouseUp={() => setBackPressed(false)}
+          onMouseLeave={() => setBackPressed(false)}
+          className={styles.iconButton}
         >
           <ChevronLeft
             size={20}
-            color={backPressed ? theme.colors.content.primary : theme.colors.content.muted}
+            color={backPressed ? "var(--content-primary)" : "var(--content-muted)"}
           />
-        </Pressable>
+        </button>
 
-        <TextInput
+        <input
           ref={inputRef}
-          style={styles.input}
+          type="text"
+          className={styles.input}
           placeholder={placeholder}
-          placeholderTextColor={theme.colors.content.muted}
           value={value}
-          onChangeText={onChange}
+          onChange={(e) => onChange?.(e.target.value)}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           autoFocus
         />
 
         {value && value.length > 0 ? (
-          <Pressable
-            onPress={() => onChange?.("")}
-            onPressIn={() => setClearPressed(true)}
-            onPressOut={() => setClearPressed(false)}
-            style={styles.iconButton}
+          <button
+            type="button"
+            onClick={() => onChange?.("")}
+            onMouseDown={() => setClearPressed(true)}
+            onMouseUp={() => setClearPressed(false)}
+            onMouseLeave={() => setClearPressed(false)}
+            className={styles.iconButton}
           >
             <X
               size={20}
-              color={clearPressed ? theme.colors.content.primary : theme.colors.content.muted}
+              color={clearPressed ? "var(--content-primary)" : "var(--content-muted)"}
             />
-          </Pressable>
+          </button>
         ) : null}
-      </View>
+      </div>
     );
   },
 );
 
 SearchInputMobile.displayName = "SearchInputMobile";
-
-const styles = StyleSheet.create((theme) => ({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.component.gapMd,
-    backgroundColor: theme.colors.surface.subtle,
-    borderWidth: 1,
-    borderColor: theme.colors.border.default,
-    borderRadius: theme.radius.component.panelSm,
-    _web: {
-      paddingHorizontal: theme.spacing.scale.lg,
-      paddingVertical: theme.spacing.scale.md,
-    },
-  },
-  iconButton: {
-    _web: {
-      paddingVertical: theme.spacing.scale.xs,
-    },
-  },
-  input: {
-    flex: 1,
-    padding: 0,
-    color: theme.colors.content.default,
-    _web: {
-      ...theme.typography.bodyMd,
-      lineHeight: String(theme.typography.bodyMd.lineHeight),
-    },
-  },
-}));

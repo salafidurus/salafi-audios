@@ -1,6 +1,4 @@
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { Text } from "react-native-unistyles/components/native/Text";
-import { View } from "react-native-unistyles/components/native/View";
+import styles from "./SearchResultEmpty.mobile.module.css";
 
 export type SearchResultEmptyMobileProps = {
   shouldSearch: boolean;
@@ -13,8 +11,6 @@ export function SearchResultEmptyMobile({
   isFetching,
   errorMessage,
 }: SearchResultEmptyMobileProps) {
-  const { theme } = useUnistyles();
-
   const message = shouldSearch
     ? errorMessage
       ? errorMessage
@@ -24,31 +20,8 @@ export function SearchResultEmptyMobile({
     : "Start typing to search.";
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.message}>{message}</Text>
-    </View>
+    <div className={styles.container}>
+      <span className={styles.message}>{message}</span>
+    </div>
   );
 }
-
-const styles = StyleSheet.create((theme) => ({
-  container: {
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: theme.colors.border.subtle,
-    borderRadius: theme.radius.component.card,
-    backgroundColor: theme.colors.surface.subtle,
-    _web: {
-      marginTop: theme.spacing.scale["3xl"],
-      paddingHorizontal: theme.spacing.component.cardPadding,
-      paddingVertical: theme.spacing.scale["3xl"],
-    },
-  },
-  message: {
-    color: theme.colors.content.muted,
-    textAlign: "center",
-    _web: {
-      ...theme.typography.bodyMd,
-      lineHeight: String(theme.typography.bodyMd.lineHeight),
-    },
-  },
-}));

@@ -1,0 +1,30 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-component-gap-sm);
+  overflow: hidden;
+  border: 1px solid var(--accent-primary-subtle-border);
+  border-radius: var(--radius-component-panel-sm);
+  background: var(--accent-primary-subtle-surface);
+  box-shadow: var(--shadow-xs);
+  padding: var(--space-scale-md) var(--space-scale-lg);
+  cursor: pointer;
+  width: 100%;
+  transition: opacity 0.1s;
+}
+
+.containerPressed {
+  opacity: 0.9;
+}
+
+.placeholder {
+  flex: 1;
+  color: var(--accent-primary-subtle-fg);
+  text-align: left;
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  letter-spacing: var(--typo-body-md-letter-spacing);
+  font-weight: var(--typo-body-md-font-weight);
+}

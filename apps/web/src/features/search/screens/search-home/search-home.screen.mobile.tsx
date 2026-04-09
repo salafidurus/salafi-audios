@@ -1,10 +1,9 @@
-import { View } from "react-native-unistyles/components/native/View";
-import { StyleSheet } from "react-native-unistyles";
 import { QuickBrowseMobile } from "../../components/QuickBrowse/QuickBrowse.mobile";
 import { SearchButtonMobile } from "../../components/SearchButton/SearchButton.mobile";
 import { TitleTextMobile } from "../../components/TitleText/TitleText.mobile";
 import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 import { useQuickBrowse } from "@sd/domain-search";
+import styles from "./search-home.screen.mobile.module.css";
 
 export type SearchHomeScreenProps = {
   onOpenSearch?: () => void;
@@ -25,16 +24,16 @@ export function SearchHomeMobileScreen({
 
   return (
     <ScreenView center>
-      <View style={styles.content}>
-        <View style={styles.searchGroup}>
-          <View style={styles.header}>
+      <div className={styles.content}>
+        <div className={styles.searchGroup}>
+          <div className={styles.header}>
             <TitleTextMobile>Find a lesson</TitleTextMobile>
-          </View>
+          </div>
           <SearchButtonMobile
             placeholder="What do you want to listen to?"
             onPress={onOpenSearch}
           />
-        </View>
+        </div>
         <QuickBrowseMobile
           scholars={data?.scholars}
           suggestions={data?.suggestions}
@@ -44,20 +43,7 @@ export function SearchHomeMobileScreen({
           onContinueListening={onContinueListening}
           onSelectCategory={onSelectCategory}
         />
-      </View>
+      </div>
     </ScreenView>
   );
 }
-
-const styles = StyleSheet.create((theme) => ({
-  content: {
-    gap: theme.spacing.component.gapXl,
-    width: "100%",
-  },
-  searchGroup: {
-    gap: theme.spacing.component.gapMd,
-  },
-  header: {
-    alignItems: "center",
-  },
-}));

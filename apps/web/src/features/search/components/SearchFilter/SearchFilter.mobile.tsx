@@ -1,12 +1,9 @@
 "use client";
 
 import { type CSSProperties, useMemo, useState } from "react";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { Pressable } from "react-native-unistyles/components/native/Pressable";
-import { Text } from "react-native-unistyles/components/native/Text";
-import { View } from "react-native-unistyles/components/native/View";
 import type { TopicDetailDto, TopicSlug } from "@sd/core-contracts";
 import { useDragScroll } from "../../../../shared/hooks/use-drag-scroll";
+import styles from "./SearchFilter.mobile.module.css";
 
 export type SearchFilterValue = TopicSlug[];
 
@@ -24,7 +21,6 @@ export type SearchFilterProps = {
 export type SearchFilterMobileProps = SearchFilterProps;
 
 export function SearchFilterMobile({ value, onChange, topics }: SearchFilterMobileProps) {
-  const { theme } = useUnistyles();
   const scrollRef = useDragScroll("horizontal");
 
   const options = useMemo<FilterOption[]>(() => {
@@ -46,9 +42,9 @@ export function SearchFilterMobile({ value, onChange, topics }: SearchFilterMobi
           flexDirection: "row",
           overflowX: "auto",
           overflowY: "hidden",
-          gap: theme.spacing.component.gapSm,
-          paddingTop: theme.spacing.component.gapSm,
-          paddingBottom: theme.spacing.component.gapSm,
+          gap: "var(--space-component-gap-sm)",
+          paddingTop: "var(--space-component-gap-sm)",
+          paddingBottom: "var(--space-component-gap-sm)",
           scrollbarWidth: "none",
           cursor: "grab",
         } satisfies CSSProperties
@@ -90,65 +86,18 @@ type FilterChipProps = {
 };
 
 function FilterChip({ label, isActive, onPress }: FilterChipProps) {
-  const { theme } = useUnistyles();
   const [isPressed, setIsPressed] = useState(false);
 
   return (
-    <View style={styles.chipWrap}>
-      <Pressable
-        onPress={onPress}
-        onPressIn={() => setIsPressed(true)}
-        onPressOut={() => setIsPressed(false)}
-        style={[
-          styles.chip,
-          isActive
-            ? {
-                backgroundColor: theme.recipes.primarySubtleSurface.backgroundColor,
-                borderColor: theme.recipes.primarySubtleSurface.borderColor,
-              }
-            : {
-                backgroundColor: theme.colors.surface.subtle,
-                borderColor: theme.colors.border.subtle,
-              },
-          isPressed && styles.chipPressed,
-        ]}
-      >
-        <Text
-          style={[
-            styles.chipLabel,
-            {
-              color: isActive
-                ? theme.recipes.primarySubtleSurface.textColor
-                : theme.colors.content.muted,
-            },
-          ]}
-        >
-          {label}
-        </Text>
-      </Pressable>
-    </View>
+    <button
+      type="button"
+      onClick={onPress}
+      onMouseDown={() => setIsPressed(true)}
+      onMouseUp={() => setIsPressed(false)}
+      onMouseLeave={() => setIsPressed(false)}
+      className={`${styles.chip} ${isActive ? styles.chipActive : styles.chipInactive} ${isPressed ? styles.chipPressed : ""}`}
+    >
+      {label}
+    </button>
   );
 }
-
-const styles = StyleSheet.create((theme) => ({
-  chipWrap: {
-    borderRadius: theme.radius.component.chip,
-  },
-  chip: {
-    borderWidth: 1,
-    borderRadius: theme.radius.component.chip,
-    _web: {
-      paddingHorizontal: theme.spacing.component.chipX,
-      paddingVertical: theme.spacing.component.chipY,
-    },
-  },
-  chipLabel: {
-    _web: {
-      ...theme.typography.labelMd,
-      lineHeight: String(theme.typography.labelMd.lineHeight),
-    },
-  },
-  chipPressed: {
-    opacity: 0.85,
-  },
-}));

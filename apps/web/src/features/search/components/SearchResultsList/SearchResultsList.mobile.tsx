@@ -1,9 +1,8 @@
 import { type CSSProperties } from "react";
 import React from "react";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { View } from "react-native-unistyles/components/native/View";
 import { SearchResultEmptyMobile } from "../SearchResultEmpty/SearchResultEmpty.mobile";
 import { useDragScroll } from "../../../../shared/hooks/use-drag-scroll";
+import styles from "./SearchResultsList.mobile.module.css";
 
 export type SearchResultRow = {
   id: string;
@@ -31,7 +30,6 @@ export function SearchResultsListMobile({
   errorMessage,
   renderItem,
 }: SearchResultsListMobileProps) {
-  const { theme } = useUnistyles();
   const scrollRef = useDragScroll("vertical");
 
   return (
@@ -47,7 +45,7 @@ export function SearchResultsListMobile({
         } satisfies CSSProperties
       }
     >
-      <div style={{ paddingBottom: theme.spacing.layout.pageY }}>
+      <div className={styles.inner}>
         {items.length === 0 ? (
           <SearchResultEmptyMobile
             shouldSearch={shouldSearch}
@@ -57,7 +55,7 @@ export function SearchResultsListMobile({
         ) : (
           items.map((item, index) => (
             <React.Fragment key={item.id}>
-              {index > 0 && <View style={styles.separator} />}
+              {index > 0 && <div className={styles.separator} />}
               {renderItem(item)}
             </React.Fragment>
           ))
@@ -66,11 +64,3 @@ export function SearchResultsListMobile({
     </div>
   );
 }
-
-const styles = StyleSheet.create((theme) => ({
-  separator: {
-    _web: {
-      height: theme.spacing.component.gapSm,
-    },
-  },
-}));
