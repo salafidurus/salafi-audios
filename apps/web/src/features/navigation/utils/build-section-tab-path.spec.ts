@@ -22,7 +22,14 @@ describe("buildSectionTabPath", () => {
   it("appends non-default account tab", () => {
     expect(buildSectionTabPath("account", "profile")).toBe("/account/profile");
   });
-  it("collapses default live tab to /live", () => {
+  it("collapses default live tab (ongoing) to /live", () => {
     expect(buildSectionTabPath("live")).toBe("/live");
+    expect(buildSectionTabPath("live", "ongoing")).toBe("/live");
+  });
+  it("appends non-default live tab (scheduled)", () => {
+    expect(buildSectionTabPath("live", "scheduled")).toBe("/live/scheduled");
+  });
+  it("appends non-default live tab (ended)", () => {
+    expect(buildSectionTabPath("live", "ended")).toBe("/live/ended");
   });
 });

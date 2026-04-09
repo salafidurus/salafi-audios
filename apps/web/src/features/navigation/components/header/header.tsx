@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { routes } from "@sd/core-contracts";
 import styles from "./header.module.css";
 import { Button } from "../../../../shared/components/Button/Button";
+import { LocaleSwitcher } from "../../../../shared/components/LocaleSwitcher/LocaleSwitcher";
 
 export function Header() {
   const headerRef = useRef<HTMLElement | null>(null);
@@ -58,6 +59,7 @@ export function Header() {
         </Link>
 
         <div className={styles.actions}>
+          <LocaleSwitcher />
           <Button variant="ghost" size="sm" onClick={() => router.push(routes.signIn)}>
             Sign In
           </Button>

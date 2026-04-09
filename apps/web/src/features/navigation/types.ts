@@ -8,7 +8,11 @@ export const SECTION_TABS: Record<Section, TabConfig[]> = {
     { id: "recent", label: "Recent", icon: "clock" },
     { id: "following", label: "Following", icon: "heart" },
   ],
-  live: [],
+  live: [
+    { id: "ongoing", label: "Live Now", icon: "radio" },
+    { id: "scheduled", label: "Scheduled", icon: "calendar" },
+    { id: "ended", label: "Ended", icon: "check-circle" },
+  ],
   library: [
     { id: "started", label: "Started", icon: "play" },
     { id: "saved", label: "Saved", icon: "bookmark" },
@@ -23,7 +27,7 @@ export const SECTION_TABS: Record<Section, TabConfig[]> = {
 
 export const DEFAULT_TABS: Record<Section, string> = {
   feed: "popular",
-  live: "index",
+  live: "ongoing",
   library: "started",
   account: "general",
 };
