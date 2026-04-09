@@ -2,6 +2,13 @@
 
 > Internationalization keys and locale infrastructure for the Salafi Durus platform
 
+## ⚠️ Stub Status
+
+This package is currently an **empty stub**. `src/index.ts` exports nothing yet.
+Implementation is planned — see `docs/superpowers/specs/2026-04-09-i18n-design.md` for the
+full design spec. Do not remove this package; all scaffolding and design decisions are
+documented and implementation will follow once i18n work begins.
+
 ## Purpose
 
 Owns all translation keys and locale definitions used across the platform. Keeps i18n
