@@ -1,7 +1,7 @@
 # Metadata
 
 - **Date:** 2026-04-09
-- **Status:** Planned
+- **Status:** Complete ✅ (2026-04-09)
 - **Scope:** `apps/web`, `apps/mobile` — cleanup of relics left behind by the migration
   from centralized `packages/features-*` into app-local `src/features/`
 - **Summary:** Remove dead code, naming relics, duplicated responsive CSS modules, stray
@@ -138,7 +138,7 @@
 
 18. **`packages/shared` ghost reference in root `AGENT.md`.** The root `AGENT.md`
     package map lists `packages/shared — Cross-app utilities only (no platform-specific
-    UI primitives)` but this package does not exist in the repository. The line must be
+UI primitives)` but this package does not exist in the repository. The line must be
     removed from `AGENT.md`.
 
 ## Immediate next step
@@ -199,7 +199,7 @@ require test rewrites because the rewrites are presentational.
 
 ## Stage 1: Establish canonical responsive rendering utilities
 
-**Status:** Planned
+**Status:** Complete ✅
 
 **Goal:** Give every web feature a single way to branch on viewport, and a single
 `responsive.module.css` if CSS-based branching is ever needed again.
@@ -273,7 +273,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 2: Delete `.native.tsx` relics from `apps/web`
 
-**Status:** Planned
+**Status:** Complete ✅
 
 **Goal:** `apps/web` must contain zero `.native.tsx` files.
 
@@ -326,7 +326,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 3: Rewrite `apps/web/src/shared/components/*` off react-native-unistyles
 
-**Status:** Planned
+**Status:** Complete ✅
 
 **Goal:** Every `apps/web/src/shared/components/*` file becomes plain React + CSS
 Modules (or inline style where trivial), with no imports from `react-native`,
@@ -406,7 +406,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 4: Rewrite `apps/web/src/features/**` files off react-native-unistyles
 
-**Status:** Planned
+**Status:** Complete ✅
 
 **Goal:** Zero imports from `react-native`, `react-native-web`, or
 `react-native-unistyles` anywhere under `apps/web/src/features`.
@@ -467,7 +467,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 5: Collapse responsive router screens and dedupe `responsive.module.css`
 
-**Status:** Planned
+**Status:** Complete ✅
 
 **Goal:** Replace the dual-render `display: none` pattern with `<Responsive>`. Delete
 the 10 per-feature `responsive.module.css` files. Delete or merge sibling
@@ -601,7 +601,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 6: Drop `Web` / `DesktopWeb` / `MobileWeb` suffix from identifiers and filenames
 
-**Status:** Planned
+**Status:** Complete ✅
 
 **Goal:** Components and files that live in `apps/web` do not need to brand themselves
 as `Web`. Rename every exported identifier, filename, and import site.
@@ -682,7 +682,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 7: Delete Unistyles bootstrap and type augmentation from `apps/web`
 
-**Status:** Planned
+**Status:** Complete ✅
 
 **Goal:** No Unistyles code in `apps/web`.
 
@@ -746,7 +746,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 8: Remove React Native deps from `apps/web/package.json` and `next.config.ts`
 
-**Status:** Planned
+**Status:** Complete ✅
 
 **Goal:** `apps/web` no longer depends on `react-native*`. Next.js builds without the
 alias.
@@ -812,7 +812,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 9: Enforce named-export policy across both apps (web)
 
-**Status:** Planned
+**Status:** Complete ✅
 
 **Goal:** Named exports are the default everywhere. Default exports are allowed only
 where the framework requires them:
@@ -841,7 +841,7 @@ where the framework requires them:
   `src/features/**`, `src/shared/**`, `src/core/**`. Override to `off` for the allowed
   Next.js paths listed above.
   - **`src/app/**/route.ts` is NOT in the exception list.** Next.js App Router route
-    handlers use named exports (`GET`, `POST`, etc.) and must not use default exports.
+handlers use named exports (`GET`, `POST`, etc.) and must not use default exports.
     Do not add an override for route files.
 - `packages/util-config/eslint/expo.js` — this is the shared ESLint config consumed by
   `apps/mobile/eslint.config.js`. Add `import/no-default-export` at `error` for
@@ -891,7 +891,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 10: Drop `MobileNative` / `Native` suffix from mobile exports
 
-**Status:** Planned
+**Status:** Complete ✅
 
 **Goal:** Every component, hook, screen, and type exported from `apps/mobile/src/features/**`,
 `apps/mobile/src/shared/**`, and `apps/mobile/src/core/**` uses a clean, unsuffixed name.
@@ -959,7 +959,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 11: Add missing feature barrel exports to `apps/mobile`
 
-**Status:** Planned
+**Status:** Complete ✅
 
 **Goal:** All 14 `apps/mobile/src/features/*/` folders have a lean `index.ts` barrel.
 Lean means: export only screens and components with a confirmed cross-feature consumer.
@@ -1020,7 +1020,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 12: Clean up `Mobile*` prefix in `apps/mobile/src/core/` and update AGENT.md
 
-**Status:** Planned
+**Status:** Complete ✅
 
 **Goal:** Internal `apps/mobile/src/core/` functions shed their redundant `Mobile`
 infix; `apps/mobile/AGENT.md` is updated to document the conventions this cleanup
@@ -1072,7 +1072,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 13: Packages cleanup
 
-**Status:** Planned
+**Status:** Complete ✅
 
 **Goal:** Trim dead exports from `packages/domain-playback`, remove stale mobile-theme
 re-exports from `packages/design-tokens`'s web entry, decide the fate of the abandoned
@@ -1175,7 +1175,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 14: Final verification pass
 
-**Status:** Planned
+**Status:** Complete ✅
 
 **Goal:** Confirm the cleanup holds together at monorepo level.
 

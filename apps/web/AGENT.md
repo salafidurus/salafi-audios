@@ -62,7 +62,12 @@ import { FeedDesktopScreen } from "./feed.screen.desktop";
 import { FeedMobileScreen } from "./feed.screen.mobile";
 
 export function FeedScreen(props: FeedScreenProps) {
-  return <Responsive mobile={<FeedMobileScreen {...props} />} desktop={<FeedDesktopScreen {...props} />} />;
+  return (
+    <Responsive
+      mobile={<FeedMobileScreen {...props} />}
+      desktop={<FeedDesktopScreen {...props} />}
+    />
+  );
 }
 ```
 
@@ -74,15 +79,15 @@ export function FeedScreen(props: FeedScreenProps) {
 
 ### Rules
 
-- **`app/**/page.tsx`** — server component, no hooks, imports one screen component, adds metadata
-- **`features/**/screens/<name>/<name>.screen.tsx`** — responsive router only:
+- **`app/**/page.tsx`\*\* — server component, no hooks, imports one screen component, adds metadata
+- **`features/**/screens/<name>/<name>.screen.tsx`\*\* — responsive router only:
   - Uses `<Responsive>` to decide mobile vs desktop
   - For simple cases where mobile and desktop share ≥80% markup, collapse into one file using CSS
-- **`features/**/screens/<name>/<name>.screen.desktop.tsx`** — desktop-only UI:
+- **`features/**/screens/<name>/<name>.screen.desktop.tsx`\*\* — desktop-only UI:
   - Uses CSS Modules + CSS variables (`var(--token-name)`)
   - No `useResponsive()`, no mobile imports
   - All styles use design token CSS variables — never hardcode colors/spacing
-- **`features/**/screens/<name>/<name>.screen.mobile.tsx`** — mobile-web variant (only when truly needed)
+- **`features/**/screens/<name>/<name>.screen.mobile.tsx`\*\* — mobile-web variant (only when truly needed)
 
 ### Naming Conventions
 
@@ -92,11 +97,6 @@ export function FeedScreen(props: FeedScreenProps) {
 - Feature screen folders: `features/<feature>/screens/<name>/` (kebab-case)
 - Responsive router: `<name>.screen.tsx`
 - Desktop file: `<name>.screen.desktop.tsx`
-
-### Top Auth Strip
-
-- `TopAuthStrip` is hidden on auth routes (`/sign-in`, `/sign-up`) via `usePathname` check at the component level
-- Add new auth routes to the `AUTH_ROUTES` constant in `top-auth-strip.tsx` if needed
 
 ### Top Auth Strip
 
@@ -269,6 +269,23 @@ core → shared
 - Import shared types from `@sd/core-contracts`
 - Types are hand-written and stable — no codegen required
 - When API changes, update `packages/core-contracts/src/types/` manually
+
+---
+
+## Export Style
+
+**Named exports everywhere.** `export default` is only allowed in files where Next.js App Router requires it:
+
+- `src/app/**/layout.tsx`, `page.tsx`, `error.tsx`, `not-found.tsx`, `loading.tsx`, `template.tsx`, `default.tsx`, `global-error.tsx`
+- `src/middleware.ts`, `src/instrumentation.ts`
+
+All components, screens, hooks, utilities, and barrel `index.ts` files in `src/features/`, `src/shared/`, and `src/core/` must use **named exports only**. This is enforced by ESLint (`import/no-default-export`).
+
+**Note:** `src/app/**/route.ts` files must also use named exports (`GET`, `POST`, etc.) — no default export exception for route handlers.
+
+## Feature Barrels
+
+Every `src/features/<name>/` directory should have an `index.ts` barrel that re-exports the feature's public surface using named exports only. Include: screens (always), and non-screen components only if confirmed to be imported from outside the feature folder. Do **not** speculatively re-export hooks, utilities, or sub-components — grep for the symbol name outside the feature folder first.
 
 ---
 
