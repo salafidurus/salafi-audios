@@ -1,625 +1,369 @@
-# Cross-Platform UI Color Integration Plan
+# Metadata
 
-## Goal
+- **Date:** 2026-04-07
+- **Status:** In Progress
+- **Scope:** `packages/design-tokens`, `apps/web/src/app/theme-css.ts`, `apps/web/src/features/*`,
+  `apps/mobile/src/features/*`, `apps/web/src/core/styles/unistyles.ts`,
+  `apps/mobile/src/core/styles/unistyles.ts`, `apps/web/src/shared/`, `apps/mobile/src/shared/`
+- **Summary:** Finish and normalise the cross-platform theme system. `packages/design-tokens`
+  is the single source of truth for accent recipes. `apps/web/src/app/theme-css.ts` becomes a
+  pure projector — it reads recipe values and writes CSS custom properties, computing nothing.
+  Native consumes the same recipe objects through Unistyles themes. Feature code inside
+  `apps/web/src/features/` and `apps/mobile/src/features/` uses the theme system consistently
+  instead of ad hoc color treatments.
+- **Dependencies:**
+  - `packages/design-tokens` must be built before web/mobile apps consume updated types
+  - Unistyles bootstrap already wired in `apps/web/src/core/styles/unistyles.ts` and
+    `apps/mobile/src/core/styles/unistyles.ts`
 
-Finish and normalize the broader cross-platform theme system so that:
+---
 
-1. `@sd/design-tokens` remains the single source of truth for theme semantics and accent recipes,
-2. web projects theme and recipe outputs into CSS variables without app-local theme logic,
-3. native consumes the same logical theme model through Unistyles themes,
-4. `@sd/core-styles` remains the stable styling bridge between design tokens and app/package consumption,
-5. package entrypoints expose the theme types and surfaces that downstream packages actually need,
-6. shared primitives and feature packages use the theme system consistently instead of ad hoc color treatments.
+# Progress
 
-This plan updates the existing file in place to reflect the current repo state as of 2026-04-07.
+## Done
 
-## Scope
+- `packages/design-tokens/src/recipes/shared.ts` — implemented
+- `packages/design-tokens/src/recipes/web.ts` — implemented
+- `packages/design-tokens/src/recipes/native.ts` — implemented
+- `packages/design-tokens/src/theme/web.ts` — exists with recipe projections
+- `packages/design-tokens/src/theme/native.ts` — exists with recipe projections
+- `AccentGradientFill` web + native — in `apps/web/src/shared/` and `apps/mobile/src/shared/`
+- Button primary variant web + native — in `apps/web/src/shared/` and `apps/mobile/src/shared/`
+- `apps/web/src/core/styles/unistyles.ts` — Unistyles bootstrap for web
+- `apps/mobile/src/core/styles/unistyles.ts` — Unistyles bootstrap for mobile
 
-This merged plan now covers both:
+## Blocked / Uncertain
 
-1. the original accent/color integration intent, and
-2. the broader cross-platform theme-system surface that now spans `@sd/design-tokens`, `@sd/core-styles`, web CSS projection, shared primitives, and package entrypoints.
+- None currently identified.
 
-It is intentionally wider than a color-only plan because the current repo architecture couples those concerns in practice.
+## Immediate Next Step
 
-## Design Standards
+Execute Stage 1: add the four missing semantic recipes (`selectedSurface`, `selectedContent`,
+`secondarySupportingBadge`, `mixedPromotedPanel`) to `packages/design-tokens/src/recipes/`.
 
-### Color role standards
+---
 
-- `primary` is for prominent actions, active states, and strong emphasis
-- `secondary` is for supporting emphasis, chips, informational accents, and balance
-- `neutral` remains the foundation for canvases, dense content, forms, and resting UI
-
-### Gradient standards
-
-- radial and layered gradient treatments are part of the accent language
-- promoted surfaces may use stronger branded treatment
-- standard surfaces should remain neutral or subtle
-- one screen should not accumulate multiple competing promoted surfaces above the fold
-
-### Accessibility standards
-
-- color must not be the only signal for state
-- selected, focused, destructive, success, and disabled states need supporting cues such as border, icon, shape, or label
-- light and dark mode behavior must be reviewed independently
-
-## External Guidance And Repo Fit
-
-This plan is repo-specific, but the direction is also consistent with broader platform guidance:
-
-- Material-style systems reserve primary for key actions and active emphasis
-- Apple-style guidance favors hierarchy, restraint, and not relying on color alone
-- React Native and web rendering constraints make it important to keep the semantic system shared while allowing platform-specific output shapes
-
-For this repo, the correct implementation boundary remains:
-
-- `@sd/design-tokens` owns token and recipe semantics
-- `@sd/core-styles` owns styling bridge/bootstrap responsibilities
-- web app code projects theme values into CSS variables
-- `@sd/shared` owns reusable recipe-aware primitives
-- feature packages compose surfaces without inventing their own color systems
-
-## Current State
-
-### What already exists
-
-The foundational recipe and theme system is present.
-
-Implemented areas:
-
-- [`packages/design-tokens/src/recipes/shared.ts`](C:/dev/salafi-audios/packages/design-tokens/src/recipes/shared.ts)
-- [`packages/design-tokens/src/recipes/web.ts`](C:/dev/salafi-audios/packages/design-tokens/src/recipes/web.ts)
-- [`packages/design-tokens/src/recipes/native.ts`](C:/dev/salafi-audios/packages/design-tokens/src/recipes/native.ts)
-- [`packages/design-tokens/src/theme/web.ts`](C:/dev/salafi-audios/packages/design-tokens/src/theme/web.ts)
-- [`packages/design-tokens/src/theme/native.ts`](C:/dev/salafi-audios/packages/design-tokens/src/theme/native.ts)
-- [`packages/core-styles`](C:/dev/salafi-audios/packages/core-styles)
-- [`packages/shared/src/components/AccentGradientFill/AccentGradientFill.web.tsx`](C:/dev/salafi-audios/packages/shared/src/components/AccentGradientFill/AccentGradientFill.web.tsx)
-- [`packages/shared/src/components/AccentGradientFill/AccentGradientFill.native.tsx`](C:/dev/salafi-audios/packages/shared/src/components/AccentGradientFill/AccentGradientFill.native.tsx)
-- [`packages/shared/src/components/Button/Button.web.tsx`](C:/dev/salafi-audios/packages/shared/src/components/Button/Button.web.tsx)
-- [`packages/shared/src/components/Button/Button.native.tsx`](C:/dev/salafi-audios/packages/shared/src/components/Button/Button.native.tsx)
-
-Observed implemented theme/recipe base:
-
-- `primaryCta`
-- `primarySubtleSurface`
-- `secondarySubtleSurface`
-- `mixedHeroSurface`
-- `dividerColor`
-- `focusRingColor`
-
-Observed implemented theme infrastructure:
-
-- web themes exported from `@sd/design-tokens`
-- native themes exported from `@sd/design-tokens`
-- Unistyles bootstrap owned by `@sd/core-styles`
-- web CSS projection owned by `apps/web/src/app/theme-css.ts`
-- shared components consuming theme values through `@sd/shared`
-
-Observed rollout areas already using accent-related primitives:
-
-- `feature-auth`
-- `feature-search`
-
-### What is still misaligned
-
-The current system is only partially normalized.
-
-Main architecture gaps:
-
-- [`apps/web/src/app/theme-css.ts`](C:/dev/salafi-audios/apps/web/src/app/theme-css.ts) still computes several chrome and screen-wash values locally instead of projecting them from recipe output.
-- theme projection responsibility is split across `@sd/design-tokens`, `@sd/core-styles`, and web app code, but the current plan did not previously treat that split as first-class scope.
-
-Concrete local computations still in app code:
-
-- `chromeSurface`
-- `chromeSurfaceStrong`
-- `chromeBorder`
-- `chromeBorderStrong`
-- `hoverAccentSurface`
-- `screenWashPrimary`
-- `screenWashSecondary`
-- `screenWashMixed`
-
-Main recipe-model gaps:
-
-- `selectedSurface`
-- `selectedContent`
-- `secondarySupportingBadge`
-- `mixedPromotedPanel`
-
-Main package-surface gaps:
-
-- [`packages/design-tokens/src/index.native.ts`](C:/dev/salafi-audios/packages/design-tokens/src/index.native.ts) does not export recipe types
-- [`packages/design-tokens/src/index.web.ts`](C:/dev/salafi-audios/packages/design-tokens/src/index.web.ts) also lacks explicit recipe type exports
-- the current plan does not account for `@sd/core-styles` as a theme-distribution layer that also needs review when the theme surface changes
-
-Main rollout gaps:
-
-- `feature-navigation`
-- `feature-account`
-- `feature-legal`
-- `feature-library`
-- `feature-live`
-- `feature-lecture`
-- `feature-scholar`
-- selected shared states such as auth-required and empty-state surfaces
+# Design Standards
 
 ## Confirmed Decisions
 
-### Native gradient implementation
+- **No `expo-linear-gradient` migration.** Existing directional fills remain as-is.
+- **SVG-based radial glow approved** — use `react-native-svg` for static radial overlay on native.
+  Rules: static, low-opacity, ≤ 3 stops, no `fx`/`fy` (Android limitation).
+
+## Color Role Standards
+
+- `primary` — prominent actions, active states, strong emphasis
+- `secondary` — supporting emphasis, chips, informational accents, balance
+- `neutral` — foundation for canvases, dense content, forms, resting UI
+
+## Gradient Standards
+
+- Radial and layered gradient treatments are part of the accent language.
+- Promoted surfaces may use stronger branded treatment.
+- Standard surfaces remain neutral or subtle.
+- One screen must not accumulate multiple competing promoted surfaces above the fold.
 
-The native implementation uses `react-native-svg` for both linear and radial layers inside a single SVG surface.
+## Usage Constraints (all screens, all platforms)
+
+- Max 1 promoted gradient surface per screen above the fold
+- Max 2 secondary accent zones per screen
+- Never stack multiple promoted gradients in the same viewport section
+- Dense form shells, long text content, and list-heavy screens degrade to subtle fills
 
-Current source:
+## Accessibility Standards
 
-- [`packages/shared/src/components/AccentGradientFill/AccentGradientFill.native.tsx`](C:/dev/salafi-audios/packages/shared/src/components/AccentGradientFill/AccentGradientFill.native.tsx)
+- Color must not be the only signal for state.
+- Selected, focused, destructive, success, and disabled states need supporting cues (border,
+  icon, shape, or label).
+- Light and dark mode behavior must be reviewed independently.
 
-This is now the approved implementation.
+## Semantic Recipe Names
 
-Implications:
+```
+accent.primary.cta               — prominent actions, elevated surfaces
+accent.primary.ctaHover
+accent.primary.ctaActive
+accent.primary.subtleSurface     — active nav item, selected chip background
+accent.primary.focusRing
+accent.secondary.subtleSurface   — chips, badges, informational panels
+accent.secondary.supportingBadge — NEW: badge fills on secondary surfaces
+accent.mixed.heroSurface         — screen hero zones (auth, profile header)
+accent.mixed.promotedPanel       — NEW: featured cards, promoted content zones
+accent.selected.surface          — NEW: selected item background
+accent.selected.content          — NEW: selected item foreground
+accent.divider                   — branded rule/separator
+chrome.surface                   — semi-transparent chrome fill
+chrome.surfaceStrong             — stronger chrome fill
+chrome.border                    — chrome edge
+chrome.borderStrong              — stronger chrome edge
+hover.accentSurface              — hover state on accent surfaces
+screen.washPrimary               — full-screen primary wash (projected from recipe)
+screen.washSecondary             — full-screen secondary wash
+screen.washMixed                 — full-screen mixed wash
+```
 
-- no migration to `expo-linear-gradient` is planned,
-- recipe shapes should continue to support the existing SVG-based layering model,
-- any future convenience wrapper must map cleanly onto this implementation.
+## Package Boundary Conventions
 
-### Restraint model
+- `packages/design-tokens` — token and recipe semantics (single source of truth)
+- `apps/web/src/core/styles/unistyles.ts` — web Unistyles bootstrap
+- `apps/mobile/src/core/styles/unistyles.ts` — mobile Unistyles bootstrap
+- `apps/web/src/app/theme-css.ts` — projects recipe values to CSS custom properties (no logic)
+- `apps/web/src/shared/` — reusable recipe-aware web primitives
+- `apps/mobile/src/shared/` — reusable recipe-aware native primitives
+- Feature code in `apps/web/src/features/` and `apps/mobile/src/features/` composes from
+  shared primitives — does not define its own color systems
 
-This plan keeps the original restraint intent:
+---
 
-- strong promoted accent treatment should be limited to the most important surface in a viewport
-- supporting accent treatment should remain subordinate to primary actions
-- list-heavy, text-heavy, and form-heavy screens should prefer subtle surfaces over decorative emphasis
+# Staging Strategy
 
-## Desired End State
+1. **Stage 1** — Add missing recipes to `packages/design-tokens`
+2. **Stage 2** — Export recipe types from `packages/design-tokens` index files
+3. **Stage 3** — Refactor `apps/web/src/app/theme-css.ts` to project from recipes
+4. **Stage 4** — Audit and update feature usage in `apps/web/src/features/` and
+   `apps/mobile/src/features/`
+5. **Stage 5** — Final verification
 
-### Architecture
+---
 
-- All accent/chrome/screen-wash semantics are defined in `@sd/design-tokens`.
-- Theme projection responsibilities are explicit across `@sd/design-tokens`, `@sd/core-styles`, and app-level projection files.
-- Web theme projection in `theme-css.ts` becomes reference-only.
-- Native and web consume the same logical theme model, with platform-specific output types where needed.
+## Stage 1: Add Missing Recipes to design-tokens
 
-### Package surface
+**Status:** Pending
 
-- `@sd/design-tokens` exports recipe types from package entrypoints.
-- `@sd/design-tokens` and `@sd/core-styles` expose a coherent theme surface for downstream packages.
-- `@sd/shared` exposes one ergonomic recipe-aware gradient primitive for consumers that should not manually unpack gradient fields.
+**Goal:** Add the four missing semantic recipes — `selectedSurface`, `selectedContent`,
+`secondarySupportingBadge`, and `mixedPromotedPanel` — to the existing recipe files in
+`packages/design-tokens/src/recipes/`.
 
-### Feature usage
+**Files:**
 
-- high-visibility UI surfaces use recipes intentionally,
-- active/selected states are standardized,
-- screens do not invent local accent logic,
-- features use accent emphasis with restraint instead of applying branded treatment everywhere.
+- `packages/design-tokens/src/recipes/shared.ts`
+- `packages/design-tokens/src/recipes/web.ts`
+- `packages/design-tokens/src/recipes/native.ts`
 
-### Validation
+**Changes:**
 
-- recipe outputs are covered by tests,
-- accessibility checks are explicit,
-- there is a visual review surface for light and dark mode on web and mobile.
+- In `shared.ts`: add recipe definitions for `selectedSurface`, `selectedContent`,
+  `secondarySupportingBadge`, and `mixedPromotedPanel` following the existing recipe pattern.
+- In `web.ts`: project each new recipe to CSS-ready output fields (`background`, `borderColor`,
+  `textColor`, `shadow`, `radial`, `linear` as appropriate).
+- In `native.ts`: project each new recipe to composition-ready output fields (`baseColorToken`,
+  `borderColorToken`, `linearGradient`, `radialGlow` as appropriate).
 
-## Non-Negotiable Architecture
+**Blockers:** None currently identified.
 
-- Base tokens and semantic recipes live in `@sd/design-tokens`.
-- Theme bridging and styling bootstrap live in `@sd/core-styles`.
-- `apps/web/src/app/theme-css.ts` must only project theme values, not invent recipe logic.
-- Native consumes recipe data from the Unistyles theme.
-- `@sd/shared` owns reusable accent-capable primitives.
-- Feature packages compose recipe-aware screens; they do not define independent color systems.
+**Dependencies:** None — foundational change.
 
-## Workstreams
+**Completion Criteria:**
 
-## Workstream 1: Move Web Chrome And Screen-Wash Values Into Recipe Output
+- `pnpm --filter design-tokens typecheck` passes with no errors.
+- All four new recipe names are exported from `packages/design-tokens/src/recipes/web.ts` and
+  `packages/design-tokens/src/recipes/native.ts`.
 
-### Objective
+**Suggested Commit Message:**
 
-Remove app-local web color computation from [`theme-css.ts`](C:/dev/salafi-audios/apps/web/src/app/theme-css.ts).
+```
+feat(design-tokens): add selectedSurface, selectedContent, secondarySupportingBadge,
+mixedPromotedPanel recipes
 
-### Current issue
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+```
 
-The file still performs color mixing and gradient construction directly. That is the largest remaining architecture violation in the current system.
+---
 
-### Plan
+## Stage 2: Export Recipe Types from design-tokens Index Files
 
-Add web-specific recipe output for:
+**Status:** Pending
 
-- `screen.washPrimary`
-- `screen.washSecondary`
-- `screen.washMixed`
-- `chrome.surface`
-- `chrome.surfaceStrong`
-- `chrome.border`
-- `chrome.borderStrong`
-- `chrome.hoverAccentSurface`
+**Goal:** Ensure `packages/design-tokens/src/index.native.ts` and `index.web.ts` export the
+recipe types so consuming packages can import them without drilling into internal paths.
 
-### Files to update
+**Files:**
 
-- [`packages/design-tokens/src/recipes/web.ts`](C:/dev/salafi-audios/packages/design-tokens/src/recipes/web.ts)
-- [`packages/design-tokens/src/recipes/shared.ts`](C:/dev/salafi-audios/packages/design-tokens/src/recipes/shared.ts) if shared typing needs extension
-- [`apps/web/src/app/theme-css.ts`](C:/dev/salafi-audios/apps/web/src/app/theme-css.ts)
+- `packages/design-tokens/src/index.web.ts`
+- `packages/design-tokens/src/index.native.ts`
 
-### Notes
+**Changes:**
 
-- These values are web-only in rendering form, but they still belong to the recipe layer.
-- Shared typing should not force native to pretend it has screen-wash concepts if they are strictly web projection outputs.
+- In `index.web.ts`: add named exports for all web recipe types and the recipe object itself.
+- In `index.native.ts`: add named exports for all native recipe types and the recipe object.
+- Verify that `theme/web.ts` and `theme/native.ts` recipe projections are accessible via the
+  exported theme type (so `useUnistyles().theme.recipes.*` is fully typed).
 
-### Validation
+**Blockers:** Depends on Stage 1 (new recipes must exist before they can be exported).
 
-- `pnpm --filter @sd/design-tokens typecheck`
-- `pnpm --filter web typecheck`
-- `pnpm --filter web build`
+**Dependencies:** Stage 1 complete.
 
-## Workstream 2: Review Theme Surface Boundaries Across Design Tokens, Core Styles, And Web Projection
+**Completion Criteria:**
 
-### Objective
+- `pnpm --filter design-tokens typecheck` passes.
+- A consuming package can import recipe types from `@sd/design-tokens` without internal paths.
+- `pnpm --filter web typecheck` and `pnpm --filter mobile typecheck` pass.
 
-Treat the broader theme system as an explicit architecture concern instead of limiting the plan to accent recipes.
+**Suggested Commit Message:**
 
-### Current issue
+```
+feat(design-tokens): export recipe types from index.web.ts and index.native.ts
 
-The repo currently relies on three separate layers for theme delivery:
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+```
 
-- `@sd/design-tokens` defines the theme and recipe data,
-- `@sd/core-styles` bridges that data into Unistyles and web styling setup,
-- `apps/web/src/app/theme-css.ts` projects theme values into CSS variables.
+---
 
-The previous version of this plan focused mainly on recipe additions and did not explicitly account for this split.
+## Stage 3: Refactor theme-css.ts to Project from Design-Token Recipes
 
-### Plan
+**Status:** Pending
 
-Review and document the intended responsibility of each layer:
+**Goal:** Remove all local color computations from `apps/web/src/app/theme-css.ts`. The file
+becomes a pure projector: it imports recipe values from `@sd/design-tokens` and writes CSS
+custom properties. It computes nothing.
 
-- what belongs in `@sd/design-tokens`
-- what belongs in `@sd/core-styles`
-- what remains acceptable in app-level projection code
+**Files:**
 
-### Files to review or update if implementation is needed later
+- `apps/web/src/app/theme-css.ts`
 
-- [`packages/design-tokens/src/theme/web.ts`](C:/dev/salafi-audios/packages/design-tokens/src/theme/web.ts)
-- [`packages/design-tokens/src/theme/native.ts`](C:/dev/salafi-audios/packages/design-tokens/src/theme/native.ts)
-- [`packages/core-styles/src/index.web.ts`](C:/dev/salafi-audios/packages/core-styles/src/index.web.ts)
-- [`packages/core-styles/src/index.native.ts`](C:/dev/salafi-audios/packages/core-styles/src/index.native.ts)
-- [`packages/core-styles/src/utils/unistyles.web.ts`](C:/dev/salafi-audios/packages/core-styles/src/utils/unistyles.web.ts)
-- [`apps/web/src/app/theme-css.ts`](C:/dev/salafi-audios/apps/web/src/app/theme-css.ts)
+**Changes:**
 
-### Validation
+- Remove all local computations for `chromeSurface`, `chromeSurfaceStrong`, `chromeBorder`,
+  `chromeBorderStrong`, `hoverAccentSurface`, `screenWashPrimary`, `screenWashSecondary`,
+  `screenWashMixed` — these must instead be projected from the design-token recipe objects.
+- Import the appropriate web recipe object from `@sd/design-tokens`.
+- For each CSS custom property, read the value directly from the recipe projection and write
+  it as a CSS variable. No intermediate computation.
+- Verify `--screen-wash-primary` still works correctly on the auth page and search home after
+  the change.
 
-- no theme logic is duplicated across layers without an intentional reason
-- package responsibilities are clear enough to document and maintain
+**Blockers:** Depends on Stage 2 (recipe types must be exported before they can be imported).
 
-## Workstream 3: Expand The Recipe Model
+**Dependencies:** Stage 2 complete.
 
-### Objective
+**Completion Criteria:**
 
-Add the missing semantic surfaces needed by current feature packages.
+- `apps/web/src/app/theme-css.ts` contains no inline color formulas or gradient computations.
+- `pnpm --filter web typecheck` passes.
+- `pnpm dev:web` — auth page and search home render without visual regressions in light and
+  dark mode.
 
-### Missing recipes
+**Suggested Commit Message:**
 
-- `selectedSurface`
-- `selectedContent`
-- `secondarySupportingBadge`
-- `mixedPromotedPanel`
+```
+refactor(web): make theme-css.ts a pure projector — remove all local color computations
 
-### Why these matter now
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+```
 
-- `feature-navigation` needs standardized selected-state treatment
-- informational panels and restrained promotional containers need something between neutral panels and `mixedHeroSurface`
-- badge and chip treatments should not be improvised per feature
+---
 
-### Files to update
+## Stage 4: Audit and Update Feature Usage
 
-- [`packages/design-tokens/src/recipes/shared.ts`](C:/dev/salafi-audios/packages/design-tokens/src/recipes/shared.ts)
-- [`packages/design-tokens/src/recipes/web.ts`](C:/dev/salafi-audios/packages/design-tokens/src/recipes/web.ts)
-- [`packages/design-tokens/src/recipes/native.ts`](C:/dev/salafi-audios/packages/design-tokens/src/recipes/native.ts)
-- [`apps/web/src/app/theme-css.ts`](C:/dev/salafi-audios/apps/web/src/app/theme-css.ts)
+**Status:** Pending
 
-### CSS variables likely needed
+**Goal:** Audit all feature code in `apps/web/src/features/` and `apps/mobile/src/features/`
+for ad hoc color treatments that should instead use the theme system. Update any violations.
 
-- `--accent-selected-surface`
-- `--accent-selected-content`
-- `--accent-secondary-badge-surface`
-- `--accent-secondary-badge-border`
-- `--accent-secondary-badge-fg`
-- `--accent-mixed-panel-surface`
-- `--accent-mixed-panel-border`
+**Files:**
 
-### Validation
+- `apps/web/src/features/navigation/` — all relevant component files
+- `apps/web/src/features/account/` — all relevant component files
+- `apps/web/src/features/library/` — all relevant component files
+- `apps/web/src/features/live/` — all relevant component files
+- `apps/web/src/features/lecture/` — all relevant component files
+- `apps/web/src/features/scholar/` — all relevant component files
+- `apps/mobile/src/features/navigation/` — all relevant component files
+- `apps/mobile/src/features/account/` — all relevant component files
+- `apps/mobile/src/features/library/` — all relevant component files
+- `apps/mobile/src/features/live/` — all relevant component files
+- `apps/mobile/src/features/lecture/` — all relevant component files
+- `apps/mobile/src/features/scholar/` — all relevant component files
 
-- `pnpm --filter @sd/design-tokens typecheck`
-- `pnpm --filter web typecheck`
+**Changes:**
 
-## Workstream 4: Export Theme And Recipe Types From Package Entrypoints
+- Replace any hardcoded hex/rgba colors that should be semantic recipe values with the
+  appropriate CSS variable reference (web) or `useUnistyles().theme.recipes.*` lookup (native).
+- Replace any local gradient definitions with shared primitives from `apps/web/src/shared/`
+  or `apps/mobile/src/shared/` (e.g. `AccentGradientFill`, future `AccentPanel`).
+- Features must not define their own color systems — they compose from shared primitives.
 
-### Objective
+**Blockers:** Depends on Stage 3 (theme-css.ts must be the projector before features align to
+it). This stage should be executed after Stage 3 is committed.
 
-Make theme and recipe typing available from package entrypoints instead of forcing internal-file imports.
+**Dependencies:** Stage 3 complete.
 
-### Current issue
+**Completion Criteria:**
 
-Current files:
+- `grep -r "rgba\|#[0-9a-fA-F]\{3,6\}" apps/web/src/features apps/mobile/src/features` returns
+  only intentional exceptions (if any), none that override semantic recipe slots.
+- `pnpm --filter web typecheck` and `pnpm --filter mobile typecheck` pass.
+- `pnpm lint` passes with no new violations.
 
-- [`packages/design-tokens/src/index.native.ts`](C:/dev/salafi-audios/packages/design-tokens/src/index.native.ts)
-- [`packages/design-tokens/src/index.web.ts`](C:/dev/salafi-audios/packages/design-tokens/src/index.web.ts)
+**Suggested Commit Message:**
 
-They export themes and typography types, but not recipe types.
+```
+refactor(features): replace ad hoc color treatments with design-token recipe values
 
-This workstream should also verify whether any `@sd/core-styles` entrypoint types need to be made more explicit for downstream consumers.
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+```
 
-### Plan
+---
 
-Export the relevant recipe types from both entrypoints for parity.
+## Stage 5: Final Verification
 
-### Candidate exports from `@sd/design-tokens`
+**Status:** Pending
 
-- `AccentRecipesShared`
-- `AccentRecipesNative`
-- `AccentRecipesWeb`
-- `AccentPrimaryCtaRecipe`
-- `AccentSurfaceRecipe`
-- supporting web-only recipe type shapes if added in Workstream 1
+**Goal:** Run all validation commands across the full monorepo and confirm no regressions.
 
-### Additional review target
+**Files:** No file changes — verification only.
 
-- confirm whether `@sd/core-styles` should re-export any stable theme-facing types, or whether all theme typing should remain sourced from `@sd/design-tokens`
+**Changes:** None.
 
-### Validation
+**Blockers:** Depends on Stage 4 complete.
 
-- `pnpm --filter @sd/design-tokens typecheck`
+**Dependencies:** Stages 1–4 complete.
 
-## Workstream 5: Add A Recipe-Aware Shared Gradient Wrapper
+**Completion Criteria:**
 
-### Objective
+- `pnpm typecheck` passes across all workspaces.
+- `pnpm test` passes with no regressions.
+- `pnpm lint` passes with no new violations.
+- `pnpm build` succeeds for `packages/design-tokens`, `apps/web`, `apps/mobile`.
+- `pnpm dev:web` — visual smoke: auth page, search home, nav active state all render correctly
+  in light and dark mode.
+- `pnpm dev:mobile` — visual smoke: no visual regressions on any native screen.
+- No remaining references to `@sd/core-styles`, `@sd/shared` (dissolved), `packages/shared`,
+  `feature-navigation` (as a package), or `feature-account` (as a package) in source files.
 
-Reduce repetitive unpacking of recipe fields in feature packages.
+**Suggested Commit Message:**
 
-### Current issue
+```
+chore: final verification pass — cross-platform UI color integration complete
 
-Consumers still have to manually pass `linear.*` and `radial.*` values to `AccentGradientFill`.
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+```
 
-### Plan
+---
 
-Add a convenience wrapper such as `AccentGradientFillFromRecipe` inside `@sd/shared`.
+# Final Verification
 
-### Files to update
+After Stage 5 is complete, confirm all of the following:
 
-- create `packages/shared/src/components/AccentGradientFill/AccentGradientFillFromRecipe.tsx`
-- update [`packages/shared/src/index.web.ts`](C:/dev/salafi-audios/packages/shared/src/index.web.ts)
-- update [`packages/shared/src/index.native.ts`](C:/dev/salafi-audios/packages/shared/src/index.native.ts)
+- `pnpm typecheck` — passes across all workspaces
+- `pnpm test` — passes with no regressions
+- `pnpm lint` — passes with no new violations
+- `pnpm build` — succeeds for `packages/design-tokens`, `apps/web`, `apps/mobile`
+- Visual smoke test: auth page, search home, nav active states, accent surfaces — light + dark
+- No `@sd/core-styles`, dissolved `@sd/shared`, or dissolved feature package imports in source
 
-### Scope
+---
 
-The wrapper should accept `AccentPrimaryCtaRecipe | AccentSurfaceRecipe` and map them to the existing primitive without changing the underlying primitive API.
+# Plan Completion
 
-### Additional consideration
+This plan is `Completed` when:
 
-If the wrapper is added, it should support the current native SVG-based implementation cleanly and not assume a future switch to another gradient primitive.
+1. All five stages are marked `Done`.
+2. The Final Verification section passes in full.
+3. `packages/design-tokens` is the single source of truth for all recipe semantics.
+4. `apps/web/src/app/theme-css.ts` is a pure projector with no local color computations.
+5. All feature code in `apps/web/src/features/` and `apps/mobile/src/features/` uses the
+   theme system consistently.
 
-### Validation
-
-- `pnpm --filter @sd/shared typecheck`
-- targeted feature package typechecks for migrated consumers
-
-## Workstream 6: Add A Visual Review Harness
-
-### Objective
-
-Create a stable manual review surface for recipe behavior in light and dark mode.
-
-### Web surface
-
-Proposed route:
-
-- `apps/web/src/app/(main)/design/recipes/page.tsx`
-
-Requirements:
-
-- development-only behavior
-- renders current and newly added recipes
-- shows text, borders, hover-capable states, and disabled states
-- should make it obvious when a surface is intended as CTA, subtle support, selected state, or promoted panel
-
-### Mobile surface
-
-Proposed route:
-
-- `apps/mobile/src/app/design/recipes.tsx`
-
-Requirements:
-
-- development-only behavior
-- renders the same recipe families
-- uses current native theme consumption path
-- should make light and dark review equally straightforward
-
-### Validation
-
-- web route renders in development
-- mobile screen renders in development
-- light and dark mode can both be reviewed intentionally
-
-## Workstream 7: Roll Out Theme And Recipe Usage To Current Feature Surfaces
-
-### Objective
-
-Audit and complete adoption on the current repo surface, not the older subset.
-
-### Immediate rollout targets
-
-- `feature-navigation`
-- `feature-library`
-- `feature-scholar`
-- `feature-lecture`
-- `feature-account`
-- `feature-legal`
-- `feature-live`
-- selected shared empty/auth-required states
-
-### Focus by area
-
-`feature-navigation`
-
-- active sidebar state
-- active tab indicator
-- subsection selection states
-
-`feature-library`
-
-- empty states
-- saved/completed affordances if they currently rely on neutral-only treatment
-
-`feature-scholar`
-
-- hero/header strip
-- promoted contextual surfaces if needed
-
-`feature-lecture`
-
-- primary listening or save actions
-- contextual metadata surfaces where promoted treatment is appropriate
-
-`feature-account`
-
-- account entry surfaces
-- profile/status sections where selected or supporting-badge styles are useful
-
-`feature-legal`
-
-- likely lower priority for accents, but should still be audited to confirm neutral treatment is intentional
-
-`feature-live`
-
-- active/scheduled/ended states may benefit from recipe-backed promotional or selected treatments
-
-### Rule
-
-Do not force accent usage where neutral treatment is the better UX. This is an audit and normalization pass, not a blanket recoloring exercise.
-
-### Screen intent guidance
-
-Auth:
-
-- strong primary emphasis belongs on the main submit path
-- secondary or mixed surfaces can support the shell, but should not compete with the CTA
-
-Search:
-
-- selected chips, entry points, and promoted discovery affordances can use accent recipes
-- results-heavy surfaces should stay mostly neutral
-
-Navigation:
-
-- active state should be branded
-- navigation shell should remain mostly neutral
-
-Empty and informational states:
-
-- one promoted action zone is acceptable
-- supporting panels should use subtle or mixed restrained treatment
-
-Legal and dense reading screens:
-
-- default assumption is neutral-first unless there is a clear UX reason for accent treatment
-
-## Workstream 8: Accessibility Verification
-
-### Objective
-
-Ensure accent adoption does not reduce usability.
-
-### Checklist
-
-- selected and focused states have a non-color cue where needed
-- CTA foreground/background contrast is verified in light mode
-- CTA foreground/background contrast is verified in dark mode
-- focus ring treatment remains visible and consistent
-- promoted gradient usage stays visually restrained
-
-### Validation surface
-
-Use the review harness from Workstream 5 plus targeted spot checks in feature screens.
-
-### Additional checks
-
-- selected states still read clearly in monochrome or reduced-color conditions
-- focus treatment is not visually lost against promoted surfaces
-
-## Workstream 9: Theme And Recipe Layer Tests
-
-### Objective
-
-Add explicit regression coverage for the theme and recipe layer.
-
-### Proposed test file
-
-- `packages/design-tokens/src/recipes/recipes.spec.ts`
-
-### Coverage targets
-
-- web recipe creation returns all expected fields
-- native recipe creation returns all expected fields
-- theme entrypoint exports remain valid for both web and native consumption
-- web theme projection continues to receive all expected values
-- `primaryCta` web backgrounds differ across rest/hover/active
-- native gradient payloads are structurally valid
-- light and dark themes differ meaningfully
-- screen/chrome recipe outputs from Workstream 1 are defined
-- selected and promoted-panel recipes from Workstream 2 are defined
-- review-harness-facing recipe families remain structurally complete
-
-### Notes
-
-- This plan should reference the current dated test plan file if cross-linking is needed:
-  - [`2026-04-07-test-plan.md`](C:/dev/salafi-audios/.agents/plans/2026-04-07-test-plan.md)
-
-## Recommended Execution Order
-
-1. Workstream 1: move web-local chrome/screen-wash logic into recipes
-2. Workstream 2: review broader theme-surface boundaries across design-tokens, core-styles, and web projection
-3. Workstream 3: add missing recipe semantics
-4. Workstream 4: export theme and recipe types
-5. Workstream 5: add the shared recipe-aware wrapper
-6. Workstream 9: add theme/recipe tests in parallel with 1 through 4
-7. Workstream 6: add the review harness
-8. Workstream 7: complete feature rollout audit
-9. Workstream 8: accessibility verification before final signoff
-
-## Review Surface Expectations
-
-Before implementation is considered complete, the merged system should be reviewable at three levels:
-
-1. token/recipe level
-2. shared primitive level
-3. screen-composition level
-
-That means this plan is not complete if the recipe model exists only in code but cannot be inspected coherently in a dedicated review surface.
-
-## Validation Criteria
-
-The plan is complete when:
-
-1. `theme-css.ts` no longer computes accent/chrome/screen-wash recipe logic locally
-2. theme-surface responsibilities between `@sd/design-tokens`, `@sd/core-styles`, and web projection are clear and stable
-3. recipe gaps required by current feature surfaces are closed
-4. theme and recipe types are exported from the right package entrypoints
-5. shared consumers have an ergonomic recipe-aware gradient API
-6. theme/recipe tests exist
-7. a visual review harness exists on web and mobile
-8. current feature packages have been audited and intentionally updated or intentionally left neutral
-9. the resulting system is understandable as a theme-system boundary, not just a collection of accent values
-
-## Risks
-
-1. Over-expanding recipe or theme types can create a bloated semantic surface that features do not actually need
-2. Blurring the boundary between `@sd/design-tokens` and `@sd/core-styles` can make theme ownership less clear
-3. Forcing screen-wash concepts into shared native typing may weaken the platform model
-4. Broad rollout without a review harness may produce inconsistent visual treatment
-5. Accent adoption without accessibility checks may create contrast regressions
-6. Treating all packages as accent candidates may lead to decorative overuse instead of intentional hierarchy
-
-## Non-Goals
-
-- This plan does not change the base token categories in `@sd/design-tokens`
-- This plan does not replace the underlying `AccentGradientFill` primitive API
-- This plan does not require every screen to use accent recipes
-- This plan does not attempt a full visual redesign of the product
-- This plan does not reopen unrelated token categories unless they are directly needed to stabilize the theme system surface
+On completion, move this file to `.agents/plans/completed/` and update status to `Completed`.
