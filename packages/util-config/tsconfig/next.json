@@ -1,8 +1,7 @@
 {
-  "extends": "./app.json",
+  // Next.js apps: extend packages.json for Bundler module resolution, add only JSX mode
+  "extends": "./packages.json",
   "compilerOptions": {
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
     // "preserve" — Next.js handles JSX transformation via SWC; TS should not transform it
     "jsx": "preserve"
   }

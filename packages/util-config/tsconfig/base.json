@@ -7,8 +7,6 @@
     // Skip .d.ts validation in node_modules — speeds up compilation significantly
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    // Type-checking only by default; packages that emit override this in their own tsconfig
-    "noEmit": true,
     "forceConsistentCasingInFileNames": true
   }
 }
