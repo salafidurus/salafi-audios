@@ -17,3 +17,4 @@ export type {
   ChromeRecipe,
 } from "./recipes/shared";
 export type { AccentRecipesWeb } from "./recipes/web";
+export { createAccentRecipesWeb } from "./recipes/web";

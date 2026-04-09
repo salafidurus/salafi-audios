@@ -13,3 +13,4 @@ export type {
   ChromeRecipe,
 } from "./recipes/shared";
 export type { AccentRecipesNative } from "./recipes/native";
+export { createAccentRecipesNative } from "./recipes/native";
