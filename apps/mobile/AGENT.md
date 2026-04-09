@@ -80,7 +80,7 @@ Use the feature's own directory (`src/features/<feature>/`) for the current comp
 // apps/mobile/src/app/(auth)/sign-in.tsx
 import { Platform, useColorScheme } from "react-native";
 import { useRouter } from "expo-router";
-import { SignInMobileNativeScreen } from "../../features/auth/screens/sign-in/sign-in.screen";
+import { SignInScreen } from "../../features/auth/screens/sign-in/sign-in.screen";
 import { authClient } from "../../core/auth";
 
 export default function SignInPage() {
@@ -352,6 +352,22 @@ import { useState } from "react";
 - Typecheck: `pnpm --filter mobile typecheck`
 - Build: `pnpm --filter mobile build`
 - Test: `pnpm --filter mobile test`
+
+## Export Style
+
+Named exports everywhere. `export default` is only used in `src/app/**` route and layout files as required by Expo Router. All components, screens, hooks, and utilities use named exports.
+
+## Naming Conventions
+
+No `MobileNative`, `Native`, or `Mobile` suffix on any identifier inside `apps/mobile`. Components are named for their domain purpose only (e.g., `Button`, `FeedScreen`, `ScholarCard`). `AppText` and `TabIcon` are reference examples of already-clean names.
+
+## Feature Barrels
+
+Every `src/features/<name>/` directory must have an `index.ts` barrel that re-exports the feature's public surface using named exports only. Include: screens (always), and non-screen components only if confirmed to be imported from outside the feature folder. Do NOT speculatively re-export hooks, utilities, or sub-components.
+
+## Type Declarations
+
+`src/types/unistyles-*.d.ts` and `src/unistyles.d.ts` were removed. Unistyles module augmentation now lives exclusively in `src/core/styles/unistyles.ts`.
 
 ### Single-test commands
 
