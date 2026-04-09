@@ -132,7 +132,7 @@ composition and UI. It may depend on domain packages for state.
 4. **Stage 3** — Library feature implementation
 5. **Stage 4** — Scholar detail screen
 6. **Stage 5** — Lecture detail screen
-7. **Stage 6** — Admin permissions system
+7. **Stage 6** — Admin permissions system — Done ✅
 8. **Stage 7** — Livestreams service (`apps/livestreams`)
 
 ---
@@ -469,7 +469,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 6: Admin Permissions System
 
-**Status:** Pending
+**Status:** Done ✅
 
 **Goal:** Add a granular `AdminPermission` DB model, a permission-aware guard, a decorator,
 and CRUD admin endpoints. Replace the single `User.role` string with fine-grained permissions.
