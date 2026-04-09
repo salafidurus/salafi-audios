@@ -22,6 +22,8 @@ export class AdminPermissionGuard implements CanActivate {
       [context.getHandler(), context.getClass()],
     );
 
+    // Routes without @RequiresPermission are guarded only by AuthGuard — this guard is a
+    // layer on top, not a replacement. Returning true here lets AuthGuard's decision stand.
     if (!requiredPermission) return true;
 
     const request = context.switchToHttp().getRequest<Request>();

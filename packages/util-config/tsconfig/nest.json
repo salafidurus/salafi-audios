@@ -1,11 +1,14 @@
 {
   "extends": "./app.json",
   "compilerOptions": {
+    // CommonJS — NestJS runs on Node.js; ESM interop with reflect-metadata and DI is unreliable
     "module": "commonjs",
+    // Required for NestJS decorator-based dependency injection and metadata reflection
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    // Override base noEmit — the API app must produce compiled output for deployment
     "noEmit": false
   }
 }
