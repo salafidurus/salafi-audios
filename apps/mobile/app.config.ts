@@ -1,8 +1,9 @@
 import { ConfigContext, ExpoConfig } from "expo/config";
 import { withSentry } from "@sentry/react-native/expo";
 import { version } from "./package.json";
-import { getMobileBuildEnv, type AppEnv } from "./src/core/config/build-env";
 import path from "path";
+
+type AppEnv = "development" | "preview" | "production";
 
 const OWNER = "basmalabs";
 const PROJECT_ID = "f943688f-bb4a-4f22-af5a-60dc5bafb485";
@@ -45,8 +46,7 @@ type ExpoConfigWithAutolinking = ExpoConfig & {
 };
 
 export default ({ config }: ConfigContext): ExpoConfig => {
-  const buildEnv = getMobileBuildEnv(process.env);
-  const appEnv = buildEnv.APP_ENV;
+  const appEnv = (process.env.APP_ENV ?? "development") as AppEnv;
 
   const { name, iosBundleId, androidPackage, scheme } = ids(appEnv);
 
@@ -91,8 +91,8 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         "@sentry/react-native/expo",
         {
           url: "https://sentry.io/",
-          project: buildEnv.EXPO_PUBLIC_SENTRY_PROJECT,
-          organization: buildEnv.EXPO_PUBLIC_SENTRY_ORG,
+          project: process.env.EXPO_PUBLIC_SENTRY_PROJECT,
+          organization: process.env.EXPO_PUBLIC_SENTRY_ORG,
         },
       ],
     ],
@@ -151,11 +151,11 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         projectId: PROJECT_ID,
       },
       appEnv,
-      apiUrl: buildEnv.EXPO_PUBLIC_API_URL,
-      sentryDsn: buildEnv.EXPO_PUBLIC_SENTRY_DSN,
-      sentryOrg: buildEnv.EXPO_PUBLIC_SENTRY_ORG,
-      sentryProject: buildEnv.EXPO_PUBLIC_SENTRY_PROJECT,
-      vexoProjectId: buildEnv.EXPO_PUBLIC_VEXO_PROJECT_ID,
+      apiUrl: process.env.EXPO_PUBLIC_API_URL,
+      sentryDsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
+      sentryOrg: process.env.EXPO_PUBLIC_SENTRY_ORG,
+      sentryProject: process.env.EXPO_PUBLIC_SENTRY_PROJECT,
+      vexoProjectId: process.env.EXPO_PUBLIC_VEXO_PROJECT_ID,
     },
 
     owner: OWNER,
@@ -163,7 +163,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
   return withSentry(expoConfig, {
     url: "https://sentry.io/",
-    project: buildEnv.EXPO_PUBLIC_SENTRY_PROJECT,
-    organization: buildEnv.EXPO_PUBLIC_SENTRY_ORG,
+    project: process.env.EXPO_PUBLIC_SENTRY_PROJECT,
+    organization: process.env.EXPO_PUBLIC_SENTRY_ORG,
   });
 };

@@ -1,4 +1,4 @@
-import { SearchProcessingMobileNativeScreen } from "../../../../features/search/screens/search-processing/search-processing.screen";
+import { SearchProcessingMobileNativeScreen } from "../../../features/search/screens/search-processing/search-processing.screen";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { routes } from "@sd/core-contracts";
 

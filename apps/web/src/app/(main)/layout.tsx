@@ -1,8 +1,8 @@
-import { Footer } from "../../../features/navigation/components/footer/footer";
-import { Sidebar } from "../../../features/navigation/components/sidebar/sidebar";
-import { TopAuthStrip } from "../../../features/navigation/components/top-auth-strip/top-auth-strip";
-import { MiniPlayerWeb } from "../../../features/playback/components/mini-player/mini-player";
-import { ComponentErrorBoundary } from "../../../shared/components/error-boundary/ComponentErrorBoundary";
+import { Footer } from "../../features/navigation/components/footer/footer";
+import { Sidebar } from "../../features/navigation/components/sidebar/sidebar";
+import { TopAuthStrip } from "../../features/navigation/components/top-auth-strip/top-auth-strip";
+import { MiniPlayerWeb } from "../../features/playback/components/mini-player/mini-player";
+import { ComponentErrorBoundary } from "../../shared/components/error-boundary/ComponentErrorBoundary";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
