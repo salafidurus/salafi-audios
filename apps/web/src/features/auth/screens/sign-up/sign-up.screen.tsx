@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { SignUpMobileScreen } from "./sign-up.screen.mobile";
 import { SignUpDesktopScreen } from "./sign-up.screen.desktop";
 import { useResponsive } from "../../../../shared/hooks/use-responsive";
+import { useIsHydrated } from "../../../../shared/hooks/use-is-hydrated";
 import { authClient } from "../../../../core/auth";
 
 type SignUpScreenProps = {
@@ -17,12 +17,8 @@ export function SignUpResponsiveScreen({
   onSignUpSuccess,
   onNavigateToSignIn,
 }: SignUpScreenProps) {
-  const [isHydrated, setIsHydrated] = useState(false);
+  const isHydrated = useIsHydrated();
   const { isMobile, isTablet } = useResponsive();
-
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
 
   if (!isHydrated) {
     return null;

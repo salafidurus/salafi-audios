@@ -82,7 +82,7 @@ export function AdminDashboardDesktopScreen() {
           ))}
         </div>
         {visibleSections.length === 0 && (
-          <p style={{ color: "#999" }}>You don't have any admin permissions.</p>
+          <p style={{ color: "#999" }}>You don&apos;t have any admin permissions.</p>
         )}
       </div>
     </ScreenView>

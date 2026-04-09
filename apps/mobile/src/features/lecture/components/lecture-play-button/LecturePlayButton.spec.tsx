@@ -1,23 +1,20 @@
 import { render, screen, fireEvent } from "@testing-library/react-native";
 import type { LectureDetailDto } from "@sd/core-contracts";
 import { LecturePlayButton } from "./LecturePlayButton";
+import { usePlayback } from "@sd/domain-playback";
 
-jest.mock("@sd/domain-playback", () => ({
-  usePlayback: jest.fn(),
-}));
+jest.mock("@sd/domain-playback", () => ({ usePlayback: jest.fn() }));
 
-jest.mock("../../../../shared/components/Button/Button", () => ({
-  Button: ({ label, onPress }: { label: string; onPress: () => void }) => {
-    const { TouchableOpacity, Text } = require("react-native");
-    return (
+jest.mock("../../../../shared/components/Button/Button", () => {
+  const { TouchableOpacity, Text } = jest.requireActual("react-native");
+  return {
+    Button: ({ label, onPress }: { label: string; onPress: () => void }) => (
       <TouchableOpacity onPress={onPress}>
         <Text>{label}</Text>
       </TouchableOpacity>
-    );
-  },
-}));
-
-import { usePlayback } from "@sd/domain-playback";
+    ),
+  };
+});
 
 const mockPlay = jest.fn();
 
@@ -74,4 +71,3 @@ describe("LecturePlayButton", () => {
     });
   });
 });
-

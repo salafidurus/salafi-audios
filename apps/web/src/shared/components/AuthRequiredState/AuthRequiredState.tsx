@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useResponsive } from "../../hooks/use-responsive";
+import { useIsHydrated } from "../../hooks/use-is-hydrated";
 import {
   AuthRequiredStateDesktop,
   type AuthRequiredStateDesktopProps,
@@ -11,12 +11,8 @@ import { AuthRequiredStateMobile } from "./AuthRequiredState.mobile";
 export type AuthRequiredStateProps = AuthRequiredStateDesktopProps;
 
 export function AuthRequiredState(props: AuthRequiredStateProps) {
-  const [isHydrated, setIsHydrated] = useState(false);
+  const isHydrated = useIsHydrated();
   const { isMobile, isTablet } = useResponsive();
-
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
 
   if (!isHydrated) {
     return null;

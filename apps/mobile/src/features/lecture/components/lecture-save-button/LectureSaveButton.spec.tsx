@@ -2,16 +2,16 @@ import { render, screen, fireEvent } from "@testing-library/react-native";
 import { useProgressStore } from "@sd/domain-progress";
 import { LectureSaveButton } from "./LectureSaveButton";
 
-jest.mock("../../../../shared/components/Button/Button", () => ({
-  Button: ({ label, onPress }: { label: string; onPress: () => void }) => {
-    const { TouchableOpacity, Text } = require("react-native");
-    return (
+jest.mock("../../../../shared/components/Button/Button", () => {
+  const { TouchableOpacity, Text } = jest.requireActual("react-native");
+  return {
+    Button: ({ label, onPress }: { label: string; onPress: () => void }) => (
       <TouchableOpacity onPress={onPress}>
         <Text>{label}</Text>
       </TouchableOpacity>
-    );
-  },
-}));
+    ),
+  };
+});
 
 const initialState = useProgressStore.getState();
 beforeEach(() => useProgressStore.setState(initialState, true));

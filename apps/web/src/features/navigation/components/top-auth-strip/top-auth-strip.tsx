@@ -1,16 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useResponsive } from "../../../../shared/hooks/use-responsive";
+import { useIsHydrated } from "../../../../shared/hooks/use-is-hydrated";
 import { TopAuthStrip as TopAuthStripDesktop } from "./top-auth-strip.desktop";
 
 export function TopAuthStrip() {
-  const [isHydrated, setIsHydrated] = useState(false);
+  const isHydrated = useIsHydrated();
   const { isWeb } = useResponsive();
-
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
 
   if (!isHydrated) {
     return null;

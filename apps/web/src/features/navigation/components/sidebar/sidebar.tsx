@@ -1,18 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useResponsive } from "../../../../shared/hooks/use-responsive";
+import { useIsHydrated } from "../../../../shared/hooks/use-is-hydrated";
 import { Sidebar as SidebarDesktop } from "./sidebar.desktop";
 import { SidebarTablet } from "./sidebar.tablet";
 import { SidebarMobile } from "./sidebar.mobile";
 
 export function Sidebar() {
-  const [isHydrated, setIsHydrated] = useState(false);
+  const isHydrated = useIsHydrated();
   const { isMobile, isTablet } = useResponsive();
-
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
 
   if (!isHydrated) {
     return null;

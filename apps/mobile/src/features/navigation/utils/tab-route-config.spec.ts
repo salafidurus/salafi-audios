@@ -1,3 +1,5 @@
+import { getRootTabFromPathname, getActiveSubsection } from "./tab-route-config";
+
 jest.mock("lucide-react-native", () => ({
   BookOpen: "BookOpen",
   Cloud: "Cloud",
@@ -5,8 +7,6 @@ jest.mock("lucide-react-native", () => ({
   Search: "Search",
   Settings: "Settings",
 }));
-
-import { getRootTabFromPathname, getActiveSubsection } from "./tab-route-config";
 
 describe("getRootTabFromPathname", () => {
   it("returns search for root path /", () => {

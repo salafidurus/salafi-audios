@@ -1,3 +1,5 @@
+import { routes } from "@sd/core-contracts";
+
 export type Section = "feed" | "live" | "library" | "account";
 
 export type TabConfig = { id: string; label: string; icon: string };
@@ -34,8 +36,6 @@ export const SECTION_LABELS: Record<Section, string> = {
   library: "Library",
   account: "Account",
 };
-
-import { routes } from "@sd/core-contracts";
 
 export const SECTION_ROUTES: Record<Section, string> = {
   feed: routes.feed.index,

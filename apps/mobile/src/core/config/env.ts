@@ -63,6 +63,7 @@ export function getRuntimeEnv() {
   } catch (error) {
     if (!hasLoggedRuntimeExtraWarning) {
       hasLoggedRuntimeExtraWarning = true;
+      // eslint-disable-next-line no-console
       console.warn(
         "Mobile runtime extra is unavailable during native startup. Native integrations will stay disabled until runtime config is present.",
         error,
@@ -90,4 +91,3 @@ export function isProduction(): boolean {
 export function getApiBaseUrl(): string | undefined {
   return getRuntimeEnv()?.apiUrl;
 }
-
