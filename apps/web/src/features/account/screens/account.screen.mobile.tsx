@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "react-i18next";
 import { useAccountScreen } from "@sd/domain-account";
 
 export type AccountMobileScreenProps = {
@@ -14,14 +15,15 @@ export function AccountMobileScreen({
   onSignOut,
 }: AccountMobileScreenProps) {
   const { profile, isFetching } = useAccountScreen();
+  const { t } = useTranslation();
 
   if (isFetching) {
-    return <div style={{ padding: 16 }}>Loading account...</div>;
+    return <div style={{ padding: 16 }}>{t("common.loading", "Loading account...")}</div>;
   }
 
   return (
     <div style={{ padding: 16 }}>
-      <h1 style={{ margin: 0, fontSize: 22 }}>Account</h1>
+      <h1 style={{ margin: 0, fontSize: 22 }}>{t("account.title", "Account")}</h1>
       {profile && (
         <div style={{ marginTop: 16, display: "flex", alignItems: "center", gap: 12 }}>
           {profile.avatarUrl && (
@@ -32,7 +34,9 @@ export function AccountMobileScreen({
             />
           )}
           <div>
-            <div style={{ fontSize: 16, fontWeight: 600 }}>{profile.displayName || "User"}</div>
+            <div style={{ fontSize: 16, fontWeight: 600 }}>
+              {profile.displayName || t("account.defaultUser", "User")}
+            </div>
             <div style={{ fontSize: 13, color: "var(--content-muted)" }}>{profile.email}</div>
           </div>
         </div>
@@ -51,7 +55,7 @@ export function AccountMobileScreen({
             fontSize: 14,
           }}
         >
-          Edit Profile
+          {t("account.editProfile", "Edit Profile")}
         </button>
         <button
           type="button"
@@ -66,7 +70,7 @@ export function AccountMobileScreen({
             fontSize: 14,
           }}
         >
-          Legal
+          {t("account.legal", "Legal")}
         </button>
         <button
           type="button"
@@ -82,7 +86,7 @@ export function AccountMobileScreen({
             color: "var(--action-danger)",
           }}
         >
-          Sign Out
+          {t("account.signOut", "Sign Out")}
         </button>
       </div>
     </div>

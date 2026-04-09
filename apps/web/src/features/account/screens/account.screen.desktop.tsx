@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "react-i18next";
 import { useAccountScreen } from "@sd/domain-account";
 
 export type AccountDesktopScreenProps = {
@@ -14,14 +15,15 @@ export function AccountDesktopScreen({
   onSignOut,
 }: AccountDesktopScreenProps) {
   const { profile, isFetching } = useAccountScreen();
+  const { t } = useTranslation();
 
   if (isFetching) {
-    return <div style={{ padding: 32 }}>Loading account...</div>;
+    return <div style={{ padding: 32 }}>{t("common.loading", "Loading account...")}</div>;
   }
 
   return (
     <div style={{ maxWidth: 600, margin: "0 auto", padding: 32 }}>
-      <h1 style={{ margin: 0, fontSize: 28 }}>Account</h1>
+      <h1 style={{ margin: 0, fontSize: 28 }}>{t("account.title", "Account")}</h1>
       {profile && (
         <div style={{ marginTop: 24 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
@@ -33,7 +35,9 @@ export function AccountDesktopScreen({
               />
             )}
             <div>
-              <div style={{ fontSize: 18, fontWeight: 600 }}>{profile.displayName || "User"}</div>
+              <div style={{ fontSize: 18, fontWeight: 600 }}>
+                {profile.displayName || t("account.defaultUser", "User")}
+              </div>
               <div style={{ fontSize: 14, color: "var(--content-muted)" }}>{profile.email}</div>
             </div>
           </div>
@@ -53,7 +57,7 @@ export function AccountDesktopScreen({
             fontSize: 15,
           }}
         >
-          Edit Profile
+          {t("account.editProfile", "Edit Profile")}
         </button>
         <button
           type="button"
@@ -68,7 +72,7 @@ export function AccountDesktopScreen({
             fontSize: 15,
           }}
         >
-          Legal
+          {t("account.legal", "Legal")}
         </button>
         <button
           type="button"
@@ -84,7 +88,7 @@ export function AccountDesktopScreen({
             color: "var(--action-danger)",
           }}
         >
-          Sign Out
+          {t("account.signOut", "Sign Out")}
         </button>
       </div>
     </div>

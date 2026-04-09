@@ -6,8 +6,8 @@ import {
   TopicViewDto,
   TopicLectureViewDto,
   TranslationViewDto,
+  type Locale,
 } from '@sd/core-contracts';
-import type { Locale } from '@sd/core-i18n';
 import { UpsertTopicDto } from './dto/upsert-topic.dto';
 import { SaveTopicTranslationDto } from './dto/save-topic-translation.dto';
 import { isLegacyTopicSchemaFailure } from './topics-error.utils';

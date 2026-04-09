@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { routes } from "@sd/core-contracts";
 import { authClient } from "../../../../core/auth";
 import { TextInput } from "../../../../shared/components/TextInput/TextInput";
 import { GoogleSignInButton, AppleSignInButton } from "../../components/social-buttons";
@@ -17,6 +19,7 @@ export function SignUpDesktopScreen({
   onSignUpSuccess,
   onNavigateToSignIn,
 }: SignUpDesktopScreenProps) {
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [emailTouched, setEmailTouched] = useState(false);
@@ -61,11 +64,11 @@ export function SignUpDesktopScreen({
             />
             <span>
               I agree to the{" "}
-              <a href="/terms-of-use" className={styles.inlineLink}>
+              <a href={routes.termsOfUse} className={styles.inlineLink}>
                 Terms of Service
               </a>{" "}
               and{" "}
-              <a href="/privacy" className={styles.inlineLink}>
+              <a href={routes.privacy} className={styles.inlineLink}>
                 Privacy Policy
               </a>
             </span>
@@ -140,7 +143,7 @@ export function SignUpDesktopScreen({
           <p className={styles.footerText}>
             Already have an account?{" "}
             <a
-              href="/sign-in"
+              href={routes.signIn}
               onClick={(e) => {
                 e.preventDefault();
                 onNavigateToSignIn();

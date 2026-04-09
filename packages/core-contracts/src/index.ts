@@ -89,3 +89,10 @@ export {
   type TranslationTarget,
   type UpdateLocaleDto,
 } from "./types/translation.types";
+
+export {
+  SUPPORTED_LOCALES,
+  DEFAULT_LOCALE,
+  RTL_LOCALES,
+  type Locale,
+} from "./types/localization.types";

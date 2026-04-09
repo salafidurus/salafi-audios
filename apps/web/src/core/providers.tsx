@@ -5,7 +5,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { I18nextProvider } from "react-i18next";
 import { initApiClient } from "@sd/core-api";
 import { createQueryClient } from "@sd/core-contracts/query";
-import type { Locale } from "@sd/core-i18n";
+import type { Locale } from "@sd/core-contracts";
 import { createI18n } from "./i18n/i18n";
 import { setLocaleCookie } from "./i18n/locale-cookie";
 

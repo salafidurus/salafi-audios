@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsIn, IsOptional, IsString } from 'class-validator';
-import { SUPPORTED_LOCALES } from '@sd/core-i18n';
+import { SUPPORTED_LOCALES } from '@sd/core-contracts';
 
 export class SaveSeriesTranslationDto {
   @ApiProperty({ enum: SUPPORTED_LOCALES })

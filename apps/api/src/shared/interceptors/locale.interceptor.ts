@@ -6,7 +6,8 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 import type { Observable } from 'rxjs';
-import { resolveLocale, type Locale } from '@sd/core-i18n';
+import { resolveLocale } from '@sd/core-i18n';
+import type { Locale } from '@sd/core-contracts';
 
 @Injectable()
 export class LocaleInterceptor implements NestInterceptor {

@@ -29,7 +29,7 @@ export function TranslationEditor({ target, fields, originalValues }: Translatio
 
   const active = data?.translations.find((t) => t.locale === activeLocale);
 
-  const getFieldValue = (key: string) => fieldValues[key] ?? active?.fields[key] ?? "" ?? "";
+  const getFieldValue = (key: string) => fieldValues[key] ?? active?.fields[key] ?? "";
 
   const handleSave = () => {
     const mergedFields: Record<string, string | null> = {};

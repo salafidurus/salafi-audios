@@ -6,8 +6,8 @@ import type {
   RelatedLectureDto,
   AdminLectureUpdateDto,
   TranslationViewDto,
+  Locale,
 } from '@sd/core-contracts';
-import type { Locale } from '@sd/core-i18n';
 import type { SaveLectureTranslationDto } from './dto/save-lecture-translation.dto';
 
 @Injectable()

@@ -1,12 +1,16 @@
 import { useRouter } from "expo-router";
 import { ScholarListScreen } from "../../../features/scholar/screens/scholar-list/scholar-list.screen";
+import { routes } from "@sd/core-contracts";
 
-export default function ScholarsScreen() {
+export default function ScholarsRoute() {
   const router = useRouter();
 
   return (
     <ScholarListScreen
-      onSelectScholar={(slug) => router.push({ pathname: "/scholar/[slug]", params: { slug } })}
+      onSelectScholar={(slug: string) => {
+        const path = routes.scholars.detail(slug);
+        router.push(path as any);
+      }}
     />
   );
 }

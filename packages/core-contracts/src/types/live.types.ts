@@ -1,6 +1,6 @@
 export type LiveSessionStatus = "scheduled" | "live" | "ended";
 
-import type { Locale } from "@sd/core-i18n";
+import type { Locale } from "./localization.types";
 
 export type LiveSessionPublicDto = {
   id: string;

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { routes } from "@sd/core-contracts";
 import { authClient } from "../../../../core/auth";
 import { TextInput } from "../../../../shared/components/TextInput/TextInput";
 import { GoogleSignInButton, AppleSignInButton } from "../../components/social-buttons";
@@ -17,6 +19,7 @@ export function SignInDesktopScreen({
   onSignInSuccess,
   onNavigateToSignUp,
 }: SignInDesktopScreenProps) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [emailTouched, setEmailTouched] = useState(false);
   const [password, setPassword] = useState("");
@@ -108,7 +111,7 @@ export function SignInDesktopScreen({
           <p className={styles.footerText}>
             Don&apos;t have an account?{" "}
             <a
-              href="/sign-up"
+              href={routes.signUp}
               onClick={(e) => {
                 e.preventDefault();
                 onNavigateToSignUp();

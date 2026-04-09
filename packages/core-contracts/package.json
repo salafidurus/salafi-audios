@@ -47,7 +47,6 @@
     "test:cov": "jest --coverage --passWithNoTests"
   },
   "dependencies": {
-    "@sd/core-i18n": "workspace:*",
     "@tanstack/react-query": "^5.69.0"
   },
   "devDependencies": {

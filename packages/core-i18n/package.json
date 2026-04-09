@@ -28,8 +28,14 @@
     "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
+  "dependencies": {
+    "@sd/core-contracts": "workspace:*",
+    "i18next": "^23.7.6",
+    "react-i18next": "^14.0.0"
+  },
   "devDependencies": {
     "@sd/util-config": "workspace:*",
+    "@types/react": "^19.2.9",
     "@types/jest": "^30.0.0",
     "jest": "^30.2.0",
     "rimraf": "^6.0.0",

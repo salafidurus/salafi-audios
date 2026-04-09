@@ -9,8 +9,8 @@ import type {
   SeriesSummaryDto,
   LectureSummaryDto,
   TranslationViewDto,
+  Locale,
 } from '@sd/core-contracts';
-import type { Locale } from '@sd/core-i18n';
 import type { CreateScholarDto } from './dto/create-scholar.dto';
 import type { UpdateScholarDto } from './dto/update-scholar.dto';
 import type { SaveScholarTranslationDto } from './dto/save-scholar-translation.dto';
