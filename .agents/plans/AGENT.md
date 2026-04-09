@@ -149,7 +149,11 @@ pnpm test:e2e                           # Playwright E2E (web only)
 
 - Follow Conventional Commits: `type(scope): description`
 - Lines must not exceed 100 characters
-- Always include the Co-authored-by trailer:
+- Always include `Co-authored-by` trailers for every agent/model that made a material
+  contribution to the task.
+- Multiple co-authors are allowed and expected when multiple agents/models contributed;
+  add one trailer line per contributor.
+- If Copilot contributed, include:
   `Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>`
 
 ### Package boundary conventions
