@@ -1,5 +1,5 @@
 import { Text, type TextProps } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { useUnistyles } from "react-native-unistyles";
 import type { TypographyVariant } from "@sd/design-tokens";
 
 export type AppTextProps = {

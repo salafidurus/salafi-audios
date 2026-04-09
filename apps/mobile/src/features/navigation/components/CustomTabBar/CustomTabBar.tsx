@@ -14,7 +14,6 @@ type CustomTabBarProps = Parameters<NonNullable<ComponentProps<typeof Tabs>["tab
 export function CustomTabBarMobileNative({ state, descriptors, navigation }: CustomTabBarProps) {
   const insets = useSafeAreaInsets();
   const { theme } = useUnistyles();
-  const supportsEaseView = typeof EaseView === "function";
 
   return (
     <View pointerEvents="box-none" style={styles.wrapper}>
@@ -65,30 +64,13 @@ export function CustomTabBarMobileNative({ state, descriptors, navigation }: Cus
                 accessibilityLabel={`Open ${label}`}
                 style={styles.tabPressable}
               >
-                {supportsEaseView ? (
-                  <EaseView
-                    animate={{
-                      scale: isFocused ? 1 : 0.97,
-                      opacity: isFocused ? 1 : 0.78,
-                    }}
-                    transition={{ type: "spring", damping: 12, stiffness: 150 }}
-                  >
-                    <View style={[styles.tab, isFocused && styles.tabActive]}>
-                      <Icon
-                        color={
-                          isFocused ? theme.colors.content.primary : theme.colors.content.muted
-                        }
-                        size={20}
-                        strokeWidth={1.9}
-                      />
-                      {isFocused ? (
-                        <Text style={styles.label} numberOfLines={1}>
-                          {label}
-                        </Text>
-                      ) : null}
-                    </View>
-                  </EaseView>
-                ) : (
+                <EaseView
+                  animate={{
+                    scale: isFocused ? 1 : 0.97,
+                    opacity: isFocused ? 1 : 0.78,
+                  }}
+                  transition={{ type: "spring", damping: 12, stiffness: 150 }}
+                >
                   <View style={[styles.tab, isFocused && styles.tabActive]}>
                     <Icon
                       color={isFocused ? theme.colors.content.primary : theme.colors.content.muted}
@@ -101,7 +83,7 @@ export function CustomTabBarMobileNative({ state, descriptors, navigation }: Cus
                       </Text>
                     ) : null}
                   </View>
-                )}
+                </EaseView>
               </Pressable>
             );
           })}

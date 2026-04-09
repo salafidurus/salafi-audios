@@ -1,7 +1,7 @@
 # Metadata
 
 - **Date:** 2026-04-07
-- **Status:** In Progress
+- **Status:** Completed
 - **Scope:** Full monorepo — `packages/design-tokens`, `apps/api`, `apps/web`, `apps/mobile`,
   `apps/livestreams` (new), `packages/domain-*`, `packages/core-contracts`, `packages/core-db`
 - **Summary:** Establish the cross-platform design token recipe system, fix TypeScript
@@ -126,9 +126,9 @@ composition and UI. It may depend on domain packages for state.
 
 # Staging Strategy
 
-1. **Stage 0** — Design token recipe system (In Progress — partially done)
+1. **Stage 0** — Design token recipe system — Done ✅
 2. **Stage 1** — TypeScript deprecation noise removal (baseUrl cleanup) — Done ✅
-3. **Stage 2** — Feed feature implementation
+3. **Stage 2** — Feed feature implementation — Done ✅
 4. **Stage 3** — Library feature implementation
 5. **Stage 4** — Scholar detail screen
 6. **Stage 5** — Lecture detail screen — Done ✅
@@ -139,7 +139,7 @@ composition and UI. It may depend on domain packages for state.
 
 ## Stage 0: Design Token Recipe System
 
-**Status:** In Progress
+**Status:** Done ✅
 
 **Goal:** Make `packages/design-tokens` the single source of truth for all accent recipe
 semantics. Make `apps/web/src/app/theme-css.ts` a pure projector. Ensure feature code in
@@ -235,7 +235,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 2: Feed Feature Implementation
 
-**Status:** Pending
+**Status:** Done ✅
 
 **Goal:** Implement the ranked infinite-scroll Feed feature. Anonymous users get a generic
 ranked feed; personalization hints (scholar/topic slugs from local state) are passed as query
@@ -413,7 +413,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 5: Lecture Detail Screen
 
-**Status:** Pending
+**Status:** Done ✅
 
 **Goal:** Implement lecture detail pages on web and mobile. Single public API endpoint;
 feature area in `apps/web/src/features/lecture/` and `apps/mobile/src/features/lecture/`.

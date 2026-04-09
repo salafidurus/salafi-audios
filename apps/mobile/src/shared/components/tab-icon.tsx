@@ -21,7 +21,6 @@ type TabIconProps = {
 
 export function TabIcon({ name, focused, size = 24 }: TabIconProps) {
   const { theme } = useUnistyles();
-  const supportsEaseView = typeof EaseView === "function";
 
   const Icon = ICONS[name] as ComponentType<{
     size?: number;
@@ -29,10 +28,6 @@ export function TabIcon({ name, focused, size = 24 }: TabIconProps) {
     color?: string;
   }>;
   const color = focused ? theme.colors.content.primary : theme.colors.content.muted;
-
-  if (!supportsEaseView) {
-    return <Icon color={color} size={size} strokeWidth={focused ? 1.5 : 2} />;
-  }
 
   return (
     <EaseView

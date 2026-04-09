@@ -41,12 +41,22 @@ export function ButtonMobileNative({
 }: ButtonMobileNativeProps) {
   const { theme } = useUnistyles();
   const [isPressed, setIsPressed] = useState(false);
-  const supportsEaseView = typeof EaseView === "function";
 
   const isDisabled = disabled || loading;
 
-  const content = (
-    <>
+  return (
+    <EaseView
+      animate={{
+        scale: isPressed ? 0.97 : 1,
+        opacity: isPressed ? 0.88 : 1,
+      }}
+      transition={{
+        type: "spring",
+        damping: 10,
+        stiffness: 100,
+      }}
+      style={[fullWidth ? base.stretch : base.shrink, isDisabled && base.disabled]}
+    >
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={label}
@@ -94,27 +104,6 @@ export function ButtonMobileNative({
           </>
         )}
       </Pressable>
-    </>
-  );
-
-  if (!supportsEaseView) {
-    return <>{content}</>;
-  }
-
-  return (
-    <EaseView
-      animate={{
-        scale: isPressed ? 0.97 : 1,
-        opacity: isPressed ? 0.88 : 1,
-      }}
-      transition={{
-        type: "spring",
-        damping: 10,
-        stiffness: 100,
-      }}
-      style={[fullWidth ? base.stretch : base.shrink, isDisabled && base.disabled]}
-    >
-      {content}
     </EaseView>
   );
 }
