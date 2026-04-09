@@ -133,7 +133,7 @@ composition and UI. It may depend on domain packages for state.
 5. **Stage 4** — Scholar detail screen
 6. **Stage 5** — Lecture detail screen
 7. **Stage 6** — Admin permissions system — Done ✅
-8. **Stage 7** — Livestreams service (`apps/livestreams`)
+8. **Stage 7** — Livestreams service (`apps/livestreams`) — Done ✅
 
 ---
 
@@ -546,7 +546,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 7: Livestreams Service
 
-**Status:** Pending
+**Status:** Done ✅
 
 **Goal:** Create `apps/livestreams` — a standalone NestJS service with a Telegram MTProto
 connection that polls channels for live session state and writes to the shared DB. The main

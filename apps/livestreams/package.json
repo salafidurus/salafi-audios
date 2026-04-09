@@ -6,13 +6,16 @@
     "dev": "nest start --watch",
     "build": "nest build",
     "start": "node dist/main.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch --passWithNoTests",
+    "test:prepush": "jest --changedSince=origin/main --passWithNoTests"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.3",
     "@nestjs/core": "^11.1.3",
-    "@nestjs/platform-fastify": "^11.1.3",
-    "@nestjs/swagger": "^11.2.0",
+    "@nestjs/platform-express": "^11.1.3",
+    "@nestjs/schedule": "^5.0.0",
     "@sd/core-contracts": "workspace:*",
     "@sd/core-db": "workspace:*",
     "reflect-metadata": "^0.2.2",
@@ -20,6 +23,14 @@
     "telegram": "^2.26.16"
   },
   "devDependencies": {
-    "@nestjs/cli": "^11.0.7"
+    "@nestjs/cli": "^11.0.7",
+    "@nestjs/testing": "^11.1.3",
+    "@sd/util-config": "workspace:*",
+    "@types/express": "^5.0.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^22.10.7",
+    "jest": "^30.0.0",
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.9.0"
   }
 }

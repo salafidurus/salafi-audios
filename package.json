@@ -16,6 +16,7 @@
     "dev:mobile:prebuild:ios": "pnpm --filter mobile prebuild:clean && pnpm --filter mobile ios",
     "dev:api+web": "pnpm --filter @sd/design-tokens build && pnpm --filter @sd/core-db build && turbo run dev --concurrency=25 --filter=api --filter=web",
     "dev:api+mobile": "pnpm --filter @sd/design-tokens build && pnpm --filter @sd/core-db build && turbo run dev --concurrency=25 --filter=api --filter=mobile",
+    "dev:livestreams": "pnpm --filter @sd/core-db build && turbo run dev --concurrency=25 --filter=livestreams",
     "build": "turbo run build",
     "build:affected": "turbo run build --affected",
     "build:api": "turbo run build --filter=api...",
