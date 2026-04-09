@@ -1,2 +1,2 @@
-import baseConfig from "@sd/util-config/eslint/base";
-export default baseConfig;
+import packagesConfig from "@sd/util-config/eslint/packages";
+export default packagesConfig;
