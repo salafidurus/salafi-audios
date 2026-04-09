@@ -84,7 +84,7 @@ export const routeAuth = {
   signIn: "public",
   signUp: "public",
   library: "local-first",
-  account: "auth",
+  account: "local-first",
 } as const satisfies Record<keyof typeof routes, RouteAuthMode>;
 
 /**
