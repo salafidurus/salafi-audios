@@ -31,7 +31,7 @@ The web app consumes shared packages directly: `@sd/core-*` and `@sd/domain-*`. 
 - `next.config.ts` transpiles `@sd/*` packages directly instead of importing pre-built bundles
 - `@sd/core-*` packages use `react-native` aliased to `react-native-web` via module resolver
 - App-local `src/features/` and `src/shared/` use plain `.tsx` (CSS-responsive default), `.desktop.tsx` (desktop-only layout variant), and `.mobile.tsx` (mobile-web variant)
-- App-local `src/core/` contains: `providers.tsx`, `config/env.ts`, `styles/unistyles.ts`, `styles/UnistylesStyle.tsx`
+- App-local `src/core/` contains: `providers.tsx`, `config/env.ts`, `styles/unistyles.ts`, `styles/UnistylesStyle.tsx`, `auth/` (auth client + hooks)
 
 **When to use local shared components:**
 
@@ -72,7 +72,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { SignInMobileWebScreen } from "./sign-in.screen.mobile";
 import { SignInDesktopScreen } from "./sign-in.screen.desktop";
 import { useResponsive } from "@/shared/hooks/use-responsive";
-import { authClient } from "@sd/core-auth";
+import { authClient } from "../../core/auth";
 
 export function SignInScreen() {
   const router = useRouter();

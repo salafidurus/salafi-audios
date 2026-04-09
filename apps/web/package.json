@@ -21,7 +21,7 @@
     "@hugeicons/react": "^1.1.5",
     "@sd/core-contracts": "workspace:*",
     "@sd/core-api": "workspace:*",
-    "@sd/core-auth": "workspace:*",
+    "better-auth": "^1.5.5",
     "@sd/design-tokens": "workspace:*",
     "@sd/domain-content": "workspace:*",
     "@sd/domain-live": "workspace:*",

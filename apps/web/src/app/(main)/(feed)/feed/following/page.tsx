@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useAuth } from "@sd/core-auth";
+import { useAuth } from "../../../../../core/auth";
 import { FeedFollowingResponsiveScreen } from "../../../../../features/feed/screens/feed-following.screen";
 import { AuthRequiredStateResponsive } from "../../../../../shared/components/AuthRequiredState/AuthRequiredState";
 import { routes } from "@sd/core-contracts";

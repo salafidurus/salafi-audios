@@ -3,8 +3,7 @@
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import clsx from "clsx";
-import { useAuth } from "@sd/core-auth";
-import { authClient } from "@sd/core-auth";
+import { useAuth, authClient } from "../../../../core/auth";
 import { ButtonDesktopWeb } from "../../../../shared/components/Button/Button";
 import { Search } from "lucide-react";
 import { routes } from "@sd/core-contracts";

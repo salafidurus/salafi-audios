@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { authClient } from "@sd/core-auth";
+import { authClient } from "../../../../core/auth";
 import { TextInputWeb } from "../../../../shared/components/TextInput/TextInput";
 import { GoogleSignInButton, AppleSignInButton } from "../../components/social-buttons";
 import styles from "../auth-form.module.css";

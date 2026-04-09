@@ -1,7 +1,7 @@
 import { Platform, useColorScheme } from "react-native";
 import { useRouter } from "expo-router";
 import { SignInMobileNativeScreen } from "../../features/auth/screens/sign-in/sign-in.screen";
-import { authClient } from "@sd/core-auth";
+import { authClient } from "../../core/auth";
 import { routes } from "@sd/core-contracts";
 
 export default function SignInPage() {

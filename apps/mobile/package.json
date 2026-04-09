@@ -31,7 +31,7 @@
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.28",
     "@sd/core-api": "workspace:*",
-    "@sd/core-auth": "workspace:*",
+    "better-auth": "^1.5.5",
     "@sd/core-contracts": "workspace:*",
     "@sd/design-tokens": "workspace:*",
     "@sd/domain-content": "workspace:*",

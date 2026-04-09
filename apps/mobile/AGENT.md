@@ -37,7 +37,7 @@ This Expo/React Native app prioritizes offline listening and resilient sync.
 - `app/` — routing and composition
 - `app/(tabs)/` — Expo Router tabs boundary for the main signed-in and public app surface
 - `features/` — domain UX slices
-- `core/` — API/auth/playback/persistence/sync infrastructure; also contains app-local bootstrap (`providers.tsx`, `config/env.ts`, `styles/unistyles.ts`, `integrations.ts`)
+- `core/` — API/auth/playback/persistence/sync infrastructure; also contains app-local bootstrap (`providers.tsx`, `config/env.ts`, `styles/unistyles.ts`, `integrations.ts`, `auth/` (auth client + hooks))
 - `shared/` — primitives/utilities
 
 **Dependency direction:**
@@ -52,7 +52,7 @@ shared → no inward deps
 
 ## Native Package Entrypoints
 
-- Any package imported from mobile via its root specifier, for example `@sd/core-auth`, must expose a `react-native` export in `package.json`.
+- Any package imported from mobile via its root specifier must expose a `react-native` export in `package.json`.
 - If a package root needs platform-specific behavior, add `src/index.native.ts` and route the `react-native` export to it.
 - Do not rely on a web-first root `src/index.ts` for native, especially when that file statically re-exports `.web` or `.desktop.web` modules.
 - A missing native root export caused Expo Dev Client runtime bundle failures in March 2026 by pulling web-only package entrypoints into the Android graph.
@@ -81,7 +81,7 @@ Use the feature's own directory (`src/features/<feature>/`) for the current comp
 import { Platform, useColorScheme } from "react-native";
 import { useRouter } from "expo-router";
 import { SignInMobileNativeScreen } from "../../features/auth/screens/sign-in/sign-in.screen";
-import { authClient } from "@sd/core-auth";
+import { authClient } from "../../core/auth";
 
 export default function SignInPage() {
   const router = useRouter();

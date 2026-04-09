@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import { useAuth } from "@sd/core-auth";
+import { useAuth } from "../../../../core/auth";
 import { routes } from "@sd/core-contracts";
 import { Cloud, Mic, Search, CassetteTape, Settings, type LucideIcon } from "lucide-react";
 import styles from "./sidebar-bottom.module.css";

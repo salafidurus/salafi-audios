@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { SignInMobileWebScreen } from "./sign-in.screen.mobile";
 import { SignInDesktopScreen } from "./sign-in.screen.desktop";
 import { useResponsive } from "../../../../shared/hooks/use-responsive";
-import { authClient } from "@sd/core-auth";
+import { authClient } from "../../../../core/auth";
 
 type SignInScreenProps = {
   redirectTo: string;
