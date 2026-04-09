@@ -1,0 +1,89 @@
+.displayLg {
+  font-family: var(--typo-display-lg-font-family), serif;
+  font-size: var(--typo-display-lg-font-size);
+  line-height: var(--typo-display-lg-line-height);
+  font-weight: var(--typo-display-lg-font-weight);
+  letter-spacing: var(--typo-display-lg-letter-spacing);
+  color: var(--content-primary);
+}
+
+.displayMd {
+  font-family: var(--typo-display-md-font-family), serif;
+  font-size: var(--typo-display-md-font-size);
+  line-height: var(--typo-display-md-line-height);
+  font-weight: var(--typo-display-md-font-weight);
+  letter-spacing: var(--typo-display-md-letter-spacing);
+  color: var(--content-primary);
+}
+
+.titleLg {
+  font-family: var(--typo-title-lg-font-family), serif;
+  font-size: var(--typo-title-lg-font-size);
+  line-height: var(--typo-title-lg-line-height);
+  font-weight: var(--typo-title-lg-font-weight);
+  letter-spacing: var(--typo-title-lg-letter-spacing);
+  color: var(--content-primary);
+}
+
+.titleMd {
+  font-family: var(--typo-title-md-font-family), serif;
+  font-size: var(--typo-title-md-font-size);
+  line-height: var(--typo-title-md-line-height);
+  font-weight: var(--typo-title-md-font-weight);
+  letter-spacing: var(--typo-title-md-letter-spacing);
+  color: var(--content-primary);
+}
+
+.bodyLg {
+  font-family: var(--typo-body-lg-font-family), sans-serif;
+  font-size: var(--typo-body-lg-font-size);
+  line-height: var(--typo-body-lg-line-height);
+  font-weight: var(--typo-body-lg-font-weight);
+  letter-spacing: var(--typo-body-lg-letter-spacing);
+  color: var(--content-primary);
+}
+
+.bodyMd {
+  font-family: var(--typo-body-md-font-family), sans-serif;
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  font-weight: var(--typo-body-md-font-weight);
+  letter-spacing: var(--typo-body-md-letter-spacing);
+  color: var(--content-primary);
+}
+
+.bodySm {
+  font-family: var(--typo-body-sm-font-family), sans-serif;
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
+  font-weight: var(--typo-body-sm-font-weight);
+  letter-spacing: var(--typo-body-sm-letter-spacing);
+  color: var(--content-primary);
+}
+
+.labelMd {
+  font-family: var(--typo-label-md-font-family), sans-serif;
+  font-size: var(--typo-label-md-font-size);
+  line-height: var(--typo-label-md-line-height);
+  font-weight: var(--typo-label-md-font-weight);
+  letter-spacing: var(--typo-label-md-letter-spacing);
+  color: var(--content-primary);
+}
+
+.caption {
+  font-family: var(--typo-caption-font-family), sans-serif;
+  font-size: var(--typo-caption-font-size);
+  line-height: var(--typo-caption-line-height);
+  font-weight: var(--typo-caption-font-weight);
+  letter-spacing: var(--typo-caption-letter-spacing);
+  color: var(--content-primary);
+}
+
+.xs {
+  font-family: var(--typo-xs-font-family), sans-serif;
+  font-size: var(--typo-xs-font-size);
+  line-height: var(--typo-xs-line-height);
+  font-weight: var(--typo-xs-font-weight);
+  letter-spacing: var(--typo-xs-letter-spacing);
+  color: var(--content-primary);
+}

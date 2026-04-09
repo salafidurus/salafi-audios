@@ -1,16 +1,15 @@
-import { type ViewStyle } from "react-native";
-import { View } from "react-native-unistyles/components/native/View";
-import { StyleSheet } from "react-native-unistyles";
+import React from "react";
+import styles from "./screen-view.module.css";
 
 export interface ScreenViewProps {
   children: React.ReactNode;
-  style?: ViewStyle;
-  contentStyle?: ViewStyle;
+  style?: React.CSSProperties;
+  contentStyle?: React.CSSProperties;
   center?: boolean;
   backgroundVariant?: "canvas" | "primaryWash" | "secondaryWash" | "mixedWash";
 }
 
-export function ScreenViewWeb({
+export function ScreenView({
   children,
   style,
   contentStyle,
@@ -18,71 +17,33 @@ export function ScreenViewWeb({
   backgroundVariant = "canvas",
 }: ScreenViewProps) {
   return (
-    <View style={[styles.container, getBackgroundVariant(backgroundVariant), style]}>
-      <View style={[styles.content, center && styles.center, contentStyle]}>{children}</View>
-    </View>
+    <div
+      className={styles.container}
+      style={{ ...getBackgroundVariant(backgroundVariant), ...style }}
+    >
+      <div className={`${styles.content}${center ? ` ${styles.center}` : ""}`} style={contentStyle}>
+        {children}
+      </div>
+    </div>
   );
 }
 
-const styles = StyleSheet.create((theme) => {
-  const sharedTheme = theme as unknown as {
-    colors: {
-      surface: {
-        canvas: string;
-      };
-    };
-    spacing: {
-      layout: {
-        pageX: number | string;
-        pageY: number | string;
-      };
-    };
-  };
+export { ScreenView as ScreenViewWeb };
 
-  return {
-    container: {
-      flex: 1,
-      backgroundColor: sharedTheme.colors.surface.canvas,
-      _web: {
-        paddingHorizontal: sharedTheme.spacing.layout.pageX,
-        paddingVertical: sharedTheme.spacing.layout.pageY,
-      },
-    },
-    content: {
-      flex: 1,
-    },
-    center: {
-      justifyContent: "center",
-    },
-  };
-});
-
-function getBackgroundVariant(variant: ScreenViewProps["backgroundVariant"]) {
+function getBackgroundVariant(variant: ScreenViewProps["backgroundVariant"]): React.CSSProperties {
   switch (variant) {
     case "primaryWash":
-      return {
-        _web: {
-          backgroundImage: "var(--screen-wash-primary)",
-          backgroundRepeat: "no-repeat",
-        },
-      };
+      return { backgroundImage: "var(--screen-wash-primary)", backgroundRepeat: "no-repeat" };
     case "secondaryWash":
-      return {
-        _web: {
-          backgroundImage: "var(--screen-wash-secondary)",
-          backgroundRepeat: "no-repeat",
-        },
-      };
+      return { backgroundImage: "var(--screen-wash-secondary)", backgroundRepeat: "no-repeat" };
     case "mixedWash":
       return {
         backgroundColor: "var(--accent-mixed-surface, var(--surface-canvas))",
-        _web: {
-          backgroundImage: "var(--screen-wash-mixed)",
-          backgroundRepeat: "no-repeat",
-        },
+        backgroundImage: "var(--screen-wash-mixed)",
+        backgroundRepeat: "no-repeat",
       };
     case "canvas":
     default:
-      return undefined;
+      return {};
   }
 }

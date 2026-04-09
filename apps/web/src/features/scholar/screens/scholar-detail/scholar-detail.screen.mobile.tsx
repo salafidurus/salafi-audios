@@ -1,6 +1,6 @@
 "use client";
 
-import { ScreenViewWeb } from "../../../../shared/components/ScreenView/ScreenView";
+import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 import { AppText } from "../../../../shared/components/AppText/AppText";
 import { useScholarDetailScreen } from "@sd/domain-content";
 import { ScholarHeaderWeb } from "../../components/scholar-header/scholar-header";
@@ -15,24 +15,24 @@ export function ScholarDetailMobileWebScreen({ slug }: ScholarDetailMobileWebScr
 
   if (isFetching) {
     return (
-      <ScreenViewWeb center>
+      <ScreenView center>
         <AppText variant="bodyMd">Loading scholar...</AppText>
-      </ScreenViewWeb>
+      </ScreenView>
     );
   }
 
   if (!scholar) {
     return (
-      <ScreenViewWeb center>
+      <ScreenView center>
         <AppText variant="titleMd">Scholar not found</AppText>
-      </ScreenViewWeb>
+      </ScreenView>
     );
   }
 
   return (
-    <ScreenViewWeb>
+    <ScreenView>
       <ScholarHeaderWeb scholar={scholar} />
       <div style={{ marginTop: 24 }}>{content && <ScholarContentListWeb content={content} />}</div>
-    </ScreenViewWeb>
+    </ScreenView>
   );
 }

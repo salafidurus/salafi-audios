@@ -1,6 +1,6 @@
 "use client";
 
-import { ScreenViewWeb } from "../../../../shared/components/ScreenView/ScreenView";
+import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 import { AppText } from "../../../../shared/components/AppText/AppText";
 import { useLectureDetailScreen } from "@sd/domain-content";
 import { LectureMetaWeb } from "../../components/lecture-meta/lecture-meta";
@@ -18,22 +18,22 @@ export function LectureDetailMobileWebScreen({ id }: LectureDetailMobileWebScree
 
   if (isFetching) {
     return (
-      <ScreenViewWeb center>
+      <ScreenView center>
         <AppText variant="bodyMd">Loading lecture...</AppText>
-      </ScreenViewWeb>
+      </ScreenView>
     );
   }
 
   if (!lecture) {
     return (
-      <ScreenViewWeb center>
+      <ScreenView center>
         <AppText variant="titleMd">Lecture not found</AppText>
-      </ScreenViewWeb>
+      </ScreenView>
     );
   }
 
   return (
-    <ScreenViewWeb>
+    <ScreenView>
       <AppText variant="titleLg">{lecture.title}</AppText>
       <LectureMetaWeb lecture={lecture} />
       <TopicChipsWeb topics={lecture.topics} />
@@ -52,6 +52,6 @@ export function LectureDetailMobileWebScreen({ id }: LectureDetailMobileWebScree
       )}
 
       {lecture.seriesContext && <SeriesContextBarWeb seriesContext={lecture.seriesContext} />}
-    </ScreenViewWeb>
+    </ScreenView>
   );
 }

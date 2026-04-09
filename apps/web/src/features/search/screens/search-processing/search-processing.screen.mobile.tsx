@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import type { SearchCatalogItemDto, SearchCatalogResultsDto } from "@sd/core-contracts";
 import { StyleSheet } from "react-native-unistyles";
 import { View } from "react-native-unistyles/components/native/View";
-import { ScreenViewWeb } from "../../../../shared/components/ScreenView/ScreenView";
+import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 import { SearchFilterMobileWeb } from "../../components/SearchFilter/SearchFilter.mobile";
 import {
   SearchInputMobileWeb,
@@ -44,7 +44,7 @@ export function SearchProcessingMobileWebScreen({
   }, []);
 
   return (
-    <ScreenViewWeb contentStyle={styles.screenContent}>
+    <ScreenView contentStyle={styles.screenContent}>
       <View style={styles.searchGroup}>
         <SearchInputMobileWeb
           ref={inputRef}
@@ -72,7 +72,7 @@ export function SearchProcessingMobileWebScreen({
           />
         )}
       />
-    </ScreenViewWeb>
+    </ScreenView>
   );
 }
 

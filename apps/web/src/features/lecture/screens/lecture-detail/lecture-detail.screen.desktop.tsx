@@ -1,6 +1,6 @@
 "use client";
 
-import { ScreenViewWeb } from "../../../../shared/components/ScreenView/ScreenView";
+import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 import { AppText } from "../../../../shared/components/AppText/AppText";
 import { useLectureDetailScreen } from "@sd/domain-content";
 import { LectureMetaWeb } from "../../components/lecture-meta/lecture-meta";
@@ -18,22 +18,22 @@ export function LectureDetailDesktopWebScreen({ id }: LectureDetailDesktopWebScr
 
   if (isFetching) {
     return (
-      <ScreenViewWeb center>
+      <ScreenView center>
         <AppText variant="bodyMd">Loading lecture...</AppText>
-      </ScreenViewWeb>
+      </ScreenView>
     );
   }
 
   if (!lecture) {
     return (
-      <ScreenViewWeb center>
+      <ScreenView center>
         <AppText variant="titleMd">Lecture not found</AppText>
-      </ScreenViewWeb>
+      </ScreenView>
     );
   }
 
   return (
-    <ScreenViewWeb>
+    <ScreenView>
       <div style={{ maxWidth: 960, margin: "0 auto", display: "flex", gap: 40 }}>
         {/* Left column: content */}
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -58,6 +58,6 @@ export function LectureDetailDesktopWebScreen({ id }: LectureDetailDesktopWebScr
           <LectureSaveButton lectureId={lecture.id} />
         </div>
       </div>
-    </ScreenViewWeb>
+    </ScreenView>
   );
 }

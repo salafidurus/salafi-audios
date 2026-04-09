@@ -1,35 +1,37 @@
-import { Fragment } from "react";
-import { View } from "react-native-unistyles/components/native/View";
+import React, { Fragment } from "react";
 
-export type UniversalListWebProps<TItem> = {
+export type UniversalListProps<TItem> = {
   items: TItem[];
   keyExtractor: (item: TItem) => string;
   renderItem: (item: TItem) => React.ReactElement | null;
-  contentContainerStyle?: object;
+  contentContainerStyle?: React.CSSProperties;
   itemSeparator?: React.ComponentType;
   emptyComponent?: React.ComponentType;
 };
 
-export function UniversalListWeb<TItem>({
+export function UniversalList<TItem>({
   items,
   keyExtractor,
   renderItem,
   contentContainerStyle,
   itemSeparator: ItemSeparator,
   emptyComponent: EmptyComponent,
-}: UniversalListWebProps<TItem>) {
+}: UniversalListProps<TItem>) {
   if (items.length === 0) {
     return EmptyComponent ? <EmptyComponent /> : null;
   }
 
   return (
-    <View style={contentContainerStyle}>
+    <div style={contentContainerStyle}>
       {items.map((item, index) => (
         <Fragment key={keyExtractor(item)}>
           {renderItem(item)}
           {ItemSeparator && index < items.length - 1 ? <ItemSeparator /> : null}
         </Fragment>
       ))}
-    </View>
+    </div>
   );
 }
+
+export { UniversalList as UniversalListWeb };
+export type { UniversalListProps as UniversalListWebProps };

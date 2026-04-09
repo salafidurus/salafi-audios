@@ -4,7 +4,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import clsx from "clsx";
 import { useAuth, authClient } from "../../../../core/auth";
-import { ButtonDesktopWeb } from "../../../../shared/components/Button/Button";
+import { Button } from "../../../../shared/components/Button/Button";
 import { Search } from "lucide-react";
 import { routes } from "@sd/core-contracts";
 import styles from "./top-auth-strip.module.css";
@@ -33,30 +33,22 @@ export function TopAuthStripWeb() {
               <span style={{ fontSize: "0.875rem", color: "#6b7280" }}>
                 {user.name ?? user.email ?? "Account"}
               </span>
-              <ButtonDesktopWeb
+              <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => void authClient.signOut().then(() => router.push(routes.home))}
               >
                 Sign Out
-              </ButtonDesktopWeb>
+              </Button>
             </>
           ) : !isAuthenticated && !isLoading ? (
             <>
-              <ButtonDesktopWeb
-                variant="ghost"
-                size="sm"
-                onClick={() => router.push(routes.signIn)}
-              >
+              <Button variant="ghost" size="sm" onClick={() => router.push(routes.signIn)}>
                 Sign In
-              </ButtonDesktopWeb>
-              <ButtonDesktopWeb
-                variant="primary"
-                size="sm"
-                onClick={() => router.push(routes.signUp)}
-              >
+              </Button>
+              <Button variant="primary" size="sm" onClick={() => router.push(routes.signUp)}>
                 Create Free Account
-              </ButtonDesktopWeb>
+              </Button>
             </>
           ) : null}
         </div>

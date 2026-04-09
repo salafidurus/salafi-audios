@@ -3,7 +3,7 @@
 import type { LectureDetailDto } from "@sd/core-contracts";
 import { usePlayback } from "@sd/domain-playback";
 import type { Track } from "@sd/domain-playback";
-import { ButtonDesktopWeb } from "../../../../shared/components/Button/Button";
+import { Button } from "../../../../shared/components/Button/Button";
 
 export type LecturePlayButtonProps = {
   lecture: LectureDetailDto;
@@ -32,8 +32,8 @@ export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
   };
 
   return (
-    <ButtonDesktopWeb variant="primary" size="lg" onClick={handlePlay} style={{ width: "100%" }}>
+    <Button variant="primary" size="lg" onClick={handlePlay} style={{ width: "100%" }}>
       ▶ Play Lecture
-    </ButtonDesktopWeb>
+    </Button>
   );
 }

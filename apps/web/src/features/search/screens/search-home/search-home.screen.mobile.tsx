@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { QuickBrowseMobileWeb } from "../../components/QuickBrowse/QuickBrowse.mobile";
 import { SearchButtonMobileWeb } from "../../components/SearchButton/SearchButton.mobile";
 import { TitleTextMobileWeb } from "../../components/TitleText/TitleText.mobile";
-import { ScreenViewWeb } from "../../../../shared/components/ScreenView/ScreenView";
+import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 import { useQuickBrowse } from "@sd/domain-search";
 
 export type SearchHomeScreenProps = {
@@ -24,7 +24,7 @@ export function SearchHomeMobileWebScreen({
   const { data } = useQuickBrowse();
 
   return (
-    <ScreenViewWeb center>
+    <ScreenView center>
       <View style={styles.content}>
         <View style={styles.searchGroup}>
           <View style={styles.header}>
@@ -45,7 +45,7 @@ export function SearchHomeMobileWebScreen({
           onSelectCategory={onSelectCategory}
         />
       </View>
-    </ScreenViewWeb>
+    </ScreenView>
   );
 }
 

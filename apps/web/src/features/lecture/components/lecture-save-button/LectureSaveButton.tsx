@@ -1,7 +1,7 @@
 "use client";
 
 import { useProgressStore } from "@sd/domain-progress";
-import { ButtonDesktopWeb } from "../../../../shared/components/Button/Button";
+import { Button } from "../../../../shared/components/Button/Button";
 
 export type LectureSaveButtonProps = {
   lectureId: string;
@@ -21,13 +21,13 @@ export function LectureSaveButton({ lectureId }: LectureSaveButtonProps) {
   };
 
   return (
-    <ButtonDesktopWeb
+    <Button
       variant={isSaved ? "surface" : "outline"}
       size="lg"
       onClick={handleClick}
       style={{ width: "100%", marginTop: 8 }}
     >
       {isSaved ? "✓ Saved" : "Save"}
-    </ButtonDesktopWeb>
+    </Button>
   );
 }

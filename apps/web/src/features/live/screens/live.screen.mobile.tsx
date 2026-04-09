@@ -1,6 +1,6 @@
 "use client";
 
-import { ScreenViewWeb } from "../../../shared/components/ScreenView/ScreenView";
+import { ScreenView } from "../../../shared/components/ScreenView/ScreenView";
 import { AppText } from "../../../shared/components/AppText/AppText";
 import type { LiveSessionPublicDto } from "@sd/core-contracts";
 import { useLiveSessions } from "@sd/domain-live";
@@ -46,7 +46,7 @@ export function LiveMobileWebScreen(_props: LiveMobileWebScreenProps) {
   const { active, upcoming, ended } = useLiveSessions();
 
   return (
-    <ScreenViewWeb>
+    <ScreenView>
       <div className={styles.page}>
         <div className={styles.container}>
           <AppText variant="titleLg">Live Sessions</AppText>
@@ -71,6 +71,6 @@ export function LiveMobileWebScreen(_props: LiveMobileWebScreenProps) {
           />
         </div>
       </div>
-    </ScreenViewWeb>
+    </ScreenView>
   );
 }

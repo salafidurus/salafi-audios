@@ -1,7 +1,7 @@
 "use client";
 
 import { useScholarsList } from "@sd/domain-content";
-import { ScreenViewWeb } from "../../../../shared/components/ScreenView/ScreenView";
+import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 import { AppText } from "../../../../shared/components/AppText/AppText";
 import { ScholarCardWeb } from "../../components/scholar-card/scholar-card";
 
@@ -15,22 +15,22 @@ export function ScholarListDesktopWebScreen({ onSelectScholar }: ScholarListDesk
 
   if (isFetching && scholars.length === 0) {
     return (
-      <ScreenViewWeb center>
+      <ScreenView center>
         <AppText variant="bodyMd">Loading scholars...</AppText>
-      </ScreenViewWeb>
+      </ScreenView>
     );
   }
 
   if (!isFetching && scholars.length === 0) {
     return (
-      <ScreenViewWeb center>
+      <ScreenView center>
         <AppText variant="bodyMd">No scholars found.</AppText>
-      </ScreenViewWeb>
+      </ScreenView>
     );
   }
 
   return (
-    <ScreenViewWeb>
+    <ScreenView>
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "24px 0" }}>
         <h1
           style={{
@@ -54,6 +54,6 @@ export function ScholarListDesktopWebScreen({ onSelectScholar }: ScholarListDesk
           ))}
         </div>
       </div>
-    </ScreenViewWeb>
+    </ScreenView>
   );
 }
