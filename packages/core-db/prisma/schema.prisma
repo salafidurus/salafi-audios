@@ -56,6 +56,16 @@ enum LiveSessionStatus {
   ended
 }
 
+enum Locale {
+  en
+  ar
+}
+
+enum TranslationStatus {
+  draft
+  published
+}
+
 //////////////////////////
 // Ingestion batch (for seed/dummy dataset lifecycle)
 //////////////////////////
@@ -96,7 +106,7 @@ model User {
   banExpires    DateTime?
 
   // Domain extensions
-  preferredLanguage String?
+  preferredLanguage Locale?
 
   // Relations
   sessions            Session[]
@@ -150,7 +160,7 @@ model Scholar {
   name         String
   bio          String?
   country      String?
-  mainLanguage String?
+  mainLanguage Locale?
   imageUrl     String?
   isActive     Boolean   @default(true)
   isKibar      Boolean   @default(false)
@@ -172,6 +182,7 @@ model Scholar {
   lectures    Lecture[]
   userRoles   UserScholarRole[]
   livestreamChannels LivestreamChannel[]
+  translations ScholarTranslation[]
 
   @@unique([slug], map: "uq_scholar_slug")
   @@index([isActive], map: "idx_scholar_active")
@@ -188,7 +199,7 @@ model Collection {
   title                    String
   description              String?
   coverImageUrl            String?
-  language                 String?
+  language                 Locale?
   status                   Status                    @default(draft)
   orderIndex               Int?
   publishedLectureCount    Int?
@@ -206,9 +217,10 @@ model Collection {
   ingestionBatchId String?
   ingestionBatch   IngestionBatch? @relation("IngestBatchCollections", fields: [ingestionBatchId], references: [id])
 
-  scholar Scholar           @relation(fields: [scholarId], references: [id], onDelete: Restrict)
-  series  Series[]
-  topics  CollectionTopic[]
+  scholar      Scholar                @relation(fields: [scholarId], references: [id], onDelete: Restrict)
+  series       Series[]
+  topics       CollectionTopic[]
+  translations CollectionTranslation[]
 
   @@unique([scholarId, slug], map: "uq_collection_scholar_slug")
   @@index([scholarId, status], map: "idx_collection_scholar_status")
@@ -258,7 +270,7 @@ model Series {
   title                    String
   description              String?
   coverImageUrl            String?
-  language                 String?
+  language                 Locale?
   status                   Status                    @default(draft)
   orderIndex               Int?
   publishedLectureCount    Int?
@@ -276,10 +288,11 @@ model Series {
   ingestionBatchId String?
   ingestionBatch   IngestionBatch? @relation("IngestBatchSeries", fields: [ingestionBatchId], references: [id])
 
-  scholar    Scholar       @relation(fields: [scholarId], references: [id], onDelete: Restrict)
-  collection Collection?   @relation(fields: [collectionId], references: [id], onDelete: Restrict)
-  lectures   Lecture[]
-  topics     SeriesTopic[]
+  scholar      Scholar            @relation(fields: [scholarId], references: [id], onDelete: Restrict)
+  collection   Collection?        @relation(fields: [collectionId], references: [id], onDelete: Restrict)
+  lectures     Lecture[]
+  topics       SeriesTopic[]
+  translations SeriesTranslation[]
 
   @@unique([scholarId, slug], map: "uq_series_scholar_slug")
   @@index([collectionId, orderIndex], map: "idx_series_collection_order")
@@ -299,7 +312,7 @@ model Lecture {
   slug                     String
   title                    String
   description              String?
-  language                 String?
+  language                 Locale?
   status                   Status                    @default(draft)
   publishedAt              DateTime?
   orderIndex               Int?
@@ -317,12 +330,13 @@ model Lecture {
   ingestionBatchId String?
   ingestionBatch   IngestionBatch? @relation("IngestBatchLectures", fields: [ingestionBatchId], references: [id])
 
-  scholar     Scholar               @relation(fields: [scholarId], references: [id], onDelete: Restrict)
-  series      Series?               @relation(fields: [seriesId], references: [id], onDelete: Restrict)
-  audioAssets AudioAsset[]
-  topics      LectureTopic[]
-  progress    UserLectureProgress[]
-  favorites   FavoriteLecture[]
+  scholar      Scholar                @relation(fields: [scholarId], references: [id], onDelete: Restrict)
+  series       Series?                @relation(fields: [seriesId], references: [id], onDelete: Restrict)
+  audioAssets  AudioAsset[]
+  topics       LectureTopic[]
+  progress     UserLectureProgress[]
+  favorites    FavoriteLecture[]
+  translations LectureTranslation[]
 
   @@unique([scholarId, slug], map: "uq_lecture_scholar_slug")
   @@index([seriesId, orderIndex], map: "idx_lecture_series_order")
@@ -374,6 +388,7 @@ model Topic {
   lectureTopics    LectureTopic[]
   seriesTopics     SeriesTopic[]
   collectionTopics CollectionTopic[]
+  translations     TopicTranslation[]
 
   @@unique([slug], map: "uq_topic_slug")
   @@index([parentId], map: "idx_topic_parent")
@@ -457,7 +472,7 @@ model LivestreamChannel {
   telegramId   String   @unique
   telegramSlug String?
   displayName  String
-  language     String?
+  language     Locale?
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -531,4 +546,83 @@ model Verification {
   expiresAt  DateTime
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+model ScholarTranslation {
+  id        String            @id @default(cuid())
+  scholarId String
+  locale    Locale
+  status    TranslationStatus @default(draft)
+  name      String
+  bio       String?
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  scholar Scholar @relation(fields: [scholarId], references: [id], onDelete: Cascade)
+
+  @@unique([scholarId, locale])
+  @@index([scholarId])
+}
+
+model LectureTranslation {
+  id          String            @id @default(cuid())
+  lectureId   String
+  locale      Locale
+  status      TranslationStatus @default(draft)
+  title       String
+  description String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  lecture Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+
+  @@unique([lectureId, locale])
+  @@index([lectureId])
+}
+
+model SeriesTranslation {
+  id          String            @id @default(cuid())
+  seriesId    String
+  locale      Locale
+  status      TranslationStatus @default(draft)
+  title       String
+  description String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  series Series @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+
+  @@unique([seriesId, locale])
+  @@index([seriesId])
+}
+
+model CollectionTranslation {
+  id           String            @id @default(cuid())
+  collectionId String
+  locale       Locale
+  status       TranslationStatus @default(draft)
+  title        String
+  description  String?
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+
+  @@unique([collectionId, locale])
+  @@index([collectionId])
+}
+
+model TopicTranslation {
+  id        String            @id @default(cuid())
+  topicId   String
+  locale    Locale
+  status    TranslationStatus @default(draft)
+  name      String
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  topic Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@unique([topicId, locale])
+  @@index([topicId])
 }
