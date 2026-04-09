@@ -1,7 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import type { LectureDetailDto, RelatedLectureDto, AdminLectureUpdateDto, AdminLectureActionDto } from '@sd/core-contracts';
+import type {
+  LectureDetailDto,
+  RelatedLectureDto,
+  AdminLectureUpdateDto,
+  AdminLectureActionDto,
+  TranslationViewDto,
+} from '@sd/core-contracts';
 import { Status } from '@sd/core-db';
 import { LecturesRepository } from './lectures.repo';
+import type { SaveLectureTranslationDto } from './dto/save-lecture-translation.dto';
 
 @Injectable()
 export class LecturesService {
@@ -20,7 +27,10 @@ export class LecturesService {
     return related;
   }
 
-  async updateLecture(id: string, updateDto: AdminLectureUpdateDto): Promise<AdminLectureActionDto> {
+  async updateLecture(
+    id: string,
+    updateDto: AdminLectureUpdateDto,
+  ): Promise<AdminLectureActionDto> {
     const updated = await this.repo.updateLecture(id, updateDto);
     if (!updated) {
       throw new NotFoundException(`Lecture "${id}" not found`);
@@ -42,5 +52,40 @@ export class LecturesService {
       throw new NotFoundException(`Lecture "${id}" not found`);
     }
     return { success: true, message: 'Lecture archived successfully' };
+  }
+
+  // ─── Lecture translations ─────────────────────────────────────────────────
+
+  listTranslations(lectureId: string): Promise<TranslationViewDto[]> {
+    return this.repo.listLectureTranslations(lectureId);
+  }
+
+  upsertTranslation(
+    lectureId: string,
+    dto: SaveLectureTranslationDto,
+  ): Promise<TranslationViewDto> {
+    return this.repo.upsertLectureTranslation(lectureId, dto);
+  }
+
+  updateTranslation(
+    lectureId: string,
+    locale: string,
+    fields: Partial<{ title: string; description: string | null }>,
+  ): Promise<TranslationViewDto> {
+    return this.repo.updateLectureTranslation(lectureId, locale, fields);
+  }
+
+  publishTranslation(
+    lectureId: string,
+    locale: string,
+  ): Promise<TranslationViewDto> {
+    return this.repo.publishLectureTranslation(lectureId, locale);
+  }
+
+  unpublishTranslation(
+    lectureId: string,
+    locale: string,
+  ): Promise<TranslationViewDto> {
+    return this.repo.unpublishLectureTranslation(lectureId, locale);
   }
 }

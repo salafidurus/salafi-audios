@@ -1,12 +1,12 @@
 .sidebar {
   position: fixed;
   top: 0;
-  left: 0;
+  inset-inline-start: 0;
   bottom: 0;
   width: var(--sidebar-width, 16.5rem);
   padding: var(--space-component-gap-md) var(--space-component-gap-lg);
   background: var(--surface-default);
-  border-right: 1px solid var(--border-subtle);
+  border-inline-end: 1px solid var(--border-subtle);
   display: flex;
   flex-direction: column;
   gap: var(--space-component-gap-lg);
@@ -140,7 +140,7 @@
 .subNav {
   display: flex;
   flex-direction: column;
-  padding-left: 1.75rem;
+  padding-inline-start: 1.75rem;
   gap: var(--space-component-gap-xs);
   max-height: 12rem;
   opacity: 1;

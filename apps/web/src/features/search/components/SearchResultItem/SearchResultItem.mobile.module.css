@@ -9,7 +9,7 @@
   background: var(--surface-default);
   cursor: pointer;
   width: 100%;
-  text-align: left;
+  text-align: start;
   transition: background 0.1s, border-color 0.1s;
 }
 

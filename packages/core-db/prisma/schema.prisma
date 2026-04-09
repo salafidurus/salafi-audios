@@ -177,12 +177,12 @@ model Scholar {
   ingestionBatchId String?
   ingestionBatch   IngestionBatch? @relation("IngestBatchScholars", fields: [ingestionBatchId], references: [id])
 
-  collections Collection[]
-  series      Series[]
-  lectures    Lecture[]
-  userRoles   UserScholarRole[]
+  collections        Collection[]
+  series             Series[]
+  lectures           Lecture[]
+  userRoles          UserScholarRole[]
   livestreamChannels LivestreamChannel[]
-  translations ScholarTranslation[]
+  translations       ScholarTranslation[]
 
   @@unique([slug], map: "uq_scholar_slug")
   @@index([isActive], map: "idx_scholar_active")
@@ -217,7 +217,7 @@ model Collection {
   ingestionBatchId String?
   ingestionBatch   IngestionBatch? @relation("IngestBatchCollections", fields: [ingestionBatchId], references: [id])
 
-  scholar      Scholar                @relation(fields: [scholarId], references: [id], onDelete: Restrict)
+  scholar      Scholar                 @relation(fields: [scholarId], references: [id], onDelete: Restrict)
   series       Series[]
   topics       CollectionTopic[]
   translations CollectionTranslation[]
@@ -288,8 +288,8 @@ model Series {
   ingestionBatchId String?
   ingestionBatch   IngestionBatch? @relation("IngestBatchSeries", fields: [ingestionBatchId], references: [id])
 
-  scholar      Scholar            @relation(fields: [scholarId], references: [id], onDelete: Restrict)
-  collection   Collection?        @relation(fields: [collectionId], references: [id], onDelete: Restrict)
+  scholar      Scholar             @relation(fields: [scholarId], references: [id], onDelete: Restrict)
+  collection   Collection?         @relation(fields: [collectionId], references: [id], onDelete: Restrict)
   lectures     Lecture[]
   topics       SeriesTopic[]
   translations SeriesTranslation[]
@@ -330,8 +330,8 @@ model Lecture {
   ingestionBatchId String?
   ingestionBatch   IngestionBatch? @relation("IngestBatchLectures", fields: [ingestionBatchId], references: [id])
 
-  scholar      Scholar                @relation(fields: [scholarId], references: [id], onDelete: Restrict)
-  series       Series?                @relation(fields: [seriesId], references: [id], onDelete: Restrict)
+  scholar      Scholar               @relation(fields: [scholarId], references: [id], onDelete: Restrict)
+  series       Series?               @relation(fields: [seriesId], references: [id], onDelete: Restrict)
   audioAssets  AudioAsset[]
   topics       LectureTopic[]
   progress     UserLectureProgress[]
@@ -383,8 +383,8 @@ model Topic {
   parentId  String?
   createdAt DateTime @default(now())
 
-  parent           Topic?            @relation("TopicToParent", fields: [parentId], references: [id], onDelete: SetNull)
-  children         Topic[]           @relation("TopicToParent")
+  parent           Topic?             @relation("TopicToParent", fields: [parentId], references: [id], onDelete: SetNull)
+  children         Topic[]            @relation("TopicToParent")
   lectureTopics    LectureTopic[]
   seriesTopics     SeriesTopic[]
   collectionTopics CollectionTopic[]

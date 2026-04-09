@@ -12,3 +12,9 @@ export { useLectureDetail } from "./lecture.api";
 export { useLectureDetailScreen } from "./use-lecture-detail";
 export { useScholarsList, useScholarDetail, useScholarContent } from "./scholar.api";
 export { useScholarDetailScreen } from "./use-scholar-detail";
+export {
+  useContentTranslations,
+  useSaveTranslation,
+  usePublishTranslation,
+  useUnpublishTranslation,
+} from "./translations.api";

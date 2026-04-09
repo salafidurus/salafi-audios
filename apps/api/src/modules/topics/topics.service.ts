@@ -3,8 +3,10 @@ import {
   TopicDetailDto,
   TopicViewDto,
   TopicLectureViewDto,
+  TranslationViewDto,
 } from '@sd/core-contracts';
 import { UpsertTopicDto } from './dto/upsert-topic.dto';
+import { SaveTopicTranslationDto } from './dto/save-topic-translation.dto';
 import { TopicsRepository } from './topics.repo';
 
 @Injectable()
@@ -51,5 +53,40 @@ export class TopicsService {
     const found = await this.repo.findBySlug(slug);
     if (!found) throw new NotFoundException(`Topic "${slug}" not found`);
     await this.repo.deleteBySlug(slug);
+  }
+
+  // ─── Topic translations ───────────────────────────────────────────────────
+
+  listTranslations(topicId: string): Promise<TranslationViewDto[]> {
+    return this.repo.listTopicTranslations(topicId);
+  }
+
+  upsertTranslation(
+    topicId: string,
+    dto: SaveTopicTranslationDto,
+  ): Promise<TranslationViewDto> {
+    return this.repo.upsertTopicTranslation(topicId, dto);
+  }
+
+  updateTranslation(
+    topicId: string,
+    locale: string,
+    fields: Partial<{ name: string }>,
+  ): Promise<TranslationViewDto> {
+    return this.repo.updateTopicTranslation(topicId, locale, fields);
+  }
+
+  publishTranslation(
+    topicId: string,
+    locale: string,
+  ): Promise<TranslationViewDto> {
+    return this.repo.publishTopicTranslation(topicId, locale);
+  }
+
+  unpublishTranslation(
+    topicId: string,
+    locale: string,
+  ): Promise<TranslationViewDto> {
+    return this.repo.unpublishTopicTranslation(topicId, locale);
   }
 }

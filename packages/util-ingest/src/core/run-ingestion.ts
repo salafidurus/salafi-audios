@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma, Status } from "@sd/core-db";
+import { PrismaClient, Prisma, Status, Locale } from "@sd/core-db";
 import { S3Client } from "@aws-sdk/client-s3";
 import { ContentDefinition, LectureDef } from "../schema/content-schema";
 import { syncLectureAudioAssets } from "./audio-assets";
@@ -35,6 +35,11 @@ export function computePublishedAt(status: Status, publishedAt?: string): Date |
   if (publishedAt) return new Date(publishedAt);
   if (status === Status.published) return new Date();
   return null;
+}
+
+function toLocale(value: string | null | undefined): Locale | undefined {
+  if (!value) return undefined;
+  return value as Locale;
 }
 
 function isTruthyDate(input?: string): boolean {
@@ -92,7 +97,7 @@ async function upsertLecture(
       slug: input.lecture.slug,
       title: input.lecture.title,
       description: input.lecture.description,
-      language: input.lecture.language,
+      language: toLocale(input.lecture.language),
       status: input.lecture.status,
       publishedAt: computePublishedAt(input.lecture.status, input.lecture.publishedAt),
       orderIndex: input.lecture.orderIndex,
@@ -105,7 +110,7 @@ async function upsertLecture(
       seriesId: input.seriesId,
       title: input.lecture.title,
       description: input.lecture.description,
-      language: input.lecture.language,
+      language: toLocale(input.lecture.language),
       status: input.lecture.status,
       publishedAt: computePublishedAt(input.lecture.status, input.lecture.publishedAt),
       orderIndex: input.lecture.orderIndex,
@@ -177,7 +182,7 @@ export async function runIngestion(
           name: scholar.name,
           bio: scholar.bio,
           country: scholar.country,
-          mainLanguage: scholar.mainLanguage,
+          mainLanguage: toLocale(scholar.mainLanguage),
           imageUrl: scholar.imageUrl,
           isActive: scholar.isActive,
           ingestionBatchId: batch.id,
@@ -186,7 +191,7 @@ export async function runIngestion(
           name: scholar.name,
           bio: scholar.bio,
           country: scholar.country,
-          mainLanguage: scholar.mainLanguage,
+          mainLanguage: toLocale(scholar.mainLanguage),
           imageUrl: scholar.imageUrl,
           isActive: scholar.isActive,
           ingestionBatchId: batch.id,
@@ -213,7 +218,7 @@ export async function runIngestion(
             title: collection.title,
             description: collection.description,
             coverImageUrl: collection.coverImageUrl,
-            language: collection.language,
+            language: toLocale(collection.language),
             status: collection.status,
             orderIndex: collection.orderIndex,
             publishedLectureCount: collectionLectureAgg.publishedLectureCount,
@@ -226,7 +231,7 @@ export async function runIngestion(
             title: collection.title,
             description: collection.description,
             coverImageUrl: collection.coverImageUrl,
-            language: collection.language,
+            language: toLocale(collection.language),
             status: collection.status,
             orderIndex: collection.orderIndex,
             publishedLectureCount: collectionLectureAgg.publishedLectureCount,
@@ -257,7 +262,7 @@ export async function runIngestion(
               title: series.title,
               description: series.description,
               coverImageUrl: series.coverImageUrl,
-              language: series.language,
+              language: toLocale(series.language),
               status: series.status,
               orderIndex: series.orderIndex,
               publishedLectureCount: seriesLectureAgg.publishedLectureCount,
@@ -271,7 +276,7 @@ export async function runIngestion(
               title: series.title,
               description: series.description,
               coverImageUrl: series.coverImageUrl,
-              language: series.language,
+              language: toLocale(series.language),
               status: series.status,
               orderIndex: series.orderIndex,
               publishedLectureCount: seriesLectureAgg.publishedLectureCount,
@@ -319,7 +324,7 @@ export async function runIngestion(
             title: series.title,
             description: series.description,
             coverImageUrl: series.coverImageUrl,
-            language: series.language,
+            language: toLocale(series.language),
             status: series.status,
             orderIndex: series.orderIndex,
             publishedLectureCount: seriesLectureAgg.publishedLectureCount,
@@ -333,7 +338,7 @@ export async function runIngestion(
             title: series.title,
             description: series.description,
             coverImageUrl: series.coverImageUrl,
-            language: series.language,
+            language: toLocale(series.language),
             status: series.status,
             orderIndex: series.orderIndex,
             publishedLectureCount: seriesLectureAgg.publishedLectureCount,

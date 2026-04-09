@@ -1,7 +1,14 @@
 import { PrismaService } from '../../shared/db/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { Prisma, Status } from '@sd/core-db';
-import type { LectureDetailDto, RelatedLectureDto, AdminLectureUpdateDto } from '@sd/core-contracts';
+import type {
+  LectureDetailDto,
+  RelatedLectureDto,
+  AdminLectureUpdateDto,
+  TranslationViewDto,
+} from '@sd/core-contracts';
+import type { Locale } from '@sd/core-i18n';
+import type { SaveLectureTranslationDto } from './dto/save-lecture-translation.dto';
 
 @Injectable()
 export class LecturesRepository {
@@ -156,7 +163,10 @@ export class LecturesRepository {
     };
   }
 
-  async findRelated(lectureId: string, limit: number = 6): Promise<RelatedLectureDto[]> {
+  async findRelated(
+    lectureId: string,
+    limit: number = 6,
+  ): Promise<RelatedLectureDto[]> {
     const lecture = await this.prisma.lecture.findFirst({
       where: { id: lectureId, deletedAt: null },
       select: {
@@ -276,7 +286,10 @@ export class LecturesRepository {
     }));
   }
 
-  async updateLecture(id: string, updateDto: AdminLectureUpdateDto): Promise<boolean> {
+  async updateLecture(
+    id: string,
+    updateDto: AdminLectureUpdateDto,
+  ): Promise<boolean> {
     try {
       await this.prisma.lecture.update({
         where: { id },
@@ -311,5 +324,86 @@ export class LecturesRepository {
     } catch {
       return false;
     }
+  }
+
+  // ─── Lecture translations ─────────────────────────────────────────────────
+
+  private mapLectureTranslation(t: {
+    locale: string;
+    status: string;
+    title: string;
+    description: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+  }): TranslationViewDto {
+    return {
+      locale: t.locale as Locale,
+      status: t.status === 'published' ? 'published' : 'draft',
+      fields: { title: t.title, description: t.description },
+      createdAt: t.createdAt.toISOString(),
+      updatedAt: t.updatedAt.toISOString(),
+    };
+  }
+
+  async listLectureTranslations(
+    lectureId: string,
+  ): Promise<TranslationViewDto[]> {
+    const records = await this.prisma.lectureTranslation.findMany({
+      where: { lectureId },
+      orderBy: { locale: 'asc' },
+    });
+    return records.map((r) => this.mapLectureTranslation(r));
+  }
+
+  async upsertLectureTranslation(
+    lectureId: string,
+    dto: SaveLectureTranslationDto,
+  ): Promise<TranslationViewDto> {
+    const record = await this.prisma.lectureTranslation.upsert({
+      where: { lectureId_locale: { lectureId, locale: dto.locale } },
+      create: {
+        lectureId,
+        locale: dto.locale,
+        title: dto.title,
+        description: dto.description ?? null,
+        status: 'draft',
+      },
+      update: { title: dto.title, description: dto.description ?? null },
+    });
+    return this.mapLectureTranslation(record);
+  }
+
+  async updateLectureTranslation(
+    lectureId: string,
+    locale: string,
+    fields: Partial<{ title: string; description: string | null }>,
+  ): Promise<TranslationViewDto> {
+    const record = await this.prisma.lectureTranslation.update({
+      where: { lectureId_locale: { lectureId, locale: locale as Locale } },
+      data: { ...fields },
+    });
+    return this.mapLectureTranslation(record);
+  }
+
+  async publishLectureTranslation(
+    lectureId: string,
+    locale: string,
+  ): Promise<TranslationViewDto> {
+    const record = await this.prisma.lectureTranslation.update({
+      where: { lectureId_locale: { lectureId, locale: locale as Locale } },
+      data: { status: 'published' },
+    });
+    return this.mapLectureTranslation(record);
+  }
+
+  async unpublishLectureTranslation(
+    lectureId: string,
+    locale: string,
+  ): Promise<TranslationViewDto> {
+    const record = await this.prisma.lectureTranslation.update({
+      where: { lectureId_locale: { lectureId, locale: locale as Locale } },
+      data: { status: 'draft' },
+    });
+    return this.mapLectureTranslation(record);
   }
 }

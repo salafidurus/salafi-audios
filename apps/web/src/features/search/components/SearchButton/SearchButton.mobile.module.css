@@ -21,7 +21,7 @@
 .placeholder {
   flex: 1;
   color: var(--accent-primary-subtle-fg);
-  text-align: left;
+  text-align: start;
   font-family: var(--typo-body-md-font-family);
   font-size: var(--typo-body-md-font-size);
   line-height: var(--typo-body-md-line-height);

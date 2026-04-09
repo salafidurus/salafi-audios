@@ -1,7 +1,6 @@
 .sidebar {
   position: fixed;
-  left: 0;
-  right: 0;
+  inset-inline: 0;
   bottom: 0;
   padding:
     var(--space-component-gap-sm)
@@ -98,7 +97,7 @@
 .sectionMenu {
   position: absolute;
   bottom: calc(100% + 0.5rem);
-  left: 0;
+  inset-inline-start: 0;
   min-width: 10rem;
   padding: var(--space-component-gap-sm);
   background: var(--chrome-surface-strong);

@@ -51,4 +51,19 @@ export default [
     files: ["src/features/*/index.ts", "src/shared/**/index.ts", "src/core/*/index.ts"],
     rules: { "no-restricted-syntax": "off" },
   },
+  // RTL safety: ban physical directional style keys
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "Property[key.name='marginLeft'], Property[key.name='marginRight'], Property[key.name='paddingLeft'], Property[key.name='paddingRight'], Property[key.name='borderLeftWidth'], Property[key.name='borderRightWidth']",
+          message:
+            "Use RTL-safe directional properties (marginStart/marginEnd, paddingStart/paddingEnd, etc.) instead of physical left/right keys.",
+        },
+      ],
+    },
+  },
 ];

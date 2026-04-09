@@ -1,5 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient, Status } from "@sd/core-db";
+import { PrismaClient, Status, Locale } from "@sd/core-db";
 import { getDbEnv } from "../env";
 import { DryRunRollbackError } from "../core/errors";
 import { bootstrapEnv } from "../shared/env.bootstrap";
@@ -381,7 +381,7 @@ async function runFix(prisma: PrismaClient, args: FixArgs): Promise<FixCounters>
             data: {
               title: collectionTitle,
               status: collectionStatus,
-              language: collectionLanguage,
+              language: collectionLanguage as Locale | null,
               publishedLectureCount: aggregates.publishedLectureCount,
               publishedDurationSeconds: aggregates.publishedDurationSeconds,
               ingestionBatchId: batch.id,
@@ -397,7 +397,7 @@ async function runFix(prisma: PrismaClient, args: FixArgs): Promise<FixCounters>
               slug: prefix,
               title: collectionTitle,
               status: collectionStatus,
-              language: collectionLanguage,
+              language: collectionLanguage as Locale | null,
               publishedLectureCount: aggregates.publishedLectureCount,
               publishedDurationSeconds: aggregates.publishedDurationSeconds,
               ingestionBatchId: batch.id,
