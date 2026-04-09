@@ -865,6 +865,16 @@ handlers use named exports (`GET`, `POST`, etc.) and must not use default export
 
 - Document the policy in `apps/web/AGENT.md` and `apps/mobile/AGENT.md` under a new
   "Export style" subsection.
+- Added `import/no-default-export` to `packages/util-config/eslint/next.js` and `expo.js`
+  (scoped to `src/features/**`, `src/shared/**`, `src/core/**`) with overrides for
+  Next.js App Router and Expo Router framework files.
+- Added `no-restricted-syntax` barrel re-export restriction to `base.js` (all `src/**`),
+  with designated barrel-file exemptions in `next.js`, `expo.js`, and `base.js`.
+- Created `packages/util-config/eslint/packages.js` — extends `base.js` and adds
+  `import/no-default-export` for `src/**`. Used by all packages that lint (`core-contracts`,
+  `core-db`, `core-i18n`, `design-tokens`, `util-ingest`). Avoids plugin-conflict with
+  the `import` plugin already registered by `eslint-config-next`/`eslint-config-expo`.
+- All 5 linted packages updated to import from `@sd/util-config/eslint/packages`.
 
 **Blockers:** None currently identified.
 
@@ -872,8 +882,9 @@ handlers use named exports (`GET`, `POST`, etc.) and must not use default export
 
 **Completion Criteria:**
 
-- `pnpm --filter web lint` passes with the new rule enabled.
-- `pnpm --filter mobile lint` passes with the new rule enabled.
+- `pnpm --filter web lint` passes with the new rule enabled. ✅
+- `pnpm --filter mobile lint` passes with the new rule enabled. ✅
+- Package lint passes (`core-contracts`, `core-db`, `core-i18n`, `design-tokens`, `util-ingest`). ✅
 - `pnpm --filter web typecheck` and `pnpm --filter mobile typecheck` pass.
 
 **Suggested Commit Message:**
