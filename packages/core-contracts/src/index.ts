@@ -81,3 +81,11 @@ export type { RouteAuthMode } from "./routes";
 // Export query utilities (client, keys, hooks)
 export { createQueryClient, queryKeys } from "./query";
 export { useApiQuery, initApiClient } from "./query/hooks";
+
+export {
+  type TranslationStatus,
+  type TranslationViewDto,
+  type SaveTranslationDto,
+  type TranslationTarget,
+  type UpdateLocaleDto,
+} from "./types/translation.types";

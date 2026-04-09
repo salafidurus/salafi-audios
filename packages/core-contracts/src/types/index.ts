@@ -82,3 +82,10 @@ export {
   type RecentProgressDto,
   type QuickBrowseDto,
 } from "../types/home.types";
+export {
+  type TranslationStatus,
+  type TranslationViewDto,
+  type SaveTranslationDto,
+  type TranslationTarget,
+  type UpdateLocaleDto,
+} from "../types/translation.types";

@@ -78,4 +78,54 @@ export const endpoints = {
       updateStatus: (id: string) => `/admin/live/sessions/${id}/status`,
     },
   },
+  translations: {
+    scholars: {
+      list: (id: string) => `/scholars/${id}/translations`,
+      save: (id: string) => `/scholars/${id}/translations`,
+      update: (id: string, locale: string) => `/scholars/${id}/translations/${locale}`,
+      publish: (id: string, locale: string) => `/scholars/${id}/translations/${locale}/publish`,
+      unpublish: (id: string, locale: string) => `/scholars/${id}/translations/${locale}/unpublish`,
+    },
+    lectures: {
+      list: (id: string) => `/lectures/${id}/translations`,
+      save: (id: string) => `/lectures/${id}/translations`,
+      update: (id: string, locale: string) => `/lectures/${id}/translations/${locale}`,
+      publish: (id: string, locale: string) => `/lectures/${id}/translations/${locale}/publish`,
+      unpublish: (id: string, locale: string) => `/lectures/${id}/translations/${locale}/unpublish`,
+    },
+    topics: {
+      list: (id: string) => `/topics/${id}/translations`,
+      save: (id: string) => `/topics/${id}/translations`,
+      update: (id: string, locale: string) => `/topics/${id}/translations/${locale}`,
+      publish: (id: string, locale: string) => `/topics/${id}/translations/${locale}/publish`,
+      unpublish: (id: string, locale: string) => `/topics/${id}/translations/${locale}/unpublish`,
+    },
+    series: {
+      list: (scholarId: string, seriesId: string) =>
+        `/scholars/${scholarId}/series/${seriesId}/translations`,
+      save: (scholarId: string, seriesId: string) =>
+        `/scholars/${scholarId}/series/${seriesId}/translations`,
+      update: (scholarId: string, seriesId: string, locale: string) =>
+        `/scholars/${scholarId}/series/${seriesId}/translations/${locale}`,
+      publish: (scholarId: string, seriesId: string, locale: string) =>
+        `/scholars/${scholarId}/series/${seriesId}/translations/${locale}/publish`,
+      unpublish: (scholarId: string, seriesId: string, locale: string) =>
+        `/scholars/${scholarId}/series/${seriesId}/translations/${locale}/unpublish`,
+    },
+    collections: {
+      list: (scholarId: string, collectionId: string) =>
+        `/scholars/${scholarId}/collections/${collectionId}/translations`,
+      save: (scholarId: string, collectionId: string) =>
+        `/scholars/${scholarId}/collections/${collectionId}/translations`,
+      update: (scholarId: string, collectionId: string, locale: string) =>
+        `/scholars/${scholarId}/collections/${collectionId}/translations/${locale}`,
+      publish: (scholarId: string, collectionId: string, locale: string) =>
+        `/scholars/${scholarId}/collections/${collectionId}/translations/${locale}/publish`,
+      unpublish: (scholarId: string, collectionId: string, locale: string) =>
+        `/scholars/${scholarId}/collections/${collectionId}/translations/${locale}/unpublish`,
+    },
+  },
+  auth: {
+    updateLocale: "/auth/me/locale",
+  },
 } as const;
