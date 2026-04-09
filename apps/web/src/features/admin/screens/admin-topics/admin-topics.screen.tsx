@@ -1,18 +1,9 @@
 "use client";
 
-import styles from "../responsive.module.css";
+import { Responsive } from "@/shared/components/Responsive";
 import { AdminTopicsDesktopWebScreen } from "./admin-topics.screen.desktop";
 import { AdminTopicsMobileWebScreen } from "./admin-topics.screen.mobile";
 
-export function AdminTopicsResponsiveScreen() {
-  return (
-    <>
-      <div className={styles.mobileOnly}>
-        <AdminTopicsMobileWebScreen />
-      </div>
-      <div className={styles.desktopOnly}>
-        <AdminTopicsDesktopWebScreen />
-      </div>
-    </>
-  );
+export function AdminTopicsScreen() {
+  return <Responsive mobile={<AdminTopicsMobileWebScreen />} desktop={<AdminTopicsDesktopWebScreen />} />;
 }

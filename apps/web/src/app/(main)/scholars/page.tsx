@@ -1,4 +1,4 @@
-import { ScholarListResponsiveScreen } from "../../../features/scholar/screens/scholar-list/scholar-list.screen";
+import { ScholarListScreen } from "../../../features/scholar/screens/scholar-list/scholar-list.screen";
 
 export const metadata = {
   title: "Scholars",
@@ -6,5 +6,5 @@ export const metadata = {
 };
 
 export default function ScholarsPage() {
-  return <ScholarListResponsiveScreen />;
+  return <ScholarListScreen />;
 }

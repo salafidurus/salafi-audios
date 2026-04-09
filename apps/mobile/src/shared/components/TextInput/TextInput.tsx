@@ -1,19 +1,19 @@
 import { useState } from "react";
-import { TextInput as RNTextInput, type TextInputProps, type TextStyle } from "react-native";
+import { TextInput as RNTextInput, type TextInputProps as RNTextInputProps, type TextStyle } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-export type TextInputMobileNativeProps = TextInputProps & {
+export type TextInputProps = RNTextInputProps & {
   invalid?: boolean;
 };
 
-export function TextInputMobileNative({
+export function TextInput({
   invalid = false,
   onFocus,
   onBlur,
   style,
   placeholderTextColor,
   ...props
-}: TextInputMobileNativeProps) {
+}: TextInputProps) {
   const { theme } = useUnistyles();
   const [isFocused, setIsFocused] = useState(false);
 

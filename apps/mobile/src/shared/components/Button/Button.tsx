@@ -15,7 +15,7 @@ import { AccentGradientFill } from "../AccentGradientFill/AccentGradientFill";
 type ButtonVariant = "primary" | "surface" | "outline" | "ghost" | "danger";
 type ButtonSize = "sm" | "md" | "lg";
 
-export type ButtonMobileNativeProps = PressableProps & {
+export type ButtonProps = PressableProps & {
   variant?: ButtonVariant;
   size?: ButtonSize;
   label: string;
@@ -25,7 +25,7 @@ export type ButtonMobileNativeProps = PressableProps & {
   fullWidth?: boolean;
 };
 
-export function ButtonMobileNative({
+export function Button({
   variant = "surface",
   size = "md",
   label,

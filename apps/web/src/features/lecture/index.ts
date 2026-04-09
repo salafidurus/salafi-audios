@@ -16,8 +16,8 @@ export {
 
 // Screens
 export {
-  LectureDetailResponsiveScreen,
-  type LectureDetailResponsiveScreenProps,
+  LectureDetailScreen,
+  type LectureDetailScreenProps,
 } from "./screens/lecture-detail/lecture-detail.screen";
 export {
   LectureDetailDesktopWebScreen,

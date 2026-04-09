@@ -36,7 +36,7 @@ type Props = {
   children: ReactNode;
 };
 
-export function ProvidersMobileNative({ children }: Props) {
+export function Providers({ children }: Props) {
   useEffect(() => {
     const baseUrl = getApiBaseUrl();
     if (baseUrl) {

@@ -11,7 +11,7 @@ import {
 import { getSectionTabIcon } from "../../utils/section-tab-icons";
 import { SUBSECTION_BAR_HEIGHT, TAB_BAR_HEIGHT } from "../CustomTabBar/CustomTabBar";
 
-export function SubsectionBarHostMobileNative() {
+export function SubsectionBarHost() {
   const pathname = usePathname();
   const router = useRouter();
   const activeRootTab = getRootTabFromPathname(pathname);

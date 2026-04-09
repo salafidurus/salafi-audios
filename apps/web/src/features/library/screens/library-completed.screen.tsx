@@ -1,22 +1,13 @@
 "use client";
 
-import styles from "./responsive.module.css";
+import { Responsive } from "@/shared/components/Responsive";
 import { LibraryCompletedDesktopWebScreen } from "./library-completed.screen.desktop";
 import { LibraryCompletedMobileWebScreen } from "./library-completed.screen.mobile";
 
-export type LibraryCompletedResponsiveScreenProps = {
+export type LibraryCompletedScreenProps = {
   onNavigateToLecture?: (id: string) => void;
 };
 
-export function LibraryCompletedResponsiveScreen(props: LibraryCompletedResponsiveScreenProps) {
-  return (
-    <>
-      <div className={styles.mobileOnly}>
-        <LibraryCompletedMobileWebScreen {...props} />
-      </div>
-      <div className={styles.desktopOnly}>
-        <LibraryCompletedDesktopWebScreen {...props} />
-      </div>
-    </>
-  );
+export function LibraryCompletedScreen(props: LibraryCompletedScreenProps) {
+  return <Responsive mobile={<LibraryCompletedMobileWebScreen {...props} />} desktop={<LibraryCompletedDesktopWebScreen {...props} />} />;
 }

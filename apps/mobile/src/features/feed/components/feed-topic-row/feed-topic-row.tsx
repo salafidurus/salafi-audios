@@ -1,13 +1,13 @@
 import { View, Text, ScrollView, Pressable } from "react-native";
 import type { ContentSuggestionDto } from "@sd/core-contracts";
 
-export type FeedTopicRowNativeProps = {
+export type FeedTopicRowProps = {
   topicName: string;
   items: ContentSuggestionDto[];
   onItemPress?: (slug: string) => void;
 };
 
-export function FeedTopicRowNative({ topicName, items, onItemPress }: FeedTopicRowNativeProps) {
+export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProps) {
   if (!items.length) return null;
 
   return (

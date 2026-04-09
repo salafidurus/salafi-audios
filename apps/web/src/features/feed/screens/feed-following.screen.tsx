@@ -1,23 +1,14 @@
 "use client";
 
+import { Responsive } from "@/shared/components/Responsive";
 import { FeedFollowingDesktopWebScreen } from "./feed-following.screen.desktop";
 import { FeedFollowingMobileWebScreen } from "./feed-following.screen.mobile";
-import styles from "./responsive.module.css";
 
-export type FeedFollowingResponsiveScreenProps = {
+export type FeedFollowingScreenProps = {
   onNavigateToLecture?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
 };
 
-export function FeedFollowingResponsiveScreen(props: FeedFollowingResponsiveScreenProps) {
-  return (
-    <>
-      <div className={styles.mobileOnly}>
-        <FeedFollowingMobileWebScreen {...props} />
-      </div>
-      <div className={styles.desktopOnly}>
-        <FeedFollowingDesktopWebScreen {...props} />
-      </div>
-    </>
-  );
+export function FeedFollowingScreen(props: FeedFollowingScreenProps) {
+  return <Responsive mobile={<FeedFollowingMobileWebScreen {...props} />} desktop={<FeedFollowingDesktopWebScreen {...props} />} />;
 }

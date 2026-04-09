@@ -11,7 +11,7 @@ export const SUBSECTION_BAR_HEIGHT = 56;
 
 type CustomTabBarProps = Parameters<NonNullable<ComponentProps<typeof Tabs>["tabBar"]>>[0];
 
-export function CustomTabBarMobileNative({ state, descriptors, navigation }: CustomTabBarProps) {
+export function CustomTabBar({ state, descriptors, navigation }: CustomTabBarProps) {
   const insets = useSafeAreaInsets();
   const { theme } = useUnistyles();
 

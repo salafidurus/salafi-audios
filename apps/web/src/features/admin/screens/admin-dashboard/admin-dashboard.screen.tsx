@@ -1,18 +1,9 @@
 "use client";
 
-import styles from "../responsive.module.css";
+import { Responsive } from "@/shared/components/Responsive";
 import { AdminDashboardDesktopWebScreen } from "./admin-dashboard.screen.desktop";
 import { AdminDashboardMobileWebScreen } from "./admin-dashboard.screen.mobile";
 
-export function AdminDashboardResponsiveScreen() {
-  return (
-    <>
-      <div className={styles.mobileOnly}>
-        <AdminDashboardMobileWebScreen />
-      </div>
-      <div className={styles.desktopOnly}>
-        <AdminDashboardDesktopWebScreen />
-      </div>
-    </>
-  );
+export function AdminDashboardScreen() {
+  return <Responsive mobile={<AdminDashboardMobileWebScreen />} desktop={<AdminDashboardDesktopWebScreen />} />;
 }

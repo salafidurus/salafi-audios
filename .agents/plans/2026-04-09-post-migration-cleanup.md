@@ -7,8 +7,15 @@
 - **Summary:** Remove dead code, naming relics, duplicated responsive CSS modules, stray
   `.native.tsx` files in the web app, React Native / React Native Web / Unistyles
   infrastructure in `apps/web`, audit component export style (named only, except for
-  Next.js required defaults), and standardize the responsive rendering strategy in
-  `apps/web` so that mobile/desktop branching uses a single source of truth.
+  Next.js/Expo Router required defaults), standardize the responsive rendering strategy
+  in `apps/web` so that mobile/desktop branching uses a single source of truth, remove
+  `MobileNative`/`Native` suffixes from 93+ mobile component exports, add consistent
+  feature barrel exports to the 12 `apps/mobile` features that are missing them, and
+  simplify internal naming in `apps/mobile/src/core/`, trim dead exports from
+  `packages/domain-playback`, remove the stale mobile-theme re-export from
+  `packages/design-tokens/src/index.web.ts`, audit `packages/core-i18n` (abandoned —
+  remove if confirmed unused), and remove the `packages/shared` ghost reference from the
+  root `AGENT.md`.
 - **Dependencies:**
   - Prior migration PRs that dissolved `packages/features-*` into `apps/web/src/features`
     and `apps/mobile/src/features` must be merged (they are — see commit `777d221`).
@@ -62,16 +69,77 @@
    build. Examples: `AppTextWeb`, `ButtonDesktopWeb`, `ButtonMobileWeb`,
    `ScreenViewWeb`, `UniversalListWeb`, `UnistylesStyleDesktopWeb`,
    `FeedDesktopWebScreen`, `FeedMobileWebScreen`, `AdminDashboardDesktopWebScreen`, etc.
-9. **Export style audit needed.** Grep shows 0 `export default` inside
-   `apps/web/src/features`, `apps/web/src/shared`, `apps/mobile/src/features`,
-   `apps/mobile/src/shared` — good. But `app/**/layout.tsx` and `app/**/page.tsx` in Next.js
-   and `app/_layout.tsx` in Expo Router are _required_ to use `export default`. The audit
-   must codify this rule, not regress it. Also confirm `index.ts` barrels use only named
-   re-exports.
+9. **Export style and barrel scope audit needed.** Grep shows 0 `export default` inside
+   feature and shared directories — good. But the rule must be codified. Additionally,
+   `apps/web/src/features/*/index.ts` barrels must be **lean**: export only screens (the
+   public routing surface of the feature) and components that are **demonstrably consumed
+   by another feature**. Everything else (internal hooks, utilities, sub-components) stays
+   private. Before adding any non-screen export to a barrel, verify a cross-feature
+   consumer actually exists. The same restrained policy applies to `apps/mobile`.
 10. **Mobile-side still imports from `react-native-unistyles/components/native/*`.**
     Several mobile files already modified in the working tree use this path — not in
     scope for this cleanup plan (mobile should keep Unistyles), but the plan must avoid
     touching mobile except where clearly a leftover from the old shared layout.
+
+### `apps/mobile` — additional relics identified by deep audit
+
+11. **`MobileNative` / `Native` naming relics — 93+ exports.** During the shared-package
+    era components had to signal their platform. Now that they live inside `apps/mobile`
+    the suffix is redundant:
+    - `ButtonMobileNative` → `Button`
+    - `CustomTabBarMobileNative` → `CustomTabBar`
+    - `SubsectionBarHostMobileNative` → `SubsectionBarHost`
+    - `ProvidersMobileNative` → `Providers`
+    - `TextInputMobileNative` → `TextInput`
+    - All `*MobileNativeScreen` exports → `*Screen`
+    - `AppText` is already cleaned up (no suffix). `TabIcon` also clean. The rename
+      is incomplete and inconsistent — needs to be finished systematically.
+
+12. **Missing or over-scoped feature barrel exports.** `feed` and `lecture` have
+    `index.ts` barrels; the remaining 12 features do not. Barrels must follow a lean
+    policy: export only screens and components that have a confirmed cross-feature
+    consumer. Internal hooks, utilities, and sub-components must not be re-exported.
+    Before adding anything beyond screens, verify an actual caller outside the feature
+    exists.
+
+13. **`Mobile*` prefix on core config functions.** `getMobileRuntimeEnv()` and
+    `getMobileBuildEnv()` in `apps/mobile/src/core/config/` carry a redundant `Mobile`
+    infix. Internal functions within `apps/mobile` need no platform qualifier.
+
+14. **`apps/mobile/AGENT.md` not updated.** Doesn't document the suffix removal
+    convention, barrel strategy, or the type-declaration cleanup already done in this
+    branch.
+
+### `packages/*` — cleanup items identified by deep audit
+
+15. **`packages/design-tokens/src/index.web.ts` exports mobile themes.** Lines 2-5 of
+    `index.web.ts` re-export `lightMobileTheme` and `darkMobileTheme` from the native
+    theme file, with a comment noting that "some workspace package builds resolve
+    @sd/design-tokens through the default export path even when compiling native-only
+    sources." After Stage 7 removes Unistyles from `apps/web`, no web-context file will
+    need mobile themes. This export must be removed — but only _after_ Stages 3 and 7
+    have been completed, because web files still reference these types during the
+    intermediate migration.
+
+16. **`packages/domain-playback` has potentially dead exports.** `index.ts` exports
+    `usePlaybackStore`, `PlaybackStore`, `webPlaybackEngine`, `nativePlaybackEngine`,
+    `PlaybackStatus`, `PlaybackState`, and `PlaybackEngine`. Grep of `apps/**` and
+    `packages/**` shows none of these are imported outside the package itself. Before
+    removing them, confirm by running:
+    `rg "usePlaybackStore|PlaybackStore|PlaybackEngine|webPlaybackEngine|nativePlaybackEngine|PlaybackStatus|PlaybackState" apps/ packages/ --include="*.ts" --include="*.tsx" -l`
+    If the only matches are inside `packages/domain-playback` itself, make them
+    unexported internal implementation details rather than public API.
+
+17. **`packages/core-i18n` appears abandoned.** `src/index.ts` is empty (one line,
+    zero content). No app imports from `@sd/core-i18n`. Before deleting: check for any
+    planned i18n work in `docs/`, then either remove the package entirely (and clean it
+    from all `package.json` dependencies, `pnpm-workspace.yaml`, and `turbo.json`) or
+    leave it as an explicit stub with a comment explaining its future purpose.
+
+18. **`packages/shared` ghost reference in root `AGENT.md`.** The root `AGENT.md`
+    package map lists `packages/shared — Cross-app utilities only (no platform-specific
+    UI primitives)` but this package does not exist in the repository. The line must be
+    removed from `AGENT.md`.
 
 ## Immediate next step
 
@@ -110,7 +178,19 @@ The stages are dependency-ordered:
    `loading.tsx` / `template.tsx` / `route.ts` (which require default exports) and Expo
    Router `apps/mobile/src/app/**/_layout.tsx` / `apps/mobile/src/app/**/*.tsx`
    route files (which require default exports). Add an ESLint rule to lock it in.
-10. **Stage 10** — Final verification pass.
+10. **Stage 10** — Drop `MobileNative`/`Native` suffix from all 93+ mobile component and
+    screen exports; rename call sites in `apps/mobile/src/app/**` and any `index.ts`
+    barrels.
+11. **Stage 11** — Add missing `index.ts` barrel exports to the 12 `apps/mobile`
+    features that lack them, following the same named-export pattern as `feed` and
+    `lecture`.
+12. **Stage 12** — Simplify `Mobile*` prefix in `apps/mobile/src/core/config/` function
+    names and update `apps/mobile/AGENT.md` to document the conventions now in place.
+13. **Stage 13** — Packages cleanup: prune stale exports from `packages/domain-playback`,
+    trim `packages/design-tokens` web entry once the web app no longer consumes mobile
+    themes, audit `packages/core-i18n` (appears abandoned — decide keep or remove), and
+    fix the `packages/shared` ghost reference in root `AGENT.md`.
+14. **Stage 14** — Final verification pass.
 
 Each stage is small enough to commit independently and, except where noted, does not
 require test rewrites because the rewrites are presentational.
@@ -133,6 +213,15 @@ require test rewrites because the rewrites are presentational.
   - Small client component `<Responsive mobile={<M/>} desktop={<D/>} />` that calls
     `useResponsive()` and renders exactly one branch. This replaces the
     `mobileOnly`/`desktopOnly` CSS pattern.
+  - **SSR / hydration safety is critical.** The component must match exactly what
+    `useResponsive()` returns during SSR (desktop-biased default: `isMobile = false`).
+    During the first client render before `useEffect` fires, the component must still
+    render the desktop branch — this avoids a server/client mismatch. After `useEffect`
+    fires and the real viewport is known, it can switch to the mobile branch if needed.
+    This is identical to the pattern already used in
+    `apps/web/src/features/auth/screens/sign-in/sign-in.screen.tsx` (which reads
+    `useResponsive()` and defaults to desktop SSR). Do NOT add `suppressHydrationWarning`
+    as a shortcut — fix the SSR default instead.
 - Create: `apps/web/src/shared/components/Responsive/index.ts` (named re-export only).
 - Create: `apps/web/src/shared/styles/responsive.module.css`
   - Single file with `.mobileOnly` / `.desktopOnly` rules kept as a **fallback** for any
@@ -152,6 +241,16 @@ require test rewrites because the rewrites are presentational.
 **Blockers:** None currently identified.
 
 **Dependencies:** None. This stage is the foundation.
+
+**AGENT.md updates (same commit):**
+
+- `apps/web/AGENT.md` — add a **Responsive rendering** subsection:
+  - The canonical branching primitive is `<Responsive mobile={…} desktop={…} />` from
+    `src/shared/components/Responsive`.
+  - SSR default is desktop. Mobile branch activates after first `useEffect` on narrow
+    viewports. Do not use `display: none` to hide one tree.
+  - `useResponsive()` from `src/shared/hooks/use-responsive` is the underlying hook;
+    prefer the `<Responsive>` wrapper for screen-level branching.
 
 **Completion Criteria:**
 
@@ -195,7 +294,9 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 **Changes:**
 
-- Verify with `rg "\\.native\\.(t|j)sx?" apps/web/` — must return zero matches.
+- Verify with `rg --files apps/web -g '*.native.tsx' -g '*.native.ts'` — must return
+  zero lines. **Note:** `rg "\\.native\\.(t|j)sx?" apps/web` searches file _contents_
+  and will false-pass. Always use the filename glob form for this check.
 
 **Blockers:** None currently identified.
 
@@ -205,7 +306,9 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 - `pnpm --filter web typecheck` passes.
 - `pnpm --filter web build` succeeds.
-- No file in `apps/web/` matches `*.native.ts(x)`.
+- `rg --files apps/web -g '*.native.tsx' -g '*.native.ts'` returns zero lines.
+  (Do NOT use `rg "\\.native\\.(t|j)sx?" apps/web` — that searches file contents and
+  will false-pass even when the files still exist.)
 
 **Suggested Commit Message:**
 
@@ -271,6 +374,13 @@ Modules (or inline style where trivial), with no imports from `react-native`,
 **Blockers:** None currently identified.
 
 **Dependencies:** Stage 1 (for `<Responsive>` if any shared component needs branching).
+
+**AGENT.md updates (same commit):**
+
+- `apps/web/AGENT.md` — add a **Shared components** subsection:
+  - `src/shared/components/*` are plain React + CSS Modules. No React Native imports.
+  - Design tokens are consumed via CSS variables (defined in `src/app/theme-css.ts`
+    and `globals.css`), not via `useUnistyles()`.
 
 **Completion Criteria:**
 
@@ -457,14 +567,23 @@ export function FeedRecentScreen(props: FeedRecentScreenProps) {
 
 **Dependencies:** Stages 1, 3, 4.
 
+**AGENT.md updates (same commit):**
+
+- `apps/web/AGENT.md` — update the **Responsive Routing Architecture** section:
+  - Replace the `display: none` dual-render description with: "Use `<Responsive>` from
+    `src/shared/components/Responsive` to render exactly one branch. Do not render both
+    trees and hide one with CSS."
+  - Remove or archive any mention of per-feature `responsive.module.css` files. The
+    single canonical file lives at `src/shared/styles/responsive.module.css`.
+
 **Completion Criteria:**
 
 - `rg "mobileOnly|desktopOnly" apps/web/src/features` returns zero matches.
 - No duplicated `responsive.module.css` remains under `apps/web/src/features`.
 - Every responsive router screen imports `Responsive` from the shared location.
 - `pnpm --filter web test` passes.
-- `pnpm --filter web test:e2e` passes (Playwright smoke of key routes: `/`, `/feed`,
-  `/library`, `/scholar`, `/admin/dashboard`, `/search`, `/lecture/[slug]`).
+- `pnpm --filter web test:e2e` passes (Playwright smoke: `/`, `/feed`, `/library`,
+  `/scholars`, `/admin/dashboard`, `/search`, `/lectures/[id]`).
 - `pnpm --filter web typecheck` and `pnpm --filter web build` pass.
 
 **Suggested Commit Message:**
@@ -520,11 +639,23 @@ as `Web`. Rename every exported identifier, filename, and import site.
 - `apps/web/src/app/**/page.tsx` — every Next.js page that imports a `*ResponsiveScreen`
   must be updated.
 - Feature-level `index.ts` barrels (e.g. `apps/web/src/features/feed/index.ts`,
-  `apps/web/src/features/lecture/index.ts`) must re-export under the new names.
+  `apps/web/src/features/lecture/index.ts`) must re-export renamed screen identifiers.
+  Do NOT use this rename pass as an opportunity to add new exports — only update
+  existing ones to their new names. The barrel scope policy (screens + confirmed
+  cross-feature consumers only) is enforced in Stage 9.
 
 **Blockers:** None currently identified.
 
 **Dependencies:** Stages 3, 4, 5.
+
+**AGENT.md updates (same commit):**
+
+- `apps/web/AGENT.md` — add a **Naming conventions** subsection:
+  - Components, hooks, and screens in `apps/web` must not carry a `Web`, `DesktopWeb`,
+    or `MobileWeb` suffix. These suffixes dated from the shared-package era and are
+    redundant now that code is app-local.
+  - Correct: `AppText`, `Button`, `FeedRecentScreen`, `FeedDesktopScreen`.
+  - Wrong: `AppTextWeb`, `ButtonDesktopWeb`, `FeedDesktopWebScreen`.
 
 **Completion Criteria:**
 
@@ -586,6 +717,14 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 **Dependencies:** Stages 3, 4 (nothing in `apps/web/src/**` may still import Unistyles).
 
+**AGENT.md updates (same commit):**
+
+- `apps/web/AGENT.md` — update the **Platform bootstrap** section to remove all
+  mention of Unistyles. Document `ThemeSync` as the only theme-management primitive:
+  "Dark/light mode is handled by `ThemeSync` in `src/core/styles/ThemeSync.tsx`, which
+  listens to `prefers-color-scheme` and sets `data-theme` on `<html>`. No Unistyles
+  runtime is present in `apps/web`."
+
 **Completion Criteria:**
 
 - `rg "unistyles|react-native-unistyles" apps/web/src` returns zero matches.
@@ -642,6 +781,13 @@ react-native-safe-area-context` (per `feedback_pnpm_add.md` memory — always us
 **Dependencies:** Stage 7. Must be last before the audit stage because any remaining
 import would break the build.
 
+**AGENT.md updates (same commit):**
+
+- `apps/web/AGENT.md` — remove any remaining mention of `react-native-web`, Webpack
+  alias, `__DEV__` polyfill, or `.web.*` / `.native.*` resolver extensions.
+  Add one line to the **Non-negotiables** section: "`apps/web` has no dependency on
+  `react-native`, `react-native-web`, or `react-native-unistyles`. Do not add them."
+
 **Completion Criteria:**
 
 - `rg "\"react-native" apps/web/package.json` returns zero matches.
@@ -664,7 +810,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ---
 
-## Stage 9: Enforce named-export policy across both apps
+## Stage 9: Enforce named-export policy across both apps (web)
 
 **Status:** Planned
 
@@ -690,18 +836,30 @@ where the framework requires them:
 
 **Files to modify:**
 
-- `packages/util-config/eslint/web.mjs` (or wherever `apps/web` flat config lives):
-  - Add `import/no-default-export` at `error` for `src/features/**`, `src/shared/**`,
-    `src/core/**`.
-  - Override to `off` for the allowed Next.js paths above.
-- `packages/util-config/eslint/mobile.mjs` (or wherever `apps/mobile` flat config lives):
-  - Add `import/no-default-export` at `error` for `src/features/**`, `src/shared/**`,
-    `src/core/**`.
-  - Override to `off` for `src/app/**`.
+- `packages/util-config/eslint/next.js` — this is the shared ESLint config consumed by
+  `apps/web/eslint.config.js`. Add `import/no-default-export` at `error` for
+  `src/features/**`, `src/shared/**`, `src/core/**`. Override to `off` for the allowed
+  Next.js paths listed above.
+  - **`src/app/**/route.ts` is NOT in the exception list.** Next.js App Router route
+    handlers use named exports (`GET`, `POST`, etc.) and must not use default exports.
+    Do not add an override for route files.
+- `packages/util-config/eslint/expo.js` — this is the shared ESLint config consumed by
+  `apps/mobile/eslint.config.js`. Add `import/no-default-export` at `error` for
+  `src/features/**`, `src/shared/**`, `src/core/**`. Override to `off` for `src/app/**`
+  (Expo Router requires default exports for every route and layout file).
 - Fix any existing violations the new rule reports.
 - Audit `index.ts` barrels under `apps/web/src/features/*/index.ts` and
-  `apps/mobile/src/features/*/index.ts` — ensure each uses only `export { X } from ...`
-  (no `export { default as X }`).
+  `apps/mobile/src/features/*/index.ts`:
+  - Named exports only — no `export { default as X }`.
+  - **Web barrel scope rule (enforce now):** only export screens plus any component
+    that is verifiably imported by a _different_ feature. To verify, grep for the
+    component name outside its own feature folder before keeping it in the barrel.
+    Remove any export that has no cross-feature consumer.
+  - **Mobile barrel scope rule:** same policy — screens plus confirmed cross-feature
+    consumers only. Do not add exports speculatively.
+- Update `apps/web/AGENT.md` and `apps/mobile/AGENT.md` with a **Barrel exports**
+  subsection documenting this policy so future contributors do not add speculative
+  exports.
 
 **Changes:**
 
@@ -731,7 +889,291 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ---
 
-## Stage 10: Final verification pass
+## Stage 10: Drop `MobileNative` / `Native` suffix from mobile exports
+
+**Status:** Planned
+
+**Goal:** Every component, hook, screen, and type exported from `apps/mobile/src/features/**`,
+`apps/mobile/src/shared/**`, and `apps/mobile/src/core/**` uses a clean, unsuffixed name.
+The full rename set was already partially started (e.g. `AppText`, `TabIcon` are clean) but
+is inconsistent — finish it systematically.
+
+**Rename mapping (non-exhaustive; execution must grep for the full set):**
+
+- `ButtonMobileNative` → `Button` — `apps/mobile/src/shared/components/Button/Button.tsx`
+- `ButtonMobileNativeProps` → `ButtonProps`
+- `TextInputMobileNative` → `TextInput` — `apps/mobile/src/shared/components/TextInput/TextInput.tsx`
+- `TextInputMobileNativeProps` → `TextInputProps`
+- `CustomTabBarMobileNative` → `CustomTabBar` — `apps/mobile/src/features/navigation/components/CustomTabBar/CustomTabBar.tsx`
+- `SubsectionBarHostMobileNative` → `SubsectionBarHost` — `apps/mobile/src/features/navigation/components/SubsectionBarHost/SubsectionBarHost.tsx`
+- `ProvidersMobileNative` → `Providers` — `apps/mobile/src/core/providers.tsx`
+- Every `*MobileNativeScreen` export → `*Screen` across all feature screen files
+- Any remaining `*Native` or `*MobileNative` prop-type exports
+
+**Strategy:**
+
+- Run: `rg "MobileNative|Native\b" apps/mobile/src --include="*.tsx" --include="*.ts" -l`
+  to get the full list of files before starting.
+- Rename identifiers inside each file first; then grep all callers (mostly under
+  `apps/mobile/src/app/**` and feature `index.ts` barrels) and update.
+- Do NOT rename Expo Router route files under `apps/mobile/src/app/**` — those use
+  `export default` and the identifier name is irrelevant.
+- TDD is not required for pure identifier renames; run `pnpm --filter mobile typecheck`
+  and `pnpm --filter mobile test` after each batch.
+
+**Blockers:** None currently identified.
+
+**Dependencies:** Stage 9 (ESLint rule is in place — catch any accidental regressions).
+
+**AGENT.md updates (same commit):**
+
+- `apps/mobile/AGENT.md` — add a **Naming conventions** subsection:
+  - Components, hooks, and screens in `apps/mobile` must not carry a `Native`,
+    `MobileNative`, or `Mobile` suffix. These suffixes dated from the shared-package
+    era and are redundant now that code is app-local.
+  - Correct: `Button`, `CustomTabBar`, `FeedScreen`, `Providers`.
+  - Wrong: `ButtonMobileNative`, `CustomTabBarMobileNative`, `FeedMobileNativeScreen`.
+  - `AppText` and `TabIcon` are already clean — use them as reference.
+
+**Completion Criteria:**
+
+- `rg "MobileNative|Native\b" apps/mobile/src --include="*.tsx" --include="*.ts"` returns
+  zero matches (excluding comments and string literals that are just docs).
+- `pnpm --filter mobile typecheck` passes.
+- `pnpm --filter mobile test` passes.
+- `pnpm --filter mobile lint` passes.
+
+**Suggested Commit Message:**
+
+```text
+refactor(mobile): drop MobileNative/Native suffix from all component exports
+
+Components in apps/mobile no longer carry the suffix that dated from the
+shared-package era. Button, TextInput, CustomTabBar, SubsectionBarHost,
+Providers, and all screen exports renamed to clean identifiers.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+```
+
+---
+
+## Stage 11: Add missing feature barrel exports to `apps/mobile`
+
+**Status:** Planned
+
+**Goal:** All 14 `apps/mobile/src/features/*/` folders have a lean `index.ts` barrel.
+Lean means: export only screens and components with a confirmed cross-feature consumer.
+Do not speculatively export hooks, utilities, or sub-components.
+
+**Missing barrels (create `index.ts` for each):**
+
+- `apps/mobile/src/features/account/index.ts`
+- `apps/mobile/src/features/auth/index.ts`
+- `apps/mobile/src/features/legal/index.ts`
+- `apps/mobile/src/features/library/index.ts`
+- `apps/mobile/src/features/live/index.ts`
+- `apps/mobile/src/features/navigation/index.ts`
+- `apps/mobile/src/features/playback/index.ts`
+- `apps/mobile/src/features/progress/index.ts`
+- `apps/mobile/src/features/scholar/index.ts`
+- `apps/mobile/src/features/search/index.ts`
+- `apps/mobile/src/features/support/index.ts`
+- `apps/mobile/src/features/downloads/index.ts`
+
+**Barrel conventions:**
+
+- Named exports only — `export { FooScreen } from "./screens/foo.screen"`.
+- Always export screens (they are the feature's routing surface consumed by
+  `apps/mobile/src/app/**`).
+- For each non-screen item you consider exporting: grep the rest of the codebase
+  (`rg "ComponentName" apps/mobile/src --include="*.ts" --include="*.tsx"`) and only
+  include it if at least one file _outside this feature folder_ imports it.
+- Do NOT re-export anything from `apps/mobile/src/app/**` (route files stay route-only).
+
+**Existing barrels to verify (no changes expected but confirm):**
+
+- `apps/mobile/src/features/feed/index.ts`
+- `apps/mobile/src/features/lecture/index.ts`
+
+**Blockers:** None currently identified.
+
+**Dependencies:** Stage 10 (so the correct post-rename identifiers are in the barrels).
+
+**Completion Criteria:**
+
+- `ls apps/mobile/src/features/*/index.ts` lists 14 files.
+- `pnpm --filter mobile typecheck` passes.
+- `pnpm --filter mobile lint` passes.
+
+**Suggested Commit Message:**
+
+```text
+feat(mobile): add index.ts barrel exports to all 12 features missing them
+
+Consistent named barrels across all features so callers do not need
+direct deep imports.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+```
+
+---
+
+## Stage 12: Clean up `Mobile*` prefix in `apps/mobile/src/core/` and update AGENT.md
+
+**Status:** Planned
+
+**Goal:** Internal `apps/mobile/src/core/` functions shed their redundant `Mobile`
+infix; `apps/mobile/AGENT.md` is updated to document the conventions this cleanup
+establishes.
+
+**Files to modify:**
+
+- `apps/mobile/src/core/config/env.ts`
+  - Rename `getMobileRuntimeEnv` → `getRuntimeEnv`.
+  - Update every call site (likely just `apps/mobile/src/core/providers.tsx` and one or
+    two feature hooks that read env at startup).
+- `apps/mobile/src/core/config/build-env.ts`
+  - Rename `getMobileBuildEnv` → `getBuildEnv`.
+  - Update call sites.
+- `apps/mobile/AGENT.md` — add or update:
+  - **Export style** subsection: named exports everywhere; `export default` only in
+    `src/app/**` route and layout files required by Expo Router.
+  - **Naming convention** subsection: no `MobileNative`, `Native`, or `Mobile` suffix
+    on identifiers inside `apps/mobile`. Components are named for their domain purpose
+    only.
+  - **Feature barrels** subsection: every `src/features/<name>/` must have an
+    `index.ts` with named re-exports of the feature's public surface.
+  - **Type declarations**: note that `src/types/unistyles-*.d.ts` and `src/unistyles.d.ts`
+    were removed; Unistyles module augmentation now lives only in
+    `src/core/styles/unistyles.ts`.
+
+**Blockers:** None currently identified.
+
+**Dependencies:** Stages 10, 11.
+
+**Completion Criteria:**
+
+- `rg "getMobileRuntimeEnv|getMobileBuildEnv" apps/mobile/src` returns zero matches.
+- `pnpm --filter mobile typecheck` passes.
+- `pnpm --filter mobile lint` passes.
+
+**Suggested Commit Message:**
+
+```text
+chore(mobile): remove Mobile prefix from core config helpers and update AGENT.md
+
+getMobileRuntimeEnv → getRuntimeEnv, getMobileBuildEnv → getBuildEnv.
+AGENT.md documents the naming, barrel, and export-style conventions.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+```
+
+---
+
+## Stage 13: Packages cleanup
+
+**Status:** Planned
+
+**Goal:** Trim dead exports from `packages/domain-playback`, remove stale mobile-theme
+re-exports from `packages/design-tokens`'s web entry, decide the fate of the abandoned
+`packages/core-i18n`, and remove the `packages/shared` ghost reference from the root
+`AGENT.md`.
+
+**Sub-task A — `packages/design-tokens/src/index.web.ts`:**
+
+- Remove lines that re-export `lightMobileTheme` and `darkMobileTheme` from the native
+  theme file. Run the following grep first to confirm no web-context file still imports
+  them (this stage runs after Stages 3 and 7 have cleared all web Unistyles usage):
+  `rg "lightMobileTheme|darkMobileTheme" apps/web --include="*.ts" --include="*.tsx"`
+  — must return zero matches before making the deletion.
+- The native entry point (`index.native.ts`) is unaffected — it legitimately exports
+  both mobile themes for `apps/mobile`.
+
+**Sub-task B — `packages/domain-playback` dead exports:**
+
+- Before touching anything, run the verification grep:
+
+  ```bash
+  rg "usePlaybackStore|PlaybackStore\b|PlaybackEngine\b|webPlaybackEngine|nativePlaybackEngine|PlaybackStatus\b|PlaybackState\b" \
+    apps/ packages/ --include="*.ts" --include="*.tsx" -l
+  ```
+
+- If the only matching files are inside `packages/domain-playback/src/` itself, remove
+  these from the public `index.ts` export. Do not delete the implementations — just stop
+  re-exporting them so they become internal.
+- Keep in the barrel: `usePlayback` and `Track` (verify these are actually imported by
+  apps first with the same grep pattern before deciding).
+- If any of the "dead" exports are actually consumed (grep returns an app file), keep
+  them and update the relic description accordingly.
+
+**Sub-task C — `packages/core-i18n` abandoned package:**
+
+- Check `docs/` for any mention of i18n work planned. Run:
+  `rg "@sd/core-i18n" apps/ packages/ --include="*.ts" --include="*.tsx" --include="*.json" -l`
+- If zero matches outside `packages/core-i18n` itself:
+  - Remove the package's entries from:
+    - `pnpm-workspace.yaml`
+    - Root `turbo.json` pipeline
+    - Any `package.json` that lists it as a dependency
+  - Delete `packages/core-i18n/` directory.
+- If matches exist, leave the package and add a `README.md` explaining its current stub
+  status and intended scope.
+
+**Sub-task D — `packages/shared` ghost reference:**
+
+- Edit the root `AGENT.md` package map: remove the line
+  `packages/shared - Cross-app utilities only (no platform-specific UI primitives)`.
+  This package does not exist; keeping the line misleads contributors.
+
+**Files to modify:**
+
+- `packages/design-tokens/src/index.web.ts` — remove mobile theme re-exports.
+- `packages/domain-playback/src/index.ts` — remove dead public exports (after
+  verification).
+- Root `AGENT.md` — remove `packages/shared` line from the package map.
+- `pnpm-workspace.yaml`, root `turbo.json`, dependent `package.json` files — remove
+  `core-i18n` references if the package is deleted.
+
+**Blockers:**
+
+- Sub-task A is blocked on Stages 3 and 7 completing (web must not import mobile themes
+  before this removal).
+- Sub-task B requires the verification grep to confirm orphan status before removal.
+
+**Dependencies:** Stages 7 and 8 for Sub-task A. Stages 1–12 for Sub-tasks B, C, D (run
+this near the end so the codebase is in its final state before auditing for dead exports).
+
+**AGENT.md updates (same commit):**
+
+- Root `AGENT.md` — remove the `packages/shared` ghost entry (Sub-task D above).
+- If `core-i18n` is removed: also remove it from the package map in root `AGENT.md`.
+
+**Completion Criteria:**
+
+- `rg "lightMobileTheme|darkMobileTheme" apps/web` returns zero matches.
+- `rg "packages/shared" AGENT.md` returns zero matches.
+- `pnpm install` succeeds (no dangling workspace references).
+- `pnpm --filter domain-playback typecheck` passes.
+- `pnpm --filter design-tokens typecheck` passes (both web and native entry points).
+- `pnpm typecheck` — full monorepo passes.
+- `pnpm build` — full monorepo passes.
+
+**Suggested Commit Message:**
+
+```text
+chore(packages): trim dead exports, remove ghost package reference, drop core-i18n stub
+
+- design-tokens/index.web.ts no longer re-exports mobile themes
+- domain-playback stops exporting unused engine internals
+- packages/shared ghost removed from AGENT.md
+- core-i18n removed (was empty stub with no consumers)
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+```
+
+---
+
+## Stage 14: Final verification pass
 
 **Status:** Planned
 
@@ -743,11 +1185,18 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 - `pnpm lint` — full monorepo clean.
 - `pnpm test` — full monorepo clean.
 - `pnpm build` — all apps and packages build.
-- `pnpm --filter web test:e2e` — Playwright smoke of:
-  - `/`, `/feed`, `/feed/following`, `/library`, `/library/saved`, `/lecture/[slug]`,
-    `/scholar`, `/scholar/[slug]`, `/search`, `/admin/dashboard`, `/admin/scholars`,
-    `/admin/topics`, `/admin/livestreams`, `/admin/permissions`, `/sign-in`, `/sign-up`,
-    `/support`, `/legal/privacy`, `/legal/terms-of-use`, `/live/*`.
+- `pnpm --filter web test:e2e` — Playwright smoke of (use actual route paths from
+  `apps/web/src/app/(main)/`):
+  - `/`, `/feed`, `/feed/following`
+  - `/library`, `/library/saved`, `/library/completed`
+  - `/lectures/[id]` (the real slug — not `/lecture/[slug]`)
+  - `/scholars`, `/scholars/[slug]` (not `/scholar/…`)
+  - `/search`
+  - `/admin/dashboard`, `/admin/scholars`, `/admin/topics`, `/admin/livestreams`,
+    `/admin/permissions`
+  - `/sign-in`, `/sign-up`
+  - `/support`, `/legal/privacy`, `/legal/terms-of-use`
+  - `/live/*`
   - Each route must render one tree (no `display: none` phantom), and viewport resize
     must switch branches without full reload.
 - Manual dark-mode toggle on `apps/web` — `data-theme` still flips.
@@ -759,8 +1208,12 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
   - `rg "react-native-unistyles" apps/web`
   - `rg "DesktopWeb|MobileWeb\b" apps/web/src`
   - `rg "mobileOnly|desktopOnly" apps/web/src/features`
-  - `rg "\\.native\\.(t|j)sx?" apps/web`
-  - `rg "export default" apps/web/src/features apps/web/src/shared apps/mobile/src/features apps/mobile/src/shared`
+  - `rg --files apps/web -g '*.native.tsx' -g '*.native.ts'` (filename check — not
+    content grep, which would false-pass)
+  - `rg "export default" apps/web/src/features apps/web/src/shared --include="*.tsx" --include="*.ts"`
+    (exclude `apps/web/src/shared/types/css.d.ts` which legitimately has a module
+    declaration — use `--glob '!**/types/**'` or inspect manually)
+  - `rg "export default" apps/mobile/src/features apps/mobile/src/shared --include="*.tsx" --include="*.ts"`
 
 **Blockers:** None currently identified.
 

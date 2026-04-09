@@ -1,5 +1,5 @@
-import { AccountResponsiveScreen } from "../../../../features/account/screens/account.screen";
+import { AccountScreen } from "../../../../features/account/screens/account.screen";
 
 export default function AccountPage() {
-  return <AccountResponsiveScreen />;
+  return <AccountScreen />;
 }

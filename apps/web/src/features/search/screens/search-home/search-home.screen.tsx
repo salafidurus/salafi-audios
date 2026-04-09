@@ -1,10 +1,10 @@
 "use client";
 
+import { Responsive } from "@/shared/components/Responsive";
 import { SearchHomeMobileWebScreen } from "./search-home.screen.mobile";
 import { SearchHomeDesktopWebScreen } from "./search-home.screen.desktop";
-import styles from "../responsive.module.css";
 
-export type SearchHomeResponsiveScreenProps = {
+export type SearchHomeScreenProps = {
   onOpenSearch?: () => void;
   onSelectCategory?: (searchKey: string) => void;
   onSelectScholar?: (slug: string) => void;
@@ -12,16 +12,16 @@ export type SearchHomeResponsiveScreenProps = {
   onContinueListening?: (lectureSlug: string) => void;
 };
 
-export function SearchHomeResponsiveScreen({
+export function SearchHomeScreen({
   onOpenSearch,
   onSelectCategory,
   onSelectScholar,
   onSelectSuggestion,
   onContinueListening,
-}: SearchHomeResponsiveScreenProps) {
+}: SearchHomeScreenProps) {
   return (
-    <>
-      <div className={styles.mobileOnly}>
+    <Responsive
+      mobile={
         <SearchHomeMobileWebScreen
           onOpenSearch={onOpenSearch}
           onSelectCategory={onSelectCategory}
@@ -29,8 +29,8 @@ export function SearchHomeResponsiveScreen({
           onSelectSuggestion={onSelectSuggestion}
           onContinueListening={onContinueListening}
         />
-      </div>
-      <div className={styles.desktopOnly}>
+      }
+      desktop={
         <SearchHomeDesktopWebScreen
           onOpenSearch={onOpenSearch}
           onSelectCategory={onSelectCategory}
@@ -38,7 +38,7 @@ export function SearchHomeResponsiveScreen({
           onSelectSuggestion={onSelectSuggestion}
           onContinueListening={onContinueListening}
         />
-      </div>
-    </>
+      }
+    />
   );
 }

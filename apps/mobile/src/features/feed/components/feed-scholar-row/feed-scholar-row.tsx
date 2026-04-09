@@ -1,12 +1,12 @@
 import { View, Text, Pressable, ScrollView } from "react-native";
 import type { ScholarChipDto } from "@sd/core-contracts";
 
-export type FeedScholarRowNativeProps = {
+export type FeedScholarRowProps = {
   scholars: ScholarChipDto[];
   onScholarPress?: (slug: string) => void;
 };
 
-export function FeedScholarRowNative({ scholars, onScholarPress }: FeedScholarRowNativeProps) {
+export function FeedScholarRow({ scholars, onScholarPress }: FeedScholarRowProps) {
   return (
     <View style={{ paddingVertical: 12 }}>
       <Text

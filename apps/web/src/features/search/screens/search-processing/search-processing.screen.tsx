@@ -1,26 +1,19 @@
 "use client";
 
+import { Responsive } from "@/shared/components/Responsive";
 import { SearchProcessingMobileWebScreen } from "./search-processing.screen.mobile";
 import { SearchProcessingDesktopWebScreen } from "./search-processing.screen.desktop";
-import styles from "../responsive.module.css";
 
-export type SearchProcessingResponsiveScreenProps = {
+export type SearchProcessingScreenProps = {
   searchKey?: string;
   onBackPress?: () => void;
 };
 
-export function SearchProcessingResponsiveScreen({
-  searchKey,
-  onBackPress,
-}: SearchProcessingResponsiveScreenProps) {
+export function SearchProcessingScreen({ searchKey, onBackPress }: SearchProcessingScreenProps) {
   return (
-    <>
-      <div className={styles.mobileOnly}>
-        <SearchProcessingMobileWebScreen prefill={searchKey} onBackPress={onBackPress} />
-      </div>
-      <div className={styles.desktopOnly}>
-        <SearchProcessingDesktopWebScreen />
-      </div>
-    </>
+    <Responsive
+      mobile={<SearchProcessingMobileWebScreen prefill={searchKey} onBackPress={onBackPress} />}
+      desktop={<SearchProcessingDesktopWebScreen />}
+    />
   );
 }

@@ -1,22 +1,13 @@
 "use client";
 
-import styles from "../responsive.module.css";
+import { Responsive } from "@/shared/components/Responsive";
 import { LectureDetailDesktopWebScreen } from "./lecture-detail.screen.desktop";
 import { LectureDetailMobileWebScreen } from "./lecture-detail.screen.mobile";
 
-export type LectureDetailResponsiveScreenProps = {
+export type LectureDetailScreenProps = {
   id: string;
 };
 
-export function LectureDetailResponsiveScreen(props: LectureDetailResponsiveScreenProps) {
-  return (
-    <>
-      <div className={styles.mobileOnly}>
-        <LectureDetailMobileWebScreen {...props} />
-      </div>
-      <div className={styles.desktopOnly}>
-        <LectureDetailDesktopWebScreen {...props} />
-      </div>
-    </>
-  );
+export function LectureDetailScreen(props: LectureDetailScreenProps) {
+  return <Responsive mobile={<LectureDetailMobileWebScreen {...props} />} desktop={<LectureDetailDesktopWebScreen {...props} />} />;
 }

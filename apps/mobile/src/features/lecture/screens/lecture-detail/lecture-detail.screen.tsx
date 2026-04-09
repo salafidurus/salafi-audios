@@ -1,47 +1,47 @@
 import { View, ScrollView } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { ScreenViewMobileNative } from "../../../../shared/components/ScreenView/ScreenView";
+import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 import { AppText } from "../../../../shared/components/AppText/AppText";
 import { useLectureDetailScreen } from "@sd/domain-content";
-import { LectureMetaNative } from "../../components/lecture-meta/lecture-meta";
-import { TopicChipsNative } from "../../components/topic-chips/topic-chips";
-import { SeriesContextBarNative } from "../../components/series-context-bar/series-context-bar";
-import { LecturePlayButtonNative } from "../../components/lecture-play-button/LecturePlayButton";
-import { LectureSaveButtonNative } from "../../components/lecture-save-button/LectureSaveButton";
+import { LectureMeta } from "../../components/lecture-meta/lecture-meta";
+import { TopicChips } from "../../components/topic-chips/topic-chips";
+import { SeriesContextBar } from "../../components/series-context-bar/series-context-bar";
+import { LecturePlayButton } from "../../components/lecture-play-button/LecturePlayButton";
+import { LectureSaveButton } from "../../components/lecture-save-button/LectureSaveButton";
 
-export type LectureDetailMobileNativeScreenProps = {
+export type LectureDetailScreenProps = {
   id: string;
 };
 
-export function LectureDetailMobileNativeScreen({ id }: LectureDetailMobileNativeScreenProps) {
+export function LectureDetailScreen({ id }: LectureDetailScreenProps) {
   const { lecture, isFetching } = useLectureDetailScreen(id);
 
   if (isFetching) {
     return (
-      <ScreenViewMobileNative center>
+      <ScreenView center>
         <AppText variant="bodyMd">Loading lecture...</AppText>
-      </ScreenViewMobileNative>
+      </ScreenView>
     );
   }
 
   if (!lecture) {
     return (
-      <ScreenViewMobileNative center>
+      <ScreenView center>
         <AppText variant="titleMd">Lecture not found</AppText>
-      </ScreenViewMobileNative>
+      </ScreenView>
     );
   }
 
   return (
-    <ScreenViewMobileNative>
+    <ScreenView>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
         <AppText variant="titleLg">{lecture.title}</AppText>
-        <LectureMetaNative lecture={lecture} />
-        <TopicChipsNative topics={lecture.topics} />
+        <LectureMeta lecture={lecture} />
+        <TopicChips topics={lecture.topics} />
 
         <View style={styles.playSection}>
-          <LecturePlayButtonNative lecture={lecture} />
-          <LectureSaveButtonNative lectureId={lecture.id} />
+          <LecturePlayButton lecture={lecture} />
+          <LectureSaveButton lectureId={lecture.id} />
         </View>
 
         {lecture.description && (
@@ -50,9 +50,9 @@ export function LectureDetailMobileNativeScreen({ id }: LectureDetailMobileNativ
           </View>
         )}
 
-        {lecture.seriesContext && <SeriesContextBarNative seriesContext={lecture.seriesContext} />}
+        {lecture.seriesContext && <SeriesContextBar seriesContext={lecture.seriesContext} />}
       </ScrollView>
-    </ScreenViewMobileNative>
+    </ScreenView>
   );
 }
 

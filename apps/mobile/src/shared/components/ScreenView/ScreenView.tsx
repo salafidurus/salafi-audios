@@ -10,7 +10,7 @@ export interface ScreenViewProps {
   backgroundVariant?: "canvas" | "primaryWash" | "secondaryWash" | "mixedWash";
 }
 
-export function ScreenViewMobileNative({
+export function ScreenView({
   children,
   style,
   contentStyle,

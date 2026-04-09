@@ -1,12 +1,12 @@
 import { View, Text, Pressable } from "react-native";
 import type { FeedContentItemDto } from "@sd/core-contracts";
 
-export type FeedContentCardNativeProps = {
+export type FeedContentCardProps = {
   item: FeedContentItemDto;
   onPress?: () => void;
 };
 
-export function FeedContentCardNative({ item, onPress }: FeedContentCardNativeProps) {
+export function FeedContentCard({ item, onPress }: FeedContentCardProps) {
   return (
     <Pressable
       onPress={onPress}

@@ -1,13 +1,13 @@
 import type { LectureDetailDto } from "@sd/core-contracts";
 import { usePlayback } from "@sd/domain-playback";
 import type { Track } from "@sd/domain-playback";
-import { ButtonMobileNative } from "../../../../shared/components/Button/Button";
+import { Button } from "../../../../shared/components/Button/Button";
 
-export type LecturePlayButtonNativeProps = {
+export type LecturePlayButtonProps = {
   lecture: LectureDetailDto;
 };
 
-export function LecturePlayButtonNative({ lecture }: LecturePlayButtonNativeProps) {
+export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
   const { play } = usePlayback();
 
   if (!lecture.primaryAudioAsset) {
@@ -30,7 +30,7 @@ export function LecturePlayButtonNative({ lecture }: LecturePlayButtonNativeProp
   };
 
   return (
-    <ButtonMobileNative
+    <Button
       variant="primary"
       size="lg"
       fullWidth

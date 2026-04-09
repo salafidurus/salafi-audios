@@ -13,10 +13,10 @@ export {
 } from "./components/feed-topic-row/feed-topic-row";
 
 // Screens
-export { FeedResponsiveScreen, type FeedResponsiveScreenProps } from "./screens/feed.screen";
+export { FeedScreen, type FeedScreenProps } from "./screens/feed.screen";
 export {
-  FeedRecentResponsiveScreen,
-  type FeedRecentResponsiveScreenProps,
+  FeedRecentScreen,
+  type FeedRecentScreenProps,
 } from "./screens/feed-recent.screen";
 export {
   FeedDesktopWebScreen,
@@ -27,8 +27,8 @@ export {
   type FeedMobileWebScreenProps,
 } from "./screens/feed-recent.screen.mobile";
 export {
-  FeedFollowingResponsiveScreen,
-  type FeedFollowingResponsiveScreenProps,
+  FeedFollowingScreen,
+  type FeedFollowingScreenProps,
 } from "./screens/feed-following.screen";
 export {
   FeedFollowingDesktopWebScreen,

@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { ButtonMobileNative } from "../Button/Button";
-import { ScreenViewMobileNative } from "../ScreenView/ScreenView";
+import { Button } from "../Button/Button";
+import { ScreenView } from "../ScreenView/ScreenView";
 
 export type NotFoundStateProps = {
   title?: string;
@@ -10,20 +10,20 @@ export type NotFoundStateProps = {
   onPress: () => void;
 };
 
-export function NotFoundStateMobileNative({
+export function NotFoundState({
   title = "Page not found",
   description = "The desired screen doesn't exist or may have moved.",
   actionLabel = "Return to home screen",
   onPress,
 }: NotFoundStateProps) {
   return (
-    <ScreenViewMobileNative center contentStyle={styles.content}>
+    <ScreenView center contentStyle={styles.content}>
       <View style={styles.group}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.subtitle}>{description}</Text>
       </View>
       <View style={styles.group}>
-        <ButtonMobileNative
+        <Button
           variant="primary"
           size="md"
           label={actionLabel}
@@ -31,7 +31,7 @@ export function NotFoundStateMobileNative({
           style={styles.button}
         />
       </View>
-    </ScreenViewMobileNative>
+    </ScreenView>
   );
 }
 

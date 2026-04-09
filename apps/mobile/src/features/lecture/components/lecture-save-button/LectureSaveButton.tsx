@@ -1,11 +1,11 @@
 import { useProgressStore } from "@sd/domain-progress";
-import { ButtonMobileNative } from "../../../../shared/components/Button/Button";
+import { Button } from "../../../../shared/components/Button/Button";
 
-export type LectureSaveButtonNativeProps = {
+export type LectureSaveButtonProps = {
   lectureId: string;
 };
 
-export function LectureSaveButtonNative({ lectureId }: LectureSaveButtonNativeProps) {
+export function LectureSaveButton({ lectureId }: LectureSaveButtonProps) {
   const isSaved = useProgressStore((s) => s.actions.isSaved(lectureId));
   const addSaved = useProgressStore((s) => s.actions.addSaved);
   const removeSaved = useProgressStore((s) => s.actions.removeSaved);
@@ -19,7 +19,7 @@ export function LectureSaveButtonNative({ lectureId }: LectureSaveButtonNativePr
   };
 
   return (
-    <ButtonMobileNative
+    <Button
       variant={isSaved ? "surface" : "outline"}
       size="lg"
       fullWidth

@@ -118,7 +118,6 @@ Web (`apps/web`):
 - `packages/core-i18n` - Internationalization config and keys
 - `packages/core-contracts` - Shared TypeScript contracts (DTOs, types, query hooks)
 - `packages/design-tokens` - Design tokens (colors, spacing, radius, typography) — authoritative source
-- `packages/shared` - Cross-app utilities only (no platform-specific UI primitives)
 - `packages/core-*` - Shared platform infrastructure (auth, API, config, styling)
 - `packages/domain-content` - Lectures, scholars, series, feed, library data hooks
 - `packages/domain-account` - User profile and auth state hooks

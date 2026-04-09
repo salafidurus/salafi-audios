@@ -1,10 +1,10 @@
 import { View, Text, FlatList } from "react-native";
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
-import { FeedContentCardNative } from "../components/feed-content-card/feed-content-card";
-import { FeedScholarRowNative } from "../components/feed-scholar-row/feed-scholar-row";
+import { FeedContentCard } from "../components/feed-content-card/feed-content-card";
+import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import { useFeed } from "@sd/domain-content";
 
-export type FeedFollowingMobileNativeScreenProps = {
+export type FeedFollowingScreenProps = {
   onNavigateToLecture?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
 };
@@ -16,12 +16,12 @@ function renderFeedItem(
 ) {
   switch (item.kind) {
     case "scholar_row":
-      return <FeedScholarRowNative scholars={item.scholars} onScholarPress={onNavigateToScholar} />;
+      return <FeedScholarRow scholars={item.scholars} onScholarPress={onNavigateToScholar} />;
     case "topic_row":
       return null;
     default:
       return (
-        <FeedContentCardNative
+        <FeedContentCard
           item={item as FeedContentItemDto}
           onPress={() => onNavigateToLecture?.((item as FeedContentItemDto).slug)}
         />
@@ -35,10 +35,10 @@ function getItemKey(item: FeedItemDto, index: number): string {
   return item.id;
 }
 
-export function FeedFollowingMobileNativeScreen({
+export function FeedFollowingScreen({
   onNavigateToLecture,
   onNavigateToScholar,
-}: FeedFollowingMobileNativeScreenProps) {
+}: FeedFollowingScreenProps) {
   const { data, isFetching, hasNextPage, fetchNextPage } = useFeed();
   const items = data?.pages.flatMap((p) => p.items) ?? [];
 

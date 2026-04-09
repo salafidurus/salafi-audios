@@ -1,22 +1,13 @@
 "use client";
 
-import styles from "./responsive.module.css";
+import { Responsive } from "@/shared/components/Responsive";
 import { LiveEndedDesktopWebScreen } from "./live-ended.screen.desktop";
 import { LiveEndedMobileWebScreen } from "./live-ended.screen.mobile";
 
-export type LiveEndedResponsiveScreenProps = {
+export type LiveEndedScreenProps = {
   onNavigateToSession?: (id: string) => void;
 };
 
-export function LiveEndedResponsiveScreen(props: LiveEndedResponsiveScreenProps) {
-  return (
-    <>
-      <div className={styles.mobileOnly}>
-        <LiveEndedMobileWebScreen {...props} />
-      </div>
-      <div className={styles.desktopOnly}>
-        <LiveEndedDesktopWebScreen {...props} />
-      </div>
-    </>
-  );
+export function LiveEndedScreen(props: LiveEndedScreenProps) {
+  return <Responsive mobile={<LiveEndedMobileWebScreen {...props} />} desktop={<LiveEndedDesktopWebScreen {...props} />} />;
 }

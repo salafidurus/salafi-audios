@@ -1,5 +1,5 @@
-import { FeedResponsiveScreen } from "../../../../features/feed/screens/feed.screen";
+import { FeedScreen } from "../../../../features/feed/screens/feed.screen";
 
 export default function FeedPage() {
-  return <FeedResponsiveScreen />;
+  return <FeedScreen />;
 }

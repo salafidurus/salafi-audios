@@ -36,9 +36,9 @@ const baseLecture: LectureDetailDto = {
   seriesContext: null,
 };
 
-describe("LecturePlayButtonNative", () => {
+describe("LecturePlayButton", () => {
   it("returns null when there is no primaryAudioAsset", () => {
-    const { toJSON } = render(<LecturePlayButtonNative lecture={baseLecture} />);
+    const { toJSON } = render(<LecturePlayButton lecture={baseLecture} />);
     expect(toJSON()).toBeNull();
   });
 
@@ -47,7 +47,7 @@ describe("LecturePlayButtonNative", () => {
       ...baseLecture,
       primaryAudioAsset: { id: "asset-1", url: "https://example.com/audio.mp3" },
     };
-    render(<LecturePlayButtonNative lecture={lecture} />);
+    render(<LecturePlayButton lecture={lecture} />);
     expect(screen.getByText("▶ Play Lecture")).toBeTruthy();
   });
 
@@ -61,7 +61,7 @@ describe("LecturePlayButtonNative", () => {
         durationSeconds: 1800,
       },
     };
-    render(<LecturePlayButtonNative lecture={lecture} />);
+    render(<LecturePlayButton lecture={lecture} />);
     fireEvent.press(screen.getByText("▶ Play Lecture"));
     expect(mockPlay).toHaveBeenCalledWith({
       id: "asset-1",

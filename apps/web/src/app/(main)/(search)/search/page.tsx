@@ -2,7 +2,7 @@
 
 import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { SearchProcessingResponsiveScreen } from "../../../../features/search/screens/search-processing/search-processing.screen";
+import { SearchProcessingScreen } from "../../../../features/search/screens/search-processing/search-processing.screen";
 
 function SearchPageInner() {
   const router = useRouter();
@@ -10,7 +10,7 @@ function SearchPageInner() {
   const searchKey = searchParams.get("searchKey") ?? undefined;
 
   return (
-    <SearchProcessingResponsiveScreen searchKey={searchKey} onBackPress={() => router.back()} />
+    <SearchProcessingScreen searchKey={searchKey} onBackPress={() => router.back()} />
   );
 }
 

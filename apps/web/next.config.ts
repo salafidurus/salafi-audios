@@ -31,10 +31,6 @@ const nextConfig: NextConfig = {
       ".js",
       ".mjs",
       ".cjs",
-      ".native.tsx",
-      ".native.ts",
-      ".native.jsx",
-      ".native.js",
       ...(config.resolve.extensions ?? []),
     ];
 
@@ -59,10 +55,6 @@ const nextConfig: NextConfig = {
       ".js",
       ".mjs",
       ".cjs",
-      ".native.tsx",
-      ".native.ts",
-      ".native.jsx",
-      ".native.js",
     ],
   },
 };

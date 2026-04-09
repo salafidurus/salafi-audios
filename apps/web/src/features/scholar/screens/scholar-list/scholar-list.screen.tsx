@@ -2,11 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import { routes } from "@sd/core-contracts";
-import styles from "../responsive.module.css";
+import { Responsive } from "@/shared/components/Responsive";
 import { ScholarListDesktopWebScreen } from "./scholar-list.screen.desktop";
 import { ScholarListMobileWebScreen } from "./scholar-list.screen.mobile";
 
-export function ScholarListResponsiveScreen() {
+export function ScholarListScreen() {
   const router = useRouter();
 
   const handleSelectScholar = (slug: string) => {
@@ -14,13 +14,9 @@ export function ScholarListResponsiveScreen() {
   };
 
   return (
-    <>
-      <div className={styles.mobileOnly}>
-        <ScholarListMobileWebScreen onSelectScholar={handleSelectScholar} />
-      </div>
-      <div className={styles.desktopOnly}>
-        <ScholarListDesktopWebScreen onSelectScholar={handleSelectScholar} />
-      </div>
-    </>
+    <Responsive
+      mobile={<ScholarListMobileWebScreen onSelectScholar={handleSelectScholar} />}
+      desktop={<ScholarListDesktopWebScreen onSelectScholar={handleSelectScholar} />}
+    />
   );
 }

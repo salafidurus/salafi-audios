@@ -1,11 +1,11 @@
 import { View, Text, FlatList } from "react-native";
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
-import { FeedContentCardNative } from "../components/feed-content-card/feed-content-card";
-import { FeedScholarRowNative } from "../components/feed-scholar-row/feed-scholar-row";
-import { FeedTopicRowNative } from "../components/feed-topic-row/feed-topic-row";
+import { FeedContentCard } from "../components/feed-content-card/feed-content-card";
+import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
+import { FeedTopicRow } from "../components/feed-topic-row/feed-topic-row";
 import { useFeed } from "@sd/domain-content";
 
-export type FeedMobileNativeScreenProps = {
+export type FeedScreenProps = {
   onNavigateToLecture?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
 };
@@ -17,10 +17,10 @@ function renderFeedItem(
 ) {
   switch (item.kind) {
     case "scholar_row":
-      return <FeedScholarRowNative scholars={item.scholars} onScholarPress={onNavigateToScholar} />;
+      return <FeedScholarRow scholars={item.scholars} onScholarPress={onNavigateToScholar} />;
     case "topic_row":
       return (
-        <FeedTopicRowNative
+        <FeedTopicRow
           topicName={item.topicName}
           items={item.items}
           onItemPress={onNavigateToLecture}
@@ -28,7 +28,7 @@ function renderFeedItem(
       );
     default:
       return (
-        <FeedContentCardNative
+        <FeedContentCard
           item={item as FeedContentItemDto}
           onPress={() => onNavigateToLecture?.((item as FeedContentItemDto).slug)}
         />
@@ -42,10 +42,10 @@ function getItemKey(item: FeedItemDto, index: number): string {
   return item.id;
 }
 
-export function FeedMobileNativeScreen({
+export function FeedScreen({
   onNavigateToLecture,
   onNavigateToScholar,
-}: FeedMobileNativeScreenProps) {
+}: FeedScreenProps) {
   const { data, isFetching, hasNextPage, fetchNextPage } = useFeed();
   const items = data?.pages.flatMap((p) => p.items) ?? [];
 

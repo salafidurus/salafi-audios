@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { ButtonMobileNative } from "../Button/Button";
-import { ScreenViewMobileNative } from "../ScreenView/ScreenView";
+import { Button } from "../Button/Button";
+import { ScreenView } from "../ScreenView/ScreenView";
 
 export type AuthRequiredStateProps = {
   title: string;
@@ -10,22 +10,22 @@ export type AuthRequiredStateProps = {
   onPress: () => void;
 };
 
-export function AuthRequiredStateMobileNative({
+export function AuthRequiredState({
   title,
   description,
   actionLabel = "Sign In",
   onPress,
 }: AuthRequiredStateProps) {
   return (
-    <ScreenViewMobileNative center contentStyle={styles.content}>
+    <ScreenView center contentStyle={styles.content}>
       <View style={styles.group}>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.subtitle}>{description}</Text>
       </View>
       <View style={styles.group}>
-        <ButtonMobileNative variant="primary" size="md" label={actionLabel} onPress={onPress} />
+        <Button variant="primary" size="md" label={actionLabel} onPress={onPress} />
       </View>
-    </ScreenViewMobileNative>
+    </ScreenView>
   );
 }
 

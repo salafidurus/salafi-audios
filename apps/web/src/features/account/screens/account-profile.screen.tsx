@@ -1,22 +1,13 @@
 "use client";
 
-import styles from "./responsive.module.css";
+import { Responsive } from "@/shared/components/Responsive";
 import { AccountProfileDesktopWebScreen } from "./account-profile.screen.desktop";
 import { AccountProfileMobileWebScreen } from "./account-profile.screen.mobile";
 
-export type AccountProfileResponsiveScreenProps = {
+export type AccountProfileScreenProps = {
   onBack?: () => void;
 };
 
-export function AccountProfileResponsiveScreen(props: AccountProfileResponsiveScreenProps) {
-  return (
-    <>
-      <div className={styles.mobileOnly}>
-        <AccountProfileMobileWebScreen {...props} />
-      </div>
-      <div className={styles.desktopOnly}>
-        <AccountProfileDesktopWebScreen {...props} />
-      </div>
-    </>
-  );
+export function AccountProfileScreen(props: AccountProfileScreenProps) {
+  return <Responsive mobile={<AccountProfileMobileWebScreen {...props} />} desktop={<AccountProfileDesktopWebScreen {...props} />} />;
 }

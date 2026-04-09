@@ -1,22 +1,13 @@
 "use client";
 
+import { Responsive } from "@/shared/components/Responsive";
 import { LibrarySavedDesktopWebScreen } from "./library-saved.screen.desktop";
 import { LibrarySavedMobileWebScreen } from "./library-saved.screen.mobile";
-import styles from "./responsive.module.css";
 
-export type LibraryResponsiveScreenProps = {
+export type LibraryScreenProps = {
   onNavigateToLecture?: (id: string) => void;
 };
 
-export function LibraryResponsiveScreen(props: LibraryResponsiveScreenProps) {
-  return (
-    <>
-      <div className={styles.mobileOnly}>
-        <LibrarySavedMobileWebScreen {...props} />
-      </div>
-      <div className={styles.desktopOnly}>
-        <LibrarySavedDesktopWebScreen {...props} />
-      </div>
-    </>
-  );
+export function LibraryScreen(props: LibraryScreenProps) {
+  return <Responsive mobile={<LibrarySavedMobileWebScreen {...props} />} desktop={<LibrarySavedDesktopWebScreen {...props} />} />;
 }
