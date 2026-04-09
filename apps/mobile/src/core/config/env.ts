@@ -40,7 +40,7 @@ type ConstantsWithLegacyManifests = typeof Constants & {
   };
 };
 
-let cachedMobileEnv: ReturnType<typeof parseMobileRuntimeExtra> | null | undefined;
+let cachedEnv: ReturnType<typeof parseMobileRuntimeExtra> | null | undefined;
 let hasLoggedRuntimeExtraWarning = false;
 
 function getRuntimeExtra(): unknown {
@@ -53,13 +53,13 @@ function getRuntimeExtra(): unknown {
   );
 }
 
-export function getMobileRuntimeEnv() {
-  if (cachedMobileEnv !== undefined) {
-    return cachedMobileEnv;
+export function getRuntimeEnv() {
+  if (cachedEnv !== undefined) {
+    return cachedEnv;
   }
 
   try {
-    cachedMobileEnv = parseMobileRuntimeExtra(getRuntimeExtra());
+    cachedEnv = parseMobileRuntimeExtra(getRuntimeExtra());
   } catch (error) {
     if (!hasLoggedRuntimeExtraWarning) {
       hasLoggedRuntimeExtraWarning = true;
@@ -69,24 +69,25 @@ export function getMobileRuntimeEnv() {
       );
     }
 
-    cachedMobileEnv = null;
+    cachedEnv = null;
   }
 
-  return cachedMobileEnv;
+  return cachedEnv;
 }
 
 export function isDev(): boolean {
-  return getMobileRuntimeEnv()?.appEnv === "development";
+  return getRuntimeEnv()?.appEnv === "development";
 }
 
 export function isPreview(): boolean {
-  return getMobileRuntimeEnv()?.appEnv === "preview";
+  return getRuntimeEnv()?.appEnv === "preview";
 }
 
 export function isProduction(): boolean {
-  return getMobileRuntimeEnv()?.appEnv === "production";
+  return getRuntimeEnv()?.appEnv === "production";
 }
 
 export function getApiBaseUrl(): string | undefined {
-  return getMobileRuntimeEnv()?.apiUrl;
+  return getRuntimeEnv()?.apiUrl;
 }
+

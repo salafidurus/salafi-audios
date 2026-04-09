@@ -1,14 +1,14 @@
 import * as Sentry from "@sentry/react-native";
 import type { ComponentType } from "react";
 import { vexo } from "vexo-analytics";
-import { getMobileRuntimeEnv, isDev } from "./config/env";
+import { getRuntimeEnv, isDev } from "./config/env";
 
 export function initIntegrations(): void {
   if (isDev()) {
     return;
   }
 
-  const mobileEnv = getMobileRuntimeEnv();
+  const mobileEnv = getRuntimeEnv();
 
   if (mobileEnv?.sentryDsn) {
     Sentry.init({
@@ -26,10 +26,11 @@ export function initIntegrations(): void {
 export function getWrappedLayout<T extends ComponentType<unknown>>(
   Layout: T,
 ): T | ReturnType<typeof Sentry.wrap> {
-  const mobileEnv = getMobileRuntimeEnv();
+  const mobileEnv = getRuntimeEnv();
 
   if (isDev() || !mobileEnv?.sentryDsn) {
     return Layout;
   }
   return Sentry.wrap(Layout) as T;
 }
+

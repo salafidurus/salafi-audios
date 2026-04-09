@@ -3,7 +3,7 @@ import { z } from "zod";
 export const AppEnvSchema = z.enum(["development", "preview", "production"]);
 export type AppEnv = z.infer<typeof AppEnvSchema>;
 
-const MobileBuildEnvSchema = z.object({
+const BuildEnvSchema = z.object({
   APP_ENV: AppEnvSchema.default("development"),
   EXPO_PUBLIC_API_URL: z.string().url(),
   SENTRY_AUTH_TOKEN: z.string().optional(),
@@ -13,10 +13,10 @@ const MobileBuildEnvSchema = z.object({
   EXPO_PUBLIC_VEXO_PROJECT_ID: z.string(),
 });
 
-export type MobileBuildEnv = z.infer<typeof MobileBuildEnvSchema>;
+export type BuildEnv = z.infer<typeof BuildEnvSchema>;
 
-export function getMobileBuildEnv(raw: NodeJS.ProcessEnv = process.env): MobileBuildEnv {
-  const parsed = MobileBuildEnvSchema.safeParse(raw);
+export function getBuildEnv(raw: NodeJS.ProcessEnv = process.env): BuildEnv {
+  const parsed = BuildEnvSchema.safeParse(raw);
   if (!parsed.success) {
     throw new Error(
       [
