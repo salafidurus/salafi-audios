@@ -5,7 +5,7 @@ import Link from "next/link";
 import clsx from "clsx";
 import { useAuth } from "@sd/core-auth";
 import { authClient } from "@sd/core-auth";
-import { ButtonDesktopWeb } from "@sd/shared";
+import { ButtonDesktopWeb } from "../../../../shared/components/Button/Button";
 import { Search } from "lucide-react";
 import { routes } from "@sd/core-contracts";
 import styles from "./top-auth-strip.module.css";

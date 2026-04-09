@@ -6,7 +6,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Pressable } from "react-native-unistyles/components/native/Pressable";
 import { Text } from "react-native-unistyles/components/native/Text";
 import { View } from "react-native-unistyles/components/native/View";
-import { AccentGradientFill } from "@sd/shared";
+import { AccentGradientFill } from "../../../../shared/components/AccentGradientFill/AccentGradientFill";
 
 export type SearchButtonMobileWebProps = {
   placeholder?: string;

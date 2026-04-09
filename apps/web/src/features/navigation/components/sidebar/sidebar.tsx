@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useResponsive } from "@sd/shared";
+import { useResponsive } from "../../../../shared/hooks/use-responsive";
 import { SidebarWeb } from "./sidebar.desktop";
 import { SidebarTablet } from "./sidebar.tablet";
 import { SidebarMobile } from "./sidebar.mobile";

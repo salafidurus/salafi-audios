@@ -3,7 +3,7 @@
 import clsx from "clsx";
 import { useMemo } from "react";
 import type { TopicDetailDto } from "@sd/core-contracts";
-import { useDragScrollWeb } from "@sd/shared";
+import { useDragScrollWeb } from "../../../../shared/hooks/use-drag-scroll";
 
 const chipStyle = {
   fontFamily: "var(--typo-label-md-font-family)",

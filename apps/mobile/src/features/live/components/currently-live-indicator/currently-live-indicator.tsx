@@ -2,7 +2,7 @@
 
 import { View, Pressable, Linking } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { AppText } from "@sd/shared";
+import { AppText } from "../../../../shared/components/AppText/AppText";
 import { useActiveSession } from "@sd/domain-live";
 
 export type CurrentlyLiveIndicatorNativeProps = {

@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { QuickBrowseMobileWeb } from "../../components/QuickBrowse/QuickBrowse.mobile";
 import { SearchButtonMobileWeb } from "../../components/SearchButton/SearchButton.mobile";
 import { TitleTextMobileWeb } from "../../components/TitleText/TitleText.mobile";
-import { ScreenViewWeb } from "@sd/shared";
+import { ScreenViewWeb } from "../../../../shared/components/ScreenView/ScreenView";
 import { useQuickBrowse } from "@sd/domain-search";
 
 export type SearchHomeScreenProps = {

@@ -61,15 +61,15 @@ This directory contains the authoritative documentation for Salafi Durus.
 
 ### Mobile (apps/mobile)
 
-| Feature           | Status      | MVP      | Notes                     |
-| ----------------- | ----------- | -------- | ------------------------- |
-| Search home       | IMPLEMENTED | CRITICAL | Uses `@sd/feature-search` |
-| Search processing | IMPLEMENTED | CRITICAL | Uses `@sd/feature-search` |
-| Catalog browsing  | MISSING     | CRITICAL | Detail screens needed     |
-| Audio playback    | NOT STARTED | CRITICAL | Planned for Phase 05      |
-| Progress tracking | NOT STARTED | CRITICAL | Planned for Phase 05      |
-| Offline sync      | NOT STARTED | CRITICAL | Phase 06                  |
-| Downloads         | NOT STARTED | CRITICAL | Phase 06                  |
+| Feature           | Status      | MVP      | Notes                               |
+| ----------------- | ----------- | -------- | ----------------------------------- |
+| Search home       | IMPLEMENTED | CRITICAL | App-local `features/search/` slices |
+| Search processing | IMPLEMENTED | CRITICAL | App-local `features/search/` slices |
+| Catalog browsing  | MISSING     | CRITICAL | Detail screens needed               |
+| Audio playback    | NOT STARTED | CRITICAL | Planned for Phase 05                |
+| Progress tracking | NOT STARTED | CRITICAL | Planned for Phase 05                |
+| Offline sync      | NOT STARTED | CRITICAL | Phase 06                            |
+| Downloads         | NOT STARTED | CRITICAL | Phase 06                            |
 
 ### Current Mobile Runtime Guardrail
 

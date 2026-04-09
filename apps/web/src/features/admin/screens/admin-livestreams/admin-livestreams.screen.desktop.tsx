@@ -2,7 +2,7 @@
 
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { LiveSessionDeltaDto } from "@sd/core-contracts";
-import { ScreenViewWeb } from "@sd/shared";
+import { ScreenViewWeb } from "../../../../shared/components/ScreenView/ScreenView";
 import { updateLiveSessionStatus } from "../../api/admin.api";
 
 export function AdminLivestreamsDesktopWebScreen() {

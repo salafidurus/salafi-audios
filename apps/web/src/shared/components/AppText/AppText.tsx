@@ -31,3 +31,5 @@ export function AppTextWeb({ variant, children, style, numberOfLines }: AppTextP
     </Text>
   );
 }
+
+export { AppTextWeb as AppText };

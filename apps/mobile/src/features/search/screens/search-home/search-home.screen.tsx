@@ -1,6 +1,6 @@
 import { Pressable, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { ScreenViewMobileNative } from "@sd/shared";
+import { ScreenViewMobileNative } from "../../../../shared/components/ScreenView/ScreenView";
 import { QuickBrowse } from "../../components/QuickBrowse/QuickBrowse";
 import { useQuickBrowse } from "@sd/domain-search";
 

@@ -39,7 +39,6 @@
     "@sd/domain-content": "workspace:*",
     "@sd/core-env": "workspace:*",
     "@sd/domain-live": "workspace:*",
-    "@sd/shared": "workspace:*",
     "@sentry/react-native": "^7.11.0",
     "@shopify/flash-list": "2.0.2",
     "expo": "~55.0.6",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useResponsive } from "@sd/shared";
+import { useResponsive } from "../../../../shared/hooks/use-responsive";
 import { TopAuthStripWeb } from "./top-auth-strip.desktop";
 
 export function TopAuthStrip() {

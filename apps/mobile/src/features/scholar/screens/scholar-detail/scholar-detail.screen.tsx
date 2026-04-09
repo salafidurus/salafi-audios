@@ -1,5 +1,6 @@
 import { View, ScrollView } from "react-native";
-import { ScreenViewMobileNative, AppText } from "@sd/shared";
+import { ScreenViewMobileNative } from "../../../../shared/components/ScreenView/ScreenView";
+import { AppText } from "../../../../shared/components/AppText/AppText";
 import { useScholarDetailScreen } from "@sd/domain-content";
 import { ScholarHeaderNative } from "../../components/scholar-header/scholar-header";
 import { ScholarContentListNative } from "../../components/scholar-content-list/scholar-content-list";

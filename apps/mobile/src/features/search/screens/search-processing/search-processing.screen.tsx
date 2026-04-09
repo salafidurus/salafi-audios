@@ -9,7 +9,7 @@ import {
   type SearchResultRow,
 } from "../../components/SearchResultsList/SearchResultsList";
 import { useSearchProcessing } from "@sd/domain-search";
-import { ScreenViewMobileNative } from "@sd/shared";
+import { ScreenViewMobileNative } from "../../../../shared/components/ScreenView/ScreenView";
 
 export type SearchProcessingScreenProps = {
   prefill?: string;

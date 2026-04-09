@@ -6,7 +6,7 @@ import { Pressable } from "react-native-unistyles/components/native/Pressable";
 import { Text } from "react-native-unistyles/components/native/Text";
 import { View } from "react-native-unistyles/components/native/View";
 import type { TopicDetailDto, TopicSlug } from "@sd/core-contracts";
-import { useDragScrollWeb } from "@sd/shared";
+import { useDragScrollWeb } from "../../../../shared/hooks/use-drag-scroll";
 
 export type SearchFilterValue = TopicSlug[];
 

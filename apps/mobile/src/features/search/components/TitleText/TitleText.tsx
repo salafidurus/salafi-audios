@@ -1,4 +1,4 @@
-import { AppText } from "@sd/shared";
+import { AppText } from "../../../../shared/components/AppText/AppText";
 
 export type TitleTextProps = {
   children: string;

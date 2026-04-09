@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import type { SearchCatalogItemDto, SearchCatalogResultsDto } from "@sd/core-contracts";
 import { StyleSheet } from "react-native-unistyles";
 import { View } from "react-native-unistyles/components/native/View";
-import { ScreenViewWeb } from "@sd/shared";
+import { ScreenViewWeb } from "../../../../shared/components/ScreenView/ScreenView";
 import { SearchFilterMobileWeb } from "../../components/SearchFilter/SearchFilter.mobile";
 import {
   SearchInputMobileWeb,

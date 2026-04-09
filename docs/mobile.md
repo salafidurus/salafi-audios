@@ -9,9 +9,10 @@ The mobile app (`apps/mobile`) is the listening-first client. It prioritizes con
 ### Layered Structure
 
 - **Composition (`apps/mobile/src/app`)**: Expo Router navigation, route groups, layouts, and screen wiring.
-- **Features (`@sd/feature-*`)**: domain-oriented screens, hooks, and feature logic.
+- **Features (`apps/mobile/src/features/`)**: app-local feature slices — each owns screens, components, hooks, and utils.
 - **Core (`@sd/core-*`)**: shared infrastructure such as auth, API access, and styling.
-- **Shared (`@sd/shared`)**: reusable cross-platform primitives and utilities.
+- **Domain (`@sd/domain-*`)**: shared data and state hooks used across both apps.
+- **Shared (`apps/mobile/src/shared/` and `@sd/shared`)**: app-local primitives and cross-app utilities.
 
 ### Structural Rules
 
@@ -28,11 +29,11 @@ The navigation surface has been reworked into a tabs-owned structure:
 - the main app surface lives under `apps/mobile/src/app/(tabs)/`
 - the shared tabs boundary is `apps/mobile/src/app/(tabs)/_layout.tsx`
 - top-level sections are real tabs: feed, live, search, library, and account
-- tab chrome UI is rendered by `@sd/feature-navigation`
+- tab chrome UI is rendered by `apps/mobile/src/features/navigation/` components
 - route state is the source of truth for active tab and subsection
 - subsection selection happens inside each tab stack rather than through a shell-owned navigation store
 
-This means mobile now uses Expo Router tabs for peer-root navigation, with custom package-owned chrome layered over them for product-specific visuals.
+This means mobile now uses Expo Router tabs for peer-root navigation, with app-local chrome layered over them for product-specific visuals.
 
 ## 4. Offline and Sync Principles
 
@@ -91,9 +92,9 @@ The tab bar is a product-specific navigation surface layered over a standard Exp
 
 ### Ownership
 
-- Top-level tab chrome lives in `packages/feature-navigation/src/components/CustomTabBar/`
-- Subsection chrome lives in `packages/feature-navigation/src/components/SubsectionBarHost/`
-- Shared route helpers for tabs live in `packages/feature-navigation/src/utils/tab-route-config.native.ts`
+- Top-level tab chrome lives in `apps/mobile/src/features/navigation/components/CustomTabBar.tsx`
+- Subsection chrome lives in `apps/mobile/src/features/navigation/components/SubsectionBarHost.tsx`
+- Shared route helpers for tabs live in `apps/mobile/src/features/navigation/utils/tab-route-config.ts`
 
 ### Package Discipline
 

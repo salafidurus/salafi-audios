@@ -52,7 +52,7 @@ shared → no inward deps
 
 ## Native Package Entrypoints
 
-- Any package imported from mobile via its root specifier, for example `@sd/shared` or `@sd/feature-search`, must expose a `react-native` export in `package.json`.
+- Any package imported from mobile via its root specifier, for example `@sd/core-auth`, must expose a `react-native` export in `package.json`.
 - If a package root needs platform-specific behavior, add `src/index.native.ts` and route the `react-native` export to it.
 - Do not rely on a web-first root `src/index.ts` for native, especially when that file statically re-exports `.web` or `.desktop.web` modules.
 - A missing native root export caused Expo Dev Client runtime bundle failures in March 2026 by pulling web-only package entrypoints into the Android graph.
@@ -61,20 +61,20 @@ shared → no inward deps
 
 ## UI Components
 
-Most feature screens and shared UI components now come from `@sd/shared`, `@sd/feature-*`, and `@sd/core-*` packages:
+Feature screens and shared UI components come from app-local `src/features/` and `src/shared/` directories, with data and state from `@sd/domain-*` and `@sd/core-*` packages:
 
 - Search, browse, and results screens
 - Auth screens (`SignInScreen`, `SignUpScreen`)
 - Navigation surfaces (custom tab bar, subsection bar, and related components)
 - Form/list primitives (Button, SearchInput, etc.)
 
-Use the owning package `AGENT.md` and source folder for the current component inventory and styling patterns.
+Use the feature's own directory (`src/features/<feature>/`) for the current component inventory and styling patterns.
 
 ---
 
 ## Route Wrapper Pattern
 
-`app/(auth)/` and other route files are **thin wrappers** — they import screens from the relevant `@sd/feature-*` package and wire callback props to `authClient` and `router`. No UI logic lives here.
+`app/(auth)/` and other route files are **thin wrappers** — they import screens from the local `features/` directory and wire callback props to `authClient` and `router`. No UI logic lives here.
 
 ```typescript
 // apps/mobile/src/app/(auth)/sign-in.tsx

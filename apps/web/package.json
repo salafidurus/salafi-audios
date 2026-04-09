@@ -27,7 +27,6 @@
     "@sd/design-tokens": "workspace:*",
     "@sd/domain-content": "workspace:*",
     "@sd/domain-live": "workspace:*",
-    "@sd/shared": "workspace:*",
     "@sd/core-i18n": "workspace:*",
     "clsx": "^2.1.1",
     "framer-motion": "^12.34.0",

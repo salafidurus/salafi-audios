@@ -9,9 +9,10 @@ The web app (`apps/web`) serves two roles: public discovery and authenticated ac
 ### Layered Structure
 
 - **Composition (`apps/web/src/app`)**: App Router routes, layouts, metadata, and route-level composition.
-- **Features (`@sd/feature-*`)**: domain-oriented UI and hooks.
+- **Features (`apps/web/src/features/`)**: app-local feature slices — each owns screens, components, hooks, and utils.
 - **Core (`@sd/core-*`)**: auth, API access, styling, and shared infrastructure.
-- **Shared (`@sd/shared`)**: reusable primitives and utilities.
+- **Domain (`@sd/domain-*`)**: shared data and state hooks used across both apps.
+- **Shared (`apps/web/src/shared/` and `@sd/shared`)**: app-local primitives and cross-app utilities.
 
 ### Structural Rules
 

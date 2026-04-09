@@ -32,9 +32,9 @@ The monorepo exists because the web app, mobile app, and backend are one coordin
 
 ### Package Roles
 
-- **`@sd/shared`**: generic UI primitives and utilities.
+- **`@sd/shared`**: generic cross-app utilities (no platform-specific UI primitives).
 - **`@sd/core-*`**: cross-cutting infrastructure such as auth, API, config, and styling.
-- **`@sd/feature-*`**: domain-oriented feature packages for reusable app behavior.
+- **`@sd/domain-*`**: shared data and state hooks organized by bounded context (`domain-content`, `domain-account`, `domain-live`, `domain-playback`, `domain-progress`, `domain-search`).
 - **`@sd/core-contracts`**: shared public API contracts and query helpers.
 - **`@sd/core-db`**: schema, migrations, and generated database client.
 - **`@sd/core-env`**: environment parsing and validation.
@@ -129,11 +129,11 @@ The repo uses platform-specific module extensions to colocate a feature while ke
 
 ### Mobile App Shell
 
-The mobile app uses Expo Router `Tabs` for top-level sections, with a custom tab bar and subsection bar supplied by `@sd/feature-navigation`.
+The mobile app uses Expo Router `Tabs` for top-level sections, with a custom tab bar and subsection bar supplied by `apps/mobile/src/features/navigation/`.
 
 - Top-level sections are real tab roots.
 - Subsections are route-owned within each tab stack.
-- Shared tab chrome and section constants live in `@sd/feature-navigation`.
+- Tab chrome and section constants live in the app-local `features/navigation/` slice.
 
 This keeps Expo Router responsible for tab state, route structure, and screen lifecycle while preserving a product-specific navigation surface.
 

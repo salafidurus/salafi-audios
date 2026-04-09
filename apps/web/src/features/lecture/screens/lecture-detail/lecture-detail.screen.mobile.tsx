@@ -1,6 +1,8 @@
 "use client";
 
-import { ScreenViewWeb, AppText, ButtonDesktopWeb } from "@sd/shared";
+import { ScreenViewWeb } from "../../../../shared/components/ScreenView/ScreenView";
+import { AppText } from "../../../../shared/components/AppText/AppText";
+import { ButtonDesktopWeb } from "../../../../shared/components/Button/Button";
 import { useLectureDetailScreen } from "@sd/domain-content";
 import { LectureMetaWeb } from "../../components/lecture-meta/lecture-meta";
 import { TopicChipsWeb } from "../../components/topic-chips/topic-chips";

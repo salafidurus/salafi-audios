@@ -3,7 +3,7 @@ import React from "react";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { View } from "react-native-unistyles/components/native/View";
 import { SearchResultEmptyMobileWeb } from "../SearchResultEmpty/SearchResultEmpty.mobile";
-import { useDragScrollWeb } from "@sd/shared";
+import { useDragScrollWeb } from "../../../../shared/hooks/use-drag-scroll";
 
 export type SearchResultRow = {
   id: string;

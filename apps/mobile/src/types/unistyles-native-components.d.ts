@@ -3,7 +3,6 @@
  * These paths lack a `types` export condition in the package's export map,
  * so TypeScript cannot resolve them automatically.
  */
-
 declare module "react-native-unistyles/components/native/View" {
   export const View: any;
 }

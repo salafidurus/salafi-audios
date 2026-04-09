@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { ScholarListItemDto } from "@sd/core-contracts";
-import { ScreenViewWeb } from "@sd/shared";
+import { ScreenViewWeb } from "../../../../shared/components/ScreenView/ScreenView";
 import { createScholar, updateScholar, type AdminScholarInput } from "../../api/admin.api";
 
 type ScholarsListDto = { scholars: ScholarListItemDto[] };

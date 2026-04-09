@@ -1,7 +1,7 @@
 "use client";
 
 import type { LectureDetailDto } from "@sd/core-contracts";
-import { AppText } from "@sd/shared";
+import { AppText } from "../../../../shared/components/AppText/AppText";
 
 function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);

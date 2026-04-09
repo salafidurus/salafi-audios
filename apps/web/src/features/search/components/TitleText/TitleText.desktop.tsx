@@ -1,6 +1,6 @@
 "use client";
 
-import { AppText } from "@sd/shared";
+import { AppText } from "../../../../shared/components/AppText/AppText";
 
 type Props = {
   children: string;

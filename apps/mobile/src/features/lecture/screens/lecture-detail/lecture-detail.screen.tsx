@@ -1,6 +1,8 @@
 import { View, Text, ScrollView, Pressable } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { ScreenViewMobileNative, AppText, ButtonMobileNative } from "@sd/shared";
+import { ScreenViewMobileNative } from "../../../../shared/components/ScreenView/ScreenView";
+import { AppText } from "../../../../shared/components/AppText/AppText";
+import { ButtonMobileNative } from "../../../../shared/components/Button/Button";
 import { useLectureDetailScreen } from "@sd/domain-content";
 import { LectureMetaNative } from "../../components/lecture-meta/lecture-meta";
 import { TopicChipsNative } from "../../components/topic-chips/topic-chips";

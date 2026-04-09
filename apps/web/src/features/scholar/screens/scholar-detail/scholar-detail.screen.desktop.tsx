@@ -1,6 +1,7 @@
 "use client";
 
-import { ScreenViewWeb, AppText } from "@sd/shared";
+import { ScreenViewWeb } from "../../../../shared/components/ScreenView/ScreenView";
+import { AppText } from "../../../../shared/components/AppText/AppText";
 import { useScholarDetailScreen } from "@sd/domain-content";
 import { ScholarHeaderWeb } from "../../components/scholar-header/scholar-header";
 import { ScholarContentListWeb } from "../../components/scholar-content-list/scholar-content-list";

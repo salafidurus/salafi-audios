@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { TopicDetailDto } from "@sd/core-contracts";
-import { ScreenViewWeb } from "@sd/shared";
+import { ScreenViewWeb } from "../../../../shared/components/ScreenView/ScreenView";
 import { createTopic, updateTopic, deleteTopic, type AdminTopicInput } from "../../api/admin.api";
 
 export function AdminTopicsMobileWebScreen() {

@@ -24,28 +24,20 @@ This Next.js app is a client of the backend API, not an authority.
 
 ## Shared Package Integration
 
-The web app consumes the split shared packages directly: `@sd/shared`, `@sd/core-*`, and `@sd/feature-*`.
+The web app consumes shared packages directly: `@sd/core-*` and `@sd/domain-*`. Feature code lives in app-local `src/features/` slices. App-local `src/shared/` contains primitives used across two or more features within the web app.
 
 **How it works:**
 
-- `next.config.ts` transpiles the shared `@sd/*` UI packages directly instead of importing pre-built bundles
-- The repo now uses `.desktop.web.tsx`, `.web.tsx`, `.native.tsx`, and fallback `.tsx` variants
-- Next.js resolves `.desktop.web` and `.web` variants first
-- `react-native` is aliased to `react-native-web` via module resolver in Next config
+- `next.config.ts` transpiles `@sd/*` packages directly instead of importing pre-built bundles
+- `@sd/core-*` packages use `react-native` aliased to `react-native-web` via module resolver
+- App-local `src/features/` and `src/shared/` use plain `.tsx` (CSS-responsive default), `.desktop.tsx` (desktop-only layout variant), and `.mobile.tsx` (mobile-web variant)
 
-**When to use shared package components:**
+**When to use local shared components:**
 
-- Use `useResponsive()` from `@sd/shared` for breakpoint-aware rendering:
-  - **Tablets/mobile (≤900px):** render package-provided mobile/tablet variants when they exist
-  - **Desktop (>900px):** render desktop-specific layouts or `.desktop.web` variants
+- Use `useResponsive()` from `src/shared/hooks/use-responsive` for breakpoint-aware rendering:
+  - **Tablets/mobile (≤900px):** render mobile/tablet variants
+  - **Desktop (>900px):** render desktop-specific layouts or `.desktop.tsx` variants
 - Breakpoints: `MOBILE_MAX = 640px`, `TABLET_MAX = 900px`
-
-**Web-specific CSS properties in shared package components:**
-
-- `.web.tsx` files in shared packages use `_web` key inside `StyleSheet.create()` for CSS-only properties
-- Import `View`/`Text`/`Pressable` from `react-native-unistyles/components/native/*` to enable `_web` key
-- These are automatically applied on web, ignored on native
-- Prefer colocating platform-specific files inside the owning package
 
 ---
 
@@ -78,7 +70,7 @@ features/<feature>/screens/<name>/
 import { useRouter, useSearchParams } from "next/navigation";
 import { SignInMobileWebScreen } from "./sign-in.screen.mobile";
 import { SignInDesktopScreen } from "./sign-in.screen.desktop";
-import { useResponsive } from "@sd/shared";
+import { useResponsive } from "@/shared/hooks/use-responsive";
 import { authClient } from "@sd/core-auth";
 
 export function SignInScreen() {
@@ -219,17 +211,17 @@ import { motion } from 'framer-motion';
 
 **Shared navigation types + store:**
 
-- Shared navigation types, routes, and state come from `@sd/feature-navigation`:
+- Shared navigation types, routes, and state come from `src/features/navigation/`:
   - `SECTION_TABS`, `SECTION_ROUTES`, `SECTION_LABELS` — constants
   - `getCurrentSection()`, `getActiveTabFromPath()` — utilities
   - `useNavigationStore()` — Zustand store for active section/tab
-- Web sidebar consumes these shared utilities to stay in sync with mobile
+- Web sidebar consumes these app-local utilities
 
 **Mobile navigation:**
 
 - Expo Router `Tabs` owns top-level mobile navigation
 - Mobile renders an app-owned custom tab bar and subsection bar over tab state
-- Shared section constants and helpers in `@sd/feature-navigation` still keep web and mobile aligned
+- Section constants and helpers in `apps/mobile/src/features/navigation/` keep the tab structure aligned with web
 
 ---
 
