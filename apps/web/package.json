@@ -22,8 +22,6 @@
     "@sd/core-contracts": "workspace:*",
     "@sd/core-api": "workspace:*",
     "@sd/core-auth": "workspace:*",
-    "@sd/core-config": "workspace:*",
-    "@sd/core-styles": "workspace:*",
     "@sd/design-tokens": "workspace:*",
     "@sd/domain-content": "workspace:*",
     "@sd/domain-live": "workspace:*",

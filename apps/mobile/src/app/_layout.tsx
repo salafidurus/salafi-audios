@@ -1,6 +1,6 @@
 import type { ErrorBoundaryProps } from "expo-router";
 import { View, Text, Pressable } from "react-native";
-import { ProvidersMobileNative } from "../providers";
+import { ProvidersMobileNative } from "../core/providers";
 import { Slot } from "expo-router";
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {

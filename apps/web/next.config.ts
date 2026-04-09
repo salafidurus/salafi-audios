@@ -2,7 +2,7 @@ import type { NextConfig } from "next";
 import webpack from "webpack";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@sd/core-api", "@sd/core-auth", "@sd/core-config", "@sd/core-styles"],
+  transpilePackages: ["@sd/core-api", "@sd/core-auth"],
   webpack(config) {
     // Define React Native's __DEV__ global for webpack builds
     config.plugins.push(

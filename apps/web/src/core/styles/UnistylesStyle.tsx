@@ -8,7 +8,7 @@ import {
   hydrateServerUnistyles,
   resetServerUnistyles,
 } from "react-native-unistyles/server";
-import "../../utils/unistyles.web";
+import "./unistyles";
 
 export function UnistylesStyleDesktopWeb({ children }: PropsWithChildren): ReactElement {
   const isServerInserted = useRef(false);

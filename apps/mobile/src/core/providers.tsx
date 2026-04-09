@@ -6,22 +6,23 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { useFonts } from "expo-font";
 import { initApiClient } from "@sd/core-api";
 import { createQueryClient } from "@sd/core-contracts";
+import { getApiBaseUrl } from "./config/env";
 
 const queryClient = createQueryClient();
 
 function AppFontsProvider({ children }: { children: ReactNode }) {
   const [loaded] = useFonts({
-    "Fraunces-Regular": require("../assets/fonts/Fraunces-Regular.ttf"),
-    "Fraunces-SemiBold": require("../assets/fonts/Fraunces-SemiBold.ttf"),
-    "Fraunces-Bold": require("../assets/fonts/Fraunces-Bold.ttf"),
-    "Manrope-Regular": require("../assets/fonts/Manrope-Regular.ttf"),
-    "Manrope-Medium": require("../assets/fonts/Manrope-Medium.ttf"),
-    "Manrope-SemiBold": require("../assets/fonts/Manrope-SemiBold.ttf"),
-    "Manrope-Bold": require("../assets/fonts/Manrope-Bold.ttf"),
-    "GeistMono-Regular": require("../assets/fonts/GeistMono-Regular.ttf"),
-    "GeistMono-Medium": require("../assets/fonts/GeistMono-Medium.ttf"),
-    "GeistMono-SemiBold": require("../assets/fonts/GeistMono-SemiBold.ttf"),
-    "GeistMono-Bold": require("../assets/fonts/GeistMono-Bold.ttf"),
+    "Fraunces-Regular": require("../../assets/fonts/Fraunces-Regular.ttf"),
+    "Fraunces-SemiBold": require("../../assets/fonts/Fraunces-SemiBold.ttf"),
+    "Fraunces-Bold": require("../../assets/fonts/Fraunces-Bold.ttf"),
+    "Manrope-Regular": require("../../assets/fonts/Manrope-Regular.ttf"),
+    "Manrope-Medium": require("../../assets/fonts/Manrope-Medium.ttf"),
+    "Manrope-SemiBold": require("../../assets/fonts/Manrope-SemiBold.ttf"),
+    "Manrope-Bold": require("../../assets/fonts/Manrope-Bold.ttf"),
+    "GeistMono-Regular": require("../../assets/fonts/GeistMono-Regular.ttf"),
+    "GeistMono-Medium": require("../../assets/fonts/GeistMono-Medium.ttf"),
+    "GeistMono-SemiBold": require("../../assets/fonts/GeistMono-SemiBold.ttf"),
+    "GeistMono-Bold": require("../../assets/fonts/GeistMono-Bold.ttf"),
   });
 
   if (!loaded) {
@@ -37,7 +38,12 @@ type Props = {
 
 export function ProvidersMobileNative({ children }: Props) {
   useEffect(() => {
-    initApiClient();
+    const baseUrl = getApiBaseUrl();
+    if (baseUrl) {
+      initApiClient({ baseUrl });
+    } else {
+      initApiClient();
+    }
   }, []);
 
   return (

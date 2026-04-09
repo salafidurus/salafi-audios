@@ -5,8 +5,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { themeCss } from "./theme-css";
 
-import { UnistylesStyleDesktopWeb } from "@sd/core-styles";
-import { Providers } from "./providers";
+import { UnistylesStyleDesktopWeb } from "../core/styles/UnistylesStyle";
+import { Providers } from "../core/providers";
 
 const fraunces = localFont({
   variable: "--font-display",

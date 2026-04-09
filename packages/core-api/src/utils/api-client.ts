@@ -1,4 +1,3 @@
-import { getApiBaseUrl } from "@sd/core-config";
 import {
   type HttpClientConfig,
   httpClient,
@@ -31,7 +30,7 @@ export function setAccessTokenProvider(provider: HttpClientConfig["getAccessToke
 }
 
 export function initApiClient(config?: Pick<HttpClientConfig, "baseUrl">) {
-  const baseUrl = config?.baseUrl ?? getApiBaseUrl();
+  const baseUrl = config?.baseUrl;
   if (!baseUrl) {
     console.error(
       "API client initialization failed: No baseUrl provided. Set NEXT_PUBLIC_API_URL environment variable.",
