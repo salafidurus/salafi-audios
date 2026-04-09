@@ -127,7 +127,7 @@ composition and UI. It may depend on domain packages for state.
 # Staging Strategy
 
 1. **Stage 0** — Design token recipe system (In Progress — partially done)
-2. **Stage 1** — TypeScript deprecation noise removal (baseUrl cleanup)
+2. **Stage 1** — TypeScript deprecation noise removal (baseUrl cleanup) — Done ✅
 3. **Stage 2** — Feed feature implementation
 4. **Stage 3** — Library feature implementation
 5. **Stage 4** — Scholar detail screen
@@ -191,7 +191,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 1: TypeScript Deprecation Noise Removal
 
-**Status:** Pending
+**Status:** Done ✅
 
 **Goal:** Remove `baseUrl` from all package and app `tsconfig.json` files. Replace with
 explicit `paths` entries where needed. Eliminate TypeScript 5.9 `baseUrl` deprecation warnings.
