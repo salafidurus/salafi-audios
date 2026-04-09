@@ -5,7 +5,17 @@ import {
   useApiQuery,
   type ScholarDetailDto,
   type ScholarContentDto,
+  type ScholarListItemDto,
 } from "@sd/core-contracts";
+
+export function useScholarsList() {
+  return useApiQuery(queryKeys.scholars.list(), () =>
+    httpClient<{ scholars: ScholarListItemDto[] }>({
+      url: endpoints.scholars.list,
+      method: "GET",
+    }),
+  );
+}
 
 export function useScholarDetail(slug: string) {
   return useApiQuery(
