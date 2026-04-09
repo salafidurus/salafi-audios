@@ -24,13 +24,14 @@ This Next.js app is a client of the backend API, not an authority.
 
 ## Shared Package Integration
 
-The web app consumes shared packages directly: `@sd/core-*` and `@sd/domain-*`. Feature code lives in app-local `src/features/` slices. App-local `src/shared/` contains primitives used across two or more features within the web app.
+The web app consumes shared packages directly: `@sd/core-*` and `@sd/domain-*`. Feature code lives in app-local `src/features/` slices. App-local `src/shared/` contains primitives used across two or more features within the web app. Platform bootstrap (Unistyles setup, providers, environment config) lives in `src/core/`.
 
 **How it works:**
 
 - `next.config.ts` transpiles `@sd/*` packages directly instead of importing pre-built bundles
 - `@sd/core-*` packages use `react-native` aliased to `react-native-web` via module resolver
 - App-local `src/features/` and `src/shared/` use plain `.tsx` (CSS-responsive default), `.desktop.tsx` (desktop-only layout variant), and `.mobile.tsx` (mobile-web variant)
+- App-local `src/core/` contains: `providers.tsx`, `config/env.ts`, `styles/unistyles.ts`, `styles/UnistylesStyle.tsx`
 
 **When to use local shared components:**
 
@@ -148,7 +149,7 @@ export function SignInScreen() {
 
 **For shared package components rendered in web context:**
 
-- Styling happens via the shared unistyles theme factory in `@sd/core-styles`
+- Styling happens via the app-local unistyles theme in `src/core/styles/unistyles.ts`
 - Web-specific CSS properties use `_web` key inside `StyleSheet.create()`
 - You don't need to override these when the package already owns the platform variant
 

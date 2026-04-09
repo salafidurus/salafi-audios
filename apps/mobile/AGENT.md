@@ -37,7 +37,7 @@ This Expo/React Native app prioritizes offline listening and resilient sync.
 - `app/` — routing and composition
 - `app/(tabs)/` — Expo Router tabs boundary for the main signed-in and public app surface
 - `features/` — domain UX slices
-- `core/` — API/auth/playback/persistence/sync infrastructure
+- `core/` — API/auth/playback/persistence/sync infrastructure; also contains app-local bootstrap (`providers.tsx`, `config/env.ts`, `styles/unistyles.ts`, `integrations.ts`)
 - `shared/` — primitives/utilities
 
 **Dependency direction:**
