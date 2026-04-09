@@ -5,6 +5,7 @@ import {
   useLibraryProgressScreen,
   useLibraryCompletedScreen,
 } from "@sd/domain-content";
+import { useAuth } from "../../../core/auth/use-auth";
 
 export type LibraryMobileNativeScreenProps = {
   onNavigateToLecture?: (id: string) => void;
@@ -76,9 +77,10 @@ type Section = {
 };
 
 export function LibraryMobileNativeScreen({ onNavigateToLecture }: LibraryMobileNativeScreenProps) {
-  const progressData = useLibraryProgressScreen();
-  const savedData = useLibrarySavedScreen();
-  const completedData = useLibraryCompletedScreen();
+  const { isAuthenticated } = useAuth();
+  const progressData = useLibraryProgressScreen(isAuthenticated);
+  const savedData = useLibrarySavedScreen(isAuthenticated);
+  const completedData = useLibraryCompletedScreen(isAuthenticated);
 
   const sections: Section[] = [
     {

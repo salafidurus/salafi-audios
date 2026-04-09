@@ -1,6 +1,7 @@
 import { View, Text, TouchableOpacity, FlatList } from "react-native";
 import type { LibraryItemDto } from "@sd/core-contracts";
 import { useLibrarySavedScreen } from "@sd/domain-content";
+import { useAuth } from "../../../core/auth/use-auth";
 
 export type LibrarySavedMobileNativeScreenProps = {
   onNavigateToLecture?: (id: string) => void;
@@ -34,7 +35,8 @@ function LibraryItem({ item, onPress }: { item: LibraryItemDto; onPress?: () => 
 export function LibrarySavedMobileNativeScreen({
   onNavigateToLecture,
 }: LibrarySavedMobileNativeScreenProps) {
-  const { items, isFetching } = useLibrarySavedScreen();
+  const { isAuthenticated } = useAuth();
+  const { items, isFetching } = useLibrarySavedScreen(isAuthenticated);
 
   if (isFetching && items.length === 0) {
     return (

@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@sd/core-contracts": "workspace:*",
+    "@sd/domain-progress": "workspace:*",
     "@tanstack/react-query": "^5.69.0",
     "react": "^19.0.0"
   },

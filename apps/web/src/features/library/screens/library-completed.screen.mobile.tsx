@@ -2,6 +2,7 @@
 
 import type { LibraryItemDto } from "@sd/core-contracts";
 import { useLibraryCompletedScreen } from "@sd/domain-content";
+import { useAuth } from "../../../core/auth/use-auth";
 
 export type LibraryCompletedMobileWebScreenProps = {
   onNavigateToLecture?: (id: string) => void;
@@ -39,7 +40,8 @@ function LibraryItem({ item, onPress }: { item: LibraryItemDto; onPress?: () => 
 export function LibraryCompletedMobileWebScreen({
   onNavigateToLecture,
 }: LibraryCompletedMobileWebScreenProps) {
-  const { items, isFetching } = useLibraryCompletedScreen();
+  const { isAuthenticated } = useAuth();
+  const { items, isFetching } = useLibraryCompletedScreen(isAuthenticated);
 
   if (isFetching && items.length === 0) {
     return <div style={{ padding: 16 }}>Loading completed lectures...</div>;

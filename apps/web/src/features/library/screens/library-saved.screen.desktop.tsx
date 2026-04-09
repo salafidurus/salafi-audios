@@ -6,6 +6,7 @@ import {
   useLibraryProgressScreen,
   useLibraryCompletedScreen,
 } from "@sd/domain-content";
+import { useAuth } from "../../../core/auth/use-auth";
 
 function ProgressBar({ percent }: { percent: number }) {
   return (
@@ -115,9 +116,10 @@ export type LibrarySavedDesktopWebScreenProps = {
 export function LibrarySavedDesktopWebScreen({
   onNavigateToLecture,
 }: LibrarySavedDesktopWebScreenProps) {
-  const progressData = useLibraryProgressScreen();
-  const savedData = useLibrarySavedScreen();
-  const completedData = useLibraryCompletedScreen();
+  const { isAuthenticated } = useAuth();
+  const progressData = useLibraryProgressScreen(isAuthenticated);
+  const savedData = useLibrarySavedScreen(isAuthenticated);
+  const completedData = useLibraryCompletedScreen(isAuthenticated);
 
   return (
     <div style={{ maxWidth: 720, margin: "0 auto", padding: 24 }}>
