@@ -5,7 +5,7 @@ export type AccountProfileScreenProps = {
   onBack?: () => void;
 };
 
-export function AccountProfileScreen({}: AccountProfileScreenProps) {
+export function AccountProfileScreen(_props: AccountProfileScreenProps) {
   const { profile, isFetching } = useAccountScreen();
 
   if (isFetching) {

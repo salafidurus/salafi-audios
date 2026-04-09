@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from "react-native";
+import { Text, Pressable } from "react-native";
 import type { FeedContentItemDto } from "@sd/core-contracts";
 
 export type FeedContentCardProps = {

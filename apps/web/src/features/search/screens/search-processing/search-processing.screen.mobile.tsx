@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { SearchCatalogItemDto, SearchCatalogResultsDto } from "@sd/core-contracts";
+
 import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 import { SearchFilterMobile } from "../../components/SearchFilter/SearchFilter.mobile";
 import {

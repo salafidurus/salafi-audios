@@ -37,14 +37,6 @@ const labelStyle = {
   fontWeight: "var(--typo-label-md-font-weight)",
 } as const;
 
-const bodySmStyle = {
-  fontFamily: "var(--typo-body-sm-font-family)",
-  fontSize: "var(--typo-body-sm-font-size)",
-  lineHeight: "var(--typo-body-sm-line-height)",
-  letterSpacing: "var(--typo-body-sm-letter-spacing)",
-  fontWeight: "var(--typo-body-sm-font-weight)",
-} as const;
-
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;

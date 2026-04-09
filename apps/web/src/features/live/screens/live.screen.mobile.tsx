@@ -42,7 +42,7 @@ function Section({
   );
 }
 
-export function LiveMobileScreen(_props: LiveMobileScreenProps) {
+export function LiveMobileScreen() {
   const { active, upcoming, ended } = useLiveSessions();
 
   return (

@@ -42,7 +42,7 @@ function Section({
   );
 }
 
-export function LiveDesktopScreen(_props: LiveDesktopScreenProps) {
+export function LiveDesktopScreen() {
   const { active, upcoming, ended } = useLiveSessions();
 
   return (
