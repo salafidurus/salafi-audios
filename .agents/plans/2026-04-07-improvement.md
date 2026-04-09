@@ -357,7 +357,7 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Stage 4: Scholar Detail Screen
 
-**Status:** Pending
+**Status:** Done
 
 **Goal:** Implement scholar detail pages on web and mobile. Three public API endpoints; one
 new feature area in `apps/web/src/features/scholar/` and `apps/mobile/src/features/scholar/`.
