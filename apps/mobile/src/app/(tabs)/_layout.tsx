@@ -2,7 +2,6 @@ import { View } from "react-native";
 import { Tabs } from "expo-router";
 import { CustomTabBar } from "../../features/navigation/components/CustomTabBar/CustomTabBar";
 import { MiniPlayer } from "../../features/playback/components/mini-player/mini-player";
-import { ComponentErrorBoundary } from "../../shared/components/error-boundary/ComponentErrorBoundary";
 
 export default function TabsLayout() {
   return (
@@ -10,12 +9,8 @@ export default function TabsLayout() {
       <Tabs
         tabBar={(props) => (
           <>
-            <ComponentErrorBoundary fallback={null}>
-              <MiniPlayer />
-            </ComponentErrorBoundary>
-            <ComponentErrorBoundary fallback={null}>
-              <CustomTabBar {...props} />
-            </ComponentErrorBoundary>
+            <MiniPlayer />
+            <CustomTabBar {...props} />
           </>
         )}
         screenOptions={{ headerShown: false }}
