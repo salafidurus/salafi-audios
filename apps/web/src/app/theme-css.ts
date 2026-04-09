@@ -63,6 +63,13 @@ ${selector} {
   --accent-secondary-subtle-fg: ${theme.recipes.secondarySubtleSurface.textColor};
   --accent-mixed-surface: ${theme.recipes.mixedHeroSurface.background};
   --accent-mixed-border: ${theme.recipes.mixedHeroSurface.borderColor};
+  --accent-selected-surface: ${theme.recipes.selectedSurface.backgroundColor};
+  --accent-selected-content: ${theme.recipes.selectedContent};
+  --accent-secondary-badge-surface: ${theme.recipes.secondarySupportingBadge.surfaceColor};
+  --accent-secondary-badge-border: ${theme.recipes.secondarySupportingBadge.borderColor};
+  --accent-secondary-badge-fg: ${theme.recipes.secondarySupportingBadge.foregroundColor};
+  --accent-promoted-panel: ${theme.recipes.mixedPromotedPanel.background};
+  --accent-promoted-panel-border: ${theme.recipes.mixedPromotedPanel.borderColor};
   --accent-divider: ${theme.recipes.dividerColor};
   --accent-focus-ring: ${theme.recipes.focusRingColor};
   --chrome-surface: ${theme.recipes.chrome.surface};
