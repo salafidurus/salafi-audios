@@ -1,4 +1,5 @@
 import type { StatusValue } from "../types/common.types";
+import type { Locale } from "@sd/core-i18n";
 
 export type AudioAssetViewDto = {
   id: string;
@@ -20,7 +21,7 @@ export type LectureViewDto = {
   slug: string;
   title: string;
   description?: string;
-  language?: string;
+  language?: Locale;
   status: StatusValue;
   publishedAt?: string;
   orderIndex?: number;
@@ -93,7 +94,7 @@ export type RelatedLectureDto = {
 export type AdminLectureUpdateDto = {
   title?: string;
   description?: string;
-  language?: string;
+  language?: Locale;
   orderIndex?: number;
   status?: StatusValue;
 };

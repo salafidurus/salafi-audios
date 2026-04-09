@@ -1,5 +1,7 @@
 export type LiveSessionStatus = "scheduled" | "live" | "ended";
 
+import type { Locale } from "@sd/core-i18n";
+
 export type LiveSessionPublicDto = {
   id: string;
   status: LiveSessionStatus;
@@ -47,7 +49,7 @@ export type LivestreamChannelDto = {
   id: string;
   displayName: string;
   telegramSlug?: string;
-  language?: string;
+  language?: Locale;
   isActive: boolean;
   scholarName?: string;
   scholarSlug?: string;
@@ -60,14 +62,14 @@ export type CreateLivestreamChannelDto = {
   telegramId: string;
   telegramSlug?: string;
   displayName: string;
-  language?: string;
+  language?: Locale;
   scholarId?: string;
 };
 
 export type UpdateLivestreamChannelDto = {
   telegramSlug?: string;
   displayName?: string;
-  language?: string;
+  language?: Locale;
   isActive?: boolean;
   scholarId?: string;
 };
