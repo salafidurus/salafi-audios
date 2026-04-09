@@ -6,7 +6,6 @@ import { LectureDetailMobileWebScreen } from "./lecture-detail.screen.mobile";
 
 export type LectureDetailResponsiveScreenProps = {
   id: string;
-  onPlay?: (audioAssetId: string) => void;
 };
 
 export function LectureDetailResponsiveScreen(props: LectureDetailResponsiveScreenProps) {

@@ -4,12 +4,5 @@ import { LectureDetailMobileNativeScreen } from "../../../../features/lecture/sc
 export default function LectureRoute() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  return (
-    <LectureDetailMobileNativeScreen
-      id={id}
-      onPlay={() => {
-        /* TODO: wire to playback system */
-      }}
-    />
-  );
+  return <LectureDetailMobileNativeScreen id={id} />;
 }

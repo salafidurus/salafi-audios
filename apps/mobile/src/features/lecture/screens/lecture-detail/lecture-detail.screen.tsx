@@ -1,31 +1,20 @@
-import { View, Text, ScrollView, Pressable } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { View, ScrollView } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 import { ScreenViewMobileNative } from "../../../../shared/components/ScreenView/ScreenView";
 import { AppText } from "../../../../shared/components/AppText/AppText";
-import { ButtonMobileNative } from "../../../../shared/components/Button/Button";
 import { useLectureDetailScreen } from "@sd/domain-content";
 import { LectureMetaNative } from "../../components/lecture-meta/lecture-meta";
 import { TopicChipsNative } from "../../components/topic-chips/topic-chips";
 import { SeriesContextBarNative } from "../../components/series-context-bar/series-context-bar";
+import { LecturePlayButtonNative } from "../../components/lecture-play-button/LecturePlayButton";
+import { LectureSaveButtonNative } from "../../components/lecture-save-button/LectureSaveButton";
 
 export type LectureDetailMobileNativeScreenProps = {
   id: string;
-  onPlay?: (audioAssetId: string) => void;
 };
 
-function formatDuration(seconds: number): string {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  if (h > 0) return `${h}h ${m}m`;
-  return `${m} min`;
-}
-
-export function LectureDetailMobileNativeScreen({
-  id,
-  onPlay,
-}: LectureDetailMobileNativeScreenProps) {
+export function LectureDetailMobileNativeScreen({ id }: LectureDetailMobileNativeScreenProps) {
   const { lecture, isFetching } = useLectureDetailScreen(id);
-  const { theme } = useUnistyles();
 
   if (isFetching) {
     return (
@@ -43,8 +32,6 @@ export function LectureDetailMobileNativeScreen({
     );
   }
 
-  const audioDuration = lecture.primaryAudioAsset?.durationSeconds ?? lecture.durationSeconds;
-
   return (
     <ScreenViewMobileNative>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
@@ -52,22 +39,10 @@ export function LectureDetailMobileNativeScreen({
         <LectureMetaNative lecture={lecture} />
         <TopicChipsNative topics={lecture.topics} />
 
-        {lecture.primaryAudioAsset && (
-          <View style={styles.playSection}>
-            <ButtonMobileNative
-              variant="primary"
-              size="lg"
-              fullWidth
-              label="▶ Play Lecture"
-              onPress={() => onPlay?.(lecture.primaryAudioAsset!.id)}
-            />
-            {audioDuration != null && (
-              <Text style={[styles.durationText, { color: theme.colors.content.muted }]}>
-                {formatDuration(audioDuration)}
-              </Text>
-            )}
-          </View>
-        )}
+        <View style={styles.playSection}>
+          <LecturePlayButtonNative lecture={lecture} />
+          <LectureSaveButtonNative lectureId={lecture.id} />
+        </View>
 
         {lecture.description && (
           <View style={styles.descriptionSection}>
@@ -87,12 +62,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   playSection: {
     marginTop: theme.spacing.layout.sectionY,
-    alignItems: "center",
-  },
-  durationText: {
-    ...theme.typography.caption,
-    textAlign: "center",
-    marginTop: theme.spacing.component.gapSm,
+    gap: theme.spacing.component.gapSm,
   },
   descriptionSection: {
     marginTop: theme.spacing.component.gapLg,

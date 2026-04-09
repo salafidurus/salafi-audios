@@ -1,0 +1,39 @@
+"use client";
+
+import type { LectureDetailDto } from "@sd/core-contracts";
+import { usePlayback } from "@sd/domain-playback";
+import type { Track } from "@sd/domain-playback";
+import { ButtonDesktopWeb } from "../../../../shared/components/Button/Button";
+
+export type LecturePlayButtonProps = {
+  lecture: LectureDetailDto;
+};
+
+export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
+  const { play } = usePlayback();
+
+  if (!lecture.primaryAudioAsset) {
+    return null;
+  }
+
+  const asset = lecture.primaryAudioAsset;
+
+  const handlePlay = () => {
+    const track: Track = {
+      id: asset.id,
+      lectureId: lecture.id,
+      title: lecture.title,
+      scholarName: lecture.scholar.name,
+      audioUrl: asset.url,
+      durationSeconds: asset.durationSeconds ?? lecture.durationSeconds,
+      artworkUrl: undefined,
+    };
+    play(track);
+  };
+
+  return (
+    <ButtonDesktopWeb variant="primary" size="lg" onClick={handlePlay} style={{ width: "100%" }}>
+      ▶ Play Lecture
+    </ButtonDesktopWeb>
+  );
+}

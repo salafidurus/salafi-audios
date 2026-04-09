@@ -2,25 +2,18 @@
 
 import { ScreenViewWeb } from "../../../../shared/components/ScreenView/ScreenView";
 import { AppText } from "../../../../shared/components/AppText/AppText";
-import { ButtonDesktopWeb } from "../../../../shared/components/Button/Button";
 import { useLectureDetailScreen } from "@sd/domain-content";
 import { LectureMetaWeb } from "../../components/lecture-meta/lecture-meta";
 import { TopicChipsWeb } from "../../components/topic-chips/topic-chips";
 import { SeriesContextBarWeb } from "../../components/series-context-bar/series-context-bar";
+import { LecturePlayButton } from "../../components/lecture-play-button/LecturePlayButton";
+import { LectureSaveButton } from "../../components/lecture-save-button/LectureSaveButton";
 
 export type LectureDetailDesktopWebScreenProps = {
   id: string;
-  onPlay?: (audioAssetId: string) => void;
 };
 
-function formatDuration(seconds: number): string {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  if (h > 0) return `${h}h ${m}m`;
-  return `${m} min`;
-}
-
-export function LectureDetailDesktopWebScreen({ id, onPlay }: LectureDetailDesktopWebScreenProps) {
+export function LectureDetailDesktopWebScreen({ id }: LectureDetailDesktopWebScreenProps) {
   const { lecture, isFetching } = useLectureDetailScreen(id);
 
   if (isFetching) {
@@ -38,8 +31,6 @@ export function LectureDetailDesktopWebScreen({ id, onPlay }: LectureDetailDeskt
       </ScreenViewWeb>
     );
   }
-
-  const audioDuration = lecture.primaryAudioAsset?.durationSeconds ?? lecture.durationSeconds;
 
   return (
     <ScreenViewWeb>
@@ -63,25 +54,8 @@ export function LectureDetailDesktopWebScreen({ id, onPlay }: LectureDetailDeskt
 
         {/* Right column: play action */}
         <div style={{ width: 240, flexShrink: 0, paddingTop: 8 }}>
-          {lecture.primaryAudioAsset && (
-            <div>
-              <ButtonDesktopWeb
-                variant="primary"
-                size="lg"
-                onClick={() => onPlay?.(lecture.primaryAudioAsset!.id)}
-                style={{ width: "100%" }}
-              >
-                ▶ Play Lecture
-              </ButtonDesktopWeb>
-              {audioDuration != null && (
-                <div style={{ textAlign: "center", marginTop: 8 }}>
-                  <AppText variant="caption" style={{ color: "var(--content-muted, #888)" }}>
-                    {formatDuration(audioDuration)}
-                  </AppText>
-                </div>
-              )}
-            </div>
-          )}
+          <LecturePlayButton lecture={lecture} />
+          <LectureSaveButton lectureId={lecture.id} />
         </div>
       </div>
     </ScreenViewWeb>
