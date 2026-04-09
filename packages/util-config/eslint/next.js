@@ -33,4 +33,9 @@ export default [
       "import/no-default-export": "off",
     },
   },
+  // App barrel files: allowed to re-export
+  {
+    files: ["src/features/*/index.ts", "src/shared/**/index.ts", "src/core/*/index.ts"],
+    rules: { "no-restricted-syntax": "off" },
+  },
 ];
