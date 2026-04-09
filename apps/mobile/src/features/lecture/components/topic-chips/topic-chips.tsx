@@ -2,11 +2,11 @@ import { View, Text, ScrollView } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import type { TopicRefDto } from "@sd/core-contracts";
 
-export type TopicChipsNativeProps = {
+export type TopicChipsProps = {
   topics: TopicRefDto[];
 };
 
-export function TopicChipsNative({ topics }: TopicChipsNativeProps) {
+export function TopicChips({ topics }: TopicChipsProps) {
   const { theme } = useUnistyles();
 
   if (topics.length === 0) return null;

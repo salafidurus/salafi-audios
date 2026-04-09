@@ -2,12 +2,12 @@
 
 import type { ScholarListItemDto } from "@sd/core-contracts";
 
-export type ScholarCardWebProps = {
+export type ScholarCardProps = {
   scholar: ScholarListItemDto;
   onPress?: (slug: string) => void;
 };
 
-export function ScholarCardWeb({ scholar, onPress }: ScholarCardWebProps) {
+export function ScholarCard({ scholar, onPress }: ScholarCardProps) {
   return (
     <div
       role="button"

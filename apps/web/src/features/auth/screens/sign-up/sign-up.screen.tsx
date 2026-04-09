@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SignUpMobileWebScreen } from "./sign-up.screen.mobile";
+import { SignUpMobileScreen } from "./sign-up.screen.mobile";
 import { SignUpDesktopScreen } from "./sign-up.screen.desktop";
 import { useResponsive } from "../../../../shared/hooks/use-responsive";
 import { authClient } from "../../../../core/auth";
@@ -30,7 +30,7 @@ export function SignUpResponsiveScreen({
 
   if (isMobile || isTablet) {
     return (
-      <SignUpMobileWebScreen
+      <SignUpMobileScreen
         onSignUp={async (name, email, password) => {
           const { error } = await authClient.signUp.email({ name, email, password });
           if (error) throw new Error(error.message ?? "Sign up failed");

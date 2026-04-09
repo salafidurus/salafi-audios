@@ -7,11 +7,11 @@ export {
   LectureSaveButton,
   type LectureSaveButtonProps,
 } from "./components/lecture-save-button/LectureSaveButton";
-export { LectureMetaWeb, type LectureMetaWebProps } from "./components/lecture-meta/lecture-meta";
-export { TopicChipsWeb, type TopicChipsWebProps } from "./components/topic-chips/topic-chips";
+export { LectureMeta, type LectureMetaProps } from "./components/lecture-meta/lecture-meta";
+export { TopicChips, type TopicChipsProps } from "./components/topic-chips/topic-chips";
 export {
-  SeriesContextBarWeb,
-  type SeriesContextBarWebProps,
+  SeriesContextBar,
+  type SeriesContextBarProps,
 } from "./components/series-context-bar/series-context-bar";
 
 // Screens
@@ -20,10 +20,10 @@ export {
   type LectureDetailScreenProps,
 } from "./screens/lecture-detail/lecture-detail.screen";
 export {
-  LectureDetailDesktopWebScreen,
-  type LectureDetailDesktopWebScreenProps,
+  LectureDetailDesktopScreen,
+  type LectureDetailDesktopScreenProps,
 } from "./screens/lecture-detail/lecture-detail.screen.desktop";
 export {
-  LectureDetailMobileWebScreen,
-  type LectureDetailMobileWebScreenProps,
+  LectureDetailMobileScreen,
+  type LectureDetailMobileScreenProps,
 } from "./screens/lecture-detail/lecture-detail.screen.mobile";

@@ -63,5 +63,4 @@ export function Button({
   );
 }
 
-export { Button as ButtonDesktopWeb };
-export type { ButtonProps as ButtonDesktopWebProps };
+

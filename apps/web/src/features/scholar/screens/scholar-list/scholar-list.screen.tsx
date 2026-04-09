@@ -3,8 +3,8 @@
 import { useRouter } from "next/navigation";
 import { routes } from "@sd/core-contracts";
 import { Responsive } from "@/shared/components/Responsive";
-import { ScholarListDesktopWebScreen } from "./scholar-list.screen.desktop";
-import { ScholarListMobileWebScreen } from "./scholar-list.screen.mobile";
+import { ScholarListDesktopScreen } from "./scholar-list.screen.desktop";
+import { ScholarListMobileScreen } from "./scholar-list.screen.mobile";
 
 export function ScholarListScreen() {
   const router = useRouter();
@@ -15,8 +15,8 @@ export function ScholarListScreen() {
 
   return (
     <Responsive
-      mobile={<ScholarListMobileWebScreen onSelectScholar={handleSelectScholar} />}
-      desktop={<ScholarListDesktopWebScreen onSelectScholar={handleSelectScholar} />}
+      mobile={<ScholarListMobileScreen onSelectScholar={handleSelectScholar} />}
+      desktop={<ScholarListDesktopScreen onSelectScholar={handleSelectScholar} />}
     />
   );
 }

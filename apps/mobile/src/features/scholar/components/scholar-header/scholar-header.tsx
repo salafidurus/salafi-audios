@@ -1,7 +1,7 @@
 import { View, Text, Image, Pressable, Linking } from "react-native";
 import type { ScholarDetailDto } from "@sd/core-contracts";
 
-export type ScholarHeaderNativeProps = {
+export type ScholarHeaderProps = {
   scholar: ScholarDetailDto & {
     lectureCount: number;
     seriesCount: number;
@@ -9,7 +9,7 @@ export type ScholarHeaderNativeProps = {
   };
 };
 
-export function ScholarHeaderNative({ scholar }: ScholarHeaderNativeProps) {
+export function ScholarHeader({ scholar }: ScholarHeaderProps) {
   const totalHours = Math.round(scholar.totalDurationSeconds / 3600);
 
   const openLink = (url: string) => {

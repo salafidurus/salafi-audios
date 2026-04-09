@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { authClient } from "../../../../core/auth";
-import { TextInputWeb } from "../../../../shared/components/TextInput/TextInput";
+import { TextInput } from "../../../../shared/components/TextInput/TextInput";
 import { GoogleSignInButton, AppleSignInButton } from "../../components/social-buttons";
 import styles from "../auth-form.module.css";
 
@@ -89,7 +89,7 @@ export function SignUpDesktopScreen({
           <div className={styles.divider}>or sign up with email</div>
 
           <form onSubmit={handleSubmit} className={styles.form}>
-            <TextInputWeb
+            <TextInput
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Name"
@@ -99,7 +99,7 @@ export function SignUpDesktopScreen({
             />
 
             <div className={styles.inputGroup}>
-              <TextInputWeb
+              <TextInput
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -116,7 +116,7 @@ export function SignUpDesktopScreen({
               )}
             </div>
 
-            <TextInputWeb
+            <TextInput
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

@@ -1,7 +1,7 @@
 import { Play, Headphones, Clock } from "lucide-react";
-import { MarqueeTextDesktopWeb } from "../MarqueeText/MarqueeText.desktop";
+import { MarqueeTextDesktop } from "../MarqueeText/MarqueeText.desktop";
 
-export type SearchResultItemDesktopWebProps = {
+export type SearchResultItemDesktopProps = {
   id: string;
   title: string;
   scholarName: string;
@@ -28,7 +28,7 @@ const titleMdStyle = {
   fontWeight: "var(--typo-title-md-font-weight)",
 } as const;
 
-export function SearchResultItemDesktopWeb(item: SearchResultItemDesktopWebProps) {
+export function SearchResultItemDesktop(item: SearchResultItemDesktopProps) {
   const imageUrl = item.imageUrl;
   const durationLabel = formatDuration(item.durationSeconds);
 
@@ -44,12 +44,12 @@ export function SearchResultItemDesktopWeb(item: SearchResultItemDesktopWebProps
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col gap-[var(--space-scale-xs)]">
-        <MarqueeTextDesktopWeb
+        <MarqueeTextDesktop
           text={item.title}
           className="truncate text-[var(--content-strong)] [font-size:var(--typo-title-md-font-size)] xl:[font-size:var(--typo-title-lg-font-size)]"
           style={titleMdStyle}
         />
-        <MarqueeTextDesktopWeb
+        <MarqueeTextDesktop
           text={item.scholarName}
           className="truncate text-[var(--content-muted)] [font-size:var(--typo-body-sm-font-size)] xl:[font-size:var(--typo-body-md-font-size)]"
           style={bodySmStyle}

@@ -1,9 +1,9 @@
 "use client";
 
 import { Responsive } from "@/shared/components/Responsive";
-import { AdminPermissionsDesktopWebScreen } from "./admin-permissions.screen.desktop";
-import { AdminPermissionsMobileWebScreen } from "./admin-permissions.screen.mobile";
+import { AdminPermissionsDesktopScreen } from "./admin-permissions.screen.desktop";
+import { AdminPermissionsMobileScreen } from "./admin-permissions.screen.mobile";
 
 export function AdminPermissionsScreen() {
-  return <Responsive mobile={<AdminPermissionsMobileWebScreen />} desktop={<AdminPermissionsDesktopWebScreen />} />;
+  return <Responsive mobile={<AdminPermissionsMobileScreen />} desktop={<AdminPermissionsDesktopScreen />} />;
 }

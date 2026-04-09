@@ -1,5 +1,5 @@
-import { TermsOfUseMobileNativeScreen } from "../../../features/legal/screens/terms-of-use.screen";
+import { TermsOfUseScreen } from "../../../features/legal/screens/terms-of-use.screen";
 
 export default function AccountLegal() {
-  return <TermsOfUseMobileNativeScreen />;
+  return <TermsOfUseScreen />;
 }

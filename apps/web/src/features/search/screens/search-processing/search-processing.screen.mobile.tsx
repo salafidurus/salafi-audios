@@ -5,14 +5,14 @@ import type { SearchCatalogItemDto, SearchCatalogResultsDto } from "@sd/core-con
 import { StyleSheet } from "react-native-unistyles";
 import { View } from "react-native-unistyles/components/native/View";
 import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
-import { SearchFilterMobileWeb } from "../../components/SearchFilter/SearchFilter.mobile";
+import { SearchFilterMobile } from "../../components/SearchFilter/SearchFilter.mobile";
 import {
-  SearchInputMobileWeb,
-  type SearchInputMobileWebRef,
+  SearchInputMobile,
+  type SearchInputMobileRef,
 } from "../../components/SearchInput/SearchInput.mobile";
-import { SearchResultItemMobileWeb } from "../../components/SearchResultItem/SearchResultItem.mobile";
+import { SearchResultItemMobile } from "../../components/SearchResultItem/SearchResultItem.mobile";
 import {
-  SearchResultsListMobileWeb,
+  SearchResultsListMobile,
   type SearchResultRow,
 } from "../../components/SearchResultsList/SearchResultsList.mobile";
 import { useSearchProcessing } from "@sd/domain-search";
@@ -22,11 +22,11 @@ export type SearchProcessingScreenProps = {
   onBackPress?: () => void;
 };
 
-export function SearchProcessingMobileWebScreen({
+export function SearchProcessingMobileScreen({
   prefill,
   onBackPress,
 }: SearchProcessingScreenProps) {
-  const inputRef = useRef<SearchInputMobileWebRef>(null);
+  const inputRef = useRef<SearchInputMobileRef>(null);
   const {
     query,
     setQuery,
@@ -46,7 +46,7 @@ export function SearchProcessingMobileWebScreen({
   return (
     <ScreenView contentStyle={styles.screenContent}>
       <View style={styles.searchGroup}>
-        <SearchInputMobileWeb
+        <SearchInputMobile
           ref={inputRef}
           placeholder="Search"
           value={query}
@@ -54,16 +54,16 @@ export function SearchProcessingMobileWebScreen({
           onBackPress={onBackPress}
         />
         {shouldSearch ? (
-          <SearchFilterMobileWeb value={filter} onChange={setFilter} topics={topics} />
+          <SearchFilterMobile value={filter} onChange={setFilter} topics={topics} />
         ) : null}
       </View>
-      <SearchResultsListMobileWeb
+      <SearchResultsListMobile
         items={items}
         isFetching={isFetching}
         shouldSearch={shouldSearch}
         errorMessage={errorMessage}
         renderItem={(item: SearchResultRow) => (
-          <SearchResultItemMobileWeb
+          <SearchResultItemMobile
             title={item.title}
             scholarName={item.scholarName}
             imageUrl={item.imageUrl}

@@ -1,22 +1,22 @@
 import { useEffect, useRef } from "react";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { SearchFilterMobileNative } from "../../components/SearchFilter/SearchFilter";
+import { SearchFilter } from "../../components/SearchFilter/SearchFilter";
 import { SearchInput, type SearchInputRef } from "../../components/SearchInput/SearchInput";
-import { SearchResultItemMobileNative } from "../../components/SearchResultItem/SearchResultItem";
+import { SearchResultItem } from "../../components/SearchResultItem/SearchResultItem";
 import {
-  SearchResultsListMobileNative,
+  SearchResultsList,
   type SearchResultRow,
 } from "../../components/SearchResultsList/SearchResultsList";
 import { useSearchProcessing } from "@sd/domain-search";
-import { ScreenViewMobileNative } from "../../../../shared/components/ScreenView/ScreenView";
+import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 
 export type SearchProcessingScreenProps = {
   prefill?: string;
   onBackPress?: () => void;
 };
 
-export function SearchProcessingMobileNativeScreen({
+export function SearchProcessingScreen({
   prefill,
   onBackPress,
 }: SearchProcessingScreenProps) {
@@ -38,7 +38,7 @@ export function SearchProcessingMobileNativeScreen({
   }, []);
 
   return (
-    <ScreenViewMobileNative backgroundVariant="primaryWash">
+    <ScreenView backgroundVariant="primaryWash">
       <View style={styles.searchGroup}>
         <SearchInput
           ref={inputRef}
@@ -48,16 +48,16 @@ export function SearchProcessingMobileNativeScreen({
           onBackPress={onBackPress}
         />
         {shouldSearch ? (
-          <SearchFilterMobileNative value={filter} onChange={setFilter} topics={topics} />
+          <SearchFilter value={filter} onChange={setFilter} topics={topics} />
         ) : null}
       </View>
-      <SearchResultsListMobileNative
+      <SearchResultsList
         items={items}
         isFetching={isFetching}
         shouldSearch={shouldSearch}
         errorMessage={errorMessage}
         renderItem={(item: SearchResultRow) => (
-          <SearchResultItemMobileNative
+          <SearchResultItem
             title={item.title}
             scholarName={item.scholarName}
             imageUrl={item.imageUrl}
@@ -66,7 +66,7 @@ export function SearchProcessingMobileNativeScreen({
           />
         )}
       />
-    </ScreenViewMobileNative>
+    </ScreenView>
   );
 }
 

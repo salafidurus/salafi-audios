@@ -2,13 +2,13 @@
 
 import { forwardRef, useState, type CSSProperties, type InputHTMLAttributes } from "react";
 
-export type TextInputWebProps = Omit<InputHTMLAttributes<HTMLInputElement>, "style"> & {
+export type TextInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "style"> & {
   invalid?: boolean;
   onChangeText?: (value: string) => void;
   style?: CSSProperties;
 };
 
-export const TextInputWeb = forwardRef<HTMLInputElement, TextInputWebProps>(function TextInputWeb(
+export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(function TextInput(
   { invalid = false, onChangeText, onFocus, onBlur, style, ...props },
   ref,
 ) {

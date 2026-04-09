@@ -8,18 +8,18 @@ import { Pressable } from "react-native-unistyles/components/native/Pressable";
 import { TextInput } from "react-native-unistyles/components/native/TextInput";
 import { View } from "react-native-unistyles/components/native/View";
 
-export type SearchInputMobileWebProps = {
+export type SearchInputMobileProps = {
   placeholder: string;
   value?: string;
   onChange?: (value: string) => void;
   onBackPress?: () => void;
 };
 
-export type SearchInputMobileWebRef = {
+export type SearchInputMobileRef = {
   focus: () => void;
 };
 
-export const SearchInputMobileWeb = forwardRef<SearchInputMobileWebRef, SearchInputMobileWebProps>(
+export const SearchInputMobile = forwardRef<SearchInputMobileRef, SearchInputMobileProps>(
   ({ placeholder, value, onChange, onBackPress }, ref) => {
     const { theme } = useUnistyles();
     const inputRef = React.useRef<RNTextInput>(null);
@@ -83,7 +83,7 @@ export const SearchInputMobileWeb = forwardRef<SearchInputMobileWebRef, SearchIn
   },
 );
 
-SearchInputMobileWeb.displayName = "SearchInputMobileWeb";
+SearchInputMobile.displayName = "SearchInputMobile";
 
 const styles = StyleSheet.create((theme) => ({
   container: {

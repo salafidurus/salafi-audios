@@ -1,11 +1,11 @@
 "use client";
 
-type ProgressBarWebProps = {
+type ProgressBarProps = {
   progressPercent: number;
   onSeek?: (percent: number) => void;
 };
 
-export function ProgressBarWeb({ progressPercent, onSeek }: ProgressBarWebProps) {
+export function ProgressBar({ progressPercent, onSeek }: ProgressBarProps) {
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!onSeek) return;
     const rect = e.currentTarget.getBoundingClientRect();

@@ -1,9 +1,9 @@
 "use client";
 
 import type { ScholarChipDto, ContentSuggestionDto, RecentProgressDto } from "@sd/core-contracts";
-import { BrowseCardDesktopWeb } from "../BrowseCard/BrowseCard.desktop";
+import { BrowseCardDesktop } from "../BrowseCard/BrowseCard.desktop";
 
-export type QuickBrowseDesktopWebProps = {
+export type QuickBrowseDesktopProps = {
   scholars?: ScholarChipDto[];
   suggestions?: ContentSuggestionDto[];
   recentProgress?: RecentProgressDto | null;
@@ -51,7 +51,7 @@ function formatDuration(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-export function QuickBrowseDesktopWeb({
+export function QuickBrowseDesktop({
   scholars,
   suggestions,
   recentProgress,
@@ -59,7 +59,7 @@ export function QuickBrowseDesktopWeb({
   onSelectSuggestion,
   onContinueListening,
   onSelectCategory,
-}: QuickBrowseDesktopWebProps) {
+}: QuickBrowseDesktopProps) {
   return (
     <section className="flex w-full max-w-[56rem] flex-col gap-[var(--space-scale-4xl)]">
       {/* Continue Listening */}
@@ -184,7 +184,7 @@ export function QuickBrowseDesktopWeb({
           <div className="grid grid-cols-2 gap-[var(--space-component-gap-md)] lg:grid-cols-3">
             {(["Senior Scholars", "Hadith", "Fiqh", "Tafsir", "Arabic", "Farah"] as const).map(
               (name) => (
-                <BrowseCardDesktopWeb
+                <BrowseCardDesktop
                   key={name}
                   name={name}
                   onPress={() => onSelectCategory?.(name)}

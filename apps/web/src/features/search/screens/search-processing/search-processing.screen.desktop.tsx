@@ -2,13 +2,13 @@
 
 import { Suspense } from "react";
 import { useEffect, useRef } from "react";
-import { SearchFilterDesktopWeb } from "../../components/SearchFilter/SearchFilter.desktop";
-import { SearchInputDesktopWeb } from "../../components/SearchInput/SearchInput.desktop";
-import { SearchResultItemDesktopWeb } from "../../components/SearchResultItem/SearchResultItem.desktop";
-import { SearchResultsListDesktopWeb } from "../../components/SearchResultsList/SearchResultsList.desktop";
+import { SearchFilterDesktop } from "../../components/SearchFilter/SearchFilter.desktop";
+import { SearchInputDesktop } from "../../components/SearchInput/SearchInput.desktop";
+import { SearchResultItemDesktop } from "../../components/SearchResultItem/SearchResultItem.desktop";
+import { SearchResultsListDesktop } from "../../components/SearchResultsList/SearchResultsList.desktop";
 import { useSearchProcessing } from "@sd/domain-search";
 
-export function SearchProcessingDesktopWebScreen() {
+export function SearchProcessingDesktopScreen() {
   const inputRef = useRef<HTMLInputElement>(null);
   const {
     query,
@@ -37,24 +37,24 @@ export function SearchProcessingDesktopWebScreen() {
         }}
       >
         <div className="mx-auto flex w-full max-w-[52rem] flex-col gap-[var(--space-component-gap-md)]">
-          <SearchInputDesktopWeb
+          <SearchInputDesktop
             ref={inputRef}
             placeholder="Search"
             value={query}
             onChange={setQuery}
             autoFocus
           />
-          <SearchFilterDesktopWeb value={filter} onChange={setFilter} topics={topics} />
+          <SearchFilterDesktop value={filter} onChange={setFilter} topics={topics} />
         </div>
       </div>
       <section className="mx-auto w-full max-w-[70rem] px-[var(--space-layout-page-x)] pb-[var(--space-layout-page-y)]">
         <Suspense fallback={<p className="text-[var(--content-muted)]">Loading results…</p>}>
-          <SearchResultsListDesktopWeb
+          <SearchResultsListDesktop
             items={items}
             isFetching={isFetching}
             shouldSearch={shouldSearch}
             errorMessage={errorMessage}
-            renderItem={(item) => <SearchResultItemDesktopWeb {...item} />}
+            renderItem={(item) => <SearchResultItemDesktop {...item} />}
           />
         </Suspense>
       </section>

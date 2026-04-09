@@ -1,8 +1,8 @@
 "use client";
 
 import { Responsive } from "@/shared/components/Responsive";
-import { SearchHomeMobileWebScreen } from "./search-home.screen.mobile";
-import { SearchHomeDesktopWebScreen } from "./search-home.screen.desktop";
+import { SearchHomeMobileScreen } from "./search-home.screen.mobile";
+import { SearchHomeDesktopScreen } from "./search-home.screen.desktop";
 
 export type SearchHomeScreenProps = {
   onOpenSearch?: () => void;
@@ -22,7 +22,7 @@ export function SearchHomeScreen({
   return (
     <Responsive
       mobile={
-        <SearchHomeMobileWebScreen
+        <SearchHomeMobileScreen
           onOpenSearch={onOpenSearch}
           onSelectCategory={onSelectCategory}
           onSelectScholar={onSelectScholar}
@@ -31,7 +31,7 @@ export function SearchHomeScreen({
         />
       }
       desktop={
-        <SearchHomeDesktopWebScreen
+        <SearchHomeDesktopScreen
           onOpenSearch={onOpenSearch}
           onSelectCategory={onSelectCategory}
           onSelectScholar={onSelectScholar}

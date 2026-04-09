@@ -1,6 +1,6 @@
 import { View, Text, ScrollView } from "react-native";
 
-export function PrivacyMobileNativeScreen() {
+export function PrivacyScreen() {
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16 }}>
       <Text style={{ fontSize: 22, fontWeight: "700", marginBottom: 16 }}>Privacy Policy</Text>

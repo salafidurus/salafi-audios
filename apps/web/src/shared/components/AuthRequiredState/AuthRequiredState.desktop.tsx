@@ -1,18 +1,18 @@
 "use client";
 
-export type AuthRequiredStateDesktopWebProps = {
+export type AuthRequiredStateDesktopProps = {
   title: string;
   description: string;
   actionLabel?: string;
   onPress: () => void;
 };
 
-export function AuthRequiredStateDesktopWeb({
+export function AuthRequiredStateDesktop({
   title,
   description,
   actionLabel = "Sign In",
   onPress,
-}: AuthRequiredStateDesktopWebProps) {
+}: AuthRequiredStateDesktopProps) {
   return (
     <div style={wrapperStyle}>
       <h2 style={titleStyle}>{title}</h2>

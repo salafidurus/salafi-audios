@@ -31,7 +31,7 @@ const SUPPORT_SECTIONS = [
   },
 ];
 
-export function SupportMobileNativeScreen() {
+export function SupportScreen() {
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16 }}>
       <Text style={{ fontSize: 22, fontWeight: "700", marginBottom: 16 }}>Support</Text>

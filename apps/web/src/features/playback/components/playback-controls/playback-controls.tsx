@@ -1,18 +1,18 @@
 "use client";
 
-type PlaybackControlsWebProps = {
+type PlaybackControlsProps = {
   isPlaying: boolean;
   isLoading: boolean;
   onPlayPause: () => void;
   onSkipNext?: () => void;
 };
 
-export function PlaybackControlsWeb({
+export function PlaybackControls({
   isPlaying,
   isLoading,
   onPlayPause,
   onSkipNext,
-}: PlaybackControlsWebProps) {
+}: PlaybackControlsProps) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
       <button

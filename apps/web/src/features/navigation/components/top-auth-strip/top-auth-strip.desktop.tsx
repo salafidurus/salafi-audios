@@ -10,7 +10,7 @@ import { routes } from "@sd/core-contracts";
 import styles from "./top-auth-strip.module.css";
 import searchStyles from "./search-action.module.css";
 
-export function TopAuthStripWeb() {
+export function TopAuthStrip() {
   const router = useRouter();
   const pathname = usePathname();
   const { isAuthenticated, isLoading, user } = useAuth();

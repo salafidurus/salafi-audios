@@ -1,6 +1,6 @@
 "use client";
 
-import { AuthProviderButtonWeb } from "./provider-button";
+import { AuthProviderButton } from "./provider-button";
 
 type Props = {
   onClick: () => void;
@@ -8,9 +8,9 @@ type Props = {
 };
 
 export function GoogleSignInButton({ onClick, disabled }: Props) {
-  return <AuthProviderButtonWeb provider="google" onClick={onClick} disabled={disabled} />;
+  return <AuthProviderButton provider="google" onClick={onClick} disabled={disabled} />;
 }
 
 export function AppleSignInButton({ onClick, disabled }: Props) {
-  return <AuthProviderButtonWeb provider="apple" onClick={onClick} disabled={disabled} />;
+  return <AuthProviderButton provider="apple" onClick={onClick} disabled={disabled} />;
 }

@@ -16,13 +16,11 @@ export type SearchFilterProps = {
   topics: TopicDetailDto[];
 };
 
-export type SearchFilterMobileNativeProps = SearchFilterProps;
-
-export function SearchFilterMobileNative({
+export function SearchFilter({
   value,
   onChange,
   topics,
-}: SearchFilterMobileNativeProps) {
+}: SearchFilterProps) {
   const options = useMemo<FilterOption[]>(() => {
     const sortedTopics = [...topics].sort((a, b) => a.name.localeCompare(b.name));
     return [

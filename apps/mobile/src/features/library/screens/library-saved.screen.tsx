@@ -3,7 +3,7 @@ import type { LibraryItemDto } from "@sd/core-contracts";
 import { useLibrarySavedScreen } from "@sd/domain-content";
 import { useAuth } from "../../../core/auth/use-auth";
 
-export type LibrarySavedMobileNativeScreenProps = {
+export type LibrarySavedScreenProps = {
   onNavigateToLecture?: (id: string) => void;
 };
 
@@ -32,9 +32,9 @@ function LibraryItem({ item, onPress }: { item: LibraryItemDto; onPress?: () => 
   );
 }
 
-export function LibrarySavedMobileNativeScreen({
+export function LibrarySavedScreen({
   onNavigateToLecture,
-}: LibrarySavedMobileNativeScreenProps) {
+}: LibrarySavedScreenProps) {
   const { isAuthenticated } = useAuth();
   const { items, isFetching } = useLibrarySavedScreen(isAuthenticated);
 

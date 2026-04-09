@@ -3,7 +3,7 @@ import type { LibraryItemDto } from "@sd/core-contracts";
 import { useLibraryCompletedScreen } from "@sd/domain-content";
 import { useAuth } from "../../../core/auth/use-auth";
 
-export type LibraryCompletedMobileNativeScreenProps = {
+export type LibraryCompletedScreenProps = {
   onNavigateToLecture?: (id: string) => void;
 };
 
@@ -29,9 +29,9 @@ function LibraryItem({ item, onPress }: { item: LibraryItemDto; onPress?: () => 
   );
 }
 
-export function LibraryCompletedMobileNativeScreen({
+export function LibraryCompletedScreen({
   onNavigateToLecture,
-}: LibraryCompletedMobileNativeScreenProps) {
+}: LibraryCompletedScreenProps) {
   const { isAuthenticated } = useAuth();
   const { items, isFetching } = useLibraryCompletedScreen(isAuthenticated);
 

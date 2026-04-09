@@ -2,11 +2,11 @@
 
 import { useAccountScreen } from "@sd/domain-account";
 
-export type AccountProfileDesktopWebScreenProps = {
+export type AccountProfileDesktopScreenProps = {
   onBack?: () => void;
 };
 
-export function AccountProfileDesktopWebScreen({ onBack }: AccountProfileDesktopWebScreenProps) {
+export function AccountProfileDesktopScreen({ onBack }: AccountProfileDesktopScreenProps) {
   const { profile, isFetching } = useAccountScreen();
 
   if (isFetching) {

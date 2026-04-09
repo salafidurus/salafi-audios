@@ -3,11 +3,11 @@
 import type { TopicRefDto } from "@sd/core-contracts";
 import { AppText } from "../../../../shared/components/AppText/AppText";
 
-export type TopicChipsWebProps = {
+export type TopicChipsProps = {
   topics: TopicRefDto[];
 };
 
-export function TopicChipsWeb({ topics }: TopicChipsWebProps) {
+export function TopicChips({ topics }: TopicChipsProps) {
   if (topics.length === 0) return null;
 
   return (

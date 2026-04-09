@@ -1,8 +1,8 @@
 "use client";
 
 import { Responsive } from "@/shared/components/Responsive";
-import { AccountDesktopWebScreen } from "./account.screen.desktop";
-import { AccountMobileWebScreen } from "./account.screen.mobile";
+import { AccountDesktopScreen } from "./account.screen.desktop";
+import { AccountMobileScreen } from "./account.screen.mobile";
 
 export type AccountScreenProps = {
   onNavigateToProfile?: () => void;
@@ -11,5 +11,5 @@ export type AccountScreenProps = {
 };
 
 export function AccountScreen(props: AccountScreenProps) {
-  return <Responsive mobile={<AccountMobileWebScreen {...props} />} desktop={<AccountDesktopWebScreen {...props} />} />;
+  return <Responsive mobile={<AccountMobileScreen {...props} />} desktop={<AccountDesktopScreen {...props} />} />;
 }

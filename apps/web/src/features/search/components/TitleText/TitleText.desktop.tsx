@@ -6,6 +6,6 @@ type Props = {
   children: string;
 };
 
-export function TitleTextDesktopWeb({ children }: Props) {
+export function TitleTextDesktop({ children }: Props) {
   return <AppText variant="displayMd">{children}</AppText>;
 }

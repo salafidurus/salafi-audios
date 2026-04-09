@@ -1,11 +1,11 @@
 "use client";
 
-import { QuickBrowseDesktopWeb } from "../../components/QuickBrowse/QuickBrowse.desktop";
-import { SearchButtonDesktopWeb } from "../../components/SearchButton/SearchButton.desktop";
-import { TitleTextDesktopWeb } from "../../components/TitleText/TitleText.desktop";
+import { QuickBrowseDesktop } from "../../components/QuickBrowse/QuickBrowse.desktop";
+import { SearchButtonDesktop } from "../../components/SearchButton/SearchButton.desktop";
+import { TitleTextDesktop } from "../../components/TitleText/TitleText.desktop";
 import { useQuickBrowse } from "@sd/domain-search";
 
-export type SearchHomeDesktopWebScreenProps = {
+export type SearchHomeDesktopScreenProps = {
   onOpenSearch?: () => void;
   onSelectCategory?: (searchKey: string) => void;
   onSelectScholar?: (slug: string) => void;
@@ -13,23 +13,23 @@ export type SearchHomeDesktopWebScreenProps = {
   onContinueListening?: (lectureSlug: string) => void;
 };
 
-export function SearchHomeDesktopWebScreen({
+export function SearchHomeDesktopScreen({
   onOpenSearch,
   onSelectCategory,
   onSelectScholar,
   onSelectSuggestion,
   onContinueListening,
-}: SearchHomeDesktopWebScreenProps) {
+}: SearchHomeDesktopScreenProps) {
   const { data } = useQuickBrowse();
 
   return (
     <section className="flex flex-1 items-center justify-center px-[var(--space-layout-page-x)] py-[var(--space-layout-page-y)]">
       <section className="flex w-full max-w-[56rem] flex-col items-center gap-[var(--space-scale-4xl)] text-center">
         <div className="flex w-full max-w-[44rem] flex-col items-center gap-[var(--space-component-gap-lg)]">
-          <TitleTextDesktopWeb>Find a lesson</TitleTextDesktopWeb>
-          <SearchButtonDesktopWeb label="What do you want to listen to?" onClick={onOpenSearch} />
+          <TitleTextDesktop>Find a lesson</TitleTextDesktop>
+          <SearchButtonDesktop label="What do you want to listen to?" onClick={onOpenSearch} />
         </div>
-        <QuickBrowseDesktopWeb
+        <QuickBrowseDesktop
           scholars={data?.scholars}
           suggestions={data?.suggestions}
           recentProgress={data?.recentProgress}

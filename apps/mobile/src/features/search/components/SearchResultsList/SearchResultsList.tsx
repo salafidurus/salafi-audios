@@ -20,15 +20,13 @@ export type SearchResultsListProps = {
   renderItem: (item: SearchResultRow) => React.ReactElement | null;
 };
 
-export type SearchResultsListMobileNativeProps = SearchResultsListProps;
-
-export function SearchResultsListMobileNative({
+export function SearchResultsList({
   items,
   isFetching,
   shouldSearch,
   errorMessage,
   renderItem,
-}: SearchResultsListMobileNativeProps) {
+}: SearchResultsListProps) {
   if (items.length === 0) {
     return (
       <SearchResultEmpty

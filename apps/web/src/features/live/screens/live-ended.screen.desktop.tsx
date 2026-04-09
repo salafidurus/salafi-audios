@@ -3,7 +3,7 @@
 import type { LiveSessionDto } from "@sd/core-contracts";
 import { useLiveEndedScreen } from "@sd/domain-live";
 
-export type LiveEndedDesktopWebScreenProps = {
+export type LiveEndedDesktopScreenProps = {
   onNavigateToSession?: (id: string) => void;
 };
 
@@ -31,7 +31,7 @@ function EndedSessionItem({ session, onPress }: { session: LiveSessionDto; onPre
   );
 }
 
-export function LiveEndedDesktopWebScreen({ onNavigateToSession }: LiveEndedDesktopWebScreenProps) {
+export function LiveEndedDesktopScreen({ onNavigateToSession }: LiveEndedDesktopScreenProps) {
   const { sessions, isFetching } = useLiveEndedScreen();
 
   if (isFetching && sessions.length === 0) {

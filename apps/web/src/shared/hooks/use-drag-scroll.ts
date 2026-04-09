@@ -9,7 +9,7 @@ import { useEffect, useRef } from "react";
  * scroll container from stealing the event when content fits).
  * Attach the ref to a native HTML element with overflow set appropriately.
  */
-export function useDragScrollWeb(direction: "horizontal" | "vertical") {
+export function useDragScroll(direction: "horizontal" | "vertical") {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

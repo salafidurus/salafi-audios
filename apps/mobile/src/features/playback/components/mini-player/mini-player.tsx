@@ -1,9 +1,9 @@
 import { View, Text } from "react-native";
 import { usePlayback } from "@sd/domain-playback";
-import { ProgressBarNative } from "../progress-bar/progress-bar";
-import { PlaybackControlsNative } from "../playback-controls/playback-controls";
+import { ProgressBar } from "../progress-bar/progress-bar";
+import { PlaybackControls } from "../playback-controls/playback-controls";
 
-export function MiniPlayerNative() {
+export function MiniPlayer() {
   const {
     currentTrack,
     isPlaying,
@@ -35,7 +35,7 @@ export function MiniPlayerNative() {
         gap: 6,
       }}
     >
-      <ProgressBarNative progressPercent={progressPercent} />
+      <ProgressBar progressPercent={progressPercent} />
       <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
         <View style={{ flex: 1 }}>
           <Text numberOfLines={1} style={{ fontSize: 14, fontWeight: "600" }}>
@@ -50,7 +50,7 @@ export function MiniPlayerNative() {
         <Text style={{ fontSize: 12, color: "#999" }}>
           {formatTime(positionSeconds)} / {formatTime(durationSeconds)}
         </Text>
-        <PlaybackControlsNative
+        <PlaybackControls
           isPlaying={isPlaying}
           isLoading={isLoading}
           onPlayPause={handlePlayPause}

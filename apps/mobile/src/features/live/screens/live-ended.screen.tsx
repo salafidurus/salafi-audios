@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, FlatList } from "react-native";
 import type { LiveSessionDto } from "@sd/core-contracts";
 import { useLiveEndedScreen } from "@sd/domain-live";
 
-export type LiveEndedMobileNativeScreenProps = {
+export type LiveEndedScreenProps = {
   onNavigateToSession?: (id: string) => void;
 };
 
@@ -23,9 +23,9 @@ function EndedItem({ session, onPress }: { session: LiveSessionDto; onPress?: ()
   );
 }
 
-export function LiveEndedMobileNativeScreen({
+export function LiveEndedScreen({
   onNavigateToSession,
-}: LiveEndedMobileNativeScreenProps) {
+}: LiveEndedScreenProps) {
   const { sessions, isFetching } = useLiveEndedScreen();
 
   if (isFetching && sessions.length === 0) {

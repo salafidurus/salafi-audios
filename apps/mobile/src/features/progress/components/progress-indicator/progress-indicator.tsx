@@ -1,12 +1,12 @@
 import { View } from "react-native";
 import { useLectureProgress } from "@sd/domain-progress";
 
-type ProgressIndicatorNativeProps = {
+type ProgressIndicatorProps = {
   lectureId: string;
   size?: number;
 };
 
-export function ProgressIndicatorNative({ lectureId, size = 32 }: ProgressIndicatorNativeProps) {
+export function ProgressIndicator({ lectureId, size = 32 }: ProgressIndicatorProps) {
   const { progressPercent, isCompleted } = useLectureProgress(lectureId);
 
   if (progressPercent === 0 && !isCompleted) return null;

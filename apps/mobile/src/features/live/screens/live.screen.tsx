@@ -1,12 +1,12 @@
 import { View, ScrollView } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { ScreenViewMobileNative } from "../../../shared/components/ScreenView/ScreenView";
+import { ScreenView } from "../../../shared/components/ScreenView/ScreenView";
 import { AppText } from "../../../shared/components/AppText/AppText";
 import type { LiveSessionPublicDto } from "@sd/core-contracts";
 import { useLiveSessions } from "@sd/domain-live";
-import { LiveSessionCardNative } from "../components/live-session-card/live-session-card";
+import { LiveSessionCard } from "../components/live-session-card/live-session-card";
 
-export type LiveMobileNativeScreenProps = Record<string, never>;
+export type LiveScreenProps = Record<string, never>;
 
 function Section({
   title,
@@ -35,7 +35,7 @@ function Section({
       ) : (
         <View>
           {sessions.map((s) => (
-            <LiveSessionCardNative key={s.id} session={s} />
+            <LiveSessionCard key={s.id} session={s} />
           ))}
         </View>
       )}
@@ -43,11 +43,11 @@ function Section({
   );
 }
 
-export function LiveMobileNativeScreen(_props: LiveMobileNativeScreenProps) {
+export function LiveScreen(_props: LiveScreenProps) {
   const { active, upcoming, ended } = useLiveSessions();
 
   return (
-    <ScreenViewMobileNative>
+    <ScreenView>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={nativeStyles.scroll}>
         <AppText variant="titleLg">Live Sessions</AppText>
 
@@ -70,7 +70,7 @@ export function LiveMobileNativeScreen(_props: LiveMobileNativeScreenProps) {
           emptyMessage="No recent sessions."
         />
       </ScrollView>
-    </ScreenViewMobileNative>
+    </ScreenView>
   );
 }
 

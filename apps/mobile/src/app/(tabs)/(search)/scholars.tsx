@@ -1,11 +1,11 @@
 import { useRouter } from "expo-router";
-import { ScholarListMobileNativeScreen } from "../../../features/scholar/screens/scholar-list/scholar-list.screen";
+import { ScholarListScreen } from "../../../features/scholar/screens/scholar-list/scholar-list.screen";
 
 export default function ScholarsScreen() {
   const router = useRouter();
 
   return (
-    <ScholarListMobileNativeScreen
+    <ScholarListScreen
       onSelectScholar={(slug) => router.push({ pathname: "/scholar/[slug]", params: { slug } })}
     />
   );

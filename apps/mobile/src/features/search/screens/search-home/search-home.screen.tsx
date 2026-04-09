@@ -1,6 +1,6 @@
 import { Pressable, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { ScreenViewMobileNative } from "../../../../shared/components/ScreenView/ScreenView";
+import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 import { QuickBrowse } from "../../components/QuickBrowse/QuickBrowse";
 import { useQuickBrowse } from "@sd/domain-search";
 
@@ -12,7 +12,7 @@ export type SearchHomeScreenProps = {
   onContinueListening?: (lectureSlug: string) => void;
 };
 
-export function SearchHomeMobileNativeScreen({
+export function SearchHomeScreen({
   onOpenSearch,
   onSelectCategory,
   onSelectScholar,
@@ -22,7 +22,7 @@ export function SearchHomeMobileNativeScreen({
   const { data } = useQuickBrowse();
 
   return (
-    <ScreenViewMobileNative center>
+    <ScreenView center>
       <View style={styles.content}>
         <View style={styles.searchGroup}>
           <View style={styles.header}>
@@ -46,7 +46,7 @@ export function SearchHomeMobileNativeScreen({
           onSelectCategory={onSelectCategory}
         />
       </View>
-    </ScreenViewMobileNative>
+    </ScreenView>
   );
 }
 

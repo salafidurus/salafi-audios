@@ -3,14 +3,14 @@
 import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 import { AppText } from "../../../../shared/components/AppText/AppText";
 import { useScholarDetailScreen } from "@sd/domain-content";
-import { ScholarHeaderWeb } from "../../components/scholar-header/scholar-header";
-import { ScholarContentListWeb } from "../../components/scholar-content-list/scholar-content-list";
+import { ScholarHeader } from "../../components/scholar-header/scholar-header";
+import { ScholarContentList } from "../../components/scholar-content-list/scholar-content-list";
 
-export type ScholarDetailMobileWebScreenProps = {
+export type ScholarDetailMobileScreenProps = {
   slug: string;
 };
 
-export function ScholarDetailMobileWebScreen({ slug }: ScholarDetailMobileWebScreenProps) {
+export function ScholarDetailMobileScreen({ slug }: ScholarDetailMobileScreenProps) {
   const { scholar, content, isFetching } = useScholarDetailScreen(slug);
 
   if (isFetching) {
@@ -31,8 +31,8 @@ export function ScholarDetailMobileWebScreen({ slug }: ScholarDetailMobileWebScr
 
   return (
     <ScreenView>
-      <ScholarHeaderWeb scholar={scholar} />
-      <div style={{ marginTop: 24 }}>{content && <ScholarContentListWeb content={content} />}</div>
+      <ScholarHeader scholar={scholar} />
+      <div style={{ marginTop: 24 }}>{content && <ScholarContentList content={content} />}</div>
     </ScreenView>
   );
 }

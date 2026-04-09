@@ -18,11 +18,11 @@ function formatDate(iso: string): string {
   });
 }
 
-export type LectureMetaWebProps = {
+export type LectureMetaProps = {
   lecture: LectureDetailDto;
 };
 
-export function LectureMetaWeb({ lecture }: LectureMetaWebProps) {
+export function LectureMeta({ lecture }: LectureMetaProps) {
   return (
     <div
       style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12, marginTop: 12 }}

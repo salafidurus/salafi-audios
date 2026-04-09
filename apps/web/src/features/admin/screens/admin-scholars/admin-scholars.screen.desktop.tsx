@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { ScholarListItemDto } from "@sd/core-contracts";
-import { ScreenViewWeb } from "../../../../shared/components/ScreenView/ScreenView";
+import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 import { createScholar, updateScholar, type AdminScholarInput } from "../../api/admin.api";
 
 type ScholarsListDto = { scholars: ScholarListItemDto[] };
 
-export function AdminScholarsDesktopWebScreen() {
+export function AdminScholarsDesktopScreen() {
   const { data, isFetching, refetch } = useApiQuery<ScholarsListDto>(
     queryKeys.scholars.list(),
     () => httpClient<ScholarsListDto>({ url: endpoints.scholars.list, method: "GET" }),
@@ -37,16 +37,16 @@ export function AdminScholarsDesktopWebScreen() {
 
   if (isFetching) {
     return (
-      <ScreenViewWeb>
+      <ScreenView>
         <div style={{ textAlign: "center" }}>Loading scholars...</div>
-      </ScreenViewWeb>
+      </ScreenView>
     );
   }
 
   const scholars = data?.scholars ?? [];
 
   return (
-    <ScreenViewWeb>
+    <ScreenView>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div
           style={{
@@ -209,6 +209,6 @@ export function AdminScholarsDesktopWebScreen() {
           </tbody>
         </table>
       </div>
-    </ScreenViewWeb>
+    </ScreenView>
   );
 }

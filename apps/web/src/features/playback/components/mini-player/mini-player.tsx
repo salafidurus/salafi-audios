@@ -1,10 +1,10 @@
 "use client";
 
 import { usePlayback } from "@sd/domain-playback";
-import { ProgressBarWeb } from "../progress-bar/progress-bar";
-import { PlaybackControlsWeb } from "../playback-controls/playback-controls";
+import { ProgressBar } from "../progress-bar/progress-bar";
+import { PlaybackControls } from "../playback-controls/playback-controls";
 
-export function MiniPlayerWeb() {
+export function MiniPlayer() {
   const {
     currentTrack,
     isPlaying,
@@ -41,7 +41,7 @@ export function MiniPlayerWeb() {
         backgroundColor: "#fafafa",
       }}
     >
-      <ProgressBarWeb progressPercent={progressPercent} onSeek={handleSeek} />
+      <ProgressBar progressPercent={progressPercent} onSeek={handleSeek} />
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <p
@@ -74,7 +74,7 @@ export function MiniPlayerWeb() {
         <span style={{ fontSize: 12, color: "#999", whiteSpace: "nowrap" }}>
           {formatTime(positionSeconds)} / {formatTime(durationSeconds)}
         </span>
-        <PlaybackControlsWeb
+        <PlaybackControls
           isPlaying={isPlaying}
           isLoading={isLoading}
           onPlayPause={handlePlayPause}

@@ -1,6 +1,6 @@
 "use client";
 
-export function TermsOfUseDesktopWebScreen() {
+export function TermsOfUseDesktopScreen() {
   return (
     <div style={{ maxWidth: 720, margin: "0 auto", padding: "32px 16px" }}>
       <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 24 }}>Terms of Use</h1>

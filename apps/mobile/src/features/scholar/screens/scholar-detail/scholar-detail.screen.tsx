@@ -1,41 +1,41 @@
 import { View, ScrollView } from "react-native";
-import { ScreenViewMobileNative } from "../../../../shared/components/ScreenView/ScreenView";
+import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 import { AppText } from "../../../../shared/components/AppText/AppText";
 import { useScholarDetailScreen } from "@sd/domain-content";
-import { ScholarHeaderNative } from "../../components/scholar-header/scholar-header";
-import { ScholarContentListNative } from "../../components/scholar-content-list/scholar-content-list";
+import { ScholarHeader } from "../../components/scholar-header/scholar-header";
+import { ScholarContentList } from "../../components/scholar-content-list/scholar-content-list";
 
-export type ScholarDetailMobileNativeScreenProps = {
+export type ScholarDetailScreenProps = {
   slug: string;
 };
 
-export function ScholarDetailMobileNativeScreen({ slug }: ScholarDetailMobileNativeScreenProps) {
+export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
   const { scholar, content, isFetching } = useScholarDetailScreen(slug);
 
   if (isFetching) {
     return (
-      <ScreenViewMobileNative center>
+      <ScreenView center>
         <AppText variant="bodyMd">Loading scholar...</AppText>
-      </ScreenViewMobileNative>
+      </ScreenView>
     );
   }
 
   if (!scholar) {
     return (
-      <ScreenViewMobileNative center>
+      <ScreenView center>
         <AppText variant="titleMd">Scholar not found</AppText>
-      </ScreenViewMobileNative>
+      </ScreenView>
     );
   }
 
   return (
-    <ScreenViewMobileNative>
+    <ScreenView>
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingVertical: 16 }}>
-        <ScholarHeaderNative scholar={scholar} />
+        <ScholarHeader scholar={scholar} />
         <View style={{ marginTop: 24 }}>
-          {content && <ScholarContentListNative content={content} />}
+          {content && <ScholarContentList content={content} />}
         </View>
       </ScrollView>
-    </ScreenViewMobileNative>
+    </ScreenView>
   );
 }

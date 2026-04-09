@@ -7,7 +7,7 @@ import {
 } from "@sd/domain-content";
 import { useAuth } from "../../../core/auth/use-auth";
 
-export type LibraryMobileNativeScreenProps = {
+export type LibraryScreenProps = {
   onNavigateToLecture?: (id: string) => void;
 };
 
@@ -76,7 +76,7 @@ type Section = {
   isFetching: boolean;
 };
 
-export function LibraryMobileNativeScreen({ onNavigateToLecture }: LibraryMobileNativeScreenProps) {
+export function LibraryScreen({ onNavigateToLecture }: LibraryScreenProps) {
   const { isAuthenticated } = useAuth();
   const progressData = useLibraryProgressScreen(isAuthenticated);
   const savedData = useLibrarySavedScreen(isAuthenticated);

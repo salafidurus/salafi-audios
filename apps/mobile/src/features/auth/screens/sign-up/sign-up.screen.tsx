@@ -13,8 +13,8 @@ import * as AppleAuthentication from "expo-apple-authentication";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Controller, useForm } from "react-hook-form";
 import { AccentGradientFill } from "../../../../shared/components/AccentGradientFill/AccentGradientFill";
-import { ButtonMobileNative } from "../../../../shared/components/Button/Button";
-import { TextInputMobileNative } from "../../../../shared/components/TextInput/TextInput";
+import { Button } from "../../../../shared/components/Button/Button";
+import { TextInput } from "../../../../shared/components/TextInput/TextInput";
 
 type FormValues = {
   name: string;
@@ -31,7 +31,7 @@ export type SignUpScreenProps = {
   googleButtonSource?: ImageSourcePropType;
 };
 
-export function SignUpMobileNativeScreen({
+export function SignUpScreen({
   onSignUp,
   onSignUpWithGoogle,
   onSignUpWithApple,
@@ -148,7 +148,7 @@ export function SignUpMobileNativeScreen({
           name="name"
           rules={{ required: true }}
           render={({ field: { value, onChange, onBlur } }) => (
-            <TextInputMobileNative
+            <TextInput
               style={styles.input}
               placeholder="Name"
               value={value}
@@ -171,7 +171,7 @@ export function SignUpMobileNativeScreen({
           }}
           render={({ field: { value, onChange, onBlur } }) => (
             <>
-              <TextInputMobileNative
+              <TextInput
                 style={styles.input}
                 invalid={Boolean(errors.email)}
                 placeholder="Email"
@@ -194,7 +194,7 @@ export function SignUpMobileNativeScreen({
           name="password"
           rules={{ required: true }}
           render={({ field: { value, onChange, onBlur } }) => (
-            <TextInputMobileNative
+            <TextInput
               style={styles.input}
               placeholder="Password"
               value={value}
@@ -211,7 +211,7 @@ export function SignUpMobileNativeScreen({
         {loading ? (
           <ActivityIndicator style={styles.loader} />
         ) : (
-          <ButtonMobileNative
+          <Button
             variant="primary"
             size="md"
             label="Create Account"
@@ -337,3 +337,4 @@ const styles = StyleSheet.create((theme) => ({
     marginBottom: theme.spacing.component.gapSm,
   },
 }));
+

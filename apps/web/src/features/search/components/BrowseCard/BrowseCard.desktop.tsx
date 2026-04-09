@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export type BrowseCardDesktopWebProps = {
+export type BrowseCardDesktopProps = {
   name: string;
   onPress?: (name: string) => void;
 };
@@ -15,7 +15,7 @@ const labelStyle = {
   fontWeight: "var(--typo-label-md-font-weight)",
 } as const;
 
-export function BrowseCardDesktopWeb({ name, onPress }: BrowseCardDesktopWebProps) {
+export function BrowseCardDesktop({ name, onPress }: BrowseCardDesktopProps) {
   const [isPressed, setIsPressed] = useState(false);
 
   return (

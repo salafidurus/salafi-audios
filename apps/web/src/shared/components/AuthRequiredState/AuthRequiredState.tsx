@@ -3,14 +3,14 @@
 import { useEffect, useState } from "react";
 import { useResponsive } from "../../hooks/use-responsive";
 import {
-  AuthRequiredStateDesktopWeb,
-  type AuthRequiredStateDesktopWebProps,
+  AuthRequiredStateDesktop,
+  type AuthRequiredStateDesktopProps,
 } from "./AuthRequiredState.desktop";
-import { AuthRequiredStateMobileWeb } from "./AuthRequiredState.mobile";
+import { AuthRequiredStateMobile } from "./AuthRequiredState.mobile";
 
-export type AuthRequiredStateResponsiveProps = AuthRequiredStateDesktopWebProps;
+export type AuthRequiredStateProps = AuthRequiredStateDesktopProps;
 
-export function AuthRequiredStateResponsive(props: AuthRequiredStateResponsiveProps) {
+export function AuthRequiredState(props: AuthRequiredStateProps) {
   const [isHydrated, setIsHydrated] = useState(false);
   const { isMobile, isTablet } = useResponsive();
 
@@ -23,8 +23,8 @@ export function AuthRequiredStateResponsive(props: AuthRequiredStateResponsivePr
   }
 
   if (isMobile || isTablet) {
-    return <AuthRequiredStateMobileWeb {...props} />;
+    return <AuthRequiredStateMobile {...props} />;
   }
 
-  return <AuthRequiredStateDesktopWeb {...props} />;
+  return <AuthRequiredStateDesktop {...props} />;
 }

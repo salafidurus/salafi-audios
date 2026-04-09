@@ -1,12 +1,12 @@
 import { View, Pressable, Text, ActivityIndicator } from "react-native";
 import { useDownload } from "../../hooks/use-download";
 
-type DownloadButtonNativeProps = {
+type DownloadButtonProps = {
   lectureId: string;
   audioUrl: string;
 };
 
-export function DownloadButtonNative({ lectureId }: DownloadButtonNativeProps) {
+export function DownloadButton({ lectureId }: DownloadButtonProps) {
   const { status, isDownloaded, isDownloading, startDownload, removeDownload } =
     useDownload(lectureId);
 

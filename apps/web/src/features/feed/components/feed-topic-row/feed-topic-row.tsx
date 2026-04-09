@@ -2,13 +2,13 @@
 
 import type { ContentSuggestionDto } from "@sd/core-contracts";
 
-export type FeedTopicRowWebProps = {
+export type FeedTopicRowProps = {
   topicName: string;
   items: ContentSuggestionDto[];
   onItemPress?: (slug: string) => void;
 };
 
-export function FeedTopicRowWeb({ topicName, items, onItemPress }: FeedTopicRowWebProps) {
+export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProps) {
   if (!items.length) return null;
 
   return (

@@ -2,7 +2,7 @@
 
 import type { ScholarDetailDto } from "@sd/core-contracts";
 
-export type ScholarHeaderWebProps = {
+export type ScholarHeaderProps = {
   scholar: ScholarDetailDto & {
     lectureCount: number;
     seriesCount: number;
@@ -10,7 +10,7 @@ export type ScholarHeaderWebProps = {
   };
 };
 
-export function ScholarHeaderWeb({ scholar }: ScholarHeaderWebProps) {
+export function ScholarHeader({ scholar }: ScholarHeaderProps) {
   const totalHours = Math.round(scholar.totalDurationSeconds / 3600);
 
   return (

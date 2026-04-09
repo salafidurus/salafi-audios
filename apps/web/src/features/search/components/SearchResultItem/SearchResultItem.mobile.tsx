@@ -7,7 +7,7 @@ import { Pressable } from "react-native-unistyles/components/native/Pressable";
 import { Text } from "react-native-unistyles/components/native/Text";
 import { View } from "react-native-unistyles/components/native/View";
 import { Headphones, Clock } from "lucide-react";
-import { MarqueeTextMobileWeb } from "../MarqueeText/MarqueeText.mobile";
+import { MarqueeTextMobile } from "../MarqueeText/MarqueeText.mobile";
 
 export type SearchResultItemProps = {
   title: string;
@@ -18,16 +18,16 @@ export type SearchResultItemProps = {
   onPress?: () => void;
 };
 
-export type SearchResultItemMobileWebProps = SearchResultItemProps;
+export type SearchResultItemMobileProps = SearchResultItemProps;
 
-export function SearchResultItemMobileWeb({
+export function SearchResultItemMobile({
   title,
   scholarName,
   imageUrl,
   lectureCount,
   durationSeconds,
   onPress,
-}: SearchResultItemMobileWebProps) {
+}: SearchResultItemMobileProps) {
   const { theme } = useUnistyles();
   const [isPressed, setIsPressed] = useState(false);
   const durationLabel = formatDuration(durationSeconds);
@@ -60,8 +60,8 @@ export function SearchResultItemMobileWeb({
         )}
       </View>
       <View style={styles.body}>
-        <MarqueeTextMobileWeb text={title} textStyle={styles.title} />
-        <MarqueeTextMobileWeb text={scholarName} textStyle={styles.scholarName} />
+        <MarqueeTextMobile text={title} textStyle={styles.title} />
+        <MarqueeTextMobile text={scholarName} textStyle={styles.scholarName} />
         <View style={styles.metaRow}>
           <Headphones size={11} color={theme.colors.content.muted} />
           <Text style={styles.metaText}>{formatLectureCount(lectureCount)}</Text>

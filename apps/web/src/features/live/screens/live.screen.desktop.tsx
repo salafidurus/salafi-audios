@@ -4,10 +4,10 @@ import { ScreenView } from "../../../shared/components/ScreenView/ScreenView";
 import { AppText } from "../../../shared/components/AppText/AppText";
 import type { LiveSessionPublicDto } from "@sd/core-contracts";
 import { useLiveSessions } from "@sd/domain-live";
-import { LiveSessionCardWeb } from "../components/live-session-card/live-session-card";
+import { LiveSessionCard } from "../components/live-session-card/live-session-card";
 import styles from "./live.screen.module.css";
 
-export type LiveDesktopWebScreenProps = Record<string, never>;
+export type LiveDesktopScreenProps = Record<string, never>;
 
 function Section({
   title,
@@ -34,7 +34,7 @@ function Section({
       ) : (
         <div className={styles.cardList}>
           {sessions.map((s) => (
-            <LiveSessionCardWeb key={s.id} session={s} />
+            <LiveSessionCard key={s.id} session={s} />
           ))}
         </div>
       )}
@@ -42,7 +42,7 @@ function Section({
   );
 }
 
-export function LiveDesktopWebScreen(_props: LiveDesktopWebScreenProps) {
+export function LiveDesktopScreen(_props: LiveDesktopScreenProps) {
   const { active, upcoming, ended } = useLiveSessions();
 
   return (

@@ -6,12 +6,12 @@ import { StyleSheet } from "react-native-unistyles";
 import { Text } from "react-native-unistyles/components/native/Text";
 import { View } from "react-native-unistyles/components/native/View";
 
-export type MarqueeTextMobileWebProps = {
+export type MarqueeTextMobileProps = {
   text: string;
   textStyle?: StyleProp<TextStyle>;
 };
 
-export function MarqueeTextMobileWeb({ text, textStyle }: MarqueeTextMobileWebProps) {
+export function MarqueeTextMobile({ text, textStyle }: MarqueeTextMobileProps) {
   const containerRef = useRef<any>(null);
   const textRef = useRef<any>(null);
   const animRef = useRef<Animation | null>(null);

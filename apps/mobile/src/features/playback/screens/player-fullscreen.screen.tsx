@@ -1,13 +1,13 @@
 import { View, Text, TouchableOpacity, SafeAreaView } from "react-native";
 import { usePlayback } from "@sd/domain-playback";
-import { ProgressBarNative } from "../components/progress-bar/progress-bar";
-import { PlaybackControlsNative } from "../components/playback-controls/playback-controls";
+import { ProgressBar } from "../components/progress-bar/progress-bar";
+import { PlaybackControls } from "../components/playback-controls/playback-controls";
 
-export type PlayerFullscreenNativeScreenProps = {
+export type PlayerFullscreenScreenProps = {
   onClose?: () => void;
 };
 
-export function PlayerFullscreenNativeScreen({ onClose }: PlayerFullscreenNativeScreenProps) {
+export function PlayerFullscreenScreen({ onClose }: PlayerFullscreenScreenProps) {
   const {
     currentTrack,
     isPlaying,
@@ -70,7 +70,7 @@ export function PlayerFullscreenNativeScreen({ onClose }: PlayerFullscreenNative
 
         {/* Progress & controls */}
         <View style={{ gap: 16, paddingBottom: 32 }}>
-          <ProgressBarNative progressPercent={progressPercent} />
+          <ProgressBar progressPercent={progressPercent} />
           <View
             style={{
               flexDirection: "row",
@@ -82,7 +82,7 @@ export function PlayerFullscreenNativeScreen({ onClose }: PlayerFullscreenNative
             <Text style={{ fontSize: 12, color: "#999" }}>{formatTime(durationSeconds)}</Text>
           </View>
           <View style={{ alignItems: "center" }}>
-            <PlaybackControlsNative
+            <PlaybackControls
               isPlaying={isPlaying}
               isLoading={isLoading}
               onPlayPause={handlePlayPause}

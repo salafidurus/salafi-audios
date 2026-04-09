@@ -2,12 +2,12 @@ import { View, Text, Pressable } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import type { SeriesContextDto } from "@sd/core-contracts";
 
-export type SeriesContextBarNativeProps = {
+export type SeriesContextBarProps = {
   seriesContext: SeriesContextDto;
   onNavigate?: (lectureId: string) => void;
 };
 
-export function SeriesContextBarNative({ seriesContext, onNavigate }: SeriesContextBarNativeProps) {
+export function SeriesContextBar({ seriesContext, onNavigate }: SeriesContextBarProps) {
   const { theme } = useUnistyles();
 
   return (

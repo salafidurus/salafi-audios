@@ -2,10 +2,10 @@
 
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { LiveSessionDeltaDto } from "@sd/core-contracts";
-import { ScreenViewWeb } from "../../../../shared/components/ScreenView/ScreenView";
+import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 import { updateLiveSessionStatus } from "../../api/admin.api";
 
-export function AdminLivestreamsDesktopWebScreen() {
+export function AdminLivestreamsDesktopScreen() {
   const {
     data: activeData,
     isFetching: loadingActive,
@@ -41,9 +41,9 @@ export function AdminLivestreamsDesktopWebScreen() {
 
   if (loadingActive || loadingScheduled || loadingEnded) {
     return (
-      <ScreenViewWeb>
+      <ScreenView>
         <div style={{ textAlign: "center" }}>Loading live sessions...</div>
-      </ScreenViewWeb>
+      </ScreenView>
     );
   }
 
@@ -134,7 +134,7 @@ export function AdminLivestreamsDesktopWebScreen() {
   );
 
   return (
-    <ScreenViewWeb>
+    <ScreenView>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 24 }}>Manage Livestreams</h1>
 
@@ -186,6 +186,6 @@ export function AdminLivestreamsDesktopWebScreen() {
           <tbody>{ended.map(renderSession)}</tbody>
         </table>
       </div>
-    </ScreenViewWeb>
+    </ScreenView>
   );
 }

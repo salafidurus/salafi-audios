@@ -9,7 +9,7 @@ import {
   type AdminPermissionsListResponse,
 } from "../../api/admin.api";
 
-export function AdminPermissionsMobileWebScreen() {
+export function AdminPermissionsMobileScreen() {
   const [userId, setUserId] = useState("");
   const [userPerms, setUserPerms] = useState<AdminPermissionsListResponse | null>(null);
   const [loading, setLoading] = useState(false);

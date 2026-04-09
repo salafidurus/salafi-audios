@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { useAuth } from "../../../core/auth";
-import { FeedFollowingMobileNativeScreen } from "../../../features/feed/screens/feed-following.screen";
-import { AuthRequiredStateMobileNative } from "../../../shared/components/AuthRequiredState/AuthRequiredState";
+import { FeedFollowingScreen } from "../../../features/feed/screens/feed-following.screen";
+import { AuthRequiredState } from "../../../shared/components/AuthRequiredState/AuthRequiredState";
 import { routes } from "@sd/core-contracts";
 
 export default function FeedFollowing() {
@@ -12,7 +12,7 @@ export default function FeedFollowing() {
 
   if (!isAuthenticated) {
     return (
-      <AuthRequiredStateMobileNative
+      <AuthRequiredState
         title="Sign in to see content from scholars you follow"
         description="Follow your favourite scholars to get personalised content in your feed."
         onPress={() => router.push(routes.signIn)}
@@ -20,5 +20,5 @@ export default function FeedFollowing() {
     );
   }
 
-  return <FeedFollowingMobileNativeScreen />;
+  return <FeedFollowingScreen />;
 }

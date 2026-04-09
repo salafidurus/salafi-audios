@@ -1,7 +1,7 @@
 "use client";
 
 import type { AdminPermission } from "@sd/core-contracts";
-import { ScreenViewWeb } from "../../../../shared/components/ScreenView/ScreenView";
+import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 import { useAdminPermissions } from "../../hooks/use-admin-permissions";
 
 type AdminSection = {
@@ -38,14 +38,14 @@ const ADMIN_SECTIONS: AdminSection[] = [
   },
 ];
 
-export function AdminDashboardMobileWebScreen() {
+export function AdminDashboardMobileScreen() {
   const { data, isFetching } = useAdminPermissions();
 
   if (isFetching) {
     return (
-      <ScreenViewWeb>
+      <ScreenView>
         <div style={{ textAlign: "center" }}>Loading...</div>
-      </ScreenViewWeb>
+      </ScreenView>
     );
   }
 
@@ -53,7 +53,7 @@ export function AdminDashboardMobileWebScreen() {
   const visibleSections = ADMIN_SECTIONS.filter((s) => permissions.includes(s.permission));
 
   return (
-    <ScreenViewWeb>
+    <ScreenView>
       <div>
         <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 16 }}>Admin</h1>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -77,6 +77,6 @@ export function AdminDashboardMobileWebScreen() {
         </div>
         {visibleSections.length === 0 && <p style={{ color: "#999" }}>No admin permissions.</p>}
       </div>
-    </ScreenViewWeb>
+    </ScreenView>
   );
 }

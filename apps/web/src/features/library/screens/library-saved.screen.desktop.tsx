@@ -109,13 +109,13 @@ function SectionList({
   );
 }
 
-export type LibrarySavedDesktopWebScreenProps = {
+export type LibrarySavedDesktopScreenProps = {
   onNavigateToLecture?: (id: string) => void;
 };
 
-export function LibrarySavedDesktopWebScreen({
+export function LibrarySavedDesktopScreen({
   onNavigateToLecture,
-}: LibrarySavedDesktopWebScreenProps) {
+}: LibrarySavedDesktopScreenProps) {
   const { isAuthenticated } = useAuth();
   const progressData = useLibraryProgressScreen(isAuthenticated);
   const savedData = useLibrarySavedScreen(isAuthenticated);

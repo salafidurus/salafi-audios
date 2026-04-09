@@ -13,8 +13,8 @@ import * as AppleAuthentication from "expo-apple-authentication";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { Controller, useForm } from "react-hook-form";
 import { AccentGradientFill } from "../../../../shared/components/AccentGradientFill/AccentGradientFill";
-import { ButtonMobileNative } from "../../../../shared/components/Button/Button";
-import { TextInputMobileNative } from "../../../../shared/components/TextInput/TextInput";
+import { Button } from "../../../../shared/components/Button/Button";
+import { TextInput } from "../../../../shared/components/TextInput/TextInput";
 
 type FormValues = {
   email: string;
@@ -30,7 +30,7 @@ export type SignInScreenProps = {
   googleButtonSource?: ImageSourcePropType;
 };
 
-export function SignInMobileNativeScreen({
+export function SignInScreen({
   onSignIn,
   onSignInWithGoogle,
   onSignInWithApple,
@@ -133,7 +133,7 @@ export function SignInMobileNativeScreen({
           }}
           render={({ field: { value, onChange, onBlur } }) => (
             <>
-              <TextInputMobileNative
+              <TextInput
                 style={styles.input}
                 invalid={Boolean(errors.email)}
                 placeholder="Email"
@@ -156,7 +156,7 @@ export function SignInMobileNativeScreen({
           name="password"
           rules={{ required: true }}
           render={({ field: { value, onChange, onBlur } }) => (
-            <TextInputMobileNative
+            <TextInput
               style={styles.input}
               placeholder="Password"
               value={value}
@@ -173,7 +173,7 @@ export function SignInMobileNativeScreen({
         {loading ? (
           <ActivityIndicator style={styles.loader} />
         ) : (
-          <ButtonMobileNative
+          <Button
             variant="primary"
             size="md"
             label="Sign In"
@@ -260,3 +260,4 @@ const styles = StyleSheet.create((theme) => ({
     marginBottom: theme.spacing.component.gapSm,
   },
 }));
+

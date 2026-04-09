@@ -28,7 +28,7 @@ export function ScreenView({
   );
 }
 
-export { ScreenView as ScreenViewWeb };
+
 
 function getBackgroundVariant(variant: ScreenViewProps["backgroundVariant"]): React.CSSProperties {
   switch (variant) {

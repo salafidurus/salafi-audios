@@ -5,14 +5,14 @@ import { StyleSheet } from "react-native-unistyles";
 import { AppText } from "../../../../shared/components/AppText/AppText";
 import { useActiveSession } from "@sd/domain-live";
 
-export type CurrentlyLiveIndicatorNativeProps = {
+export type CurrentlyLiveIndicatorProps = {
   /** Show compact version (just the dot and "LIVE") */
   compact?: boolean;
 };
 
-export function CurrentlyLiveIndicatorNative({
+export function CurrentlyLiveIndicator({
   compact = false,
-}: CurrentlyLiveIndicatorNativeProps) {
+}: CurrentlyLiveIndicatorProps) {
   const { activeSession, isLoading } = useActiveSession();
 
   if (isLoading || !activeSession) {

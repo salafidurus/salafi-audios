@@ -2,12 +2,12 @@
 
 import type { FeedContentItemDto } from "@sd/core-contracts";
 
-export type FeedContentCardWebProps = {
+export type FeedContentCardProps = {
   item: FeedContentItemDto;
   onPress?: () => void;
 };
 
-export function FeedContentCardWeb({ item, onPress }: FeedContentCardWebProps) {
+export function FeedContentCard({ item, onPress }: FeedContentCardProps) {
   return (
     <div
       role="button"

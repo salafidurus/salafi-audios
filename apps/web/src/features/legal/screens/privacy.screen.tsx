@@ -1,9 +1,9 @@
 "use client";
 
 import { Responsive } from "@/shared/components/Responsive";
-import { PrivacyDesktopWebScreen } from "./privacy.screen.desktop";
-import { PrivacyMobileWebScreen } from "./privacy.screen.mobile";
+import { PrivacyDesktopScreen } from "./privacy.screen.desktop";
+import { PrivacyMobileScreen } from "./privacy.screen.mobile";
 
 export function PrivacyScreen() {
-  return <Responsive mobile={<PrivacyMobileWebScreen />} desktop={<PrivacyDesktopWebScreen />} />;
+  return <Responsive mobile={<PrivacyMobileScreen />} desktop={<PrivacyDesktopScreen />} />;
 }

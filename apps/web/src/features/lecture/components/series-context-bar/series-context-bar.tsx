@@ -3,12 +3,12 @@
 import type { SeriesContextDto } from "@sd/core-contracts";
 import { AppText } from "../../../../shared/components/AppText/AppText";
 
-export type SeriesContextBarWebProps = {
+export type SeriesContextBarProps = {
   seriesContext: SeriesContextDto;
   onNavigate?: (lectureId: string) => void;
 };
 
-export function SeriesContextBarWeb({ seriesContext, onNavigate }: SeriesContextBarWebProps) {
+export function SeriesContextBar({ seriesContext, onNavigate }: SeriesContextBarProps) {
   return (
     <div
       style={{

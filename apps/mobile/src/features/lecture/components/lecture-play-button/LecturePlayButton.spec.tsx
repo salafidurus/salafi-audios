@@ -1,13 +1,13 @@
 import { render, screen, fireEvent } from "@testing-library/react-native";
 import type { LectureDetailDto } from "@sd/core-contracts";
-import { LecturePlayButtonNative } from "./LecturePlayButton";
+import { LecturePlayButton } from "./LecturePlayButton";
 
 jest.mock("@sd/domain-playback", () => ({
   usePlayback: jest.fn(),
 }));
 
 jest.mock("../../../../shared/components/Button/Button", () => ({
-  ButtonMobileNative: ({ label, onPress }: { label: string; onPress: () => void }) => {
+  Button: ({ label, onPress }: { label: string; onPress: () => void }) => {
     const { TouchableOpacity, Text } = require("react-native");
     return (
       <TouchableOpacity onPress={onPress}>
@@ -74,3 +74,4 @@ describe("LecturePlayButton", () => {
     });
   });
 });
+

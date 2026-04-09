@@ -2,8 +2,8 @@ import { type CSSProperties } from "react";
 import React from "react";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { View } from "react-native-unistyles/components/native/View";
-import { SearchResultEmptyMobileWeb } from "../SearchResultEmpty/SearchResultEmpty.mobile";
-import { useDragScrollWeb } from "../../../../shared/hooks/use-drag-scroll";
+import { SearchResultEmptyMobile } from "../SearchResultEmpty/SearchResultEmpty.mobile";
+import { useDragScroll } from "../../../../shared/hooks/use-drag-scroll";
 
 export type SearchResultRow = {
   id: string;
@@ -22,17 +22,17 @@ export type SearchResultsListProps = {
   renderItem: (item: SearchResultRow) => React.ReactElement | null;
 };
 
-export type SearchResultsListMobileWebProps = SearchResultsListProps;
+export type SearchResultsListMobileProps = SearchResultsListProps;
 
-export function SearchResultsListMobileWeb({
+export function SearchResultsListMobile({
   items,
   isFetching,
   shouldSearch,
   errorMessage,
   renderItem,
-}: SearchResultsListMobileWebProps) {
+}: SearchResultsListMobileProps) {
   const { theme } = useUnistyles();
-  const scrollRef = useDragScrollWeb("vertical");
+  const scrollRef = useDragScroll("vertical");
 
   return (
     <div
@@ -49,7 +49,7 @@ export function SearchResultsListMobileWeb({
     >
       <div style={{ paddingBottom: theme.spacing.layout.pageY }}>
         {items.length === 0 ? (
-          <SearchResultEmptyMobileWeb
+          <SearchResultEmptyMobile
             shouldSearch={shouldSearch}
             isFetching={isFetching}
             errorMessage={errorMessage}

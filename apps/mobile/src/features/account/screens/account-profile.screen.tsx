@@ -1,11 +1,11 @@
 import { View, Text, TextInput, ScrollView } from "react-native";
 import { useAccountScreen } from "@sd/domain-account";
 
-export type AccountProfileMobileNativeScreenProps = {
+export type AccountProfileScreenProps = {
   onBack?: () => void;
 };
 
-export function AccountProfileMobileNativeScreen({}: AccountProfileMobileNativeScreenProps) {
+export function AccountProfileScreen({}: AccountProfileScreenProps) {
   const { profile, isFetching } = useAccountScreen();
 
   if (isFetching) {

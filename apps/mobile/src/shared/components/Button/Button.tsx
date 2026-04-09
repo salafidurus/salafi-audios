@@ -38,7 +38,7 @@ export function Button({
   onPressOut,
   style,
   ...props
-}: ButtonMobileNativeProps) {
+}: ButtonProps) {
   const { theme } = useUnistyles();
   const [isPressed, setIsPressed] = useState(false);
 

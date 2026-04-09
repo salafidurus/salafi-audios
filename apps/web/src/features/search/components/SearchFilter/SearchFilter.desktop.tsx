@@ -3,7 +3,7 @@
 import clsx from "clsx";
 import { useMemo } from "react";
 import type { TopicDetailDto } from "@sd/core-contracts";
-import { useDragScrollWeb } from "../../../../shared/hooks/use-drag-scroll";
+import { useDragScroll } from "../../../../shared/hooks/use-drag-scroll";
 
 const chipStyle = {
   fontFamily: "var(--typo-label-md-font-family)",
@@ -20,15 +20,15 @@ const chipInactive =
 const chipActive =
   "border-[var(--accent-primary-subtle-border)] bg-[var(--accent-primary-subtle-surface)] text-[var(--accent-primary-subtle-fg)]";
 
-export type SearchFilterDesktopWebProps = {
+export type SearchFilterDesktopProps = {
   value: string[];
   onChange: (value: string[]) => void;
   topics: TopicDetailDto[];
 };
 
-export function SearchFilterDesktopWeb({ value, onChange, topics }: SearchFilterDesktopWebProps) {
+export function SearchFilterDesktop({ value, onChange, topics }: SearchFilterDesktopProps) {
   const isAllActive = value.length === 0;
-  const scrollRef = useDragScrollWeb("horizontal");
+  const scrollRef = useDragScroll("horizontal");
   const sortedTopics = useMemo(
     () => [...topics].sort((a, b) => a.name.localeCompare(b.name)),
     [topics],

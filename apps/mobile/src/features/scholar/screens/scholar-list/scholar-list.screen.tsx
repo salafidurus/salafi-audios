@@ -1,30 +1,30 @@
 import { View, Text, FlatList } from "react-native";
-import { ScreenViewMobileNative } from "../../../../shared/components/ScreenView/ScreenView";
+import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 import { AppText } from "../../../../shared/components/AppText/AppText";
 import { useScholarsList } from "@sd/domain-content";
-import { ScholarCardNative } from "../../components/scholar-card/scholar-card";
+import { ScholarCard } from "../../components/scholar-card/scholar-card";
 import type { ScholarListItemDto } from "@sd/core-contracts";
 
-export type ScholarListMobileNativeScreenProps = {
+export type ScholarListScreenProps = {
   onSelectScholar?: (slug: string) => void;
 };
 
-export function ScholarListMobileNativeScreen({
+export function ScholarListScreen({
   onSelectScholar,
-}: ScholarListMobileNativeScreenProps) {
+}: ScholarListScreenProps) {
   const { data, isFetching } = useScholarsList();
   const scholars = data?.scholars ?? [];
 
   if (isFetching && scholars.length === 0) {
     return (
-      <ScreenViewMobileNative center>
+      <ScreenView center>
         <AppText variant="bodyMd">Loading scholars...</AppText>
-      </ScreenViewMobileNative>
+      </ScreenView>
     );
   }
 
   return (
-    <ScreenViewMobileNative>
+    <ScreenView>
       <View style={{ flex: 1 }}>
         <Text style={{ fontSize: 22, fontWeight: "700", marginBottom: 16, paddingHorizontal: 16 }}>
           Scholars
@@ -40,12 +40,12 @@ export function ScholarListMobileNativeScreen({
             columnWrapperStyle={{ gap: 12, marginBottom: 12 }}
             renderItem={({ item }: { item: ScholarListItemDto }) => (
               <View style={{ flex: 1 }}>
-                <ScholarCardNative scholar={item} onPress={onSelectScholar} />
+                <ScholarCard scholar={item} onPress={onSelectScholar} />
               </View>
             )}
           />
         )}
       </View>
-    </ScreenViewMobileNative>
+    </ScreenView>
   );
 }

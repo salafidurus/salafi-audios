@@ -1,6 +1,6 @@
 "use client";
 
-export type SearchResultEmptyDesktopWebProps = {
+export type SearchResultEmptyDesktopProps = {
   shouldSearch: boolean;
   isFetching: boolean;
   errorMessage?: string;
@@ -13,11 +13,11 @@ const bodyStyle = {
   letterSpacing: "var(--typo-body-md-letter-spacing)",
 } as const;
 
-export function SearchResultEmptyDesktopWeb({
+export function SearchResultEmptyDesktop({
   shouldSearch,
   isFetching,
   errorMessage,
-}: SearchResultEmptyDesktopWebProps) {
+}: SearchResultEmptyDesktopProps) {
   const message = shouldSearch
     ? errorMessage
       ? errorMessage

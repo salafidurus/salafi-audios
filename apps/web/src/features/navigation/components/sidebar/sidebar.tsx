@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useResponsive } from "../../../../shared/hooks/use-responsive";
-import { SidebarWeb } from "./sidebar.desktop";
+import { Sidebar as SidebarDesktop } from "./sidebar.desktop";
 import { SidebarTablet } from "./sidebar.tablet";
 import { SidebarMobile } from "./sidebar.mobile";
 
@@ -20,5 +20,5 @@ export function Sidebar() {
 
   if (isMobile) return <SidebarMobile />;
   if (isTablet) return <SidebarTablet />;
-  return <SidebarWeb />;
+  return <SidebarDesktop />;
 }

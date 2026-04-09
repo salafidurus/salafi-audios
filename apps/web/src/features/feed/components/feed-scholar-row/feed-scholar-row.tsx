@@ -2,12 +2,12 @@
 
 import type { ScholarChipDto } from "@sd/core-contracts";
 
-export type FeedScholarRowWebProps = {
+export type FeedScholarRowProps = {
   scholars: ScholarChipDto[];
   onScholarPress?: (slug: string) => void;
 };
 
-export function FeedScholarRowWeb({ scholars, onScholarPress }: FeedScholarRowWebProps) {
+export function FeedScholarRow({ scholars, onScholarPress }: FeedScholarRowProps) {
   return (
     <div style={{ padding: "12px 0" }}>
       <div

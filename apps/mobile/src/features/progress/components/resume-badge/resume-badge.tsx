@@ -1,11 +1,11 @@
 import { Text, View } from "react-native";
 import { useLectureProgress } from "@sd/domain-progress";
 
-type ResumeBadgeNativeProps = {
+type ResumeBadgeProps = {
   lectureId: string;
 };
 
-export function ResumeBadgeNative({ lectureId }: ResumeBadgeNativeProps) {
+export function ResumeBadge({ lectureId }: ResumeBadgeProps) {
   const { resumePositionSeconds, isCompleted, progressPercent } = useLectureProgress(lectureId);
 
   if (isCompleted) {

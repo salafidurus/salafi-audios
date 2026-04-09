@@ -2,13 +2,13 @@
 
 import { useEffect, useRef } from "react";
 
-export type MarqueeTextDesktopWebProps = {
+export type MarqueeTextDesktopProps = {
   text: string;
   className?: string;
   style?: React.CSSProperties;
 };
 
-export function MarqueeTextDesktopWeb({ text, className, style }: MarqueeTextDesktopWebProps) {
+export function MarqueeTextDesktop({ text, className, style }: MarqueeTextDesktopProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
   const animationRef = useRef<Animation | null>(null);

@@ -5,7 +5,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { themeCss } from "./theme-css";
 
-import { UnistylesStyleDesktopWeb } from "../core/styles/UnistylesStyle";
+import { UnistylesStyleDesktop } from "../core/styles/UnistylesStyle";
 import { Providers } from "../core/providers";
 
 const fraunces = localFont({
@@ -144,9 +144,9 @@ export default function RootLayout({
           <Script src="https://www.vexo.co/analytics.js" strategy="afterInteractive" />
         ) : null}
         <style>{themeCss}</style>
-        <UnistylesStyleDesktopWeb>
+        <UnistylesStyleDesktop>
           <Providers apiBaseUrl={apiBaseUrl}>{children}</Providers>
-        </UnistylesStyleDesktopWeb>
+        </UnistylesStyleDesktop>
       </body>
     </html>
   );

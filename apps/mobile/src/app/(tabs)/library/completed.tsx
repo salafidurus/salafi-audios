@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { useAuth } from "../../../core/auth";
-import { LibraryCompletedMobileNativeScreen } from "../../../features/library/screens/library-completed.screen";
-import { AuthRequiredStateMobileNative } from "../../../shared/components/AuthRequiredState/AuthRequiredState";
+import { LibraryCompletedScreen } from "../../../features/library/screens/library-completed.screen";
+import { AuthRequiredState } from "../../../shared/components/AuthRequiredState/AuthRequiredState";
 import { routes } from "@sd/core-contracts";
 
 export default function LibraryCompleted() {
@@ -14,7 +14,7 @@ export default function LibraryCompleted() {
 
   if (!isAuthenticated) {
     return (
-      <AuthRequiredStateMobileNative
+      <AuthRequiredState
         title="Sign in to access your library"
         description="Your saved, started, and completed listening lives in your personal library."
         onPress={() => router.push(routes.signIn)}
@@ -22,5 +22,5 @@ export default function LibraryCompleted() {
     );
   }
 
-  return <LibraryCompletedMobileNativeScreen />;
+  return <LibraryCompletedScreen />;
 }

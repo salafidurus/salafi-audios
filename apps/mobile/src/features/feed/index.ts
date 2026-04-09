@@ -1,24 +1,24 @@
 // Components
 export {
-  FeedContentCardNative,
-  type FeedContentCardNativeProps,
+  FeedContentCard,
+  type FeedContentCardProps,
 } from "./components/feed-content-card/feed-content-card";
 export {
-  FeedScholarRowNative,
-  type FeedScholarRowNativeProps,
+  FeedScholarRow,
+  type FeedScholarRowProps,
 } from "./components/feed-scholar-row/feed-scholar-row";
 export {
-  FeedTopicRowNative,
-  type FeedTopicRowNativeProps,
+  FeedTopicRow,
+  type FeedTopicRowProps,
 } from "./components/feed-topic-row/feed-topic-row";
 
 // Screens
-export { FeedMobileNativeScreen, type FeedMobileNativeScreenProps } from "./screens/feed.screen";
+export { FeedScreen, type FeedScreenProps } from "./screens/feed.screen";
 export {
-  FeedRecentMobileNativeScreen,
-  type FeedRecentMobileNativeScreenProps,
+  FeedRecentScreen,
+  type FeedRecentScreenProps,
 } from "./screens/feed-recent.screen";
 export {
-  FeedFollowingMobileNativeScreen,
-  type FeedFollowingMobileNativeScreenProps,
+  FeedFollowingScreen,
+  type FeedFollowingScreenProps,
 } from "./screens/feed-following.screen";

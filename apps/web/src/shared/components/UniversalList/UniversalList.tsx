@@ -33,5 +33,4 @@ export function UniversalList<TItem>({
   );
 }
 
-export { UniversalList as UniversalListWeb };
-export type { UniversalListProps as UniversalListWebProps };
+

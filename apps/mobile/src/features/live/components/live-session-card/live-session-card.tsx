@@ -3,11 +3,11 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { AppText } from "../../../../shared/components/AppText/AppText";
 import type { LiveSessionPublicDto } from "@sd/core-contracts";
 
-export type LiveSessionCardNativeProps = {
+export type LiveSessionCardProps = {
   session: LiveSessionPublicDto;
 };
 
-export function LiveSessionCardNative({ session }: LiveSessionCardNativeProps) {
+export function LiveSessionCard({ session }: LiveSessionCardProps) {
   const { theme } = useUnistyles();
 
   const handlePress = () => {

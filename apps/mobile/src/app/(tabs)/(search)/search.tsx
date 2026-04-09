@@ -1,4 +1,4 @@
-import { SearchProcessingMobileNativeScreen } from "../../../features/search/screens/search-processing/search-processing.screen";
+import { SearchProcessingScreen } from "../../../features/search/screens/search-processing/search-processing.screen";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { routes } from "@sd/core-contracts";
 
@@ -7,7 +7,7 @@ export default function SearchRoute() {
   const { searchKey } = useLocalSearchParams<{ searchKey?: string }>();
 
   return (
-    <SearchProcessingMobileNativeScreen
+    <SearchProcessingScreen
       prefill={searchKey}
       onBackPress={() => {
         if (router.canGoBack()) {

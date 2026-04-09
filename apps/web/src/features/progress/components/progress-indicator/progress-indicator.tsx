@@ -2,12 +2,12 @@
 
 import { useLectureProgress } from "@sd/domain-progress";
 
-type ProgressIndicatorWebProps = {
+type ProgressIndicatorProps = {
   lectureId: string;
   size?: number;
 };
 
-export function ProgressIndicatorWeb({ lectureId, size = 32 }: ProgressIndicatorWebProps) {
+export function ProgressIndicator({ lectureId, size = 32 }: ProgressIndicatorProps) {
   const { progressPercent, isCompleted } = useLectureProgress(lectureId);
 
   if (progressPercent === 0 && !isCompleted) return null;

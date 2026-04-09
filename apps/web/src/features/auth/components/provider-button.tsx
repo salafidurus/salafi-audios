@@ -5,7 +5,7 @@ import { useEffect, useState, type CSSProperties } from "react";
 type Provider = "apple" | "google";
 type ThemeMode = "light" | "dark";
 
-export type AuthProviderButtonWebProps = {
+export type AuthProviderButtonProps = {
   provider: Provider;
   onClick?: () => void;
   disabled?: boolean;
@@ -24,11 +24,11 @@ const providerConfig = {
   },
 } as const;
 
-export function AuthProviderButtonWeb({
+export function AuthProviderButton({
   provider,
   onClick,
   disabled = false,
-}: AuthProviderButtonWebProps) {
+}: AuthProviderButtonProps) {
   const [themeMode, setThemeMode] = useState<ThemeMode>("light");
   const config = providerConfig[provider];
   const themeConfig = getProviderThemeConfig(provider, themeMode);

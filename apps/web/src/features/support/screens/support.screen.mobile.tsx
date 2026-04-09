@@ -37,7 +37,7 @@ const SUPPORT_SECTIONS = [
   },
 ];
 
-export function SupportMobileWebScreen() {
+export function SupportMobileScreen() {
   return (
     <div style={{ padding: "16px 12px" }}>
       <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 16 }}>Support</h1>

@@ -2,17 +2,17 @@
 
 import { useAccountScreen } from "@sd/domain-account";
 
-export type AccountMobileWebScreenProps = {
+export type AccountMobileScreenProps = {
   onNavigateToProfile?: () => void;
   onNavigateToLegal?: () => void;
   onSignOut?: () => void;
 };
 
-export function AccountMobileWebScreen({
+export function AccountMobileScreen({
   onNavigateToProfile,
   onNavigateToLegal,
   onSignOut,
-}: AccountMobileWebScreenProps) {
+}: AccountMobileScreenProps) {
   const { profile, isFetching } = useAccountScreen();
 
   if (isFetching) {

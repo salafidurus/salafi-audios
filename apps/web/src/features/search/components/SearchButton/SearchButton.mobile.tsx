@@ -8,15 +8,15 @@ import { Text } from "react-native-unistyles/components/native/Text";
 import { View } from "react-native-unistyles/components/native/View";
 import { AccentGradientFill } from "../../../../shared/components/AccentGradientFill/AccentGradientFill";
 
-export type SearchButtonMobileWebProps = {
+export type SearchButtonMobileProps = {
   placeholder?: string;
   onPress?: () => void;
 };
 
-export function SearchButtonMobileWeb({
+export function SearchButtonMobile({
   placeholder = "Search...",
   onPress,
-}: SearchButtonMobileWebProps) {
+}: SearchButtonMobileProps) {
   const { theme } = useUnistyles();
   const [isPressed, setIsPressed] = useState(false);
   const recipe = theme.recipes.primarySubtleSurface;

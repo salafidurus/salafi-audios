@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { TextInputWeb } from "../../../../shared/components/TextInput/TextInput";
-import { AuthProviderButtonWeb } from "../../components/provider-button";
+import { TextInput } from "../../../../shared/components/TextInput/TextInput";
+import { AuthProviderButton } from "../../components/provider-button";
 
 type FormValues = {
   email: string;
@@ -17,7 +17,7 @@ export type SignInScreenProps = {
   onNavigateToSignUp: () => void;
 };
 
-export function SignInMobileWebScreen({
+export function SignInMobileScreen({
   onSignIn,
   onSignInWithGoogle,
   onSignInWithApple,
@@ -62,8 +62,8 @@ export function SignInMobileWebScreen({
         <h1 style={titleStyle}>Sign In</h1>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <AuthProviderButtonWeb provider="apple" onClick={onSignInWithApple} />
-          <AuthProviderButtonWeb provider="google" onClick={onSignInWithGoogle} />
+          <AuthProviderButton provider="apple" onClick={onSignInWithApple} />
+          <AuthProviderButton provider="google" onClick={onSignInWithGoogle} />
         </div>
 
         <div style={dividerStyle}>
@@ -78,7 +78,7 @@ export function SignInMobileWebScreen({
           style={{ display: "flex", flexDirection: "column", gap: 12 }}
         >
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <TextInputWeb
+            <TextInput
               type="email"
               placeholder="Email"
               autoComplete="email"
@@ -91,7 +91,7 @@ export function SignInMobileWebScreen({
             />
             {errors.email?.message && <p style={fieldErrorStyle}>{errors.email.message}</p>}
           </div>
-          <TextInputWeb
+          <TextInput
             type="password"
             placeholder="Password"
             autoComplete="current-password"

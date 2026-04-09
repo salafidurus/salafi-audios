@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useResponsive } from "../../../../shared/hooks/use-responsive";
-import { TopAuthStripWeb } from "./top-auth-strip.desktop";
+import { TopAuthStrip as TopAuthStripDesktop } from "./top-auth-strip.desktop";
 
 export function TopAuthStrip() {
   const [isHydrated, setIsHydrated] = useState(false);
@@ -21,5 +21,5 @@ export function TopAuthStrip() {
     return null;
   }
 
-  return <TopAuthStripWeb />;
+  return <TopAuthStripDesktop />;
 }

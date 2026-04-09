@@ -1,5 +1,5 @@
 import { Href, Stack, useRouter } from "expo-router";
-import { NotFoundStateMobileNative } from "../shared/components/NotFoundState/NotFoundState";
+import { NotFoundState } from "../shared/components/NotFoundState/NotFoundState";
 import { routes } from "@sd/core-contracts";
 
 export default function NotFoundScreen() {
@@ -8,7 +8,7 @@ export default function NotFoundScreen() {
   return (
     <>
       <Stack.Screen options={{ title: "Oops!" }} />
-      <NotFoundStateMobileNative onPress={() => router.replace(routes.home as Href)} />
+      <NotFoundState onPress={() => router.replace(routes.home as Href)} />
     </>
   );
 }

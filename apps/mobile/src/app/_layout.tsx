@@ -1,6 +1,6 @@
 import type { ErrorBoundaryProps } from "expo-router";
 import { View, Text, Pressable } from "react-native";
-import { ProvidersMobileNative } from "../core/providers";
+import { Providers } from "../core/providers";
 import { Slot } from "expo-router";
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
@@ -16,8 +16,8 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
 
 export default function RootLayout() {
   return (
-    <ProvidersMobileNative>
+    <Providers>
       <Slot />
-    </ProvidersMobileNative>
+    </Providers>
   );
 }

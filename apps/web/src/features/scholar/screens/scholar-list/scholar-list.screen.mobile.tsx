@@ -3,13 +3,13 @@
 import { useScholarsList } from "@sd/domain-content";
 import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 import { AppText } from "../../../../shared/components/AppText/AppText";
-import { ScholarCardWeb } from "../../components/scholar-card/scholar-card";
+import { ScholarCard } from "../../components/scholar-card/scholar-card";
 
-export type ScholarListMobileWebScreenProps = {
+export type ScholarListMobileScreenProps = {
   onSelectScholar?: (slug: string) => void;
 };
 
-export function ScholarListMobileWebScreen({ onSelectScholar }: ScholarListMobileWebScreenProps) {
+export function ScholarListMobileScreen({ onSelectScholar }: ScholarListMobileScreenProps) {
   const { data, isFetching } = useScholarsList();
   const scholars = data?.scholars ?? [];
 
@@ -50,7 +50,7 @@ export function ScholarListMobileWebScreen({ onSelectScholar }: ScholarListMobil
           }}
         >
           {scholars.map((scholar) => (
-            <ScholarCardWeb key={scholar.id} scholar={scholar} onPress={onSelectScholar} />
+            <ScholarCard key={scholar.id} scholar={scholar} onPress={onSelectScholar} />
           ))}
         </div>
       </div>

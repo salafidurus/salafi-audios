@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { TopicDetailDto } from "@sd/core-contracts";
-import { ScreenViewWeb } from "../../../../shared/components/ScreenView/ScreenView";
+import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 import { createTopic, updateTopic, deleteTopic, type AdminTopicInput } from "../../api/admin.api";
 
-export function AdminTopicsDesktopWebScreen() {
+export function AdminTopicsDesktopScreen() {
   const { data, isFetching, refetch } = useApiQuery<TopicDetailDto[]>(queryKeys.topics.list(), () =>
     httpClient<TopicDetailDto[]>({ url: endpoints.topics.list, method: "GET" }),
   );
@@ -40,16 +40,16 @@ export function AdminTopicsDesktopWebScreen() {
 
   if (isFetching) {
     return (
-      <ScreenViewWeb>
+      <ScreenView>
         <div style={{ textAlign: "center" }}>Loading topics...</div>
-      </ScreenViewWeb>
+      </ScreenView>
     );
   }
 
   const topics = data ?? [];
 
   return (
-    <ScreenViewWeb>
+    <ScreenView>
       <div style={{ maxWidth: 1100, margin: "0 auto" }}>
         <div
           style={{
@@ -200,6 +200,6 @@ export function AdminTopicsDesktopWebScreen() {
           </tbody>
         </table>
       </div>
-    </ScreenViewWeb>
+    </ScreenView>
   );
 }

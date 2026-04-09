@@ -17,11 +17,11 @@ function formatDate(iso: string): string {
   });
 }
 
-export type LectureMetaNativeProps = {
+export type LectureMetaProps = {
   lecture: LectureDetailDto;
 };
 
-export function LectureMetaNative({ lecture }: LectureMetaNativeProps) {
+export function LectureMeta({ lecture }: LectureMetaProps) {
   const { theme } = useUnistyles();
 
   return (

@@ -7,7 +7,7 @@ type Props = {
   description?: string;
 };
 
-export function ScreenInProgressDesktopWeb({
+export function ScreenInProgressDesktop({
   title = "Screen in progress",
   description = "We are building this experience. Please check back soon.",
 }: Props) {

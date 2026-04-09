@@ -1,18 +1,18 @@
 import { View, TouchableOpacity, Text, ActivityIndicator } from "react-native";
 
-type PlaybackControlsNativeProps = {
+type PlaybackControlsProps = {
   isPlaying: boolean;
   isLoading: boolean;
   onPlayPause: () => void;
   onSkipNext?: () => void;
 };
 
-export function PlaybackControlsNative({
+export function PlaybackControls({
   isPlaying,
   isLoading,
   onPlayPause,
   onSkipNext,
-}: PlaybackControlsNativeProps) {
+}: PlaybackControlsProps) {
   return (
     <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
       <TouchableOpacity

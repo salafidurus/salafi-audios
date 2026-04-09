@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { forwardRef, type CSSProperties } from "react";
 
-export type SearchInputDesktopWebProps = {
+export type SearchInputDesktopProps = {
   placeholder: string;
   className?: string;
   value?: string;
@@ -23,7 +23,7 @@ const inputStyle: CSSProperties = {
   fontWeight: "var(--typo-body-lg-font-weight)",
 };
 
-export const SearchInputDesktopWeb = forwardRef<HTMLInputElement, SearchInputDesktopWebProps>(
+export const SearchInputDesktop = forwardRef<HTMLInputElement, SearchInputDesktopProps>(
   ({ placeholder, className, value, onChange, autoFocus }, ref) => {
     const shellStyle: CSSProperties = {
       ...inputStyle,
@@ -50,7 +50,7 @@ export const SearchInputDesktopWeb = forwardRef<HTMLInputElement, SearchInputDes
   },
 );
 
-SearchInputDesktopWeb.displayName = "SearchInputDesktopWeb";
+SearchInputDesktop.displayName = "SearchInputDesktop";
 
 function SearchGlyph() {
   return (

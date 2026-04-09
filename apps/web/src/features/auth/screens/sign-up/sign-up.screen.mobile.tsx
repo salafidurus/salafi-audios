@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { TextInputWeb } from "../../../../shared/components/TextInput/TextInput";
-import { AuthProviderButtonWeb } from "../../components/provider-button";
+import { TextInput } from "../../../../shared/components/TextInput/TextInput";
+import { AuthProviderButton } from "../../components/provider-button";
 
 type FormValues = {
   name: string;
@@ -18,7 +18,7 @@ export type SignUpScreenProps = {
   onNavigateToSignIn: () => void;
 };
 
-export function SignUpMobileWebScreen({
+export function SignUpMobileScreen({
   onSignUp,
   onSignUpWithGoogle,
   onSignUpWithApple,
@@ -78,12 +78,12 @@ export function SignUpMobileWebScreen({
         </label>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <AuthProviderButtonWeb
+          <AuthProviderButton
             provider="apple"
             onClick={termsAccepted ? onSignUpWithApple : undefined}
             disabled={!termsAccepted}
           />
-          <AuthProviderButtonWeb
+          <AuthProviderButton
             provider="google"
             onClick={termsAccepted ? onSignUpWithGoogle : undefined}
             disabled={!termsAccepted}
@@ -101,7 +101,7 @@ export function SignUpMobileWebScreen({
           autoComplete="on"
           style={{ display: "flex", flexDirection: "column", gap: 12 }}
         >
-          <TextInputWeb
+          <TextInput
             placeholder="Name"
             autoComplete="name"
             onBlur={nameField.onBlur}
@@ -110,7 +110,7 @@ export function SignUpMobileWebScreen({
             onChange={nameField.onChange}
           />
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <TextInputWeb
+            <TextInput
               type="email"
               placeholder="Email"
               autoComplete="email"
@@ -123,7 +123,7 @@ export function SignUpMobileWebScreen({
             />
             {errors.email?.message && <p style={fieldErrorStyle}>{errors.email.message}</p>}
           </div>
-          <TextInputWeb
+          <TextInput
             type="password"
             placeholder="Password"
             autoComplete="new-password"

@@ -3,14 +3,14 @@
 import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 import { AppText } from "../../../../shared/components/AppText/AppText";
 import { useScholarDetailScreen } from "@sd/domain-content";
-import { ScholarHeaderWeb } from "../../components/scholar-header/scholar-header";
-import { ScholarContentListWeb } from "../../components/scholar-content-list/scholar-content-list";
+import { ScholarHeader } from "../../components/scholar-header/scholar-header";
+import { ScholarContentList } from "../../components/scholar-content-list/scholar-content-list";
 
-export type ScholarDetailDesktopWebScreenProps = {
+export type ScholarDetailDesktopScreenProps = {
   slug: string;
 };
 
-export function ScholarDetailDesktopWebScreen({ slug }: ScholarDetailDesktopWebScreenProps) {
+export function ScholarDetailDesktopScreen({ slug }: ScholarDetailDesktopScreenProps) {
   const { scholar, content, isFetching } = useScholarDetailScreen(slug);
 
   if (isFetching) {
@@ -33,10 +33,10 @@ export function ScholarDetailDesktopWebScreen({ slug }: ScholarDetailDesktopWebS
     <ScreenView>
       <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", gap: 48 }}>
         <div style={{ flex: "0 0 320px" }}>
-          <ScholarHeaderWeb scholar={scholar} />
+          <ScholarHeader scholar={scholar} />
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          {content && <ScholarContentListWeb content={content} />}
+          {content && <ScholarContentList content={content} />}
         </div>
       </div>
     </ScreenView>

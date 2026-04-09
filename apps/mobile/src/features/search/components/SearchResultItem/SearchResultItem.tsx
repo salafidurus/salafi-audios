@@ -13,16 +13,14 @@ export type SearchResultItemProps = {
   onPress?: () => void;
 };
 
-export type SearchResultItemMobileNativeProps = SearchResultItemProps;
-
-export function SearchResultItemMobileNative({
+export function SearchResultItem({
   title,
   scholarName,
   imageUrl,
   lectureCount,
   durationSeconds,
   onPress,
-}: SearchResultItemMobileNativeProps) {
+}: SearchResultItemProps) {
   const { theme } = useUnistyles();
   const durationLabel = formatDuration(durationSeconds);
   const HeadphonesIcon = Headphones as ComponentType<{

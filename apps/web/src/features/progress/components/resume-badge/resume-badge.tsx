@@ -2,11 +2,11 @@
 
 import { useLectureProgress } from "@sd/domain-progress";
 
-type ResumeBadgeWebProps = {
+type ResumeBadgeProps = {
   lectureId: string;
 };
 
-export function ResumeBadgeWeb({ lectureId }: ResumeBadgeWebProps) {
+export function ResumeBadge({ lectureId }: ResumeBadgeProps) {
   const { resumePositionSeconds, isCompleted, progressPercent } = useLectureProgress(lectureId);
 
   if (isCompleted) {

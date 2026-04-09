@@ -1,18 +1,18 @@
 "use client";
 
-export type AuthRequiredStateMobileWebProps = {
+export type AuthRequiredStateMobileProps = {
   title: string;
   description: string;
   actionLabel?: string;
   onPress: () => void;
 };
 
-export function AuthRequiredStateMobileWeb({
+export function AuthRequiredStateMobile({
   title,
   description,
   actionLabel = "Sign In",
   onPress,
-}: AuthRequiredStateMobileWebProps) {
+}: AuthRequiredStateMobileProps) {
   return (
     <div style={wrapperStyle}>
       <h2 style={titleStyle}>{title}</h2>

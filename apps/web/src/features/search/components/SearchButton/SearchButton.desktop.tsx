@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import type { CSSProperties } from "react";
 
-export type SearchButtonDesktopWebProps = {
+export type SearchButtonDesktopProps = {
   label: string;
   href?: string;
   onClick?: () => void;
@@ -12,12 +12,12 @@ export type SearchButtonDesktopWebProps = {
 const baseClass =
   "flex w-full items-center gap-3 rounded-[var(--radius-scale-full)] border text-[var(--content-default)] transition hover:-translate-y-px hover:saturate-[1.01]";
 
-const sizeClass: Record<NonNullable<SearchButtonDesktopWebProps["size"]>, string> = {
+const sizeClass: Record<NonNullable<SearchButtonDesktopProps["size"]>, string> = {
   lg: "px-5 py-3",
   sm: "px-[0.82rem] py-[0.52rem]",
 };
 
-const textStyle: Record<NonNullable<SearchButtonDesktopWebProps["size"]>, CSSProperties> = {
+const textStyle: Record<NonNullable<SearchButtonDesktopProps["size"]>, CSSProperties> = {
   lg: {
     fontFamily: "var(--typo-body-lg-font-family)",
     fontSize: "var(--typo-body-lg-font-size)",
@@ -34,13 +34,13 @@ const textStyle: Record<NonNullable<SearchButtonDesktopWebProps["size"]>, CSSPro
   },
 };
 
-export function SearchButtonDesktopWeb({
+export function SearchButtonDesktop({
   label,
   href,
   onClick,
   size = "lg",
   className,
-}: SearchButtonDesktopWebProps) {
+}: SearchButtonDesktopProps) {
   const classes = clsx(baseClass, sizeClass[size], className);
   const style = textStyle[size];
   const accentStyle: CSSProperties = {

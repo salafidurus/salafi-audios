@@ -1,11 +1,11 @@
 import { View, Text } from "react-native";
 import { useDownload } from "../../hooks/use-download";
 
-type DownloadProgressNativeProps = {
+type DownloadProgressProps = {
   lectureId: string;
 };
 
-export function DownloadProgressNative({ lectureId }: DownloadProgressNativeProps) {
+export function DownloadProgress({ lectureId }: DownloadProgressProps) {
   const { isDownloading, progress } = useDownload(lectureId);
 
   if (!isDownloading) return null;

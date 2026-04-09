@@ -1,15 +1,15 @@
 // Components
 export {
-  FeedContentCardWeb,
-  type FeedContentCardWebProps,
+  FeedContentCard,
+  type FeedContentCardProps,
 } from "./components/feed-content-card/feed-content-card";
 export {
-  FeedScholarRowWeb,
-  type FeedScholarRowWebProps,
+  FeedScholarRow,
+  type FeedScholarRowProps,
 } from "./components/feed-scholar-row/feed-scholar-row";
 export {
-  FeedTopicRowWeb,
-  type FeedTopicRowWebProps,
+  FeedTopicRow,
+  type FeedTopicRowProps,
 } from "./components/feed-topic-row/feed-topic-row";
 
 // Screens
@@ -19,22 +19,22 @@ export {
   type FeedRecentScreenProps,
 } from "./screens/feed-recent.screen";
 export {
-  FeedDesktopWebScreen,
-  type FeedDesktopWebScreenProps,
+  FeedDesktopScreen,
+  type FeedDesktopScreenProps,
 } from "./screens/feed-recent.screen.desktop";
 export {
-  FeedMobileWebScreen,
-  type FeedMobileWebScreenProps,
+  FeedMobileScreen,
+  type FeedMobileScreenProps,
 } from "./screens/feed-recent.screen.mobile";
 export {
   FeedFollowingScreen,
   type FeedFollowingScreenProps,
 } from "./screens/feed-following.screen";
 export {
-  FeedFollowingDesktopWebScreen,
-  type FeedFollowingDesktopWebScreenProps,
+  FeedFollowingDesktopScreen,
+  type FeedFollowingDesktopScreenProps,
 } from "./screens/feed-following.screen.desktop";
 export {
-  FeedFollowingMobileWebScreen,
-  type FeedFollowingMobileWebScreenProps,
+  FeedFollowingMobileScreen,
+  type FeedFollowingMobileScreenProps,
 } from "./screens/feed-following.screen.mobile";

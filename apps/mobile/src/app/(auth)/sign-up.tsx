@@ -1,6 +1,6 @@
 import { Platform, useColorScheme } from "react-native";
 import { useRouter } from "expo-router";
-import { SignUpMobileNativeScreen } from "../../features/auth/screens/sign-up/sign-up.screen";
+import { SignUpScreen } from "../../features/auth/screens/sign-up/sign-up.screen";
 import { authClient } from "../../core/auth";
 import { routes } from "@sd/core-contracts";
 
@@ -17,7 +17,7 @@ export default function SignUpPage() {
   };
 
   return (
-    <SignUpMobileNativeScreen
+    <SignUpScreen
       googleButtonSource={
         Platform.OS === "android"
           ? colorScheme === "dark"

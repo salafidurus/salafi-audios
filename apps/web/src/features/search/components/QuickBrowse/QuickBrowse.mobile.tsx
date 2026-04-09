@@ -4,7 +4,7 @@ import { View } from "react-native-unistyles/components/native/View";
 import { Pressable } from "react-native-unistyles/components/native/Pressable";
 import { ScrollView } from "react-native-unistyles/components/native/ScrollView";
 import type { ScholarChipDto, ContentSuggestionDto, RecentProgressDto } from "@sd/core-contracts";
-import { BrowseCardMobileWeb } from "../BrowseCard/BrowseCard.mobile";
+import { BrowseCardMobile } from "../BrowseCard/BrowseCard.mobile";
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -12,7 +12,7 @@ function formatDuration(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-export type QuickBrowseMobileWebProps = {
+export type QuickBrowseMobileProps = {
   scholars?: ScholarChipDto[];
   suggestions?: ContentSuggestionDto[];
   recentProgress?: RecentProgressDto | null;
@@ -22,7 +22,7 @@ export type QuickBrowseMobileWebProps = {
   onSelectCategory?: (searchKey: string) => void;
 };
 
-export function QuickBrowseMobileWeb({
+export function QuickBrowseMobile({
   scholars,
   suggestions,
   recentProgress,
@@ -30,7 +30,7 @@ export function QuickBrowseMobileWeb({
   onSelectSuggestion,
   onContinueListening,
   onSelectCategory,
-}: QuickBrowseMobileWebProps) {
+}: QuickBrowseMobileProps) {
   const showFallback =
     (!scholars || scholars.length === 0) && (!suggestions || suggestions.length === 0);
 
@@ -134,7 +134,7 @@ export function QuickBrowseMobileWeb({
             {(["Senior Scholars", "Hadith", "Fiqh", "Tafsir", "Arabic", "Farah"] as const).map(
               (name) => (
                 <View key={name} style={styles.cardWrapper}>
-                  <BrowseCardMobileWeb name={name} onPress={() => onSelectCategory?.(name)} />
+                  <BrowseCardMobile name={name} onPress={() => onSelectCategory?.(name)} />
                 </View>
               ),
             )}

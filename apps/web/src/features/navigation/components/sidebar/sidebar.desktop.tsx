@@ -53,7 +53,7 @@ const navItems: NavItem[] = [
   },
 ];
 
-export function SidebarWeb() {
+export function Sidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const { isAuthenticated } = useAuth();

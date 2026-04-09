@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, FlatList } from "react-native";
 import type { LiveSessionDto } from "@sd/core-contracts";
 import { useLiveScheduledScreen } from "@sd/domain-live";
 
-export type LiveScheduledMobileNativeScreenProps = {
+export type LiveScheduledScreenProps = {
   onNavigateToSession?: (id: string) => void;
 };
 
@@ -23,9 +23,9 @@ function ScheduledItem({ session, onPress }: { session: LiveSessionDto; onPress?
   );
 }
 
-export function LiveScheduledMobileNativeScreen({
+export function LiveScheduledScreen({
   onNavigateToSession,
-}: LiveScheduledMobileNativeScreenProps) {
+}: LiveScheduledScreenProps) {
   const { sessions, isFetching } = useLiveScheduledScreen();
 
   if (isFetching && sessions.length === 0) {

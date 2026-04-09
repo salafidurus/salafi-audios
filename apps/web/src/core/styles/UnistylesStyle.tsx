@@ -10,7 +10,7 @@ import {
 } from "react-native-unistyles/server";
 import "./unistyles";
 
-export function UnistylesStyleDesktopWeb({ children }: PropsWithChildren): ReactElement {
+export function UnistylesStyleDesktop({ children }: PropsWithChildren): ReactElement {
   const isServerInserted = useRef(false);
 
   useServerInsertedHTML(() => {

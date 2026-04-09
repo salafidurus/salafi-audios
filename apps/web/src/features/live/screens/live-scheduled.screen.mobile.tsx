@@ -3,7 +3,7 @@
 import type { LiveSessionDto } from "@sd/core-contracts";
 import { useLiveScheduledScreen } from "@sd/domain-live";
 
-export type LiveScheduledMobileWebScreenProps = {
+export type LiveScheduledMobileScreenProps = {
   onNavigateToSession?: (id: string) => void;
 };
 
@@ -37,9 +37,9 @@ function ScheduledSessionItem({
   );
 }
 
-export function LiveScheduledMobileWebScreen({
+export function LiveScheduledMobileScreen({
   onNavigateToSession,
-}: LiveScheduledMobileWebScreenProps) {
+}: LiveScheduledMobileScreenProps) {
   const { sessions, isFetching } = useLiveScheduledScreen();
 
   if (isFetching && sessions.length === 0) {

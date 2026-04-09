@@ -1,24 +1,24 @@
 // Components
 export {
-  LecturePlayButtonNative,
-  type LecturePlayButtonNativeProps,
+  LecturePlayButton,
+  type LecturePlayButtonProps,
 } from "./components/lecture-play-button/LecturePlayButton";
 export {
-  LectureSaveButtonNative,
-  type LectureSaveButtonNativeProps,
+  LectureSaveButton,
+  type LectureSaveButtonProps,
 } from "./components/lecture-save-button/LectureSaveButton";
 export {
-  LectureMetaNative,
-  type LectureMetaNativeProps,
+  LectureMeta,
+  type LectureMetaProps,
 } from "./components/lecture-meta/lecture-meta";
-export { TopicChipsNative, type TopicChipsNativeProps } from "./components/topic-chips/topic-chips";
+export { TopicChips, type TopicChipsProps } from "./components/topic-chips/topic-chips";
 export {
-  SeriesContextBarNative,
-  type SeriesContextBarNativeProps,
+  SeriesContextBar,
+  type SeriesContextBarProps,
 } from "./components/series-context-bar/series-context-bar";
 
 // Screens
 export {
-  LectureDetailMobileNativeScreen,
-  type LectureDetailMobileNativeScreenProps,
+  LectureDetailScreen,
+  type LectureDetailScreenProps,
 } from "./screens/lecture-detail/lecture-detail.screen";

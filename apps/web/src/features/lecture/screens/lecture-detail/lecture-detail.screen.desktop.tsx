@@ -3,17 +3,17 @@
 import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 import { AppText } from "../../../../shared/components/AppText/AppText";
 import { useLectureDetailScreen } from "@sd/domain-content";
-import { LectureMetaWeb } from "../../components/lecture-meta/lecture-meta";
-import { TopicChipsWeb } from "../../components/topic-chips/topic-chips";
-import { SeriesContextBarWeb } from "../../components/series-context-bar/series-context-bar";
+import { LectureMeta } from "../../components/lecture-meta/lecture-meta";
+import { TopicChips } from "../../components/topic-chips/topic-chips";
+import { SeriesContextBar } from "../../components/series-context-bar/series-context-bar";
 import { LecturePlayButton } from "../../components/lecture-play-button/LecturePlayButton";
 import { LectureSaveButton } from "../../components/lecture-save-button/LectureSaveButton";
 
-export type LectureDetailDesktopWebScreenProps = {
+export type LectureDetailDesktopScreenProps = {
   id: string;
 };
 
-export function LectureDetailDesktopWebScreen({ id }: LectureDetailDesktopWebScreenProps) {
+export function LectureDetailDesktopScreen({ id }: LectureDetailDesktopScreenProps) {
   const { lecture, isFetching } = useLectureDetailScreen(id);
 
   if (isFetching) {
@@ -38,8 +38,8 @@ export function LectureDetailDesktopWebScreen({ id }: LectureDetailDesktopWebScr
         {/* Left column: content */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <AppText variant="displayMd">{lecture.title}</AppText>
-          <LectureMetaWeb lecture={lecture} />
-          <TopicChipsWeb topics={lecture.topics} />
+          <LectureMeta lecture={lecture} />
+          <TopicChips topics={lecture.topics} />
 
           {lecture.description && (
             <div style={{ marginTop: 20 }}>
@@ -49,7 +49,7 @@ export function LectureDetailDesktopWebScreen({ id }: LectureDetailDesktopWebScr
             </div>
           )}
 
-          {lecture.seriesContext && <SeriesContextBarWeb seriesContext={lecture.seriesContext} />}
+          {lecture.seriesContext && <SeriesContextBar seriesContext={lecture.seriesContext} />}
         </div>
 
         {/* Right column: play action */}

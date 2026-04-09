@@ -1,6 +1,6 @@
 "use client";
 
-export function TermsOfUseMobileWebScreen() {
+export function TermsOfUseMobileScreen() {
   return (
     <div style={{ padding: "16px 12px" }}>
       <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 16 }}>Terms of Use</h1>

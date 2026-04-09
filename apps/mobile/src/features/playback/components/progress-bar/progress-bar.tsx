@@ -1,10 +1,10 @@
 import { View } from "react-native";
 
-type ProgressBarNativeProps = {
+type ProgressBarProps = {
   progressPercent: number;
 };
 
-export function ProgressBarNative({ progressPercent }: ProgressBarNativeProps) {
+export function ProgressBar({ progressPercent }: ProgressBarProps) {
   return (
     <View
       style={{

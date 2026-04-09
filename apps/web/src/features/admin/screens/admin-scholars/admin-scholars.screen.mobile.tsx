@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { ScholarListItemDto } from "@sd/core-contracts";
-import { ScreenViewWeb } from "../../../../shared/components/ScreenView/ScreenView";
+import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 import { createScholar, updateScholar, type AdminScholarInput } from "../../api/admin.api";
 
 type ScholarsListDto = { scholars: ScholarListItemDto[] };
 
-export function AdminScholarsMobileWebScreen() {
+export function AdminScholarsMobileScreen() {
   const { data, isFetching, refetch } = useApiQuery<ScholarsListDto>(
     queryKeys.scholars.list(),
     () => httpClient<ScholarsListDto>({ url: endpoints.scholars.list, method: "GET" }),
@@ -37,16 +37,16 @@ export function AdminScholarsMobileWebScreen() {
 
   if (isFetching) {
     return (
-      <ScreenViewWeb>
+      <ScreenView>
         <div style={{ textAlign: "center" }}>Loading scholars...</div>
-      </ScreenViewWeb>
+      </ScreenView>
     );
   }
 
   const scholars = data?.scholars ?? [];
 
   return (
-    <ScreenViewWeb>
+    <ScreenView>
       <div>
         <div
           style={{
@@ -199,6 +199,6 @@ export function AdminScholarsMobileWebScreen() {
           </div>
         ))}
       </div>
-    </ScreenViewWeb>
+    </ScreenView>
   );
 }

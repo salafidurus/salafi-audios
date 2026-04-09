@@ -1,8 +1,8 @@
 "use client";
 
 import { Responsive } from "@/shared/components/Responsive";
-import { FeedDesktopWebScreen } from "./feed-recent.screen.desktop";
-import { FeedMobileWebScreen } from "./feed-recent.screen.mobile";
+import { FeedDesktopScreen } from "./feed-recent.screen.desktop";
+import { FeedMobileScreen } from "./feed-recent.screen.mobile";
 
 export type FeedScreenProps = {
   onNavigateToLecture?: (slug: string) => void;
@@ -10,10 +10,10 @@ export type FeedScreenProps = {
 };
 
 export function FeedScreen(props: FeedScreenProps) {
-  return <Responsive mobile={<FeedMobileWebScreen {...props} />} desktop={<FeedDesktopWebScreen {...props} />} />;
+  return <Responsive mobile={<FeedMobileScreen {...props} />} desktop={<FeedDesktopScreen {...props} />} />;
 }
 
-export { FeedDesktopWebScreen } from "./feed-recent.screen.desktop";
-export { FeedMobileWebScreen } from "./feed-recent.screen.mobile";
-export { FeedFollowingDesktopWebScreen } from "./feed-following.screen.desktop";
-export { FeedFollowingMobileWebScreen } from "./feed-following.screen.mobile";
+export { FeedDesktopScreen } from "./feed-recent.screen.desktop";
+export { FeedMobileScreen } from "./feed-recent.screen.mobile";
+export { FeedFollowingDesktopScreen } from "./feed-following.screen.desktop";
+export { FeedFollowingMobileScreen } from "./feed-following.screen.mobile";

@@ -1,5 +1,5 @@
-import { ScreenInProgressMobileNative } from "../../../../shared/components/ScreenInProgress/ScreenInProgress";
+import { ScreenInProgress } from "../../../../shared/components/ScreenInProgress/ScreenInProgress";
 
 export default function SeriesScreen() {
-  return <ScreenInProgressMobileNative />;
+  return <ScreenInProgress />;
 }

@@ -2,11 +2,11 @@
 
 import type { ScholarContentDto } from "@sd/core-contracts";
 
-export type ScholarContentListWebProps = {
+export type ScholarContentListProps = {
   content: ScholarContentDto;
 };
 
-export function ScholarContentListWeb({ content }: ScholarContentListWebProps) {
+export function ScholarContentList({ content }: ScholarContentListProps) {
   return (
     <div>
       {content.collections.length > 0 && (

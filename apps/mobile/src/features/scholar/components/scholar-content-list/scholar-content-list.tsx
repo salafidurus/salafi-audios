@@ -1,11 +1,11 @@
 import { View, Text } from "react-native";
 import type { ScholarContentDto } from "@sd/core-contracts";
 
-export type ScholarContentListNativeProps = {
+export type ScholarContentListProps = {
   content: ScholarContentDto;
 };
 
-export function ScholarContentListNative({ content }: ScholarContentListNativeProps) {
+export function ScholarContentList({ content }: ScholarContentListProps) {
   return (
     <View>
       {content.collections.length > 0 && (

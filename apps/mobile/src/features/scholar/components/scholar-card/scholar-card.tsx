@@ -1,12 +1,12 @@
 import { View, Text, Pressable, Image } from "react-native";
 import type { ScholarListItemDto } from "@sd/core-contracts";
 
-export type ScholarCardNativeProps = {
+export type ScholarCardProps = {
   scholar: ScholarListItemDto;
   onPress?: (slug: string) => void;
 };
 
-export function ScholarCardNative({ scholar, onPress }: ScholarCardNativeProps) {
+export function ScholarCard({ scholar, onPress }: ScholarCardProps) {
   return (
     <Pressable
       onPress={() => onPress?.(scholar.slug)}

@@ -3,11 +3,11 @@
 import type { LiveSessionPublicDto } from "@sd/core-contracts";
 import styles from "./live-session-card.module.css";
 
-export type LiveSessionCardWebProps = {
+export type LiveSessionCardProps = {
   session: LiveSessionPublicDto;
 };
 
-export function LiveSessionCardWeb({ session }: LiveSessionCardWebProps) {
+export function LiveSessionCard({ session }: LiveSessionCardProps) {
   const telegramUrl = session.telegramSlug ? `https://t.me/${session.telegramSlug}` : undefined;
 
   const cardClassName =

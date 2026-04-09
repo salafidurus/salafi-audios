@@ -3,12 +3,12 @@
 import { useActiveSession } from "@sd/domain-live";
 import styles from "./currently-live-indicator.module.css";
 
-export type CurrentlyLiveIndicatorWebProps = {
+export type CurrentlyLiveIndicatorProps = {
   /** Show compact version (just the dot and "LIVE") */
   compact?: boolean;
 };
 
-export function CurrentlyLiveIndicatorWeb({ compact = false }: CurrentlyLiveIndicatorWebProps) {
+export function CurrentlyLiveIndicator({ compact = false }: CurrentlyLiveIndicatorProps) {
   const { activeSession, isLoading } = useActiveSession();
 
   if (isLoading || !activeSession) {

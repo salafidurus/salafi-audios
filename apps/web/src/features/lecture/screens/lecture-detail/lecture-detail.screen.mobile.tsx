@@ -3,17 +3,17 @@
 import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
 import { AppText } from "../../../../shared/components/AppText/AppText";
 import { useLectureDetailScreen } from "@sd/domain-content";
-import { LectureMetaWeb } from "../../components/lecture-meta/lecture-meta";
-import { TopicChipsWeb } from "../../components/topic-chips/topic-chips";
-import { SeriesContextBarWeb } from "../../components/series-context-bar/series-context-bar";
+import { LectureMeta } from "../../components/lecture-meta/lecture-meta";
+import { TopicChips } from "../../components/topic-chips/topic-chips";
+import { SeriesContextBar } from "../../components/series-context-bar/series-context-bar";
 import { LecturePlayButton } from "../../components/lecture-play-button/LecturePlayButton";
 import { LectureSaveButton } from "../../components/lecture-save-button/LectureSaveButton";
 
-export type LectureDetailMobileWebScreenProps = {
+export type LectureDetailMobileScreenProps = {
   id: string;
 };
 
-export function LectureDetailMobileWebScreen({ id }: LectureDetailMobileWebScreenProps) {
+export function LectureDetailMobileScreen({ id }: LectureDetailMobileScreenProps) {
   const { lecture, isFetching } = useLectureDetailScreen(id);
 
   if (isFetching) {
@@ -35,8 +35,8 @@ export function LectureDetailMobileWebScreen({ id }: LectureDetailMobileWebScree
   return (
     <ScreenView>
       <AppText variant="titleLg">{lecture.title}</AppText>
-      <LectureMetaWeb lecture={lecture} />
-      <TopicChipsWeb topics={lecture.topics} />
+      <LectureMeta lecture={lecture} />
+      <TopicChips topics={lecture.topics} />
 
       <div style={{ marginTop: 20 }}>
         <LecturePlayButton lecture={lecture} />
@@ -51,7 +51,7 @@ export function LectureDetailMobileWebScreen({ id }: LectureDetailMobileWebScree
         </div>
       )}
 
-      {lecture.seriesContext && <SeriesContextBarWeb seriesContext={lecture.seriesContext} />}
+      {lecture.seriesContext && <SeriesContextBar seriesContext={lecture.seriesContext} />}
     </ScreenView>
   );
 }

@@ -6,7 +6,7 @@ import { Pressable } from "react-native-unistyles/components/native/Pressable";
 import { Text } from "react-native-unistyles/components/native/Text";
 import { View } from "react-native-unistyles/components/native/View";
 import type { TopicDetailDto, TopicSlug } from "@sd/core-contracts";
-import { useDragScrollWeb } from "../../../../shared/hooks/use-drag-scroll";
+import { useDragScroll } from "../../../../shared/hooks/use-drag-scroll";
 
 export type SearchFilterValue = TopicSlug[];
 
@@ -21,11 +21,11 @@ export type SearchFilterProps = {
   topics: TopicDetailDto[];
 };
 
-export type SearchFilterMobileWebProps = SearchFilterProps;
+export type SearchFilterMobileProps = SearchFilterProps;
 
-export function SearchFilterMobileWeb({ value, onChange, topics }: SearchFilterMobileWebProps) {
+export function SearchFilterMobile({ value, onChange, topics }: SearchFilterMobileProps) {
   const { theme } = useUnistyles();
-  const scrollRef = useDragScrollWeb("horizontal");
+  const scrollRef = useDragScroll("horizontal");
 
   const options = useMemo<FilterOption[]>(() => {
     const sortedTopics = [...topics].sort((a, b) => a.name.localeCompare(b.name));
