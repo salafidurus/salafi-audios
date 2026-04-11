@@ -1,15 +1,7 @@
+import * as SecureStore from "expo-secure-store";
 import { resolveLocale, type Locale } from "@sd/core-i18n";
 
 const KEY = "locale";
-
-async function getSecureStore() {
-  try {
-    const mod = await import("expo-secure-store");
-    return mod;
-  } catch {
-    return null;
-  }
-}
 
 function getDeviceLocale(): string | null {
   try {
@@ -20,19 +12,22 @@ function getDeviceLocale(): string | null {
 }
 
 export async function getStoredLocale(): Promise<Locale> {
-  const SecureStore = await getSecureStore();
-  const stored = SecureStore ? await SecureStore.getItemAsync(KEY) : null;
-
-  if (stored) {
-    return resolveLocale(stored);
+  try {
+    const stored = await SecureStore.getItemAsync(KEY);
+    if (stored) {
+      return resolveLocale(stored);
+    }
+  } catch {
+    // SecureStore unavailable — fall through to device locale
   }
 
   return resolveLocale(getDeviceLocale());
 }
 
 export async function storeLocale(locale: Locale): Promise<void> {
-  const SecureStore = await getSecureStore();
-  if (SecureStore) {
+  try {
     await SecureStore.setItemAsync(KEY, locale);
+  } catch {
+    // SecureStore unavailable — silently skip
   }
 }
