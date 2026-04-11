@@ -9,11 +9,11 @@ Defines the hand-written TypeScript DTOs, route constants, and TanStack Query ho
 ## Boundaries
 
 - **Depends on:** `@tanstack/react-query`
-- **Consumed by:** `apps/api`, `apps/web`, `apps/mobile`, `@sd/core-api`, `@sd/shared`, all `feature-*` / `domain-*` packages
+- **Consumed by:** `apps/api`, `apps/web`, `apps/native`, `@sd/core-api`, `@sd/shared`, all `feature-*` / `domain-*` packages
 
 ## Structure
 
-```
+```text
 src/
 ├── types/          # DTO definitions per domain (scholar, lecture, topic, etc.)
 ├── query/          # TanStack Query client, keys, and hooks
@@ -25,12 +25,12 @@ src/
 
 ## Exports
 
-| Subpath           | What it provides                        |
-| ----------------- | --------------------------------------- |
-| `@sd/core-contracts`         | All types, routes, endpoints            |
-| `@sd/core-contracts/query`   | Query client, query keys                |
-| `@sd/core-contracts/query/hooks` | `useApiQuery`, `initApiClient`      |
-| `@sd/core-contracts/http`    | HTTP client config                      |
+| Subpath                          | What it provides               |
+| -------------------------------- | ------------------------------ |
+| `@sd/core-contracts`             | All types, routes, endpoints   |
+| `@sd/core-contracts/query`       | Query client, query keys       |
+| `@sd/core-contracts/query/hooks` | `useApiQuery`, `initApiClient` |
+| `@sd/core-contracts/http`        | HTTP client config             |
 
 ## Key Commands
 

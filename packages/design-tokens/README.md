@@ -9,11 +9,11 @@ Defines the canonical token values consumed by the entire design system. Web app
 ## Boundaries
 
 - **Depends on:** none (leaf package)
-- **Consumed by:** `@sd/core-styles`, `@sd/shared`, all `feature-*` packages, `apps/web`, `apps/mobile`
+- **Consumed by:** `@sd/core-styles`, `@sd/shared`, all `feature-*` packages, `apps/web`, `apps/native`
 
 ## Structure
 
-```
+```text
 src/
 ├── colors/         # Color palettes and semantic color tokens
 ├── spacing/        # Layout and component spacing scales

@@ -59,7 +59,7 @@ This directory contains the authoritative documentation for Salafi Durus.
 | `/account/*`           | PLACEHOLDER | SUPPORTING | Account routes exist but are early |
 | `/sign-in`, `/sign-up` | IMPLEMENTED | SUPPORTING | App-local `features/auth/` slices  |
 
-### Mobile (apps/mobile)
+### Mobile (apps/native)
 
 | Feature           | Status      | MVP      | Notes                               |
 | ----------------- | ----------- | -------- | ----------------------------------- |

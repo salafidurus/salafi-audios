@@ -6,13 +6,13 @@
 
 Owns the React Query hooks that fetch and expose all content-domain data — the feed,
 lectures, scholars, and library (saved, completed, in-progress) — to consuming apps.
-Centralises content data access so `apps/web` and `apps/mobile` share query keys,
+Centralises content data access so `apps/web` and `apps/native` share query keys,
 pagination logic, and API contracts for the core content catalogue.
 
 ## Boundaries
 
 - **Depends on:** `@sd/core-contracts`, `@tanstack/react-query`
-- **Consumed by:** `apps/web`, `apps/mobile`
+- **Consumed by:** `apps/web`, `apps/native`
 
 This package provides **data hooks only** — no UI components, no Zustand stores, and no
 business logic beyond composing query results into screen-ready view models. Content write

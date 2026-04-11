@@ -24,7 +24,7 @@ This package provides shared configuration for the monorepo, including ESLint an
 - `eslint/base`: Base TypeScript/JS config.
 - `eslint/next`: Config for Next.js apps (`apps/web`).
 - `eslint/nest`: Config for NestJS apps (`apps/api`).
-- `eslint/expo`: Config for Expo apps (`apps/mobile`).
+- `eslint/expo`: Config for Expo apps (`apps/native`).
 
 ## Commands (run from repo root)
 

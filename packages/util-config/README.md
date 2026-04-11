@@ -24,7 +24,7 @@ eslint/
 ├── base.js     # Base TypeScript/JS rules (used by all packages)
 ├── next.js     # Next.js additions (apps/web)
 ├── nest.js     # NestJS additions (apps/api)
-└── expo.js     # Expo additions (apps/mobile)
+└── expo.js     # Expo additions (apps/native)
 
 tsconfig/
 ├── base.json      # Root compiler options (strict, ES2022, noEmit)

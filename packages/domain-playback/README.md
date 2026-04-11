@@ -9,11 +9,11 @@ Manages audio playback state via a Zustand store and exposes a `usePlayback` hoo
 ## Boundaries
 
 - **Depends on:** `@sd/core-contracts`, `zustand`
-- **Consumed by:** `@sd/feature-playback`, `apps/web`, `apps/mobile`
+- **Consumed by:** `@sd/feature-playback`, `apps/web`, `apps/native`
 
 ## Structure
 
-```
+```text
 src/
 ├── engine/
 │   ├── playback.engine.web.ts      # Web audio engine

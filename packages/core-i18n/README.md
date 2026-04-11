@@ -12,13 +12,13 @@ documented and implementation will follow once i18n work begins.
 ## Purpose
 
 Owns all translation keys and locale definitions used across the platform. Keeps i18n
-logic in one place so both `apps/web` and `apps/mobile` pull from a single source of truth
+logic in one place so both `apps/web` and `apps/native` pull from a single source of truth
 for every user-facing string.
 
 ## Boundaries
 
 - **Depends on:** none (leaf package — no workspace dependencies)
-- **Consumed by:** `apps/web`, `apps/mobile`
+- **Consumed by:** `apps/web`, `apps/native`
 
 Do not hardcode text strings in components in any app or package. Always reference a key
 from this package. Do not import framework-specific i18n libraries (e.g., `next-intl`,

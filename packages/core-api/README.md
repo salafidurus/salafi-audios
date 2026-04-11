@@ -9,13 +9,11 @@ Owns the HTTP client setup, request interceptors, and client initialization logi
 ## Boundaries
 
 - **Depends on:** `@sd/core-contracts`, `@sd/core-config`
-- **Consumed by:** `apps/web`, `apps/mobile`, `feature-*` packages
+- **Consumed by:** `apps/web`, `apps/native`, `feature-*` packages
 
 ## Structure
 
-```
-src/
-├── utils/      # API client utilities (interceptors, base config)
+```text
 ├── types/      # Package-local shared types
 └── index.ts    # Single public entrypoint
 ```

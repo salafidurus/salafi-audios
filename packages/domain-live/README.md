@@ -12,7 +12,7 @@ from the general content catalogue.
 ## Boundaries
 
 - **Depends on:** `@sd/core-contracts`
-- **Consumed by:** `apps/web`, `apps/mobile`
+- **Consumed by:** `apps/web`, `apps/native`
 
 This package provides **data hooks only** — no UI components, no Zustand stores, and no
 live-stream infrastructure. Session lifecycle transitions (starting, ending) are enforced

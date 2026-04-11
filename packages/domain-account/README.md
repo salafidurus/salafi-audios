@@ -6,12 +6,12 @@
 
 Owns the React Query hooks that fetch and expose user account data — profile details and
 auth state — to consuming apps. Centralises account data access so `apps/web` and
-`apps/mobile` share the same query keys, caching behaviour, and API contract.
+`apps/native` share the same query keys, caching behaviour, and API contract.
 
 ## Boundaries
 
 - **Depends on:** `@sd/core-contracts`
-- **Consumed by:** `apps/web`, `apps/mobile`
+- **Consumed by:** `apps/web`, `apps/native`
 
 This package provides **data hooks only** — no UI components, no Zustand stores, and no
 business logic. Auth enforcement lives exclusively in `apps/api`; client-side auth state

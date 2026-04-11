@@ -4,7 +4,7 @@ Salafi Durus is a curated, offline-first lecture platform for preserving and del
 
 This monorepo contains the full system:
 
-- `apps/mobile` - offline-first listener experience + focused admin actions
+- `apps/native` - offline-first listener experience + focused admin actions
 - `apps/web` - public discovery + primary editorial workflows
 - `apps/api` - authoritative backend and API contract
 - `packages/*` - shared libraries, schemas, config, and generated client

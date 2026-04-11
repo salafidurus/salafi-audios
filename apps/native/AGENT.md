@@ -1,13 +1,14 @@
-# AGENT.md - apps/native (Incremental Native Scaffold)
+# AGENT.md - apps/native
 
-This workspace exists to migrate from `apps/mobile` in small, verifiable steps.
+This is the native mobile client (iOS + Android). It is the successor to `apps/mobile` and has fully replaced it. All 5 tabs (Search, Feed, Live, Library, Account) are implemented and verified on device.
 
 ## Rules
 
-- Keep `apps/mobile` working while building `apps/native`.
-- Do not bulk-copy the whole mobile app into this workspace.
-- Move or recreate pieces incrementally so each step can be tested on the emulator.
-- Prefer the smallest possible change that advances the migration.
+- This is the canonical native client. Do not modify `apps/mobile`.
+- Keep feature slices thin: screens assemble package-owned hooks and components.
+- Use `pnpm --filter native exec expo install <pkg>` to install dependencies so Expo picks the compatible version.
+- Run `pnpm --filter native exec expo-doctor` after adding native dependencies.
+- Verify UI changes on the Android emulator using local-expo-mcp tools.
 
 ## Commands
 

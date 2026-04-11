@@ -2,17 +2,17 @@
 
 ## 1. Role of the Mobile App
 
-The mobile app (`apps/mobile`) is the listening-first client. It prioritizes continuity, playback ergonomics, and eventual offline support, while remaining a pure consumer of backend authority.
+The mobile app (`apps/native`) is the listening-first client. It prioritizes continuity, playback ergonomics, and eventual offline support, while remaining a pure consumer of backend authority.
 
 ## 2. Structure
 
 ### Layered Structure
 
-- **Composition (`apps/mobile/src/app`)**: Expo Router navigation, route groups, layouts, and screen wiring.
-- **Features (`apps/mobile/src/features/`)**: app-local feature slices — each owns screens, components, hooks, and utils.
+- **Composition (`apps/native/src/app`)**: Expo Router navigation, route groups, layouts, and screen wiring.
+- **Features (`apps/native/src/features/`)**: app-local feature slices — each owns screens, components, hooks, and utils.
 - **Core (`@sd/core-*`)**: shared infrastructure such as auth, API access, and styling.
 - **Domain (`@sd/domain-*`)**: shared data and state hooks used across both apps.
-- **Shared (`apps/mobile/src/shared/` and `@sd/shared`)**: app-local primitives and cross-app utilities.
+- **Shared (`apps/native/src/shared/` and `@sd/shared`)**: app-local primitives and cross-app utilities.
 
 ### Structural Rules
 
@@ -26,10 +26,10 @@ Current mobile work is centered on search and auth flows. Offline sync, download
 
 The navigation surface has been reworked into a tabs-owned structure:
 
-- the main app surface lives under `apps/mobile/src/app/(tabs)/`
-- the shared tabs boundary is `apps/mobile/src/app/(tabs)/_layout.tsx`
+- the main app surface lives under `apps/native/src/app/(tabs)/`
+- the shared tabs boundary is `apps/native/src/app/(tabs)/_layout.tsx`
 - top-level sections are real tabs: feed, live, search, library, and account
-- tab chrome UI is rendered by `apps/mobile/src/features/navigation/` components
+- tab chrome UI is rendered by `apps/native/src/features/navigation/` components
 - route state is the source of truth for active tab and subsection
 - subsection selection happens inside each tab stack rather than through a shell-owned navigation store
 
@@ -92,13 +92,13 @@ The tab bar is a product-specific navigation surface layered over a standard Exp
 
 ### Ownership
 
-- Top-level tab chrome lives in `apps/mobile/src/features/navigation/components/CustomTabBar.tsx`
-- Subsection chrome lives in `apps/mobile/src/features/navigation/components/SubsectionBarHost.tsx`
-- Shared route helpers for tabs live in `apps/mobile/src/features/navigation/utils/tab-route-config.ts`
+- Top-level tab chrome lives in `apps/native/src/features/navigation/components/CustomTabBar.tsx`
+- Subsection chrome lives in `apps/native/src/features/navigation/components/SubsectionBarHost.tsx`
+- Shared route helpers for tabs live in `apps/native/src/features/navigation/utils/tab-route-config.ts`
 
 ### Package Discipline
 
-- Route files in `apps/mobile/src/app/` stay thin and assemble package-owned screens.
+- Route files in `apps/native/src/app/` stay thin and assemble package-owned screens.
 - Feature packages own reusable mobile-native UI and route-facing screen components.
 - Shared and core packages must not hide native-only code behind generic filenames or generic root exports.
 - If code is mobile-native only, it must live in an explicit `.native.*` file and be exported through `index.native.ts`.

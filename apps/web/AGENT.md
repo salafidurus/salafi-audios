@@ -225,7 +225,7 @@ import { motion } from 'framer-motion';
 
 - Expo Router `Tabs` owns top-level mobile navigation
 - Mobile renders an app-owned custom tab bar and subsection bar over tab state
-- Section constants and helpers in `apps/mobile/src/features/navigation/` keep the tab structure aligned with web
+- Section constants and helpers in `apps/native/src/features/navigation/` keep the tab structure aligned with web
 
 ---
 

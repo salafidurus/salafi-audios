@@ -9,11 +9,11 @@ Tracks listening progress per lecture via a Zustand store, provides a `useLectur
 ## Boundaries
 
 - **Depends on:** `@sd/core-contracts`, `zustand`
-- **Consumed by:** `@sd/feature-progress`, `apps/web`, `apps/mobile`
+- **Consumed by:** `@sd/feature-progress`, `apps/web`, `apps/native`
 
 ## Structure
 
-```
+```text
 src/
 ├── store/
 │   └── progress.store.ts       # Zustand progress state

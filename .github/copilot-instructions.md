@@ -20,7 +20,7 @@ Purpose: give an AI coding agent just-enough context to be immediately productiv
 - Follow Interface → Application → Domain → Infrastructure (see `apps/api/AGENT.md` and `apps/api/src`).
 - Shared contracts: `packages/core-contracts/src/types/*` and query helpers in `packages/core-contracts/src/query/`.
 - DB & migrations: `packages/core-db/prisma/schema.prisma`, migrations in `packages/core-db/prisma/migrations/`.
-- Client structure: `apps/web/AGENT.md` (app/core/features/shared) and `apps/mobile/AGENT.md` (outbox/sync patterns).
+- Client structure: `apps/web/AGENT.md` (app/core/features/shared) and `apps/native/AGENT.md` (outbox/sync patterns).
 
 ## Developer workflows — exact commands ▶️
 
@@ -135,7 +135,7 @@ Add `POST /lectures/:id/publish` →
 **Where to look for examples** 📁
 
 - Backend layering & rules: `apps/api/AGENT.md`, `apps/api/src`
-- Mobile offline/outbox: `apps/mobile/AGENT.md`, `docs/mobile.md`
+- Mobile offline/outbox: `apps/native/AGENT.md`, `docs/mobile.md`
 - Web structure: `apps/web/AGENT.md` (`app/`, `core/`, `features/`, `shared/`)
 - DB modeling & migrations: `packages/core-db/AGENT.md`, `packages/core-db/prisma`
 

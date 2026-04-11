@@ -53,14 +53,14 @@ Before editing agent instructions or skills:
 - For design image requests, use root skill `google-stitch` with a Stitch-first flow.
 - Sequence is mandatory: image -> Stitch baseline -> repo adaptation.
 - Adaptation must apply `docs/`, root/workspace `AGENT.md`, and `.github/copilot-instructions.md`.
-- Place generated code only in the target workspace (`apps/web` or `apps/mobile`) and keep monorepo boundaries intact.
+- Place generated code only in the target workspace (`apps/web` or `apps/native`) and keep monorepo boundaries intact.
 
 ## Brand assets
 
 - Web favicon/app icons: `apps/web/src/app/favicon.ico`, `apps/web/public/icons/*`
 - Web logos: `apps/web/public/logo/*`
-- Mobile app icon/splash: `apps/mobile/assets/images/icon.png`, `apps/mobile/assets/images/splash-icon.png`
-- Mobile logos: `apps/mobile/assets/images/logo/*`
+- Mobile app icon/splash: `apps/native/assets/images/icon.png`, `apps/native/assets/images/splash-icon.png`
+- Mobile logos: `apps/native/assets/images/logo/*`
 - When implementing UI, use these assets (avoid starter/template logos).
 
 ## Non-negotiable guardrails
@@ -82,7 +82,7 @@ Before editing agent instructions or skills:
 
 - `apps/api` - authoritative backend core
 - `apps/web` - public/admin web client (Next.js, CSS-responsive — no React Native Web)
-- `apps/mobile` - offline-first native client (iOS + Android — no Expo Web)
+- `apps/native` - offline-first native client (iOS + Android — no Expo Web)
 - `packages/*` - shared libraries: core infra, domain state, design tokens, cross-app utilities
 - `docs/` - product + implementation authority
 
@@ -99,7 +99,7 @@ src/
 
 ### Platform file extensions
 
-Mobile (`apps/mobile`):
+Mobile (`apps/native`):
 
 - `.tsx` — base native component (iOS + Android)
 - `.ios.tsx` — iOS-only override (only when behavior truly diverges)
@@ -259,13 +259,13 @@ everything is already covered.
 
 | Location                                   | Test file                     |
 | ------------------------------------------ | ----------------------------- |
-| `apps/mobile/src/features/<f>/screens/`    | co-located `.spec.tsx`        |
-| `apps/mobile/src/features/<f>/components/` | co-located `.spec.tsx`        |
-| `apps/mobile/src/features/<f>/hooks/`      | co-located `.spec.ts`         |
+| `apps/native/src/features/<f>/screens/`    | co-located `.spec.tsx`        |
+| `apps/native/src/features/<f>/components/` | co-located `.spec.tsx`        |
+| `apps/native/src/features/<f>/hooks/`      | co-located `.spec.ts`         |
 | `apps/web/src/features/<f>/screens/`       | co-located `.spec.tsx`        |
 | `apps/web/src/features/<f>/components/`    | co-located `.spec.tsx`        |
 | `apps/web/src/features/<f>/hooks/`         | co-located `.spec.ts`         |
-| `apps/mobile/src/shared/`                  | co-located `.spec.tsx`        |
+| `apps/native/src/shared/`                  | co-located `.spec.tsx`        |
 | `apps/web/src/shared/`                     | co-located `.spec.tsx`        |
 | `packages/domain-*/src/`                   | co-located `.spec.ts`         |
 | `apps/api/src/modules/<m>/`                | co-located `.service.spec.ts` |
@@ -400,4 +400,4 @@ same commit.
 
 - Use Playwright MCP only for web UI verification.
 - For mobile app work, use Playwright MCP only for responsive/mobile web-view checks in `apps/web`.
-- Do not use Playwright MCP to validate native mobile views in `apps/mobile`; use Expo/native tooling for that.
+- Do not use Playwright MCP to validate native mobile views in `apps/native`; use Expo/native tooling for that.

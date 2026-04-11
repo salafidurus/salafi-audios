@@ -9,11 +9,11 @@ Manages search query execution and result processing. Provides the search API cl
 ## Boundaries
 
 - **Depends on:** `@sd/core-contracts`, `react`
-- **Consumed by:** `@sd/feature-search`, `apps/web`, `apps/mobile`
+- **Consumed by:** `@sd/feature-search`, `apps/web`, `apps/native`
 
 ## Structure
 
-```
+```text
 src/
 ├── api/
 │   └── search.api.ts                  # Search API client
