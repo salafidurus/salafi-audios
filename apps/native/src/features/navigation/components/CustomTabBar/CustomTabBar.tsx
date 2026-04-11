@@ -4,7 +4,7 @@ import { Pressable, Text, View } from "react-native";
 import { EaseView } from "react-native-ease";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { getRootTabByRouteName } from "../../utils/tab-route-config";
+import { getRootTabByRouteName } from "@/features/navigation/utils/tab-route-config";
 
 export const TAB_BAR_HEIGHT = 84;
 export const SUBSECTION_BAR_HEIGHT = 56;

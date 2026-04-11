@@ -1,5 +1,5 @@
 import type { AdminPermission } from "@sd/core-contracts";
-import { useAdminPermissions } from "../../hooks/use-admin-permissions";
+import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 
 type Props = {
   requires: AdminPermission;

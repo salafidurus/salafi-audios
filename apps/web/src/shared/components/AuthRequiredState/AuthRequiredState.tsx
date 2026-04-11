@@ -1,7 +1,7 @@
 "use client";
 
-import { useResponsive } from "../../hooks/use-responsive";
-import { useIsHydrated } from "../../hooks/use-is-hydrated";
+import { useResponsive } from "@/shared/hooks/use-responsive";
+import { useIsHydrated } from "@/shared/hooks/use-is-hydrated";
 import {
   AuthRequiredStateDesktop,
   type AuthRequiredStateDesktopProps,

@@ -13,9 +13,9 @@ import { Controller, useForm } from "react-hook-form";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useTranslation } from "@sd/core-i18n";
-import { AccentGradientFill } from "../../../../shared/components/AccentGradientFill/AccentGradientFill";
-import { Button } from "../../../../shared/components/Button/Button";
-import { TextInput } from "../../../../shared/components/TextInput/TextInput";
+import { AccentGradientFill } from "@/shared/components/AccentGradientFill/AccentGradientFill";
+import { Button } from "@/shared/components/Button/Button";
+import { TextInput } from "@/shared/components/TextInput/TextInput";
 
 type FormValues = {
   email: string;

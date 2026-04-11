@@ -1,6 +1,6 @@
 import { type Href, useRouter } from "expo-router";
 import { routes } from "@sd/core-contracts";
-import { ScholarListScreen } from "../../../features/scholar/screens/scholar-list/scholar-list.screen";
+import { ScholarListScreen } from "@/features/scholar/screens/scholar-list/scholar-list.screen";
 
 export default function ScholarsIndexRoute() {
   const router = useRouter();

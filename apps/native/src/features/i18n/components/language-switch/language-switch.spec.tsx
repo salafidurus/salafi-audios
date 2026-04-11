@@ -1,6 +1,6 @@
 import React from "react";
 import renderer, { act } from "react-test-renderer";
-import { changeLocale } from "../../../../core/i18n/i18n";
+import { changeLocale } from "@/core/i18n/i18n";
 import { LanguageSwitch } from "./language-switch";
 
 const mockUseTranslation = jest.fn(() => ({

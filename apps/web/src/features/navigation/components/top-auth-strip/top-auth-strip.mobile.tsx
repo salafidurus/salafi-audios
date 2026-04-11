@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname } from "next/navigation";
 import clsx from "clsx";
-import { Button } from "../../../../shared/components/Button/Button";
+import { Button } from "@/shared/components/Button/Button";
 import { routes } from "@sd/core-contracts";
 import styles from "./top-auth-strip.mobile.module.css";
 

@@ -2,17 +2,17 @@
 
 import { useEffect, useRef } from "react";
 
-import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
-import { SearchFilterMobile } from "../../components/SearchFilter/SearchFilter.mobile";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { SearchFilterMobile } from "@/features/search/components/SearchFilter/SearchFilter.mobile";
 import {
   SearchInputMobile,
   type SearchInputMobileRef,
-} from "../../components/SearchInput/SearchInput.mobile";
-import { SearchResultItemMobile } from "../../components/SearchResultItem/SearchResultItem.mobile";
+} from "@/features/search/components/SearchInput/SearchInput.mobile";
+import { SearchResultItemMobile } from "@/features/search/components/SearchResultItem/SearchResultItem.mobile";
 import {
   SearchResultsListMobile,
   type SearchResultRow,
-} from "../../components/SearchResultsList/SearchResultsList.mobile";
+} from "@/features/search/components/SearchResultsList/SearchResultsList.mobile";
 import { useSearchProcessing } from "@sd/domain-search";
 import styles from "./search-processing.screen.mobile.module.css";
 

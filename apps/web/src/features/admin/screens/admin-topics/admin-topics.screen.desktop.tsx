@@ -3,8 +3,13 @@
 import { useState } from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { TopicDetailDto } from "@sd/core-contracts";
-import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
-import { createTopic, updateTopic, deleteTopic, type AdminTopicInput } from "../../api/admin.api";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import {
+  createTopic,
+  updateTopic,
+  deleteTopic,
+  type AdminTopicInput,
+} from "@/features/admin/api/admin.api";
 
 export function AdminTopicsDesktopScreen() {
   const { data, isFetching, refetch } = useApiQuery<TopicDetailDto[]>(queryKeys.topics.list(), () =>

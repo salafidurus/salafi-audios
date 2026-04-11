@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { useTranslation } from "@sd/core-i18n";
-import { useAuth } from "../../../../core/auth";
+import { useAuth } from "@/core/auth";
 import { routes } from "@sd/core-contracts";
 import {
   PanelLeftOpen,
@@ -18,9 +18,12 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import styles from "./sidebar.module.css";
-import { SECTION_TABS, type Section } from "../../types";
-import { buildSectionTabPath, getCurrentSection } from "../../utils/get-current-section";
-import { getSectionTabIcon } from "../../utils/section-tab-icons";
+import { SECTION_TABS, type Section } from "@/features/navigation/types";
+import {
+  buildSectionTabPath,
+  getCurrentSection,
+} from "@/features/navigation/utils/get-current-section";
+import { getSectionTabIcon } from "@/features/navigation/utils/section-tab-icons";
 
 type NavItem = {
   label: string;

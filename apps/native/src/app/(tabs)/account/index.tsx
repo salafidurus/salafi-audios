@@ -1,6 +1,6 @@
 import { type Href, useRouter } from "expo-router";
 import { routes } from "@sd/core-contracts";
-import { AccountScreen } from "../../../features/account/screens/account.screen";
+import { AccountScreen } from "@/features/account/screens/account.screen";
 
 export default function AccountIndexRoute() {
   const router = useRouter();

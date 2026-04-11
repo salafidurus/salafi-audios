@@ -1,8 +1,8 @@
 "use client";
 
 import type { AdminPermission } from "@sd/core-contracts";
-import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
-import { useAdminPermissions } from "../../hooks/use-admin-permissions";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 
 type AdminSection = {
   title: string;

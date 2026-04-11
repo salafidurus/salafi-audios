@@ -1,9 +1,9 @@
 import { FlatList, Text, View } from "react-native";
 import type { ScholarListItemDto } from "@sd/core-contracts";
 import { useScholarsList } from "@sd/domain-content";
-import { AppText } from "../../../../shared/components/AppText/AppText";
-import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
-import { ScholarCard } from "../../components/scholar-card/scholar-card";
+import { AppText } from "@/shared/components/AppText/AppText";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { ScholarCard } from "@/features/scholar/components/scholar-card/scholar-card";
 
 export type ScholarListScreenProps = {
   onSelectScholar?: (slug: string) => void;

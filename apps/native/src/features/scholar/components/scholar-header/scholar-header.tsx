@@ -1,6 +1,6 @@
 import type { ScholarDetailDto } from "@sd/core-contracts";
 import { Image, Linking, Pressable, View } from "react-native";
-import { AppText } from "../../../../shared/components/AppText/AppText";
+import { AppText } from "@/shared/components/AppText/AppText";
 
 export type ScholarHeaderProps = {
   scholar: ScholarDetailDto & {

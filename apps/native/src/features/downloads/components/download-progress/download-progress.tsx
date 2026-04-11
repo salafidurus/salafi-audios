@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import { useDownload } from "../../hooks/use-download";
+import { useDownload } from "@/features/downloads/hooks/use-download";
 
 type DownloadProgressProps = {
   lectureId: string;

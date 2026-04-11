@@ -1,9 +1,9 @@
 import { ScrollView, View } from "react-native";
 import { useScholarDetailScreen } from "@sd/domain-content";
-import { AppText } from "../../../../shared/components/AppText/AppText";
-import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
-import { ScholarContentList } from "../../components/scholar-content-list/scholar-content-list";
-import { ScholarHeader } from "../../components/scholar-header/scholar-header";
+import { AppText } from "@/shared/components/AppText/AppText";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { ScholarContentList } from "@/features/scholar/components/scholar-content-list/scholar-content-list";
+import { ScholarHeader } from "@/features/scholar/components/scholar-header/scholar-header";
 
 export type ScholarDetailScreenProps = {
   slug: string;

@@ -2,7 +2,7 @@
 
 import { type CSSProperties, useMemo, useState } from "react";
 import type { TopicDetailDto, TopicSlug } from "@sd/core-contracts";
-import { useDragScroll } from "../../../../shared/hooks/use-drag-scroll";
+import { useDragScroll } from "@/shared/hooks/use-drag-scroll";
 import styles from "./SearchFilter.mobile.module.css";
 
 export type SearchFilterValue = TopicSlug[];

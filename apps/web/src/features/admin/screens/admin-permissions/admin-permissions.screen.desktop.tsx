@@ -7,7 +7,7 @@ import {
   grantPermission,
   revokePermission,
   type AdminPermissionsListResponse,
-} from "../../api/admin.api";
+} from "@/features/admin/api/admin.api";
 
 export function AdminPermissionsDesktopScreen() {
   const [userId, setUserId] = useState("");

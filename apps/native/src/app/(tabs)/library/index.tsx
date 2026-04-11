@@ -1,6 +1,6 @@
 import { type Href, useRouter } from "expo-router";
 import { routes } from "@sd/core-contracts";
-import { LibraryScreen } from "../../../features/library/screens/library.screen";
+import { LibraryScreen } from "@/features/library/screens/library.screen";
 
 export default function LibraryIndexRoute() {
   const router = useRouter();

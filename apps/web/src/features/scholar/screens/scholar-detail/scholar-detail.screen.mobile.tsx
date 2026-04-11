@@ -1,10 +1,10 @@
 "use client";
 
-import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
-import { AppText } from "../../../../shared/components/AppText/AppText";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { AppText } from "@/shared/components/AppText/AppText";
 import { useScholarDetailScreen } from "@sd/domain-content";
-import { ScholarHeader } from "../../components/scholar-header/scholar-header";
-import { ScholarContentList } from "../../components/scholar-content-list/scholar-content-list";
+import { ScholarHeader } from "@/features/scholar/components/scholar-header/scholar-header";
+import { ScholarContentList } from "@/features/scholar/components/scholar-content-list/scholar-content-list";
 
 export type ScholarDetailMobileScreenProps = {
   slug: string;

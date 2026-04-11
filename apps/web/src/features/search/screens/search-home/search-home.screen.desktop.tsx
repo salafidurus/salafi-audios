@@ -1,8 +1,8 @@
 "use client";
 
-import { QuickBrowseDesktop } from "../../components/QuickBrowse/QuickBrowse.desktop";
-import { SearchButtonDesktop } from "../../components/SearchButton/SearchButton.desktop";
-import { TitleTextDesktop } from "../../components/TitleText/TitleText.desktop";
+import { QuickBrowseDesktop } from "@/features/search/components/QuickBrowse/QuickBrowse.desktop";
+import { SearchButtonDesktop } from "@/features/search/components/SearchButton/SearchButton.desktop";
+import { TitleTextDesktop } from "@/features/search/components/TitleText/TitleText.desktop";
 import { useQuickBrowse } from "@sd/domain-search";
 
 export type SearchHomeDesktopScreenProps = {

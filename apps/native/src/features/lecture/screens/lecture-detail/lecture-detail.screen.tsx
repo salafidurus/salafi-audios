@@ -1,11 +1,11 @@
 import { ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { useLectureDetailScreen } from "@sd/domain-content";
-import { AppText } from "../../../../shared/components/AppText/AppText";
-import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
-import { LectureMeta } from "../../components/lecture-meta/lecture-meta";
-import { SeriesContextBar } from "../../components/series-context-bar/series-context-bar";
-import { TopicChips } from "../../components/topic-chips/topic-chips";
+import { AppText } from "@/shared/components/AppText/AppText";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { LectureMeta } from "@/features/lecture/components/lecture-meta/lecture-meta";
+import { SeriesContextBar } from "@/features/lecture/components/series-context-bar/series-context-bar";
+import { TopicChips } from "@/features/lecture/components/topic-chips/topic-chips";
 
 export type LectureDetailScreenProps = {
   id: string;

@@ -2,13 +2,13 @@ import { type Href, usePathname, useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { EaseView } from "react-native-ease";
 import { StyleSheet } from "react-native-unistyles";
-import { SECTION_TABS, type Section } from "../../types";
+import { SECTION_TABS, type Section } from "@/features/navigation/types";
 import {
   buildSectionPath,
   getActiveSubsection,
   getRootTabFromPathname,
-} from "../../utils/tab-route-config";
-import { getSectionTabIcon } from "../../utils/section-tab-icons";
+} from "@/features/navigation/utils/tab-route-config";
+import { getSectionTabIcon } from "@/features/navigation/utils/section-tab-icons";
 import { SUBSECTION_BAR_HEIGHT, TAB_BAR_HEIGHT } from "../CustomTabBar/CustomTabBar";
 
 export function SubsectionBarHost() {

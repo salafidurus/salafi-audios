@@ -4,18 +4,23 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import { useAuth } from "../../../../core/auth";
+import { useAuth } from "@/core/auth";
 import { routes } from "@sd/core-contracts";
 import { Cloud, Mic, Search, CassetteTape, Settings, type LucideIcon } from "lucide-react";
 import styles from "./sidebar-bottom.module.css";
-import { DEFAULT_TABS, SECTION_TABS, SECTION_LABELS, type Section } from "../../types";
-import { useNavigationStore } from "../../store/navigation-store";
+import {
+  DEFAULT_TABS,
+  SECTION_TABS,
+  SECTION_LABELS,
+  type Section,
+} from "@/features/navigation/types";
+import { useNavigationStore } from "@/features/navigation/store/navigation-store";
 import {
   buildSectionTabPath,
   getCurrentSection,
   getActiveTabFromPath,
-} from "../../utils/get-current-section";
-import { getSectionTabIcon } from "../../utils/section-tab-icons";
+} from "@/features/navigation/utils/get-current-section";
+import { getSectionTabIcon } from "@/features/navigation/utils/section-tab-icons";
 
 const SECTION_ICONS: Record<Section, LucideIcon> = {
   feed: Cloud,

@@ -2,10 +2,10 @@
 
 import { Suspense } from "react";
 import { useEffect, useRef } from "react";
-import { SearchFilterDesktop } from "../../components/SearchFilter/SearchFilter.desktop";
-import { SearchInputDesktop } from "../../components/SearchInput/SearchInput.desktop";
-import { SearchResultItemDesktop } from "../../components/SearchResultItem/SearchResultItem.desktop";
-import { SearchResultsListDesktop } from "../../components/SearchResultsList/SearchResultsList.desktop";
+import { SearchFilterDesktop } from "@/features/search/components/SearchFilter/SearchFilter.desktop";
+import { SearchInputDesktop } from "@/features/search/components/SearchInput/SearchInput.desktop";
+import { SearchResultItemDesktop } from "@/features/search/components/SearchResultItem/SearchResultItem.desktop";
+import { SearchResultsListDesktop } from "@/features/search/components/SearchResultsList/SearchResultsList.desktop";
 import { useSearchProcessing } from "@sd/domain-search";
 
 export function SearchProcessingDesktopScreen() {

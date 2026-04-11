@@ -1,7 +1,7 @@
 "use client";
 
-import { useResponsive } from "../../../../shared/hooks/use-responsive";
-import { useIsHydrated } from "../../../../shared/hooks/use-is-hydrated";
+import { useResponsive } from "@/shared/hooks/use-responsive";
+import { useIsHydrated } from "@/shared/hooks/use-is-hydrated";
 import { Sidebar as SidebarDesktop } from "./sidebar.desktop";
 import { SidebarTablet } from "./sidebar.tablet";
 import { SidebarMobile } from "./sidebar.mobile";

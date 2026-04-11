@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
-import { useAuth } from "../../../core/auth";
-import { FeedFollowingScreen } from "../../../features/feed/screens/feed-following.screen";
-import { AuthRequiredState } from "../../../shared/components/AuthRequiredState/AuthRequiredState";
+import { useAuth } from "@/core/auth";
+import { FeedFollowingScreen } from "@/features/feed/screens/feed-following.screen";
+import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
 import { routes } from "@sd/core-contracts";
 
 export default function FeedFollowing() {

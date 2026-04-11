@@ -1,13 +1,13 @@
 "use client";
 
-import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
-import { AppText } from "../../../../shared/components/AppText/AppText";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { AppText } from "@/shared/components/AppText/AppText";
 import { useLectureDetailScreen } from "@sd/domain-content";
-import { LectureMeta } from "../../components/lecture-meta/lecture-meta";
-import { TopicChips } from "../../components/topic-chips/topic-chips";
-import { SeriesContextBar } from "../../components/series-context-bar/series-context-bar";
-import { LecturePlayButton } from "../../components/lecture-play-button/LecturePlayButton";
-import { LectureSaveButton } from "../../components/lecture-save-button/LectureSaveButton";
+import { LectureMeta } from "@/features/lecture/components/lecture-meta/lecture-meta";
+import { TopicChips } from "@/features/lecture/components/topic-chips/topic-chips";
+import { SeriesContextBar } from "@/features/lecture/components/series-context-bar/series-context-bar";
+import { LecturePlayButton } from "@/features/lecture/components/lecture-play-button/LecturePlayButton";
+import { LectureSaveButton } from "@/features/lecture/components/lecture-save-button/LectureSaveButton";
 
 export type LectureDetailMobileScreenProps = {
   id: string;

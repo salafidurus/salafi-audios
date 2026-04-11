@@ -1,4 +1,4 @@
-import { AdminPermissionsScreen } from "../../../../../features/admin/screens/admin-permissions/admin-permissions.screen";
+import { AdminPermissionsScreen } from "@/features/admin/screens/admin-permissions/admin-permissions.screen";
 
 export default function AdminPermissionsPage() {
   return <AdminPermissionsScreen />;

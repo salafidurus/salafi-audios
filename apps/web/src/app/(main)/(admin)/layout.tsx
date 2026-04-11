@@ -1,6 +1,6 @@
 "use client";
 
-import { useAdminPermissions } from "../../../features/admin/hooks/use-admin-permissions";
+import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { data, isFetching } = useAdminPermissions();

@@ -1,7 +1,7 @@
 import { Pressable, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
-import { QuickBrowse } from "../../components/QuickBrowse/QuickBrowse";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { QuickBrowse } from "@/features/search/components/QuickBrowse/QuickBrowse";
 import { useQuickBrowse } from "@sd/domain-search";
 
 export type SearchHomeScreenProps = {

@@ -1,7 +1,7 @@
 "use client";
 
 import type { SeriesContextDto } from "@sd/core-contracts";
-import { AppText } from "../../../../shared/components/AppText/AppText";
+import { AppText } from "@/shared/components/AppText/AppText";
 
 export type SeriesContextBarProps = {
   seriesContext: SeriesContextDto;

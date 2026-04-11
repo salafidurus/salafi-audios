@@ -3,11 +3,11 @@
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import clsx from "clsx";
-import { useAuth, authClient } from "../../../../core/auth";
-import { Button } from "../../../../shared/components/Button/Button";
+import { useAuth, authClient } from "@/core/auth";
+import { Button } from "@/shared/components/Button/Button";
 import { Search } from "lucide-react";
 import { routes } from "@sd/core-contracts";
-import { LanguageSwitch } from "../../../i18n";
+import { LanguageSwitch } from "@/features/i18n";
 import styles from "./top-auth-strip.module.css";
 import searchStyles from "./search-action.module.css";
 

@@ -1,7 +1,7 @@
 "use client";
 
-import { useResponsive } from "../../../../shared/hooks/use-responsive";
-import { useIsHydrated } from "../../../../shared/hooks/use-is-hydrated";
+import { useResponsive } from "@/shared/hooks/use-responsive";
+import { useIsHydrated } from "@/shared/hooks/use-is-hydrated";
 import { TopAuthStrip as TopAuthStripDesktop } from "./top-auth-strip.desktop";
 
 export function TopAuthStrip() {

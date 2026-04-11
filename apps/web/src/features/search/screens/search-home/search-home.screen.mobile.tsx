@@ -1,7 +1,7 @@
-import { QuickBrowseMobile } from "../../components/QuickBrowse/QuickBrowse.mobile";
-import { SearchButtonMobile } from "../../components/SearchButton/SearchButton.mobile";
-import { TitleTextMobile } from "../../components/TitleText/TitleText.mobile";
-import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
+import { QuickBrowseMobile } from "@/features/search/components/QuickBrowse/QuickBrowse.mobile";
+import { SearchButtonMobile } from "@/features/search/components/SearchButton/SearchButton.mobile";
+import { TitleTextMobile } from "@/features/search/components/TitleText/TitleText.mobile";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { useQuickBrowse } from "@sd/domain-search";
 import styles from "./search-home.screen.mobile.module.css";
 
@@ -29,10 +29,7 @@ export function SearchHomeMobileScreen({
           <div className={styles.header}>
             <TitleTextMobile>Find a lesson</TitleTextMobile>
           </div>
-          <SearchButtonMobile
-            placeholder="What do you want to listen to?"
-            onPress={onOpenSearch}
-          />
+          <SearchButtonMobile placeholder="What do you want to listen to?" onPress={onOpenSearch} />
         </div>
         <QuickBrowseMobile
           scholars={data?.scholars}

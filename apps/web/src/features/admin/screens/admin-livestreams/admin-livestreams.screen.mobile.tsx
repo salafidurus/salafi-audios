@@ -2,8 +2,8 @@
 
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { LiveSessionDeltaDto } from "@sd/core-contracts";
-import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
-import { updateLiveSessionStatus } from "../../api/admin.api";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { updateLiveSessionStatus } from "@/features/admin/api/admin.api";
 
 export function AdminLivestreamsMobileScreen() {
   const {

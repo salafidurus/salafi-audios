@@ -1,7 +1,7 @@
 import { type CSSProperties } from "react";
 import React from "react";
 import { SearchResultEmptyMobile } from "../SearchResultEmpty/SearchResultEmpty.mobile";
-import { useDragScroll } from "../../../../shared/hooks/use-drag-scroll";
+import { useDragScroll } from "@/shared/hooks/use-drag-scroll";
 import styles from "./SearchResultsList.mobile.module.css";
 
 export type SearchResultRow = {

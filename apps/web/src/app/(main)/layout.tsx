@@ -1,7 +1,7 @@
-import { Footer } from "../../features/navigation/components/footer/footer";
-import { Sidebar } from "../../features/navigation/components/sidebar/sidebar";
-import { TopAuthStrip } from "../../features/navigation/components/top-auth-strip/top-auth-strip";
-import { MiniPlayer } from "../../features/playback/components/mini-player/mini-player";
+import { Footer } from "@/features/navigation/components/footer/footer";
+import { Sidebar } from "@/features/navigation/components/sidebar/sidebar";
+import { TopAuthStrip } from "@/features/navigation/components/top-auth-strip/top-auth-strip";
+import { MiniPlayer } from "@/features/playback/components/mini-player/mini-player";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (

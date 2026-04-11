@@ -2,9 +2,9 @@
 
 import { SignInMobileScreen } from "./sign-in.screen.mobile";
 import { SignInDesktopScreen } from "./sign-in.screen.desktop";
-import { useResponsive } from "../../../../shared/hooks/use-responsive";
-import { useIsHydrated } from "../../../../shared/hooks/use-is-hydrated";
-import { authClient } from "../../../../core/auth";
+import { useResponsive } from "@/shared/hooks/use-responsive";
+import { useIsHydrated } from "@/shared/hooks/use-is-hydrated";
+import { authClient } from "@/core/auth";
 
 type SignInScreenProps = {
   redirectTo: string;

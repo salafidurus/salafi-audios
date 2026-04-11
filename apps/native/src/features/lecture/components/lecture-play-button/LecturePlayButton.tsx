@@ -1,7 +1,7 @@
 import type { LectureDetailDto } from "@sd/core-contracts";
 import { usePlayback } from "@sd/domain-playback";
 import type { Track } from "@sd/domain-playback";
-import { Button } from "../../../../shared/components/Button/Button";
+import { Button } from "@/shared/components/Button/Button";
 
 export type LecturePlayButtonProps = {
   lecture: LectureDetailDto;

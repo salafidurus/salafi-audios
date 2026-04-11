@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useTranslation } from "@sd/core-i18n";
 import { routes } from "@sd/core-contracts";
-import { authClient } from "../../../../core/auth";
-import { TextInput } from "../../../../shared/components/TextInput/TextInput";
-import { GoogleSignInButton, AppleSignInButton } from "../../components/social-buttons";
+import { authClient } from "@/core/auth";
+import { TextInput } from "@/shared/components/TextInput/TextInput";
+import { GoogleSignInButton, AppleSignInButton } from "@/features/auth/components/social-buttons";
 import styles from "../auth-form.module.css";
 
 type SignInDesktopScreenProps = {

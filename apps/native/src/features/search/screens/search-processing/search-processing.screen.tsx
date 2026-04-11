@@ -1,15 +1,18 @@
 import { useEffect, useRef } from "react";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { SearchFilter } from "../../components/SearchFilter/SearchFilter";
-import { SearchInput, type SearchInputRef } from "../../components/SearchInput/SearchInput";
-import { SearchResultItem } from "../../components/SearchResultItem/SearchResultItem";
+import { SearchFilter } from "@/features/search/components/SearchFilter/SearchFilter";
+import {
+  SearchInput,
+  type SearchInputRef,
+} from "@/features/search/components/SearchInput/SearchInput";
+import { SearchResultItem } from "@/features/search/components/SearchResultItem/SearchResultItem";
 import {
   SearchResultsList,
   type SearchResultRow,
-} from "../../components/SearchResultsList/SearchResultsList";
+} from "@/features/search/components/SearchResultsList/SearchResultsList";
 import { useSearchProcessing } from "@sd/domain-search";
-import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
 export type SearchProcessingScreenProps = {
   prefill?: string;

@@ -1,7 +1,7 @@
 "use client";
 
-import { ScreenView } from "../../../shared/components/ScreenView/ScreenView";
-import { AppText } from "../../../shared/components/AppText/AppText";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { AppText } from "@/shared/components/AppText/AppText";
 import type { LiveSessionPublicDto } from "@sd/core-contracts";
 import { useLiveSessions } from "@sd/domain-live";
 import { LiveSessionCard } from "../components/live-session-card/live-session-card";

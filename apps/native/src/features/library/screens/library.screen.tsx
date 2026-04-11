@@ -5,7 +5,7 @@ import {
   useLibraryProgressScreen,
   useLibrarySavedScreen,
 } from "@sd/domain-content";
-import { useAuth } from "../../../core/auth/use-auth";
+import { useAuth } from "@/core/auth/use-auth";
 
 export type LibraryScreenProps = {
   onNavigateToLecture?: (id: string) => void;

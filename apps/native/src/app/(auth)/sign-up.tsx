@@ -1,8 +1,8 @@
 import { Platform, useColorScheme } from "react-native";
 import { type Href, useRouter } from "expo-router";
 import { routes } from "@sd/core-contracts";
-import { authClient } from "../../core/auth";
-import { SignUpScreen } from "../../features/auth/screens/sign-up/sign-up.screen";
+import { authClient } from "@/core/auth";
+import { SignUpScreen } from "@/features/auth/screens/sign-up/sign-up.screen";
 
 export default function SignUpRoute() {
   const router = useRouter();

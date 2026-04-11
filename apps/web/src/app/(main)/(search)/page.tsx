@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { SearchHomeScreen } from "../../../features/search/screens/search-home/search-home.screen";
+import { SearchHomeScreen } from "@/features/search/screens/search-home/search-home.screen";
 import { routes } from "@sd/core-contracts";
 
 export default function HomePage() {

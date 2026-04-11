@@ -6,7 +6,7 @@ import {
   useLibraryProgressScreen,
   useLibraryCompletedScreen,
 } from "@sd/domain-content";
-import { useAuth } from "../../../core/auth/use-auth";
+import { useAuth } from "@/core/auth/use-auth";
 
 function ProgressBar({ percent }: { percent: number }) {
   return (
@@ -113,9 +113,7 @@ export type LibrarySavedMobileScreenProps = {
   onNavigateToLecture?: (id: string) => void;
 };
 
-export function LibrarySavedMobileScreen({
-  onNavigateToLecture,
-}: LibrarySavedMobileScreenProps) {
+export function LibrarySavedMobileScreen({ onNavigateToLecture }: LibrarySavedMobileScreenProps) {
   const { isAuthenticated } = useAuth();
   const progressData = useLibraryProgressScreen(isAuthenticated);
   const savedData = useLibrarySavedScreen(isAuthenticated);

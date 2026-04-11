@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, FlatList } from "react-native";
 import type { LibraryItemDto } from "@sd/core-contracts";
 import { useLibraryCompletedScreen } from "@sd/domain-content";
-import { useAuth } from "../../../core/auth/use-auth";
+import { useAuth } from "@/core/auth/use-auth";
 
 export type LibraryCompletedScreenProps = {
   onNavigateToLecture?: (id: string) => void;

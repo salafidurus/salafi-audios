@@ -1,7 +1,7 @@
 import { Pressable, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { SUPPORTED_LOCALES, type Locale, useTranslation } from "@sd/core-i18n";
-import { changeLocale } from "../../../../core/i18n/i18n";
+import { changeLocale } from "@/core/i18n/i18n";
 
 const LOCALE_LABELS: Record<Locale, string> = {
   en: "English",

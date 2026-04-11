@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from "expo-router";
-import { PlaceholderRouteScreen } from "../../../shared/components/placeholder-route-screen";
+import { PlaceholderRouteScreen } from "@/shared/components/placeholder-route-screen";
 
 export default function SeriesDetailRoute() {
   const { id } = useLocalSearchParams<{ id?: string }>();

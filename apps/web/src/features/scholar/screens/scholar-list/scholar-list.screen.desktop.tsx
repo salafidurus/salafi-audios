@@ -1,9 +1,9 @@
 "use client";
 
 import { useScholarsList } from "@sd/domain-content";
-import { ScreenView } from "../../../../shared/components/ScreenView/ScreenView";
-import { AppText } from "../../../../shared/components/AppText/AppText";
-import { ScholarCard } from "../../components/scholar-card/scholar-card";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { AppText } from "@/shared/components/AppText/AppText";
+import { ScholarCard } from "@/features/scholar/components/scholar-card/scholar-card";
 
 export type ScholarListDesktopScreenProps = {
   onSelectScholar?: (slug: string) => void;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useProgressStore } from "@sd/domain-progress";
-import { Button } from "../../../../shared/components/Button/Button";
+import { Button } from "@/shared/components/Button/Button";
 
 export type LectureSaveButtonProps = {
   lectureId: string;

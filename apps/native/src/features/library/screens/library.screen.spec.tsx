@@ -6,7 +6,7 @@ import {
   useLibraryProgressScreen,
   useLibrarySavedScreen,
 } from "@sd/domain-content";
-import { useAuth } from "../../../core/auth/use-auth";
+import { useAuth } from "@/core/auth/use-auth";
 import { LibraryScreen } from "./library.screen";
 
 // SectionList uses @react-native/virtualized-lists which bundles its own react-native

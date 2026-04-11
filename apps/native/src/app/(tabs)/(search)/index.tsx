@@ -1,10 +1,18 @@
-import { PlaceholderRouteScreen } from "../../../shared/components/placeholder-route-screen";
+import type { ErrorBoundaryProps } from "expo-router";
+import { View, Text, Pressable } from "react-native";
+import { SearchHomeScreen } from "@/features/search/screens/search-home/search-home.screen";
+
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  return (
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Text>Something went wrong</Text>
+      <Pressable onPress={retry}>
+        <Text>Try again</Text>
+      </Pressable>
+    </View>
+  );
+}
 
 export default function SearchIndexRoute() {
-  return (
-    <PlaceholderRouteScreen
-      title="Search"
-      description="Grouped search route shell is in apps/native now. Search feature screens will move in later slices."
-    />
-  );
+  return <SearchHomeScreen />;
 }

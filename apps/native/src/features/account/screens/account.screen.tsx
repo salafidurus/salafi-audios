@@ -1,7 +1,7 @@
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "@sd/core-i18n";
 import { useAccountScreen } from "@sd/domain-account";
-import { LanguageSwitch } from "../../i18n";
+import { LanguageSwitch } from "@/features/i18n";
 
 export type AccountScreenProps = {
   onNavigateToProfile?: () => void;

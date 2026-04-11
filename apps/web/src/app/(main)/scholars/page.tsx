@@ -1,4 +1,4 @@
-import { ScholarListScreen } from "../../../features/scholar/screens/scholar-list/scholar-list.screen";
+import { ScholarListScreen } from "@/features/scholar/screens/scholar-list/scholar-list.screen";
 
 export const metadata = {
   title: "Scholars",

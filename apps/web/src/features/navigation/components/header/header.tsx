@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { routes } from "@sd/core-contracts";
 import styles from "./header.module.css";
-import { Button } from "../../../../shared/components/Button/Button";
+import { Button } from "@/shared/components/Button/Button";
 
 export function Header() {
   const headerRef = useRef<HTMLElement | null>(null);

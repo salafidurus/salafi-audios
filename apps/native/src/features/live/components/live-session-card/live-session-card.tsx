@@ -1,6 +1,6 @@
 import { View, Pressable, Linking } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { AppText } from "../../../../shared/components/AppText/AppText";
+import { AppText } from "@/shared/components/AppText/AppText";
 import type { LiveSessionPublicDto } from "@sd/core-contracts";
 
 export type LiveSessionCardProps = {

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { LanguageSwitch } from "./language-switch";
-import { setLocaleCookie } from "../../../../core/i18n/locale-cookie";
+import { setLocaleCookie } from "@/core/i18n/locale-cookie";
 
 const mockChangeLanguage = jest.fn().mockResolvedValue(undefined);
 const mockRefresh = jest.fn();
