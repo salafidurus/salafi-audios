@@ -1,5 +1,7 @@
-import type { ErrorBoundaryProps } from "expo-router";
+import type { ErrorBoundaryProps, Href } from "expo-router";
+import { useRouter } from "expo-router";
 import { View, Text, Pressable } from "react-native";
+import { routes } from "@sd/core-contracts";
 import { FeedScreen } from "@/features/feed/screens/feed.screen";
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
@@ -14,5 +16,12 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
 }
 
 export default function FeedIndexRoute() {
-  return <FeedScreen />;
+  const router = useRouter();
+
+  return (
+    <FeedScreen
+      onNavigateToLecture={(id) => router.push(routes.lectures.detail(id) as Href)}
+      onNavigateToScholar={(slug) => router.push(routes.scholars.detail(slug) as Href)}
+    />
+  );
 }

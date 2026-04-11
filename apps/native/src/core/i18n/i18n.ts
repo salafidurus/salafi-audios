@@ -72,4 +72,21 @@ export async function initI18n(): Promise<void> {
 export async function changeLocale(locale: Locale): Promise<void> {
   await storeLocale(locale);
   await i18n.changeLanguage(locale);
+
+  const shouldBeRtl = isRtl(locale);
+  if (I18nManager.isRTL !== shouldBeRtl) {
+    I18nManager.forceRTL(shouldBeRtl);
+    if (__DEV__) {
+      // DevSettings only available in development builds
+      const { DevSettings } = await import("react-native");
+      DevSettings.reload();
+    } else {
+      try {
+        const { reloadAsync } = await import("expo-updates");
+        await reloadAsync();
+      } catch {
+        // expo-updates not available in this build
+      }
+    }
+  }
 }

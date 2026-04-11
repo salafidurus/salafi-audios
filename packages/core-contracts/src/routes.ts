@@ -26,6 +26,7 @@ export const routes = {
 
   live: {
     index: "/live",
+    session: (id: string) => `/live/${id}` as const,
   },
 
   account: {

@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { type Href, useRouter } from "expo-router";
 import { useAuth } from "@/core/auth";
 import { FeedFollowingScreen } from "@/features/feed/screens/feed-following.screen";
 import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
@@ -20,5 +20,10 @@ export default function FeedFollowing() {
     );
   }
 
-  return <FeedFollowingScreen />;
+  return (
+    <FeedFollowingScreen
+      onNavigateToLecture={(id) => router.push(routes.lectures.detail(id) as Href)}
+      onNavigateToScholar={(slug) => router.push(routes.scholars.detail(slug) as Href)}
+    />
+  );
 }

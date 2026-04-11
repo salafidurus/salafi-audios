@@ -1,5 +1,7 @@
 import type { ErrorBoundaryProps } from "expo-router";
+import { type Href, useRouter } from "expo-router";
 import { View, Text, Pressable } from "react-native";
+import { routes } from "@sd/core-contracts";
 import { SearchHomeScreen } from "@/features/search/screens/search-home/search-home.screen";
 
 export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
@@ -14,5 +16,19 @@ export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
 }
 
 export default function SearchIndexRoute() {
-  return <SearchHomeScreen />;
+  const router = useRouter();
+
+  return (
+    <SearchHomeScreen
+      onOpenSearch={() => router.push(routes.search as Href)}
+      onSelectCategory={(key) =>
+        router.push(`${routes.search}?searchKey=${encodeURIComponent(key)}` as Href)
+      }
+      onSelectScholar={(slug) => router.push(routes.scholars.detail(slug) as Href)}
+      onSelectSuggestion={(slug) =>
+        router.push(`${routes.search}?searchKey=${encodeURIComponent(slug)}` as Href)
+      }
+      onContinueListening={(id) => router.push(routes.lectures.detail(id) as Href)}
+    />
+  );
 }

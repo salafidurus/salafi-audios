@@ -74,14 +74,12 @@ export function CustomTabBar({ state, descriptors, navigation }: CustomTabBarPro
                   <View style={[styles.tab, isFocused && styles.tabActive]}>
                     <Icon
                       color={isFocused ? theme.colors.content.primary : theme.colors.content.muted}
-                      size={20}
-                      strokeWidth={1.9}
+                      size={22}
+                      strokeWidth={isFocused ? 2.1 : 1.7}
                     />
-                    {isFocused ? (
-                      <Text style={styles.label} numberOfLines={1}>
-                        {label}
-                      </Text>
-                    ) : null}
+                    <Text style={[styles.label, !isFocused && styles.labelMuted]} numberOfLines={1}>
+                      {label}
+                    </Text>
                   </View>
                 </EaseView>
               </Pressable>
@@ -120,20 +118,23 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
   },
   tab: {
-    minHeight: 44,
-    flexDirection: "row",
+    minHeight: 52,
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
     gap: theme.spacing.scale.xs,
     borderRadius: theme.radius.component.chip,
-    paddingHorizontal: theme.spacing.scale.md,
-    paddingVertical: theme.spacing.scale.sm,
+    paddingHorizontal: theme.spacing.scale.xs,
+    paddingVertical: theme.spacing.scale.xs,
   },
   tabActive: {
     backgroundColor: theme.colors.surface.subtle,
   },
   label: {
-    ...theme.typography.labelMd,
+    ...theme.typography.caption,
     color: theme.colors.content.primary,
+  },
+  labelMuted: {
+    color: theme.colors.content.muted,
   },
 }));

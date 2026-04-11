@@ -1,8 +1,8 @@
-import { SearchProcessingScreen } from "@/features/search/screens/search-processing/search-processing.screen";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { type Href, useLocalSearchParams, useRouter } from "expo-router";
 import { routes } from "@sd/core-contracts";
+import { SearchProcessingScreen } from "@/features/search/screens/search-processing/search-processing.screen";
 
-export default function SearchScreenRoute() {
+export default function SearchRoute() {
   const router = useRouter();
   const { searchKey } = useLocalSearchParams<{ searchKey?: string }>();
 
@@ -14,7 +14,7 @@ export default function SearchScreenRoute() {
           router.back();
           return;
         }
-        router.replace(routes.home);
+        router.replace(routes.home as Href);
       }}
     />
   );

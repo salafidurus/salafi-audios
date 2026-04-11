@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { type Href, useRouter } from "expo-router";
 import { useAuth } from "@/core/auth";
 import { LibrarySavedScreen } from "@/features/library/screens/library-saved.screen";
 import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
@@ -22,5 +22,9 @@ export default function LibrarySaved() {
     );
   }
 
-  return <LibrarySavedScreen />;
+  return (
+    <LibrarySavedScreen
+      onNavigateToLecture={(id) => router.push(routes.lectures.detail(id) as Href)}
+    />
+  );
 }
