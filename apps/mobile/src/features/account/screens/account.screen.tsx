@@ -1,8 +1,7 @@
 import { View, Text, Pressable, ScrollView } from "react-native";
-import { useTranslation } from "react-i18next";
-import { SUPPORTED_LOCALES, type Locale } from "@sd/core-i18n";
+import { useTranslation } from "@sd/core-i18n";
 import { useAccountScreen } from "@sd/domain-account";
-import { changeLocale } from "../../../core/i18n/i18n";
+import { LanguageSwitch } from "../../i18n";
 
 export type AccountScreenProps = {
   onNavigateToProfile?: () => void;
@@ -16,11 +15,7 @@ export function AccountScreen({
   onSignOut,
 }: AccountScreenProps) {
   const { profile, isFetching } = useAccountScreen();
-  const { t, i18n } = useTranslation();
-
-  const handleLocaleChange = async (locale: Locale) => {
-    await changeLocale(locale);
-  };
+  const { t } = useTranslation();
 
   if (isFetching) {
     return (
@@ -85,25 +80,7 @@ export function AccountScreen({
         <Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 8 }}>
           {t("account.language", "Language")}
         </Text>
-        <View style={{ flexDirection: "row", gap: 8 }}>
-          {SUPPORTED_LOCALES.map((locale) => (
-            <Pressable
-              key={locale}
-              onPress={() => handleLocaleChange(locale)}
-              style={{
-                padding: 10,
-                borderWidth: 1,
-                borderColor: i18n.language === locale ? "#000" : "#e5e5e5",
-                borderRadius: 8,
-                backgroundColor: i18n.language === locale ? "#000" : "#fff",
-              }}
-            >
-              <Text style={{ fontSize: 14, color: i18n.language === locale ? "#fff" : "#000" }}>
-                {locale === "en" ? "English" : "العربية"}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
+        <LanguageSwitch />
       </View>
     </ScrollView>
   );

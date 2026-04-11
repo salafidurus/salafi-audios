@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "@sd/core-i18n";
 import { TextInput } from "../../../../shared/components/TextInput/TextInput";
 import { AuthProviderButton } from "../../components/provider-button";
 
@@ -24,6 +25,7 @@ export function SignUpMobileScreen({
   onSignUpWithApple,
   onNavigateToSignIn,
 }: SignUpScreenProps) {
+  const { t } = useTranslation();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -43,7 +45,7 @@ export function SignUpMobileScreen({
     try {
       await onSignUp(name, email, password);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Sign up failed");
+      setError(err instanceof Error ? err.message : t("auth.signUp.failed"));
     } finally {
       setLoading(false);
     }
@@ -54,7 +56,7 @@ export function SignUpMobileScreen({
     required: true,
     pattern: {
       value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-      message: "Please enter a valid email address.",
+      message: t("validation.emailInvalid"),
     },
   });
   const passwordField = register("password", { required: true });
@@ -62,7 +64,7 @@ export function SignUpMobileScreen({
   return (
     <div style={wrapperStyle}>
       <div style={cardStyle}>
-        <h1 style={titleStyle}>Create Account</h1>
+        <h1 style={titleStyle}>{t("auth.signUp.title")}</h1>
 
         <label style={termsRowStyle}>
           <input
@@ -72,8 +74,9 @@ export function SignUpMobileScreen({
             style={checkboxStyle}
           />
           <span style={termsTextStyle}>
-            I agree to the <span style={termsLinkStyle}>Terms of Service</span> and{" "}
-            <span style={termsLinkStyle}>Privacy Policy</span>
+            {t("auth.signUp.iAgreeTo")}{" "}
+            <span style={termsLinkStyle}>{t("common.termsOfService")}</span> {t("common.and")}{" "}
+            <span style={termsLinkStyle}>{t("common.privacyPolicy")}</span>
           </span>
         </label>
 
@@ -92,7 +95,7 @@ export function SignUpMobileScreen({
 
         <div style={dividerStyle}>
           <hr style={hrStyle} />
-          <span style={dividerTextStyle}>or sign up with email</span>
+          <span style={dividerTextStyle}>{t("auth.signUp.orEmail")}</span>
           <hr style={hrStyle} />
         </div>
 
@@ -102,7 +105,7 @@ export function SignUpMobileScreen({
           style={{ display: "flex", flexDirection: "column", gap: 12 }}
         >
           <TextInput
-            placeholder="Name"
+            placeholder={t("common.name")}
             autoComplete="name"
             onBlur={nameField.onBlur}
             name={nameField.name}
@@ -112,7 +115,7 @@ export function SignUpMobileScreen({
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             <TextInput
               type="email"
-              placeholder="Email"
+              placeholder={t("common.email")}
               autoComplete="email"
               autoCapitalize="none"
               invalid={Boolean(errors.email)}
@@ -125,7 +128,7 @@ export function SignUpMobileScreen({
           </div>
           <TextInput
             type="password"
-            placeholder="Password"
+            placeholder={t("common.password")}
             autoComplete="new-password"
             onBlur={passwordField.onBlur}
             name={passwordField.name}
@@ -142,12 +145,12 @@ export function SignUpMobileScreen({
               cursor: termsAccepted && isValid ? "pointer" : "not-allowed",
             }}
           >
-            {loading ? "Creating account…" : "Create Account"}
+            {loading ? t("auth.signUp.submitting") : t("auth.signUp.submit")}
           </button>
         </form>
 
         <button type="button" onClick={onNavigateToSignIn} style={linkBtnStyle}>
-          Already have an account? Sign in
+          {t("auth.signUp.alreadyAccount")}
         </button>
       </div>
     </div>

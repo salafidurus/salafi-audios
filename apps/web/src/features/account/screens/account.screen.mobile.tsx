@@ -1,7 +1,8 @@
 "use client";
 
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@sd/core-i18n";
 import { useAccountScreen } from "@sd/domain-account";
+import { LanguageSwitch } from "../../i18n";
 
 export type AccountMobileScreenProps = {
   onNavigateToProfile?: () => void;
@@ -88,6 +89,9 @@ export function AccountMobileScreen({
         >
           {t("account.signOut", "Sign Out")}
         </button>
+      </div>
+      <div style={{ marginTop: 24 }}>
+        <LanguageSwitch />
       </div>
     </div>
   );

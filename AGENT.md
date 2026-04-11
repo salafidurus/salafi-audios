@@ -132,7 +132,7 @@ Web (`apps/web`):
 
 - Install: `pnpm i`
 - Dev: `pnpm dev`
-- Dev one app: `pnpm dev:api`, `pnpm dev:web`, `pnpm dev:mobile`
+- Dev one app: `pnpm dev:api`, `pnpm dev:web`, `pnpm dev:mobile`, `pnpm dev:native`
 - Build: `pnpm build`
 - Lint: `pnpm lint`
 - Typecheck: `pnpm typecheck`
@@ -149,6 +149,7 @@ Web (`apps/web`):
 - API: `pnpm --filter api <script>`
 - Web: `pnpm --filter web <script>`
 - Mobile: `pnpm --filter mobile <script>`
+- Native scaffold: `pnpm --filter native <script>`
 - DB: `pnpm --filter core-db <script>`
 - Env: `pnpm --filter core-env <script>`
 - I18n: `pnpm --filter core-i18n <script>`
@@ -163,8 +164,11 @@ Web (`apps/web`):
 Turbo grouped scripts:
 
 - `pnpm lint:api+web`, `pnpm lint:api+mobile`
+- `pnpm lint:api+native`
 - `pnpm typecheck:api+web`, `pnpm typecheck:api+mobile`
+- `pnpm typecheck:api+native`
 - `pnpm test:api+web`, `pnpm test:api+mobile`
+- `pnpm test:api+native`
 
 ## Single-test quick reference
 

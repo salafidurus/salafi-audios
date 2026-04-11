@@ -26,7 +26,7 @@ Purpose: give an AI coding agent just-enough context to be immediately productiv
 
 - Install: `pnpm i`
 - Run all in dev: `pnpm dev`
-- Run single app: `pnpm dev:api`, `pnpm dev:web`, `pnpm dev:mobile`
+- Run single app: `pnpm dev:api`, `pnpm dev:web`, `pnpm dev:mobile`, `pnpm dev:native`
 - Build / Test / Lint / Typecheck: `pnpm build`, `pnpm test`, `pnpm lint`, `pnpm typecheck` (use Turbo filters to scope)
 - API-only tests: `pnpm --filter api test`
 - E2E (Playwright): `pnpm test:e2e`

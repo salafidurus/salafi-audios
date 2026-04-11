@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@sd/core-i18n";
 import { routes } from "@sd/core-contracts";
 import { authClient } from "../../../../core/auth";
 import { TextInput } from "../../../../shared/components/TextInput/TextInput";
@@ -50,7 +50,7 @@ export function SignInDesktopScreen({
   return (
     <main className={styles.page}>
       <div className={styles.card}>
-        <h1 className={styles.title}>Sign In</h1>
+        <h1 className={styles.title}>{t("auth.signIn.title")}</h1>
 
         <div className={styles.stack}>
           <div className={styles.socialStack}>
@@ -66,7 +66,7 @@ export function SignInDesktopScreen({
             />
           </div>
 
-          <div className={styles.divider}>or continue with email</div>
+          <div className={styles.divider}>{t("auth.signIn.orContinue")}</div>
 
           <form onSubmit={handleEmailSignIn} className={styles.form}>
             <div className={styles.inputGroup}>
@@ -75,14 +75,14 @@ export function SignInDesktopScreen({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onBlur={() => setEmailTouched(true)}
-                placeholder="Email"
+                placeholder={t("common.email")}
                 required
                 autoComplete="email"
                 className={`${styles.input} ${showEmailError ? styles.inputError : ""}`}
               />
               {showEmailError && (
                 <p className={styles.errorText} role="alert">
-                  Please enter a valid email address.
+                  {t("validation.emailInvalid")}
                 </p>
               )}
             </div>
@@ -91,7 +91,7 @@ export function SignInDesktopScreen({
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
+              placeholder={t("common.password")}
               required
               autoComplete="current-password"
               className={styles.input}
@@ -104,12 +104,12 @@ export function SignInDesktopScreen({
             ) : null}
 
             <button type="submit" disabled={loading || !canSubmit} className={styles.submitButton}>
-              {loading ? "Signing in…" : "Sign In"}
+              {loading ? t("auth.signIn.submitting") : t("auth.signIn.submit")}
             </button>
           </form>
 
           <p className={styles.footerText}>
-            Don&apos;t have an account?{" "}
+            {t("auth.signIn.noAccountSplit")}{" "}
             <a
               href={routes.signUp}
               onClick={(e) => {
@@ -118,7 +118,7 @@ export function SignInDesktopScreen({
               }}
               className={styles.footerLink}
             >
-              Create one
+              {t("auth.signIn.noAccountLink")}
             </a>
           </p>
         </div>

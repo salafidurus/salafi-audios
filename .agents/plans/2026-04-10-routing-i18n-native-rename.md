@@ -1,46 +1,53 @@
 # Metadata
 
 - **Date**: 2026-04-10
-- **Status**: Completed (mobile→native rename deferred per user request)
+- **Status**: In Progress
 - **Scope**: Cross-cutting — `apps/mobile`, `apps/web`, `packages/core-contracts`,
   `packages/core-i18n`, all feature packages with user-facing strings, docs.
-- **Summary**: ✅ COMPLETED. All routing aligned with canonical `@sd/core-contracts` route model.
-  Mobile routes restructured with content outside `(tabs)`. `@sd/core-i18n` implemented as full
-  i18n layer with i18next. Translations wired through all user-facing components. Language switcher
-  exposed on desktop (auth strip/footer) and mobile (account screen). RTL support complete with
-  logical CSS properties. Note: `apps/mobile` → `apps/native` rename deferred per user request;
-  will migrate incrementally.
+- **Summary**: Routing/i18n work is partially implemented in the repo, but this plan is not
+  complete. The migration strategy has changed: keep `apps/mobile` intact, create `apps/native` as
+  a separate Expo workspace, and move pieces incrementally so runtime failures can be isolated.
+  No stage should be treated as done until its `Completion Criteria` and runtime gate have been
+  explicitly satisfied and recorded in this file.
 - **Dependencies**:
   - `packages/core-contracts/src/routes.ts` is the authoritative route contract; no stage may
     introduce divergent paths.
-  - `packages/core-i18n` is currently a documented stub (see commit `1842dea`); Stage 2 turns it
-    into a real package.
-  - The in-flight SceneView render-error debug in `(tabs)/(search)` (6 `.bak` sibling files) must
-    be resolved before Stage 3 executes, because Stage 3 moves those files out of `(search)`
-    entirely and would otherwise mask the root cause.
+  - `packages/core-i18n` originated as a documented stub (see commit `1842dea`); the current tree
+    now contains a partial implementation that still needs to be reconciled against Stage 2's full
+    completion criteria.
+  - Stage 0 cleanup appears to have landed statically (no `.bak` / `PROBE` artefacts remain), but
+    the runtime confirmation still needs to be recorded before downstream stages can be treated as
+    complete.
 
 # Progress
 
-- **Completed Stages**:
-  - Stage 0: Fixed SceneView render error in (search) ✅
-  - Stage 2: Stood up @sd/core-i18n as real package with i18next ✅
-  - Stage 3: Restructured mobile routes to (content) layout ✅
-  - Stage 4: Replaced all hardcoded paths with routes.\* ✅
-  - Stage 5: Wired i18n and language switching ✅
-  - Stage 6: Audited and translated user strings ✅
-  - All i18n stages (1-17): Complete with translations, RTL, domain hooks ✅
+- **Observed implementation state**:
+  - Parts of Stages 2–6 appear to be present in the current repo (for example: `@sd/core-i18n`
+    exists, `(content)` routes exist under `apps/mobile`, and language switching UI exists in app
+    code).
+  - `apps/native` has progressed beyond a bare scaffold: it now contains bootstrap/config under
+    `src/core/`, auth and tab route groups, a top-level `(content)` stack, and feature slices such
+    as account + i18n.
+  - Root scripts already expose both `mobile` and `native` commands in parallel, which confirms
+    the migration is being executed side-by-side rather than as a rename-in-place.
+  - Those observations are not equivalent to stage completion. They still need to be reconciled
+    against each stage's `Completion Criteria`, validation commands, and runtime gate before any
+    stage is marked `Completed` in this plan.
+  - Static grep also shows the obvious SceneView cleanup artefacts are gone: no `.bak`, `PROBE`,
+    or `DiagnosticBoundary` references remain under `apps/mobile`, `apps/native`, or `apps/web`.
 
 - **Blocked / Deferred**:
-  - Stages 1a–1d (mobile→native rename): Deferred per user request ("Don't rename. Leave the
-    apps/mobile and we will migrate to apps/native little by little.")
-  - Stage 16 (Mobile admin): Deferred as part of rename decision.
+  - The `apps/mobile` → `apps/native` migration is to be executed incrementally, stage by stage,
+    not as a single rename or full tree copy.
+  - Current `local-expo-mcp` runtime verification for `apps/native` is blocked in this environment
+    by missing Android SDK configuration (`ANDROID_HOME` / `sdk.dir`).
+  - Docs/defaults are intentionally still mobile-first in places (`docs/mobile.md` still exists),
+    so the final switch-over stage has not started.
 
-- **Final Results**:
-  - All tests passing (215 total: 159 API, 44 web+mobile, 12 core-i18n)
-  - All apps typecheck successfully
-  - Full i18n infrastructure production-ready
-  - RTL support complete with logical CSS and I18nManager integration
-  - Language switcher component implemented and integrated
+- **Immediate next step**:
+  - Reconcile the already-landed `apps/native`, i18n, and route-contract work against the
+    completion gates below, then continue the remaining `apps/mobile` → `apps/native` migration in
+    small verified steps.
 
 # Stage Gate Rule
 
@@ -51,20 +58,27 @@ miss Metro bundling, native linking, provider wiring, and route resolution regre
 discovering breakage several stages later makes bisecting painful. This rule applies to every
 stage below; each stage's `Completion Criteria` includes an explicit "User verifies runtime" gate.
 
+For the staged `apps/mobile` → `apps/native` migration specifically (Stages 1a–1d), use
+`local-expo-mcp` to verify the native app runtime after each stage before proceeding to the next
+rename stage.
+
 # Staging Strategy
 
 Stages are ordered so that each stage lands in a tree that still typechecks, lints, and boots.
-The rename (Stage 1) is split into four small reversible sub-stages so any breakage is caught
+The native migration (Stage 1) is split into small reversible sub-stages so any breakage is caught
 and fixed before compounding.
 
 1. **Stage 0** — Resolve the outstanding SceneView render error and clean up remaining diagnostic
    probes in `(tabs)/(search)`.
-2. **Stage 1** — Rename `apps/mobile` → `apps/native`, split into:
-   - **1a** — Workspace identifier rename only (package name, filter flags, CI). Directory stays.
-   - **1b** — Filesystem move `apps/mobile` → `apps/native`; update path-sensitive config (Metro,
-     tsconfig, turbo, Gradle, EAS).
-   - **1c** — Doc and `AGENT.md` rename/cross-reference updates.
-   - **1d** — Final sweep for stragglers and add a guard against regressions.
+2. **Stage 1** — Stand up `apps/native` alongside `apps/mobile`, split into:
+   - **1a** — Create a minimal `apps/native` Expo scaffold and add parallel root scripts without
+     changing or removing any existing `mobile` commands.
+   - **1b** — Migrate shared bootstrap/config from `apps/mobile` into `apps/native` incrementally
+     (providers, env, styling, metro, app config), validating runtime after each step.
+   - **1c** — Migrate route groups and feature slices from `apps/mobile` into `apps/native`
+     incrementally, again with runtime verification after each move.
+   - **1d** — Only when explicitly requested, switch defaults/docs/CI toward `native` and later
+     retire `apps/mobile`.
 3. **Stage 2** — Promote `@sd/core-i18n` from stub to real package: provider, language store,
    loader, locale catalogs, typed `t()` / `useTranslation()` surface. No call-site changes yet.
 4. **Stage 3** — Restructure native route tree: move `scholars/`, `collections/`, `series/`,
@@ -109,131 +123,154 @@ and fixed before compounding.
   fix(mobile): resolve SceneView render error in (search) stack and remove probe scaffolding
   ```
 
-## Stage 1a: Workspace identifier rename (`mobile` → `native`)
+## Stage 1a: Create a minimal `apps/native` scaffold alongside `apps/mobile`
 
-- **Status**: Planned
-- **Goal**: Change only the workspace package name and filter flags. The directory remains
-  `apps/mobile`; only identifiers move. This is the smallest possible first step.
+- **Status**: In Progress
+- **Goal**: Add `apps/native` as a separate Expo workspace with the smallest viable scaffold, while
+  leaving `apps/mobile` and all existing `mobile` commands intact.
 - **Files**:
-  - `apps/mobile/package.json` (`"name": "mobile"` → `"name": "native"`)
-  - `pnpm-workspace.yaml` (only if it names the package; it likely globs by path)
-  - Root `package.json` scripts referencing `--filter mobile`
-  - `turbo.json` pipelines referencing `mobile`
-  - `.github/workflows/*.yml` — any `--filter mobile` or `pnpm mobile:*` references
+  - New: `apps/native/package.json`
+  - New: `apps/native/{app.config.ts,index.js,babel.config.cjs,metro.config.cjs,tsconfig.json}`
+  - New: `apps/native/src/app/{_layout.tsx,index.tsx}`
+  - New: `apps/native/{README.md,AGENT.md,.gitignore,jest.config.cjs,jest.setup.js,eslint.config.js}`
+  - Root `package.json` — add parallel `native` scripts without deleting `mobile` scripts
+  - `turbo.json` — add `dev:native:prebuild`
+  - Command documentation that should mention the new native scaffold
 - **Changes**:
-  1. Rename the package identifier to `native` in `apps/mobile/package.json`.
-  2. Update every `--filter mobile` / `mobile:*` script in root config and CI to `--filter native`.
-  3. Run `pnpm install` to refresh the lockfile.
-- **Blockers**: None currently identified.
+  1. Create a minimal Expo Router scaffold under `apps/native`.
+  2. Keep `apps/mobile` untouched; add parallel `native` root scripts instead of replacing
+     `mobile` scripts.
+  3. Refresh workspace install state.
+  4. Validate `apps/native` with typecheck/lint/test and `local-expo-mcp`.
+- **Blockers**:
+  - Current environment lacks Android SDK configuration for `local-expo-mcp` Android build
+    verification (`ANDROID_HOME` / `sdk.dir`).
 - **Dependencies**: Stage 0.
 - **Completion Criteria**:
   - `pnpm install` succeeds.
   - `pnpm --filter native typecheck`, `lint`, `test` pass.
-  - `grep -R "--filter mobile\|\"name\": \"mobile\"" .` returns only historical plan content.
-  - **User verifies runtime**: user runs `pnpm --filter native start`, launches app on Android
-    emulator, confirms it boots and tab navigation works.
+  - Existing `mobile` scripts still exist and still target `apps/mobile`.
+  - `local-expo-mcp` verifies that the new scaffold reaches Metro/build runtime, or records the
+    exact environment blocker preventing that verification.
+  - **User verifies runtime**: user runs the new `apps/native` scaffold on Android emulator and
+    confirms it boots before Stage 1b begins.
 - **Suggested Commit Message**:
 
   ```text
-  chore(workspace): rename mobile workspace package identifier to native
+  feat(native): add minimal apps/native scaffold alongside existing apps/mobile workspace
   ```
 
-## Stage 1b: Filesystem move `apps/mobile` → `apps/native`
+## Stage 1b: Incrementally migrate bootstrap and config into `apps/native`
 
-- **Status**: Planned
-- **Goal**: Move the directory on disk and update path-sensitive config. No identifier changes
-  beyond what's needed for the new path to resolve.
+- **Status**: In Progress
+- **Goal**: Bring `apps/native` closer to the real mobile bootstrap in small, reversible slices
+  while keeping `apps/mobile` untouched and runnable.
 - **Files**:
-  - `apps/mobile/**` → `apps/native/**` (`git mv apps/mobile apps/native`)
-  - `tsconfig.base.json` / workspace tsconfig `paths` and `references`
-  - `turbo.json` workspace paths
-  - `apps/native/app.json` / `app.config.ts` — project root, asset paths
-  - `apps/native/metro.config.js` — `projectRoot`, `watchFolders`, monorepo node_modules paths
-  - `apps/native/android/settings.gradle`, `android/app/build.gradle` — only if they embed the
-    old path (leave `applicationId` and iOS `bundleIdentifier` unchanged to preserve store
-    identity)
-  - `eas.json` if present
-  - `.vscode/*`, `.gitignore` path entries, `.eslintignore`, `prettierignore`
+  - `apps/native/src/core/**` — provider shell, env parsing, styling bootstrap, integrations
+  - `apps/native/src/app/_layout.tsx` — mount native providers
+  - `apps/native/app.config.ts` — runtime `extra` needed by the migrated bootstrap pieces
+  - `apps/native/package.json` — only the dependencies required by the migrated slice
 - **Changes**:
-  1. `git mv apps/mobile apps/native`.
-  2. Update Metro config paths.
-  3. Update tsconfig `paths`/`references` and turbo workspace references.
-  4. Fix any other absolute path references found via grep.
-  5. Intentionally leave Android `applicationId` and iOS `bundleIdentifier` untouched; document
-     this choice in the commit body.
-- **Blockers**: Metro bundler may cache old paths — clear `.expo/`, Metro cache, and
-  `node_modules/.cache` after the move.
+  1. Migrate shared bootstrap pieces from `apps/mobile` one bounded slice at a time.
+  2. Prefer infrastructure-first moves: providers, env/runtime config, styling bootstrap, API
+     client init, then optional integrations.
+  3. Do not move feature screens or route groups in this stage.
+  4. After each slice, run native static checks and verify the emulator runtime with
+     `local-expo-mcp` before taking the next slice.
+- **Blockers**:
+  - Any added bootstrap dependency can surface native-linking or Metro-resolution regressions; if
+    that happens, stop and fix before moving another piece.
 - **Dependencies**: Stage 1a.
 - **Completion Criteria**:
-  - `pnpm install` succeeds.
-  - `pnpm typecheck`, `pnpm lint`, `pnpm test` pass across the monorepo.
-  - `grep -R "apps/mobile" . --exclude-dir=.agents --exclude-dir=.git` is empty.
-  - **User verifies runtime**: user runs `pnpm --filter native start`, launches app on Android
-    emulator, confirms Metro bundles from the new path and the app boots end-to-end.
+  - `apps/native` has a provider/bootstrap shell that can host later route and feature moves.
+  - `pnpm --filter native typecheck`, `lint`, `test` pass after each migrated slice.
+  - `apps/mobile` remains untouched and still passes its own targeted verification when affected.
+  - `local-expo-mcp` verifies the native app still boots on the emulator after each bootstrap
+    slice.
+  - **User verifies runtime**: user confirms `apps/native` still boots after the final Stage 1b
+    bootstrap slice before Stage 1c begins.
 - **Suggested Commit Message**:
 
   ```text
-  chore(workspace): move apps/mobile to apps/native and update path-sensitive config
+  feat(native): migrate bootstrap and config slices into apps/native incrementally
   ```
 
-## Stage 1c: Rename docs and AGENT.md references
+## Stage 1c: Incrementally migrate route groups and feature slices into `apps/native`
 
-- **Status**: Planned
-- **Goal**: Rename `docs/mobile.md` → `docs/native.md` and update every cross-reference so docs
-  match the new structure. Purely textual.
+- **Status**: In Progress
+- **Goal**: Move native route groups and feature slices into `apps/native` in bounded increments
+  while keeping `apps/mobile` available as the known-good reference app until the runtime is
+  proven.
 - **Files**:
-  - `docs/mobile.md` → `docs/native.md`
-  - `docs/architecture.md`, `docs/web.md`, `docs/api.md` — cross-references
-  - Root `AGENT.md` — quick-reference table and path entries
-  - `apps/native/AGENT.md` — any self-references to the old path/name
-  - `packages/*/AGENT.md` — any references to the old path
+  - `apps/native/src/app/**` — route groups moved over from `apps/mobile`
+  - `apps/native/src/features/**` — feature slices needed by the migrated routes
+  - `apps/native/src/shared/**` — shared primitives used by the migrated features
+  - `apps/native/src/core/**` — follow-on bootstrap changes required by the moved routes/features
+  - Matching source files in `apps/mobile/**` used as the migration source of truth
 - **Changes**:
-  1. Rename the doc file with `git mv`.
-  2. Grep for `mobile.md`, `apps/mobile`, `@sd/mobile`, and replace.
-  3. Update AGENT.md files.
-- **Blockers**: None currently identified.
+  1. Move one route group or feature slice at a time from `apps/mobile` into `apps/native`.
+  2. Keep the `apps/native` route tree aligned with `packages/core-contracts/src/routes.ts`.
+  3. Do not delete the corresponding `apps/mobile` implementation until the equivalent native slice
+     has passed static checks and runtime verification.
+  4. Record which slices are fully migrated versus only mirrored so later cleanup does not require
+     rediscovery.
+- **Blockers**:
+  - Each slice can expose missing provider wiring, unresolved shared imports, or Expo Router
+    resolution issues that only show up at runtime.
 - **Dependencies**: Stage 1b.
 - **Completion Criteria**:
-  - `grep -R "docs/mobile.md\|apps/mobile\|@sd/mobile" . --exclude-dir=.agents --exclude-dir=.git`
-    is empty.
-  - `pnpm lint` passes (markdownlint included).
-  - **User verifies runtime**: user skims the renamed docs to confirm cross-links resolve; no app
-    run needed for this stage, but user still confirms before we proceed.
+  - `apps/native` contains the route groups and feature slices required to boot the current native
+    navigation shell, including `(auth)`, `(tabs)`, and `(content)`.
+  - `pnpm --filter native typecheck`, `lint`, `test` pass after each migrated slice.
+  - `local-expo-mcp` verifies the native app still boots and navigates after each slice, or the
+    exact blocker is recorded here.
+  - **User verifies runtime**: user confirms the migrated routes/features in `apps/native` render
+    and navigate correctly before Stage 1d begins.
 - **Suggested Commit Message**:
 
   ```text
-  docs: rename mobile docs to native and update cross-references
+  feat(native): migrate route groups and feature slices into apps/native incrementally
   ```
 
-## Stage 1d: Final sweep and regression guard
+## Stage 1d: Switch defaults, docs, and CI toward `native` when requested
 
 - **Status**: Planned
-- **Goal**: Catch any stragglers and prevent the old name from coming back.
+- **Goal**: Only after `apps/native` is proven, update docs/default commands/CI toward the new
+  workspace and then retire `apps/mobile` on an explicit user-approved pass.
 - **Files**:
-  - Any remaining grep hits
-  - `.github/workflows/*.yml` — add a CI check (grep or lint) that fails on `apps/mobile` or
-    `@sd/mobile`
+  - `docs/mobile.md` → `docs/native.md`
+  - `docs/architecture.md`, `docs/web.md`, `docs/api.md`, `README.md`, root `AGENT.md`
+  - `apps/native/AGENT.md`, `apps/native/README.md`, package/workflow docs
+  - Root `package.json`, `turbo.json`, `.github/workflows/*.yml`
+  - Final cleanup of `apps/mobile/**` once explicitly approved
 - **Changes**:
-  1. Final grep sweep across the entire repo (including configs, scripts, CI, docs).
-  2. Add a CI guard step that fails the build on any new occurrence of the old path or package
-     name (allow-listing `.agents/plans/` for historical plan content).
-- **Blockers**: None currently identified.
+  1. Rename the remaining mobile-first docs and update all cross-references.
+  2. Flip default scripts/docs/CI from `mobile` to `native` only when the user wants that cutover.
+  3. Add a CI guard that prevents accidental reintroduction of retired `apps/mobile` references
+     once the old workspace is actually removed.
+  4. Remove `apps/mobile` only as a final explicit cleanup step, not as part of earlier migration
+     stages.
+- **Blockers**:
+  - This stage is intentionally blocked on user approval to make `native` the default and to
+    retire `apps/mobile`.
 - **Dependencies**: Stages 1a–1c.
 - **Completion Criteria**:
+  - `grep -R "docs/mobile.md\|apps/mobile\|@sd/mobile" . --exclude-dir=.agents --exclude-dir=.git`
+    is empty, except for approved historical references.
   - `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm build` all pass monorepo-wide.
   - CI guard fires on an artificially re-introduced `apps/mobile` reference in a test branch (or
-    equivalent local verification).
+    equivalent local verification) after the cleanup is complete.
   - **User verifies runtime**: user runs native app on emulator and web app in browser,
-    confirms both still boot and navigate correctly.
+    confirms both still boot and navigate correctly after the final cutover.
 - **Suggested Commit Message**:
 
   ```text
-  chore(ci): guard against reintroduction of apps/mobile path after rename to apps/native
+  chore(native): switch docs and CI defaults to apps/native and retire apps/mobile
   ```
 
 ## Stage 2: Stand up `@sd/core-i18n` as a real package
 
-- **Status**: Planned
+- **Status**: In Progress
 - **Goal**: Turn the `core-i18n` stub into a working i18n runtime shared by web and native, with
   a typed translation surface and a language store.
 - **Files**:
@@ -271,7 +308,7 @@ and fixed before compounding.
 
 ## Stage 3: Restructure native route tree to match `routes.ts`
 
-- **Status**: Planned
+- **Status**: In Progress
 - **Goal**: Move content detail routes out of `(tabs)/(search)/` and into a top-level
   `(content)/` group so native paths match `routes.scholars.detail`, `routes.collections.detail`,
   `routes.series.detail`, `routes.lectures.detail`. Mirror any necessary adjustments on web.
@@ -313,7 +350,7 @@ and fixed before compounding.
 
 ## Stage 4: Enforce `@sd/core-contracts` routes at every call site
 
-- **Status**: Planned
+- **Status**: In Progress
 - **Goal**: No hardcoded navigation paths anywhere in apps; every `href` / `router.push` /
   `redirect` goes through `routes.*`.
 - **Files**:
@@ -340,7 +377,7 @@ and fixed before compounding.
 
 ## Stage 5: Mount i18n provider and add `LanguageSwitch` control
 
-- **Status**: Planned
+- **Status**: In Progress
 - **Goal**: Wire `I18nProvider` into both apps' bootstraps and expose a language switch in the
   documented locations.
 - **Files**:
@@ -375,7 +412,7 @@ and fixed before compounding.
 
 ## Stage 6: Translate all user-facing strings via `useTranslation`
 
-- **Status**: Planned
+- **Status**: In Progress
 - **Goal**: Remove hardcoded user-facing copy from components; every string goes through
   `useTranslation`, with `en` and `ar` catalogs populated. Verify RTL.
 - **Files**:
@@ -420,42 +457,11 @@ and fixed before compounding.
 - No `.bak`, `PROBE`, or `DiagnosticBoundary` references remain anywhere.
 - User has signed off on the runtime gate for every stage along the way.
 
-# Plan Completion Status
+# Plan Completion
 
-## ✅ COMPLETED (2026-04-10)
+This plan is **not completed** yet.
 
-**Completion Summary:**
-
-- All routing and i18n stages completed (Stages 0, 2–6 + Stages 1–17 from i18n.md)
-- `apps/mobile` → `apps/native` rename deferred per user request (Stages 1a–1d blocked)
-- Mobile admin (Stage 16) deferred as dependent on rename
-- Final fixes: core-i18n module resolution, auth-locale test, TranslationEditor null coalescing
-
-**Test Results:**
-
-- 215 tests passing (159 API + 44 web+mobile + 12 core-i18n)
-- All apps typecheck successfully
-- No regressions from previous checkpoints
-
-**Key Deliverables:**
-
-- Canonical route definitions enforcing auth modes (public, local-first, auth)
-- Full i18n infrastructure with i18next across API, Web, Mobile
-- RTL support with logical CSS properties (web) and I18nManager (mobile)
-- Translation workflows for scholars, lectures, topics, series, collections
-- Language switcher component integrated in UI
-- User locale preferences endpoint
-
-**Next Steps (If Needed):**
-
-- Deferred: Execute Stages 1a–1d when mobile→native rename is approved
-- Otherwise: i18n infrastructure is production-ready
-
----
-
-# Original Completion Criteria (Archived - All Requirements Met)
-
-The plan is `Completed` when:
+The plan is `Completed` only when:
 
 - Stage 0, Stages 1a–1d, and Stages 2–6 are all merged and their `Completion Criteria` are
   satisfied, including the user-runtime gate for each.

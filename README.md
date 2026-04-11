@@ -36,6 +36,7 @@ Useful scoped dev commands:
 pnpm dev:api
 pnpm dev:web
 pnpm dev:mobile
+pnpm dev:native
 ```
 
 ## Monorepo Commands
@@ -55,6 +56,7 @@ Scoped examples:
 - API only: `pnpm --filter api <script>`
 - Web only: `pnpm --filter web <script>`
 - Mobile only: `pnpm --filter mobile <script>`
+- Native scaffold only: `pnpm --filter native <script>`
 
 ## Architecture Guardrails
 

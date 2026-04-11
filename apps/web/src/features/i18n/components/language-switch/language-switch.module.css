@@ -1,0 +1,10 @@
+.switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.button {
+  min-width: 5.75rem;
+}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useTranslation } from "@sd/core-i18n";
 import { TextInput } from "../../../../shared/components/TextInput/TextInput";
 import { AuthProviderButton } from "../../components/provider-button";
 
@@ -23,6 +24,7 @@ export function SignInMobileScreen({
   onSignInWithApple,
   onNavigateToSignUp,
 }: SignInScreenProps) {
+  const { t } = useTranslation();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -41,7 +43,7 @@ export function SignInMobileScreen({
     try {
       await onSignIn(email, password);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Sign in failed");
+      setError(err instanceof Error ? err.message : t("auth.signIn.failed"));
     } finally {
       setLoading(false);
     }
@@ -51,7 +53,7 @@ export function SignInMobileScreen({
     required: true,
     pattern: {
       value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-      message: "Please enter a valid email address.",
+      message: t("validation.emailInvalid"),
     },
   });
   const passwordField = register("password", { required: true });
@@ -59,7 +61,7 @@ export function SignInMobileScreen({
   return (
     <div style={wrapperStyle}>
       <div style={cardStyle}>
-        <h1 style={titleStyle}>Sign In</h1>
+        <h1 style={titleStyle}>{t("auth.signIn.title")}</h1>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <AuthProviderButton provider="apple" onClick={onSignInWithApple} />
@@ -68,7 +70,7 @@ export function SignInMobileScreen({
 
         <div style={dividerStyle}>
           <hr style={hrStyle} />
-          <span style={dividerTextStyle}>or continue with email</span>
+          <span style={dividerTextStyle}>{t("auth.signIn.orContinue")}</span>
           <hr style={hrStyle} />
         </div>
 
@@ -80,7 +82,7 @@ export function SignInMobileScreen({
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             <TextInput
               type="email"
-              placeholder="Email"
+              placeholder={t("common.email")}
               autoComplete="email"
               autoCapitalize="none"
               invalid={Boolean(errors.email)}
@@ -93,7 +95,7 @@ export function SignInMobileScreen({
           </div>
           <TextInput
             type="password"
-            placeholder="Password"
+            placeholder={t("common.password")}
             autoComplete="current-password"
             onBlur={passwordField.onBlur}
             name={passwordField.name}
@@ -110,12 +112,12 @@ export function SignInMobileScreen({
               cursor: isValid ? "pointer" : "not-allowed",
             }}
           >
-            {loading ? "Signing in…" : "Sign In"}
+            {loading ? t("auth.signIn.submitting") : t("auth.signIn.submit")}
           </button>
         </form>
 
         <button type="button" onClick={onNavigateToSignUp} style={linkBtnStyle}>
-          Don&apos;t have an account? Create one
+          {t("auth.signIn.noAccount")}
         </button>
       </div>
     </div>

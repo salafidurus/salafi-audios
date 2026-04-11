@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "@sd/core-i18n";
 import { routes } from "@sd/core-contracts";
 import { authClient } from "../../../../core/auth";
 import { TextInput } from "../../../../shared/components/TextInput/TextInput";
@@ -52,7 +52,7 @@ export function SignUpDesktopScreen({
   return (
     <main className={styles.page}>
       <div className={styles.card}>
-        <h1 className={styles.title}>Create Account</h1>
+        <h1 className={styles.title}>{t("auth.signUp.title")}</h1>
 
         <div className={styles.stack}>
           <label className={styles.checkboxRow}>
@@ -63,13 +63,13 @@ export function SignUpDesktopScreen({
               className={styles.checkbox}
             />
             <span>
-              I agree to the{" "}
+              {t("auth.signUp.iAgreeTo")}{" "}
               <a href={routes.termsOfUse} className={styles.inlineLink}>
-                Terms of Service
+                {t("common.termsOfService")}
               </a>{" "}
-              and{" "}
+              {t("common.and")}{" "}
               <a href={routes.privacy} className={styles.inlineLink}>
-                Privacy Policy
+                {t("common.privacyPolicy")}
               </a>
             </span>
           </label>
@@ -89,13 +89,13 @@ export function SignUpDesktopScreen({
             />
           </div>
 
-          <div className={styles.divider}>or sign up with email</div>
+          <div className={styles.divider}>{t("auth.signUp.orEmail")}</div>
 
           <form onSubmit={handleSubmit} className={styles.form}>
             <TextInput
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Name"
+              placeholder={t("common.name")}
               required
               autoComplete="name"
               className={styles.input}
@@ -107,14 +107,14 @@ export function SignUpDesktopScreen({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onBlur={() => setEmailTouched(true)}
-                placeholder="Email"
+                placeholder={t("common.email")}
                 required
                 autoComplete="email"
                 className={`${styles.input} ${showEmailError ? styles.inputError : ""}`}
               />
               {showEmailError && (
                 <p className={styles.errorText} role="alert">
-                  Please enter a valid email address.
+                  {t("validation.emailInvalid")}
                 </p>
               )}
             </div>
@@ -123,7 +123,7 @@ export function SignUpDesktopScreen({
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
+              placeholder={t("common.password")}
               required
               autoComplete="new-password"
               className={styles.input}
@@ -136,12 +136,12 @@ export function SignUpDesktopScreen({
             ) : null}
 
             <button type="submit" disabled={loading || !canSubmit} className={styles.submitButton}>
-              {loading ? "Creating account…" : "Create Account"}
+              {loading ? t("auth.signUp.submitting") : t("auth.signUp.submit")}
             </button>
           </form>
 
           <p className={styles.footerText}>
-            Already have an account?{" "}
+            {t("auth.signUp.alreadyAccountSplit")}{" "}
             <a
               href={routes.signIn}
               onClick={(e) => {
@@ -150,7 +150,7 @@ export function SignUpDesktopScreen({
               }}
               className={styles.footerLink}
             >
-              Sign in
+              {t("auth.signUp.alreadyAccountLink")}
             </a>
           </p>
         </div>

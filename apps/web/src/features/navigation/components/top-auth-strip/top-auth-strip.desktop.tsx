@@ -7,6 +7,7 @@ import { useAuth, authClient } from "../../../../core/auth";
 import { Button } from "../../../../shared/components/Button/Button";
 import { Search } from "lucide-react";
 import { routes } from "@sd/core-contracts";
+import { LanguageSwitch } from "../../../i18n";
 import styles from "./top-auth-strip.module.css";
 import searchStyles from "./search-action.module.css";
 
@@ -27,6 +28,8 @@ export function TopAuthStrip() {
               <span className={searchStyles.label}>Search</span>
             </Link>
           ) : null}
+
+          <LanguageSwitch />
 
           {isAuthenticated && !isLoading && user ? (
             <>

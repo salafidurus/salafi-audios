@@ -1,47 +1,33 @@
 "use client";
 
-const SUPPORT_SECTIONS = [
-  {
-    title: "FAQ",
-    items: [
-      {
-        q: "What is Salafi Durus?",
-        a: "A platform for authentic Islamic audio lectures from trusted scholars following the Salafi methodology.",
-      },
-      {
-        q: "How do I save lectures?",
-        a: "Tap the bookmark icon on any lecture to add it to your Library.",
-      },
-      {
-        q: "Can I listen offline?",
-        a: "Yes — download lectures using the download button. They'll be available without internet.",
-      },
-      {
-        q: "How do I follow a scholar?",
-        a: "Visit a scholar's profile and tap Follow.",
-      },
-    ],
-  },
-  {
-    title: "Contact",
-    items: [
-      {
-        q: "Email",
-        a: "support@salafidurus.com",
-      },
-      {
-        q: "Response time",
-        a: "We aim to respond within 48 hours.",
-      },
-    ],
-  },
-];
+import { useTranslation } from "@sd/core-i18n";
 
 export function SupportMobileScreen() {
+  const { t } = useTranslation();
+
+  const sections = [
+    {
+      title: t("support.faqSection"),
+      items: [
+        { q: t("support.faq.whatIs.q"), a: t("support.faq.whatIs.a") },
+        { q: t("support.faq.saveLectures.q"), a: t("support.faq.saveLectures.a") },
+        { q: t("support.faq.offline.q"), a: t("support.faq.offline.a") },
+        { q: t("support.faq.followScholar.q"), a: t("support.faq.followScholar.a") },
+      ],
+    },
+    {
+      title: t("support.contactSection"),
+      items: [
+        { q: t("support.contact.email.q"), a: t("support.contact.email.a") },
+        { q: t("support.contact.responseTime.q"), a: t("support.contact.responseTime.a") },
+      ],
+    },
+  ];
+
   return (
     <div style={{ padding: "16px 12px" }}>
-      <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 16 }}>Support</h1>
-      {SUPPORT_SECTIONS.map((section) => (
+      <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 16 }}>{t("support.title")}</h1>
+      {sections.map((section) => (
         <div key={section.title} style={{ marginBottom: 24 }}>
           <h2 style={{ fontSize: 17, fontWeight: 600, marginBottom: 8 }}>{section.title}</h2>
           {section.items.map((item) => (

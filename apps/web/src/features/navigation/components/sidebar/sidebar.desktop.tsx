@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
+import { useTranslation } from "@sd/core-i18n";
 import { useAuth } from "../../../../core/auth";
 import { routes } from "@sd/core-contracts";
 import {
@@ -29,36 +30,37 @@ type NavItem = {
   section: Section;
 };
 
-const navItems: NavItem[] = [
-  {
-    label: "Feeds",
-    Icon: Cloud,
-    href: routes.feed.index,
-    activeMatch: routes.feed.index,
-    section: "feed",
-  },
-  {
-    label: "Live",
-    Icon: Mic,
-    href: routes.live.index,
-    activeMatch: routes.live.index,
-    section: "live",
-  },
-  {
-    label: "Lessons",
-    Icon: CassetteTape,
-    href: routes.library.index,
-    activeMatch: routes.library.index,
-    section: "library",
-  },
-];
-
 export function Sidebar() {
   const pathname = usePathname();
+  const { t } = useTranslation();
   const [collapsed, setCollapsed] = useState(false);
   const { isAuthenticated } = useAuth();
   const accountHref = isAuthenticated ? routes.account.index : routes.signIn;
   const currentSection = getCurrentSection(pathname);
+
+  const navItems: NavItem[] = [
+    {
+      label: t("navigation.feeds"),
+      Icon: Cloud,
+      href: routes.feed.index,
+      activeMatch: routes.feed.index,
+      section: "feed",
+    },
+    {
+      label: t("navigation.live"),
+      Icon: Mic,
+      href: routes.live.index,
+      activeMatch: routes.live.index,
+      section: "live",
+    },
+    {
+      label: t("navigation.lessons"),
+      Icon: CassetteTape,
+      href: routes.library.index,
+      activeMatch: routes.library.index,
+      section: "library",
+    },
+  ];
 
   useEffect(() => {
     const root = document.documentElement;
@@ -68,11 +70,11 @@ export function Sidebar() {
   return (
     <aside
       className={clsx(styles.sidebar, collapsed && styles.collapsed)}
-      aria-label="Primary sidebar"
+      aria-label={t("navigation.primarySidebar")}
       data-collapsed={collapsed}
     >
       <div className={styles.brandRow}>
-        <Link href={routes.home} className={styles.brand} aria-label="Salafi Durus">
+        <Link href={routes.home} className={styles.brand} aria-label={t("navigation.siteTitle")}>
           <span className={styles.brandMark} aria-hidden="true">
             <Image
               src="/logo/logo_72.png"
@@ -83,18 +85,18 @@ export function Sidebar() {
               className={styles.brandImg}
             />
           </span>
-          <span className={styles.brandText}>Salafi Durus</span>
+          <span className={styles.brandText}>{t("navigation.siteTitle")}</span>
         </Link>
         <button
           type="button"
           className={styles.collapseButton}
           onClick={() => setCollapsed((prev) => !prev)}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          aria-label={collapsed ? t("navigation.expandSidebar") : t("navigation.collapseSidebar")}
         >
           {collapsed ? <PanelRightOpen size={16} /> : <PanelLeftOpen size={16} />}
         </button>
       </div>
-      <nav className={styles.nav} aria-label="Main">
+      <nav className={styles.nav} aria-label={t("navigation.mainNav")}>
         {navItems.map((item) => {
           const isActive =
             pathname === item.activeMatch || pathname.startsWith(`${item.activeMatch}/`);
@@ -147,7 +149,7 @@ export function Sidebar() {
           <span className={styles.icon} aria-hidden="true">
             <Settings size={18} />
           </span>
-          <span className={styles.label}>Account</span>
+          <span className={styles.label}>{t("navigation.account")}</span>
         </Link>
         {currentSection === "account" && !collapsed && (
           <div className={styles.subNav} role="tablist">

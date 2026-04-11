@@ -1,0 +1,115 @@
+Starting project at C:\dev\salafi-audios\apps\native
+Using src/app as the root directory for Expo Router.
+Expo Autolinking module resolution enabled
+Starting Metro Bundler
+
+Waiting on http://localhost:8081
+Logs for your project will appear below.
+Android apps\native\index.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android apps\native\index.js ▓▓▓▓▓░░░░░░░░░░░ 32.3% ( 61/213)
+Android apps\native\index.js ▓▓▓▓▓░░░░░░░░░░░ 32.3% (192/478)
+Android apps\native\index.js ▓▓▓▓▓░░░░░░░░░░░ 37.3% (445/729)
+Android apps\native\index.js ▓▓▓▓▓▓░░░░░░░░░░ 38.7% (545/889)
+Android apps\native\index.js ▓▓▓▓▓▓▓▓░░░░░░░░ 55.6% ( 820/1102)
+Android apps\native\index.js ▓▓▓▓▓▓▓▓▓▓░░░░░░ 64.2% (1034/1293)
+Android apps\native\index.js ▓▓▓▓▓▓▓▓▓▓▓░░░░░ 71.0% (1198/1462)
+Android apps\native\index.js ▓▓▓▓▓▓▓▓▓▓▓▓░░░░ 76.1% (1407/1627)
+Android apps\native\index.js ▓▓▓▓▓▓▓▓▓▓▓▓░░░░ 78.9% (1573/1771)
+Android apps\native\index.js ▓▓▓▓▓▓▓▓▓▓▓▓░░░░ 79.9% (1736/1942)
+Android apps\native\index.js ▓▓▓▓▓▓▓▓▓▓▓▓▓░░░ 86.7% (1932/2084)
+Android apps\native\index.js ▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░ 93.4% (2128/2240)
+Android Bundled 46877ms apps\native\index.js (2436 modules)
+Android apps\native\index.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 131ms apps\native\index.js (1 module)
+ WARN  [Reanimated] Reduced motion setting is enabled on this device. This warning is visible only in the development mode. Some animations will be disabled by default. You can override the behavior for individual animations, see https://docs.swmansion.com/react-native-reanimated/docs/guides/troubleshooting#reduced-motion-setting-is-enabled-on-this-device.
+Android apps\native\index.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 111ms apps\native\index.js (1 module)
+ WARN  [Reanimated] Reduced motion setting is enabled on this device. This warning is visible only in the development mode. Some animations will be disabled by default. You can override the behavior for individual animations, see https://docs.swmansion.com/react-native-reanimated/docs/guides/troubleshooting#reduced-motion-setting-is-enabled-on-this-device.
+Android apps\native\index.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 113ms apps\native\index.js (1 module)
+ WARN  [Reanimated] Reduced motion setting is enabled on this device. This warning is visible only in the development mode. Some animations will be disabled by default. You can override the behavior for individual animations, see https://docs.swmansion.com/react-native-reanimated/docs/guides/troubleshooting#reduced-motion-setting-is-enabled-on-this-device.
+Android node_modules\expo-network\build\Network.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 947ms node_modules\expo-network\build\Network.js (629 modules)
+ ERROR  [Error: Cannot find native module 'ExpoNetwork']
+Android apps\native\index.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 133ms apps\native\index.js (1 module)
+ WARN  [Reanimated] Reduced motion setting is enabled on this device. This warning is visible only in the development mode. Some animations will be disabled by default. You can override the behavior for individual animations, see https://docs.swmansion.com/react-native-reanimated/docs/guides/troubleshooting#reduced-motion-setting-is-enabled-on-this-device.
+Android apps\native\index.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 99ms apps\native\index.js (1 module)
+ WARN  [Reanimated] Reduced motion setting is enabled on this device. This warning is visible only in the development mode. Some animations will be disabled by default. You can override the behavior for individual animations, see https://docs.swmansion.com/react-native-reanimated/docs/guides/troubleshooting#reduced-motion-setting-is-enabled-on-this-device.
+Android node_modules\expo-network\build\Network.js ░░░░░░░░░░░░░░░░  0.0% (0/1)
+Android Bundled 40ms node_modules\expo-network\build\Network.js (1 module)
+Unable to resolve "../../../features/account/screens/account.screen" from "apps\native\src\app\(tabs)\account\index.tsx"
+[0m [90m 1 |[39m [36mimport[39m { type [33mHref[39m[33m,[39m useRouter } [36mfrom[39m [32m"expo-router"[39m[33m;[39m
+ [90m 2 |[39m [36mimport[39m { routes } [36mfrom[39m [32m"@sd/core-contracts"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 3 |[39m [36mimport[39m { [33mAccountScreen[39m } [36mfrom[39m [32m"../../../features/account/screens/account.screen"[39m[33m;[39m
+ [90m   |[39m                                [31m[1m^[22m[39m
+ [90m 4 |[39m
+ [90m 5 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m [33mAccountIndexRoute[39m() {
+ [90m 6 |[39m   [36mconst[39m router [33m=[39m useRouter()[33m;[39m[0m
+
+Import stack:
+
+ apps\native\src\app\(tabs)\account\index.tsx
+ | import "../../../features/account/screens/account.screen"
+
+ apps\native\src\app (require.context)
+
+Unable to resolve "@sd/core-i18n" from "apps\native\src\features\account\screens\account.screen.tsx"
+[0m [90m 1 |[39m [36mimport[39m { [33mPressable[39m[33m,[39m [33mScrollView[39m[33m,[39m [33mText[39m[33m,[39m [33mView[39m } [36mfrom[39m [32m"react-native"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { useTranslation } [36mfrom[39m [32m"@sd/core-i18n"[39m[33m;[39m
+ [90m   |[39m                                 [31m[1m^[22m[39m
+ [90m 3 |[39m [36mimport[39m { useAccountScreen } [36mfrom[39m [32m"@sd/domain-account"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { [33mLanguageSwitch[39m } [36mfrom[39m [32m"../../i18n"[39m[33m;[39m
+ [90m 5 |[39m[0m
+
+Import stack:
+
+ apps\native\src\features\account\screens\account.screen.tsx
+ | import "@sd/core-i18n"
+
+ apps\native\src\app\(tabs)\account\index.tsx
+ | import "../../../features/account/screens/account.screen"
+
+ apps\native\src\app (require.context)
+
+Unable to resolve "@sd/core-i18n" from "apps\native\src\features\account\screens\account.screen.tsx"
+[0m [90m 1 |[39m [36mimport[39m { [33mPressable[39m[33m,[39m [33mScrollView[39m[33m,[39m [33mText[39m[33m,[39m [33mView[39m } [36mfrom[39m [32m"react-native"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { useTranslation } [36mfrom[39m [32m"@sd/core-i18n"[39m[33m;[39m
+ [90m   |[39m                                 [31m[1m^[22m[39m
+ [90m 3 |[39m [36mimport[39m { useAccountScreen } [36mfrom[39m [32m"@sd/domain-account"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { [33mLanguageSwitch[39m } [36mfrom[39m [32m"../../i18n"[39m[33m;[39m
+ [90m 5 |[39m[0m
+
+Import stack:
+
+ apps\native\src\features\account\screens\account.screen.tsx
+ | import "@sd/core-i18n"
+
+ apps\native\src\app\(tabs)\account\index.tsx
+ | import "../../../features/account/screens/account.screen"
+
+ apps\native\src\app (require.context)
+
+Unable to resolve "@sd/core-i18n" from "apps\native\src\features\account\screens\account.screen.tsx"
+[0m [90m 1 |[39m [36mimport[39m { [33mPressable[39m[33m,[39m [33mScrollView[39m[33m,[39m [33mText[39m[33m,[39m [33mView[39m } [36mfrom[39m [32m"react-native"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 2 |[39m [36mimport[39m { useTranslation } [36mfrom[39m [32m"@sd/core-i18n"[39m[33m;[39m
+ [90m   |[39m                                 [31m[1m^[22m[39m
+ [90m 3 |[39m [36mimport[39m { useAccountScreen } [36mfrom[39m [32m"@sd/domain-account"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { [33mLanguageSwitch[39m } [36mfrom[39m [32m"../../i18n"[39m[33m;[39m
+ [90m 5 |[39m[0m
+
+Import stack:
+
+ apps\native\src\features\account\screens\account.screen.tsx
+ | import "@sd/core-i18n"
+
+ apps\native\src\app\(tabs)\account\index.tsx
+ | import "../../../features/account/screens/account.screen"
+
+ apps\native\src\app (require.context)
+
+ ERROR  [Error: Cannot find native module 'ExpoUpdates']
+ ERROR  [Error: Cannot find native module 'ExpoUpdates']
+ ERROR  [Error: Cannot find native module 'ExpoUpdates']
+ ERROR  [Error: Cannot find native module 'ExpoUpdates']
