@@ -7,7 +7,7 @@ module.exports = {
     "^@/(.*)$": "<rootDir>/src/$1"
   },
   transformIgnorePatterns: [
-    "node_modules/(?!(?:.pnpm/)?((jest-)?react-native|@react-native(-community)?|expo(nent)?|@expo(nent)?/.*|react-navigation|@react-navigation/.*))"
+    "node_modules/(?!(?:.pnpm/)?((jest-)?react-native|@react-native(-community)?|@react-native/.*|expo(nent)?|@expo(nent)?/.*|react-navigation|@react-navigation/.*))"
   ],
   collectCoverage: true,
   collectCoverageFrom: [

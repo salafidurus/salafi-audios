@@ -9,6 +9,46 @@ import {
 import { useAuth } from "../../../core/auth/use-auth";
 import { LibraryScreen } from "./library.screen";
 
+// SectionList uses @react-native/virtualized-lists which bundles its own react-native
+// copy that triggers native bridge assertions in Jest. Mock it at the module level.
+jest.mock("react-native/Libraries/Lists/SectionList", () => {
+  const React = require("react");
+  function MockSectionList({
+    sections = [],
+    renderSectionHeader,
+    renderItem,
+    renderSectionFooter,
+  }: {
+    sections?: Array<{ title: string; data: unknown[] }>;
+    renderSectionHeader?: (info: {
+      section: { title: string; data: unknown[] };
+    }) => React.ReactNode;
+    renderItem?: (info: {
+      item: unknown;
+      section: { title: string; data: unknown[] };
+      index: number;
+      separators: Record<string, unknown>;
+    }) => React.ReactNode;
+    renderSectionFooter?: (info: {
+      section: { title: string; data: unknown[] };
+    }) => React.ReactNode;
+  }) {
+    return React.createElement(
+      "View",
+      null,
+      sections.flatMap((section) => [
+        renderSectionHeader ? renderSectionHeader({ section }) : null,
+        ...section.data.map((item, index) =>
+          renderItem ? renderItem({ item, section, index, separators: {} }) : null,
+        ),
+        renderSectionFooter ? renderSectionFooter({ section }) : null,
+      ]),
+    );
+  }
+  MockSectionList.displayName = "SectionList";
+  return { default: MockSectionList };
+});
+
 jest.mock("@sd/domain-content", () => ({
   useLibraryCompletedScreen: jest.fn(),
   useLibraryProgressScreen: jest.fn(),

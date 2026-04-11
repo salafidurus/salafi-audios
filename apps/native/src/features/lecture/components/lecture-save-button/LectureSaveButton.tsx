@@ -1,0 +1,30 @@
+import { useProgressStore } from "@sd/domain-progress";
+import { Button } from "../../../../shared/components/Button/Button";
+
+export type LectureSaveButtonProps = {
+  lectureId: string;
+};
+
+export function LectureSaveButton({ lectureId }: LectureSaveButtonProps) {
+  const isSaved = useProgressStore((s) => s.actions.isSaved(lectureId));
+  const addSaved = useProgressStore((s) => s.actions.addSaved);
+  const removeSaved = useProgressStore((s) => s.actions.removeSaved);
+
+  const handlePress = () => {
+    if (isSaved) {
+      removeSaved(lectureId);
+    } else {
+      addSaved(lectureId);
+    }
+  };
+
+  return (
+    <Button
+      variant={isSaved ? "surface" : "outline"}
+      size="lg"
+      fullWidth
+      label={isSaved ? "✓ Saved" : "Save"}
+      onPress={handlePress}
+    />
+  );
+}

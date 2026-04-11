@@ -1,3 +1,5 @@
+jest.mock("expo-constants", () => ({ default: { expoConfig: null } }));
+
 import { parseNativeRuntimeExtra } from "./runtime-env";
 
 describe("parseNativeRuntimeExtra", () => {

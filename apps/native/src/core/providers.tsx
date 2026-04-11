@@ -4,11 +4,18 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { type ReactNode, useEffect, useState } from "react";
 import { I18nextProvider } from "react-i18next";
+import { LogBox } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { getApiBaseUrl } from "./config/runtime-env";
 import { i18n, initI18n } from "./i18n/i18n";
+
+LogBox.ignoreLogs([
+  "API client initialization failed",
+  "Open debugger to view warnings",
+  "i18next::pluralResolver",
+]);
 
 const queryClient = createQueryClient();
 

@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from "@testing-library/react-native";
+import React from "react";
+import renderer, { act } from "react-test-renderer";
 import { changeLocale } from "../../../../core/i18n/i18n";
 import { LanguageSwitch } from "./language-switch";
 
@@ -48,17 +49,27 @@ describe("LanguageSwitch", () => {
   });
 
   it("renders all supported locales", () => {
-    render(<LanguageSwitch />);
-
-    expect(screen.getByText("English")).toBeTruthy();
-    expect(screen.getByText("العربية")).toBeTruthy();
+    let tree: ReturnType<typeof renderer.create>;
+    act(() => {
+      tree = renderer.create(<LanguageSwitch />);
+    });
+    const rendered = JSON.stringify(tree!.toJSON());
+    expect(rendered).toContain("English");
+    expect(rendered).toContain("العربية");
   });
 
   it("changes locale when a locale button is pressed", () => {
-    render(<LanguageSwitch />);
-
-    fireEvent.press(screen.getByText("العربية"));
-
+    let tree: ReturnType<typeof renderer.create>;
+    act(() => {
+      tree = renderer.create(<LanguageSwitch />);
+    });
+    // Find all pressables and press the one for Arabic (index 1)
+    const pressables = tree!.root.findAll(
+      (node: { props: { onPress?: unknown } }) => typeof node.props.onPress === "function",
+    );
+    act(() => {
+      pressables[1].props.onPress();
+    });
     expect(changeLocale).toHaveBeenCalledWith("ar");
   });
 });
