@@ -1,7 +1,6 @@
 import i18next from "i18next";
 import { initReactI18next } from "react-i18next";
 import { I18nManager } from "react-native";
-import * as Updates from "expo-updates";
 import { type Locale, isRtl } from "@sd/core-i18n";
 import enShared from "@sd/core-i18n/locales/en.json";
 import arShared from "@sd/core-i18n/locales/ar.json";
@@ -21,34 +20,48 @@ export async function initI18n(): Promise<void> {
 
   if (!initPromise) {
     initPromise = (async () => {
-      const locale = await getStoredLocale();
+      let locale: Locale;
+      try {
+        locale = await getStoredLocale();
+      } catch {
+        locale = "en" as Locale;
+      }
 
-      await i18n.use(initReactI18next).init({
-        lng: locale,
-        fallbackLng: "en",
-        resources: {
-          en: {
-            translation: mergeLocaleMessages(
-              enShared as Record<string, unknown>,
-              enOverrides as Record<string, unknown>,
-            ),
+      if (!i18n.isInitialized) {
+        await i18n.use(initReactI18next).init({
+          lng: locale,
+          fallbackLng: "en",
+          resources: {
+            en: {
+              translation: mergeLocaleMessages(
+                enShared as Record<string, unknown>,
+                enOverrides as Record<string, unknown>,
+              ),
+            },
+            ar: {
+              translation: mergeLocaleMessages(
+                arShared as Record<string, unknown>,
+                arOverrides as Record<string, unknown>,
+              ),
+            },
           },
-          ar: {
-            translation: mergeLocaleMessages(
-              arShared as Record<string, unknown>,
-              arOverrides as Record<string, unknown>,
-            ),
-          },
-        },
-        defaultNS: "translation",
-        interpolation: { escapeValue: false },
-      });
+          defaultNS: "translation",
+          interpolation: { escapeValue: false },
+        });
+      }
 
       const shouldBeRtl = isRtl(locale);
 
       if (I18nManager.isRTL !== shouldBeRtl) {
         I18nManager.forceRTL(shouldBeRtl);
-        await Updates.reloadAsync();
+        if (!__DEV__) {
+          try {
+            const { reloadAsync } = await import("expo-updates");
+            await reloadAsync();
+          } catch {
+            // expo-updates not available in this build
+          }
+        }
       }
     })();
   }

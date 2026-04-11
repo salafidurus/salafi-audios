@@ -4,6 +4,10 @@ import { z } from "zod";
 const NativeRuntimeExtraSchema = z.object({
   appEnv: z.enum(["development", "preview", "production"]).optional(),
   apiUrl: z.string().url().optional(),
+  sentryDsn: z.string().url().optional(),
+  sentryOrg: z.string().optional(),
+  sentryProject: z.string().optional(),
+  vexoProjectId: z.string().optional(),
 });
 
 export type NativeRuntimeExtra = z.infer<typeof NativeRuntimeExtraSchema>;
@@ -55,6 +59,18 @@ export function getRuntimeEnv(): NativeRuntimeExtra | null {
   }
 
   return cachedEnv;
+}
+
+export function isDev(): boolean {
+  return getRuntimeEnv()?.appEnv === "development";
+}
+
+export function isPreview(): boolean {
+  return getRuntimeEnv()?.appEnv === "preview";
+}
+
+export function isProduction(): boolean {
+  return getRuntimeEnv()?.appEnv === "production";
 }
 
 export function getApiBaseUrl(): string | undefined {

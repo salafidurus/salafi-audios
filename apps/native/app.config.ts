@@ -46,7 +46,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     version: "1.0.0",
     platforms: ["ios", "android"],
     orientation: "default",
-    plugins: ["expo-router"],
+    plugins: ["expo-router", "expo-image", "expo-localization", "expo-secure-store"],
     experiments: {
       typedRoutes: true,
       tsconfigPaths: true,
