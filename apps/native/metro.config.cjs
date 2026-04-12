@@ -6,8 +6,9 @@ const workspaceRoot = path.resolve(projectRoot, "../..");
 
 const config = getSentryExpoConfig(projectRoot);
 
-// Monorepo: watch workspace root + expo defaults
-config.watchFolders = [workspaceRoot, ...(config.watchFolders ?? [])];
+// pnpm symlinks workspace packages into local node_modules — Metro follows
+// symlinks automatically, so explicit watchFolders are not needed and cause
+// FallbackWatcher crashes on Windows when walking broken symlinks.
 config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, "node_modules"),
   path.resolve(workspaceRoot, "node_modules"),
