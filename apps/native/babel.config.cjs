@@ -5,14 +5,6 @@ module.exports = function (api) {
     presets: ["babel-preset-expo"],
     plugins: [
       [
-        "module-resolver",
-        {
-          root: ["./src"],
-          alias: { "@": "./src" },
-          extensions: [".native.tsx", ".native.ts", ".tsx", ".ts", ".native.js", ".js"],
-        },
-      ],
-      [
         "react-native-unistyles/plugin",
         {
           root: "src",

@@ -1,7 +1,8 @@
 import { Stack } from "expo-router";
 import { Providers } from "../core/providers";
+import { getWrappedLayout } from "@/core/integrations";
 
-export default function RootLayout() {
+function RootLayout() {
   return (
     <Providers>
       <Stack screenOptions={{ headerShown: false }}>
@@ -12,3 +13,5 @@ export default function RootLayout() {
     </Providers>
   );
 }
+
+export default getWrappedLayout( RootLayout );

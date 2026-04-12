@@ -4,7 +4,8 @@
   "compilerOptions": {
     "moduleSuffixes": [".native", ".web", ""],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@/assets/*": ["./assets/*"]
     }
   }
 }

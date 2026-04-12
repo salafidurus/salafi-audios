@@ -1,7 +1,7 @@
 # Metadata
 
 - **Date**: 2026-04-10
-- **Status**: In Progress
+- **Status**: Stages 0–6 Complete; Stage 1d and Final Verification pending
 - **Scope**: Cross-cutting — `apps/mobile`, `apps/web`, `packages/core-contracts`,
   `packages/core-i18n`, all feature packages with user-facing strings, docs.
 - **Summary**: Routing/i18n work is partially implemented in the repo, but this plan is not
@@ -45,9 +45,9 @@
     so the final switch-over stage has not started.
 
 - **Immediate next step**:
-  - Reconcile the already-landed `apps/native`, i18n, and route-contract work against the
-    completion gates below, then continue the remaining `apps/mobile` → `apps/native` migration in
-    small verified steps.
+  - Stage 1d: Update docs and CI from `mobile` → `native` (pending explicit user approval).
+  - Final Verification: run full monorepo typecheck/lint/test/build and document results.
+  - Archive this file to `.agents/plans/completed/` when Stage 1d is complete.
 
 # Stage Gate Rule
 
@@ -97,7 +97,10 @@ and fixed before compounding.
 
 ## Stage 0: Resolve SceneView render error and clean up diagnostics
 
-- **Status**: In Progress
+- **Status**: ✅ Completed
+- **Completed**: 2026-04-10
+- **Notes**: No `.bak` or `PROBE` artefacts remain. SceneView error was resolved by migrating to
+  `apps/native` (fresh Expo SDK 55 scaffold) rather than fixing `apps/mobile` in place.
 - **Goal**: Land `(tabs)/(search)` in a clean, working state so the subsequent rename and
   restructure stages operate on a known-good tree.
 - **Files**:
@@ -125,7 +128,11 @@ and fixed before compounding.
 
 ## Stage 1a: Create a minimal `apps/native` scaffold alongside `apps/mobile`
 
-- **Status**: In Progress
+- **Status**: ✅ Completed
+- **Completed**: 2026-04-10
+- **Notes**: `apps/native` created with Expo SDK 55 (new arch enabled by default), `package.json`,
+  `app.config.ts`, `babel.config.cjs`, `tsconfig.json`, `jest.config.cjs`, `AGENT.md`. Parallel
+  root scripts added (`dev:native`, `pnpm --filter native`). `apps/mobile` left intact.
 - **Goal**: Add `apps/native` as a separate Expo workspace with the smallest viable scaffold, while
   leaving `apps/mobile` and all existing `mobile` commands intact.
 - **Files**:
@@ -162,7 +169,11 @@ and fixed before compounding.
 
 ## Stage 1b: Incrementally migrate bootstrap and config into `apps/native`
 
-- **Status**: In Progress
+- **Status**: ✅ Completed
+- **Completed**: 2026-04-11
+- **Notes**: Migrated `src/core/` (auth, i18n, providers, styling/unistyles), fonts, env config,
+  `@/` alias via `babel-plugin-module-resolver`, provider shell mounted in `_layout.tsx`. Verified
+  with `local-expo-mcp` — app boots on Android emulator.
 - **Goal**: Bring `apps/native` closer to the real mobile bootstrap in small, reversible slices
   while keeping `apps/mobile` untouched and runnable.
 - **Files**:
@@ -197,7 +208,14 @@ and fixed before compounding.
 
 ## Stage 1c: Incrementally migrate route groups and feature slices into `apps/native`
 
-- **Status**: In Progress
+- **Status**: ✅ Completed
+- **Completed**: 2026-04-12
+- **Notes**: All route groups migrated — `(auth)`, `(tabs)/(search)`, `(tabs)/feed`,
+  `(tabs)/live`, `(tabs)/library`, `(tabs)/account`, and `(content)/` stack (scholars, collections,
+  series, lectures, search). All feature slices migrated: search, feed, live, library, account,
+  navigation. All route callbacks wired (`onNavigateToLecture`, `onNavigateToScholar`,
+  `onNavigateToSession`, `onSignOut`, etc.). `@/` aliases working. Verified rendering on emulator
+  with `local-expo-mcp`. Commit: `f880607`.
 - **Goal**: Move native route groups and feature slices into `apps/native` in bounded increments
   while keeping `apps/mobile` available as the known-good reference app until the runtime is
   proven.
@@ -234,7 +252,7 @@ and fixed before compounding.
 
 ## Stage 1d: Switch defaults, docs, and CI toward `native` when requested
 
-- **Status**: Planned
+- **Status**: ⏳ Pending (awaiting explicit user approval to retire `apps/mobile`)
 - **Goal**: Only after `apps/native` is proven, update docs/default commands/CI toward the new
   workspace and then retire `apps/mobile` on an explicit user-approved pass.
 - **Files**:
@@ -270,7 +288,11 @@ and fixed before compounding.
 
 ## Stage 2: Stand up `@sd/core-i18n` as a real package
 
-- **Status**: In Progress
+- **Status**: ✅ Completed
+- **Completed**: 2026-04-11
+- **Notes**: `I18nProvider`, `useTranslation`, `languageStore`, `isRtl()`, `SUPPORTED_LOCALES`
+  implemented. `en` and `ar` locale catalogs populated with all feature keys. Tests passing.
+  Commit: `stage-2` work landed as part of the i18n migration work.
 - **Goal**: Turn the `core-i18n` stub into a working i18n runtime shared by web and native, with
   a typed translation surface and a language store.
 - **Files**:
@@ -308,7 +330,12 @@ and fixed before compounding.
 
 ## Stage 3: Restructure native route tree to match `routes.ts`
 
-- **Status**: In Progress
+- **Status**: ✅ Completed
+- **Completed**: 2026-04-11
+- **Notes**: `(content)/` stack created as sibling of `(tabs)/` containing `scholars/[slug].tsx`,
+  `collections/[id].tsx`, `series/[id].tsx`, `lectures/[id].tsx`, `search/index.tsx`.
+  `(tabs)/(search)/` simplified to only `index` (SearchHomeScreen) with no nested detail routes.
+  All paths match `routes.ts`. `routes.live.session(id)` added to `core-contracts`. Commit: `f880607`.
 - **Goal**: Move content detail routes out of `(tabs)/(search)/` and into a top-level
   `(content)/` group so native paths match `routes.scholars.detail`, `routes.collections.detail`,
   `routes.series.detail`, `routes.lectures.detail`. Mirror any necessary adjustments on web.
@@ -350,7 +377,10 @@ and fixed before compounding.
 
 ## Stage 4: Enforce `@sd/core-contracts` routes at every call site
 
-- **Status**: In Progress
+- **Status**: ✅ Completed
+- **Completed**: 2026-04-12
+- **Notes**: All `router.push` / `router.replace` calls in `apps/native` use `routes.*` constants.
+  Feed, live, library, account, and search routes all go through `@sd/core-contracts`. Commit: `f880607`.
 - **Goal**: No hardcoded navigation paths anywhere in apps; every `href` / `router.push` /
   `redirect` goes through `routes.*`.
 - **Files**:
@@ -377,7 +407,12 @@ and fixed before compounding.
 
 ## Stage 5: Mount i18n provider and add `LanguageSwitch` control
 
-- **Status**: In Progress
+- **Status**: ✅ Completed
+- **Completed**: 2026-04-11
+- **Notes**: `I18nProvider` mounted in `apps/native/src/core/providers.tsx` and
+  `apps/web/src/core/providers/`. `LanguageSwitch` component added to native account screen and web
+  desktop top-auth-strip. `changeLocale()` in native now applies `I18nManager.forceRTL` and
+  calls `DevSettings.reload()` to restart the app when RTL direction changes.
 - **Goal**: Wire `I18nProvider` into both apps' bootstraps and expose a language switch in the
   documented locations.
 - **Files**:
@@ -412,7 +447,13 @@ and fixed before compounding.
 
 ## Stage 6: Translate all user-facing strings via `useTranslation`
 
-- **Status**: In Progress
+- **Status**: ✅ Completed
+- **Completed**: 2026-04-11
+- **Notes**: All user-facing strings in `apps/native` and `apps/web` components translated via
+  `useTranslation()`. `en.json` and `ar.json` catalogs fully populated. RTL verified — tab order
+  reverses correctly when Arabic is selected; `changeLocale()` now triggers app reload to apply
+  direction change. Tab bar labels use `caption` (12px) typography to fit all 5 labels without
+  truncation. Labels always visible (not just for active tab).
 - **Goal**: Remove hardcoded user-facing copy from components; every string goes through
   `useTranslation`, with `en` and `ar` catalogs populated. Verify RTL.
 - **Files**:
@@ -459,7 +500,13 @@ and fixed before compounding.
 
 # Plan Completion
 
-This plan is **not completed** yet.
+This plan is **not yet completed** — only **Stage 1d** remains.
+
+**Completed stages**: Stage 0, 1a, 1b, 1c, 2, 3, 4, 5, 6 ✅
+
+**Remaining**:
+- **Stage 1d** — Update docs, CI, and default scripts from `mobile` → `native`; retire
+  `apps/mobile`. **Requires explicit user approval before starting.**
 
 The plan is `Completed` only when:
 

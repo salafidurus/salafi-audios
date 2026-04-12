@@ -59,7 +59,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     slug: "salafi-durus",
     scheme,
     version,
-
+    
+    // Autolinking path configuration.
+    // This ensures that during development, the app can resolve packages from the monorepo's node_modules,
+    // while in production, it resolves from the correct location in the bundled app.
     autolinking: {
       searchPaths:
         appEnv === "development"
