@@ -9,6 +9,9 @@ const mockUseTranslation = jest.fn(() => ({
 
 jest.mock("@sd/core-i18n", () => ({
   SUPPORTED_LOCALES: ["en", "ar"],
+}));
+
+jest.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => mockUseTranslation(),
 }));
 

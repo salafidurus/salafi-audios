@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import { useTranslation } from "@sd/core-i18n";
+import { useTranslation } from "@/core/i18n/use-translation";
 import { useAuth } from "@/core/auth";
 import { routes } from "@sd/core-contracts";
 import {

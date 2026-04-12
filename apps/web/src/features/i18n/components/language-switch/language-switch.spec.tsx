@@ -7,6 +7,9 @@ const mockRefresh = jest.fn();
 
 jest.mock("@sd/core-i18n", () => ({
   SUPPORTED_LOCALES: ["en", "ar"],
+}));
+
+jest.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({
     i18n: { language: "en", changeLanguage: mockChangeLanguage },
   }),

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useTranslation } from "@sd/core-i18n";
+import { useTranslation } from "@/core/i18n/use-translation";
 import { routes } from "@sd/core-contracts";
 import { LanguageSwitch } from "@/features/i18n";
 import styles from "./footer.module.css";

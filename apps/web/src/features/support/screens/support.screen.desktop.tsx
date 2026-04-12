@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslation } from "@sd/core-i18n";
+import { useTranslation } from "@/core/i18n/use-translation";
 
 export function SupportDesktopScreen() {
   const { t } = useTranslation();

@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { SUPPORTED_LOCALES, type Locale, useTranslation } from "@sd/core-i18n";
+import { SUPPORTED_LOCALES, type Locale } from "@sd/core-i18n";
+import { useTranslation } from "@/core/i18n/use-translation";
 import { Button } from "@/shared/components/Button/Button";
 import { setLocaleCookie } from "@/core/i18n/locale-cookie";
 import styles from "./language-switch.module.css";

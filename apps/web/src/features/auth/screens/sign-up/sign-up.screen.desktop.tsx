@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslation } from "@sd/core-i18n";
+import { useTranslation } from "@/core/i18n/use-translation";
 import { routes } from "@sd/core-contracts";
 import { authClient } from "@/core/auth";
 import { TextInput } from "@/shared/components/TextInput/TextInput";

@@ -2,13 +2,6 @@
 
 > Internationalization keys and locale infrastructure for the Salafi Durus platform
 
-## ⚠️ Stub Status
-
-This package is currently an **empty stub**. `src/index.ts` exports nothing yet.
-Implementation is planned — see `docs/superpowers/specs/2026-04-09-i18n-design.md` for the
-full design spec. Do not remove this package; all scaffolding and design decisions are
-documented and implementation will follow once i18n work begins.
-
 ## Purpose
 
 Owns all translation keys and locale definitions used across the platform. Keeps i18n
@@ -17,22 +10,26 @@ for every user-facing string.
 
 ## Boundaries
 
-- **Depends on:** none (leaf package — no workspace dependencies)
-- **Consumed by:** `apps/web`, `apps/native`
+- **Depends on:** `i18next`, `@sd/core-contracts`
+- **Consumed by:** `apps/api`, `apps/web`, `apps/native`, transitional `apps/mobile`
 
 Do not hardcode text strings in components in any app or package. Always reference a key
-from this package. Do not import framework-specific i18n libraries (e.g., `next-intl`,
-`expo-localization`) here; keep this package framework-agnostic so both apps can share it.
+from this package. Keep this package framework-agnostic:
+
+- No JSX providers or app-level UI components in `packages/core-i18n`
+- No Next.js or Expo-specific bootstrapping in this package
+- App-specific provider wiring belongs in `apps/web/src/core/` and `apps/native/src/core/`
 
 ## Entrypoints
 
 ```text
 src/
-└── index.ts    # Single public entrypoint — exports locale definitions and key namespaces
+└── index.ts    # Single public entrypoint — exports shared locale/runtime helpers
 ```
 
-The package exports locale identifiers and structured key namespaces. Apps wire these keys
-into their own i18n runtime (e.g., `next-intl` on web, `expo-localization` on mobile).
+The package exports locale identifiers, locale utilities, i18next initialization helpers,
+and language-storage helpers. Apps own their i18n runtime setup, provider wiring, and React
+hook bindings.
 
 ## Key Commands
 
@@ -51,6 +48,8 @@ into their own i18n runtime (e.g., `next-intl` on web, `expo-localization` on mo
   UI in each app.
 - **Framework adapters live in apps, not here.** The translation runtime (pluralisation,
   interpolation, RTL layout) is the responsibility of each app's i18n setup.
+- **Provider ownership lives in apps.** `I18nextProvider` wrappers belong in app bootstrap
+  code so this package stays safe to consume from non-UI workspaces such as `apps/api`.
 
 ## Related Docs
 

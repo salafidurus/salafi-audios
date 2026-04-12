@@ -7,7 +7,7 @@ jest.mock("@sd/domain-account", () => ({
   useAccountScreen: jest.fn(),
 }));
 
-jest.mock("@sd/core-i18n", () => ({
+jest.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({
     t: (_key: string, fallback: string) => fallback,
   }),

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useTranslation } from "@sd/core-i18n";
+import { useTranslation } from "@/core/i18n/use-translation";
 import { TextInput } from "@/shared/components/TextInput/TextInput";
 import { AuthProviderButton } from "@/features/auth/components/provider-button";
 

@@ -1,5 +1,5 @@
 import { View, Text, Pressable, ScrollView } from "react-native";
-import { useTranslation } from "@sd/core-i18n";
+import { useTranslation } from "../../../core/i18n/use-translation";
 import { useAccountScreen } from "@sd/domain-account";
 import { LanguageSwitch } from "../../i18n";
 
