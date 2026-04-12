@@ -12,9 +12,9 @@ const OWNER = "basmalabs";
 const PROJECT_ID = "f943688f-bb4a-4f22-af5a-60dc5bafb485";
 
 function ids(env: AppEnv) {
-  const baseName = "Salafi Durus Native";
-  const baseBundle = "com.salafidevs.salafidurusnative";
-  const baseScheme = "salafidurus-native";
+  const baseName = "Salafi Durus";
+  const baseBundle = "com.salafidevs.salafidurus";
+  const baseScheme = "salafidurus";
 
   if (env === "production") {
     return {
@@ -56,7 +56,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   const expoConfig: ExpoConfigWithAutolinking = {
     ...config,
     name,
-    slug: "salafi-durus-native",
+    slug: "salafi-durus",
     scheme,
     version,
 
