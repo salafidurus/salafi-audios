@@ -1,4 +1,5 @@
-import { View, Text, TouchableOpacity, SafeAreaView } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { usePlayback } from "@sd/domain-playback";
 import { ProgressBar } from "../components/progress-bar/progress-bar";
 import { PlaybackControls } from "../components/playback-controls/playback-controls";

@@ -1,3 +1,4 @@
+import { ensureIntlPluralRules } from "./ensure-intl-plural-rules";
 import i18next from "i18next";
 import { initReactI18next } from "react-i18next";
 import { I18nManager } from "react-native";
@@ -8,6 +9,8 @@ import arOverrides from "./overrides.ar.json";
 import enOverrides from "./overrides.en.json";
 import { getStoredLocale, storeLocale } from "./locale-storage";
 import { mergeLocaleMessages } from "./merge-locale-messages";
+
+ensureIntlPluralRules();
 
 export const i18n = i18next;
 

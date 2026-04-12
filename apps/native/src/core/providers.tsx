@@ -14,7 +14,6 @@ import { i18n, initI18n } from "./i18n/i18n";
 LogBox.ignoreLogs([
   "API client initialization failed",
   "Open debugger to view warnings",
-  "i18next::pluralResolver",
 ]);
 
 const queryClient = createQueryClient();
