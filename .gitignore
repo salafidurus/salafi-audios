@@ -45,3 +45,6 @@ infra/envs/*.env
 
 # generated DB artifacts (derived, never committed)
 packages/db/src/generated/
+
+# IDE and Tool settings
+.vscode/mcp.json
