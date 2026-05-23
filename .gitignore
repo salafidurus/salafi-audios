@@ -9,6 +9,8 @@ coverage/
 dist/
 **/dist/
 
+.antigravitycli/
+
 generated/
 **/generated/
 
