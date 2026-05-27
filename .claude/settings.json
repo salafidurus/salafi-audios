@@ -8,11 +8,18 @@
     "server-memory": {},
     "next-devtools": {
       "command": "npx",
-      "args": ["-y", "next-devtools-mcp@latest"]
+      "args": [
+        "-y",
+        "next-devtools-mcp@latest"
+      ]
     },
     "prisma": {
       "command": "npx",
-      "args": ["-y", "prisma", "mcp"]
+      "args": [
+        "-y",
+        "prisma",
+        "mcp"
+      ]
     }
   },
   "instructions": [
@@ -114,7 +121,8 @@
       "Bash(rm -rf **/coverage*)",
       "Bash(pnpm install)",
       "Bash(pnpm install *)",
-      "Bash(pnpm --filter * add *)"
+      "Bash(pnpm --filter * add *)",
+      "mcp__argent"
     ],
     "ask": [
       "Bash(npx kill-port*)",
