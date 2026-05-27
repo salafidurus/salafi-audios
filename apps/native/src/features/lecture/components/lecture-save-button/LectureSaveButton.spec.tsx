@@ -1,6 +1,6 @@
 import React from "react";
 import renderer, { act } from "react-test-renderer";
-import { useProgressStore } from "@sd/domain-progress";
+import { useProgressStore } from "@sd/domain-audio";
 import { LectureSaveButton } from "./LectureSaveButton";
 
 jest.mock("../../../../shared/components/Button/Button", () => ({

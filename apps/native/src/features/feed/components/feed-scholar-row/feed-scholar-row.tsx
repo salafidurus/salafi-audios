@@ -1,4 +1,6 @@
-import { View, Text, Pressable, ScrollView } from "react-native";
+import { View, Text, Pressable, FlatList } from "react-native";
+import type { ListRenderItemInfo } from "react-native";
+import { Image } from "expo-image";
 import type { ScholarChipDto } from "@sd/core-contracts";
 
 export type FeedScholarRowProps = {
@@ -7,6 +9,45 @@ export type FeedScholarRowProps = {
 };
 
 export function FeedScholarRow({ scholars, onScholarPress }: FeedScholarRowProps) {
+  function renderScholar({ item: scholar }: ListRenderItemInfo<ScholarChipDto>) {
+    return (
+      <Pressable
+        onPress={() => onScholarPress?.(scholar.slug)}
+        style={{ alignItems: "center", width: 72 }}
+      >
+        <View
+          style={{
+            width: 48,
+            height: 48,
+            borderRadius: 24,
+            backgroundColor: "#e0e0e0",
+            marginBottom: 4,
+            overflow: "hidden",
+          }}
+        >
+          {scholar.imageUrl && (
+            <Image
+              source={{ uri: scholar.imageUrl }}
+              style={{ width: 48, height: 48 }}
+              contentFit="cover"
+            />
+          )}
+        </View>
+        <Text
+          numberOfLines={1}
+          style={{
+            fontSize: 12,
+            color: "#555",
+            textAlign: "center",
+            maxWidth: 72,
+          }}
+        >
+          {scholar.name}
+        </Text>
+      </Pressable>
+    );
+  }
+
   return (
     <View style={{ paddingVertical: 12 }}>
       <Text
@@ -20,40 +61,14 @@ export function FeedScholarRow({ scholars, onScholarPress }: FeedScholarRowProps
       >
         Popular Scholars
       </Text>
-      <ScrollView
+      <FlatList
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ gap: 12, paddingHorizontal: 4 }}
-      >
-        {scholars.map((scholar) => (
-          <Pressable
-            key={scholar.id}
-            onPress={() => onScholarPress?.(scholar.slug)}
-            style={{ alignItems: "center", width: 72 }}
-          >
-            <View
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: 24,
-                backgroundColor: "#e0e0e0",
-                marginBottom: 4,
-              }}
-            />
-            <Text
-              numberOfLines={1}
-              style={{
-                fontSize: 11,
-                color: "#555",
-                textAlign: "center",
-                maxWidth: 72,
-              }}
-            >
-              {scholar.name}
-            </Text>
-          </Pressable>
-        ))}
-      </ScrollView>
+        data={scholars}
+        keyExtractor={(item) => item.id}
+        renderItem={renderScholar}
+      />
     </View>
   );
 }

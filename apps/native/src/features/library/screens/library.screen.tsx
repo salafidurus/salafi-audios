@@ -1,4 +1,5 @@
-import { SectionList, Text, TouchableOpacity, View } from "react-native";
+import { useCallback } from "react";
+import { SectionList, StyleSheet, Text, Pressable, View } from "react-native";
 import type { LibraryItemDto } from "@sd/core-contracts";
 import {
   useLibraryCompletedScreen,
@@ -13,14 +14,9 @@ export type LibraryScreenProps = {
 
 function ProgressBar({ percent }: { percent: number }) {
   return (
-    <View style={{ height: 3, backgroundColor: "#e5e7eb", borderRadius: 2, marginTop: 4 }}>
+    <View style={styles.progressTrack}>
       <View
-        style={{
-          height: "100%",
-          width: `${Math.min(percent, 100)}%`,
-          backgroundColor: "#2563eb",
-          borderRadius: 2,
-        }}
+        style={[styles.progressFill, { width: `${Math.min(percent, 100)}%` as unknown as number }]}
       />
     </View>
   );
@@ -41,19 +37,16 @@ function LibraryItem({
       : null;
 
   return (
-    <TouchableOpacity
-      onPress={onPress}
-      style={{ padding: 12, borderBottomWidth: 1, borderBottomColor: "#eee" }}
-    >
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-        {variant === "completed" ? <Text style={{ color: "#16a34a", fontSize: 12 }}>✓</Text> : null}
-        <Text style={{ fontSize: 15, fontWeight: "600" }}>{item.lectureTitle}</Text>
+    <Pressable onPress={onPress} style={styles.item}>
+      <View style={styles.itemRow}>
+        {variant === "completed" ? <Text style={styles.checkmark}>✓</Text> : null}
+        <Text style={styles.itemTitle}>{item.lectureTitle}</Text>
       </View>
-      <Text style={{ fontSize: 12, color: "#666", marginTop: 2 }}>
+      <Text style={styles.itemSubtitle}>
         {item.scholarName}
         {item.seriesTitle ? ` · ${item.seriesTitle}` : ""}
       </Text>
-      <Text style={{ fontSize: 11, color: "#999", marginTop: 2 }}>
+      <Text style={styles.itemMeta}>
         {item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""}
         {variant === "progress" && progress !== null ? ` · ${progress}% listened` : ""}
         {variant === "saved" && item.savedAt
@@ -64,7 +57,7 @@ function LibraryItem({
           : ""}
       </Text>
       {variant === "progress" && progress !== null ? <ProgressBar percent={progress} /> : null}
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 
@@ -114,10 +107,28 @@ export function LibraryScreen({ onNavigateToLecture }: LibraryScreenProps) {
     savedData.items.length === 0 &&
     completedData.items.length === 0;
 
+  const handleItemPress = useCallback(
+    (lectureId: string) => {
+      onNavigateToLecture?.(lectureId);
+    },
+    [onNavigateToLecture],
+  );
+
+  const renderItem = useCallback(
+    ({ item, section }: { item: LibraryItemDto; section: Section }) => (
+      <LibraryItem
+        item={item}
+        variant={(section as Section).variant}
+        onPress={() => handleItemPress(item.lectureId)}
+      />
+    ),
+    [handleItemPress],
+  );
+
   if (isAllLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Loading your library...</Text>
+      <View style={styles.loadingContainer}>
+        <Text>Loading your library…</Text>
       </View>
     );
   }
@@ -126,16 +137,10 @@ export function LibraryScreen({ onNavigateToLecture }: LibraryScreenProps) {
     <SectionList
       sections={sections}
       keyExtractor={(item) => item.id}
-      renderItem={({ item, section }) => (
-        <LibraryItem
-          item={item}
-          variant={(section as Section).variant}
-          onPress={() => onNavigateToLecture?.(item.lectureId)}
-        />
-      )}
+      renderItem={renderItem}
       renderSectionHeader={({ section }) => (
-        <View style={{ backgroundColor: "#f9fafb", paddingHorizontal: 12, paddingVertical: 8 }}>
-          <Text style={{ fontSize: 16, fontWeight: "700" }}>{section.title}</Text>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionHeaderText}>{section.title}</Text>
         </View>
       )}
       renderSectionFooter={({ section }) => {
@@ -143,16 +148,16 @@ export function LibraryScreen({ onNavigateToLecture }: LibraryScreenProps) {
 
         if (currentSection.isFetching && currentSection.data.length === 0) {
           return (
-            <View style={{ padding: 12 }}>
-              <Text style={{ color: "#999" }}>Loading...</Text>
+            <View style={styles.sectionFooter}>
+              <Text style={styles.sectionFooterLoadingText}>Loading…</Text>
             </View>
           );
         }
 
         if (currentSection.data.length === 0) {
           return (
-            <View style={{ padding: 12 }}>
-              <Text style={{ color: "#666" }}>{currentSection.emptyMessage}</Text>
+            <View style={styles.sectionFooter}>
+              <Text style={styles.sectionFooterEmptyText}>{currentSection.emptyMessage}</Text>
             </View>
           );
         }
@@ -164,3 +169,68 @@ export function LibraryScreen({ onNavigateToLecture }: LibraryScreenProps) {
     />
   );
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  item: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  itemRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  checkmark: {
+    color: "#16a34a",
+    fontSize: 12,
+  },
+  itemTitle: {
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  itemSubtitle: {
+    fontSize: 12,
+    color: "#666",
+    marginTop: 2,
+  },
+  itemMeta: {
+    fontSize: 12,
+    color: "#999",
+    marginTop: 2,
+  },
+  progressTrack: {
+    height: 3,
+    backgroundColor: "#e5e7eb",
+    borderRadius: 2,
+    marginTop: 4,
+  },
+  progressFill: {
+    height: "100%",
+    backgroundColor: "#2563eb",
+    borderRadius: 2,
+  },
+  sectionHeader: {
+    backgroundColor: "#f9fafb",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  sectionHeaderText: {
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  sectionFooter: {
+    padding: 12,
+  },
+  sectionFooterLoadingText: {
+    color: "#999",
+  },
+  sectionFooterEmptyText: {
+    color: "#666",
+  },
+});

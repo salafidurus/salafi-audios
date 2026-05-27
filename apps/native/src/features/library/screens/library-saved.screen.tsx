@@ -1,4 +1,5 @@
-import { View, Text, TouchableOpacity, FlatList } from "react-native";
+import { useCallback } from "react";
+import { View, Text, Pressable, FlatList } from "react-native";
 import type { LibraryItemDto } from "@sd/core-contracts";
 import { useLibrarySavedScreen } from "@sd/domain-content";
 import { useAuth } from "@/core/auth/use-auth";
@@ -14,7 +15,7 @@ function LibraryItem({ item, onPress }: { item: LibraryItemDto; onPress?: () => 
       : null;
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={onPress}
       style={{ padding: 12, borderBottomWidth: 1, borderBottomColor: "#eee" }}
     >
@@ -23,12 +24,12 @@ function LibraryItem({ item, onPress }: { item: LibraryItemDto; onPress?: () => 
         {item.scholarName}
         {item.seriesTitle ? ` · ${item.seriesTitle}` : ""}
       </Text>
-      <Text style={{ fontSize: 11, color: "#999", marginTop: 2 }}>
+      <Text style={{ fontSize: 12, color: "#999", marginTop: 2 }}>
         {item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""}
         {progress !== null ? ` · ${progress}% listened` : ""}
         {item.savedAt ? ` · Saved ${new Date(item.savedAt).toLocaleDateString()}` : ""}
       </Text>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 
@@ -36,10 +37,24 @@ export function LibrarySavedScreen({ onNavigateToLecture }: LibrarySavedScreenPr
   const { isAuthenticated } = useAuth();
   const { items, isFetching } = useLibrarySavedScreen(isAuthenticated);
 
+  const handleItemPress = useCallback(
+    (lectureId: string) => {
+      onNavigateToLecture?.(lectureId);
+    },
+    [onNavigateToLecture],
+  );
+
+  const renderItem = useCallback(
+    ({ item }: { item: LibraryItemDto }) => (
+      <LibraryItem item={item} onPress={() => handleItemPress(item.lectureId)} />
+    ),
+    [handleItemPress],
+  );
+
   if (isFetching && items.length === 0) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Loading saved lectures...</Text>
+        <Text>Loading saved lectures…</Text>
       </View>
     );
   }
@@ -58,9 +73,7 @@ export function LibrarySavedScreen({ onNavigateToLecture }: LibrarySavedScreenPr
     <FlatList
       data={items}
       keyExtractor={(item) => item.id}
-      renderItem={({ item }) => (
-        <LibraryItem item={item} onPress={() => onNavigateToLecture?.(item.lectureId)} />
-      )}
+      renderItem={renderItem}
       contentContainerStyle={{ padding: 8 }}
     />
   );

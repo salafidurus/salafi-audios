@@ -1,4 +1,6 @@
+import { useCallback } from "react";
 import { View, Text, FlatList } from "react-native";
+import type { ListRenderItemInfo } from "react-native";
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
 import { FeedContentCard } from "../components/feed-content-card/feed-content-card";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
@@ -42,6 +44,12 @@ function getItemKey(item: FeedItemDto, index: number): string {
   return item.id;
 }
 
+const LoadingFooter = (
+  <View style={{ padding: 16, alignItems: "center" }}>
+    <Text style={{ color: "#999" }}>Loading more\u2026</Text>
+  </View>
+);
+
 export function FeedRecentScreen({
   onNavigateToLecture,
   onNavigateToScholar,
@@ -49,10 +57,16 @@ export function FeedRecentScreen({
   const { data, isFetching, hasNextPage, fetchNextPage } = useFeed();
   const items = data?.pages.flatMap((p) => p.items) ?? [];
 
+  const renderItem = useCallback(
+    ({ item }: ListRenderItemInfo<FeedItemDto>) =>
+      renderFeedItem(item, onNavigateToLecture, onNavigateToScholar),
+    [onNavigateToLecture, onNavigateToScholar],
+  );
+
   if (isFetching && items.length === 0) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Loading feed...</Text>
+        <Text>Loading feed\u2026</Text>
       </View>
     );
   }
@@ -69,17 +83,11 @@ export function FeedRecentScreen({
     <FlatList
       data={items}
       keyExtractor={getItemKey}
-      renderItem={({ item }) => renderFeedItem(item, onNavigateToLecture, onNavigateToScholar)}
+      renderItem={renderItem}
       onEndReached={() => hasNextPage && fetchNextPage()}
       onEndReachedThreshold={0.5}
       contentContainerStyle={{ padding: 8 }}
-      ListFooterComponent={
-        isFetching ? (
-          <View style={{ padding: 16, alignItems: "center" }}>
-            <Text style={{ color: "#999" }}>Loading more...</Text>
-          </View>
-        ) : null
-      }
+      ListFooterComponent={isFetching ? LoadingFooter : null}
     />
   );
 }

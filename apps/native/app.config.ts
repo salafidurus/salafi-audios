@@ -103,6 +103,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           organization: process.env.EXPO_PUBLIC_SENTRY_ORG,
         },
       ],
+      "expo-audio",
     ],
 
     experiments: {
@@ -130,12 +131,17 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       supportsTablet: true,
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
+        UIBackgroundModes: ["audio"],
       },
     },
 
     android: {
       ...config.android,
       package: androidPackage,
+      permissions: [
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+      ],
       adaptiveIcon: {
         backgroundColor: "#ffffff",
         foregroundImage: "./assets/icons/adaptive-icon.png",

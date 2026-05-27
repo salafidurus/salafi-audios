@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { useLectureProgress } from "@sd/domain-progress";
+import { useLectureProgress } from "@sd/domain-audio";
 
 type ProgressIndicatorProps = {
   lectureId: string;
