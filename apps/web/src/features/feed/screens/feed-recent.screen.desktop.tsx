@@ -11,9 +11,14 @@ export type FeedDesktopScreenProps = {
   onNavigateToScholar?: (slug: string) => void;
 };
 
+function getFeedItemKey(item: FeedItemDto): string {
+  if (item.kind === "scholar_row") return "scholar-row";
+  if (item.kind === "topic_row") return `topic-row-${item.topicName}`;
+  return item.id;
+}
+
 function renderFeedItem(
   item: FeedItemDto,
-  index: number,
   onNavigateToLecture?: (slug: string) => void,
   onNavigateToScholar?: (slug: string) => void,
 ) {
@@ -21,7 +26,7 @@ function renderFeedItem(
     case "scholar_row":
       return (
         <FeedScholarRow
-          key={`scholar-row-${index}`}
+          key={getFeedItemKey(item)}
           scholars={item.scholars}
           onScholarPress={onNavigateToScholar}
         />
@@ -29,7 +34,7 @@ function renderFeedItem(
     case "topic_row":
       return (
         <FeedTopicRow
-          key={`topic-row-${index}`}
+          key={getFeedItemKey(item)}
           topicName={item.topicName}
           items={item.items}
           onItemPress={onNavigateToLecture}
@@ -54,7 +59,7 @@ export function FeedDesktopScreen({
   const items = data?.pages.flatMap((p) => p.items) ?? [];
 
   if (isFetching && items.length === 0) {
-    return <div style={{ padding: 32 }}>Loading feed...</div>;
+    return <div style={{ padding: 32 }}>Loading feed\u2026</div>;
   }
 
   if (items.length === 0) {
@@ -68,9 +73,7 @@ export function FeedDesktopScreen({
   return (
     <div style={{ maxWidth: 720, margin: "0 auto", padding: 24 }}>
       <h2 style={{ margin: 0, fontSize: 22, marginBottom: 16 }}>Feed</h2>
-      {items.map((item, index) =>
-        renderFeedItem(item, index, onNavigateToLecture, onNavigateToScholar),
-      )}
+      {items.map((item) => renderFeedItem(item, onNavigateToLecture, onNavigateToScholar))}
       {hasNextPage && (
         <div style={{ padding: 16, textAlign: "center" }}>
           <button
@@ -84,7 +87,7 @@ export function FeedDesktopScreen({
               background: "var(--surface-default)",
             }}
           >
-            {isFetching ? "Loading..." : "Load more"}
+            {isFetching ? "Loading\u2026" : "Load more"}
           </button>
         </div>
       )}

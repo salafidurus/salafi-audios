@@ -1,6 +1,6 @@
 "use client";
 
-import { useProgressStore } from "@sd/domain-progress";
+import { useProgressStore } from "@sd/domain-audio";
 import { Button } from "@/shared/components/Button/Button";
 
 export type LectureSaveButtonProps = {

@@ -1,18 +1,25 @@
+import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import type { LectureDetailDto } from "@sd/core-contracts";
 import { LecturePlayButton } from "./LecturePlayButton";
+import { useAudio } from "@sd/domain-audio";
+import { audioService } from "@/features/audio";
 
-jest.mock("@sd/domain-playback", () => ({
-  usePlayback: jest.fn(),
+jest.mock("@sd/domain-audio", () => ({
+  useAudio: jest.fn(),
 }));
 
-import { usePlayback } from "@sd/domain-playback";
-
-const mockPlay = jest.fn();
+jest.mock("@/features/audio", () => ({
+  audioService: {
+    playLecture: jest.fn(),
+    pause: jest.fn(),
+    resume: jest.fn(),
+  },
+}));
 
 beforeEach(() => {
-  mockPlay.mockClear();
-  (usePlayback as jest.Mock).mockReturnValue({ play: mockPlay });
+  jest.clearAllMocks();
+  (useAudio as jest.Mock).mockReturnValue({ isPlaying: false, currentTrack: null });
 });
 
 const baseLecture: LectureDetailDto = {
@@ -40,7 +47,7 @@ describe("LecturePlayButton", () => {
     expect(screen.getByText("▶ Play Lecture")).toBeInTheDocument();
   });
 
-  it("calls play() with correct Track shape when clicked", () => {
+  it("calls playLecture() with correct Track shape when clicked", () => {
     const lecture: LectureDetailDto = {
       ...baseLecture,
       durationSeconds: 3600,
@@ -52,14 +59,62 @@ describe("LecturePlayButton", () => {
     };
     render(<LecturePlayButton lecture={lecture} />);
     fireEvent.click(screen.getByText("▶ Play Lecture"));
-    expect(mockPlay).toHaveBeenCalledWith({
-      id: "asset-1",
-      lectureId: "lec-1",
+    const expectedTrack = {
+      id: "lec-1",
       title: "Test Lecture",
-      scholarName: "Ibn Baz",
-      audioUrl: "https://example.com/audio.mp3",
+      artist: "Ibn Baz",
+      url: "https://example.com/audio.mp3",
       durationSeconds: 1800,
       artworkUrl: undefined,
-    });
+      seriesId: null,
+      seriesTitle: null,
+    };
+    expect(audioService.playLecture).toHaveBeenCalledWith(
+      expectedTrack,
+      [expectedTrack],
+    );
+  });
+
+  it("passes series queueContext with lazy next-track stub when seriesContext has nextLecture", () => {
+    const lecture: LectureDetailDto = {
+      ...baseLecture,
+      primaryAudioAsset: {
+        id: "asset-1",
+        url: "https://example.com/audio.mp3",
+        durationSeconds: 1800,
+      },
+      seriesContext: {
+        seriesId: "series-1",
+        seriesTitle: "Islamic Jurisprudence",
+        seriesSlug: "islamic-jurisprudence",
+        prevLecture: null,
+        nextLecture: { id: "lec-2", slug: "lecture-2", title: "Lecture 2" },
+      },
+    };
+    render(<LecturePlayButton lecture={lecture} />);
+    fireEvent.click(screen.getByText("▶ Play Lecture"));
+    const mainTrack = {
+      id: "lec-1",
+      title: "Test Lecture",
+      artist: "Ibn Baz",
+      url: "https://example.com/audio.mp3",
+      durationSeconds: 1800,
+      artworkUrl: undefined,
+      seriesId: "series-1",
+      seriesTitle: "Islamic Jurisprudence",
+    };
+    const nextStub = {
+      id: "lec-2",
+      title: "Lecture 2",
+      artist: "Ibn Baz",
+      url: '',
+      durationSeconds: 0,
+      seriesId: "series-1",
+      seriesTitle: "Islamic Jurisprudence",
+    };
+    expect(audioService.playLecture).toHaveBeenCalledWith(
+      mainTrack,
+      [mainTrack, nextStub],
+    );
   });
 });

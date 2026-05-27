@@ -9,7 +9,7 @@ export type FeedContentCardProps = {
 
 export function FeedContentCard({ item, onPress }: FeedContentCardProps) {
   return (
-    <div
+    <article
       role="button"
       tabIndex={0}
       onClick={onPress}
@@ -29,6 +29,6 @@ export function FeedContentCard({ item, onPress }: FeedContentCardProps) {
         {item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""}
         {item.publishedAt && ` · ${new Date(item.publishedAt).toLocaleDateString()}`}
       </div>
-    </div>
+    </article>
   );
 }

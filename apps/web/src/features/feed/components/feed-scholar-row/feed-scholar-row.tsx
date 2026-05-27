@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import type { ScholarChipDto } from "@sd/core-contracts";
 
 export type FeedScholarRowProps = {
@@ -52,19 +53,22 @@ export function FeedScholarRow({ scholars, onScholarPress }: FeedScholarRowProps
                 backgroundColor: "var(--surface-hover)",
                 marginBottom: 4,
                 overflow: "hidden",
+                position: "relative",
               }}
             >
               {scholar.imageUrl && (
-                <img
+                <Image
                   src={scholar.imageUrl}
                   alt={scholar.name}
-                  style={{ width: 48, height: 48, objectFit: "cover" }}
+                  width={48}
+                  height={48}
+                  style={{ objectFit: "cover" }}
                 />
               )}
             </div>
             <div
               style={{
-                fontSize: 11,
+                fontSize: 12,
                 color: "var(--content-default)",
                 textAlign: "center",
                 maxWidth: 72,

@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { useProgressStore } from "@sd/domain-progress";
+import { useProgressStore } from "@sd/domain-audio";
 import { LectureSaveButton } from "./LectureSaveButton";
 
 const initialState = useProgressStore.getState();

@@ -1,5 +1,5 @@
 import type { LibraryItemDto } from "@sd/core-contracts";
-import type { LectureProgress } from "@sd/domain-progress";
+import type { LectureProgress } from "@sd/domain-audio";
 
 type SavedMap = Record<string, string>;
 

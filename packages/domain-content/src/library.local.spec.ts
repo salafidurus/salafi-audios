@@ -1,5 +1,5 @@
 import { localProgressItems, localSavedItems, localCompletedItems } from "./library.local";
-import type { LectureProgress } from "@sd/domain-progress";
+import type { LectureProgress } from "@sd/domain-audio";
 
 const makeProgress = (
   lectureId: string,

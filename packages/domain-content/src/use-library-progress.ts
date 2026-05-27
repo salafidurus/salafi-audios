@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useProgressStore } from "@sd/domain-progress";
+import { useProgressStore } from "@sd/domain-audio";
 import { useLibraryProgress } from "./library.api";
 import { localProgressItems } from "./library.local";
 

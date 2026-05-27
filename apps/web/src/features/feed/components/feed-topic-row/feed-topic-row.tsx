@@ -34,8 +34,9 @@ export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProp
         }}
       >
         {items.map((item) => (
-          <div
+          <button
             key={item.id}
+            type="button"
             style={{
               minWidth: 200,
               padding: 12,
@@ -44,8 +45,15 @@ export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProp
               backgroundColor: "var(--surface-default)",
               cursor: "pointer",
               transition: "box-shadow 0.2s ease",
+              textAlign: "left",
             }}
             onClick={() => onItemPress?.(item.slug)}
+            onFocus={(e) => {
+              e.currentTarget.style.boxShadow = "var(--shadow-sm)";
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.boxShadow = "none";
+            }}
             onMouseOver={(e) => {
               e.currentTarget.style.boxShadow = "var(--shadow-sm)";
             }}
@@ -76,11 +84,11 @@ export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProp
               {item.scholarName}
             </div>
             {item.durationSeconds && (
-              <div style={{ fontSize: 11, color: "var(--content-subtle)" }}>
+              <div style={{ fontSize: 12, color: "var(--content-subtle)" }}>
                 {Math.floor(item.durationSeconds / 60)}m
               </div>
             )}
-          </div>
+          </button>
         ))}
       </div>
     </div>
