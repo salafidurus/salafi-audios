@@ -1,11 +1,11 @@
 import { httpClient, endpoints } from "@sd/core-contracts";
-import type { ProgressUpdateDto, ProgressSyncDto, SavedSyncDto } from "@sd/core-contracts";
-import { useProgressStore } from "../store/progress.store";
+import type { ProgressSyncDto, SavedSyncDto } from "@sd/core-contracts";
+import { useProgressStore } from "./progress.store";
 
 let syncTimeout: ReturnType<typeof setTimeout> | null = null;
 const SYNC_DEBOUNCE_MS = 5000;
 
-const pendingUpdates = new Map<string, ProgressUpdateDto>();
+const pendingUpdates = new Map<string, { lectureId: string; positionSeconds: number; durationSeconds: number }>();
 
 function flushPending() {
   const updates = Array.from(pendingUpdates.values());
@@ -13,9 +13,12 @@ function flushPending() {
 
   for (const update of updates) {
     httpClient({
-      url: endpoints.progress.update(update.lectureId),
-      method: "POST",
-      body: update,
+      url: endpoints.audio.progress.update(update.lectureId),
+      method: "PUT",
+      body: {
+        positionSeconds: update.positionSeconds,
+        durationSeconds: update.durationSeconds,
+      },
     }).catch(() => {
       pendingUpdates.set(update.lectureId, update);
     });
@@ -27,7 +30,7 @@ function flushPending() {
  * Multiple calls for the same lectureId within the debounce window
  * are collapsed into a single request.
  */
-export function syncProgressToBackend(update: ProgressUpdateDto) {
+export function syncProgressToBackend(update: { lectureId: string; positionSeconds: number; durationSeconds: number }) {
   pendingUpdates.set(update.lectureId, update);
 
   if (syncTimeout) clearTimeout(syncTimeout);
@@ -35,25 +38,8 @@ export function syncProgressToBackend(update: ProgressUpdateDto) {
 }
 
 /**
- * Connect the playback store to progress tracking.
- * Call this once at app init to automatically record progress
- * as audio position changes.
- */
-export function connectPlaybackToProgress(
-  subscribeToPosition: (
-    cb: (lectureId: string, position: number, duration: number) => void,
-  ) => () => void,
-) {
-  return subscribeToPosition((lectureId, position, duration) => {
-    const { actions } = useProgressStore.getState();
-    actions.setProgress(lectureId, position, duration);
-    syncProgressToBackend({ lectureId, positionSeconds: position, durationSeconds: duration });
-  });
-}
-
-/**
  * Bulk-sync all local progress and saved lectures to the server.
- * Sends progress entries to POST /me/progress/sync and
+ * Sends progress entries to POST /audio/progress/sync and
  * saved lecture IDs to POST /me/library/saved/sync.
  */
 export async function syncLocalToServer(): Promise<void> {
@@ -74,7 +60,7 @@ export async function syncLocalToServer(): Promise<void> {
         updatedAt: p.updatedAt,
       })),
     };
-    promises.push(httpClient({ url: endpoints.progress.sync, method: "POST", body }));
+    promises.push(httpClient({ url: endpoints.audio.progress.sync, method: "POST", body }));
   }
 
   if (savedIds.length > 0) {

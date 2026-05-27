@@ -45,10 +45,15 @@ export const endpoints = {
     upcoming: "/live/upcoming",
     ended: "/live/ended",
   },
-  progress: {
-    list: "/me/progress",
-    update: (lectureId: string) => `/me/progress/${lectureId}`,
-    sync: "/me/progress/sync",
+  audio: {
+    progress: {
+      list: "/audio/progress",
+      update: (lectureId: string) => `/audio/progress/${lectureId}`,
+      sync: "/audio/progress/sync",
+    },
+    lectures: {
+      stream: (id: string) => `/audio/lectures/${id}/stream`,
+    },
   },
   home: {
     quickbrowse: "/home/quickbrowse",

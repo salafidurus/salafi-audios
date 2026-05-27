@@ -51,8 +51,6 @@ export {
 export {
   type LibraryItemDto,
   type LibraryPageDto,
-  type ProgressSyncItemDto,
-  type ProgressSyncDto,
   type SavedSyncDto,
 } from "../types/library.types";
 export { type UserProfileDto } from "../types/account.types";
@@ -68,7 +66,12 @@ export {
   type CreateLiveSessionDto,
   type UpdateLiveSessionDto,
 } from "../types/live.types";
-export { type LectureProgressDto, type ProgressUpdateDto } from "../types/progress.types";
+export {
+  type StreamResponseDto,
+  type AudioProgressDto,
+  type ProgressSyncItemDto,
+  type ProgressSyncDto,
+} from "../types/audio.types";
 export type {
   AdminPermission,
   AdminPermissionDto,

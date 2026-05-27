@@ -5,7 +5,6 @@
     "outDir": "dist",
     "jsx": "react-jsx",
     "module": "ESNext",
-    // Bundler — consumed as source by Expo/Next.js bundler, never loaded directly by Node
     "moduleResolution": "Bundler",
     "esModuleInterop": true,
     "resolveJsonModule": true

@@ -1,15 +1,24 @@
-import { create } from "zustand";
-import type { LectureProgress } from "../types";
+import { create } from 'zustand';
+
+export type LectureProgress = {
+  lectureId: string;
+  positionSeconds: number;
+  durationSeconds: number;
+  completedAt?: string;
+  updatedAt: string;
+};
 
 type ProgressState = {
   progressMap: Record<string, LectureProgress>;
   /** Map of lectureId → savedAt ISO string */
   savedMap: Record<string, string>;
+  lastSyncedAt: string | null;
   actions: {
     setProgress: (lectureId: string, positionSeconds: number, durationSeconds: number) => void;
     markCompleted: (lectureId: string) => void;
     loadProgress: (entries: LectureProgress[]) => void;
     getProgress: (lectureId: string) => LectureProgress | undefined;
+    setLastSyncedAt: (timestamp: string) => void;
     addSaved: (lectureId: string) => void;
     removeSaved: (lectureId: string) => void;
     isSaved: (lectureId: string) => boolean;
@@ -21,6 +30,7 @@ type ProgressState = {
 export const useProgressStore = create<ProgressState>((set, get) => ({
   progressMap: {},
   savedMap: {},
+  lastSyncedAt: null,
 
   actions: {
     setProgress: (lectureId, positionSeconds, durationSeconds) =>
@@ -63,6 +73,8 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
       }),
 
     getProgress: (lectureId) => get().progressMap[lectureId],
+
+    setLastSyncedAt: (timestamp) => set({ lastSyncedAt: timestamp }),
 
     addSaved: (lectureId) =>
       set((state) => ({
