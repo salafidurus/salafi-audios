@@ -2,16 +2,19 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../shared/db/prisma.service';
 import type {
   ProgressSyncItemDto,
-  LectureProgressDto,
+  AudioProgressDto,
 } from '@sd/core-contracts';
 
 @Injectable()
-export class ProgressRepository {
+export class AudioRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getUserProgress(userId: string): Promise<LectureProgressDto[]> {
+  async getUserProgress(userId: string, since?: Date): Promise<AudioProgressDto[]> {
     const progressRecords = await this.prisma.userLectureProgress.findMany({
-      where: { userId },
+      where: {
+        userId,
+        ...(since ? { updatedAt: { gt: since } } : {}),
+      },
       orderBy: { updatedAt: 'desc' },
       include: {
         lecture: {
@@ -59,11 +62,6 @@ export class ProgressRepository {
   async bulkSync(userId: string, items: ProgressSyncItemDto[]): Promise<void> {
     if (items.length === 0) return;
 
-    // Raw SQL is required because Prisma's upsert does not support conditional SET clauses.
-    // Strategy: last-write-wins by comparing updatedAt timestamps.
-    // The client sends its local updatedAt from the offline outbox; the backend only
-    // overwrites if the client's record is newer than what is stored — resolving conflicts
-    // deterministically without requiring a separate conflict-resolution round-trip.
     const operations = items.map((item) => {
       const clientUpdatedAt = new Date(item.updatedAt);
       const isCompleted = !!item.completedAt;
@@ -92,5 +90,23 @@ export class ProgressRepository {
     });
 
     await this.prisma.$transaction(operations);
+  }
+
+  async findLectureById(lectureId: string) {
+    return this.prisma.lecture.findUnique({
+      where: { id: lectureId },
+    });
+  }
+
+  async findPrimaryAsset(lectureId: string) {
+    return this.prisma.audioAsset.findFirst({
+      where: { lectureId, isPrimary: true },
+    });
+  }
+
+  async findFirstAsset(lectureId: string) {
+    return this.prisma.audioAsset.findFirst({
+      where: { lectureId },
+    });
   }
 }

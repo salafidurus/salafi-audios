@@ -16,7 +16,7 @@ import { LecturesModule } from './modules/lectures/lectures.module';
 import { ScholarsModule } from './modules/scholars/scholars.module';
 import { LiveModule } from './modules/live/live.module';
 import { LibraryModule } from './modules/library/library.module';
-import { ProgressModule } from './modules/progress/progress.module';
+import { AudioModule } from './modules/audio/audio.module';
 import { HomeModule } from './modules/home/home.module';
 import { FeedModule } from './modules/feed/feed.module';
 import { LocaleInterceptor } from './shared/interceptors/locale.interceptor';
@@ -36,7 +36,7 @@ import { LocaleInterceptor } from './shared/interceptors/locale.interceptor';
     ScholarsModule,
     LiveModule,
     LibraryModule,
-    ProgressModule,
+    AudioModule,
     HomeModule,
     FeedModule,
   ],
