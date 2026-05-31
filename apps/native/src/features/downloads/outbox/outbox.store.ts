@@ -42,23 +42,25 @@ export const useOutboxStore = create<OutboxState>((set, get) => ({
 
       const toProcess = [...state.entries];
 
-      for (const entry of toProcess) {
-        try {
-          await httpClient({
-            url: `/outbox/${entry.type}`,
-            method: "POST",
-            body: entry.payload,
-          });
-          get().actions.remove(entry.id);
-        } catch {
-          // Increment retry count, keep in queue
-          set((s) => ({
-            entries: s.entries.map((e) =>
-              e.id === entry.id ? { ...e, retries: e.retries + 1 } : e,
-            ),
-          }));
-        }
-      }
+      await Promise.all(
+        toProcess.map(async (entry) => {
+          try {
+            await httpClient({
+              url: `/outbox/${entry.type}`,
+              method: "POST",
+              body: entry.payload,
+            });
+            get().actions.remove(entry.id);
+          } catch {
+            // Increment retry count, keep in queue
+            set((s) => ({
+              entries: s.entries.map((e) =>
+                e.id === entry.id ? { ...e, retries: e.retries + 1 } : e,
+              ),
+            }));
+          }
+        }),
+      );
 
       set({ isDraining: false });
     },

@@ -29,7 +29,7 @@ export function DownloadProgress({ lectureId }: DownloadProgressProps) {
           }}
         />
       </View>
-      <Text style={{ fontSize: 11, color: "#999" }}>{Math.round(progress)}%</Text>
+      <Text style={{ fontSize: 12, color: "#999" }}>{Math.round(progress)}%</Text>
     </View>
   );
 }

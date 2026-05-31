@@ -16,4 +16,5 @@ function RootLayout() {
   );
 }
 
-export default getWrappedLayout( RootLayout );
+const WrappedLayout = getWrappedLayout(RootLayout);
+export default WrappedLayout;

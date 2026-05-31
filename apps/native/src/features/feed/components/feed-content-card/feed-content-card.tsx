@@ -17,7 +17,7 @@ export function FeedContentCard({ item, onPress }: FeedContentCardProps) {
         {item.scholarName}
         {item.kind !== "lecture" ? ` · ${item.kind}` : ""}
       </Text>
-      <Text style={{ fontSize: 11, color: "#999", marginTop: 2 }}>
+      <Text style={{ fontSize: 12, color: "#999", marginTop: 2 }}>
         {item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""}
         {item.publishedAt ? ` · ${new Date(item.publishedAt).toLocaleDateString()}` : ""}
       </Text>

@@ -18,7 +18,7 @@ export function ResumeBadge({ lectureId }: ResumeBadgeProps) {
           borderRadius: 4,
         }}
       >
-        <Text style={{ fontSize: 11, color: "#16a34a", fontWeight: "600" }}>✓ Completed</Text>
+        <Text style={{ fontSize: 12, color: "#16a34a", fontWeight: "600" }}>✓ Completed</Text>
       </View>
     );
   }
@@ -34,7 +34,7 @@ export function ResumeBadge({ lectureId }: ResumeBadgeProps) {
         borderRadius: 4,
       }}
     >
-      <Text style={{ fontSize: 11, color: "#2563eb", fontWeight: "500" }}>
+      <Text style={{ fontSize: 12, color: "#2563eb", fontWeight: "500" }}>
         Resume at {formatTime(resumePositionSeconds)}
       </Text>
     </View>
