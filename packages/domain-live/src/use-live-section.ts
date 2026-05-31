@@ -12,7 +12,10 @@ function mergeDelta(
   const deltaMap = new Map(delta.sessions.map((s) => [s.id, s]));
   const deletedSet = new Set(delta.deletedIds);
 
-  const merged = current.filter((s) => !deletedSet.has(s.id)).map((s) => deltaMap.get(s.id) ?? s);
+  const merged = current.reduce<LiveSessionPublicDto[]>((acc, s) => {
+    if (!deletedSet.has(s.id)) acc.push(deltaMap.get(s.id) ?? s);
+    return acc;
+  }, []);
 
   const existingIds = new Set(current.map((s) => s.id));
   const added = delta.sessions.filter((s) => !existingIds.has(s.id));
