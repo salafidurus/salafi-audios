@@ -63,7 +63,7 @@ export function SubsectionBarHost() {
   );
 }
 
-export function getSceneBottomInsetForPath(pathname: string): number {
+function getSceneBottomInsetForPath(pathname: string): number {
   const activeRootTab = getRootTabFromPathname(pathname);
   return activeRootTab === "search"
     ? TAB_BAR_HEIGHT + 24

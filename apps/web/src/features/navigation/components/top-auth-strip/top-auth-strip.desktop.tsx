@@ -12,7 +12,7 @@ import styles from "./top-auth-strip.module.css";
 import searchStyles from "./search-action.module.css";
 
 export function TopAuthStrip() {
-  const router = useRouter();
+  const { push } = useRouter();
   const pathname = usePathname();
   const { isAuthenticated, isLoading, user } = useAuth();
   const isHome = pathname === routes.home;
@@ -39,17 +39,17 @@ export function TopAuthStrip() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => void authClient.signOut().then(() => router.push(routes.home))}
+                onClick={() => void authClient.signOut().then(() => push(routes.home))}
               >
                 Sign Out
               </Button>
             </>
           ) : !isAuthenticated && !isLoading ? (
             <>
-              <Button variant="ghost" size="sm" onClick={() => router.push(routes.signIn)}>
+              <Button variant="ghost" size="sm" onClick={() => push(routes.signIn)}>
                 Sign In
               </Button>
-              <Button variant="primary" size="sm" onClick={() => router.push(routes.signUp)}>
+              <Button variant="primary" size="sm" onClick={() => push(routes.signUp)}>
                 Create Free Account
               </Button>
             </>

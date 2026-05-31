@@ -10,7 +10,7 @@ import { Button } from "@/shared/components/Button/Button";
 
 export function Header() {
   const headerRef = useRef<HTMLElement | null>(null);
-  const router = useRouter();
+  const { push } = useRouter();
 
   useEffect(() => {
     const el = headerRef.current;
@@ -58,10 +58,10 @@ export function Header() {
         </Link>
 
         <div className={styles.actions}>
-          <Button variant="ghost" size="sm" onClick={() => router.push(routes.signIn)}>
+          <Button variant="ghost" size="sm" onClick={() => push(routes.signIn)}>
             Sign In
           </Button>
-          <Button variant="primary" size="sm" onClick={() => router.push(routes.signUp)}>
+          <Button variant="primary" size="sm" onClick={() => push(routes.signUp)}>
             Create Free Account
           </Button>
         </div>

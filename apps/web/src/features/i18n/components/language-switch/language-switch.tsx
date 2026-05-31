@@ -14,7 +14,7 @@ const LOCALE_LABELS: Record<Locale, string> = {
 
 export function LanguageSwitch() {
   const { i18n } = useTranslation();
-  const router = useRouter();
+  const { refresh } = useRouter();
 
   const handleChangeLocale = async (locale: Locale) => {
     if (i18n.language === locale) {
@@ -23,11 +23,11 @@ export function LanguageSwitch() {
 
     await i18n.changeLanguage(locale);
     setLocaleCookie(locale);
-    router.refresh();
+    refresh();
   };
 
   return (
-    <div className={styles.switcher} role="group" aria-label="Language switch">
+    <fieldset className={styles.switcher} aria-label="Language switch">
       {SUPPORTED_LOCALES.map((locale) => {
         const isActive = i18n.language === locale;
 
@@ -44,6 +44,6 @@ export function LanguageSwitch() {
           </Button>
         );
       })}
-    </div>
+    </fieldset>
   );
 }

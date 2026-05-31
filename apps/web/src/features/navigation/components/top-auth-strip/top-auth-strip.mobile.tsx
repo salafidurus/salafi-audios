@@ -7,7 +7,7 @@ import { routes } from "@sd/core-contracts";
 import styles from "./top-auth-strip.mobile.module.css";
 
 export function TopAuthStripMobile() {
-  const router = useRouter();
+  const { push } = useRouter();
   const pathname = usePathname();
   const isHome = pathname === routes.home;
 
@@ -15,7 +15,7 @@ export function TopAuthStripMobile() {
     <div className={styles.strip} aria-label="Top actions">
       <div className={styles.inner}>
         <div className={clsx(styles.actions, isHome && styles.actionsHome)}>
-          <Button variant="ghost" size="sm" onClick={() => router.push(routes.signIn)}>
+          <Button variant="ghost" size="sm" onClick={() => push(routes.signIn)}>
             Sign In
           </Button>
         </div>
