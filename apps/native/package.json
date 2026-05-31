@@ -15,10 +15,10 @@
     "dev:build:android": "expo run:android",
     "dev:build:ios": "expo run:ios",
     "lint": "expo lint",
-    "test": "jest --passWithNoTests",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage --watchAll=false",
-    "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
+    "test": "node ../../node_modules/jest/bin/jest.js --passWithNoTests",
+    "test:watch": "node ../../node_modules/jest/bin/jest.js --watch",
+    "test:cov": "node ../../node_modules/jest/bin/jest.js --coverage --watchAll=false",
+    "test:prepush": "node ../../node_modules/jest/bin/jest.js --changedSince=origin/main --passWithNoTests",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

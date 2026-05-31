@@ -19,10 +19,10 @@
     "build": "tsc -p tsconfig.build.json",
     "dev": "pnpm build --watch",
     "lint": "eslint .",
-    "test": "jest --passWithNoTests",
-    "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
-    "test:watch": "jest --watch --passWithNoTests",
-    "test:cov": "jest --coverage --passWithNoTests",
+    "test": "node ../../node_modules/jest/bin/jest.js --passWithNoTests",
+    "test:prepush": "node ../../node_modules/jest/bin/jest.js --changedSince=origin/main --passWithNoTests",
+    "test:watch": "node ../../node_modules/jest/bin/jest.js --watch --passWithNoTests",
+    "test:cov": "node ../../node_modules/jest/bin/jest.js --coverage --passWithNoTests",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {

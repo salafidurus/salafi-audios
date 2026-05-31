@@ -1,9 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
-import type {
-  AudioProgressDto,
-  ProgressSyncItemDto,
-} from '@sd/core-contracts';
+import type { AudioProgressDto, ProgressSyncItemDto } from '@sd/core-contracts';
 import { AudioRepository } from './audio.repo';
 import { AudioService } from './audio.service';
 
@@ -70,7 +68,10 @@ describe('AudioService', () => {
       const result = await service.getUserProgress('user1', sinceStr);
 
       expect(result).toEqual(mockProgress);
-      expect(repo.getUserProgress).toHaveBeenCalledWith('user1', new Date(sinceStr));
+      expect(repo.getUserProgress).toHaveBeenCalledWith(
+        'user1',
+        new Date(sinceStr),
+      );
     });
   });
 
@@ -121,7 +122,12 @@ describe('AudioService', () => {
 
     it('should return the primary audio asset if available', async () => {
       repo.findLectureById.mockResolvedValue(mockLecture);
-      repo.findPrimaryAsset.mockResolvedValue({ url: 'https://primary.mp3', durationSeconds: 1200, format: 'mp3', isPrimary: true } as any);
+      repo.findPrimaryAsset.mockResolvedValue({
+        url: 'https://primary.mp3',
+        durationSeconds: 1200,
+        format: 'mp3',
+        isPrimary: true,
+      } as any);
 
       const result = await service.resolveStreamUrl('l1');
 
@@ -137,7 +143,12 @@ describe('AudioService', () => {
     it('should fallback to the first audio asset if no primary asset exists', async () => {
       repo.findLectureById.mockResolvedValue(mockLecture);
       repo.findPrimaryAsset.mockResolvedValue(null);
-      repo.findFirstAsset.mockResolvedValue({ url: 'https://fallback.mp3', durationSeconds: 1200, format: 'mp3', isPrimary: false } as any);
+      repo.findFirstAsset.mockResolvedValue({
+        url: 'https://fallback.mp3',
+        durationSeconds: 1200,
+        format: 'mp3',
+        isPrimary: false,
+      } as any);
 
       const result = await service.resolveStreamUrl('l1');
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { LocaleInterceptor } from './locale.interceptor';
 import { of } from 'rxjs';
 

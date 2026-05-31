@@ -7,9 +7,9 @@
     "build": "nest build",
     "start": "node dist/main.js",
     "typecheck": "tsc --noEmit",
-    "test": "jest --passWithNoTests",
-    "test:watch": "jest --watch --passWithNoTests",
-    "test:prepush": "jest --changedSince=origin/main --passWithNoTests"
+    "test": "node ../../node_modules/jest/bin/jest.js --passWithNoTests",
+    "test:watch": "node ../../node_modules/jest/bin/jest.js --watch --passWithNoTests",
+    "test:prepush": "node ../../node_modules/jest/bin/jest.js --changedSince=origin/main --passWithNoTests"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.3",
