@@ -1,4 +1,5 @@
-import { Image, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
+import { Image } from "expo-image";
 import type { ScholarListItemDto } from "@sd/core-contracts";
 
 export type ScholarCardProps = {
@@ -37,9 +38,9 @@ export function ScholarCard({ scholar, onPress }: ScholarCardProps) {
         {scholar.name}
       </Text>
       {scholar.mainLanguage && (
-        <Text style={{ fontSize: 11, color: "#6b7280" }}>{scholar.mainLanguage}</Text>
+        <Text style={{ fontSize: 12, color: "#6b7280" }}>{scholar.mainLanguage}</Text>
       )}
-      <Text style={{ fontSize: 11, color: "#9ca3af" }}>{scholar.lectureCount} lectures</Text>
+      <Text style={{ fontSize: 12, color: "#9ca3af" }}>{scholar.lectureCount} lectures</Text>
     </Pressable>
   );
 }

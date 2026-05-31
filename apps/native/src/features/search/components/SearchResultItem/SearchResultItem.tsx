@@ -1,4 +1,5 @@
-import { Image, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
+import { Image } from "expo-image";
 import { Clock3, Headphones } from "lucide-react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { MarqueeText } from "../MarqueeText/MarqueeText";
@@ -38,7 +39,7 @@ export function SearchResultItem({
     <Pressable onPress={onPress} style={({ pressed }) => [styles.card, pressed && styles.pressed]}>
       <View style={styles.media}>
         {imageUrl ? (
-          <Image source={{ uri: imageUrl }} style={styles.cover} resizeMode="cover" />
+          <Image source={{ uri: imageUrl }} style={styles.cover} contentFit="cover" />
         ) : (
           <View style={styles.coverFallback}>
             <HeadphonesIcon size={20} color={theme.colors.content.subtle} />
