@@ -3,8 +3,10 @@
   "compilerOptions": {
     "noEmit": true,
     "target": "ES2020",
-    "lib": ["ES2020"],
-    "moduleSuffixes": [".desktop.web", ".mobile.web", ".native", ".web", ""]
+    "lib": ["ES2020", "DOM"],
+    "moduleSuffixes": [".desktop.web", ".mobile.web", ".native", ".web", ""],
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src"]
 }
