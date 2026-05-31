@@ -32,6 +32,15 @@ export function PlaybackControls() {
     audioService.setSpeed(speeds[nextIndex]);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const RotateCcwIcon = <RotateCcw {...({ size: 28, color: "#1E293B" } as any)} />;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const PauseIcon = <Pause {...({ size: 32, color: "#FFFFFF", fill: "#FFFFFF" } as any)} />;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const PlayIcon = <Play {...({ size: 32, color: "#FFFFFF", fill: "#FFFFFF" } as any)} />;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const RotateCwIcon = <RotateCw {...({ size: 28, color: "#1E293B" } as any)} />;
+
   if (!hasTrack) return null;
 
   return (
@@ -42,22 +51,16 @@ export function PlaybackControls() {
 
       <View style={styles.centerControls}>
         <Pressable onPress={handleSkipBackward} style={styles.controlButton}>
-          <RotateCcw size={28} stroke="#1E293B" />
+          {RotateCcwIcon}
           <Text style={styles.skipLabel}>30</Text>
         </Pressable>
 
         <Pressable onPress={handlePlayPause} style={styles.playButton}>
-          {isPlaying ? (
-            <Pause size={32} stroke="#FFFFFF" fill="#FFFFFF" />
-          ) : (
-            <View style={{ marginStart: 4 }}>
-              <Play size={32} stroke="#FFFFFF" fill="#FFFFFF" />
-            </View>
-          )}
+          {isPlaying ? PauseIcon : <View style={{ marginStart: 4 }}>{PlayIcon}</View>}
         </Pressable>
 
         <Pressable onPress={handleSkipForward} style={styles.controlButton}>
-          <RotateCw size={28} stroke="#1E293B" />
+          {RotateCwIcon}
           <Text style={styles.skipLabel}>30</Text>
         </Pressable>
       </View>

@@ -25,9 +25,11 @@ export function UniversalList<TItem>({
     [renderItem],
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const FlashListAny = FlashList as any;
+
   return (
-    // @ts-expect-error FlashList generic typing has slight incompatibilities in this environment
-    <FlashList
+    <FlashListAny
       data={items}
       keyExtractor={keyExtractor}
       renderItem={renderFlashItem}

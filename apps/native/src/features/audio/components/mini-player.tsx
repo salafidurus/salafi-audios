@@ -22,6 +22,13 @@ export function MiniPlayer() {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const PauseIcon = <Pause {...({ size: 20, color: "#1E293B", fill: "#1E293B" } as any)} />;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const PlayIcon = <Play {...({ size: 20, color: "#1E293B", fill: "#1E293B" } as any)} />;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const ChevronDownIcon = <ChevronDown {...({ size: 28, color: "#1E293B" } as any)} />;
+
   return (
     <>
       <Pressable onPress={() => setModalVisible(true)} style={styles.container}>
@@ -46,13 +53,7 @@ export function MiniPlayer() {
           </View>
 
           <Pressable onPress={handlePlayPause} style={styles.playButton}>
-            {isPlaying ? (
-              <Pause size={20} stroke="#1E293B" fill="#1E293B" />
-            ) : (
-              <View style={{ marginStart: 2 }}>
-                <Play size={20} stroke="#1E293B" fill="#1E293B" />
-              </View>
-            )}
+            {isPlaying ? PauseIcon : <View style={{ marginStart: 2 }}>{PlayIcon}</View>}
           </Pressable>
         </View>
       </Pressable>
@@ -67,7 +68,7 @@ export function MiniPlayer() {
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <Pressable onPress={() => setModalVisible(false)} style={styles.closeButton}>
-              <ChevronDown size={28} stroke="#1E293B" />
+              {ChevronDownIcon}
             </Pressable>
             <Text style={styles.modalHeaderTitle}>Now Playing</Text>
             <View style={styles.placeholder} />
