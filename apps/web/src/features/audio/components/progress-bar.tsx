@@ -8,7 +8,7 @@ type ProgressBarProps = {
 };
 
 export function ProgressBar({ progressPercent, onSeek }: ProgressBarProps) {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (onSeek) {
       onSeek(Number(e.target.value));
     }
@@ -29,7 +29,8 @@ export function ProgressBar({ progressPercent, onSeek }: ProgressBarProps) {
         max={100}
         step={0.1}
         value={progressPercent || 0}
-        onChange={handleChange}
+        onChange={handleSeek}
+        aria-label="Audio progress"
         disabled={!onSeek}
         style={{
           width: "100%",

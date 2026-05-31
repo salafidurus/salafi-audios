@@ -1,8 +1,8 @@
-import React from 'react';
-import { View, StyleSheet, Pressable, Text } from 'react-native';
-import { useAudio } from '@sd/domain-audio';
-import { audioService } from '../index';
-import { Play, Pause, RotateCw, RotateCcw } from 'lucide-react-native';
+import React from "react";
+import { View, StyleSheet, Pressable, Text } from "react-native";
+import { useAudio } from "@sd/domain-audio";
+import { audioService } from "../index";
+import { Play, Pause, RotateCw, RotateCcw } from "lucide-react-native";
 
 export function PlaybackControls() {
   const { isPlaying, speed, positionSeconds, durationSeconds, hasTrack } = useAudio();
@@ -69,56 +69,52 @@ export function PlaybackControls() {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
     paddingHorizontal: 20,
     marginVertical: 15,
   },
   centerControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   playButton: {
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#3B82F6', // primary design token
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#3B82F6", // primary design token
+    justifyContent: "center",
+    alignItems: "center",
     marginHorizontal: 24,
-    shadowColor: '#3B82F6',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 4,
+    boxShadow: "0 4px 6px rgba(59, 130, 246, 0.3)",
   },
   controlButton: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
+    justifyContent: "center",
+    alignItems: "center",
+    position: "relative",
   },
   skipLabel: {
-    fontSize: 9,
-    fontWeight: 'bold',
-    color: '#1E293B',
-    position: 'absolute',
+    fontSize: 12,
+    fontWeight: "bold",
+    color: "#1E293B",
+    position: "absolute",
     top: 9,
   },
   speedButton: {
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 16,
-    backgroundColor: '#F1F5F9', // light gray token
+    backgroundColor: "#F1F5F9", // light gray token
     width: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   speedText: {
     fontSize: 12,
-    fontWeight: 'bold',
-    color: '#64748B',
+    fontWeight: "bold",
+    color: "#64748B",
   },
   placeholder: {
     width: 60,

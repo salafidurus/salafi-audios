@@ -7,13 +7,7 @@ import { ProgressBar } from "./progress-bar";
 import { PlaybackControls } from "./playback-controls";
 
 export function MiniPlayer() {
-  const {
-    currentTrack,
-    hasTrack,
-    progressPercent,
-    durationSeconds,
-    positionSeconds,
-  } = useAudio();
+  const { currentTrack, hasTrack, progressPercent, durationSeconds, positionSeconds } = useAudio();
 
   if (!hasTrack || !currentTrack) return null;
 
@@ -31,8 +25,8 @@ export function MiniPlayer() {
         left: 0,
         right: 0,
         zIndex: 50,
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
+        backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
         backgroundColor: "rgba(255, 255, 255, 0.85)",
         borderTop: "1px solid rgba(226, 232, 240, 0.8)",
         padding: "12px 24px",
@@ -44,7 +38,7 @@ export function MiniPlayer() {
       }}
     >
       <ProgressBar progressPercent={progressPercent} onSeek={handleSeek} />
-      
+
       <div
         style={{
           display: "flex",
@@ -102,7 +96,7 @@ export function MiniPlayer() {
           >
             {formatTime(positionSeconds)} / {formatTime(durationSeconds)}
           </span>
-          
+
           <PlaybackControls />
         </div>
       </div>

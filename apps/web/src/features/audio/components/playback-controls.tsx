@@ -38,6 +38,7 @@ export function PlaybackControls() {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
       <button
+        type="button"
         onClick={handleCycleSpeed}
         style={{
           padding: "4px 8px",
@@ -58,6 +59,7 @@ export function PlaybackControls() {
 
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         <button
+          type="button"
           onClick={handleSkipBackward}
           style={{
             background: "none",
@@ -72,10 +74,21 @@ export function PlaybackControls() {
           aria-label="Skip backward 30 seconds"
         >
           <RotateCcw size={22} />
-          <span style={{ fontSize: 8, fontWeight: "bold", position: "absolute", top: 8, color: "#475569" }}>30</span>
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: "bold",
+              position: "absolute",
+              top: 8,
+              color: "#475569",
+            }}
+          >
+            30
+          </span>
         </button>
 
         <button
+          type="button"
           onClick={handlePlayPause}
           disabled={isLoading}
           style={{
@@ -94,7 +107,7 @@ export function PlaybackControls() {
           aria-label={isPlaying ? "Pause" : "Play"}
         >
           {isLoading ? (
-            <span style={{ fontSize: 10 }}>…</span>
+            <span style={{ fontSize: 12 }}>…</span>
           ) : isPlaying ? (
             <Pause size={18} fill="#fff" />
           ) : (
@@ -103,6 +116,7 @@ export function PlaybackControls() {
         </button>
 
         <button
+          type="button"
           onClick={handleSkipForward}
           style={{
             background: "none",
@@ -117,7 +131,17 @@ export function PlaybackControls() {
           aria-label="Skip forward 30 seconds"
         >
           <RotateCw size={22} />
-          <span style={{ fontSize: 8, fontWeight: "bold", position: "absolute", top: 8, color: "#475569" }}>30</span>
+          <span
+            style={{
+              fontSize: 12,
+              fontWeight: "bold",
+              position: "absolute",
+              top: 8,
+              color: "#475569",
+            }}
+          >
+            30
+          </span>
         </button>
       </div>
     </div>
