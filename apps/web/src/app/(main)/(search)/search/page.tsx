@@ -5,11 +5,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { SearchProcessingScreen } from "@/features/search/screens/search-processing/search-processing.screen";
 
 function SearchPageInner() {
-  const router = useRouter();
+  const { back } = useRouter();
   const searchParams = useSearchParams();
   const searchKey = searchParams.get("searchKey") ?? undefined;
 
-  return <SearchProcessingScreen searchKey={searchKey} onBackPress={() => router.back()} />;
+  return <SearchProcessingScreen searchKey={searchKey} onBackPress={() => back()} />;
 }
 
 export default function SearchPage() {

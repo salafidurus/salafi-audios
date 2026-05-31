@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
 import { AdminLivestreamsScreen } from "@/features/admin/screens/admin-livestreams/admin-livestreams.screen";
+
+export const metadata: Metadata = {
+  title: "Manage Livestreams",
+  description: "Schedule and manage live streaming events.",
+};
 
 export default function AdminLivestreamsPage() {
   return <AdminLivestreamsScreen />;

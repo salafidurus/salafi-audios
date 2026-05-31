@@ -6,15 +6,15 @@ import { SignInResponsiveScreen } from "@/features/auth/screens/sign-in/sign-in.
 import { routes } from "@sd/core-contracts";
 
 function SignInPageInner() {
-  const router = useRouter();
+  const { push } = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("from") ?? routes.home;
 
   return (
     <SignInResponsiveScreen
       redirectTo={redirectTo}
-      onSignInSuccess={() => router.push(redirectTo)}
-      onNavigateToSignUp={() => router.push(routes.signUp)}
+      onSignInSuccess={() => push(redirectTo)}
+      onNavigateToSignUp={() => push(routes.signUp)}
     />
   );
 }
