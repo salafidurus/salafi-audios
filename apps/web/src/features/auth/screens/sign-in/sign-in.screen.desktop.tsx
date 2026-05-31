@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { routes } from "@sd/core-contracts";
 import { authClient } from "@/core/auth";
 import { TextInput } from "@/shared/components/TextInput/TextInput";
 import { GoogleSignInButton, AppleSignInButton } from "@/features/auth/components/social-buttons";
