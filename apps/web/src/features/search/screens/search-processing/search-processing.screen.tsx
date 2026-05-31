@@ -10,10 +10,7 @@ export type SearchProcessingScreenProps = {
 };
 
 export function SearchProcessingScreen({ searchKey, onBackPress }: SearchProcessingScreenProps) {
-  return (
-    <Responsive
-      mobile={<SearchProcessingMobileScreen prefill={searchKey} onBackPress={onBackPress} />}
-      desktop={<SearchProcessingDesktopScreen />}
-    />
-  );
+  const mobile = <SearchProcessingMobileScreen prefill={searchKey} onBackPress={onBackPress} />;
+  const desktop = <SearchProcessingDesktopScreen />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }

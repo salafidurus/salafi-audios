@@ -34,7 +34,7 @@ export function QuickBrowse({
   return (
     <View style={styles.root}>
       {/* Continue Listening */}
-      {recentProgress && (
+      {recentProgress != null && (
         <View style={styles.section}>
           <Text style={styles.header}>Continue Listening</Text>
           <Pressable

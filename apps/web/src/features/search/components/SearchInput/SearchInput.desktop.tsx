@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { forwardRef, type CSSProperties } from "react";
+import type { CSSProperties } from "react";
 
 export type SearchInputDesktopProps = {
   placeholder: string;
@@ -7,6 +7,7 @@ export type SearchInputDesktopProps = {
   value?: string;
   onChange?: (value: string) => void;
   autoFocus?: boolean;
+  ref?: React.Ref<HTMLInputElement>;
 };
 
 const shellClass =
@@ -23,41 +24,44 @@ const inputStyle: CSSProperties = {
   fontWeight: "var(--typo-body-lg-font-weight)",
 };
 
-export const SearchInputDesktop = forwardRef<HTMLInputElement, SearchInputDesktopProps>(
-  ({ placeholder, className, value, onChange, autoFocus }, ref) => {
-    const shellStyle: CSSProperties = {
-      ...inputStyle,
-      borderColor: "var(--input-border-rest)",
-      background: "var(--input-surface-rest)",
-    };
+export function SearchInputDesktop({
+  placeholder,
+  className,
+  value,
+  onChange,
+  autoFocus,
+  ref,
+}: SearchInputDesktopProps) {
+  const shellStyle: CSSProperties = {
+    ...inputStyle,
+    borderColor: "var(--input-border-rest)",
+    background: "var(--input-surface-rest)",
+  };
 
-    return (
-      <label className={clsx(shellClass, className)} aria-label="Search library" style={shellStyle}>
-        <SearchGlyph />
-        <input
-          ref={ref}
-          type="search"
-          placeholder={placeholder}
-          className={inputClass}
-          aria-label={placeholder}
-          value={value}
-          onChange={(e) => onChange?.(e.target.value)}
-          autoFocus={autoFocus}
-          style={inputStyle}
-        />
-      </label>
-    );
-  },
-);
-
-SearchInputDesktop.displayName = "SearchInputDesktop";
+  return (
+    <label className={clsx(shellClass, className)} aria-label="Search library" style={shellStyle}>
+      <SearchGlyph />
+      <input
+        ref={ref}
+        type="search"
+        placeholder={placeholder}
+        className={inputClass}
+        aria-label={placeholder}
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
+        autoFocus={autoFocus}
+        style={inputStyle}
+      />
+    </label>
+  );
+}
 
 function SearchGlyph() {
   return (
     <svg
       aria-hidden="true"
       viewBox="0 0 20 20"
-      className="h-4 w-4 text-[var(--content-muted)]"
+      className="size-4 text-[var(--content-muted)]"
       fill="none"
       stroke="currentColor"
       strokeWidth="1.8"

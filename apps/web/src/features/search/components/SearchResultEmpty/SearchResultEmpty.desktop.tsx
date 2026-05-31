@@ -22,7 +22,7 @@ export function SearchResultEmptyDesktop({
     ? errorMessage
       ? errorMessage
       : isFetching
-        ? "Searching..."
+        ? "Searching…"
         : "No results found."
     : "Start typing to search.";
 

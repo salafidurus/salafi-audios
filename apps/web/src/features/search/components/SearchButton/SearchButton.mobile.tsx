@@ -9,10 +9,7 @@ export type SearchButtonMobileProps = {
   onPress?: () => void;
 };
 
-export function SearchButtonMobile({
-  placeholder = "Search...",
-  onPress,
-}: SearchButtonMobileProps) {
+export function SearchButtonMobile({ placeholder = "Search…", onPress }: SearchButtonMobileProps) {
   const [isPressed, setIsPressed] = useState(false);
 
   return (

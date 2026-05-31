@@ -11,6 +11,15 @@ export type SearchResultsListDesktopProps = {
   renderItem: (item: SearchResultRow) => React.ReactElement | null;
 };
 
+type ItemRendererProps = {
+  item: SearchResultRow;
+  renderItem: (item: SearchResultRow) => React.ReactElement | null;
+};
+
+function ItemRenderer({ item, renderItem }: ItemRendererProps) {
+  return renderItem(item);
+}
+
 export function SearchResultsListDesktop({
   items,
   isFetching,
@@ -31,7 +40,7 @@ export function SearchResultsListDesktop({
       ) : null}
       <div className="flex flex-col gap-[var(--space-component-gap-sm)]">
         {items.map((item) => (
-          <div key={item.id}>{renderItem(item)}</div>
+          <ItemRenderer key={item.id} item={item} renderItem={renderItem} />
         ))}
       </div>
     </div>

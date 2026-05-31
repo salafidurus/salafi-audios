@@ -103,7 +103,7 @@ export function QuickBrowseDesktop({
                 onClick={() => onSelectScholar?.(scholar.slug)}
                 className="flex shrink-0 flex-col items-center gap-[var(--space-scale-xs)] transition hover:opacity-80"
               >
-                <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full border border-[var(--border-default)] bg-[var(--surface-default)]">
+                <div className="flex size-14 items-center justify-center overflow-hidden rounded-full border border-[var(--border-default)] bg-[var(--surface-default)]">
                   {scholar.imageUrl ? (
                     <img
                       src={scholar.imageUrl}

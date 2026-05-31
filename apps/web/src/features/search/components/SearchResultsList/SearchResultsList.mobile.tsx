@@ -23,6 +23,15 @@ export type SearchResultsListProps = {
 
 export type SearchResultsListMobileProps = SearchResultsListProps;
 
+type ItemRendererProps = {
+  item: SearchResultRow;
+  renderItem: (item: SearchResultRow) => React.ReactElement | null;
+};
+
+function ItemRenderer({ item, renderItem }: ItemRendererProps) {
+  return renderItem(item);
+}
+
 export function SearchResultsListMobile({
   items,
   isFetching,
@@ -56,7 +65,7 @@ export function SearchResultsListMobile({
           items.map((item, index) => (
             <React.Fragment key={item.id}>
               {index > 0 && <div className={styles.separator} />}
-              {renderItem(item)}
+              <ItemRenderer item={item} renderItem={renderItem} />
             </React.Fragment>
           ))
         )}

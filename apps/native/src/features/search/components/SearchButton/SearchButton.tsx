@@ -9,7 +9,7 @@ export type SearchButtonProps = {
   onPress?: () => void;
 };
 
-export function SearchButton({ placeholder = "Search...", onPress }: SearchButtonProps) {
+export function SearchButton({ placeholder = "Search…", onPress }: SearchButtonProps) {
   const { theme } = useUnistyles();
   const recipe = theme.recipes.primarySubtleSurface;
   const SearchIcon = Search as ComponentType<{

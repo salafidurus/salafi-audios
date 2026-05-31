@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Headphones, Clock } from "lucide-react";
 import { MarqueeTextMobile } from "../MarqueeText/MarqueeText.mobile";
 import styles from "./SearchResultItem.mobile.module.css";
@@ -38,7 +39,7 @@ export function SearchResultItemMobile({
     >
       <div className={styles.media}>
         {imageUrl ? (
-          <img src={imageUrl} alt="" className={styles.cover} />
+          <Image src={imageUrl} alt="" fill className={styles.cover} />
         ) : (
           <div className={styles.coverFallback}>
             <Headphones size={20} color="var(--content-subtle)" />
