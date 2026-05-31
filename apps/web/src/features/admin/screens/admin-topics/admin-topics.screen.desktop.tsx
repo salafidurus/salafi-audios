@@ -46,7 +46,7 @@ export function AdminTopicsDesktopScreen() {
   if (isFetching) {
     return (
       <ScreenView>
-        <div style={{ textAlign: "center" }}>Loading topics...</div>
+        <div style={{ textAlign: "center" }}>Loading topics…</div>
       </ScreenView>
     );
   }
@@ -66,6 +66,7 @@ export function AdminTopicsDesktopScreen() {
         >
           <h1 style={{ fontSize: 28, fontWeight: 700 }}>Manage Topics</h1>
           <button
+            type="button"
             onClick={() => {
               setCreating(true);
               setEditing(null);
@@ -98,18 +99,21 @@ export function AdminTopicsDesktopScreen() {
               }}
             >
               <input
+                aria-label="Topic slug"
                 placeholder="Slug"
                 value={formData.slug}
                 onChange={(e) => setFormData((p) => ({ ...p, slug: e.target.value }))}
                 style={{ padding: 8, border: "1px solid #ccc", borderRadius: 4 }}
               />
               <input
+                aria-label="Topic name"
                 placeholder="Name"
                 value={formData.name}
                 onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
                 style={{ padding: 8, border: "1px solid #ccc", borderRadius: 4 }}
               />
               <input
+                aria-label="Parent topic slug"
                 placeholder="Parent slug (optional)"
                 value={formData.parentSlug ?? ""}
                 onChange={(e) =>
@@ -120,6 +124,7 @@ export function AdminTopicsDesktopScreen() {
             </div>
             <div style={{ display: "flex", gap: 8 }}>
               <button
+                type="button"
                 onClick={handleSave}
                 disabled={saving}
                 style={{
@@ -131,9 +136,10 @@ export function AdminTopicsDesktopScreen() {
                   cursor: "pointer",
                 }}
               >
-                {saving ? "Saving..." : "Save"}
+                {saving ? "Saving…" : "Save"}
               </button>
               <button
+                type="button"
                 onClick={() => {
                   setCreating(false);
                   setEditing(null);
@@ -170,6 +176,7 @@ export function AdminTopicsDesktopScreen() {
                 <td style={{ padding: 8 }}>
                   <div style={{ display: "flex", gap: 8 }}>
                     <button
+                      type="button"
                       onClick={() => {
                         setEditing(t);
                         setCreating(false);
@@ -186,6 +193,7 @@ export function AdminTopicsDesktopScreen() {
                       Edit
                     </button>
                     <button
+                      type="button"
                       onClick={() => handleDelete(t.slug)}
                       style={{
                         padding: "4px 12px",

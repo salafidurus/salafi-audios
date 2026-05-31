@@ -55,12 +55,14 @@ export function AdminPermissionsMobileScreen() {
 
       <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
         <input
+          aria-label="User ID"
           placeholder="User ID"
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
           style={{ flex: 1, padding: 8, border: "1px solid #ccc", borderRadius: 4 }}
         />
         <button
+          type="button"
           onClick={handleLookup}
           disabled={loading}
           style={{
@@ -72,7 +74,7 @@ export function AdminPermissionsMobileScreen() {
             fontSize: 13,
           }}
         >
-          {loading ? "..." : "Lookup"}
+          {loading ? "…" : "Lookup"}
         </button>
       </div>
 
@@ -93,12 +95,13 @@ export function AdminPermissionsMobileScreen() {
               >
                 <div>
                   <div style={{ fontFamily: "monospace", fontSize: 13 }}>{perm}</div>
-                  <div style={{ fontSize: 11, color: hasIt ? "#16a34a" : "#999" }}>
+                  <div style={{ fontSize: 12, color: hasIt ? "#16a34a" : "#999" }}>
                     {hasIt ? "Granted" : "Not granted"}
                   </div>
                 </div>
                 {hasIt ? (
                   <button
+                    type="button"
                     onClick={() => handleRevoke(perm)}
                     disabled={loading}
                     style={{
@@ -107,13 +110,14 @@ export function AdminPermissionsMobileScreen() {
                       border: "1px solid #fca5a5",
                       background: "#fef2f2",
                       color: "#dc2626",
-                      fontSize: 11,
+                      fontSize: 12,
                     }}
                   >
                     Revoke
                   </button>
                 ) : (
                   <button
+                    type="button"
                     onClick={() => handleGrant(perm)}
                     disabled={loading}
                     style={{
@@ -122,7 +126,7 @@ export function AdminPermissionsMobileScreen() {
                       border: "none",
                       background: "#16a34a",
                       color: "#fff",
-                      fontSize: 11,
+                      fontSize: 12,
                     }}
                   >
                     Grant

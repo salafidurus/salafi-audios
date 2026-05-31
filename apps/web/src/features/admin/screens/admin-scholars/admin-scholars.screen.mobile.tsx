@@ -42,7 +42,7 @@ export function AdminScholarsMobileScreen() {
   if (isFetching) {
     return (
       <ScreenView>
-        <div style={{ textAlign: "center" }}>Loading scholars...</div>
+        <div style={{ textAlign: "center" }}>Loading scholars…</div>
       </ScreenView>
     );
   }
@@ -62,6 +62,7 @@ export function AdminScholarsMobileScreen() {
         >
           <h1 style={{ fontSize: 22, fontWeight: 700 }}>Scholars</h1>
           <button
+            type="button"
             onClick={() => {
               setCreating(true);
               setEditing(null);
@@ -86,6 +87,7 @@ export function AdminScholarsMobileScreen() {
           >
             <h3 style={{ marginBottom: 8, fontSize: 16 }}>{editing ? "Edit" : "New Scholar"}</h3>
             <input
+              aria-label="Scholar name"
               placeholder="Name"
               value={formData.name}
               onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
@@ -98,6 +100,7 @@ export function AdminScholarsMobileScreen() {
               }}
             />
             <input
+              aria-label="Scholar slug"
               placeholder="Slug"
               value={formData.slug}
               onChange={(e) => setFormData((p) => ({ ...p, slug: e.target.value }))}
@@ -137,6 +140,7 @@ export function AdminScholarsMobileScreen() {
             </div>
             <div style={{ display: "flex", gap: 8 }}>
               <button
+                type="button"
                 onClick={handleSave}
                 disabled={saving}
                 style={{
@@ -147,9 +151,10 @@ export function AdminScholarsMobileScreen() {
                   color: "#fff",
                 }}
               >
-                {saving ? "Saving..." : "Save"}
+                {saving ? "Saving…" : "Save"}
               </button>
               <button
+                type="button"
                 onClick={() => {
                   setCreating(false);
                   setEditing(null);
@@ -185,6 +190,7 @@ export function AdminScholarsMobileScreen() {
               </div>
             </div>
             <button
+              type="button"
               onClick={() => {
                 setEditing(s);
                 setCreating(false);

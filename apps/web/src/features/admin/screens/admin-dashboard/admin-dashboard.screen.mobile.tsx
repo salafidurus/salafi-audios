@@ -44,7 +44,7 @@ export function AdminDashboardMobileScreen() {
   if (isFetching) {
     return (
       <ScreenView>
-        <div style={{ textAlign: "center" }}>Loading...</div>
+        <div style={{ textAlign: "center" }}>Loading…</div>
       </ScreenView>
     );
   }

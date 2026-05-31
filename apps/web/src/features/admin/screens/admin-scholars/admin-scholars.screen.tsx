@@ -5,5 +5,7 @@ import { AdminScholarsDesktopScreen } from "./admin-scholars.screen.desktop";
 import { AdminScholarsMobileScreen } from "./admin-scholars.screen.mobile";
 
 export function AdminScholarsScreen() {
-  return <Responsive mobile={<AdminScholarsMobileScreen />} desktop={<AdminScholarsDesktopScreen />} />;
+  const mobile = <AdminScholarsMobileScreen />;
+  const desktop = <AdminScholarsDesktopScreen />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }

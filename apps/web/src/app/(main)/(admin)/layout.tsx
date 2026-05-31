@@ -8,7 +8,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (isFetching) {
     return (
       <div style={{ padding: 32, textAlign: "center" }}>
-        <p>Checking permissions...</p>
+        <p>Checking permissions…</p>
       </div>
     );
   }

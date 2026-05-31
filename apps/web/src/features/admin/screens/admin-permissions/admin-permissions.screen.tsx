@@ -5,5 +5,7 @@ import { AdminPermissionsDesktopScreen } from "./admin-permissions.screen.deskto
 import { AdminPermissionsMobileScreen } from "./admin-permissions.screen.mobile";
 
 export function AdminPermissionsScreen() {
-  return <Responsive mobile={<AdminPermissionsMobileScreen />} desktop={<AdminPermissionsDesktopScreen />} />;
+  const mobile = <AdminPermissionsMobileScreen />;
+  const desktop = <AdminPermissionsDesktopScreen />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }

@@ -5,6 +5,62 @@ import type { LiveSessionDeltaDto } from "@sd/core-contracts";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { updateLiveSessionStatus } from "@/features/admin/api/admin.api";
 
+type Session = LiveSessionDeltaDto["sessions"][number];
+
+type SessionCardProps = {
+  session: Session;
+  onStatusChange: (id: string, status: string) => void;
+};
+
+function SessionCard({ session, onStatusChange }: SessionCardProps) {
+  return (
+    <div style={{ padding: 12, borderBottom: "1px solid #f0f0f0" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div>
+          <div style={{ fontWeight: 600 }}>{session.title ?? "Untitled"}</div>
+          <div style={{ fontSize: 12, color: "#666" }}>
+            {session.channelDisplayName} · {session.scholarName ?? "—"}
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: 4 }}>
+          {session.status === "scheduled" && (
+            <button
+              type="button"
+              onClick={() => onStatusChange(session.id, "live")}
+              style={{
+                padding: "4px 8px",
+                borderRadius: 4,
+                border: "none",
+                background: "#16a34a",
+                color: "#fff",
+                fontSize: 12,
+              }}
+            >
+              Live
+            </button>
+          )}
+          {session.status === "live" && (
+            <button
+              type="button"
+              onClick={() => onStatusChange(session.id, "ended")}
+              style={{
+                padding: "4px 8px",
+                borderRadius: 4,
+                border: "none",
+                background: "#dc2626",
+                color: "#fff",
+                fontSize: 12,
+              }}
+            >
+              End
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function AdminLivestreamsMobileScreen() {
   const {
     data: activeData,
@@ -34,58 +90,13 @@ export function AdminLivestreamsMobileScreen() {
   if (loadingActive || loadingScheduled) {
     return (
       <ScreenView>
-        <div style={{ textAlign: "center" }}>Loading...</div>
+        <div style={{ textAlign: "center" }}>Loading…</div>
       </ScreenView>
     );
   }
 
   const active = activeData?.sessions ?? [];
   const scheduled = scheduledData?.sessions ?? [];
-
-  const renderSession = (session: LiveSessionDeltaDto["sessions"][number]) => (
-    <div key={session.id} style={{ padding: 12, borderBottom: "1px solid #f0f0f0" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div>
-          <div style={{ fontWeight: 600 }}>{session.title ?? "Untitled"}</div>
-          <div style={{ fontSize: 12, color: "#666" }}>
-            {session.channelDisplayName} · {session.scholarName ?? "—"}
-          </div>
-        </div>
-        <div style={{ display: "flex", gap: 4 }}>
-          {session.status === "scheduled" && (
-            <button
-              onClick={() => handleStatusChange(session.id, "live")}
-              style={{
-                padding: "4px 8px",
-                borderRadius: 4,
-                border: "none",
-                background: "#16a34a",
-                color: "#fff",
-                fontSize: 11,
-              }}
-            >
-              Live
-            </button>
-          )}
-          {session.status === "live" && (
-            <button
-              onClick={() => handleStatusChange(session.id, "ended")}
-              style={{
-                padding: "4px 8px",
-                borderRadius: 4,
-                border: "none",
-                background: "#dc2626",
-                color: "#fff",
-                fontSize: 11,
-              }}
-            >
-              End
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <ScreenView>
@@ -96,7 +107,9 @@ export function AdminLivestreamsMobileScreen() {
             <h2 style={{ fontSize: 16, fontWeight: 600, color: "#16a34a", marginBottom: 8 }}>
               Active ({active.length})
             </h2>
-            {active.map(renderSession)}
+            {active.map((session) => (
+              <SessionCard key={session.id} session={session} onStatusChange={handleStatusChange} />
+            ))}
           </>
         )}
         <h2
@@ -110,7 +123,9 @@ export function AdminLivestreamsMobileScreen() {
         >
           Scheduled ({scheduled.length})
         </h2>
-        {scheduled.map(renderSession)}
+        {scheduled.map((session) => (
+          <SessionCard key={session.id} session={session} onStatusChange={handleStatusChange} />
+        ))}
       </div>
     </ScreenView>
   );

@@ -46,7 +46,7 @@ export function AdminTopicsMobileScreen() {
   if (isFetching) {
     return (
       <ScreenView>
-        <div style={{ textAlign: "center" }}>Loading topics...</div>
+        <div style={{ textAlign: "center" }}>Loading topics…</div>
       </ScreenView>
     );
   }
@@ -66,6 +66,7 @@ export function AdminTopicsMobileScreen() {
         >
           <h1 style={{ fontSize: 22, fontWeight: 700 }}>Topics</h1>
           <button
+            type="button"
             onClick={() => {
               setCreating(true);
               setEditing(null);
@@ -90,6 +91,7 @@ export function AdminTopicsMobileScreen() {
           >
             <h3 style={{ marginBottom: 8, fontSize: 16 }}>{editing ? "Edit" : "New Topic"}</h3>
             <input
+              aria-label="Topic slug"
               placeholder="Slug"
               value={formData.slug}
               onChange={(e) => setFormData((p) => ({ ...p, slug: e.target.value }))}
@@ -102,6 +104,7 @@ export function AdminTopicsMobileScreen() {
               }}
             />
             <input
+              aria-label="Topic name"
               placeholder="Name"
               value={formData.name}
               onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
@@ -114,6 +117,7 @@ export function AdminTopicsMobileScreen() {
               }}
             />
             <input
+              aria-label="Parent topic slug"
               placeholder="Parent slug (optional)"
               value={formData.parentSlug ?? ""}
               onChange={(e) =>
@@ -129,6 +133,7 @@ export function AdminTopicsMobileScreen() {
             />
             <div style={{ display: "flex", gap: 8 }}>
               <button
+                type="button"
                 onClick={handleSave}
                 disabled={saving}
                 style={{
@@ -139,9 +144,10 @@ export function AdminTopicsMobileScreen() {
                   color: "#fff",
                 }}
               >
-                {saving ? "Saving..." : "Save"}
+                {saving ? "Saving…" : "Save"}
               </button>
               <button
+                type="button"
                 onClick={() => {
                   setCreating(false);
                   setEditing(null);
@@ -176,6 +182,7 @@ export function AdminTopicsMobileScreen() {
             </div>
             <div style={{ display: "flex", gap: 8 }}>
               <button
+                type="button"
                 onClick={() => {
                   setEditing(t);
                   setCreating(false);
@@ -192,6 +199,7 @@ export function AdminTopicsMobileScreen() {
                 Edit
               </button>
               <button
+                type="button"
                 onClick={() => handleDelete(t.slug)}
                 style={{
                   padding: "4px 10px",

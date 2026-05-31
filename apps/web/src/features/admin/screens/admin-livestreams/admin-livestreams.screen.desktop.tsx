@@ -5,6 +5,100 @@ import type { LiveSessionDeltaDto } from "@sd/core-contracts";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { updateLiveSessionStatus } from "@/features/admin/api/admin.api";
 
+type Session = LiveSessionDeltaDto["sessions"][number];
+
+type SessionRowProps = {
+  session: Session;
+  onStatusChange: (id: string, status: string) => void;
+};
+
+function SessionRow({ session, onStatusChange }: SessionRowProps) {
+  return (
+    <tr style={{ borderBottom: "1px solid #f0f0f0" }}>
+      <td style={{ padding: 8 }}>{session.title ?? "Untitled"}</td>
+      <td style={{ padding: 8 }}>{session.channelDisplayName}</td>
+      <td style={{ padding: 8 }}>{session.scholarName ?? "—"}</td>
+      <td style={{ padding: 8 }}>
+        <span
+          style={{
+            padding: "2px 8px",
+            borderRadius: 4,
+            fontSize: 12,
+            background:
+              session.status === "live"
+                ? "#dcfce7"
+                : session.status === "scheduled"
+                  ? "#dbeafe"
+                  : "#f3f4f6",
+            color:
+              session.status === "live"
+                ? "#16a34a"
+                : session.status === "scheduled"
+                  ? "#2563eb"
+                  : "#666",
+          }}
+        >
+          {session.status}
+        </span>
+      </td>
+      <td style={{ padding: 8 }}>
+        <div style={{ display: "flex", gap: 4 }}>
+          {session.status === "scheduled" && (
+            <button
+              type="button"
+              onClick={() => onStatusChange(session.id, "live")}
+              style={{
+                padding: "4px 8px",
+                borderRadius: 4,
+                border: "none",
+                background: "#16a34a",
+                color: "#fff",
+                cursor: "pointer",
+                fontSize: 12,
+              }}
+            >
+              Go Live
+            </button>
+          )}
+          {session.status === "live" && (
+            <button
+              type="button"
+              onClick={() => onStatusChange(session.id, "ended")}
+              style={{
+                padding: "4px 8px",
+                borderRadius: 4,
+                border: "none",
+                background: "#dc2626",
+                color: "#fff",
+                cursor: "pointer",
+                fontSize: 12,
+              }}
+            >
+              End
+            </button>
+          )}
+          {session.status === "ended" && (
+            <button
+              type="button"
+              onClick={() => onStatusChange(session.id, "scheduled")}
+              style={{
+                padding: "4px 8px",
+                borderRadius: 4,
+                border: "1px solid #ccc",
+                background: "#fff",
+                cursor: "pointer",
+                fontSize: 12,
+              }}
+            >
+              Reschedule
+            </button>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
+}
+
 export function AdminLivestreamsDesktopScreen() {
   const {
     data: activeData,
@@ -42,7 +136,7 @@ export function AdminLivestreamsDesktopScreen() {
   if (loadingActive || loadingScheduled || loadingEnded) {
     return (
       <ScreenView>
-        <div style={{ textAlign: "center" }}>Loading live sessions...</div>
+        <div style={{ textAlign: "center" }}>Loading live sessions…</div>
       </ScreenView>
     );
   }
@@ -50,88 +144,6 @@ export function AdminLivestreamsDesktopScreen() {
   const active = activeData?.sessions ?? [];
   const scheduled = scheduledData?.sessions ?? [];
   const ended = endedData?.sessions ?? [];
-
-  const renderSession = (session: LiveSessionDeltaDto["sessions"][number]) => (
-    <tr key={session.id} style={{ borderBottom: "1px solid #f0f0f0" }}>
-      <td style={{ padding: 8 }}>{session.title ?? "Untitled"}</td>
-      <td style={{ padding: 8 }}>{session.channelDisplayName}</td>
-      <td style={{ padding: 8 }}>{session.scholarName ?? "—"}</td>
-      <td style={{ padding: 8 }}>
-        <span
-          style={{
-            padding: "2px 8px",
-            borderRadius: 4,
-            fontSize: 12,
-            background:
-              session.status === "live"
-                ? "#dcfce7"
-                : session.status === "scheduled"
-                  ? "#dbeafe"
-                  : "#f3f4f6",
-            color:
-              session.status === "live"
-                ? "#16a34a"
-                : session.status === "scheduled"
-                  ? "#2563eb"
-                  : "#666",
-          }}
-        >
-          {session.status}
-        </span>
-      </td>
-      <td style={{ padding: 8 }}>
-        <div style={{ display: "flex", gap: 4 }}>
-          {session.status === "scheduled" && (
-            <button
-              onClick={() => handleStatusChange(session.id, "live")}
-              style={{
-                padding: "4px 8px",
-                borderRadius: 4,
-                border: "none",
-                background: "#16a34a",
-                color: "#fff",
-                cursor: "pointer",
-                fontSize: 12,
-              }}
-            >
-              Go Live
-            </button>
-          )}
-          {session.status === "live" && (
-            <button
-              onClick={() => handleStatusChange(session.id, "ended")}
-              style={{
-                padding: "4px 8px",
-                borderRadius: 4,
-                border: "none",
-                background: "#dc2626",
-                color: "#fff",
-                cursor: "pointer",
-                fontSize: 12,
-              }}
-            >
-              End
-            </button>
-          )}
-          {session.status === "ended" && (
-            <button
-              onClick={() => handleStatusChange(session.id, "scheduled")}
-              style={{
-                padding: "4px 8px",
-                borderRadius: 4,
-                border: "1px solid #ccc",
-                background: "#fff",
-                cursor: "pointer",
-                fontSize: 12,
-              }}
-            >
-              Reschedule
-            </button>
-          )}
-        </div>
-      </td>
-    </tr>
-  );
 
   return (
     <ScreenView>
@@ -151,7 +163,11 @@ export function AdminLivestreamsDesktopScreen() {
               <th style={{ padding: 8 }}>Actions</th>
             </tr>
           </thead>
-          <tbody>{active.map(renderSession)}</tbody>
+          <tbody>
+            {active.map((session) => (
+              <SessionRow key={session.id} session={session} onStatusChange={handleStatusChange} />
+            ))}
+          </tbody>
         </table>
 
         <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 12, color: "#2563eb" }}>
@@ -167,7 +183,11 @@ export function AdminLivestreamsDesktopScreen() {
               <th style={{ padding: 8 }}>Actions</th>
             </tr>
           </thead>
-          <tbody>{scheduled.map(renderSession)}</tbody>
+          <tbody>
+            {scheduled.map((session) => (
+              <SessionRow key={session.id} session={session} onStatusChange={handleStatusChange} />
+            ))}
+          </tbody>
         </table>
 
         <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 12, color: "#666" }}>
@@ -183,7 +203,11 @@ export function AdminLivestreamsDesktopScreen() {
               <th style={{ padding: 8 }}>Actions</th>
             </tr>
           </thead>
-          <tbody>{ended.map(renderSession)}</tbody>
+          <tbody>
+            {ended.map((session) => (
+              <SessionRow key={session.id} session={session} onStatusChange={handleStatusChange} />
+            ))}
+          </tbody>
         </table>
       </div>
     </ScreenView>

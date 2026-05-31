@@ -55,6 +55,7 @@ export function AdminPermissionsDesktopScreen() {
 
       <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
         <input
+          aria-label="User ID"
           placeholder="User ID"
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
@@ -62,6 +63,7 @@ export function AdminPermissionsDesktopScreen() {
           style={{ flex: 1, padding: 8, border: "1px solid #ccc", borderRadius: 4 }}
         />
         <button
+          type="button"
           onClick={handleLookup}
           disabled={loading}
           style={{
@@ -73,7 +75,7 @@ export function AdminPermissionsDesktopScreen() {
             cursor: "pointer",
           }}
         >
-          {loading ? "Loading..." : "Lookup"}
+          {loading ? "Loading…" : "Lookup"}
         </button>
       </div>
 
@@ -112,6 +114,7 @@ export function AdminPermissionsDesktopScreen() {
                     <td style={{ padding: 8 }}>
                       {hasIt ? (
                         <button
+                          type="button"
                           onClick={() => handleRevoke(perm)}
                           disabled={loading}
                           style={{
@@ -128,6 +131,7 @@ export function AdminPermissionsDesktopScreen() {
                         </button>
                       ) : (
                         <button
+                          type="button"
                           onClick={() => handleGrant(perm)}
                           disabled={loading}
                           style={{

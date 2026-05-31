@@ -5,5 +5,7 @@ import { AdminLivestreamsDesktopScreen } from "./admin-livestreams.screen.deskto
 import { AdminLivestreamsMobileScreen } from "./admin-livestreams.screen.mobile";
 
 export function AdminLivestreamsScreen() {
-  return <Responsive mobile={<AdminLivestreamsMobileScreen />} desktop={<AdminLivestreamsDesktopScreen />} />;
+  const mobile = <AdminLivestreamsMobileScreen />;
+  const desktop = <AdminLivestreamsDesktopScreen />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }

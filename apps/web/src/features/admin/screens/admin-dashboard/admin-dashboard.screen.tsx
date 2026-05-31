@@ -5,5 +5,7 @@ import { AdminDashboardDesktopScreen } from "./admin-dashboard.screen.desktop";
 import { AdminDashboardMobileScreen } from "./admin-dashboard.screen.mobile";
 
 export function AdminDashboardScreen() {
-  return <Responsive mobile={<AdminDashboardMobileScreen />} desktop={<AdminDashboardDesktopScreen />} />;
+  const mobile = <AdminDashboardMobileScreen />;
+  const desktop = <AdminDashboardDesktopScreen />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }

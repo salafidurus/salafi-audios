@@ -42,7 +42,7 @@ export function AdminScholarsDesktopScreen() {
   if (isFetching) {
     return (
       <ScreenView>
-        <div style={{ textAlign: "center" }}>Loading scholars...</div>
+        <div style={{ textAlign: "center" }}>Loading scholars…</div>
       </ScreenView>
     );
   }
@@ -62,6 +62,7 @@ export function AdminScholarsDesktopScreen() {
         >
           <h1 style={{ fontSize: 28, fontWeight: 700 }}>Manage Scholars</h1>
           <button
+            type="button"
             onClick={() => {
               setCreating(true);
               setEditing(null);
@@ -89,24 +90,28 @@ export function AdminScholarsDesktopScreen() {
               style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}
             >
               <input
+                aria-label="Scholar name"
                 placeholder="Name"
                 value={formData.name}
                 onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
                 style={{ padding: 8, border: "1px solid #ccc", borderRadius: 4 }}
               />
               <input
+                aria-label="Scholar slug"
                 placeholder="Slug"
                 value={formData.slug}
                 onChange={(e) => setFormData((p) => ({ ...p, slug: e.target.value }))}
                 style={{ padding: 8, border: "1px solid #ccc", borderRadius: 4 }}
               />
               <input
+                aria-label="Scholar bio"
                 placeholder="Bio"
                 value={formData.bio ?? ""}
                 onChange={(e) => setFormData((p) => ({ ...p, bio: e.target.value }))}
                 style={{ padding: 8, border: "1px solid #ccc", borderRadius: 4 }}
               />
               <input
+                aria-label="Scholar image URL"
                 placeholder="Image URL"
                 value={formData.imageUrl ?? ""}
                 onChange={(e) => setFormData((p) => ({ ...p, imageUrl: e.target.value }))}
@@ -141,6 +146,7 @@ export function AdminScholarsDesktopScreen() {
             </div>
             <div style={{ display: "flex", gap: 8 }}>
               <button
+                type="button"
                 onClick={handleSave}
                 disabled={saving}
                 style={{
@@ -152,9 +158,10 @@ export function AdminScholarsDesktopScreen() {
                   cursor: "pointer",
                 }}
               >
-                {saving ? "Saving..." : "Save"}
+                {saving ? "Saving…" : "Save"}
               </button>
               <button
+                type="button"
                 onClick={() => {
                   setCreating(false);
                   setEditing(null);
@@ -192,6 +199,7 @@ export function AdminScholarsDesktopScreen() {
                 <td style={{ padding: 8 }}>{s.lectureCount}</td>
                 <td style={{ padding: 8 }}>
                   <button
+                    type="button"
                     onClick={() => {
                       setEditing(s);
                       setCreating(false);
