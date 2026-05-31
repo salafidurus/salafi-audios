@@ -9,5 +9,7 @@ export type ScholarDetailScreenProps = {
 };
 
 export function ScholarDetailScreen(props: ScholarDetailScreenProps) {
-  return <Responsive mobile={<ScholarDetailMobileScreen {...props} />} desktop={<ScholarDetailDesktopScreen {...props} />} />;
+  const mobile = <ScholarDetailMobileScreen {...props} />;
+  const desktop = <ScholarDetailDesktopScreen {...props} />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }

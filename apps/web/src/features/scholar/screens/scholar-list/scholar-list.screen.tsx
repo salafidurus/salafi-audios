@@ -7,16 +7,13 @@ import { ScholarListDesktopScreen } from "./scholar-list.screen.desktop";
 import { ScholarListMobileScreen } from "./scholar-list.screen.mobile";
 
 export function ScholarListScreen() {
-  const router = useRouter();
+  const { push } = useRouter();
 
   const handleSelectScholar = (slug: string) => {
-    router.push(routes.scholars.detail(slug));
+    push(routes.scholars.detail(slug));
   };
 
-  return (
-    <Responsive
-      mobile={<ScholarListMobileScreen onSelectScholar={handleSelectScholar} />}
-      desktop={<ScholarListDesktopScreen onSelectScholar={handleSelectScholar} />}
-    />
-  );
+  const mobile = <ScholarListMobileScreen onSelectScholar={handleSelectScholar} />;
+  const desktop = <ScholarListDesktopScreen onSelectScholar={handleSelectScholar} />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }

@@ -16,7 +16,7 @@ export function ScholarDetailMobileScreen({ slug }: ScholarDetailMobileScreenPro
   if (isFetching) {
     return (
       <ScreenView center>
-        <AppText variant="bodyMd">Loading scholar...</AppText>
+        <AppText variant="bodyMd">Loading scholar…</AppText>
       </ScreenView>
     );
   }

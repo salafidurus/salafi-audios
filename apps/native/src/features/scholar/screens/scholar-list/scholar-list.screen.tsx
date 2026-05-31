@@ -16,7 +16,7 @@ export function ScholarListScreen({ onSelectScholar }: ScholarListScreenProps) {
   if (isFetching && scholars.length === 0) {
     return (
       <ScreenView center>
-        <AppText variant="bodyMd">Loading scholars...</AppText>
+        <AppText variant="bodyMd">Loading scholars…</AppText>
       </ScreenView>
     );
   }
