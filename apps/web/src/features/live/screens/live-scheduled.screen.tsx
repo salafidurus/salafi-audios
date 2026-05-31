@@ -9,5 +9,7 @@ export type LiveScheduledScreenProps = {
 };
 
 export function LiveScheduledScreen(props: LiveScheduledScreenProps) {
-  return <Responsive mobile={<LiveScheduledMobileScreen {...props} />} desktop={<LiveScheduledDesktopScreen {...props} />} />;
+  const mobile = <LiveScheduledMobileScreen {...props} />;
+  const desktop = <LiveScheduledDesktopScreen {...props} />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }

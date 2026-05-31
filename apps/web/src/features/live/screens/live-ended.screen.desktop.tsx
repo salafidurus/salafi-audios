@@ -35,7 +35,7 @@ export function LiveEndedDesktopScreen({ onNavigateToSession }: LiveEndedDesktop
   const { sessions, isFetching } = useLiveEndedScreen();
 
   if (isFetching && sessions.length === 0) {
-    return <div style={{ padding: 32 }}>Loading ended sessions...</div>;
+    return <div style={{ padding: 32 }}>Loading ended sessions…</div>;
   }
 
   if (sessions.length === 0) {

@@ -5,5 +5,7 @@ import { LiveDesktopScreen } from "./live.screen.desktop";
 import { LiveMobileScreen } from "./live.screen.mobile";
 
 export function LiveScreen() {
-  return <Responsive mobile={<LiveMobileScreen />} desktop={<LiveDesktopScreen />} />;
+  const mobile = <LiveMobileScreen />;
+  const desktop = <LiveDesktopScreen />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }

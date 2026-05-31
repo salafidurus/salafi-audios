@@ -23,7 +23,7 @@ function EndedSessionItem({ session, onPress }: { session: LiveSessionDto; onPre
       <div style={{ fontSize: 15, fontWeight: 600 }}>{session.title}</div>
       <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>{session.scholarName}</div>
       {session.endedAt && (
-        <div style={{ fontSize: 11, color: "#999", marginTop: 2 }}>
+        <div style={{ fontSize: 12, color: "#999", marginTop: 2 }}>
           {new Date(session.endedAt).toLocaleDateString()}
         </div>
       )}
@@ -35,7 +35,7 @@ export function LiveEndedMobileScreen({ onNavigateToSession }: LiveEndedMobileSc
   const { sessions, isFetching } = useLiveEndedScreen();
 
   if (isFetching && sessions.length === 0) {
-    return <div style={{ padding: 16 }}>Loading past sessions...</div>;
+    return <div style={{ padding: 16 }}>Loading past sessions…</div>;
   }
 
   if (sessions.length === 0) {

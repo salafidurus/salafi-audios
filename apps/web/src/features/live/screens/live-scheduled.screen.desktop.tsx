@@ -43,7 +43,7 @@ export function LiveScheduledDesktopScreen({
   const { sessions, isFetching } = useLiveScheduledScreen();
 
   if (isFetching && sessions.length === 0) {
-    return <div style={{ padding: 32 }}>Loading scheduled sessions...</div>;
+    return <div style={{ padding: 32 }}>Loading scheduled sessions…</div>;
   }
 
   if (sessions.length === 0) {

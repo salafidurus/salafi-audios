@@ -9,5 +9,7 @@ export type LiveEndedScreenProps = {
 };
 
 export function LiveEndedScreen(props: LiveEndedScreenProps) {
-  return <Responsive mobile={<LiveEndedMobileScreen {...props} />} desktop={<LiveEndedDesktopScreen {...props} />} />;
+  const mobile = <LiveEndedMobileScreen {...props} />;
+  const desktop = <LiveEndedDesktopScreen {...props} />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }
