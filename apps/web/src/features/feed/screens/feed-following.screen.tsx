@@ -10,5 +10,7 @@ export type FeedFollowingScreenProps = {
 };
 
 export function FeedFollowingScreen(props: FeedFollowingScreenProps) {
-  return <Responsive mobile={<FeedFollowingMobileScreen {...props} />} desktop={<FeedFollowingDesktopScreen {...props} />} />;
+  const mobile = <FeedFollowingMobileScreen {...props} />;
+  const desktop = <FeedFollowingDesktopScreen {...props} />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }

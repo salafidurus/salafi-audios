@@ -10,5 +10,7 @@ export type FeedRecentScreenProps = {
 };
 
 export function FeedRecentScreen(props: FeedRecentScreenProps) {
-  return <Responsive mobile={<FeedMobileScreen {...props} />} desktop={<FeedDesktopScreen {...props} />} />;
+  const mobile = <FeedMobileScreen {...props} />;
+  const desktop = <FeedDesktopScreen {...props} />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }

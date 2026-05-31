@@ -45,7 +45,7 @@ export function FeedMobileScreen({
   const items = data?.pages.flatMap((p) => p.items) ?? [];
 
   if (isFetching && items.length === 0) {
-    return <div style={{ padding: 16 }}>Loading feed...</div>;
+    return <div style={{ padding: 16 }}>Loading feed…</div>;
   }
 
   if (items.length === 0) {
@@ -73,7 +73,7 @@ export function FeedMobileScreen({
               background: "var(--surface-default)",
             }}
           >
-            {isFetching ? "Loading..." : "Load more"}
+            {isFetching ? "Loading…" : "Load more"}
           </button>
         </div>
       )}
