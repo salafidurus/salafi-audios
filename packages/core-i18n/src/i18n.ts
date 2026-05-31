@@ -26,6 +26,7 @@ export function initI18nOptions(config: I18nConfig = {}): InitOptions {
 // Initialize i18next once at module load
 if (!i18nextLib.isInitialized) {
   i18nextLib.init(initI18nOptions()).catch((err) => {
+    // eslint-disable-next-line no-console
     console.error("Failed to initialize i18n:", err);
   });
 }
