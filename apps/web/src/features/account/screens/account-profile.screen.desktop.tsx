@@ -10,7 +10,7 @@ export function AccountProfileDesktopScreen({ onBack }: AccountProfileDesktopScr
   const { profile, isFetching } = useAccountScreen();
 
   if (isFetching) {
-    return <div style={{ padding: 32 }}>Loading profile...</div>;
+    return <div style={{ padding: 32 }}>Loading profile…</div>;
   }
 
   if (!profile) {

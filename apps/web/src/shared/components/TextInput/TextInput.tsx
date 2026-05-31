@@ -1,17 +1,23 @@
 "use client";
 
-import { forwardRef, useState, type CSSProperties, type InputHTMLAttributes } from "react";
+import { useState, type CSSProperties, type InputHTMLAttributes } from "react";
 
 export type TextInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "style"> & {
   invalid?: boolean;
   onChangeText?: (value: string) => void;
   style?: CSSProperties;
+  ref?: React.Ref<HTMLInputElement>;
 };
 
-export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(function TextInput(
-  { invalid = false, onChangeText, onFocus, onBlur, style, ...props },
+export function TextInput({
   ref,
-) {
+  invalid = false,
+  onChangeText,
+  onFocus,
+  onBlur,
+  style,
+  ...props
+}: TextInputProps) {
   const [isFocused, setIsFocused] = useState(false);
 
   return (
@@ -37,7 +43,7 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(function T
       }}
     />
   );
-});
+}
 
 const baseStyle: CSSProperties = {
   width: "100%",

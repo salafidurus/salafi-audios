@@ -11,5 +11,7 @@ export type AccountScreenProps = {
 };
 
 export function AccountScreen(props: AccountScreenProps) {
-  return <Responsive mobile={<AccountMobileScreen {...props} />} desktop={<AccountDesktopScreen {...props} />} />;
+  const mobile = <AccountMobileScreen {...props} />;
+  const desktop = <AccountDesktopScreen {...props} />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }

@@ -9,6 +9,29 @@ export type UniversalListProps<TItem> = {
   emptyComponent?: React.ComponentType;
 };
 
+type ItemRendererProps<TItem> = {
+  item: TItem;
+  index: number;
+  total: number;
+  renderItem: (item: TItem) => React.ReactElement | null;
+  ItemSeparator?: React.ComponentType;
+};
+
+function ItemRenderer<TItem>({
+  item,
+  index,
+  total,
+  renderItem,
+  ItemSeparator,
+}: ItemRendererProps<TItem>) {
+  return (
+    <>
+      {renderItem(item)}
+      {ItemSeparator && index < total - 1 ? <ItemSeparator /> : null}
+    </>
+  );
+}
+
 export function UniversalList<TItem>({
   items,
   keyExtractor,
@@ -24,13 +47,15 @@ export function UniversalList<TItem>({
   return (
     <div style={contentContainerStyle}>
       {items.map((item, index) => (
-        <Fragment key={keyExtractor(item)}>
-          {renderItem(item)}
-          {ItemSeparator && index < items.length - 1 ? <ItemSeparator /> : null}
-        </Fragment>
+        <ItemRenderer
+          key={keyExtractor(item)}
+          item={item}
+          index={index}
+          total={items.length}
+          renderItem={renderItem}
+          ItemSeparator={ItemSeparator}
+        />
       ))}
     </div>
   );
 }
-
-

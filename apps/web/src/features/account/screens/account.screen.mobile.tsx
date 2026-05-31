@@ -19,7 +19,7 @@ export function AccountMobileScreen({
   const { t } = useTranslation();
 
   if (isFetching) {
-    return <div style={{ padding: 16 }}>{t("common.loading", "Loading account...")}</div>;
+    return <div style={{ padding: 16 }}>{t("common.loading", "Loading account…")}</div>;
   }
 
   return (

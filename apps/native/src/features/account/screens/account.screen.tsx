@@ -20,7 +20,7 @@ export function AccountScreen({
   if (isFetching) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>{t("common.loading", "Loading account...")}</Text>
+        <Text>{t("common.loading", "Loading account…")}</Text>
       </View>
     );
   }

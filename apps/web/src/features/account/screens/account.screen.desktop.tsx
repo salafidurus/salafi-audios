@@ -19,7 +19,7 @@ export function AccountDesktopScreen({
   const { t } = useTranslation();
 
   if (isFetching) {
-    return <div style={{ padding: 32 }}>{t("common.loading", "Loading account...")}</div>;
+    return <div style={{ padding: 32 }}>{t("common.loading", "Loading account…")}</div>;
   }
 
   return (

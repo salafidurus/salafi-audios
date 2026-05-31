@@ -13,7 +13,7 @@ export function ActivityDesktop({ label = "Loading" }: ActivityProps) {
       }}
       aria-live="polite"
     >
-      <span className="h-2 w-2 animate-pulse rounded-full bg-[var(--content-muted)]" />
+      <span className="size-2 animate-pulse rounded-full bg-[var(--content-muted)]" />
       <span>{label}</span>
     </div>
   );

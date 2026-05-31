@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { FlashList } from "@shopify/flash-list";
 
 export type UniversalListProps<TItem> = {
@@ -19,11 +20,16 @@ export function UniversalList<TItem>({
   itemSeparator,
   emptyComponent,
 }: UniversalListProps<TItem>) {
+  const renderFlashItem = useCallback(
+    ({ item }: { item: TItem }) => renderItem(item),
+    [renderItem],
+  );
+
   return (
     <FlashList
       data={items}
       keyExtractor={keyExtractor}
-      renderItem={({ item }) => renderItem(item)}
+      renderItem={renderFlashItem}
       estimatedItemSize={estimatedItemSize}
       contentContainerStyle={contentContainerStyle}
       showsVerticalScrollIndicator={false}
