@@ -7,7 +7,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
+    "lint": "node ../../node_modules/eslint/bin/eslint.js .",
     "test": "node ../../node_modules/jest/bin/jest.js --passWithNoTests",
     "test:watch": "node ../../node_modules/jest/bin/jest.js --watch",
     "test:cov": "node ../../node_modules/jest/bin/jest.js --coverage",

@@ -39,7 +39,7 @@
     "clean": "rimraf dist",
     "build": "tsc -p tsconfig.build.json",
     "dev": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
-    "lint": "eslint .",
+    "lint": "node ../../node_modules/eslint/bin/eslint.js .",
     "test": "node ../../node_modules/jest/bin/jest.js --passWithNoTests",
     "test:prepush": "node ../../node_modules/jest/bin/jest.js --changedSince=origin/main --passWithNoTests",
     "typecheck": "tsc -p tsconfig.json --noEmit",

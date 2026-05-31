@@ -18,7 +18,7 @@
     "clean": "rimraf dist",
     "build": "tsc -p tsconfig.build.json",
     "dev": "pnpm build --watch",
-    "lint": "eslint .",
+    "lint": "node ../../node_modules/eslint/bin/eslint.js .",
     "test": "node ../../node_modules/jest/bin/jest.js --passWithNoTests",
     "test:prepush": "node ../../node_modules/jest/bin/jest.js --changedSince=origin/main --passWithNoTests",
     "test:watch": "node ../../node_modules/jest/bin/jest.js --watch --passWithNoTests",

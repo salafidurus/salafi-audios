@@ -21,7 +21,7 @@
     "clean": "rimraf dist",
     "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist && node -e \"require('fs').cpSync('src/locales', 'dist/locales', {recursive:true})\"",
     "dev": "pnpm build --watch",
-    "lint": "eslint .",
+    "lint": "node ../../node_modules/eslint/bin/eslint.js .",
     "test": "node ../../node_modules/jest/bin/jest.js --passWithNoTests",
     "test:watch": "node ../../node_modules/jest/bin/jest.js --watch",
     "test:cov": "node ../../node_modules/jest/bin/jest.js --coverage",

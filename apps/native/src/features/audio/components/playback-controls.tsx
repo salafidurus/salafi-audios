@@ -42,22 +42,22 @@ export function PlaybackControls() {
 
       <View style={styles.centerControls}>
         <Pressable onPress={handleSkipBackward} style={styles.controlButton}>
-          <RotateCcw size={28} color="#1E293B" />
+          <RotateCcw {...({ size: 28, color: "#1E293B" } as any)} />
           <Text style={styles.skipLabel}>30</Text>
         </Pressable>
 
         <Pressable onPress={handlePlayPause} style={styles.playButton}>
           {isPlaying ? (
-            <Pause size={32} color="#FFFFFF" fill="#FFFFFF" />
+            <Pause {...({ size: 32, color: "#FFFFFF", fill: "#FFFFFF" } as any)} />
           ) : (
             <View style={{ marginLeft: 4 }}>
-              <Play size={32} color="#FFFFFF" fill="#FFFFFF" />
+              <Play {...({ size: 32, color: "#FFFFFF", fill: "#FFFFFF" } as any)} />
             </View>
           )}
         </Pressable>
 
         <Pressable onPress={handleSkipForward} style={styles.controlButton}>
-          <RotateCw size={28} color="#1E293B" />
+          <RotateCw {...({ size: 28, color: "#1E293B" } as any)} />
           <Text style={styles.skipLabel}>30</Text>
         </Pressable>
       </View>

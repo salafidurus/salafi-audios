@@ -25,8 +25,10 @@ export function UniversalList<TItem>({
     [renderItem],
   );
 
+  const FlashListAny = FlashList as any;
+
   return (
-    <FlashList
+    <FlashListAny
       data={items}
       keyExtractor={keyExtractor}
       renderItem={renderFlashItem}
