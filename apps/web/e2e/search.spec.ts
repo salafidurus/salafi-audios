@@ -7,7 +7,7 @@ test.describe("Search", () => {
     const main = page.locator("main").first();
     await expect(main).toBeAttached();
 
-    const heading = main.locator("p").filter({ hasText: "Find a lesson" });
+    const heading = main.getByText("Find a lesson");
     await expect(heading).toBeVisible();
   });
 

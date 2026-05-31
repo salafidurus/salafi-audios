@@ -5,5 +5,9 @@ import { ScholarDetailScreen } from "@/features/scholar/screens/scholar-detail/s
 
 export default function ScholarPage() {
   const params = useParams<{ slug: string }>();
-  return <ScholarDetailScreen slug={params.slug} />;
+  return (
+    <main className="flex flex-1 min-h-full flex-col">
+      <ScholarDetailScreen slug={params.slug} />
+    </main>
+  );
 }
