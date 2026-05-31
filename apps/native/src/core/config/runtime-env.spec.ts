@@ -1,6 +1,6 @@
-jest.mock("expo-constants", () => ({ default: { expoConfig: null } }));
-
 import { parseNativeRuntimeExtra } from "./runtime-env";
+
+jest.mock("expo-constants", () => ({ default: { expoConfig: null } }));
 
 describe("parseNativeRuntimeExtra", () => {
   it("returns parsed runtime config when apiUrl is valid", () => {

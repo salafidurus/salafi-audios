@@ -5,6 +5,7 @@ import { LectureSaveButton } from "./LectureSaveButton";
 
 jest.mock("../../../../shared/components/Button/Button", () => ({
   Button: ({ label, onPress }: { label: string; onPress: () => void }) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const React = require("react");
     return React.createElement("View", { testID: label, onPress }, label);
   },

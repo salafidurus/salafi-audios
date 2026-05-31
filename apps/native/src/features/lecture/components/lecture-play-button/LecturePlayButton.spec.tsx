@@ -16,6 +16,7 @@ jest.mock("@/features/audio", () => ({
 
 jest.mock("../../../../shared/components/Button/Button", () => ({
   Button: ({ label, onPress }: { label: string; onPress: () => void }) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const React = require("react");
     return React.createElement("View", { testID: label, onPress }, label);
   },
@@ -87,10 +88,7 @@ describe("LecturePlayButton", () => {
       seriesId: null,
       seriesTitle: null,
     };
-    expect(audioService.playLecture).toHaveBeenCalledWith(
-      expectedTrack,
-      [expectedTrack],
-    );
+    expect(audioService.playLecture).toHaveBeenCalledWith(expectedTrack, [expectedTrack]);
   });
 
   it("passes series queueContext with lazy next-track stub when seriesContext has nextLecture", () => {
@@ -133,14 +131,11 @@ describe("LecturePlayButton", () => {
       id: "lec-2",
       title: "Lecture 2",
       artist: "Ibn Baz",
-      url: '',
+      url: "",
       durationSeconds: 0,
       seriesId: "series-1",
       seriesTitle: "Islamic Jurisprudence",
     };
-    expect(audioService.playLecture).toHaveBeenCalledWith(
-      mainTrack,
-      [mainTrack, nextStub],
-    );
+    expect(audioService.playLecture).toHaveBeenCalledWith(mainTrack, [mainTrack, nextStub]);
   });
 });

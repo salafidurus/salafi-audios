@@ -63,18 +63,11 @@ export function SubsectionBarHost() {
   );
 }
 
-function getSceneBottomInsetForPath(pathname: string): number {
-  const activeRootTab = getRootTabFromPathname(pathname);
-  return activeRootTab === "search"
-    ? TAB_BAR_HEIGHT + 24
-    : TAB_BAR_HEIGHT + SUBSECTION_BAR_HEIGHT + 32;
-}
-
 const styles = StyleSheet.create((theme) => ({
   wrapper: {
     position: "absolute",
-    left: 0,
-    right: 0,
+    start: 0,
+    end: 0,
     bottom: TAB_BAR_HEIGHT + theme.spacing.scale.lg,
     paddingHorizontal: theme.spacing.layout.pageX,
   },

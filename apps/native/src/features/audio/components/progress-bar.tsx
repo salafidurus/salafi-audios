@@ -4,7 +4,7 @@ import { useAudio } from "@sd/domain-audio";
 import { audioService } from "../index";
 
 export function ProgressBar() {
-  const { positionSeconds, durationSeconds, progressPercent } = useAudio();
+  const { durationSeconds, progressPercent } = useAudio();
   const progressBarRef = useRef<View>(null);
 
   const handlePress = (event: GestureResponderEvent) => {
@@ -23,7 +23,7 @@ export function ProgressBar() {
       <View ref={progressBarRef} style={styles.container} collapsable={false}>
         <View style={styles.track}>
           <View style={[styles.fill, { width: `${progressPercent}%` }]} />
-          <View style={[styles.knob, { left: `${progressPercent}%` }]} />
+          <View style={[styles.knob, { start: `${progressPercent}%` }]} />
         </View>
       </View>
     </Pressable>
@@ -54,6 +54,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#3B82F6",
     position: "absolute",
     top: -4,
-    marginLeft: -6,
+    marginStart: -6,
   },
 });

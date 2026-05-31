@@ -11,10 +11,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { getApiBaseUrl } from "./config/runtime-env";
 import { i18n, initI18n } from "./i18n/i18n";
 
-LogBox.ignoreLogs([
-  "API client initialization failed",
-  "Open debugger to view warnings",
-]);
+LogBox.ignoreLogs(["API client initialization failed", "Open debugger to view warnings"]);
 
 const queryClient = createQueryClient();
 
@@ -60,6 +57,7 @@ export function Providers({ children }: Props) {
     void initI18n()
       .then(() => setI18nReady(true))
       .catch((err) => {
+        // eslint-disable-next-line no-console
         console.warn("[i18n] init failed, falling back to default:", err);
         setI18nReady(true);
       });

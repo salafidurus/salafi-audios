@@ -18,11 +18,11 @@ function LibraryItem({ item, onPress }: { item: LibraryItemDto; onPress?: () => 
         <Text style={{ color: "#16a34a", fontSize: 12 }}>✓</Text>
         <Text style={{ fontSize: 15, fontWeight: "600" }}>{item.lectureTitle}</Text>
       </View>
-      <Text style={{ fontSize: 12, color: "#666", marginTop: 2, paddingLeft: 18 }}>
+      <Text style={{ fontSize: 12, color: "#666", marginTop: 2, paddingStart: 18 }}>
         {item.scholarName}
         {item.seriesTitle ? ` · ${item.seriesTitle}` : ""}
       </Text>
-      <Text style={{ fontSize: 12, color: "#999", marginTop: 2, paddingLeft: 18 }}>
+      <Text style={{ fontSize: 12, color: "#999", marginTop: 2, paddingStart: 18 }}>
         {item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""}
         {item.completedAt ? ` · ${new Date(item.completedAt).toLocaleDateString()}` : ""}
       </Text>

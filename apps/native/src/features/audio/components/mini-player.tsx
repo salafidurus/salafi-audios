@@ -47,10 +47,10 @@ export function MiniPlayer() {
 
           <Pressable onPress={handlePlayPause} style={styles.playButton}>
             {isPlaying ? (
-              <Pause {...({ size: 20, color: "#1E293B", fill: "#1E293B" } as any)} />
+              <Pause size={20} color="#1E293B" fill="#1E293B" />
             ) : (
-              <View style={{ marginLeft: 2 }}>
-                <Play {...({ size: 20, color: "#1E293B", fill: "#1E293B" } as any)} />
+              <View style={{ marginStart: 2 }}>
+                <Play size={20} color="#1E293B" fill="#1E293B" />
               </View>
             )}
           </Pressable>
@@ -67,7 +67,7 @@ export function MiniPlayer() {
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <Pressable onPress={() => setModalVisible(false)} style={styles.closeButton}>
-              <ChevronDown {...({ size: 28, color: "#1E293B" } as any)} />
+              <ChevronDown size={28} color="#1E293B" />
             </Pressable>
             <Text style={styles.modalHeaderTitle}>Now Playing</Text>
             <View style={styles.placeholder} />
@@ -113,8 +113,8 @@ const styles = StyleSheet.create({
   container: {
     position: "absolute",
     bottom: 50, // floats safely above system tab bars
-    left: 12,
-    right: 12,
+    start: 12,
+    end: 12,
     height: 64,
     borderRadius: 12,
     backgroundColor: "#FFFFFF",
@@ -137,8 +137,8 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     flex: 1,
-    marginLeft: 12,
-    marginRight: 8,
+    marginStart: 12,
+    marginEnd: 8,
   },
   title: {
     fontSize: 14,

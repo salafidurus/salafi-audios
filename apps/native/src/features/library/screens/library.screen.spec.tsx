@@ -12,6 +12,7 @@ import { LibraryScreen } from "./library.screen";
 // SectionList uses @react-native/virtualized-lists which bundles its own react-native
 // copy that triggers native bridge assertions in Jest. Mock it at the module level.
 jest.mock("react-native/Libraries/Lists/SectionList", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require("react");
   function MockSectionList({
     sections = [],
@@ -19,7 +20,7 @@ jest.mock("react-native/Libraries/Lists/SectionList", () => {
     renderItem,
     renderSectionFooter,
   }: {
-    sections?: Array<{ title: string; data: unknown[] }>;
+    sections?: { title: string; data: unknown[] }[];
     renderSectionHeader?: (info: {
       section: { title: string; data: unknown[] };
     }) => React.ReactNode;

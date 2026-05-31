@@ -56,7 +56,7 @@ export function FeedScholarRow({ scholars, onScholarPress }: FeedScholarRowProps
           fontWeight: "600",
           color: "#333",
           marginBottom: 8,
-          paddingLeft: 4,
+          paddingStart: 4,
         }}
       >
         Popular Scholars

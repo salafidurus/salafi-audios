@@ -63,7 +63,7 @@ export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProp
           fontSize: 16,
           fontWeight: "600",
           marginBottom: 12,
-          marginLeft: 8,
+          marginStart: 8,
           color: "#333",
         }}
       >
