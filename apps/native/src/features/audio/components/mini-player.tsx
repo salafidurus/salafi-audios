@@ -47,10 +47,10 @@ export function MiniPlayer() {
 
           <Pressable onPress={handlePlayPause} style={styles.playButton}>
             {isPlaying ? (
-              <Pause size={20} color="#1E293B" fill="#1E293B" />
+              <Pause size={20} stroke="#1E293B" fill="#1E293B" />
             ) : (
               <View style={{ marginStart: 2 }}>
-                <Play size={20} color="#1E293B" fill="#1E293B" />
+                <Play size={20} stroke="#1E293B" fill="#1E293B" />
               </View>
             )}
           </Pressable>
@@ -67,7 +67,7 @@ export function MiniPlayer() {
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
             <Pressable onPress={() => setModalVisible(false)} style={styles.closeButton}>
-              <ChevronDown size={28} color="#1E293B" />
+              <ChevronDown size={28} stroke="#1E293B" />
             </Pressable>
             <Text style={styles.modalHeaderTitle}>Now Playing</Text>
             <View style={styles.placeholder} />

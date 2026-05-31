@@ -25,11 +25,9 @@ export function UniversalList<TItem>({
     [renderItem],
   );
 
-  // @ts-expect-error FlashList generic typing has slight incompatibilities in this environment
-  const FlashListAny = FlashList;
-
   return (
-    <FlashListAny
+    // @ts-expect-error FlashList generic typing has slight incompatibilities in this environment
+    <FlashList
       data={items}
       keyExtractor={keyExtractor}
       renderItem={renderFlashItem}
