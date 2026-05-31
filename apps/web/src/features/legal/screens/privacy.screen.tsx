@@ -5,5 +5,7 @@ import { PrivacyDesktopScreen } from "./privacy.screen.desktop";
 import { PrivacyMobileScreen } from "./privacy.screen.mobile";
 
 export function PrivacyScreen() {
-  return <Responsive mobile={<PrivacyMobileScreen />} desktop={<PrivacyDesktopScreen />} />;
+  const mobile = <PrivacyMobileScreen />;
+  const desktop = <PrivacyDesktopScreen />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }

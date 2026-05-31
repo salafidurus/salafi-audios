@@ -19,7 +19,7 @@ export function LectureDetailMobileScreen({ id }: LectureDetailMobileScreenProps
   if (isFetching) {
     return (
       <ScreenView center>
-        <AppText variant="bodyMd">Loading lecture...</AppText>
+        <AppText variant="bodyMd">Loading lecture…</AppText>
       </ScreenView>
     );
   }

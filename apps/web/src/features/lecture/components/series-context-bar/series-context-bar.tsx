@@ -42,7 +42,7 @@ export function SeriesContextBar({ seriesContext, onNavigate }: SeriesContextBar
               minWidth: 0,
             }}
           >
-            <div style={{ fontSize: 11, color: "var(--content-muted, #888)" }}>← Previous</div>
+            <div style={{ fontSize: 12, color: "var(--content-muted, #888)" }}>← Previous</div>
             <div
               style={{
                 fontSize: 13,
@@ -74,7 +74,7 @@ export function SeriesContextBar({ seriesContext, onNavigate }: SeriesContextBar
               minWidth: 0,
             }}
           >
-            <div style={{ fontSize: 11, color: "var(--content-muted, #888)" }}>Next →</div>
+            <div style={{ fontSize: 12, color: "var(--content-muted, #888)" }}>Next →</div>
             <div
               style={{
                 fontSize: 13,

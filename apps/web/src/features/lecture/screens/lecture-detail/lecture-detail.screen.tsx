@@ -9,5 +9,7 @@ export type LectureDetailScreenProps = {
 };
 
 export function LectureDetailScreen(props: LectureDetailScreenProps) {
-  return <Responsive mobile={<LectureDetailMobileScreen {...props} />} desktop={<LectureDetailDesktopScreen {...props} />} />;
+  const mobile = <LectureDetailMobileScreen {...props} />;
+  const desktop = <LectureDetailDesktopScreen {...props} />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }
