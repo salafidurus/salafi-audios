@@ -9,5 +9,7 @@ export type LibrarySavedScreenProps = {
 };
 
 export function LibrarySavedScreen(props: LibrarySavedScreenProps) {
-  return <Responsive mobile={<LibrarySavedMobileScreen {...props} />} desktop={<LibrarySavedDesktopScreen {...props} />} />;
+  const mobile = <LibrarySavedMobileScreen {...props} />;
+  const desktop = <LibrarySavedDesktopScreen {...props} />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }

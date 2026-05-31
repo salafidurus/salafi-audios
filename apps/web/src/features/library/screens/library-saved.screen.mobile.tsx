@@ -57,7 +57,7 @@ function LibraryItem({
         {item.scholarName}
         {item.seriesTitle && ` · ${item.seriesTitle}`}
       </div>
-      <div style={{ fontSize: 11, color: "#999", marginTop: 2 }}>
+      <div style={{ fontSize: 12, color: "#999", marginTop: 2 }}>
         {item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""}
         {variant === "progress" && progress !== null && ` · ${progress}% listened`}
         {variant === "saved" &&
@@ -88,7 +88,7 @@ function SectionList({
   onNavigateToLecture?: (id: string) => void;
 }) {
   if (isFetching && items.length === 0) {
-    return <div style={{ padding: 8, color: "#999" }}>Loading {title.toLowerCase()}...</div>;
+    return <div style={{ padding: 8, color: "#999" }}>Loading {title.toLowerCase()}…</div>;
   }
 
   if (items.length === 0) {

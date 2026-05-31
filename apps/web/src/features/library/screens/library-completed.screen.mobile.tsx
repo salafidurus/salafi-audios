@@ -29,7 +29,7 @@ function LibraryItem({ item, onPress }: { item: LibraryItemDto; onPress?: () => 
         {item.scholarName}
         {item.seriesTitle && ` · ${item.seriesTitle}`}
       </div>
-      <div style={{ fontSize: 11, color: "#999", marginTop: 2, paddingLeft: 18 }}>
+      <div style={{ fontSize: 12, color: "#999", marginTop: 2, paddingLeft: 18 }}>
         {item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""}
         {item.completedAt && ` · ${new Date(item.completedAt).toLocaleDateString()}`}
       </div>
@@ -44,7 +44,7 @@ export function LibraryCompletedMobileScreen({
   const { items, isFetching } = useLibraryCompletedScreen(isAuthenticated);
 
   if (isFetching && items.length === 0) {
-    return <div style={{ padding: 16 }}>Loading completed lectures...</div>;
+    return <div style={{ padding: 16 }}>Loading completed lectures…</div>;
   }
 
   if (items.length === 0) {

@@ -9,5 +9,7 @@ export type LibraryCompletedScreenProps = {
 };
 
 export function LibraryCompletedScreen(props: LibraryCompletedScreenProps) {
-  return <Responsive mobile={<LibraryCompletedMobileScreen {...props} />} desktop={<LibraryCompletedDesktopScreen {...props} />} />;
+  const mobile = <LibraryCompletedMobileScreen {...props} />;
+  const desktop = <LibraryCompletedDesktopScreen {...props} />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }

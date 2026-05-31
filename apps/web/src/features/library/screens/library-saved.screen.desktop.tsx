@@ -88,7 +88,7 @@ function SectionList({
   onNavigateToLecture?: (id: string) => void;
 }) {
   if (isFetching && items.length === 0) {
-    return <div style={{ padding: 16, color: "#999" }}>Loading {title.toLowerCase()}...</div>;
+    return <div style={{ padding: 16, color: "#999" }}>Loading {title.toLowerCase()}…</div>;
   }
 
   if (items.length === 0) {

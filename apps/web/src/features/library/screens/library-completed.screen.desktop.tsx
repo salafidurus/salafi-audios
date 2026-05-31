@@ -44,7 +44,7 @@ export function LibraryCompletedDesktopScreen({
   const { items, isFetching } = useLibraryCompletedScreen(isAuthenticated);
 
   if (isFetching && items.length === 0) {
-    return <div style={{ padding: 32 }}>Loading completed lectures...</div>;
+    return <div style={{ padding: 32 }}>Loading completed lectures…</div>;
   }
 
   if (items.length === 0) {
