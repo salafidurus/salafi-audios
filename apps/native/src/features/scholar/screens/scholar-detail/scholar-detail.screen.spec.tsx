@@ -40,7 +40,7 @@ describe("ScholarDetailScreen", () => {
       tree = renderer.create(<ScholarDetailScreen slug="ibn-baz" />);
     });
 
-    expect(tree!.toJSON()).toBe("Loading scholar...");
+    expect(tree!.toJSON()).toBe("Loading scholar…");
   });
 
   it("renders an empty state when the scholar is missing", () => {

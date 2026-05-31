@@ -97,7 +97,7 @@ describe("LibraryScreen", () => {
       tree = renderer.create(<LibraryScreen />);
     });
 
-    expect(JSON.stringify(tree!.toJSON())).toContain("Loading your library...");
+    expect(JSON.stringify(tree!.toJSON())).toContain("Loading your library…");
   });
 
   it("renders empty section messages when no items exist", () => {

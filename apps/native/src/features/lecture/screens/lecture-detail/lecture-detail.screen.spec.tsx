@@ -59,7 +59,7 @@ describe("LectureDetailScreen", () => {
       tree = renderer.create(<LectureDetailScreen id="lecture-1" />);
     });
 
-    expect(tree!.toJSON()).toBe("Loading lecture...");
+    expect(tree!.toJSON()).toBe("Loading lecture…");
   });
 
   it("renders an empty state when the lecture is missing", () => {

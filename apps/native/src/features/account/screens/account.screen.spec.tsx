@@ -41,7 +41,7 @@ describe("AccountScreen", () => {
       tree = renderer.create(<AccountScreen />);
     });
 
-    expect(JSON.stringify(tree!.toJSON())).toContain("Loading account...");
+    expect(JSON.stringify(tree!.toJSON())).toContain("Loading account…");
   });
 
   it("renders profile details and language controls", () => {
