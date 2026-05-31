@@ -110,16 +110,9 @@ export function SignInDesktopScreen({
 
           <p className={styles.footerText}>
             {t("auth.signIn.noAccountSplit")}{" "}
-            <a
-              href={routes.signUp}
-              onClick={(e) => {
-                e.preventDefault();
-                onNavigateToSignUp();
-              }}
-              className={styles.footerLink}
-            >
+            <button type="button" onClick={onNavigateToSignUp} className={styles.footerLink}>
               {t("auth.signIn.noAccountLink")}
-            </a>
+            </button>
           </p>
         </div>
       </div>

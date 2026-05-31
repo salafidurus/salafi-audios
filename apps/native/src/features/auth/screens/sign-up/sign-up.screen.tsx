@@ -1,13 +1,13 @@
 import { useState } from "react";
 import {
   ActivityIndicator,
-  Image,
   Platform,
   Pressable,
   Text,
   View,
   type ImageSourcePropType,
 } from "react-native";
+import { Image } from "expo-image";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
@@ -139,7 +139,7 @@ export function SignUpScreen({
             <Image
               source={googleButtonSource}
               style={styles.googleButtonImage}
-              resizeMode="cover"
+              contentFit="cover"
             />
           )}
         </Pressable>
