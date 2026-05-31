@@ -18,7 +18,7 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist",
+    "build": "tsup src/index.ts --format esm,cjs --dts --tsconfig tsconfig.build.json --out-dir dist",
     "dev": "pnpm build --watch",
     "fix:series-collections": "tsx src/commands/fix-series-collections.ts",
     "fix:recommendation-hero": "tsx src/commands/fix-recommendation-hero.ts",
