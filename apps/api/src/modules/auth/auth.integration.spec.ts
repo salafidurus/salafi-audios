@@ -56,4 +56,19 @@ describe('AuthGuard — HTTP integration', () => {
 
     return request(app.getHttpServer()).get('/auth-test/protected').expect(200);
   });
+
+  it('GET /auth-test/protected returns 403 for a banned user', async () => {
+    mockAuth.api.getSession.mockResolvedValue({
+      user: {
+        id: 'u2',
+        role: 'user',
+        email: 'banned@b.com',
+        banned: true,
+        banExpires: null,
+      },
+      session: {},
+    });
+
+    return request(app.getHttpServer()).get('/auth-test/protected').expect(403);
+  });
 });
