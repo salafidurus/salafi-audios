@@ -1,8 +1,10 @@
-import { initApiClient } from "@sd/core-api";
-import { createQueryClient } from "@sd/core-contracts";
+import { initApiClient, setUnauthorizedHandler } from "@sd/core-api";
+import { createQueryClient, routes } from "@sd/core-contracts";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
+import { type Href, useRouter } from "expo-router";
 import { type ReactNode, useEffect, useState } from "react";
+import { authClient } from "./auth";
 import { I18nextProvider } from "react-i18next";
 import { LogBox } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -43,6 +45,7 @@ type Props = {
 
 export function Providers({ children }: Props) {
   const [i18nReady, setI18nReady] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const baseUrl = getApiBaseUrl();
@@ -51,6 +54,12 @@ export function Providers({ children }: Props) {
     } else {
       initApiClient();
     }
+
+    setUnauthorizedHandler(() => {
+      authClient.signOut().then(() => {
+        router.replace(routes.home as Href);
+      });
+    });
   }, []);
 
   useEffect(() => {
