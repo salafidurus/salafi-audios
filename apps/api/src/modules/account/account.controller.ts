@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import type { UserProfileDto } from '@sd/core-contracts';
 import { AccountService } from './account.service';
@@ -13,6 +13,7 @@ export class AccountController {
 
   @Get('profile')
   @ApiOperation({ summary: 'Get current user profile' })
+  @ApiOkResponse({ description: 'Current user profile' })
   getProfile(
     @CurrentUser()
     user: {

@@ -1,7 +1,7 @@
 export type UserProfileDto = {
   id: string;
   email: string;
-  displayName?: string;
+  displayName: string;
   avatarUrl?: string;
   role: string;
   emailVerified: boolean;

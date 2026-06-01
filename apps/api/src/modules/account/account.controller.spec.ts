@@ -74,7 +74,9 @@ describe('AccountController — auth boundaries', () => {
         .expect(200);
 
       expect(res.body).toEqual(mockProfile);
-      expect(mockAccountService.getProfile).toHaveBeenCalledTimes(1);
+      expect(mockAccountService.getProfile).toHaveBeenCalledWith(
+        expect.objectContaining({ id: 'user-1', email: 'test@example.com' }),
+      );
     });
   });
 });
