@@ -13,7 +13,6 @@ function SignInPageInner() {
   return (
     <SignInResponsiveScreen
       redirectTo={redirectTo}
-      onSignInSuccess={() => push(redirectTo)}
       onNavigateToSignUp={() => push(routes.signUp)}
     />
   );
