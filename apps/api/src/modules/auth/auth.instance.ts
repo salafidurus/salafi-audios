@@ -1,6 +1,7 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { admin } from 'better-auth/plugins';
+import { expo } from '@better-auth/expo';
 import { PrismaClient } from '@sd/core-db';
 import { PrismaPg } from '@prisma/adapter-pg';
 import type { ConfigService } from '../../shared/config/config.service';
@@ -30,7 +31,7 @@ function createAuthInstance(config: ConfigService) {
     basePath: '/api/auth',
     database: prismaAdapter(getAuthPrisma(config), { provider: 'postgresql' }),
     trustedOrigins: config.CORS_ORIGINS,
-    emailAndPassword: { enabled: true },
+    emailAndPassword: { enabled: false },
     socialProviders: {
       google: {
         clientId: config.GOOGLE_CLIENT_ID,
@@ -41,7 +42,7 @@ function createAuthInstance(config: ConfigService) {
         clientSecret: config.APPLE_CLIENT_SECRET,
       },
     },
-    plugins: [admin()],
+    plugins: [admin(), expo()],
   });
 }
 
