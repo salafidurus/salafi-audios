@@ -3,6 +3,8 @@ export type UserProfileDto = {
   email: string;
   displayName?: string;
   avatarUrl?: string;
+  role: string;
+  emailVerified: boolean;
   createdAt: string;
   updatedAt: string;
 };

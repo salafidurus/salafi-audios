@@ -9,6 +9,7 @@ import { AppThrottlerModule } from './shared/security/throttler.module';
 
 import { AuthModule } from './modules/auth/auth.module';
 import { AuthGuard } from './modules/auth/auth.guard';
+import { AccountModule } from './modules/account/account.module';
 import { SearchModule } from './modules/search/search.module';
 import { TopicsModule } from './modules/topics/topics.module';
 import { AdminPermissionsModule } from './modules/admin-permissions/admin-permissions.module';
@@ -29,6 +30,7 @@ import { LocaleInterceptor } from './shared/interceptors/locale.interceptor';
     AppThrottlerModule,
     DbModule,
     AuthModule,
+    AccountModule,
     SearchModule,
     TopicsModule,
     AdminPermissionsModule,
