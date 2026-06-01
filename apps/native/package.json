@@ -68,7 +68,7 @@
     "expo-web-browser": "~56.0.0",
     "i18next": "^25.2.1",
     "intl-pluralrules": "^2.0.1",
-    "lucide-react-native": "^0.564.0",
+    "lucide-react-native": "^1.17.0",
     "react": "19.2.3",
     "react-content-loader": "^7.1.2",
     "react-dom": "19.2.3",
