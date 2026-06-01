@@ -8,7 +8,7 @@ Salafi Durus is a single system delivered through multiple clients around one au
 
 - **API (`apps/api`)**: authoritative backend for business rules, permissions, content lifecycle, and media coordination.
 - **Web (`apps/web`)**: public discovery surface plus authenticated editorial and account flows.
-- **Mobile (`apps/mobile`)**: listening-focused client optimized for continuity and eventual offline support.
+- **Mobile (`apps/native`)**: listening-focused client optimized for continuity and eventual offline support.
 - **Database**: PostgreSQL via Prisma for authoritative relational state.
 - **Storage and CDN**: object storage for media, delivered separately from relational state.
 
@@ -32,12 +32,12 @@ The monorepo exists because the web app, mobile app, and backend are one coordin
 
 ### Package Roles
 
-- **`@sd/shared`**: generic UI primitives and utilities.
-- **`@sd/core-*`**: cross-cutting infrastructure such as auth, API, config, and styling.
-- **`@sd/feature-*`**: domain-oriented feature packages for reusable app behavior.
+- **`@sd/shared`**: generic cross-app utilities (no platform-specific UI primitives).
+- **`@sd/core-*`**: cross-cutting infrastructure such as auth and API. Note: `core-styles`, `core-config`, and `core-env` have been dissolved — styling bootstrap, environment config, and env validation now live in each app's `src/core/` directory (or the consuming package's `src/env.ts`).
+- **`@sd/domain-*`**: shared data and state hooks organized by bounded context (`domain-content`, `domain-account`, `domain-live`, `domain-playback`, `domain-progress`, `domain-search`).
 - **`@sd/core-contracts`**: shared public API contracts and query helpers.
 - **`@sd/core-db`**: schema, migrations, and generated database client.
-- **`@sd/core-env`**: environment parsing and validation.
+- **`@sd/core-env`**: ~~environment parsing and validation~~ dissolved — each consumer owns its local `env.ts`.
 - **`@sd/design-tokens`**: authoritative visual tokens.
 
 ## 4. Dependency and Boundary Rules
@@ -58,7 +58,7 @@ These rules are enforcement rules, not style preferences.
 - Playback-focused listening experience.
 - Local persistence for continuity and planned offline support.
 - No backend authority, no hidden business rules.
-- Expo Router owns route structure through a tab-based main app boundary under `apps/mobile/src/app/(tabs)`.
+- Expo Router owns route structure through a tab-based main app boundary under `apps/native/src/app/(tabs)`.
 - The bottom navigation surface is package-owned custom chrome layered on top of real Expo Router tabs, with a subsection bar for in-tab route switching.
 
 ### Web
@@ -101,7 +101,7 @@ The repo uses platform-specific module extensions to colocate a feature while ke
 - Use plain `index.ts` only when the package public surface is fully platform-agnostic and there is no real web/native split.
 - If a package has distinct platform behavior, use `index.web.ts` and `index.native.ts` as the only public entrypoints.
 - `index.web.ts` is reserved for code that is intended for `apps/web`.
-- `index.native.ts` is reserved for code that is intended for `apps/mobile`.
+- `index.native.ts` is reserved for code that is intended for `apps/native`.
 - Intermediate barrel files inside `src/` are not allowed. Export only from the package root entrypoint files.
 
 ### Package Structure Rules
@@ -129,11 +129,11 @@ The repo uses platform-specific module extensions to colocate a feature while ke
 
 ### Mobile App Shell
 
-The mobile app uses Expo Router `Tabs` for top-level sections, with a custom tab bar and subsection bar supplied by `@sd/feature-navigation`.
+The mobile app uses Expo Router `Tabs` for top-level sections, with a custom tab bar and subsection bar supplied by `apps/native/src/features/navigation/`.
 
 - Top-level sections are real tab roots.
 - Subsections are route-owned within each tab stack.
-- Shared tab chrome and section constants live in `@sd/feature-navigation`.
+- Tab chrome and section constants live in the app-local `features/navigation/` slice.
 
 This keeps Expo Router responsible for tab state, route structure, and screen lifecycle while preserving a product-specific navigation surface.
 

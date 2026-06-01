@@ -1,27 +1,14 @@
 {
-  "extends": "@sd/util-config/tsconfig/base.json",
+  // Build config — drives NestJS CLI compilation and produces the dist/ output.
+  "extends": "@sd/util-config/tsconfig/nest.json",
   "compilerOptions": {
-    "module": "commonjs",
     "declaration": true,
     "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "target": "ES2022",
     "sourceMap": true,
     "outDir": "./dist",
     "incremental": true,
-    "skipLibCheck": true,
-    "strictNullChecks": true,
-    "noImplicitAny": true,
-    "strictBindCallApply": true,
-    "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "noEmit": false,
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "noEmit": false
   },
   "exclude": ["node_modules", "dist", "test", "**/*.spec.ts"],
   "include": ["src/**/*.ts"]

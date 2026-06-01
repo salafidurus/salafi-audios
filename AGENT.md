@@ -53,14 +53,14 @@ Before editing agent instructions or skills:
 - For design image requests, use root skill `google-stitch` with a Stitch-first flow.
 - Sequence is mandatory: image -> Stitch baseline -> repo adaptation.
 - Adaptation must apply `docs/`, root/workspace `AGENT.md`, and `.github/copilot-instructions.md`.
-- Place generated code only in the target workspace (`apps/web` or `apps/mobile`) and keep monorepo boundaries intact.
+- Place generated code only in the target workspace (`apps/web` or `apps/native`) and keep monorepo boundaries intact.
 
 ## Brand assets
 
 - Web favicon/app icons: `apps/web/src/app/favicon.ico`, `apps/web/public/icons/*`
 - Web logos: `apps/web/public/logo/*`
-- Mobile app icon/splash: `apps/mobile/assets/images/icon.png`, `apps/mobile/assets/images/splash-icon.png`
-- Mobile logos: `apps/mobile/assets/images/logo/*`
+- Mobile app icon/splash: `apps/native/assets/images/icon.png`, `apps/native/assets/images/splash-icon.png`
+- Mobile logos: `apps/native/assets/images/logo/*`
 - When implementing UI, use these assets (avoid starter/template logos).
 
 ## Non-negotiable guardrails
@@ -81,31 +81,58 @@ Before editing agent instructions or skills:
 ## Repo layout
 
 - `apps/api` - authoritative backend core
-- `apps/web` - public/admin web client
-- `apps/mobile` - offline-first mobile client
-- `packages/*` - shared libraries and configs
+- `apps/web` - public/admin web client (Next.js, CSS-responsive — no React Native Web)
+- `apps/native` - offline-first native client (iOS + Android — no Expo Web)
+- `packages/*` - shared libraries: core infra, domain state, design tokens, cross-app utilities
 - `docs/` - product + implementation authority
 
-### Package Map
+### App source structure
+
+Both apps follow this layout:
+
+```text
+src/
+  app/        ← routing ONLY — imports screen components from ../features or ../shared
+  features/   ← one folder per feature; each owns components, hooks, screens, utils
+  shared/     ← components and hooks used across 2+ features within this app
+```
+
+### Platform file extensions
+
+Mobile (`apps/native`):
+
+- `.tsx` — base native component (iOS + Android)
+- `.ios.tsx` — iOS-only override (only when behavior truly diverges)
+- `.android.tsx` — Android-only override (only when behavior truly diverges)
+
+Web (`apps/web`):
+
+- `.tsx` — base component, fully responsive via CSS (default)
+- `.desktop.tsx` — desktop-only layout variant (only when truly needed)
+- `.mobile.tsx` — mobile-web layout variant (only when truly needed)
+
+### Package map
 
 - `packages/core-db` - Database schema and client
 - `packages/core-env` - Environment variable schemas
 - `packages/core-i18n` - Internationalization config and keys
 - `packages/core-contracts` - Shared TypeScript contracts (DTOs, types, query hooks)
 - `packages/design-tokens` - Design tokens (colors, spacing, radius, typography) — authoritative source
-- `packages/shared` - Shared UI primitives, hooks, and generic utilities
 - `packages/core-*` - Shared platform infrastructure (auth, API, config, styling)
-- `packages/feature-*` - Domain feature packages with platform-specific UI and data wiring
+- `packages/domain-content` - Lectures, scholars, series, feed, library data hooks
+- `packages/domain-account` - User profile and auth state hooks
+- `packages/domain-live` - Live session and channel hooks
+- `packages/domain-playback` - Playback engine and player state
+- `packages/domain-progress` - Progress tracking state
+- `packages/domain-search` - Search and quick-browse hooks
 - `packages/util-config` - Shared lint/build config
 - `packages/util-ingest` - Content ingestion
-
-**Note:** `apps/web` transpiles the new `@sd/shared`, `@sd/core-*`, and `@sd/feature-*` packages directly in `next.config.ts`.
 
 ## Commands (root)
 
 - Install: `pnpm i`
 - Dev: `pnpm dev`
-- Dev one app: `pnpm dev:api`, `pnpm dev:web`, `pnpm dev:mobile`
+- Dev one app: `pnpm dev:api`, `pnpm dev:web`, `pnpm dev:mobile`, `pnpm dev:native`
 - Build: `pnpm build`
 - Lint: `pnpm lint`
 - Typecheck: `pnpm typecheck`
@@ -122,6 +149,7 @@ Before editing agent instructions or skills:
 - API: `pnpm --filter api <script>`
 - Web: `pnpm --filter web <script>`
 - Mobile: `pnpm --filter mobile <script>`
+- Native scaffold: `pnpm --filter native <script>`
 - DB: `pnpm --filter core-db <script>`
 - Env: `pnpm --filter core-env <script>`
 - I18n: `pnpm --filter core-i18n <script>`
@@ -129,15 +157,18 @@ Before editing agent instructions or skills:
 - Design tokens: `pnpm --filter design-tokens <script>`
 - Shared UI: `pnpm --filter @sd/shared <script>`
 - Core packages: `pnpm --filter @sd/core-* <script>`
-- Feature packages: `pnpm --filter @sd/feature-* <script>`
+- Domain packages: `pnpm --filter @sd/domain-* <script>`
 - Config: `pnpm --filter util-config <script>`
 - Ingest: `pnpm --filter util-ingest <script>`
 
 Turbo grouped scripts:
 
 - `pnpm lint:api+web`, `pnpm lint:api+mobile`
+- `pnpm lint:api+native`
 - `pnpm typecheck:api+web`, `pnpm typecheck:api+mobile`
+- `pnpm typecheck:api+native`
 - `pnpm test:api+web`, `pnpm test:api+mobile`
+- `pnpm test:api+native`
 
 ## Single-test quick reference
 
@@ -201,20 +232,53 @@ All AGENT.md and documentation files are linted with markdownlint. Two rules are
 
 ## TDD policy
 
-This repo follows Test-Driven Development. The rule is non-negotiable:
+This repo follows strict Test-Driven Development. **No exceptions.**
 
-**Write a failing test before writing implementation.** No exceptions for new service methods, store actions, utility functions, or auth boundaries.
+### The workflow (non-negotiable)
+
+1. Write the failing test — describe the behavior, not the implementation.
+2. Run it: confirm it fails with the expected error, not a setup error.
+3. Write the minimal code to make it pass.
+4. Run it again: confirm it passes.
+5. Run all tests: confirm nothing else broke.
+6. Commit: test and implementation in the same commit.
 
 ### What to test
 
-| Layer                                                                          | Test type                        | Where                                                    |
-| ------------------------------------------------------------------------------ | -------------------------------- | -------------------------------------------------------- |
-| API service methods (domain invariants, NotFoundException, status transitions) | Unit — mock the repo             | `apps/api/src/modules/<module>/<module>.service.spec.ts` |
-| Auth guard and permission checks                                               | Unit + Integration               | `apps/api/src/modules/auth/`                             |
-| Domain store actions (Zustand)                                                 | Unit — reset store between tests | `packages/domain-*/src/**/*.spec.ts`                     |
-| Pure utility / helper functions                                                | Unit                             | co-located `.spec.ts` next to the source file            |
-| Route/contract smoke tests                                                     | Unit                             | `packages/core-contracts/src/routes.spec.ts`             |
-| Critical user flows (auth redirect, public page load)                          | E2E — Playwright                 | `apps/web/e2e/`                                          |
+Test everything: screens, components, hooks, utils, stores, guards, services.
+The only exceptions are:
+
+- Framework-provided behavior (NestJS DI wiring, Expo Router navigation internals).
+- Third-party library internals.
+- Generated code artifacts.
+
+Testing everything prevents duplication — you will not write the same test twice if
+everything is already covered.
+
+### Test placement
+
+| Location                                   | Test file                     |
+| ------------------------------------------ | ----------------------------- |
+| `apps/native/src/features/<f>/screens/`    | co-located `.spec.tsx`        |
+| `apps/native/src/features/<f>/components/` | co-located `.spec.tsx`        |
+| `apps/native/src/features/<f>/hooks/`      | co-located `.spec.ts`         |
+| `apps/web/src/features/<f>/screens/`       | co-located `.spec.tsx`        |
+| `apps/web/src/features/<f>/components/`    | co-located `.spec.tsx`        |
+| `apps/web/src/features/<f>/hooks/`         | co-located `.spec.ts`         |
+| `apps/native/src/shared/`                  | co-located `.spec.tsx`        |
+| `apps/web/src/shared/`                     | co-located `.spec.tsx`        |
+| `packages/domain-*/src/`                   | co-located `.spec.ts`         |
+| `apps/api/src/modules/<m>/`                | co-located `.service.spec.ts` |
+
+### Running tests
+
+- All: `pnpm test`
+- Mobile only: `pnpm --filter mobile test`
+- Web only: `pnpm --filter web test`
+- API only: `pnpm --filter api test`
+- Single file: `pnpm --filter mobile test -- src/features/feed/screens/feed.screen.spec.tsx`
+- Watch: `pnpm --filter api test:watch -- src/modules/scholars/scholars.service.spec.ts`
+- E2E: `pnpm test:e2e`
 
 ### What NOT to test
 
@@ -222,27 +286,6 @@ This repo follows Test-Driven Development. The rule is non-negotiable:
 - Trivial getters, setters, or passthrough methods.
 - Framework-provided behavior (NestJS DI wiring, Expo Router navigation).
 - Third-party library internals.
-
-### TDD workflow
-
-```text
-Red → Green → Commit (test + impl together)
-```
-
-1. Write the failing test — describe the behavior, not the implementation.
-2. Run it: confirm it fails with the expected error, not a setup error.
-3. Write the minimal code to make it pass.
-4. Run again: confirm it passes.
-5. Commit: test and implementation in the same commit.
-
-**Bug fixes always start with a failing test** that reproduces the bug. The test is the regression guard.
-
-### Test file placement
-
-- API: `apps/api/src/modules/<module>/<module>.service.spec.ts` (co-located)
-- Web E2E: `apps/web/e2e/<flow>.spec.ts`
-- Packages: co-located `.spec.ts` next to the source file being tested
-- Integration tests: `apps/api/src/modules/<module>/<module>.integration.spec.ts`
 
 ### Coverage targets (minimum)
 
@@ -252,14 +295,6 @@ Red → Green → Commit (test + impl together)
 | Auth/permission boundaries | Every endpoint category (public, auth, admin) covered |
 | Domain store actions       | All actions in `domain-*/src/store/*.store.ts`        |
 | Route constants            | `routes.spec.ts` smoke test exists                    |
-
-### Running tests
-
-- All: `pnpm test`
-- API only: `pnpm --filter api test`
-- Single file: `pnpm --filter api test -- src/modules/scholars/scholars.service.spec.ts`
-- Watch: `pnpm --filter api test:watch -- src/modules/scholars/scholars.service.spec.ts`
-- E2E: `pnpm test:e2e`
 
 ## Quality and style
 
@@ -291,6 +326,68 @@ Red → Green → Commit (test + impl together)
   - strict monorepo boundaries
   - generated client is derived
 
+## Documentation standards
+
+### When to add workspace README.md
+
+A workspace-level `README.md` is required when:
+
+- The workspace is directly executable or deployable.
+- The workspace has its own build, test, or runtime expectations.
+- The workspace exposes a public internal API used by multiple other workspaces.
+- The workspace has platform-specific entrypoints.
+- The workspace contains non-obvious codegen, caching, CI, or build constraints.
+
+### When inline comments are expected
+
+Add comments to files containing:
+
+- CI cache logic or workflow conditionals.
+- Unusual TypeScript or build configuration.
+- Source-vs-dist export map decisions.
+- Platform-specific entrypoint indirection.
+- Generated-code constraints.
+- Backend authority or security invariants.
+- Offline/outbox semantics.
+- Non-obvious query or cache invalidation behavior.
+
+### When inline comments should NOT be added
+
+Do not add comments to:
+
+- Straightforward presentational components.
+- Simple DTO or type definitions.
+- Obvious utility functions.
+- Boilerplate config that mirrors defaults.
+
+### When file-level documentation is expected
+
+Add a file-level comment block to:
+
+- CI workflow files that contain non-obvious job dependencies or cache strategy.
+- Root scripts whose purpose is not clear from the file name alone.
+- Complex `tsconfig` files that deviate from the base in non-trivial ways.
+- Package entrypoints that perform platform selection (e.g., `.web.ts` vs `.native.ts`
+  dispatch logic that is not self-evident).
+
+### When docs updates are mandatory
+
+Update `docs/` when making any of the following changes:
+
+- Architectural boundary change (new package, new app, changed dependency direction).
+- API surface change that affects the shared contract in `packages/core-contracts`.
+- Mobile offline or outbox pattern change.
+- Web app structure change (new routing pattern, new shared primitive layer).
+
+Docs and code must not drift. If a change makes `docs/` inaccurate, update `docs/` in the
+same commit.
+
+### AGENT.md vs README.md
+
+- `AGENT.md` defines contributor and AI agent behavior rules.
+- `README.md` explains structure, purpose, and operational guidance for humans.
+- These must not duplicate each other.
+
 ## Safety checklist
 
 - Do not bypass backend authorization with client logic.
@@ -303,4 +400,4 @@ Red → Green → Commit (test + impl together)
 
 - Use Playwright MCP only for web UI verification.
 - For mobile app work, use Playwright MCP only for responsive/mobile web-view checks in `apps/web`.
-- Do not use Playwright MCP to validate native mobile views in `apps/mobile`; use Expo/native tooling for that.
+- Do not use Playwright MCP to validate native mobile views in `apps/native`; use Expo/native tooling for that.

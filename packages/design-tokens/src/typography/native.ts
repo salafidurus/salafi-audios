@@ -1,4 +1,4 @@
-import { typographyBase, weightToKey, type TypographyVariant } from "./shared";
+import { typographyBase, getWeightKey, type TypographyVariant } from "./shared";
 
 /**
  * Fraunces does not have a Medium file in the current setup.
@@ -25,14 +25,63 @@ const mobileFontFamily = {
   },
 } as const;
 
+const getMobileFontFamily = (
+  role: "display" | "body" | "mono",
+  weightKey: "regular" | "medium" | "semibold" | "bold",
+): string => {
+  switch (role) {
+    case "display":
+      switch (weightKey) {
+        case "regular":
+          return mobileFontFamily.display.regular;
+        case "medium":
+          return mobileFontFamily.display.medium;
+        case "semibold":
+          return mobileFontFamily.display.semibold;
+        case "bold":
+          return mobileFontFamily.display.bold;
+        default:
+          return mobileFontFamily.display.regular;
+      }
+    case "body":
+      switch (weightKey) {
+        case "regular":
+          return mobileFontFamily.body.regular;
+        case "medium":
+          return mobileFontFamily.body.medium;
+        case "semibold":
+          return mobileFontFamily.body.semibold;
+        case "bold":
+          return mobileFontFamily.body.bold;
+        default:
+          return mobileFontFamily.body.regular;
+      }
+    case "mono":
+      switch (weightKey) {
+        case "regular":
+          return mobileFontFamily.mono.regular;
+        case "medium":
+          return mobileFontFamily.mono.medium;
+        case "semibold":
+          return mobileFontFamily.mono.semibold;
+        case "bold":
+          return mobileFontFamily.mono.bold;
+        default:
+          return mobileFontFamily.mono.regular;
+      }
+    default:
+      return mobileFontFamily.body.regular;
+  }
+};
+
 export const createTypographyMobile = () => {
   return Object.fromEntries(
     Object.entries(typographyBase).map(([variant, token]) => {
-      const weightKey = weightToKey[token.fontWeight];
+      const weightKey = getWeightKey(token.fontWeight);
       return [
         variant,
         {
-          fontFamily: mobileFontFamily[token.fontRole][weightKey],
+          fontFamily: getMobileFontFamily(token.fontRole, weightKey),
           fontSize: token.fontSize.mobile,
           lineHeight: token.lineHeight.mobile,
           letterSpacing: token.letterSpacing.mobile,

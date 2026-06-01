@@ -1,9 +1,8 @@
 {
-  "extends": "@sd/util-config/tsconfig/base.json",
+  // Editor / typecheck only — build settings live in tsconfig.build.json.
+  "extends": "@sd/util-config/tsconfig/packages.json",
   "compilerOptions": {
-    "declaration": true,
-    "declarationDir": "./dist",
-    "moduleResolution": "bundler",
+    "noEmit": true,
     "moduleSuffixes": [".desktop.web", ".mobile.web", ".native", ".web", ""]
   },
   "include": ["src/**/*.ts"],

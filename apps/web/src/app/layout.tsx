@@ -5,8 +5,10 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { themeCss } from "./theme-css";
 
-import { UnistylesStyleDesktopWeb } from "@sd/core-styles";
-import { Providers } from "./providers";
+import { ThemeSync } from "../core/styles/ThemeSync";
+import { Providers } from "../core/providers";
+import { getServerLocale } from "../core/i18n/locale-cookie.server";
+import { localeToDir } from "@sd/core-i18n";
 
 const fraunces = localFont({
   variable: "--font-display",
@@ -123,17 +125,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const locale = await getServerLocale();
+  const dir = localeToDir(locale);
 
   return (
     <html
-      lang="en"
-      suppressHydrationWarning
+      lang={locale}
+      dir={dir}
       className={`${fraunces.variable} ${manrope.variable} ${geistMono.variable}`}
     >
       <body className="antialiased">
@@ -144,9 +148,10 @@ export default function RootLayout({
           <Script src="https://www.vexo.co/analytics.js" strategy="afterInteractive" />
         ) : null}
         <style>{themeCss}</style>
-        <UnistylesStyleDesktopWeb>
-          <Providers apiBaseUrl={apiBaseUrl}>{children}</Providers>
-        </UnistylesStyleDesktopWeb>
+        <ThemeSync />
+        <Providers apiBaseUrl={apiBaseUrl} initialLocale={locale}>
+          {children}
+        </Providers>
       </body>
     </html>
   );

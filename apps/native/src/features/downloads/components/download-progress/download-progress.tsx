@@ -1,0 +1,35 @@
+import { View, Text } from "react-native";
+import { useDownload } from "@/features/downloads/hooks/use-download";
+
+type DownloadProgressProps = {
+  lectureId: string;
+};
+
+export function DownloadProgress({ lectureId }: DownloadProgressProps) {
+  const { isDownloading, progress } = useDownload(lectureId);
+
+  if (!isDownloading) return null;
+
+  return (
+    <View style={{ gap: 4 }}>
+      <View
+        style={{
+          height: 3,
+          backgroundColor: "#e5e7eb",
+          borderRadius: 2,
+          overflow: "hidden",
+        }}
+      >
+        <View
+          style={{
+            height: "100%",
+            width: `${progress}%`,
+            backgroundColor: "#2563eb",
+            borderRadius: 2,
+          }}
+        />
+      </View>
+      <Text style={{ fontSize: 12, color: "#999" }}>{Math.round(progress)}%</Text>
+    </View>
+  );
+}

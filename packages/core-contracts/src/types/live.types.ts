@@ -1,5 +1,7 @@
 export type LiveSessionStatus = "scheduled" | "live" | "ended";
 
+import type { Locale } from "./localization.types";
+
 export type LiveSessionPublicDto = {
   id: string;
   status: LiveSessionStatus;
@@ -40,4 +42,49 @@ export type LiveSessionPageDto = {
   items: LiveSessionDto[];
   nextCursor?: string;
   hasMore: boolean;
+};
+
+// Livestream Channel Types
+export type LivestreamChannelDto = {
+  id: string;
+  displayName: string;
+  telegramSlug?: string;
+  language?: Locale;
+  isActive: boolean;
+  scholarName?: string;
+  scholarSlug?: string;
+  scholarImageUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CreateLivestreamChannelDto = {
+  telegramId: string;
+  telegramSlug?: string;
+  displayName: string;
+  language?: Locale;
+  scholarId?: string;
+};
+
+export type UpdateLivestreamChannelDto = {
+  telegramSlug?: string;
+  displayName?: string;
+  language?: Locale;
+  isActive?: boolean;
+  scholarId?: string;
+};
+
+export type CreateLiveSessionDto = {
+  channelId: string;
+  title?: string;
+  scheduledAt?: string;
+  telegramMsgId?: string;
+};
+
+export type UpdateLiveSessionDto = {
+  title?: string;
+  scheduledAt?: string;
+  status?: LiveSessionStatus;
+  telegramMsgId?: string;
+  viewerCount?: number;
 };

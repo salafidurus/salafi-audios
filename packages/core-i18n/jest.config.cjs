@@ -2,15 +2,13 @@
 module.exports = {
   testEnvironment: "node",
 
-  testMatch: [
-    "<rootDir>/**/?(*.)+(spec|test).[tj]s?(x)",
-  ],
+  testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.[tj]sx?$",
 
   transform: {
     "^.+\\.(t|j)sx?$": [
       "ts-jest",
       {
-        tsconfig: "tsconfig.json",
+        tsconfig: { esModuleInterop: true },
         isolatedModules: true,
       },
     ],

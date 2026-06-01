@@ -14,11 +14,6 @@ export function useSearchProcessing({ prefill }: UseSearchProcessingOptions = {}
   const [filter, setFilter] = useState<SearchFilterValue>([]);
 
   useEffect(() => {
-    setQuery(prefill || "");
-    setDebouncedQuery(prefill || "");
-  }, [prefill]);
-
-  useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedQuery(query.trim());
     }, 250);

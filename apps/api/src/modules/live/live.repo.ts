@@ -25,6 +25,23 @@ const sessionPublicSelect = {
   },
 } as const;
 
+const channelPublicSelect = {
+  id: true,
+  displayName: true,
+  telegramSlug: true,
+  language: true,
+  isActive: true,
+  createdAt: true,
+  updatedAt: true,
+  scholar: {
+    select: {
+      name: true,
+      slug: true,
+      imageUrl: true,
+    },
+  },
+} as const;
+
 @Injectable()
 export class LiveRepository {
   constructor(private readonly prisma: PrismaService) {}
@@ -121,6 +138,63 @@ export class LiveRepository {
     return this.prisma.liveSession.update({
       where: { id },
       data,
+    });
+  }
+
+  // Channel methods
+  async findChannels() {
+    return this.prisma.livestreamChannel.findMany({
+      where: { isActive: true },
+      select: channelPublicSelect,
+      orderBy: { displayName: 'asc' },
+    });
+  }
+
+  async findChannelBySlug(slug: string) {
+    return this.prisma.livestreamChannel.findFirst({
+      where: {
+        telegramSlug: slug,
+        isActive: true,
+      },
+      select: channelPublicSelect,
+    });
+  }
+
+  async createChannel(data: Prisma.LivestreamChannelCreateInput) {
+    return this.prisma.livestreamChannel.create({
+      data,
+      select: channelPublicSelect,
+    });
+  }
+
+  async updateChannel(id: string, data: Prisma.LivestreamChannelUpdateInput) {
+    return this.prisma.livestreamChannel.update({
+      where: { id },
+      data,
+      select: channelPublicSelect,
+    });
+  }
+
+  async findChannelById(id: string) {
+    return this.prisma.livestreamChannel.findUnique({
+      where: { id },
+      select: channelPublicSelect,
+    });
+  }
+
+  // Session methods
+  async createSession(data: Prisma.LiveSessionCreateInput) {
+    return this.prisma.liveSession.create({
+      data,
+      select: sessionPublicSelect,
+    });
+  }
+
+  async updateSession(id: string, data: Prisma.LiveSessionUpdateInput) {
+    return this.prisma.liveSession.update({
+      where: { id },
+      data,
+      select: sessionPublicSelect,
     });
   }
 }

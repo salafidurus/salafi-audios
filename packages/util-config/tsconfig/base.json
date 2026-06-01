@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
+    // ES2022 enables top-level await and class fields without downleveling
     "target": "ES2022",
     "lib": ["ES2022", "DOM"],
     "strict": true,
+    // Skip .d.ts validation in node_modules — speeds up compilation significantly
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "noEmit": true,
     "forceConsistentCasingInFileNames": true
   }
 }

@@ -23,7 +23,6 @@ This package defines shared TypeScript contracts (DTOs, types) and query infrast
 ## Package dependencies
 
 - `@tanstack/react-query`: Query client library
-- `@sd/core-env`: Environment configuration
 - `@sd/core-i18n`: Internationalization types
 
 ## Usage guidance

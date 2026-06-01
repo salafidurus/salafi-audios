@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 
 import { HealthModule } from './core/health/health.module';
 import { ConfigModule } from './shared/config/config.module';
@@ -16,9 +16,10 @@ import { LecturesModule } from './modules/lectures/lectures.module';
 import { ScholarsModule } from './modules/scholars/scholars.module';
 import { LiveModule } from './modules/live/live.module';
 import { LibraryModule } from './modules/library/library.module';
-import { ProgressModule } from './modules/progress/progress.module';
+import { AudioModule } from './modules/audio/audio.module';
 import { HomeModule } from './modules/home/home.module';
 import { FeedModule } from './modules/feed/feed.module';
+import { LocaleInterceptor } from './shared/interceptors/locale.interceptor';
 
 @Module({
   imports: [
@@ -35,10 +36,13 @@ import { FeedModule } from './modules/feed/feed.module';
     ScholarsModule,
     LiveModule,
     LibraryModule,
-    ProgressModule,
+    AudioModule,
     HomeModule,
     FeedModule,
   ],
-  providers: [{ provide: APP_GUARD, useClass: AuthGuard }],
+  providers: [
+    { provide: APP_GUARD, useClass: AuthGuard },
+    { provide: APP_INTERCEPTOR, useClass: LocaleInterceptor },
+  ],
 })
 export class AppModule {}

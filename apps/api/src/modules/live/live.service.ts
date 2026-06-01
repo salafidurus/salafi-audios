@@ -3,6 +3,11 @@ import type {
   LiveSessionDeltaDto,
   LiveSessionPublicDto,
   LiveSessionStatus,
+  LivestreamChannelDto,
+  CreateLivestreamChannelDto,
+  UpdateLivestreamChannelDto,
+  CreateLiveSessionDto,
+  UpdateLiveSessionDto,
 } from '@sd/core-contracts';
 import { LiveRepository } from './live.repo';
 import type { Prisma } from '@sd/core-db';
@@ -27,6 +32,25 @@ type LiveSessionPublicRecord = Prisma.LiveSessionGetPayload<{
             imageUrl: true;
           };
         };
+      };
+    };
+  };
+}>;
+
+type LiveChannelRecord = Prisma.LivestreamChannelGetPayload<{
+  select: {
+    id: true;
+    displayName: true;
+    telegramSlug: true;
+    language: true;
+    isActive: true;
+    createdAt: true;
+    updatedAt: true;
+    scholar: {
+      select: {
+        name: true;
+        slug: true;
+        imageUrl: true;
       };
     };
   };
@@ -83,6 +107,102 @@ export class LiveService {
     return this.repo.updateSessionStatus(id, status);
   }
 
+  // Channel methods
+  async getChannels(): Promise<LivestreamChannelDto[]> {
+    const channels = await this.repo.findChannels();
+    return channels.map(this.mapChannel);
+  }
+
+  async getChannelBySlug(slug: string): Promise<LivestreamChannelDto> {
+    const channel = await this.repo.findChannelBySlug(slug);
+    if (!channel) {
+      throw new NotFoundException(
+        `Livestream channel with slug "${slug}" not found`,
+      );
+    }
+    return this.mapChannel(channel);
+  }
+
+  async createChannel(
+    data: CreateLivestreamChannelDto,
+  ): Promise<LivestreamChannelDto> {
+    const channel = await this.repo.createChannel({
+      telegramId: data.telegramId,
+      telegramSlug: data.telegramSlug,
+      displayName: data.displayName,
+      language: data.language,
+      scholar: data.scholarId ? { connect: { id: data.scholarId } } : undefined,
+    });
+    return this.mapChannel(channel);
+  }
+
+  async updateChannel(
+    id: string,
+    data: UpdateLivestreamChannelDto,
+  ): Promise<LivestreamChannelDto> {
+    const existing = await this.repo.findChannelById(id);
+    if (!existing) {
+      throw new NotFoundException(`Livestream channel "${id}" not found`);
+    }
+
+    const updateData: Prisma.LivestreamChannelUpdateInput = {};
+    if (data.telegramSlug !== undefined)
+      updateData.telegramSlug = data.telegramSlug;
+    if (data.displayName !== undefined)
+      updateData.displayName = data.displayName;
+    if (data.language !== undefined) updateData.language = data.language;
+    if (data.isActive !== undefined) updateData.isActive = data.isActive;
+    if (data.scholarId !== undefined) {
+      updateData.scholar = data.scholarId
+        ? { connect: { id: data.scholarId } }
+        : { disconnect: true };
+    }
+
+    const channel = await this.repo.updateChannel(id, updateData);
+    return this.mapChannel(channel);
+  }
+
+  // Session methods
+  async createSession(
+    data: CreateLiveSessionDto,
+  ): Promise<LiveSessionPublicDto> {
+    const session = await this.repo.createSession({
+      channel: { connect: { id: data.channelId } },
+      title: data.title,
+      scheduledAt: data.scheduledAt ? new Date(data.scheduledAt) : undefined,
+      telegramMsgId: data.telegramMsgId,
+    });
+    return this.mapSession(session);
+  }
+
+  async updateSession(
+    id: string,
+    data: UpdateLiveSessionDto,
+  ): Promise<LiveSessionPublicDto> {
+    const existing = await this.repo.findSessionById(id);
+    if (!existing) {
+      throw new NotFoundException(`Live session "${id}" not found`);
+    }
+
+    const updateData: Prisma.LiveSessionUpdateInput = {};
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.scheduledAt !== undefined)
+      updateData.scheduledAt = new Date(data.scheduledAt);
+    if (data.status !== undefined) {
+      updateData.status = data.status;
+      const now = new Date();
+      if (data.status === 'live') updateData.startedAt = now;
+      if (data.status === 'ended') updateData.endedAt = now;
+    }
+    if (data.telegramMsgId !== undefined)
+      updateData.telegramMsgId = data.telegramMsgId;
+    if (data.viewerCount !== undefined)
+      updateData.viewerCount = data.viewerCount;
+
+    const session = await this.repo.updateSession(id, updateData);
+    return this.mapSession(session);
+  }
+
   private mapSession(session: LiveSessionPublicRecord): LiveSessionPublicDto {
     return {
       id: session.id,
@@ -97,6 +217,21 @@ export class LiveService {
       startedAt: session.startedAt?.toISOString() ?? undefined,
       endedAt: session.endedAt?.toISOString() ?? undefined,
       updatedAt: session.updatedAt.toISOString(),
+    };
+  }
+
+  private mapChannel(channel: LiveChannelRecord): LivestreamChannelDto {
+    return {
+      id: channel.id,
+      displayName: channel.displayName,
+      telegramSlug: channel.telegramSlug ?? undefined,
+      language: channel.language ?? undefined,
+      isActive: channel.isActive,
+      scholarName: channel.scholar?.name ?? undefined,
+      scholarSlug: channel.scholar?.slug ?? undefined,
+      scholarImageUrl: channel.scholar?.imageUrl ?? undefined,
+      createdAt: channel.createdAt.toISOString(),
+      updatedAt: channel.updatedAt.toISOString(),
     };
   }
 }

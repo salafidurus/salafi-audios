@@ -1,4 +1,5 @@
 import type { StatusValue } from "../types/common.types";
+import type { Locale } from "./localization.types";
 
 export type AudioAssetViewDto = {
   id: string;
@@ -20,7 +21,7 @@ export type LectureViewDto = {
   slug: string;
   title: string;
   description?: string;
-  language?: string;
+  language?: Locale;
   status: StatusValue;
   publishedAt?: string;
   orderIndex?: number;
@@ -79,4 +80,26 @@ export type LectureDetailDto = {
   topics: TopicRefDto[];
   primaryAudioAsset: AudioAssetDto | null;
   seriesContext: SeriesContextDto | null;
+};
+
+export type RelatedLectureDto = {
+  id: string;
+  slug: string;
+  title: string;
+  durationSeconds?: number;
+  scholar: ScholarRefDto;
+  primaryAudioAsset: AudioAssetDto | null;
+};
+
+export type AdminLectureUpdateDto = {
+  title?: string;
+  description?: string;
+  language?: Locale;
+  orderIndex?: number;
+  status?: StatusValue;
+};
+
+export type AdminLectureActionDto = {
+  success: boolean;
+  message: string;
 };

@@ -1,12 +1,10 @@
 {
-  "extends": "./app.json",
+  // Expo/mobile apps: extend packages.json for Bundler module resolution, add only mobile-specific settings
+  "extends": "./packages.json",
   "compilerOptions": {
+    // "react-jsx" uses the automatic runtime (React 17+) — no manual React import needed
     "jsx": "react-jsx",
-    "moduleResolution": "bundler",
-    "esModuleInterop": true,
-    "paths": {
-      "@/*": ["./src/*"],
-      "@assets/*": ["./assets/*"]
-    }
+    // Many React Native / Expo packages only ship CJS — esModuleInterop enables default imports from them
+    "esModuleInterop": true
   }
 }

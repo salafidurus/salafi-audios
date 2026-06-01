@@ -1,0 +1,20 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-component-card);
+  background: var(--surface-subtle);
+  margin-top: var(--space-scale-3xl);
+  padding: var(--space-scale-3xl) var(--space-component-card-padding);
+}
+
+.message {
+  color: var(--content-muted);
+  text-align: center;
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  line-height: var(--typo-body-md-line-height);
+  letter-spacing: var(--typo-body-md-letter-spacing);
+  font-weight: var(--typo-body-md-font-weight);
+}

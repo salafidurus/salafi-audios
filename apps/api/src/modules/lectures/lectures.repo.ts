@@ -1,7 +1,14 @@
 import { PrismaService } from '../../shared/db/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { Status } from '@sd/core-db';
-import type { LectureDetailDto } from '@sd/core-contracts';
+import { Prisma, Status } from '@sd/core-db';
+import type {
+  LectureDetailDto,
+  RelatedLectureDto,
+  AdminLectureUpdateDto,
+  TranslationViewDto,
+  Locale,
+} from '@sd/core-contracts';
+import type { SaveLectureTranslationDto } from './dto/save-lecture-translation.dto';
 
 @Injectable()
 export class LecturesRepository {
@@ -154,5 +161,249 @@ export class LecturesRepository {
         ? { id: next.id, slug: next.slug, title: next.title }
         : null,
     };
+  }
+
+  async findRelated(
+    lectureId: string,
+    limit: number = 6,
+  ): Promise<RelatedLectureDto[]> {
+    const lecture = await this.prisma.lecture.findFirst({
+      where: { id: lectureId, deletedAt: null },
+      select: {
+        scholarId: true,
+        seriesId: true,
+        topics: {
+          select: { topicId: true },
+        },
+      },
+    });
+
+    if (!lecture) return [];
+
+    const topicIds = lecture.topics.map((topic) => topic.topicId);
+
+    const related = await this.prisma.lecture.findMany({
+      where: {
+        AND: [
+          { id: { not: lectureId } },
+          { deletedAt: null },
+          { status: Status.published },
+          { scholar: { isActive: true } },
+          {
+            OR: [
+              { scholarId: lecture.scholarId },
+              { topics: { some: { topicId: { in: topicIds } } } },
+              ...(lecture.seriesId ? [{ seriesId: lecture.seriesId }] : []),
+            ],
+          },
+        ],
+      },
+      take: Math.max(limit * 3, limit),
+      orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        durationSeconds: true,
+        scholarId: true,
+        seriesId: true,
+        publishedAt: true,
+        createdAt: true,
+        topics: {
+          select: {
+            topicId: true,
+          },
+        },
+        scholar: {
+          select: {
+            id: true,
+            slug: true,
+            name: true,
+            imageUrl: true,
+          },
+        },
+        audioAssets: {
+          where: { isPrimary: true },
+          take: 1,
+          select: {
+            id: true,
+            url: true,
+            format: true,
+            bitrateKbps: true,
+            durationSeconds: true,
+          },
+        },
+      },
+    });
+
+    const rankedRelated = related
+      .map((item) => {
+        const sharedTopicCount = item.topics.reduce(
+          (count, topic) => count + (topicIds.includes(topic.topicId) ? 1 : 0),
+          0,
+        );
+        const relevanceScore =
+          (item.scholarId === lecture.scholarId ? 100 : 0) +
+          (lecture.seriesId && item.seriesId === lecture.seriesId ? 40 : 0) +
+          sharedTopicCount * 10;
+
+        return {
+          item,
+          relevanceScore,
+          sortDate: item.publishedAt ?? item.createdAt,
+        };
+      })
+      .sort((left, right) => {
+        if (right.relevanceScore !== left.relevanceScore) {
+          return right.relevanceScore - left.relevanceScore;
+        }
+
+        return right.sortDate.getTime() - left.sortDate.getTime();
+      })
+      .slice(0, limit)
+      .map(({ item }) => item);
+
+    return rankedRelated.map((r) => ({
+      id: r.id,
+      slug: r.slug,
+      title: r.title,
+      durationSeconds: r.durationSeconds ?? undefined,
+      scholar: {
+        id: r.scholar.id,
+        slug: r.scholar.slug,
+        name: r.scholar.name,
+        imageUrl: r.scholar.imageUrl ?? undefined,
+      },
+      primaryAudioAsset: r.audioAssets[0]
+        ? {
+            id: r.audioAssets[0].id,
+            url: r.audioAssets[0].url,
+            format: r.audioAssets[0].format ?? undefined,
+            bitrateKbps: r.audioAssets[0].bitrateKbps ?? undefined,
+            durationSeconds: r.audioAssets[0].durationSeconds ?? undefined,
+          }
+        : null,
+    }));
+  }
+
+  async updateLecture(
+    id: string,
+    updateDto: AdminLectureUpdateDto,
+  ): Promise<boolean> {
+    try {
+      await this.prisma.lecture.update({
+        where: { id },
+        data: {
+          ...updateDto,
+          updatedAt: new Date(),
+        },
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async updateLectureStatus(id: string, status: Status): Promise<boolean> {
+    try {
+      const updateData: Prisma.LectureUpdateInput = {
+        status,
+        updatedAt: new Date(),
+      };
+
+      // Set publishedAt when publishing
+      if (status === Status.published) {
+        updateData.publishedAt = new Date();
+      }
+
+      await this.prisma.lecture.update({
+        where: { id },
+        data: updateData,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  // ─── Lecture translations ─────────────────────────────────────────────────
+
+  private mapLectureTranslation(t: {
+    locale: string;
+    status: string;
+    title: string;
+    description: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+  }): TranslationViewDto {
+    return {
+      locale: t.locale as Locale,
+      status: t.status === 'published' ? 'published' : 'draft',
+      fields: { title: t.title, description: t.description },
+      createdAt: t.createdAt.toISOString(),
+      updatedAt: t.updatedAt.toISOString(),
+    };
+  }
+
+  async listLectureTranslations(
+    lectureId: string,
+  ): Promise<TranslationViewDto[]> {
+    const records = await this.prisma.lectureTranslation.findMany({
+      where: { lectureId },
+      orderBy: { locale: 'asc' },
+    });
+    return records.map((r) => this.mapLectureTranslation(r));
+  }
+
+  async upsertLectureTranslation(
+    lectureId: string,
+    dto: SaveLectureTranslationDto,
+  ): Promise<TranslationViewDto> {
+    const record = await this.prisma.lectureTranslation.upsert({
+      where: { lectureId_locale: { lectureId, locale: dto.locale } },
+      create: {
+        lectureId,
+        locale: dto.locale,
+        title: dto.title,
+        description: dto.description ?? null,
+        status: 'draft',
+      },
+      update: { title: dto.title, description: dto.description ?? null },
+    });
+    return this.mapLectureTranslation(record);
+  }
+
+  async updateLectureTranslation(
+    lectureId: string,
+    locale: string,
+    fields: Partial<{ title: string; description: string | null }>,
+  ): Promise<TranslationViewDto> {
+    const record = await this.prisma.lectureTranslation.update({
+      where: { lectureId_locale: { lectureId, locale: locale as Locale } },
+      data: { ...fields },
+    });
+    return this.mapLectureTranslation(record);
+  }
+
+  async publishLectureTranslation(
+    lectureId: string,
+    locale: string,
+  ): Promise<TranslationViewDto> {
+    const record = await this.prisma.lectureTranslation.update({
+      where: { lectureId_locale: { lectureId, locale: locale as Locale } },
+      data: { status: 'published' },
+    });
+    return this.mapLectureTranslation(record);
+  }
+
+  async unpublishLectureTranslation(
+    lectureId: string,
+    locale: string,
+  ): Promise<TranslationViewDto> {
+    const record = await this.prisma.lectureTranslation.update({
+      where: { lectureId_locale: { lectureId, locale: locale as Locale } },
+      data: { status: 'draft' },
+    });
+    return this.mapLectureTranslation(record);
   }
 }

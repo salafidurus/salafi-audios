@@ -1,6 +1,29 @@
-import { Controller, Get, Post, Patch, Param, Body } from "@nestjs/common";
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Param,
+  Body,
+  UseGuards,
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+} from "@nestjs/common";
+import type { Request } from "express";
 import { ChannelsService } from "./channels.service";
 
+@Injectable()
+class InternalGuard implements CanActivate {
+  canActivate(context: ExecutionContext): boolean {
+    const secret = process.env.INTERNAL_SECRET;
+    if (!secret) return false;
+    const req = context.switchToHttp().getRequest<Request>();
+    return req.headers["x-internal-secret"] === secret;
+  }
+}
+
+@UseGuards(InternalGuard)
 @Controller("channels")
 export class ChannelsController {
   constructor(private readonly service: ChannelsService) {}

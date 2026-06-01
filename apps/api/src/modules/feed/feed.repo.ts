@@ -6,6 +6,8 @@ import type {
   FeedItemDto,
   FeedPageDto,
   ScholarChipDto,
+  FeedTopicRowDto,
+  ContentSuggestionDto,
 } from '@sd/core-contracts';
 
 @Injectable()
@@ -15,7 +17,7 @@ export class FeedRepo {
   async getFeed(
     cursor?: string,
     limit = 20,
-    _topicSlugs?: string[],
+    topicSlugs?: string[],
     scholarSlugs?: string[],
   ): Promise<FeedPageDto> {
     const cursorDate = cursor ? new Date(cursor) : undefined;
@@ -28,6 +30,13 @@ export class FeedRepo {
       ...(scholarSlugs?.length && {
         scholar: { isActive: true, slug: { in: scholarSlugs } },
       }),
+      ...(topicSlugs?.length && {
+        topics: {
+          some: {
+            topic: { slug: { in: topicSlugs } }
+          }
+        }
+      }),
     };
 
     // Fetch one extra to determine if there's a next page
@@ -37,6 +46,13 @@ export class FeedRepo {
         scholar: {
           select: { name: true, slug: true, isFeatured: true },
         },
+        topics: {
+          include: {
+            topic: {
+              select: { name: true, slug: true }
+            }
+          }
+        }
       },
       orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
       take: limit + 1,
@@ -57,17 +73,28 @@ export class FeedRepo {
       publishedAt: (r.publishedAt ?? r.createdAt).toISOString(),
     }));
 
-    // Inject scholar_row items every 4–5 content items
+    // Build feed with mixed content and horizontal rows
     const items: FeedItemDto[] = [];
     const scholarRow = await this.getScholarRowItems();
     let scholarRowInjected = false;
+    let topicRowInjected = false;
 
     for (let i = 0; i < contentItems.length; i++) {
       items.push(contentItems[i]);
 
+      // Inject scholar row after 3rd item
       if (!scholarRowInjected && i === 3 && scholarRow.length > 0) {
         items.push({ kind: 'scholar_row', scholars: scholarRow });
         scholarRowInjected = true;
+      }
+
+      // Inject topic row after 7th item if we have topic suggestions
+      if (!topicRowInjected && i === 7 && topicSlugs?.length) {
+        const topicRow = await this.getTopicRowItems(topicSlugs[0]);
+        if (topicRow) {
+          items.push(topicRow);
+          topicRowInjected = true;
+        }
       }
     }
 
@@ -120,5 +147,55 @@ export class FeedRepo {
       slug: r.slug,
       imageUrl: r.imageUrl,
     }));
+  }
+
+  private async getTopicRowItems(topicSlug: string): Promise<FeedTopicRowDto | null> {
+    // Get the topic name
+    const topic = await this.prisma.topic.findUnique({
+      where: { slug: topicSlug },
+      select: { name: true }
+    });
+
+    if (!topic) return null;
+
+    // Get recent lectures in this topic
+    const lectures = await this.prisma.lecture.findMany({
+      where: {
+        status: Status.published,
+        deletedAt: null,
+        scholar: { isActive: true },
+        topics: {
+          some: {
+            topic: { slug: topicSlug }
+          }
+        }
+      },
+      include: {
+        scholar: {
+          select: { name: true, slug: true }
+        }
+      },
+      orderBy: { publishedAt: 'desc' },
+      take: 6
+    });
+
+    const items: ContentSuggestionDto[] = lectures.map(lecture => ({
+      kind: 'lecture' as const,
+      id: lecture.id,
+      title: lecture.title,
+      slug: lecture.slug,
+      scholarName: lecture.scholar.name,
+      scholarSlug: lecture.scholar.slug,
+      thumbnailUrl: null,
+      durationSeconds: lecture.durationSeconds,
+    }));
+
+    if (items.length === 0) return null;
+
+    return {
+      kind: 'topic_row' as const,
+      topicName: topic.name,
+      items
+    };
   }
 }

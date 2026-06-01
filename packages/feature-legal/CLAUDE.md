@@ -1,1 +1,0 @@
-C:/dev/salafi-audios/packages/feature-legal/AGENT.md

@@ -30,11 +30,49 @@ export type AccentSurfaceRecipe = {
   radial: AccentRadialRecipe;
 };
 
+export type ScreenWashRecipe = {
+  washPrimary: string;
+  washSecondary: string;
+  washMixed: string;
+};
+
+export type ChromeRecipe = {
+  surface: string;
+  surfaceStrong: string;
+  border: string;
+  borderStrong: string;
+  hoverAccentSurface: string;
+  inputBorderRest: string;
+};
+
+export type AccentSelectedSurfaceRecipe = {
+  backgroundColor: string;
+  contentColor: string;
+};
+
+export type AccentBadgeRecipe = {
+  surfaceColor: string;
+  borderColor: string;
+  foregroundColor: string;
+};
+
+export type BadgeVariantRecipes = {
+  primary: AccentBadgeRecipe;
+  secondary: AccentBadgeRecipe;
+  success: AccentBadgeRecipe;
+  danger: AccentBadgeRecipe;
+};
+
 export type AccentRecipesShared = {
   primaryCta: AccentPrimaryCtaRecipe;
   primarySubtleSurface: AccentSurfaceRecipe;
   secondarySubtleSurface: AccentSurfaceRecipe;
   mixedHeroSurface: AccentSurfaceRecipe;
+  selectedSurface: AccentSelectedSurfaceRecipe;
+  selectedContent: string;
+  secondarySupportingBadge: AccentBadgeRecipe;
+  badge: BadgeVariantRecipes;
+  mixedPromotedPanel: AccentSurfaceRecipe;
   dividerColor: string;
   focusRingColor: string;
 };

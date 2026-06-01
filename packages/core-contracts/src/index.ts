@@ -19,6 +19,9 @@ export {
   type LectureRefDto,
   type SeriesContextDto,
   type LectureDetailDto,
+  type RelatedLectureDto,
+  type AdminLectureUpdateDto,
+  type AdminLectureActionDto,
   type ScholarViewDto,
   type ScholarDetailDto,
   type ScholarStatsDto,
@@ -49,8 +52,13 @@ export {
   type LiveSessionDeltaDto,
   type LiveSessionDto,
   type LiveSessionPageDto,
-  type LectureProgressDto,
-  type ProgressUpdateDto,
+  type LivestreamChannelDto,
+  type CreateLivestreamChannelDto,
+  type UpdateLivestreamChannelDto,
+  type CreateLiveSessionDto,
+  type UpdateLiveSessionDto,
+  type StreamResponseDto,
+  type AudioProgressDto,
   type AdminPermission,
   type AdminPermissionDto,
   type AdminPermissionsListDto,
@@ -67,9 +75,24 @@ export type {
 } from "./types";
 
 // Export route constants
-export { routes, routeAuth } from "./routes";
+export { routes, routeAuth, routeAuthOverrides, getEffectiveAuthMode } from "./routes";
 export type { RouteAuthMode } from "./routes";
 
 // Export query utilities (client, keys, hooks)
 export { createQueryClient, queryKeys } from "./query";
 export { useApiQuery, initApiClient } from "./query/hooks";
+
+export {
+  type TranslationStatus,
+  type TranslationViewDto,
+  type SaveTranslationDto,
+  type TranslationTarget,
+  type UpdateLocaleDto,
+} from "./types/translation.types";
+
+export {
+  SUPPORTED_LOCALES,
+  DEFAULT_LOCALE,
+  RTL_LOCALES,
+  type Locale,
+} from "./types/localization.types";

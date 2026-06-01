@@ -5,8 +5,11 @@ import {
   TopicDetailDto,
   TopicViewDto,
   TopicLectureViewDto,
+  TranslationViewDto,
+  type Locale,
 } from '@sd/core-contracts';
 import { UpsertTopicDto } from './dto/upsert-topic.dto';
+import { SaveTopicTranslationDto } from './dto/save-topic-translation.dto';
 import { isLegacyTopicSchemaFailure } from './topics-error.utils';
 
 const topicViewSelect = {
@@ -161,6 +164,78 @@ export class TopicsRepository {
     await this.prisma.topic.delete({
       where: { slug },
     });
+  }
+
+  // ─── Topic translations ───────────────────────────────────────────────────
+
+  private mapTopicTranslation(t: {
+    locale: string;
+    status: string;
+    name: string;
+    createdAt: Date;
+    updatedAt: Date;
+  }): TranslationViewDto {
+    return {
+      locale: t.locale as Locale,
+      status: t.status === 'published' ? 'published' : 'draft',
+      fields: { name: t.name },
+      createdAt: t.createdAt.toISOString(),
+      updatedAt: t.updatedAt.toISOString(),
+    };
+  }
+
+  async listTopicTranslations(topicId: string): Promise<TranslationViewDto[]> {
+    const records = await this.prisma.topicTranslation.findMany({
+      where: { topicId },
+      orderBy: { locale: 'asc' },
+    });
+    return records.map((r) => this.mapTopicTranslation(r));
+  }
+
+  async upsertTopicTranslation(
+    topicId: string,
+    dto: SaveTopicTranslationDto,
+  ): Promise<TranslationViewDto> {
+    const record = await this.prisma.topicTranslation.upsert({
+      where: { topicId_locale: { topicId, locale: dto.locale } },
+      create: { topicId, locale: dto.locale, name: dto.name, status: 'draft' },
+      update: { name: dto.name },
+    });
+    return this.mapTopicTranslation(record);
+  }
+
+  async updateTopicTranslation(
+    topicId: string,
+    locale: string,
+    fields: Partial<{ name: string }>,
+  ): Promise<TranslationViewDto> {
+    const record = await this.prisma.topicTranslation.update({
+      where: { topicId_locale: { topicId, locale: locale as Locale } },
+      data: { ...fields },
+    });
+    return this.mapTopicTranslation(record);
+  }
+
+  async publishTopicTranslation(
+    topicId: string,
+    locale: string,
+  ): Promise<TranslationViewDto> {
+    const record = await this.prisma.topicTranslation.update({
+      where: { topicId_locale: { topicId, locale: locale as Locale } },
+      data: { status: 'published' },
+    });
+    return this.mapTopicTranslation(record);
+  }
+
+  async unpublishTopicTranslation(
+    topicId: string,
+    locale: string,
+  ): Promise<TranslationViewDto> {
+    const record = await this.prisma.topicTranslation.update({
+      where: { topicId_locale: { topicId, locale: locale as Locale } },
+      data: { status: 'draft' },
+    });
+    return this.mapTopicTranslation(record);
   }
 
   private async resolveOptionalParentId(

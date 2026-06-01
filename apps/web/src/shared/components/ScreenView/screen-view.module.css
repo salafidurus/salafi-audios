@@ -1,0 +1,17 @@
+.container {
+  flex: 1;
+  background-color: var(--surface-canvas);
+  padding: var(--space-layout-page-y) var(--space-layout-page-x);
+  min-height: 100%;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.center {
+  justify-content: center;
+  align-items: center;
+}

@@ -75,6 +75,54 @@ export const createAccentRecipesNative = (
         edgeColor: "transparent",
       },
     },
+    selectedSurface: {
+      backgroundColor: colors.surface.selected,
+      contentColor: colors.content.primaryStrong,
+    },
+    selectedContent: colors.content.primaryStrong,
+    secondarySupportingBadge: {
+      surfaceColor: colors.surface.secondarySubtle,
+      borderColor: colors.border.secondary,
+      foregroundColor: colors.content.secondaryStrong,
+    },
+    badge: {
+      primary: {
+        surfaceColor: colors.surface.primarySubtle,
+        borderColor: colors.border.primary,
+        foregroundColor: colors.content.primaryStrong,
+      },
+      secondary: {
+        surfaceColor: colors.surface.secondarySubtle,
+        borderColor: colors.border.secondary,
+        foregroundColor: colors.content.secondaryStrong,
+      },
+      success: {
+        surfaceColor: colors.surface.primarySubtle,
+        borderColor: colors.border.primary,
+        foregroundColor: colors.content.primaryStrong,
+      },
+      danger: {
+        surfaceColor: colors.surface.default,
+        borderColor: colors.border.default,
+        foregroundColor: colors.content.strong,
+      },
+    },
+    mixedPromotedPanel: {
+      backgroundColor: colors.surface.default,
+      borderColor: colors.border.primary,
+      textColor: colors.content.strong,
+      linear: {
+        colors: [colors.surface.primarySubtle, colors.surface.secondarySubtle],
+        start: { x: 0, y: 0 },
+        end: { x: 1, y: 1 },
+      },
+      radial: {
+        center: { x: 0.86, y: 0.14 },
+        radius: 0.66,
+        centerColor: colors.border.primaryStrong,
+        edgeColor: "transparent",
+      },
+    },
     dividerColor: colors.border.default,
     focusRingColor,
   };

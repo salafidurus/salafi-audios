@@ -2,6 +2,8 @@ packages:
   - apps/*
   - packages/*
 
+# Allowlist of native packages that need post-install build steps.
+# All other native deps are skipped for faster installs — add here only if builds fail.
 onlyBuiltDependencies:
   - "@nestjs/core"
   - "@prisma/engines"

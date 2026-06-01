@@ -1,0 +1,35 @@
+# Exclude package manager and node dependencies
+node_modules/
+**/node_modules/
+
+# Exclude compiled output directories
+dist/
+**/dist/
+build/
+**/build/
+out/
+**/out/
+
+# Exclude generated code and ORM clients
+generated/
+**/generated/
+packages/core-db/src/generated/
+packages/core-db/dist/
+
+# Exclude coverage and temporary directories
+coverage/
+**/coverage/
+.tmp/
+.temp/
+.antigravitycli/
+.gemini/
+.local-expo-mcp/
+.android-tmp/
+.turbo/
+
+# Exclude locks and static assets
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+**/*.min.js
+**/*.map

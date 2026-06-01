@@ -19,6 +19,9 @@ export {
   type LectureRefDto,
   type SeriesContextDto,
   type LectureDetailDto,
+  type RelatedLectureDto,
+  type AdminLectureUpdateDto,
+  type AdminLectureActionDto,
 } from "../types/lecture.types";
 export {
   type ScholarViewDto,
@@ -48,8 +51,6 @@ export {
 export {
   type LibraryItemDto,
   type LibraryPageDto,
-  type ProgressSyncItemDto,
-  type ProgressSyncDto,
   type SavedSyncDto,
 } from "../types/library.types";
 export { type UserProfileDto } from "../types/account.types";
@@ -59,8 +60,18 @@ export {
   type LiveSessionDeltaDto,
   type LiveSessionDto,
   type LiveSessionPageDto,
+  type LivestreamChannelDto,
+  type CreateLivestreamChannelDto,
+  type UpdateLivestreamChannelDto,
+  type CreateLiveSessionDto,
+  type UpdateLiveSessionDto,
 } from "../types/live.types";
-export { type LectureProgressDto, type ProgressUpdateDto } from "../types/progress.types";
+export {
+  type StreamResponseDto,
+  type AudioProgressDto,
+  type ProgressSyncItemDto,
+  type ProgressSyncDto,
+} from "../types/audio.types";
 export type {
   AdminPermission,
   AdminPermissionDto,
@@ -74,3 +85,10 @@ export {
   type RecentProgressDto,
   type QuickBrowseDto,
 } from "../types/home.types";
+export {
+  type TranslationStatus,
+  type TranslationViewDto,
+  type SaveTranslationDto,
+  type TranslationTarget,
+  type UpdateLocaleDto,
+} from "../types/translation.types";

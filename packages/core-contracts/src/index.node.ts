@@ -16,6 +16,9 @@ export {
   type LectureRefDto,
   type SeriesContextDto,
   type LectureDetailDto,
+  type RelatedLectureDto,
+  type AdminLectureUpdateDto,
+  type AdminLectureActionDto,
   type ScholarViewDto,
   type ScholarDetailDto,
   type ScholarStatsDto,
@@ -37,8 +40,6 @@ export {
   type FeedPageDto,
   type LibraryItemDto,
   type LibraryPageDto,
-  type ProgressSyncItemDto,
-  type ProgressSyncDto,
   type SavedSyncDto,
   type UserProfileDto,
   type LiveSessionStatus,
@@ -46,8 +47,10 @@ export {
   type LiveSessionDeltaDto,
   type LiveSessionDto,
   type LiveSessionPageDto,
-  type LectureProgressDto,
-  type ProgressUpdateDto,
+  type StreamResponseDto,
+  type AudioProgressDto,
+  type ProgressSyncItemDto,
+  type ProgressSyncDto,
   type AdminPermission,
   type AdminPermissionDto,
   type AdminPermissionsListDto,
@@ -62,5 +65,5 @@ export type {
   QuickBrowseDto,
 } from "./types";
 
-export { routes, routeAuth } from "./routes";
+export { routes, routeAuth, routeAuthOverrides, getEffectiveAuthMode } from "./routes";
 export type { RouteAuthMode } from "./routes";

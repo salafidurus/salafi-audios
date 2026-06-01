@@ -24,28 +24,19 @@ This Next.js app is a client of the backend API, not an authority.
 
 ## Shared Package Integration
 
-The web app consumes the split shared packages directly: `@sd/shared`, `@sd/core-*`, and `@sd/feature-*`.
+The web app consumes shared packages directly: `@sd/core-*` and `@sd/domain-*`. Feature code lives in app-local `src/features/` slices. App-local `src/shared/` contains primitives used across two or more features within the web app. Platform bootstrap (providers, environment config, theme sync) lives in `src/core/`.
 
 **How it works:**
 
-- `next.config.ts` transpiles the shared `@sd/*` UI packages directly instead of importing pre-built bundles
-- The repo now uses `.desktop.web.tsx`, `.web.tsx`, `.native.tsx`, and fallback `.tsx` variants
-- Next.js resolves `.desktop.web` and `.web` variants first
-- `react-native` is aliased to `react-native-web` via module resolver in Next config
+- `next.config.ts` transpiles `@sd/*` packages directly instead of importing pre-built bundles
+- App-local `src/features/` and `src/shared/` use plain `.tsx` (CSS-responsive default), `.desktop.tsx` (desktop-only layout variant), and `.mobile.tsx` (mobile-web variant)
+- App-local `src/core/` contains: `providers.tsx`, `config/env.ts`, `styles/ThemeSync.tsx`, `auth/` (auth client + hooks)
 
-**When to use shared package components:**
+**When to use local shared components:**
 
-- Use `useResponsive()` from `@sd/shared` for breakpoint-aware rendering:
-  - **Tablets/mobile (≤900px):** render package-provided mobile/tablet variants when they exist
-  - **Desktop (>900px):** render desktop-specific layouts or `.desktop.web` variants
-- Breakpoints: `MOBILE_MAX = 640px`, `TABLET_MAX = 900px`
-
-**Web-specific CSS properties in shared package components:**
-
-- `.web.tsx` files in shared packages use `_web` key inside `StyleSheet.create()` for CSS-only properties
-- Import `View`/`Text`/`Pressable` from `react-native-unistyles/components/native/*` to enable `_web` key
-- These are automatically applied on web, ignored on native
-- Prefer colocating platform-specific files inside the owning package
+- Use `<Responsive>` from `src/shared/components/Responsive` for screen-level mobile/desktop branching
+- Use `useIsDesktop()` from `src/shared/hooks/use-responsive` when only a boolean is needed
+- Breakpoints: `MOBILE_MAX = 640px`, `TABLET_MAX = 900px` (desktop = >900px)
 
 ---
 
@@ -58,50 +49,51 @@ app/(feature)/page.tsx                         ← server component, metadata on
 features/<feature>/screens/<name>/
   <name>.screen.tsx                            ← responsive router (client component)
   <name>.screen.desktop.tsx                    ← desktop-only implementation
+  <name>.screen.mobile.tsx                     ← mobile-web implementation (if needed)
 ```
+
+### Responsive rendering
+
+The canonical branching primitive is `<Responsive>` from `src/shared/components/Responsive`:
+
+```tsx
+import { Responsive } from "@/shared/components/Responsive";
+import { FeedDesktopScreen } from "./feed.screen.desktop";
+import { FeedMobileScreen } from "./feed.screen.mobile";
+
+export function FeedScreen(props: FeedScreenProps) {
+  return (
+    <Responsive
+      mobile={<FeedMobileScreen {...props} />}
+      desktop={<FeedDesktopScreen {...props} />}
+    />
+  );
+}
+```
+
+- **SSR default is desktop.** The mobile branch activates only after the first `useEffect` on narrow viewports. This avoids server/client hydration mismatches.
+- **Do not use `display: none` to hide one tree.** Render exactly one branch at a time.
+- `useResponsive()` from `src/shared/hooks/use-responsive` is the underlying hook; prefer `<Responsive>` for screen-level branching.
+- `useIsDesktop()` from the same module returns a plain `boolean` when you only need a single condition.
+- The shared `src/shared/styles/responsive.module.css` (`.mobileOnly` / `.desktopOnly`) is a CSS-only fallback for non-React contexts. Do not use it in feature screens.
 
 ### Rules
 
 - **`app/**/page.tsx`\*\* — server component, no hooks, imports one screen component, adds metadata
 - **`features/**/screens/<name>/<name>.screen.tsx`\*\* — responsive router only:
-  - Contains `useResponsive()`, decides mobile vs desktop
-  - For mobile/tablet: renders the package-provided shared screen component with callback props wired to `authClient` / `router`
-  - For desktop: renders `<NameDesktopScreen />`
+  - Uses `<Responsive>` to decide mobile vs desktop
+  - For simple cases where mobile and desktop share ≥80% markup, collapse into one file using CSS
 - **`features/**/screens/<name>/<name>.screen.desktop.tsx`\*\* — desktop-only UI:
-  - Uses Tailwind + CSS variables (`var(--token-name)`)
+  - Uses CSS Modules + CSS variables (`var(--token-name)`)
   - No `useResponsive()`, no mobile imports
   - All styles use design token CSS variables — never hardcode colors/spacing
-
-```typescript
-// features/auth/screens/sign-in/sign-in.screen.tsx — responsive router
-"use client";
-import { useRouter, useSearchParams } from "next/navigation";
-import { SignInScreen as MobileSignInScreen } from "@sd/feature-auth";
-import { SignInDesktopScreen } from "./sign-in.screen.desktop";
-import { useResponsive } from "@sd/shared";
-import { authClient } from "@sd/core-auth";
-
-export function SignInScreen() {
-  const router = useRouter();
-  const { isMobile, isTablet } = useResponsive();
-
-  if (isMobile || isTablet) {
-    return (
-      <MobileSignInScreen
-        onSignIn={async (email, password) => { ... }}
-        onSignInWithGoogle={() => authClient.signIn.social({ provider: "google" })}
-        onSignInWithApple={() => authClient.signIn.social({ provider: "apple" })}
-        onNavigateToSignUp={() => router.push("/sign-up")}
-      />
-    );
-  }
-
-  return <SignInDesktopScreen />;
-}
-```
+- **`features/**/screens/<name>/<name>.screen.mobile.tsx`\*\* — mobile-web variant (only when truly needed)
 
 ### Naming Conventions
 
+- Components, hooks, and screens in `apps/web` must not carry a `Web`, `DesktopWeb`, or `MobileWeb` suffix. These suffixes dated from the shared-package era and are redundant now that code is app-local.
+  - Correct: `AppText`, `Button`, `FeedRecentScreen`, `FeedDesktopScreen`
+  - Wrong: `AppTextWeb`, `ButtonDesktopWeb`, `FeedDesktopWebScreen`
 - Feature screen folders: `features/<feature>/screens/<name>/` (kebab-case)
 - Responsive router: `<name>.screen.tsx`
 - Desktop file: `<name>.screen.desktop.tsx`
@@ -153,12 +145,16 @@ export function SignInScreen() {
 - Use CSS Modules + design tokens via CSS variables (e.g., `var(--surface-canvas)`)
 - Theme tokens are injected as CSS variables in `src/app/theme-css.ts` and applied in `src/app/layout.tsx`
 - Never hardcode color/spacing/radius values — always reference a design token
+- `apps/web` has **no dependency on `react-native`, `react-native-web`, or `react-native-unistyles`**. Do not add them.
 
-**For shared package components rendered in web context:**
+**Shared components (`src/shared/components/*`):**
 
-- Styling happens via the shared unistyles theme factory in `@sd/core-styles`
-- Web-specific CSS properties use `_web` key inside `StyleSheet.create()`
-- You don't need to override these when the package already owns the platform variant
+- Plain React + CSS Modules. No React Native imports.
+- Design tokens are consumed via CSS variables (defined in `src/app/theme-css.ts` and `globals.css`), not via `useUnistyles()`.
+
+**Platform bootstrap:**
+
+- Dark/light mode is handled by `ThemeSync` in `src/core/styles/ThemeSync.tsx`, which listens to `prefers-color-scheme` and sets `data-theme` on `<html>`. No Unistyles runtime is present in `apps/web`.
 
 **Design tokens (complete reference):**
 See `packages/design-tokens/AGENT.md` for the authoritative token guide covering surface, border, content, spacing, radius, and typography.
@@ -219,17 +215,17 @@ import { motion } from 'framer-motion';
 
 **Shared navigation types + store:**
 
-- Shared navigation types, routes, and state come from `@sd/feature-navigation`:
+- Shared navigation types, routes, and state come from `src/features/navigation/`:
   - `SECTION_TABS`, `SECTION_ROUTES`, `SECTION_LABELS` — constants
   - `getCurrentSection()`, `getActiveTabFromPath()` — utilities
   - `useNavigationStore()` — Zustand store for active section/tab
-- Web sidebar consumes these shared utilities to stay in sync with mobile
+- Web sidebar consumes these app-local utilities
 
 **Mobile navigation:**
 
 - Expo Router `Tabs` owns top-level mobile navigation
 - Mobile renders an app-owned custom tab bar and subsection bar over tab state
-- Shared section constants and helpers in `@sd/feature-navigation` still keep web and mobile aligned
+- Section constants and helpers in `apps/native/src/features/navigation/` keep the tab structure aligned with web
 
 ---
 
@@ -273,6 +269,23 @@ core → shared
 - Import shared types from `@sd/core-contracts`
 - Types are hand-written and stable — no codegen required
 - When API changes, update `packages/core-contracts/src/types/` manually
+
+---
+
+## Export Style
+
+**Named exports everywhere.** `export default` is only allowed in files where Next.js App Router requires it:
+
+- `src/app/**/layout.tsx`, `page.tsx`, `error.tsx`, `not-found.tsx`, `loading.tsx`, `template.tsx`, `default.tsx`, `global-error.tsx`
+- `src/middleware.ts`, `src/instrumentation.ts`
+
+All components, screens, hooks, utilities, and barrel `index.ts` files in `src/features/`, `src/shared/`, and `src/core/` must use **named exports only**. This is enforced by ESLint (`import/no-default-export`).
+
+**Note:** `src/app/**/route.ts` files must also use named exports (`GET`, `POST`, etc.) — no default export exception for route handlers.
+
+## Feature Barrels
+
+Every `src/features/<name>/` directory should have an `index.ts` barrel that re-exports the feature's public surface using named exports only. Include: screens (always), and non-screen components only if confirmed to be imported from outside the feature folder. Do **not** speculatively re-export hooks, utilities, or sub-components — grep for the symbol name outside the feature folder first.
 
 ---
 

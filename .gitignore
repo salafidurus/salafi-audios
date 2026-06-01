@@ -9,6 +9,8 @@ coverage/
 dist/
 **/dist/
 
+.antigravitycli/
+
 generated/
 **/generated/
 
@@ -37,8 +39,12 @@ generated/
 infra/envs/.env.*
 infra/envs/*.env
 
-# temp deploy files
+# temp files
 .deploy_tmp/
+.local-expo-mcp/
 
 # generated DB artifacts (derived, never committed)
 packages/db/src/generated/
+
+# IDE and Tool settings
+.vscode/mcp.json

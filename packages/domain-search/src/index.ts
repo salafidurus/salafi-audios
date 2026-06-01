@@ -10,3 +10,6 @@ export {
 
 // Utils & types
 export { buildSearchResultRows, type SearchResultRow } from "./utils/build-search-result-rows";
+
+// Quick browse
+export { useQuickBrowse } from "./use-quickbrowse";

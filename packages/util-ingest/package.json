@@ -18,30 +18,26 @@
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist",
+    "build": "tsup src/index.ts --format esm,cjs --dts --tsconfig tsconfig.build.json --out-dir dist",
     "dev": "pnpm build --watch",
-    "prefix:series-collections": "pnpm --filter @sd/core-env build",
     "fix:series-collections": "tsx src/commands/fix-series-collections.ts",
-    "prefix:recommendation-hero": "pnpm --filter @sd/core-env build",
     "fix:recommendation-hero": "tsx src/commands/fix-recommendation-hero.ts",
-    "preingest:content": "pnpm --filter @sd/core-env build",
     "ingest:content": "tsx src/commands/ingest-content.ts",
-    "preingest:remove": "pnpm --filter @sd/core-env build",
     "ingest:remove": "tsx src/commands/remove-content.ts",
     "convert:supabase": "tsx src/commands/convert-supabase.ts",
     "pretypecheck": "pnpm --filter @sd/core-db prisma:generate",
-    "lint": "eslint .",
-    "test": "jest --passWithNoTests",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
+    "pretest": "pnpm --filter @sd/core-db prisma:generate",
+    "lint": "node ../../node_modules/eslint/bin/eslint.js .",
+    "test": "node ../../node_modules/jest/bin/jest.js --passWithNoTests",
+    "test:watch": "node ../../node_modules/jest/bin/jest.js --watch",
+    "test:cov": "node ../../node_modules/jest/bin/jest.js --coverage",
+    "test:prepush": "node ../../node_modules/jest/bin/jest.js --changedSince=origin/main --passWithNoTests",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.922.0",
     "@prisma/adapter-pg": "^7.3.0",
     "@sd/core-db": "workspace:*",
-    "@sd/core-env": "workspace:*",
     "dotenv": "^16.4.5",
     "zod": "^3.25.17"
   },
@@ -53,7 +49,6 @@
     "rimraf": "^6.0.0",
     "ts-jest": "^29.4.6",
     "tsup": "^8.0.0",
-    "tsx": "^4.21.0",
-    "typescript": "^5.9.0"
+    "tsx": "^4.21.0"
   }
 }

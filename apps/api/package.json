@@ -13,18 +13,17 @@
     "dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "test": "jest --passWithNoTests",
-    "pretest": "pnpm --filter @sd/core-env build && pnpm --filter @sd/core-db build",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
-    "pretypecheck": "pnpm --filter @sd/core-env build",
+    "lint": "node ../../node_modules/eslint/bin/eslint.js .",
+    "lint:fix": "node ../../node_modules/eslint/bin/eslint.js . --fix",
+    "test": "node ../../node_modules/jest/bin/jest.js --passWithNoTests",
+    "pretest": "pnpm --filter @sd/core-db build",
+    "test:watch": "node ../../node_modules/jest/bin/jest.js --watch",
+    "test:cov": "node ../../node_modules/jest/bin/jest.js --coverage",
+    "test:prepush": "node ../../node_modules/jest/bin/jest.js --changedSince=origin/main --passWithNoTests",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register ../../node_modules/jest/bin/jest.js --runInBand",
+    "test:e2e": "node ../../node_modules/jest/bin/jest.js --config ./test/jest-e2e.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "prebuild": "pnpm --filter @sd/core-env build && pnpm --filter @sd/core-db build",
+    "prebuild": "pnpm --filter @sd/core-db build",
     "openapi:json": "pnpm build && node dist/openapi.js",
     "preopenapi:json": "pnpm --filter @sd/core-db prisma:generate",
     "openapi": "pnpm openapi:json"
@@ -49,7 +48,9 @@
     "pg": "^8.17.2",
     "pino-http": "^11.0.0",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "@sd/core-i18n": "workspace:*",
+    "zod": "^3.25.17"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
@@ -60,7 +61,6 @@
     "@sd/util-config": "workspace:*",
     "@sd/core-contracts": "workspace:*",
     "@sd/core-db": "workspace:*",
-    "@sd/core-env": "workspace:*",
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
@@ -79,7 +79,6 @@
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0"
   }
 }

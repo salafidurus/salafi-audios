@@ -1,10 +1,11 @@
-import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
+import { Cron } from "@nestjs/schedule";
 import { TelegramService } from "./telegram.service";
 import { SessionsService } from "../sessions/sessions.service";
 import { ChannelsService } from "../channels/channels.service";
 
 @Injectable()
-export class TelegramMonitor implements OnModuleInit {
+export class TelegramMonitor {
   private readonly logger = new Logger(TelegramMonitor.name);
 
   constructor(
@@ -13,37 +14,46 @@ export class TelegramMonitor implements OnModuleInit {
     private readonly channels: ChannelsService,
   ) {}
 
-  async onModuleInit() {
+  @Cron("*/30 * * * * *")
+  async pollChannels() {
     if (!this.telegram.isConnected()) {
-      this.logger.warn("Telegram not connected — monitor not starting");
       return;
     }
 
-    this.logger.log("Starting Telegram channel monitor");
-    this.startPolling();
-  }
-
-  private startPolling() {
-    // Poll active channels every 60 seconds for live session changes
-    setInterval(() => this.pollChannels(), 60_000);
-    // Initial poll
-    this.pollChannels();
-  }
-
-  private async pollChannels() {
     try {
       const activeChannels = await this.channels.listActive();
-      for (const channel of activeChannels) {
-        await this.checkChannel(channel);
-      }
+      await Promise.all(activeChannels.map((ch) => this.checkChannel(ch)));
     } catch (error) {
-      this.logger.error("Error polling channels", error);
+      this.logger.error("Error polling Telegram channels", error);
     }
   }
 
-  private async checkChannel(channel: { id: string; telegramId: string }) {
-    // Placeholder — actual implementation would use gramjs to check
-    // for group call status, new messages with schedule announcements, etc.
-    this.logger.debug(`Checking channel ${channel.telegramId}`);
+  private async checkChannel(channel: {
+    id: string;
+    telegramId: string;
+    telegramSlug: string | null;
+  }) {
+    const client = this.telegram.getClient();
+    if (!client) return;
+
+    try {
+      const { Api } = await import("telegram");
+      const identifier = channel.telegramSlug ?? channel.telegramId;
+
+      const result = await client.invoke(new Api.channels.GetFullChannel({ channel: identifier }));
+
+      const fullChat = result.fullChat as Record<string, unknown>;
+      const call = fullChat["call"];
+      const isLive = call != null;
+      const viewerCount =
+        isLive && typeof fullChat["participantsCount"] === "number"
+          ? (fullChat["participantsCount"] as number)
+          : undefined;
+
+      await this.sessions.upsertFromTelegram(channel.id, { isLive, viewerCount });
+      this.logger.debug(`Channel ${identifier}: isLive=${isLive}`);
+    } catch (error) {
+      this.logger.warn(`Failed to check channel ${channel.telegramId}: ${error}`);
+    }
   }
 }

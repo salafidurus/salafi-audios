@@ -99,3 +99,18 @@ export const weightToKey: Record<number, FontWeightKey> = {
   600: "semibold",
   700: "bold",
 };
+
+export const getWeightKey = (weight: number): FontWeightKey => {
+  switch (weight) {
+    case 400:
+      return "regular";
+    case 500:
+      return "medium";
+    case 600:
+      return "semibold";
+    case 700:
+      return "bold";
+    default:
+      return "regular";
+  }
+};

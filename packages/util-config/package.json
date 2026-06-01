@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     "./eslint/base": "./eslint/base.js",
+    "./eslint/packages": "./eslint/packages.js",
     "./eslint/next": "./eslint/next.js",
     "./eslint/nest": "./eslint/nest.js",
     "./eslint/expo": "./eslint/expo.js",
@@ -24,4 +25,3 @@
     "globals": "^16.0.0"
   }
 }
-

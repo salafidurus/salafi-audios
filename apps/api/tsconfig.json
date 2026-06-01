@@ -1,21 +1,8 @@
 {
-  "extends": "@sd/util-config/tsconfig/base.json",
+  // Editor / typecheck only — does not emit. NestJS CLI uses tsconfig.build.json.
+  "extends": "@sd/util-config/tsconfig/nest.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "declaration": true,
-    "removeComments": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "target": "ES2022",
-    "sourceMap": true,
-    "outDir": "./dist",
-    "incremental": true,
-    "skipLibCheck": true,
-    "strictNullChecks": true,
-    "noImplicitAny": true,
-    "strictBindCallApply": true,
-    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src/**/*.ts", "test/**/*.ts"]

@@ -19,18 +19,7 @@ export type LibraryPageDto = {
   hasMore: boolean;
 };
 
-export type ProgressSyncItemDto = {
-  lectureId: string;
-  positionSeconds: number;
-  durationSeconds: number;
-  completedAt?: string;
-  updatedAt: string;
-};
-
-export type ProgressSyncDto = {
-  items: ProgressSyncItemDto[];
-};
-
 export type SavedSyncDto = {
   lectureIds: string[];
 };
+

@@ -1,0 +1,24 @@
+/**
+ * Fallback CSS-based responsive utilities.
+ * Prefer <Responsive> from src/shared/components/Responsive for JS-driven
+ * branching. These classes are only for non-React-render contexts (e.g.
+ * server-rendered layouts where no JS is desired).
+ */
+
+.mobileOnly {
+  display: block;
+}
+
+.desktopOnly {
+  display: none;
+}
+
+@media (min-width: 901px) {
+  .mobileOnly {
+    display: none;
+  }
+
+  .desktopOnly {
+    display: block;
+  }
+}

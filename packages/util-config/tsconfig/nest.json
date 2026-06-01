@@ -1,11 +1,13 @@
 {
-  "extends": "./app.json",
+  // NestJS/Node backend services: extend base.json (CommonJS runtime, not Bundler)
+  "extends": "./base.json",
   "compilerOptions": {
+    // CommonJS — NestJS runs on Node.js; ESM interop with reflect-metadata and DI is unreliable
     "module": "commonjs",
+    // Required for NestJS decorator-based dependency injection and metadata reflection
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "noEmit": false
+    "allowSyntheticDefaultImports": true
   }
 }

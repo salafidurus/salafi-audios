@@ -57,19 +57,19 @@ This directory contains the authoritative documentation for Salafi Durus.
 | `/feed/*`              | PLACEHOLDER | SUPPORTING | Feed pages exist but are early     |
 | `/library/*`           | PLACEHOLDER | SUPPORTING | Library routes exist but are early |
 | `/account/*`           | PLACEHOLDER | SUPPORTING | Account routes exist but are early |
-| `/sign-in`, `/sign-up` | IMPLEMENTED | SUPPORTING | Using `@sd/feature-auth`           |
+| `/sign-in`, `/sign-up` | IMPLEMENTED | SUPPORTING | App-local `features/auth/` slices  |
 
-### Mobile (apps/mobile)
+### Mobile (apps/native)
 
-| Feature           | Status      | MVP      | Notes                     |
-| ----------------- | ----------- | -------- | ------------------------- |
-| Search home       | IMPLEMENTED | CRITICAL | Uses `@sd/feature-search` |
-| Search processing | IMPLEMENTED | CRITICAL | Uses `@sd/feature-search` |
-| Catalog browsing  | MISSING     | CRITICAL | Detail screens needed     |
-| Audio playback    | NOT STARTED | CRITICAL | Planned for Phase 05      |
-| Progress tracking | NOT STARTED | CRITICAL | Planned for Phase 05      |
-| Offline sync      | NOT STARTED | CRITICAL | Phase 06                  |
-| Downloads         | NOT STARTED | CRITICAL | Phase 06                  |
+| Feature           | Status      | MVP      | Notes                               |
+| ----------------- | ----------- | -------- | ----------------------------------- |
+| Search home       | IMPLEMENTED | CRITICAL | App-local `features/search/` slices |
+| Search processing | IMPLEMENTED | CRITICAL | App-local `features/search/` slices |
+| Catalog browsing  | MISSING     | CRITICAL | Detail screens needed               |
+| Audio playback    | NOT STARTED | CRITICAL | Planned for Phase 05                |
+| Progress tracking | NOT STARTED | CRITICAL | Planned for Phase 05                |
+| Offline sync      | NOT STARTED | CRITICAL | Phase 06                            |
+| Downloads         | NOT STARTED | CRITICAL | Phase 06                            |
 
 ### Current Mobile Runtime Guardrail
 

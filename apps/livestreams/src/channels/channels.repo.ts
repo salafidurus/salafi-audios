@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import { Prisma } from "@sd/core-db";
 import { PrismaService } from "../shared/db/prisma.service";
 
 @Injectable()
@@ -33,7 +34,9 @@ export class ChannelsRepository {
     scholarId?: string;
     language?: string;
   }) {
-    return this.prisma.livestreamChannel.create({ data });
+    return this.prisma.livestreamChannel.create({
+      data: data as Prisma.LivestreamChannelCreateInput,
+    });
   }
 
   async update(
@@ -46,6 +49,9 @@ export class ChannelsRepository {
       isActive?: boolean;
     },
   ) {
-    return this.prisma.livestreamChannel.update({ where: { id }, data });
+    return this.prisma.livestreamChannel.update({
+      where: { id },
+      data: data as Prisma.LivestreamChannelUpdateInput,
+    });
   }
 }
