@@ -26,6 +26,7 @@
     "ingest:remove": "tsx src/commands/remove-content.ts",
     "convert:supabase": "tsx src/commands/convert-supabase.ts",
     "pretypecheck": "pnpm --filter @sd/core-db prisma:generate",
+    "pretest": "pnpm --filter @sd/core-db prisma:generate",
     "lint": "node ../../node_modules/eslint/bin/eslint.js .",
     "test": "node ../../node_modules/jest/bin/jest.js --passWithNoTests",
     "test:watch": "node ../../node_modules/jest/bin/jest.js --watch",
