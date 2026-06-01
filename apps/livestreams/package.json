@@ -5,9 +5,12 @@
   "scripts": {
     "dev": "nest start --watch",
     "build": "nest build",
+    "prebuild": "pnpm --filter @sd/core-db build",
     "start": "node dist/main.js",
     "typecheck": "tsc --noEmit",
+    "pretypecheck": "pnpm --filter @sd/core-db build",
     "test": "node ../../node_modules/jest/bin/jest.js --passWithNoTests",
+    "pretest": "pnpm --filter @sd/core-db build",
     "test:watch": "node ../../node_modules/jest/bin/jest.js --watch --passWithNoTests",
     "test:prepush": "node ../../node_modules/jest/bin/jest.js --changedSince=origin/main --passWithNoTests"
   },
