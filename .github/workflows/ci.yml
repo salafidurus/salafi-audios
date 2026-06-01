@@ -129,8 +129,7 @@ jobs:
           path: |
             apps/api/dist/**
             apps/web/.next/**
-            packages/core-contracts/dist/**
-            packages/core-env/dist/**
+            packages/*/dist/**
 
   lint:
     name: lint
