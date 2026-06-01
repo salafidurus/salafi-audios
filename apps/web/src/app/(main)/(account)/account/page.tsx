@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { AccountScreen } from "@/features/account/screens/account.screen";
+import { AccountActions } from "@/features/account/screens/account-actions";
 
 export const metadata: Metadata = {
   title: "Account",
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function AccountPage() {
-  return <AccountScreen />;
+  return <AccountActions />;
 }
