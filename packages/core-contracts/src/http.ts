@@ -1,6 +1,7 @@
 export type HttpClientConfig = {
   baseUrl: string;
   getAccessToken?: () => string | undefined | null;
+  onError?: (status: number) => void;
 };
 
 type QueryParamValue = string | number | boolean | null | undefined;
@@ -69,6 +70,7 @@ export async function httpClient<T>(options: {
   }
 
   if (!res.ok) {
+    config.onError?.(res.status);
     const text = await res.text().catch(() => "");
     throw new Error(`API ${res.status} ${res.statusText}: ${text}`);
   }

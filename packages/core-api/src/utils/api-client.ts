@@ -14,6 +14,11 @@ export type ApiInterceptor = {
 
 const interceptors: ApiInterceptor[] = [];
 let accessTokenProvider: HttpClientConfig["getAccessToken"];
+let unauthorizedHandler: (() => void) | undefined;
+
+export function setUnauthorizedHandler(handler: () => void) {
+  unauthorizedHandler = handler;
+}
 
 export function registerApiInterceptor(interceptor: ApiInterceptor) {
   interceptors.push(interceptor);
@@ -41,6 +46,9 @@ export function initApiClient(config?: Pick<HttpClientConfig, "baseUrl">) {
   initContractsApiClient({
     baseUrl,
     getAccessToken: () => accessTokenProvider?.(),
+    onError: (status) => {
+      if (status === 401) unauthorizedHandler?.();
+    },
   });
 }
 

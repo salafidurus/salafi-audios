@@ -1,1 +1,1 @@
-export { initApiClient } from "./utils/api-client";
+export { initApiClient, setUnauthorizedHandler } from "./utils/api-client";
