@@ -30,7 +30,6 @@ permissions:
 
 env:
   NODE_VERSION: "22"
-  PNPM_VERSION: "10"
   # Custom Playwright path enables GitHub Actions caching (default path is not cacheable)
   PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/ms-playwright
   # Turbo Remote Cache credentials — shared cache across CI runs
@@ -104,8 +103,6 @@ jobs:
           fetch-depth: 0
 
       - uses: pnpm/action-setup@v6
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - uses: actions/setup-node@v6
         with:
@@ -144,8 +141,6 @@ jobs:
           fetch-depth: 0
 
       - uses: pnpm/action-setup@v6
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - uses: actions/setup-node@v6
         with:
@@ -180,8 +175,6 @@ jobs:
           fetch-depth: 0
 
       - uses: pnpm/action-setup@v6
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - uses: actions/setup-node@v6
         with:
@@ -217,8 +210,6 @@ jobs:
           fetch-depth: 0
 
       - uses: pnpm/action-setup@v6
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - uses: actions/setup-node@v6
         with:
@@ -250,8 +241,6 @@ jobs:
           fetch-depth: 0
 
       - uses: pnpm/action-setup@v6
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - uses: actions/setup-node@v6
         with:
@@ -319,8 +308,6 @@ jobs:
           fetch-depth: 0
 
       - uses: pnpm/action-setup@v6
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - uses: actions/setup-node@v6
         with:
