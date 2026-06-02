@@ -1,5 +1,16 @@
-import { ScreenInProgress } from "@/shared/components/screen-in-progress/screen-in-progress";
+"use client";
 
-export function FeedScreen() {
-  return <ScreenInProgress title="Feed" description="Your feed is on the way." />;
+import { Responsive } from "@/shared/components/Responsive";
+import { FeedDesktopScreen } from "./feed-recent.screen.desktop";
+import { FeedMobileScreen } from "./feed-recent.screen.mobile";
+
+export type FeedScreenProps = {
+  onNavigateToLecture?: (slug: string) => void;
+  onNavigateToScholar?: (slug: string) => void;
+};
+
+export function FeedScreen(props: FeedScreenProps) {
+  const mobile = <FeedMobileScreen {...props} />;
+  const desktop = <FeedDesktopScreen {...props} />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }

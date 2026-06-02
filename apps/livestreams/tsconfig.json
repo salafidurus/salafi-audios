@@ -1,0 +1,8 @@
+{
+  "extends": "@sd/util-config/tsconfig/nest.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src/**/*.ts"]
+}

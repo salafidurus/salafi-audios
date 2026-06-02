@@ -1,73 +1,91 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import type {
+  LectureDetailDto,
+  RelatedLectureDto,
+  AdminLectureUpdateDto,
+  AdminLectureActionDto,
+  TranslationViewDto,
+} from '@sd/core-contracts';
+import { Status } from '@sd/core-db';
 import { LecturesRepository } from './lectures.repo';
-import type { LectureViewDto } from '@sd/contracts';
-import { UpsertLectureDto } from './dto/upsert-lecture.dto';
+import type { SaveLectureTranslationDto } from './dto/save-lecture-translation.dto';
 
 @Injectable()
 export class LecturesService {
   constructor(private readonly repo: LecturesRepository) {}
 
-  listPublished(scholarSlug: string): Promise<LectureViewDto[]> {
-    return this.repo.listPublishedByScholarSlug(scholarSlug);
-  }
-
-  async getPublished(
-    scholarSlug: string,
-    slug: string,
-  ): Promise<LectureViewDto> {
-    const found = await this.repo.findPublishedByScholarSlugAndSlug(
-      scholarSlug,
-      slug,
-    );
-    if (!found) throw new NotFoundException(`Lecture "${slug}" not found`);
-    return found;
-  }
-
-  async getPublishedById(id: string): Promise<LectureViewDto> {
-    const found = await this.repo.findPublishedById(id);
-    if (!found) {
-      throw new NotFoundException('Lecture not found');
+  async getById(id: string): Promise<LectureDetailDto> {
+    const lecture = await this.repo.findDetailById(id);
+    if (!lecture) {
+      throw new NotFoundException(`Lecture "${id}" not found`);
     }
-    return found;
+    return lecture;
   }
 
-  async upsert(
-    scholarSlug: string,
-    dto: UpsertLectureDto,
-  ): Promise<LectureViewDto> {
-    const result = await this.repo.upsertByScholarSlug(scholarSlug, dto);
-    if (!result)
-      throw new NotFoundException(
-        `Scholar "${scholarSlug}" (or parent series) not found`,
-      );
-    return result;
+  async getRelated(id: string): Promise<RelatedLectureDto[]> {
+    const related = await this.repo.findRelated(id);
+    return related;
   }
 
-  async listPublishedForSeries(
-    scholarSlug: string,
-    seriesSlug: string,
-  ): Promise<LectureViewDto[]> {
-    const result = await this.repo.listPublishedByScholarAndSeriesSlug(
-      scholarSlug,
-      seriesSlug,
-    );
-
-    if (!result) {
-      throw new NotFoundException('Series not found');
+  async updateLecture(
+    id: string,
+    updateDto: AdminLectureUpdateDto,
+  ): Promise<AdminLectureActionDto> {
+    const updated = await this.repo.updateLecture(id, updateDto);
+    if (!updated) {
+      throw new NotFoundException(`Lecture "${id}" not found`);
     }
-
-    return result;
+    return { success: true, message: 'Lecture updated successfully' };
   }
 
-  async listPublishedByScholarSlugPaginated(
-    scholarSlug: string,
-    limit = 20,
-    cursor?: string,
-  ): Promise<LectureViewDto[]> {
-    return this.repo.listPublishedByScholarSlugPaginated(
-      scholarSlug,
-      limit,
-      cursor,
-    );
+  async publishLecture(id: string): Promise<AdminLectureActionDto> {
+    const published = await this.repo.updateLectureStatus(id, Status.published);
+    if (!published) {
+      throw new NotFoundException(`Lecture "${id}" not found`);
+    }
+    return { success: true, message: 'Lecture published successfully' };
+  }
+
+  async archiveLecture(id: string): Promise<AdminLectureActionDto> {
+    const archived = await this.repo.updateLectureStatus(id, Status.archived);
+    if (!archived) {
+      throw new NotFoundException(`Lecture "${id}" not found`);
+    }
+    return { success: true, message: 'Lecture archived successfully' };
+  }
+
+  // ─── Lecture translations ─────────────────────────────────────────────────
+
+  listTranslations(lectureId: string): Promise<TranslationViewDto[]> {
+    return this.repo.listLectureTranslations(lectureId);
+  }
+
+  upsertTranslation(
+    lectureId: string,
+    dto: SaveLectureTranslationDto,
+  ): Promise<TranslationViewDto> {
+    return this.repo.upsertLectureTranslation(lectureId, dto);
+  }
+
+  updateTranslation(
+    lectureId: string,
+    locale: string,
+    fields: Partial<{ title: string; description: string | null }>,
+  ): Promise<TranslationViewDto> {
+    return this.repo.updateLectureTranslation(lectureId, locale, fields);
+  }
+
+  publishTranslation(
+    lectureId: string,
+    locale: string,
+  ): Promise<TranslationViewDto> {
+    return this.repo.publishLectureTranslation(lectureId, locale);
+  }
+
+  unpublishTranslation(
+    lectureId: string,
+    locale: string,
+  ): Promise<TranslationViewDto> {
+    return this.repo.unpublishLectureTranslation(lectureId, locale);
   }
 }

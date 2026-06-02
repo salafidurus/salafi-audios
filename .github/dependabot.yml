@@ -1,0 +1,123 @@
+# yaml-language-server: $schema=https://json.schemastore.org/dependabot-2.0.json
+#
+# Conservative Dependabot config for a PNPM + Turborepo monorepo.
+# Design goals:
+#   - One root npm entry (PNPM workspaces handle resolution)
+#   - Group low-risk patch/minor updates to reduce PR noise
+#   - Keep major bumps ungrouped so each is individually reviewable
+#   - Explicitly ignore SDK-coupled and infrastructure-managed deps
+#   - Separate github-actions ecosystem entry
+
+version: 2
+
+updates:
+  # ──────────────────────────────────────────────
+  # npm ecosystem (PNPM workspace root)
+  # ──────────────────────────────────────────────
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    versioning-strategy: increase
+
+    # ── Ignore list ──────────────────────────────
+    # These dependencies are tightly coupled to SDK releases, framework
+    # internals, or infrastructure tooling. Updating them independently
+    # risks breaking the build or diverging from coordinated upgrade plans.
+    ignore:
+      # Expo SDK — all Expo packages must move together during SDK upgrades.
+      # Partial bumps break native module compatibility.
+      - dependency-name: "expo"
+      - dependency-name: "expo-*"
+      - dependency-name: "@expo/*"
+
+      # React & React DOM — pinned to the version supported by the current
+      # Expo SDK and Next.js major. Bumping independently causes type and
+      # runtime mismatches across web and mobile.
+      - dependency-name: "react"
+      - dependency-name: "react-dom"
+      - dependency-name: "@types/react"
+      - dependency-name: "@types/react-dom"
+
+      # React Native — version-locked to the Expo SDK. Independent bumps
+      # break the managed workflow and native builds.
+      - dependency-name: "react-native"
+      - dependency-name: "react-native-*"
+      - dependency-name: "@react-native/*"
+
+      # React Navigation — version matrix is coupled to React Native and
+      # Expo Router; must be upgraded as a coordinated set.
+      - dependency-name: "@react-navigation/*"
+
+      # Next.js — major upgrades require migration guides, middleware
+      # changes, and build config updates. Handled manually.
+      - dependency-name: "next"
+
+      # Prisma — ORM + client + engine versions must match exactly.
+      # Upgraded together via dedicated migration workflow.
+      - dependency-name: "prisma"
+      - dependency-name: "@prisma/*"
+
+      # Turborepo — build orchestrator; upgrades can change caching
+      # behavior and task resolution. Upgraded manually.
+      - dependency-name: "turbo"
+
+      # NestJS — framework packages share a version matrix. Partial
+      # bumps cause decorator/DI incompatibilities.
+      - dependency-name: "@nestjs/*"
+
+      # TypeScript — managed manually per ts-modernization plan.
+      # Compiler upgrades affect every package in the monorepo.
+      - dependency-name: "typescript"
+
+    # ── Groups ───────────────────────────────────
+    groups:
+      # Dev-tooling patches & minors — linting, formatting, git hooks.
+      dev-tooling:
+        applies-to: version-updates
+        patterns:
+          - "eslint"
+          - "eslint-*"
+          - "@eslint/*"
+          - "prettier"
+          - "lint-staged"
+          - "husky"
+          - "commitlint"
+          - "@commitlint/*"
+        update-types:
+          - minor
+          - patch
+
+      # Test-tooling patches & minors — test runners and assertion libs.
+      test-tooling:
+        applies-to: version-updates
+        patterns:
+          - "jest"
+          - "jest-*"
+          - "@jest/*"
+          - "ts-jest"
+          - "@testing-library/*"
+          - "playwright"
+          - "@playwright/*"
+        update-types:
+          - minor
+          - patch
+
+  # ──────────────────────────────────────────────
+  # GitHub Actions ecosystem
+  # ──────────────────────────────────────────────
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 3
+
+    groups:
+      # Group all Actions version bumps into a single PR.
+      github-actions:
+        applies-to: version-updates
+        patterns:
+          - "*"

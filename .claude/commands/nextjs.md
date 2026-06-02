@@ -71,10 +71,10 @@ export async function submitForm(formData: FormData) {
 
 ## Data Fetching
 
-This project uses `@sd/contracts` for API types and React Query hooks:
+This project uses `@sd/core-contracts` for API types and React Query hooks:
 
 ```typescript
-import { useQuery } from '@sd/contracts/query';
+import { useQuery } from '@sd/core-contracts/query';
 
 function Component() {
   const { data } = useQuery(...);

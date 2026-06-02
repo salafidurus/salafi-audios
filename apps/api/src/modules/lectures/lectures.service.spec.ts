@@ -1,33 +1,51 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
-import { LecturesService } from './lectures.service';
+import { Test, TestingModule } from '@nestjs/testing';
+import { Status } from '@sd/core-db';
+import type {
+  AdminLectureUpdateDto,
+  LectureDetailDto,
+  RelatedLectureDto,
+} from '@sd/core-contracts';
 import { LecturesRepository } from './lectures.repo';
-import { LectureViewDto } from '@sd/contracts';
-import { UpsertLectureDto } from './dto/upsert-lecture.dto';
-import { Status } from '@sd/db';
+import { LecturesService } from './lectures.service';
 
 describe('LecturesService', () => {
   let service: LecturesService;
   let repo: jest.Mocked<LecturesRepository>;
 
-  const sample: LectureViewDto = {
-    id: 'l1',
-    scholarId: 'sc1',
-    slug: 'lecture-1',
-    title: 'Lecture 1',
-    status: Status.published,
-    createdAt: new Date().toISOString(),
+  const lectureDetail: LectureDetailDto = {
+    id: 'lecture-1',
+    slug: 'kitab-at-tawhid-1',
+    title: 'Kitab at-Tawhid 1',
+    description: 'Opening lesson',
+    language: 'ar',
+    durationSeconds: 3600,
+    publishedAt: '2026-04-01T00:00:00.000Z',
+    scholar: {
+      id: 'scholar-1',
+      slug: 'ibn-baz',
+      name: 'Ibn Baz',
+      imageUrl: undefined,
+    },
+    topics: [
+      {
+        id: 'topic-1',
+        slug: 'tawhid',
+        name: 'Tawhid',
+      },
+    ],
+    primaryAudioAsset: null,
+    seriesContext: null,
   };
 
-  const sampleList: LectureViewDto[] = [
-    sample,
+  const relatedLectures: RelatedLectureDto[] = [
     {
-      id: 'l2',
-      scholarId: 'sc1',
-      slug: 'lecture-2',
-      title: 'Lecture 2',
-      status: Status.published,
-      createdAt: new Date().toISOString(),
+      id: 'lecture-2',
+      slug: 'kitab-at-tawhid-2',
+      title: 'Kitab at-Tawhid 2',
+      durationSeconds: 3500,
+      scholar: lectureDetail.scholar,
+      primaryAudioAsset: null,
     },
   ];
 
@@ -38,11 +56,10 @@ describe('LecturesService', () => {
         {
           provide: LecturesRepository,
           useValue: {
-            listPublishedByScholarSlug: jest.fn(),
-            findPublishedByScholarSlugAndSlug: jest.fn(),
-            findPublishedById: jest.fn(),
-            upsertByScholarSlug: jest.fn(),
-            listPublishedByScholarAndSeriesSlug: jest.fn(),
+            findDetailById: jest.fn(),
+            findRelated: jest.fn(),
+            updateLecture: jest.fn(),
+            updateLectureStatus: jest.fn(),
           } satisfies Partial<jest.Mocked<LecturesRepository>>,
         },
       ],
@@ -56,159 +73,96 @@ describe('LecturesService', () => {
     jest.clearAllMocks();
   });
 
-  describe('listPublished', () => {
-    it('returns list of published lectures for scholar', async () => {
-      repo.listPublishedByScholarSlug.mockResolvedValue(sampleList);
+  describe('getById', () => {
+    it('returns lecture detail when found', async () => {
+      repo.findDetailById.mockResolvedValue(lectureDetail);
 
-      const result = await service.listPublished('scholar-slug');
-
-      expect(repo.listPublishedByScholarSlug).toHaveBeenCalledWith(
-        'scholar-slug',
-      );
-      expect(result).toEqual(sampleList);
+      await expect(service.getById('lecture-1')).resolves.toEqual(lectureDetail);
+      expect(repo.findDetailById).toHaveBeenCalledWith('lecture-1');
     });
 
-    it('returns empty array when no lectures', async () => {
-      repo.listPublishedByScholarSlug.mockResolvedValue([]);
+    it('throws when the lecture does not exist', async () => {
+      repo.findDetailById.mockResolvedValue(null);
 
-      const result = await service.listPublished('scholar-slug');
-
-      expect(result).toEqual([]);
-    });
-
-    it('propagates repository errors', async () => {
-      repo.listPublishedByScholarSlug.mockRejectedValue(new Error('DB error'));
-
-      await expect(service.listPublished('scholar-slug')).rejects.toThrow(
-        'DB error',
+      await expect(service.getById('missing')).rejects.toThrow(
+        new NotFoundException('Lecture "missing" not found'),
       );
     });
   });
 
-  describe('getPublished', () => {
-    it('returns lecture when found', async () => {
-      repo.findPublishedByScholarSlugAndSlug.mockResolvedValue(sample);
+  describe('getRelated', () => {
+    it('returns related lectures from the repository', async () => {
+      repo.findRelated.mockResolvedValue(relatedLectures);
 
-      const result = await service.getPublished('scholar', 'lecture-1');
+      await expect(service.getRelated('lecture-1')).resolves.toEqual(relatedLectures);
+      expect(repo.findRelated).toHaveBeenCalledWith('lecture-1');
+    });
+  });
 
-      expect(repo.findPublishedByScholarSlugAndSlug).toHaveBeenCalledWith(
-        'scholar',
+  describe('updateLecture', () => {
+    it('returns a success payload when the lecture is updated', async () => {
+      const dto: AdminLectureUpdateDto = { title: 'Updated title' };
+      repo.updateLecture.mockResolvedValue(true);
+
+      await expect(service.updateLecture('lecture-1', dto)).resolves.toEqual({
+        success: true,
+        message: 'Lecture updated successfully',
+      });
+      expect(repo.updateLecture).toHaveBeenCalledWith('lecture-1', dto);
+    });
+
+    it('throws when updating a missing lecture', async () => {
+      repo.updateLecture.mockResolvedValue(false);
+
+      await expect(service.updateLecture('missing', {})).rejects.toThrow(
+        new NotFoundException('Lecture "missing" not found'),
+      );
+    });
+  });
+
+  describe('publishLecture', () => {
+    it('publishes the lecture through the repository', async () => {
+      repo.updateLectureStatus.mockResolvedValue(true);
+
+      await expect(service.publishLecture('lecture-1')).resolves.toEqual({
+        success: true,
+        message: 'Lecture published successfully',
+      });
+      expect(repo.updateLectureStatus).toHaveBeenCalledWith(
         'lecture-1',
+        Status.published,
       );
-      expect(result).toEqual(sample);
     });
 
-    it('throws NotFoundException when lecture missing', async () => {
-      repo.findPublishedByScholarSlugAndSlug.mockResolvedValue(null);
+    it('throws when publishing a missing lecture', async () => {
+      repo.updateLectureStatus.mockResolvedValue(false);
 
-      await expect(
-        service.getPublished('sch', 'missing'),
-      ).rejects.toBeInstanceOf(NotFoundException);
-    });
-  });
-
-  describe('getPublishedById', () => {
-    it('returns lecture by id when found', async () => {
-      repo.findPublishedById.mockResolvedValue(sample);
-
-      const result = await service.getPublishedById('l1');
-
-      expect(repo.findPublishedById).toHaveBeenCalledWith('l1');
-      expect(result).toEqual(sample);
-    });
-
-    it('throws NotFoundException when lecture not found by id', async () => {
-      repo.findPublishedById.mockResolvedValue(null);
-
-      await expect(
-        service.getPublishedById('invalid-id'),
-      ).rejects.toBeInstanceOf(NotFoundException);
-    });
-
-    it('propagates repository errors', async () => {
-      repo.findPublishedById.mockRejectedValue(new Error('DB failure'));
-
-      await expect(service.getPublishedById('l1')).rejects.toThrow(
-        'DB failure',
+      await expect(service.publishLecture('missing')).rejects.toThrow(
+        new NotFoundException('Lecture "missing" not found'),
       );
     });
   });
 
-  describe('upsert', () => {
-    it('creates/updates lecture and returns DTO', async () => {
-      const dto: UpsertLectureDto = {
-        slug: 'lecture-1',
-        title: 'Lecture 1',
-        status: Status.published,
-      };
-      repo.upsertByScholarSlug.mockResolvedValue(sample);
+  describe('archiveLecture', () => {
+    it('archives the lecture through the repository', async () => {
+      repo.updateLectureStatus.mockResolvedValue(true);
 
-      const result = await service.upsert('scholar-slug', dto);
-
-      expect(repo.upsertByScholarSlug).toHaveBeenCalledWith(
-        'scholar-slug',
-        dto,
+      await expect(service.archiveLecture('lecture-1')).resolves.toEqual({
+        success: true,
+        message: 'Lecture archived successfully',
+      });
+      expect(repo.updateLectureStatus).toHaveBeenCalledWith(
+        'lecture-1',
+        Status.archived,
       );
-      expect(result).toEqual(sample);
     });
 
-    it('throws NotFoundException when scholar not found', async () => {
-      const dto: UpsertLectureDto = { slug: 'l', title: 't' };
-      repo.upsertByScholarSlug.mockResolvedValue(null);
+    it('throws when archiving a missing lecture', async () => {
+      repo.updateLectureStatus.mockResolvedValue(false);
 
-      await expect(
-        service.upsert('missing-scholar', dto),
-      ).rejects.toBeInstanceOf(NotFoundException);
-    });
-
-    it('propagates repository errors', async () => {
-      const dto: UpsertLectureDto = { slug: 'l', title: 't' };
-      repo.upsertByScholarSlug.mockRejectedValue(new Error('DB error'));
-
-      await expect(service.upsert('scholar', dto)).rejects.toThrow('DB error');
-    });
-  });
-
-  describe('listPublishedForSeries', () => {
-    it('returns lectures for series', async () => {
-      repo.listPublishedByScholarAndSeriesSlug.mockResolvedValue(sampleList);
-
-      const result = await service.listPublishedForSeries(
-        'scholar',
-        'series-slug',
+      await expect(service.archiveLecture('missing')).rejects.toThrow(
+        new NotFoundException('Lecture "missing" not found'),
       );
-
-      expect(repo.listPublishedByScholarAndSeriesSlug).toHaveBeenCalledWith(
-        'scholar',
-        'series-slug',
-      );
-      expect(result).toEqual(sampleList);
-    });
-
-    it('throws NotFoundException when series not found', async () => {
-      repo.listPublishedByScholarAndSeriesSlug.mockResolvedValue(null);
-
-      await expect(
-        service.listPublishedForSeries('scholar', 'missing-series'),
-      ).rejects.toBeInstanceOf(NotFoundException);
-    });
-
-    it('returns empty array when series exists but has no lectures', async () => {
-      repo.listPublishedByScholarAndSeriesSlug.mockResolvedValue([]);
-
-      const result = await service.listPublishedForSeries('scholar', 'series');
-
-      expect(result).toEqual([]);
-    });
-
-    it('propagates repository errors', async () => {
-      repo.listPublishedByScholarAndSeriesSlug.mockRejectedValue(
-        new Error('DB error'),
-      );
-
-      await expect(
-        service.listPublishedForSeries('scholar', 'series'),
-      ).rejects.toThrow('DB error');
     });
   });
 });

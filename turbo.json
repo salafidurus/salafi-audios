@@ -1,6 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
+  // Prisma client generation needs DB URLs at build time; pass them through to all tasks
   "globalPassThroughEnv": ["DIRECT_DB_URL", "DATABASE_URL"],
   "tasks": {
     "dev": {
@@ -8,18 +9,28 @@
       "persistent": true
     },
     "build": {
+      // Topological: packages build before apps that depend on them
       "dependsOn": ["^build"],
+      // Env files included because Next.js and NestJS inline env vars at build time
       "inputs": ["$TURBO_DEFAULT$", ".env*", "tsconfig*.json", "next.config.*"],
       "outputs": ["dist/**", "build/**", ".next/**", "lib/**", "generated/**", "src/generated/**"]
     },
     "lint": {
       "dependsOn": ["^lint"],
-      "inputs": ["$TURBO_DEFAULT$", ".eslintrc*", "eslint.config.*", "packages/config/eslint/**"],
+      // Include shared ESLint config so lint re-runs when rules change
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        ".eslintrc*",
+        "eslint.config.*",
+        "packages/util-config/eslint/**"
+      ],
       "outputs": []
     },
     "typecheck": {
       "dependsOn": ["^typecheck"],
-      "inputs": ["$TURBO_DEFAULT$", "tsconfig*.json", "packages/config/tsconfig/**"],
+      // Include shared tsconfig so typecheck re-runs when compiler options change
+      "inputs": ["$TURBO_DEFAULT$", "tsconfig*.json", "packages/util-config/tsconfig/**"],
+      // Prisma client generation is part of typecheck pipeline — output cached for downstream
       "outputs": ["generated/**", "src/generated/**"]
     },
     "test": {
@@ -35,23 +46,33 @@
     },
     "test:e2e": {
       "dependsOn": ["^test:e2e"],
+      // E2E tests hit external services/browsers — results are not reproducible from inputs alone
       "cache": false
     },
     "test:prepush": {
       "dependsOn": ["^test:prepush"],
       "cache": true
     },
+    // Generates OpenAPI spec from NestJS decorators for contract-first API development
     "openapi": {
       "dependsOn": ["^openapi"],
       "inputs": ["$TURBO_DEFAULT$", "src/**", "package.json", "tsconfig*.json"],
       "outputs": ["openapi.json"]
     },
+    // Builds shared contract types (DTOs, response shapes) consumed by web and mobile
     "contract": {
       "dependsOn": ["^contract"],
       "inputs": ["$TURBO_DEFAULT$", "src/**", "package.json", "tsconfig*.json"],
       "outputs": ["dist/**"]
     },
     "dev:mobile:prebuild": {
+      // Packages must be built first so native module linking resolves correctly
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    },
+    "dev:native:prebuild": {
+      // Packages must be built first so native module linking resolves correctly
       "dependsOn": ["^build"],
       "cache": false,
       "persistent": true

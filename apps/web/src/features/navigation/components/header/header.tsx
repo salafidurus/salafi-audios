@@ -4,12 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import styles from "@/features/navigation/components/header/header.module.css";
-import { Button } from "@/shared/components/button/button";
+import { routes } from "@sd/core-contracts";
+import styles from "./header.module.css";
+import { Button } from "@/shared/components/Button/Button";
 
 export function Header() {
   const headerRef = useRef<HTMLElement | null>(null);
-  const router = useRouter();
+  const { push } = useRouter();
 
   useEffect(() => {
     const el = headerRef.current;
@@ -42,7 +43,7 @@ export function Header() {
       className={styles.header}
     >
       <div className={styles.inner}>
-        <Link href="/" className={styles.brand} aria-label="Salafi Durus">
+        <Link href={routes.home} className={styles.brand} aria-label="Salafi Durus">
           <span className={styles.brandMark} aria-hidden="true">
             <Image
               src="/logo/logo_72.png"
@@ -57,10 +58,10 @@ export function Header() {
         </Link>
 
         <div className={styles.actions}>
-          <Button variant="ghost" size="sm" onClick={() => router.push("/sign-in")}>
+          <Button variant="ghost" size="sm" onClick={() => push(routes.signIn)}>
             Sign In
           </Button>
-          <Button variant="primary" size="sm" onClick={() => router.push("/signup")}>
+          <Button variant="primary" size="sm" onClick={() => push(routes.signUp)}>
             Create Free Account
           </Button>
         </div>

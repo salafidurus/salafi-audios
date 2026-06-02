@@ -1,419 +1,409 @@
+import { PrismaService } from '../../shared/db/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@/shared/db/prisma.service';
-import { ConfigService } from '@/shared/config/config.service';
-import { Prisma, Status } from '@sd/db';
-import { UpsertLectureDto } from './dto/upsert-lecture.dto';
-import type { LectureViewDto, AudioAssetViewDto } from '@sd/contracts';
-
-const lectureViewSelect = {
-  id: true,
-  scholarId: true,
-  seriesId: true,
-  slug: true,
-  title: true,
-  description: true,
-  language: true,
-  status: true,
-  publishedAt: true,
-  orderIndex: true,
-  durationSeconds: true,
-  deletedAt: true,
-  deleteAfterAt: true,
-  createdAt: true,
-  updatedAt: true,
-  audioAssets: {
-    where: { isPrimary: true },
-    orderBy: [{ createdAt: 'asc' }],
-    take: 1,
-    select: {
-      id: true,
-      lectureId: true,
-      url: true,
-      format: true,
-      bitrateKbps: true,
-      sizeBytes: true,
-      durationSeconds: true,
-      source: true,
-      isPrimary: true,
-      createdAt: true,
-    },
-  },
-} satisfies Prisma.LectureSelect;
-
-type LectureViewRecord = Prisma.LectureGetPayload<{
-  select: typeof lectureViewSelect;
-}>;
+import { Prisma, Status } from '@sd/core-db';
+import type {
+  LectureDetailDto,
+  RelatedLectureDto,
+  AdminLectureUpdateDto,
+  TranslationViewDto,
+  Locale,
+} from '@sd/core-contracts';
+import type { SaveLectureTranslationDto } from './dto/save-lecture-translation.dto';
 
 @Injectable()
 export class LecturesRepository {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly config: ConfigService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
-  async listPublishedByScholarSlug(
-    scholarSlug: string,
-  ): Promise<LectureViewDto[]> {
-    const scholar = await this.prisma.scholar.findFirst({
-      where: { slug: scholarSlug, isActive: true },
-      select: { id: true },
-    });
-    if (!scholar) return [];
-
-    const records = await this.prisma.lecture.findMany({
-      where: {
-        scholarId: scholar.id,
-        deletedAt: null,
-        status: Status.published,
-        OR: [
-          { seriesId: null },
-          {
-            series: {
-              is: {
-                deletedAt: null,
-                status: Status.published,
-                OR: [
-                  { collectionId: null },
-                  {
-                    collection: {
-                      is: {
-                        deletedAt: null,
-                        status: Status.published,
-                      },
-                    },
-                  },
-                ],
-              },
-            },
-          },
-        ],
-      },
-      orderBy: [{ orderIndex: 'asc' }, { title: 'asc' }],
-      select: lectureViewSelect,
-    });
-
-    return records.map((r) => this.toViewDto(r));
-  }
-
-  async listPublishedByScholarSlugPaginated(
-    scholarSlug: string,
-    limit = 20,
-    cursor?: string,
-  ): Promise<LectureViewDto[]> {
-    const scholar = await this.prisma.scholar.findFirst({
-      where: { slug: scholarSlug, isActive: true },
-      select: { id: true },
-    });
-
-    if (!scholar) {
-      return [];
-    }
-
-    const records = await this.prisma.lecture.findMany({
-      where: {
-        scholarId: scholar.id,
-        deletedAt: null,
-        status: Status.published,
-        OR: [
-          { seriesId: null },
-          {
-            series: {
-              is: {
-                deletedAt: null,
-                status: Status.published,
-                OR: [
-                  { collectionId: null },
-                  {
-                    collection: {
-                      is: {
-                        deletedAt: null,
-                        status: Status.published,
-                      },
-                    },
-                  },
-                ],
-              },
-            },
-          },
-        ],
-      },
-      orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
-      take: limit,
-      skip: cursor ? 1 : 0,
-      cursor: cursor ? { id: cursor } : undefined,
-      select: lectureViewSelect,
-    });
-
-    return records.map((r) => this.toViewDto(r));
-  }
-
-  async findPublishedByScholarSlugAndSlug(
-    scholarSlug: string,
-    slug: string,
-  ): Promise<LectureViewDto | null> {
-    const scholar = await this.prisma.scholar.findFirst({
-      where: { slug: scholarSlug, isActive: true },
-      select: { id: true },
-    });
-    if (!scholar) return null;
-
-    const record = await this.prisma.lecture.findFirst({
-      where: {
-        scholarId: scholar.id,
-        slug,
-        deletedAt: null,
-        status: Status.published,
-        OR: [
-          { seriesId: null },
-          {
-            series: {
-              is: {
-                deletedAt: null,
-                status: Status.published,
-                OR: [
-                  { collectionId: null },
-                  {
-                    collection: {
-                      is: {
-                        deletedAt: null,
-                        status: Status.published,
-                      },
-                    },
-                  },
-                ],
-              },
-            },
-          },
-        ],
-      },
-      select: lectureViewSelect,
-    });
-
-    return record ? this.toViewDto(record) : null;
-  }
-
-  async findPublishedById(id: string): Promise<LectureViewDto | null> {
-    const record = await this.prisma.lecture.findFirst({
+  async findDetailById(id: string): Promise<LectureDetailDto | null> {
+    const lecture = await this.prisma.lecture.findFirst({
       where: {
         id,
         deletedAt: null,
         status: Status.published,
+        scholar: { isActive: true },
+      },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        description: true,
+        language: true,
+        durationSeconds: true,
+        publishedAt: true,
+        seriesId: true,
+        orderIndex: true,
         scholar: {
-          isActive: true,
+          select: {
+            id: true,
+            slug: true,
+            name: true,
+            imageUrl: true,
+          },
         },
-        OR: [
-          { seriesId: null },
-          {
-            series: {
-              is: {
-                deletedAt: null,
-                status: Status.published,
-                OR: [
-                  { collectionId: null },
-                  {
-                    collection: {
-                      is: {
-                        deletedAt: null,
-                        status: Status.published,
-                      },
-                    },
-                  },
-                ],
+        topics: {
+          select: {
+            topic: {
+              select: {
+                id: true,
+                slug: true,
+                name: true,
               },
             },
           },
-        ],
+        },
+        audioAssets: {
+          where: { isPrimary: true },
+          take: 1,
+          select: {
+            id: true,
+            url: true,
+            format: true,
+            bitrateKbps: true,
+            durationSeconds: true,
+          },
+        },
       },
-      select: lectureViewSelect,
     });
 
-    return record ? this.toViewDto(record) : null;
-  }
+    if (!lecture) return null;
 
-  async upsertByScholarSlug(
-    scholarSlug: string,
-    input: UpsertLectureDto,
-  ): Promise<LectureViewDto | null> {
-    const scholar = await this.prisma.scholar.findUnique({
-      where: { slug: scholarSlug },
-      select: { id: true },
-    });
-    if (!scholar) return null;
-
-    const seriesId = await this.resolveOptionalSeriesId(
-      scholar.id,
-      input.seriesSlug,
+    const seriesContext = await this.resolveSeriesContext(
+      lecture.seriesId,
+      lecture.id,
     );
-    if (input.seriesSlug && !seriesId) return null; // parent series not found
 
-    const record = await this.prisma.lecture.upsert({
-      where: { scholarId_slug: { scholarId: scholar.id, slug: input.slug } },
-      select: lectureViewSelect,
-      create: {
-        scholarId: scholar.id,
-        seriesId,
-        slug: input.slug,
-        title: input.title,
-        description: input.description,
-        language: input.language,
-        status: input.status ?? Status.draft,
-        publishedAt: input.publishedAt ? new Date(input.publishedAt) : null,
-        orderIndex: input.orderIndex,
-        durationSeconds: input.durationSeconds,
-        deletedAt: input.deletedAt ? new Date(input.deletedAt) : null,
-        deleteAfterAt: input.deleteAfterAt
-          ? new Date(input.deleteAfterAt)
-          : null,
-      },
-      update: {
-        seriesId,
-        title: input.title,
-        description: input.description,
-        language: input.language,
-        status: input.status ?? Status.draft,
-        publishedAt: input.publishedAt ? new Date(input.publishedAt) : null,
-        orderIndex: input.orderIndex,
-        durationSeconds: input.durationSeconds,
-        deletedAt: input.deletedAt ? new Date(input.deletedAt) : null,
-        deleteAfterAt: input.deleteAfterAt
-          ? new Date(input.deleteAfterAt)
-          : null,
-      },
-    });
+    const primaryAudio = lecture.audioAssets[0] ?? null;
 
-    return this.toViewDto(record);
+    return {
+      id: lecture.id,
+      slug: lecture.slug,
+      title: lecture.title,
+      description: lecture.description ?? undefined,
+      language: lecture.language ?? undefined,
+      durationSeconds: lecture.durationSeconds ?? undefined,
+      publishedAt: lecture.publishedAt?.toISOString(),
+      scholar: {
+        id: lecture.scholar.id,
+        slug: lecture.scholar.slug,
+        name: lecture.scholar.name,
+        imageUrl: lecture.scholar.imageUrl ?? undefined,
+      },
+      topics: lecture.topics.map((lt) => ({
+        id: lt.topic.id,
+        slug: lt.topic.slug,
+        name: lt.topic.name,
+      })),
+      primaryAudioAsset: primaryAudio
+        ? {
+            id: primaryAudio.id,
+            url: primaryAudio.url,
+            format: primaryAudio.format ?? undefined,
+            bitrateKbps: primaryAudio.bitrateKbps ?? undefined,
+            durationSeconds: primaryAudio.durationSeconds ?? undefined,
+          }
+        : null,
+      seriesContext,
+    };
   }
 
-  /**
-   * List published lectures that belong to a given scholar + series.
-   * Returns null if either the scholar or the series is not found.
-   */
-  async listPublishedByScholarAndSeriesSlug(
-    scholarSlug: string,
-    seriesSlug: string,
-  ): Promise<LectureViewDto[] | null> {
-    const scholar = await this.prisma.scholar.findFirst({
-      where: { slug: scholarSlug, isActive: true },
-      select: { id: true },
-    });
-
-    if (!scholar) {
-      return null;
-    }
+  private async resolveSeriesContext(
+    seriesId: string | null,
+    lectureId: string,
+  ): Promise<LectureDetailDto['seriesContext']> {
+    if (!seriesId) return null;
 
     const series = await this.prisma.series.findFirst({
       where: {
-        scholarId: scholar.id,
-        slug: seriesSlug,
+        id: seriesId,
         deletedAt: null,
         status: Status.published,
-        OR: [
-          { collectionId: null },
+      },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+      },
+    });
+
+    if (!series) return null;
+
+    const siblings = await this.prisma.lecture.findMany({
+      where: {
+        seriesId,
+        deletedAt: null,
+        status: Status.published,
+        scholar: { isActive: true },
+      },
+      orderBy: [{ orderIndex: 'asc' }, { title: 'asc' }],
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        orderIndex: true,
+      },
+    });
+
+    const currentIndex = siblings.findIndex((s) => s.id === lectureId);
+    const prev = currentIndex > 0 ? siblings[currentIndex - 1] : null;
+    const next =
+      currentIndex >= 0 && currentIndex < siblings.length - 1
+        ? siblings[currentIndex + 1]
+        : null;
+
+    return {
+      seriesId: series.id,
+      seriesTitle: series.title,
+      seriesSlug: series.slug,
+      prevLecture: prev
+        ? { id: prev.id, slug: prev.slug, title: prev.title }
+        : null,
+      nextLecture: next
+        ? { id: next.id, slug: next.slug, title: next.title }
+        : null,
+    };
+  }
+
+  async findRelated(
+    lectureId: string,
+    limit: number = 6,
+  ): Promise<RelatedLectureDto[]> {
+    const lecture = await this.prisma.lecture.findFirst({
+      where: { id: lectureId, deletedAt: null },
+      select: {
+        scholarId: true,
+        seriesId: true,
+        topics: {
+          select: { topicId: true },
+        },
+      },
+    });
+
+    if (!lecture) return [];
+
+    const topicIds = lecture.topics.map((topic) => topic.topicId);
+
+    const related = await this.prisma.lecture.findMany({
+      where: {
+        AND: [
+          { id: { not: lectureId } },
+          { deletedAt: null },
+          { status: Status.published },
+          { scholar: { isActive: true } },
           {
-            collection: {
-              is: {
-                deletedAt: null,
-                status: Status.published,
-              },
-            },
+            OR: [
+              { scholarId: lecture.scholarId },
+              { topics: { some: { topicId: { in: topicIds } } } },
+              ...(lecture.seriesId ? [{ seriesId: lecture.seriesId }] : []),
+            ],
           },
         ],
       },
-      select: { id: true },
-    });
-
-    if (!series) {
-      return null;
-    }
-
-    const records = await this.prisma.lecture.findMany({
-      where: {
-        scholarId: scholar.id,
-        seriesId: series.id,
-        deletedAt: null,
-        status: Status.published,
+      take: Math.max(limit * 3, limit),
+      orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        durationSeconds: true,
+        scholarId: true,
+        seriesId: true,
+        publishedAt: true,
+        createdAt: true,
+        topics: {
+          select: {
+            topicId: true,
+          },
+        },
+        scholar: {
+          select: {
+            id: true,
+            slug: true,
+            name: true,
+            imageUrl: true,
+          },
+        },
+        audioAssets: {
+          where: { isPrimary: true },
+          take: 1,
+          select: {
+            id: true,
+            url: true,
+            format: true,
+            bitrateKbps: true,
+            durationSeconds: true,
+          },
+        },
       },
-      orderBy: [
-        { orderIndex: 'asc' },
-        { publishedAt: 'desc' },
-        { title: 'asc' },
-      ],
-      select: lectureViewSelect,
     });
 
-    return records.map((r) => this.toViewDto(r));
+    const rankedRelated = related
+      .map((item) => {
+        const sharedTopicCount = item.topics.reduce(
+          (count, topic) => count + (topicIds.includes(topic.topicId) ? 1 : 0),
+          0,
+        );
+        const relevanceScore =
+          (item.scholarId === lecture.scholarId ? 100 : 0) +
+          (lecture.seriesId && item.seriesId === lecture.seriesId ? 40 : 0) +
+          sharedTopicCount * 10;
+
+        return {
+          item,
+          relevanceScore,
+          sortDate: item.publishedAt ?? item.createdAt,
+        };
+      })
+      .sort((left, right) => {
+        if (right.relevanceScore !== left.relevanceScore) {
+          return right.relevanceScore - left.relevanceScore;
+        }
+
+        return right.sortDate.getTime() - left.sortDate.getTime();
+      })
+      .slice(0, limit)
+      .map(({ item }) => item);
+
+    return rankedRelated.map((r) => ({
+      id: r.id,
+      slug: r.slug,
+      title: r.title,
+      durationSeconds: r.durationSeconds ?? undefined,
+      scholar: {
+        id: r.scholar.id,
+        slug: r.scholar.slug,
+        name: r.scholar.name,
+        imageUrl: r.scholar.imageUrl ?? undefined,
+      },
+      primaryAudioAsset: r.audioAssets[0]
+        ? {
+            id: r.audioAssets[0].id,
+            url: r.audioAssets[0].url,
+            format: r.audioAssets[0].format ?? undefined,
+            bitrateKbps: r.audioAssets[0].bitrateKbps ?? undefined,
+            durationSeconds: r.audioAssets[0].durationSeconds ?? undefined,
+          }
+        : null,
+    }));
   }
 
-  // ----------------
-  // Helpers
-  // ----------------
-
-  private async resolveOptionalSeriesId(
-    scholarId: string,
-    seriesSlug?: string,
-  ): Promise<string | null> {
-    if (!seriesSlug) return null;
-
-    const series = await this.prisma.series.findUnique({
-      where: { scholarId_slug: { scholarId, slug: seriesSlug } },
-      select: { id: true },
-    });
-
-    return series?.id ?? null;
+  async updateLecture(
+    id: string,
+    updateDto: AdminLectureUpdateDto,
+  ): Promise<boolean> {
+    try {
+      await this.prisma.lecture.update({
+        where: { id },
+        data: {
+          ...updateDto,
+          updatedAt: new Date(),
+        },
+      });
+      return true;
+    } catch {
+      return false;
+    }
   }
 
-  private toViewDto(record: LectureViewRecord): LectureViewDto {
-    const primaryAudioAsset = record.audioAssets[0];
+  async updateLectureStatus(id: string, status: Status): Promise<boolean> {
+    try {
+      const updateData: Prisma.LectureUpdateInput = {
+        status,
+        updatedAt: new Date(),
+      };
 
+      // Set publishedAt when publishing
+      if (status === Status.published) {
+        updateData.publishedAt = new Date();
+      }
+
+      await this.prisma.lecture.update({
+        where: { id },
+        data: updateData,
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  // ─── Lecture translations ─────────────────────────────────────────────────
+
+  private mapLectureTranslation(t: {
+    locale: string;
+    status: string;
+    title: string;
+    description: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+  }): TranslationViewDto {
     return {
-      id: record.id,
-      scholarId: record.scholarId,
-      seriesId: record.seriesId ?? undefined,
-      slug: record.slug,
-      title: record.title,
-      description: record.description ?? undefined,
-      language: record.language ?? undefined,
-      status: record.status,
-      publishedAt: record.publishedAt?.toISOString(),
-      orderIndex: record.orderIndex ?? undefined,
-      durationSeconds: record.durationSeconds ?? undefined,
-      primaryAudioAsset: primaryAudioAsset
-        ? this.toPrimaryAudioAssetDto(primaryAudioAsset)
-        : undefined,
-      deletedAt: record.deletedAt?.toISOString(),
-      deleteAfterAt: record.deleteAfterAt?.toISOString(),
-      createdAt: record.createdAt.toISOString(),
-      updatedAt: record.updatedAt?.toISOString(),
+      locale: t.locale as Locale,
+      status: t.status === 'published' ? 'published' : 'draft',
+      fields: { title: t.title, description: t.description },
+      createdAt: t.createdAt.toISOString(),
+      updatedAt: t.updatedAt.toISOString(),
     };
   }
 
-  private toPrimaryAudioAssetDto(
-    asset: LectureViewRecord['audioAssets'][number],
-  ): AudioAssetViewDto {
-    return {
-      id: asset.id,
-      lectureId: asset.lectureId,
-      url: this.toPublicUrl(asset.url),
-      format: asset.format ?? undefined,
-      bitrateKbps: asset.bitrateKbps ?? undefined,
-      sizeBytes: asset.sizeBytes !== null ? Number(asset.sizeBytes) : undefined,
-      durationSeconds: asset.durationSeconds ?? undefined,
-      source: asset.source ?? undefined,
-      isPrimary: asset.isPrimary,
-      createdAt: asset.createdAt.toISOString(),
-    };
+  async listLectureTranslations(
+    lectureId: string,
+  ): Promise<TranslationViewDto[]> {
+    const records = await this.prisma.lectureTranslation.findMany({
+      where: { lectureId },
+      orderBy: { locale: 'asc' },
+    });
+    return records.map((r) => this.mapLectureTranslation(r));
   }
 
-  private toPublicUrl(value: string): string {
-    if (/^[a-z]+:\/\//i.test(value)) {
-      return value;
-    }
+  async upsertLectureTranslation(
+    lectureId: string,
+    dto: SaveLectureTranslationDto,
+  ): Promise<TranslationViewDto> {
+    const record = await this.prisma.lectureTranslation.upsert({
+      where: { lectureId_locale: { lectureId, locale: dto.locale } },
+      create: {
+        lectureId,
+        locale: dto.locale,
+        title: dto.title,
+        description: dto.description ?? null,
+        status: 'draft',
+      },
+      update: { title: dto.title, description: dto.description ?? null },
+    });
+    return this.mapLectureTranslation(record);
+  }
 
-    const base = this.config.ASSET_CDN_BASE_URL;
-    if (!base) {
-      return value;
-    }
+  async updateLectureTranslation(
+    lectureId: string,
+    locale: string,
+    fields: Partial<{ title: string; description: string | null }>,
+  ): Promise<TranslationViewDto> {
+    const record = await this.prisma.lectureTranslation.update({
+      where: { lectureId_locale: { lectureId, locale: locale as Locale } },
+      data: { ...fields },
+    });
+    return this.mapLectureTranslation(record);
+  }
 
-    return `${base.replace(/\/$/, '')}/${value.replace(/^\//, '')}`;
+  async publishLectureTranslation(
+    lectureId: string,
+    locale: string,
+  ): Promise<TranslationViewDto> {
+    const record = await this.prisma.lectureTranslation.update({
+      where: { lectureId_locale: { lectureId, locale: locale as Locale } },
+      data: { status: 'published' },
+    });
+    return this.mapLectureTranslation(record);
+  }
+
+  async unpublishLectureTranslation(
+    lectureId: string,
+    locale: string,
+  ): Promise<TranslationViewDto> {
+    const record = await this.prisma.lectureTranslation.update({
+      where: { lectureId_locale: { lectureId, locale: locale as Locale } },
+      data: { status: 'draft' },
+    });
+    return this.mapLectureTranslation(record);
   }
 }

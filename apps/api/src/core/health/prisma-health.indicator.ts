@@ -1,4 +1,4 @@
-import { PrismaService } from '@/shared/db/prisma.service';
+import { PrismaService } from '../../shared/db/prisma.service';
 import { Injectable } from '@nestjs/common';
 import {
   HealthCheckError,

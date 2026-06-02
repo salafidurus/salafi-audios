@@ -1,4 +1,6 @@
 @import "tailwindcss";
+/* Include shared package sources so desktop-web utility classes are emitted in the app build. */
+@source "../../../../packages/**/*.{js,jsx,ts,tsx}";
 
 @theme inline {
   --surface-default: var(--surface-default);
@@ -56,7 +58,7 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding-left: var(--sidebar-width, 16.5rem);
+  padding-inline-start: var(--sidebar-width, 16.5rem);
   padding-top: 0;
   min-height: 0;
   width: 100%;
@@ -79,7 +81,7 @@ body {
   }
 
   .appMain {
-    padding-left: 0;
+    padding-inline-start: 0;
     padding-bottom: var(--bottom-tab-height, 4.25rem);
   }
 }
@@ -96,4 +98,8 @@ h4 {
 input:focus,
 textarea:focus {
   outline: none;
+}
+
+[dir="rtl"] .icon-directional {
+  transform: scaleX(-1);
 }

@@ -1,0 +1,8 @@
+{
+  "extends": "../util-config/tsconfig/packages.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "moduleSuffixes": [".desktop.web", ".mobile.web", ".native", ".web", ""]
+  },
+  "include": ["src"]
+}

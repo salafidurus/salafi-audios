@@ -1,5 +1,17 @@
-import { ScreenInProgress } from "@/shared/components/screen-in-progress/screen-in-progress";
+"use client";
 
-export function AccountScreen() {
-  return <ScreenInProgress title="Account" description="Account settings are coming soon." />;
+import { Responsive } from "@/shared/components/Responsive";
+import { AccountDesktopScreen } from "./account.screen.desktop";
+import { AccountMobileScreen } from "./account.screen.mobile";
+
+export type AccountScreenProps = {
+  onNavigateToProfile?: () => void;
+  onNavigateToLegal?: () => void;
+  onSignOut?: () => void;
+};
+
+export function AccountScreen(props: AccountScreenProps) {
+  const mobile = <AccountMobileScreen {...props} />;
+  const desktop = <AccountDesktopScreen {...props} />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }

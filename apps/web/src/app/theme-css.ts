@@ -1,6 +1,11 @@
 import { lightWebTheme, darkWebTheme } from "@sd/design-tokens";
 
 const createThemeCss = (selector: string, theme: typeof lightWebTheme) => {
+  const inputSurfaceRest = theme.colors.surface.subtle;
+  const inputSurfaceFocus = theme.colors.surface.default;
+  const inputBorderRest = theme.recipes.chrome.inputBorderRest;
+  const inputBorderFocus = theme.colors.border.primary;
+
   return `
 ${selector} {
   --surface-canvas: ${theme.colors.surface.canvas};
@@ -44,6 +49,42 @@ ${selector} {
   --action-primary: ${theme.colors.action.primary};
   --action-primary-hover: ${theme.colors.action.primaryHover};
   --action-primary-active: ${theme.colors.action.primaryActive};
+  --accent-primary-bg: ${theme.recipes.primaryCta.background};
+  --accent-primary-bg-hover: ${theme.recipes.primaryCta.backgroundHover};
+  --accent-primary-bg-active: ${theme.recipes.primaryCta.backgroundActive};
+  --accent-primary-border: ${theme.recipes.primaryCta.borderColor};
+  --accent-primary-border-hover: ${theme.recipes.primaryCta.borderColorHover};
+  --accent-primary-fg: ${theme.recipes.primaryCta.textColor};
+  --accent-primary-subtle-surface: ${theme.recipes.primarySubtleSurface.background};
+  --accent-primary-subtle-border: ${theme.recipes.primarySubtleSurface.borderColor};
+  --accent-primary-subtle-fg: ${theme.recipes.primarySubtleSurface.textColor};
+  --accent-secondary-subtle-surface: ${theme.recipes.secondarySubtleSurface.background};
+  --accent-secondary-subtle-border: ${theme.recipes.secondarySubtleSurface.borderColor};
+  --accent-secondary-subtle-fg: ${theme.recipes.secondarySubtleSurface.textColor};
+  --accent-mixed-surface: ${theme.recipes.mixedHeroSurface.background};
+  --accent-mixed-border: ${theme.recipes.mixedHeroSurface.borderColor};
+  --accent-selected-surface: ${theme.recipes.selectedSurface.backgroundColor};
+  --accent-selected-content: ${theme.recipes.selectedContent};
+  --accent-secondary-badge-surface: ${theme.recipes.secondarySupportingBadge.surfaceColor};
+  --accent-secondary-badge-border: ${theme.recipes.secondarySupportingBadge.borderColor};
+  --accent-secondary-badge-fg: ${theme.recipes.secondarySupportingBadge.foregroundColor};
+  --accent-promoted-panel: ${theme.recipes.mixedPromotedPanel.background};
+  --accent-promoted-panel-border: ${theme.recipes.mixedPromotedPanel.borderColor};
+  --accent-divider: ${theme.recipes.dividerColor};
+  --accent-focus-ring: ${theme.recipes.focusRingColor};
+  --chrome-surface: ${theme.recipes.chrome.surface};
+  --chrome-surface-strong: ${theme.recipes.chrome.surfaceStrong};
+  --chrome-border: ${theme.recipes.chrome.border};
+  --chrome-border-strong: ${theme.recipes.chrome.borderStrong};
+  --chrome-shadow: ${theme.shadows.lg};
+  --input-surface-rest: ${inputSurfaceRest};
+  --input-surface-focus: ${inputSurfaceFocus};
+  --input-border-rest: ${inputBorderRest};
+  --input-border-focus: ${inputBorderFocus};
+  --hover-accent-surface: ${theme.recipes.chrome.hoverAccentSurface};
+  --screen-wash-primary: ${theme.recipes.screen.washPrimary};
+  --screen-wash-secondary: ${theme.recipes.screen.washSecondary};
+  --screen-wash-mixed: ${theme.recipes.screen.washMixed};
   --action-secondary: ${theme.colors.action.secondary};
   --action-secondary-hover: ${theme.colors.action.secondaryHover};
   --action-secondary-active: ${theme.colors.action.secondaryActive};

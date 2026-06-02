@@ -1,14 +1,21 @@
 import { Module } from '@nestjs/common';
-import { RecommendationsModule } from '../recommendations/recommendations.module';
-import { AdminScholarsController } from './admin-scholars.controller';
 import { ScholarsController } from './scholars.controller';
-import { ScholarRepository } from './scholars.repo';
-import { ScholarService } from './scholars.service';
+import { AdminScholarsController } from './admin-scholars.controller';
+import { ScholarsTranslationsController } from './scholars-translations.controller';
+import { SeriesTranslationsController } from './series-translations.controller';
+import { CollectionTranslationsController } from './collection-translations.controller';
+import { ScholarsService } from './scholars.service';
+import { ScholarsRepository } from './scholars.repo';
 
 @Module({
-  imports: [RecommendationsModule],
-  controllers: [ScholarsController, AdminScholarsController],
-  providers: [ScholarRepository, ScholarService],
-  exports: [ScholarService, ScholarRepository],
+  controllers: [
+    ScholarsController,
+    AdminScholarsController,
+    ScholarsTranslationsController,
+    SeriesTranslationsController,
+    CollectionTranslationsController,
+  ],
+  providers: [ScholarsService, ScholarsRepository],
+  exports: [ScholarsService, ScholarsRepository],
 })
 export class ScholarsModule {}

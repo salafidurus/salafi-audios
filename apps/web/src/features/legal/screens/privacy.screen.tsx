@@ -1,5 +1,11 @@
-import { ScreenInProgress } from "@/shared/components/screen-in-progress/screen-in-progress";
+"use client";
+
+import { Responsive } from "@/shared/components/Responsive";
+import { PrivacyDesktopScreen } from "./privacy.screen.desktop";
+import { PrivacyMobileScreen } from "./privacy.screen.mobile";
 
 export function PrivacyScreen() {
-  return <ScreenInProgress title="Privacy Policy" description="Legal content is being prepared." />;
+  const mobile = <PrivacyMobileScreen />;
+  const desktop = <PrivacyDesktopScreen />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }

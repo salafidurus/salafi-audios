@@ -1,31 +1,35 @@
+import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
+import { Public } from '../../modules/auth/decorators';
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { ApiCommonErrors } from '@/shared/decorators/api-common-errors.decorator';
 import { SkipThrottle } from '@nestjs/throttler';
+import type { LectureDetailDto, RelatedLectureDto } from '@sd/core-contracts';
 import { LecturesService } from './lectures.service';
-import type { LectureViewDto } from '@sd/contracts';
 
 @SkipThrottle()
 @ApiTags('Lectures')
 @ApiCommonErrors()
-@Controller('scholars/:scholarSlug/lectures')
+@Public()
+@Controller('lectures')
 export class LecturesController {
   constructor(private readonly lectures: LecturesService) {}
 
-  @Get()
-  @ApiOperation({ summary: 'List published lectures for a scholar' })
-  @ApiOkResponse({ description: 'List of published lectures' })
-  list(@Param('scholarSlug') scholarSlug: string): Promise<LectureViewDto[]> {
-    return this.lectures.listPublished(scholarSlug);
+  @Get(':id')
+  @ApiOperation({ summary: 'Get lecture detail by ID' })
+  @ApiOkResponse({
+    description:
+      'Lecture detail with scholar, topics, audio, and series context',
+  })
+  getById(@Param('id') id: string): Promise<LectureDetailDto> {
+    return this.lectures.getById(id);
   }
 
-  @Get(':slug')
-  @ApiOperation({ summary: 'Get a published lecture by slug' })
-  @ApiOkResponse({ description: 'Published lecture details' })
-  get(
-    @Param('scholarSlug') scholarSlug: string,
-    @Param('slug') slug: string,
-  ): Promise<LectureViewDto> {
-    return this.lectures.getPublished(scholarSlug, slug);
+  @Get(':id/related')
+  @ApiOperation({ summary: 'Get related lectures' })
+  @ApiOkResponse({
+    description: 'Related lectures based on scholar, topics, and series',
+  })
+  getRelated(@Param('id') id: string): Promise<RelatedLectureDto[]> {
+    return this.lectures.getRelated(id);
   }
 }

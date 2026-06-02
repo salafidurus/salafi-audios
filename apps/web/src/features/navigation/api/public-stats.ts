@@ -1,4 +1,4 @@
-import { httpClient, type PlatformStatsDto } from "@sd/contracts";
+import { httpClient, type PlatformStatsDto } from "@sd/core-contracts";
 
 export async function getPlatformStats(): Promise<PlatformStatsDto> {
   const response = await httpClient<PlatformStatsDto>({

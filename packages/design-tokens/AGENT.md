@@ -19,6 +19,169 @@ This package defines the design tokens used across web and mobile.
 
 - Use `@/` for package-local imports (maps to `src/*`).
 
+---
+
+## Web Usage (CSS Variables)
+
+Design tokens are injected as CSS variables in `apps/web/src/app/theme-css.ts` and applied in `apps/web/src/app/layout.tsx`.
+
+**CSS variable naming convention:**
+
+```css
+/* Colors */
+--surface-canvas
+--surface-default
+--surface-subtle
+--surface-elevated
+--surface-hover
+--surface-inverse
+--surface-primary-subtle
+--surface-secondary-subtle
+--surface-selected
+--surface-disabled
+
+--border-default
+--border-subtle
+--border-strong
+--border-muted
+--border-hover
+--border-focus
+--border-primary
+--border-primary-strong
+--border-secondary
+--border-secondary-strong
+--border-disabled
+
+--content-default
+--content-muted
+--content-subtle
+--content-strong
+--content-inverse
+--content-primary
+--content-primary-strong
+--content-secondary
+--content-secondary-strong
+--content-on-primary
+--content-on-secondary
+--content-on-danger
+--content-on-success
+--content-disabled
+
+--action-primary
+--action-secondary
+--action-danger
+--action-success
+--action-warning
+--action-info
+
+/* Spacing */
+--space-layout-page-x
+--space-layout-page-y
+--space-layout-section-y
+--space-layout-content-max
+
+--space-component-card-padding
+--space-component-panel-padding
+--space-component-chip-x
+--space-component-chip-y
+--space-component-gap-sm
+--space-component-gap-md
+--space-component-gap-lg
+--space-component-gap-xl
+
+--space-xs, --space-sm, --space-md, --space-lg, --space-xl, --space-2xl, --space-3xl, --space-4xl
+
+/* Radius */
+--radius-component-chip
+--radius-component-card
+--radius-component-panel-sm
+--radius-component-panel
+
+--radius-xs, --radius-sm, --radius-md, --radius-lg, --radius-xl, --radius-full
+
+/* Typography */
+--typo-display-lg
+--typo-display-md
+--typo-title-lg
+--typo-title-md
+--typo-body-lg
+--typo-body-md
+--typo-body-sm
+--typo-label-md
+--typo-caption
+--typo-xs
+```
+
+**Reference in CSS/modules:**
+
+```css
+.container {
+  background-color: var(--surface-canvas);
+  padding: var(--space-layout-page-x);
+  color: var(--content-default);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-component-card);
+}
+
+.title {
+  font: var(--typo-title-md);
+  color: var(--content-strong);
+}
+```
+
+**Reference in inline styles (JS):**
+
+```typescript
+style={{ backgroundColor: `var(--surface-canvas)` }}
+```
+
+---
+
+## Mobile Usage (Unistyles Theme)
+
+Design tokens are accessible via the Unistyles theme factory. Access in `StyleSheet.create()` callback or via `useUnistyles()` hook.
+
+**Access in StyleSheet.create():**
+
+```typescript
+import { StyleSheet } from "react-native-unistyles";
+
+const styles = StyleSheet.create((theme) => ({
+  container: {
+    backgroundColor: theme.colors.surface.canvas,
+    padding: theme.spacing.layout.pageX,
+    borderRadius: theme.radius.component.card,
+  },
+  title: {
+    ...theme.typography.titleMd,
+    color: theme.colors.content.strong,
+  },
+}));
+```
+
+**Access at runtime:**
+
+```typescript
+import { useUnistyles } from 'react-native-unistyles';
+
+export function Component() {
+  const { theme } = useUnistyles();
+  return <View style={{ color: theme.colors.content.muted }} />;
+}
+```
+
+**Token structure (mobile):**
+
+- `theme.colors.surface.*`, `theme.colors.border.*`, `theme.colors.content.*`, `theme.colors.action.*`
+- `theme.spacing.layout.*`, `theme.spacing.component.*`, `theme.spacing.scale.*`
+- `theme.radius.component.*`, `theme.radius.scale.*`
+- `theme.typography.*` (spreads with font-family, font-size, font-weight, line-height)
+- `theme.shadows.*` (native shadows for elevation)
+
+See packages/ui-mobile/AGENT.md for styling patterns and examples.
+
+---
+
 ## Design Token Usage Guide: `surface`, `border`, and `content`
 
 Use these token groups by **role**, not by visual preference.

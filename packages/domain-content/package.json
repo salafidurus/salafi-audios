@@ -1,0 +1,32 @@
+{
+  "name": "@sd/domain-content",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node ../../node_modules/jest/bin/jest.js --passWithNoTests",
+    "test:watch": "node ../../node_modules/jest/bin/jest.js --watch --passWithNoTests",
+    "test:cov": "node ../../node_modules/jest/bin/jest.js --coverage --passWithNoTests",
+    "test:prepush": "node ../../node_modules/jest/bin/jest.js --changedSince=origin/main --passWithNoTests"
+  },
+  "dependencies": {
+    "@sd/core-contracts": "workspace:*",
+    "@sd/core-i18n": "workspace:*",
+    "@sd/domain-audio": "workspace:*",
+    "@tanstack/react-query": "^5.69.0"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
+    "jest-environment-jsdom": "^30.2.0"
+  }
+}

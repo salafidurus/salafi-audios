@@ -4,7 +4,7 @@ Salafi Durus is a curated, offline-first lecture platform for preserving and del
 
 This monorepo contains the full system:
 
-- `apps/mobile` - offline-first listener experience + focused admin actions
+- `apps/native` - offline-first listener experience + focused admin actions
 - `apps/web` - public discovery + primary editorial workflows
 - `apps/api` - authoritative backend and API contract
 - `packages/*` - shared libraries, schemas, config, and generated client
@@ -36,6 +36,7 @@ Useful scoped dev commands:
 pnpm dev:api
 pnpm dev:web
 pnpm dev:mobile
+pnpm dev:native
 ```
 
 ## Monorepo Commands
@@ -55,6 +56,7 @@ Scoped examples:
 - API only: `pnpm --filter api <script>`
 - Web only: `pnpm --filter web <script>`
 - Mobile only: `pnpm --filter mobile <script>`
+- Native scaffold only: `pnpm --filter native <script>`
 
 ## Architecture Guardrails
 
@@ -102,7 +104,7 @@ Contributions must preserve documented architecture and guardrails.
 
 - Do not bypass backend authorization in clients.
 - Do not hand-edit generated API client output in `packages/api-client/generated/`.
-- Do not commit generated DB artifacts from `packages/db/src/generated/`.
+- Do not commit generated DB artifacts from `packages/core-db/src/generated/`.
 - Do not add app-to-app imports.
 - Update docs when behavior or architectural intent changes.
 

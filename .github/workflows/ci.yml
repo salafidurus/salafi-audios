@@ -11,6 +11,7 @@ on:
       - main
       - preview
       - production
+    # Skip CI for doc-only changes — no build/test impact
     paths-ignore:
       - "README.md"
       - "**/README.md"
@@ -19,6 +20,7 @@ on:
       - "AGENTS.md"
       - ".github/copilot-instructions.md"
 
+# Cancel stale runs on the same PR to save CI minutes on rapid pushes
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
@@ -28,12 +30,14 @@ permissions:
 
 env:
   NODE_VERSION: "22"
-  PNPM_VERSION: "10"
+  # Custom Playwright path enables GitHub Actions caching (default path is not cacheable)
   PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/ms-playwright
+  # Turbo Remote Cache credentials — shared cache across CI runs
   TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
 
 jobs:
+  # Path-based change detection: downstream jobs only run when relevant files change
   changes:
     name: detect:changes
     runs-on: ubuntu-latest
@@ -44,7 +48,7 @@ jobs:
       web_e2e: ${{ steps.filter.outputs.web_e2e }}
       db_generated_policy: ${{ steps.filter.outputs.db_generated_policy }}
     steps:
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: filter
         with:
           filters: |
@@ -58,7 +62,8 @@ jobs:
               - "packages/**/*.{ts,tsx,mts,cts}"
               - "tsconfig*.json"
               - "**/tsconfig*.json"
-              - "packages/db/prisma/**"
+              # Prisma schema changes affect generated types used by typecheck
+              - "packages/core-db/prisma/**"
             test:
               - "apps/**/*.{js,jsx,ts,tsx,mjs,cjs}"
               - "packages/**/*.{js,jsx,ts,tsx,mjs,cjs}"
@@ -66,35 +71,40 @@ jobs:
               - "packages/**/*.{spec,test}.{js,jsx,ts,tsx,mjs,cjs}"
               - "jest.config.*"
               - "**/jest.config.*"
-              - "packages/db/prisma/**"
+              # Prisma schema changes can break tests that use generated client
+              - "packages/core-db/prisma/**"
             web_e2e:
               - "apps/web/**"
               - "packages/api-client/**"
-              - "packages/env/**"
-              - "packages/i18n/**"
+              - "packages/core-env/**"
+              - "packages/core-i18n/**"
+            # Catches accidental commits of generated Prisma client output
             db_generated_policy:
-              - "packages/db/prisma/**"
-              - "packages/db/prisma.config.ts"
+              - "packages/core-db/prisma/**"
+              - "packages/core-db/prisma.config.ts"
 
+  # Shared build step: builds once and uploads artifacts for lint/typecheck/e2e to avoid redundant builds
   build_deps:
     name: build:deps
     needs: changes
+    # Only build if at least one downstream job needs the artifacts
     if: needs.changes.outputs.lint == 'true' || needs.changes.outputs.typecheck == 'true' || needs.changes.outputs.web_e2e == 'true'
     runs-on: ubuntu-latest
+    # Maps PR target branch to the correct env for secrets (DB URLs differ per environment)
     environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
+    # CI uses direct DB URL (no pooler) — DATABASE_URL alias needed for Prisma client generation
     env:
       DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
       DATABASE_URL: ${{ secrets.DIRECT_DB_URL }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
+          # Full history needed for dorny/paths-filter and turbo's --affected
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v3
-        with:
-          version: ${{ env.PNPM_VERSION }}
+      - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -105,16 +115,18 @@ jobs:
       - name: Build (all)
         run: pnpm build
 
+      # Upload compiled outputs so downstream jobs skip building
       - name: Upload build outputs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: build-outputs
           if-no-files-found: error
+          # .next contains hidden dirs (e.g., .next/cache) required for Next.js
           include-hidden-files: true
           path: |
             apps/api/dist/**
             apps/web/.next/**
-            packages/env/dist/**
+            packages/*/dist/**
 
   lint:
     name: lint
@@ -124,15 +136,13 @@ jobs:
     if: needs.changes.outputs.lint == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v3
-        with:
-          version: ${{ env.PNPM_VERSION }}
+      - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -141,7 +151,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Download build outputs
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: build-outputs
 
@@ -160,15 +170,13 @@ jobs:
       DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
       DATABASE_URL: ${{ secrets.DIRECT_DB_URL }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v3
-        with:
-          version: ${{ env.PNPM_VERSION }}
+      - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -177,7 +185,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Download build outputs
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: build-outputs
 
@@ -187,6 +195,7 @@ jobs:
   test:
     name: test
     needs:
+      # Tests run after typecheck passes — no point testing code with type errors
       - typecheck
       - changes
     if: needs.changes.outputs.test == 'true'
@@ -196,21 +205,19 @@ jobs:
       DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
       DATABASE_URL: ${{ secrets.DIRECT_DB_URL }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v3
-        with:
-          version: ${{ env.PNPM_VERSION }}
+      - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
 
       - name: Download build outputs
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: build-outputs
           path: .
@@ -229,52 +236,64 @@ jobs:
     if: needs.changes.outputs.web_e2e == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v3
-        with:
-          version: ${{ env.PNPM_VERSION }}
+      - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
 
-      - name: Cache Playwright browsers
-        id: pw-cache
-        uses: actions/cache@v4
-        with:
-          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
-          key: ${{ runner.os }}-playwright-${{ hashFiles('pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
-
       - name: Install
         run: pnpm install --frozen-lockfile
 
+      # Cache Playwright browsers (~200MB) keyed by apps/web/package.json to avoid
+      # invalidation from unrelated lockfile changes while still catching Playwright bumps
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
+          key: ${{ runner.os }}-playwright-${{ hashFiles('apps/web/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
       - name: Install Playwright browsers
-        if: steps.pw-cache.outputs.cache-hit != 'true'
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: pnpm --filter web exec playwright install --with-deps
 
+      - name: Playwright cache diagnostics
+        if: always()
+        run: |
+          echo "Cache key: ${{ runner.os }}-playwright-${{ hashFiles('apps/web/package.json') }}"
+          echo "Cache hit: ${{ steps.playwright-cache.outputs.cache-hit }}"
+          pnpm --filter web exec playwright --version || echo "Playwright not in PATH"
+          echo "Browser path: $PLAYWRIGHT_BROWSERS_PATH"
+          ls -la "$PLAYWRIGHT_BROWSERS_PATH" 2>/dev/null || echo "Browser path does not exist (cache miss expected)"
+
       - name: Download build outputs
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: build-outputs
 
       - name: Run Playwright
         env:
+          # Skip Next.js build inside Playwright — reuse the artifact from build_deps
           PW_SKIP_WEB_BUILD: "1"
         run: pnpm --filter web test:e2e
 
       - name: Upload Playwright report
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report
           path: apps/web/playwright-report
 
+  # Guardrail: generated Prisma client must never be committed to git.
+  # It's regenerated at build time from the schema; stale checked-in output causes subtle bugs.
   db_generated_policy:
     name: db:generated-policy
     needs: changes
@@ -284,15 +303,13 @@ jobs:
     env:
       DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v3
-        with:
-          version: ${{ env.PNPM_VERSION }}
+      - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -301,18 +318,18 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma client
-        run: pnpm --filter @sd/db prisma:generate
+        run: pnpm --filter @sd/core-db prisma:generate
 
       - name: Enforce generated DB artifact policy
         run: |
-          if [ -n "$(git ls-files -- packages/db/src/generated)" ]; then
-            echo "::error::Forbidden tracked files found in packages/db/src/generated"
-            git ls-files -- packages/db/src/generated
+          if [ -n "$(git ls-files -- packages/core-db/src/generated)" ]; then
+            echo "::error::Forbidden tracked files found in packages/core-db/src/generated"
+            git ls-files -- packages/core-db/src/generated
             exit 1
           fi
 
-          if [ -n "$(git status --porcelain --untracked-files=all -- packages/db/src/generated)" ]; then
-            echo "::error::packages/db/src/generated must remain git-clean after generation"
-            git status --porcelain --untracked-files=all -- packages/db/src/generated
+          if [ -n "$(git status --porcelain --untracked-files=all -- packages/core-db/src/generated)" ]; then
+            echo "::error::packages/core-db/src/generated must remain git-clean after generation"
+            git status --porcelain --untracked-files=all -- packages/core-db/src/generated
             exit 1
           fi

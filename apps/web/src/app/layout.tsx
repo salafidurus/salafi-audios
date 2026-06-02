@@ -5,11 +5,10 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { themeCss } from "./theme-css";
 
-import { Footer } from "@/features/navigation/components/footer/footer";
-import { Sidebar } from "@/features/navigation/components/sidebar/sidebar";
-import { TopAuthStrip } from "@/features/navigation/components/top-auth-strip/top-auth-strip";
-import { UnistylesStyle } from "@/core/styles/unistyles-style";
-import { Providers } from "./providers";
+import { ThemeSync } from "../core/styles/ThemeSync";
+import { Providers } from "../core/providers";
+import { getServerLocale } from "../core/i18n/locale-cookie.server";
+import { localeToDir } from "@sd/core-i18n";
 
 const fraunces = localFont({
   variable: "--font-display",
@@ -92,6 +91,22 @@ const metadataBase =
     ? new URL(process.env.NEXT_PUBLIC_WEB_URL)
     : new URL("http://localhost:3000");
 
+const themeInitScript = `
+(() => {
+  try {
+    const root = document.documentElement;
+    const explicitTheme = root.getAttribute("data-theme");
+    if (explicitTheme === "light" || explicitTheme === "dark") {
+      return;
+    }
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    root.setAttribute("data-theme", prefersDark ? "dark" : "light");
+  } catch {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+`;
+
 export const metadata: Metadata = {
   metadataBase,
   title: {
@@ -110,34 +125,33 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const locale = await getServerLocale();
+  const dir = localeToDir(locale);
+
   return (
     <html
-      lang="en"
-      suppressHydrationWarning
+      lang={locale}
+      dir={dir}
       className={`${fraunces.variable} ${manrope.variable} ${geistMono.variable}`}
     >
       <body className="antialiased">
-        <Script src="https://www.vexo.co/analytics.js" strategy="afterInteractive" />
+        <Script id="theme-init" strategy="beforeInteractive">
+          {themeInitScript}
+        </Script>
+        {process.env.NODE_ENV === "production" ? (
+          <Script src="https://www.vexo.co/analytics.js" strategy="afterInteractive" />
+        ) : null}
         <style>{themeCss}</style>
-        <UnistylesStyle>
-          <Providers>
-            <div className="appFrame">
-              <div className="appShell">
-                <Sidebar />
-                <div className="appMain">
-                  <TopAuthStrip />
-                  <div className="appContent">{children}</div>
-                  <Footer />
-                </div>
-              </div>
-            </div>
-          </Providers>
-        </UnistylesStyle>
+        <ThemeSync />
+        <Providers apiBaseUrl={apiBaseUrl} initialLocale={locale}>
+          {children}
+        </Providers>
       </body>
     </html>
   );

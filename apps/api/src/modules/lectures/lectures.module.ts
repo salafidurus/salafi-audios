@@ -1,17 +1,15 @@
 import { Module } from '@nestjs/common';
-import { LecturesBySeriesController } from './lectures-by-series.controller';
-import { LecturesByScholarController } from './lectures-by-scholar.controller';
+import { AdminLecturesController } from './admin-lectures.controller';
 import { LecturesController } from './lectures.controller';
-import { LecturesRepository } from './lectures.repo';
+import { LecturesTranslationsController } from './lectures-translations.controller';
 import { LecturesService } from './lectures.service';
-import { LecturesPublicController } from './lectures-public.controller';
+import { LecturesRepository } from './lectures.repo';
 
 @Module({
   controllers: [
     LecturesController,
-    LecturesBySeriesController,
-    LecturesByScholarController,
-    LecturesPublicController,
+    AdminLecturesController,
+    LecturesTranslationsController,
   ],
   providers: [LecturesService, LecturesRepository],
   exports: [LecturesService, LecturesRepository],

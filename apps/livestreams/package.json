@@ -1,0 +1,39 @@
+{
+  "name": "livestreams",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "nest start --watch",
+    "build": "nest build",
+    "prebuild": "pnpm --filter @sd/core-db build",
+    "start": "node dist/main.js",
+    "typecheck": "tsc --noEmit",
+    "pretypecheck": "pnpm --filter @sd/core-db build",
+    "test": "node ../../node_modules/jest/bin/jest.js --passWithNoTests",
+    "pretest": "pnpm --filter @sd/core-db build",
+    "test:watch": "node ../../node_modules/jest/bin/jest.js --watch --passWithNoTests",
+    "test:prepush": "node ../../node_modules/jest/bin/jest.js --changedSince=origin/main --passWithNoTests"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.1.3",
+    "@nestjs/core": "^11.1.3",
+    "@nestjs/platform-express": "^11.1.3",
+    "@nestjs/schedule": "^5.0.0",
+    "@sd/core-contracts": "workspace:*",
+    "@sd/core-db": "workspace:*",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "telegram": "^2.26.16"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.7",
+    "@nestjs/testing": "^11.1.3",
+    "@sd/util-config": "workspace:*",
+    "@types/express": "^5.0.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^22.10.7",
+    "jest": "^30.0.0",
+    "ts-jest": "^29.2.5",
+    "typescript": "^5.9.0"
+  }
+}

@@ -1,20 +1,21 @@
 "use client";
 
 import { useResponsive } from "@/shared/hooks/use-responsive";
-import { TopAuthStripTablet } from "@/features/navigation/components/top-auth-strip/top-auth-strip.tablet";
-import { TopAuthStripWeb } from "@/features/navigation/components/top-auth-strip/top-auth-strip.web";
+import { useIsHydrated } from "@/shared/hooks/use-is-hydrated";
+import { TopAuthStrip as TopAuthStripDesktop } from "./top-auth-strip.desktop";
 
 export function TopAuthStrip() {
-  const { isMobile, isTablet } = useResponsive();
+  const isHydrated = useIsHydrated();
+  const { isWeb } = useResponsive();
 
-  // Mobile uses expo-router navigation, no top auth strip needed
-  if (isMobile) {
+  if (!isHydrated) {
     return null;
   }
 
-  if (isTablet) {
-    return <TopAuthStripTablet />;
+  // Mobile and tablet use Expo Router navigation, no top auth strip needed
+  if (!isWeb) {
+    return null;
   }
 
-  return <TopAuthStripWeb />;
+  return <TopAuthStripDesktop />;
 }

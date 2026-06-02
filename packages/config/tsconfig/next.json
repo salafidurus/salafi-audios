@@ -1,8 +1,0 @@
-{
-  "extends": "./app.json",
-  "compilerOptions": {
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "jsx": "preserve"
-  }
-}

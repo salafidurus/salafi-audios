@@ -1,7 +1,11 @@
-import { ScreenInProgress } from "@/shared/components/screen-in-progress/screen-in-progress";
+"use client";
+
+import { Responsive } from "@/shared/components/Responsive";
+import { TermsOfUseDesktopScreen } from "./terms-of-use.screen.desktop";
+import { TermsOfUseMobileScreen } from "./terms-of-use.screen.mobile";
 
 export function TermsOfUseScreen() {
-  return (
-    <ScreenInProgress title="Terms of Service" description="Legal content is being prepared." />
-  );
+  const mobile = <TermsOfUseMobileScreen />;
+  const desktop = <TermsOfUseDesktopScreen />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }

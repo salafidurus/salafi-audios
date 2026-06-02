@@ -23,10 +23,10 @@ jobs:
     name: docs:quality
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Markdown lint
-        uses: DavidAnson/markdownlint-cli2-action@v20
+        uses: DavidAnson/markdownlint-cli2-action@v23
         with:
           globs: |
             README.md

@@ -10,7 +10,8 @@ This service is the authority for business rules, permissions, and state transit
 
 ## Agent skills scope
 
-- Project-local OpenCode skills live in `.opencode/skills/`.
+- If using Claude Code: Skills are defined at the root and listed in CLAUDE.md.
+- If using OpenCode: Project-local skills live in `.opencode/skills/`.
 - Keep backend/NestJS skills scoped to this app directory.
 
 ## Layering rules
@@ -36,8 +37,8 @@ This service is the authority for business rules, permissions, and state transit
 - Prefer intent-driven actions for transitions (publish/archive/reorder/replace).
 - Validate all boundary input with DTO/class-validator.
 - Keep error responses structured and consistent.
-- Import shared response types from `@sd/contracts`.
-- If a DTO is used by web or mobile, define it in `@sd/contracts` and import it here.
+- Import shared response types from `@sd/core-contracts`.
+- If a DTO is used by web or mobile, define it in `@sd/core-contracts` and import it here.
 - If a DTO is API-only, keep it local to this app.
 - Keep API-only request DTOs local (for validation decorators).
 
@@ -49,7 +50,7 @@ This service is the authority for business rules, permissions, and state transit
 - Typecheck: `pnpm --filter api typecheck`
 - Test: `pnpm --filter api test`
 - E2E: `pnpm --filter api test:e2e`
-- OpenAPI: `pnpm openapi`
+- Contracts: `pnpm --filter core-contracts build`
 
 ## Single-test commands
 
@@ -60,9 +61,9 @@ This service is the authority for business rules, permissions, and state transit
 
 ## Contract workflow
 
-- Shared types are defined in `@sd/contracts` - import from there.
-- When API response shapes change, update `packages/contracts/src/types/` manually.
-- Run `pnpm --filter @sd/contracts build` after updating contracts.
+- Shared types are defined in `@sd/core-contracts` - import from there.
+- When API response shapes change, update `packages/core-contracts/src/types/` manually.
+- Run `pnpm --filter core-contracts build` after updating contracts.
 
 ## Data and media rules
 
@@ -84,3 +85,12 @@ This service is the authority for business rules, permissions, and state transit
 - Client-authoritative logic hidden in endpoints.
 - Silent fallback for invalid config or invalid state.
 - Unstructured errors or inconsistent status semantics.
+
+---
+
+## Documentation Sync
+
+When implementing features, update:
+
+- `docs/AGENT.md` - Update implementation gap analysis and phase status when needed
+- Relevant top-level docs file in `docs/` - If architecture, API, data, or environment rules change

@@ -1,5 +1,11 @@
-import { ScreenInProgress } from "@/shared/components/screen-in-progress/screen-in-progress";
+"use client";
+
+import { Responsive } from "@/shared/components/Responsive";
+import { SupportDesktopScreen } from "./support.screen.desktop";
+import { SupportMobileScreen } from "./support.screen.mobile";
 
 export function SupportScreen() {
-  return <ScreenInProgress title="Support" description="Support resources are coming soon." />;
+  const mobile = <SupportMobileScreen />;
+  const desktop = <SupportDesktopScreen />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }

@@ -1,0 +1,54 @@
+{
+  "name": "@sd/core-db",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./src/generated/prisma/client.d.ts",
+      "import": "./dist/generated/prisma/client.js",
+      "require": "./dist/generated/prisma/client.js"
+    }
+  },
+  "scripts": {
+    "lint": "node ../../node_modules/eslint/bin/eslint.js .",
+    "test": "node ../../node_modules/jest/bin/jest.js --passWithNoTests",
+    "test:watch": "node ../../node_modules/jest/bin/jest.js --watch",
+    "test:cov": "node ../../node_modules/jest/bin/jest.js --coverage",
+    "test:prepush": "node ../../node_modules/jest/bin/jest.js --changedSince=origin/main --passWithNoTests",
+    "pretypecheck": "pnpm prisma:generate",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prisma:generate": "node ../../node_modules/prisma/build/index.js generate --schema=./prisma/schema.prisma --config=./prisma.config.ts && node ./scripts/copy-generated-to-dist.js",
+    "prisma:format": "node ../../node_modules/prisma/build/index.js format --schema=./prisma/schema.prisma --config=./prisma.config.ts",
+    "prisma:validate": "node ../../node_modules/prisma/build/index.js validate --schema=./prisma/schema.prisma --config=./prisma.config.ts",
+    "migrate:create-only": "node ./scripts/migrate-with-auto-name.js",
+    "migrate:deploy": "node ../../node_modules/prisma/build/index.js migrate deploy --schema=./prisma/schema.prisma --config=./prisma.config.ts",
+    "build": "pnpm prisma:generate && tsup src/index.ts --format esm,cjs --out-dir dist && node ./scripts/copy-generated-to-dist.js && tsc -p tsconfig.build.json",
+    "dev": "pnpm build --watch"
+  },
+  "dependencies": {
+    "@prisma/client": "^7.3.0",
+    "@prisma/client-runtime-utils": "^7.3.0"
+  },
+  "devDependencies": {
+    "@sd/util-config": "workspace:*",
+    "prisma": "^7.3.0",
+    "pg": "^8.0.0",
+    "@types/jest": "^30.0.0",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.6",
+    "dotenv": "^16.4.5",
+    "tsup": "^8.0.0"
+  }
+}

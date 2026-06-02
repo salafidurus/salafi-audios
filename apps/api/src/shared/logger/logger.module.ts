@@ -1,7 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { LoggerModule } from 'nestjs-pino';
 import crypto from 'node:crypto';
-import { ConfigService } from '@/shared/config/config.service';
+import { ConfigService } from '../../shared/config/config.service';
 
 function genId() {
   return crypto.randomUUID();

@@ -1,5 +1,11 @@
-import { ScreenInProgress } from "@/shared/components/screen-in-progress/screen-in-progress";
+"use client";
+
+import { Responsive } from "@/shared/components/Responsive";
+import { LiveDesktopScreen } from "./live.screen.desktop";
+import { LiveMobileScreen } from "./live.screen.mobile";
 
 export function LiveScreen() {
-  return <ScreenInProgress title="Live" description="Live sessions will appear here." />;
+  const mobile = <LiveMobileScreen />;
+  const desktop = <LiveDesktopScreen />;
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }
