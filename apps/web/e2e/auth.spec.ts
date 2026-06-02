@@ -10,18 +10,13 @@ test.describe("Auth flows", () => {
       await expect(heading).toBeVisible();
     });
 
-    test("email input is present", async ({ page }) => {
+    test("social sign-in buttons are present", async ({ page }) => {
       await page.goto("/sign-in");
 
-      const emailInput = page.getByPlaceholder("Email");
-      await expect(emailInput).toBeVisible();
-    });
-
-    test("password input is present", async ({ page }) => {
-      await page.goto("/sign-in");
-
-      const passwordInput = page.getByPlaceholder("Password");
-      await expect(passwordInput).toBeVisible();
+      const appleButton = page.getByRole("button", { name: "Continue with Apple" });
+      const googleButton = page.getByRole("button", { name: "Continue with Google" });
+      await expect(appleButton).toBeVisible();
+      await expect(googleButton).toBeVisible();
     });
 
     test("has link to sign-up page", async ({ page }) => {
@@ -38,14 +33,6 @@ test.describe("Auth flows", () => {
       await signUpLink.click();
       await expect(page).toHaveURL(/\/sign-up/);
     });
-
-    test("submitting empty form does not navigate away", async ({ page }) => {
-      await page.goto("/sign-in");
-
-      const submitButton = page.getByRole("button", { name: "Sign In" });
-      // Button should be disabled when form is empty
-      await expect(submitButton).toBeDisabled();
-    });
   });
 
   test.describe("sign-up page", () => {
@@ -57,33 +44,53 @@ test.describe("Auth flows", () => {
       await expect(heading).toBeVisible();
     });
 
-    test("form fields are present", async ({ page }) => {
+    test("social sign-up buttons are present", async ({ page }) => {
       await page.goto("/sign-up");
 
-      await expect(page.getByPlaceholder("Name")).toBeVisible();
-      await expect(page.getByPlaceholder("Email")).toBeVisible();
-      await expect(page.getByPlaceholder("Password")).toBeVisible();
+      const appleButton = page.getByRole("button", { name: "Continue with Apple" });
+      const googleButton = page.getByRole("button", { name: "Continue with Google" });
+      await expect(appleButton).toBeVisible();
+      await expect(googleButton).toBeVisible();
     });
 
     test("terms checkbox is present and unchecked by default", async ({ page }) => {
       await page.goto("/sign-up");
 
-      // Terms agreement must be checked before submitting
-      const termsText = page.getByText("I agree to the");
-      await expect(termsText).toBeVisible();
+      const termsCheckbox = page.getByRole("checkbox");
+      await expect(termsCheckbox).toBeVisible();
+      await expect(termsCheckbox).not.toBeChecked();
+    });
+
+    test("social buttons are disabled until terms are accepted", async ({ page }) => {
+      await page.goto("/sign-up");
+
+      const appleButton = page.getByRole("button", { name: "Continue with Apple" });
+      const googleButton = page.getByRole("button", { name: "Continue with Google" });
+
+      // Initially disabled
+      await expect(appleButton).toBeDisabled();
+      await expect(googleButton).toBeDisabled();
+
+      // Check the terms checkbox
+      const termsCheckbox = page.getByRole("checkbox");
+      await termsCheckbox.check();
+
+      // Now enabled
+      await expect(appleButton).toBeEnabled();
+      await expect(googleButton).toBeEnabled();
     });
 
     test("has link to sign-in page", async ({ page }) => {
       await page.goto("/sign-up");
 
-      const signInLink = page.getByText("Sign in");
+      const signInLink = page.getByRole("button", { name: "Sign in", exact: true });
       await expect(signInLink).toBeVisible();
     });
 
     test("navigating to sign-in works from sign-up", async ({ page }) => {
       await page.goto("/sign-up");
 
-      const signInLink = page.getByText("Sign in");
+      const signInLink = page.getByRole("button", { name: "Sign in", exact: true });
       await signInLink.click();
       await expect(page).toHaveURL(/\/sign-in/);
     });
