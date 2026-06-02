@@ -1,62 +1,20 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { TextInput } from "@/shared/components/TextInput/TextInput";
 import { AuthProviderButton } from "@/features/auth/components/provider-button";
 
-type FormValues = {
-  email: string;
-  password: string;
-};
-
 export type SignInScreenProps = {
-  onSignIn: (email: string, password: string) => Promise<void>;
   onSignInWithGoogle: () => void;
   onSignInWithApple: () => void;
   onNavigateToSignUp: () => void;
 };
 
 export function SignInMobileScreen({
-  onSignIn,
   onSignInWithGoogle,
   onSignInWithApple,
   onNavigateToSignUp,
 }: SignInScreenProps) {
   const { t } = useTranslation();
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid },
-  } = useForm<FormValues>({
-    defaultValues: { email: "", password: "" },
-    mode: "onChange",
-  });
-
-  async function onSubmit({ email, password }: FormValues) {
-    setLoading(true);
-    setError("");
-    try {
-      await onSignIn(email, password);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t("auth.signIn.failed"));
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const emailField = register("email", {
-    required: true,
-    pattern: {
-      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-      message: t("validation.emailInvalid"),
-    },
-  });
-  const passwordField = register("password", { required: true });
 
   return (
     <div style={wrapperStyle}>
@@ -67,54 +25,6 @@ export function SignInMobileScreen({
           <AuthProviderButton provider="apple" onClick={onSignInWithApple} />
           <AuthProviderButton provider="google" onClick={onSignInWithGoogle} />
         </div>
-
-        <div style={dividerStyle}>
-          <hr style={hrStyle} />
-          <span style={dividerTextStyle}>{t("auth.signIn.orContinue")}</span>
-          <hr style={hrStyle} />
-        </div>
-
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          autoComplete="on"
-          style={{ display: "flex", flexDirection: "column", gap: 12 }}
-        >
-          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <TextInput
-              type="email"
-              placeholder={t("common.email")}
-              autoComplete="email"
-              autoCapitalize="none"
-              invalid={Boolean(errors.email)}
-              onBlur={emailField.onBlur}
-              name={emailField.name}
-              ref={emailField.ref}
-              onChange={emailField.onChange}
-            />
-            {errors.email?.message && <p style={fieldErrorStyle}>{errors.email.message}</p>}
-          </div>
-          <TextInput
-            type="password"
-            placeholder={t("common.password")}
-            autoComplete="current-password"
-            onBlur={passwordField.onBlur}
-            name={passwordField.name}
-            ref={passwordField.ref}
-            onChange={passwordField.onChange}
-          />
-          {error && <p style={errorStyle}>{error}</p>}
-          <button
-            type="submit"
-            disabled={loading || !isValid}
-            style={{
-              ...submitBtnStyle,
-              opacity: isValid ? 1 : 0.45,
-              cursor: isValid ? "pointer" : "not-allowed",
-            }}
-          >
-            {loading ? t("auth.signIn.submitting") : t("auth.signIn.submit")}
-          </button>
-        </form>
 
         <button type="button" onClick={onNavigateToSignUp} style={linkBtnStyle}>
           {t("auth.signIn.noAccount")}
@@ -153,49 +63,6 @@ const titleStyle: React.CSSProperties = {
   textAlign: "center",
   margin: 0,
   color: "var(--content-primary)",
-};
-
-const dividerStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: 12,
-};
-
-const hrStyle: React.CSSProperties = {
-  flex: 1,
-  border: "none",
-  borderTop: "1px solid var(--accent-divider, var(--border-default))",
-};
-
-const dividerTextStyle: React.CSSProperties = {
-  fontSize: 13,
-  color: "var(--content-muted)",
-  whiteSpace: "nowrap",
-};
-
-const errorStyle: React.CSSProperties = {
-  color: "var(--state-danger)",
-  fontSize: 14,
-  margin: 0,
-};
-
-const fieldErrorStyle: React.CSSProperties = {
-  color: "var(--state-danger-content)",
-  fontSize: 12,
-  margin: 0,
-};
-
-const submitBtnStyle: React.CSSProperties = {
-  width: "100%",
-  padding: "12px 16px",
-  background: "var(--accent-primary-bg, var(--action-primary))",
-  color: "var(--accent-primary-fg, var(--content-on-primary))",
-  border: "1px solid var(--accent-primary-border, var(--action-primary))",
-  boxShadow: "var(--shadow-sm)",
-  borderRadius: 14,
-  fontSize: 16,
-  fontWeight: 600,
-  cursor: "pointer",
 };
 
 const linkBtnStyle: React.CSSProperties = {

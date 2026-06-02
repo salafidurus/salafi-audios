@@ -3,9 +3,10 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState, type ReactNode } from "react";
 import { I18nextProvider } from "react-i18next";
-import { initApiClient } from "@sd/core-api";
+import { initApiClient, setUnauthorizedHandler } from "@sd/core-api";
 import { createQueryClient } from "@sd/core-contracts/query";
 import type { Locale } from "@sd/core-contracts";
+import { authClient } from "@/core/auth/auth-client";
 import { createI18n } from "./i18n/i18n";
 import { setLocaleCookie } from "./i18n/locale-cookie";
 
@@ -27,6 +28,14 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
   useEffect(() => {
     setLocaleCookie(initialLocale);
   }, [initialLocale]);
+
+  useEffect(() => {
+    setUnauthorizedHandler(() => {
+      authClient.signOut().then(() => {
+        window.location.href = "/sign-in";
+      });
+    });
+  }, []);
 
   return (
     <I18nextProvider i18n={i18n}>

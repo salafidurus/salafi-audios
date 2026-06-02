@@ -8,15 +8,10 @@ import { authClient } from "@/core/auth";
 
 type SignUpScreenProps = {
   redirectTo: string;
-  onSignUpSuccess: () => void;
   onNavigateToSignIn: () => void;
 };
 
-export function SignUpResponsiveScreen({
-  redirectTo,
-  onSignUpSuccess,
-  onNavigateToSignIn,
-}: SignUpScreenProps) {
+export function SignUpResponsiveScreen({ redirectTo, onNavigateToSignIn }: SignUpScreenProps) {
   const isHydrated = useIsHydrated();
   const { isMobile, isTablet } = useResponsive();
 
@@ -27,11 +22,6 @@ export function SignUpResponsiveScreen({
   if (isMobile || isTablet) {
     return (
       <SignUpMobileScreen
-        onSignUp={async (name, email, password) => {
-          const { error } = await authClient.signUp.email({ name, email, password });
-          if (error) throw new Error(error.message ?? "Sign up failed");
-          onSignUpSuccess();
-        }}
         onSignUpWithGoogle={() =>
           authClient.signIn.social({ provider: "google", callbackURL: redirectTo })
         }
@@ -43,11 +33,5 @@ export function SignUpResponsiveScreen({
     );
   }
 
-  return (
-    <SignUpDesktopScreen
-      redirectTo={redirectTo}
-      onSignUpSuccess={onSignUpSuccess}
-      onNavigateToSignIn={onNavigateToSignIn}
-    />
-  );
+  return <SignUpDesktopScreen redirectTo={redirectTo} onNavigateToSignIn={onNavigateToSignIn} />;
 }

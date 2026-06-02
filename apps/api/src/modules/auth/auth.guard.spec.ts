@@ -1,7 +1,11 @@
 // apps/api/src/modules/auth/auth.guard.spec.ts
 import { AuthGuard } from './auth.guard';
 import { Reflector } from '@nestjs/core';
-import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import {
+  ExecutionContext,
+  ForbiddenException,
+  UnauthorizedException,
+} from '@nestjs/common';
 
 const mockAuth = { api: { getSession: jest.fn() } };
 jest.mock('./auth.instance', () => ({ getAuth: () => mockAuth }));
@@ -64,5 +68,48 @@ describe('AuthGuard', () => {
     await expect(guard.canActivate(mockContext())).rejects.toThrow(
       UnauthorizedException,
     );
+  });
+
+  describe('ban enforcement', () => {
+    it('throws 403 for a permanently banned user (banned: true, banExpires: null)', async () => {
+      jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
+      mockAuth.api.getSession.mockResolvedValue({
+        user: { id: 'u2', role: 'user', banned: true, banExpires: null },
+        session: {},
+      });
+      await expect(guard.canActivate(mockContext())).rejects.toThrow(
+        ForbiddenException,
+      );
+    });
+
+    it('throws 403 for a temporarily banned user whose ban has not yet expired', async () => {
+      const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+      jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
+      mockAuth.api.getSession.mockResolvedValue({
+        user: { id: 'u3', role: 'user', banned: true, banExpires: tomorrow },
+        session: {},
+      });
+      await expect(guard.canActivate(mockContext())).rejects.toThrow(
+        ForbiddenException,
+      );
+    });
+
+    it('passes through when a temporary ban has already expired', async () => {
+      const yesterday = new Date(
+        Date.now() - 24 * 60 * 60 * 1000,
+      ).toISOString();
+      jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
+      const req: Record<string, unknown> = { headers: {}, user: undefined };
+      const ctx = {
+        getHandler: () => ({}),
+        getClass: () => ({}),
+        switchToHttp: () => ({ getRequest: () => req }),
+      } as unknown as ExecutionContext;
+      mockAuth.api.getSession.mockResolvedValue({
+        user: { id: 'u4', role: 'user', banned: true, banExpires: yesterday },
+        session: {},
+      });
+      await expect(guard.canActivate(ctx)).resolves.toBe(true);
+    });
   });
 });

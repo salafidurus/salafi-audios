@@ -1,29 +1,11 @@
-import { useState } from "react";
-import {
-  ActivityIndicator,
-  Platform,
-  Pressable,
-  Text,
-  View,
-  type ImageSourcePropType,
-} from "react-native";
+import { Platform, Pressable, Text, View, type ImageSourcePropType } from "react-native";
 import { Image } from "expo-image";
 import * as AppleAuthentication from "expo-apple-authentication";
-import { Controller, useForm } from "react-hook-form";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { AccentGradientFill } from "@/shared/components/AccentGradientFill/AccentGradientFill";
-import { Button } from "@/shared/components/Button/Button";
-import { TextInput } from "@/shared/components/TextInput/TextInput";
-
-type FormValues = {
-  email: string;
-  password: string;
-};
 
 export type SignInScreenProps = {
-  onSignIn: (email: string, password: string) => Promise<void>;
   onSignInWithGoogle: () => void;
   onSignInWithApple: () => void;
   onNavigateToSignUp: () => void;
@@ -32,7 +14,6 @@ export type SignInScreenProps = {
 };
 
 export function SignInScreen({
-  onSignIn,
   onSignInWithGoogle,
   onSignInWithApple,
   onNavigateToSignUp,
@@ -41,38 +22,11 @@ export function SignInScreen({
 }: SignInScreenProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isValid },
-  } = useForm<FormValues>({
-    defaultValues: { email: "", password: "" },
-    mode: "onChange",
-  });
-
-  async function onSubmit({ email, password }: FormValues) {
-    setLoading(true);
-    setError("");
-    try {
-      await onSignIn(email, password);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t("auth.signIn.failed"));
-    } finally {
-      setLoading(false);
-    }
-  }
 
   const heroRecipe = theme.recipes.mixedHeroSurface;
 
   return (
-    <KeyboardAwareScrollView
-      contentContainerStyle={styles.container}
-      keyboardShouldPersistTaps="handled"
-      bottomOffset={16}
-    >
+    <View style={styles.container}>
       <View style={styles.inner}>
         {onBack ? (
           <Pressable
@@ -121,80 +75,16 @@ export function SignInScreen({
           )}
         </Pressable>
 
-        <Text style={styles.divider}>{t("auth.signIn.orEmail")}</Text>
-
-        <Controller
-          control={control}
-          name="email"
-          rules={{
-            required: true,
-            pattern: {
-              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: t("validation.emailInvalid"),
-            },
-          }}
-          render={({ field: { value, onChange, onBlur } }) => (
-            <>
-              <TextInput
-                style={styles.input}
-                invalid={Boolean(errors.email)}
-                placeholder={t("common.email")}
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                autoCapitalize="none"
-                keyboardType="email-address"
-                textContentType="emailAddress"
-              />
-              {errors.email?.message ? (
-                <Text style={styles.fieldError}>{errors.email.message}</Text>
-              ) : null}
-            </>
-          )}
-        />
-
-        <Controller
-          control={control}
-          name="password"
-          rules={{ required: true }}
-          render={({ field: { value, onChange, onBlur } }) => (
-            <TextInput
-              style={styles.input}
-              placeholder={t("common.password")}
-              value={value}
-              onChangeText={onChange}
-              onBlur={onBlur}
-              secureTextEntry
-              textContentType="password"
-            />
-          )}
-        />
-
-        {!!error && <Text style={styles.error}>{error}</Text>}
-
-        {loading ? (
-          <ActivityIndicator style={styles.loader} />
-        ) : (
-          <Button
-            variant="primary"
-            size="md"
-            label={t("auth.signIn.submit")}
-            fullWidth
-            disabled={!isValid}
-            onPress={isValid ? handleSubmit(onSubmit) : undefined}
-          />
-        )}
-
         <Pressable onPress={onNavigateToSignUp}>
           <Text style={styles.link}>{t("auth.signIn.noAccount")}</Text>
         </Pressable>
       </View>
-    </KeyboardAwareScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  container: { flexGrow: 1, justifyContent: "center" },
+  container: { flex: 1, justifyContent: "center" },
   inner: { padding: theme.spacing.layout.pageX },
   heroPanel: {
     position: "relative",
@@ -234,21 +124,6 @@ const styles = StyleSheet.create((theme) => ({
     minHeight: 48,
   },
   googleButtonImage: { width: "100%", height: 48 },
-  divider: {
-    textAlign: "center",
-    color: theme.colors.content.primary,
-    fontSize: 14,
-    marginVertical: theme.spacing.component.gapMd,
-  },
-  input: {
-    marginBottom: theme.spacing.component.gapSm,
-  },
-  error: {
-    color: theme.colors.state.danger,
-    fontSize: 14,
-    marginBottom: theme.spacing.component.gapSm,
-  },
-  loader: { marginTop: 4 },
   link: {
     textAlign: "center",
     color: theme.colors.content.primary,
@@ -256,10 +131,4 @@ const styles = StyleSheet.create((theme) => ({
     fontSize: 14,
   },
   pressed: { opacity: 0.75 },
-  fieldError: {
-    color: theme.colors.state.danger,
-    fontSize: 12,
-    marginTop: -4,
-    marginBottom: theme.spacing.component.gapSm,
-  },
 }));

@@ -29,11 +29,6 @@ export default function SignInRoute() {
             : require("../../../assets/auth/google-continue-light-1x-ios.png")
       }
       onBack={handleBack}
-      onSignIn={async (email, password) => {
-        const { error } = await authClient.signIn.email({ email, password });
-        if (error) throw new Error(error.message ?? "Sign in failed");
-        router.replace(routes.home as Href);
-      }}
       onSignInWithGoogle={() => authClient.signIn.social({ provider: "google" })}
       onSignInWithApple={() => authClient.signIn.social({ provider: "apple" })}
       onNavigateToSignUp={() => router.push(routes.signUp)}

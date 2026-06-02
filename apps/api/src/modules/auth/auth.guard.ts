@@ -1,6 +1,7 @@
 import {
   CanActivate,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -28,6 +29,15 @@ export class AuthGuard implements CanActivate {
     });
 
     if (!session) throw new UnauthorizedException();
+
+    const { banned, banExpires } = session.user as {
+      banned?: boolean | null;
+      banExpires?: Date | string | null;
+    };
+    if (banned) {
+      const expired = banExpires && new Date(banExpires) <= new Date();
+      if (!expired) throw new ForbiddenException('Account is banned');
+    }
 
     const requiredRoles = this.reflector.getAllAndOverride<string[]>(
       ROLES_KEY,
