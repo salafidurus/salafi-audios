@@ -63,6 +63,10 @@ Add the following (versions to match `apps/api`):
 
 - `prettier`
 
+**NestJS CLI peer (explicit dep, mirrors api):**
+
+- `@nestjs/schematics`
+
 ### 3. New file: `apps/livestreams/eslint.config.mjs`
 
 ```js
@@ -78,7 +82,7 @@ Add `apps/livestreams/dist/**` to the artifact path list alongside `apps/api/dis
 
 ## Notes
 
-- `@nestjs/schematics` is absent from `apps/livestreams` devDependencies (unlike api). This is intentional — `.npmrc` sets `node-linker=hoisted`, so `@nestjs/schematics` installed by `apps/api` is hoisted to root `node_modules` and available workspace-wide. `nest build` and `nest start` already work in livestreams without an explicit listing.
+- `@nestjs/schematics` is added explicitly to `apps/livestreams` devDependencies to keep each app self-contained, even though `.npmrc` sets `node-linker=hoisted` and it would be available via hoisting from `apps/api`. Explicit deps are more robust.
 
 ---
 
