@@ -76,6 +76,12 @@ Add `apps/livestreams/dist/**` to the artifact path list alongside `apps/api/dis
 
 ---
 
+## Notes
+
+- `@nestjs/schematics` is absent from `apps/livestreams` devDependencies (unlike api). This is intentional — `.npmrc` sets `node-linker=hoisted`, so `@nestjs/schematics` installed by `apps/api` is hoisted to root `node_modules` and available workspace-wide. `nest build` and `nest start` already work in livestreams without an explicit listing.
+
+---
+
 ## Out of scope
 
 - `test:e2e` — deferred until a `test/` directory and `jest-e2e.json` exist in livestreams
