@@ -34,3 +34,11 @@ if git diff --quiet origin/main...HEAD -- packages/db/prisma/schema.prisma packa
 else
   pnpm --filter @sd/db prisma:generate
 fi
+
+if git diff --quiet origin/main...HEAD -- ':(glob)apps/native/**'; then
+  printf "pre-push: skipping expo-doctor (no native changes)\n"
+else
+  printf "pre-push: running expo-doctor\n"
+  pnpm --filter native exec expo-doctor
+fi
+
