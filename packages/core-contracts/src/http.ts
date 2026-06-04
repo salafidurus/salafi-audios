@@ -14,6 +14,10 @@ export function configureApiClient(next: HttpClientConfig) {
   config = next;
 }
 
+export function getApiBaseUrl(): string {
+  return config?.baseUrl ?? "";
+}
+
 export async function httpClient<T>(options: {
   url: string;
   method: string;

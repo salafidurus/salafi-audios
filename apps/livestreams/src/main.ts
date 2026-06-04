@@ -1,13 +1,28 @@
-import "reflect-metadata";
-import { Logger } from "@nestjs/common";
+import "./shared/utils/env.bootstrap";
+import { Logger, ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
+import helmet from "helmet";
 import { AppModule } from "./app.module";
+import { AllExceptionsFilter } from "./shared/errors/http-exception.filter";
+import { LiveConfigService } from "./shared/config/config.service";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const port = process.env.PORT ?? 3002;
-  await app.listen(port);
-  new Logger("Bootstrap").log(`Livestreams service running on port ${port}`);
+  const config = app.get(LiveConfigService);
+
+  app.use(helmet());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      transformOptions: { enableImplicitConversion: true },
+    }),
+  );
+  app.useGlobalFilters(new AllExceptionsFilter(config));
+
+  await app.listen(config.PORT);
+  new Logger("Bootstrap").log(`Livestreams service running on port ${config.PORT}`);
 }
 
-bootstrap();
+void bootstrap();

@@ -7,6 +7,7 @@ import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard
 import { LiveController } from './live.controller';
 import { AdminLiveController } from './admin-live.controller';
 import { LiveService } from './live.service';
+import { ConfigService } from '../../shared/config/config.service';
 
 const mockAuth = { api: { getSession: jest.fn() } };
 jest.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
@@ -35,6 +36,12 @@ describe('LiveController — auth boundaries', () => {
       providers: [
         { provide: APP_GUARD, useClass: AuthGuard },
         { provide: LiveService, useValue: mockLiveService },
+        {
+          provide: ConfigService,
+          useValue: {
+            LIVESTREAM_SECRET: 'test-secret',
+          },
+        },
       ],
     })
       .overrideGuard(AdminPermissionGuard)

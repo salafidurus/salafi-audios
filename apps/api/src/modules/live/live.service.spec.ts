@@ -56,6 +56,7 @@ describe('LiveService', () => {
             findEnded: jest.fn(),
             findDeletedFromEnded: jest.fn(),
             findSessionById: jest.fn(),
+            findSessionPublicById: jest.fn(),
             updateSessionStatus: jest.fn(),
             findChannels: jest.fn(),
             findChannelBySlug: jest.fn(),
@@ -290,6 +291,27 @@ describe('LiveService', () => {
         'session-1',
         expect.objectContaining({ title: 'Updated Title' }),
       );
+    });
+  });
+
+  describe('getSessionPublic', () => {
+    it('should return mapped session DTO when found', async () => {
+      repo.findSessionPublicById.mockResolvedValue(mockSessionRecord as any);
+
+      const result = await service.getSessionPublic('session-1');
+
+      expect(result).toBeDefined();
+      expect(result?.id).toBe('session-1');
+      expect(repo.findSessionPublicById).toHaveBeenCalledWith('session-1');
+    });
+
+    it('should return null when session not found', async () => {
+      repo.findSessionPublicById.mockResolvedValue(null);
+
+      const result = await service.getSessionPublic('unknown');
+
+      expect(result).toBeNull();
+      expect(repo.findSessionPublicById).toHaveBeenCalledWith('unknown');
     });
   });
 });

@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { Prisma } from "@sd/core-db";
-import { PrismaService } from "../shared/db/prisma.service";
+import { PrismaService } from "../../shared/db/prisma.service";
 
 @Injectable()
 export class ChannelsRepository {

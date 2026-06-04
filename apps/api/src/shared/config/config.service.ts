@@ -55,4 +55,8 @@ export class ConfigService {
   get APPLE_CLIENT_SECRET(): string {
     return this.env.APPLE_CLIENT_SECRET;
   }
+
+  get LIVESTREAM_SECRET(): string {
+    return this.env.LIVESTREAM_SECRET;
+  }
 }

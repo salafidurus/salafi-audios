@@ -1,6 +1,6 @@
 import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from "@nestjs/common";
 import type { TelegramClient } from "telegram";
-import { LiveConfigService } from "../shared/config/config.service";
+import { LiveConfigService } from "../../shared/config/config.service";
 
 @Injectable()
 export class TelegramService implements OnModuleInit, OnModuleDestroy {
@@ -14,7 +14,7 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
     const apiHash = this.config.telegramApiHash;
     const sessionStr = this.config.telegramSession;
 
-    if (!apiId || !apiHash) {
+    if (!apiId || !apiHash || !sessionStr) {
       this.logger.warn("Telegram credentials not configured — monitor disabled");
       return;
     }
