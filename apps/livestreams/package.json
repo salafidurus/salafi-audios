@@ -19,7 +19,8 @@
     "test:cov": "node ../../node_modules/jest/bin/jest.js --coverage",
     "test:prepush": "node ../../node_modules/jest/bin/jest.js --changedSince=origin/main --passWithNoTests",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register ../../node_modules/jest/bin/jest.js --runInBand",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "gen:telegram:session": "node scripts/gen-telegram-session.mjs"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.3",

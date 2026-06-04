@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Patch, Param, Body, UseGuards } from "@nestjs/common";
-import { InternalGuard } from "../shared/guards/internal.guard";
+import { InternalGuard } from "../../shared/guards/internal.guard";
 import { ChannelsService } from "./channels.service";
 
 @UseGuards(InternalGuard)
