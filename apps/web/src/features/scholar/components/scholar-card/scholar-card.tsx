@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import type { ScholarListItemDto } from "@sd/core-contracts";
 
 export type ScholarCardProps = {
@@ -18,13 +19,13 @@ export function ScholarCard({ scholar, onPress }: ScholarCardProps) {
         border: "1px solid var(--border-default)",
         borderRadius: 12,
         padding: 16,
-        cursor: "pointer",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: 8,
+        gap: 12,
+        cursor: "pointer",
         background: "var(--surface-default)",
-        transition: "background 0.15s",
+        transition: "transform 0.2s, box-shadow 0.2s",
       }}
     >
       <div
@@ -38,10 +39,13 @@ export function ScholarCard({ scholar, onPress }: ScholarCardProps) {
         }}
       >
         {scholar.imageUrl && (
-          <img
+          <Image
             src={scholar.imageUrl}
             alt={scholar.name}
-            style={{ width: 80, height: 80, objectFit: "cover" }}
+            width={80}
+            height={80}
+            unoptimized
+            style={{ objectFit: "cover" }}
           />
         )}
       </div>

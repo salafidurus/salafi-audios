@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import type { ScholarChipDto, ContentSuggestionDto, RecentProgressDto } from "@sd/core-contracts";
 import { BrowseCardDesktop } from "../BrowseCard/BrowseCard.desktop";
 
@@ -105,9 +106,12 @@ export function QuickBrowseDesktop({
               >
                 <div className="flex size-14 items-center justify-center overflow-hidden rounded-full border border-[var(--border-default)] bg-[var(--surface-default)]">
                   {scholar.imageUrl ? (
-                    <img
+                    <Image
                       src={scholar.imageUrl}
                       alt={scholar.name}
+                      width={56}
+                      height={56}
+                      unoptimized
                       className="h-full w-full object-cover"
                     />
                   ) : (

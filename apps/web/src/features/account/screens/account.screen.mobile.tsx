@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useAccountScreen } from "@sd/domain-account";
 import { LanguageSwitch } from "@/features/i18n";
@@ -28,10 +29,13 @@ export function AccountMobileScreen({
       {profile && (
         <div style={{ marginTop: 16, display: "flex", alignItems: "center", gap: 12 }}>
           {profile.avatarUrl && (
-            <img
+            <Image
               src={profile.avatarUrl}
               alt=""
-              style={{ width: 48, height: 48, borderRadius: 24 }}
+              width={48}
+              height={48}
+              unoptimized
+              style={{ borderRadius: 24 }}
             />
           )}
           <div>
