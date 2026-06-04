@@ -28,7 +28,7 @@
     "@sd/domain-live": "workspace:*",
     "@sd/domain-audio": "workspace:*",
     "@sd/domain-search": "workspace:*",
-    "better-auth": "^1.5.5",
+    "better-auth": "^1.6.11",
     "clsx": "^2.1.1",
     "framer-motion": "^12.34.0",
     "i18next": "^25.2.1",
