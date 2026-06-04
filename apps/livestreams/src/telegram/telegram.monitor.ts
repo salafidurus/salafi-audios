@@ -42,7 +42,7 @@ export class TelegramMonitor {
 
       const result = await client.invoke(new Api.channels.GetFullChannel({ channel: identifier }));
 
-      const fullChat = result.fullChat as Record<string, unknown>;
+      const fullChat = result.fullChat as unknown as Record<string, unknown>;
       const call = fullChat["call"];
       const isLive = call != null;
       const viewerCount =
