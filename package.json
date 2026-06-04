@@ -51,7 +51,8 @@
     "ingest:content": "pnpm --filter @sd/util-ingest ingest:content",
     "ingest:remove": "pnpm --filter @sd/util-ingest ingest:remove",
     "doctor": "npx react-doctor@latest",
-    "native:expo:fix": "pnpm --filter native exec expo install --check"
+    "native:expo:fix": "pnpm --filter native exec expo install --check",
+    "native:expo:check": "pnpm --filter native exec expo-doctor"
   },
   "devDependencies": {
     "@commitlint/cli": "20.3.1",

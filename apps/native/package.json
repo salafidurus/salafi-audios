@@ -20,7 +20,8 @@
     "test:cov": "node ../../node_modules/jest/bin/jest.js --coverage --watchAll=false",
     "test:prepush": "node ../../node_modules/jest/bin/jest.js --changedSince=origin/main --passWithNoTests",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "expo:fix": "expo install --check"
+    "expo:fix": "expo install --check",
+    "expo:check": "expo-doctor"
   },
   "dependencies": {
     "@better-auth/expo": "^1.6.14",
