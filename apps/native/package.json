@@ -19,7 +19,8 @@
     "test:watch": "node ../../node_modules/jest/bin/jest.js --watch",
     "test:cov": "node ../../node_modules/jest/bin/jest.js --coverage --watchAll=false",
     "test:prepush": "node ../../node_modules/jest/bin/jest.js --changedSince=origin/main --passWithNoTests",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "expo:fix": "expo install --check"
   },
   "dependencies": {
     "@better-auth/expo": "^1.6.14",

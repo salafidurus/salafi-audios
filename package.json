@@ -50,7 +50,8 @@
     "ci:local": "pnpm verify:build-configs && pnpm lint && pnpm typecheck && pnpm test:prepush && pnpm build:affected && pnpm --filter web build && pnpm docs:quality",
     "ingest:content": "pnpm --filter @sd/util-ingest ingest:content",
     "ingest:remove": "pnpm --filter @sd/util-ingest ingest:remove",
-    "doctor": "npx react-doctor@latest"
+    "doctor": "npx react-doctor@latest",
+    "native:expo:fix": "pnpm --filter native exec expo install --check"
   },
   "devDependencies": {
     "@commitlint/cli": "20.3.1",
