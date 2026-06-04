@@ -3,16 +3,23 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "nest start --watch",
     "build": "nest build",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main",
+    "dev": "nest start --watch",
     "prebuild": "pnpm --filter @sd/core-db build",
-    "start": "node dist/main.js",
-    "typecheck": "tsc --noEmit",
-    "pretypecheck": "pnpm --filter @sd/core-db build",
+    "lint": "node ../../node_modules/eslint/bin/eslint.js .",
+    "lint:fix": "node ../../node_modules/eslint/bin/eslint.js . --fix",
     "test": "node ../../node_modules/jest/bin/jest.js --passWithNoTests",
     "pretest": "pnpm --filter @sd/core-db build",
     "test:watch": "node ../../node_modules/jest/bin/jest.js --watch --passWithNoTests",
-    "test:prepush": "node ../../node_modules/jest/bin/jest.js --changedSince=origin/main --passWithNoTests"
+    "test:cov": "node ../../node_modules/jest/bin/jest.js --coverage",
+    "test:prepush": "node ../../node_modules/jest/bin/jest.js --changedSince=origin/main --passWithNoTests",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register ../../node_modules/jest/bin/jest.js --runInBand",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.3",
@@ -26,14 +33,26 @@
     "telegram": "^2.26.16"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.5",
+    "@eslint/js": "^9.39.4",
     "@nestjs/cli": "^11.0.7",
+    "@nestjs/schematics": "^11.0.9",
     "@nestjs/testing": "^11.1.3",
     "@sd/util-config": "workspace:*",
     "@types/express": "^5.0.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.10.7",
+    "eslint": "^9.39.4",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "globals": "^16.5.0",
     "jest": "^30.0.0",
+    "prettier": "^3.8.0",
+    "source-map-support": "^0.5.21",
     "ts-jest": "^29.2.5",
-    "typescript": "^5.9.0"
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.9.0",
+    "typescript-eslint": "^8.53.1"
   }
 }

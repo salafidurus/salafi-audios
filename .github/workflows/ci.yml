@@ -125,6 +125,7 @@ jobs:
           include-hidden-files: true
           path: |
             apps/api/dist/**
+            apps/livestreams/dist/**
             apps/web/.next/**
             packages/*/dist/**
 
