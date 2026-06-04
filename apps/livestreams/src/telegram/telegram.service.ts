@@ -1,10 +1,11 @@
 import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from "@nestjs/common";
+import type { TelegramClient } from "telegram";
 import { LiveConfigService } from "../shared/config/config.service";
 
 @Injectable()
 export class TelegramService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(TelegramService.name);
-  private client: any = null;
+  private client: TelegramClient | null = null;
 
   constructor(private readonly config: LiveConfigService) {}
 
@@ -23,11 +24,12 @@ export class TelegramService implements OnModuleInit, OnModuleDestroy {
       const { StringSession } = await import("telegram/sessions");
 
       const session = new StringSession(sessionStr);
-      this.client = new TelegramClient(session, apiId, apiHash, {
+      const client = new TelegramClient(session, apiId, apiHash, {
         connectionRetries: 5,
       });
-
-      await this.client.start({ botAuthToken: undefined } as any);
+      this.client = client;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await client.start({ botAuthToken: undefined } as any);
       this.logger.log("Telegram client connected");
     } catch (error) {
       this.logger.error("Failed to connect Telegram client", error);

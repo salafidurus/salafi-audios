@@ -32,7 +32,7 @@ describe("SessionsService", () => {
   describe("upsertFromTelegram", () => {
     it("creates a new live session when none exists and isLive=true", async () => {
       repo.findLatestLiveSession.mockResolvedValue(null);
-      repo.createSession.mockResolvedValue({} as any);
+      repo.createSession.mockResolvedValue({} as Awaited<ReturnType<typeof repo.createSession>>);
 
       await service.upsertFromTelegram("channel-1", { isLive: true, title: "Live Now" });
 
@@ -48,8 +48,8 @@ describe("SessionsService", () => {
     });
 
     it("updates viewerCount on existing live session when isLive=true", async () => {
-      repo.findLatestLiveSession.mockResolvedValue(mockLiveSession as any);
-      repo.updateStatus.mockResolvedValue({} as any);
+      repo.findLatestLiveSession.mockResolvedValue(mockLiveSession);
+      repo.updateStatus.mockResolvedValue({} as Awaited<ReturnType<typeof repo.updateStatus>>);
 
       await service.upsertFromTelegram("channel-1", { isLive: true, viewerCount: 42 });
 
@@ -62,8 +62,8 @@ describe("SessionsService", () => {
     });
 
     it("transitions scheduled session to live when isLive=true", async () => {
-      repo.findLatestLiveSession.mockResolvedValue(mockScheduledSession as any);
-      repo.updateStatus.mockResolvedValue({} as any);
+      repo.findLatestLiveSession.mockResolvedValue(mockScheduledSession);
+      repo.updateStatus.mockResolvedValue({} as Awaited<ReturnType<typeof repo.updateStatus>>);
 
       await service.upsertFromTelegram("channel-1", { isLive: true });
 
@@ -76,8 +76,8 @@ describe("SessionsService", () => {
     });
 
     it("marks live session as ended when isLive=false", async () => {
-      repo.findLatestLiveSession.mockResolvedValue(mockLiveSession as any);
-      repo.updateStatus.mockResolvedValue({} as any);
+      repo.findLatestLiveSession.mockResolvedValue(mockLiveSession);
+      repo.updateStatus.mockResolvedValue({} as Awaited<ReturnType<typeof repo.updateStatus>>);
 
       await service.upsertFromTelegram("channel-1", { isLive: false });
 
