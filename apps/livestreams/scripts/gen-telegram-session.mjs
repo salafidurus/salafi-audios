@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { TelegramClient } from "telegram";
 import { StringSession } from "telegram/sessions/index.js";
 import * as readline from "readline";

@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Subject, Observable } from 'rxjs';
+import { Subject } from 'rxjs';
 import type {
   LiveSessionDeltaDto,
   LiveSessionPublicDto,
