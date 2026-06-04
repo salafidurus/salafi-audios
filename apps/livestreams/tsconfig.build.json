@@ -1,7 +1,7 @@
 {
   "extends": "@sd/util-config/tsconfig/nest.json",
   "compilerOptions": {
-    "declaration": true,
+    "declaration": false,
     "removeComments": true,
     "sourceMap": true,
     "outDir": "./dist",
