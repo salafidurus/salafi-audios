@@ -43,12 +43,12 @@
   },
   "devDependencies": {
     "@sd/util-config": "workspace:*",
-    "prisma": "^7.3.0",
-    "pg": "^8.0.0",
     "@types/jest": "^30.0.0",
-    "jest": "^30.2.0",
-    "ts-jest": "^29.4.6",
     "dotenv": "^16.4.5",
+    "jest": "^30.4.2",
+    "pg": "^8.0.0",
+    "prisma": "^7.3.0",
+    "ts-jest": "^29.4.11",
     "tsup": "^8.0.0"
   }
 }
