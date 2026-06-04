@@ -8,6 +8,8 @@ const LiveEnvSchema = z.object({
   TELEGRAM_API_HASH: z.string().min(1),
   TELEGRAM_SESSION: z.string().default(""),
   INTERNAL_SECRET: z.string().min(16),
+  API_URL: z.string().url().default("http://localhost:4000"),
+  LIVESTREAM_SECRET: z.string().default("local-dev-secret"),
 });
 
 export type LiveEnv = z.infer<typeof LiveEnvSchema>;

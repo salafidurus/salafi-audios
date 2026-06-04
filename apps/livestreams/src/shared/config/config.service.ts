@@ -17,6 +17,14 @@ export class LiveConfigService {
     return this.env.DATABASE_URL;
   }
 
+  get apiUrl(): string {
+    return this.env.API_URL;
+  }
+
+  get livestreamSecret(): string {
+    return this.env.LIVESTREAM_SECRET;
+  }
+
   get telegramApiId(): number {
     return this.env.TELEGRAM_API_ID;
   }

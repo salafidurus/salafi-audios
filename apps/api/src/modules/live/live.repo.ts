@@ -128,6 +128,13 @@ export class LiveRepository {
     });
   }
 
+  async findSessionPublicById(id: string) {
+    return this.prisma.liveSession.findUnique({
+      where: { id },
+      select: sessionPublicSelect,
+    });
+  }
+
   async updateSessionStatus(id: string, status: LiveSessionStatus) {
     const now = new Date();
     const data: Prisma.LiveSessionUpdateInput = { status };
@@ -138,6 +145,7 @@ export class LiveRepository {
     return this.prisma.liveSession.update({
       where: { id },
       data,
+      select: sessionPublicSelect,
     });
   }
 

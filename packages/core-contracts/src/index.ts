@@ -1,5 +1,5 @@
 // Export HTTP client
-export { httpClient } from "./http";
+export { httpClient, getApiBaseUrl } from "./http";
 export type { HttpClientConfig } from "./http";
 
 // Export endpoint constants

@@ -52,5 +52,5 @@ export function useLiveSection(
     setSessions((prev) => mergeDelta(prev, query.data!));
   }, [query.data]);
 
-  return { sessions, isLoading: query.isLoading };
+  return { sessions, setSessions, isLoading: query.isLoading };
 }

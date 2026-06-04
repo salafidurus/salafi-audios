@@ -1,6 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { SessionsService } from "./sessions.service";
 import { SessionsRepository } from "./sessions.repo";
+import { LiveConfigService } from "../../shared/config/config.service";
 
 const mockLiveSession = { id: "s-1", status: "live" as const, startedAt: new Date() };
 const mockScheduledSession = { id: "s-2", status: "scheduled" as const, startedAt: null };
@@ -8,8 +9,17 @@ const mockScheduledSession = { id: "s-2", status: "scheduled" as const, startedA
 describe("SessionsService", () => {
   let service: SessionsService;
   let repo: jest.Mocked<SessionsRepository>;
+  let fetchMock: jest.SpyInstance;
 
   beforeEach(async () => {
+    fetchMock = jest.spyOn(global, "fetch").mockImplementation(() =>
+      Promise.resolve({
+        ok: true,
+        status: 200,
+        text: () => Promise.resolve(""),
+      } as Response),
+    );
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SessionsService,
@@ -22,6 +32,13 @@ describe("SessionsService", () => {
             findByChannelAndStatus: jest.fn(),
           } satisfies Partial<jest.Mocked<SessionsRepository>>,
         },
+        {
+          provide: LiveConfigService,
+          useValue: {
+            apiUrl: "http://test-api",
+            livestreamSecret: "test-secret",
+          },
+        },
       ],
     }).compile();
 
@@ -29,10 +46,14 @@ describe("SessionsService", () => {
     repo = module.get(SessionsRepository) as jest.Mocked<SessionsRepository>;
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   describe("upsertFromTelegram", () => {
     it("creates a new live session when none exists and isLive=true", async () => {
       repo.findLatestLiveSession.mockResolvedValue(null);
-      repo.createSession.mockResolvedValue({} as Awaited<ReturnType<typeof repo.createSession>>);
+      repo.createSession.mockResolvedValue({ id: "s-create" } as any);
 
       await service.upsertFromTelegram("channel-1", { isLive: true, title: "Live Now" });
 
@@ -45,11 +66,21 @@ describe("SessionsService", () => {
         }),
       );
       expect(repo.updateStatus).not.toHaveBeenCalled();
+      expect(fetchMock).toHaveBeenCalledWith(
+        "http://test-api/live/sessions/sync-notify",
+        expect.objectContaining({
+          method: "POST",
+          headers: expect.objectContaining({
+            Authorization: "Bearer test-secret",
+          }),
+          body: JSON.stringify({ sessionId: "s-create" }),
+        }),
+      );
     });
 
     it("updates viewerCount on existing live session when isLive=true", async () => {
       repo.findLatestLiveSession.mockResolvedValue(mockLiveSession);
-      repo.updateStatus.mockResolvedValue({} as Awaited<ReturnType<typeof repo.updateStatus>>);
+      repo.updateStatus.mockResolvedValue({ id: "s-1" } as any);
 
       await service.upsertFromTelegram("channel-1", { isLive: true, viewerCount: 42 });
 
@@ -59,11 +90,18 @@ describe("SessionsService", () => {
         expect.objectContaining({ viewerCount: 42 }),
       );
       expect(repo.createSession).not.toHaveBeenCalled();
+      expect(fetchMock).toHaveBeenCalledWith(
+        "http://test-api/live/sessions/sync-notify",
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({ sessionId: "s-1" }),
+        }),
+      );
     });
 
     it("transitions scheduled session to live when isLive=true", async () => {
       repo.findLatestLiveSession.mockResolvedValue(mockScheduledSession);
-      repo.updateStatus.mockResolvedValue({} as Awaited<ReturnType<typeof repo.updateStatus>>);
+      repo.updateStatus.mockResolvedValue({ id: "s-2" } as any);
 
       await service.upsertFromTelegram("channel-1", { isLive: true });
 
@@ -73,11 +111,18 @@ describe("SessionsService", () => {
         expect.objectContaining({ startedAt: expect.any(Date) }),
       );
       expect(repo.createSession).not.toHaveBeenCalled();
+      expect(fetchMock).toHaveBeenCalledWith(
+        "http://test-api/live/sessions/sync-notify",
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({ sessionId: "s-2" }),
+        }),
+      );
     });
 
     it("marks live session as ended when isLive=false", async () => {
       repo.findLatestLiveSession.mockResolvedValue(mockLiveSession);
-      repo.updateStatus.mockResolvedValue({} as Awaited<ReturnType<typeof repo.updateStatus>>);
+      repo.updateStatus.mockResolvedValue({ id: "s-1" } as any);
 
       await service.upsertFromTelegram("channel-1", { isLive: false });
 
@@ -87,6 +132,13 @@ describe("SessionsService", () => {
         expect.objectContaining({ endedAt: expect.any(Date) }),
       );
       expect(repo.createSession).not.toHaveBeenCalled();
+      expect(fetchMock).toHaveBeenCalledWith(
+        "http://test-api/live/sessions/sync-notify",
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({ sessionId: "s-1" }),
+        }),
+      );
     });
 
     it("does nothing when isLive=false and no active session", async () => {

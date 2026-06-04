@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Subject, Observable } from 'rxjs';
 import type {
   LiveSessionDeltaDto,
   LiveSessionPublicDto,
@@ -58,7 +59,14 @@ type LiveChannelRecord = Prisma.LivestreamChannelGetPayload<{
 
 @Injectable()
 export class LiveService {
+  private readonly updateSubject$ = new Subject<LiveSessionPublicDto>();
+  readonly updates$ = this.updateSubject$.asObservable();
+
   constructor(private readonly repo: LiveRepository) {}
+
+  emitSessionUpdate(session: LiveSessionPublicDto) {
+    this.updateSubject$.next(session);
+  }
 
   async getActive(since?: string): Promise<LiveSessionDeltaDto> {
     const sinceDate = since ? new Date(since) : undefined;
@@ -99,12 +107,18 @@ export class LiveService {
     };
   }
 
-  async updateSessionStatus(id: string, status: LiveSessionStatus) {
+  async updateSessionStatus(
+    id: string,
+    status: LiveSessionStatus,
+  ): Promise<LiveSessionPublicDto> {
     const session = await this.repo.findSessionById(id);
     if (!session) {
       throw new NotFoundException(`Live session "${id}" not found`);
     }
-    return this.repo.updateSessionStatus(id, status);
+    const updated = await this.repo.updateSessionStatus(id, status);
+    const dto = this.mapSession(updated);
+    this.emitSessionUpdate(dto);
+    return dto;
   }
 
   // Channel methods
@@ -162,7 +176,6 @@ export class LiveService {
     return this.mapChannel(channel);
   }
 
-  // Session methods
   async createSession(
     data: CreateLiveSessionDto,
   ): Promise<LiveSessionPublicDto> {
@@ -172,7 +185,9 @@ export class LiveService {
       scheduledAt: data.scheduledAt ? new Date(data.scheduledAt) : undefined,
       telegramMsgId: data.telegramMsgId,
     });
-    return this.mapSession(session);
+    const dto = this.mapSession(session);
+    this.emitSessionUpdate(dto);
+    return dto;
   }
 
   async updateSession(
@@ -200,6 +215,14 @@ export class LiveService {
       updateData.viewerCount = data.viewerCount;
 
     const session = await this.repo.updateSession(id, updateData);
+    const dto = this.mapSession(session);
+    this.emitSessionUpdate(dto);
+    return dto;
+  }
+
+  async getSessionPublic(id: string): Promise<LiveSessionPublicDto | null> {
+    const session = await this.repo.findSessionPublicById(id);
+    if (!session) return null;
     return this.mapSession(session);
   }
 
