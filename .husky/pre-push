@@ -20,7 +20,7 @@ if git diff --quiet origin/main...HEAD -- ':(glob)apps/web/**' ':(glob)packages/
   printf "pre-push: skipping web e2e (no web-affecting changes)\n"
 else
   printf "pre-push: running web e2e\n"
-  pnpm --filter web test:e2e
+  pnpm turbo test:e2e --filter=web
 fi
 
 if git diff --quiet origin/main...HEAD -- README.md ':(glob)docs/**/*.md' AGENT.md AGENTS.md .github/copilot-instructions.md; then
@@ -34,3 +34,11 @@ if git diff --quiet origin/main...HEAD -- packages/db/prisma/schema.prisma packa
 else
   pnpm --filter @sd/db prisma:generate
 fi
+
+if git diff --quiet origin/main...HEAD -- ':(glob)apps/native/**'; then
+  printf "pre-push: skipping expo-doctor (no native changes)\n"
+else
+  printf "pre-push: running expo-doctor\n"
+  pnpm --filter native exec expo-doctor
+fi
+

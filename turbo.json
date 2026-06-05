@@ -34,7 +34,7 @@
       "outputs": ["generated/**", "src/generated/**"]
     },
     "test": {
-      "dependsOn": ["^test"],
+      "dependsOn": ["^build", "^test"],
       "inputs": [
         "$TURBO_DEFAULT$",
         "**/*.spec.*",
@@ -45,12 +45,14 @@
       "outputs": []
     },
     "test:e2e": {
-      "dependsOn": ["^test:e2e"],
-      // E2E tests hit external services/browsers — results are not reproducible from inputs alone
-      "cache": false
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "e2e/**/*.ts"],
+      "outputs": ["playwright-report/**", "test-results/**"],
+      "cache": true,
+      "env": ["CI", "PW_SKIP_WEB_BUILD"]
     },
     "test:prepush": {
-      "dependsOn": ["^test:prepush"],
+      "dependsOn": ["^build", "^test:prepush"],
       "cache": true
     },
     // Generates OpenAPI spec from NestJS decorators for contract-first API development

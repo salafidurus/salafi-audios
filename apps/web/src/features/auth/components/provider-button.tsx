@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type CSSProperties } from "react";
+import Image from "next/image";
 
 type Provider = "apple" | "google";
 type ThemeMode = "light" | "dark";
@@ -66,9 +67,8 @@ export function AuthProviderButton({
         opacity: disabled ? 0.45 : 1,
       }}
     >
-      <img
+      <Image
         src={themeConfig.src}
-        srcSet={themeConfig.srcSet}
         width={config.width}
         height={config.height}
         alt=""
@@ -104,30 +104,26 @@ function getProviderThemeConfig(provider: Provider, themeMode: ThemeMode) {
   if (provider === "apple") {
     if (themeMode === "dark") {
       return {
-        src: "/auth/apple-continue-dark-1x.png",
-        srcSet: "/auth/apple-continue-dark-1x.png 1x, /auth/apple-continue-dark-4x.png 4x",
+        src: "/auth/apple-continue-dark-4x.png",
         buttonStyle: {} satisfies CSSProperties,
       };
     }
 
     return {
-      src: "/auth/apple-continue-light-1x.png",
-      srcSet: "/auth/apple-continue-light-1x.png 1x, /auth/apple-continue-light-4x.png 4x",
+      src: "/auth/apple-continue-light-4x.png",
       buttonStyle: {} satisfies CSSProperties,
     };
   }
 
   if (themeMode === "dark") {
     return {
-      src: "/auth/google-continue-dark-1x-web.png",
-      srcSet: "/auth/google-continue-dark-1x-web.png 1x, /auth/google-continue-dark-4x-web.png 4x",
+      src: "/auth/google-continue-dark-4x-web.png",
       buttonStyle: {} satisfies CSSProperties,
     };
   }
 
   return {
-    src: "/auth/google-continue-light-1x-web.png",
-    srcSet: "/auth/google-continue-light-1x-web.png 1x, /auth/google-continue-light-4x-web.png 4x",
+    src: "/auth/google-continue-light-4x-web.png",
     buttonStyle: {} satisfies CSSProperties,
   };
 }

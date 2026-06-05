@@ -2,7 +2,7 @@
   // Build config — drives NestJS CLI compilation and produces the dist/ output.
   "extends": "@sd/util-config/tsconfig/nest.json",
   "compilerOptions": {
-    "declaration": true,
+    "declaration": false,
     "removeComments": true,
     "sourceMap": true,
     "outDir": "./dist",

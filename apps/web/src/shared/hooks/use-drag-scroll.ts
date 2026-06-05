@@ -63,7 +63,6 @@ export function useDragScroll(direction: "horizontal" | "vertical") {
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
     // passive: false is required because onWheel calls e.preventDefault() to intercept scroll
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     el.addEventListener("wheel", onWheel, { passive: false });
 
     return () => {

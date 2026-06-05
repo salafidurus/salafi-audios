@@ -4,20 +4,20 @@
   "private": true,
   "sideEffects": false,
   "files": [
+    "src",
     "dist"
   ],
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
     ".": {
       "types": "./src/index.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./src/index.ts",
+      "require": "./src/index.ts",
+      "default": "./src/index.ts"
     },
     "./locales/*": {
-      "types": "./src/locales/*",
-      "default": "./dist/locales/*"
+      "default": "./src/locales/*"
     }
   },
   "scripts": {
@@ -38,9 +38,9 @@
   "devDependencies": {
     "@sd/util-config": "workspace:*",
     "@types/jest": "^30.0.0",
-    "jest": "^30.2.0",
+    "jest": "^30.4.2",
     "rimraf": "^6.0.0",
-    "ts-jest": "^29.4.6",
+    "ts-jest": "^29.4.11",
     "tsup": "^8.0.0"
   }
 }

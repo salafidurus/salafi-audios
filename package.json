@@ -50,7 +50,9 @@
     "ci:local": "pnpm verify:build-configs && pnpm lint && pnpm typecheck && pnpm test:prepush && pnpm build:affected && pnpm --filter web build && pnpm docs:quality",
     "ingest:content": "pnpm --filter @sd/util-ingest ingest:content",
     "ingest:remove": "pnpm --filter @sd/util-ingest ingest:remove",
-    "doctor": "npx react-doctor@latest"
+    "doctor": "npx react-doctor@latest",
+    "native:expo:fix": "pnpm --filter native exec expo install --check",
+    "native:expo:check": "pnpm --filter native exec expo-doctor"
   },
   "devDependencies": {
     "@commitlint/cli": "20.3.1",
@@ -65,7 +67,7 @@
     "husky": "9.1.7",
     "lint-staged": "16.2.7",
     "markdownlint-cli2": "0.18.1",
-    "prettier": "3.3.3",
+    "prettier": "3.8.3",
     "react-doctor": "^0.2.14",
     "rimraf": "6.0.0",
     "tsx": "4.21.0",
@@ -78,7 +80,11 @@
     "overrides": {
       "react": "19.2.3",
       "react-dom": "19.2.3",
-      "@types/react": "19.2.9"
+      "@types/react": "19.2.9",
+      "jest": "^29.7.0",
+      "ts-jest": "^29.2.5",
+      "jest-environment-jsdom": "^29.7.0",
+      "@types/jest": "^29.5.14"
     }
   }
 }

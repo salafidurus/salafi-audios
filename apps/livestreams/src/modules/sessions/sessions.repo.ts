@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../shared/db/prisma.service";
+import { PrismaService } from "../../shared/db/prisma.service";
 import { LiveSessionStatus } from "@sd/core-db";
 
 @Injectable()
