@@ -34,7 +34,7 @@
       "outputs": ["generated/**", "src/generated/**"]
     },
     "test": {
-      "dependsOn": ["^test"],
+      "dependsOn": ["^build", "^test"],
       "inputs": [
         "$TURBO_DEFAULT$",
         "**/*.spec.*",
@@ -52,7 +52,7 @@
       "env": ["CI", "PW_SKIP_WEB_BUILD"]
     },
     "test:prepush": {
-      "dependsOn": ["^test:prepush"],
+      "dependsOn": ["^build", "^test:prepush"],
       "cache": true
     },
     // Generates OpenAPI spec from NestJS decorators for contract-first API development
