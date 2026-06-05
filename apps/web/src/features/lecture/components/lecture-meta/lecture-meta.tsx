@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import type { LectureDetailDto } from "@sd/core-contracts";
 import { AppText } from "@/shared/components/AppText/AppText";
 
@@ -39,10 +40,13 @@ export function LectureMeta({ lecture }: LectureMetaProps) {
         }}
       >
         {lecture.scholar.imageUrl && (
-          <img
+          <Image
             src={lecture.scholar.imageUrl}
             alt={lecture.scholar.name}
-            style={{ width: 28, height: 28, borderRadius: 14, objectFit: "cover" }}
+            width={28}
+            height={28}
+            unoptimized
+            style={{ borderRadius: 14, objectFit: "cover" }}
           />
         )}
         <AppText variant="labelMd">{lecture.scholar.name}</AppText>

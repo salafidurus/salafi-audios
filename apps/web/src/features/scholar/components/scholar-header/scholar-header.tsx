@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import type { ScholarDetailDto } from "@sd/core-contracts";
 
 export type ScholarHeaderProps = {
@@ -16,12 +17,13 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
   return (
     <div>
       {scholar.imageUrl && (
-        <img
+        <Image
           src={scholar.imageUrl}
           alt={scholar.name}
+          width={120}
+          height={120}
+          unoptimized
           style={{
-            width: 120,
-            height: 120,
             borderRadius: 60,
             objectFit: "cover",
             marginBottom: 16,
