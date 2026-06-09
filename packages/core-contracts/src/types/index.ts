@@ -22,6 +22,12 @@ export {
   type RelatedLectureDto,
   type AdminLectureUpdateDto,
   type AdminLectureActionDto,
+  type CreateLectureDto,
+  type AdminLectureListItemDto,
+  type AdminLectureListDto,
+  type AdminLectureDetailDto,
+  type BulkActionDto,
+  type BulkActionResultDto,
 } from "../types/lecture.types";
 export {
   type ScholarViewDto,
@@ -35,6 +41,23 @@ export {
 } from "../types/scholar.types";
 export { type CollectionViewDto } from "../types/collection.types";
 export { type SeriesViewDto } from "../types/series.types";
+export {
+  type PresignedUrlPurpose,
+  type PresignedUrlRequestDto,
+  type PresignedUrlResponseDto,
+} from "../types/media.types";
+export {
+  type AdminSeriesListItemDto,
+  type AdminSeriesDetailDto,
+  type CreateSeriesDto,
+  type UpdateSeriesDto,
+} from "../types/series.types";
+export {
+  type AdminCollectionListItemDto,
+  type AdminCollectionDetailDto,
+  type CreateCollectionDto,
+  type UpdateCollectionDto,
+} from "../types/collection.types";
 export { type PlatformStatsDto } from "../types/analytics.types";
 export {
   type SearchCatalogParams,
