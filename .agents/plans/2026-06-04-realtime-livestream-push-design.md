@@ -46,12 +46,10 @@ graph TD
 ### 1. Backend Core (`apps/api`)
 
 - **Environment & Config:**
-
   - Add `LIVESTREAM_SECRET` validation via `zod` in `apps/api/src/shared/config/env.ts` (optional with a fallback in development, required in production).
   - Expose `LIVESTREAM_SECRET` in `ConfigService`.
 
 - **Live Service (`LiveService`):**
-
   - Maintain an RxJS `Subject` to act as the central message bus.
   - Implement `emitSessionUpdate(session: LiveSessionPublicDto)` to push changes to the stream.
   - Call `emitSessionUpdate` during standard DB updates (create/update/status changes).
