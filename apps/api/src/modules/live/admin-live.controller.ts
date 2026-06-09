@@ -6,6 +6,7 @@ import {
   UseGuards,
   Post,
   Put,
+  Get,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import type {
@@ -14,6 +15,7 @@ import type {
   UpdateLivestreamChannelDto,
   CreateLiveSessionDto,
   UpdateLiveSessionDto,
+  LivestreamChannelDto,
 } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { RequiresPermission } from '../../shared/decorators/requires-permission.decorator';
@@ -26,6 +28,13 @@ import { LiveService } from './live.service';
 @UseGuards(AdminPermissionGuard)
 export class AdminLiveController {
   constructor(private readonly service: LiveService) {}
+
+  @Get('channels')
+  @RequiresPermission('manage:livestreams')
+  @ApiOperation({ summary: 'List all livestream channels' })
+  listChannels(): Promise<LivestreamChannelDto[]> {
+    return this.service.listChannels();
+  }
 
   @Post('channels')
   @RequiresPermission('manage:livestreams')

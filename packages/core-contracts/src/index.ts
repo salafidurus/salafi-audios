@@ -7,6 +7,7 @@ export { endpoints } from "./endpoints";
 
 // Export all shared types
 export {
+  type StatusValue,
   type TopicSlug,
   type TopicViewDto,
   type TopicDetailDto,
