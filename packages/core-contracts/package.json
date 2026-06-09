@@ -47,7 +47,7 @@
     "test:cov": "node ../../node_modules/jest/bin/jest.js --coverage --passWithNoTests"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.69.0"
+    "@tanstack/react-query": "catalog:"
   },
   "devDependencies": {
     "@sd/util-config": "workspace:*",
@@ -55,7 +55,7 @@
     "@types/react": "~19.2.14",
     "jest": "^30.4.2",
     "rimraf": "^6.0.0",
-    "ts-jest": "^29.4.11"
+    "ts-jest": "catalog:"
   },
   "peerDependencies": {
     "react": ">=18"

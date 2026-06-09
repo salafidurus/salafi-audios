@@ -3,9 +3,28 @@ packages:
   - packages/*
 
 catalog:
+  "@better-auth/expo": ^1.6.14
+  "@nestjs/common": ^11.1.24
+  "@nestjs/core": ^11.1.24
+  "@nestjs/platform-express": ^11.1.24
+  "@nestjs/terminus": ^11.1.1
+  "@nestjs/testing": ^11.1.24
+  "@prisma/adapter-pg": ^7.3.0
+  "@prisma/client": ^7.3.0
+  "@tanstack/react-query": ^5.69.0
+  better-auth: ^1.6.14
+  class-transformer: ^0.5.1
+  class-validator: ^0.15.1
   i18next: ^26.3.1
+  pg: ^8.17.2
+  react: 19.2.3
+  react-dom: 19.2.3
   react-hook-form: ^7.78.0
   react-i18next: ^15.5.3
+  reflect-metadata: ^0.2.2
+  rxjs: ^7.8.2
+  ts-jest: ^29.4.11
+  zustand: ^5.0.11
 
 # Allowlist of native packages that need post-install build steps.
 # All other native deps are skipped for faster installs — add here only if builds fail.

@@ -6,15 +6,63 @@ settings:
 
 catalogs:
   default:
+    '@better-auth/expo':
+      specifier: ^1.6.14
+      version: 1.6.14
+    '@nestjs/common':
+      specifier: ^11.1.24
+      version: 11.1.24
+    '@nestjs/core':
+      specifier: ^11.1.24
+      version: 11.1.24
+    '@nestjs/platform-express':
+      specifier: ^11.1.24
+      version: 11.1.24
+    '@nestjs/terminus':
+      specifier: ^11.1.1
+      version: 11.1.1
+    '@nestjs/testing':
+      specifier: ^11.1.24
+      version: 11.1.24
+    '@prisma/adapter-pg':
+      specifier: ^7.3.0
+      version: 7.3.0
+    '@prisma/client':
+      specifier: ^7.3.0
+      version: 7.3.0
+    '@tanstack/react-query':
+      specifier: ^5.69.0
+      version: 5.90.19
+    better-auth:
+      specifier: ^1.6.14
+      version: 1.6.14
+    class-transformer:
+      specifier: ^0.5.1
+      version: 0.5.1
+    class-validator:
+      specifier: ^0.15.1
+      version: 0.15.1
     i18next:
       specifier: ^26.3.1
       version: 26.3.1
+    pg:
+      specifier: ^8.17.2
+      version: 8.17.2
     react-hook-form:
       specifier: ^7.78.0
       version: 7.78.0
     react-i18next:
       specifier: ^15.5.3
       version: 15.7.4
+    reflect-metadata:
+      specifier: ^0.2.2
+      version: 0.2.2
+    rxjs:
+      specifier: ^7.8.2
+      version: 7.8.2
+    zustand:
+      specifier: ^5.0.11
+      version: 5.0.11
 
 overrides:
   react: 19.2.3
@@ -90,43 +138,43 @@ importers:
   apps/api:
     dependencies:
       '@better-auth/expo':
-        specifier: ^1.6.14
+        specifier: 'catalog:'
         version: 1.6.14(3d4f6298f332233801cd9990f81359f8)
       '@nestjs/common':
-        specifier: ^11.1.24
+        specifier: 'catalog:'
         version: 11.1.24(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core':
-        specifier: ^11.1.24
+        specifier: 'catalog:'
         version: 11.1.24(@nestjs/common@11.1.24(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.24)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express':
-        specifier: ^11.1.24
+        specifier: 'catalog:'
         version: 11.1.24(@nestjs/common@11.1.24(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.24)
       '@nestjs/swagger':
         specifier: ^11.4.4
         version: 11.4.4(@nestjs/common@11.1.24(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.24)(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)
       '@nestjs/terminus':
-        specifier: ^11.1.1
+        specifier: 'catalog:'
         version: 11.1.1(@nestjs/common@11.1.24(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.24)(@prisma/client@7.3.0(prisma@7.3.0(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@6.0.3))(typescript@6.0.3))(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/throttler':
         specifier: ^6.5.0
         version: 6.5.0(@nestjs/common@11.1.24(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.24)(reflect-metadata@0.2.2)
       '@prisma/adapter-pg':
-        specifier: ^7.3.0
+        specifier: 'catalog:'
         version: 7.3.0
       '@prisma/client':
-        specifier: ^7.3.0
+        specifier: 'catalog:'
         version: 7.3.0(prisma@7.3.0(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@6.0.3))(typescript@6.0.3)
       '@sd/core-i18n':
         specifier: workspace:*
         version: link:../../packages/core-i18n
       better-auth:
-        specifier: ^1.6.14
+        specifier: 'catalog:'
         version: 1.6.14(@opentelemetry/api@1.9.1)(@prisma/client@7.3.0(prisma@7.3.0(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@6.0.3))(typescript@6.0.3))(mongodb@7.1.0(socks@2.8.7))(mysql2@3.15.3)(next@16.2.7(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@playwright/test@1.60.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(pg@8.17.2)(prisma@7.3.0(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@6.0.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       class-transformer:
-        specifier: ^0.5.1
+        specifier: 'catalog:'
         version: 0.5.1
       class-validator:
-        specifier: ^0.15.1
+        specifier: 'catalog:'
         version: 0.15.1
       cookie-parser:
         specifier: ^1.4.7
@@ -141,16 +189,16 @@ importers:
         specifier: ^4.6.1
         version: 4.6.1(@nestjs/common@11.1.24(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(pino-http@11.0.0)(pino@10.3.0)(rxjs@7.8.2)
       pg:
-        specifier: ^8.17.2
+        specifier: 'catalog:'
         version: 8.17.2
       pino-http:
         specifier: ^11.0.0
         version: 11.0.0
       reflect-metadata:
-        specifier: ^0.2.2
+        specifier: 'catalog:'
         version: 0.2.2
       rxjs:
-        specifier: ^7.8.2
+        specifier: 'catalog:'
         version: 7.8.2
       zod:
         specifier: ^4.4.3
@@ -169,7 +217,7 @@ importers:
         specifier: ^11.1.0
         version: 11.1.0(chokidar@4.0.3)(prettier@3.8.3)(typescript@6.0.3)
       '@nestjs/testing':
-        specifier: ^11.1.24
+        specifier: 'catalog:'
         version: 11.1.24(@nestjs/common@11.1.24(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.24)(@nestjs/platform-express@11.1.24)
       '@sd/core-contracts':
         specifier: workspace:*
@@ -241,22 +289,22 @@ importers:
   apps/livestreams:
     dependencies:
       '@nestjs/common':
-        specifier: ^11.1.24
+        specifier: 'catalog:'
         version: 11.1.24(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/core':
-        specifier: ^11.1.24
+        specifier: 'catalog:'
         version: 11.1.24(@nestjs/common@11.1.24(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/platform-express@11.1.24)(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@nestjs/platform-express':
-        specifier: ^11.1.24
+        specifier: 'catalog:'
         version: 11.1.24(@nestjs/common@11.1.24(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.24)
       '@nestjs/schedule':
         specifier: ^5.0.1
         version: 5.0.1(@nestjs/common@11.1.24(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.24)
       '@nestjs/terminus':
-        specifier: ^11.1.1
+        specifier: 'catalog:'
         version: 11.1.1(@nestjs/common@11.1.24(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.24)(@prisma/client@7.3.0(prisma@7.3.0(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.9.3))(typescript@5.9.3))(reflect-metadata@0.2.2)(rxjs@7.8.2)
       '@prisma/adapter-pg':
-        specifier: ^7.3.0
+        specifier: 'catalog:'
         version: 7.3.0
       '@sd/core-contracts':
         specifier: workspace:*
@@ -265,10 +313,10 @@ importers:
         specifier: workspace:*
         version: link:../../packages/core-db
       class-transformer:
-        specifier: ^0.5.1
+        specifier: 'catalog:'
         version: 0.5.1
       class-validator:
-        specifier: ^0.15.1
+        specifier: 'catalog:'
         version: 0.15.1
       dotenv:
         specifier: ^17.4.2
@@ -277,13 +325,13 @@ importers:
         specifier: ^8.1.0
         version: 8.1.0
       pg:
-        specifier: ^8.17.2
+        specifier: 'catalog:'
         version: 8.17.2
       reflect-metadata:
-        specifier: ^0.2.2
+        specifier: 'catalog:'
         version: 0.2.2
       rxjs:
-        specifier: ^7.8.2
+        specifier: 'catalog:'
         version: 7.8.2
       telegram:
         specifier: ^2.26.16
@@ -305,7 +353,7 @@ importers:
         specifier: ^11.0.9
         version: 11.0.9(chokidar@4.0.3)(typescript@5.9.3)
       '@nestjs/testing':
-        specifier: ^11.1.24
+        specifier: 'catalog:'
         version: 11.1.24(@nestjs/common@11.1.24(class-transformer@0.5.1)(class-validator@0.15.1)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.24)(@nestjs/platform-express@11.1.24)
       '@sd/util-config':
         specifier: workspace:*
@@ -359,7 +407,7 @@ importers:
   apps/native:
     dependencies:
       '@better-auth/expo':
-        specifier: ^1.6.14
+        specifier: 'catalog:'
         version: 1.6.14(83cd98e37cf9ca4c355254355bf82f39)
       '@expo/dom-webview':
         specifier: ^56.0.0
@@ -416,10 +464,10 @@ importers:
         specifier: 2.0.2
         version: 2.0.2(@babel/runtime@7.29.2)(react-native@0.85.3(@babel/core@7.29.7)(@react-native/jest-preset@0.85.0(@babel/core@7.29.7)(react@19.2.3))(@react-native/metro-config@0.85.3(@babel/core@7.29.7))(@types/react@19.2.9)(bufferutil@4.1.0)(react@19.2.3)(utf-8-validate@5.0.10))(react@19.2.3)
       '@tanstack/react-query':
-        specifier: ^5.90.2
+        specifier: 'catalog:'
         version: 5.90.19(react@19.2.3)
       better-auth:
-        specifier: ^1.6.14
+        specifier: 'catalog:'
         version: 1.6.14(@opentelemetry/api@1.9.1)(@prisma/client@7.3.0(prisma@7.3.0(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@6.0.3))(typescript@6.0.3))(mongodb@7.1.0(socks@2.8.7))(mysql2@3.15.3)(next@16.2.7(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@playwright/test@1.60.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(pg@8.17.2)(prisma@7.3.0(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@6.0.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       expo:
         specifier: ~56.0.5
@@ -557,7 +605,7 @@ importers:
         specifier: ^3.25.17
         version: 3.25.76
       zustand:
-        specifier: ^5.0.11
+        specifier: 'catalog:'
         version: 5.0.11(@types/react@19.2.9)(immer@9.0.21)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
     devDependencies:
       '@rnrepo/expo-config-plugin':
@@ -624,7 +672,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/domain-search
       better-auth:
-        specifier: ^1.6.14
+        specifier: 'catalog:'
         version: 1.6.14(@opentelemetry/api@1.9.1)(@prisma/client@7.3.0(prisma@7.3.0(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@6.0.3))(typescript@6.0.3))(mongodb@7.1.0(socks@2.8.7))(mysql2@3.15.3)(next@16.2.7(@babel/core@7.29.7)(@opentelemetry/api@1.9.1)(@playwright/test@1.60.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(pg@8.17.2)(prisma@7.3.0(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@6.0.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       clsx:
         specifier: ^2.1.1
@@ -657,7 +705,7 @@ importers:
         specifier: ^3.25.17
         version: 3.25.76
       zustand:
-        specifier: ^5.0.11
+        specifier: 'catalog:'
         version: 5.0.11(@types/react@19.2.9)(immer@9.0.21)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
     devDependencies:
       '@jest/globals':
@@ -718,7 +766,7 @@ importers:
   packages/core-contracts:
     dependencies:
       '@tanstack/react-query':
-        specifier: ^5.69.0
+        specifier: 'catalog:'
         version: 5.90.19(react@19.2.3)
       react:
         specifier: 19.2.3
@@ -746,7 +794,7 @@ importers:
   packages/core-db:
     dependencies:
       '@prisma/client':
-        specifier: ^7.3.0
+        specifier: 'catalog:'
         version: 7.3.0(prisma@7.3.0(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@6.0.3))(typescript@6.0.3)
       '@prisma/client-runtime-utils':
         specifier: ^7.3.0
@@ -854,7 +902,7 @@ importers:
         specifier: 19.2.3
         version: 19.2.3
       zustand:
-        specifier: ^5.0.11
+        specifier: 'catalog:'
         version: 5.0.11(@types/react@19.2.9)(immer@9.0.21)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
     devDependencies:
       '@types/jest':
@@ -882,7 +930,7 @@ importers:
         specifier: workspace:*
         version: link:../domain-audio
       '@tanstack/react-query':
-        specifier: ^5.69.0
+        specifier: 'catalog:'
         version: 5.90.19(react@19.2.3)
       react:
         specifier: 19.2.3
@@ -972,7 +1020,7 @@ importers:
         specifier: ^3.1063.0
         version: 3.1063.0
       '@prisma/adapter-pg':
-        specifier: ^7.3.0
+        specifier: 'catalog:'
         version: 7.3.0
       '@sd/core-db':
         specifier: workspace:*
@@ -15395,6 +15443,22 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@typescript-eslint/eslint-plugin@8.53.1(@typescript-eslint/parser@8.53.1(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)':
+    dependencies:
+      '@eslint-community/regexpp': 4.12.2
+      '@typescript-eslint/parser': 8.53.1(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3)
+      '@typescript-eslint/scope-manager': 8.53.1
+      '@typescript-eslint/type-utils': 8.53.1(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
+      '@typescript-eslint/utils': 8.53.1(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
+      '@typescript-eslint/visitor-keys': 8.53.1
+      eslint: 9.39.4(jiti@2.7.0)
+      ignore: 7.0.5
+      natural-compare: 1.4.0
+      ts-api-utils: 2.4.0(typescript@6.0.3)
+      typescript: 6.0.3
+    transitivePeerDependencies:
+      - supports-color
+
   '@typescript-eslint/eslint-plugin@8.53.1(@typescript-eslint/parser@8.53.1(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)':
     dependencies:
       '@eslint-community/regexpp': 4.12.2
@@ -17583,7 +17647,7 @@ snapshots:
       tinyglobby: 0.2.17
       unrs-resolver: 1.12.2
     optionalDependencies:
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.53.1(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.4(jiti@2.7.0))
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.60.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.4(jiti@2.7.0))
     transitivePeerDependencies:
       - supports-color
 
@@ -19366,7 +19430,7 @@ snapshots:
 
   jest-cli@29.7.0(@types/node@20.19.30):
     dependencies:
-      '@jest/core': 29.7.0(ts-node@10.9.2(@types/node@22.19.7)(typescript@5.9.3))
+      '@jest/core': 29.7.0(ts-node@10.9.2(@types/node@22.19.7)(typescript@6.0.3))
       '@jest/test-result': 29.7.0
       '@jest/types': 29.6.3
       chalk: 4.1.2
@@ -19385,14 +19449,14 @@ snapshots:
 
   jest-cli@29.7.0(@types/node@22.19.7):
     dependencies:
-      '@jest/core': 29.7.0(ts-node@10.9.2(@types/node@22.19.7)(typescript@5.9.3))
+      '@jest/core': 29.7.0(ts-node@10.9.2(@types/node@22.19.7)(typescript@6.0.3))
       '@jest/test-result': 29.7.0
       '@jest/types': 29.6.3
       chalk: 4.1.2
-      create-jest: 29.7.0(@types/node@22.19.7)(ts-node@10.9.2(@types/node@22.19.7)(typescript@5.9.3))
+      create-jest: 29.7.0(@types/node@22.19.7)(ts-node@10.9.2(@types/node@22.19.7)(typescript@6.0.3))
       exit: 0.1.2
       import-local: 3.2.0
-      jest-config: 29.7.0(@types/node@22.19.7)(ts-node@10.9.2(@types/node@22.19.7)(typescript@5.9.3))
+      jest-config: 29.7.0(@types/node@22.19.7)(ts-node@10.9.2(@types/node@22.19.7)(typescript@6.0.3))
       jest-util: 29.7.0
       jest-validate: 29.7.0
       yargs: 17.7.2
@@ -19442,7 +19506,7 @@ snapshots:
 
   jest-cli@29.7.0(@types/node@25.9.2):
     dependencies:
-      '@jest/core': 29.7.0(ts-node@10.9.2(@types/node@22.19.7)(typescript@5.9.3))
+      '@jest/core': 29.7.0(ts-node@10.9.2(@types/node@22.19.7)(typescript@6.0.3))
       '@jest/test-result': 29.7.0
       '@jest/types': 29.6.3
       chalk: 4.1.2
@@ -19915,7 +19979,7 @@ snapshots:
 
   jest@29.7.0(@types/node@20.19.30):
     dependencies:
-      '@jest/core': 29.7.0(ts-node@10.9.2(@types/node@22.19.7)(typescript@5.9.3))
+      '@jest/core': 29.7.0(ts-node@10.9.2(@types/node@22.19.7)(typescript@6.0.3))
       '@jest/types': 29.6.3
       import-local: 3.2.0
       jest-cli: 29.7.0(@types/node@20.19.30)
@@ -19927,7 +19991,7 @@ snapshots:
 
   jest@29.7.0(@types/node@22.19.7):
     dependencies:
-      '@jest/core': 29.7.0(ts-node@10.9.2(@types/node@22.19.7)(typescript@5.9.3))
+      '@jest/core': 29.7.0(ts-node@10.9.2(@types/node@22.19.7)(typescript@6.0.3))
       '@jest/types': 29.6.3
       import-local: 3.2.0
       jest-cli: 29.7.0(@types/node@22.19.7)
@@ -19963,7 +20027,7 @@ snapshots:
 
   jest@29.7.0(@types/node@25.9.2):
     dependencies:
-      '@jest/core': 29.7.0(ts-node@10.9.2(@types/node@22.19.7)(typescript@5.9.3))
+      '@jest/core': 29.7.0(ts-node@10.9.2(@types/node@22.19.7)(typescript@6.0.3))
       '@jest/types': 29.6.3
       import-local: 3.2.0
       jest-cli: 29.7.0(@types/node@25.9.2)
@@ -23182,7 +23246,7 @@ snapshots:
 
   typescript-eslint@8.53.1(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3):
     dependencies:
-      '@typescript-eslint/eslint-plugin': 8.53.1(@typescript-eslint/parser@8.53.1(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3))(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
+      '@typescript-eslint/eslint-plugin': 8.53.1(@typescript-eslint/parser@8.53.1(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
       '@typescript-eslint/parser': 8.53.1(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)
       '@typescript-eslint/typescript-estree': 8.53.1(typescript@6.0.3)
       '@typescript-eslint/utils': 8.53.1(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3)

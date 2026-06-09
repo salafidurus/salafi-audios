@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@sd/core-contracts": "workspace:*",
-    "zustand": "^5.0.11"
+    "zustand": "catalog:"
   },
   "peerDependencies": {
     "react": "*"
@@ -25,6 +25,6 @@
     "@types/jest": "^30.0.0",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
-    "ts-jest": "^29.4.11"
+    "ts-jest": "catalog:"
   }
 }
