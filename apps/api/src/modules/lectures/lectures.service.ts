@@ -4,11 +4,16 @@ import type {
   RelatedLectureDto,
   AdminLectureUpdateDto,
   AdminLectureActionDto,
+  AdminLectureListDto,
+  AdminLectureDetailDto,
+  BulkActionDto,
+  BulkActionResultDto,
   TranslationViewDto,
 } from '@sd/core-contracts';
 import { Status } from '@sd/core-db';
 import { LecturesRepository } from './lectures.repo';
 import type { SaveLectureTranslationDto } from './dto/save-lecture-translation.dto';
+import type { CreateLectureDto } from './dto/create-lecture.dto';
 
 @Injectable()
 export class LecturesService {
@@ -52,6 +57,35 @@ export class LecturesService {
       throw new NotFoundException(`Lecture "${id}" not found`);
     }
     return { success: true, message: 'Lecture archived successfully' };
+  }
+
+  // ─── Admin methods ────────────────────────────────────────────────────────
+
+  async listAdmin(params: {
+    page: number;
+    scholarId?: string;
+    status?: string;
+    search?: string;
+  }): Promise<AdminLectureListDto> {
+    return this.repo.listAdmin(params);
+  }
+
+  async getAdminDetail(id: string): Promise<AdminLectureDetailDto> {
+    const lecture = await this.repo.findAdminDetail(id);
+    if (!lecture) throw new NotFoundException(`Lecture "${id}" not found`);
+    return lecture;
+  }
+
+  async createLecture(
+    dto: CreateLectureDto & { publicUrl: string },
+  ): Promise<{ id: string; title: string }> {
+    return this.repo.createWithAudioAsset(dto);
+  }
+
+  async bulkAction(dto: BulkActionDto): Promise<BulkActionResultDto> {
+    const status =
+      dto.action === 'publish' ? Status.published : Status.archived;
+    return this.repo.bulkUpdateStatus(dto.ids, status);
   }
 
   // ─── Lecture translations ─────────────────────────────────────────────────

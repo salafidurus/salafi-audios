@@ -107,7 +107,7 @@ export type AdminLectureActionDto = {
 export type CreateLectureDto = {
   title: string;
   slug?: string;
-  scholarId?: string;
+  scholarId: string;
   seriesId?: string;
   topics?: string[];
   audioKey: string;
