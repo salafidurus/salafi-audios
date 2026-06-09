@@ -7,7 +7,7 @@ jest.mock("../../hooks/use-admin-lectures", () => ({
   useAdminLectures: jest.fn(),
 }));
 jest.mock("@shopify/flash-list", () => {
-  const { FlatList } = require("react-native");
+  const { FlatList } = jest.requireActual<typeof import("react-native")>("react-native");
   return {
     FlashList: FlatList,
   };
@@ -33,7 +33,7 @@ describe("AdminLecturesScreen", () => {
       data: undefined,
       isLoading: true,
       refetch: jest.fn(),
-    } as any);
+    } as ReturnType<typeof mockUseAdminLectures>);
 
     let tree: ReturnType<typeof renderer.create>;
     act(() => {
@@ -51,7 +51,7 @@ describe("AdminLecturesScreen", () => {
       },
       isLoading: false,
       refetch: jest.fn(),
-    } as any);
+    } as ReturnType<typeof mockUseAdminLectures>);
 
     let tree: ReturnType<typeof renderer.create>;
     act(() => {

@@ -51,7 +51,7 @@ function SectionHeader({
           paddingVertical: 4,
           backgroundColor: "#3b82f6",
           borderRadius: 6,
-          marginRight: 8,
+          marginEnd: 8,
         }}
       >
         <Text style={{ color: "#fff", fontSize: 12, fontWeight: "600" }}>+ Add</Text>

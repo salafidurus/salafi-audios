@@ -10,13 +10,13 @@ jest.mock("@sd/core-contracts", () => ({
 }));
 
 jest.mock("@shopify/flash-list", () => {
-  const { FlatList } = require("react-native");
+  const { FlatList } = jest.requireActual<typeof import("react-native")>("react-native");
   return {
     FlashList: FlatList,
   };
 });
 
-const mockUseApiQuery = useApiQuery as jest.Mock;
+const mockUseApiQuery = jest.mocked(useApiQuery);
 
 describe("AdminScholarsScreen", () => {
   it("renders a loading indicator when loading", () => {

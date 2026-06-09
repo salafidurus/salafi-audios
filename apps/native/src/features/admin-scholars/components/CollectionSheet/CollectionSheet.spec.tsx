@@ -21,19 +21,13 @@ describe("CollectionSheet", () => {
   });
 
   it("renders Edit Collection title when collection is provided", () => {
-    const collection = {
-      id: "col-1",
-      scholarId: "s1",
-      title: "My Collection",
-      status: "draft",
-    };
     let tree: ReturnType<typeof renderer.create>;
     act(() => {
       tree = renderer.create(
         <CollectionSheet
           isOpen={true}
           scholarId="s1"
-          collection={collection as any}
+          collection={{ id: "col1", title: "My Collection", status: "draft" }}
           onClose={() => {}}
           onSaved={() => {}}
         />,

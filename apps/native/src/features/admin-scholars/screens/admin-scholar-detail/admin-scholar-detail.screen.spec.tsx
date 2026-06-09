@@ -20,14 +20,14 @@ jest.mock("../../hooks/use-admin-scholars", () => ({
 }));
 
 jest.mock("@/shared/components/DraggableList", () => {
-  const { FlatList } = require("react-native");
+  const { FlatList } = jest.requireActual<typeof import("react-native")>("react-native");
   return {
     DraggableList: FlatList,
   };
 });
 
 jest.mock("react-native-gesture-handler", () => {
-  const { View } = require("react-native");
+  const { View } = jest.requireActual<typeof import("react-native")>("react-native");
   return {
     GestureHandlerRootView: View,
     GestureDetector: View,
@@ -39,9 +39,9 @@ jest.mock("react-native-gesture-handler", () => {
   };
 });
 
-const mockUseApiQuery = useApiQuery as jest.Mock;
-const mockUseAdminSeries = useAdminSeries as jest.Mock;
-const mockUseAdminCollections = useAdminCollections as jest.Mock;
+const mockUseApiQuery = jest.mocked(useApiQuery);
+const mockUseAdminSeries = jest.mocked(useAdminSeries);
+const mockUseAdminCollections = jest.mocked(useAdminCollections);
 
 describe("AdminScholarDetailScreen", () => {
   beforeEach(() => {

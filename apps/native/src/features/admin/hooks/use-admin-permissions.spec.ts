@@ -1,4 +1,5 @@
 import { useAdminPermissions } from "./use-admin-permissions";
+import { useApiQuery } from "@sd/core-contracts";
 
 jest.mock("@sd/core-contracts", () => ({
   useApiQuery: jest.fn(),
@@ -8,11 +9,11 @@ jest.mock("@sd/core-contracts", () => ({
   },
 }));
 
-const { useApiQuery } = require("@sd/core-contracts");
+const mockUseApiQuery = jest.mocked(useApiQuery);
 
 describe("useAdminPermissions", () => {
   it("returns hasAnyPermission=false when permissions list is empty", () => {
-    useApiQuery.mockReturnValue({
+    mockUseApiQuery.mockReturnValue({
       data: { permissions: [] },
       isLoading: false,
     });
@@ -22,7 +23,7 @@ describe("useAdminPermissions", () => {
   });
 
   it("returns hasAnyPermission=true when user has at least one permission", () => {
-    useApiQuery.mockReturnValue({
+    mockUseApiQuery.mockReturnValue({
       data: {
         permissions: [{ permission: "manage:content", grantedAt: "2026-01-01" }],
       },

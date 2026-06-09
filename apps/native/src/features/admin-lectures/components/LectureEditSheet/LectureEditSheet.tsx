@@ -25,8 +25,8 @@ export function LectureEditSheet({ lectureId, onClose, onSaved }: LectureEditShe
     fetchAdminLectureDetail(lectureId).then((data) => {
       setLecture(data);
       setTitle(data.title ?? "");
-      setDescription((data as any).description ?? "");
-      setLanguage((data as any).language ?? "");
+      setDescription(data.description ?? "");
+      setLanguage(data.language ?? "");
     });
   }, [lectureId]);
 
@@ -40,7 +40,7 @@ export function LectureEditSheet({ lectureId, onClose, onSaved }: LectureEditShe
       await updateLecture(lecture.id, {
         title,
         ...(description ? { description } : {}),
-        ...(language ? { language: language as any } : {}),
+        ...(language ? { language } : {}),
       });
       onSaved();
     } catch (e) {

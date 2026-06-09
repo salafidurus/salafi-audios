@@ -1,4 +1,4 @@
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text } from "react-native";
 import { useTranslation } from "@/core/i18n/use-translation";
 
 type AdminDashboardScreenProps = {
@@ -28,8 +28,8 @@ export function AdminDashboardScreen({
           marginBottom: 12,
           backgroundColor: "#f3f4f6",
           borderRadius: 12,
-          borderLeftWidth: 4,
-          borderLeftColor: "#ef4444",
+          borderStartWidth: 4,
+          borderStartColor: "#ef4444",
         }}
       >
         <Text style={{ fontSize: 18, fontWeight: "600", marginBottom: 4 }}>
@@ -47,8 +47,8 @@ export function AdminDashboardScreen({
           marginBottom: 12,
           backgroundColor: "#f3f4f6",
           borderRadius: 12,
-          borderLeftWidth: 4,
-          borderLeftColor: "#f59e0b",
+          borderStartWidth: 4,
+          borderStartColor: "#f59e0b",
         }}
       >
         <Text style={{ fontSize: 18, fontWeight: "600", marginBottom: 4 }}>
@@ -66,8 +66,8 @@ export function AdminDashboardScreen({
           marginBottom: 12,
           backgroundColor: "#f3f4f6",
           borderRadius: 12,
-          borderLeftWidth: 4,
-          borderLeftColor: "#10b981",
+          borderStartWidth: 4,
+          borderStartColor: "#10b981",
         }}
       >
         <Text style={{ fontSize: 18, fontWeight: "600", marginBottom: 4 }}>

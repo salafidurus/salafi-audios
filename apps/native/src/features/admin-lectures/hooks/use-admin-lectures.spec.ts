@@ -1,4 +1,5 @@
 import { useAdminLectures } from "./use-admin-lectures";
+import { useApiQuery } from "@sd/core-contracts";
 
 jest.mock("@sd/core-contracts", () => ({
   useApiQuery: jest.fn(),
@@ -6,14 +7,14 @@ jest.mock("@sd/core-contracts", () => ({
   endpoints: { admin: { lectures: { list: "/admin/lectures" } } },
 }));
 
-const { useApiQuery } = require("@sd/core-contracts");
+const mockUseApiQuery = jest.mocked(useApiQuery);
 
 describe("useAdminLectures", () => {
   it("calls useApiQuery and returns result", () => {
-    useApiQuery.mockReturnValue({ data: { items: [], total: 0, page: 1 }, isLoading: false });
+    mockUseApiQuery.mockReturnValue({ data: { items: [], total: 0, page: 1 }, isLoading: false });
 
     const result = useAdminLectures();
     expect(result.data?.items).toEqual([]);
-    expect(useApiQuery).toHaveBeenCalled();
+    expect(mockUseApiQuery).toHaveBeenCalled();
   });
 });

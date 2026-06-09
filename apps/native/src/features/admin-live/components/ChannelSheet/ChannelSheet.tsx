@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
-import type { LivestreamChannelDto } from "@sd/core-contracts";
+import type { LivestreamChannelDto, Locale } from "@sd/core-contracts";
 import { createChannel, updateChannel } from "../../api/admin-live.api";
 
 const HELPER_TEXT = {
@@ -45,14 +45,14 @@ export function ChannelSheet({ isOpen, channel, onClose, onSaved }: ChannelSheet
         await updateChannel(channel.id, {
           displayName,
           telegramSlug: telegramSlug || undefined,
-          language: (language as any) || undefined,
+          language: (language as Locale) || undefined,
         });
       } else {
         await createChannel({
           telegramId,
           displayName,
           telegramSlug: telegramSlug || undefined,
-          language: (language as any) || undefined,
+          language: (language as Locale) || undefined,
         });
       }
       onSaved();
@@ -63,14 +63,14 @@ export function ChannelSheet({ isOpen, channel, onClose, onSaved }: ChannelSheet
     }
   };
 
-  const fields: Array<{
+  const fields: {
     key: keyof typeof HELPER_TEXT;
     label: string;
     value: string;
     set: (v: string) => void;
     keyboardType?: "default" | "numeric";
     showInEditMode?: boolean;
-  }> = [
+  }[] = [
     {
       key: "telegramId",
       label: "Telegram ID *",

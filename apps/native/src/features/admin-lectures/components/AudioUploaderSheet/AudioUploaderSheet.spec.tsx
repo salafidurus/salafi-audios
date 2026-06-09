@@ -11,10 +11,10 @@ jest.mock("expo-file-system", () => {
     }
   }
   class MockUploadTask {
-    file: any;
+    file: MockFile;
     url: string;
-    options: any;
-    constructor(file: any, url: string, options: any) {
+    options: Record<string, unknown>;
+    constructor(file: MockFile, url: string, options: Record<string, unknown>) {
       this.file = file;
       this.url = url;
       this.options = options;

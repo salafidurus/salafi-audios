@@ -1,4 +1,5 @@
 import { useAdminChannels, useAdminSessions } from "./use-admin-live";
+import { useApiQuery } from "@sd/core-contracts";
 
 jest.mock("@sd/core-contracts", () => ({
   useApiQuery: jest.fn(),
@@ -13,20 +14,20 @@ jest.mock("@sd/core-contracts", () => ({
   },
 }));
 
-const { useApiQuery } = require("@sd/core-contracts");
+const mockUseApiQuery = jest.mocked(useApiQuery);
 
 describe("useAdminLive hooks", () => {
   it("useAdminChannels calls useApiQuery", () => {
-    useApiQuery.mockReturnValue({ data: [], isLoading: false });
+    mockUseApiQuery.mockReturnValue({ data: [], isLoading: false });
     const result = useAdminChannels();
     expect(result.data).toEqual([]);
-    expect(useApiQuery).toHaveBeenCalled();
+    expect(mockUseApiQuery).toHaveBeenCalled();
   });
 
   it("useAdminSessions calls useApiQuery", () => {
-    useApiQuery.mockReturnValue({ data: { sessions: [] }, isLoading: false });
+    mockUseApiQuery.mockReturnValue({ data: { sessions: [] }, isLoading: false });
     const result = useAdminSessions();
     expect(result.data?.sessions).toEqual([]);
-    expect(useApiQuery).toHaveBeenCalled();
+    expect(mockUseApiQuery).toHaveBeenCalled();
   });
 });

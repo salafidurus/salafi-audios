@@ -8,8 +8,6 @@ import { AudioUploaderSheet } from "../../components/AudioUploaderSheet/AudioUpl
 import { LectureEditSheet } from "../../components/LectureEditSheet/LectureEditSheet";
 import { BulkActionBar } from "../../components/BulkActionBar/BulkActionBar";
 
-const FlashListAny = FlashList as any;
-
 export function AdminLecturesScreen() {
   const { data, isLoading, refetch } = useAdminLectures();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -72,11 +70,11 @@ export function AdminLecturesScreen() {
       {isLoading ? (
         <Text style={{ textAlign: "center", marginTop: 32 }}>Loading…</Text>
       ) : (
-        <FlashListAny
+        <FlashList<AdminLectureListItemDto>
           data={lectures}
           estimatedItemSize={72}
-          keyExtractor={(item: AdminLectureListItemDto) => item.id}
-          renderItem={({ item }: { item: AdminLectureListItemDto }) => {
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => {
             const isSelected = selectedIds.has(item.id);
             return (
               <Pressable

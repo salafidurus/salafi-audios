@@ -148,7 +148,7 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
                 paddingVertical: 6,
                 borderRadius: 16,
                 backgroundColor: isSelected ? "#3b82f6" : "#f3f4f6",
-                marginRight: 8,
+                marginEnd: 8,
                 borderWidth: 1,
                 borderColor: isSelected ? "#3b82f6" : "#e5e7eb",
                 height: 32,

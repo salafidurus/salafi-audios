@@ -2,6 +2,7 @@ import React from "react";
 import renderer, { act } from "react-test-renderer";
 import { useAccountScreen } from "@sd/domain-account";
 import { AccountScreen } from "./account.screen";
+import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 
 jest.mock("@sd/domain-account", () => ({
   useAccountScreen: jest.fn(),
@@ -22,9 +23,7 @@ jest.mock("../../i18n", () => ({
 }));
 
 const mockedUseAccountScreen = jest.mocked(useAccountScreen);
-const mockedUseAdminPermissions = jest.mocked(
-  require("@/features/admin/hooks/use-admin-permissions").useAdminPermissions,
-);
+const mockedUseAdminPermissions = jest.mocked(useAdminPermissions);
 
 describe("AccountScreen", () => {
   beforeEach(() => {

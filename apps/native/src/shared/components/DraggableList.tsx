@@ -1,19 +1,6 @@
 import React, { useState, useCallback, useRef } from "react";
-import {
-  View,
-  FlatList,
-  Pressable,
-  ViewStyle,
-  LayoutChangeEvent,
-  Animated as RNAnimated,
-} from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  runOnJS,
-} from "react-native-reanimated";
+import { View, FlatList, Pressable, ViewStyle, LayoutChangeEvent } from "react-native";
+import { useSharedValue } from "react-native-reanimated";
 
 export interface RenderItemParams<T> {
   item: T;
