@@ -1,5 +1,4 @@
-import { Pressable, Text, View } from "react-native";
-import { FlashList } from "@shopify/flash-list";
+import { FlatList, Pressable, Text, View } from "react-native";
 import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
 import type { ScholarListItemDto } from "@sd/core-contracts";
 
@@ -20,9 +19,8 @@ export function AdminScholarsScreen({ onNavigateToScholar }: AdminScholarsScreen
       {isLoading ? (
         <Text style={{ textAlign: "center", marginTop: 32 }}>Loading…</Text>
       ) : (
-        <FlashList
+        <FlatList
           data={data ?? []}
-          estimatedItemSize={64}
           keyExtractor={(item: ScholarListItemDto) => item.id}
           renderItem={({ item }: { item: ScholarListItemDto }) => (
             <Pressable

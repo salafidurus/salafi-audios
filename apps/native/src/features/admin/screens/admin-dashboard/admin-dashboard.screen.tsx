@@ -5,6 +5,7 @@ type AdminDashboardScreenProps = {
   onNavigateToLectures?: () => void;
   onNavigateToLive?: () => void;
   onNavigateToScholars?: () => void;
+  onNavigateToPermissions?: () => void;
 };
 
 export function AdminDashboardScreen({

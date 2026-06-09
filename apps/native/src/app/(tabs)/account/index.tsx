@@ -15,6 +15,7 @@ export default function AccountIndexRoute() {
     <AccountScreen
       onNavigateToProfile={() => router.push(routes.account.profile as Href)}
       onNavigateToLegal={() => router.push(routes.account.legal as Href)}
+      onNavigateToAdmin={() => router.push("/(tabs)/account/(admin)" as Href)}
       onSignOut={handleSignOut}
     />
   );
