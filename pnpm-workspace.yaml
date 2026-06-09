@@ -2,6 +2,10 @@ packages:
   - apps/*
   - packages/*
 
+catalog:
+  i18next: ^26.3.1
+  react-i18next: ^15.5.3
+
 # Allowlist of native packages that need post-install build steps.
 # All other native deps are skipped for faster installs — add here only if builds fail.
 onlyBuiltDependencies:
