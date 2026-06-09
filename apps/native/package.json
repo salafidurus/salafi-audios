@@ -74,7 +74,7 @@
     "react": "19.2.3",
     "react-content-loader": "^7.1.2",
     "react-dom": "19.2.3",
-    "react-hook-form": "^7.78.0",
+    "react-hook-form": "catalog:",
     "react-i18next": "catalog:",
     "react-native": "0.85.3",
     "react-native-ease": "^0.2.0",

@@ -9,6 +9,9 @@ catalogs:
     i18next:
       specifier: ^26.3.1
       version: 26.3.1
+    react-hook-form:
+      specifier: ^7.78.0
+      version: 7.78.0
     react-i18next:
       specifier: ^15.5.3
       version: 15.7.4
@@ -506,7 +509,7 @@ importers:
         specifier: 19.2.3
         version: 19.2.3(react@19.2.3)
       react-hook-form:
-        specifier: ^7.78.0
+        specifier: 'catalog:'
         version: 7.78.0(react@19.2.3)
       react-i18next:
         specifier: 'catalog:'
@@ -645,7 +648,7 @@ importers:
         specifier: 19.2.3
         version: 19.2.3(react@19.2.3)
       react-hook-form:
-        specifier: ^7.78.0
+        specifier: 'catalog:'
         version: 7.78.0(react@19.2.3)
       react-i18next:
         specifier: 'catalog:'
@@ -17580,7 +17583,7 @@ snapshots:
       tinyglobby: 0.2.17
       unrs-resolver: 1.12.2
     optionalDependencies:
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.60.0(eslint@9.39.4(jiti@2.7.0))(typescript@6.0.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.4(jiti@2.7.0))
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.53.1(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3))(eslint-import-resolver-typescript@3.10.1)(eslint@9.39.4(jiti@2.7.0))
     transitivePeerDependencies:
       - supports-color
 
