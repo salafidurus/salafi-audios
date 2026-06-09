@@ -20,6 +20,7 @@ import { LibraryModule } from './modules/library/library.module';
 import { AudioModule } from './modules/audio/audio.module';
 import { HomeModule } from './modules/home/home.module';
 import { FeedModule } from './modules/feed/feed.module';
+import { MediaModule } from './modules/media/media.module';
 import { LocaleInterceptor } from './shared/interceptors/locale.interceptor';
 
 @Module({
@@ -41,6 +42,7 @@ import { LocaleInterceptor } from './shared/interceptors/locale.interceptor';
     AudioModule,
     HomeModule,
     FeedModule,
+    MediaModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: AuthGuard },
