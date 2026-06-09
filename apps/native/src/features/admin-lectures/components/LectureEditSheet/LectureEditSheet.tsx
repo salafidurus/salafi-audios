@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
-import type { AdminLectureDetailDto } from "@sd/core-contracts";
+import type { AdminLectureDetailDto, Locale } from "@sd/core-contracts";
 import { fetchAdminLectureDetail, updateLecture } from "../../api/admin-lectures.api";
 
 type LectureEditSheetProps = {
@@ -40,7 +40,7 @@ export function LectureEditSheet({ lectureId, onClose, onSaved }: LectureEditShe
       await updateLecture(lecture.id, {
         title,
         ...(description ? { description } : {}),
-        ...(language ? { language } : {}),
+        ...(language ? { language: language as Locale } : {}),
       });
       onSaved();
     } catch (e) {

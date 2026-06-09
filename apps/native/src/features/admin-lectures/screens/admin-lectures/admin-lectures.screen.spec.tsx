@@ -25,7 +25,7 @@ jest.mock("../../components/BulkActionBar/BulkActionBar", () => ({
   BulkActionBar: () => null,
 }));
 
-const mockUseAdminLectures = jest.mocked(useAdminLectures);
+const mockUseAdminLectures = useAdminLectures as jest.Mock;
 
 describe("AdminLecturesScreen", () => {
   it("renders loading state when loading", () => {
@@ -33,7 +33,7 @@ describe("AdminLecturesScreen", () => {
       data: undefined,
       isLoading: true,
       refetch: jest.fn(),
-    } as ReturnType<typeof mockUseAdminLectures>);
+    });
 
     let tree: ReturnType<typeof renderer.create>;
     act(() => {
@@ -51,7 +51,7 @@ describe("AdminLecturesScreen", () => {
       },
       isLoading: false,
       refetch: jest.fn(),
-    } as ReturnType<typeof mockUseAdminLectures>);
+    });
 
     let tree: ReturnType<typeof renderer.create>;
     act(() => {

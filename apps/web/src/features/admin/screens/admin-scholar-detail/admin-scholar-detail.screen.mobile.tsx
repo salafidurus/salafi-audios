@@ -7,6 +7,7 @@ import type {
   AdminSeriesListItemDto,
   AdminCollectionListItemDto,
 } from "@sd/core-contracts";
+import Link from "next/link";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import styles from "./admin-scholar-detail.screen.mobile.module.css";
 import { ArrowLeft, Plus } from "lucide-react";
@@ -16,8 +17,6 @@ interface AdminScholarDetailMobileScreenProps {
 }
 
 type ScholarsListDto = { scholars: ScholarListItemDto[] };
-type SeriesListDto = { items: AdminSeriesListItemDto[] };
-type CollectionsListDto = { items: AdminCollectionListItemDto[] };
 
 export function AdminScholarDetailMobileScreen({ id }: AdminScholarDetailMobileScreenProps) {
   // Fetch Scholar
@@ -73,8 +72,8 @@ export function AdminScholarDetailMobileScreen({ id }: AdminScholarDetailMobileS
       setNewSeriesTitle("");
       setCreatingSeries(false);
       refetchSeries();
-    } catch (err) {
-      console.error("Failed to create series", err);
+    } catch {
+      // ignore
     }
   };
 
@@ -94,8 +93,8 @@ export function AdminScholarDetailMobileScreen({ id }: AdminScholarDetailMobileS
       setNewCollectionTitle("");
       setCreatingCollection(false);
       refetchCollections();
-    } catch (err) {
-      console.error("Failed to create collection", err);
+    } catch {
+      // ignore
     }
   };
 
@@ -107,8 +106,8 @@ export function AdminScholarDetailMobileScreen({ id }: AdminScholarDetailMobileS
         body: { orderIndex },
       });
       refetchSeries();
-    } catch (err) {
-      console.error("Failed to update series orderIndex", err);
+    } catch {
+      // ignore
     }
   };
 
@@ -120,8 +119,8 @@ export function AdminScholarDetailMobileScreen({ id }: AdminScholarDetailMobileS
         body: { orderIndex },
       });
       refetchCollections();
-    } catch (err) {
-      console.error("Failed to update collection orderIndex", err);
+    } catch {
+      // ignore
     }
   };
 
@@ -132,9 +131,9 @@ export function AdminScholarDetailMobileScreen({ id }: AdminScholarDetailMobileS
     <ScreenView>
       <div className={styles.container}>
         <div className={styles.backNav}>
-          <a href="/admin/scholars" className={styles.backLink}>
+          <Link href="/admin/scholars" className={styles.backLink}>
             <ArrowLeft size={16} /> Back
-          </a>
+          </Link>
         </div>
 
         <div className={styles.header}>

@@ -2,13 +2,13 @@
 
 import React, { useState } from "react";
 import { useApiQuery } from "@sd/core-contracts";
-import type { AdminLectureListItemDto, AdminLectureDetailDto } from "@sd/core-contracts";
+import type { AdminLectureDetailDto } from "@sd/core-contracts";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { fetchAdminLectures, fetchAdminLectureDetail } from "../../api/admin-lectures.api";
 import { AudioUploader } from "../../components/AudioUploader/AudioUploader";
 import { LectureEditModal } from "../../components/LectureEditModal/LectureEditModal";
 import styles from "./admin-lectures.screen.desktop.module.css";
-import { Search, Plus, X, Edit, Eye, Archive } from "lucide-react";
+import { Search, Plus, X, Edit } from "lucide-react";
 
 export function AdminLecturesDesktopScreen() {
   const [search, setSearch] = useState("");
@@ -38,8 +38,8 @@ export function AdminLecturesDesktopScreen() {
       setSelectedLecture(details);
       setInitialAudioData(null);
       setIsModalOpen(true);
-    } catch (err) {
-      console.error("Failed to fetch lecture details", err);
+    } catch {
+      // ignore: user stays on current view
     }
   };
 

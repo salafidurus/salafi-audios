@@ -71,6 +71,7 @@ export function LectureEditModal({
         : Promise.resolve([]),
   );
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (lecture) {
       setTitle(lecture.title);
@@ -94,6 +95,7 @@ export function LectureEditModal({
     }
     setFormError(null);
   }, [lecture, initialAudioData, isOpen]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Autogenerate slug from title if slug is empty
   const handleTitleChange = (val: string) => {
@@ -153,9 +155,8 @@ export function LectureEditModal({
       }
       onSuccess();
       onClose();
-    } catch (err: any) {
-      console.error(err);
-      setFormError(err?.message || "Failed to save lecture details.");
+    } catch (err) {
+      setFormError((err as Error)?.message || "Failed to save lecture details.");
     } finally {
       setSaving(false);
     }
@@ -281,7 +282,7 @@ export function LectureEditModal({
                 id="lecture-status"
                 className={styles.select}
                 value={status}
-                onChange={(e) => setStatus(e.target.value as any)}
+                onChange={(e) => setStatus(e.target.value as "draft" | "published" | "archived")}
               >
                 <option value="draft">Draft</option>
                 <option value="published">Published</option>

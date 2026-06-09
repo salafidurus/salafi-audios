@@ -72,7 +72,6 @@ export function AdminLecturesScreen() {
       ) : (
         <FlashList<AdminLectureListItemDto>
           data={lectures}
-          estimatedItemSize={72}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => {
             const isSelected = selectedIds.has(item.id);

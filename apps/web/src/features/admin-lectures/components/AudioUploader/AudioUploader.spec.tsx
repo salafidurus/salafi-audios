@@ -8,7 +8,12 @@ jest.mock("../../api/admin-lectures.api", () => ({
 }));
 
 describe("AudioUploader", () => {
-  let mockAudio: any;
+  let mockAudio: {
+    src: string;
+    duration: number;
+    addEventListener: jest.Mock;
+    removeEventListener: jest.Mock;
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -21,7 +26,7 @@ describe("AudioUploader", () => {
     mockAudio = {
       src: "",
       duration: 180,
-      addEventListener: jest.fn((event, callback) => {
+      addEventListener: jest.fn((event: string, callback: () => void) => {
         if (event === "loadedmetadata") {
           setTimeout(callback, 0);
         }
@@ -29,7 +34,7 @@ describe("AudioUploader", () => {
       removeEventListener: jest.fn(),
     };
 
-    global.Audio = jest.fn(() => mockAudio) as any;
+    global.Audio = jest.fn(() => mockAudio) as unknown as typeof Audio;
   });
 
   it("renders the dropzone area", () => {
@@ -41,7 +46,7 @@ describe("AudioUploader", () => {
   it("handles file selection, extracts metadata, and performs upload", async () => {
     const onUploadCompleteMock = jest.fn();
 
-    let resolvePresigned: any;
+    let resolvePresigned: () => void;
     const presignedPromise = new Promise((resolve) => {
       resolvePresigned = () =>
         resolve({

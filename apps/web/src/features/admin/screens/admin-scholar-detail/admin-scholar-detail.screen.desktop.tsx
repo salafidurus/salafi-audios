@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type {
   ScholarListItemDto,
@@ -9,15 +10,13 @@ import type {
 } from "@sd/core-contracts";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import styles from "./admin-scholar-detail.screen.desktop.module.css";
-import { ArrowLeft, Save, Plus, Edit } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 
 interface AdminScholarDetailDesktopScreenProps {
   id: string;
 }
 
 type ScholarsListDto = { scholars: ScholarListItemDto[] };
-type SeriesListDto = { items: AdminSeriesListItemDto[] };
-type CollectionsListDto = { items: AdminCollectionListItemDto[] };
 
 export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDesktopScreenProps) {
   // Fetch Scholar
@@ -75,8 +74,8 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
       setNewSeriesOrder(0);
       setCreatingSeries(false);
       refetchSeries();
-    } catch (err) {
-      console.error("Failed to create series", err);
+    } catch {
+      // ignore
     }
   };
 
@@ -98,8 +97,8 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
       setNewCollectionOrder(0);
       setCreatingCollection(false);
       refetchCollections();
-    } catch (err) {
-      console.error("Failed to create collection", err);
+    } catch {
+      // ignore
     }
   };
 
@@ -111,8 +110,8 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
         body: { orderIndex },
       });
       refetchSeries();
-    } catch (err) {
-      console.error("Failed to update series orderIndex", err);
+    } catch {
+      // ignore
     }
   };
 
@@ -124,8 +123,8 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
         body: { orderIndex },
       });
       refetchCollections();
-    } catch (err) {
-      console.error("Failed to update collection orderIndex", err);
+    } catch {
+      // ignore
     }
   };
 
@@ -136,9 +135,9 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
     <ScreenView>
       <div className={styles.container}>
         <div className={styles.backNav}>
-          <a href="/admin/scholars" className={styles.backLink}>
+          <Link href="/admin/scholars" className={styles.backLink}>
             <ArrowLeft size={16} /> Back to Scholars
-          </a>
+          </Link>
         </div>
 
         <div className={styles.header}>

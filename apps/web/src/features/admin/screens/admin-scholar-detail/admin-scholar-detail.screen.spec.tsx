@@ -1,11 +1,11 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { AdminScholarDetailScreen } from "./admin-scholar-detail.screen";
 
 jest.mock("@sd/core-contracts", () => {
   const actual = jest.requireActual("@sd/core-contracts");
   return {
     ...actual,
-    useApiQuery: jest.fn((key, fn) => {
+    useApiQuery: jest.fn((key) => {
       if (key[0] === "scholars" && key[1] === "list") {
         return {
           data: {

@@ -16,7 +16,7 @@ jest.mock("@shopify/flash-list", () => {
   };
 });
 
-const mockUseApiQuery = jest.mocked(useApiQuery);
+const mockUseApiQuery = useApiQuery as jest.Mock;
 
 describe("AdminScholarsScreen", () => {
   it("renders a loading indicator when loading", () => {

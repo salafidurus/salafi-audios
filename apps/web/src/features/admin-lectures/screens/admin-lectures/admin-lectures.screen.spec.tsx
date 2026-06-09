@@ -11,7 +11,7 @@ jest.mock("@sd/core-contracts", () => {
   const actual = jest.requireActual("@sd/core-contracts");
   return {
     ...actual,
-    useApiQuery: jest.fn((key, fn) => {
+    useApiQuery: jest.fn((key) => {
       // Mock queries
       if (key[0] === "scholars") {
         return { data: { scholars: [] }, isFetching: false };

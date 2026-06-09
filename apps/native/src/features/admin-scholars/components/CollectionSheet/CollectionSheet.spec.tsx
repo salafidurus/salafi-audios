@@ -27,7 +27,7 @@ describe("CollectionSheet", () => {
         <CollectionSheet
           isOpen={true}
           scholarId="s1"
-          collection={{ id: "col1", title: "My Collection", status: "draft" }}
+          collection={{ id: "col1", title: "My Collection", status: "draft", scholarId: "s1" }}
           onClose={() => {}}
           onSaved={() => {}}
         />,

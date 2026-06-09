@@ -7,7 +7,7 @@ jest.mock("@sd/core-contracts", () => ({
   endpoints: { admin: { lectures: { list: "/admin/lectures" } } },
 }));
 
-const mockUseApiQuery = jest.mocked(useApiQuery);
+const mockUseApiQuery = useApiQuery as jest.Mock;
 
 describe("useAdminLectures", () => {
   it("calls useApiQuery and returns result", () => {

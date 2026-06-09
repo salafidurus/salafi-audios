@@ -74,9 +74,8 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
         format: file.type,
         filename: file.name,
       });
-    } catch (err: any) {
-      console.error(err);
-      setError(err?.message || "An error occurred during file upload.");
+    } catch (err) {
+      setError((err as Error)?.message || "An error occurred during file upload.");
       setUploadState("error");
     }
   };

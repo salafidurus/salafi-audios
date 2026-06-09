@@ -9,7 +9,7 @@ jest.mock("@sd/core-contracts", () => ({
   },
 }));
 
-const mockUseApiQuery = jest.mocked(useApiQuery);
+const mockUseApiQuery = useApiQuery as jest.Mock;
 
 describe("useAdminPermissions", () => {
   it("returns hasAnyPermission=false when permissions list is empty", () => {

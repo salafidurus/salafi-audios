@@ -14,7 +14,7 @@ jest.mock("@sd/core-contracts", () => ({
   },
 }));
 
-const mockUseApiQuery = jest.mocked(useApiQuery);
+const mockUseApiQuery = useApiQuery as jest.Mock;
 
 describe("useAdminLive hooks", () => {
   it("useAdminChannels calls useApiQuery", () => {

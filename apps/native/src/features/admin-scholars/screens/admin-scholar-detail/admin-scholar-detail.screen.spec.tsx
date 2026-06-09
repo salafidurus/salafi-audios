@@ -39,9 +39,9 @@ jest.mock("react-native-gesture-handler", () => {
   };
 });
 
-const mockUseApiQuery = jest.mocked(useApiQuery);
-const mockUseAdminSeries = jest.mocked(useAdminSeries);
-const mockUseAdminCollections = jest.mocked(useAdminCollections);
+const mockUseApiQuery = useApiQuery as jest.Mock;
+const mockUseAdminSeries = useAdminSeries as jest.Mock;
+const mockUseAdminCollections = useAdminCollections as jest.Mock;
 
 describe("AdminScholarDetailScreen", () => {
   beforeEach(() => {
@@ -79,7 +79,9 @@ describe("AdminScholarDetailScreen", () => {
       refetch: jest.fn(),
     });
     mockUseAdminCollections.mockReturnValue({
-      data: [{ id: "col1", title: "Collection Title", status: "published" }],
+      data: [
+        { id: "col1", title: "Collection Title", status: "published", publishedLectureCount: 0 },
+      ],
       refetch: jest.fn(),
     });
 

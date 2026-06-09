@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useApiQuery } from "@sd/core-contracts";
-import type { AdminLectureListItemDto, AdminLectureDetailDto } from "@sd/core-contracts";
+import type { AdminLectureDetailDto } from "@sd/core-contracts";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { fetchAdminLectures, fetchAdminLectureDetail } from "../../api/admin-lectures.api";
 import { AudioUploader } from "../../components/AudioUploader/AudioUploader";
@@ -38,8 +38,8 @@ export function AdminLecturesMobileScreen() {
       setSelectedLecture(details);
       setInitialAudioData(null);
       setIsModalOpen(true);
-    } catch (err) {
-      console.error("Failed to fetch lecture details", err);
+    } catch {
+      // ignore: user stays on current view
     }
   };
 
