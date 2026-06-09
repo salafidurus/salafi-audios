@@ -505,6 +505,7 @@ This plan is **not yet completed** — only **Stage 1d** remains.
 **Completed stages**: Stage 0, 1a, 1b, 1c, 2, 3, 4, 5, 6 ✅
 
 **Remaining**:
+
 - **Stage 1d** — Update docs, CI, and default scripts from `mobile` → `native`; retire
   `apps/mobile`. **Requires explicit user approval before starting.**
 
