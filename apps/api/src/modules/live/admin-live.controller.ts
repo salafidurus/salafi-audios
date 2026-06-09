@@ -28,14 +28,14 @@ export class AdminLiveController {
   constructor(private readonly service: LiveService) {}
 
   @Post('channels')
-  @RequiresPermission('manage:live')
+  @RequiresPermission('manage:livestreams')
   @ApiOperation({ summary: 'Create a new livestream channel' })
   createChannel(@Body() body: CreateLivestreamChannelDto) {
     return this.service.createChannel(body);
   }
 
   @Put('channels/:id')
-  @RequiresPermission('manage:live')
+  @RequiresPermission('manage:livestreams')
   @ApiOperation({ summary: 'Update a livestream channel' })
   updateChannel(
     @Param('id') id: string,
@@ -45,21 +45,21 @@ export class AdminLiveController {
   }
 
   @Post('sessions')
-  @RequiresPermission('manage:live')
+  @RequiresPermission('manage:livestreams')
   @ApiOperation({ summary: 'Create a new live session' })
   createSession(@Body() body: CreateLiveSessionDto) {
     return this.service.createSession(body);
   }
 
   @Put('sessions/:id')
-  @RequiresPermission('manage:live')
+  @RequiresPermission('manage:livestreams')
   @ApiOperation({ summary: 'Update a live session' })
   updateSession(@Param('id') id: string, @Body() body: UpdateLiveSessionDto) {
     return this.service.updateSession(id, body);
   }
 
   @Patch('sessions/:id/status')
-  @RequiresPermission('manage:live')
+  @RequiresPermission('manage:livestreams')
   @ApiOperation({ summary: 'Update a live session status' })
   updateSessionStatus(
     @Param('id') id: string,
