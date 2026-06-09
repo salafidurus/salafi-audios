@@ -3,12 +3,42 @@ import renderer, { act } from "react-test-renderer";
 import { AudioUploaderSheet } from "./AudioUploaderSheet";
 
 jest.mock("expo-document-picker", () => ({ getDocumentAsync: jest.fn() }));
-jest.mock("expo-file-system", () => ({
-  createUploadTask: jest.fn(),
-  FileSystemUploadType: { BINARY_CONTENT: "BINARY_CONTENT" },
-}));
+jest.mock("expo-file-system", () => {
+  class MockFile {
+    uri: string;
+    constructor(uri: string) {
+      this.uri = uri;
+    }
+  }
+  class MockUploadTask {
+    file: any;
+    url: string;
+    options: any;
+    constructor(file: any, url: string, options: any) {
+      this.file = file;
+      this.url = url;
+      this.options = options;
+    }
+    uploadAsync = jest.fn().mockResolvedValue({ status: 200 });
+  }
+  return {
+    File: MockFile,
+    UploadTask: MockUploadTask,
+    UploadType: { BINARY_CONTENT: "BINARY_CONTENT" },
+  };
+});
 jest.mock("expo-audio", () => ({
   createAudioPlayer: jest.fn(),
+}));
+jest.mock("@sd/domain-content", () => ({
+  useScholarsList: () => ({
+    data: {
+      scholars: [
+        { id: "sch-1", slug: "scholar-one", name: "Scholar One", isKibar: false, lectureCount: 1 },
+      ],
+    },
+    isLoading: false,
+  }),
 }));
 jest.mock("@/features/admin-lectures/api/admin-lectures.api", () => ({
   getPresignedUrl: jest.fn(),

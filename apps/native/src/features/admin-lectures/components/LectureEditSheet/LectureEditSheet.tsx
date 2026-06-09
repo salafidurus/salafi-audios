@@ -40,7 +40,7 @@ export function LectureEditSheet({ lectureId, onClose, onSaved }: LectureEditShe
       await updateLecture(lecture.id, {
         title,
         ...(description ? { description } : {}),
-        ...(language ? { language } : {}),
+        ...(language ? { language: language as any } : {}),
       });
       onSaved();
     } catch (e) {

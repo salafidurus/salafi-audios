@@ -9,7 +9,7 @@ import type {
   BulkActionDto,
   BulkActionResultDto,
 } from "@sd/core-contracts";
-import * as FileSystem from "expo-file-system";
+import { File, UploadTask, UploadType, type UploadProgress } from "expo-file-system";
 
 export async function getPresignedUrl(
   data: PresignedUrlRequestDto,
@@ -28,23 +28,20 @@ export async function uploadToR2(
   onProgress?: (progress: number) => void,
 ): Promise<void> {
   const callback = onProgress
-    ? ({ totalBytesSent, totalBytesExpectedToSend }: FileSystem.UploadProgressData) => {
-        if (totalBytesExpectedToSend > 0) {
-          onProgress(totalBytesSent / totalBytesExpectedToSend);
+    ? ({ bytesSent, totalBytes }: UploadProgress) => {
+        if (totalBytes > 0) {
+          onProgress(bytesSent / totalBytes);
         }
       }
     : undefined;
 
-  const uploadTask = FileSystem.createUploadTask(
-    uploadUrl,
-    fileUri,
-    {
-      httpMethod: "PUT",
-      headers: { "Content-Type": contentType },
-      uploadType: FileSystem.FileSystemUploadType.BINARY_CONTENT,
-    },
-    callback,
-  );
+  const file = new File(fileUri);
+  const uploadTask = new UploadTask(file, uploadUrl, {
+    httpMethod: "PUT",
+    headers: { "Content-Type": contentType },
+    uploadType: UploadType.BINARY_CONTENT,
+    onProgress: callback,
+  });
 
   const result = await uploadTask.uploadAsync();
   if (!result || result.status >= 300) {

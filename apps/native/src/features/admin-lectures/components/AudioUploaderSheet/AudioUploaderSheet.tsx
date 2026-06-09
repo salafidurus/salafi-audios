@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
+import { useScholarsList } from "@sd/domain-content";
 import { getPresignedUrl, uploadToR2, createLecture } from "../../api/admin-lectures.api";
 
 async function getNativeAudioDuration(uri: string): Promise<number | undefined> {
@@ -49,6 +50,9 @@ type AudioUploaderSheetProps = {
 };
 
 export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioUploaderSheetProps) {
+  const { data: scholarsData } = useScholarsList();
+  const scholars = scholarsData?.scholars ?? [];
+  const [selectedScholarId, setSelectedScholarId] = useState<string | null>(null);
   const [queue, setQueue] = useState<UploadItem[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -76,6 +80,7 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
   };
 
   const handleUploadAll = async () => {
+    if (!selectedScholarId) return;
     setIsUploading(true);
     let anySuccess = false;
     for (let i = 0; i < queue.length; i++) {
@@ -95,6 +100,7 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
         await createLecture({
           title: item.name.replace(/\.[^.]+$/, ""),
           audioKey: objectKey,
+          scholarId: selectedScholarId,
           ...(durationSeconds != null ? { durationSeconds } : {}),
         });
         setItemState(i, { progress: 1, status: "done" });
@@ -106,6 +112,8 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
     setIsUploading(false);
     if (anySuccess) onUploadComplete();
   };
+
+  const isUploadDisabled = queue.length === 0 || isUploading || !selectedScholarId;
 
   return (
     <View
@@ -122,6 +130,44 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
       }}
     >
       <Text style={{ fontSize: 17, fontWeight: "600", marginBottom: 12 }}>Upload Audio</Text>
+
+      <Text style={{ fontSize: 13, fontWeight: "600", marginBottom: 6 }}>Assign to Scholar</Text>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={{ marginBottom: 12, maxHeight: 40 }}
+      >
+        {scholars.map((scholar) => {
+          const isSelected = selectedScholarId === scholar.id;
+          return (
+            <Pressable
+              key={scholar.id}
+              onPress={() => setSelectedScholarId(scholar.id)}
+              style={{
+                paddingHorizontal: 12,
+                paddingVertical: 6,
+                borderRadius: 16,
+                backgroundColor: isSelected ? "#3b82f6" : "#f3f4f6",
+                marginRight: 8,
+                borderWidth: 1,
+                borderColor: isSelected ? "#3b82f6" : "#e5e7eb",
+                height: 32,
+              }}
+            >
+              <Text
+                style={{
+                  color: isSelected ? "#fff" : "#374151",
+                  fontSize: 13,
+                  fontWeight: isSelected ? "600" : "400",
+                }}
+              >
+                {scholar.name}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </ScrollView>
+
       <Pressable
         onPress={handlePick}
         style={{
@@ -135,6 +181,7 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
       >
         <Text style={{ fontSize: 15 }}>Select Audio Files</Text>
       </Pressable>
+
       <ScrollView style={{ maxHeight: 200 }}>
         {queue.map((item, i) => (
           <View key={i} style={{ marginBottom: 8 }}>
@@ -162,14 +209,15 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
           </View>
         ))}
       </ScrollView>
+
       <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
         <Pressable
           onPress={handleUploadAll}
-          disabled={queue.length === 0 || isUploading}
+          disabled={isUploadDisabled}
           style={{
             flex: 1,
             padding: 12,
-            backgroundColor: "#3b82f6",
+            backgroundColor: isUploadDisabled ? "#9ca3af" : "#3b82f6",
             borderRadius: 8,
             alignItems: "center",
           }}
