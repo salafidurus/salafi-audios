@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1063.0",
-    "@prisma/adapter-pg": "^7.3.0",
+    "@prisma/adapter-pg": "catalog:",
     "@sd/core-db": "workspace:*",
     "dotenv": "^16.4.5",
     "zod": "^3.25.17"
@@ -45,7 +45,7 @@
     "@types/node": "^22.0.0",
     "jest": "^30.4.2",
     "rimraf": "^6.0.0",
-    "ts-jest": "^29.4.11",
+    "ts-jest": "catalog:",
     "tsup": "^8.0.0",
     "tsx": "^4.21.0"
   }

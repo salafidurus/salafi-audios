@@ -38,7 +38,7 @@
     "dev": "pnpm build --watch"
   },
   "dependencies": {
-    "@prisma/client": "^7.3.0",
+    "@prisma/client": "catalog:",
     "@prisma/client-runtime-utils": "^7.3.0"
   },
   "devDependencies": {
@@ -48,7 +48,7 @@
     "jest": "^30.4.2",
     "pg": "^8.0.0",
     "prisma": "^7.3.0",
-    "ts-jest": "^29.4.11",
+    "ts-jest": "catalog:",
     "tsup": "^8.0.0"
   }
 }

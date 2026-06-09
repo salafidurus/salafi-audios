@@ -17,7 +17,6 @@ const arOverrides = require("./overrides.ar.json") as Partial<Record<string, unk
 export function createI18n(initialLocale: Locale) {
   const instance = i18next.createInstance();
   void instance.use(initReactI18next).init({
-    initImmediate: false,
     lng: initialLocale,
     fallbackLng: "en",
     resources: {

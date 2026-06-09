@@ -35,14 +35,14 @@
   },
   "dependencies": {
     "@sd/core-contracts": "workspace:*",
-    "i18next": "^23.7.6"
+    "i18next": "catalog:"
   },
   "devDependencies": {
     "@sd/util-config": "workspace:*",
     "@types/jest": "^30.0.0",
     "jest": "^30.4.2",
     "rimraf": "^6.0.0",
-    "ts-jest": "^29.4.11",
+    "ts-jest": "catalog:",
     "tsup": "^8.0.0"
   }
 }
