@@ -91,7 +91,7 @@
     "vexo-analytics": "^1.5.4",
     "zod": "^3.25.17",
     "zustand": "catalog:",
-    "expo-document-picker": "~13.0.3"
+    "expo-document-picker": "~56.0.4"
   },
   "devDependencies": {
     "@rnrepo/expo-config-plugin": "^0.3.1",
