@@ -46,7 +46,7 @@ describe("AudioUploader", () => {
   it("handles file selection, extracts metadata, and performs upload", async () => {
     const onUploadCompleteMock = jest.fn();
 
-    let resolvePresigned: () => void;
+    let resolvePresigned!: () => void;
     const presignedPromise = new Promise((resolve) => {
       resolvePresigned = () =>
         resolve({
