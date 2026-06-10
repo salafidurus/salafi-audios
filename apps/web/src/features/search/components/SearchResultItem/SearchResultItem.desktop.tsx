@@ -37,7 +37,13 @@ export function SearchResultItemDesktop(item: SearchResultItemDesktopProps) {
     <article className="flex cursor-pointer items-center gap-[var(--space-component-gap-md)] rounded-[var(--radius-component-card)] border border-[var(--border-subtle)] bg-[var(--surface-default)] px-3 py-3 transition hover:border-[var(--accent-primary-subtle-border)] hover:bg-[var(--accent-primary-subtle-surface)] hover:shadow-[0_18px_36px_-30px_var(--accent-primary-border)]">
       <div className="relative w-[20%] xl:w-[10%] shrink-0 aspect-[4/5] overflow-hidden rounded-[var(--radius-component-panel-sm)] bg-[var(--surface-subtle)] flex items-center justify-center">
         {imageUrl ? (
-          <Image src={imageUrl} alt="" fill className="object-cover" />
+          <Image
+            src={imageUrl}
+            alt=""
+            fill
+            sizes="(max-width: 768px) 20vw, 10vw"
+            className="object-cover"
+          />
         ) : (
           <Headphones size={22} style={{ color: "var(--content-subtle)" }} aria-hidden />
         )}

@@ -1,7 +1,21 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import type { ScholarListItemDto } from "@sd/core-contracts";
+
+const cardButtonStyle: CSSProperties = {
+  border: "1px solid var(--border-default)",
+  borderRadius: 12,
+  padding: 16,
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  gap: 12,
+  cursor: "pointer",
+  background: "var(--surface-default)",
+  transition: "transform 0.2s, box-shadow 0.2s",
+};
 
 export type ScholarCardProps = {
   scholar: ScholarListItemDto;
@@ -10,24 +24,7 @@ export type ScholarCardProps = {
 
 export function ScholarCard({ scholar, onPress }: ScholarCardProps) {
   return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={() => onPress?.(scholar.slug)}
-      onKeyDown={(e) => e.key === "Enter" && onPress?.(scholar.slug)}
-      style={{
-        border: "1px solid var(--border-default)",
-        borderRadius: 12,
-        padding: 16,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 12,
-        cursor: "pointer",
-        background: "var(--surface-default)",
-        transition: "transform 0.2s, box-shadow 0.2s",
-      }}
-    >
+    <button type="button" onClick={() => onPress?.(scholar.slug)} style={cardButtonStyle}>
       <div
         style={{
           width: 80,
@@ -65,6 +62,6 @@ export function ScholarCard({ scholar, onPress }: ScholarCardProps) {
       <div style={{ fontSize: 12, color: "var(--content-muted)" }}>
         {scholar.lectureCount} lectures
       </div>
-    </div>
+    </button>
   );
 }

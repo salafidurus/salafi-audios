@@ -9,8 +9,10 @@ export type SearchProcessingScreenProps = {
   onBackPress?: () => void;
 };
 
+const DESKTOP = <SearchProcessingDesktopScreen />;
+
 export function SearchProcessingScreen({ searchKey, onBackPress }: SearchProcessingScreenProps) {
   const mobile = <SearchProcessingMobileScreen prefill={searchKey} onBackPress={onBackPress} />;
-  const desktop = <SearchProcessingDesktopScreen />;
-  return <Responsive mobile={mobile} desktop={desktop} />;
+  // eslint-disable-next-line react-doctor/jsx-no-jsx-as-prop
+  return <Responsive mobile={mobile} desktop={DESKTOP} />;
 }

@@ -41,6 +41,7 @@ export function SearchInputMobile({
         onMouseUp={() => setBackPressed(false)}
         onMouseLeave={() => setBackPressed(false)}
         className={styles.iconButton}
+        aria-label="Go back"
       >
         <ChevronLeft
           size={20}
@@ -53,6 +54,7 @@ export function SearchInputMobile({
         type="text"
         className={styles.input}
         placeholder={placeholder}
+        aria-label={placeholder ?? "Search"}
         value={value}
         onChange={(e) => onChange?.(e.target.value)}
         onFocus={() => setIsFocused(true)}

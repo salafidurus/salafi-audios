@@ -227,6 +227,7 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
                       className={styles.orderInput}
                       defaultValue={s.orderIndex || 0}
                       onBlur={(e) => handleUpdateSeriesOrder(s.id, Number(e.target.value))}
+                      aria-label="Update series order index"
                       title="Update Order Index"
                     />
                   </div>
@@ -300,6 +301,7 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
                       className={styles.orderInput}
                       defaultValue={c.orderIndex || 0}
                       onBlur={(e) => handleUpdateCollectionOrder(c.id, Number(e.target.value))}
+                      aria-label="Update collection order index"
                       title="Update Order Index"
                     />
                   </div>

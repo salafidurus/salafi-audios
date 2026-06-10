@@ -1,11 +1,23 @@
 "use client";
 
+import type React from "react";
 import Image from "next/image";
 import type { ScholarChipDto } from "@sd/core-contracts";
 
 export type FeedScholarRowProps = {
   scholars: ScholarChipDto[];
   onScholarPress?: (slug: string) => void;
+};
+
+const scholarButtonStyle: React.CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  minWidth: 72,
+  cursor: "pointer",
+  background: "none",
+  border: "none",
+  padding: 0,
 };
 
 export function FeedScholarRow({ scholars, onScholarPress }: FeedScholarRowProps) {
@@ -31,19 +43,11 @@ export function FeedScholarRow({ scholars, onScholarPress }: FeedScholarRowProps
         }}
       >
         {scholars.map((scholar) => (
-          <div
+          <button
             key={scholar.id}
-            role="button"
-            tabIndex={0}
+            type="button"
             onClick={() => onScholarPress?.(scholar.slug)}
-            onKeyDown={(e) => e.key === "Enter" && onScholarPress?.(scholar.slug)}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              minWidth: 72,
-              cursor: "pointer",
-            }}
+            style={scholarButtonStyle}
           >
             <div
               style={{
@@ -79,7 +83,7 @@ export function FeedScholarRow({ scholars, onScholarPress }: FeedScholarRowProps
             >
               {scholar.name}
             </div>
-          </div>
+          </button>
         ))}
       </div>
     </div>

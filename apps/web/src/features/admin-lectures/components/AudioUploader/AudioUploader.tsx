@@ -17,28 +17,28 @@ interface AudioUploaderProps {
   }) => void;
 }
 
+function extractMetadata(file: File): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const objectUrl = URL.createObjectURL(file);
+    const audio = new Audio();
+    audio.src = objectUrl;
+    audio.addEventListener("loadedmetadata", () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(audio.duration);
+    });
+    audio.addEventListener("error", () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("Failed to load audio metadata"));
+    });
+  });
+}
+
 export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
   const [dragActive, setDragActive] = useState(false);
   const [uploadState, setUploadState] = useState<UploadState>("idle");
   const [error, setError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const extractMetadata = (file: File): Promise<number> => {
-    return new Promise((resolve, reject) => {
-      const objectUrl = URL.createObjectURL(file);
-      const audio = new Audio();
-      audio.src = objectUrl;
-      audio.addEventListener("loadedmetadata", () => {
-        URL.revokeObjectURL(objectUrl);
-        resolve(audio.duration);
-      });
-      audio.addEventListener("error", () => {
-        URL.revokeObjectURL(objectUrl);
-        reject(new Error("Failed to load audio metadata"));
-      });
-    });
-  };
 
   const handleFile = async (file: File) => {
     if (!file.type.startsWith("audio/")) {
@@ -111,9 +111,12 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
     fileInputRef.current?.click();
   };
 
+  const isClickable = uploadState === "idle" || uploadState === "error";
+
   return (
     <div className={styles.container}>
-      <form
+      <div
+        role="presentation"
         className={`${styles.dropzone} ${dragActive ? styles.dragActive : ""} ${
           styles[`state-${uploadState}`]
         }`}
@@ -121,7 +124,6 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
         onDragOver={handleDrag}
         onDragLeave={handleDrag}
         onDrop={handleDrop}
-        onClick={uploadState === "idle" || uploadState === "error" ? onButtonClick : undefined}
       >
         <input
           data-testid="audio-file-input"
@@ -129,6 +131,7 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
           type="file"
           className={styles.fileInput}
           accept="audio/*"
+          aria-label="Select audio file"
           onChange={handleChange}
         />
 
@@ -137,7 +140,9 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
             <>
               <Upload className={styles.icon} size={40} />
               <p className={styles.primaryText}>Drag & drop an audio file here</p>
-              <p className={styles.secondaryText}>or click to browse files</p>
+              <button type="button" className={styles.secondaryText} onClick={onButtonClick}>
+                or click to browse files
+              </button>
             </>
           )}
 
@@ -170,11 +175,13 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
               <AlertCircle className={styles.iconError} size={40} />
               <p className={styles.primaryText}>Upload failed</p>
               <p className={styles.errorMessage}>{error}</p>
-              <p className={styles.secondaryText}>Click to try again</p>
+              <button type="button" className={styles.secondaryText} onClick={onButtonClick}>
+                Click to try again
+              </button>
             </>
           )}
         </div>
-      </form>
+      </div>
     </div>
   );
 }

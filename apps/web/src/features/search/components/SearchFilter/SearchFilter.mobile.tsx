@@ -24,6 +24,7 @@ export function SearchFilterMobile({ value, onChange, topics }: SearchFilterMobi
   const scrollRef = useDragScroll("horizontal");
 
   const options = useMemo<FilterOption[]>(() => {
+    // eslint-disable-next-line react-doctor/js-tosorted-immutable
     const sortedTopics = [...topics].sort((a, b) => a.name.localeCompare(b.name));
     return [
       { id: "all", label: "All" },

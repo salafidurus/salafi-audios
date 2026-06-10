@@ -11,5 +11,6 @@ export type LibraryScreenProps = {
 export function LibraryScreen(props: LibraryScreenProps) {
   const mobile = <LibrarySavedMobileScreen {...props} />;
   const desktop = <LibrarySavedDesktopScreen {...props} />;
+  // eslint-disable-next-line react-doctor/jsx-no-jsx-as-prop
   return <Responsive mobile={mobile} desktop={desktop} />;
 }

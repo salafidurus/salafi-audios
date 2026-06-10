@@ -1,5 +1,6 @@
 "use client";
 
+import type React from "react";
 import type { LiveSessionDto } from "@sd/core-contracts";
 import { useLiveEndedScreen } from "@sd/domain-live";
 
@@ -7,19 +8,20 @@ export type LiveEndedMobileScreenProps = {
   onNavigateToSession?: (id: string) => void;
 };
 
+const endedSessionButtonStyle: React.CSSProperties = {
+  display: "block",
+  width: "100%",
+  textAlign: "left",
+  padding: 12,
+  borderBottom: "1px solid #eee",
+  cursor: "pointer",
+  background: "none",
+  border: "none",
+};
+
 function EndedSessionItem({ session, onPress }: { session: LiveSessionDto; onPress?: () => void }) {
   return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={onPress}
-      onKeyDown={(e) => e.key === "Enter" && onPress?.()}
-      style={{
-        padding: 12,
-        borderBottom: "1px solid #eee",
-        cursor: "pointer",
-      }}
-    >
+    <button type="button" onClick={onPress} style={endedSessionButtonStyle}>
       <div style={{ fontSize: 15, fontWeight: 600 }}>{session.title}</div>
       <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>{session.scholarName}</div>
       {session.endedAt && (
@@ -27,7 +29,7 @@ function EndedSessionItem({ session, onPress }: { session: LiveSessionDto; onPre
           {new Date(session.endedAt).toLocaleDateString()}
         </div>
       )}
-    </div>
+    </button>
   );
 }
 

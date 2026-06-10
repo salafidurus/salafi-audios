@@ -19,26 +19,24 @@ export function SearchHomeScreen({
   onSelectSuggestion,
   onContinueListening,
 }: SearchHomeScreenProps) {
-  return (
-    <Responsive
-      mobile={
-        <SearchHomeMobileScreen
-          onOpenSearch={onOpenSearch}
-          onSelectCategory={onSelectCategory}
-          onSelectScholar={onSelectScholar}
-          onSelectSuggestion={onSelectSuggestion}
-          onContinueListening={onContinueListening}
-        />
-      }
-      desktop={
-        <SearchHomeDesktopScreen
-          onOpenSearch={onOpenSearch}
-          onSelectCategory={onSelectCategory}
-          onSelectScholar={onSelectScholar}
-          onSelectSuggestion={onSelectSuggestion}
-          onContinueListening={onContinueListening}
-        />
-      }
+  const mobile = (
+    <SearchHomeMobileScreen
+      onOpenSearch={onOpenSearch}
+      onSelectCategory={onSelectCategory}
+      onSelectScholar={onSelectScholar}
+      onSelectSuggestion={onSelectSuggestion}
+      onContinueListening={onContinueListening}
     />
   );
+  const desktop = (
+    <SearchHomeDesktopScreen
+      onOpenSearch={onOpenSearch}
+      onSelectCategory={onSelectCategory}
+      onSelectScholar={onSelectScholar}
+      onSelectSuggestion={onSelectSuggestion}
+      onContinueListening={onContinueListening}
+    />
+  );
+  // eslint-disable-next-line react-doctor/jsx-no-jsx-as-prop
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }

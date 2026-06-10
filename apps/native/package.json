@@ -29,8 +29,6 @@
     "@expo/metro-runtime": "~56.0.14",
     "@expo/ui": "^56.0.16",
     "@expo/vector-icons": "^15.0.3",
-    "@hugeicons/core-free-icons": "^4.0.0",
-    "@hugeicons/react-native": "^1.0.11",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@sd/core-api": "workspace:*",
     "@sd/core-contracts": "workspace:*",
@@ -74,7 +72,6 @@
     "react": "catalog:",
     "react-content-loader": "^7.1.2",
     "react-dom": "catalog:",
-    "react-hook-form": "catalog:",
     "react-i18next": "catalog:",
     "react-native": "0.85.3",
     "react-native-ease": "^0.2.0",
@@ -94,7 +91,6 @@
     "expo-document-picker": "~56.0.4"
   },
   "devDependencies": {
-    "@rnrepo/expo-config-plugin": "^0.3.1",
     "@sd/util-config": "workspace:*",
     "@testing-library/react-native": "^13.3.3",
     "@types/jest": "^29.5.14",

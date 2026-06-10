@@ -11,5 +11,6 @@ export type LectureDetailScreenProps = {
 export function LectureDetailScreen(props: LectureDetailScreenProps) {
   const mobile = <LectureDetailMobileScreen {...props} />;
   const desktop = <LectureDetailDesktopScreen {...props} />;
+  // eslint-disable-next-line react-doctor/jsx-no-jsx-as-prop
   return <Responsive mobile={mobile} desktop={desktop} />;
 }

@@ -11,5 +11,6 @@ export type LiveScheduledScreenProps = {
 export function LiveScheduledScreen(props: LiveScheduledScreenProps) {
   const mobile = <LiveScheduledMobileScreen {...props} />;
   const desktop = <LiveScheduledDesktopScreen {...props} />;
+  // eslint-disable-next-line react-doctor/jsx-no-jsx-as-prop
   return <Responsive mobile={mobile} desktop={desktop} />;
 }
