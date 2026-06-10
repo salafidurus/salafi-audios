@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import { useScholarsList } from "@sd/domain-content";
 import { getPresignedUrl, uploadToR2, createLecture } from "../../api/admin-lectures.api";
@@ -88,15 +88,17 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
       if (item.status === "done") continue;
       try {
         setItemState(i, { progress: 0, status: "uploading" });
-        const { uploadUrl, objectKey } = await getPresignedUrl({
-          filename: item.name,
-          contentType: item.mimeType,
-          purpose: "audio",
-        });
+        const [{ uploadUrl, objectKey }, durationSeconds] = await Promise.all([
+          getPresignedUrl({
+            filename: item.name,
+            contentType: item.mimeType,
+            purpose: "audio",
+          }),
+          getNativeAudioDuration(item.uri),
+        ]);
         await uploadToR2(uploadUrl, item.uri, item.mimeType, (p) =>
           setItemState(i, { progress: p, status: "uploading" }),
         );
-        const durationSeconds = await getNativeAudioDuration(item.uri);
         await createLecture({
           title: item.name.replace(/\.[^.]+$/, ""),
           audioKey: objectKey,
@@ -116,131 +118,192 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
   const isUploadDisabled = queue.length === 0 || isUploading || !selectedScholarId;
 
   return (
-    <View
-      style={{
-        position: "absolute",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: "#fff",
-        borderTopLeftRadius: 16,
-        borderTopRightRadius: 16,
-        padding: 16,
-        maxHeight: "80%",
-      }}
-    >
-      <Text style={{ fontSize: 17, fontWeight: "600", marginBottom: 12 }}>Upload Audio</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Upload Audio</Text>
 
-      <Text style={{ fontSize: 13, fontWeight: "600", marginBottom: 6 }}>Assign to Scholar</Text>
-      <ScrollView
+      <Text style={styles.label}>Assign to Scholar</Text>
+      <FlatList
+        data={scholars}
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={{ marginBottom: 12, maxHeight: 40 }}
-      >
-        {scholars.map((scholar) => {
+        style={styles.scholarList}
+        keyExtractor={(scholar) => scholar.id}
+        renderItem={({ item: scholar }) => {
           const isSelected = selectedScholarId === scholar.id;
           return (
             <Pressable
-              key={scholar.id}
               onPress={() => setSelectedScholarId(scholar.id)}
-              style={{
-                paddingHorizontal: 12,
-                paddingVertical: 6,
-                borderRadius: 16,
-                backgroundColor: isSelected ? "#3b82f6" : "#f3f4f6",
-                marginEnd: 8,
-                borderWidth: 1,
-                borderColor: isSelected ? "#3b82f6" : "#e5e7eb",
-                height: 32,
-              }}
+              style={[styles.scholarChip, isSelected && styles.scholarChipSelected]}
             >
-              <Text
-                style={{
-                  color: isSelected ? "#fff" : "#374151",
-                  fontSize: 13,
-                  fontWeight: isSelected ? "600" : "400",
-                }}
-              >
+              <Text style={[styles.scholarChipText, isSelected && styles.scholarChipTextSelected]}>
                 {scholar.name}
               </Text>
             </Pressable>
           );
-        })}
-      </ScrollView>
-
-      <Pressable
-        onPress={handlePick}
-        style={{
-          padding: 12,
-          borderWidth: 1,
-          borderColor: "#d1d5db",
-          borderRadius: 8,
-          alignItems: "center",
-          marginBottom: 12,
         }}
-      >
-        <Text style={{ fontSize: 15 }}>Select Audio Files</Text>
+      />
+
+      <Pressable onPress={handlePick} style={styles.pickBtn}>
+        <Text style={styles.pickBtnText}>Select Audio Files</Text>
       </Pressable>
 
-      <ScrollView style={{ maxHeight: 200 }}>
-        {queue.map((item, i) => (
-          <View key={i} style={{ marginBottom: 8 }}>
-            <Text numberOfLines={1} style={{ fontSize: 13 }}>
+      <FlatList
+        data={queue}
+        keyExtractor={(item) => item.name}
+        style={styles.queueList}
+        renderItem={({ item }) => (
+          <View style={styles.queueItem}>
+            <Text numberOfLines={1} style={styles.queueItemName}>
               {item.name}
             </Text>
-            <View style={{ height: 4, backgroundColor: "#e5e7eb", borderRadius: 2, marginTop: 4 }}>
+            <View style={styles.progressTrack}>
               <View
-                style={{
-                  height: 4,
-                  width: `${Math.round(item.progress * 100)}%`,
-                  backgroundColor:
-                    item.status === "error"
-                      ? "#dc2626"
-                      : item.status === "done"
-                        ? "#16a34a"
-                        : "#3b82f6",
-                  borderRadius: 2,
-                }}
+                style={[
+                  styles.progressFill,
+                  {
+                    width: `${Math.round(item.progress * 100)}%`,
+                    backgroundColor:
+                      item.status === "error"
+                        ? "#dc2626"
+                        : item.status === "done"
+                          ? "#16a34a"
+                          : "#3b82f6",
+                  },
+                ]}
               />
             </View>
-            {item.status === "error" && (
-              <Text style={{ fontSize: 11, color: "#dc2626" }}>{item.error}</Text>
-            )}
+            {item.status === "error" && <Text style={styles.queueItemError}>{item.error}</Text>}
           </View>
-        ))}
-      </ScrollView>
+        )}
+      />
 
-      <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
+      <View style={styles.buttonRow}>
         <Pressable
           onPress={handleUploadAll}
           disabled={isUploadDisabled}
-          style={{
-            flex: 1,
-            padding: 12,
-            backgroundColor: isUploadDisabled ? "#9ca3af" : "#3b82f6",
-            borderRadius: 8,
-            alignItems: "center",
-          }}
+          style={[styles.uploadBtn, isUploadDisabled && styles.uploadBtnDisabled]}
         >
           {isUploading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={{ color: "#fff", fontWeight: "600" }}>Upload All</Text>
+            <Text style={styles.uploadBtnText}>Upload All</Text>
           )}
         </Pressable>
-        <Pressable
-          onPress={onClose}
-          style={{
-            padding: 12,
-            borderWidth: 1,
-            borderColor: "#d1d5db",
-            borderRadius: 8,
-            alignItems: "center",
-          }}
-        >
+        <Pressable onPress={onClose} style={styles.cancelBtn}>
           <Text>Cancel</Text>
         </Pressable>
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    padding: 16,
+    maxHeight: "80%",
+  },
+  title: {
+    fontSize: 17,
+    fontWeight: "600",
+    marginBottom: 12,
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: "600",
+    marginBottom: 6,
+  },
+  scholarList: {
+    marginBottom: 12,
+    maxHeight: 40,
+  },
+  scholarChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: "#f3f4f6",
+    marginEnd: 8,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    height: 32,
+  },
+  scholarChipSelected: {
+    backgroundColor: "#3b82f6",
+    borderColor: "#3b82f6",
+  },
+  scholarChipText: {
+    color: "#374151",
+    fontSize: 13,
+    fontWeight: "400",
+  },
+  scholarChipTextSelected: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+  pickBtn: {
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    borderRadius: 8,
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  pickBtnText: {
+    fontSize: 15,
+  },
+  queueList: {
+    maxHeight: 200,
+  },
+  queueItem: {
+    marginBottom: 8,
+  },
+  queueItemName: {
+    fontSize: 13,
+  },
+  progressTrack: {
+    height: 4,
+    backgroundColor: "#e5e7eb",
+    borderRadius: 2,
+    marginTop: 4,
+  },
+  progressFill: {
+    height: 4,
+    borderRadius: 2,
+  },
+  queueItemError: {
+    fontSize: 12,
+    color: "#dc2626",
+  },
+  buttonRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 12,
+  },
+  uploadBtn: {
+    flex: 1,
+    padding: 12,
+    backgroundColor: "#3b82f6",
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  uploadBtnDisabled: {
+    backgroundColor: "#9ca3af",
+  },
+  uploadBtnText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+  cancelBtn: {
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    borderRadius: 8,
+    alignItems: "center",
+  },
+});

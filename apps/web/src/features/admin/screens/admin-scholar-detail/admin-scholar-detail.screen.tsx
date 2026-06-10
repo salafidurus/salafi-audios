@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { Responsive } from "@/shared/components/Responsive";
 import { AdminScholarDetailDesktopScreen } from "./admin-scholar-detail.screen.desktop";
 import { AdminScholarDetailMobileScreen } from "./admin-scholar-detail.screen.mobile";
@@ -9,10 +10,7 @@ interface AdminScholarDetailScreenProps {
 }
 
 export function AdminScholarDetailScreen({ id }: AdminScholarDetailScreenProps) {
-  return (
-    <Responsive
-      mobile={<AdminScholarDetailMobileScreen id={id} />}
-      desktop={<AdminScholarDetailDesktopScreen id={id} />}
-    />
-  );
+  const mobile = useMemo(() => <AdminScholarDetailMobileScreen id={id} />, [id]);
+  const desktop = useMemo(() => <AdminScholarDetailDesktopScreen id={id} />, [id]);
+  return <Responsive mobile={mobile} desktop={desktop} />;
 }

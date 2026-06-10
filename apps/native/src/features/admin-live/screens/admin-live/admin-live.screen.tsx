@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import type { LivestreamChannelDto, LiveSessionPublicDto } from "@sd/core-contracts";
 import { useAdminChannels, useAdminSessions } from "../../hooks/use-admin-live";
 import { updateSessionStatus } from "../../api/admin-live.api";
@@ -16,64 +16,24 @@ function SessionRow({
   const statusColor =
     session.status === "live" ? "#dc2626" : session.status === "scheduled" ? "#d97706" : "#6b7280";
   return (
-    <View
-      style={{
-        padding: 12,
-        borderWidth: 1,
-        borderColor: "#e5e5e5",
-        borderRadius: 8,
-        marginBottom: 8,
-      }}
-    >
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-        <Text style={{ flex: 1, fontWeight: "600" }} numberOfLines={1}>
+    <View style={styles.sessionRow}>
+      <View style={styles.sessionRowHeader}>
+        <Text style={styles.sessionTitle} numberOfLines={1}>
           {session.title ?? session.channelDisplayName}
         </Text>
-        <View
-          style={{
-            backgroundColor: statusColor + "22",
-            paddingHorizontal: 6,
-            paddingVertical: 2,
-            borderRadius: 4,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 11,
-              color: statusColor,
-              fontWeight: "600",
-              textTransform: "capitalize",
-            }}
-          >
-            {session.status}
-          </Text>
+        <View style={[styles.statusBadge, { backgroundColor: statusColor + "22" }]}>
+          <Text style={[styles.statusText, { color: statusColor }]}>{session.status}</Text>
         </View>
       </View>
-      <View style={{ flexDirection: "row", gap: 6, marginTop: 8 }}>
+      <View style={styles.sessionActions}>
         {session.status === "scheduled" && (
-          <Pressable
-            onPress={() => onStatusChange(session.id, "live")}
-            style={{
-              paddingHorizontal: 10,
-              paddingVertical: 5,
-              backgroundColor: "#dc2626",
-              borderRadius: 6,
-            }}
-          >
-            <Text style={{ color: "#fff", fontSize: 12, fontWeight: "600" }}>Go Live</Text>
+          <Pressable onPress={() => onStatusChange(session.id, "live")} style={styles.goLiveBtn}>
+            <Text style={styles.actionBtnText}>Go Live</Text>
           </Pressable>
         )}
         {session.status === "live" && (
-          <Pressable
-            onPress={() => onStatusChange(session.id, "ended")}
-            style={{
-              paddingHorizontal: 10,
-              paddingVertical: 5,
-              backgroundColor: "#374151",
-              borderRadius: 6,
-            }}
-          >
-            <Text style={{ color: "#fff", fontSize: 12, fontWeight: "600" }}>End</Text>
+          <Pressable onPress={() => onStatusChange(session.id, "ended")} style={styles.endBtn}>
+            <Text style={styles.actionBtnText}>End</Text>
           </Pressable>
         )}
       </View>
@@ -95,59 +55,55 @@ export function AdminLiveScreen() {
   };
 
   return (
-    <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
+    <ScrollView style={styles.screen} contentContainerStyle={styles.screenContent}>
       {/* Sessions */}
-      <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 12 }}>
-        <Text style={{ flex: 1, fontSize: 18, fontWeight: "700" }}>Sessions</Text>
-        <Pressable
-          onPress={() => setShowSessionSheet(true)}
-          style={{ padding: 8, backgroundColor: "#3b82f6", borderRadius: 8 }}
-        >
-          <Text style={{ color: "#fff", fontWeight: "600" }}>+ New</Text>
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>Sessions</Text>
+        <Pressable onPress={() => setShowSessionSheet(true)} style={styles.newBtn}>
+          <Text style={styles.newBtnText}>+ New</Text>
         </Pressable>
       </View>
-      {sessions.length === 0 && (
-        <Text style={{ color: "#6b7280", marginBottom: 16 }}>No sessions found.</Text>
-      )}
-      {sessions.map((s) => (
-        <SessionRow key={s.id} session={s} onStatusChange={handleStatusChange} />
-      ))}
+      {sessions.length === 0 && <Text style={styles.emptyText}>No sessions found.</Text>}
+      <FlatList
+        data={sessions}
+        keyExtractor={(s) => s.id}
+        scrollEnabled={false}
+        renderItem={({ item: s }) => <SessionRow session={s} onStatusChange={handleStatusChange} />}
+      />
 
       {/* Channels */}
-      <View style={{ flexDirection: "row", alignItems: "center", marginTop: 24, marginBottom: 12 }}>
-        <Text style={{ flex: 1, fontSize: 18, fontWeight: "700" }}>Channels</Text>
+      <View style={[styles.sectionHeader, styles.sectionHeaderSpacing]}>
+        <Text style={styles.sectionTitle}>Channels</Text>
         <Pressable
           onPress={() => {
             setEditingChannel(undefined);
             setShowChannelSheet(true);
           }}
-          style={{ padding: 8, backgroundColor: "#3b82f6", borderRadius: 8 }}
+          style={styles.newBtn}
         >
-          <Text style={{ color: "#fff", fontWeight: "600" }}>+ New</Text>
+          <Text style={styles.newBtnText}>+ New</Text>
         </Pressable>
       </View>
-      {(channels ?? []).map((ch: LivestreamChannelDto) => (
-        <Pressable
-          key={ch.id}
-          onPress={() => {
-            setEditingChannel(ch);
-            setShowChannelSheet(true);
-          }}
-          style={{
-            padding: 12,
-            borderWidth: 1,
-            borderColor: "#e5e5e5",
-            borderRadius: 8,
-            marginBottom: 8,
-          }}
-        >
-          <Text style={{ fontWeight: "600" }}>{ch.displayName}</Text>
-          <Text style={{ fontSize: 12, color: "#6b7280" }}>
-            {ch.telegramSlug ? `@${ch.telegramSlug}` : "Private"} · {ch.language ?? "—"} ·{" "}
-            {ch.isActive ? "Active" : "Inactive"}
-          </Text>
-        </Pressable>
-      ))}
+      <FlatList
+        data={channels ?? []}
+        keyExtractor={(ch) => ch.id}
+        scrollEnabled={false}
+        renderItem={({ item: ch }) => (
+          <Pressable
+            onPress={() => {
+              setEditingChannel(ch);
+              setShowChannelSheet(true);
+            }}
+            style={styles.channelRow}
+          >
+            <Text style={styles.channelName}>{ch.displayName}</Text>
+            <Text style={styles.channelMeta}>
+              {ch.telegramSlug ? `@${ch.telegramSlug}` : "Private"} · {ch.language ?? "—"} ·{" "}
+              {ch.isActive ? "Active" : "Inactive"}
+            </Text>
+          </Pressable>
+        )}
+      />
 
       <ChannelSheet
         isOpen={showChannelSheet}
@@ -170,3 +126,101 @@ export function AdminLiveScreen() {
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+  },
+  screenContent: {
+    padding: 16,
+    paddingBottom: 40,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  sectionHeaderSpacing: {
+    marginTop: 24,
+  },
+  sectionTitle: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  newBtn: {
+    padding: 8,
+    backgroundColor: "#3b82f6",
+    borderRadius: 8,
+  },
+  newBtnText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+  emptyText: {
+    color: "#6b7280",
+    marginBottom: 16,
+  },
+  sessionRow: {
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#e5e5e5",
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  sessionRowHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  sessionTitle: {
+    flex: 1,
+    fontWeight: "600",
+  },
+  statusBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: "600",
+    textTransform: "capitalize",
+  },
+  sessionActions: {
+    flexDirection: "row",
+    gap: 6,
+    marginTop: 8,
+  },
+  goLiveBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: "#dc2626",
+    borderRadius: 6,
+  },
+  endBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    backgroundColor: "#374151",
+    borderRadius: 6,
+  },
+  actionBtnText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  channelRow: {
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#e5e5e5",
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  channelName: {
+    fontWeight: "600",
+  },
+  channelMeta: {
+    fontSize: 12,
+    color: "#6b7280",
+  },
+});

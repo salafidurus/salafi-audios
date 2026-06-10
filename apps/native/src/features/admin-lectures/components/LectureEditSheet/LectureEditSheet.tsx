@@ -1,5 +1,13 @@
-import { useEffect, useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { useEffect, useReducer } from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import type { AdminLectureDetailDto, Locale } from "@sd/core-contracts";
 import { fetchAdminLectureDetail, updateLecture } from "../../api/admin-lectures.api";
 
@@ -9,33 +17,51 @@ type LectureEditSheetProps = {
   onSaved: () => void;
 };
 
+type FormState = {
+  lecture: AdminLectureDetailDto | null;
+  title: string;
+  description: string;
+  language: string;
+  isSaving: boolean;
+  error: string | null;
+};
+
+function reduce(state: FormState, patch: Partial<FormState>): FormState {
+  return { ...state, ...patch };
+}
+
 export function LectureEditSheet({ lectureId, onClose, onSaved }: LectureEditSheetProps) {
-  const [lecture, setLecture] = useState<AdminLectureDetailDto | null>(null);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [language, setLanguage] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(reduce, {
+    lecture: null,
+    title: "",
+    description: "",
+    language: "",
+    isSaving: false,
+    error: null,
+  });
 
   useEffect(() => {
     if (!lectureId) {
-      setLecture(null);
+      dispatch({ lecture: null });
       return;
     }
     fetchAdminLectureDetail(lectureId).then((data) => {
-      setLecture(data);
-      setTitle(data.title ?? "");
-      setDescription(data.description ?? "");
-      setLanguage(data.language ?? "");
+      dispatch({
+        lecture: data,
+        title: data.title ?? "",
+        description: data.description ?? "",
+        language: data.language ?? "",
+      });
     });
   }, [lectureId]);
 
   if (!lectureId) return null;
 
+  const { lecture, title, description, language, isSaving, error } = state;
+
   const handleSave = async () => {
     if (!lecture) return;
-    setIsSaving(true);
-    setError(null);
+    dispatch({ isSaving: true, error: null });
     try {
       await updateLecture(lecture.id, {
         title,
@@ -44,107 +70,122 @@ export function LectureEditSheet({ lectureId, onClose, onSaved }: LectureEditShe
       });
       onSaved();
     } catch (e) {
-      setError((e as Error).message);
+      dispatch({ error: (e as Error).message });
     } finally {
-      setIsSaving(false);
+      dispatch({ isSaving: false });
     }
   };
 
   return (
-    <View
-      style={{
-        position: "absolute",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: "#fff",
-        borderTopLeftRadius: 16,
-        borderTopRightRadius: 16,
-        padding: 16,
-        maxHeight: "85%",
-      }}
-    >
-      <Text style={{ fontSize: 17, fontWeight: "600", marginBottom: 16 }}>Edit Lecture</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>Edit Lecture</Text>
       {!lecture ? (
-        <ActivityIndicator style={{ marginVertical: 32 }} />
+        <ActivityIndicator style={styles.loader} />
       ) : (
         <ScrollView showsVerticalScrollIndicator={false}>
-          <Text style={{ fontSize: 13, fontWeight: "600", marginBottom: 4 }}>Title</Text>
+          <Text style={styles.label}>Title</Text>
           <TextInput
             value={title}
-            onChangeText={setTitle}
-            style={{
-              borderWidth: 1,
-              borderColor: "#d1d5db",
-              borderRadius: 8,
-              padding: 10,
-              marginBottom: 12,
-            }}
+            onChangeText={(v) => dispatch({ title: v })}
+            style={styles.input}
           />
-          <Text style={{ fontSize: 13, fontWeight: "600", marginBottom: 4 }}>Description</Text>
+          <Text style={styles.label}>Description</Text>
           <TextInput
             value={description}
-            onChangeText={setDescription}
+            onChangeText={(v) => dispatch({ description: v })}
             multiline
             numberOfLines={3}
-            style={{
-              borderWidth: 1,
-              borderColor: "#d1d5db",
-              borderRadius: 8,
-              padding: 10,
-              marginBottom: 12,
-            }}
+            style={styles.input}
           />
-          <Text style={{ fontSize: 13, fontWeight: "600", marginBottom: 4 }}>Language</Text>
+          <Text style={styles.label}>Language</Text>
           <TextInput
             value={language}
-            onChangeText={setLanguage}
+            onChangeText={(v) => dispatch({ language: v })}
             placeholder="e.g. ar, en"
-            style={{
-              borderWidth: 1,
-              borderColor: "#d1d5db",
-              borderRadius: 8,
-              padding: 10,
-              marginBottom: 12,
-            }}
+            style={styles.input}
           />
-          <Text style={{ fontSize: 12, color: "#6b7280", marginBottom: 12 }}>
-            Status: {lecture.status}
-          </Text>
-          {error && <Text style={{ color: "#dc2626", marginBottom: 8 }}>{error}</Text>}
+          <Text style={styles.statusText}>Status: {lecture.status}</Text>
+          {error && <Text style={styles.errorText}>{error}</Text>}
         </ScrollView>
       )}
-      <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
-        <Pressable
-          onPress={handleSave}
-          disabled={isSaving || !lecture}
-          style={{
-            flex: 1,
-            padding: 12,
-            backgroundColor: "#3b82f6",
-            borderRadius: 8,
-            alignItems: "center",
-          }}
-        >
+      <View style={styles.buttonRow}>
+        <Pressable onPress={handleSave} disabled={isSaving || !lecture} style={styles.saveBtn}>
           {isSaving ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={{ color: "#fff", fontWeight: "600" }}>Save</Text>
+            <Text style={styles.saveBtnText}>Save</Text>
           )}
         </Pressable>
-        <Pressable
-          onPress={onClose}
-          style={{
-            padding: 12,
-            borderWidth: 1,
-            borderColor: "#d1d5db",
-            borderRadius: 8,
-            alignItems: "center",
-          }}
-        >
+        <Pressable onPress={onClose} style={styles.cancelBtn}>
           <Text>Cancel</Text>
         </Pressable>
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    padding: 16,
+    maxHeight: "85%",
+  },
+  title: {
+    fontSize: 17,
+    fontWeight: "600",
+    marginBottom: 16,
+  },
+  loader: {
+    marginVertical: 32,
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: "600",
+    marginBottom: 4,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 12,
+  },
+  statusText: {
+    fontSize: 12,
+    color: "#6b7280",
+    marginBottom: 12,
+  },
+  errorText: {
+    color: "#dc2626",
+    marginBottom: 8,
+  },
+  buttonRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 12,
+  },
+  saveBtn: {
+    flex: 1,
+    padding: 12,
+    backgroundColor: "#3b82f6",
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  saveBtnText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+  cancelBtn: {
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    borderRadius: 8,
+    alignItems: "center",
+  },
+});

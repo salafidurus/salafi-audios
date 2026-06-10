@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useReducer } from "react";
 import Link from "next/link";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type {
@@ -17,6 +17,19 @@ interface AdminScholarDetailDesktopScreenProps {
 }
 
 type ScholarsListDto = { scholars: ScholarListItemDto[] };
+
+type FormState = {
+  newSeriesTitle: string;
+  newSeriesOrder: number;
+  creatingSeries: boolean;
+  newCollectionTitle: string;
+  newCollectionOrder: number;
+  creatingCollection: boolean;
+};
+
+function reduce(state: FormState, patch: Partial<FormState>): FormState {
+  return { ...state, ...patch };
+}
 
 export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDesktopScreenProps) {
   // Fetch Scholar
@@ -46,15 +59,23 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
     }),
   );
 
-  // Series Form State
-  const [newSeriesTitle, setNewSeriesTitle] = useState("");
-  const [newSeriesOrder, setNewSeriesOrder] = useState(0);
-  const [creatingSeries, setCreatingSeries] = useState(false);
+  const [state, dispatch] = useReducer(reduce, {
+    newSeriesTitle: "",
+    newSeriesOrder: 0,
+    creatingSeries: false,
+    newCollectionTitle: "",
+    newCollectionOrder: 0,
+    creatingCollection: false,
+  });
 
-  // Collection Form State
-  const [newCollectionTitle, setNewCollectionTitle] = useState("");
-  const [newCollectionOrder, setNewCollectionOrder] = useState(0);
-  const [creatingCollection, setCreatingCollection] = useState(false);
+  const {
+    newSeriesTitle,
+    newSeriesOrder,
+    creatingSeries,
+    newCollectionTitle,
+    newCollectionOrder,
+    creatingCollection,
+  } = state;
 
   const handleCreateSeries = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,9 +91,7 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
           orderIndex: Number(newSeriesOrder),
         },
       });
-      setNewSeriesTitle("");
-      setNewSeriesOrder(0);
-      setCreatingSeries(false);
+      dispatch({ newSeriesTitle: "", newSeriesOrder: 0, creatingSeries: false });
       refetchSeries();
     } catch {
       // ignore
@@ -93,9 +112,7 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
           orderIndex: Number(newCollectionOrder),
         },
       });
-      setNewCollectionTitle("");
-      setNewCollectionOrder(0);
-      setCreatingCollection(false);
+      dispatch({ newCollectionTitle: "", newCollectionOrder: 0, creatingCollection: false });
       refetchCollections();
     } catch {
       // ignore
@@ -155,7 +172,7 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
               <button
                 type="button"
                 className={styles.addBtn}
-                onClick={() => setCreatingSeries(!creatingSeries)}
+                onClick={() => dispatch({ creatingSeries: !creatingSeries })}
               >
                 <Plus size={16} /> Add Series
               </button>
@@ -168,7 +185,8 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
                   placeholder="Series Title"
                   className={styles.input}
                   value={newSeriesTitle}
-                  onChange={(e) => setNewSeriesTitle(e.target.value)}
+                  onChange={(e) => dispatch({ newSeriesTitle: e.target.value })}
+                  aria-label="Series title"
                   required
                 />
                 <input
@@ -176,7 +194,8 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
                   placeholder="Order"
                   className={styles.input}
                   value={newSeriesOrder}
-                  onChange={(e) => setNewSeriesOrder(Number(e.target.value))}
+                  onChange={(e) => dispatch({ newSeriesOrder: Number(e.target.value) })}
+                  aria-label="Series order index"
                 />
                 <div className={styles.formActions}>
                   <button type="submit" className={styles.saveBtn}>
@@ -185,7 +204,7 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
                   <button
                     type="button"
                     className={styles.cancelBtn}
-                    onClick={() => setCreatingSeries(false)}
+                    onClick={() => dispatch({ creatingSeries: false })}
                   >
                     Cancel
                   </button>
@@ -226,7 +245,7 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
               <button
                 type="button"
                 className={styles.addBtn}
-                onClick={() => setCreatingCollection(!creatingCollection)}
+                onClick={() => dispatch({ creatingCollection: !creatingCollection })}
               >
                 <Plus size={16} /> Add Collection
               </button>
@@ -239,7 +258,8 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
                   placeholder="Collection Title"
                   className={styles.input}
                   value={newCollectionTitle}
-                  onChange={(e) => setNewCollectionTitle(e.target.value)}
+                  onChange={(e) => dispatch({ newCollectionTitle: e.target.value })}
+                  aria-label="Collection title"
                   required
                 />
                 <input
@@ -247,7 +267,8 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
                   placeholder="Order"
                   className={styles.input}
                   value={newCollectionOrder}
-                  onChange={(e) => setNewCollectionOrder(Number(e.target.value))}
+                  onChange={(e) => dispatch({ newCollectionOrder: Number(e.target.value) })}
+                  aria-label="Collection order index"
                 />
                 <div className={styles.formActions}>
                   <button type="submit" className={styles.saveBtn}>
@@ -256,7 +277,7 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
                   <button
                     type="button"
                     className={styles.cancelBtn}
-                    onClick={() => setCreatingCollection(false)}
+                    onClick={() => dispatch({ creatingCollection: false })}
                   >
                     Cancel
                   </button>

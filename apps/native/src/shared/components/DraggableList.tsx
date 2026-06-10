@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from "react";
-import { View, FlatList, Pressable, ViewStyle, LayoutChangeEvent } from "react-native";
+import { View, FlatList, Pressable, StyleSheet, ViewStyle, LayoutChangeEvent } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
 
 export interface RenderItemParams<T> {
@@ -25,6 +25,51 @@ interface ItemLayout {
   height: number;
 }
 
+interface DraggableItemProps<T> {
+  item: T;
+  index: number;
+  isActive: boolean;
+  keyExtractor: (item: T, index: number) => string;
+  renderItem: (params: RenderItemParams<T>) => React.ReactElement;
+  onLayout: (index: number, event: LayoutChangeEvent) => void;
+  onDragStart: (index: number) => void;
+  onDragEnd: (index: number) => void;
+}
+
+function DraggableItemRenderer<T>({
+  item,
+  index,
+  isActive,
+  renderItem,
+  onLayout,
+  onDragStart,
+  onDragEnd,
+}: DraggableItemProps<T>) {
+  const drag = useCallback(() => onDragStart(index), [onDragStart, index]);
+  return (
+    <View
+      onLayout={(e) => onLayout(index, e)}
+      style={[draggableStyles.item, { opacity: isActive ? 0.5 : 1, zIndex: isActive ? 1000 : 0 }]}
+    >
+      {renderItem({ item, index, drag, isActive })}
+      {isActive && (
+        <Pressable onPressOut={() => onDragEnd(index)} style={draggableStyles.overlay} />
+      )}
+    </View>
+  );
+}
+
+const draggableStyles = StyleSheet.create({
+  item: {},
+  overlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+});
+
 export function DraggableList<T>({
   data,
   renderItem,
@@ -34,19 +79,13 @@ export function DraggableList<T>({
   estimatedItemSize = 60,
   contentContainerStyle,
 }: DraggableListProps<T>) {
-  const [layouts, setLayouts] = useState<Map<string, ItemLayout>>(new Map());
+  const [layouts, setLayouts] = useState<Map<string, ItemLayout>>(() => new Map());
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [reorderedData, setReorderedData] = useState<T[]>(data);
   const draggedItemOffsetY = useSharedValue(0);
   const containerOffsetY = useSharedValue(0);
 
   const itemHeights = useRef<Map<string, number>>(new Map());
   const flatListRef = useRef<FlatList>(null);
-
-  // Update reorderedData when data changes externally
-  React.useEffect(() => {
-    setReorderedData(data);
-  }, [data]);
 
   const handleItemLayout = useCallback(
     (index: number, event: LayoutChangeEvent) => {
@@ -72,15 +111,14 @@ export function DraggableList<T>({
       setActiveIndex(null);
       draggedItemOffsetY.value = 0;
 
-      // Calculate the target index based on the dragged item's position
       let toIndex = fromIndex;
-      const draggedKey = keyExtractor(reorderedData[fromIndex], fromIndex);
+      const draggedKey = keyExtractor(data[fromIndex], fromIndex);
       const draggedLayout = layouts.get(draggedKey);
 
       if (draggedLayout) {
         let cumulativeY = 0;
-        for (let i = 0; i < reorderedData.length; i++) {
-          const key = keyExtractor(reorderedData[i], i);
+        for (let i = 0; i < data.length; i++) {
+          const key = keyExtractor(data[i], i);
           const itemHeight = itemHeights.current.get(key) || estimatedItemSize;
 
           if (draggedLayout.y + draggedLayout.height / 2 < cumulativeY + itemHeight / 2) {
@@ -92,14 +130,11 @@ export function DraggableList<T>({
         }
       }
 
-      // Reorder the data
       if (toIndex !== fromIndex) {
-        const newData = [...reorderedData];
+        const newData = [...data];
         const [draggedItem] = newData.splice(fromIndex, 1);
         newData.splice(toIndex, 0, draggedItem);
-        setReorderedData(newData);
 
-        // Call the callback with the new order
         onDragEnd({
           data: newData,
           from: fromIndex,
@@ -107,65 +142,31 @@ export function DraggableList<T>({
         });
       }
     },
-    [
-      activeIndex,
-      reorderedData,
-      keyExtractor,
-      layouts,
-      estimatedItemSize,
-      draggedItemOffsetY,
-      onDragEnd,
-    ],
+    [activeIndex, data, keyExtractor, layouts, estimatedItemSize, draggedItemOffsetY, onDragEnd],
   );
 
   const renderDraggableItem = useCallback(
-    ({ item, index }: { item: T; index: number }) => {
-      const isActive = activeIndex === index;
-      const key = keyExtractor(item, index);
-
-      const drag = () => {
-        handleDragStart(index);
-      };
-
-      return (
-        <View
-          key={key}
-          onLayout={(e) => handleItemLayout(index, e)}
-          style={{
-            opacity: isActive ? 0.5 : 1,
-            zIndex: isActive ? 1000 : 0,
-          }}
-        >
-          {renderItem({
-            item,
-            index,
-            drag,
-            isActive,
-          })}
-          {isActive && (
-            <Pressable
-              onPressOut={() => handleDragEnd(index)}
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-              }}
-            />
-          )}
-        </View>
-      );
-    },
-    [activeIndex, keyExtractor, handleDragStart, handleDragEnd, renderItem, handleItemLayout],
+    ({ item, index }: { item: T; index: number }) => (
+      <DraggableItemRenderer
+        item={item}
+        index={index}
+        isActive={activeIndex === index}
+        keyExtractor={keyExtractor}
+        renderItem={renderItem}
+        onLayout={handleItemLayout}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+      />
+    ),
+    [activeIndex, keyExtractor, renderItem, handleItemLayout, handleDragStart, handleDragEnd],
   );
 
   return (
     <FlatList
       ref={flatListRef}
-      data={reorderedData}
+      data={data}
       renderItem={renderDraggableItem}
-      keyExtractor={(item, index) => keyExtractor(item, index)}
+      keyExtractor={keyExtractor}
       scrollEnabled={scrollEnabled && activeIndex === null}
       contentContainerStyle={contentContainerStyle}
       onScroll={(e) => {

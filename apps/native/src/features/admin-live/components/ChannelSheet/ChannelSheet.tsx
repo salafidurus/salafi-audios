@@ -1,5 +1,13 @@
-import { useState } from "react";
-import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { useReducer } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import type { LivestreamChannelDto, Locale } from "@sd/core-contracts";
 import { createChannel, updateChannel } from "../../api/admin-live.api";
 
@@ -19,27 +27,51 @@ type ChannelSheetProps = {
   onSaved: () => void;
 };
 
+type FormState = {
+  telegramId: string;
+  displayName: string;
+  telegramSlug: string;
+  language: string;
+  isSaving: boolean;
+  error: string | null;
+};
+
+function reduce(state: FormState, patch: Partial<FormState>): FormState {
+  return { ...state, ...patch };
+}
+
+type FieldItem = {
+  key: keyof typeof HELPER_TEXT;
+  label: string;
+  value: string;
+  onChangeText: (v: string) => void;
+  keyboardType?: "default" | "numeric";
+};
+
 export function ChannelSheet({ isOpen, channel, onClose, onSaved }: ChannelSheetProps) {
-  const [telegramId, setTelegramId] = useState("");
-  const [displayName, setDisplayName] = useState(channel?.displayName ?? "");
-  const [telegramSlug, setTelegramSlug] = useState(channel?.telegramSlug ?? "");
-  const [language, setLanguage] = useState(channel?.language ?? "");
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(reduce, {
+    telegramId: "",
+    displayName: channel?.displayName ?? "",
+    telegramSlug: channel?.telegramSlug ?? "",
+    language: channel?.language ?? "",
+    isSaving: false,
+    error: null,
+  });
 
   if (!isOpen) return null;
 
+  const { telegramId, displayName, telegramSlug, language, isSaving, error } = state;
+
   const handleSave = async () => {
     if (!displayName) {
-      setError("Display Name is required");
+      dispatch({ error: "Display Name is required" });
       return;
     }
     if (!channel && !telegramId) {
-      setError("Telegram ID is required for new channels");
+      dispatch({ error: "Telegram ID is required for new channels" });
       return;
     }
-    setIsSaving(true);
-    setError(null);
+    dispatch({ isSaving: true, error: null });
     try {
       if (channel) {
         await updateChannel(channel.id, {
@@ -57,106 +89,141 @@ export function ChannelSheet({ isOpen, channel, onClose, onSaved }: ChannelSheet
       }
       onSaved();
     } catch (e) {
-      setError((e as Error).message);
+      dispatch({ error: (e as Error).message });
     } finally {
-      setIsSaving(false);
+      dispatch({ isSaving: false });
     }
   };
 
-  const fields: {
-    key: keyof typeof HELPER_TEXT;
-    label: string;
-    value: string;
-    set: (v: string) => void;
-    keyboardType?: "default" | "numeric";
-    showInEditMode?: boolean;
-  }[] = [
+  const allFields: FieldItem[] = [
     {
       key: "telegramId",
       label: "Telegram ID *",
       value: telegramId,
-      set: setTelegramId,
+      onChangeText: (v) => dispatch({ telegramId: v }),
       keyboardType: "numeric",
-      showInEditMode: false,
     },
-    { key: "displayName", label: "Display Name *", value: displayName, set: setDisplayName },
-    { key: "telegramSlug", label: "Telegram Slug", value: telegramSlug, set: setTelegramSlug },
-    { key: "language", label: "Language", value: language, set: setLanguage },
+    {
+      key: "displayName",
+      label: "Display Name *",
+      value: displayName,
+      onChangeText: (v) => dispatch({ displayName: v }),
+    },
+    {
+      key: "telegramSlug",
+      label: "Telegram Slug",
+      value: telegramSlug,
+      onChangeText: (v) => dispatch({ telegramSlug: v }),
+    },
+    {
+      key: "language",
+      label: "Language",
+      value: language,
+      onChangeText: (v) => dispatch({ language: v }),
+    },
   ];
 
+  const fields = allFields.flatMap((f) => (f.key !== "telegramId" || !channel ? [f] : []));
+
   return (
-    <View
-      style={{
-        position: "absolute",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: "#fff",
-        borderTopLeftRadius: 16,
-        borderTopRightRadius: 16,
-        padding: 16,
-        maxHeight: "90%",
-      }}
-    >
-      <Text style={{ fontSize: 17, fontWeight: "600", marginBottom: 16 }}>
-        {channel ? "Edit Channel" : "New Channel"}
-      </Text>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {fields
-          .filter((f) => f.showInEditMode !== false || !channel)
-          .map(({ key, label, value, set, keyboardType }) => (
-            <View key={key} style={{ marginBottom: 16 }}>
-              <Text style={{ fontSize: 13, fontWeight: "600", marginBottom: 4 }}>{label}</Text>
-              <TextInput
-                value={value}
-                onChangeText={set}
-                keyboardType={keyboardType ?? "default"}
-                style={{
-                  borderWidth: 1,
-                  borderColor: "#d1d5db",
-                  borderRadius: 8,
-                  padding: 10,
-                  fontSize: 14,
-                }}
-              />
-              <Text style={{ fontSize: 11, color: "#6b7280", marginTop: 4 }}>
-                {HELPER_TEXT[key]}
-              </Text>
-            </View>
-          ))}
-        {error && <Text style={{ color: "#dc2626", marginBottom: 8 }}>{error}</Text>}
-      </ScrollView>
-      <View style={{ flexDirection: "row", gap: 8, marginTop: 12 }}>
-        <Pressable
-          onPress={handleSave}
-          disabled={isSaving}
-          style={{
-            flex: 1,
-            padding: 12,
-            backgroundColor: "#3b82f6",
-            borderRadius: 8,
-            alignItems: "center",
-          }}
-        >
+    <View style={styles.container}>
+      <Text style={styles.title}>{channel ? "Edit Channel" : "New Channel"}</Text>
+      <FlatList
+        data={fields}
+        keyExtractor={(f) => f.key}
+        showsVerticalScrollIndicator={false}
+        renderItem={({ item: { key, label, value, onChangeText, keyboardType } }) => (
+          <View style={styles.fieldRow}>
+            <Text style={styles.label}>{label}</Text>
+            <TextInput
+              value={value}
+              onChangeText={onChangeText}
+              keyboardType={keyboardType ?? "default"}
+              style={styles.input}
+            />
+            <Text style={styles.helperText}>{HELPER_TEXT[key]}</Text>
+          </View>
+        )}
+        ListFooterComponent={error ? <Text style={styles.errorText}>{error}</Text> : null}
+      />
+      <View style={styles.buttonRow}>
+        <Pressable onPress={handleSave} disabled={isSaving} style={styles.saveBtn}>
           {isSaving ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={{ color: "#fff", fontWeight: "600" }}>Save</Text>
+            <Text style={styles.saveBtnText}>Save</Text>
           )}
         </Pressable>
-        <Pressable
-          onPress={onClose}
-          style={{
-            padding: 12,
-            borderWidth: 1,
-            borderColor: "#d1d5db",
-            borderRadius: 8,
-            alignItems: "center",
-          }}
-        >
+        <Pressable onPress={onClose} style={styles.cancelBtn}>
           <Text>Cancel</Text>
         </Pressable>
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    padding: 16,
+    maxHeight: "90%",
+  },
+  title: {
+    fontSize: 17,
+    fontWeight: "600",
+    marginBottom: 16,
+  },
+  fieldRow: {
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: "600",
+    marginBottom: 4,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 14,
+  },
+  helperText: {
+    fontSize: 12,
+    color: "#6b7280",
+    marginTop: 4,
+  },
+  errorText: {
+    color: "#dc2626",
+    marginBottom: 8,
+  },
+  buttonRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 12,
+  },
+  saveBtn: {
+    flex: 1,
+    padding: 12,
+    backgroundColor: "#3b82f6",
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  saveBtnText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+  cancelBtn: {
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    borderRadius: 8,
+    alignItems: "center",
+  },
+});
