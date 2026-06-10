@@ -60,6 +60,7 @@ export function Providers({ children }: Props) {
         router.replace(routes.home as Href);
       });
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
