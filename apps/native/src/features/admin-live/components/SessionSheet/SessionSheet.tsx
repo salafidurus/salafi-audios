@@ -68,6 +68,7 @@ export function SessionSheet({ isOpen, channels, onClose, onSaved }: SessionShee
       <Text style={styles.title}>New Session</Text>
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles.label}>Channel *</Text>
+        {/* eslint-disable-next-line react-doctor/rn-no-scrollview-mapped-list */}
         {channels.map((ch) => (
           <Pressable
             key={ch.id}

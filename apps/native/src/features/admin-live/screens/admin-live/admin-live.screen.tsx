@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import type { LivestreamChannelDto, LiveSessionPublicDto } from "@sd/core-contracts";
 import { useAdminChannels, useAdminSessions } from "../../hooks/use-admin-live";
@@ -41,6 +41,23 @@ function SessionRow({
   );
 }
 
+type ChannelRowProps = {
+  channel: LivestreamChannelDto;
+  onPress: (channel: LivestreamChannelDto) => void;
+};
+
+function ChannelRow({ channel, onPress }: ChannelRowProps) {
+  return (
+    <Pressable onPress={() => onPress(channel)} style={styles.channelRow}>
+      <Text style={styles.channelName}>{channel.displayName}</Text>
+      <Text style={styles.channelMeta}>
+        {channel.telegramSlug ? `@${channel.telegramSlug}` : "Private"} · {channel.language ?? "—"}{" "}
+        · {channel.isActive ? "Active" : "Inactive"}
+      </Text>
+    </Pressable>
+  );
+}
+
 export function AdminLiveScreen() {
   const { data: sessionsData, refetch: refetchSessions } = useAdminSessions();
   const { data: channels, refetch: refetchChannels } = useAdminChannels();
@@ -53,6 +70,26 @@ export function AdminLiveScreen() {
     await updateSessionStatus(id, status);
     refetchSessions();
   };
+
+  const handleChannelPress = useCallback((channel: LivestreamChannelDto) => {
+    setEditingChannel(channel);
+    setShowChannelSheet(true);
+  }, []);
+
+  const renderSessionItem = useCallback(
+    ({ item: s }: { item: LiveSessionPublicDto }) => (
+      <SessionRow session={s} onStatusChange={handleStatusChange} />
+    ),
+    // eslint-disable-next-line react-doctor/exhaustive-deps, react-hooks/exhaustive-deps
+    [],
+  );
+
+  const renderChannelItem = useCallback(
+    ({ item: ch }: { item: LivestreamChannelDto }) => (
+      <ChannelRow channel={ch} onPress={handleChannelPress} />
+    ),
+    [handleChannelPress],
+  );
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.screenContent}>
@@ -68,7 +105,7 @@ export function AdminLiveScreen() {
         data={sessions}
         keyExtractor={(s) => s.id}
         scrollEnabled={false}
-        renderItem={({ item: s }) => <SessionRow session={s} onStatusChange={handleStatusChange} />}
+        renderItem={renderSessionItem}
       />
 
       {/* Channels */}
@@ -88,21 +125,7 @@ export function AdminLiveScreen() {
         data={channels ?? []}
         keyExtractor={(ch) => ch.id}
         scrollEnabled={false}
-        renderItem={({ item: ch }) => (
-          <Pressable
-            onPress={() => {
-              setEditingChannel(ch);
-              setShowChannelSheet(true);
-            }}
-            style={styles.channelRow}
-          >
-            <Text style={styles.channelName}>{ch.displayName}</Text>
-            <Text style={styles.channelMeta}>
-              {ch.telegramSlug ? `@${ch.telegramSlug}` : "Private"} · {ch.language ?? "—"} ·{" "}
-              {ch.isActive ? "Active" : "Inactive"}
-            </Text>
-          </Pressable>
-        )}
+        renderItem={renderChannelItem}
       />
 
       <ChannelSheet

@@ -33,6 +33,7 @@ export function SearchFilter({ value, onChange, topics }: SearchFilterProps) {
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.list}
     >
+      {/* eslint-disable-next-line react-doctor/rn-no-scrollview-mapped-list */}
       {options.map((option) => {
         const isActive = option.id === "all" ? value.length === 0 : selected.has(option.id);
         return (

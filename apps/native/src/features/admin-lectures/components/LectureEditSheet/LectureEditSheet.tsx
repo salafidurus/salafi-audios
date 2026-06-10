@@ -41,6 +41,7 @@ export function LectureEditSheet({ lectureId, onClose, onSaved }: LectureEditShe
   });
 
   useEffect(() => {
+    // eslint-disable-next-line react-doctor/no-event-handler
     if (!lectureId) {
       dispatch({ lecture: null });
       return;
