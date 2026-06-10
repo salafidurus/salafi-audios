@@ -104,6 +104,12 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         },
       ],
       "expo-audio",
+      [
+        "expo-document-picker",
+        {
+          iCloudContainerEnvironment: appEnv === "production" ? "Production" : "Development",
+        },
+      ],
     ],
 
     experiments: {
