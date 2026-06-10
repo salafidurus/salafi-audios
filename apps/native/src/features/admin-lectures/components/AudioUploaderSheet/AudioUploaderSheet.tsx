@@ -136,7 +136,7 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
       if (item.status === "done") continue;
       try {
         setItemState(i, { progress: 0, status: "uploading" });
-        // eslint-disable-next-line react-doctor/async-await-in-loop, react-doctor/async-parallel
+        // react-doctor-disable-next-line react-doctor/async-await-in-loop, react-doctor/async-parallel
         const [{ uploadUrl, objectKey }, durationSeconds] = await Promise.all([
           getPresignedUrl({
             filename: item.name,

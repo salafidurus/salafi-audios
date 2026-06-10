@@ -12,6 +12,6 @@ export type FeedRecentScreenProps = {
 export function FeedRecentScreen(props: FeedRecentScreenProps) {
   const mobile = <FeedMobileScreen {...props} />;
   const desktop = <FeedDesktopScreen {...props} />;
-  // eslint-disable-next-line react-doctor/jsx-no-jsx-as-prop
+  // react-doctor-disable-next-line react-doctor/jsx-no-jsx-as-prop
   return <Responsive mobile={mobile} desktop={desktop} />;
 }

@@ -15,6 +15,6 @@ export function ScholarListScreen() {
 
   const mobile = <ScholarListMobileScreen onSelectScholar={handleSelectScholar} />;
   const desktop = <ScholarListDesktopScreen onSelectScholar={handleSelectScholar} />;
-  // eslint-disable-next-line react-doctor/jsx-no-jsx-as-prop
+  // react-doctor-disable-next-line react-doctor/jsx-no-jsx-as-prop
   return <Responsive mobile={mobile} desktop={desktop} />;
 }

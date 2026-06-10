@@ -111,8 +111,6 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
     fileInputRef.current?.click();
   };
 
-  const isClickable = uploadState === "idle" || uploadState === "error";
-
   return (
     <div className={styles.container}>
       <div

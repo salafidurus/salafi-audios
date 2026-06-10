@@ -15,7 +15,7 @@ export class HTMLAudioAdapter implements PlaybackEngine {
   }
 
   async load(track: Track): Promise<void> {
-    // eslint-disable-next-line react-doctor/async-defer-await
+    // react-doctor-disable-next-line react-doctor/async-defer-await
     await this.setup();
     if (!this.audio) return;
 

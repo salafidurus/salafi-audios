@@ -11,6 +11,6 @@ export type LiveEndedScreenProps = {
 export function LiveEndedScreen(props: LiveEndedScreenProps) {
   const mobile = <LiveEndedMobileScreen {...props} />;
   const desktop = <LiveEndedDesktopScreen {...props} />;
-  // eslint-disable-next-line react-doctor/jsx-no-jsx-as-prop
+  // react-doctor-disable-next-line react-doctor/jsx-no-jsx-as-prop
   return <Responsive mobile={mobile} desktop={desktop} />;
 }

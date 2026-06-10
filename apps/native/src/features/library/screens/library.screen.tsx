@@ -137,7 +137,7 @@ export function LibraryScreen({ onNavigateToLecture }: LibraryScreenProps) {
     <SectionList
       sections={sections}
       keyExtractor={(item) => item.id}
-      // eslint-disable-next-line react-doctor/no-render-prop-children
+      // react-doctor-disable-next-line react-doctor/no-render-prop-children
       renderItem={renderItem}
       renderSectionHeader={({ section }) => (
         <View style={styles.sectionHeader}>

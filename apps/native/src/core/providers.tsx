@@ -60,7 +60,8 @@ export function Providers({ children }: Props) {
         router.replace(routes.home as Href);
       });
     });
-    // eslint-disable-next-line react-doctor/exhaustive-deps, react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // react-doctor-disable-next-line react-doctor/exhaustive-deps
   }, []);
 
   useEffect(() => {

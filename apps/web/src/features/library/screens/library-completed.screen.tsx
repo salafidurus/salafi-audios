@@ -11,6 +11,6 @@ export type LibraryCompletedScreenProps = {
 export function LibraryCompletedScreen(props: LibraryCompletedScreenProps) {
   const mobile = <LibraryCompletedMobileScreen {...props} />;
   const desktop = <LibraryCompletedDesktopScreen {...props} />;
-  // eslint-disable-next-line react-doctor/jsx-no-jsx-as-prop
+  // react-doctor-disable-next-line react-doctor/jsx-no-jsx-as-prop
   return <Responsive mobile={mobile} desktop={desktop} />;
 }

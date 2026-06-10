@@ -99,12 +99,13 @@ export function LectureEditModal({
     formError,
   } = state;
 
-  // Inline state adjustment when lecture/initialAudioData/isOpen changes
-  const prevLectureRef = React.useRef(lecture);
-  const prevIsOpenRef = React.useRef(isOpen);
-  if (lecture !== prevLectureRef.current || isOpen !== prevIsOpenRef.current) {
-    prevLectureRef.current = lecture;
-    prevIsOpenRef.current = isOpen;
+  // react-doctor-disable-next-line react-doctor/no-derived-useState, react-doctor/rerender-state-only-in-handlers
+  const [prevLecture, setPrevLecture] = React.useState(lecture);
+  // react-doctor-disable-next-line react-doctor/no-derived-useState, react-doctor/rerender-state-only-in-handlers
+  const [prevIsOpen, setPrevIsOpen] = React.useState(isOpen);
+  if (lecture !== prevLecture || isOpen !== prevIsOpen) {
+    setPrevLecture(lecture);
+    setPrevIsOpen(isOpen);
     dispatch(initFormState(lecture, initialAudioData));
   }
 
@@ -219,7 +220,7 @@ export function LectureEditModal({
     if (e.target === e.currentTarget) onClose();
   };
 
-  // eslint-disable-next-line react-doctor/no-static-element-interactions, react-doctor/click-events-have-key-events
+  // react-doctor-disable-next-line react-doctor/no-static-element-interactions, react-doctor/click-events-have-key-events
   return (
     <div className={styles.overlay} onClick={handleOverlayClick}>
       <div className={styles.modal}>

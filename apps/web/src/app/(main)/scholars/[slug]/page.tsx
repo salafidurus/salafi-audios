@@ -1,4 +1,4 @@
-// eslint-disable-next-line react-doctor/nextjs-missing-metadata
+// react-doctor-disable-next-line react-doctor/nextjs-missing-metadata
 "use client";
 
 import { useParams } from "next/navigation";

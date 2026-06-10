@@ -41,7 +41,7 @@ export function SearchResultsList({
     <View style={styles.list}>
       {items.map((item, index) => (
         <View key={item.id} style={index > 0 ? styles.itemWithSeparator : undefined}>
-          {/* eslint-disable-next-line react-doctor/no-render-in-render */}
+          {/* react-doctor-disable-next-line react-doctor/no-render-in-render */}
           {renderItem(item)}
         </View>
       ))}

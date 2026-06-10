@@ -13,6 +13,6 @@ export type AccountScreenProps = {
 export function AccountScreen(props: AccountScreenProps) {
   const mobile = <AccountMobileScreen {...props} />;
   const desktop = <AccountDesktopScreen {...props} />;
-  // eslint-disable-next-line react-doctor/jsx-no-jsx-as-prop
+  // react-doctor-disable-next-line react-doctor/jsx-no-jsx-as-prop
   return <Responsive mobile={mobile} desktop={desktop} />;
 }
