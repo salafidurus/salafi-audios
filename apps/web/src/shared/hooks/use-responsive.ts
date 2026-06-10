@@ -32,19 +32,15 @@ export function useResponsive(): ResponsiveState {
 
 /**
  * SSR-safe hook that returns true when the viewport is wider than TABLET_MAX.
- * Defaults to `true` (desktop) during SSR so the server and first hydration
- * render match, avoiding hydration mismatches on narrow viewports.
+ * Always defaults to `true` (desktop) on both server and first client render
+ * so hydration never mismatches. Corrects to the real width after mount.
  */
 export function useIsDesktop(): boolean {
-  const [isDesktop, setIsDesktop] = useState<boolean>(() => {
-    if (typeof window !== "undefined") {
-      return window.innerWidth > TABLET_MAX;
-    }
-    return true;
-  });
+  const [isDesktop, setIsDesktop] = useState<boolean>(true);
 
   useEffect(() => {
     const update = () => setIsDesktop(window.innerWidth > TABLET_MAX);
+    update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
   }, []);
