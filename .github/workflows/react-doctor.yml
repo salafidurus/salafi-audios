@@ -6,8 +6,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
-  issues: write
 
 concurrency:
   group: react-doctor-${{ github.event.pull_request.number || github.ref }}
@@ -17,10 +15,9 @@ jobs:
   react-doctor:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: millionco/react-doctor@main
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          directory: .
-          project: ""
-          scope: changed
-          blocking: none
+          node-version: "20"
+      - name: Run React Doctor
+        run: npx --yes react-doctor@latest .
