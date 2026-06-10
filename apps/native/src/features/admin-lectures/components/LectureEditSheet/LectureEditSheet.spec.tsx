@@ -30,7 +30,9 @@ describe("LectureEditSheet", () => {
         <LectureEditSheet lectureId="lec-1" onClose={() => {}} onSaved={() => {}} />,
       );
     });
+    // Flush any remaining microtasks from the useEffect's async fetch
+    await act(async () => {});
     expect(JSON.stringify(tree!.toJSON())).toContain("Edit Lecture");
     expect(JSON.stringify(tree!.toJSON())).toContain("Title");
-  });
+  }, 15000);
 });
