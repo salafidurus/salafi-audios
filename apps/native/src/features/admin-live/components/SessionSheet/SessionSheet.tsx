@@ -1,8 +1,8 @@
 import { useReducer } from "react";
 import {
   ActivityIndicator,
-  FlatList,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -66,38 +66,32 @@ export function SessionSheet({ isOpen, channels, onClose, onSaved }: SessionShee
   return (
     <View style={styles.container}>
       <Text style={styles.title}>New Session</Text>
-      <FlatList
-        data={channels}
-        keyExtractor={(ch) => ch.id}
-        showsVerticalScrollIndicator={false}
-        ListHeaderComponent={<Text style={styles.label}>Channel *</Text>}
-        renderItem={({ item: ch }) => (
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <Text style={styles.label}>Channel *</Text>
+        {channels.map((ch) => (
           <Pressable
+            key={ch.id}
             onPress={() => dispatch({ channelId: ch.id })}
             style={[styles.channelOption, channelId === ch.id && styles.channelOptionSelected]}
           >
             <Text>{ch.displayName}</Text>
           </Pressable>
-        )}
-        ListFooterComponent={
-          <>
-            <Text style={[styles.label, styles.labelSpacingTop]}>Title (optional)</Text>
-            <TextInput
-              value={title}
-              onChangeText={(v) => dispatch({ title: v })}
-              style={styles.input}
-            />
-            <Text style={styles.label}>Scheduled At (ISO, optional)</Text>
-            <TextInput
-              value={scheduledAt}
-              onChangeText={(v) => dispatch({ scheduledAt: v })}
-              placeholder="e.g. 2026-07-01T18:00:00Z"
-              style={[styles.input, styles.inputSpacingBottom]}
-            />
-            {error && <Text style={styles.errorText}>{error}</Text>}
-          </>
-        }
-      />
+        ))}
+        <Text style={[styles.label, styles.labelSpacingTop]}>Title (optional)</Text>
+        <TextInput
+          value={title}
+          onChangeText={(v) => dispatch({ title: v })}
+          style={styles.input}
+        />
+        <Text style={styles.label}>Scheduled At (ISO, optional)</Text>
+        <TextInput
+          value={scheduledAt}
+          onChangeText={(v) => dispatch({ scheduledAt: v })}
+          placeholder="e.g. 2026-07-01T18:00:00Z"
+          style={[styles.input, styles.inputSpacingBottom]}
+        />
+        {error && <Text style={styles.errorText}>{error}</Text>}
+      </ScrollView>
       <View style={styles.buttonRow}>
         <Pressable onPress={handleSave} disabled={isSaving} style={styles.saveBtn}>
           {isSaving ? (
