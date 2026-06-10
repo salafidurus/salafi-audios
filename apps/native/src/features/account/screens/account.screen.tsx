@@ -2,20 +2,24 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useAccountScreen } from "@sd/domain-account";
 import { LanguageSwitch } from "@/features/i18n";
+import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 
 export type AccountScreenProps = {
   onNavigateToProfile?: () => void;
   onNavigateToLegal?: () => void;
+  onNavigateToAdmin?: () => void;
   onSignOut?: () => void;
 };
 
 export function AccountScreen({
   onNavigateToProfile,
   onNavigateToLegal,
+  onNavigateToAdmin,
   onSignOut,
 }: AccountScreenProps) {
   const { profile, isFetching } = useAccountScreen();
   const { t } = useTranslation();
+  const { hasAnyPermission } = useAdminPermissions();
 
   if (isFetching) {
     return (
@@ -39,6 +43,22 @@ export function AccountScreen({
         </View>
       ) : null}
       <View style={{ marginTop: 24, gap: 8 }}>
+        {hasAnyPermission && (
+          <Pressable
+            onPress={onNavigateToAdmin}
+            style={{
+              padding: 12,
+              borderWidth: 1,
+              borderColor: "#3b82f6",
+              borderRadius: 8,
+              backgroundColor: "#eff6ff",
+            }}
+          >
+            <Text style={{ fontSize: 15, fontWeight: "600", color: "#3b82f6" }}>
+              {t("account.admin", "Admin")}
+            </Text>
+          </Pressable>
+        )}
         <Pressable
           onPress={onNavigateToProfile}
           style={{

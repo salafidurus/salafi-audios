@@ -5,9 +5,14 @@ import type {
   LectureDetailDto,
   RelatedLectureDto,
   AdminLectureUpdateDto,
+  AdminLectureListDto,
+  AdminLectureDetailDto,
+  BulkActionResultDto,
   TranslationViewDto,
   Locale,
 } from '@sd/core-contracts';
+import type { StatusValue } from '../../shared/enums/status-values';
+import type { CreateLectureDto } from './dto/create-lecture.dto';
 import type { SaveLectureTranslationDto } from './dto/save-lecture-translation.dto';
 
 @Injectable()
@@ -405,5 +410,181 @@ export class LecturesRepository {
       data: { status: 'draft' },
     });
     return this.mapLectureTranslation(record);
+  }
+
+  // ─── Admin methods ────────────────────────────────────────────────────────
+
+  async listAdmin(params: {
+    page: number;
+    scholarId?: string;
+    status?: string;
+    search?: string;
+  }): Promise<AdminLectureListDto> {
+    const pageSize = 50;
+    const skip = (params.page - 1) * pageSize;
+
+    const where: Prisma.LectureWhereInput = {
+      deletedAt: null,
+      ...(params.scholarId ? { scholarId: params.scholarId } : {}),
+      ...(params.status ? { status: params.status as Status } : {}),
+      ...(params.search ? { title: { contains: params.search } } : {}),
+    };
+
+    const [records, total] = await Promise.all([
+      this.prisma.lecture.findMany({
+        where,
+        skip,
+        take: pageSize,
+        orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          title: true,
+          status: true,
+          durationSeconds: true,
+          orderIndex: true,
+          createdAt: true,
+          scholar: { select: { name: true } },
+        },
+      }),
+      this.prisma.lecture.count({ where }),
+    ]);
+
+    return {
+      items: records.map((r) => ({
+        id: r.id,
+        title: r.title,
+        scholarName: r.scholar.name,
+        status: r.status as StatusValue,
+        durationSeconds: r.durationSeconds ?? undefined,
+        orderIndex: r.orderIndex ?? undefined,
+        createdAt: r.createdAt.toISOString(),
+      })),
+      total,
+      page: params.page,
+    };
+  }
+
+  async findAdminDetail(id: string): Promise<AdminLectureDetailDto | null> {
+    const lecture = await this.prisma.lecture.findFirst({
+      where: { id, deletedAt: null },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        description: true,
+        language: true,
+        status: true,
+        orderIndex: true,
+        durationSeconds: true,
+        createdAt: true,
+        updatedAt: true,
+        scholarId: true,
+        seriesId: true,
+        scholar: { select: { name: true } },
+        topics: { select: { topic: { select: { id: true } } } },
+        audioAssets: {
+          where: { isPrimary: true },
+          take: 1,
+          select: { url: true },
+        },
+      },
+    });
+    if (!lecture) return null;
+
+    return {
+      id: lecture.id,
+      slug: lecture.slug,
+      title: lecture.title,
+      description: lecture.description ?? undefined,
+      language: lecture.language ?? undefined,
+      status: lecture.status as StatusValue,
+      orderIndex: lecture.orderIndex ?? undefined,
+      durationSeconds: lecture.durationSeconds ?? undefined,
+      scholarId: lecture.scholarId,
+      scholarName: lecture.scholar.name,
+      seriesId: lecture.seriesId ?? undefined,
+      topics: lecture.topics.map((t) => t.topic.id),
+      audioUrl: lecture.audioAssets[0]?.url,
+      createdAt: lecture.createdAt.toISOString(),
+      updatedAt: lecture.updatedAt?.toISOString(),
+    };
+  }
+
+  async createWithAudioAsset(
+    dto: CreateLectureDto & { publicUrl: string },
+  ): Promise<{ id: string; title: string }> {
+    const slug = dto.slug ?? dto.title.toLowerCase().replace(/\s+/g, '-');
+
+    return this.prisma.$transaction(async (tx) => {
+      const lectureData: Prisma.LectureUncheckedCreateInput = {
+        title: dto.title,
+        slug,
+        status: Status.draft,
+        durationSeconds: dto.durationSeconds ?? undefined,
+        scholarId: dto.scholarId,
+        seriesId: dto.seriesId ?? undefined,
+      };
+
+      const lecture = await tx.lecture.create({
+        data: lectureData,
+        select: { id: true, title: true },
+      });
+
+      if (dto.topics?.length) {
+        await tx.lectureTopic.createMany({
+          data: dto.topics.map((topicId) => ({
+            lectureId: lecture.id,
+            topicId,
+          })),
+        });
+      }
+
+      await tx.audioAsset.create({
+        data: {
+          lectureId: lecture.id,
+          url: dto.publicUrl,
+          format: dto.format ?? undefined,
+          sizeBytes: dto.sizeBytes ?? undefined,
+          durationSeconds: dto.durationSeconds ?? undefined,
+          isPrimary: true,
+          source: 'r2',
+        },
+      });
+
+      return lecture;
+    });
+  }
+
+  async bulkUpdateStatus(
+    ids: string[],
+    status: Status,
+  ): Promise<BulkActionResultDto> {
+    const succeeded: string[] = [];
+    const failed: string[] = [];
+
+    await Promise.all(
+      ids.map(async (id) => {
+        try {
+          const updated = await this.prisma.lecture.updateMany({
+            where: { id, deletedAt: null },
+            data: {
+              status,
+              ...(status === Status.published
+                ? { publishedAt: new Date() }
+                : {}),
+            },
+          });
+          if (updated.count > 0) {
+            succeeded.push(id);
+          } else {
+            failed.push(id);
+          }
+        } catch {
+          failed.push(id);
+        }
+      }),
+    );
+
+    return { succeeded, failed };
   }
 }

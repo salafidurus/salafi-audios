@@ -25,9 +25,15 @@ const ADMIN_SECTIONS: AdminSection[] = [
     permission: "manage:topics",
   },
   {
+    title: "Lectures",
+    description: "Manage lectures",
+    href: "/admin/lectures",
+    permission: "manage:content",
+  },
+  {
     title: "Livestreams",
     description: "Manage livestreams",
-    href: "/admin/livestreams",
+    href: "/admin/live",
     permission: "manage:livestreams",
   },
   {

@@ -65,6 +65,7 @@ describe('LiveService', () => {
             updateChannel: jest.fn(),
             createSession: jest.fn(),
             updateSession: jest.fn(),
+            listChannels: jest.fn(),
           } satisfies Partial<jest.Mocked<LiveRepository>>,
         },
       ],
@@ -312,6 +313,22 @@ describe('LiveService', () => {
 
       expect(result).toBeNull();
       expect(repo.findSessionPublicById).toHaveBeenCalledWith('unknown');
+    });
+  });
+
+  describe('listChannels', () => {
+    it('returns all channels', async () => {
+      repo.listChannels.mockResolvedValue([
+        {
+          id: 'c1',
+          displayName: 'Channel 1',
+          isActive: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      ] as any);
+      const result = await service.listChannels();
+      expect(result).toHaveLength(1);
     });
   });
 });

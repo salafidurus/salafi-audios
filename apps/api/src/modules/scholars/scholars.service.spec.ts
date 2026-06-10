@@ -54,6 +54,18 @@ describe('ScholarsService', () => {
             create: jest.fn(),
             update: jest.fn(),
             findById: jest.fn(),
+            listAdminSeries: jest.fn(),
+            findAdminSeriesDetail: jest.fn(),
+            createSeries: jest.fn(),
+            updateSeries: jest.fn(),
+            updateSeriesStatus: jest.fn(),
+            bulkUpdateSeriesStatus: jest.fn(),
+            listAdminCollections: jest.fn(),
+            findAdminCollectionDetail: jest.fn(),
+            createCollection: jest.fn(),
+            updateCollection: jest.fn(),
+            updateCollectionStatus: jest.fn(),
+            bulkUpdateCollectionStatus: jest.fn(),
           } satisfies Partial<jest.Mocked<ScholarsRepository>>,
         },
       ],
@@ -205,6 +217,62 @@ describe('ScholarsService', () => {
         new NotFoundException('Scholar "unknown" not found'),
       );
       expect(repo.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('listAdminSeries', () => {
+    it('returns series filtered by scholarId', async () => {
+      repo.listAdminSeries.mockResolvedValue([
+        {
+          id: 's1',
+          title: 'Series One',
+          status: 'published',
+          publishedLectureCount: 5,
+          orderIndex: 1,
+        },
+      ]);
+      const result = await service.listAdminSeries('scholar-1');
+      expect(result).toHaveLength(1);
+      expect(result[0].title).toBe('Series One');
+    });
+  });
+
+  describe('createSeries', () => {
+    it('creates a series for the scholar', async () => {
+      repo.createSeries.mockResolvedValue({ id: 'new-series' });
+      const result = await service.createSeries({
+        scholarId: 'sc1',
+        title: 'New Series',
+      });
+      expect(result.id).toBe('new-series');
+    });
+  });
+
+  describe('listAdminCollections', () => {
+    it('returns collections filtered by scholarId', async () => {
+      repo.listAdminCollections.mockResolvedValue([
+        {
+          id: 'c1',
+          title: 'Collection One',
+          status: 'published',
+          publishedLectureCount: 5,
+          orderIndex: 1,
+        },
+      ]);
+      const result = await service.listAdminCollections('scholar-1');
+      expect(result).toHaveLength(1);
+      expect(result[0].title).toBe('Collection One');
+    });
+  });
+
+  describe('createCollection', () => {
+    it('creates a collection for the scholar', async () => {
+      repo.createCollection.mockResolvedValue({ id: 'new-collection' });
+      const result = await service.createCollection({
+        scholarId: 'sc1',
+        title: 'New Collection',
+      });
+      expect(result.id).toBe('new-collection');
     });
   });
 });

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../shared/db/prisma.service';
 import type { Prisma, LiveSessionStatus } from '@sd/core-db';
+import type { LivestreamChannelDto } from '@sd/core-contracts';
 
 const sessionPublicSelect = {
   id: true,
@@ -204,5 +205,33 @@ export class LiveRepository {
       data,
       select: sessionPublicSelect,
     });
+  }
+
+  async listChannels(): Promise<LivestreamChannelDto[]> {
+    const records = await this.prisma.livestreamChannel.findMany({
+      orderBy: { displayName: 'asc' },
+      select: {
+        id: true,
+        displayName: true,
+        telegramSlug: true,
+        language: true,
+        isActive: true,
+        createdAt: true,
+        updatedAt: true,
+        scholar: { select: { name: true, slug: true, imageUrl: true } },
+      },
+    });
+    return records.map((r) => ({
+      id: r.id,
+      displayName: r.displayName,
+      telegramSlug: r.telegramSlug ?? undefined,
+      language: r.language ?? undefined,
+      isActive: r.isActive,
+      createdAt: r.createdAt.toISOString(),
+      updatedAt: r.updatedAt.toISOString(),
+      scholarName: r.scholar?.name,
+      scholarSlug: r.scholar?.slug,
+      scholarImageUrl: r.scholar?.imageUrl ?? undefined,
+    }));
   }
 }
