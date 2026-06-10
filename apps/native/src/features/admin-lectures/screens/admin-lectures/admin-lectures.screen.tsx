@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { useCallback, useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 import type { AdminLectureListItemDto } from "@sd/core-contracts";
 import { useAdminLectures } from "../../hooks/use-admin-lectures";
@@ -7,6 +7,30 @@ import { bulkLectureAction } from "../../api/admin-lectures.api";
 import { AudioUploaderSheet } from "../../components/AudioUploaderSheet/AudioUploaderSheet";
 import { LectureEditSheet } from "../../components/LectureEditSheet/LectureEditSheet";
 import { BulkActionBar } from "../../components/BulkActionBar/BulkActionBar";
+
+type LectureRowProps = {
+  item: AdminLectureListItemDto;
+  isSelected: boolean;
+  onPress: (id: string) => void;
+  onLongPress: (id: string) => void;
+};
+
+function LectureRow({ item, isSelected, onPress, onLongPress }: LectureRowProps) {
+  return (
+    <Pressable
+      onPress={() => onPress(item.id)}
+      onLongPress={() => onLongPress(item.id)}
+      style={[styles.row, isSelected ? styles.rowSelected : styles.rowDefault]}
+    >
+      <Text numberOfLines={1} style={styles.rowTitle}>
+        {item.title}
+      </Text>
+      <Text style={styles.rowMeta}>
+        {item.scholarName} · {item.status}
+      </Text>
+    </Pressable>
+  );
+}
 
 export function AdminLecturesScreen() {
   const { data, isLoading, refetch } = useAdminLectures();
@@ -48,56 +72,35 @@ export function AdminLecturesScreen() {
     refetch();
   };
 
+  const renderItem = useCallback(
+    ({ item }: { item: AdminLectureListItemDto }) => (
+      <LectureRow
+        item={item}
+        isSelected={selectedIds.has(item.id)}
+        onPress={handleRowPress}
+        onLongPress={toggleSelect}
+      />
+    ),
+    // react-doctor-disable-next-line react-doctor/exhaustive-deps
+    [selectedIds], // eslint-disable-line react-hooks/exhaustive-deps
+  );
+
   return (
-    <View style={{ flex: 1 }}>
-      <View
-        style={{
-          padding: 16,
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Text style={{ fontSize: 20, fontWeight: "700" }}>Lectures</Text>
-        <Pressable
-          onPress={() => setShowUploader(true)}
-          style={{ padding: 10, backgroundColor: "#3b82f6", borderRadius: 8 }}
-        >
-          <Text style={{ color: "#fff", fontWeight: "600" }}>+ Upload</Text>
+    <View style={styles.screen}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Lectures</Text>
+        <Pressable onPress={() => setShowUploader(true)} style={styles.uploadBtn}>
+          <Text style={styles.uploadBtnText}>+ Upload</Text>
         </Pressable>
       </View>
 
       {isLoading ? (
-        <Text style={{ textAlign: "center", marginTop: 32 }}>Loading…</Text>
+        <Text style={styles.loadingText}>Loading…</Text>
       ) : (
         <FlashList<AdminLectureListItemDto>
           data={lectures}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => {
-            const isSelected = selectedIds.has(item.id);
-            return (
-              <Pressable
-                onPress={() => handleRowPress(item.id)}
-                onLongPress={() => toggleSelect(item.id)}
-                style={{
-                  padding: 12,
-                  marginHorizontal: 16,
-                  marginBottom: 8,
-                  borderWidth: 1,
-                  borderColor: isSelected ? "#3b82f6" : "#e5e5e5",
-                  borderRadius: 8,
-                  backgroundColor: isSelected ? "#eff6ff" : "#fff",
-                }}
-              >
-                <Text numberOfLines={1} style={{ fontWeight: "600" }}>
-                  {item.title}
-                </Text>
-                <Text style={{ fontSize: 12, color: "#666", marginTop: 2 }}>
-                  {item.scholarName} · {item.status}
-                </Text>
-              </Pressable>
-            );
-          }}
+          renderItem={renderItem}
           contentContainerStyle={{ paddingBottom: 80 }}
         />
       )}
@@ -129,3 +132,55 @@ export function AdminLecturesScreen() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+  },
+  header: {
+    padding: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+  },
+  uploadBtn: {
+    padding: 10,
+    backgroundColor: "#3b82f6",
+    borderRadius: 8,
+  },
+  uploadBtnText: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+  loadingText: {
+    textAlign: "center",
+    marginTop: 32,
+  },
+  row: {
+    padding: 12,
+    marginHorizontal: 16,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderRadius: 8,
+  },
+  rowDefault: {
+    borderColor: "#e5e5e5",
+    backgroundColor: "#fff",
+  },
+  rowSelected: {
+    borderColor: "#3b82f6",
+    backgroundColor: "#eff6ff",
+  },
+  rowTitle: {
+    fontWeight: "600",
+  },
+  rowMeta: {
+    fontSize: 12,
+    color: "#666",
+    marginTop: 2,
+  },
+});

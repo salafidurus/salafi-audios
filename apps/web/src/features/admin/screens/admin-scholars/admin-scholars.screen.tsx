@@ -4,8 +4,9 @@ import { Responsive } from "@/shared/components/Responsive";
 import { AdminScholarsDesktopScreen } from "./admin-scholars.screen.desktop";
 import { AdminScholarsMobileScreen } from "./admin-scholars.screen.mobile";
 
+const MOBILE = <AdminScholarsMobileScreen />;
+const DESKTOP = <AdminScholarsDesktopScreen />;
+
 export function AdminScholarsScreen() {
-  const mobile = <AdminScholarsMobileScreen />;
-  const desktop = <AdminScholarsDesktopScreen />;
-  return <Responsive mobile={mobile} desktop={desktop} />;
+  return <Responsive mobile={MOBILE} desktop={DESKTOP} />;
 }

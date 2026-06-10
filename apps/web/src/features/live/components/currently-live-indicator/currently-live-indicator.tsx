@@ -21,16 +21,24 @@ export function CurrentlyLiveIndicator({ compact = false }: CurrentlyLiveIndicat
 
   const containerClassName = compact ? styles.containerCompact : styles.container;
 
+  if (!telegramUrl) {
+    return (
+      <span className={containerClassName}>
+        <span className={styles.liveBadge}>
+          <span className={styles.pulseDot} />
+          LIVE
+        </span>
+        {!compact && (
+          <span className={styles.title}>
+            {activeSession.title ?? activeSession.channelDisplayName}
+          </span>
+        )}
+      </span>
+    );
+  }
+
   return (
-    <a
-      className={containerClassName}
-      href={telegramUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={(e) => {
-        if (!telegramUrl) e.preventDefault();
-      }}
-    >
+    <a className={containerClassName} href={telegramUrl} target="_blank" rel="noopener noreferrer">
       <span className={styles.liveBadge}>
         <span className={styles.pulseDot} />
         LIVE

@@ -4,8 +4,9 @@ import { Responsive } from "@/shared/components/Responsive";
 import { PrivacyDesktopScreen } from "./privacy.screen.desktop";
 import { PrivacyMobileScreen } from "./privacy.screen.mobile";
 
+const MOBILE = <PrivacyMobileScreen />;
+const DESKTOP = <PrivacyDesktopScreen />;
+
 export function PrivacyScreen() {
-  const mobile = <PrivacyMobileScreen />;
-  const desktop = <PrivacyDesktopScreen />;
-  return <Responsive mobile={mobile} desktop={desktop} />;
+  return <Responsive mobile={MOBILE} desktop={DESKTOP} />;
 }

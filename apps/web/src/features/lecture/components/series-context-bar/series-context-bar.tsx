@@ -1,7 +1,26 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import type { SeriesContextDto } from "@sd/core-contracts";
 import { AppText } from "@/shared/components/AppText/AppText";
+
+const containerStyle: CSSProperties = {
+  marginTop: 24,
+  padding: 16,
+  borderRadius: 12,
+  background: "var(--surface-subtle, #f8f8f8)",
+  border: "1px solid var(--border-subtle, #e4e4e4)",
+};
+
+const navButtonStyle: CSSProperties = {
+  background: "none",
+  border: "1px solid var(--border-default, #ddd)",
+  borderRadius: 8,
+  padding: "8px 16px",
+  cursor: "pointer",
+  flex: 1,
+  minWidth: 0,
+};
 
 export type SeriesContextBarProps = {
   seriesContext: SeriesContextDto;
@@ -10,15 +29,7 @@ export type SeriesContextBarProps = {
 
 export function SeriesContextBar({ seriesContext, onNavigate }: SeriesContextBarProps) {
   return (
-    <div
-      style={{
-        marginTop: 24,
-        padding: 16,
-        borderRadius: 12,
-        background: "var(--surface-subtle, #f8f8f8)",
-        border: "1px solid var(--border-subtle, #e4e4e4)",
-      }}
-    >
+    <div style={containerStyle}>
       <AppText variant="caption" style={{ color: "var(--content-muted, #888)" }}>
         Part of series
       </AppText>
@@ -31,16 +42,7 @@ export function SeriesContextBar({ seriesContext, onNavigate }: SeriesContextBar
           <button
             type="button"
             onClick={() => onNavigate?.(seriesContext.prevLecture!.id)}
-            style={{
-              background: "none",
-              border: "1px solid var(--border-default, #ddd)",
-              borderRadius: 8,
-              padding: "8px 16px",
-              cursor: "pointer",
-              textAlign: "left",
-              flex: 1,
-              minWidth: 0,
-            }}
+            style={{ ...navButtonStyle, textAlign: "left" }}
           >
             <div style={{ fontSize: 12, color: "var(--content-muted, #888)" }}>← Previous</div>
             <div
@@ -63,16 +65,7 @@ export function SeriesContextBar({ seriesContext, onNavigate }: SeriesContextBar
           <button
             type="button"
             onClick={() => onNavigate?.(seriesContext.nextLecture!.id)}
-            style={{
-              background: "none",
-              border: "1px solid var(--border-default, #ddd)",
-              borderRadius: 8,
-              padding: "8px 16px",
-              cursor: "pointer",
-              textAlign: "right",
-              flex: 1,
-              minWidth: 0,
-            }}
+            style={{ ...navButtonStyle, textAlign: "right" }}
           >
             <div style={{ fontSize: 12, color: "var(--content-muted, #888)" }}>Next →</div>
             <div

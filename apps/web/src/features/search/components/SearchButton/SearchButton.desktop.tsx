@@ -34,6 +34,13 @@ const textStyle: Record<NonNullable<SearchButtonDesktopProps["size"]>, CSSProper
   },
 };
 
+const accentStyle: CSSProperties = {
+  borderColor: "var(--accent-primary-subtle-border, var(--border-default))",
+  background: "var(--accent-primary-subtle-surface, var(--surface-default))",
+  color: "var(--accent-primary-subtle-fg, var(--content-default))",
+  boxShadow: "var(--shadow-sm)",
+};
+
 export function SearchButtonDesktop({
   label,
   href,
@@ -43,12 +50,6 @@ export function SearchButtonDesktop({
 }: SearchButtonDesktopProps) {
   const classes = clsx(baseClass, sizeClass[size], className);
   const style = textStyle[size];
-  const accentStyle: CSSProperties = {
-    borderColor: "var(--accent-primary-subtle-border, var(--border-default))",
-    background: "var(--accent-primary-subtle-surface, var(--surface-default))",
-    color: "var(--accent-primary-subtle-fg, var(--content-default))",
-    boxShadow: "var(--shadow-sm)",
-  };
 
   if (href) {
     return (

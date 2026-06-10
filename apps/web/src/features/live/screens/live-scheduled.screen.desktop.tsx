@@ -1,10 +1,22 @@
 "use client";
 
+import type React from "react";
 import type { LiveSessionDto } from "@sd/core-contracts";
 import { useLiveScheduledScreen } from "@sd/domain-live";
 
 export type LiveScheduledDesktopScreenProps = {
   onNavigateToSession?: (id: string) => void;
+};
+
+const scheduledSessionButtonStyle: React.CSSProperties = {
+  display: "block",
+  width: "100%",
+  textAlign: "left",
+  padding: 16,
+  borderBottom: "1px solid #eee",
+  cursor: "pointer",
+  background: "none",
+  border: "none",
 };
 
 function ScheduledSessionItem({
@@ -15,17 +27,7 @@ function ScheduledSessionItem({
   onPress?: () => void;
 }) {
   return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={onPress}
-      onKeyDown={(e) => e.key === "Enter" && onPress?.()}
-      style={{
-        padding: 16,
-        borderBottom: "1px solid #eee",
-        cursor: "pointer",
-      }}
-    >
+    <button type="button" onClick={onPress} style={scheduledSessionButtonStyle}>
       <div style={{ fontSize: 16, fontWeight: 600 }}>{session.title}</div>
       <div style={{ fontSize: 13, color: "#666", marginTop: 4 }}>{session.scholarName}</div>
       {session.scheduledAt && (
@@ -33,7 +35,7 @@ function ScheduledSessionItem({
           Scheduled: {new Date(session.scheduledAt).toLocaleString()}
         </div>
       )}
-    </div>
+    </button>
   );
 }
 

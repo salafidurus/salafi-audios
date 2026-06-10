@@ -11,12 +11,12 @@ export type ScholarHeaderProps = {
   };
 };
 
+function openLink(url: string) {
+  Linking.openURL(url).catch(() => undefined);
+}
+
 export function ScholarHeader({ scholar }: ScholarHeaderProps) {
   const totalHours = Math.round(scholar.totalDurationSeconds / 3600);
-
-  const openLink = (url: string) => {
-    Linking.openURL(url).catch(() => undefined);
-  };
 
   return (
     <View>

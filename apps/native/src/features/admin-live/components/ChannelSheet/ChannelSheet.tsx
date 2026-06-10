@@ -1,4 +1,4 @@
-import { useReducer } from "react";
+import { useCallback, useReducer } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -57,8 +57,6 @@ export function ChannelSheet({ isOpen, channel, onClose, onSaved }: ChannelSheet
     isSaving: false,
     error: null,
   });
-
-  if (!isOpen) return null;
 
   const { telegramId, displayName, telegramSlug, language, isSaving, error } = state;
 
@@ -125,6 +123,24 @@ export function ChannelSheet({ isOpen, channel, onClose, onSaved }: ChannelSheet
 
   const fields = allFields.flatMap((f) => (f.key !== "telegramId" || !channel ? [f] : []));
 
+  const renderFieldItem = useCallback(
+    ({ item: { key, label, value, onChangeText, keyboardType } }: { item: FieldItem }) => (
+      <View style={styles.fieldRow}>
+        <Text style={styles.label}>{label}</Text>
+        <TextInput
+          value={value}
+          onChangeText={onChangeText}
+          keyboardType={keyboardType ?? "default"}
+          style={styles.input}
+        />
+        <Text style={styles.helperText}>{HELPER_TEXT[key]}</Text>
+      </View>
+    ),
+    [],
+  );
+
+  if (!isOpen) return null;
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{channel ? "Edit Channel" : "New Channel"}</Text>
@@ -132,18 +148,7 @@ export function ChannelSheet({ isOpen, channel, onClose, onSaved }: ChannelSheet
         data={fields}
         keyExtractor={(f) => f.key}
         showsVerticalScrollIndicator={false}
-        renderItem={({ item: { key, label, value, onChangeText, keyboardType } }) => (
-          <View style={styles.fieldRow}>
-            <Text style={styles.label}>{label}</Text>
-            <TextInput
-              value={value}
-              onChangeText={onChangeText}
-              keyboardType={keyboardType ?? "default"}
-              style={styles.input}
-            />
-            <Text style={styles.helperText}>{HELPER_TEXT[key]}</Text>
-          </View>
-        )}
+        renderItem={renderFieldItem}
         ListFooterComponent={error ? <Text style={styles.errorText}>{error}</Text> : null}
       />
       <View style={styles.buttonRow}>

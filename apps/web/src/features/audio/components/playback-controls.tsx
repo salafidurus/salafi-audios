@@ -1,9 +1,46 @@
 "use client";
 
 import React from "react";
+import type { CSSProperties } from "react";
 import { useAudio } from "@sd/domain-audio";
 import { audioService } from "../index";
 import { Play, Pause, RotateCw, RotateCcw } from "lucide-react";
+
+const outerStyle: CSSProperties = { display: "flex", alignItems: "center", gap: 16 };
+
+const speedButtonStyle: CSSProperties = {
+  padding: "4px 8px",
+  borderRadius: 12,
+  border: "none",
+  backgroundColor: "#f1f5f9",
+  color: "#475569",
+  fontSize: 12,
+  fontWeight: "bold",
+  cursor: "pointer",
+  minWidth: 50,
+  textAlign: "center",
+};
+
+const controlsGroupStyle: CSSProperties = { display: "flex", alignItems: "center", gap: 12 };
+
+const skipButtonStyle: CSSProperties = {
+  background: "none",
+  border: "none",
+  color: "#475569",
+  cursor: "pointer",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  position: "relative",
+};
+
+const skipLabelStyle: CSSProperties = {
+  fontSize: 12,
+  fontWeight: "bold",
+  position: "absolute",
+  top: 8,
+  color: "#475569",
+};
 
 export function PlaybackControls() {
   const { isPlaying, isLoading, speed, positionSeconds, durationSeconds, hasTrack } = useAudio();
@@ -35,75 +72,47 @@ export function PlaybackControls() {
 
   if (!hasTrack) return null;
 
+  const playButtonStyle: CSSProperties = {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    border: "none",
+    backgroundColor: "#2563eb",
+    color: "#fff",
+    cursor: isLoading ? "wait" : "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "0 4px 6px -1px rgba(37, 99, 235, 0.2)",
+  };
+
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+    <div style={outerStyle}>
       <button
         type="button"
         onClick={handleCycleSpeed}
-        style={{
-          padding: "4px 8px",
-          borderRadius: 12,
-          border: "none",
-          backgroundColor: "#f1f5f9",
-          color: "#475569",
-          fontSize: 12,
-          fontWeight: "bold",
-          cursor: "pointer",
-          minWidth: 50,
-          textAlign: "center",
-        }}
+        style={speedButtonStyle}
         title="Playback Speed"
       >
         {speed.toFixed(2)}x
       </button>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <div style={controlsGroupStyle}>
         <button
           type="button"
           onClick={handleSkipBackward}
-          style={{
-            background: "none",
-            border: "none",
-            color: "#475569",
-            cursor: "pointer",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            position: "relative",
-          }}
+          style={skipButtonStyle}
           aria-label="Skip backward 30 seconds"
         >
           <RotateCcw size={22} />
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: "bold",
-              position: "absolute",
-              top: 8,
-              color: "#475569",
-            }}
-          >
-            30
-          </span>
+          <span style={skipLabelStyle}>30</span>
         </button>
 
         <button
           type="button"
           onClick={handlePlayPause}
           disabled={isLoading}
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            border: "none",
-            backgroundColor: "#2563eb",
-            color: "#fff",
-            cursor: isLoading ? "wait" : "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "0 4px 6px -1px rgba(37, 99, 235, 0.2)",
-          }}
+          style={playButtonStyle}
           aria-label={isPlaying ? "Pause" : "Play"}
         >
           {isLoading ? (
@@ -118,30 +127,11 @@ export function PlaybackControls() {
         <button
           type="button"
           onClick={handleSkipForward}
-          style={{
-            background: "none",
-            border: "none",
-            color: "#475569",
-            cursor: "pointer",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            position: "relative",
-          }}
+          style={skipButtonStyle}
           aria-label="Skip forward 30 seconds"
         >
           <RotateCw size={22} />
-          <span
-            style={{
-              fontSize: 12,
-              fontWeight: "bold",
-              position: "absolute",
-              top: 8,
-              color: "#475569",
-            }}
-          >
-            30
-          </span>
+          <span style={skipLabelStyle}>30</span>
         </button>
       </div>
     </div>

@@ -30,7 +30,12 @@ export function AuthProviderButton({
   onClick,
   disabled = false,
 }: AuthProviderButtonProps) {
-  const [themeMode, setThemeMode] = useState<ThemeMode>("light");
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
+    if (typeof document !== "undefined") {
+      return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
+    }
+    return "light";
+  });
   const config = providerConfig[provider];
   const themeConfig = getProviderThemeConfig(provider, themeMode);
 
@@ -42,8 +47,6 @@ export function AuthProviderButton({
     const syncTheme = () => {
       setThemeMode(readTheme());
     };
-
-    syncTheme();
 
     const observer = new MutationObserver(syncTheme);
     observer.observe(root, {

@@ -51,6 +51,7 @@ function DraggableItemRenderer<T>({
       onLayout={(e) => onLayout(index, e)}
       style={[draggableStyles.item, { opacity: isActive ? 0.5 : 1, zIndex: isActive ? 1000 : 0 }]}
     >
+      {/* react-doctor-disable-next-line react-doctor/no-render-in-render */}
       {renderItem({ item, index, drag, isActive })}
       {isActive && (
         <Pressable onPressOut={() => onDragEnd(index)} style={draggableStyles.overlay} />
@@ -84,7 +85,8 @@ export function DraggableList<T>({
   const draggedItemOffsetY = useSharedValue(0);
   const containerOffsetY = useSharedValue(0);
 
-  const itemHeights = useRef<Map<string, number>>(new Map());
+  // react-doctor-disable-next-line react-doctor/rerender-lazy-ref-init
+  const itemHeights = useRef(new Map<string, number>());
   const flatListRef = useRef<FlatList>(null);
 
   const handleItemLayout = useCallback(

@@ -12,5 +12,6 @@ export type FeedScreenProps = {
 export function FeedScreen(props: FeedScreenProps) {
   const mobile = <FeedMobileScreen {...props} />;
   const desktop = <FeedDesktopScreen {...props} />;
+  // react-doctor-disable-next-line react-doctor/jsx-no-jsx-as-prop
   return <Responsive mobile={mobile} desktop={desktop} />;
 }

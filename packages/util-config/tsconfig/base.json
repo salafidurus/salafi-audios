@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    // ES2022 enables top-level await and class fields without downleveling
+    // ES2023 enables Array.toSorted/toReversed/with and other modern built-ins
     "target": "ES2022",
-    "lib": ["ES2022", "DOM"],
+    "lib": ["ES2023", "DOM"],
     "strict": true,
     // Skip .d.ts validation in node_modules — speeds up compilation significantly
     "skipLibCheck": true,

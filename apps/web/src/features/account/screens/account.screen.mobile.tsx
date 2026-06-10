@@ -1,9 +1,25 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useAccountScreen } from "@sd/domain-account";
 import { LanguageSwitch } from "@/features/i18n";
+
+const menuButtonStyle: CSSProperties = {
+  padding: "10px 14px",
+  textAlign: "left",
+  border: "1px solid var(--border-default)",
+  borderRadius: 8,
+  background: "var(--surface-default)",
+  cursor: "pointer",
+  fontSize: 14,
+};
+
+const signOutButtonStyle: CSSProperties = {
+  ...menuButtonStyle,
+  color: "var(--action-danger)",
+};
 
 export type AccountMobileScreenProps = {
   onNavigateToProfile?: () => void;
@@ -47,50 +63,13 @@ export function AccountMobileScreen({
         </div>
       )}
       <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 6 }}>
-        <button
-          type="button"
-          onClick={onNavigateToProfile}
-          style={{
-            padding: "10px 14px",
-            textAlign: "left",
-            border: "1px solid var(--border-default)",
-            borderRadius: 8,
-            background: "var(--surface-default)",
-            cursor: "pointer",
-            fontSize: 14,
-          }}
-        >
+        <button type="button" onClick={onNavigateToProfile} style={menuButtonStyle}>
           {t("account.editProfile", "Edit Profile")}
         </button>
-        <button
-          type="button"
-          onClick={onNavigateToLegal}
-          style={{
-            padding: "10px 14px",
-            textAlign: "left",
-            border: "1px solid var(--border-default)",
-            borderRadius: 8,
-            background: "var(--surface-default)",
-            cursor: "pointer",
-            fontSize: 14,
-          }}
-        >
+        <button type="button" onClick={onNavigateToLegal} style={menuButtonStyle}>
           {t("account.legal", "Legal")}
         </button>
-        <button
-          type="button"
-          onClick={onSignOut}
-          style={{
-            padding: "10px 14px",
-            textAlign: "left",
-            border: "1px solid var(--border-default)",
-            borderRadius: 8,
-            background: "var(--surface-default)",
-            cursor: "pointer",
-            fontSize: 14,
-            color: "var(--action-danger)",
-          }}
-        >
+        <button type="button" onClick={onSignOut} style={signOutButtonStyle}>
           {t("account.signOut", "Sign Out")}
         </button>
       </div>

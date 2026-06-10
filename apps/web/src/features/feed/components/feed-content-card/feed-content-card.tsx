@@ -1,5 +1,6 @@
 "use client";
 
+import type React from "react";
 import type { FeedContentItemDto } from "@sd/core-contracts";
 
 export type FeedContentCardProps = {
@@ -7,19 +8,20 @@ export type FeedContentCardProps = {
   onPress?: () => void;
 };
 
+const feedContentCardButtonStyle: React.CSSProperties = {
+  display: "block",
+  width: "100%",
+  textAlign: "left",
+  padding: 16,
+  cursor: "pointer",
+  background: "none",
+  border: "none",
+  borderBottom: "1px solid var(--border-subtle)",
+};
+
 export function FeedContentCard({ item, onPress }: FeedContentCardProps) {
   return (
-    <article
-      role="button"
-      tabIndex={0}
-      onClick={onPress}
-      onKeyDown={(e) => e.key === "Enter" && onPress?.()}
-      style={{
-        padding: 16,
-        borderBottom: "1px solid var(--border-subtle)",
-        cursor: "pointer",
-      }}
-    >
+    <button type="button" onClick={onPress} style={feedContentCardButtonStyle}>
       <div style={{ fontSize: 16, fontWeight: 600 }}>{item.title}</div>
       <div style={{ fontSize: 13, color: "var(--content-muted)", marginTop: 4 }}>
         {item.scholarName}
@@ -29,6 +31,6 @@ export function FeedContentCard({ item, onPress }: FeedContentCardProps) {
         {item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""}
         {item.publishedAt && ` · ${new Date(item.publishedAt).toLocaleDateString()}`}
       </div>
-    </article>
+    </button>
   );
 }

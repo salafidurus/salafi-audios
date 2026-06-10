@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
+import type { ScholarListItemDto } from "@sd/core-contracts";
 import { useScholarsList } from "@sd/domain-content";
 import { getPresignedUrl, uploadToR2, createLecture } from "../../api/admin-lectures.api";
 
@@ -49,6 +50,55 @@ type AudioUploaderSheetProps = {
   onUploadComplete: () => void;
 };
 
+type ScholarChipProps = {
+  scholar: ScholarListItemDto;
+  isSelected: boolean;
+  onPress: (id: string) => void;
+};
+
+function ScholarChip({ scholar, isSelected, onPress }: ScholarChipProps) {
+  return (
+    <Pressable
+      onPress={() => onPress(scholar.id)}
+      style={[styles.scholarChip, isSelected && styles.scholarChipSelected]}
+    >
+      <Text style={[styles.scholarChipText, isSelected && styles.scholarChipTextSelected]}>
+        {scholar.name}
+      </Text>
+    </Pressable>
+  );
+}
+
+type QueueItemProps = {
+  item: UploadItem;
+};
+
+function QueueItem({ item }: QueueItemProps) {
+  const fillStyle = useMemo(
+    () => [
+      styles.progressFill,
+      {
+        width: `${Math.round(item.progress * 100)}%` as unknown as number,
+        backgroundColor:
+          item.status === "error" ? "#dc2626" : item.status === "done" ? "#16a34a" : "#3b82f6",
+      },
+    ],
+    [item.progress, item.status],
+  );
+
+  return (
+    <View style={styles.queueItem}>
+      <Text numberOfLines={1} style={styles.queueItemName}>
+        {item.name}
+      </Text>
+      <View style={styles.progressTrack}>
+        <View style={fillStyle} />
+      </View>
+      {item.status === "error" && <Text style={styles.queueItemError}>{item.error}</Text>}
+    </View>
+  );
+}
+
 export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioUploaderSheetProps) {
   const { data: scholarsData } = useScholarsList();
   const scholars = scholarsData?.scholars ?? [];
@@ -56,13 +106,11 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
   const [queue, setQueue] = useState<UploadItem[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
-  if (!isOpen) return null;
-
-  const setItemState = (index: number, update: Partial<UploadItem>) => {
+  const setItemState = useCallback((index: number, update: Partial<UploadItem>) => {
     setQueue((prev) => prev.map((item, i) => (i === index ? { ...item, ...update } : item)));
-  };
+  }, []);
 
-  const handlePick = async () => {
+  const handlePick = useCallback(async () => {
     const result = await DocumentPicker.getDocumentAsync({
       type: ["audio/mpeg", "audio/mp4", "audio/x-m4a"],
       multiple: true,
@@ -77,9 +125,9 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
         status: "pending" as const,
       })),
     );
-  };
+  }, []);
 
-  const handleUploadAll = async () => {
+  const handleUploadAll = useCallback(async () => {
     if (!selectedScholarId) return;
     setIsUploading(true);
     let anySuccess = false;
@@ -88,6 +136,7 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
       if (item.status === "done") continue;
       try {
         setItemState(i, { progress: 0, status: "uploading" });
+        // react-doctor-disable-next-line react-doctor/async-await-in-loop, react-doctor/async-parallel
         const [{ uploadUrl, objectKey }, durationSeconds] = await Promise.all([
           getPresignedUrl({
             filename: item.name,
@@ -113,9 +162,27 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
     }
     setIsUploading(false);
     if (anySuccess) onUploadComplete();
-  };
+  }, [selectedScholarId, queue, setItemState, onUploadComplete]);
 
   const isUploadDisabled = queue.length === 0 || isUploading || !selectedScholarId;
+
+  const renderScholarItem = useCallback(
+    ({ item: scholar }: { item: ScholarListItemDto }) => (
+      <ScholarChip
+        scholar={scholar}
+        isSelected={selectedScholarId === scholar.id}
+        onPress={setSelectedScholarId}
+      />
+    ),
+    [selectedScholarId],
+  );
+
+  const renderQueueItem = useCallback(
+    ({ item }: { item: UploadItem }) => <QueueItem item={item} />,
+    [],
+  );
+
+  if (!isOpen) return null;
 
   return (
     <View style={styles.container}>
@@ -128,19 +195,7 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
         showsHorizontalScrollIndicator={false}
         style={styles.scholarList}
         keyExtractor={(scholar) => scholar.id}
-        renderItem={({ item: scholar }) => {
-          const isSelected = selectedScholarId === scholar.id;
-          return (
-            <Pressable
-              onPress={() => setSelectedScholarId(scholar.id)}
-              style={[styles.scholarChip, isSelected && styles.scholarChipSelected]}
-            >
-              <Text style={[styles.scholarChipText, isSelected && styles.scholarChipTextSelected]}>
-                {scholar.name}
-              </Text>
-            </Pressable>
-          );
-        }}
+        renderItem={renderScholarItem}
       />
 
       <Pressable onPress={handlePick} style={styles.pickBtn}>
@@ -151,30 +206,7 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
         data={queue}
         keyExtractor={(item) => item.name}
         style={styles.queueList}
-        renderItem={({ item }) => (
-          <View style={styles.queueItem}>
-            <Text numberOfLines={1} style={styles.queueItemName}>
-              {item.name}
-            </Text>
-            <View style={styles.progressTrack}>
-              <View
-                style={[
-                  styles.progressFill,
-                  {
-                    width: `${Math.round(item.progress * 100)}%`,
-                    backgroundColor:
-                      item.status === "error"
-                        ? "#dc2626"
-                        : item.status === "done"
-                          ? "#16a34a"
-                          : "#3b82f6",
-                  },
-                ]}
-              />
-            </View>
-            {item.status === "error" && <Text style={styles.queueItemError}>{item.error}</Text>}
-          </View>
-        )}
+        renderItem={renderQueueItem}
       />
 
       <View style={styles.buttonRow}>

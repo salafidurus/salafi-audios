@@ -26,6 +26,7 @@ function ItemRenderer<TItem>({
 }: ItemRendererProps<TItem>) {
   return (
     <>
+      {/* react-doctor-disable-next-line react-doctor/no-render-in-render */}
       {renderItem(item)}
       {ItemSeparator && index < total - 1 ? <ItemSeparator /> : null}
     </>

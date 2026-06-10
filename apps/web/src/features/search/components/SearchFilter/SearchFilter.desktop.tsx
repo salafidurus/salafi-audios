@@ -30,7 +30,7 @@ export function SearchFilterDesktop({ value, onChange, topics }: SearchFilterDes
   const isAllActive = value.length === 0;
   const scrollRef = useDragScroll("horizontal");
   const sortedTopics = useMemo(
-    () => [...topics].sort((a, b) => a.name.localeCompare(b.name)),
+    () => topics.toSorted((a, b) => a.name.localeCompare(b.name)),
     [topics],
   );
 

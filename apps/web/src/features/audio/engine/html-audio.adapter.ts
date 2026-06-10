@@ -1,4 +1,4 @@
-import { PlaybackEngine, PlaybackEngineEvents, Track } from '@sd/domain-audio';
+import { PlaybackEngine, PlaybackEngineEvents, Track } from "@sd/domain-audio";
 
 export class HTMLAudioAdapter implements PlaybackEngine {
   private audio: HTMLAudioElement | null = null;
@@ -6,7 +6,7 @@ export class HTMLAudioAdapter implements PlaybackEngine {
   private activeListeners: { [K in string]?: (e: Event) => void } = {};
 
   async setup(): Promise<void> {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
     if (!this.audio) {
       this.audio = new Audio();
@@ -15,11 +15,12 @@ export class HTMLAudioAdapter implements PlaybackEngine {
   }
 
   async load(track: Track): Promise<void> {
+    // react-doctor-disable-next-line react-doctor/async-defer-await
     await this.setup();
     if (!this.audio) return;
 
     if (this.events.onStatusChange) {
-      this.events.onStatusChange('loading');
+      this.events.onStatusChange("loading");
     }
 
     this.audio.src = track.url;
@@ -32,7 +33,7 @@ export class HTMLAudioAdapter implements PlaybackEngine {
       await this.audio.play();
     } catch (err) {
       if (this.events.onError) {
-        const message = err instanceof Error ? err.message : 'Error playing audio';
+        const message = err instanceof Error ? err.message : "Error playing audio";
         this.events.onError(message);
       }
     }
@@ -59,7 +60,7 @@ export class HTMLAudioAdapter implements PlaybackEngine {
     this.audio.pause();
     this.audio.currentTime = 0;
     if (this.events.onStatusChange) {
-      this.events.onStatusChange('idle');
+      this.events.onStatusChange("idle");
     }
   }
 
@@ -67,7 +68,7 @@ export class HTMLAudioAdapter implements PlaybackEngine {
     if (this.audio) {
       this.unbindListeners();
       this.audio.pause();
-      this.audio.src = '';
+      this.audio.src = "";
       this.audio = null;
     }
   }
@@ -99,35 +100,35 @@ export class HTMLAudioAdapter implements PlaybackEngine {
 
     const playing = () => {
       if (this.events.onStatusChange) {
-        this.events.onStatusChange('playing');
+        this.events.onStatusChange("playing");
       }
     };
 
     const paused = () => {
       if (this.events.onStatusChange && this.audio && !this.audio.ended) {
-        this.events.onStatusChange('paused');
+        this.events.onStatusChange("paused");
       }
     };
 
     const waiting = () => {
       if (this.events.onStatusChange) {
-        this.events.onStatusChange('loading');
+        this.events.onStatusChange("loading");
       }
     };
 
     const error = () => {
       if (this.events.onError && this.audio) {
-        this.events.onError(this.audio.error?.message || 'HTMLAudioElement error');
+        this.events.onError(this.audio.error?.message || "HTMLAudioElement error");
       }
     };
 
-    this.audio.addEventListener('timeupdate', timeUpdate);
-    this.audio.addEventListener('durationchange', durationChange);
-    this.audio.addEventListener('ended', ended);
-    this.audio.addEventListener('playing', playing);
-    this.audio.addEventListener('pause', paused);
-    this.audio.addEventListener('waiting', waiting);
-    this.audio.addEventListener('error', error);
+    this.audio.addEventListener("timeupdate", timeUpdate);
+    this.audio.addEventListener("durationchange", durationChange);
+    this.audio.addEventListener("ended", ended);
+    this.audio.addEventListener("playing", playing);
+    this.audio.addEventListener("pause", paused);
+    this.audio.addEventListener("waiting", waiting);
+    this.audio.addEventListener("error", error);
 
     this.activeListeners = {
       timeupdate: timeUpdate,

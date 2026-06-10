@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type {
   ScholarListItemDto,
@@ -46,15 +46,27 @@ export function AdminScholarDetailMobileScreen({ id }: AdminScholarDetailMobileS
     }),
   );
 
-  const [activeTab, setActiveTab] = useState<"series" | "collections">("series");
+  type FormState = {
+    activeTab: "series" | "collections";
+    newSeriesTitle: string;
+    creatingSeries: boolean;
+    newCollectionTitle: string;
+    creatingCollection: boolean;
+  };
 
-  // Series Form State
-  const [newSeriesTitle, setNewSeriesTitle] = useState("");
-  const [creatingSeries, setCreatingSeries] = useState(false);
+  const [formState, dispatchForm] = React.useReducer(
+    (state: FormState, patch: Partial<FormState>): FormState => ({ ...state, ...patch }),
+    {
+      activeTab: "series",
+      newSeriesTitle: "",
+      creatingSeries: false,
+      newCollectionTitle: "",
+      creatingCollection: false,
+    },
+  );
 
-  // Collection Form State
-  const [newCollectionTitle, setNewCollectionTitle] = useState("");
-  const [creatingCollection, setCreatingCollection] = useState(false);
+  const { activeTab, newSeriesTitle, creatingSeries, newCollectionTitle, creatingCollection } =
+    formState;
 
   const handleCreateSeries = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,8 +81,7 @@ export function AdminScholarDetailMobileScreen({ id }: AdminScholarDetailMobileS
           title: newSeriesTitle,
         },
       });
-      setNewSeriesTitle("");
-      setCreatingSeries(false);
+      dispatchForm({ newSeriesTitle: "", creatingSeries: false });
       refetchSeries();
     } catch {
       // ignore
@@ -90,8 +101,7 @@ export function AdminScholarDetailMobileScreen({ id }: AdminScholarDetailMobileS
           title: newCollectionTitle,
         },
       });
-      setNewCollectionTitle("");
-      setCreatingCollection(false);
+      dispatchForm({ newCollectionTitle: "", creatingCollection: false });
       refetchCollections();
     } catch {
       // ignore
@@ -146,14 +156,14 @@ export function AdminScholarDetailMobileScreen({ id }: AdminScholarDetailMobileS
           <button
             type="button"
             className={`${styles.tabBtn} ${activeTab === "series" ? styles.tabActive : ""}`}
-            onClick={() => setActiveTab("series")}
+            onClick={() => dispatchForm({ activeTab: "series" })}
           >
             Series ({scholarSeries.length})
           </button>
           <button
             type="button"
             className={`${styles.tabBtn} ${activeTab === "collections" ? styles.tabActive : ""}`}
-            onClick={() => setActiveTab("collections")}
+            onClick={() => dispatchForm({ activeTab: "collections" })}
           >
             Collections ({scholarCollections.length})
           </button>
@@ -166,7 +176,7 @@ export function AdminScholarDetailMobileScreen({ id }: AdminScholarDetailMobileS
               <button
                 type="button"
                 className={styles.addBtn}
-                onClick={() => setCreatingSeries(!creatingSeries)}
+                onClick={() => dispatchForm({ creatingSeries: !creatingSeries })}
               >
                 <Plus size={16} /> Add
               </button>
@@ -177,9 +187,10 @@ export function AdminScholarDetailMobileScreen({ id }: AdminScholarDetailMobileS
                 <input
                   type="text"
                   placeholder="Series Title"
+                  aria-label="Series title"
                   className={styles.input}
                   value={newSeriesTitle}
-                  onChange={(e) => setNewSeriesTitle(e.target.value)}
+                  onChange={(e) => dispatchForm({ newSeriesTitle: e.target.value })}
                   required
                 />
                 <button type="submit" className={styles.saveBtn}>
@@ -204,6 +215,7 @@ export function AdminScholarDetailMobileScreen({ id }: AdminScholarDetailMobileS
                       className={styles.orderInput}
                       defaultValue={s.orderIndex || 0}
                       onBlur={(e) => handleUpdateSeriesOrder(s.id, Number(e.target.value))}
+                      aria-label="Update series order index"
                       title="Update Order Index"
                     />
                   </div>
@@ -221,7 +233,7 @@ export function AdminScholarDetailMobileScreen({ id }: AdminScholarDetailMobileS
               <button
                 type="button"
                 className={styles.addBtn}
-                onClick={() => setCreatingCollection(!creatingCollection)}
+                onClick={() => dispatchForm({ creatingCollection: !creatingCollection })}
               >
                 <Plus size={16} /> Add
               </button>
@@ -232,9 +244,10 @@ export function AdminScholarDetailMobileScreen({ id }: AdminScholarDetailMobileS
                 <input
                   type="text"
                   placeholder="Collection Title"
+                  aria-label="Collection title"
                   className={styles.input}
                   value={newCollectionTitle}
-                  onChange={(e) => setNewCollectionTitle(e.target.value)}
+                  onChange={(e) => dispatchForm({ newCollectionTitle: e.target.value })}
                   required
                 />
                 <button type="submit" className={styles.saveBtn}>
@@ -259,6 +272,7 @@ export function AdminScholarDetailMobileScreen({ id }: AdminScholarDetailMobileS
                       className={styles.orderInput}
                       defaultValue={c.orderIndex || 0}
                       onBlur={(e) => handleUpdateCollectionOrder(c.id, Number(e.target.value))}
+                      aria-label="Update collection order index"
                       title="Update Order Index"
                     />
                   </div>

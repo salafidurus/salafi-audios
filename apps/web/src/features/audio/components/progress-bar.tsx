@@ -36,11 +36,9 @@ export function ProgressBar({ progressPercent, onSeek }: ProgressBarProps) {
           width: "100%",
           height: 4,
           borderRadius: 2,
-          outline: "none",
           cursor: onSeek ? "pointer" : "default",
           WebkitAppearance: "none",
           background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${progressPercent}%, #e2e8f0 ${progressPercent}%, #e2e8f0 100%)`,
-          transition: "height 0.1s ease",
         }}
       />
     </div>

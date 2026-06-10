@@ -49,6 +49,7 @@ export function useLiveSection(
   useEffect(() => {
     if (!query.data) return;
     fetchedAtRef.current = query.data.fetchedAt;
+    // react-doctor-disable-next-line react-doctor/no-derived-state
     setSessions((prev) => mergeDelta(prev, query.data!));
   }, [query.data]);
 

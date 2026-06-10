@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useReducer } from "react";
 import { useApiQuery } from "@sd/core-contracts";
 import type { AdminLectureDetailDto } from "@sd/core-contracts";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
@@ -10,22 +10,55 @@ import { LectureEditModal } from "../../components/LectureEditModal/LectureEditM
 import styles from "./admin-lectures.screen.mobile.module.css";
 import { Search, Plus, X, Edit } from "lucide-react";
 
-export function AdminLecturesMobileScreen() {
-  const [search, setSearch] = useState("");
-  const [status, setStatus] = useState<string>(""); // Empty means all
-  const [page, setPage] = useState(1);
-  const limit = 15;
+type AudioData = {
+  audioKey: string;
+  durationSeconds: number;
+  sizeBytes: number;
+  format: string;
+  filename: string;
+};
 
-  const [isUploaderOpen, setIsUploaderOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedLecture, setSelectedLecture] = useState<AdminLectureDetailDto | null>(null);
-  const [initialAudioData, setInitialAudioData] = useState<{
-    audioKey: string;
-    durationSeconds: number;
-    sizeBytes: number;
-    format: string;
-    filename: string;
-  } | null>(null);
+type ScreenState = {
+  search: string;
+  status: string;
+  page: number;
+  isUploaderOpen: boolean;
+  isModalOpen: boolean;
+  selectedLecture: AdminLectureDetailDto | null;
+  initialAudioData: AudioData | null;
+};
+
+function screenReducer(state: ScreenState, patch: Partial<ScreenState>): ScreenState {
+  return { ...state, ...patch };
+}
+
+function formatDuration(secs?: number): string {
+  if (!secs) return "--:--";
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+  const parts = [
+    h > 0 ? String(h) : null,
+    String(m).padStart(2, "0"),
+    String(s).padStart(2, "0"),
+  ].filter(Boolean);
+  return parts.join(":");
+}
+
+export function AdminLecturesMobileScreen() {
+  const [state, dispatch] = useReducer(screenReducer, {
+    search: "",
+    status: "",
+    page: 1,
+    isUploaderOpen: false,
+    isModalOpen: false,
+    selectedLecture: null,
+    initialAudioData: null,
+  });
+
+  const { search, status, page, isUploaderOpen, isModalOpen, selectedLecture, initialAudioData } =
+    state;
+  const limit = 15;
 
   const { data, isFetching, refetch } = useApiQuery(
     ["admin", "lectures", "list", { search, status, page }],
@@ -35,32 +68,19 @@ export function AdminLecturesMobileScreen() {
   const handleEditClick = async (lectureId: string) => {
     try {
       const details = await fetchAdminLectureDetail(lectureId);
-      setSelectedLecture(details);
-      setInitialAudioData(null);
-      setIsModalOpen(true);
+      dispatch({ selectedLecture: details, initialAudioData: null, isModalOpen: true });
     } catch {
       // ignore: user stays on current view
     }
   };
 
-  const handleUploadComplete = (audioInfo: typeof initialAudioData) => {
-    setInitialAudioData(audioInfo);
-    setSelectedLecture(null);
-    setIsUploaderOpen(false);
-    setIsModalOpen(true);
-  };
-
-  const formatDuration = (secs?: number) => {
-    if (!secs) return "--:--";
-    const h = Math.floor(secs / 3600);
-    const m = Math.floor((secs % 3600) / 60);
-    const s = secs % 60;
-    const parts = [
-      h > 0 ? String(h) : null,
-      String(m).padStart(2, "0"),
-      String(s).padStart(2, "0"),
-    ].filter(Boolean);
-    return parts.join(":");
+  const handleUploadComplete = (audioInfo: AudioData | null) => {
+    dispatch({
+      initialAudioData: audioInfo,
+      selectedLecture: null,
+      isUploaderOpen: false,
+      isModalOpen: true,
+    });
   };
 
   const lectures = data?.items ?? [];
@@ -75,7 +95,7 @@ export function AdminLecturesMobileScreen() {
           <button
             type="button"
             className={styles.uploadTriggerBtn}
-            onClick={() => setIsUploaderOpen(!isUploaderOpen)}
+            onClick={() => dispatch({ isUploaderOpen: !isUploaderOpen })}
             aria-label="Upload Audio Toggle"
           >
             {isUploaderOpen ? <X size={20} /> : <Plus size={20} />}
@@ -94,11 +114,11 @@ export function AdminLecturesMobileScreen() {
             <input
               type="text"
               placeholder="Search lectures..."
+              aria-label="Search lectures"
               className={styles.searchInput}
               value={search}
               onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
+                dispatch({ search: e.target.value, page: 1 });
               }}
             />
           </div>
@@ -109,40 +129,28 @@ export function AdminLecturesMobileScreen() {
             <button
               type="button"
               className={`${styles.tab} ${status === "" ? styles.tabActive : ""}`}
-              onClick={() => {
-                setStatus("");
-                setPage(1);
-              }}
+              onClick={() => dispatch({ status: "", page: 1 })}
             >
               All
             </button>
             <button
               type="button"
               className={`${styles.tab} ${status === "published" ? styles.tabActive : ""}`}
-              onClick={() => {
-                setStatus("published");
-                setPage(1);
-              }}
+              onClick={() => dispatch({ status: "published", page: 1 })}
             >
               Pub
             </button>
             <button
               type="button"
               className={`${styles.tab} ${status === "draft" ? styles.tabActive : ""}`}
-              onClick={() => {
-                setStatus("draft");
-                setPage(1);
-              }}
+              onClick={() => dispatch({ status: "draft", page: 1 })}
             >
               Draft
             </button>
             <button
               type="button"
               className={`${styles.tab} ${status === "archived" ? styles.tabActive : ""}`}
-              onClick={() => {
-                setStatus("archived");
-                setPage(1);
-              }}
+              onClick={() => dispatch({ status: "archived", page: 1 })}
             >
               Arch
             </button>
@@ -183,6 +191,7 @@ export function AdminLecturesMobileScreen() {
                       type="button"
                       className={styles.cardEditBtn}
                       onClick={() => handleEditClick(lecture.id)}
+                      aria-label="Edit lecture"
                     >
                       <Edit size={14} /> Edit
                     </button>
@@ -200,7 +209,7 @@ export function AdminLecturesMobileScreen() {
                   type="button"
                   className={styles.pageBtn}
                   disabled={page <= 1}
-                  onClick={() => setPage((p) => p - 1)}
+                  onClick={() => dispatch({ page: page - 1 })}
                 >
                   Prev
                 </button>
@@ -211,7 +220,7 @@ export function AdminLecturesMobileScreen() {
                   type="button"
                   className={styles.pageBtn}
                   disabled={page >= totalPages}
-                  onClick={() => setPage((p) => p + 1)}
+                  onClick={() => dispatch({ page: page + 1 })}
                 >
                   Next
                 </button>
@@ -222,7 +231,7 @@ export function AdminLecturesMobileScreen() {
 
         <LectureEditModal
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => dispatch({ isModalOpen: false })}
           onSuccess={refetch}
           lecture={selectedLecture}
           initialAudioData={initialAudioData}

@@ -4,7 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { type Href, useRouter } from "expo-router";
 import { type ReactNode, useEffect, useState } from "react";
-import { authClient } from "./auth";
+import { authClient } from "./auth/auth-client";
 import { I18nextProvider } from "react-i18next";
 import { LogBox } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -60,8 +60,8 @@ export function Providers({ children }: Props) {
         router.replace(routes.home as Href);
       });
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    // react-doctor-disable-next-line react-doctor/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     void initI18n()

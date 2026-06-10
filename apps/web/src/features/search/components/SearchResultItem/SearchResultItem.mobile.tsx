@@ -39,7 +39,13 @@ export function SearchResultItemMobile({
     >
       <div className={styles.media}>
         {imageUrl ? (
-          <Image src={imageUrl} alt="" fill className={styles.cover} />
+          <Image
+            src={imageUrl}
+            alt=""
+            fill
+            sizes="(max-width: 640px) 30vw, 20vw"
+            className={styles.cover}
+          />
         ) : (
           <div className={styles.coverFallback}>
             <Headphones size={20} color="var(--content-subtle)" />

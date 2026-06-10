@@ -1,4 +1,4 @@
-import { useReducer } from "react";
+import { useMemo, useReducer } from "react";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { DraggableList, type RenderItemParams } from "@/shared/components/DraggableList";
@@ -28,6 +28,50 @@ type ScreenState = {
 
 function reduce(state: ScreenState, patch: Partial<ScreenState>): ScreenState {
   return { ...state, ...patch };
+}
+
+function SeriesItem({
+  item,
+  drag,
+  isActive,
+}: {
+  item: AdminSeriesListItemDto;
+  drag: () => void;
+  isActive: boolean;
+}) {
+  const itemStyle = useMemo(
+    () => [styles.listItem, isActive ? styles.listItemActive : null],
+    [isActive],
+  );
+  return (
+    <Pressable onLongPress={drag} style={itemStyle}>
+      <Text style={styles.listItemTitle}>{item.title}</Text>
+      <Text style={styles.listItemSubtitle}>
+        {item.publishedLectureCount ?? 0} lectures · {item.status}
+      </Text>
+    </Pressable>
+  );
+}
+
+function CollectionItem({
+  item,
+  drag,
+  isActive,
+}: {
+  item: AdminCollectionListItemDto;
+  drag: () => void;
+  isActive: boolean;
+}) {
+  const itemStyle = useMemo(
+    () => [styles.listItem, isActive ? styles.listItemActive : null],
+    [isActive],
+  );
+  return (
+    <Pressable onLongPress={drag} style={itemStyle}>
+      <Text style={styles.listItemTitle}>{item.title}</Text>
+      <Text style={styles.listItemSubtitle}>{item.status}</Text>
+    </Pressable>
+  );
 }
 
 function SectionHeader({
@@ -151,15 +195,7 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
             onDragEnd={handleSeriesDragEnd}
             scrollEnabled={false}
             renderItem={({ item, drag, isActive }: RenderItemParams<AdminSeriesListItemDto>) => (
-              <Pressable
-                onLongPress={drag}
-                style={[styles.listItem, isActive && styles.listItemActive]}
-              >
-                <Text style={styles.listItemTitle}>{item.title}</Text>
-                <Text style={styles.listItemSubtitle}>
-                  {item.publishedLectureCount ?? 0} lectures · {item.status}
-                </Text>
-              </Pressable>
+              <SeriesItem item={item} drag={drag} isActive={isActive} />
             )}
           />
         )}
@@ -182,13 +218,7 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
               drag,
               isActive,
             }: RenderItemParams<AdminCollectionListItemDto>) => (
-              <Pressable
-                onLongPress={drag}
-                style={[styles.listItem, isActive && styles.listItemActive]}
-              >
-                <Text style={styles.listItemTitle}>{item.title}</Text>
-                <Text style={styles.listItemSubtitle}>{item.status}</Text>
-              </Pressable>
+              <CollectionItem item={item} drag={drag} isActive={isActive} />
             )}
           />
         )}
