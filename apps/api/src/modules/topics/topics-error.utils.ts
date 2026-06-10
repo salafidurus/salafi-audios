@@ -10,7 +10,9 @@ export function isLegacyTopicSchemaFailure(error: unknown): boolean {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     return (
       error.code === 'P2022' ||
-      LEGACY_TOPIC_SCHEMA_PATTERNS.some((pattern) => pattern.test(error.message))
+      LEGACY_TOPIC_SCHEMA_PATTERNS.some((pattern) =>
+        pattern.test(error.message),
+      )
     );
   }
 

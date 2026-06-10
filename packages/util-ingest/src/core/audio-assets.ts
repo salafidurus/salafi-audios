@@ -3,8 +3,10 @@ import { access } from "node:fs/promises";
 import { S3Client } from "@aws-sdk/client-s3";
 import { Prisma } from "@sd/core-db";
 import { z } from "zod";
-import { LectureDef, audioAssetSchema } from "../schema/content-schema";
-import { R2Config, uploadAudioFile } from "../storage/r2";
+import { audioAssetSchema } from "../schema/content-schema";
+import type { LectureDef } from "../schema/content-schema";
+import { uploadAudioFile } from "../storage/r2";
+import type { R2Config } from "../storage/r2";
 
 function normalizePrimaryAudioAssets(assets: LectureDef["audioAssets"]): LectureDef["audioAssets"] {
   if (assets.length === 0) return assets;

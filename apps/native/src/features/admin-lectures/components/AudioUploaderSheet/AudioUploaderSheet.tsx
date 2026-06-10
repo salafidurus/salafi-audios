@@ -132,7 +132,7 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
     setIsUploading(true);
     let anySuccess = false;
     for (let i = 0; i < queue.length; i++) {
-      const item = queue[i];
+      const item = queue[i]!;
       if (item.status === "done") continue;
       try {
         setItemState(i, { progress: 0, status: "uploading" });

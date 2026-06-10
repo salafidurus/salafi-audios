@@ -1,10 +1,10 @@
-import { httpClient, endpoints } from '@sd/core-contracts';
-import { PlaybackEngine } from '../engine/playback.engine';
-import { QueueManager } from '../queue/queue.manager';
-import { usePlaybackStore } from '../store/playback.store';
-import { useProgressStore } from '../progress/progress.store';
-import { syncProgressToBackend } from '../progress/progress.sync';
-import { Track } from '../types/track.types';
+import { httpClient, endpoints } from "@sd/core-contracts";
+import type { PlaybackEngine } from "../engine/playback.engine";
+import { QueueManager } from "../queue/queue.manager";
+import { usePlaybackStore } from "../store/playback.store";
+import { useProgressStore } from "../progress/progress.store";
+import { syncProgressToBackend } from "../progress/progress.sync";
+import type { Track } from "../types/track.types";
 
 type StreamUrlResponse = { url: string };
 
@@ -23,14 +23,14 @@ export class DurusAudioService {
 
   async playLecture(track: Track, queueContext?: Track[]) {
     if (queueContext && queueContext.length > 0) {
-      const index = queueContext.findIndex(t => t.id === track.id);
+      const index = queueContext.findIndex((t) => t.id === track.id);
       this.queueManager.setQueue(queueContext, index >= 0 ? index : 0);
     } else {
       this.queueManager.setQueue([track], 0);
     }
 
     usePlaybackStore.getState().actions.setCurrentTrack(track);
-    usePlaybackStore.getState().actions.setStatus('loading');
+    usePlaybackStore.getState().actions.setStatus("loading");
 
     const resolvedTrack = await this.resolveStreamUrl(track);
     await this.engine.load(resolvedTrack);
@@ -46,12 +46,12 @@ export class DurusAudioService {
    * the service fetches a fresh signed URL from the backend.
    */
   private async resolveStreamUrl(track: Track): Promise<Track> {
-    if (track.url && !track.url.startsWith('file://')) {
+    if (track.url && !track.url.startsWith("file://")) {
       // Already has a usable remote URL — no need to re-resolve.
       return track;
     }
 
-    if (track.url.startsWith('file://')) {
+    if (track.url.startsWith("file://")) {
       // Local file — pass through unchanged.
       return track;
     }
@@ -59,7 +59,7 @@ export class DurusAudioService {
     // Empty URL stub (series continuation) — lazily fetch a fresh signed URL.
     const { url } = await httpClient<StreamUrlResponse>({
       url: endpoints.audio.lectures.stream(track.id),
-      method: 'GET',
+      method: "GET",
     });
 
     return { ...track, url };
@@ -114,7 +114,7 @@ export class DurusAudioService {
     if (currentTrack) {
       const duration = usePlaybackStore.getState().durationSeconds;
       useProgressStore.getState().actions.setProgress(currentTrack.id, positionSeconds, duration);
-      
+
       // debounced sync to server
       syncProgressToBackend({
         lectureId: currentTrack.id,

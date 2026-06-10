@@ -1,12 +1,12 @@
 import { useCallback } from "react";
+import type { StyleProp, ViewStyle } from "react-native";
 import { FlashList } from "@shopify/flash-list";
 
 export type UniversalListProps<TItem> = {
   items: TItem[];
   keyExtractor: (item: TItem) => string;
   renderItem: (item: TItem) => React.ReactElement | null;
-  estimatedItemSize?: number;
-  contentContainerStyle?: object;
+  contentContainerStyle?: StyleProp<ViewStyle>;
   itemSeparator?: React.ComponentType;
   emptyComponent?: React.ComponentType;
 };
@@ -15,7 +15,6 @@ export function UniversalList<TItem>({
   items,
   keyExtractor,
   renderItem,
-  estimatedItemSize = 80,
   contentContainerStyle,
   itemSeparator,
   emptyComponent,
@@ -25,15 +24,11 @@ export function UniversalList<TItem>({
     [renderItem],
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const FlashListAny = FlashList as any;
-
   return (
-    <FlashListAny
+    <FlashList<TItem>
       data={items}
       keyExtractor={keyExtractor}
       renderItem={renderFlashItem}
-      estimatedItemSize={estimatedItemSize}
       contentContainerStyle={contentContainerStyle}
       showsVerticalScrollIndicator={false}
       ItemSeparatorComponent={itemSeparator}

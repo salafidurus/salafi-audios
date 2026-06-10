@@ -199,7 +199,7 @@ describe('LecturesService', () => {
         status: undefined,
       });
       expect(result.items).toHaveLength(1);
-      expect(result.items[0].scholarName).toBe('Sheikh Test');
+      expect(result.items[0]!.scholarName).toBe('Sheikh Test');
     });
   });
 

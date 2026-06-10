@@ -105,7 +105,9 @@
   color: var(--content-default, #111111);
   font-family: var(--typo-body-md-font-family);
   font-size: var(--typo-body-md-font-size, 14px);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .input:focus,

@@ -61,9 +61,6 @@ test.describe("Theme — system-preference based", () => {
 
   // No explicit theme toggle UI exists — theme follows system preference.
   test("theme toggle switches between light and dark", async () => {
-    test.skip(
-      true,
-      "No manual theme toggle UI exists; theme follows system preference",
-    );
+    test.skip(true, "No manual theme toggle UI exists; theme follows system preference");
   });
 });

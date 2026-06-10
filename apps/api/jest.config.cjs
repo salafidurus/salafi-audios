@@ -9,8 +9,12 @@ module.exports = {
   moduleFileExtensions: ['js', 'json', 'ts'],
 
   transform: {
-    '^.+\\.ts$': 'ts-jest',
+    '^.+\\.(t|j)s$': 'ts-jest',
   },
+
+  transformIgnorePatterns: [
+    'node_modules/.pnpm/(?!@paralleldrive\\+cuid2)',
+  ],
 
   testEnvironment: 'node',
 

@@ -144,7 +144,7 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
     const prevOrder = seriesOrder ?? seriesList ?? [];
     dispatch({ seriesOrder: data });
     try {
-      await updateSeries(data[to].id, { orderIndex: to });
+      await updateSeries(data[to]!.id, { orderIndex: to });
     } catch {
       dispatch({ seriesOrder: prevOrder });
     }
@@ -161,7 +161,7 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
     const prevOrder = collectionOrder ?? collectionList ?? [];
     dispatch({ collectionOrder: data });
     try {
-      await updateCollection(data[to].id, { orderIndex: to });
+      await updateCollection(data[to]!.id, { orderIndex: to });
     } catch {
       dispatch({ collectionOrder: prevOrder });
     }

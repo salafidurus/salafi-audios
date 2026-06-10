@@ -119,7 +119,7 @@ describe("AdminLecturesScreen", () => {
 
     // Click Edit button for the first lecture
     const editButtons = screen.getAllByRole("button", { name: /edit/i });
-    fireEvent.click(editButtons[0]);
+    fireEvent.click(editButtons[0]!);
 
     await waitFor(() => {
       expect(fetchAdminLectureDetail).toHaveBeenCalledWith("lec-1");

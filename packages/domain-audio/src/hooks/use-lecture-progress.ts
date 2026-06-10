@@ -1,4 +1,4 @@
-import { useProgressStore } from '../progress/progress.store';
+import { useProgressStore } from "../progress/progress.store";
 
 export function useLectureProgress(lectureId: string) {
   const progress = useProgressStore((state) => state.progressMap[lectureId]);

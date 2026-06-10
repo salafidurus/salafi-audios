@@ -1,4 +1,4 @@
-import { ConfigContext, ExpoConfig } from "expo/config";
+import type { ConfigContext, ExpoConfig } from "expo/config";
 import { withSentry } from "@sentry/react-native/expo";
 import { version } from "./package.json";
 import path from "path";

@@ -47,7 +47,7 @@ export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
             id: nextLecture.id,
             title: nextLecture.title,
             artist: lecture.scholar.name,
-            url: '', // resolved lazily by DurusAudioService
+            url: "", // resolved lazily by DurusAudioService
             durationSeconds: 0,
             seriesId: lecture.seriesContext?.seriesId ?? null,
             seriesTitle: lecture.seriesContext?.seriesTitle ?? null,
@@ -60,7 +60,5 @@ export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
 
   const label = isCurrentAsset && isPlaying ? "⏸ Pause Lecture" : "▶ Play Lecture";
 
-  return (
-    <Button variant="primary" size="lg" fullWidth label={label} onPress={handlePress} />
-  );
+  return <Button variant="primary" size="lg" fullWidth label={label} onPress={handlePress} />;
 }

@@ -1,6 +1,6 @@
-import { create } from 'zustand';
-import { PlaybackState, PlaybackStatus } from '../types/state.types';
-import { Track } from '../types/track.types';
+import { create } from "zustand";
+import type { PlaybackState, PlaybackStatus } from "../types/state.types";
+import type { Track } from "../types/track.types";
 
 type PlaybackActions = {
   setCurrentTrack: (track: Track | null) => void;
@@ -16,7 +16,7 @@ export type PlaybackStore = PlaybackState & { actions: PlaybackActions };
 
 export const usePlaybackStore = create<PlaybackStore>((set) => ({
   currentTrack: null,
-  status: 'idle',
+  status: "idle",
   positionSeconds: 0,
   durationSeconds: 0,
   speed: 1.0,
@@ -28,7 +28,7 @@ export const usePlaybackStore = create<PlaybackStore>((set) => ({
     setPosition: (positionSeconds) => set({ positionSeconds }),
     setDuration: (durationSeconds) => set({ durationSeconds }),
     setSpeed: (speed) => set({ speed }),
-    setError: (error) => set({ status: 'error', error }),
-    stop: () => set({ currentTrack: null, status: 'idle', positionSeconds: 0, durationSeconds: 0 }),
+    setError: (error) => set({ status: "error", error }),
+    stop: () => set({ currentTrack: null, status: "idle", positionSeconds: 0, durationSeconds: 0 }),
   },
 }));

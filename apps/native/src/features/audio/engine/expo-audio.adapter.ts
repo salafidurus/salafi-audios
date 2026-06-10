@@ -1,5 +1,6 @@
-import { createAudioPlayer, AudioPlayer, AudioStatus } from 'expo-audio';
-import { PlaybackEngine, PlaybackEngineEvents, Track, PlaybackStatus } from '@sd/domain-audio';
+import { createAudioPlayer } from "expo-audio";
+import type { AudioPlayer, AudioStatus } from "expo-audio";
+import type { PlaybackEngine, PlaybackEngineEvents, Track, PlaybackStatus } from "@sd/domain-audio";
 
 export class ExpoAudioAdapter implements PlaybackEngine {
   private player: AudioPlayer | null = null;
@@ -19,7 +20,7 @@ export class ExpoAudioAdapter implements PlaybackEngine {
     this.player = player;
 
     // Bind event listeners
-    const statusListener = player.addListener('playbackStatusUpdate', (status: AudioStatus) => {
+    const statusListener = player.addListener("playbackStatusUpdate", (status: AudioStatus) => {
       // 1. Map and trigger status change
       const mappedStatus = this.mapStatus(status);
       if (this.events.onStatusChange) {
@@ -106,9 +107,9 @@ export class ExpoAudioAdapter implements PlaybackEngine {
   }
 
   private mapStatus(status: AudioStatus): PlaybackStatus {
-    if (!status.isLoaded) return 'loading';
-    if (status.isBuffering) return 'loading';
-    if (status.playing) return 'playing';
-    return 'paused';
+    if (!status.isLoaded) return "loading";
+    if (status.isBuffering) return "loading";
+    if (status.playing) return "playing";
+    return "paused";
   }
 }

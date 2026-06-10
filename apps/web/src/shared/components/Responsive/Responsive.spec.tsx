@@ -20,10 +20,7 @@ describe("Responsive", () => {
   it("renders the desktop branch at a wide viewport (1440px)", async () => {
     setViewport(1440);
     render(
-      <Responsive
-        mobile={<span>mobile content</span>}
-        desktop={<span>desktop content</span>}
-      />,
+      <Responsive mobile={<span>mobile content</span>} desktop={<span>desktop content</span>} />,
     );
     // useEffect fires synchronously in act — wait for the state update
     expect(await screen.findByText("desktop content")).toBeInTheDocument();
@@ -34,10 +31,7 @@ describe("Responsive", () => {
     setViewport(320);
     await act(async () => {
       render(
-        <Responsive
-          mobile={<span>mobile content</span>}
-          desktop={<span>desktop content</span>}
-        />,
+        <Responsive mobile={<span>mobile content</span>} desktop={<span>desktop content</span>} />,
       );
     });
     expect(await screen.findByText("mobile content")).toBeInTheDocument();
@@ -49,10 +43,7 @@ describe("Responsive", () => {
     // This is validated by the useState(true) default — unit-test that the
     // desktop branch is present immediately after a synchronous render.
     render(
-      <Responsive
-        mobile={<span>mobile content</span>}
-        desktop={<span>desktop content</span>}
-      />,
+      <Responsive mobile={<span>mobile content</span>} desktop={<span>desktop content</span>} />,
     );
     // At render time (before effects) window.innerWidth defaults to jsdom's
     // value, but useState(true) guarantees the desktop branch is rendered first.

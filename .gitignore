@@ -48,3 +48,6 @@ packages/db/src/generated/
 
 # IDE and Tool settings
 .vscode/mcp.json
+
+# Turborepo
+.turbo

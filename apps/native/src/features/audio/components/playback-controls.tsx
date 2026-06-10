@@ -29,17 +29,13 @@ export function PlaybackControls() {
     const speeds = [0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
     const currentIndex = speeds.indexOf(speed);
     const nextIndex = (currentIndex + 1) % speeds.length;
-    audioService.setSpeed(speeds[nextIndex]);
+    audioService.setSpeed(speeds[nextIndex]!);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const RotateCcwIcon = <RotateCcw {...({ size: 28, color: "#1E293B" } as any)} />;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const PauseIcon = <Pause {...({ size: 32, color: "#FFFFFF", fill: "#FFFFFF" } as any)} />;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const PlayIcon = <Play {...({ size: 32, color: "#FFFFFF", fill: "#FFFFFF" } as any)} />;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const RotateCwIcon = <RotateCw {...({ size: 28, color: "#1E293B" } as any)} />;
+  const RotateCcwIcon = <RotateCcw size={28} color="#1E293B" />;
+  const PauseIcon = <Pause size={32} color="#FFFFFF" fill="#FFFFFF" />;
+  const PlayIcon = <Play size={32} color="#FFFFFF" fill="#FFFFFF" />;
+  const RotateCwIcon = <RotateCw size={28} color="#1E293B" />;
 
   if (!hasTrack) return null;
 

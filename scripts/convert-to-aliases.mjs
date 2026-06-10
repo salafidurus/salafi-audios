@@ -16,12 +16,14 @@ function getAllTsFiles(dir) {
     throw new Error(`Directory ${normalizedDir} is outside repoRoot ${repoRoot}`);
   }
   const files = [];
-  for (const item of fs.readdirSync(normalizedDir)) { // nosemgrep: gitlab.eslint.detect-non-literal-fs-filename
+  for (const item of fs.readdirSync(normalizedDir)) {
+    // nosemgrep: gitlab.eslint.detect-non-literal-fs-filename
     const full = path.normalize(path.join(normalizedDir, item));
     if (!full.startsWith(normalizedDir)) {
       throw new Error(`Path traversal detected: ${full} is outside ${normalizedDir}`);
     }
-    if (fs.statSync(full).isDirectory()) { // nosemgrep: gitlab.eslint.detect-non-literal-fs-filename
+    if (fs.statSync(full).isDirectory()) {
+      // nosemgrep: gitlab.eslint.detect-non-literal-fs-filename
       files.push(...getAllTsFiles(full));
     } else if (/\.(ts|tsx)$/.test(item)) {
       files.push(full);
@@ -41,31 +43,30 @@ function convertSrcDir(srcRoot) {
   for (const filePath of files) {
     const normalizedFilePath = path.normalize(path.resolve(filePath));
     if (!normalizedFilePath.startsWith(normalizedSrcRoot)) {
-      throw new Error(`File path ${normalizedFilePath} is outside source root ${normalizedSrcRoot}`);
+      throw new Error(
+        `File path ${normalizedFilePath} is outside source root ${normalizedSrcRoot}`,
+      );
     }
     const fileDir = path.normalize(path.dirname(normalizedFilePath));
     const original = fs.readFileSync(normalizedFilePath, "utf8"); // nosemgrep: gitlab.eslint.detect-non-literal-fs-filename
 
-    const updated = original.replace(
-      /from\s+(['"])(\.\.[^'"]+)\1/g,
-      (match, quote, importPath) => {
-        // Only convert paths with 2+ levels up
-        const levels = (importPath.match(/\.\.\//g) ?? []).length;
-        if (levels < 2) return match;
+    const updated = original.replace(/from\s+(['"])(\.\.[^'"]+)\1/g, (match, quote, importPath) => {
+      // Only convert paths with 2+ levels up
+      const levels = (importPath.match(/\.\.\//g) ?? []).length;
+      if (levels < 2) return match;
 
-        const resolved = path.normalize(path.resolve(fileDir, importPath));
-        if (!resolved.startsWith(repoRoot)) {
-          throw new Error(`Import path resolved outside repoRoot: ${resolved}`);
-        }
-        const rel = path.relative(normalizedSrcRoot, resolved);
-
-        // Don't convert if it escapes src/ (e.g. into node_modules)
-        if (rel.startsWith("..")) return match;
-
-        const aliasPath = "@/" + rel.replace(/\\/g, "/");
-        return `from ${quote}${aliasPath}${quote}`;
+      const resolved = path.normalize(path.resolve(fileDir, importPath));
+      if (!resolved.startsWith(repoRoot)) {
+        throw new Error(`Import path resolved outside repoRoot: ${resolved}`);
       }
-    );
+      const rel = path.relative(normalizedSrcRoot, resolved);
+
+      // Don't convert if it escapes src/ (e.g. into node_modules)
+      if (rel.startsWith("..")) return match;
+
+      const aliasPath = "@/" + rel.replace(/\\/g, "/");
+      return `from ${quote}${aliasPath}${quote}`;
+    });
 
     if (updated !== original) {
       fs.writeFileSync(normalizedFilePath, updated, "utf8"); // nosemgrep: gitlab.eslint.detect-non-literal-fs-filename
@@ -86,7 +87,8 @@ for (const { label, src } of targets) {
   if (!normalizedSrc.startsWith(repoRoot)) {
     throw new Error(`Target path ${normalizedSrc} is outside repoRoot ${repoRoot}`);
   }
-  if (!fs.existsSync(normalizedSrc)) { // nosemgrep: gitlab.eslint.detect-non-literal-fs-filename
+  if (!fs.existsSync(normalizedSrc)) {
+    // nosemgrep: gitlab.eslint.detect-non-literal-fs-filename
     console.log(`\n[SKIP] ${label} (not found)`);
     continue;
   }
@@ -94,4 +96,3 @@ for (const { label, src } of targets) {
   const n = convertSrcDir(normalizedSrc);
   console.log(`  → ${n} file(s) updated`);
 }
-

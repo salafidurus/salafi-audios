@@ -25,9 +25,9 @@ Usually not needed - Prisma connects automatically on first query. Use for:
 async function main() {
   try {
     await prisma.$connect();
-    console.log('Database connected');
+    console.log("Database connected");
   } catch (e) {
-    console.error('Failed to connect:', e);
+    console.error("Failed to connect:", e);
     process.exit(1);
   }
 }
@@ -44,12 +44,12 @@ await prisma.$disconnect();
 ### Graceful shutdown
 
 ```typescript
-process.on('beforeExit', async () => {
+process.on("beforeExit", async () => {
   await prisma.$disconnect();
 });
 
 // Or with SIGTERM
-process.on('SIGTERM', async () => {
+process.on("SIGTERM", async () => {
   await prisma.$disconnect();
   process.exit(0);
 });
@@ -72,13 +72,13 @@ Subscribe to events:
 ```typescript
 const prisma = new PrismaClient({
   adapter,
-  log: [{ level: 'query', emit: 'event' }],
+  log: [{ level: "query", emit: "event" }],
 });
 
-prisma.$on('query', (e) => {
-  console.log('Query:', e.query);
-  console.log('Params:', e.params);
-  console.log('Duration:', e.duration, 'ms');
+prisma.$on("query", (e) => {
+  console.log("Query:", e.query);
+  console.log("Params:", e.params);
+  console.log("Duration:", e.duration, "ms");
 });
 ```
 
@@ -88,15 +88,15 @@ prisma.$on('query', (e) => {
 const prisma = new PrismaClient({
   adapter,
   log: [
-    { level: 'info', emit: 'event' },
-    { level: 'warn', emit: 'event' },
-    { level: 'error', emit: 'event' },
+    { level: "info", emit: "event" },
+    { level: "warn", emit: "event" },
+    { level: "error", emit: "event" },
   ],
 });
 
-prisma.$on('info', (e) => console.log(e.message));
-prisma.$on('warn', (e) => console.warn(e.message));
-prisma.$on('error', (e) => console.error(e.message));
+prisma.$on("info", (e) => console.log(e.message));
+prisma.$on("warn", (e) => console.warn(e.message));
+prisma.$on("error", (e) => console.error(e.message));
 ```
 
 ## $extends()
@@ -112,7 +112,7 @@ const prisma = new PrismaClient({ adapter }).$extends({
   },
 });
 
-prisma.$log('Hello!');
+prisma.$log("Hello!");
 ```
 
 ### Add model methods
@@ -128,7 +128,7 @@ const prisma = new PrismaClient({ adapter }).$extends({
   },
 });
 
-const user = await prisma.user.findByEmail('alice@prisma.io');
+const user = await prisma.user.findByEmail("alice@prisma.io");
 ```
 
 ### Query extensions
@@ -189,7 +189,7 @@ See `raw-queries.md` for details.
 ### Prisma namespace
 
 ```typescript
-import { Prisma } from '../generated/client';
+import { Prisma } from "../generated/client";
 
 // Input types
 type UserCreateInput = Prisma.UserCreateInput;
@@ -207,7 +207,7 @@ type UserWithPosts = Prisma.UserGetPayload<{
 Type-safe query fragments:
 
 ```typescript
-import { Prisma } from '../generated/client';
+import { Prisma } from "../generated/client";
 
 const userSelect = Prisma.validator<Prisma.UserSelect>()({
   id: true,

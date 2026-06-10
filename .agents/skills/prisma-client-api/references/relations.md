@@ -24,7 +24,7 @@ const user = await prisma.user.findUnique({
   include: {
     posts: {
       where: { published: true },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       take: 5,
       select: { id: true, title: true },
     },
@@ -70,12 +70,12 @@ const user = await prisma.user.findUnique({
 ```typescript
 const user = await prisma.user.create({
   data: {
-    email: 'alice@prisma.io',
+    email: "alice@prisma.io",
     posts: {
-      create: [{ title: 'Post 1' }, { title: 'Post 2' }],
+      create: [{ title: "Post 1" }, { title: "Post 2" }],
     },
     profile: {
-      create: { bio: 'Hello!' },
+      create: { bio: "Hello!" },
     },
   },
 });
@@ -86,11 +86,11 @@ const user = await prisma.user.create({
 ```typescript
 const post = await prisma.post.create({
   data: {
-    title: 'New Post',
+    title: "New Post",
     author: {
       connectOrCreate: {
-        where: { email: 'alice@prisma.io' },
-        create: { email: 'alice@prisma.io', name: 'Alice' },
+        where: { email: "alice@prisma.io" },
+        create: { email: "alice@prisma.io", name: "Alice" },
       },
     },
   },
@@ -102,7 +102,7 @@ const post = await prisma.post.create({
 ```typescript
 const post = await prisma.post.create({
   data: {
-    title: 'New Post',
+    title: "New Post",
     author: {
       connect: { id: 1 },
     },
@@ -112,7 +112,7 @@ const post = await prisma.post.create({
 // Shorthand for foreign key
 const post = await prisma.post.create({
   data: {
-    title: 'New Post',
+    title: "New Post",
     authorId: 1,
   },
 });
@@ -129,7 +129,7 @@ const user = await prisma.user.update({
     posts: {
       update: {
         where: { id: 1 },
-        data: { title: 'Updated Title' },
+        data: { title: "Updated Title" },
       },
     },
   },
@@ -160,8 +160,8 @@ const user = await prisma.user.update({
   data: {
     profile: {
       upsert: {
-        create: { bio: 'New bio' },
-        update: { bio: 'Updated bio' },
+        create: { bio: "New bio" },
+        update: { bio: "Updated bio" },
       },
     },
   },
@@ -270,7 +270,7 @@ const users = await prisma.user.findMany({
 ```typescript
 const users = await prisma.user.findMany({
   where: {
-    profile: { is: { country: 'USA' } },
+    profile: { is: { country: "USA" } },
   },
 });
 ```

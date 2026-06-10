@@ -23,5 +23,3 @@ export type ProgressSyncItemDto = {
 export type ProgressSyncDto = {
   items: ProgressSyncItemDto[];
 };
-
-

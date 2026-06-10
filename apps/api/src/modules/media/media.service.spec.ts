@@ -2,6 +2,10 @@ import { Test } from '@nestjs/testing';
 import { MediaService } from './media.service';
 import { ConfigService } from '../../shared/config/config.module';
 
+jest.mock('@paralleldrive/cuid2', () => ({
+  createId: () => 'mock-cuid-12345',
+}));
+
 describe('MediaService', () => {
   let service: MediaService;
 

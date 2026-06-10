@@ -20,7 +20,7 @@ export function getCurrentSection(pathname: string): Section | "home" {
 export function getActiveTabFromPath(pathname: string): string | null {
   const parts = pathname.split("/").filter(Boolean);
   // e.g. /feed/recent → ["feed", "recent"]
-  return parts.length >= 2 ? parts[1] : null;
+  return parts.length >= 2 ? (parts[1] ?? null) : null;
 }
 
 export function buildSectionTabPath(section: Section, tabId?: string): string {
