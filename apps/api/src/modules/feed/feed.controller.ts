@@ -53,7 +53,9 @@ export class FeedController {
   }
 
   @Get('personalized')
-  @ApiOperation({ summary: 'Get personalized content feed for authenticated users' })
+  @ApiOperation({
+    summary: 'Get personalized content feed for authenticated users',
+  })
   @ApiOkResponse({ description: 'Paginated personalized feed items' })
   @ApiQuery({ name: 'cursor', required: false, type: String })
   @ApiQuery({ name: 'limit', required: false, type: Number })
@@ -62,7 +64,7 @@ export class FeedController {
     @Query('limit') limitStr?: string,
   ) {
     const limit = Math.min(Math.max(Number(limitStr) || 20, 1), 40);
-    
+
     // For now, return the same as the public feed
     // In the future, this could use user's interaction history, saved lectures, etc.
     return this.feed.getFeed(cursor, limit);

@@ -7,7 +7,9 @@
   border: 1px solid var(--border-default);
   border-radius: var(--radius-component-panel-sm);
   padding: var(--space-scale-md) var(--space-scale-lg);
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 }
 
 .containerFocused {

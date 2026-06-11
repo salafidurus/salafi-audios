@@ -13,7 +13,7 @@
     "**/.claude/**",
     "**/.agents/**",
     "**/SKILL.md",
-    "**/CLAUDE.md"
+    "**/CLAUDE.md",
   ],
   "config": {
     "default": true,

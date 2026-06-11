@@ -50,7 +50,7 @@ export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
             id: nextLecture.id,
             title: nextLecture.title,
             artist: lecture.scholar.name,
-            url: '', // resolved lazily by DurusAudioService
+            url: "", // resolved lazily by DurusAudioService
             durationSeconds: 0,
             seriesId: lecture.seriesContext?.seriesId ?? null,
             seriesTitle: lecture.seriesContext?.seriesTitle ?? null,

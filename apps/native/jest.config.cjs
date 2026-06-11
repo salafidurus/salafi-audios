@@ -4,10 +4,10 @@ module.exports = {
   testEnvironment: "node",
   setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
   moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/src/$1"
+    "^@/(.*)$": "<rootDir>/src/$1",
   },
   transformIgnorePatterns: [
-    "node_modules/(?!(?:.pnpm/)?((jest-)?react-native|@react-native(-community)?|@react-native/.*|expo(nent)?|@expo(nent)?/.*|react-navigation|@react-navigation/.*))"
+    "node_modules/(?!(?:.pnpm/)?((jest-)?react-native|@react-native(-community)?|@react-native/.*|expo(nent)?|@expo(nent)?/.*|react-navigation|@react-navigation/.*))",
   ],
   collectCoverage: true,
   collectCoverageFrom: [
@@ -16,7 +16,7 @@ module.exports = {
     "!src/**/__tests__/**",
     "!src/**/?(*.)+(spec|test).{ts,tsx,js,jsx}",
     "!src/app/**",
-    "!src/**/index.{ts,tsx,js,jsx}"
+    "!src/**/index.{ts,tsx,js,jsx}",
   ],
-  coveragePathIgnorePatterns: ["/node_modules/", "/dist/", "/build/"]
+  coveragePathIgnorePatterns: ["/node_modules/", "/dist/", "/build/"],
 };

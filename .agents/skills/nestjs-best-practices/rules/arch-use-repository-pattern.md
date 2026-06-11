@@ -20,13 +20,13 @@ export class UsersService {
   async findActiveWithOrders(minOrders: number): Promise<User[]> {
     // Complex query logic mixed with business logic
     return this.repo
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.orders', 'order')
-      .where('user.isActive = :active', { active: true })
-      .andWhere('user.deletedAt IS NULL')
-      .groupBy('user.id')
-      .having('COUNT(order.id) >= :min', { min: minOrders })
-      .orderBy('user.createdAt', 'DESC')
+      .createQueryBuilder("user")
+      .leftJoinAndSelect("user.orders", "order")
+      .where("user.isActive = :active", { active: true })
+      .andWhere("user.deletedAt IS NULL")
+      .groupBy("user.id")
+      .having("COUNT(order.id) >= :min", { min: minOrders })
+      .orderBy("user.createdAt", "DESC")
       .getMany();
   }
 
@@ -52,13 +52,13 @@ export class UsersRepository {
 
   async findActiveWithMinOrders(minOrders: number): Promise<User[]> {
     return this.repo
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.orders', 'order')
-      .where('user.isActive = :active', { active: true })
-      .andWhere('user.deletedAt IS NULL')
-      .groupBy('user.id')
-      .having('COUNT(order.id) >= :min', { min: minOrders })
-      .orderBy('user.createdAt', 'DESC')
+      .createQueryBuilder("user")
+      .leftJoinAndSelect("user.orders", "order")
+      .where("user.isActive = :active", { active: true })
+      .andWhere("user.deletedAt IS NULL")
+      .groupBy("user.id")
+      .having("COUNT(order.id) >= :min", { min: minOrders })
+      .orderBy("user.createdAt", "DESC")
       .getMany();
   }
 
@@ -79,7 +79,7 @@ export class UsersService {
   async create(dto: CreateUserDto): Promise<User> {
     const existing = await this.usersRepo.findByEmail(dto.email);
     if (existing) {
-      throw new ConflictException('Email already registered');
+      throw new ConflictException("Email already registered");
     }
 
     const user = new User();

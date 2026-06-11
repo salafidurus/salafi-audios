@@ -1,4 +1,4 @@
-import { PlaybackEngine, PlaybackEngineEvents, Track } from "@sd/domain-audio";
+import type { PlaybackEngine, PlaybackEngineEvents, Track } from "@sd/domain-audio";
 
 export class HTMLAudioAdapter implements PlaybackEngine {
   private audio: HTMLAudioElement | null = null;

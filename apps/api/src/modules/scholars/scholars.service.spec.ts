@@ -233,7 +233,7 @@ describe('ScholarsService', () => {
       ]);
       const result = await service.listAdminSeries('scholar-1');
       expect(result).toHaveLength(1);
-      expect(result[0].title).toBe('Series One');
+      expect(result[0]!.title).toBe('Series One');
     });
   });
 
@@ -261,7 +261,7 @@ describe('ScholarsService', () => {
       ]);
       const result = await service.listAdminCollections('scholar-1');
       expect(result).toHaveLength(1);
-      expect(result[0].title).toBe('Collection One');
+      expect(result[0]!.title).toBe('Collection One');
     });
   });
 

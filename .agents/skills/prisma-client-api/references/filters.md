@@ -7,20 +7,20 @@ Filter operators for the `where` clause.
 ```typescript
 // Exact match (implicit)
 where: {
-  email: 'alice@prisma.io';
+  email: "alice@prisma.io";
 }
 
 // Explicit equals
 where: {
   email: {
-    equals: 'alice@prisma.io';
+    equals: "alice@prisma.io";
   }
 }
 
 // Not equal
 where: {
   email: {
-    not: 'alice@prisma.io';
+    not: "alice@prisma.io";
   }
 }
 ```
@@ -114,7 +114,7 @@ where: {
 
 ```typescript
 where: {
-  AND: [{ email: { contains: '@prisma.io' } }, { role: 'ADMIN' }];
+  AND: [{ email: { contains: "@prisma.io" } }, { role: "ADMIN" }];
 }
 ```
 
@@ -122,10 +122,7 @@ where: {
 
 ```typescript
 where: {
-  OR: [
-    { email: { contains: '@gmail.com' } },
-    { email: { contains: '@prisma.io' } },
-  ];
+  OR: [{ email: { contains: "@gmail.com" } }, { email: { contains: "@prisma.io" } }];
 }
 ```
 
@@ -134,13 +131,13 @@ where: {
 ```typescript
 where: {
   NOT: {
-    role: 'GUEST';
+    role: "GUEST";
   }
 }
 
 // Multiple NOT conditions
 where: {
-  NOT: [{ role: 'GUEST' }, { verified: false }];
+  NOT: [{ role: "GUEST" }, { verified: false }];
 }
 ```
 
@@ -215,7 +212,7 @@ where: {
 where: {
   profile: {
     is: {
-      country: 'USA';
+      country: "USA";
     }
   }
 }
@@ -236,21 +233,21 @@ For fields like `String[]`:
 // Has element
 where: {
   tags: {
-    has: 'typescript';
+    has: "typescript";
   }
 }
 
 // Has some elements
 where: {
   tags: {
-    hasSome: ['typescript', 'javascript'];
+    hasSome: ["typescript", "javascript"];
   }
 }
 
 // Has every element
 where: {
   tags: {
-    hasEvery: ['typescript', 'prisma'];
+    hasEvery: ["typescript", "prisma"];
   }
 }
 
@@ -288,7 +285,7 @@ where: {
 // Requires @@fulltext index
 where: {
   content: {
-    search: 'prisma database';
+    search: "prisma database";
   }
 }
 ```

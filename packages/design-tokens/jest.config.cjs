@@ -2,9 +2,7 @@
 module.exports = {
   testEnvironment: "node",
 
-  testMatch: [
-    "<rootDir>/**/?(*.)+(spec|test).[tj]s?(x)",
-  ],
+  testMatch: ["<rootDir>/**/?(*.)+(spec|test).[tj]s?(x)"],
 
   transform: {
     "^.+\\.(t|j)sx?$": [

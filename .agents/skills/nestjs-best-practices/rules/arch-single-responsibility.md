@@ -1,7 +1,7 @@
 ---
 title: Single Responsibility for Services
 impact: CRITICAL
-impactDescription: '40%+ improvement in testability'
+impactDescription: "40%+ improvement in testability"
 tags: architecture, services, single-responsibility
 ---
 
@@ -85,7 +85,7 @@ export class OrderStatsService {
 }
 
 // Orchestration in controller or dedicated orchestrator
-@Controller('orders')
+@Controller("orders")
 export class OrdersController {
   constructor(
     private orders: OrdersService,

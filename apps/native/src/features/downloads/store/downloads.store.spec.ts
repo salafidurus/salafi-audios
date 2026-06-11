@@ -13,7 +13,7 @@ describe("downloads store", () => {
     it("creates a pending download entry", () => {
       useDownloadsStore.getState().actions.startDownload("lec1");
 
-      const dl = useDownloadsStore.getState().downloads["lec1"];
+      const dl = useDownloadsStore.getState().downloads["lec1"]!;
       expect(dl).toBeDefined();
       expect(dl.lectureId).toBe("lec1");
       expect(dl.status).toBe("pending");
@@ -27,7 +27,7 @@ describe("downloads store", () => {
       useDownloadsStore.getState().actions.startDownload("lec1");
       useDownloadsStore.getState().actions.setProgress("lec1", 45);
 
-      const dl = useDownloadsStore.getState().downloads["lec1"];
+      const dl = useDownloadsStore.getState().downloads["lec1"]!;
       expect(dl.status).toBe("downloading");
       expect(dl.progress).toBe(45);
     });
@@ -44,7 +44,7 @@ describe("downloads store", () => {
       useDownloadsStore.getState().actions.startDownload("lec1");
       useDownloadsStore.getState().actions.setComplete("lec1", "/path/to/file.mp3");
 
-      const dl = useDownloadsStore.getState().downloads["lec1"];
+      const dl = useDownloadsStore.getState().downloads["lec1"]!;
       expect(dl.status).toBe("complete");
       expect(dl.progress).toBe(100);
       expect(dl.localUri).toBe("/path/to/file.mp3");
@@ -63,7 +63,7 @@ describe("downloads store", () => {
       useDownloadsStore.getState().actions.startDownload("lec1");
       useDownloadsStore.getState().actions.setError("lec1", "disk full");
 
-      const dl = useDownloadsStore.getState().downloads["lec1"];
+      const dl = useDownloadsStore.getState().downloads["lec1"]!;
       expect(dl.status).toBe("error");
       expect(dl.error).toBe("disk full");
     });

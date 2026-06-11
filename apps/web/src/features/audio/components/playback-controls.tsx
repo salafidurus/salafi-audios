@@ -67,7 +67,7 @@ export function PlaybackControls() {
     const speeds = [0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
     const currentIndex = speeds.indexOf(speed);
     const nextIndex = (currentIndex + 1) % speeds.length;
-    audioService.setSpeed(speeds[nextIndex]);
+    audioService.setSpeed(speeds[nextIndex]!);
   };
 
   if (!hasTrack) return null;

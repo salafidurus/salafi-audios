@@ -1,56 +1,53 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "instructions": [
-    "**/AGENT.md",
-    ".agents/skills/project-guardrails/SKILL.md"
-  ],
+  "instructions": ["**/AGENT.md", ".agents/skills/project-guardrails/SKILL.md"],
   "mcp": {
     "tailwindcss": {
-      "enabled": true
+      "enabled": true,
     },
     "playwright": {
-      "enabled": false
+      "enabled": false,
     },
     "stitch": {
-      "enabled": false
+      "enabled": false,
     },
     "antigravity": {
-      "enabled": false
+      "enabled": false,
     },
     "hugeicons": {
-      "enabled": false
+      "enabled": false,
     },
     "server-github": {
-      "enabled": true
+      "enabled": true,
     },
     "in-memoria": {
-      "enabled": true
+      "enabled": true,
     },
     "sequential-thinking": {
-      "enabled": true
+      "enabled": true,
     },
     "kratos": {
-      "enabled": false
+      "enabled": false,
     },
     "context7": {
-      "enabled": true
+      "enabled": true,
     },
     "server-memory": {
-      "enabled": true
+      "enabled": true,
     },
     "argent": {
       "type": "local",
-      "command": [
-        "argent",
-        "mcp"
-      ],
+      "command": ["argent", "mcp"],
       "enabled": true,
       "environment": {
-        "ARGENT_MCP_LOG": "C:\\Users\\olanr\\.argent\\mcp-calls.log"
-      }
-    }
+        "ARGENT_MCP_LOG": "C:\\Users\\olanr\\.argent\\mcp-calls.log",
+      },
+    },
   },
   "tools": {
-    "argent*": true
-  }
+    "argent*": true,
+  },
+  "indexing": {
+    "enabled": true
+  },
 }

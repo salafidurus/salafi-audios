@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 /**
  * Account layout — renders for everyone (local-first auth mode).

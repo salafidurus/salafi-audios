@@ -1,6 +1,6 @@
-import { Track } from './track.types';
+import type { Track } from "./track.types";
 
-export type PlaybackStatus = 'idle' | 'loading' | 'playing' | 'paused' | 'error';
+export type PlaybackStatus = "idle" | "loading" | "playing" | "paused" | "error";
 
 export type QueueItem = {
   track: Track;

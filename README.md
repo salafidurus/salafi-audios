@@ -20,8 +20,8 @@ This monorepo contains the full system:
 
 Prerequisites:
 
-- Node.js 22.x
-- `pnpm@10.x` (repo pins `pnpm@10.28.1`)
+- Node.js 24.x
+- `pnpm@11.x` (repo pins `pnpm@11.5.3`)
 
 Install and run:
 

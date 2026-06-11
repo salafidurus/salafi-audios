@@ -1,7 +1,6 @@
 {
-  "compilerOptions": {
-    "strict": true,
-    "skipLibCheck": true,
-    "noEmit": true
-  }
+  // Thin root base — consumed by domain-* packages and core-api via relative path.
+  // Canonical per-family presets live in packages/util-config/tsconfig/*.json.
+  // Prefer extending those canonical presets over this file for new packages.
+  "extends": "./packages/util-config/tsconfig/base.json"
 }

@@ -1,4 +1,4 @@
-import { Track } from '../types/track.types';
+import type { Track } from "../types/track.types";
 
 export class QueueManager {
   private queue: Track[] = [];
@@ -11,7 +11,7 @@ export class QueueManager {
 
   getCurrentTrack(): Track | null {
     if (this.currentIndex >= 0 && this.currentIndex < this.queue.length) {
-      return this.queue[this.currentIndex];
+      return this.queue[this.currentIndex] ?? null;
     }
     return null;
   }

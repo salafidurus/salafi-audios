@@ -18,17 +18,17 @@
     "clean": "rimraf dist",
     "build": "tsc -p tsconfig.build.json",
     "dev": "pnpm build --watch",
-    "lint": "node ../../node_modules/eslint/bin/eslint.js .",
-    "test": "node ../../node_modules/jest/bin/jest.js --passWithNoTests",
-    "test:prepush": "node ../../node_modules/jest/bin/jest.js --changedSince=origin/main --passWithNoTests",
-    "test:watch": "node ../../node_modules/jest/bin/jest.js --watch --passWithNoTests",
-    "test:cov": "node ../../node_modules/jest/bin/jest.js --coverage --passWithNoTests",
+    "lint": "eslint .",
+    "test": "jest --passWithNoTests",
+    "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
+    "test:watch": "jest --watch --passWithNoTests",
+    "test:cov": "jest --coverage --passWithNoTests",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
     "@sd/util-config": "workspace:*",
-    "@types/jest": "^30.0.0",
-    "jest": "^30.4.2",
+    "@types/jest": "catalog:",
+    "jest": "catalog:",
     "rimraf": "^6.0.0",
     "ts-jest": "catalog:"
   }

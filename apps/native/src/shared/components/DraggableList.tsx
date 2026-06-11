@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useRef } from "react";
-import { View, FlatList, Pressable, StyleSheet, ViewStyle, LayoutChangeEvent } from "react-native";
+import { View, FlatList, Pressable, StyleSheet } from "react-native";
+import type { ViewStyle, LayoutChangeEvent } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
 
 export interface RenderItemParams<T> {
@@ -92,7 +93,7 @@ export function DraggableList<T>({
   const handleItemLayout = useCallback(
     (index: number, event: LayoutChangeEvent) => {
       const { y, height } = event.nativeEvent.layout;
-      const key = keyExtractor(data[index], index);
+      const key = keyExtractor(data[index]!, index);
       itemHeights.current.set(key, height);
 
       const newLayouts = new Map(layouts);
@@ -114,13 +115,13 @@ export function DraggableList<T>({
       draggedItemOffsetY.value = 0;
 
       let toIndex = fromIndex;
-      const draggedKey = keyExtractor(data[fromIndex], fromIndex);
+      const draggedKey = keyExtractor(data[fromIndex]!, fromIndex);
       const draggedLayout = layouts.get(draggedKey);
 
       if (draggedLayout) {
         let cumulativeY = 0;
         for (let i = 0; i < data.length; i++) {
-          const key = keyExtractor(data[i], i);
+          const key = keyExtractor(data[i]!, i);
           const itemHeight = itemHeights.current.get(key) || estimatedItemSize;
 
           if (draggedLayout.y + draggedLayout.height / 2 < cumulativeY + itemHeight / 2) {
@@ -135,7 +136,7 @@ export function DraggableList<T>({
       if (toIndex !== fromIndex) {
         const newData = [...data];
         const [draggedItem] = newData.splice(fromIndex, 1);
-        newData.splice(toIndex, 0, draggedItem);
+        newData.splice(toIndex, 0, draggedItem!);
 
         onDragEnd({
           data: newData,

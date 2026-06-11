@@ -26,11 +26,11 @@
     "clean": "rimraf dist",
     "build": "tsup src/index.ts --format esm,cjs --dts --tsconfig tsconfig.build.json --out-dir dist && node -e \"require('fs').cpSync('src/locales', 'dist/locales', {recursive:true})\"",
     "dev": "pnpm build --watch",
-    "lint": "node ../../node_modules/eslint/bin/eslint.js .",
-    "test": "node ../../node_modules/jest/bin/jest.js --passWithNoTests",
-    "test:watch": "node ../../node_modules/jest/bin/jest.js --watch",
-    "test:cov": "node ../../node_modules/jest/bin/jest.js --coverage",
-    "test:prepush": "node ../../node_modules/jest/bin/jest.js --changedSince=origin/main --passWithNoTests",
+    "lint": "eslint .",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
@@ -39,8 +39,8 @@
   },
   "devDependencies": {
     "@sd/util-config": "workspace:*",
-    "@types/jest": "^30.0.0",
-    "jest": "^30.4.2",
+    "@types/jest": "catalog:",
+    "jest": "catalog:",
     "rimraf": "^6.0.0",
     "ts-jest": "catalog:",
     "tsup": "^8.0.0"

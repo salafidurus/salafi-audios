@@ -5,7 +5,10 @@ import { useProgressStore } from "./progress.store";
 let syncTimeout: ReturnType<typeof setTimeout> | null = null;
 const SYNC_DEBOUNCE_MS = 5000;
 
-const pendingUpdates = new Map<string, { lectureId: string; positionSeconds: number; durationSeconds: number }>();
+const pendingUpdates = new Map<
+  string,
+  { lectureId: string; positionSeconds: number; durationSeconds: number }
+>();
 
 function flushPending() {
   const updates = Array.from(pendingUpdates.values());
@@ -30,7 +33,11 @@ function flushPending() {
  * Multiple calls for the same lectureId within the debounce window
  * are collapsed into a single request.
  */
-export function syncProgressToBackend(update: { lectureId: string; positionSeconds: number; durationSeconds: number }) {
+export function syncProgressToBackend(update: {
+  lectureId: string;
+  positionSeconds: number;
+  durationSeconds: number;
+}) {
   pendingUpdates.set(update.lectureId, update);
 
   if (syncTimeout) clearTimeout(syncTimeout);
