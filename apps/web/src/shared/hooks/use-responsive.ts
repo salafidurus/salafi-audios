@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 
 const MOBILE_MAX = 640;
 export const TABLET_MAX = 900;
@@ -32,18 +32,12 @@ export function useResponsive(): ResponsiveState {
 
 /**
  * SSR-safe hook that returns true when the viewport is wider than TABLET_MAX.
- * Always defaults to `true` (desktop) on both server and first client render
- * so hydration never mismatches. Corrects to the real width after mount.
+ * Uses useSyncExternalStore for proper SSR hydration without extra renders.
  */
 export function useIsDesktop(): boolean {
-  const [isDesktop, setIsDesktop] = useState<boolean>(true);
-
-  useEffect(() => {
-    const update = () => setIsDesktop(window.innerWidth > TABLET_MAX);
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, []);
-
-  return isDesktop;
+  return useSyncExternalStore(
+    subscribeToResize,
+    () => window.innerWidth > TABLET_MAX,
+    () => true,
+  );
 }
