@@ -75,6 +75,7 @@ function initFormState(
   };
 }
 
+// react-doctor-disable-next-line react-doctor/no-giant-component
 export function LectureEditModal({
   isOpen,
   onClose,
@@ -220,8 +221,8 @@ export function LectureEditModal({
     if (e.target === e.currentTarget) onClose();
   };
 
-  // react-doctor-disable-next-line react-doctor/no-static-element-interactions, react-doctor/click-events-have-key-events
   return (
+    // react-doctor-disable-next-line react-doctor/no-static-element-interactions, react-doctor/click-events-have-key-events
     <div className={styles.overlay} onClick={handleOverlayClick}>
       <div className={styles.modal}>
         <div className={styles.header}>
