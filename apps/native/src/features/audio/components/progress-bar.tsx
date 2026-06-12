@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { View, StyleSheet, Pressable } from "react-native";
 import type { GestureResponderEvent } from "react-native";
 import { useAudio } from "@sd/domain-audio";
-import { audioService } from "../index";
+import { audioService } from "../audio-service";
 
 export function ProgressBar() {
   const { durationSeconds, progressPercent } = useAudio();

@@ -2,6 +2,8 @@ packages:
   - apps/*
   - packages/*
 
+nodeLinker: hoisted
+
 # pnpm 11: allowBuilds replaces onlyBuiltDependencies.
 # true  = allow build scripts (was in the old whitelist)
 # false = block build scripts

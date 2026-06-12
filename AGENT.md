@@ -132,7 +132,8 @@ Web (`apps/web`):
 
 - Install: `pnpm i`
 - Dev: `pnpm dev`
-- Dev one app: `pnpm dev:api`, `pnpm dev:web`, `pnpm dev:mobile`, `pnpm dev:native`
+- Dev one app: `pnpm dev:api`, `pnpm dev:web`, `pnpm dev:native`
+- Native build: `pnpm dev:native:build` (no clean), `pnpm dev:native:clean-build` (prebuild --clean first); `:android`/`:ios` variants exist
 - Build: `pnpm build`
 - Lint: `pnpm lint`
 - Typecheck: `pnpm typecheck`

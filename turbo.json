@@ -1,10 +1,12 @@
 {
-  "$schema": "https://turbo.build/schema.json",
+  "$schema": "https://turborepo.dev/schema.v2.json",
   "ui": "tui",
   // Prisma client generation needs DB URLs at build time; pass them through to all tasks
   "globalPassThroughEnv": ["DIRECT_DB_URL", "DATABASE_URL"],
   "tasks": {
     "dev": {
+      // Build workspace dependencies first (cached) so dist/ exports resolve
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     },
@@ -66,18 +68,6 @@
       "dependsOn": ["^contract"],
       "inputs": ["$TURBO_DEFAULT$", "src/**", "package.json", "tsconfig*.json"],
       "outputs": ["dist/**"]
-    },
-    "dev:mobile:prebuild": {
-      // Packages must be built first so native module linking resolves correctly
-      "dependsOn": ["^build"],
-      "cache": false,
-      "persistent": true
-    },
-    "dev:native:prebuild": {
-      // Packages must be built first so native module linking resolves correctly
-      "dependsOn": ["^build"],
-      "cache": false,
-      "persistent": true
     },
     "clean": {
       "cache": false
