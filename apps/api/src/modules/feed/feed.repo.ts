@@ -33,9 +33,9 @@ export class FeedRepo {
       ...(topicSlugs?.length && {
         topics: {
           some: {
-            topic: { slug: { in: topicSlugs } }
-          }
-        }
+            topic: { slug: { in: topicSlugs } },
+          },
+        },
       }),
     };
 
@@ -49,10 +49,10 @@ export class FeedRepo {
         topics: {
           include: {
             topic: {
-              select: { name: true, slug: true }
-            }
-          }
-        }
+              select: { name: true, slug: true },
+            },
+          },
+        },
       },
       orderBy: [{ publishedAt: 'desc' }, { createdAt: 'desc' }],
       take: limit + 1,
@@ -80,7 +80,7 @@ export class FeedRepo {
     let topicRowInjected = false;
 
     for (let i = 0; i < contentItems.length; i++) {
-      items.push(contentItems[i]);
+      items.push(contentItems[i]!);
 
       // Inject scholar row after 3rd item
       if (!scholarRowInjected && i === 3 && scholarRow.length > 0) {
@@ -90,7 +90,7 @@ export class FeedRepo {
 
       // Inject topic row after 7th item if we have topic suggestions
       if (!topicRowInjected && i === 7 && topicSlugs?.length) {
-        const topicRow = await this.getTopicRowItems(topicSlugs[0]);
+        const topicRow = await this.getTopicRowItems(topicSlugs[0]!);
         if (topicRow) {
           items.push(topicRow);
           topicRowInjected = true;
@@ -149,11 +149,13 @@ export class FeedRepo {
     }));
   }
 
-  private async getTopicRowItems(topicSlug: string): Promise<FeedTopicRowDto | null> {
+  private async getTopicRowItems(
+    topicSlug: string,
+  ): Promise<FeedTopicRowDto | null> {
     // Get the topic name
     const topic = await this.prisma.topic.findUnique({
       where: { slug: topicSlug },
-      select: { name: true }
+      select: { name: true },
     });
 
     if (!topic) return null;
@@ -166,20 +168,20 @@ export class FeedRepo {
         scholar: { isActive: true },
         topics: {
           some: {
-            topic: { slug: topicSlug }
-          }
-        }
+            topic: { slug: topicSlug },
+          },
+        },
       },
       include: {
         scholar: {
-          select: { name: true, slug: true }
-        }
+          select: { name: true, slug: true },
+        },
       },
       orderBy: { publishedAt: 'desc' },
-      take: 6
+      take: 6,
     });
 
-    const items: ContentSuggestionDto[] = lectures.map(lecture => ({
+    const items: ContentSuggestionDto[] = lectures.map((lecture) => ({
       kind: 'lecture' as const,
       id: lecture.id,
       title: lecture.title,
@@ -195,7 +197,7 @@ export class FeedRepo {
     return {
       kind: 'topic_row' as const,
       topicName: topic.name,
-      items
+      items,
     };
   }
 }

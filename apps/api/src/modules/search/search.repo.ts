@@ -512,7 +512,12 @@ export class SearchRepository {
     query: string,
     includeRelated: boolean,
   ): Prisma.Sql {
-    const clauses = this.fallbackRankingClauses('c."title"', 's."name"', query, includeRelated);
+    const clauses = this.fallbackRankingClauses(
+      'c."title"',
+      's."name"',
+      query,
+      includeRelated,
+    );
 
     clauses.push(
       Prisma.sql`c."publishedLectureCount" DESC NULLS LAST`,
@@ -526,7 +531,12 @@ export class SearchRepository {
     query: string,
     includeRelated: boolean,
   ): Prisma.Sql {
-    const clauses = this.fallbackRankingClauses('se."title"', 's."name"', query, includeRelated);
+    const clauses = this.fallbackRankingClauses(
+      'se."title"',
+      's."name"',
+      query,
+      includeRelated,
+    );
 
     clauses.push(
       Prisma.sql`se."publishedLectureCount" DESC NULLS LAST`,
@@ -540,7 +550,12 @@ export class SearchRepository {
     query: string,
     includeRelated: boolean,
   ): Prisma.Sql {
-    const clauses = this.fallbackRankingClauses('l."title"', 's."name"', query, includeRelated);
+    const clauses = this.fallbackRankingClauses(
+      'l."title"',
+      's."name"',
+      query,
+      includeRelated,
+    );
 
     clauses.push(
       Prisma.sql`l."publishedAt" DESC NULLS LAST`,

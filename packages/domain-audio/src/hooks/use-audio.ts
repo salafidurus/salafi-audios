@@ -1,5 +1,5 @@
-import { usePlaybackStore } from '../store/playback.store';
-import { useProgressStore } from '../progress/progress.store';
+import { usePlaybackStore } from "../store/playback.store";
+import { useProgressStore } from "../progress/progress.store";
 
 export function useAudio() {
   const currentTrack = usePlaybackStore((s) => s.currentTrack);
@@ -9,9 +9,9 @@ export function useAudio() {
   const speed = usePlaybackStore((s) => s.speed);
   const error = usePlaybackStore((s) => s.error);
 
-  const isPlaying = status === 'playing';
-  const isLoading = status === 'loading';
-  const isPaused = status === 'paused';
+  const isPlaying = status === "playing";
+  const isLoading = status === "loading";
+  const isPaused = status === "paused";
   const hasTrack = currentTrack !== null;
 
   const progressPercent = durationSeconds > 0 ? (positionSeconds / durationSeconds) * 100 : 0;

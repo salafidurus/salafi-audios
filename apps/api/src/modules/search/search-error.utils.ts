@@ -10,11 +10,15 @@ const TRIGRAM_ERROR_PATTERNS = [
 
 export function isTrigramSearchFailure(error: unknown): boolean {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    return TRIGRAM_ERROR_PATTERNS.some((pattern) => pattern.test(error.message));
+    return TRIGRAM_ERROR_PATTERNS.some((pattern) =>
+      pattern.test(error.message),
+    );
   }
 
   if (error instanceof Error) {
-    return TRIGRAM_ERROR_PATTERNS.some((pattern) => pattern.test(error.message));
+    return TRIGRAM_ERROR_PATTERNS.some((pattern) =>
+      pattern.test(error.message),
+    );
   }
 
   return false;

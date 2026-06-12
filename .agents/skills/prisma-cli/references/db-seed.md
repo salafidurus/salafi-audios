@@ -26,17 +26,17 @@ prisma db seed [options]
 Configure seed script in `prisma.config.ts`:
 
 ```typescript
-import 'dotenv/config';
-import { defineConfig, env } from 'prisma/config';
+import "dotenv/config";
+import { defineConfig, env } from "prisma/config";
 
 export default defineConfig({
-  schema: 'prisma/schema.prisma',
+  schema: "prisma/schema.prisma",
   migrations: {
-    path: 'prisma/migrations',
-    seed: 'tsx prisma/seed.ts', // Your seed command
+    path: "prisma/migrations",
+    seed: "tsx prisma/seed.ts", // Your seed command
   },
   datasource: {
-    url: env('DATABASE_URL'),
+    url: env("DATABASE_URL"),
   },
 });
 ```
@@ -45,34 +45,34 @@ export default defineConfig({
 
 ```typescript
 // TypeScript with tsx
-seed: 'tsx prisma/seed.ts';
+seed: "tsx prisma/seed.ts";
 
 // TypeScript with ts-node
-seed: 'ts-node prisma/seed.ts';
+seed: "ts-node prisma/seed.ts";
 
 // JavaScript
-seed: 'node prisma/seed.js';
+seed: "node prisma/seed.js";
 ```
 
 ## Seed Script Example
 
 ```typescript
 // prisma/seed.ts
-import { PrismaClient } from '../generated/client';
+import { PrismaClient } from "../generated/client";
 
 const prisma = new PrismaClient();
 
 async function main() {
   // Create users
   const alice = await prisma.user.upsert({
-    where: { email: 'alice@prisma.io' },
+    where: { email: "alice@prisma.io" },
     update: {},
     create: {
-      email: 'alice@prisma.io',
-      name: 'Alice',
+      email: "alice@prisma.io",
+      name: "Alice",
       posts: {
         create: {
-          title: 'Hello World',
+          title: "Hello World",
           published: true,
         },
       },
@@ -80,11 +80,11 @@ async function main() {
   });
 
   const bob = await prisma.user.upsert({
-    where: { email: 'bob@prisma.io' },
+    where: { email: "bob@prisma.io" },
     update: {},
     create: {
-      email: 'bob@prisma.io',
-      name: 'Bob',
+      email: "bob@prisma.io",
+      name: "Bob",
     },
   });
 
@@ -138,14 +138,14 @@ Use `upsert` to make seeds re-runnable:
 ```typescript
 // Good: Can run multiple times
 await prisma.user.upsert({
-  where: { email: 'alice@prisma.io' },
+  where: { email: "alice@prisma.io" },
   update: {}, // Don't change existing
-  create: { email: 'alice@prisma.io', name: 'Alice' },
+  create: { email: "alice@prisma.io", name: "Alice" },
 });
 
 // Bad: Fails on second run
 await prisma.user.create({
-  data: { email: 'alice@prisma.io', name: 'Alice' },
+  data: { email: "alice@prisma.io", name: "Alice" },
 });
 ```
 
@@ -173,11 +173,11 @@ if (count === 0) {
 
 ```typescript
 // prisma/seed.ts
-const env = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV || "development";
 
-if (env === 'development') {
+if (env === "development") {
   await seedDevData();
-} else if (env === 'test') {
+} else if (env === "test") {
   await seedTestData();
 }
 ```

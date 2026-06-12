@@ -5,7 +5,7 @@ import {
   syncSeriesTopics,
   syncLectureTopics,
 } from "./topic-sync";
-import { TopicDef } from "../schema/content-schema";
+import type { TopicDef } from "../schema/content-schema";
 
 // Mock transaction client
 const createMockTx = () => {

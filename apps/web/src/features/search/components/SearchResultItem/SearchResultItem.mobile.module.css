@@ -10,7 +10,9 @@
   cursor: pointer;
   width: 100%;
   text-align: start;
-  transition: background 0.1s, border-color 0.1s;
+  transition:
+    background 0.1s,
+    border-color 0.1s;
 }
 
 .cardPressed {

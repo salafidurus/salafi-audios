@@ -9,9 +9,9 @@ export default [
       "import/resolver": {
         typescript: {
           project: ["./tsconfig.json"],
-          // tsconfigRootDir: "./",
+          extensions: [".js", ".jsx", ".ts", ".tsx", ".json"],
         },
-        node: { extensions: [".js", ".jsx", ".ts", ".tsx"] },
+        node: { extensions: [".js", ".jsx", ".ts", ".tsx", ".json"] },
       },
     },
     rules: {

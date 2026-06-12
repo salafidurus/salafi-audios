@@ -25,9 +25,15 @@ const ADMIN_SECTIONS: AdminSection[] = [
     permission: "manage:topics",
   },
   {
+    title: "Lectures",
+    description: "Manage audio recordings, meta data, and ordering",
+    href: "/admin/lectures",
+    permission: "manage:content",
+  },
+  {
     title: "Livestreams",
     description: "Manage live sessions and channel status",
-    href: "/admin/livestreams",
+    href: "/admin/live",
     permission: "manage:livestreams",
   },
   {

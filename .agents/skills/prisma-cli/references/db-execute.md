@@ -57,7 +57,7 @@ Uses `datasource` from `prisma.config.ts`:
 ```typescript
 export default defineConfig({
   datasource: {
-    url: env('DATABASE_URL'),
+    url: env("DATABASE_URL"),
   },
 });
 ```

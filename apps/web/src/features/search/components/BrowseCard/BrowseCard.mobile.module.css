@@ -16,7 +16,9 @@
   letter-spacing: var(--typo-label-md-letter-spacing);
   font-weight: var(--typo-label-md-font-weight);
   cursor: pointer;
-  transition: background 0.1s, border-color 0.1s;
+  transition:
+    background 0.1s,
+    border-color 0.1s;
 }
 
 .cardPressed {

@@ -20,8 +20,8 @@ This monorepo contains the full system:
 
 Prerequisites:
 
-- Node.js 22.x
-- `pnpm@10.x` (repo pins `pnpm@10.28.1`)
+- Node.js 24.x
+- `pnpm@11.x` (repo pins `pnpm@11.5.3`)
 
 Install and run:
 
@@ -35,8 +35,9 @@ Useful scoped dev commands:
 ```bash
 pnpm dev:api
 pnpm dev:web
-pnpm dev:mobile
 pnpm dev:native
+pnpm dev:native:build        # native build without cleaning (expo run:android)
+pnpm dev:native:clean-build  # prebuild --clean + native build
 ```
 
 ## Monorepo Commands

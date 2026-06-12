@@ -9,22 +9,22 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "node ../../node_modules/jest/bin/jest.js --passWithNoTests",
-    "test:watch": "node ../../node_modules/jest/bin/jest.js --watch --passWithNoTests",
-    "test:cov": "node ../../node_modules/jest/bin/jest.js --coverage --passWithNoTests",
-    "test:prepush": "node ../../node_modules/jest/bin/jest.js --changedSince=origin/main --passWithNoTests"
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch --passWithNoTests",
+    "test:cov": "jest --coverage --passWithNoTests",
+    "test:prepush": "jest --changedSince=origin/main --passWithNoTests"
   },
   "dependencies": {
     "@sd/core-contracts": "workspace:*",
-    "zustand": "^5.0.11"
+    "zustand": "catalog:"
   },
   "peerDependencies": {
     "react": "*"
   },
   "devDependencies": {
-    "@types/jest": "^30.0.0",
-    "jest": "^30.4.2",
+    "@types/jest": "catalog:",
+    "jest": "catalog:",
     "jest-environment-jsdom": "^30.4.1",
-    "ts-jest": "^29.4.11"
+    "ts-jest": "catalog:"
   }
 }

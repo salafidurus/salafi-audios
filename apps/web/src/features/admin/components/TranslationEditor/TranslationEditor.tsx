@@ -53,6 +53,7 @@ export function TranslationEditor({ target, fields, originalValues }: Translatio
         {SUPPORTED_LOCALES.map((locale) => (
           <button
             key={locale}
+            type="button"
             aria-pressed={locale === activeLocale}
             onClick={() => {
               setActiveLocale(locale);
@@ -90,16 +91,16 @@ export function TranslationEditor({ target, fields, originalValues }: Translatio
       </div>
 
       <div>
-        <button onClick={handleSave} disabled={saveTranslation.isPending}>
+        <button type="button" onClick={handleSave} disabled={saveTranslation.isPending}>
           Save draft
         </button>
         {active?.status === "draft" && (
-          <button onClick={handlePublish} disabled={publishTranslation.isPending}>
+          <button type="button" onClick={handlePublish} disabled={publishTranslation.isPending}>
             Publish
           </button>
         )}
         {active?.status === "published" && (
-          <button onClick={handleUnpublish} disabled={unpublishTranslation.isPending}>
+          <button type="button" onClick={handleUnpublish} disabled={unpublishTranslation.isPending}>
             Unpublish
           </button>
         )}

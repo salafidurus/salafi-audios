@@ -11,5 +11,6 @@ export type AccountProfileScreenProps = {
 export function AccountProfileScreen(props: AccountProfileScreenProps) {
   const mobile = <AccountProfileMobileScreen {...props} />;
   const desktop = <AccountProfileDesktopScreen {...props} />;
+  // react-doctor-disable-next-line react-doctor/jsx-no-jsx-as-prop
   return <Responsive mobile={mobile} desktop={desktop} />;
 }

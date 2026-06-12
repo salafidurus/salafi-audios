@@ -1,9 +1,9 @@
 {
-  // util-ingest runs directly in Node.js — use NodeNext for correct CJS/ESM interop
+  // util-ingest: CLI scripts built with tsup for Node.js
   "extends": "../util-config/tsconfig/base.json",
   "compilerOptions": {
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "noEmit": true,
     "types": ["node", "jest"]
   },

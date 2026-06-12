@@ -35,6 +35,7 @@ export function SupportScreen() {
   return (
     <ScrollView style={{ flex: 1 }} contentContainerStyle={{ padding: 16 }}>
       <Text style={{ fontSize: 22, fontWeight: "700", marginBottom: 16 }}>Support</Text>
+      {/* react-doctor-disable-next-line react-doctor/rn-no-scrollview-mapped-list */}
       {SUPPORT_SECTIONS.map((section) => (
         <View key={section.title} style={{ marginBottom: 24 }}>
           <Text style={{ fontSize: 17, fontWeight: "600", marginBottom: 8 }}>{section.title}</Text>

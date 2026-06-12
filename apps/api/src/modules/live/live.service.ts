@@ -220,6 +220,10 @@ export class LiveService {
     return dto;
   }
 
+  async listChannels(): Promise<LivestreamChannelDto[]> {
+    return this.repo.listChannels();
+  }
+
   async getSessionPublic(id: string): Promise<LiveSessionPublicDto | null> {
     const session = await this.repo.findSessionPublicById(id);
     if (!session) return null;

@@ -1,6 +1,18 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import type { ContentSuggestionDto } from "@sd/core-contracts";
+
+const itemButtonStyle: CSSProperties = {
+  minWidth: 200,
+  padding: 12,
+  border: "1px solid var(--border-default)",
+  borderRadius: 8,
+  backgroundColor: "var(--surface-default)",
+  cursor: "pointer",
+  transition: "box-shadow 0.2s ease",
+  textAlign: "left",
+};
 
 export type FeedTopicRowProps = {
   topicName: string;
@@ -37,16 +49,7 @@ export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProp
           <button
             key={item.id}
             type="button"
-            style={{
-              minWidth: 200,
-              padding: 12,
-              border: "1px solid var(--border-default)",
-              borderRadius: 8,
-              backgroundColor: "var(--surface-default)",
-              cursor: "pointer",
-              transition: "box-shadow 0.2s ease",
-              textAlign: "left",
-            }}
+            style={itemButtonStyle}
             onClick={() => onItemPress?.(item.slug)}
             onFocus={(e) => {
               e.currentTarget.style.boxShadow = "var(--shadow-sm)";

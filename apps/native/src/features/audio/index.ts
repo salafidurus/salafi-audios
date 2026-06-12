@@ -1,8 +1,5 @@
-import { DurusAudioService } from '@sd/domain-audio';
-import { ExpoAudioAdapter } from './engine/expo-audio.adapter';
-
-// Expose the global singleton to be imported directly by any component in the native app
-export const audioService = new DurusAudioService(new ExpoAudioAdapter());
+// Re-export the audio service singleton
+export { audioService } from "./audio-service";
 
 // Export UI components
-export { MiniPlayer } from './components/mini-player';
+export { MiniPlayer } from "./components/mini-player";

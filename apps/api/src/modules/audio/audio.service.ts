@@ -8,11 +8,12 @@ import { AudioRepository } from './audio.repo';
 
 @Injectable()
 export class AudioService {
-  constructor(
-    private readonly repo: AudioRepository,
-  ) {}
+  constructor(private readonly repo: AudioRepository) {}
 
-  async getUserProgress(userId: string, since?: string): Promise<AudioProgressDto[]> {
+  async getUserProgress(
+    userId: string,
+    since?: string,
+  ): Promise<AudioProgressDto[]> {
     const sinceDate = since ? new Date(since) : undefined;
     return this.repo.getUserProgress(userId, sinceDate);
   }
@@ -54,7 +55,9 @@ export class AudioService {
     }
 
     if (!asset) {
-      throw new NotFoundException(`No audio assets found for lecture ${lectureId}`);
+      throw new NotFoundException(
+        `No audio assets found for lecture ${lectureId}`,
+      );
     }
 
     return {

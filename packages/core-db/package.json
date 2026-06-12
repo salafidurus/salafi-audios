@@ -22,33 +22,33 @@
     }
   },
   "scripts": {
-    "lint": "node ../../node_modules/eslint/bin/eslint.js .",
-    "test": "node ../../node_modules/jest/bin/jest.js --passWithNoTests",
-    "test:watch": "node ../../node_modules/jest/bin/jest.js --watch",
-    "test:cov": "node ../../node_modules/jest/bin/jest.js --coverage",
-    "test:prepush": "node ../../node_modules/jest/bin/jest.js --changedSince=origin/main --passWithNoTests",
+    "lint": "eslint .",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
     "pretypecheck": "pnpm prisma:generate",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "prisma:generate": "node ../../node_modules/prisma/build/index.js generate --schema=./prisma/schema.prisma --config=./prisma.config.ts && node ./scripts/copy-generated-to-dist.js",
-    "prisma:format": "node ../../node_modules/prisma/build/index.js format --schema=./prisma/schema.prisma --config=./prisma.config.ts",
-    "prisma:validate": "node ../../node_modules/prisma/build/index.js validate --schema=./prisma/schema.prisma --config=./prisma.config.ts",
+    "prisma:generate": "prisma generate --schema=./prisma/schema.prisma --config=./prisma.config.ts && node ./scripts/copy-generated-to-dist.js",
+    "prisma:format": "prisma format --schema=./prisma/schema.prisma --config=./prisma.config.ts",
+    "prisma:validate": "prisma validate --schema=./prisma/schema.prisma --config=./prisma.config.ts",
     "migrate:create-only": "node ./scripts/migrate-with-auto-name.js",
-    "migrate:deploy": "node ../../node_modules/prisma/build/index.js migrate deploy --schema=./prisma/schema.prisma --config=./prisma.config.ts",
+    "migrate:deploy": "prisma migrate deploy --schema=./prisma/schema.prisma --config=./prisma.config.ts",
     "build": "pnpm prisma:generate && tsup src/index.ts --format esm,cjs --out-dir dist && node ./scripts/copy-generated-to-dist.js && tsc -p tsconfig.build.json",
     "dev": "pnpm build --watch"
   },
   "dependencies": {
-    "@prisma/client": "^7.3.0",
+    "@prisma/client": "catalog:",
     "@prisma/client-runtime-utils": "^7.3.0"
   },
   "devDependencies": {
     "@sd/util-config": "workspace:*",
-    "@types/jest": "^30.0.0",
+    "@types/jest": "catalog:",
     "dotenv": "^16.4.5",
-    "jest": "^30.4.2",
+    "jest": "catalog:",
     "pg": "^8.0.0",
     "prisma": "^7.3.0",
-    "ts-jest": "^29.4.11",
+    "ts-jest": "catalog:",
     "tsup": "^8.0.0"
   }
 }

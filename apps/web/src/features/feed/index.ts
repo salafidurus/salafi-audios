@@ -7,25 +7,16 @@ export {
   FeedScholarRow,
   type FeedScholarRowProps,
 } from "./components/feed-scholar-row/feed-scholar-row";
-export {
-  FeedTopicRow,
-  type FeedTopicRowProps,
-} from "./components/feed-topic-row/feed-topic-row";
+export { FeedTopicRow, type FeedTopicRowProps } from "./components/feed-topic-row/feed-topic-row";
 
 // Screens
 export { FeedScreen, type FeedScreenProps } from "./screens/feed.screen";
-export {
-  FeedRecentScreen,
-  type FeedRecentScreenProps,
-} from "./screens/feed-recent.screen";
+export { FeedRecentScreen, type FeedRecentScreenProps } from "./screens/feed-recent.screen";
 export {
   FeedDesktopScreen,
   type FeedDesktopScreenProps,
 } from "./screens/feed-recent.screen.desktop";
-export {
-  FeedMobileScreen,
-  type FeedMobileScreenProps,
-} from "./screens/feed-recent.screen.mobile";
+export { FeedMobileScreen, type FeedMobileScreenProps } from "./screens/feed-recent.screen.mobile";
 export {
   FeedFollowingScreen,
   type FeedFollowingScreenProps,

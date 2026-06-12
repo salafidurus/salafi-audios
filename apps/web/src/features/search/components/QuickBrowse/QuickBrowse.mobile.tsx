@@ -135,5 +135,3 @@ export function QuickBrowseMobile({
     </div>
   );
 }
-
-

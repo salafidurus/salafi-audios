@@ -28,9 +28,7 @@ const mockLiveService = {
 describe('LiveController — auth boundaries', () => {
   let app: INestApplication;
 
-  beforeEach(async () => {
-    mockAuth.api.getSession.mockReset();
-
+  beforeAll(async () => {
     const module = await Test.createTestingModule({
       controllers: [LiveController, AdminLiveController],
       providers: [
@@ -52,7 +50,11 @@ describe('LiveController — auth boundaries', () => {
     await app.init();
   });
 
-  afterEach(() => app.close());
+  beforeEach(() => {
+    mockAuth.api.getSession.mockReset();
+  });
+
+  afterAll(() => app.close());
 
   describe('public endpoints', () => {
     it('GET /live/channels returns 200 without auth', () => {

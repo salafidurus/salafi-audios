@@ -3,7 +3,7 @@ import { View, StyleSheet, Pressable, Text, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import { useAudio } from "@sd/domain-audio";
-import { audioService } from "../index";
+import { audioService } from "../audio-service";
 import { Play, Pause, ChevronDown } from "lucide-react-native";
 import { ProgressBar } from "./progress-bar";
 import { PlaybackControls } from "./playback-controls";
@@ -22,12 +22,9 @@ export function MiniPlayer() {
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const PauseIcon = <Pause {...({ size: 20, color: "#1E293B", fill: "#1E293B" } as any)} />;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const PlayIcon = <Play {...({ size: 20, color: "#1E293B", fill: "#1E293B" } as any)} />;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const ChevronDownIcon = <ChevronDown {...({ size: 28, color: "#1E293B" } as any)} />;
+  const PauseIcon = <Pause size={20} color="#1E293B" fill="#1E293B" />;
+  const PlayIcon = <Play size={20} color="#1E293B" fill="#1E293B" />;
+  const ChevronDownIcon = <ChevronDown size={28} color="#1E293B" />;
 
   return (
     <>

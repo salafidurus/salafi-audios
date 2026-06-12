@@ -8,6 +8,7 @@ import type {
 } from '@sd/core-contracts';
 import { LecturesRepository } from './lectures.repo';
 import { LecturesService } from './lectures.service';
+import type { CreateLectureDto } from './dto/create-lecture.dto';
 
 describe('LecturesService', () => {
   let service: LecturesService;
@@ -60,6 +61,10 @@ describe('LecturesService', () => {
             findRelated: jest.fn(),
             updateLecture: jest.fn(),
             updateLectureStatus: jest.fn(),
+            listAdmin: jest.fn(),
+            findAdminDetail: jest.fn(),
+            createWithAudioAsset: jest.fn(),
+            bulkUpdateStatus: jest.fn(),
           } satisfies Partial<jest.Mocked<LecturesRepository>>,
         },
       ],
@@ -77,7 +82,9 @@ describe('LecturesService', () => {
     it('returns lecture detail when found', async () => {
       repo.findDetailById.mockResolvedValue(lectureDetail);
 
-      await expect(service.getById('lecture-1')).resolves.toEqual(lectureDetail);
+      await expect(service.getById('lecture-1')).resolves.toEqual(
+        lectureDetail,
+      );
       expect(repo.findDetailById).toHaveBeenCalledWith('lecture-1');
     });
 
@@ -94,7 +101,9 @@ describe('LecturesService', () => {
     it('returns related lectures from the repository', async () => {
       repo.findRelated.mockResolvedValue(relatedLectures);
 
-      await expect(service.getRelated('lecture-1')).resolves.toEqual(relatedLectures);
+      await expect(service.getRelated('lecture-1')).resolves.toEqual(
+        relatedLectures,
+      );
       expect(repo.findRelated).toHaveBeenCalledWith('lecture-1');
     });
   });
@@ -163,6 +172,81 @@ describe('LecturesService', () => {
       await expect(service.archiveLecture('missing')).rejects.toThrow(
         new NotFoundException('Lecture "missing" not found'),
       );
+    });
+  });
+
+  describe('listAdmin', () => {
+    it('returns paginated lecture list with scholar name', async () => {
+      repo.listAdmin.mockResolvedValue({
+        items: [
+          {
+            id: '1',
+            title: 'Test Lecture',
+            scholarName: 'Sheikh Test',
+            status: 'published',
+            durationSeconds: 3600,
+            orderIndex: 1,
+            createdAt: new Date().toISOString(),
+          },
+        ],
+        total: 1,
+        page: 1,
+      });
+
+      const result = await service.listAdmin({
+        page: 1,
+        scholarId: undefined,
+        status: undefined,
+      });
+      expect(result.items).toHaveLength(1);
+      expect(result.items[0]!.scholarName).toBe('Sheikh Test');
+    });
+  });
+
+  describe('createLecture', () => {
+    it('creates lecture and audio asset in a transaction', async () => {
+      repo.createWithAudioAsset.mockResolvedValue({
+        id: 'new-id',
+        title: 'New Lecture',
+      });
+      const dto: CreateLectureDto & { publicUrl: string } = {
+        title: 'New Lecture',
+        scholarId: 'scholar-1',
+        audioKey: 'audio/abc-file.mp3',
+        publicUrl: 'https://cdn.example.com/audio/abc-file.mp3',
+      };
+      const result = await service.createLecture(dto);
+      expect(result.id).toBe('new-id');
+      expect(repo.createWithAudioAsset).toHaveBeenCalledWith(
+        expect.objectContaining({ audioKey: 'audio/abc-file.mp3' }),
+      );
+    });
+  });
+
+  describe('bulkAction', () => {
+    it('publishes multiple lectures and returns succeeded ids', async () => {
+      repo.bulkUpdateStatus.mockResolvedValue({
+        succeeded: ['1', '2'],
+        failed: [],
+      });
+      const result = await service.bulkAction({
+        action: 'publish',
+        ids: ['1', '2'],
+      });
+      expect(result.succeeded).toEqual(['1', '2']);
+      expect(result.failed).toEqual([]);
+    });
+
+    it('returns failed ids when a lecture is not found', async () => {
+      repo.bulkUpdateStatus.mockResolvedValue({
+        succeeded: ['1'],
+        failed: ['missing'],
+      });
+      const result = await service.bulkAction({
+        action: 'archive',
+        ids: ['1', 'missing'],
+      });
+      expect(result.failed).toContain('missing');
     });
   });
 });

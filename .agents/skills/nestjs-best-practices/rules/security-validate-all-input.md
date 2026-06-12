@@ -13,7 +13,7 @@ Always validate incoming data using class-validator decorators on DTOs and the g
 
 ```typescript
 // Trust raw input without validation
-@Controller('users')
+@Controller("users")
 export class UsersController {
   @Post()
   create(@Body() body: any) {
@@ -69,8 +69,8 @@ import {
   MaxLength,
   Matches,
   IsNotEmpty,
-} from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+} from "class-validator";
+import { Transform, Type } from "class-transformer";
 
 export class CreateUserDto {
   @IsString()
@@ -93,7 +93,7 @@ export class CreateUserDto {
   @MinLength(8)
   @MaxLength(100)
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, {
-    message: 'Password must contain uppercase, lowercase, and number',
+    message: "Password must contain uppercase, lowercase, and number",
   })
   password: string;
 }
@@ -121,11 +121,11 @@ export class FindUsersQueryDto {
 
 // Param validation
 export class UserIdParamDto {
-  @IsUUID('4')
+  @IsUUID("4")
   id: string;
 }
 
-@Controller('users')
+@Controller("users")
 export class UsersController {
   @Post()
   create(@Body() dto: CreateUserDto): Promise<User> {
@@ -139,7 +139,7 @@ export class UsersController {
     return this.usersService.findAll(query);
   }
 
-  @Get(':id')
+  @Get(":id")
   findOne(@Param() params: UserIdParamDto): Promise<User> {
     // params.id is a valid UUID
     return this.usersService.findById(params.id);

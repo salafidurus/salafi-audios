@@ -29,7 +29,7 @@ permissions:
   contents: read
 
 env:
-  NODE_VERSION: "22"
+  NODE_VERSION: "24"
   # Custom Playwright path enables GitHub Actions caching (default path is not cacheable)
   PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/ms-playwright
   # Turbo Remote Cache credentials — shared cache across CI runs
@@ -157,7 +157,7 @@ jobs:
           name: build-outputs
 
       - name: Lint
-        run: pnpm lint
+        run: pnpm turbo lint --continue
 
   typecheck:
     name: typecheck
@@ -191,7 +191,7 @@ jobs:
           name: build-outputs
 
       - name: Typecheck
-        run: pnpm typecheck
+        run: pnpm turbo typecheck --continue
 
   test:
     name: test
@@ -227,7 +227,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Unit tests
-        run: pnpm test
+        run: pnpm turbo test --continue
 
   e2e_web:
     name: e2e:web

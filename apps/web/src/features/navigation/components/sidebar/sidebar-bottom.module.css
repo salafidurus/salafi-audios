@@ -2,9 +2,7 @@
   position: fixed;
   inset-inline: 0;
   bottom: 0;
-  padding:
-    var(--space-component-gap-sm)
-    var(--space-layout-page-x)
+  padding: var(--space-component-gap-sm) var(--space-layout-page-x)
     calc(var(--space-component-gap-sm) + env(safe-area-inset-bottom, 0px));
   display: flex;
   align-items: center;

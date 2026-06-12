@@ -1,3 +1,4 @@
+// react-doctor-disable-next-line react-doctor/nextjs-missing-metadata
 "use client";
 
 import { Suspense } from "react";

@@ -28,8 +28,6 @@ export function ScreenView({
   );
 }
 
-
-
 function getBackgroundVariant(variant: ScreenViewProps["backgroundVariant"]): React.CSSProperties {
   switch (variant) {
     case "primaryWash":

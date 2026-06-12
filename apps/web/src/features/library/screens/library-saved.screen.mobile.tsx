@@ -1,5 +1,6 @@
 "use client";
 
+import type React from "react";
 import type { LibraryItemDto } from "@sd/core-contracts";
 import {
   useLibrarySavedScreen,
@@ -23,6 +24,17 @@ function ProgressBar({ percent }: { percent: number }) {
   );
 }
 
+const libraryItemButtonStyle: React.CSSProperties = {
+  display: "block",
+  width: "100%",
+  textAlign: "left",
+  padding: 12,
+  borderBottom: "1px solid #eee",
+  cursor: "pointer",
+  background: "none",
+  border: "none",
+};
+
 function LibraryItem({
   item,
   onPress,
@@ -38,17 +50,7 @@ function LibraryItem({
       : null;
 
   return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={onPress}
-      onKeyDown={(e) => e.key === "Enter" && onPress?.()}
-      style={{
-        padding: 12,
-        borderBottom: "1px solid #eee",
-        cursor: "pointer",
-      }}
-    >
+    <button type="button" onClick={onPress} style={libraryItemButtonStyle}>
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
         {variant === "completed" && <span style={{ color: "#16a34a", fontSize: 12 }}>✓</span>}
         <span style={{ fontSize: 15, fontWeight: 600 }}>{item.lectureTitle}</span>
@@ -68,7 +70,7 @@ function LibraryItem({
           ` · ${new Date(item.completedAt).toLocaleDateString()}`}
       </div>
       {variant === "progress" && progress !== null && <ProgressBar percent={progress} />}
-    </div>
+    </button>
   );
 }
 

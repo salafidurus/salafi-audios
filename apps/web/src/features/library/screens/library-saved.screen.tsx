@@ -11,5 +11,6 @@ export type LibrarySavedScreenProps = {
 export function LibrarySavedScreen(props: LibrarySavedScreenProps) {
   const mobile = <LibrarySavedMobileScreen {...props} />;
   const desktop = <LibrarySavedDesktopScreen {...props} />;
+  // react-doctor-disable-next-line react-doctor/jsx-no-jsx-as-prop
   return <Responsive mobile={mobile} desktop={desktop} />;
 }

@@ -12,8 +12,7 @@
   "scripts": {
     "dev": "tsc -p tsconfig.json --noEmit --watch",
     "build": "tsc -p tsconfig.build.json",
-    "typecheck": "tsc --noEmit",
-    "type-check": "tsc --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@sd/core-contracts": "workspace:*"

@@ -1,12 +1,16 @@
 {
   "compilerOptions": {
-    // ES2022 enables top-level await and class fields without downleveling
+    // target ES2022 for broad compat; lib ES2024 exposes all modern built-ins without a runtime bump
     "target": "ES2022",
-    "lib": ["ES2022", "DOM"],
+    "lib": ["ES2024", "DOM"],
     "strict": true,
     // Skip .d.ts validation in node_modules — speeds up compilation significantly
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    // Forces explicit `import type` for type-only imports — required for correct bundler output
+    "verbatimModuleSyntax": true,
+    // Array index / object key access returns T | undefined — prevents common runtime crashes
+    "noUncheckedIndexedAccess": true
   }
 }

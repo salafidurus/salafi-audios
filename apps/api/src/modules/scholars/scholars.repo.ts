@@ -1,6 +1,6 @@
 import { PrismaService } from '../../shared/db/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { Status } from '@sd/core-db';
+import { Status, Locale as DbLocale } from '@sd/core-db';
 import type {
   ScholarListItemDto,
   ScholarDetailDto,
@@ -10,12 +10,22 @@ import type {
   LectureSummaryDto,
   TranslationViewDto,
   Locale,
+  AdminSeriesListItemDto,
+  AdminSeriesDetailDto,
+  AdminCollectionListItemDto,
+  AdminCollectionDetailDto,
+  BulkActionResultDto,
+  StatusValue,
 } from '@sd/core-contracts';
 import type { CreateScholarDto } from './dto/create-scholar.dto';
 import type { UpdateScholarDto } from './dto/update-scholar.dto';
 import type { SaveScholarTranslationDto } from './dto/save-scholar-translation.dto';
 import type { SaveSeriesTranslationDto } from './dto/save-series-translation.dto';
 import type { SaveCollectionTranslationDto } from './dto/save-collection-translation.dto';
+import type { CreateSeriesDto } from './dto/create-series.dto';
+import type { UpdateSeriesDto } from './dto/update-series.dto';
+import type { CreateCollectionDto } from './dto/create-collection.dto';
+import type { UpdateCollectionDto } from './dto/update-collection.dto';
 
 @Injectable()
 export class ScholarsRepository {
@@ -535,5 +545,225 @@ export class ScholarsRepository {
       durationSeconds: r.durationSeconds ?? undefined,
       publishedAt: r.publishedAt?.toISOString(),
     }));
+  }
+
+  // ─── Admin Series Methods ──────────────────────────────────────────────────
+
+  async listAdminSeries(scholarId: string): Promise<AdminSeriesListItemDto[]> {
+    const records = await this.prisma.series.findMany({
+      where: { scholarId, deletedAt: null },
+      orderBy: [{ orderIndex: 'asc' }, { createdAt: 'asc' }],
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        orderIndex: true,
+        _count: {
+          select: {
+            lectures: { where: { status: Status.published, deletedAt: null } },
+          },
+        },
+      },
+    });
+    return records.map((r) => ({
+      id: r.id,
+      title: r.title,
+      status: r.status as StatusValue,
+      publishedLectureCount: r._count.lectures,
+      orderIndex: r.orderIndex ?? undefined,
+    }));
+  }
+
+  async findAdminSeriesDetail(
+    id: string,
+  ): Promise<AdminSeriesDetailDto | null> {
+    const record = await this.prisma.series.findFirst({
+      where: { id, deletedAt: null },
+      select: {
+        id: true,
+        scholarId: true,
+        title: true,
+        description: true,
+        coverImageUrl: true,
+        language: true,
+        status: true,
+        orderIndex: true,
+      },
+    });
+    if (!record) return null;
+    return {
+      ...record,
+      status: record.status as StatusValue,
+      description: record.description ?? undefined,
+      coverImageUrl: record.coverImageUrl ?? undefined,
+      language: record.language ?? undefined,
+      orderIndex: record.orderIndex ?? undefined,
+    };
+  }
+
+  async createSeries(dto: CreateSeriesDto): Promise<{ id: string }> {
+    return this.prisma.series.create({
+      data: {
+        scholarId: dto.scholarId,
+        title: dto.title,
+        slug: dto.title.toLowerCase().replace(/\s+/g, '-'),
+        description: dto.description,
+        coverImageUrl: dto.coverImageUrl,
+        language: dto.language as DbLocale | undefined,
+        orderIndex: dto.orderIndex,
+        status: Status.draft,
+      },
+      select: { id: true },
+    });
+  }
+
+  async updateSeries(
+    id: string,
+    dto: UpdateSeriesDto,
+  ): Promise<{ id: string } | null> {
+    try {
+      return await this.prisma.series.update({
+        where: { id, deletedAt: null },
+        data: {
+          ...dto,
+          language: dto.language as DbLocale | undefined,
+        },
+        select: { id: true },
+      });
+    } catch {
+      return null;
+    }
+  }
+
+  async updateSeriesStatus(id: string, status: Status): Promise<boolean> {
+    const result = await this.prisma.series.updateMany({
+      where: { id, deletedAt: null },
+      data: { status },
+    });
+    return result.count > 0;
+  }
+
+  async bulkUpdateSeriesStatus(
+    ids: string[],
+    status: Status,
+  ): Promise<BulkActionResultDto> {
+    const succeeded: string[] = [];
+    const failed: string[] = [];
+    await Promise.all(
+      ids.map(async (id) => {
+        const ok = await this.updateSeriesStatus(id, status);
+        (ok ? succeeded : failed).push(id);
+      }),
+    );
+    return { succeeded, failed };
+  }
+
+  // ─── Admin Collection Methods ──────────────────────────────────────────────
+
+  async listAdminCollections(
+    scholarId: string,
+  ): Promise<AdminCollectionListItemDto[]> {
+    const records = await this.prisma.collection.findMany({
+      where: { scholarId, deletedAt: null },
+      orderBy: [{ orderIndex: 'asc' }, { createdAt: 'asc' }],
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        orderIndex: true,
+        publishedLectureCount: true,
+      },
+    });
+    return records.map((r) => ({
+      id: r.id,
+      title: r.title,
+      status: r.status as StatusValue,
+      publishedLectureCount: r.publishedLectureCount ?? 0,
+      orderIndex: r.orderIndex ?? undefined,
+    }));
+  }
+
+  async findAdminCollectionDetail(
+    id: string,
+  ): Promise<AdminCollectionDetailDto | null> {
+    const record = await this.prisma.collection.findFirst({
+      where: { id, deletedAt: null },
+      select: {
+        id: true,
+        scholarId: true,
+        title: true,
+        description: true,
+        coverImageUrl: true,
+        language: true,
+        status: true,
+        orderIndex: true,
+      },
+    });
+    if (!record) return null;
+    return {
+      ...record,
+      status: record.status as StatusValue,
+      description: record.description ?? undefined,
+      coverImageUrl: record.coverImageUrl ?? undefined,
+      language: record.language ?? undefined,
+      orderIndex: record.orderIndex ?? undefined,
+    };
+  }
+
+  async createCollection(dto: CreateCollectionDto): Promise<{ id: string }> {
+    return this.prisma.collection.create({
+      data: {
+        scholarId: dto.scholarId,
+        title: dto.title,
+        slug: dto.title.toLowerCase().replace(/\s+/g, '-'),
+        description: dto.description,
+        coverImageUrl: dto.coverImageUrl,
+        language: dto.language as DbLocale | undefined,
+        orderIndex: dto.orderIndex,
+        status: Status.draft,
+      },
+      select: { id: true },
+    });
+  }
+
+  async updateCollection(
+    id: string,
+    dto: UpdateCollectionDto,
+  ): Promise<{ id: string } | null> {
+    try {
+      return await this.prisma.collection.update({
+        where: { id, deletedAt: null },
+        data: {
+          ...dto,
+          language: dto.language as DbLocale | undefined,
+        },
+        select: { id: true },
+      });
+    } catch {
+      return null;
+    }
+  }
+
+  async updateCollectionStatus(id: string, status: Status): Promise<boolean> {
+    const result = await this.prisma.collection.updateMany({
+      where: { id, deletedAt: null },
+      data: { status },
+    });
+    return result.count > 0;
+  }
+
+  async bulkUpdateCollectionStatus(
+    ids: string[],
+    status: Status,
+  ): Promise<BulkActionResultDto> {
+    const succeeded: string[] = [];
+    const failed: string[] = [];
+    await Promise.all(
+      ids.map(async (id) => {
+        const ok = await this.updateCollectionStatus(id, status);
+        (ok ? succeeded : failed).push(id);
+      }),
+    );
+    return { succeeded, failed };
   }
 }

@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../shared/db/prisma.service';
-import type {
-  ProgressSyncItemDto,
-  AudioProgressDto,
-} from '@sd/core-contracts';
+import type { ProgressSyncItemDto, AudioProgressDto } from '@sd/core-contracts';
 
 @Injectable()
 export class AudioRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getUserProgress(userId: string, since?: Date): Promise<AudioProgressDto[]> {
+  async getUserProgress(
+    userId: string,
+    since?: Date,
+  ): Promise<AudioProgressDto[]> {
     const progressRecords = await this.prisma.userLectureProgress.findMany({
       where: {
         userId,

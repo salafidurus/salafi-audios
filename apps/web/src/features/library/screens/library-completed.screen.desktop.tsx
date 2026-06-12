@@ -1,5 +1,6 @@
 "use client";
 
+import type React from "react";
 import type { LibraryItemDto } from "@sd/core-contracts";
 import { useLibraryCompletedScreen } from "@sd/domain-content";
 import { useAuth } from "@/core/auth/use-auth";
@@ -8,19 +9,20 @@ export type LibraryCompletedDesktopScreenProps = {
   onNavigateToLecture?: (id: string) => void;
 };
 
+const libraryItemButtonStyle: React.CSSProperties = {
+  display: "block",
+  width: "100%",
+  textAlign: "left",
+  padding: 16,
+  borderBottom: "1px solid #eee",
+  cursor: "pointer",
+  background: "none",
+  border: "none",
+};
+
 function LibraryItem({ item, onPress }: { item: LibraryItemDto; onPress?: () => void }) {
   return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={onPress}
-      onKeyDown={(e) => e.key === "Enter" && onPress?.()}
-      style={{
-        padding: 16,
-        borderBottom: "1px solid #eee",
-        cursor: "pointer",
-      }}
-    >
+    <button type="button" onClick={onPress} style={libraryItemButtonStyle}>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <span style={{ color: "#16a34a", fontSize: 14 }}>✓</span>
         <span style={{ fontSize: 16, fontWeight: 600 }}>{item.lectureTitle}</span>
@@ -33,7 +35,7 @@ function LibraryItem({ item, onPress }: { item: LibraryItemDto; onPress?: () => 
         {item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""}
         {item.completedAt && ` · Completed ${new Date(item.completedAt).toLocaleDateString()}`}
       </div>
-    </div>
+    </button>
   );
 }
 

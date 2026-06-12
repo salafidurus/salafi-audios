@@ -1,11 +1,13 @@
 {
-  "extends": "../../tsconfig.base.json",
+  // Consumed as source by Expo and Next.js bundlers — never run directly by Node.
+  // Extends canonical packages preset (ESNext + Bundler moduleResolution).
+  "extends": "../../packages/util-config/tsconfig/packages.json",
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
+    // react-jsx uses the automatic runtime (React 17+) — no manual React import needed
     "jsx": "react-jsx",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    // Many React Native / Expo packages ship CJS — esModuleInterop enables default imports from them
     "esModuleInterop": true,
     "resolveJsonModule": true
   },

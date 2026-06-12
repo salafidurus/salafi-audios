@@ -151,7 +151,7 @@ function findCommonPrefix(titles: string[]): string | null {
   const common: string[] = [];
 
   for (let index = 0; index < minLength; index += 1) {
-    const word = tokenized[0][index];
+    const word = tokenized[0]![index];
     if (!word) break;
     const lower = word.toLowerCase();
     const allMatch = tokenized.every((words) => words[index]?.toLowerCase() === lower);
@@ -204,7 +204,7 @@ function titleCaseFromSlug(slug: string): string {
     .filter((word) => word.length > 0)
     .map((word) => {
       if (word.toUpperCase() === word && word.length <= 4) return word;
-      return word[0].toUpperCase() + word.slice(1).toLowerCase();
+      return word[0]!.toUpperCase() + word.slice(1).toLowerCase();
     })
     .join(" ");
 }

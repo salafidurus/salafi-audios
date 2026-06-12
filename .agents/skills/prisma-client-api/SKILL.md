@@ -4,7 +4,7 @@ description: Prisma Client API reference covering model queries, filters, operat
 license: MIT
 metadata:
   author: prisma
-  version: '7.0.0'
+  version: "7.0.0"
 ---
 
 # Prisma Client API Reference
@@ -49,8 +49,8 @@ Reference this skill when:
 ## Client Instantiation (v7)
 
 ```typescript
-import { PrismaClient } from '../generated/client';
-import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from "../generated/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
@@ -114,13 +114,13 @@ const prisma = new PrismaClient({ adapter });
 ```typescript
 // Find by unique field
 const user = await prisma.user.findUnique({
-  where: { email: 'alice@prisma.io' },
+  where: { email: "alice@prisma.io" },
 });
 
 // Find with filter
 const users = await prisma.user.findMany({
-  where: { role: 'ADMIN' },
-  orderBy: { createdAt: 'desc' },
+  where: { role: "ADMIN" },
+  orderBy: { createdAt: "desc" },
   take: 10,
 });
 ```
@@ -130,10 +130,10 @@ const users = await prisma.user.findMany({
 ```typescript
 const user = await prisma.user.create({
   data: {
-    email: 'alice@prisma.io',
-    name: 'Alice',
+    email: "alice@prisma.io",
+    name: "Alice",
     posts: {
-      create: { title: 'Hello World' },
+      create: { title: "Hello World" },
     },
   },
   include: { posts: true },
@@ -145,7 +145,7 @@ const user = await prisma.user.create({
 ```typescript
 const user = await prisma.user.update({
   where: { id: 1 },
-  data: { name: 'Alice Smith' },
+  data: { name: "Alice Smith" },
 });
 ```
 
@@ -161,8 +161,8 @@ await prisma.user.delete({
 
 ```typescript
 const [user, post] = await prisma.$transaction([
-  prisma.user.create({ data: { email: 'alice@prisma.io' } }),
-  prisma.post.create({ data: { title: 'Hello', authorId: 1 } }),
+  prisma.user.create({ data: { email: "alice@prisma.io" } }),
+  prisma.post.create({ data: { title: "Hello", authorId: 1 } }),
 ]);
 ```
 

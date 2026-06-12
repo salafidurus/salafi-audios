@@ -74,7 +74,7 @@ describe("httpClient – configured", () => {
 
   it("constructs the correct full URL from baseUrl + url", async () => {
     await httpClient({ url: "/items", method: "GET" });
-    const calledUrl = fetchSpy.mock.calls[0][0] as string;
+    const calledUrl = fetchSpy.mock.calls[0]![0]! as string;
     expect(calledUrl).toBe(`${BASE}/items`);
   });
 
@@ -84,7 +84,7 @@ describe("httpClient – configured", () => {
       method: "GET",
       params: { page: 1, search: "test" },
     });
-    const calledUrl = new URL(fetchSpy.mock.calls[0][0] as string);
+    const calledUrl = new URL(fetchSpy.mock.calls[0]![0]! as string);
     expect(calledUrl.searchParams.get("page")).toBe("1");
     expect(calledUrl.searchParams.get("search")).toBe("test");
   });
@@ -95,7 +95,7 @@ describe("httpClient – configured", () => {
       method: "GET",
       params: { ids: ["a", "b", "c"] },
     });
-    const calledUrl = new URL(fetchSpy.mock.calls[0][0] as string);
+    const calledUrl = new URL(fetchSpy.mock.calls[0]![0]! as string);
     expect(calledUrl.searchParams.getAll("ids")).toEqual(["a", "b", "c"]);
   });
 
@@ -105,7 +105,7 @@ describe("httpClient – configured", () => {
       method: "GET",
       params: { a: undefined, b: null, c: "keep" },
     });
-    const calledUrl = new URL(fetchSpy.mock.calls[0][0] as string);
+    const calledUrl = new URL(fetchSpy.mock.calls[0]![0]! as string);
     expect(calledUrl.searchParams.has("a")).toBe(false);
     expect(calledUrl.searchParams.has("b")).toBe(false);
     expect(calledUrl.searchParams.get("c")).toBe("keep");
@@ -117,7 +117,7 @@ describe("httpClient – configured", () => {
       method: "GET",
       params: { ids: [null, "x", undefined, "y"] },
     });
-    const calledUrl = new URL(fetchSpy.mock.calls[0][0] as string);
+    const calledUrl = new URL(fetchSpy.mock.calls[0]![0]! as string);
     expect(calledUrl.searchParams.getAll("ids")).toEqual(["x", "y"]);
   });
 
@@ -125,7 +125,7 @@ describe("httpClient – configured", () => {
 
   it("sets Content-Type header to application/json", async () => {
     await httpClient({ url: "/items", method: "GET" });
-    const init = fetchSpy.mock.calls[0][1] as RequestInit;
+    const init = fetchSpy.mock.calls[0]![1]! as RequestInit;
     expect((init.headers as Record<string, string>)["Content-Type"]).toBe("application/json");
   });
 
@@ -135,7 +135,7 @@ describe("httpClient – configured", () => {
       getAccessToken: () => "tok_123",
     });
     await httpClient({ url: "/secure", method: "GET" });
-    const init = fetchSpy.mock.calls[0][1] as RequestInit;
+    const init = fetchSpy.mock.calls[0]![1]! as RequestInit;
     expect((init.headers as Record<string, string>)["Authorization"]).toBe("Bearer tok_123");
   });
 
@@ -145,7 +145,7 @@ describe("httpClient – configured", () => {
       getAccessToken: () => undefined,
     });
     await httpClient({ url: "/public", method: "GET" });
-    const init = fetchSpy.mock.calls[0][1] as RequestInit;
+    const init = fetchSpy.mock.calls[0]![1]! as RequestInit;
     expect((init.headers as Record<string, string>)["Authorization"]).toBeUndefined();
   });
 
@@ -155,14 +155,14 @@ describe("httpClient – configured", () => {
       getAccessToken: () => null,
     });
     await httpClient({ url: "/public", method: "GET" });
-    const init = fetchSpy.mock.calls[0][1] as RequestInit;
+    const init = fetchSpy.mock.calls[0]![1]! as RequestInit;
     expect((init.headers as Record<string, string>)["Authorization"]).toBeUndefined();
   });
 
   it("omits Authorization header when getAccessToken is not provided", async () => {
     configureApiClient({ baseUrl: BASE });
     await httpClient({ url: "/public", method: "GET" });
-    const init = fetchSpy.mock.calls[0][1] as RequestInit;
+    const init = fetchSpy.mock.calls[0]![1]! as RequestInit;
     expect((init.headers as Record<string, string>)["Authorization"]).toBeUndefined();
   });
 
@@ -170,13 +170,13 @@ describe("httpClient – configured", () => {
 
   it("serialises body as JSON", async () => {
     await httpClient({ url: "/items", method: "POST", body: { name: "test" } });
-    const init = fetchSpy.mock.calls[0][1] as RequestInit;
+    const init = fetchSpy.mock.calls[0]![1]! as RequestInit;
     expect(init.body).toBe(JSON.stringify({ name: "test" }));
   });
 
   it("uses data as fallback when body is not provided", async () => {
     await httpClient({ url: "/items", method: "POST", data: { name: "test" } });
-    const init = fetchSpy.mock.calls[0][1] as RequestInit;
+    const init = fetchSpy.mock.calls[0]![1]! as RequestInit;
     expect(init.body).toBe(JSON.stringify({ name: "test" }));
   });
 

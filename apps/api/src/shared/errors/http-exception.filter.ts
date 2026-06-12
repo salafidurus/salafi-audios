@@ -26,7 +26,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
     let details: unknown = undefined;
 
     if (this.isPrismaConnectionRefused(exception)) {
-      message = 'Database connection refused. Ensure PostgreSQL is running and reachable.';
+      message =
+        'Database connection refused. Ensure PostgreSQL is running and reachable.';
     } else if (exception instanceof HttpException) {
       statusCode = exception.getStatus();
       const response = exception.getResponse();
@@ -52,7 +53,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
 
     const isProd = this.config.NODE_ENV === 'production';
-    const devDetails = isProd ? undefined : this.buildDevDetails(exception, details);
+    const devDetails = isProd
+      ? undefined
+      : this.buildDevDetails(exception, details);
 
     res.status(statusCode).json({
       statusCode,

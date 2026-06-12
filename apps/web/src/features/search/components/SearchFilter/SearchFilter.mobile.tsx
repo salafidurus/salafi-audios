@@ -24,7 +24,7 @@ export function SearchFilterMobile({ value, onChange, topics }: SearchFilterMobi
   const scrollRef = useDragScroll("horizontal");
 
   const options = useMemo<FilterOption[]>(() => {
-    const sortedTopics = [...topics].sort((a, b) => a.name.localeCompare(b.name));
+    const sortedTopics = topics.toSorted((a, b) => a.name.localeCompare(b.name));
     return [
       { id: "all", label: "All" },
       ...sortedTopics.map((topic) => ({ id: topic.slug, label: topic.name })),

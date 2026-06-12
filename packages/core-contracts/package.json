@@ -7,55 +7,64 @@
     "src",
     "dist"
   ],
-  "types": "./src/index.ts",
-  "main": "./dist/index.node.js",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "import": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.mjs"
+    },
+    "./node": {
+      "types": "./dist/index.node.d.ts",
+      "import": "./dist/index.node.mjs",
       "require": "./dist/index.node.js",
-      "default": "./src/index.ts"
+      "default": "./dist/index.node.mjs"
     },
     "./query": {
-      "types": "./src/query/index.ts",
-      "import": "./dist/query/index.js",
+      "types": "./dist/query/index.d.ts",
+      "import": "./dist/query/index.mjs",
       "require": "./dist/query/index.js",
-      "default": "./dist/query/index.js"
+      "default": "./dist/query/index.mjs"
     },
     "./query/hooks": {
-      "types": "./src/query/hooks/index.ts",
-      "import": "./dist/query/hooks/index.js",
+      "types": "./dist/query/hooks/index.d.ts",
+      "import": "./dist/query/hooks/index.mjs",
       "require": "./dist/query/hooks/index.js",
-      "default": "./dist/query/hooks/index.js"
+      "default": "./dist/query/hooks/index.mjs"
     },
     "./http": {
-      "types": "./src/http.ts",
-      "import": "./dist/http.js",
+      "types": "./dist/http.d.ts",
+      "import": "./dist/http.mjs",
       "require": "./dist/http.js",
-      "default": "./dist/http.js"
+      "default": "./dist/http.mjs"
     }
   },
   "scripts": {
     "clean": "rimraf dist",
-    "build": "tsc -p tsconfig.build.json",
-    "dev": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
-    "lint": "node ../../node_modules/eslint/bin/eslint.js .",
-    "test": "node ../../node_modules/jest/bin/jest.js --passWithNoTests",
-    "test:prepush": "node ../../node_modules/jest/bin/jest.js --changedSince=origin/main --passWithNoTests",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint .",
+    "test": "jest --passWithNoTests",
+    "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test:watch": "node ../../node_modules/jest/bin/jest.js --watch --passWithNoTests",
-    "test:cov": "node ../../node_modules/jest/bin/jest.js --coverage --passWithNoTests"
+    "test:watch": "jest --watch --passWithNoTests",
+    "test:cov": "jest --coverage --passWithNoTests"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.69.0"
+    "@tanstack/react-query": "catalog:"
   },
   "devDependencies": {
     "@sd/util-config": "workspace:*",
-    "@types/jest": "^30.0.0",
+    "@types/jest": "catalog:",
+    "@types/node": "^22.10.7",
     "@types/react": "~19.2.14",
-    "jest": "^30.4.2",
+    "jest": "catalog:",
     "rimraf": "^6.0.0",
-    "ts-jest": "^29.4.11"
+    "ts-jest": "catalog:",
+    "tsup": "^8.5.1"
   },
   "peerDependencies": {
     "react": ">=18"

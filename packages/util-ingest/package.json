@@ -1,6 +1,7 @@
 {
   "name": "@sd/util-ingest",
   "version": "0.0.0",
+  "type": "module",
   "private": true,
   "sideEffects": false,
   "files": [
@@ -25,27 +26,27 @@
     "ingest:content": "tsx src/commands/ingest-content.ts",
     "ingest:remove": "tsx src/commands/remove-content.ts",
     "convert:supabase": "tsx src/commands/convert-supabase.ts",
-    "lint": "node ../../node_modules/eslint/bin/eslint.js .",
-    "test": "node ../../node_modules/jest/bin/jest.js --passWithNoTests",
-    "test:watch": "node ../../node_modules/jest/bin/jest.js --watch",
-    "test:cov": "node ../../node_modules/jest/bin/jest.js --coverage",
-    "test:prepush": "node ../../node_modules/jest/bin/jest.js --changedSince=origin/main --passWithNoTests",
+    "lint": "eslint .",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.922.0",
-    "@prisma/adapter-pg": "^7.3.0",
+    "@aws-sdk/client-s3": "^3.1063.0",
+    "@prisma/adapter-pg": "catalog:",
     "@sd/core-db": "workspace:*",
     "dotenv": "^16.4.5",
     "zod": "^3.25.17"
   },
   "devDependencies": {
     "@sd/util-config": "workspace:*",
-    "@types/jest": "^30.0.0",
+    "@types/jest": "catalog:",
     "@types/node": "^22.0.0",
-    "jest": "^30.4.2",
+    "jest": "catalog:",
     "rimraf": "^6.0.0",
-    "ts-jest": "^29.4.11",
+    "ts-jest": "catalog:",
     "tsup": "^8.0.0",
     "tsx": "^4.21.0"
   }

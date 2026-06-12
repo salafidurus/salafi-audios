@@ -59,4 +59,20 @@ export class ConfigService {
   get LIVESTREAM_SECRET(): string {
     return this.env.LIVESTREAM_SECRET;
   }
+
+  get R2_ACCOUNT_ID(): string {
+    return this.env.R2_ACCOUNT_ID;
+  }
+  get R2_ACCESS_KEY_ID(): string {
+    return this.env.R2_ACCESS_KEY_ID;
+  }
+  get R2_SECRET_ACCESS_KEY(): string {
+    return this.env.R2_SECRET_ACCESS_KEY;
+  }
+  get R2_BUCKET_NAME(): string {
+    return this.env.R2_BUCKET_NAME;
+  }
+  get R2_PUBLIC_BASE_URL(): string {
+    return this.env.R2_PUBLIC_BASE_URL;
+  }
 }

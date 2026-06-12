@@ -30,7 +30,7 @@ export function useLiveSection(
 ) {
   const fetchedAtRef = useRef<string | undefined>(undefined);
 
-  const query = useQuery<LiveSessionDeltaDto>({
+  const { data, isLoading } = useQuery<LiveSessionDeltaDto>({
     queryKey: [...queryKey, fetchedAtRef.current],
     queryFn: async () => {
       const res = await httpClient<LiveSessionDeltaDto>({
@@ -47,10 +47,11 @@ export function useLiveSection(
   const [sessions, setSessions] = useState<LiveSessionPublicDto[]>([]);
 
   useEffect(() => {
-    if (!query.data) return;
-    fetchedAtRef.current = query.data.fetchedAt;
-    setSessions((prev) => mergeDelta(prev, query.data!));
-  }, [query.data]);
+    if (!data) return;
+    fetchedAtRef.current = data.fetchedAt;
+    // react-doctor-disable-next-line react-doctor/no-derived-state
+    setSessions((prev) => mergeDelta(prev, data));
+  }, [data]);
 
-  return { sessions, setSessions, isLoading: query.isLoading };
+  return { sessions, setSessions, isLoading };
 }

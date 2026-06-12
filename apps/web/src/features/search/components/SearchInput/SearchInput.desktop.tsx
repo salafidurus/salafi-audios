@@ -24,6 +24,12 @@ const inputStyle: CSSProperties = {
   fontWeight: "var(--typo-body-lg-font-weight)",
 };
 
+const shellStyle: CSSProperties = {
+  ...inputStyle,
+  borderColor: "var(--input-border-rest)",
+  background: "var(--input-surface-rest)",
+};
+
 export function SearchInputDesktop({
   placeholder,
   className,
@@ -32,12 +38,6 @@ export function SearchInputDesktop({
   autoFocus,
   ref,
 }: SearchInputDesktopProps) {
-  const shellStyle: CSSProperties = {
-    ...inputStyle,
-    borderColor: "var(--input-border-rest)",
-    background: "var(--input-surface-rest)",
-  };
-
   return (
     <label className={clsx(shellClass, className)} aria-label="Search library" style={shellStyle}>
       <SearchGlyph />
