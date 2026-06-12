@@ -1,6 +1,8 @@
 import styles from "./QuickBrowse.mobile.module.css";
 import type { ScholarChipDto, ContentSuggestionDto, RecentProgressDto } from "@sd/core-contracts";
-import { BrowseCardMobile } from "../BrowseCard/BrowseCard.mobile";
+
+const SCHOLAR_SKELETON_COUNT = 5;
+const SUGGESTION_SKELETON_COUNT = 3;
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -12,6 +14,7 @@ export type QuickBrowseMobileProps = {
   scholars?: ScholarChipDto[];
   suggestions?: ContentSuggestionDto[];
   recentProgress?: RecentProgressDto | null;
+  isLoading?: boolean;
   onSelectScholar?: (slug: string) => void;
   onSelectSuggestion?: (slug: string) => void;
   onContinueListening?: (lectureSlug: string) => void;
@@ -22,14 +25,11 @@ export function QuickBrowseMobile({
   scholars,
   suggestions,
   recentProgress,
+  isLoading,
   onSelectScholar,
   onSelectSuggestion,
   onContinueListening,
-  onSelectCategory,
 }: QuickBrowseMobileProps) {
-  const showFallback =
-    (!scholars || scholars.length === 0) && (!suggestions || suggestions.length === 0);
-
   return (
     <div className={styles.root}>
       {/* Continue Listening */}
@@ -85,6 +85,23 @@ export function QuickBrowseMobile({
         </div>
       )}
 
+      {/* Scholars skeleton */}
+      {isLoading && (!scholars || scholars.length === 0) && (
+        <div className={styles.section}>
+          <span className={styles.header}>Scholars</span>
+          <div className={styles.scholarScroll}>
+            <div className={styles.scholarRow}>
+              {Array.from({ length: SCHOLAR_SKELETON_COUNT }).map((_, index) => (
+                <div key={index} className={styles.scholarChip}>
+                  <div className={styles.skeletonAvatar} />
+                  <div className={styles.skeletonName} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Suggestions */}
       {suggestions && suggestions.length > 0 && (
         <div className={styles.section}>
@@ -117,18 +134,19 @@ export function QuickBrowseMobile({
         </div>
       )}
 
-      {/* Fallback: Browse All */}
-      {showFallback && (
-        <div>
-          <span className={styles.header}>Browse all</span>
-          <div className={styles.grid}>
-            {(["Senior Scholars", "Hadith", "Fiqh", "Tafsir", "Arabic", "Farah"] as const).map(
-              (name) => (
-                <div key={name} className={styles.cardWrapper}>
-                  <BrowseCardMobile name={name} onPress={() => onSelectCategory?.(name)} />
+      {/* Suggestions skeleton */}
+      {isLoading && (!suggestions || suggestions.length === 0) && (
+        <div className={styles.section}>
+          <span className={styles.header}>Suggestions</span>
+          <div className={styles.suggestionsScroll}>
+            <div className={styles.suggestionsRow}>
+              {Array.from({ length: SUGGESTION_SKELETON_COUNT }).map((_, index) => (
+                <div key={index} className={styles.skeletonCard}>
+                  <div className={styles.skeletonLineLg} />
+                  <div className={styles.skeletonLineSm} />
                 </div>
-              ),
-            )}
+              ))}
+            </div>
           </div>
         </div>
       )}

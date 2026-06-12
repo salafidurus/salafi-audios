@@ -20,7 +20,7 @@ export function SearchHomeDesktopScreen({
   onSelectSuggestion,
   onContinueListening,
 }: SearchHomeDesktopScreenProps) {
-  const { data } = useQuickBrowse();
+  const { data, isLoading } = useQuickBrowse();
 
   return (
     <section className="flex flex-1 items-center justify-center px-[var(--space-layout-page-x)] py-[var(--space-layout-page-y)]">
@@ -30,6 +30,7 @@ export function SearchHomeDesktopScreen({
           <SearchButtonDesktop label="What do you want to listen to?" onClick={onOpenSearch} />
         </div>
         <QuickBrowseDesktop
+          isLoading={isLoading}
           scholars={data?.scholars}
           suggestions={data?.suggestions}
           recentProgress={data?.recentProgress}

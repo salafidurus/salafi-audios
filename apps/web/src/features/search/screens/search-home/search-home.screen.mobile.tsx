@@ -20,7 +20,7 @@ export function SearchHomeMobileScreen({
   onSelectSuggestion,
   onContinueListening,
 }: SearchHomeScreenProps) {
-  const { data } = useQuickBrowse();
+  const { data, isLoading } = useQuickBrowse();
 
   return (
     <ScreenView center>
@@ -32,6 +32,7 @@ export function SearchHomeMobileScreen({
           <SearchButtonMobile placeholder="What do you want to listen to?" onPress={onOpenSearch} />
         </div>
         <QuickBrowseMobile
+          isLoading={isLoading}
           scholars={data?.scholars}
           suggestions={data?.suggestions}
           recentProgress={data?.recentProgress}
