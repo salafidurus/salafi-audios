@@ -1,7 +1,7 @@
 import React from "react";
 import { View, StyleSheet, Pressable, Text } from "react-native";
 import { useAudio } from "@sd/domain-audio";
-import { audioService } from "../index";
+import { audioService } from "../audio-service";
 import { Play, Pause, RotateCw, RotateCcw } from "lucide-react-native";
 
 export function PlaybackControls() {

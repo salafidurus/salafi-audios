@@ -35,8 +35,9 @@ Useful scoped dev commands:
 ```bash
 pnpm dev:api
 pnpm dev:web
-pnpm dev:mobile
 pnpm dev:native
+pnpm dev:native:build        # native build without cleaning (expo run:android)
+pnpm dev:native:clean-build  # prebuild --clean + native build
 ```
 
 ## Monorepo Commands

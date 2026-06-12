@@ -3,7 +3,7 @@ import { View, StyleSheet, Pressable, Text, Modal } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import { useAudio } from "@sd/domain-audio";
-import { audioService } from "../index";
+import { audioService } from "../audio-service";
 import { Play, Pause, ChevronDown } from "lucide-react-native";
 import { ProgressBar } from "./progress-bar";
 import { PlaybackControls } from "./playback-controls";

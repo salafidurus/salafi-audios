@@ -150,10 +150,10 @@ Co-locate test files next to the source file:
 ## Quick Commands
 
 ```bash
-pnpm dev              # All apps (api, web, mobile)
+pnpm dev              # All apps (api, web, native)
 pnpm dev:api          # Backend only
 pnpm dev:web          # Web only
-pnpm dev:mobile       # Mobile only
+pnpm dev:native       # Native only
 pnpm build            # Build all
 pnpm lint             # Lint all
 pnpm typecheck        # Typecheck all
