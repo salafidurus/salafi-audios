@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { AuthGuard } from './auth.guard';
 import { AuthLocaleController } from './auth-locale.controller';
+import { AuthBridgeController } from './auth-bridge.controller';
 
 @Module({
-  controllers: [AuthLocaleController],
+  controllers: [AuthLocaleController, AuthBridgeController],
   providers: [AuthGuard],
   exports: [AuthGuard],
 })
