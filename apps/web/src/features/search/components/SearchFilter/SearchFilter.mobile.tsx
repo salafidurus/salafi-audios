@@ -36,6 +36,7 @@ export function SearchFilterMobile({ value, onChange, topics }: SearchFilterMobi
   return (
     <div
       ref={scrollRef}
+      className="no-scrollbar"
       style={
         {
           display: "flex",

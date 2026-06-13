@@ -41,7 +41,7 @@ async function bootstrap() {
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-Id', 'Cookie'],
-    exposedHeaders: ['X-Request-Id', 'Set-Cookie'],
+    exposedHeaders: ['X-Request-Id', 'Set-Cookie', 'set-auth-token'],
   });
 
   // Mount better-auth as Express middleware — handles all /api/auth/* routes

@@ -2,12 +2,15 @@
 
 import Image from "next/image";
 import type { ScholarChipDto, ContentSuggestionDto, RecentProgressDto } from "@sd/core-contracts";
-import { BrowseCardDesktop } from "../BrowseCard/BrowseCard.desktop";
+
+const SCHOLAR_SKELETON_COUNT = 5;
+const SUGGESTION_SKELETON_COUNT = 3;
 
 export type QuickBrowseDesktopProps = {
   scholars?: ScholarChipDto[];
   suggestions?: ContentSuggestionDto[];
   recentProgress?: RecentProgressDto | null;
+  isLoading?: boolean;
   onSelectScholar?: (slug: string) => void;
   onSelectSuggestion?: (slug: string) => void;
   onContinueListening?: (lectureSlug: string) => void;
@@ -48,10 +51,10 @@ export function QuickBrowseDesktop({
   scholars,
   suggestions,
   recentProgress,
+  isLoading,
   onSelectScholar,
   onSelectSuggestion,
   onContinueListening,
-  onSelectCategory,
 }: QuickBrowseDesktopProps) {
   return (
     <section className="flex w-full max-w-[56rem] flex-col gap-[var(--space-scale-4xl)]">
@@ -96,7 +99,7 @@ export function QuickBrowseDesktop({
           <h2 className="m-0 text-[var(--content-strong)]" style={headerStyle}>
             Scholars
           </h2>
-          <div className="flex gap-[var(--space-component-gap-md)] overflow-x-auto pb-[var(--space-scale-xs)]">
+          <div className="no-scrollbar flex gap-[var(--space-component-gap-md)] overflow-x-auto pb-[var(--space-scale-xs)]">
             {scholars.map((scholar) => (
               <button
                 key={scholar.id}
@@ -132,13 +135,33 @@ export function QuickBrowseDesktop({
         </section>
       )}
 
+      {/* Scholars skeleton */}
+      {isLoading && (!scholars || scholars.length === 0) && (
+        <section className="flex flex-col gap-[var(--space-component-gap-md)]">
+          <h2 className="m-0 text-[var(--content-strong)]" style={headerStyle}>
+            Scholars
+          </h2>
+          <div className="flex gap-[var(--space-component-gap-md)]">
+            {Array.from({ length: SCHOLAR_SKELETON_COUNT }).map((_, index) => (
+              <div
+                key={index}
+                className="flex shrink-0 flex-col items-center gap-[var(--space-scale-xs)]"
+              >
+                <div className="size-14 animate-pulse rounded-full bg-[var(--surface-hover)]" />
+                <div className="h-[10px] w-12 animate-pulse rounded-[var(--radius-component-chip)] bg-[var(--surface-hover)]" />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Suggestions */}
       {suggestions && suggestions.length > 0 && (
         <section className="flex flex-col gap-[var(--space-component-gap-md)]">
           <h2 className="m-0 text-[var(--content-strong)]" style={headerStyle}>
             Suggestions
           </h2>
-          <div className="flex gap-[var(--space-component-gap-md)] overflow-x-auto pb-[var(--space-scale-xs)]">
+          <div className="no-scrollbar flex gap-[var(--space-component-gap-md)] overflow-x-auto pb-[var(--space-scale-xs)]">
             {suggestions.map((item) => (
               <button
                 key={item.id}
@@ -171,22 +194,22 @@ export function QuickBrowseDesktop({
         </section>
       )}
 
-      {/* Fallback: Browse All categories when no data loaded */}
-      {(!scholars || scholars.length === 0) && (!suggestions || suggestions.length === 0) && (
+      {/* Suggestions skeleton */}
+      {isLoading && (!suggestions || suggestions.length === 0) && (
         <section className="flex flex-col gap-[var(--space-component-gap-md)]">
           <h2 className="m-0 text-[var(--content-strong)]" style={headerStyle}>
-            Browse all
+            Suggestions
           </h2>
-          <div className="grid grid-cols-2 gap-[var(--space-component-gap-md)] lg:grid-cols-3">
-            {(["Senior Scholars", "Hadith", "Fiqh", "Tafsir", "Arabic", "Farah"] as const).map(
-              (name) => (
-                <BrowseCardDesktop
-                  key={name}
-                  name={name}
-                  onPress={() => onSelectCategory?.(name)}
-                />
-              ),
-            )}
+          <div className="flex gap-[var(--space-component-gap-md)]">
+            {Array.from({ length: SUGGESTION_SKELETON_COUNT }).map((_, index) => (
+              <div
+                key={index}
+                className="flex w-48 shrink-0 animate-pulse flex-col gap-[var(--space-scale-xs)] rounded-[var(--radius-component-card)] bg-[var(--surface-hover)] p-[var(--space-component-card-padding)]"
+              >
+                <div className="h-[14px] rounded-[var(--radius-component-chip)] bg-[var(--surface-default)]" />
+                <div className="h-[10px] w-3/5 rounded-[var(--radius-component-chip)] bg-[var(--surface-default)]" />
+              </div>
+            ))}
           </div>
         </section>
       )}

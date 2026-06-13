@@ -1,4 +1,4 @@
-import { initApiClient, setUnauthorizedHandler } from "@sd/core-api";
+import { initApiClient, setCookieProvider, setUnauthorizedHandler } from "@sd/core-api";
 import { createQueryClient, routes } from "@sd/core-contracts";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
@@ -54,6 +54,10 @@ export function Providers({ children }: Props) {
     } else {
       initApiClient();
     }
+
+    // RN fetch has no cookie jar, so forward the @better-auth/expo session
+    // cookie (kept in SecureStore) as a Cookie header on shared API calls.
+    setCookieProvider(() => authClient.getCookie());
 
     setUnauthorizedHandler(() => {
       authClient.signOut().then(() => {

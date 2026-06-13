@@ -1,4 +1,4 @@
-import { Pressable, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { QuickBrowse } from "@/features/search/components/QuickBrowse/QuickBrowse";
@@ -19,11 +19,15 @@ export function SearchHomeScreen({
   onSelectSuggestion,
   onContinueListening,
 }: SearchHomeScreenProps) {
-  const { data } = useQuickBrowse();
+  const { data, isLoading } = useQuickBrowse();
 
   return (
-    <ScreenView center>
-      <View style={styles.content}>
+    <ScreenView>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
         <View style={styles.searchGroup}>
           <View style={styles.header}>
             <Text style={styles.title}>Find a lesson</Text>
@@ -37,6 +41,7 @@ export function SearchHomeScreen({
           </Pressable>
         </View>
         <QuickBrowse
+          isLoading={isLoading}
           scholars={data?.scholars}
           suggestions={data?.suggestions}
           recentProgress={data?.recentProgress}
@@ -45,15 +50,21 @@ export function SearchHomeScreen({
           onContinueListening={onContinueListening}
           onSelectCategory={onSelectCategory}
         />
-      </View>
+      </ScrollView>
     </ScreenView>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
+  scrollView: {
+    flex: 1,
+  },
   content: {
     width: "100%",
     gap: theme.spacing.component.gapXl,
+    justifyContent: "center",
+    flexGrow: 1,
+    paddingVertical: theme.spacing.scale.lg,
   },
   searchGroup: {
     width: "100%",

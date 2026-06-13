@@ -1,6 +1,6 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
-import { admin } from 'better-auth/plugins';
+import { admin, bearer, oneTimeToken } from 'better-auth/plugins';
 import { expo } from '@better-auth/expo';
 import { PrismaClient } from '@sd/core-db';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -42,7 +42,11 @@ function createAuthInstance(config: ConfigService) {
         clientSecret: config.APPLE_CLIENT_SECRET,
       },
     },
-    plugins: [admin(), expo()],
+    // bearer: accept `Authorization: Bearer <token>` and emit `set-auth-token`
+    //   so the cross-site web SPA can authenticate without third-party cookies.
+    // oneTimeToken: mints the single-use token the OAuth bridge hands to the web
+    //   app (see auth-bridge.controller.ts).
+    plugins: [admin(), expo(), bearer(), oneTimeToken()],
   });
 }
 

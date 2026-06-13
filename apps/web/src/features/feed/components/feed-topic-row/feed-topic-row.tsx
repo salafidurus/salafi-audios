@@ -37,12 +37,12 @@ export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProp
         New in {topicName}
       </h3>
       <div
+        className="no-scrollbar"
         style={{
           display: "flex",
           gap: 12,
           overflowX: "auto",
           paddingBottom: 8,
-          scrollbarWidth: "thin",
         }}
       >
         {items.map((item) => (
