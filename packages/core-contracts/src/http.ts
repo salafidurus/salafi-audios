@@ -1,6 +1,7 @@
 export type HttpClientConfig = {
   baseUrl: string;
   getAccessToken?: () => string | undefined | null;
+  getCookie?: () => string | undefined | null;
   onError?: (status: number) => void;
 };
 
@@ -34,6 +35,7 @@ export async function httpClient<T>(options: {
   }
 
   const token = config.getAccessToken?.() ?? undefined;
+  const cookie = config.getCookie?.() ?? undefined;
 
   const endpoint = new URL(`${config.baseUrl}${options.url}`);
 
@@ -61,9 +63,14 @@ export async function httpClient<T>(options: {
   try {
     res = await fetch(endpoint.toString(), {
       method: options.method,
+      // Cross-origin auth: send the bearer token (web) or forwarded cookie
+      // (native via @better-auth/expo). credentials:"include" keeps same-origin
+      // and dev cookie flows working; a caller-supplied Cookie header wins.
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(cookie ? { Cookie: cookie } : {}),
         ...(options.headers ?? {}),
       },
       body: payload ? JSON.stringify(payload) : undefined,
