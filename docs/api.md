@@ -58,6 +58,9 @@ Authentication and authorization are centralized in the backend.
 - The current auth implementation is **Better Auth**.
 - Identity is established through backend-managed auth flows and sessions.
 - Web and mobile consume auth as clients; neither client owns the trust model.
+- See **[auth.md](./auth.md)** for the end-to-end mechanism: per-platform
+  credentials (web bearer token, native cookie), session validation, and the
+  cross-site OAuth handoff.
 
 ### Authorization
 
