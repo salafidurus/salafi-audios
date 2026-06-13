@@ -5,6 +5,7 @@ import { SignUpDesktopScreen } from "./sign-up.screen.desktop";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { useIsHydrated } from "@/shared/hooks/use-is-hydrated";
 import { authClient } from "@/core/auth";
+import { buildOAuthCallbackURL } from "@/features/auth/oauth-callback-url";
 
 type SignUpScreenProps = {
   redirectTo: string;
@@ -23,10 +24,16 @@ export function SignUpResponsiveScreen({ redirectTo, onNavigateToSignIn }: SignU
     return (
       <SignUpMobileScreen
         onSignUpWithGoogle={() =>
-          authClient.signIn.social({ provider: "google", callbackURL: redirectTo })
+          authClient.signIn.social({
+            provider: "google",
+            callbackURL: buildOAuthCallbackURL(redirectTo),
+          })
         }
         onSignUpWithApple={() =>
-          authClient.signIn.social({ provider: "apple", callbackURL: redirectTo })
+          authClient.signIn.social({
+            provider: "apple",
+            callbackURL: buildOAuthCallbackURL(redirectTo),
+          })
         }
         onNavigateToSignIn={onNavigateToSignIn}
       />

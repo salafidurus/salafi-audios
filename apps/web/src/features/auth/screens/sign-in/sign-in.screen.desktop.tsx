@@ -2,6 +2,7 @@
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { authClient } from "@/core/auth";
+import { buildOAuthCallbackURL } from "@/features/auth/oauth-callback-url";
 import { GoogleSignInButton, AppleSignInButton } from "@/features/auth/components/social-buttons";
 import styles from "../auth-form.module.css";
 
@@ -22,12 +23,18 @@ export function SignInDesktopScreen({ redirectTo, onNavigateToSignUp }: SignInDe
           <div className={styles.socialStack}>
             <AppleSignInButton
               onClick={() =>
-                authClient.signIn.social({ provider: "apple", callbackURL: redirectTo })
+                authClient.signIn.social({
+                  provider: "apple",
+                  callbackURL: buildOAuthCallbackURL(redirectTo),
+                })
               }
             />
             <GoogleSignInButton
               onClick={() =>
-                authClient.signIn.social({ provider: "google", callbackURL: redirectTo })
+                authClient.signIn.social({
+                  provider: "google",
+                  callbackURL: buildOAuthCallbackURL(redirectTo),
+                })
               }
             />
           </div>

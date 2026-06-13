@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { routes } from "@sd/core-contracts";
 import { authClient } from "@/core/auth";
+import { buildOAuthCallbackURL } from "@/features/auth/oauth-callback-url";
 import { GoogleSignInButton, AppleSignInButton } from "@/features/auth/components/social-buttons";
 import styles from "../auth-form.module.css";
 
@@ -44,13 +45,19 @@ export function SignUpDesktopScreen({ redirectTo, onNavigateToSignIn }: SignUpDe
           <div className={styles.socialStack}>
             <AppleSignInButton
               onClick={() =>
-                authClient.signIn.social({ provider: "apple", callbackURL: redirectTo })
+                authClient.signIn.social({
+                  provider: "apple",
+                  callbackURL: buildOAuthCallbackURL(redirectTo),
+                })
               }
               disabled={!termsAccepted}
             />
             <GoogleSignInButton
               onClick={() =>
-                authClient.signIn.social({ provider: "google", callbackURL: redirectTo })
+                authClient.signIn.social({
+                  provider: "google",
+                  callbackURL: buildOAuthCallbackURL(redirectTo),
+                })
               }
               disabled={!termsAccepted}
             />
