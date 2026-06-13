@@ -8,6 +8,7 @@ This directory contains the standard, top-level documentation for Salafi Durus. 
 - **[prd.md](./prd.md)**: Product vision, principles, user roles, trust model, and non-goals.
 - **[architecture.md](./architecture.md)**: System architecture, monorepo boundaries, and platform responsibilities.
 - **[api.md](./api.md)**: Backend architecture, API contract rules, auth/authz, and media/API boundaries.
+- **[auth.md](./auth.md)**: End-to-end authentication mechanism across api, web, and native (bearer tokens, cross-site OAuth handoff).
 - **[database.md](./database.md)**: Data ownership, relational modeling, media references, and migration rules.
 - **[mobile.md](./mobile.md)**: Mobile structure, current capabilities, and target offline/sync architecture.
 - **[web.md](./web.md)**: Web structure, SEO/discovery responsibilities, and admin/public boundaries.

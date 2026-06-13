@@ -83,6 +83,7 @@ This directory contains the authoritative documentation for Salafi Durus.
 - **[prd.md](./prd.md)** — Vision, philosophy, user roles, and guardrails.
 - **[architecture.md](./architecture.md)** — Monorepo structure and system architecture.
 - **[api.md](./api.md)** — Backend architecture and API design.
+- **[auth.md](./auth.md)** — Cross-cutting authentication mechanism (api + web + native).
 - **[database.md](./database.md)** — DB schema and media management.
 - **[mobile.md](./mobile.md)** — Mobile app and offline mechanics.
 - **[web.md](./web.md)** — Web app structure and SEO.
