@@ -166,6 +166,65 @@ describe("httpClient – configured", () => {
     expect((init.headers as Record<string, string>)["Authorization"]).toBeUndefined();
   });
 
+  /* ---------- Credentials & Cookie ---------- */
+
+  it("always sends credentials: 'include'", async () => {
+    await httpClient({ url: "/items", method: "GET" });
+    const init = fetchSpy.mock.calls[0]![1]! as RequestInit;
+    expect(init.credentials).toBe("include");
+  });
+
+  it("injects Cookie header when getCookie returns a string", async () => {
+    configureApiClient({
+      baseUrl: BASE,
+      getCookie: () => "better-auth.session_token=abc",
+    });
+    await httpClient({ url: "/secure", method: "GET" });
+    const init = fetchSpy.mock.calls[0]![1]! as RequestInit;
+    expect((init.headers as Record<string, string>)["Cookie"]).toBe(
+      "better-auth.session_token=abc",
+    );
+  });
+
+  it("omits Cookie header when getCookie returns undefined", async () => {
+    configureApiClient({ baseUrl: BASE, getCookie: () => undefined });
+    await httpClient({ url: "/public", method: "GET" });
+    const init = fetchSpy.mock.calls[0]![1]! as RequestInit;
+    expect((init.headers as Record<string, string>)["Cookie"]).toBeUndefined();
+  });
+
+  it("omits Cookie header when getCookie returns null", async () => {
+    configureApiClient({ baseUrl: BASE, getCookie: () => null });
+    await httpClient({ url: "/public", method: "GET" });
+    const init = fetchSpy.mock.calls[0]![1]! as RequestInit;
+    expect((init.headers as Record<string, string>)["Cookie"]).toBeUndefined();
+  });
+
+  it("omits Cookie header when getCookie returns an empty string", async () => {
+    configureApiClient({ baseUrl: BASE, getCookie: () => "" });
+    await httpClient({ url: "/public", method: "GET" });
+    const init = fetchSpy.mock.calls[0]![1]! as RequestInit;
+    expect((init.headers as Record<string, string>)["Cookie"]).toBeUndefined();
+  });
+
+  it("omits Cookie header when getCookie is not provided", async () => {
+    configureApiClient({ baseUrl: BASE });
+    await httpClient({ url: "/public", method: "GET" });
+    const init = fetchSpy.mock.calls[0]![1]! as RequestInit;
+    expect((init.headers as Record<string, string>)["Cookie"]).toBeUndefined();
+  });
+
+  it("does not clobber a caller-provided Cookie header", async () => {
+    configureApiClient({ baseUrl: BASE, getCookie: () => "fromProvider=1" });
+    await httpClient({
+      url: "/secure",
+      method: "GET",
+      headers: { Cookie: "explicit=2" },
+    });
+    const init = fetchSpy.mock.calls[0]![1]! as RequestInit;
+    expect((init.headers as Record<string, string>)["Cookie"]).toBe("explicit=2");
+  });
+
   /* ---------- Body ---------- */
 
   it("serialises body as JSON", async () => {

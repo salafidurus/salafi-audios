@@ -35,6 +35,7 @@ export function FeedScholarRow({ scholars, onScholarPress }: FeedScholarRowProps
         Popular Scholars
       </div>
       <div
+        className="no-scrollbar"
         style={{
           display: "flex",
           gap: 12,

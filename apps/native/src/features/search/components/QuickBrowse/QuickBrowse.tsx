@@ -1,7 +1,10 @@
 import { View, Text, Pressable, ScrollView } from "react-native";
+import { Image } from "expo-image";
 import { StyleSheet } from "react-native-unistyles";
 import type { ScholarChipDto, ContentSuggestionDto, RecentProgressDto } from "@sd/core-contracts";
-import { BrowseCard } from "../BrowseCard/BrowseCard";
+
+const SCHOLAR_SKELETON_COUNT = 5;
+const SUGGESTION_SKELETON_COUNT = 3;
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -13,6 +16,7 @@ export type QuickBrowseProps = {
   scholars?: ScholarChipDto[];
   suggestions?: ContentSuggestionDto[];
   recentProgress?: RecentProgressDto | null;
+  isLoading?: boolean;
   onSelectScholar?: (slug: string) => void;
   onSelectSuggestion?: (slug: string) => void;
   onContinueListening?: (lectureSlug: string) => void;
@@ -23,14 +27,11 @@ export function QuickBrowse({
   scholars,
   suggestions,
   recentProgress,
+  isLoading,
   onSelectScholar,
   onSelectSuggestion,
   onContinueListening,
-  onSelectCategory,
 }: QuickBrowseProps) {
-  const showFallback =
-    (!scholars || scholars.length === 0) && (!suggestions || suggestions.length === 0);
-
   return (
     <View style={styles.root}>
       {/* Continue Listening */}
@@ -76,7 +77,15 @@ export function QuickBrowse({
                   style={({ pressed }) => [styles.scholarChip, pressed && styles.pressed]}
                 >
                   <View style={styles.scholarAvatar}>
-                    <Text style={styles.scholarInitial}>{scholar.name.charAt(0)}</Text>
+                    {scholar.imageUrl ? (
+                      <Image
+                        source={{ uri: scholar.imageUrl }}
+                        style={styles.scholarAvatarImage}
+                        contentFit="cover"
+                      />
+                    ) : (
+                      <Text style={styles.scholarInitial}>{scholar.name.charAt(0)}</Text>
+                    )}
                   </View>
                   <Text style={styles.scholarName} numberOfLines={1}>
                     {scholar.name}
@@ -85,6 +94,21 @@ export function QuickBrowse({
               ))}
             </View>
           </ScrollView>
+        </View>
+      )}
+
+      {/* Scholars skeleton */}
+      {isLoading && (!scholars || scholars.length === 0) && (
+        <View style={styles.section}>
+          <Text style={styles.header}>Scholars</Text>
+          <View style={styles.scholarRow}>
+            {Array.from({ length: SCHOLAR_SKELETON_COUNT }).map((_, index) => (
+              <View key={index} style={styles.scholarChip}>
+                <View style={[styles.scholarAvatar, styles.skeletonBlock]} />
+                <View style={styles.scholarNameSkeleton} />
+              </View>
+            ))}
+          </View>
         </View>
       )}
 
@@ -123,14 +147,15 @@ export function QuickBrowse({
         </View>
       )}
 
-      {/* Fallback: Browse All */}
-      {showFallback && (
-        <View>
-          <Text style={styles.header}>Browse all</Text>
-          <View style={styles.grid}>
-            {(["Senior Scholars", "Hadith", "Fiqh", "Tafsir"] as const).map((name) => (
-              <View key={name} style={styles.cardWrapper}>
-                <BrowseCard name={name} onPress={() => onSelectCategory?.(name)} />
+      {/* Suggestions skeleton */}
+      {isLoading && (!suggestions || suggestions.length === 0) && (
+        <View style={styles.section}>
+          <Text style={styles.header}>Suggestions</Text>
+          <View style={styles.suggestionsRow}>
+            {Array.from({ length: SUGGESTION_SKELETON_COUNT }).map((_, index) => (
+              <View key={index} style={[styles.suggestionCard, styles.skeletonBlock]}>
+                <View style={styles.skeletonLineLg} />
+                <View style={styles.skeletonLineSm} />
               </View>
             ))}
           </View>
@@ -216,6 +241,10 @@ const styles = StyleSheet.create((theme) => ({
     justifyContent: "center",
     overflow: "hidden",
   },
+  scholarAvatarImage: {
+    width: "100%",
+    height: "100%",
+  },
   scholarInitial: {
     color: theme.colors.content.muted,
     ...theme.typography.labelMd,
@@ -225,6 +254,12 @@ const styles = StyleSheet.create((theme) => ({
     textAlign: "center",
     color: theme.colors.content.default,
     ...theme.typography.caption,
+  },
+  scholarNameSkeleton: {
+    width: 48,
+    height: 10,
+    borderRadius: theme.radius.component.chip,
+    backgroundColor: theme.colors.surface.hover,
   },
 
   // Suggestions
@@ -269,14 +304,20 @@ const styles = StyleSheet.create((theme) => ({
     ...theme.typography.caption,
   },
 
-  // Fallback grid
-  grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: theme.spacing.component.gapMd,
-    marginTop: theme.spacing.component.gapMd,
+  // Skeletons
+  skeletonBlock: {
+    backgroundColor: theme.colors.surface.hover,
   },
-  cardWrapper: {
-    width: "48%",
+  skeletonLineLg: {
+    height: 14,
+    borderRadius: theme.radius.component.chip,
+    backgroundColor: theme.colors.surface.default,
+    marginBottom: theme.spacing.scale.xs,
+  },
+  skeletonLineSm: {
+    height: 10,
+    width: "60%",
+    borderRadius: theme.radius.component.chip,
+    backgroundColor: theme.colors.surface.default,
   },
 }));
