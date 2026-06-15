@@ -4,6 +4,12 @@ packages:
 
 nodeLinker: hoisted
 
+# Don't let `pnpm run`/`pnpm exec` auto-reinstall deps before running a script.
+# Default is "install", which made Render's `start:prod` trigger a full
+# 17-workspace reinstall at runtime and OOM the 512Mi instance. Install is
+# already done explicitly in the build step.
+verifyDepsBeforeRun: false
+
 # pnpm 11: allowBuilds replaces onlyBuiltDependencies.
 # true  = allow build scripts (was in the old whitelist)
 # false = block build scripts
