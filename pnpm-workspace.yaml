@@ -32,7 +32,7 @@ overrides:
   react-dom: 19.2.3
 
 catalog:
-  "@better-auth/expo": ^1.6.14
+  "@better-auth/expo": ^1.6.18
   "@nestjs/common": ^11.1.24
   "@nestjs/core": ^11.1.24
   "@nestjs/platform-express": ^11.1.24
