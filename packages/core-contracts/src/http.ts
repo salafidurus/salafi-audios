@@ -2,6 +2,9 @@ export type HttpClientConfig = {
   baseUrl: string;
   getAccessToken?: () => string | undefined | null;
   getCookie?: () => string | undefined | null;
+  /** Active content locale; sent as `Accept-Language` so the API resolves
+   * translations to the user's selected language. */
+  getLocale?: () => string | undefined | null;
   onError?: (status: number) => void;
 };
 
@@ -36,6 +39,7 @@ export async function httpClient<T>(options: {
 
   const token = config.getAccessToken?.() ?? undefined;
   const cookie = config.getCookie?.() ?? undefined;
+  const locale = config.getLocale?.() ?? undefined;
 
   const endpoint = new URL(`${config.baseUrl}${options.url}`);
 
@@ -71,6 +75,7 @@ export async function httpClient<T>(options: {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(cookie ? { Cookie: cookie } : {}),
+        ...(locale ? { "Accept-Language": locale } : {}),
         ...(options.headers ?? {}),
       },
       body: payload ? JSON.stringify(payload) : undefined,
