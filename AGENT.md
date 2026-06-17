@@ -77,6 +77,12 @@ Before editing agent instructions or skills:
   - no circular dependencies
 - Misconfiguration must fail fast.
 - Non-authoritative analytics failures must never break core workflows.
+- `better-auth` and `@better-auth/expo` are pinned to the **exact same version** in the
+  pnpm-workspace catalog (no caret). They each pin `@better-fetch/fetch` exactly (e.g.
+  `better-auth@1.6.18` → `1.3.0`, `1.6.19` → `1.3.1`); any version skew installs two
+  `@better-fetch/fetch` copies whose `BetterFetch` types differ and breaks the native auth
+  client plugin typecheck. Always bump the two together. Note Dependabot ignores
+  `better-auth`/`@better-auth/expo` for this reason — bump them manually, in lockstep.
 
 ## Repo layout
 

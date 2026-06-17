@@ -46,11 +46,8 @@ export function TopAuthStrip() {
             </>
           ) : !isAuthenticated && !isLoading ? (
             <>
-              <Button variant="ghost" size="sm" onClick={() => push(routes.signIn)}>
+              <Button variant="primary" size="sm" onClick={() => push(routes.signIn)}>
                 Sign In
-              </Button>
-              <Button variant="primary" size="sm" onClick={() => push(routes.signUp)}>
-                Create Free Account
               </Button>
             </>
           ) : null}

@@ -8,7 +8,6 @@ import { AccentGradientFill } from "@/shared/components/AccentGradientFill/Accen
 export type SignInScreenProps = {
   onSignInWithGoogle: () => void;
   onSignInWithApple: () => void;
-  onNavigateToSignUp: () => void;
   onBack?: () => void;
   googleButtonSource?: ImageSourcePropType;
 };
@@ -16,7 +15,6 @@ export type SignInScreenProps = {
 export function SignInScreen({
   onSignInWithGoogle,
   onSignInWithApple,
-  onNavigateToSignUp,
   onBack,
   googleButtonSource,
 }: SignInScreenProps) {
@@ -74,10 +72,6 @@ export function SignInScreen({
             />
           )}
         </Pressable>
-
-        <Pressable onPress={onNavigateToSignUp}>
-          <Text style={styles.link}>{t("auth.signIn.noAccount")}</Text>
-        </Pressable>
       </View>
     </View>
   );
@@ -124,11 +118,5 @@ const styles = StyleSheet.create((theme) => ({
     minHeight: 48,
   },
   googleButtonImage: { width: "100%", height: 48 },
-  link: {
-    textAlign: "center",
-    color: theme.colors.content.primary,
-    marginTop: theme.spacing.component.gapMd,
-    fontSize: 14,
-  },
   pressed: { opacity: 0.75 },
 }));

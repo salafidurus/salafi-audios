@@ -13,10 +13,9 @@ done || {
 }
 
 pnpm verify:build-configs
-pnpm turbo lint typecheck test:prepush --affected --continue
-pnpm turbo build --affected --continue
+pnpm turbo lint typecheck test:prepush build --affected --continue
 
-if git diff --quiet origin/main...HEAD -- ':(glob)apps/web/**' ':(glob)packages/shared/**' ':(glob)packages/design-tokens/**' ':(glob)packages/core-config/**' ':(glob)packages/core-styles/**' ':(glob)packages/core-auth/**' ':(glob)packages/feature-auth/**' ':(glob)packages/feature-navigation/**' ':(glob)packages/feature-search/**'; then
+if git diff --quiet origin/main...HEAD -- ':(glob)apps/web/**' ':(glob)packages/core-api/**' ':(glob)packages/core-contracts/**' ':(glob)packages/core-i18n/**' ':(glob)packages/design-tokens/**' ':(glob)packages/domain-account/**' ':(glob)packages/domain-audio/**' ':(glob)packages/domain-content/**' ':(glob)packages/domain-live/**' ':(glob)packages/domain-search/**' ':(glob)packages/util-config/**'; then
   printf "pre-push: skipping web e2e (no web-affecting changes)\n"
 else
   printf "pre-push: running web e2e\n"
@@ -29,10 +28,10 @@ else
   pnpm docs:quality
 fi
 
-if git diff --quiet origin/main...HEAD -- packages/db/prisma/schema.prisma packages/db/prisma.config.ts packages/db/package.json; then
+if git diff --quiet origin/main...HEAD -- packages/core-db/prisma/schema.prisma packages/core-db/prisma.config.ts packages/core-db/package.json; then
   printf "pre-push: skipping prisma:generate (no db schema/config changes)\n"
 else
-  pnpm --filter @sd/db prisma:generate
+  pnpm --filter @sd/core-db prisma:generate
 fi
 
 if git diff --quiet origin/main...HEAD -- ':(glob)apps/native/**'; then

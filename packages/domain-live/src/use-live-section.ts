@@ -31,7 +31,7 @@ export function useLiveSection(
   const fetchedAtRef = useRef<string | undefined>(undefined);
 
   const { data, isLoading } = useQuery<LiveSessionDeltaDto>({
-    queryKey: [...queryKey, fetchedAtRef.current],
+    queryKey,
     queryFn: async () => {
       const res = await httpClient<LiveSessionDeltaDto>({
         url: endpoint,
@@ -42,6 +42,7 @@ export function useLiveSection(
     },
     refetchInterval: refetchIntervalMs,
     staleTime: 0,
+    gcTime: 0,
   });
 
   const [sessions, setSessions] = useState<LiveSessionPublicDto[]>([]);

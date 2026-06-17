@@ -22,6 +22,7 @@
     "react": "^19.0.0"
   },
   "devDependencies": {
+    "@testing-library/react": "catalog:",
     "@types/jest": "catalog:",
     "jest": "catalog:",
     "jest-environment-jsdom": "^30.4.1",
