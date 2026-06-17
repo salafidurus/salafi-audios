@@ -38,7 +38,7 @@
     "@prisma/adapter-pg": "catalog:",
     "@sd/core-db": "workspace:*",
     "dotenv": "^16.4.5",
-    "zod": "^3.25.17"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@sd/util-config": "workspace:*",

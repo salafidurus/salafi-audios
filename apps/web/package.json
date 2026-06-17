@@ -37,7 +37,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-i18next": "catalog:",
-    "zod": "^3.25.17",
+    "zod": "^4.4.3",
     "zustand": "catalog:"
   },
   "devDependencies": {

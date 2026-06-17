@@ -86,7 +86,7 @@
     "react-native-web": "~0.21.2",
     "react-native-worklets": "0.8.3",
     "vexo-analytics": "^1.5.4",
-    "zod": "^3.25.17",
+    "zod": "^4.4.3",
     "zustand": "catalog:"
   },
   "devDependencies": {

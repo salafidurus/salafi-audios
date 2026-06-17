@@ -37,7 +37,7 @@
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:",
     "telegram": "^2.26.16",
-    "zod": "^3.25.76"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
