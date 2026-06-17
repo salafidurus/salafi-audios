@@ -14,12 +14,15 @@ import type {
 import type { StatusValue } from '../../shared/enums/status-values';
 import type { CreateLectureDto } from './dto/create-lecture.dto';
 import type { SaveLectureTranslationDto } from './dto/save-lecture-translation.dto';
+import { resolveContentTranslation } from '../../shared/utils/resolve-content-translation';
+import { getRequestLocale } from '../../shared/i18n/locale-context';
 
 @Injectable()
 export class LecturesRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findDetailById(id: string): Promise<LectureDetailDto | null> {
+    const locale = getRequestLocale();
     const lecture = await this.prisma.lecture.findFirst({
       where: {
         id,
@@ -37,12 +40,23 @@ export class LecturesRepository {
         publishedAt: true,
         seriesId: true,
         orderIndex: true,
+        translations: {
+          where: { locale, status: 'published' },
+          select: { title: true, description: true },
+          take: 1,
+        },
         scholar: {
           select: {
             id: true,
             slug: true,
             name: true,
+            mainLanguage: true,
             imageUrl: true,
+            translations: {
+              where: { locale, status: 'published' },
+              select: { name: true },
+              take: 1,
+            },
           },
         },
         topics: {
@@ -75,22 +89,44 @@ export class LecturesRepository {
     const seriesContext = await this.resolveSeriesContext(
       lecture.seriesId,
       lecture.id,
+      locale,
     );
 
     const primaryAudio = lecture.audioAssets[0] ?? null;
 
+    const resolved = resolveContentTranslation({
+      base: { title: lecture.title, description: lecture.description ?? null },
+      originalLanguage: lecture.language,
+      targetLocale: locale,
+      publishedTranslation: lecture.translations[0] ?? null,
+    });
+
+    const scholarName = resolveContentTranslation({
+      base: { name: lecture.scholar.name },
+      originalLanguage: lecture.scholar.mainLanguage,
+      targetLocale: locale,
+      publishedTranslation: lecture.scholar.translations[0] ?? null,
+    }).fields.name;
+
     return {
       id: lecture.id,
       slug: lecture.slug,
-      title: lecture.title,
-      description: lecture.description ?? undefined,
+      title: resolved.fields.title,
+      description: resolved.fields.description ?? undefined,
       language: lecture.language ?? undefined,
+      originalLanguage: resolved.originalLanguage,
+      original: resolved.original
+        ? {
+            title: resolved.original.title,
+            description: resolved.original.description ?? undefined,
+          }
+        : undefined,
       durationSeconds: lecture.durationSeconds ?? undefined,
       publishedAt: lecture.publishedAt?.toISOString(),
       scholar: {
         id: lecture.scholar.id,
         slug: lecture.scholar.slug,
-        name: lecture.scholar.name,
+        name: scholarName,
         imageUrl: lecture.scholar.imageUrl ?? undefined,
       },
       topics: lecture.topics.map((lt) => ({
@@ -114,6 +150,7 @@ export class LecturesRepository {
   private async resolveSeriesContext(
     seriesId: string | null,
     lectureId: string,
+    locale: Locale,
   ): Promise<LectureDetailDto['seriesContext']> {
     if (!seriesId) return null;
 
@@ -127,6 +164,12 @@ export class LecturesRepository {
         id: true,
         slug: true,
         title: true,
+        language: true,
+        translations: {
+          where: { locale, status: 'published' },
+          select: { title: true },
+          take: 1,
+        },
       },
     });
 
@@ -145,6 +188,12 @@ export class LecturesRepository {
         slug: true,
         title: true,
         orderIndex: true,
+        language: true,
+        translations: {
+          where: { locale, status: 'published' },
+          select: { title: true },
+          take: 1,
+        },
       },
     });
 
@@ -155,15 +204,27 @@ export class LecturesRepository {
         ? siblings[currentIndex + 1]
         : null;
 
+    const titleOf = (item: {
+      title: string;
+      language: Locale | null;
+      translations: { title: string }[];
+    }): string =>
+      resolveContentTranslation({
+        base: { title: item.title },
+        originalLanguage: item.language,
+        targetLocale: locale,
+        publishedTranslation: item.translations[0] ?? null,
+      }).fields.title;
+
     return {
       seriesId: series.id,
-      seriesTitle: series.title,
+      seriesTitle: titleOf(series),
       seriesSlug: series.slug,
       prevLecture: prev
-        ? { id: prev.id, slug: prev.slug, title: prev.title }
+        ? { id: prev.id, slug: prev.slug, title: titleOf(prev) }
         : null,
       nextLecture: next
-        ? { id: next.id, slug: next.slug, title: next.title }
+        ? { id: next.id, slug: next.slug, title: titleOf(next) }
         : null,
     };
   }
@@ -172,6 +233,7 @@ export class LecturesRepository {
     lectureId: string,
     limit: number = 6,
   ): Promise<RelatedLectureDto[]> {
+    const locale = getRequestLocale();
     const lecture = await this.prisma.lecture.findFirst({
       where: { id: lectureId, deletedAt: null },
       select: {
@@ -209,11 +271,17 @@ export class LecturesRepository {
         id: true,
         slug: true,
         title: true,
+        language: true,
         durationSeconds: true,
         scholarId: true,
         seriesId: true,
         publishedAt: true,
         createdAt: true,
+        translations: {
+          where: { locale, status: 'published' },
+          select: { title: true },
+          take: 1,
+        },
         topics: {
           select: {
             topicId: true,
@@ -224,7 +292,13 @@ export class LecturesRepository {
             id: true,
             slug: true,
             name: true,
+            mainLanguage: true,
             imageUrl: true,
+            translations: {
+              where: { locale, status: 'published' },
+              select: { name: true },
+              take: 1,
+            },
           },
         },
         audioAssets: {
@@ -268,27 +342,46 @@ export class LecturesRepository {
       .slice(0, limit)
       .map(({ item }) => item);
 
-    return rankedRelated.map((r) => ({
-      id: r.id,
-      slug: r.slug,
-      title: r.title,
-      durationSeconds: r.durationSeconds ?? undefined,
-      scholar: {
-        id: r.scholar.id,
-        slug: r.scholar.slug,
-        name: r.scholar.name,
-        imageUrl: r.scholar.imageUrl ?? undefined,
-      },
-      primaryAudioAsset: r.audioAssets[0]
-        ? {
-            id: r.audioAssets[0].id,
-            url: r.audioAssets[0].url,
-            format: r.audioAssets[0].format ?? undefined,
-            bitrateKbps: r.audioAssets[0].bitrateKbps ?? undefined,
-            durationSeconds: r.audioAssets[0].durationSeconds ?? undefined,
-          }
-        : null,
-    }));
+    return rankedRelated.map((r) => {
+      const resolved = resolveContentTranslation({
+        base: { title: r.title },
+        originalLanguage: r.language,
+        targetLocale: locale,
+        publishedTranslation: r.translations[0] ?? null,
+      });
+      const scholarName = resolveContentTranslation({
+        base: { name: r.scholar.name },
+        originalLanguage: r.scholar.mainLanguage,
+        targetLocale: locale,
+        publishedTranslation: r.scholar.translations[0] ?? null,
+      }).fields.name;
+
+      return {
+        id: r.id,
+        slug: r.slug,
+        title: resolved.fields.title,
+        originalLanguage: resolved.originalLanguage,
+        original: resolved.original
+          ? { title: resolved.original.title }
+          : undefined,
+        durationSeconds: r.durationSeconds ?? undefined,
+        scholar: {
+          id: r.scholar.id,
+          slug: r.scholar.slug,
+          name: scholarName,
+          imageUrl: r.scholar.imageUrl ?? undefined,
+        },
+        primaryAudioAsset: r.audioAssets[0]
+          ? {
+              id: r.audioAssets[0].id,
+              url: r.audioAssets[0].url,
+              format: r.audioAssets[0].format ?? undefined,
+              bitrateKbps: r.audioAssets[0].bitrateKbps ?? undefined,
+              durationSeconds: r.audioAssets[0].durationSeconds ?? undefined,
+            }
+          : null,
+      };
+    });
   }
 
   async updateLecture(

@@ -1,5 +1,5 @@
 import type { StatusValue } from "../types/common.types";
-import type { Locale } from "./localization.types";
+import type { ContentOriginalFields, Locale } from "./localization.types";
 
 export type AudioAssetViewDto = {
   id: string;
@@ -73,7 +73,11 @@ export type LectureDetailDto = {
   slug: string;
   title: string;
   description?: string;
-  language?: string;
+  language?: Locale;
+  /** Language the original (untranslated) fields are written in. */
+  originalLanguage?: Locale;
+  /** Original-language fields, set only when `title`/`description` are translated. */
+  original?: ContentOriginalFields;
   durationSeconds?: number;
   publishedAt?: string;
   scholar: ScholarRefDto;
@@ -86,6 +90,8 @@ export type RelatedLectureDto = {
   id: string;
   slug: string;
   title: string;
+  originalLanguage?: Locale;
+  original?: ContentOriginalFields;
   durationSeconds?: number;
   scholar: ScholarRefDto;
   primaryAudioAsset: AudioAssetDto | null;

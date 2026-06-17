@@ -1,4 +1,5 @@
 import type { ScholarChipDto, ContentSuggestionDto } from "./home.types";
+import type { ContentOriginalFields, Locale } from "./localization.types";
 
 export type FeedContentItemDto = {
   kind: "lecture" | "series" | "collection";
@@ -10,6 +11,8 @@ export type FeedContentItemDto = {
   thumbnailUrl: string | null;
   durationSeconds: number | null;
   publishedAt: string;
+  originalLanguage?: Locale;
+  original?: ContentOriginalFields;
 };
 
 export type FeedScholarRowDto = {

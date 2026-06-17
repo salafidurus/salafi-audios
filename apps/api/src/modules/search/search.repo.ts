@@ -1,12 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Prisma, Status } from '@sd/core-db';
-import type { SearchCatalogItemDto } from '@sd/core-contracts';
+import type { Locale, SearchCatalogItemDto } from '@sd/core-contracts';
 import { ConfigService } from '../../shared/config/config.service';
 import { PrismaService } from '../../shared/db/prisma.service';
 import type { SearchQueryDto } from './dto/search-query.dto';
 import { isTrigramSearchFailure } from './search-error.utils';
+import { resolveContentTranslation } from '../../shared/utils/resolve-content-translation';
+import { getRequestLocale } from '../../shared/i18n/locale-context';
 
 const SIMILARITY_THRESHOLD = 0.12;
+
+type SearchRow = SearchCatalogItemDto & { originalLanguage: Locale | null };
+type SearchEntity = 'collection' | 'series' | 'lecture';
 
 @Injectable()
 export class SearchRepository {
@@ -22,6 +27,7 @@ export class SearchRepository {
     take: number,
     includeRelated: boolean,
   ): Promise<SearchCatalogItemDto[]> {
+    const locale = getRequestLocale();
     const topicSlugs = this.resolveTopicSlugs(query);
     const orderBySql = this.collectionOrderBySql(query.q ?? '', includeRelated);
     const fallbackOrderBySql = this.collectionFallbackOrderBySql(
@@ -30,7 +36,7 @@ export class SearchRepository {
     );
     const rows = await this.runSearchQuery(
       () =>
-        this.prisma.$queryRaw<SearchCatalogItemDto[]>(Prisma.sql`
+        this.prisma.$queryRaw<SearchRow[]>(Prisma.sql`
       SELECT
         c."id",
         c."slug",
@@ -40,7 +46,8 @@ export class SearchRepository {
         c."coverImageUrl",
         s."imageUrl" AS "scholarImageUrl",
         COALESCE(c."publishedLectureCount", 0) AS "lectureCount",
-        c."publishedDurationSeconds" AS "durationSeconds"
+        c."publishedDurationSeconds" AS "durationSeconds",
+        c."language" AS "originalLanguage"
       FROM "Collection" c
       JOIN "Scholar" s ON s."id" = c."scholarId"
       WHERE c."status" = ${Status.published}
@@ -54,7 +61,7 @@ export class SearchRepository {
       LIMIT ${take}
     `),
       () =>
-        this.prisma.$queryRaw<SearchCatalogItemDto[]>(Prisma.sql`
+        this.prisma.$queryRaw<SearchRow[]>(Prisma.sql`
       SELECT
         c."id",
         c."slug",
@@ -64,7 +71,8 @@ export class SearchRepository {
         c."coverImageUrl",
         s."imageUrl" AS "scholarImageUrl",
         COALESCE(c."publishedLectureCount", 0) AS "lectureCount",
-        c."publishedDurationSeconds" AS "durationSeconds"
+        c."publishedDurationSeconds" AS "durationSeconds",
+        c."language" AS "originalLanguage"
       FROM "Collection" c
       JOIN "Scholar" s ON s."id" = c."scholarId"
       WHERE c."status" = ${Status.published}
@@ -79,7 +87,11 @@ export class SearchRepository {
     `),
     );
 
-    return rows.map((row) => this.normalizeSearchItem(row));
+    return this.resolveSearchRows(
+      rows.map((row) => this.normalizeSearchItem(row)),
+      'collection',
+      locale,
+    );
   }
 
   async listRootSeries(
@@ -87,6 +99,7 @@ export class SearchRepository {
     take: number,
     includeRelated: boolean,
   ): Promise<SearchCatalogItemDto[]> {
+    const locale = getRequestLocale();
     const topicSlugs = this.resolveTopicSlugs(query);
     const orderBySql = this.seriesOrderBySql(query.q ?? '', includeRelated);
     const fallbackOrderBySql = this.seriesFallbackOrderBySql(
@@ -95,7 +108,7 @@ export class SearchRepository {
     );
     const rows = await this.runSearchQuery(
       () =>
-        this.prisma.$queryRaw<SearchCatalogItemDto[]>(Prisma.sql`
+        this.prisma.$queryRaw<SearchRow[]>(Prisma.sql`
       SELECT
         se."id",
         se."slug",
@@ -105,7 +118,8 @@ export class SearchRepository {
         se."coverImageUrl",
         s."imageUrl" AS "scholarImageUrl",
         COALESCE(se."publishedLectureCount", 0) AS "lectureCount",
-        se."publishedDurationSeconds" AS "durationSeconds"
+        se."publishedDurationSeconds" AS "durationSeconds",
+        se."language" AS "originalLanguage"
       FROM "Series" se
       JOIN "Scholar" s ON s."id" = se."scholarId"
       WHERE se."status" = ${Status.published}
@@ -120,7 +134,7 @@ export class SearchRepository {
       LIMIT ${take}
     `),
       () =>
-        this.prisma.$queryRaw<SearchCatalogItemDto[]>(Prisma.sql`
+        this.prisma.$queryRaw<SearchRow[]>(Prisma.sql`
       SELECT
         se."id",
         se."slug",
@@ -130,7 +144,8 @@ export class SearchRepository {
         se."coverImageUrl",
         s."imageUrl" AS "scholarImageUrl",
         COALESCE(se."publishedLectureCount", 0) AS "lectureCount",
-        se."publishedDurationSeconds" AS "durationSeconds"
+        se."publishedDurationSeconds" AS "durationSeconds",
+        se."language" AS "originalLanguage"
       FROM "Series" se
       JOIN "Scholar" s ON s."id" = se."scholarId"
       WHERE se."status" = ${Status.published}
@@ -146,7 +161,11 @@ export class SearchRepository {
     `),
     );
 
-    return rows.map((row) => this.normalizeSearchItem(row));
+    return this.resolveSearchRows(
+      rows.map((row) => this.normalizeSearchItem(row)),
+      'series',
+      locale,
+    );
   }
 
   async listRootLectures(
@@ -154,6 +173,7 @@ export class SearchRepository {
     take: number,
     includeRelated: boolean,
   ): Promise<SearchCatalogItemDto[]> {
+    const locale = getRequestLocale();
     const topicSlugs = this.resolveTopicSlugs(query);
     const orderBySql = this.lectureOrderBySql(query.q ?? '', includeRelated);
     const fallbackOrderBySql = this.lectureFallbackOrderBySql(
@@ -162,7 +182,7 @@ export class SearchRepository {
     );
     const rows = await this.runSearchQuery(
       () =>
-        this.prisma.$queryRaw<SearchCatalogItemDto[]>(Prisma.sql`
+        this.prisma.$queryRaw<SearchRow[]>(Prisma.sql`
       SELECT
         l."id",
         l."slug",
@@ -172,7 +192,8 @@ export class SearchRepository {
         NULL AS "coverImageUrl",
         s."imageUrl" AS "scholarImageUrl",
         1 AS "lectureCount",
-        l."durationSeconds" AS "durationSeconds"
+        l."durationSeconds" AS "durationSeconds",
+        l."language" AS "originalLanguage"
       FROM "Lecture" l
       JOIN "Scholar" s ON s."id" = l."scholarId"
       WHERE l."status" = ${Status.published}
@@ -187,7 +208,7 @@ export class SearchRepository {
       LIMIT ${take}
     `),
       () =>
-        this.prisma.$queryRaw<SearchCatalogItemDto[]>(Prisma.sql`
+        this.prisma.$queryRaw<SearchRow[]>(Prisma.sql`
       SELECT
         l."id",
         l."slug",
@@ -197,7 +218,8 @@ export class SearchRepository {
         NULL AS "coverImageUrl",
         s."imageUrl" AS "scholarImageUrl",
         1 AS "lectureCount",
-        l."durationSeconds" AS "durationSeconds"
+        l."durationSeconds" AS "durationSeconds",
+        l."language" AS "originalLanguage"
       FROM "Lecture" l
       JOIN "Scholar" s ON s."id" = l."scholarId"
       WHERE l."status" = ${Status.published}
@@ -213,7 +235,11 @@ export class SearchRepository {
     `),
     );
 
-    return rows.map((row) => this.normalizeSearchItem(row));
+    return this.resolveSearchRows(
+      rows.map((row) => this.normalizeSearchItem(row)),
+      'lecture',
+      locale,
+    );
   }
 
   private async runSearchQuery<T>(
@@ -725,14 +751,75 @@ export class SearchRepository {
     return query.replace(/[\\%_]/g, '\\$&');
   }
 
-  private normalizeSearchItem(
-    item: SearchCatalogItemDto,
-  ): SearchCatalogItemDto {
+  private normalizeSearchItem<T extends SearchCatalogItemDto>(item: T): T {
     return {
       ...item,
       coverImageUrl: this.toOptionalPublicUrl(item.coverImageUrl),
       scholarImageUrl: this.toOptionalPublicUrl(item.scholarImageUrl),
     };
+  }
+
+  /**
+   * Overlays published target-locale title translations onto raw search rows,
+   * keeping the original title available via the `original` block for clients
+   * that prefer original-language content.
+   */
+  private async resolveSearchRows(
+    rows: SearchRow[],
+    entity: SearchEntity,
+    locale: Locale,
+  ): Promise<SearchCatalogItemDto[]> {
+    const ids = rows.map((row) => row.id);
+    const translations = await this.fetchTitleTranslations(entity, ids, locale);
+
+    return rows.map((row) => {
+      const { originalLanguage, ...item } = row;
+      const resolved = resolveContentTranslation({
+        base: { title: item.title },
+        originalLanguage,
+        targetLocale: locale,
+        publishedTranslation: translations.get(row.id) ?? null,
+      });
+      return {
+        ...item,
+        title: resolved.fields.title,
+        originalLanguage: resolved.originalLanguage,
+        original: resolved.original
+          ? { title: resolved.original.title }
+          : undefined,
+      };
+    });
+  }
+
+  private async fetchTitleTranslations(
+    entity: SearchEntity,
+    ids: string[],
+    locale: Locale,
+  ): Promise<Map<string, { title: string }>> {
+    const map = new Map<string, { title: string }>();
+    if (!ids.length) return map;
+
+    if (entity === 'collection') {
+      const rows = await this.prisma.collectionTranslation.findMany({
+        where: { collectionId: { in: ids }, locale, status: 'published' },
+        select: { collectionId: true, title: true },
+      });
+      for (const r of rows) map.set(r.collectionId, { title: r.title });
+    } else if (entity === 'series') {
+      const rows = await this.prisma.seriesTranslation.findMany({
+        where: { seriesId: { in: ids }, locale, status: 'published' },
+        select: { seriesId: true, title: true },
+      });
+      for (const r of rows) map.set(r.seriesId, { title: r.title });
+    } else {
+      const rows = await this.prisma.lectureTranslation.findMany({
+        where: { lectureId: { in: ids }, locale, status: 'published' },
+        select: { lectureId: true, title: true },
+      });
+      for (const r of rows) map.set(r.lectureId, { title: r.title });
+    }
+
+    return map;
   }
 
   private toPublicUrl(value: string): string {
