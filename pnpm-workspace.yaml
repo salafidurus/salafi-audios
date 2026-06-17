@@ -32,7 +32,8 @@ overrides:
   react-dom: 19.2.3
 
 catalog:
-  "@better-auth/expo": ^1.6.18
+  # better-auth and @better-auth/expo MUST be pinned to the exact same version.
+  "@better-auth/expo": 1.6.18
   "@nestjs/common": ^11.1.24
   "@nestjs/core": ^11.1.24
   "@nestjs/platform-express": ^11.1.24
@@ -45,7 +46,7 @@ catalog:
   "@testing-library/react": ^16.3.2
   "@testing-library/react-native": ^13.3.3
   "@types/jest": ^29.5.14
-  better-auth: ^1.6.18
+  better-auth: 1.6.18 # keep in exact lockstep with @better-auth/expo (see note above)
   class-transformer: ^0.5.1
   class-validator: ^0.15.1
   i18next: ^26.3.1
