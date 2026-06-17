@@ -8,6 +8,7 @@ coverage/
 **/coverage/
 dist/
 **/dist/
+.worktrees/
 
 .antigravitycli/
 

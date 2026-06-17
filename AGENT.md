@@ -403,6 +403,11 @@ same commit.
 - Do not hand-edit generated API client output.
 - Update docs when architecture intent or guarantees change.
 
+## Agent worktree policy
+
+- All AI agents must work inside a git worktree.
+- Agents must either create a new worktree in the `.worktrees` (or `.worktree`) folder, or ask the user if they should use one of the available worktrees or create a new one.
+
 ## MCP usage policy
 
 - Use Playwright MCP only for web UI verification.
