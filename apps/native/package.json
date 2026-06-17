@@ -91,7 +91,7 @@
   },
   "devDependencies": {
     "@sd/util-config": "workspace:*",
-    "@testing-library/react-native": "^13.3.3",
+    "@testing-library/react-native": "catalog:",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.10.7",
     "@types/react": "19.2.9",
