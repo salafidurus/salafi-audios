@@ -43,11 +43,11 @@ test.describe("Navigation — sidebar & routing", () => {
     });
 
     test("page title updates on navigation", async ({ page }) => {
-      await page.goto("/");
+      await page.goto("/", { waitUntil: "domcontentloaded" });
       const homeTitle = await page.title();
       expect(homeTitle).toBeTruthy();
 
-      await page.goto("/feed");
+      await page.goto("/feed", { waitUntil: "domcontentloaded" });
       await expect(page).toHaveURL(/\/feed/);
       const feedTitle = await page.title();
       expect(feedTitle).toBeTruthy();

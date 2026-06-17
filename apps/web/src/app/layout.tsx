@@ -125,7 +125,7 @@ export default async function RootLayout({
       className={`${fraunces.variable} ${manrope.variable} ${geistMono.variable}`}
     >
       <body className="antialiased">
-        {process.env.NODE_ENV === "production" ? (
+        {process.env.NODE_ENV === "production" && !apiBaseUrl?.includes("localhost") ? (
           <Script src="https://www.vexo.co/analytics.js" strategy="afterInteractive" />
         ) : null}
         <style>{themeCss}</style>
