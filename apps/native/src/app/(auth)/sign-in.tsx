@@ -31,7 +31,6 @@ export default function SignInRoute() {
       onBack={handleBack}
       onSignInWithGoogle={() => authClient.signIn.social({ provider: "google" })}
       onSignInWithApple={() => authClient.signIn.social({ provider: "apple" })}
-      onNavigateToSignUp={() => router.push(routes.signUp)}
     />
   );
 }

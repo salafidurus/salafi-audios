@@ -21,18 +21,6 @@
       "noAccountSplit": "ليس لديك حساب؟",
       "noAccountLink": "أنشئ حسابًا",
       "failed": "فشل تسجيل الدخول"
-    },
-    "signUp": {
-      "kicker": "ابدأ الاستماع",
-      "title": "إنشاء حساب",
-      "orEmail": "أو أنشئ حسابًا عبر البريد الإلكتروني",
-      "submit": "إنشاء حساب",
-      "submitting": "جارٍ إنشاء الحساب...",
-      "alreadyAccount": "لديك حساب بالفعل؟ سجّل الدخول",
-      "alreadyAccountSplit": "لديك حساب بالفعل؟",
-      "alreadyAccountLink": "سجّل الدخول",
-      "iAgreeTo": "أوافق على",
-      "failed": "فشل إنشاء الحساب"
     }
   },
   "validation": {

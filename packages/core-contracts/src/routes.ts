@@ -53,7 +53,6 @@ export const routes = {
   },
 
   signIn: "/sign-in",
-  signUp: "/sign-up",
   support: "/support",
   privacy: "/privacy",
   termsOfUse: "/terms-of-use",
@@ -83,7 +82,6 @@ export const routeAuth = {
   privacy: "public",
   termsOfUse: "public",
   signIn: "public",
-  signUp: "public",
   library: "local-first",
   account: "local-first",
 } as const satisfies Record<keyof typeof routes, RouteAuthMode>;
