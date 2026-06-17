@@ -4,24 +4,21 @@ test.describe("Theme — system-preference based", () => {
   test("page loads with a data-theme attribute on <html>", async ({ page }) => {
     await page.goto("/");
 
-    const theme = await page.locator("html").getAttribute("data-theme");
-    expect(["light", "dark"]).toContain(theme);
+    await expect(page.locator("html")).toHaveAttribute("data-theme", /light|dark/);
   });
 
   test("light color scheme results in light theme", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "light" });
     await page.goto("/");
 
-    const theme = await page.locator("html").getAttribute("data-theme");
-    expect(theme).toBe("light");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   });
 
   test("dark color scheme results in dark theme", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "dark" });
     await page.goto("/");
 
-    const theme = await page.locator("html").getAttribute("data-theme");
-    expect(theme).toBe("dark");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   });
 
   test("theme applies different CSS variables for light vs dark", async ({ page }) => {
@@ -49,14 +46,12 @@ test.describe("Theme — system-preference based", () => {
     await page.emulateMedia({ colorScheme: "dark" });
     await page.goto("/");
 
-    const themeBefore = await page.locator("html").getAttribute("data-theme");
-    expect(themeBefore).toBe("dark");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
 
     // Navigate to another page
     await page.goto("/feed");
 
-    const themeAfter = await page.locator("html").getAttribute("data-theme");
-    expect(themeAfter).toBe("dark");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   });
 
   // No explicit theme toggle UI exists — theme follows system preference.

@@ -1,13 +1,12 @@
 import { lightWebTheme, darkWebTheme } from "@sd/design-tokens";
 
-const createThemeCss = (selector: string, theme: typeof lightWebTheme) => {
+const getThemeProperties = (theme: typeof lightWebTheme) => {
   const inputSurfaceRest = theme.colors.surface.subtle;
   const inputSurfaceFocus = theme.colors.surface.default;
   const inputBorderRest = theme.recipes.chrome.inputBorderRest;
   const inputBorderFocus = theme.colors.border.primary;
 
   return `
-${selector} {
   --surface-canvas: ${theme.colors.surface.canvas};
   --surface-default: ${theme.colors.surface.default};
   --surface-subtle: ${theme.colors.surface.subtle};
@@ -207,11 +206,20 @@ ${selector} {
   --typo-xs-line-height: ${theme.typography.xs.lineHeight};
   --typo-xs-font-weight: ${theme.typography.xs.fontWeight};
   --typo-xs-letter-spacing: ${theme.typography.xs.letterSpacing};
-}
 `;
+};
+
+const createThemeCss = (selector: string, theme: typeof lightWebTheme) => {
+  return `${selector} {${getThemeProperties(theme)}}`;
 };
 
 export const themeCss = `
 ${createThemeCss(":root", lightWebTheme)}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    ${getThemeProperties(darkWebTheme)}
+  }
+}
 ${createThemeCss('[data-theme="dark"]', darkWebTheme)}
+${createThemeCss('[data-theme="light"]', lightWebTheme)}
 `;
