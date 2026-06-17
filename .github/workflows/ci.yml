@@ -146,14 +146,18 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
-      # Cache Playwright browsers (~200MB) keyed by apps/web/package.json to avoid
-      # invalidation from unrelated lockfile changes while still catching Playwright bumps
+      - name: Get Playwright version
+        id: playwright-version
+        run: echo "version=$(pnpm --filter web exec playwright --version | cut -d' ' -f2)" >> $GITHUB_OUTPUT
+
+      # Cache Playwright browsers (~200MB) keyed by installed Playwright version to avoid
+      # invalidation from unrelated changes while ensuring correct browser alignment
       - name: Cache Playwright browsers
         id: playwright-cache
         uses: actions/cache@v5
         with:
           path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
-          key: ${{ runner.os }}-playwright-${{ hashFiles('apps/web/package.json') }}
+          key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}
           restore-keys: |
             ${{ runner.os }}-playwright-
 
@@ -164,7 +168,7 @@ jobs:
       - name: Playwright cache diagnostics
         if: always()
         run: |
-          echo "Cache key: ${{ runner.os }}-playwright-${{ hashFiles('apps/web/package.json') }}"
+          echo "Cache key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version || 'unknown' }}"
           echo "Cache hit: ${{ steps.playwright-cache.outputs.cache-hit }}"
           pnpm --filter web exec playwright --version || echo "Playwright not in PATH"
           echo "Browser path: $PLAYWRIGHT_BROWSERS_PATH"
