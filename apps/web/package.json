@@ -41,7 +41,7 @@
     "zustand": "catalog:"
   },
   "devDependencies": {
-    "@playwright/test": "^1.60.0",
+    "@playwright/test": "^1.61.0",
     "@sd/util-config": "workspace:*",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "catalog:",
