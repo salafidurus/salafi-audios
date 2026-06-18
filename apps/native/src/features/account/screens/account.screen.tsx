@@ -1,7 +1,7 @@
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useAccountScreen } from "@sd/domain-account";
-import { LanguageSwitch } from "@/features/i18n";
+import { LanguageSwitch, ContentLanguageToggle } from "@/features/i18n";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 
 export type AccountScreenProps = {
@@ -96,11 +96,14 @@ export function AccountScreen({
           <Text style={{ fontSize: 15, color: "#dc2626" }}>{t("account.signOut", "Sign Out")}</Text>
         </Pressable>
       </View>
-      <View style={{ marginTop: 24 }}>
-        <Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 8 }}>
-          {t("account.language", "Language")}
-        </Text>
-        <LanguageSwitch />
+      <View style={{ marginTop: 24, gap: 16 }}>
+        <View>
+          <Text style={{ fontSize: 16, fontWeight: "600", marginBottom: 8 }}>
+            {t("account.language", "Language")}
+          </Text>
+          <LanguageSwitch />
+        </View>
+        <ContentLanguageToggle />
       </View>
     </ScrollView>
   );

@@ -44,7 +44,8 @@
     "editProfile": "Edit Profile",
     "legal": "Legal",
     "signOut": "Sign Out",
-    "language": "Language"
+    "language": "Language",
+    "showOriginalContent": "Show content in its original language"
   },
   "tabs": {
     "search": "Search",

@@ -44,7 +44,8 @@
     "editProfile": "تعديل الملف الشخصي",
     "legal": "الشؤون القانونية",
     "signOut": "تسجيل الخروج",
-    "language": "اللغة"
+    "language": "اللغة",
+    "showOriginalContent": "عرض المحتوى بلغته الأصلية"
   },
   "tabs": {
     "search": "بحث",

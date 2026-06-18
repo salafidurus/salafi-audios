@@ -20,6 +20,7 @@ jest.mock("@/core/i18n/use-translation", () => ({
 
 jest.mock("../../i18n", () => ({
   LanguageSwitch: () => "LanguageSwitch",
+  ContentLanguageToggle: () => "ContentLanguageToggle",
 }));
 
 const mockedUseAccountScreen = jest.mocked(useAccountScreen);

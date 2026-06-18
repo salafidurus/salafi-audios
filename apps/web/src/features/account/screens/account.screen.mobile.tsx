@@ -4,7 +4,7 @@ import type { CSSProperties } from "react";
 import Image from "next/image";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useAccountScreen } from "@sd/domain-account";
-import { LanguageSwitch } from "@/features/i18n";
+import { LanguageSwitch, ContentLanguageToggle } from "@/features/i18n";
 
 const menuButtonStyle: CSSProperties = {
   padding: "10px 14px",
@@ -73,8 +73,9 @@ export function AccountMobileScreen({
           {t("account.signOut", "Sign Out")}
         </button>
       </div>
-      <div style={{ marginTop: 24 }}>
+      <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 12 }}>
         <LanguageSwitch />
+        <ContentLanguageToggle />
       </div>
     </div>
   );
