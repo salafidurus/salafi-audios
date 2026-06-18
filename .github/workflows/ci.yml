@@ -87,10 +87,7 @@ jobs:
               - "packages/domain-live/**"
               - "packages/domain-search/**"
               - "packages/util-config/**"
-              - "pnpm-lock.yaml"
               - "pnpm-workspace.yaml"
-              - "package.json"
-              - "**/package.json"
               - "turbo.json"
               - ".github/workflows/ci.yml"
             # Catches accidental commits of generated Prisma client output
@@ -98,12 +95,6 @@ jobs:
               - "packages/core-db/prisma/**"
               - "packages/core-db/prisma.config.ts"
               - "packages/core-db/src/generated/**"
-              - "pnpm-lock.yaml"
-              - "pnpm-workspace.yaml"
-              - "package.json"
-              - "**/package.json"
-              - "turbo.json"
-              - ".github/workflows/ci.yml"
 
   # Single consolidated check: one install, then build + lint + typecheck + test in one Turbo
   # run. `--continue` runs every task and surfaces all failures together (no early stop), and
