@@ -7,9 +7,11 @@ import { SearchInputDesktop } from "@/features/search/components/SearchInput/Sea
 import { SearchResultItemDesktop } from "@/features/search/components/SearchResultItem/SearchResultItem.desktop";
 import { SearchResultsListDesktop } from "@/features/search/components/SearchResultsList/SearchResultsList.desktop";
 import { useSearchProcessing } from "@sd/domain-search";
+import { useShowOriginalContent } from "@/features/i18n/content-preference";
 
 export function SearchProcessingDesktopScreen() {
   const inputRef = useRef<HTMLInputElement>(null);
+  const showOriginal = useShowOriginalContent();
   const {
     query,
     setQuery,
@@ -20,7 +22,7 @@ export function SearchProcessingDesktopScreen() {
     isFetching,
     shouldSearch,
     errorMessage,
-  } = useSearchProcessing();
+  } = useSearchProcessing({ showOriginal });
 
   useEffect(() => {
     inputRef.current?.focus();

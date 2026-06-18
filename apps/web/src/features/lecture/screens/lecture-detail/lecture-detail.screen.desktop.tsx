@@ -8,6 +8,8 @@ import { TopicChips } from "@/features/lecture/components/topic-chips/topic-chip
 import { SeriesContextBar } from "@/features/lecture/components/series-context-bar/series-context-bar";
 import { LecturePlayButton } from "@/features/lecture/components/lecture-play-button/LecturePlayButton";
 import { LectureSaveButton } from "@/features/lecture/components/lecture-save-button/LectureSaveButton";
+import { pickContentField } from "@sd/core-i18n";
+import { useShowOriginalContent } from "@/features/i18n/content-preference";
 
 export type LectureDetailDesktopScreenProps = {
   id: string;
@@ -15,6 +17,7 @@ export type LectureDetailDesktopScreenProps = {
 
 export function LectureDetailDesktopScreen({ id }: LectureDetailDesktopScreenProps) {
   const { lecture, isFetching } = useLectureDetailScreen(id);
+  const showOriginal = useShowOriginalContent();
 
   if (isFetching) {
     return (
@@ -32,19 +35,24 @@ export function LectureDetailDesktopScreen({ id }: LectureDetailDesktopScreenPro
     );
   }
 
+  const title = pickContentField(lecture.title, lecture.original?.title, showOriginal);
+  const description = lecture.description
+    ? pickContentField(lecture.description, lecture.original?.description, showOriginal)
+    : undefined;
+
   return (
     <ScreenView>
       <div style={{ maxWidth: 960, margin: "0 auto", display: "flex", gap: 40 }}>
         {/* Left column: content */}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <AppText variant="displayMd">{lecture.title}</AppText>
+          <AppText variant="displayMd">{title}</AppText>
           <LectureMeta lecture={lecture} />
           <TopicChips topics={lecture.topics} />
 
-          {lecture.description && (
+          {description && (
             <div style={{ marginTop: 20 }}>
               <AppText variant="bodyMd" style={{ lineHeight: "1.7" }}>
-                {lecture.description}
+                {description}
               </AppText>
             </div>
           )}

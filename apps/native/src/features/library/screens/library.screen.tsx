@@ -1,12 +1,14 @@
 import { useCallback } from "react";
 import { SectionList, StyleSheet, Text, Pressable, View } from "react-native";
 import type { LibraryItemDto } from "@sd/core-contracts";
+import { pickContentField } from "@sd/core-i18n";
 import {
   useLibraryCompletedScreen,
   useLibraryProgressScreen,
   useLibrarySavedScreen,
 } from "@sd/domain-content";
 import { useAuth } from "@/core/auth/use-auth";
+import { useShowOriginalContent } from "@/features/i18n/content-preference";
 
 export type LibraryScreenProps = {
   onNavigateToLecture?: (id: string) => void;
@@ -35,12 +37,14 @@ function LibraryItem({
     item.durationSeconds && item.progressSeconds
       ? Math.round((item.progressSeconds / item.durationSeconds) * 100)
       : null;
+  const showOriginal = useShowOriginalContent();
+  const lectureTitle = pickContentField(item.lectureTitle, item.originalLectureTitle, showOriginal);
 
   return (
     <Pressable onPress={onPress} style={styles.item}>
       <View style={styles.itemRow}>
         {variant === "completed" ? <Text style={styles.checkmark}>✓</Text> : null}
-        <Text style={styles.itemTitle}>{item.lectureTitle}</Text>
+        <Text style={styles.itemTitle}>{lectureTitle}</Text>
       </View>
       <Text style={styles.itemSubtitle}>
         {item.scholarName}

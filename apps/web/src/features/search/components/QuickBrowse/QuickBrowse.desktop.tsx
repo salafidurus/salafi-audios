@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import type { ScholarChipDto, ContentSuggestionDto, RecentProgressDto } from "@sd/core-contracts";
+import { pickContentField } from "@sd/core-i18n";
+import { useShowOriginalContent } from "@/features/i18n/content-preference";
 
 const SCHOLAR_SKELETON_COUNT = 5;
 const SUGGESTION_SKELETON_COUNT = 3;
@@ -56,6 +58,8 @@ export function QuickBrowseDesktop({
   onSelectSuggestion,
   onContinueListening,
 }: QuickBrowseDesktopProps) {
+  const showOriginal = useShowOriginalContent();
+
   return (
     <section className="flex w-full max-w-[56rem] flex-col gap-[var(--space-scale-4xl)]">
       {/* Continue Listening */}
@@ -162,34 +166,37 @@ export function QuickBrowseDesktop({
             Suggestions
           </h2>
           <div className="no-scrollbar flex gap-[var(--space-component-gap-md)] overflow-x-auto pb-[var(--space-scale-xs)]">
-            {suggestions.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => onSelectSuggestion?.(item.slug)}
-                className="flex w-48 shrink-0 flex-col gap-[var(--space-scale-xs)] rounded-[var(--radius-component-card)] border border-[var(--border-default)] bg-[var(--surface-default)] p-[var(--space-component-card-padding)] text-left transition hover:border-[var(--accent-primary-subtle-border)] hover:bg-[var(--accent-primary-subtle-surface)]"
-              >
-                <span className="text-[var(--content-strong)]" style={labelStyle}>
-                  {item.title}
-                </span>
-                <span className="text-[var(--content-muted)]" style={captionStyle}>
-                  {item.scholarName}
-                </span>
-                <div className="flex items-center gap-[var(--space-scale-xs)]">
-                  <span
-                    className="rounded-[var(--radius-component-chip)] bg-[var(--surface-hover)] px-[var(--space-scale-xs)] py-px text-[var(--content-muted)]"
-                    style={captionStyle}
-                  >
-                    {item.kind}
+            {suggestions.map((item) => {
+              const title = pickContentField(item.title, item.original?.title, showOriginal);
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => onSelectSuggestion?.(item.slug)}
+                  className="flex w-48 shrink-0 flex-col gap-[var(--space-scale-xs)] rounded-[var(--radius-component-card)] border border-[var(--border-default)] bg-[var(--surface-default)] p-[var(--space-component-card-padding)] text-left transition hover:border-[var(--accent-primary-subtle-border)] hover:bg-[var(--accent-primary-subtle-surface)]"
+                >
+                  <span className="text-[var(--content-strong)]" style={labelStyle}>
+                    {title}
                   </span>
-                  {item.durationSeconds != null && (
-                    <span className="text-[var(--content-muted)]" style={captionStyle}>
-                      {formatDuration(item.durationSeconds)}
+                  <span className="text-[var(--content-muted)]" style={captionStyle}>
+                    {item.scholarName}
+                  </span>
+                  <div className="flex items-center gap-[var(--space-scale-xs)]">
+                    <span
+                      className="rounded-[var(--radius-component-chip)] bg-[var(--surface-hover)] px-[var(--space-scale-xs)] py-px text-[var(--content-muted)]"
+                      style={captionStyle}
+                    >
+                      {item.kind}
                     </span>
-                  )}
-                </div>
-              </button>
-            ))}
+                    {item.durationSeconds != null && (
+                      <span className="text-[var(--content-muted)]" style={captionStyle}>
+                        {formatDuration(item.durationSeconds)}
+                      </span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </section>
       )}

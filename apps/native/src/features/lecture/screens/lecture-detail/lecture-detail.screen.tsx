@@ -1,11 +1,13 @@
 import { ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { useLectureDetailScreen } from "@sd/domain-content";
+import { pickContentField } from "@sd/core-i18n";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { LectureMeta } from "@/features/lecture/components/lecture-meta/lecture-meta";
 import { SeriesContextBar } from "@/features/lecture/components/series-context-bar/series-context-bar";
 import { TopicChips } from "@/features/lecture/components/topic-chips/topic-chips";
+import { useShowOriginalContent } from "@/features/i18n/content-preference";
 
 export type LectureDetailScreenProps = {
   id: string;
@@ -13,6 +15,7 @@ export type LectureDetailScreenProps = {
 
 export function LectureDetailScreen({ id }: LectureDetailScreenProps) {
   const { lecture, isFetching } = useLectureDetailScreen(id);
+  const showOriginal = useShowOriginalContent();
 
   if (isFetching) {
     return (
@@ -30,16 +33,21 @@ export function LectureDetailScreen({ id }: LectureDetailScreenProps) {
     );
   }
 
+  const title = pickContentField(lecture.title, lecture.original?.title, showOriginal);
+  const description = lecture.description
+    ? pickContentField(lecture.description, lecture.original?.description, showOriginal)
+    : undefined;
+
   return (
     <ScreenView>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        <AppText variant="titleLg">{lecture.title}</AppText>
+        <AppText variant="titleLg">{title}</AppText>
         <LectureMeta lecture={lecture} />
         <TopicChips topics={lecture.topics} />
 
-        {lecture.description ? (
+        {description ? (
           <View style={styles.descriptionSection}>
-            <AppText variant="bodyMd">{lecture.description}</AppText>
+            <AppText variant="bodyMd">{description}</AppText>
           </View>
         ) : null}
 

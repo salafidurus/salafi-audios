@@ -1,6 +1,8 @@
 import { View, Text, FlatList, Pressable } from "react-native";
 import type { ListRenderItemInfo } from "react-native";
 import type { ContentSuggestionDto } from "@sd/core-contracts";
+import { pickContentField } from "@sd/core-i18n";
+import { useShowOriginalContent } from "@/features/i18n/content-preference";
 
 export type FeedTopicRowProps = {
   topicName: string;
@@ -9,9 +11,12 @@ export type FeedTopicRowProps = {
 };
 
 export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProps) {
+  const showOriginal = useShowOriginalContent();
+
   if (!items.length) return null;
 
   function renderItem({ item }: ListRenderItemInfo<ContentSuggestionDto>) {
+    const title = pickContentField(item.title, item.original?.title, showOriginal);
     return (
       <Pressable
         style={({ pressed }) => [
@@ -36,7 +41,7 @@ export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProp
           }}
           numberOfLines={2}
         >
-          {item.title}
+          {title}
         </Text>
         <Text
           style={{

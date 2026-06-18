@@ -2,6 +2,8 @@
 
 import type { CSSProperties } from "react";
 import type { ContentSuggestionDto } from "@sd/core-contracts";
+import { pickContentField } from "@sd/core-i18n";
+import { useShowOriginalContent } from "@/features/i18n/content-preference";
 
 const itemButtonStyle: CSSProperties = {
   minWidth: 200,
@@ -21,6 +23,8 @@ export type FeedTopicRowProps = {
 };
 
 export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProps) {
+  const showOriginal = useShowOriginalContent();
+
   if (!items.length) return null;
 
   return (
@@ -45,54 +49,57 @@ export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProp
           paddingBottom: 8,
         }}
       >
-        {items.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            style={itemButtonStyle}
-            onClick={() => onItemPress?.(item.slug)}
-            onFocus={(e) => {
-              e.currentTarget.style.boxShadow = "var(--shadow-sm)";
-            }}
-            onBlur={(e) => {
-              e.currentTarget.style.boxShadow = "none";
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.boxShadow = "var(--shadow-sm)";
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.boxShadow = "none";
-            }}
-          >
-            <div
-              style={{
-                fontSize: 14,
-                fontWeight: 500,
-                marginBottom: 4,
-                lineHeight: "1.4",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
+        {items.map((item) => {
+          const title = pickContentField(item.title, item.original?.title, showOriginal);
+          return (
+            <button
+              key={item.id}
+              type="button"
+              style={itemButtonStyle}
+              onClick={() => onItemPress?.(item.slug)}
+              onFocus={(e) => {
+                e.currentTarget.style.boxShadow = "var(--shadow-sm)";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.boxShadow = "none";
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.boxShadow = "var(--shadow-sm)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.boxShadow = "none";
               }}
             >
-              {item.title}
-            </div>
-            <div
-              style={{
-                fontSize: 12,
-                color: "var(--content-muted)",
-                marginBottom: 4,
-              }}
-            >
-              {item.scholarName}
-            </div>
-            {item.durationSeconds && (
-              <div style={{ fontSize: 12, color: "var(--content-subtle)" }}>
-                {Math.floor(item.durationSeconds / 60)}m
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 500,
+                  marginBottom: 4,
+                  lineHeight: "1.4",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {title}
               </div>
-            )}
-          </button>
-        ))}
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "var(--content-muted)",
+                  marginBottom: 4,
+                }}
+              >
+                {item.scholarName}
+              </div>
+              {item.durationSeconds && (
+                <div style={{ fontSize: 12, color: "var(--content-subtle)" }}>
+                  {Math.floor(item.durationSeconds / 60)}m
+                </div>
+              )}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

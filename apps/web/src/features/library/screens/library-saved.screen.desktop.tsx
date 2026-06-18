@@ -2,12 +2,14 @@
 
 import type React from "react";
 import type { LibraryItemDto } from "@sd/core-contracts";
+import { pickContentField } from "@sd/core-i18n";
 import {
   useLibrarySavedScreen,
   useLibraryProgressScreen,
   useLibraryCompletedScreen,
 } from "@sd/domain-content";
 import { useAuth } from "@/core/auth/use-auth";
+import { useShowOriginalContent } from "@/features/i18n/content-preference";
 
 function ProgressBar({ percent }: { percent: number }) {
   return (
@@ -48,12 +50,14 @@ function LibraryItem({
     item.durationSeconds && item.progressSeconds
       ? Math.round((item.progressSeconds / item.durationSeconds) * 100)
       : null;
+  const showOriginal = useShowOriginalContent();
+  const lectureTitle = pickContentField(item.lectureTitle, item.originalLectureTitle, showOriginal);
 
   return (
     <button type="button" onClick={onPress} style={libraryItemButtonStyle}>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         {variant === "completed" && <span style={{ color: "#16a34a", fontSize: 14 }}>✓</span>}
-        <span style={{ fontSize: 16, fontWeight: 600 }}>{item.lectureTitle}</span>
+        <span style={{ fontSize: 16, fontWeight: 600 }}>{lectureTitle}</span>
       </div>
       <div style={{ fontSize: 13, color: "#666", marginTop: 4 }}>
         {item.scholarName}

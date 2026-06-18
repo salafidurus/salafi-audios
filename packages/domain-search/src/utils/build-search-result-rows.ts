@@ -1,4 +1,5 @@
 import type { SearchCatalogItemDto, SearchCatalogResultsDto } from "@sd/core-contracts";
+import { pickContentField } from "@sd/core-i18n";
 
 export type SearchResultRow = {
   id: string;
@@ -11,37 +12,26 @@ export type SearchResultRow = {
 
 export function buildSearchResultRows(
   data: SearchCatalogResultsDto | undefined,
+  showOriginal = false,
 ): SearchResultRow[] {
   if (!data) {
     return [];
   }
 
-  const collections = data.collections.map((item: SearchCatalogItemDto) => ({
-    id: `collection:${item.id}`,
-    title: item.title,
-    scholarName: item.scholarName,
-    imageUrl: item.coverImageUrl ?? item.scholarImageUrl,
-    lectureCount: item.lectureCount,
-    durationSeconds: item.durationSeconds,
-  }));
+  const toRow =
+    (prefix: string) =>
+    (item: SearchCatalogItemDto): SearchResultRow => ({
+      id: `${prefix}:${item.id}`,
+      title: pickContentField(item.title, item.original?.title, showOriginal),
+      scholarName: item.scholarName,
+      imageUrl: item.coverImageUrl ?? item.scholarImageUrl,
+      lectureCount: item.lectureCount,
+      durationSeconds: item.durationSeconds,
+    });
 
-  const series = data.series.map((item: SearchCatalogItemDto) => ({
-    id: `series:${item.id}`,
-    title: item.title,
-    scholarName: item.scholarName,
-    imageUrl: item.coverImageUrl ?? item.scholarImageUrl,
-    lectureCount: item.lectureCount,
-    durationSeconds: item.durationSeconds,
-  }));
-
-  const lectures = data.lectures.map((item: SearchCatalogItemDto) => ({
-    id: `lecture:${item.id}`,
-    title: item.title,
-    scholarName: item.scholarName,
-    imageUrl: item.coverImageUrl ?? item.scholarImageUrl,
-    lectureCount: item.lectureCount,
-    durationSeconds: item.durationSeconds,
-  }));
-
-  return [...collections, ...series, ...lectures];
+  return [
+    ...data.collections.map(toRow("collection")),
+    ...data.series.map(toRow("series")),
+    ...data.lectures.map(toRow("lecture")),
+  ];
 }

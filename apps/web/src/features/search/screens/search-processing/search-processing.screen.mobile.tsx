@@ -14,6 +14,7 @@ import {
   type SearchResultRow,
 } from "@/features/search/components/SearchResultsList/SearchResultsList.mobile";
 import { useSearchProcessing } from "@sd/domain-search";
+import { useShowOriginalContent } from "@/features/i18n/content-preference";
 import styles from "./search-processing.screen.mobile.module.css";
 
 export type SearchProcessingScreenProps = {
@@ -26,6 +27,7 @@ export function SearchProcessingMobileScreen({
   onBackPress,
 }: SearchProcessingScreenProps) {
   const inputRef = useRef<SearchInputMobileRef>(null);
+  const showOriginal = useShowOriginalContent();
   const {
     query,
     setQuery,
@@ -36,7 +38,7 @@ export function SearchProcessingMobileScreen({
     isFetching,
     shouldSearch,
     errorMessage,
-  } = useSearchProcessing({ prefill });
+  } = useSearchProcessing({ prefill, showOriginal });
 
   useEffect(() => {
     inputRef.current?.focus();

@@ -15,7 +15,8 @@
     "test:prepush": "jest --changedSince=origin/main --passWithNoTests"
   },
   "dependencies": {
-    "@sd/core-contracts": "workspace:*"
+    "@sd/core-contracts": "workspace:*",
+    "@sd/core-i18n": "workspace:*"
   },
   "peerDependencies": {
     "react": "^19.0.0"

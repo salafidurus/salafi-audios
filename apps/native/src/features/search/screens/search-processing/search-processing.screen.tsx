@@ -12,6 +12,7 @@ import {
   type SearchResultRow,
 } from "@/features/search/components/SearchResultsList/SearchResultsList";
 import { useSearchProcessing } from "@sd/domain-search";
+import { useShowOriginalContent } from "@/features/i18n/content-preference";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
 export type SearchProcessingScreenProps = {
@@ -21,6 +22,7 @@ export type SearchProcessingScreenProps = {
 
 export function SearchProcessingScreen({ prefill, onBackPress }: SearchProcessingScreenProps) {
   const inputRef = useRef<SearchInputRef>(null);
+  const showOriginal = useShowOriginalContent();
   const {
     query,
     setQuery,
@@ -31,7 +33,7 @@ export function SearchProcessingScreen({ prefill, onBackPress }: SearchProcessin
     isFetching,
     shouldSearch,
     errorMessage,
-  } = useSearchProcessing({ prefill });
+  } = useSearchProcessing({ prefill, showOriginal });
 
   useEffect(() => {
     inputRef.current?.focus();

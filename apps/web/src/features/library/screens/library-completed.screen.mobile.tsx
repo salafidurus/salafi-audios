@@ -2,8 +2,10 @@
 
 import type React from "react";
 import type { LibraryItemDto } from "@sd/core-contracts";
+import { pickContentField } from "@sd/core-i18n";
 import { useLibraryCompletedScreen } from "@sd/domain-content";
 import { useAuth } from "@/core/auth/use-auth";
+import { useShowOriginalContent } from "@/features/i18n/content-preference";
 
 export type LibraryCompletedMobileScreenProps = {
   onNavigateToLecture?: (id: string) => void;
@@ -21,11 +23,13 @@ const libraryItemButtonStyle: React.CSSProperties = {
 };
 
 function LibraryItem({ item, onPress }: { item: LibraryItemDto; onPress?: () => void }) {
+  const showOriginal = useShowOriginalContent();
+  const lectureTitle = pickContentField(item.lectureTitle, item.originalLectureTitle, showOriginal);
   return (
     <button type="button" onClick={onPress} style={libraryItemButtonStyle}>
       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
         <span style={{ color: "#16a34a", fontSize: 12 }}>✓</span>
-        <span style={{ fontSize: 15, fontWeight: 600 }}>{item.lectureTitle}</span>
+        <span style={{ fontSize: 15, fontWeight: 600 }}>{lectureTitle}</span>
       </div>
       <div style={{ fontSize: 12, color: "#666", marginTop: 2, paddingLeft: 18 }}>
         {item.scholarName}
