@@ -1,41 +1,70 @@
+# Git passes information about refs being pushed on stdin in the format:
+# <local_ref> <local_sha> <remote_ref> <remote_sha>
+# We read stdin to find the target branch's current remote SHA.
 ZERO_SHA="0000000000000000000000000000000000000000"
+COMPARISON_BASE="origin/main"
+HAS_UPDATES=false
+
+# Strip any \r from ZERO_SHA itself if the script is saved with CRLF on Windows
+ZERO_SHA=$(printf "%s" "$ZERO_SHA" | tr -d '\r')
 
 while read -r local_ref local_sha remote_ref remote_sha; do
+  # Strip trailing carriage returns to ensure string comparisons and git commands
+  # do not break on Windows checkouts.
+  local_sha=$(printf "%s" "$local_sha" | tr -d '\r')
+  remote_sha=$(printf "%s" "$remote_sha" | tr -d '\r')
+
+  # Skip branch deletions (local SHA is empty/zeroed)
   if [ -z "$local_sha" ] || [ "$local_sha" = "$ZERO_SHA" ]; then
     continue
   fi
 
-  printf "pre-push: validating changed packages...\n"
+  HAS_UPDATES=true
+  # If the branch already exists on the remote (non-zero remote SHA), we use
+  # that remote commit as the comparison base. This optimizes execution by only
+  # verifying commits that are actually new since the last push.
+  # Otherwise, we fall back to comparing against origin/main.
+  if [ -n "$remote_sha" ] && [ "$remote_sha" != "$ZERO_SHA" ]; then
+    COMPARISON_BASE="$remote_sha"
+  fi
   break
-done || {
+done
+
+if [ "$HAS_UPDATES" = false ]; then
   printf "pre-push: no branch updates to validate\n"
   exit 0
-}
+fi
+
+printf "pre-push: validating changed packages against %s...\n" "$COMPARISON_BASE"
 
 pnpm verify:build-configs
-pnpm turbo lint typecheck test:prepush --affected --continue
-pnpm turbo build --affected --continue
 
-if git diff --quiet origin/main...HEAD -- ':(glob)apps/web/**' ':(glob)packages/shared/**' ':(glob)packages/design-tokens/**' ':(glob)packages/core-config/**' ':(glob)packages/core-styles/**' ':(glob)packages/core-auth/**' ':(glob)packages/feature-auth/**' ':(glob)packages/feature-navigation/**' ':(glob)packages/feature-search/**'; then
+# Run Turborepo tasks only on packages affected since the comparison base.
+# TURBO_SCM_BASE instructs Turborepo what git commit/ref to compare changes against.
+TURBO_SCM_BASE="$COMPARISON_BASE" pnpm turbo lint typecheck test:prepush build --affected --continue
+
+# Perform conditional checks (e2e, docs, DB schema, native build checks)
+# by diffing against the resolved comparison base.
+if git diff --quiet "$COMPARISON_BASE"...HEAD -- ':(glob)apps/web/**' ':(glob)packages/core-api/**' ':(glob)packages/core-contracts/**' ':(glob)packages/core-i18n/**' ':(glob)packages/design-tokens/**' ':(glob)packages/domain-account/**' ':(glob)packages/domain-audio/**' ':(glob)packages/domain-content/**' ':(glob)packages/domain-live/**' ':(glob)packages/domain-search/**' ':(glob)packages/util-config/**'; then
   printf "pre-push: skipping web e2e (no web-affecting changes)\n"
 else
   printf "pre-push: running web e2e\n"
   pnpm turbo test:e2e --filter=web
 fi
 
-if git diff --quiet origin/main...HEAD -- README.md ':(glob)docs/**/*.md' AGENT.md AGENTS.md .github/copilot-instructions.md; then
+if git diff --quiet "$COMPARISON_BASE"...HEAD -- README.md ':(glob)docs/**/*.md' AGENT.md AGENTS.md .github/copilot-instructions.md; then
   printf "pre-push: skipping docs:quality (no docs changes)\n"
 else
   pnpm docs:quality
 fi
 
-if git diff --quiet origin/main...HEAD -- packages/db/prisma/schema.prisma packages/db/prisma.config.ts packages/db/package.json; then
+if git diff --quiet "$COMPARISON_BASE"...HEAD -- packages/core-db/prisma/schema.prisma packages/core-db/prisma.config.ts packages/core-db/package.json; then
   printf "pre-push: skipping prisma:generate (no db schema/config changes)\n"
 else
-  pnpm --filter @sd/db prisma:generate
+  pnpm --filter @sd/core-db prisma:generate
 fi
 
-if git diff --quiet origin/main...HEAD -- ':(glob)apps/native/**'; then
+if git diff --quiet "$COMPARISON_BASE"...HEAD -- ':(glob)apps/native/**'; then
   printf "pre-push: skipping expo-doctor (no native changes)\n"
 else
   printf "pre-push: running expo-doctor\n"

@@ -6,14 +6,9 @@ import { AuthProviderButton } from "@/features/auth/components/provider-button";
 export type SignInScreenProps = {
   onSignInWithGoogle: () => void;
   onSignInWithApple: () => void;
-  onNavigateToSignUp: () => void;
 };
 
-export function SignInMobileScreen({
-  onSignInWithGoogle,
-  onSignInWithApple,
-  onNavigateToSignUp,
-}: SignInScreenProps) {
+export function SignInMobileScreen({ onSignInWithGoogle, onSignInWithApple }: SignInScreenProps) {
   const { t } = useTranslation();
 
   return (
@@ -25,10 +20,6 @@ export function SignInMobileScreen({
           <AuthProviderButton provider="apple" onClick={onSignInWithApple} />
           <AuthProviderButton provider="google" onClick={onSignInWithGoogle} />
         </div>
-
-        <button type="button" onClick={onNavigateToSignUp} style={linkBtnStyle}>
-          {t("auth.signIn.noAccount")}
-        </button>
       </div>
     </div>
   );
@@ -63,14 +54,4 @@ const titleStyle: React.CSSProperties = {
   textAlign: "center",
   margin: 0,
   color: "var(--content-primary)",
-};
-
-const linkBtnStyle: React.CSSProperties = {
-  textAlign: "center",
-  color: "var(--content-primary)",
-  fontSize: 14,
-  background: "none",
-  border: "none",
-  cursor: "pointer",
-  padding: 0,
 };

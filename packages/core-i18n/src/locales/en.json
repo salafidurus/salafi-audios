@@ -21,18 +21,6 @@
       "noAccountSplit": "Don't have an account?",
       "noAccountLink": "Create one",
       "failed": "Sign in failed"
-    },
-    "signUp": {
-      "kicker": "Start Listening",
-      "title": "Create Account",
-      "orEmail": "or sign up with email",
-      "submit": "Create Account",
-      "submitting": "Creating account\u2026",
-      "alreadyAccount": "Already have an account? Sign in",
-      "alreadyAccountSplit": "Already have an account?",
-      "alreadyAccountLink": "Sign in",
-      "iAgreeTo": "I agree to the",
-      "failed": "Sign up failed"
     }
   },
   "validation": {

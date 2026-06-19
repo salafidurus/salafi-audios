@@ -72,6 +72,11 @@ updates:
       # Compiler upgrades affect every package in the monorepo.
       - dependency-name: "typescript"
 
+      # better-auth + @better-auth/expo — must be bumped together, exact same version
+      # (version skew breaks native auth typecheck). See guardrail in AGENT.md.
+      - dependency-name: "better-auth"
+      - dependency-name: "@better-auth/*"
+
     # ── Groups ───────────────────────────────────
     groups:
       # Dev-tooling patches & minors — linting, formatting, git hooks.

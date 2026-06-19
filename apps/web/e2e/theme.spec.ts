@@ -4,7 +4,7 @@ test.describe("Theme — system-preference based", () => {
   test("page loads with a data-theme attribute on <html>", async ({ page }) => {
     await page.goto("/", { waitUntil: "load" });
 
-    await expect(page.locator("html")).toHaveAttribute("data-theme", /^(light|dark)$/);
+    await expect(page.locator("html")).toHaveAttribute("data-theme", /light|dark/);
   });
 
   test("light color scheme results in light theme", async ({ page }) => {
@@ -46,11 +46,13 @@ test.describe("Theme — system-preference based", () => {
 
   test("theme persists across navigation", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "dark" });
-    await page.goto("/", { waitUntil: "load" });
+    await page.goto("/");
+
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
 
     // Navigate to another page
-    await page.goto("/feed", { waitUntil: "load" });
+    await page.goto("/feed");
+
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   });
 

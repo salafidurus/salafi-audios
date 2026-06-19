@@ -160,3 +160,9 @@ pnpm typecheck        # Typecheck all
 pnpm test             # Test all
 pnpm format           # Format codebase
 ```
+
+## Agent Worktree Enforcement
+
+- All AI agents must work inside a git worktree.
+- Agents must either create a new worktree in the `.worktrees` (or `.worktree`) folder, or ask the user if they should use one of the available worktrees or create a new one.
+
