@@ -59,7 +59,6 @@
     "@tanstack/react-query": "catalog:"
   },
   "devDependencies": {
-    "@sd/util-config": "workspace:*",
     "@types/jest": "catalog:",
     "@types/node": "^22.10.7",
     "@types/react": "~19.2.14",

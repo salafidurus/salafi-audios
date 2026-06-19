@@ -90,7 +90,6 @@
     "zustand": "catalog:"
   },
   "devDependencies": {
-    "@sd/util-config": "workspace:*",
     "@testing-library/react-native": "catalog:",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.10.7",

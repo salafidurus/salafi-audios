@@ -61,7 +61,6 @@
     "@nestjs/testing": "catalog:",
     "@sd/core-contracts": "workspace:*",
     "@sd/core-db": "workspace:*",
-    "@sd/util-config": "workspace:*",
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "catalog:",
     "@types/jest": "catalog:",

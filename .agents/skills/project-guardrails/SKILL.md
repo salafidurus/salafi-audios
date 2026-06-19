@@ -56,8 +56,10 @@ docs/      → authoritative documentation
 - **`@sd/domain-progress`**: Progress tracking state (Zustand + hooks).
 - **`@sd/domain-search`**: Search and quick-browse hooks.
 - **`@sd/design-tokens`**: Design tokens — authoritative source.
-- **`@sd/util-config`**: Shared lint/build config.
 - **`@sd/util-ingest`**: Content ingestion tooling.
+
+Shared lint/TS config lives at the repo root (`tsconfig.*.json`, `eslint.config.*.mjs`),
+not in a package.
 
 **Dependency rules:**
 
@@ -165,4 +167,3 @@ pnpm format           # Format codebase
 
 - All AI agents must work inside a git worktree.
 - Agents must either create a new worktree in the `.worktrees` (or `.worktree`) folder, or ask the user if they should use one of the available worktrees or create a new one.
-

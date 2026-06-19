@@ -42,7 +42,6 @@
     "@prisma/client-runtime-utils": "^7.3.0"
   },
   "devDependencies": {
-    "@sd/util-config": "workspace:*",
     "@types/jest": "catalog:",
     "dotenv": "^16.4.5",
     "jest": "catalog:",

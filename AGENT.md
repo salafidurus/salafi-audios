@@ -131,8 +131,12 @@ Web (`apps/web`):
 - `packages/domain-playback` - Playback engine and player state
 - `packages/domain-progress` - Progress tracking state
 - `packages/domain-search` - Search and quick-browse hooks
-- `packages/util-config` - Shared lint/build config
 - `packages/util-ingest` - Content ingestion
+
+Shared lint/TS config lives at the repo root (`tsconfig.base.json`, `tsconfig.packages.json`,
+`tsconfig.nest.json`, `eslint.config.base.mjs`, `eslint.config.packages.mjs`,
+`eslint.config.nest.mjs`). Apps extend/compose these; `next`/`expo` specifics are inlined
+into `apps/web` and `apps/native`.
 
 ## Commands (root)
 
@@ -167,7 +171,6 @@ Web (`apps/web`):
 - Shared UI: `pnpm --filter @sd/shared <script>`
 - Core packages: `pnpm --filter @sd/core-* <script>`
 - Domain packages: `pnpm --filter @sd/domain-* <script>`
-- Config: `pnpm --filter util-config <script>`
 - Ingest: `pnpm --filter util-ingest <script>`
 
 Turbo grouped scripts:
@@ -306,7 +309,8 @@ everything is already covered.
 
 - Prettier is mandatory; root `.prettierrc` is authoritative.
 - API has a local Prettier override (`apps/api/.prettierrc`: single quotes).
-- ESLint flat configs come from `@sd/util-config/eslint/*`.
+- ESLint flat configs come from the root `eslint.config.{base,packages,nest}.mjs` presets
+  (apps/web and apps/native inline their next/expo specifics).
 - `no-console` is an error unless explicitly allowed.
 - TypeScript strict mode is required (`strict: true`, `noEmit: true`).
 - Prefer explicit return types for exported services/repos.

@@ -36,7 +36,6 @@
     "i18next": "catalog:"
   },
   "devDependencies": {
-    "@sd/util-config": "workspace:*",
     "@types/jest": "catalog:",
     "jest": "catalog:",
     "rimraf": "catalog:",

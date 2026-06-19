@@ -5,7 +5,11 @@ const BARREL_MESSAGE =
   "(src/index.ts for packages; features/*/index.ts, shared/**/index.ts, " +
   "core/*/index.ts for apps).";
 
-export default [
+// Shared ignores + custom rules. Deliberately does NOT register the
+// @typescript-eslint plugin, so this layer can be composed with
+// eslint-config-next / eslint-config-expo (which bring their own
+// typescript-eslint) without an ESLint "Cannot redefine plugin" error.
+export const baseRules = [
   {
     ignores: [
       "**/node_modules/**",
@@ -24,12 +28,6 @@ export default [
       "no-console": "error",
     },
   },
-
-  ...tseslint.configs.recommended.map((c) => ({
-    ...c,
-    files: ["**/*.{ts,tsx}"],
-  })),
-
   // Disallow barrel re-exports outside designated index files
   {
     files: ["src/**/*.{ts,tsx}"],
@@ -53,3 +51,22 @@ export default [
     rules: { "no-restricted-syntax": "off" },
   },
 ];
+
+// typescript-eslint recommended, scoped to TS files. Registers the
+// @typescript-eslint plugin — compose this ONLY where the framework config
+// does not already provide it (nest, packages — NOT next/expo).
+export const typescriptRecommended = tseslint.configs.recommended.map((c) => ({
+  ...c,
+  files: ["**/*.{ts,tsx}"],
+}));
+
+// The recommended RULES only (no plugin registration). Apply this where a
+// framework config (eslint-config-next / eslint-config-expo) already registers
+// @typescript-eslint, so web/native keep full recommended coverage without the
+// "Cannot redefine plugin" collision.
+export const typescriptRecommendedRules = Object.assign(
+  {},
+  ...tseslint.configs.recommended.map((c) => c.rules ?? {}),
+);
+
+export default [...baseRules, ...typescriptRecommended];

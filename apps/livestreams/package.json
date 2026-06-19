@@ -45,7 +45,6 @@
     "@nestjs/cli": "catalog:",
     "@nestjs/schematics": "catalog:",
     "@nestjs/testing": "catalog:",
-    "@sd/util-config": "workspace:*",
     "@types/express": "catalog:",
     "@types/jest": "catalog:",
     "@types/node": "^22.10.7",
