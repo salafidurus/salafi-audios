@@ -30,7 +30,7 @@ export function FeedContentCard({ item, onPress }: FeedContentCardProps) {
       <div style={{ fontSize: 16, fontWeight: 600 }}>{title}</div>
       <div style={{ fontSize: 13, color: "var(--content-muted)", marginTop: 4 }}>
         {item.scholarName}
-        {item.kind !== "lecture" && ` · ${item.kind}`}
+        {item.kind !== "single" && ` · ${item.kind}`}
       </div>
       <div style={{ fontSize: 12, color: "var(--content-subtle)", marginTop: 4 }}>
         {item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""}

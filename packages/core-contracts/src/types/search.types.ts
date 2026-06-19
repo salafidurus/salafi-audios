@@ -27,5 +27,5 @@ export type SearchCatalogItemDto = {
 export type SearchCatalogResultsDto = {
   collections: SearchCatalogItemDto[];
   series: SearchCatalogItemDto[];
-  lectures: SearchCatalogItemDto[];
+  singles: SearchCatalogItemDto[];
 };

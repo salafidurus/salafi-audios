@@ -41,8 +41,8 @@ describe('ScholarsService', () => {
 
   const mockScholarContent: ScholarContentDto = {
     collections: [],
-    standaloneSeries: [],
-    standaloneLectures: [],
+    series: [],
+    singles: [],
   };
 
   beforeEach(async () => {

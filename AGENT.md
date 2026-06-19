@@ -48,6 +48,26 @@ Before editing agent instructions or skills:
 - Read in order: `docs/README.md` -> this file -> target workspace `AGENT.md` -> `.github/copilot-instructions.md`.
 - If code and docs conflict, reconcile intentionally (do not silently drift).
 
+## Content nomenclature
+
+Canonical vocabulary for the content hierarchy (full detail: `docs/nomenclature.md`).
+Content is described by two axes — **Format** (the DB primitive) and **Placement**
+(top-level vs nested). Each cell has one name; do not overload "lecture"/"series":
+
+| DB primitive | Condition              | Name           | Top-level? |
+| :----------- | :--------------------- | :------------- | :--------- |
+| `Collection` | always root            | **Collection** | yes        |
+| `Series`     | `collectionId == null` | **Series**     | yes        |
+| `Series`     | `collectionId != null` | **Module**     | no         |
+| `Lecture`    | `seriesId == null`     | **Single**     | yes        |
+| `Lecture`    | `seriesId != null`     | **Lesson**     | no         |
+
+A **Listing** is any top-level unit (Collection / Series / Single);
+`ListingFormat = "collection" | "series" | "single"`. Module and Lesson are never
+Listings. Users browse Listings in the **Catalog** ("Library" is the separate
+saved/in-progress surface). DB columns, the `title` field, and route paths keep
+the primitive names.
+
 ## Image-to-code workflow
 
 - For design image requests, use root skill `google-stitch` with a Stitch-first flow.

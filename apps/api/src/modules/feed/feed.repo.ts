@@ -94,7 +94,7 @@ export class FeedRepo {
         publishedTranslation: r.scholar.translations[0] ?? null,
       }).fields.name;
       return {
-        kind: 'lecture' as const,
+        kind: 'single' as const,
         id: r.id,
         title: resolved.fields.title,
         slug: r.slug,
@@ -255,7 +255,7 @@ export class FeedRepo {
         publishedTranslation: lecture.scholar.translations[0] ?? null,
       }).fields.name;
       return {
-        kind: 'lecture' as const,
+        kind: 'single' as const,
         id: lecture.id,
         title: resolved.fields.title,
         slug: lecture.slug,

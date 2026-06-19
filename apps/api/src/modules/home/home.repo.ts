@@ -101,7 +101,7 @@ export class HomeRepo {
         id: r.id,
         title: resolved.fields.title,
         slug: r.slug,
-        kind: 'lecture' as const,
+        kind: 'single' as const,
         scholarName,
         scholarSlug: r.scholar.slug,
         thumbnailUrl: null,

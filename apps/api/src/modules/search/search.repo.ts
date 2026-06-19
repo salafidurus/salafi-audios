@@ -94,7 +94,7 @@ export class SearchRepository {
     );
   }
 
-  async listRootSeries(
+  async listSeries(
     query: SearchQueryDto,
     take: number,
     includeRelated: boolean,
@@ -168,7 +168,7 @@ export class SearchRepository {
     );
   }
 
-  async listRootLectures(
+  async listSingles(
     query: SearchQueryDto,
     take: number,
     includeRelated: boolean,

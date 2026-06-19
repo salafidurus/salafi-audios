@@ -1,3 +1,4 @@
+import type { ListingFormat } from "./listing.types";
 import type { ContentOriginalFields, Locale, ScholarOriginalFields } from "./localization.types";
 
 export type ScholarChipDto = {
@@ -13,7 +14,7 @@ export type ContentSuggestionDto = {
   id: string;
   title: string;
   slug: string;
-  kind: "lecture" | "series" | "collection";
+  kind: ListingFormat;
   scholarName: string;
   scholarSlug: string;
   thumbnailUrl: string | null;

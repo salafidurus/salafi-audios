@@ -11,7 +11,7 @@ describe('FeedService', () => {
   const mockFeedPage: FeedPageDto = {
     items: [
       {
-        kind: 'lecture',
+        kind: 'single',
         id: 'l1',
         slug: 'test-lecture',
         title: 'Test Lecture',

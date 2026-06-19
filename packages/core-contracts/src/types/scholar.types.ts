@@ -36,8 +36,8 @@ export type ScholarStatsDto = {
   lecturesCount: number;
   followerCount: number;
   collectionsCount: number;
-  standaloneSeriesCount: number;
-  standaloneLecturesCount: number;
+  seriesListingCount: number;
+  singlesCount: number;
 };
 
 export type ScholarListItemDto = {
@@ -54,8 +54,8 @@ export type ScholarListItemDto = {
 
 export type ScholarContentDto = {
   collections: CollectionSummaryDto[];
-  standaloneSeries: SeriesSummaryDto[];
-  standaloneLectures: LectureSummaryDto[];
+  series: SeriesSummaryDto[];
+  singles: SingleSummaryDto[];
 };
 
 export type CollectionSummaryDto = {
@@ -78,7 +78,8 @@ export type SeriesSummaryDto = {
   original?: ContentOriginalFields;
 };
 
-export type LectureSummaryDto = {
+/** Summary of a Single (a standalone Lecture), as shown in a scholar's Catalog. */
+export type SingleSummaryDto = {
   id: string;
   slug: string;
   title: string;

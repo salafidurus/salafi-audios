@@ -20,7 +20,7 @@ export function FeedContentCard({ item, onPress }: FeedContentCardProps) {
       <Text style={{ fontSize: 15, fontWeight: "600" }}>{title}</Text>
       <Text style={{ fontSize: 12, color: "#666", marginTop: 2 }}>
         {item.scholarName}
-        {item.kind !== "lecture" ? ` · ${item.kind}` : ""}
+        {item.kind !== "single" ? ` · ${item.kind}` : ""}
       </Text>
       <Text style={{ fontSize: 12, color: "#999", marginTop: 2 }}>
         {item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""}
