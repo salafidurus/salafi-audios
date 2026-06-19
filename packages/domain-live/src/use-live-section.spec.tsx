@@ -52,12 +52,16 @@ describe("useLiveSection", () => {
     expect(result.current.isLoading).toBe(true);
     expect(result.current.sessions).toEqual([]);
 
-    // Wait for the query to resolve
+    // Wait for the query to resolve and the merge effect to flush into sessions.
+    // sessions is populated by a useEffect that runs a render after isLoading
+    // flips, so assert on it with waitFor rather than reading it synchronously.
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
-    expect(result.current.sessions).toEqual([
-      { id: "1", title: "Active Session 1", status: "live", updatedAt: "2026-06-17T12:00:00Z" },
-    ]);
+    await waitFor(() =>
+      expect(result.current.sessions).toEqual([
+        { id: "1", title: "Active Session 1", status: "live", updatedAt: "2026-06-17T12:00:00Z" },
+      ]),
+    );
 
     expect(mockHttpClient).toHaveBeenCalledTimes(1);
     expect(mockHttpClient).toHaveBeenLastCalledWith({
