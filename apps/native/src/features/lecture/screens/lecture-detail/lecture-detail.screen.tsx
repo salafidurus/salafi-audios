@@ -8,6 +8,7 @@ import { LectureMeta } from "@/features/lecture/components/lecture-meta/lecture-
 import { SeriesContextBar } from "@/features/lecture/components/series-context-bar/series-context-bar";
 import { TopicChips } from "@/features/lecture/components/topic-chips/topic-chips";
 import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import { useTranslation } from "@/core/i18n/use-translation";
 
 export type LectureDetailScreenProps = {
   id: string;
@@ -16,11 +17,12 @@ export type LectureDetailScreenProps = {
 export function LectureDetailScreen({ id }: LectureDetailScreenProps) {
   const { lecture, isFetching } = useLectureDetailScreen(id);
   const showOriginal = useShowOriginalContent();
+  const { t } = useTranslation();
 
   if (isFetching) {
     return (
       <ScreenView center>
-        <AppText variant="bodyMd">Loading lecture…</AppText>
+        <AppText variant="bodyMd">{t("lecture.loading", "Loading lecture…")}</AppText>
       </ScreenView>
     );
   }
@@ -28,7 +30,7 @@ export function LectureDetailScreen({ id }: LectureDetailScreenProps) {
   if (!lecture) {
     return (
       <ScreenView center>
-        <AppText variant="titleMd">Lecture not found</AppText>
+        <AppText variant="titleMd">{t("lecture.notFound", "Lecture not found")}</AppText>
       </ScreenView>
     );
   }

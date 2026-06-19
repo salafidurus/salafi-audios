@@ -106,6 +106,51 @@
     "terms": "Terms of Service",
     "support": "Support"
   },
+  "authStrip": {
+    "search": "Search",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "createAccount": "Create Free Account",
+    "topActions": "Top actions"
+  },
+  "search": {
+    "placeholder": "Search",
+    "searching": "Searching…",
+    "noResults": "No results found.",
+    "startTyping": "Start typing to search.",
+    "suggestions": "Suggestions",
+    "scholars": "Scholars",
+    "continueListening": "Continue Listening"
+  },
+  "library": {
+    "title": "My Library",
+    "inProgress": "In Progress",
+    "saved": "Saved",
+    "completed": "Completed",
+    "loadingSection": "Loading {{section}}…",
+    "emptyProgress": "No lectures in progress.",
+    "emptySaved": "No saved lectures yet. Save lectures to listen to later.",
+    "emptyCompleted": "No completed lectures yet. Keep listening!",
+    "percentListened": "{{percent}}% listened",
+    "savedOn": "Saved {{date}}",
+    "completedOn": "Completed {{date}}"
+  },
+  "lecture": {
+    "loading": "Loading lecture…",
+    "notFound": "Lecture not found",
+    "minutes": "{{count}} min"
+  },
+  "scholarContent": {
+    "collections": "Collections",
+    "series": "Series",
+    "lectures": "Lectures",
+    "empty": "No published content yet.",
+    "seriesCount": "{{count}} series",
+    "lectureCount": "{{count}} lectures"
+  },
+  "feed": {
+    "newInTopic": "New in {{topic}}"
+  },
   "notFound": {
     "title": "Oops!",
     "message": "Page not found",

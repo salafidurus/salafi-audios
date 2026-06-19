@@ -8,16 +8,31 @@ export type RootTab = Section | "search";
 export type RootTabConfig = {
   id: RootTab;
   routeName: "feed" | "live" | "(search)" | "library" | "account";
+  /** English fallback label. */
   label: string;
+  /** i18n key (under the `tabs` namespace) resolved at render time. */
+  labelKey: string;
   Icon: ComponentType<{ color?: string; size?: number; strokeWidth?: number }>;
 };
 
 export const ROOT_TABS: RootTabConfig[] = [
-  { id: "feed", routeName: "feed", label: "Feed", Icon: Cloud },
-  { id: "live", routeName: "live", label: "Live", Icon: Mic },
-  { id: "search", routeName: "(search)", label: "Search", Icon: Search },
-  { id: "library", routeName: "library", label: "Library", Icon: BookOpen },
-  { id: "account", routeName: "account", label: "Account", Icon: Settings },
+  { id: "feed", routeName: "feed", label: "Feed", labelKey: "tabs.feed", Icon: Cloud },
+  { id: "live", routeName: "live", label: "Live", labelKey: "tabs.live", Icon: Mic },
+  { id: "search", routeName: "(search)", label: "Search", labelKey: "tabs.search", Icon: Search },
+  {
+    id: "library",
+    routeName: "library",
+    label: "Library",
+    labelKey: "tabs.library",
+    Icon: BookOpen,
+  },
+  {
+    id: "account",
+    routeName: "account",
+    label: "Account",
+    labelKey: "tabs.account",
+    Icon: Settings,
+  },
 ];
 
 const GROUP_NAME_TO_TAB: Record<RootTabConfig["routeName"], RootTab> = {

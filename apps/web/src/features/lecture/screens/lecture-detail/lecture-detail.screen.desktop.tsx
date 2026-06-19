@@ -10,6 +10,7 @@ import { LecturePlayButton } from "@/features/lecture/components/lecture-play-bu
 import { LectureSaveButton } from "@/features/lecture/components/lecture-save-button/LectureSaveButton";
 import { pickContentField } from "@sd/core-i18n";
 import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import { useTranslation } from "@/core/i18n/use-translation";
 
 export type LectureDetailDesktopScreenProps = {
   id: string;
@@ -18,11 +19,12 @@ export type LectureDetailDesktopScreenProps = {
 export function LectureDetailDesktopScreen({ id }: LectureDetailDesktopScreenProps) {
   const { lecture, isFetching } = useLectureDetailScreen(id);
   const showOriginal = useShowOriginalContent();
+  const { t } = useTranslation();
 
   if (isFetching) {
     return (
       <ScreenView center>
-        <AppText variant="bodyMd">Loading lecture…</AppText>
+        <AppText variant="bodyMd">{t("lecture.loading", "Loading lecture…")}</AppText>
       </ScreenView>
     );
   }
@@ -30,7 +32,7 @@ export function LectureDetailDesktopScreen({ id }: LectureDetailDesktopScreenPro
   if (!lecture) {
     return (
       <ScreenView center>
-        <AppText variant="titleMd">Lecture not found</AppText>
+        <AppText variant="titleMd">{t("lecture.notFound", "Lecture not found")}</AppText>
       </ScreenView>
     );
   }

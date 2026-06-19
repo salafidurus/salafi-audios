@@ -9,6 +9,7 @@ import {
 } from "@sd/domain-content";
 import { useAuth } from "@/core/auth/use-auth";
 import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import { useTranslation } from "@/core/i18n/use-translation";
 
 export type LibraryScreenProps = {
   onNavigateToLecture?: (id: string) => void;
@@ -38,6 +39,7 @@ function LibraryItem({
       ? Math.round((item.progressSeconds / item.durationSeconds) * 100)
       : null;
   const showOriginal = useShowOriginalContent();
+  const { t } = useTranslation();
   const lectureTitle = pickContentField(item.lectureTitle, item.originalLectureTitle, showOriginal);
 
   return (
@@ -51,13 +53,21 @@ function LibraryItem({
         {item.seriesTitle ? ` · ${item.seriesTitle}` : ""}
       </Text>
       <Text style={styles.itemMeta}>
-        {item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""}
-        {variant === "progress" && progress !== null ? ` · ${progress}% listened` : ""}
+        {item.durationSeconds
+          ? t("lecture.minutes", "{{count}} min", { count: Math.round(item.durationSeconds / 60) })
+          : ""}
+        {variant === "progress" && progress !== null
+          ? ` · ${t("library.percentListened", "{{percent}}% listened", { percent: progress })}`
+          : ""}
         {variant === "saved" && item.savedAt
-          ? ` · Saved ${new Date(item.savedAt).toLocaleDateString()}`
+          ? ` · ${t("library.savedOn", "Saved {{date}}", {
+              date: new Date(item.savedAt).toLocaleDateString(),
+            })}`
           : ""}
         {variant === "completed" && item.completedAt
-          ? ` · ${new Date(item.completedAt).toLocaleDateString()}`
+          ? ` · ${t("library.completedOn", "Completed {{date}}", {
+              date: new Date(item.completedAt).toLocaleDateString(),
+            })}`
           : ""}
       </Text>
       {variant === "progress" && progress !== null ? <ProgressBar percent={progress} /> : null}
@@ -75,30 +85,34 @@ type Section = {
 
 export function LibraryScreen({ onNavigateToLecture }: LibraryScreenProps) {
   const { isAuthenticated } = useAuth();
+  const { t } = useTranslation();
   const progressData = useLibraryProgressScreen(isAuthenticated);
   const savedData = useLibrarySavedScreen(isAuthenticated);
   const completedData = useLibraryCompletedScreen(isAuthenticated);
 
   const sections: Section[] = [
     {
-      title: "In Progress",
+      title: t("library.inProgress", "In Progress"),
       data: progressData.items,
       variant: "progress",
-      emptyMessage: "No lectures in progress.",
+      emptyMessage: t("library.emptyProgress", "No lectures in progress."),
       isFetching: progressData.isFetching,
     },
     {
-      title: "Saved",
+      title: t("library.saved", "Saved"),
       data: savedData.items,
       variant: "saved",
-      emptyMessage: "No saved lectures yet.",
+      emptyMessage: t(
+        "library.emptySaved",
+        "No saved lectures yet. Save lectures to listen to later.",
+      ),
       isFetching: savedData.isFetching,
     },
     {
-      title: "Completed",
+      title: t("library.completed", "Completed"),
       data: completedData.items,
       variant: "completed",
-      emptyMessage: "No completed lectures yet.",
+      emptyMessage: t("library.emptyCompleted", "No completed lectures yet. Keep listening!"),
       isFetching: completedData.isFetching,
     },
   ];
@@ -132,7 +146,11 @@ export function LibraryScreen({ onNavigateToLecture }: LibraryScreenProps) {
   if (isAllLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <Text>Loading your library…</Text>
+        <Text>
+          {t("library.loadingSection", "Loading {{section}}…", {
+            section: t("library.title", "My Library"),
+          })}
+        </Text>
       </View>
     );
   }
@@ -154,7 +172,9 @@ export function LibraryScreen({ onNavigateToLecture }: LibraryScreenProps) {
         if (currentSection.isFetching && currentSection.data.length === 0) {
           return (
             <View style={styles.sectionFooter}>
-              <Text style={styles.sectionFooterLoadingText}>Loading…</Text>
+              <Text style={styles.sectionFooterLoadingText}>
+                {t("common.loading", "Loading...")}
+              </Text>
             </View>
           );
         }

@@ -4,6 +4,7 @@ import type { CSSProperties } from "react";
 import type { ContentSuggestionDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import { useTranslation } from "@/core/i18n/use-translation";
 
 const itemButtonStyle: CSSProperties = {
   minWidth: 200,
@@ -24,6 +25,7 @@ export type FeedTopicRowProps = {
 
 export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProps) {
   const showOriginal = useShowOriginalContent();
+  const { t } = useTranslation();
 
   if (!items.length) return null;
 
@@ -38,7 +40,7 @@ export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProp
           color: "var(--content-strong)",
         }}
       >
-        New in {topicName}
+        {t("feed.newInTopic", "New in {{topic}}", { topic: topicName })}
       </h3>
       <div
         className="no-scrollbar"

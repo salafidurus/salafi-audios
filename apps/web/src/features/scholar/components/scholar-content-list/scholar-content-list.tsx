@@ -3,6 +3,7 @@
 import type { ScholarContentDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import { useTranslation } from "@/core/i18n/use-translation";
 
 export type ScholarContentListProps = {
   content: ScholarContentDto;
@@ -10,19 +11,24 @@ export type ScholarContentListProps = {
 
 export function ScholarContentList({ content }: ScholarContentListProps) {
   const showOriginal = useShowOriginalContent();
+  const { t } = useTranslation();
 
   return (
     <div>
       {content.collections.length > 0 && (
         <section style={{ marginBottom: 32 }}>
-          <h2 style={{ fontSize: 20, marginBottom: 12 }}>Collections</h2>
+          <h2 style={{ fontSize: 20, marginBottom: 12 }}>
+            {t("scholarContent.collections", "Collections")}
+          </h2>
           {content.collections.map((c) => {
             const title = pickContentField(c.title, c.original?.title, showOriginal);
             return (
               <div key={c.id} style={{ padding: "12px 0", borderBottom: "1px solid #eee" }}>
                 <div style={{ fontWeight: 500, fontSize: 15 }}>{title}</div>
                 <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>
-                  {c.lectureCount} series
+                  {t("scholarContent.seriesCount", "{{count}} series", {
+                    count: c.lectureCount,
+                  })}
                 </div>
               </div>
             );
@@ -32,14 +38,16 @@ export function ScholarContentList({ content }: ScholarContentListProps) {
 
       {content.standaloneSeries.length > 0 && (
         <section style={{ marginBottom: 32 }}>
-          <h2 style={{ fontSize: 20, marginBottom: 12 }}>Series</h2>
+          <h2 style={{ fontSize: 20, marginBottom: 12 }}>{t("scholarContent.series", "Series")}</h2>
           {content.standaloneSeries.map((s) => {
             const title = pickContentField(s.title, s.original?.title, showOriginal);
             return (
               <div key={s.id} style={{ padding: "12px 0", borderBottom: "1px solid #eee" }}>
                 <div style={{ fontWeight: 500, fontSize: 15 }}>{title}</div>
                 <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>
-                  {s.lectureCount} lectures
+                  {t("scholarContent.lectureCount", "{{count}} lectures", {
+                    count: s.lectureCount,
+                  })}
                 </div>
               </div>
             );
@@ -49,7 +57,9 @@ export function ScholarContentList({ content }: ScholarContentListProps) {
 
       {content.standaloneLectures.length > 0 && (
         <section>
-          <h2 style={{ fontSize: 20, marginBottom: 12 }}>Lectures</h2>
+          <h2 style={{ fontSize: 20, marginBottom: 12 }}>
+            {t("scholarContent.lectures", "Lectures")}
+          </h2>
           {content.standaloneLectures.map((l) => {
             const title = pickContentField(l.title, l.original?.title, showOriginal);
             return (
@@ -67,7 +77,9 @@ export function ScholarContentList({ content }: ScholarContentListProps) {
       {content.collections.length === 0 &&
         content.standaloneSeries.length === 0 &&
         content.standaloneLectures.length === 0 && (
-          <p style={{ color: "#888", fontSize: 14 }}>No published content yet.</p>
+          <p style={{ color: "#888", fontSize: 14 }}>
+            {t("scholarContent.empty", "No published content yet.")}
+          </p>
         )}
     </div>
   );

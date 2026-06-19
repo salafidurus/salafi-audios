@@ -3,6 +3,7 @@ import { View } from "react-native";
 import { pickContentField } from "@sd/core-i18n";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import { useTranslation } from "@/core/i18n/use-translation";
 
 export type ScholarContentListProps = {
   content: ScholarContentDto;
@@ -21,6 +22,7 @@ function ContentSection({ title, children }: { title: string; children: React.Re
 
 export function ScholarContentList({ content }: ScholarContentListProps) {
   const showOriginal = useShowOriginalContent();
+  const { t } = useTranslation();
   const hasContent =
     content.collections.length > 0 ||
     content.standaloneSeries.length > 0 ||
@@ -29,7 +31,7 @@ export function ScholarContentList({ content }: ScholarContentListProps) {
   if (!hasContent) {
     return (
       <AppText variant="bodyMd" style={{ opacity: 0.7 }}>
-        No published content yet.
+        {t("scholarContent.empty", "No published content yet.")}
       </AppText>
     );
   }
@@ -37,7 +39,7 @@ export function ScholarContentList({ content }: ScholarContentListProps) {
   return (
     <View>
       {content.collections.length > 0 ? (
-        <ContentSection title="Collections">
+        <ContentSection title={t("scholarContent.collections", "Collections")}>
           {content.collections.map((collection) => {
             const title = pickContentField(
               collection.title,
@@ -51,7 +53,9 @@ export function ScholarContentList({ content }: ScholarContentListProps) {
               >
                 <AppText variant="labelMd">{title}</AppText>
                 <AppText variant="caption" style={{ marginTop: 2, opacity: 0.6 }}>
-                  {collection.lectureCount} series
+                  {t("scholarContent.seriesCount", "{{count}} series", {
+                    count: collection.lectureCount,
+                  })}
                 </AppText>
               </View>
             );
@@ -60,7 +64,7 @@ export function ScholarContentList({ content }: ScholarContentListProps) {
       ) : null}
 
       {content.standaloneSeries.length > 0 ? (
-        <ContentSection title="Series">
+        <ContentSection title={t("scholarContent.series", "Series")}>
           {content.standaloneSeries.map((series) => {
             const title = pickContentField(series.title, series.original?.title, showOriginal);
             return (
@@ -70,7 +74,9 @@ export function ScholarContentList({ content }: ScholarContentListProps) {
               >
                 <AppText variant="labelMd">{title}</AppText>
                 <AppText variant="caption" style={{ marginTop: 2, opacity: 0.6 }}>
-                  {series.lectureCount} lectures
+                  {t("scholarContent.lectureCount", "{{count}} lectures", {
+                    count: series.lectureCount,
+                  })}
                 </AppText>
               </View>
             );
@@ -79,7 +85,7 @@ export function ScholarContentList({ content }: ScholarContentListProps) {
       ) : null}
 
       {content.standaloneLectures.length > 0 ? (
-        <ContentSection title="Lectures">
+        <ContentSection title={t("scholarContent.lectures", "Lectures")}>
           {content.standaloneLectures.map((lecture) => {
             const title = pickContentField(lecture.title, lecture.original?.title, showOriginal);
             return (
