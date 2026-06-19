@@ -131,6 +131,7 @@
   "scholarContent": {
     "collections": "Collections",
     "series": "Series",
+    "singles": "Singles",
     "lectures": "Lectures",
     "empty": "No published content yet.",
     "seriesCount": "{{count}} series",

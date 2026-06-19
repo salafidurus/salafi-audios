@@ -10,6 +10,7 @@ This directory contains the standard, top-level documentation for Salafi Durus. 
 - **[api.md](./api.md)**: Backend architecture, API contract rules, auth/authz, and media/API boundaries.
 - **[auth.md](./auth.md)**: End-to-end authentication mechanism across api, web, and native (bearer tokens, cross-site OAuth handoff).
 - **[database.md](./database.md)**: Data ownership, relational modeling, media references, and migration rules.
+- **[nomenclature.md](./nomenclature.md)**: Canonical content vocabulary — the two-axis model and the Collection / Series / Module / Single / Lesson names, plus the Listing umbrella term.
 - **[mobile.md](./mobile.md)**: Mobile structure, current capabilities, and target offline/sync architecture.
 - **[web.md](./web.md)**: Web structure, SEO/discovery responsibilities, and admin/public boundaries.
 - **[dev-ops.md](./dev-ops.md)**: Environment model, configuration rules, and branch-deploy workflow.

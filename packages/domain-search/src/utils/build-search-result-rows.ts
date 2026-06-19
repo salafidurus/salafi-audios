@@ -32,6 +32,6 @@ export function buildSearchResultRows(
   return [
     ...data.collections.map(toRow("collection")),
     ...data.series.map(toRow("series")),
-    ...data.lectures.map(toRow("lecture")),
+    ...data.singles.map(toRow("single")),
   ];
 }
