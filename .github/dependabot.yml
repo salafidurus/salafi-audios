@@ -32,6 +32,10 @@ updates:
       - dependency-name: "expo"
       - dependency-name: "expo-*"
       - dependency-name: "@expo/*"
+      # eslint-config-expo — versioned in lockstep with the Expo SDK. A
+      # standalone bump crashes the native flat ESLint config; upgrade it
+      # only as part of a coordinated Expo SDK upgrade.
+      - dependency-name: "eslint-config-expo"
 
       # React & React DOM — pinned to the version supported by the current
       # Expo SDK and Next.js major. Bumping independently causes type and
