@@ -151,6 +151,15 @@
   "feed": {
     "newInTopic": "New in {{topic}}"
   },
+  "live": {
+    "title": "Live Sessions",
+    "liveNow": "Live Now",
+    "upcoming": "Upcoming",
+    "recentlyEnded": "Recently Ended",
+    "emptyLive": "No live sessions right now.",
+    "emptyUpcoming": "No upcoming sessions scheduled.",
+    "emptyEnded": "No recent sessions."
+  },
   "notFound": {
     "title": "Oops!",
     "message": "Page not found",

@@ -151,6 +151,15 @@
   "feed": {
     "newInTopic": "جديد في {{topic}}"
   },
+  "live": {
+    "title": "البث المباشر",
+    "liveNow": "مباشر الآن",
+    "upcoming": "القادمة",
+    "recentlyEnded": "المنتهية مؤخرًا",
+    "emptyLive": "لا توجد جلسات مباشرة الآن.",
+    "emptyUpcoming": "لا توجد جلسات قادمة مجدولة.",
+    "emptyEnded": "لا توجد جلسات حديثة."
+  },
   "notFound": {
     "title": "عذرًا!",
     "message": "الصفحة غير موجودة",
