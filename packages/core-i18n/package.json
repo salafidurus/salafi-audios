@@ -39,8 +39,8 @@
     "@sd/util-config": "workspace:*",
     "@types/jest": "catalog:",
     "jest": "catalog:",
-    "rimraf": "^6.0.0",
+    "rimraf": "catalog:",
     "ts-jest": "catalog:",
-    "tsup": "^8.0.0"
+    "tsup": "catalog:"
   }
 }

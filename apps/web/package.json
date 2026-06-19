@@ -50,10 +50,10 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.9",
+    "eslint": "catalog:",
+    "eslint-config-next": "catalog:",
     "jest": "catalog:",
-    "jest-environment-jsdom": "^30.4.1",
+    "jest-environment-jsdom": "catalog:",
     "tailwindcss": "^4",
     "ts-jest": "catalog:"
   }

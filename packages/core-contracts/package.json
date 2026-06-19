@@ -64,9 +64,9 @@
     "@types/node": "^22.10.7",
     "@types/react": "~19.2.14",
     "jest": "catalog:",
-    "rimraf": "^6.0.0",
+    "rimraf": "catalog:",
     "ts-jest": "catalog:",
-    "tsup": "^8.5.1"
+    "tsup": "catalog:"
   },
   "peerDependencies": {
     "react": ">=18"
