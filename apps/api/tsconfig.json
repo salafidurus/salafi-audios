@@ -1,6 +1,6 @@
 {
   // Editor / typecheck only — does not emit. NestJS CLI uses tsconfig.build.json.
-  "extends": "@sd/util-config/tsconfig/nest.json",
+  "extends": "../../tsconfig.nest.json",
   "compilerOptions": {
     "noEmit": true,
     "noFallthroughCasesInSwitch": true

@@ -45,7 +45,7 @@ TURBO_SCM_BASE="$COMPARISON_BASE" pnpm turbo lint typecheck test:prepush build -
 
 # Perform conditional checks (e2e, docs, DB schema, native build checks)
 # by diffing against the resolved comparison base.
-if git diff --quiet "$COMPARISON_BASE"...HEAD -- ':(glob)apps/web/**' ':(glob)packages/core-api/**' ':(glob)packages/core-contracts/**' ':(glob)packages/core-i18n/**' ':(glob)packages/design-tokens/**' ':(glob)packages/domain-account/**' ':(glob)packages/domain-audio/**' ':(glob)packages/domain-content/**' ':(glob)packages/domain-live/**' ':(glob)packages/domain-search/**' ':(glob)packages/util-config/**'; then
+if git diff --quiet "$COMPARISON_BASE"...HEAD -- ':(glob)apps/web/**' ':(glob)packages/core-api/**' ':(glob)packages/core-contracts/**' ':(glob)packages/core-i18n/**' ':(glob)packages/design-tokens/**' ':(glob)packages/domain-account/**' ':(glob)packages/domain-audio/**' ':(glob)packages/domain-content/**' ':(glob)packages/domain-live/**' ':(glob)packages/domain-search/**' ':(glob)tsconfig.base.json' ':(glob)tsconfig.packages.json' ':(glob)eslint.config.base.mjs'; then
   printf "pre-push: skipping web e2e (no web-affecting changes)\n"
 else
   printf "pre-push: running web e2e\n"

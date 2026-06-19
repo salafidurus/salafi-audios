@@ -1,3 +1,3 @@
-import packagesConfig from "@sd/util-config/eslint/packages";
+import packagesConfig from "../../eslint.config.packages.mjs";
 
 export default packagesConfig;

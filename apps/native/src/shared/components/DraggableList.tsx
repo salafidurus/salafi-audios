@@ -112,6 +112,9 @@ export function DraggableList<T>({
       if (activeIndex === null) return;
 
       setActiveIndex(null);
+      // Reanimated shared values are designed to be mutated via `.value`; the
+      // React Compiler immutability rule can't see that opt-out and false-positives here.
+      // eslint-disable-next-line react-hooks/immutability
       draggedItemOffsetY.value = 0;
 
       let toIndex = fromIndex;

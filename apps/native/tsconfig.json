@@ -1,7 +1,9 @@
 {
-  "extends": ["expo/tsconfig.base", "../../packages/util-config/tsconfig/expo.json"],
+  "extends": ["expo/tsconfig.base", "../../tsconfig.packages.json"],
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
   "compilerOptions": {
+    // react-jsx uses the automatic runtime (React 17+) — no manual React import needed
+    "jsx": "react-jsx",
     "types": ["jest", "node"],
     "moduleSuffixes": [".native", ".web", ""],
     "paths": {

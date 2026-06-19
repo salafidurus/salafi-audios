@@ -41,7 +41,6 @@
     "zod": "^3.25.17"
   },
   "devDependencies": {
-    "@sd/util-config": "workspace:*",
     "@types/jest": "catalog:",
     "@types/node": "^22.0.0",
     "jest": "catalog:",

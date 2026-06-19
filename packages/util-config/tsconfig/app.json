@@ -1,4 +1,0 @@
-{
-  // Generic app base — extends base.json. Prefer next.json, expo.json, or nest.json for specific families.
-  "extends": "./base.json"
-}
