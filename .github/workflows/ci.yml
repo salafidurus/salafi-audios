@@ -113,7 +113,7 @@ jobs:
       DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL || 'postgresql://ci:ci@localhost:5432/ci' }}
       DATABASE_URL: ${{ secrets.DIRECT_DB_URL || 'postgresql://ci:ci@localhost:5432/ci' }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           # Full history needed for dorny/paths-filter and turbo's --affected
           fetch-depth: 0
@@ -142,7 +142,7 @@ jobs:
       DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL || 'postgresql://ci:ci@localhost:5432/ci' }}
       DATABASE_URL: ${{ secrets.DIRECT_DB_URL || 'postgresql://ci:ci@localhost:5432/ci' }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -214,7 +214,7 @@ jobs:
       DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL || 'postgresql://ci:ci@localhost:5432/ci' }}
       DATABASE_URL: ${{ secrets.DIRECT_DB_URL || 'postgresql://ci:ci@localhost:5432/ci' }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
