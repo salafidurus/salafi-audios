@@ -51,7 +51,7 @@ export function LanguageSwitch() {
       <button
         type="button"
         className={styles.trigger}
-        aria-haspopup="listbox"
+        aria-haspopup="menu"
         aria-expanded={open}
         aria-label={t("navigation.languageSwitch", "Language")}
         onClick={() => setOpen((prev) => !prev)}
@@ -63,15 +63,15 @@ export function LanguageSwitch() {
       </button>
 
       {open && (
-        <ul className={styles.menu} role="listbox">
+        <ul className={styles.menu} role="menu">
           {SUPPORTED_LOCALES.map((locale) => {
             const isActive = locale === activeLocale;
             return (
               <li key={locale} role="none">
                 <button
                   type="button"
-                  role="option"
-                  aria-selected={isActive}
+                  role="menuitemradio"
+                  aria-checked={isActive}
                   className={styles.option}
                   data-active={isActive}
                   onClick={() => void handleSelect(locale)}

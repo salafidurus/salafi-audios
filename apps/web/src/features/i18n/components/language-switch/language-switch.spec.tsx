@@ -42,19 +42,19 @@ describe("LanguageSwitch", () => {
     expect(trigger).toHaveTextContent("English");
 
     // Menu is closed initially.
-    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
 
     fireEvent.click(trigger);
 
-    expect(screen.getByRole("listbox")).toBeInTheDocument();
-    expect(screen.getByRole("option", { name: "العربية" })).toBeInTheDocument();
+    expect(screen.getByRole("menu")).toBeInTheDocument();
+    expect(screen.getByRole("menuitemradio", { name: "العربية" })).toBeInTheDocument();
   });
 
   it("switches locale, persists it, invalidates queries, and refreshes", async () => {
     render(<LanguageSwitch />);
 
     fireEvent.click(screen.getByRole("button", { name: "Language" }));
-    fireEvent.click(screen.getByRole("option", { name: "العربية" }));
+    fireEvent.click(screen.getByRole("menuitemradio", { name: "العربية" }));
 
     await waitFor(() => expect(mockRefresh).toHaveBeenCalled());
 

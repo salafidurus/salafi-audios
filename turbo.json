@@ -29,10 +29,22 @@
       "outputs": []
     },
     "typecheck": {
-      "dependsOn": ["^typecheck"],
+      // ^build so dependencies' emitted .d.ts exist before we typecheck. apps/api uses
+      // classic "node" moduleResolution, which ignores package "exports" and reads the
+      // top-level "types": "./dist/index.d.ts" — that file must be built first.
+      "dependsOn": ["^build", "^typecheck"],
       // Include shared tsconfig so typecheck re-runs when compiler options change
       "inputs": ["$TURBO_DEFAULT$", "tsconfig*.json", "packages/util-config/tsconfig/**"],
-      // Prisma client generation is part of typecheck pipeline — output cached for downstream
+      // Most packages emit nothing from typecheck (tsc --noEmit); declaring outputs here
+      // produced "no output files found" warnings. Prisma generation is scoped to the
+      // @sd/core-db override below.
+      "outputs": []
+    },
+    // core-db's pretypecheck runs `prisma generate`, so its typecheck genuinely emits the
+    // client. Cache it for downstream consumers.
+    "@sd/core-db#typecheck": {
+      "dependsOn": ["^build", "^typecheck"],
+      "inputs": ["$TURBO_DEFAULT$", "tsconfig*.json", "packages/util-config/tsconfig/**"],
       "outputs": ["generated/**", "src/generated/**"]
     },
     "test": {
