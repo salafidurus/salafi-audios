@@ -1007,6 +1007,9 @@ importers:
       '@sd/core-contracts':
         specifier: workspace:*
         version: link:../core-contracts
+      '@sd/core-i18n':
+        specifier: workspace:*
+        version: link:../core-i18n
       react:
         specifier: 19.2.3
         version: 19.2.3

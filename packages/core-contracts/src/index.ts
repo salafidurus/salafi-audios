@@ -113,4 +113,6 @@ export {
   DEFAULT_LOCALE,
   RTL_LOCALES,
   type Locale,
+  type ContentOriginalFields,
+  type ScholarOriginalFields,
 } from "./types/localization.types";

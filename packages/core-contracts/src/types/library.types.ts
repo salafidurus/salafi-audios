@@ -1,3 +1,5 @@
+import type { Locale } from "./localization.types";
+
 export type LibraryItemDto = {
   id: string;
   lectureId: string;
@@ -11,6 +13,9 @@ export type LibraryItemDto = {
   savedAt?: string;
   completedAt?: string;
   progressSeconds?: number;
+  originalLanguage?: Locale;
+  /** Original-language lecture title, set only when `lectureTitle` is translated. */
+  originalLectureTitle?: string;
 };
 
 export type LibraryPageDto = {

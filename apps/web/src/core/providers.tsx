@@ -3,7 +3,12 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState, type ReactNode } from "react";
 import { I18nextProvider } from "react-i18next";
-import { initApiClient, setAccessTokenProvider, setUnauthorizedHandler } from "@sd/core-api";
+import {
+  initApiClient,
+  setAccessTokenProvider,
+  setLocaleProvider,
+  setUnauthorizedHandler,
+} from "@sd/core-api";
 import { createQueryClient } from "@sd/core-contracts/query";
 import type { Locale } from "@sd/core-contracts";
 import { authClient } from "@/core/auth/auth-client";
@@ -25,7 +30,10 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
   useEffect(() => {
     initApiClient(apiBaseUrl ? { baseUrl: apiBaseUrl } : undefined);
     setAccessTokenProvider(() => getBearerToken());
-  }, [apiBaseUrl]);
+    // Send the active UI locale as Accept-Language so the API resolves
+    // content translations to the user's selected language.
+    setLocaleProvider(() => i18n.language);
+  }, [apiBaseUrl, i18n]);
 
   useEffect(() => {
     setLocaleCookie(initialLocale);

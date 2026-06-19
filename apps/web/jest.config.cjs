@@ -17,6 +17,9 @@ const customJestConfig = {
   // Typical ignores
   testPathIgnorePatterns: ["<rootDir>/.next/", "<rootDir>/node_modules/", "<rootDir>/e2e/"],
 
+  // Only scan src directory for tests to prevent E2E specs from running under Jest
+  roots: ["<rootDir>/src"],
+
   collectCoverageFrom: [
     "src/**/*.{ts,tsx,js,jsx}",
     "!src/**/*.d.ts",

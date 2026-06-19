@@ -1,6 +1,9 @@
 import { View, Text, FlatList, Pressable } from "react-native";
 import type { ListRenderItemInfo } from "react-native";
 import type { ContentSuggestionDto } from "@sd/core-contracts";
+import { pickContentField } from "@sd/core-i18n";
+import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import { useTranslation } from "@/core/i18n/use-translation";
 
 export type FeedTopicRowProps = {
   topicName: string;
@@ -9,9 +12,13 @@ export type FeedTopicRowProps = {
 };
 
 export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProps) {
+  const showOriginal = useShowOriginalContent();
+  const { t } = useTranslation();
+
   if (!items.length) return null;
 
   function renderItem({ item }: ListRenderItemInfo<ContentSuggestionDto>) {
+    const title = pickContentField(item.title, item.original?.title, showOriginal);
     return (
       <Pressable
         style={({ pressed }) => [
@@ -36,7 +43,7 @@ export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProp
           }}
           numberOfLines={2}
         >
-          {item.title}
+          {title}
         </Text>
         <Text
           style={{
@@ -67,7 +74,7 @@ export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProp
           color: "#333",
         }}
       >
-        New in {topicName}
+        {t("feed.newInTopic", "New in {{topic}}", { topic: topicName })}
       </Text>
       <FlatList
         horizontal

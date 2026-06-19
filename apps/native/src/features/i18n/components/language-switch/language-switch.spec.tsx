@@ -15,6 +15,10 @@ jest.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => mockUseTranslation(),
 }));
 
+jest.mock("@tanstack/react-query", () => ({
+  useQueryClient: () => ({ invalidateQueries: jest.fn().mockResolvedValue(undefined) }),
+}));
+
 jest.mock("../../../../core/i18n/i18n", () => ({
   changeLocale: jest.fn().mockResolvedValue(undefined),
 }));
@@ -43,6 +47,12 @@ jest.mock("react-native-unistyles", () => ({
   },
 }));
 
+function findPressables(tree: ReturnType<typeof renderer.create>) {
+  return tree.root.findAll(
+    (node: { props: { onPress?: unknown } }) => typeof node.props.onPress === "function",
+  );
+}
+
 describe("LanguageSwitch", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -51,28 +61,38 @@ describe("LanguageSwitch", () => {
     });
   });
 
-  it("renders all supported locales", () => {
+  it("shows the active locale and reveals the others when opened", () => {
     let tree: ReturnType<typeof renderer.create>;
     act(() => {
       tree = renderer.create(<LanguageSwitch />);
     });
-    const rendered = JSON.stringify(tree!.toJSON());
-    expect(rendered).toContain("English");
-    expect(rendered).toContain("العربية");
+
+    // Closed: only the active locale label is shown.
+    expect(JSON.stringify(tree!.toJSON())).toContain("English");
+    expect(JSON.stringify(tree!.toJSON())).not.toContain("العربية");
+
+    // Open the menu.
+    act(() => {
+      findPressables(tree!)[0]!.props.onPress();
+    });
+
+    expect(JSON.stringify(tree!.toJSON())).toContain("العربية");
   });
 
-  it("changes locale when a locale button is pressed", () => {
+  it("changes locale when a locale option is pressed", async () => {
     let tree: ReturnType<typeof renderer.create>;
     act(() => {
       tree = renderer.create(<LanguageSwitch />);
     });
-    // Find all pressables and press the one for Arabic (index 1)
-    const pressables = tree!.root.findAll(
-      (node: { props: { onPress?: unknown } }) => typeof node.props.onPress === "function",
-    );
+
     act(() => {
-      pressables[1].props.onPress();
+      findPressables(tree!)[0]!.props.onPress();
     });
+    // After opening: [trigger, option en, option ar].
+    await act(async () => {
+      await findPressables(tree!)[2]!.props.onPress();
+    });
+
     expect(changeLocale).toHaveBeenCalledWith("ar");
   });
 });

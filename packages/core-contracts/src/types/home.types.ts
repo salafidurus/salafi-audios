@@ -1,8 +1,12 @@
+import type { ContentOriginalFields, Locale, ScholarOriginalFields } from "./localization.types";
+
 export type ScholarChipDto = {
   id: string;
   name: string;
   slug: string;
   imageUrl: string | null;
+  originalLanguage?: Locale;
+  original?: ScholarOriginalFields;
 };
 
 export type ContentSuggestionDto = {
@@ -14,6 +18,8 @@ export type ContentSuggestionDto = {
   scholarSlug: string;
   thumbnailUrl: string | null;
   durationSeconds: number | null;
+  originalLanguage?: Locale;
+  original?: ContentOriginalFields;
 };
 
 export type RecentProgressDto = {

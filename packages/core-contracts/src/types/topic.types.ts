@@ -1,4 +1,5 @@
 import type { StatusValue } from "../types/common.types";
+import type { ContentOriginalFields, Locale } from "./localization.types";
 
 export type TopicSlug = string;
 
@@ -25,7 +26,9 @@ export type TopicLectureViewDto = {
   slug: string;
   title: string;
   description?: string;
-  language?: string;
+  language?: Locale;
+  originalLanguage?: Locale;
+  original?: ContentOriginalFields;
   status: StatusValue;
   publishedAt?: string;
   durationSeconds?: number;

@@ -2,6 +2,8 @@ import { View, Text, Pressable, ScrollView } from "react-native";
 import { Image } from "expo-image";
 import { StyleSheet } from "react-native-unistyles";
 import type { ScholarChipDto, ContentSuggestionDto, RecentProgressDto } from "@sd/core-contracts";
+import { pickContentField } from "@sd/core-i18n";
+import { useShowOriginalContent } from "@/features/i18n/content-preference";
 
 const SCHOLAR_SKELETON_COUNT = 5;
 const SUGGESTION_SKELETON_COUNT = 3;
@@ -32,6 +34,8 @@ export function QuickBrowse({
   onSelectSuggestion,
   onContinueListening,
 }: QuickBrowseProps) {
+  const showOriginal = useShowOriginalContent();
+
   return (
     <View style={styles.root}>
       {/* Continue Listening */}
@@ -118,30 +122,33 @@ export function QuickBrowse({
           <Text style={styles.header}>Suggestions</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.suggestionsRow}>
-              {suggestions.map((item) => (
-                <Pressable
-                  key={item.id}
-                  onPress={() => onSelectSuggestion?.(item.slug)}
-                  style={({ pressed }) => [styles.suggestionCard, pressed && styles.pressed]}
-                >
-                  <Text style={styles.suggestionTitle} numberOfLines={2}>
-                    {item.title}
-                  </Text>
-                  <Text style={styles.suggestionScholar} numberOfLines={1}>
-                    {item.scholarName}
-                  </Text>
-                  <View style={styles.suggestionMeta}>
-                    <View style={styles.kindBadge}>
-                      <Text style={styles.kindText}>{item.kind}</Text>
+              {suggestions.map((item) => {
+                const title = pickContentField(item.title, item.original?.title, showOriginal);
+                return (
+                  <Pressable
+                    key={item.id}
+                    onPress={() => onSelectSuggestion?.(item.slug)}
+                    style={({ pressed }) => [styles.suggestionCard, pressed && styles.pressed]}
+                  >
+                    <Text style={styles.suggestionTitle} numberOfLines={2}>
+                      {title}
+                    </Text>
+                    <Text style={styles.suggestionScholar} numberOfLines={1}>
+                      {item.scholarName}
+                    </Text>
+                    <View style={styles.suggestionMeta}>
+                      <View style={styles.kindBadge}>
+                        <Text style={styles.kindText}>{item.kind}</Text>
+                      </View>
+                      {item.durationSeconds != null && (
+                        <Text style={styles.durationText}>
+                          {formatDuration(item.durationSeconds)}
+                        </Text>
+                      )}
                     </View>
-                    {item.durationSeconds != null && (
-                      <Text style={styles.durationText}>
-                        {formatDuration(item.durationSeconds)}
-                      </Text>
-                    )}
-                  </View>
-                </Pressable>
-              ))}
+                  </Pressable>
+                );
+              })}
             </View>
           </ScrollView>
         </View>

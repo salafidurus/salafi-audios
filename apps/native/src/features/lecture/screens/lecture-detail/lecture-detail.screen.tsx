@@ -1,11 +1,14 @@
 import { ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { useLectureDetailScreen } from "@sd/domain-content";
+import { pickContentField } from "@sd/core-i18n";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { LectureMeta } from "@/features/lecture/components/lecture-meta/lecture-meta";
 import { SeriesContextBar } from "@/features/lecture/components/series-context-bar/series-context-bar";
 import { TopicChips } from "@/features/lecture/components/topic-chips/topic-chips";
+import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import { useTranslation } from "@/core/i18n/use-translation";
 
 export type LectureDetailScreenProps = {
   id: string;
@@ -13,11 +16,13 @@ export type LectureDetailScreenProps = {
 
 export function LectureDetailScreen({ id }: LectureDetailScreenProps) {
   const { lecture, isFetching } = useLectureDetailScreen(id);
+  const showOriginal = useShowOriginalContent();
+  const { t } = useTranslation();
 
   if (isFetching) {
     return (
       <ScreenView center>
-        <AppText variant="bodyMd">Loading lecture…</AppText>
+        <AppText variant="bodyMd">{t("lecture.loading", "Loading lecture…")}</AppText>
       </ScreenView>
     );
   }
@@ -25,21 +30,26 @@ export function LectureDetailScreen({ id }: LectureDetailScreenProps) {
   if (!lecture) {
     return (
       <ScreenView center>
-        <AppText variant="titleMd">Lecture not found</AppText>
+        <AppText variant="titleMd">{t("lecture.notFound", "Lecture not found")}</AppText>
       </ScreenView>
     );
   }
 
+  const title = pickContentField(lecture.title, lecture.original?.title, showOriginal);
+  const description = lecture.description
+    ? pickContentField(lecture.description, lecture.original?.description, showOriginal)
+    : undefined;
+
   return (
     <ScreenView>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
-        <AppText variant="titleLg">{lecture.title}</AppText>
+        <AppText variant="titleLg">{title}</AppText>
         <LectureMeta lecture={lecture} />
         <TopicChips topics={lecture.topics} />
 
-        {lecture.description ? (
+        {description ? (
           <View style={styles.descriptionSection}>
-            <AppText variant="bodyMd">{lecture.description}</AppText>
+            <AppText variant="bodyMd">{description}</AppText>
           </View>
         ) : null}
 

@@ -32,7 +32,8 @@
     "editProfile": "تعديل الملف الشخصي",
     "legal": "الشؤون القانونية",
     "signOut": "تسجيل الخروج",
-    "language": "اللغة"
+    "language": "اللغة",
+    "showOriginalContent": "عرض المحتوى بلغته الأصلية"
   },
   "tabs": {
     "search": "بحث",
@@ -92,6 +93,60 @@
     "privacy": "سياسة الخصوصية",
     "terms": "شروط الخدمة",
     "support": "الدعم"
+  },
+  "authStrip": {
+    "search": "بحث",
+    "signIn": "تسجيل الدخول",
+    "signOut": "تسجيل الخروج",
+    "createAccount": "إنشاء حساب مجاني",
+    "topActions": "إجراءات علوية"
+  },
+  "search": {
+    "placeholder": "بحث",
+    "searching": "جارٍ البحث…",
+    "noResults": "لا توجد نتائج.",
+    "startTyping": "ابدأ الكتابة للبحث.",
+    "suggestions": "اقتراحات",
+    "scholars": "العلماء",
+    "continueListening": "متابعة الاستماع"
+  },
+  "library": {
+    "title": "مكتبتي",
+    "inProgress": "قيد الاستماع",
+    "saved": "المحفوظة",
+    "completed": "المكتملة",
+    "loadingSection": "جارٍ تحميل {{section}}…",
+    "emptyProgress": "لا توجد محاضرات قيد الاستماع.",
+    "emptySaved": "لا توجد محاضرات محفوظة بعد. احفظ المحاضرات للاستماع إليها لاحقًا.",
+    "emptyCompleted": "لا توجد محاضرات مكتملة بعد. واصل الاستماع!",
+    "percentListened": "{{percent}}٪ تم الاستماع",
+    "savedOn": "حُفظت في {{date}}",
+    "completedOn": "اكتملت في {{date}}"
+  },
+  "lecture": {
+    "loading": "جارٍ تحميل المحاضرة…",
+    "notFound": "لم يتم العثور على المحاضرة",
+    "minutes": "{{count}} دقيقة"
+  },
+  "scholarContent": {
+    "collections": "المجموعات",
+    "series": "السلاسل",
+    "lectures": "المحاضرات",
+    "empty": "لا يوجد محتوى منشور بعد.",
+    "seriesCount": "{{count}} سلسلة",
+    "lectureCount": "{{count}} محاضرة"
+  },
+  "feed": {
+    "newInTopic": "جديد في {{topic}}"
+  },
+  "live": {
+    "title": "البث المباشر",
+    "liveNow": "مباشر الآن",
+    "upcoming": "القادمة",
+    "recentlyEnded": "المنتهية مؤخرًا",
+    "emptyLive": "لا توجد جلسات مباشرة الآن.",
+    "emptyUpcoming": "لا توجد جلسات قادمة مجدولة.",
+    "emptyEnded": "لا توجد جلسات حديثة."
   },
   "notFound": {
     "title": "عذرًا!",

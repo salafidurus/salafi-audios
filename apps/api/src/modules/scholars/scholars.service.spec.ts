@@ -1,6 +1,10 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import type { ScholarDetailDto, ScholarContentDto } from '@sd/core-contracts';
+import type {
+  ScholarDetailDto,
+  ScholarContentDto,
+  ScholarListItemDto,
+} from '@sd/core-contracts';
 import { CreateScholarDto } from './dto/create-scholar.dto';
 import { UpdateScholarDto } from './dto/update-scholar.dto';
 import { ScholarsRepository } from './scholars.repo';
@@ -21,7 +25,7 @@ describe('ScholarsService', () => {
     bio: 'Great scholar',
     imageUrl: 'image1.jpg',
     country: 'Saudi Arabia',
-    mainLanguage: 'Arabic',
+    mainLanguage: 'ar',
     isActive: true,
     isKibar: true,
     socialTwitter: '@example',
@@ -81,14 +85,14 @@ describe('ScholarsService', () => {
 
   describe('list', () => {
     it('should return scholars list from repository', async () => {
-      const expected = {
+      const expected: { scholars: ScholarListItemDto[] } = {
         scholars: [
           {
             id: 's1',
             name: 'Test Scholar',
             slug: 'test-scholar',
             imageUrl: 'test.jpg',
-            mainLanguage: 'English',
+            mainLanguage: 'en',
             isKibar: false,
             lectureCount: 10,
           },
