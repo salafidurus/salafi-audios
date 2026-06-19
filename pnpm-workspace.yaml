@@ -32,11 +32,20 @@ overrides:
   react-dom: 19.2.3
 
 catalog:
+  # AWS SDK (S3/R2) — client and presigner share a tightly-coupled version
+  # matrix; even a patch-level mismatch pulls in two @smithy/smithy-client
+  # copies and breaks the API typecheck. Catalog keeps every consumer in lockstep.
+  "@aws-sdk/client-s3": ^3.1068.0
+  "@aws-sdk/s3-request-presigner": ^3.1068.0
   # better-auth and @better-auth/expo MUST be pinned to the exact same version.
   "@better-auth/expo": 1.6.18
+  "@eslint/eslintrc": ^3.3.5
+  "@eslint/js": ^9.39.4
+  "@nestjs/cli": ^11.0.21
   "@nestjs/common": ^11.1.24
   "@nestjs/core": ^11.1.24
   "@nestjs/platform-express": ^11.1.24
+  "@nestjs/schematics": ^11.1.0
   "@nestjs/terminus": ^11.1.1
   "@nestjs/testing": ^11.1.24
   "@prisma/adapter-pg": ^7.3.0
@@ -45,20 +54,36 @@ catalog:
   "@testing-library/jest-dom": ^6.9.1
   "@testing-library/react": ^16.3.2
   "@testing-library/react-native": ^13.3.3
+  "@types/express": ^5.0.0
   "@types/jest": ^29.5.14
   better-auth: 1.6.18 # keep in exact lockstep with @better-auth/expo (see note above)
   class-transformer: ^0.5.1
   class-validator: ^0.15.1
+  eslint: ^9.39.4
+  eslint-config-next: 16.2.9
+  eslint-config-prettier: ^10.1.8
+  eslint-plugin-import: ^2.32.0
+  eslint-plugin-prettier: ^5.5.6
+  globals: ^16.5.0
+  helmet: ^8.2.0
   i18next: ^26.3.1
   jest: ^29.7.0
+  jest-environment-jsdom: ^30.4.1
   pg: ^8.17.2
+  prettier: ^3.8.4
   react: 19.2.3
   react-dom: 19.2.3
   react-hook-form: ^7.78.0
   react-i18next: ^15.5.3
   reflect-metadata: ^0.2.2
+  rimraf: ^6.0.0
   rxjs: ^7.8.2
+  source-map-support: ^0.5.21
   ts-jest: ^29.2.6
+  ts-node: ^10.9.2
+  tsconfig-paths: ^4.2.0
+  tsup: ^8.5.1
+  typescript-eslint: ^8.53.1
   zustand: ^5.0.11
 
 minimumReleaseAgeExclude:

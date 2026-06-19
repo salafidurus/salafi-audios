@@ -49,6 +49,6 @@
     "pg": "^8.0.0",
     "prisma": "^7.3.0",
     "ts-jest": "catalog:",
-    "tsup": "^8.0.0"
+    "tsup": "catalog:"
   }
 }
