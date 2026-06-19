@@ -75,7 +75,7 @@
     "prettier": "3.8.4",
     "react-doctor": "^0.5.1",
     "rimraf": "6.0.0",
-    "tsx": "4.21.0",
+    "tsx": "4.22.4",
     "turbo": "2.9.14",
     "typescript": "5.9.3",
     "typescript-eslint": "8.53.1"
