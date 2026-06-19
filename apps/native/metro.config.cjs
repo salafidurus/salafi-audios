@@ -54,5 +54,8 @@
 const { getSentryExpoConfig } = require("@sentry/react-native/metro");
 // const config = getDefaultConfig(__dirname);
 // eslint-disable-next-line no-undef
-const config = getSentryExpoConfig(__dirname);
+const config = getSentryExpoConfig(__dirname, {
+  includeWebReplay: false,
+  includeWebFeedback: false,
+});
 module.exports = config;
