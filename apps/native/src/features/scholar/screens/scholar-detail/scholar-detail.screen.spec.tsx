@@ -84,8 +84,8 @@ describe("ScholarDetailScreen", () => {
         collections: [
           { id: "collection-1", slug: "collection", title: "Collection", lectureCount: 2 },
         ],
-        standaloneSeries: [],
-        standaloneLectures: [],
+        series: [],
+        singles: [],
       },
       isFetching: false,
     });

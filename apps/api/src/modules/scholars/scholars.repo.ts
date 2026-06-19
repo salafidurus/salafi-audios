@@ -7,7 +7,7 @@ import type {
   ScholarContentDto,
   CollectionSummaryDto,
   SeriesSummaryDto,
-  LectureSummaryDto,
+  SingleSummaryDto,
   TranslationViewDto,
   Locale,
   AdminSeriesListItemDto,
@@ -189,14 +189,13 @@ export class ScholarsRepository {
 
     if (!scholar) return null;
 
-    const [collections, standaloneSeries, standaloneLectures] =
-      await Promise.all([
-        this.getCollections(scholar.id, locale),
-        this.getStandaloneSeries(scholar.id, locale),
-        this.getStandaloneLectures(scholar.id, locale),
-      ]);
+    const [collections, series, singles] = await Promise.all([
+      this.getCollections(scholar.id, locale),
+      this.getSeriesListings(scholar.id, locale),
+      this.getSingles(scholar.id, locale),
+    ]);
 
-    return { collections, standaloneSeries, standaloneLectures };
+    return { collections, series, singles };
   }
 
   async findById(id: string) {
@@ -540,7 +539,7 @@ export class ScholarsRepository {
     });
   }
 
-  private async getStandaloneSeries(
+  private async getSeriesListings(
     scholarId: string,
     locale: Locale,
   ): Promise<SeriesSummaryDto[]> {
@@ -597,10 +596,10 @@ export class ScholarsRepository {
     });
   }
 
-  private async getStandaloneLectures(
+  private async getSingles(
     scholarId: string,
     locale: Locale,
-  ): Promise<LectureSummaryDto[]> {
+  ): Promise<SingleSummaryDto[]> {
     const records = await this.prisma.lecture.findMany({
       where: {
         scholarId,

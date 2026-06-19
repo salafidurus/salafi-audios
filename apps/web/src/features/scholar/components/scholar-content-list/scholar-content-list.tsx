@@ -36,10 +36,10 @@ export function ScholarContentList({ content }: ScholarContentListProps) {
         </section>
       )}
 
-      {content.standaloneSeries.length > 0 && (
+      {content.series.length > 0 && (
         <section style={{ marginBottom: 32 }}>
           <h2 style={{ fontSize: 20, marginBottom: 12 }}>{t("scholarContent.series", "Series")}</h2>
-          {content.standaloneSeries.map((s) => {
+          {content.series.map((s) => {
             const title = pickContentField(s.title, s.original?.title, showOriginal);
             return (
               <div key={s.id} style={{ padding: "12px 0", borderBottom: "1px solid #eee" }}>
@@ -55,12 +55,12 @@ export function ScholarContentList({ content }: ScholarContentListProps) {
         </section>
       )}
 
-      {content.standaloneLectures.length > 0 && (
+      {content.singles.length > 0 && (
         <section>
           <h2 style={{ fontSize: 20, marginBottom: 12 }}>
-            {t("scholarContent.lectures", "Lectures")}
+            {t("scholarContent.singles", "Singles")}
           </h2>
-          {content.standaloneLectures.map((l) => {
+          {content.singles.map((l) => {
             const title = pickContentField(l.title, l.original?.title, showOriginal);
             return (
               <div key={l.id} style={{ padding: "12px 0", borderBottom: "1px solid #eee" }}>
@@ -75,8 +75,8 @@ export function ScholarContentList({ content }: ScholarContentListProps) {
       )}
 
       {content.collections.length === 0 &&
-        content.standaloneSeries.length === 0 &&
-        content.standaloneLectures.length === 0 && (
+        content.series.length === 0 &&
+        content.singles.length === 0 && (
           <p style={{ color: "#888", fontSize: 14 }}>
             {t("scholarContent.empty", "No published content yet.")}
           </p>

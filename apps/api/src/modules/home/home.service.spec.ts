@@ -17,7 +17,7 @@ describe('HomeService', () => {
       id: 'l1',
       slug: 'lecture-1',
       title: 'Suggested Lecture 1',
-      kind: 'lecture' as const,
+      kind: 'single' as const,
       scholarName: 'Scholar 1',
       scholarSlug: 'scholar-1',
       thumbnailUrl: null,

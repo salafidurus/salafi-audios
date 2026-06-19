@@ -24,9 +24,7 @@ export function ScholarContentList({ content }: ScholarContentListProps) {
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
   const hasContent =
-    content.collections.length > 0 ||
-    content.standaloneSeries.length > 0 ||
-    content.standaloneLectures.length > 0;
+    content.collections.length > 0 || content.series.length > 0 || content.singles.length > 0;
 
   if (!hasContent) {
     return (
@@ -63,9 +61,9 @@ export function ScholarContentList({ content }: ScholarContentListProps) {
         </ContentSection>
       ) : null}
 
-      {content.standaloneSeries.length > 0 ? (
+      {content.series.length > 0 ? (
         <ContentSection title={t("scholarContent.series", "Series")}>
-          {content.standaloneSeries.map((series) => {
+          {content.series.map((series) => {
             const title = pickContentField(series.title, series.original?.title, showOriginal);
             return (
               <View
@@ -84,9 +82,9 @@ export function ScholarContentList({ content }: ScholarContentListProps) {
         </ContentSection>
       ) : null}
 
-      {content.standaloneLectures.length > 0 ? (
-        <ContentSection title={t("scholarContent.lectures", "Lectures")}>
-          {content.standaloneLectures.map((lecture) => {
+      {content.singles.length > 0 ? (
+        <ContentSection title={t("scholarContent.singles", "Singles")}>
+          {content.singles.map((lecture) => {
             const title = pickContentField(lecture.title, lecture.original?.title, showOriginal);
             return (
               <View

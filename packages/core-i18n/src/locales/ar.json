@@ -131,6 +131,7 @@
   "scholarContent": {
     "collections": "المجموعات",
     "series": "السلاسل",
+    "singles": "محاضرات مفردة",
     "lectures": "المحاضرات",
     "empty": "لا يوجد محتوى منشور بعد.",
     "seriesCount": "{{count}} سلسلة",
