@@ -18,9 +18,7 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     },
-    "./locales/*": {
-      "default": "./dist/locales/*"
-    }
+    "./locales/*": "./src/locales/*"
   },
   "scripts": {
     "clean": "rimraf dist",
