@@ -5,6 +5,7 @@
   "version": "1.0.0",
   "scripts": {
     "eas-build-post-install": "cd ../.. && pnpm turbo run build --filter=native^...",
+    "eas-build-on-error": "sentry-eas-build-on-error",
     "start": "expo start --dev-client",
     "dev": "expo start --dev-client",
     "prebuild": "expo prebuild",
@@ -36,7 +37,7 @@
     "@sd/domain-content": "workspace:*",
     "@sd/domain-live": "workspace:*",
     "@sd/domain-search": "workspace:*",
-    "@sentry/react-native": "^7.11.0",
+    "@sentry/react-native": "~7.11.0",
     "@shopify/flash-list": "2.0.2",
     "@tanstack/react-query": "catalog:",
     "better-auth": "catalog:",
