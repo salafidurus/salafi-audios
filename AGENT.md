@@ -137,9 +137,11 @@ Web (`apps/web`):
 ## Commands (root)
 
 - Install: `pnpm i`
-- Dev: `pnpm dev`
-- Dev one app: `pnpm dev:api`, `pnpm dev:web`, `pnpm dev:native`
-- Native build: `pnpm dev:native:build` (no clean), `pnpm dev:native:clean-build` (prebuild --clean first); `:android`/`:ios` variants exist
+- Dev (all apps): `pnpm dev`
+- Dev backend: `pnpm dev:be` (runs both `api` and `livestreams`), or single service: `pnpm dev:api`, `pnpm dev:livestreams`
+- Dev frontend: `pnpm dev:web`, `pnpm dev:native`
+- Dev combinations: `pnpm dev:be+web`, `pnpm dev:be+native`
+- Native build: `pnpm dev:native:build:android` (no clean), `pnpm dev:native:clean-build:android` (prebuild --clean first); `:ios` variants exist
 - Build: `pnpm build`
 - Lint: `pnpm lint`
 - Typecheck: `pnpm typecheck`
@@ -170,12 +172,9 @@ Web (`apps/web`):
 
 Turbo grouped scripts:
 
-- `pnpm lint:api+web`, `pnpm lint:api+mobile`
-- `pnpm lint:api+native`
-- `pnpm typecheck:api+web`, `pnpm typecheck:api+mobile`
-- `pnpm typecheck:api+native`
-- `pnpm test:api+web`, `pnpm test:api+mobile`
-- `pnpm test:api+native`
+- `pnpm lint:be+web`, `pnpm lint:be+native`
+- `pnpm typecheck:be+web`, `pnpm typecheck:be+native`
+- `pnpm test:be+web`, `pnpm test:be+native`
 
 ## Single-test quick reference
 
