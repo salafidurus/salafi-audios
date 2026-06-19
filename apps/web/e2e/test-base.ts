@@ -22,6 +22,7 @@ export const test = base.extend({
         waitUntil: "domcontentloaded",
         ...options,
       })) as typeof page.goto;
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     await use(page);
   },
 });
