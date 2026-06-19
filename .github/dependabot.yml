@@ -105,6 +105,21 @@ updates:
           - minor
           - patch
 
+      # AWS SDK (S3/R2) — client, presigner, and @smithy internals share a
+      # tightly-coupled version matrix. Even a patch-level mismatch between
+      # @aws-sdk/client-s3 and @aws-sdk/s3-request-presigner pulls in two
+      # @smithy/smithy-client copies and breaks the API typecheck. Always
+      # bump every update type together in one PR.
+      aws-sdk:
+        applies-to: version-updates
+        patterns:
+          - "@aws-sdk/*"
+          - "@smithy/*"
+        update-types:
+          - major
+          - minor
+          - patch
+
   # ──────────────────────────────────────────────
   # GitHub Actions ecosystem
   # ──────────────────────────────────────────────

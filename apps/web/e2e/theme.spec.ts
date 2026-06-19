@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./test-base";
 
 test.describe("Theme — system-preference based", () => {
   test("page loads with a data-theme attribute on <html>", async ({ page }) => {

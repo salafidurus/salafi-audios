@@ -60,6 +60,16 @@ jest.mock("../../../core/auth/use-auth", () => ({
   useAuth: jest.fn(),
 }));
 
+jest.mock("../../../core/i18n/use-translation", () => ({
+  useTranslation: () => ({
+    t: (_key: string, fallback?: string, vars?: Record<string, unknown>) =>
+      (fallback ?? _key).replace(/\{\{(\w+)\}\}/g, (_m: string, name: string) =>
+        String(vars?.[name] ?? ""),
+      ),
+    i18n: { language: "en" },
+  }),
+}));
+
 const mockedUseAuth = jest.mocked(useAuth);
 const mockedUseLibraryProgressScreen = jest.mocked(useLibraryProgressScreen);
 const mockedUseLibrarySavedScreen = jest.mocked(useLibrarySavedScreen);
@@ -98,7 +108,7 @@ describe("LibraryScreen", () => {
       tree = renderer.create(<LibraryScreen />);
     });
 
-    expect(JSON.stringify(tree!.toJSON())).toContain("Loading your library…");
+    expect(JSON.stringify(tree!.toJSON())).toContain("Loading My Library…");
   });
 
   it("renders empty section messages when no items exist", () => {

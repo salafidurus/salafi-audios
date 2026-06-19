@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./test-base";
 
 test.describe("Navigation — sidebar & routing", () => {
   test.describe("desktop viewport", () => {

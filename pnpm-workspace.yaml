@@ -32,7 +32,7 @@ overrides:
   react-dom: 19.2.3
 
 catalog:
-  "@better-auth/expo": ^1.6.18
+  "@better-auth/expo": 1.6.18
   "@nestjs/common": ^11.1.24
   "@nestjs/core": ^11.1.24
   "@nestjs/platform-express": ^11.1.24
@@ -42,7 +42,7 @@ catalog:
   "@prisma/client": ^7.3.0
   "@tanstack/react-query": ^5.69.0
   "@types/jest": ^29.5.14
-  better-auth: ^1.6.14
+  better-auth: 1.6.18
   class-transformer: ^0.5.1
   class-validator: ^0.15.1
   i18next: ^26.3.1
