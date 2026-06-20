@@ -21,7 +21,7 @@ jest.mock("@sd/domain-content", () => ({
   useLectureDetailScreen: jest.fn(),
 }));
 
-jest.mock("../../../../shared/components/ScreenView/ScreenView", () => ({
+jest.mock("@/shared/components/ScreenView/ScreenView", () => ({
   ScreenView: ({ children }: { children: React.ReactNode }) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const ReactM = require("react");
@@ -31,7 +31,7 @@ jest.mock("../../../../shared/components/ScreenView/ScreenView", () => ({
   },
 }));
 
-jest.mock("../../../../shared/components/AppText/AppText", () => ({
+jest.mock("@/shared/components/AppText/AppText", () => ({
   AppText: ({ children }: { children: React.ReactNode }) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const ReactM = require("react");
@@ -41,7 +41,7 @@ jest.mock("../../../../shared/components/AppText/AppText", () => ({
   },
 }));
 
-jest.mock("../../components/lecture-meta/lecture-meta", () => ({
+jest.mock("@/features/lecture/components/lecture-meta/lecture-meta", () => ({
   LectureMeta: ({ lecture }: { lecture: { scholar: { name: string } } }) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const ReactM = require("react");
@@ -51,7 +51,7 @@ jest.mock("../../components/lecture-meta/lecture-meta", () => ({
   },
 }));
 
-jest.mock("../../components/topic-chips/topic-chips", () => ({
+jest.mock("@/features/lecture/components/topic-chips/topic-chips", () => ({
   TopicChips: ({ topics }: { topics: { name: string }[] }) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const ReactM = require("react");
@@ -61,7 +61,7 @@ jest.mock("../../components/topic-chips/topic-chips", () => ({
   },
 }));
 
-jest.mock("../../components/series-context-bar/series-context-bar", () => ({
+jest.mock("@/features/lecture/components/series-context-bar/series-context-bar", () => ({
   SeriesContextBar: ({ seriesContext }: { seriesContext: { seriesTitle: string } }) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const ReactM = require("react");

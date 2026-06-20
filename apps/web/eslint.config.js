@@ -1,4 +1,5 @@
 import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
+import oxlint from "eslint-plugin-oxlint";
 import { baseRules, typescriptRecommendedRules } from "../../eslint.config.base.mjs";
 
 // eslint-config-next (next/typescript) already registers @typescript-eslint, so we
@@ -43,6 +44,7 @@ const config = [
     files: ["src/features/*/index.ts", "src/shared/**/index.ts", "src/core/*/index.ts"],
     rules: { "no-restricted-syntax": "off" },
   },
+  ...oxlint.configs["flat/recommended"],
 ];
 
 export default config;

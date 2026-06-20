@@ -1,4 +1,5 @@
 import globals from "globals";
+import oxlint from "eslint-plugin-oxlint";
 import base from "./eslint.config.base.mjs";
 
 export default [
@@ -10,4 +11,5 @@ export default [
       },
     },
   },
+  ...oxlint.configs["flat/recommended"],
 ];

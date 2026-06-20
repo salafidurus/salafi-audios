@@ -26,7 +26,7 @@
     "ingest:content": "tsx src/commands/ingest-content.ts",
     "ingest:remove": "tsx src/commands/remove-content.ts",
     "convert:supabase": "tsx src/commands/convert-supabase.ts",
-    "lint": "eslint .",
+    "lint": "oxlint . && eslint .",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",

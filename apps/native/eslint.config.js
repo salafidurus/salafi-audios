@@ -1,4 +1,5 @@
 import expo from "eslint-config-expo/flat.js";
+import oxlint from "eslint-plugin-oxlint";
 import { baseRules, typescriptRecommendedRules } from "../../eslint.config.base.mjs";
 
 // eslint-config-expo already registers @typescript-eslint, so we compose it with
@@ -70,4 +71,5 @@ export default [
       ],
     },
   },
+  ...oxlint.configs["flat/recommended"],
 ];

@@ -1,4 +1,5 @@
 import importPlugin from "eslint-plugin-import";
+import oxlint from "eslint-plugin-oxlint";
 import base from "./eslint.config.base.mjs";
 
 export default [
@@ -11,4 +12,5 @@ export default [
       "import/no-default-export": "error",
     },
   },
+  ...oxlint.configs["flat/recommended"],
 ];
