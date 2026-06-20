@@ -68,3 +68,11 @@ export type {
 
 export { routes, routeDefinitions, resolveRouteAccess } from "./routes";
 export type { RouteAccess, RouteDefinition } from "./routes";
+export {
+  SECTION_TABS,
+  DEFAULT_TABS,
+  SECTION_LABELS,
+  SECTION_ROUTES,
+  type Section,
+  type TabConfig,
+} from "./navigation";

@@ -53,7 +53,13 @@
     "expandSidebar": "توسيع الشريط الجانبي",
     "collapseSidebar": "طيّ الشريط الجانبي",
     "siteFooter": "تذييل الموقع",
-    "languageSwitch": "تغيير اللغة"
+    "languageSwitch": "تغيير اللغة",
+    "subnav": {
+      "feed": { "popular": "الأكثر شيوعًا", "recent": "الأحدث", "following": "المتابَعون" },
+      "live": { "ongoing": "مباشر الآن", "scheduled": "مجدولة", "ended": "منتهية" },
+      "library": { "started": "قيد التشغيل", "saved": "المحفوظة", "completed": "المكتملة" },
+      "account": { "general": "عام", "profile": "الملف الشخصي", "legal": "قانوني" }
+    }
   },
   "support": {
     "title": "الدعم",
@@ -138,16 +144,23 @@
     "lectureCount": "{{count}} محاضرة"
   },
   "feed": {
-    "newInTopic": "جديد في {{topic}}"
+    "newInTopic": "جديد في {{topic}}",
+    "loading": "جارٍ تحميل المحتوى...",
+    "empty": "لا توجد محاضرات في هذا الموجز.",
+    "error": "تعذّر تحميل محتوى الموجز.",
+    "retry": "إعادة المحاولة"
   },
   "live": {
     "title": "البث المباشر",
-    "liveNow": "مباشر الآن",
-    "upcoming": "القادمة",
-    "recentlyEnded": "المنتهية مؤخرًا",
-    "emptyLive": "لا توجد جلسات مباشرة الآن.",
-    "emptyUpcoming": "لا توجد جلسات قادمة مجدولة.",
-    "emptyEnded": "لا توجد جلسات حديثة."
+    "loading": "جارٍ تحميل البث...",
+    "empty": "لا توجد جلسات مباشرة الآن.",
+    "error": "تعذّر التحقق من الجلسات المباشرة.",
+    "retry": "إعادة المحاولة",
+    "sections": {
+      "ongoing": { "title": "مباشر الآن", "empty": "لا توجد جلسات مباشرة الآن." },
+      "scheduled": { "title": "القادمة", "empty": "لا توجد جلسات قادمة مجدولة." },
+      "ended": { "title": "المنتهية مؤخرًا", "empty": "لا توجد جلسات حديثة." }
+    }
   },
   "notFound": {
     "title": "عذرًا!",
