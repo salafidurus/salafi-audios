@@ -10,8 +10,8 @@
 
 - [x] Create a git worktree at `.worktrees/c-oxlint` on branch `c/oxlint`.
 - [x] Install devDependencies (`oxlint`, `eslint-plugin-oxlint`).
-- [/] Configure `eslint-plugin-oxlint` in base and app ESLint configs.
-- [ ] Set up root-level `oxlint` script and `.oxlintrc.json` configuration.
+- [x] Configure `eslint-plugin-oxlint` in base and app ESLint configs.
+- [/] Set up root-level `oxlint` script and `.oxlintrc.json` configuration.
 - [ ] Update `lint-staged` pre-commit config and root `ci:local` workflow.
 
 # Staging Strategy
@@ -56,7 +56,7 @@ The implementation is broken down into five sequential stages to ensure correctn
 
 ## Stage 2: Configure ESLint configs to extend eslint-plugin-oxlint
 
-- Status: Planned
+- Status: Completed
 - Goal: Extend `eslint-plugin-oxlint` in all base and app-level ESLint configs to disable redundant rules that are natively checked by Oxlint.
 - Files:
   - [eslint.config.base.mjs](file:///C:/dev/salafi-audios/eslint.config.base.mjs)

@@ -1,4 +1,5 @@
 import tseslint from "typescript-eslint";
+import oxlint from "eslint-plugin-oxlint";
 
 const BARREL_MESSAGE =
   "Barrel re-exports are only allowed in designated index files " +
@@ -69,4 +70,4 @@ export const typescriptRecommendedRules = Object.assign(
   ...tseslint.configs.recommended.map((c) => c.rules ?? {}),
 );
 
-export default [...baseRules, ...typescriptRecommended];
+export default [...baseRules, ...typescriptRecommended, ...oxlint.configs["flat/recommended"]];
