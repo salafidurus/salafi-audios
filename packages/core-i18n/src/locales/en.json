@@ -53,7 +53,13 @@
     "expandSidebar": "Expand sidebar",
     "collapseSidebar": "Collapse sidebar",
     "siteFooter": "Site footer",
-    "languageSwitch": "Language switch"
+    "languageSwitch": "Language switch",
+    "subnav": {
+      "feed": { "popular": "Popular", "recent": "Recent", "following": "Following" },
+      "live": { "ongoing": "Live Now", "scheduled": "Scheduled", "ended": "Ended" },
+      "library": { "started": "Started", "saved": "Saved", "completed": "Completed" },
+      "account": { "general": "General", "profile": "Profile", "legal": "Legal" }
+    }
   },
   "support": {
     "title": "Support",
@@ -138,16 +144,23 @@
     "lectureCount": "{{count}} lectures"
   },
   "feed": {
-    "newInTopic": "New in {{topic}}"
+    "newInTopic": "New in {{topic}}",
+    "loading": "Loading feed...",
+    "empty": "No lectures available in this feed.",
+    "error": "Failed to load feed content.",
+    "retry": "Try Again"
   },
   "live": {
     "title": "Live Sessions",
-    "liveNow": "Live Now",
-    "upcoming": "Upcoming",
-    "recentlyEnded": "Recently Ended",
-    "emptyLive": "No live sessions right now.",
-    "emptyUpcoming": "No upcoming sessions scheduled.",
-    "emptyEnded": "No recent sessions."
+    "loading": "Loading streams...",
+    "empty": "No live sessions right now.",
+    "error": "Failed to check live sessions.",
+    "retry": "Retry",
+    "sections": {
+      "ongoing": { "title": "Live Now", "empty": "No live sessions right now." },
+      "scheduled": { "title": "Upcoming", "empty": "No upcoming sessions scheduled." },
+      "ended": { "title": "Recently Ended", "empty": "No recent sessions." }
+    }
   },
   "notFound": {
     "title": "Oops!",

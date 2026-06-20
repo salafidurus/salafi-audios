@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
+import { useTranslation } from "react-i18next";
+import { getSubnavLabel } from "@sd/core-i18n";
 import { useAuth } from "@/core/auth";
 import { routes } from "@sd/core-contracts";
 import { Cloud, Mic, Search, CassetteTape, Settings, type LucideIcon } from "lucide-react";
@@ -33,6 +35,7 @@ const SECTION_ORDER: Section[] = ["feed", "live", "library", "account"];
 
 export function AdaptiveBottomBar() {
   const pathname = usePathname();
+  const { t } = useTranslation();
   const sectionTabs = useNavigationStore((s) => s.sectionTabs);
   const setActiveTab = useNavigationStore((s) => s.setActiveTab);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -164,7 +167,7 @@ export function AdaptiveBottomBar() {
                     }
                     return <TabIcon size={14} />;
                   })()}
-                {tab.label}
+                {getSubnavLabel(currentSection, tab.id, t)}
               </Link>
             );
           })}
