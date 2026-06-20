@@ -3,7 +3,7 @@
 - **Date**: 2026-06-20
 - **Status**: In Progress
 - **Scope**: Monorepo-wide (excluding apps/native)
-- **Summary**: Migrate the test suites of apps/api, apps/livestreams, apps/web, and packages/* from Jest to Vitest. Refactor all occurrences of jest APIs (e.g. jest.fn, jest.mock, jest.spyOn) to native Vitest vi APIs (vi.fn, vi.mock, vi.spyOn) and imports, keeping apps/native on Jest for stability.
+- **Summary**: Migrate the test suites of apps/api, apps/livestreams, apps/web, and packages/\* from Jest to Vitest. Refactor all occurrences of jest APIs (e.g. jest.fn, jest.mock, jest.spyOn) to native Vitest vi APIs (vi.fn, vi.mock, vi.spyOn) and imports, keeping apps/native on Jest for stability.
 - **Dependencies**: None.
 
 ---
@@ -15,6 +15,7 @@
 - Refactoring strategy updated: directly rewrite all Jest mocks and globals to Vitest's `vi` and native Vitest imports (no global shims).
 - Architectural blueprint drafted and approved.
 - Stage 0 completed: git worktree setup and husky pre-push hook configuration.
+- Stage 1 completed: Vitest toolchain dependencies registered and installed.
 
 ---
 
@@ -55,7 +56,7 @@ Implementation is split into 7 sequential, incremental stages:
 
 ## Stage 1: Add Vitest catalog dependencies
 
-- **Status**: Planned
+- **Status**: Completed (Commit 876cd16)
 - **Goal**: Register Vitest and supporting compilation/routing libraries in the monorepo catalog.
 - **Files**:
   - [pnpm-workspace.yaml](file:///C:/dev/salafi-audios/pnpm-workspace.yaml)
@@ -102,9 +103,9 @@ Implementation is split into 7 sequential, incremental stages:
 - **Goal**: Replace Jest configurations with Vitest base configurations, and directly refactor mock/spy usages in `packages/*`.
 - **Files**:
   - [packages/vitest.config.base.ts](file:///C:/dev/salafi-audios/packages/vitest.config.base.ts) (NEW)
-  - [packages/*/package.json](file:///C:/dev/salafi-audios/packages) (MODIFY)
-  - [packages/*/vitest.config.ts](file:///C:/dev/salafi-audios/packages) (NEW)
-  - [packages/*/jest.config.cjs](file:///C:/dev/salafi-audios/packages) (DELETE)
+  - [packages/\*/package.json](file:///C:/dev/salafi-audios/packages) (MODIFY)
+  - [packages/\*/vitest.config.ts](file:///C:/dev/salafi-audios/packages) (NEW)
+  - [packages/\*/jest.config.cjs](file:///C:/dev/salafi-audios/packages) (DELETE)
   - All test files under `packages/*/src/**/*.spec.ts` (MODIFY)
 - **Changes**:
   - Implement a centralized base Vitest configuration.
