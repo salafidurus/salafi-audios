@@ -1,5 +1,5 @@
 import React from "react";
-import renderer, { act } from "react-test-renderer";
+import { render, screen } from "@testing-library/react-native";
 import { LectureEditSheet } from "./LectureEditSheet";
 
 jest.mock("@/features/admin-lectures/api/admin-lectures.api", () => ({
@@ -13,26 +13,15 @@ jest.mock("@/features/admin-lectures/api/admin-lectures.api", () => ({
 }));
 
 describe("LectureEditSheet", () => {
-  it("renders nothing when lectureId is null", () => {
-    let tree: ReturnType<typeof renderer.create>;
-    act(() => {
-      tree = renderer.create(
-        <LectureEditSheet lectureId={null} onClose={() => {}} onSaved={() => {}} />,
-      );
-    });
-    expect(tree!.toJSON()).toBeNull();
+  it("renders nothing when lectureId is null", async () => {
+    await render(<LectureEditSheet lectureId={null} onClose={() => {}} onSaved={() => {}} />);
+    expect(screen.toJSON()).toBeNull();
   });
 
   it("renders edit form when lectureId is provided", async () => {
-    let tree: ReturnType<typeof renderer.create>;
-    await act(async () => {
-      tree = renderer.create(
-        <LectureEditSheet lectureId="lec-1" onClose={() => {}} onSaved={() => {}} />,
-      );
-    });
-    // Flush any remaining microtasks from the useEffect's async fetch
-    await act(async () => {});
-    expect(JSON.stringify(tree!.toJSON())).toContain("Edit Lecture");
-    expect(JSON.stringify(tree!.toJSON())).toContain("Title");
+    await render(<LectureEditSheet lectureId="lec-1" onClose={() => {}} onSaved={() => {}} />);
+    // findByText waits for the useEffect's async fetch to settle.
+    expect(await screen.findByText("Edit Lecture")).toBeTruthy();
+    expect(screen.getByText("Title")).toBeTruthy();
   }, 15000);
 });

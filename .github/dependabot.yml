@@ -44,9 +44,6 @@ updates:
       - dependency-name: "react-dom"
       - dependency-name: "@types/react"
       - dependency-name: "@types/react-dom"
-      # react-test-renderer must match the installed React version exactly;
-      # bump it only as part of a coordinated React upgrade.
-      - dependency-name: "react-test-renderer"
 
       # React Native — version-locked to the Expo SDK. Independent bumps
       # break the managed workflow and native builds.

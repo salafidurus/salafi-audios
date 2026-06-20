@@ -1,5 +1,5 @@
 import React from "react";
-import renderer, { act } from "react-test-renderer";
+import { render, screen } from "@testing-library/react-native";
 import { AdminScholarDetailScreen } from "./admin-scholar-detail.screen";
 import { useApiQuery } from "@sd/core-contracts";
 import { useAdminSeries, useAdminCollections } from "../../hooks/use-admin-scholars";
@@ -48,7 +48,7 @@ describe("AdminScholarDetailScreen", () => {
     jest.clearAllMocks();
   });
 
-  it("renders loading indicator when scholar detail is loading", () => {
+  it("renders loading indicator when scholar detail is loading", async () => {
     mockUseApiQuery.mockReturnValue({
       data: null,
       isLoading: true,
@@ -56,16 +56,12 @@ describe("AdminScholarDetailScreen", () => {
     mockUseAdminSeries.mockReturnValue({ data: [], refetch: jest.fn() });
     mockUseAdminCollections.mockReturnValue({ data: [], refetch: jest.fn() });
 
-    let tree: ReturnType<typeof renderer.create>;
-    act(() => {
-      tree = renderer.create(<AdminScholarDetailScreen scholarSlug="scholar-one" />);
-    });
-    const rendered = JSON.stringify(tree!.toJSON());
+    await render(<AdminScholarDetailScreen scholarSlug="scholar-one" />);
     // Since it just returns ActivityIndicator, it should not contain "Series"
-    expect(rendered).not.toContain("Series");
+    expect(screen.queryByText("Series", { exact: false })).toBeNull();
   });
 
-  it("renders scholar details, series and collections lists when loaded", () => {
+  it("renders scholar details, series and collections lists when loaded", async () => {
     mockUseApiQuery.mockReturnValue({
       data: {
         id: "s1",
@@ -85,14 +81,10 @@ describe("AdminScholarDetailScreen", () => {
       refetch: jest.fn(),
     });
 
-    let tree: ReturnType<typeof renderer.create>;
-    act(() => {
-      tree = renderer.create(<AdminScholarDetailScreen scholarSlug="scholar-one" />);
-    });
-    const rendered = JSON.stringify(tree!.toJSON());
-    expect(rendered).toContain("Scholar One");
-    expect(rendered).toContain("scholar-one");
-    expect(rendered).toContain("Series Title");
-    expect(rendered).toContain("Collection Title");
+    await render(<AdminScholarDetailScreen scholarSlug="scholar-one" />);
+    expect(screen.getByText("Scholar One")).toBeTruthy();
+    expect(screen.getByText("scholar-one", { exact: false })).toBeTruthy();
+    expect(screen.getByText("Series Title")).toBeTruthy();
+    expect(screen.getByText("Collection Title")).toBeTruthy();
   });
 });

@@ -1,5 +1,5 @@
 import React from "react";
-import renderer, { act } from "react-test-renderer";
+import { render, screen } from "@testing-library/react-native";
 import { AudioUploaderSheet } from "./AudioUploaderSheet";
 
 jest.mock("expo-document-picker", () => ({ getDocumentAsync: jest.fn() }));
@@ -47,23 +47,17 @@ jest.mock("@/features/admin-lectures/api/admin-lectures.api", () => ({
 }));
 
 describe("AudioUploaderSheet", () => {
-  it("renders Select Audio Files button when open", () => {
-    let tree: ReturnType<typeof renderer.create>;
-    act(() => {
-      tree = renderer.create(
-        <AudioUploaderSheet isOpen={true} onClose={() => {}} onUploadComplete={() => {}} />,
-      );
-    });
-    expect(JSON.stringify(tree!.toJSON())).toContain("Select Audio Files");
+  it("renders Select Audio Files button when open", async () => {
+    await render(
+      <AudioUploaderSheet isOpen={true} onClose={() => {}} onUploadComplete={() => {}} />,
+    );
+    expect(screen.getByText("Select Audio Files")).toBeTruthy();
   });
 
-  it("renders nothing when closed", () => {
-    let tree: ReturnType<typeof renderer.create>;
-    act(() => {
-      tree = renderer.create(
-        <AudioUploaderSheet isOpen={false} onClose={() => {}} onUploadComplete={() => {}} />,
-      );
-    });
-    expect(tree!.toJSON()).toBeNull();
+  it("renders nothing when closed", async () => {
+    await render(
+      <AudioUploaderSheet isOpen={false} onClose={() => {}} onUploadComplete={() => {}} />,
+    );
+    expect(screen.toJSON()).toBeNull();
   });
 });
