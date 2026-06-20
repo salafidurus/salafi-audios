@@ -9,15 +9,15 @@
 # Progress
 
 - [x] Create a git worktree at `.worktrees/c-oxlint` on branch `c/oxlint`.
-- [/] Install devDependencies (`oxlint`, `eslint-plugin-oxlint`).
-- [ ] Configure `eslint-plugin-oxlint` in base and app ESLint configs.
+- [x] Install devDependencies (`oxlint`, `eslint-plugin-oxlint`).
+- [/] Configure `eslint-plugin-oxlint` in base and app ESLint configs.
 - [ ] Set up root-level `oxlint` script and `.oxlintrc.json` configuration.
 - [ ] Update `lint-staged` pre-commit config and root `ci:local` workflow.
 
 # Staging Strategy
 
-The implementation is broken down into five sequential stages to ensure correctness and testability:
-0. Stage 0: Create a git worktree at `.worktrees/c-oxlint` on branch `c/oxlint`.
+The implementation is broken down into five sequential stages to ensure correctness and testability: 0. Stage 0: Create a git worktree at `.worktrees/c-oxlint` on branch `c/oxlint`.
+
 1. Stage 1: Install `oxlint` and `eslint-plugin-oxlint` at the monorepo root.
 2. Stage 2: Update all ESLint configurations to extend `eslint-plugin-oxlint` (disabling duplicate ESLint checks).
 3. Stage 3: Add Oxlint run scripts, turbo config, and `.oxlintrc.json`.
@@ -40,7 +40,7 @@ The implementation is broken down into five sequential stages to ensure correctn
 
 ## Stage 1: Install devDependencies
 
-- Status: Planned
+- Status: Completed
 - Goal: Install `oxlint` and `eslint-plugin-oxlint` at the monorepo root.
 - Files:
   - [package.json](file:///C:/dev/salafi-audios/package.json)
