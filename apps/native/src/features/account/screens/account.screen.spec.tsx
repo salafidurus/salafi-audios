@@ -18,7 +18,7 @@ jest.mock("@/core/i18n/use-translation", () => ({
   }),
 }));
 
-jest.mock("../../i18n", () => {
+jest.mock("@/features/i18n", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require("react");
   // eslint-disable-next-line @typescript-eslint/no-require-imports
