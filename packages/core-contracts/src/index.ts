@@ -94,8 +94,8 @@ export type {
 } from "./types";
 
 // Export route constants
-export { routes, routeAuth, routeAuthOverrides, getEffectiveAuthMode } from "./routes";
-export type { RouteAuthMode } from "./routes";
+export { routes, routeDefinitions, resolveRouteAccess } from "./routes";
+export type { RouteAccess, RouteDefinition } from "./routes";
 
 // Export shared navigation metadata
 export {

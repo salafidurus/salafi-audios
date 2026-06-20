@@ -66,8 +66,8 @@ export type {
   QuickBrowseDto,
 } from "./types";
 
-export { routes, routeAuth, routeAuthOverrides, getEffectiveAuthMode } from "./routes";
-export type { RouteAuthMode } from "./routes";
+export { routes, routeDefinitions, resolveRouteAccess } from "./routes";
+export type { RouteAccess, RouteDefinition } from "./routes";
 export {
   SECTION_TABS,
   DEFAULT_TABS,
