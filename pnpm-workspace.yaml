@@ -35,8 +35,8 @@ catalog:
   # AWS SDK (S3/R2) — client and presigner share a tightly-coupled version
   # matrix; even a patch-level mismatch pulls in two @smithy/smithy-client
   # copies and breaks the API typecheck. Catalog keeps every consumer in lockstep.
-  "@aws-sdk/client-s3": ^3.1068.0
-  "@aws-sdk/s3-request-presigner": ^3.1068.0
+  "@aws-sdk/client-s3": ^3.1073.0
+  "@aws-sdk/s3-request-presigner": ^3.1073.0
   # better-auth and @better-auth/expo MUST be pinned to the exact same version.
   "@better-auth/expo": 1.6.18
   "@eslint/eslintrc": ^3.3.5
@@ -87,6 +87,8 @@ catalog:
   tsup: ^8.5.1
   typescript-eslint: ^8.61.1
   zustand: ^5.0.11
+
+minimumReleaseAge: 0
 
 minimumReleaseAgeExclude:
   - oxlint-plugin-react-doctor@0.5.1

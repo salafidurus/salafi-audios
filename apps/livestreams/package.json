@@ -47,7 +47,7 @@
     "@nestjs/testing": "catalog:",
     "@types/express": "catalog:",
     "@types/jest": "catalog:",
-    "@types/node": "^22.10.7",
+    "@types/node": "^26.0.0",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",
     "eslint-plugin-prettier": "catalog:",
