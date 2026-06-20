@@ -51,7 +51,7 @@
     "postinstall": "node ./scripts/postinstall.mjs",
     "lint:staged": "lint-staged",
     "docs:quality": "markdownlint-cli2 README.md **/README.md docs/**/*.md AGENT.md .github/copilot-instructions.md",
-    "ci:local": "pnpm verify:build-configs && pnpm lint && pnpm typecheck && pnpm test:prepush && pnpm build:affected && pnpm --filter web build && pnpm docs:quality",
+    "ci:local": "pnpm verify:build-configs && pnpm lint:oxlint && pnpm lint && pnpm typecheck && pnpm test:prepush && pnpm build:affected && pnpm --filter web build && pnpm docs:quality",
     "ingest:content": "pnpm --filter @sd/util-ingest ingest:content",
     "ingest:remove": "pnpm --filter @sd/util-ingest ingest:remove",
     "doctor": "npx react-doctor@latest",

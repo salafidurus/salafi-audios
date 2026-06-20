@@ -12,7 +12,7 @@
 - [x] Install devDependencies (`oxlint`, `eslint-plugin-oxlint`).
 - [x] Configure `eslint-plugin-oxlint` in base and app ESLint configs.
 - [x] Set up root-level `oxlint` script and `.oxlintrc.json` configuration.
-- [/] Update `lint-staged` pre-commit config and root `ci:local` workflow.
+- [x] Update `lint-staged` pre-commit config and root `ci:local` workflow.
 
 # Staging Strategy
 
@@ -95,7 +95,7 @@ The implementation is broken down into five sequential stages to ensure correctn
 
 ## Stage 4: Integrate with lint-staged and CI workflows
 
-- Status: Planned
+- Status: Completed
 - Goal: Run Oxlint before committing and enforce it as part of CI quality gates.
 - Files:
   - [.lintstagedrc.cjs](file:///C:/dev/salafi-audios/.lintstagedrc.cjs)
