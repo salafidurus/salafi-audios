@@ -884,6 +884,9 @@ importers:
       '@prisma/client-runtime-utils':
         specifier: ^7.3.0
         version: 7.8.0
+      '@sd/core-contracts':
+        specifier: workspace:*
+        version: link:../core-contracts
     devDependencies:
       '@types/jest':
         specifier: 'catalog:'

@@ -30,8 +30,8 @@ describe("proxy", () => {
     mockNext.mockReturnValue({ type: "next" });
   });
 
-  describe("protected paths", () => {
-    it.each(["/account", "/feed/following", "/settings", "/admin", "/admin/dashboard"])(
+  describe("auth-required paths", () => {
+    it.each(["/feed/following", "/account/profile", "/admin", "/admin/dashboard"])(
       "redirects unauthenticated request to %s → /sign-in",
       (pathname) => {
         proxy(makeRequest(pathname, undefined));
@@ -40,11 +40,32 @@ describe("proxy", () => {
       },
     );
 
-    it.each(["/account", "/admin/dashboard"])("allows authenticated request to %s", (pathname) => {
-      proxy(makeRequest(pathname, "some-session-token"));
-      expect(mockNext).toHaveBeenCalledTimes(1);
-      expect(mockRedirect).not.toHaveBeenCalled();
+    it("redirects to /sign-in carrying the original path in the `from` query", () => {
+      proxy(makeRequest("/account/profile", undefined));
+      const redirectedTo = mockRedirect.mock.calls[0][0] as URL;
+      expect(redirectedTo.pathname).toBe("/sign-in");
+      expect(redirectedTo.searchParams.get("from")).toBe("/account/profile");
     });
+
+    it.each(["/account/profile", "/admin/dashboard"])(
+      "allows authenticated request to %s",
+      (pathname) => {
+        proxy(makeRequest(pathname, "some-session-token"));
+        expect(mockNext).toHaveBeenCalledTimes(1);
+        expect(mockRedirect).not.toHaveBeenCalled();
+      },
+    );
+  });
+
+  describe("auth-optional and public paths", () => {
+    it.each(["/account", "/feed", "/live", "/library", "/search", "/settings", "/"])(
+      "allows unauthenticated access to %s",
+      (pathname) => {
+        proxy(makeRequest(pathname, undefined));
+        expect(mockNext).toHaveBeenCalledTimes(1);
+        expect(mockRedirect).not.toHaveBeenCalled();
+      },
+    );
   });
 
   describe("auth paths", () => {
@@ -57,14 +78,6 @@ describe("proxy", () => {
     it("allows unauthenticated user to /sign-in", () => {
       proxy(makeRequest("/sign-in", undefined));
       expect(mockNext).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe("public paths", () => {
-    it("allows unauthenticated access to /", () => {
-      proxy(makeRequest("/", undefined));
-      expect(mockNext).toHaveBeenCalledTimes(1);
-      expect(mockRedirect).not.toHaveBeenCalled();
     });
   });
 });
