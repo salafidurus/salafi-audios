@@ -29,6 +29,7 @@
     "build:be+native": "turbo run build --filter=api... --filter=livestreams... --filter=native...",
     "build:android": "pnpm --filter native android",
     "lint": "turbo run lint",
+    "lint:oxlint": "oxlint .",
     "lint:be+web": "turbo run lint --filter=api --filter=livestreams --filter=web",
     "lint:be+native": "turbo run lint --filter=api --filter=livestreams --filter=native",
     "typecheck": "turbo run typecheck",

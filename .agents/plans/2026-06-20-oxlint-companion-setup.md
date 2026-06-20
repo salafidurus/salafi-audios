@@ -11,8 +11,8 @@
 - [x] Create a git worktree at `.worktrees/c-oxlint` on branch `c/oxlint`.
 - [x] Install devDependencies (`oxlint`, `eslint-plugin-oxlint`).
 - [x] Configure `eslint-plugin-oxlint` in base and app ESLint configs.
-- [/] Set up root-level `oxlint` script and `.oxlintrc.json` configuration.
-- [ ] Update `lint-staged` pre-commit config and root `ci:local` workflow.
+- [x] Set up root-level `oxlint` script and `.oxlintrc.json` configuration.
+- [/] Update `lint-staged` pre-commit config and root `ci:local` workflow.
 
 # Staging Strategy
 
@@ -76,7 +76,7 @@ The implementation is broken down into five sequential stages to ensure correctn
 
 ## Stage 3: Add Oxlint config and run scripts
 
-- Status: Planned
+- Status: Completed
 - Goal: Establish Oxlint ignore rules and define scripts to run Oxlint via Turbo.
 - Files:
   - [package.json](file:///C:/dev/salafi-audios/package.json)
