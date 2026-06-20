@@ -92,12 +92,12 @@
   },
   "devDependencies": {
     "@testing-library/react-native": "catalog:",
-    "@types/jest": "^29.5.14",
+    "@types/jest": "^30.0.0",
     "@types/node": "^22.10.7",
     "@types/react": "19.2.9",
     "eslint": "catalog:",
     "eslint-config-expo": "~56.0.0",
-    "jest": "^29.7.0",
+    "jest": "^30.4.2",
     "jest-expo": "~56.0.5"
   },
   "private": true,
