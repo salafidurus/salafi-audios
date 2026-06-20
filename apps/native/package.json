@@ -12,7 +12,7 @@
     "prebuild:clean": "expo prebuild --clean",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "lint": "expo lint",
+    "lint": "oxlint . && expo lint",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage --watchAll=false",

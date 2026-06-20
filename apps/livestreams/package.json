@@ -10,7 +10,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "dev": "nest start --watch",
-    "lint": "eslint .",
+    "lint": "oxlint . && eslint .",
     "lint:fix": "eslint . --fix",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch --passWithNoTests",

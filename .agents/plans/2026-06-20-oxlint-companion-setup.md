@@ -1,7 +1,7 @@
 # Metadata
 
 - Date: 2026-06-20
-- Status: In Progress
+- Status: Completed
 - Scope: Monorepo-wide dev environment / lint configurations
 - Summary: Integrate Oxlint as a companion to ESLint in the Salafi Durus monorepo to accelerate linting times while preserving custom AST rule guardrails and framework-specific rules.
 - Dependencies: None
@@ -11,7 +11,7 @@
 - [x] Create a git worktree at `.worktrees/c-oxlint` on branch `c/oxlint`.
 - [x] Install devDependencies (`oxlint`, `eslint-plugin-oxlint`).
 - [x] Configure `eslint-plugin-oxlint` in base and app ESLint configs.
-- [x] Set up root-level `oxlint` script and `.oxlintrc.json` configuration.
+- [x] Set up package-level `oxlint` scripts and `.oxlintrc.json` configuration.
 - [x] Update `lint-staged` pre-commit config and root `ci:local` workflow.
 
 # Staging Strategy
@@ -20,7 +20,7 @@ The implementation is broken down into five sequential stages to ensure correctn
 
 1. Stage 1: Install `oxlint` and `eslint-plugin-oxlint` at the monorepo root.
 2. Stage 2: Update all ESLint configurations to extend `eslint-plugin-oxlint` (disabling duplicate ESLint checks).
-3. Stage 3: Add Oxlint run scripts, turbo config, and `.oxlintrc.json`.
+3. Stage 3: Add Oxlint config and package-level run scripts.
 4. Stage 4: Hook up Oxlint to `lint-staged` for pre-commit checks and integrate with CI commands.
 
 ## Stage 0: Create a git worktree
@@ -52,7 +52,7 @@ The implementation is broken down into five sequential stages to ensure correctn
   - Running `pnpm install` completes successfully.
   - Verification that the packages are resolved and installed in `node_modules`.
 - Suggested Commit Message:
-  `devkit(root): install oxlint and eslint-plugin-oxlint`
+  `build(root): install oxlint and eslint-plugin-oxlint`
 
 ## Stage 2: Configure ESLint configs to extend eslint-plugin-oxlint
 
@@ -72,26 +72,27 @@ The implementation is broken down into five sequential stages to ensure correctn
 - Completion Criteria:
   - `pnpm lint` runs successfully without duplicate rule warnings.
 - Suggested Commit Message:
-  `config(eslint): integrate eslint-plugin-oxlint to turn off redundant rules`
+  `build(eslint): integrate eslint-plugin-oxlint to turn off redundant rules`
 
 ## Stage 3: Add Oxlint config and run scripts
 
 - Status: Completed
-- Goal: Establish Oxlint ignore rules and define scripts to run Oxlint via Turbo.
+- Goal: Establish Oxlint ignore rules and define scripts to run Oxlint in each package.
 - Files:
   - [package.json](file:///C:/dev/salafi-audios/package.json)
   - [turbo.json](file:///C:/dev/salafi-audios/turbo.json)
   - [NEW] `.oxlintrc.json`
+  - [apps/\*/package.json](file:///C:/dev/salafi-audios/apps/api/package.json)
+  - [packages/\*/package.json](file:///C:/dev/salafi-audios/packages/core-db/package.json)
 - Changes:
   - Create a root `.oxlintrc.json` configured with global ignores matching `eslint.config.base.mjs` (e.g. `dist/`, `build/`, `.next/`, `.expo/`, `node_modules/`, `coverage/`, etc.).
-  - Add `"lint:oxlint": "oxlint ."` script to the root `package.json`.
-  - Configure the `"lint:oxlint"` task in `turbo.json` with appropriate inputs/outputs for caching.
+  - Add `"lint": "oxlint . && eslint ."` to existing packages/apps configurations.
 - Blockers: None currently identified.
 - Dependencies: Stage 2.
 - Completion Criteria:
-  - `pnpm lint:oxlint` runs and finishes without configuration errors.
+  - Running `pnpm lint` triggers package-level scripts correctly.
 - Suggested Commit Message:
-  `config(oxlint): add oxlint config and run scripts`
+  `build(oxlint): add oxlint config and run scripts`
 
 ## Stage 4: Integrate with lint-staged and CI workflows
 
@@ -102,25 +103,24 @@ The implementation is broken down into five sequential stages to ensure correctn
   - [package.json](file:///C:/dev/salafi-audios/package.json)
 - Changes:
   - Edit [.lintstagedrc.cjs](file:///C:/dev/salafi-audios/.lintstagedrc.cjs) to run `oxlint` on `*.{js,jsx,ts,tsx}` staged files.
-  - Update `ci:local` script in the root `package.json` to execute `pnpm lint:oxlint && pnpm lint`.
+  - Update `ci:local` script in the root `package.json` to execute `pnpm lint && pnpm typecheck && ...`.
 - Blockers: None currently identified.
 - Dependencies: Stage 3.
 - Completion Criteria:
   - Committing a JS/TS file executes `oxlint` on the staged file.
   - Running `pnpm ci:local` completes successfully.
 - Suggested Commit Message:
-  `ci(oxlint): integrate oxlint into pre-commit and ci pipelines`
+  `build(ci): integrate oxlint into pre-commit and ci pipelines`
 
 # Final Verification
 
 - `pnpm install` runs successfully.
-- `pnpm lint:oxlint` runs successfully on the entire codebase.
-- `pnpm lint` runs successfully (executing the slimmed-down ESLint rules without redundant checks).
+- `pnpm lint` runs successfully (executing oxlint then ESLint rules concurrently).
 - `pnpm typecheck` passes across all workspaces.
 - `pnpm build` succeeds for all affected apps and packages.
 - `pnpm ci:local` passes fully.
 
 # Plan Completion
 
-- The plan will be marked as `Completed` once all stages have been implemented, verified, and merged.
-- Upon completion, this plan file will be moved to the `.agents/plans/completed/` directory.
+- The plan is marked as `Completed` as all stages have been implemented, verified, and merged.
+- This plan file will be moved to the `.agents/plans/completed/` directory.
