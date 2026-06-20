@@ -68,3 +68,11 @@ export type {
 
 export { routes, routeAuth, routeAuthOverrides, getEffectiveAuthMode } from "./routes";
 export type { RouteAuthMode } from "./routes";
+export {
+  SECTION_TABS,
+  DEFAULT_TABS,
+  SECTION_LABELS,
+  SECTION_ROUTES,
+  type Section,
+  type TabConfig,
+} from "./navigation";
