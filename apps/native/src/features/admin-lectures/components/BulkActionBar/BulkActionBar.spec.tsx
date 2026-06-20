@@ -1,29 +1,17 @@
 import React from "react";
-import renderer, { act } from "react-test-renderer";
+import { render, screen } from "@testing-library/react-native";
 import { BulkActionBar } from "./BulkActionBar";
 
 describe("BulkActionBar", () => {
-  it("returns null when no items are selected", () => {
-    let tree: ReturnType<typeof renderer.create>;
-    act(() => {
-      tree = renderer.create(
-        <BulkActionBar selectedCount={0} onPublish={() => {}} onArchive={() => {}} />,
-      );
-    });
-    expect(tree!.toJSON()).toBeNull();
+  it("returns null when no items are selected", async () => {
+    await render(<BulkActionBar selectedCount={0} onPublish={() => {}} onArchive={() => {}} />);
+    expect(screen.toJSON()).toBeNull();
   });
 
-  it("shows count and action buttons when items are selected", () => {
-    let tree: ReturnType<typeof renderer.create>;
-    act(() => {
-      tree = renderer.create(
-        <BulkActionBar selectedCount={3} onPublish={() => {}} onArchive={() => {}} />,
-      );
-    });
-    const rendered = JSON.stringify(tree!.toJSON());
-    expect(rendered).toContain("3");
-    expect(rendered).toContain("selected");
-    expect(rendered).toContain("Publish");
-    expect(rendered).toContain("Archive");
+  it("shows count and action buttons when items are selected", async () => {
+    await render(<BulkActionBar selectedCount={3} onPublish={() => {}} onArchive={() => {}} />);
+    expect(screen.getByText("3 selected")).toBeTruthy();
+    expect(screen.getByText("Publish")).toBeTruthy();
+    expect(screen.getByText("Archive")).toBeTruthy();
   });
 });

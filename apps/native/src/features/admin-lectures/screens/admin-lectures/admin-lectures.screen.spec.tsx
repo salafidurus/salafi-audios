@@ -1,5 +1,5 @@
 import React from "react";
-import renderer, { act } from "react-test-renderer";
+import { render, screen } from "@testing-library/react-native";
 import { AdminLecturesScreen } from "./admin-lectures.screen";
 import { useAdminLectures } from "../../hooks/use-admin-lectures";
 
@@ -28,21 +28,18 @@ jest.mock("../../components/BulkActionBar/BulkActionBar", () => ({
 const mockUseAdminLectures = useAdminLectures as jest.Mock;
 
 describe("AdminLecturesScreen", () => {
-  it("renders loading state when loading", () => {
+  it("renders loading state when loading", async () => {
     mockUseAdminLectures.mockReturnValue({
       data: undefined,
       isLoading: true,
       refetch: jest.fn(),
     });
 
-    let tree: ReturnType<typeof renderer.create>;
-    act(() => {
-      tree = renderer.create(<AdminLecturesScreen />);
-    });
-    expect(JSON.stringify(tree!.toJSON())).toContain("Loading");
+    await render(<AdminLecturesScreen />);
+    expect(screen.getByText("Loading", { exact: false })).toBeTruthy();
   });
 
-  it("renders lectures list when data is loaded", () => {
+  it("renders lectures list when data is loaded", async () => {
     mockUseAdminLectures.mockReturnValue({
       data: {
         items: [{ id: "lec-1", title: "Lecture One", scholarName: "Scholar A", status: "draft" }],
@@ -53,12 +50,8 @@ describe("AdminLecturesScreen", () => {
       refetch: jest.fn(),
     });
 
-    let tree: ReturnType<typeof renderer.create>;
-    act(() => {
-      tree = renderer.create(<AdminLecturesScreen />);
-    });
-    const rendered = JSON.stringify(tree!.toJSON());
-    expect(rendered).toContain("Lecture One");
-    expect(rendered).toContain("Scholar A");
+    await render(<AdminLecturesScreen />);
+    expect(screen.getByText("Lecture One")).toBeTruthy();
+    expect(screen.getByText("Scholar A", { exact: false })).toBeTruthy();
   });
 });
