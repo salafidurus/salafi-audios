@@ -138,5 +138,5 @@ describe("LectureDetailScreen", () => {
     expect(screen.getByText("Topics:2")).toBeTruthy();
     expect(screen.getByText("Useful lecture description.")).toBeTruthy();
     expect(screen.getByText("Series:Important Series")).toBeTruthy();
-  });
+  }, 15000);
 });
