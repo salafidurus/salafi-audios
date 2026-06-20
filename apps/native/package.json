@@ -93,7 +93,7 @@
   "devDependencies": {
     "@testing-library/react-native": "catalog:",
     "@types/jest": "catalog:",
-    "@types/node": "^22.10.7",
+    "@types/node": "^26.0.0",
     "@types/react": "19.2.9",
     "eslint": "catalog:",
     "eslint-config-expo": "~56.0.0",

@@ -64,7 +64,7 @@
     "@types/cookie-parser": "^1.4.10",
     "@types/express": "catalog:",
     "@types/jest": "catalog:",
-    "@types/node": "^22.10.7",
+    "@types/node": "^26.0.0",
     "@types/supertest": "^6.0.2",
     "eslint": "catalog:",
     "eslint-config-prettier": "catalog:",

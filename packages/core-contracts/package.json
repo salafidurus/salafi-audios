@@ -60,7 +60,7 @@
   },
   "devDependencies": {
     "@types/jest": "catalog:",
-    "@types/node": "^22.10.7",
+    "@types/node": "^26.0.0",
     "@types/react": "~19.2.14",
     "jest": "catalog:",
     "rimraf": "catalog:",

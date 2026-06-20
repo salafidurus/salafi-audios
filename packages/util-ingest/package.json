@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@types/jest": "catalog:",
-    "@types/node": "^22.0.0",
+    "@types/node": "^26.0.0",
     "jest": "catalog:",
     "rimraf": "catalog:",
     "ts-jest": "catalog:",
