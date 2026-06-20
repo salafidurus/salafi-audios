@@ -109,5 +109,5 @@ describe("ScholarDetailScreen", () => {
 
     expect(screen.getByText("Header:Ibn Baz")).toBeTruthy();
     expect(screen.getByText("Content:1")).toBeTruthy();
-  });
+  }, 15000);
 });

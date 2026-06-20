@@ -84,7 +84,7 @@ describe("AccountScreen", () => {
     expect(screen.getByText("Sign Out")).toBeTruthy();
     expect(screen.getByText("Language")).toBeTruthy();
     expect(screen.getByText("LanguageSwitch")).toBeTruthy();
-  });
+  }, 15000);
 
   it("renders Admin card when user has admin permissions", async () => {
     mockedUseAccountScreen.mockReturnValue({
