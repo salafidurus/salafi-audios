@@ -71,3 +71,9 @@ Client persistence improves continuity but never becomes authoritative.
 - Data ownership boundaries must remain explicit during migrations.
 - Backfills and content-ingestion workflows must preserve canonical relationships and publication rules.
 - If a migration changes architectural meaning, update these docs as part of the change.
+
+## 8. Admin Roles and Permissions
+
+- Promoting a user to admin and granting the `AdminPermission` capabilities is documented in
+  [database-admin-setup.md](./database-admin-setup.md) — covers the automated `make-admin`
+  script, manual SQL, and Prisma Studio.
