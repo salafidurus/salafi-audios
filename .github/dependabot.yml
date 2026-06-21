@@ -95,6 +95,10 @@ updates:
           - "husky"
           - "commitlint"
           - "@commitlint/*"
+          - "oxlint"
+          - "oxlint-*"
+          - "@oxlint/*"
+          - "react-doctor"
         update-types:
           - minor
           - patch
@@ -111,6 +115,21 @@ updates:
           - "playwright"
           - "@playwright/*"
         update-types:
+          - minor
+          - patch
+
+      # Vitest and its ecosystem — allow major updates to be grouped.
+      vitest:
+        applies-to: version-updates
+        patterns:
+          - "vitest"
+          - "vitest-*"
+          - "@vitest/*"
+          - "@vitejs/*"
+          - "vite-tsconfig-paths"
+          - "unplugin-swc"
+        update-types:
+          - major
           - minor
           - patch
 
