@@ -48,7 +48,7 @@
     // core-db's pretypecheck runs `prisma generate`, so its typecheck genuinely emits the
     // client. Cache it for downstream consumers.
     "@sd/core-db#typecheck": {
-      "dependsOn": ["^build", "^typecheck"],
+      "dependsOn": ["build", "^typecheck"],
       "inputs": ["$TURBO_DEFAULT$", "tsconfig*.json"],
       "outputs": ["generated/**", "src/generated/**"]
     },
