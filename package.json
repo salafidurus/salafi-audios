@@ -71,7 +71,7 @@
     "eslint-plugin-oxlint": "catalog:",
     "globals": "catalog:",
     "husky": "9.1.7",
-    "lint-staged": "16.2.7",
+    "lint-staged": "17.0.8",
     "markdownlint-cli2": "0.22.1",
     "oxlint": "catalog:",
     "prettier": "catalog:",
