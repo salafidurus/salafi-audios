@@ -29,6 +29,22 @@ for (const name of eagerEvaluate) {
 
 jest.mock("react-native/Libraries/EventEmitter/NativeEventEmitter");
 
+// react-native-unistyles pulls in native nitro-modules that cannot load under
+// jest. Mock it so StyleSheet.create((theme) => ...) resolves against the real
+// light theme and useUnistyles exposes that theme.
+jest.mock("react-native-unistyles", () => {
+  const { lightMobileTheme } = require("@sd/design-tokens");
+  const resolve = (styles) =>
+    typeof styles === "function" ? styles(lightMobileTheme, {}) : styles;
+  return {
+    StyleSheet: {
+      create: resolve,
+      configure: () => undefined,
+    },
+    useUnistyles: () => ({ theme: lightMobileTheme, rt: {} }),
+  };
+});
+
 jest.mock("expo-secure-store", () => ({
   getItemAsync: jest.fn(),
   setItemAsync: jest.fn(),
