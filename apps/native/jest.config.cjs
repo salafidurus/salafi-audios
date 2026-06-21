@@ -6,7 +6,7 @@ module.exports = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
     // jest resolves the package's web entry by default; the native app needs the
-    // native theme (lightMobileTheme/darkMobileTheme) for its Unistyles mock.
+    // native theme (lightNativeTheme/darkNativeTheme) for its Unistyles mock.
     "^@sd/design-tokens$": "<rootDir>/../../packages/design-tokens/src/index.native.ts",
   },
   transformIgnorePatterns: [

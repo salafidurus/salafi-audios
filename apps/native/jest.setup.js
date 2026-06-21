@@ -33,15 +33,15 @@ jest.mock("react-native/Libraries/EventEmitter/NativeEventEmitter");
 // jest. Mock it so StyleSheet.create((theme) => ...) resolves against the real
 // light theme and useUnistyles exposes that theme.
 jest.mock("react-native-unistyles", () => {
-  const { lightMobileTheme } = require("@sd/design-tokens");
+  const { lightNativeTheme } = require("@sd/design-tokens");
   const resolve = (styles) =>
-    typeof styles === "function" ? styles(lightMobileTheme, {}) : styles;
+    typeof styles === "function" ? styles(lightNativeTheme, {}) : styles;
   return {
     StyleSheet: {
       create: resolve,
       configure: () => undefined,
     },
-    useUnistyles: () => ({ theme: lightMobileTheme, rt: {} }),
+    useUnistyles: () => ({ theme: lightNativeTheme, rt: {} }),
   };
 });
 

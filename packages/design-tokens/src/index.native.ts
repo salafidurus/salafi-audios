@@ -1,4 +1,4 @@
-export { lightMobileTheme, darkMobileTheme } from "./theme/native";
+export { lightNativeTheme, darkNativeTheme } from "./theme/native";
 export type { TypographyVariant } from "./typography/shared";
 export type {
   AccentLinearRecipe,

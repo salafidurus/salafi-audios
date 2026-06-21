@@ -1,31 +1,31 @@
 import { createColors, type AppColors } from "../colors/shared";
 import { createAccentRecipesNative, type AccentRecipesNative } from "../recipes/native";
-import { spacingMobile, type SpacingMobile } from "../spacing/native";
-import { radiusMobile, type RadiusMobile } from "../radius/native";
-import { createShadowsMobile, type ShadowsMobileTheme } from "../shadows/native";
-import { typographyMobile, type TypographyMobile } from "../typography/native";
+import { spacingNative, type SpacingNative } from "../spacing/native";
+import { radiusNative, type RadiusNative } from "../radius/native";
+import { createShadowsNative, type ShadowsNativeTheme } from "../shadows/native";
+import { typographyNative, type TypographyNative } from "../typography/native";
 
-export type AppThemeMobile = {
+export type AppThemeNative = {
   colors: AppColors;
   recipes: AccentRecipesNative;
-  spacing: SpacingMobile;
-  radius: RadiusMobile;
-  shadows: ShadowsMobileTheme;
-  typography: TypographyMobile;
+  spacing: SpacingNative;
+  radius: RadiusNative;
+  shadows: ShadowsNativeTheme;
+  typography: TypographyNative;
 };
 
-export const createThemeMobile = (mode: "light" | "dark"): AppThemeMobile => {
+export const createThemeNative = (mode: "light" | "dark"): AppThemeNative => {
   const colors = createColors(mode);
 
   return {
     colors,
     recipes: createAccentRecipesNative(colors, colors.border.focus),
-    spacing: spacingMobile,
-    radius: radiusMobile,
-    shadows: createShadowsMobile(mode),
-    typography: typographyMobile,
+    spacing: spacingNative,
+    radius: radiusNative,
+    shadows: createShadowsNative(mode),
+    typography: typographyNative,
   };
 };
 
-export const lightMobileTheme = createThemeMobile("light");
-export const darkMobileTheme = createThemeMobile("dark");
+export const lightNativeTheme = createThemeNative("light");
+export const darkNativeTheme = createThemeNative("dark");

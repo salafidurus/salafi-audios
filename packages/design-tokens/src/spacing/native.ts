@@ -1,4 +1,4 @@
-export const spacingMobile = {
+export const spacingNative = {
   scale: {
     xs: 4,
     sm: 8,
@@ -29,4 +29,4 @@ export const spacingMobile = {
   },
 } as const;
 
-export type SpacingMobile = typeof spacingMobile;
+export type SpacingNative = typeof spacingNative;

@@ -1,4 +1,4 @@
-export const radiusMobile = {
+export const radiusNative = {
   scale: {
     xs: 4,
     sm: 8,
@@ -16,4 +16,4 @@ export const radiusMobile = {
   },
 } as const;
 
-export type RadiusMobile = typeof radiusMobile;
+export type RadiusNative = typeof radiusNative;
