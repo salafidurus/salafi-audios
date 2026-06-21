@@ -1,17 +1,19 @@
+import { vi, type Mock } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { AdminLecturesScreen } from "./admin-lectures.screen";
 import { fetchAdminLectures, fetchAdminLectureDetail } from "../../api/admin-lectures.api";
 
-jest.mock("../../api/admin-lectures.api", () => ({
-  fetchAdminLectures: jest.fn(),
-  fetchAdminLectureDetail: jest.fn(),
+vi.mock("../../api/admin-lectures.api", () => ({
+  fetchAdminLectures: vi.fn(),
+  fetchAdminLectureDetail: vi.fn(),
 }));
 
-jest.mock("@sd/core-contracts", () => {
-  const actual = jest.requireActual("@sd/core-contracts");
+vi.mock("@sd/core-contracts", async (importOriginal) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const actual = await importOriginal<any>();
   return {
     ...actual,
-    useApiQuery: jest.fn((key) => {
+    useApiQuery: vi.fn((key) => {
       // Mock queries
       if (key[0] === "scholars") {
         return { data: { scholars: [] }, isFetching: false };
@@ -47,7 +49,7 @@ jest.mock("@sd/core-contracts", () => {
             page: 1,
           },
           isFetching: false,
-          refetch: jest.fn(),
+          refetch: vi.fn(),
         };
       }
       return { data: undefined, isFetching: false };
@@ -70,9 +72,9 @@ jest.mock("@sd/core-contracts", () => {
 
 describe("AdminLecturesScreen", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
-    (fetchAdminLectures as jest.Mock).mockReturnValue({
+    (fetchAdminLectures as Mock).mockReturnValue({
       data: {
         items: [
           {
@@ -94,7 +96,7 @@ describe("AdminLecturesScreen", () => {
         page: 1,
       },
       isFetching: false,
-      refetch: jest.fn(),
+      refetch: vi.fn(),
     });
   });
 
@@ -106,7 +108,7 @@ describe("AdminLecturesScreen", () => {
   });
 
   it("opens edit modal when edit button is clicked", async () => {
-    (fetchAdminLectureDetail as jest.Mock).mockResolvedValue({
+    (fetchAdminLectureDetail as Mock).mockResolvedValue({
       id: "lec-1",
       title: "Lecture One",
       scholarId: "scholar-1",

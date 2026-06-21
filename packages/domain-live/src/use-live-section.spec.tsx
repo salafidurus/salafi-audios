@@ -1,19 +1,20 @@
 import React from "react";
+import { vi } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useLiveSection } from "./use-live-section";
 import { httpClient } from "@sd/core-contracts";
 
 // Mock the httpClient
-jest.mock("@sd/core-contracts", () => {
-  const actual = jest.requireActual("@sd/core-contracts");
+vi.mock("@sd/core-contracts", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@sd/core-contracts")>();
   return {
     ...actual,
-    httpClient: jest.fn(),
+    httpClient: vi.fn(),
   };
 });
 
-const mockHttpClient = httpClient as jest.MockedFunction<typeof httpClient>;
+const mockHttpClient = vi.mocked(httpClient);
 
 describe("useLiveSection", () => {
   let queryClient: QueryClient;
@@ -26,7 +27,7 @@ describe("useLiveSection", () => {
         },
       },
     });
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   const wrapper = ({ children }: { children: React.ReactNode }) => (

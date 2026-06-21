@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { Controller, Get, INestApplication } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
@@ -5,8 +6,8 @@ import request from 'supertest';
 import { Public } from './decorators';
 import { AuthGuard } from './auth.guard';
 
-const mockAuth = { api: { getSession: jest.fn() } };
-jest.mock('./auth.instance', () => ({ getAuth: () => mockAuth }));
+const mockAuth = { api: { getSession: vi.fn() } };
+vi.mock('./auth.instance', () => ({ getAuth: () => mockAuth }));
 
 @Controller('auth-test')
 class TestController {

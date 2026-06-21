@@ -73,8 +73,7 @@ export function Providers({ children }: Props) {
         router.replace(routes.home as Href);
       });
     });
-    // react-doctor-disable-next-line react-doctor/exhaustive-deps
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     void initI18n()

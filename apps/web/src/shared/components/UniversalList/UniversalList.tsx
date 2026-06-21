@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 
 export type UniversalListProps<TItem> = {
   items: TItem[];

@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { INestApplication } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
@@ -8,19 +9,19 @@ import { AdminPermissionsService } from './admin-permissions.service';
 import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { PrismaService } from '../../shared/db/prisma.service';
 
-const mockAuth = { api: { getSession: jest.fn() } };
-jest.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
+const mockAuth = { api: { getSession: vi.fn() } };
+vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockAdminPermissionsService = {
-  getMyPermissions: jest.fn().mockResolvedValue([]),
-  getPermissions: jest.fn().mockResolvedValue([]),
-  grant: jest.fn().mockResolvedValue({}),
-  revoke: jest.fn().mockResolvedValue({}),
+  getMyPermissions: vi.fn().mockResolvedValue([]),
+  getPermissions: vi.fn().mockResolvedValue([]),
+  grant: vi.fn().mockResolvedValue({}),
+  revoke: vi.fn().mockResolvedValue({}),
 };
 
 const mockPrisma = {
   adminPermission: {
-    findUnique: jest.fn(),
+    findUnique: vi.fn(),
   },
 };
 
@@ -30,7 +31,7 @@ describe('AdminPermissionsController — auth boundaries', () => {
   beforeEach(async () => {
     mockAuth.api.getSession.mockReset();
     mockPrisma.adminPermission.findUnique.mockReset();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     const module = await Test.createTestingModule({
       controllers: [AdminPermissionsController],

@@ -19,16 +19,13 @@
     "build": "tsc -p tsconfig.build.json",
     "dev": "pnpm build --watch",
     "lint": "oxlint . && eslint .",
-    "test": "jest --passWithNoTests",
-    "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
-    "test:watch": "jest --watch --passWithNoTests",
-    "test:cov": "jest --coverage --passWithNoTests",
+    "test": "vitest run",
+    "test:prepush": "vitest run --changed=origin/main",
+    "test:watch": "vitest",
+    "test:cov": "vitest run --coverage",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
-    "@types/jest": "catalog:",
-    "jest": "catalog:",
-    "rimraf": "catalog:",
-    "ts-jest": "catalog:"
+    "rimraf": "catalog:"
   }
 }

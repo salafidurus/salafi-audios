@@ -20,7 +20,7 @@ export class AuthGuard implements CanActivate {
     ]);
     if (isPublic) return true;
 
-    // Lazy import so jest.mock('./auth.instance', factory) works correctly in tests.
+    // Lazy import so vi.mock('./auth.instance', factory) works correctly in tests.
     const { getAuth } = await import('./auth.instance');
 
     const request = context.switchToHttp().getRequest<Request>();

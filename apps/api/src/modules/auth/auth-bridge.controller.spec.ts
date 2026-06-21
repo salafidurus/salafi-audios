@@ -1,11 +1,12 @@
+import { vi } from 'vitest';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { AuthBridgeController } from './auth-bridge.controller';
 import { ConfigService } from '../../shared/config/config.service';
 
-const mockAuth = { api: { generateOneTimeToken: jest.fn() } };
-jest.mock('./auth.instance', () => ({ getAuth: () => mockAuth }));
+const mockAuth = { api: { generateOneTimeToken: vi.fn() } };
+vi.mock('./auth.instance', () => ({ getAuth: () => mockAuth }));
 
 describe('AuthBridgeController — OAuth handoff', () => {
   let app: INestApplication;

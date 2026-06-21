@@ -10,6 +10,7 @@
     "isolatedModules": true,
     // Many React Native / Expo packages only ship CJS — enables default imports from them
     "esModuleInterop": true,
-    "noEmit": true
+    "noEmit": true,
+    "types": ["vitest/globals", "node"]
   }
 }

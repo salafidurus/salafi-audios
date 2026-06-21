@@ -1,3 +1,4 @@
+import { vi, type Mocked } from 'vitest';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
@@ -7,7 +8,7 @@ import { AudioService } from './audio.service';
 
 describe('AudioService', () => {
   let service: AudioService;
-  let repo: jest.Mocked<AudioRepository>;
+  let repo: Mocked<AudioRepository>;
 
   const mockProgress: AudioProgressDto[] = [
     {
@@ -32,23 +33,23 @@ describe('AudioService', () => {
         {
           provide: AudioRepository,
           useValue: {
-            getUserProgress: jest.fn(),
-            upsertProgress: jest.fn(),
-            bulkSync: jest.fn(),
-            findLectureById: jest.fn(),
-            findPrimaryAsset: jest.fn(),
-            findFirstAsset: jest.fn(),
-          } satisfies Partial<jest.Mocked<AudioRepository>>,
+            getUserProgress: vi.fn(),
+            upsertProgress: vi.fn(),
+            bulkSync: vi.fn(),
+            findLectureById: vi.fn(),
+            findPrimaryAsset: vi.fn(),
+            findFirstAsset: vi.fn(),
+          } satisfies Partial<Mocked<AudioRepository>>,
         },
       ],
     }).compile();
 
     service = module.get(AudioService);
-    repo = module.get(AudioRepository) as jest.Mocked<AudioRepository>;
+    repo = module.get(AudioRepository) as Mocked<AudioRepository>;
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('getUserProgress', () => {

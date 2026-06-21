@@ -1,3 +1,4 @@
+import { vi, type MockInstance } from "vitest";
 import { configureApiClient, httpClient } from "./http";
 
 /* ------------------------------------------------------------------ */
@@ -32,10 +33,10 @@ function textResponse(body: string, status = 200): Response {
 /* ------------------------------------------------------------------ */
 /*  Shared spy                                                        */
 /* ------------------------------------------------------------------ */
-let fetchSpy: jest.SpiedFunction<typeof global.fetch>;
+let fetchSpy: MockInstance<typeof global.fetch>;
 
 beforeEach(() => {
-  fetchSpy = jest.spyOn(global, "fetch").mockResolvedValue(jsonResponse({ ok: true }));
+  fetchSpy = vi.spyOn(global, "fetch").mockResolvedValue(jsonResponse({ ok: true }));
 });
 
 afterEach(() => {
@@ -48,18 +49,15 @@ afterEach(() => {
 
 describe("httpClient – unconfigured", () => {
   beforeEach(() => {
-    jest.resetModules();
+    vi.resetModules();
   });
 
   it("throws when called before configureApiClient", async () => {
     // Use isolated module loading so config is reset to null for this test only.
-    let fresh: typeof httpClient;
-    jest.isolateModules(() => {
-      // eslint-disable-next-line @typescript-eslint/no-require-imports -- isolated CommonJS load is needed to reset module state under the current tsconfig
-      const httpModule: typeof import("./http") = require("./http");
-      fresh = httpModule.httpClient;
-    });
-    await expect(fresh!({ url: "/test", method: "GET" })).rejects.toThrow(/not configured/i);
+    vi.resetModules();
+    const httpModule = await import("./http");
+    const fresh = httpModule.httpClient;
+    await expect(fresh({ url: "/test", method: "GET" })).rejects.toThrow(/not configured/i);
   });
 });
 

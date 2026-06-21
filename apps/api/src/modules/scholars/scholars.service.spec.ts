@@ -1,3 +1,4 @@
+import { vi, type Mocked } from 'vitest';
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import type {
@@ -12,7 +13,7 @@ import { ScholarsService } from './scholars.service';
 
 describe('ScholarsService', () => {
   let service: ScholarsService;
-  let repo: jest.Mocked<ScholarsRepository>;
+  let repo: Mocked<ScholarsRepository>;
 
   const mockScholarDetail: ScholarDetailDto & {
     lectureCount: number;
@@ -52,35 +53,35 @@ describe('ScholarsService', () => {
         {
           provide: ScholarsRepository,
           useValue: {
-            list: jest.fn(),
-            findBySlug: jest.fn(),
-            getContent: jest.fn(),
-            create: jest.fn(),
-            update: jest.fn(),
-            findById: jest.fn(),
-            listAdminSeries: jest.fn(),
-            findAdminSeriesDetail: jest.fn(),
-            createSeries: jest.fn(),
-            updateSeries: jest.fn(),
-            updateSeriesStatus: jest.fn(),
-            bulkUpdateSeriesStatus: jest.fn(),
-            listAdminCollections: jest.fn(),
-            findAdminCollectionDetail: jest.fn(),
-            createCollection: jest.fn(),
-            updateCollection: jest.fn(),
-            updateCollectionStatus: jest.fn(),
-            bulkUpdateCollectionStatus: jest.fn(),
-          } satisfies Partial<jest.Mocked<ScholarsRepository>>,
+            list: vi.fn(),
+            findBySlug: vi.fn(),
+            getContent: vi.fn(),
+            create: vi.fn(),
+            update: vi.fn(),
+            findById: vi.fn(),
+            listAdminSeries: vi.fn(),
+            findAdminSeriesDetail: vi.fn(),
+            createSeries: vi.fn(),
+            updateSeries: vi.fn(),
+            updateSeriesStatus: vi.fn(),
+            bulkUpdateSeriesStatus: vi.fn(),
+            listAdminCollections: vi.fn(),
+            findAdminCollectionDetail: vi.fn(),
+            createCollection: vi.fn(),
+            updateCollection: vi.fn(),
+            updateCollectionStatus: vi.fn(),
+            bulkUpdateCollectionStatus: vi.fn(),
+          } satisfies Partial<Mocked<ScholarsRepository>>,
         },
       ],
     }).compile();
 
     service = module.get(ScholarsService);
-    repo = module.get(ScholarsRepository) as jest.Mocked<ScholarsRepository>;
+    repo = module.get(ScholarsRepository) as Mocked<ScholarsRepository>;
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('list', () => {

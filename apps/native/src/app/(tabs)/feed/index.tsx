@@ -4,7 +4,7 @@ import { View, Text, Pressable } from "react-native";
 import { routes } from "@sd/core-contracts";
 import { FeedScreen } from "@/features/feed/screens/feed.screen";
 
-export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+export function ErrorBoundary({ error: _error, retry }: ErrorBoundaryProps) {
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Text>Something went wrong</Text>

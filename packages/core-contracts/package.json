@@ -49,22 +49,19 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "lint": "oxlint . && eslint .",
-    "test": "jest --passWithNoTests",
-    "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
+    "test": "vitest run",
+    "test:prepush": "vitest run --changed=origin/main",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test:watch": "jest --watch --passWithNoTests",
-    "test:cov": "jest --coverage --passWithNoTests"
+    "test:watch": "vitest",
+    "test:cov": "vitest run --coverage"
   },
   "dependencies": {
     "@tanstack/react-query": "catalog:"
   },
   "devDependencies": {
-    "@types/jest": "catalog:",
     "@types/node": "^26.0.0",
     "@types/react": "~19.2.14",
-    "jest": "catalog:",
     "rimraf": "catalog:",
-    "ts-jest": "catalog:",
     "tsup": "catalog:"
   },
   "peerDependencies": {
