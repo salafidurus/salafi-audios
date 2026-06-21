@@ -25,10 +25,10 @@
     "build": "tsup src/index.ts --format esm,cjs --dts --tsconfig tsconfig.build.json --out-dir dist && node -e \"require('fs').cpSync('src/locales', 'dist/locales', {recursive:true})\"",
     "dev": "pnpm build --watch",
     "lint": "oxlint . && eslint .",
-    "test": "jest --passWithNoTests",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:cov": "vitest run --coverage",
+    "test:prepush": "vitest run --changedSince=origin/main",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
@@ -36,10 +36,7 @@
     "i18next": "catalog:"
   },
   "devDependencies": {
-    "@types/jest": "catalog:",
-    "jest": "catalog:",
     "rimraf": "catalog:",
-    "ts-jest": "catalog:",
     "tsup": "catalog:"
   }
 }

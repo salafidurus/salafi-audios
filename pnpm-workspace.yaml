@@ -18,6 +18,7 @@ allowBuilds:
   "@prisma/engines": true
   "@scarf/scarf": true
   "@sentry/cli": true
+  "@swc/core": true
   bufferutil: false
   es5-ext: false
   esbuild: true

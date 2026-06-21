@@ -81,6 +81,9 @@
     "turbo": "2.9.14",
     "typescript": "5.9.3",
     "typescript-eslint": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "unplugin-swc": "catalog:",
+    "vite-tsconfig-paths": "catalog:",
     "vitest": "catalog:"
   }
 }

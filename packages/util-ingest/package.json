@@ -27,10 +27,10 @@
     "ingest:remove": "tsx src/commands/remove-content.ts",
     "convert:supabase": "tsx src/commands/convert-supabase.ts",
     "lint": "oxlint . && eslint .",
-    "test": "jest --passWithNoTests",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:cov": "vitest run --coverage",
+    "test:prepush": "vitest run --changedSince=origin/main",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
@@ -41,11 +41,8 @@
     "zod": "^3.25.17"
   },
   "devDependencies": {
-    "@types/jest": "catalog:",
     "@types/node": "^26.0.0",
-    "jest": "catalog:",
     "rimraf": "catalog:",
-    "ts-jest": "catalog:",
     "tsup": "catalog:",
     "tsx": "^4.22.4"
   }

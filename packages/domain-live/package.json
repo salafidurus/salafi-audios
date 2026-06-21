@@ -9,10 +9,10 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "jest --passWithNoTests",
-    "test:watch": "jest --watch --passWithNoTests",
-    "test:cov": "jest --coverage --passWithNoTests",
-    "test:prepush": "jest --changedSince=origin/main --passWithNoTests"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:cov": "vitest run --coverage",
+    "test:prepush": "vitest run --changedSince=origin/main"
   },
   "dependencies": {
     "@sd/core-contracts": "workspace:*",
@@ -22,10 +22,6 @@
     "react": "^19.0.0"
   },
   "devDependencies": {
-    "@testing-library/react": "catalog:",
-    "@types/jest": "catalog:",
-    "jest": "catalog:",
-    "jest-environment-jsdom": "catalog:",
-    "ts-jest": "catalog:"
+    "@testing-library/react": "catalog:"
   }
 }
