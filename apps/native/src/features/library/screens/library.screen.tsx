@@ -1,5 +1,6 @@
 import { useCallback } from "react";
-import { SectionList, StyleSheet, Text, Pressable, View } from "react-native";
+import { SectionList, Text, Pressable, View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 import type { LibraryItemDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import {
@@ -146,7 +147,7 @@ export function LibraryScreen({ onNavigateToLecture }: LibraryScreenProps) {
   if (isAllLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <Text>
+        <Text style={styles.loadingText}>
           {t("library.loadingSection", "Loading {{section}}…", {
             section: t("library.title", "My Library"),
           })}
@@ -195,16 +196,19 @@ export function LibraryScreen({ onNavigateToLecture }: LibraryScreenProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
+  loadingText: {
+    color: theme.colors.content.default,
+  },
   item: {
     padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: theme.colors.border.subtle,
   },
   itemRow: {
     flexDirection: "row",
@@ -212,50 +216,52 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   checkmark: {
-    color: "#16a34a",
+    color: theme.colors.state.success,
     fontSize: 12,
   },
   itemTitle: {
     fontSize: 15,
     fontWeight: "600",
+    color: theme.colors.content.strong,
   },
   itemSubtitle: {
     fontSize: 12,
-    color: "#666",
+    color: theme.colors.content.muted,
     marginTop: 2,
   },
   itemMeta: {
     fontSize: 12,
-    color: "#999",
+    color: theme.colors.content.muted,
     marginTop: 2,
   },
   progressTrack: {
     height: 3,
-    backgroundColor: "#e5e7eb",
+    backgroundColor: theme.colors.surface.subtle,
     borderRadius: 2,
     marginTop: 4,
   },
   progressFill: {
     height: "100%",
-    backgroundColor: "#2563eb",
+    backgroundColor: theme.colors.action.primary,
     borderRadius: 2,
   },
   sectionHeader: {
-    backgroundColor: "#f9fafb",
+    backgroundColor: theme.colors.surface.canvas,
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
   sectionHeaderText: {
     fontSize: 16,
     fontWeight: "700",
+    color: theme.colors.content.strong,
   },
   sectionFooter: {
     padding: 12,
   },
   sectionFooterLoadingText: {
-    color: "#999",
+    color: theme.colors.content.muted,
   },
   sectionFooterEmptyText: {
-    color: "#666",
+    color: theme.colors.content.muted,
   },
-});
+}));

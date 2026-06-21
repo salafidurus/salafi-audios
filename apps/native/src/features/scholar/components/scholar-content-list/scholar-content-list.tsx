@@ -1,5 +1,6 @@
 import type { ScholarContentDto } from "@sd/core-contracts";
 import { View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 import { pickContentField } from "@sd/core-i18n";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { useShowOriginalContent } from "@/features/i18n/content-preference";
@@ -45,10 +46,7 @@ export function ScholarContentList({ content }: ScholarContentListProps) {
               showOriginal,
             );
             return (
-              <View
-                key={collection.id}
-                style={{ paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: "#eee" }}
-              >
+              <View key={collection.id} style={styles.row}>
                 <AppText variant="labelMd">{title}</AppText>
                 <AppText variant="caption" style={{ marginTop: 2, opacity: 0.6 }}>
                   {t("scholarContent.seriesCount", "{{count}} series", {
@@ -66,10 +64,7 @@ export function ScholarContentList({ content }: ScholarContentListProps) {
           {content.series.map((series) => {
             const title = pickContentField(series.title, series.original?.title, showOriginal);
             return (
-              <View
-                key={series.id}
-                style={{ paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: "#eee" }}
-              >
+              <View key={series.id} style={styles.row}>
                 <AppText variant="labelMd">{title}</AppText>
                 <AppText variant="caption" style={{ marginTop: 2, opacity: 0.6 }}>
                   {t("scholarContent.lectureCount", "{{count}} lectures", {
@@ -87,10 +82,7 @@ export function ScholarContentList({ content }: ScholarContentListProps) {
           {content.singles.map((lecture) => {
             const title = pickContentField(lecture.title, lecture.original?.title, showOriginal);
             return (
-              <View
-                key={lecture.id}
-                style={{ paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: "#eee" }}
-              >
+              <View key={lecture.id} style={styles.row}>
                 <AppText variant="labelMd">{title}</AppText>
                 <AppText variant="caption" style={{ marginTop: 2, opacity: 0.6 }}>
                   {lecture.durationSeconds ? `${Math.round(lecture.durationSeconds / 60)} min` : ""}
@@ -103,3 +95,11 @@ export function ScholarContentList({ content }: ScholarContentListProps) {
     </View>
   );
 }
+
+const styles = StyleSheet.create((theme) => ({
+  row: {
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border.subtle,
+  },
+}));

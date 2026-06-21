@@ -25,7 +25,7 @@ const mobileFontFamily = {
   },
 } as const;
 
-const getMobileFontFamily = (
+const getNativeFontFamily = (
   role: "display" | "body" | "mono",
   weightKey: "regular" | "medium" | "semibold" | "bold",
 ): string => {
@@ -74,14 +74,14 @@ const getMobileFontFamily = (
   }
 };
 
-export const createTypographyMobile = () => {
+export const createTypographyNative = () => {
   return Object.fromEntries(
     Object.entries(typographyBase).map(([variant, token]) => {
       const weightKey = getWeightKey(token.fontWeight);
       return [
         variant,
         {
-          fontFamily: getMobileFontFamily(token.fontRole, weightKey),
+          fontFamily: getNativeFontFamily(token.fontRole, weightKey),
           fontSize: token.fontSize.mobile,
           lineHeight: token.lineHeight.mobile,
           letterSpacing: token.letterSpacing.mobile,
@@ -99,6 +99,6 @@ export const createTypographyMobile = () => {
   >;
 };
 
-export const typographyMobile = createTypographyMobile();
+export const typographyNative = createTypographyNative();
 
-export type TypographyMobile = typeof typographyMobile;
+export type TypographyNative = typeof typographyNative;

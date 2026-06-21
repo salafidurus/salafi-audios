@@ -1,5 +1,6 @@
 import { useCallback } from "react";
-import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { FlatList, Pressable, Text, View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
 import type { ScholarListItemDto } from "@sd/core-contracts";
 
@@ -52,7 +53,7 @@ export function AdminScholarsScreen({ onNavigateToScholar }: AdminScholarsScreen
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
   },
@@ -62,25 +63,28 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 20,
     fontWeight: "700",
+    color: theme.colors.content.strong,
   },
   loadingText: {
     textAlign: "center",
     marginTop: 32,
+    color: theme.colors.content.muted,
   },
   row: {
     padding: 14,
     marginHorizontal: 16,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: "#e5e5e5",
+    borderColor: theme.colors.border.subtle,
     borderRadius: 8,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.surface.default,
   },
   rowName: {
     fontWeight: "600",
+    color: theme.colors.content.strong,
   },
   rowSlug: {
     fontSize: 12,
-    color: "#6b7280",
+    color: theme.colors.content.muted,
   },
-});
+}));

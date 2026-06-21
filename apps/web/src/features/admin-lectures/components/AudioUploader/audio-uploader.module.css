@@ -8,10 +8,10 @@
   align-items: center;
   justify-content: center;
   min-height: 180px;
-  padding: var(--space-component-panel-padding, 24px);
-  border: 2px dashed var(--border-default, #e0e0e0);
-  border-radius: var(--radius-component-card, 12px);
-  background-color: var(--surface-subtle, #fafafa);
+  padding: var(--space-component-panel-padding);
+  border: 2px dashed var(--border-default);
+  border-radius: var(--radius-component-card);
+  background-color: var(--surface-subtle);
   cursor: pointer;
   transition:
     border-color 0.2s ease,
@@ -19,24 +19,24 @@
 }
 
 .dropzone:hover {
-  border-color: var(--border-primary, #0066cc);
-  background-color: var(--surface-hover, #f0f7ff);
+  border-color: var(--border-primary);
+  background-color: var(--surface-hover);
 }
 
 .dragActive {
-  border-color: var(--border-primary-strong, #004499);
-  background-color: var(--surface-selected, #e6f2ff);
+  border-color: var(--border-primary-strong);
+  background-color: var(--surface-selected);
 }
 
 .state-success {
-  border-color: var(--state-success, #2e7d32);
-  background-color: var(--state-success-surface, #e8f5e9);
+  border-color: var(--state-success);
+  background-color: var(--state-success-surface);
   cursor: default;
 }
 
 .state-error {
-  border-color: var(--state-danger, #d32f2f);
-  background-color: var(--state-danger-surface, #ffebee);
+  border-color: var(--state-danger);
+  background-color: var(--state-danger-surface);
 }
 
 .fileInput {
@@ -48,52 +48,52 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: var(--space-scale-xs, 8px);
+  gap: var(--space-scale-xs);
 }
 
 .icon {
-  color: var(--content-muted, #888888);
+  color: var(--content-muted);
 }
 
 .dropzone:hover .icon {
-  color: var(--content-primary, #0066cc);
+  color: var(--content-primary);
 }
 
 .iconSuccess {
-  color: var(--state-success, #2e7d32);
+  color: var(--state-success);
 }
 
 .iconError {
-  color: var(--state-danger, #d32f2f);
+  color: var(--state-danger);
 }
 
 .primaryText {
   font-family: var(--typo-body-lg-font-family);
-  font-size: var(--typo-body-lg-font-size, 16px);
-  font-weight: var(--typo-body-lg-font-weight, 500);
-  color: var(--content-default, #333333);
+  font-size: var(--typo-body-lg-font-size);
+  font-weight: var(--typo-body-lg-font-weight);
+  color: var(--content-default);
   margin: 0;
 }
 
 .secondaryText {
   font-family: var(--typo-caption-font-family);
-  font-size: var(--typo-caption-font-size, 12px);
-  color: var(--content-subtle, #666666);
+  font-size: var(--typo-caption-font-size);
+  color: var(--content-subtle);
   margin: 0;
 }
 
 .fileName {
   font-family: var(--typo-label-md-font-family);
-  font-size: var(--typo-label-md-font-size, 14px);
+  font-size: var(--typo-label-md-font-size);
   font-weight: 600;
-  color: var(--content-strong, #111111);
+  color: var(--content-strong);
   margin: 0;
 }
 
 .errorMessage {
   font-family: var(--typo-body-sm-font-family);
-  font-size: var(--typo-body-sm-font-size, 13px);
-  color: var(--state-danger-content, #c62828);
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--state-danger-content);
   margin: 0;
 }
 
@@ -108,7 +108,7 @@
 
 .spin {
   animation: spin 1.5s linear infinite;
-  color: var(--content-primary, #0066cc);
+  color: var(--content-primary);
 }
 
 @keyframes pulse {
@@ -128,5 +128,5 @@
 
 .pulse {
   animation: pulse 1.5s ease-in-out infinite;
-  color: var(--content-primary, #0066cc);
+  color: var(--content-primary);
 }

@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { View, Text, Pressable, FlatList } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 import type { LibraryItemDto } from "@sd/core-contracts";
 import { useLibraryCompletedScreen } from "@sd/domain-content";
 import { useAuth } from "@/core/auth/use-auth";
@@ -10,19 +11,16 @@ export type LibraryCompletedScreenProps = {
 
 function LibraryItem({ item, onPress }: { item: LibraryItemDto; onPress?: () => void }) {
   return (
-    <Pressable
-      onPress={onPress}
-      style={{ padding: 12, borderBottomWidth: 1, borderBottomColor: "#eee" }}
-    >
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-        <Text style={{ color: "#16a34a", fontSize: 12 }}>✓</Text>
-        <Text style={{ fontSize: 15, fontWeight: "600" }}>{item.lectureTitle}</Text>
+    <Pressable onPress={onPress} style={styles.item}>
+      <View style={styles.itemRow}>
+        <Text style={styles.checkmark}>✓</Text>
+        <Text style={styles.itemTitle}>{item.lectureTitle}</Text>
       </View>
-      <Text style={{ fontSize: 12, color: "#666", marginTop: 2, paddingStart: 18 }}>
+      <Text style={styles.itemSubtitle}>
         {item.scholarName}
         {item.seriesTitle ? ` · ${item.seriesTitle}` : ""}
       </Text>
-      <Text style={{ fontSize: 12, color: "#999", marginTop: 2, paddingStart: 18 }}>
+      <Text style={styles.itemMeta}>
         {item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""}
         {item.completedAt ? ` · ${new Date(item.completedAt).toLocaleDateString()}` : ""}
       </Text>
@@ -50,18 +48,16 @@ export function LibraryCompletedScreen({ onNavigateToLecture }: LibraryCompleted
 
   if (isFetching && items.length === 0) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Loading completed lectures…</Text>
+      <View style={styles.centered}>
+        <Text style={styles.loadingText}>Loading completed lectures…</Text>
       </View>
     );
   }
 
   if (items.length === 0) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 16 }}>
-        <Text style={{ color: "#666", textAlign: "center" }}>
-          No completed lectures yet. Keep listening!
-        </Text>
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>No completed lectures yet. Keep listening!</Text>
       </View>
     );
   }
@@ -71,7 +67,62 @@ export function LibraryCompletedScreen({ onNavigateToLecture }: LibraryCompleted
       data={items}
       keyExtractor={(item) => item.id}
       renderItem={renderItem}
-      contentContainerStyle={{ padding: 8 }}
+      contentContainerStyle={styles.listContent}
     />
   );
 }
+
+const styles = StyleSheet.create((theme) => ({
+  item: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border.subtle,
+  },
+  itemRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  checkmark: {
+    color: theme.colors.state.success,
+    fontSize: 12,
+  },
+  itemTitle: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: theme.colors.content.strong,
+  },
+  itemSubtitle: {
+    fontSize: 12,
+    color: theme.colors.content.muted,
+    marginTop: 2,
+    paddingStart: 18,
+  },
+  itemMeta: {
+    fontSize: 12,
+    color: theme.colors.content.muted,
+    marginTop: 2,
+    paddingStart: 18,
+  },
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    color: theme.colors.content.default,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 16,
+  },
+  emptyText: {
+    color: theme.colors.content.muted,
+    textAlign: "center",
+  },
+  listContent: {
+    padding: 8,
+  },
+}));

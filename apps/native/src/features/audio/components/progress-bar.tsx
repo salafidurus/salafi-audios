@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
-import { View, StyleSheet, Pressable } from "react-native";
+import { View, Pressable } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 import type { GestureResponderEvent } from "react-native";
 import { useAudio } from "@sd/domain-audio";
 import { audioService } from "../audio-service";
@@ -31,7 +32,7 @@ export function ProgressBar() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   container: {
     paddingVertical: 10,
     width: "100%",
@@ -39,22 +40,22 @@ const styles = StyleSheet.create({
   track: {
     height: 4,
     width: "100%",
-    backgroundColor: "#E2E8F0", // design token placeholder
+    backgroundColor: theme.colors.border.subtle,
     borderRadius: 2,
     position: "relative",
   },
   fill: {
     height: "100%",
-    backgroundColor: "#3B82F6", // primary color token
+    backgroundColor: theme.colors.action.primary,
     borderRadius: 2,
   },
   knob: {
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: "#3B82F6",
+    backgroundColor: theme.colors.action.primary,
     position: "absolute",
     top: -4,
     marginStart: -6,
   },
-});
+}));

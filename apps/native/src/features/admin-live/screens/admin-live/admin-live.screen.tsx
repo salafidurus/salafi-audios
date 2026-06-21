@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
-import { FlatList, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import type { LivestreamChannelDto, LiveSessionPublicDto } from "@sd/core-contracts";
 import { useAdminChannels, useAdminSessions } from "../../hooks/use-admin-live";
 import { updateSessionStatus } from "../../api/admin-live.api";
@@ -13,8 +14,13 @@ function SessionRow({
   session: LiveSessionPublicDto;
   onStatusChange: (id: string, status: "live" | "ended") => void;
 }) {
+  const { theme } = useUnistyles();
   const statusColor =
-    session.status === "live" ? "#dc2626" : session.status === "scheduled" ? "#d97706" : "#6b7280";
+    session.status === "live"
+      ? theme.colors.state.danger
+      : session.status === "scheduled"
+        ? theme.colors.action.secondary
+        : theme.colors.content.muted;
   return (
     <View style={styles.sessionRow}>
       <View style={styles.sessionRowHeader}>
@@ -28,12 +34,12 @@ function SessionRow({
       <View style={styles.sessionActions}>
         {session.status === "scheduled" && (
           <Pressable onPress={() => onStatusChange(session.id, "live")} style={styles.goLiveBtn}>
-            <Text style={styles.actionBtnText}>Go Live</Text>
+            <Text style={[styles.actionBtnText, styles.goLiveBtnText]}>Go Live</Text>
           </Pressable>
         )}
         {session.status === "live" && (
           <Pressable onPress={() => onStatusChange(session.id, "ended")} style={styles.endBtn}>
-            <Text style={styles.actionBtnText}>End</Text>
+            <Text style={[styles.actionBtnText, styles.endBtnText]}>End</Text>
           </Pressable>
         )}
       </View>
@@ -150,7 +156,7 @@ export function AdminLiveScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   screen: {
     flex: 1,
   },
@@ -170,24 +176,25 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 18,
     fontWeight: "700",
+    color: theme.colors.content.strong,
   },
   newBtn: {
     padding: 8,
-    backgroundColor: "#3b82f6",
+    backgroundColor: theme.colors.action.primary,
     borderRadius: 8,
   },
   newBtnText: {
-    color: "#fff",
+    color: theme.colors.content.onPrimary,
     fontWeight: "600",
   },
   emptyText: {
-    color: "#6b7280",
+    color: theme.colors.content.muted,
     marginBottom: 16,
   },
   sessionRow: {
     padding: 12,
     borderWidth: 1,
-    borderColor: "#e5e5e5",
+    borderColor: theme.colors.border.subtle,
     borderRadius: 8,
     marginBottom: 8,
   },
@@ -199,6 +206,7 @@ const styles = StyleSheet.create({
   sessionTitle: {
     flex: 1,
     fontWeight: "600",
+    color: theme.colors.content.strong,
   },
   statusBadge: {
     paddingHorizontal: 6,
@@ -218,32 +226,38 @@ const styles = StyleSheet.create({
   goLiveBtn: {
     paddingHorizontal: 10,
     paddingVertical: 5,
-    backgroundColor: "#dc2626",
+    backgroundColor: theme.colors.action.danger,
     borderRadius: 6,
+  },
+  goLiveBtnText: {
+    color: theme.colors.content.onDanger,
   },
   endBtn: {
     paddingHorizontal: 10,
     paddingVertical: 5,
-    backgroundColor: "#374151",
+    backgroundColor: theme.colors.surface.inverse,
     borderRadius: 6,
   },
+  endBtnText: {
+    color: theme.colors.content.inverse,
+  },
   actionBtnText: {
-    color: "#fff",
     fontSize: 12,
     fontWeight: "600",
   },
   channelRow: {
     padding: 12,
     borderWidth: 1,
-    borderColor: "#e5e5e5",
+    borderColor: theme.colors.border.subtle,
     borderRadius: 8,
     marginBottom: 8,
   },
   channelName: {
     fontWeight: "600",
+    color: theme.colors.content.strong,
   },
   channelMeta: {
     fontSize: 12,
-    color: "#6b7280",
+    color: theme.colors.content.muted,
   },
-});
+}));

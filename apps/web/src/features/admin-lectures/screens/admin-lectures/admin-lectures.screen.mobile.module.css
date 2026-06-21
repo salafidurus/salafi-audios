@@ -11,9 +11,9 @@
 
 .title {
   font-family: var(--typo-title-lg-font-family);
-  font-size: var(--typo-title-lg-font-size, 22px);
+  font-size: var(--typo-title-lg-font-size);
   font-weight: 700;
-  color: var(--content-strong, #111111);
+  color: var(--content-strong);
   margin: 0;
 }
 
@@ -23,16 +23,16 @@
   justify-content: center;
   width: 38px;
   height: 38px;
-  border-radius: var(--radius-scale-full, 9999px);
-  border: 1px solid var(--accent-divider, #e5e7eb);
-  background-color: var(--surface-default, #ffffff);
-  color: var(--content-default, #374151);
+  border-radius: var(--radius-scale-full);
+  border: 1px solid var(--accent-divider);
+  background-color: var(--surface-default);
+  color: var(--content-default);
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
 
 .uploadTriggerBtn:hover {
-  background-color: var(--surface-hover, #f9fafb);
+  background-color: var(--surface-hover);
 }
 
 .uploaderWrapper {
@@ -65,23 +65,23 @@
   left: 10px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--content-muted, #9ca3af);
+  color: var(--content-muted);
 }
 
 .searchInput {
   width: 100%;
   padding: 8px 10px 8px 32px;
-  border: 1px solid var(--border-subtle, #d1d5db);
-  border-radius: var(--radius-scale-md, 6px);
-  background-color: var(--surface-default, #ffffff);
-  color: var(--content-default, #111111);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-scale-md);
+  background-color: var(--surface-default);
+  color: var(--content-default);
   font-family: var(--typo-body-sm-font-family);
-  font-size: var(--typo-body-sm-font-size, 13px);
+  font-size: var(--typo-body-sm-font-size);
 }
 
 .searchInput:focus {
   outline: none;
-  border-color: var(--border-primary, #2563eb);
+  border-color: var(--border-primary);
 }
 
 .tabsSection {
@@ -91,9 +91,9 @@
 .statusTabs {
   display: flex;
   gap: 2px;
-  background-color: var(--surface-subtle, #f3f4f6);
+  background-color: var(--surface-subtle);
   padding: 3px;
-  border-radius: var(--radius-scale-md, 8px);
+  border-radius: var(--radius-scale-md);
   width: 100%;
 }
 
@@ -101,10 +101,10 @@
   flex: 1;
   padding: 6px 0;
   text-align: center;
-  border-radius: var(--radius-scale-sm, 6px);
+  border-radius: var(--radius-scale-sm);
   border: none;
   background: none;
-  color: var(--content-muted, #4b5563);
+  color: var(--content-muted);
   font-family: var(--typo-label-md-font-family);
   font-size: 12px;
   font-weight: 500;
@@ -112,15 +112,15 @@
 }
 
 .tabActive {
-  background-color: var(--surface-default, #ffffff);
-  color: var(--content-strong, #111111);
+  background-color: var(--surface-default);
+  color: var(--content-strong);
   box-shadow: var(--shadow-xs);
 }
 
 .loading {
   text-align: center;
   padding: 24px 0;
-  color: var(--content-muted, #6b7280);
+  color: var(--content-muted);
   font-size: 14px;
 }
 
@@ -131,9 +131,9 @@
 }
 
 .card {
-  background-color: var(--surface-default, #ffffff);
-  border: 1px solid var(--border-subtle, #e5e7eb);
-  border-radius: var(--radius-component-card, 10px);
+  background-color: var(--surface-default);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-component-card);
   padding: 14px;
   box-shadow: var(--shadow-xs);
   display: flex;
@@ -152,7 +152,7 @@
   font-family: var(--typo-title-md-font-family);
   font-size: 15px;
   font-weight: 600;
-  color: var(--content-strong, #111111);
+  color: var(--content-strong);
   margin: 0;
   line-height: 1.3;
 }
@@ -161,25 +161,25 @@
   display: inline-flex;
   align-items: center;
   padding: 1px 6px;
-  border-radius: var(--radius-scale-full, 9999px);
+  border-radius: var(--radius-scale-full);
   font-size: 11px;
   font-weight: 500;
   text-transform: capitalize;
 }
 
 .badge-published {
-  background-color: var(--state-success-surface, #ecfdf5);
-  color: var(--state-success-content, #065f46);
+  background-color: var(--state-success-surface);
+  color: var(--state-success-content);
 }
 
 .badge-draft {
-  background-color: var(--surface-subtle, #f3f4f6);
-  color: var(--content-muted, #374151);
+  background-color: var(--surface-subtle);
+  color: var(--content-muted);
 }
 
 .badge-archived {
-  background-color: var(--state-danger-surface, #fef2f2);
-  color: var(--state-danger-content, #991b1b);
+  background-color: var(--state-danger-surface);
+  color: var(--state-danger-content);
 }
 
 .cardMeta {
@@ -190,19 +190,19 @@
 }
 
 .metaLabel {
-  color: var(--content-subtle, #6b7280);
+  color: var(--content-subtle);
   width: 75px;
 }
 
 .metaValue {
-  color: var(--content-default, #1f2937);
+  color: var(--content-default);
   font-weight: 500;
 }
 
 .cardActions {
   display: flex;
   justify-content: flex-end;
-  border-top: 1px solid var(--accent-divider, #f3f4f6);
+  border-top: 1px solid var(--accent-divider);
   padding-top: 8px;
   margin-top: 4px;
 }
@@ -212,10 +212,10 @@
   align-items: center;
   gap: 4px;
   padding: 4px 12px;
-  border-radius: var(--radius-scale-sm, 4px);
-  border: 1px solid var(--border-subtle, #d1d5db);
-  background-color: var(--surface-default, #ffffff);
-  color: var(--content-default, #374151);
+  border-radius: var(--radius-scale-sm);
+  border: 1px solid var(--border-subtle);
+  background-color: var(--surface-default);
+  color: var(--content-default);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
@@ -224,7 +224,7 @@
 .noData {
   text-align: center;
   padding: 24px 0;
-  color: var(--content-muted, #9ca3af);
+  color: var(--content-muted);
   font-size: 13px;
 }
 
@@ -238,10 +238,10 @@
 
 .pageBtn {
   padding: 4px 10px;
-  border-radius: var(--radius-scale-md, 6px);
-  border: 1px solid var(--border-default, #d1d5db);
-  background-color: var(--surface-default, #ffffff);
-  color: var(--content-default, #374151);
+  border-radius: var(--radius-scale-md);
+  border: 1px solid var(--border-default);
+  background-color: var(--surface-default);
+  color: var(--content-default);
   font-size: 12px;
   cursor: pointer;
 }
@@ -253,5 +253,5 @@
 
 .pageInfo {
   font-size: 12px;
-  color: var(--content-default, #4b5563);
+  color: var(--content-default);
 }
