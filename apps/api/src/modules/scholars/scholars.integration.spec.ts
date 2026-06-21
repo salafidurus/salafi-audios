@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { INestApplication } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
@@ -8,15 +9,15 @@ import { ScholarsController } from './scholars.controller';
 import { AdminScholarsController } from './admin-scholars.controller';
 import { ScholarsService } from './scholars.service';
 
-const mockAuth = { api: { getSession: jest.fn() } };
-jest.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
+const mockAuth = { api: { getSession: vi.fn() } };
+vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockScholarsService = {
-  list: jest.fn().mockResolvedValue({ scholars: [] }),
-  getBySlug: jest.fn().mockResolvedValue(null),
-  getContent: jest.fn().mockResolvedValue({ lectures: [], series: [] }),
-  create: jest.fn().mockResolvedValue({}),
-  update: jest.fn().mockResolvedValue({}),
+  list: vi.fn().mockResolvedValue({ scholars: [] }),
+  getBySlug: vi.fn().mockResolvedValue(null),
+  getContent: vi.fn().mockResolvedValue({ lectures: [], series: [] }),
+  create: vi.fn().mockResolvedValue({}),
+  update: vi.fn().mockResolvedValue({}),
 };
 
 describe('ScholarsController — auth boundaries', () => {

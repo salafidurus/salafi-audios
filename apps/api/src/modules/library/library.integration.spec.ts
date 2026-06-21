@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { INestApplication } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
@@ -6,16 +7,16 @@ import { AuthGuard } from '../auth/auth.guard';
 import { LibraryController } from './library.controller';
 import { LibraryService } from './library.service';
 
-const mockAuth = { api: { getSession: jest.fn() } };
-jest.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
+const mockAuth = { api: { getSession: vi.fn() } };
+vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockLibraryService = {
-  getInProgress: jest.fn().mockResolvedValue({ items: [], hasMore: false }),
-  getCompleted: jest.fn().mockResolvedValue({ items: [], hasMore: false }),
-  getSaved: jest.fn().mockResolvedValue({ items: [], hasMore: false }),
-  saveLecture: jest.fn().mockResolvedValue(undefined),
-  unsaveLecture: jest.fn().mockResolvedValue(undefined),
-  bulkSave: jest.fn().mockResolvedValue(undefined),
+  getInProgress: vi.fn().mockResolvedValue({ items: [], hasMore: false }),
+  getCompleted: vi.fn().mockResolvedValue({ items: [], hasMore: false }),
+  getSaved: vi.fn().mockResolvedValue({ items: [], hasMore: false }),
+  saveLecture: vi.fn().mockResolvedValue(undefined),
+  unsaveLecture: vi.fn().mockResolvedValue(undefined),
+  bulkSave: vi.fn().mockResolvedValue(undefined),
 };
 
 describe('LibraryController — auth boundaries', () => {

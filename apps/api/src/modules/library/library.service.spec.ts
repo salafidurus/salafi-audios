@@ -1,3 +1,4 @@
+import { vi, type Mocked } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import type { LibraryPageDto } from '@sd/core-contracts';
 import { LibraryRepository } from './library.repo';
@@ -5,7 +6,7 @@ import { LibraryService } from './library.service';
 
 describe('LibraryService', () => {
   let service: LibraryService;
-  let repo: jest.Mocked<LibraryRepository>;
+  let repo: Mocked<LibraryRepository>;
 
   const mockLibraryPage: LibraryPageDto = {
     items: [
@@ -32,23 +33,23 @@ describe('LibraryService', () => {
         {
           provide: LibraryRepository,
           useValue: {
-            findInProgress: jest.fn(),
-            findCompleted: jest.fn(),
-            findSaved: jest.fn(),
-            saveLecture: jest.fn(),
-            unsaveLecture: jest.fn(),
-            bulkSave: jest.fn(),
-          } satisfies Partial<jest.Mocked<LibraryRepository>>,
+            findInProgress: vi.fn(),
+            findCompleted: vi.fn(),
+            findSaved: vi.fn(),
+            saveLecture: vi.fn(),
+            unsaveLecture: vi.fn(),
+            bulkSave: vi.fn(),
+          } satisfies Partial<Mocked<LibraryRepository>>,
         },
       ],
     }).compile();
 
     service = module.get(LibraryService);
-    repo = module.get(LibraryRepository) as jest.Mocked<LibraryRepository>;
+    repo = module.get(LibraryRepository) as Mocked<LibraryRepository>;
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('getInProgress', () => {

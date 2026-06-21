@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { ForbiddenException, INestApplication } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
@@ -8,8 +9,8 @@ import { TopicsController } from './topics.controller';
 import { TopicsTranslationsController } from './topics-translations.controller';
 import { TopicsService } from './topics.service';
 
-const mockAuth = { api: { getSession: jest.fn() } };
-jest.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
+const mockAuth = { api: { getSession: vi.fn() } };
+vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const draftTranslation = {
   locale: 'ar',
@@ -22,17 +23,17 @@ const draftTranslation = {
 const publishedTranslation = { ...draftTranslation, status: 'published' };
 
 const mockTopicsService = {
-  list: jest.fn().mockResolvedValue([]),
-  getBySlug: jest.fn(),
-  upsert: jest.fn(),
-  listChildren: jest.fn().mockResolvedValue([]),
-  listLectures: jest.fn().mockResolvedValue([]),
-  remove: jest.fn(),
-  listTranslations: jest.fn().mockResolvedValue([]),
-  upsertTranslation: jest.fn().mockResolvedValue(draftTranslation),
-  updateTranslation: jest.fn().mockResolvedValue(draftTranslation),
-  publishTranslation: jest.fn().mockResolvedValue(publishedTranslation),
-  unpublishTranslation: jest.fn().mockResolvedValue(draftTranslation),
+  list: vi.fn().mockResolvedValue([]),
+  getBySlug: vi.fn(),
+  upsert: vi.fn(),
+  listChildren: vi.fn().mockResolvedValue([]),
+  listLectures: vi.fn().mockResolvedValue([]),
+  remove: vi.fn(),
+  listTranslations: vi.fn().mockResolvedValue([]),
+  upsertTranslation: vi.fn().mockResolvedValue(draftTranslation),
+  updateTranslation: vi.fn().mockResolvedValue(draftTranslation),
+  publishTranslation: vi.fn().mockResolvedValue(publishedTranslation),
+  unpublishTranslation: vi.fn().mockResolvedValue(draftTranslation),
 };
 
 async function buildApp(
@@ -61,7 +62,7 @@ describe('TopicsTranslationsController — auth boundaries', () => {
 
   beforeEach(async () => {
     mockAuth.api.getSession.mockReset();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockTopicsService.upsertTranslation.mockResolvedValue(draftTranslation);
     mockTopicsService.publishTranslation.mockResolvedValue(
       publishedTranslation,

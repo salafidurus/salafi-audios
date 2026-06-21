@@ -1,3 +1,4 @@
+import { vi, type Mocked } from 'vitest';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -40,7 +41,7 @@ const mockChannelRecord = {
 
 describe('LiveService', () => {
   let service: LiveService;
-  let repo: jest.Mocked<LiveRepository>;
+  let repo: Mocked<LiveRepository>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -49,34 +50,34 @@ describe('LiveService', () => {
         {
           provide: LiveRepository,
           useValue: {
-            findActive: jest.fn(),
-            findDeletedFromActive: jest.fn(),
-            findUpcoming: jest.fn(),
-            findDeletedFromUpcoming: jest.fn(),
-            findEnded: jest.fn(),
-            findDeletedFromEnded: jest.fn(),
-            findSessionById: jest.fn(),
-            findSessionPublicById: jest.fn(),
-            updateSessionStatus: jest.fn(),
-            findChannels: jest.fn(),
-            findChannelBySlug: jest.fn(),
-            findChannelById: jest.fn(),
-            createChannel: jest.fn(),
-            updateChannel: jest.fn(),
-            createSession: jest.fn(),
-            updateSession: jest.fn(),
-            listChannels: jest.fn(),
-          } satisfies Partial<jest.Mocked<LiveRepository>>,
+            findActive: vi.fn(),
+            findDeletedFromActive: vi.fn(),
+            findUpcoming: vi.fn(),
+            findDeletedFromUpcoming: vi.fn(),
+            findEnded: vi.fn(),
+            findDeletedFromEnded: vi.fn(),
+            findSessionById: vi.fn(),
+            findSessionPublicById: vi.fn(),
+            updateSessionStatus: vi.fn(),
+            findChannels: vi.fn(),
+            findChannelBySlug: vi.fn(),
+            findChannelById: vi.fn(),
+            createChannel: vi.fn(),
+            updateChannel: vi.fn(),
+            createSession: vi.fn(),
+            updateSession: vi.fn(),
+            listChannels: vi.fn(),
+          } satisfies Partial<Mocked<LiveRepository>>,
         },
       ],
     }).compile();
 
     service = module.get(LiveService);
-    repo = module.get(LiveRepository) as jest.Mocked<LiveRepository>;
+    repo = module.get(LiveRepository) as Mocked<LiveRepository>;
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('getActive', () => {

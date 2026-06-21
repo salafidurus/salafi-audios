@@ -1,3 +1,4 @@
+import { vi, type Mocked } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import type { QuickBrowseDto } from '@sd/core-contracts';
 import { HomeRepo } from './home.repo';
@@ -5,7 +6,7 @@ import { HomeService } from './home.service';
 
 describe('HomeService', () => {
   let service: HomeService;
-  let repo: jest.Mocked<HomeRepo>;
+  let repo: Mocked<HomeRepo>;
 
   const mockScholars = [
     { id: 's1', name: 'Scholar 1', slug: 'scholar-1', imageUrl: 'image1.jpg' },
@@ -41,20 +42,20 @@ describe('HomeService', () => {
         {
           provide: HomeRepo,
           useValue: {
-            getScholars: jest.fn(),
-            getSuggestions: jest.fn(),
-            getRecentProgress: jest.fn(),
-          } satisfies Partial<jest.Mocked<HomeRepo>>,
+            getScholars: vi.fn(),
+            getSuggestions: vi.fn(),
+            getRecentProgress: vi.fn(),
+          } satisfies Partial<Mocked<HomeRepo>>,
         },
       ],
     }).compile();
 
     service = module.get(HomeService);
-    repo = module.get(HomeRepo) as jest.Mocked<HomeRepo>;
+    repo = module.get(HomeRepo) as Mocked<HomeRepo>;
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('getQuickBrowse', () => {

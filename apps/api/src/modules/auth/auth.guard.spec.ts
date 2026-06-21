@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 // apps/api/src/modules/auth/auth.guard.spec.ts
 import { AuthGuard } from './auth.guard';
 import { Reflector } from '@nestjs/core';
@@ -7,8 +8,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 
-const mockAuth = { api: { getSession: jest.fn() } };
-jest.mock('./auth.instance', () => ({ getAuth: () => mockAuth }));
+const mockAuth = { api: { getSession: vi.fn() } };
+vi.mock('./auth.instance', () => ({ getAuth: () => mockAuth }));
 
 function mockContext(headers: Record<string, string> = {}): ExecutionContext {
   return {
@@ -27,17 +28,17 @@ describe('AuthGuard', () => {
   beforeEach(() => {
     reflector = new Reflector();
     guard = new AuthGuard(reflector);
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('allows @Public() routes without a session', async () => {
-    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValueOnce(true);
+    vi.spyOn(reflector, 'getAllAndOverride').mockReturnValueOnce(true);
     await expect(guard.canActivate(mockContext())).resolves.toBe(true);
     expect(mockAuth.api.getSession).not.toHaveBeenCalled();
   });
 
   it('throws 401 when no session', async () => {
-    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
+    vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
     mockAuth.api.getSession.mockResolvedValue(null);
     await expect(guard.canActivate(mockContext())).rejects.toThrow(
       UnauthorizedException,
@@ -46,7 +47,7 @@ describe('AuthGuard', () => {
 
   it('attaches user to request and returns true when session is valid', async () => {
     const fakeUser = { id: 'u1', role: 'user', email: 'a@b.com' };
-    jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
+    vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
     mockAuth.api.getSession.mockResolvedValue({ user: fakeUser, session: {} });
     const req: Record<string, unknown> = { headers: {}, user: undefined };
     const ctx = {
@@ -60,8 +61,7 @@ describe('AuthGuard', () => {
 
   it('throws 401 when user role does not match @Roles()', async () => {
     const fakeUser = { id: 'u1', role: 'user' };
-    jest
-      .spyOn(reflector, 'getAllAndOverride')
+    vi.spyOn(reflector, 'getAllAndOverride')
       .mockReturnValueOnce(false) // isPublic
       .mockReturnValueOnce(['admin']); // roles
     mockAuth.api.getSession.mockResolvedValue({ user: fakeUser, session: {} });
@@ -72,7 +72,7 @@ describe('AuthGuard', () => {
 
   describe('ban enforcement', () => {
     it('throws 403 for a permanently banned user (banned: true, banExpires: null)', async () => {
-      jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
+      vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
       mockAuth.api.getSession.mockResolvedValue({
         user: { id: 'u2', role: 'user', banned: true, banExpires: null },
         session: {},
@@ -84,7 +84,7 @@ describe('AuthGuard', () => {
 
     it('throws 403 for a temporarily banned user whose ban has not yet expired', async () => {
       const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
-      jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
+      vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
       mockAuth.api.getSession.mockResolvedValue({
         user: { id: 'u3', role: 'user', banned: true, banExpires: tomorrow },
         session: {},
@@ -98,7 +98,7 @@ describe('AuthGuard', () => {
       const yesterday = new Date(
         Date.now() - 24 * 60 * 60 * 1000,
       ).toISOString();
-      jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
+      vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
       const req: Record<string, unknown> = { headers: {}, user: undefined };
       const ctx = {
         getHandler: () => ({}),

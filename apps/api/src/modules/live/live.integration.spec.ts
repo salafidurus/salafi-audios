@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { INestApplication } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
@@ -9,20 +10,20 @@ import { AdminLiveController } from './admin-live.controller';
 import { LiveService } from './live.service';
 import { ConfigService } from '../../shared/config/config.service';
 
-const mockAuth = { api: { getSession: jest.fn() } };
-jest.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
+const mockAuth = { api: { getSession: vi.fn() } };
+vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockLiveService = {
-  getChannels: jest.fn().mockResolvedValue([]),
-  getChannelBySlug: jest.fn().mockResolvedValue(null),
-  getActive: jest.fn().mockResolvedValue([]),
-  getUpcoming: jest.fn().mockResolvedValue([]),
-  getEnded: jest.fn().mockResolvedValue([]),
-  createChannel: jest.fn().mockResolvedValue({}),
-  updateChannel: jest.fn().mockResolvedValue({}),
-  createSession: jest.fn().mockResolvedValue({}),
-  updateSession: jest.fn().mockResolvedValue({}),
-  updateSessionStatus: jest.fn().mockResolvedValue({}),
+  getChannels: vi.fn().mockResolvedValue([]),
+  getChannelBySlug: vi.fn().mockResolvedValue(null),
+  getActive: vi.fn().mockResolvedValue([]),
+  getUpcoming: vi.fn().mockResolvedValue([]),
+  getEnded: vi.fn().mockResolvedValue([]),
+  createChannel: vi.fn().mockResolvedValue({}),
+  updateChannel: vi.fn().mockResolvedValue({}),
+  createSession: vi.fn().mockResolvedValue({}),
+  updateSession: vi.fn().mockResolvedValue({}),
+  updateSessionStatus: vi.fn().mockResolvedValue({}),
 };
 
 describe('LiveController — auth boundaries', () => {

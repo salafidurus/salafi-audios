@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { INestApplication } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
@@ -6,14 +7,14 @@ import { AuthGuard } from '../auth/auth.guard';
 import { FeedController } from './feed.controller';
 import { FeedService } from './feed.service';
 
-const mockAuth = { api: { getSession: jest.fn() } };
-jest.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
+const mockAuth = { api: { getSession: vi.fn() } };
+vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockFeedService = {
-  getFeed: jest
+  getFeed: vi
     .fn()
     .mockResolvedValue({ items: [], nextCursor: null, hasMore: false }),
-  getScholars: jest.fn().mockResolvedValue({ scholars: [] }),
+  getScholars: vi.fn().mockResolvedValue({ scholars: [] }),
 };
 
 describe('FeedController — auth boundaries', () => {

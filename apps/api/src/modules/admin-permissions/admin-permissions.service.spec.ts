@@ -1,3 +1,4 @@
+import { vi, type Mocked } from 'vitest';
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ADMIN_PERMISSIONS, type AdminPermission } from '@sd/core-contracts';
@@ -6,7 +7,7 @@ import { AdminPermissionsService } from './admin-permissions.service';
 
 describe('AdminPermissionsService', () => {
   let service: AdminPermissionsService;
-  let repo: jest.Mocked<AdminPermissionsRepository>;
+  let repo: Mocked<AdminPermissionsRepository>;
 
   const mockPermissionRecord = {
     userId: 'user1',
@@ -22,12 +23,12 @@ describe('AdminPermissionsService', () => {
         {
           provide: AdminPermissionsRepository,
           useValue: {
-            findByUserId: jest.fn(),
-            findPermissionStringsByUserId: jest.fn(),
-            grant: jest.fn().mockResolvedValue(mockPermissionRecord),
-            revoke: jest.fn().mockResolvedValue(mockPermissionRecord),
-            hasPermission: jest.fn(),
-          } satisfies Partial<jest.Mocked<AdminPermissionsRepository>>,
+            findByUserId: vi.fn(),
+            findPermissionStringsByUserId: vi.fn(),
+            grant: vi.fn().mockResolvedValue(mockPermissionRecord),
+            revoke: vi.fn().mockResolvedValue(mockPermissionRecord),
+            hasPermission: vi.fn(),
+          } satisfies Partial<Mocked<AdminPermissionsRepository>>,
         },
       ],
     }).compile();
@@ -35,11 +36,11 @@ describe('AdminPermissionsService', () => {
     service = module.get(AdminPermissionsService);
     repo = module.get(
       AdminPermissionsRepository,
-    ) as jest.Mocked<AdminPermissionsRepository>;
+    ) as Mocked<AdminPermissionsRepository>;
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('getPermissions', () => {

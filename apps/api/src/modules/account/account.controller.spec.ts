@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { INestApplication } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
@@ -6,8 +7,8 @@ import { AuthGuard } from '../auth/auth.guard';
 import { AccountController } from './account.controller';
 import { AccountService } from './account.service';
 
-const mockAuth = { api: { getSession: jest.fn() } };
-jest.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
+const mockAuth = { api: { getSession: vi.fn() } };
+vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockProfile = {
   id: 'user-1',
@@ -21,7 +22,7 @@ const mockProfile = {
 };
 
 const mockAccountService = {
-  getProfile: jest.fn().mockReturnValue(mockProfile),
+  getProfile: vi.fn().mockReturnValue(mockProfile),
 };
 
 describe('AccountController — auth boundaries', () => {
@@ -29,7 +30,7 @@ describe('AccountController — auth boundaries', () => {
 
   beforeEach(async () => {
     mockAuth.api.getSession.mockReset();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockAccountService.getProfile.mockReturnValue(mockProfile);
 
     const module = await Test.createTestingModule({
