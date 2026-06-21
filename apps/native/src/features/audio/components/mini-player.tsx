@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { View, StyleSheet, Pressable, Text, Modal } from "react-native";
+import { View, Pressable, Text, Modal } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import { useAudio } from "@sd/domain-audio";
@@ -10,6 +11,7 @@ import { PlaybackControls } from "./playback-controls";
 
 export function MiniPlayer() {
   const { currentTrack, isPlaying, progressPercent, positionSeconds } = useAudio();
+  const { theme } = useUnistyles();
   const [modalVisible, setModalVisible] = useState(false);
 
   if (!currentTrack) return null;
@@ -22,9 +24,10 @@ export function MiniPlayer() {
     }
   };
 
-  const PauseIcon = <Pause size={20} color="#1E293B" fill="#1E293B" />;
-  const PlayIcon = <Play size={20} color="#1E293B" fill="#1E293B" />;
-  const ChevronDownIcon = <ChevronDown size={28} color="#1E293B" />;
+  const strong = theme.colors.content.strong;
+  const PauseIcon = <Pause size={20} color={strong} fill={strong} />;
+  const PlayIcon = <Play size={20} color={strong} fill={strong} />;
+  const ChevronDownIcon = <ChevronDown size={28} color={strong} />;
 
   return (
     <>
@@ -107,7 +110,7 @@ function formatTime(seconds: number): string {
   return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   container: {
     position: "absolute",
     bottom: 50, // floats safely above system tab bars
@@ -115,11 +118,11 @@ const styles = StyleSheet.create({
     end: 12,
     height: 64,
     borderRadius: 12,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: theme.colors.surface.default,
     boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: "#F1F5F9",
+    borderColor: theme.colors.border.subtle,
   },
   content: {
     flex: 1,
@@ -131,7 +134,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 6,
-    backgroundColor: "#E2E8F0",
+    backgroundColor: theme.colors.surface.subtle,
   },
   textContainer: {
     flex: 1,
@@ -141,34 +144,34 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: "bold",
-    color: "#0F172A",
+    color: theme.colors.content.strong,
   },
   artist: {
     fontSize: 12,
-    color: "#64748B",
+    color: theme.colors.content.muted,
     marginTop: 2,
   },
   playButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: "#F1F5F9",
+    backgroundColor: theme.colors.surface.subtle,
     justifyContent: "center",
     alignItems: "center",
   },
   miniProgressTrack: {
     height: 2,
     width: "100%",
-    backgroundColor: "#F1F5F9",
+    backgroundColor: theme.colors.surface.subtle,
   },
   miniProgressFill: {
     height: "100%",
-    backgroundColor: "#3B82F6",
+    backgroundColor: theme.colors.action.primary,
   },
   // Fullscreen Modal Styles
   modalContainer: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: theme.colors.surface.default,
   },
   modalHeader: {
     flexDirection: "row",
@@ -180,7 +183,7 @@ const styles = StyleSheet.create({
   modalHeaderTitle: {
     fontSize: 16,
     fontWeight: "bold",
-    color: "#0F172A",
+    color: theme.colors.content.strong,
   },
   closeButton: {
     padding: 4,
@@ -199,7 +202,7 @@ const styles = StyleSheet.create({
     width: 280,
     height: 280,
     borderRadius: 16,
-    backgroundColor: "#E2E8F0",
+    backgroundColor: theme.colors.surface.subtle,
     boxShadow: "0 8px 16px rgba(0, 0, 0, 0.15)",
   },
   modalTextContainer: {
@@ -211,13 +214,13 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#0F172A",
+    color: theme.colors.content.strong,
     textAlign: "center",
     paddingHorizontal: 12,
   },
   modalArtist: {
     fontSize: 16,
-    color: "#3B82F6",
+    color: theme.colors.action.primary,
     fontWeight: "600",
     marginTop: 8,
   },
@@ -234,6 +237,6 @@ const styles = StyleSheet.create({
   },
   timeText: {
     fontSize: 12,
-    color: "#64748B",
+    color: theme.colors.content.muted,
   },
-});
+}));

@@ -1,13 +1,6 @@
 import { useCallback, useReducer } from "react";
-import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { ActivityIndicator, FlatList, Pressable, Text, TextInput, View } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import type { LivestreamChannelDto, Locale } from "@sd/core-contracts";
 import { createChannel, updateChannel } from "../../api/admin-live.api";
 
@@ -49,6 +42,7 @@ type FieldItem = {
 };
 
 export function ChannelSheet({ isOpen, channel, onClose, onSaved }: ChannelSheetProps) {
+  const { theme } = useUnistyles();
   const [state, dispatch] = useReducer(reduce, {
     telegramId: "",
     displayName: channel?.displayName ?? "",
@@ -154,26 +148,26 @@ export function ChannelSheet({ isOpen, channel, onClose, onSaved }: ChannelSheet
       <View style={styles.buttonRow}>
         <Pressable onPress={handleSave} disabled={isSaving} style={styles.saveBtn}>
           {isSaving ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={theme.colors.content.onPrimary} />
           ) : (
             <Text style={styles.saveBtnText}>Save</Text>
           )}
         </Pressable>
         <Pressable onPress={onClose} style={styles.cancelBtn}>
-          <Text>Cancel</Text>
+          <Text style={styles.cancelBtnText}>Cancel</Text>
         </Pressable>
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   container: {
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.surface.elevated,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 16,
@@ -183,6 +177,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: "600",
     marginBottom: 16,
+    color: theme.colors.content.strong,
   },
   fieldRow: {
     marginBottom: 16,
@@ -191,21 +186,23 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "600",
     marginBottom: 4,
+    color: theme.colors.content.default,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#d1d5db",
+    borderColor: theme.colors.border.default,
     borderRadius: 8,
     padding: 10,
     fontSize: 14,
+    color: theme.colors.content.default,
   },
   helperText: {
     fontSize: 12,
-    color: "#6b7280",
+    color: theme.colors.content.muted,
     marginTop: 4,
   },
   errorText: {
-    color: "#dc2626",
+    color: theme.colors.state.danger,
     marginBottom: 8,
   },
   buttonRow: {
@@ -216,19 +213,22 @@ const styles = StyleSheet.create({
   saveBtn: {
     flex: 1,
     padding: 12,
-    backgroundColor: "#3b82f6",
+    backgroundColor: theme.colors.action.primary,
     borderRadius: 8,
     alignItems: "center",
   },
   saveBtnText: {
-    color: "#fff",
+    color: theme.colors.content.onPrimary,
     fontWeight: "600",
   },
   cancelBtn: {
     padding: 12,
     borderWidth: 1,
-    borderColor: "#d1d5db",
+    borderColor: theme.colors.border.default,
     borderRadius: 8,
     alignItems: "center",
   },
-});
+  cancelBtnText: {
+    color: theme.colors.content.default,
+  },
+}));

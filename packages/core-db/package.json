@@ -34,12 +34,14 @@
     "prisma:validate": "prisma validate --schema=./prisma/schema.prisma --config=./prisma.config.ts",
     "migrate:create-only": "node ./scripts/migrate-with-auto-name.js",
     "migrate:deploy": "prisma migrate deploy --schema=./prisma/schema.prisma --config=./prisma.config.ts",
+    "make-admin": "node ./scripts/make-admin.js",
     "build": "pnpm prisma:generate && tsup src/index.ts --format esm,cjs --out-dir dist && node ./scripts/copy-generated-to-dist.js && tsc -p tsconfig.build.json",
     "dev": "pnpm build --watch"
   },
   "dependencies": {
     "@prisma/client": "catalog:",
-    "@prisma/client-runtime-utils": "^7.3.0"
+    "@prisma/client-runtime-utils": "^7.3.0",
+    "@sd/core-contracts": "workspace:*"
   },
   "devDependencies": {
     "dotenv": "^16.4.5",

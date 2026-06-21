@@ -1,4 +1,5 @@
-import { routes, routeAuth, routeAuthOverrides } from "./routes";
+import { routes, routeDefinitions, resolveRouteAccess } from "./routes";
+import type { RouteAccess } from "./routes";
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                           */
@@ -21,6 +22,12 @@ function collectLeafStrings(
   }
   return results;
 }
+
+const VALID_ACCESS: ReadonlySet<RouteAccess> = new Set<RouteAccess>([
+  "public",
+  "auth-optional",
+  "auth-required",
+]);
 
 /* ------------------------------------------------------------------ */
 /*  Route structure tests                                             */
@@ -51,58 +58,77 @@ describe("routes – structural integrity", () => {
 });
 
 /* ------------------------------------------------------------------ */
-/*  routeAuth tests                                                   */
+/*  routeDefinitions tests                                            */
 /* ------------------------------------------------------------------ */
 
-describe("routeAuth – coverage", () => {
-  const topLevelKeys = Object.keys(routes);
-  const authKeys = Object.keys(routeAuth);
-
-  it("every top-level route section has an auth mode", () => {
-    for (const key of topLevelKeys) {
-      expect(authKeys).toContain(key);
+describe("routeDefinitions – validity", () => {
+  it("every definition path starts with /", () => {
+    for (const def of routeDefinitions) {
+      expect({ path: def.path, ok: def.path.startsWith("/") }).toEqual(
+        expect.objectContaining({ ok: true }),
+      );
     }
   });
 
-  it("routeAuth contains only valid auth modes", () => {
-    const validModes = new Set(["public", "local-first", "auth"]);
-    for (const [key, mode] of Object.entries(routeAuth)) {
-      expect({ key, valid: validModes.has(mode) }).toEqual(
+  it("every definition access is a valid RouteAccess", () => {
+    for (const def of routeDefinitions) {
+      expect({ path: def.path, valid: VALID_ACCESS.has(def.access) }).toEqual(
         expect.objectContaining({ valid: true }),
       );
     }
   });
 
-  it("routeAuth has no extra keys beyond routes", () => {
-    for (const key of authKeys) {
-      expect(topLevelKeys).toContain(key);
-    }
+  it("has no duplicate paths", () => {
+    const paths = routeDefinitions.map((d) => d.path);
+    const duplicates = paths.filter((p, i) => paths.indexOf(p) !== i);
+    expect(duplicates).toEqual([]);
   });
 });
 
 /* ------------------------------------------------------------------ */
-/*  routeAuthOverrides tests                                          */
+/*  resolveRouteAccess tests                                          */
 /* ------------------------------------------------------------------ */
 
-describe("routeAuthOverrides – validity", () => {
-  const allLeafValues = new Set(
-    collectLeafStrings(routes as unknown as Record<string, unknown>).map((l) => l.value),
-  );
-
-  it("every override key is a valid leaf route path", () => {
-    for (const key of Object.keys(routeAuthOverrides)) {
-      expect({ key, isLeaf: allLeafValues.has(key) }).toEqual(
-        expect.objectContaining({ isLeaf: true }),
-      );
-    }
+describe("resolveRouteAccess", () => {
+  it("matches the longest prefix, not a parent rule", () => {
+    expect(resolveRouteAccess("/feed/following")).toBe("auth-required");
+    expect(resolveRouteAccess("/feed")).toBe("public");
+    expect(resolveRouteAccess("/feed/recent")).toBe("public");
   });
 
-  it("override values are valid auth modes", () => {
-    const validModes = new Set(["public", "local-first", "auth"]);
-    for (const [key, mode] of Object.entries(routeAuthOverrides)) {
-      expect({ key, valid: validModes.has(mode) }).toEqual(
-        expect.objectContaining({ valid: true }),
-      );
-    }
+  it("normalizes a trailing slash", () => {
+    expect(resolveRouteAccess("/account/profile/")).toBe("auth-required");
+    expect(resolveRouteAccess("/account/")).toBe("auth-optional");
+  });
+
+  it("matches nested sub-paths via prefix", () => {
+    expect(resolveRouteAccess("/account/profile/edit")).toBe("auth-required");
+    expect(resolveRouteAccess("/live/session-123")).toBe("public");
+    expect(resolveRouteAccess("/library/saved")).toBe("auth-optional");
+    expect(resolveRouteAccess("/admin/users")).toBe("auth-required");
+  });
+
+  it("preserves local-first semantics as auth-optional", () => {
+    expect(resolveRouteAccess("/account")).toBe("auth-optional");
+    expect(resolveRouteAccess("/library")).toBe("auth-optional");
+  });
+
+  it("honors the per-path public override under an auth-optional section", () => {
+    expect(resolveRouteAccess("/account/legal")).toBe("public");
+  });
+
+  it("treats the home route as public", () => {
+    expect(resolveRouteAccess("/")).toBe("public");
+  });
+
+  it("falls back to public for unknown routes", () => {
+    expect(resolveRouteAccess("/totally-unknown")).toBe("public");
+    expect(resolveRouteAccess("/search")).toBe("public");
+  });
+
+  it("gates the newly protected leaves", () => {
+    expect(resolveRouteAccess("/feed/following")).toBe("auth-required");
+    expect(resolveRouteAccess("/account/profile")).toBe("auth-required");
+    expect(resolveRouteAccess("/admin")).toBe("auth-required");
   });
 });

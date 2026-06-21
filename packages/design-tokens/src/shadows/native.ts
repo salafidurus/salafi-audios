@@ -1,4 +1,4 @@
-export const shadowsMobile = {
+export const shadowsNative = {
   xs: {
     light: {
       shadowColor: "#000",
@@ -81,7 +81,7 @@ export const shadowsMobile = {
   },
 } as const;
 
-export type ShadowsMobileVariant = {
+export type ShadowsNativeVariant = {
   shadowColor: string;
   shadowOffset: { width: number; height: number };
   shadowOpacity: number;
@@ -89,24 +89,24 @@ export type ShadowsMobileVariant = {
   elevation: number;
 };
 
-export type ShadowsMobileTheme = {
-  xs: ShadowsMobileVariant;
-  sm: ShadowsMobileVariant;
-  md: ShadowsMobileVariant;
-  lg: ShadowsMobileVariant;
-  elevated: ShadowsMobileVariant;
+export type ShadowsNativeTheme = {
+  xs: ShadowsNativeVariant;
+  sm: ShadowsNativeVariant;
+  md: ShadowsNativeVariant;
+  lg: ShadowsNativeVariant;
+  elevated: ShadowsNativeVariant;
 };
 
-export const createShadowsMobile = (mode: "light" | "dark"): ShadowsMobileTheme => {
+export const createShadowsNative = (mode: "light" | "dark"): ShadowsNativeTheme => {
   const isLight = mode === "light";
 
   return {
-    xs: isLight ? shadowsMobile.xs.light : shadowsMobile.xs.dark,
-    sm: isLight ? shadowsMobile.sm.light : shadowsMobile.sm.dark,
-    md: isLight ? shadowsMobile.md.light : shadowsMobile.md.dark,
-    lg: isLight ? shadowsMobile.lg.light : shadowsMobile.lg.dark,
-    elevated: isLight ? shadowsMobile.elevated.light : shadowsMobile.elevated.dark,
+    xs: isLight ? shadowsNative.xs.light : shadowsNative.xs.dark,
+    sm: isLight ? shadowsNative.sm.light : shadowsNative.sm.dark,
+    md: isLight ? shadowsNative.md.light : shadowsNative.md.dark,
+    lg: isLight ? shadowsNative.lg.light : shadowsNative.lg.dark,
+    elevated: isLight ? shadowsNative.elevated.light : shadowsNative.elevated.dark,
   };
 };
 
-export type ShadowsMobile = typeof shadowsMobile;
+export type ShadowsNative = typeof shadowsNative;

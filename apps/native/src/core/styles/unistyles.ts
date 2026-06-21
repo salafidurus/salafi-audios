@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native-unistyles";
-import { darkMobileTheme, lightMobileTheme } from "@sd/design-tokens";
+import { darkNativeTheme, lightNativeTheme } from "@sd/design-tokens";
 
 const breakpoints = {
   xs: 0,
@@ -17,16 +17,16 @@ declare module "react-native-unistyles" {
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   export interface UnistylesBreakpoints extends NativeBreakpoints {}
   export interface UnistylesThemes {
-    light: typeof lightMobileTheme;
-    dark: typeof darkMobileTheme;
+    light: typeof lightNativeTheme;
+    dark: typeof darkNativeTheme;
   }
 }
 
 StyleSheet.configure({
   breakpoints,
   themes: {
-    light: lightMobileTheme,
-    dark: darkMobileTheme,
+    light: lightNativeTheme,
+    dark: darkNativeTheme,
   },
   settings: {
     adaptiveThemes: true,

@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 import { FlashList } from "@shopify/flash-list";
 import type { AdminLectureListItemDto } from "@sd/core-contracts";
 import { useAdminLectures } from "../../hooks/use-admin-lectures";
@@ -133,7 +134,7 @@ export function AdminLecturesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   screen: {
     flex: 1,
   },
@@ -146,19 +147,21 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: "700",
+    color: theme.colors.content.strong,
   },
   uploadBtn: {
     padding: 10,
-    backgroundColor: "#3b82f6",
+    backgroundColor: theme.colors.action.primary,
     borderRadius: 8,
   },
   uploadBtnText: {
-    color: "#fff",
+    color: theme.colors.content.onPrimary,
     fontWeight: "600",
   },
   loadingText: {
     textAlign: "center",
     marginTop: 32,
+    color: theme.colors.content.muted,
   },
   row: {
     padding: 12,
@@ -168,19 +171,20 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   rowDefault: {
-    borderColor: "#e5e5e5",
-    backgroundColor: "#fff",
+    borderColor: theme.colors.border.subtle,
+    backgroundColor: theme.colors.surface.default,
   },
   rowSelected: {
-    borderColor: "#3b82f6",
-    backgroundColor: "#eff6ff",
+    borderColor: theme.colors.action.primary,
+    backgroundColor: theme.colors.surface.primarySubtle,
   },
   rowTitle: {
     fontWeight: "600",
+    color: theme.colors.content.strong,
   },
   rowMeta: {
     fontSize: 12,
-    color: "#666",
+    color: theme.colors.content.muted,
     marginTop: 2,
   },
-});
+}));

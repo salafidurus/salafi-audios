@@ -1,4 +1,5 @@
 import { View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 import { useLectureProgress } from "@sd/domain-audio";
 
 type ProgressIndicatorProps = {
@@ -13,23 +14,33 @@ export function ProgressIndicator({ lectureId, size = 32 }: ProgressIndicatorPro
 
   // Simple bar-style indicator for native (SVG requires react-native-svg)
   return (
-    <View
-      style={{
-        width: size,
-        height: 3,
-        borderRadius: 2,
-        backgroundColor: "#e5e7eb",
-        overflow: "hidden",
-      }}
-    >
+    <View style={[styles.track, { width: size }]}>
       <View
-        style={{
-          height: "100%",
-          width: `${Math.min(progressPercent, 100)}%`,
-          backgroundColor: isCompleted ? "#16a34a" : "#2563eb",
-          borderRadius: 2,
-        }}
+        style={[
+          styles.fill,
+          isCompleted ? styles.fillCompleted : styles.fillInProgress,
+          { width: `${Math.min(progressPercent, 100)}%` },
+        ]}
       />
     </View>
   );
 }
+
+const styles = StyleSheet.create((theme) => ({
+  track: {
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: theme.colors.surface.subtle,
+    overflow: "hidden",
+  },
+  fill: {
+    height: "100%",
+    borderRadius: 2,
+  },
+  fillCompleted: {
+    backgroundColor: theme.colors.state.success,
+  },
+  fillInProgress: {
+    backgroundColor: theme.colors.action.primary,
+  },
+}));

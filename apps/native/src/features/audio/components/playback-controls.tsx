@@ -1,11 +1,13 @@
 import React from "react";
-import { View, StyleSheet, Pressable, Text } from "react-native";
+import { View, Pressable, Text } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useAudio } from "@sd/domain-audio";
 import { audioService } from "../audio-service";
 import { Play, Pause, RotateCw, RotateCcw } from "lucide-react-native";
 
 export function PlaybackControls() {
   const { isPlaying, speed, positionSeconds, durationSeconds, hasTrack } = useAudio();
+  const { theme } = useUnistyles();
 
   const handlePlayPause = () => {
     if (isPlaying) {
@@ -32,10 +34,12 @@ export function PlaybackControls() {
     audioService.setSpeed(speeds[nextIndex]!);
   };
 
-  const RotateCcwIcon = <RotateCcw size={28} color="#1E293B" />;
-  const PauseIcon = <Pause size={32} color="#FFFFFF" fill="#FFFFFF" />;
-  const PlayIcon = <Play size={32} color="#FFFFFF" fill="#FFFFFF" />;
-  const RotateCwIcon = <RotateCw size={28} color="#1E293B" />;
+  const onPrimary = theme.colors.content.onPrimary;
+  const strong = theme.colors.content.strong;
+  const RotateCcwIcon = <RotateCcw size={28} color={strong} />;
+  const PauseIcon = <Pause size={32} color={onPrimary} fill={onPrimary} />;
+  const PlayIcon = <Play size={32} color={onPrimary} fill={onPrimary} />;
+  const RotateCwIcon = <RotateCw size={28} color={strong} />;
 
   if (!hasTrack) return null;
 
@@ -66,7 +70,7 @@ export function PlaybackControls() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   container: {
     flexDirection: "row",
     alignItems: "center",
@@ -83,7 +87,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: "#3B82F6", // primary design token
+    backgroundColor: theme.colors.action.primary,
     justifyContent: "center",
     alignItems: "center",
     marginHorizontal: 24,
@@ -97,7 +101,7 @@ const styles = StyleSheet.create({
   skipLabel: {
     fontSize: 12,
     fontWeight: "bold",
-    color: "#1E293B",
+    color: theme.colors.content.strong,
     position: "absolute",
     top: 9,
   },
@@ -105,7 +109,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 16,
-    backgroundColor: "#F1F5F9", // light gray token
+    backgroundColor: theme.colors.surface.subtle,
     width: 60,
     justifyContent: "center",
     alignItems: "center",
@@ -113,9 +117,9 @@ const styles = StyleSheet.create({
   speedText: {
     fontSize: 12,
     fontWeight: "bold",
-    color: "#64748B",
+    color: theme.colors.content.muted,
   },
   placeholder: {
     width: 60,
   },
-});
+}));

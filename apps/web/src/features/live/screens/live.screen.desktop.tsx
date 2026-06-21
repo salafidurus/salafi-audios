@@ -57,25 +57,25 @@ export function LiveDesktopScreen() {
           <div className={styles.twoColumn}>
             <div className={styles.columnMain}>
               <Section
-                title={`🔴 ${t("live.liveNow", "Live Now")}`}
+                title={`🔴 ${t("live.sections.ongoing.title", "Live Now")}`}
                 sessions={active.sessions}
                 isLoading={active.isLoading}
-                emptyMessage={t("live.emptyLive", "No live sessions right now.")}
+                emptyMessage={t("live.sections.ongoing.empty", "No live sessions right now.")}
               />
             </div>
 
             <div className={styles.columnSide}>
               <Section
-                title={t("live.upcoming", "Upcoming")}
+                title={t("live.sections.scheduled.title", "Upcoming")}
                 sessions={upcoming.sessions}
                 isLoading={upcoming.isLoading}
-                emptyMessage={t("live.emptyUpcoming", "No upcoming sessions scheduled.")}
+                emptyMessage={t("live.sections.scheduled.empty", "No upcoming sessions scheduled.")}
               />
               <Section
-                title={t("live.recentlyEnded", "Recently Ended")}
+                title={t("live.sections.ended.title", "Recently Ended")}
                 sessions={ended.sessions}
                 isLoading={ended.isLoading}
-                emptyMessage={t("live.emptyEnded", "No recent sessions.")}
+                emptyMessage={t("live.sections.ended.empty", "No recent sessions.")}
               />
             </div>
           </div>
