@@ -13,7 +13,7 @@ const scheduledSessionButtonStyle: React.CSSProperties = {
   width: "100%",
   textAlign: "left",
   padding: 12,
-  borderBottom: "1px solid #eee",
+  borderBottom: "1px solid var(--border-subtle)",
   cursor: "pointer",
   background: "none",
   border: "none",
@@ -29,9 +29,11 @@ function ScheduledSessionItem({
   return (
     <button type="button" onClick={onPress} style={scheduledSessionButtonStyle}>
       <div style={{ fontSize: 15, fontWeight: 600 }}>{session.title}</div>
-      <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>{session.scholarName}</div>
+      <div style={{ fontSize: 12, color: "var(--content-muted)", marginTop: 2 }}>
+        {session.scholarName}
+      </div>
       {session.scheduledAt && (
-        <div style={{ fontSize: 12, color: "#2563eb", marginTop: 2 }}>
+        <div style={{ fontSize: 12, color: "var(--content-primary)", marginTop: 2 }}>
           {new Date(session.scheduledAt).toLocaleString()}
         </div>
       )}
@@ -47,7 +49,7 @@ export function LiveScheduledMobileScreen({ onNavigateToSession }: LiveScheduled
   }
 
   if (sessions.length === 0) {
-    return <div style={{ padding: 16, color: "#666" }}>No scheduled sessions.</div>;
+    return <div style={{ padding: 16, color: "var(--content-muted)" }}>No scheduled sessions.</div>;
   }
 
   return (
