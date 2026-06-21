@@ -148,7 +148,9 @@
     "loading": "Loading feed...",
     "empty": "No lectures available in this feed.",
     "error": "Failed to load feed content.",
-    "retry": "Try Again"
+    "retry": "Try Again",
+    "loadMore": "Load more",
+    "followingEmpty": "Follow scholars to see their latest lectures here."
   },
   "live": {
     "title": "Live Sessions",

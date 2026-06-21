@@ -35,6 +35,20 @@ export function LiveSessionCard({ session }: LiveSessionCardProps) {
             </AppText>
           </View>
         )}
+        {session.status === "scheduled" && (
+          <View style={cardStyles.scheduledBadge}>
+            <AppText variant="caption" style={cardStyles.scheduledBadgeText}>
+              SCHEDULED
+            </AppText>
+          </View>
+        )}
+        {session.status === "ended" && (
+          <View style={cardStyles.endedBadge}>
+            <AppText variant="caption" style={cardStyles.endedBadgeText}>
+              ENDED
+            </AppText>
+          </View>
+        )}
         <AppText variant="bodyMd" style={cardStyles.title}>
           {session.title ?? session.channelDisplayName}
         </AppText>
@@ -88,10 +102,32 @@ const cardStyles = StyleSheet.create((theme) => ({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#dc2626",
+    backgroundColor: theme.colors.state.danger,
   },
   liveText: {
-    color: "#dc2626",
+    color: theme.colors.state.danger,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+  },
+  scheduledBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: theme.radius.scale.sm,
+    backgroundColor: theme.colors.surface.primarySubtle,
+  },
+  scheduledBadgeText: {
+    color: theme.colors.content.primary,
+    fontWeight: "700",
+    letterSpacing: 0.5,
+  },
+  endedBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: theme.radius.scale.sm,
+    backgroundColor: theme.colors.surface.subtle,
+  },
+  endedBadgeText: {
+    color: theme.colors.content.muted,
     fontWeight: "700",
     letterSpacing: 0.5,
   },
@@ -100,6 +136,6 @@ const cardStyles = StyleSheet.create((theme) => ({
     flex: 1,
   },
   scheduledTime: {
-    color: "#2563eb",
+    color: theme.colors.content.primary,
   },
 }));

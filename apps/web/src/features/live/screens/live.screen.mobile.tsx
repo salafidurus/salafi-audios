@@ -5,6 +5,7 @@ import { AppText } from "@/shared/components/AppText/AppText";
 import type { LiveSessionPublicDto } from "@sd/core-contracts";
 import { useLiveSessions } from "@sd/domain-live";
 import { LiveSessionCard } from "../components/live-session-card/live-session-card";
+import { LiveSkeleton } from "../components/live-skeleton/live-skeleton";
 import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./live.screen.module.css";
 
@@ -21,16 +22,13 @@ function Section({
   isLoading: boolean;
   emptyMessage: string;
 }) {
-  const { t } = useTranslation();
   return (
     <div className={styles.section}>
       <AppText variant="titleMd">{title}</AppText>
       {isLoading && sessions.length === 0 ? (
-        <AppText variant="bodyMd" style={{ color: "var(--content-subtle, #666)" }}>
-          {t("common.loading", "Loading...")}
-        </AppText>
+        <LiveSkeleton />
       ) : sessions.length === 0 ? (
-        <AppText variant="bodyMd" style={{ color: "var(--content-subtle, #666)" }}>
+        <AppText variant="bodyMd" style={{ color: "var(--content-subtle)" }}>
           {emptyMessage}
         </AppText>
       ) : (

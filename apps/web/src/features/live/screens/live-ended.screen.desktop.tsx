@@ -13,7 +13,7 @@ const endedSessionButtonStyle: React.CSSProperties = {
   width: "100%",
   textAlign: "left",
   padding: 16,
-  borderBottom: "1px solid #eee",
+  borderBottom: "1px solid var(--border-subtle)",
   cursor: "pointer",
   background: "none",
   border: "none",
@@ -23,9 +23,11 @@ function EndedSessionItem({ session, onPress }: { session: LiveSessionDto; onPre
   return (
     <button type="button" onClick={onPress} style={endedSessionButtonStyle}>
       <div style={{ fontSize: 16, fontWeight: 600 }}>{session.title}</div>
-      <div style={{ fontSize: 13, color: "#666", marginTop: 4 }}>{session.scholarName}</div>
+      <div style={{ fontSize: 13, color: "var(--content-muted)", marginTop: 4 }}>
+        {session.scholarName}
+      </div>
       {session.endedAt && (
-        <div style={{ fontSize: 12, color: "#999", marginTop: 4 }}>
+        <div style={{ fontSize: 12, color: "var(--content-subtle)", marginTop: 4 }}>
           Ended: {new Date(session.endedAt).toLocaleDateString()}
         </div>
       )}
@@ -41,7 +43,9 @@ export function LiveEndedDesktopScreen({ onNavigateToSession }: LiveEndedDesktop
   }
 
   if (sessions.length === 0) {
-    return <div style={{ padding: 32, color: "#666" }}>No past sessions available.</div>;
+    return (
+      <div style={{ padding: 32, color: "var(--content-muted)" }}>No past sessions available.</div>
+    );
   }
 
   return (

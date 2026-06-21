@@ -51,9 +51,7 @@ export function LiveEndedScreen({ onNavigateToSession }: LiveEndedScreenProps) {
   if (sessions.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>
-          {t("live.sections.ended.empty", "No recent sessions.")}
-        </Text>
+        <Text style={styles.emptyText}>{t("live.sections.ended.empty", "No recent sessions.")}</Text>
       </View>
     );
   }

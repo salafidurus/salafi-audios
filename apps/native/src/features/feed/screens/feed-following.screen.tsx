@@ -1,10 +1,15 @@
 import { useCallback } from "react";
-import { View, Text, FlatList } from "react-native";
+import { FlatList } from "react-native";
 import type { ListRenderItemInfo } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
+import { getErrorStateText } from "@sd/core-i18n";
+import { useFeed } from "@sd/domain-content";
+import { useTranslation } from "@/core/i18n/use-translation";
 import { FeedContentCard } from "../components/feed-content-card/feed-content-card";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
-import { useFeed } from "@sd/domain-content";
+import { FeedSkeleton } from "../components/feed-skeleton/feed-skeleton";
+import { FeedLoadingFooter, FeedStatusView } from "../components/feed-status/feed-status";
 
 export type FeedFollowingScreenProps = {
   onNavigateToLecture?: (slug: string) => void;
@@ -37,17 +42,12 @@ function getItemKey(item: FeedItemDto, index: number): string {
   return item.id;
 }
 
-const LoadingFooter = (
-  <View style={{ padding: 16, alignItems: "center" }}>
-    <Text style={{ color: "#999" }}>Loading more\u2026</Text>
-  </View>
-);
-
 export function FeedFollowingScreen({
   onNavigateToLecture,
   onNavigateToScholar,
 }: FeedFollowingScreenProps) {
-  const { data, isFetching, hasNextPage, fetchNextPage } = useFeed();
+  const { t } = useTranslation();
+  const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } = useFeed();
   const items = data?.pages.flatMap((p) => p.items) ?? [];
 
   const renderItem = useCallback(
@@ -56,21 +56,25 @@ export function FeedFollowingScreen({
     [onNavigateToLecture, onNavigateToScholar],
   );
 
-  if (isFetching && items.length === 0) {
+  if (isError && items.length === 0) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Loading followed scholars\u2026</Text>
-      </View>
+      <FeedStatusView
+        message={getErrorStateText("feed", t)}
+        onRetry={() => refetch()}
+        retryLabel={t("feed.retry", "Try Again")}
+      />
     );
+  }
+
+  if (isFetching && items.length === 0) {
+    return <FeedSkeleton />;
   }
 
   if (items.length === 0) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 16 }}>
-        <Text style={{ color: "#666", textAlign: "center" }}>
-          Follow scholars to see their latest lectures here.
-        </Text>
-      </View>
+      <FeedStatusView
+        message={t("feed.followingEmpty", "Follow scholars to see their latest lectures here.")}
+      />
     );
   }
 
@@ -81,8 +85,15 @@ export function FeedFollowingScreen({
       renderItem={renderItem}
       onEndReached={() => hasNextPage && fetchNextPage()}
       onEndReachedThreshold={0.5}
-      contentContainerStyle={{ padding: 8 }}
-      ListFooterComponent={isFetching ? LoadingFooter : null}
+      contentContainerStyle={styles.listContent}
+      ListFooterComponent={isFetching ? <FeedLoadingFooter /> : null}
     />
   );
 }
+
+const styles = StyleSheet.create(() => ({
+  listContent: {
+    padding: 8,
+    gap: 8,
+  },
+}));
