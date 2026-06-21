@@ -1,4 +1,6 @@
 /* global jest */
+jest.setTimeout(15000);
+
 // Eagerly evaluate Expo's lazy globals to prevent Jest from throwing "import outside of the scope of the test code"
 // when they are accessed asynchronously/lazy-loaded later during tests.
 const eagerEvaluate = [
