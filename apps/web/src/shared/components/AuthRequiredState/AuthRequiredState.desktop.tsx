@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/shared/components/Button/Button";
+
 export type AuthRequiredStateDesktopProps = {
   title: string;
   description: string;
@@ -17,9 +19,9 @@ export function AuthRequiredStateDesktop({
     <div style={wrapperStyle}>
       <h2 style={titleStyle}>{title}</h2>
       <p style={descriptionStyle}>{description}</p>
-      <button type="button" onClick={onPress} style={buttonStyle}>
+      <Button variant="primary" onClick={onPress}>
         {actionLabel}
-      </button>
+      </Button>
     </div>
   );
 }
@@ -36,18 +38,6 @@ const titleStyle: React.CSSProperties = {
 };
 
 const descriptionStyle: React.CSSProperties = {
-  color: "#6b7280",
+  color: "var(--content-muted)",
   marginBottom: "1.5rem",
-};
-
-const buttonStyle: React.CSSProperties = {
-  display: "inline-block",
-  padding: "0.5rem 1.5rem",
-  backgroundColor: "#2563eb",
-  color: "#fff",
-  borderRadius: "0.375rem",
-  border: "none",
-  fontWeight: 600,
-  fontSize: "0.875rem",
-  cursor: "pointer",
 };

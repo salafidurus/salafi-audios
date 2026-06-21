@@ -38,23 +38,25 @@ export function TopSubnavTabs() {
 
   return (
     <nav className={styles.tabsContainer} role="tablist" aria-label={t("navigation.mainNav")}>
-      {tabs.map((tab) => {
-        const tabPath = buildSectionTabPath(section, tab.id);
-        const isActive = tab.id === activeTabId;
-        const TabIcon = getSectionTabIcon(section, tab.id);
-        return (
-          <Link
-            key={tab.id}
-            href={tabPath}
-            className={clsx(styles.tabLink, isActive && styles.activeTab)}
-            role="tab"
-            aria-selected={isActive}
-          >
-            {TabIcon ? <TabIcon size={14} /> : null}
-            {getSubnavLabel(section, tab.id, t)}
-          </Link>
-        );
-      })}
+      <div className={styles.inner}>
+        {tabs.map((tab) => {
+          const tabPath = buildSectionTabPath(section, tab.id);
+          const isActive = tab.id === activeTabId;
+          const TabIcon = getSectionTabIcon(section, tab.id);
+          return (
+            <Link
+              key={tab.id}
+              href={tabPath}
+              className={clsx(styles.tabLink, isActive && styles.activeTab)}
+              role="tab"
+              aria-selected={isActive}
+            >
+              {TabIcon ? <TabIcon size={14} /> : null}
+              {getSubnavLabel(section, tab.id, t)}
+            </Link>
+          );
+        })}
+      </div>
     </nav>
   );
 }
