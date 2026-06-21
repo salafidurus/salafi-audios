@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { AdminScholarDetailScreen } from "./admin-scholar-detail.screen";
 
 vi.mock("@sd/core-contracts", async (importOriginal) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const actual = await importOriginal<any>();
   return {
     ...actual,

@@ -1,4 +1,4 @@
-import { vi, type Mock } from "vitest";
+import { vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { LanguageSwitch } from "./language-switch";
 import { setLocaleCookie } from "@/core/i18n/locale-cookie";

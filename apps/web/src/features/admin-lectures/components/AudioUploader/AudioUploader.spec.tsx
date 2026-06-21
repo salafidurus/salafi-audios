@@ -37,7 +37,7 @@ describe("AudioUploader", () => {
 
     global.Audio = vi.fn().mockImplementation(function () {
       return mockAudio;
-    }) as any;
+    }) as unknown as typeof Audio;
   });
 
   it("renders the dropzone area", () => {
