@@ -1,18 +1,19 @@
+import { vi, type Mock } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { AdminDashboardScreen } from "./admin-dashboard.screen";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 
-jest.mock("@/features/admin/hooks/use-admin-permissions", () => ({
-  useAdminPermissions: jest.fn(),
+vi.mock("@/features/admin/hooks/use-admin-permissions", () => ({
+  useAdminPermissions: vi.fn(),
 }));
 
 describe("AdminDashboardScreen", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("renders loading state when fetching permissions", () => {
-    (useAdminPermissions as jest.Mock).mockReturnValue({
+    (useAdminPermissions as Mock).mockReturnValue({
       data: undefined,
       isFetching: true,
     });
@@ -22,7 +23,7 @@ describe("AdminDashboardScreen", () => {
   });
 
   it("renders sections based on user permissions", () => {
-    (useAdminPermissions as jest.Mock).mockReturnValue({
+    (useAdminPermissions as Mock).mockReturnValue({
       data: {
         permissions: ["manage:scholars", "manage:content", "manage:livestreams"],
       },

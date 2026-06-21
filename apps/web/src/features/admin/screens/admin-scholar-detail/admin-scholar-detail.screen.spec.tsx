@@ -1,11 +1,12 @@
+import { vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { AdminScholarDetailScreen } from "./admin-scholar-detail.screen";
 
-jest.mock("@sd/core-contracts", () => {
-  const actual = jest.requireActual("@sd/core-contracts");
+vi.mock("@sd/core-contracts", async (importOriginal) => {
+  const actual = await importOriginal<any>();
   return {
     ...actual,
-    useApiQuery: jest.fn((key) => {
+    useApiQuery: vi.fn((key) => {
       if (key[0] === "scholars" && key[1] === "list") {
         return {
           data: {
@@ -51,7 +52,7 @@ jest.mock("@sd/core-contracts", () => {
       }
       return { data: undefined, isFetching: false };
     }),
-    httpClient: jest.fn(() => Promise.resolve({ success: true })),
+    httpClient: vi.fn(() => Promise.resolve({ success: true })),
     queryKeys: {
       scholars: {
         list: () => ["scholars", "list"],
@@ -70,7 +71,7 @@ jest.mock("@sd/core-contracts", () => {
 
 describe("AdminScholarDetailScreen", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("renders scholar details, series, and collections lists", async () => {

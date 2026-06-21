@@ -1,50 +1,51 @@
+import { vi, type Mock } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { AudioUploader } from "./AudioUploader";
 import { getPresignedUrl, uploadToR2 } from "../../api/admin-lectures.api";
 
-jest.mock("../../api/admin-lectures.api", () => ({
-  getPresignedUrl: jest.fn(),
-  uploadToR2: jest.fn(),
+vi.mock("../../api/admin-lectures.api", () => ({
+  getPresignedUrl: vi.fn(),
+  uploadToR2: vi.fn(),
 }));
 
 describe("AudioUploader", () => {
   let mockAudio: {
     src: string;
     duration: number;
-    addEventListener: jest.Mock;
-    removeEventListener: jest.Mock;
+    addEventListener: Mock;
+    removeEventListener: Mock;
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Mock URL.createObjectURL
-    global.URL.createObjectURL = jest.fn(() => "mock-audio-url");
-    global.URL.revokeObjectURL = jest.fn();
+    global.URL.createObjectURL = vi.fn(() => "mock-audio-url");
+    global.URL.revokeObjectURL = vi.fn();
 
     // Mock HTML5 Audio for metadata extraction
     mockAudio = {
       src: "",
       duration: 180,
-      addEventListener: jest.fn((event: string, callback: () => void) => {
+      addEventListener: vi.fn((event: string, callback: () => void) => {
         if (event === "loadedmetadata") {
           setTimeout(callback, 0);
         }
       }),
-      removeEventListener: jest.fn(),
+      removeEventListener: vi.fn(),
     };
 
-    global.Audio = jest.fn(() => mockAudio) as unknown as typeof Audio;
+    global.Audio = vi.fn(() => mockAudio) as unknown as typeof Audio;
   });
 
   it("renders the dropzone area", () => {
-    render(<AudioUploader onUploadComplete={jest.fn()} />);
+    render(<AudioUploader onUploadComplete={vi.fn()} />);
     expect(screen.getByText(/drag & drop an audio file/i)).toBeInTheDocument();
     expect(screen.getByText(/or click to browse/i)).toBeInTheDocument();
   });
 
   it("handles file selection, extracts metadata, and performs upload", async () => {
-    const onUploadCompleteMock = jest.fn();
+    const onUploadCompleteMock = vi.fn();
 
     let resolvePresigned!: () => void;
     const presignedPromise = new Promise((resolve) => {
@@ -56,8 +57,8 @@ describe("AudioUploader", () => {
         });
     });
 
-    (getPresignedUrl as jest.Mock).mockReturnValue(presignedPromise);
-    (uploadToR2 as jest.Mock).mockResolvedValue(undefined);
+    (getPresignedUrl as Mock).mockReturnValue(presignedPromise);
+    (uploadToR2 as Mock).mockResolvedValue(undefined);
 
     render(<AudioUploader onUploadComplete={onUploadCompleteMock} />);
 

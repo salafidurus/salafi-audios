@@ -1,17 +1,18 @@
+import { vi, type Mock } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { LectureEditModal } from "./LectureEditModal";
 import { createLecture, updateLecture } from "../../api/admin-lectures.api";
 
-jest.mock("../../api/admin-lectures.api", () => ({
-  createLecture: jest.fn(),
-  updateLecture: jest.fn(),
+vi.mock("../../api/admin-lectures.api", () => ({
+  createLecture: vi.fn(),
+  updateLecture: vi.fn(),
 }));
 
-jest.mock("@sd/core-contracts", () => {
-  const actual = jest.requireActual("@sd/core-contracts");
+vi.mock("@sd/core-contracts", async (importOriginal) => {
+  const actual = await importOriginal<any>();
   return {
     ...actual,
-    useApiQuery: jest.fn((key) => {
+    useApiQuery: vi.fn((key) => {
       // Mock queries return empty/mocked lists
       if (key[0] === "scholars") {
         return {
@@ -59,18 +60,18 @@ jest.mock("@sd/core-contracts", () => {
 
 describe("LectureEditModal", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("does not render when isOpen is false", () => {
-    render(<LectureEditModal isOpen={false} onClose={jest.fn()} onSuccess={jest.fn()} />);
+    render(<LectureEditModal isOpen={false} onClose={vi.fn()} onSuccess={vi.fn()} />);
     expect(screen.queryByText(/lecture details/i)).not.toBeInTheDocument();
   });
 
   it("renders with create form fields and triggers save", async () => {
-    const onSuccessMock = jest.fn();
-    const onCloseMock = jest.fn();
-    (createLecture as jest.Mock).mockResolvedValue({ id: "new-lecture-id" });
+    const onSuccessMock = vi.fn();
+    const onCloseMock = vi.fn();
+    (createLecture as Mock).mockResolvedValue({ id: "new-lecture-id" });
 
     render(
       <LectureEditModal
@@ -120,9 +121,9 @@ describe("LectureEditModal", () => {
   });
 
   it("renders with edit form fields prefilled and updates details", async () => {
-    const onSuccessMock = jest.fn();
-    const onCloseMock = jest.fn();
-    (updateLecture as jest.Mock).mockResolvedValue({ id: "edit-lecture-id" });
+    const onSuccessMock = vi.fn();
+    const onCloseMock = vi.fn();
+    (updateLecture as Mock).mockResolvedValue({ id: "edit-lecture-id" });
 
     const existingLecture = {
       id: "lecture-123",

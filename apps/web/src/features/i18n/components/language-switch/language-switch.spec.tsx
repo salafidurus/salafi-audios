@@ -1,37 +1,38 @@
+import { vi, type Mock } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { LanguageSwitch } from "./language-switch";
 import { setLocaleCookie } from "@/core/i18n/locale-cookie";
 
-const mockChangeLanguage = jest.fn().mockResolvedValue(undefined);
-const mockRefresh = jest.fn();
-const mockInvalidate = jest.fn().mockResolvedValue(undefined);
+const mockChangeLanguage = vi.fn().mockResolvedValue(undefined);
+const mockRefresh = vi.fn();
+const mockInvalidate = vi.fn().mockResolvedValue(undefined);
 
-jest.mock("@sd/core-i18n", () => ({
+vi.mock("@sd/core-i18n", () => ({
   SUPPORTED_LOCALES: ["en", "ar"],
 }));
 
-jest.mock("@/core/i18n/use-translation", () => ({
+vi.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({
     i18n: { language: "en", changeLanguage: mockChangeLanguage },
     t: (_key: string, fallback?: string) => fallback ?? _key,
   }),
 }));
 
-jest.mock("next/navigation", () => ({
+vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: mockRefresh }),
 }));
 
-jest.mock("@tanstack/react-query", () => ({
+vi.mock("@tanstack/react-query", () => ({
   useQueryClient: () => ({ invalidateQueries: mockInvalidate }),
 }));
 
-jest.mock("../../../../core/i18n/locale-cookie", () => ({
-  setLocaleCookie: jest.fn(),
+vi.mock("../../../../core/i18n/locale-cookie", () => ({
+  setLocaleCookie: vi.fn(),
 }));
 
 describe("LanguageSwitch", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it("shows the active locale and opens a menu of locales on click", () => {

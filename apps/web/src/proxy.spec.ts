@@ -1,16 +1,17 @@
+import { vi, type Mock } from "vitest";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { proxy } from "./proxy";
 
-jest.mock("next/server", () => ({
+vi.mock("next/server", () => ({
   NextResponse: {
-    redirect: jest.fn(),
-    next: jest.fn(),
+    redirect: vi.fn(),
+    next: vi.fn(),
   },
 }));
 
-const mockRedirect = NextResponse.redirect as jest.Mock;
-const mockNext = NextResponse.next as jest.Mock;
+const mockRedirect = NextResponse.redirect as Mock;
+const mockNext = NextResponse.next as Mock;
 
 function makeRequest(pathname: string, cookieValue?: string): NextRequest {
   return {
@@ -25,7 +26,7 @@ function makeRequest(pathname: string, cookieValue?: string): NextRequest {
 
 describe("proxy", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockRedirect.mockReturnValue({ type: "redirect" });
     mockNext.mockReturnValue({ type: "next" });
   });
