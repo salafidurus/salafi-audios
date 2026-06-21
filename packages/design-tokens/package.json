@@ -20,7 +20,7 @@
     "dev": "pnpm build --watch",
     "lint": "oxlint . && eslint .",
     "test": "vitest run",
-    "test:prepush": "vitest run --changedSince=origin/main",
+    "test:prepush": "vitest run --changed=origin/main",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
     "typecheck": "tsc -p tsconfig.json --noEmit"

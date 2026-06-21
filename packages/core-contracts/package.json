@@ -50,7 +50,7 @@
     "dev": "tsup --watch",
     "lint": "oxlint . && eslint .",
     "test": "vitest run",
-    "test:prepush": "vitest run --changedSince=origin/main",
+    "test:prepush": "vitest run --changed=origin/main",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage"

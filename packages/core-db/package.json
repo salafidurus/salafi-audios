@@ -26,7 +26,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
-    "test:prepush": "vitest run --changedSince=origin/main",
+    "test:prepush": "vitest run --changed=origin/main",
     "pretypecheck": "pnpm prisma:generate",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "prisma:generate": "prisma generate --schema=./prisma/schema.prisma --config=./prisma.config.ts && node ./scripts/copy-generated-to-dist.js",

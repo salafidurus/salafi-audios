@@ -18,7 +18,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
-    "test:prepush": "vitest run --changedSince=origin/main",
+    "test:prepush": "vitest run --changed=origin/main",
     "test:e2e": "vitest run --config vitest.config.e2e.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "openapi:json": "pnpm build && node dist/openapi.js",
