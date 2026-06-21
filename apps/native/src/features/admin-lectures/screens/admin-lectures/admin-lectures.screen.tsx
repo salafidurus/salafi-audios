@@ -82,8 +82,7 @@ export function AdminLecturesScreen() {
         onLongPress={toggleSelect}
       />
     ),
-    // react-doctor-disable-next-line react-doctor/exhaustive-deps
-    [selectedIds], // eslint-disable-line react-hooks/exhaustive-deps
+    [selectedIds],
   );
 
   return (

@@ -76,7 +76,7 @@ export async function httpClient<T>(options: {
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(cookie ? { Cookie: cookie } : {}),
         ...(locale ? { "Accept-Language": locale } : {}),
-        ...(options.headers ?? {}),
+        ...options.headers,
       },
       body: payload ? JSON.stringify(payload) : undefined,
       signal: options.signal,
