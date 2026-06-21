@@ -23,6 +23,7 @@ export function LiveSessionCard({ session }: LiveSessionCardProps) {
               LIVE
             </span>
           )}
+          {session.status === "ended" && <span className={styles.endedBadge}>Ended</span>}
           <span className={styles.title}>{session.title ?? session.channelDisplayName}</span>
         </div>
         <div className={styles.meta}>
@@ -32,7 +33,7 @@ export function LiveSessionCard({ session }: LiveSessionCardProps) {
         </div>
         {session.status === "scheduled" && session.scheduledAt && (
           <div className={styles.scheduledTime}>
-            Scheduled: {new Date(session.scheduledAt).toLocaleString()}
+            📅 Scheduled: {new Date(session.scheduledAt).toLocaleString()}
           </div>
         )}
         {session.status === "ended" && session.endedAt && (
@@ -53,6 +54,7 @@ export function LiveSessionCard({ session }: LiveSessionCardProps) {
             LIVE
           </span>
         )}
+        {session.status === "ended" && <span className={styles.endedBadge}>Ended</span>}
         <span className={styles.title}>{session.title ?? session.channelDisplayName}</span>
       </div>
 
@@ -64,7 +66,7 @@ export function LiveSessionCard({ session }: LiveSessionCardProps) {
 
       {session.status === "scheduled" && session.scheduledAt && (
         <div className={styles.scheduledTime}>
-          Scheduled: {new Date(session.scheduledAt).toLocaleString()}
+          📅 Scheduled: {new Date(session.scheduledAt).toLocaleString()}
         </div>
       )}
 
