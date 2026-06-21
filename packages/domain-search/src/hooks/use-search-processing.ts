@@ -6,9 +6,14 @@ export type SearchFilterValue = string[];
 
 export type UseSearchProcessingOptions = {
   prefill?: string;
+  /** Show original-language titles instead of the selected-language ones. */
+  showOriginal?: boolean;
 };
 
-export function useSearchProcessing({ prefill }: UseSearchProcessingOptions = {}) {
+export function useSearchProcessing({
+  prefill,
+  showOriginal = false,
+}: UseSearchProcessingOptions = {}) {
   const [query, setQuery] = useState(prefill || "");
   const [debouncedQuery, setDebouncedQuery] = useState(prefill || "");
   const [filter, setFilter] = useState<SearchFilterValue>([]);
@@ -34,7 +39,10 @@ export function useSearchProcessing({ prefill }: UseSearchProcessingOptions = {}
 
   const { data: topics = [] } = useTopicsList();
 
-  const items = useMemo<SearchResultRow[]>(() => buildSearchResultRows(data), [data]);
+  const items = useMemo<SearchResultRow[]>(
+    () => buildSearchResultRows(data, showOriginal),
+    [data, showOriginal],
+  );
 
   const errorMessage = useMemo(() => {
     if (!error) {

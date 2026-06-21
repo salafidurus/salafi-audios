@@ -2,6 +2,8 @@ import { type Href, usePathname, useRouter } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { EaseView } from "react-native-ease";
 import { StyleSheet } from "react-native-unistyles";
+import { useTranslation } from "react-i18next";
+import { getSubnavLabel } from "@sd/core-i18n";
 import { SECTION_TABS, type Section } from "@/features/navigation/types";
 import {
   buildSectionPath,
@@ -14,6 +16,7 @@ import { SUBSECTION_BAR_HEIGHT, TAB_BAR_HEIGHT } from "../CustomTabBar/CustomTab
 export function SubsectionBarHost() {
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useTranslation();
   const activeRootTab = getRootTabFromPathname(pathname);
 
   if (activeRootTab === "search") {
@@ -52,7 +55,9 @@ export function SubsectionBarHost() {
                       color={isActive ? styles.labelActive.color : styles.label.color}
                     />
                   ) : null}
-                  <Text style={[styles.label, isActive && styles.labelActive]}>{tab.label}</Text>
+                  <Text style={[styles.label, isActive && styles.labelActive]}>
+                    {getSubnavLabel(section, tab.id, t)}
+                  </Text>
                 </View>
               </EaseView>
             </Pressable>

@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslation } from "@/core/i18n/use-translation";
+
 export type SearchResultEmptyDesktopProps = {
   shouldSearch: boolean;
   isFetching: boolean;
@@ -18,13 +20,14 @@ export function SearchResultEmptyDesktop({
   isFetching,
   errorMessage,
 }: SearchResultEmptyDesktopProps) {
+  const { t } = useTranslation();
   const message = shouldSearch
     ? errorMessage
       ? errorMessage
       : isFetching
-        ? "Searching…"
-        : "No results found."
-    : "Start typing to search.";
+        ? t("search.searching", "Searching…")
+        : t("search.noResults", "No results found.")
+    : t("search.startTyping", "Start typing to search.");
 
   return (
     <div className="mt-[var(--space-scale-4xl)] flex items-center justify-center rounded-[var(--radius-component-card)] border border-[var(--border-subtle)] bg-[var(--surface-subtle)] px-[var(--space-component-card-padding)] py-[var(--space-scale-3xl)] text-center text-[var(--content-muted)]">

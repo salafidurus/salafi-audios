@@ -1,3 +1,4 @@
+import { vi, type Mocked } from 'vitest';
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Status } from '@sd/core-db';
@@ -12,7 +13,7 @@ import type { CreateLectureDto } from './dto/create-lecture.dto';
 
 describe('LecturesService', () => {
   let service: LecturesService;
-  let repo: jest.Mocked<LecturesRepository>;
+  let repo: Mocked<LecturesRepository>;
 
   const lectureDetail: LectureDetailDto = {
     id: 'lecture-1',
@@ -57,25 +58,25 @@ describe('LecturesService', () => {
         {
           provide: LecturesRepository,
           useValue: {
-            findDetailById: jest.fn(),
-            findRelated: jest.fn(),
-            updateLecture: jest.fn(),
-            updateLectureStatus: jest.fn(),
-            listAdmin: jest.fn(),
-            findAdminDetail: jest.fn(),
-            createWithAudioAsset: jest.fn(),
-            bulkUpdateStatus: jest.fn(),
-          } satisfies Partial<jest.Mocked<LecturesRepository>>,
+            findDetailById: vi.fn(),
+            findRelated: vi.fn(),
+            updateLecture: vi.fn(),
+            updateLectureStatus: vi.fn(),
+            listAdmin: vi.fn(),
+            findAdminDetail: vi.fn(),
+            createWithAudioAsset: vi.fn(),
+            bulkUpdateStatus: vi.fn(),
+          } satisfies Partial<Mocked<LecturesRepository>>,
         },
       ],
     }).compile();
 
     service = module.get(LecturesService);
-    repo = module.get(LecturesRepository) as jest.Mocked<LecturesRepository>;
+    repo = module.get(LecturesRepository) as Mocked<LecturesRepository>;
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('getById', () => {

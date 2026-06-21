@@ -1,3 +1,4 @@
+import { vi, type Mocked } from 'vitest';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Test, TestingModule } from '@nestjs/testing';
 import type { FeedPageDto } from '@sd/core-contracts';
@@ -6,12 +7,12 @@ import { FeedService } from './feed.service';
 
 describe('FeedService', () => {
   let service: FeedService;
-  let repo: jest.Mocked<FeedRepo>;
+  let repo: Mocked<FeedRepo>;
 
   const mockFeedPage: FeedPageDto = {
     items: [
       {
-        kind: 'lecture',
+        kind: 'single',
         id: 'l1',
         slug: 'test-lecture',
         title: 'Test Lecture',
@@ -37,19 +38,19 @@ describe('FeedService', () => {
         {
           provide: FeedRepo,
           useValue: {
-            getFeed: jest.fn(),
-            getScholars: jest.fn(),
-          } satisfies Partial<jest.Mocked<FeedRepo>>,
+            getFeed: vi.fn(),
+            getScholars: vi.fn(),
+          } satisfies Partial<Mocked<FeedRepo>>,
         },
       ],
     }).compile();
 
     service = module.get(FeedService);
-    repo = module.get(FeedRepo) as jest.Mocked<FeedRepo>;
+    repo = module.get(FeedRepo) as Mocked<FeedRepo>;
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('getFeed', () => {

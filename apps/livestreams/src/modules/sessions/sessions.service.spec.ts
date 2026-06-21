@@ -1,3 +1,4 @@
+import { vi, type Mocked, type MockInstance } from "vitest";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Test, TestingModule } from "@nestjs/testing";
 import { SessionsService } from "./sessions.service";
@@ -9,11 +10,11 @@ const mockScheduledSession = { id: "s-2", status: "scheduled" as const, startedA
 
 describe("SessionsService", () => {
   let service: SessionsService;
-  let repo: jest.Mocked<SessionsRepository>;
-  let fetchMock: jest.SpyInstance;
+  let repo: Mocked<SessionsRepository>;
+  let fetchMock: MockInstance;
 
   beforeEach(async () => {
-    fetchMock = jest.spyOn(global, "fetch").mockImplementation(() =>
+    fetchMock = vi.spyOn(global, "fetch").mockImplementation(() =>
       Promise.resolve({
         ok: true,
         status: 200,
@@ -27,11 +28,11 @@ describe("SessionsService", () => {
         {
           provide: SessionsRepository,
           useValue: {
-            findLatestLiveSession: jest.fn(),
-            createSession: jest.fn(),
-            updateStatus: jest.fn(),
-            findByChannelAndStatus: jest.fn(),
-          } satisfies Partial<jest.Mocked<SessionsRepository>>,
+            findLatestLiveSession: vi.fn(),
+            createSession: vi.fn(),
+            updateStatus: vi.fn(),
+            findByChannelAndStatus: vi.fn(),
+          } satisfies Partial<Mocked<SessionsRepository>>,
         },
         {
           provide: LiveConfigService,
@@ -44,11 +45,11 @@ describe("SessionsService", () => {
     }).compile();
 
     service = module.get(SessionsService);
-    repo = module.get(SessionsRepository) as jest.Mocked<SessionsRepository>;
+    repo = module.get(SessionsRepository) as Mocked<SessionsRepository>;
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe("upsertFromTelegram", () => {

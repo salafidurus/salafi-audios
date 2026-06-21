@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { ForbiddenException, INestApplication } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
@@ -8,8 +9,8 @@ import { ScholarsController } from './scholars.controller';
 import { ScholarsTranslationsController } from './scholars-translations.controller';
 import { ScholarsService } from './scholars.service';
 
-const mockAuth = { api: { getSession: jest.fn() } };
-jest.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
+const mockAuth = { api: { getSession: vi.fn() } };
+vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const draftTranslation = {
   locale: 'ar',
@@ -22,16 +23,16 @@ const draftTranslation = {
 const publishedTranslation = { ...draftTranslation, status: 'published' };
 
 const mockScholarsService = {
-  list: jest.fn().mockResolvedValue({ scholars: [] }),
-  getBySlug: jest.fn(),
-  getContent: jest.fn(),
-  create: jest.fn(),
-  update: jest.fn(),
-  listTranslations: jest.fn().mockResolvedValue([]),
-  upsertTranslation: jest.fn().mockResolvedValue(draftTranslation),
-  updateTranslation: jest.fn().mockResolvedValue(draftTranslation),
-  publishTranslation: jest.fn().mockResolvedValue(publishedTranslation),
-  unpublishTranslation: jest.fn().mockResolvedValue(draftTranslation),
+  list: vi.fn().mockResolvedValue({ scholars: [] }),
+  getBySlug: vi.fn(),
+  getContent: vi.fn(),
+  create: vi.fn(),
+  update: vi.fn(),
+  listTranslations: vi.fn().mockResolvedValue([]),
+  upsertTranslation: vi.fn().mockResolvedValue(draftTranslation),
+  updateTranslation: vi.fn().mockResolvedValue(draftTranslation),
+  publishTranslation: vi.fn().mockResolvedValue(publishedTranslation),
+  unpublishTranslation: vi.fn().mockResolvedValue(draftTranslation),
 };
 
 async function buildApp(
@@ -60,7 +61,7 @@ describe('ScholarsTranslationsController — auth boundaries', () => {
 
   beforeEach(async () => {
     mockAuth.api.getSession.mockReset();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockScholarsService.upsertTranslation.mockResolvedValue(draftTranslation);
     mockScholarsService.publishTranslation.mockResolvedValue(
       publishedTranslation,

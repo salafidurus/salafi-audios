@@ -1,5 +1,5 @@
 import React from "react";
-import renderer, { act } from "react-test-renderer";
+import { render, screen } from "@testing-library/react-native";
 import { useAccountScreen } from "@sd/domain-account";
 import { AccountScreen } from "./account.screen";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
@@ -18,9 +18,16 @@ jest.mock("@/core/i18n/use-translation", () => ({
   }),
 }));
 
-jest.mock("../../i18n", () => ({
-  LanguageSwitch: () => "LanguageSwitch",
-}));
+jest.mock("@/features/i18n", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const React = require("react");
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { Text } = require("react-native");
+  return {
+    LanguageSwitch: () => React.createElement(Text, null, "LanguageSwitch"),
+    ContentLanguageToggle: () => React.createElement(Text, null, "ContentLanguageToggle"),
+  };
+});
 
 const mockedUseAccountScreen = jest.mocked(useAccountScreen);
 const mockedUseAdminPermissions = jest.mocked(useAdminPermissions);
@@ -40,23 +47,19 @@ describe("AccountScreen", () => {
     });
   });
 
-  it("renders a loading state while the account query is fetching", () => {
+  it("renders a loading state while the account query is fetching", async () => {
     mockedUseAccountScreen.mockReturnValue({
       profile: undefined,
       isFetching: true,
       error: null,
     });
 
-    let tree: ReturnType<typeof renderer.create>;
+    await render(<AccountScreen />);
 
-    act(() => {
-      tree = renderer.create(<AccountScreen />);
-    });
-
-    expect(JSON.stringify(tree!.toJSON())).toContain("Loading account…");
+    expect(screen.getByText("Loading account…")).toBeTruthy();
   });
 
-  it("renders profile details and language controls", () => {
+  it("renders profile details and language controls", async () => {
     mockedUseAccountScreen.mockReturnValue({
       profile: {
         id: "user-1",
@@ -71,25 +74,19 @@ describe("AccountScreen", () => {
       error: null,
     });
 
-    let tree: ReturnType<typeof renderer.create>;
+    await render(<AccountScreen />);
 
-    act(() => {
-      tree = renderer.create(<AccountScreen />);
-    });
+    expect(screen.getByText("Account")).toBeTruthy();
+    expect(screen.getByText("Test User")).toBeTruthy();
+    expect(screen.getByText("user@example.com")).toBeTruthy();
+    expect(screen.getByText("Edit Profile")).toBeTruthy();
+    expect(screen.getByText("Legal")).toBeTruthy();
+    expect(screen.getByText("Sign Out")).toBeTruthy();
+    expect(screen.getByText("Language")).toBeTruthy();
+    expect(screen.getByText("LanguageSwitch")).toBeTruthy();
+  }, 15000);
 
-    const rendered = JSON.stringify(tree!.toJSON());
-
-    expect(rendered).toContain("Account");
-    expect(rendered).toContain("Test User");
-    expect(rendered).toContain("user@example.com");
-    expect(rendered).toContain("Edit Profile");
-    expect(rendered).toContain("Legal");
-    expect(rendered).toContain("Sign Out");
-    expect(rendered).toContain("Language");
-    expect(rendered).toContain("LanguageSwitch");
-  });
-
-  it("renders Admin card when user has admin permissions", () => {
+  it("renders Admin card when user has admin permissions", async () => {
     mockedUseAccountScreen.mockReturnValue({
       profile: {
         id: "user-1",
@@ -118,14 +115,8 @@ describe("AccountScreen", () => {
       isLoading: false,
     });
 
-    let tree: ReturnType<typeof renderer.create>;
+    await render(<AccountScreen />);
 
-    act(() => {
-      tree = renderer.create(<AccountScreen />);
-    });
-
-    const rendered = JSON.stringify(tree!.toJSON());
-
-    expect(rendered).toContain("Admin");
+    expect(screen.getByText("Admin")).toBeTruthy();
   });
 });

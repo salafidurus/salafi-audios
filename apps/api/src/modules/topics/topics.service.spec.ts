@@ -1,3 +1,4 @@
+import { vi, type Mocked } from 'vitest';
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TopicDetailDto } from '@sd/core-contracts';
@@ -7,7 +8,7 @@ import { TopicsService } from './topics.service';
 
 describe('TopicsService', () => {
   let service: TopicsService;
-  let repo: jest.Mocked<TopicsRepository>;
+  let repo: Mocked<TopicsRepository>;
 
   const sample: TopicDetailDto = {
     id: 't1',
@@ -23,16 +24,16 @@ describe('TopicsService', () => {
         {
           provide: TopicsRepository,
           useValue: {
-            list: jest.fn(),
-            findBySlug: jest.fn(),
-            upsertBySlug: jest.fn(),
-          } satisfies Partial<jest.Mocked<TopicsRepository>>,
+            list: vi.fn(),
+            findBySlug: vi.fn(),
+            upsertBySlug: vi.fn(),
+          } satisfies Partial<Mocked<TopicsRepository>>,
         },
       ],
     }).compile();
 
     service = module.get(TopicsService);
-    repo = module.get(TopicsRepository) as jest.Mocked<TopicsRepository>;
+    repo = module.get(TopicsRepository) as Mocked<TopicsRepository>;
   });
 
   it('getBySlug throws NotFoundException if missing', async () => {

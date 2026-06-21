@@ -1,23 +1,21 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-
-const PROTECTED_PATHS = ["/feed/following", "/account", "/settings", "/admin"];
-const AUTH_PATHS = ["/sign-in", "/sign-up"];
+import { resolveRouteAccess } from "@sd/core-contracts";
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const sessionCookie = request.cookies.get("better-auth.session_token");
   const isAuthenticated = !!sessionCookie?.value;
 
-  const isProtected = PROTECTED_PATHS.some((p) => pathname.startsWith(p));
-  if (isProtected && !isAuthenticated) {
+  const access = resolveRouteAccess(pathname);
+
+  if (access === "auth-required" && !isAuthenticated) {
     const url = new URL("/sign-in", request.url);
     url.searchParams.set("from", pathname);
     return NextResponse.redirect(url);
   }
 
-  const isAuthPage = AUTH_PATHS.some((p) => pathname.startsWith(p));
-  if (isAuthPage && isAuthenticated) {
+  if (pathname.startsWith("/sign-in") && isAuthenticated) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 

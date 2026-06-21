@@ -1,3 +1,4 @@
+import { vi, type Mocked } from 'vitest';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Test, TestingModule } from '@nestjs/testing';
 import { LiveController } from './live.controller';
@@ -8,7 +9,7 @@ import { of } from 'rxjs';
 
 describe('LiveController', () => {
   let controller: LiveController;
-  let service: jest.Mocked<LiveService>;
+  let service: Mocked<LiveService>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -18,13 +19,13 @@ describe('LiveController', () => {
           provide: LiveService,
           useValue: {
             updates$: of(),
-            emitSessionUpdate: jest.fn(),
-            getSessionPublic: jest.fn(),
-            getChannels: jest.fn(),
-            getChannelBySlug: jest.fn(),
-            getActive: jest.fn(),
-            getUpcoming: jest.fn(),
-            getEnded: jest.fn(),
+            emitSessionUpdate: vi.fn(),
+            getSessionPublic: vi.fn(),
+            getChannels: vi.fn(),
+            getChannelBySlug: vi.fn(),
+            getActive: vi.fn(),
+            getUpcoming: vi.fn(),
+            getEnded: vi.fn(),
           },
         },
         {

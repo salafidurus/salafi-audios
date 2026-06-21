@@ -16,13 +16,13 @@ describe("buildSearchResultRows", () => {
     expect(buildSearchResultRows(undefined)).toEqual([]);
   });
   it("returns empty array when all categories are empty", () => {
-    expect(buildSearchResultRows({ collections: [], series: [], lectures: [] })).toEqual([]);
+    expect(buildSearchResultRows({ collections: [], series: [], singles: [] })).toEqual([]);
   });
   it("prefixes collection IDs", () => {
     const data: SearchCatalogResultsDto = {
       collections: [makeItem({ id: "c1" })],
       series: [],
-      lectures: [],
+      singles: [],
     };
     expect(buildSearchResultRows(data)[0]!.id).toBe("collection:c1");
   });
@@ -30,35 +30,35 @@ describe("buildSearchResultRows", () => {
     const data: SearchCatalogResultsDto = {
       collections: [],
       series: [makeItem({ id: "s1" })],
-      lectures: [],
+      singles: [],
     };
     expect(buildSearchResultRows(data)[0]!.id).toBe("series:s1");
   });
-  it("prefixes lecture IDs", () => {
+  it("prefixes single IDs", () => {
     const data: SearchCatalogResultsDto = {
       collections: [],
       series: [],
-      lectures: [makeItem({ id: "l1" })],
+      singles: [makeItem({ id: "l1" })],
     };
-    expect(buildSearchResultRows(data)[0]!.id).toBe("lecture:l1");
+    expect(buildSearchResultRows(data)[0]!.id).toBe("single:l1");
   });
-  it("orders collections then series then lectures", () => {
+  it("orders collections then series then singles", () => {
     const data: SearchCatalogResultsDto = {
       collections: [makeItem({ id: "c1" })],
       series: [makeItem({ id: "s1" })],
-      lectures: [makeItem({ id: "l1" })],
+      singles: [makeItem({ id: "l1" })],
     };
     expect(buildSearchResultRows(data).map((r) => r.id)).toEqual([
       "collection:c1",
       "series:s1",
-      "lecture:l1",
+      "single:l1",
     ]);
   });
   it("uses coverImageUrl when available", () => {
     const data: SearchCatalogResultsDto = {
       collections: [makeItem({ coverImageUrl: "cover.jpg", scholarImageUrl: "scholar.jpg" })],
       series: [],
-      lectures: [],
+      singles: [],
     };
     expect(buildSearchResultRows(data)[0]!.imageUrl).toBe("cover.jpg");
   });
@@ -66,7 +66,7 @@ describe("buildSearchResultRows", () => {
     const data: SearchCatalogResultsDto = {
       collections: [makeItem({ coverImageUrl: undefined, scholarImageUrl: "scholar.jpg" })],
       series: [],
-      lectures: [],
+      singles: [],
     };
     expect(buildSearchResultRows(data)[0]!.imageUrl).toBe("scholar.jpg");
   });

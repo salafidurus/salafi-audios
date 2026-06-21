@@ -5,6 +5,7 @@ import { EaseView } from "react-native-ease";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { getRootTabByRouteName } from "@/features/navigation/utils/tab-route-config";
+import { useTranslation } from "@/core/i18n/use-translation";
 
 export const TAB_BAR_HEIGHT = 84;
 export const SUBSECTION_BAR_HEIGHT = 56;
@@ -14,6 +15,7 @@ type CustomTabBarProps = Parameters<NonNullable<ComponentProps<typeof Tabs>["tab
 export function CustomTabBar({ state, descriptors, navigation }: CustomTabBarProps) {
   const insets = useSafeAreaInsets();
   const { theme } = useUnistyles();
+  const { t } = useTranslation();
 
   return (
     <View pointerEvents="box-none" style={styles.wrapper}>
@@ -40,7 +42,7 @@ export function CustomTabBar({ state, descriptors, navigation }: CustomTabBarPro
                 ? options.tabBarLabel
                 : typeof options?.title === "string"
                   ? options.title
-                  : config.label;
+                  : t(config.labelKey, config.label);
 
             const Icon = config.Icon;
 

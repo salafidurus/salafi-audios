@@ -3,7 +3,7 @@
   align-items: center;
   gap: 12px;
   padding: 8px;
-  background-color: var(--surface-subtle, #f8f9fa);
+  background-color: var(--surface-subtle);
   border-radius: 8px;
   text-decoration: none;
   transition: opacity 0.2s;
@@ -29,7 +29,7 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  color: #dc2626;
+  color: var(--state-danger);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -39,7 +39,7 @@
   width: 8px;
   height: 8px;
   border-radius: 4px;
-  background-color: #dc2626;
+  background-color: var(--state-danger);
   animation: pulse 2s infinite;
 }
 
@@ -55,7 +55,7 @@
 
 .title {
   font-weight: 500;
-  color: var(--content-default, #000);
+  color: var(--content-default);
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;

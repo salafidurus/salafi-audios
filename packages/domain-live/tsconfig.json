@@ -1,7 +1,7 @@
 {
   // Consumed as source by Expo and Next.js bundlers — never run directly by Node.
   // Extends canonical packages preset (ESNext + Bundler moduleResolution).
-  "extends": "../../packages/util-config/tsconfig/packages.json",
+  "extends": "../../tsconfig.packages.json",
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",

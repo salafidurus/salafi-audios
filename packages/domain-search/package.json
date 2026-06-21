@@ -9,21 +9,17 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "jest --passWithNoTests",
-    "test:watch": "jest --watch --passWithNoTests",
-    "test:cov": "jest --coverage --passWithNoTests",
-    "test:prepush": "jest --changedSince=origin/main --passWithNoTests"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:cov": "vitest run --coverage",
+    "test:prepush": "vitest run --changed=origin/main"
   },
   "dependencies": {
-    "@sd/core-contracts": "workspace:*"
+    "@sd/core-contracts": "workspace:*",
+    "@sd/core-i18n": "workspace:*"
   },
   "peerDependencies": {
     "react": "^19.0.0"
   },
-  "devDependencies": {
-    "@types/jest": "catalog:",
-    "jest": "catalog:",
-    "jest-environment-jsdom": "^30.4.1",
-    "ts-jest": "catalog:"
-  }
+  "devDependencies": {}
 }

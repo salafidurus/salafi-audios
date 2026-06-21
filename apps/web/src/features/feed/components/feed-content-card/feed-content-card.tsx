@@ -2,6 +2,8 @@
 
 import type React from "react";
 import type { FeedContentItemDto } from "@sd/core-contracts";
+import { pickContentField } from "@sd/core-i18n";
+import { useShowOriginalContent } from "@/features/i18n/content-preference";
 
 export type FeedContentCardProps = {
   item: FeedContentItemDto;
@@ -20,12 +22,15 @@ const feedContentCardButtonStyle: React.CSSProperties = {
 };
 
 export function FeedContentCard({ item, onPress }: FeedContentCardProps) {
+  const showOriginal = useShowOriginalContent();
+  const title = pickContentField(item.title, item.original?.title, showOriginal);
+
   return (
     <button type="button" onClick={onPress} style={feedContentCardButtonStyle}>
-      <div style={{ fontSize: 16, fontWeight: 600 }}>{item.title}</div>
+      <div style={{ fontSize: 16, fontWeight: 600 }}>{title}</div>
       <div style={{ fontSize: 13, color: "var(--content-muted)", marginTop: 4 }}>
         {item.scholarName}
-        {item.kind !== "lecture" && ` · ${item.kind}`}
+        {item.kind !== "single" && ` · ${item.kind}`}
       </div>
       <div style={{ fontSize: 12, color: "var(--content-subtle)", marginTop: 4 }}>
         {item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : ""}

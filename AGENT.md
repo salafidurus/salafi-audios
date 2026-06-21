@@ -48,6 +48,26 @@ Before editing agent instructions or skills:
 - Read in order: `docs/README.md` -> this file -> target workspace `AGENT.md` -> `.github/copilot-instructions.md`.
 - If code and docs conflict, reconcile intentionally (do not silently drift).
 
+## Content nomenclature
+
+Canonical vocabulary for the content hierarchy (full detail: `docs/nomenclature.md`).
+Content is described by two axes — **Format** (the DB primitive) and **Placement**
+(top-level vs nested). Each cell has one name; do not overload "lecture"/"series":
+
+| DB primitive | Condition              | Name           | Top-level? |
+| :----------- | :--------------------- | :------------- | :--------- |
+| `Collection` | always root            | **Collection** | yes        |
+| `Series`     | `collectionId == null` | **Series**     | yes        |
+| `Series`     | `collectionId != null` | **Module**     | no         |
+| `Lecture`    | `seriesId == null`     | **Single**     | yes        |
+| `Lecture`    | `seriesId != null`     | **Lesson**     | no         |
+
+A **Listing** is any top-level unit (Collection / Series / Single);
+`ListingFormat = "collection" | "series" | "single"`. Module and Lesson are never
+Listings. Users browse Listings in the **Catalog** ("Library" is the separate
+saved/in-progress surface). DB columns, the `title` field, and route paths keep
+the primitive names.
+
 ## Image-to-code workflow
 
 - For design image requests, use root skill `google-stitch` with a Stitch-first flow.
@@ -77,6 +97,12 @@ Before editing agent instructions or skills:
   - no circular dependencies
 - Misconfiguration must fail fast.
 - Non-authoritative analytics failures must never break core workflows.
+- `better-auth` and `@better-auth/expo` are pinned to the **exact same version** in the
+  pnpm-workspace catalog (no caret). They each pin `@better-fetch/fetch` exactly (e.g.
+  `better-auth@1.6.18` → `1.3.0`, `1.6.19` → `1.3.1`); any version skew installs two
+  `@better-fetch/fetch` copies whose `BetterFetch` types differ and breaks the native auth
+  client plugin typecheck. Always bump the two together. Note Dependabot ignores
+  `better-auth`/`@better-auth/expo` for this reason — bump them manually, in lockstep.
 
 ## Repo layout
 
@@ -125,15 +151,21 @@ Web (`apps/web`):
 - `packages/domain-playback` - Playback engine and player state
 - `packages/domain-progress` - Progress tracking state
 - `packages/domain-search` - Search and quick-browse hooks
-- `packages/util-config` - Shared lint/build config
 - `packages/util-ingest` - Content ingestion
+
+Shared lint/TS config lives at the repo root (`tsconfig.base.json`, `tsconfig.packages.json`,
+`tsconfig.nest.json`, `eslint.config.base.mjs`, `eslint.config.packages.mjs`,
+`eslint.config.nest.mjs`). Apps extend/compose these; `next`/`expo` specifics are inlined
+into `apps/web` and `apps/native`.
 
 ## Commands (root)
 
 - Install: `pnpm i`
-- Dev: `pnpm dev`
-- Dev one app: `pnpm dev:api`, `pnpm dev:web`, `pnpm dev:native`
-- Native build: `pnpm dev:native:build` (no clean), `pnpm dev:native:clean-build` (prebuild --clean first); `:android`/`:ios` variants exist
+- Dev (all apps): `pnpm dev`
+- Dev backend: `pnpm dev:be` (runs both `api` and `livestreams`), or single service: `pnpm dev:api`, `pnpm dev:livestreams`
+- Dev frontend: `pnpm dev:web`, `pnpm dev:native`
+- Dev combinations: `pnpm dev:be+web`, `pnpm dev:be+native`
+- Native build: `pnpm dev:native:build:android` (no clean), `pnpm dev:native:clean-build:android` (prebuild --clean first); `:ios` variants exist
 - Build: `pnpm build`
 - Lint: `pnpm lint`
 - Typecheck: `pnpm typecheck`
@@ -159,17 +191,13 @@ Web (`apps/web`):
 - Shared UI: `pnpm --filter @sd/shared <script>`
 - Core packages: `pnpm --filter @sd/core-* <script>`
 - Domain packages: `pnpm --filter @sd/domain-* <script>`
-- Config: `pnpm --filter util-config <script>`
 - Ingest: `pnpm --filter util-ingest <script>`
 
 Turbo grouped scripts:
 
-- `pnpm lint:api+web`, `pnpm lint:api+mobile`
-- `pnpm lint:api+native`
-- `pnpm typecheck:api+web`, `pnpm typecheck:api+mobile`
-- `pnpm typecheck:api+native`
-- `pnpm test:api+web`, `pnpm test:api+mobile`
-- `pnpm test:api+native`
+- `pnpm lint:be+web`, `pnpm lint:be+native`
+- `pnpm typecheck:be+web`, `pnpm typecheck:be+native`
+- `pnpm test:be+web`, `pnpm test:be+native`
 
 ## Single-test quick reference
 
@@ -301,7 +329,8 @@ everything is already covered.
 
 - Prettier is mandatory; root `.prettierrc` is authoritative.
 - API has a local Prettier override (`apps/api/.prettierrc`: single quotes).
-- ESLint flat configs come from `@sd/util-config/eslint/*`.
+- ESLint flat configs come from the root `eslint.config.{base,packages,nest}.mjs` presets
+  (apps/web and apps/native inline their next/expo specifics).
 - `no-console` is an error unless explicitly allowed.
 - TypeScript strict mode is required (`strict: true`, `noEmit: true`).
 - Prefer explicit return types for exported services/repos.
@@ -396,6 +425,11 @@ same commit.
 - Do not commit secrets or env values.
 - Do not hand-edit generated API client output.
 - Update docs when architecture intent or guarantees change.
+
+## Agent worktree policy
+
+- All AI agents must work inside a git worktree.
+- Agents must either create a new worktree in the `.worktrees` (or `.worktree`) folder, or ask the user if they should use one of the available worktrees or create a new one.
 
 ## MCP usage policy
 

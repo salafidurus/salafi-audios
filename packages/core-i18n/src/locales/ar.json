@@ -21,18 +21,6 @@
       "noAccountSplit": "ليس لديك حساب؟",
       "noAccountLink": "أنشئ حسابًا",
       "failed": "فشل تسجيل الدخول"
-    },
-    "signUp": {
-      "kicker": "ابدأ الاستماع",
-      "title": "إنشاء حساب",
-      "orEmail": "أو أنشئ حسابًا عبر البريد الإلكتروني",
-      "submit": "إنشاء حساب",
-      "submitting": "جارٍ إنشاء الحساب...",
-      "alreadyAccount": "لديك حساب بالفعل؟ سجّل الدخول",
-      "alreadyAccountSplit": "لديك حساب بالفعل؟",
-      "alreadyAccountLink": "سجّل الدخول",
-      "iAgreeTo": "أوافق على",
-      "failed": "فشل إنشاء الحساب"
     }
   },
   "validation": {
@@ -44,7 +32,8 @@
     "editProfile": "تعديل الملف الشخصي",
     "legal": "الشؤون القانونية",
     "signOut": "تسجيل الخروج",
-    "language": "اللغة"
+    "language": "اللغة",
+    "showOriginalContent": "عرض المحتوى بلغته الأصلية"
   },
   "tabs": {
     "search": "بحث",
@@ -64,7 +53,13 @@
     "expandSidebar": "توسيع الشريط الجانبي",
     "collapseSidebar": "طيّ الشريط الجانبي",
     "siteFooter": "تذييل الموقع",
-    "languageSwitch": "تغيير اللغة"
+    "languageSwitch": "تغيير اللغة",
+    "subnav": {
+      "feed": { "popular": "الأكثر شيوعًا", "recent": "الأحدث", "following": "المتابَعون" },
+      "live": { "ongoing": "مباشر الآن", "scheduled": "مجدولة", "ended": "منتهية" },
+      "library": { "started": "قيد التشغيل", "saved": "المحفوظة", "completed": "المكتملة" },
+      "account": { "general": "عام", "profile": "الملف الشخصي", "legal": "قانوني" }
+    }
   },
   "support": {
     "title": "الدعم",
@@ -104,6 +99,68 @@
     "privacy": "سياسة الخصوصية",
     "terms": "شروط الخدمة",
     "support": "الدعم"
+  },
+  "authStrip": {
+    "search": "بحث",
+    "signIn": "تسجيل الدخول",
+    "signOut": "تسجيل الخروج",
+    "createAccount": "إنشاء حساب مجاني",
+    "topActions": "إجراءات علوية"
+  },
+  "search": {
+    "placeholder": "بحث",
+    "searching": "جارٍ البحث…",
+    "noResults": "لا توجد نتائج.",
+    "startTyping": "ابدأ الكتابة للبحث.",
+    "suggestions": "اقتراحات",
+    "scholars": "العلماء",
+    "continueListening": "متابعة الاستماع"
+  },
+  "library": {
+    "title": "مكتبتي",
+    "inProgress": "قيد الاستماع",
+    "saved": "المحفوظة",
+    "completed": "المكتملة",
+    "loadingSection": "جارٍ تحميل {{section}}…",
+    "emptyProgress": "لا توجد محاضرات قيد الاستماع.",
+    "emptySaved": "لا توجد محاضرات محفوظة بعد. احفظ المحاضرات للاستماع إليها لاحقًا.",
+    "emptyCompleted": "لا توجد محاضرات مكتملة بعد. واصل الاستماع!",
+    "percentListened": "{{percent}}٪ تم الاستماع",
+    "savedOn": "حُفظت في {{date}}",
+    "completedOn": "اكتملت في {{date}}"
+  },
+  "lecture": {
+    "loading": "جارٍ تحميل المحاضرة…",
+    "notFound": "لم يتم العثور على المحاضرة",
+    "minutes": "{{count}} دقيقة"
+  },
+  "scholarContent": {
+    "collections": "المجموعات",
+    "series": "السلاسل",
+    "singles": "محاضرات مفردة",
+    "lectures": "المحاضرات",
+    "empty": "لا يوجد محتوى منشور بعد.",
+    "seriesCount": "{{count}} سلسلة",
+    "lectureCount": "{{count}} محاضرة"
+  },
+  "feed": {
+    "newInTopic": "جديد في {{topic}}",
+    "loading": "جارٍ تحميل المحتوى...",
+    "empty": "لا توجد محاضرات في هذا الموجز.",
+    "error": "تعذّر تحميل محتوى الموجز.",
+    "retry": "إعادة المحاولة"
+  },
+  "live": {
+    "title": "البث المباشر",
+    "loading": "جارٍ تحميل البث...",
+    "empty": "لا توجد جلسات مباشرة الآن.",
+    "error": "تعذّر التحقق من الجلسات المباشرة.",
+    "retry": "إعادة المحاولة",
+    "sections": {
+      "ongoing": { "title": "مباشر الآن", "empty": "لا توجد جلسات مباشرة الآن." },
+      "scheduled": { "title": "القادمة", "empty": "لا توجد جلسات قادمة مجدولة." },
+      "ended": { "title": "المنتهية مؤخرًا", "empty": "لا توجد جلسات حديثة." }
+    }
   },
   "notFound": {
     "title": "عذرًا!",

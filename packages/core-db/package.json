@@ -22,11 +22,11 @@
     }
   },
   "scripts": {
-    "lint": "eslint .",
-    "test": "jest --passWithNoTests",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
+    "lint": "oxlint . && eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:cov": "vitest run --coverage",
+    "test:prepush": "vitest run --changed=origin/main",
     "pretypecheck": "pnpm prisma:generate",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "prisma:generate": "prisma generate --schema=./prisma/schema.prisma --config=./prisma.config.ts && node ./scripts/copy-generated-to-dist.js",
@@ -34,21 +34,19 @@
     "prisma:validate": "prisma validate --schema=./prisma/schema.prisma --config=./prisma.config.ts",
     "migrate:create-only": "node ./scripts/migrate-with-auto-name.js",
     "migrate:deploy": "prisma migrate deploy --schema=./prisma/schema.prisma --config=./prisma.config.ts",
+    "make-admin": "node ./scripts/make-admin.js",
     "build": "pnpm prisma:generate && tsup src/index.ts --format esm,cjs --out-dir dist && node ./scripts/copy-generated-to-dist.js && tsc -p tsconfig.build.json",
     "dev": "pnpm build --watch"
   },
   "dependencies": {
     "@prisma/client": "catalog:",
-    "@prisma/client-runtime-utils": "^7.3.0"
+    "@prisma/client-runtime-utils": "^7.3.0",
+    "@sd/core-contracts": "workspace:*"
   },
   "devDependencies": {
-    "@sd/util-config": "workspace:*",
-    "@types/jest": "catalog:",
     "dotenv": "^16.4.5",
-    "jest": "catalog:",
     "pg": "^8.0.0",
     "prisma": "^7.3.0",
-    "ts-jest": "catalog:",
-    "tsup": "^8.0.0"
+    "tsup": "catalog:"
   }
 }

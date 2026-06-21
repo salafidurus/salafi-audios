@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { INestApplication } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
@@ -8,15 +9,15 @@ import { LecturesController } from './lectures.controller';
 import { AdminLecturesController } from './admin-lectures.controller';
 import { LecturesService } from './lectures.service';
 
-const mockAuth = { api: { getSession: jest.fn() } };
-jest.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
+const mockAuth = { api: { getSession: vi.fn() } };
+vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockLecturesService = {
-  getById: jest.fn().mockResolvedValue({ id: 'l1', title: 'Test Lecture' }),
-  getRelated: jest.fn().mockResolvedValue([]),
-  updateLecture: jest.fn().mockResolvedValue({}),
-  publishLecture: jest.fn().mockResolvedValue({}),
-  archiveLecture: jest.fn().mockResolvedValue({}),
+  getById: vi.fn().mockResolvedValue({ id: 'l1', title: 'Test Lecture' }),
+  getRelated: vi.fn().mockResolvedValue([]),
+  updateLecture: vi.fn().mockResolvedValue({}),
+  publishLecture: vi.fn().mockResolvedValue({}),
+  archiveLecture: vi.fn().mockResolvedValue({}),
 };
 
 describe('LecturesController — auth boundaries', () => {

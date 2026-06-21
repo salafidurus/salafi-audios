@@ -3,10 +3,10 @@
  * All navigation references in apps and packages must use these instead
  * of hardcoded path strings.
  *
- * Auth modes (see routeAuth below):
- *   public      — accessible to everyone, full content, no auth needed
- *   local-first — full UI for everyone; anonymous = local storage, authenticated = API
- *   auth        — requires a signed-in session; redirects to sign-in if absent
+ * Access levels (see routeDefinitions below):
+ *   public        — accessible to everyone, full content, no auth needed
+ *   auth-optional — full UI for everyone; anonymous = local storage, authenticated = API
+ *   auth-required — requires a signed-in session; redirects to sign-in if absent
  */
 export const routes = {
   home: "/",
@@ -53,54 +53,69 @@ export const routes = {
   },
 
   signIn: "/sign-in",
-  signUp: "/sign-up",
   support: "/support",
   privacy: "/privacy",
   termsOfUse: "/terms-of-use",
 } as const;
 
 /**
- * Auth mode for each route section.
+ * Access level for a route, consumed by the web proxy middleware and the
+ * native route guard via {@link resolveRouteAccess}.
  *
- *   public      — full content for everyone, no sign-in needed
- *   local-first — UI renders for everyone; anonymous data lives in local
- *                 storage, authenticated data comes from the API and syncs
- *                 on sign-in. Never gate or redirect.
- *   auth        — must be signed in; redirect to routes.signIn if not
+ *   public        — full content for everyone, no sign-in needed
+ *   auth-optional — UI renders for everyone; anonymous data lives in local
+ *                   storage, authenticated data comes from the API and syncs
+ *                   on sign-in. Never gate or redirect.
+ *   auth-required — must be signed in; redirect to routes.signIn if not
  */
-export type RouteAuthMode = "public" | "local-first" | "auth";
+export type RouteAccess = "public" | "auth-optional" | "auth-required";
 
-export const routeAuth = {
-  home: "public",
-  search: "public",
-  feed: "public",
-  live: "public",
-  scholars: "public",
-  collections: "public",
-  series: "public",
-  lectures: "public",
-  support: "public",
-  privacy: "public",
-  termsOfUse: "public",
-  signIn: "public",
-  signUp: "public",
-  library: "local-first",
-  account: "local-first",
-} as const satisfies Record<keyof typeof routes, RouteAuthMode>;
+export interface RouteDefinition {
+  path: string;
+  access: RouteAccess;
+}
 
 /**
- * Per-path overrides that take precedence over section-level routeAuth.
- * Use when an individual route within an auth-guarded section should
- * have a different auth mode (e.g. /account/legal is public content).
+ * Canonical route-access registry — the single source of truth shared by web
+ * and native. Order does not matter: resolution uses longest-prefix matching,
+ * so a deeper path (e.g. /feed/following) overrides a shallower one (/feed).
+ *
+ * Mapping from the previous auth modes: public→public, local-first→auth-optional,
+ * auth→auth-required. /feed/following and /account/profile are gated; the rest
+ * preserve their prior semantics. Routes not listed fall back to "public".
  */
-export const routeAuthOverrides = {
-  [routes.account.legal]: "public",
-} as const satisfies Partial<Record<string, RouteAuthMode>>;
+export const routeDefinitions: RouteDefinition[] = [
+  { path: routes.feed.following, access: "auth-required" },
+  { path: routes.feed.index, access: "public" },
+  { path: routes.account.profile, access: "auth-required" },
+  { path: routes.account.legal, access: "public" },
+  { path: routes.account.index, access: "auth-optional" },
+  { path: routes.library.index, access: "auth-optional" },
+  { path: routes.live.index, access: "public" },
+  { path: routes.search, access: "public" },
+  { path: routes.scholars.index, access: "public" },
+  { path: routes.support, access: "public" },
+  { path: "/admin", access: "auth-required" },
+  { path: routes.home, access: "public" },
+];
 
-/** Resolve the effective auth mode for a given pathname. */
-export function getEffectiveAuthMode(pathname: string, sectionAuth: RouteAuthMode): RouteAuthMode {
-  if (pathname in routeAuthOverrides) {
-    return routeAuthOverrides[pathname as keyof typeof routeAuthOverrides];
+/**
+ * Resolve the access level for a pathname using longest-prefix matching.
+ * Trailing slashes are normalized; unknown paths fall back to "public".
+ */
+export function resolveRouteAccess(pathname: string): RouteAccess {
+  // 1. Normalize trailing slash (keep root "/" intact)
+  const normalizedPath = pathname === "/" ? "/" : pathname.replace(/\/$/, "");
+
+  // 2. Sort definitions by path length descending (longest-prefix matching)
+  const sortedDefs = [...routeDefinitions].sort((a, b) => b.path.length - a.path.length);
+
+  // 3. First exact or prefix match wins
+  for (const def of sortedDefs) {
+    if (normalizedPath === def.path || normalizedPath.startsWith(`${def.path}/`)) {
+      return def.access;
+    }
   }
-  return sectionAuth;
+
+  return "public";
 }

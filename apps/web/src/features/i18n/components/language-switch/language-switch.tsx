@@ -1,9 +1,10 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { SUPPORTED_LOCALES, type Locale } from "@sd/core-i18n";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { Button } from "@/shared/components/Button/Button";
 import { setLocaleCookie } from "@/core/i18n/locale-cookie";
 import styles from "./language-switch.module.css";
 
@@ -13,37 +14,75 @@ const LOCALE_LABELS: Record<Locale, string> = {
 };
 
 export function LanguageSwitch() {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const { refresh } = useRouter();
+  const queryClient = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const handleChangeLocale = async (locale: Locale) => {
-    if (i18n.language === locale) {
-      return;
-    }
+  const activeLocale =
+    (i18n.language as Locale) in LOCALE_LABELS ? (i18n.language as Locale) : "en";
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (event: MouseEvent) => {
+      if (!containerRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    return () => document.removeEventListener("mousedown", onPointerDown);
+  }, [open]);
+
+  const handleSelect = async (locale: Locale) => {
+    setOpen(false);
+    if (i18n.language === locale) return;
 
     await i18n.changeLanguage(locale);
     setLocaleCookie(locale);
+    // Content queries carry the locale via Accept-Language; refetch so cached
+    // results are replaced with the newly selected language.
+    await queryClient.invalidateQueries();
     refresh();
   };
 
   return (
-    <fieldset className={styles.switcher} aria-label="Language switch">
-      {SUPPORTED_LOCALES.map((locale) => {
-        const isActive = i18n.language === locale;
+    <div className={styles.switcher} ref={containerRef}>
+      <button
+        type="button"
+        className={styles.trigger}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label={t("navigation.languageSwitch", "Language")}
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        <span>{LOCALE_LABELS[activeLocale]}</span>
+        <span aria-hidden className={styles.chevron}>
+          ▾
+        </span>
+      </button>
 
-        return (
-          <Button
-            key={locale}
-            variant={isActive ? "primary" : "ghost"}
-            size="sm"
-            className={styles.button}
-            aria-pressed={isActive}
-            onClick={() => void handleChangeLocale(locale)}
-          >
-            {LOCALE_LABELS[locale]}
-          </Button>
-        );
-      })}
-    </fieldset>
+      {open && (
+        <ul className={styles.menu} role="menu">
+          {SUPPORTED_LOCALES.map((locale) => {
+            const isActive = locale === activeLocale;
+            return (
+              <li key={locale} role="none">
+                <button
+                  type="button"
+                  role="menuitemradio"
+                  aria-checked={isActive}
+                  className={styles.option}
+                  data-active={isActive}
+                  onClick={() => void handleSelect(locale)}
+                >
+                  {LOCALE_LABELS[locale]}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
   );
 }

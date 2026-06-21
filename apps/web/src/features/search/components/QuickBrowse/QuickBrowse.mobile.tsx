@@ -1,5 +1,7 @@
 import styles from "./QuickBrowse.mobile.module.css";
 import type { ScholarChipDto, ContentSuggestionDto, RecentProgressDto } from "@sd/core-contracts";
+import { pickContentField } from "@sd/core-i18n";
+import { useShowOriginalContent } from "@/features/i18n/content-preference";
 
 const SCHOLAR_SKELETON_COUNT = 5;
 const SUGGESTION_SKELETON_COUNT = 3;
@@ -30,6 +32,8 @@ export function QuickBrowseMobile({
   onSelectSuggestion,
   onContinueListening,
 }: QuickBrowseMobileProps) {
+  const showOriginal = useShowOriginalContent();
+
   return (
     <div className={styles.root}>
       {/* Continue Listening */}
@@ -108,27 +112,30 @@ export function QuickBrowseMobile({
           <span className={styles.header}>Suggestions</span>
           <div className={styles.suggestionsScroll}>
             <div className={styles.suggestionsRow}>
-              {suggestions.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => onSelectSuggestion?.(item.slug)}
-                  className={styles.suggestionCard}
-                >
-                  <span className={styles.suggestionTitle}>{item.title}</span>
-                  <span className={styles.suggestionScholar}>{item.scholarName}</span>
-                  <div className={styles.suggestionMeta}>
-                    <div className={styles.kindBadge}>
-                      <span className={styles.kindText}>{item.kind}</span>
+              {suggestions.map((item) => {
+                const title = pickContentField(item.title, item.original?.title, showOriginal);
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => onSelectSuggestion?.(item.slug)}
+                    className={styles.suggestionCard}
+                  >
+                    <span className={styles.suggestionTitle}>{title}</span>
+                    <span className={styles.suggestionScholar}>{item.scholarName}</span>
+                    <div className={styles.suggestionMeta}>
+                      <div className={styles.kindBadge}>
+                        <span className={styles.kindText}>{item.kind}</span>
+                      </div>
+                      {item.durationSeconds != null && (
+                        <span className={styles.durationText}>
+                          {formatDuration(item.durationSeconds)}
+                        </span>
+                      )}
                     </div>
-                    {item.durationSeconds != null && (
-                      <span className={styles.durationText}>
-                        {formatDuration(item.durationSeconds)}
-                      </span>
-                    )}
-                  </div>
-                </button>
-              ))}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>

@@ -1,0 +1,86 @@
+name: pnpm-bump
+
+# Dependabot cannot bump the pnpm version pinned in `packageManager`
+# (feature request dependabot-core#4830 is still unimplemented). This workflow fills that
+# gap: weekly it checks for a newer pnpm release and opens a PR updating the root
+# `packageManager` field (which `pnpm/action-setup` reads everywhere) and, on a major bump,
+# the `engines.pnpm` range.
+
+on:
+  schedule:
+    # Monday 07:00 UTC — same day as Dependabot, offset by an hour to avoid collision
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Resolve current and latest pnpm versions
+        id: ver
+        run: |
+          current="$(node -p "require('./package.json').packageManager.split('@')[1]")"
+          latest="$(npm view pnpm version)"
+          echo "current=$current" >> "$GITHUB_OUTPUT"
+          echo "latest=$latest" >> "$GITHUB_OUTPUT"
+          if [ "$current" = "$latest" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "pnpm already up to date at $current"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "pnpm $current -> $latest"
+          fi
+
+      - name: Update package.json
+        if: steps.ver.outputs.changed == 'true'
+        env:
+          CURRENT: ${{ steps.ver.outputs.current }}
+          LATEST: ${{ steps.ver.outputs.latest }}
+        run: |
+          node - <<'NODE'
+          const fs = require("fs");
+          const file = "package.json";
+          const { CURRENT, LATEST } = process.env;
+          let s = fs.readFileSync(file, "utf8");
+
+          // Targeted string edits preserve the file's existing formatting (no full reserialize).
+          s = s.replace(/("packageManager":\s*")pnpm@[^"]+(")/, `$1pnpm@${LATEST}$2`);
+
+          // Only widen the engines range when the major actually changes.
+          const curMajor = Number(CURRENT.split(".")[0]);
+          const latestMajor = Number(LATEST.split(".")[0]);
+          if (curMajor !== latestMajor) {
+            s = s.replace(
+              /("pnpm":\s*")>=\d+ <\d+(")/,
+              `$1>=${latestMajor} <${latestMajor + 1}$2`,
+            );
+          }
+
+          fs.writeFileSync(file, s);
+          NODE
+
+      - name: Open pull request
+        if: steps.ver.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v8
+        with:
+          branch: chore/bump-pnpm
+          delete-branch: true
+          commit-message: "chore(deps): bump pnpm to ${{ steps.ver.outputs.latest }}"
+          title: "chore(deps): bump pnpm to ${{ steps.ver.outputs.latest }}"
+          body: |
+            Automated pnpm version bump.
+
+            Dependabot can't update the `packageManager` pnpm version
+            ([dependabot-core#4830](https://github.com/dependabot/dependabot-core/issues/4830)),
+            so this workflow does it.
+
+            - `packageManager`: `pnpm@${{ steps.ver.outputs.current }}` → `pnpm@${{ steps.ver.outputs.latest }}`
+
+            `pnpm/action-setup` reads `packageManager`, so merging updates pnpm across CI and local dev.
+          labels: dependencies

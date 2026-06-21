@@ -12,8 +12,8 @@
   gap: 6px;
   text-decoration: none;
   font-family: var(--typo-body-sm-font-family);
-  font-size: var(--typo-body-sm-font-size, 13px);
-  color: var(--content-muted, #666666);
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
 }
 
 .header {
@@ -22,8 +22,8 @@
 
 .subtitle {
   font-family: var(--typo-caption-font-family);
-  font-size: var(--typo-caption-font-size, 11px);
-  color: var(--content-subtle, #888888);
+  font-size: var(--typo-caption-font-size);
+  color: var(--content-subtle);
   text-transform: uppercase;
   margin-bottom: 2px;
   display: block;
@@ -31,18 +31,18 @@
 
 .title {
   font-family: var(--typo-title-lg-font-family);
-  font-size: var(--typo-title-lg-font-size, 22px);
+  font-size: var(--typo-title-lg-font-size);
   font-weight: 700;
-  color: var(--content-strong, #111111);
+  color: var(--content-strong);
   margin: 0;
 }
 
 .tabs {
   display: flex;
   gap: 2px;
-  background-color: var(--surface-subtle, #f3f4f6);
+  background-color: var(--surface-subtle);
   padding: 3px;
-  border-radius: var(--radius-scale-md, 8px);
+  border-radius: var(--radius-scale-md);
   margin-bottom: 20px;
 }
 
@@ -50,10 +50,10 @@
   flex: 1;
   padding: 8px 0;
   text-align: center;
-  border-radius: var(--radius-scale-sm, 6px);
+  border-radius: var(--radius-scale-sm);
   border: none;
   background: none;
-  color: var(--content-muted, #4b5563);
+  color: var(--content-muted);
   font-family: var(--typo-label-md-font-family);
   font-size: 13px;
   font-weight: 500;
@@ -61,8 +61,8 @@
 }
 
 .tabActive {
-  background-color: var(--surface-default, #ffffff);
-  color: var(--content-strong, #111111);
+  background-color: var(--surface-default);
+  color: var(--content-strong);
   box-shadow: var(--shadow-xs);
 }
 
@@ -82,7 +82,7 @@
   font-family: var(--typo-title-md-font-family);
   font-size: 18px;
   font-weight: 600;
-  color: var(--content-strong, #111111);
+  color: var(--content-strong);
   margin: 0;
 }
 
@@ -91,18 +91,18 @@
   align-items: center;
   gap: 4px;
   padding: 4px 10px;
-  border-radius: var(--radius-scale-md, 6px);
-  border: 1px solid var(--border-default, #d1d5db);
-  background-color: var(--surface-default, #ffffff);
-  color: var(--content-default, #374151);
+  border-radius: var(--radius-scale-md);
+  border: 1px solid var(--border-default);
+  background-color: var(--surface-default);
+  color: var(--content-default);
   font-size: 12px;
   cursor: pointer;
 }
 
 .quickForm {
-  background-color: var(--surface-subtle, #f9fafb);
-  border-radius: var(--radius-scale-md, 8px);
-  border: 1px solid var(--border-subtle, #e5e7eb);
+  background-color: var(--surface-subtle);
+  border-radius: var(--radius-scale-md);
+  border: 1px solid var(--border-subtle);
   padding: 10px;
   display: flex;
   gap: 8px;
@@ -112,17 +112,17 @@
 .input {
   flex: 1;
   padding: 6px 10px;
-  border: 1px solid var(--border-subtle, #d1d5db);
-  border-radius: var(--radius-scale-md, 6px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-scale-md);
   font-size: 13px;
 }
 
 .saveBtn {
   padding: 6px 12px;
-  border-radius: var(--radius-scale-md, 6px);
+  border-radius: var(--radius-scale-md);
   border: none;
-  background-color: var(--accent-primary-bg, #2563eb);
-  color: var(--accent-primary-fg, #ffffff);
+  background-color: var(--accent-primary-bg);
+  color: var(--accent-primary-fg);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -135,9 +135,9 @@
 }
 
 .itemCard {
-  background-color: var(--surface-default, #ffffff);
-  border: 1px solid var(--border-subtle, #e5e7eb);
-  border-radius: var(--radius-component-card, 10px);
+  background-color: var(--surface-default);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-component-card);
   padding: 14px;
   box-shadow: var(--shadow-xs);
   display: flex;
@@ -156,50 +156,50 @@
   font-family: var(--typo-body-md-font-family);
   font-size: 14px;
   font-weight: 600;
-  color: var(--content-strong, #111111);
+  color: var(--content-strong);
 }
 
 .badge {
   display: inline-flex;
   padding: 1px 6px;
-  border-radius: var(--radius-scale-full, 9999px);
+  border-radius: var(--radius-scale-full);
   font-size: 10px;
   text-transform: capitalize;
 }
 
 .badge-published {
-  background-color: var(--state-success-surface, #e8f5e9);
-  color: var(--state-success-content, #2e7d32);
+  background-color: var(--state-success-surface);
+  color: var(--state-success-content);
 }
 
 .badge-draft {
-  background-color: var(--surface-subtle, #f3f4f6);
-  color: var(--content-muted, #4b5563);
+  background-color: var(--surface-subtle);
+  color: var(--content-muted);
 }
 
 .badge-archived {
-  background-color: var(--state-danger-surface, #ffebee);
-  color: var(--state-danger-content, #c62828);
+  background-color: var(--state-danger-surface);
+  color: var(--state-danger-content);
 }
 
 .cardOrdering {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-top: 1px solid var(--accent-divider, #f3f4f6);
+  border-top: 1px solid var(--accent-divider);
   padding-top: 8px;
 }
 
 .orderLabel {
   font-size: 12px;
-  color: var(--content-muted, #6b7280);
+  color: var(--content-muted);
 }
 
 .orderInput {
   width: 50px;
   padding: 4px 6px;
-  border: 1px solid var(--border-subtle, #d1d5db);
-  border-radius: var(--radius-scale-sm, 4px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-scale-sm);
   text-align: center;
   font-size: 12px;
 }
@@ -207,7 +207,7 @@
 .noData {
   font-family: var(--typo-caption-font-family);
   font-size: 13px;
-  color: var(--content-muted, #9ca3af);
+  color: var(--content-muted);
   text-align: center;
   padding: 20px 0;
 }

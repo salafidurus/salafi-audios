@@ -1,5 +1,5 @@
 import React from "react";
-import renderer, { act } from "react-test-renderer";
+import { render, screen, fireEvent } from "@testing-library/react-native";
 import type { LibraryItemDto } from "@sd/core-contracts";
 import {
   useLibraryCompletedScreen,
@@ -60,6 +60,16 @@ jest.mock("../../../core/auth/use-auth", () => ({
   useAuth: jest.fn(),
 }));
 
+jest.mock("../../../core/i18n/use-translation", () => ({
+  useTranslation: () => ({
+    t: (_key: string, fallback?: string, vars?: Record<string, unknown>) =>
+      (fallback ?? _key).replace(/\{\{(\w+)\}\}/g, (_m: string, name: string) =>
+        String(vars?.[name] ?? ""),
+      ),
+    i18n: { language: "en" },
+  }),
+}));
+
 const mockedUseAuth = jest.mocked(useAuth);
 const mockedUseLibraryProgressScreen = jest.mocked(useLibraryProgressScreen);
 const mockedUseLibrarySavedScreen = jest.mocked(useLibrarySavedScreen);
@@ -87,38 +97,28 @@ describe("LibraryScreen", () => {
     mockedUseLibraryCompletedScreen.mockReturnValue(buildLibraryState());
   });
 
-  it("renders a loading state while all sections are fetching", () => {
+  it("renders a loading state while all sections are fetching", async () => {
     mockedUseLibraryProgressScreen.mockReturnValue(buildLibraryState([], true));
     mockedUseLibrarySavedScreen.mockReturnValue(buildLibraryState([], true));
     mockedUseLibraryCompletedScreen.mockReturnValue(buildLibraryState([], true));
 
-    let tree: ReturnType<typeof renderer.create>;
+    await render(<LibraryScreen />);
 
-    act(() => {
-      tree = renderer.create(<LibraryScreen />);
-    });
-
-    expect(JSON.stringify(tree!.toJSON())).toContain("Loading your library…");
+    expect(screen.getByText("Loading My Library…")).toBeTruthy();
   });
 
-  it("renders empty section messages when no items exist", () => {
-    let tree: ReturnType<typeof renderer.create>;
+  it("renders empty section messages when no items exist", async () => {
+    await render(<LibraryScreen />);
 
-    act(() => {
-      tree = renderer.create(<LibraryScreen />);
-    });
-
-    const rendered = JSON.stringify(tree!.toJSON());
-
-    expect(rendered).toContain("In Progress");
-    expect(rendered).toContain("No lectures in progress.");
-    expect(rendered).toContain("Saved");
-    expect(rendered).toContain("No saved lectures yet.");
-    expect(rendered).toContain("Completed");
-    expect(rendered).toContain("No completed lectures yet.");
+    expect(screen.getByText("In Progress")).toBeTruthy();
+    expect(screen.getByText("No lectures in progress.")).toBeTruthy();
+    expect(screen.getByText("Saved")).toBeTruthy();
+    expect(screen.getByText("No saved lectures yet.", { exact: false })).toBeTruthy();
+    expect(screen.getByText("Completed")).toBeTruthy();
+    expect(screen.getByText("No completed lectures yet.", { exact: false })).toBeTruthy();
   });
 
-  it("navigates to a lecture when an item is pressed", () => {
+  it("navigates to a lecture when an item is pressed", async () => {
     const onNavigateToLecture = jest.fn();
 
     mockedUseAuth.mockReturnValue({
@@ -145,18 +145,9 @@ describe("LibraryScreen", () => {
       ]),
     );
 
-    let tree: ReturnType<typeof renderer.create>;
+    await render(<LibraryScreen onNavigateToLecture={onNavigateToLecture} />);
 
-    act(() => {
-      tree = renderer.create(<LibraryScreen onNavigateToLecture={onNavigateToLecture} />);
-    });
-
-    const touchables = tree!.root.findAll(
-      (node: { props: { onPress?: unknown } }) => typeof node.props.onPress === "function",
-    );
-    act(() => {
-      touchables[0].props.onPress();
-    });
+    await fireEvent.press(screen.getByText("Library Lecture"));
 
     expect(onNavigateToLecture).toHaveBeenCalledWith("lecture-1");
   });

@@ -10,7 +10,12 @@ const buildTargets = [
 for (const target of buildTargets) {
   console.log(`\n> pnpm --filter ${target} build`);
 
-  const result = spawnSync("pnpm", ["--filter", target, "build"], {
+  // `shell: true` is required so the pnpm shim resolves cross-platform
+  // (spawning `pnpm.cmd` directly throws EINVAL on Windows). We pass the
+  // whole command as a single string rather than an args array to avoid
+  // Node's DEP0190 warning — the only interpolated value is a hardcoded
+  // build target from the list above, so there is no injection risk.
+  const result = spawnSync(`pnpm --filter ${target} build`, {
     stdio: "inherit",
     shell: true,
   });

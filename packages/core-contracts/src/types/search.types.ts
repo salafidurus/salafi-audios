@@ -1,4 +1,5 @@
 import type { TopicSlug } from "../types/topic.types";
+import type { ContentOriginalFields, Locale } from "./localization.types";
 
 export type SearchCatalogParams = {
   q: string;
@@ -19,10 +20,12 @@ export type SearchCatalogItemDto = {
   scholarImageUrl?: string;
   lectureCount: number;
   durationSeconds?: number;
+  originalLanguage?: Locale;
+  original?: ContentOriginalFields;
 };
 
 export type SearchCatalogResultsDto = {
   collections: SearchCatalogItemDto[];
   series: SearchCatalogItemDto[];
-  lectures: SearchCatalogItemDto[];
+  singles: SearchCatalogItemDto[];
 };

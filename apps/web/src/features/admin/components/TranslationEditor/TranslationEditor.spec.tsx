@@ -1,18 +1,19 @@
+import { vi, type Mock } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import type { TranslationTarget, TranslationViewDto } from "@sd/core-contracts";
 
-jest.mock("@sd/core-i18n", () => ({
+vi.mock("@sd/core-i18n", () => ({
   SUPPORTED_LOCALES: ["en", "ar"],
 }));
 
-jest.mock("@sd/domain-content", () => ({
-  useContentTranslations: jest.fn(),
-  useSaveTranslation: jest.fn(),
-  usePublishTranslation: jest.fn(),
-  useUnpublishTranslation: jest.fn(),
+vi.mock("@sd/domain-content", () => ({
+  useContentTranslations: vi.fn(),
+  useSaveTranslation: vi.fn(),
+  usePublishTranslation: vi.fn(),
+  useUnpublishTranslation: vi.fn(),
 }));
 
-jest.mock("react-i18next", () => ({
+vi.mock("react-i18next", () => ({
   useTranslation: () => ({ t: (k: string) => k }),
 }));
 
@@ -33,7 +34,7 @@ const mockFields = [
 
 const mockOriginalValues = { name: "Ibn Baz", bio: "A great scholar" };
 
-const makeMutation = (mutateFn = jest.fn()) => ({
+const makeMutation = (mutateFn = vi.fn()) => ({
   mutate: mutateFn,
   isPending: false,
 });
@@ -49,11 +50,11 @@ const makeTranslation = (overrides: Partial<TranslationViewDto> = {}): Translati
 
 describe("TranslationEditor", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    (useContentTranslations as jest.Mock).mockReturnValue({ data: undefined });
-    (useSaveTranslation as jest.Mock).mockReturnValue(makeMutation());
-    (usePublishTranslation as jest.Mock).mockReturnValue(makeMutation());
-    (useUnpublishTranslation as jest.Mock).mockReturnValue(makeMutation());
+    vi.clearAllMocks();
+    (useContentTranslations as Mock).mockReturnValue({ data: undefined });
+    (useSaveTranslation as Mock).mockReturnValue(makeMutation());
+    (usePublishTranslation as Mock).mockReturnValue(makeMutation());
+    (useUnpublishTranslation as Mock).mockReturnValue(makeMutation());
   });
 
   it("shows original values as placeholder when no translation exists", () => {
@@ -69,8 +70,8 @@ describe("TranslationEditor", () => {
   });
 
   it("calls saveTranslation.mutate when Save draft is clicked", () => {
-    const mutateFn = jest.fn();
-    (useSaveTranslation as jest.Mock).mockReturnValue(makeMutation(mutateFn));
+    const mutateFn = vi.fn();
+    (useSaveTranslation as Mock).mockReturnValue(makeMutation(mutateFn));
     render(
       <TranslationEditor
         target={mockTarget}
@@ -83,9 +84,9 @@ describe("TranslationEditor", () => {
   });
 
   it("calls publishTranslation.mutate when Publish is clicked", () => {
-    const mutateFn = jest.fn();
-    (usePublishTranslation as jest.Mock).mockReturnValue(makeMutation(mutateFn));
-    (useContentTranslations as jest.Mock).mockReturnValue({
+    const mutateFn = vi.fn();
+    (usePublishTranslation as Mock).mockReturnValue(makeMutation(mutateFn));
+    (useContentTranslations as Mock).mockReturnValue({
       data: { translations: [makeTranslation({ status: "draft" })] },
     });
     render(
@@ -101,9 +102,9 @@ describe("TranslationEditor", () => {
   });
 
   it("calls unpublishTranslation.mutate when Unpublish is clicked", () => {
-    const mutateFn = jest.fn();
-    (useUnpublishTranslation as jest.Mock).mockReturnValue(makeMutation(mutateFn));
-    (useContentTranslations as jest.Mock).mockReturnValue({
+    const mutateFn = vi.fn();
+    (useUnpublishTranslation as Mock).mockReturnValue(makeMutation(mutateFn));
+    (useContentTranslations as Mock).mockReturnValue({
       data: { translations: [makeTranslation({ status: "published" })] },
     });
     render(
@@ -119,7 +120,7 @@ describe("TranslationEditor", () => {
   });
 
   it("shows 'draft' status badge when translation status is draft", () => {
-    (useContentTranslations as jest.Mock).mockReturnValue({
+    (useContentTranslations as Mock).mockReturnValue({
       data: { translations: [makeTranslation({ status: "draft" })] },
     });
     render(
@@ -134,7 +135,7 @@ describe("TranslationEditor", () => {
   });
 
   it("shows 'published' status badge when translation status is published", () => {
-    (useContentTranslations as jest.Mock).mockReturnValue({
+    (useContentTranslations as Mock).mockReturnValue({
       data: { translations: [makeTranslation({ status: "published" })] },
     });
     render(

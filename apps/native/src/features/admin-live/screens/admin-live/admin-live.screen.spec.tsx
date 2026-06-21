@@ -1,5 +1,5 @@
 import React from "react";
-import renderer, { act } from "react-test-renderer";
+import { render, screen } from "@testing-library/react-native";
 import { AdminLiveScreen } from "./admin-live.screen";
 import { useAdminChannels, useAdminSessions } from "../../hooks/use-admin-live";
 
@@ -20,7 +20,7 @@ describe("AdminLiveScreen", () => {
     jest.clearAllMocks();
   });
 
-  it("renders sessions and channels lists", () => {
+  it("renders sessions and channels lists", async () => {
     mockUseAdminChannels.mockReturnValue({
       data: [
         {
@@ -43,16 +43,12 @@ describe("AdminLiveScreen", () => {
       refetch: jest.fn(),
     });
 
-    let tree: ReturnType<typeof renderer.create>;
-    act(() => {
-      tree = renderer.create(<AdminLiveScreen />);
-    });
+    await render(<AdminLiveScreen />);
 
-    const rendered = JSON.stringify(tree!.toJSON());
-    expect(rendered).toContain("Sessions");
-    expect(rendered).toContain("Channels");
-    expect(rendered).toContain("Test Session");
-    expect(rendered).toContain("Mock Channel");
-    expect(rendered).toContain("Active");
+    expect(screen.getByText("Sessions")).toBeTruthy();
+    expect(screen.getByText("Channels")).toBeTruthy();
+    expect(screen.getByText("Test Session")).toBeTruthy();
+    expect(screen.getAllByText("Mock Channel").length).toBeGreaterThan(0);
+    expect(screen.getByText("Active", { exact: false })).toBeTruthy();
   });
 });

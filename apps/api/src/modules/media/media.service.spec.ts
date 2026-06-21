@@ -1,8 +1,9 @@
+import { vi } from 'vitest';
 import { Test } from '@nestjs/testing';
 import { MediaService } from './media.service';
 import { ConfigService } from '../../shared/config/config.module';
 
-jest.mock('@paralleldrive/cuid2', () => ({
+vi.mock('@paralleldrive/cuid2', () => ({
   createId: () => 'mock-cuid-12345',
 }));
 

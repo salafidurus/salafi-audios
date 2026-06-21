@@ -26,7 +26,8 @@ export {
   type ScholarContentDto,
   type CollectionSummaryDto,
   type SeriesSummaryDto,
-  type LectureSummaryDto,
+  type SingleSummaryDto,
+  type ListingFormat,
   type CollectionViewDto,
   type SeriesViewDto,
   type PlatformStatsDto,
@@ -65,5 +66,13 @@ export type {
   QuickBrowseDto,
 } from "./types";
 
-export { routes, routeAuth, routeAuthOverrides, getEffectiveAuthMode } from "./routes";
-export type { RouteAuthMode } from "./routes";
+export { routes, routeDefinitions, resolveRouteAccess } from "./routes";
+export type { RouteAccess, RouteDefinition } from "./routes";
+export {
+  SECTION_TABS,
+  DEFAULT_TABS,
+  SECTION_LABELS,
+  SECTION_ROUTES,
+  type Section,
+  type TabConfig,
+} from "./navigation";

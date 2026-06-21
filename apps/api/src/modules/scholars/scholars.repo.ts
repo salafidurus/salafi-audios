@@ -7,7 +7,7 @@ import type {
   ScholarContentDto,
   CollectionSummaryDto,
   SeriesSummaryDto,
-  LectureSummaryDto,
+  SingleSummaryDto,
   TranslationViewDto,
   Locale,
   AdminSeriesListItemDto,
@@ -26,12 +26,15 @@ import type { CreateSeriesDto } from './dto/create-series.dto';
 import type { UpdateSeriesDto } from './dto/update-series.dto';
 import type { CreateCollectionDto } from './dto/create-collection.dto';
 import type { UpdateCollectionDto } from './dto/update-collection.dto';
+import { resolveContentTranslation } from '../../shared/utils/resolve-content-translation';
+import { getRequestLocale } from '../../shared/i18n/locale-context';
 
 @Injectable()
 export class ScholarsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async list(): Promise<{ scholars: ScholarListItemDto[] }> {
+    const locale = getRequestLocale();
     const records = await this.prisma.scholar.findMany({
       where: { isActive: true },
       orderBy: { name: 'asc' },
@@ -42,6 +45,11 @@ export class ScholarsRepository {
         imageUrl: true,
         mainLanguage: true,
         isKibar: true,
+        translations: {
+          where: { locale, status: 'published' },
+          select: { name: true },
+          take: 1,
+        },
         _count: {
           select: {
             lectures: {
@@ -55,15 +63,27 @@ export class ScholarsRepository {
       },
     });
 
-    const scholars: ScholarListItemDto[] = records.map((r) => ({
-      id: r.id,
-      slug: r.slug,
-      name: r.name,
-      imageUrl: r.imageUrl ?? undefined,
-      mainLanguage: r.mainLanguage ?? undefined,
-      isKibar: r.isKibar,
-      lectureCount: r._count.lectures,
-    }));
+    const scholars: ScholarListItemDto[] = records.map((r) => {
+      const resolved = resolveContentTranslation({
+        base: { name: r.name },
+        originalLanguage: r.mainLanguage,
+        targetLocale: locale,
+        publishedTranslation: r.translations[0] ?? null,
+      });
+      return {
+        id: r.id,
+        slug: r.slug,
+        name: resolved.fields.name,
+        imageUrl: r.imageUrl ?? undefined,
+        mainLanguage: r.mainLanguage ?? undefined,
+        originalLanguage: resolved.originalLanguage,
+        original: resolved.original
+          ? { name: resolved.original.name }
+          : undefined,
+        isKibar: r.isKibar,
+        lectureCount: r._count.lectures,
+      };
+    });
 
     return { scholars };
   }
@@ -76,6 +96,7 @@ export class ScholarsRepository {
       })
     | null
   > {
+    const locale = getRequestLocale();
     const record = await this.prisma.scholar.findFirst({
       where: { slug, isActive: true },
       select: {
@@ -94,10 +115,22 @@ export class ScholarsRepository {
         socialWebsite: true,
         createdAt: true,
         updatedAt: true,
+        translations: {
+          where: { locale, status: 'published' },
+          select: { name: true, bio: true },
+          take: 1,
+        },
       },
     });
 
     if (!record) return null;
+
+    const resolved = resolveContentTranslation({
+      base: { name: record.name, bio: record.bio ?? null },
+      originalLanguage: record.mainLanguage,
+      targetLocale: locale,
+      publishedTranslation: record.translations[0] ?? null,
+    });
 
     const [lectureStats, seriesCount] = await Promise.all([
       this.prisma.lecture.aggregate({
@@ -121,10 +154,17 @@ export class ScholarsRepository {
     return {
       id: record.id,
       slug: record.slug,
-      name: record.name,
-      bio: record.bio ?? undefined,
+      name: resolved.fields.name,
+      bio: resolved.fields.bio ?? undefined,
       country: record.country ?? undefined,
       mainLanguage: record.mainLanguage ?? undefined,
+      originalLanguage: resolved.originalLanguage,
+      original: resolved.original
+        ? {
+            name: resolved.original.name,
+            bio: resolved.original.bio ?? undefined,
+          }
+        : undefined,
       imageUrl: record.imageUrl ?? undefined,
       isActive: record.isActive,
       isKibar: record.isKibar,
@@ -141,6 +181,7 @@ export class ScholarsRepository {
   }
 
   async getContent(slug: string): Promise<ScholarContentDto | null> {
+    const locale = getRequestLocale();
     const scholar = await this.prisma.scholar.findFirst({
       where: { slug, isActive: true },
       select: { id: true },
@@ -148,14 +189,13 @@ export class ScholarsRepository {
 
     if (!scholar) return null;
 
-    const [collections, standaloneSeries, standaloneLectures] =
-      await Promise.all([
-        this.getCollections(scholar.id),
-        this.getStandaloneSeries(scholar.id),
-        this.getStandaloneLectures(scholar.id),
-      ]);
+    const [collections, series, singles] = await Promise.all([
+      this.getCollections(scholar.id, locale),
+      this.getSeriesListings(scholar.id, locale),
+      this.getSingles(scholar.id, locale),
+    ]);
 
-    return { collections, standaloneSeries, standaloneLectures };
+    return { collections, series, singles };
   }
 
   async findById(id: string) {
@@ -445,6 +485,7 @@ export class ScholarsRepository {
 
   private async getCollections(
     scholarId: string,
+    locale: Locale,
   ): Promise<CollectionSummaryDto[]> {
     const records = await this.prisma.collection.findMany({
       where: {
@@ -457,7 +498,13 @@ export class ScholarsRepository {
         id: true,
         slug: true,
         title: true,
+        language: true,
         coverImageUrl: true,
+        translations: {
+          where: { locale, status: 'published' },
+          select: { title: true },
+          take: 1,
+        },
         _count: {
           select: {
             series: {
@@ -471,17 +518,30 @@ export class ScholarsRepository {
       },
     });
 
-    return records.map((r) => ({
-      id: r.id,
-      slug: r.slug,
-      title: r.title,
-      coverImageUrl: r.coverImageUrl ?? undefined,
-      lectureCount: r._count.series,
-    }));
+    return records.map((r) => {
+      const resolved = resolveContentTranslation({
+        base: { title: r.title },
+        originalLanguage: r.language,
+        targetLocale: locale,
+        publishedTranslation: r.translations[0] ?? null,
+      });
+      return {
+        id: r.id,
+        slug: r.slug,
+        title: resolved.fields.title,
+        coverImageUrl: r.coverImageUrl ?? undefined,
+        lectureCount: r._count.series,
+        originalLanguage: resolved.originalLanguage,
+        original: resolved.original
+          ? { title: resolved.original.title }
+          : undefined,
+      };
+    });
   }
 
-  private async getStandaloneSeries(
+  private async getSeriesListings(
     scholarId: string,
+    locale: Locale,
   ): Promise<SeriesSummaryDto[]> {
     const records = await this.prisma.series.findMany({
       where: {
@@ -495,7 +555,13 @@ export class ScholarsRepository {
         id: true,
         slug: true,
         title: true,
+        language: true,
         coverImageUrl: true,
+        translations: {
+          where: { locale, status: 'published' },
+          select: { title: true },
+          take: 1,
+        },
         _count: {
           select: {
             lectures: {
@@ -509,18 +575,31 @@ export class ScholarsRepository {
       },
     });
 
-    return records.map((r) => ({
-      id: r.id,
-      slug: r.slug,
-      title: r.title,
-      coverImageUrl: r.coverImageUrl ?? undefined,
-      lectureCount: r._count.lectures,
-    }));
+    return records.map((r) => {
+      const resolved = resolveContentTranslation({
+        base: { title: r.title },
+        originalLanguage: r.language,
+        targetLocale: locale,
+        publishedTranslation: r.translations[0] ?? null,
+      });
+      return {
+        id: r.id,
+        slug: r.slug,
+        title: resolved.fields.title,
+        coverImageUrl: r.coverImageUrl ?? undefined,
+        lectureCount: r._count.lectures,
+        originalLanguage: resolved.originalLanguage,
+        original: resolved.original
+          ? { title: resolved.original.title }
+          : undefined,
+      };
+    });
   }
 
-  private async getStandaloneLectures(
+  private async getSingles(
     scholarId: string,
-  ): Promise<LectureSummaryDto[]> {
+    locale: Locale,
+  ): Promise<SingleSummaryDto[]> {
     const records = await this.prisma.lecture.findMany({
       where: {
         scholarId,
@@ -533,18 +612,36 @@ export class ScholarsRepository {
         id: true,
         slug: true,
         title: true,
+        language: true,
         durationSeconds: true,
         publishedAt: true,
+        translations: {
+          where: { locale, status: 'published' },
+          select: { title: true },
+          take: 1,
+        },
       },
     });
 
-    return records.map((r) => ({
-      id: r.id,
-      slug: r.slug,
-      title: r.title,
-      durationSeconds: r.durationSeconds ?? undefined,
-      publishedAt: r.publishedAt?.toISOString(),
-    }));
+    return records.map((r) => {
+      const resolved = resolveContentTranslation({
+        base: { title: r.title },
+        originalLanguage: r.language,
+        targetLocale: locale,
+        publishedTranslation: r.translations[0] ?? null,
+      });
+      return {
+        id: r.id,
+        slug: r.slug,
+        title: resolved.fields.title,
+        durationSeconds: r.durationSeconds ?? undefined,
+        publishedAt: r.publishedAt?.toISOString(),
+        originalLanguage: resolved.originalLanguage,
+        original: resolved.original
+          ? { title: resolved.original.title }
+          : undefined,
+      };
+    });
   }
 
   // ─── Admin Series Methods ──────────────────────────────────────────────────

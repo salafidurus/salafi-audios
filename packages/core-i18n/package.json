@@ -18,19 +18,17 @@
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     },
-    "./locales/*": {
-      "default": "./dist/locales/*"
-    }
+    "./locales/*": "./src/locales/*"
   },
   "scripts": {
     "clean": "rimraf dist",
     "build": "tsup src/index.ts --format esm,cjs --dts --tsconfig tsconfig.build.json --out-dir dist && node -e \"require('fs').cpSync('src/locales', 'dist/locales', {recursive:true})\"",
     "dev": "pnpm build --watch",
-    "lint": "eslint .",
-    "test": "jest --passWithNoTests",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
+    "lint": "oxlint . && eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:cov": "vitest run --coverage",
+    "test:prepush": "vitest run --changed=origin/main",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
@@ -38,11 +36,7 @@
     "i18next": "catalog:"
   },
   "devDependencies": {
-    "@sd/util-config": "workspace:*",
-    "@types/jest": "catalog:",
-    "jest": "catalog:",
-    "rimraf": "^6.0.0",
-    "ts-jest": "catalog:",
-    "tsup": "^8.0.0"
+    "rimraf": "catalog:",
+    "tsup": "catalog:"
   }
 }

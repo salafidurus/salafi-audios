@@ -1,3 +1,4 @@
+import { vi, type Mocked } from "vitest";
 import { DurusAudioService } from "./audio.service";
 import type { PlaybackEngine, PlaybackEngineEvents } from "../engine/playback.engine";
 import { usePlaybackStore } from "../store/playback.store";
@@ -5,16 +6,16 @@ import { useProgressStore } from "../progress/progress.store";
 import type { Track } from "../types/track.types";
 
 // Mock progress sync module to avoid network triggers in tests
-jest.mock("../progress/progress.sync", () => ({
-  syncProgressToBackend: jest.fn(),
-  syncLocalToServer: jest.fn(),
-  saveLecture: jest.fn(),
-  unsaveLecture: jest.fn(),
+vi.mock("../progress/progress.sync", () => ({
+  syncProgressToBackend: vi.fn(),
+  syncLocalToServer: vi.fn(),
+  saveLecture: vi.fn(),
+  unsaveLecture: vi.fn(),
 }));
 
 // Mock httpClient used for lazy stream URL resolution
-jest.mock("@sd/core-contracts", () => ({
-  httpClient: jest.fn(),
+vi.mock("@sd/core-contracts", () => ({
+  httpClient: vi.fn(),
   endpoints: {
     audio: {
       lectures: {
@@ -29,7 +30,7 @@ import { httpClient } from "@sd/core-contracts";
 
 describe("DurusAudioService", () => {
   let service: DurusAudioService;
-  let mockEngine: jest.Mocked<PlaybackEngine>;
+  let mockEngine: Mocked<PlaybackEngine>;
   let engineEvents: PlaybackEngineEvents;
 
   const mockTrack: Track = {
@@ -41,23 +42,23 @@ describe("DurusAudioService", () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     usePlaybackStore.getState().actions.stop();
-    (httpClient as jest.Mock).mockResolvedValue({ url: "https://resolved.stream.mp3" });
+    vi.mocked(httpClient).mockResolvedValue({ url: "https://resolved.stream.mp3" });
 
     mockEngine = {
-      setup: jest.fn().mockResolvedValue(undefined),
-      load: jest.fn().mockResolvedValue(undefined),
-      play: jest.fn().mockResolvedValue(undefined),
-      pause: jest.fn().mockResolvedValue(undefined),
-      seek: jest.fn().mockResolvedValue(undefined),
-      setSpeed: jest.fn().mockResolvedValue(undefined),
-      stop: jest.fn().mockResolvedValue(undefined),
-      destroy: jest.fn().mockResolvedValue(undefined),
-      setEvents: jest.fn().mockImplementation((ev) => {
+      setup: vi.fn().mockResolvedValue(undefined),
+      load: vi.fn().mockResolvedValue(undefined),
+      play: vi.fn().mockResolvedValue(undefined),
+      pause: vi.fn().mockResolvedValue(undefined),
+      seek: vi.fn().mockResolvedValue(undefined),
+      setSpeed: vi.fn().mockResolvedValue(undefined),
+      stop: vi.fn().mockResolvedValue(undefined),
+      destroy: vi.fn().mockResolvedValue(undefined),
+      setEvents: vi.fn().mockImplementation((ev) => {
         engineEvents = ev;
       }),
-    } as unknown as jest.Mocked<PlaybackEngine>;
+    } as unknown as Mocked<PlaybackEngine>;
 
     service = new DurusAudioService(mockEngine);
   });
@@ -140,7 +141,7 @@ describe("DurusAudioService", () => {
 
   it("should lazily resolve stream URL when track.url is empty", async () => {
     const stubTrack: Track = { ...mockTrack, url: "" };
-    (httpClient as jest.Mock).mockResolvedValue({ url: "https://fresh-signed.mp3" });
+    vi.mocked(httpClient).mockResolvedValue({ url: "https://fresh-signed.mp3" });
 
     await service.playLecture(stubTrack);
 

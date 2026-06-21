@@ -1,5 +1,5 @@
 import React from "react";
-import renderer, { act } from "react-test-renderer";
+import { render, screen } from "@testing-library/react-native";
 import { SeriesSheet } from "./SeriesSheet";
 
 jest.mock("@/features/admin-scholars/api/admin-scholars.api", () => ({
@@ -8,25 +8,18 @@ jest.mock("@/features/admin-scholars/api/admin-scholars.api", () => ({
 }));
 
 describe("SeriesSheet", () => {
-  it("renders create form when no series is provided", () => {
-    let tree: ReturnType<typeof renderer.create>;
-    act(() => {
-      tree = renderer.create(
-        <SeriesSheet isOpen={true} scholarId="s1" onClose={() => {}} onSaved={() => {}} />,
-      );
-    });
-    const rendered = JSON.stringify(tree!.toJSON());
-    expect(rendered).toContain("New Series");
-    expect(rendered).toContain("Title");
+  it("renders create form when no series is provided", async () => {
+    await render(
+      <SeriesSheet isOpen={true} scholarId="s1" onClose={() => {}} onSaved={() => {}} />,
+    );
+    expect(screen.getByText("New Series")).toBeTruthy();
+    expect(screen.getByText("Title", { exact: false })).toBeTruthy();
   });
 
-  it("renders nothing when closed", () => {
-    let tree: ReturnType<typeof renderer.create>;
-    act(() => {
-      tree = renderer.create(
-        <SeriesSheet isOpen={false} scholarId="s1" onClose={() => {}} onSaved={() => {}} />,
-      );
-    });
-    expect(tree!.toJSON()).toBeNull();
+  it("renders nothing when closed", async () => {
+    await render(
+      <SeriesSheet isOpen={false} scholarId="s1" onClose={() => {}} onSaved={() => {}} />,
+    );
+    expect(screen.toJSON()).toBeNull();
   });
 });

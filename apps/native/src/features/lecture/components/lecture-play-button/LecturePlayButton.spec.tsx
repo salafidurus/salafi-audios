@@ -1,5 +1,5 @@
 import React from "react";
-import renderer, { act } from "react-test-renderer";
+import { render, screen, fireEvent } from "@testing-library/react-native";
 import type { LectureDetailDto } from "@sd/core-contracts";
 import { LecturePlayButton } from "./LecturePlayButton";
 import { useAudio } from "@sd/domain-audio";
@@ -18,7 +18,13 @@ jest.mock("../../../../shared/components/Button/Button", () => ({
   Button: ({ label, onPress }: { label: string; onPress: () => void }) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const React = require("react");
-    return React.createElement("View", { testID: label, onPress }, label);
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { Text } = require("react-native");
+    return React.createElement(
+      "View",
+      { testID: label, onPress },
+      React.createElement(Text, null, label),
+    );
   },
 }));
 
@@ -38,27 +44,21 @@ const baseLecture: LectureDetailDto = {
 };
 
 describe("LecturePlayButton", () => {
-  it("returns null when there is no primaryAudioAsset", () => {
-    let tree: ReturnType<typeof renderer.create>;
-    act(() => {
-      tree = renderer.create(<LecturePlayButton lecture={baseLecture} />);
-    });
-    expect(tree!.toJSON()).toBeNull();
+  it("returns null when there is no primaryAudioAsset", async () => {
+    await render(<LecturePlayButton lecture={baseLecture} />);
+    expect(screen.toJSON()).toBeNull();
   });
 
-  it("renders play button when primaryAudioAsset exists", () => {
+  it("renders play button when primaryAudioAsset exists", async () => {
     const lecture: LectureDetailDto = {
       ...baseLecture,
       primaryAudioAsset: { id: "asset-1", url: "https://example.com/audio.mp3" },
     };
-    let tree: ReturnType<typeof renderer.create>;
-    act(() => {
-      tree = renderer.create(<LecturePlayButton lecture={lecture} />);
-    });
-    expect(JSON.stringify(tree!.toJSON())).toContain("▶ Play Lecture");
+    await render(<LecturePlayButton lecture={lecture} />);
+    expect(screen.getByTestId("▶ Play Lecture")).toBeTruthy();
   });
 
-  it("calls playLecture() with correct Track shape when pressed", () => {
+  it("calls playLecture() with correct Track shape when pressed", async () => {
     const lecture: LectureDetailDto = {
       ...baseLecture,
       durationSeconds: 3600,
@@ -68,16 +68,8 @@ describe("LecturePlayButton", () => {
         durationSeconds: 1800,
       },
     };
-    let tree: ReturnType<typeof renderer.create>;
-    act(() => {
-      tree = renderer.create(<LecturePlayButton lecture={lecture} />);
-    });
-    const pressable = tree!.root.find(
-      (node: { props: { onPress?: unknown } }) => typeof node.props.onPress === "function",
-    );
-    act(() => {
-      pressable.props.onPress();
-    });
+    await render(<LecturePlayButton lecture={lecture} />);
+    await fireEvent.press(screen.getByTestId("▶ Play Lecture"));
     const expectedTrack = {
       id: "asset-1",
       title: "Test Lecture",
@@ -91,7 +83,7 @@ describe("LecturePlayButton", () => {
     expect(audioService.playLecture).toHaveBeenCalledWith(expectedTrack, [expectedTrack]);
   });
 
-  it("passes series queueContext with lazy next-track stub when seriesContext has nextLecture", () => {
+  it("passes series queueContext with lazy next-track stub when seriesContext has nextLecture", async () => {
     const lecture: LectureDetailDto = {
       ...baseLecture,
       primaryAudioAsset: {
@@ -107,16 +99,8 @@ describe("LecturePlayButton", () => {
         nextLecture: { id: "lec-2", slug: "lecture-2", title: "Lecture 2" },
       },
     };
-    let tree: ReturnType<typeof renderer.create>;
-    act(() => {
-      tree = renderer.create(<LecturePlayButton lecture={lecture} />);
-    });
-    const pressable = tree!.root.find(
-      (node: { props: { onPress?: unknown } }) => typeof node.props.onPress === "function",
-    );
-    act(() => {
-      pressable.props.onPress();
-    });
+    await render(<LecturePlayButton lecture={lecture} />);
+    await fireEvent.press(screen.getByTestId("▶ Play Lecture"));
     const mainTrack = {
       id: "asset-1",
       title: "Test Lecture",

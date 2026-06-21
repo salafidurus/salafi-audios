@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 
 import { HealthModule } from './core/health/health.module';
@@ -22,6 +22,7 @@ import { HomeModule } from './modules/home/home.module';
 import { FeedModule } from './modules/feed/feed.module';
 import { MediaModule } from './modules/media/media.module';
 import { LocaleInterceptor } from './shared/interceptors/locale.interceptor';
+import { LocaleMiddleware } from './shared/i18n/locale.middleware';
 
 @Module({
   imports: [
@@ -49,4 +50,8 @@ import { LocaleInterceptor } from './shared/interceptors/locale.interceptor';
     { provide: APP_INTERCEPTOR, useClass: LocaleInterceptor },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer): void {
+    consumer.apply(LocaleMiddleware).forRoutes('*');
+  }
+}

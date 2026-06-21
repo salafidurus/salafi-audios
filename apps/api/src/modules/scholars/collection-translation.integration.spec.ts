@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { ForbiddenException, INestApplication } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
@@ -7,8 +8,8 @@ import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard
 import { CollectionTranslationsController } from './collection-translations.controller';
 import { ScholarsService } from './scholars.service';
 
-const mockAuth = { api: { getSession: jest.fn() } };
-jest.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
+const mockAuth = { api: { getSession: vi.fn() } };
+vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const draftTranslation = {
   locale: 'ar',
@@ -21,13 +22,11 @@ const draftTranslation = {
 const publishedTranslation = { ...draftTranslation, status: 'published' };
 
 const mockScholarsService = {
-  listCollectionTranslations: jest.fn().mockResolvedValue([]),
-  upsertCollectionTranslation: jest.fn().mockResolvedValue(draftTranslation),
-  updateCollectionTranslation: jest.fn().mockResolvedValue(draftTranslation),
-  publishCollectionTranslation: jest
-    .fn()
-    .mockResolvedValue(publishedTranslation),
-  unpublishCollectionTranslation: jest.fn().mockResolvedValue(draftTranslation),
+  listCollectionTranslations: vi.fn().mockResolvedValue([]),
+  upsertCollectionTranslation: vi.fn().mockResolvedValue(draftTranslation),
+  updateCollectionTranslation: vi.fn().mockResolvedValue(draftTranslation),
+  publishCollectionTranslation: vi.fn().mockResolvedValue(publishedTranslation),
+  unpublishCollectionTranslation: vi.fn().mockResolvedValue(draftTranslation),
 };
 
 async function buildApp(
@@ -56,7 +55,7 @@ describe('CollectionTranslationsController — auth boundaries', () => {
 
   beforeEach(async () => {
     mockAuth.api.getSession.mockReset();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockScholarsService.upsertCollectionTranslation.mockResolvedValue(
       draftTranslation,
     );

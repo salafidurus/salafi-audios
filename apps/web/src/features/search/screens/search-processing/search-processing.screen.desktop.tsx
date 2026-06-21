@@ -7,9 +7,13 @@ import { SearchInputDesktop } from "@/features/search/components/SearchInput/Sea
 import { SearchResultItemDesktop } from "@/features/search/components/SearchResultItem/SearchResultItem.desktop";
 import { SearchResultsListDesktop } from "@/features/search/components/SearchResultsList/SearchResultsList.desktop";
 import { useSearchProcessing } from "@sd/domain-search";
+import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import { useTranslation } from "@/core/i18n/use-translation";
 
 export function SearchProcessingDesktopScreen() {
   const inputRef = useRef<HTMLInputElement>(null);
+  const showOriginal = useShowOriginalContent();
+  const { t } = useTranslation();
   const {
     query,
     setQuery,
@@ -20,7 +24,7 @@ export function SearchProcessingDesktopScreen() {
     isFetching,
     shouldSearch,
     errorMessage,
-  } = useSearchProcessing();
+  } = useSearchProcessing({ showOriginal });
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -39,7 +43,7 @@ export function SearchProcessingDesktopScreen() {
         <div className="mx-auto flex w-full max-w-[52rem] flex-col gap-[var(--space-component-gap-md)]">
           <SearchInputDesktop
             ref={inputRef}
-            placeholder="Search"
+            placeholder={t("search.placeholder", "Search")}
             value={query}
             onChange={setQuery}
             autoFocus

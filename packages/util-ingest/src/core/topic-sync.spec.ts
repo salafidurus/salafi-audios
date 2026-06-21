@@ -1,3 +1,4 @@
+import { vi, type Mock } from "vitest";
 import { Prisma } from "@sd/core-db";
 import {
   upsertTopics,
@@ -11,19 +12,19 @@ import type { TopicDef } from "../schema/content-schema";
 const createMockTx = () => {
   const mockTx: Partial<Prisma.TransactionClient> = {
     topic: {
-      upsert: jest.fn(),
+      upsert: vi.fn(),
     } as unknown as Prisma.TransactionClient["topic"],
     collectionTopic: {
-      deleteMany: jest.fn(),
-      createMany: jest.fn(),
+      deleteMany: vi.fn(),
+      createMany: vi.fn(),
     } as unknown as Prisma.TransactionClient["collectionTopic"],
     seriesTopic: {
-      deleteMany: jest.fn(),
-      createMany: jest.fn(),
+      deleteMany: vi.fn(),
+      createMany: vi.fn(),
     } as unknown as Prisma.TransactionClient["seriesTopic"],
     lectureTopic: {
-      deleteMany: jest.fn(),
-      createMany: jest.fn(),
+      deleteMany: vi.fn(),
+      createMany: vi.fn(),
     } as unknown as Prisma.TransactionClient["lectureTopic"],
   };
   return mockTx as Prisma.TransactionClient;
@@ -38,7 +39,7 @@ describe("upsertTopics", () => {
 
   it("upserts root topics first", async () => {
     const tx = createMockTx();
-    const mockTopicUpsert = tx.topic.upsert as jest.Mock;
+    const mockTopicUpsert = tx.topic.upsert as Mock;
 
     mockTopicUpsert.mockResolvedValue({
       id: "topic-1-id",
@@ -61,7 +62,7 @@ describe("upsertTopics", () => {
 
   it("upserts child topics after parents", async () => {
     const tx = createMockTx();
-    const mockTopicUpsert = tx.topic.upsert as jest.Mock;
+    const mockTopicUpsert = tx.topic.upsert as Mock;
 
     // Mock parent topic upsert
     mockTopicUpsert
@@ -101,7 +102,7 @@ describe("upsertTopics", () => {
 
   it("handles multiple generations of topics", async () => {
     const tx = createMockTx();
-    const mockTopicUpsert = tx.topic.upsert as jest.Mock;
+    const mockTopicUpsert = tx.topic.upsert as Mock;
 
     mockTopicUpsert
       .mockResolvedValueOnce({ id: "grandparent-id", slug: "grandparent" })
@@ -124,7 +125,7 @@ describe("upsertTopics", () => {
 
   it("throws error for unresolvable parent relationships", async () => {
     const tx = createMockTx();
-    const mockTopicUpsert = tx.topic.upsert as jest.Mock;
+    const mockTopicUpsert = tx.topic.upsert as Mock;
 
     // Only return parent topic, child will have missing parent reference
     mockTopicUpsert.mockResolvedValue({
@@ -146,8 +147,8 @@ describe("upsertTopics", () => {
 describe("syncCollectionTopics", () => {
   it("deletes existing topics and creates new ones", async () => {
     const tx = createMockTx();
-    const mockDeleteMany = tx.collectionTopic.deleteMany as jest.Mock;
-    const mockCreateMany = tx.collectionTopic.createMany as jest.Mock;
+    const mockDeleteMany = tx.collectionTopic.deleteMany as Mock;
+    const mockCreateMany = tx.collectionTopic.createMany as Mock;
 
     const topicIdBySlug = new Map([
       ["topic-1", "id-1"],
@@ -174,8 +175,8 @@ describe("syncCollectionTopics", () => {
 
   it("handles empty topic slugs by deleting all existing topics", async () => {
     const tx = createMockTx();
-    const mockDeleteMany = tx.collectionTopic.deleteMany as jest.Mock;
-    const mockCreateMany = tx.collectionTopic.createMany as jest.Mock;
+    const mockDeleteMany = tx.collectionTopic.deleteMany as Mock;
+    const mockCreateMany = tx.collectionTopic.createMany as Mock;
 
     const topicIdBySlug = new Map<string, string>();
 
@@ -203,8 +204,8 @@ describe("syncCollectionTopics", () => {
 describe("syncSeriesTopics", () => {
   it("deletes existing topics and creates new ones", async () => {
     const tx = createMockTx();
-    const mockDeleteMany = tx.seriesTopic.deleteMany as jest.Mock;
-    const mockCreateMany = tx.seriesTopic.createMany as jest.Mock;
+    const mockDeleteMany = tx.seriesTopic.deleteMany as Mock;
+    const mockCreateMany = tx.seriesTopic.createMany as Mock;
 
     const topicIdBySlug = new Map([
       ["topic-1", "id-1"],
@@ -231,8 +232,8 @@ describe("syncSeriesTopics", () => {
 
   it("handles empty topic slugs", async () => {
     const tx = createMockTx();
-    const mockDeleteMany = tx.seriesTopic.deleteMany as jest.Mock;
-    const mockCreateMany = tx.seriesTopic.createMany as jest.Mock;
+    const mockDeleteMany = tx.seriesTopic.deleteMany as Mock;
+    const mockCreateMany = tx.seriesTopic.createMany as Mock;
 
     await syncSeriesTopics(tx, "series-id", [], new Map());
 
@@ -258,8 +259,8 @@ describe("syncSeriesTopics", () => {
 describe("syncLectureTopics", () => {
   it("deletes existing topics and creates new ones", async () => {
     const tx = createMockTx();
-    const mockDeleteMany = tx.lectureTopic.deleteMany as jest.Mock;
-    const mockCreateMany = tx.lectureTopic.createMany as jest.Mock;
+    const mockDeleteMany = tx.lectureTopic.deleteMany as Mock;
+    const mockCreateMany = tx.lectureTopic.createMany as Mock;
 
     const topicIdBySlug = new Map([
       ["topic-1", "id-1"],
@@ -286,8 +287,8 @@ describe("syncLectureTopics", () => {
 
   it("handles empty topic slugs", async () => {
     const tx = createMockTx();
-    const mockDeleteMany = tx.lectureTopic.deleteMany as jest.Mock;
-    const mockCreateMany = tx.lectureTopic.createMany as jest.Mock;
+    const mockDeleteMany = tx.lectureTopic.deleteMany as Mock;
+    const mockCreateMany = tx.lectureTopic.createMany as Mock;
 
     await syncLectureTopics(tx, "lecture-id", [], new Map());
 

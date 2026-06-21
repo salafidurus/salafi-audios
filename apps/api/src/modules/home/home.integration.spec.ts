@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { INestApplication } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
@@ -6,11 +7,11 @@ import { AuthGuard } from '../auth/auth.guard';
 import { HomeController } from './home.controller';
 import { HomeService } from './home.service';
 
-const mockAuth = { api: { getSession: jest.fn() } };
-jest.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
+const mockAuth = { api: { getSession: vi.fn() } };
+vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockHomeService = {
-  getQuickBrowse: jest.fn().mockResolvedValue({
+  getQuickBrowse: vi.fn().mockResolvedValue({
     recentLectures: [],
     topScholars: [],
     featuredCollections: [],

@@ -1,5 +1,5 @@
 import React from "react";
-import renderer, { act } from "react-test-renderer";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react-native";
 import { changeLocale } from "@/core/i18n/i18n";
 import { LanguageSwitch } from "./language-switch";
 
@@ -13,6 +13,10 @@ jest.mock("@sd/core-i18n", () => ({
 
 jest.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => mockUseTranslation(),
+}));
+
+jest.mock("@tanstack/react-query", () => ({
+  useQueryClient: () => ({ invalidateQueries: jest.fn().mockResolvedValue(undefined) }),
 }));
 
 jest.mock("../../../../core/i18n/i18n", () => ({
@@ -51,28 +55,26 @@ describe("LanguageSwitch", () => {
     });
   });
 
-  it("renders all supported locales", () => {
-    let tree: ReturnType<typeof renderer.create>;
-    act(() => {
-      tree = renderer.create(<LanguageSwitch />);
-    });
-    const rendered = JSON.stringify(tree!.toJSON());
-    expect(rendered).toContain("English");
-    expect(rendered).toContain("العربية");
+  it("shows the active locale and reveals the others when opened", async () => {
+    await render(<LanguageSwitch />);
+
+    // Closed: only the active locale label is shown.
+    expect(screen.getByText("English")).toBeTruthy();
+    expect(screen.queryByText("العربية")).toBeNull();
+
+    // Open the menu.
+    await fireEvent.press(screen.getByText("English"));
+
+    expect(screen.getByText("العربية")).toBeTruthy();
   });
 
-  it("changes locale when a locale button is pressed", () => {
-    let tree: ReturnType<typeof renderer.create>;
-    act(() => {
-      tree = renderer.create(<LanguageSwitch />);
-    });
-    // Find all pressables and press the one for Arabic (index 1)
-    const pressables = tree!.root.findAll(
-      (node: { props: { onPress?: unknown } }) => typeof node.props.onPress === "function",
-    );
-    act(() => {
-      pressables[1].props.onPress();
-    });
-    expect(changeLocale).toHaveBeenCalledWith("ar");
+  it("changes locale when a locale option is pressed", async () => {
+    await render(<LanguageSwitch />);
+
+    // Open the menu, then pick the Arabic option.
+    await fireEvent.press(screen.getByText("English"));
+    await fireEvent.press(screen.getByText("العربية"));
+
+    await waitFor(() => expect(changeLocale).toHaveBeenCalledWith("ar"));
   });
 });

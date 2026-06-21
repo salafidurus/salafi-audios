@@ -1,5 +1,5 @@
 import React from "react";
-import renderer, { act } from "react-test-renderer";
+import { render, screen } from "@testing-library/react-native";
 import { AdminDashboardScreen } from "./admin-dashboard.screen";
 
 jest.mock("@/core/i18n/use-translation", () => ({
@@ -9,39 +9,29 @@ jest.mock("@/core/i18n/use-translation", () => ({
 }));
 
 describe("AdminDashboardScreen", () => {
-  it("renders all admin sections", () => {
-    let tree: ReturnType<typeof renderer.create>;
+  it("renders all admin sections", async () => {
+    await render(<AdminDashboardScreen />);
 
-    act(() => {
-      tree = renderer.create(<AdminDashboardScreen />);
-    });
-
-    const rendered = JSON.stringify(tree!.toJSON());
-
-    expect(rendered).toContain("Admin Dashboard");
-    expect(rendered).toContain("Lectures");
-    expect(rendered).toContain("Live");
-    expect(rendered).toContain("Scholars");
+    expect(screen.getByText("Admin Dashboard")).toBeTruthy();
+    expect(screen.getByText("Lectures")).toBeTruthy();
+    expect(screen.getByText("Live")).toBeTruthy();
+    expect(screen.getByText("Scholars")).toBeTruthy();
   });
 
-  it("calls navigation handlers when sections are pressed", () => {
+  it("calls navigation handlers when sections are pressed", async () => {
     const mockNavigateLectures = jest.fn();
     const mockNavigateLive = jest.fn();
     const mockNavigateScholars = jest.fn();
 
-    let tree: ReturnType<typeof renderer.create>;
+    await render(
+      <AdminDashboardScreen
+        onNavigateToLectures={mockNavigateLectures}
+        onNavigateToLive={mockNavigateLive}
+        onNavigateToScholars={mockNavigateScholars}
+      />,
+    );
 
-    act(() => {
-      tree = renderer.create(
-        <AdminDashboardScreen
-          onNavigateToLectures={mockNavigateLectures}
-          onNavigateToLive={mockNavigateLive}
-          onNavigateToScholars={mockNavigateScholars}
-        />,
-      );
-    });
-
-    expect(tree!.toJSON()).not.toBeNull();
+    expect(screen.toJSON()).not.toBeNull();
     expect(mockNavigateLectures).not.toHaveBeenCalled();
   });
 });

@@ -1,8 +1,9 @@
 {
-  "extends": "@sd/util-config/tsconfig/nest.json",
+  "extends": "../../tsconfig.nest.json",
   "compilerOptions": {
     "noEmit": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "types": ["vitest/globals", "node"]
   },
   "include": ["src/**/*.ts", "test/**/*.ts"]
 }

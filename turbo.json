@@ -3,6 +3,16 @@
   "ui": "tui",
   // Prisma client generation needs DB URLs at build time; pass them through to all tasks
   "globalPassThroughEnv": ["DIRECT_DB_URL", "DATABASE_URL"],
+  // Root-level shared lint/tsconfig presets — a change here invalidates every task's cache
+  "globalDependencies": [
+    "tsconfig.base.json",
+    "tsconfig.packages.json",
+    "tsconfig.nest.json",
+    "eslint.config.base.mjs",
+    "eslint.config.packages.mjs",
+    "eslint.config.nest.mjs",
+    ".oxlintrc.json"
+  ],
   "tasks": {
     "dev": {
       // Build workspace dependencies first (cached) so dist/ exports resolve
@@ -20,19 +30,26 @@
     "lint": {
       "dependsOn": ["^lint"],
       // Include shared ESLint config so lint re-runs when rules change
-      "inputs": [
-        "$TURBO_DEFAULT$",
-        ".eslintrc*",
-        "eslint.config.*",
-        "packages/util-config/eslint/**"
-      ],
+      "inputs": ["$TURBO_DEFAULT$", ".eslintrc*", "eslint.config.*"],
       "outputs": []
     },
     "typecheck": {
-      "dependsOn": ["^typecheck"],
+      // ^build so dependencies' emitted .d.ts exist before we typecheck. apps/api uses
+      // classic "node" moduleResolution, which ignores package "exports" and reads the
+      // top-level "types": "./dist/index.d.ts" — that file must be built first.
+      "dependsOn": ["^build", "^typecheck"],
       // Include shared tsconfig so typecheck re-runs when compiler options change
-      "inputs": ["$TURBO_DEFAULT$", "tsconfig*.json", "packages/util-config/tsconfig/**"],
-      // Prisma client generation is part of typecheck pipeline — output cached for downstream
+      "inputs": ["$TURBO_DEFAULT$", "tsconfig*.json"],
+      // Most packages emit nothing from typecheck (tsc --noEmit); declaring outputs here
+      // produced "no output files found" warnings. Prisma generation is scoped to the
+      // @sd/core-db override below.
+      "outputs": []
+    },
+    // core-db's pretypecheck runs `prisma generate`, so its typecheck genuinely emits the
+    // client. Cache it for downstream consumers.
+    "@sd/core-db#typecheck": {
+      "dependsOn": ["build", "^typecheck"],
+      "inputs": ["$TURBO_DEFAULT$", "tsconfig*.json"],
       "outputs": ["generated/**", "src/generated/**"]
     },
     "test": {
@@ -42,7 +59,9 @@
         "**/*.spec.*",
         "**/*.test.*",
         "jest.config.*",
-        "**/jest.config.*"
+        "**/jest.config.*",
+        "vitest.config.*",
+        "**/vitest.config.*"
       ],
       "outputs": []
     },

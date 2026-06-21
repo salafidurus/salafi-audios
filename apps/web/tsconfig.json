@@ -1,6 +1,8 @@
 {
-  "extends": "../../packages/util-config/tsconfig/next.json",
+  "extends": "../../tsconfig.packages.json",
   "compilerOptions": {
+    // Next.js handles JSX transformation via SWC; TS should not transform it
+    "jsx": "preserve",
     "moduleSuffixes": [".desktop.web", ".web", "", ".native"],
     "paths": {
       "@/*": ["./src/*"]

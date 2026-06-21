@@ -8,10 +8,9 @@ import styles from "../auth-form.module.css";
 
 type SignInDesktopScreenProps = {
   redirectTo: string;
-  onNavigateToSignUp: () => void;
 };
 
-export function SignInDesktopScreen({ redirectTo, onNavigateToSignUp }: SignInDesktopScreenProps) {
+export function SignInDesktopScreen({ redirectTo }: SignInDesktopScreenProps) {
   const { t } = useTranslation();
 
   return (
@@ -38,13 +37,6 @@ export function SignInDesktopScreen({ redirectTo, onNavigateToSignUp }: SignInDe
               }
             />
           </div>
-
-          <p className={styles.footerText}>
-            {t("auth.signIn.noAccountSplit")}{" "}
-            <button type="button" onClick={onNavigateToSignUp} className={styles.footerLink}>
-              {t("auth.signIn.noAccountLink")}
-            </button>
-          </p>
         </div>
       </div>
     </main>

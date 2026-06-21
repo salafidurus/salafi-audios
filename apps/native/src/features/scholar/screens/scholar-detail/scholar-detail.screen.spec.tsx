@@ -1,5 +1,5 @@
 import React from "react";
-import renderer, { act } from "react-test-renderer";
+import { render, screen } from "@testing-library/react-native";
 import { useScholarDetailScreen } from "@sd/domain-content";
 import { ScholarDetailScreen } from "./scholar-detail.screen";
 
@@ -7,59 +7,74 @@ jest.mock("@sd/domain-content", () => ({
   useScholarDetailScreen: jest.fn(),
 }));
 
-jest.mock("../../../../shared/components/ScreenView/ScreenView", () => ({
-  ScreenView: ({ children }: { children: React.ReactNode }) => children,
+jest.mock("@/shared/components/ScreenView/ScreenView", () => ({
+  ScreenView: ({ children }: { children: React.ReactNode }) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const ReactM = require("react");
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { View } = require("react-native");
+    return ReactM.createElement(View, null, children);
+  },
 }));
 
-jest.mock("../../../../shared/components/AppText/AppText", () => ({
-  AppText: ({ children }: { children: React.ReactNode }) => children,
+jest.mock("@/shared/components/AppText/AppText", () => ({
+  AppText: ({ children }: { children: React.ReactNode }) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const ReactM = require("react");
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { Text } = require("react-native");
+    return ReactM.createElement(Text, null, children);
+  },
 }));
 
-jest.mock("../../components/scholar-header/scholar-header", () => ({
-  ScholarHeader: ({ scholar }: { scholar: { name: string } }) => `Header:${scholar.name}`,
+jest.mock("@/features/scholar/components/scholar-header/scholar-header", () => ({
+  ScholarHeader: ({ scholar }: { scholar: { name: string } }) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const ReactM = require("react");
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { Text } = require("react-native");
+    return ReactM.createElement(Text, null, `Header:${scholar.name}`);
+  },
 }));
 
-jest.mock("../../components/scholar-content-list/scholar-content-list", () => ({
-  ScholarContentList: ({ content }: { content: { collections: unknown[] } }) =>
-    `Content:${content.collections.length}`,
+jest.mock("@/features/scholar/components/scholar-content-list/scholar-content-list", () => ({
+  ScholarContentList: ({ content }: { content: { collections: unknown[] } }) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const ReactM = require("react");
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { Text } = require("react-native");
+    return ReactM.createElement(Text, null, `Content:${content.collections.length}`);
+  },
 }));
 
 const mockedUseScholarDetailScreen = jest.mocked(useScholarDetailScreen);
 
 describe("ScholarDetailScreen", () => {
-  it("renders a loading state while scholar detail is fetching", () => {
+  it("renders a loading state while scholar detail is fetching", async () => {
     mockedUseScholarDetailScreen.mockReturnValue({
       scholar: undefined,
       content: undefined,
       isFetching: true,
     });
 
-    let tree: ReturnType<typeof renderer.create>;
+    await render(<ScholarDetailScreen slug="ibn-baz" />);
 
-    act(() => {
-      tree = renderer.create(<ScholarDetailScreen slug="ibn-baz" />);
-    });
-
-    expect(tree!.toJSON()).toBe("Loading scholar…");
+    expect(screen.getByText("Loading scholar…")).toBeTruthy();
   });
 
-  it("renders an empty state when the scholar is missing", () => {
+  it("renders an empty state when the scholar is missing", async () => {
     mockedUseScholarDetailScreen.mockReturnValue({
       scholar: undefined,
       content: undefined,
       isFetching: false,
     });
 
-    let tree: ReturnType<typeof renderer.create>;
+    await render(<ScholarDetailScreen slug="missing" />);
 
-    act(() => {
-      tree = renderer.create(<ScholarDetailScreen slug="missing" />);
-    });
-
-    expect(tree!.toJSON()).toBe("Scholar not found");
+    expect(screen.getByText("Scholar not found")).toBeTruthy();
   });
 
-  it("renders the scholar header and content when data exists", () => {
+  it("renders the scholar header and content when data exists", async () => {
     mockedUseScholarDetailScreen.mockReturnValue({
       scholar: {
         id: "scholar-1",
@@ -84,19 +99,15 @@ describe("ScholarDetailScreen", () => {
         collections: [
           { id: "collection-1", slug: "collection", title: "Collection", lectureCount: 2 },
         ],
-        standaloneSeries: [],
-        standaloneLectures: [],
+        series: [],
+        singles: [],
       },
       isFetching: false,
     });
 
-    let tree: ReturnType<typeof renderer.create>;
+    await render(<ScholarDetailScreen slug="ibn-baz" />);
 
-    act(() => {
-      tree = renderer.create(<ScholarDetailScreen slug="ibn-baz" />);
-    });
-
-    expect(JSON.stringify(tree!.toJSON())).toContain("Header:Ibn Baz");
-    expect(JSON.stringify(tree!.toJSON())).toContain("Content:1");
-  });
+    expect(screen.getByText("Header:Ibn Baz")).toBeTruthy();
+    expect(screen.getByText("Content:1")).toBeTruthy();
+  }, 15000);
 });

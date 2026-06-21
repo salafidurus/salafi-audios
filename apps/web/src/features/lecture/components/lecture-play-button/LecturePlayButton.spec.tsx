@@ -1,3 +1,4 @@
+import { vi, type Mock } from "vitest";
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import type { LectureDetailDto } from "@sd/core-contracts";
@@ -5,21 +6,21 @@ import { LecturePlayButton } from "./LecturePlayButton";
 import { useAudio } from "@sd/domain-audio";
 import { audioService } from "@/features/audio";
 
-jest.mock("@sd/domain-audio", () => ({
-  useAudio: jest.fn(),
+vi.mock("@sd/domain-audio", () => ({
+  useAudio: vi.fn(),
 }));
 
-jest.mock("@/features/audio", () => ({
+vi.mock("@/features/audio", () => ({
   audioService: {
-    playLecture: jest.fn(),
-    pause: jest.fn(),
-    resume: jest.fn(),
+    playLecture: vi.fn(),
+    pause: vi.fn(),
+    resume: vi.fn(),
   },
 }));
 
 beforeEach(() => {
-  jest.clearAllMocks();
-  (useAudio as jest.Mock).mockReturnValue({ isPlaying: false, currentTrack: null });
+  vi.clearAllMocks();
+  (useAudio as Mock).mockReturnValue({ isPlaying: false, currentTrack: null });
 });
 
 const baseLecture: LectureDetailDto = {

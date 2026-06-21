@@ -3,4 +3,5 @@ export {
   setUnauthorizedHandler,
   setAccessTokenProvider,
   setCookieProvider,
+  setLocaleProvider,
 } from "./utils/api-client";

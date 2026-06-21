@@ -36,7 +36,8 @@ export {
   type ScholarContentDto,
   type CollectionSummaryDto,
   type SeriesSummaryDto,
-  type LectureSummaryDto,
+  type SingleSummaryDto,
+  type ListingFormat,
   type CollectionViewDto,
   type SeriesViewDto,
   type PresignedUrlPurpose,
@@ -93,8 +94,18 @@ export type {
 } from "./types";
 
 // Export route constants
-export { routes, routeAuth, routeAuthOverrides, getEffectiveAuthMode } from "./routes";
-export type { RouteAuthMode } from "./routes";
+export { routes, routeDefinitions, resolveRouteAccess } from "./routes";
+export type { RouteAccess, RouteDefinition } from "./routes";
+
+// Export shared navigation metadata
+export {
+  SECTION_TABS,
+  DEFAULT_TABS,
+  SECTION_LABELS,
+  SECTION_ROUTES,
+  type Section,
+  type TabConfig,
+} from "./navigation";
 
 // Export query utilities (client, keys, hooks)
 export { createQueryClient, queryKeys } from "./query";
@@ -113,4 +124,6 @@ export {
   DEFAULT_LOCALE,
   RTL_LOCALES,
   type Locale,
+  type ContentOriginalFields,
+  type ScholarOriginalFields,
 } from "./types/localization.types";

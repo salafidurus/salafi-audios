@@ -11,6 +11,8 @@ import {
 import { UpsertTopicDto } from './dto/upsert-topic.dto';
 import { SaveTopicTranslationDto } from './dto/save-topic-translation.dto';
 import { isLegacyTopicSchemaFailure } from './topics-error.utils';
+import { resolveContentTranslation } from '../../shared/utils/resolve-content-translation';
+import { getRequestLocale } from '../../shared/i18n/locale-context';
 
 const topicViewSelect = {
   id: true,
@@ -64,6 +66,7 @@ export class TopicsRepository {
     });
     if (!topic) return null;
 
+    const locale = getRequestLocale();
     const records = await this.prisma.lecture.findMany({
       where: {
         deletedAt: null,
@@ -111,21 +114,41 @@ export class TopicsRepository {
         status: true,
         publishedAt: true,
         durationSeconds: true,
+        translations: {
+          where: { locale, status: 'published' },
+          select: { title: true, description: true },
+          take: 1,
+        },
       } satisfies Prisma.LectureSelect,
     });
 
-    return records.map((r) => ({
-      id: r.id,
-      scholarId: r.scholarId,
-      seriesId: r.seriesId ?? undefined,
-      slug: r.slug,
-      title: r.title,
-      description: r.description ?? undefined,
-      language: r.language ?? undefined,
-      status: r.status,
-      publishedAt: r.publishedAt?.toISOString(),
-      durationSeconds: r.durationSeconds ?? undefined,
-    }));
+    return records.map((r) => {
+      const resolved = resolveContentTranslation({
+        base: { title: r.title, description: r.description ?? null },
+        originalLanguage: r.language,
+        targetLocale: locale,
+        publishedTranslation: r.translations[0] ?? null,
+      });
+      return {
+        id: r.id,
+        scholarId: r.scholarId,
+        seriesId: r.seriesId ?? undefined,
+        slug: r.slug,
+        title: resolved.fields.title,
+        description: resolved.fields.description ?? undefined,
+        language: r.language ?? undefined,
+        originalLanguage: resolved.originalLanguage,
+        original: resolved.original
+          ? {
+              title: resolved.original.title,
+              description: resolved.original.description ?? undefined,
+            }
+          : undefined,
+        status: r.status,
+        publishedAt: r.publishedAt?.toISOString(),
+        durationSeconds: r.durationSeconds ?? undefined,
+      };
+    });
   }
 
   async findBySlug(slug: string): Promise<TopicDetailDto | null> {

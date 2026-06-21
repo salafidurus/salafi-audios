@@ -9,10 +9,9 @@ import { buildOAuthCallbackURL } from "@/features/auth/oauth-callback-url";
 
 type SignInScreenProps = {
   redirectTo: string;
-  onNavigateToSignUp: () => void;
 };
 
-export function SignInResponsiveScreen({ redirectTo, onNavigateToSignUp }: SignInScreenProps) {
+export function SignInResponsiveScreen({ redirectTo }: SignInScreenProps) {
   const isHydrated = useIsHydrated();
   const { isMobile, isTablet } = useResponsive();
 
@@ -35,10 +34,9 @@ export function SignInResponsiveScreen({ redirectTo, onNavigateToSignUp }: SignI
             callbackURL: buildOAuthCallbackURL(redirectTo),
           })
         }
-        onNavigateToSignUp={onNavigateToSignUp}
       />
     );
   }
 
-  return <SignInDesktopScreen redirectTo={redirectTo} onNavigateToSignUp={onNavigateToSignUp} />;
+  return <SignInDesktopScreen redirectTo={redirectTo} />;
 }

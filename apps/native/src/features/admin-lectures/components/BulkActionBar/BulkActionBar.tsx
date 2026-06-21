@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 
 type BulkActionBarProps = {
   selectedCount: number;
@@ -18,16 +19,16 @@ export function BulkActionBar({
     <View style={styles.container}>
       <Text style={styles.countText}>{selectedCount} selected</Text>
       <Pressable onPress={onPublish} disabled={isLoading} style={styles.publishBtn}>
-        <Text style={styles.btnText}>Publish</Text>
+        <Text style={[styles.btnText, styles.publishBtnText]}>Publish</Text>
       </Pressable>
       <Pressable onPress={onArchive} disabled={isLoading} style={styles.archiveBtn}>
-        <Text style={styles.btnText}>Archive</Text>
+        <Text style={[styles.btnText, styles.archiveBtnText]}>Archive</Text>
       </Pressable>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   container: {
     position: "absolute",
     bottom: 0,
@@ -36,29 +37,34 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     padding: 12,
-    backgroundColor: "#1a1a1a",
+    backgroundColor: theme.colors.surface.inverse,
     gap: 8,
   },
   countText: {
     flex: 1,
-    color: "#fff",
+    color: theme.colors.content.inverse,
     fontSize: 13,
   },
   publishBtn: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: "#16a34a",
+    backgroundColor: theme.colors.action.success,
     borderRadius: 8,
   },
   archiveBtn: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: "#dc2626",
+    backgroundColor: theme.colors.action.danger,
     borderRadius: 8,
   },
   btnText: {
-    color: "#fff",
     fontSize: 13,
     fontWeight: "600",
   },
-});
+  publishBtnText: {
+    color: theme.colors.content.onSuccess,
+  },
+  archiveBtnText: {
+    color: theme.colors.content.onDanger,
+  },
+}));

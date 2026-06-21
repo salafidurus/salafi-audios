@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { INestApplication } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
@@ -7,12 +8,12 @@ import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard
 import { AuthLocaleController } from './auth-locale.controller';
 import { PrismaService } from '../../shared/db/prisma.service';
 
-const mockAuth = { api: { getSession: jest.fn() } };
-jest.mock('./auth.instance', () => ({ getAuth: () => mockAuth }));
+const mockAuth = { api: { getSession: vi.fn() } };
+vi.mock('./auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockPrismaService = {
   user: {
-    update: jest.fn().mockResolvedValue({ preferredLanguage: 'ar' }),
+    update: vi.fn().mockResolvedValue({ preferredLanguage: 'ar' }),
   },
 };
 
@@ -21,7 +22,7 @@ describe('AuthLocaleController — auth boundaries', () => {
 
   beforeEach(async () => {
     mockAuth.api.getSession.mockReset();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockPrismaService.user.update.mockResolvedValue({
       preferredLanguage: 'ar',
     });
