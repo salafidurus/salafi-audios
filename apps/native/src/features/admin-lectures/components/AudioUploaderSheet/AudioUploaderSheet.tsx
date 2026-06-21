@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import * as DocumentPicker from "expo-document-picker";
 import type { ScholarListItemDto } from "@sd/core-contracts";
 import { useScholarsList } from "@sd/domain-content";
@@ -74,16 +75,21 @@ type QueueItemProps = {
 };
 
 function QueueItem({ item }: QueueItemProps) {
+  const { theme } = useUnistyles();
   const fillStyle = useMemo(
     () => [
       styles.progressFill,
       {
         width: `${Math.round(item.progress * 100)}%` as unknown as number,
         backgroundColor:
-          item.status === "error" ? "#dc2626" : item.status === "done" ? "#16a34a" : "#3b82f6",
+          item.status === "error"
+            ? theme.colors.state.danger
+            : item.status === "done"
+              ? theme.colors.state.success
+              : theme.colors.action.primary,
       },
     ],
-    [item.progress, item.status],
+    [item.progress, item.status, theme],
   );
 
   return (
@@ -100,6 +106,7 @@ function QueueItem({ item }: QueueItemProps) {
 }
 
 export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioUploaderSheetProps) {
+  const { theme } = useUnistyles();
   const { data: scholarsData } = useScholarsList();
   const scholars = scholarsData?.scholars ?? [];
   const [selectedScholarId, setSelectedScholarId] = useState<string | null>(null);
@@ -216,26 +223,26 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
           style={[styles.uploadBtn, isUploadDisabled && styles.uploadBtnDisabled]}
         >
           {isUploading ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={theme.colors.content.onPrimary} />
           ) : (
             <Text style={styles.uploadBtnText}>Upload All</Text>
           )}
         </Pressable>
         <Pressable onPress={onClose} style={styles.cancelBtn}>
-          <Text>Cancel</Text>
+          <Text style={styles.cancelBtnText}>Cancel</Text>
         </Pressable>
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   container: {
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.surface.elevated,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 16,
@@ -245,11 +252,13 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: "600",
     marginBottom: 12,
+    color: theme.colors.content.strong,
   },
   label: {
     fontSize: 13,
     fontWeight: "600",
     marginBottom: 6,
+    color: theme.colors.content.default,
   },
   scholarList: {
     marginBottom: 12,
@@ -259,35 +268,36 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
-    backgroundColor: "#f3f4f6",
+    backgroundColor: theme.colors.surface.subtle,
     marginEnd: 8,
     borderWidth: 1,
-    borderColor: "#e5e7eb",
+    borderColor: theme.colors.border.subtle,
     height: 32,
   },
   scholarChipSelected: {
-    backgroundColor: "#3b82f6",
-    borderColor: "#3b82f6",
+    backgroundColor: theme.colors.action.primary,
+    borderColor: theme.colors.action.primary,
   },
   scholarChipText: {
-    color: "#374151",
+    color: theme.colors.content.default,
     fontSize: 13,
     fontWeight: "400",
   },
   scholarChipTextSelected: {
-    color: "#fff",
+    color: theme.colors.content.onPrimary,
     fontWeight: "600",
   },
   pickBtn: {
     padding: 12,
     borderWidth: 1,
-    borderColor: "#d1d5db",
+    borderColor: theme.colors.border.default,
     borderRadius: 8,
     alignItems: "center",
     marginBottom: 12,
   },
   pickBtnText: {
     fontSize: 15,
+    color: theme.colors.content.default,
   },
   queueList: {
     maxHeight: 200,
@@ -297,10 +307,11 @@ const styles = StyleSheet.create({
   },
   queueItemName: {
     fontSize: 13,
+    color: theme.colors.content.default,
   },
   progressTrack: {
     height: 4,
-    backgroundColor: "#e5e7eb",
+    backgroundColor: theme.colors.surface.subtle,
     borderRadius: 2,
     marginTop: 4,
   },
@@ -310,7 +321,7 @@ const styles = StyleSheet.create({
   },
   queueItemError: {
     fontSize: 12,
-    color: "#dc2626",
+    color: theme.colors.state.danger,
   },
   buttonRow: {
     flexDirection: "row",
@@ -320,22 +331,25 @@ const styles = StyleSheet.create({
   uploadBtn: {
     flex: 1,
     padding: 12,
-    backgroundColor: "#3b82f6",
+    backgroundColor: theme.colors.action.primary,
     borderRadius: 8,
     alignItems: "center",
   },
   uploadBtnDisabled: {
-    backgroundColor: "#9ca3af",
+    backgroundColor: theme.colors.content.disabled,
   },
   uploadBtnText: {
-    color: "#fff",
+    color: theme.colors.content.onPrimary,
     fontWeight: "600",
   },
   cancelBtn: {
     padding: 12,
     borderWidth: 1,
-    borderColor: "#d1d5db",
+    borderColor: theme.colors.border.default,
     borderRadius: 8,
     alignItems: "center",
   },
-});
+  cancelBtnText: {
+    color: theme.colors.content.default,
+  },
+}));

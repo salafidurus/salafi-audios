@@ -1,13 +1,6 @@
 import { useEffect, useReducer } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import type { AdminLectureDetailDto, Locale } from "@sd/core-contracts";
 import { fetchAdminLectureDetail, updateLecture } from "../../api/admin-lectures.api";
 
@@ -31,6 +24,7 @@ function reduce(state: FormState, patch: Partial<FormState>): FormState {
 }
 
 export function LectureEditSheet({ lectureId, onClose, onSaved }: LectureEditSheetProps) {
+  const { theme } = useUnistyles();
   const [state, dispatch] = useReducer(reduce, {
     lecture: null,
     title: "",
@@ -103,6 +97,7 @@ export function LectureEditSheet({ lectureId, onClose, onSaved }: LectureEditShe
             value={language}
             onChangeText={(v) => dispatch({ language: v })}
             placeholder="e.g. ar, en"
+            placeholderTextColor={theme.colors.content.muted}
             style={styles.input}
           />
           <Text style={styles.statusText}>Status: {lecture.status}</Text>
@@ -112,26 +107,26 @@ export function LectureEditSheet({ lectureId, onClose, onSaved }: LectureEditShe
       <View style={styles.buttonRow}>
         <Pressable onPress={handleSave} disabled={isSaving || !lecture} style={styles.saveBtn}>
           {isSaving ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={theme.colors.content.onPrimary} />
           ) : (
             <Text style={styles.saveBtnText}>Save</Text>
           )}
         </Pressable>
         <Pressable onPress={onClose} style={styles.cancelBtn}>
-          <Text>Cancel</Text>
+          <Text style={styles.cancelBtnText}>Cancel</Text>
         </Pressable>
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   container: {
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.surface.elevated,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 16,
@@ -141,6 +136,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: "600",
     marginBottom: 16,
+    color: theme.colors.content.strong,
   },
   loader: {
     marginVertical: 32,
@@ -149,21 +145,23 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: "600",
     marginBottom: 4,
+    color: theme.colors.content.default,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#d1d5db",
+    borderColor: theme.colors.border.default,
     borderRadius: 8,
     padding: 10,
     marginBottom: 12,
+    color: theme.colors.content.default,
   },
   statusText: {
     fontSize: 12,
-    color: "#6b7280",
+    color: theme.colors.content.muted,
     marginBottom: 12,
   },
   errorText: {
-    color: "#dc2626",
+    color: theme.colors.state.danger,
     marginBottom: 8,
   },
   buttonRow: {
@@ -174,19 +172,22 @@ const styles = StyleSheet.create({
   saveBtn: {
     flex: 1,
     padding: 12,
-    backgroundColor: "#3b82f6",
+    backgroundColor: theme.colors.action.primary,
     borderRadius: 8,
     alignItems: "center",
   },
   saveBtnText: {
-    color: "#fff",
+    color: theme.colors.content.onPrimary,
     fontWeight: "600",
   },
   cancelBtn: {
     padding: 12,
     borderWidth: 1,
-    borderColor: "#d1d5db",
+    borderColor: theme.colors.border.default,
     borderRadius: 8,
     alignItems: "center",
   },
-});
+  cancelBtnText: {
+    color: theme.colors.content.default,
+  },
+}));

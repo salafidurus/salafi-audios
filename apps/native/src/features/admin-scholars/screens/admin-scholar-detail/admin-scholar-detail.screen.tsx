@@ -1,5 +1,6 @@
 import { useMemo, useReducer } from "react";
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { DraggableList, type RenderItemParams } from "@/shared/components/DraggableList";
 import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
@@ -246,7 +247,7 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
   );
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create((theme) => ({
   root: {
     flex: 1,
   },
@@ -263,10 +264,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700",
     marginBottom: 4,
+    color: theme.colors.content.strong,
   },
   scholarSlug: {
     fontSize: 13,
-    color: "#6b7280",
+    color: theme.colors.content.muted,
     marginBottom: 24,
   },
   sectionHeader: {
@@ -274,48 +276,50 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderColor: "#e5e7eb",
+    borderColor: theme.colors.border.subtle,
     marginBottom: 8,
   },
   sectionTitle: {
     flex: 1,
     fontSize: 16,
     fontWeight: "700",
+    color: theme.colors.content.strong,
   },
   addBtn: {
     paddingHorizontal: 10,
     paddingVertical: 4,
-    backgroundColor: "#3b82f6",
+    backgroundColor: theme.colors.action.primary,
     borderRadius: 6,
     marginEnd: 8,
   },
   addBtnText: {
-    color: "#fff",
+    color: theme.colors.content.onPrimary,
     fontSize: 12,
     fontWeight: "600",
   },
   chevron: {
-    color: "#6b7280",
+    color: theme.colors.content.muted,
   },
   listItem: {
     padding: 12,
     borderWidth: 1,
-    borderColor: "#e5e5e5",
+    borderColor: theme.colors.border.subtle,
     borderRadius: 8,
     marginBottom: 8,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.surface.default,
     opacity: 1,
   },
   listItemActive: {
-    borderColor: "#3b82f6",
-    backgroundColor: "#eff6ff",
+    borderColor: theme.colors.action.primary,
+    backgroundColor: theme.colors.surface.primarySubtle,
     opacity: 0.9,
   },
   listItemTitle: {
     fontWeight: "600",
+    color: theme.colors.content.strong,
   },
   listItemSubtitle: {
     fontSize: 12,
-    color: "#6b7280",
+    color: theme.colors.content.muted,
   },
-});
+}));
