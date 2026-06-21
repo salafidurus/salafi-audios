@@ -16,6 +16,7 @@
 - Architectural blueprint drafted and approved.
 - Stage 0 completed: git worktree setup and husky pre-push hook configuration.
 - Stage 1 completed: Vitest toolchain dependencies registered and installed.
+- Stage 2 completed: isolated typescript configurations to resolve vitest types globally.
 
 ---
 
@@ -75,7 +76,7 @@ Implementation is split into 7 sequential, incremental stages:
 
 ## Stage 2: Configure type isolation and TS compiler targets
 
-- **Status**: Planned
+- **Status**: Completed (Commit ebf0239)
 - **Goal**: Isolate `jest` global types to `apps/native` and introduce `vitest/globals` to Vitest workspaces.
 - **Files**:
   - [apps/native/tsconfig.json](file:///C:/dev/salafi-audios/apps/native/tsconfig.json)
