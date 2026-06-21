@@ -43,7 +43,7 @@ describe("proxy", () => {
 
     it("redirects to /sign-in carrying the original path in the `from` query", () => {
       proxy(makeRequest("/account/profile", undefined));
-      const redirectedTo = mockRedirect.mock.calls[0][0] as URL;
+      const redirectedTo = mockRedirect.mock.calls[0]![0] as URL;
       expect(redirectedTo.pathname).toBe("/sign-in");
       expect(redirectedTo.searchParams.get("from")).toBe("/account/profile");
     });
