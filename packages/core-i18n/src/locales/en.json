@@ -148,7 +148,8 @@
     "loading": "Loading feed...",
     "empty": "No lectures available in this feed.",
     "error": "Failed to load feed content.",
-    "retry": "Try Again"
+    "retry": "Try Again",
+    "loadMore": "Load more"
   },
   "live": {
     "title": "Live Sessions",

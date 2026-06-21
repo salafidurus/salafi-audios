@@ -1,0 +1,79 @@
+.page {
+  max-width: var(--space-layout-content-max);
+  margin: 0 auto;
+  padding: var(--space-layout-page-y) var(--space-layout-page-x);
+}
+
+.hero {
+  margin-bottom: var(--space-component-gap-lg);
+}
+
+.heroTitle {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--content-strong);
+}
+
+.heroSubtitle {
+  margin: var(--space-scale-xs) 0 0;
+  font-size: 0.95rem;
+  color: var(--content-muted);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-component-gap-md);
+  margin-bottom: var(--space-component-gap-lg);
+}
+
+.section {
+  margin-bottom: var(--space-component-gap-lg);
+}
+
+.state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-component-gap-md);
+  padding: var(--space-component-gap-xl) var(--space-component-gap-md);
+  text-align: center;
+  color: var(--content-muted);
+}
+
+.loadMoreRow {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-component-gap-md);
+}
+
+.button {
+  padding: var(--space-component-chip-y) var(--space-component-gap-lg);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-component-chip);
+  background: var(--surface-default);
+  color: var(--content-default);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease;
+}
+
+.button:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.button:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.retryButton {
+  border-color: var(--action-primary);
+  color: var(--action-primary);
+}
