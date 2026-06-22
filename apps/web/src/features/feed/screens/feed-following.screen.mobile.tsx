@@ -3,7 +3,7 @@
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
 import { FeedContentCard } from "../components/feed-content-card/feed-content-card";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
-import { useFeed } from "@sd/domain-content";
+import { useFeedFollowingScreen } from "@sd/domain-content";
 
 export type FeedFollowingMobileScreenProps = {
   onNavigateToLecture?: (slug: string) => void;
@@ -41,7 +41,7 @@ export function FeedFollowingMobileScreen({
   onNavigateToLecture,
   onNavigateToScholar,
 }: FeedFollowingMobileScreenProps) {
-  const { data, isFetching, hasNextPage, fetchNextPage } = useFeed();
+  const { data, isFetching, hasNextPage, fetchNextPage } = useFeedFollowingScreen();
   const items = data?.pages.flatMap((p) => p.items) ?? [];
 
   if (isFetching && items.length === 0) {

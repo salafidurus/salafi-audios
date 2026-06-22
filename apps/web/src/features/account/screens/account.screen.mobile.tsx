@@ -3,7 +3,7 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { useAccountScreen } from "@sd/domain-account";
+import { useAccountProfile } from "@sd/domain-account";
 import { LanguageSwitch, ContentLanguageToggle } from "@/features/i18n";
 
 const menuButtonStyle: CSSProperties = {
@@ -32,7 +32,7 @@ export function AccountMobileScreen({
   onNavigateToLegal,
   onSignOut,
 }: AccountMobileScreenProps) {
-  const { profile, isFetching } = useAccountScreen();
+  const { data: profile, isFetching } = useAccountProfile();
   const { t } = useTranslation();
 
   if (isFetching) {

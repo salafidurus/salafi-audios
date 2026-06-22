@@ -2,7 +2,7 @@
 
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { AppText } from "@/shared/components/AppText/AppText";
-import { useScholarDetailScreen } from "@sd/domain-content";
+import { useScholarDetail, useScholarContent } from "@sd/domain-content";
 import { ScholarHeader } from "@/features/scholar/components/scholar-header/scholar-header";
 import { ScholarContentList } from "@/features/scholar/components/scholar-content-list/scholar-content-list";
 
@@ -11,7 +11,9 @@ export type ScholarDetailDesktopScreenProps = {
 };
 
 export function ScholarDetailDesktopScreen({ slug }: ScholarDetailDesktopScreenProps) {
-  const { scholar, content, isFetching } = useScholarDetailScreen(slug);
+  const { data: scholar, isFetching: isScholarFetching } = useScholarDetail(slug);
+  const { data: content, isFetching: isContentFetching } = useScholarContent(slug);
+  const isFetching = isScholarFetching || isContentFetching;
 
   if (isFetching) {
     return (

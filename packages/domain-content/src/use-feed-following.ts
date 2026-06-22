@@ -1,11 +1,5 @@
 import { useFeedFollowing } from "./feed.api";
 
 export function useFeedFollowingScreen() {
-  const { data, isFetching, error } = useFeedFollowing();
-  return {
-    items: data?.items ?? [],
-    nextCursor: data?.nextCursor,
-    isFetching,
-    error,
-  };
+  return useFeedFollowing();
 }
