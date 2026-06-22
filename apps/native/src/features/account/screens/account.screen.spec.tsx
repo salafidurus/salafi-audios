@@ -1,11 +1,11 @@
 import React from "react";
 import { render, screen } from "@testing-library/react-native";
-import { useAccountScreen } from "@sd/domain-account";
+import { useAccountProfile } from "@sd/domain-account";
 import { AccountScreen } from "./account.screen";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 
 jest.mock("@sd/domain-account", () => ({
-  useAccountScreen: jest.fn(),
+  useAccountProfile: jest.fn(),
 }));
 
 jest.mock("@/features/admin/hooks/use-admin-permissions", () => ({
@@ -29,13 +29,14 @@ jest.mock("@/features/i18n", () => {
   };
 });
 
-const mockedUseAccountScreen = jest.mocked(useAccountScreen);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockedUseAccountProfile = jest.mocked(useAccountProfile) as any;
 const mockedUseAdminPermissions = jest.mocked(useAdminPermissions);
 
 describe("AccountScreen", () => {
   beforeEach(() => {
-    mockedUseAccountScreen.mockReturnValue({
-      profile: undefined,
+    mockedUseAccountProfile.mockReturnValue({
+      data: undefined,
       isFetching: false,
       error: null,
     });
@@ -48,8 +49,8 @@ describe("AccountScreen", () => {
   });
 
   it("renders a loading state while the account query is fetching", async () => {
-    mockedUseAccountScreen.mockReturnValue({
-      profile: undefined,
+    mockedUseAccountProfile.mockReturnValue({
+      data: undefined,
       isFetching: true,
       error: null,
     });
@@ -60,8 +61,8 @@ describe("AccountScreen", () => {
   });
 
   it("renders profile details and language controls", async () => {
-    mockedUseAccountScreen.mockReturnValue({
-      profile: {
+    mockedUseAccountProfile.mockReturnValue({
+      data: {
         id: "user-1",
         email: "user@example.com",
         displayName: "Test User",
@@ -87,8 +88,8 @@ describe("AccountScreen", () => {
   }, 15000);
 
   it("renders Admin card when user has admin permissions", async () => {
-    mockedUseAccountScreen.mockReturnValue({
-      profile: {
+    mockedUseAccountProfile.mockReturnValue({
+      data: {
         id: "user-1",
         email: "admin@example.com",
         displayName: "Admin User",

@@ -1,13 +1,13 @@
 import { ScrollView, Text, TextInput, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { useAccountScreen } from "@sd/domain-account";
+import { useAccountProfile } from "@sd/domain-account";
 
 export type AccountProfileScreenProps = {
   onBack?: () => void;
 };
 
 export function AccountProfileScreen(_props: AccountProfileScreenProps) {
-  const { profile, isFetching } = useAccountScreen();
+  const { data: profile, isFetching } = useAccountProfile();
   const { theme } = useUnistyles();
 
   if (isFetching) {

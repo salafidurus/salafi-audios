@@ -1,13 +1,13 @@
 "use client";
 
-import { useAccountScreen } from "@sd/domain-account";
+import { useAccountProfile } from "@sd/domain-account";
 
 export type AccountProfileDesktopScreenProps = {
   onBack?: () => void;
 };
 
 export function AccountProfileDesktopScreen({ onBack }: AccountProfileDesktopScreenProps) {
-  const { profile, isFetching } = useAccountScreen();
+  const { data: profile, isFetching } = useAccountProfile();
 
   if (isFetching) {
     return <div style={{ padding: 32 }}>Loading profile…</div>;
