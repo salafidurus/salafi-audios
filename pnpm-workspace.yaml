@@ -76,7 +76,7 @@ catalog:
   prettier: ^3.8.4
   react: 19.2.3
   react-dom: 19.2.3
-  react-hook-form: ^7.78.0
+  react-hook-form: ^7.80.0
   react-i18next: ^15.5.3
   reflect-metadata: ^0.2.2
   rimraf: ^6.0.0
