@@ -4,7 +4,8 @@ import {
   queryKeys,
   useApiQuery,
   type ScholarDetailDto,
-  type ScholarContentDto,
+  type ScholarContentItemDto,
+  type ScholarContentUnifiedDto,
   type ScholarListItemDto,
 } from "@sd/core-contracts";
 
@@ -39,10 +40,25 @@ export function useScholarContent(slug: string) {
   return useApiQuery(
     queryKeys.scholars.content(slug),
     () =>
-      httpClient<ScholarContentDto>({
+      httpClient<ScholarContentUnifiedDto>({
         url: endpoints.scholars.content(slug),
         method: "GET",
       }),
     { enabled: !!slug },
   );
+}
+
+export function splitScholarContent(
+  items: ScholarContentItemDto[],
+  recommendedCount = 4,
+): {
+  featured: ScholarContentItemDto | undefined;
+  recommended: ScholarContentItemDto[];
+  browse: ScholarContentItemDto[];
+} {
+  return {
+    featured: items[0],
+    recommended: items.slice(1, 1 + recommendedCount),
+    browse: items.slice(1 + recommendedCount),
+  };
 }
