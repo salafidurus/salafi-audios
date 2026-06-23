@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import type { ScholarDetailDto } from "@sd/core-contracts";
+import { Globe, Youtube, Twitter, Send } from "lucide-react";
+import styles from "./scholar-header.module.css";
 
 export type ScholarHeaderProps = {
   scholar: ScholarDetailDto & {
@@ -15,7 +17,7 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
   const totalHours = Math.round(scholar.totalDurationSeconds / 3600);
 
   return (
-    <div>
+    <div className={styles.root}>
       {scholar.imageUrl && (
         <Image
           src={scholar.imageUrl}
@@ -23,34 +25,30 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
           width={120}
           height={120}
           unoptimized
-          style={{
-            borderRadius: 60,
-            objectFit: "cover",
-            marginBottom: 16,
-          }}
+          className={styles.avatar}
         />
       )}
-      <h1 style={{ margin: 0, fontSize: 28 }}>{scholar.name}</h1>
+      <h1 className={styles.name}>{scholar.name}</h1>
       {(scholar.country || scholar.mainLanguage) && (
-        <p style={{ color: "#666", fontSize: 14, marginTop: 4 }}>
+        <p className={styles.meta}>
           {[scholar.country, scholar.mainLanguage].filter(Boolean).join(" · ")}
         </p>
       )}
-      {scholar.bio && <p style={{ marginTop: 12, fontSize: 15, lineHeight: 1.6 }}>{scholar.bio}</p>}
+      {scholar.bio && <p className={styles.bio}>{scholar.bio}</p>}
 
-      <div style={{ display: "flex", gap: 24, marginTop: 16 }}>
-        <div>
-          <div style={{ fontSize: 20, fontWeight: "bold" }}>{scholar.lectureCount}</div>
-          <div style={{ fontSize: 12, color: "#888" }}>Lectures</div>
+      <div className={styles.stats}>
+        <div className={styles.stat}>
+          <span className={styles.statValue}>{scholar.lectureCount}</span>
+          <span className={styles.statLabel}>Lectures</span>
         </div>
-        <div>
-          <div style={{ fontSize: 20, fontWeight: "bold" }}>{scholar.seriesCount}</div>
-          <div style={{ fontSize: 12, color: "#888" }}>Series</div>
+        <div className={styles.stat}>
+          <span className={styles.statValue}>{scholar.seriesCount}</span>
+          <span className={styles.statLabel}>Series</span>
         </div>
         {totalHours > 0 && (
-          <div>
-            <div style={{ fontSize: 20, fontWeight: "bold" }}>{totalHours}h</div>
-            <div style={{ fontSize: 12, color: "#888" }}>Total</div>
+          <div className={styles.stat}>
+            <span className={styles.statValue}>{totalHours}h</span>
+            <span className={styles.statLabel}>Total</span>
           </div>
         )}
       </div>
@@ -59,15 +57,16 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
         scholar.socialTelegram ||
         scholar.socialYoutube ||
         scholar.socialWebsite) && (
-        <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
+        <div className={styles.socials}>
           {scholar.socialWebsite && (
             <a
               href={scholar.socialWebsite}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: "#2563eb", fontSize: 14 }}
+              className={styles.socialLink}
+              aria-label="Website"
             >
-              Website
+              <Globe size={18} />
             </a>
           )}
           {scholar.socialYoutube && (
@@ -75,9 +74,10 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
               href={scholar.socialYoutube}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: "#2563eb", fontSize: 14 }}
+              className={styles.socialLink}
+              aria-label="YouTube"
             >
-              YouTube
+              <Youtube size={18} />
             </a>
           )}
           {scholar.socialTwitter && (
@@ -85,9 +85,10 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
               href={scholar.socialTwitter}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: "#2563eb", fontSize: 14 }}
+              className={styles.socialLink}
+              aria-label="Twitter"
             >
-              Twitter
+              <Twitter size={18} />
             </a>
           )}
           {scholar.socialTelegram && (
@@ -95,9 +96,10 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
               href={scholar.socialTelegram}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: "#2563eb", fontSize: 14 }}
+              className={styles.socialLink}
+              aria-label="Telegram"
             >
-              Telegram
+              <Send size={18} />
             </a>
           )}
         </div>
