@@ -2,27 +2,18 @@
 
 This directory contains the authoritative documentation for Salafi Durus.
 
-## Documentation Hierarchy
-
-1. **Root AGENT.md** → Monorepo orientation and high-level rules.
-2. **This file** → Documentation index, timeline summary, and gap analysis.
-3. **[README.md](./README.md)** → Standard entry point for humans.
-4. **Workspace AGENT.md** → Context for `apps/` and `packages/`.
-
----
-
 ## Timeline Summary
 
-| Phase | Name                | Status      | Key Deliverables                            |
-| ----- | ------------------- | ----------- | ------------------------------------------- |
-| 01    | Foundations         | COMPLETE    | Monorepo, CI/CD, environments               |
-| 02    | Model & Ingestion   | COMPLETE    | Schema, Prisma, ingestion pipeline          |
-| 03    | Read-Only Catalog   | PARTIAL     | APIs exist; web/mobile detail pages missing |
-| 04    | Auth & User State   | PARTIAL     | Auth is live; user-state features are early |
-| 05    | Playback & Progress | NOT STARTED | Audio player, progress tracking             |
-| 06    | Offline & Downloads | NOT STARTED | Offline playback, outbox sync               |
-| 07    | Admin & Uploads     | NOT STARTED | Admin workflows, moderation                 |
-| 08    | Polish & Analytics  | NOT STARTED | UX polish, analytics integration            |
+| Phase | Name                | Status      | Key Deliverables                                           |
+| ----- | ------------------- | ----------- | ---------------------------------------------------------- |
+| 01    | Foundations         | COMPLETE    | Monorepo, CI/CD, environments                              |
+| 02    | Model & Ingestion   | COMPLETE    | Schema, Prisma, ingestion pipeline                         |
+| 03    | Read-Only Catalog   | PARTIAL     | Web routes complete; mobile catalog detail screens missing |
+| 04    | Auth & User State   | PARTIAL     | Auth live; account, library, feed screens implemented      |
+| 05    | Playback & Progress | NOT STARTED | Audio player, progress tracking                            |
+| 06    | Offline & Downloads | NOT STARTED | Offline playback, outbox sync                              |
+| 07    | Admin & Uploads     | NOT STARTED | Admin workflows, moderation                                |
+| 08    | Polish & Analytics  | NOT STARTED | UX polish, analytics integration                           |
 
 ---
 
@@ -46,30 +37,33 @@ This directory contains the authoritative documentation for Salafi Durus.
 
 ### Web (apps/web)
 
-| Route                  | Status      | MVP        | Notes                              |
-| ---------------------- | ----------- | ---------- | ---------------------------------- |
-| `/`                    | IMPLEMENTED | CRITICAL   | Search landing                     |
-| `/searchprocessing`    | IMPLEMENTED | CRITICAL   | Active search                      |
-| `/scholars/[slug]`     | MISSING     | CRITICAL   | Scholar detail page                |
-| `/collections/[id]`    | MISSING     | CRITICAL   | Collection detail page             |
-| `/series/[id]`         | MISSING     | CRITICAL   | Series detail page                 |
-| `/lectures/[id]`       | MISSING     | CRITICAL   | Lecture detail page                |
-| `/feed/*`              | PLACEHOLDER | SUPPORTING | Feed pages exist but are early     |
-| `/library/*`           | PLACEHOLDER | SUPPORTING | Library routes exist but are early |
-| `/account/*`           | PLACEHOLDER | SUPPORTING | Account routes exist but are early |
-| `/sign-in`, `/sign-up` | IMPLEMENTED | SUPPORTING | App-local `features/auth/` slices  |
+| Route                  | Status      | MVP        | Notes                                         |
+| ---------------------- | ----------- | ---------- | --------------------------------------------- |
+| `/`                    | IMPLEMENTED | CRITICAL   | Search landing                                |
+| `/search`              | IMPLEMENTED | CRITICAL   | Active search                                 |
+| `/scholars/[slug]`     | IMPLEMENTED | CRITICAL   | Scholar detail page                           |
+| `/collections/[id]`    | IMPLEMENTED | CRITICAL   | Collection detail page                        |
+| `/series/[id]`         | IMPLEMENTED | CRITICAL   | Series detail page                            |
+| `/lectures/[id]`       | IMPLEMENTED | CRITICAL   | Lecture detail page                           |
+| `/feed/*`              | IMPLEMENTED | SUPPORTING | Recent + following feeds with infinite scroll |
+| `/library/*`           | IMPLEMENTED | SUPPORTING | Saved and completed lists                     |
+| `/account/*`           | IMPLEMENTED | SUPPORTING | Profile and settings                          |
+| `/sign-in`, `/sign-up` | IMPLEMENTED | SUPPORTING | App-local `features/auth/` slices             |
 
 ### Mobile (apps/native)
 
-| Feature           | Status      | MVP      | Notes                               |
-| ----------------- | ----------- | -------- | ----------------------------------- |
-| Search home       | IMPLEMENTED | CRITICAL | App-local `features/search/` slices |
-| Search processing | IMPLEMENTED | CRITICAL | App-local `features/search/` slices |
-| Catalog browsing  | MISSING     | CRITICAL | Detail screens needed               |
-| Audio playback    | NOT STARTED | CRITICAL | Planned for Phase 05                |
-| Progress tracking | NOT STARTED | CRITICAL | Planned for Phase 05                |
-| Offline sync      | NOT STARTED | CRITICAL | Phase 06                            |
-| Downloads         | NOT STARTED | CRITICAL | Phase 06                            |
+| Feature           | Status      | MVP      | Notes                                                       |
+| ----------------- | ----------- | -------- | ----------------------------------------------------------- |
+| Search            | IMPLEMENTED | CRITICAL | Home + active results                                       |
+| Feed              | IMPLEMENTED | CRITICAL | Recent + following feeds                                    |
+| Live              | IMPLEMENTED | CRITICAL | Live session screens                                        |
+| Library           | IMPLEMENTED | CRITICAL | Saved and completed lists                                   |
+| Account           | IMPLEMENTED | CRITICAL | Profile and settings                                        |
+| Catalog browsing  | MISSING     | CRITICAL | Detail screens (scholar/lecture/series) not yet implemented |
+| Audio playback    | NOT STARTED | CRITICAL | Planned for Phase 05                                        |
+| Progress tracking | NOT STARTED | CRITICAL | Planned for Phase 05                                        |
+| Offline sync      | NOT STARTED | CRITICAL | Phase 06                                                    |
+| Downloads         | NOT STARTED | CRITICAL | Phase 06                                                    |
 
 ### Current Mobile Runtime Guardrail
 
@@ -88,18 +82,3 @@ This directory contains the authoritative documentation for Salafi Durus.
 - **[mobile.md](./mobile.md)** — Mobile app and offline mechanics.
 - **[web.md](./web.md)** — Web app structure and SEO.
 - **[dev-ops.md](./dev-ops.md)** — Environments and deployment.
-
-## Scope of This Folder
-
-- This folder keeps the standard, cross-cutting documentation set.
-- Workspace `AGENT.md` files hold app- and package-specific conventions, commands, and implementation notes.
-- Avoid recreating deep per-topic doc trees unless the information cannot live cleanly in the standard set or a workspace `AGENT.md`.
-
----
-
-## Documentation as Enforcement
-
-- Architectural changes require documentation updates.
-- Undocumented behavior is considered incomplete.
-- Docs reflect intent, not just implementation.
-- If implementation diverges from docs, reconcile intentionally.

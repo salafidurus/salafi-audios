@@ -181,14 +181,12 @@ into `apps/web` and `apps/native`.
 
 - API: `pnpm --filter api <script>`
 - Web: `pnpm --filter web <script>`
-- Mobile: `pnpm --filter mobile <script>`
-- Native scaffold: `pnpm --filter native <script>`
+- Native: `pnpm --filter native <script>`
 - DB: `pnpm --filter core-db <script>`
 - Env: `pnpm --filter core-env <script>`
 - I18n: `pnpm --filter core-i18n <script>`
 - Contracts: `pnpm --filter core-contracts <script>`
 - Design tokens: `pnpm --filter design-tokens <script>`
-- Shared UI: `pnpm --filter @sd/shared <script>`
 - Core packages: `pnpm --filter @sd/core-* <script>`
 - Domain packages: `pnpm --filter @sd/domain-* <script>`
 - Ingest: `pnpm --filter util-ingest <script>`
@@ -202,9 +200,9 @@ Turbo grouped scripts:
 ## Single-test quick reference
 
 - Jest file (API): `pnpm --filter api test -- src/modules/topics/topics.service.spec.ts`
-- Jest file (Web): `pnpm --filter web test -- src/path/to/file.test.tsx`
-- Jest file (Mobile): `pnpm --filter mobile test -- src/path/to/file.test.tsx`
+- Jest file (Native): `pnpm --filter native test -- src/path/to/file.spec.tsx`
 - Jest file (DB): `pnpm --filter core-db test -- src/path/to/file.spec.ts`
+- Vitest file (Web): `pnpm --filter web test src/path/to/file.spec.tsx`
 - Jest by name: `pnpm --filter api test -- src/modules/topics/topics.service.spec.ts -t "returns topic by slug"`
 - Jest watch file (API): `pnpm --filter api test:watch -- src/modules/topics/topics.service.spec.ts`
 - Playwright file: `pnpm --filter web test:e2e -- e2e/catalog.spec.ts`
@@ -261,69 +259,15 @@ All AGENT.md and documentation files are linted with markdownlint. Two rules are
 
 ## TDD policy
 
-This repo follows strict Test-Driven Development. **No exceptions.**
+Strict TDD. No exceptions. Red → Green → Commit.
 
-### The workflow (non-negotiable)
+1. Write the failing test. Confirm it fails with the expected error (not a setup error).
+2. Write minimal code to pass. Confirm pass. Run all tests in the workspace — confirm no regressions.
+3. Commit test and implementation together.
 
-1. Write the failing test — describe the behavior, not the implementation.
-2. Run it: confirm it fails with the expected error, not a setup error.
-3. Write the minimal code to make it pass.
-4. Run it again: confirm it passes.
-5. Run all tests: confirm nothing else broke.
-6. Commit: test and implementation in the same commit.
+Test everything: screens, components, hooks, utils, stores, services. Exceptions: framework DI wiring (NestJS, Expo Router), third-party internals, generated artifacts, presentational-only components with no logic.
 
-### What to test
-
-Test everything: screens, components, hooks, utils, stores, guards, services.
-The only exceptions are:
-
-- Framework-provided behavior (NestJS DI wiring, Expo Router navigation internals).
-- Third-party library internals.
-- Generated code artifacts.
-
-Testing everything prevents duplication — you will not write the same test twice if
-everything is already covered.
-
-### Test placement
-
-| Location                                   | Test file                     |
-| ------------------------------------------ | ----------------------------- |
-| `apps/native/src/features/<f>/screens/`    | co-located `.spec.tsx`        |
-| `apps/native/src/features/<f>/components/` | co-located `.spec.tsx`        |
-| `apps/native/src/features/<f>/hooks/`      | co-located `.spec.ts`         |
-| `apps/web/src/features/<f>/screens/`       | co-located `.spec.tsx`        |
-| `apps/web/src/features/<f>/components/`    | co-located `.spec.tsx`        |
-| `apps/web/src/features/<f>/hooks/`         | co-located `.spec.ts`         |
-| `apps/native/src/shared/`                  | co-located `.spec.tsx`        |
-| `apps/web/src/shared/`                     | co-located `.spec.tsx`        |
-| `packages/domain-*/src/`                   | co-located `.spec.ts`         |
-| `apps/api/src/modules/<m>/`                | co-located `.service.spec.ts` |
-
-### Running tests
-
-- All: `pnpm test`
-- Mobile only: `pnpm --filter mobile test`
-- Web only: `pnpm --filter web test`
-- API only: `pnpm --filter api test`
-- Single file: `pnpm --filter mobile test -- src/features/feed/screens/feed.screen.spec.tsx`
-- Watch: `pnpm --filter api test:watch -- src/modules/scholars/scholars.service.spec.ts`
-- E2E: `pnpm test:e2e`
-
-### What NOT to test
-
-- Presentational React/RN components with no logic.
-- Trivial getters, setters, or passthrough methods.
-- Framework-provided behavior (NestJS DI wiring, Expo Router navigation).
-- Third-party library internals.
-
-### Coverage targets (minimum)
-
-| Area                       | Target                                                |
-| -------------------------- | ----------------------------------------------------- |
-| API service methods        | All public methods tested                             |
-| Auth/permission boundaries | Every endpoint category (public, auth, admin) covered |
-| Domain store actions       | All actions in `domain-*/src/store/*.store.ts`        |
-| Route constants            | `routes.spec.ts` smoke test exists                    |
+Tests co-locate with source (`.spec.ts` / `.spec.tsx`). All public API service methods, auth/permission boundaries, and domain store actions must be covered.
 
 ## Quality and style
 
@@ -345,78 +289,11 @@ everything is already covered.
 - Pre-commit runs `pnpm lint:staged`.
 - Pre-push runs `pnpm test:prepush`.
 
-## Copilot/Cursor notes
-
-- Cursor rules files are not present (`.cursorrules`, `.cursor/rules/`).
-- Follow `.github/copilot-instructions.md`:
-  - backend authority
-  - backend-only authorization
-  - offline intent queueing
-  - media as references
-  - strict monorepo boundaries
-  - generated client is derived
-
 ## Documentation standards
 
-### When to add workspace README.md
-
-A workspace-level `README.md` is required when:
-
-- The workspace is directly executable or deployable.
-- The workspace has its own build, test, or runtime expectations.
-- The workspace exposes a public internal API used by multiple other workspaces.
-- The workspace has platform-specific entrypoints.
-- The workspace contains non-obvious codegen, caching, CI, or build constraints.
-
-### When inline comments are expected
-
-Add comments to files containing:
-
-- CI cache logic or workflow conditionals.
-- Unusual TypeScript or build configuration.
-- Source-vs-dist export map decisions.
-- Platform-specific entrypoint indirection.
-- Generated-code constraints.
-- Backend authority or security invariants.
-- Offline/outbox semantics.
-- Non-obvious query or cache invalidation behavior.
-
-### When inline comments should NOT be added
-
-Do not add comments to:
-
-- Straightforward presentational components.
-- Simple DTO or type definitions.
-- Obvious utility functions.
-- Boilerplate config that mirrors defaults.
-
-### When file-level documentation is expected
-
-Add a file-level comment block to:
-
-- CI workflow files that contain non-obvious job dependencies or cache strategy.
-- Root scripts whose purpose is not clear from the file name alone.
-- Complex `tsconfig` files that deviate from the base in non-trivial ways.
-- Package entrypoints that perform platform selection (e.g., `.web.ts` vs `.native.ts`
-  dispatch logic that is not self-evident).
-
-### When docs updates are mandatory
-
-Update `docs/` when making any of the following changes:
-
-- Architectural boundary change (new package, new app, changed dependency direction).
-- API surface change that affects the shared contract in `packages/core-contracts`.
-- Mobile offline or outbox pattern change.
-- Web app structure change (new routing pattern, new shared primitive layer).
-
-Docs and code must not drift. If a change makes `docs/` inaccurate, update `docs/` in the
-same commit.
-
-### AGENT.md vs README.md
-
-- `AGENT.md` defines contributor and AI agent behavior rules.
-- `README.md` explains structure, purpose, and operational guidance for humans.
-- These must not duplicate each other.
+- `AGENT.md` = behavior rules for contributors and agents. `README.md` = structure/purpose for humans. Do not duplicate between them.
+- Add inline comments only for non-obvious constraints: CI cache logic, auth invariants, offline/outbox semantics, generated-code behavior, platform-entrypoint dispatch.
+- Update `docs/` when architectural boundaries, API contracts (`packages/core-contracts`), or offline patterns change. Docs and code must not drift — update in the same commit.
 
 ## Safety checklist
 
