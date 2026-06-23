@@ -39,12 +39,12 @@ jest.mock("@/features/scholar/components/scholar-header/scholar-header", () => (
 }));
 
 jest.mock("@/features/scholar/components/scholar-content-list/scholar-content-list", () => ({
-  ScholarContentList: ({ content }: { content: { collections: unknown[] } }) => {
+  ScholarContentList: ({ items }: { items: unknown[] }) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const ReactM = require("react");
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { Text } = require("react-native");
-    return ReactM.createElement(Text, null, `Content:${content.collections.length}`);
+    return ReactM.createElement(Text, null, `Content:${items.length}`);
   },
 }));
 
@@ -109,11 +109,16 @@ describe("ScholarDetailScreen", () => {
     });
     mockedUseScholarContent.mockReturnValue({
       data: {
-        collections: [
-          { id: "collection-1", slug: "collection", title: "Collection", lectureCount: 2 },
+        items: [
+          {
+            id: "collection-1",
+            slug: "collection",
+            title: "Collection",
+            type: "collection",
+            recencyAt: "2024-01-01T00:00:00Z",
+            lectureCount: 2,
+          },
         ],
-        series: [],
-        singles: [],
       },
       isFetching: false,
     });
