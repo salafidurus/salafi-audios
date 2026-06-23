@@ -32,18 +32,6 @@ Env file precedence for local DB commands:
 - `.env` -> `.env.local` -> `.env.<NODE_ENV>` -> `.env.<NODE_ENV>.local`
 - Existing process env vars (for CI/secrets) are never overridden by env files.
 
-## Build/lint/test commands
-
-- Build: `pnpm --filter core-db build`
-- Lint: `pnpm --filter core-db lint`
-- Typecheck: `pnpm --filter core-db typecheck`
-- Test: `pnpm --filter core-db test`
-
-## Single-test commands
-
-- Jest file: `pnpm --filter core-db test -- src/path/to/file.spec.ts`
-- Jest by name: `pnpm --filter core-db test -- src/path/to/file.spec.ts -t "creates record"`
-
 ## Safety notes
 
 - Do not embed environment values in source or migrations.

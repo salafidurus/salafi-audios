@@ -8,12 +8,6 @@ This service is the authority for business rules, permissions, and state transit
 - Expose stable API contracts for web/mobile.
 - Coordinate DB, media, and non-authoritative analytics safely.
 
-## Agent skills scope
-
-- If using Claude Code: Skills are defined at the root and listed in CLAUDE.md.
-- If using OpenCode: Project-local skills live in `.opencode/skills/`.
-- Keep backend/NestJS skills scoped to this app directory.
-
 ## Layering rules
 
 - Keep layering explicit:
@@ -42,23 +36,6 @@ This service is the authority for business rules, permissions, and state transit
 - If a DTO is API-only, keep it local to this app.
 - Keep API-only request DTOs local (for validation decorators).
 
-## Commands (run from repo root)
-
-- Dev: `pnpm dev:api`
-- Build: `pnpm --filter api build`
-- Lint: `pnpm --filter api lint`
-- Typecheck: `pnpm --filter api typecheck`
-- Test: `pnpm --filter api test`
-- E2E: `pnpm --filter api test:e2e`
-- Contracts: `pnpm --filter core-contracts build`
-
-## Single-test commands
-
-- One test file: `pnpm --filter api test -- src/modules/topics/topics.service.spec.ts`
-- One test name: `pnpm --filter api test -- src/modules/topics/topics.service.spec.ts -t "returns topic by slug"`
-- Watch one file: `pnpm --filter api test:watch -- src/modules/topics/topics.service.spec.ts`
-- E2E file: `pnpm --filter api test:e2e -- test/health.e2e-spec.ts`
-
 ## Contract workflow
 
 - Shared types are defined in `@sd/core-contracts` - import from there.
@@ -79,18 +56,3 @@ This service is the authority for business rules, permissions, and state transit
   - transition semantics (publish/archive/reorder/replace)
 - Add regression tests for bug fixes.
 - Update tests when contracts change.
-
-## Common pitfalls to avoid
-
-- Client-authoritative logic hidden in endpoints.
-- Silent fallback for invalid config or invalid state.
-- Unstructured errors or inconsistent status semantics.
-
----
-
-## Documentation Sync
-
-When implementing features, update:
-
-- `docs/AGENT.md` - Update implementation gap analysis and phase status when needed
-- Relevant top-level docs file in `docs/` - If architecture, API, data, or environment rules change

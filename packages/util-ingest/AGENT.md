@@ -19,10 +19,3 @@ This package owns deterministic content ingestion workflows.
 ## Path aliases
 
 - Use `@/` for package-local imports (maps to `src/*`).
-
-## Commands
-
-- Run ingestion: `pnpm --filter util-ingest ingest:content`
-- Lint: `pnpm --filter util-ingest lint`
-- Typecheck: `pnpm --filter util-ingest typecheck`
-- Test: `pnpm --filter util-ingest test`
