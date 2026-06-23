@@ -35,4 +35,27 @@ else
   exit 1
 fi
 # react-doctor hook end
+
+# semgrep hook start
+semgrep_scan_staged_files() {
+  if command -v semgrep >/dev/null 2>&1; then
+    printf "pre-commit: running semgrep on staged changes...\n"
+    staged_files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|tsx|js|jsx)$' || true)
+    if [ -n "$staged_files" ]; then
+      semgrep scan --config .semgrep-rules.json --metrics=off --quiet --error --skip-unknown-extensions $staged_files
+    fi
+    return
+  fi
+
+  printf '%s\n' "WARNING: semgrep CLI is not installed. Static analysis check skipped."
+  printf '%s\n' "To install: brew install semgrep (macOS) or pip install semgrep (Windows/Linux)"
+}
+
+if ! semgrep_scan_staged_files; then
+  printf '%s\n' "Semgrep check failed. Commit blocked." >&2
+  exit 1
+fi
+# semgrep hook end
+
 pnpm lint:staged
+
