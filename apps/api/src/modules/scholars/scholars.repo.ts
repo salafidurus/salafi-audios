@@ -4,10 +4,8 @@ import { Status, Locale as DbLocale } from '@sd/core-db';
 import type {
   ScholarListItemDto,
   ScholarDetailDto,
-  ScholarContentDto,
-  CollectionSummaryDto,
-  SeriesSummaryDto,
-  SingleSummaryDto,
+  ScholarContentUnifiedDto,
+  ScholarContentItemDto,
   TranslationViewDto,
   Locale,
   AdminSeriesListItemDto,
@@ -180,7 +178,7 @@ export class ScholarsRepository {
     };
   }
 
-  async getContent(slug: string): Promise<ScholarContentDto | null> {
+  async getContent(slug: string): Promise<ScholarContentUnifiedDto | null> {
     const locale = getRequestLocale();
     const scholar = await this.prisma.scholar.findFirst({
       where: { slug, isActive: true },
@@ -189,13 +187,98 @@ export class ScholarsRepository {
 
     if (!scholar) return null;
 
-    const [collections, series, singles] = await Promise.all([
-      this.getCollections(scholar.id, locale),
-      this.getSeriesListings(scholar.id, locale),
-      this.getSingles(scholar.id, locale),
+    const [collectionRecords, seriesRecords, lectureRecords] = await Promise.all([
+      this.prisma.collection.findMany({
+        where: { scholarId: scholar.id, status: Status.published, deletedAt: null },
+        select: {
+          id: true, slug: true, title: true, language: true,
+          coverImageUrl: true, createdAt: true,
+          translations: { where: { locale, status: 'published' }, select: { title: true }, take: 1 },
+          _count: { select: { series: { where: { status: Status.published, deletedAt: null } } } },
+        },
+      }),
+      this.prisma.series.findMany({
+        where: { scholarId: scholar.id, collectionId: null, status: Status.published, deletedAt: null },
+        select: {
+          id: true, slug: true, title: true, language: true,
+          coverImageUrl: true, createdAt: true,
+          translations: { where: { locale, status: 'published' }, select: { title: true }, take: 1 },
+          _count: { select: { lectures: { where: { status: Status.published, deletedAt: null } } } },
+        },
+      }),
+      this.prisma.lecture.findMany({
+        where: { scholarId: scholar.id, seriesId: null, status: Status.published, deletedAt: null },
+        select: {
+          id: true, slug: true, title: true, language: true,
+          durationSeconds: true,
+          publishedAt: true, createdAt: true,
+          translations: { where: { locale, status: 'published' }, select: { title: true }, take: 1 },
+        },
+      }),
     ]);
 
-    return { collections, series, singles };
+    const items: ScholarContentItemDto[] = [
+      ...collectionRecords.map((r) => {
+        const resolved = resolveContentTranslation({
+          base: { title: r.title },
+          originalLanguage: r.language,
+          targetLocale: locale,
+          publishedTranslation: r.translations[0] ?? null,
+        });
+        return {
+          id: r.id,
+          slug: r.slug,
+          title: resolved.fields.title,
+          type: 'collection' as const,
+          recencyAt: r.createdAt.toISOString(),
+          coverImageUrl: r.coverImageUrl ?? undefined,
+          lectureCount: r._count.series,
+          originalLanguage: resolved.originalLanguage,
+          original: resolved.original ? { title: resolved.original.title } : undefined,
+        };
+      }),
+      ...seriesRecords.map((r) => {
+        const resolved = resolveContentTranslation({
+          base: { title: r.title },
+          originalLanguage: r.language,
+          targetLocale: locale,
+          publishedTranslation: r.translations[0] ?? null,
+        });
+        return {
+          id: r.id,
+          slug: r.slug,
+          title: resolved.fields.title,
+          type: 'series' as const,
+          recencyAt: r.createdAt.toISOString(),
+          coverImageUrl: r.coverImageUrl ?? undefined,
+          lectureCount: r._count.lectures,
+          originalLanguage: resolved.originalLanguage,
+          original: resolved.original ? { title: resolved.original.title } : undefined,
+        };
+      }),
+      ...lectureRecords.map((r) => {
+        const resolved = resolveContentTranslation({
+          base: { title: r.title },
+          originalLanguage: r.language,
+          targetLocale: locale,
+          publishedTranslation: r.translations[0] ?? null,
+        });
+        return {
+          id: r.id,
+          slug: r.slug,
+          title: resolved.fields.title,
+          type: 'single' as const,
+          recencyAt: (r.publishedAt ?? r.createdAt).toISOString(),
+          durationSeconds: r.durationSeconds ?? undefined,
+          originalLanguage: resolved.originalLanguage,
+          original: resolved.original ? { title: resolved.original.title } : undefined,
+        };
+      }),
+    ];
+
+    items.sort((a, b) => b.recencyAt.localeCompare(a.recencyAt));
+
+    return { items };
   }
 
   async findById(id: string) {
@@ -481,167 +564,6 @@ export class ScholarsRepository {
       data: { status: 'draft' },
     });
     return this.mapCollectionTranslation(record);
-  }
-
-  private async getCollections(
-    scholarId: string,
-    locale: Locale,
-  ): Promise<CollectionSummaryDto[]> {
-    const records = await this.prisma.collection.findMany({
-      where: {
-        scholarId,
-        status: Status.published,
-        deletedAt: null,
-      },
-      orderBy: { title: 'asc' },
-      select: {
-        id: true,
-        slug: true,
-        title: true,
-        language: true,
-        coverImageUrl: true,
-        translations: {
-          where: { locale, status: 'published' },
-          select: { title: true },
-          take: 1,
-        },
-        _count: {
-          select: {
-            series: {
-              where: {
-                status: Status.published,
-                deletedAt: null,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    return records.map((r) => {
-      const resolved = resolveContentTranslation({
-        base: { title: r.title },
-        originalLanguage: r.language,
-        targetLocale: locale,
-        publishedTranslation: r.translations[0] ?? null,
-      });
-      return {
-        id: r.id,
-        slug: r.slug,
-        title: resolved.fields.title,
-        coverImageUrl: r.coverImageUrl ?? undefined,
-        lectureCount: r._count.series,
-        originalLanguage: resolved.originalLanguage,
-        original: resolved.original
-          ? { title: resolved.original.title }
-          : undefined,
-      };
-    });
-  }
-
-  private async getSeriesListings(
-    scholarId: string,
-    locale: Locale,
-  ): Promise<SeriesSummaryDto[]> {
-    const records = await this.prisma.series.findMany({
-      where: {
-        scholarId,
-        collectionId: null,
-        status: Status.published,
-        deletedAt: null,
-      },
-      orderBy: { title: 'asc' },
-      select: {
-        id: true,
-        slug: true,
-        title: true,
-        language: true,
-        coverImageUrl: true,
-        translations: {
-          where: { locale, status: 'published' },
-          select: { title: true },
-          take: 1,
-        },
-        _count: {
-          select: {
-            lectures: {
-              where: {
-                status: Status.published,
-                deletedAt: null,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    return records.map((r) => {
-      const resolved = resolveContentTranslation({
-        base: { title: r.title },
-        originalLanguage: r.language,
-        targetLocale: locale,
-        publishedTranslation: r.translations[0] ?? null,
-      });
-      return {
-        id: r.id,
-        slug: r.slug,
-        title: resolved.fields.title,
-        coverImageUrl: r.coverImageUrl ?? undefined,
-        lectureCount: r._count.lectures,
-        originalLanguage: resolved.originalLanguage,
-        original: resolved.original
-          ? { title: resolved.original.title }
-          : undefined,
-      };
-    });
-  }
-
-  private async getSingles(
-    scholarId: string,
-    locale: Locale,
-  ): Promise<SingleSummaryDto[]> {
-    const records = await this.prisma.lecture.findMany({
-      where: {
-        scholarId,
-        seriesId: null,
-        status: Status.published,
-        deletedAt: null,
-      },
-      orderBy: [{ publishedAt: 'desc' }, { title: 'asc' }],
-      select: {
-        id: true,
-        slug: true,
-        title: true,
-        language: true,
-        durationSeconds: true,
-        publishedAt: true,
-        translations: {
-          where: { locale, status: 'published' },
-          select: { title: true },
-          take: 1,
-        },
-      },
-    });
-
-    return records.map((r) => {
-      const resolved = resolveContentTranslation({
-        base: { title: r.title },
-        originalLanguage: r.language,
-        targetLocale: locale,
-        publishedTranslation: r.translations[0] ?? null,
-      });
-      return {
-        id: r.id,
-        slug: r.slug,
-        title: resolved.fields.title,
-        durationSeconds: r.durationSeconds ?? undefined,
-        publishedAt: r.publishedAt?.toISOString(),
-        originalLanguage: resolved.originalLanguage,
-        original: resolved.original
-          ? { title: resolved.original.title }
-          : undefined,
-      };
-    });
   }
 
   // ─── Admin Series Methods ──────────────────────────────────────────────────
