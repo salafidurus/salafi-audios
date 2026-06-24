@@ -13,12 +13,12 @@ import { FeedService } from './feed.service';
 @SkipThrottle()
 @ApiTags('Feed')
 @ApiCommonErrors()
-@Public()
 @Controller('feed')
 export class FeedController {
   constructor(private readonly feed: FeedService) {}
 
   @Get()
+  @Public()
   @ApiOperation({ summary: 'Get ranked content feed' })
   @ApiOkResponse({ description: 'Paginated feed items' })
   @ApiQuery({ name: 'cursor', required: false, type: String })
@@ -52,25 +52,37 @@ export class FeedController {
     return this.feed.getFeed(cursor, limit, topics, scholars);
   }
 
-  @Get('personalized')
-  @ApiOperation({
-    summary: 'Get personalized content feed for authenticated users',
-  })
-  @ApiOkResponse({ description: 'Paginated personalized feed items' })
+  @Get('recent')
+  @Public()
+  @ApiOperation({ summary: 'Get recent content feed sorted by creation date' })
+  @ApiOkResponse({ description: 'Paginated recent feed items' })
   @ApiQuery({ name: 'cursor', required: false, type: String })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  getPersonalizedFeed(
+  getFeedRecent(
     @Query('cursor') cursor?: string,
     @Query('limit') limitStr?: string,
   ) {
     const limit = Math.min(Math.max(Number(limitStr) || 20, 1), 40);
+    return this.feed.getFeedRecent(cursor, limit);
+  }
 
-    // For now, return the same as the public feed
-    // In the future, this could use user's interaction history, saved lectures, etc.
-    return this.feed.getFeed(cursor, limit);
+  @Get('following')
+  @ApiOperation({
+    summary: 'Get following feed for authenticated users',
+  })
+  @ApiOkResponse({ description: 'Paginated following feed items' })
+  @ApiQuery({ name: 'cursor', required: false, type: String })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  getFollowingFeed(
+    @Query('cursor') cursor?: string,
+    @Query('limit') limitStr?: string,
+  ) {
+    const limit = Math.min(Math.max(Number(limitStr) || 20, 1), 40);
+    return this.feed.getFollowingFeed(cursor, limit);
   }
 
   @Get('scholars')
+  @Public()
   @ApiOperation({ summary: 'Get ranked scholars for feed' })
   @ApiOkResponse({ description: 'Top scholars for horizontal section' })
   getScholars() {
