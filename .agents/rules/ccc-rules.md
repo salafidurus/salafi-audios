@@ -11,9 +11,9 @@
 ## CLI
 
 ```
-C:/Users/olanr/go/bin/snip.exe -- ccc search "<natural language query>"
-C:/Users/olanr/go/bin/snip.exe -- ccc search "<query>" --limit 10
-C:/Users/olanr/go/bin/snip.exe -- ccc index
+snip -- ccc search "<natural language query>"
+snip -- ccc search "<query>" --limit 10
+snip -- ccc index
 ```
 
 Run `ccc index` after adding new files or making significant changes so the semantic index stays current.

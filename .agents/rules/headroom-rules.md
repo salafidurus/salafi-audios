@@ -13,15 +13,15 @@ Headroom compresses and optimizes content going into context. Use it when contex
 ## CLI
 
 ```
-C:/Users/olanr/go/bin/snip.exe -- headroom proxy <command>
-C:/Users/olanr/go/bin/snip.exe -- headroom diff
-C:/Users/olanr/go/bin/snip.exe -- headroom stats
-C:/Users/olanr/go/bin/snip.exe -- headroom audit-reads
+snip -- headroom proxy <command>
+snip -- headroom diff
+snip -- headroom stats
+snip -- headroom audit-reads
 headroom memory
 ```
 
 ## Rules
 
-- `snip.exe --` first — it handles most common tools (git, vitest, tsc, pnpm, etc.).
+- `snip --` first — it handles most common tools (git, vitest, tsc, pnpm, etc.).
 - `headroom proxy` is the fallback for anything snip doesn't filter.
 - Never compress security-critical output (auth flows, migration SQL, secrets scanning) — detail matters there.
