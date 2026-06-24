@@ -59,3 +59,8 @@
   background: var(--accent-primary-subtle-surface);
   font-weight: 600;
 }
+
+.menuUp {
+  bottom: calc(100% + 0.25rem);
+  top: auto;
+}

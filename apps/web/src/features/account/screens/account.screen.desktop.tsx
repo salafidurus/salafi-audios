@@ -1,25 +1,11 @@
 "use client";
 
-import type { CSSProperties } from "react";
 import Image from "next/image";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { useAccountScreen } from "@sd/domain-account";
+import { useAccountProfile } from "@sd/domain-account";
 import { LanguageSwitch, ContentLanguageToggle } from "@/features/i18n";
-
-const menuButtonStyle: CSSProperties = {
-  padding: "12px 16px",
-  textAlign: "left",
-  border: "1px solid var(--border-default)",
-  borderRadius: 8,
-  background: "var(--surface-default)",
-  cursor: "pointer",
-  fontSize: 15,
-};
-
-const signOutButtonStyle: CSSProperties = {
-  ...menuButtonStyle,
-  color: "var(--action-danger)",
-};
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import styles from "./account.screen.desktop.module.css";
 
 export type AccountDesktopScreenProps = {
   onNavigateToProfile?: () => void;
@@ -32,53 +18,55 @@ export function AccountDesktopScreen({
   onNavigateToLegal,
   onSignOut,
 }: AccountDesktopScreenProps) {
-  const { profile, isFetching } = useAccountScreen();
+  const { data: profile, isFetching } = useAccountProfile();
   const { t } = useTranslation();
 
-  if (isFetching) {
-    return <div style={{ padding: 32 }}>{t("common.loading", "Loading account…")}</div>;
-  }
-
   return (
-    <div style={{ maxWidth: 600, margin: "0 auto", padding: 32 }}>
-      <h1 style={{ margin: 0, fontSize: 28 }}>{t("account.title", "Account")}</h1>
-      {profile && (
-        <div style={{ marginTop: 24 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            {profile.avatarUrl && (
-              <Image
-                src={profile.avatarUrl}
-                alt=""
-                width={64}
-                height={64}
-                unoptimized
-                style={{ borderRadius: 32 }}
-              />
-            )}
-            <div>
-              <div style={{ fontSize: 18, fontWeight: 600 }}>
-                {profile.displayName || t("account.defaultUser", "User")}
+    <ScreenView>
+      <div className={styles.page}>
+        {isFetching ? (
+          <p>{t("common.loading", "Loading account…")}</p>
+        ) : (
+          <>
+            <h1 className={styles.title}>{t("account.title", "Account")}</h1>
+            {profile && (
+              <div className={styles.profileRow}>
+                {profile.avatarUrl && (
+                  <Image
+                    src={profile.avatarUrl}
+                    alt=""
+                    width={64}
+                    height={64}
+                    unoptimized
+                    className={styles.avatar}
+                  />
+                )}
+                <div>
+                  <div className={styles.profileName}>
+                    {profile.displayName || t("account.defaultUser", "User")}
+                  </div>
+                  <div className={styles.profileEmail}>{profile.email}</div>
+                </div>
               </div>
-              <div style={{ fontSize: 14, color: "var(--content-muted)" }}>{profile.email}</div>
+            )}
+            <div className={styles.actions}>
+              <button type="button" onClick={onNavigateToProfile} className={styles.menuButton}>
+                {t("account.editProfile", "Edit Profile")}
+              </button>
+              <button type="button" onClick={onNavigateToLegal} className={styles.menuButton}>
+                {t("account.legal", "Legal")}
+              </button>
+              <button type="button" onClick={onSignOut} className={styles.signOutButton}>
+                {t("account.signOut", "Sign Out")}
+              </button>
             </div>
-          </div>
-        </div>
-      )}
-      <div style={{ marginTop: 32, display: "flex", flexDirection: "column", gap: 8 }}>
-        <button type="button" onClick={onNavigateToProfile} style={menuButtonStyle}>
-          {t("account.editProfile", "Edit Profile")}
-        </button>
-        <button type="button" onClick={onNavigateToLegal} style={menuButtonStyle}>
-          {t("account.legal", "Legal")}
-        </button>
-        <button type="button" onClick={onSignOut} style={signOutButtonStyle}>
-          {t("account.signOut", "Sign Out")}
-        </button>
+            <div className={styles.languageSection}>
+              <LanguageSwitch />
+              <ContentLanguageToggle />
+            </div>
+          </>
+        )}
       </div>
-      <div style={{ marginTop: 32, display: "flex", flexDirection: "column", gap: 12 }}>
-        <LanguageSwitch />
-        <ContentLanguageToggle />
-      </div>
-    </div>
+    </ScreenView>
   );
 }

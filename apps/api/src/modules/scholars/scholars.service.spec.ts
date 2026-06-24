@@ -3,7 +3,7 @@ import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import type {
   ScholarDetailDto,
-  ScholarContentDto,
+  ScholarContentUnifiedDto,
   ScholarListItemDto,
 } from '@sd/core-contracts';
 import { CreateScholarDto } from './dto/create-scholar.dto';
@@ -40,10 +40,8 @@ describe('ScholarsService', () => {
     totalDurationSeconds: 18000,
   };
 
-  const mockScholarContent: ScholarContentDto = {
-    collections: [],
-    series: [],
-    singles: [],
+  const mockScholarContent: ScholarContentUnifiedDto = {
+    items: [],
   };
 
   beforeEach(async () => {

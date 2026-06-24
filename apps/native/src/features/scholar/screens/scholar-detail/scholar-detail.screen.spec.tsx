@@ -1,10 +1,11 @@
 import React from "react";
 import { render, screen } from "@testing-library/react-native";
-import { useScholarDetailScreen } from "@sd/domain-content";
+import { useScholarDetail, useScholarContent } from "@sd/domain-content";
 import { ScholarDetailScreen } from "./scholar-detail.screen";
 
 jest.mock("@sd/domain-content", () => ({
-  useScholarDetailScreen: jest.fn(),
+  useScholarDetail: jest.fn(),
+  useScholarContent: jest.fn(),
 }));
 
 jest.mock("@/shared/components/ScreenView/ScreenView", () => ({
@@ -38,23 +39,29 @@ jest.mock("@/features/scholar/components/scholar-header/scholar-header", () => (
 }));
 
 jest.mock("@/features/scholar/components/scholar-content-list/scholar-content-list", () => ({
-  ScholarContentList: ({ content }: { content: { collections: unknown[] } }) => {
+  ScholarContentList: ({ items }: { items: unknown[] }) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const ReactM = require("react");
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { Text } = require("react-native");
-    return ReactM.createElement(Text, null, `Content:${content.collections.length}`);
+    return ReactM.createElement(Text, null, `Content:${items.length}`);
   },
 }));
 
-const mockedUseScholarDetailScreen = jest.mocked(useScholarDetailScreen);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockedUseScholarDetail = jest.mocked(useScholarDetail) as any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockedUseScholarContent = jest.mocked(useScholarContent) as any;
 
 describe("ScholarDetailScreen", () => {
   it("renders a loading state while scholar detail is fetching", async () => {
-    mockedUseScholarDetailScreen.mockReturnValue({
-      scholar: undefined,
-      content: undefined,
+    mockedUseScholarDetail.mockReturnValue({
+      data: undefined,
       isFetching: true,
+    });
+    mockedUseScholarContent.mockReturnValue({
+      data: undefined,
+      isFetching: false,
     });
 
     await render(<ScholarDetailScreen slug="ibn-baz" />);
@@ -63,9 +70,12 @@ describe("ScholarDetailScreen", () => {
   });
 
   it("renders an empty state when the scholar is missing", async () => {
-    mockedUseScholarDetailScreen.mockReturnValue({
-      scholar: undefined,
-      content: undefined,
+    mockedUseScholarDetail.mockReturnValue({
+      data: undefined,
+      isFetching: false,
+    });
+    mockedUseScholarContent.mockReturnValue({
+      data: undefined,
       isFetching: false,
     });
 
@@ -75,8 +85,8 @@ describe("ScholarDetailScreen", () => {
   });
 
   it("renders the scholar header and content when data exists", async () => {
-    mockedUseScholarDetailScreen.mockReturnValue({
-      scholar: {
+    mockedUseScholarDetail.mockReturnValue({
+      data: {
         id: "scholar-1",
         slug: "ibn-baz",
         name: "Ibn Baz",
@@ -95,12 +105,20 @@ describe("ScholarDetailScreen", () => {
         seriesCount: 3,
         totalDurationSeconds: 3600,
       },
-      content: {
-        collections: [
-          { id: "collection-1", slug: "collection", title: "Collection", lectureCount: 2 },
+      isFetching: false,
+    });
+    mockedUseScholarContent.mockReturnValue({
+      data: {
+        items: [
+          {
+            id: "collection-1",
+            slug: "collection",
+            title: "Collection",
+            type: "collection",
+            recencyAt: "2024-01-01T00:00:00Z",
+            lectureCount: 2,
+          },
         ],
-        series: [],
-        singles: [],
       },
       isFetching: false,
     });

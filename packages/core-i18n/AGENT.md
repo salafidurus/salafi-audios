@@ -17,9 +17,3 @@ This package handles internationalization logic and translation keys for the Sal
 ## Path aliases
 
 - Use `@/` for package-local imports (maps to `src/*`).
-
-## Commands (root)
-
-- Lint: `pnpm --filter core-i18n lint`
-- Test: `pnpm --filter core-i18n test`
-- Typecheck: `pnpm --filter core-i18n typecheck`

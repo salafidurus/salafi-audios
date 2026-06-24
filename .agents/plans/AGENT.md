@@ -108,80 +108,13 @@ Define the checks that must happen after the last implementation stage. Examples
 - For stages that affect shared packages or cross-app contracts, prefer running
   `pnpm typecheck` and `pnpm test` across the full monorepo before committing.
 
-## Monorepo-Specific Guidance
+## Monorepo Rules
 
-### Architectural guardrails (non-negotiable)
-
-- Read `AGENT.md` in each workspace you are modifying before making changes.
-- Read the relevant `docs/*.md` file for the area of work (see the quick-reference table in
-  the root `AGENT.md`).
-- Backend (`apps/api`) is the single source of truth for all business rules and auth.
-- No `apps/*` → `apps/*` imports. No `packages/*` → `apps/*` imports.
-- No circular dependencies between packages.
-
-### TDD rule (applies to every implementation stage)
-
-Every implementation stage that adds or changes behaviour must follow Red → Green → Commit:
-
-1. Write the failing test first.
-2. Run it — confirm it fails with the expected error, not a setup error.
-3. Write the minimal implementation to make it pass.
-4. Run it again — confirm it passes.
-5. Run all tests in the workspace — confirm nothing else broke.
-6. Commit test and implementation together.
-
-The only exceptions: presentational-only components with no logic, framework DI wiring,
-generated artifacts, and third-party library internals.
-
-### Validation commands
-
-```bash
-pnpm typecheck                          # full monorepo typecheck
-pnpm --filter <workspace> typecheck     # single workspace
-pnpm test                               # all tests
-pnpm --filter <workspace> test          # single workspace
-pnpm lint                               # all linting
-pnpm build                              # full build
-pnpm test:e2e                           # Playwright E2E (web only)
-```
-
-### Commit message rules
-
-- Follow Conventional Commits: `type(scope): description`
-- Lines must not exceed 100 characters
-- Always include `Co-authored-by` trailers for every agent/model that made a material
-  contribution to the task.
-- Multiple co-authors are allowed and expected when multiple agents/models contributed;
-  add one trailer line per contributor.
-- If Copilot contributed, include:
-  `Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>`
-
-### Package boundary conventions
-
-- `apps/web/src/core/` — web bootstrap (providers, styles, config, auth)
-- `apps/mobile/src/core/` — mobile bootstrap (providers, styles, config, auth)
-- `apps/web/src/features/<name>/` — web feature UI (components, hooks, screens, utils)
-- `apps/mobile/src/features/<name>/` — mobile feature UI
-- `apps/web/src/shared/` — primitives used across 2+ web features
-- `apps/mobile/src/shared/` — primitives used across 2+ mobile features
-- `packages/domain-*` — shared reactive state and data hooks (no UI)
-- `packages/core-*` — truly shared infrastructure only (core-db, core-api, core-contracts,
-  core-i18n)
-
-### When to update docs alongside code
-
-- If an architectural boundary changes → update `docs/architecture.md`
-- If the API surface changes → update `docs/api.md` and `packages/core-contracts`
-- If the mobile offline pattern changes → update `docs/mobile.md`
-- If the web structure changes → update `docs/web.md`
-- Always update the relevant `AGENT.md` file in the workspace being modified
+See root `AGENT.md` for architectural guardrails, TDD policy, commit format, and package boundaries.
 
 ## Editing Discipline
 
-- Use plans in this folder before making substantial structural changes to the codebase.
-- Keep plans concise but specific enough that another agent can execute them without re-discovering the scope.
-- Do not store scratch notes, raw logs, or large code dumps here unless directly needed for execution.
-- Plan files must follow markdownlint-style Markdown: consistent heading structure, blank lines around lists and headings, no malformed nested lists.
+Keep plans concise but execution-specific. No scratch notes or raw logs. Follow markdownlint Markdown style.
 
 ## Completion And Archival
 

@@ -2,18 +2,6 @@
 
 This Next.js app is a client of the backend API, not an authority.
 
-## Core responsibilities
-
-- Public discovery (SEO-friendly pages, deep links, shareable routes).
-- Admin/editor workflows with efficient UI and safe UX.
-- Strict adherence to backend contracts and permissions.
-
-## Agent skills scope
-
-- If using Claude Code: Skills are defined at the root and listed in CLAUDE.md.
-- If using OpenCode: Project-local skills live in `.opencode/skills/`.
-- Keep web/Next.js skills scoped to this app directory.
-
 ## Non-negotiables
 
 - Never move business rules from API into web.
@@ -229,30 +217,6 @@ import { motion } from 'framer-motion';
 
 ---
 
-## Data-Fetching Guidance
-
-- Public pages: SSR/SSG as appropriate; respect publication status
-- Auth/admin flows: interactive client paths, backend-authorized
-- Keep client state derived from authoritative API responses
-
----
-
-## Brand Assets
-
-- Favicons/app icons live in `apps/web/src/app/favicon.ico` and `apps/web/public/icons/*`; wire them via Next metadata in `apps/web/src/app/layout.tsx`
-- Logos live in `apps/web/public/logo/*`; reference them as `/logo/<file>` in UI (e.g. with `next/image`)
-- Auth provider button assets live in `apps/web/public/auth/*`
-- Web auth provider buttons should stay provider-branded; use the full branded button assets rather than recoloring them into app-brand CTAs
-
----
-
-## Information Architecture
-
-- Web route IA can diverge from backend endpoint shapes when UX/SEO benefits
-- Backend remains authoritative; web IA is a presentation concern
-
----
-
 ## Dependency Direction
 
 ```file
@@ -261,14 +225,6 @@ features/*/screens → features/*/components
 features/*/components → core/shared
 core → shared
 ```
-
----
-
-## API Contracts
-
-- Import shared types from `@sd/core-contracts`
-- Types are hand-written and stable — no codegen required
-- When API changes, update `packages/core-contracts/src/types/` manually
 
 ---
 
@@ -300,29 +256,3 @@ Every `src/features/<name>/` directory should have an `index.ts` barrel that re-
 - Before finishing web changes, run `pnpm --filter web typecheck` and `pnpm --filter web build` locally to mirror CI
 
 ---
-
-## Commands (run from repo root)
-
-- Dev: `pnpm dev:web`
-- Build: `pnpm --filter web build`
-- Lint: `pnpm --filter web lint`
-- Typecheck: `pnpm --filter web typecheck`
-- Unit/integration tests: `pnpm --filter web test`
-- E2E (Playwright): `pnpm --filter web test:e2e`
-
-### Single-test commands
-
-- Jest file: `pnpm --filter web test -- src/path/to/file.test.tsx`
-- Jest by name: `pnpm --filter web test -- -t "renders heading"`
-- Playwright file: `pnpm --filter web test:e2e -- e2e/catalog.spec.ts`
-- Playwright by title: `pnpm --filter web test:e2e -- --grep "catalog list"`
-- Playwright project: `pnpm --filter web test:e2e -- --project chromium`
-
----
-
-## Documentation Sync
-
-When implementing features, update:
-
-- `docs/AGENT.md` - Update implementation gap analysis and phase status when needed
-- Relevant top-level docs file in `docs/` - If web architecture, routing, SEO, or platform boundaries change

@@ -18,6 +18,7 @@ generated/
 .claude/settings.local.json
 .codex/
 .claude/
+.omc/
 .gemini/
 .opencode/
 **/.codex/
@@ -52,3 +53,5 @@ packages/db/src/generated/
 
 # Turborepo
 .turbo
+# CocoIndex Code (ccc)
+/.cocoindex_code/

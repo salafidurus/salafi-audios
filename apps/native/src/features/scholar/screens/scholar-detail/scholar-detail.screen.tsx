@@ -1,5 +1,5 @@
 import { ScrollView, View } from "react-native";
-import { useScholarDetailScreen } from "@sd/domain-content";
+import { useScholarDetail, useScholarContent } from "@sd/domain-content";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { ScholarContentList } from "@/features/scholar/components/scholar-content-list/scholar-content-list";
@@ -10,7 +10,9 @@ export type ScholarDetailScreenProps = {
 };
 
 export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
-  const { scholar, content, isFetching } = useScholarDetailScreen(slug);
+  const { data: scholar, isFetching: isScholarFetching } = useScholarDetail(slug);
+  const { data: content, isFetching: isContentFetching } = useScholarContent(slug);
+  const isFetching = isScholarFetching || isContentFetching;
 
   if (isFetching) {
     return (
@@ -33,7 +35,7 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingVertical: 16 }}>
         <ScholarHeader scholar={scholar} />
         <View style={{ marginTop: 24 }}>
-          {content ? <ScholarContentList content={content} /> : null}
+          <ScholarContentList items={content?.items ?? []} />
         </View>
       </ScrollView>
     </ScreenView>

@@ -3,7 +3,7 @@ import { Status } from '@sd/core-db';
 import type {
   ScholarListItemDto,
   ScholarDetailDto,
-  ScholarContentDto,
+  ScholarContentUnifiedDto,
   TranslationViewDto,
   AdminSeriesListItemDto,
   AdminSeriesDetailDto,
@@ -43,7 +43,7 @@ export class ScholarsService {
     return found;
   }
 
-  async getContent(slug: string): Promise<ScholarContentDto> {
+  async getContent(slug: string): Promise<ScholarContentUnifiedDto> {
     const content = await this.repo.getContent(slug);
     if (!content) throw new NotFoundException(`Scholar "${slug}" not found`);
     return content;

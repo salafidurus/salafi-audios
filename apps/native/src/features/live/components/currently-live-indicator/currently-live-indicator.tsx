@@ -72,10 +72,10 @@ const indicatorStyles = StyleSheet.create((theme) => ({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#dc2626",
+    backgroundColor: theme.colors.state.danger,
   },
   liveText: {
-    color: "#dc2626",
+    color: theme.colors.state.danger,
     fontWeight: "700",
     letterSpacing: 0.5,
   },

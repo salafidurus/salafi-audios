@@ -1,5 +1,7 @@
 "use client";
 
+import { Button } from "@/shared/components/Button/Button";
+
 export type AuthRequiredStateMobileProps = {
   title: string;
   description: string;
@@ -17,9 +19,9 @@ export function AuthRequiredStateMobile({
     <div style={wrapperStyle}>
       <h2 style={titleStyle}>{title}</h2>
       <p style={descriptionStyle}>{description}</p>
-      <button type="button" onClick={onPress} style={buttonStyle}>
+      <Button variant="primary" size="lg" onClick={onPress}>
         {actionLabel}
-      </button>
+      </Button>
     </div>
   );
 }
@@ -36,20 +38,8 @@ const titleStyle: React.CSSProperties = {
 };
 
 const descriptionStyle: React.CSSProperties = {
-  color: "#6b7280",
+  color: "var(--content-muted)",
   marginBottom: "1.25rem",
   fontSize: "0.9375rem",
   lineHeight: 1.5,
-};
-
-const buttonStyle: React.CSSProperties = {
-  display: "inline-block",
-  padding: "0.75rem 1.5rem",
-  backgroundColor: "#2563eb",
-  color: "#fff",
-  borderRadius: "0.5rem",
-  border: "none",
-  fontWeight: 600,
-  fontSize: "0.9375rem",
-  cursor: "pointer",
 };

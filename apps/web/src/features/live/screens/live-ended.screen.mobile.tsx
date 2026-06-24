@@ -1,33 +1,21 @@
 "use client";
 
-import type React from "react";
 import type { LiveSessionDto } from "@sd/core-contracts";
 import { useLiveEndedScreen } from "@sd/domain-live";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import styles from "./live-ended.screen.mobile.module.css";
 
 export type LiveEndedMobileScreenProps = {
   onNavigateToSession?: (id: string) => void;
 };
 
-const endedSessionButtonStyle: React.CSSProperties = {
-  display: "block",
-  width: "100%",
-  textAlign: "left",
-  padding: 12,
-  borderBottom: "1px solid #eee",
-  cursor: "pointer",
-  background: "none",
-  border: "none",
-};
-
 function EndedSessionItem({ session, onPress }: { session: LiveSessionDto; onPress?: () => void }) {
   return (
-    <button type="button" onClick={onPress} style={endedSessionButtonStyle}>
-      <div style={{ fontSize: 15, fontWeight: 600 }}>{session.title}</div>
-      <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>{session.scholarName}</div>
+    <button type="button" onClick={onPress} className={styles.sessionItem}>
+      <div className={styles.sessionTitle}>{session.title}</div>
+      <div className={styles.sessionMeta}>{session.scholarName}</div>
       {session.endedAt && (
-        <div style={{ fontSize: 12, color: "#999", marginTop: 2 }}>
-          {new Date(session.endedAt).toLocaleDateString()}
-        </div>
+        <div className={styles.sessionDate}>{new Date(session.endedAt).toLocaleDateString()}</div>
       )}
     </button>
   );
@@ -36,24 +24,24 @@ function EndedSessionItem({ session, onPress }: { session: LiveSessionDto; onPre
 export function LiveEndedMobileScreen({ onNavigateToSession }: LiveEndedMobileScreenProps) {
   const { sessions, isFetching } = useLiveEndedScreen();
 
-  if (isFetching && sessions.length === 0) {
-    return <div style={{ padding: 16 }}>Loading past sessions…</div>;
-  }
-
-  if (sessions.length === 0) {
-    return <div style={{ padding: 16, color: "#666" }}>No past sessions.</div>;
-  }
-
   return (
-    <div style={{ padding: 12 }}>
-      <h2 style={{ margin: 0, fontSize: 18, marginBottom: 12 }}>Past Sessions</h2>
-      {sessions.map((session) => (
-        <EndedSessionItem
-          key={session.id}
-          session={session}
-          onPress={() => onNavigateToSession?.(session.id)}
-        />
-      ))}
-    </div>
+    <ScreenView>
+      {isFetching && sessions.length === 0 ? (
+        <p>Loading past sessions…</p>
+      ) : sessions.length === 0 ? (
+        <p>No past sessions.</p>
+      ) : (
+        <>
+          <h2 className={styles.title}>Past Sessions</h2>
+          {sessions.map((session) => (
+            <EndedSessionItem
+              key={session.id}
+              session={session}
+              onPress={() => onNavigateToSession?.(session.id)}
+            />
+          ))}
+        </>
+      )}
+    </ScreenView>
   );
 }

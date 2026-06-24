@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react-native";
-import { useLectureDetailScreen } from "@sd/domain-content";
+import { useLectureDetail } from "@sd/domain-content";
 import { LectureDetailScreen } from "./lecture-detail.screen";
 
 jest.mock("react-native-unistyles", () => ({
@@ -18,7 +18,7 @@ jest.mock("react-native-unistyles", () => ({
 }));
 
 jest.mock("@sd/domain-content", () => ({
-  useLectureDetailScreen: jest.fn(),
+  useLectureDetail: jest.fn(),
 }));
 
 jest.mock("@/shared/components/ScreenView/ScreenView", () => ({
@@ -71,12 +71,13 @@ jest.mock("@/features/lecture/components/series-context-bar/series-context-bar",
   },
 }));
 
-const mockedUseLectureDetailScreen = jest.mocked(useLectureDetailScreen);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockedUseLectureDetail = jest.mocked(useLectureDetail) as any;
 
 describe("LectureDetailScreen", () => {
   it("renders a loading state while lecture detail is fetching", async () => {
-    mockedUseLectureDetailScreen.mockReturnValue({
-      lecture: undefined,
+    mockedUseLectureDetail.mockReturnValue({
+      data: undefined,
       isFetching: true,
       error: null,
     });
@@ -87,8 +88,8 @@ describe("LectureDetailScreen", () => {
   });
 
   it("renders an empty state when the lecture is missing", async () => {
-    mockedUseLectureDetailScreen.mockReturnValue({
-      lecture: undefined,
+    mockedUseLectureDetail.mockReturnValue({
+      data: undefined,
       isFetching: false,
       error: null,
     });
@@ -99,8 +100,8 @@ describe("LectureDetailScreen", () => {
   });
 
   it("renders lecture details when data exists", async () => {
-    mockedUseLectureDetailScreen.mockReturnValue({
-      lecture: {
+    mockedUseLectureDetail.mockReturnValue({
+      data: {
         id: "lecture-1",
         slug: "an-example-lecture",
         title: "An Example Lecture",

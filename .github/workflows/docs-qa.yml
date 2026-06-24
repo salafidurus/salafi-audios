@@ -2,11 +2,6 @@ name: docs-qa
 
 on:
   pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - ready_for_review
     paths:
       - "README.md"
       - "**/README.md"

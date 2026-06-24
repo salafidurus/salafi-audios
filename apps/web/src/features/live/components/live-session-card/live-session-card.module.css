@@ -78,4 +78,18 @@
 
 .cardEnded {
   opacity: 0.72;
+  filter: grayscale(1);
+}
+
+.endedBadge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--content-muted);
+  background: var(--surface-subtle);
+  border-radius: var(--radius-scale-sm);
+  padding: 0.1rem 0.4rem;
 }

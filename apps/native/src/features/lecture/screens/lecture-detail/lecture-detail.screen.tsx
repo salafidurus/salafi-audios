@@ -1,6 +1,6 @@
 import { ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { useLectureDetailScreen } from "@sd/domain-content";
+import { useLectureDetail } from "@sd/domain-content";
 import { pickContentField } from "@sd/core-i18n";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
@@ -15,7 +15,7 @@ export type LectureDetailScreenProps = {
 };
 
 export function LectureDetailScreen({ id }: LectureDetailScreenProps) {
-  const { lecture, isFetching } = useLectureDetailScreen(id);
+  const { data: lecture, isFetching } = useLectureDetail(id);
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
 

@@ -1,0 +1,59 @@
+name: db-policy
+
+on:
+  pull_request:
+    paths:
+      - "packages/core-db/prisma/**"
+      - "packages/core-db/prisma.config.ts"
+      - "packages/core-db/src/generated/**"
+
+# Cancel stale runs on the same PR to save CI minutes on rapid pushes
+concurrency:
+  group: db-policy-${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "24"
+
+jobs:
+  db_generated_policy:
+    name: db:generated-policy
+    runs-on: ubuntu-latest
+    environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
+    env:
+      DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL || 'postgresql://ci:ci@localhost:5432/ci' }}
+      DATABASE_URL: ${{ secrets.DIRECT_DB_URL || 'postgresql://ci:ci@localhost:5432/ci' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate Prisma client
+        run: pnpm --filter @sd/core-db prisma:generate
+
+      - name: Enforce generated DB artifact policy
+        run: |
+          if [ -n "$(git ls-files -- packages/core-db/src/generated)" ]; then
+            echo "::error::Forbidden tracked files found in packages/core-db/src/generated"
+            git ls-files -- packages/core-db/src/generated
+            exit 1
+          fi
+
+          if [ -n "$(git status --porcelain --untracked-files=all -- packages/core-db/src/generated)" ]; then
+            echo "::error::packages/core-db/src/generated must remain git-clean after generation"
+            git status --porcelain --untracked-files=all -- packages/core-db/src/generated
+            exit 1
+          fi

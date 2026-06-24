@@ -2,103 +2,44 @@
 
 This package defines shared TypeScript contracts (DTOs, types) and query infrastructure for the Salafi Durus platform.
 
-## Core responsibilities
-
-- Define authoritative TypeScript types for all API contracts
-- Provide TanStack Query (React Query) hooks and client infrastructure
-- Ensure type safety across web, mobile, and API boundaries
-- Eliminate codegen friction by providing hand-written, stable contracts
-
-## Architecture rules
-
-- **Source of truth**: This package is the single source of truth for shared TypeScript contracts
-- **Manual maintenance**: Types are hand-written and reviewed, not auto-generated
-- **Stability first**: Contract changes require explicit review and versioning
-- **Cross-platform**: Contracts work for web (Next.js), mobile (Expo), and backend (NestJS)
-
 ## Path aliases
 
 - Use `@/` for package-local imports (maps to `src/*`).
 
-## Package dependencies
+## What lives here vs domain-\* packages
 
-- `@tanstack/react-query`: Query client library
-- `@sd/core-i18n`: Internationalization types
+- `@sd/core-contracts` — base infrastructure: `httpClient`, `useApiQuery`, `endpoints`, `queryKeys`, and shared TypeScript types (DTOs).
+- `@sd/domain-*` — feature-level hooks built on top (e.g. `useScholarDetail`, `useFeedRecent` from `@sd/domain-content`).
 
-## Usage guidance
+Import DTOs from `@sd/core-contracts`. For data-fetching hooks, import from the relevant `@sd/domain-*` package.
 
-### Importing types
-
-```typescript
-import { LectureViewDto, ScholarViewDto, CollectionViewDto } from "@sd/core-contracts";
-```
-
-### Using query hooks
+## Usage
 
 ```typescript
-import {
-  useScholar,
-  useScholarStats,
-  usePlatformStats,
-  initApiClient,
-} from "@sd/core-contracts/query/hooks";
+// Types
+import { LectureViewDto, ScholarViewDto } from "@sd/core-contracts";
 
-// Initialize once per app
-initApiClient({
-  baseUrl: process.env.NEXT_PUBLIC_API_URL,
-  getAccessToken: () => getAuthToken(),
-});
-
-// Use in components
-const { data: scholar } = useScholar("al-albani");
-const { data: stats } = useScholarStats("al-albani");
-```
-
-### HTTP client
-
-```typescript
+// HTTP client (raw)
 import { httpClient } from "@sd/core-contracts/http";
+const data = await httpClient<ScholarViewDto>({ url: "/scholars/al-albani", method: "GET" });
 
-const response = await httpClient({
-  url: "/lectures/123",
-  method: "GET",
-});
+// API client init (once per app)
+import { initApiClient } from "@sd/core-contracts";
+initApiClient({ baseUrl: process.env.NEXT_PUBLIC_API_URL, getAccessToken: () => getAuthToken() });
 ```
 
-## Development workflow
+## When types change
 
-1. When API endpoint changes, update types in `src/types/`
-2. Update query hooks in `src/query/hooks/` if needed
-3. Update `src/query/query-keys.ts` if endpoints changed
-4. Update `src/http.ts` for any HTTP client changes
-5. Run `pnpm --filter core-contracts typecheck` to verify
-6. Run `pnpm --filter core-contracts lint` for style compliance
-7. Deploy updates across all apps (web, mobile, api)
+1. Update types in `src/types/`.
+2. Update `src/query/hooks/` and `src/query/query-keys.ts` if the endpoint or hook signature changed.
+3. Run `pnpm --filter core-contracts build` before testing downstream apps.
 
 ## Quality rules
 
-- Keep types minimal and focused on API boundaries
-- Avoid business logic in contracts
-- Use `readonly` for immutable contract properties
-- Prefer branded types over primitives (`LectureSlug` vs `string`)
-- Add JSDoc for non-obvious contracts
-- Export only stable, public contracts
-- Keep internal implementation details private
-
-## Build/lint/test commands
-
-- Build: `pnpm --filter core-contracts build`
-- Lint: `pnpm --filter core-contracts lint`
-- Typecheck: `pnpm --filter core-contracts typecheck`
-- Test: `pnpm --filter core-contracts test`
-
-## Safety checklist
-
-- Do not expose secrets or environment-specific details
-- Do not import from apps (web/mobile/api) into this package
-- Keep exports stable across minor versions
-- Document breaking changes in changelog
-- Test type changes with downstream apps before merging
+- Keep types minimal and focused on API boundaries.
+- Avoid business logic in contracts.
+- Use `readonly` for immutable properties.
+- Prefer branded types over primitives where it prevents misuse.
 
 ## Troubleshooting
 

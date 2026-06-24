@@ -1,10 +1,16 @@
 "use client";
 
+import type { ReactNode } from "react";
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
+import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
+import { useFeedRecentScreen } from "@sd/domain-content";
+import { useTranslation } from "@/core/i18n/use-translation";
 import { FeedContentCard } from "../components/feed-content-card/feed-content-card";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import { FeedTopicRow } from "../components/feed-topic-row/feed-topic-row";
-import { useFeed } from "@sd/domain-content";
+import { FeedSkeleton } from "../components/feed-skeleton/feed-skeleton";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import styles from "./feed-recent.screen.desktop.module.css";
 
 export type FeedDesktopScreenProps = {
   onNavigateToLecture?: (slug: string) => void;
@@ -17,80 +23,126 @@ function getFeedItemKey(item: FeedItemDto): string {
   return item.id;
 }
 
-function renderFeedItem(
-  item: FeedItemDto,
-  onNavigateToLecture?: (slug: string) => void,
-  onNavigateToScholar?: (slug: string) => void,
-) {
-  switch (item.kind) {
-    case "scholar_row":
-      return (
-        <FeedScholarRow
-          key={getFeedItemKey(item)}
-          scholars={item.scholars}
-          onScholarPress={onNavigateToScholar}
-        />
+type FeedBlocksProps = {
+  items: FeedItemDto[];
+  onNavigateToLecture?: (slug: string) => void;
+  onNavigateToScholar?: (slug: string) => void;
+};
+
+/**
+ * Render the feed as a responsive grid of content cards, with scholar/topic
+ * carousels breaking out to full-width sections in their original order.
+ */
+function FeedBlocks({ items, onNavigateToLecture, onNavigateToScholar }: FeedBlocksProps) {
+  const blocks: ReactNode[] = [];
+  let cards: ReactNode[] = [];
+
+  const flushCards = (key: string) => {
+    if (cards.length === 0) return;
+    blocks.push(
+      <div className={styles.grid} key={`grid-${key}`}>
+        {cards}
+      </div>,
+    );
+    cards = [];
+  };
+
+  items.forEach((item, index) => {
+    if (item.kind === "scholar_row") {
+      flushCards(String(index));
+      blocks.push(
+        <section className={styles.section} key={getFeedItemKey(item)}>
+          <FeedScholarRow scholars={item.scholars} onScholarPress={onNavigateToScholar} />
+        </section>,
       );
-    case "topic_row":
-      return (
-        <FeedTopicRow
-          key={getFeedItemKey(item)}
-          topicName={item.topicName}
-          items={item.items}
-          onItemPress={onNavigateToLecture}
-        />
+    } else if (item.kind === "topic_row") {
+      flushCards(String(index));
+      blocks.push(
+        <section className={styles.section} key={getFeedItemKey(item)}>
+          <FeedTopicRow
+            topicName={item.topicName}
+            items={item.items}
+            onItemPress={onNavigateToLecture}
+          />
+        </section>,
       );
-    default:
-      return (
+    } else {
+      cards.push(
         <FeedContentCard
           key={item.id}
           item={item as FeedContentItemDto}
           onPress={() => onNavigateToLecture?.(item.slug)}
-        />
+        />,
       );
-  }
+    }
+  });
+
+  flushCards("end");
+  return <>{blocks}</>;
 }
 
 export function FeedDesktopScreen({
   onNavigateToLecture,
   onNavigateToScholar,
 }: FeedDesktopScreenProps) {
-  const { data, isFetching, hasNextPage, fetchNextPage } = useFeed();
+  const { t } = useTranslation();
+  const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } = useFeedRecentScreen();
   const items = data?.pages.flatMap((p) => p.items) ?? [];
 
-  if (isFetching && items.length === 0) {
-    return <div style={{ padding: 32 }}>Loading feed\u2026</div>;
-  }
+  const hero = (
+    <header className={styles.hero}>
+      <h2 className={styles.heroTitle}>Feed</h2>
+    </header>
+  );
 
-  if (items.length === 0) {
-    return (
-      <div style={{ padding: 32, color: "var(--content-muted)" }}>
-        No content yet. Check back soon.
+  let body: ReactNode;
+  if (isError && items.length === 0) {
+    body = (
+      <div className={styles.state} role="alert">
+        <span>{getErrorStateText("feed", t)}</span>
+        <button
+          type="button"
+          className={`${styles.button} ${styles.retryButton}`}
+          onClick={() => refetch()}
+        >
+          {t("feed.retry", "Try Again")}
+        </button>
       </div>
+    );
+  } else if (isFetching && items.length === 0) {
+    body = <FeedSkeleton />;
+  } else if (items.length === 0) {
+    body = <div className={styles.state}>{getEmptyStateText("feed", t)}</div>;
+  } else {
+    body = (
+      <>
+        <FeedBlocks
+          items={items}
+          onNavigateToLecture={onNavigateToLecture}
+          onNavigateToScholar={onNavigateToScholar}
+        />
+        {hasNextPage && (
+          <div className={styles.loadMoreRow}>
+            <button
+              type="button"
+              className={styles.button}
+              onClick={() => fetchNextPage()}
+              disabled={isFetching}
+            >
+              {isFetching ? t("feed.loading", "Loading…") : t("feed.loadMore", "Load more")}
+            </button>
+          </div>
+        )}
+      </>
     );
   }
 
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto", padding: 24 }}>
-      <h2 style={{ margin: 0, fontSize: 22, marginBottom: 16 }}>Feed</h2>
-      {items.map((item) => renderFeedItem(item, onNavigateToLecture, onNavigateToScholar))}
-      {hasNextPage && (
-        <div style={{ padding: 16, textAlign: "center" }}>
-          <button
-            type="button"
-            onClick={() => fetchNextPage()}
-            style={{
-              padding: "8px 24px",
-              border: "1px solid var(--border-default)",
-              borderRadius: 6,
-              cursor: "pointer",
-              background: "var(--surface-default)",
-            }}
-          >
-            {isFetching ? "Loading\u2026" : "Load more"}
-          </button>
-        </div>
-      )}
-    </div>
+    <ScreenView>
+      <div className={styles.page}>
+        {hero}
+        {body}
+      </div>
+    </ScreenView>
   );
 }

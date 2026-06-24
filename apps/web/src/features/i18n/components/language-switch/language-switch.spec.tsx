@@ -51,6 +51,15 @@ describe("LanguageSwitch", () => {
     expect(screen.getByRole("menuitemradio", { name: "العربية" })).toBeInTheDocument();
   });
 
+  it("applies menuUp class when direction is up", () => {
+    render(<LanguageSwitch direction="up" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Language" }));
+
+    const menu = screen.getByRole("menu");
+    expect(menu.className).toContain("menuUp");
+  });
+
   it("switches locale, persists it, invalidates queries, and refreshes", async () => {
     render(<LanguageSwitch />);
 

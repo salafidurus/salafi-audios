@@ -3,6 +3,7 @@ import { ConfigService } from './shared/config/config.service';
 import { AllExceptionsFilter } from './shared/errors/http-exception.filter';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { Transport } from '@nestjs/microservices';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
@@ -57,6 +58,14 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('docs', app, document);
+
+  // TCP microservice listener — dormant until @MessagePattern handlers are added.
+  // Split-later: extract TelegramModule to a separate process pointing at this port.
+  app.connectMicroservice({
+    transport: Transport.TCP,
+    options: { host: '127.0.0.1', port: 5001 },
+  });
+  await app.startAllMicroservices();
 
   await app.listen(config.PORT);
 }

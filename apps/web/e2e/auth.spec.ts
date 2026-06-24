@@ -21,11 +21,14 @@ test.describe("Auth flows", () => {
   });
 
   test.describe("protected routes", () => {
-    test("accessing /account/profile without session redirects to /sign-in", async ({ page }) => {
+    test("accessing /account/profile without session shows auth prompt (auth-optional)", async ({
+      page,
+    }) => {
       await page.goto("/account/profile");
 
-      // auth-required leaf — unauthenticated users are redirected to sign-in
-      await expect(page).toHaveURL(/\/sign-in/);
+      // /account/profile is auth-optional — stays on page, shows in-page auth prompt
+      await expect(page).toHaveURL(/\/account\/profile/);
+      await expect(page).not.toHaveURL(/\/sign-in/);
     });
 
     test("accessing /feed/following without session redirects to /sign-in", async ({ page }) => {
