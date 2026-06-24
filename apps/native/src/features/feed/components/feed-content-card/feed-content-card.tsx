@@ -33,10 +33,10 @@ export function FeedContentCard({ item, onPress }: FeedContentCardProps) {
 
 const styles = StyleSheet.create((theme) => ({
   card: {
-    padding: 12,
-    borderWidth: 1,
+    padding: theme.spacing.scale.md,
+    borderWidth: theme.border.width.default,
     borderColor: theme.colors.border.subtle,
-    borderRadius: 12,
+    borderRadius: theme.radius.component.panelSm,
     backgroundColor: theme.colors.surface.default,
     boxShadow: "0 1px 3px rgba(0, 0, 0, 0.06)",
   },

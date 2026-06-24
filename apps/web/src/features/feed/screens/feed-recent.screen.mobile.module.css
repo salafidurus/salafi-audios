@@ -9,8 +9,8 @@
 
 .button {
   padding: var(--space-scale-sm) var(--space-component-gap-md);
-  border: 1px solid var(--border-default);
-  border-radius: 6px;
+  border: var(--border-width-default) solid var(--border-default);
+  border-radius: var(--radius-scale-sm);
   cursor: pointer;
   background: var(--surface-default);
 }

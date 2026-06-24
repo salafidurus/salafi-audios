@@ -55,25 +55,25 @@ export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProp
 
 const styles = StyleSheet.create((theme) => ({
   container: {
-    marginBottom: 16,
+    marginBottom: theme.spacing.scale.lg,
   },
   heading: {
     fontSize: 16,
     fontWeight: "600",
-    marginBottom: 12,
-    marginStart: 8,
+    marginBottom: theme.spacing.scale.md,
+    marginStart: theme.spacing.scale.sm,
     color: theme.colors.content.strong,
   },
   listContent: {
-    paddingHorizontal: 8,
-    gap: 12,
+    paddingHorizontal: theme.spacing.scale.sm,
+    gap: theme.spacing.scale.md,
   },
   card: {
     minWidth: 200,
-    padding: 12,
-    borderWidth: 1,
+    padding: theme.spacing.scale.md,
+    borderWidth: theme.border.width.default,
     borderColor: theme.colors.border.default,
-    borderRadius: 8,
+    borderRadius: theme.radius.component.panel,
     backgroundColor: theme.colors.surface.default,
   },
   cardPressed: {
@@ -82,14 +82,14 @@ const styles = StyleSheet.create((theme) => ({
   title: {
     fontSize: 14,
     fontWeight: "500",
-    marginBottom: 4,
+    marginBottom: theme.spacing.scale.xs,
     lineHeight: 20,
     color: theme.colors.content.strong,
   },
   scholar: {
     fontSize: 12,
     color: theme.colors.content.muted,
-    marginBottom: 4,
+    marginBottom: theme.spacing.scale.xs,
   },
   duration: {
     fontSize: 12,

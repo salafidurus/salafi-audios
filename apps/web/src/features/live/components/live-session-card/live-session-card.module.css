@@ -1,10 +1,10 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  padding: 1rem 1.1rem;
+  gap: var(--space-component-gap-sm);
+  padding: var(--space-scale-lg) var(--space-component-card-padding);
   border-radius: var(--radius-component-panel);
-  border: 1px solid var(--border-subtle);
+  border: var(--border-width-default) solid var(--border-subtle);
   background: var(--surface-default);
   box-shadow: var(--shadow-sm);
   cursor: pointer;
@@ -20,13 +20,13 @@
 .headerRow {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-scale-sm);
 }
 
 .liveBadge {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: var(--space-scale-xs);
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -91,5 +91,5 @@
   color: var(--content-muted);
   background: var(--surface-subtle);
   border-radius: var(--radius-scale-sm);
-  padding: 0.1rem 0.4rem;
+  padding: var(--space-scale-xs) var(--space-scale-sm);
 }

@@ -22,20 +22,20 @@ export function FeedSkeleton({ count = 6 }: FeedSkeletonProps) {
 
 const styles = StyleSheet.create((theme) => ({
   container: {
-    padding: 8,
-    gap: 8,
+    padding: theme.spacing.scale.sm,
+    gap: theme.spacing.scale.sm,
   },
   card: {
-    padding: 12,
-    gap: 8,
-    borderWidth: 1,
+    padding: theme.spacing.scale.md,
+    gap: theme.spacing.scale.sm,
+    borderWidth: theme.border.width.default,
     borderColor: theme.colors.border.subtle,
-    borderRadius: 12,
+    borderRadius: theme.radius.component.panelSm,
     backgroundColor: theme.colors.surface.default,
   },
   line: {
     height: 12,
-    borderRadius: 4,
+    borderRadius: theme.radius.scale.xs,
     backgroundColor: theme.colors.surface.subtle,
   },
   lineTitle: {
