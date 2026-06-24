@@ -6,16 +6,17 @@ When executing shell commands, always prefix them with the snip proxy to reduce 
 
 Instead of running commands directly:
 
-```
+```bash
 git status
 go test ./...
 ```
 
-Prefix with snip:
+Prefix with `snip` (either directly or using its absolute path):
 
-```
+```bash
+snip -- git status
+# Or using the absolute path:
 C:/Users/olanr/go/bin/snip.exe -- git status
-C:/Users/olanr/go/bin/snip.exe -- go test ./...
 ```
 
 This applies to all shell commands. Snip filters verbose output while preserving errors and essential information.
