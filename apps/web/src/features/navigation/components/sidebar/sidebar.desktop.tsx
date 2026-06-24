@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { useAuth } from "@/core/auth";
 import { routes } from "@sd/core-contracts";
 import {
   PanelLeftOpen,
@@ -30,8 +29,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const { t } = useTranslation();
   const [collapsed, setCollapsed] = useState(false);
-  const { isAuthenticated } = useAuth();
-  const accountHref = isAuthenticated ? routes.account.index : routes.signIn;
+  const accountHref = routes.account.index;
 
   const navItems: NavItem[] = [
     {
