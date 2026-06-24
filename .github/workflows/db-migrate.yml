@@ -2,10 +2,6 @@ name: db-migrate-neon
 
 on:
   pull_request:
-    branches:
-      - main
-      - preview
-      - production
     paths:
       - packages/core-db/prisma/**
       - packages/core-db/prisma.config.ts

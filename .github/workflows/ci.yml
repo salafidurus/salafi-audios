@@ -2,15 +2,6 @@ name: ci
 
 on:
   pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - ready_for_review
-    branches:
-      - main
-      - preview
-      - production
     paths:
       - "apps/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}"
       - "packages/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}"

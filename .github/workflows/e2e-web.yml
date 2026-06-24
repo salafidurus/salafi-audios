@@ -2,15 +2,6 @@ name: e2e-web
 
 on:
   pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - ready_for_review
-    branches:
-      - main
-      - preview
-      - production
     paths:
       - "apps/web/**"
       - "packages/core-api/**"

@@ -32,7 +32,7 @@ describe("proxy", () => {
   });
 
   describe("auth-required paths", () => {
-    it.each(["/feed/following", "/account/profile", "/admin", "/admin/dashboard"])(
+    it.each(["/feed/following", "/admin", "/admin/dashboard"])(
       "redirects unauthenticated request to %s → /sign-in",
       (pathname) => {
         proxy(makeRequest(pathname, undefined));
@@ -42,10 +42,10 @@ describe("proxy", () => {
     );
 
     it("redirects to /sign-in carrying the original path in the `from` query", () => {
-      proxy(makeRequest("/account/profile", undefined));
+      proxy(makeRequest("/feed/following", undefined));
       const redirectedTo = mockRedirect.mock.calls[0]![0] as URL;
       expect(redirectedTo.pathname).toBe("/sign-in");
-      expect(redirectedTo.searchParams.get("from")).toBe("/account/profile");
+      expect(redirectedTo.searchParams.get("from")).toBe("/feed/following");
     });
 
     it.each(["/account/profile", "/admin/dashboard"])(
@@ -59,14 +59,20 @@ describe("proxy", () => {
   });
 
   describe("auth-optional and public paths", () => {
-    it.each(["/account", "/feed", "/live", "/library", "/search", "/settings", "/"])(
-      "allows unauthenticated access to %s",
-      (pathname) => {
-        proxy(makeRequest(pathname, undefined));
-        expect(mockNext).toHaveBeenCalledTimes(1);
-        expect(mockRedirect).not.toHaveBeenCalled();
-      },
-    );
+    it.each([
+      "/account",
+      "/account/profile",
+      "/feed",
+      "/live",
+      "/library",
+      "/search",
+      "/settings",
+      "/",
+    ])("allows unauthenticated access to %s", (pathname) => {
+      proxy(makeRequest(pathname, undefined));
+      expect(mockNext).toHaveBeenCalledTimes(1);
+      expect(mockRedirect).not.toHaveBeenCalled();
+    });
   });
 
   describe("auth paths", () => {
