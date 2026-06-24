@@ -1,8 +1,6 @@
 name: security
 
 on:
-  push:
-    branches: [main, preview, production]
   pull_request:
     branches: [main, preview, production]
 
