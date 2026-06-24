@@ -19,10 +19,9 @@
 
 import {
   existsSync, mkdirSync, lstatSync, unlinkSync,
-  symlinkSync, readdirSync, realpathSync,
+  symlinkSync, readdirSync, realpathSync, rmdirSync,
 } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { execSync } from 'node:child_process';
 
 const root = process.cwd();
 const AGENTS_DIR = join(root, '.agents');
@@ -56,8 +55,8 @@ function removeLink(p) {
       console.warn(`  skip (real dir): ${p}`);
       return false;
     }
-    // Junction — Node's rmdirSync pre-checks contents through the junction, so use Python
-    execSync(`python -c "import os; os.rmdir(r'${p}')"`, { stdio: 'pipe' });
+    // Junction — Native rmdirSync deletes the directory junction itself on Windows without touching the target folder contents
+    rmdirSync(p);
     return true;
   }
   // Real file — safe to overwrite alias shims (AGENTS.md, CLAUDE.md etc. are tiny path files)

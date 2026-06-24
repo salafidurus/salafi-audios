@@ -8,8 +8,17 @@ import { createContentPreferenceStore, type LanguageStorageAdapter } from "@sd/c
 const cookieAdapter: LanguageStorageAdapter = {
   getItem(key) {
     if (typeof document === "undefined") return null;
-    const match = document.cookie.match(new RegExp(`(?:^|;\\s*)${key}=([^;]*)`));
-    return match ? decodeURIComponent(match[1]!) : null;
+    const cookies = document.cookie.split(";");
+    for (const cookie of cookies) {
+      const eqIdx = cookie.indexOf("=");
+      if (eqIdx !== -1) {
+        const name = cookie.slice(0, eqIdx).trim();
+        if (name === key) {
+          return decodeURIComponent(cookie.slice(eqIdx + 1));
+        }
+      }
+    }
+    return null;
   },
   setItem(key, value) {
     if (typeof document === "undefined") return;
