@@ -5,9 +5,6 @@ module.exports = {
   setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
-    // jest resolves the package's web entry by default; the native app needs the
-    // native theme (lightNativeTheme/darkNativeTheme) for its Unistyles mock.
-    "^@sd/design-tokens$": "<rootDir>/../../packages/design-tokens/src/index.native.ts",
   },
   transformIgnorePatterns: [
     "node_modules/(?!(?:.pnpm/)?((jest-)?react-native|@react-native(-community)?|@react-native/.*|expo(nent)?|@expo(nent)?/.*|react-navigation|@react-navigation/.*))",

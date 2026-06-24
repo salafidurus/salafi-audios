@@ -1,6 +1,6 @@
 import { StyleSheet as RNStyleSheet } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { darkNativeTheme as baseDark, lightNativeTheme as baseLight } from "@sd/design-tokens";
+import { darkNativeTheme as baseDark, lightNativeTheme as baseLight } from "./theme";
 
 const patchTheme = <T extends typeof baseLight>(theme: T) => ({
   ...theme,
