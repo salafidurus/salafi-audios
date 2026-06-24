@@ -1,0 +1,31 @@
+.title {
+  margin: 0 0 var(--space-scale-sm);
+}
+
+.sessionItem {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: var(--space-scale-sm);
+  border: none;
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer;
+  background: none;
+}
+
+.sessionTitle {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.sessionMeta {
+  font-size: 0.75rem;
+  color: var(--content-muted);
+  margin-top: 2px;
+}
+
+.sessionDate {
+  font-size: 0.75rem;
+  color: var(--content-subtle);
+  margin-top: 2px;
+}

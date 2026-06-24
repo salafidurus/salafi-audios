@@ -1,6 +1,7 @@
 .page {
   min-height: 100vh;
-  padding: var(--top-nav-height, 0px) var(--space-layout-page-x) 3rem;
+  padding-top: var(--top-nav-height, 0px);
+  padding-bottom: 3rem;
 }
 
 .container {
@@ -43,10 +44,6 @@
 }
 
 @media (max-width: 960px) {
-  .page {
-    padding-inline: clamp(1rem, 4.5vw, 1.75rem);
-  }
-
   .twoColumn {
     grid-template-columns: 1fr;
     gap: 2rem;
