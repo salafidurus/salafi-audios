@@ -1,0 +1,115 @@
+name: e2e-web
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+    branches:
+      - main
+      - preview
+      - production
+    paths:
+      - "apps/web/**"
+      - "packages/core-api/**"
+      - "packages/core-contracts/**"
+      - "packages/core-i18n/**"
+      - "packages/design-tokens/**"
+      - "packages/domain-account/**"
+      - "packages/domain-audio/**"
+      - "packages/domain-content/**"
+      - "packages/domain-live/**"
+      - "packages/domain-search/**"
+      - "tsconfig.base.json"
+      - "tsconfig.packages.json"
+      - "eslint.config.base.mjs"
+      - "pnpm-workspace.yaml"
+      - "turbo.json"
+      - ".github/workflows/e2e-web.yml"
+
+# Cancel stale runs on the same PR to save CI minutes on rapid pushes
+concurrency:
+  group: e2e-web-${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: "24"
+  # Custom Playwright path enables GitHub Actions caching (default path is not cacheable)
+  PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/ms-playwright
+  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+
+jobs:
+  e2e_web:
+    name: e2e:web
+    runs-on: ubuntu-latest
+    # e2e builds the web app (and its workspace deps, incl. @sd/core-db codegen) itself now
+    # that there's no shared build artifact, so it needs a DB URL for prisma generate.
+    env:
+      DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL || 'postgresql://ci:ci@localhost:5432/ci' }}
+      DATABASE_URL: ${{ secrets.DIRECT_DB_URL || 'postgresql://ci:ci@localhost:5432/ci' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Get Playwright version
+        id: playwright-version
+        run: echo "version=$(pnpm --filter web exec playwright --version | cut -d' ' -f2)" >> $GITHUB_OUTPUT
+
+      # Cache Playwright browsers (~200MB) keyed by installed Playwright version to avoid
+      # invalidation from unrelated changes while ensuring correct browser alignment
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
+          key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm --filter web exec playwright install --with-deps
+
+      - name: Playwright cache diagnostics
+        if: always()
+        run: |
+          echo "Cache key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version || 'unknown' }}"
+          echo "Cache hit: ${{ steps.playwright-cache.outputs.cache-hit }}"
+          pnpm --filter web exec playwright --version || echo "Playwright not in PATH"
+          echo "Browser path: $PLAYWRIGHT_BROWSERS_PATH"
+          ls -la "$PLAYWRIGHT_BROWSERS_PATH" 2>/dev/null || echo "Browser path does not exist"
+
+      # Build web + its workspace deps (reuses Turbo remote cache from `verify` when tokens exist),
+      # so Playwright can `pnpm start` the prebuilt app instead of building inside the test run.
+      - name: Build web
+        run: pnpm turbo run build --filter=web...
+
+      - name: Run Playwright
+        env:
+          # Skip Next.js build inside Playwright — the app is already built above
+          PW_SKIP_WEB_BUILD: "1"
+        run: pnpm --filter web test:e2e
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report

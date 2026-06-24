@@ -3,16 +3,18 @@ name: React Doctor
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
-    paths-ignore:
-      - "**.md"
-      - "**/README.md"
-      - "docs/**"
-      - "AGENT.md"
-      - "AGENTS.md"
-      - ".github/copilot-instructions.md"
+    paths:
+      - "apps/native/**/*.{js,jsx,ts,tsx}"
+      - "apps/web/**/*.{js,jsx,ts,tsx}"
+      - "packages/domain-account/**/*.{js,jsx,ts,tsx}"
+      - "packages/domain-audio/**/*.{js,jsx,ts,tsx}"
+      - "packages/domain-content/**/*.{js,jsx,ts,tsx}"
+      - "packages/domain-live/**/*.{js,jsx,ts,tsx}"
+      - "packages/domain-search/**/*.{js,jsx,ts,tsx}"
 
 permissions:
   contents: read
+  pull-requests: write # Required for posting comments on PRs
 
 concurrency:
   group: react-doctor-${{ github.event.pull_request.number || github.ref }}
@@ -23,8 +25,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-node@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
           node-version: "24"
-      - name: Run React Doctor
-        run: npx --yes react-doctor@latest .
+
+      - name: Run React Doctor Action
+        uses: millionco/react-doctor@v2
+        with:
+          diff: ${{ github.base_ref }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
