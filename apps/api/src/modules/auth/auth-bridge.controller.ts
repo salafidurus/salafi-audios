@@ -66,19 +66,26 @@ export class AuthBridgeController {
     }
 
     const sep = target.includes('?') ? '&' : '?';
+    // nosemgrep: javascript.express.web.tainted-redirect-express.tainted-redirect-express
     res.redirect(302, `${target}${sep}ott=${encodeURIComponent(token)}`);
   }
 
   private resolveAllowedRedirect(redirect: string | undefined): string | null {
     if (!redirect) return null;
 
-    let origin: string;
+    let parsed: URL;
     try {
-      origin = new URL(redirect).origin;
+      parsed = new URL(redirect);
     } catch {
       return null;
     }
 
-    return this.config.CORS_ORIGINS.includes(origin) ? redirect : null;
+    const matchedOrigin = this.config.CORS_ORIGINS.find(
+      (origin) => origin === parsed.origin,
+    );
+    if (!matchedOrigin) return null;
+
+    // Reconstruct the URL using the matched origin (never redirect to raw user input)
+    return `${matchedOrigin}${parsed.pathname}${parsed.search}`;
   }
 }

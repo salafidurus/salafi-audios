@@ -9,8 +9,8 @@ const __dirname = path.dirname(__filename);
 
 loadDbEnvFiles(path.resolve(__dirname, ".."));
 
-function run(cmd, args) {
-  const r = spawnSync(cmd, args, { stdio: "inherit", env: process.env });
+function runPnpm(args) {
+  const r = spawnSync("pnpm", args, { stdio: "inherit", env: process.env });
   if (r.status !== 0) process.exit(r.status ?? 1);
 }
 
@@ -24,9 +24,9 @@ getDbEnv(process.env);
 
 const name = autoName();
 
-run("pnpm", ["run", "prisma:format"]);
-run("pnpm", ["run", "prisma:validate"]);
-run("pnpm", [
+runPnpm(["run", "prisma:format"]);
+runPnpm(["run", "prisma:validate"]);
+runPnpm([
   "exec",
   "prisma",
   "migrate",
