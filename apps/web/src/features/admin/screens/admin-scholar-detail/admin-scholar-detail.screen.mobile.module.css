@@ -1,9 +1,9 @@
 .container {
-  padding: 0 4px 24px 4px;
+  padding: 0 var(--space-scale-xs) var(--space-scale-2xl) var(--space-scale-xs);
 }
 
 .backNav {
-  margin-bottom: 12px;
+  margin-bottom: var(--space-scale-md);
 }
 
 .backLink {
@@ -17,7 +17,7 @@
 }
 
 .header {
-  margin-bottom: 20px;
+  margin-bottom: var(--space-scale-xl);
 }
 
 .subtitle {
@@ -43,12 +43,12 @@
   background-color: var(--surface-subtle);
   padding: 3px;
   border-radius: var(--radius-scale-md);
-  margin-bottom: 20px;
+  margin-bottom: var(--space-scale-xl);
 }
 
 .tabBtn {
   flex: 1;
-  padding: 8px 0;
+  padding: var(--space-scale-sm) 0;
   text-align: center;
   border-radius: var(--radius-scale-sm);
   border: none;
@@ -69,7 +69,7 @@
 .section {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-scale-lg);
 }
 
 .sectionHeader {
@@ -89,8 +89,8 @@
 .addBtn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
+  gap: var(--space-scale-xs);
+  padding: var(--space-scale-xs) 10px;
   border-radius: var(--radius-scale-md);
   border: 1px solid var(--border-default);
   background-color: var(--surface-default);
@@ -105,7 +105,7 @@
   border: 1px solid var(--border-subtle);
   padding: 10px;
   display: flex;
-  gap: 8px;
+  gap: var(--space-scale-sm);
   align-items: center;
 }
 
@@ -118,7 +118,7 @@
 }
 
 .saveBtn {
-  padding: 6px 12px;
+  padding: 6px var(--space-scale-md);
   border-radius: var(--radius-scale-md);
   border: none;
   background-color: var(--accent-primary-bg);
@@ -131,7 +131,7 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-scale-md);
 }
 
 .itemCard {
@@ -149,7 +149,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 12px;
+  gap: var(--space-scale-md);
 }
 
 .itemTitle {
@@ -187,7 +187,7 @@
   justify-content: space-between;
   align-items: center;
   border-top: 1px solid var(--accent-divider);
-  padding-top: 8px;
+  padding-top: var(--space-scale-sm);
 }
 
 .orderLabel {
@@ -197,7 +197,7 @@
 
 .orderInput {
   width: 50px;
-  padding: 4px 6px;
+  padding: var(--space-scale-xs) 6px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-scale-sm);
   text-align: center;
@@ -209,5 +209,5 @@
   font-size: 13px;
   color: var(--content-muted);
   text-align: center;
-  padding: 20px 0;
+  padding: var(--space-scale-xl) 0;
 }

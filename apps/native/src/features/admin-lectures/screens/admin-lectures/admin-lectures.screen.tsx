@@ -138,7 +138,7 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
   },
   header: {
-    padding: 16,
+    padding: theme.spacing.scale.lg,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -149,9 +149,10 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.content.strong,
   },
   uploadBtn: {
-    padding: 10,
+    paddingVertical: theme.spacing.scale.sm,
+    paddingHorizontal: theme.spacing.scale.md,
     backgroundColor: theme.colors.action.primary,
-    borderRadius: 8,
+    borderRadius: theme.radius.scale.sm,
   },
   uploadBtnText: {
     color: theme.colors.content.onPrimary,
@@ -159,15 +160,15 @@ const styles = StyleSheet.create((theme) => ({
   },
   loadingText: {
     textAlign: "center",
-    marginTop: 32,
+    marginTop: theme.spacing.scale["3xl"],
     color: theme.colors.content.muted,
   },
   row: {
-    padding: 12,
-    marginHorizontal: 16,
-    marginBottom: 8,
-    borderWidth: 1,
-    borderRadius: 8,
+    padding: theme.spacing.scale.md,
+    marginHorizontal: theme.spacing.scale.lg,
+    marginBottom: theme.spacing.scale.sm,
+    borderWidth: theme.border.width.default,
+    borderRadius: theme.radius.scale.sm,
   },
   rowDefault: {
     borderColor: theme.colors.border.subtle,
@@ -184,6 +185,6 @@ const styles = StyleSheet.create((theme) => ({
   rowMeta: {
     fontSize: 12,
     color: theme.colors.content.muted,
-    marginTop: 2,
+    marginTop: theme.spacing.scale.xs,
   },
 }));

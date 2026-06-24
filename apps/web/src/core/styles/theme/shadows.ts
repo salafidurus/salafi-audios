@@ -1,4 +1,9 @@
-import { shadowsShared } from "./shared";
+export const shadowsShared = {
+  focus: {
+    light: "0 0 0 3px rgb(20 184 166 / 0.28)",
+    dark: "0 0 0 3px rgb(45 212 191 / 0.36)",
+  },
+} as const;
 
 export const shadowsWeb = {
   xs: {
@@ -50,5 +55,3 @@ export const createShadowsWeb = (mode: "light" | "dark"): ShadowsWebTheme => {
     top: isLight ? shadowsWeb.top.light : shadowsWeb.top.dark,
   };
 };
-
-export type ShadowsWeb = typeof shadowsWeb;

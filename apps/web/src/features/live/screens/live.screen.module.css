@@ -1,7 +1,7 @@
 .page {
   min-height: 100vh;
   padding-top: var(--top-nav-height, 0px);
-  padding-bottom: 3rem;
+  padding-bottom: var(--space-scale-4xl);
 }
 
 .container {
@@ -9,43 +9,43 @@
   margin-inline: auto;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: var(--space-scale-3xl);
 }
 
 .section {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: var(--space-component-gap-md);
 }
 
 .cardList {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 0.6rem;
+  gap: var(--space-component-gap-sm);
 }
 
 .twoColumn {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 2.5rem;
+  gap: var(--space-scale-4xl);
   align-items: start;
 }
 
 .columnMain {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: var(--space-scale-2xl);
 }
 
 .columnSide {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: var(--space-scale-3xl);
 }
 
 @media (max-width: 960px) {
   .twoColumn {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: var(--space-scale-3xl);
   }
 }

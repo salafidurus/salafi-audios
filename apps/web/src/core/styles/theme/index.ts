@@ -1,15 +1,18 @@
-import { createColors, type AppColors } from "../colors/shared";
-import { createAccentRecipesWeb, type AccentRecipesWeb } from "../recipes/web";
-import { spacingWeb, type SpacingWeb } from "../spacing/web";
-import { radiusWeb, type RadiusWeb } from "../radius/web";
-import { createShadowsWeb, type ShadowsWebTheme } from "../shadows/web";
-import { typographyWeb, type TypographyWeb } from "../typography/web";
+import { createColors } from "@sd/design-tokens";
+import type { AppColors } from "@sd/design-tokens";
+import { createAccentRecipesWeb, type AccentRecipesWeb } from "./recipes";
+import { spacingWeb, type SpacingWeb } from "./spacing";
+import { radiusWeb, type RadiusWeb } from "./radius";
+import { borderWeb, type BorderWeb } from "./border";
+import { createShadowsWeb, type ShadowsWebTheme } from "./shadows";
+import { typographyWeb, type TypographyWeb } from "./typography";
 
 export type AppThemeWeb = {
   colors: AppColors;
   recipes: AccentRecipesWeb;
   spacing: SpacingWeb;
   radius: RadiusWeb;
+  border: BorderWeb;
   shadows: ShadowsWebTheme;
   typography: TypographyWeb;
 };
@@ -23,6 +26,7 @@ export const createThemeWeb = (mode: "light" | "dark"): AppThemeWeb => {
     recipes: createAccentRecipesWeb(colors, shadows.focus, mode),
     spacing: spacingWeb,
     radius: radiusWeb,
+    border: borderWeb,
     shadows,
     typography: typographyWeb,
   };

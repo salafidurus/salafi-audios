@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native-unistyles";
-import { darkNativeTheme, lightNativeTheme } from "@sd/design-tokens";
+import { lightNativeTheme, darkNativeTheme } from "./theme";
 
 const breakpoints = {
   xs: 0,

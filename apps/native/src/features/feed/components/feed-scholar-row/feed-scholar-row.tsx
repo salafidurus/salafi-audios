@@ -46,18 +46,18 @@ export function FeedScholarRow({ scholars, onScholarPress }: FeedScholarRowProps
 
 const styles = StyleSheet.create((theme) => ({
   container: {
-    paddingVertical: 12,
+    paddingVertical: theme.spacing.scale.md,
   },
   heading: {
     fontSize: 14,
     fontWeight: "600",
     color: theme.colors.content.strong,
-    marginBottom: 8,
-    paddingStart: 4,
+    marginBottom: theme.spacing.scale.sm,
+    paddingStart: theme.spacing.scale.xs,
   },
   listContent: {
-    gap: 12,
-    paddingHorizontal: 4,
+    gap: theme.spacing.scale.md,
+    paddingHorizontal: theme.spacing.scale.xs,
   },
   scholar: {
     alignItems: "center",
@@ -66,9 +66,9 @@ const styles = StyleSheet.create((theme) => ({
   avatar: {
     width: 48,
     height: 48,
-    borderRadius: 24,
+    borderRadius: theme.radius.scale.full,
     backgroundColor: theme.colors.surface.subtle,
-    marginBottom: 4,
+    marginBottom: theme.spacing.scale.xs,
     overflow: "hidden",
   },
   avatarImage: {

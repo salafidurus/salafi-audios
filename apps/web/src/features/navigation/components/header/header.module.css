@@ -63,7 +63,7 @@
 
 @media (max-width: 720px) {
   .inner {
-    padding-inline: 1rem;
+    padding-inline: var(--space-scale-lg);
   }
 
   .brandText {

@@ -96,7 +96,7 @@ const cardStyles = StyleSheet.create((theme) => ({
   liveBadge: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    gap: theme.spacing.scale.xs,
   },
   pulseDot: {
     width: 8,

@@ -1,4 +1,4 @@
-import { typographyBase, type TypographyVariant } from "./shared";
+import { typographyBase, type TypographyVariant } from "@sd/design-tokens";
 
 const webFontFamily = {
   display: "var(--font-display), serif",

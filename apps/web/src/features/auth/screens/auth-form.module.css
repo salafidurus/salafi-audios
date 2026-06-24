@@ -176,7 +176,7 @@
 .checkboxRow {
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
+  gap: var(--space-component-gap-md);
   color: var(--content-default);
   font-family: var(--typo-body-sm-font-family), sans-serif;
   font-size: var(--typo-body-sm-font-size);

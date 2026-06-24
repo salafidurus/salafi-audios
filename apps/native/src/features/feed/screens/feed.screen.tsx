@@ -91,9 +91,9 @@ export function FeedScreen({ onNavigateToLecture, onNavigateToScholar }: FeedScr
   );
 }
 
-const styles = StyleSheet.create(() => ({
+const styles = StyleSheet.create((theme) => ({
   listContent: {
-    padding: 8,
-    gap: 8,
+    padding: theme.spacing.scale.sm,
+    gap: theme.spacing.scale.sm,
   },
 }));

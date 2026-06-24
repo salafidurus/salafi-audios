@@ -9,7 +9,7 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 16px;
+  padding: var(--space-scale-lg);
 }
 
 .modal {
@@ -45,7 +45,7 @@
   border: none;
   color: var(--content-muted);
   cursor: pointer;
-  padding: 4px;
+  padding: var(--space-scale-xs);
   border-radius: var(--radius-scale-sm);
   display: flex;
   align-items: center;
@@ -69,7 +69,7 @@
   background-color: var(--state-danger-surface);
   border: 1px solid var(--state-danger-border);
   color: var(--state-danger-content);
-  padding: 12px;
+  padding: var(--space-scale-md);
   border-radius: var(--radius-scale-sm);
   font-family: var(--typo-body-sm-font-family);
   font-size: var(--typo-body-sm-font-size);
@@ -98,7 +98,7 @@
 .select,
 .textarea {
   width: 100%;
-  padding: 8px 12px;
+  padding: var(--space-scale-sm) var(--space-scale-md);
   border: 1px solid var(--input-border-rest);
   border-radius: var(--radius-scale-md);
   background-color: var(--input-surface-rest);
@@ -125,10 +125,10 @@
 .topicsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 8px;
+  gap: var(--space-scale-sm);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-scale-md);
-  padding: 12px;
+  padding: var(--space-scale-md);
   max-height: 150px;
   overflow-y: auto;
   background-color: var(--surface-subtle);
@@ -137,7 +137,7 @@
 .topicCheckboxLabel {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-scale-sm);
   font-family: var(--typo-body-sm-font-family);
   font-size: var(--typo-body-sm-font-size);
   color: var(--content-default);
@@ -161,11 +161,11 @@
   display: flex;
   justify-content: flex-end;
   gap: var(--space-scale-sm);
-  margin-top: 8px;
+  margin-top: var(--space-scale-sm);
 }
 
 .cancelBtn {
-  padding: 8px 16px;
+  padding: var(--space-scale-sm) var(--space-scale-lg);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-scale-md);
   background-color: var(--surface-default);
@@ -181,7 +181,7 @@
 }
 
 .saveBtn {
-  padding: 8px 20px;
+  padding: var(--space-scale-sm) var(--space-scale-xl);
   border: 1px solid var(--accent-primary-border);
   border-radius: var(--radius-scale-md);
   background-color: var(--accent-primary-bg);

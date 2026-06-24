@@ -1,5 +1,4 @@
-import type { AppColors } from "../colors/shared";
-import type { AccentRecipesShared } from "./shared";
+import type { AppColors, AccentRecipesShared } from "@sd/design-tokens";
 
 export type AccentRecipesNative = AccentRecipesShared;
 

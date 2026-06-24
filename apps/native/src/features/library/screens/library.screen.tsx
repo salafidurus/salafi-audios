@@ -191,7 +191,7 @@ export function LibraryScreen({ onNavigateToLecture }: LibraryScreenProps) {
         return null;
       }}
       stickySectionHeadersEnabled={false}
-      contentContainerStyle={{ paddingBottom: 24 }}
+      contentContainerStyle={styles.listContent}
     />
   );
 }
@@ -205,8 +205,11 @@ const styles = StyleSheet.create((theme) => ({
   loadingText: {
     color: theme.colors.content.default,
   },
+  listContent: {
+    paddingBottom: theme.spacing.scale["2xl"],
+  },
   item: {
-    padding: 12,
+    padding: theme.spacing.scale.md,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border.subtle,
   },
@@ -238,7 +241,7 @@ const styles = StyleSheet.create((theme) => ({
     height: 3,
     backgroundColor: theme.colors.surface.subtle,
     borderRadius: 2,
-    marginTop: 4,
+    marginTop: theme.spacing.scale.xs,
   },
   progressFill: {
     height: "100%",
@@ -247,8 +250,8 @@ const styles = StyleSheet.create((theme) => ({
   },
   sectionHeader: {
     backgroundColor: theme.colors.surface.canvas,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: theme.spacing.scale.md,
+    paddingVertical: theme.spacing.scale.sm,
   },
   sectionHeaderText: {
     fontSize: 16,
@@ -256,7 +259,7 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.content.strong,
   },
   sectionFooter: {
-    padding: 12,
+    padding: theme.spacing.scale.md,
   },
   sectionFooterLoadingText: {
     color: theme.colors.content.muted,

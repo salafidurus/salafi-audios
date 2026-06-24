@@ -58,7 +58,7 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
   },
   header: {
-    padding: 16,
+    padding: theme.spacing.scale.lg,
   },
   headerText: {
     fontSize: 20,
@@ -67,16 +67,16 @@ const styles = StyleSheet.create((theme) => ({
   },
   loadingText: {
     textAlign: "center",
-    marginTop: 32,
+    marginTop: theme.spacing.scale["3xl"],
     color: theme.colors.content.muted,
   },
   row: {
-    padding: 14,
-    marginHorizontal: 16,
-    marginBottom: 8,
-    borderWidth: 1,
+    padding: theme.spacing.scale.md,
+    marginHorizontal: theme.spacing.scale.lg,
+    marginBottom: theme.spacing.scale.sm,
+    borderWidth: theme.border.width.default,
     borderColor: theme.colors.border.subtle,
-    borderRadius: 8,
+    borderRadius: theme.radius.scale.sm,
     backgroundColor: theme.colors.surface.default,
   },
   rowName: {

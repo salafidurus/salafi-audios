@@ -1,4 +1,4 @@
-import { lightWebTheme, darkWebTheme } from "@sd/design-tokens";
+import { lightWebTheme, darkWebTheme } from "../core/styles/theme";
 
 const getThemeProperties = (theme: typeof lightWebTheme) => {
   const inputSurfaceRest = theme.colors.surface.subtle;
@@ -139,6 +139,9 @@ const getThemeProperties = (theme: typeof lightWebTheme) => {
   --radius-component-card: ${theme.radius.component.card};
   --radius-component-panel-sm: ${theme.radius.component.panelSm};
   --radius-component-panel: ${theme.radius.component.panel};
+
+  --border-width-default: ${theme.border.width.default};
+  --border-width-hairline: ${theme.border.width.hairline};
 
   --shadow-xs: ${theme.shadows.xs};
   --shadow-sm: ${theme.shadows.sm};

@@ -47,7 +47,7 @@ export function DownloadButton({ lectureId }: DownloadButtonProps) {
 
 const styles = StyleSheet.create((theme) => ({
   pill: {
-    paddingHorizontal: 12,
+    paddingHorizontal: theme.spacing.scale.md,
     paddingVertical: 6,
     borderRadius: 6,
   },

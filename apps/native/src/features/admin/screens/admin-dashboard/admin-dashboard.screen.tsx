@@ -45,20 +45,20 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
   },
   content: {
-    padding: 16,
-    paddingBottom: 48,
+    padding: theme.spacing.scale.lg,
+    paddingBottom: theme.spacing.scale["4xl"],
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 24,
+    marginBottom: theme.spacing.scale["2xl"],
     color: theme.colors.content.strong,
   },
   card: {
-    padding: 16,
-    marginBottom: 12,
+    padding: theme.spacing.scale.lg,
+    marginBottom: theme.spacing.scale.md,
     backgroundColor: theme.colors.surface.subtle,
-    borderRadius: 12,
+    borderRadius: theme.radius.scale.md,
     borderStartWidth: 4,
   },
   cardLectures: {
@@ -73,7 +73,7 @@ const styles = StyleSheet.create((theme) => ({
   cardTitle: {
     fontSize: 18,
     fontWeight: "600",
-    marginBottom: 4,
+    marginBottom: theme.spacing.scale.xs,
     color: theme.colors.content.strong,
   },
   cardSubtitle: {

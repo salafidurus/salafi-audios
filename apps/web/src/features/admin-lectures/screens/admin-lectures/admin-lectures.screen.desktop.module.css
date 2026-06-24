@@ -1,14 +1,14 @@
 .container {
   max-width: 1100px;
   margin: 0 auto;
-  padding-bottom: 40px;
+  padding-bottom: var(--space-scale-4xl);
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: var(--space-scale-2xl);
 }
 
 .title {
@@ -22,8 +22,8 @@
 .uploadTriggerBtn {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
+  gap: var(--space-scale-sm);
+  padding: var(--space-scale-sm) var(--space-scale-lg);
   border-radius: var(--radius-scale-md);
   border: 1px solid var(--accent-divider);
   background-color: var(--surface-default);
@@ -43,7 +43,7 @@
 }
 
 .uploaderWrapper {
-  margin-bottom: 24px;
+  margin-bottom: var(--space-scale-2xl);
   animation: slideDown 0.2s ease-out;
 }
 
@@ -62,8 +62,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 20px;
+  gap: var(--space-scale-lg);
+  margin-bottom: var(--space-scale-xl);
 }
 
 .searchWrapper {
@@ -74,7 +74,7 @@
 
 .searchIcon {
   position: absolute;
-  left: 12px;
+  left: var(--space-scale-md);
   top: 50%;
   transform: translateY(-50%);
   color: var(--content-muted);
@@ -82,7 +82,7 @@
 
 .searchInput {
   width: 100%;
-  padding: 8px 12px 8px 38px;
+  padding: var(--space-scale-sm) var(--space-scale-md) var(--space-scale-sm) 38px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-scale-md);
   background-color: var(--surface-default);
@@ -99,14 +99,14 @@
 
 .statusTabs {
   display: flex;
-  gap: 4px;
+  gap: var(--space-scale-xs);
   background-color: var(--surface-subtle);
-  padding: 4px;
+  padding: var(--space-scale-xs);
   border-radius: var(--radius-scale-md);
 }
 
 .tab {
-  padding: 6px 16px;
+  padding: 6px var(--space-scale-lg);
   border-radius: var(--radius-scale-sm);
   border: none;
   background: none;
@@ -132,7 +132,7 @@
 
 .loading {
   text-align: center;
-  padding: 40px 0;
+  padding: var(--space-scale-4xl) 0;
   color: var(--content-muted);
   font-family: var(--typo-body-md-font-family);
 }
@@ -153,7 +153,7 @@
 
 .table th {
   background-color: var(--surface-subtle);
-  padding: 12px 16px;
+  padding: var(--space-scale-md) var(--space-scale-lg);
   font-family: var(--typo-label-md-font-family);
   font-size: var(--typo-label-md-font-size);
   font-weight: 600;
@@ -162,7 +162,7 @@
 }
 
 .table td {
-  padding: 14px 16px;
+  padding: 14px var(--space-scale-lg);
   font-family: var(--typo-body-md-font-family);
   font-size: var(--typo-body-md-font-size);
   color: var(--content-default);
@@ -181,7 +181,7 @@
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
+  padding: 2px var(--space-scale-sm);
   border-radius: var(--radius-scale-full);
   font-size: 12px;
   font-weight: 500;
@@ -205,14 +205,14 @@
 
 .actions {
   display: flex;
-  gap: 8px;
+  gap: var(--space-scale-sm);
 }
 
 .actionBtn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
+  gap: var(--space-scale-xs);
+  padding: var(--space-scale-xs) 10px;
   border-radius: var(--radius-scale-sm);
   border: 1px solid var(--border-subtle);
   background-color: var(--surface-default);
@@ -228,7 +228,7 @@
 
 .noData {
   text-align: center;
-  padding: 32px 0;
+  padding: var(--space-scale-3xl) 0;
   color: var(--content-muted);
 }
 
@@ -236,12 +236,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 16px;
-  margin-top: 24px;
+  gap: var(--space-scale-lg);
+  margin-top: var(--space-scale-2xl);
 }
 
 .pageBtn {
-  padding: 6px 12px;
+  padding: 6px var(--space-scale-md);
   border-radius: var(--radius-scale-md);
   border: 1px solid var(--border-default);
   background-color: var(--surface-default);

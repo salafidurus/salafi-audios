@@ -1,5 +1,9 @@
-import type { AppColors } from "../colors/shared";
-import type { AccentRecipesShared, ScreenWashRecipe, ChromeRecipe } from "./shared";
+import type {
+  AppColors,
+  AccentRecipesShared,
+  ScreenWashRecipe,
+  ChromeRecipe,
+} from "@sd/design-tokens";
 
 export type AccentRecipesWeb = AccentRecipesShared & {
   primaryCta: AccentRecipesShared["primaryCta"] & {

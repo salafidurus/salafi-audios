@@ -1,4 +1,4 @@
-import { typographyBase, getWeightKey, type TypographyVariant } from "./shared";
+import { typographyBase, getWeightKey, type TypographyVariant } from "@sd/design-tokens";
 
 /**
  * Fraunces does not have a Medium file in the current setup.
