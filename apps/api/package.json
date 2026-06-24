@@ -31,7 +31,9 @@
     "@better-auth/expo": "catalog:",
     "@nestjs/common": "catalog:",
     "@nestjs/core": "catalog:",
+    "@nestjs/microservices": "^11.1.27",
     "@nestjs/platform-express": "catalog:",
+    "@nestjs/schedule": "^5.0.1",
     "@nestjs/swagger": "^11.4.4",
     "@nestjs/terminus": "catalog:",
     "@nestjs/throttler": "^6.5.0",
@@ -50,6 +52,7 @@
     "pino-http": "^11.0.0",
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:",
+    "telegram": "^2.26.22",
     "zod": "^4.4.3"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
-import { Injectable } from "@nestjs/common";
-import { Prisma } from "@sd/core-db";
-import { PrismaService } from "../../shared/db/prisma.service";
+import { Injectable } from '@nestjs/common';
+import { Prisma } from '@sd/core-db';
+import { PrismaService } from '../../shared/db/prisma.service';
 
 @Injectable()
 export class ChannelsRepository {
@@ -8,7 +8,7 @@ export class ChannelsRepository {
 
   async findAll() {
     return this.prisma.livestreamChannel.findMany({
-      orderBy: { displayName: "asc" },
+      orderBy: { displayName: 'asc' },
       include: { scholar: { select: { id: true, slug: true, name: true } } },
     });
   }
@@ -16,7 +16,12 @@ export class ChannelsRepository {
   async findActive() {
     return this.prisma.livestreamChannel.findMany({
       where: { isActive: true },
-      select: { id: true, telegramId: true, telegramSlug: true, displayName: true },
+      select: {
+        id: true,
+        telegramId: true,
+        telegramSlug: true,
+        displayName: true,
+      },
     });
   }
 

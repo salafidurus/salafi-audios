@@ -1,25 +1,27 @@
-import { Injectable } from "@nestjs/common";
-import { PrismaService } from "../../shared/db/prisma.service";
-import { LiveSessionStatus } from "@sd/core-db";
+import { Injectable } from '@nestjs/common';
+import { LiveSessionStatus } from '@sd/core-db';
+import { PrismaService } from '../../shared/db/prisma.service';
 
 @Injectable()
 export class SessionsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findLatestLiveSession(
-    channelId: string,
-  ): Promise<{ id: string; status: LiveSessionStatus; startedAt: Date | null } | null> {
+  async findLatestLiveSession(channelId: string): Promise<{
+    id: string;
+    status: LiveSessionStatus;
+    startedAt: Date | null;
+  } | null> {
     return this.prisma.liveSession.findFirst({
-      where: { channelId, status: { in: ["live", "scheduled"] } },
+      where: { channelId, status: { in: ['live', 'scheduled'] } },
       select: { id: true, status: true, startedAt: true },
-      orderBy: { createdAt: "desc" },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
   async findByChannelAndStatus(channelId: string, status: LiveSessionStatus) {
     return this.prisma.liveSession.findMany({
       where: { channelId, status },
-      orderBy: { updatedAt: "desc" },
+      orderBy: { updatedAt: 'desc' },
     });
   }
 

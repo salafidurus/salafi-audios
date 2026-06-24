@@ -1,5 +1,5 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
-import { ChannelsRepository } from "./channels.repo";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { ChannelsRepository } from './channels.repo';
 
 @Injectable()
 export class ChannelsService {
@@ -8,6 +8,7 @@ export class ChannelsService {
   listAll() {
     return this.repo.findAll();
   }
+
   listActive() {
     return this.repo.findActive();
   }
