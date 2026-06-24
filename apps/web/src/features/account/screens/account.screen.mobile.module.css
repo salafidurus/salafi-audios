@@ -27,13 +27,13 @@
   margin-top: var(--space-scale-2xl);
   display: flex;
   flex-direction: column;
-  gap: 0.375rem; /* ponytail: no token match — 6px */
+  gap: var(--space-scale-xs);
 }
 
 .menuButton {
-  padding: 0.625rem 0.875rem; /* ponytail: no token match — 10px/14px */
+  padding: var(--space-scale-sm) var(--space-scale-md);
   text-align: left;
-  border: 1px solid var(--border-default);
+  border: var(--border-width-default) solid var(--border-default);
   border-radius: var(--radius-component-chip);
   background: var(--surface-default);
   cursor: pointer;
@@ -42,9 +42,9 @@
 }
 
 .signOutButton {
-  padding: 0.625rem 0.875rem; /* ponytail: no token match — 10px/14px */
+  padding: var(--space-scale-sm) var(--space-scale-md);
   text-align: left;
-  border: 1px solid var(--border-default);
+  border: var(--border-width-default) solid var(--border-default);
   border-radius: var(--radius-component-chip);
   background: var(--surface-default);
   cursor: pointer;

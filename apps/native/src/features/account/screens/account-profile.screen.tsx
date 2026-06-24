@@ -65,7 +65,8 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
   },
   content: {
-    padding: 16,
+    paddingHorizontal: theme.spacing.layout.pageX,
+    paddingVertical: theme.spacing.layout.pageY,
   },
   title: {
     fontSize: 20,
@@ -73,11 +74,11 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.content.strong,
   },
   form: {
-    marginTop: 20,
-    gap: 16,
+    marginTop: theme.spacing.scale.xl,
+    gap: theme.spacing.component.gapLg,
   },
   field: {
-    gap: 4,
+    gap: theme.spacing.scale.xs,
   },
   label: {
     fontSize: 12,
@@ -85,10 +86,11 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.content.default,
   },
   input: {
-    padding: 10,
-    borderWidth: 1,
+    paddingVertical: theme.spacing.scale.sm,
+    paddingHorizontal: theme.spacing.scale.md,
+    borderWidth: theme.border.width.default,
     borderColor: theme.colors.border.default,
-    borderRadius: 6,
+    borderRadius: theme.radius.scale.sm,
     fontSize: 14,
     color: theme.colors.content.default,
   },

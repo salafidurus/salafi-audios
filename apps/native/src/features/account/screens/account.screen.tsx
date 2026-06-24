@@ -83,7 +83,8 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
   },
   content: {
-    padding: 16,
+    paddingHorizontal: theme.spacing.layout.pageX,
+    paddingVertical: theme.spacing.layout.pageY,
   },
   title: {
     fontSize: 22,
@@ -91,10 +92,10 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.content.strong,
   },
   profileRow: {
-    marginTop: 16,
+    marginTop: theme.spacing.scale.lg,
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: theme.spacing.component.gapMd,
   },
   profileName: {
     fontSize: 16,
@@ -106,14 +107,14 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.content.muted,
   },
   actions: {
-    marginTop: 24,
-    gap: 8,
+    marginTop: theme.spacing.scale["2xl"],
+    gap: theme.spacing.component.gapSm,
   },
   actionButton: {
-    padding: 12,
-    borderWidth: 1,
+    padding: theme.spacing.scale.md,
+    borderWidth: theme.border.width.default,
     borderColor: theme.colors.border.subtle,
-    borderRadius: 8,
+    borderRadius: theme.radius.scale.sm,
     backgroundColor: theme.colors.surface.default,
   },
   actionLabel: {
@@ -134,13 +135,13 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.state.danger,
   },
   languageSection: {
-    marginTop: 24,
-    gap: 16,
+    marginTop: theme.spacing.scale["2xl"],
+    gap: theme.spacing.component.gapLg,
   },
   sectionHeading: {
     fontSize: 16,
     fontWeight: "600",
-    marginBottom: 8,
+    marginBottom: theme.spacing.component.gapSm,
     color: theme.colors.content.strong,
   },
 }));

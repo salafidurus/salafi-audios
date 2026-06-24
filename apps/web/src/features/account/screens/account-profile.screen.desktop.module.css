@@ -1,5 +1,5 @@
 .page {
-  max-width: 37.5rem; /* ponytail: no token match — fixed 600px panel */
+  max-width: 37.5rem;
   margin-inline: auto;
 }
 
@@ -37,7 +37,7 @@
 
 .input {
   padding: var(--space-scale-sm) var(--space-component-gap-md);
-  border: 1px solid var(--border-default);
+  border: var(--border-width-default) solid var(--border-default);
   border-radius: var(--radius-component-chip);
   font-size: 0.9375rem;
 }

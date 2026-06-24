@@ -31,8 +31,8 @@
 }
 
 .input {
-  padding: var(--space-scale-sm) 0.625rem; /* ponytail: 0.625rem has no token match */
-  border: 1px solid var(--border-default);
+  padding: var(--space-scale-sm) var(--space-scale-md);
+  border: var(--border-width-default) solid var(--border-default);
   border-radius: var(--radius-component-chip);
   font-size: 0.875rem;
 }
