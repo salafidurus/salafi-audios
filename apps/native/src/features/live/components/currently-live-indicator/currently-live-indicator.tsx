@@ -58,7 +58,7 @@ const indicatorStyles = StyleSheet.create((theme) => ({
   containerCompact: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    gap: theme.spacing.scale.xs,
   },
   pressed: {
     opacity: 0.8,
@@ -66,7 +66,7 @@ const indicatorStyles = StyleSheet.create((theme) => ({
   liveBadge: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    gap: theme.spacing.scale.xs,
   },
   pulseDot: {
     width: 8,

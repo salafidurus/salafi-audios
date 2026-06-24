@@ -28,11 +28,11 @@ export function SeriesContextBar({ seriesContext }: SeriesContextBarProps) {
 
 const styles = StyleSheet.create((theme) => ({
   container: {
-    marginTop: 24,
-    padding: 16,
+    marginTop: theme.spacing.scale["2xl"],
+    padding: theme.spacing.scale.lg,
     borderRadius: 16,
     backgroundColor: theme.colors.surface.subtle,
-    gap: 8,
+    gap: theme.spacing.scale.sm,
   },
   navText: {
     opacity: 0.7,

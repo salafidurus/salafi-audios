@@ -74,7 +74,7 @@ export function LibraryCompletedScreen({ onNavigateToLecture }: LibraryCompleted
 
 const styles = StyleSheet.create((theme) => ({
   item: {
-    padding: 12,
+    padding: theme.spacing.scale.md,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border.subtle,
   },
@@ -116,13 +116,13 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 16,
+    padding: theme.spacing.scale.lg,
   },
   emptyText: {
     color: theme.colors.content.muted,
     textAlign: "center",
   },
   listContent: {
-    padding: 8,
+    padding: theme.spacing.scale.sm,
   },
 }));

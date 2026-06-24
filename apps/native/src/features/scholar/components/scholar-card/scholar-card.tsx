@@ -30,7 +30,7 @@ const styles = StyleSheet.create((theme) => ({
     borderWidth: 1,
     borderColor: theme.colors.border.subtle,
     borderRadius: 12,
-    padding: 12,
+    padding: theme.spacing.scale.md,
     alignItems: "center",
     gap: 6,
     backgroundColor: theme.colors.surface.default,
