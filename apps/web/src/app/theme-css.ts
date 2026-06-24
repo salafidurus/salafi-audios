@@ -140,6 +140,9 @@ const getThemeProperties = (theme: typeof lightWebTheme) => {
   --radius-component-panel-sm: ${theme.radius.component.panelSm};
   --radius-component-panel: ${theme.radius.component.panel};
 
+  --border-width-default: ${theme.border.width.default};
+  --border-width-hairline: ${theme.border.width.hairline};
+
   --shadow-xs: ${theme.shadows.xs};
   --shadow-sm: ${theme.shadows.sm};
   --shadow-md: ${theme.shadows.md};
