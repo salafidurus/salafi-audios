@@ -14,3 +14,4 @@ export type {
 } from "./recipes/shared";
 export type { AccentRecipesWeb } from "./recipes/web";
 export { createAccentRecipesWeb } from "./recipes/web";
+export type { BorderWeb } from "./border/web";

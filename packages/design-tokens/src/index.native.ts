@@ -14,3 +14,4 @@ export type {
 } from "./recipes/shared";
 export type { AccentRecipesNative } from "./recipes/native";
 export { createAccentRecipesNative } from "./recipes/native";
+export type { BorderNative } from "./border/native";

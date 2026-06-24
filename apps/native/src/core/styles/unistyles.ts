@@ -1,5 +1,20 @@
+import { StyleSheet as RNStyleSheet } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { darkNativeTheme, lightNativeTheme } from "@sd/design-tokens";
+import { darkNativeTheme as baseDark, lightNativeTheme as baseLight } from "@sd/design-tokens";
+
+const patchTheme = <T extends typeof baseLight>(theme: T) => ({
+  ...theme,
+  border: {
+    ...theme.border,
+    width: {
+      ...theme.border.width,
+      hairline: RNStyleSheet.hairlineWidth,
+    },
+  },
+});
+
+const lightNativeTheme = patchTheme(baseLight);
+const darkNativeTheme = patchTheme(baseDark);
 
 const breakpoints = {
   xs: 0,
