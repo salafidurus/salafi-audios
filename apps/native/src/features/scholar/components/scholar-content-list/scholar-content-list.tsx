@@ -2,6 +2,7 @@ import type { ScholarContentItemDto } from "@sd/core-contracts";
 import { FlatList, Pressable, TextInput, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { useRouter } from "expo-router";
+import type { Href } from "expo-router";
 import { useState } from "react";
 import { pickContentField } from "@sd/core-i18n";
 import { AppText } from "@/shared/components/AppText/AppText";
@@ -12,10 +13,10 @@ export type ScholarContentListProps = {
   items: ScholarContentItemDto[];
 };
 
-function contentRoute(item: ScholarContentItemDto): string {
-  if (item.type === "series") return `/(content)/series/${item.id}`;
-  if (item.type === "collection") return `/(content)/collections/${item.id}`;
-  return `/(content)/lectures/${item.id}`;
+function contentRoute(item: ScholarContentItemDto): Href {
+  if (item.type === "series") return `/(content)/series/${item.id}` as Href;
+  if (item.type === "collection") return `/(content)/collections/${item.id}` as Href;
+  return `/(content)/lectures/${item.id}` as Href;
 }
 
 export function ScholarContentList({ items }: ScholarContentListProps) {
@@ -24,7 +25,8 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
   const { t } = useTranslation();
   const [filter, setFilter] = useState("");
 
-  if (items.length === 0) {
+  const featured = items[0];
+  if (!featured) {
     return (
       <AppText variant="bodyMd" style={{ opacity: 0.7 }}>
         {t("scholarContent.empty", "No published content yet.")}
@@ -32,7 +34,7 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
     );
   }
 
-  const [featured, ...rest] = items;
+  const rest = items.slice(1);
   const recommended = rest.slice(0, 4);
   const browse = rest.slice(4);
 
@@ -49,14 +51,19 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
   return (
     <View style={styles.root}>
       {/* Featured */}
-      <Pressable style={styles.featured} onPress={() => router.push(contentRoute(featured) as any)}>
+      <Pressable
+        style={styles.featured}
+        onPress={() => router.push(contentRoute(featured) as Href)}
+      >
         <AppText variant="caption" style={styles.typeLabel}>
           {featured.type}
         </AppText>
         <AppText variant="titleMd">{featuredTitle}</AppText>
         {featured.lectureCount != null && (
           <AppText variant="caption" style={styles.meta}>
-            {t("scholarContent.lectureCount", "{{count}} lectures", { count: featured.lectureCount })}
+            {t("scholarContent.lectureCount", "{{count}} lectures", {
+              count: featured.lectureCount,
+            })}
           </AppText>
         )}
       </Pressable>
@@ -74,7 +81,7 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
             return (
               <Pressable
                 style={styles.card}
-                onPress={() => router.push(contentRoute(item) as any)}
+                onPress={() => router.push(contentRoute(item) as Href)}
               >
                 <AppText variant="caption" style={styles.typeLabel}>
                   {item.type}
@@ -106,7 +113,7 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
               return (
                 <Pressable
                   style={styles.row}
-                  onPress={() => router.push(contentRoute(item) as any)}
+                  onPress={() => router.push(contentRoute(item) as Href)}
                 >
                   <AppText variant="caption" style={styles.typeLabel}>
                     {item.type}
@@ -151,7 +158,7 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.radius.scale.sm,
     borderWidth: 1,
     borderColor: theme.colors.border.subtle,
-    marginRight: theme.spacing.scale.sm,
+    marginEnd: theme.spacing.scale.sm,
     gap: theme.spacing.scale.xs,
   },
   browse: {

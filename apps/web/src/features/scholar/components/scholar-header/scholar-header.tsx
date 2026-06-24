@@ -2,8 +2,45 @@
 
 import Image from "next/image";
 import type { ScholarDetailDto } from "@sd/core-contracts";
-import { Globe, Youtube, Twitter, Send } from "lucide-react";
+import { Globe, Send } from "lucide-react";
 import styles from "./scholar-header.module.css";
+
+function YoutubeIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 11.54a29 29 0 0 0 .46 5.12 2.78 2.78 0 0 0 1.95 1.96C5.12 19.08 12 19.08 12 19.08s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96 29 29 0 0 0 .46-5.12 29 29 0 0 0-.46-5.12z" />
+      <polygon points="9.75 15.02 15.5 11.54 9.75 8.06 9.75 15.02" />
+    </svg>
+  );
+}
+
+function TwitterIcon({ size = 18 }: { size?: number }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
+    </svg>
+  );
+}
 
 export type ScholarHeaderProps = {
   scholar: ScholarDetailDto & {
@@ -77,7 +114,7 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
               className={styles.socialLink}
               aria-label="YouTube"
             >
-              <Youtube size={18} />
+              <YoutubeIcon size={18} />
             </a>
           )}
           {scholar.socialTwitter && (
@@ -88,7 +125,7 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
               className={styles.socialLink}
               aria-label="Twitter"
             >
-              <Twitter size={18} />
+              <TwitterIcon size={18} />
             </a>
           )}
           {scholar.socialTelegram && (

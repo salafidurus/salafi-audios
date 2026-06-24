@@ -41,13 +41,19 @@ const mockScholar = {
 };
 
 beforeEach(() => {
-  mockDetail.mockReturnValue({ data: undefined, isFetching: false } as ReturnType<typeof useScholarDetail>);
-  mockContent.mockReturnValue({ data: undefined, isFetching: false } as ReturnType<typeof useScholarContent>);
+  mockDetail.mockReturnValue({ data: undefined, isFetching: false } as ReturnType<
+    typeof useScholarDetail
+  >);
+  mockContent.mockReturnValue({ data: undefined, isFetching: false } as ReturnType<
+    typeof useScholarContent
+  >);
 });
 
 describe("ScholarDetailDesktopScreen", () => {
   it("shows loading state", () => {
-    mockDetail.mockReturnValue({ data: undefined, isFetching: true } as ReturnType<typeof useScholarDetail>);
+    mockDetail.mockReturnValue({ data: undefined, isFetching: true } as ReturnType<
+      typeof useScholarDetail
+    >);
     render(<ScholarDetailDesktopScreen slug="ibn-baz" />);
     expect(screen.getByText("Loading scholar…")).toBeTruthy();
   });
@@ -58,7 +64,9 @@ describe("ScholarDetailDesktopScreen", () => {
   });
 
   it("renders header and content with unified items", () => {
-    mockDetail.mockReturnValue({ data: mockScholar, isFetching: false } as ReturnType<typeof useScholarDetail>);
+    mockDetail.mockReturnValue({ data: mockScholar, isFetching: false } as ReturnType<
+      typeof useScholarDetail
+    >);
     mockContent.mockReturnValue({
       data: {
         items: [
@@ -79,21 +87,25 @@ describe("ScholarDetailDesktopScreen", () => {
   });
 
   it("renders empty content when items is empty", () => {
-    mockDetail.mockReturnValue({ data: mockScholar, isFetching: false } as ReturnType<typeof useScholarDetail>);
+    mockDetail.mockReturnValue({ data: mockScholar, isFetching: false } as ReturnType<
+      typeof useScholarDetail
+    >);
     mockContent.mockReturnValue({
       data: { items: [] },
       isFetching: false,
-    } as ReturnType<typeof useScholarContent>);
+    } as unknown as ReturnType<typeof useScholarContent>);
     render(<ScholarDetailDesktopScreen slug="ibn-baz" />);
     expect(screen.getByText("Content:0")).toBeTruthy();
   });
 
   it("renders no isKibar badge", () => {
-    mockDetail.mockReturnValue({ data: mockScholar, isFetching: false } as ReturnType<typeof useScholarDetail>);
+    mockDetail.mockReturnValue({ data: mockScholar, isFetching: false } as ReturnType<
+      typeof useScholarDetail
+    >);
     mockContent.mockReturnValue({
       data: { items: [] },
       isFetching: false,
-    } as ReturnType<typeof useScholarContent>);
+    } as unknown as ReturnType<typeof useScholarContent>);
     render(<ScholarDetailDesktopScreen slug="ibn-baz" />);
     expect(screen.queryByText(/kibar/i)).toBeNull();
   });

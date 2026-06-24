@@ -23,15 +23,12 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
   const { t } = useTranslation();
   const [filter, setFilter] = useState("");
 
-  if (items.length === 0) {
-    return (
-      <p className={styles.empty}>
-        {t("scholarContent.empty", "No published content yet.")}
-      </p>
-    );
+  const featured = items[0];
+  if (!featured) {
+    return <p className={styles.empty}>{t("scholarContent.empty", "No published content yet.")}</p>;
   }
 
-  const [featured, ...rest] = items;
+  const rest = items.slice(1);
   const recommended = rest.slice(0, 4);
   const browse = rest.slice(4);
   const filteredBrowse = filter
@@ -52,7 +49,9 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
         <span className={styles.featuredTitle}>{featuredTitle}</span>
         {featured.lectureCount != null && (
           <span className={styles.featuredMeta}>
-            {t("scholarContent.lectureCount", "{{count}} lectures", { count: featured.lectureCount })}
+            {t("scholarContent.lectureCount", "{{count}} lectures", {
+              count: featured.lectureCount,
+            })}
           </span>
         )}
       </Link>
