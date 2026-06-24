@@ -7,10 +7,6 @@ on:
       - synchronize
       - reopened
       - ready_for_review
-    branches:
-      - main
-      - preview
-      - production
     paths:
       - "packages/core-db/prisma/**"
       - "packages/core-db/prisma.config.ts"

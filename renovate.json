@@ -5,7 +5,7 @@
     "enabled": true
   },
   "timezone": "UTC",
-  "schedule": ["before 7am on monday"],
+  "schedule": ["before 7am every 2 days"],
   "prConcurrentLimit": 5,
   "prHourlyLimit": 2,
   "packageRules": [
