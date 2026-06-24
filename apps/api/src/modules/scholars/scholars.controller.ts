@@ -6,7 +6,7 @@ import { SkipThrottle } from '@nestjs/throttler';
 import type {
   ScholarListItemDto,
   ScholarDetailDto,
-  ScholarContentDto,
+  ScholarContentUnifiedDto,
 } from '@sd/core-contracts';
 import { ScholarsService } from './scholars.service';
 
@@ -41,9 +41,9 @@ export class ScholarsController {
   @Get(':slug/content')
   @ApiOperation({ summary: "Get scholar's published content" })
   @ApiOkResponse({
-    description: 'Collections, standalone series, and standalone lectures',
+    description: 'Unified ranked list of content items (collections, series, singles)',
   })
-  getContent(@Param('slug') slug: string): Promise<ScholarContentDto> {
+  getContent(@Param('slug') slug: string): Promise<ScholarContentUnifiedDto> {
     return this.scholars.getContent(slug);
   }
 }

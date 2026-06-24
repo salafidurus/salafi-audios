@@ -1,6 +1,7 @@
 import type { ScholarDetailDto } from "@sd/core-contracts";
 import { Linking, Pressable, View } from "react-native";
 import { Image } from "expo-image";
+import { StyleSheet } from "react-native-unistyles";
 import { AppText } from "@/shared/components/AppText/AppText";
 
 export type ScholarHeaderProps = {
@@ -21,48 +22,39 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
   return (
     <View>
       {scholar.imageUrl ? (
-        <Image
-          source={{ uri: scholar.imageUrl }}
-          style={{
-            width: 100,
-            height: 100,
-            borderRadius: 50,
-            marginBottom: 12,
-            alignSelf: "center",
-          }}
-        />
+        <Image source={{ uri: scholar.imageUrl }} style={styles.avatar} />
       ) : null}
-      <AppText variant="titleLg" style={{ textAlign: "center" }}>
+      <AppText variant="titleLg" style={styles.name}>
         {scholar.name}
       </AppText>
       {scholar.country || scholar.mainLanguage ? (
-        <AppText variant="caption" style={{ marginTop: 4, textAlign: "center", opacity: 0.7 }}>
+        <AppText variant="caption" style={styles.meta}>
           {[scholar.country, scholar.mainLanguage].filter(Boolean).join(" · ")}
         </AppText>
       ) : null}
       {scholar.bio ? (
-        <AppText variant="bodyMd" style={{ marginTop: 12, lineHeight: 22 }}>
+        <AppText variant="bodyMd" style={styles.bio}>
           {scholar.bio}
         </AppText>
       ) : null}
 
-      <View style={{ flexDirection: "row", justifyContent: "center", gap: 24, marginTop: 16 }}>
-        <View style={{ alignItems: "center" }}>
+      <View style={styles.statsRow}>
+        <View style={styles.statItem}>
           <AppText variant="titleMd">{scholar.lectureCount}</AppText>
-          <AppText variant="caption" style={{ opacity: 0.6 }}>
+          <AppText variant="caption" style={styles.statLabel}>
             Lectures
           </AppText>
         </View>
-        <View style={{ alignItems: "center" }}>
+        <View style={styles.statItem}>
           <AppText variant="titleMd">{scholar.seriesCount}</AppText>
-          <AppText variant="caption" style={{ opacity: 0.6 }}>
+          <AppText variant="caption" style={styles.statLabel}>
             Series
           </AppText>
         </View>
         {totalHours > 0 ? (
-          <View style={{ alignItems: "center" }}>
+          <View style={styles.statItem}>
             <AppText variant="titleMd">{totalHours}h</AppText>
-            <AppText variant="caption" style={{ opacity: 0.6 }}>
+            <AppText variant="caption" style={styles.statLabel}>
               Total
             </AppText>
           </View>
@@ -73,7 +65,7 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
       scholar.socialYoutube ||
       scholar.socialTwitter ||
       scholar.socialTelegram ? (
-        <View style={{ flexDirection: "row", justifyContent: "center", gap: 12, marginTop: 16 }}>
+        <View style={styles.socialRow}>
           {scholar.socialWebsite ? (
             <Pressable onPress={() => openLink(scholar.socialWebsite!)}>
               <AppText variant="labelMd">Website</AppText>
@@ -99,3 +91,43 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
     </View>
   );
 }
+
+const styles = StyleSheet.create((theme) => ({
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: theme.radius.scale.full,
+    marginBottom: theme.spacing.scale.md,
+    alignSelf: "center",
+  },
+  name: {
+    textAlign: "center",
+  },
+  meta: {
+    marginTop: theme.spacing.scale.xs,
+    textAlign: "center",
+    opacity: 0.7,
+  },
+  bio: {
+    marginTop: theme.spacing.scale.md,
+    lineHeight: 22,
+  },
+  statsRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: theme.spacing.scale["2xl"],
+    marginTop: theme.spacing.scale.lg,
+  },
+  statItem: {
+    alignItems: "center",
+  },
+  statLabel: {
+    opacity: 0.6,
+  },
+  socialRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: theme.spacing.scale.md,
+    marginTop: theme.spacing.scale.lg,
+  },
+}));

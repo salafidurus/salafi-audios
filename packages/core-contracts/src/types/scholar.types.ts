@@ -1,5 +1,22 @@
 import type { ContentOriginalFields, Locale, ScholarOriginalFields } from "./localization.types";
 
+export type ScholarContentItemDto = {
+  id: string;
+  slug: string;
+  title: string;
+  type: 'collection' | 'series' | 'single';
+  recencyAt: string;
+  coverImageUrl?: string;
+  lectureCount?: number;
+  durationSeconds?: number;
+  originalLanguage?: Locale;
+  original?: ContentOriginalFields;
+};
+
+export type ScholarContentUnifiedDto = {
+  items: ScholarContentItemDto[];
+};
+
 export type ScholarViewDto = {
   id: string;
   slug: string;
@@ -52,18 +69,14 @@ export type ScholarListItemDto = {
   lectureCount: number;
 };
 
-export type ScholarContentDto = {
-  collections: CollectionSummaryDto[];
-  series: SeriesSummaryDto[];
-  singles: SingleSummaryDto[];
-};
-
 export type CollectionSummaryDto = {
   id: string;
   slug: string;
   title: string;
   coverImageUrl?: string;
   lectureCount: number;
+  publishedAt?: string;
+  createdAt: string;
   originalLanguage?: Locale;
   original?: ContentOriginalFields;
 };
@@ -74,6 +87,8 @@ export type SeriesSummaryDto = {
   title: string;
   coverImageUrl?: string;
   lectureCount: number;
+  publishedAt?: string;
+  createdAt: string;
   originalLanguage?: Locale;
   original?: ContentOriginalFields;
 };

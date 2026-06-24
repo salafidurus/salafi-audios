@@ -35,7 +35,7 @@ export function ScholarDetailScreen({ slug }: ScholarDetailScreenProps) {
       <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingVertical: 16 }}>
         <ScholarHeader scholar={scholar} />
         <View style={{ marginTop: 24 }}>
-          {content ? <ScholarContentList content={content} /> : null}
+          <ScholarContentList items={content?.items ?? []} />
         </View>
       </ScrollView>
     </ScreenView>
