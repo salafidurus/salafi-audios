@@ -97,12 +97,12 @@ describe("resolveRouteAccess", () => {
   });
 
   it("normalizes a trailing slash", () => {
-    expect(resolveRouteAccess("/account/profile/")).toBe("auth-required");
+    expect(resolveRouteAccess("/account/profile/")).toBe("auth-optional");
     expect(resolveRouteAccess("/account/")).toBe("auth-optional");
   });
 
   it("matches nested sub-paths via prefix", () => {
-    expect(resolveRouteAccess("/account/profile/edit")).toBe("auth-required");
+    expect(resolveRouteAccess("/account/profile/edit")).toBe("auth-optional");
     expect(resolveRouteAccess("/live/session-123")).toBe("public");
     expect(resolveRouteAccess("/library/saved")).toBe("auth-optional");
     expect(resolveRouteAccess("/admin/users")).toBe("auth-required");
@@ -128,7 +128,10 @@ describe("resolveRouteAccess", () => {
 
   it("gates the newly protected leaves", () => {
     expect(resolveRouteAccess("/feed/following")).toBe("auth-required");
-    expect(resolveRouteAccess("/account/profile")).toBe("auth-required");
     expect(resolveRouteAccess("/admin")).toBe("auth-required");
+  });
+
+  it("/account/profile is auth-optional — shows AuthRequiredState, does not redirect", () => {
+    expect(resolveRouteAccess("/account/profile")).toBe("auth-optional");
   });
 });

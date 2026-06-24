@@ -87,7 +87,7 @@ export interface RouteDefinition {
 export const routeDefinitions: RouteDefinition[] = [
   { path: routes.feed.following, access: "auth-required" },
   { path: routes.feed.index, access: "public" },
-  { path: routes.account.profile, access: "auth-required" },
+  { path: routes.account.profile, access: "auth-optional" },
   { path: routes.account.legal, access: "public" },
   { path: routes.account.index, access: "auth-optional" },
   { path: routes.library.index, access: "auth-optional" },
