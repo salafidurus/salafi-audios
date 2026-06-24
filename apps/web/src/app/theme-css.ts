@@ -1,4 +1,4 @@
-import { lightWebTheme, darkWebTheme } from "@sd/design-tokens";
+import { lightWebTheme, darkWebTheme } from "../core/styles/theme";
 
 const getThemeProperties = (theme: typeof lightWebTheme) => {
   const inputSurfaceRest = theme.colors.surface.subtle;
