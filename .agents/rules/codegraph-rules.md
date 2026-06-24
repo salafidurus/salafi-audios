@@ -14,10 +14,10 @@ Load via ToolSearch if deferred: `select:codegraph_explore,codegraph_node,codegr
 ## CLI fallback
 
 ```
-C:/Users/olanr/go/bin/snip.exe -- codegraph explore "<question or symbol names>"
-C:/Users/olanr/go/bin/snip.exe -- codegraph node <symbol-or-file>
-C:/Users/olanr/go/bin/snip.exe -- codegraph callers <symbol>
-C:/Users/olanr/go/bin/snip.exe -- codegraph sync
+snip -- codegraph explore "<question or symbol names>"
+snip -- codegraph node <symbol-or-file>
+snip -- codegraph callers <symbol>
+snip -- codegraph sync
 ```
 
 ## Rules
