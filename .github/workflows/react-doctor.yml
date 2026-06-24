@@ -3,6 +3,13 @@ name: React Doctor
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - "**.md"
+      - "**/README.md"
+      - "docs/**"
+      - "AGENT.md"
+      - "AGENTS.md"
+      - ".github/copilot-instructions.md"
 
 permissions:
   contents: read
