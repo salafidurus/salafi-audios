@@ -162,9 +162,8 @@ into `apps/web` and `apps/native`.
 
 - Install: `pnpm i`
 - Dev (all apps): `pnpm dev`
-- Dev backend: `pnpm dev:be` (runs both `api` and `livestreams`), or single service: `pnpm dev:api`, `pnpm dev:livestreams`
+- Dev backend: `pnpm dev:api`
 - Dev frontend: `pnpm dev:web`, `pnpm dev:native`
-- Dev combinations: `pnpm dev:be+web`, `pnpm dev:be+native`
 - Native build: `pnpm dev:native:build:android` (no clean), `pnpm dev:native:clean-build:android` (prebuild --clean first); `:ios` variants exist
 - Build: `pnpm build`
 - Lint: `pnpm lint`
@@ -190,12 +189,6 @@ into `apps/web` and `apps/native`.
 - Core packages: `pnpm --filter @sd/core-* <script>`
 - Domain packages: `pnpm --filter @sd/domain-* <script>`
 - Ingest: `pnpm --filter util-ingest <script>`
-
-Turbo grouped scripts:
-
-- `pnpm lint:be+web`, `pnpm lint:be+native`
-- `pnpm typecheck:be+web`, `pnpm typecheck:be+native`
-- `pnpm test:be+web`, `pnpm test:be+native`
 
 ## Single-test quick reference
 
