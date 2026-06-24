@@ -19,12 +19,12 @@
 }
 
 .profileName {
-  font-size: 1.125rem;
+  font-size: var(--typo-title-lg-font-size);
   font-weight: 600;
 }
 
 .profileEmail {
-  font-size: 0.875rem;
+  font-size: var(--typo-body-sm-font-size);
   color: var(--content-muted);
 }
 
@@ -42,7 +42,7 @@
   border-radius: var(--radius-component-chip);
   background: var(--surface-default);
   cursor: pointer;
-  font-size: 0.9375rem;
+  font-size: var(--typo-body-sm-font-size);
   color: var(--content-default);
 }
 
@@ -53,7 +53,7 @@
   border-radius: var(--radius-component-chip);
   background: var(--surface-default);
   cursor: pointer;
-  font-size: 0.9375rem;
+  font-size: var(--typo-body-sm-font-size);
   color: var(--action-danger);
 }
 

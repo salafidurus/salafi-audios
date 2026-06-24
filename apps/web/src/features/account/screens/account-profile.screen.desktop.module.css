@@ -7,7 +7,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: var(--typo-body-sm-font-size);
   color: var(--action-primary);
   margin-bottom: var(--space-scale-lg);
   padding: 0;
@@ -31,7 +31,7 @@
 }
 
 .fieldLabel {
-  font-size: 0.8125rem;
+  font-size: var(--typo-label-md-font-size);
   font-weight: 600;
 }
 
@@ -39,7 +39,7 @@
   padding: var(--space-scale-sm) var(--space-component-gap-md);
   border: var(--border-width-default) solid var(--border-default);
   border-radius: var(--radius-component-chip);
-  font-size: 0.9375rem;
+  font-size: var(--typo-body-sm-font-size);
 }
 
 .input:disabled {
