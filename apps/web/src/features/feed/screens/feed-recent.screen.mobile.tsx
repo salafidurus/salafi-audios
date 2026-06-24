@@ -1,9 +1,11 @@
 "use client";
 
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
+import { useFeedRecentScreen } from "@sd/domain-content";
 import { FeedContentCard } from "../components/feed-content-card/feed-content-card";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
-import { useFeedRecentScreen } from "@sd/domain-content";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import styles from "./feed-recent.screen.mobile.module.css";
 
 export type FeedMobileScreenProps = {
   onNavigateToLecture?: (slug: string) => void;
@@ -44,39 +46,25 @@ export function FeedMobileScreen({
   const { data, isFetching, hasNextPage, fetchNextPage } = useFeedRecentScreen();
   const items = data?.pages.flatMap((p) => p.items) ?? [];
 
-  if (isFetching && items.length === 0) {
-    return <div style={{ padding: 16 }}>Loading feed…</div>;
-  }
-
-  if (items.length === 0) {
-    return (
-      <div style={{ padding: 16, color: "var(--content-muted)" }}>
-        No content yet. Check back soon.
-      </div>
-    );
-  }
-
   return (
-    <div style={{ padding: 12 }}>
-      <h2 style={{ margin: 0, fontSize: 18, marginBottom: 12 }}>Feed</h2>
-      {items.map((item) => renderFeedItem(item, onNavigateToLecture, onNavigateToScholar))}
-      {hasNextPage && (
-        <div style={{ padding: 12, textAlign: "center" }}>
-          <button
-            type="button"
-            onClick={() => fetchNextPage()}
-            style={{
-              padding: "8px 20px",
-              border: "1px solid var(--border-default)",
-              borderRadius: 6,
-              cursor: "pointer",
-              background: "var(--surface-default)",
-            }}
-          >
-            {isFetching ? "Loading…" : "Load more"}
-          </button>
-        </div>
+    <ScreenView>
+      {isFetching && items.length === 0 ? (
+        <p>Loading feed…</p>
+      ) : items.length === 0 ? (
+        <p>No content yet. Check back soon.</p>
+      ) : (
+        <>
+          <h2 className={styles.title}>Feed</h2>
+          {items.map((item) => renderFeedItem(item, onNavigateToLecture, onNavigateToScholar))}
+          {hasNextPage && (
+            <div className={styles.loadMoreRow}>
+              <button type="button" onClick={() => fetchNextPage()} className={styles.button}>
+                {isFetching ? "Loading…" : "Load more"}
+              </button>
+            </div>
+          )}
+        </>
       )}
-    </div>
+    </ScreenView>
   );
 }

@@ -1,0 +1,16 @@
+.title {
+  margin: 0 0 var(--space-scale-sm);
+}
+
+.loadMoreRow {
+  padding-top: var(--space-component-gap-md);
+  text-align: center;
+}
+
+.button {
+  padding: var(--space-scale-sm) var(--space-component-gap-md);
+  border: 1px solid var(--border-default);
+  border-radius: 6px;
+  cursor: pointer;
+  background: var(--surface-default);
+}

@@ -9,6 +9,7 @@ import { FeedContentCard } from "../components/feed-content-card/feed-content-ca
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import { FeedTopicRow } from "../components/feed-topic-row/feed-topic-row";
 import { FeedSkeleton } from "../components/feed-skeleton/feed-skeleton";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import styles from "./feed-recent.screen.desktop.module.css";
 
 export type FeedDesktopScreenProps = {
@@ -137,9 +138,11 @@ export function FeedDesktopScreen({
   }
 
   return (
-    <div className={styles.page}>
-      {hero}
-      {body}
-    </div>
+    <ScreenView>
+      <div className={styles.page}>
+        {hero}
+        {body}
+      </div>
+    </ScreenView>
   );
 }

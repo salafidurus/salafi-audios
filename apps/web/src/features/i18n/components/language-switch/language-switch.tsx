@@ -13,7 +13,11 @@ const LOCALE_LABELS: Record<Locale, string> = {
   ar: "العربية",
 };
 
-export function LanguageSwitch() {
+interface LanguageSwitchProps {
+  direction?: "up" | "down";
+}
+
+export function LanguageSwitch({ direction = "down" }: LanguageSwitchProps) {
   const { i18n, t } = useTranslation();
   const { refresh } = useRouter();
   const queryClient = useQueryClient();
@@ -63,7 +67,10 @@ export function LanguageSwitch() {
       </button>
 
       {open && (
-        <ul className={styles.menu} role="menu">
+        <ul
+          className={direction === "up" ? `${styles.menu} ${styles.menuUp}` : styles.menu}
+          role="menu"
+        >
           {SUPPORTED_LOCALES.map((locale) => {
             const isActive = locale === activeLocale;
             return (

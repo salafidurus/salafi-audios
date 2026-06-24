@@ -23,7 +23,7 @@ export function Footer() {
           <Link href={routes.termsOfUse}>{t("footer.terms")}</Link>
           <Link href={routes.support}>{t("footer.support")}</Link>
         </div>
-        <LanguageSwitch />
+        <LanguageSwitch direction="up" />
       </div>
     </footer>
   );
