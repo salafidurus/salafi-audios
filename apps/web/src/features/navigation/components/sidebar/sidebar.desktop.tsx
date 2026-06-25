@@ -33,7 +33,7 @@ export function Sidebar() {
 
   const navItems: NavItem[] = [
     {
-      label: t("navigation.feeds"),
+      label: t("navigation.explore"),
       Icon: Cloud,
       href: routes.feed.index,
       activeMatch: routes.feed.index,
@@ -45,7 +45,7 @@ export function Sidebar() {
       activeMatch: routes.live.index,
     },
     {
-      label: t("navigation.lessons"),
+      label: t("navigation.library"),
       Icon: CassetteTape,
       href: routes.library.index,
       activeMatch: routes.library.index,
