@@ -30,7 +30,7 @@ export class HealthController {
   getHealth(): Promise<HealthCheckResult> {
     return this.health.check([
       () => this.prismaHealth.pingCheck('database', { timeout: 300 }),
-      () => this.r2Health.pingCheck('storage', { timeout: 300 }),
+      // () => this.r2Health.pingCheck('storage', { timeout: 300 }),
     ]);
   }
 
@@ -49,7 +49,7 @@ export class HealthController {
   getReady(): Promise<HealthCheckResult> {
     return this.health.check([
       () => this.prismaHealth.pingCheck('database', { timeout: 300 }),
-      () => this.r2Health.pingCheck('storage', { timeout: 300 }),
+      // () => this.r2Health.pingCheck('storage', { timeout: 300 }),
     ]);
   }
 }

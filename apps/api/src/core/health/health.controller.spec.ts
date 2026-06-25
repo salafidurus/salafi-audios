@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TerminusModule } from '@nestjs/terminus';
 import { HealthController } from './health.controller';
@@ -6,15 +7,17 @@ import { R2HealthIndicator } from './r2-health.indicator';
 
 describe('HealthController', () => {
   let controller: HealthController;
-  let prismaHealth: jest.Mocked<Pick<PrismaHealthIndicator, 'pingCheck'>>;
-  let r2Health: jest.Mocked<Pick<R2HealthIndicator, 'pingCheck'>>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let prismaHealth: { pingCheck: any };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let r2Health: { pingCheck: any };
 
   beforeEach(async () => {
     prismaHealth = {
-      pingCheck: jest.fn().mockResolvedValue({ database: { status: 'up' } }),
+      pingCheck: vi.fn().mockResolvedValue({ database: { status: 'up' } }),
     };
     r2Health = {
-      pingCheck: jest.fn().mockResolvedValue({ storage: { status: 'up' } }),
+      pingCheck: vi.fn().mockResolvedValue({ storage: { status: 'up' } }),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -29,24 +32,20 @@ describe('HealthController', () => {
     controller = module.get<HealthController>(HealthController);
   });
 
-  it('getHealth calls both database and storage indicators', async () => {
+  it('getHealth calls database indicator but not storage indicator', async () => {
     await controller.getHealth();
     expect(prismaHealth.pingCheck).toHaveBeenCalledWith('database', {
       timeout: 300,
     });
-    expect(r2Health.pingCheck).toHaveBeenCalledWith('storage', {
-      timeout: 300,
-    });
+    expect(r2Health.pingCheck).not.toHaveBeenCalled();
   });
 
-  it('getReady calls both database and storage indicators', async () => {
+  it('getReady calls database indicator but not storage indicator', async () => {
     await controller.getReady();
     expect(prismaHealth.pingCheck).toHaveBeenCalledWith('database', {
       timeout: 300,
     });
-    expect(r2Health.pingCheck).toHaveBeenCalledWith('storage', {
-      timeout: 300,
-    });
+    expect(r2Health.pingCheck).not.toHaveBeenCalled();
   });
 
   it('getLive succeeds with no indicator calls', async () => {

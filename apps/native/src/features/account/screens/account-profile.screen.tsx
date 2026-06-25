@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useAccountProfile, useUpdateProfile } from "@sd/domain-account";
@@ -7,31 +7,23 @@ export type AccountProfileScreenProps = {
   onBack?: () => void;
 };
 
-export function AccountProfileScreen(_props: AccountProfileScreenProps) {
-  const { data: profile, isFetching } = useAccountProfile();
-  const { mutate: updateProfile, isPending, isSuccess, isError } = useUpdateProfile();
+type AccountProfileFormProps = {
+  profile: NonNullable<ReturnType<typeof useAccountProfile>["data"]>;
+  isPending: boolean;
+  isSuccess: boolean;
+  isError: boolean;
+  updateProfile: ReturnType<typeof useUpdateProfile>["mutate"];
+};
+
+function AccountProfileForm({
+  profile,
+  isPending,
+  isSuccess,
+  isError,
+  updateProfile,
+}: AccountProfileFormProps) {
   const { theme } = useUnistyles();
-  const [displayName, setDisplayName] = useState("");
-
-  useEffect(() => {
-    if (profile) setDisplayName(profile.displayName ?? "");
-  }, [profile]);
-
-  if (isFetching) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.statusText}>Loading profile...</Text>
-      </View>
-    );
-  }
-
-  if (!profile) {
-    return (
-      <View style={styles.centered}>
-        <Text style={styles.statusText}>Profile not available</Text>
-      </View>
-    );
-  }
+  const [displayName, setDisplayName] = useState(profile.displayName ?? "");
 
   const unchanged = displayName === profile.displayName;
 
@@ -70,6 +62,37 @@ export function AccountProfileScreen(_props: AccountProfileScreenProps) {
         </Pressable>
       </View>
     </ScrollView>
+  );
+}
+
+export function AccountProfileScreen(_props: AccountProfileScreenProps) {
+  const { data: profile, isFetching } = useAccountProfile();
+  const { mutate: updateProfile, isPending, isSuccess, isError } = useUpdateProfile();
+
+  if (isFetching) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.statusText}>Loading profile...</Text>
+      </View>
+    );
+  }
+
+  if (!profile) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.statusText}>Profile not available</Text>
+      </View>
+    );
+  }
+
+  return (
+    <AccountProfileForm
+      profile={profile}
+      isPending={isPending}
+      isSuccess={isSuccess}
+      isError={isError}
+      updateProfile={updateProfile}
+    />
   );
 }
 
