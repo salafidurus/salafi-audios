@@ -3,21 +3,22 @@ name: ci
 on:
   pull_request:
     paths:
-      - "apps/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}"
-      - "packages/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}"
+      - "apps/**"
+      - "packages/**"
+      - "scripts/**"
       - "tsconfig*.json"
       - "**/tsconfig*.json"
       - "eslint.config.*"
       - "**/eslint.config.*"
       - "jest.config.*"
       - "**/jest.config.*"
-      - "packages/core-db/prisma/**"
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
       - "package.json"
       - "**/package.json"
       - "turbo.json"
       - ".github/workflows/ci.yml"
+      - "!**/*.md"
 
 # Cancel stale runs on the same PR to save CI minutes on rapid pushes
 concurrency:
