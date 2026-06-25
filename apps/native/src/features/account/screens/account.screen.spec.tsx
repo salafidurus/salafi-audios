@@ -48,6 +48,22 @@ describe("AccountScreen", () => {
     });
   });
 
+  it("renders sign-in prompt and legal when unauthenticated (no profile)", async () => {
+    mockedUseAccountProfile.mockReturnValue({
+      data: undefined,
+      isFetching: false,
+      error: null,
+    });
+
+    await render(<AccountScreen />);
+
+    expect(screen.getByText("Sign in to access your profile")).toBeTruthy();
+    expect(screen.getByText("Legal")).toBeTruthy();
+    expect(screen.getByText("Language")).toBeTruthy();
+    expect(screen.queryByText("Edit Profile")).toBeNull();
+    expect(screen.queryByText("Sign Out")).toBeNull();
+  }, 15000);
+
   it("renders a loading state while the account query is fetching", async () => {
     mockedUseAccountProfile.mockReturnValue({
       data: undefined,
