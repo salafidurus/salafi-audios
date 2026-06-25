@@ -1,6 +1,7 @@
 "use client";
 
-import { useAccountProfile } from "@sd/domain-account";
+import { useState, useEffect } from "react";
+import { useAccountProfile, useUpdateProfile } from "@sd/domain-account";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import styles from "./account-profile.screen.mobile.module.css";
 
@@ -10,6 +11,12 @@ export type AccountProfileMobileScreenProps = {
 
 export function AccountProfileMobileScreen({ onBack }: AccountProfileMobileScreenProps) {
   const { data: profile, isFetching } = useAccountProfile();
+  const { mutate: updateProfile, isPending, isSuccess, isError } = useUpdateProfile();
+  const [displayName, setDisplayName] = useState("");
+
+  useEffect(() => {
+    if (profile) setDisplayName(profile.displayName ?? "");
+  }, [profile]);
 
   return (
     <ScreenView>
@@ -30,15 +37,28 @@ export function AccountProfileMobileScreen({ onBack }: AccountProfileMobileScree
               <span className={styles.fieldLabel}>Display Name</span>
               <input
                 type="text"
-                defaultValue={profile.displayName || ""}
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="Your display name"
                 className={styles.input}
               />
             </label>
             <label className={styles.field}>
               <span className={styles.fieldLabel}>Email</span>
-              <input type="email" defaultValue={profile.email} disabled className={styles.input} />
+              <input type="email" value={profile.email} disabled className={styles.input} />
             </label>
+          </div>
+          <div className={styles.actions}>
+            {isError && <p className={styles.errorText}>Failed to save. Please try again.</p>}
+            {isSuccess && <p className={styles.successText}>Saved.</p>}
+            <button
+              type="button"
+              onClick={() => updateProfile({ displayName })}
+              disabled={isPending || displayName === profile.displayName}
+              className={styles.saveButton}
+            >
+              {isPending ? "Saving…" : "Save"}
+            </button>
           </div>
         </>
       )}

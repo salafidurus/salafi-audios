@@ -45,3 +45,38 @@
 .input:disabled {
   background: var(--surface-subtle);
 }
+
+.actions {
+  margin-top: var(--space-scale-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-md);
+}
+
+.saveButton {
+  padding: var(--space-scale-sm) var(--space-scale-xl);
+  background: var(--action-primary);
+  color: var(--content-on-primary);
+  border: none;
+  border-radius: var(--radius-component-chip);
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.saveButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.successText {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-success, green);
+  margin: 0;
+}
+
+.errorText {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-error, red);
+  margin: 0;
+}

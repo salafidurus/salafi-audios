@@ -1,6 +1,7 @@
-import { ScrollView, Text, TextInput, View } from "react-native";
+import { useState, useEffect } from "react";
+import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { useAccountProfile } from "@sd/domain-account";
+import { useAccountProfile, useUpdateProfile } from "@sd/domain-account";
 
 export type AccountProfileScreenProps = {
   onBack?: () => void;
@@ -8,7 +9,13 @@ export type AccountProfileScreenProps = {
 
 export function AccountProfileScreen(_props: AccountProfileScreenProps) {
   const { data: profile, isFetching } = useAccountProfile();
+  const { mutate: updateProfile, isPending, isSuccess, isError } = useUpdateProfile();
   const { theme } = useUnistyles();
+  const [displayName, setDisplayName] = useState("");
+
+  useEffect(() => {
+    if (profile) setDisplayName(profile.displayName ?? "");
+  }, [profile]);
 
   if (isFetching) {
     return (
@@ -26,6 +33,8 @@ export function AccountProfileScreen(_props: AccountProfileScreenProps) {
     );
   }
 
+  const unchanged = displayName === profile.displayName;
+
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
       <Text style={styles.title}>Edit Profile</Text>
@@ -33,7 +42,8 @@ export function AccountProfileScreen(_props: AccountProfileScreenProps) {
         <View style={styles.field}>
           <Text style={styles.label}>Display Name</Text>
           <TextInput
-            defaultValue={profile.displayName || ""}
+            value={displayName}
+            onChangeText={setDisplayName}
             placeholder="Your display name"
             placeholderTextColor={theme.colors.content.muted}
             style={styles.input}
@@ -42,11 +52,22 @@ export function AccountProfileScreen(_props: AccountProfileScreenProps) {
         <View style={styles.field}>
           <Text style={styles.label}>Email</Text>
           <TextInput
-            defaultValue={profile.email}
+            value={profile.email}
             editable={false}
             style={[styles.input, styles.inputDisabled]}
           />
         </View>
+      </View>
+      <View style={styles.actions}>
+        {isError && <Text style={styles.errorText}>Failed to save. Please try again.</Text>}
+        {isSuccess && <Text style={styles.successText}>Saved.</Text>}
+        <Pressable
+          onPress={() => updateProfile({ displayName })}
+          disabled={isPending || unchanged}
+          style={[styles.saveButton, (isPending || unchanged) && styles.saveButtonDisabled]}
+        >
+          <Text style={styles.saveButtonText}>{isPending ? "Saving…" : "Save"}</Text>
+        </Pressable>
       </View>
     </ScrollView>
   );
@@ -96,5 +117,33 @@ const styles = StyleSheet.create((theme) => ({
   },
   inputDisabled: {
     backgroundColor: theme.colors.surface.subtle,
+  },
+  actions: {
+    marginTop: theme.spacing.scale.xl,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.scale.md,
+  },
+  saveButton: {
+    paddingVertical: theme.spacing.scale.sm,
+    paddingHorizontal: theme.spacing.scale.xl,
+    backgroundColor: theme.colors.action.primary,
+    borderRadius: theme.radius.scale.sm,
+  },
+  saveButtonDisabled: {
+    opacity: 0.5,
+  },
+  saveButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: theme.colors.content.onPrimary,
+  },
+  successText: {
+    fontSize: 12,
+    color: theme.colors.state.successContent,
+  },
+  errorText: {
+    fontSize: 12,
+    color: theme.colors.state.dangerContent,
   },
 }));

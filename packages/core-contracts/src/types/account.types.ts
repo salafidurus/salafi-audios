@@ -8,3 +8,7 @@ export type UserProfileDto = {
   createdAt: string;
   updatedAt: string;
 };
+
+export type UpdateProfileDto = {
+  displayName: string;
+};
