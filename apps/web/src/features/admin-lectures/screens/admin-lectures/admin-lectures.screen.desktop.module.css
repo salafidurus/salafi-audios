@@ -183,7 +183,7 @@
   align-items: center;
   padding: 2px var(--space-scale-sm);
   border-radius: var(--radius-scale-full);
-  font-size: 12px;
+  font-size: var(--typo-caption-font-size);
   font-weight: 500;
   text-transform: capitalize;
 }
@@ -217,7 +217,7 @@
   border: 1px solid var(--border-subtle);
   background-color: var(--surface-default);
   color: var(--content-default);
-  font-size: 13px;
+  font-size: var(--typo-caption-font-size);
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
@@ -246,7 +246,7 @@
   border: 1px solid var(--border-default);
   background-color: var(--surface-default);
   color: var(--content-default);
-  font-size: 13px;
+  font-size: var(--typo-caption-font-size);
   cursor: pointer;
 }
 
@@ -257,6 +257,6 @@
 
 .pageInfo {
   font-family: var(--typo-body-sm-font-family);
-  font-size: 13px;
+  font-size: var(--typo-caption-font-size);
   color: var(--content-default);
 }

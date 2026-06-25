@@ -63,7 +63,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
+  font-size: var(--typo-body-sm-font-size);
   cursor: pointer;
 }
 

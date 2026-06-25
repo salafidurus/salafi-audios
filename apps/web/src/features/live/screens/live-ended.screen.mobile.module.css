@@ -14,18 +14,18 @@
 }
 
 .sessionTitle {
-  font-size: 0.9375rem;
+  font-size: var(--typo-body-sm-font-size);
   font-weight: 600;
 }
 
 .sessionMeta {
-  font-size: 0.75rem;
+  font-size: var(--typo-caption-font-size);
   color: var(--content-muted);
   margin-top: 2px;
 }
 
 .sessionDate {
-  font-size: 0.75rem;
+  font-size: var(--typo-caption-font-size);
   color: var(--content-subtle);
   margin-top: 2px;
 }
