@@ -17,7 +17,6 @@ permissions:
   contents: read
 
 env:
-  NODE_VERSION: "24"
   PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/ms-playwright
 
 jobs:

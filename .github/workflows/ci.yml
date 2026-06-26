@@ -29,7 +29,6 @@ permissions:
   contents: read
 
 env:
-  NODE_VERSION: "24"
   # Custom Playwright path enables GitHub Actions caching (default path is not cacheable)
   PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/ms-playwright
   TURBO_TEAM: ${{ secrets.TURBO_TEAM }}

@@ -15,8 +15,7 @@ concurrency:
 permissions:
   contents: read
 
-env:
-  NODE_VERSION: "24"
+# Bun is the runtime; no Node.js version required
 
 jobs:
   db_generated_policy:

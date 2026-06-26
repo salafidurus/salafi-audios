@@ -29,13 +29,13 @@
     "test:prepush": "vitest run --changed=origin/main",
     "pretypecheck": "bun run prisma:generate",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "prisma:generate": "prisma generate --schema=./prisma/schema.prisma --config=./prisma.config.ts && node ./scripts/copy-generated-to-dist.js",
+    "prisma:generate": "prisma generate --schema=./prisma/schema.prisma --config=./prisma.config.ts && bun ./scripts/copy-generated-to-dist.js",
     "prisma:format": "prisma format --schema=./prisma/schema.prisma --config=./prisma.config.ts",
     "prisma:validate": "prisma validate --schema=./prisma/schema.prisma --config=./prisma.config.ts",
-    "migrate:create-only": "node ./scripts/migrate-with-auto-name.js",
+    "migrate:create-only": "bun ./scripts/migrate-with-auto-name.js",
     "migrate:deploy": "prisma migrate deploy --schema=./prisma/schema.prisma --config=./prisma.config.ts",
-    "make-admin": "node ./scripts/make-admin.js",
-    "build": "bun run prisma:generate && tsup src/index.ts --format esm,cjs --out-dir dist && node ./scripts/copy-generated-to-dist.js && tsc -p tsconfig.build.json",
+    "make-admin": "bun ./scripts/make-admin.js",
+    "build": "bun run prisma:generate && tsup src/index.ts --format esm,cjs --out-dir dist && bun ./scripts/copy-generated-to-dist.js && tsc -p tsconfig.build.json",
     "dev": "bun run build --watch"
   },
   "dependencies": {

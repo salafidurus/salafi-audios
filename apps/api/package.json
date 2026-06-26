@@ -12,7 +12,7 @@
     "start:dev": "nest start --watch",
     "dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "bun dist/main",
     "lint": "oxlint . && eslint .",
     "lint:fix": "eslint . --fix",
     "test": "vitest run",
