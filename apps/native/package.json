@@ -4,7 +4,7 @@
   "main": "index.js",
   "version": "1.0.0",
   "scripts": {
-    "eas-build-post-install": "cd ../.. && pnpm turbo run build --filter=native^...",
+    "eas-build-post-install": "cd ../.. && turbo run build --filter=native^...",
     "eas-build-on-error": "sentry-eas-build-on-error",
     "start": "expo start --dev-client",
     "dev": "expo start --dev-client",
@@ -98,7 +98,9 @@
     "eslint": "catalog:",
     "eslint-config-expo": "~56.0.0",
     "jest": "catalog:",
-    "jest-expo": "~56.0.5"
+    "jest-expo": "~56.0.5",
+    "babel-preset-expo": "~56.0.15",
+    "@babel/runtime": "^7.29.7"
   },
   "private": true,
   "expo": {

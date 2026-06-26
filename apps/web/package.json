@@ -4,9 +4,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "bun --bun next dev",
+    "build": "bun --bun next build",
+    "start": "bun --bun next start",
     "lint": "oxlint . && eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -50,6 +50,7 @@
     "@types/react-dom": "^19",
     "eslint": "catalog:",
     "eslint-config-next": "catalog:",
-    "tailwindcss": "^4"
+    "tailwindcss": "^4",
+    "@vitejs/plugin-react": "^6.0.2"
   }
 }
