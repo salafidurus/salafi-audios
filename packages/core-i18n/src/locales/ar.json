@@ -43,9 +43,9 @@
     "account": "الحساب"
   },
   "navigation": {
-    "feeds": "الرئيسية",
+    "explore": "استكشاف",
     "live": "مباشر",
-    "lessons": "الدروس",
+    "library": "المكتبة",
     "account": "الحساب",
     "siteTitle": "دروس سلفية",
     "primarySidebar": "الشريط الجانبي الرئيسي",

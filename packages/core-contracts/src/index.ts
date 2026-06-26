@@ -67,6 +67,7 @@ export {
   type ProgressSyncDto,
   type SavedSyncDto,
   type UserProfileDto,
+  type UpdateProfileDto,
   type LiveSessionStatus,
   type LiveSessionPublicDto,
   type LiveSessionDeltaDto,

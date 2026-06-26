@@ -15,6 +15,14 @@ export class FeedService {
     return this.repo.getFeed(cursor, limit, topicSlugs, scholarSlugs);
   }
 
+  async getFeedRecent(cursor?: string, limit = 20): Promise<FeedPageDto> {
+    return this.repo.getFeedRecent(cursor, limit);
+  }
+
+  async getFollowingFeed(cursor?: string, limit = 20): Promise<FeedPageDto> {
+    return this.repo.getFeed(cursor, limit);
+  }
+
   async getScholars(): Promise<{ scholars: ScholarChipDto[] }> {
     const scholars = await this.repo.getScholars();
     return { scholars };

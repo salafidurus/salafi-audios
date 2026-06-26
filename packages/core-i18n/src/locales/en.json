@@ -43,9 +43,9 @@
     "account": "Account"
   },
   "navigation": {
-    "feeds": "Feeds",
+    "explore": "Explore",
     "live": "Live",
-    "lessons": "Lessons",
+    "library": "Library",
     "account": "Account",
     "siteTitle": "Salafi Durus",
     "primarySidebar": "Primary sidebar",

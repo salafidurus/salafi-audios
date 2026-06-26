@@ -9,6 +9,7 @@ import {
 } from '@nestjs/terminus';
 import { SkipThrottle } from '@nestjs/throttler';
 import { PrismaHealthIndicator } from './prisma-health.indicator';
+import { R2HealthIndicator } from './r2-health.indicator';
 
 @SkipThrottle()
 @ApiTags('Health')
@@ -19,6 +20,7 @@ export class HealthController {
   constructor(
     private readonly health: HealthCheckService,
     private readonly prismaHealth: PrismaHealthIndicator,
+    private readonly r2Health: R2HealthIndicator,
   ) {}
 
   @Get()
@@ -28,6 +30,7 @@ export class HealthController {
   getHealth(): Promise<HealthCheckResult> {
     return this.health.check([
       () => this.prismaHealth.pingCheck('database', { timeout: 300 }),
+      // () => this.r2Health.pingCheck('storage', { timeout: 300 }),
     ]);
   }
 
@@ -46,6 +49,7 @@ export class HealthController {
   getReady(): Promise<HealthCheckResult> {
     return this.health.check([
       () => this.prismaHealth.pingCheck('database', { timeout: 300 }),
+      // () => this.r2Health.pingCheck('storage', { timeout: 300 }),
     ]);
   }
 }

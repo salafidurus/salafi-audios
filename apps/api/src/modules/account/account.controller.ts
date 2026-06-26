@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Patch, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import type { UserProfileDto } from '@sd/core-contracts';
@@ -28,5 +28,15 @@ export class AccountController {
     },
   ): UserProfileDto {
     return this.accountService.getProfile(user);
+  }
+
+  @Patch('profile')
+  @ApiOperation({ summary: 'Update current user profile' })
+  @ApiOkResponse({ description: 'Updated user profile' })
+  updateProfile(
+    @CurrentUser() user: { id: string },
+    @Body() body: { displayName: string },
+  ): Promise<UserProfileDto> {
+    return this.accountService.updateProfile(user.id, body.displayName);
   }
 }

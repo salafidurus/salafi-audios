@@ -76,7 +76,7 @@ export const DEFAULT_TABS: Record<Section, string> = {
 };
 
 export const SECTION_LABELS: Record<Section, string> = {
-  feed: "Feed",
+  feed: "Explore",
   live: "Live",
   library: "Library",
   account: "Account",

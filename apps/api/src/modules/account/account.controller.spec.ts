@@ -23,6 +23,7 @@ const mockProfile = {
 
 const mockAccountService = {
   getProfile: vi.fn().mockReturnValue(mockProfile),
+  updateProfile: vi.fn().mockResolvedValue(mockProfile),
 };
 
 describe('AccountController — auth boundaries', () => {
@@ -55,20 +56,22 @@ describe('AccountController — auth boundaries', () => {
   });
 
   describe('200 — authenticated', () => {
+    const authenticatedSession = {
+      user: {
+        id: 'user-1',
+        email: 'test@example.com',
+        name: 'Test User',
+        image: 'https://example.com/avatar.png',
+        role: 'user',
+        emailVerified: true,
+        createdAt: new Date('2024-01-01T00:00:00.000Z'),
+        updatedAt: new Date('2024-06-01T00:00:00.000Z'),
+      },
+      session: {},
+    };
+
     it('GET /account/profile returns the mapped profile for an authenticated user', async () => {
-      mockAuth.api.getSession.mockResolvedValue({
-        user: {
-          id: 'user-1',
-          email: 'test@example.com',
-          name: 'Test User',
-          image: 'https://example.com/avatar.png',
-          role: 'user',
-          emailVerified: true,
-          createdAt: new Date('2024-01-01T00:00:00.000Z'),
-          updatedAt: new Date('2024-06-01T00:00:00.000Z'),
-        },
-        session: {},
-      });
+      mockAuth.api.getSession.mockResolvedValue(authenticatedSession);
 
       const res = await request(app.getHttpServer())
         .get('/account/profile')
@@ -78,6 +81,31 @@ describe('AccountController — auth boundaries', () => {
       expect(mockAccountService.getProfile).toHaveBeenCalledWith(
         expect.objectContaining({ id: 'user-1', email: 'test@example.com' }),
       );
+    });
+
+    it('PATCH /account/profile updates and returns the profile', async () => {
+      mockAuth.api.getSession.mockResolvedValue(authenticatedSession);
+
+      const res = await request(app.getHttpServer())
+        .patch('/account/profile')
+        .send({ displayName: 'Updated Name' })
+        .expect(200);
+
+      expect(res.body).toEqual(mockProfile);
+      expect(mockAccountService.updateProfile).toHaveBeenCalledWith(
+        'user-1',
+        'Updated Name',
+      );
+    });
+  });
+
+  describe('401 — unauthenticated PATCH', () => {
+    it('PATCH /account/profile returns 401 without a session', () => {
+      mockAuth.api.getSession.mockResolvedValue(null);
+      return request(app.getHttpServer())
+        .patch('/account/profile')
+        .send({ displayName: 'X' })
+        .expect(401);
     });
   });
 });

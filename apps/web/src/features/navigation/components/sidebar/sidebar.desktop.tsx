@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { useAuth } from "@/core/auth";
 import { routes } from "@sd/core-contracts";
 import {
   PanelLeftOpen,
@@ -30,12 +29,11 @@ export function Sidebar() {
   const pathname = usePathname();
   const { t } = useTranslation();
   const [collapsed, setCollapsed] = useState(false);
-  const { isAuthenticated } = useAuth();
-  const accountHref = isAuthenticated ? routes.account.index : routes.signIn;
+  const accountHref = routes.account.index;
 
   const navItems: NavItem[] = [
     {
-      label: t("navigation.feeds"),
+      label: t("navigation.explore"),
       Icon: Cloud,
       href: routes.feed.index,
       activeMatch: routes.feed.index,
@@ -47,7 +45,7 @@ export function Sidebar() {
       activeMatch: routes.live.index,
     },
     {
-      label: t("navigation.lessons"),
+      label: t("navigation.library"),
       Icon: CassetteTape,
       href: routes.library.index,
       activeMatch: routes.library.index,
