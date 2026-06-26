@@ -14,7 +14,7 @@ loadDbEnvFiles(path.resolve(__dirname, ".."));
 async function main() {
   const email = process.argv[2];
   if (!email) {
-    console.error("Usage: pnpm --filter @sd/core-db make-admin <email>");
+    console.error("Usage: bun run --filter @sd/core-db make-admin <email>");
     process.exit(1);
   }
 

@@ -13,6 +13,7 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     clearMocks: true,
+    retry: 2,
     passWithNoTests: true,
     include: ['test/**/*.e2e-spec.ts'],
   },

@@ -27,14 +27,14 @@ scripts/
 
 ## Key Commands
 
-- `pnpm --filter core-db build` — Generate client + build
-- `pnpm --filter core-db typecheck` — Type check (auto-generates client first)
-- `pnpm --filter core-db prisma:generate` — Regenerate Prisma client from schema
-- `pnpm --filter core-db prisma:validate` — Validate schema syntax
-- `pnpm --filter core-db prisma:format` — Format schema file
-- `pnpm --filter core-db migrate:create-only` — Create a new migration
-- `pnpm --filter core-db migrate:deploy` — Apply pending migrations
-- `pnpm --filter core-db test` — Run tests (Jest)
+- `bun run --filter @sd/core-db build` — Generate client + build
+- `bun run --filter @sd/core-db typecheck` — Type check (auto-generates client first)
+- `bun run --filter @sd/core-db prisma:generate` — Regenerate Prisma client from schema
+- `bun run --filter @sd/core-db prisma:validate` — Validate schema syntax
+- `bun run --filter @sd/core-db prisma:format` — Format schema file
+- `bun run --filter @sd/core-db migrate:create-only` — Create a new migration
+- `bun run --filter @sd/core-db migrate:deploy` — Apply pending migrations
+- `bun run --filter @sd/core-db test` — Run tests (Jest)
 
 ## Constraints
 

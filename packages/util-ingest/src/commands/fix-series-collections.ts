@@ -123,7 +123,7 @@ function parseArgs(argv: string[]): FixArgs {
 
   if (!result.tag.trim()) {
     throw new Error(
-      "Missing required --tag. Example: pnpm --filter @sd/util-ingest fix:series-collections -- --tag phase-02-series-fix",
+      "Missing required --tag. Example: bun run --filter @sd/util-ingest fix:series-collections -- --tag phase-02-series-fix",
     );
   }
 

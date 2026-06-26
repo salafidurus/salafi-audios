@@ -1,13 +1,10 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended", ":separateMultipleVarRanges"],
-  "pnpm": {
-    "enabled": true
-  },
   "timezone": "UTC",
   "schedule": ["before 7am every 2 days"],
-  "prConcurrentLimit": 5,
-  "prHourlyLimit": 2,
+  "prConcurrentLimit": 10,
+  "prHourlyLimit": 10,
   "packageRules": [
     {
       "description": "Ignore Expo, React, React Native, NestJS, Next.js, Prisma, and other locked infrastructure deps",

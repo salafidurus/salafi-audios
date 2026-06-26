@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: "./e2e",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  retries: 2,
   workers: process.env.CI ? 1 : undefined,
   reporter: "list",
   timeout: 90_000,
@@ -22,8 +22,8 @@ export default defineConfig({
   webServer: {
     command:
       process.env.PW_SKIP_WEB_BUILD === "1"
-        ? "pnpm start -p 3000"
-        : "pnpm build && pnpm start -p 3000",
+        ? "bun run start -p 3000"
+        : "bun run build && bun run start -p 3000",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

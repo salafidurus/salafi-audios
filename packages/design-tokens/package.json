@@ -16,7 +16,7 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "tsc -p tsconfig.build.json",
-    "dev": "pnpm build --watch",
+    "dev": "bun run build --watch",
     "lint": "oxlint . && eslint .",
     "test": "vitest run",
     "test:prepush": "vitest run --changed=origin/main",

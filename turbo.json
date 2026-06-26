@@ -76,12 +76,6 @@
       "dependsOn": ["^build", "^test:prepush"],
       "cache": true
     },
-    // Generates OpenAPI spec from NestJS decorators for contract-first API development
-    "openapi": {
-      "dependsOn": ["^openapi"],
-      "inputs": ["$TURBO_DEFAULT$", "src/**", "package.json", "tsconfig*.json"],
-      "outputs": ["openapi.json"]
-    },
     // Builds shared contract types (DTOs, response shapes) consumed by web and mobile
     "contract": {
       "dependsOn": ["^contract"],

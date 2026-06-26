@@ -7,15 +7,13 @@ const buildTargets = [
   "@sd/design-tokens",
 ];
 
-const cmd = process.platform === "win32" ? "cmd.exe" : "pnpm";
-const baseArgs = process.platform === "win32" ? ["/c", "pnpm"] : [];
+const cmd = "bun";
 
 for (const target of buildTargets) {
-  console.log(`\n> pnpm --filter ${target} build`);
+  console.log(`\n> bun run --filter ${target} build`);
 
   // Run without shell: true to avoid shell-spawn vulnerabilities.
-  // Resolve cross-platform pnpm command shim name natively.
-  const args = [...baseArgs, "--filter", target, "build"];
+  const args = ["run", "--filter", target, "build"];
   const result = spawnSync(cmd, args, {
     stdio: "inherit",
   });

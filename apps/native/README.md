@@ -11,20 +11,20 @@ emulator.
 From repo root:
 
 ```bash
-pnpm dev:native
+bun run dev:native
 ```
 
 Or scoped directly:
 
 ```bash
-pnpm --filter native dev
+bun run --filter native dev
 ```
 
 ## Common Commands
 
-- Start: `pnpm --filter native start`
-- Android: `pnpm --filter native android`
-- iOS: `pnpm --filter native ios`
-- Lint: `pnpm --filter native lint`
-- Typecheck: `pnpm --filter native typecheck`
-- Test: `pnpm --filter native test`
+- Start: `bun run --filter native start`
+- Android: `bun run --filter native android`
+- iOS: `bun run --filter native ios`
+- Lint: `bun run --filter native lint`
+- Typecheck: `bun run --filter native typecheck`
+- Test: `bun run --filter native test`

@@ -52,13 +52,13 @@ Deployments follow protected branch promotion:
 - Credentials must be revocable and scoped to minimum required access.
 - Hard-coded secrets, runtime config mutation, and implicit environment inference are avoided.
 
-## 7. Dependabot Policy
+## 7. Renovate Policy
 
-Dependabot is configured in `.github/dependabot.yml` with conservative defaults suited to this monorepo.
+Renovate is configured in `renovate.json` with conservative defaults suited to this monorepo.
 
 ### Ignored Dependencies
 
-The following dependency groups are **explicitly ignored** by Dependabot because they are version-locked to SDK releases or framework internals. Updating them independently risks breaking native builds, type compatibility, or coordinated version matrices:
+The following dependency groups are **explicitly ignored** by Renovate because they are version-locked to SDK releases or framework internals. Updating them independently risks breaking native builds, type compatibility, or coordinated version matrices:
 
 - **Expo / React Native / React Navigation** — all pinned to the current Expo SDK. Upgrades follow the [Expo SDK upgrade guide](https://docs.expo.dev/workflow/upgrading-expo-sdk-walkthrough/) as a coordinated batch.
 - **React / React DOM / @types/react** — shared across web (Next.js) and mobile (Expo). Version is dictated by the Expo SDK and Next.js major.
@@ -77,17 +77,17 @@ The following dependency groups are **explicitly ignored** by Dependabot because
 
 ### Validation Commands for Dependency PRs
 
-Every Dependabot PR (and any manual dependency update) must pass:
+Every Renovate PR (and any manual dependency update) must pass:
 
 ```bash
-pnpm typecheck   # Ensures no type regressions across the monorepo
-pnpm build        # Verifies all apps and packages compile cleanly
-pnpm test         # Runs unit and integration tests
-pnpm test:e2e     # Runs Playwright end-to-end tests (web)
+bun run typecheck   # Ensures no type regressions across the monorepo
+bun run build       # Verifies all apps and packages compile cleanly
+bun run test        # Runs unit and integration tests
+bun run test:e2e    # Runs Playwright end-to-end tests (web)
 ```
 
 CI enforces these automatically; reviewers should verify all checks are green before merging.
 
 ### Playwright Browser Caching in CI
 
-The CI workflow caches Playwright browser binaries at `$GITHUB_WORKSPACE/.cache/ms-playwright`, keyed on `pnpm-lock.yaml`. When Dependabot bumps `playwright` or `@playwright/test`, the lockfile hash changes, causing a cache miss. The CI job detects this and re-installs browsers automatically (`playwright install --with-deps`). No manual intervention is required — the next run after a Playwright bump simply takes slightly longer.
+The CI workflow caches Playwright browser binaries at `$GITHUB_WORKSPACE/.cache/ms-playwright`, keyed on `bun.lock`. When Renovate bumps `playwright` or `@playwright/test`, the lockfile hash changes, causing a cache miss. The CI job detects this and re-installs browsers automatically (`playwright install --with-deps`). No manual intervention is required — the next run after a Playwright bump simply takes slightly longer.

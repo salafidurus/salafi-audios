@@ -33,10 +33,10 @@ hook bindings.
 
 ## Key Commands
 
-- `pnpm --filter core-i18n build` — Build the package
-- `pnpm --filter core-i18n typecheck` — Type check
-- `pnpm --filter core-i18n lint` — Lint
-- `pnpm --filter core-i18n test` — Run tests
+- `bun run --filter @sd/core-i18n build` — Build the package
+- `bun run --filter @sd/core-i18n typecheck` — Type check
+- `bun run --filter @sd/core-i18n lint` — Lint
+- `bun run --filter @sd/core-i18n test` — Run tests
 
 ## Known Constraints
 

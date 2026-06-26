@@ -14,16 +14,25 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: "24"
+          bun-version: "1.3.3"
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
+      - name: Restore bun dependencies
+        id: bun-cache
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            node_modules
+            .bun
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock', 'package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
 
       - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
+        if: steps.bun-cache.outputs.cache-hit != 'true'
+        run: bun install --frozen-lockfile
 
       - name: Run Secretlint
-        run: pnpm security:secrets
+        run: bun run security:secrets

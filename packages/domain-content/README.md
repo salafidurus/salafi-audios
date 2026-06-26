@@ -44,8 +44,8 @@ src/
 
 ## Key Commands
 
-- `pnpm --filter domain-content typecheck` — Type check
-- `pnpm --filter domain-content test` — Run tests
+- `bun run --filter @sd/domain-content typecheck` — Type check
+- `bun run --filter @sd/domain-content test` — Run tests
 
 ## Known Constraints
 

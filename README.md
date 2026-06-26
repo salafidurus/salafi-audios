@@ -21,43 +21,43 @@ This monorepo contains the full system:
 Prerequisites:
 
 - Node.js 24.x
-- `pnpm@11.x` (repo pins `pnpm@11.5.3`)
+- Bun 1.3.x (repo pins `bun@1.3.3`)
 
 Install and run:
 
 ```bash
-pnpm i
-pnpm dev
+bun install
+bun run dev
 ```
 
 Useful scoped dev commands:
 
 ```bash
-pnpm dev:api
-pnpm dev:web
-pnpm dev:native
-pnpm dev:native:build        # native build without cleaning (expo run:android)
-pnpm dev:native:clean-build  # prebuild --clean + native build
+bun run dev:api
+bun run dev:web
+bun run dev:native
+bun run dev:native:build:android   # native build without cleaning (expo run:android)
+bun run dev:native:clean-build:android  # prebuild --clean + native build
 ```
 
 ## Monorepo Commands
 
 Run from repo root:
 
-- Build: `pnpm build`
-- Lint: `pnpm lint`
-- Typecheck: `pnpm typecheck`
-- Test: `pnpm test`
-- E2E: `pnpm test:e2e`
-- Pre-push suite: `pnpm test:prepush`
-- Contract/codegen: `pnpm contract`
+- Build: `bun run build`
+- Lint: `bun run lint`
+- Typecheck: `bun run typecheck`
+- Test: `bun run test`
+- E2E: `bun run test:e2e`
+- Pre-push suite: `bun run test:prepush`
+- API OpenAPI generation: `bun run --filter api openapi`
 
 Scoped examples:
 
-- API only: `pnpm --filter api <script>`
-- Web only: `pnpm --filter web <script>`
-- Mobile only: `pnpm --filter mobile <script>`
-- Native scaffold only: `pnpm --filter native <script>`
+- API only: `bun run --filter api <script>`
+- Web only: `bun run --filter web <script>`
+- Mobile only: `bun run --filter mobile <script>`
+- Native only: `bun run --filter native <script>`
 
 ## Architecture Guardrails
 

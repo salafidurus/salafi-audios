@@ -82,7 +82,7 @@ export function parseArgs(argv: string[]): IngestCliArgs {
   }
 
   if (!result.tag.trim()) {
-    throw new Error("Missing required --tag. Example: pnpm ingest:content -- --tag phase-02-seed");
+    throw new Error("Missing required --tag. Example: bun run ingest:content -- --tag phase-02-seed");
   }
 
   return result;

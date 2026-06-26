@@ -17,31 +17,31 @@ Core modules:
 From repo root:
 
 ```bash
-pnpm ingest:content -- --tag phase-02-seed
+bun run ingest:content -- --tag phase-02-seed
 ```
 
 Fix grouped series collections:
 
 ```bash
-pnpm --filter @sd/util-ingest fix:series-collections -- --tag phase-02-series-fix
+bun run --filter @sd/util-ingest fix:series-collections -- --tag phase-02-series-fix
 ```
 
 Optional prefixes override:
 
 ```bash
-pnpm --filter @sd/util-ingest fix:series-collections -- --tag phase-02-series-fix --prefixes shAbadSB,shBnBazSB
+bun run --filter @sd/util-ingest fix:series-collections -- --tag phase-02-series-fix --prefixes shAbadSB,shBnBazSB
 ```
 
 Remove a tagged ingestion batch:
 
 ```bash
-pnpm ingest:remove -- --tag phase-02-seed --environment development
+bun run ingest:remove -- --tag phase-02-seed --environment development
 ```
 
 Or scoped directly:
 
 ```bash
-pnpm --filter @sd/util-ingest ingest:content -- --tag phase-02-seed
+bun run --filter @sd/util-ingest ingest:content -- --tag phase-02-seed
 ```
 
 ## Options
