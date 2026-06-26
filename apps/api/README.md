@@ -12,43 +12,36 @@ This app is the authoritative backend for Salafi Durus.
 From the monorepo root:
 
 ```bash
-pnpm dev:api
+bun run dev:api
 ```
 
 Or scoped directly:
 
 ```bash
-pnpm --filter api dev
+bun run --filter api dev
 ```
 
 ## Common Commands
 
 Run from repo root:
 
-- Build: `pnpm --filter api build`
-- Lint: `pnpm --filter api lint`
-- Typecheck: `pnpm --filter api typecheck`
-- Unit tests: `pnpm --filter api test`
-- E2E tests: `pnpm --filter api test:e2e`
+- Build: `bun run --filter api build`
+- Lint: `bun run --filter api lint`
+- Typecheck: `bun run --filter api typecheck`
+- Unit tests: `bun run --filter api test`
+- E2E tests: `bun run --filter api test:e2e`
 
 Single-test examples:
 
-- One file: `pnpm --filter api test -- src/modules/topics/topics.service.spec.ts`
-- By name: `pnpm --filter api test -- src/modules/topics/topics.service.spec.ts -t "returns topic by slug"`
+- One file: `bun run --filter api test -- src/modules/topics/topics.service.spec.ts`
+- By name: `bun run --filter api test -- src/modules/topics/topics.service.spec.ts -t "returns topic by slug"`
 
 ## OpenAPI and Client Contract
 
 When backend contract changes:
 
 ```bash
-pnpm openapi
-pnpm codegen
-```
-
-Or run both:
-
-```bash
-pnpm contract
+bun run openapi
 ```
 
 Never hand-edit generated files in `packages/api-client/generated/`.
@@ -60,13 +53,13 @@ Content ingestion is implemented in `packages/util-ingest`.
 Run from repo root:
 
 ```bash
-pnpm ingest:content
+bun run ingest:content
 ```
 
 Or scoped directly:
 
 ```bash
-pnpm --filter @sd/util-ingest ingest:content
+bun run --filter @sd/util-ingest ingest:content
 ```
 
 For audio assets stored as relative object keys, set `ASSET_CDN_BASE_URL` in API env so

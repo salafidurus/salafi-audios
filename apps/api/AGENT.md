@@ -40,7 +40,7 @@ This service is the authority for business rules, permissions, and state transit
 
 - Shared types are defined in `@sd/core-contracts` - import from there.
 - When API response shapes change, update `packages/core-contracts/src/types/` manually.
-- Run `pnpm --filter core-contracts build` after updating contracts.
+- Run `bun run --filter @sd/core-contracts build` after updating contracts.
 
 ## Data and media rules
 

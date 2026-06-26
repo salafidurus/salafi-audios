@@ -34,10 +34,10 @@ src/
 
 ## Key Commands
 
-- `pnpm --filter core-contracts build` — Build the package
-- `pnpm --filter core-contracts typecheck` — Type check
-- `pnpm --filter core-contracts lint` — Lint
-- `pnpm --filter core-contracts test` — Run tests
+- `bun run --filter @sd/core-contracts build` — Build the package
+- `bun run --filter @sd/core-contracts typecheck` — Type check
+- `bun run --filter @sd/core-contracts lint` — Lint
+- `bun run --filter @sd/core-contracts test` — Run tests
 
 ## Constraints
 

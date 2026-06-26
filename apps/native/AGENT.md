@@ -5,8 +5,8 @@ Native mobile client (iOS + Android). All 5 tabs (Search, Feed, Live, Library, A
 ## Rules
 
 - Keep feature slices thin: screens assemble package-owned hooks and shared components.
-- Use `pnpm --filter native exec expo install <pkg>` to install dependencies so Expo picks the compatible version.
-- Run `pnpm --filter native exec expo-doctor` after adding native dependencies.
+- Use `bun expo install <pkg>` to install dependencies so Expo picks the compatible version.
+- Run `bun run expo:check` after adding native dependencies.
 - Verify UI changes on the Android emulator using Argent MCP tools.
 
 ## Source structure
@@ -30,9 +30,9 @@ src/
 - Test runner: **jest** (not vitest — packages use vitest; native uses jest).
 - RTL version: `@testing-library/react-native` v14 — `render` and `fireEvent` are async; always `await` them.
 - Text must be wrapped in `<Text>` for RTL queries to find it.
-- Single file: `pnpm --filter native test -- src/features/account/screens/account.screen.spec.tsx`
-- By name: `pnpm --filter native test -- -t "renders loading state"`
-- Watch: `pnpm --filter native test:watch -- src/features/account/screens/account.screen.spec.tsx`
+- Single file: `bun run test -- src/features/account/screens/account.screen.spec.tsx`
+- By name: `bun run test -- -t "renders loading state"`
+- Watch: `bun run test:watch -- src/features/account/screens/account.screen.spec.tsx`
 
 ## Android dev client
 

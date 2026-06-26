@@ -6,7 +6,7 @@
 
 // const config = getSentryExpoConfig(projectRoot);
 
-// pnpm symlinks workspace packages into local node_modules — Metro follows
+// Workspace package symlinks live in local node_modules — Metro follows
 // symlinks automatically, so explicit watchFolders are not needed and cause
 // FallbackWatcher crashes on Windows when walking broken symlinks.
 // config.resolver.nodeModulesPaths = [

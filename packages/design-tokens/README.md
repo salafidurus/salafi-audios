@@ -29,9 +29,9 @@ src/
 
 ## Key Commands
 
-- `pnpm --filter design-tokens build` — Build the package
-- `pnpm --filter design-tokens typecheck` — Type check
-- `pnpm --filter design-tokens lint` — Lint
+- `bun run --filter @sd/design-tokens build` — Build the package
+- `bun run --filter @sd/design-tokens typecheck` — Type check
+- `bun run --filter @sd/design-tokens lint` — Lint
 
 ## Constraints
 

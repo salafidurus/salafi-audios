@@ -26,7 +26,7 @@ src/
 
 ## Key Commands
 
-- `pnpm --filter domain-search typecheck` — Type check
+- `bun run --filter @sd/domain-search typecheck` — Type check
 
 ## Constraints
 

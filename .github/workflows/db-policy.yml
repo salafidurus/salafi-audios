@@ -31,18 +31,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v6
-
-      - uses: actions/setup-node@v6
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
+          bun-version: "1.3.3"
 
       - name: Install
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Generate Prisma client
-        run: pnpm --filter @sd/core-db prisma:generate
+        run: bun run --filter @sd/core-db prisma:generate
 
       - name: Enforce generated DB artifact policy
         run: |
