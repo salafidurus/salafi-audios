@@ -91,7 +91,7 @@
     "format": "prettier -w .",
     "format:check": "prettier -c .",
     "clean": "turbo run clean",
-    "clean:hard": "turbo run clean && rimraf node_modules **/node_modules **/.next **/dist **/build **/coverage .turbo",
+    "clean:hard": "(turbo run clean || true) && rimraf node_modules .turbo \"**/node_modules\" \"**/.next\" \"**/dist\" \"**/build\" \"**/coverage\"",
     "local-clean": "rimraf node_modules **/node_modules **/.turbo .turbo",
     "prepare": "husky",
     "postinstall": "node ./scripts/postinstall.mjs",
