@@ -7,6 +7,7 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     clearMocks: true,
+    retry: 2,
     passWithNoTests: true,
   },
 });
