@@ -47,7 +47,7 @@ jobs:
 
       - name: Get Playwright version
         id: playwright-version
-        run: echo "version=$(bun run --filter web playwright:version | cut -d' ' -f2)" >> $GITHUB_OUTPUT
+        run: echo "version=$(bun run --filter web playwright:version | grep ^Version | cut -d' ' -f2)" >> $GITHUB_OUTPUT
 
       - name: Cache Playwright browsers
         id: playwright-cache

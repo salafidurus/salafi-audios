@@ -69,7 +69,7 @@ jobs:
 
       - name: Get Playwright version
         id: playwright-version
-        run: echo "version=$(bun run --filter web playwright:version | cut -d' ' -f2)" >> $GITHUB_OUTPUT
+        run: echo "version=$(bun run --filter web playwright:version | grep ^Version | cut -d' ' -f2)" >> $GITHUB_OUTPUT
 
       # Cache Playwright browsers (~200MB) keyed by installed Playwright version to avoid
       # invalidation from unrelated changes while ensuring correct browser alignment
