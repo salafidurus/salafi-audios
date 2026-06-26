@@ -68,6 +68,6 @@ if git diff --quiet "$COMPARISON_BASE"...HEAD -- ':(glob)apps/native/**'; then
   printf "pre-push: skipping expo-doctor (no native changes)\n"
 else
   printf "pre-push: running expo-doctor\n"
-  pnpm --filter native exec expo-doctor
+  bun run native:expo:check
 fi
 
