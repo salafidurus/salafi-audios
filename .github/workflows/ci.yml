@@ -67,4 +67,4 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Build, lint, typecheck, test
-        run: turbo run build lint typecheck test --continue
+        run: bun run turbo run build lint typecheck test --continue

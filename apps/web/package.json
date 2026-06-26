@@ -15,6 +15,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
+    "playwright:version": "playwright --version",
+    "playwright:install": "playwright install --with-deps",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
