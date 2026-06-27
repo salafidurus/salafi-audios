@@ -1,7 +1,7 @@
 /** @type {import('lint-staged').Config} */
 module.exports = {
   "*": "secretlint",
-  "*.{js,jsx,ts,tsx}": ["oxlint", "prettier -w"],
-  "*.{json,md,yml,yaml}": ["prettier -w"],
+  "*.{js,jsx,ts,tsx}": ["oxlint", "oxfmt --write"],
+  "*.{json,md,yml,yaml}": ["oxfmt --write"],
   "*.md": ["markdownlint-cli2"],
 };
