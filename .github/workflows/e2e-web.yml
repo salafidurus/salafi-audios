@@ -15,7 +15,6 @@ on:
       - "packages/domain-search/**"
       - "tsconfig.base.json"
       - "tsconfig.packages.json"
-      - "eslint.config.base.mjs"
       - "bun.lock"
       - "turbo.json"
       - ".github/workflows/e2e-web.yml"
