@@ -22,7 +22,7 @@
     }
   },
   "scripts": {
-    "lint": "oxlint . && eslint .",
+    "lint": "oxlint .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",

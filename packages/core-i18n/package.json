@@ -24,7 +24,7 @@
     "clean": "rimraf dist",
     "build": "tsup src/index.ts --format esm,cjs --dts --tsconfig tsconfig.build.json --out-dir dist && node -e \"require('fs').cpSync('src/locales', 'dist/locales', {recursive:true})\"",
     "dev": "bun run build --watch",
-    "lint": "oxlint . && eslint .",
+    "lint": "oxlint .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",

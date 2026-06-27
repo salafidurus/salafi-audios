@@ -73,13 +73,12 @@ export function Providers({ children }: Props) {
         router.replace(routes.home as Href);
       });
     });
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     void initI18n()
       .then(() => setI18nReady(true))
       .catch((err) => {
-        // eslint-disable-next-line no-console
         console.warn("[i18n] init failed, falling back to default:", err);
         setI18nReady(true);
       });
