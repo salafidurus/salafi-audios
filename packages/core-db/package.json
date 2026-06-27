@@ -41,10 +41,10 @@
   "dependencies": {
     "@prisma/client": "catalog:",
     "@prisma/client-runtime-utils": "^7.3.0",
-    "@sd/core-contracts": "workspace:*"
+    "@sd/core-contracts": "workspace:*",
+    "dotenv": "^16.4.5"
   },
   "devDependencies": {
-    "dotenv": "^16.4.5",
     "pg": "^8.0.0",
     "prisma": "^7.3.0",
     "tsup": "catalog:"

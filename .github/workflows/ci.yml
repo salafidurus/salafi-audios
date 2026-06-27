@@ -124,7 +124,7 @@ jobs:
         continue-on-error: true
         env:
           PW_SKIP_WEB_BUILD: "1"
-        run: bun run test:e2e
+        run: bun run --filter web test:e2e
 
       - name: Upload Playwright report
         if: steps.e2e.outcome == 'failure'
