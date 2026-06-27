@@ -72,10 +72,13 @@ export function AdminLiveScreen() {
   const [showSessionSheet, setShowSessionSheet] = useState(false);
   const sessions = sessionsData?.sessions ?? [];
 
-  const handleStatusChange = async (id: string, status: "live" | "ended") => {
-    await updateSessionStatus(id, status);
-    refetchSessions();
-  };
+  const handleStatusChange = useCallback(
+    async (id: string, status: "live" | "ended") => {
+      await updateSessionStatus(id, status);
+      refetchSessions();
+    },
+    [refetchSessions],
+  );
 
   const handleChannelPress = useCallback((channel: LivestreamChannelDto) => {
     setEditingChannel(channel);
@@ -86,7 +89,7 @@ export function AdminLiveScreen() {
     ({ item: s }: { item: LiveSessionPublicDto }) => (
       <SessionRow session={s} onStatusChange={handleStatusChange} />
     ),
-    [],
+    [handleStatusChange],
   );
 
   const renderChannelItem = useCallback(

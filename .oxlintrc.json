@@ -1,9 +1,6 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["import"],
-  "rules": {
-    "no-console": "error"
-  },
   "ignorePatterns": [
     "**/node_modules/**",
     "**/dist/**",

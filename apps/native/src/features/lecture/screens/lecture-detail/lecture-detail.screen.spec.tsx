@@ -71,7 +71,6 @@ jest.mock("@/features/lecture/components/series-context-bar/series-context-bar",
   },
 }));
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockedUseLectureDetail = jest.mocked(useLectureDetail) as any;
 
 describe("LectureDetailScreen", () => {

@@ -1,8 +1,9 @@
 {
   "name": "native",
+  "version": "1.0.0",
+  "private": true,
   "type": "module",
   "main": "index.js",
-  "version": "1.0.0",
   "scripts": {
     "eas-build-post-install": "cd ../.. && turbo run build --filter=native^...",
     "eas-build-on-error": "sentry-eas-build-on-error",
@@ -12,7 +13,7 @@
     "prebuild:clean": "expo prebuild --clean",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "lint": "oxlint . && expo lint",
+    "lint": "oxlint . && eslint .",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage --watchAll=false",
@@ -91,18 +92,17 @@
     "zustand": "catalog:"
   },
   "devDependencies": {
+    "@babel/runtime": "^7.29.7",
     "@testing-library/react-native": "catalog:",
     "@types/jest": "catalog:",
     "@types/node": "^26.0.0",
     "@types/react": "19.2.9",
+    "babel-preset-expo": "~56.0.15",
     "eslint": "catalog:",
     "eslint-config-expo": "~56.0.0",
     "jest": "catalog:",
-    "jest-expo": "~56.0.5",
-    "babel-preset-expo": "~56.0.15",
-    "@babel/runtime": "^7.29.7"
+    "jest-expo": "~56.0.5"
   },
-  "private": true,
   "expo": {
     "install": {
       "exclude": [

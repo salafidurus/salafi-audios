@@ -3,7 +3,12 @@ import expo from "eslint-config-expo/flat.js";
 export default [
   ...expo,
   {
-    files: ["src/shared/log/**/*.{js,jsx,ts,tsx}", "app.config.ts"],
+    files: [
+      "src/shared/log/**/*.{js,jsx,ts,tsx}",
+      "app.config.ts",
+      "src/core/config/runtime-env.ts",
+      "src/core/providers.tsx",
+    ],
     rules: { "no-console": "off" },
   },
   // Enforce named exports in all non-framework files

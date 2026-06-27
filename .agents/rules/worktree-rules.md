@@ -17,6 +17,24 @@ Every implementation/task must follow this Git worktree workflow to ensure isola
     - Worktree directory: `.worktrees/fix-xxx`
     - Git branch: `fix/xxx`
 
+## Post-Creation: Copy .env Files
+
+After creating a worktree, copy all `.env` files from the main working tree into the worktree.
+These files are gitignored and not shared across worktrees.
+
+```bash
+# From repo root:
+$src = Get-Item .; $dst = "C:\dev\salafi-audios\.worktrees\<worktree-name>"
+Get-ChildItem -Path $src -Filter ".env" -Recurse -Depth 4 |
+  Where-Object { -not $_.FullName.Contains("node_modules") -and -not $_.FullName.Contains(".git") -and -not $_.FullName.Contains(".worktrees") } |
+  ForEach-Object {
+    $rel = $_.FullName.Substring($src.FullName.Length + 1)
+    $target = Join-Path $dst $rel
+    New-Item -ItemType File -Path $target -Force | Out-Null
+    Copy-Item -Path $_.FullName -Destination $target -Force
+  }
+```
+
 ## Cleanup & Deletion Workflow
 
 1. **Push when complete**: When the work is fully complete and verified, push the branch to the remote repository.

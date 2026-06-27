@@ -23,7 +23,7 @@ for (const name of eagerEvaluate) {
   try {
     if (global[name]) {
       // Eagerly access a property to trigger the lazy getter
-      const _ = global[name].prototype || global[name];
+      void (global[name].prototype || global[name]);
     }
   } catch {
     // Ignore any evaluation errors during eager load

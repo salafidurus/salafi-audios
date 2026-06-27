@@ -1,6 +1,6 @@
 import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
 
-export default [
+const config = [
   ...nextCoreWebVitals,
   // Enforce named exports in all non-framework files
   {
@@ -32,3 +32,5 @@ export default [
     },
   },
 ];
+
+export default config;
