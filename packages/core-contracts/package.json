@@ -48,7 +48,7 @@
     "clean": "rimraf dist",
     "build": "tsup",
     "dev": "tsup --watch",
-    "lint": "oxlint . && eslint .",
+    "lint": "oxlint .",
     "test": "vitest run",
     "test:prepush": "vitest run --changed=origin/main",
     "typecheck": "tsc -p tsconfig.json --noEmit",

@@ -26,7 +26,7 @@
     "ingest:content": "tsx src/commands/ingest-content.ts",
     "ingest:remove": "tsx src/commands/remove-content.ts",
     "convert:supabase": "tsx src/commands/convert-supabase.ts",
-    "lint": "oxlint . && eslint .",
+    "lint": "oxlint .",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
