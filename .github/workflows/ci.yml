@@ -2,24 +2,9 @@ name: ci
 
 on:
   pull_request:
-    paths:
-      - "apps/**"
-      - "packages/**"
-      - "scripts/**"
-      - "tsconfig*.json"
-      - "**/tsconfig*.json"
-      - "**/eslint.config.*"
-      - "jest.config.*"
-      - "**/jest.config.*"
-      - "packages/core-db/prisma/**"
-      - "bun.lock"
-      - "package.json"
-      - "**/package.json"
-      - "turbo.json"
-      - ".github/workflows/ci.yml"
-      - "!**/*.md"
+    paths-ignore:
+      - "**/*.md"
 
-# Cancel stale runs on the same PR to save CI minutes on rapid pushes
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.event.pull_request.number }}
   cancel-in-progress: true
@@ -28,14 +13,13 @@ permissions:
   contents: read
 
 env:
-  # Custom Playwright path enables GitHub Actions caching (default path is not cacheable)
   PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/ms-playwright
   TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
 
 jobs:
-  verify:
-    name: verify
+  check:
+    name: check
     runs-on: ubuntu-latest
     environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
     env:
@@ -48,7 +32,7 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version: "1.3.3"
+          bun-version: "1.3.14"
 
       - name: Restore bun dependencies
         id: bun-cache
@@ -57,13 +41,111 @@ jobs:
           path: |
             node_modules
             .bun
-          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock', 'package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-bun-
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
 
       - name: Install
         if: steps.bun-cache.outputs.cache-hit != 'true'
         run: bun install --frozen-lockfile
 
-      - name: Build, lint, typecheck, test
-        run: bun run turbo run build lint typecheck test --continue
+      - name: Save bun cache
+        if: steps.bun-cache.outputs.cache-hit != 'true' && success()
+        uses: actions/cache/save@v5
+        with:
+          path: |
+            node_modules
+            .bun
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+
+      - name: Build
+        id: build
+        continue-on-error: true
+        run: bun run turbo run build
+
+      - name: Lint
+        id: lint
+        continue-on-error: true
+        run: bun run turbo run lint
+
+      - name: Typecheck
+        id: typecheck
+        continue-on-error: true
+        run: bun run turbo run typecheck
+
+      - name: Test
+        id: test
+        continue-on-error: true
+        run: bun run turbo run test
+
+      - name: Security
+        id: security
+        continue-on-error: true
+        run: bun run security:secrets
+
+      - name: DB generated policy
+        id: db-policy
+        continue-on-error: true
+        run: |
+          bun run --filter @sd/core-db prisma:generate
+          if [ -n "$(git ls-files -- packages/core-db/src/generated)" ]; then
+            echo "::error::Forbidden tracked files found in packages/core-db/src/generated"
+            git ls-files -- packages/core-db/src/generated
+            exit 1
+          fi
+          if [ -n "$(git status --porcelain --untracked-files=all -- packages/core-db/src/generated)" ]; then
+            echo "::error::packages/core-db/src/generated must remain git-clean after generation"
+            git status --porcelain --untracked-files=all -- packages/core-db/src/generated
+            exit 1
+          fi
+
+      - name: Get Playwright version
+        id: playwright-version
+        continue-on-error: true
+        run: echo "version=$(bun run --filter web playwright:version | grep ^Version | cut -d' ' -f2)" >> $GITHUB_OUTPUT
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
+          key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        continue-on-error: true
+        run: bun run --filter web playwright:install
+
+      - name: Build web for E2E
+        id: build-web
+        continue-on-error: true
+        run: bun run turbo run build --filter=web...
+
+      - name: Run Playwright
+        id: e2e
+        continue-on-error: true
+        env:
+          PW_SKIP_WEB_BUILD: "1"
+        run: bun run --filter web test:e2e
+
+      - name: Upload Playwright report
+        if: steps.e2e.outcome == 'failure'
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report
+
+      - name: Check for failures
+        if: always()
+        run: |
+          failed=0
+          if [ "${{ steps.build.outcome }}" = "failure" ]; then echo "::error::build failed"; failed=1; fi
+          if [ "${{ steps.lint.outcome }}" = "failure" ]; then echo "::error::lint failed"; failed=1; fi
+          if [ "${{ steps.typecheck.outcome }}" = "failure" ]; then echo "::error::typecheck failed"; failed=1; fi
+          if [ "${{ steps.test.outcome }}" = "failure" ]; then echo "::error::test failed"; failed=1; fi
+          if [ "${{ steps.security.outcome }}" = "failure" ]; then echo "::error::security failed"; failed=1; fi
+          if [ "${{ steps.db-policy.outcome }}" = "failure" ]; then echo "::error::db-policy failed"; failed=1; fi
+          if [ "${{ steps.build-web.outcome }}" = "failure" ]; then echo "::error::build-web failed"; failed=1; fi
+          if [ "${{ steps.e2e.outcome }}" = "failure" ]; then echo "::error::e2e failed"; failed=1; fi
+          if [ $failed -eq 1 ]; then exit 1; fi
+          echo "All checks passed!"
