@@ -29,7 +29,6 @@ jest.mock("@/features/i18n", () => {
   };
 });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockedUseAccountProfile = jest.mocked(useAccountProfile) as any;
 const mockedUseAdminPermissions = jest.mocked(useAdminPermissions);
 

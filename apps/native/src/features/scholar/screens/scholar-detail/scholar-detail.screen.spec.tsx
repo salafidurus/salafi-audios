@@ -48,9 +48,7 @@ jest.mock("@/features/scholar/components/scholar-content-list/scholar-content-li
   },
 }));
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockedUseScholarDetail = jest.mocked(useScholarDetail) as any;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockedUseScholarContent = jest.mocked(useScholarContent) as any;
 
 describe("ScholarDetailScreen", () => {

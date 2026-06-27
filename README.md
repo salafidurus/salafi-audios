@@ -21,7 +21,7 @@ This monorepo contains the full system:
 Prerequisites:
 
 - Node.js 24.x
-- Bun 1.3.x (repo pins `bun@1.3.3`)
+- Bun 1.3.x (repo pins `bun@1.3.14`)
 
 Install and run:
 

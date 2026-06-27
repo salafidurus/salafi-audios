@@ -53,13 +53,16 @@ export function AdminLecturesScreen() {
     });
   };
 
-  const handleRowPress = (id: string) => {
-    if (selectedIds.size > 0) {
-      toggleSelect(id);
-    } else {
-      setEditingLectureId(id);
-    }
-  };
+  const handleRowPress = useCallback(
+    (id: string) => {
+      if (selectedIds.size > 0) {
+        toggleSelect(id);
+      } else {
+        setEditingLectureId(id);
+      }
+    },
+    [selectedIds],
+  );
 
   const handleBulkAction = async (action: "publish" | "archive") => {
     setIsBulkLoading(true);
@@ -82,7 +85,7 @@ export function AdminLecturesScreen() {
         onLongPress={toggleSelect}
       />
     ),
-    [selectedIds],
+    [selectedIds, handleRowPress],
   );
 
   return (

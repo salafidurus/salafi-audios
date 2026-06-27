@@ -9,7 +9,6 @@ vi.mock("../../api/admin-lectures.api", () => ({
 }));
 
 vi.mock("@sd/core-contracts", async (importOriginal) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const actual = await importOriginal<any>();
   return {
     ...actual,
