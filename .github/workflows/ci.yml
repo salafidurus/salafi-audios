@@ -59,22 +59,22 @@ jobs:
       - name: Build
         id: build
         continue-on-error: true
-        run: bun run turbo run build
+        run: bun run build
 
       - name: Lint
         id: lint
         continue-on-error: true
-        run: bun run turbo run lint
+        run: bun run lint
 
       - name: Typecheck
         id: typecheck
         continue-on-error: true
-        run: bun run turbo run typecheck
+        run: bun run typecheck
 
       - name: Test
         id: test
         continue-on-error: true
-        run: bun run turbo run test
+        run: bun run test
 
       - name: Security
         id: security
@@ -119,14 +119,14 @@ jobs:
       - name: Build web for E2E
         id: build-web
         continue-on-error: true
-        run: bun run turbo run build --filter=web...
+        run: bun run build:web
 
       - name: Run Playwright
         id: e2e
         continue-on-error: true
         env:
           PW_SKIP_WEB_BUILD: "1"
-        run: bun run --filter web test:e2e
+        run: bun run test:e2e
 
       - name: Upload Playwright report
         if: steps.e2e.outcome == 'failure'
