@@ -2,7 +2,6 @@
   flex: 1;
   background-color: var(--surface-canvas);
   padding: var(--space-layout-page-y) var(--space-layout-page-x);
-  min-height: 100%;
 }
 
 .content {

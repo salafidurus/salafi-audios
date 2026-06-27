@@ -12,14 +12,16 @@ function formatDuration(seconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+import type { ListingFormat } from "@sd/core-contracts";
+
 export type QuickBrowseMobileProps = {
   scholars?: ScholarChipDto[];
   suggestions?: ContentSuggestionDto[];
   recentProgress?: RecentProgressDto | null;
   isLoading?: boolean;
   onSelectScholar?: (slug: string) => void;
-  onSelectSuggestion?: (slug: string) => void;
-  onContinueListening?: (lectureSlug: string) => void;
+  onSelectSuggestion?: (id: string, kind: ListingFormat) => void;
+  onContinueListening?: (lectureId: string) => void;
   onSelectCategory?: (searchKey: string) => void;
 };
 
@@ -42,7 +44,7 @@ export function QuickBrowseMobile({
           <span className={styles.header}>Continue Listening</span>
           <button
             type="button"
-            onClick={() => onContinueListening?.(recentProgress.lectureSlug)}
+            onClick={() => onContinueListening?.(recentProgress.lectureId)}
             className={styles.continueCard}
           >
             <span className={styles.continueTitle}>{recentProgress.lectureTitle}</span>
@@ -118,7 +120,7 @@ export function QuickBrowseMobile({
                   <button
                     key={item.id}
                     type="button"
-                    onClick={() => onSelectSuggestion?.(item.slug)}
+                    onClick={() => onSelectSuggestion?.(item.id, item.kind)}
                     className={styles.suggestionCard}
                   >
                     <span className={styles.suggestionTitle}>{title}</span>

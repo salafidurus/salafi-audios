@@ -9,6 +9,8 @@ import { SearchResultsListDesktop } from "@/features/search/components/SearchRes
 import { useSearchProcessing } from "@sd/domain-search";
 import { useShowOriginalContent } from "@/features/i18n/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { useRouter } from "next/navigation";
+import { routes } from "@sd/core-contracts";
 
 export function SearchProcessingDesktopScreen() {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -25,10 +27,22 @@ export function SearchProcessingDesktopScreen() {
     shouldSearch,
     errorMessage,
   } = useSearchProcessing({ showOriginal });
+  const { push } = useRouter();
 
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+
+  const handleItemClick = (item: any) => {
+    const [kind, id] = item.id.split(":");
+    if (kind === "collection") {
+      push(routes.collections.detail(id));
+    } else if (kind === "series") {
+      push(routes.series.detail(id));
+    } else if (kind === "single") {
+      push(routes.lectures.detail(id));
+    }
+  };
 
   return (
     <main className="flex flex-1 flex-col">
@@ -58,7 +72,9 @@ export function SearchProcessingDesktopScreen() {
             isFetching={isFetching}
             shouldSearch={shouldSearch}
             errorMessage={errorMessage}
-            renderItem={(item) => <SearchResultItemDesktop {...item} />}
+            renderItem={(item) => (
+              <SearchResultItemDesktop {...item} onClick={() => handleItemClick(item)} />
+            )}
           />
         </Suspense>
       </section>

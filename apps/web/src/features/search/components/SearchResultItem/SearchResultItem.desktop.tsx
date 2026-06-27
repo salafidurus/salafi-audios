@@ -9,6 +9,7 @@ export type SearchResultItemDesktopProps = {
   imageUrl?: string;
   lectureCount: number;
   durationSeconds?: number;
+  onClick?: () => void;
 };
 
 const captionStyle = {
@@ -34,7 +35,10 @@ export function SearchResultItemDesktop(item: SearchResultItemDesktopProps) {
   const durationLabel = formatDuration(item.durationSeconds);
 
   return (
-    <article className="flex cursor-pointer items-center gap-[var(--space-component-gap-md)] rounded-[var(--radius-component-card)] border border-[var(--border-subtle)] bg-[var(--surface-default)] px-3 py-3 transition hover:border-[var(--accent-primary-subtle-border)] hover:bg-[var(--accent-primary-subtle-surface)] hover:shadow-[0_18px_36px_-30px_var(--accent-primary-border)]">
+    <article
+      onClick={item.onClick}
+      className="flex cursor-pointer items-center gap-[var(--space-component-gap-md)] rounded-[var(--radius-component-card)] border border-[var(--border-subtle)] bg-[var(--surface-default)] px-3 py-3 transition hover:border-[var(--accent-primary-subtle-border)] hover:bg-[var(--accent-primary-subtle-surface)] hover:shadow-[0_18px_36px_-30px_var(--accent-primary-border)]"
+    >
       <div className="relative w-[20%] xl:w-[10%] shrink-0 aspect-[4/5] overflow-hidden rounded-[var(--radius-component-panel-sm)] bg-[var(--surface-subtle)] flex items-center justify-center">
         {imageUrl ? (
           <Image

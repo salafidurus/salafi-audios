@@ -8,14 +8,16 @@ import { useShowOriginalContent } from "@/features/i18n/content-preference";
 const SCHOLAR_SKELETON_COUNT = 5;
 const SUGGESTION_SKELETON_COUNT = 3;
 
+import type { ListingFormat } from "@sd/core-contracts";
+
 export type QuickBrowseDesktopProps = {
   scholars?: ScholarChipDto[];
   suggestions?: ContentSuggestionDto[];
   recentProgress?: RecentProgressDto | null;
   isLoading?: boolean;
   onSelectScholar?: (slug: string) => void;
-  onSelectSuggestion?: (slug: string) => void;
-  onContinueListening?: (lectureSlug: string) => void;
+  onSelectSuggestion?: (id: string, kind: ListingFormat) => void;
+  onContinueListening?: (lectureId: string) => void;
   onSelectCategory?: (searchKey: string) => void;
 };
 
@@ -70,7 +72,7 @@ export function QuickBrowseDesktop({
           </h2>
           <button
             type="button"
-            onClick={() => onContinueListening?.(recentProgress.lectureSlug)}
+            onClick={() => onContinueListening?.(recentProgress.lectureId)}
             className="flex w-full flex-col gap-[var(--space-scale-sm)] rounded-[var(--radius-component-card)] border border-[var(--border-default)] bg-[var(--surface-default)] p-[var(--space-component-card-padding)] text-left transition hover:border-[var(--accent-primary-subtle-border)] hover:bg-[var(--accent-primary-subtle-surface)]"
           >
             <span className="text-[var(--content-strong)]" style={labelStyle}>
@@ -172,7 +174,7 @@ export function QuickBrowseDesktop({
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => onSelectSuggestion?.(item.slug)}
+                  onClick={() => onSelectSuggestion?.(item.id, item.kind)}
                   className="flex w-48 shrink-0 flex-col gap-[var(--space-scale-xs)] rounded-[var(--radius-component-card)] border border-[var(--border-default)] bg-[var(--surface-default)] p-[var(--space-component-card-padding)] text-left transition hover:border-[var(--accent-primary-subtle-border)] hover:bg-[var(--accent-primary-subtle-surface)]"
                 >
                   <span className="text-[var(--content-strong)]" style={labelStyle}>

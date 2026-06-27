@@ -1,6 +1,7 @@
 "use client";
 
 import { Responsive } from "@/shared/components/Responsive";
+import type { ListingFormat } from "@sd/core-contracts";
 import { SearchHomeMobileScreen } from "./search-home.screen.mobile";
 import { SearchHomeDesktopScreen } from "./search-home.screen.desktop";
 
@@ -8,8 +9,8 @@ export type SearchHomeScreenProps = {
   onOpenSearch?: () => void;
   onSelectCategory?: (searchKey: string) => void;
   onSelectScholar?: (slug: string) => void;
-  onSelectSuggestion?: (slug: string) => void;
-  onContinueListening?: (lectureSlug: string) => void;
+  onSelectSuggestion?: (id: string, kind: ListingFormat) => void;
+  onContinueListening?: (lectureId: string) => void;
 };
 
 export function SearchHomeScreen({

@@ -5,12 +5,14 @@ import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { useQuickBrowse } from "@sd/domain-search";
 import styles from "./search-home.screen.mobile.module.css";
 
-export type SearchHomeScreenProps = {
+import type { ListingFormat } from "@sd/core-contracts";
+
+export type SearchHomeMobileScreenProps = {
   onOpenSearch?: () => void;
   onSelectCategory?: (searchKey: string) => void;
   onSelectScholar?: (slug: string) => void;
-  onSelectSuggestion?: (slug: string) => void;
-  onContinueListening?: (lectureSlug: string) => void;
+  onSelectSuggestion?: (id: string, kind: ListingFormat) => void;
+  onContinueListening?: (lectureId: string) => void;
 };
 
 export function SearchHomeMobileScreen({
@@ -19,7 +21,7 @@ export function SearchHomeMobileScreen({
   onSelectScholar,
   onSelectSuggestion,
   onContinueListening,
-}: SearchHomeScreenProps) {
+}: SearchHomeMobileScreenProps) {
   const { data, isLoading } = useQuickBrowse();
 
   return (

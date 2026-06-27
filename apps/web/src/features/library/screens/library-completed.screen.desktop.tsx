@@ -7,6 +7,7 @@ import { useLibraryCompletedScreen } from "@sd/domain-content";
 import { useAuth } from "@/core/auth/use-auth";
 import { useShowOriginalContent } from "@/features/i18n/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
 export type LibraryCompletedDesktopScreenProps = {
   onNavigateToLecture?: (id: string) => void;
@@ -59,34 +60,40 @@ export function LibraryCompletedDesktopScreen({
 
   if (isFetching && items.length === 0) {
     return (
-      <div style={{ padding: 32 }}>
-        {t("library.loadingSection", "Loading {{section}}…", {
-          section: t("library.completed", "Completed"),
-        })}
-      </div>
+      <ScreenView>
+        <div style={{ maxWidth: 720, margin: "0 auto" }}>
+          {t("library.loadingSection", "Loading {{section}}…", {
+            section: t("library.completed", "Completed"),
+          })}
+        </div>
+      </ScreenView>
     );
   }
 
   if (items.length === 0) {
     return (
-      <div style={{ padding: 32, color: "#666" }}>
-        {t("library.emptyCompleted", "No completed lectures yet. Keep listening!")}
-      </div>
+      <ScreenView>
+        <div style={{ maxWidth: 720, margin: "0 auto", color: "#666" }}>
+          {t("library.emptyCompleted", "No completed lectures yet. Keep listening!")}
+        </div>
+      </ScreenView>
     );
   }
 
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto", padding: 24 }}>
-      <h2 style={{ margin: 0, fontSize: 22, marginBottom: 16 }}>
-        {t("library.completed", "Completed")}
-      </h2>
-      {items.map((item) => (
-        <LibraryItem
-          key={item.id}
-          item={item}
-          onPress={() => onNavigateToLecture?.(item.lectureId)}
-        />
-      ))}
-    </div>
+    <ScreenView>
+      <div style={{ maxWidth: 720, margin: "0 auto" }}>
+        <h2 style={{ margin: 0, fontSize: 22, marginBottom: 16 }}>
+          {t("library.completed", "Completed")}
+        </h2>
+        {items.map((item) => (
+          <LibraryItem
+            key={item.id}
+            item={item}
+            onPress={() => onNavigateToLecture?.(item.lectureId)}
+          />
+        ))}
+      </div>
+    </ScreenView>
   );
 }
