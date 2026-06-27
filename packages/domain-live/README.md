@@ -35,8 +35,8 @@ src/
 
 ## Key Commands
 
-- `pnpm --filter domain-live typecheck` — Type check
-- `pnpm --filter domain-live test` — Run tests
+- `bun run --filter @sd/domain-live typecheck` — Type check
+- `bun run --filter @sd/domain-live test` — Run tests
 
 ## Known Constraints
 

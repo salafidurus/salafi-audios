@@ -23,14 +23,14 @@ canonical `ADMIN_PERMISSIONS` enum, so it never drifts from what the API enforce
 
 ```bash
 # 1. Generate the Prisma client (requires DATABASE_URL / DIRECT_DB_URL)
-pnpm --filter @sd/core-db prisma:generate
+bun run --filter @sd/core-db prisma:generate
 
 # 2. Local database (reads .env / .env.local in packages/core-db)
-pnpm --filter @sd/core-db make-admin user@example.com
+bun run --filter @sd/core-db make-admin user@example.com
 
 # 3. Against a Neon preview/production database
 DATABASE_URL="postgresql://user:pass@ep-xxxx.region.aws.neon.tech/neondb" \
-  pnpm --filter @sd/core-db make-admin user@example.com
+  bun run --filter @sd/core-db make-admin user@example.com
 ```
 
 The script is idempotent — re-running it on an existing admin is a no-op for
@@ -84,7 +84,7 @@ WHERE p."userId" = (SELECT id FROM "User" WHERE email = 'user@example.com');
 ## Option C — Prisma Studio
 
 ```bash
-pnpm --filter @sd/core-db prisma studio
+bun run --filter @sd/core-db prisma studio
 ```
 
 - In the `User` table, set `role` to `admin` for the target user.

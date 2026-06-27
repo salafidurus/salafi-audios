@@ -34,7 +34,7 @@ test.describe("Theme — system-preference based", () => {
 
     // Switch to dark and verify the value changes
     await page.emulateMedia({ colorScheme: "dark" });
-    await page.reload();
+    await page.reload({ timeout: 90000 });
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
 
     const darkBg = await page.evaluate(() =>

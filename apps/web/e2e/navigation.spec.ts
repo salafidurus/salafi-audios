@@ -18,10 +18,10 @@ test.describe("Navigation — sidebar & routing", () => {
       await expect(page).toHaveURL("/");
     });
 
-    test("clicking Feed sidebar link navigates to /feed", async ({ page }) => {
+    test("clicking Explore sidebar link navigates to /feed", async ({ page }) => {
       await page.goto("/");
       const sidebar = page.locator('[aria-label="Primary sidebar"]');
-      const feedLink = sidebar.getByText("Feeds", { exact: true });
+      const feedLink = sidebar.getByText("Explore", { exact: true });
       await feedLink.click();
       await expect(page).toHaveURL(/\/feed/);
     });
@@ -34,10 +34,10 @@ test.describe("Navigation — sidebar & routing", () => {
       await expect(page).toHaveURL(/\/live/);
     });
 
-    test("clicking Lessons sidebar link navigates to /library", async ({ page }) => {
+    test("clicking Library sidebar link navigates to /library", async ({ page }) => {
       await page.goto("/");
       const sidebar = page.locator('[aria-label="Primary sidebar"]');
-      const libraryLink = sidebar.getByText("Lessons", { exact: true });
+      const libraryLink = sidebar.getByText("Library", { exact: true });
       await libraryLink.click();
       await expect(page).toHaveURL(/\/library/);
     });

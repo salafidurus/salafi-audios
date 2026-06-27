@@ -144,6 +144,90 @@ export class FeedRepo {
     return { items, nextCursor };
   }
 
+  async getFeedRecent(cursor?: string, limit = 20): Promise<FeedPageDto> {
+    const locale = getRequestLocale();
+    const cursorDate = cursor ? new Date(cursor) : undefined;
+
+    const where = {
+      status: Status.published,
+      deletedAt: null,
+      scholar: { isActive: true },
+      ...(cursorDate && { createdAt: { lt: cursorDate } }),
+    };
+
+    const lectures = await this.prisma.lecture.findMany({
+      where,
+      include: {
+        translations: {
+          where: { locale, status: 'published' },
+          select: { title: true },
+          take: 1,
+        },
+        scholar: {
+          select: {
+            name: true,
+            slug: true,
+            isFeatured: true,
+            mainLanguage: true,
+            translations: {
+              where: { locale, status: 'published' },
+              select: { name: true },
+              take: 1,
+            },
+          },
+        },
+        topics: {
+          include: {
+            topic: {
+              select: { name: true, slug: true },
+            },
+          },
+        },
+      },
+      orderBy: [{ createdAt: 'desc' }],
+      take: limit + 1,
+    });
+
+    const hasMore = lectures.length > limit;
+    const page = hasMore ? lectures.slice(0, limit) : lectures;
+
+    const items: FeedItemDto[] = page.map((r) => {
+      const resolved = resolveContentTranslation({
+        base: { title: r.title },
+        originalLanguage: r.language,
+        targetLocale: locale,
+        publishedTranslation: r.translations[0] ?? null,
+      });
+      const scholarName = resolveContentTranslation({
+        base: { name: r.scholar.name },
+        originalLanguage: r.scholar.mainLanguage,
+        targetLocale: locale,
+        publishedTranslation: r.scholar.translations[0] ?? null,
+      }).fields.name;
+      return {
+        kind: 'single' as const,
+        id: r.id,
+        title: resolved.fields.title,
+        slug: r.slug,
+        scholarName,
+        scholarSlug: r.scholar.slug,
+        thumbnailUrl: null,
+        durationSeconds: r.durationSeconds,
+        publishedAt: (r.publishedAt ?? r.createdAt).toISOString(),
+        originalLanguage: resolved.originalLanguage,
+        original: resolved.original
+          ? { title: resolved.original.title }
+          : undefined,
+      };
+    });
+
+    const lastItem = page[page.length - 1];
+    const nextCursor =
+      hasMore && lastItem ? lastItem.createdAt.toISOString() : undefined;
+
+    return { items, nextCursor };
+  }
+
   async getScholars(): Promise<ScholarChipDto[]> {
     return this.fetchScholarChips(getRequestLocale(), 12);
   }

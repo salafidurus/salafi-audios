@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { useTranslation } from "react-i18next";
 import { getSubnavLabel } from "@sd/core-i18n";
-import { useAuth } from "@/core/auth";
 import { routes } from "@sd/core-contracts";
 import { Cloud, Mic, Search, CassetteTape, Settings, type LucideIcon } from "lucide-react";
 import styles from "./sidebar-bottom.module.css";
@@ -44,8 +43,6 @@ export function AdaptiveBottomBar() {
   const currentSection = getCurrentSection(pathname);
   const isHub = currentSection === "home";
 
-  const { isAuthenticated } = useAuth();
-
   // Sync active tab from URL
   useEffect(() => {
     if (currentSection !== "home") {
@@ -72,10 +69,7 @@ export function AdaptiveBottomBar() {
           {SECTION_ORDER.map((section) => {
             const Icon = SECTION_ICONS[section];
             const tab = sectionTabs[section];
-            const href =
-              section === "account" && !isAuthenticated
-                ? routes.signIn
-                : buildSectionTabPath(section, tab);
+            const href = buildSectionTabPath(section, tab);
             return (
               <Link
                 key={section}
@@ -124,10 +118,7 @@ export function AdaptiveBottomBar() {
               {SECTION_ORDER.map((section) => {
                 const Icon = SECTION_ICONS[section];
                 const tab = sectionTabs[section];
-                const href =
-                  section === "account" && !isAuthenticated
-                    ? routes.signIn
-                    : buildSectionTabPath(section, tab);
+                const href = buildSectionTabPath(section, tab);
                 return (
                   <Link
                     key={section}

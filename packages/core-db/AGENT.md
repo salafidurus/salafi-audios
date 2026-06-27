@@ -21,11 +21,11 @@ This package owns Prisma schema, migrations, and DB client utilities.
 
 ## Prisma workflow (root commands)
 
-- Generate client: `pnpm --filter core-db prisma:generate`
-- Validate schema: `pnpm --filter core-db prisma:validate`
-- Format schema: `pnpm --filter core-db prisma:format`
-- Create migration: `pnpm --filter core-db migrate:create-only`
-- Deploy migrations: `pnpm --filter core-db migrate:deploy`
+- Generate client: `bun run prisma:generate`
+- Validate schema: `bun run prisma:validate`
+- Format schema: `bun run prisma:format`
+- Create migration: `bun run migrate:create-only`
+- Deploy migrations: `bun run migrate:deploy`
 
 Env file precedence for local DB commands:
 

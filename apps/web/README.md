@@ -11,30 +11,30 @@ This is the Next.js client for public discovery and web-based editorial workflow
 From monorepo root:
 
 ```bash
-pnpm dev:web
+bun run dev:web
 ```
 
 Or scoped directly:
 
 ```bash
-pnpm --filter web dev
+bun run --filter web dev
 ```
 
 ## Common Commands
 
 Run from repo root:
 
-- Build: `pnpm --filter web build`
-- Lint: `pnpm --filter web lint`
-- Typecheck: `pnpm --filter web typecheck`
-- Unit/integration tests: `pnpm --filter web test`
-- E2E tests (Playwright): `pnpm --filter web test:e2e`
+- Build: `bun run --filter web build`
+- Lint: `bun run --filter web lint`
+- Typecheck: `bun run --filter web typecheck`
+- Unit/integration tests: `bun run --filter web test`
+- E2E tests (Playwright): `bun run --filter web test:e2e`
 
 Targeted testing examples:
 
-- Jest by name: `pnpm --filter web test -- -t "renders heading"`
-- Playwright file: `pnpm --filter web test:e2e -- e2e/catalog.spec.ts`
-- Playwright grep: `pnpm --filter web test:e2e -- --grep "catalog list"`
+- Jest by name: `bun run --filter web test -- -t "renders heading"`
+- Playwright file: `bun run --filter web test:e2e -- e2e/catalog.spec.ts`
+- Playwright grep: `bun run --filter web test:e2e -- --grep "catalog list"`
 
 ## Guardrails
 

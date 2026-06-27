@@ -253,6 +253,6 @@ Every `src/features/<name>/` directory should have an `index.ts` barrel that re-
 - TypeScript strictness is non-negotiable: do not allow implicit `any`
 - For screen loaders/view-model builders, add explicit return types (especially around `Promise.all` results)
 - For `map`/`filter`/`reduce` callbacks that can lose inference in CI, add explicit element types
-- Before finishing web changes, run `pnpm --filter web typecheck` and `pnpm --filter web build` locally to mirror CI
+- Before finishing web changes, run `bun run typecheck` and `bun run build` locally to mirror CI
 
 ---

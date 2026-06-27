@@ -33,8 +33,8 @@ src/
 
 ## Key Commands
 
-- `pnpm --filter domain-account typecheck` — Type check
-- `pnpm --filter domain-account test` — Run tests
+- `bun run --filter @sd/domain-account typecheck` — Type check
+- `bun run --filter @sd/domain-account test` — Run tests
 
 ## Known Constraints
 

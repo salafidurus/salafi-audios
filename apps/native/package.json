@@ -4,7 +4,7 @@
   "main": "index.js",
   "version": "1.0.0",
   "scripts": {
-    "eas-build-post-install": "cd ../.. && pnpm turbo run build --filter=native^...",
+    "eas-build-post-install": "cd ../.. && turbo run build --filter=native^...",
     "eas-build-on-error": "sentry-eas-build-on-error",
     "start": "expo start --dev-client",
     "dev": "expo start --dev-client",
@@ -19,7 +19,7 @@
     "test:prepush": "jest --changedSince=origin/main --passWithNoTests",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "expo:fix": "expo install --check",
-    "expo:check": "expo-doctor"
+    "expo:check": "bun run expo-doctor"
   },
   "dependencies": {
     "@better-auth/expo": "catalog:",
@@ -82,7 +82,7 @@
     "react-native-reanimated": "4.3.1",
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "4.25.2",
-    "react-native-svg": "^15.15.3",
+    "react-native-svg": "15.15.4",
     "react-native-unistyles": "^3.1.1",
     "react-native-web": "~0.21.2",
     "react-native-worklets": "0.8.3",
@@ -98,7 +98,9 @@
     "eslint": "catalog:",
     "eslint-config-expo": "~56.0.0",
     "jest": "catalog:",
-    "jest-expo": "~56.0.5"
+    "jest-expo": "~56.0.5",
+    "babel-preset-expo": "~56.0.15",
+    "@babel/runtime": "^7.29.7"
   },
   "private": true,
   "expo": {

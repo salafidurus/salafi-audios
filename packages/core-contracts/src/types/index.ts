@@ -78,7 +78,7 @@ export {
   type LibraryPageDto,
   type SavedSyncDto,
 } from "../types/library.types";
-export { type UserProfileDto } from "../types/account.types";
+export { type UserProfileDto, type UpdateProfileDto } from "../types/account.types";
 export {
   type LiveSessionStatus,
   type LiveSessionPublicDto,

@@ -20,8 +20,8 @@ Owns the HTTP client setup, request interceptors, and client initialization logi
 
 ## Key Commands
 
-- `pnpm --filter core-api build` — Build the package
-- `pnpm --filter core-api typecheck` — Type check
+- `bun run --filter @sd/core-api build` — Build the package
+- `bun run --filter @sd/core-api typecheck` — Type check
 
 ## Constraints
 

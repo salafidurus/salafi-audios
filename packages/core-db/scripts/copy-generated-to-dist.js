@@ -7,11 +7,11 @@ async function main() {
   const pkgRoot = path.join(__dirname, "..");
 
   const src = path.join(pkgRoot, "src", "generated", "prisma");
-  const dest = path.join(pkgRoot, "dist", "generated", "prisma");
+  const generatedRoot = path.join(pkgRoot, "dist", "generated");
+  const dest = path.join(generatedRoot, "prisma");
 
-  await fs.mkdir(dest, { recursive: true });
-  await fs.rm(dest, { recursive: true, force: true });
-  await fs.mkdir(dest, { recursive: true });
+  await fs.rm(generatedRoot, { recursive: true, force: true });
+  await fs.mkdir(generatedRoot, { recursive: true });
   await fs.cp(src, dest, { recursive: true });
 }
 

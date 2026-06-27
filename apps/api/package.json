@@ -12,7 +12,7 @@
     "start:dev": "nest start --watch",
     "dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "bun dist/main",
     "lint": "oxlint . && eslint .",
     "lint:fix": "eslint . --fix",
     "test": "vitest run",
@@ -20,10 +20,7 @@
     "test:cov": "vitest run --coverage",
     "test:prepush": "vitest run --changed=origin/main",
     "test:e2e": "vitest run --config vitest.config.e2e.ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "openapi:json": "pnpm build && node dist/openapi.js",
-    "preopenapi:json": "pnpm --filter @sd/core-db prisma:generate",
-    "openapi": "pnpm openapi:json"
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "catalog:",

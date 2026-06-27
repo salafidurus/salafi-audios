@@ -59,7 +59,7 @@ export function parseRemoveArgs(argv: string[]): RemoveCliArgs {
   }
 
   if (!result.tag.trim()) {
-    throw new Error("Missing required --tag. Example: pnpm ingest:remove -- --tag phase-02-seed");
+    throw new Error("Missing required --tag. Example: bun run ingest:remove -- --tag phase-02-seed");
   }
 
   return result;

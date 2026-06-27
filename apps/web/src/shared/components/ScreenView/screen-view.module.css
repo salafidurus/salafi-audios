@@ -8,8 +8,21 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  width: min(var(--space-layout-content-max), 100%);
+  width: 70%;
+  max-width: 1400px;
   margin-inline: auto;
+}
+
+@media (max-width: 1199px) {
+  .content {
+    width: 90%;
+  }
+}
+
+@media (max-width: 899px) {
+  .content {
+    width: 100%;
+  }
 }
 
 .center {

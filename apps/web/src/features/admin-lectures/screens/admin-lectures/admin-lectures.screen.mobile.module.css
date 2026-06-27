@@ -106,7 +106,7 @@
   background: none;
   color: var(--content-muted);
   font-family: var(--typo-label-md-font-family);
-  font-size: 12px;
+  font-size: var(--typo-caption-font-size);
   font-weight: 500;
   cursor: pointer;
 }
@@ -121,7 +121,7 @@
   text-align: center;
   padding: var(--space-scale-2xl) 0;
   color: var(--content-muted);
-  font-size: 14px;
+  font-size: var(--typo-body-sm-font-size);
 }
 
 .cardsList {
@@ -150,7 +150,7 @@
 
 .cardTitle {
   font-family: var(--typo-title-md-font-family);
-  font-size: 15px;
+  font-size: var(--typo-body-sm-font-size);
   font-weight: 600;
   color: var(--content-strong);
   margin: 0;
@@ -162,7 +162,7 @@
   align-items: center;
   padding: 1px 6px;
   border-radius: var(--radius-scale-full);
-  font-size: 11px;
+  font-size: var(--typo-xs-font-size);
   font-weight: 500;
   text-transform: capitalize;
 }
@@ -184,7 +184,7 @@
 
 .cardMeta {
   display: flex;
-  font-size: 13px;
+  font-size: var(--typo-caption-font-size);
   font-family: var(--typo-body-sm-font-family);
   line-height: 1.2;
 }
@@ -216,7 +216,7 @@
   border: 1px solid var(--border-subtle);
   background-color: var(--surface-default);
   color: var(--content-default);
-  font-size: 12px;
+  font-size: var(--typo-caption-font-size);
   font-weight: 500;
   cursor: pointer;
 }
@@ -225,7 +225,7 @@
   text-align: center;
   padding: var(--space-scale-2xl) 0;
   color: var(--content-muted);
-  font-size: 13px;
+  font-size: var(--typo-caption-font-size);
 }
 
 .pagination {
@@ -242,7 +242,7 @@
   border: 1px solid var(--border-default);
   background-color: var(--surface-default);
   color: var(--content-default);
-  font-size: 12px;
+  font-size: var(--typo-caption-font-size);
   cursor: pointer;
 }
 
@@ -252,6 +252,6 @@
 }
 
 .pageInfo {
-  font-size: 12px;
+  font-size: var(--typo-caption-font-size);
   color: var(--content-default);
 }

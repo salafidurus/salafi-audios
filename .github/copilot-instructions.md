@@ -24,12 +24,12 @@ Purpose: give an AI coding agent just-enough context to be immediately productiv
 
 ## Developer workflows — exact commands ▶️
 
-- Install: `pnpm i`
-- Run all in dev: `pnpm dev`
-- Run single app: `pnpm dev:api`, `pnpm dev:web`, `pnpm dev:native`
-- Build / Test / Lint / Typecheck: `pnpm build`, `pnpm test`, `pnpm lint`, `pnpm typecheck` (use Turbo filters to scope)
-- API-only tests: `pnpm --filter api test`
-- E2E (Playwright): `pnpm test:e2e`
+- Install: `bun install`
+- Run all in dev: `bun run dev`
+- Run single app: `bun run dev:api`, `bun run dev:web`, `bun run dev:native`
+- Build / Test / Lint / Typecheck: `bun run build`, `bun run test`, `bun run lint`, `bun run typecheck` (use Turbo filters to scope)
+- API-only tests: `bun run --filter api test`
+- E2E (Playwright): `bun run test:e2e`
 - Shared contract updates: edit `packages/core-contracts` manually when backend response shapes change, then build/typecheck the package.
 
 ## Codegen & generated artifacts ⚠️
@@ -93,12 +93,12 @@ Bug fixes start with a failing test that reproduces the bug.
 ### Test commands
 
 ```bash
-pnpm test                                                     # all
-pnpm --filter api test                                        # API only
-pnpm --filter api test -- src/modules/scholars/scholars.service.spec.ts
-pnpm --filter api test:watch -- src/modules/scholars/scholars.service.spec.ts
-pnpm test:e2e                                                 # Playwright
-pnpm test:prepush                                             # CI gate (changed files only)
+bun run test                                                  # all
+bun run --filter api test                                     # API only
+bun run --filter api test -- src/modules/scholars/scholars.service.spec.ts
+bun run --filter api test:watch -- src/modules/scholars/scholars.service.spec.ts
+bun run test:e2e                                              # Playwright
+bun run test:prepush                                          # CI gate (changed files only)
 ```
 
 ### Coverage minimums
@@ -128,7 +128,7 @@ Add `POST /lectures/:id/publish` →
 3. Add or update the API interface in `apps/api/src` and keep request/response DTOs explicit.
 4. Update `packages/core-contracts` to keep shared response types in sync.
 5. Add an integration test that verifies `POST /lectures/:id/publish` returns 401 without auth.
-6. Run `pnpm test` — all tests pass, commit.
+6. Run `bun run test` — all tests pass, commit.
 
 ---
 

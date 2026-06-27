@@ -34,31 +34,50 @@ export function AccountScreen({
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
       <Text style={styles.title}>{t("account.title", "Account")}</Text>
       {profile ? (
-        <View style={styles.profileRow}>
-          <View>
-            <Text style={styles.profileName}>
-              {profile.displayName || t("account.defaultUser", "User")}
-            </Text>
-            <Text style={styles.profileEmail}>{profile.email}</Text>
+        <>
+          <View style={styles.profileRow}>
+            <View>
+              <Text style={styles.profileName}>
+                {profile.displayName || t("account.defaultUser", "User")}
+              </Text>
+              <Text style={styles.profileEmail}>{profile.email}</Text>
+            </View>
           </View>
-        </View>
-      ) : null}
-      <View style={styles.actions}>
-        {hasAnyPermission && (
-          <Pressable onPress={onNavigateToAdmin} style={[styles.actionButton, styles.adminButton]}>
-            <Text style={styles.adminLabel}>{t("account.admin", "Admin")}</Text>
+          <View style={styles.actions}>
+            {hasAnyPermission && (
+              <Pressable
+                onPress={onNavigateToAdmin}
+                style={[styles.actionButton, styles.adminButton]}
+              >
+                <Text style={styles.adminLabel}>{t("account.admin", "Admin")}</Text>
+              </Pressable>
+            )}
+            <Pressable onPress={onNavigateToProfile} style={styles.actionButton}>
+              <Text style={styles.actionLabel}>{t("account.editProfile", "Edit Profile")}</Text>
+            </Pressable>
+            <Pressable onPress={onNavigateToLegal} style={styles.actionButton}>
+              <Text style={styles.actionLabel}>{t("account.legal", "Legal")}</Text>
+            </Pressable>
+            <Pressable onPress={onSignOut} style={styles.actionButton}>
+              <Text style={styles.signOutLabel}>{t("account.signOut", "Sign Out")}</Text>
+            </Pressable>
+          </View>
+        </>
+      ) : (
+        <View style={styles.actions}>
+          <Pressable onPress={onNavigateToLegal} style={styles.actionButton}>
+            <Text style={styles.actionLabel}>{t("account.legal", "Legal")}</Text>
           </Pressable>
-        )}
-        <Pressable onPress={onNavigateToProfile} style={styles.actionButton}>
-          <Text style={styles.actionLabel}>{t("account.editProfile", "Edit Profile")}</Text>
-        </Pressable>
-        <Pressable onPress={onNavigateToLegal} style={styles.actionButton}>
-          <Text style={styles.actionLabel}>{t("account.legal", "Legal")}</Text>
-        </Pressable>
-        <Pressable onPress={onSignOut} style={styles.actionButton}>
-          <Text style={styles.signOutLabel}>{t("account.signOut", "Sign Out")}</Text>
-        </Pressable>
-      </View>
+          <Pressable
+            onPress={onNavigateToProfile}
+            style={[styles.actionButton, styles.signInPrompt]}
+          >
+            <Text style={styles.signInLabel}>
+              {t("account.signInToAccess", "Sign in to access your profile")}
+            </Text>
+          </Pressable>
+        </View>
+      )}
       <View style={styles.languageSection}>
         <View>
           <Text style={styles.sectionHeading}>{t("account.language", "Language")}</Text>
@@ -133,6 +152,13 @@ const styles = StyleSheet.create((theme) => ({
   signOutLabel: {
     fontSize: 15,
     color: theme.colors.state.danger,
+  },
+  signInPrompt: {
+    borderColor: theme.colors.action.primary,
+  },
+  signInLabel: {
+    fontSize: 15,
+    color: theme.colors.action.primary,
   },
   languageSection: {
     marginTop: theme.spacing.scale["2xl"],
