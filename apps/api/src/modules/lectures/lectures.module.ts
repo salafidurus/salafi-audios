@@ -6,11 +6,7 @@ import { LecturesService } from './lectures.service';
 import { LecturesRepository } from './lectures.repo';
 
 @Module({
-  controllers: [
-    LecturesController,
-    AdminLecturesController,
-    LecturesTranslationsController,
-  ],
+  controllers: [LecturesController, AdminLecturesController, LecturesTranslationsController],
   providers: [LecturesService, LecturesRepository],
   exports: [LecturesService, LecturesRepository],
 })

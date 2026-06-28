@@ -18,9 +18,7 @@ export class AdminPermissionsService {
     };
   }
 
-  async getMyPermissions(
-    userId: string,
-  ): Promise<{ permissions: AdminPermission[] }> {
+  async getMyPermissions(userId: string): Promise<{ permissions: AdminPermission[] }> {
     const strings = await this.repo.findPermissionStringsByUserId(userId);
     return {
       permissions: strings as AdminPermission[],
@@ -41,9 +39,7 @@ export class AdminPermissionsService {
     }
     const has = await this.repo.hasPermission(userId, permission);
     if (!has) {
-      throw new NotFoundException(
-        `User does not have permission: ${permission}`,
-      );
+      throw new NotFoundException(`User does not have permission: ${permission}`);
     }
     await this.repo.revoke(userId, permission);
     return this.getPermissions(userId);

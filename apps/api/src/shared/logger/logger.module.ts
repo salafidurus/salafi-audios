@@ -21,9 +21,7 @@ function genId() {
             genReqId: (req, res) => {
               const existing = req.headers['x-request-id'];
               const id =
-                typeof existing === 'string' && existing.trim().length > 0
-                  ? existing
-                  : genId();
+                typeof existing === 'string' && existing.trim().length > 0 ? existing : genId();
 
               res.setHeader('x-request-id', id);
               return id;
@@ -43,11 +41,7 @@ function genId() {
 
             // Redact sensitive headers
             redact: {
-              paths: [
-                'req.headers.authorization',
-                'req.headers.cookie',
-                'req.headers.set-cookie',
-              ],
+              paths: ['req.headers.authorization', 'req.headers.cookie', 'req.headers.set-cookie'],
               remove: true,
             },
 

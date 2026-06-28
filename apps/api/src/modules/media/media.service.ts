@@ -2,10 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { createId } from '@paralleldrive/cuid2';
-import type {
-  PresignedUrlRequestDto,
-  PresignedUrlResponseDto,
-} from '@sd/core-contracts';
+import type { PresignedUrlRequestDto, PresignedUrlResponseDto } from '@sd/core-contracts';
 import { ConfigService } from '../../shared/config/config.module';
 
 @Injectable()
@@ -27,9 +24,7 @@ export class MediaService {
     });
   }
 
-  async getPresignedUploadUrl(
-    dto: PresignedUrlRequestDto,
-  ): Promise<PresignedUrlResponseDto> {
+  async getPresignedUploadUrl(dto: PresignedUrlRequestDto): Promise<PresignedUrlResponseDto> {
     const objectKey = `${dto.purpose}/${createId()}-${dto.filename}`;
     const command = new PutObjectCommand({
       Bucket: this.bucket,

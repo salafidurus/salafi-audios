@@ -17,24 +17,39 @@ export function useDragScroll(direction: "horizontal" | "vertical") {
     if (!el) return;
 
     let isDragging = false;
-    let startPos = 0;
+    let hasMoved = false;
+    let startX = 0;
+    let startY = 0;
     let startScroll = 0;
 
     const onMouseDown = (e: MouseEvent) => {
       isDragging = true;
-      startPos = direction === "horizontal" ? e.pageX : e.pageY;
+      hasMoved = false;
+      startX = e.clientX;
+      startY = e.clientY;
       startScroll = direction === "horizontal" ? el.scrollLeft : el.scrollTop;
-      el.style.cursor = "grabbing";
-      e.preventDefault();
     };
 
     const onMouseMove = (e: MouseEvent) => {
       if (!isDragging) return;
-      const pos = direction === "horizontal" ? e.pageX : e.pageY;
-      if (direction === "horizontal") {
-        el.scrollLeft = startScroll - (pos - startPos);
-      } else {
-        el.scrollTop = startScroll - (pos - startPos);
+      const currentX = e.clientX;
+      const currentY = e.clientY;
+      const dx = currentX - startX;
+      const dy = currentY - startY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance > 5) {
+        if (!hasMoved) {
+          hasMoved = true;
+          el.style.cursor = "grabbing";
+        }
+        e.preventDefault();
+        const delta = direction === "horizontal" ? dx : dy;
+        if (direction === "horizontal") {
+          el.scrollLeft = startScroll - delta;
+        } else {
+          el.scrollTop = startScroll - delta;
+        }
       }
     };
 
@@ -42,6 +57,14 @@ export function useDragScroll(direction: "horizontal" | "vertical") {
       if (!isDragging) return;
       isDragging = false;
       el.style.cursor = "grab";
+    };
+
+    const onClick = (e: MouseEvent) => {
+      if (hasMoved) {
+        e.preventDefault();
+        e.stopPropagation();
+        hasMoved = false;
+      }
     };
 
     const onWheel = (e: WheelEvent) => {
@@ -62,6 +85,7 @@ export function useDragScroll(direction: "horizontal" | "vertical") {
     el.addEventListener("mousedown", onMouseDown);
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
+    el.addEventListener("click", onClick, true);
     // passive: false is required because onWheel calls e.preventDefault() to intercept scroll
     // react-doctor-disable-next-line react-doctor/client-passive-event-listeners
     el.addEventListener("wheel", onWheel, { passive: false });
@@ -70,6 +94,7 @@ export function useDragScroll(direction: "horizontal" | "vertical") {
       el.removeEventListener("mousedown", onMouseDown);
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
+      el.removeEventListener("click", onClick, true);
       el.removeEventListener("wheel", onWheel);
     };
   }, [direction]);

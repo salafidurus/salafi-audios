@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Patch,
-  Param,
-  Body,
-  UseGuards,
-  Post,
-  Put,
-  Get,
-} from '@nestjs/common';
+import { Controller, Patch, Param, Body, UseGuards, Post, Put, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import type {
   LiveSessionStatus,
@@ -46,10 +37,7 @@ export class AdminLiveController {
   @Put('channels/:id')
   @RequiresPermission('manage:livestreams')
   @ApiOperation({ summary: 'Update a livestream channel' })
-  updateChannel(
-    @Param('id') id: string,
-    @Body() body: UpdateLivestreamChannelDto,
-  ) {
+  updateChannel(@Param('id') id: string, @Body() body: UpdateLivestreamChannelDto) {
     return this.service.updateChannel(id, body);
   }
 
@@ -70,10 +58,7 @@ export class AdminLiveController {
   @Patch('sessions/:id/status')
   @RequiresPermission('manage:livestreams')
   @ApiOperation({ summary: 'Update a live session status' })
-  updateSessionStatus(
-    @Param('id') id: string,
-    @Body() body: { status: LiveSessionStatus },
-  ) {
+  updateSessionStatus(@Param('id') id: string, @Body() body: { status: LiveSessionStatus }) {
     return this.service.updateSessionStatus(id, body.status);
   }
 }

@@ -35,9 +35,7 @@ const mockLecturesService = {
   unpublishTranslation: vi.fn().mockResolvedValue(draftTranslation),
 };
 
-async function buildApp(
-  overrideGuard?: () => boolean | never,
-): Promise<INestApplication> {
+async function buildApp(overrideGuard?: () => boolean | never): Promise<INestApplication> {
   const builder = Test.createTestingModule({
     controllers: [LecturesController, LecturesTranslationsController],
     providers: [
@@ -63,12 +61,8 @@ describe('LecturesTranslationsController — auth boundaries', () => {
     mockAuth.api.getSession.mockReset();
     vi.clearAllMocks();
     mockLecturesService.upsertTranslation.mockResolvedValue(draftTranslation);
-    mockLecturesService.publishTranslation.mockResolvedValue(
-      publishedTranslation,
-    );
-    mockLecturesService.unpublishTranslation.mockResolvedValue(
-      draftTranslation,
-    );
+    mockLecturesService.publishTranslation.mockResolvedValue(publishedTranslation);
+    mockLecturesService.unpublishTranslation.mockResolvedValue(draftTranslation);
     app = await buildApp();
   });
 
@@ -105,12 +99,8 @@ describe('LecturesTranslationsController — auth boundaries', () => {
     });
 
     it('GET /lectures/:id/translations lists translations', async () => {
-      mockLecturesService.listTranslations.mockResolvedValue([
-        draftTranslation,
-      ]);
-      const res = await request(app.getHttpServer())
-        .get('/lectures/l1/translations')
-        .expect(200);
+      mockLecturesService.listTranslations.mockResolvedValue([draftTranslation]);
+      const res = await request(app.getHttpServer()).get('/lectures/l1/translations').expect(200);
       expect(Array.isArray(res.body)).toBe(true);
     });
   });

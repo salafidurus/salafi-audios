@@ -61,7 +61,6 @@ export function initAuth(config: ConfigService): Auth {
 }
 
 export function getAuth(): Auth {
-  if (!_auth)
-    throw new Error('Auth not initialized — call initAuth(config) first');
+  if (!_auth) throw new Error('Auth not initialized — call initAuth(config) first');
   return _auth;
 }

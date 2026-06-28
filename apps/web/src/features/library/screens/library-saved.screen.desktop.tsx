@@ -11,6 +11,7 @@ import {
 import { useAuth } from "@/core/auth/use-auth";
 import { useShowOriginalContent } from "@/features/i18n/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
 function ProgressBar({ percent }: { percent: number }) {
   return (
@@ -144,45 +145,49 @@ export function LibrarySavedDesktopScreen({ onNavigateToLecture }: LibrarySavedD
   const completedData = useLibraryCompletedScreen(isAuthenticated);
 
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto", padding: 24 }}>
-      <h2 style={{ margin: 0, fontSize: 22, marginBottom: 16 }}>
-        {t("library.title", "My Library")}
-      </h2>
+    <ScreenView>
+      <div style={{ maxWidth: 720, margin: "0 auto" }}>
+        <h2 style={{ margin: 0, fontSize: 22, marginBottom: 16 }}>
+          {t("library.title", "My Library")}
+        </h2>
 
-      <h3 style={{ fontSize: 18, margin: "24px 0 8px" }}>
-        {t("library.inProgress", "In Progress")}
-      </h3>
-      <SectionList
-        title={t("library.inProgress", "In Progress")}
-        items={progressData.items}
-        isFetching={progressData.isFetching}
-        emptyMessage={t("library.emptyProgress", "No lectures in progress.")}
-        variant="progress"
-        onNavigateToLecture={onNavigateToLecture}
-      />
+        <h3 style={{ fontSize: 18, margin: "24px 0 8px" }}>
+          {t("library.inProgress", "In Progress")}
+        </h3>
+        <SectionList
+          title={t("library.inProgress", "In Progress")}
+          items={progressData.items}
+          isFetching={progressData.isFetching}
+          emptyMessage={t("library.emptyProgress", "No lectures in progress.")}
+          variant="progress"
+          onNavigateToLecture={onNavigateToLecture}
+        />
 
-      <h3 style={{ fontSize: 18, margin: "24px 0 8px" }}>{t("library.saved", "Saved")}</h3>
-      <SectionList
-        title={t("library.saved", "Saved")}
-        items={savedData.items}
-        isFetching={savedData.isFetching}
-        emptyMessage={t(
-          "library.emptySaved",
-          "No saved lectures yet. Save lectures to listen to later.",
-        )}
-        variant="saved"
-        onNavigateToLecture={onNavigateToLecture}
-      />
+        <h3 style={{ fontSize: 18, margin: "24px 0 8px" }}>{t("library.saved", "Saved")}</h3>
+        <SectionList
+          title={t("library.saved", "Saved")}
+          items={savedData.items}
+          isFetching={savedData.isFetching}
+          emptyMessage={t(
+            "library.emptySaved",
+            "No saved lectures yet. Save lectures to listen to later.",
+          )}
+          variant="saved"
+          onNavigateToLecture={onNavigateToLecture}
+        />
 
-      <h3 style={{ fontSize: 18, margin: "24px 0 8px" }}>{t("library.completed", "Completed")}</h3>
-      <SectionList
-        title={t("library.completed", "Completed")}
-        items={completedData.items}
-        isFetching={completedData.isFetching}
-        emptyMessage={t("library.emptyCompleted", "No completed lectures yet. Keep listening!")}
-        variant="completed"
-        onNavigateToLecture={onNavigateToLecture}
-      />
-    </div>
+        <h3 style={{ fontSize: 18, margin: "24px 0 8px" }}>
+          {t("library.completed", "Completed")}
+        </h3>
+        <SectionList
+          title={t("library.completed", "Completed")}
+          items={completedData.items}
+          isFetching={completedData.isFetching}
+          emptyMessage={t("library.emptyCompleted", "No completed lectures yet. Keep listening!")}
+          variant="completed"
+          onNavigateToLecture={onNavigateToLecture}
+        />
+      </div>
+    </ScreenView>
   );
 }

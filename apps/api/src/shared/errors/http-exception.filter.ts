@@ -1,10 +1,4 @@
-import {
-  ArgumentsHost,
-  Catch,
-  ExceptionFilter,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import { Prisma } from '@sd/core-db';
 import { ConfigService } from '../../shared/config/config.service';
 import type { Request, Response } from 'express';
@@ -26,19 +20,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
     let details: unknown = undefined;
 
     if (this.isPrismaConnectionRefused(exception)) {
-      message =
-        'Database connection refused. Ensure PostgreSQL is running and reachable.';
+      message = 'Database connection refused. Ensure PostgreSQL is running and reachable.';
     } else if (exception instanceof HttpException) {
       statusCode = exception.getStatus();
       const response = exception.getResponse();
 
       if (typeof response === 'string') {
         message = response;
-      } else if (
-        response &&
-        typeof response === 'object' &&
-        'message' in response
-      ) {
+      } else if (response && typeof response === 'object' && 'message' in response) {
         const body = response;
 
         if (Array.isArray(body.message)) {
@@ -53,9 +42,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
 
     const isProd = this.config.NODE_ENV === 'production';
-    const devDetails = isProd
-      ? undefined
-      : this.buildDevDetails(exception, details);
+    const devDetails = isProd ? undefined : this.buildDevDetails(exception, details);
 
     res.status(statusCode).json({
       statusCode,
@@ -67,10 +54,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     });
   }
 
-  private buildDevDetails(
-    exception: unknown,
-    existingDetails: unknown,
-  ): unknown {
+  private buildDevDetails(exception: unknown, existingDetails: unknown): unknown {
     if (existingDetails !== undefined) {
       return existingDetails;
     }
@@ -123,8 +107,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
   private isPrismaConnectionRefused(exception: unknown): boolean {
     return (
-      exception instanceof Prisma.PrismaClientKnownRequestError &&
-      exception.code === 'ECONNREFUSED'
+      exception instanceof Prisma.PrismaClientKnownRequestError && exception.code === 'ECONNREFUSED'
     );
   }
 }

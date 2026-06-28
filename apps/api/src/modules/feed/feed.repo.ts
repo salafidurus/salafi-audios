@@ -104,9 +104,7 @@ export class FeedRepo {
         durationSeconds: r.durationSeconds,
         publishedAt: (r.publishedAt ?? r.createdAt).toISOString(),
         originalLanguage: resolved.originalLanguage,
-        original: resolved.original
-          ? { title: resolved.original.title }
-          : undefined,
+        original: resolved.original ? { title: resolved.original.title } : undefined,
       };
     });
 
@@ -137,9 +135,7 @@ export class FeedRepo {
 
     const lastItem = page[page.length - 1];
     const nextCursor =
-      hasMore && lastItem
-        ? (lastItem.publishedAt ?? lastItem.createdAt).toISOString()
-        : undefined;
+      hasMore && lastItem ? (lastItem.publishedAt ?? lastItem.createdAt).toISOString() : undefined;
 
     return { items, nextCursor };
   }
@@ -215,15 +211,12 @@ export class FeedRepo {
         durationSeconds: r.durationSeconds,
         publishedAt: (r.publishedAt ?? r.createdAt).toISOString(),
         originalLanguage: resolved.originalLanguage,
-        original: resolved.original
-          ? { title: resolved.original.title }
-          : undefined,
+        original: resolved.original ? { title: resolved.original.title } : undefined,
       };
     });
 
     const lastItem = page[page.length - 1];
-    const nextCursor =
-      hasMore && lastItem ? lastItem.createdAt.toISOString() : undefined;
+    const nextCursor = hasMore && lastItem ? lastItem.createdAt.toISOString() : undefined;
 
     return { items, nextCursor };
   }
@@ -236,10 +229,7 @@ export class FeedRepo {
     return this.fetchScholarChips(locale, 8);
   }
 
-  private async fetchScholarChips(
-    locale: Locale,
-    take: number,
-  ): Promise<ScholarChipDto[]> {
+  private async fetchScholarChips(locale: Locale, take: number): Promise<ScholarChipDto[]> {
     const records = await this.prisma.scholar.findMany({
       where: { isActive: true },
       orderBy: [{ isFeatured: 'desc' }, { isKibar: 'desc' }],
@@ -271,9 +261,7 @@ export class FeedRepo {
         slug: r.slug,
         imageUrl: r.imageUrl,
         originalLanguage: resolved.originalLanguage,
-        original: resolved.original
-          ? { name: resolved.original.name }
-          : undefined,
+        original: resolved.original ? { name: resolved.original.name } : undefined,
       };
     });
   }
@@ -348,9 +336,7 @@ export class FeedRepo {
         thumbnailUrl: null,
         durationSeconds: lecture.durationSeconds,
         originalLanguage: resolved.originalLanguage,
-        original: resolved.original
-          ? { title: resolved.original.title }
-          : undefined,
+        original: resolved.original ? { title: resolved.original.title } : undefined,
       };
     });
 

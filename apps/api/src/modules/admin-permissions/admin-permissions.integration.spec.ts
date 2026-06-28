@@ -58,15 +58,11 @@ describe('AdminPermissionsController — auth boundaries', () => {
     });
 
     it('GET /admin/permissions/me returns 401 without a session', () => {
-      return request(app.getHttpServer())
-        .get('/admin/permissions/me')
-        .expect(401);
+      return request(app.getHttpServer()).get('/admin/permissions/me').expect(401);
     });
 
     it('GET /admin/permissions/:userId returns 401 without a session', () => {
-      return request(app.getHttpServer())
-        .get('/admin/permissions/u2')
-        .expect(401);
+      return request(app.getHttpServer()).get('/admin/permissions/u2').expect(401);
     });
 
     it('POST /admin/permissions/:userId returns 401 without a session', () => {
@@ -77,9 +73,7 @@ describe('AdminPermissionsController — auth boundaries', () => {
     });
 
     it('DELETE /admin/permissions/:userId/:permission returns 401 without a session', () => {
-      return request(app.getHttpServer())
-        .delete('/admin/permissions/u2/manage:admin')
-        .expect(401);
+      return request(app.getHttpServer()).delete('/admin/permissions/u2/manage:admin').expect(401);
     });
   });
 
@@ -94,9 +88,7 @@ describe('AdminPermissionsController — auth boundaries', () => {
     });
 
     it('GET /admin/permissions/:userId returns 403 without manage:admin', () => {
-      return request(app.getHttpServer())
-        .get('/admin/permissions/u2')
-        .expect(403);
+      return request(app.getHttpServer()).get('/admin/permissions/u2').expect(403);
     });
 
     it('POST /admin/permissions/:userId returns 403 without manage:admin', () => {
@@ -107,9 +99,7 @@ describe('AdminPermissionsController — auth boundaries', () => {
     });
 
     it('DELETE /admin/permissions/:userId/:permission returns 403 without manage:admin', () => {
-      return request(app.getHttpServer())
-        .delete('/admin/permissions/u2/manage:admin')
-        .expect(403);
+      return request(app.getHttpServer()).delete('/admin/permissions/u2/manage:admin').expect(403);
     });
   });
 
@@ -121,9 +111,7 @@ describe('AdminPermissionsController — auth boundaries', () => {
       });
       mockAdminPermissionsService.getMyPermissions.mockResolvedValue([]);
 
-      return request(app.getHttpServer())
-        .get('/admin/permissions/me')
-        .expect(200);
+      return request(app.getHttpServer()).get('/admin/permissions/me').expect(200);
     });
   });
 });

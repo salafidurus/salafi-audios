@@ -34,9 +34,7 @@ describe('AdminPermissionsService', () => {
     }).compile();
 
     service = module.get(AdminPermissionsService);
-    repo = module.get(
-      AdminPermissionsRepository,
-    ) as Mocked<AdminPermissionsRepository>;
+    repo = module.get(AdminPermissionsRepository) as Mocked<AdminPermissionsRepository>;
   });
 
   afterEach(() => {
@@ -73,10 +71,7 @@ describe('AdminPermissionsService', () => {
 
   describe('getMyPermissions', () => {
     it('should return permission strings for user', async () => {
-      repo.findPermissionStringsByUserId.mockResolvedValue([
-        'manage:scholars',
-        'manage:content',
-      ]);
+      repo.findPermissionStringsByUserId.mockResolvedValue(['manage:scholars', 'manage:content']);
 
       const result = await service.getMyPermissions('user1');
 
@@ -119,9 +114,7 @@ describe('AdminPermissionsService', () => {
     it('should throw NotFoundException for invalid permission', async () => {
       const invalidPermission = 'INVALID_PERMISSION';
 
-      await expect(
-        service.grant('user1', invalidPermission, 'admin1'),
-      ).rejects.toThrow(
+      await expect(service.grant('user1', invalidPermission, 'admin1')).rejects.toThrow(
         new NotFoundException(`Unknown permission: ${invalidPermission}`),
       );
 
@@ -133,9 +126,7 @@ describe('AdminPermissionsService', () => {
       for (const permission of ADMIN_PERMISSIONS) {
         repo.findByUserId.mockResolvedValue([]);
 
-        await expect(
-          service.grant('user1', permission, 'admin1'),
-        ).resolves.toBeDefined();
+        await expect(service.grant('user1', permission, 'admin1')).resolves.toBeDefined();
 
         expect(repo.grant).toHaveBeenCalledWith('user1', permission, 'admin1');
       }

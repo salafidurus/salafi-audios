@@ -6,10 +6,7 @@ import type { ProgressSyncItemDto, AudioProgressDto } from '@sd/core-contracts';
 export class AudioRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getUserProgress(
-    userId: string,
-    since?: Date,
-  ): Promise<AudioProgressDto[]> {
+  async getUserProgress(userId: string, since?: Date): Promise<AudioProgressDto[]> {
     const progressRecords = await this.prisma.userLectureProgress.findMany({
       where: {
         userId,
@@ -29,9 +26,7 @@ export class AudioRepository {
       lectureId: record.lectureId,
       positionSeconds: record.positionSeconds,
       durationSeconds: record.lecture.durationSeconds || 0,
-      completedAt: record.isCompleted
-        ? record.updatedAt.toISOString()
-        : undefined,
+      completedAt: record.isCompleted ? record.updatedAt.toISOString() : undefined,
       updatedAt: record.updatedAt.toISOString(),
     }));
   }

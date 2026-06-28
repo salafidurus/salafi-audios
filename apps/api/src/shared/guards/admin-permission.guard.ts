@@ -1,9 +1,4 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
 import { REQUIRES_PERMISSION_KEY } from '../decorators/requires-permission.decorator';
@@ -17,10 +12,10 @@ export class AdminPermissionGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const requiredPermission = this.reflector.getAllAndOverride<string>(
-      REQUIRES_PERMISSION_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const requiredPermission = this.reflector.getAllAndOverride<string>(REQUIRES_PERMISSION_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
     // Routes without @RequiresPermission are guarded only by AuthGuard — this guard is a
     // layer on top, not a replacement. Returning true here lets AuthGuard's decision stand.

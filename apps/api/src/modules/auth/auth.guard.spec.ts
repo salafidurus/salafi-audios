@@ -2,11 +2,7 @@ import { vi } from 'vitest';
 // apps/api/src/modules/auth/auth.guard.spec.ts
 import { AuthGuard } from './auth.guard';
 import { Reflector } from '@nestjs/core';
-import {
-  ExecutionContext,
-  ForbiddenException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ExecutionContext, ForbiddenException, UnauthorizedException } from '@nestjs/common';
 
 const mockAuth = { api: { getSession: vi.fn() } };
 vi.mock('./auth.instance', () => ({ getAuth: () => mockAuth }));
@@ -40,9 +36,7 @@ describe('AuthGuard', () => {
   it('throws 401 when no session', async () => {
     vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
     mockAuth.api.getSession.mockResolvedValue(null);
-    await expect(guard.canActivate(mockContext())).rejects.toThrow(
-      UnauthorizedException,
-    );
+    await expect(guard.canActivate(mockContext())).rejects.toThrow(UnauthorizedException);
   });
 
   it('attaches user to request and returns true when session is valid', async () => {
@@ -65,9 +59,7 @@ describe('AuthGuard', () => {
       .mockReturnValueOnce(false) // isPublic
       .mockReturnValueOnce(['admin']); // roles
     mockAuth.api.getSession.mockResolvedValue({ user: fakeUser, session: {} });
-    await expect(guard.canActivate(mockContext())).rejects.toThrow(
-      UnauthorizedException,
-    );
+    await expect(guard.canActivate(mockContext())).rejects.toThrow(UnauthorizedException);
   });
 
   describe('ban enforcement', () => {
@@ -77,9 +69,7 @@ describe('AuthGuard', () => {
         user: { id: 'u2', role: 'user', banned: true, banExpires: null },
         session: {},
       });
-      await expect(guard.canActivate(mockContext())).rejects.toThrow(
-        ForbiddenException,
-      );
+      await expect(guard.canActivate(mockContext())).rejects.toThrow(ForbiddenException);
     });
 
     it('throws 403 for a temporarily banned user whose ban has not yet expired', async () => {
@@ -89,15 +79,11 @@ describe('AuthGuard', () => {
         user: { id: 'u3', role: 'user', banned: true, banExpires: tomorrow },
         session: {},
       });
-      await expect(guard.canActivate(mockContext())).rejects.toThrow(
-        ForbiddenException,
-      );
+      await expect(guard.canActivate(mockContext())).rejects.toThrow(ForbiddenException);
     });
 
     it('passes through when a temporary ban has already expired', async () => {
-      const yesterday = new Date(
-        Date.now() - 24 * 60 * 60 * 1000,
-      ).toISOString();
+      const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
       vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
       const req: Record<string, unknown> = { headers: {}, user: undefined };
       const ctx = {

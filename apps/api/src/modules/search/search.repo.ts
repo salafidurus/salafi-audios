@@ -30,10 +30,7 @@ export class SearchRepository {
     const locale = getRequestLocale();
     const topicSlugs = this.resolveTopicSlugs(query);
     const orderBySql = this.collectionOrderBySql(query.q ?? '', includeRelated);
-    const fallbackOrderBySql = this.collectionFallbackOrderBySql(
-      query.q ?? '',
-      includeRelated,
-    );
+    const fallbackOrderBySql = this.collectionFallbackOrderBySql(query.q ?? '', includeRelated);
     const rows = await this.runSearchQuery(
       () =>
         this.prisma.$queryRaw<SearchRow[]>(Prisma.sql`
@@ -102,10 +99,7 @@ export class SearchRepository {
     const locale = getRequestLocale();
     const topicSlugs = this.resolveTopicSlugs(query);
     const orderBySql = this.seriesOrderBySql(query.q ?? '', includeRelated);
-    const fallbackOrderBySql = this.seriesFallbackOrderBySql(
-      query.q ?? '',
-      includeRelated,
-    );
+    const fallbackOrderBySql = this.seriesFallbackOrderBySql(query.q ?? '', includeRelated);
     const rows = await this.runSearchQuery(
       () =>
         this.prisma.$queryRaw<SearchRow[]>(Prisma.sql`
@@ -176,10 +170,7 @@ export class SearchRepository {
     const locale = getRequestLocale();
     const topicSlugs = this.resolveTopicSlugs(query);
     const orderBySql = this.lectureOrderBySql(query.q ?? '', includeRelated);
-    const fallbackOrderBySql = this.lectureFallbackOrderBySql(
-      query.q ?? '',
-      includeRelated,
-    );
+    const fallbackOrderBySql = this.lectureFallbackOrderBySql(query.q ?? '', includeRelated);
     const rows = await this.runSearchQuery(
       () =>
         this.prisma.$queryRaw<SearchRow[]>(Prisma.sql`
@@ -253,9 +244,7 @@ export class SearchRepository {
         throw error;
       }
 
-      this.logger.warn(
-        'Trigram search support is unavailable. Falling back to ILIKE search.',
-      );
+      this.logger.warn('Trigram search support is unavailable. Falling back to ILIKE search.');
 
       return fallback();
     }
@@ -273,10 +262,7 @@ export class SearchRepository {
     return [];
   }
 
-  private collectionMatchSql(
-    query: string,
-    includeRelated: boolean,
-  ): Prisma.Sql {
+  private collectionMatchSql(query: string, includeRelated: boolean): Prisma.Sql {
     const queryText = Prisma.sql`CAST(${query} AS TEXT)`;
     const clauses: Prisma.Sql[] = [
       Prisma.sql`c."title" % ${queryText}`,
@@ -381,10 +367,7 @@ export class SearchRepository {
     return Prisma.sql`${Prisma.join(clauses, ' OR ')}`;
   }
 
-  private collectionFallbackMatchSql(
-    query: string,
-    includeRelated: boolean,
-  ): Prisma.Sql {
+  private collectionFallbackMatchSql(query: string, includeRelated: boolean): Prisma.Sql {
     const pattern = this.likeContainsPattern(query);
     const clauses: Prisma.Sql[] = [
       Prisma.sql`c."title" ILIKE ${pattern} ESCAPE '\\'`,
@@ -412,10 +395,7 @@ export class SearchRepository {
     return Prisma.sql`${Prisma.join(clauses, ' OR ')}`;
   }
 
-  private seriesFallbackMatchSql(
-    query: string,
-    includeRelated: boolean,
-  ): Prisma.Sql {
+  private seriesFallbackMatchSql(query: string, includeRelated: boolean): Prisma.Sql {
     const pattern = this.likeContainsPattern(query);
     const clauses: Prisma.Sql[] = [
       Prisma.sql`se."title" ILIKE ${pattern} ESCAPE '\\'`,
@@ -443,10 +423,7 @@ export class SearchRepository {
     return Prisma.sql`${Prisma.join(clauses, ' OR ')}`;
   }
 
-  private lectureFallbackMatchSql(
-    query: string,
-    includeRelated: boolean,
-  ): Prisma.Sql {
+  private lectureFallbackMatchSql(query: string, includeRelated: boolean): Prisma.Sql {
     const pattern = this.likeContainsPattern(query);
     const clauses: Prisma.Sql[] = [
       Prisma.sql`l."title" ILIKE ${pattern} ESCAPE '\\'`,
@@ -534,79 +511,39 @@ export class SearchRepository {
     `;
   }
 
-  private collectionFallbackOrderBySql(
-    query: string,
-    includeRelated: boolean,
-  ): Prisma.Sql {
-    const clauses = this.fallbackRankingClauses(
-      'c."title"',
-      's."name"',
-      query,
-      includeRelated,
-    );
+  private collectionFallbackOrderBySql(query: string, includeRelated: boolean): Prisma.Sql {
+    const clauses = this.fallbackRankingClauses('c."title"', 's."name"', query, includeRelated);
 
-    clauses.push(
-      Prisma.sql`c."publishedLectureCount" DESC NULLS LAST`,
-      Prisma.sql`c."id" ASC`,
-    );
+    clauses.push(Prisma.sql`c."publishedLectureCount" DESC NULLS LAST`, Prisma.sql`c."id" ASC`);
 
     return Prisma.sql`${Prisma.join(clauses, ', ')}`;
   }
 
-  private seriesFallbackOrderBySql(
-    query: string,
-    includeRelated: boolean,
-  ): Prisma.Sql {
-    const clauses = this.fallbackRankingClauses(
-      'se."title"',
-      's."name"',
-      query,
-      includeRelated,
-    );
+  private seriesFallbackOrderBySql(query: string, includeRelated: boolean): Prisma.Sql {
+    const clauses = this.fallbackRankingClauses('se."title"', 's."name"', query, includeRelated);
 
-    clauses.push(
-      Prisma.sql`se."publishedLectureCount" DESC NULLS LAST`,
-      Prisma.sql`se."id" ASC`,
-    );
+    clauses.push(Prisma.sql`se."publishedLectureCount" DESC NULLS LAST`, Prisma.sql`se."id" ASC`);
 
     return Prisma.sql`${Prisma.join(clauses, ', ')}`;
   }
 
-  private lectureFallbackOrderBySql(
-    query: string,
-    includeRelated: boolean,
-  ): Prisma.Sql {
-    const clauses = this.fallbackRankingClauses(
-      'l."title"',
-      's."name"',
-      query,
-      includeRelated,
-    );
+  private lectureFallbackOrderBySql(query: string, includeRelated: boolean): Prisma.Sql {
+    const clauses = this.fallbackRankingClauses('l."title"', 's."name"', query, includeRelated);
 
-    clauses.push(
-      Prisma.sql`l."publishedAt" DESC NULLS LAST`,
-      Prisma.sql`l."id" ASC`,
-    );
+    clauses.push(Prisma.sql`l."publishedAt" DESC NULLS LAST`, Prisma.sql`l."id" ASC`);
 
     return Prisma.sql`${Prisma.join(clauses, ', ')}`;
   }
 
-  private collectionOrderBySql(
-    query: string,
-    includeRelated: boolean,
-  ): Prisma.Sql {
+  private collectionOrderBySql(query: string, includeRelated: boolean): Prisma.Sql {
     const queryText = Prisma.sql`CAST(${query} AS TEXT)`;
-    const clauses: Prisma.Sql[] = [
-      Prisma.sql`similarity(c."title", ${queryText}) DESC`,
-    ];
+    const clauses: Prisma.Sql[] = [Prisma.sql`similarity(c."title", ${queryText}) DESC`];
 
     if (includeRelated) {
       clauses.push(Prisma.sql`similarity(s."name", ${queryText}) DESC`);
     }
 
-    clauses.push(
-      Prisma.sql`similarity(COALESCE(c."description", ''), ${queryText}) DESC`,
-    );
+    clauses.push(Prisma.sql`similarity(COALESCE(c."description", ''), ${queryText}) DESC`);
 
     if (includeRelated) {
       clauses.push(
@@ -631,17 +568,13 @@ export class SearchRepository {
 
   private seriesOrderBySql(query: string, includeRelated: boolean): Prisma.Sql {
     const queryText = Prisma.sql`CAST(${query} AS TEXT)`;
-    const clauses: Prisma.Sql[] = [
-      Prisma.sql`similarity(se."title", ${queryText}) DESC`,
-    ];
+    const clauses: Prisma.Sql[] = [Prisma.sql`similarity(se."title", ${queryText}) DESC`];
 
     if (includeRelated) {
       clauses.push(Prisma.sql`similarity(s."name", ${queryText}) DESC`);
     }
 
-    clauses.push(
-      Prisma.sql`similarity(COALESCE(se."description", ''), ${queryText}) DESC`,
-    );
+    clauses.push(Prisma.sql`similarity(COALESCE(se."description", ''), ${queryText}) DESC`);
 
     if (includeRelated) {
       clauses.push(
@@ -664,22 +597,15 @@ export class SearchRepository {
     return Prisma.sql`${Prisma.join(clauses, ', ')}`;
   }
 
-  private lectureOrderBySql(
-    query: string,
-    includeRelated: boolean,
-  ): Prisma.Sql {
+  private lectureOrderBySql(query: string, includeRelated: boolean): Prisma.Sql {
     const queryText = Prisma.sql`CAST(${query} AS TEXT)`;
-    const clauses: Prisma.Sql[] = [
-      Prisma.sql`similarity(l."title", ${queryText}) DESC`,
-    ];
+    const clauses: Prisma.Sql[] = [Prisma.sql`similarity(l."title", ${queryText}) DESC`];
 
     if (includeRelated) {
       clauses.push(Prisma.sql`similarity(s."name", ${queryText}) DESC`);
     }
 
-    clauses.push(
-      Prisma.sql`similarity(COALESCE(l."description", ''), ${queryText}) DESC`,
-    );
+    clauses.push(Prisma.sql`similarity(COALESCE(l."description", ''), ${queryText}) DESC`);
 
     if (includeRelated) {
       clauses.push(
@@ -697,10 +623,7 @@ export class SearchRepository {
       );
     }
 
-    clauses.push(
-      Prisma.sql`l."publishedAt" DESC NULLS LAST`,
-      Prisma.sql`l."id" ASC`,
-    );
+    clauses.push(Prisma.sql`l."publishedAt" DESC NULLS LAST`, Prisma.sql`l."id" ASC`);
 
     return Prisma.sql`${Prisma.join(clauses, ', ')}`;
   }
@@ -784,9 +707,7 @@ export class SearchRepository {
         ...item,
         title: resolved.fields.title,
         originalLanguage: resolved.originalLanguage,
-        original: resolved.original
-          ? { title: resolved.original.title }
-          : undefined,
+        original: resolved.original ? { title: resolved.original.title } : undefined,
       };
     });
   }

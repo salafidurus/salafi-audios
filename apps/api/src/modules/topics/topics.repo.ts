@@ -239,10 +239,7 @@ export class TopicsRepository {
     return this.mapTopicTranslation(record);
   }
 
-  async publishTopicTranslation(
-    topicId: string,
-    locale: string,
-  ): Promise<TranslationViewDto> {
+  async publishTopicTranslation(topicId: string, locale: string): Promise<TranslationViewDto> {
     const record = await this.prisma.topicTranslation.update({
       where: { topicId_locale: { topicId, locale: locale as Locale } },
       data: { status: 'published' },
@@ -250,10 +247,7 @@ export class TopicsRepository {
     return this.mapTopicTranslation(record);
   }
 
-  async unpublishTopicTranslation(
-    topicId: string,
-    locale: string,
-  ): Promise<TranslationViewDto> {
+  async unpublishTopicTranslation(topicId: string, locale: string): Promise<TranslationViewDto> {
     const record = await this.prisma.topicTranslation.update({
       where: { topicId_locale: { topicId, locale: locale as Locale } },
       data: { status: 'draft' },
@@ -261,9 +255,7 @@ export class TopicsRepository {
     return this.mapTopicTranslation(record);
   }
 
-  private async resolveOptionalParentId(
-    parentSlug?: string,
-  ): Promise<string | null> {
+  private async resolveOptionalParentId(parentSlug?: string): Promise<string | null> {
     if (!parentSlug) return null;
 
     const parent = await this.prisma.topic.findUnique({
@@ -299,9 +291,7 @@ export class TopicsRepository {
     take?: number,
   ): Promise<LegacyTopicRow[]> {
     const columns = await this.getTopicColumnSet();
-    const parentExpr = columns.has('parentId')
-      ? '"parentId"'
-      : 'NULL::text AS "parentId"';
+    const parentExpr = columns.has('parentId') ? '"parentId"' : 'NULL::text AS "parentId"';
     const createdAtExpr = columns.has('createdAt')
       ? '"createdAt"'
       : 'CURRENT_TIMESTAMP AS "createdAt"';

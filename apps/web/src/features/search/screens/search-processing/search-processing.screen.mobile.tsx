@@ -16,6 +16,8 @@ import {
 import { useSearchProcessing } from "@sd/domain-search";
 import { useShowOriginalContent } from "@/features/i18n/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { useRouter } from "next/navigation";
+import { routes } from "@sd/core-contracts";
 import styles from "./search-processing.screen.mobile.module.css";
 
 export type SearchProcessingScreenProps = {
@@ -41,10 +43,23 @@ export function SearchProcessingMobileScreen({
     shouldSearch,
     errorMessage,
   } = useSearchProcessing({ prefill, showOriginal });
+  const { push } = useRouter();
 
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+
+  const handleItemPress = (item: SearchResultRow) => {
+    const [kind, id] = item.id.split(":");
+    if (!id) return;
+    if (kind === "collection") {
+      push(routes.collections.detail(id));
+    } else if (kind === "series") {
+      push(routes.series.detail(id));
+    } else if (kind === "single") {
+      push(routes.lectures.detail(id));
+    }
+  };
 
   return (
     <ScreenView contentStyle={{ flex: 1 }}>
@@ -72,6 +87,7 @@ export function SearchProcessingMobileScreen({
             imageUrl={item.imageUrl}
             lectureCount={item.lectureCount}
             durationSeconds={item.durationSeconds}
+            onPress={() => handleItemPress(item)}
           />
         )}
       />

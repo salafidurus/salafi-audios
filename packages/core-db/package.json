@@ -2,10 +2,10 @@
   "name": "@sd/core-db",
   "version": "0.0.0",
   "private": true,
-  "sideEffects": false,
   "files": [
     "dist"
   ],
+  "sideEffects": false,
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./src/index.ts",

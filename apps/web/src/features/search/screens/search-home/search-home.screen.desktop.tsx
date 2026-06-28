@@ -5,12 +5,14 @@ import { SearchButtonDesktop } from "@/features/search/components/SearchButton/S
 import { TitleTextDesktop } from "@/features/search/components/TitleText/TitleText.desktop";
 import { useQuickBrowse } from "@sd/domain-search";
 
+import type { ListingFormat } from "@sd/core-contracts";
+
 export type SearchHomeDesktopScreenProps = {
   onOpenSearch?: () => void;
   onSelectCategory?: (searchKey: string) => void;
   onSelectScholar?: (slug: string) => void;
-  onSelectSuggestion?: (slug: string) => void;
-  onContinueListening?: (lectureSlug: string) => void;
+  onSelectSuggestion?: (id: string, kind: ListingFormat) => void;
+  onContinueListening?: (lectureId: string) => void;
 };
 
 export function SearchHomeDesktopScreen({

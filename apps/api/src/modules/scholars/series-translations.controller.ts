@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Param,
-  Body,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { RequiresPermission } from '../../shared/decorators/requires-permission.decorator';
@@ -31,10 +23,7 @@ export class SeriesTranslationsController {
   @Post(':seriesId/translations')
   @RequiresPermission('manage:content')
   @ApiOperation({ summary: 'Upsert a series translation' })
-  upsertTranslation(
-    @Param('seriesId') seriesId: string,
-    @Body() dto: SaveSeriesTranslationDto,
-  ) {
+  upsertTranslation(@Param('seriesId') seriesId: string, @Body() dto: SaveSeriesTranslationDto) {
     return this.service.upsertSeriesTranslation(seriesId, dto);
   }
 
@@ -52,20 +41,14 @@ export class SeriesTranslationsController {
   @Post(':seriesId/translations/:locale/publish')
   @RequiresPermission('manage:content')
   @ApiOperation({ summary: 'Publish a series translation' })
-  publishTranslation(
-    @Param('seriesId') seriesId: string,
-    @Param('locale') locale: string,
-  ) {
+  publishTranslation(@Param('seriesId') seriesId: string, @Param('locale') locale: string) {
     return this.service.publishSeriesTranslation(seriesId, locale);
   }
 
   @Post(':seriesId/translations/:locale/unpublish')
   @RequiresPermission('manage:content')
   @ApiOperation({ summary: 'Unpublish a series translation' })
-  unpublishTranslation(
-    @Param('seriesId') seriesId: string,
-    @Param('locale') locale: string,
-  ) {
+  unpublishTranslation(@Param('seriesId') seriesId: string, @Param('locale') locale: string) {
     return this.service.unpublishSeriesTranslation(seriesId, locale);
   }
 }

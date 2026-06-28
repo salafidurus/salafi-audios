@@ -1,8 +1,8 @@
 {
   "name": "web",
-  "type": "module",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "bun --bun next dev",
     "build": "bun --bun next build",
@@ -50,9 +50,9 @@
     "@types/node": "^26",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.0.2",
     "eslint": "catalog:",
     "eslint-config-next": "catalog:",
-    "tailwindcss": "^4",
-    "@vitejs/plugin-react": "^6.0.2"
+    "tailwindcss": "^4"
   }
 }

@@ -83,9 +83,7 @@ describe('LecturesService', () => {
     it('returns lecture detail when found', async () => {
       repo.findDetailById.mockResolvedValue(lectureDetail);
 
-      await expect(service.getById('lecture-1')).resolves.toEqual(
-        lectureDetail,
-      );
+      await expect(service.getById('lecture-1')).resolves.toEqual(lectureDetail);
       expect(repo.findDetailById).toHaveBeenCalledWith('lecture-1');
     });
 
@@ -102,9 +100,7 @@ describe('LecturesService', () => {
     it('returns related lectures from the repository', async () => {
       repo.findRelated.mockResolvedValue(relatedLectures);
 
-      await expect(service.getRelated('lecture-1')).resolves.toEqual(
-        relatedLectures,
-      );
+      await expect(service.getRelated('lecture-1')).resolves.toEqual(relatedLectures);
       expect(repo.findRelated).toHaveBeenCalledWith('lecture-1');
     });
   });
@@ -138,10 +134,7 @@ describe('LecturesService', () => {
         success: true,
         message: 'Lecture published successfully',
       });
-      expect(repo.updateLectureStatus).toHaveBeenCalledWith(
-        'lecture-1',
-        Status.published,
-      );
+      expect(repo.updateLectureStatus).toHaveBeenCalledWith('lecture-1', Status.published);
     });
 
     it('throws when publishing a missing lecture', async () => {
@@ -161,10 +154,7 @@ describe('LecturesService', () => {
         success: true,
         message: 'Lecture archived successfully',
       });
-      expect(repo.updateLectureStatus).toHaveBeenCalledWith(
-        'lecture-1',
-        Status.archived,
-      );
+      expect(repo.updateLectureStatus).toHaveBeenCalledWith('lecture-1', Status.archived);
     });
 
     it('throws when archiving a missing lecture', async () => {

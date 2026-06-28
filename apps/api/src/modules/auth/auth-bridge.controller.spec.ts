@@ -17,9 +17,7 @@ describe('AuthBridgeController — OAuth handoff', () => {
 
     const moduleRef = await Test.createTestingModule({
       controllers: [AuthBridgeController],
-      providers: [
-        { provide: ConfigService, useValue: { CORS_ORIGINS: [WEB] } },
-      ],
+      providers: [{ provide: ConfigService, useValue: { CORS_ORIGINS: [WEB] } }],
     }).compile();
 
     app = moduleRef.createNestApplication();
@@ -42,9 +40,7 @@ describe('AuthBridgeController — OAuth handoff', () => {
   });
 
   it('redirects to sign-in when no session/token is available', async () => {
-    mockAuth.api.generateOneTimeToken.mockRejectedValue(
-      new Error('no session'),
-    );
+    mockAuth.api.generateOneTimeToken.mockRejectedValue(new Error('no session'));
 
     const res = await request(app.getHttpServer())
       .get('/auth-bridge/oauth-complete')
@@ -66,9 +62,7 @@ describe('AuthBridgeController — OAuth handoff', () => {
   });
 
   it('redirects to sign-in when the redirect param is missing', async () => {
-    const res = await request(app.getHttpServer())
-      .get('/auth-bridge/oauth-complete')
-      .expect(302);
+    const res = await request(app.getHttpServer()).get('/auth-bridge/oauth-complete').expect(302);
 
     expect(res.headers.location).toBe(`${WEB}/sign-in`);
     expect(mockAuth.api.generateOneTimeToken).not.toHaveBeenCalled();

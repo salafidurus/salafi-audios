@@ -1,10 +1,5 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import {
-  ApiOkResponse,
-  ApiOperation,
-  ApiQuery,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { Public } from '../../modules/auth/decorators';
@@ -42,12 +37,8 @@ export class FeedController {
     @Query('scholarSlugs') scholarSlugs?: string,
   ) {
     const limit = Math.min(Math.max(Number(limitStr) || 20, 1), 40);
-    const topics = topicSlugs
-      ? topicSlugs.split(',').map((s) => s.trim())
-      : undefined;
-    const scholars = scholarSlugs
-      ? scholarSlugs.split(',').map((s) => s.trim())
-      : undefined;
+    const topics = topicSlugs ? topicSlugs.split(',').map((s) => s.trim()) : undefined;
+    const scholars = scholarSlugs ? scholarSlugs.split(',').map((s) => s.trim()) : undefined;
 
     return this.feed.getFeed(cursor, limit, topics, scholars);
   }
@@ -58,10 +49,7 @@ export class FeedController {
   @ApiOkResponse({ description: 'Paginated recent feed items' })
   @ApiQuery({ name: 'cursor', required: false, type: String })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  getFeedRecent(
-    @Query('cursor') cursor?: string,
-    @Query('limit') limitStr?: string,
-  ) {
+  getFeedRecent(@Query('cursor') cursor?: string, @Query('limit') limitStr?: string) {
     const limit = Math.min(Math.max(Number(limitStr) || 20, 1), 40);
     return this.feed.getFeedRecent(cursor, limit);
   }
@@ -73,10 +61,7 @@ export class FeedController {
   @ApiOkResponse({ description: 'Paginated following feed items' })
   @ApiQuery({ name: 'cursor', required: false, type: String })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  getFollowingFeed(
-    @Query('cursor') cursor?: string,
-    @Query('limit') limitStr?: string,
-  ) {
+  getFollowingFeed(@Query('cursor') cursor?: string, @Query('limit') limitStr?: string) {
     const limit = Math.min(Math.max(Number(limitStr) || 20, 1), 40);
     return this.feed.getFollowingFeed(cursor, limit);
   }

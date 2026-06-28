@@ -20,8 +20,8 @@
     "@sd/domain-audio": "workspace:*",
     "@tanstack/react-query": "catalog:"
   },
+  "devDependencies": {},
   "peerDependencies": {
     "react": "^19.0.0"
-  },
-  "devDependencies": {}
+  }
 }

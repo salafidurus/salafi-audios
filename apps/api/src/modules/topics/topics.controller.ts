@@ -3,11 +3,7 @@ import { Public } from '../../modules/auth/decorators';
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
-import type {
-  TopicDetailDto,
-  TopicViewDto,
-  TopicLectureViewDto,
-} from '@sd/core-contracts';
+import type { TopicDetailDto, TopicViewDto, TopicLectureViewDto } from '@sd/core-contracts';
 import { TopicsService } from './topics.service';
 
 @SkipThrottle()

@@ -4,7 +4,7 @@ export type ScholarContentItemDto = {
   id: string;
   slug: string;
   title: string;
-  type: 'collection' | 'series' | 'single';
+  type: "collection" | "series" | "single";
   recencyAt: string;
   coverImageUrl?: string;
   lectureCount?: number;

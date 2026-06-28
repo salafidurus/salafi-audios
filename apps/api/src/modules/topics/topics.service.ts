@@ -37,14 +37,8 @@ export class TopicsService {
     return result;
   }
 
-  async listLectures(
-    slug: string,
-    limit?: number,
-  ): Promise<TopicLectureViewDto[]> {
-    const result = await this.repo.listPublishedLecturesByTopicSlug(
-      slug,
-      limit,
-    );
+  async listLectures(slug: string, limit?: number): Promise<TopicLectureViewDto[]> {
+    const result = await this.repo.listPublishedLecturesByTopicSlug(slug, limit);
     if (result === null) throw new NotFoundException('Topic not found');
     return result;
   }
@@ -61,10 +55,7 @@ export class TopicsService {
     return this.repo.listTopicTranslations(topicId);
   }
 
-  upsertTranslation(
-    topicId: string,
-    dto: SaveTopicTranslationDto,
-  ): Promise<TranslationViewDto> {
+  upsertTranslation(topicId: string, dto: SaveTopicTranslationDto): Promise<TranslationViewDto> {
     return this.repo.upsertTopicTranslation(topicId, dto);
   }
 
@@ -76,17 +67,11 @@ export class TopicsService {
     return this.repo.updateTopicTranslation(topicId, locale, fields);
   }
 
-  publishTranslation(
-    topicId: string,
-    locale: string,
-  ): Promise<TranslationViewDto> {
+  publishTranslation(topicId: string, locale: string): Promise<TranslationViewDto> {
     return this.repo.publishTopicTranslation(topicId, locale);
   }
 
-  unpublishTranslation(
-    topicId: string,
-    locale: string,
-  ): Promise<TranslationViewDto> {
+  unpublishTranslation(topicId: string, locale: string): Promise<TranslationViewDto> {
     return this.repo.unpublishTopicTranslation(topicId, locale);
   }
 }

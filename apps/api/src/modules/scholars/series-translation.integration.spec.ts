@@ -29,9 +29,7 @@ const mockScholarsService = {
   unpublishSeriesTranslation: vi.fn().mockResolvedValue(draftTranslation),
 };
 
-async function buildApp(
-  overrideGuard?: () => boolean | never,
-): Promise<INestApplication> {
+async function buildApp(overrideGuard?: () => boolean | never): Promise<INestApplication> {
   const builder = Test.createTestingModule({
     controllers: [SeriesTranslationsController],
     providers: [
@@ -56,15 +54,9 @@ describe('SeriesTranslationsController — auth boundaries', () => {
   beforeEach(async () => {
     mockAuth.api.getSession.mockReset();
     vi.clearAllMocks();
-    mockScholarsService.upsertSeriesTranslation.mockResolvedValue(
-      draftTranslation,
-    );
-    mockScholarsService.publishSeriesTranslation.mockResolvedValue(
-      publishedTranslation,
-    );
-    mockScholarsService.unpublishSeriesTranslation.mockResolvedValue(
-      draftTranslation,
-    );
+    mockScholarsService.upsertSeriesTranslation.mockResolvedValue(draftTranslation);
+    mockScholarsService.publishSeriesTranslation.mockResolvedValue(publishedTranslation);
+    mockScholarsService.unpublishSeriesTranslation.mockResolvedValue(draftTranslation);
     app = await buildApp();
   });
 

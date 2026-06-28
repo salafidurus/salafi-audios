@@ -73,9 +73,7 @@ describe('AccountController — auth boundaries', () => {
     it('GET /account/profile returns the mapped profile for an authenticated user', async () => {
       mockAuth.api.getSession.mockResolvedValue(authenticatedSession);
 
-      const res = await request(app.getHttpServer())
-        .get('/account/profile')
-        .expect(200);
+      const res = await request(app.getHttpServer()).get('/account/profile').expect(200);
 
       expect(res.body).toEqual(mockProfile);
       expect(mockAccountService.getProfile).toHaveBeenCalledWith(
@@ -92,10 +90,7 @@ describe('AccountController — auth boundaries', () => {
         .expect(200);
 
       expect(res.body).toEqual(mockProfile);
-      expect(mockAccountService.updateProfile).toHaveBeenCalledWith(
-        'user-1',
-        'Updated Name',
-      );
+      expect(mockAccountService.updateProfile).toHaveBeenCalledWith('user-1', 'Updated Name');
     });
   });
 

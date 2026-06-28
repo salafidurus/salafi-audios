@@ -72,7 +72,10 @@
   border: 1px solid var(--border-subtle);
   color: var(--content-subtle);
   text-decoration: none;
-  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .socialLink:hover {

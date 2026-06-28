@@ -21,9 +21,7 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
 
   return (
     <View>
-      {scholar.imageUrl ? (
-        <Image source={{ uri: scholar.imageUrl }} style={styles.avatar} />
-      ) : null}
+      {scholar.imageUrl ? <Image source={{ uri: scholar.imageUrl }} style={styles.avatar} /> : null}
       <AppText variant="titleLg" style={styles.name}>
         {scholar.name}
       </AppText>

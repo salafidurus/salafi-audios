@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Body,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CurrentUser } from '../../modules/auth/decorators';
@@ -48,10 +40,7 @@ export class AdminPermissionsController {
   @Delete(':userId/:permission')
   @RequiresPermission('manage:admin')
   @ApiOperation({ summary: 'Revoke a permission from a user' })
-  revoke(
-    @Param('userId') userId: string,
-    @Param('permission') permission: string,
-  ) {
+  revoke(@Param('userId') userId: string, @Param('permission') permission: string) {
     return this.service.revoke(userId, permission);
   }
 }

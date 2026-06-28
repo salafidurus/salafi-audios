@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Param,
-  Body,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { RequiresPermission } from '../../shared/decorators/requires-permission.decorator';
@@ -52,10 +44,7 @@ export class CollectionTranslationsController {
   @Post(':collectionId/translations/:locale/publish')
   @RequiresPermission('manage:content')
   @ApiOperation({ summary: 'Publish a collection translation' })
-  publishTranslation(
-    @Param('collectionId') collectionId: string,
-    @Param('locale') locale: string,
-  ) {
+  publishTranslation(@Param('collectionId') collectionId: string, @Param('locale') locale: string) {
     return this.service.publishCollectionTranslation(collectionId, locale);
   }
 

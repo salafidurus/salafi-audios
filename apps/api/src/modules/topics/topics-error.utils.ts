@@ -10,22 +10,16 @@ export function isLegacyTopicSchemaFailure(error: unknown): boolean {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     return (
       error.code === 'P2022' ||
-      LEGACY_TOPIC_SCHEMA_PATTERNS.some((pattern) =>
-        pattern.test(error.message),
-      )
+      LEGACY_TOPIC_SCHEMA_PATTERNS.some((pattern) => pattern.test(error.message))
     );
   }
 
   if (error instanceof Prisma.PrismaClientUnknownRequestError) {
-    return LEGACY_TOPIC_SCHEMA_PATTERNS.some((pattern) =>
-      pattern.test(error.message),
-    );
+    return LEGACY_TOPIC_SCHEMA_PATTERNS.some((pattern) => pattern.test(error.message));
   }
 
   if (error instanceof Error) {
-    return LEGACY_TOPIC_SCHEMA_PATTERNS.some((pattern) =>
-      pattern.test(error.message),
-    );
+    return LEGACY_TOPIC_SCHEMA_PATTERNS.some((pattern) => pattern.test(error.message));
   }
 
   return false;

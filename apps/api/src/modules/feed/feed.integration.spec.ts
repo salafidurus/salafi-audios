@@ -11,15 +11,9 @@ const mockAuth = { api: { getSession: vi.fn() } };
 vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockFeedService = {
-  getFeed: vi
-    .fn()
-    .mockResolvedValue({ items: [], nextCursor: null, hasMore: false }),
-  getFeedRecent: vi
-    .fn()
-    .mockResolvedValue({ items: [], nextCursor: null, hasMore: false }),
-  getFollowingFeed: vi
-    .fn()
-    .mockResolvedValue({ items: [], nextCursor: null, hasMore: false }),
+  getFeed: vi.fn().mockResolvedValue({ items: [], nextCursor: null, hasMore: false }),
+  getFeedRecent: vi.fn().mockResolvedValue({ items: [], nextCursor: null, hasMore: false }),
+  getFollowingFeed: vi.fn().mockResolvedValue({ items: [], nextCursor: null, hasMore: false }),
   getScholars: vi.fn().mockResolvedValue({ scholars: [] }),
 };
 

@@ -19,10 +19,7 @@ export class SessionsService {
     private readonly liveService: LiveService,
   ) {}
 
-  async upsertFromTelegram(
-    channelId: string,
-    data: TelegramPollData,
-  ): Promise<void> {
+  async upsertFromTelegram(channelId: string, data: TelegramPollData): Promise<void> {
     const existing = await this.repo.findLatestLiveSession(channelId);
     let session: { id: string } | undefined;
 
@@ -56,11 +53,7 @@ export class SessionsService {
     }
   }
 
-  async startSession(
-    channelId: string,
-    title?: string,
-    telegramMsgId?: string,
-  ) {
+  async startSession(channelId: string, title?: string, telegramMsgId?: string) {
     this.logger.log(`Starting live session for channel ${channelId}`);
     const session = await this.repo.createSession({
       channelId,
@@ -75,11 +68,10 @@ export class SessionsService {
 
   async endSession(sessionId: string, viewerCount?: number) {
     this.logger.log(`Ending session ${sessionId}`);
-    const session = await this.repo.updateStatus(
-      sessionId,
-      'ended' as LiveSessionStatus,
-      { endedAt: new Date(), viewerCount },
-    );
+    const session = await this.repo.updateStatus(sessionId, 'ended' as LiveSessionStatus, {
+      endedAt: new Date(),
+      viewerCount,
+    });
     await this.notifyLive(session.id);
     return session;
   }
@@ -96,10 +88,7 @@ export class SessionsService {
   }
 
   async getLiveSessionsForChannel(channelId: string) {
-    return this.repo.findByChannelAndStatus(
-      channelId,
-      'live' as LiveSessionStatus,
-    );
+    return this.repo.findByChannelAndStatus(channelId, 'live' as LiveSessionStatus);
   }
 
   private async notifyLive(sessionId: string): Promise<void> {
