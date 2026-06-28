@@ -83,8 +83,7 @@ export class LecturesService {
   }
 
   async bulkAction(dto: BulkActionDto): Promise<BulkActionResultDto> {
-    const status =
-      dto.action === 'publish' ? Status.published : Status.archived;
+    const status = dto.action === 'publish' ? Status.published : Status.archived;
     return this.repo.bulkUpdateStatus(dto.ids, status);
   }
 
@@ -109,17 +108,11 @@ export class LecturesService {
     return this.repo.updateLectureTranslation(lectureId, locale, fields);
   }
 
-  publishTranslation(
-    lectureId: string,
-    locale: string,
-  ): Promise<TranslationViewDto> {
+  publishTranslation(lectureId: string, locale: string): Promise<TranslationViewDto> {
     return this.repo.publishLectureTranslation(lectureId, locale);
   }
 
-  unpublishTranslation(
-    lectureId: string,
-    locale: string,
-  ): Promise<TranslationViewDto> {
+  unpublishTranslation(lectureId: string, locale: string): Promise<TranslationViewDto> {
     return this.repo.unpublishLectureTranslation(lectureId, locale);
   }
 }

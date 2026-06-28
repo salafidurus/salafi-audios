@@ -58,20 +58,10 @@ describe('FeedService', () => {
     it('should pass all parameters to repository and return result', async () => {
       repo.getFeed.mockResolvedValue(mockFeedPage);
 
-      const result = await service.getFeed(
-        'cursor1',
-        10,
-        ['aqeedah'],
-        ['scholar-1'],
-      );
+      const result = await service.getFeed('cursor1', 10, ['aqeedah'], ['scholar-1']);
 
       expect(result).toEqual(mockFeedPage);
-      expect(repo.getFeed).toHaveBeenCalledWith(
-        'cursor1',
-        10,
-        ['aqeedah'],
-        ['scholar-1'],
-      );
+      expect(repo.getFeed).toHaveBeenCalledWith('cursor1', 10, ['aqeedah'], ['scholar-1']);
     });
 
     it('should use default limit of 20 when not provided', async () => {
@@ -79,12 +69,7 @@ describe('FeedService', () => {
 
       await service.getFeed();
 
-      expect(repo.getFeed).toHaveBeenCalledWith(
-        undefined,
-        20,
-        undefined,
-        undefined,
-      );
+      expect(repo.getFeed).toHaveBeenCalledWith(undefined, 20, undefined, undefined);
     });
 
     it('should forward undefined optional params to repository', async () => {
@@ -92,12 +77,7 @@ describe('FeedService', () => {
 
       await service.getFeed('cursor1');
 
-      expect(repo.getFeed).toHaveBeenCalledWith(
-        'cursor1',
-        20,
-        undefined,
-        undefined,
-      );
+      expect(repo.getFeed).toHaveBeenCalledWith('cursor1', 20, undefined, undefined);
     });
   });
 

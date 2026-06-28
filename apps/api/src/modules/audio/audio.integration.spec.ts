@@ -101,9 +101,7 @@ describe('AudioController — boundaries', () => {
 
   describe('GET /audio/lectures/:lectureId/stream', () => {
     it('should return 200 without a session (Public route)', () => {
-      return request(app.getHttpServer())
-        .get('/audio/lectures/l1/stream')
-        .expect(200);
+      return request(app.getHttpServer()).get('/audio/lectures/l1/stream').expect(200);
     });
   });
 });

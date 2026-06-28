@@ -1,9 +1,7 @@
 import type { Locale } from '@sd/core-contracts';
 import { resolveTranslatedFields } from './resolve-translated-fields';
 
-export type ContentTranslationResult<
-  F extends Record<string, string | null | undefined>,
-> = {
+export type ContentTranslationResult<F extends Record<string, string | null | undefined>> = {
   /** Preferred-language fields: the published translation overlaid on the base,
    * falling back to the base for any field the translation omits. */
   fields: F;
@@ -35,14 +33,11 @@ export function resolveContentTranslation<
   const result: ContentTranslationResult<F> = { fields: base };
   if (originalLanguage) result.originalLanguage = originalLanguage;
 
-  const sameAsOriginal =
-    originalLanguage != null && targetLocale === originalLanguage;
+  const sameAsOriginal = originalLanguage != null && targetLocale === originalLanguage;
 
   if (publishedTranslation && !sameAsOriginal) {
     const merged = resolveTranslatedFields(base, publishedTranslation);
-    const changed = (Object.keys(base) as (keyof F)[]).some(
-      (key) => merged[key] !== base[key],
-    );
+    const changed = (Object.keys(base) as (keyof F)[]).some((key) => merged[key] !== base[key]);
     if (changed) {
       result.fields = merged;
       result.original = { ...base };

@@ -80,17 +80,11 @@ export class ScholarsService {
     return this.repo.updateScholarTranslation(scholarId, locale, fields);
   }
 
-  publishTranslation(
-    scholarId: string,
-    locale: string,
-  ): Promise<TranslationViewDto> {
+  publishTranslation(scholarId: string, locale: string): Promise<TranslationViewDto> {
     return this.repo.publishScholarTranslation(scholarId, locale);
   }
 
-  unpublishTranslation(
-    scholarId: string,
-    locale: string,
-  ): Promise<TranslationViewDto> {
+  unpublishTranslation(scholarId: string, locale: string): Promise<TranslationViewDto> {
     return this.repo.unpublishScholarTranslation(scholarId, locale);
   }
 
@@ -115,25 +109,17 @@ export class ScholarsService {
     return this.repo.updateSeriesTranslation(seriesId, locale, fields);
   }
 
-  publishSeriesTranslation(
-    seriesId: string,
-    locale: string,
-  ): Promise<TranslationViewDto> {
+  publishSeriesTranslation(seriesId: string, locale: string): Promise<TranslationViewDto> {
     return this.repo.publishSeriesTranslation(seriesId, locale);
   }
 
-  unpublishSeriesTranslation(
-    seriesId: string,
-    locale: string,
-  ): Promise<TranslationViewDto> {
+  unpublishSeriesTranslation(seriesId: string, locale: string): Promise<TranslationViewDto> {
     return this.repo.unpublishSeriesTranslation(seriesId, locale);
   }
 
   // ─── Collection translations ──────────────────────────────────────────────
 
-  listCollectionTranslations(
-    collectionId: string,
-  ): Promise<TranslationViewDto[]> {
+  listCollectionTranslations(collectionId: string): Promise<TranslationViewDto[]> {
     return this.repo.listCollectionTranslations(collectionId);
   }
 
@@ -152,10 +138,7 @@ export class ScholarsService {
     return this.repo.updateCollectionTranslation(collectionId, locale, fields);
   }
 
-  publishCollectionTranslation(
-    collectionId: string,
-    locale: string,
-  ): Promise<TranslationViewDto> {
+  publishCollectionTranslation(collectionId: string, locale: string): Promise<TranslationViewDto> {
     return this.repo.publishCollectionTranslation(collectionId, locale);
   }
 
@@ -182,10 +165,7 @@ export class ScholarsService {
     return this.repo.createSeries(dto);
   }
 
-  async updateSeries(
-    id: string,
-    dto: UpdateSeriesDto,
-  ): Promise<{ id: string }> {
+  async updateSeries(id: string, dto: UpdateSeriesDto): Promise<{ id: string }> {
     const updated = await this.repo.updateSeries(id, dto);
     if (!updated) throw new NotFoundException(`Series "${id}" not found`);
     return updated;
@@ -204,22 +184,17 @@ export class ScholarsService {
   }
 
   bulkSeriesAction(dto: BulkActionDto): Promise<BulkActionResultDto> {
-    const status =
-      dto.action === 'publish' ? Status.published : Status.archived;
+    const status = dto.action === 'publish' ? Status.published : Status.archived;
     return this.repo.bulkUpdateSeriesStatus(dto.ids, status);
   }
 
   // ─── Admin Collection Methods ──────────────────────────────────────────────
 
-  listAdminCollections(
-    scholarId: string,
-  ): Promise<AdminCollectionListItemDto[]> {
+  listAdminCollections(scholarId: string): Promise<AdminCollectionListItemDto[]> {
     return this.repo.listAdminCollections(scholarId);
   }
 
-  async getAdminCollectionDetail(
-    id: string,
-  ): Promise<AdminCollectionDetailDto> {
+  async getAdminCollectionDetail(id: string): Promise<AdminCollectionDetailDto> {
     const c = await this.repo.findAdminCollectionDetail(id);
     if (!c) throw new NotFoundException(`Collection "${id}" not found`);
     return c;
@@ -229,10 +204,7 @@ export class ScholarsService {
     return this.repo.createCollection(dto);
   }
 
-  async updateCollection(
-    id: string,
-    dto: UpdateCollectionDto,
-  ): Promise<{ id: string }> {
+  async updateCollection(id: string, dto: UpdateCollectionDto): Promise<{ id: string }> {
     const updated = await this.repo.updateCollection(id, dto);
     if (!updated) throw new NotFoundException(`Collection "${id}" not found`);
     return updated;
@@ -251,8 +223,7 @@ export class ScholarsService {
   }
 
   bulkCollectionAction(dto: BulkActionDto): Promise<BulkActionResultDto> {
-    const status =
-      dto.action === 'publish' ? Status.published : Status.archived;
+    const status = dto.action === 'publish' ? Status.published : Status.archived;
     return this.repo.bulkUpdateCollectionStatus(dto.ids, status);
   }
 }

@@ -2,11 +2,11 @@
   "name": "@sd/core-i18n",
   "version": "0.0.0",
   "private": true,
-  "sideEffects": false,
   "files": [
     "src",
     "dist"
   ],
+  "sideEffects": false,
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./src/index.ts",

@@ -56,15 +56,11 @@ describe('LiveController — auth boundaries', () => {
     });
 
     it('GET /live/sessions/active returns 200 without auth', () => {
-      return request(app.getHttpServer())
-        .get('/live/sessions/active')
-        .expect(200);
+      return request(app.getHttpServer()).get('/live/sessions/active').expect(200);
     });
 
     it('GET /live/sessions/upcoming returns 200 without auth', () => {
-      return request(app.getHttpServer())
-        .get('/live/sessions/upcoming')
-        .expect(200);
+      return request(app.getHttpServer()).get('/live/sessions/upcoming').expect(200);
     });
 
     it('GET /live/ended returns 200 without auth', () => {

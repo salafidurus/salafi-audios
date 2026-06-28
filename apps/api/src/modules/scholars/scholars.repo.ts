@@ -75,9 +75,7 @@ export class ScholarsRepository {
         imageUrl: r.imageUrl ?? undefined,
         mainLanguage: r.mainLanguage ?? undefined,
         originalLanguage: resolved.originalLanguage,
-        original: resolved.original
-          ? { name: resolved.original.name }
-          : undefined,
+        original: resolved.original ? { name: resolved.original.name } : undefined,
         isKibar: r.isKibar,
         lectureCount: r._count.lectures,
       };
@@ -191,28 +189,59 @@ export class ScholarsRepository {
       this.prisma.collection.findMany({
         where: { scholarId: scholar.id, status: Status.published, deletedAt: null },
         select: {
-          id: true, slug: true, title: true, language: true,
-          coverImageUrl: true, createdAt: true,
-          translations: { where: { locale, status: 'published' }, select: { title: true }, take: 1 },
+          id: true,
+          slug: true,
+          title: true,
+          language: true,
+          coverImageUrl: true,
+          createdAt: true,
+          translations: {
+            where: { locale, status: 'published' },
+            select: { title: true },
+            take: 1,
+          },
           _count: { select: { series: { where: { status: Status.published, deletedAt: null } } } },
         },
       }),
       this.prisma.series.findMany({
-        where: { scholarId: scholar.id, collectionId: null, status: Status.published, deletedAt: null },
+        where: {
+          scholarId: scholar.id,
+          collectionId: null,
+          status: Status.published,
+          deletedAt: null,
+        },
         select: {
-          id: true, slug: true, title: true, language: true,
-          coverImageUrl: true, createdAt: true,
-          translations: { where: { locale, status: 'published' }, select: { title: true }, take: 1 },
-          _count: { select: { lectures: { where: { status: Status.published, deletedAt: null } } } },
+          id: true,
+          slug: true,
+          title: true,
+          language: true,
+          coverImageUrl: true,
+          createdAt: true,
+          translations: {
+            where: { locale, status: 'published' },
+            select: { title: true },
+            take: 1,
+          },
+          _count: {
+            select: { lectures: { where: { status: Status.published, deletedAt: null } } },
+          },
         },
       }),
       this.prisma.lecture.findMany({
         where: { scholarId: scholar.id, seriesId: null, status: Status.published, deletedAt: null },
         select: {
-          id: true, slug: true, title: true, language: true,
+          id: true,
+          slug: true,
+          title: true,
+          language: true,
           durationSeconds: true,
-          publishedAt: true, createdAt: true,
-          translations: { where: { locale, status: 'published' }, select: { title: true }, take: 1 },
+          publishedAt: true,
+          createdAt: true,
+          translations: {
+            where: { locale, status: 'published' },
+            select: { title: true },
+            take: 1,
+          },
         },
       }),
     ]);
@@ -336,9 +365,7 @@ export class ScholarsRepository {
     };
   }
 
-  async listScholarTranslations(
-    scholarId: string,
-  ): Promise<TranslationViewDto[]> {
+  async listScholarTranslations(scholarId: string): Promise<TranslationViewDto[]> {
     const records = await this.prisma.scholarTranslation.findMany({
       where: { scholarId },
       orderBy: { locale: 'asc' },
@@ -376,10 +403,7 @@ export class ScholarsRepository {
     return this.mapScholarTranslation(record);
   }
 
-  async publishScholarTranslation(
-    scholarId: string,
-    locale: string,
-  ): Promise<TranslationViewDto> {
+  async publishScholarTranslation(scholarId: string, locale: string): Promise<TranslationViewDto> {
     const record = await this.prisma.scholarTranslation.update({
       where: { scholarId_locale: { scholarId, locale: locale as Locale } },
       data: { status: 'published' },
@@ -417,9 +441,7 @@ export class ScholarsRepository {
     };
   }
 
-  async listSeriesTranslations(
-    seriesId: string,
-  ): Promise<TranslationViewDto[]> {
+  async listSeriesTranslations(seriesId: string): Promise<TranslationViewDto[]> {
     const records = await this.prisma.seriesTranslation.findMany({
       where: { seriesId },
       orderBy: { locale: 'asc' },
@@ -457,10 +479,7 @@ export class ScholarsRepository {
     return this.mapSeriesTranslation(record);
   }
 
-  async publishSeriesTranslation(
-    seriesId: string,
-    locale: string,
-  ): Promise<TranslationViewDto> {
+  async publishSeriesTranslation(seriesId: string, locale: string): Promise<TranslationViewDto> {
     const record = await this.prisma.seriesTranslation.update({
       where: { seriesId_locale: { seriesId, locale: locale as Locale } },
       data: { status: 'published' },
@@ -468,10 +487,7 @@ export class ScholarsRepository {
     return this.mapSeriesTranslation(record);
   }
 
-  async unpublishSeriesTranslation(
-    seriesId: string,
-    locale: string,
-  ): Promise<TranslationViewDto> {
+  async unpublishSeriesTranslation(seriesId: string, locale: string): Promise<TranslationViewDto> {
     const record = await this.prisma.seriesTranslation.update({
       where: { seriesId_locale: { seriesId, locale: locale as Locale } },
       data: { status: 'draft' },
@@ -498,9 +514,7 @@ export class ScholarsRepository {
     };
   }
 
-  async listCollectionTranslations(
-    collectionId: string,
-  ): Promise<TranslationViewDto[]> {
+  async listCollectionTranslations(collectionId: string): Promise<TranslationViewDto[]> {
     const records = await this.prisma.collectionTranslation.findMany({
       where: { collectionId },
       orderBy: { locale: 'asc' },
@@ -593,9 +607,7 @@ export class ScholarsRepository {
     }));
   }
 
-  async findAdminSeriesDetail(
-    id: string,
-  ): Promise<AdminSeriesDetailDto | null> {
+  async findAdminSeriesDetail(id: string): Promise<AdminSeriesDetailDto | null> {
     const record = await this.prisma.series.findFirst({
       where: { id, deletedAt: null },
       select: {
@@ -636,10 +648,7 @@ export class ScholarsRepository {
     });
   }
 
-  async updateSeries(
-    id: string,
-    dto: UpdateSeriesDto,
-  ): Promise<{ id: string } | null> {
+  async updateSeries(id: string, dto: UpdateSeriesDto): Promise<{ id: string } | null> {
     try {
       return await this.prisma.series.update({
         where: { id, deletedAt: null },
@@ -662,10 +671,7 @@ export class ScholarsRepository {
     return result.count > 0;
   }
 
-  async bulkUpdateSeriesStatus(
-    ids: string[],
-    status: Status,
-  ): Promise<BulkActionResultDto> {
+  async bulkUpdateSeriesStatus(ids: string[], status: Status): Promise<BulkActionResultDto> {
     const succeeded: string[] = [];
     const failed: string[] = [];
     await Promise.all(
@@ -679,9 +685,7 @@ export class ScholarsRepository {
 
   // ─── Admin Collection Methods ──────────────────────────────────────────────
 
-  async listAdminCollections(
-    scholarId: string,
-  ): Promise<AdminCollectionListItemDto[]> {
+  async listAdminCollections(scholarId: string): Promise<AdminCollectionListItemDto[]> {
     const records = await this.prisma.collection.findMany({
       where: { scholarId, deletedAt: null },
       orderBy: [{ orderIndex: 'asc' }, { createdAt: 'asc' }],
@@ -702,9 +706,7 @@ export class ScholarsRepository {
     }));
   }
 
-  async findAdminCollectionDetail(
-    id: string,
-  ): Promise<AdminCollectionDetailDto | null> {
+  async findAdminCollectionDetail(id: string): Promise<AdminCollectionDetailDto | null> {
     const record = await this.prisma.collection.findFirst({
       where: { id, deletedAt: null },
       select: {
@@ -745,10 +747,7 @@ export class ScholarsRepository {
     });
   }
 
-  async updateCollection(
-    id: string,
-    dto: UpdateCollectionDto,
-  ): Promise<{ id: string } | null> {
+  async updateCollection(id: string, dto: UpdateCollectionDto): Promise<{ id: string } | null> {
     try {
       return await this.prisma.collection.update({
         where: { id, deletedAt: null },
@@ -771,10 +770,7 @@ export class ScholarsRepository {
     return result.count > 0;
   }
 
-  async bulkUpdateCollectionStatus(
-    ids: string[],
-    status: Status,
-  ): Promise<BulkActionResultDto> {
+  async bulkUpdateCollectionStatus(ids: string[], status: Status): Promise<BulkActionResultDto> {
     const succeeded: string[] = [];
     const failed: string[] = [];
     await Promise.all(

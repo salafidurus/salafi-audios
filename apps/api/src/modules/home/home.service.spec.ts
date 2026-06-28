@@ -64,11 +64,7 @@ describe('HomeService', () => {
       repo.getSuggestions.mockResolvedValue(mockSuggestions);
       repo.getRecentProgress.mockResolvedValue(mockRecentProgress);
 
-      const result = await service.getQuickBrowse(
-        ['aqeedah', 'fiqh'],
-        ['scholar-1'],
-        'user123',
-      );
+      const result = await service.getQuickBrowse(['aqeedah', 'fiqh'], ['scholar-1'], 'user123');
 
       const expected: QuickBrowseDto = {
         scholars: mockScholars,
@@ -105,11 +101,7 @@ describe('HomeService', () => {
       repo.getSuggestions.mockResolvedValue(mockSuggestions);
       repo.getRecentProgress.mockResolvedValue(mockRecentProgress);
 
-      const result = await service.getQuickBrowse(
-        undefined,
-        undefined,
-        'user123',
-      );
+      const result = await service.getQuickBrowse(undefined, undefined, 'user123');
 
       expect(result.scholars).toEqual(mockScholars);
       expect(result.suggestions).toEqual(mockSuggestions);

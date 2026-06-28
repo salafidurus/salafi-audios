@@ -69,10 +69,7 @@ describe('AudioService', () => {
       const result = await service.getUserProgress('user1', sinceStr);
 
       expect(result).toEqual(mockProgress);
-      expect(repo.getUserProgress).toHaveBeenCalledWith(
-        'user1',
-        new Date(sinceStr),
-      );
+      expect(repo.getUserProgress).toHaveBeenCalledWith('user1', new Date(sinceStr));
     });
   });
 
@@ -82,13 +79,7 @@ describe('AudioService', () => {
 
       await service.upsertProgress('user1', 'lecture1', 300, 1800, false);
 
-      expect(repo.upsertProgress).toHaveBeenCalledWith(
-        'user1',
-        'lecture1',
-        300,
-        1800,
-        false,
-      );
+      expect(repo.upsertProgress).toHaveBeenCalledWith('user1', 'lecture1', 300, 1800, false);
     });
   });
 
@@ -116,9 +107,7 @@ describe('AudioService', () => {
     it('should throw NotFoundException when lecture does not exist', async () => {
       repo.findLectureById.mockResolvedValue(null);
 
-      await expect(service.resolveStreamUrl('l1')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.resolveStreamUrl('l1')).rejects.toThrow(NotFoundException);
     });
 
     it('should return the primary audio asset if available', async () => {
@@ -168,9 +157,7 @@ describe('AudioService', () => {
       repo.findPrimaryAsset.mockResolvedValue(null);
       repo.findFirstAsset.mockResolvedValue(null);
 
-      await expect(service.resolveStreamUrl('l1')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.resolveStreamUrl('l1')).rejects.toThrow(NotFoundException);
     });
   });
 });

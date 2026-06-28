@@ -2,11 +2,7 @@ import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decor
 import { Public } from '../../modules/auth/decorators';
 import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import {
-  HealthCheck,
-  HealthCheckResult,
-  HealthCheckService,
-} from '@nestjs/terminus';
+import { HealthCheck, HealthCheckResult, HealthCheckService } from '@nestjs/terminus';
 import { SkipThrottle } from '@nestjs/throttler';
 import { PrismaHealthIndicator } from './prisma-health.indicator';
 import { R2HealthIndicator } from './r2-health.indicator';

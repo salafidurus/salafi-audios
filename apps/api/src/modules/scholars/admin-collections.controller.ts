@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type {
   AdminCollectionListItemDto,
@@ -34,9 +25,7 @@ export class AdminCollectionsController {
   @ApiOperation({
     summary: 'List collections (optionally filtered by scholarId)',
   })
-  list(
-    @Query('scholarId') scholarId?: string,
-  ): Promise<AdminCollectionListItemDto[]> {
+  list(@Query('scholarId') scholarId?: string): Promise<AdminCollectionListItemDto[]> {
     return this.service.listAdminCollections(scholarId ?? '');
   }
 

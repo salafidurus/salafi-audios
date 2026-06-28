@@ -2,11 +2,7 @@ import { Controller, Get, Post, Put, Param, Query, Body } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CurrentUser, Public } from '../auth/decorators';
-import type {
-  AudioProgressDto,
-  ProgressSyncDto,
-  StreamResponseDto,
-} from '@sd/core-contracts';
+import type { AudioProgressDto, ProgressSyncDto, StreamResponseDto } from '@sd/core-contracts';
 import { AudioService } from './audio.service';
 
 @ApiTags('Audio')
@@ -28,10 +24,7 @@ export class AudioController {
   @Post('progress/sync')
   @ApiOperation({ summary: 'Bulk sync progress from client' })
   @ApiOkResponse({ description: 'Progress synced' })
-  syncProgress(
-    @CurrentUser() user: { id: string },
-    @Body() body: ProgressSyncDto,
-  ): Promise<void> {
+  syncProgress(@CurrentUser() user: { id: string }, @Body() body: ProgressSyncDto): Promise<void> {
     return this.audio.bulkSync(user.id, body.items ?? []);
   }
 
@@ -61,9 +54,7 @@ export class AudioController {
   @Get('lectures/:lectureId/stream')
   @ApiOperation({ summary: 'Resolve a lecture primary audio stream' })
   @ApiOkResponse({ description: 'Primary audio asset URL and duration' })
-  getLectureStream(
-    @Param('lectureId') lectureId: string,
-  ): Promise<StreamResponseDto> {
+  getLectureStream(@Param('lectureId') lectureId: string): Promise<StreamResponseDto> {
     return this.audio.resolveStreamUrl(lectureId);
   }
 }

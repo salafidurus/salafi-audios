@@ -6,14 +6,8 @@ import { LibraryRepository } from './library.repo';
 export class LibraryService {
   constructor(private readonly repo: LibraryRepository) {}
 
-  async getInProgress(
-    userId: string,
-    cursor?: string,
-  ): Promise<LibraryPageDto> {
-    const { items, nextCursor } = await this.repo.findInProgress(
-      userId,
-      cursor,
-    );
+  async getInProgress(userId: string, cursor?: string): Promise<LibraryPageDto> {
+    const { items, nextCursor } = await this.repo.findInProgress(userId, cursor);
     return { items, nextCursor, hasMore: !!nextCursor };
   }
 

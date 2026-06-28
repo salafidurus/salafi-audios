@@ -86,11 +86,7 @@ export class LecturesRepository {
 
     if (!lecture) return null;
 
-    const seriesContext = await this.resolveSeriesContext(
-      lecture.seriesId,
-      lecture.id,
-      locale,
-    );
+    const seriesContext = await this.resolveSeriesContext(lecture.seriesId, lecture.id, locale);
 
     const primaryAudio = lecture.audioAssets[0] ?? null;
 
@@ -200,9 +196,7 @@ export class LecturesRepository {
     const currentIndex = siblings.findIndex((s) => s.id === lectureId);
     const prev = currentIndex > 0 ? siblings[currentIndex - 1] : null;
     const next =
-      currentIndex >= 0 && currentIndex < siblings.length - 1
-        ? siblings[currentIndex + 1]
-        : null;
+      currentIndex >= 0 && currentIndex < siblings.length - 1 ? siblings[currentIndex + 1] : null;
 
     const titleOf = (item: {
       title: string;
@@ -220,19 +214,12 @@ export class LecturesRepository {
       seriesId: series.id,
       seriesTitle: titleOf(series),
       seriesSlug: series.slug,
-      prevLecture: prev
-        ? { id: prev.id, slug: prev.slug, title: titleOf(prev) }
-        : null,
-      nextLecture: next
-        ? { id: next.id, slug: next.slug, title: titleOf(next) }
-        : null,
+      prevLecture: prev ? { id: prev.id, slug: prev.slug, title: titleOf(prev) } : null,
+      nextLecture: next ? { id: next.id, slug: next.slug, title: titleOf(next) } : null,
     };
   }
 
-  async findRelated(
-    lectureId: string,
-    limit: number = 6,
-  ): Promise<RelatedLectureDto[]> {
+  async findRelated(lectureId: string, limit: number = 6): Promise<RelatedLectureDto[]> {
     const locale = getRequestLocale();
     const lecture = await this.prisma.lecture.findFirst({
       where: { id: lectureId, deletedAt: null },
@@ -361,9 +348,7 @@ export class LecturesRepository {
         slug: r.slug,
         title: resolved.fields.title,
         originalLanguage: resolved.originalLanguage,
-        original: resolved.original
-          ? { title: resolved.original.title }
-          : undefined,
+        original: resolved.original ? { title: resolved.original.title } : undefined,
         durationSeconds: r.durationSeconds ?? undefined,
         scholar: {
           id: r.scholar.id,
@@ -384,10 +369,7 @@ export class LecturesRepository {
     });
   }
 
-  async updateLecture(
-    id: string,
-    updateDto: AdminLectureUpdateDto,
-  ): Promise<boolean> {
+  async updateLecture(id: string, updateDto: AdminLectureUpdateDto): Promise<boolean> {
     try {
       await this.prisma.lecture.update({
         where: { id },
@@ -443,9 +425,7 @@ export class LecturesRepository {
     };
   }
 
-  async listLectureTranslations(
-    lectureId: string,
-  ): Promise<TranslationViewDto[]> {
+  async listLectureTranslations(lectureId: string): Promise<TranslationViewDto[]> {
     const records = await this.prisma.lectureTranslation.findMany({
       where: { lectureId },
       orderBy: { locale: 'asc' },
@@ -483,10 +463,7 @@ export class LecturesRepository {
     return this.mapLectureTranslation(record);
   }
 
-  async publishLectureTranslation(
-    lectureId: string,
-    locale: string,
-  ): Promise<TranslationViewDto> {
+  async publishLectureTranslation(lectureId: string, locale: string): Promise<TranslationViewDto> {
     const record = await this.prisma.lectureTranslation.update({
       where: { lectureId_locale: { lectureId, locale: locale as Locale } },
       data: { status: 'published' },
@@ -648,10 +625,7 @@ export class LecturesRepository {
     });
   }
 
-  async bulkUpdateStatus(
-    ids: string[],
-    status: Status,
-  ): Promise<BulkActionResultDto> {
+  async bulkUpdateStatus(ids: string[], status: Status): Promise<BulkActionResultDto> {
     const succeeded: string[] = [];
     const failed: string[] = [];
 
@@ -662,9 +636,7 @@ export class LecturesRepository {
             where: { id, deletedAt: null },
             data: {
               status,
-              ...(status === Status.published
-                ? { publishedAt: new Date() }
-                : {}),
+              ...(status === Status.published ? { publishedAt: new Date() } : {}),
             },
           });
           if (updated.count > 0) {

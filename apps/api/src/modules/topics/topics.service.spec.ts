@@ -38,9 +38,7 @@ describe('TopicsService', () => {
 
   it('getBySlug throws NotFoundException if missing', async () => {
     repo.findBySlug.mockResolvedValue(null);
-    await expect(service.getBySlug('missing')).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
+    await expect(service.getBySlug('missing')).rejects.toBeInstanceOf(NotFoundException);
   });
 
   it('upsert throws NotFoundException when parentSlug is missing', async () => {

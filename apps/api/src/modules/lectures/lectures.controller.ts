@@ -17,8 +17,7 @@ export class LecturesController {
   @Get(':id')
   @ApiOperation({ summary: 'Get lecture detail by ID' })
   @ApiOkResponse({
-    description:
-      'Lecture detail with scholar, topics, audio, and series context',
+    description: 'Lecture detail with scholar, topics, audio, and series context',
   })
   getById(@Param('id') id: string): Promise<LectureDetailDto> {
     return this.lectures.getById(id);

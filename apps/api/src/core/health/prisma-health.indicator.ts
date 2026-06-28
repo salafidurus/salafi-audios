@@ -1,10 +1,6 @@
 import { PrismaService } from '../../shared/db/prisma.service';
 import { Injectable } from '@nestjs/common';
-import {
-  HealthCheckError,
-  HealthIndicator,
-  HealthIndicatorResult,
-} from '@nestjs/terminus';
+import { HealthCheckError, HealthIndicator, HealthIndicatorResult } from '@nestjs/terminus';
 
 @Injectable()
 export class PrismaHealthIndicator extends HealthIndicator {
@@ -12,17 +8,12 @@ export class PrismaHealthIndicator extends HealthIndicator {
     super();
   }
 
-  async pingCheck(
-    key: string,
-    options?: { timeout?: number },
-  ): Promise<HealthIndicatorResult> {
+  async pingCheck(key: string, options?: { timeout?: number }): Promise<HealthIndicatorResult> {
     try {
       const timeout = options?.timeout ?? 1000;
       await Promise.race([
         this.prisma.$queryRaw`SELECT 1`,
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('timeout')), timeout),
-        ),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout)),
       ]);
       return this.getStatus(key, true);
     } catch {

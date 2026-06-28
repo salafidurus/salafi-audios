@@ -44,9 +44,7 @@ export class TelegramMonitor {
       const { Api } = await import('telegram');
       const identifier = channel.telegramSlug ?? channel.telegramId;
 
-      const result = await client.invoke(
-        new Api.channels.GetFullChannel({ channel: identifier }),
-      );
+      const result = await client.invoke(new Api.channels.GetFullChannel({ channel: identifier }));
 
       const fullChat = result.fullChat as unknown as Record<string, unknown>;
       const call = fullChat['call'];
@@ -62,9 +60,7 @@ export class TelegramMonitor {
       });
       this.logger.debug(`Channel ${identifier}: isLive=${isLive}`);
     } catch (error) {
-      this.logger.warn(
-        `Failed to check channel ${channel.telegramId}: ${error}`,
-      );
+      this.logger.warn(`Failed to check channel ${channel.telegramId}: ${error}`);
     }
   }
 }

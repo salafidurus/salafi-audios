@@ -11,9 +11,7 @@ describe('resolveTranslatedFields', () => {
   });
 
   it('returns translated fields when translation is present', () => {
-    expect(
-      resolveTranslatedFields(primary, { title: 'مرحبا', description: 'وصف' }),
-    ).toEqual({
+    expect(resolveTranslatedFields(primary, { title: 'مرحبا', description: 'وصف' })).toEqual({
       title: 'مرحبا',
       description: 'وصف',
     });

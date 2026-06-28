@@ -49,9 +49,7 @@ describe('LecturesController — auth boundaries', () => {
     });
 
     it('GET /lectures/:id/related returns 200 without auth', () => {
-      return request(app.getHttpServer())
-        .get('/lectures/l1/related')
-        .expect(200);
+      return request(app.getHttpServer()).get('/lectures/l1/related').expect(200);
     });
   });
 
@@ -66,16 +64,12 @@ describe('LecturesController — auth boundaries', () => {
 
     it('POST /admin/lectures/:id/publish returns 401 without a session', () => {
       mockAuth.api.getSession.mockResolvedValue(null);
-      return request(app.getHttpServer())
-        .post('/admin/lectures/l1/publish')
-        .expect(401);
+      return request(app.getHttpServer()).post('/admin/lectures/l1/publish').expect(401);
     });
 
     it('POST /admin/lectures/:id/archive returns 401 without a session', () => {
       mockAuth.api.getSession.mockResolvedValue(null);
-      return request(app.getHttpServer())
-        .post('/admin/lectures/l1/archive')
-        .expect(401);
+      return request(app.getHttpServer()).post('/admin/lectures/l1/archive').expect(401);
     });
   });
 });

@@ -18,10 +18,10 @@
     "@sd/core-contracts": "workspace:*",
     "@tanstack/react-query": "catalog:"
   },
-  "peerDependencies": {
-    "react": "^19.0.0"
-  },
   "devDependencies": {
     "@testing-library/react": "catalog:"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
   }
 }

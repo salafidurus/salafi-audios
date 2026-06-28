@@ -1,9 +1,6 @@
 import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import type {
-  PresignedUrlRequestDto,
-  PresignedUrlResponseDto,
-} from '@sd/core-contracts';
+import type { PresignedUrlRequestDto, PresignedUrlResponseDto } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { RequiresPermission } from '../../shared/decorators/requires-permission.decorator';
 import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
@@ -19,9 +16,7 @@ export class MediaController {
   @Post('presigned-url')
   @RequiresPermission('manage:content')
   @ApiOperation({ summary: 'Get a presigned R2 upload URL' })
-  getPresignedUrl(
-    @Body() dto: PresignedUrlRequestDto,
-  ): Promise<PresignedUrlResponseDto> {
+  getPresignedUrl(@Body() dto: PresignedUrlRequestDto): Promise<PresignedUrlResponseDto> {
     return this.service.getPresignedUploadUrl(dto);
   }
 }

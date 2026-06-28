@@ -98,9 +98,7 @@ describe('LiveService', () => {
       });
       expect(result.deletedIds).toEqual(['old-id-1']);
       expect(typeof result.fetchedAt).toBe('string');
-      expect(repo.findActive).toHaveBeenCalledWith(
-        new Date('2024-01-01T00:00:00.000Z'),
-      );
+      expect(repo.findActive).toHaveBeenCalledWith(new Date('2024-01-01T00:00:00.000Z'));
       expect(repo.findDeletedFromActive).toHaveBeenCalled();
     });
 
@@ -124,9 +122,7 @@ describe('LiveService', () => {
 
       expect(result.sessions).toHaveLength(1);
       expect(result.deletedIds).toEqual([]);
-      expect(repo.findUpcoming).toHaveBeenCalledWith(
-        new Date('2024-01-01T00:00:00.000Z'),
-      );
+      expect(repo.findUpcoming).toHaveBeenCalledWith(new Date('2024-01-01T00:00:00.000Z'));
     });
 
     it('should not fetch deletedIds when no since date', async () => {
@@ -148,9 +144,7 @@ describe('LiveService', () => {
 
       expect(result.sessions).toHaveLength(1);
       expect(result.deletedIds).toEqual(['ended-old']);
-      expect(repo.findEnded).toHaveBeenCalledWith(
-        new Date('2024-01-01T00:00:00.000Z'),
-      );
+      expect(repo.findEnded).toHaveBeenCalledWith(new Date('2024-01-01T00:00:00.000Z'));
     });
   });
 
@@ -164,18 +158,13 @@ describe('LiveService', () => {
 
       expect(result).toBeDefined();
       expect(repo.findSessionById).toHaveBeenCalledWith('session-1');
-      expect(repo.updateSessionStatus).toHaveBeenCalledWith(
-        'session-1',
-        'ended',
-      );
+      expect(repo.updateSessionStatus).toHaveBeenCalledWith('session-1', 'ended');
     });
 
     it('should throw NotFoundException when session not found', async () => {
       repo.findSessionById.mockResolvedValue(null);
 
-      await expect(
-        service.updateSessionStatus('unknown', 'ended'),
-      ).rejects.toThrow(
+      await expect(service.updateSessionStatus('unknown', 'ended')).rejects.toThrow(
         new NotFoundException('Live session "unknown" not found'),
       );
       expect(repo.updateSessionStatus).not.toHaveBeenCalled();
@@ -213,9 +202,7 @@ describe('LiveService', () => {
     it('should throw NotFoundException when channel not found', async () => {
       repo.findChannelBySlug.mockResolvedValue(null);
 
-      await expect(service.getChannelBySlug('unknown')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.getChannelBySlug('unknown')).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -223,9 +210,7 @@ describe('LiveService', () => {
     it('should throw NotFoundException when channel not found', async () => {
       repo.findChannelById.mockResolvedValue(null);
 
-      await expect(
-        service.updateChannel('unknown', { displayName: 'New Name' }),
-      ).rejects.toThrow(
+      await expect(service.updateChannel('unknown', { displayName: 'New Name' })).rejects.toThrow(
         new NotFoundException('Livestream channel "unknown" not found'),
       );
       expect(repo.updateChannel).not.toHaveBeenCalled();
@@ -271,9 +256,7 @@ describe('LiveService', () => {
     it('should throw NotFoundException when session not found', async () => {
       repo.findSessionById.mockResolvedValue(null);
 
-      await expect(
-        service.updateSession('unknown', { title: 'New Title' }),
-      ).rejects.toThrow(
+      await expect(service.updateSession('unknown', { title: 'New Title' })).rejects.toThrow(
         new NotFoundException('Live session "unknown" not found'),
       );
       expect(repo.updateSession).not.toHaveBeenCalled();

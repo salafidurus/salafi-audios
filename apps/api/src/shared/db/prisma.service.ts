@@ -5,10 +5,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PinoLogger } from 'nestjs-pino';
 
 @Injectable()
-export class PrismaService
-  extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy
-{
+export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   private isConnected = false;
 
   constructor(
@@ -16,14 +13,10 @@ export class PrismaService
     private readonly logger: PinoLogger,
   ) {
     const connectionString =
-      config?.DATABASE_URL ??
-      process.env.DATABASE_URL ??
-      process.env.DIRECT_DB_URL;
+      config?.DATABASE_URL ?? process.env.DATABASE_URL ?? process.env.DIRECT_DB_URL;
 
     if (!connectionString) {
-      throw new Error(
-        'DATABASE_URL is required and no DB fallback is allowed.',
-      );
+      throw new Error('DATABASE_URL is required and no DB fallback is allowed.');
     }
 
     const adapter = new PrismaPg({ connectionString });

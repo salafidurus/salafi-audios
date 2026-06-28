@@ -21,9 +21,7 @@ export class SearchController {
     summary: 'Search catalog across collections, series, and lectures',
   })
   @ApiOkResponse({ type: SearchResultsDto })
-  search(
-    @Query() query: SearchQueryDto,
-  ): Promise<CatalogSearchResultsContractDto> {
+  search(@Query() query: SearchQueryDto): Promise<CatalogSearchResultsContractDto> {
     return this.searchService.search(query);
   }
 
@@ -33,9 +31,7 @@ export class SearchController {
       'Search catalog including scholar names and topic matches for collections, series, and lectures',
   })
   @ApiOkResponse({ type: SearchResultsDto })
-  searchExtended(
-    @Query() query: SearchQueryDto,
-  ): Promise<CatalogSearchResultsContractDto> {
+  searchExtended(@Query() query: SearchQueryDto): Promise<CatalogSearchResultsContractDto> {
     return this.searchService.searchExtended(query);
   }
 }

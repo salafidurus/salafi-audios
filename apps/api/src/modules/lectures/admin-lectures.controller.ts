@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Post,
-  Put,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type {
   AdminLectureActionDto,
@@ -57,9 +48,7 @@ export class AdminLecturesController {
   @Post()
   @RequiresPermission('manage:content')
   @ApiOperation({ summary: 'Create a lecture after R2 upload' })
-  createLecture(
-    @Body() dto: CreateLectureDto,
-  ): Promise<{ id: string; title: string }> {
+  createLecture(@Body() dto: CreateLectureDto): Promise<{ id: string; title: string }> {
     const publicUrl = `${process.env['R2_PUBLIC_BASE_URL']}/${dto.audioKey}`;
     return this.lectures.createLecture({ ...dto, publicUrl });
   }

@@ -1,11 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../shared/db/prisma.service';
 import { Status } from '@sd/core-db';
-import type {
-  ScholarChipDto,
-  ContentSuggestionDto,
-  RecentProgressDto,
-} from '@sd/core-contracts';
+import type { ScholarChipDto, ContentSuggestionDto, RecentProgressDto } from '@sd/core-contracts';
 import { resolveContentTranslation } from '../../shared/utils/resolve-content-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 
@@ -46,9 +42,7 @@ export class HomeRepo {
         slug: r.slug,
         imageUrl: r.imageUrl,
         originalLanguage: resolved.originalLanguage,
-        original: resolved.original
-          ? { name: resolved.original.name }
-          : undefined,
+        original: resolved.original ? { name: resolved.original.name } : undefined,
       };
     });
   }
@@ -107,9 +101,7 @@ export class HomeRepo {
         thumbnailUrl: null,
         durationSeconds: r.durationSeconds,
         originalLanguage: resolved.originalLanguage,
-        original: resolved.original
-          ? { title: resolved.original.title }
-          : undefined,
+        original: resolved.original ? { title: resolved.original.title } : undefined,
       };
     });
   }

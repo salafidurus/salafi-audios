@@ -7,7 +7,12 @@ export { useLibrarySavedScreen } from "./use-library-saved";
 export { useLibraryCompletedScreen } from "./use-library-completed";
 export { useLibraryProgressScreen } from "./use-library-progress";
 export { useLectureDetail } from "./lecture.api";
-export { useScholarsList, useScholarDetail, useScholarContent, splitScholarContent } from "./scholar.api";
+export {
+  useScholarsList,
+  useScholarDetail,
+  useScholarContent,
+  splitScholarContent,
+} from "./scholar.api";
 export {
   useContentTranslations,
   useSaveTranslation,

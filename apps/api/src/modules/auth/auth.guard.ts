@@ -39,10 +39,10 @@ export class AuthGuard implements CanActivate {
       if (!expired) throw new ForbiddenException('Account is banned');
     }
 
-    const requiredRoles = this.reflector.getAllAndOverride<string[]>(
-      ROLES_KEY,
-      [context.getHandler(), context.getClass()],
-    );
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
     if (!session.user.role) throw new UnauthorizedException();
 
