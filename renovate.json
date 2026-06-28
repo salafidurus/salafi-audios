@@ -89,11 +89,7 @@
     },
     {
       "description": "Ensure vulnerability fixes bypass the schedule and are sent immediately",
-      "matchRules": [
-        {
-          "matchUpdateTypes": ["security"]
-        }
-      ],
+      "matchUpdateTypes": ["security"],
       "schedule": ["at any time"]
     }
   ]
