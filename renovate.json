@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", ":separateMultipleVarRanges"],
+  "extends": ["config:recommended", ":separatePatchReleases", ":separateMultipleMinorReleases"],
   "timezone": "UTC",
   "schedule": ["before 7am every 2 days"],
   "prConcurrentLimit": 10,
