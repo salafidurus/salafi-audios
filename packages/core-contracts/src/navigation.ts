@@ -6,7 +6,7 @@
  */
 import { routes } from "./routes";
 
-export type Section = "feed" | "live" | "library" | "account";
+export type Section = "feed" | "live" | "library" | "settings";
 
 export type TabConfig = { id: string; label: string; labelKey: string; icon: string };
 
@@ -51,20 +51,20 @@ export const SECTION_TABS: Record<Section, TabConfig[]> = {
       icon: "check-circle",
     },
   ],
-  account: [
+  settings: [
     {
       id: "general",
       label: "General",
-      labelKey: "navigation.subnav.account.general",
+      labelKey: "navigation.subnav.settings.general",
       icon: "sliders-horizontal",
     },
     {
       id: "profile",
       label: "Profile",
-      labelKey: "navigation.subnav.account.profile",
+      labelKey: "navigation.subnav.settings.profile",
       icon: "user",
     },
-    { id: "legal", label: "Legal", labelKey: "navigation.subnav.account.legal", icon: "scale" },
+    { id: "legal", label: "Legal", labelKey: "navigation.subnav.settings.legal", icon: "scale" },
   ],
 };
 
@@ -72,19 +72,19 @@ export const DEFAULT_TABS: Record<Section, string> = {
   feed: "popular",
   live: "ongoing",
   library: "started",
-  account: "general",
+  settings: "general",
 };
 
 export const SECTION_LABELS: Record<Section, string> = {
   feed: "Explore",
   live: "Live",
   library: "Library",
-  account: "Account",
+  settings: "Settings",
 };
 
 export const SECTION_ROUTES: Record<Section, string> = {
   feed: routes.feed.index,
   live: routes.live.index,
   library: routes.library.index,
-  account: routes.account.index,
+  settings: routes.settings.index,
 };

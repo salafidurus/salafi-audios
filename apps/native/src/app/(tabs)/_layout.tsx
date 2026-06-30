@@ -10,7 +10,7 @@ export default function TabsLayout() {
         <Tabs.Screen name="feed" options={{ title: "Explore", tabBarLabel: "Explore" }} />
         <Tabs.Screen name="live" options={{ title: "Live", tabBarLabel: "Live" }} />
         <Tabs.Screen name="library" options={{ title: "Library", tabBarLabel: "Library" }} />
-        <Tabs.Screen name="account" options={{ title: "Account", tabBarLabel: "Account" }} />
+        <Tabs.Screen name="settings" options={{ title: "Settings", tabBarLabel: "Settings" }} />
       </Tabs>
     </RouteAccessGuard>
   );

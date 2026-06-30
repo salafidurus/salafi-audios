@@ -27,10 +27,10 @@ const SECTION_ICONS: Record<Section, LucideIcon> = {
   feed: Cloud,
   live: Mic,
   library: CassetteTape,
-  account: Settings,
+  settings: Settings,
 };
 
-const SECTION_ORDER: Section[] = ["feed", "live", "library", "account"];
+const SECTION_ORDER: Section[] = ["feed", "live", "library", "settings"];
 
 export function AdaptiveBottomBar() {
   const pathname = usePathname();

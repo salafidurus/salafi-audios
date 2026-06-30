@@ -31,9 +31,9 @@ export type SectionTabIconKey =
   | "library-started"
   | "library-saved"
   | "library-completed"
-  | "account-general"
-  | "account-profile"
-  | "account-legal";
+  | "settings-general"
+  | "settings-profile"
+  | "settings-legal";
 
 const SECTION_TAB_ICONS: Record<SectionTabIconKey, NativeNavigationIcon> = {
   "feed-popular": Flame,
@@ -45,9 +45,9 @@ const SECTION_TAB_ICONS: Record<SectionTabIconKey, NativeNavigationIcon> = {
   "library-started": Play,
   "library-saved": Bookmark,
   "library-completed": CheckCircle,
-  "account-general": SlidersHorizontal,
-  "account-profile": User,
-  "account-legal": Scale,
+  "settings-general": SlidersHorizontal,
+  "settings-profile": User,
+  "settings-legal": Scale,
 };
 
 export function getSectionTabIcon(section: Section, tabId: string): NativeNavigationIcon | null {
