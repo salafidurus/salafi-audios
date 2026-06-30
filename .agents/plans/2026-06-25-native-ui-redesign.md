@@ -2,11 +2,18 @@
 
 - **Date:** 2026-06-25
 - **Status:** Planned
-- **Scope:** `apps/native` — all screens, shared components, navigation, routing
-- **Summary:** Comprehensive UI redesign of the Salafi Durus native mobile app. The app serves Muslim learners seeking authentic Islamic knowledge; the target mood is scholarly, calm, and trustworthy — matching the premium web experience. The redesign does not change the core color palette. It addresses layout, typography, spacing, card/row consistency, navigation structure, settings restructuring, and clean route mapping across all mobile screens.
+- **Scope:** `apps/native` — all screens, shared components, navigation, routing; `packages/core-contracts` —
+  route constants and `ListingViewDto`; `apps/api` — new listing detail and scholar topics endpoints
+- **Summary:** Comprehensive UI redesign of the Salafi Durus native mobile app. The app serves Muslim
+  learners seeking authentic Islamic knowledge; the target mood is scholarly, calm, and trustworthy —
+  matching the premium web experience. The redesign does not change the core color palette. It
+  addresses layout, typography, spacing, card/row consistency, navigation structure, settings
+  restructuring, and clean route mapping across all mobile screens.
 - **Dependencies:**
   - `docs/nomenclature.md` content nomenclature rules.
-  - Shared design tokens in `packages/design-tokens` and shared domain packages (`@sd/domain-content`, `@sd/core-contracts`).
+  - Shared design tokens in `packages/design-tokens` and shared domain packages
+    (`@sd/domain-content`, `@sd/core-contracts`).
+  - Backend endpoints in `apps/api` (new: `GET /listing/:id`, `GET /scholars/:slug/topics`).
 
 ---
 
@@ -14,113 +21,164 @@
 
 > **All implementation work for this plan must be done in a git worktree.**
 >
-> Do not implement directly on the main working tree. Create a worktree branch first:
->
 > ```bash
 > git worktree add .worktrees/feat/native-ui-redesign -b feat/native-ui-redesign
 > ```
 >
-> Work exclusively in `.worktrees/feat/native-ui-redesign`. Commit each stage independently. When all stages are complete and the final verification passes, open a PR from `feat/native-ui-redesign` into the main branch and remove the worktree after merge.
+> Work exclusively in `.worktrees/feat/native-ui-redesign`. Commit each stage independently.
+> When all stages are complete and the final verification passes, open a PR from
+> `feat/native-ui-redesign` into the main branch and remove the worktree after merge.
 
 ---
 
 # Design Brief — For Mobile Agents
 
-This section records the design intent and constraints for the native mobile app redesign.
-
 - **Look & Feel:** Scholarly, premium, digital Islamic library.
-- **Styling Tech:** Use `react-native-unistyles` to resolve styling based on the shared design token system (`packages/design-tokens`).
-- **Nomenclature:** Implement the listing system exactly as defined in `docs/nomenclature.md`. Completely remove `/lectures`, `/series`, and `/collections` route layouts. Introduce unified `/listing/[id].tsx` path mapping.
-- **TDD Requirement:** Strict TDD. Write test files (`*.spec.tsx` or `*.spec.ts`) before implementing component or route changes.
+- **Styling Tech:** Use `react-native-unistyles` with `theme.colors.*`, `theme.spacing.*`,
+  `theme.radius.*`, `theme.typography.*` paths — never CSS variable syntax (`var(--...)`).
+- **Nomenclature:** Implement the listing system per `docs/nomenclature.md`. Remove `/lectures`,
+  `/series`, `/collections` route layouts. Introduce unified `/listing/[id].tsx`.
+- **TDD Requirement:** Write test files (`*.spec.tsx` / `*.spec.ts`) before implementation.
+- **Execution:** Sequential (one stage at a time).
 
 ---
 
 # Progress
 
-- **Done:** Target structure of mobile directories catalogued. Route directories identified in `apps/native/src/app`.
+- **Done:** Mobile directory structure catalogued. Codebase exploration complete — tab icon already
+  `Settings` gear, admin subtree found, `scholar-content-list.tsx` is sole legacy route linker,
+  `ListingViewDto` absent from `@sd/core-contracts`.
 - **Blocked / Uncertain:** None.
-- **Next step:** Create worktree, then execute Stage 1 (Global shell / Navigation).
+- **Next step:** Create worktree, then Stage 1.
 
 ---
 
 # Staging Strategy
 
-1. Global shell — Rename Account tab to Settings, update TabBar icons and active indicator states.
-2. Global design polish — Unistyles typography configuration, spacing token adjustments, card/row consistency.
-3. Feed screen — Redesign cards to unified podcast-style row components.
-4. Scholar List screen — Vertical list layout matching the list directory aesthetic.
-5. Scholar Detail screen — Scrollable mobile scholar view, header details, and list filtering.
-6. Live screen — Tabbed sub-views (Now | Scheduled | Ended) using Tab navigation.
-7. Library screen — Tabbed sub-views (Saved | In Progress | Completed).
-8. Sign In screen — Polished login page with Google + Apple premium SSO buttons.
-9. Settings screen (renamed from Account) — Grouped sub-menus (General, Profile, Legal).
-10. Admin screens — [Cancelled] Removed admin dashboard from mobile app.
-11. Unified Listing Detail page — Completely remove old `/lectures/[id]`, `/series/[id]`, `/collections/[id]` routes and create dynamic `/listing/[id]` router page.
-12. MiniPlayer & Playback polish — Clean up padding, controls, and dark mode theme.
+1. Global shell — Account→Settings rename + route constants update
+2. Global design polish — tokens + MiniPlayer
+3. Feed screen — podcast-style rows
+4. Scholar List — vertical catalog rows
+5. Scholar Detail — topic-based grouping + backend topics endpoint
+6. Live screen — tabbed sub-views
+7. Library screen — sub-tab layout
+8. Sign in — premium auth card
+9. Settings — grouped sub-sections
+10. Admin audit + cleanup
+11. Backend listing endpoint + ListingViewDto + unified mobile route + nomenclature docs
 
 ---
 
-## Stage 1: Global shell — Rename Account to Settings, update navigation bar
+## Stage 1: Global shell — Rename Account to Settings
 
 - **Status:** Planned
 
 ### Why
 
-The main navigation must reflect the renaming of "Account" to "Settings" to maintain consistency with the web app and properly describe the restructured options.
-
-### Goal
-
-Rename the bottom navigation tab "Account" to "Settings", update the active icon, and polish styling transitions on the TabBar.
+"Account" must become "Settings". The `CustomTabBar` already uses the `Settings` icon — only the
+label, route name, and route constants need changing. `@sd/core-contracts` exports route constants
+that reference `account` — they must be updated too.
 
 ### Files
 
 - `apps/native/src/app/(tabs)/_layout.tsx`
-- `apps/native/src/features/navigation/` (related navigation components)
+- `apps/native/src/features/navigation/utils/tab-route-config.ts`
+- `apps/native/src/app/(tabs)/account/` — rename to `(tabs)/settings/`
+- `apps/native/src/features/account/` — rename to `features/settings/`
+- `packages/core-contracts/src/query/routes.ts` or wherever `routes.account.*` constants are defined
+- All files importing from `@/features/account/` or `@/app/(tabs)/account/`
 
 ### Changes
 
-- Rename tab configuration from "Account" to "Settings".
+1. Delete `(tabs)/account/(admin)/` (all files).
+2. Rename `(tabs)/account/` → `(tabs)/settings/`.
+3. Update `_layout.tsx`: `name="account"` → `name="settings"`, label → `"Settings"`.
+4. Update `tab-route-config.ts`: `routeName: "account"` → `routeName: "settings"`,
+   `label: "Settings"`.
+5. Update `@sd/core-contracts` route constants: `routes.account.*` → `routes.settings.*`.
+6. Rename `features/account/` → `features/settings/`.
+7. Update all import paths.
 
-* Update tab icon from generic avatar/user icon to settings gear.
-* Update navigation labels and headers.
+### Test Files
+
+- `apps/native/src/app/(tabs)/_layout.spec.tsx`
+- `apps/native/src/features/navigation/utils/tab-route-config.spec.ts`
+- `packages/core-contracts/src/query/__tests__/routes.spec.ts`
 
 ### Completion Criteria
 
-- App compiles and runs cleanly on Android/iOS.
+- `pnpm --filter native typecheck && pnpm --filter native test` passes.
+- `pnpm --filter @sd/core-contracts typecheck && test` passes.
+- Bottom tab bar displays "Settings". Admin routes absent. Route constants resolve correctly.
 
-* Bottom navigation bar correctly displays "Settings" as the final tab.
+### Suggested Commit Message
+
+```
+feat(native): rename Account tab to Settings, update route constants
+
+- Rename (tabs)/account/ → (tabs)/settings/ in route tree
+- Delete all admin route files
+- Rename features/account/ → features/settings/
+- Update @sd/core-contracts route constants (account → settings)
+- Update all import references in apps/native/src
+```
 
 ---
 
-## Stage 2: Global design polish — Unistyles tokens, typography, and card layouts
+## Stage 2: Global design polish — Unistyles tokens, typography, card layouts, and MiniPlayer
 
 - **Status:** Planned
 
 ### Why
 
-Mobile typography needs to feel premium. Headings should be bold (utilizing the Fraunces display font where supported or configured), line-heights must be expanded for readability, and card layouts must be unified.
+Mobile typography needs to feel premium. Card layouts and the MiniPlayer use hardcoded values that
+must be migrated to design tokens for consistency and dark/light theme compliance.
 
 ### Goal
 
-Integrate design tokens for card padding, borders, shadows, and row highlights. Remediate hardcoded colors.
+Integrate design tokens for card padding, borders, shadows, and row highlights. Remediate hardcoded
+colors. Merge MiniPlayer token migration into this stage (absorbing the former Stage 12).
 
 ### Files
 
 - `apps/native/src/shared/components/ScreenView/ScreenView.tsx`
 - `apps/native/src/shared/components/Button/`
-- Global styles & Unistyles configurations
+- `apps/native/src/features/audio/components/mini-player.tsx`
+- Unistyles config files (theme definition, breakpoints)
 
 ### Changes
 
-- Map `ScreenView` background colors using design tokens (`var(--surface-canvas)` equivalent).
+1. Map `ScreenView` background colors to `theme.colors.surface.*` tokens.
+2. Map `Button` component colors to `theme.colors.action.*` and `theme.colors.content.*`.
+3. Map MiniPlayer colors from hardcoded hex values to `theme.colors.surface.*`, `theme.colors.content.*`.
+4. Define unified row container style helper in `apps/native/src/shared/styles/` for reuse across
+   Feed, Scholar List, Library, and Listing screens.
+5. Verify Unistyles theme resolves all new token references correctly.
 
-* Define unified row container styling class/style helper in `shared/styles` for reuse.
+### Test Files
+
+- `apps/native/src/shared/components/ScreenView/ScreenView.spec.tsx`
+- `apps/native/src/shared/components/Button/Button.spec.tsx`
+- `apps/native/src/features/audio/components/mini-player.spec.tsx`
 
 ### Completion Criteria
 
+- `pnpm --filter native typecheck` passes.
 - `pnpm --filter native test` passes.
+- All audited screens show consistent spacing, border radius, and color token usage.
+- MiniPlayer renders correctly in both dark and light modes.
 
-* All audited screens show consistent spacing and border radius metrics.
+### Suggested Commit Message
+
+```
+feat(native): migrate ScreenView, Button, MiniPlayer to design tokens
+
+- Map ScreenView background to theme.colors.surface tokens
+- Map Button colors to theme.colors.action and content tokens
+- Map MiniPlayer from hardcoded hex to theme token references
+- Add shared row style helper in shared/styles/
+- All hardcoded colors remediated in target components
+```
 
 ---
 
@@ -130,11 +188,13 @@ Integrate design tokens for card padding, borders, shadows, and row highlights. 
 
 ### Why
 
-The current feed is a collection of various card variants that compete for visual attention. Shifting to a vertical list of podcast-style rows improves scannability.
+The current feed renders various card variants that compete for visual attention. A vertical list of
+podcast-style rows improves scannability.
 
 ### Goal
 
-Replace card grid layouts in the feed with clean, full-width row items showing scholar avatar, lecture title, duration, date, and progress indicator.
+Replace card grid layouts in the feed with clean, full-width row items showing scholar avatar,
+lecture title, duration, date, and progress indicator. Use the shared row style helper from Stage 2.
 
 ### Files
 
@@ -143,13 +203,28 @@ Replace card grid layouts in the feed with clean, full-width row items showing s
 
 ### Changes
 
-- Modify `FeedRecentScreen` layout to render dynamic full-width list items.
+1. Rebuild `FeedRecentScreen` to render a single vertical `FlatList` with full-width podcast rows.
+2. Integrate progress bar indicator for in-progress feed items.
+3. Replace `FeedContentCard` with the new row component, or delete it if no other consumers exist.
 
-* Implement progress bar indicator for in-progress feed audios.
+### Test Files
+
+- `apps/native/src/features/feed/screens/feed-recent.screen.spec.tsx`
 
 ### Completion Criteria
 
-- Feed scrolls smoothly and items render correctly with consistent padding.
+- `pnpm --filter native test` passes.
+- Feed scrolls smoothly and items render with consistent padding from shared row styles.
+
+### Suggested Commit Message
+
+```
+feat(native): redesign feed as podcast-style full-width rows
+
+- Replace card grid in FeedRecentScreen with FlatList of rows
+- Add progress bar indicator for in-progress items
+- Use shared row style helper from Stage 2
+```
 
 ---
 
@@ -159,11 +234,13 @@ Replace card grid layouts in the feed with clean, full-width row items showing s
 
 ### Why
 
-The portrait grid representation displays minimal information per scholar. A vertical catalog row layout allows showing bio snippets and lecture counts directly in the list.
+The portrait grid displays minimal information per scholar. A vertical catalog row layout allows
+showing bio snippets and lecture counts directly in the list.
 
 ### Goal
 
-Update the scholar list to show large circle photos, scholar names (serif typography), bio snippets, and lecture counts.
+Update the scholar list to show large circle photos, scholar names (serif typography), bio
+snippets, and lecture counts.
 
 ### Files
 
@@ -172,42 +249,89 @@ Update the scholar list to show large circle photos, scholar names (serif typogr
 
 ### Changes
 
-- Replace the 2-column grid layout with a single-column vertical list.
+1. Replace the 2-column `FlatList` grid with a single-column vertical list.
+2. Render photo circle, scholar name, bio snippet (clamped to 2 lines), and lecture count.
+3. Apply the shared row style helper.
 
-* Render photo circle, title, bio snippet (clamped), and chevron buttons.
+### Test Files
+
+- `apps/native/src/features/scholar/screens/scholar-list/scholar-list.screen.spec.tsx`
+- `apps/native/src/features/scholar/components/scholar-card/scholar-card.spec.tsx`
 
 ### Completion Criteria
 
-- Scholar list displays as a list with centered content (max-width aligned).
+- `pnpm --filter native test` passes.
+- Scholar list renders as a vertical list with centered, max-width-aligned content.
+
+### Suggested Commit Message
+
+```
+feat(native): redesign scholar list as vertical catalog rows
+
+- Replace 2-column grid with single-column FlatList
+- Display circle photo, name, bio snippet, lecture count
+- Apply shared row style helper
+```
 
 ---
 
-## Stage 5: Scholar Detail screen — Mobile profile polish
+## Stage 5: Scholar Detail screen — Topic-based content grouping
 
 - **Status:** Planned
 
 ### Why
 
-The scholar profile header is currently sparse. It needs expansion to support biography toggling, detailed stats, and clean tab filters for content.
+The scholar profile header is sparse. Content should be grouped by topic (Tawheed, Fiqh, etc.)
+rather than filtered by type (Series/Singles/Collections). This requires a new backend endpoint
+that returns only topics for which the scholar has published listings.
 
 ### Goal
 
-Expand `ScholarHeader` to support collapsable/expandable bio snippets, and add filter tabs (All | Series | Singles | Collections) above the content list.
+Expand `ScholarHeader` with collapsible bio. Replace type-filter tabs with topic-based grouping
+powered by a new `GET /scholars/:slug/topics` endpoint. Render topic sections with their listings.
 
 ### Files
 
-- `apps/native/src/features/scholar/screens/scholar-detail/scholar-detail.screen.tsx`
-- `apps/native/src/features/scholar/components/scholar-header/scholar-header.tsx`
+- **New (backend):** `apps/api/src/modules/scholars/` — add topic-grouped content endpoint
+- **New (domain):** `packages/domain-content/src/hooks/useScholarTopics.ts`
+- **Existing (mobile):** `apps/native/src/features/scholar/screens/scholar-detail/scholar-detail.screen.tsx`
+- **Existing (mobile):** `apps/native/src/features/scholar/components/scholar-header/scholar-header.tsx`
 
 ### Changes
 
-- Implement expandable text block for biographies.
+1. **Backend:** Add `GET /scholars/:slug/topics` that returns
+   `{ topics: { topicId, topicName, items: ScholarContentItemDto[] }[] }`.
+2. **Contracts:** Add `ScholarTopicsDto` to `@sd/core-contracts/src/types/scholar.types.ts`.
+3. **Domain:** Add `useScholarTopics(slug)` hook.
+4. **Mobile:** Replace `ScholarContentList` with topic-sectioned display. Add expandable bio to
+   `ScholarHeader`.
 
-* Add filter tab buttons. Connect filter state to content query hooks.
+### Test Files
+
+- `apps/api/src/modules/scholars/scholars.controller.spec.ts`
+- `packages/core-contracts/src/types/scholar.types.spec.ts`
+- `apps/native/src/features/scholar/screens/scholar-detail/scholar-detail.screen.spec.tsx`
+- `apps/native/src/features/scholar/components/scholar-header/scholar-header.spec.tsx`
 
 ### Completion Criteria
 
-- Profile detail screen correctly filters listed content categories when tabs are clicked.
+- `pnpm --filter api test` passes.
+- `pnpm --filter @sd/core-contracts typecheck && test` passes.
+- `pnpm --filter native typecheck && test` passes.
+- Scholar detail shows topic-grouped content sections. Bio expands/collapses smoothly.
+
+### Suggested Commit Message
+
+```
+feat(api): add GET /scholars/:slug/topics endpoint
+
+feat(native): group scholar content by topic, add expandable bio
+
+- Add backend endpoint returning topics with their listings
+- Add ScholarTopicsDto and useScholarTopics hook
+- Replace type-filter tabs with topic sections on scholar detail
+- Add collapsible bio to ScholarHeader
+```
 
 ---
 
@@ -217,11 +341,13 @@ Expand `ScholarHeader` to support collapsable/expandable bio snippets, and add f
 
 ### Why
 
-Showing Live, Scheduled, and Ended sessions on a single scrollable page causes visual clutter. Introducing clean sub-tabs divides concerns logically.
+Showing Live, Scheduled, and Ended sessions in a single scroll causes visual clutter. Sub-tabs
+divide concerns logically.
 
 ### Goal
 
-Create sub-tabs (Now | Scheduled | Ended) in the live features layout, displaying lists corresponding to active, upcoming, and recording-ended streams.
+Add segmented control (Now | Scheduled | Ended) to the live screen, displaying list variants
+based on the active category.
 
 ### Files
 
@@ -229,13 +355,26 @@ Create sub-tabs (Now | Scheduled | Ended) in the live features layout, displayin
 
 ### Changes
 
-- Implement top tab switcher or segmented control.
+1. Implement top tab switcher or segmented control component.
+2. Render three list variants conditionally based on the active tab.
 
-* Render lists conditionally based on active live category filter.
+### Test Files
+
+- `apps/native/src/features/live/screens/live.screen.spec.tsx`
 
 ### Completion Criteria
 
-- Live screen switches tabs smoothly. Empty states are displayed correctly when no sessions exist.
+- `pnpm --filter native test` passes.
+- Live screen switches tabs smoothly. Empty states render correctly.
+
+### Suggested Commit Message
+
+```
+feat(native): add Now/Scheduled/Ended tabs to live screen
+
+- Implement segmented control for live session categories
+- Render list variants conditionally per active tab
+```
 
 ---
 
@@ -245,11 +384,12 @@ Create sub-tabs (Now | Scheduled | Ended) in the live features layout, displayin
 
 ### Why
 
-Users want to quickly filter saved items, in-progress items, and completed listings.
+Users need to quickly filter saved, in-progress, and completed listings.
 
 ### Goal
 
-Add top tab switcher (Saved | In Progress | Completed) to the library, with clean row items featuring progress bars.
+Add top tab switcher (Saved | In Progress | Completed) to the library, with clean row items
+featuring progress bars.
 
 ### Files
 
@@ -257,13 +397,26 @@ Add top tab switcher (Saved | In Progress | Completed) to the library, with clea
 
 ### Changes
 
-- Refactor `SectionList` into tab-filtered `FlatList` elements.
+1. Refactor `SectionList` into tab-filtered `FlatList` elements.
+2. Display thin progress bars (4px, rounded) under in-progress items.
 
-* Display thin progress bars (4px, rounded) under in-progress items.
+### Test Files
+
+- `apps/native/src/features/library/screens/library.screen.spec.tsx`
 
 ### Completion Criteria
 
-- Library tabs work correctly. Progress bars display values matching database states.
+- `pnpm --filter native test` passes.
+- Library tabs filter correctly. Progress bars reflect database state.
+
+### Suggested Commit Message
+
+```
+feat(native): add Saved/In Progress/Completed tabs to library
+
+- Replace SectionList with tab-filtered FlatLists
+- Add thin progress bar to in-progress items
+```
 
 ---
 
@@ -273,11 +426,11 @@ Add top tab switcher (Saved | In Progress | Completed) to the library, with clea
 
 ### Why
 
-The login page should present a high-quality interface that matches a scholarly digital catalog.
+The login page should present a high-quality interface matching a scholarly digital catalog.
 
 ### Goal
 
-Design a clean floating authentication panel featuring Google and Apple premium single-sign-on buttons.
+Design a clean floating authentication panel with Google and Apple premium SSO buttons.
 
 ### Files
 
@@ -285,13 +438,26 @@ Design a clean floating authentication panel featuring Google and Apple premium 
 
 ### Changes
 
-- Polish spacing, logo placement, and typography.
+1. Polish spacing, logo placement, and typography using design tokens.
+2. Style SSO buttons to match dark/light token presets.
 
-* Style the SSO buttons to match the dark and light token presets.
+### Test Files
+
+- `apps/native/src/features/auth/screens/sign-in/sign-in.screen.spec.tsx`
 
 ### Completion Criteria
 
-- Sign in screen renders cleanly. Button interaction states work correctly.
+- `pnpm --filter native test` passes.
+- Sign-in screen renders cleanly. Button interaction states work correctly.
+
+### Suggested Commit Message
+
+```
+feat(native): polish sign-in screen with premium SSO buttons
+
+- Apply design tokens to logo, spacing, and typography
+- Style Google and Apple buttons for dark/light mode
+```
 
 ---
 
@@ -301,143 +467,192 @@ Design a clean floating authentication panel featuring Google and Apple premium 
 
 ### Why
 
-The Account screen was a flat list mixing unrelated options. Grouping settings in sub-sections (General, Profile, Legal) provides better hierarchy.
+The Account screen was a flat list mixing unrelated options. Grouped sub-sections provide better
+hierarchy. The Unistyles theme context already exists — no infrastructure to build.
 
 ### Goal
 
-Re-style Settings as a multi-menu panel:
+Re-style Settings as a multi-menu panel with three sub-sections:
 
-- General: Language preference, theme mode (System/Light/Dark), and master notification toggles.
-- Profile: User name, email, display name editing, role permissions.
-- Legal: Document links (Privacy Policy, Terms).
-
-### Files
-
-- `apps/native/src/features/account/screens/account.screen.tsx`
-- `apps/native/src/features/account/screens/account-profile.screen.tsx`
-
-### Changes
-
-- Add segmented layout blocks or routing screens for each settings category.
-
-* Implement local state notifications configuration toggles.
-
-### Completion Criteria
-
-- Segmented controls save configuration variables correctly.
-
----
-
-## Stage 10: Admin screen — Unified dashboard screens [Cancelled]
-
-- **Status:** Cancelled
-
-### Why
-
-The user decided to keep admin functionality web-only and remove all admin panels/routes from the mobile app.
-
-### Goal
-
-None (Stage is Cancelled).
+- General: Language preference, theme mode (System/Light/Dark), notification toggles.
+- Profile: Name, email, display name editing, role display.
+- Legal: Privacy Policy, Terms links.
 
 ### Files
 
-None.
+- `apps/native/src/features/settings/screens/settings.screen.tsx` (renamed from account)
+- `apps/native/src/features/settings/screens/settings-profile.screen.tsx` (renamed from account-profile)
 
 ### Changes
 
-None.
+1. Add segmented layout blocks or sub-route screens for each category.
+2. Implement local state for notification toggles.
+3. Wire theme mode selector to the existing Unistyles theme context.
+
+### Test Files
+
+- `apps/native/src/features/settings/screens/settings.screen.spec.tsx`
+- `apps/native/src/features/settings/screens/settings-profile.screen.spec.tsx`
 
 ### Completion Criteria
 
-None.
+- `pnpm --filter native test` passes.
+- Theme mode toggle applies correctly in light/dark/system modes.
+- Notification toggles persist correctly.
+
+### Suggested Commit Message
+
+```
+feat(native): restructure settings with General/Profile/Legal sections
+
+- Add segmented sections for language, theme, notifications
+- Wire theme mode to existing Unistyles context
+- Wire notification toggles to local state
+```
 
 ---
 
-## Stage 11: Unified Listing Detail page — /listing/[id] and removal of legacy routes
+## Stage 10: Admin route cleanup — Audit then delete
 
 - **Status:** Planned
 
 ### Why
 
-As per the nomenclature authority, `/lectures/[id]`, `/series/[id]`, and `/collections/[id]` detail layouts must be completely removed. We must transition to a single, unified dynamic route `/listing/[id]` to represent any top-level content unit.
-
-### Goal
-
-Completely delete old route directories for collections, series, and lectures. Add the dynamic `/listing/[id].tsx` router page. Update `docs/nomenclature.md` to reflect this routing structure and prevent documentation drift.
+Admin is web-only. The admin subtree and feature folders must be removed. First audit for
+cross-references to avoid build breaks.
 
 ### Files
 
-- Delete: `apps/native/src/app/(content)/lectures/`
-- Delete: `apps/native/src/app/(content)/series/`
-- Delete: `apps/native/src/app/(content)/collections/`
-- Add: `apps/native/src/app/(content)/listing/[id].tsx`
-- Add screen component: `apps/native/src/features/listing/screens/listing-detail.screen.tsx`
-- Documentation: `docs/nomenclature.md`
+- **Grep targets:** `apps/native/src/` for any imports/usage of admin features
+- **Delete:** `apps/native/src/app/(tabs)/account/(admin)/` (all files)
+- **Delete:** `apps/native/src/features/admin/`, `admin-lectures/`, `admin-live/`, `admin-scholars/`
+- **Update:** `apps/native/src/features/settings/screens/settings.screen.tsx`
 
 ### Changes
 
-- **Route Deletion:** Cleanly delete the legacy route files from the monorepo router.
+1. Grep `apps/native/src/` for `features/admin`, `admin-lectures`, `admin-live`, `admin-scholars`,
+   to confirm no cross-feature imports exist.
+2. Delete admin route directory and all admin feature folders.
+3. Remove `onNavigateToAdmin` and `useAdminPermissions` admin-button branch from Settings screen.
 
-* **Unified Routing:** In `/listing/[id].tsx`, resolve the listing parameters and pass them to the `ListingDetailScreen` component.
-* **Dynamic Rendering:** Implement `ListingDetailScreen` to fetch the listing item. Differentiate layouts dynamically based on `ListingFormat` (Single, Series, Collection).
-* **Nomenclature Document Update:** Edit `docs/nomenclature.md` (specifically line 59) to replace `/lectures/:id` with `/listing/:id` as the canonical route for Listings, noting that legacy routes are removed (this change is shared with the web plan).
+### Test Files
+
+- `apps/native/src/features/settings/screens/settings.screen.spec.tsx`
+
+### Completion Criteria
+
+- `pnpm --filter native typecheck && test` passes.
+- No `(admin)` directory exists. Settings has no admin button.
+
+### Suggested Commit Message
+
+```
+feat(native): audit and remove admin routes from mobile app
+
+- Audit cross-references before deletion
+- Delete (tabs)/account/(admin)/ route tree
+- Delete admin feature folders
+- Remove admin navigation from Settings screen
+```
+
+---
+
+## Stage 11: Unified Listing Detail page — /listing/[id], ListingViewDto, and backend endpoint
+
+- **Status:** Planned
+
+### Why
+
+Legacy `/lectures/[id]`, `/series/[id]`, `/collections/[id]` must become a single `/listing/[id]`.
+A `ListingViewDto` must be created in `@sd/core-contracts` and served by a new backend endpoint.
+
+### Files
+
+- **Add (contracts):** `packages/core-contracts/src/types/listing.types.ts` — add `ListingViewDto`
+  discriminated union with `format: ListingFormat`
+- **Add (backend):** `apps/api/src/modules/listings/` — `GET /listing/:id` returning `ListingViewDto`
+- **Add (domain):** `packages/domain-content/src/hooks/useListingDetail.ts`
+- **Delete (routes):** `apps/native/src/app/(content)/lectures/[id].tsx`,
+  `series/[id].tsx`, `collections/[id].tsx`
+- **Add (route):** `apps/native/src/app/(content)/listing/[id].tsx`
+- **Add (screen):** `apps/native/src/features/listing/screens/listing-detail.screen.tsx`
+- **Update:** `apps/native/src/features/scholar/components/scholar-content-list/scholar-content-list.tsx`
+- **Update:** `docs/nomenclature.md`
+
+### Changes
+
+1. **Add `ListingViewDto`:** Discriminated union:
+   ```typescript
+   export type ListingViewDto = {
+     format: ListingFormat;
+   } & (LectureViewDto | SeriesViewDto | CollectionViewDto);
+   ```
+2. **Backend:** Add `GET /listing/:id` controller that fetches by legacy ID, checks if the entity
+   is a top-level Listing (not nested), and returns the unified DTO.
+3. **Contracts build:** `pnpm --filter @sd/core-contracts build`.
+4. **Domain hook:** `useListingDetail(id)`.
+5. **Route deletion:** Remove the three legacy route files.
+6. **New route + screen:** `/listing/[id].tsx` → `ListingDetailScreen` rendering by format.
+7. **Update scholar-content-list.tsx:** All items use `/(content)/listing/${item.id}`.
+8. **Update nomenclature.md:** Replace `/lectures/:id` with `/listing/:id`, add removal note.
 
 ### Blockers
 
-None. Old routes will be completely deleted from the mobile codebase without redirects.
+None. Old routes are deleted without redirects — no mobile consumers outside
+`scholar-content-list.tsx`. `LectureDetailScreen` becomes the Single variant of the new
+`ListingDetailScreen`.
 
 ### Dependencies
 
-Stages 2 and 3 (shared row styles). Scroll fix complete.
+Stages 2 (shared row styles for listing card layouts).
+
+### Test Files
+
+- `packages/core-contracts/src/types/listing.types.spec.ts`
+- `apps/api/src/modules/listings/listings.controller.spec.ts`
+- `apps/native/src/features/listing/screens/listing-detail.screen.spec.tsx`
+- `apps/native/src/features/scholar/components/scholar-content-list/scholar-content-list.spec.tsx`
 
 ### Completion Criteria
 
-- `pnpm --filter native typecheck` passes.
+- `pnpm --filter api typecheck && test` passes.
+- `pnpm --filter @sd/core-contracts typecheck && test` passes.
+- `pnpm --filter native typecheck && test` passes.
+- Legacy routes `/lectures/[id]`, `/series/[id]`, `/collections/[id]` do not exist.
+- Navigating to `/listing/[id]` renders correct layout based on `ListingFormat`.
+- `scholar-content-list.tsx` routes point to `/listing/[id]` exclusively.
+- Nomenclature doc updated.
 
-* Legacy routes are removed. Navigating to `/listing/[id]` fetches and displays listings.
+### Suggested Commit Message
 
----
+```
+feat(api): add GET /listing/:id endpoint returning ListingViewDto
 
-## Stage 12: MiniPlayer & Playback polish
+feat(native): replace legacy detail routes with unified /listing/[id]
 
-- **Status:** Planned
-
-### Why
-
-The audio mini-player should have unified controls, padding constraints, and dark/light color token compliance.
-
-### Goal
-
-Migrate playback components to token configurations and ensure responsive display constraints on all mobile viewports.
-
-### Files
-
-- `apps/native/src/features/audio/components/mini-player.tsx`
-
-### Changes
-
-- Remove hardcoded color styles.
-
-* Refactor dimensions to adapt cleanly to navigation bar sizing.
-
-### Completion Criteria
-
-- MiniPlayer looks correct in both dark and light modes.
+- Add ListingViewDto to @sd/core-contracts
+- Remove /lectures/[id], /series/[id], /collections/[id] routes
+- Add /listing/[id] route and ListingDetailScreen
+- Absorb LectureDetailScreen as Single variant
+- Update scholar-content-list.tsx to use /listing/[id]
+- Update docs/nomenclature.md route references
+```
 
 ---
 
 # Final Verification
 
-After all stages are committed:
-
-- `pnpm --filter native typecheck` passes.
-- `pnpm --filter native test` passes.
+- `pnpm --filter api typecheck && test` passes.
+- `pnpm --filter native typecheck && test` passes.
+- `pnpm --filter @sd/core-contracts typecheck && test` passes.
 - Verification checks:
-  - Catalog list, Feed list, and Library lists scroll smoothly.
-  - Legacy routes `/lectures`, `/series`, `/collections` do not compile or exist in router configuration.
+  - Feed list, Library lists, Scholar list scroll smoothly.
+  - Legacy routes `/lectures`, `/series`, `/collections` do not exist in router configuration.
   - Unified `/listing/[id]` loads and displays Single, Series, and Collection layouts properly.
-  - Active and disabled states in settings configure correctly.
+  - Scholar content grouped by topic. Bio expand/collapse works.
+  - Theme mode toggle applies correctly across all screens.
+  - Admin routes and feature code are absent from the mobile app.
+  - MiniPlayer renders correctly in both dark and light modes.
 
 ---
 

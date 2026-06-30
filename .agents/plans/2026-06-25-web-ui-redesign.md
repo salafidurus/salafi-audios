@@ -216,8 +216,10 @@ dark mode correctly.
 Stages are ordered by dependency: foundational/shared first, then screen by screen, then
 routing and new screens last. Each stage is independently committable.
 
-1. Global shell — sidebar, remove TopAuthStrip, sign-in at sidebar bottom
-2. Global polish — typography, spacing tokens, card/row design system, inline style remediation
+_Note: The `/search` screen is out of scope for this redesign and remains unchanged._
+
+1. Global shell — sidebar, remove TopAuthStrip, sign-in at sidebar bottom, useAdminPermissions hooks
+2. Global polish — typography, spacing tokens, card/row design system, inline style remediation (including MiniPlayer tokens)
 3. Feed screen — list view layout
 4. Scholar List screen — vertical list layout
 5. Scholar Detail screen — sticky two-panel polish
@@ -225,10 +227,9 @@ routing and new screens last. Each stage is independently committable.
 7. Library screen — tabbed layout (Saved | In Progress | Completed) + ScreenView wrap
 8. Sign In — AuthModal component + updated `/sign-in` page
 9. Settings screen (renamed from Account) — 3 tabs: General | Profile | Legal
-10. Admin section — new sidebar entries + new sub-pages (Stats, Users, Contents, Scholars)
-11. Unified Listing Detail page — /listing/[id] (remove older routes)
-12. MiniPlayer inline style fix (can be merged with Stage 2 if convenient)
-13. TopSubnavTabs polish
+10. Admin section — backend User List endpoint, new sidebar entries + new sub-pages (Stats, Users, Contents, Scholars)
+11. Unified Listing Detail page — /listing/[id] (ListingViewDto union, routes.ts update, contentHref updates, remove older routes)
+12. TopSubnavTabs polish
 
 ---
 
@@ -263,19 +264,32 @@ navigate to first.
 - `apps/web/src/features/navigation/components/sidebar/sidebar.desktop.tsx`
 - `apps/web/src/features/navigation/components/sidebar/sidebar.module.css`
 - `apps/web/src/features/navigation/components/top-auth-strip/` — can be deleted or left unused
+- `apps/web/src/features/admin/hooks/use-admin-permissions.ts` — accept options param
 - New component: `SectionLabel` (non-clickable sidebar section header — uppercase, muted/caption
   style)
 
 ### Changes
 
 - Remove `<TopAuthStrip />` from `MainLayout`.
+- Modify `useAdminPermissions()` hook:
+  - Add optional TanStack Query options parameter:
+    ```typescript
+    export function useAdminPermissions(
+      options?: Omit<
+        UseQueryOptions<MyPermissionsDto, Error, MyPermissionsDto, QueryKey>,
+        "queryKey" | "queryFn"
+      >,
+    );
+    ```
 - Update `SidebarDesktop`:
   - Add search icon button at top of nav items linking to `/search`.
   - Rename "Account" nav item label to "Settings" and change it to always point to `/account`.
   - Add bottom slot: if unauthenticated → "Sign In" button; if authenticated → user avatar +
     name + sign-out action.
+  - Query admin permissions with `useAdminPermissions({ enabled: isAuthenticated })` to avoid fetching when logged out.
+  - Derive admin check: `const hasAdminAccess = (adminPermissionsData?.permissions ?? []).length > 0;`.
   - Add admin nav section: divider line + `<SectionLabel>ADMIN</SectionLabel>` + five nav
-    items (Home, Stats, Users, Contents, Scholars), rendered only when `useAdminPermissions()` returns true.
+    items (Home, Stats, Users, Contents, Scholars), rendered only when `hasAdminAccess` is true.
 - Improve active item: richer `--surface-selected` background + smoother hover transition.
 
 ### Blockers
@@ -290,6 +304,7 @@ None. Can execute as the first implementation stage.
 
 - `pnpm --filter web typecheck` passes.
 - `pnpm --filter web test` passes.
+- Run tests: `pnpm --filter web test apps/web/src/features/navigation/components/sidebar`
 - Manual: sidebar renders correctly with sign-in at bottom; TopAuthStrip absent; admin section
   visible for admin user, hidden for regular user; search icon navigates to `/search`.
 
@@ -336,12 +351,13 @@ token system. This must be cleaned up.
 - **Spacing:** Audit `--space-layout-page-x/y` token values; increase if too cramped.
 - **Card/row design system:** Shared list-row CSS — `1rem 1.5rem` padding,
   `--surface-hover` hover state, `150ms ease` transition, `--border-subtle` border.
-- **Inline style remediation:** Replace all hardcoded colour values with CSS tokens.
+- **Inline style remediation:** Replace all hardcoded colour values with CSS tokens (including the MiniPlayer bar).
 
 ### Files
 
 - `apps/web/src/app/theme-css.ts` — review/adjust spacing token values if needed
 - `apps/web/src/features/audio/components/mini-player/mini-player.tsx` — inline colour fix
+- `apps/web/src/features/audio/components/mini-player/mini-player.module.css` — move styles to CSS module
 - `apps/web/src/features/library/screens/library-saved.screen.desktop.tsx`
 - `apps/web/src/features/library/screens/library-completed.screen.desktop.tsx`
 - `apps/web/src/features/scholar/screens/scholar-list/scholar-list.screen.desktop.tsx`
@@ -350,7 +366,9 @@ token system. This must be cleaned up.
 
 ### Changes
 
-- `MiniPlayer`: `#1e293b` → `var(--content-default)`, `#64748b` → `var(--content-muted)`.
+- `MiniPlayer` Inline Style Cleanup (Merged from Stage 12):
+  - Replace hardcoded colors `#1e293b` → `var(--content-default)` and `#64748b` → `var(--content-muted)`.
+  - Move styles to a CSS module `mini-player.module.css` for clean layout classes and dark mode adaptability.
 - Library screens: `borderBottom: "1px solid #eee"` → `var(--border-subtle)`,
   `color: "#666"` → `var(--content-muted)`, `color: "#999"` → `var(--content-subtle)`,
   progress bar `background: "#2563eb"` → `var(--action-primary)`.
@@ -369,6 +387,7 @@ Stage 1 should be complete (TopAuthStrip may be deleted, making its inline style
 
 - `pnpm --filter web typecheck` passes.
 - `pnpm --filter web lint` passes with no new violations.
+- Run tests: `pnpm --filter web test apps/web/src/features/audio/components/mini-player`
 - MiniPlayer renders correctly in both light and dark mode.
 - No hardcoded colour strings (`#xxx` or `rgb(...)`) remain in the listed files.
 
@@ -876,7 +895,7 @@ links). New components: SettingsSection, SettingsRow, SegmentedControl.
 
 ---
 
-## Stage 10: Admin section — new sub-pages and sidebar entries
+## Stage 10: Admin section — backend User List endpoint, new sub-pages and sidebar entries
 
 - **Status:** Planned
 
@@ -892,30 +911,44 @@ app is structured (sections in sidebar, not nested pages). The new admin section
 - **Contents** — content management (lectures, series, collections, topics).
 - **Scholars** — scholar management.
 
-The architectural mapping has been resolved: we will create entirely new separate admin pages at `/admin/stats`, `/admin/users`, `/admin/contents`, and `/admin/scholars`. The old routes (`/admin/lectures`, `/admin/live`, `/admin/topics`, `/admin/permissions`) will be completely deleted and return 404.
+Because lookup-by-ID is a poor user experience for user management, we will introduce backend API endpoints to list and search users and their permissions. The architectural mapping has been resolved: we will create entirely new separate admin pages at `/admin/stats`, `/admin/users`, `/admin/contents`, and `/admin/scholars`. The old routes (`/admin/lectures`, `/admin/live`, `/admin/topics`, `/admin/permissions`) will be completely deleted and return 404.
 
 ### Goal
 
-Add new admin sub-pages and wire the sidebar entries added in Stage 1.
+Implement backend search/list APIs for users, add new admin sub-pages, and wire the sidebar entries added in Stage 1.
 
 ### Files
 
-- `apps/web/src/app/(main)/(admin)/admin/` — new page files
-- `apps/web/src/features/admin/` — new screen components
-- Delete old legacy admin routes in `apps/web/src/app/(main)/(admin)/admin/` (except scholars which is redesigned)
+- **Backend / Shared Contracts:**
+  - `packages/core-contracts/src/endpoints.ts` — add `admin.users.list` endpoint
+  - `packages/core-contracts/src/types/admin.types.ts` — add response types (`AdminUserListItemDto`, `AdminUserListDto`)
+  - `apps/api/src/modules/admin-permissions/admin-permissions.controller.ts` — add `GET /admin/users` or `GET /admin/permissions` listing endpoint
+  - `apps/api/src/modules/admin-permissions/admin-permissions.service.ts` — add user listing and query logic
+- **Frontend:**
+  - `apps/web/src/features/admin/api/admin.api.ts` — add `fetchAdminUsers()`
+  - `apps/web/src/features/admin/hooks/use-admin-users.ts` — React Query list users hook
+  - `apps/web/src/features/admin/screens/admin-users/admin-users.screen.desktop.tsx` — new screen components (searchable/sortable table)
+  - `apps/web/src/app/(main)/(admin)/admin/` — new page files
+  - Delete old legacy admin routes in `apps/web/src/app/(main)/(admin)/admin/` (except scholars which is redesigned)
 
 ### Changes
 
-- `/admin` (Home): overview page with quick navigation links and recent activity summary.
-- `/admin/stats`: key metrics dashboard (total lectures, scholars, users, sessions).
-- `/admin/users`: searchable/sortable user table; view profile, change role, revoke access. (Handles user management and role/permissions from old `/admin/permissions`).
-- `/admin/contents`: searchable/sortable table for lectures/series/collections; add, edit, delete; manage topics taxonomy. (Handles old `/admin/lectures`, `/admin/live`, `/admin/topics` routes).
-- `/admin/scholars`: dedicated scholar manager screen (redesigned separately from `/admin/contents`).
-- Delete all unused legacy route folders (e.g. `lectures`, `live`, `topics`, `permissions` under `/admin/`).
+- **Backend Implementation:**
+  - In `core-contracts`, register `GET /admin/permissions` as the users and permissions list endpoint.
+  - In NestJS `AdminPermissionsController`, expose `@Get()` method. Secure it with `@RequiresPermission('manage:admin')`.
+  - In NestJS `AdminPermissionsService`, query all users (with optional query filter for name/email matching `contains` case-insensitive) and join their granted `adminPermissions`.
+- **Frontend Implementation:**
+  - Implement `fetchAdminUsers()` API fetch and custom react-query hook `useAdminUsers()`.
+  - Build `AdminUsersDesktopScreen` and `/admin/users/page.tsx` rendering a table of users (showing name, email, roles/permissions list, and a "Manage" button triggering the modal or inline role editing).
+  - `/admin` (Home): overview page with quick navigation links and recent activity summary.
+  - `/admin/stats`: key metrics dashboard (total lectures, scholars, users, sessions).
+  - `/admin/contents`: searchable/sortable table for lectures/series/collections; add, edit, delete; manage topics taxonomy. (Handles old `/admin/lectures`, `/admin/live`, `/admin/topics` routes).
+  - `/admin/scholars`: dedicated scholar manager screen (redesigned separately from `/admin/contents`).
+  - Delete all unused legacy route folders (e.g. `lectures`, `live`, `topics`, `permissions` under `/admin/`).
 
 ### Blockers
 
-None. The architectural decision has been made to delete the old routes completely (except scholars) and create new dedicated layout screens.
+None.
 
 ### Dependencies
 
@@ -923,9 +956,12 @@ Stage 1 (admin sidebar nav items must be wired first).
 
 ### Completion Criteria
 
+- `pnpm --filter api test` passes (including new integration tests for NestJS controller).
 - `pnpm --filter web typecheck` passes.
 - `pnpm --filter web test` passes.
-- Manual: `/admin/stats`, `/admin/users`, `/admin/contents`, and `/admin/scholars` all render for an admin user; non-admin users are redirected or shown an access-denied state.
+- Run tests: `pnpm --filter web test apps/web/src/features/admin`
+- Manual: `/admin/users` fetches all registered users from the backend; search filter functions correctly.
+- Manual: `/admin/stats`, `/admin/contents`, and `/admin/scholars` all render for an admin user; non-admin users are redirected or shown an access-denied state.
 - Manual: Legacy routes return 404.
 
 ### Suggested Commit Message
@@ -956,28 +992,46 @@ All three container types are top-level "Listings" (as defined in [nomenclature.
 
 ### Goal
 
-Build a unified `/listing/[id]` page that dynamically handles Series, Collections, and Singles. Remove the legacy `/lectures/[id]`, `/series/[id]`, and `/collections/[id]` routes completely. Update `docs/nomenclature.md` to reflect this routing structure and prevent documentation drift.
+Build a unified `/listing/[id]` page that dynamically handles Series, Collections, and Singles. Declare unified type and route contracts in `core-contracts`. Remove the legacy `/lectures/[id]`, `/series/[id]`, and `/collections/[id]` routes completely. Update `docs/nomenclature.md` to reflect this routing structure and prevent documentation drift.
 
 ### Files
 
-- New route: `apps/web/src/app/(main)/listing/[id]/page.tsx`
-- Delete routes:
-  - `apps/web/src/app/(main)/lectures/[id]/page.tsx` — remove
-  - `apps/web/src/app/(main)/series/[id]/page.tsx` — remove
-  - `apps/web/src/app/(main)/collections/[id]/page.tsx` — remove
-- New feature: `apps/web/src/features/content-detail/` — shared dynamic `ContentItemDetail` component
-- Documentation: `docs/nomenclature.md`
+- **Core Contracts & Shared Types:**
+  - `packages/core-contracts/src/types/listing.types.ts` — add `ListingViewDto`
+  - `packages/core-contracts/src/routes.ts` — update route configuration details
+- **Frontend Components & Routing:**
+  - New route: `apps/web/src/app/(main)/listing/[id]/page.tsx`
+  - Modify: `apps/web/src/features/scholar/components/scholar-content-list/scholar-content-list.tsx` — update route builder `contentHref()`
+  - Delete routes:
+    - `apps/web/src/app/(main)/lectures/` — remove
+    - `apps/web/src/app/(main)/series/` — remove
+    - `apps/web/src/app/(main)/collections/` — remove
+  - New feature: `apps/web/src/features/content-detail/` — shared dynamic `ContentItemDetail` component
+- **Documentation:**
+  - `docs/nomenclature.md` — update reference
 
 ### Changes
 
-- **Unified Listing Page Routing:** In `/listing/[id]/page.tsx`, resolve the listing data from the API (which includes the listing format: Single, Series, or Collection). Pass the resolved data and format to the `ContentItemDetail` component.
+- **Contracts Registration:**
+  - Declare `ListingViewDto` union in `listing.types.ts`:
+    ```typescript
+    export type ListingViewDto = LectureViewDto | SeriesViewDto | CollectionViewDto;
+    ```
+  - In `routes.ts`, replace the old detail routes (`lectures.detail`, `series.detail`, `collections.detail`) with the unified listings route constant:
+    ```typescript
+    listings: {
+      detail: (id: string) => `/listing/${id}` as const,
+    }
+    ```
+- **Unified Listing Page Routing:** In `/listing/[id]/page.tsx`, resolve the listing data from the API. Since there is no unified backend `/listing/:id` endpoint yet, the page will query `/lectures/${id}`, `/series/${id}`, or `/collections/${id}` sequentially (or use a helper resolver function) to retrieve the correct payload. Pass the resolved data and format to the `ContentItemDetail` component.
+- **Client links update:** Modify `scholar-content-list.tsx`'s `contentHref` method to return `/listing/${item.id}` for all content types.
 - **Common layout for Series, Collections, Singles:**
   - Top header: cover image/scholar photo + title (`displayMd`, Fraunces) + scholar link + type badge (Series/Collection/Single) + description (expandable) + topic tags + Play All button + Save button + progress indicator ("3 of 10 listened").
   - Lecture list: numbered (series) or unordered (collections); each row: track number/index + title + duration + play icon + "listened" checkmark.
   - Currently playing row: highlighted with primary color.
   - Related content: "More from [Scholar]" horizontal scroll row at the bottom.
 - **Legacy Route Removal:** Completely delete the directories `apps/web/src/app/(main)/lectures`, `apps/web/src/app/(main)/series`, and `apps/web/src/app/(main)/collections`.
-- **Nomenclature Document Update:** Edit `docs/nomenclature.md` (specifically line 59) to replace `/lectures/:id` with `/listing/:id` as the canonical route for Listings, noting that legacy routes are removed.
+- **Nomenclature Document Update:** Edit `docs/nomenclature.md` (specifically the last sentence of the document) to replace `/lectures/:id` with `/listing/:id` as the canonical route for Listings, noting that legacy routes are removed.
 
 ### Blockers
 
@@ -991,6 +1045,7 @@ Stages 2 and 3 (shared list row styles). Scroll fix complete.
 
 - `pnpm --filter web typecheck` passes.
 - `pnpm --filter web test` passes (add/run tests for dynamic layout branching).
+- Run tests: `pnpm --filter web test apps/web/src/features/scholar` (verifies scholar-content-list route links)
 - Manual: Navigating to `/listing/[id]` for a Series, Collection, or Single renders the correct layout.
 - Manual: Confirm that legacy routes `/lectures/[id]`, `/series/[id]`, and `/collections/[id]` are removed and return 404.
 
@@ -1006,60 +1061,7 @@ Delete legacy route directories for lectures, series, and collections.
 
 ---
 
-## Stage 12: MiniPlayer inline style fix
-
-- **Status:** Planned
-
-### Why
-
-The MiniPlayer uses hardcoded inline colours (`#1e293b`, `#64748b`) that do not respond to
-dark mode. The design token system has the correct tokens (`--content-default`,
-`--content-muted`) that already handle both themes. This is extracted as its own stage for
-clean isolation, but can be merged into Stage 2 if convenient.
-
-### Goal
-
-Replace all hardcoded inline colour values in `MiniPlayer` with CSS custom property tokens.
-Move styles to a CSS module.
-
-### Files
-
-- `apps/web/src/features/audio/components/mini-player/mini-player.tsx`
-- `apps/web/src/features/audio/components/mini-player/mini-player.module.css` (create if
-  absent)
-
-### Changes
-
-- `#1e293b` → `var(--content-default)`
-- `#64748b` → `var(--content-muted)`
-- Any other hardcoded colour values → appropriate token.
-- Move styles to CSS module where practical.
-
-### Blockers
-
-None currently identified.
-
-### Dependencies
-
-Stage 2 (can be merged with it).
-
-### Completion Criteria
-
-- `pnpm --filter web lint` passes.
-- Manual: MiniPlayer looks correct in light mode and dark mode; no colour regression.
-
-### Suggested Commit Message
-
-```
-fix(web/audio): replace MiniPlayer hardcoded colours with CSS tokens
-
-Replace #1e293b and #64748b inline styles with --content-default and
---content-muted. Move styles to CSS module for dark mode correctness.
-```
-
----
-
-## Stage 13: TopSubnavTabs polish
+## Stage 12: TopSubnavTabs polish
 
 - **Status:** Planned
 
@@ -1098,6 +1100,7 @@ Stage 1 (sidebar + layout changes must be stable).
 ### Completion Criteria
 
 - `pnpm --filter web typecheck` passes.
+- Run tests: `pnpm --filter web test apps/web/src/features/navigation/components/top-subnav-tabs`
 - Manual: `TopSubnavTabs` renders with improved typography and clear active state on all
   section pages.
 
@@ -1143,7 +1146,7 @@ After all stages are committed:
 
 The plan is `Completed` when:
 
-1. All 13 stages are committed and merged from the `feat/web-ui-redesign` worktree branch.
+1. All 12 stages are committed and merged from the `feat/web-ui-redesign` worktree branch.
 2. All final verification checks pass.
 3. No regressions observed during the full manual smoke test.
 4. The worktree is removed after merge (`git worktree remove .worktrees/feat/web-ui-redesign`).
