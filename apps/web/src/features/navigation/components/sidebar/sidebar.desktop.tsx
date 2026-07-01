@@ -48,32 +48,32 @@ const adminNavItems: AdminNavItem[] = [
   {
     label: "Home",
     Icon: LayoutDashboard,
-    href: "/admin",
-    activeMatch: "/admin",
+    href: routes.admin.index,
+    activeMatch: routes.admin.index,
   },
   {
     label: "Stats",
     Icon: BarChart3,
-    href: "/admin/stats",
-    activeMatch: "/admin/stats",
+    href: routes.admin.stats,
+    activeMatch: routes.admin.stats,
   },
   {
     label: "Users",
     Icon: Users,
-    href: "/admin/users",
-    activeMatch: "/admin/users",
+    href: routes.admin.users,
+    activeMatch: routes.admin.users,
   },
   {
     label: "Contents",
     Icon: FolderOpen,
-    href: "/admin/contents",
-    activeMatch: "/admin/contents",
+    href: routes.admin.contents,
+    activeMatch: routes.admin.contents,
   },
   {
     label: "Scholars",
     Icon: GraduationCap,
-    href: "/admin/scholars",
-    activeMatch: "/admin/scholars",
+    href: routes.admin.scholars,
+    activeMatch: routes.admin.scholars,
   },
 ];
 
@@ -84,11 +84,9 @@ export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const { isAuthenticated, user, isLoading } = useAuth();
 
-  const { data: adminPermissionsData } = useAdminPermissions({
-    enabled: isAuthenticated,
-  });
+  const { data: adminPermissionsData } = useAdminPermissions();
 
-  const hasAdminAccess = (adminPermissionsData?.permissions ?? []).length > 0;
+  const hasAdminAccess = isAuthenticated && (adminPermissionsData?.permissions ?? []).length > 0;
   const accountHref = routes.account.index;
 
   const navItems: NavItem[] = [
@@ -164,6 +162,8 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={clsx(styles.link, isActive && styles.active)}
+              aria-label={item.label}
+              title={collapsed ? item.label : undefined}
             >
               <span className={styles.icon} aria-hidden="true">
                 <item.Icon size={18} />
@@ -175,6 +175,8 @@ export function Sidebar() {
         <Link
           href={accountHref}
           className={clsx(styles.link, pathname.startsWith(routes.account.index) && styles.active)}
+          aria-label={t("navigation.settings", "Settings")}
+          title={collapsed ? t("navigation.settings", "Settings") : undefined}
         >
           <span className={styles.icon} aria-hidden="true">
             <Settings size={18} />
@@ -188,12 +190,14 @@ export function Sidebar() {
             <SectionLabel collapsed={collapsed}>ADMIN</SectionLabel>
             {adminNavItems.map((item) => {
               const isActive =
-                item.href === "/admin" ? pathname === "/admin" : pathname.startsWith(item.href);
+                item.href === routes.admin.index ? pathname === routes.admin.index : pathname.startsWith(item.href);
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={clsx(styles.link, isActive && styles.active)}
+                  aria-label={item.label}
+                  title={collapsed ? item.label : undefined}
                 >
                   <span className={styles.icon} aria-hidden="true">
                     <item.Icon size={18} />

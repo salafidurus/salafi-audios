@@ -52,6 +52,14 @@ export const routes = {
     detail: (id: string) => `/lectures/${id}` as const,
   },
 
+  admin: {
+    index: "/admin",
+    stats: "/admin/stats",
+    users: "/admin/users",
+    contents: "/admin/contents",
+    scholars: "/admin/scholars",
+  },
+
   signIn: "/sign-in",
   support: "/support",
   privacy: "/privacy",
@@ -95,7 +103,7 @@ export const routeDefinitions: RouteDefinition[] = [
   { path: routes.search, access: "public" },
   { path: routes.scholars.index, access: "public" },
   { path: routes.support, access: "public" },
-  { path: "/admin", access: "auth-required" },
+  { path: routes.admin.index, access: "auth-required" },
   { path: routes.home, access: "public" },
 ];
 
