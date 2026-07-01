@@ -220,16 +220,14 @@ export function Sidebar() {
                 </div>
               )}
             </div>
-            {!collapsed && (
-              <button
-                type="button"
-                className={styles.signOutButton}
-                onClick={() => void authClient.signOut().then(() => router.push(routes.home))}
-                aria-label={t("authStrip.signOut", "Sign Out")}
-              >
-                <LogOut size={16} />
-              </button>
-            )}
+            <button
+              type="button"
+              className={styles.signOutButton}
+              onClick={() => void authClient.signOut().then(() => router.push(routes.home))}
+              aria-label={t("authStrip.signOut", "Sign Out")}
+            >
+              <LogOut size={16} />
+            </button>
           </div>
         ) : !isLoading && !isAuthenticated ? (
           collapsed ? (

@@ -1,10 +1,11 @@
 import React from "react";
 import { vi, type Mock } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { Sidebar } from "./sidebar.desktop";
 import { useAuth, authClient } from "@/core/auth";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 import { usePathname, useRouter } from "next/navigation";
+import { routes } from "@sd/core-contracts";
 
 vi.mock("@/core/auth", () => ({
   useAuth: vi.fn(),
@@ -104,9 +105,14 @@ describe("Sidebar component", () => {
     render(<Sidebar />);
 
     const signOutBtn = screen.getByRole("button", { name: "Sign Out" });
-    fireEvent.click(signOutBtn);
+    await act(async () => {
+      fireEvent.click(signOutBtn);
+    });
 
     expect(authClient.signOut).toHaveBeenCalled();
+    await vi.waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith(routes.home);
+    });
   });
 
   it("renders ADMIN section with sub-routes only when user has admin permissions", () => {
