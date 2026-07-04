@@ -126,6 +126,10 @@ textarea:focus {
   transition: background-color 150ms ease, border-color 150ms ease;
 }
 
+.listRow:last-child {
+  border-bottom: none;
+}
+
 .listRow:hover {
   background-color: var(--surface-hover);
 }

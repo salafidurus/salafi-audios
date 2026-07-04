@@ -78,7 +78,7 @@
   font-size: var(--typo-caption-font-size);
   font-weight: var(--typo-caption-font-weight);
   line-height: var(--typo-caption-line-height);
-  color: var(--content-subtle);
+  color: var(--content-muted);
 }
 
 .rightSection {

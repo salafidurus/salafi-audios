@@ -69,6 +69,7 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.target !== e.currentTarget) return;
     if (onPress && (e.key === "Enter" || e.key === " ")) {
       e.preventDefault();
       onPress();

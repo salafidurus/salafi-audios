@@ -1,40 +1,59 @@
 "use client";
 
+import type { ReactNode } from "react";
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
 import { FeedListRow } from "../components/feed-list-row/feed-list-row";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import { useFeedFollowingScreen } from "@sd/domain-content";
+import styles from "./feed-recent.screen.mobile.module.css";
 
 export type FeedFollowingMobileScreenProps = {
   onNavigateToLecture?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
 };
 
-function renderFeedItem(
-  item: FeedItemDto,
-  onNavigateToLecture?: (slug: string) => void,
-  onNavigateToScholar?: (slug: string) => void,
-) {
-  switch (item.kind) {
-    case "scholar_row":
-      return (
-        <FeedScholarRow
-          key="scholar-row"
-          scholars={item.scholars}
-          onScholarPress={onNavigateToScholar}
-        />
+type FeedBlocksProps = {
+  items: FeedItemDto[];
+  onNavigateToLecture?: (slug: string) => void;
+  onNavigateToScholar?: (slug: string) => void;
+};
+
+function FeedBlocks({ items, onNavigateToLecture, onNavigateToScholar }: FeedBlocksProps) {
+  const blocks: ReactNode[] = [];
+  let cards: ReactNode[] = [];
+
+  const flushCards = (key: string) => {
+    if (cards.length === 0) return;
+    blocks.push(
+      <div className={styles.list} key={`list-${key}`}>
+        {cards}
+      </div>,
+    );
+    cards = [];
+  };
+
+  items.forEach((item, index) => {
+    if (item.kind === "scholar_row") {
+      flushCards(String(index));
+      blocks.push(
+        <section className={styles.section} key={`scholar-row-${index}`}>
+          <FeedScholarRow scholars={item.scholars} onScholarPress={onNavigateToScholar} />
+        </section>,
       );
-    case "topic_row":
-      return null;
-    default:
-      return (
+    } else if (item.kind !== "topic_row") {
+      const contentItem = item as FeedContentItemDto;
+      cards.push(
         <FeedListRow
-          key={item.id}
-          item={item as FeedContentItemDto}
-          onPress={() => onNavigateToLecture?.(item.slug)}
-        />
+          key={contentItem.id}
+          item={contentItem}
+          onPress={() => onNavigateToLecture?.(contentItem.slug)}
+        />,
       );
-  }
+    }
+  });
+
+  flushCards("end");
+  return <>{blocks}</>;
 }
 
 export function FeedFollowingMobileScreen({
@@ -58,21 +77,15 @@ export function FeedFollowingMobileScreen({
 
   return (
     <div style={{ padding: 12 }}>
-      <h2 style={{ margin: 0, fontSize: 18, marginBottom: 12 }}>Following</h2>
-      {items.map((item) => renderFeedItem(item, onNavigateToLecture, onNavigateToScholar))}
+      <h2 className={styles.title}>Following</h2>
+      <FeedBlocks
+        items={items}
+        onNavigateToLecture={onNavigateToLecture}
+        onNavigateToScholar={onNavigateToScholar}
+      />
       {hasNextPage && (
-        <div style={{ padding: 12, textAlign: "center" }}>
-          <button
-            type="button"
-            onClick={() => fetchNextPage()}
-            style={{
-              padding: "8px 20px",
-              border: "1px solid var(--border-default)",
-              borderRadius: 6,
-              cursor: "pointer",
-              background: "var(--surface-default)",
-            }}
-          >
+        <div className={styles.loadMoreRow}>
+          <button type="button" onClick={() => fetchNextPage()} className={styles.button}>
             {isFetching ? "Loading…" : "Load more"}
           </button>
         </div>
