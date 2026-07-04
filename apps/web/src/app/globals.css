@@ -130,6 +130,8 @@ textarea:focus {
   border-bottom: none;
 }
 
-.listRow:hover {
+button.listRow:hover,
+a.listRow:hover,
+[role="button"].listRow:hover {
   background-color: var(--surface-hover);
 }
