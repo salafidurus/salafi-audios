@@ -11,7 +11,7 @@ export type LiveSessionRowProps = {
   onPress?: () => void;
 };
 
-function formatScheduledTime(dateStr: string) {
+export function formatScheduledTime(dateStr: string) {
   const date = new Date(dateStr);
   const timeOptions: Intl.DateTimeFormatOptions = {
     hour: "numeric",
