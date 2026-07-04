@@ -10,7 +10,14 @@ vi.mock("@/features/i18n/content-preference", () => ({
 
 vi.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({
-    t: (_key: string, fallback: string) => fallback,
+    t: (key: string, fallback: string, options?: any) => {
+      if (!options) return fallback;
+      let result = fallback;
+      for (const k of Object.keys(options)) {
+        result = result.replace(`{{${k}}}`, String(options[k]));
+      }
+      return result;
+    },
   }),
 }));
 
@@ -39,6 +46,7 @@ const mockItems: ScholarContentItemDto[] = [
     title: "Insightful Single",
     type: "single",
     recencyAt: "2024-01-02T00:00:00Z",
+    durationSeconds: 2700,
   },
   {
     id: "item-3",
@@ -99,6 +107,7 @@ describe("ScholarContentList", () => {
     render(<ScholarContentList slug="ibn-baz" />);
     expect(screen.getByText("Awesome Series")).toBeTruthy();
     expect(screen.getByText("Insightful Single")).toBeTruthy();
+    expect(screen.getByText("Single · 45m")).toBeTruthy();
     expect(screen.getByText("Rich Collection")).toBeTruthy();
   });
 

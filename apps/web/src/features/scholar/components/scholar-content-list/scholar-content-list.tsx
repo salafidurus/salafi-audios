@@ -40,6 +40,15 @@ function ContentRow({ item }: { item: ScholarContentItemDto }) {
         count: item.lectureCount,
       });
     }
+
+    if (item.type === "single" && item.durationSeconds != null) {
+      const minutes = Math.round(item.durationSeconds / 60);
+      return t("scholarContent.metadataWithDuration", "{{type}} · {{minutes}}m", {
+        type: typeLabel,
+        minutes,
+      });
+    }
+
     return typeLabel;
   };
 
@@ -86,15 +95,16 @@ export function ScholarContentList({ slug }: ScholarContentListProps) {
     data: topicsData,
     isFetching: isTopicsFetching,
     isSuccess: isTopicsSettled,
+    isError: isTopicsError,
   } = useScholarTopics(slug);
   const hasTopics = (topicsData?.topics?.length ?? 0) > 0;
 
-  // Flat-list fallback: only fetch once topics query has settled AND returned empty
+  // Flat-list fallback: only fetch once topics query has settled (success or error) AND returned empty
   const { data: flatContent, isFetching: isFlatFetching } = useScholarContent(slug, {
-    enabled: isTopicsSettled && !hasTopics,
+    enabled: (isTopicsSettled || isTopicsError) && !hasTopics,
   });
 
-  if (isTopicsFetching) {
+  if (isTopicsFetching && !topicsData) {
     return <p className={styles.empty}>{t("common.loading", "Loading…")}</p>;
   }
 
@@ -120,7 +130,7 @@ export function ScholarContentList({ slug }: ScholarContentListProps) {
   }
 
   // Graceful fallback: flat list for scholars without topic tags
-  if (isFlatFetching) {
+  if (isFlatFetching && !flatContent) {
     return <p className={styles.empty}>{t("common.loading", "Loading…")}</p>;
   }
 
