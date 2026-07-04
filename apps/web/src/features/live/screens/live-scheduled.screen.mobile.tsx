@@ -5,6 +5,7 @@ import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { useLiveScheduledScreen } from "@sd/domain-live";
 import { LiveSessionRow } from "../components/live-session-row/live-session-row";
+import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./live.screen.module.css";
 
 export type LiveScheduledMobileScreenProps = {
@@ -15,10 +16,15 @@ export function LiveScheduledMobileScreen({
   onNavigateToSession,
 }: LiveScheduledMobileScreenProps) {
   const { sessions, isFetching } = useLiveScheduledScreen();
+  const { t } = useTranslation();
 
   const renderContent = () => {
     if (isFetching && sessions.length === 0) {
-      return <div style={{ padding: 16, textAlign: "center" }}>Loading scheduled sessions…</div>;
+      return (
+        <div style={{ padding: 16, textAlign: "center", color: "var(--content-muted)" }}>
+          {t("common.loading", "Loading…")}
+        </div>
+      );
     }
 
     if (sessions.length === 0) {
@@ -32,7 +38,7 @@ export function LiveScheduledMobileScreen({
             display: "block",
           }}
         >
-          No scheduled sessions.
+          {t("live.sections.scheduled.empty", "No upcoming sessions scheduled.")}
         </AppText>
       );
     }
@@ -55,7 +61,7 @@ export function LiveScheduledMobileScreen({
       <div className={styles.page}>
         <div className={styles.listContainer}>
           <AppText variant="titleLg" style={{ display: "block", marginBottom: 16 }}>
-            Scheduled Sessions
+            {t("live.sections.scheduled.header", "Scheduled Sessions")}
           </AppText>
           {renderContent()}
         </div>
@@ -63,4 +69,3 @@ export function LiveScheduledMobileScreen({
     </ScreenView>
   );
 }
-

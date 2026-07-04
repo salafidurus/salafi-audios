@@ -34,7 +34,7 @@ export function LiveSessionRow({ session, onPress }: LiveSessionRowProps) {
   const isEnded = session.status === "ended";
   const telegramSlug = "telegramSlug" in session ? session.telegramSlug : undefined;
   const telegramUrl = telegramSlug ? `https://t.me/${telegramSlug}` : undefined;
-  const recordingLectureId = (session as any).recordingLectureId;
+  const recordingLectureId = session.recordingLectureId;
 
   const title = session.title || ("channelDisplayName" in session ? session.channelDisplayName : undefined) || "Live Session";
   const scholarName = session.scholarName;
@@ -50,7 +50,7 @@ export function LiveSessionRow({ session, onPress }: LiveSessionRowProps) {
           </span>
         )}
         {isScheduled && session.scheduledAt && (
-          <span className={styles.scheduledBadge} data-testid="scheduled-badge">
+          <span className={styles.scheduledBadge} data-testid="scheduled-badge" suppressHydrationWarning>
             {formatScheduledTime(session.scheduledAt)}
           </span>
         )}

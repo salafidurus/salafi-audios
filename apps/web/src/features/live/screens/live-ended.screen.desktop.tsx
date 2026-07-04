@@ -5,6 +5,7 @@ import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { useLiveEndedScreen } from "@sd/domain-live";
 import { LiveSessionRow } from "../components/live-session-row/live-session-row";
+import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./live.screen.module.css";
 
 export type LiveEndedDesktopScreenProps = {
@@ -15,10 +16,15 @@ export function LiveEndedDesktopScreen({
   onNavigateToSession,
 }: LiveEndedDesktopScreenProps) {
   const { sessions, isFetching } = useLiveEndedScreen();
+  const { t } = useTranslation();
 
   const renderContent = () => {
     if (isFetching && sessions.length === 0) {
-      return <div style={{ padding: 32, textAlign: "center" }}>Loading past sessions…</div>;
+      return (
+        <div style={{ padding: 32, textAlign: "center", color: "var(--content-muted)" }}>
+          {t("common.loading", "Loading…")}
+        </div>
+      );
     }
 
     if (sessions.length === 0) {
@@ -32,7 +38,7 @@ export function LiveEndedDesktopScreen({
             display: "block",
           }}
         >
-          No past sessions available.
+          {t("live.sections.ended.empty", "No recent sessions.")}
         </AppText>
       );
     }
@@ -55,7 +61,7 @@ export function LiveEndedDesktopScreen({
       <div className={styles.page}>
         <div className={styles.listContainer}>
           <AppText variant="displayMd" style={{ display: "block", marginBottom: 24 }}>
-            Past Sessions
+            {t("live.sections.ended.header", "Past Sessions")}
           </AppText>
           {renderContent()}
         </div>
@@ -63,4 +69,3 @@ export function LiveEndedDesktopScreen({
     </ScreenView>
   );
 }
-
