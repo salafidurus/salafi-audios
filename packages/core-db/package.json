@@ -23,9 +23,11 @@
   },
   "scripts": {
     "lint": "oxlint .",
+    "pretest": "bun run prisma:generate",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
+    "pretest:prepush": "bun run prisma:generate",
     "test:prepush": "vitest run --changed=origin/main",
     "pretypecheck": "bun run prisma:generate",
     "typecheck": "tsc -p tsconfig.json --noEmit",
