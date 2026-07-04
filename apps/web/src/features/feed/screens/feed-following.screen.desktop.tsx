@@ -1,7 +1,7 @@
 "use client";
 
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
-import { FeedContentCard } from "../components/feed-content-card/feed-content-card";
+import { FeedListRow } from "../components/feed-list-row/feed-list-row";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import { useFeedFollowingScreen } from "@sd/domain-content";
 
@@ -28,7 +28,7 @@ function renderFeedItem(
       return null;
     default:
       return (
-        <FeedContentCard
+        <FeedListRow
           key={item.id}
           item={item as FeedContentItemDto}
           onPress={() => onNavigateToLecture?.(item.slug)}

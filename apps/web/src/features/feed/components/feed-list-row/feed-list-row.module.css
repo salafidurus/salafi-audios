@@ -1,0 +1,145 @@
+.row {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-component-gap-md);
+  width: 100%;
+}
+
+.avatarSection {
+  flex-shrink: 0;
+}
+
+.avatarContainer {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-scale-full);
+  overflow: hidden;
+  position: relative;
+}
+
+.avatarImage {
+  object-fit: cover;
+}
+
+.avatarFallback {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-scale-full);
+  background-color: var(--surface-primary-subtle);
+  color: var(--content-primary-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-lg-font-size);
+  font-weight: 600;
+}
+
+.centerSection {
+  flex-grow: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
+}
+
+.title {
+  font-family: var(--typo-title-md-font-family), serif;
+  font-size: var(--typo-title-md-font-size);
+  font-weight: var(--typo-title-md-font-weight);
+  line-height: var(--typo-title-md-line-height);
+  letter-spacing: var(--typo-title-md-letter-spacing);
+  color: var(--content-strong);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scholarName {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  font-weight: var(--typo-body-md-font-weight);
+  line-height: var(--typo-body-md-line-height);
+  color: var(--content-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  font-family: var(--typo-caption-font-family);
+  font-size: var(--typo-caption-font-size);
+  font-weight: var(--typo-caption-font-weight);
+  line-height: var(--typo-caption-line-height);
+  color: var(--content-subtle);
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-sm);
+  flex-shrink: 0;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-scale-full);
+  border: 1px solid var(--border-default);
+  background-color: var(--surface-default);
+  color: var(--content-default);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.actionButton:hover {
+  background-color: var(--surface-hover);
+  border-color: var(--border-hover);
+  color: var(--content-strong);
+}
+
+.actionButton:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}
+
+.playButton.playing {
+  background-color: var(--action-primary);
+  border-color: var(--action-primary);
+  color: var(--content-on-primary);
+}
+
+.playButton.playing:hover {
+  opacity: 0.9;
+}
+
+.saveButton.saved {
+  color: var(--content-primary);
+  border-color: var(--border-primary);
+}
+
+.progressBarContainer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: var(--surface-subtle);
+  overflow: hidden;
+}
+
+.progressBar {
+  height: 100%;
+  background-color: var(--action-primary);
+  transition: width 200ms ease;
+}
