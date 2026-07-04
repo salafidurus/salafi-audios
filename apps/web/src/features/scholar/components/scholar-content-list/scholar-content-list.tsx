@@ -82,12 +82,16 @@ function ContentRow({ item }: { item: ScholarContentItemDto }) {
 
 export function ScholarContentList({ slug }: ScholarContentListProps) {
   const { t } = useTranslation();
-  const { data: topicsData, isFetching: isTopicsFetching } = useScholarTopics(slug);
+  const {
+    data: topicsData,
+    isFetching: isTopicsFetching,
+    isSuccess: isTopicsSettled,
+  } = useScholarTopics(slug);
   const hasTopics = (topicsData?.topics?.length ?? 0) > 0;
 
-  // Flat-list fallback: only fetch when topics query has settled and returned empty
+  // Flat-list fallback: only fetch once topics query has settled AND returned empty
   const { data: flatContent, isFetching: isFlatFetching } = useScholarContent(slug, {
-    enabled: !isTopicsFetching && !hasTopics,
+    enabled: isTopicsSettled && !hasTopics,
   });
 
   if (isTopicsFetching) {
