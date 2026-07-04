@@ -6,7 +6,7 @@ test.describe("Auth flows", () => {
       await page.goto("/sign-in");
 
       await expect(page).toHaveTitle(/./);
-      const heading = page.getByRole("heading", { name: "Sign In" });
+      const heading = page.getByRole("heading", { name: "Salafi Durus" });
       await expect(heading).toBeVisible();
     });
 
