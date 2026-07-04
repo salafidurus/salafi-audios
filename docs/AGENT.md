@@ -21,49 +21,45 @@ This directory contains the authoritative documentation for Salafi Durus.
 
 ### Backend (apps/api)
 
-| Module          | Status      | MVP        | Notes                                           |
-| --------------- | ----------- | ---------- | ----------------------------------------------- |
-| scholars        | IMPLEMENTED | CRITICAL   | API complete; needs web/mobile screens          |
-| collections     | IMPLEMENTED | CRITICAL   | API complete; needs web/mobile screens          |
-| series          | IMPLEMENTED | CRITICAL   | API complete; needs web/mobile screens          |
-| lectures        | IMPLEMENTED | CRITICAL   | API complete; needs web/mobile screens          |
-| audio-assets    | IMPLEMENTED | CRITICAL   | Required for playback (Phase 05)                |
-| catalog         | IMPLEMENTED | CRITICAL   | Browse endpoints exist                          |
-| health          | IMPLEMENTED | SUPPORTING | Deployment and monitoring                       |
-| search          | INTEGRATED  | CRITICAL   | Active in web/mobile                            |
-| topics          | IMPLEMENTED | SUPPORTING | Used in search filter                           |
-| analytics       | PARTIAL     | SUPPORTING | Stats endpoint used; event ingestion deferred   |
-| recommendations | IMPLEMENTED | SUPPORTING | Multiple endpoints exist; may be narrowed later |
+| Module          | Status      | MVP        | Notes                                                                     |
+| --------------- | ----------- | ---------- | ------------------------------------------------------------------------- |
+| listings        | IMPLEMENTED | CRITICAL   | Unified Listing model (replaces collections/series/lectures)              |
+| scholars        | IMPLEMENTED | CRITICAL   | API complete; needs web/mobile screens                                    |
+| audio-assets    | IMPLEMENTED | CRITICAL   | Required for playback (Phase 05)                                          |
+| catalog         | IMPLEMENTED | CRITICAL   | Browse endpoints exist                                                    |
+| health          | IMPLEMENTED | SUPPORTING | Deployment and monitoring                                                 |
+| search          | INTEGRATED  | CRITICAL   | Active in web/mobile                                                      |
+| topics          | IMPLEMENTED | SUPPORTING | Used in search filter                                                     |
+| analytics       | REMOVED     | SUPPORTING | Clickstream table removed from PostgreSQL; deferred to dedicated pipeline |
+| recommendations | IMPLEMENTED | SUPPORTING | Multiple endpoints exist; may be narrowed later                           |
 
 ### Web (apps/web)
 
-| Route                  | Status      | MVP        | Notes                                         |
-| ---------------------- | ----------- | ---------- | --------------------------------------------- |
-| `/`                    | IMPLEMENTED | CRITICAL   | Search landing                                |
-| `/search`              | IMPLEMENTED | CRITICAL   | Active search                                 |
-| `/scholars/[slug]`     | IMPLEMENTED | CRITICAL   | Scholar detail page                           |
-| `/collections/[id]`    | IMPLEMENTED | CRITICAL   | Collection detail page                        |
-| `/series/[id]`         | IMPLEMENTED | CRITICAL   | Series detail page                            |
-| `/lectures/[id]`       | IMPLEMENTED | CRITICAL   | Lecture detail page                           |
-| `/feed/*`              | IMPLEMENTED | SUPPORTING | Recent + following feeds with infinite scroll |
-| `/library/*`           | IMPLEMENTED | SUPPORTING | Saved and completed lists                     |
-| `/account/*`           | IMPLEMENTED | SUPPORTING | Profile and settings                          |
-| `/sign-in`, `/sign-up` | IMPLEMENTED | SUPPORTING | App-local `features/auth/` slices             |
+| Route                  | Status      | MVP        | Notes                                                         |
+| ---------------------- | ----------- | ---------- | ------------------------------------------------------------- |
+| `/`                    | IMPLEMENTED | CRITICAL   | Search landing                                                |
+| `/search`              | IMPLEMENTED | CRITICAL   | Active search                                                 |
+| `/scholars/[slug]`     | IMPLEMENTED | CRITICAL   | Scholar detail page                                           |
+| `/listings/[slug]`     | NOT STARTED | CRITICAL   | Unified listing detail (replaces collections/series/lectures) |
+| `/feed/*`              | IMPLEMENTED | SUPPORTING | Recent + following feeds with infinite scroll                 |
+| `/library/*`           | IMPLEMENTED | SUPPORTING | Saved and completed lists                                     |
+| `/account/*`           | IMPLEMENTED | SUPPORTING | Profile and settings                                          |
+| `/sign-in`, `/sign-up` | IMPLEMENTED | SUPPORTING | App-local `features/auth/` slices                             |
 
 ### Mobile (apps/native)
 
-| Feature           | Status      | MVP      | Notes                                                       |
-| ----------------- | ----------- | -------- | ----------------------------------------------------------- |
-| Search            | IMPLEMENTED | CRITICAL | Home + active results                                       |
-| Feed              | IMPLEMENTED | CRITICAL | Recent + following feeds                                    |
-| Live              | IMPLEMENTED | CRITICAL | Live session screens                                        |
-| Library           | IMPLEMENTED | CRITICAL | Saved and completed lists                                   |
-| Account           | IMPLEMENTED | CRITICAL | Profile and settings                                        |
-| Catalog browsing  | MISSING     | CRITICAL | Detail screens (scholar/lecture/series) not yet implemented |
-| Audio playback    | NOT STARTED | CRITICAL | Planned for Phase 05                                        |
-| Progress tracking | NOT STARTED | CRITICAL | Planned for Phase 05                                        |
-| Offline sync      | NOT STARTED | CRITICAL | Phase 06                                                    |
-| Downloads         | NOT STARTED | CRITICAL | Phase 06                                                    |
+| Feature           | Status      | MVP      | Notes                                                |
+| ----------------- | ----------- | -------- | ---------------------------------------------------- |
+| Search            | IMPLEMENTED | CRITICAL | Home + active results                                |
+| Feed              | IMPLEMENTED | CRITICAL | Recent + following feeds                             |
+| Live              | IMPLEMENTED | CRITICAL | Live session screens                                 |
+| Library           | IMPLEMENTED | CRITICAL | Saved and completed lists                            |
+| Account           | IMPLEMENTED | CRITICAL | Profile and settings                                 |
+| Catalog browsing  | MISSING     | CRITICAL | Detail screens (scholar/listing) not yet implemented |
+| Audio playback    | NOT STARTED | CRITICAL | Planned for Phase 05                                 |
+| Progress tracking | NOT STARTED | CRITICAL | Planned for Phase 05                                 |
+| Offline sync      | NOT STARTED | CRITICAL | Phase 06                                             |
+| Downloads         | NOT STARTED | CRITICAL | Phase 06                                             |
 
 ### Current Mobile Runtime Guardrail
 

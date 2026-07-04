@@ -64,10 +64,17 @@ Authentication and authorization are centralized in the backend.
 
 ### Authorization
 
-- Roles are explicit and backend-enforced.
+- Roles are explicit and backend-enforced via the `UserRole` enum (`user`, `admin`, `editor`, `superadmin`).
 - Authorization is checked for every protected action, not inferred from the UI.
-- Scoped editor permissions must be evaluated dynamically against the affected scholar, collection, or content area.
+- Scoped editor permissions must be evaluated dynamically against the targeted Listing or Scholar context.
 - Offline state or cached client data never grants authority.
+
+### Route Mappings & Resource Namespaces
+
+- Public listing details are resolved by a globally unique slug at `GET /listings/:slug` for both web and mobile clients.
+- Permissions endpoints are mapped as a nested sub-resource under the User resource space at `/admin/users/:userId/permissions`.
+- Read and write permission endpoints standardize on returning string arrays (`string[]`) of permission names.
+- GDPR account deletions are resolved via `DELETE /account` and administrative user deletion endpoints.
 
 ## 6. Media and Analytics Through the API
 
