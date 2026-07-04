@@ -4,6 +4,10 @@ export {
   type FeedContentCardProps,
 } from "./components/feed-content-card/feed-content-card";
 export {
+  FeedPodcastRow,
+  type FeedPodcastRowProps,
+} from "./components/feed-podcast-row/feed-podcast-row";
+export {
   FeedScholarRow,
   type FeedScholarRowProps,
 } from "./components/feed-scholar-row/feed-scholar-row";

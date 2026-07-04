@@ -11,6 +11,7 @@ export const endpoints = {
     detail: (slug: string) => `/scholars/${slug}`,
     stats: (slug: string) => `/scholars/${slug}/stats`,
     content: (slug: string) => `/scholars/${slug}/content`,
+    topics: (slug: string) => `/scholars/${slug}/topics`,
   },
   collections: {
     detail: (id: string) => `/collections/${id}`,

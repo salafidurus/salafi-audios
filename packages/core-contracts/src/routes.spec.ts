@@ -97,24 +97,24 @@ describe("resolveRouteAccess", () => {
   });
 
   it("normalizes a trailing slash", () => {
-    expect(resolveRouteAccess("/account/profile/")).toBe("auth-optional");
-    expect(resolveRouteAccess("/account/")).toBe("auth-optional");
+    expect(resolveRouteAccess("/settings/profile/")).toBe("auth-optional");
+    expect(resolveRouteAccess("/settings/")).toBe("auth-optional");
   });
 
   it("matches nested sub-paths via prefix", () => {
-    expect(resolveRouteAccess("/account/profile/edit")).toBe("auth-optional");
+    expect(resolveRouteAccess("/settings/profile/edit")).toBe("auth-optional");
     expect(resolveRouteAccess("/live/session-123")).toBe("public");
     expect(resolveRouteAccess("/library/saved")).toBe("auth-optional");
     expect(resolveRouteAccess("/admin/users")).toBe("auth-required");
   });
 
   it("preserves local-first semantics as auth-optional", () => {
-    expect(resolveRouteAccess("/account")).toBe("auth-optional");
+    expect(resolveRouteAccess("/settings")).toBe("auth-optional");
     expect(resolveRouteAccess("/library")).toBe("auth-optional");
   });
 
   it("honors the per-path public override under an auth-optional section", () => {
-    expect(resolveRouteAccess("/account/legal")).toBe("public");
+    expect(resolveRouteAccess("/settings/legal")).toBe("public");
   });
 
   it("treats the home route as public", () => {
@@ -131,7 +131,7 @@ describe("resolveRouteAccess", () => {
     expect(resolveRouteAccess("/admin")).toBe("auth-required");
   });
 
-  it("/account/profile is auth-optional — shows AuthRequiredState, does not redirect", () => {
-    expect(resolveRouteAccess("/account/profile")).toBe("auth-optional");
+  it("/settings/profile is auth-optional — shows AuthRequiredState, does not redirect", () => {
+    expect(resolveRouteAccess("/settings/profile")).toBe("auth-optional");
   });
 });

@@ -7,6 +7,7 @@ import type {
   ScholarListItemDto,
   ScholarDetailDto,
   ScholarContentUnifiedDto,
+  ScholarTopicsDto,
 } from '@sd/core-contracts';
 import { ScholarsService } from './scholars.service';
 
@@ -45,5 +46,14 @@ export class ScholarsController {
   })
   getContent(@Param('slug') slug: string): Promise<ScholarContentUnifiedDto> {
     return this.scholars.getContent(slug);
+  }
+
+  @Get(':slug/topics')
+  @ApiOperation({ summary: "Get scholar's published content grouped by topic" })
+  @ApiOkResponse({
+    description: 'Scholar content grouped by topic',
+  })
+  getTopics(@Param('slug') slug: string): Promise<ScholarTopicsDto> {
+    return this.scholars.getTopics(slug);
   }
 }

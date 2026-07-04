@@ -4,6 +4,7 @@ import type {
   ScholarListItemDto,
   ScholarDetailDto,
   ScholarContentUnifiedDto,
+  ScholarTopicsDto,
   TranslationViewDto,
   AdminSeriesListItemDto,
   AdminSeriesDetailDto,
@@ -47,6 +48,12 @@ export class ScholarsService {
     const content = await this.repo.getContent(slug);
     if (!content) throw new NotFoundException(`Scholar "${slug}" not found`);
     return content;
+  }
+
+  async getTopics(slug: string): Promise<ScholarTopicsDto> {
+    const topics = await this.repo.getTopics(slug);
+    if (!topics) throw new NotFoundException(`Scholar "${slug}" not found`);
+    return topics;
   }
 
   async create(dto: CreateScholarDto) {

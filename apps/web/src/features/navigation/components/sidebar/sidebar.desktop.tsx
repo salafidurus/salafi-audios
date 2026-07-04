@@ -29,7 +29,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const { t } = useTranslation();
   const [collapsed, setCollapsed] = useState(false);
-  const accountHref = routes.account.index;
+  const settingsHref = routes.settings.index;
 
   const navItems: NavItem[] = [
     {
@@ -104,13 +104,13 @@ export function Sidebar() {
           );
         })}
         <Link
-          href={accountHref}
-          className={clsx(styles.link, pathname.startsWith(routes.account.index) && styles.active)}
+          href={settingsHref}
+          className={clsx(styles.link, pathname.startsWith(routes.settings.index) && styles.active)}
         >
           <span className={styles.icon} aria-hidden="true">
             <Settings size={18} />
           </span>
-          <span className={styles.label}>{t("navigation.account")}</span>
+          <span className={styles.label}>{t("navigation.settings")}</span>
         </Link>
       </nav>
     </aside>

@@ -35,6 +35,7 @@ export {
   type ScholarListItemDto,
   type ScholarContentItemDto,
   type ScholarContentUnifiedDto,
+  type ScholarTopicsDto,
   type CollectionSummaryDto,
   type SeriesSummaryDto,
   type SingleSummaryDto,

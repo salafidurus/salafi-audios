@@ -6,6 +6,7 @@ import type {
   ScholarDetailDto,
   ScholarContentUnifiedDto,
   ScholarContentItemDto,
+  ScholarTopicsDto,
   TranslationViewDto,
   Locale,
   AdminSeriesListItemDto,
@@ -308,6 +309,219 @@ export class ScholarsRepository {
     items.sort((a, b) => b.recencyAt.localeCompare(a.recencyAt));
 
     return { items };
+  }
+
+  async getTopics(slug: string): Promise<ScholarTopicsDto | null> {
+    const locale = getRequestLocale();
+    const scholar = await this.prisma.scholar.findFirst({
+      where: { slug, isActive: true },
+      select: { id: true },
+    });
+
+    if (!scholar) return null;
+
+    const [lectureTopicRows, seriesTopicRows, collectionTopicRows] = await Promise.all([
+      this.prisma.lectureTopic.findMany({
+        where: {
+          lecture: {
+            scholarId: scholar.id,
+            status: Status.published,
+            deletedAt: null,
+            seriesId: null,
+          },
+        },
+        select: {
+          topicId: true,
+          topic: {
+            select: {
+              name: true,
+              translations: {
+                where: { locale: locale as DbLocale, status: 'published' },
+                select: { name: true },
+                take: 1,
+              },
+            },
+          },
+          lecture: {
+            select: {
+              id: true,
+              slug: true,
+              title: true,
+              language: true,
+              durationSeconds: true,
+              publishedAt: true,
+              createdAt: true,
+              translations: {
+                where: { locale: locale as DbLocale, status: 'published' },
+                select: { title: true },
+                take: 1,
+              },
+            },
+          },
+        },
+      }),
+      this.prisma.seriesTopic.findMany({
+        where: {
+          series: {
+            scholarId: scholar.id,
+            status: Status.published,
+            deletedAt: null,
+            collectionId: null,
+          },
+        },
+        select: {
+          topicId: true,
+          topic: {
+            select: {
+              name: true,
+              translations: {
+                where: { locale: locale as DbLocale, status: 'published' },
+                select: { name: true },
+                take: 1,
+              },
+            },
+          },
+          series: {
+            select: {
+              id: true,
+              slug: true,
+              title: true,
+              language: true,
+              coverImageUrl: true,
+              createdAt: true,
+              translations: {
+                where: { locale: locale as DbLocale, status: 'published' },
+                select: { title: true },
+                take: 1,
+              },
+              _count: {
+                select: { lectures: { where: { status: Status.published, deletedAt: null } } },
+              },
+            },
+          },
+        },
+      }),
+      this.prisma.collectionTopic.findMany({
+        where: {
+          collection: { scholarId: scholar.id, status: Status.published, deletedAt: null },
+        },
+        select: {
+          topicId: true,
+          topic: {
+            select: {
+              name: true,
+              translations: {
+                where: { locale: locale as DbLocale, status: 'published' },
+                select: { name: true },
+                take: 1,
+              },
+            },
+          },
+          collection: {
+            select: {
+              id: true,
+              slug: true,
+              title: true,
+              language: true,
+              coverImageUrl: true,
+              createdAt: true,
+              translations: {
+                where: { locale: locale as DbLocale, status: 'published' },
+                select: { title: true },
+                take: 1,
+              },
+              _count: {
+                select: { series: { where: { status: Status.published, deletedAt: null } } },
+              },
+            },
+          },
+        },
+      }),
+    ]);
+
+    const topicMap = new Map<string, { topicName: string; items: ScholarContentItemDto[] }>();
+
+    const ensureTopic = (topicId: string, topicName: string) => {
+      if (!topicMap.has(topicId)) topicMap.set(topicId, { topicName, items: [] });
+      return topicMap.get(topicId)!;
+    };
+
+    for (const row of lectureTopicRows) {
+      const r = row.lecture;
+      const topicName = row.topic.translations[0]?.name ?? row.topic.name;
+      const resolved = resolveContentTranslation({
+        base: { title: r.title },
+        originalLanguage: r.language,
+        targetLocale: locale,
+        publishedTranslation: r.translations[0] ?? null,
+      });
+      const bucket = ensureTopic(row.topicId, topicName);
+      bucket.items.push({
+        id: r.id,
+        slug: r.slug,
+        title: resolved.fields.title,
+        type: 'single' as const,
+        recencyAt: (r.publishedAt ?? r.createdAt).toISOString(),
+        durationSeconds: r.durationSeconds ?? undefined,
+        originalLanguage: resolved.originalLanguage,
+        original: resolved.original ? { title: resolved.original.title } : undefined,
+      });
+    }
+
+    for (const row of seriesTopicRows) {
+      const r = row.series;
+      const topicName = row.topic.translations[0]?.name ?? row.topic.name;
+      const resolved = resolveContentTranslation({
+        base: { title: r.title },
+        originalLanguage: r.language,
+        targetLocale: locale,
+        publishedTranslation: r.translations[0] ?? null,
+      });
+      const bucket = ensureTopic(row.topicId, topicName);
+      bucket.items.push({
+        id: r.id,
+        slug: r.slug,
+        title: resolved.fields.title,
+        type: 'series' as const,
+        recencyAt: r.createdAt.toISOString(),
+        coverImageUrl: r.coverImageUrl ?? undefined,
+        lectureCount: r._count.lectures,
+        originalLanguage: resolved.originalLanguage,
+        original: resolved.original ? { title: resolved.original.title } : undefined,
+      });
+    }
+
+    for (const row of collectionTopicRows) {
+      const r = row.collection;
+      const topicName = row.topic.translations[0]?.name ?? row.topic.name;
+      const resolved = resolveContentTranslation({
+        base: { title: r.title },
+        originalLanguage: r.language,
+        targetLocale: locale,
+        publishedTranslation: r.translations[0] ?? null,
+      });
+      const bucket = ensureTopic(row.topicId, topicName);
+      bucket.items.push({
+        id: r.id,
+        slug: r.slug,
+        title: resolved.fields.title,
+        type: 'collection' as const,
+        recencyAt: r.createdAt.toISOString(),
+        coverImageUrl: r.coverImageUrl ?? undefined,
+        lectureCount: r._count.series,
+        originalLanguage: resolved.originalLanguage,
+        original: resolved.original ? { title: resolved.original.title } : undefined,
+      });
+    }
+
+    const topics = Array.from(topicMap.entries()).map(([topicId, { topicName, items }]) => {
+      items.sort((a, b) => b.recencyAt.localeCompare(a.recencyAt));
+      return { topicId, topicName, items };
+    });
+
+    topics.sort((a, b) => a.topicName.localeCompare(b.topicName));
+
+    return { topics };
   }
 
   async findById(id: string) {

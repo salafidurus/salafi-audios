@@ -38,6 +38,7 @@ export const queryKeys = {
     detail: (slug: string) => [...queryKeys.scholars.all, "detail", slug] as const,
     stats: (slug: string) => [...queryKeys.scholars.all, "stats", slug] as const,
     content: (slug: string) => [...queryKeys.scholars.all, "content", slug] as const,
+    topics: (slug: string) => [...queryKeys.scholars.all, "topics", slug] as const,
   },
   series: {
     all: ["series"] as const,
