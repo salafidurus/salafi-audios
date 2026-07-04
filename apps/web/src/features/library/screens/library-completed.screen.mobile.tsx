@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useLibraryCompletedScreen } from "@sd/domain-content";
-import { useAuth } from "@/core/auth/use-auth";
+import { useAuth } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";

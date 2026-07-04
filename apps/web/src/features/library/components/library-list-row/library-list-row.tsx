@@ -64,8 +64,12 @@ export function LibraryListRow({ item, variant }: LibraryListRowProps) {
         )}
       </div>
 
-      <div className={styles.rightSection} suppressHydrationWarning>
-        {rightLabelText && <span className={styles.caption}>{rightLabelText}</span>}
+      <div className={styles.rightSection}>
+        {rightLabelText && (
+          <span className={styles.caption} suppressHydrationWarning>
+            {rightLabelText}
+          </span>
+        )}
         <ChevronRight className={styles.chevron} size={20} />
       </div>
     </Link>

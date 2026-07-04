@@ -73,13 +73,13 @@ export function AuthModal({ isOpen, onClose, message }: AuthModalProps) {
   const modalContent = (
     <AnimatePresence>
       {isOpen && (
-        <div className={styles.overlay} onClick={onClose}>
+        <div className={styles.overlayWrapper}>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className={styles.overlay}
+            className={styles.overlayBackdrop}
             onClick={onClose}
           />
           <motion.div
