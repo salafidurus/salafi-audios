@@ -78,12 +78,12 @@ describe("LibraryItemRow", () => {
 
   it("shows Bookmark icon for saved variant", async () => {
     await render(<LibraryItemRow item={baseItem} variant="saved" />);
-    expect(screen.getByTestId("library-item-icon-bookmark")).toBeTruthy();
+    expect(screen.getByTestId("library-item-icon-saved")).toBeTruthy();
   });
 
   it("shows Clock icon for progress variant", async () => {
     await render(<LibraryItemRow item={baseItem} variant="progress" />);
-    expect(screen.getByTestId("library-item-icon-clock")).toBeTruthy();
+    expect(screen.getByTestId("library-item-icon-progress")).toBeTruthy();
   });
 
   it("shows CheckCircle icon for completed variant", async () => {
@@ -93,7 +93,7 @@ describe("LibraryItemRow", () => {
         variant="completed"
       />,
     );
-    expect(screen.getByTestId("library-item-icon-check-circle")).toBeTruthy();
+    expect(screen.getByTestId("library-item-icon-completed")).toBeTruthy();
   });
 
   it("shows progress bar for progress variant", async () => {
