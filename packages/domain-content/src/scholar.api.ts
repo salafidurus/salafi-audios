@@ -7,6 +7,7 @@ import {
   type ScholarContentItemDto,
   type ScholarContentUnifiedDto,
   type ScholarListItemDto,
+  type ScholarTopicsDto,
 } from "@sd/core-contracts";
 
 export function useScholarsList() {
@@ -61,4 +62,16 @@ export function splitScholarContent(
     recommended: items.slice(1, 1 + recommendedCount),
     browse: items.slice(1 + recommendedCount),
   };
+}
+
+export function useScholarTopics(slug: string) {
+  return useApiQuery(
+    queryKeys.scholars.topics(slug),
+    () =>
+      httpClient<ScholarTopicsDto>({
+        url: endpoints.scholars.topics(slug),
+        method: "GET",
+      }),
+    { enabled: !!slug },
+  );
 }
