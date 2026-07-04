@@ -26,6 +26,30 @@
   font-weight: var(--typo-title-lg-font-weight);
 }
 
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: var(--space-component-gap-lg);
+}
+
+.logoContainer {
+  position: relative;
+  width: 4.5rem;
+  height: 4.5rem;
+  margin-bottom: var(--space-component-gap-md);
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.05));
+}
+
+.tagline {
+  margin: 0.25rem 0 0;
+  color: var(--content-muted);
+  font-family: var(--typo-body-sm-font-family), sans-serif;
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
+  letter-spacing: var(--typo-body-sm-letter-spacing);
+}
+
 .stack {
   display: flex;
   flex-direction: column;

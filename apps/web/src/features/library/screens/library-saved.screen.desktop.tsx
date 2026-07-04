@@ -5,6 +5,7 @@ import { useLibrarySavedScreen } from "@sd/domain-content";
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
 import { LibraryListRow } from "../components/library-list-row/library-list-row";
 import styles from "./library-screens.module.css";
 
@@ -16,6 +17,17 @@ export function LibrarySavedDesktopScreen({ onNavigateToLecture }: LibrarySavedD
   const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
   const { items, isFetching } = useLibrarySavedScreen(isAuthenticated);
+
+  if (!isAuthenticated) {
+    return (
+      <ScreenView>
+        <AuthRequiredState
+          title="Sign in to view saved lectures"
+          description="Save lectures to build your personal listening library."
+        />
+      </ScreenView>
+    );
+  }
 
   return (
     <ScreenView>

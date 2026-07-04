@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { authClient } from "@/core/auth";
 import { buildOAuthCallbackURL } from "@/features/auth/oauth-callback-url";
@@ -16,7 +17,21 @@ export function SignInDesktopScreen({ redirectTo }: SignInDesktopScreenProps) {
   return (
     <main className={styles.page}>
       <div className={styles.card}>
-        <h1 className={styles.title}>{t("auth.signIn.title")}</h1>
+        <div className={styles.header}>
+          <div className={styles.logoContainer}>
+            <Image
+              src="/logo/logo_72.png"
+              alt="Salafi Durus Logo"
+              width={72}
+              height={72}
+              priority
+            />
+          </div>
+          <h1 className={styles.title}>Salafi Durus</h1>
+          <p className={styles.tagline}>
+            {t("auth.signIn.tagline", "Join the community of learners")}
+          </p>
+        </div>
 
         <div className={styles.stack}>
           <div className={styles.socialStack}>

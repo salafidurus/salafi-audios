@@ -10,6 +10,8 @@ import {
   useLibraryCompletedScreen,
 } from "@sd/domain-content";
 
+const mockUseAuth = vi.fn(() => ({ isAuthenticated: true }));
+
 vi.mock("@sd/domain-content", () => ({
   useLibraryProgressScreen: vi.fn(),
   useLibrarySavedScreen: vi.fn(),
@@ -17,7 +19,7 @@ vi.mock("@sd/domain-content", () => ({
 }));
 
 vi.mock("@/core/auth/use-auth", () => ({
-  useAuth: () => ({ isAuthenticated: true }),
+  useAuth: () => mockUseAuth(),
 }));
 
 vi.mock("@/core/i18n/use-translation", () => ({
@@ -32,6 +34,15 @@ vi.mock("@/shared/components/ScreenView/ScreenView", () => ({
 
 vi.mock("../components/library-list-row/library-list-row", () => ({
   LibraryListRow: ({ item }: { item: any }) => <div data-testid="library-row">{item.lectureTitle}</div>,
+}));
+
+vi.mock("@/shared/components/AuthRequiredState/AuthRequiredState", () => ({
+  AuthRequiredState: ({ title, description }: any) => (
+    <div data-testid="auth-required-state">
+      <h3>{title}</h3>
+      <p>{description}</p>
+    </div>
+  ),
 }));
 
 const mockProgress = vi.mocked(useLibraryProgressScreen);
@@ -51,6 +62,7 @@ const mockItem = {
 describe("Library screens", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseAuth.mockReturnValue({ isAuthenticated: true });
   });
 
   describe("LibraryDesktopScreen (Started)", () => {
@@ -70,6 +82,13 @@ describe("Library screens", () => {
       mockProgress.mockReturnValue({ items: [mockItem], isFetching: false } as any);
       render(<LibraryDesktopScreen />);
       expect(screen.getByTestId("library-row")).toHaveTextContent("Lecture Title 1");
+    });
+
+    it("renders AuthRequiredState when unauthenticated", () => {
+      mockUseAuth.mockReturnValue({ isAuthenticated: false });
+      render(<LibraryDesktopScreen />);
+      expect(screen.getByTestId("auth-required-state")).toBeInTheDocument();
+      expect(screen.getByText("Sign in to view your progress")).toBeInTheDocument();
     });
   });
 
@@ -91,6 +110,13 @@ describe("Library screens", () => {
       render(<LibrarySavedDesktopScreen />);
       expect(screen.getByTestId("library-row")).toHaveTextContent("Lecture Title 1");
     });
+
+    it("renders AuthRequiredState when unauthenticated", () => {
+      mockUseAuth.mockReturnValue({ isAuthenticated: false });
+      render(<LibrarySavedDesktopScreen />);
+      expect(screen.getByTestId("auth-required-state")).toBeInTheDocument();
+      expect(screen.getByText("Sign in to view saved lectures")).toBeInTheDocument();
+    });
   });
 
   describe("LibraryCompletedDesktopScreen (Completed)", () => {
@@ -110,6 +136,13 @@ describe("Library screens", () => {
       mockCompleted.mockReturnValue({ items: [mockItem], isFetching: false } as any);
       render(<LibraryCompletedDesktopScreen />);
       expect(screen.getByTestId("library-row")).toHaveTextContent("Lecture Title 1");
+    });
+
+    it("renders AuthRequiredState when unauthenticated", () => {
+      mockUseAuth.mockReturnValue({ isAuthenticated: false });
+      render(<LibraryCompletedDesktopScreen />);
+      expect(screen.getByTestId("auth-required-state")).toBeInTheDocument();
+      expect(screen.getByText("Sign in to view completed history")).toBeInTheDocument();
     });
   });
 });
