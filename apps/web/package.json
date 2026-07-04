@@ -8,7 +8,7 @@
     "build": "bun --bun next build",
     "start": "bun --bun next start",
     "lint": "oxlint . && eslint .",
-    "test": "vitest run",
+    "test": "bun run vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
     "test:prepush": "vitest run --changed=origin/main",

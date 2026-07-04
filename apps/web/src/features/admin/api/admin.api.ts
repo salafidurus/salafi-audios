@@ -1,5 +1,5 @@
 import { httpClient, endpoints } from "@sd/core-contracts";
-import type { AdminPermission } from "@sd/core-contracts";
+import type { AdminPermission, AdminUserListDto } from "@sd/core-contracts";
 
 // --- Permissions ---
 
@@ -90,6 +90,17 @@ export function deleteTopic(slug: string) {
   return httpClient<unknown>({
     url: endpoints.admin.topics.delete(slug),
     method: "DELETE",
+  });
+}
+
+// --- Users ---
+
+export function fetchAdminUsers(q?: string) {
+  const url = endpoints.admin.users.list;
+  const query = q ? `?q=${encodeURIComponent(q)}` : "";
+  return httpClient<AdminUserListDto>({
+    url: `${url}${query}`,
+    method: "GET",
   });
 }
 

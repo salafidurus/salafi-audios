@@ -19,10 +19,14 @@
   color: var(--content-muted);
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: var(--space-component-gap-md);
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-component-card);
+  background-color: var(--surface-default);
+  overflow: hidden;
   margin-bottom: var(--space-component-gap-lg);
 }
 

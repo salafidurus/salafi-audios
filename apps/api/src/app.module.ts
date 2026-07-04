@@ -21,6 +21,7 @@ import { AudioModule } from './modules/audio/audio.module';
 import { HomeModule } from './modules/home/home.module';
 import { FeedModule } from './modules/feed/feed.module';
 import { MediaModule } from './modules/media/media.module';
+import { ListingModule } from './modules/listing/listing.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TelegramModule } from './modules/telegram/telegram.module';
 import { LocaleInterceptor } from './shared/interceptors/locale.interceptor';
@@ -46,6 +47,7 @@ import { LocaleMiddleware } from './shared/i18n/locale.middleware';
     HomeModule,
     FeedModule,
     MediaModule,
+    ListingModule,
     ScheduleModule.forRoot(),
     TelegramModule,
   ],

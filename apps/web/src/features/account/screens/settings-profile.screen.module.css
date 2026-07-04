@@ -1,0 +1,206 @@
+.page {
+  max-width: 40rem;
+  margin-inline: auto;
+  padding: var(--space-layout-page-y) var(--space-layout-page-x);
+}
+
+.title {
+  margin: 0 0 var(--space-scale-3xl);
+  font-size: var(--typo-title-lg-font-size);
+}
+
+.avatarRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-component-gap-lg);
+  margin-bottom: var(--space-scale-3xl);
+}
+
+.avatarImage {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.avatarInitials {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: var(--action-primary);
+  color: var(--content-on-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--typo-title-md-font-size);
+  font-weight: 700;
+  flex-shrink: 0;
+  letter-spacing: 0.05em;
+}
+
+.profileName {
+  margin: 0;
+  font-size: var(--typo-body-md-font-size);
+  font-weight: 600;
+  color: var(--content-default);
+}
+
+.profileEmail {
+  margin: var(--space-scale-xs) 0 0;
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+}
+
+.editableField {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-sm);
+}
+
+.input {
+  padding: var(--space-scale-xs) var(--space-scale-md);
+  border: var(--border-width-default) solid var(--border-default);
+  border-radius: var(--radius-component-chip);
+  font-size: var(--typo-body-sm-font-size);
+  background: var(--surface-default);
+  color: var(--content-default);
+  min-width: 10rem;
+  max-width: 14rem;
+  width: 100%;
+}
+
+.input:focus {
+  border-color: var(--action-primary);
+}
+
+.saveButton {
+  padding: var(--space-scale-xs) var(--space-scale-md);
+  background: var(--action-primary);
+  color: var(--content-on-primary);
+  border: none;
+  border-radius: var(--radius-component-chip);
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 150ms ease;
+}
+
+.saveButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.saveButton:focus-visible {
+  outline: 2px solid var(--action-primary);
+  outline-offset: 2px;
+}
+
+
+.readOnly {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+}
+
+.roleBadge {
+  display: inline-block;
+  padding: var(--space-scale-xs) var(--space-scale-md);
+  background: var(--surface-subtle);
+  border: var(--border-width-default) solid var(--border-subtle);
+  border-radius: var(--radius-component-chip);
+  font-size: var(--typo-caption-font-size);
+  font-weight: 600;
+  color: var(--content-default);
+  text-transform: capitalize;
+}
+
+.verifiedBadge {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-success, #22c55e);
+  font-weight: 500;
+}
+
+.unverifiedBadge {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+}
+
+.successText {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-success, #22c55e);
+  margin: var(--space-scale-sm) 0;
+}
+
+.errorText {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-error, #ef4444);
+  margin: var(--space-scale-sm) 0;
+}
+
+.signOutRow {
+  margin-top: var(--space-scale-3xl);
+  padding-top: var(--space-scale-xl);
+  border-top: var(--border-width-default) solid var(--border-subtle);
+}
+
+.signOutButton {
+  padding: var(--space-scale-sm) var(--space-scale-xl);
+  border: var(--border-width-default) solid var(--action-danger);
+  border-radius: var(--radius-component-chip);
+  background: transparent;
+  color: var(--action-danger);
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.signOutButton:hover {
+  background: var(--action-danger);
+  color: var(--content-on-primary);
+}
+
+/* Sign-in CTA */
+.signInCta {
+  text-align: center;
+  padding: var(--space-scale-3xl) var(--space-scale-xl);
+  border: var(--border-width-default) solid var(--border-default);
+  border-radius: var(--radius-component-panel);
+  background: var(--surface-subtle);
+}
+
+.signInTitle {
+  margin: 0 0 var(--space-scale-sm);
+  font-size: var(--typo-title-md-font-size);
+  font-weight: 600;
+}
+
+.signInDesc {
+  margin: 0 0 var(--space-scale-xl);
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+}
+
+.signInButton {
+  padding: var(--space-scale-sm) var(--space-scale-2xl);
+  background: var(--action-primary);
+  color: var(--content-on-primary);
+  border: none;
+  border-radius: var(--radius-component-chip);
+  font-size: var(--typo-body-md-font-size);
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 150ms ease;
+}
+
+.signInButton:hover {
+  opacity: 0.88;
+}
+
+.loading,
+.empty {
+  margin: 0;
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+}

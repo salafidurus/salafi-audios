@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { AccountScreen } from "@/features/account/screens/account.screen";
+import { SettingsLegalScreen } from "@/features/account/screens/settings-legal.screen";
 
 export const metadata: Metadata = {
-  title: "Legal",
-  description: "Legal information and agreements for your account.",
+  title: "Legal — Settings",
+  description: "View the Privacy Policy and Terms of Use for Salafi Durus.",
 };
 
 export default function AccountLegalPage() {
-  return <AccountScreen />;
+  return <SettingsLegalScreen />;
 }

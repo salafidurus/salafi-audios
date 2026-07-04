@@ -15,6 +15,7 @@ export type LiveSessionPublicDto = {
   startedAt?: string;
   endedAt?: string;
   updatedAt: string;
+  recordingLectureId?: string;
 };
 
 export type LiveSessionDeltaDto = {
@@ -36,6 +37,7 @@ export type LiveSessionDto = {
   endedAt?: string;
   viewerCount?: number;
   streamUrl?: string;
+  recordingLectureId?: string;
 };
 
 export type LiveSessionPageDto = {

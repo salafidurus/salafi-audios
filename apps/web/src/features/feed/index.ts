@@ -1,8 +1,8 @@
 // Components
 export {
-  FeedContentCard,
-  type FeedContentCardProps,
-} from "./components/feed-content-card/feed-content-card";
+  FeedListRow,
+  type FeedListRowProps,
+} from "./components/feed-list-row/feed-list-row";
 export {
   FeedScholarRow,
   type FeedScholarRowProps,

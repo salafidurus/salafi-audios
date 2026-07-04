@@ -106,6 +106,10 @@ export const queryKeys = {
     scheduled: () => [...queryKeys.live.all, "scheduled"] as const,
     ended: (cursor?: string) => [...queryKeys.live.all, "ended", cursor] as const,
   },
+  listings: {
+    all: ["listings"] as const,
+    detail: (id: string) => [...queryKeys.listings.all, "detail", id] as const,
+  },
   progress: {
     all: ["progress"] as const,
     lecture: (lectureId: string) => [...queryKeys.progress.all, "lecture", lectureId] as const,
@@ -122,6 +126,10 @@ export const queryKeys = {
       all: () => [...queryKeys.admin.all, "permissions"] as const,
       me: () => [...queryKeys.admin.all, "permissions", "me"] as const,
       user: (userId: string) => [...queryKeys.admin.all, "permissions", userId] as const,
+    },
+    users: {
+      all: () => [...queryKeys.admin.all, "users"] as const,
+      list: (query?: string) => [...queryKeys.admin.all, "users", "list", query] as const,
     },
     scholars: {
       all: () => [...queryKeys.admin.all, "scholars"] as const,

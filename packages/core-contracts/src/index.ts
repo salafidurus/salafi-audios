@@ -40,6 +40,7 @@ export {
   type SeriesSummaryDto,
   type SingleSummaryDto,
   type ListingFormat,
+  type ListingViewDto,
   type CollectionViewDto,
   type SeriesViewDto,
   type PresignedUrlPurpose,
@@ -84,6 +85,8 @@ export {
   type AdminPermission,
   type AdminPermissionDto,
   type AdminPermissionsListDto,
+  type AdminUserListItemDto,
+  type AdminUserListDto,
   type GrantPermissionDto,
   ADMIN_PERMISSIONS,
 } from "./types";

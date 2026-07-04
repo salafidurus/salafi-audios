@@ -329,6 +329,7 @@ export class ScholarsRepository {
             deletedAt: null,
             seriesId: null,
           },
+
         },
         select: {
           topicId: true,
@@ -368,6 +369,7 @@ export class ScholarsRepository {
             deletedAt: null,
             collectionId: null,
           },
+
         },
         select: {
           topicId: true,
@@ -397,6 +399,7 @@ export class ScholarsRepository {
               _count: {
                 select: { lectures: { where: { status: Status.published, deletedAt: null } } },
               },
+
             },
           },
         },
@@ -433,6 +436,7 @@ export class ScholarsRepository {
               _count: {
                 select: { series: { where: { status: Status.published, deletedAt: null } } },
               },
+
             },
           },
         },

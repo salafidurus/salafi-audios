@@ -1,0 +1,48 @@
+.row {
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+}
+
+.cell {
+  padding: var(--space-scale-md) var(--space-scale-sm);
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-sm);
+}
+
+.name {
+  font-weight: 500;
+  color: var(--content-default);
+}
+
+.email {
+  color: var(--content-muted);
+  font-size: var(--typo-body-sm-font-size);
+}
+
+.permissions {
+  display: flex;
+  gap: var(--space-scale-xs);
+  flex-wrap: wrap;
+}
+
+.noPerms {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: var(--typo-xs-font-size);
+  color: var(--content-disabled);
+}
+
+.noPermsIcon {
+  width: 12px;
+  height: 12px;
+}
+
+.date {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+}

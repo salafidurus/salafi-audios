@@ -14,3 +14,13 @@
  * See `docs/nomenclature.md` for the full two-axis model.
  */
 export type ListingFormat = "collection" | "series" | "single";
+
+/**
+ * Resolution result from GET /listing/:id.
+ * Returns the content format and ID so the client can render the
+ * appropriate detail screen (each screen fetches its own data).
+ */
+export type ListingViewDto = {
+  format: ListingFormat;
+  id: string;
+};

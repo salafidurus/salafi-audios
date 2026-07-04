@@ -1,186 +1,58 @@
 "use client";
 
-import type React from "react";
-import type { LibraryItemDto } from "@sd/core-contracts";
-import { pickContentField } from "@sd/core-i18n";
-import {
-  useLibrarySavedScreen,
-  useLibraryProgressScreen,
-  useLibraryCompletedScreen,
-} from "@sd/domain-content";
-import { useAuth } from "@/core/auth/use-auth";
-import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import React from "react";
+import { useLibrarySavedScreen } from "@sd/domain-content";
+import { useAuth } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
+import { LibraryListRow } from "../components/library-list-row/library-list-row";
+import styles from "./library-screens.module.css";
 
-function ProgressBar({ percent }: { percent: number }) {
-  return (
-    <div style={{ height: 3, background: "#e5e7eb", borderRadius: 2, marginTop: 4 }}>
-      <div
-        style={{
-          height: "100%",
-          width: `${Math.min(percent, 100)}%`,
-          background: "#2563eb",
-          borderRadius: 2,
-        }}
-      />
-    </div>
-  );
-}
-
-const libraryItemButtonStyle: React.CSSProperties = {
-  display: "block",
-  width: "100%",
-  textAlign: "left",
-  padding: 12,
-  borderBottom: "1px solid #eee",
-  cursor: "pointer",
-  background: "none",
-  border: "none",
-};
-
-function LibraryItem({
-  item,
-  onPress,
-  variant,
-}: {
-  item: LibraryItemDto;
-  onPress?: () => void;
-  variant: "progress" | "saved" | "completed";
-}) {
-  const progress =
-    item.durationSeconds && item.progressSeconds
-      ? Math.round((item.progressSeconds / item.durationSeconds) * 100)
-      : null;
-  const showOriginal = useShowOriginalContent();
+export function LibrarySavedMobileScreen() {
+  const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
-  const lectureTitle = pickContentField(item.lectureTitle, item.originalLectureTitle, showOriginal);
+  const { items, isFetching } = useLibrarySavedScreen(isAuthenticated);
 
-  return (
-    <button type="button" onClick={onPress} style={libraryItemButtonStyle}>
-      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-        {variant === "completed" && <span style={{ color: "#16a34a", fontSize: 12 }}>✓</span>}
-        <span style={{ fontSize: 15, fontWeight: 600 }}>{lectureTitle}</span>
-      </div>
-      <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>
-        {item.scholarName}
-        {item.seriesTitle && ` · ${item.seriesTitle}`}
-      </div>
-      <div style={{ fontSize: 12, color: "#999", marginTop: 2 }}>
-        {item.durationSeconds
-          ? t("lecture.minutes", "{{count}} min", {
-              count: Math.round(item.durationSeconds / 60),
-            })
-          : ""}
-        {variant === "progress" &&
-          progress !== null &&
-          ` · ${t("library.percentListened", "{{percent}}% listened", { percent: progress })}`}
-        {variant === "saved" &&
-          item.savedAt &&
-          ` · ${t("library.savedOn", "Saved {{date}}", {
-            date: new Date(item.savedAt).toLocaleDateString(),
-          })}`}
-        {variant === "completed" &&
-          item.completedAt &&
-          ` · ${new Date(item.completedAt).toLocaleDateString()}`}
-      </div>
-      {variant === "progress" && progress !== null && <ProgressBar percent={progress} />}
-    </button>
-  );
-}
-
-function SectionList({
-  title,
-  items,
-  isFetching,
-  emptyMessage,
-  variant,
-  onNavigateToLecture,
-}: {
-  title: string;
-  items: LibraryItemDto[];
-  isFetching: boolean;
-  emptyMessage: string;
-  variant: "progress" | "saved" | "completed";
-  onNavigateToLecture?: (id: string) => void;
-}) {
-  const { t } = useTranslation();
-  if (isFetching && items.length === 0) {
+  if (!isAuthenticated) {
     return (
-      <div style={{ padding: 8, color: "#999" }}>
-        {t("library.loadingSection", "Loading {{section}}…", { section: title })}
-      </div>
+      <ScreenView>
+        <AuthRequiredState
+          title="Sign in to view saved lectures"
+          description="Save lectures to build your personal listening library."
+        />
+      </ScreenView>
     );
   }
 
-  if (items.length === 0) {
-    return <div style={{ padding: 8, color: "#666" }}>{emptyMessage}</div>;
-  }
-
   return (
-    <div>
-      {items.map((item) => (
-        <LibraryItem
-          key={item.id}
-          item={item}
-          variant={variant}
-          onPress={() => onNavigateToLecture?.(item.lectureId)}
-        />
-      ))}
-    </div>
-  );
-}
+    <ScreenView>
+      <div className={styles.container}>
+        <h2 className={styles.title}>
+          {t("library.saved", "Saved")}
+        </h2>
 
-export type LibrarySavedMobileScreenProps = {
-  onNavigateToLecture?: (id: string) => void;
-};
-
-export function LibrarySavedMobileScreen({ onNavigateToLecture }: LibrarySavedMobileScreenProps) {
-  const { isAuthenticated } = useAuth();
-  const { t } = useTranslation();
-  const progressData = useLibraryProgressScreen(isAuthenticated);
-  const savedData = useLibrarySavedScreen(isAuthenticated);
-  const completedData = useLibraryCompletedScreen(isAuthenticated);
-
-  return (
-    <div style={{ padding: 12 }}>
-      <h2 style={{ margin: 0, fontSize: 18, marginBottom: 12 }}>
-        {t("library.title", "My Library")}
-      </h2>
-
-      <h3 style={{ fontSize: 15, margin: "16px 0 6px" }}>
-        {t("library.inProgress", "In Progress")}
-      </h3>
-      <SectionList
-        title={t("library.inProgress", "In Progress")}
-        items={progressData.items}
-        isFetching={progressData.isFetching}
-        emptyMessage={t("library.emptyProgress", "No lectures in progress.")}
-        variant="progress"
-        onNavigateToLecture={onNavigateToLecture}
-      />
-
-      <h3 style={{ fontSize: 15, margin: "16px 0 6px" }}>{t("library.saved", "Saved")}</h3>
-      <SectionList
-        title={t("library.saved", "Saved")}
-        items={savedData.items}
-        isFetching={savedData.isFetching}
-        emptyMessage={t(
-          "library.emptySaved",
-          "No saved lectures yet. Save lectures to listen to later.",
+        {isFetching && items.length === 0 ? (
+          <div className={styles.loading}>
+            {t("library.loadingSection", "Loading {{section}}…", {
+              section: t("library.saved", "Saved"),
+            })}
+          </div>
+        ) : items.length === 0 ? (
+          <div className={styles.emptyState}>
+            {t(
+              "library.emptySaved",
+              "No saved lectures yet. Save lectures to listen to later.",
+            )}
+          </div>
+        ) : (
+          <div className={styles.list}>
+            {items.map((item) => (
+              <LibraryListRow key={item.id} item={item} variant="saved" />
+            ))}
+          </div>
         )}
-        variant="saved"
-        onNavigateToLecture={onNavigateToLecture}
-      />
-
-      <h3 style={{ fontSize: 15, margin: "16px 0 6px" }}>{t("library.completed", "Completed")}</h3>
-      <SectionList
-        title={t("library.completed", "Completed")}
-        items={completedData.items}
-        isFetching={completedData.isFetching}
-        emptyMessage={t("library.emptyCompleted", "No completed lectures yet. Keep listening!")}
-        variant="completed"
-        onNavigateToLecture={onNavigateToLecture}
-      />
-    </div>
+      </div>
+    </ScreenView>
   );
 }

@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { AccountProfilePageClient } from "./account-profile-page.client";
+import { SettingsProfileScreen } from "@/features/account/screens/settings-profile.screen";
 
 export const metadata: Metadata = {
-  title: "Profile",
+  title: "Profile — Settings",
   description: "View and update your profile information.",
 };
 
 export default function AccountProfilePage() {
-  return <AccountProfilePageClient />;
+  return <SettingsProfileScreen />;
 }

@@ -56,4 +56,4 @@ The DB is unchanged: nesting is expressed by nullable foreign keys
 (`Series.collectionId`, `Lecture.seriesId`). Placement (and therefore whether
 something is a Module/Lesson vs a Series/Single Listing) is derived from those
 keys, not stored as a separate flag. A Single is still a `Lecture` row reached at
-`/lectures/:id`; it is merely _labelled_ "Single".
+`/listing/:id`; it is merely _labelled_ "Single".

@@ -28,6 +28,7 @@ describe('AdminPermissionsService', () => {
             grant: vi.fn().mockResolvedValue(mockPermissionRecord),
             revoke: vi.fn().mockResolvedValue(mockPermissionRecord),
             hasPermission: vi.fn(),
+            listUsers: vi.fn(),
           } satisfies Partial<Mocked<AdminPermissionsRepository>>,
         },
       ],
@@ -130,6 +131,118 @@ describe('AdminPermissionsService', () => {
 
         expect(repo.grant).toHaveBeenCalledWith('user1', permission, 'admin1');
       }
+    });
+  });
+
+  describe('listUsers', () => {
+    it('should return all users with their permissions', async () => {
+      const now = new Date();
+      const mockUsers = [
+        {
+          id: 'user1',
+          name: 'Alice',
+          email: 'alice@example.com',
+          emailVerified: true,
+          image: null,
+          role: 'user',
+          banned: null,
+          banReason: null,
+          banExpires: null,
+          preferredLanguage: null,
+          createdAt: new Date('2023-01-01'),
+          updatedAt: now,
+          adminPermissions: [{ permission: 'manage:content' }],
+        },
+        {
+          id: 'user2',
+          name: 'Bob',
+          email: 'bob@example.com',
+          emailVerified: true,
+          image: 'https://example.com/avatar.png',
+          role: 'admin',
+          banned: null,
+          banReason: null,
+          banExpires: null,
+          preferredLanguage: null,
+          createdAt: new Date('2023-06-01'),
+          updatedAt: now,
+          adminPermissions: [
+            { permission: 'manage:scholars' },
+            { permission: 'manage:admin' },
+          ],
+        },
+      ];
+
+      repo.listUsers.mockResolvedValue({
+        users: mockUsers,
+        total: 2,
+      });
+
+      const result = await service.listUsers();
+
+      expect(result).toEqual({
+        users: [
+          {
+            id: 'user1',
+            name: 'Alice',
+            email: 'alice@example.com',
+            image: null,
+            role: 'user',
+            createdAt: '2023-01-01T00:00:00.000Z',
+            permissions: ['manage:content'],
+          },
+          {
+            id: 'user2',
+            name: 'Bob',
+            email: 'bob@example.com',
+            image: 'https://example.com/avatar.png',
+            role: 'admin',
+            createdAt: '2023-06-01T00:00:00.000Z',
+            permissions: ['manage:scholars', 'manage:admin'],
+          },
+        ],
+        total: 2,
+      });
+      expect(repo.listUsers).toHaveBeenCalledWith(undefined);
+    });
+
+    it('should filter users by query string', async () => {
+      const now = new Date();
+      const mockUsers = [
+        {
+          id: 'user1',
+          name: 'Alice',
+          email: 'alice@example.com',
+          emailVerified: true,
+          image: null,
+          role: 'user',
+          banned: null,
+          banReason: null,
+          banExpires: null,
+          preferredLanguage: null,
+          createdAt: new Date('2023-01-01'),
+          updatedAt: now,
+          adminPermissions: [],
+        },
+      ];
+
+      repo.listUsers.mockResolvedValue({
+        users: mockUsers,
+        total: 1,
+      });
+
+      const result = await service.listUsers('alice');
+
+      expect(result.users).toHaveLength(1);
+      expect(repo.listUsers).toHaveBeenCalledWith('alice');
+    });
+
+    it('should return empty list when no users match', async () => {
+      repo.listUsers.mockResolvedValue({ users: [], total: 0 });
+
+      const result = await service.listUsers('nonexistent');
+
+      expect(result).toEqual({ users: [], total: 0 });
     });
   });
 

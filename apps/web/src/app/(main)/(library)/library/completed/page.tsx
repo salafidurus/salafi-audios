@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { LibraryCompletedScreen } from "@/features/library/screens/library-completed.screen";
+import { LibraryCompletedScreen } from "@/features/library";
 
 export const metadata: Metadata = {
   title: "Completed Lectures",

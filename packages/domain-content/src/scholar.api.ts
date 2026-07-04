@@ -9,6 +9,7 @@ import {
   type ScholarListItemDto,
   type ScholarTopicsDto,
 } from "@sd/core-contracts";
+import type { UseQueryOptions } from "@tanstack/react-query";
 
 export function useScholarsList() {
   return useApiQuery(queryKeys.scholars.list(), () =>
@@ -37,7 +38,10 @@ export function useScholarDetail(slug: string) {
   );
 }
 
-export function useScholarContent(slug: string) {
+export function useScholarContent(
+  slug: string,
+  options?: Omit<UseQueryOptions<ScholarContentUnifiedDto, Error, ScholarContentUnifiedDto>, "queryKey" | "queryFn">,
+) {
   return useApiQuery(
     queryKeys.scholars.content(slug),
     () =>
@@ -45,7 +49,7 @@ export function useScholarContent(slug: string) {
         url: endpoints.scholars.content(slug),
         method: "GET",
       }),
-    { enabled: !!slug },
+    { enabled: !!slug, ...options },
   );
 }
 

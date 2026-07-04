@@ -2,25 +2,42 @@
 
 import { useEffect } from "react";
 
+export type ThemePreference = "system" | "light" | "dark";
+
+const THEME_KEY = "theme-preference";
+const THEME_CHANGE_EVENT = "theme-change";
+
+function applyTheme(preference: ThemePreference, mediaQuery: MediaQueryList) {
+  const resolved = preference === "system"
+    ? (mediaQuery.matches ? "dark" : "light")
+    : preference;
+  document.documentElement.setAttribute("data-theme", resolved);
+}
+
 export function ThemeSync() {
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
-    const resolveTheme = (): "light" | "dark" => {
-      const explicitTheme = document.documentElement.getAttribute("data-theme");
-      if (explicitTheme === "light" || explicitTheme === "dark") {
-        return explicitTheme;
-      }
-      return mediaQuery.matches ? "dark" : "light";
-    };
-
     const syncTheme = () => {
-      document.documentElement.setAttribute("data-theme", resolveTheme());
+      const stored = localStorage.getItem(THEME_KEY) as ThemePreference | null;
+      const preference: ThemePreference =
+        stored === "light" || stored === "dark" ? stored : "system";
+      applyTheme(preference, mediaQuery);
     };
 
+    // Apply on mount from localStorage
     syncTheme();
+
+    // Re-sync when OS preference changes (only affects "system" mode)
     mediaQuery.addEventListener("change", syncTheme);
-    return () => mediaQuery.removeEventListener("change", syncTheme);
+
+    // Re-sync when the settings screen dispatches a theme-change event
+    window.addEventListener(THEME_CHANGE_EVENT, syncTheme);
+
+    return () => {
+      mediaQuery.removeEventListener("change", syncTheme);
+      window.removeEventListener(THEME_CHANGE_EVENT, syncTheme);
+    };
   }, []);
 
   return null;

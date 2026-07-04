@@ -1,0 +1,16 @@
+.badge {
+  padding: 2px var(--space-scale-xs);
+  border-radius: var(--radius-scale-sm);
+  font-size: var(--typo-xs-font-size);
+  font-weight: 600;
+}
+
+.admin {
+  background: var(--surface-primary-subtle);
+  color: var(--content-primary-strong);
+}
+
+.user {
+  background: var(--surface-subtle);
+  color: var(--content-muted);
+}

@@ -1,73 +1,71 @@
 "use client";
 
-import type React from "react";
-import type { LiveSessionDto } from "@sd/core-contracts";
+import React from "react";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { AppText } from "@/shared/components/AppText/AppText";
 import { useLiveScheduledScreen } from "@sd/domain-live";
+import { LiveSessionRow } from "../components/live-session-row/live-session-row";
+import { useTranslation } from "@/core/i18n/use-translation";
+import styles from "./live.screen.module.css";
 
 export type LiveScheduledDesktopScreenProps = {
   onNavigateToSession?: (id: string) => void;
 };
 
-const scheduledSessionButtonStyle: React.CSSProperties = {
-  display: "block",
-  width: "100%",
-  textAlign: "left",
-  padding: 16,
-  borderBottom: "1px solid var(--border-subtle)",
-  cursor: "pointer",
-  background: "none",
-  border: "none",
-};
-
-function ScheduledSessionItem({
-  session,
-  onPress,
-}: {
-  session: LiveSessionDto;
-  onPress?: () => void;
-}) {
-  return (
-    <button type="button" onClick={onPress} style={scheduledSessionButtonStyle}>
-      <div style={{ fontSize: 16, fontWeight: 600 }}>{session.title}</div>
-      <div style={{ fontSize: 13, color: "var(--content-muted)", marginTop: 4 }}>
-        {session.scholarName}
-      </div>
-      {session.scheduledAt && (
-        <div style={{ fontSize: 12, color: "var(--content-primary)", marginTop: 4 }}>
-          Scheduled: {new Date(session.scheduledAt).toLocaleString()}
-        </div>
-      )}
-    </button>
-  );
-}
-
 export function LiveScheduledDesktopScreen({
   onNavigateToSession,
 }: LiveScheduledDesktopScreenProps) {
   const { sessions, isFetching } = useLiveScheduledScreen();
+  const { t } = useTranslation();
 
-  if (isFetching && sessions.length === 0) {
-    return <div style={{ padding: 32 }}>Loading scheduled sessions…</div>;
-  }
+  const renderContent = () => {
+    if (isFetching && sessions.length === 0) {
+      return (
+        <div style={{ padding: 32, textAlign: "center", color: "var(--content-muted)" }}>
+          {t("common.loading", "Loading…")}
+        </div>
+      );
+    }
 
-  if (sessions.length === 0) {
+    if (sessions.length === 0) {
+      return (
+        <AppText
+          variant="bodyMd"
+          style={{
+            color: "var(--content-subtle)",
+            padding: 24,
+            textAlign: "center",
+            display: "block",
+          }}
+        >
+          {t("live.sections.scheduled.empty", "No upcoming sessions scheduled.")}
+        </AppText>
+      );
+    }
+
     return (
-      <div style={{ padding: 32, color: "var(--content-muted)" }}>
-        No scheduled sessions. Check back later.
+      <div className={styles.list}>
+        {sessions.map((session) => (
+          <LiveSessionRow
+            key={session.id}
+            session={session}
+            onPress={() => onNavigateToSession?.(session.id)}
+          />
+        ))}
       </div>
     );
-  }
+  };
 
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto", padding: 24 }}>
-      <h2 style={{ margin: 0, fontSize: 22, marginBottom: 16 }}>Scheduled</h2>
-      {sessions.map((session) => (
-        <ScheduledSessionItem
-          key={session.id}
-          session={session}
-          onPress={() => onNavigateToSession?.(session.id)}
-        />
-      ))}
-    </div>
+    <ScreenView>
+      <div className={styles.page}>
+        <div className={styles.listContainer}>
+          <AppText variant="displayMd" style={{ display: "block", marginBottom: 24 }}>
+            {t("live.sections.scheduled.header", "Scheduled Sessions")}
+          </AppText>
+          {renderContent()}
+        </div>
+      </div>
+    </ScreenView>
   );
 }

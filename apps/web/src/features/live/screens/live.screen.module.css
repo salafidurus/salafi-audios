@@ -10,40 +10,20 @@
   gap: var(--space-scale-3xl);
 }
 
-.section {
+.listContainer {
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 var(--space-scale-md, 16px);
+}
+
+.list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-component-gap-md);
+  gap: 0;
+  border-radius: var(--radius-component-panel, 12px);
+  border: var(--border-width-default, 1px) solid var(--border-subtle, #e5e7eb);
+  background: var(--surface-default, #ffffff);
+  overflow: hidden;
 }
 
-.cardList {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: var(--space-component-gap-sm);
-}
-
-.twoColumn {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-scale-4xl);
-  align-items: start;
-}
-
-.columnMain {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-scale-2xl);
-}
-
-.columnSide {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-scale-3xl);
-}
-
-@media (max-width: 960px) {
-  .twoColumn {
-    grid-template-columns: 1fr;
-    gap: var(--space-scale-3xl);
-  }
-}

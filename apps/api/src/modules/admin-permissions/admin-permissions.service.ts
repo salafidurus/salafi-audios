@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ADMIN_PERMISSIONS, type AdminPermission } from '@sd/core-contracts';
+import { ADMIN_PERMISSIONS, type AdminPermission, type AdminUserListDto } from '@sd/core-contracts';
 import { AdminPermissionsRepository } from './admin-permissions.repo';
 
 @Injectable()
@@ -31,6 +31,22 @@ export class AdminPermissionsService {
     }
     await this.repo.grant(userId, permission, grantedById);
     return this.getPermissions(userId);
+  }
+
+  async listUsers(query?: string): Promise<AdminUserListDto> {
+    const { users, total } = await this.repo.listUsers(query);
+    return {
+      users: users.map((u) => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        image: u.image,
+        role: u.role,
+        createdAt: u.createdAt.toISOString(),
+        permissions: u.adminPermissions.map((p) => p.permission as AdminPermission),
+      })),
+      total,
+    };
   }
 
   async revoke(userId: string, permission: string) {

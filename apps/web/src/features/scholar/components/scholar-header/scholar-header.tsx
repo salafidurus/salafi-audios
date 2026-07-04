@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import type { ScholarDetailDto } from "@sd/core-contracts";
 import { Globe, Send } from "lucide-react";
@@ -51,27 +52,59 @@ export type ScholarHeaderProps = {
 };
 
 export function ScholarHeader({ scholar }: ScholarHeaderProps) {
+  const [isBioExpanded, setIsBioExpanded] = useState(false);
   const totalHours = Math.round(scholar.totalDurationSeconds / 3600);
+  const initial = scholar.name?.trim().charAt(0).toUpperCase() || "?";
+
+  const bio = scholar.bio || "";
+  const isLongBio = bio.length > 160;
+  const displayBio = isLongBio && !isBioExpanded ? `${bio.substring(0, 160)}...` : bio;
 
   return (
     <div className={styles.root}>
-      {scholar.imageUrl && (
-        <Image
-          src={scholar.imageUrl}
-          alt={scholar.name}
-          width={120}
-          height={120}
-          unoptimized
-          className={styles.avatar}
-        />
+      <div className={styles.headerTop}>
+        {scholar.imageUrl ? (
+          <Image
+            src={scholar.imageUrl}
+            alt={scholar.name}
+            width={144}
+            height={144}
+            unoptimized
+            className={styles.avatar}
+          />
+        ) : (
+          <div
+            className={styles.avatarFallback}
+            role="img"
+            aria-label={scholar.name}
+          >
+            {initial}
+          </div>
+        )}
+        <div className={styles.headerInfo}>
+          <h1 className={styles.name}>{scholar.name}</h1>
+          {(scholar.country || scholar.mainLanguage) && (
+            <p className={styles.meta}>
+              {[scholar.country, scholar.mainLanguage].filter(Boolean).join(" · ")}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {scholar.bio && (
+        <div className={styles.bioContainer}>
+          <p className={styles.bio}>{displayBio}</p>
+          {isLongBio && (
+            <button
+              type="button"
+              className={styles.toggleBtn}
+              onClick={() => setIsBioExpanded(!isBioExpanded)}
+            >
+              {isBioExpanded ? "Show less" : "Show more"}
+            </button>
+          )}
+        </div>
       )}
-      <h1 className={styles.name}>{scholar.name}</h1>
-      {(scholar.country || scholar.mainLanguage) && (
-        <p className={styles.meta}>
-          {[scholar.country, scholar.mainLanguage].filter(Boolean).join(" · ")}
-        </p>
-      )}
-      {scholar.bio && <p className={styles.bio}>{scholar.bio}</p>}
 
       <div className={styles.stats}>
         <div className={styles.stat}>
