@@ -2,6 +2,7 @@ import { vi, type Mocked } from 'vitest';
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ADMIN_PERMISSIONS, type AdminPermission } from '@sd/core-contracts';
+import { UserRole } from '@sd/core-db';
 import { AdminPermissionsRepository } from './admin-permissions.repo';
 import { AdminPermissionsService } from './admin-permissions.service';
 
@@ -144,8 +145,8 @@ describe('AdminPermissionsService', () => {
           email: 'alice@example.com',
           emailVerified: true,
           image: null,
-          role: 'user',
-          banned: null,
+          role: UserRole.user,
+          banned: false,
           banReason: null,
           banExpires: null,
           preferredLanguage: null,
@@ -159,17 +160,14 @@ describe('AdminPermissionsService', () => {
           email: 'bob@example.com',
           emailVerified: true,
           image: 'https://example.com/avatar.png',
-          role: 'admin',
-          banned: null,
+          role: UserRole.admin,
+          banned: false,
           banReason: null,
           banExpires: null,
           preferredLanguage: null,
           createdAt: new Date('2023-06-01'),
           updatedAt: now,
-          adminPermissions: [
-            { permission: 'manage:scholars' },
-            { permission: 'manage:admin' },
-          ],
+          adminPermissions: [{ permission: 'manage:scholars' }, { permission: 'manage:admin' }],
         },
       ];
 
@@ -215,8 +213,8 @@ describe('AdminPermissionsService', () => {
           email: 'alice@example.com',
           emailVerified: true,
           image: null,
-          role: 'user',
-          banned: null,
+          role: UserRole.user,
+          banned: false,
           banReason: null,
           banExpires: null,
           preferredLanguage: null,

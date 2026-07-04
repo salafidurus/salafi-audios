@@ -2,8 +2,7 @@
   // Editor / typecheck only — build settings live in tsconfig.build.json.
   "extends": "../../tsconfig.packages.json",
   "compilerOptions": {
-    "noEmit": true,
-    "moduleSuffixes": [".desktop.web", ".mobile.web", ".native", ".web", ""]
+    "noEmit": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]

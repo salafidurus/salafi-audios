@@ -23,15 +23,18 @@
   },
   "scripts": {
     "lint": "oxlint .",
+    "pretest": "bun run prisma:generate",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
+    "pretest:prepush": "bun run prisma:generate",
     "test:prepush": "vitest run --changed=origin/main",
     "pretypecheck": "bun run prisma:generate",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "prisma:generate": "prisma generate --schema=./prisma/schema.prisma --config=./prisma.config.ts && bun ./scripts/copy-generated-to-dist.js",
     "prisma:format": "prisma format --schema=./prisma/schema.prisma --config=./prisma.config.ts",
     "prisma:validate": "prisma validate --schema=./prisma/schema.prisma --config=./prisma.config.ts",
+    "prisma:seed": "bun run prisma/seed.ts",
     "migrate:create-only": "bun ./scripts/migrate-with-auto-name.js",
     "migrate:deploy": "prisma migrate deploy --schema=./prisma/schema.prisma --config=./prisma.config.ts",
     "make-admin": "bun ./scripts/make-admin.js",
@@ -39,6 +42,7 @@
     "dev": "bun run build --watch"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "catalog:",
     "@prisma/client": "catalog:",
     "@prisma/client-runtime-utils": "^7.3.0",
     "@sd/core-contracts": "workspace:*"
@@ -48,5 +52,8 @@
     "pg": "^8.0.0",
     "prisma": "^7.3.0",
     "tsup": "catalog:"
+  },
+  "prisma": {
+    "seed": "bun run prisma/seed.ts"
   }
 }
