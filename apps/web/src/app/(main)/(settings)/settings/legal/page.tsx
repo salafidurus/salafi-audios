@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SettingsLegalScreen } from "@/features/account/screens/settings-legal.screen";
+import { SettingsLegalScreen } from "@/features/settings/screens/settings-legal.screen";
 
 export const metadata: Metadata = {
   title: "Legal — Settings",
