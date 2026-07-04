@@ -11,6 +11,7 @@ export {
   useScholarsList,
   useScholarDetail,
   useScholarContent,
+  useScholarTopics,
   splitScholarContent,
 } from "./scholar.api";
 export {

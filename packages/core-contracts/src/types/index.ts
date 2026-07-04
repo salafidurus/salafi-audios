@@ -39,6 +39,7 @@ export {
   type CollectionSummaryDto,
   type SeriesSummaryDto,
   type SingleSummaryDto,
+  type ScholarTopicsDto,
 } from "../types/scholar.types";
 export { type ListingFormat } from "../types/listing.types";
 export { type CollectionViewDto } from "../types/collection.types";

@@ -103,3 +103,11 @@ export type SingleSummaryDto = {
   originalLanguage?: Locale;
   original?: ContentOriginalFields;
 };
+
+export type ScholarTopicsDto = {
+  topics: {
+    topicId: string;
+    topicName: string;
+    items: ScholarContentItemDto[];
+  }[];
+};

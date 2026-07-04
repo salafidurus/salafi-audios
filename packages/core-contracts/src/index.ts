@@ -38,6 +38,7 @@ export {
   type CollectionSummaryDto,
   type SeriesSummaryDto,
   type SingleSummaryDto,
+  type ScholarTopicsDto,
   type ListingFormat,
   type CollectionViewDto,
   type SeriesViewDto,

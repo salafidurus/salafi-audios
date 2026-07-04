@@ -2,7 +2,7 @@
 
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { AppText } from "@/shared/components/AppText/AppText";
-import { useScholarDetail, useScholarContent } from "@sd/domain-content";
+import { useScholarDetail } from "@sd/domain-content";
 import { ScholarHeader } from "@/features/scholar/components/scholar-header/scholar-header";
 import { ScholarContentList } from "@/features/scholar/components/scholar-content-list/scholar-content-list";
 import styles from "./scholar-detail.screen.desktop.module.css";
@@ -12,9 +12,7 @@ export type ScholarDetailDesktopScreenProps = {
 };
 
 export function ScholarDetailDesktopScreen({ slug }: ScholarDetailDesktopScreenProps) {
-  const { data: scholar, isFetching: isScholarFetching } = useScholarDetail(slug);
-  const { data: content, isFetching: isContentFetching } = useScholarContent(slug);
-  const isFetching = isScholarFetching || isContentFetching;
+  const { data: scholar, isFetching } = useScholarDetail(slug);
 
   if (isFetching) {
     return (
@@ -39,7 +37,7 @@ export function ScholarDetailDesktopScreen({ slug }: ScholarDetailDesktopScreenP
           <ScholarHeader scholar={scholar} />
         </div>
         <div className={styles.main}>
-          <ScholarContentList items={content?.items ?? []} />
+          <ScholarContentList slug={slug} />
         </div>
       </div>
     </ScreenView>
