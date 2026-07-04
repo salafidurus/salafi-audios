@@ -13,14 +13,8 @@ export type ScholarListRowProps = {
 export function ScholarListRow({ scholar, onPress }: ScholarListRowProps) {
   const initial = scholar.name?.trim().charAt(0).toUpperCase() || "?";
 
-  return (
-    <button
-      type="button"
-      onClick={() => onPress?.(scholar.slug)}
-      className={`${styles.row} ${onPress ? "listRow" : ""}`}
-      style={{ cursor: onPress ? "pointer" : "default" }}
-      disabled={!onPress}
-    >
+  const content = (
+    <>
       <div className={styles.avatarSection}>
         {scholar.imageUrl ? (
           <div className={styles.avatarContainer}>
@@ -58,6 +52,24 @@ export function ScholarListRow({ scholar, onPress }: ScholarListRowProps) {
       <div className={styles.rightSection}>
         {onPress && <ChevronRight className={styles.chevron} size={20} />}
       </div>
-    </button>
+    </>
+  );
+
+  if (onPress) {
+    return (
+      <button
+        type="button"
+        onClick={() => onPress(scholar.slug)}
+        className={`${styles.row} ${styles.interactive} listRow`}
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <div className={`${styles.row} listRow`}>
+      {content}
+    </div>
   );
 }
