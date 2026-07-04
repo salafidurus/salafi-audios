@@ -1,39 +1,6 @@
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { createZodDto } from 'nestjs-zod';
+import { CreateScholarSchema } from './create-scholar.dto';
 
-export class UpdateScholarDto {
-  @ApiPropertyOptional()
-  @IsString()
-  @IsOptional()
-  name?: string;
+export const UpdateScholarSchema = CreateScholarSchema.partial();
 
-  @ApiPropertyOptional()
-  @IsString()
-  @IsOptional()
-  slug?: string;
-
-  @ApiPropertyOptional()
-  @IsString()
-  @IsOptional()
-  bio?: string;
-
-  @ApiPropertyOptional()
-  @IsString()
-  @IsOptional()
-  imageUrl?: string;
-
-  @ApiPropertyOptional()
-  @IsBoolean()
-  @IsOptional()
-  isKibar?: boolean;
-
-  @ApiPropertyOptional()
-  @IsBoolean()
-  @IsOptional()
-  isFeatured?: boolean;
-
-  @ApiPropertyOptional()
-  @IsBoolean()
-  @IsOptional()
-  isActive?: boolean;
-}
+export class UpdateScholarDto extends createZodDto(UpdateScholarSchema) {}

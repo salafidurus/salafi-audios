@@ -1,13 +1,10 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsIn, IsString } from 'class-validator';
-import { SUPPORTED_LOCALES } from '@sd/core-contracts';
+import { createZodDto } from 'nestjs-zod';
+import { z } from 'zod';
+import { LocaleSchema } from '@sd/core-contracts';
 
-export class SaveTopicTranslationDto {
-  @ApiProperty({ enum: SUPPORTED_LOCALES })
-  @IsIn(SUPPORTED_LOCALES)
-  locale!: 'en' | 'ar';
+export const SaveTopicTranslationSchema = z.object({
+  locale: LocaleSchema,
+  name: z.string().min(1, 'Name must not be empty'),
+});
 
-  @ApiProperty()
-  @IsString()
-  name!: string;
-}
+export class SaveTopicTranslationDto extends createZodDto(SaveTopicTranslationSchema) {}

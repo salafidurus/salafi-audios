@@ -602,7 +602,7 @@ export class LecturesRepository {
 
       if (dto.topics?.length) {
         await tx.lectureTopic.createMany({
-          data: dto.topics.map((topicId) => ({
+          data: dto.topics.map((topicId: string) => ({
             lectureId: lecture.id,
             topicId,
           })),

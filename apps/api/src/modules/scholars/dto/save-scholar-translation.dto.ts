@@ -1,18 +1,11 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsIn, IsOptional, IsString } from 'class-validator';
-import { SUPPORTED_LOCALES } from '@sd/core-contracts';
+import { createZodDto } from 'nestjs-zod';
+import { z } from 'zod';
+import { LocaleSchema } from '@sd/core-contracts';
 
-export class SaveScholarTranslationDto {
-  @ApiProperty({ enum: SUPPORTED_LOCALES })
-  @IsIn(SUPPORTED_LOCALES)
-  locale!: 'en' | 'ar';
+export const SaveScholarTranslationSchema = z.object({
+  locale: LocaleSchema,
+  name: z.string().min(1, 'Name must not be empty'),
+  bio: z.string().nullable().optional(),
+});
 
-  @ApiProperty()
-  @IsString()
-  name!: string;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
-  bio?: string | null;
-}
+export class SaveScholarTranslationDto extends createZodDto(SaveScholarTranslationSchema) {}

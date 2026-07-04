@@ -1,36 +1,16 @@
-import { IsString, IsOptional, IsArray, IsNumber } from 'class-validator';
+import { createZodDto } from 'nestjs-zod';
+import { z } from 'zod';
 
-export class CreateLectureDto {
-  @IsString()
-  title!: string;
+export const CreateLectureSchema = z.object({
+  title: z.string().min(1, 'Title must not be empty'),
+  slug: z.string().optional(),
+  scholarId: z.string().min(1, 'Scholar ID must not be empty'),
+  seriesId: z.string().optional(),
+  topics: z.array(z.string()).optional(),
+  audioKey: z.string().min(1, 'Audio key must not be empty'),
+  format: z.string().optional(),
+  durationSeconds: z.number().optional(),
+  sizeBytes: z.number().optional(),
+});
 
-  @IsOptional()
-  @IsString()
-  slug?: string;
-
-  @IsString()
-  scholarId!: string;
-
-  @IsOptional()
-  @IsString()
-  seriesId?: string;
-
-  @IsOptional()
-  @IsArray()
-  topics?: string[];
-
-  @IsString()
-  audioKey!: string;
-
-  @IsOptional()
-  @IsString()
-  format?: string;
-
-  @IsOptional()
-  @IsNumber()
-  durationSeconds?: number;
-
-  @IsOptional()
-  @IsNumber()
-  sizeBytes?: number;
-}
+export class CreateLectureDto extends createZodDto(CreateLectureSchema) {}

@@ -1,19 +1,10 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { createZodDto } from 'nestjs-zod';
+import { z } from 'zod';
 
-export class UpsertTopicDto {
-  @ApiProperty({ description: 'Stable, URL-safe slug (unique)' })
-  @IsString()
-  @IsNotEmpty()
-  slug!: string;
+export const UpsertTopicSchema = z.object({
+  slug: z.string().min(1, 'Slug must not be empty'),
+  name: z.string().min(1, 'Name must not be empty'),
+  parentSlug: z.string().optional(),
+});
 
-  @ApiProperty({ description: 'Display name' })
-  @IsString()
-  @IsNotEmpty()
-  name!: string;
-
-  @ApiPropertyOptional({ description: 'Optional parent topic slug' })
-  @IsString()
-  @IsOptional()
-  parentSlug?: string;
-}
+export class UpsertTopicDto extends createZodDto(UpsertTopicSchema) {}

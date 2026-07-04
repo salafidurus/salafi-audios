@@ -4,6 +4,7 @@ import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decor
 import type { UserProfileDto } from '@sd/core-contracts';
 import { AccountService } from './account.service';
 import { CurrentUser } from '../auth/decorators';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @ApiTags('Account')
 @ApiCommonErrors()
@@ -35,7 +36,7 @@ export class AccountController {
   @ApiOkResponse({ description: 'Updated user profile' })
   updateProfile(
     @CurrentUser() user: { id: string },
-    @Body() body: { displayName: string },
+    @Body() body: UpdateProfileDto,
   ): Promise<UserProfileDto> {
     return this.accountService.updateProfile(user.id, body.displayName);
   }

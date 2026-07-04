@@ -1,25 +1,4 @@
-import { IsString, IsOptional, IsNumber } from 'class-validator';
+import { createZodDto } from 'nestjs-zod';
+import { CreateSeriesDtoSchema } from '@sd/core-contracts';
 
-export class CreateSeriesDto {
-  @IsString()
-  scholarId!: string;
-
-  @IsString()
-  title!: string;
-
-  @IsOptional()
-  @IsString()
-  description?: string;
-
-  @IsOptional()
-  @IsString()
-  coverImageUrl?: string;
-
-  @IsOptional()
-  @IsString()
-  language?: string;
-
-  @IsOptional()
-  @IsNumber()
-  orderIndex?: number;
-}
+export class CreateSeriesDto extends createZodDto(CreateSeriesDtoSchema) {}
