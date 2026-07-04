@@ -15,9 +15,9 @@ export type ScholarContentListProps = {
 };
 
 function contentHref(item: ScholarContentItemDto): string {
-  if (item.type === "series") return `/series/${item.id}`;
-  if (item.type === "collection") return `/collections/${item.id}`;
-  return `/lectures/${item.id}`;
+  if (item.type === "series") return `/series/${item.slug}`;
+  if (item.type === "collection") return `/collections/${item.slug}`;
+  return `/lectures/${item.slug}`;
 }
 
 function ContentRow({ item }: { item: ScholarContentItemDto }) {
@@ -85,11 +85,13 @@ export function ScholarContentList({ slug }: ScholarContentListProps) {
   const { data: topicsData, isFetching: isTopicsFetching } = useScholarTopics(slug);
   const hasTopics = (topicsData?.topics?.length ?? 0) > 0;
 
-  // Flat-list fallback: only fetch when topics are empty
-  const { data: flatContent, isFetching: isFlatFetching } = useScholarContent(slug);
+  // Flat-list fallback: only fetch when topics query has settled and returned empty
+  const { data: flatContent, isFetching: isFlatFetching } = useScholarContent(slug, {
+    enabled: !isTopicsFetching && !hasTopics,
+  });
 
   if (isTopicsFetching) {
-    return <p className={styles.empty}>{"Loading…"}</p>;
+    return <p className={styles.empty}>{t("common.loading", "Loading…")}</p>;
   }
 
   // Topic-grouped display — sort alphabetically by topicName for consistent ordering
@@ -115,7 +117,7 @@ export function ScholarContentList({ slug }: ScholarContentListProps) {
 
   // Graceful fallback: flat list for scholars without topic tags
   if (isFlatFetching) {
-    return <p className={styles.empty}>{"Loading…"}</p>;
+    return <p className={styles.empty}>{t("common.loading", "Loading…")}</p>;
   }
 
   const flatItems = flatContent?.items ?? [];
