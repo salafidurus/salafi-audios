@@ -1,9 +1,10 @@
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useAccountProfile } from "@sd/domain-account";
 import { LanguageSwitch, ContentLanguageToggle } from "@/features/i18n";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
+import { AppText } from "@/shared/components/AppText/AppText";
 
 export type AccountScreenProps = {
   onNavigateToProfile?: () => void;
@@ -25,22 +26,26 @@ export function AccountScreen({
   if (isFetching) {
     return (
       <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>{t("common.loading", "Loading account…")}</Text>
+        <AppText variant="bodyMd">{t("common.loading", "Loading account…")}</AppText>
       </View>
     );
   }
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>{t("account.title", "Account")}</Text>
+      <AppText variant="titleLg" style={styles.title}>
+        {t("account.title", "Account")}
+      </AppText>
       {profile ? (
         <>
           <View style={styles.profileRow}>
             <View>
-              <Text style={styles.profileName}>
+              <AppText variant="bodyMd" style={styles.profileName}>
                 {profile.displayName || t("account.defaultUser", "User")}
-              </Text>
-              <Text style={styles.profileEmail}>{profile.email}</Text>
+              </AppText>
+              <AppText variant="caption" style={styles.profileEmail}>
+                {profile.email}
+              </AppText>
             </View>
           </View>
           <View style={styles.actions}>
@@ -49,38 +54,44 @@ export function AccountScreen({
                 onPress={onNavigateToAdmin}
                 style={[styles.actionButton, styles.adminButton]}
               >
-                <Text style={styles.adminLabel}>{t("account.admin", "Admin")}</Text>
+                <AppText variant="bodySm" style={styles.adminLabel}>
+                  {t("account.admin", "Admin")}
+                </AppText>
               </Pressable>
             )}
             <Pressable onPress={onNavigateToProfile} style={styles.actionButton}>
-              <Text style={styles.actionLabel}>{t("account.editProfile", "Edit Profile")}</Text>
+              <AppText variant="bodySm">{t("account.editProfile", "Edit Profile")}</AppText>
             </Pressable>
             <Pressable onPress={onNavigateToLegal} style={styles.actionButton}>
-              <Text style={styles.actionLabel}>{t("account.legal", "Legal")}</Text>
+              <AppText variant="bodySm">{t("account.legal", "Legal")}</AppText>
             </Pressable>
             <Pressable onPress={onSignOut} style={styles.actionButton}>
-              <Text style={styles.signOutLabel}>{t("account.signOut", "Sign Out")}</Text>
+              <AppText variant="bodySm" style={styles.signOutLabel}>
+                {t("account.signOut", "Sign Out")}
+              </AppText>
             </Pressable>
           </View>
         </>
       ) : (
         <View style={styles.actions}>
           <Pressable onPress={onNavigateToLegal} style={styles.actionButton}>
-            <Text style={styles.actionLabel}>{t("account.legal", "Legal")}</Text>
+            <AppText variant="bodySm">{t("account.legal", "Legal")}</AppText>
           </Pressable>
           <Pressable
             onPress={onNavigateToProfile}
             style={[styles.actionButton, styles.signInPrompt]}
           >
-            <Text style={styles.signInLabel}>
+            <AppText variant="bodySm" style={styles.signInLabel}>
               {t("account.signInToAccess", "Sign in to access your profile")}
-            </Text>
+            </AppText>
           </Pressable>
         </View>
       )}
       <View style={styles.languageSection}>
         <View>
-          <Text style={styles.sectionHeading}>{t("account.language", "Language")}</Text>
+          <AppText variant="titleMd" style={styles.sectionHeading}>
+            {t("account.language", "Language")}
+          </AppText>
           <LanguageSwitch />
         </View>
         <ContentLanguageToggle />
@@ -96,7 +107,7 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
   },
   loadingText: {
-    color: theme.colors.content.default,
+    color: theme.colors.content.primary,
   },
   screen: {
     flex: 1,
@@ -106,8 +117,6 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing.layout.pageY,
   },
   title: {
-    fontSize: 22,
-    fontWeight: "bold",
     color: theme.colors.content.strong,
   },
   profileRow: {
@@ -117,12 +126,10 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.component.gapMd,
   },
   profileName: {
-    fontSize: 16,
     fontWeight: "600",
     color: theme.colors.content.strong,
   },
   profileEmail: {
-    fontSize: 13,
     color: theme.colors.content.muted,
   },
   actions: {
@@ -136,28 +143,20 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.radius.scale.sm,
     backgroundColor: theme.colors.surface.default,
   },
-  actionLabel: {
-    fontSize: 15,
-    color: theme.colors.content.default,
-  },
   adminButton: {
     borderColor: theme.colors.action.primary,
     backgroundColor: theme.colors.surface.primarySubtle,
   },
   adminLabel: {
-    fontSize: 15,
-    fontWeight: "600",
     color: theme.colors.action.primary,
   },
   signOutLabel: {
-    fontSize: 15,
     color: theme.colors.state.danger,
   },
   signInPrompt: {
     borderColor: theme.colors.action.primary,
   },
   signInLabel: {
-    fontSize: 15,
     color: theme.colors.action.primary,
   },
   languageSection: {
@@ -165,8 +164,6 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing.component.gapLg,
   },
   sectionHeading: {
-    fontSize: 16,
-    fontWeight: "600",
     marginBottom: theme.spacing.component.gapSm,
     color: theme.colors.content.strong,
   },

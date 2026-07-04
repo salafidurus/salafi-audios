@@ -29,10 +29,10 @@ export const routes = {
     session: (id: string) => `/live/${id}` as const,
   },
 
-  account: {
-    index: "/account",
-    profile: "/account/profile",
-    legal: "/account/legal",
+  settings: {
+    index: "/settings",
+    profile: "/settings/profile",
+    legal: "/settings/legal",
   },
 
   scholars: {
@@ -95,9 +95,9 @@ export interface RouteDefinition {
 export const routeDefinitions: RouteDefinition[] = [
   { path: routes.feed.following, access: "auth-required" },
   { path: routes.feed.index, access: "public" },
-  { path: routes.account.profile, access: "auth-optional" },
-  { path: routes.account.legal, access: "public" },
-  { path: routes.account.index, access: "auth-optional" },
+  { path: routes.settings.profile, access: "auth-optional" },
+  { path: routes.settings.legal, access: "public" },
+  { path: routes.settings.index, access: "auth-optional" },
   { path: routes.library.index, access: "auth-optional" },
   { path: routes.live.index, access: "public" },
   { path: routes.search, access: "public" },

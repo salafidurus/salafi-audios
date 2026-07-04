@@ -5,7 +5,7 @@ const PATH_TO_SECTION: Record<string, Section> = {
   [routes.feed.index]: "feed",
   [routes.live.index]: "live",
   [routes.library.index]: "library",
-  [routes.account.index]: "account",
+  [routes.settings.index]: "settings",
 };
 
 export function getCurrentSection(pathname: string): Section | "home" {

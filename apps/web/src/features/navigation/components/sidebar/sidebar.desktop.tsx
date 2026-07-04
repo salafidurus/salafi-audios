@@ -87,7 +87,7 @@ export function Sidebar() {
   const { data: adminPermissionsData } = useAdminPermissions();
 
   const hasAdminAccess = isAuthenticated && (adminPermissionsData?.permissions ?? []).length > 0;
-  const accountHref = routes.account.index;
+  const settingsHref = routes.settings.index;
 
   const navItems: NavItem[] = [
     {
@@ -173,15 +173,15 @@ export function Sidebar() {
           );
         })}
         <Link
-          href={accountHref}
-          className={clsx(styles.link, pathname.startsWith(routes.account.index) && styles.active)}
-          aria-label={t("navigation.settings", "Settings")}
-          title={collapsed ? t("navigation.settings", "Settings") : undefined}
+          href={settingsHref}
+          className={clsx(styles.link, pathname.startsWith(routes.settings.index) && styles.active)}
+          aria-label={t("navigation.settings")}
+          title={collapsed ? t("navigation.settings") : undefined}
         >
           <span className={styles.icon} aria-hidden="true">
             <Settings size={18} />
           </span>
-          <span className={styles.label}>{t("navigation.settings", "Settings")}</span>
+          <span className={styles.label}>{t("navigation.settings")}</span>
         </Link>
 
         {hasAdminAccess && (

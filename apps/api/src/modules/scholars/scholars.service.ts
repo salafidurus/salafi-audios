@@ -4,6 +4,7 @@ import type {
   ScholarListItemDto,
   ScholarDetailDto,
   ScholarContentUnifiedDto,
+  ScholarTopicsDto,
   TranslationViewDto,
   AdminSeriesListItemDto,
   AdminSeriesDetailDto,

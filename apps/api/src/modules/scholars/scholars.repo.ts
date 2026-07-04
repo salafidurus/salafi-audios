@@ -320,12 +320,16 @@ export class ScholarsRepository {
 
     if (!scholar) return null;
 
-    // Collect all topics + their content items for this scholar.
-    // We fan-out across lectureTopics, seriesTopics, and collectionTopics.
     const [lectureTopicRows, seriesTopicRows, collectionTopicRows] = await Promise.all([
       this.prisma.lectureTopic.findMany({
         where: {
-          lecture: { scholarId: scholar.id, status: Status.published, deletedAt: null, seriesId: null },
+          lecture: {
+            scholarId: scholar.id,
+            status: Status.published,
+            deletedAt: null,
+            seriesId: null,
+          },
+
         },
         select: {
           topicId: true,
@@ -359,7 +363,13 @@ export class ScholarsRepository {
       }),
       this.prisma.seriesTopic.findMany({
         where: {
-          series: { scholarId: scholar.id, status: Status.published, deletedAt: null, collectionId: null },
+          series: {
+            scholarId: scholar.id,
+            status: Status.published,
+            deletedAt: null,
+            collectionId: null,
+          },
+
         },
         select: {
           topicId: true,
@@ -386,7 +396,10 @@ export class ScholarsRepository {
                 select: { title: true },
                 take: 1,
               },
-              _count: { select: { lectures: { where: { status: Status.published, deletedAt: null } } } },
+              _count: {
+                select: { lectures: { where: { status: Status.published, deletedAt: null } } },
+              },
+
             },
           },
         },
@@ -420,14 +433,16 @@ export class ScholarsRepository {
                 select: { title: true },
                 take: 1,
               },
-              _count: { select: { series: { where: { status: Status.published, deletedAt: null } } } },
+              _count: {
+                select: { series: { where: { status: Status.published, deletedAt: null } } },
+              },
+
             },
           },
         },
       }),
     ]);
 
-    // Build a map: topicId -> { topicName, items[] }
     const topicMap = new Map<string, { topicName: string; items: ScholarContentItemDto[] }>();
 
     const ensureTopic = (topicId: string, topicName: string) => {
@@ -503,13 +518,11 @@ export class ScholarsRepository {
       });
     }
 
-    // Sort items within each topic by recency, then return sorted topics
     const topics = Array.from(topicMap.entries()).map(([topicId, { topicName, items }]) => {
       items.sort((a, b) => b.recencyAt.localeCompare(a.recencyAt));
       return { topicId, topicName, items };
     });
 
-    // Sort topics alphabetically by name (consistent with topics.repo.ts convention)
     topics.sort((a, b) => a.topicName.localeCompare(b.topicName));
 
     return { topics };

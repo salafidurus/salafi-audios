@@ -10,3 +10,4 @@ export {
 
 // Components (used outside this feature)
 export { ScholarCard, type ScholarCardProps } from "./components/scholar-card/scholar-card";
+export { ScholarRow, type ScholarRowProps } from "./components/scholar-row/scholar-row";

@@ -3,13 +3,16 @@ import { useAudio } from "@sd/domain-audio";
 import type { Track } from "@sd/domain-audio";
 import { audioService } from "@/features/audio";
 import { Button } from "@/shared/components/Button/Button";
+import { Play, Pause } from "lucide-react-native";
+import { useUnistyles } from "react-native-unistyles";
 
 export type LecturePlayButtonProps = {
   lecture: LectureDetailDto;
 };
 
 export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
-  const { isPlaying, currentTrack } = useAudio();
+  const { isPlaying, currentTrack, isLoading } = useAudio();
+  const { theme } = useUnistyles();
 
   if (!lecture.primaryAudioAsset) {
     return null;
@@ -58,7 +61,24 @@ export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
     await audioService.playLecture(track, queueContext);
   };
 
-  const label = isCurrentAsset && isPlaying ? "⏸ Pause Lecture" : "▶ Play Lecture";
+  const isPausing = isCurrentAsset && isPlaying;
+  const label = isPausing ? "Pause Lecture" : "Play Lecture";
+  const icon = isPausing ? (
+    <Pause size={20} color={theme.colors.content.onPrimary} fill={theme.colors.content.onPrimary} />
+  ) : (
+    <Play size={20} color={theme.colors.content.onPrimary} fill={theme.colors.content.onPrimary} />
+  );
 
-  return <Button variant="primary" size="lg" fullWidth label={label} onPress={handlePress} />;
+  return (
+    <Button
+      variant="primary"
+      size="lg"
+      fullWidth
+      label={label}
+      icon={icon}
+      iconPosition="left"
+      loading={isCurrentAsset && isLoading}
+      onPress={handlePress}
+    />
+  );
 }
