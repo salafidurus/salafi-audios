@@ -88,8 +88,6 @@
     "docs:quality": "markdownlint-cli2 README.md **/README.md docs/**/*.md AGENT.md .github/copilot-instructions.md",
     "security:secrets": "secretlint \"**/*\"",
     "ci:local": "bun run verify:build-configs && bun run lint && bun run typecheck && bun run test:prepush && bun run build:affected && bun run --filter web build && bun run docs:quality",
-    "ingest:content": "bun run --filter @sd/util-ingest ingest:content",
-    "ingest:remove": "bun run --filter @sd/util-ingest ingest:remove",
     "doctor": "bunx react-doctor@latest",
     "native:expo:fix": "bun run --filter native expo:fix",
     "native:expo:check": "bun run --filter native expo:check"

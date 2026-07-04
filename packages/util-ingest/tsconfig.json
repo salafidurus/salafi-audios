@@ -1,8 +1,0 @@
-{
-  // util-ingest: CLI scripts built with tsup for Node.js
-  "extends": "../../tsconfig.packages.json",
-  "compilerOptions": {
-    "types": ["node", "jest"]
-  },
-  "include": ["src"]
-}

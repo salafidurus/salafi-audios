@@ -13,6 +13,13 @@ datasource db {
 // Enums
 //////////////////////////
 
+enum UserRole {
+  user
+  admin
+  editor
+  superadmin
+}
+
 enum Status {
   draft
   review
@@ -100,8 +107,8 @@ model User {
   image         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  role          String    @default("user")
-  banned        Boolean?
+  role          UserRole  @default(user)
+  banned        Boolean   @default(false)
   banReason     String?
   banExpires    DateTime?
 
@@ -155,18 +162,18 @@ model UserScholarRole {
 //////////////////////////
 
 model Scholar {
-  id           String    @id @default(cuid())
+  id           String   @id @default(cuid())
   slug         String
   name         String
   bio          String?
   country      String?
   mainLanguage Locale?
   imageUrl     String?
-  isActive     Boolean   @default(true)
-  isKibar      Boolean   @default(false)
-  isFeatured   Boolean   @default(false)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime?
+  isActive     Boolean  @default(true)
+  isKibar      Boolean  @default(false)
+  isFeatured   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   // Social links
   socialTwitter  String?
@@ -383,7 +390,7 @@ model Topic {
   parentId  String?
   createdAt DateTime @default(now())
 
-  parent           Topic?             @relation("TopicToParent", fields: [parentId], references: [id], onDelete: SetNull)
+  parent           Topic?             @relation("TopicToParent", fields: [parentId], references: [id], onDelete: Cascade)
   children         Topic[]            @relation("TopicToParent")
   lectureTopics    LectureTopic[]
   seriesTopics     SeriesTopic[]
