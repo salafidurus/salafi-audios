@@ -1,53 +1,66 @@
 "use client";
 
-import type { LiveSessionDto } from "@sd/core-contracts";
-import { useLiveScheduledScreen } from "@sd/domain-live";
+import React from "react";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import styles from "./live-scheduled.screen.mobile.module.css";
+import { AppText } from "@/shared/components/AppText/AppText";
+import { useLiveScheduledScreen } from "@sd/domain-live";
+import { LiveSessionRow } from "../components/live-session-row/live-session-row";
+import styles from "./live.screen.module.css";
 
 export type LiveScheduledMobileScreenProps = {
   onNavigateToSession?: (id: string) => void;
 };
 
-function ScheduledSessionItem({
-  session,
-  onPress,
-}: {
-  session: LiveSessionDto;
-  onPress?: () => void;
-}) {
-  return (
-    <button type="button" onClick={onPress} className={styles.sessionItem}>
-      <div className={styles.sessionTitle}>{session.title}</div>
-      <div className={styles.sessionMeta}>{session.scholarName}</div>
-      {session.scheduledAt && (
-        <div className={styles.sessionDate}>{new Date(session.scheduledAt).toLocaleString()}</div>
-      )}
-    </button>
-  );
-}
-
-export function LiveScheduledMobileScreen({ onNavigateToSession }: LiveScheduledMobileScreenProps) {
+export function LiveScheduledMobileScreen({
+  onNavigateToSession,
+}: LiveScheduledMobileScreenProps) {
   const { sessions, isFetching } = useLiveScheduledScreen();
+
+  const renderContent = () => {
+    if (isFetching && sessions.length === 0) {
+      return <div style={{ padding: 16, textAlign: "center" }}>Loading scheduled sessions…</div>;
+    }
+
+    if (sessions.length === 0) {
+      return (
+        <AppText
+          variant="bodyMd"
+          style={{
+            color: "var(--content-subtle)",
+            padding: 16,
+            textAlign: "center",
+            display: "block",
+          }}
+        >
+          No scheduled sessions.
+        </AppText>
+      );
+    }
+
+    return (
+      <div className={styles.list}>
+        {sessions.map((session) => (
+          <LiveSessionRow
+            key={session.id}
+            session={session}
+            onPress={() => onNavigateToSession?.(session.id)}
+          />
+        ))}
+      </div>
+    );
+  };
 
   return (
     <ScreenView>
-      {isFetching && sessions.length === 0 ? (
-        <p>Loading scheduled sessions…</p>
-      ) : sessions.length === 0 ? (
-        <p>No scheduled sessions.</p>
-      ) : (
-        <>
-          <h2 className={styles.title}>Scheduled</h2>
-          {sessions.map((session) => (
-            <ScheduledSessionItem
-              key={session.id}
-              session={session}
-              onPress={() => onNavigateToSession?.(session.id)}
-            />
-          ))}
-        </>
-      )}
+      <div className={styles.page}>
+        <div className={styles.listContainer}>
+          <AppText variant="titleLg" style={{ display: "block", marginBottom: 16 }}>
+            Scheduled Sessions
+          </AppText>
+          {renderContent()}
+        </div>
+      </div>
     </ScreenView>
   );
 }
+
