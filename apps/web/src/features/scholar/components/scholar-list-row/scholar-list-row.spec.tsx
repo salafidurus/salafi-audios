@@ -33,10 +33,12 @@ describe("ScholarListRow", () => {
   });
 
   it("renders avatar image when imageUrl is present", () => {
-    render(<ScholarListRow scholar={{ ...mockScholar, imageUrl: "/images/binbaz.jpg" }} />);
-    const img = screen.getByRole("img", { name: "Abdul Aziz bin Baz" });
+    const { container } = render(
+      <ScholarListRow scholar={{ ...mockScholar, imageUrl: "/images/binbaz.jpg" }} />
+    );
+    const img = container.querySelector("img");
     expect(img).toBeInTheDocument();
-    expect(img.getAttribute("src")).toContain("binbaz.jpg");
+    expect(img?.getAttribute("src")).toContain("binbaz.jpg");
   });
 
   it("renders fallback initial avatar when imageUrl is not present", () => {
