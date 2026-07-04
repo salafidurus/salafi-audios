@@ -1,63 +1,66 @@
 "use client";
 
-import type React from "react";
-import type { LiveSessionDto } from "@sd/core-contracts";
+import React from "react";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { AppText } from "@/shared/components/AppText/AppText";
 import { useLiveEndedScreen } from "@sd/domain-live";
+import { LiveSessionRow } from "../components/live-session-row/live-session-row";
+import styles from "./live.screen.module.css";
 
 export type LiveEndedDesktopScreenProps = {
   onNavigateToSession?: (id: string) => void;
 };
 
-const endedSessionButtonStyle: React.CSSProperties = {
-  display: "block",
-  width: "100%",
-  textAlign: "left",
-  padding: 16,
-  borderBottom: "1px solid var(--border-subtle)",
-  cursor: "pointer",
-  background: "none",
-  border: "none",
-};
-
-function EndedSessionItem({ session, onPress }: { session: LiveSessionDto; onPress?: () => void }) {
-  return (
-    <button type="button" onClick={onPress} style={endedSessionButtonStyle}>
-      <div style={{ fontSize: 16, fontWeight: 600 }}>{session.title}</div>
-      <div style={{ fontSize: 13, color: "var(--content-muted)", marginTop: 4 }}>
-        {session.scholarName}
-      </div>
-      {session.endedAt && (
-        <div style={{ fontSize: 12, color: "var(--content-subtle)", marginTop: 4 }}>
-          Ended: {new Date(session.endedAt).toLocaleDateString()}
-        </div>
-      )}
-    </button>
-  );
-}
-
-export function LiveEndedDesktopScreen({ onNavigateToSession }: LiveEndedDesktopScreenProps) {
+export function LiveEndedDesktopScreen({
+  onNavigateToSession,
+}: LiveEndedDesktopScreenProps) {
   const { sessions, isFetching } = useLiveEndedScreen();
 
-  if (isFetching && sessions.length === 0) {
-    return <div style={{ padding: 32 }}>Loading ended sessions…</div>;
-  }
+  const renderContent = () => {
+    if (isFetching && sessions.length === 0) {
+      return <div style={{ padding: 32, textAlign: "center" }}>Loading past sessions…</div>;
+    }
 
-  if (sessions.length === 0) {
+    if (sessions.length === 0) {
+      return (
+        <AppText
+          variant="bodyMd"
+          style={{
+            color: "var(--content-subtle)",
+            padding: 24,
+            textAlign: "center",
+            display: "block",
+          }}
+        >
+          No past sessions available.
+        </AppText>
+      );
+    }
+
     return (
-      <div style={{ padding: 32, color: "var(--content-muted)" }}>No past sessions available.</div>
+      <div className={styles.list}>
+        {sessions.map((session) => (
+          <LiveSessionRow
+            key={session.id}
+            session={session}
+            onPress={() => onNavigateToSession?.(session.id)}
+          />
+        ))}
+      </div>
     );
-  }
+  };
 
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto", padding: 24 }}>
-      <h2 style={{ margin: 0, fontSize: 22, marginBottom: 16 }}>Past Sessions</h2>
-      {sessions.map((session) => (
-        <EndedSessionItem
-          key={session.id}
-          session={session}
-          onPress={() => onNavigateToSession?.(session.id)}
-        />
-      ))}
-    </div>
+    <ScreenView>
+      <div className={styles.page}>
+        <div className={styles.listContainer}>
+          <AppText variant="displayMd" style={{ display: "block", marginBottom: 24 }}>
+            Past Sessions
+          </AppText>
+          {renderContent()}
+        </div>
+      </div>
+    </ScreenView>
   );
 }
+
