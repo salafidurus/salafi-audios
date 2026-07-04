@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { AccountActions } from "@/features/account/screens/account-actions";
+import { SettingsGeneralScreen } from "@/features/account/screens/settings-general.screen";
 
 export const metadata: Metadata = {
-  title: "Account",
-  description: "Manage your account settings and preferences.",
+  title: "Settings",
+  description: "Manage your app language, display theme, and notification preferences.",
 };
 
 export default function AccountPage() {
-  return <AccountActions />;
+  return <SettingsGeneralScreen />;
 }

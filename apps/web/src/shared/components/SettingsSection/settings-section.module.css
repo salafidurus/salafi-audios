@@ -1,0 +1,30 @@
+.section {
+  margin-bottom: var(--space-scale-3xl);
+}
+
+.header {
+  margin-bottom: var(--space-scale-md);
+}
+
+.title {
+  margin: 0 0 var(--space-scale-xs);
+  font-size: var(--typo-label-md-font-size);
+  font-weight: 600;
+  color: var(--content-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.description {
+  margin: 0;
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+  line-height: 1.5;
+}
+
+.rows {
+  border: var(--border-width-default) solid var(--border-default);
+  border-radius: var(--radius-component-panel);
+  overflow: hidden;
+  background: var(--surface-default);
+}
