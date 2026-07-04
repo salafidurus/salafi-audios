@@ -136,23 +136,36 @@ describe('AdminPermissionsService', () => {
 
   describe('listUsers', () => {
     it('should return all users with their permissions', async () => {
+      const now = new Date();
       const mockUsers = [
         {
           id: 'user1',
           name: 'Alice',
           email: 'alice@example.com',
+          emailVerified: true,
           image: null,
           role: 'user',
+          banned: null,
+          banReason: null,
+          banExpires: null,
+          preferredLanguage: null,
           createdAt: new Date('2023-01-01'),
+          updatedAt: now,
           adminPermissions: [{ permission: 'manage:content' }],
         },
         {
           id: 'user2',
           name: 'Bob',
           email: 'bob@example.com',
+          emailVerified: true,
           image: 'https://example.com/avatar.png',
           role: 'admin',
+          banned: null,
+          banReason: null,
+          banExpires: null,
+          preferredLanguage: null,
           createdAt: new Date('2023-06-01'),
+          updatedAt: now,
           adminPermissions: [
             { permission: 'manage:scholars' },
             { permission: 'manage:admin' },
@@ -194,14 +207,21 @@ describe('AdminPermissionsService', () => {
     });
 
     it('should filter users by query string', async () => {
+      const now = new Date();
       const mockUsers = [
         {
           id: 'user1',
           name: 'Alice',
           email: 'alice@example.com',
+          emailVerified: true,
           image: null,
           role: 'user',
+          banned: null,
+          banReason: null,
+          banExpires: null,
+          preferredLanguage: null,
           createdAt: new Date('2023-01-01'),
+          updatedAt: now,
           adminPermissions: [],
         },
       ];
