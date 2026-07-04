@@ -1,14 +1,18 @@
-export type UserProfileDto = {
-  id: string;
-  email: string;
-  displayName: string;
-  avatarUrl?: string;
-  role: string;
-  emailVerified: boolean;
-  createdAt: string;
-  updatedAt: string;
-};
+import { z } from "zod";
 
-export type UpdateProfileDto = {
-  displayName: string;
-};
+export const UserProfileDtoSchema = z.object({
+  id: z.string(),
+  email: z.string().email(),
+  displayName: z.string(),
+  avatarUrl: z.string().optional(),
+  role: z.string(),
+  emailVerified: z.boolean(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+export type UserProfileDto = z.infer<typeof UserProfileDtoSchema>;
+
+export const UpdateProfileDtoSchema = z.object({
+  displayName: z.string().min(1, "Display name must not be empty"),
+});
+export type UpdateProfileDto = z.infer<typeof UpdateProfileDtoSchema>;

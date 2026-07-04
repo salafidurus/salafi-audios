@@ -1,55 +1,61 @@
-import type { StatusValue } from "../types/common.types";
+import { z } from "zod";
+import { StatusValueSchema } from "./common.types";
 
-export type CollectionViewDto = {
-  id: string;
-  scholarId: string;
-  slug: string;
-  title: string;
-  description?: string;
-  coverImageUrl?: string;
-  publishedLectureCount?: number;
-  publishedDurationSeconds?: number;
-  language?: string;
-  status: StatusValue;
-  orderIndex?: number;
-  deletedAt?: string;
-  deleteAfterAt?: string;
-  createdAt: string;
-  updatedAt?: string;
-};
+export const CollectionViewDtoSchema = z.object({
+  id: z.string(),
+  scholarId: z.string(),
+  slug: z.string(),
+  title: z.string(),
+  description: z.string().optional(),
+  coverImageUrl: z.string().optional(),
+  publishedLectureCount: z.number().optional(),
+  publishedDurationSeconds: z.number().optional(),
+  language: z.string().optional(),
+  status: StatusValueSchema,
+  orderIndex: z.number().optional(),
+  deletedAt: z.string().optional(),
+  deleteAfterAt: z.string().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string().optional(),
+});
+export type CollectionViewDto = z.infer<typeof CollectionViewDtoSchema>;
 
-export type AdminCollectionListItemDto = {
-  id: string;
-  title: string;
-  status: StatusValue;
-  publishedLectureCount: number;
-  orderIndex?: number;
-};
+export const AdminCollectionListItemDtoSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  status: StatusValueSchema,
+  publishedLectureCount: z.number(),
+  orderIndex: z.number().optional(),
+});
+export type AdminCollectionListItemDto = z.infer<typeof AdminCollectionListItemDtoSchema>;
 
-export type AdminCollectionDetailDto = {
-  id: string;
-  scholarId: string;
-  title: string;
-  description?: string;
-  coverImageUrl?: string;
-  language?: string;
-  status: StatusValue;
-  orderIndex?: number;
-};
+export const AdminCollectionDetailDtoSchema = z.object({
+  id: z.string(),
+  scholarId: z.string(),
+  title: z.string(),
+  description: z.string().optional(),
+  coverImageUrl: z.string().optional(),
+  language: z.string().optional(),
+  status: StatusValueSchema,
+  orderIndex: z.number().optional(),
+});
+export type AdminCollectionDetailDto = z.infer<typeof AdminCollectionDetailDtoSchema>;
 
-export type CreateCollectionDto = {
-  scholarId: string;
-  title: string;
-  description?: string;
-  coverImageUrl?: string;
-  language?: string;
-  orderIndex?: number;
-};
+export const CreateCollectionDtoSchema = z.object({
+  scholarId: z.string().min(1, "Scholar ID must not be empty"),
+  title: z.string().min(1, "Title must not be empty"),
+  description: z.string().optional(),
+  coverImageUrl: z.string().optional(),
+  language: z.string().optional(),
+  orderIndex: z.number().optional(),
+});
+export type CreateCollectionDto = z.infer<typeof CreateCollectionDtoSchema>;
 
-export type UpdateCollectionDto = {
-  title?: string;
-  description?: string;
-  coverImageUrl?: string;
-  language?: string;
-  orderIndex?: number;
-};
+export const UpdateCollectionDtoSchema = z.object({
+  title: z.string().optional(),
+  description: z.string().optional(),
+  coverImageUrl: z.string().optional(),
+  language: z.string().optional(),
+  orderIndex: z.number().optional(),
+});
+export type UpdateCollectionDto = z.infer<typeof UpdateCollectionDtoSchema>;

@@ -1,39 +1,48 @@
-import type { ListingFormat } from "./listing.types";
-import type { ContentOriginalFields, Locale, ScholarOriginalFields } from "./localization.types";
+import { z } from "zod";
+import { ListingFormatSchema } from "./listing.types";
+import {
+  ContentOriginalFieldsSchema,
+  LocaleSchema,
+  ScholarOriginalFieldsSchema,
+} from "./localization.types";
 
-export type ScholarChipDto = {
-  id: string;
-  name: string;
-  slug: string;
-  imageUrl: string | null;
-  originalLanguage?: Locale;
-  original?: ScholarOriginalFields;
-};
+export const ScholarChipDtoSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  slug: z.string(),
+  imageUrl: z.string().nullable(),
+  originalLanguage: LocaleSchema.optional(),
+  original: ScholarOriginalFieldsSchema.optional(),
+});
+export type ScholarChipDto = z.infer<typeof ScholarChipDtoSchema>;
 
-export type ContentSuggestionDto = {
-  id: string;
-  title: string;
-  slug: string;
-  kind: ListingFormat;
-  scholarName: string;
-  scholarSlug: string;
-  thumbnailUrl: string | null;
-  durationSeconds: number | null;
-  originalLanguage?: Locale;
-  original?: ContentOriginalFields;
-};
+export const ContentSuggestionDtoSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  slug: z.string(),
+  kind: ListingFormatSchema,
+  scholarName: z.string(),
+  scholarSlug: z.string(),
+  thumbnailUrl: z.string().nullable(),
+  durationSeconds: z.number().nullable(),
+  originalLanguage: LocaleSchema.optional(),
+  original: ContentOriginalFieldsSchema.optional(),
+});
+export type ContentSuggestionDto = z.infer<typeof ContentSuggestionDtoSchema>;
 
-export type RecentProgressDto = {
-  lectureId: string;
-  lectureTitle: string;
-  lectureSlug: string;
-  scholarName: string;
-  durationSeconds: number;
-  positionSeconds: number;
-};
+export const RecentProgressDtoSchema = z.object({
+  lectureId: z.string(),
+  lectureTitle: z.string(),
+  lectureSlug: z.string(),
+  scholarName: z.string(),
+  durationSeconds: z.number(),
+  positionSeconds: z.number(),
+});
+export type RecentProgressDto = z.infer<typeof RecentProgressDtoSchema>;
 
-export type QuickBrowseDto = {
-  scholars: ScholarChipDto[];
-  suggestions: ContentSuggestionDto[];
-  recentProgress: RecentProgressDto | null;
-};
+export const QuickBrowseDtoSchema = z.object({
+  scholars: z.array(ScholarChipDtoSchema),
+  suggestions: z.array(ContentSuggestionDtoSchema),
+  recentProgress: RecentProgressDtoSchema.nullable(),
+});
+export type QuickBrowseDto = z.infer<typeof QuickBrowseDtoSchema>;

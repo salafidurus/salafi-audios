@@ -1,5 +1,8 @@
+import { z } from "zod";
+
 export const SUPPORTED_LOCALES = ["en", "ar"] as const;
-export type Locale = (typeof SUPPORTED_LOCALES)[number];
+export const LocaleSchema = z.enum(SUPPORTED_LOCALES);
+export type Locale = z.infer<typeof LocaleSchema>;
 export const DEFAULT_LOCALE: Locale = "en";
 export const RTL_LOCALES: readonly Locale[] = ["ar"];
 
@@ -10,13 +13,15 @@ export const RTL_LOCALES: readonly Locale[] = ["ar"];
  * without an extra request. When absent, the primary fields already are the
  * original.
  */
-export type ContentOriginalFields = {
-  title?: string;
-  description?: string;
-};
+export const ContentOriginalFieldsSchema = z.object({
+  title: z.string().optional(),
+  description: z.string().optional(),
+});
+export type ContentOriginalFields = z.infer<typeof ContentOriginalFieldsSchema>;
 
 /** Original-language values for scholar entities. See {@link ContentOriginalFields}. */
-export type ScholarOriginalFields = {
-  name?: string;
-  bio?: string;
-};
+export const ScholarOriginalFieldsSchema = z.object({
+  name: z.string().optional(),
+  bio: z.string().optional(),
+});
+export type ScholarOriginalFields = z.infer<typeof ScholarOriginalFieldsSchema>;

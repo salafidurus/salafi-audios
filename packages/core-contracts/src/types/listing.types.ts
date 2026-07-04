@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 /**
  * A **Listing** is any top-level, browsable content unit — the thing users
  * discover via search/feed and the scholar Catalog. Every Listing has one of
@@ -13,14 +15,16 @@
  *
  * See `docs/nomenclature.md` for the full two-axis model.
  */
-export type ListingFormat = "collection" | "series" | "single";
+export const ListingFormatSchema = z.enum(["collection", "series", "single"]);
+export type ListingFormat = z.infer<typeof ListingFormatSchema>;
 
 /**
  * Resolution result from GET /listing/:id.
  * Returns the content format and ID so the client can render the
  * appropriate detail screen (each screen fetches its own data).
  */
-export type ListingViewDto = {
-  format: ListingFormat;
-  id: string;
-};
+export const ListingViewDtoSchema = z.object({
+  format: ListingFormatSchema,
+  id: z.string(),
+});
+export type ListingViewDto = z.infer<typeof ListingViewDtoSchema>;

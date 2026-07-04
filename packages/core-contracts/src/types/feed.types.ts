@@ -1,35 +1,45 @@
-import type { ScholarChipDto, ContentSuggestionDto } from "./home.types";
-import type { ListingFormat } from "./listing.types";
-import type { ContentOriginalFields, Locale } from "./localization.types";
+import { z } from "zod";
+import { ScholarChipDtoSchema, ContentSuggestionDtoSchema } from "./home.types";
+import { ListingFormatSchema } from "./listing.types";
+import { ContentOriginalFieldsSchema, LocaleSchema } from "./localization.types";
 
-export type FeedContentItemDto = {
-  kind: ListingFormat;
-  id: string;
-  title: string;
-  slug: string;
-  scholarName: string;
-  scholarSlug: string;
-  thumbnailUrl: string | null;
-  durationSeconds: number | null;
-  publishedAt: string;
-  originalLanguage?: Locale;
-  original?: ContentOriginalFields;
-};
+export const FeedContentItemDtoSchema = z.object({
+  kind: ListingFormatSchema,
+  id: z.string(),
+  title: z.string(),
+  slug: z.string(),
+  scholarName: z.string(),
+  scholarSlug: z.string(),
+  thumbnailUrl: z.string().nullable(),
+  durationSeconds: z.number().nullable(),
+  publishedAt: z.string(),
+  originalLanguage: LocaleSchema.optional(),
+  original: ContentOriginalFieldsSchema.optional(),
+});
+export type FeedContentItemDto = z.infer<typeof FeedContentItemDtoSchema>;
 
-export type FeedScholarRowDto = {
-  kind: "scholar_row";
-  scholars: ScholarChipDto[];
-};
+export const FeedScholarRowDtoSchema = z.object({
+  kind: z.literal("scholar_row"),
+  scholars: z.array(ScholarChipDtoSchema),
+});
+export type FeedScholarRowDto = z.infer<typeof FeedScholarRowDtoSchema>;
 
-export type FeedTopicRowDto = {
-  kind: "topic_row";
-  topicName: string;
-  items: ContentSuggestionDto[];
-};
+export const FeedTopicRowDtoSchema = z.object({
+  kind: z.literal("topic_row"),
+  topicName: z.string(),
+  items: z.array(ContentSuggestionDtoSchema),
+});
+export type FeedTopicRowDto = z.infer<typeof FeedTopicRowDtoSchema>;
 
-export type FeedItemDto = FeedContentItemDto | FeedScholarRowDto | FeedTopicRowDto;
+export const FeedItemDtoSchema = z.union([
+  FeedContentItemDtoSchema,
+  FeedScholarRowDtoSchema,
+  FeedTopicRowDtoSchema,
+]);
+export type FeedItemDto = z.infer<typeof FeedItemDtoSchema>;
 
-export type FeedPageDto = {
-  items: FeedItemDto[];
-  nextCursor?: string;
-};
+export const FeedPageDtoSchema = z.object({
+  items: z.array(FeedItemDtoSchema),
+  nextCursor: z.string().optional(),
+});
+export type FeedPageDto = z.infer<typeof FeedPageDtoSchema>;

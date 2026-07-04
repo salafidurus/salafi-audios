@@ -1,8 +1,11 @@
 export {
   STATUS_VALUES,
   type StatusValue,
+  StatusValueSchema,
   type PaginationParams,
+  PaginationParamsSchema,
   type ErrorResponseDto,
+  ErrorResponseDtoSchema,
 } from "../types/common.types";
 export {
   type TopicSlug,
@@ -31,66 +34,117 @@ export {
 } from "../types/lecture.types";
 export {
   type ScholarViewDto,
+  ScholarViewDtoSchema,
   type ScholarDetailDto,
+  ScholarDetailDtoSchema,
   type ScholarStatsDto,
+  ScholarStatsDtoSchema,
   type ScholarListItemDto,
+  ScholarListItemDtoSchema,
   type ScholarContentItemDto,
+  ScholarContentItemDtoSchema,
   type ScholarContentUnifiedDto,
+  ScholarContentUnifiedDtoSchema,
   type ScholarTopicsDto,
+  ScholarTopicsDtoSchema,
   type CollectionSummaryDto,
+  CollectionSummaryDtoSchema,
   type SeriesSummaryDto,
+  SeriesSummaryDtoSchema,
   type SingleSummaryDto,
+  SingleSummaryDtoSchema,
 } from "../types/scholar.types";
-export { type ListingFormat, type ListingViewDto } from "../types/listing.types";
-export { type CollectionViewDto } from "../types/collection.types";
-export { type SeriesViewDto } from "../types/series.types";
+export {
+  type ListingFormat,
+  ListingFormatSchema,
+  type ListingViewDto,
+  ListingViewDtoSchema,
+} from "../types/listing.types";
+export {
+  type CollectionViewDto,
+  CollectionViewDtoSchema,
+  type AdminCollectionListItemDto,
+  AdminCollectionListItemDtoSchema,
+  type AdminCollectionDetailDto,
+  AdminCollectionDetailDtoSchema,
+  type CreateCollectionDto,
+  CreateCollectionDtoSchema,
+  type UpdateCollectionDto,
+  UpdateCollectionDtoSchema,
+} from "../types/collection.types";
+export {
+  type SeriesViewDto,
+  SeriesViewDtoSchema,
+  type AdminSeriesListItemDto,
+  AdminSeriesListItemDtoSchema,
+  type AdminSeriesDetailDto,
+  AdminSeriesDetailDtoSchema,
+  type CreateSeriesDto,
+  CreateSeriesDtoSchema,
+  type UpdateSeriesDto,
+  UpdateSeriesDtoSchema,
+} from "../types/series.types";
 export {
   type PresignedUrlPurpose,
   type PresignedUrlRequestDto,
   type PresignedUrlResponseDto,
 } from "../types/media.types";
-export {
-  type AdminSeriesListItemDto,
-  type AdminSeriesDetailDto,
-  type CreateSeriesDto,
-  type UpdateSeriesDto,
-} from "../types/series.types";
-export {
-  type AdminCollectionListItemDto,
-  type AdminCollectionDetailDto,
-  type CreateCollectionDto,
-  type UpdateCollectionDto,
-} from "../types/collection.types";
 export { type PlatformStatsDto } from "../types/analytics.types";
 export {
   type SearchCatalogParams,
+  SearchCatalogParamsSchema,
   type SearchCatalogItemDto,
+  SearchCatalogItemDtoSchema,
   type SearchCatalogResultsDto,
+  SearchCatalogResultsDtoSchema,
 } from "../types/search.types";
 export {
   type FeedContentItemDto,
+  FeedContentItemDtoSchema,
   type FeedScholarRowDto,
+  FeedScholarRowDtoSchema,
   type FeedTopicRowDto,
+  FeedTopicRowDtoSchema,
   type FeedItemDto,
+  FeedItemDtoSchema,
   type FeedPageDto,
+  FeedPageDtoSchema,
 } from "../types/feed.types";
 export {
   type LibraryItemDto,
+  LibraryItemDtoSchema,
   type LibraryPageDto,
+  LibraryPageDtoSchema,
   type SavedSyncDto,
+  SavedSyncDtoSchema,
 } from "../types/library.types";
-export { type UserProfileDto, type UpdateProfileDto } from "../types/account.types";
+export {
+  type UserProfileDto,
+  UserProfileDtoSchema,
+  type UpdateProfileDto,
+  UpdateProfileDtoSchema,
+} from "../types/account.types";
 export {
   type LiveSessionStatus,
+  LiveSessionStatusSchema,
   type LiveSessionPublicDto,
+  LiveSessionPublicDtoSchema,
   type LiveSessionDeltaDto,
+  LiveSessionDeltaDtoSchema,
   type LiveSessionDto,
+  LiveSessionDtoSchema,
   type LiveSessionPageDto,
+  LiveSessionPageDtoSchema,
   type LivestreamChannelDto,
+  LivestreamChannelDtoSchema,
   type CreateLivestreamChannelDto,
+  CreateLivestreamChannelDtoSchema,
   type UpdateLivestreamChannelDto,
+  UpdateLivestreamChannelDtoSchema,
   type CreateLiveSessionDto,
+  CreateLiveSessionDtoSchema,
   type UpdateLiveSessionDto,
+  UpdateLiveSessionDtoSchema,
 } from "../types/live.types";
 export {
   type StreamResponseDto,
@@ -98,25 +152,51 @@ export {
   type ProgressSyncItemDto,
   type ProgressSyncDto,
 } from "../types/audio.types";
-export type {
-  AdminPermission,
-  AdminPermissionDto,
-  AdminPermissionsListDto,
-  GrantPermissionDto,
-  AdminUserListItemDto,
-  AdminUserListDto,
+export {
+  type AdminPermission,
+  AdminPermissionSchema,
+  type AdminPermissionDto,
+  AdminPermissionDtoSchema,
+  type AdminPermissionsListDto,
+  AdminPermissionsListDtoSchema,
+  type GrantPermissionDto,
+  GrantPermissionDtoSchema,
+  type AdminUserListItemDto,
+  AdminUserListItemDtoSchema,
+  type AdminUserListDto,
+  AdminUserListDtoSchema,
+  ADMIN_PERMISSIONS,
 } from "./admin.types";
-export { ADMIN_PERMISSIONS } from "./admin.types";
 export {
   type ScholarChipDto,
+  ScholarChipDtoSchema,
   type ContentSuggestionDto,
+  ContentSuggestionDtoSchema,
   type RecentProgressDto,
+  RecentProgressDtoSchema,
   type QuickBrowseDto,
+  QuickBrowseDtoSchema,
 } from "../types/home.types";
 export {
   type TranslationStatus,
+  TranslationStatusSchema,
   type TranslationViewDto,
+  TranslationViewDtoSchema,
   type SaveTranslationDto,
+  SaveTranslationDtoSchema,
   type TranslationTarget,
+  TranslationTargetSchema,
   type UpdateLocaleDto,
+  UpdateLocaleDtoSchema,
 } from "../types/translation.types";
+export {
+  SUPPORTED_LOCALES,
+  type Locale,
+  LocaleSchema,
+  DEFAULT_LOCALE,
+  RTL_LOCALES,
+  type ContentOriginalFields,
+  ContentOriginalFieldsSchema,
+  type ScholarOriginalFields,
+  ScholarOriginalFieldsSchema,
+} from "./localization.types";

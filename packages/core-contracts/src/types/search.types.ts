@@ -1,31 +1,34 @@
-import type { TopicSlug } from "../types/topic.types";
-import type { ContentOriginalFields, Locale } from "./localization.types";
+import { z } from "zod";
+import { ContentOriginalFieldsSchema, LocaleSchema } from "./localization.types";
 
-export type SearchCatalogParams = {
-  q: string;
-  limit?: number;
-  language?: string;
-  topicSlug?: string;
-  topicSlugs?: TopicSlug[];
-  scholarSlug?: string;
-};
+export const SearchCatalogParamsSchema = z.object({
+  q: z.string(),
+  limit: z.number().optional(),
+  language: z.string().optional(),
+  topicSlug: z.string().optional(),
+  topicSlugs: z.array(z.string()).optional(),
+  scholarSlug: z.string().optional(),
+});
+export type SearchCatalogParams = z.infer<typeof SearchCatalogParamsSchema>;
 
-export type SearchCatalogItemDto = {
-  id: string;
-  slug: string;
-  title: string;
-  scholarName: string;
-  scholarSlug: string;
-  coverImageUrl?: string;
-  scholarImageUrl?: string;
-  lectureCount: number;
-  durationSeconds?: number;
-  originalLanguage?: Locale;
-  original?: ContentOriginalFields;
-};
+export const SearchCatalogItemDtoSchema = z.object({
+  id: z.string(),
+  slug: z.string(),
+  title: z.string(),
+  scholarName: z.string(),
+  scholarSlug: z.string(),
+  coverImageUrl: z.string().optional(),
+  scholarImageUrl: z.string().optional(),
+  lectureCount: z.number(),
+  durationSeconds: z.number().optional(),
+  originalLanguage: LocaleSchema.optional(),
+  original: ContentOriginalFieldsSchema.optional(),
+});
+export type SearchCatalogItemDto = z.infer<typeof SearchCatalogItemDtoSchema>;
 
-export type SearchCatalogResultsDto = {
-  collections: SearchCatalogItemDto[];
-  series: SearchCatalogItemDto[];
-  singles: SearchCatalogItemDto[];
-};
+export const SearchCatalogResultsDtoSchema = z.object({
+  collections: z.array(SearchCatalogItemDtoSchema),
+  series: z.array(SearchCatalogItemDtoSchema),
+  singles: z.array(SearchCatalogItemDtoSchema),
+});
+export type SearchCatalogResultsDto = z.infer<typeof SearchCatalogResultsDtoSchema>;
