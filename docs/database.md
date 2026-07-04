@@ -6,7 +6,7 @@ Salafi Durus separates authoritative relational state, media storage, analytics,
 
 ### Data Categories
 
-- **Core relational data**: scholars, collections, series, lectures, publication state, and user-facing canonical state.
+- **Core relational data**: scholars, listings (collections, series, and singles), publication state, and user-facing canonical state.
 - **Media data**: object storage files plus relational references to those files.
 - **Analytics and event data**: isolated from the authoritative core.
 - **Client-side data**: cached metadata, playback continuity, and temporary local state.
@@ -19,16 +19,15 @@ Salafi Durus separates authoritative relational state, media storage, analytics,
 
 ### Core Domain Shape
 
-- **Scholars**: authoritative teaching source.
-- **Collections**: curated groupings.
-- **Series**: ordered teaching groups within or outside collections.
-- **Lectures**: individual media-backed lessons with metadata.
+- **Scholars**: authoritative teaching source profiles (name, bio, image, social links).
+- **Listings**: a single hierarchical table storing all content types — collections, series, singles, and their nested children (modules, lessons) — using self-referencing parent relations. See [nomenclature.md](./nomenclature.md) for the full content hierarchy definitions.
+- **AudioAssets**: file URL metadata points linked directly to singles.
 
 ## 3. What the Database Must Not Store
 
 - Audio or image blobs.
 - Client-only ephemeral UI state.
-- Analytics as part of canonical relational truth.
+- Analytics events (the Clickstream events table is fully removed from PostgreSQL; analytics must be sent directly to external collectors like PostHog or ClickHouse).
 - Secrets or infrastructure credentials.
 
 These are structural rules, not optimization suggestions.
@@ -69,10 +68,20 @@ Client persistence improves continuity but never becomes authoritative.
 
 - Schema changes must go through Prisma migrations.
 - Data ownership boundaries must remain explicit during migrations.
-- Backfills and content-ingestion workflows must preserve canonical relationships and publication rules.
+- Local database seeding is orchestrated via the standard `prisma db seed` command. Production catalog additions are managed through administrative API endpoints.
 - If a migration changes architectural meaning, update these docs as part of the change.
 
-## 8. Admin Roles and Permissions
+## 8. Auditing, Caching, and Trigram Search
+
+- **Audit Columns**: `createdBy`, `updatedBy`, and `deletedBy` are stored as independent, decoupled `String? @db.Uuid` columns on `Listing` and `Scholar` models to track history without strict database cascades.
+- **Counter Sync**: Listings maintain denormalized `publishedLectureCount` and `publishedDurationSeconds` synchronized inside a database transaction during repository writes.
+- **Trigram Search**: The database uses the PostgreSQL `pg_trgm` extension. The `Listing` model contains a GIN index on the `title` field for fuzzy searches.
+
+## 9. Privacy and Hard Deletions
+
+- GDPR compliance is backend-enforced. When a user requests hard deletion, executing `DELETE /account` cascades and purges all personal rows (`Session`, `Account`, `AdminPermission`, `UserListingProgress`, `FavoriteListing`) using `onDelete: Cascade` rules, while decoupled listing audit columns preserve catalog integrity.
+
+## 10. Admin Roles and Permissions
 
 - Promoting a user to admin and granting the `AdminPermission` capabilities is documented in
   [database-admin-setup.md](./database-admin-setup.md) — covers the automated `make-admin`
