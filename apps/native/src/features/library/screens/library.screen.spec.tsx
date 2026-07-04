@@ -9,6 +9,12 @@ import {
 import { useAuth } from "@/core/auth/use-auth";
 import { LibraryScreen } from "./library.screen";
 
+jest.mock("react-native-safe-area-context", () => ({
+  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+  SafeAreaView: ({ children }: { children: React.ReactNode }) =>
+    require("react-native").View(null, children),
+}));
+
 // SectionList uses @react-native/virtualized-lists which bundles its own react-native
 // copy that triggers native bridge assertions in Jest. Mock it at the module level.
 jest.mock("react-native/Libraries/Lists/SectionList", () => {
