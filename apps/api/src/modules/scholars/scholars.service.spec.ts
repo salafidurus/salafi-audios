@@ -166,7 +166,7 @@ describe('ScholarsService', () => {
         socialTelegram: null,
         socialYoutube: null,
         socialWebsite: null,
-        updatedAt: null,
+        updatedAt: new Date(),
         ingestionBatchId: null,
       };
       repo.create.mockResolvedValue(expected);
@@ -197,7 +197,7 @@ describe('ScholarsService', () => {
         socialTelegram: null,
         socialYoutube: null,
         socialWebsite: null,
-        updatedAt: null,
+        updatedAt: new Date(),
         ingestionBatchId: null,
       };
       const updated = { ...existing, name: dto.name! };
