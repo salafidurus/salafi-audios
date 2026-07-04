@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { LibraryScreen } from "@/features/library/screens/library.screen";
+import { LibraryScreen } from "@/features/library";
 
 export const metadata: Metadata = {
   title: "Library",

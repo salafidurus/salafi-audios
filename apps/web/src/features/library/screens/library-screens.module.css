@@ -1,0 +1,44 @@
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-scale-md) var(--space-scale-lg);
+  box-sizing: border-box;
+}
+
+.title {
+  margin: 0 0 var(--space-component-gap-md, 16px);
+  font-family: var(--typo-display-md-font-family), serif;
+  font-size: var(--typo-display-md-font-size);
+  font-weight: var(--typo-display-md-font-weight);
+  line-height: var(--typo-display-md-line-height);
+  color: var(--content-strong);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-component-card, 12px);
+  background-color: var(--surface-default);
+  overflow: hidden;
+}
+
+.emptyState {
+  padding: var(--space-scale-xl) var(--space-scale-lg);
+  color: var(--content-muted);
+  text-align: center;
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-component-card, 12px);
+  background-color: var(--surface-default);
+}
+
+.loading {
+  padding: var(--space-scale-xl) var(--space-scale-lg);
+  color: var(--content-subtle);
+  text-align: center;
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+}
