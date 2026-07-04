@@ -15,22 +15,43 @@ jest.mock("@/features/audio", () => ({
 }));
 
 jest.mock("../../../../shared/components/Button/Button", () => ({
-  Button: ({ label, onPress }: { label: string; onPress: () => void }) => {
+  Button: ({
+    label,
+    onPress,
+    loading,
+    icon,
+  }: {
+    label: string;
+    onPress: () => void;
+    loading?: boolean;
+    icon?: React.ReactNode;
+  }) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const React = require("react");
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { Text } = require("react-native");
+    const { View, Text } = require("react-native");
     return React.createElement(
-      "View",
-      { testID: label, onPress },
-      React.createElement(Text, null, label),
+      View,
+      { testID: label, onPress, loading },
+      loading
+        ? React.createElement(Text, null, "Loading...")
+        : React.createElement(
+            View,
+            null,
+            icon && React.createElement(View, { testID: "button-icon" }),
+            React.createElement(Text, null, label),
+          ),
     );
   },
 }));
 
 beforeEach(() => {
   jest.clearAllMocks();
-  (useAudio as jest.Mock).mockReturnValue({ isPlaying: false, currentTrack: null });
+  (useAudio as jest.Mock).mockReturnValue({
+    isPlaying: false,
+    currentTrack: null,
+    isLoading: false,
+  });
 });
 
 const baseLecture: LectureDetailDto = {
@@ -55,7 +76,7 @@ describe("LecturePlayButton", () => {
       primaryAudioAsset: { id: "asset-1", url: "https://example.com/audio.mp3" },
     };
     await render(<LecturePlayButton lecture={lecture} />);
-    expect(screen.getByTestId("▶ Play Lecture")).toBeTruthy();
+    expect(screen.getByTestId("Play Lecture")).toBeTruthy();
   });
 
   it("calls playLecture() with correct Track shape when pressed", async () => {
@@ -69,7 +90,7 @@ describe("LecturePlayButton", () => {
       },
     };
     await render(<LecturePlayButton lecture={lecture} />);
-    await fireEvent.press(screen.getByTestId("▶ Play Lecture"));
+    await fireEvent.press(screen.getByTestId("Play Lecture"));
     const expectedTrack = {
       id: "asset-1",
       title: "Test Lecture",
@@ -100,7 +121,7 @@ describe("LecturePlayButton", () => {
       },
     };
     await render(<LecturePlayButton lecture={lecture} />);
-    await fireEvent.press(screen.getByTestId("▶ Play Lecture"));
+    await fireEvent.press(screen.getByTestId("Play Lecture"));
     const mainTrack = {
       id: "asset-1",
       title: "Test Lecture",
@@ -121,5 +142,20 @@ describe("LecturePlayButton", () => {
       seriesTitle: "Islamic Jurisprudence",
     };
     expect(audioService.playLecture).toHaveBeenCalledWith(mainTrack, [mainTrack, nextStub]);
+  });
+
+  it("passes loading prop when audio is loading current track", async () => {
+    const lecture: LectureDetailDto = {
+      ...baseLecture,
+      primaryAudioAsset: { id: "asset-1", url: "https://example.com/audio.mp3" },
+    };
+    (useAudio as jest.Mock).mockReturnValue({
+      isPlaying: false,
+      currentTrack: { id: "asset-1" },
+      isLoading: true,
+    });
+    await render(<LecturePlayButton lecture={lecture} />);
+    const button = screen.getByTestId("Play Lecture");
+    expect(button.props.loading).toBe(true);
   });
 });

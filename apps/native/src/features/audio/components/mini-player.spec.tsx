@@ -13,6 +13,12 @@ jest.mock("lucide-react-native", () => ({
   Play: "Play",
   Pause: "Pause",
   ChevronDown: "ChevronDown",
+  Music: "Music",
+}));
+
+jest.mock("react-native-safe-area-context", () => ({
+  SafeAreaView: "SafeAreaView",
+  useSafeAreaInsets: () => ({ bottom: 0 }),
 }));
 
 jest.mock("../audio-service", () => ({
@@ -48,7 +54,7 @@ describe("MiniPlayer", () => {
   });
 
   it("renders nothing when no currentTrack", async () => {
-    useAudio.mockReturnValue({ currentTrack: null, isPlaying: false });
+    useAudio.mockReturnValue({ currentTrack: null, isPlaying: false, isLoading: false });
     await render(<MiniPlayer />);
     expect(screen.toJSON()).toBeNull();
   });
@@ -57,6 +63,7 @@ describe("MiniPlayer", () => {
     useAudio.mockReturnValue({
       currentTrack: mockTrack,
       isPlaying: false,
+      isLoading: false,
       progressPercent: 0,
       positionSeconds: 0,
     });
@@ -69,6 +76,7 @@ describe("MiniPlayer", () => {
     useAudio.mockReturnValue({
       currentTrack: mockTrack,
       isPlaying: false,
+      isLoading: false,
       progressPercent: 0,
       positionSeconds: 0,
     });
@@ -80,6 +88,7 @@ describe("MiniPlayer", () => {
     useAudio.mockReturnValue({
       currentTrack: mockTrack,
       isPlaying: true,
+      isLoading: false,
       progressPercent: 50,
       positionSeconds: 30,
     });

@@ -1,18 +1,19 @@
 import React, { useState } from "react";
-import { View, Pressable, Text, Modal } from "react-native";
+import { View, Pressable, Text, Modal, ActivityIndicator } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import { useAudio } from "@sd/domain-audio";
 import { audioService } from "../audio-service";
-import { Play, Pause, ChevronDown } from "lucide-react-native";
+import { Play, Pause, ChevronDown, Music } from "lucide-react-native";
 import { ProgressBar } from "./progress-bar";
 import { PlaybackControls } from "./playback-controls";
 
 export function MiniPlayer() {
-  const { currentTrack, isPlaying, progressPercent, positionSeconds } = useAudio();
+  const { currentTrack, isPlaying, isLoading, progressPercent, positionSeconds } = useAudio();
   const { theme } = useUnistyles();
   const [modalVisible, setModalVisible] = useState(false);
+  const insets = useSafeAreaInsets();
 
   if (!currentTrack) return null;
 
@@ -31,17 +32,23 @@ export function MiniPlayer() {
 
   return (
     <>
-      <Pressable onPress={() => setModalVisible(true)} style={styles.container}>
+      <Pressable
+        onPress={() => setModalVisible(true)}
+        style={[styles.container, { bottom: insets.bottom + 8 }]}
+      >
         {/* Progress Bar underlaid at the very top of mini-player */}
         <View style={styles.miniProgressTrack}>
           <View style={[styles.miniProgressFill, { width: `${progressPercent}%` }]} />
         </View>
 
         <View style={styles.content}>
-          <Image
-            source={{ uri: currentTrack.artworkUrl || "https://via.placeholder.com/150" }}
-            style={styles.artwork}
-          />
+          {currentTrack.artworkUrl ? (
+            <Image source={{ uri: currentTrack.artworkUrl }} style={styles.artwork} />
+          ) : (
+            <View style={[styles.artwork, styles.artworkPlaceholder]}>
+              <Music size={20} color={theme.colors.content.muted} />
+            </View>
+          )}
 
           <View style={styles.textContainer}>
             <Text style={styles.title} numberOfLines={1}>
@@ -53,7 +60,13 @@ export function MiniPlayer() {
           </View>
 
           <Pressable onPress={handlePlayPause} style={styles.playButton}>
-            {isPlaying ? PauseIcon : <View style={{ marginStart: 2 }}>{PlayIcon}</View>}
+            {isLoading ? (
+              <ActivityIndicator size="small" color={theme.colors.content.strong} />
+            ) : isPlaying ? (
+              PauseIcon
+            ) : (
+              <View style={{ marginStart: 2 }}>{PlayIcon}</View>
+            )}
           </Pressable>
         </View>
       </Pressable>
@@ -75,10 +88,13 @@ export function MiniPlayer() {
           </View>
 
           <View style={styles.modalBody}>
-            <Image
-              source={{ uri: currentTrack.artworkUrl || "https://via.placeholder.com/300" }}
-              style={styles.modalArtwork}
-            />
+            {currentTrack.artworkUrl ? (
+              <Image source={{ uri: currentTrack.artworkUrl }} style={styles.modalArtwork} />
+            ) : (
+              <View style={[styles.modalArtwork, styles.modalArtworkPlaceholder]}>
+                <Music size={80} color={theme.colors.content.muted} />
+              </View>
+            )}
 
             <View style={styles.modalTextContainer}>
               <Text style={styles.modalTitle} numberOfLines={2}>
@@ -113,7 +129,7 @@ function formatTime(seconds: number): string {
 const styles = StyleSheet.create((theme) => ({
   container: {
     position: "absolute",
-    bottom: 50,
+    bottom: 0,
     start: theme.spacing.scale.md,
     end: theme.spacing.scale.md,
     height: 64,
@@ -135,6 +151,10 @@ const styles = StyleSheet.create((theme) => ({
     height: 40,
     borderRadius: theme.radius.scale.sm,
     backgroundColor: theme.colors.surface.subtle,
+  },
+  artworkPlaceholder: {
+    justifyContent: "center",
+    alignItems: "center",
   },
   textContainer: {
     flex: 1,
@@ -203,6 +223,10 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.radius.scale.lg,
     backgroundColor: theme.colors.surface.subtle,
     ...theme.shadows.lg,
+  },
+  modalArtworkPlaceholder: {
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalTextContainer: {
     alignItems: "center",
