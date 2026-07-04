@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import { FlatList } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
 import type { ScholarListItemDto } from "@sd/core-contracts";
 import { useScholarsList } from "@sd/domain-content";
 import { AppText } from "@/shared/components/AppText/AppText";

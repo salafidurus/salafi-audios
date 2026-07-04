@@ -11,7 +11,9 @@ jest.mock("@sd/domain-content", () => ({
 
 jest.mock("@/shared/components/ScreenView/ScreenView", () => ({
   ScreenView: ({ children }: { children: React.ReactNode }) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const ReactM = require("react");
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { View } = require("react-native");
     return ReactM.createElement(View, null, children);
   },
@@ -19,7 +21,9 @@ jest.mock("@/shared/components/ScreenView/ScreenView", () => ({
 
 jest.mock("@/shared/components/AppText/AppText", () => ({
   AppText: ({ children }: { children: React.ReactNode }) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const ReactM = require("react");
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { Text } = require("react-native");
     return ReactM.createElement(Text, null, children);
   },
@@ -27,7 +31,9 @@ jest.mock("@/shared/components/AppText/AppText", () => ({
 
 jest.mock("@/features/scholar/components/scholar-header/scholar-header", () => ({
   ScholarHeader: ({ scholar }: { scholar: { name: string } }) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const ReactM = require("react");
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { Text } = require("react-native");
     return ReactM.createElement(Text, null, `Header:${scholar.name}`);
   },
@@ -35,7 +41,9 @@ jest.mock("@/features/scholar/components/scholar-header/scholar-header", () => (
 
 jest.mock("@/features/scholar/components/scholar-content-list/scholar-content-list", () => ({
   ScholarContentList: ({ items }: { items: unknown[] }) => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const ReactM = require("react");
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const { Text } = require("react-native");
     return ReactM.createElement(Text, null, `Content:${items.length}`);
   },

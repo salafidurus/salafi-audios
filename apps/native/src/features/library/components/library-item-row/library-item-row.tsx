@@ -20,20 +20,28 @@ type LibraryItemIconProps = {
 const iconProps = { size: 20, color: "var(--content-muted)" as unknown as string };
 
 function LibraryItemIcon({ variant }: LibraryItemIconProps) {
-  switch (variant) {
-    case "saved":
-      return <Bookmark {...iconProps} testID="library-item-icon-bookmark" />;
-    case "progress":
-      return <Clock {...iconProps} testID="library-item-icon-clock" />;
-    case "completed":
-      return <CheckCircle {...iconProps} testID="library-item-icon-check-circle" />;
-  }
+  const icon = (() => {
+    switch (variant) {
+      case "saved":
+        return <Bookmark {...iconProps} />;
+      case "progress":
+        return <Clock {...iconProps} />;
+      case "completed":
+        return <CheckCircle {...iconProps} />;
+    }
+  })();
+
+  const testID = `library-item-icon-${variant}`;
+
+  return <View testID={testID}>{icon}</View>;
 }
 
 function ProgressBarFill({ percent }: { percent: number }) {
   return (
     <View style={styles.progressTrack} testID="library-progress-bar">
-      <View style={[styles.progressFill, { width: `${Math.min(percent, 100)}%` as unknown as number }]} />
+      <View
+        style={[styles.progressFill, { width: `${Math.min(percent, 100)}%` as unknown as number }]}
+      />
     </View>
   );
 }
@@ -48,8 +56,13 @@ export function LibraryItemRow({ item, variant, onPress }: LibraryItemRowProps) 
       : null;
 
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [styles.container, pressed && styles.pressed]}>
-      <View style={styles.iconContainer}><LibraryItemIcon variant={variant} /></View>
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [styles.container, pressed && styles.pressed]}
+    >
+      <View style={styles.iconContainer}>
+        <LibraryItemIcon variant={variant} />
+      </View>
       <View style={styles.content}>
         <AppText variant="bodyMd" numberOfLines={2}>
           {lectureTitle}
@@ -60,7 +73,9 @@ export function LibraryItemRow({ item, variant, onPress }: LibraryItemRowProps) 
         </AppText>
         <AppText variant="xs" style={styles.meta}>
           {item.durationSeconds
-            ? t("lecture.minutes", "{{count}} min", { count: Math.round(item.durationSeconds / 60) })
+            ? t("lecture.minutes", "{{count}} min", {
+                count: Math.round(item.durationSeconds / 60),
+              })
             : ""}
           {variant === "progress" && progress !== null
             ? ` · ${t("library.percentListened", "{{percent}}% listened", { percent: progress })}`

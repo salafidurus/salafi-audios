@@ -1,9 +1,12 @@
 import React from "react";
 import { render, screen } from "@testing-library/react-native";
-import { View, Text } from "react-native";
+import { View } from "react-native";
+import { ScreenView } from "./ScreenView";
 
 jest.mock("react-native-safe-area-context", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require("react");
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { View } = require("react-native");
   return {
     useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
@@ -11,8 +14,6 @@ jest.mock("react-native-safe-area-context", () => {
       React.createElement(View, null, children),
   };
 });
-
-import { ScreenView } from "./ScreenView";
 
 describe("ScreenView", () => {
   it("renders children", async () => {

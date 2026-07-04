@@ -1,8 +1,7 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { LayoutAnimation, Platform, Pressable, ScrollView, UIManager, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useScholarDetail, useScholarContent, useScholarTopics } from "@sd/domain-content";
-import type { ScholarTopicsDto } from "@sd/core-contracts";
 import { ChevronDown } from "lucide-react-native";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
@@ -24,6 +23,7 @@ type TopicSectionProps = {
 
 function TopicSection({ topicName, children }: TopicSectionProps) {
   const [expanded, setExpanded] = useState(true);
+  const { theme } = useUnistyles();
 
   const handleToggle = useCallback(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -34,7 +34,9 @@ function TopicSection({ topicName, children }: TopicSectionProps) {
     <View style={styles.topicSection}>
       <Pressable onPress={handleToggle} style={styles.topicHeader}>
         <AppText variant="labelMd">{topicName}</AppText>
-        <ChevronDown size={16} style={[styles.chevron, !expanded && styles.chevronCollapsed]} />
+        <View style={!expanded && styles.chevronCollapsed}>
+          <ChevronDown size={16} color={theme.colors.content.muted} />
+        </View>
       </Pressable>
       {expanded && <View style={styles.topicContent}>{children}</View>}
     </View>
@@ -123,9 +125,6 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing.scale.sm,
     paddingHorizontal: theme.spacing.scale.md,
     backgroundColor: theme.colors.surface.subtle,
-  },
-  chevron: {
-    color: theme.colors.content.muted,
   },
   chevronCollapsed: {
     transform: [{ rotate: "-90deg" }],

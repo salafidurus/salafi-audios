@@ -1,5 +1,6 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react-native";
+import { render, screen } from "@testing-library/react-native";
+import { MiniPlayer } from "./mini-player";
 
 jest.mock("@sd/domain-audio", () => ({
   useAudio: jest.fn(),
@@ -37,8 +38,6 @@ jest.mock("./playback-controls", () => ({
 }));
 
 const { useAudio } = jest.requireMock("@sd/domain-audio");
-
-import { MiniPlayer } from "./mini-player";
 
 const mockTrack = {
   id: "track-1",
@@ -84,7 +83,6 @@ describe("MiniPlayer", () => {
   });
 
   it("calls pause when play button pressed while playing", async () => {
-    const audioService = jest.requireMock("../audio-service").audioService;
     useAudio.mockReturnValue({
       currentTrack: mockTrack,
       isPlaying: true,

@@ -1,6 +1,7 @@
 import React from "react";
 import { View } from "react-native";
 import { render, screen, fireEvent } from "@testing-library/react-native";
+import { Button } from "./Button";
 
 jest.mock("react-native-svg", () => ({
   Svg: "Svg",
@@ -12,7 +13,9 @@ jest.mock("react-native-svg", () => ({
 }));
 
 jest.mock("react-native-ease", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require("react");
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { View } = require("react-native");
   return {
     EaseView: ({ children, style }: { children: React.ReactNode; style?: object }) =>
@@ -23,8 +26,6 @@ jest.mock("react-native-ease", () => {
 jest.mock("../AccentGradientFill/AccentGradientFill", () => ({
   AccentGradientFill: () => null,
 }));
-
-import { Button } from "./Button";
 
 describe("Button", () => {
   it("renders label text", async () => {

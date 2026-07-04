@@ -28,11 +28,20 @@ jest.mock("@/features/i18n/content-preference", () => ({
 }));
 
 jest.mock("@/shared/components/AppText/AppText", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require("react");
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { Text } = require("react-native");
   return {
-    AppText: ({ children, style, numberOfLines }: { children: React.ReactNode; style?: unknown; numberOfLines?: number }) =>
-      React.createElement(Text, { style, numberOfLines }, children),
+    AppText: ({
+      children,
+      style,
+      numberOfLines,
+    }: {
+      children: React.ReactNode;
+      style?: unknown;
+      numberOfLines?: number;
+    }) => React.createElement(Text, { style, numberOfLines }, children),
   };
 });
 
@@ -79,7 +88,10 @@ describe("LibraryItemRow", () => {
 
   it("shows CheckCircle icon for completed variant", async () => {
     await render(
-      <LibraryItemRow item={{ ...baseItem, completedAt: "2026-06-15T00:00:00Z" }} variant="completed" />,
+      <LibraryItemRow
+        item={{ ...baseItem, completedAt: "2026-06-15T00:00:00Z" }}
+        variant="completed"
+      />,
     );
     expect(screen.getByTestId("library-item-icon-check-circle")).toBeTruthy();
   });
@@ -96,7 +108,10 @@ describe("LibraryItemRow", () => {
 
   it("shows completed date for completed variant", async () => {
     await render(
-      <LibraryItemRow item={{ ...baseItem, completedAt: "2026-06-15T00:00:00Z" }} variant="completed" />,
+      <LibraryItemRow
+        item={{ ...baseItem, completedAt: "2026-06-15T00:00:00Z" }}
+        variant="completed"
+      />,
     );
     expect(screen.getByText(/Completed/)).toBeTruthy();
   });
