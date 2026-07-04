@@ -113,13 +113,13 @@ function formatTime(seconds: number): string {
 const styles = StyleSheet.create((theme) => ({
   container: {
     position: "absolute",
-    bottom: 50, // floats safely above system tab bars
+    bottom: 50,
     start: theme.spacing.scale.md,
     end: theme.spacing.scale.md,
     height: 64,
     borderRadius: theme.radius.scale.md,
     backgroundColor: theme.colors.surface.default,
-    boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+    ...theme.shadows.sm,
     overflow: "hidden",
     borderWidth: theme.border.width.default,
     borderColor: theme.colors.border.subtle,
@@ -142,12 +142,11 @@ const styles = StyleSheet.create((theme) => ({
     marginEnd: theme.spacing.scale.sm,
   },
   title: {
-    fontSize: 14,
-    fontWeight: "bold",
+    ...theme.typography.labelMd,
     color: theme.colors.content.strong,
   },
   artist: {
-    fontSize: 12,
+    ...theme.typography.caption,
     color: theme.colors.content.muted,
     marginTop: theme.spacing.scale.xs,
   },
@@ -182,8 +181,7 @@ const styles = StyleSheet.create((theme) => ({
     height: 56,
   },
   modalHeaderTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
+    ...theme.typography.titleMd,
     color: theme.colors.content.strong,
   },
   closeButton: {
@@ -204,7 +202,7 @@ const styles = StyleSheet.create((theme) => ({
     height: 280,
     borderRadius: theme.radius.scale.lg,
     backgroundColor: theme.colors.surface.subtle,
-    boxShadow: "0 8px 16px rgba(0, 0, 0, 0.15)",
+    ...theme.shadows.lg,
   },
   modalTextContainer: {
     alignItems: "center",
@@ -213,14 +211,13 @@ const styles = StyleSheet.create((theme) => ({
     width: "100%",
   },
   modalTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
+    ...theme.typography.titleLg,
     color: theme.colors.content.strong,
     textAlign: "center",
     paddingHorizontal: theme.spacing.scale.md,
   },
   modalArtist: {
-    fontSize: 16,
+    ...theme.typography.bodyMd,
     color: theme.colors.action.primary,
     fontWeight: "600",
     marginTop: theme.spacing.scale.sm,
@@ -237,7 +234,7 @@ const styles = StyleSheet.create((theme) => ({
     marginTop: theme.spacing.scale.xs,
   },
   timeText: {
-    fontSize: 12,
+    ...theme.typography.caption,
     color: theme.colors.content.muted,
   },
 }));
