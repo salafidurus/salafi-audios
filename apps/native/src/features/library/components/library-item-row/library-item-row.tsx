@@ -17,8 +17,9 @@ type LibraryItemIconProps = {
   variant: "progress" | "saved" | "completed";
 };
 
+const iconProps = { size: 20, color: "var(--content-muted)" as unknown as string };
+
 function LibraryItemIcon({ variant }: LibraryItemIconProps) {
-  const iconProps = { size: 20, color: "var(--content-muted)" as unknown as string };
   switch (variant) {
     case "saved":
       return <Bookmark {...iconProps} testID="library-item-icon-bookmark" />;
