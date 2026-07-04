@@ -13,31 +13,55 @@ import { useShowOriginalContent } from "@/features/i18n/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
+const pageTitleStyle: React.CSSProperties = {
+  margin: 0,
+  fontFamily: "var(--typo-display-md-font-family), serif",
+  fontSize: "var(--typo-display-md-font-size)",
+  fontWeight: "var(--typo-display-md-font-weight)",
+  lineHeight: "var(--typo-display-md-line-height)",
+  marginBottom: 16,
+};
+
+const sectionHeaderStyle: React.CSSProperties = {
+  fontFamily: "var(--typo-label-md-font-family), sans-serif",
+  fontSize: "var(--typo-label-md-font-size)",
+  fontWeight: "var(--typo-label-md-font-weight)",
+  lineHeight: "var(--typo-label-md-line-height)",
+  letterSpacing: "0.08em",
+  margin: "24px 0 8px",
+};
+
+const libraryItemButtonStyle: React.CSSProperties = {
+  display: "block",
+  width: "100%",
+  textAlign: "left",
+  cursor: "pointer",
+  background: "none",
+  border: "none",
+};
+
+const itemTitleStyle: React.CSSProperties = {
+  fontFamily: "var(--typo-title-md-font-family), serif",
+  fontSize: "var(--typo-title-md-font-size)",
+  fontWeight: "var(--typo-title-md-font-weight)",
+  lineHeight: "var(--typo-title-md-line-height)",
+  color: "var(--content-default)",
+};
+
 function ProgressBar({ percent }: { percent: number }) {
   return (
-    <div style={{ height: 4, background: "#e5e7eb", borderRadius: 2, marginTop: 6 }}>
+    <div style={{ height: 4, background: "var(--border-subtle)", borderRadius: 2, marginTop: 6 }}>
       <div
         style={{
           height: "100%",
           width: `${Math.min(percent, 100)}%`,
-          background: "#2563eb",
+          background: "var(--action-primary)",
           borderRadius: 2,
         }}
       />
     </div>
   );
 }
-
-const libraryItemButtonStyle: React.CSSProperties = {
-  display: "block",
-  width: "100%",
-  textAlign: "left",
-  padding: 16,
-  cursor: "pointer",
-  background: "none",
-  border: "none",
-  borderBottom: "1px solid #eee",
-};
 
 function LibraryItem({
   item,
@@ -57,16 +81,16 @@ function LibraryItem({
   const lectureTitle = pickContentField(item.lectureTitle, item.originalLectureTitle, showOriginal);
 
   return (
-    <button type="button" onClick={onPress} style={libraryItemButtonStyle}>
+    <button type="button" onClick={onPress} style={libraryItemButtonStyle} className="listRow">
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         {variant === "completed" && <span style={{ color: "#16a34a", fontSize: 14 }}>✓</span>}
-        <span style={{ fontSize: 16, fontWeight: 600 }}>{lectureTitle}</span>
+        <span style={itemTitleStyle}>{lectureTitle}</span>
       </div>
-      <div style={{ fontSize: 13, color: "#666", marginTop: 4 }}>
+      <div style={{ fontSize: 13, color: "var(--content-muted)", marginTop: 4 }}>
         {item.scholarName}
         {item.seriesTitle && ` · ${item.seriesTitle}`}
       </div>
-      <div style={{ fontSize: 12, color: "#999", marginTop: 4 }}>
+      <div style={{ fontSize: 12, color: "var(--content-subtle)", marginTop: 4 }}>
         {item.durationSeconds
           ? t("lecture.minutes", "{{count}} min", {
               count: Math.round(item.durationSeconds / 60),
@@ -109,14 +133,14 @@ function SectionList({
   const { t } = useTranslation();
   if (isFetching && items.length === 0) {
     return (
-      <div style={{ padding: 16, color: "#999" }}>
+      <div style={{ padding: "16px 24px", color: "var(--content-subtle)" }}>
         {t("library.loadingSection", "Loading {{section}}…", { section: title })}
       </div>
     );
   }
 
   if (items.length === 0) {
-    return <div style={{ padding: 16, color: "#666" }}>{emptyMessage}</div>;
+    return <div style={{ padding: "16px 24px", color: "var(--content-muted)" }}>{emptyMessage}</div>;
   }
 
   return (
@@ -147,11 +171,11 @@ export function LibrarySavedDesktopScreen({ onNavigateToLecture }: LibrarySavedD
   return (
     <ScreenView>
       <div style={{ maxWidth: 720, margin: "0 auto" }}>
-        <h2 style={{ margin: 0, fontSize: 22, marginBottom: 16 }}>
+        <h2 style={pageTitleStyle}>
           {t("library.title", "My Library")}
         </h2>
 
-        <h3 style={{ fontSize: 18, margin: "24px 0 8px" }}>
+        <h3 style={sectionHeaderStyle}>
           {t("library.inProgress", "In Progress")}
         </h3>
         <SectionList
@@ -163,7 +187,7 @@ export function LibrarySavedDesktopScreen({ onNavigateToLecture }: LibrarySavedD
           onNavigateToLecture={onNavigateToLecture}
         />
 
-        <h3 style={{ fontSize: 18, margin: "24px 0 8px" }}>{t("library.saved", "Saved")}</h3>
+        <h3 style={sectionHeaderStyle}>{t("library.saved", "Saved")}</h3>
         <SectionList
           title={t("library.saved", "Saved")}
           items={savedData.items}
@@ -176,7 +200,7 @@ export function LibrarySavedDesktopScreen({ onNavigateToLecture }: LibrarySavedD
           onNavigateToLecture={onNavigateToLecture}
         />
 
-        <h3 style={{ fontSize: 18, margin: "24px 0 8px" }}>
+        <h3 style={sectionHeaderStyle}>
           {t("library.completed", "Completed")}
         </h3>
         <SectionList

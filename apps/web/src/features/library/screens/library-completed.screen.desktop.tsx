@@ -13,15 +13,30 @@ export type LibraryCompletedDesktopScreenProps = {
   onNavigateToLecture?: (id: string) => void;
 };
 
+const pageTitleStyle: React.CSSProperties = {
+  margin: 0,
+  fontFamily: "var(--typo-display-md-font-family), serif",
+  fontSize: "var(--typo-display-md-font-size)",
+  fontWeight: "var(--typo-display-md-font-weight)",
+  lineHeight: "var(--typo-display-md-line-height)",
+  marginBottom: 16,
+};
+
 const libraryItemButtonStyle: React.CSSProperties = {
   display: "block",
   width: "100%",
   textAlign: "left",
-  padding: 16,
-  borderBottom: "1px solid #eee",
   cursor: "pointer",
   background: "none",
   border: "none",
+};
+
+const itemTitleStyle: React.CSSProperties = {
+  fontFamily: "var(--typo-title-md-font-family), serif",
+  fontSize: "var(--typo-title-md-font-size)",
+  fontWeight: "var(--typo-title-md-font-weight)",
+  lineHeight: "var(--typo-title-md-line-height)",
+  color: "var(--content-default)",
 };
 
 function LibraryItem({ item, onPress }: { item: LibraryItemDto; onPress?: () => void }) {
@@ -29,16 +44,16 @@ function LibraryItem({ item, onPress }: { item: LibraryItemDto; onPress?: () => 
   const { t } = useTranslation();
   const lectureTitle = pickContentField(item.lectureTitle, item.originalLectureTitle, showOriginal);
   return (
-    <button type="button" onClick={onPress} style={libraryItemButtonStyle}>
+    <button type="button" onClick={onPress} style={libraryItemButtonStyle} className="listRow">
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <span style={{ color: "#16a34a", fontSize: 14 }}>✓</span>
-        <span style={{ fontSize: 16, fontWeight: 600 }}>{lectureTitle}</span>
+        <span style={itemTitleStyle}>{lectureTitle}</span>
       </div>
-      <div style={{ fontSize: 13, color: "#666", marginTop: 4, paddingLeft: 22 }}>
+      <div style={{ fontSize: 13, color: "var(--content-muted)", marginTop: 4, paddingLeft: 22 }}>
         {item.scholarName}
         {item.seriesTitle && ` · ${item.seriesTitle}`}
       </div>
-      <div style={{ fontSize: 12, color: "#999", marginTop: 4, paddingLeft: 22 }}>
+      <div style={{ fontSize: 12, color: "var(--content-subtle)", marginTop: 4, paddingLeft: 22 }}>
         {item.durationSeconds
           ? t("lecture.minutes", "{{count}} min", { count: Math.round(item.durationSeconds / 60) })
           : ""}
@@ -61,7 +76,7 @@ export function LibraryCompletedDesktopScreen({
   if (isFetching && items.length === 0) {
     return (
       <ScreenView>
-        <div style={{ maxWidth: 720, margin: "0 auto" }}>
+        <div style={{ maxWidth: 720, margin: "0 auto", padding: "16px 24px", color: "var(--content-subtle)" }}>
           {t("library.loadingSection", "Loading {{section}}…", {
             section: t("library.completed", "Completed"),
           })}
@@ -73,7 +88,7 @@ export function LibraryCompletedDesktopScreen({
   if (items.length === 0) {
     return (
       <ScreenView>
-        <div style={{ maxWidth: 720, margin: "0 auto", color: "#666" }}>
+        <div style={{ maxWidth: 720, margin: "0 auto", padding: "16px 24px", color: "var(--content-muted)" }}>
           {t("library.emptyCompleted", "No completed lectures yet. Keep listening!")}
         </div>
       </ScreenView>
@@ -83,7 +98,7 @@ export function LibraryCompletedDesktopScreen({
   return (
     <ScreenView>
       <div style={{ maxWidth: 720, margin: "0 auto" }}>
-        <h2 style={{ margin: 0, fontSize: 22, marginBottom: 16 }}>
+        <h2 style={pageTitleStyle}>
           {t("library.completed", "Completed")}
         </h2>
         {items.map((item) => (

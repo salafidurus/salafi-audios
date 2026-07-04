@@ -11,8 +11,8 @@ export const spacingWeb = {
   },
 
   layout: {
-    pageX: "clamp(1.15rem, 3.8vw, 2.75rem)",
-    pageY: "clamp(1.25rem, 3vw, 2rem)",
+    pageX: "clamp(1.5rem, 4vw, 3rem)",
+    pageY: "clamp(1.5rem, 3.5vw, 2.5rem)",
     sectionY: "clamp(1.2rem, 2vw, 1.8rem)",
     contentMax: "84rem",
   },

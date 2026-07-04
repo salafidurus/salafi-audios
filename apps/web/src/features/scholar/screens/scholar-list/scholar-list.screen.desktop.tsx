@@ -4,6 +4,7 @@ import { useScholarsList } from "@sd/domain-content";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { ScholarCard } from "@/features/scholar/components/scholar-card/scholar-card";
+import styles from "./scholar-list.module.css";
 
 export type ScholarListDesktopScreenProps = {
   onSelectScholar?: (slug: string) => void;
@@ -31,24 +32,9 @@ export function ScholarListDesktopScreen({ onSelectScholar }: ScholarListDesktop
 
   return (
     <ScreenView>
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "24px 0" }}>
-        <h1
-          style={{
-            fontSize: 28,
-            fontWeight: 700,
-            marginBottom: 24,
-            color: "var(--content-strong)",
-          }}
-        >
-          Scholars
-        </h1>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
-            gap: 16,
-          }}
-        >
+      <div className={styles.container}>
+        <h1 className={styles.title}>Scholars</h1>
+        <div className={styles.grid}>
           {scholars.map((scholar) => (
             <ScholarCard key={scholar.id} scholar={scholar} onPress={onSelectScholar} />
           ))}

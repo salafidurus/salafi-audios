@@ -33,6 +33,7 @@ body {
   font-family: var(--font-body), sans-serif;
   background: var(--surface-canvas);
   min-height: 100%;
+  line-height: 1.6;
 }
 
 *,
@@ -117,4 +118,14 @@ textarea:focus {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+.listRow {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.listRow:hover {
+  background-color: var(--surface-hover);
 }
