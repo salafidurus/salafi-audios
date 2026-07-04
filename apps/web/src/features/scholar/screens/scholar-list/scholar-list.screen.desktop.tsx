@@ -3,7 +3,7 @@
 import { useScholarsList } from "@sd/domain-content";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { AppText } from "@/shared/components/AppText/AppText";
-import { ScholarCard } from "@/features/scholar/components/scholar-card/scholar-card";
+import { ScholarListRow } from "@/features/scholar/components/scholar-list-row/scholar-list-row";
 import styles from "./scholar-list.module.css";
 
 export type ScholarListDesktopScreenProps = {
@@ -33,13 +33,17 @@ export function ScholarListDesktopScreen({ onSelectScholar }: ScholarListDesktop
   return (
     <ScreenView>
       <div className={styles.container}>
-        <h1 className={styles.title}>Scholars</h1>
-        <div className={styles.grid}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Scholars</h1>
+          <p className={styles.tagline}>Browse our database of authentic scholars</p>
+        </div>
+        <div className={styles.list}>
           {scholars.map((scholar) => (
-            <ScholarCard key={scholar.id} scholar={scholar} onPress={onSelectScholar} />
+            <ScholarListRow key={scholar.id} scholar={scholar} onPress={onSelectScholar} />
           ))}
         </div>
       </div>
     </ScreenView>
   );
 }
+
