@@ -46,7 +46,7 @@ function LibraryItem({ item, onPress }: { item: LibraryItemDto; onPress?: () => 
   return (
     <button type="button" onClick={onPress} style={libraryItemButtonStyle} className="listRow">
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span style={{ color: "#16a34a", fontSize: 14 }}>✓</span>
+        <span style={{ color: "var(--state-success)", fontSize: 14 }}>✓</span>
         <span style={itemTitleStyle}>{lectureTitle}</span>
       </div>
       <div style={{ fontSize: 13, color: "var(--content-muted)", marginTop: 4, paddingLeft: 22 }}>
