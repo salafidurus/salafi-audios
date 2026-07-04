@@ -1,84 +1,61 @@
 "use client";
 
+import React from "react";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { AppText } from "@/shared/components/AppText/AppText";
-import type { LiveSessionPublicDto } from "@sd/core-contracts";
 import { useLiveSessions } from "@sd/domain-live";
-import { LiveSessionCard } from "../components/live-session-card/live-session-card";
+import { LiveSessionRow } from "../components/live-session-row/live-session-row";
 import { LiveSkeleton } from "../components/live-skeleton/live-skeleton";
 import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./live.screen.module.css";
 
 export type LiveDesktopScreenProps = Record<string, never>;
 
-function Section({
-  title,
-  sessions,
-  isLoading,
-  emptyMessage,
-}: {
-  title: string;
-  sessions: LiveSessionPublicDto[];
-  isLoading: boolean;
-  emptyMessage: string;
-}) {
-  return (
-    <div className={styles.section}>
-      <AppText variant="titleMd">{title}</AppText>
-      {isLoading && sessions.length === 0 ? (
-        <LiveSkeleton />
-      ) : sessions.length === 0 ? (
-        <AppText variant="bodyMd" style={{ color: "var(--content-subtle)" }}>
-          {emptyMessage}
-        </AppText>
-      ) : (
-        <div className={styles.cardList}>
-          {sessions.map((s) => (
-            <LiveSessionCard key={s.id} session={s} />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 export function LiveDesktopScreen() {
-  const { active, upcoming, ended } = useLiveSessions();
+  const { active } = useLiveSessions();
   const { t } = useTranslation();
+
+  const renderContent = () => {
+    if (active.isLoading && active.sessions.length === 0) {
+      return <LiveSkeleton />;
+    }
+
+    if (active.sessions.length === 0) {
+      return (
+        <AppText
+          variant="bodyMd"
+          style={{
+            color: "var(--content-subtle)",
+            padding: 24,
+            textAlign: "center",
+            display: "block",
+          }}
+        >
+          {t("live.sections.ongoing.empty", "No live sessions right now — check back soon.")}
+        </AppText>
+      );
+    }
+
+    return (
+      <div className={styles.list}>
+        {active.sessions.map((s) => (
+          <LiveSessionRow key={s.id} session={s} />
+        ))}
+      </div>
+    );
+  };
 
   return (
     <ScreenView>
       <div className={styles.page}>
-        <div className={styles.container}>
-          <AppText variant="displayMd">{t("live.title", "Live Sessions")}</AppText>
-
-          <div className={styles.twoColumn}>
-            <div className={styles.columnMain}>
-              <Section
-                title={`🔴 ${t("live.sections.ongoing.title", "Live Now")}`}
-                sessions={active.sessions}
-                isLoading={active.isLoading}
-                emptyMessage={t("live.sections.ongoing.empty", "No live sessions right now.")}
-              />
-            </div>
-
-            <div className={styles.columnSide}>
-              <Section
-                title={t("live.sections.scheduled.title", "Upcoming")}
-                sessions={upcoming.sessions}
-                isLoading={upcoming.isLoading}
-                emptyMessage={t("live.sections.scheduled.empty", "No upcoming sessions scheduled.")}
-              />
-              <Section
-                title={t("live.sections.ended.title", "Recently Ended")}
-                sessions={ended.sessions}
-                isLoading={ended.isLoading}
-                emptyMessage={t("live.sections.ended.empty", "No recent sessions.")}
-              />
-            </div>
-          </div>
+        <div className={styles.listContainer}>
+          <AppText variant="displayMd" style={{ display: "block", marginBottom: 24 }}>
+            {t("live.title", "Live Sessions")}
+          </AppText>
+          {renderContent()}
         </div>
       </div>
     </ScreenView>
   );
 }
+

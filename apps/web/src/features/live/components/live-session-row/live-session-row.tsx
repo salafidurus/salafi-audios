@@ -32,7 +32,8 @@ export function LiveSessionRow({ session, onPress }: LiveSessionRowProps) {
   const isLive = session.status === "live";
   const isScheduled = session.status === "scheduled";
   const isEnded = session.status === "ended";
-  const telegramUrl = session.telegramSlug ? `https://t.me/${session.telegramSlug}` : undefined;
+  const telegramSlug = "telegramSlug" in session ? session.telegramSlug : undefined;
+  const telegramUrl = telegramSlug ? `https://t.me/${telegramSlug}` : undefined;
   const recordingLectureId = (session as any).recordingLectureId;
 
   const title = session.title || ("channelDisplayName" in session ? session.channelDisplayName : undefined) || "Live Session";
