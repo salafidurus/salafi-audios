@@ -52,9 +52,9 @@ describe("Sidebar component", () => {
 
     // Basic nav checks
     expect(screen.getByText("Search")).toBeInTheDocument();
-    expect(screen.getByText("navigation.explore")).toBeInTheDocument();
-    expect(screen.getByText("navigation.live")).toBeInTheDocument();
-    expect(screen.getByText("navigation.library")).toBeInTheDocument();
+    expect(screen.getByText("Explore")).toBeInTheDocument();
+    expect(screen.getByText("Live")).toBeInTheDocument();
+    expect(screen.getByText("Library")).toBeInTheDocument();
     expect(screen.getByText("Settings")).toBeInTheDocument();
   });
 

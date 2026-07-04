@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AdminPermissionsController } from './admin-permissions.controller';
+import { AdminUsersController } from './admin-users.controller';
 import { AdminPermissionsService } from './admin-permissions.service';
 import { AdminPermissionsRepository } from './admin-permissions.repo';
 
 @Module({
-  controllers: [AdminPermissionsController],
+  controllers: [AdminPermissionsController, AdminUsersController],
   providers: [AdminPermissionsService, AdminPermissionsRepository],
   exports: [AdminPermissionsService, AdminPermissionsRepository],
 })

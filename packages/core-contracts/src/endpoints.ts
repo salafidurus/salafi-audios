@@ -19,6 +19,9 @@ export const endpoints = {
   series: {
     detail: (id: string) => `/series/${id}`,
   },
+  listings: {
+    detail: (id: string) => `/listing/${id}`,
+  },
   lectures: {
     detail: (id: string) => `/lectures/${id}`,
     related: (id: string) => `/lectures/${id}/related`,
@@ -60,6 +63,9 @@ export const endpoints = {
     quickbrowse: "/home/quickbrowse",
   },
   admin: {
+    users: {
+      list: "/admin/users",
+    },
     permissions: {
       me: "/admin/permissions/me",
       list: "/admin/permissions",

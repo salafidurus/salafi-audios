@@ -23,3 +23,18 @@ export interface AdminPermissionsListDto {
 export interface GrantPermissionDto {
   permission: AdminPermission;
 }
+
+export interface AdminUserListItemDto {
+  id: string;
+  name: string;
+  email: string;
+  image: string | null;
+  role: string;
+  createdAt: string;
+  permissions: AdminPermission[];
+}
+
+export interface AdminUserListDto {
+  users: AdminUserListItemDto[];
+  total: number;
+}

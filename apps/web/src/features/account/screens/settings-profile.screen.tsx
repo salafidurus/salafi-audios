@@ -24,7 +24,13 @@ function ProfileContent() {
   const { data: profile, isFetching } = useAccountProfile();
   const { mutate: updateProfile, isPending, isSuccess, isError } = useUpdateProfile();
   const router = useRouter();
-  const [displayName, setDisplayName] = useState<string | null>(null);
+  const [prevProfileId, setPrevProfileId] = useState(profile?.id);
+  const [displayName, setDisplayName] = useState(profile?.displayName ?? "");
+
+  if (profile && profile.id !== prevProfileId) {
+    setPrevProfileId(profile.id);
+    setDisplayName(profile.displayName ?? "");
+  }
 
   const handleSignOut = async () => {
     await authClient.signOut();
@@ -39,8 +45,8 @@ function ProfileContent() {
     return <p className={styles.empty}>Profile not available.</p>;
   }
 
-  const currentDisplayName = displayName ?? profile.displayName;
-  const isDirty = currentDisplayName !== profile.displayName;
+  const currentDisplayName = displayName;
+  const isDirty = currentDisplayName !== (profile.displayName ?? "");
 
   const initials = getInitials(profile.displayName || profile.email);
 
@@ -122,7 +128,7 @@ function SignInCta() {
   const [showModal, setShowModal] = useState(false);
   return (
     <div className={styles.signInCta}>
-      <p className={styles.signInTitle}>Sign in to view your profile</p>
+      <p className={styles.signInTitle}>Sign in to view your profile and roles.</p>
       <p className={styles.signInDesc}>
         Create an account or sign in to manage your profile and roles.
       </p>

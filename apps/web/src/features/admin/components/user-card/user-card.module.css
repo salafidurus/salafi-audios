@@ -1,0 +1,54 @@
+.card {
+  padding: var(--space-scale-md);
+  border-radius: var(--radius-component-card);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-default);
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-sm);
+  margin-bottom: var(--space-scale-sm);
+}
+
+.nameSection {
+  flex: 1;
+}
+
+.name {
+  font-weight: 600;
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-default);
+}
+
+.email {
+  font-size: var(--typo-xs-font-size);
+  color: var(--content-muted);
+}
+
+.permissions {
+  display: flex;
+  gap: var(--space-scale-xs);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-scale-xs);
+}
+
+.noPerms {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: var(--typo-xs-font-size);
+  color: var(--content-disabled);
+}
+
+.noPermsIcon {
+  width: 10px;
+  height: 10px;
+}
+
+.joined {
+  font-size: var(--typo-xs-font-size);
+  color: var(--content-disabled);
+  margin-top: var(--space-scale-xs);
+}

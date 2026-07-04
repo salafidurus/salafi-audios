@@ -1,10 +1,9 @@
 import { defineConfig } from 'vitest/config';
 import swc from 'unplugin-swc';
-import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
+  resolve: { tsconfigPaths: true },
   plugins: [
-    tsconfigPaths(),
     swc.vite({
       module: { type: 'es6' },
     }),
@@ -15,6 +14,7 @@ export default defineConfig({
     clearMocks: true,
     retry: 2,
     passWithNoTests: true,
+    oxc: false,
     include: ['src/**/*.spec.ts'],
   },
 });

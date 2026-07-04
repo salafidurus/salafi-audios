@@ -44,7 +44,7 @@ export function LibraryListRow({ item, variant }: LibraryListRowProps) {
   }
 
   return (
-    <Link href={`/lectures/${item.lectureSlug}`} className={`${styles.row} listRow`}>
+    <Link href={`/listing/${item.lectureSlug}`} className={`${styles.row} listRow`}>
       <div className={styles.avatarSection}>
         <div className={styles.avatarFallback} aria-hidden="true">
           {initial}

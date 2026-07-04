@@ -83,7 +83,7 @@ describe("SettingsProfileScreen", () => {
       typeof useAccountProfile
     >);
     render(<SettingsProfileScreen />);
-    expect(screen.getByText("Sign in to view your profile")).toBeInTheDocument();
+    expect(screen.getByText("Sign in to view your profile and roles.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Sign In" })).toBeInTheDocument();
   });
 
@@ -92,7 +92,7 @@ describe("SettingsProfileScreen", () => {
     mockProfile.mockReturnValue({ data: undefined, isFetching: false } as ReturnType<
       typeof useAccountProfile
     >);
-    const { container } = render(<SettingsProfileScreen />);
+    render(<SettingsProfileScreen />);
     // Only the page wrapper and title should render; no profile content
     expect(screen.getByText("Profile")).toBeInTheDocument();
     expect(screen.queryByText("Sign in to view your profile")).not.toBeInTheDocument();

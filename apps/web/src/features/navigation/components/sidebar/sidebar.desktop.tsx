@@ -97,19 +97,19 @@ export function Sidebar() {
       activeMatch: routes.search,
     },
     {
-      label: t("navigation.explore"),
+      label: t("navigation.explore", "Explore"),
       Icon: Cloud,
       href: routes.feed.index,
       activeMatch: routes.feed.index,
     },
     {
-      label: t("navigation.live"),
+      label: t("navigation.live", "Live"),
       Icon: Mic,
       href: routes.live.index,
       activeMatch: routes.live.index,
     },
     {
-      label: t("navigation.library"),
+      label: t("navigation.library", "Library"),
       Icon: CassetteTape,
       href: routes.library.index,
       activeMatch: routes.library.index,
@@ -175,13 +175,13 @@ export function Sidebar() {
         <Link
           href={settingsHref}
           className={clsx(styles.link, pathname.startsWith(routes.settings.index) && styles.active)}
-          aria-label={t("navigation.settings")}
-          title={collapsed ? t("navigation.settings") : undefined}
+          aria-label={t("navigation.settings", "Settings")}
+          title={collapsed ? t("navigation.settings", "Settings") : undefined}
         >
           <span className={styles.icon} aria-hidden="true">
             <Settings size={18} />
           </span>
-          <span className={styles.label}>{t("navigation.settings")}</span>
+          <span className={styles.label}>{t("navigation.settings", "Settings")}</span>
         </Link>
 
         {hasAdminAccess && (

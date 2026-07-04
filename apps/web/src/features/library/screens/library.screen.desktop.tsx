@@ -9,11 +9,7 @@ import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthReq
 import { LibraryListRow } from "../components/library-list-row/library-list-row";
 import styles from "./library-screens.module.css";
 
-export type LibraryDesktopScreenProps = {
-  onNavigateToLecture?: (id: string) => void;
-};
-
-export function LibraryDesktopScreen({ onNavigateToLecture }: LibraryDesktopScreenProps) {
+export function LibraryDesktopScreen() {
   const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
   const { items, isFetching } = useLibraryProgressScreen(isAuthenticated);

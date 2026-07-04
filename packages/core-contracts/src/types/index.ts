@@ -40,9 +40,8 @@ export {
   type CollectionSummaryDto,
   type SeriesSummaryDto,
   type SingleSummaryDto,
-  type ScholarTopicsDto,
 } from "../types/scholar.types";
-export { type ListingFormat } from "../types/listing.types";
+export { type ListingFormat, type ListingViewDto } from "../types/listing.types";
 export { type CollectionViewDto } from "../types/collection.types";
 export { type SeriesViewDto } from "../types/series.types";
 export {
@@ -104,6 +103,8 @@ export type {
   AdminPermissionDto,
   AdminPermissionsListDto,
   GrantPermissionDto,
+  AdminUserListItemDto,
+  AdminUserListDto,
 } from "./admin.types";
 export { ADMIN_PERMISSIONS } from "./admin.types";
 export {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { LanguageSwitch, ContentLanguageToggle } from "@/features/i18n";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { SettingsSection } from "@/shared/components/SettingsSection/SettingsSection";
@@ -48,20 +48,8 @@ function loadThemePreference(): ThemePreference {
 }
 
 export function SettingsGeneralScreen() {
-  const [themePreference, setThemePreference] = useState<ThemePreference>("system");
-  const [notif, setNotif] = useState<NotificationState>({
-    master: true,
-    live: true,
-    scholars: true,
-    lectures: true,
-  });
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    setThemePreference(loadThemePreference());
-    setNotif(loadNotifState());
-    setHydrated(true);
-  }, []);
+  const [themePreference, setThemePreference] = useState<ThemePreference>(loadThemePreference);
+  const [notif, setNotif] = useState<NotificationState>(loadNotifState);
 
   const handleThemeChange = useCallback((value: ThemePreference) => {
     setThemePreference(value);
@@ -96,14 +84,12 @@ export function SettingsGeneralScreen() {
 
         <SettingsSection title="Display" description="Choose a theme for the interface.">
           <SettingsRow label="Theme" sublabel="System follows your OS preference">
-            {hydrated && (
-              <SegmentedControl
-                options={THEME_OPTIONS}
-                value={themePreference}
-                onChange={handleThemeChange}
-                ariaLabel="Theme preference"
-              />
-            )}
+            <SegmentedControl
+              options={THEME_OPTIONS}
+              value={themePreference}
+              onChange={handleThemeChange}
+              ariaLabel="Theme preference"
+            />
           </SettingsRow>
         </SettingsSection>
 
@@ -117,6 +103,7 @@ export function SettingsGeneralScreen() {
                 type="checkbox"
                 role="switch"
                 aria-checked={notif.master}
+                aria-label="Enable Notifications"
                 checked={notif.master}
                 onChange={handleNotifChange("master")}
                 className={styles.toggleInput}
@@ -132,6 +119,7 @@ export function SettingsGeneralScreen() {
                     type="checkbox"
                     role="switch"
                     aria-checked={notif.live}
+                    aria-label="Notify for Live Sessions"
                     checked={notif.live}
                     onChange={handleNotifChange("live")}
                     className={styles.toggleInput}
@@ -148,6 +136,7 @@ export function SettingsGeneralScreen() {
                     type="checkbox"
                     role="switch"
                     aria-checked={notif.scholars}
+                    aria-label="Notify for Followed Scholars"
                     checked={notif.scholars}
                     onChange={handleNotifChange("scholars")}
                     className={styles.toggleInput}
@@ -161,6 +150,7 @@ export function SettingsGeneralScreen() {
                     type="checkbox"
                     role="switch"
                     aria-checked={notif.lectures}
+                    aria-label="Notify for New Lectures"
                     checked={notif.lectures}
                     onChange={handleNotifChange("lectures")}
                     className={styles.toggleInput}

@@ -12,7 +12,6 @@ import type {
   AdminCollectionDetailDto,
   BulkActionDto,
   BulkActionResultDto,
-  ScholarTopicsDto,
 } from '@sd/core-contracts';
 import { ScholarsRepository } from './scholars.repo';
 import type { CreateScholarDto } from './dto/create-scholar.dto';

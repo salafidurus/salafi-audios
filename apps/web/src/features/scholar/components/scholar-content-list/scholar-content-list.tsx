@@ -15,9 +15,7 @@ export type ScholarContentListProps = {
 };
 
 function contentHref(item: ScholarContentItemDto): string {
-  if (item.type === "series") return `/series/${item.slug}`;
-  if (item.type === "collection") return `/collections/${item.slug}`;
-  return `/lectures/${item.slug}`;
+  return `/listing/${item.id}`;
 }
 
 function ContentRow({ item }: { item: ScholarContentItemDto }) {

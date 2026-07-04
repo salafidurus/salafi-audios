@@ -92,6 +92,12 @@
   cursor: not-allowed;
 }
 
+.saveButton:focus-visible {
+  outline: 2px solid var(--action-primary);
+  outline-offset: 2px;
+}
+
+
 .readOnly {
   font-size: var(--typo-body-sm-font-size);
   color: var(--content-muted);
