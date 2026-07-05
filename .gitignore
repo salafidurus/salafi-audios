@@ -1,9 +1,34 @@
+.assets
 node_modules/
 .turbo/
 **/.turbo/
+**/.playwright-mcp/
 **/node_modules/
 coverage/
 **/coverage/
+dist/
+**/dist/
+.worktrees/
+.superpowers/
+
+.antigravitycli/
+
+generated/
+**/generated/
+
+.claude/settings.local.json
+.codex/
+.claude/
+.omc/
+.gemini/
+.opencode/
+**/.codex/
+**/.claude/
+**/.gemini/
+**/.opencode/
+**/AGENTS.md
+**/CLAUDE.md
+**/GEMINI.md
 
 
 # dotenv environment variable files
@@ -17,5 +42,21 @@ coverage/
 infra/envs/.env.*
 infra/envs/*.env
 
-# temp deploy files
+# temp files
 .deploy_tmp/
+.local-expo-mcp/
+
+# generated DB artifacts (derived, never committed)
+packages/db/src/generated/
+
+# IDE and Tool settings
+.vscode/mcp.json
+
+# Turborepo
+.turbo
+# CocoIndex Code (ccc)
+/.cocoindex_code/
+
+# Kilo config and state
+.kilo/
+.kilocode/

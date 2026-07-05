@@ -1,0 +1,207 @@
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.pageTitle {
+  font-family: var(--typo-display-md-font-family);
+  font-size: var(--typo-display-md-font-size);
+  font-weight: 700;
+  color: var(--content-strong);
+  margin: 0 0 var(--space-scale-2xl);
+}
+
+.searchRow {
+  display: flex;
+  gap: var(--space-scale-sm);
+  margin-bottom: var(--space-scale-2xl);
+  align-items: center;
+}
+
+.toolbar {
+  margin-bottom: var(--space-scale-md);
+}
+
+.resultCount {
+  font-family: var(--typo-caption-font-family);
+  font-size: var(--typo-caption-font-size);
+  color: var(--content-muted);
+  margin: 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tableHead th {
+  padding: var(--space-scale-md) var(--space-scale-sm);
+  border-bottom: 2px solid var(--border-default);
+  font-family: var(--typo-label-md-font-family);
+  font-size: var(--typo-caption-font-size);
+  color: var(--content-muted);
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tableRow {
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+}
+
+.tableRow td {
+  padding: var(--space-scale-md) var(--space-scale-sm);
+}
+
+.userCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-sm);
+}
+
+.userName {
+  font-weight: 500;
+  color: var(--content-default);
+}
+
+.emailCell {
+  color: var(--content-muted);
+  font-size: var(--typo-body-sm-font-size);
+}
+
+.dateCell {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+}
+
+.permissionsCell {
+  display: flex;
+  gap: var(--space-scale-xs);
+  flex-wrap: wrap;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-scale-full);
+  object-fit: cover;
+}
+
+.avatarFallback {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-scale-full);
+  background: var(--surface-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+}
+
+.permissionBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px var(--space-scale-xs);
+  border-radius: var(--radius-scale-sm);
+  font-size: var(--typo-xs-font-size);
+  background: var(--surface-primary-subtle);
+  color: var(--content-primary-strong);
+}
+
+.permissionBadgeIcon {
+  width: 12px;
+  height: 12px;
+}
+
+.noPermissions {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: var(--typo-xs-font-size);
+  color: var(--content-disabled);
+}
+
+.noPermissionsIcon {
+  width: 12px;
+  height: 12px;
+}
+
+.roleBadge {
+  padding: 2px var(--space-scale-xs);
+  border-radius: var(--radius-scale-sm);
+  font-size: var(--typo-xs-font-size);
+  font-weight: 600;
+}
+
+.roleBadgeAdmin {
+  background: var(--surface-primary-subtle);
+  color: var(--content-primary-strong);
+}
+
+.roleBadgeUser {
+  background: var(--surface-subtle);
+  color: var(--content-muted);
+}
+
+.loading {
+  text-align: center;
+  color: var(--content-muted);
+  padding: var(--space-scale-3xl) 0;
+}
+
+.empty {
+  text-align: center;
+  color: var(--content-muted);
+  padding: var(--space-scale-3xl) 0;
+}
+
+.searchInputWrapper {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--content-muted);
+  width: 16px;
+  height: 16px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: var(--space-scale-sm) var(--space-scale-md) var(--space-scale-sm) 36px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-scale-md);
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-sm-font-size);
+  background: var(--surface-default);
+  color: var(--content-default);
+  box-sizing: border-box;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--border-focus);
+}
+
+.searchBtn {
+  padding: var(--space-scale-sm) var(--space-scale-md);
+  border-radius: var(--radius-scale-md);
+  border: none;
+  background: var(--action-primary);
+  color: var(--content-on-primary);
+  cursor: pointer;
+  font-family: var(--typo-label-md-font-family);
+  font-size: var(--typo-body-sm-font-size);
+}
+
+.searchBtn:hover {
+  opacity: 0.9;
+}

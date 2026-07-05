@@ -1,0 +1,34 @@
+import { DEFAULT_TABS, type Section } from "../types";
+import { routes } from "@sd/core-contracts";
+
+const PATH_TO_SECTION: Record<string, Section> = {
+  [routes.feed.index]: "feed",
+  [routes.live.index]: "live",
+  [routes.library.index]: "library",
+  [routes.settings.index]: "settings",
+};
+
+export function getCurrentSection(pathname: string): Section | "home" {
+  for (const [path, section] of Object.entries(PATH_TO_SECTION)) {
+    if (pathname === path || pathname.startsWith(`${path}/`)) {
+      return section;
+    }
+  }
+  return "home";
+}
+
+export function getActiveTabFromPath(pathname: string): string | null {
+  const parts = pathname.split("/").filter(Boolean);
+  // e.g. /feed/recent → ["feed", "recent"]
+  return parts.length >= 2 ? (parts[1] ?? null) : null;
+}
+
+export function buildSectionTabPath(section: Section, tabId?: string): string {
+  const activeTab = tabId ?? DEFAULT_TABS[section];
+
+  if (activeTab === DEFAULT_TABS[section]) {
+    return `/${section}`;
+  }
+
+  return `/${section}/${activeTab}`;
+}

@@ -1,0 +1,137 @@
+@import "tailwindcss";
+/* Include shared package sources so desktop-web utility classes are emitted in the app build. */
+@source "../../../../packages/**/*.{js,jsx,ts,tsx}";
+
+@theme inline {
+  --surface-default: var(--surface-default);
+  --action-primary: var(--action-primary);
+  --border-default: var(--border-default);
+  --spacing-page-x: var(--space-layout-page-x);
+  --spacing-page-y: var(--space-layout-page-y);
+  --spacing-section-y: var(--space-layout-section-y);
+  --spacing-card-p: var(--space-component-card-padding);
+  --radius-component-panel: var(--radius-component-panel);
+  --radius-component-chip: var(--radius-component-chip);
+  --shadow-lg: var(--shadow-lg);
+  --text-h1: var(--typo-display-lg-font-size);
+  --text-h2: var(--typo-title-lg-font-size);
+  --text-caption: var(--typo-caption-font-size);
+  --font-sans: var(--typo-body-md-font-family);
+  --typo-display-lg-font-family: var(--typo-display-lg-font-family);
+}
+
+html,
+body {
+  height: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  color: var(--content-default);
+  font-family: var(--font-body), sans-serif;
+  background: var(--surface-canvas);
+  min-height: 100%;
+  line-height: 1.6;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.appFrame {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.appShell {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.appMain {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-inline-start: var(--sidebar-width, 16.5rem);
+  padding-top: 0;
+  min-height: 0;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.appContent {
+  flex: 1;
+  min-height: 0;
+  overflow-x: clip;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 900px) {
+  .appShell {
+    flex-direction: column;
+  }
+
+  .appMain {
+    padding-inline-start: 0;
+    padding-bottom: var(--bottom-tab-height, 4.25rem);
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--typo-display-lg-font-family), serif;
+}
+
+.text-display {
+  font-family: var(--typo-display-lg-font-family), serif;
+}
+
+/* Remove default browser focus ring from RNW TextInput on web */
+[data-focusable="true"]:focus,
+input:focus,
+textarea:focus {
+  outline: none;
+}
+
+[dir="rtl"] .icon-directional {
+  transform: scaleX(-1);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.listRow {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.listRow:last-child {
+  border-bottom: none;
+}
+
+button.listRow:hover,
+a.listRow:hover,
+[role="button"].listRow:hover {
+  background-color: var(--surface-hover);
+}

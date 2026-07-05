@@ -1,0 +1,36 @@
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.header {
+  margin-bottom: 24px;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--typo-display-md-font-family), serif;
+  font-size: var(--typo-display-md-font-size);
+  font-weight: var(--typo-display-md-font-weight);
+  line-height: var(--typo-display-md-line-height);
+  margin-bottom: 8px;
+  color: var(--content-strong);
+}
+
+.tagline {
+  font-family: var(--typo-body-md-font-family);
+  font-size: var(--typo-body-md-font-size);
+  color: var(--content-muted);
+  margin: 0;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-component-card, 12px);
+  background-color: var(--surface-default);
+  overflow: hidden;
+}

@@ -1,0 +1,25 @@
+{
+  "ignores": [
+    "**/node_modules/**",
+    "**/.pnpm/**",
+    "**/.turbo/**",
+    "**/.next/**",
+    "**/.expo/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/coverage/**",
+    "**/generated/**",
+    "**/.opencode/**",
+    "**/.claude/**",
+    "**/.agents/**",
+    "**/SKILL.md",
+    "**/CLAUDE.md",
+  ],
+  "config": {
+    "default": true,
+    "MD013": false,
+    "MD024": {
+      "siblings_only": true,
+    },
+  },
+}

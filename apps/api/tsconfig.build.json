@@ -1,9 +1,14 @@
 {
-  "extends": "../../packages/config/tsconfig/nest.json",
+  // Build config — drives NestJS CLI compilation and produces the dist/ output.
+  "extends": "../../tsconfig.nest.json",
   "compilerOptions": {
-    "noEmit": false,
+    "declaration": false,
+    "removeComments": true,
+    "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "./src"
+    "incremental": true,
+    "noFallthroughCasesInSwitch": true,
+    "noEmit": false
   },
   "exclude": ["node_modules", "dist", "test", "**/*.spec.ts"],
   "include": ["src/**/*.ts"]

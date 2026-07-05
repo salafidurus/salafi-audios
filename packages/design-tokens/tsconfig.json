@@ -1,0 +1,9 @@
+{
+  // Editor / typecheck only — build settings live in tsconfig.build.json.
+  "extends": "../../tsconfig.packages.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}

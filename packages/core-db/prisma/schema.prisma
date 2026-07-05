@@ -1,0 +1,486 @@
+// packages/core-db/prisma/schema.prisma
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../src/generated/prisma"
+  moduleFormat    = "cjs"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  extensions = [pg_trgm]
+}
+
+//////////////////////////
+// Enums
+//////////////////////////
+
+enum UserRole {
+  user
+  admin
+  editor
+  superadmin
+}
+
+enum Status {
+  draft
+  review
+  published
+  archived
+}
+
+enum ListingFormat {
+  collection
+  series
+  single
+}
+
+enum RecommendationRecurrence {
+  none
+  yearly
+}
+
+enum ScholarRole {
+  scholar
+  scholar_editor
+}
+
+enum LiveSessionStatus {
+  scheduled
+  live
+  ended
+}
+
+enum Locale {
+  en
+  ar
+}
+
+enum TranslationStatus {
+  draft
+  published
+}
+
+//////////////////////////
+// Ingestion batch (for seed/dummy dataset lifecycle)
+//////////////////////////
+
+model IngestionBatch {
+  id          String   @id @default(cuid())
+  tag         String
+  environment String
+  createdAt   DateTime @default(now())
+
+  scholars    Scholar[]    @relation("IngestBatchScholars")
+  listings    Listing[]    @relation("IngestBatchListings")
+  audioAssets AudioAsset[] @relation("IngestBatchAudioAssets")
+
+  @@unique([tag, environment])
+  @@index([tag])
+  @@index([environment])
+}
+
+//////////////////////////
+// Users & Roles
+//////////////////////////
+
+model User {
+  id            String    @id @default(cuid())
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  role          UserRole  @default(user)
+  banned        Boolean   @default(false)
+  banReason     String?
+  banExpires    DateTime?
+
+  // Domain extensions
+  preferredLanguage Locale?
+
+  // Relations
+  sessions            Session[]
+  accounts            Account[]
+  scholarRoles        UserScholarRole[]
+  createdScholarRoles UserScholarRole[]     @relation("createdByUser")
+  progress            UserListingProgress[]
+  favorites           FavoriteListing[]
+
+  adminPermissions        AdminPermission[]
+  adminPermissionsGranted AdminPermission[] @relation("AdminPermissionGranter")
+}
+
+model AdminPermission {
+  userId      String
+  permission  String
+  grantedAt   DateTime @default(now())
+  grantedById String?
+
+  user      User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grantedBy User? @relation("AdminPermissionGranter", fields: [grantedById], references: [id], onDelete: SetNull)
+
+  @@id([userId, permission])
+  @@index([userId])
+  @@index([permission])
+}
+
+model UserScholarRole {
+  userId          String
+  scholarId       String
+  role            ScholarRole
+  createdAt       DateTime    @default(now())
+  createdByUserId String?
+
+  user          User    @relation(fields: [userId], references: [id], onDelete: Restrict)
+  scholar       Scholar @relation(fields: [scholarId], references: [id], onDelete: Restrict)
+  createdByUser User?   @relation("createdByUser", fields: [createdByUserId], references: [id], onDelete: SetNull)
+
+  @@id([userId, scholarId, role])
+  @@index([scholarId, role], map: "idx_user_scholar_role_scholar_role")
+  @@index([userId], map: "idx_user_scholar_role_user")
+}
+
+//////////////////////////
+// Scholars
+//////////////////////////
+
+model Scholar {
+  id           String   @id @default(cuid())
+  slug         String
+  name         String
+  bio          String?
+  country      String?
+  mainLanguage Locale?
+  imageUrl     String?
+  isActive     Boolean  @default(true)
+  isKibar      Boolean  @default(false)
+  isFeatured   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Decoupled audit columns
+  createdBy String? @db.Uuid
+  updatedBy String? @db.Uuid
+  deletedBy String? @db.Uuid
+
+  // Social links
+  socialTwitter  String?
+  socialTelegram String?
+  socialYoutube  String?
+  socialWebsite  String?
+
+  ingestionBatchId String?
+  ingestionBatch   IngestionBatch? @relation("IngestBatchScholars", fields: [ingestionBatchId], references: [id])
+
+  listings           Listing[]
+  userRoles          UserScholarRole[]
+  livestreamChannels LivestreamChannel[]
+  translations       ScholarTranslation[]
+
+  @@unique([slug], map: "uq_scholar_slug")
+  @@index([isActive], map: "idx_scholar_active")
+}
+
+//////////////////////////
+// Listings
+//////////////////////////
+
+model Listing {
+  id                       String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  scholarId                String
+  parentId                 String?       @db.Uuid
+  slug                     String        @unique
+  title                    String
+  description              String?
+  format                   ListingFormat
+  coverImageUrl            String?
+  language                 Locale?
+  status                   Status        @default(draft)
+  publishedAt              DateTime?
+  orderIndex               Int?
+  durationSeconds          Int?
+  publishedLectureCount    Int?
+  publishedDurationSeconds Int?
+  createdAt                DateTime      @default(now())
+  updatedAt                DateTime?     @updatedAt
+
+  deletedAt     DateTime?
+  deleteAfterAt DateTime?
+
+  // Decoupled audit columns
+  createdBy String? @db.Uuid
+  updatedBy String? @db.Uuid
+  deletedBy String? @db.Uuid
+
+  ingestionBatchId String?
+  ingestionBatch   IngestionBatch? @relation("IngestBatchListings", fields: [ingestionBatchId], references: [id])
+
+  scholar              Scholar               @relation(fields: [scholarId], references: [id], onDelete: Restrict)
+  parent               Listing?              @relation("ListingHierarchy", fields: [parentId, scholarId], references: [id, scholarId], onDelete: Restrict)
+  children             Listing[]             @relation("ListingHierarchy")
+  audioAssets          AudioAsset[]
+  topics               ListingTopic[]
+  progress             UserListingProgress[]
+  favorites            FavoriteListing[]
+  translations         ListingTranslation[]
+  curationMetadata     CurationMetadata?
+  recommendationHeroes RecommendationHero[]
+
+  @@unique([id, scholarId])
+  @@index([title(ops: raw("gin_trgm_ops"))], type: Gin)
+  @@index([parentId])
+  @@index([scholarId, status])
+  @@index([publishedAt])
+  @@index([deletedAt])
+  @@index([deleteAfterAt])
+  @@index([orderIndex])
+}
+
+model CurationMetadata {
+  id         String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  listingId  String                   @unique @db.Uuid
+  override   Boolean                  @default(false)
+  startAt    DateTime?
+  endAt      DateTime?
+  recurrence RecommendationRecurrence @default(none)
+  listing    Listing                  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
+
+model RecommendationHero {
+  id         String    @id @default(cuid())
+  listingId  String    @db.Uuid
+  headline   String
+  orderIndex Int       @default(0)
+  isActive   Boolean   @default(true)
+  startAt    DateTime?
+  endAt      DateTime?
+  createdAt  DateTime  @default(now())
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([isActive, orderIndex], map: "idx_recommendationhero_active_order")
+  @@index([listingId], map: "idx_recommendationhero_listing")
+}
+
+//////////////////////////
+// AudioAssets
+//////////////////////////
+
+model AudioAsset {
+  id              String   @id @default(cuid())
+  listingId       String   @db.Uuid
+  url             String
+  format          String?
+  bitrateKbps     Int?
+  sizeBytes       BigInt?
+  durationSeconds Int?
+  source          String?
+  isPrimary       Boolean  @default(false)
+  createdAt       DateTime @default(now())
+
+  ingestionBatchId String?
+  ingestionBatch   IngestionBatch? @relation("IngestBatchAudioAssets", fields: [ingestionBatchId], references: [id])
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId], map: "idx_audioasset_listing")
+}
+
+//////////////////////////
+// Topics & join tables
+//////////////////////////
+
+model Topic {
+  id        String   @id @default(cuid())
+  slug      String
+  name      String
+  parentId  String?
+  createdAt DateTime @default(now())
+
+  parent        Topic?             @relation("TopicToParent", fields: [parentId], references: [id], onDelete: Cascade)
+  children      Topic[]            @relation("TopicToParent")
+  listingTopics ListingTopic[]
+  translations  TopicTranslation[]
+
+  @@unique([slug], map: "uq_topic_slug")
+  @@index([parentId], map: "idx_topic_parent")
+}
+
+model ListingTopic {
+  listingId String   @db.Uuid
+  topicId   String
+  createdAt DateTime @default(now())
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  topic   Topic   @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@id([listingId, topicId])
+  @@index([topicId, listingId], map: "idx_listingtopic_topic_listing")
+}
+
+//////////////////////////
+// Progress & Favorites
+//////////////////////////
+
+model UserListingProgress {
+  userId          String
+  listingId       String   @db.Uuid
+  positionSeconds Int      @default(0)
+  isCompleted     Boolean  @default(false)
+  updatedAt       DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@id([userId, listingId])
+  @@index([userId, updatedAt], map: "idx_progress_user_updatedat")
+  @@index([listingId], map: "idx_progress_listing")
+}
+
+model FavoriteListing {
+  userId    String
+  listingId String   @db.Uuid
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@id([userId, listingId])
+  @@index([userId, createdAt], map: "idx_fav_user_createdat")
+  @@index([listingId], map: "idx_fav_listing")
+}
+
+//////////////////////////
+// Livestreams
+//////////////////////////
+
+model LivestreamChannel {
+  id           String   @id @default(cuid())
+  scholarId    String?
+  telegramId   String   @unique
+  telegramSlug String?
+  displayName  String
+  language     Locale?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  scholar  Scholar?      @relation(fields: [scholarId], references: [id], onDelete: SetNull)
+  sessions LiveSession[]
+
+  @@index([isActive])
+  @@index([scholarId])
+}
+
+model LiveSession {
+  id            String            @id @default(cuid())
+  channelId     String
+  status        LiveSessionStatus @default(scheduled)
+  title         String?
+  scheduledAt   DateTime?
+  startedAt     DateTime?
+  endedAt       DateTime?
+  telegramMsgId String?
+  viewerCount   Int?
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  channel LivestreamChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@index([channelId, status])
+  @@index([status, scheduledAt])
+  @@index([status, startedAt])
+}
+
+//////////////////////////
+// better-auth tables
+//////////////////////////
+
+model Session {
+  id        String   @id @default(cuid())
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([providerId, accountId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model ScholarTranslation {
+  id        String            @id @default(cuid())
+  scholarId String
+  locale    Locale
+  status    TranslationStatus @default(draft)
+  name      String
+  bio       String?
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  scholar Scholar @relation(fields: [scholarId], references: [id], onDelete: Cascade)
+
+  @@unique([scholarId, locale])
+  @@index([scholarId])
+}
+
+model ListingTranslation {
+  id          String            @id @default(cuid())
+  listingId   String            @db.Uuid
+  locale      Locale
+  status      TranslationStatus @default(draft)
+  title       String
+  description String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([listingId, locale])
+  @@index([listingId])
+}
+
+model TopicTranslation {
+  id        String            @id @default(cuid())
+  topicId   String
+  locale    Locale
+  status    TranslationStatus @default(draft)
+  name      String
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  topic Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@unique([topicId, locale])
+  @@index([topicId])
+}

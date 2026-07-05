@@ -1,0 +1,172 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "back": "Back",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "and": "and"
+  },
+  "auth": {
+    "signIn": {
+      "kicker": "Welcome Back",
+      "title": "Sign In",
+      "orEmail": "or sign in with email",
+      "orContinue": "or continue with email",
+      "submit": "Sign In",
+      "submitting": "Signing in\u2026",
+      "noAccount": "Don't have an account? Create one",
+      "noAccountSplit": "Don't have an account?",
+      "noAccountLink": "Create one",
+      "failed": "Sign in failed"
+    }
+  },
+  "validation": {
+    "emailInvalid": "Please enter a valid email address."
+  },
+  "account": {
+    "title": "Account",
+    "defaultUser": "User",
+    "editProfile": "Edit Profile",
+    "legal": "Legal",
+    "signOut": "Sign Out",
+    "language": "Language",
+    "showOriginalContent": "Show content in its original language"
+  },
+  "tabs": {
+    "search": "Search",
+    "feed": "Feed",
+    "live": "Live",
+    "library": "Library",
+    "account": "Account"
+  },
+  "navigation": {
+    "explore": "Explore",
+    "live": "Live",
+    "library": "Library",
+    "account": "Account",
+    "siteTitle": "Salafi Durus",
+    "primarySidebar": "Primary sidebar",
+    "mainNav": "Main",
+    "expandSidebar": "Expand sidebar",
+    "collapseSidebar": "Collapse sidebar",
+    "siteFooter": "Site footer",
+    "languageSwitch": "Language switch",
+    "subnav": {
+      "feed": { "popular": "Popular", "recent": "Recent", "following": "Following" },
+      "live": { "ongoing": "Live Now", "scheduled": "Scheduled", "ended": "Ended" },
+      "library": { "started": "Started", "saved": "Saved", "completed": "Completed" },
+      "account": { "general": "General", "profile": "Profile", "legal": "Legal" }
+    }
+  },
+  "support": {
+    "title": "Support",
+    "faqSection": "Frequently Asked Questions",
+    "contactSection": "Contact Us",
+    "faq": {
+      "whatIs": {
+        "q": "What is Salafi Durus?",
+        "a": "Salafi Durus is a platform for authentic Islamic audio lectures from trusted scholars following the Salafi methodology."
+      },
+      "saveLectures": {
+        "q": "How do I save lectures for later?",
+        "a": "Tap the bookmark icon on any lecture to add it to your Library. You can access saved lectures from the Library tab."
+      },
+      "offline": {
+        "q": "Can I listen offline?",
+        "a": "Yes — download lectures using the download button on the lecture detail screen. Downloaded lectures are available without an internet connection."
+      },
+      "followScholar": {
+        "q": "How do I follow a scholar?",
+        "a": "Visit a scholar's profile and tap Follow. New lectures from followed scholars appear in your Feed."
+      }
+    },
+    "contact": {
+      "email": {
+        "q": "Email",
+        "a": "support@salafidurus.com"
+      },
+      "responseTime": {
+        "q": "Response time",
+        "a": "We aim to respond within 48 hours."
+      }
+    }
+  },
+  "footer": {
+    "copyright": "© {{year}} Salafi Durus",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "support": "Support"
+  },
+  "authStrip": {
+    "search": "Search",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "createAccount": "Create Free Account",
+    "topActions": "Top actions"
+  },
+  "search": {
+    "placeholder": "Search",
+    "searching": "Searching…",
+    "noResults": "No results found.",
+    "startTyping": "Start typing to search.",
+    "suggestions": "Suggestions",
+    "scholars": "Scholars",
+    "continueListening": "Continue Listening"
+  },
+  "library": {
+    "title": "My Library",
+    "inProgress": "In Progress",
+    "saved": "Saved",
+    "completed": "Completed",
+    "loadingSection": "Loading {{section}}…",
+    "emptyProgress": "No lectures in progress.",
+    "emptySaved": "No saved lectures yet. Save lectures to listen to later.",
+    "emptyCompleted": "No completed lectures yet. Keep listening!",
+    "percentListened": "{{percent}}% listened",
+    "savedOn": "Saved {{date}}",
+    "completedOn": "Completed {{date}}"
+  },
+  "lecture": {
+    "loading": "Loading lecture…",
+    "notFound": "Lecture not found",
+    "minutes": "{{count}} min"
+  },
+  "scholarContent": {
+    "collections": "Collections",
+    "series": "Series",
+    "singles": "Singles",
+    "lectures": "Lectures",
+    "empty": "No published content yet.",
+    "seriesCount": "{{count}} series",
+    "lectureCount": "{{count}} lectures"
+  },
+  "feed": {
+    "newInTopic": "New in {{topic}}",
+    "loading": "Loading feed...",
+    "empty": "No lectures available in this feed.",
+    "error": "Failed to load feed content.",
+    "retry": "Try Again",
+    "loadMore": "Load more",
+    "followingEmpty": "Follow scholars to see their latest lectures here."
+  },
+  "live": {
+    "title": "Live Sessions",
+    "loading": "Loading streams...",
+    "empty": "No live sessions right now.",
+    "error": "Failed to check live sessions.",
+    "retry": "Retry",
+    "sections": {
+      "ongoing": { "title": "Live Now", "empty": "No live sessions right now." },
+      "scheduled": { "title": "Upcoming", "empty": "No upcoming sessions scheduled." },
+      "ended": { "title": "Recently Ended", "empty": "No recent sessions." }
+    }
+  },
+  "notFound": {
+    "title": "Oops!",
+    "message": "Page not found",
+    "nativeDescription": "This native route has not been migrated yet. Tap back in the app or return home."
+  }
+}

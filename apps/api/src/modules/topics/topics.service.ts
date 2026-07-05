@@ -1,0 +1,77 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  TopicDetailDto,
+  TopicViewDto,
+  TopicLectureViewDto,
+  TranslationViewDto,
+} from '@sd/core-contracts';
+import { UpsertTopicDto } from './dto/upsert-topic.dto';
+import { SaveTopicTranslationDto } from './dto/save-topic-translation.dto';
+import { TopicsRepository } from './topics.repo';
+
+@Injectable()
+export class TopicsService {
+  constructor(private readonly repo: TopicsRepository) {}
+
+  list(): Promise<TopicDetailDto[]> {
+    return this.repo.list();
+  }
+
+  async getBySlug(slug: string): Promise<TopicDetailDto> {
+    const found = await this.repo.findBySlug(slug);
+    if (!found) throw new NotFoundException(`Topic "${slug}" not found`);
+    return found;
+  }
+
+  async upsert(dto: UpsertTopicDto): Promise<TopicDetailDto> {
+    const result = await this.repo.upsertBySlug(dto);
+    if (!result && dto.parentSlug) {
+      throw new NotFoundException(`Parent topic "${dto.parentSlug}" not found`);
+    }
+    return result ?? (await this.getBySlug(dto.slug)); // safe fallback if upsert somehow returns null without parentSlug
+  }
+
+  async listChildren(slug: string): Promise<TopicViewDto[]> {
+    const result = await this.repo.listChildrenBySlug(slug);
+    if (result === null) throw new NotFoundException('Topic not found');
+    return result;
+  }
+
+  async listLectures(slug: string, limit?: number): Promise<TopicLectureViewDto[]> {
+    const result = await this.repo.listPublishedLecturesByTopicSlug(slug, limit);
+    if (result === null) throw new NotFoundException('Topic not found');
+    return result;
+  }
+
+  async remove(slug: string): Promise<void> {
+    const found = await this.repo.findBySlug(slug);
+    if (!found) throw new NotFoundException(`Topic "${slug}" not found`);
+    await this.repo.deleteBySlug(slug);
+  }
+
+  // ─── Topic translations ───────────────────────────────────────────────────
+
+  listTranslations(topicId: string): Promise<TranslationViewDto[]> {
+    return this.repo.listTopicTranslations(topicId);
+  }
+
+  upsertTranslation(topicId: string, dto: SaveTopicTranslationDto): Promise<TranslationViewDto> {
+    return this.repo.upsertTopicTranslation(topicId, dto);
+  }
+
+  updateTranslation(
+    topicId: string,
+    locale: string,
+    fields: Partial<{ name: string }>,
+  ): Promise<TranslationViewDto> {
+    return this.repo.updateTopicTranslation(topicId, locale, fields);
+  }
+
+  publishTranslation(topicId: string, locale: string): Promise<TranslationViewDto> {
+    return this.repo.publishTopicTranslation(topicId, locale);
+  }
+
+  unpublishTranslation(topicId: string, locale: string): Promise<TranslationViewDto> {
+    return this.repo.unpublishTopicTranslation(topicId, locale);
+  }
+}

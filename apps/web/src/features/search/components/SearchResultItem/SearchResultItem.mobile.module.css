@@ -1,0 +1,91 @@
+.card {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-component-card);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-component-gap-md);
+  padding: var(--space-component-card-padding);
+  background: var(--surface-default);
+  cursor: pointer;
+  width: 100%;
+  text-align: start;
+  transition:
+    background 0.1s,
+    border-color 0.1s;
+}
+
+.cardPressed {
+  background: var(--accent-primary-subtle-surface);
+  border-color: var(--accent-primary-subtle-border);
+}
+
+.media {
+  width: 20%;
+  aspect-ratio: 4 / 5;
+  border-radius: var(--radius-component-panel-sm);
+  overflow: hidden;
+  background: var(--surface-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.coverFallback {
+  width: 100%;
+  height: 100%;
+  background: var(--surface-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
+  overflow: hidden;
+  min-width: 0;
+}
+
+.title {
+  color: var(--content-strong);
+  font-family: var(--typo-title-md-font-family);
+  font-size: var(--typo-title-md-font-size);
+  line-height: var(--typo-title-md-line-height);
+  letter-spacing: var(--typo-title-md-letter-spacing);
+  font-weight: var(--typo-title-md-font-weight);
+}
+
+.scholarName {
+  color: var(--content-muted);
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+  line-height: var(--typo-body-sm-line-height);
+  letter-spacing: var(--typo-body-sm-letter-spacing);
+  font-weight: var(--typo-body-sm-font-weight);
+}
+
+.metaRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-scale-xs);
+}
+
+.metaText {
+  color: var(--content-muted);
+  font-family: var(--typo-caption-font-family);
+  font-size: var(--typo-caption-font-size);
+  line-height: var(--typo-caption-line-height);
+  letter-spacing: var(--typo-caption-letter-spacing);
+  font-weight: var(--typo-caption-font-weight);
+}

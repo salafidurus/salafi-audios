@@ -1,0 +1,265 @@
+import { useCallback, useState } from "react";
+import { FlatList, Pressable, ScrollView, Text, View } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import type { LivestreamChannelDto, LiveSessionPublicDto } from "@sd/core-contracts";
+import { useAdminChannels, useAdminSessions } from "../../hooks/use-admin-live";
+import { updateSessionStatus } from "../../api/admin-live.api";
+import { ChannelSheet } from "../../components/ChannelSheet/ChannelSheet";
+import { SessionSheet } from "../../components/SessionSheet/SessionSheet";
+
+function SessionRow({
+  session,
+  onStatusChange,
+}: {
+  session: LiveSessionPublicDto;
+  onStatusChange: (id: string, status: "live" | "ended") => void;
+}) {
+  const { theme } = useUnistyles();
+  const statusColor =
+    session.status === "live"
+      ? theme.colors.state.danger
+      : session.status === "scheduled"
+        ? theme.colors.action.secondary
+        : theme.colors.content.muted;
+  return (
+    <View style={styles.sessionRow}>
+      <View style={styles.sessionRowHeader}>
+        <Text style={styles.sessionTitle} numberOfLines={1}>
+          {session.title ?? session.channelDisplayName}
+        </Text>
+        <View style={[styles.statusBadge, { backgroundColor: statusColor + "22" }]}>
+          <Text style={[styles.statusText, { color: statusColor }]}>{session.status}</Text>
+        </View>
+      </View>
+      <View style={styles.sessionActions}>
+        {session.status === "scheduled" && (
+          <Pressable onPress={() => onStatusChange(session.id, "live")} style={styles.goLiveBtn}>
+            <Text style={[styles.actionBtnText, styles.goLiveBtnText]}>Go Live</Text>
+          </Pressable>
+        )}
+        {session.status === "live" && (
+          <Pressable onPress={() => onStatusChange(session.id, "ended")} style={styles.endBtn}>
+            <Text style={[styles.actionBtnText, styles.endBtnText]}>End</Text>
+          </Pressable>
+        )}
+      </View>
+    </View>
+  );
+}
+
+type ChannelRowProps = {
+  channel: LivestreamChannelDto;
+  onPress: (channel: LivestreamChannelDto) => void;
+};
+
+function ChannelRow({ channel, onPress }: ChannelRowProps) {
+  return (
+    <Pressable onPress={() => onPress(channel)} style={styles.channelRow}>
+      <Text style={styles.channelName}>{channel.displayName}</Text>
+      <Text style={styles.channelMeta}>
+        {channel.telegramSlug ? `@${channel.telegramSlug}` : "Private"} · {channel.language ?? "—"}{" "}
+        · {channel.isActive ? "Active" : "Inactive"}
+      </Text>
+    </Pressable>
+  );
+}
+
+export function AdminLiveScreen() {
+  const { data: sessionsData, refetch: refetchSessions } = useAdminSessions();
+  const { data: channels, refetch: refetchChannels } = useAdminChannels();
+  const [showChannelSheet, setShowChannelSheet] = useState(false);
+  const [editingChannel, setEditingChannel] = useState<LivestreamChannelDto | undefined>();
+  const [showSessionSheet, setShowSessionSheet] = useState(false);
+  const sessions = sessionsData?.sessions ?? [];
+
+  const handleStatusChange = useCallback(
+    async (id: string, status: "live" | "ended") => {
+      await updateSessionStatus(id, status);
+      refetchSessions();
+    },
+    [refetchSessions],
+  );
+
+  const handleChannelPress = useCallback((channel: LivestreamChannelDto) => {
+    setEditingChannel(channel);
+    setShowChannelSheet(true);
+  }, []);
+
+  const renderSessionItem = useCallback(
+    ({ item: s }: { item: LiveSessionPublicDto }) => (
+      <SessionRow session={s} onStatusChange={handleStatusChange} />
+    ),
+    [handleStatusChange],
+  );
+
+  const renderChannelItem = useCallback(
+    ({ item: ch }: { item: LivestreamChannelDto }) => (
+      <ChannelRow channel={ch} onPress={handleChannelPress} />
+    ),
+    [handleChannelPress],
+  );
+
+  return (
+    <ScrollView style={styles.screen} contentContainerStyle={styles.screenContent}>
+      {/* Sessions */}
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>Sessions</Text>
+        <Pressable onPress={() => setShowSessionSheet(true)} style={styles.newBtn}>
+          <Text style={styles.newBtnText}>+ New</Text>
+        </Pressable>
+      </View>
+      {sessions.length === 0 && <Text style={styles.emptyText}>No sessions found.</Text>}
+      <FlatList
+        data={sessions}
+        keyExtractor={(s) => s.id}
+        scrollEnabled={false}
+        renderItem={renderSessionItem}
+      />
+
+      {/* Channels */}
+      <View style={[styles.sectionHeader, styles.sectionHeaderSpacing]}>
+        <Text style={styles.sectionTitle}>Channels</Text>
+        <Pressable
+          onPress={() => {
+            setEditingChannel(undefined);
+            setShowChannelSheet(true);
+          }}
+          style={styles.newBtn}
+        >
+          <Text style={styles.newBtnText}>+ New</Text>
+        </Pressable>
+      </View>
+      <FlatList
+        data={channels ?? []}
+        keyExtractor={(ch) => ch.id}
+        scrollEnabled={false}
+        renderItem={renderChannelItem}
+      />
+
+      <ChannelSheet
+        isOpen={showChannelSheet}
+        channel={editingChannel}
+        onClose={() => setShowChannelSheet(false)}
+        onSaved={() => {
+          setShowChannelSheet(false);
+          refetchChannels();
+        }}
+      />
+      <SessionSheet
+        isOpen={showSessionSheet}
+        channels={channels ?? []}
+        onClose={() => setShowSessionSheet(false)}
+        onSaved={() => {
+          setShowSessionSheet(false);
+          refetchSessions();
+        }}
+      />
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create((theme) => ({
+  screen: {
+    flex: 1,
+  },
+  screenContent: {
+    padding: theme.spacing.scale.lg,
+    paddingBottom: theme.spacing.scale["4xl"],
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: theme.spacing.scale.md,
+  },
+  sectionHeaderSpacing: {
+    marginTop: theme.spacing.scale["2xl"],
+  },
+  sectionTitle: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: "700",
+    color: theme.colors.content.strong,
+  },
+  newBtn: {
+    padding: theme.spacing.scale.sm,
+    backgroundColor: theme.colors.action.primary,
+    borderRadius: theme.radius.scale.sm,
+  },
+  newBtnText: {
+    color: theme.colors.content.onPrimary,
+    fontWeight: "600",
+  },
+  emptyText: {
+    color: theme.colors.content.muted,
+    marginBottom: theme.spacing.scale.lg,
+  },
+  sessionRow: {
+    padding: theme.spacing.scale.md,
+    borderWidth: theme.border.width.default,
+    borderColor: theme.colors.border.subtle,
+    borderRadius: theme.radius.scale.sm,
+    marginBottom: theme.spacing.scale.sm,
+  },
+  sessionRowHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.scale.sm,
+  },
+  sessionTitle: {
+    flex: 1,
+    fontWeight: "600",
+    color: theme.colors.content.strong,
+  },
+  statusBadge: {
+    paddingHorizontal: theme.spacing.scale.sm,
+    paddingVertical: theme.spacing.scale.xs,
+    borderRadius: theme.radius.scale.xs,
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: "600",
+    textTransform: "capitalize",
+  },
+  sessionActions: {
+    flexDirection: "row",
+    gap: theme.spacing.component.chipY,
+    marginTop: theme.spacing.scale.sm,
+  },
+  goLiveBtn: {
+    paddingHorizontal: theme.spacing.scale.sm,
+    paddingVertical: theme.spacing.scale.xs,
+    backgroundColor: theme.colors.action.danger,
+    borderRadius: theme.radius.scale.sm,
+  },
+  goLiveBtnText: {
+    color: theme.colors.content.onDanger,
+  },
+  endBtn: {
+    paddingHorizontal: theme.spacing.scale.sm,
+    paddingVertical: theme.spacing.scale.xs,
+    backgroundColor: theme.colors.surface.inverse,
+    borderRadius: theme.radius.scale.sm,
+  },
+  endBtnText: {
+    color: theme.colors.content.inverse,
+  },
+  actionBtnText: {
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  channelRow: {
+    padding: theme.spacing.scale.md,
+    borderWidth: theme.border.width.default,
+    borderColor: theme.colors.border.subtle,
+    borderRadius: theme.radius.scale.sm,
+    marginBottom: theme.spacing.scale.sm,
+  },
+  channelName: {
+    fontWeight: "600",
+    color: theme.colors.content.strong,
+  },
+  channelMeta: {
+    fontSize: 12,
+    color: theme.colors.content.muted,
+  },
+}));

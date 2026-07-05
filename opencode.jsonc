@@ -1,0 +1,50 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": ["**/AGENT.md", ".agents/skills/project-guardrails/SKILL.md"],
+  "mcp": {
+    "tailwindcss": {
+      "enabled": true,
+    },
+    "playwright": {
+      "enabled": false,
+    },
+    "stitch": {
+      "enabled": false,
+    },
+    "antigravity": {
+      "enabled": false,
+    },
+    "hugeicons": {
+      "enabled": false,
+    },
+    "server-github": {
+      "enabled": true,
+    },
+    "in-memoria": {
+      "enabled": true,
+    },
+    "sequential-thinking": {
+      "enabled": true,
+    },
+    "kratos": {
+      "enabled": false,
+    },
+    "context7": {
+      "enabled": true,
+    },
+    "server-memory": {
+      "enabled": true,
+    },
+    "argent": {
+      "type": "local",
+      "command": ["argent", "mcp"],
+      "enabled": true,
+      "environment": {
+        "ARGENT_MCP_LOG": "C:\\Users\\olanr\\.argent\\mcp-calls.log",
+      },
+    },
+  },
+  "tools": {
+    "argent*": true,
+  },
+}

@@ -1,24 +1,66 @@
+import './shared/utils/env.bootstrap';
+import { ConfigService } from './shared/config/config.service';
+import { AllExceptionsFilter } from './shared/errors/http-exception.filter';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { Transport } from '@nestjs/microservices';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { Logger } from 'nestjs-pino';
+import { AppModule } from './app.module';
+import { initAuth, getAuth } from './modules/auth/auth.instance';
+import { toNodeHandler } from 'better-auth/node';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
+import { ZodValidationPipe } from 'nestjs-zod';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const config = app.get(ConfigService);
+  initAuth(config);
+
+  app.useLogger(app.get(Logger));
+  app.use(helmet({ contentSecurityPolicy: false }));
+  app.useGlobalPipes(new ZodValidationPipe());
+  app.useGlobalFilters(new AllExceptionsFilter(app.get(ConfigService)));
+  app.use(cookieParser());
+
+  app.enableCors({
+    origin: (
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void,
+    ) => {
+      if (!origin) return callback(null, true);
+      if (config.CORS_ORIGINS.includes(origin)) return callback(null, true);
+      return callback(new Error(`CORS blocked origin: ${origin}`), false);
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-Id', 'Cookie'],
+    exposedHeaders: ['X-Request-Id', 'Set-Cookie', 'set-auth-token'],
+  });
+
+  // Mount better-auth as Express middleware — handles all /api/auth/* routes
+  // before NestJS routing, bypassing ValidationPipe and wildcard issues.
+  app.use('/api/auth', toNodeHandler(getAuth()));
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Salafi Durus API')
     .setDescription('Backend API for Salafi Durus')
     .setVersion('1.0.0')
-    .addBearerAuth(
-      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
-      'bearer',
-    )
+    .addCookieAuth('better-auth.session_token')
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('docs', app, document);
 
-  await app.listen(process.env.PORT ?? 4000);
+  // TCP microservice listener — dormant until @MessagePattern handlers are added.
+  // Split-later: extract TelegramModule to a separate process pointing at this port.
+  app.connectMicroservice({
+    transport: Transport.TCP,
+    options: { host: '127.0.0.1', port: 5001 },
+  });
+  await app.startAllMicroservices();
+
+  await app.listen(config.PORT);
 }
 
 void bootstrap();

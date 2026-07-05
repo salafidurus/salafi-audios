@@ -1,7 +1,20 @@
 {
+  // Shared base compiler options for every workspace. Family presets
+  // (tsconfig.packages.json, tsconfig.nest.json) and apps extend this file.
   "compilerOptions": {
+    // target ES2023 for broad modern-runtime compat; lib ES2024 exposes all modern built-ins
+    "target": "ES2023",
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "strict": true,
+    // Skip .d.ts validation in node_modules — speeds up compilation significantly
     "skipLibCheck": true,
-    "noEmit": true
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    // Forces explicit `import type` for type-only imports — required for correct bundler output
+    "verbatimModuleSyntax": true,
+    // Array index / object key access returns T | undefined — prevents common runtime crashes
+    "noUncheckedIndexedAccess": true,
+    // Treat every file as a module — avoids accidental global scripts under modern tooling
+    "moduleDetection": "force"
   }
 }

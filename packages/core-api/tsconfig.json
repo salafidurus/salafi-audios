@@ -1,0 +1,10 @@
+{
+  // Consumed as source by Expo and Next.js bundlers — never run directly by Node.
+  // Extends canonical packages preset (ESNext + Bundler moduleResolution + noEmit).
+  "extends": "../../tsconfig.packages.json",
+  "compilerOptions": {
+    "jsx": "react-native",
+    "allowImportingTsExtensions": true
+  },
+  "include": ["src"]
+}

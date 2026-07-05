@@ -1,0 +1,58 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { httpClient } from "@sd/core-contracts";
+import type { LiveSessionPublicDto, LiveSessionDeltaDto } from "@sd/core-contracts";
+
+function mergeDelta(
+  current: LiveSessionPublicDto[],
+  delta: LiveSessionDeltaDto,
+): LiveSessionPublicDto[] {
+  const deltaMap = new Map(delta.sessions.map((s) => [s.id, s]));
+  const deletedSet = new Set(delta.deletedIds);
+
+  const merged = current.reduce<LiveSessionPublicDto[]>((acc, s) => {
+    if (!deletedSet.has(s.id)) acc.push(deltaMap.get(s.id) ?? s);
+    return acc;
+  }, []);
+
+  const existingIds = new Set(current.map((s) => s.id));
+  const added = delta.sessions.filter((s) => !existingIds.has(s.id));
+
+  return [...merged, ...added];
+}
+
+export function useLiveSection(
+  endpoint: string,
+  queryKey: readonly string[],
+  refetchIntervalMs: number,
+) {
+  const fetchedAtRef = useRef<string | undefined>(undefined);
+
+  const { data, isLoading } = useQuery<LiveSessionDeltaDto>({
+    queryKey,
+    queryFn: async () => {
+      const res = await httpClient<LiveSessionDeltaDto>({
+        url: endpoint,
+        method: "GET",
+        params: fetchedAtRef.current ? { since: fetchedAtRef.current } : undefined,
+      });
+      return res;
+    },
+    refetchInterval: refetchIntervalMs,
+    staleTime: 0,
+    gcTime: 0,
+  });
+
+  const [sessions, setSessions] = useState<LiveSessionPublicDto[]>([]);
+
+  useEffect(() => {
+    if (!data) return;
+    fetchedAtRef.current = data.fetchedAt;
+    // react-doctor-disable-next-line react-doctor/no-derived-state
+    setSessions((prev) => mergeDelta(prev, data));
+  }, [data]);
+
+  return { sessions, setSessions, isLoading };
+}

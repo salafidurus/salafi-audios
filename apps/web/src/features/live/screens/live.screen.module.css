@@ -1,0 +1,29 @@
+.page {
+  min-height: 100vh;
+  padding-top: var(--top-nav-height, 0px);
+  padding-bottom: var(--space-scale-4xl);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-3xl);
+}
+
+.listContainer {
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 var(--space-scale-md, 16px);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-radius: var(--radius-component-panel, 12px);
+  border: var(--border-width-default, 1px) solid var(--border-subtle, #e5e7eb);
+  background: var(--surface-default, #ffffff);
+  overflow: hidden;
+}
+

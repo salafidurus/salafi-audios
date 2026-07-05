@@ -1,5 +1,12 @@
 {
-  "extends": "../../packages/config/tsconfig/next.json",
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "extends": "../../tsconfig.packages.json",
+  "compilerOptions": {
+    // Next.js handles JSX transformation via SWC; TS should not transform it
+    "jsx": "preserve",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
 }

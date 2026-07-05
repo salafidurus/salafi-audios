@@ -1,41 +1,83 @@
 {
-  "$schema": "https://turbo.build/schema.json",
+  "$schema": "https://turborepo.dev/schema.v2.json",
   "ui": "tui",
+  // Prisma client generation needs DB URLs at build time; pass them through to all tasks
+  "globalPassThroughEnv": ["DIRECT_DB_URL", "DATABASE_URL"],
+  // Root-level shared lint/tsconfig presets — a change here invalidates every task's cache
+  "globalDependencies": [
+    "tsconfig.base.json",
+    "tsconfig.packages.json",
+    "tsconfig.nest.json",
+    ".oxlintrc.json"
+  ],
   "tasks": {
     "dev": {
+      // Build workspace dependencies first (cached) so dist/ exports resolve
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     },
     "build": {
+      // Topological: packages build before apps that depend on them
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", "build/**", ".next/**", "lib/**"]
+      // Env files included because Next.js and NestJS inline env vars at build time
+      "inputs": ["$TURBO_DEFAULT$", ".env*", "tsconfig*.json", "next.config.*"],
+      "outputs": ["dist/**", "build/**", ".next/**", "lib/**", "generated/**", "src/generated/**"]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["^lint"],
+      // Include ESLint configs (web/native still use ESLint) and oxlint config
+      "inputs": ["$TURBO_DEFAULT$", "eslint.config.*"],
+      "outputs": []
     },
     "typecheck": {
-      "dependsOn": ["^typecheck"]
+      // ^build so dependencies' emitted .d.ts exist before we typecheck. apps/api uses
+      // classic "node" moduleResolution, which ignores package "exports" and reads the
+      // top-level "types": "./dist/index.d.ts" — that file must be built first.
+      "dependsOn": ["^build", "^typecheck"],
+      // Include shared tsconfig so typecheck re-runs when compiler options change
+      "inputs": ["$TURBO_DEFAULT$", "tsconfig*.json"],
+      // Most packages emit nothing from typecheck (tsc --noEmit); declaring outputs here
+      // produced "no output files found" warnings. Prisma generation is scoped to the
+      // @sd/core-db override below.
+      "outputs": []
+    },
+    // core-db's pretypecheck runs `prisma generate`, so its typecheck genuinely emits the
+    // client. Cache it for downstream consumers.
+    "@sd/core-db#typecheck": {
+      "dependsOn": ["build", "^typecheck"],
+      "inputs": ["$TURBO_DEFAULT$", "tsconfig*.json"],
+      "outputs": ["generated/**", "src/generated/**"]
     },
     "test": {
-      "dependsOn": ["^test"],
-      "cache": true
+      "dependsOn": ["^build", "^test"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "**/*.spec.*",
+        "**/*.test.*",
+        "jest.config.*",
+        "**/jest.config.*",
+        "vitest.config.*",
+        "**/vitest.config.*"
+      ],
+      "outputs": []
     },
     "test:e2e": {
-      "dependsOn": ["^test:e2e"],
-      "cache": false
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", "e2e/**/*.ts"],
+      "outputs": ["playwright-report/**", "test-results/**"],
+      "cache": true,
+      "env": ["CI", "PW_SKIP_WEB_BUILD"]
     },
     "test:prepush": {
-      "dependsOn": ["^test:prepush"]
+      "dependsOn": ["^build", "^test:prepush"],
+      "cache": true
     },
-    "openapi": {
-      "dependsOn": ["^openapi"],
-      "inputs": ["src/**", "package.json", "tsconfig.json"],
-      "outputs": ["openapi.json"]
-    },
-    "codegen": {
-      "dependsOn": ["openapi"],
-      "inputs": ["openapi.json", "orval.config.cjs"],
-      "outputs": ["src/generated/**"]
+    // Builds shared contract types (DTOs, response shapes) consumed by web and mobile
+    "contract": {
+      "dependsOn": ["^contract"],
+      "inputs": ["$TURBO_DEFAULT$", "src/**", "package.json", "tsconfig*.json"],
+      "outputs": ["dist/**"]
     },
     "clean": {
       "cache": false

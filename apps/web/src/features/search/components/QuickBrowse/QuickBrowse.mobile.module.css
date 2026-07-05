@@ -1,0 +1,289 @@
+.root {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-xl);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-md);
+}
+
+.header {
+  color: var(--content-strong);
+  font-family: var(--typo-title-md-font-family);
+  font-size: var(--typo-title-md-font-size);
+  line-height: var(--typo-title-md-line-height);
+  letter-spacing: var(--typo-title-md-letter-spacing);
+  font-weight: var(--typo-title-md-font-weight);
+}
+
+/* Continue Listening */
+
+.continueCard {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-component-card);
+  background: var(--surface-default);
+  padding: var(--space-component-card-padding);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
+  cursor: pointer;
+  text-align: start;
+  width: 100%;
+}
+
+.continueTitle {
+  color: var(--content-strong);
+  font-family: var(--typo-label-md-font-family);
+  font-size: var(--typo-label-md-font-size);
+  line-height: var(--typo-label-md-line-height);
+  letter-spacing: var(--typo-label-md-letter-spacing);
+  font-weight: var(--typo-label-md-font-weight);
+}
+
+.continueScholar {
+  color: var(--content-muted);
+  font-family: var(--typo-caption-font-family);
+  font-size: var(--typo-caption-font-size);
+  line-height: var(--typo-caption-line-height);
+  letter-spacing: var(--typo-caption-letter-spacing);
+  font-weight: var(--typo-caption-font-weight);
+}
+
+.progressRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-scale-sm);
+}
+
+.progressTrack {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--surface-hover);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--action-primary);
+}
+
+.progressTime {
+  color: var(--content-muted);
+  font-family: var(--typo-caption-font-family);
+  font-size: var(--typo-caption-font-size);
+  line-height: var(--typo-caption-line-height);
+  letter-spacing: var(--typo-caption-letter-spacing);
+  font-weight: var(--typo-caption-font-weight);
+}
+
+/* Scholars */
+
+.scholarScroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.scholarScroll::-webkit-scrollbar {
+  display: none;
+}
+
+.scholarRow {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-component-gap-md);
+}
+
+.scholarChip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-scale-xs);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.scholarAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+  border: 1px solid var(--border-default);
+  background: var(--surface-default);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.scholarInitial {
+  color: var(--content-muted);
+  font-family: var(--typo-label-md-font-family);
+  font-size: var(--typo-label-md-font-size);
+  line-height: var(--typo-label-md-line-height);
+  letter-spacing: var(--typo-label-md-letter-spacing);
+  font-weight: var(--typo-label-md-font-weight);
+}
+
+.scholarName {
+  max-width: 72px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--content-default);
+  font-family: var(--typo-caption-font-family);
+  font-size: var(--typo-caption-font-size);
+  line-height: var(--typo-caption-line-height);
+  letter-spacing: var(--typo-caption-letter-spacing);
+  font-weight: var(--typo-caption-font-weight);
+}
+
+/* Suggestions */
+
+.suggestionsScroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.suggestionsScroll::-webkit-scrollbar {
+  display: none;
+}
+
+.suggestionsRow {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-component-gap-md);
+}
+
+.suggestionCard {
+  width: 160px;
+  flex-shrink: 0;
+  padding: var(--space-component-card-padding);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-component-card);
+  background: var(--surface-default);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
+  cursor: pointer;
+  text-align: start;
+}
+
+.suggestionTitle {
+  color: var(--content-strong);
+  font-family: var(--typo-label-md-font-family);
+  font-size: var(--typo-label-md-font-size);
+  line-height: var(--typo-label-md-line-height);
+  letter-spacing: var(--typo-label-md-letter-spacing);
+  font-weight: var(--typo-label-md-font-weight);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.suggestionScholar {
+  color: var(--content-muted);
+  font-family: var(--typo-caption-font-family);
+  font-size: var(--typo-caption-font-size);
+  line-height: var(--typo-caption-line-height);
+  letter-spacing: var(--typo-caption-letter-spacing);
+  font-weight: var(--typo-caption-font-weight);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.suggestionMeta {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-scale-xs);
+}
+
+.kindBadge {
+  background: var(--surface-hover);
+  border-radius: var(--radius-component-chip);
+  padding: 1px var(--space-scale-xs);
+}
+
+.kindText {
+  color: var(--content-muted);
+  font-family: var(--typo-caption-font-family);
+  font-size: var(--typo-caption-font-size);
+  line-height: var(--typo-caption-line-height);
+  letter-spacing: var(--typo-caption-letter-spacing);
+  font-weight: var(--typo-caption-font-weight);
+}
+
+.durationText {
+  color: var(--content-muted);
+  font-family: var(--typo-caption-font-family);
+  font-size: var(--typo-caption-font-size);
+  line-height: var(--typo-caption-line-height);
+  letter-spacing: var(--typo-caption-letter-spacing);
+  font-weight: var(--typo-caption-font-weight);
+}
+
+/* Skeletons */
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.skeletonAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 24px;
+  background: var(--surface-hover);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.skeletonName {
+  width: 48px;
+  height: 10px;
+  border-radius: var(--radius-component-chip);
+  background: var(--surface-hover);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.skeletonCard {
+  width: 160px;
+  flex-shrink: 0;
+  padding: var(--space-component-card-padding);
+  border-radius: var(--radius-component-card);
+  background: var(--surface-hover);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.skeletonLineLg {
+  height: 14px;
+  border-radius: var(--radius-component-chip);
+  background: var(--surface-default);
+}
+
+.skeletonLineSm {
+  height: 10px;
+  width: 60%;
+  border-radius: var(--radius-component-chip);
+  background: var(--surface-default);
+}
