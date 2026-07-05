@@ -4,11 +4,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { DraggableList, type RenderItemParams } from "@/shared/components/DraggableList";
 import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
-import type {
-  ScholarDetailDto,
-  AdminSeriesListItemDto,
-  AdminCollectionListItemDto,
-} from "@sd/core-contracts";
+import type { ScholarDetailDto, AdminListingListItemDto } from "@sd/core-contracts";
 import { useAdminSeries, useAdminCollections } from "../../hooks/use-admin-scholars";
 import { updateSeries, updateCollection } from "../../api/admin-scholars.api";
 import { SeriesSheet } from "../../components/SeriesSheet/SeriesSheet";
@@ -23,8 +19,8 @@ type ScreenState = {
   collectionsExpanded: boolean;
   showSeriesSheet: boolean;
   showCollectionSheet: boolean;
-  seriesOrder: AdminSeriesListItemDto[] | null;
-  collectionOrder: AdminCollectionListItemDto[] | null;
+  seriesOrder: AdminListingListItemDto[] | null;
+  collectionOrder: AdminListingListItemDto[] | null;
 };
 
 function reduce(state: ScreenState, patch: Partial<ScreenState>): ScreenState {
@@ -36,7 +32,7 @@ function SeriesItem({
   drag,
   isActive,
 }: {
-  item: AdminSeriesListItemDto;
+  item: AdminListingListItemDto;
   drag: () => void;
   isActive: boolean;
 }) {
@@ -48,7 +44,7 @@ function SeriesItem({
     <Pressable onLongPress={drag} style={itemStyle}>
       <Text style={styles.listItemTitle}>{item.title}</Text>
       <Text style={styles.listItemSubtitle}>
-        {item.publishedLectureCount ?? 0} lectures · {item.status}
+        {item.format} · {item.status}
       </Text>
     </Pressable>
   );
@@ -59,7 +55,7 @@ function CollectionItem({
   drag,
   isActive,
 }: {
-  item: AdminCollectionListItemDto;
+  item: AdminListingListItemDto;
   drag: () => void;
   isActive: boolean;
 }) {
@@ -138,7 +134,7 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
     data,
     to,
   }: {
-    data: AdminSeriesListItemDto[];
+    data: AdminListingListItemDto[];
     from: number;
     to: number;
   }) => {
@@ -155,7 +151,7 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
     data,
     to,
   }: {
-    data: AdminCollectionListItemDto[];
+    data: AdminListingListItemDto[];
     from: number;
     to: number;
   }) => {
@@ -195,7 +191,7 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
             keyExtractor={(item) => item.id}
             onDragEnd={handleSeriesDragEnd}
             scrollEnabled={false}
-            renderItem={({ item, drag, isActive }: RenderItemParams<AdminSeriesListItemDto>) => (
+            renderItem={({ item, drag, isActive }: RenderItemParams<AdminListingListItemDto>) => (
               <SeriesItem item={item} drag={drag} isActive={isActive} />
             )}
           />
@@ -214,11 +210,7 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
             keyExtractor={(item) => item.id}
             onDragEnd={handleCollectionDragEnd}
             scrollEnabled={false}
-            renderItem={({
-              item,
-              drag,
-              isActive,
-            }: RenderItemParams<AdminCollectionListItemDto>) => (
+            renderItem={({ item, drag, isActive }: RenderItemParams<AdminListingListItemDto>) => (
               <CollectionItem item={item} drag={drag} isActive={isActive} />
             )}
           />
@@ -252,8 +244,8 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
-    paddingBottom: 48,
+    padding: theme.spacing.scale.lg,
+    paddingBottom: theme.spacing.scale["4xl"],
   },
   loadingContainer: {
     flex: 1,
@@ -263,21 +255,21 @@ const styles = StyleSheet.create((theme) => ({
   scholarName: {
     fontSize: 20,
     fontWeight: "700",
-    marginBottom: 4,
+    marginBottom: theme.spacing.scale.xs,
     color: theme.colors.content.strong,
   },
   scholarSlug: {
     fontSize: 13,
     color: theme.colors.content.muted,
-    marginBottom: 24,
+    marginBottom: theme.spacing.scale["2xl"],
   },
   sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 12,
-    borderBottomWidth: 1,
+    paddingVertical: theme.spacing.scale.md,
+    borderBottomWidth: theme.border.width.default,
     borderColor: theme.colors.border.subtle,
-    marginBottom: 8,
+    marginBottom: theme.spacing.scale.sm,
   },
   sectionTitle: {
     flex: 1,
@@ -286,11 +278,11 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.content.strong,
   },
   addBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingHorizontal: theme.spacing.scale.sm,
+    paddingVertical: theme.spacing.scale.xs,
     backgroundColor: theme.colors.action.primary,
-    borderRadius: 6,
-    marginEnd: 8,
+    borderRadius: theme.radius.scale.sm,
+    marginEnd: theme.spacing.scale.sm,
   },
   addBtnText: {
     color: theme.colors.content.onPrimary,
@@ -301,11 +293,11 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.content.muted,
   },
   listItem: {
-    padding: 12,
-    borderWidth: 1,
+    padding: theme.spacing.scale.md,
+    borderWidth: theme.border.width.default,
     borderColor: theme.colors.border.subtle,
-    borderRadius: 8,
-    marginBottom: 8,
+    borderRadius: theme.radius.scale.sm,
+    marginBottom: theme.spacing.scale.sm,
     backgroundColor: theme.colors.surface.default,
     opacity: 1,
   },

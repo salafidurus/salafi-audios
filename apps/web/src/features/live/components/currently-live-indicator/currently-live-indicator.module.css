@@ -1,10 +1,10 @@
 .container {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px;
+  gap: var(--space-scale-md);
+  padding: var(--space-scale-sm);
   background-color: var(--surface-subtle);
-  border-radius: 8px;
+  border-radius: var(--radius-scale-sm);
   text-decoration: none;
   transition: opacity 0.2s;
 }
@@ -16,7 +16,7 @@
 .containerCompact {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--space-component-gap-sm);
   text-decoration: none;
   transition: opacity 0.2s;
 }
@@ -28,9 +28,9 @@
 .liveBadge {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--space-scale-xs);
   color: var(--state-danger);
-  font-size: 12px;
+  font-size: var(--typo-caption-font-size);
   font-weight: 700;
   letter-spacing: 0.5px;
 }
@@ -38,7 +38,7 @@
 .pulseDot {
   width: 8px;
   height: 8px;
-  border-radius: 4px;
+  border-radius: var(--radius-scale-xs);
   background-color: var(--state-danger);
   animation: pulse 2s infinite;
 }

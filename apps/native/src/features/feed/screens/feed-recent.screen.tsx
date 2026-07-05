@@ -6,9 +6,9 @@ import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { useFeedRecentScreen } from "@sd/domain-content";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { FeedContentCard } from "../components/feed-content-card/feed-content-card";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import { FeedTopicRow } from "../components/feed-topic-row/feed-topic-row";
+import { FeedPodcastRow } from "../components/feed-podcast-row/feed-podcast-row";
 import { FeedSkeleton } from "../components/feed-skeleton/feed-skeleton";
 import { FeedLoadingFooter, FeedStatusView } from "../components/feed-status/feed-status";
 
@@ -35,7 +35,7 @@ function renderFeedItem(
       );
     default:
       return (
-        <FeedContentCard
+        <FeedPodcastRow
           item={item as FeedContentItemDto}
           onPress={() => onNavigateToLecture?.((item as FeedContentItemDto).slug)}
         />
@@ -94,9 +94,9 @@ export function FeedRecentScreen({
   );
 }
 
-const styles = StyleSheet.create(() => ({
+const styles = StyleSheet.create((theme) => ({
   listContent: {
-    padding: 8,
-    gap: 8,
+    padding: theme.spacing.scale.sm,
+    gap: theme.spacing.scale.sm,
   },
 }));

@@ -98,10 +98,10 @@ the primitive names.
 - Misconfiguration must fail fast.
 - Non-authoritative analytics failures must never break core workflows.
 - `better-auth` and `@better-auth/expo` are pinned to the **exact same version** in the
-  pnpm-workspace catalog (no caret). They each pin `@better-fetch/fetch` exactly (e.g.
+  workspace catalog (no caret). They each pin `@better-fetch/fetch` exactly (e.g.
   `better-auth@1.6.18` → `1.3.0`, `1.6.19` → `1.3.1`); any version skew installs two
   `@better-fetch/fetch` copies whose `BetterFetch` types differ and breaks the native auth
-  client plugin typecheck. Always bump the two together. Note Dependabot ignores
+  client plugin typecheck. Always bump the two together. Note Renovate ignores
   `better-auth`/`@better-auth/expo` for this reason — bump them manually, in lockstep.
 
 ## Repo layout
@@ -160,46 +160,46 @@ into `apps/web` and `apps/native`.
 
 ## Commands (root)
 
-- Install: `pnpm i`
-- Dev (all apps): `pnpm dev`
-- Dev backend: `pnpm dev:api`
-- Dev frontend: `pnpm dev:web`, `pnpm dev:native`
-- Native build: `pnpm dev:native:build:android` (no clean), `pnpm dev:native:clean-build:android` (prebuild --clean first); `:ios` variants exist
-- Build: `pnpm build`
-- Lint: `pnpm lint`
-- Typecheck: `pnpm typecheck`
-- Test: `pnpm test`
-- E2E: `pnpm test:e2e`
-- Prepush suite: `pnpm test:prepush`
-- Ingest content: `pnpm ingest:content`
-- Remove ingested: `pnpm ingest:remove`
-- Format: `pnpm format`
-- Format check: `pnpm format:check`
+- Install: `bun install`
+- Dev (all apps): `bun run dev`
+- Dev backend: `bun run dev:api`
+- Dev frontend: `bun run dev:web`, `bun run dev:native`
+- Native build: `bun run dev:native:build:android` (no clean), `bun run dev:native:clean-build:android` (prebuild --clean first); `:ios` variants exist
+- Build: `bun run build`
+- Lint: `bun run lint`
+- Typecheck: `bun run typecheck`
+- Test: `bun run test`
+- E2E: `bun run test:e2e`
+- Prepush suite: `bun run test:prepush`
+- Ingest content: `bun run ingest:content`
+- Remove ingested: `bun run ingest:remove`
+- Format: `bun run format`
+- Format check: `bun run format:check`
 
 ## Scoped execution
 
-- API: `pnpm --filter api <script>`
-- Web: `pnpm --filter web <script>`
-- Native: `pnpm --filter native <script>`
-- DB: `pnpm --filter core-db <script>`
-- Env: `pnpm --filter core-env <script>`
-- I18n: `pnpm --filter core-i18n <script>`
-- Contracts: `pnpm --filter core-contracts <script>`
-- Design tokens: `pnpm --filter design-tokens <script>`
-- Core packages: `pnpm --filter @sd/core-* <script>`
-- Domain packages: `pnpm --filter @sd/domain-* <script>`
-- Ingest: `pnpm --filter util-ingest <script>`
+- API: `bun run --filter api <script>`
+- Web: `bun run --filter web <script>`
+- Native: `bun run --filter native <script>`
+- DB: `bun run --filter @sd/core-db <script>`
+- Env: `bun run --filter @sd/core-env <script>`
+- I18n: `bun run --filter @sd/core-i18n <script>`
+- Contracts: `bun run --filter @sd/core-contracts <script>`
+- Design tokens: `bun run --filter @sd/design-tokens <script>`
+- Core packages: `bun run --filter @sd/core-* <script>`
+- Domain packages: `bun run --filter @sd/domain-* <script>`
+- Ingest: `bun run --filter @sd/util-ingest <script>`
 
 ## Single-test quick reference
 
-- Jest file (API): `pnpm --filter api test -- src/modules/topics/topics.service.spec.ts`
-- Jest file (Native): `pnpm --filter native test -- src/path/to/file.spec.tsx`
-- Jest file (DB): `pnpm --filter core-db test -- src/path/to/file.spec.ts`
-- Vitest file (Web): `pnpm --filter web test src/path/to/file.spec.tsx`
-- Jest by name: `pnpm --filter api test -- src/modules/topics/topics.service.spec.ts -t "returns topic by slug"`
-- Jest watch file (API): `pnpm --filter api test:watch -- src/modules/topics/topics.service.spec.ts`
-- Playwright file: `pnpm --filter web test:e2e -- e2e/catalog.spec.ts`
-- Playwright by title: `pnpm --filter web test:e2e -- --grep "catalog list"`
+- Jest file (API): `bun run --filter api test -- src/modules/topics/topics.service.spec.ts`
+- Jest file (Native): `bun run --filter native test -- src/path/to/file.spec.tsx`
+- Jest file (DB): `bun run --filter @sd/core-db test -- src/path/to/file.spec.ts`
+- Vitest file (Web): `bun run --filter web test src/path/to/file.spec.tsx`
+- Jest by name: `bun run --filter api test -- src/modules/topics/topics.service.spec.ts -t "returns topic by slug"`
+- Jest watch file (API): `bun run --filter api test:watch -- src/modules/topics/topics.service.spec.ts`
+- Playwright file: `bun run --filter web test:e2e -- e2e/catalog.spec.ts`
+- Playwright by title: `bun run --filter web test:e2e -- --grep "catalog list"`
 
 ## Contract and data discipline
 
@@ -216,13 +216,13 @@ into `apps/web` and `apps/native`.
 - Keep analytics/events out of authoritative core tables.
 - Treat migrations as first-class and reviewable.
 - Treat `packages/core-db/src/generated/` as derived output; keep it untracked and regenerate locally when needed.
-- `pnpm --filter core-db build` copies Prisma client output into `packages/core-db/dist/generated/` so Turbo remote cache restores it in CI.
+- `bun run --filter @sd/core-db build` copies Prisma client output into `packages/core-db/dist/generated/` so Turbo remote cache restores it in CI.
 - Prisma commands (scoped to db):
-  - `pnpm --filter core-db prisma:generate`
-  - `pnpm --filter core-db prisma:validate`
-  - `pnpm --filter core-db prisma:format`
-  - `pnpm --filter core-db migrate:create-only`
-  - `pnpm --filter core-db migrate:deploy`
+  - `bun run --filter @sd/core-db prisma:generate`
+  - `bun run --filter @sd/core-db prisma:validate`
+  - `bun run --filter @sd/core-db prisma:format`
+  - `bun run --filter @sd/core-db migrate:create-only`
+  - `bun run --filter @sd/core-db migrate:deploy`
 
 ## CI troubleshooting
 
@@ -235,8 +235,8 @@ into `apps/web` and `apps/native`.
 - If `apps/web` or `apps/api` fails with `Cannot find module '@sd/core-contracts'`: it means `@sd/core-contracts` hasn't been built yet.
 - Fix: ensure `@sd/core-contracts` is built before dependent packages (check `prebuild`, `pretypecheck`, `pretest` scripts).
 
-- If `pnpm typecheck` fails with missing exports from `@sd/core-contracts`: the contracts package typecheck/build hasn't run.
-- Fix: run `pnpm --filter core-contracts build` first, or check that turbo pipeline builds contracts before typechecking dependent apps.
+- If `bun run typecheck` fails with missing exports from `@sd/core-contracts`: the contracts package typecheck/build hasn't run.
+- Fix: run `bun run --filter @sd/core-contracts build` first, or check that turbo pipeline builds contracts before typechecking dependent apps.
 
 - If `apps/web` fails during `next build` with `Invalid WEB PUBLIC environment variables: NEXT_PUBLIC_API_URL Required`: the web app validated env at module import during prerender.
 - Fix: make env parsing lazy (don’t parse at module top-level) and make pages tolerate missing API env during CI builds by catching fetch errors and returning empty view models.
@@ -279,8 +279,8 @@ Tests co-locate with source (`.spec.ts` / `.spec.tsx`). All public API service m
 ## Commits and hooks
 
 - Conventional Commits are enforced (`commitlint`).
-- Pre-commit runs `pnpm lint:staged`.
-- Pre-push runs `pnpm test:prepush`.
+- Pre-commit runs `bun run lint:staged`.
+- Pre-push runs `bun run test:prepush`.
 
 ## Documentation standards
 

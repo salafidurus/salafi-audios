@@ -30,8 +30,8 @@ describe("getRootTabFromPathname", () => {
   it("returns library for /library/saved", () => {
     expect(getRootTabFromPathname("/library/saved")).toBe("library");
   });
-  it("returns account for /account", () => {
-    expect(getRootTabFromPathname("/account")).toBe("account");
+  it("returns settings for /settings", () => {
+    expect(getRootTabFromPathname("/settings")).toBe("settings");
   });
   it("returns search for unknown paths", () => {
     expect(getRootTabFromPathname("/unknown")).toBe("search");

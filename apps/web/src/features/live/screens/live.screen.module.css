@@ -1,51 +1,29 @@
 .page {
   min-height: 100vh;
   padding-top: var(--top-nav-height, 0px);
-  padding-bottom: 3rem;
+  padding-bottom: var(--space-scale-4xl);
 }
 
 .container {
-  width: min(var(--space-layout-content-max), 100%);
-  margin-inline: auto;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: var(--space-scale-3xl);
 }
 
-.section {
+.listContainer {
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 var(--space-scale-md, 16px);
+}
+
+.list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0;
+  border-radius: var(--radius-component-panel, 12px);
+  border: var(--border-width-default, 1px) solid var(--border-subtle, #e5e7eb);
+  background: var(--surface-default, #ffffff);
+  overflow: hidden;
 }
 
-.cardList {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 0.6rem;
-}
-
-.twoColumn {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2.5rem;
-  align-items: start;
-}
-
-.columnMain {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.columnSide {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-@media (max-width: 960px) {
-  .twoColumn {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
-}

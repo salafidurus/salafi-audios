@@ -39,7 +39,7 @@
 .actions {
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-component-gap-md);
   margin-top: 1.4rem;
   flex-wrap: wrap;
   justify-content: center;

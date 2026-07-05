@@ -35,8 +35,8 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 24,
-    gap: 16,
+    padding: theme.spacing.scale["2xl"],
+    gap: theme.spacing.scale.lg,
   },
   message: {
     color: theme.colors.content.muted,
@@ -44,18 +44,18 @@ const styles = StyleSheet.create((theme) => ({
     fontSize: 14,
   },
   retryButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    borderWidth: 1,
+    paddingHorizontal: theme.spacing.scale.xl,
+    paddingVertical: theme.spacing.scale.sm,
+    borderWidth: theme.border.width.default,
     borderColor: theme.colors.action.primary,
-    borderRadius: 8,
+    borderRadius: theme.radius.scale.sm,
   },
   retryLabel: {
     color: theme.colors.action.primary,
     fontWeight: "600",
   },
   footer: {
-    padding: 16,
+    padding: theme.spacing.scale.lg,
     alignItems: "center",
   },
 }));

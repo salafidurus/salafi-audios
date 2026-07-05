@@ -76,8 +76,8 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
     justifyContent: "space-between",
     width: "100%",
-    paddingHorizontal: 20,
-    marginVertical: 15,
+    paddingHorizontal: theme.spacing.scale.xl,
+    marginVertical: theme.spacing.scale.lg,
   },
   centerControls: {
     flexDirection: "row",
@@ -86,11 +86,11 @@ const styles = StyleSheet.create((theme) => ({
   playButton: {
     width: 64,
     height: 64,
-    borderRadius: 32,
+    borderRadius: theme.radius.scale.full,
     backgroundColor: theme.colors.action.primary,
     justifyContent: "center",
     alignItems: "center",
-    marginHorizontal: 24,
+    marginHorizontal: theme.spacing.scale["2xl"],
     boxShadow: "0 4px 6px rgba(59, 130, 246, 0.3)",
   },
   controlButton: {
@@ -106,9 +106,9 @@ const styles = StyleSheet.create((theme) => ({
     top: 9,
   },
   speedButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 16,
+    paddingVertical: theme.spacing.component.chipY,
+    paddingHorizontal: theme.spacing.scale.md,
+    borderRadius: theme.radius.scale.lg,
     backgroundColor: theme.colors.surface.subtle,
     width: 60,
     justifyContent: "center",

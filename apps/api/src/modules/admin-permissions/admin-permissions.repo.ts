@@ -48,4 +48,30 @@ export class AdminPermissionsRepository {
     });
     return count > 0;
   }
+
+  async listUsers(query?: string) {
+    const where = query
+      ? {
+          OR: [
+            { name: { contains: query, mode: 'insensitive' as const } },
+            { email: { contains: query, mode: 'insensitive' as const } },
+          ],
+        }
+      : {};
+
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        include: {
+          adminPermissions: {
+            select: { permission: true },
+          },
+        },
+        orderBy: { createdAt: 'desc' as const },
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+
+    return { users, total };
+  }
 }

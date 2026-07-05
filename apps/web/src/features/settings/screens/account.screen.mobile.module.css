@@ -1,0 +1,60 @@
+.title {
+  margin: 0;
+}
+
+.profileRow {
+  margin-top: var(--space-scale-2xl);
+  display: flex;
+  align-items: center;
+  gap: var(--space-component-gap-md);
+}
+
+.avatar {
+  border-radius: 50%;
+}
+
+.profileName {
+  font-size: var(--typo-body-md-font-size);
+  font-weight: 600;
+}
+
+.profileEmail {
+  font-size: var(--typo-label-md-font-size);
+  color: var(--content-muted);
+}
+
+.actions {
+  margin-top: var(--space-scale-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
+}
+
+.menuButton {
+  padding: var(--space-scale-sm) var(--space-scale-md);
+  text-align: left;
+  border: var(--border-width-default) solid var(--border-default);
+  border-radius: var(--radius-component-chip);
+  background: var(--surface-default);
+  cursor: pointer;
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-default);
+}
+
+.signOutButton {
+  padding: var(--space-scale-sm) var(--space-scale-md);
+  text-align: left;
+  border: var(--border-width-default) solid var(--border-default);
+  border-radius: var(--radius-component-chip);
+  background: var(--surface-default);
+  cursor: pointer;
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--action-danger);
+}
+
+.languageSection {
+  margin-top: var(--space-scale-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-md);
+}

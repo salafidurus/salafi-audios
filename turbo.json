@@ -8,9 +8,6 @@
     "tsconfig.base.json",
     "tsconfig.packages.json",
     "tsconfig.nest.json",
-    "eslint.config.base.mjs",
-    "eslint.config.packages.mjs",
-    "eslint.config.nest.mjs",
     ".oxlintrc.json"
   ],
   "tasks": {
@@ -29,8 +26,8 @@
     },
     "lint": {
       "dependsOn": ["^lint"],
-      // Include shared ESLint config so lint re-runs when rules change
-      "inputs": ["$TURBO_DEFAULT$", ".eslintrc*", "eslint.config.*"],
+      // Include ESLint configs (web/native still use ESLint) and oxlint config
+      "inputs": ["$TURBO_DEFAULT$", "eslint.config.*"],
       "outputs": []
     },
     "typecheck": {
@@ -75,12 +72,6 @@
     "test:prepush": {
       "dependsOn": ["^build", "^test:prepush"],
       "cache": true
-    },
-    // Generates OpenAPI spec from NestJS decorators for contract-first API development
-    "openapi": {
-      "dependsOn": ["^openapi"],
-      "inputs": ["$TURBO_DEFAULT$", "src/**", "package.json", "tsconfig*.json"],
-      "outputs": ["openapi.json"]
     },
     // Builds shared contract types (DTOs, response shapes) consumed by web and mobile
     "contract": {

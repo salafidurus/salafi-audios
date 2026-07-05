@@ -78,7 +78,7 @@ describe('AudioController — boundaries', () => {
     });
   });
 
-  describe('PUT /audio/progress/:lectureId', () => {
+  describe('PUT /audio/progress/:listingId', () => {
     it('should return 401 without a session', () => {
       return request(app.getHttpServer())
         .put('/audio/progress/l1')
@@ -99,11 +99,9 @@ describe('AudioController — boundaries', () => {
     });
   });
 
-  describe('GET /audio/lectures/:lectureId/stream', () => {
+  describe('GET /audio/listings/:listingId/stream', () => {
     it('should return 200 without a session (Public route)', () => {
-      return request(app.getHttpServer())
-        .get('/audio/lectures/l1/stream')
-        .expect(200);
+      return request(app.getHttpServer()).get('/audio/listings/l1/stream').expect(200);
     });
   });
 });

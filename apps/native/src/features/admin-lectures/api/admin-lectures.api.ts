@@ -2,10 +2,10 @@ import { httpClient, endpoints } from "@sd/core-contracts";
 import type {
   PresignedUrlRequestDto,
   PresignedUrlResponseDto,
-  CreateLectureDto,
-  AdminLectureListDto,
-  AdminLectureDetailDto,
-  AdminLectureUpdateDto,
+  CreateListingDto,
+  AdminListingListDto,
+  AdminListingDetailDto,
+  AdminListingUpdateDto,
   BulkActionDto,
   BulkActionResultDto,
 } from "@sd/core-contracts";
@@ -49,9 +49,9 @@ export async function uploadToR2(
   }
 }
 
-export async function createLecture(data: CreateLectureDto): Promise<AdminLectureDetailDto> {
-  return httpClient<AdminLectureDetailDto>({
-    url: endpoints.admin.lectures.create,
+export async function createLecture(data: CreateListingDto): Promise<AdminListingDetailDto> {
+  return httpClient<AdminListingDetailDto>({
+    url: endpoints.admin.listings.create,
     method: "POST",
     body: data,
   });
@@ -61,9 +61,9 @@ export async function fetchAdminLectures(params?: {
   scholarId?: string;
   status?: string;
   page?: number;
-}): Promise<AdminLectureListDto> {
-  return httpClient<AdminLectureListDto>({
-    url: endpoints.admin.lectures.list,
+}): Promise<AdminListingListDto> {
+  return httpClient<AdminListingListDto>({
+    url: endpoints.admin.listings.list,
     method: "GET",
     params: {
       scholarId: params?.scholarId,
@@ -73,19 +73,19 @@ export async function fetchAdminLectures(params?: {
   });
 }
 
-export async function fetchAdminLectureDetail(id: string): Promise<AdminLectureDetailDto> {
-  return httpClient<AdminLectureDetailDto>({
-    url: endpoints.admin.lectures.detail(id),
+export async function fetchAdminLectureDetail(id: string): Promise<AdminListingDetailDto> {
+  return httpClient<AdminListingDetailDto>({
+    url: endpoints.admin.listings.detail(id),
     method: "GET",
   });
 }
 
 export async function updateLecture(
   id: string,
-  data: Partial<AdminLectureUpdateDto>,
-): Promise<AdminLectureDetailDto> {
-  return httpClient<AdminLectureDetailDto>({
-    url: endpoints.admin.lectures.update(id),
+  data: Partial<AdminListingUpdateDto>,
+): Promise<AdminListingDetailDto> {
+  return httpClient<AdminListingDetailDto>({
+    url: endpoints.admin.listings.update(id),
     method: "PUT",
     body: data,
   });
@@ -93,7 +93,7 @@ export async function updateLecture(
 
 export async function bulkLectureAction(data: BulkActionDto): Promise<BulkActionResultDto> {
   return httpClient<BulkActionResultDto>({
-    url: endpoints.admin.lectures.bulk,
+    url: endpoints.admin.listings.bulk,
     method: "POST",
     body: data,
   });

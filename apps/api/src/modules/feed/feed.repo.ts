@@ -27,6 +27,7 @@ export class FeedRepo {
     const cursorDate = cursor ? new Date(cursor) : undefined;
 
     const where = {
+      format: 'single' as const,
       status: Status.published,
       deletedAt: null,
       scholar: { isActive: true },
@@ -44,7 +45,7 @@ export class FeedRepo {
     };
 
     // Fetch one extra to determine if there's a next page
-    const lectures = await this.prisma.lecture.findMany({
+    const listings = await this.prisma.listing.findMany({
       where,
       include: {
         translations: {
@@ -77,8 +78,8 @@ export class FeedRepo {
       take: limit + 1,
     });
 
-    const hasMore = lectures.length > limit;
-    const page = hasMore ? lectures.slice(0, limit) : lectures;
+    const hasMore = listings.length > limit;
+    const page = hasMore ? listings.slice(0, limit) : listings;
 
     const contentItems: FeedContentItemDto[] = page.map((r) => {
       const resolved = resolveContentTranslation({
@@ -101,12 +102,10 @@ export class FeedRepo {
         scholarName,
         scholarSlug: r.scholar.slug,
         thumbnailUrl: null,
-        durationSeconds: r.durationSeconds,
+        durationSeconds: r.durationSeconds ?? 0,
         publishedAt: (r.publishedAt ?? r.createdAt).toISOString(),
         originalLanguage: resolved.originalLanguage,
-        original: resolved.original
-          ? { title: resolved.original.title }
-          : undefined,
+        original: resolved.original ? { title: resolved.original.title } : undefined,
       };
     });
 
@@ -137,9 +136,89 @@ export class FeedRepo {
 
     const lastItem = page[page.length - 1];
     const nextCursor =
-      hasMore && lastItem
-        ? (lastItem.publishedAt ?? lastItem.createdAt).toISOString()
-        : undefined;
+      hasMore && lastItem ? (lastItem.publishedAt ?? lastItem.createdAt).toISOString() : undefined;
+
+    return { items, nextCursor };
+  }
+
+  async getFeedRecent(cursor?: string, limit = 20): Promise<FeedPageDto> {
+    const locale = getRequestLocale();
+    const cursorDate = cursor ? new Date(cursor) : undefined;
+
+    const where = {
+      format: 'single' as const,
+      status: Status.published,
+      deletedAt: null,
+      scholar: { isActive: true },
+      ...(cursorDate && { createdAt: { lt: cursorDate } }),
+    };
+
+    const listings = await this.prisma.listing.findMany({
+      where,
+      include: {
+        translations: {
+          where: { locale, status: 'published' },
+          select: { title: true },
+          take: 1,
+        },
+        scholar: {
+          select: {
+            name: true,
+            slug: true,
+            isFeatured: true,
+            mainLanguage: true,
+            translations: {
+              where: { locale, status: 'published' },
+              select: { name: true },
+              take: 1,
+            },
+          },
+        },
+        topics: {
+          include: {
+            topic: {
+              select: { name: true, slug: true },
+            },
+          },
+        },
+      },
+      orderBy: [{ createdAt: 'desc' }],
+      take: limit + 1,
+    });
+
+    const hasMore = listings.length > limit;
+    const page = hasMore ? listings.slice(0, limit) : listings;
+
+    const items: FeedItemDto[] = page.map((r) => {
+      const resolved = resolveContentTranslation({
+        base: { title: r.title },
+        originalLanguage: r.language,
+        targetLocale: locale,
+        publishedTranslation: r.translations[0] ?? null,
+      });
+      const scholarName = resolveContentTranslation({
+        base: { name: r.scholar.name },
+        originalLanguage: r.scholar.mainLanguage,
+        targetLocale: locale,
+        publishedTranslation: r.scholar.translations[0] ?? null,
+      }).fields.name;
+      return {
+        kind: 'single' as const,
+        id: r.id,
+        title: resolved.fields.title,
+        slug: r.slug,
+        scholarName,
+        scholarSlug: r.scholar.slug,
+        thumbnailUrl: null,
+        durationSeconds: r.durationSeconds ?? 0,
+        publishedAt: (r.publishedAt ?? r.createdAt).toISOString(),
+        originalLanguage: resolved.originalLanguage,
+        original: resolved.original ? { title: resolved.original.title } : undefined,
+      };
+    });
+
+    const lastItem = page[page.length - 1];
+    const nextCursor = hasMore && lastItem ? lastItem.createdAt.toISOString() : undefined;
 
     return { items, nextCursor };
   }
@@ -152,10 +231,7 @@ export class FeedRepo {
     return this.fetchScholarChips(locale, 8);
   }
 
-  private async fetchScholarChips(
-    locale: Locale,
-    take: number,
-  ): Promise<ScholarChipDto[]> {
+  private async fetchScholarChips(locale: Locale, take: number): Promise<ScholarChipDto[]> {
     const records = await this.prisma.scholar.findMany({
       where: { isActive: true },
       orderBy: [{ isFeatured: 'desc' }, { isKibar: 'desc' }],
@@ -185,11 +261,9 @@ export class FeedRepo {
         id: r.id,
         name: resolved.fields.name,
         slug: r.slug,
-        imageUrl: r.imageUrl,
+        imageUrl: r.imageUrl ?? null,
         originalLanguage: resolved.originalLanguage,
-        original: resolved.original
-          ? { name: resolved.original.name }
-          : undefined,
+        original: resolved.original ? { name: resolved.original.name } : undefined,
       };
     });
   }
@@ -206,9 +280,10 @@ export class FeedRepo {
 
     if (!topic) return null;
 
-    // Get recent lectures in this topic
-    const lectures = await this.prisma.lecture.findMany({
+    // Get recent listings in this topic
+    const listings = await this.prisma.listing.findMany({
       where: {
+        format: 'single' as const,
         status: Status.published,
         deletedAt: null,
         scholar: { isActive: true },
@@ -241,32 +316,30 @@ export class FeedRepo {
       take: 6,
     });
 
-    const items: ContentSuggestionDto[] = lectures.map((lecture) => {
+    const items: ContentSuggestionDto[] = listings.map((listing) => {
       const resolved = resolveContentTranslation({
-        base: { title: lecture.title },
-        originalLanguage: lecture.language,
+        base: { title: listing.title },
+        originalLanguage: listing.language,
         targetLocale: locale,
-        publishedTranslation: lecture.translations[0] ?? null,
+        publishedTranslation: listing.translations[0] ?? null,
       });
       const scholarName = resolveContentTranslation({
-        base: { name: lecture.scholar.name },
-        originalLanguage: lecture.scholar.mainLanguage,
+        base: { name: listing.scholar.name },
+        originalLanguage: listing.scholar.mainLanguage,
         targetLocale: locale,
-        publishedTranslation: lecture.scholar.translations[0] ?? null,
+        publishedTranslation: listing.scholar.translations[0] ?? null,
       }).fields.name;
       return {
         kind: 'single' as const,
-        id: lecture.id,
+        id: listing.id,
         title: resolved.fields.title,
-        slug: lecture.slug,
+        slug: listing.slug,
         scholarName,
-        scholarSlug: lecture.scholar.slug,
+        scholarSlug: listing.scholar.slug,
         thumbnailUrl: null,
-        durationSeconds: lecture.durationSeconds,
+        durationSeconds: listing.durationSeconds ?? 0,
         originalLanguage: resolved.originalLanguage,
-        original: resolved.original
-          ? { title: resolved.original.title }
-          : undefined,
+        original: resolved.original ? { title: resolved.original.title } : undefined,
       };
     });
 

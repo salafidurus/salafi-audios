@@ -16,7 +16,7 @@
 .inner {
   width: min(var(--space-layout-content-max), 100%);
   margin-inline: auto;
-  padding: 0.75rem var(--space-layout-page-x);
+  padding: var(--space-scale-md) var(--space-layout-page-x);
   display: flex;
   align-items: center;
   justify-content: space-between;

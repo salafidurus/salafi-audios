@@ -1,0 +1,64 @@
+.container {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background-color: var(--chrome-surface);
+  border-top: 1px solid var(--chrome-border);
+  padding: 12px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: var(--shadow-lg);
+}
+
+.innerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+}
+
+.trackInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--typo-title-md-font-family), serif;
+  font-size: var(--typo-title-md-font-size);
+  font-weight: var(--typo-title-md-font-weight);
+  line-height: var(--typo-title-md-line-height);
+  color: var(--content-default);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.artist {
+  margin: 0;
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.controlsWrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.time {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+  font-family: monospace;
+  white-space: nowrap;
+}

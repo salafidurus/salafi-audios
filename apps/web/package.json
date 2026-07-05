@@ -1,20 +1,22 @@
 {
   "name": "web",
-  "type": "module",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "bun --bun next dev",
+    "build": "bun --bun next build",
+    "start": "bun --bun next start",
     "lint": "oxlint . && eslint .",
-    "test": "vitest run",
+    "test": "bun run vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
     "test:prepush": "vitest run --changed=origin/main",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
+    "playwright:version": "playwright --version",
+    "playwright:install": "playwright install --with-deps",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
@@ -37,7 +39,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-i18next": "catalog:",
-    "zod": "^3.25.17",
+    "zod": "catalog:",
     "zustand": "catalog:"
   },
   "devDependencies": {
@@ -48,6 +50,7 @@
     "@types/node": "^26",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^6.0.2",
     "eslint": "catalog:",
     "eslint-config-next": "catalog:",
     "tailwindcss": "^4"

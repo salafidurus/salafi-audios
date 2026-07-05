@@ -1,92 +1,55 @@
 "use client";
 
-import type React from "react";
-import type { LibraryItemDto } from "@sd/core-contracts";
-import { pickContentField } from "@sd/core-i18n";
+import React from "react";
 import { useLibraryCompletedScreen } from "@sd/domain-content";
-import { useAuth } from "@/core/auth/use-auth";
-import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import { useAuth } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
+import { LibraryListRow } from "../components/library-list-row/library-list-row";
+import styles from "./library-screens.module.css";
 
-export type LibraryCompletedMobileScreenProps = {
-  onNavigateToLecture?: (id: string) => void;
-};
-
-const libraryItemButtonStyle: React.CSSProperties = {
-  display: "block",
-  width: "100%",
-  textAlign: "left",
-  padding: 12,
-  borderBottom: "1px solid #eee",
-  cursor: "pointer",
-  background: "none",
-  border: "none",
-};
-
-function LibraryItem({ item, onPress }: { item: LibraryItemDto; onPress?: () => void }) {
-  const showOriginal = useShowOriginalContent();
-  const { t } = useTranslation();
-  const lectureTitle = pickContentField(item.lectureTitle, item.originalLectureTitle, showOriginal);
-  return (
-    <button type="button" onClick={onPress} style={libraryItemButtonStyle}>
-      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-        <span style={{ color: "#16a34a", fontSize: 12 }}>✓</span>
-        <span style={{ fontSize: 15, fontWeight: 600 }}>{lectureTitle}</span>
-      </div>
-      <div style={{ fontSize: 12, color: "#666", marginTop: 2, paddingLeft: 18 }}>
-        {item.scholarName}
-        {item.seriesTitle && ` · ${item.seriesTitle}`}
-      </div>
-      <div style={{ fontSize: 12, color: "#999", marginTop: 2, paddingLeft: 18 }}>
-        {item.durationSeconds
-          ? t("lecture.minutes", "{{count}} min", { count: Math.round(item.durationSeconds / 60) })
-          : ""}
-        {item.completedAt &&
-          ` · ${t("library.completedOn", "Completed {{date}}", {
-            date: new Date(item.completedAt).toLocaleDateString(),
-          })}`}
-      </div>
-    </button>
-  );
-}
-
-export function LibraryCompletedMobileScreen({
-  onNavigateToLecture,
-}: LibraryCompletedMobileScreenProps) {
+export function LibraryCompletedMobileScreen() {
   const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
   const { items, isFetching } = useLibraryCompletedScreen(isAuthenticated);
 
-  if (isFetching && items.length === 0) {
+  if (!isAuthenticated) {
     return (
-      <div style={{ padding: 16 }}>
-        {t("library.loadingSection", "Loading {{section}}…", {
-          section: t("library.completed", "Completed"),
-        })}
-      </div>
-    );
-  }
-
-  if (items.length === 0) {
-    return (
-      <div style={{ padding: 16, color: "#666" }}>
-        {t("library.emptyCompleted", "No completed lectures yet. Keep listening!")}
-      </div>
+      <ScreenView>
+        <AuthRequiredState
+          title="Sign in to view completed history"
+          description="Keep track of all lectures you have completed listening to."
+        />
+      </ScreenView>
     );
   }
 
   return (
-    <div style={{ padding: 12 }}>
-      <h2 style={{ margin: 0, fontSize: 18, marginBottom: 12 }}>
-        {t("library.completed", "Completed")}
-      </h2>
-      {items.map((item) => (
-        <LibraryItem
-          key={item.id}
-          item={item}
-          onPress={() => onNavigateToLecture?.(item.lectureId)}
-        />
-      ))}
-    </div>
+    <ScreenView>
+      <div className={styles.container}>
+        <h2 className={styles.title}>
+          {t("library.completed", "Completed")}
+        </h2>
+
+        {isFetching && items.length === 0 ? (
+          <div className={styles.loading}>
+            {t("library.loadingSection", "Loading {{section}}…", {
+              section: t("library.completed", "Completed"),
+            })}
+          </div>
+        ) : items.length === 0 ? (
+          <div className={styles.emptyState}>
+            {t("library.emptyCompleted", "No completed lectures yet. Keep listening!")}
+          </div>
+        ) : (
+          <div className={styles.list}>
+            {items.map((item) => (
+              <LibraryListRow key={item.id} item={item} variant="completed" />
+            ))}
+          </div>
+        )}
+      </div>
+    </ScreenView>
   );
 }

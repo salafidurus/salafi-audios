@@ -1,13 +1,13 @@
 import { useReducer } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import type { AdminSeriesDetailDto } from "@sd/core-contracts";
+import type { AdminListingDetailDto } from "@sd/core-contracts";
 import { createSeries, updateSeries } from "../../api/admin-scholars.api";
 
 type SeriesSheetProps = {
   isOpen: boolean;
   scholarId: string;
-  series?: AdminSeriesDetailDto;
+  series?: AdminListingDetailDto;
   onClose: () => void;
   onSaved: () => void;
 };
@@ -49,14 +49,13 @@ export function SeriesSheet({ isOpen, scholarId, series, onClose, onSaved }: Ser
         await updateSeries(series.id, {
           title,
           description: description || undefined,
-          language: language || undefined,
+          language: (language || undefined) as any,
         });
       } else {
         await createSeries({
           scholarId,
           title,
-          description: description || undefined,
-          language: language || undefined,
+          format: "series",
         });
       }
       onSaved();
@@ -118,45 +117,46 @@ const styles = StyleSheet.create((theme) => ({
     left: 0,
     right: 0,
     backgroundColor: theme.colors.surface.elevated,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    padding: 16,
+    borderTopLeftRadius: theme.radius.scale.lg,
+    borderTopRightRadius: theme.radius.scale.lg,
+    padding: theme.spacing.scale.lg,
     maxHeight: "80%",
   },
   title: {
     fontSize: 17,
     fontWeight: "600",
-    marginBottom: 16,
+    marginBottom: theme.spacing.scale.lg,
     color: theme.colors.content.strong,
   },
   label: {
     fontSize: 13,
     fontWeight: "600",
-    marginBottom: 4,
+    marginBottom: theme.spacing.scale.xs,
     color: theme.colors.content.default,
   },
   input: {
-    borderWidth: 1,
+    borderWidth: theme.border.width.default,
     borderColor: theme.colors.border.default,
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 12,
+    borderRadius: theme.radius.scale.sm,
+    paddingVertical: theme.spacing.scale.sm,
+    paddingHorizontal: theme.spacing.scale.md,
+    marginBottom: theme.spacing.scale.md,
     color: theme.colors.content.default,
   },
   errorText: {
     color: theme.colors.state.danger,
-    marginBottom: 8,
+    marginBottom: theme.spacing.scale.sm,
   },
   buttonRow: {
     flexDirection: "row",
-    gap: 8,
-    marginTop: 12,
+    gap: theme.spacing.scale.sm,
+    marginTop: theme.spacing.scale.md,
   },
   saveBtn: {
     flex: 1,
-    padding: 12,
+    padding: theme.spacing.scale.md,
     backgroundColor: theme.colors.action.primary,
-    borderRadius: 8,
+    borderRadius: theme.radius.scale.sm,
     alignItems: "center",
   },
   saveBtnText: {
@@ -164,10 +164,10 @@ const styles = StyleSheet.create((theme) => ({
     fontWeight: "600",
   },
   cancelBtn: {
-    padding: 12,
-    borderWidth: 1,
+    padding: theme.spacing.scale.md,
+    borderWidth: theme.border.width.default,
     borderColor: theme.colors.border.default,
-    borderRadius: 8,
+    borderRadius: theme.radius.scale.sm,
     alignItems: "center",
   },
   cancelBtnText: {

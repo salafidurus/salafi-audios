@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { LibrarySavedScreen } from "@/features/library/screens/library-saved.screen";
+import { LibrarySavedScreen } from "@/features/library";
 
 export const metadata: Metadata = {
   title: "Saved Lectures",

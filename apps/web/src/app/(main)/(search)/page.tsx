@@ -15,6 +15,17 @@ export default function HomePage() {
         onSelectCategory={(searchKey) =>
           push(`${routes.search}?searchKey=${encodeURIComponent(searchKey)}`)
         }
+        onSelectScholar={(slug) => push(routes.scholars.detail(slug))}
+        onSelectSuggestion={(id, kind) => {
+          if (kind === "collection") {
+            push(routes.collections.detail(id));
+          } else if (kind === "series") {
+            push(routes.series.detail(id));
+          } else if (kind === "single") {
+            push(routes.lectures.detail(id));
+          }
+        }}
+        onContinueListening={(lectureId) => push(routes.lectures.detail(lectureId))}
       />
     </main>
   );

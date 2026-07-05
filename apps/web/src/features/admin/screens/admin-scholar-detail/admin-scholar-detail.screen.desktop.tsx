@@ -3,11 +3,7 @@
 import React, { useReducer } from "react";
 import Link from "next/link";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
-import type {
-  ScholarListItemDto,
-  AdminSeriesListItemDto,
-  AdminCollectionListItemDto,
-} from "@sd/core-contracts";
+import type { ScholarListItemDto, AdminListingListItemDto } from "@sd/core-contracts";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import styles from "./admin-scholar-detail.screen.desktop.module.css";
 import { ArrowLeft, Plus } from "lucide-react";
@@ -31,6 +27,17 @@ function reduce(state: FormState, patch: Partial<FormState>): FormState {
   return { ...state, ...patch };
 }
 
+const slugify = (text: string) => {
+  return (
+    text
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^\w\u0600-\u06FF\-]/g, "")
+      .replace(/-+/g, "-") || `listing-${Date.now()}`
+  );
+};
+
 export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDesktopScreenProps) {
   // Fetch Scholar
   const { data: scholarsData } = useApiQuery<ScholarsListDto>(queryKeys.scholars.list(), () =>
@@ -39,24 +46,14 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
 
   const scholar = scholarsData?.scholars.find((s) => s.id === id);
 
-  // Fetch Series
-  const { data: seriesData, refetch: refetchSeries } = useApiQuery<AdminSeriesListItemDto[]>(
-    ["series", "list", id],
+  // Fetch all Listings for this scholar
+  const { data: listingsData, refetch: refetchListings } = useApiQuery<AdminListingListItemDto[]>(
+    ["admin-listings-scholar", id],
     () =>
-      httpClient<AdminSeriesListItemDto[]>({
-        url: `${endpoints.admin.series.list}?scholarId=${id}`,
+      httpClient<AdminListingListItemDto[]>({
+        url: `${endpoints.admin.listings.list}?scholarId=${id}`,
         method: "GET",
       }),
-  );
-
-  // Fetch Collections
-  const { data: collectionsData, refetch: refetchCollections } = useApiQuery<
-    AdminCollectionListItemDto[]
-  >(["collections", "list", id], () =>
-    httpClient<AdminCollectionListItemDto[]>({
-      url: `${endpoints.admin.collections.list}?scholarId=${id}`,
-      method: "GET",
-    }),
   );
 
   const [state, dispatch] = useReducer(reduce, {
@@ -83,16 +80,19 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
 
     try {
       await httpClient({
-        url: endpoints.admin.series.create,
+        url: endpoints.admin.listings.create,
         method: "POST",
         body: {
           scholarId: id,
           title: newSeriesTitle,
+          slug: slugify(newSeriesTitle),
+          format: "series",
+          language: scholar?.mainLanguage || "ar",
           orderIndex: Number(newSeriesOrder),
         },
       });
       dispatch({ newSeriesTitle: "", newSeriesOrder: 0, creatingSeries: false });
-      refetchSeries();
+      refetchListings();
     } catch {
       // ignore
     }
@@ -104,49 +104,39 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
 
     try {
       await httpClient({
-        url: endpoints.admin.collections.create,
+        url: endpoints.admin.listings.create,
         method: "POST",
         body: {
           scholarId: id,
           title: newCollectionTitle,
+          slug: slugify(newCollectionTitle),
+          format: "collection",
+          language: scholar?.mainLanguage || "ar",
           orderIndex: Number(newCollectionOrder),
         },
       });
       dispatch({ newCollectionTitle: "", newCollectionOrder: 0, creatingCollection: false });
-      refetchCollections();
+      refetchListings();
     } catch {
       // ignore
     }
   };
 
-  const handleUpdateSeriesOrder = async (seriesId: string, orderIndex: number) => {
+  const handleUpdateOrder = async (listingId: string, orderIndex: number) => {
     try {
       await httpClient({
-        url: endpoints.admin.series.update(seriesId),
-        method: "PATCH",
+        url: endpoints.admin.listings.update(listingId),
+        method: "PUT",
         body: { orderIndex },
       });
-      refetchSeries();
+      refetchListings();
     } catch {
       // ignore
     }
   };
 
-  const handleUpdateCollectionOrder = async (collectionId: string, orderIndex: number) => {
-    try {
-      await httpClient({
-        url: endpoints.admin.collections.update(collectionId),
-        method: "PATCH",
-        body: { orderIndex },
-      });
-      refetchCollections();
-    } catch {
-      // ignore
-    }
-  };
-
-  const scholarSeries = seriesData ?? [];
-  const scholarCollections = collectionsData ?? [];
+  const scholarSeries = listingsData?.filter((l) => l.format === "series") ?? [];
+  const scholarCollections = listingsData?.filter((l) => l.format === "collection") ?? [];
 
   return (
     <ScreenView>
@@ -226,7 +216,7 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
                       type="number"
                       className={styles.orderInput}
                       defaultValue={s.orderIndex || 0}
-                      onBlur={(e) => handleUpdateSeriesOrder(s.id, Number(e.target.value))}
+                      onBlur={(e) => handleUpdateOrder(s.id, Number(e.target.value))}
                       aria-label="Update series order index"
                       title="Update Order Index"
                     />
@@ -300,7 +290,7 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
                       type="number"
                       className={styles.orderInput}
                       defaultValue={c.orderIndex || 0}
-                      onBlur={(e) => handleUpdateCollectionOrder(c.id, Number(e.target.value))}
+                      onBlur={(e) => handleUpdateOrder(c.id, Number(e.target.value))}
                       aria-label="Update collection order index"
                       title="Update Order Index"
                     />

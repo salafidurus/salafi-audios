@@ -1,13 +1,14 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", ":separateMultipleVarRanges"],
-  "pnpm": {
-    "enabled": true
-  },
+  "extends": [
+    "config:recommended",
+    ":separatePatchReleases",
+    ":separateMultipleMinorReleases"
+  ],
   "timezone": "UTC",
-  "schedule": ["before 7am every 2 days"],
-  "prConcurrentLimit": 5,
-  "prHourlyLimit": 2,
+  "schedule": ["before 7am every 2 day"],
+  "prConcurrentLimit": 10,
+  "prHourlyLimit": 10,
   "packageRules": [
     {
       "description": "Ignore Expo, React, React Native, NestJS, Next.js, Prisma, and other locked infrastructure deps",
@@ -19,21 +20,19 @@
         "prisma",
         "turbo",
         "typescript",
-        "better-auth"
-      ],
-      "matchPackagePrefixes": [
-        "expo-",
-        "@expo/",
-        "eslint-config-expo",
-        "@types/react",
-        "@types/react-dom",
-        "react-native",
-        "react-native-",
-        "@react-native/",
-        "@react-navigation/",
-        "@prisma/",
-        "@nestjs/",
-        "@better-auth/"
+        "better-auth",
+        "expo-{/,}**",
+        "@expo/{/,}**",
+        "eslint-config-expo{/,}**",
+        "@types/react{/,}**",
+        "@types/react-dom{/,}**",
+        "react-native{/,}**",
+        "react-native-{/,}**",
+        "@react-native/{/,}**",
+        "@react-navigation/{/,}**",
+        "@prisma/{/,}**",
+        "@nestjs/{/,}**",
+        "@better-auth/{/,}**"
       ],
       "enabled": false
     },
@@ -46,9 +45,13 @@
         "husky",
         "commitlint",
         "oxlint",
-        "react-doctor"
+        "react-doctor",
+        "eslint-{/,}**",
+        "@eslint/{/,}**",
+        "@commitlint/{/,}**",
+        "oxlint-{/,}**",
+        "@oxlint/{/,}**"
       ],
-      "matchPackagePrefixes": ["eslint-", "@eslint/", "@commitlint/", "oxlint-", "@oxlint/"],
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "dev-tooling",
       "automerge": true,
@@ -57,8 +60,15 @@
     },
     {
       "description": "Group test-tooling patches & minors with automerge",
-      "matchPackageNames": ["jest", "ts-jest", "playwright"],
-      "matchPackagePrefixes": ["jest-", "@jest/", "@testing-library/", "@playwright/"],
+      "matchPackageNames": [
+        "jest",
+        "ts-jest",
+        "playwright",
+        "jest-{/,}**",
+        "@jest/{/,}**",
+        "@testing-library/{/,}**",
+        "@playwright/{/,}**"
+      ],
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "test-tooling",
       "automerge": true,
@@ -67,8 +77,14 @@
     },
     {
       "description": "Group Vitest and Vite ecosystem (including majors) with automerge",
-      "matchPackageNames": ["vitest", "vite-tsconfig-paths", "unplugin-swc"],
-      "matchPackagePrefixes": ["vitest-", "@vitest/", "@vitejs/"],
+      "matchPackageNames": [
+        "vitest",
+        "vite-tsconfig-paths",
+        "unplugin-swc",
+        "vitest-{/,}**",
+        "@vitest/{/,}**",
+        "@vitejs/{/,}**"
+      ],
       "groupName": "vitest",
       "automerge": true,
       "automergeType": "pr",
@@ -76,11 +92,11 @@
     },
     {
       "description": "Group AWS SDK and Smithy packages with automerge",
-      "matchPackagePrefixes": ["@aws-sdk/", "@smithy/"],
       "groupName": "aws-sdk",
       "automerge": true,
       "automergeType": "pr",
-      "platformAutomerge": true
+      "platformAutomerge": true,
+      "matchPackageNames": ["@aws-sdk/{/,}**", "@smithy/{/,}**"]
     },
     {
       "description": "Group GitHub Actions updates with automerge",
@@ -92,11 +108,7 @@
     },
     {
       "description": "Ensure vulnerability fixes bypass the schedule and are sent immediately",
-      "matchRules": [
-        {
-          "matchUpdateTypes": ["security"]
-        }
-      ],
+      "matchUpdateTypes": ["security"],
       "schedule": ["at any time"]
     }
   ]

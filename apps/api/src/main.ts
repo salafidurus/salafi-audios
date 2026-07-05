@@ -1,7 +1,6 @@
 import './shared/utils/env.bootstrap';
 import { ConfigService } from './shared/config/config.service';
 import { AllExceptionsFilter } from './shared/errors/http-exception.filter';
-import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { Transport } from '@nestjs/microservices';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -11,6 +10,7 @@ import { initAuth, getAuth } from './modules/auth/auth.instance';
 import { toNodeHandler } from 'better-auth/node';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+import { ZodValidationPipe } from 'nestjs-zod';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
@@ -19,14 +19,7 @@ async function bootstrap() {
 
   app.useLogger(app.get(Logger));
   app.use(helmet({ contentSecurityPolicy: false }));
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-      transformOptions: { enableImplicitConversion: true },
-    }),
-  );
+  app.useGlobalPipes(new ZodValidationPipe());
   app.useGlobalFilters(new AllExceptionsFilter(app.get(ConfigService)));
   app.use(cookieParser());
 

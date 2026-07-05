@@ -14,9 +14,7 @@ export class SearchService {
     return this.searchByMode(query, false);
   }
 
-  async searchExtended(
-    query: SearchQueryDto,
-  ): Promise<SearchCatalogResultsDto> {
+  async searchExtended(query: SearchQueryDto): Promise<SearchCatalogResultsDto> {
     return this.searchByMode(query, true);
   }
 
@@ -29,10 +27,7 @@ export class SearchService {
       return { collections: [], series: [], singles: [] };
     }
 
-    const limit = Math.min(
-      query.limit ?? DEFAULT_SEARCH_LIMIT,
-      MAX_SEARCH_LIMIT,
-    );
+    const limit = Math.min(query.limit ?? DEFAULT_SEARCH_LIMIT, MAX_SEARCH_LIMIT);
     const listQuery: SearchQueryDto = {
       q: trimmed,
       limit,

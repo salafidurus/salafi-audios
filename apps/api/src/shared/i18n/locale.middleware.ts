@@ -13,16 +13,9 @@ import { runWithLocale } from './locale-context';
  */
 @Injectable()
 export class LocaleMiddleware implements NestMiddleware {
-  use(
-    req: Request & { locale?: Locale },
-    _res: Response,
-    next: NextFunction,
-  ): void {
+  use(req: Request & { locale?: Locale }, _res: Response, next: NextFunction): void {
     const fromQuery = req.query['locale'];
-    const candidate =
-      typeof fromQuery === 'string'
-        ? fromQuery
-        : req.headers['accept-language'];
+    const candidate = typeof fromQuery === 'string' ? fromQuery : req.headers['accept-language'];
     const locale = resolveLocale(candidate);
     req.locale = locale;
     runWithLocale(locale, () => next());

@@ -1,0 +1,48 @@
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-component-gap-lg);
+  padding: var(--space-scale-md) var(--space-scale-lg);
+  border-bottom: var(--border-width-default) solid var(--border-subtle);
+  min-height: 3rem;
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.rowFull {
+  padding: var(--space-scale-md) var(--space-scale-lg);
+  border-bottom: var(--border-width-default) solid var(--border-subtle);
+}
+
+.rowFull:last-child {
+  border-bottom: none;
+}
+
+.labelGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
+  flex: 1;
+  min-width: 0;
+}
+
+.label {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-default);
+  font-weight: 500;
+}
+
+.sublabel {
+  font-size: var(--typo-caption-font-size);
+  color: var(--content-muted);
+  line-height: 1.4;
+}
+
+.control {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}

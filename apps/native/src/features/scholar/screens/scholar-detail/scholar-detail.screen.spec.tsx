@@ -1,11 +1,12 @@
 import React from "react";
-import { render, screen } from "@testing-library/react-native";
-import { useScholarDetail, useScholarContent } from "@sd/domain-content";
+import { render, screen, fireEvent } from "@testing-library/react-native";
+import { useScholarDetail, useScholarContent, useScholarTopics } from "@sd/domain-content";
 import { ScholarDetailScreen } from "./scholar-detail.screen";
 
 jest.mock("@sd/domain-content", () => ({
   useScholarDetail: jest.fn(),
   useScholarContent: jest.fn(),
+  useScholarTopics: jest.fn(),
 }));
 
 jest.mock("@/shared/components/ScreenView/ScreenView", () => ({
@@ -48,12 +49,44 @@ jest.mock("@/features/scholar/components/scholar-content-list/scholar-content-li
   },
 }));
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockedUseScholarDetail = jest.mocked(useScholarDetail) as any;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockedUseScholarContent = jest.mocked(useScholarContent) as any;
+const mockedUseScholarTopics = jest.mocked(useScholarTopics) as any;
+
+const baseScholar = {
+  id: "scholar-1",
+  slug: "ibn-baz",
+  name: "Ibn Baz",
+  bio: undefined,
+  imageUrl: undefined,
+  country: undefined,
+  mainLanguage: undefined,
+  isActive: true,
+  isKibar: true,
+  socialTelegram: undefined,
+  socialTwitter: undefined,
+  socialWebsite: undefined,
+  socialYoutube: undefined,
+  createdAt: "2026-04-11T00:00:00.000Z",
+  lectureCount: 12,
+  seriesCount: 3,
+  totalDurationSeconds: 3600,
+};
+
+const singleItem = {
+  id: "lecture-1",
+  slug: "lecture",
+  title: "A Lecture",
+  type: "single" as const,
+  recencyAt: "2024-01-01T00:00:00Z",
+  durationSeconds: 1800,
+};
 
 describe("ScholarDetailScreen", () => {
+  beforeEach(() => {
+    mockedUseScholarTopics.mockReturnValue({ data: undefined, isFetching: false });
+  });
+
   it("renders a loading state while scholar detail is fetching", async () => {
     mockedUseScholarDetail.mockReturnValue({
       data: undefined,
@@ -85,41 +118,9 @@ describe("ScholarDetailScreen", () => {
   });
 
   it("renders the scholar header and content when data exists", async () => {
-    mockedUseScholarDetail.mockReturnValue({
-      data: {
-        id: "scholar-1",
-        slug: "ibn-baz",
-        name: "Ibn Baz",
-        bio: undefined,
-        imageUrl: undefined,
-        country: undefined,
-        mainLanguage: undefined,
-        isActive: true,
-        isKibar: true,
-        socialTelegram: undefined,
-        socialTwitter: undefined,
-        socialWebsite: undefined,
-        socialYoutube: undefined,
-        createdAt: "2026-04-11T00:00:00.000Z",
-        lectureCount: 12,
-        seriesCount: 3,
-        totalDurationSeconds: 3600,
-      },
-      isFetching: false,
-    });
+    mockedUseScholarDetail.mockReturnValue({ data: baseScholar, isFetching: false });
     mockedUseScholarContent.mockReturnValue({
-      data: {
-        items: [
-          {
-            id: "collection-1",
-            slug: "collection",
-            title: "Collection",
-            type: "collection",
-            recencyAt: "2024-01-01T00:00:00Z",
-            lectureCount: 2,
-          },
-        ],
-      },
+      data: { items: [singleItem] },
       isFetching: false,
     });
 
@@ -128,4 +129,65 @@ describe("ScholarDetailScreen", () => {
     expect(screen.getByText("Header:Ibn Baz")).toBeTruthy();
     expect(screen.getByText("Content:1")).toBeTruthy();
   }, 15000);
+
+  it("renders topic sections when topics data is present", async () => {
+    mockedUseScholarDetail.mockReturnValue({ data: baseScholar, isFetching: false });
+    mockedUseScholarContent.mockReturnValue({
+      data: { items: [singleItem] },
+      isFetching: false,
+    });
+    mockedUseScholarTopics.mockReturnValue({
+      data: {
+        topics: [
+          { topicId: "t1", topicName: "Aqeedah", items: [singleItem] },
+          { topicId: "t2", topicName: "Fiqh", items: [singleItem] },
+        ],
+      },
+      isFetching: false,
+    });
+
+    await render(<ScholarDetailScreen slug="ibn-baz" />);
+
+    expect(screen.getByText("Aqeedah")).toBeTruthy();
+    expect(screen.getByText("Fiqh")).toBeTruthy();
+  });
+
+  it("tapping a topic header expands and collapses its section", async () => {
+    mockedUseScholarDetail.mockReturnValue({ data: baseScholar, isFetching: false });
+    mockedUseScholarContent.mockReturnValue({
+      data: { items: [singleItem] },
+      isFetching: false,
+    });
+    mockedUseScholarTopics.mockReturnValue({
+      data: {
+        topics: [
+          {
+            topicId: "t1",
+            topicName: "Aqeedah",
+            items: [
+              { ...singleItem, id: "lecture-1", title: "Lesson on Tawheed" },
+              { ...singleItem, id: "lecture-2", title: "Lesson on Shirk" },
+            ],
+          },
+        ],
+      },
+      isFetching: false,
+    });
+
+    await render(<ScholarDetailScreen slug="ibn-baz" />);
+
+    expect(screen.getByText("Lesson on Tawheed")).toBeTruthy();
+    expect(screen.getByText("Lesson on Shirk")).toBeTruthy();
+
+    const topicHeader = screen.getByText("Aqeedah");
+    await fireEvent.press(topicHeader);
+
+    expect(screen.queryByText("Lesson on Tawheed")).toBeNull();
+    expect(screen.queryByText("Lesson on Shirk")).toBeNull();
+
+    await fireEvent.press(topicHeader);
+
+    expect(screen.getByText("Lesson on Tawheed")).toBeTruthy();
+    expect(screen.getByText("Lesson on Shirk")).toBeTruthy();
+  });
 });

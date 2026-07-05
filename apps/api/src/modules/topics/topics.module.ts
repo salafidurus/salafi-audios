@@ -6,11 +6,7 @@ import { TopicsService } from './topics.service';
 import { TopicsRepository } from './topics.repo';
 
 @Module({
-  controllers: [
-    TopicsController,
-    AdminTopicsController,
-    TopicsTranslationsController,
-  ],
+  controllers: [TopicsController, AdminTopicsController, TopicsTranslationsController],
   providers: [TopicsService, TopicsRepository],
   exports: [TopicsService, TopicsRepository],
 })

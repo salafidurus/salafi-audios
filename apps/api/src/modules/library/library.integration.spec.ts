@@ -45,9 +45,7 @@ describe('LibraryController — auth boundaries', () => {
   });
 
   it('GET /me/library/completed returns 401 without a session', () => {
-    return request(app.getHttpServer())
-      .get('/me/library/completed')
-      .expect(401);
+    return request(app.getHttpServer()).get('/me/library/completed').expect(401);
   });
 
   it('GET /me/library/saved returns 401 without a session', () => {
@@ -59,9 +57,7 @@ describe('LibraryController — auth boundaries', () => {
   });
 
   it('DELETE /me/library/save/:lectureId returns 401 without a session', () => {
-    return request(app.getHttpServer())
-      .delete('/me/library/save/l1')
-      .expect(401);
+    return request(app.getHttpServer()).delete('/me/library/save/l1').expect(401);
   });
 
   it('POST /me/library/saved/sync returns 401 without a session', () => {

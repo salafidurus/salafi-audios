@@ -4,7 +4,6 @@
   "extends": "../../tsconfig.packages.json",
   "compilerOptions": {
     "jsx": "react-native",
-    "moduleSuffixes": [".desktop.web", ".mobile.web", ".native", ".web", ""],
     "allowImportingTsExtensions": true
   },
   "include": ["src"]

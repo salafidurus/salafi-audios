@@ -47,7 +47,4 @@
   "tools": {
     "argent*": true,
   },
-  "indexing": {
-    "enabled": true
-  },
 }

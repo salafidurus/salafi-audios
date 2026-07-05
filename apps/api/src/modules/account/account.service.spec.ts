@@ -1,4 +1,6 @@
+import { vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
+import { PrismaService } from '../../shared/db/prisma.service';
 import { AccountService } from './account.service';
 
 describe('AccountService', () => {
@@ -15,9 +17,14 @@ describe('AccountService', () => {
     updatedAt: new Date('2024-06-01T00:00:00.000Z'),
   };
 
+  const mockPrisma = {
+    user: { update: vi.fn() },
+  };
+
   beforeEach(async () => {
+    vi.clearAllMocks();
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AccountService],
+      providers: [AccountService, { provide: PrismaService, useValue: mockPrisma }],
     }).compile();
     service = module.get(AccountService);
   });
@@ -83,6 +90,22 @@ describe('AccountService', () => {
       });
       expect(result.role).toBe('admin');
       expect(result.emailVerified).toBe(false);
+    });
+  });
+
+  describe('updateProfile', () => {
+    it('should update name via prisma and return mapped profile', async () => {
+      const updatedUser = { ...mockUser, name: 'New Name' };
+      mockPrisma.user.update.mockResolvedValue(updatedUser);
+
+      const result = await service.updateProfile('user-1', 'New Name');
+
+      expect(mockPrisma.user.update).toHaveBeenCalledWith({
+        where: { id: 'user-1' },
+        data: { name: 'New Name' },
+      });
+      expect(result.displayName).toBe('New Name');
+      expect(result.id).toBe('user-1');
     });
   });
 });

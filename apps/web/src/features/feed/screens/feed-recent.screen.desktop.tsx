@@ -5,7 +5,7 @@ import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { useFeedRecentScreen } from "@sd/domain-content";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { FeedContentCard } from "../components/feed-content-card/feed-content-card";
+import { FeedListRow } from "../components/feed-list-row/feed-list-row";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import { FeedTopicRow } from "../components/feed-topic-row/feed-topic-row";
 import { FeedSkeleton } from "../components/feed-skeleton/feed-skeleton";
@@ -30,7 +30,7 @@ type FeedBlocksProps = {
 };
 
 /**
- * Render the feed as a responsive grid of content cards, with scholar/topic
+ * Render the feed as a responsive list of content rows, with scholar/topic
  * carousels breaking out to full-width sections in their original order.
  */
 function FeedBlocks({ items, onNavigateToLecture, onNavigateToScholar }: FeedBlocksProps) {
@@ -40,7 +40,7 @@ function FeedBlocks({ items, onNavigateToLecture, onNavigateToScholar }: FeedBlo
   const flushCards = (key: string) => {
     if (cards.length === 0) return;
     blocks.push(
-      <div className={styles.grid} key={`grid-${key}`}>
+      <div className={styles.list} key={`list-${key}`}>
         {cards}
       </div>,
     );
@@ -68,7 +68,7 @@ function FeedBlocks({ items, onNavigateToLecture, onNavigateToScholar }: FeedBlo
       );
     } else {
       cards.push(
-        <FeedContentCard
+        <FeedListRow
           key={item.id}
           item={item as FeedContentItemDto}
           onPress={() => onNavigateToLecture?.(item.slug)}
@@ -92,6 +92,7 @@ export function FeedDesktopScreen({
   const hero = (
     <header className={styles.hero}>
       <h2 className={styles.heroTitle}>Feed</h2>
+      <p className={styles.heroSubtitle}>Scholarly, calm, and authentic Islamic knowledge</p>
     </header>
   );
 

@@ -15,12 +15,12 @@ describe("buildSectionTabPath", () => {
   it("appends non-default library tab", () => {
     expect(buildSectionTabPath("library", "saved")).toBe("/library/saved");
   });
-  it("collapses default account tab to /account", () => {
-    expect(buildSectionTabPath("account")).toBe("/account");
-    expect(buildSectionTabPath("account", "general")).toBe("/account");
+  it("collapses default settings tab to /settings", () => {
+    expect(buildSectionTabPath("settings")).toBe("/settings");
+    expect(buildSectionTabPath("settings", "general")).toBe("/settings");
   });
-  it("appends non-default account tab", () => {
-    expect(buildSectionTabPath("account", "profile")).toBe("/account/profile");
+  it("appends non-default settings tab", () => {
+    expect(buildSectionTabPath("settings", "profile")).toBe("/settings/profile");
   });
   it("collapses default live tab (ongoing) to /live", () => {
     expect(buildSectionTabPath("live")).toBe("/live");

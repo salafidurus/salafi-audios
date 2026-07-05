@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach } from "vitest";
 import { QueueManager } from "./queue.manager";
 import type { Track } from "../types/track.types";
 

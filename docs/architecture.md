@@ -143,8 +143,8 @@ The shipped web app currently preserves the same high-level section model and se
 
 ## 9. Technology Stack
 
-- Monorepo: PNPM, Turborepo
-- Backend: NestJS, Prisma, PostgreSQL
+- Monorepo: Bun Workspaces, Turborepo
+- Backend: NestJS, Prisma, PostgreSQL (with native UUIDv4 primary keys and pg_trgm GIN indexing)
 - Web: Next.js, React, Unistyles
 - Mobile: Expo, React Native, Expo Router, Unistyles
 - Shared: TypeScript, Zod, TanStack Query

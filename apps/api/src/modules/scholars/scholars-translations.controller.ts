@@ -1,18 +1,11 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Patch,
-  Param,
-  Body,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { RequiresPermission } from '../../shared/decorators/requires-permission.decorator';
 import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { ScholarsService } from './scholars.service';
 import { SaveScholarTranslationDto } from './dto/save-scholar-translation.dto';
+import { UpdateScholarTranslationDto } from './dto/update-scholar-translation.dto';
 
 @ApiTags('Scholar Translations')
 @ApiCommonErrors()
@@ -31,10 +24,7 @@ export class ScholarsTranslationsController {
   @Post(':id/translations')
   @RequiresPermission('manage:content')
   @ApiOperation({ summary: 'Upsert a scholar translation' })
-  upsertTranslation(
-    @Param('id') id: string,
-    @Body() dto: SaveScholarTranslationDto,
-  ) {
+  upsertTranslation(@Param('id') id: string, @Body() dto: SaveScholarTranslationDto) {
     return this.service.upsertTranslation(id, dto);
   }
 
@@ -44,7 +34,7 @@ export class ScholarsTranslationsController {
   updateTranslation(
     @Param('id') id: string,
     @Param('locale') locale: string,
-    @Body() body: Partial<{ name: string; bio: string | null }>,
+    @Body() body: UpdateScholarTranslationDto,
   ) {
     return this.service.updateTranslation(id, locale, body);
   }
@@ -59,10 +49,7 @@ export class ScholarsTranslationsController {
   @Post(':id/translations/:locale/unpublish')
   @RequiresPermission('manage:content')
   @ApiOperation({ summary: 'Unpublish a scholar translation' })
-  unpublishTranslation(
-    @Param('id') id: string,
-    @Param('locale') locale: string,
-  ) {
+  unpublishTranslation(@Param('id') id: string, @Param('locale') locale: string) {
     return this.service.unpublishTranslation(id, locale);
   }
 }

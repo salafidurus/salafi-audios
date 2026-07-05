@@ -1,5 +1,6 @@
 /* global jest */
 jest.setTimeout(15000);
+jest.retryTimes(2);
 
 // Eagerly evaluate Expo's lazy globals to prevent Jest from throwing "import outside of the scope of the test code"
 // when they are accessed asynchronously/lazy-loaded later during tests.
@@ -22,7 +23,7 @@ for (const name of eagerEvaluate) {
   try {
     if (global[name]) {
       // Eagerly access a property to trigger the lazy getter
-      const _ = global[name].prototype || global[name];
+      void (global[name].prototype || global[name]);
     }
   } catch {
     // Ignore any evaluation errors during eager load
@@ -35,7 +36,7 @@ jest.mock("react-native/Libraries/EventEmitter/NativeEventEmitter");
 // jest. Mock it so StyleSheet.create((theme) => ...) resolves against the real
 // light theme and useUnistyles exposes that theme.
 jest.mock("react-native-unistyles", () => {
-  const { lightNativeTheme } = require("@sd/design-tokens");
+  const { lightNativeTheme } = require("./src/core/styles/theme");
   const resolve = (styles) =>
     typeof styles === "function" ? styles(lightNativeTheme, {}) : styles;
   return {

@@ -14,8 +14,7 @@ concurrency:
 permissions:
   contents: read
 
-env:
-  NODE_VERSION: "24"
+# Bun is the runtime; no Node.js version required
 
 jobs:
   migrate:
@@ -31,30 +30,27 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v6
-
-      - uses: actions/setup-node@v6
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
+          bun-version: "1.3.14"
 
       - name: Install
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Build deps needed for typecheck
-        run: pnpm build --filter=@sd/core-db^...
+        run: bun run build --filter=@sd/core-db^...
 
       - name: Validate Prisma schema
         env:
           DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
-        run: pnpm --filter @sd/core-db run prisma:validate
+        run: bun run --filter @sd/core-db prisma:validate
 
       - name: Apply migrations
         env:
           DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
-        run: pnpm --filter @sd/core-db run migrate:deploy
+        run: bun run --filter @sd/core-db migrate:deploy
 
       - name: Generate Prisma client
         env:
           DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL }}
-        run: pnpm --filter @sd/core-db run prisma:generate
+        run: bun run --filter @sd/core-db prisma:generate

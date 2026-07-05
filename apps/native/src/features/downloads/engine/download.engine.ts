@@ -28,7 +28,7 @@ export async function downloadLecture(lectureId: string, audioUrl: string): Prom
     actions.setProgress(lectureId, 50);
 
     // Get presigned URL if needed (stub — audioUrl used directly until expo-file-system implemented)
-    void (audioUrl || endpoints.lectures.detail(lectureId));
+    void (audioUrl || endpoints.listings.detail(lectureId));
 
     // Mark complete (in production, use actual file URI)
     const localUri = `file:///lectures/${lectureId}.mp3`;

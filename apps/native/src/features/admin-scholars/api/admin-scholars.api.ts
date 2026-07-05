@@ -1,29 +1,25 @@
 import { httpClient, endpoints } from "@sd/core-contracts";
 import type {
-  AdminSeriesListItemDto,
-  AdminSeriesDetailDto,
-  CreateSeriesDto,
-  UpdateSeriesDto,
-  AdminCollectionListItemDto,
-  AdminCollectionDetailDto,
-  CreateCollectionDto,
-  UpdateCollectionDto,
+  AdminListingListItemDto,
+  AdminListingDetailDto,
+  CreateListingDto,
+  AdminListingUpdateDto,
   BulkActionDto,
   BulkActionResultDto,
 } from "@sd/core-contracts";
 
 // Series
-export async function fetchAdminSeries(scholarId: string): Promise<AdminSeriesListItemDto[]> {
-  return httpClient<AdminSeriesListItemDto[]>({
-    url: endpoints.admin.series.list,
+export async function fetchAdminSeries(scholarId: string): Promise<AdminListingListItemDto[]> {
+  return httpClient<AdminListingListItemDto[]>({
+    url: endpoints.admin.listings.list,
     method: "GET",
-    params: { scholarId },
+    params: { scholarId, format: "series" },
   });
 }
 
-export async function createSeries(data: CreateSeriesDto): Promise<AdminSeriesDetailDto> {
-  return httpClient<AdminSeriesDetailDto>({
-    url: endpoints.admin.series.create,
+export async function createSeries(data: CreateListingDto): Promise<AdminListingDetailDto> {
+  return httpClient<AdminListingDetailDto>({
+    url: endpoints.admin.listings.create,
     method: "POST",
     body: data,
   });
@@ -31,39 +27,35 @@ export async function createSeries(data: CreateSeriesDto): Promise<AdminSeriesDe
 
 export async function updateSeries(
   id: string,
-  data: Partial<UpdateSeriesDto>,
-): Promise<AdminSeriesDetailDto> {
-  return httpClient<AdminSeriesDetailDto>({
-    url: endpoints.admin.series.update(id),
-    method: "PATCH",
+  data: Partial<AdminListingUpdateDto>,
+): Promise<AdminListingDetailDto> {
+  return httpClient<AdminListingDetailDto>({
+    url: endpoints.admin.listings.update(id),
+    method: "PUT",
     body: data,
   });
 }
 
 export async function bulkSeriesAction(data: BulkActionDto): Promise<BulkActionResultDto> {
   return httpClient<BulkActionResultDto>({
-    url: endpoints.admin.series.bulk,
+    url: endpoints.admin.listings.bulk,
     method: "POST",
     body: data,
   });
 }
 
 // Collections
-export async function fetchAdminCollections(
-  scholarId: string,
-): Promise<AdminCollectionListItemDto[]> {
-  return httpClient<AdminCollectionListItemDto[]>({
-    url: endpoints.admin.collections.list,
+export async function fetchAdminCollections(scholarId: string): Promise<AdminListingListItemDto[]> {
+  return httpClient<AdminListingListItemDto[]>({
+    url: endpoints.admin.listings.list,
     method: "GET",
-    params: { scholarId },
+    params: { scholarId, format: "collection" },
   });
 }
 
-export async function createCollection(
-  data: CreateCollectionDto,
-): Promise<AdminCollectionDetailDto> {
-  return httpClient<AdminCollectionDetailDto>({
-    url: endpoints.admin.collections.create,
+export async function createCollection(data: CreateListingDto): Promise<AdminListingDetailDto> {
+  return httpClient<AdminListingDetailDto>({
+    url: endpoints.admin.listings.create,
     method: "POST",
     body: data,
   });
@@ -71,18 +63,18 @@ export async function createCollection(
 
 export async function updateCollection(
   id: string,
-  data: Partial<UpdateCollectionDto>,
-): Promise<AdminCollectionDetailDto> {
-  return httpClient<AdminCollectionDetailDto>({
-    url: endpoints.admin.collections.update(id),
-    method: "PATCH",
+  data: Partial<AdminListingUpdateDto>,
+): Promise<AdminListingDetailDto> {
+  return httpClient<AdminListingDetailDto>({
+    url: endpoints.admin.listings.update(id),
+    method: "PUT",
     body: data,
   });
 }
 
 export async function bulkCollectionAction(data: BulkActionDto): Promise<BulkActionResultDto> {
   return httpClient<BulkActionResultDto>({
-    url: endpoints.admin.collections.bulk,
+    url: endpoints.admin.listings.bulk,
     method: "POST",
     body: data,
   });

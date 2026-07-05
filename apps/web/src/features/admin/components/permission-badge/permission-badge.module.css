@@ -1,0 +1,15 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px var(--space-scale-xs);
+  border-radius: var(--radius-scale-sm);
+  font-size: var(--typo-xs-font-size);
+  background: var(--surface-primary-subtle);
+  color: var(--content-primary-strong);
+}
+
+.icon {
+  width: 12px;
+  height: 12px;
+}

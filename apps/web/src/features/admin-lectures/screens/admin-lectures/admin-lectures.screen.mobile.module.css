@@ -1,12 +1,12 @@
 .container {
-  padding: 0 4px 24px 4px;
+  padding: 0 var(--space-scale-xs) var(--space-scale-2xl) var(--space-scale-xs);
 }
 
 .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: var(--space-scale-lg);
 }
 
 .title {
@@ -36,7 +36,7 @@
 }
 
 .uploaderWrapper {
-  margin-bottom: 16px;
+  margin-bottom: var(--space-scale-lg);
   animation: slideDown 0.2s ease-out;
 }
 
@@ -52,7 +52,7 @@
 }
 
 .searchSection {
-  margin-bottom: 12px;
+  margin-bottom: var(--space-scale-md);
 }
 
 .searchWrapper {
@@ -70,7 +70,7 @@
 
 .searchInput {
   width: 100%;
-  padding: 8px 10px 8px 32px;
+  padding: var(--space-scale-sm) 10px var(--space-scale-sm) var(--space-scale-3xl);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-scale-md);
   background-color: var(--surface-default);
@@ -85,7 +85,7 @@
 }
 
 .tabsSection {
-  margin-bottom: 16px;
+  margin-bottom: var(--space-scale-lg);
 }
 
 .statusTabs {
@@ -106,7 +106,7 @@
   background: none;
   color: var(--content-muted);
   font-family: var(--typo-label-md-font-family);
-  font-size: 12px;
+  font-size: var(--typo-caption-font-size);
   font-weight: 500;
   cursor: pointer;
 }
@@ -119,15 +119,15 @@
 
 .loading {
   text-align: center;
-  padding: 24px 0;
+  padding: var(--space-scale-2xl) 0;
   color: var(--content-muted);
-  font-size: 14px;
+  font-size: var(--typo-body-sm-font-size);
 }
 
 .cardsList {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-scale-md);
 }
 
 .card {
@@ -138,19 +138,19 @@
   box-shadow: var(--shadow-xs);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-scale-sm);
 }
 
 .cardHeader {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 12px;
+  gap: var(--space-scale-md);
 }
 
 .cardTitle {
   font-family: var(--typo-title-md-font-family);
-  font-size: 15px;
+  font-size: var(--typo-body-sm-font-size);
   font-weight: 600;
   color: var(--content-strong);
   margin: 0;
@@ -162,7 +162,7 @@
   align-items: center;
   padding: 1px 6px;
   border-radius: var(--radius-scale-full);
-  font-size: 11px;
+  font-size: var(--typo-xs-font-size);
   font-weight: 500;
   text-transform: capitalize;
 }
@@ -184,7 +184,7 @@
 
 .cardMeta {
   display: flex;
-  font-size: 13px;
+  font-size: var(--typo-caption-font-size);
   font-family: var(--typo-body-sm-font-family);
   line-height: 1.2;
 }
@@ -203,46 +203,46 @@
   display: flex;
   justify-content: flex-end;
   border-top: 1px solid var(--accent-divider);
-  padding-top: 8px;
-  margin-top: 4px;
+  padding-top: var(--space-scale-sm);
+  margin-top: var(--space-scale-xs);
 }
 
 .cardEditBtn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 12px;
+  gap: var(--space-scale-xs);
+  padding: var(--space-scale-xs) var(--space-scale-md);
   border-radius: var(--radius-scale-sm);
   border: 1px solid var(--border-subtle);
   background-color: var(--surface-default);
   color: var(--content-default);
-  font-size: 12px;
+  font-size: var(--typo-caption-font-size);
   font-weight: 500;
   cursor: pointer;
 }
 
 .noData {
   text-align: center;
-  padding: 24px 0;
+  padding: var(--space-scale-2xl) 0;
   color: var(--content-muted);
-  font-size: 13px;
+  font-size: var(--typo-caption-font-size);
 }
 
 .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 12px;
-  margin-top: 20px;
+  gap: var(--space-scale-md);
+  margin-top: var(--space-scale-xl);
 }
 
 .pageBtn {
-  padding: 4px 10px;
+  padding: var(--space-scale-xs) 10px;
   border-radius: var(--radius-scale-md);
   border: 1px solid var(--border-default);
   background-color: var(--surface-default);
   color: var(--content-default);
-  font-size: 12px;
+  font-size: var(--typo-caption-font-size);
   cursor: pointer;
 }
 
@@ -252,6 +252,6 @@
 }
 
 .pageInfo {
-  font-size: 12px;
+  font-size: var(--typo-caption-font-size);
   color: var(--content-default);
 }

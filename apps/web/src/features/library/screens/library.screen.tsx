@@ -1,16 +1,12 @@
 "use client";
 
 import { Responsive } from "@/shared/components/Responsive";
-import { LibrarySavedDesktopScreen } from "./library-saved.screen.desktop";
-import { LibrarySavedMobileScreen } from "./library-saved.screen.mobile";
+import { LibraryDesktopScreen } from "./library.screen.desktop";
+import { LibraryMobileScreen } from "./library.screen.mobile";
 
-export type LibraryScreenProps = {
-  onNavigateToLecture?: (id: string) => void;
-};
-
-export function LibraryScreen(props: LibraryScreenProps) {
-  const mobile = <LibrarySavedMobileScreen {...props} />;
-  const desktop = <LibrarySavedDesktopScreen {...props} />;
+export function LibraryScreen() {
+  const mobile = <LibraryMobileScreen />;
+  const desktop = <LibraryDesktopScreen />;
   // react-doctor-disable-next-line react-doctor/jsx-no-jsx-as-prop
   return <Responsive mobile={mobile} desktop={desktop} />;
 }

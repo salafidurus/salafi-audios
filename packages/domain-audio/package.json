@@ -18,8 +18,8 @@
     "@sd/core-contracts": "workspace:*",
     "zustand": "catalog:"
   },
+  "devDependencies": {},
   "peerDependencies": {
     "react": "*"
-  },
-  "devDependencies": {}
+  }
 }

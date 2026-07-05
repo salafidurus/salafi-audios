@@ -1,11 +1,11 @@
 .container {
   max-width: 1100px;
   margin: 0 auto;
-  padding-bottom: 40px;
+  padding-bottom: var(--space-scale-4xl);
 }
 
 .backNav {
-  margin-bottom: 16px;
+  margin-bottom: var(--space-scale-lg);
 }
 
 .backLink {
@@ -24,7 +24,7 @@
 }
 
 .header {
-  margin-bottom: 32px;
+  margin-bottom: var(--space-scale-3xl);
 }
 
 .subtitle {
@@ -33,7 +33,7 @@
   color: var(--content-subtle);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 4px;
+  margin-bottom: var(--space-scale-xs);
   display: block;
 }
 
@@ -48,18 +48,18 @@
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  gap: var(--space-scale-2xl);
 }
 
 .panel {
   background-color: var(--surface-default);
   border-radius: var(--radius-component-panel);
   border: 1px solid var(--border-subtle);
-  padding: 24px;
+  padding: var(--space-scale-2xl);
   box-shadow: var(--shadow-xs);
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-scale-lg);
 }
 
 .panelHeader {
@@ -79,14 +79,14 @@
 .addBtn {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 6px 12px;
+  gap: var(--space-scale-xs);
+  padding: 6px var(--space-scale-md);
   border-radius: var(--radius-scale-md);
   border: 1px solid var(--border-default);
   background-color: var(--surface-default);
   color: var(--content-default);
   font-family: var(--typo-label-md-font-family);
-  font-size: 13px;
+  font-size: var(--typo-caption-font-size);
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
@@ -99,9 +99,9 @@
   background-color: var(--surface-subtle);
   border-radius: var(--radius-scale-md);
   border: 1px solid var(--border-subtle);
-  padding: 12px;
+  padding: var(--space-scale-md);
   display: flex;
-  gap: 8px;
+  gap: var(--space-scale-sm);
   align-items: center;
   animation: slideDown 0.2s ease-out;
 }
@@ -123,7 +123,7 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-scale-md);
   font-family: var(--typo-body-sm-font-family);
-  font-size: 13px;
+  font-size: var(--typo-caption-font-size);
 }
 
 .input[type="number"] {
@@ -133,16 +133,16 @@
 
 .formActions {
   display: flex;
-  gap: 4px;
+  gap: var(--space-scale-xs);
 }
 
 .saveBtn {
-  padding: 6px 12px;
+  padding: 6px var(--space-scale-md);
   border-radius: var(--radius-scale-md);
   border: none;
   background-color: var(--accent-primary-bg);
   color: var(--accent-primary-fg);
-  font-size: 13px;
+  font-size: var(--typo-caption-font-size);
   font-weight: 500;
   cursor: pointer;
 }
@@ -153,14 +153,14 @@
   border: 1px solid var(--border-default);
   background-color: var(--surface-default);
   color: var(--content-default);
-  font-size: 13px;
+  font-size: var(--typo-caption-font-size);
   cursor: pointer;
 }
 
 .list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-scale-sm);
   max-height: 400px;
   overflow-y: auto;
 }
@@ -169,7 +169,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 12px;
+  padding: 10px var(--space-scale-md);
   border-radius: var(--radius-scale-md);
   border: 1px solid var(--accent-divider);
   background-color: var(--surface-default);
@@ -178,12 +178,12 @@
 .itemDetails {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-scale-md);
 }
 
 .itemTitle {
   font-family: var(--typo-body-md-font-family);
-  font-size: 14px;
+  font-size: var(--typo-body-sm-font-size);
   font-weight: 500;
   color: var(--content-strong);
 }
@@ -192,7 +192,7 @@
   display: inline-flex;
   padding: 1px 6px;
   border-radius: var(--radius-scale-full);
-  font-size: 11px;
+  font-size: var(--typo-xs-font-size);
   text-transform: capitalize;
 }
 
@@ -218,12 +218,12 @@
 
 .orderInput {
   width: 60px;
-  padding: 4px 6px;
+  padding: var(--space-scale-xs) 6px;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-scale-sm);
   text-align: center;
   font-family: var(--typo-body-sm-font-family);
-  font-size: 13px;
+  font-size: var(--typo-caption-font-size);
 }
 
 .orderInput:focus {
@@ -233,10 +233,10 @@
 
 .noData {
   font-family: var(--typo-caption-font-family);
-  font-size: 13px;
+  font-size: var(--typo-caption-font-size);
   color: var(--content-muted);
   text-align: center;
-  padding: 24px 0;
+  padding: var(--space-scale-2xl) 0;
 }
 
 @media (max-width: 900px) {

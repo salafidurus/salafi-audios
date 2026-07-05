@@ -3,7 +3,8 @@
 import { useScholarsList } from "@sd/domain-content";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { AppText } from "@/shared/components/AppText/AppText";
-import { ScholarCard } from "@/features/scholar/components/scholar-card/scholar-card";
+import { ScholarListRow } from "@/features/scholar/components/scholar-list-row/scholar-list-row";
+import styles from "./scholar-list.module.css";
 
 export type ScholarListMobileScreenProps = {
   onSelectScholar?: (slug: string) => void;
@@ -31,29 +32,18 @@ export function ScholarListMobileScreen({ onSelectScholar }: ScholarListMobileSc
 
   return (
     <ScreenView>
-      <div style={{ padding: "16px 0" }}>
-        <h1
-          style={{
-            fontSize: 22,
-            fontWeight: 700,
-            marginBottom: 16,
-            color: "var(--content-strong)",
-          }}
-        >
-          Scholars
-        </h1>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, 1fr)",
-            gap: 12,
-          }}
-        >
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Scholars</h1>
+          <p className={styles.tagline}>Browse our database of authentic scholars</p>
+        </div>
+        <div className={styles.list}>
           {scholars.map((scholar) => (
-            <ScholarCard key={scholar.id} scholar={scholar} onPress={onSelectScholar} />
+            <ScholarListRow key={scholar.id} scholar={scholar} onPress={onSelectScholar} />
           ))}
         </div>
       </div>
     </ScreenView>
   );
 }
+

@@ -12,13 +12,13 @@ describe('AudioService', () => {
 
   const mockProgress: AudioProgressDto[] = [
     {
-      lectureId: 'l1',
+      listingId: 'l1',
       positionSeconds: 900,
       durationSeconds: 1800,
       updatedAt: new Date('2024-01-01T00:00:00.000Z').toISOString(),
     },
     {
-      lectureId: 'l2',
+      listingId: 'l2',
       positionSeconds: 1800,
       durationSeconds: 1800,
       completedAt: new Date('2024-01-01T00:00:00.000Z').toISOString(),
@@ -36,7 +36,7 @@ describe('AudioService', () => {
             getUserProgress: vi.fn(),
             upsertProgress: vi.fn(),
             bulkSync: vi.fn(),
-            findLectureById: vi.fn(),
+            findListingById: vi.fn(),
             findPrimaryAsset: vi.fn(),
             findFirstAsset: vi.fn(),
           } satisfies Partial<Mocked<AudioRepository>>,
@@ -69,10 +69,7 @@ describe('AudioService', () => {
       const result = await service.getUserProgress('user1', sinceStr);
 
       expect(result).toEqual(mockProgress);
-      expect(repo.getUserProgress).toHaveBeenCalledWith(
-        'user1',
-        new Date(sinceStr),
-      );
+      expect(repo.getUserProgress).toHaveBeenCalledWith('user1', new Date(sinceStr));
     });
   });
 
@@ -80,15 +77,9 @@ describe('AudioService', () => {
     it('should call repo with all provided params', async () => {
       repo.upsertProgress.mockResolvedValue(undefined);
 
-      await service.upsertProgress('user1', 'lecture1', 300, 1800, false);
+      await service.upsertProgress('user1', 'listing1', 300, 1800, false);
 
-      expect(repo.upsertProgress).toHaveBeenCalledWith(
-        'user1',
-        'lecture1',
-        300,
-        1800,
-        false,
-      );
+      expect(repo.upsertProgress).toHaveBeenCalledWith('user1', 'listing1', 300, 1800, false);
     });
   });
 
@@ -96,7 +87,7 @@ describe('AudioService', () => {
     it('should sync multiple progress items for user', async () => {
       const items: ProgressSyncItemDto[] = [
         {
-          lectureId: 'l1',
+          listingId: 'l1',
           positionSeconds: 300,
           durationSeconds: 1800,
           updatedAt: new Date().toISOString(),
@@ -111,18 +102,16 @@ describe('AudioService', () => {
   });
 
   describe('resolveStreamUrl', () => {
-    const mockLecture = { id: 'l1', durationSeconds: 1200 } as any;
+    const mockListing = { id: 'l1', durationSeconds: 1200 } as any;
 
-    it('should throw NotFoundException when lecture does not exist', async () => {
-      repo.findLectureById.mockResolvedValue(null);
+    it('should throw NotFoundException when listing does not exist', async () => {
+      repo.findListingById.mockResolvedValue(null);
 
-      await expect(service.resolveStreamUrl('l1')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.resolveStreamUrl('l1')).rejects.toThrow(NotFoundException);
     });
 
     it('should return the primary audio asset if available', async () => {
-      repo.findLectureById.mockResolvedValue(mockLecture);
+      repo.findListingById.mockResolvedValue(mockListing);
       repo.findPrimaryAsset.mockResolvedValue({
         url: 'https://primary.mp3',
         durationSeconds: 1200,
@@ -137,12 +126,12 @@ describe('AudioService', () => {
         durationSeconds: 1200,
         format: 'mp3',
       });
-      expect(repo.findLectureById).toHaveBeenCalledWith('l1');
+      expect(repo.findListingById).toHaveBeenCalledWith('l1');
       expect(repo.findPrimaryAsset).toHaveBeenCalledWith('l1');
     });
 
     it('should fallback to the first audio asset if no primary asset exists', async () => {
-      repo.findLectureById.mockResolvedValue(mockLecture);
+      repo.findListingById.mockResolvedValue(mockListing);
       repo.findPrimaryAsset.mockResolvedValue(null);
       repo.findFirstAsset.mockResolvedValue({
         url: 'https://fallback.mp3',
@@ -158,19 +147,17 @@ describe('AudioService', () => {
         durationSeconds: 1200,
         format: 'mp3',
       });
-      expect(repo.findLectureById).toHaveBeenCalledWith('l1');
+      expect(repo.findListingById).toHaveBeenCalledWith('l1');
       expect(repo.findPrimaryAsset).toHaveBeenCalledWith('l1');
       expect(repo.findFirstAsset).toHaveBeenCalledWith('l1');
     });
 
     it('should throw NotFoundException if no audio assets exist at all', async () => {
-      repo.findLectureById.mockResolvedValue(mockLecture);
+      repo.findListingById.mockResolvedValue(mockListing);
       repo.findPrimaryAsset.mockResolvedValue(null);
       repo.findFirstAsset.mockResolvedValue(null);
 
-      await expect(service.resolveStreamUrl('l1')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.resolveStreamUrl('l1')).rejects.toThrow(NotFoundException);
     });
   });
 });

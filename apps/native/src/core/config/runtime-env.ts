@@ -52,7 +52,6 @@ export function getRuntimeEnv(): NativeRuntimeExtra | null {
 
   if (!cachedEnv && !hasLoggedRuntimeExtraWarning) {
     hasLoggedRuntimeExtraWarning = true;
-    // eslint-disable-next-line no-console
     console.warn(
       "Native runtime extra is unavailable during startup. API initialization will stay disabled until runtime config is present.",
     );

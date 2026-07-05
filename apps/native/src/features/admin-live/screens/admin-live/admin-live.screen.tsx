@@ -72,10 +72,13 @@ export function AdminLiveScreen() {
   const [showSessionSheet, setShowSessionSheet] = useState(false);
   const sessions = sessionsData?.sessions ?? [];
 
-  const handleStatusChange = async (id: string, status: "live" | "ended") => {
-    await updateSessionStatus(id, status);
-    refetchSessions();
-  };
+  const handleStatusChange = useCallback(
+    async (id: string, status: "live" | "ended") => {
+      await updateSessionStatus(id, status);
+      refetchSessions();
+    },
+    [refetchSessions],
+  );
 
   const handleChannelPress = useCallback((channel: LivestreamChannelDto) => {
     setEditingChannel(channel);
@@ -86,7 +89,7 @@ export function AdminLiveScreen() {
     ({ item: s }: { item: LiveSessionPublicDto }) => (
       <SessionRow session={s} onStatusChange={handleStatusChange} />
     ),
-    [],
+    [handleStatusChange],
   );
 
   const renderChannelItem = useCallback(
@@ -160,16 +163,16 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
   },
   screenContent: {
-    padding: 16,
-    paddingBottom: 40,
+    padding: theme.spacing.scale.lg,
+    paddingBottom: theme.spacing.scale["4xl"],
   },
   sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: theme.spacing.scale.md,
   },
   sectionHeaderSpacing: {
-    marginTop: 24,
+    marginTop: theme.spacing.scale["2xl"],
   },
   sectionTitle: {
     flex: 1,
@@ -178,9 +181,9 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.content.strong,
   },
   newBtn: {
-    padding: 8,
+    padding: theme.spacing.scale.sm,
     backgroundColor: theme.colors.action.primary,
-    borderRadius: 8,
+    borderRadius: theme.radius.scale.sm,
   },
   newBtnText: {
     color: theme.colors.content.onPrimary,
@@ -188,19 +191,19 @@ const styles = StyleSheet.create((theme) => ({
   },
   emptyText: {
     color: theme.colors.content.muted,
-    marginBottom: 16,
+    marginBottom: theme.spacing.scale.lg,
   },
   sessionRow: {
-    padding: 12,
-    borderWidth: 1,
+    padding: theme.spacing.scale.md,
+    borderWidth: theme.border.width.default,
     borderColor: theme.colors.border.subtle,
-    borderRadius: 8,
-    marginBottom: 8,
+    borderRadius: theme.radius.scale.sm,
+    marginBottom: theme.spacing.scale.sm,
   },
   sessionRowHeader: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: theme.spacing.scale.sm,
   },
   sessionTitle: {
     flex: 1,
@@ -208,9 +211,9 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.content.strong,
   },
   statusBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
+    paddingHorizontal: theme.spacing.scale.sm,
+    paddingVertical: theme.spacing.scale.xs,
+    borderRadius: theme.radius.scale.xs,
   },
   statusText: {
     fontSize: 12,
@@ -219,23 +222,23 @@ const styles = StyleSheet.create((theme) => ({
   },
   sessionActions: {
     flexDirection: "row",
-    gap: 6,
-    marginTop: 8,
+    gap: theme.spacing.component.chipY,
+    marginTop: theme.spacing.scale.sm,
   },
   goLiveBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: theme.spacing.scale.sm,
+    paddingVertical: theme.spacing.scale.xs,
     backgroundColor: theme.colors.action.danger,
-    borderRadius: 6,
+    borderRadius: theme.radius.scale.sm,
   },
   goLiveBtnText: {
     color: theme.colors.content.onDanger,
   },
   endBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: theme.spacing.scale.sm,
+    paddingVertical: theme.spacing.scale.xs,
     backgroundColor: theme.colors.surface.inverse,
-    borderRadius: 6,
+    borderRadius: theme.radius.scale.sm,
   },
   endBtnText: {
     color: theme.colors.content.inverse,
@@ -245,11 +248,11 @@ const styles = StyleSheet.create((theme) => ({
     fontWeight: "600",
   },
   channelRow: {
-    padding: 12,
-    borderWidth: 1,
+    padding: theme.spacing.scale.md,
+    borderWidth: theme.border.width.default,
     borderColor: theme.colors.border.subtle,
-    borderRadius: 8,
-    marginBottom: 8,
+    borderRadius: theme.radius.scale.sm,
+    marginBottom: theme.spacing.scale.sm,
   },
   channelName: {
     fontWeight: "600",

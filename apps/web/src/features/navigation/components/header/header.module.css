@@ -48,8 +48,8 @@
 
 .brandText {
   font-family: var(--typo-display-lg-font-family), serif;
-  font-size: 1.15rem;
-  font-weight: 700;
+  font-size: var(--typo-title-lg-font-size);
+  font-weight: var(--typo-title-lg-font-weight);
   line-height: 1;
   color: var(--content-strong);
   white-space: nowrap;
@@ -63,7 +63,7 @@
 
 @media (max-width: 720px) {
   .inner {
-    padding-inline: 1rem;
+    padding-inline: var(--space-scale-lg);
   }
 
   .brandText {

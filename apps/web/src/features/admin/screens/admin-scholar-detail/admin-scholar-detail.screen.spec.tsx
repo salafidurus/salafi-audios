@@ -3,7 +3,6 @@ import { render, screen } from "@testing-library/react";
 import { AdminScholarDetailScreen } from "./admin-scholar-detail.screen";
 
 vi.mock("@sd/core-contracts", async (importOriginal) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const actual = await importOriginal<any>();
   return {
     ...actual,
@@ -16,36 +15,38 @@ vi.mock("@sd/core-contracts", async (importOriginal) => {
           isFetching: false,
         };
       }
-      if (key[0] === "series") {
+      if (key[0] === "admin-listings-scholar") {
         return {
           data: [
             {
               id: "ser-1",
               title: "Series One",
               scholarId: "scholar-1",
+              scholarName: "Scholar One",
+              format: "series",
               orderIndex: 1,
               status: "published",
+              createdAt: "2026-07-04T00:00:00Z",
             },
             {
               id: "ser-2",
               title: "Series Two",
               scholarId: "scholar-1",
+              scholarName: "Scholar One",
+              format: "series",
               orderIndex: 2,
               status: "draft",
+              createdAt: "2026-07-04T00:00:00Z",
             },
-          ],
-          isFetching: false,
-        };
-      }
-      if (key[0] === "collections") {
-        return {
-          data: [
             {
               id: "col-1",
               title: "Collection One",
               scholarId: "scholar-1",
+              scholarName: "Scholar One",
+              format: "collection",
               orderIndex: 1,
               status: "published",
+              createdAt: "2026-07-04T00:00:00Z",
             },
           ],
           isFetching: false,
@@ -59,11 +60,8 @@ vi.mock("@sd/core-contracts", async (importOriginal) => {
         list: () => ["scholars", "list"],
       },
       admin: {
-        series: {
-          list: () => ["series", "all-list"],
-        },
-        collections: {
-          list: () => ["collections", "all-list"],
+        listings: {
+          list: "/admin/listings",
         },
       },
     },

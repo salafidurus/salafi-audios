@@ -19,8 +19,8 @@ describe("getCurrentSection", () => {
   it("returns home for unmatched paths", () => {
     expect(getCurrentSection("/scholars/some-slug")).toBe("home");
   });
-  it("returns account for /account", () => {
-    expect(getCurrentSection("/account")).toBe("account");
+  it("returns settings for /settings", () => {
+    expect(getCurrentSection("/settings")).toBe("settings");
   });
 });
 

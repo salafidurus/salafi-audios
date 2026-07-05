@@ -43,12 +43,12 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
   },
   content: {
-    padding: 16,
+    padding: theme.spacing.scale.lg,
   },
   title: {
     fontSize: 22,
     fontWeight: "700",
-    marginBottom: 16,
+    marginBottom: theme.spacing.scale.lg,
     color: theme.colors.content.strong,
   },
   section: {

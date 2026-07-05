@@ -27,12 +27,12 @@ const styles = StyleSheet.create((theme) => ({
   container: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
-    marginTop: 16,
+    gap: theme.spacing.scale.sm,
+    marginTop: theme.spacing.scale.lg,
   },
   chip: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: theme.spacing.scale.md,
+    paddingVertical: theme.spacing.scale.sm,
     borderRadius: 999,
     backgroundColor: theme.colors.surface.subtle,
   },

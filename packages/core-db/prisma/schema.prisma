@@ -1,17 +1,26 @@
 // packages/core-db/prisma/schema.prisma
 generator client {
-  provider     = "prisma-client-js"
-  output       = "../src/generated/prisma"
-  moduleFormat = "cjs"
+  provider        = "prisma-client-js"
+  output          = "../src/generated/prisma"
+  moduleFormat    = "cjs"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"
+  provider   = "postgresql"
+  extensions = [pg_trgm]
 }
 
 //////////////////////////
 // Enums
 //////////////////////////
+
+enum UserRole {
+  user
+  admin
+  editor
+  superadmin
+}
 
 enum Status {
   draft
@@ -20,24 +29,10 @@ enum Status {
   archived
 }
 
-enum AnalyticsContentKind {
-  lecture
-  series
+enum ListingFormat {
   collection
-}
-
-enum AnalyticsEventType {
-  view
-  play
-  complete
-  save
-  share
-}
-
-enum AnalyticsSource {
-  web
-  mobile
-  api
+  series
+  single
 }
 
 enum RecommendationRecurrence {
@@ -76,11 +71,8 @@ model IngestionBatch {
   environment String
   createdAt   DateTime @default(now())
 
-  // optional relations for easier cleanup (not required)
   scholars    Scholar[]    @relation("IngestBatchScholars")
-  collections Collection[] @relation("IngestBatchCollections")
-  series      Series[]     @relation("IngestBatchSeries")
-  lectures    Lecture[]    @relation("IngestBatchLectures")
+  listings    Listing[]    @relation("IngestBatchListings")
   audioAssets AudioAsset[] @relation("IngestBatchAudioAssets")
 
   @@unique([tag, environment])
@@ -100,8 +92,8 @@ model User {
   image         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  role          String    @default("user")
-  banned        Boolean?
+  role          UserRole  @default(user)
+  banned        Boolean   @default(false)
   banReason     String?
   banExpires    DateTime?
 
@@ -113,8 +105,8 @@ model User {
   accounts            Account[]
   scholarRoles        UserScholarRole[]
   createdScholarRoles UserScholarRole[]     @relation("createdByUser")
-  progress            UserLectureProgress[]
-  favorites           FavoriteLecture[]
+  progress            UserListingProgress[]
+  favorites           FavoriteListing[]
 
   adminPermissions        AdminPermission[]
   adminPermissionsGranted AdminPermission[] @relation("AdminPermissionGranter")
@@ -155,18 +147,23 @@ model UserScholarRole {
 //////////////////////////
 
 model Scholar {
-  id           String    @id @default(cuid())
+  id           String   @id @default(cuid())
   slug         String
   name         String
   bio          String?
   country      String?
   mainLanguage Locale?
   imageUrl     String?
-  isActive     Boolean   @default(true)
-  isKibar      Boolean   @default(false)
-  isFeatured   Boolean   @default(false)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime?
+  isActive     Boolean  @default(true)
+  isKibar      Boolean  @default(false)
+  isFeatured   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Decoupled audit columns
+  createdBy String? @db.Uuid
+  updatedBy String? @db.Uuid
+  deletedBy String? @db.Uuid
 
   // Social links
   socialTwitter  String?
@@ -177,9 +174,7 @@ model Scholar {
   ingestionBatchId String?
   ingestionBatch   IngestionBatch? @relation("IngestBatchScholars", fields: [ingestionBatchId], references: [id])
 
-  collections        Collection[]
-  series             Series[]
-  lectures           Lecture[]
+  listings           Listing[]
   userRoles          UserScholarRole[]
   livestreamChannels LivestreamChannel[]
   translations       ScholarTranslation[]
@@ -189,170 +184,93 @@ model Scholar {
 }
 
 //////////////////////////
-// Collections (big containers)
+// Listings
 //////////////////////////
 
-model Collection {
-  id                       String                    @id @default(cuid())
+model Listing {
+  id                       String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   scholarId                String
-  slug                     String
+  parentId                 String?       @db.Uuid
+  slug                     String        @unique
   title                    String
   description              String?
+  format                   ListingFormat
   coverImageUrl            String?
   language                 Locale?
-  status                   Status                    @default(draft)
-  orderIndex               Int?
-  publishedLectureCount    Int?
-  publishedDurationSeconds Int?
-  recommendationOverride   Boolean                   @default(false)
-  recommendationStartAt    DateTime?
-  recommendationEndAt      DateTime?
-  recommendationRecurrence RecommendationRecurrence? @default(none)
-  createdAt                DateTime                  @default(now())
-  updatedAt                DateTime?
-
-  deletedAt     DateTime?
-  deleteAfterAt DateTime?
-
-  ingestionBatchId String?
-  ingestionBatch   IngestionBatch? @relation("IngestBatchCollections", fields: [ingestionBatchId], references: [id])
-
-  scholar      Scholar                 @relation(fields: [scholarId], references: [id], onDelete: Restrict)
-  series       Series[]
-  topics       CollectionTopic[]
-  translations CollectionTranslation[]
-
-  @@unique([scholarId, slug], map: "uq_collection_scholar_slug")
-  @@index([scholarId, status], map: "idx_collection_scholar_status")
-  @@index([scholarId, orderIndex], map: "idx_collection_scholar_order")
-  @@index([deletedAt], map: "idx_collection_deleted")
-  @@index([deleteAfterAt], map: "idx_collection_deleteafter")
-}
-
-model RecommendationHero {
-  id         String               @id @default(cuid())
-  entityKind AnalyticsContentKind
-  entityId   String
-  headline   String
-  orderIndex Int                  @default(0)
-  isActive   Boolean              @default(true)
-  startAt    DateTime?
-  endAt      DateTime?
-  createdAt  DateTime             @default(now())
-
-  @@index([isActive, orderIndex], map: "idx_recommendationhero_active_order")
-  @@index([entityKind, entityId], map: "idx_recommendationhero_entity")
-}
-
-model AnalyticsEvent {
-  id          String               @id @default(cuid())
-  contentKind AnalyticsContentKind
-  contentId   String
-  eventType   AnalyticsEventType
-  weight      Int
-  occurredAt  DateTime             @default(now())
-  source      AnalyticsSource
-  createdAt   DateTime             @default(now())
-
-  @@index([contentKind, contentId, occurredAt], map: "idx_analytics_content_time")
-  @@index([eventType, occurredAt], map: "idx_analytics_event_time")
-}
-
-//////////////////////////
-// Series
-//////////////////////////
-
-model Series {
-  id                       String                    @id @default(cuid())
-  scholarId                String
-  collectionId             String?
-  slug                     String
-  title                    String
-  description              String?
-  coverImageUrl            String?
-  language                 Locale?
-  status                   Status                    @default(draft)
-  orderIndex               Int?
-  publishedLectureCount    Int?
-  publishedDurationSeconds Int?
-  recommendationOverride   Boolean                   @default(false)
-  recommendationStartAt    DateTime?
-  recommendationEndAt      DateTime?
-  recommendationRecurrence RecommendationRecurrence? @default(none)
-  createdAt                DateTime                  @default(now())
-  updatedAt                DateTime?
-
-  deletedAt     DateTime?
-  deleteAfterAt DateTime?
-
-  ingestionBatchId String?
-  ingestionBatch   IngestionBatch? @relation("IngestBatchSeries", fields: [ingestionBatchId], references: [id])
-
-  scholar      Scholar             @relation(fields: [scholarId], references: [id], onDelete: Restrict)
-  collection   Collection?         @relation(fields: [collectionId], references: [id], onDelete: Restrict)
-  lectures     Lecture[]
-  topics       SeriesTopic[]
-  translations SeriesTranslation[]
-
-  @@unique([scholarId, slug], map: "uq_series_scholar_slug")
-  @@index([collectionId, orderIndex], map: "idx_series_collection_order")
-  @@index([scholarId, status], map: "idx_series_scholar_status")
-  @@index([deletedAt], map: "idx_series_deleted")
-  @@index([deleteAfterAt], map: "idx_series_deleteafter")
-}
-
-//////////////////////////
-// Lectures (playable units)
-//////////////////////////
-
-model Lecture {
-  id                       String                    @id @default(cuid())
-  scholarId                String
-  seriesId                 String?
-  slug                     String
-  title                    String
-  description              String?
-  language                 Locale?
-  status                   Status                    @default(draft)
+  status                   Status        @default(draft)
   publishedAt              DateTime?
   orderIndex               Int?
   durationSeconds          Int?
-  recommendationOverride   Boolean                   @default(false)
-  recommendationStartAt    DateTime?
-  recommendationEndAt      DateTime?
-  recommendationRecurrence RecommendationRecurrence? @default(none)
-  createdAt                DateTime                  @default(now())
-  updatedAt                DateTime?
+  publishedLectureCount    Int?
+  publishedDurationSeconds Int?
+  createdAt                DateTime      @default(now())
+  updatedAt                DateTime?     @updatedAt
 
   deletedAt     DateTime?
   deleteAfterAt DateTime?
 
+  // Decoupled audit columns
+  createdBy String? @db.Uuid
+  updatedBy String? @db.Uuid
+  deletedBy String? @db.Uuid
+
   ingestionBatchId String?
-  ingestionBatch   IngestionBatch? @relation("IngestBatchLectures", fields: [ingestionBatchId], references: [id])
+  ingestionBatch   IngestionBatch? @relation("IngestBatchListings", fields: [ingestionBatchId], references: [id])
 
-  scholar      Scholar               @relation(fields: [scholarId], references: [id], onDelete: Restrict)
-  series       Series?               @relation(fields: [seriesId], references: [id], onDelete: Restrict)
-  audioAssets  AudioAsset[]
-  topics       LectureTopic[]
-  progress     UserLectureProgress[]
-  favorites    FavoriteLecture[]
-  translations LectureTranslation[]
+  scholar              Scholar               @relation(fields: [scholarId], references: [id], onDelete: Restrict)
+  parent               Listing?              @relation("ListingHierarchy", fields: [parentId, scholarId], references: [id, scholarId], onDelete: Restrict)
+  children             Listing[]             @relation("ListingHierarchy")
+  audioAssets          AudioAsset[]
+  topics               ListingTopic[]
+  progress             UserListingProgress[]
+  favorites            FavoriteListing[]
+  translations         ListingTranslation[]
+  curationMetadata     CurationMetadata?
+  recommendationHeroes RecommendationHero[]
 
-  @@unique([scholarId, slug], map: "uq_lecture_scholar_slug")
-  @@index([seriesId, orderIndex], map: "idx_lecture_series_order")
-  @@index([scholarId, status], map: "idx_lecture_scholar_status")
-  @@index([publishedAt], map: "idx_lecture_publishedat")
-  @@index([deletedAt], map: "idx_lecture_deleted")
-  @@index([deleteAfterAt], map: "idx_lecture_deleteafter")
+  @@unique([id, scholarId])
+  @@index([title(ops: raw("gin_trgm_ops"))], type: Gin)
+  @@index([parentId])
+  @@index([scholarId, status])
+  @@index([publishedAt])
+  @@index([deletedAt])
+  @@index([deleteAfterAt])
+  @@index([orderIndex])
+}
+
+model CurationMetadata {
+  id         String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  listingId  String                   @unique @db.Uuid
+  override   Boolean                  @default(false)
+  startAt    DateTime?
+  endAt      DateTime?
+  recurrence RecommendationRecurrence @default(none)
+  listing    Listing                  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+}
+
+model RecommendationHero {
+  id         String    @id @default(cuid())
+  listingId  String    @db.Uuid
+  headline   String
+  orderIndex Int       @default(0)
+  isActive   Boolean   @default(true)
+  startAt    DateTime?
+  endAt      DateTime?
+  createdAt  DateTime  @default(now())
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([isActive, orderIndex], map: "idx_recommendationhero_active_order")
+  @@index([listingId], map: "idx_recommendationhero_listing")
 }
 
 //////////////////////////
-// AudioAssets (one or many per lecture)
+// AudioAssets
 //////////////////////////
 
 model AudioAsset {
   id              String   @id @default(cuid())
-  lectureId       String
+  listingId       String   @db.Uuid
   url             String
   format          String?
   bitrateKbps     Int?
@@ -365,15 +283,13 @@ model AudioAsset {
   ingestionBatchId String?
   ingestionBatch   IngestionBatch? @relation("IngestBatchAudioAssets", fields: [ingestionBatchId], references: [id])
 
-  lecture Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
-  // partial unique index for primary must be created via raw SQL after migration:
-  // CREATE UNIQUE INDEX uq_audioasset_lecture_primary ON "AudioAsset"("lectureId") WHERE (isPrimary);
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
-  @@index([lectureId], map: "idx_audioasset_lecture")
+  @@index([listingId], map: "idx_audioasset_listing")
 }
 
 //////////////////////////
-// Topics & join tables (lecture, series, collection)
+// Topics & join tables
 //////////////////////////
 
 model Topic {
@@ -383,83 +299,57 @@ model Topic {
   parentId  String?
   createdAt DateTime @default(now())
 
-  parent           Topic?             @relation("TopicToParent", fields: [parentId], references: [id], onDelete: SetNull)
-  children         Topic[]            @relation("TopicToParent")
-  lectureTopics    LectureTopic[]
-  seriesTopics     SeriesTopic[]
-  collectionTopics CollectionTopic[]
-  translations     TopicTranslation[]
+  parent        Topic?             @relation("TopicToParent", fields: [parentId], references: [id], onDelete: Cascade)
+  children      Topic[]            @relation("TopicToParent")
+  listingTopics ListingTopic[]
+  translations  TopicTranslation[]
 
   @@unique([slug], map: "uq_topic_slug")
   @@index([parentId], map: "idx_topic_parent")
 }
 
-model LectureTopic {
-  lectureId String
+model ListingTopic {
+  listingId String   @db.Uuid
   topicId   String
   createdAt DateTime @default(now())
 
-  lecture Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
   topic   Topic   @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
-  @@id([lectureId, topicId])
-  @@index([topicId, lectureId], map: "idx_lecturetopic_topic_lecture")
-}
-
-model SeriesTopic {
-  seriesId  String
-  topicId   String
-  createdAt DateTime @default(now())
-
-  series Series @relation(fields: [seriesId], references: [id], onDelete: Cascade)
-  topic  Topic  @relation(fields: [topicId], references: [id], onDelete: Cascade)
-
-  @@id([seriesId, topicId])
-  @@index([topicId, seriesId], map: "idx_seriestopic_topic_series")
-}
-
-model CollectionTopic {
-  collectionId String
-  topicId      String
-  createdAt    DateTime @default(now())
-
-  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
-  topic      Topic      @relation(fields: [topicId], references: [id], onDelete: Cascade)
-
-  @@id([collectionId, topicId])
-  @@index([topicId, collectionId], map: "idx_collectiontopic_topic_collection")
+  @@id([listingId, topicId])
+  @@index([topicId, listingId], map: "idx_listingtopic_topic_listing")
 }
 
 //////////////////////////
 // Progress & Favorites
 //////////////////////////
 
-model UserLectureProgress {
+model UserListingProgress {
   userId          String
-  lectureId       String
+  listingId       String   @db.Uuid
   positionSeconds Int      @default(0)
   isCompleted     Boolean  @default(false)
   updatedAt       DateTime @default(now())
 
-  user    User    @relation(fields: [userId], references: [id], onDelete: Restrict)
-  lecture Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
-  @@id([userId, lectureId])
+  @@id([userId, listingId])
   @@index([userId, updatedAt], map: "idx_progress_user_updatedat")
-  @@index([lectureId], map: "idx_progress_lecture")
+  @@index([listingId], map: "idx_progress_listing")
 }
 
-model FavoriteLecture {
+model FavoriteListing {
   userId    String
-  lectureId String
+  listingId String   @db.Uuid
   createdAt DateTime @default(now())
 
-  user    User    @relation(fields: [userId], references: [id], onDelete: Restrict)
-  lecture Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
-  @@id([userId, lectureId])
+  @@id([userId, listingId])
   @@index([userId, createdAt], map: "idx_fav_user_createdat")
-  @@index([lectureId], map: "idx_fav_lecture")
+  @@index([listingId], map: "idx_fav_listing")
 }
 
 //////////////////////////
@@ -564,9 +454,9 @@ model ScholarTranslation {
   @@index([scholarId])
 }
 
-model LectureTranslation {
+model ListingTranslation {
   id          String            @id @default(cuid())
-  lectureId   String
+  listingId   String            @db.Uuid
   locale      Locale
   status      TranslationStatus @default(draft)
   title       String
@@ -574,42 +464,10 @@ model LectureTranslation {
   createdAt   DateTime          @default(now())
   updatedAt   DateTime          @updatedAt
 
-  lecture Lecture @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
-  @@unique([lectureId, locale])
-  @@index([lectureId])
-}
-
-model SeriesTranslation {
-  id          String            @id @default(cuid())
-  seriesId    String
-  locale      Locale
-  status      TranslationStatus @default(draft)
-  title       String
-  description String?
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-
-  series Series @relation(fields: [seriesId], references: [id], onDelete: Cascade)
-
-  @@unique([seriesId, locale])
-  @@index([seriesId])
-}
-
-model CollectionTranslation {
-  id           String            @id @default(cuid())
-  collectionId String
-  locale       Locale
-  status       TranslationStatus @default(draft)
-  title        String
-  description  String?
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
-
-  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
-
-  @@unique([collectionId, locale])
-  @@index([collectionId])
+  @@unique([listingId, locale])
+  @@index([listingId])
 }
 
 model TopicTranslation {

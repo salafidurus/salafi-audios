@@ -36,9 +36,7 @@ const mockTopicsService = {
   unpublishTranslation: vi.fn().mockResolvedValue(draftTranslation),
 };
 
-async function buildApp(
-  overrideGuard?: () => boolean | never,
-): Promise<INestApplication> {
+async function buildApp(overrideGuard?: () => boolean | never): Promise<INestApplication> {
   const builder = Test.createTestingModule({
     controllers: [TopicsController, TopicsTranslationsController],
     providers: [
@@ -64,9 +62,7 @@ describe('TopicsTranslationsController — auth boundaries', () => {
     mockAuth.api.getSession.mockReset();
     vi.clearAllMocks();
     mockTopicsService.upsertTranslation.mockResolvedValue(draftTranslation);
-    mockTopicsService.publishTranslation.mockResolvedValue(
-      publishedTranslation,
-    );
+    mockTopicsService.publishTranslation.mockResolvedValue(publishedTranslation);
     mockTopicsService.unpublishTranslation.mockResolvedValue(draftTranslation);
     app = await buildApp();
   });
@@ -105,9 +101,7 @@ describe('TopicsTranslationsController — auth boundaries', () => {
 
     it('GET /topics/:id/translations lists translations', async () => {
       mockTopicsService.listTranslations.mockResolvedValue([draftTranslation]);
-      const res = await request(app.getHttpServer())
-        .get('/topics/t1/translations')
-        .expect(200);
+      const res = await request(app.getHttpServer()).get('/topics/t1/translations').expect(200);
       expect(Array.isArray(res.body)).toBe(true);
     });
   });

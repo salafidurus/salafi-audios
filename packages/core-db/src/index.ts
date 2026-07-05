@@ -2,9 +2,8 @@ import * as client from "./generated/prisma/client";
 
 // Export types
 export type Status = client.Status;
-export type AnalyticsContentKind = client.AnalyticsContentKind;
-export type AnalyticsEventType = client.AnalyticsEventType;
-export type AnalyticsSource = client.AnalyticsSource;
+export type UserRole = client.UserRole;
+export type ListingFormat = client.ListingFormat;
 export type RecommendationRecurrence = client.RecommendationRecurrence;
 export type ScholarRole = client.ScholarRole;
 export type LiveSessionStatus = client.LiveSessionStatus;
@@ -14,9 +13,8 @@ export type PrismaClient = client.PrismaClient;
 
 // Export values
 export const Status = client.Status;
-export const AnalyticsContentKind = client.AnalyticsContentKind;
-export const AnalyticsEventType = client.AnalyticsEventType;
-export const AnalyticsSource = client.AnalyticsSource;
+export const UserRole = client.UserRole;
+export const ListingFormat = client.ListingFormat;
 export const RecommendationRecurrence = client.RecommendationRecurrence;
 export const ScholarRole = client.ScholarRole;
 export const LiveSessionStatus = client.LiveSessionStatus;

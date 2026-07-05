@@ -62,6 +62,14 @@ export async function httpClient<T>(options: {
 
   const payload = options.body ?? options.data;
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10_000);
+
+  // If the caller passed their own signal, abort our controller when theirs does
+  if (options.signal) {
+    options.signal.addEventListener("abort", () => controller.abort(), { once: true });
+  }
+
   let res: Response;
 
   try {
@@ -79,10 +87,12 @@ export async function httpClient<T>(options: {
         ...options.headers,
       },
       body: payload ? JSON.stringify(payload) : undefined,
-      signal: options.signal,
+      signal: controller.signal,
     });
   } catch {
     throw new Error("Network request failed. Check API availability and base URL configuration.");
+  } finally {
+    clearTimeout(timeout);
   }
 
   if (!res.ok) {

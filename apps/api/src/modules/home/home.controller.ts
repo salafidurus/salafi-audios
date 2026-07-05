@@ -23,12 +23,8 @@ export class HomeController {
     @Query('scholarSlugs') scholarSlugs?: string,
     @CurrentUser() user?: { id: string },
   ): Promise<QuickBrowseDto> {
-    const topics = topicSlugs
-      ? topicSlugs.split(',').map((s) => s.trim())
-      : undefined;
-    const scholars = scholarSlugs
-      ? scholarSlugs.split(',').map((s) => s.trim())
-      : undefined;
+    const topics = topicSlugs ? topicSlugs.split(',').map((s) => s.trim()) : undefined;
+    const scholars = scholarSlugs ? scholarSlugs.split(',').map((s) => s.trim()) : undefined;
 
     return this.home.getQuickBrowse(topics, scholars, user?.id);
   }

@@ -52,8 +52,19 @@ three Listing formats are exactly **Collection**, **Series**, and **Single**
 
 ## How the model maps to storage
 
-The DB is unchanged: nesting is expressed by nullable foreign keys
-(`Series.collectionId`, `Lecture.seriesId`). Placement (and therefore whether
-something is a Module/Lesson vs a Series/Single Listing) is derived from those
-keys, not stored as a separate flag. A Single is still a `Lecture` row reached at
-`/lectures/:id`; it is merely _labelled_ "Single".
+The content hierarchy is stored in a single `Listing` table using a self-referencing
+composite foreign key `(parentId, scholarId)` pointing to `Listing(id, scholarId)`.
+This guarantees at the engine level that child modules/lessons share the parent's
+scholar.
+
+The `format` enum field (`collection`, `series`, `single`) defines the structural
+format. A Single is a Listing record of format `single` containing audio assets,
+while Lessons and Modules are nested children of format `single` and `series`
+respectively.
+
+To optimize querying, Listing records store a denormalized `title` and `description`
+containing the primary source text (e.g., Arabic), whereas `ListingTranslation`
+contains secondary localized translations (e.g., English). Slugs are globally unique
+(`slug String @unique`) to allow clean URL lookups at `/listings/:slug` for both web
+and mobile applications. Parent listings use `onDelete: Restrict` on child relations
+to prevent accidental orphans.

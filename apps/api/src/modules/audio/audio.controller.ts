@@ -2,11 +2,7 @@ import { Controller, Get, Post, Put, Param, Query, Body } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CurrentUser, Public } from '../auth/decorators';
-import type {
-  AudioProgressDto,
-  ProgressSyncDto,
-  StreamResponseDto,
-} from '@sd/core-contracts';
+import type { AudioProgressDto, ProgressSyncDto, StreamResponseDto } from '@sd/core-contracts';
 import { AudioService } from './audio.service';
 
 @ApiTags('Audio')
@@ -28,19 +24,16 @@ export class AudioController {
   @Post('progress/sync')
   @ApiOperation({ summary: 'Bulk sync progress from client' })
   @ApiOkResponse({ description: 'Progress synced' })
-  syncProgress(
-    @CurrentUser() user: { id: string },
-    @Body() body: ProgressSyncDto,
-  ): Promise<void> {
+  syncProgress(@CurrentUser() user: { id: string }, @Body() body: ProgressSyncDto): Promise<void> {
     return this.audio.bulkSync(user.id, body.items ?? []);
   }
 
-  @Put('progress/:lectureId')
-  @ApiOperation({ summary: 'Update lecture progress' })
+  @Put('progress/:listingId')
+  @ApiOperation({ summary: 'Update listing progress' })
   @ApiOkResponse({ description: 'Progress updated' })
   upsertProgress(
     @CurrentUser() user: { id: string },
-    @Param('lectureId') lectureId: string,
+    @Param('listingId') listingId: string,
     @Body()
     body: {
       positionSeconds: number;
@@ -50,7 +43,7 @@ export class AudioController {
   ): Promise<void> {
     return this.audio.upsertProgress(
       user.id,
-      lectureId,
+      listingId,
       body.positionSeconds,
       body.durationSeconds,
       body.isCompleted,
@@ -58,12 +51,10 @@ export class AudioController {
   }
 
   @Public()
-  @Get('lectures/:lectureId/stream')
-  @ApiOperation({ summary: 'Resolve a lecture primary audio stream' })
+  @Get('listings/:listingId/stream')
+  @ApiOperation({ summary: 'Resolve a listing primary audio stream' })
   @ApiOkResponse({ description: 'Primary audio asset URL and duration' })
-  getLectureStream(
-    @Param('lectureId') lectureId: string,
-  ): Promise<StreamResponseDto> {
-    return this.audio.resolveStreamUrl(lectureId);
+  getListingStream(@Param('listingId') listingId: string): Promise<StreamResponseDto> {
+    return this.audio.resolveStreamUrl(listingId);
   }
 }

@@ -3,21 +3,21 @@ name: ci
 on:
   pull_request:
     paths:
-      - "apps/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}"
-      - "packages/**/*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}"
+      - "apps/**"
+      - "packages/**"
+      - "scripts/**"
       - "tsconfig*.json"
       - "**/tsconfig*.json"
-      - "eslint.config.*"
       - "**/eslint.config.*"
       - "jest.config.*"
       - "**/jest.config.*"
       - "packages/core-db/prisma/**"
-      - "pnpm-lock.yaml"
-      - "pnpm-workspace.yaml"
+      - "bun.lock"
       - "package.json"
       - "**/package.json"
       - "turbo.json"
       - ".github/workflows/ci.yml"
+      - "!**/*.md"
 
 # Cancel stale runs on the same PR to save CI minutes on rapid pushes
 concurrency:
@@ -28,7 +28,6 @@ permissions:
   contents: read
 
 env:
-  NODE_VERSION: "24"
   # Custom Playwright path enables GitHub Actions caching (default path is not cacheable)
   PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/ms-playwright
   TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
@@ -47,15 +46,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v6
-
-      - uses: actions/setup-node@v6
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
+          bun-version: "1.3.14"
 
       - name: Install
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       - name: Build, lint, typecheck, test
-        run: pnpm turbo run build lint typecheck test --continue
+        run: bun run turbo run build lint typecheck test --continue

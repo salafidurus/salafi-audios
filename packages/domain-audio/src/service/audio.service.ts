@@ -21,7 +21,7 @@ export class DurusAudioService {
     });
   }
 
-  async playLecture(track: Track, queueContext?: Track[]) {
+  async playListing(track: Track, queueContext?: Track[]) {
     if (queueContext && queueContext.length > 0) {
       const index = queueContext.findIndex((t) => t.id === track.id);
       this.queueManager.setQueue(queueContext, index >= 0 ? index : 0);
@@ -58,7 +58,7 @@ export class DurusAudioService {
 
     // Empty URL stub (series continuation) — lazily fetch a fresh signed URL.
     const { url } = await httpClient<StreamUrlResponse>({
-      url: endpoints.audio.lectures.stream(track.id),
+      url: endpoints.audio.listings.stream(track.id),
       method: "GET",
     });
 
@@ -86,7 +86,7 @@ export class DurusAudioService {
     if (this.queueManager.hasNext()) {
       const nextTrack = this.queueManager.advance();
       if (nextTrack) {
-        await this.playLecture(nextTrack);
+        await this.playListing(nextTrack);
       }
     } else {
       await this.stop();
@@ -117,7 +117,7 @@ export class DurusAudioService {
 
       // debounced sync to server
       syncProgressToBackend({
-        lectureId: currentTrack.id,
+        listingId: currentTrack.id,
         positionSeconds,
         durationSeconds: duration,
       });

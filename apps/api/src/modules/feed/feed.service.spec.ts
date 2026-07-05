@@ -39,6 +39,7 @@ describe('FeedService', () => {
           provide: FeedRepo,
           useValue: {
             getFeed: vi.fn(),
+            getFeedRecent: vi.fn(),
             getScholars: vi.fn(),
           } satisfies Partial<Mocked<FeedRepo>>,
         },
@@ -57,20 +58,10 @@ describe('FeedService', () => {
     it('should pass all parameters to repository and return result', async () => {
       repo.getFeed.mockResolvedValue(mockFeedPage);
 
-      const result = await service.getFeed(
-        'cursor1',
-        10,
-        ['aqeedah'],
-        ['scholar-1'],
-      );
+      const result = await service.getFeed('cursor1', 10, ['aqeedah'], ['scholar-1']);
 
       expect(result).toEqual(mockFeedPage);
-      expect(repo.getFeed).toHaveBeenCalledWith(
-        'cursor1',
-        10,
-        ['aqeedah'],
-        ['scholar-1'],
-      );
+      expect(repo.getFeed).toHaveBeenCalledWith('cursor1', 10, ['aqeedah'], ['scholar-1']);
     });
 
     it('should use default limit of 20 when not provided', async () => {
@@ -78,12 +69,7 @@ describe('FeedService', () => {
 
       await service.getFeed();
 
-      expect(repo.getFeed).toHaveBeenCalledWith(
-        undefined,
-        20,
-        undefined,
-        undefined,
-      );
+      expect(repo.getFeed).toHaveBeenCalledWith(undefined, 20, undefined, undefined);
     });
 
     it('should forward undefined optional params to repository', async () => {
@@ -91,12 +77,61 @@ describe('FeedService', () => {
 
       await service.getFeed('cursor1');
 
-      expect(repo.getFeed).toHaveBeenCalledWith(
-        'cursor1',
-        20,
-        undefined,
-        undefined,
-      );
+      expect(repo.getFeed).toHaveBeenCalledWith('cursor1', 20, undefined, undefined);
+    });
+  });
+
+  describe('getFeedRecent', () => {
+    it('should delegate to repo.getFeedRecent and return result sorted by createdAt DESC', async () => {
+      const recentPage: FeedPageDto = {
+        items: [
+          {
+            kind: 'single',
+            id: 'r1',
+            slug: 'recent-lecture',
+            title: 'Recent Lecture',
+            scholarName: 'Scholar',
+            scholarSlug: 'scholar',
+            thumbnailUrl: null,
+            durationSeconds: 600,
+            publishedAt: '2024-06-01T00:00:00.000Z',
+          },
+        ],
+        nextCursor: undefined,
+      };
+      repo.getFeedRecent.mockResolvedValue(recentPage);
+
+      const result = await service.getFeedRecent('cursor1', 10);
+
+      expect(result).toEqual(recentPage);
+      expect(repo.getFeedRecent).toHaveBeenCalledWith('cursor1', 10);
+    });
+
+    it('should use default limit of 20 when not provided', async () => {
+      repo.getFeedRecent.mockResolvedValue(mockFeedPage);
+
+      await service.getFeedRecent();
+
+      expect(repo.getFeedRecent).toHaveBeenCalledWith(undefined, 20);
+    });
+  });
+
+  describe('getFollowingFeed', () => {
+    it('should delegate to repo.getFeed and return result', async () => {
+      repo.getFeed.mockResolvedValue(mockFeedPage);
+
+      const result = await service.getFollowingFeed('cursor1', 10);
+
+      expect(result).toEqual(mockFeedPage);
+      expect(repo.getFeed).toHaveBeenCalledWith('cursor1', 10);
+    });
+
+    it('should use default limit of 20 when not provided', async () => {
+      repo.getFeed.mockResolvedValue(mockFeedPage);
+
+      await service.getFollowingFeed();
+
+      expect(repo.getFeed).toHaveBeenCalledWith(undefined, 20);
     });
   });
 

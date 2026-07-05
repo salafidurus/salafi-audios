@@ -80,9 +80,7 @@ export class AuthBridgeController {
       return null;
     }
 
-    const matchedOrigin = this.config.CORS_ORIGINS.find(
-      (origin) => origin === parsed.origin,
-    );
+    const matchedOrigin = this.config.CORS_ORIGINS.find((origin) => origin === parsed.origin);
     if (!matchedOrigin) return null;
 
     // Reconstruct the URL using the matched origin (never redirect to raw user input)

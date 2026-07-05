@@ -1,5 +1,5 @@
 import { httpClient, endpoints } from "@sd/core-contracts";
-import type { AdminPermission } from "@sd/core-contracts";
+import type { AdminPermission, AdminUserListDto } from "@sd/core-contracts";
 
 // --- Permissions ---
 
@@ -14,14 +14,14 @@ export type AdminPermissionsListResponse = {
 
 export function fetchUserPermissions(userId: string) {
   return httpClient<AdminPermissionsListResponse>({
-    url: `${endpoints.admin.permissions.list}/${userId}`,
+    url: endpoints.admin.permissions.list(userId),
     method: "GET",
   });
 }
 
 export function grantPermission(userId: string, permission: AdminPermission) {
   return httpClient<AdminPermissionsListResponse>({
-    url: `${endpoints.admin.permissions.grant}/${userId}`,
+    url: endpoints.admin.permissions.grant(userId),
     method: "POST",
     body: { permission },
   });
@@ -29,7 +29,7 @@ export function grantPermission(userId: string, permission: AdminPermission) {
 
 export function revokePermission(userId: string, permission: string) {
   return httpClient<AdminPermissionsListResponse>({
-    url: endpoints.admin.permissions.revoke(`${userId}/${permission}`),
+    url: endpoints.admin.permissions.revoke(userId, permission),
     method: "DELETE",
   });
 }
@@ -90,6 +90,17 @@ export function deleteTopic(slug: string) {
   return httpClient<unknown>({
     url: endpoints.admin.topics.delete(slug),
     method: "DELETE",
+  });
+}
+
+// --- Users ---
+
+export function fetchAdminUsers(q?: string) {
+  const url = endpoints.admin.users.list;
+  const query = q ? `?q=${encodeURIComponent(q)}` : "";
+  return httpClient<AdminUserListDto>({
+    url: `${url}${query}`,
+    method: "GET",
   });
 }
 

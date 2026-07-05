@@ -57,9 +57,7 @@ describe('ScholarsController — auth boundaries', () => {
         seriesCount: 0,
         totalDurationSeconds: 0,
       });
-      return request(app.getHttpServer())
-        .get('/scholars/ibn-taymiyyah')
-        .expect(200);
+      return request(app.getHttpServer()).get('/scholars/ibn-taymiyyah').expect(200);
     });
   });
 

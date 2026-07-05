@@ -23,7 +23,7 @@ export function DownloadProgress({ lectureId }: DownloadProgressProps) {
 
 const styles = StyleSheet.create((theme) => ({
   container: {
-    gap: 4,
+    gap: theme.spacing.scale.xs,
   },
   track: {
     height: 3,

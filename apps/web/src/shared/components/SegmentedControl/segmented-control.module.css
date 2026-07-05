@@ -1,0 +1,38 @@
+.container {
+  display: flex;
+  border: var(--border-width-default) solid var(--border-default);
+  border-radius: var(--radius-component-chip);
+  overflow: hidden;
+  background: var(--surface-subtle);
+  gap: 0;
+}
+
+.segment {
+  flex: 1;
+  padding: var(--space-scale-xs) var(--space-scale-md);
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: 500;
+  color: var(--content-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease;
+  white-space: nowrap;
+  line-height: 1.5;
+}
+
+.segment:hover:not(.active) {
+  background: var(--surface-hover);
+  color: var(--content-default);
+}
+
+.segment.active {
+  background: var(--surface-default);
+  color: var(--content-default);
+  font-weight: 600;
+  box-shadow: 0 1px 3px var(--shadow-sm, rgba(0, 0, 0, 0.08));
+}
+
+.segment + .segment {
+  border-left: var(--border-width-default) solid var(--border-subtle);
+}

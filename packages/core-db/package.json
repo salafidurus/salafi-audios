@@ -2,10 +2,10 @@
   "name": "@sd/core-db",
   "version": "0.0.0",
   "private": true,
-  "sideEffects": false,
   "files": [
     "dist"
   ],
+  "sideEffects": false,
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./src/index.ts",
@@ -22,23 +22,27 @@
     }
   },
   "scripts": {
-    "lint": "oxlint . && eslint .",
+    "lint": "oxlint .",
+    "pretest": "bun run prisma:generate",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
+    "pretest:prepush": "bun run prisma:generate",
     "test:prepush": "vitest run --changed=origin/main",
-    "pretypecheck": "pnpm prisma:generate",
+    "pretypecheck": "bun run prisma:generate",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "prisma:generate": "prisma generate --schema=./prisma/schema.prisma --config=./prisma.config.ts && node ./scripts/copy-generated-to-dist.js",
+    "prisma:generate": "prisma generate --schema=./prisma/schema.prisma --config=./prisma.config.ts && bun ./scripts/copy-generated-to-dist.js",
     "prisma:format": "prisma format --schema=./prisma/schema.prisma --config=./prisma.config.ts",
     "prisma:validate": "prisma validate --schema=./prisma/schema.prisma --config=./prisma.config.ts",
-    "migrate:create-only": "node ./scripts/migrate-with-auto-name.js",
+    "prisma:seed": "bun run prisma/seed.ts",
+    "migrate:create-only": "bun ./scripts/migrate-with-auto-name.js",
     "migrate:deploy": "prisma migrate deploy --schema=./prisma/schema.prisma --config=./prisma.config.ts",
-    "make-admin": "node ./scripts/make-admin.js",
-    "build": "pnpm prisma:generate && tsup src/index.ts --format esm,cjs --out-dir dist && node ./scripts/copy-generated-to-dist.js && tsc -p tsconfig.build.json",
-    "dev": "pnpm build --watch"
+    "make-admin": "bun ./scripts/make-admin.js",
+    "build": "bun run prisma:generate && tsup src/index.ts --format esm,cjs --out-dir dist && bun ./scripts/copy-generated-to-dist.js && tsc -p tsconfig.build.json",
+    "dev": "bun run build --watch"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "catalog:",
     "@prisma/client": "catalog:",
     "@prisma/client-runtime-utils": "^7.3.0",
     "@sd/core-contracts": "workspace:*"
@@ -48,5 +52,8 @@
     "pg": "^8.0.0",
     "prisma": "^7.3.0",
     "tsup": "catalog:"
+  },
+  "prisma": {
+    "seed": "bun run prisma/seed.ts"
   }
 }

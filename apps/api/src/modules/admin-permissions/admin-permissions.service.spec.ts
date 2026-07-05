@@ -2,6 +2,7 @@ import { vi, type Mocked } from 'vitest';
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ADMIN_PERMISSIONS, type AdminPermission } from '@sd/core-contracts';
+import { UserRole } from '@sd/core-db';
 import { AdminPermissionsRepository } from './admin-permissions.repo';
 import { AdminPermissionsService } from './admin-permissions.service';
 
@@ -28,15 +29,14 @@ describe('AdminPermissionsService', () => {
             grant: vi.fn().mockResolvedValue(mockPermissionRecord),
             revoke: vi.fn().mockResolvedValue(mockPermissionRecord),
             hasPermission: vi.fn(),
+            listUsers: vi.fn(),
           } satisfies Partial<Mocked<AdminPermissionsRepository>>,
         },
       ],
     }).compile();
 
     service = module.get(AdminPermissionsService);
-    repo = module.get(
-      AdminPermissionsRepository,
-    ) as Mocked<AdminPermissionsRepository>;
+    repo = module.get(AdminPermissionsRepository) as Mocked<AdminPermissionsRepository>;
   });
 
   afterEach(() => {
@@ -73,10 +73,7 @@ describe('AdminPermissionsService', () => {
 
   describe('getMyPermissions', () => {
     it('should return permission strings for user', async () => {
-      repo.findPermissionStringsByUserId.mockResolvedValue([
-        'manage:scholars',
-        'manage:content',
-      ]);
+      repo.findPermissionStringsByUserId.mockResolvedValue(['manage:scholars', 'manage:content']);
 
       const result = await service.getMyPermissions('user1');
 
@@ -119,9 +116,7 @@ describe('AdminPermissionsService', () => {
     it('should throw NotFoundException for invalid permission', async () => {
       const invalidPermission = 'INVALID_PERMISSION';
 
-      await expect(
-        service.grant('user1', invalidPermission, 'admin1'),
-      ).rejects.toThrow(
+      await expect(service.grant('user1', invalidPermission, 'admin1')).rejects.toThrow(
         new NotFoundException(`Unknown permission: ${invalidPermission}`),
       );
 
@@ -133,12 +128,119 @@ describe('AdminPermissionsService', () => {
       for (const permission of ADMIN_PERMISSIONS) {
         repo.findByUserId.mockResolvedValue([]);
 
-        await expect(
-          service.grant('user1', permission, 'admin1'),
-        ).resolves.toBeDefined();
+        await expect(service.grant('user1', permission, 'admin1')).resolves.toBeDefined();
 
         expect(repo.grant).toHaveBeenCalledWith('user1', permission, 'admin1');
       }
+    });
+  });
+
+  describe('listUsers', () => {
+    it('should return all users with their permissions', async () => {
+      const now = new Date();
+      const mockUsers = [
+        {
+          id: 'user1',
+          name: 'Alice',
+          email: 'alice@example.com',
+          emailVerified: true,
+          image: null,
+          role: UserRole.user,
+          banned: false,
+          banReason: null,
+          banExpires: null,
+          preferredLanguage: null,
+          createdAt: new Date('2023-01-01'),
+          updatedAt: now,
+          adminPermissions: [{ permission: 'manage:content' }],
+        },
+        {
+          id: 'user2',
+          name: 'Bob',
+          email: 'bob@example.com',
+          emailVerified: true,
+          image: 'https://example.com/avatar.png',
+          role: UserRole.admin,
+          banned: false,
+          banReason: null,
+          banExpires: null,
+          preferredLanguage: null,
+          createdAt: new Date('2023-06-01'),
+          updatedAt: now,
+          adminPermissions: [{ permission: 'manage:scholars' }, { permission: 'manage:admin' }],
+        },
+      ];
+
+      repo.listUsers.mockResolvedValue({
+        users: mockUsers,
+        total: 2,
+      });
+
+      const result = await service.listUsers();
+
+      expect(result).toEqual({
+        users: [
+          {
+            id: 'user1',
+            name: 'Alice',
+            email: 'alice@example.com',
+            image: null,
+            role: 'user',
+            createdAt: '2023-01-01T00:00:00.000Z',
+            permissions: ['manage:content'],
+          },
+          {
+            id: 'user2',
+            name: 'Bob',
+            email: 'bob@example.com',
+            image: 'https://example.com/avatar.png',
+            role: 'admin',
+            createdAt: '2023-06-01T00:00:00.000Z',
+            permissions: ['manage:scholars', 'manage:admin'],
+          },
+        ],
+        total: 2,
+      });
+      expect(repo.listUsers).toHaveBeenCalledWith(undefined);
+    });
+
+    it('should filter users by query string', async () => {
+      const now = new Date();
+      const mockUsers = [
+        {
+          id: 'user1',
+          name: 'Alice',
+          email: 'alice@example.com',
+          emailVerified: true,
+          image: null,
+          role: UserRole.user,
+          banned: false,
+          banReason: null,
+          banExpires: null,
+          preferredLanguage: null,
+          createdAt: new Date('2023-01-01'),
+          updatedAt: now,
+          adminPermissions: [],
+        },
+      ];
+
+      repo.listUsers.mockResolvedValue({
+        users: mockUsers,
+        total: 1,
+      });
+
+      const result = await service.listUsers('alice');
+
+      expect(result.users).toHaveLength(1);
+      expect(repo.listUsers).toHaveBeenCalledWith('alice');
+    });
+
+    it('should return empty list when no users match', async () => {
+      repo.listUsers.mockResolvedValue({ users: [], total: 0 });
+
+      const result = await service.listUsers('nonexistent');
+
+      expect(result).toEqual({ users: [], total: 0 });
     });
   });
 
