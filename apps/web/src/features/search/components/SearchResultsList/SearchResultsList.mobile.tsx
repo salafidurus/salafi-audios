@@ -1,4 +1,3 @@
-import { type CSSProperties } from "react";
 import React from "react";
 import { SearchResultEmptyMobile } from "../SearchResultEmpty/SearchResultEmpty.mobile";
 import { useDragScroll } from "@/shared/hooks/use-drag-scroll";
@@ -42,18 +41,7 @@ export function SearchResultsListMobile({
   const scrollRef = useDragScroll("vertical");
 
   return (
-    <div
-      ref={scrollRef}
-      style={
-        {
-          flex: 1,
-          minHeight: 0,
-          overflowY: "auto",
-          overflowX: "hidden",
-          cursor: "grab",
-        } satisfies CSSProperties
-      }
-    >
+    <div ref={scrollRef} className={styles.scrollContainer}>
       <div className={styles.inner}>
         {items.length === 0 ? (
           <SearchResultEmptyMobile
