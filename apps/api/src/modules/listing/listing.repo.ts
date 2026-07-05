@@ -1,6 +1,6 @@
 import { PrismaService } from '../../shared/db/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { Prisma, Status, Locale as DbLocale } from '@sd/core-db';
+import { Prisma, Status } from '@sd/core-db';
 import type {
   ListingViewDto,
   ListingDetailDto,
