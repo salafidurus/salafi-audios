@@ -22,6 +22,7 @@ src/
 └── generated/prisma/   # Generated client (do NOT hand-edit)
 scripts/
 ├── copy-generated-to-dist.js
+├── make-admin.js
 └── migrate-with-auto-name.js
 ```
 
@@ -34,6 +35,7 @@ scripts/
 - `bun run --filter @sd/core-db prisma:format` — Format schema file
 - `bun run --filter @sd/core-db migrate:create-only` — Create a new migration
 - `bun run --filter @sd/core-db migrate:deploy` — Apply pending migrations
+- `bun run --filter @sd/core-db make-admin <email>` — Promote a user to admin (see [database-admin-setup.md](../../docs/database-admin-setup.md))
 - `bun run --filter @sd/core-db test` — Run tests (Jest)
 
 ## Constraints
