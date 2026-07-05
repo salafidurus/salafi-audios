@@ -1,10 +1,10 @@
-import { S3Client, HeadBucketCommand } from '@aws-sdk/client-s3';
 import { Injectable } from '@nestjs/common';
 import { HealthCheckError, HealthIndicator, HealthIndicatorResult } from '@nestjs/terminus';
+import { S3Client, HeadBucketCommand } from '@aws-sdk/client-s3';
 import { ConfigService } from '../../shared/config/config.service';
 
 @Injectable()
-export class R2HealthIndicator extends HealthIndicator {
+export class CDNHealthIndicator extends HealthIndicator {
   private readonly s3: S3Client;
   private readonly bucket: string;
 
@@ -14,6 +14,7 @@ export class R2HealthIndicator extends HealthIndicator {
     this.s3 = new S3Client({
       region: 'auto',
       endpoint: `https://${config.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+      forcePathStyle: true,
       credentials: {
         accessKeyId: config.R2_ACCESS_KEY_ID,
         secretAccessKey: config.R2_SECRET_ACCESS_KEY,
@@ -22,16 +23,24 @@ export class R2HealthIndicator extends HealthIndicator {
   }
 
   async pingCheck(key: string, options?: { timeout?: number }): Promise<HealthIndicatorResult> {
+    const timeout = options?.timeout ?? 1000;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
+
     try {
-      const timeout = options?.timeout ?? 1000;
-      await Promise.race([
-        this.s3.send(new HeadBucketCommand({ Bucket: this.bucket })),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), timeout)),
-      ]);
+      await this.s3.send(new HeadBucketCommand({ Bucket: this.bucket }), {
+        abortSignal: controller.signal,
+      });
+
       return this.getStatus(key, true);
-    } catch {
-      const result = this.getStatus(key, false);
+    } catch (error) {
+      const result = this.getStatus(key, false, {
+        message: error instanceof Error ? error.message : 'Unknown error',
+      });
+
       throw new HealthCheckError('R2 storage check failed', result);
+    } finally {
+      clearTimeout(timer);
     }
   }
 }

@@ -4,8 +4,8 @@ import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { HealthCheck, HealthCheckResult, HealthCheckService } from '@nestjs/terminus';
 import { SkipThrottle } from '@nestjs/throttler';
+import { CDNHealthIndicator } from './cdn-health.indicator';
 import { PrismaHealthIndicator } from './prisma-health.indicator';
-import { R2HealthIndicator } from './r2-health.indicator';
 
 @SkipThrottle()
 @ApiTags('Health')
@@ -16,36 +16,33 @@ export class HealthController {
   constructor(
     private readonly health: HealthCheckService,
     private readonly prismaHealth: PrismaHealthIndicator,
-    private readonly r2Health: R2HealthIndicator,
+    private readonly cdnHealth: CDNHealthIndicator,
   ) {}
 
   @Get()
-  @ApiOperation({ summary: 'Health check (full)' })
+  @ApiOperation({ summary: 'Full system health (database + CDN)' })
   @ApiOkResponse({ description: 'Health check result' })
   @HealthCheck()
   getHealth(): Promise<HealthCheckResult> {
     return this.health.check([
       () => this.prismaHealth.pingCheck('database', { timeout: 300 }),
-      // () => this.r2Health.pingCheck('storage', { timeout: 300 }),
+      () => this.cdnHealth.pingCheck('cdn', { timeout: 5000 }),
     ]);
   }
 
-  @Get('live')
-  @ApiOperation({ summary: 'Liveness probe' })
-  @ApiOkResponse({ description: 'Liveness check result' })
+  @Get('healthz')
+  @ApiOperation({ summary: 'Liveness probe – is the service running?' })
+  @ApiOkResponse({ description: 'Always ok if the process is alive' })
   @HealthCheck()
-  getLive(): Promise<HealthCheckResult> {
+  getLiveness(): Promise<HealthCheckResult> {
     return this.health.check([]);
   }
 
-  @Get('ready')
-  @ApiOperation({ summary: 'Readiness probe' })
-  @ApiOkResponse({ description: 'Readiness check result' })
+  @Get('readyz')
+  @ApiOperation({ summary: 'Readiness probe – can the service accept traffic?' })
+  @ApiOkResponse({ description: 'Ok when core dependencies (database) are available' })
   @HealthCheck()
-  getReady(): Promise<HealthCheckResult> {
-    return this.health.check([
-      () => this.prismaHealth.pingCheck('database', { timeout: 300 }),
-      // () => this.r2Health.pingCheck('storage', { timeout: 300 }),
-    ]);
+  getReadiness(): Promise<HealthCheckResult> {
+    return this.health.check([() => this.prismaHealth.pingCheck('database', { timeout: 300 })]);
   }
 }
