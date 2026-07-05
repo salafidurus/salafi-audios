@@ -5,7 +5,6 @@ import type {
   AdminLectureUpdateDto,
   AdminLectureListDto,
   AdminLectureDetailDto,
-  BulkActionDto,
   BulkActionResultDto,
 } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
@@ -13,6 +12,7 @@ import { RequiresPermission } from '../../shared/decorators/requires-permission.
 import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { LecturesService } from './lectures.service';
 import { CreateLectureDto } from './dto/create-lecture.dto';
+import { BulkActionDto } from '../../shared/dto/bulk-action.dto';
 
 @ApiTags('Admin Lectures')
 @ApiCommonErrors()

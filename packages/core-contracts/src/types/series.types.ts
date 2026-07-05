@@ -1,56 +1,44 @@
-import type { StatusValue } from "../types/common.types";
+import { z } from "zod";
+import { StatusValueSchema } from "./common.types";
+import { LocaleSchema } from "./localization.types";
 
-export type SeriesViewDto = {
-  id: string;
-  scholarId: string;
-  collectionId?: string;
-  slug: string;
-  title: string;
-  description?: string;
-  coverImageUrl?: string;
-  publishedLectureCount?: number;
-  publishedDurationSeconds?: number;
-  language?: string;
-  status: StatusValue;
-  orderIndex?: number;
-  deletedAt?: string;
-  deleteAfterAt?: string;
-  createdAt: string;
-  updatedAt?: string;
-};
+export const SeriesViewDtoSchema = z.object({
+  id: z.string(),
+  scholarId: z.string(),
+  collectionId: z.string().optional(),
+  slug: z.string(),
+  title: z.string(),
+  description: z.string().optional(),
+  coverImageUrl: z.string().optional(),
+  publishedLectureCount: z.number().optional(),
+  publishedDurationSeconds: z.number().optional(),
+  language: z.string().optional(),
+  status: StatusValueSchema,
+  orderIndex: z.number().optional(),
+  deletedAt: z.string().optional(),
+  deleteAfterAt: z.string().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string().optional(),
+});
+export type SeriesViewDto = z.infer<typeof SeriesViewDtoSchema>;
 
-export type AdminSeriesListItemDto = {
-  id: string;
-  title: string;
-  status: StatusValue;
-  publishedLectureCount: number;
-  orderIndex?: number;
-};
+export const AdminSeriesListItemDtoSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  status: StatusValueSchema,
+  publishedLectureCount: z.number(),
+  orderIndex: z.number().optional(),
+});
+export type AdminSeriesListItemDto = z.infer<typeof AdminSeriesListItemDtoSchema>;
 
-export type AdminSeriesDetailDto = {
-  id: string;
-  scholarId: string;
-  title: string;
-  description?: string;
-  coverImageUrl?: string;
-  language?: string;
-  status: StatusValue;
-  orderIndex?: number;
-};
-
-export type CreateSeriesDto = {
-  scholarId: string;
-  title: string;
-  description?: string;
-  coverImageUrl?: string;
-  language?: string;
-  orderIndex?: number;
-};
-
-export type UpdateSeriesDto = {
-  title?: string;
-  description?: string;
-  coverImageUrl?: string;
-  language?: string;
-  orderIndex?: number;
-};
+export const AdminSeriesDetailDtoSchema = z.object({
+  id: z.string(),
+  scholarId: z.string(),
+  title: z.string(),
+  description: z.string().optional(),
+  coverImageUrl: z.string().optional(),
+  language: z.string().optional(),
+  status: StatusValueSchema,
+  orderIndex: z.number().optional(),
+});
+export type AdminSeriesDetailDto = z.infer<typeof AdminSeriesDetailDtoSchema>;

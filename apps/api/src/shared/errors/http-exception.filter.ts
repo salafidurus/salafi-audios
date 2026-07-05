@@ -2,6 +2,7 @@ import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from
 import { Prisma } from '@sd/core-db';
 import { ConfigService } from '../../shared/config/config.service';
 import type { Request, Response } from 'express';
+import { ZodValidationException } from 'nestjs-zod';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -21,6 +22,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     if (this.isPrismaConnectionRefused(exception)) {
       message = 'Database connection refused. Ensure PostgreSQL is running and reachable.';
+    } else if (exception instanceof ZodValidationException) {
+      statusCode = exception.getStatus();
+      message = 'Validation failed';
+      details = (exception.getZodError() as any).issues;
     } else if (exception instanceof HttpException) {
       statusCode = exception.getStatus();
       const response = exception.getResponse();

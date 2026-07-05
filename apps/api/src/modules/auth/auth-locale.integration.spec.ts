@@ -7,6 +7,8 @@ import { AuthGuard } from './auth.guard';
 import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { AuthLocaleController } from './auth-locale.controller';
 import { PrismaService } from '../../shared/db/prisma.service';
+import { ZodValidationPipe } from 'nestjs-zod';
+import { AllExceptionsFilter } from '../../shared/errors/http-exception.filter';
 
 const mockAuth = { api: { getSession: vi.fn() } };
 vi.mock('./auth.instance', () => ({ getAuth: () => mockAuth }));
@@ -15,6 +17,10 @@ const mockPrismaService = {
   user: {
     update: vi.fn().mockResolvedValue({ preferredLanguage: 'ar' }),
   },
+};
+
+const mockConfigService = {
+  get: vi.fn().mockReturnValue(false),
 };
 
 describe('AuthLocaleController — auth boundaries', () => {
@@ -39,7 +45,8 @@ describe('AuthLocaleController — auth boundaries', () => {
       .compile();
 
     app = module.createNestApplication();
-    // Note: ValidationPipe is provided by NestJS main.ts in production, not needed in integration tests
+    app.useGlobalPipes(new ZodValidationPipe());
+    app.useGlobalFilters(new AllExceptionsFilter(mockConfigService as any));
     await app.init();
   });
 
@@ -65,15 +72,13 @@ describe('AuthLocaleController — auth boundaries', () => {
       });
     });
 
-    it('PATCH /auth/me/locale with invalid locale passes through (validation handled in production)', async () => {
-      // Note: DTOs are validated at the NestJS/main.ts level with ValidationPipe
-      // In integration tests without ValidationPipe, any value passes through
-      // This test just verifies the endpoint doesn't crash
+    it('PATCH /auth/me/locale with invalid locale returns 400 Bad Request', async () => {
       const res = await request(app.getHttpServer())
         .patch('/auth/me/locale')
         .send({ preferredLanguage: 'fr' });
-      // Without ValidationPipe, the DTO passes through as-is
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(400);
+      expect(res.body.details).toBeDefined();
+      expect(res.body.details[0].message).toContain('expected one of');
     });
   });
 

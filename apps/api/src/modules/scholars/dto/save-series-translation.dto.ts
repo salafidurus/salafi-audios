@@ -1,18 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsIn, IsOptional, IsString } from 'class-validator';
-import { SUPPORTED_LOCALES } from '@sd/core-contracts';
+import { createZodDto } from 'nestjs-zod';
+import { SaveSeriesTranslationDtoSchema } from '@sd/core-contracts';
 
-export class SaveSeriesTranslationDto {
-  @ApiProperty({ enum: SUPPORTED_LOCALES })
-  @IsIn(SUPPORTED_LOCALES)
-  locale!: 'en' | 'ar';
-
-  @ApiProperty()
-  @IsString()
-  title!: string;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
-  description?: string | null;
-}
+export class SaveSeriesTranslationDto extends createZodDto(SaveSeriesTranslationDtoSchema) {}

@@ -1,17 +1,15 @@
 import { Controller, Patch, Param, Body, UseGuards, Post, Put, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import type {
-  LiveSessionStatus,
-  CreateLivestreamChannelDto,
-  UpdateLivestreamChannelDto,
-  CreateLiveSessionDto,
-  UpdateLiveSessionDto,
-  LivestreamChannelDto,
-} from '@sd/core-contracts';
+import type { LivestreamChannelDto } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { RequiresPermission } from '../../shared/decorators/requires-permission.decorator';
 import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { LiveService } from './live.service';
+import { CreateLivestreamChannelDto } from './dto/create-livestream-channel.dto';
+import { UpdateLivestreamChannelDto } from './dto/update-livestream-channel.dto';
+import { CreateLiveSessionDto } from './dto/create-live-session.dto';
+import { UpdateLiveSessionDto } from './dto/update-live-session.dto';
+import { UpdateLiveSessionStatusDto } from './dto/update-live-session-status.dto';
 
 @ApiTags('Admin Live')
 @ApiCommonErrors()
@@ -58,7 +56,7 @@ export class AdminLiveController {
   @Patch('sessions/:id/status')
   @RequiresPermission('manage:livestreams')
   @ApiOperation({ summary: 'Update a live session status' })
-  updateSessionStatus(@Param('id') id: string, @Body() body: { status: LiveSessionStatus }) {
+  updateSessionStatus(@Param('id') id: string, @Body() body: UpdateLiveSessionStatusDto) {
     return this.service.updateSessionStatus(id, body.status);
   }
 }

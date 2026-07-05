@@ -1,23 +1,4 @@
-import { IsString, IsOptional, IsNumber } from 'class-validator';
+import { createZodDto } from 'nestjs-zod';
+import { UpdateCollectionDtoSchema } from '@sd/core-contracts';
 
-export class UpdateCollectionDto {
-  @IsOptional()
-  @IsString()
-  title?: string;
-
-  @IsOptional()
-  @IsString()
-  description?: string;
-
-  @IsOptional()
-  @IsString()
-  coverImageUrl?: string;
-
-  @IsOptional()
-  @IsString()
-  language?: string;
-
-  @IsOptional()
-  @IsNumber()
-  orderIndex?: number;
-}
+export class UpdateCollectionDto extends createZodDto(UpdateCollectionDtoSchema) {}

@@ -39,18 +39,17 @@
     "@prisma/client": "catalog:",
     "@sd/core-i18n": "workspace:*",
     "better-auth": "catalog:",
-    "class-transformer": "catalog:",
-    "class-validator": "catalog:",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.4.2",
     "helmet": "catalog:",
     "nestjs-pino": "^4.6.1",
+    "nestjs-zod": "^5.4.0",
     "pg": "catalog:",
     "pino-http": "^11.0.0",
     "reflect-metadata": "catalog:",
     "rxjs": "catalog:",
     "telegram": "^2.26.22",
-    "zod": "^4.4.3"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@nestjs/cli": "catalog:",
