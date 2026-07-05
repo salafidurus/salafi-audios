@@ -28,3 +28,15 @@
 .chipPressed {
   opacity: 0.85;
 }
+
+.scrollContainer {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: var(--space-component-gap-sm);
+  padding-top: var(--space-component-gap-sm);
+  padding-bottom: var(--space-component-gap-sm);
+  scrollbar-width: none;
+  cursor: grab;
+}

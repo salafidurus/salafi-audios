@@ -1,6 +1,6 @@
 "use client";
 
-import { type CSSProperties, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { TopicDetailDto, TopicSlug } from "@sd/core-contracts";
 import { useDragScroll } from "@/shared/hooks/use-drag-scroll";
 import styles from "./SearchFilter.mobile.module.css";
@@ -34,23 +34,7 @@ export function SearchFilterMobile({ value, onChange, topics }: SearchFilterMobi
   const selected = useMemo(() => new Set(value), [value]);
 
   return (
-    <div
-      ref={scrollRef}
-      className="no-scrollbar"
-      style={
-        {
-          display: "flex",
-          flexDirection: "row",
-          overflowX: "auto",
-          overflowY: "hidden",
-          gap: "var(--space-component-gap-sm)",
-          paddingTop: "var(--space-component-gap-sm)",
-          paddingBottom: "var(--space-component-gap-sm)",
-          scrollbarWidth: "none",
-          cursor: "grab",
-        } satisfies CSSProperties
-      }
-    >
+    <div ref={scrollRef} className={`${styles.scrollContainer} no-scrollbar`}>
       {options.map((option) => {
         const isActive = option.id === "all" ? value.length === 0 : selected.has(option.id);
         return (
