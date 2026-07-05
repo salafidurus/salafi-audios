@@ -3,9 +3,9 @@ import { LocaleSchema } from "./localization.types";
 
 export const LibraryItemDtoSchema = z.object({
   id: z.string(),
-  lectureId: z.string(),
-  lectureTitle: z.string(),
-  lectureSlug: z.string(),
+  listingId: z.string(),
+  listingTitle: z.string(),
+  listingSlug: z.string(),
   scholarId: z.string(),
   scholarSlug: z.string(),
   scholarName: z.string(),
@@ -15,8 +15,8 @@ export const LibraryItemDtoSchema = z.object({
   completedAt: z.string().optional(),
   progressSeconds: z.number().optional(),
   originalLanguage: LocaleSchema.optional(),
-  /** Original-language lecture title, set only when `lectureTitle` is translated. */
-  originalLectureTitle: z.string().optional(),
+  /** Original-language listing title, set only when `listingTitle` is translated. */
+  originalListingTitle: z.string().optional(),
 });
 export type LibraryItemDto = z.infer<typeof LibraryItemDtoSchema>;
 
@@ -28,6 +28,6 @@ export const LibraryPageDtoSchema = z.object({
 export type LibraryPageDto = z.infer<typeof LibraryPageDtoSchema>;
 
 export const SavedSyncDtoSchema = z.object({
-  lectureIds: z.array(z.string()),
+  listingIds: z.array(z.string()),
 });
 export type SavedSyncDto = z.infer<typeof SavedSyncDtoSchema>;

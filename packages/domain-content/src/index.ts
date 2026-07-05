@@ -6,7 +6,7 @@ export { useLibrarySaved, useLibraryCompleted, useLibraryProgress } from "./libr
 export { useLibrarySavedScreen } from "./use-library-saved";
 export { useLibraryCompletedScreen } from "./use-library-completed";
 export { useLibraryProgressScreen } from "./use-library-progress";
-export { useLectureDetail } from "./lecture.api";
+export { useListingDetail } from "./listing.api";
 export {
   useScholarsList,
   useScholarDetail,

@@ -26,12 +26,12 @@ function resolveTranslationEndpoint(
         return endpoints.translations.scholars.publish(target.scholarId, locale!);
       return endpoints.translations.scholars.unpublish(target.scholarId, locale!);
 
-    case "lecture":
-      if (action === "list") return endpoints.translations.lectures.list(target.lectureId);
-      if (action === "save") return endpoints.translations.lectures.save(target.lectureId);
+    case "listing":
+      if (action === "list") return endpoints.translations.listings.list(target.listingId);
+      if (action === "save") return endpoints.translations.listings.save(target.listingId);
       if (action === "publish")
-        return endpoints.translations.lectures.publish(target.lectureId, locale!);
-      return endpoints.translations.lectures.unpublish(target.lectureId, locale!);
+        return endpoints.translations.listings.publish(target.listingId, locale!);
+      return endpoints.translations.listings.unpublish(target.listingId, locale!);
 
     case "topic":
       if (action === "list") return endpoints.translations.topics.list(target.topicId);
@@ -39,32 +39,6 @@ function resolveTranslationEndpoint(
       if (action === "publish")
         return endpoints.translations.topics.publish(target.topicId, locale!);
       return endpoints.translations.topics.unpublish(target.topicId, locale!);
-
-    case "series":
-      if (action === "list")
-        return endpoints.translations.series.list(target.scholarId, target.seriesId);
-      if (action === "save")
-        return endpoints.translations.series.save(target.scholarId, target.seriesId);
-      if (action === "publish")
-        return endpoints.translations.series.publish(target.scholarId, target.seriesId, locale!);
-      return endpoints.translations.series.unpublish(target.scholarId, target.seriesId, locale!);
-
-    case "collection":
-      if (action === "list")
-        return endpoints.translations.collections.list(target.scholarId, target.collectionId);
-      if (action === "save")
-        return endpoints.translations.collections.save(target.scholarId, target.collectionId);
-      if (action === "publish")
-        return endpoints.translations.collections.publish(
-          target.scholarId,
-          target.collectionId,
-          locale!,
-        );
-      return endpoints.translations.collections.unpublish(
-        target.scholarId,
-        target.collectionId,
-        locale!,
-      );
   }
 }
 

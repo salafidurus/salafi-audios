@@ -40,30 +40,14 @@ export const queryKeys = {
     content: (slug: string) => [...queryKeys.scholars.all, "content", slug] as const,
     topics: (slug: string) => [...queryKeys.scholars.all, "topics", slug] as const,
   },
-  series: {
-    all: ["series"] as const,
-    list: (scholarSlug: string) => [...queryKeys.series.all, "list", scholarSlug] as const,
-    detail: (scholarSlug: string, seriesSlug: string) =>
-      [...queryKeys.series.all, "detail", scholarSlug, seriesSlug] as const,
-    lectures: (scholarSlug: string, seriesSlug: string) =>
-      [...queryKeys.series.all, "lectures", scholarSlug, seriesSlug] as const,
-  },
-  lectures: {
-    all: ["lectures"] as const,
-    list: (scholarSlug: string) => [...queryKeys.lectures.all, "list", scholarSlug] as const,
-    detail: (scholarSlug: string, lectureSlug: string) =>
-      [...queryKeys.lectures.all, "detail", scholarSlug, lectureSlug] as const,
-  },
-  collections: {
-    all: ["collections"] as const,
-    list: (scholarSlug: string) => [...queryKeys.collections.all, "list", scholarSlug] as const,
-    detail: (scholarSlug: string, collectionSlug: string) =>
-      [...queryKeys.collections.all, "detail", scholarSlug, collectionSlug] as const,
+  listings: {
+    all: ["listings"] as const,
+    detail: (id: string, slug?: string) => [...queryKeys.listings.all, "detail", id, slug] as const,
   },
   topics: {
     all: ["topics"] as const,
     list: () => [...queryKeys.topics.all, "list"] as const,
-    lectures: (slug: string) => [...queryKeys.topics.all, "lectures", slug] as const,
+    listings: (slug: string) => [...queryKeys.topics.all, "listings", slug] as const,
   },
   recommendations: {
     all: ["recommendations"] as const,
@@ -72,10 +56,6 @@ export const queryKeys = {
       [...queryKeys.recommendations.all, "popular", params] as const,
     latest: (params?: Record<string, unknown>) =>
       [...queryKeys.recommendations.all, "latest", params] as const,
-  },
-  analytics: {
-    all: ["analytics"] as const,
-    stats: () => [...queryKeys.analytics.all, "stats"] as const,
   },
   search: {
     all: ["search"] as const,
@@ -106,13 +86,9 @@ export const queryKeys = {
     scheduled: () => [...queryKeys.live.all, "scheduled"] as const,
     ended: (cursor?: string) => [...queryKeys.live.all, "ended", cursor] as const,
   },
-  listings: {
-    all: ["listings"] as const,
-    detail: (id: string) => [...queryKeys.listings.all, "detail", id] as const,
-  },
   progress: {
     all: ["progress"] as const,
-    lecture: (lectureId: string) => [...queryKeys.progress.all, "lecture", lectureId] as const,
+    listing: (listingId: string) => [...queryKeys.progress.all, "listing", listingId] as const,
     history: () => [...queryKeys.progress.all, "history"] as const,
   },
   home: {

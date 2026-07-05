@@ -10,7 +10,7 @@ export type Track = {
 };
 
 export type AudioSource = {
-  lectureId: string;
+  listingId: string;
   streamUrl: string;
   localUri?: string;
 };
