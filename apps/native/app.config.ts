@@ -103,6 +103,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           organization: process.env.EXPO_PUBLIC_SENTRY_ORG,
         },
       ],
+      "expo-asset",
       "expo-audio",
       [
         "expo-document-picker",
