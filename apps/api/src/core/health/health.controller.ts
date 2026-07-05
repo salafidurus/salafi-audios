@@ -20,7 +20,7 @@ export class HealthController {
   ) {}
 
   @Get()
-  @ApiOperation({ summary: 'Health check (full)' })
+  @ApiOperation({ summary: 'Full system health (database + CDN)' })
   @ApiOkResponse({ description: 'Health check result' })
   @HealthCheck()
   getHealth(): Promise<HealthCheckResult> {
@@ -30,19 +30,19 @@ export class HealthController {
     ]);
   }
 
-  @Get('live')
-  @ApiOperation({ summary: 'Liveness probe' })
-  @ApiOkResponse({ description: 'Liveness check result' })
+  @Get('healthz')
+  @ApiOperation({ summary: 'Liveness probe – is the service running?' })
+  @ApiOkResponse({ description: 'Always ok if the process is alive' })
   @HealthCheck()
-  getLive(): Promise<HealthCheckResult> {
+  getLiveness(): Promise<HealthCheckResult> {
     return this.health.check([]);
   }
 
-  @Get('ready')
-  @ApiOperation({ summary: 'Readiness probe' })
-  @ApiOkResponse({ description: 'Readiness check result' })
+  @Get('readyz')
+  @ApiOperation({ summary: 'Readiness probe – can the service accept traffic?' })
+  @ApiOkResponse({ description: 'Ok when core dependencies (database) are available' })
   @HealthCheck()
-  getReady(): Promise<HealthCheckResult> {
+  getReadiness(): Promise<HealthCheckResult> {
     return this.health.check([() => this.prismaHealth.pingCheck('database', { timeout: 300 })]);
   }
 }

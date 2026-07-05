@@ -42,16 +42,16 @@ describe('HealthController', () => {
     });
   });
 
-  it('getReady calls database indicator but not CDN indicator', async () => {
-    await controller.getReady();
+  it('getReadiness calls database indicator but not CDN indicator', async () => {
+    await controller.getReadiness();
     expect(prismaHealth.pingCheck).toHaveBeenCalledWith('database', {
       timeout: 300,
     });
     expect(cdnHealth.pingCheck).not.toHaveBeenCalled();
   });
 
-  it('getLive succeeds with no indicator calls', async () => {
-    const result = await controller.getLive();
+  it('getLiveness succeeds with no indicator calls', async () => {
+    const result = await controller.getLiveness();
     expect(result.status).toBe('ok');
     expect(prismaHealth.pingCheck).not.toHaveBeenCalled();
     expect(cdnHealth.pingCheck).not.toHaveBeenCalled();
