@@ -101,3 +101,8 @@ export const UpdateLiveSessionDtoSchema = z.object({
   viewerCount: z.number().optional(),
 });
 export type UpdateLiveSessionDto = z.infer<typeof UpdateLiveSessionDtoSchema>;
+
+export const UpdateLiveSessionStatusDtoSchema = z.object({
+  status: LiveSessionStatusSchema,
+});
+export type UpdateLiveSessionStatusDto = z.infer<typeof UpdateLiveSessionStatusDtoSchema>;

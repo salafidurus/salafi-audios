@@ -1,11 +1,6 @@
 import { createZodDto } from 'nestjs-zod';
-import { z } from 'zod';
-import { LocaleSchema } from '@sd/core-contracts';
+import { SaveCollectionTranslationDtoSchema } from '@sd/core-contracts';
 
-export const SaveCollectionTranslationSchema = z.object({
-  locale: LocaleSchema,
-  title: z.string().min(1, 'Title must not be empty'),
-  description: z.string().nullable().optional(),
-});
-
-export class SaveCollectionTranslationDto extends createZodDto(SaveCollectionTranslationSchema) {}
+export class SaveCollectionTranslationDto extends createZodDto(
+  SaveCollectionTranslationDtoSchema,
+) {}

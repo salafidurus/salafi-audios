@@ -1,6 +1,12 @@
 import { createZodDto } from 'nestjs-zod';
-import { CreateScholarSchema } from './create-scholar.dto';
+import { UpdateScholarDtoSchema } from '@sd/core-contracts';
 
-export const UpdateScholarSchema = CreateScholarSchema.partial();
-
-export class UpdateScholarDto extends createZodDto(UpdateScholarSchema) {}
+export class UpdateScholarDto extends createZodDto(UpdateScholarDtoSchema) {
+  name?: string;
+  slug?: string;
+  bio?: string;
+  imageUrl?: string;
+  isKibar?: boolean;
+  isFeatured?: boolean;
+  isActive?: boolean;
+}

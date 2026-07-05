@@ -9,28 +9,59 @@ export {
 } from "../types/common.types";
 export {
   type TopicSlug,
+  TopicSlugSchema,
   type TopicViewDto,
+  TopicViewDtoSchema,
   type TopicDetailDto,
+  TopicDetailDtoSchema,
   type TopicLectureViewDto,
+  TopicLectureViewDtoSchema,
+  type UpsertTopicDto,
+  UpsertTopicDtoSchema,
+  type SaveTopicTranslationDto,
+  SaveTopicTranslationDtoSchema,
+  type UpdateTopicTranslationDto,
+  UpdateTopicTranslationDtoSchema,
 } from "../types/topic.types";
 export {
   type AudioAssetViewDto,
+  AudioAssetViewDtoSchema,
   type LectureViewDto,
+  LectureViewDtoSchema,
   type ScholarRefDto,
+  ScholarRefDtoSchema,
   type TopicRefDto,
+  TopicRefDtoSchema,
   type AudioAssetDto,
+  AudioAssetDtoSchema,
   type LectureRefDto,
+  LectureRefDtoSchema,
   type SeriesContextDto,
+  SeriesContextDtoSchema,
   type LectureDetailDto,
+  LectureDetailDtoSchema,
   type RelatedLectureDto,
+  RelatedLectureDtoSchema,
   type AdminLectureUpdateDto,
+  AdminLectureUpdateDtoSchema,
   type AdminLectureActionDto,
-  type CreateLectureDto,
+  AdminLectureActionDtoSchema,
   type AdminLectureListItemDto,
+  AdminLectureListItemDtoSchema,
   type AdminLectureListDto,
+  AdminLectureListDtoSchema,
   type AdminLectureDetailDto,
+  AdminLectureDetailDtoSchema,
   type BulkActionDto,
+  BulkActionDtoSchema,
   type BulkActionResultDto,
+  BulkActionResultDtoSchema,
+  type CreateLectureDto,
+  CreateLectureDtoSchema,
+  type SaveLectureTranslationDto,
+  SaveLectureTranslationDtoSchema,
+  type UpdateLectureTranslationDto,
+  UpdateLectureTranslationDtoSchema,
 } from "../types/lecture.types";
 export {
   type ScholarViewDto,
@@ -53,6 +84,30 @@ export {
   SeriesSummaryDtoSchema,
   type SingleSummaryDto,
   SingleSummaryDtoSchema,
+  type CreateScholarDto,
+  CreateScholarDtoSchema,
+  type UpdateScholarDto,
+  UpdateScholarDtoSchema,
+  type SaveScholarTranslationDto,
+  SaveScholarTranslationDtoSchema,
+  type UpdateScholarTranslationDto,
+  UpdateScholarTranslationDtoSchema,
+  type CreateCollectionDto,
+  CreateCollectionDtoSchema,
+  type UpdateCollectionDto,
+  UpdateCollectionDtoSchema,
+  type SaveCollectionTranslationDto,
+  SaveCollectionTranslationDtoSchema,
+  type UpdateCollectionTranslationDto,
+  UpdateCollectionTranslationDtoSchema,
+  type SaveSeriesTranslationDto,
+  SaveSeriesTranslationDtoSchema,
+  type UpdateSeriesTranslationDto,
+  UpdateSeriesTranslationDtoSchema,
+  type CreateSeriesDto,
+  CreateSeriesDtoSchema,
+  type UpdateSeriesDto,
+  UpdateSeriesDtoSchema,
 } from "../types/scholar.types";
 export {
   type ListingFormat,
@@ -67,10 +122,6 @@ export {
   AdminCollectionListItemDtoSchema,
   type AdminCollectionDetailDto,
   AdminCollectionDetailDtoSchema,
-  type CreateCollectionDto,
-  CreateCollectionDtoSchema,
-  type UpdateCollectionDto,
-  UpdateCollectionDtoSchema,
 } from "../types/collection.types";
 export {
   type SeriesViewDto,
@@ -79,17 +130,16 @@ export {
   AdminSeriesListItemDtoSchema,
   type AdminSeriesDetailDto,
   AdminSeriesDetailDtoSchema,
-  type CreateSeriesDto,
-  CreateSeriesDtoSchema,
-  type UpdateSeriesDto,
-  UpdateSeriesDtoSchema,
 } from "../types/series.types";
 export {
   type PresignedUrlPurpose,
+  PresignedUrlPurposeSchema,
   type PresignedUrlRequestDto,
+  PresignedUrlRequestDtoSchema,
   type PresignedUrlResponseDto,
+  PresignedUrlResponseDtoSchema,
 } from "../types/media.types";
-export { type PlatformStatsDto } from "../types/analytics.types";
+export { type PlatformStatsDto, PlatformStatsDtoSchema } from "../types/analytics.types";
 export {
   type SearchCatalogParams,
   SearchCatalogParamsSchema,
@@ -97,6 +147,8 @@ export {
   SearchCatalogItemDtoSchema,
   type SearchCatalogResultsDto,
   SearchCatalogResultsDtoSchema,
+  type SearchQueryDto,
+  SearchQueryDtoSchema,
 } from "../types/search.types";
 export {
   type FeedContentItemDto,
@@ -145,12 +197,18 @@ export {
   CreateLiveSessionDtoSchema,
   type UpdateLiveSessionDto,
   UpdateLiveSessionDtoSchema,
+  type UpdateLiveSessionStatusDto,
+  UpdateLiveSessionStatusDtoSchema,
 } from "../types/live.types";
 export {
   type StreamResponseDto,
+  StreamResponseDtoSchema,
   type AudioProgressDto,
+  AudioProgressDtoSchema,
   type ProgressSyncItemDto,
+  ProgressSyncItemDtoSchema,
   type ProgressSyncDto,
+  ProgressSyncDtoSchema,
 } from "../types/audio.types";
 export {
   type AdminPermission,
@@ -200,3 +258,9 @@ export {
   type ScholarOriginalFields,
   ScholarOriginalFieldsSchema,
 } from "./localization.types";
+export {
+  type LectureProgressDto,
+  LectureProgressDtoSchema,
+  type ProgressUpdateDto,
+  ProgressUpdateDtoSchema,
+} from "../types/progress.types";

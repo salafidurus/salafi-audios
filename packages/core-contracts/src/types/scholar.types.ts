@@ -128,3 +128,94 @@ export const ScholarTopicsDtoSchema = z.object({
   ),
 });
 export type ScholarTopicsDto = z.infer<typeof ScholarTopicsDtoSchema>;
+
+export const CreateScholarDtoSchema = z.object({
+  name: z.string().min(1, "Name must not be empty"),
+  slug: z.string().min(1, "Slug must not be empty"),
+  bio: z.string().optional(),
+  imageUrl: z.string().optional(),
+  isKibar: z.boolean().optional(),
+  isFeatured: z.boolean().optional(),
+  isActive: z.boolean().optional(),
+});
+export type CreateScholarDto = z.infer<typeof CreateScholarDtoSchema>;
+
+export const UpdateScholarDtoSchema = CreateScholarDtoSchema.partial();
+export type UpdateScholarDto = z.infer<typeof UpdateScholarDtoSchema>;
+
+export const SaveScholarTranslationDtoSchema = z.object({
+  locale: LocaleSchema,
+  name: z.string().min(1, "Name must not be empty"),
+  bio: z.string().nullable().optional(),
+});
+export type SaveScholarTranslationDto = z.infer<typeof SaveScholarTranslationDtoSchema>;
+
+export const UpdateScholarTranslationDtoSchema = z.object({
+  name: z.string().optional(),
+  bio: z.string().nullable().optional(),
+});
+export type UpdateScholarTranslationDto = z.infer<typeof UpdateScholarTranslationDtoSchema>;
+
+export const CreateCollectionDtoSchema = z.object({
+  scholarId: z.string().min(1, "Scholar ID must not be empty"),
+  title: z.string().min(1, "Title must not be empty"),
+  description: z.string().optional(),
+  coverImageUrl: z.string().optional(),
+  language: z.string().optional(),
+  orderIndex: z.number().optional(),
+});
+export type CreateCollectionDto = z.infer<typeof CreateCollectionDtoSchema>;
+
+export const UpdateCollectionDtoSchema = z.object({
+  title: z.string().optional(),
+  description: z.string().optional(),
+  coverImageUrl: z.string().optional(),
+  language: z.string().optional(),
+  orderIndex: z.number().optional(),
+});
+export type UpdateCollectionDto = z.infer<typeof UpdateCollectionDtoSchema>;
+
+export const SaveCollectionTranslationDtoSchema = z.object({
+  locale: LocaleSchema,
+  title: z.string().min(1, "Title must not be empty"),
+  description: z.string().nullable().optional(),
+});
+export type SaveCollectionTranslationDto = z.infer<typeof SaveCollectionTranslationDtoSchema>;
+
+export const UpdateCollectionTranslationDtoSchema = z.object({
+  title: z.string().optional(),
+  description: z.string().nullable().optional(),
+});
+export type UpdateCollectionTranslationDto = z.infer<typeof UpdateCollectionTranslationDtoSchema>;
+
+export const SaveSeriesTranslationDtoSchema = z.object({
+  locale: LocaleSchema,
+  title: z.string().min(1, "Title must not be empty"),
+  description: z.string().nullable().optional(),
+});
+export type SaveSeriesTranslationDto = z.infer<typeof SaveSeriesTranslationDtoSchema>;
+
+export const UpdateSeriesTranslationDtoSchema = z.object({
+  title: z.string().optional(),
+  description: z.string().nullable().optional(),
+});
+export type UpdateSeriesTranslationDto = z.infer<typeof UpdateSeriesTranslationDtoSchema>;
+
+export const CreateSeriesDtoSchema = z.object({
+  scholarId: z.string().min(1, "Scholar ID must not be empty"),
+  title: z.string().min(1, "Title must not be empty"),
+  description: z.string().optional(),
+  coverImageUrl: z.string().optional(),
+  language: z.string().optional(),
+  orderIndex: z.number().optional(),
+});
+export type CreateSeriesDto = z.infer<typeof CreateSeriesDtoSchema>;
+
+export const UpdateSeriesDtoSchema = z.object({
+  title: z.string().optional(),
+  description: z.string().optional(),
+  coverImageUrl: z.string().optional(),
+  language: z.string().optional(),
+  orderIndex: z.number().optional(),
+});
+export type UpdateSeriesDto = z.infer<typeof UpdateSeriesDtoSchema>;

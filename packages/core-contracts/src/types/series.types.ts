@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { StatusValueSchema } from "./common.types";
+import { LocaleSchema } from "./localization.types";
 
 export const SeriesViewDtoSchema = z.object({
   id: z.string(),
@@ -41,22 +42,3 @@ export const AdminSeriesDetailDtoSchema = z.object({
   orderIndex: z.number().optional(),
 });
 export type AdminSeriesDetailDto = z.infer<typeof AdminSeriesDetailDtoSchema>;
-
-export const CreateSeriesDtoSchema = z.object({
-  scholarId: z.string().min(1, "Scholar ID must not be empty"),
-  title: z.string().min(1, "Title must not be empty"),
-  description: z.string().optional(),
-  coverImageUrl: z.string().optional(),
-  language: z.string().optional(),
-  orderIndex: z.number().optional(),
-});
-export type CreateSeriesDto = z.infer<typeof CreateSeriesDtoSchema>;
-
-export const UpdateSeriesDtoSchema = z.object({
-  title: z.string().optional(),
-  description: z.string().optional(),
-  coverImageUrl: z.string().optional(),
-  language: z.string().optional(),
-  orderIndex: z.number().optional(),
-});
-export type UpdateSeriesDto = z.infer<typeof UpdateSeriesDtoSchema>;
