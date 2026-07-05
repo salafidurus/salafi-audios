@@ -53,3 +53,87 @@ describe("User.banned field", () => {
     expect(userModel).not.toMatch(/banned\s+Boolean\?/);
   });
 });
+
+// -- 3. Listing model schema --------------------------------------------------------
+
+describe("Listing model schema", () => {
+  it("enforces globally unique slugs", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+
+    const schemaPath = path.resolve(__dirname, "../prisma/schema.prisma");
+    const schemaContent = fs.readFileSync(schemaPath, "utf-8");
+
+    const listingModelMatch = schemaContent.match(/model Listing\s*{[^}]+}/);
+    expect(listingModelMatch).toBeTruthy();
+
+    const listingModel = listingModelMatch![0];
+    expect(listingModel).toMatch(/slug\s+String\s+@unique/);
+  });
+
+  it("enforces GIN trigram index on title", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+
+    const schemaPath = path.resolve(__dirname, "../prisma/schema.prisma");
+    const schemaContent = fs.readFileSync(schemaPath, "utf-8");
+
+    const listingModelMatch = schemaContent.match(/model Listing\s*{[^}]+}/);
+    expect(listingModelMatch).toBeTruthy();
+
+    const listingModel = listingModelMatch![0];
+    expect(listingModel).toMatch(
+      /@@index\(\[title\(ops:\s*raw\("gin_trgm_ops"\)\)\],\s*type:\s*Gin\)/,
+    );
+  });
+
+  it("enforces restrict on parent relationship deletion", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+
+    const schemaPath = path.resolve(__dirname, "../prisma/schema.prisma");
+    const schemaContent = fs.readFileSync(schemaPath, "utf-8");
+
+    const listingModelMatch = schemaContent.match(/model Listing\s*{[^}]+}/);
+    expect(listingModelMatch).toBeTruthy();
+
+    const listingModel = listingModelMatch![0];
+    expect(listingModel).toMatch(/onDelete:\s*Restrict/);
+  });
+
+  it("enforces composite unique constraint for hierarchy matching", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+
+    const schemaPath = path.resolve(__dirname, "../prisma/schema.prisma");
+    const schemaContent = fs.readFileSync(schemaPath, "utf-8");
+
+    const listingModelMatch = schemaContent.match(/model Listing\s*{[^}]+}/);
+    expect(listingModelMatch).toBeTruthy();
+
+    const listingModel = listingModelMatch![0];
+    expect(listingModel).toMatch(/@@unique\(\[id,\s*scholarId\]\)/);
+  });
+});
+
+describe("User cascade deletions", () => {
+  it("enforces cascade deletes on UserListingProgress and FavoriteListing user relations", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+
+    const schemaPath = path.resolve(__dirname, "../prisma/schema.prisma");
+    const schemaContent = fs.readFileSync(schemaPath, "utf-8");
+
+    const progressMatch = schemaContent.match(/model UserListingProgress\s*{[^}]+}/);
+    expect(progressMatch).toBeTruthy();
+    expect(progressMatch![0]).toMatch(
+      /user\s+User\s+@relation\(fields:\s*\[userId\],\s*references:\s*\[id\],\s*onDelete:\s*Cascade\)/,
+    );
+
+    const favMatch = schemaContent.match(/model FavoriteListing\s*{[^}]+}/);
+    expect(favMatch).toBeTruthy();
+    expect(favMatch![0]).toMatch(
+      /user\s+User\s+@relation\(fields:\s*\[userId\],\s*references:\s*\[id\],\s*onDelete:\s*Cascade\)/,
+    );
+  });
+});
