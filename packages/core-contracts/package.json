@@ -57,7 +57,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "catalog:",
-    "zod": "^4.4.3"
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@types/node": "^26.0.0",

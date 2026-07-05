@@ -5,6 +5,7 @@ import { RequiresPermission } from '../../shared/decorators/requires-permission.
 import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { ScholarsService } from './scholars.service';
 import { SaveScholarTranslationDto } from './dto/save-scholar-translation.dto';
+import { UpdateScholarTranslationDto } from './dto/update-scholar-translation.dto';
 
 @ApiTags('Scholar Translations')
 @ApiCommonErrors()
@@ -33,7 +34,7 @@ export class ScholarsTranslationsController {
   updateTranslation(
     @Param('id') id: string,
     @Param('locale') locale: string,
-    @Body() body: Partial<{ name: string; bio: string | null }>,
+    @Body() body: UpdateScholarTranslationDto,
   ) {
     return this.service.updateTranslation(id, locale, body);
   }

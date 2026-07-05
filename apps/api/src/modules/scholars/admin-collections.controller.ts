@@ -3,7 +3,6 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type {
   AdminCollectionListItemDto,
   AdminCollectionDetailDto,
-  BulkActionDto,
   BulkActionResultDto,
 } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
@@ -12,6 +11,7 @@ import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard
 import { ScholarsService } from './scholars.service';
 import { CreateCollectionDto } from './dto/create-collection.dto';
 import { UpdateCollectionDto } from './dto/update-collection.dto';
+import { BulkActionDto } from '../../shared/dto/bulk-action.dto';
 
 @ApiTags('Admin Collections')
 @ApiCommonErrors()

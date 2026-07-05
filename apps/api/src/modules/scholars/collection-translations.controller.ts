@@ -5,6 +5,7 @@ import { RequiresPermission } from '../../shared/decorators/requires-permission.
 import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { ScholarsService } from './scholars.service';
 import { SaveCollectionTranslationDto } from './dto/save-collection-translation.dto';
+import { UpdateCollectionTranslationDto } from './dto/update-collection-translation.dto';
 
 @ApiTags('Collection Translations')
 @ApiCommonErrors()
@@ -36,7 +37,7 @@ export class CollectionTranslationsController {
   updateTranslation(
     @Param('collectionId') collectionId: string,
     @Param('locale') locale: string,
-    @Body() body: Partial<{ title: string; description: string | null }>,
+    @Body() body: UpdateCollectionTranslationDto,
   ) {
     return this.service.updateCollectionTranslation(collectionId, locale, body);
   }

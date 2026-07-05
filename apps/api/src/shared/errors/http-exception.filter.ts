@@ -25,7 +25,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     } else if (exception instanceof ZodValidationException) {
       statusCode = exception.getStatus();
       message = 'Validation failed';
-      details = exception.getZodError().issues;
+      details = (exception.getZodError() as any).issues;
     } else if (exception instanceof HttpException) {
       statusCode = exception.getStatus();
       const response = exception.getResponse();
