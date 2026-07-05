@@ -1,14 +1,14 @@
 "use client";
 
 import React from "react";
-import type { LectureDetailDto } from "@sd/core-contracts";
+import type { ListingDetailDto } from "@sd/core-contracts";
 import { useAudio } from "@sd/domain-audio";
 import type { Track } from "@sd/domain-audio";
 import { audioService } from "@/features/audio";
 import { Button } from "@/shared/components/Button/Button";
 
 export type LecturePlayButtonProps = {
-  lecture: LectureDetailDto;
+  lecture: ListingDetailDto;
 };
 
 export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
@@ -58,7 +58,7 @@ export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
         ]
       : [track];
 
-    await audioService.playLecture(track, queueContext);
+    await audioService.playListing(track, queueContext);
   };
 
   const label = isCurrentLecture && isPlaying ? "⏸ Pause Lecture" : "▶ Play Lecture";

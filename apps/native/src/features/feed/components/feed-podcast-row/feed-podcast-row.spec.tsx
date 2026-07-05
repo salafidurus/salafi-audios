@@ -16,7 +16,7 @@ const baseItem: FeedContentItemDto = {
 };
 
 jest.mock("@sd/domain-audio", () => ({
-  useLectureProgress: jest.fn(() => ({
+  useListingProgress: jest.fn(() => ({
     progressPercent: 0,
     resumePositionSeconds: 0,
     isCompleted: false,
@@ -68,7 +68,7 @@ describe("FeedPodcastRow", () => {
   });
 
   it("shows progress bar when 0 < progressPercent < 100", async () => {
-    const mock = jest.requireMock("@sd/domain-audio").useLectureProgress;
+    const mock = jest.requireMock("@sd/domain-audio").useListingProgress;
     mock.mockReturnValue({
       progressPercent: 40,
       resumePositionSeconds: 720,
@@ -79,7 +79,7 @@ describe("FeedPodcastRow", () => {
   });
 
   it("hides progress bar when progressPercent is 0", async () => {
-    const mock = jest.requireMock("@sd/domain-audio").useLectureProgress;
+    const mock = jest.requireMock("@sd/domain-audio").useListingProgress;
     mock.mockReturnValue({
       progressPercent: 0,
       resumePositionSeconds: 0,
@@ -90,7 +90,7 @@ describe("FeedPodcastRow", () => {
   });
 
   it("hides progress bar when item is completed (progressPercent 100)", async () => {
-    const mock = jest.requireMock("@sd/domain-audio").useLectureProgress;
+    const mock = jest.requireMock("@sd/domain-audio").useListingProgress;
     mock.mockReturnValue({
       progressPercent: 100,
       resumePositionSeconds: 1800,

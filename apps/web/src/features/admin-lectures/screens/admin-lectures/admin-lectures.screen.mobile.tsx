@@ -2,7 +2,7 @@
 
 import React, { useReducer } from "react";
 import { useApiQuery } from "@sd/core-contracts";
-import type { AdminLectureDetailDto } from "@sd/core-contracts";
+import type { AdminListingDetailDto, AdminListingListDto } from "@sd/core-contracts";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { fetchAdminLectures, fetchAdminLectureDetail } from "../../api/admin-lectures.api";
 import { AudioUploader } from "../../components/AudioUploader/AudioUploader";
@@ -24,7 +24,7 @@ type ScreenState = {
   page: number;
   isUploaderOpen: boolean;
   isModalOpen: boolean;
-  selectedLecture: AdminLectureDetailDto | null;
+  selectedLecture: AdminListingDetailDto | null;
   initialAudioData: AudioData | null;
 };
 
@@ -60,7 +60,7 @@ export function AdminLecturesMobileScreen() {
     state;
   const limit = 15;
 
-  const { data, isFetching, refetch } = useApiQuery(
+  const { data, isFetching, refetch } = useApiQuery<AdminListingListDto>(
     ["admin", "lectures", "list", { search, status, page }],
     () => fetchAdminLectures({ search, status, page, limit }),
   );

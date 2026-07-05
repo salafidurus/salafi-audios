@@ -1,22 +1,22 @@
 import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
-import type { AdminSeriesListItemDto, AdminCollectionListItemDto } from "@sd/core-contracts";
+import type { AdminListingListItemDto } from "@sd/core-contracts";
 
 export function useAdminSeries(scholarId: string) {
-  return useApiQuery<AdminSeriesListItemDto[]>(["admin", "series", scholarId], () =>
-    httpClient<AdminSeriesListItemDto[]>({
-      url: endpoints.admin.series.list,
+  return useApiQuery<AdminListingListItemDto[]>(["admin", "series", scholarId], () =>
+    httpClient<AdminListingListItemDto[]>({
+      url: endpoints.admin.listings.list,
       method: "GET",
-      params: { scholarId },
+      params: { scholarId, format: "series" },
     }),
   );
 }
 
 export function useAdminCollections(scholarId: string) {
-  return useApiQuery<AdminCollectionListItemDto[]>(["admin", "collections", scholarId], () =>
-    httpClient<AdminCollectionListItemDto[]>({
-      url: endpoints.admin.collections.list,
+  return useApiQuery<AdminListingListItemDto[]>(["admin", "collections", scholarId], () =>
+    httpClient<AdminListingListItemDto[]>({
+      url: endpoints.admin.listings.list,
       method: "GET",
-      params: { scholarId },
+      params: { scholarId, format: "collection" },
     }),
   );
 }

@@ -29,7 +29,7 @@ export function LibraryCompletedScreen({ onNavigateToLecture }: LibraryCompleted
       <LibraryItemRow
         item={item}
         variant="completed"
-        onPress={() => handleItemPress(item.lectureId)}
+        onPress={() => handleItemPress(item.listingId)}
       />
     ),
     [handleItemPress],

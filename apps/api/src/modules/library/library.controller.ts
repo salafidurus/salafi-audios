@@ -4,6 +4,7 @@ import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decor
 import { CurrentUser } from '../../modules/auth/decorators';
 import type { LibraryPageDto } from '@sd/core-contracts';
 import { LibraryService } from './library.service';
+import { SavedSyncDto } from './dto/saved-sync.dto';
 
 @ApiTags('Library')
 @ApiCommonErrors()
@@ -12,8 +13,8 @@ export class LibraryController {
   constructor(private readonly library: LibraryService) {}
 
   @Get('progress')
-  @ApiOperation({ summary: 'Get in-progress lectures' })
-  @ApiOkResponse({ description: 'Paginated in-progress lectures' })
+  @ApiOperation({ summary: 'Get in-progress listings' })
+  @ApiOkResponse({ description: 'Paginated in-progress listings' })
   getProgress(
     @CurrentUser() user: { id: string },
     @Query('cursor') cursor?: string,
@@ -22,8 +23,8 @@ export class LibraryController {
   }
 
   @Get('completed')
-  @ApiOperation({ summary: 'Get completed lectures' })
-  @ApiOkResponse({ description: 'Paginated completed lectures' })
+  @ApiOperation({ summary: 'Get completed listings' })
+  @ApiOkResponse({ description: 'Paginated completed listings' })
   getCompleted(
     @CurrentUser() user: { id: string },
     @Query('cursor') cursor?: string,
@@ -32,8 +33,8 @@ export class LibraryController {
   }
 
   @Get('saved')
-  @ApiOperation({ summary: 'Get saved (favorite) lectures' })
-  @ApiOkResponse({ description: 'Paginated saved lectures' })
+  @ApiOperation({ summary: 'Get saved (favorite) listings' })
+  @ApiOkResponse({ description: 'Paginated saved listings' })
   getSaved(
     @CurrentUser() user: { id: string },
     @Query('cursor') cursor?: string,
@@ -42,32 +43,29 @@ export class LibraryController {
   }
 
   @Post('saved/sync')
-  @ApiOperation({ summary: 'Bulk sync saved lectures' })
-  @ApiOkResponse({ description: 'Saved lectures synced' })
-  syncSaved(
-    @CurrentUser() user: { id: string },
-    @Body() body: { lectureIds: string[] },
-  ): Promise<void> {
-    return this.library.bulkSave(user.id, body.lectureIds ?? []);
+  @ApiOperation({ summary: 'Bulk sync saved listings' })
+  @ApiOkResponse({ description: 'Saved listings synced' })
+  syncSaved(@CurrentUser() user: { id: string }, @Body() body: SavedSyncDto): Promise<void> {
+    return this.library.bulkSave(user.id, body.listingIds ?? []);
   }
 
-  @Post('save/:lectureId')
-  @ApiOperation({ summary: 'Save a lecture' })
-  @ApiOkResponse({ description: 'Lecture saved' })
-  saveLecture(
+  @Post('save/:listingId')
+  @ApiOperation({ summary: 'Save a listing' })
+  @ApiOkResponse({ description: 'Listing saved' })
+  saveListing(
     @CurrentUser() user: { id: string },
-    @Param('lectureId') lectureId: string,
+    @Param('listingId') listingId: string,
   ): Promise<void> {
-    return this.library.saveLecture(user.id, lectureId);
+    return this.library.saveListing(user.id, listingId);
   }
 
-  @Delete('save/:lectureId')
-  @ApiOperation({ summary: 'Unsave a lecture' })
-  @ApiOkResponse({ description: 'Lecture unsaved' })
-  unsaveLecture(
+  @Delete('save/:listingId')
+  @ApiOperation({ summary: 'Unsave a listing' })
+  @ApiOkResponse({ description: 'Listing unsaved' })
+  unsaveListing(
     @CurrentUser() user: { id: string },
-    @Param('lectureId') lectureId: string,
+    @Param('listingId') listingId: string,
   ): Promise<void> {
-    return this.library.unsaveLecture(user.id, lectureId);
+    return this.library.unsaveListing(user.id, listingId);
   }
 }

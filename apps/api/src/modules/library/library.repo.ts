@@ -7,7 +7,7 @@ import { getRequestLocale } from '../../shared/i18n/locale-context';
 
 const DEFAULT_PAGE_SIZE = 20;
 
-const lectureRelationSelect = (locale: Locale) =>
+const listingRelationSelect = (locale: Locale) =>
   ({
     id: true,
     title: true,
@@ -32,7 +32,7 @@ const lectureRelationSelect = (locale: Locale) =>
         },
       },
     },
-    series: {
+    parent: {
       select: {
         title: true,
         language: true,
@@ -43,9 +43,9 @@ const lectureRelationSelect = (locale: Locale) =>
         },
       },
     },
-  }) satisfies Prisma.LectureSelect;
+  }) satisfies Prisma.ListingSelect;
 
-type LectureRelation = {
+type ListingRelation = {
   id: string;
   title: string;
   slug: string;
@@ -59,7 +59,7 @@ type LectureRelation = {
     mainLanguage: Locale | null;
     translations: { name: string }[];
   };
-  series: {
+  parent: {
     title: string;
     language: Locale | null;
     translations: { title: string }[];
@@ -78,7 +78,7 @@ export class LibraryRepository {
     const take = limit + 1;
     const locale = getRequestLocale();
 
-    const records = await this.prisma.userLectureProgress.findMany({
+    const records = await this.prisma.userListingProgress.findMany({
       where: {
         userId,
         isCompleted: false,
@@ -88,18 +88,18 @@ export class LibraryRepository {
       take,
       ...(cursor
         ? {
-            cursor: { userId_lectureId: { userId, lectureId: cursor } },
+            cursor: { userId_listingId: { userId, listingId: cursor } },
             skip: 1,
           }
         : {}),
-      include: { lecture: { select: lectureRelationSelect(locale) } },
+      include: { listing: { select: listingRelationSelect(locale) } },
     });
 
     const hasMore = records.length > limit;
     const items = (hasMore ? records.slice(0, limit) : records).map((r) =>
       this.progressToDto(r, locale),
     );
-    const nextCursor = hasMore ? items[items.length - 1]?.lectureId : undefined;
+    const nextCursor = hasMore ? items[items.length - 1]?.listingId : undefined;
 
     return { items, nextCursor };
   }
@@ -112,24 +112,24 @@ export class LibraryRepository {
     const take = limit + 1;
     const locale = getRequestLocale();
 
-    const records = await this.prisma.userLectureProgress.findMany({
+    const records = await this.prisma.userListingProgress.findMany({
       where: { userId, isCompleted: true },
       orderBy: { updatedAt: 'desc' },
       take,
       ...(cursor
         ? {
-            cursor: { userId_lectureId: { userId, lectureId: cursor } },
+            cursor: { userId_listingId: { userId, listingId: cursor } },
             skip: 1,
           }
         : {}),
-      include: { lecture: { select: lectureRelationSelect(locale) } },
+      include: { listing: { select: listingRelationSelect(locale) } },
     });
 
     const hasMore = records.length > limit;
     const items = (hasMore ? records.slice(0, limit) : records).map((r) =>
       this.progressToDto(r, locale),
     );
-    const nextCursor = hasMore ? items[items.length - 1]?.lectureId : undefined;
+    const nextCursor = hasMore ? items[items.length - 1]?.listingId : undefined;
 
     return { items, nextCursor };
   }
@@ -142,135 +142,135 @@ export class LibraryRepository {
     const take = limit + 1;
     const locale = getRequestLocale();
 
-    const records = await this.prisma.favoriteLecture.findMany({
+    const records = await this.prisma.favoriteListing.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
       take,
       ...(cursor
         ? {
-            cursor: { userId_lectureId: { userId, lectureId: cursor } },
+            cursor: { userId_listingId: { userId, listingId: cursor } },
             skip: 1,
           }
         : {}),
-      include: { lecture: { select: lectureRelationSelect(locale) } },
+      include: { listing: { select: listingRelationSelect(locale) } },
     });
 
     const hasMore = records.length > limit;
     const items = (hasMore ? records.slice(0, limit) : records).map((r) =>
       this.favoriteToDto(r, locale),
     );
-    const nextCursor = hasMore ? items[items.length - 1]?.lectureId : undefined;
+    const nextCursor = hasMore ? items[items.length - 1]?.listingId : undefined;
 
     return { items, nextCursor };
   }
 
-  async saveLecture(userId: string, lectureId: string): Promise<void> {
-    await this.prisma.favoriteLecture.upsert({
-      where: { userId_lectureId: { userId, lectureId } },
-      create: { userId, lectureId },
+  async saveLecture(userId: string, listingId: string): Promise<void> {
+    await this.prisma.favoriteListing.upsert({
+      where: { userId_listingId: { userId, listingId } },
+      create: { userId, listingId },
       update: {},
     });
   }
 
-  async unsaveLecture(userId: string, lectureId: string): Promise<void> {
-    await this.prisma.favoriteLecture.deleteMany({
-      where: { userId, lectureId },
+  async unsaveLecture(userId: string, listingId: string): Promise<void> {
+    await this.prisma.favoriteListing.deleteMany({
+      where: { userId, listingId },
     });
   }
 
-  async bulkSave(userId: string, lectureIds: string[]): Promise<void> {
-    if (lectureIds.length === 0) return;
+  async bulkSave(userId: string, listingIds: string[]): Promise<void> {
+    if (listingIds.length === 0) return;
 
-    const operations = lectureIds.map((lectureId) =>
-      this.prisma.favoriteLecture.upsert({
-        where: { userId_lectureId: { userId, lectureId } },
-        create: { userId, lectureId },
+    const operations = listingIds.map((listingId) =>
+      this.prisma.favoriteListing.upsert({
+        where: { userId_listingId: { userId, listingId } },
+        create: { userId, listingId },
         update: {},
       }),
     );
     await this.prisma.$transaction(operations);
   }
 
-  /** Shared resolution of the translatable lecture relation shared by the
+  /** Shared resolution of the translatable listing relation shared by the
    * progress- and favorite-backed library item shapes. */
-  private resolveLectureRelation(
-    lecture: LectureRelation,
+  private resolveListingRelation(
+    listing: ListingRelation,
     locale: Locale,
   ): Pick<
     LibraryItemDto,
-    | 'lectureTitle'
-    | 'lectureSlug'
+    | 'listingTitle'
+    | 'listingSlug'
     | 'scholarId'
     | 'scholarSlug'
     | 'scholarName'
     | 'seriesTitle'
     | 'durationSeconds'
     | 'originalLanguage'
-    | 'originalLectureTitle'
+    | 'originalListingTitle'
   > {
     const resolved = resolveContentTranslation({
-      base: { title: lecture.title },
-      originalLanguage: lecture.language,
+      base: { title: listing.title },
+      originalLanguage: listing.language,
       targetLocale: locale,
-      publishedTranslation: lecture.translations[0] ?? null,
+      publishedTranslation: listing.translations[0] ?? null,
     });
     const scholarName = resolveContentTranslation({
-      base: { name: lecture.scholar.name },
-      originalLanguage: lecture.scholar.mainLanguage,
+      base: { name: listing.scholar.name },
+      originalLanguage: listing.scholar.mainLanguage,
       targetLocale: locale,
-      publishedTranslation: lecture.scholar.translations[0] ?? null,
+      publishedTranslation: listing.scholar.translations[0] ?? null,
     }).fields.name;
-    const seriesTitle = lecture.series
+    const seriesTitle = listing.parent
       ? resolveContentTranslation({
-          base: { title: lecture.series.title },
-          originalLanguage: lecture.series.language,
+          base: { title: listing.parent.title },
+          originalLanguage: listing.parent.language,
           targetLocale: locale,
-          publishedTranslation: lecture.series.translations[0] ?? null,
+          publishedTranslation: listing.parent.translations[0] ?? null,
         }).fields.title
       : undefined;
 
     return {
-      lectureTitle: resolved.fields.title,
-      lectureSlug: lecture.slug,
-      scholarId: lecture.scholar.id,
-      scholarSlug: lecture.scholar.slug,
+      listingTitle: resolved.fields.title,
+      listingSlug: listing.slug,
+      scholarId: listing.scholar.id,
+      scholarSlug: listing.scholar.slug,
       scholarName,
       seriesTitle,
-      durationSeconds: lecture.durationSeconds ?? undefined,
+      durationSeconds: listing.durationSeconds ?? undefined,
       originalLanguage: resolved.originalLanguage,
-      originalLectureTitle: resolved.original?.title,
+      originalListingTitle: resolved.original?.title,
     };
   }
 
   private progressToDto(
-    r: Prisma.UserLectureProgressGetPayload<{
+    r: Prisma.UserListingProgressGetPayload<{
       include: {
-        lecture: { select: ReturnType<typeof lectureRelationSelect> };
+        listing: { select: ReturnType<typeof listingRelationSelect> };
       };
     }>,
     locale: Locale,
   ): LibraryItemDto {
     return {
-      id: `${r.userId}-${r.lectureId}`,
-      lectureId: r.lectureId,
-      ...this.resolveLectureRelation(r.lecture, locale),
+      id: `${r.userId}-${r.listingId}`,
+      listingId: r.listingId,
+      ...this.resolveListingRelation(r.listing, locale),
       progressSeconds: r.positionSeconds,
       completedAt: r.isCompleted ? r.updatedAt.toISOString() : undefined,
     };
   }
 
   private favoriteToDto(
-    r: Prisma.FavoriteLectureGetPayload<{
+    r: Prisma.FavoriteListingGetPayload<{
       include: {
-        lecture: { select: ReturnType<typeof lectureRelationSelect> };
+        listing: { select: ReturnType<typeof listingRelationSelect> };
       };
     }>,
     locale: Locale,
   ): LibraryItemDto {
     return {
-      id: `${r.userId}-${r.lectureId}`,
-      lectureId: r.lectureId,
-      ...this.resolveLectureRelation(r.lecture, locale),
+      id: `${r.userId}-${r.listingId}`,
+      listingId: r.listingId,
+      ...this.resolveListingRelation(r.listing, locale),
       savedAt: r.createdAt.toISOString(),
     };
   }

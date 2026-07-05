@@ -17,7 +17,7 @@ vi.mock("@sd/domain-audio", async (importOriginal) => {
 
 vi.mock("@/features/audio", () => ({
   audioService: {
-    playLecture: vi.fn(),
+    playListing: vi.fn(),
     pause: vi.fn(),
     resume: vi.fn(),
   },
@@ -82,7 +82,7 @@ describe("FeedListRow", () => {
       seriesId: null,
       seriesTitle: null,
     };
-    expect(audioService.playLecture).toHaveBeenCalledWith(expectedTrack, [expectedTrack]);
+    expect(audioService.playListing).toHaveBeenCalledWith(expectedTrack, [expectedTrack]);
   });
 
   it("calls audioService.pause on active playing track play button click", () => {

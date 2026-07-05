@@ -49,7 +49,7 @@ function ProgressBarFill({ percent }: { percent: number }) {
 export function LibraryItemRow({ item, variant, onPress }: LibraryItemRowProps) {
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
-  const lectureTitle = pickContentField(item.lectureTitle, item.originalLectureTitle, showOriginal);
+  const lectureTitle = pickContentField(item.listingTitle, item.originalListingTitle, showOriginal);
   const progress =
     item.durationSeconds && item.progressSeconds
       ? Math.round((item.progressSeconds / item.durationSeconds) * 100)

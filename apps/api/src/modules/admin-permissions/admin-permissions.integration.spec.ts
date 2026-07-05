@@ -5,6 +5,7 @@ import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { AuthGuard } from '../auth/auth.guard';
 import { AdminPermissionsController } from './admin-permissions.controller';
+import { AdminUsersController } from './admin-users.controller';
 import { AdminPermissionsService } from './admin-permissions.service';
 import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { PrismaService } from '../../shared/db/prisma.service';
@@ -34,7 +35,7 @@ describe('AdminPermissionsController — auth boundaries', () => {
     vi.clearAllMocks();
 
     const module = await Test.createTestingModule({
-      controllers: [AdminPermissionsController],
+      controllers: [AdminPermissionsController, AdminUsersController],
       providers: [
         { provide: APP_GUARD, useClass: AuthGuard },
         AdminPermissionGuard,
@@ -61,19 +62,21 @@ describe('AdminPermissionsController — auth boundaries', () => {
       return request(app.getHttpServer()).get('/admin/permissions/me').expect(401);
     });
 
-    it('GET /admin/permissions/:userId returns 401 without a session', () => {
-      return request(app.getHttpServer()).get('/admin/permissions/u2').expect(401);
+    it('GET /admin/users/:userId/permissions returns 401 without a session', () => {
+      return request(app.getHttpServer()).get('/admin/users/u2/permissions').expect(401);
     });
 
-    it('POST /admin/permissions/:userId returns 401 without a session', () => {
+    it('POST /admin/users/:userId/permissions returns 401 without a session', () => {
       return request(app.getHttpServer())
-        .post('/admin/permissions/u2')
+        .post('/admin/users/u2/permissions')
         .send({ permission: 'manage:admin' })
         .expect(401);
     });
 
-    it('DELETE /admin/permissions/:userId/:permission returns 401 without a session', () => {
-      return request(app.getHttpServer()).delete('/admin/permissions/u2/manage:admin').expect(401);
+    it('DELETE /admin/users/:userId/permissions/:permission returns 401 without a session', () => {
+      return request(app.getHttpServer())
+        .delete('/admin/users/u2/permissions/manage:admin')
+        .expect(401);
     });
   });
 
@@ -87,19 +90,21 @@ describe('AdminPermissionsController — auth boundaries', () => {
       mockPrisma.adminPermission.findUnique.mockResolvedValue(null);
     });
 
-    it('GET /admin/permissions/:userId returns 403 without manage:admin', () => {
-      return request(app.getHttpServer()).get('/admin/permissions/u2').expect(403);
+    it('GET /admin/users/:userId/permissions returns 403 without manage:admin', () => {
+      return request(app.getHttpServer()).get('/admin/users/u2/permissions').expect(403);
     });
 
-    it('POST /admin/permissions/:userId returns 403 without manage:admin', () => {
+    it('POST /admin/users/:userId/permissions returns 403 without manage:admin', () => {
       return request(app.getHttpServer())
-        .post('/admin/permissions/u2')
+        .post('/admin/users/u2/permissions')
         .send({ permission: 'manage:admin' })
         .expect(403);
     });
 
-    it('DELETE /admin/permissions/:userId/:permission returns 403 without manage:admin', () => {
-      return request(app.getHttpServer()).delete('/admin/permissions/u2/manage:admin').expect(403);
+    it('DELETE /admin/users/:userId/permissions/:permission returns 403 without manage:admin', () => {
+      return request(app.getHttpServer())
+        .delete('/admin/users/u2/permissions/manage:admin')
+        .expect(403);
     });
   });
 

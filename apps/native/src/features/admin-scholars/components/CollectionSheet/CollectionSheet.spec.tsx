@@ -21,7 +21,17 @@ describe("CollectionSheet", () => {
       <CollectionSheet
         isOpen={true}
         scholarId="s1"
-        collection={{ id: "col1", title: "My Collection", status: "draft", scholarId: "s1" }}
+        collection={{
+          id: "col1",
+          title: "My Collection",
+          format: "collection",
+          status: "draft",
+          scholarId: "s1",
+          scholarName: "Scholar One",
+          slug: "my-collection",
+          topics: [],
+          createdAt: "2026-07-04T00:00:00Z",
+        }}
         onClose={() => {}}
         onSaved={() => {}}
       />,

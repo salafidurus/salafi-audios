@@ -18,7 +18,7 @@ export function LibraryListRow({ item, variant }: LibraryListRowProps) {
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
 
-  const title = pickContentField(item.lectureTitle, item.originalLectureTitle, showOriginal);
+  const title = pickContentField(item.listingTitle, item.originalListingTitle, showOriginal);
   const initial = item.scholarName ? item.scholarName.trim().charAt(0).toUpperCase() : "?";
 
   const progress =
@@ -44,7 +44,7 @@ export function LibraryListRow({ item, variant }: LibraryListRowProps) {
   }
 
   return (
-    <Link href={`/listing/${item.lectureSlug}`} className={`${styles.row} listRow`}>
+    <Link href={`/listing/${item.listingSlug}`} className={`${styles.row} listRow`}>
       <div className={styles.avatarSection}>
         <div className={styles.avatarFallback} aria-hidden="true">
           {initial}

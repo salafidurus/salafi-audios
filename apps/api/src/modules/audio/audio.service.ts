@@ -13,14 +13,14 @@ export class AudioService {
 
   async upsertProgress(
     userId: string,
-    lectureId: string,
+    listingId: string,
     positionSeconds: number,
     durationSeconds?: number,
     isCompleted?: boolean,
   ): Promise<void> {
     await this.repo.upsertProgress(
       userId,
-      lectureId,
+      listingId,
       positionSeconds,
       durationSeconds,
       isCompleted,
@@ -31,30 +31,27 @@ export class AudioService {
     await this.repo.bulkSync(userId, items);
   }
 
-  async resolveStreamUrl(lectureId: string): Promise<StreamResponseDto> {
-    // Check if the lecture exists
-    const lecture = await this.repo.findLectureById(lectureId);
+  async resolveStreamUrl(listingId: string): Promise<StreamResponseDto> {
+    const listing = await this.repo.findListingById(listingId);
 
-    if (!lecture) {
-      throw new NotFoundException(`Lecture with ID ${lectureId} not found`);
+    if (!listing) {
+      throw new NotFoundException(`Listing with ID ${listingId} not found`);
     }
 
-    // Try to find the primary audio asset
-    let asset = await this.repo.findPrimaryAsset(lectureId);
+    let asset = await this.repo.findPrimaryAsset(listingId);
 
-    // Fallback to the first available audio asset
     if (!asset) {
-      asset = await this.repo.findFirstAsset(lectureId);
+      asset = await this.repo.findFirstAsset(listingId);
     }
 
     if (!asset) {
-      throw new NotFoundException(`No audio assets found for lecture ${lectureId}`);
+      throw new NotFoundException(`No audio assets found for listing ${listingId}`);
     }
 
     return {
       url: asset.url,
-      durationSeconds: asset.durationSeconds || lecture.durationSeconds || 0,
-      format: asset.format,
+      durationSeconds: asset.durationSeconds || listing.durationSeconds || 0,
+      format: asset.format ?? 'mp3',
     };
   }
 }

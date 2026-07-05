@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Body } from '@nestjs/common';
+import { Controller, Get, Patch, Body, Delete } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import type { UserProfileDto } from '@sd/core-contracts';
@@ -39,5 +39,12 @@ export class AccountController {
     @Body() body: UpdateProfileDto,
   ): Promise<UserProfileDto> {
     return this.accountService.updateProfile(user.id, body.displayName);
+  }
+
+  @Delete()
+  @ApiOperation({ summary: 'Hard-delete current user account (GDPR)' })
+  @ApiOkResponse({ description: 'Account deleted successfully' })
+  deleteAccount(@CurrentUser() user: { id: string }): Promise<void> {
+    return this.accountService.deleteAccount(user.id);
   }
 }

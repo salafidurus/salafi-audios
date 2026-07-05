@@ -21,15 +21,15 @@ export class LibraryService {
     return { items, nextCursor, hasMore: !!nextCursor };
   }
 
-  async saveLecture(userId: string, lectureId: string): Promise<void> {
-    await this.repo.saveLecture(userId, lectureId);
+  async saveListing(userId: string, listingId: string): Promise<void> {
+    await this.repo.saveLecture(userId, listingId);
   }
 
-  async unsaveLecture(userId: string, lectureId: string): Promise<void> {
-    await this.repo.unsaveLecture(userId, lectureId);
+  async unsaveListing(userId: string, listingId: string): Promise<void> {
+    await this.repo.unsaveLecture(userId, listingId);
   }
 
-  async bulkSave(userId: string, lectureIds: string[]): Promise<void> {
-    await this.repo.bulkSave(userId, lectureIds);
+  async bulkSave(userId: string, listingIds: string[]): Promise<void> {
+    await this.repo.bulkSave(userId, listingIds);
   }
 }

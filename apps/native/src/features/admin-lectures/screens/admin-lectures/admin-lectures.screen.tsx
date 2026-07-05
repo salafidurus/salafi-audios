@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { FlashList } from "@shopify/flash-list";
-import type { AdminLectureListItemDto } from "@sd/core-contracts";
+import type { AdminListingListItemDto } from "@sd/core-contracts";
 import { useAdminLectures } from "../../hooks/use-admin-lectures";
 import { bulkLectureAction } from "../../api/admin-lectures.api";
 import { AudioUploaderSheet } from "../../components/AudioUploaderSheet/AudioUploaderSheet";
@@ -10,7 +10,7 @@ import { LectureEditSheet } from "../../components/LectureEditSheet/LectureEditS
 import { BulkActionBar } from "../../components/BulkActionBar/BulkActionBar";
 
 type LectureRowProps = {
-  item: AdminLectureListItemDto;
+  item: AdminListingListItemDto;
   isSelected: boolean;
   onPress: (id: string) => void;
   onLongPress: (id: string) => void;
@@ -77,7 +77,7 @@ export function AdminLecturesScreen() {
   };
 
   const renderItem = useCallback(
-    ({ item }: { item: AdminLectureListItemDto }) => (
+    ({ item }: { item: AdminListingListItemDto }) => (
       <LectureRow
         item={item}
         isSelected={selectedIds.has(item.id)}
@@ -100,7 +100,7 @@ export function AdminLecturesScreen() {
       {isLoading ? (
         <Text style={styles.loadingText}>Loading…</Text>
       ) : (
-        <FlashList<AdminLectureListItemDto>
+        <FlashList<AdminListingListItemDto>
           data={lectures}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}

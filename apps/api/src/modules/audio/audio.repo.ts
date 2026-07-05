@@ -7,14 +7,14 @@ export class AudioRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async getUserProgress(userId: string, since?: Date): Promise<AudioProgressDto[]> {
-    const progressRecords = await this.prisma.userLectureProgress.findMany({
+    const progressRecords = await this.prisma.userListingProgress.findMany({
       where: {
         userId,
         ...(since ? { updatedAt: { gt: since } } : {}),
       },
       orderBy: { updatedAt: 'desc' },
       include: {
-        lecture: {
+        listing: {
           select: {
             durationSeconds: true,
           },
@@ -23,9 +23,9 @@ export class AudioRepository {
     });
 
     return progressRecords.map((record) => ({
-      lectureId: record.lectureId,
+      listingId: record.listingId,
       positionSeconds: record.positionSeconds,
-      durationSeconds: record.lecture.durationSeconds || 0,
+      durationSeconds: record.listing.durationSeconds || 0,
       completedAt: record.isCompleted ? record.updatedAt.toISOString() : undefined,
       updatedAt: record.updatedAt.toISOString(),
     }));
@@ -33,16 +33,16 @@ export class AudioRepository {
 
   async upsertProgress(
     userId: string,
-    lectureId: string,
+    listingId: string,
     positionSeconds: number,
     durationSeconds?: number,
     isCompleted?: boolean,
   ): Promise<void> {
-    await this.prisma.userLectureProgress.upsert({
-      where: { userId_lectureId: { userId, lectureId } },
+    await this.prisma.userListingProgress.upsert({
+      where: { userId_listingId: { userId, listingId } },
       create: {
         userId,
-        lectureId,
+        listingId,
         positionSeconds,
         isCompleted: isCompleted ?? false,
       },
@@ -62,23 +62,23 @@ export class AudioRepository {
       const isCompleted = !!item.completedAt;
 
       return this.prisma.$executeRaw`
-        INSERT INTO "UserLectureProgress" ("userId", "lectureId", "positionSeconds", "isCompleted", "updatedAt")
-        VALUES (${userId}, ${item.lectureId}, ${item.positionSeconds}, ${isCompleted}, ${clientUpdatedAt})
-        ON CONFLICT ("userId", "lectureId")
+        INSERT INTO "UserListingProgress" ("userId", "listingId", "positionSeconds", "isCompleted", "updatedAt")
+        VALUES (${userId}, ${item.listingId}::uuid, ${item.positionSeconds}, ${isCompleted}, ${clientUpdatedAt})
+        ON CONFLICT ("userId", "listingId")
         DO UPDATE SET
           "positionSeconds" = CASE
-            WHEN "UserLectureProgress"."updatedAt" > ${clientUpdatedAt}
-            THEN "UserLectureProgress"."positionSeconds"
+            WHEN "UserListingProgress"."updatedAt" > ${clientUpdatedAt}
+            THEN "UserListingProgress"."positionSeconds"
             ELSE ${item.positionSeconds}
           END,
           "isCompleted" = CASE
-            WHEN "UserLectureProgress"."updatedAt" > ${clientUpdatedAt}
-            THEN "UserLectureProgress"."isCompleted"
+            WHEN "UserListingProgress"."updatedAt" > ${clientUpdatedAt}
+            THEN "UserListingProgress"."isCompleted"
             ELSE ${isCompleted}
           END,
           "updatedAt" = CASE
-            WHEN "UserLectureProgress"."updatedAt" > ${clientUpdatedAt}
-            THEN "UserLectureProgress"."updatedAt"
+            WHEN "UserListingProgress"."updatedAt" > ${clientUpdatedAt}
+            THEN "UserListingProgress"."updatedAt"
             ELSE ${clientUpdatedAt}
           END
       `;
@@ -87,21 +87,21 @@ export class AudioRepository {
     await this.prisma.$transaction(operations);
   }
 
-  async findLectureById(lectureId: string) {
-    return this.prisma.lecture.findUnique({
-      where: { id: lectureId },
+  async findListingById(listingId: string) {
+    return this.prisma.listing.findUnique({
+      where: { id: listingId },
     });
   }
 
-  async findPrimaryAsset(lectureId: string) {
+  async findPrimaryAsset(listingId: string) {
     return this.prisma.audioAsset.findFirst({
-      where: { lectureId, isPrimary: true },
+      where: { listingId, isPrimary: true },
     });
   }
 
-  async findFirstAsset(lectureId: string) {
+  async findFirstAsset(listingId: string) {
     return this.prisma.audioAsset.findFirst({
-      where: { lectureId },
+      where: { listingId },
     });
   }
 }

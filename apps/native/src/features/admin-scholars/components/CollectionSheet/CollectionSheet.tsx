@@ -1,13 +1,13 @@
 import { useReducer } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import type { AdminCollectionDetailDto } from "@sd/core-contracts";
+import type { AdminListingDetailDto } from "@sd/core-contracts";
 import { createCollection, updateCollection } from "../../api/admin-scholars.api";
 
 type CollectionSheetProps = {
   isOpen: boolean;
   scholarId: string;
-  collection?: AdminCollectionDetailDto;
+  collection?: AdminListingDetailDto;
   onClose: () => void;
   onSaved: () => void;
 };
@@ -55,14 +55,13 @@ export function CollectionSheet({
         await updateCollection(collection.id, {
           title,
           description: description || undefined,
-          language: language || undefined,
+          language: (language || undefined) as any,
         });
       } else {
         await createCollection({
           scholarId,
           title,
-          description: description || undefined,
-          language: language || undefined,
+          format: "collection",
         });
       }
       onSaved();
