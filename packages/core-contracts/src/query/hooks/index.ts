@@ -10,6 +10,8 @@ export function useApiQuery<TData, TError = Error>(
   return useQuery<TData, TError>({
     queryKey: key,
     queryFn: fn,
+    retry: 1,
+    staleTime: 30_000,
     ...options,
   });
 }
