@@ -49,7 +49,7 @@ if git diff --quiet "$COMPARISON_BASE"...HEAD -- ':(glob)apps/web/**' ':(glob)pa
   printf "pre-push: skipping web e2e (no web-affecting changes)\n"
 else
   printf "pre-push: running web e2e\n"
-  bun run turbo test:e2e --filter=web
+  PW_SKIP_WEB_BUILD=1 bun run turbo test:e2e --filter=web
 fi
 
 if git diff --quiet "$COMPARISON_BASE"...HEAD -- README.md ':(glob)docs/**/*.md' AGENT.md AGENTS.md .github/copilot-instructions.md; then
