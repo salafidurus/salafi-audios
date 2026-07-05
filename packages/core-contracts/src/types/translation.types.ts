@@ -21,10 +21,8 @@ export type SaveTranslationDto = z.infer<typeof SaveTranslationDtoSchema>;
 
 export const TranslationTargetSchema = z.union([
   z.object({ entity: z.literal("scholar"), scholarId: z.string() }),
-  z.object({ entity: z.literal("lecture"), lectureId: z.string() }),
+  z.object({ entity: z.literal("listing"), listingId: z.string() }),
   z.object({ entity: z.literal("topic"), topicId: z.string() }),
-  z.object({ entity: z.literal("series"), scholarId: z.string(), seriesId: z.string() }),
-  z.object({ entity: z.literal("collection"), scholarId: z.string(), collectionId: z.string() }),
 ]);
 export type TranslationTarget = z.infer<typeof TranslationTargetSchema>;
 

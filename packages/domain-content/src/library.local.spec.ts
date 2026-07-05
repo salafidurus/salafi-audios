@@ -1,13 +1,14 @@
+import { describe, it, expect } from "vitest";
 import { localProgressItems, localSavedItems, localCompletedItems } from "./library.local";
-import type { LectureProgress } from "@sd/domain-audio";
+import type { ListingProgress } from "@sd/domain-audio";
 
 const makeProgress = (
-  lectureId: string,
+  listingId: string,
   positionSeconds: number,
   durationSeconds: number,
-  extra?: Partial<LectureProgress>,
-): LectureProgress => ({
-  lectureId,
+  extra?: Partial<ListingProgress>,
+): ListingProgress => ({
+  listingId,
   positionSeconds,
   durationSeconds,
   updatedAt: "2024-01-01T00:00:00Z",
@@ -23,7 +24,7 @@ describe("localProgressItems", () => {
     const entry = makeProgress("lec1", 100, 600);
     const result = localProgressItems({ lec1: entry });
     expect(result).toHaveLength(1);
-    expect(result[0]!.lectureId).toBe("lec1");
+    expect(result[0]!.listingId).toBe("lec1");
     expect(result[0]!.progressSeconds).toBe(100);
     expect(result[0]!.durationSeconds).toBe(600);
   });
@@ -46,8 +47,8 @@ describe("localProgressItems", () => {
       lec2: makeProgress("lec2", 20, 600, { updatedAt: "2024-02-01T00:00:00Z" }),
     };
     const result = localProgressItems(map);
-    expect(result[0]!.lectureId).toBe("lec2");
-    expect(result[1]!.lectureId).toBe("lec1");
+    expect(result[0]!.listingId).toBe("lec2");
+    expect(result[1]!.listingId).toBe("lec1");
   });
 
   it("maps to LibraryItemDto shape", () => {
@@ -55,7 +56,7 @@ describe("localProgressItems", () => {
     const [item] = localProgressItems({ lec1: entry });
     expect(item).toMatchObject({
       id: "lec1",
-      lectureId: "lec1",
+      listingId: "lec1",
       progressSeconds: 50,
       durationSeconds: 300,
       scholarId: "",
@@ -73,7 +74,7 @@ describe("localSavedItems", () => {
   it("converts saved map entries to LibraryItemDto", () => {
     const result = localSavedItems({ lec1: "2024-01-01T00:00:00Z" });
     expect(result).toHaveLength(1);
-    expect(result[0]!.lectureId).toBe("lec1");
+    expect(result[0]!.listingId).toBe("lec1");
     expect(result[0]!.savedAt).toBe("2024-01-01T00:00:00Z");
   });
 
@@ -83,8 +84,8 @@ describe("localSavedItems", () => {
       lec2: "2024-02-01T00:00:00Z",
     };
     const result = localSavedItems(savedMap);
-    expect(result[0]!.lectureId).toBe("lec2");
-    expect(result[1]!.lectureId).toBe("lec1");
+    expect(result[0]!.listingId).toBe("lec2");
+    expect(result[1]!.listingId).toBe("lec1");
   });
 
   it("maps to LibraryItemDto shape", () => {
@@ -92,7 +93,7 @@ describe("localSavedItems", () => {
     const [item] = localSavedItems(savedMap);
     expect(item).toMatchObject({
       id: "lec1",
-      lectureId: "lec1",
+      listingId: "lec1",
       savedAt: "2024-01-15T12:00:00Z",
       scholarId: "",
       scholarSlug: "",
@@ -113,7 +114,7 @@ describe("localCompletedItems", () => {
     };
     const result = localCompletedItems(map);
     expect(result).toHaveLength(1);
-    expect(result[0]!.lectureId).toBe("lec1");
+    expect(result[0]!.listingId).toBe("lec1");
   });
 
   it("sorts by completedAt descending (newest first)", () => {
@@ -122,8 +123,8 @@ describe("localCompletedItems", () => {
       lec2: makeProgress("lec2", 600, 600, { completedAt: "2024-02-01T00:00:00Z" }),
     };
     const result = localCompletedItems(map);
-    expect(result[0]!.lectureId).toBe("lec2");
-    expect(result[1]!.lectureId).toBe("lec1");
+    expect(result[0]!.listingId).toBe("lec2");
+    expect(result[1]!.listingId).toBe("lec1");
   });
 
   it("maps to LibraryItemDto shape", () => {
@@ -131,7 +132,7 @@ describe("localCompletedItems", () => {
     const [item] = localCompletedItems({ lec1: entry });
     expect(item).toMatchObject({
       id: "lec1",
-      lectureId: "lec1",
+      listingId: "lec1",
       completedAt: "2024-01-01T00:00:00Z",
       progressSeconds: 600,
       durationSeconds: 600,

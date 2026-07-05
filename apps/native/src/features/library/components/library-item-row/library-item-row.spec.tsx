@@ -47,9 +47,9 @@ jest.mock("@/shared/components/AppText/AppText", () => {
 
 const baseItem: LibraryItemDto = {
   id: "item-1",
-  lectureId: "lecture-1",
-  lectureTitle: "The Book of Tawheed",
-  lectureSlug: "book-of-tawheed",
+  listingId: "lecture-1",
+  listingTitle: "The Book of Tawheed",
+  listingSlug: "book-of-tawheed",
   scholarId: "scholar-1",
   scholarSlug: "ibn-baz",
   scholarName: "Ibn Baz",

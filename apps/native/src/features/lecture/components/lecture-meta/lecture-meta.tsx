@@ -1,9 +1,9 @@
-import type { LectureDetailDto } from "@sd/core-contracts";
+import type { ListingDetailDto } from "@sd/core-contracts";
 import { View } from "react-native";
 import { AppText } from "@/shared/components/AppText/AppText";
 
 export type LectureMetaProps = {
-  lecture: LectureDetailDto;
+  lecture: ListingDetailDto;
 };
 
 function formatDuration(durationSeconds?: number): string | null {

@@ -1,13 +1,13 @@
 import { Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { useLectureProgress } from "@sd/domain-audio";
+import { useListingProgress } from "@sd/domain-audio";
 
 type ResumeBadgeProps = {
-  lectureId: string;
+  listingId: string;
 };
 
-export function ResumeBadge({ lectureId }: ResumeBadgeProps) {
-  const { resumePositionSeconds, isCompleted, progressPercent } = useLectureProgress(lectureId);
+export function ResumeBadge({ listingId }: ResumeBadgeProps) {
+  const { resumePositionSeconds, isCompleted, progressPercent } = useListingProgress(listingId);
 
   if (isCompleted) {
     return (

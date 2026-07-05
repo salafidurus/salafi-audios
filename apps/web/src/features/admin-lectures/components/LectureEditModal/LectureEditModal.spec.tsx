@@ -107,12 +107,12 @@ describe("LectureEditModal", () => {
         title: "My Great Lecture",
         slug: "my-great-lecture",
         scholarId: "scholar-1",
+        parentId: undefined,
+        topics: [],
+        format: "single",
         audioKey: "audio/new-key.mp3",
         durationSeconds: 300,
         sizeBytes: 50000,
-        format: "audio/mp3",
-        topics: [],
-        seriesId: undefined,
       });
     });
 
@@ -130,14 +130,16 @@ describe("LectureEditModal", () => {
       title: "Existing Title",
       slug: "existing-title",
       description: "Existing Description",
-      scholarId: "scholar-2",
-      seriesId: "series-1",
+      format: "single" as const,
       status: "draft" as const,
+      scholarId: "scholar-2",
+      scholarName: "Scholar Two",
+      parentId: "series-1",
       orderIndex: 5,
       topics: ["topic-1"],
       audioKey: "audio/old-key.mp3",
       createdAt: "2024-01-01",
-      scholarName: "Scholar Two",
+      audioAssets: [],
     };
 
     render(

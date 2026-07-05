@@ -1,13 +1,13 @@
 import { useReducer } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import type { AdminSeriesDetailDto } from "@sd/core-contracts";
+import type { AdminListingDetailDto } from "@sd/core-contracts";
 import { createSeries, updateSeries } from "../../api/admin-scholars.api";
 
 type SeriesSheetProps = {
   isOpen: boolean;
   scholarId: string;
-  series?: AdminSeriesDetailDto;
+  series?: AdminListingDetailDto;
   onClose: () => void;
   onSaved: () => void;
 };
@@ -49,14 +49,13 @@ export function SeriesSheet({ isOpen, scholarId, series, onClose, onSaved }: Ser
         await updateSeries(series.id, {
           title,
           description: description || undefined,
-          language: language || undefined,
+          language: (language || undefined) as any,
         });
       } else {
         await createSeries({
           scholarId,
           title,
-          description: description || undefined,
-          language: language || undefined,
+          format: "series",
         });
       }
       onSaved();

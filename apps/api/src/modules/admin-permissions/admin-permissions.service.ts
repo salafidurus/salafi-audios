@@ -1,12 +1,17 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ADMIN_PERMISSIONS, type AdminPermission, type AdminUserListDto } from '@sd/core-contracts';
+import {
+  ADMIN_PERMISSIONS,
+  type AdminPermission,
+  type AdminUserListDto,
+  type AdminPermissionsListDto,
+} from '@sd/core-contracts';
 import { AdminPermissionsRepository } from './admin-permissions.repo';
 
 @Injectable()
 export class AdminPermissionsService {
   constructor(private readonly repo: AdminPermissionsRepository) {}
 
-  async getPermissions(userId: string) {
+  async getPermissions(userId: string): Promise<AdminPermissionsListDto> {
     const perms = await this.repo.findByUserId(userId);
     return {
       permissions: perms.map((p) => ({
@@ -25,7 +30,11 @@ export class AdminPermissionsService {
     };
   }
 
-  async grant(userId: string, permission: string, grantedById: string) {
+  async grant(
+    userId: string,
+    permission: string,
+    grantedById: string,
+  ): Promise<AdminPermissionsListDto> {
     if (!ADMIN_PERMISSIONS.includes(permission as AdminPermission)) {
       throw new NotFoundException(`Unknown permission: ${permission}`);
     }
@@ -49,7 +58,7 @@ export class AdminPermissionsService {
     };
   }
 
-  async revoke(userId: string, permission: string) {
+  async revoke(userId: string, permission: string): Promise<AdminPermissionsListDto> {
     if (!ADMIN_PERMISSIONS.includes(permission as AdminPermission)) {
       throw new NotFoundException(`Unknown permission: ${permission}`);
     }

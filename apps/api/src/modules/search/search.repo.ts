@@ -45,9 +45,10 @@ export class SearchRepository {
         COALESCE(c."publishedLectureCount", 0) AS "lectureCount",
         c."publishedDurationSeconds" AS "durationSeconds",
         c."language" AS "originalLanguage"
-      FROM "Collection" c
+      FROM "Listing" c
       JOIN "Scholar" s ON s."id" = c."scholarId"
-      WHERE c."status" = ${Status.published}
+      WHERE c."format" = 'collection'
+        AND c."status" = ${Status.published}
         AND c."deletedAt" IS NULL
         AND s."isActive" = true
         ${query.language ? Prisma.sql`AND c."language" = ${query.language}` : Prisma.sql``}
@@ -70,9 +71,10 @@ export class SearchRepository {
         COALESCE(c."publishedLectureCount", 0) AS "lectureCount",
         c."publishedDurationSeconds" AS "durationSeconds",
         c."language" AS "originalLanguage"
-      FROM "Collection" c
+      FROM "Listing" c
       JOIN "Scholar" s ON s."id" = c."scholarId"
-      WHERE c."status" = ${Status.published}
+      WHERE c."format" = 'collection'
+        AND c."status" = ${Status.published}
         AND c."deletedAt" IS NULL
         AND s."isActive" = true
         ${query.language ? Prisma.sql`AND c."language" = ${query.language}` : Prisma.sql``}
@@ -114,11 +116,12 @@ export class SearchRepository {
         COALESCE(se."publishedLectureCount", 0) AS "lectureCount",
         se."publishedDurationSeconds" AS "durationSeconds",
         se."language" AS "originalLanguage"
-      FROM "Series" se
+      FROM "Listing" se
       JOIN "Scholar" s ON s."id" = se."scholarId"
-      WHERE se."status" = ${Status.published}
+      WHERE se."format" = 'series'
+        AND se."status" = ${Status.published}
         AND se."deletedAt" IS NULL
-        AND se."collectionId" IS NULL
+        AND se."parentId" IS NULL
         AND s."isActive" = true
         ${query.language ? Prisma.sql`AND se."language" = ${query.language}` : Prisma.sql``}
         ${query.scholarSlug ? Prisma.sql`AND s."slug" = ${query.scholarSlug}` : Prisma.sql``}
@@ -140,11 +143,12 @@ export class SearchRepository {
         COALESCE(se."publishedLectureCount", 0) AS "lectureCount",
         se."publishedDurationSeconds" AS "durationSeconds",
         se."language" AS "originalLanguage"
-      FROM "Series" se
+      FROM "Listing" se
       JOIN "Scholar" s ON s."id" = se."scholarId"
-      WHERE se."status" = ${Status.published}
+      WHERE se."format" = 'series'
+        AND se."status" = ${Status.published}
         AND se."deletedAt" IS NULL
-        AND se."collectionId" IS NULL
+        AND se."parentId" IS NULL
         AND s."isActive" = true
         ${query.language ? Prisma.sql`AND se."language" = ${query.language}` : Prisma.sql``}
         ${query.scholarSlug ? Prisma.sql`AND s."slug" = ${query.scholarSlug}` : Prisma.sql``}
@@ -185,11 +189,12 @@ export class SearchRepository {
         1 AS "lectureCount",
         l."durationSeconds" AS "durationSeconds",
         l."language" AS "originalLanguage"
-      FROM "Lecture" l
+      FROM "Listing" l
       JOIN "Scholar" s ON s."id" = l."scholarId"
-      WHERE l."status" = ${Status.published}
+      WHERE l."format" = 'single'
+        AND l."status" = ${Status.published}
         AND l."deletedAt" IS NULL
-        AND l."seriesId" IS NULL
+        AND l."parentId" IS NULL
         AND s."isActive" = true
         ${query.language ? Prisma.sql`AND l."language" = ${query.language}` : Prisma.sql``}
         ${query.scholarSlug ? Prisma.sql`AND s."slug" = ${query.scholarSlug}` : Prisma.sql``}
@@ -211,11 +216,12 @@ export class SearchRepository {
         1 AS "lectureCount",
         l."durationSeconds" AS "durationSeconds",
         l."language" AS "originalLanguage"
-      FROM "Lecture" l
+      FROM "Listing" l
       JOIN "Scholar" s ON s."id" = l."scholarId"
-      WHERE l."status" = ${Status.published}
+      WHERE l."format" = 'single'
+        AND l."status" = ${Status.published}
         AND l."deletedAt" IS NULL
-        AND l."seriesId" IS NULL
+        AND l."parentId" IS NULL
         AND s."isActive" = true
         ${query.language ? Prisma.sql`AND l."language" = ${query.language}` : Prisma.sql``}
         ${query.scholarSlug ? Prisma.sql`AND s."slug" = ${query.scholarSlug}` : Prisma.sql``}
@@ -280,9 +286,9 @@ export class SearchRepository {
         Prisma.sql`
           EXISTS (
             SELECT 1
-            FROM "CollectionTopic" ct
+            FROM "ListingTopic" ct
             JOIN "Topic" t ON t."id" = ct."topicId"
-            WHERE ct."collectionId" = c."id"
+            WHERE ct."listingId" = c."id"
               AND (
                 t."name" % ${queryText}
                 OR similarity(t."name", ${queryText}) > ${SIMILARITY_THRESHOLD}
@@ -315,9 +321,9 @@ export class SearchRepository {
         Prisma.sql`
           EXISTS (
             SELECT 1
-            FROM "SeriesTopic" st
+            FROM "ListingTopic" st
             JOIN "Topic" t ON t."id" = st."topicId"
-            WHERE st."seriesId" = se."id"
+            WHERE st."listingId" = se."id"
               AND (
                 t."name" % ${queryText}
                 OR similarity(t."name", ${queryText}) > ${SIMILARITY_THRESHOLD}
@@ -350,9 +356,9 @@ export class SearchRepository {
         Prisma.sql`
           EXISTS (
             SELECT 1
-            FROM "LectureTopic" lt
+            FROM "ListingTopic" lt
             JOIN "Topic" t ON t."id" = lt."topicId"
-            WHERE lt."lectureId" = l."id"
+            WHERE lt."listingId" = l."id"
               AND (
                 t."name" % ${queryText}
                 OR similarity(t."name", ${queryText}) > ${SIMILARITY_THRESHOLD}
@@ -380,9 +386,9 @@ export class SearchRepository {
         Prisma.sql`
           EXISTS (
             SELECT 1
-            FROM "CollectionTopic" ct
+            FROM "ListingTopic" ct
             JOIN "Topic" t ON t."id" = ct."topicId"
-            WHERE ct."collectionId" = c."id"
+            WHERE ct."listingId" = c."id"
               AND (
                 t."name" ILIKE ${pattern} ESCAPE '\\'
                 OR t."slug" ILIKE ${pattern} ESCAPE '\\'
@@ -408,9 +414,9 @@ export class SearchRepository {
         Prisma.sql`
           EXISTS (
             SELECT 1
-            FROM "SeriesTopic" st
+            FROM "ListingTopic" st
             JOIN "Topic" t ON t."id" = st."topicId"
-            WHERE st."seriesId" = se."id"
+            WHERE st."listingId" = se."id"
               AND (
                 t."name" ILIKE ${pattern} ESCAPE '\\'
                 OR t."slug" ILIKE ${pattern} ESCAPE '\\'
@@ -436,9 +442,9 @@ export class SearchRepository {
         Prisma.sql`
           EXISTS (
             SELECT 1
-            FROM "LectureTopic" lt
+            FROM "ListingTopic" lt
             JOIN "Topic" t ON t."id" = lt."topicId"
-            WHERE lt."lectureId" = l."id"
+            WHERE lt."listingId" = l."id"
               AND (
                 t."name" ILIKE ${pattern} ESCAPE '\\'
                 OR t."slug" ILIKE ${pattern} ESCAPE '\\'
@@ -458,9 +464,9 @@ export class SearchRepository {
       (slug) => Prisma.sql`
       EXISTS (
         SELECT 1
-        FROM "CollectionTopic" ct
+        FROM "ListingTopic" ct
         JOIN "Topic" t ON t."id" = ct."topicId"
-        WHERE ct."collectionId" = c."id"
+        WHERE ct."listingId" = c."id"
           AND t."slug" = ${slug}
       )
     `,
@@ -478,9 +484,9 @@ export class SearchRepository {
       (slug) => Prisma.sql`
       EXISTS (
         SELECT 1
-        FROM "SeriesTopic" st
+        FROM "ListingTopic" st
         JOIN "Topic" t ON t."id" = st."topicId"
-        WHERE st."seriesId" = se."id"
+        WHERE st."listingId" = se."id"
           AND t."slug" = ${slug}
       )
     `,
@@ -498,9 +504,9 @@ export class SearchRepository {
       (slug) => Prisma.sql`
       EXISTS (
         SELECT 1
-        FROM "LectureTopic" lt
+        FROM "ListingTopic" lt
         JOIN "Topic" t ON t."id" = lt."topicId"
-        WHERE lt."lectureId" = l."id"
+        WHERE lt."listingId" = l."id"
           AND t."slug" = ${slug}
       )
     `,
@@ -553,9 +559,9 @@ export class SearchRepository {
               similarity(t."name", ${queryText}),
               similarity(t."slug", ${queryText})
             ))
-            FROM "CollectionTopic" ct
+            FROM "ListingTopic" ct
             JOIN "Topic" t ON t."id" = ct."topicId"
-            WHERE ct."collectionId" = c."id"
+            WHERE ct."listingId" = c."id"
           ), 0) DESC
         `,
       );
@@ -584,9 +590,9 @@ export class SearchRepository {
               similarity(t."name", ${queryText}),
               similarity(t."slug", ${queryText})
             ))
-            FROM "SeriesTopic" st
+            FROM "ListingTopic" st
             JOIN "Topic" t ON t."id" = st."topicId"
-            WHERE st."seriesId" = se."id"
+            WHERE st."listingId" = se."id"
           ), 0) DESC
         `,
       );
@@ -615,9 +621,9 @@ export class SearchRepository {
               similarity(t."name", ${queryText}),
               similarity(t."slug", ${queryText})
             ))
-            FROM "LectureTopic" lt
+            FROM "ListingTopic" lt
             JOIN "Topic" t ON t."id" = lt."topicId"
-            WHERE lt."lectureId" = l."id"
+            WHERE lt."listingId" = l."id"
           ), 0) DESC
         `,
       );
@@ -720,25 +726,11 @@ export class SearchRepository {
     const map = new Map<string, { title: string }>();
     if (!ids.length) return map;
 
-    if (entity === 'collection') {
-      const rows = await this.prisma.collectionTranslation.findMany({
-        where: { collectionId: { in: ids }, locale, status: 'published' },
-        select: { collectionId: true, title: true },
-      });
-      for (const r of rows) map.set(r.collectionId, { title: r.title });
-    } else if (entity === 'series') {
-      const rows = await this.prisma.seriesTranslation.findMany({
-        where: { seriesId: { in: ids }, locale, status: 'published' },
-        select: { seriesId: true, title: true },
-      });
-      for (const r of rows) map.set(r.seriesId, { title: r.title });
-    } else {
-      const rows = await this.prisma.lectureTranslation.findMany({
-        where: { lectureId: { in: ids }, locale, status: 'published' },
-        select: { lectureId: true, title: true },
-      });
-      for (const r of rows) map.set(r.lectureId, { title: r.title });
-    }
+    const rows = await this.prisma.listingTranslation.findMany({
+      where: { listingId: { in: ids }, locale, status: 'published' },
+      select: { listingId: true, title: true },
+    });
+    for (const r of rows) map.set(r.listingId, { title: r.title });
 
     return map;
   }

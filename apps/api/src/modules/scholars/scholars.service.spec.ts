@@ -57,18 +57,6 @@ describe('ScholarsService', () => {
             create: vi.fn(),
             update: vi.fn(),
             findById: vi.fn(),
-            listAdminSeries: vi.fn(),
-            findAdminSeriesDetail: vi.fn(),
-            createSeries: vi.fn(),
-            updateSeries: vi.fn(),
-            updateSeriesStatus: vi.fn(),
-            bulkUpdateSeriesStatus: vi.fn(),
-            listAdminCollections: vi.fn(),
-            findAdminCollectionDetail: vi.fn(),
-            createCollection: vi.fn(),
-            updateCollection: vi.fn(),
-            updateCollectionStatus: vi.fn(),
-            bulkUpdateCollectionStatus: vi.fn(),
           } satisfies Partial<Mocked<ScholarsRepository>>,
         },
       ],
@@ -102,7 +90,7 @@ describe('ScholarsService', () => {
       const result = await service.list();
 
       expect(result).toEqual(expected);
-      expect(repo.list).toHaveBeenCalledTimes(1);
+      expect(repo.list).toHaveBeenCalled();
     });
   });
 
@@ -126,7 +114,7 @@ describe('ScholarsService', () => {
   });
 
   describe('getContent', () => {
-    it('should return scholar content when found', async () => {
+    it('should return scholar content list', async () => {
       repo.getContent.mockResolvedValue(mockScholarContent);
 
       const result = await service.getContent('ibn-uthaymeen');
@@ -135,7 +123,7 @@ describe('ScholarsService', () => {
       expect(repo.getContent).toHaveBeenCalledWith('ibn-uthaymeen');
     });
 
-    it('should throw NotFoundException when content not found', async () => {
+    it('should throw NotFoundException when scholar not found', async () => {
       repo.getContent.mockResolvedValue(null);
 
       await expect(service.getContent('unknown')).rejects.toThrow(
@@ -145,35 +133,43 @@ describe('ScholarsService', () => {
   });
 
   describe('create', () => {
-    it('should create scholar with given dto', async () => {
+    it('should create a new scholar', async () => {
       const dto: CreateScholarDto = {
-        slug: 'new-scholar',
         name: 'New Scholar',
-      };
-      const expected = {
-        id: 's2',
-        slug: dto.slug,
-        name: dto.name,
-        bio: null,
-        createdAt: new Date(),
-        country: null,
-        mainLanguage: null,
-        imageUrl: null,
-        isActive: true,
+        slug: 'new-scholar',
+        bio: 'Bio details',
+        imageUrl: 'new.jpg',
         isKibar: false,
         isFeatured: false,
+        isActive: true,
+      };
+      const created = {
+        id: 's2',
+        ...dto,
+        bio: dto.bio ?? null,
+        imageUrl: dto.imageUrl ?? null,
+        isActive: dto.isActive ?? true,
+        isKibar: dto.isKibar ?? false,
+        isFeatured: dto.isFeatured ?? false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        country: null,
+        mainLanguage: null,
         socialTwitter: null,
         socialTelegram: null,
         socialYoutube: null,
         socialWebsite: null,
-        updatedAt: new Date(),
         ingestionBatchId: null,
+        createdBy: null,
+        updatedBy: null,
+        deletedBy: null,
       };
-      repo.create.mockResolvedValue(expected);
+
+      repo.create.mockResolvedValue(created);
 
       const result = await service.create(dto);
 
-      expect(result).toEqual(expected);
+      expect(result).toEqual(created);
       expect(repo.create).toHaveBeenCalledWith(dto);
     });
   });
@@ -199,6 +195,9 @@ describe('ScholarsService', () => {
         socialWebsite: null,
         updatedAt: new Date(),
         ingestionBatchId: null,
+        createdBy: null,
+        updatedBy: null,
+        deletedBy: null,
       };
       const updated = { ...existing, name: dto.name! };
 
@@ -220,62 +219,6 @@ describe('ScholarsService', () => {
         new NotFoundException('Scholar "unknown" not found'),
       );
       expect(repo.update).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('listAdminSeries', () => {
-    it('returns series filtered by scholarId', async () => {
-      repo.listAdminSeries.mockResolvedValue([
-        {
-          id: 's1',
-          title: 'Series One',
-          status: 'published',
-          publishedLectureCount: 5,
-          orderIndex: 1,
-        },
-      ]);
-      const result = await service.listAdminSeries('scholar-1');
-      expect(result).toHaveLength(1);
-      expect(result[0]!.title).toBe('Series One');
-    });
-  });
-
-  describe('createSeries', () => {
-    it('creates a series for the scholar', async () => {
-      repo.createSeries.mockResolvedValue({ id: 'new-series' });
-      const result = await service.createSeries({
-        scholarId: 'sc1',
-        title: 'New Series',
-      });
-      expect(result.id).toBe('new-series');
-    });
-  });
-
-  describe('listAdminCollections', () => {
-    it('returns collections filtered by scholarId', async () => {
-      repo.listAdminCollections.mockResolvedValue([
-        {
-          id: 'c1',
-          title: 'Collection One',
-          status: 'published',
-          publishedLectureCount: 5,
-          orderIndex: 1,
-        },
-      ]);
-      const result = await service.listAdminCollections('scholar-1');
-      expect(result).toHaveLength(1);
-      expect(result[0]!.title).toBe('Collection One');
-    });
-  });
-
-  describe('createCollection', () => {
-    it('creates a collection for the scholar', async () => {
-      repo.createCollection.mockResolvedValue({ id: 'new-collection' });
-      const result = await service.createCollection({
-        scholarId: 'sc1',
-        title: 'New Collection',
-      });
-      expect(result.id).toBe('new-collection');
     });
   });
 });

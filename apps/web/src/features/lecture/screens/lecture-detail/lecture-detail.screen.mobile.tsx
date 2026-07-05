@@ -2,7 +2,7 @@
 
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { AppText } from "@/shared/components/AppText/AppText";
-import { useLectureDetail } from "@sd/domain-content";
+import { useListingDetail } from "@sd/domain-content";
 import { LectureMeta } from "@/features/lecture/components/lecture-meta/lecture-meta";
 import { TopicChips } from "@/features/lecture/components/topic-chips/topic-chips";
 import { SeriesContextBar } from "@/features/lecture/components/series-context-bar/series-context-bar";
@@ -17,7 +17,7 @@ export type LectureDetailMobileScreenProps = {
 };
 
 export function LectureDetailMobileScreen({ id }: LectureDetailMobileScreenProps) {
-  const { data: lecture, isFetching } = useLectureDetail(id);
+  const { data: lecture, isFetching } = useListingDetail(id);
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
 

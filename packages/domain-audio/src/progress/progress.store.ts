@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
-export type LectureProgress = {
-  lectureId: string;
+export type ListingProgress = {
+  listingId: string;
   positionSeconds: number;
   durationSeconds: number;
   completedAt?: string;
@@ -9,21 +9,21 @@ export type LectureProgress = {
 };
 
 type ProgressState = {
-  progressMap: Record<string, LectureProgress>;
-  /** Map of lectureId → savedAt ISO string */
+  progressMap: Record<string, ListingProgress>;
+  /** Map of listingId → savedAt ISO string */
   savedMap: Record<string, string>;
   lastSyncedAt: string | null;
   actions: {
-    setProgress: (lectureId: string, positionSeconds: number, durationSeconds: number) => void;
-    markCompleted: (lectureId: string) => void;
-    loadProgress: (entries: LectureProgress[]) => void;
-    getProgress: (lectureId: string) => LectureProgress | undefined;
+    setProgress: (listingId: string, positionSeconds: number, durationSeconds: number) => void;
+    markCompleted: (listingId: string) => void;
+    loadProgress: (entries: ListingProgress[]) => void;
+    getProgress: (listingId: string) => ListingProgress | undefined;
     setLastSyncedAt: (timestamp: string) => void;
-    addSaved: (lectureId: string) => void;
-    removeSaved: (lectureId: string) => void;
-    isSaved: (lectureId: string) => boolean;
+    addSaved: (listingId: string) => void;
+    removeSaved: (listingId: string) => void;
+    isSaved: (listingId: string) => boolean;
     getSavedIds: () => string[];
-    loadSaved: (entries: Array<{ lectureId: string; savedAt: string }>) => void;
+    loadSaved: (entries: Array<{ listingId: string; savedAt: string }>) => void;
   };
 };
 
@@ -33,28 +33,28 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
   lastSyncedAt: null,
 
   actions: {
-    setProgress: (lectureId, positionSeconds, durationSeconds) =>
+    setProgress: (listingId, positionSeconds, durationSeconds) =>
       set((state) => ({
         progressMap: {
           ...state.progressMap,
-          [lectureId]: {
-            lectureId,
+          [listingId]: {
+            listingId,
             positionSeconds,
             durationSeconds,
-            completedAt: state.progressMap[lectureId]?.completedAt,
+            completedAt: state.progressMap[listingId]?.completedAt,
             updatedAt: new Date().toISOString(),
           },
         },
       })),
 
-    markCompleted: (lectureId) =>
+    markCompleted: (listingId) =>
       set((state) => {
-        const existing = state.progressMap[lectureId];
+        const existing = state.progressMap[listingId];
         if (!existing) return state;
         return {
           progressMap: {
             ...state.progressMap,
-            [lectureId]: {
+            [listingId]: {
               ...existing,
               completedAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
@@ -67,30 +67,30 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
       set((state) => {
         const newMap = { ...state.progressMap };
         for (const entry of entries) {
-          newMap[entry.lectureId] = entry;
+          newMap[entry.listingId] = entry;
         }
         return { progressMap: newMap };
       }),
 
-    getProgress: (lectureId) => get().progressMap[lectureId],
+    getProgress: (listingId) => get().progressMap[listingId],
 
     setLastSyncedAt: (timestamp) => set({ lastSyncedAt: timestamp }),
 
-    addSaved: (lectureId) =>
+    addSaved: (listingId) =>
       set((state) => ({
         savedMap: {
           ...state.savedMap,
-          [lectureId]: new Date().toISOString(),
+          [listingId]: new Date().toISOString(),
         },
       })),
 
-    removeSaved: (lectureId) =>
+    removeSaved: (listingId) =>
       set((state) => {
-        const { [lectureId]: _, ...rest } = state.savedMap;
+        const { [listingId]: _, ...rest } = state.savedMap;
         return { savedMap: rest };
       }),
 
-    isSaved: (lectureId) => lectureId in get().savedMap,
+    isSaved: (listingId) => listingId in get().savedMap,
 
     getSavedIds: () => Object.keys(get().savedMap),
 
@@ -98,7 +98,7 @@ export const useProgressStore = create<ProgressState>((set, get) => ({
       set((state) => {
         const newMap = { ...state.savedMap };
         for (const entry of entries) {
-          newMap[entry.lectureId] = entry.savedAt;
+          newMap[entry.listingId] = entry.savedAt;
         }
         return { savedMap: newMap };
       }),

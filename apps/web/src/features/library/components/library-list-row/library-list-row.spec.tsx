@@ -25,9 +25,9 @@ vi.mock("@/core/i18n/use-translation", () => ({
 
 const mockItem: LibraryItemDto = {
   id: "lib-1",
-  lectureId: "lec-1",
-  lectureTitle: "Explanation of Three Principles",
-  lectureSlug: "explanation-of-three-principles",
+  listingId: "lec-1",
+  listingTitle: "Explanation of Three Principles",
+  listingSlug: "explanation-of-three-principles",
   scholarId: "sch-1",
   scholarSlug: "bin-baz",
   scholarName: "Abdul-Aziz bin Baz",

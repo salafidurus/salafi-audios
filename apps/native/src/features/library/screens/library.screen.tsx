@@ -1,5 +1,5 @@
-import { useCallback } from "react";
-import { SectionList, Text, View } from "react-native";
+import React, { useCallback } from "react";
+import { ScrollView, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import type { LibraryItemDto } from "@sd/core-contracts";
 import {
@@ -73,17 +73,6 @@ export function LibraryScreen({ onNavigateToLecture }: LibraryScreenProps) {
     [onNavigateToLecture],
   );
 
-  const renderItem = useCallback(
-    ({ item, section }: { item: LibraryItemDto; section: Section }) => (
-      <LibraryItemRow
-        item={item}
-        variant={(section as Section).variant}
-        onPress={() => handleItemPress(item.lectureId)}
-      />
-    ),
-    [handleItemPress],
-  );
-
   if (isAllLoading) {
     return (
       <ScreenView center>
@@ -98,41 +87,36 @@ export function LibraryScreen({ onNavigateToLecture }: LibraryScreenProps) {
 
   return (
     <ScreenView>
-      <SectionList
-        sections={sections}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        renderSectionHeader={({ section }) => (
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionHeaderText}>{section.title}</Text>
-          </View>
-        )}
-        renderSectionFooter={({ section }) => {
-          const currentSection = section as Section;
+      <ScrollView contentContainerStyle={styles.listContent}>
+        {sections.map((section) => (
+          <View key={section.title}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionHeaderText}>{section.title}</Text>
+            </View>
 
-          if (currentSection.isFetching && currentSection.data.length === 0) {
-            return (
+            {section.data.map((item) => (
+              <LibraryItemRow
+                key={item.id}
+                item={item}
+                variant={section.variant}
+                onPress={() => handleItemPress(item.listingId)}
+              />
+            ))}
+
+            {section.isFetching && section.data.length === 0 ? (
               <View style={styles.sectionFooter}>
                 <Text style={styles.sectionFooterLoadingText}>
                   {t("common.loading", "Loading...")}
                 </Text>
               </View>
-            );
-          }
-
-          if (currentSection.data.length === 0) {
-            return (
+            ) : section.data.length === 0 ? (
               <View style={styles.sectionFooter}>
-                <Text style={styles.sectionFooterEmptyText}>{currentSection.emptyMessage}</Text>
+                <Text style={styles.sectionFooterEmptyText}>{section.emptyMessage}</Text>
               </View>
-            );
-          }
-
-          return null;
-        }}
-        stickySectionHeadersEnabled={false}
-        contentContainerStyle={styles.listContent}
-      />
+            ) : null}
+          </View>
+        ))}
+      </ScrollView>
     </ScreenView>
   );
 }

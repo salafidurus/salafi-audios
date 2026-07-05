@@ -30,9 +30,10 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
   const progress = useProgressStore((s) => s.progressMap[item.id]);
   const isInProgress = progress && progress.positionSeconds > 0 && !progress.completedAt;
 
-  const progressPercent = progress && progress.durationSeconds
-    ? Math.min(Math.max((progress.positionSeconds / progress.durationSeconds) * 100, 0), 100)
-    : 0;
+  const progressPercent =
+    progress && progress.durationSeconds
+      ? Math.min(Math.max((progress.positionSeconds / progress.durationSeconds) * 100, 0), 100)
+      : 0;
 
   const handlePlay = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -56,7 +57,7 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
       seriesTitle: null,
     };
 
-    await audioService.playLecture(track, [track]);
+    await audioService.playListing(track, [track]);
   };
 
   const handleSave = (e: React.MouseEvent) => {
@@ -78,13 +79,9 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
 
   const initial = item.scholarName ? item.scholarName.trim().charAt(0).toUpperCase() : "?";
 
-  const durationText = item.durationSeconds
-    ? `${Math.round(item.durationSeconds / 60)} min`
-    : "";
+  const durationText = item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : "";
 
-  const publishedDateText = item.publishedAt
-    ? new Date(item.publishedAt).toLocaleDateString()
-    : "";
+  const publishedDateText = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString() : "";
 
   return (
     <div

@@ -8,7 +8,7 @@ export const StreamResponseDtoSchema = z.object({
 export type StreamResponseDto = z.infer<typeof StreamResponseDtoSchema>;
 
 export const AudioProgressDtoSchema = z.object({
-  lectureId: z.string(),
+  listingId: z.string(),
   positionSeconds: z.number(),
   durationSeconds: z.number(),
   completedAt: z.string().optional(),
@@ -17,7 +17,7 @@ export const AudioProgressDtoSchema = z.object({
 export type AudioProgressDto = z.infer<typeof AudioProgressDtoSchema>;
 
 export const ProgressSyncItemDtoSchema = z.object({
-  lectureId: z.string(),
+  listingId: z.string(),
   positionSeconds: z.number(),
   durationSeconds: z.number(),
   completedAt: z.string().optional(),

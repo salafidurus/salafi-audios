@@ -3,33 +3,33 @@ import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { RequiresPermission } from '../../shared/decorators/requires-permission.decorator';
 import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
-import { LecturesService } from './lectures.service';
-import { SaveLectureTranslationDto } from './dto/save-lecture-translation.dto';
+import { ListingService } from './listing.service';
+import { SaveListingTranslationDto } from './dto/save-listing-translation.dto';
 
-@ApiTags('Lecture Translations')
+@ApiTags('Listing Translations')
 @ApiCommonErrors()
-@Controller('lectures')
+@Controller('listings')
 @UseGuards(AdminPermissionGuard)
-export class LecturesTranslationsController {
-  constructor(private readonly service: LecturesService) {}
+export class ListingTranslationsController {
+  constructor(private readonly service: ListingService) {}
 
   @Get(':id/translations')
   @RequiresPermission('manage:content')
-  @ApiOperation({ summary: 'List translations for a lecture' })
+  @ApiOperation({ summary: 'List translations for a listing' })
   listTranslations(@Param('id') id: string) {
     return this.service.listTranslations(id);
   }
 
   @Post(':id/translations')
   @RequiresPermission('manage:content')
-  @ApiOperation({ summary: 'Upsert a lecture translation' })
-  upsertTranslation(@Param('id') id: string, @Body() dto: SaveLectureTranslationDto) {
+  @ApiOperation({ summary: 'Upsert a listing translation' })
+  upsertTranslation(@Param('id') id: string, @Body() dto: SaveListingTranslationDto) {
     return this.service.upsertTranslation(id, dto);
   }
 
   @Patch(':id/translations/:locale')
   @RequiresPermission('manage:content')
-  @ApiOperation({ summary: 'Partially update a lecture translation' })
+  @ApiOperation({ summary: 'Partially update a listing translation' })
   updateTranslation(
     @Param('id') id: string,
     @Param('locale') locale: string,
@@ -40,14 +40,14 @@ export class LecturesTranslationsController {
 
   @Post(':id/translations/:locale/publish')
   @RequiresPermission('manage:content')
-  @ApiOperation({ summary: 'Publish a lecture translation' })
+  @ApiOperation({ summary: 'Publish a listing translation' })
   publishTranslation(@Param('id') id: string, @Param('locale') locale: string) {
     return this.service.publishTranslation(id, locale);
   }
 
   @Post(':id/translations/:locale/unpublish')
   @RequiresPermission('manage:content')
-  @ApiOperation({ summary: 'Unpublish a lecture translation' })
+  @ApiOperation({ summary: 'Unpublish a listing translation' })
   unpublishTranslation(@Param('id') id: string, @Param('locale') locale: string) {
     return this.service.unpublishTranslation(id, locale);
   }

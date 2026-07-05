@@ -159,6 +159,7 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
           title: item.name.replace(/\.[^.]+$/, ""),
           audioKey: objectKey,
           scholarId: selectedScholarId,
+          format: "single",
           ...(durationSeconds != null ? { durationSeconds } : {}),
         });
         setItemState(i, { progress: 1, status: "done" });

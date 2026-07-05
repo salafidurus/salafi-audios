@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import type { LectureDetailDto } from "@sd/core-contracts";
+import type { ListingDetailDto } from "@sd/core-contracts";
 import { AppText } from "@/shared/components/AppText/AppText";
 
 function formatDuration(seconds: number): string {
@@ -20,7 +20,7 @@ function formatDate(iso: string): string {
 }
 
 export type LectureMetaProps = {
-  lecture: LectureDetailDto;
+  lecture: ListingDetailDto;
 };
 
 export function LectureMeta({ lecture }: LectureMetaProps) {

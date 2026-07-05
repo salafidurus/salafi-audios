@@ -12,9 +12,9 @@ describe('LibraryService', () => {
     items: [
       {
         id: 'lib1',
-        lectureId: 'l1',
-        lectureSlug: 'test-lecture',
-        lectureTitle: 'Test Lecture',
+        listingId: 'l1',
+        listingSlug: 'test-listing',
+        listingTitle: 'Test Listing',
         durationSeconds: 1800,
         progressSeconds: 900,
         scholarId: 's1',
@@ -122,37 +122,37 @@ describe('LibraryService', () => {
     });
   });
 
-  describe('saveLecture', () => {
-    it('should save lecture for user', async () => {
+  describe('saveListing', () => {
+    it('should save listing for user', async () => {
       repo.saveLecture.mockResolvedValue(undefined);
 
-      await service.saveLecture('user1', 'lecture1');
+      await service.saveListing('user1', 'listing1');
 
-      expect(repo.saveLecture).toHaveBeenCalledWith('user1', 'lecture1');
+      expect(repo.saveLecture).toHaveBeenCalledWith('user1', 'listing1');
     });
   });
 
-  describe('unsaveLecture', () => {
-    it('should unsave lecture for user', async () => {
+  describe('unsaveListing', () => {
+    it('should unsave listing for user', async () => {
       repo.unsaveLecture.mockResolvedValue(undefined);
 
-      await service.unsaveLecture('user1', 'lecture1');
+      await service.unsaveListing('user1', 'listing1');
 
-      expect(repo.unsaveLecture).toHaveBeenCalledWith('user1', 'lecture1');
+      expect(repo.unsaveLecture).toHaveBeenCalledWith('user1', 'listing1');
     });
   });
 
   describe('bulkSave', () => {
-    it('should bulk save lectures for user', async () => {
-      const lectureIds = ['lecture1', 'lecture2', 'lecture3'];
+    it('should bulk save listings for user', async () => {
+      const listingIds = ['listing1', 'listing2', 'listing3'];
       repo.bulkSave.mockResolvedValue(undefined);
 
-      await service.bulkSave('user1', lectureIds);
+      await service.bulkSave('user1', listingIds);
 
-      expect(repo.bulkSave).toHaveBeenCalledWith('user1', lectureIds);
+      expect(repo.bulkSave).toHaveBeenCalledWith('user1', listingIds);
     });
 
-    it('should handle empty lecture ids array', async () => {
+    it('should handle empty listing ids array', async () => {
       repo.bulkSave.mockResolvedValue(undefined);
 
       await service.bulkSave('user1', []);

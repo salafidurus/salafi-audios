@@ -5,8 +5,8 @@ import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contract
 import type {
   ScholarListItemDto,
   TopicRefDto,
-  AdminSeriesListItemDto,
-  AdminLectureDetailDto,
+  AdminListingListItemDto,
+  AdminListingDetailDto,
 } from "@sd/core-contracts";
 import { createLecture, updateLecture } from "../../api/admin-lectures.api";
 import styles from "./lecture-edit-modal.module.css";
@@ -16,7 +16,7 @@ interface LectureEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  lecture?: AdminLectureDetailDto | null;
+  lecture?: AdminListingDetailDto | null;
   initialAudioData?: {
     audioKey: string;
     durationSeconds: number;
@@ -44,7 +44,7 @@ function formReducer(state: FormState, patch: Partial<FormState>): FormState {
 }
 
 function initFormState(
-  lecture: AdminLectureDetailDto | null | undefined,
+  lecture: AdminListingDetailDto | null | undefined,
   initialAudioData: LectureEditModalProps["initialAudioData"],
 ): FormState {
   if (lecture) {
@@ -53,7 +53,7 @@ function initFormState(
       slug: lecture.slug,
       description: lecture.description || "",
       scholarId: lecture.scholarId,
-      seriesId: lecture.seriesId || "",
+      seriesId: lecture.parentId || "",
       status: lecture.status as "draft" | "published" | "archived",
       orderIndex: lecture.orderIndex || 0,
       selectedTopics: lecture.topics || [],
@@ -127,12 +127,12 @@ export function LectureEditModal({
   );
 
   // Fetch series for dropdown (filtered by scholarId)
-  const { data: seriesData } = useApiQuery<AdminSeriesListItemDto[]>(
+  const { data: seriesData } = useApiQuery<AdminListingListItemDto[]>(
     ["series", "list", scholarId],
     () =>
       scholarId
-        ? httpClient<AdminSeriesListItemDto[]>({
-            url: `${endpoints.admin.series.list}?scholarId=${scholarId}`,
+        ? httpClient<AdminListingListItemDto[]>({
+            url: `${endpoints.admin.listings.list}?scholarId=${scholarId}&format=series`,
             method: "GET",
           })
         : Promise.resolve([]),
@@ -186,12 +186,12 @@ export function LectureEditModal({
           title,
           slug: slug || undefined,
           scholarId,
-          seriesId: seriesId || undefined,
+          parentId: seriesId || undefined,
           topics: selectedTopics,
+          format: "single",
           audioKey: initialAudioData.audioKey,
           durationSeconds: initialAudioData.durationSeconds,
           sizeBytes: initialAudioData.sizeBytes,
-          format: initialAudioData.format,
         });
       }
       onSuccess();

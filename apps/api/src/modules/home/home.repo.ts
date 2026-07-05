@@ -40,7 +40,7 @@ export class HomeRepo {
         id: r.id,
         name: resolved.fields.name,
         slug: r.slug,
-        imageUrl: r.imageUrl,
+        imageUrl: r.imageUrl ?? null,
         originalLanguage: resolved.originalLanguage,
         original: resolved.original ? { name: resolved.original.name } : undefined,
       };
@@ -49,8 +49,9 @@ export class HomeRepo {
 
   async getSuggestions(): Promise<ContentSuggestionDto[]> {
     const locale = getRequestLocale();
-    const records = await this.prisma.lecture.findMany({
+    const records = await this.prisma.listing.findMany({
       where: {
+        format: 'single' as const,
         status: Status.published,
         deletedAt: null,
         scholar: { isActive: true },
@@ -99,7 +100,7 @@ export class HomeRepo {
         scholarName,
         scholarSlug: r.scholar.slug,
         thumbnailUrl: null,
-        durationSeconds: r.durationSeconds,
+        durationSeconds: r.durationSeconds ?? 0,
         originalLanguage: resolved.originalLanguage,
         original: resolved.original ? { title: resolved.original.title } : undefined,
       };
@@ -108,14 +109,14 @@ export class HomeRepo {
 
   async getRecentProgress(userId: string): Promise<RecentProgressDto | null> {
     const locale = getRequestLocale();
-    const record = await this.prisma.userLectureProgress.findFirst({
+    const record = await this.prisma.userListingProgress.findFirst({
       where: {
         userId,
         isCompleted: false,
       },
       orderBy: { updatedAt: 'desc' },
       include: {
-        lecture: {
+        listing: {
           select: {
             id: true,
             title: true,
@@ -145,25 +146,25 @@ export class HomeRepo {
 
     if (!record) return null;
 
-    const lectureTitle = resolveContentTranslation({
-      base: { title: record.lecture.title },
-      originalLanguage: record.lecture.language,
+    const listingTitle = resolveContentTranslation({
+      base: { title: record.listing.title },
+      originalLanguage: record.listing.language,
       targetLocale: locale,
-      publishedTranslation: record.lecture.translations[0] ?? null,
+      publishedTranslation: record.listing.translations[0] ?? null,
     }).fields.title;
     const scholarName = resolveContentTranslation({
-      base: { name: record.lecture.scholar.name },
-      originalLanguage: record.lecture.scholar.mainLanguage,
+      base: { name: record.listing.scholar.name },
+      originalLanguage: record.listing.scholar.mainLanguage,
       targetLocale: locale,
-      publishedTranslation: record.lecture.scholar.translations[0] ?? null,
+      publishedTranslation: record.listing.scholar.translations[0] ?? null,
     }).fields.name;
 
     return {
-      lectureId: record.lecture.id,
-      lectureTitle,
-      lectureSlug: record.lecture.slug,
+      lectureId: record.listing.id,
+      lectureTitle: listingTitle,
+      lectureSlug: record.listing.slug,
       scholarName,
-      durationSeconds: record.lecture.durationSeconds ?? 0,
+      durationSeconds: record.listing.durationSeconds ?? 0,
       positionSeconds: record.positionSeconds,
     };
   }

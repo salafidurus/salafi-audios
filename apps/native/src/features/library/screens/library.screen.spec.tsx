@@ -139,9 +139,9 @@ describe("LibraryScreen", () => {
       buildLibraryState([
         {
           id: "item-1",
-          lectureId: "lecture-1",
-          lectureTitle: "Library Lecture",
-          lectureSlug: "library-lecture",
+          listingId: "lecture-1",
+          listingTitle: "Library Lecture",
+          listingSlug: "library-lecture",
           scholarId: "scholar-1",
           scholarSlug: "ibn-baz",
           scholarName: "Ibn Baz",

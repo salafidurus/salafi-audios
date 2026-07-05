@@ -2,7 +2,7 @@ import { Pressable, View, Image } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import type { FeedContentItemDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
-import { useLectureProgress } from "@sd/domain-audio";
+import { useListingProgress } from "@sd/domain-audio";
 import { useShowOriginalContent } from "@/features/i18n/content-preference";
 import { AppText } from "@/shared/components/AppText/AppText";
 
@@ -14,7 +14,7 @@ export type FeedPodcastRowProps = {
 export function FeedPodcastRow({ item, onPress }: FeedPodcastRowProps) {
   const showOriginal = useShowOriginalContent();
   const title = pickContentField(item.title, item.original?.title, showOriginal);
-  const { progressPercent } = useLectureProgress(item.id);
+  const { progressPercent } = useListingProgress(item.id);
 
   return (
     <Pressable

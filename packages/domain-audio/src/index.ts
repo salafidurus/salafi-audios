@@ -3,8 +3,8 @@ export type { PlaybackStatus, QueueItem, PlaybackState } from "./types/state.typ
 export type { PlaybackEngineEvents, PlaybackEngine } from "./engine/playback.engine";
 export { QueueManager } from "./queue/queue.manager";
 export { usePlaybackStore } from "./store/playback.store";
-export { useProgressStore, type LectureProgress } from "./progress/progress.store";
-export { syncLocalToServer, saveLecture, unsaveLecture } from "./progress/progress.sync";
+export { useProgressStore, type ListingProgress } from "./progress/progress.store";
+export { syncLocalToServer, saveListing, unsaveListing } from "./progress/progress.sync";
 export { DurusAudioService } from "./service/audio.service";
 export { useAudio, usePlayback } from "./hooks/use-audio";
-export { useLectureProgress } from "./hooks/use-lecture-progress";
+export { useListingProgress } from "./hooks/use-listing-progress";

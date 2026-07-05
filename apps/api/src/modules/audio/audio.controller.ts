@@ -28,12 +28,12 @@ export class AudioController {
     return this.audio.bulkSync(user.id, body.items ?? []);
   }
 
-  @Put('progress/:lectureId')
-  @ApiOperation({ summary: 'Update lecture progress' })
+  @Put('progress/:listingId')
+  @ApiOperation({ summary: 'Update listing progress' })
   @ApiOkResponse({ description: 'Progress updated' })
   upsertProgress(
     @CurrentUser() user: { id: string },
-    @Param('lectureId') lectureId: string,
+    @Param('listingId') listingId: string,
     @Body()
     body: {
       positionSeconds: number;
@@ -43,7 +43,7 @@ export class AudioController {
   ): Promise<void> {
     return this.audio.upsertProgress(
       user.id,
-      lectureId,
+      listingId,
       body.positionSeconds,
       body.durationSeconds,
       body.isCompleted,
@@ -51,10 +51,10 @@ export class AudioController {
   }
 
   @Public()
-  @Get('lectures/:lectureId/stream')
-  @ApiOperation({ summary: 'Resolve a lecture primary audio stream' })
+  @Get('listings/:listingId/stream')
+  @ApiOperation({ summary: 'Resolve a listing primary audio stream' })
   @ApiOkResponse({ description: 'Primary audio asset URL and duration' })
-  getLectureStream(@Param('lectureId') lectureId: string): Promise<StreamResponseDto> {
-    return this.audio.resolveStreamUrl(lectureId);
+  getListingStream(@Param('listingId') listingId: string): Promise<StreamResponseDto> {
+    return this.audio.resolveStreamUrl(listingId);
   }
 }

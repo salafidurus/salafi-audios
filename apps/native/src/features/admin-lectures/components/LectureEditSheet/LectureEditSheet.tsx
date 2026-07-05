@@ -1,7 +1,7 @@
 import { useEffect, useReducer } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import type { AdminLectureDetailDto, Locale } from "@sd/core-contracts";
+import type { AdminListingDetailDto, Locale } from "@sd/core-contracts";
 import { fetchAdminLectureDetail, updateLecture } from "../../api/admin-lectures.api";
 
 type LectureEditSheetProps = {
@@ -11,7 +11,7 @@ type LectureEditSheetProps = {
 };
 
 type FormState = {
-  lecture: AdminLectureDetailDto | null;
+  lecture: AdminListingDetailDto | null;
   title: string;
   description: string;
   language: string;

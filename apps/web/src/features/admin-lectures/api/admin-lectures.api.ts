@@ -2,11 +2,10 @@ import { httpClient, endpoints } from "@sd/core-contracts";
 import type {
   PresignedUrlRequestDto,
   PresignedUrlResponseDto,
-  CreateLectureDto,
-  LectureViewDto,
-  AdminLectureUpdateDto,
-  AdminLectureListDto,
-  AdminLectureDetailDto,
+  CreateListingDto,
+  AdminListingUpdateDto,
+  AdminListingListDto,
+  AdminListingDetailDto,
 } from "@sd/core-contracts";
 
 export function getPresignedUrl(data: PresignedUrlRequestDto) {
@@ -34,32 +33,32 @@ export async function uploadToR2(
   }
 }
 
-export function createLecture(data: CreateLectureDto) {
-  return httpClient<LectureViewDto>({
-    url: endpoints.admin.lectures.create,
+export function createLecture(data: CreateListingDto) {
+  return httpClient<AdminListingDetailDto>({
+    url: endpoints.admin.listings.create,
     method: "POST",
     body: data,
   });
 }
 
-export function updateLecture(id: string, data: AdminLectureUpdateDto) {
-  return httpClient<LectureViewDto>({
-    url: endpoints.admin.lectures.update(id),
+export function updateLecture(id: string, data: AdminListingUpdateDto) {
+  return httpClient<AdminListingDetailDto>({
+    url: endpoints.admin.listings.update(id),
     method: "PUT",
     body: data,
   });
 }
 
 export function publishLecture(id: string) {
-  return httpClient<LectureViewDto>({
-    url: endpoints.admin.lectures.publish(id),
+  return httpClient<AdminListingDetailDto>({
+    url: endpoints.admin.listings.publish(id),
     method: "POST",
   });
 }
 
 export function archiveLecture(id: string) {
-  return httpClient<LectureViewDto>({
-    url: endpoints.admin.lectures.archive(id),
+  return httpClient<AdminListingDetailDto>({
+    url: endpoints.admin.listings.archive(id),
     method: "POST",
   });
 }
@@ -78,18 +77,18 @@ export function fetchAdminLectures(params?: {
 
   const queryString = query.toString();
   const url = queryString
-    ? `${endpoints.admin.lectures.list}?${queryString}`
-    : endpoints.admin.lectures.list;
+    ? `${endpoints.admin.listings.list}?${queryString}`
+    : endpoints.admin.listings.list;
 
-  return httpClient<AdminLectureListDto>({
+  return httpClient<AdminListingListDto>({
     url,
     method: "GET",
   });
 }
 
 export function fetchAdminLectureDetail(id: string) {
-  return httpClient<AdminLectureDetailDto>({
-    url: endpoints.admin.lectures.detail(id),
+  return httpClient<AdminListingDetailDto>({
+    url: endpoints.admin.listings.detail(id),
     method: "GET",
   });
 }

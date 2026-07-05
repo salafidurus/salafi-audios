@@ -26,7 +26,7 @@ export function LibrarySavedScreen({ onNavigateToLecture }: LibrarySavedScreenPr
 
   const renderItem = useCallback(
     ({ item }: { item: LibraryItemDto }) => (
-      <LibraryItemRow item={item} variant="saved" onPress={() => handleItemPress(item.lectureId)} />
+      <LibraryItemRow item={item} variant="saved" onPress={() => handleItemPress(item.listingId)} />
     ),
     [handleItemPress],
   );

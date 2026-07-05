@@ -1,14 +1,14 @@
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { useLectureProgress } from "@sd/domain-audio";
+import { useListingProgress } from "@sd/domain-audio";
 
 type ProgressIndicatorProps = {
-  lectureId: string;
+  listingId: string;
   size?: number;
 };
 
-export function ProgressIndicator({ lectureId, size = 32 }: ProgressIndicatorProps) {
-  const { progressPercent, isCompleted } = useLectureProgress(lectureId);
+export function ProgressIndicator({ listingId, size = 32 }: ProgressIndicatorProps) {
+  const { progressPercent, isCompleted } = useListingProgress(listingId);
 
   if (progressPercent === 0 && !isCompleted) return null;
 

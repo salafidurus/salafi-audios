@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react-native";
-import type { LectureDetailDto } from "@sd/core-contracts";
+import type { ListingDetailDto } from "@sd/core-contracts";
 import { LecturePlayButton } from "./LecturePlayButton";
 import { useAudio } from "@sd/domain-audio";
 import { audioService } from "@/features/audio";
@@ -8,7 +8,7 @@ import { audioService } from "@/features/audio";
 jest.mock("@sd/domain-audio", () => ({ useAudio: jest.fn() }));
 jest.mock("@/features/audio", () => ({
   audioService: {
-    playLecture: jest.fn(),
+    playListing: jest.fn(),
     pause: jest.fn(),
     resume: jest.fn(),
   },
@@ -54,10 +54,11 @@ beforeEach(() => {
   });
 });
 
-const baseLecture: LectureDetailDto = {
+const baseLecture: ListingDetailDto = {
   id: "lec-1",
   slug: "test-lecture",
   title: "Test Lecture",
+  format: "single" as const,
   scholar: { id: "sch-1", slug: "scholar", name: "Ibn Baz" },
   topics: [],
   primaryAudioAsset: null,
@@ -71,16 +72,20 @@ describe("LecturePlayButton", () => {
   });
 
   it("renders play button when primaryAudioAsset exists", async () => {
-    const lecture: LectureDetailDto = {
+    const lecture: ListingDetailDto = {
       ...baseLecture,
-      primaryAudioAsset: { id: "asset-1", url: "https://example.com/audio.mp3" },
+      primaryAudioAsset: {
+        id: "asset-1",
+        url: "https://example.com/audio.mp3",
+        durationSeconds: 1800,
+      },
     };
     await render(<LecturePlayButton lecture={lecture} />);
     expect(screen.getByTestId("Play Lecture")).toBeTruthy();
   });
 
-  it("calls playLecture() with correct Track shape when pressed", async () => {
-    const lecture: LectureDetailDto = {
+  it("calls playListing() with correct Track shape when pressed", async () => {
+    const lecture: ListingDetailDto = {
       ...baseLecture,
       durationSeconds: 3600,
       primaryAudioAsset: {
@@ -101,11 +106,11 @@ describe("LecturePlayButton", () => {
       seriesId: null,
       seriesTitle: null,
     };
-    expect(audioService.playLecture).toHaveBeenCalledWith(expectedTrack, [expectedTrack]);
+    expect(audioService.playListing).toHaveBeenCalledWith(expectedTrack, [expectedTrack]);
   });
 
   it("passes series queueContext with lazy next-track stub when seriesContext has nextLecture", async () => {
-    const lecture: LectureDetailDto = {
+    const lecture: ListingDetailDto = {
       ...baseLecture,
       primaryAudioAsset: {
         id: "asset-1",
@@ -141,13 +146,17 @@ describe("LecturePlayButton", () => {
       seriesId: "series-1",
       seriesTitle: "Islamic Jurisprudence",
     };
-    expect(audioService.playLecture).toHaveBeenCalledWith(mainTrack, [mainTrack, nextStub]);
+    expect(audioService.playListing).toHaveBeenCalledWith(mainTrack, [mainTrack, nextStub]);
   });
 
   it("passes loading prop when audio is loading current track", async () => {
-    const lecture: LectureDetailDto = {
+    const lecture: ListingDetailDto = {
       ...baseLecture,
-      primaryAudioAsset: { id: "asset-1", url: "https://example.com/audio.mp3" },
+      primaryAudioAsset: {
+        id: "asset-1",
+        url: "https://example.com/audio.mp3",
+        durationSeconds: 1800,
+      },
     };
     (useAudio as jest.Mock).mockReturnValue({
       isPlaying: false,

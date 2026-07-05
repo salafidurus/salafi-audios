@@ -67,32 +67,29 @@ export class TopicsRepository {
     if (!topic) return null;
 
     const locale = getRequestLocale();
-    const records = await this.prisma.lecture.findMany({
+    const records = await this.prisma.listing.findMany({
       where: {
+        format: 'single' as const,
         deletedAt: null,
         status: Status.published,
         scholar: {
           isActive: true,
         },
         OR: [
-          { seriesId: null },
+          { parentId: null },
           {
-            series: {
-              is: {
-                deletedAt: null,
-                status: Status.published,
-                OR: [
-                  { collectionId: null },
-                  {
-                    collection: {
-                      is: {
-                        deletedAt: null,
-                        status: Status.published,
-                      },
-                    },
+            parent: {
+              deletedAt: null,
+              status: Status.published,
+              OR: [
+                { parentId: null },
+                {
+                  parent: {
+                    deletedAt: null,
+                    status: Status.published,
                   },
-                ],
-              },
+                },
+              ],
             },
           },
         ],
@@ -106,7 +103,7 @@ export class TopicsRepository {
       select: {
         id: true,
         scholarId: true,
-        seriesId: true,
+        parentId: true,
         slug: true,
         title: true,
         description: true,
@@ -119,7 +116,7 @@ export class TopicsRepository {
           select: { title: true, description: true },
           take: 1,
         },
-      } satisfies Prisma.LectureSelect,
+      },
     });
 
     return records.map((r) => {
@@ -132,7 +129,7 @@ export class TopicsRepository {
       return {
         id: r.id,
         scholarId: r.scholarId,
-        seriesId: r.seriesId ?? undefined,
+        seriesId: r.parentId ?? undefined,
         slug: r.slug,
         title: resolved.fields.title,
         description: resolved.fields.description ?? undefined,

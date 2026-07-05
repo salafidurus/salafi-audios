@@ -13,18 +13,9 @@ export const endpoints = {
     content: (slug: string) => `/scholars/${slug}/content`,
     topics: (slug: string) => `/scholars/${slug}/topics`,
   },
-  collections: {
-    detail: (id: string) => `/collections/${id}`,
-  },
-  series: {
-    detail: (id: string) => `/series/${id}`,
-  },
   listings: {
-    detail: (id: string) => `/listing/${id}`,
-  },
-  lectures: {
-    detail: (id: string) => `/lectures/${id}`,
-    related: (id: string) => `/lectures/${id}/related`,
+    detail: (id: string) => `/listings/${id}`,
+    related: (id: string) => `/listings/${id}/related`,
   },
   feed: {
     list: "/feed",
@@ -36,7 +27,7 @@ export const endpoints = {
     saved: "/me/library/saved",
     completed: "/me/library/completed",
     progress: "/me/library/progress",
-    saveLecture: (lectureId: string) => `/me/library/save/${lectureId}`,
+    saveListing: (listingId: string) => `/me/library/save/${listingId}`,
     syncSaved: "/me/library/saved/sync",
   },
   account: {
@@ -52,11 +43,11 @@ export const endpoints = {
   audio: {
     progress: {
       list: "/audio/progress",
-      update: (lectureId: string) => `/audio/progress/${lectureId}`,
+      update: (listingId: string) => `/audio/progress/${listingId}`,
       sync: "/audio/progress/sync",
     },
-    lectures: {
-      stream: (id: string) => `/audio/lectures/${id}/stream`,
+    listings: {
+      stream: (id: string) => `/audio/listings/${id}/stream`,
     },
   },
   home: {
@@ -68,9 +59,10 @@ export const endpoints = {
     },
     permissions: {
       me: "/admin/permissions/me",
-      list: "/admin/permissions",
-      grant: "/admin/permissions",
-      revoke: (id: string) => `/admin/permissions/${id}`,
+      list: (userId: string) => `/admin/users/${userId}/permissions`,
+      grant: (userId: string) => `/admin/users/${userId}/permissions`,
+      revoke: (userId: string, permission: string) =>
+        `/admin/users/${userId}/permissions/${permission}`,
     },
     scholars: {
       create: "/admin/scholars",
@@ -81,32 +73,14 @@ export const endpoints = {
       update: (slug: string) => `/admin/topics/${slug}`,
       delete: (slug: string) => `/admin/topics/${slug}`,
     },
-    lectures: {
-      list: "/admin/lectures",
-      detail: (id: string) => `/admin/lectures/${id}`,
-      create: "/admin/lectures",
-      update: (id: string) => `/admin/lectures/${id}`,
-      publish: (id: string) => `/admin/lectures/${id}/publish`,
-      archive: (id: string) => `/admin/lectures/${id}/archive`,
-      bulk: "/admin/lectures/bulk",
-    },
-    series: {
-      list: "/admin/series",
-      detail: (id: string) => `/admin/series/${id}`,
-      create: "/admin/series",
-      update: (id: string) => `/admin/series/${id}`,
-      publish: (id: string) => `/admin/series/${id}/publish`,
-      archive: (id: string) => `/admin/series/${id}/archive`,
-      bulk: "/admin/series/bulk",
-    },
-    collections: {
-      list: "/admin/collections",
-      detail: (id: string) => `/admin/collections/${id}`,
-      create: "/admin/collections",
-      update: (id: string) => `/admin/collections/${id}`,
-      publish: (id: string) => `/admin/collections/${id}/publish`,
-      archive: (id: string) => `/admin/collections/${id}/archive`,
-      bulk: "/admin/collections/bulk",
+    listings: {
+      list: "/admin/listings",
+      detail: (id: string) => `/admin/listings/${id}`,
+      create: "/admin/listings",
+      update: (id: string) => `/admin/listings/${id}`,
+      publish: (id: string) => `/admin/listings/${id}/publish`,
+      archive: (id: string) => `/admin/listings/${id}/archive`,
+      bulk: "/admin/listings/bulk",
     },
     live: {
       listSessions: "/admin/live/sessions",
@@ -129,12 +103,12 @@ export const endpoints = {
       publish: (id: string, locale: string) => `/scholars/${id}/translations/${locale}/publish`,
       unpublish: (id: string, locale: string) => `/scholars/${id}/translations/${locale}/unpublish`,
     },
-    lectures: {
-      list: (id: string) => `/lectures/${id}/translations`,
-      save: (id: string) => `/lectures/${id}/translations`,
-      update: (id: string, locale: string) => `/lectures/${id}/translations/${locale}`,
-      publish: (id: string, locale: string) => `/lectures/${id}/translations/${locale}/publish`,
-      unpublish: (id: string, locale: string) => `/lectures/${id}/translations/${locale}/unpublish`,
+    listings: {
+      list: (id: string) => `/listings/${id}/translations`,
+      save: (id: string) => `/listings/${id}/translations`,
+      update: (id: string, locale: string) => `/listings/${id}/translations/${locale}`,
+      publish: (id: string, locale: string) => `/listings/${id}/translations/${locale}/publish`,
+      unpublish: (id: string, locale: string) => `/listings/${id}/translations/${locale}/unpublish`,
     },
     topics: {
       list: (id: string) => `/topics/${id}/translations`,
@@ -142,30 +116,6 @@ export const endpoints = {
       update: (id: string, locale: string) => `/topics/${id}/translations/${locale}`,
       publish: (id: string, locale: string) => `/topics/${id}/translations/${locale}/publish`,
       unpublish: (id: string, locale: string) => `/topics/${id}/translations/${locale}/unpublish`,
-    },
-    series: {
-      list: (scholarId: string, seriesId: string) =>
-        `/scholars/${scholarId}/series/${seriesId}/translations`,
-      save: (scholarId: string, seriesId: string) =>
-        `/scholars/${scholarId}/series/${seriesId}/translations`,
-      update: (scholarId: string, seriesId: string, locale: string) =>
-        `/scholars/${scholarId}/series/${seriesId}/translations/${locale}`,
-      publish: (scholarId: string, seriesId: string, locale: string) =>
-        `/scholars/${scholarId}/series/${seriesId}/translations/${locale}/publish`,
-      unpublish: (scholarId: string, seriesId: string, locale: string) =>
-        `/scholars/${scholarId}/series/${seriesId}/translations/${locale}/unpublish`,
-    },
-    collections: {
-      list: (scholarId: string, collectionId: string) =>
-        `/scholars/${scholarId}/collections/${collectionId}/translations`,
-      save: (scholarId: string, collectionId: string) =>
-        `/scholars/${scholarId}/collections/${collectionId}/translations`,
-      update: (scholarId: string, collectionId: string, locale: string) =>
-        `/scholars/${scholarId}/collections/${collectionId}/translations/${locale}`,
-      publish: (scholarId: string, collectionId: string, locale: string) =>
-        `/scholars/${scholarId}/collections/${collectionId}/translations/${locale}/publish`,
-      unpublish: (scholarId: string, collectionId: string, locale: string) =>
-        `/scholars/${scholarId}/collections/${collectionId}/translations/${locale}/unpublish`,
     },
   },
   auth: {

@@ -14,14 +14,14 @@ export type AdminPermissionsListResponse = {
 
 export function fetchUserPermissions(userId: string) {
   return httpClient<AdminPermissionsListResponse>({
-    url: `${endpoints.admin.permissions.list}/${userId}`,
+    url: endpoints.admin.permissions.list(userId),
     method: "GET",
   });
 }
 
 export function grantPermission(userId: string, permission: AdminPermission) {
   return httpClient<AdminPermissionsListResponse>({
-    url: `${endpoints.admin.permissions.grant}/${userId}`,
+    url: endpoints.admin.permissions.grant(userId),
     method: "POST",
     body: { permission },
   });
@@ -29,7 +29,7 @@ export function grantPermission(userId: string, permission: AdminPermission) {
 
 export function revokePermission(userId: string, permission: string) {
   return httpClient<AdminPermissionsListResponse>({
-    url: endpoints.admin.permissions.revoke(`${userId}/${permission}`),
+    url: endpoints.admin.permissions.revoke(userId, permission),
     method: "DELETE",
   });
 }
