@@ -4,8 +4,8 @@ import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { HealthCheck, HealthCheckResult, HealthCheckService } from '@nestjs/terminus';
 import { SkipThrottle } from '@nestjs/throttler';
+import { CDNHealthIndicator } from './cdn-health.indicator';
 import { PrismaHealthIndicator } from './prisma-health.indicator';
-import { R2HealthIndicator } from './r2-health.indicator';
 
 @SkipThrottle()
 @ApiTags('Health')
@@ -16,7 +16,7 @@ export class HealthController {
   constructor(
     private readonly health: HealthCheckService,
     private readonly prismaHealth: PrismaHealthIndicator,
-    private readonly r2Health: R2HealthIndicator,
+    private readonly cdnHealth: CDNHealthIndicator,
   ) {}
 
   @Get()
@@ -26,7 +26,7 @@ export class HealthController {
   getHealth(): Promise<HealthCheckResult> {
     return this.health.check([
       () => this.prismaHealth.pingCheck('database', { timeout: 300 }),
-      // () => this.r2Health.pingCheck('storage', { timeout: 300 }),
+      () => this.cdnHealth.pingCheck('cdn', { timeout: 5000 }),
     ]);
   }
 
@@ -43,9 +43,6 @@ export class HealthController {
   @ApiOkResponse({ description: 'Readiness check result' })
   @HealthCheck()
   getReady(): Promise<HealthCheckResult> {
-    return this.health.check([
-      () => this.prismaHealth.pingCheck('database', { timeout: 300 }),
-      // () => this.r2Health.pingCheck('storage', { timeout: 300 }),
-    ]);
+    return this.health.check([() => this.prismaHealth.pingCheck('database', { timeout: 300 })]);
   }
 }
