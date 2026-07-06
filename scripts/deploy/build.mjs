@@ -75,11 +75,11 @@ try {
     // --frozen-lockfile on a subset of workspaces, so we let bun
     // reconcile them in a non-frozen pass first.
     log("Installing pruned dependency closure...");
-    await Bun.$.cwd(rootDir)`bun install`;
+    await Bun.$.cwd(rootDir).inherit()`bun install`;
     log("Installing pruned dependency closure... Done");
 
     log("Verifying lockfile consistency...");
-    await Bun.$.cwd(rootDir)`bun install --frozen-lockfile`;
+    await Bun.$.cwd(rootDir).inherit()`bun install --frozen-lockfile`;
     log("Verifying lockfile consistency... Done");
 
     // Write marker
