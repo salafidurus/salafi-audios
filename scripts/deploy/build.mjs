@@ -18,35 +18,48 @@ if (target !== "web" && target !== "api") {
 try {
   log(`Starting build process for target: "${target}"`);
 
-  // 1. Resolve monorepo root and validate environment
   const rootDir = findMonorepoRoot();
   validateEnvironment();
   log(`Monorepo root resolved: ${rootDir}`);
 
-  // 2. Clean previous build workspace output directory if exists
-  const outDir = path.join(rootDir, "out");
-  if (fs.existsSync(outDir)) {
-    log("Cleaning existing out/ directory...");
-    fs.rmSync(outDir, { recursive: true, force: true });
+  const markerPath = path.join(rootDir, ".pruned-target");
+  let isAlreadyPruned = false;
+
+  if (fs.existsSync(markerPath)) {
+    const prunedTarget = fs.readFileSync(markerPath, "utf8").trim();
+    if (prunedTarget === target) {
+      isAlreadyPruned = true;
+    }
   }
 
-  // 3. Execute Turborepo prune to isolate target dependencies
-  const turboVersion = await getTurboVersion(rootDir);
-  const turboCmd = turboVersion ? `turbo@${turboVersion}` : "turbo";
+  if (isAlreadyPruned) {
+    log(`Pruned marker file found for target "${target}". Skipping prune and install phases.`);
+  } else {
+    log(`No pruned marker found for target "${target}". Running full prune and install sequence.`);
 
-  log(`Running turbo prune for "${target}" using turbo version: ${turboVersion || "latest"}`);
+    // Clean out/
+    const outDir = path.join(rootDir, "out");
+    if (fs.existsSync(outDir)) {
+      fs.rmSync(outDir, { recursive: true, force: true });
+    }
 
-  // Execute via Bun Shell; throws automatically if command fails
-  await Bun.$`bunx ${turboCmd} prune ${target} --docker`;
+    // Execute Turborepo prune
+    const turboVersion = await getTurboVersion(rootDir);
+    const turboCmd = turboVersion ? `turbo@${turboVersion}` : "turbo";
+    await Bun.$`bunx ${turboCmd} prune ${target} --docker`;
 
-  // 4. Overwrite root with the pruned workspace closure
-  overwriteRootWithPrunedWorkspace(rootDir, outDir);
+    // Overwrite root
+    overwriteRootWithPrunedWorkspace(rootDir, outDir);
 
-  // 5. Clean installation of pruned dependencies in the workspace
-  log("Installing pruned dependency closure...");
-  await Bun.$.cwd(rootDir)`bun install --frozen-lockfile`;
+    // Clean install
+    log("Installing pruned dependencies...");
+    await Bun.$.cwd(rootDir)`bun install --frozen-lockfile`;
 
-  // 6. Build the target application
+    // Write marker
+    fs.writeFileSync(markerPath, target);
+  }
+
+  // Build the target application
   log(`Building application: "${target}"`);
   await Bun.$.cwd(rootDir)`bun run build --filter=${target}...`;
 

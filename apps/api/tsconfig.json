@@ -4,7 +4,7 @@
   "compilerOptions": {
     "noEmit": true,
     "noFallthroughCasesInSwitch": true,
-    "types": ["vitest/globals", "node"]
+    "types": ["vitest/globals", "node", "bun-types"]
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "test/**/*.ts"]
 }
