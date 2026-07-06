@@ -55,11 +55,7 @@ function ProfileContent() {
       <div className={styles.avatarRow}>
         {profile.avatarUrl ? (
           /* eslint-disable-next-line @next/next/no-img-element */
-          <img
-            src={profile.avatarUrl}
-            alt=""
-            className={styles.avatarImage}
-          />
+          <img src={profile.avatarUrl} alt="" className={styles.avatarImage} />
         ) : (
           <div className={styles.avatarInitials} aria-hidden="true">
             {initials}
@@ -132,11 +128,7 @@ function SignInCta() {
       <p className={styles.signInDesc}>
         Create an account or sign in to manage your profile and roles.
       </p>
-      <button
-        type="button"
-        className={styles.signInButton}
-        onClick={() => setShowModal(true)}
-      >
+      <button type="button" className={styles.signInButton} onClick={() => setShowModal(true)}>
         Sign In
       </button>
       <AuthModal

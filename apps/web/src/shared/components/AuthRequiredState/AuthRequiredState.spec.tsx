@@ -16,7 +16,7 @@ describe("AuthRequiredState", () => {
 
   it("opens AuthModal when clicking Sign In button", () => {
     render(<AuthRequiredState {...props} />);
-    
+
     // AuthModal is closed by default
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 

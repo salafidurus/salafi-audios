@@ -190,7 +190,9 @@ export function Sidebar() {
             <SectionLabel collapsed={collapsed}>ADMIN</SectionLabel>
             {adminNavItems.map((item) => {
               const isActive =
-                item.href === routes.admin.index ? pathname === routes.admin.index : pathname.startsWith(item.href);
+                item.href === routes.admin.index
+                  ? pathname === routes.admin.index
+                  : pathname.startsWith(item.href);
               return (
                 <Link
                   key={item.href}

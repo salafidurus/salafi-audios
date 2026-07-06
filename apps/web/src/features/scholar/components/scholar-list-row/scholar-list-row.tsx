@@ -37,16 +37,10 @@ export function ScholarListRow({ scholar, onPress }: ScholarListRowProps) {
       <div className={styles.centerSection}>
         <div className={styles.name}>{scholar.name}</div>
         <div className={styles.meta}>
-          {scholar.mainLanguage && (
-            <span className={styles.language}>{scholar.mainLanguage}</span>
-          )}
-          {scholar.isKibar && (
-            <span className={styles.kibarBadge}>Senior Scholar</span>
-          )}
+          {scholar.mainLanguage && <span className={styles.language}>{scholar.mainLanguage}</span>}
+          {scholar.isKibar && <span className={styles.kibarBadge}>Senior Scholar</span>}
         </div>
-        <div className={styles.lectureCount}>
-          {scholar.lectureCount} lectures
-        </div>
+        <div className={styles.lectureCount}>{scholar.lectureCount} lectures</div>
       </div>
 
       <div className={styles.rightSection}>
@@ -67,9 +61,5 @@ export function ScholarListRow({ scholar, onPress }: ScholarListRowProps) {
     );
   }
 
-  return (
-    <div className={`${styles.row} listRow`}>
-      {content}
-    </div>
-  );
+  return <div className={`${styles.row} listRow`}>{content}</div>;
 }

@@ -15,35 +15,32 @@ export function LiveDesktopScreen() {
   const { active } = useLiveSessions();
   const { t } = useTranslation();
 
-  const renderContent = () => {
-    if (active.isLoading && active.sessions.length === 0) {
-      return <LiveSkeleton />;
-    }
-
-    if (active.sessions.length === 0) {
-      return (
-        <AppText
-          variant="bodyMd"
-          style={{
-            color: "var(--content-subtle)",
-            padding: 24,
-            textAlign: "center",
-            display: "block",
-          }}
-        >
-          {t("live.sections.ongoing.empty", "No live sessions right now — check back soon.")}
-        </AppText>
-      );
-    }
-
-    return (
+  let content;
+  if (active.isLoading && active.sessions.length === 0) {
+    content = <LiveSkeleton />;
+  } else if (active.sessions.length === 0) {
+    content = (
+      <AppText
+        variant="bodyMd"
+        style={{
+          color: "var(--content-subtle)",
+          padding: 24,
+          textAlign: "center",
+          display: "block",
+        }}
+      >
+        {t("live.sections.ongoing.empty", "No live sessions right now — check back soon.")}
+      </AppText>
+    );
+  } else {
+    content = (
       <div className={styles.list}>
         {active.sessions.map((s) => (
           <LiveSessionRow key={s.id} session={s} />
         ))}
       </div>
     );
-  };
+  }
 
   return (
     <ScreenView>
@@ -52,10 +49,9 @@ export function LiveDesktopScreen() {
           <AppText variant="displayMd" style={{ display: "block", marginBottom: 24 }}>
             {t("live.title", "Live Sessions")}
           </AppText>
-          {renderContent()}
+          {content}
         </div>
       </div>
     </ScreenView>
   );
 }
-

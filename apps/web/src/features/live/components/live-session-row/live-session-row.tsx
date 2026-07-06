@@ -36,11 +36,15 @@ export function LiveSessionRow({ session, onPress }: LiveSessionRowProps) {
   const telegramUrl = telegramSlug ? `https://t.me/${telegramSlug}` : undefined;
   const recordingLectureId = session.recordingLectureId;
 
-  const title = session.title || ("channelDisplayName" in session ? session.channelDisplayName : undefined) || "Live Session";
+  const title =
+    session.title ||
+    ("channelDisplayName" in session ? session.channelDisplayName : undefined) ||
+    "Live Session";
   const scholarName = session.scholarName;
-  const channelDisplayName = "channelDisplayName" in session ? session.channelDisplayName : undefined;
+  const channelDisplayName =
+    "channelDisplayName" in session ? session.channelDisplayName : undefined;
 
-  const renderContent = () => (
+  const content = (
     <div className={styles.rowContent}>
       <div className={styles.header}>
         {isLive && (
@@ -50,7 +54,11 @@ export function LiveSessionRow({ session, onPress }: LiveSessionRowProps) {
           </span>
         )}
         {isScheduled && session.scheduledAt && (
-          <span className={styles.scheduledBadge} data-testid="scheduled-badge" suppressHydrationWarning>
+          <span
+            className={styles.scheduledBadge}
+            data-testid="scheduled-badge"
+            suppressHydrationWarning
+          >
             {formatScheduledTime(session.scheduledAt)}
           </span>
         )}
@@ -72,29 +80,26 @@ export function LiveSessionRow({ session, onPress }: LiveSessionRowProps) {
     </div>
   );
 
-  const containerProps = {
-    className: `${styles.row} listRow`,
-  };
-
   if (isLive && telegramUrl) {
     return (
-      <a {...containerProps} href={telegramUrl} target="_blank" rel="noopener noreferrer">
-        {renderContent()}
+      <a
+        className={`${styles.row} listRow`}
+        href={telegramUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {content}
       </a>
     );
   }
 
   if (onPress) {
     return (
-      <button type="button" {...containerProps} onClick={onPress}>
-        {renderContent()}
+      <button type="button" className={`${styles.row} listRow`} onClick={onPress}>
+        {content}
       </button>
     );
   }
 
-  return (
-    <div {...containerProps}>
-      {renderContent()}
-    </div>
-  );
+  return <div className={`${styles.row} listRow`}>{content}</div>;
 }

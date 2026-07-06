@@ -29,11 +29,15 @@ vi.mock("@/core/i18n/use-translation", () => ({
 }));
 
 vi.mock("@/shared/components/ScreenView/ScreenView", () => ({
-  ScreenView: ({ children }: { children: React.ReactNode }) => <div data-testid="screen-view">{children}</div>,
+  ScreenView: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="screen-view">{children}</div>
+  ),
 }));
 
 vi.mock("../components/library-list-row/library-list-row", () => ({
-  LibraryListRow: ({ item }: { item: any }) => <div data-testid="library-row">{item.lectureTitle}</div>,
+  LibraryListRow: ({ item }: { item: any }) => (
+    <div data-testid="library-row">{item.lectureTitle}</div>
+  ),
 }));
 
 vi.mock("@/shared/components/AuthRequiredState/AuthRequiredState", () => ({

@@ -34,42 +34,35 @@ describe("useAdminPermissions", () => {
   it("calls useApiQuery with enabled: true when authenticated by default", () => {
     vi.mocked(useAuth).mockReturnValue({ isAuthenticated: true } as any);
     useAdminPermissions();
-    expect(useApiQuery).toHaveBeenCalledWith(
-      ["admin", "permissions", "me"],
-      expect.any(Function),
-      { enabled: true }
-    );
+    expect(useApiQuery).toHaveBeenCalledWith(["admin", "permissions", "me"], expect.any(Function), {
+      enabled: true,
+    });
   });
 
   it("calls useApiQuery with enabled: false when unauthenticated", () => {
     vi.mocked(useAuth).mockReturnValue({ isAuthenticated: false } as any);
     useAdminPermissions();
-    expect(useApiQuery).toHaveBeenCalledWith(
-      ["admin", "permissions", "me"],
-      expect.any(Function),
-      { enabled: false }
-    );
+    expect(useApiQuery).toHaveBeenCalledWith(["admin", "permissions", "me"], expect.any(Function), {
+      enabled: false,
+    });
   });
 
   it("respects caller-provided options while merging enabled flag", () => {
     vi.mocked(useAuth).mockReturnValue({ isAuthenticated: true } as any);
     const options = { staleTime: 5000 };
     useAdminPermissions(options as any);
-    expect(useApiQuery).toHaveBeenCalledWith(
-      ["admin", "permissions", "me"],
-      expect.any(Function),
-      { enabled: true, staleTime: 5000 }
-    );
+    expect(useApiQuery).toHaveBeenCalledWith(["admin", "permissions", "me"], expect.any(Function), {
+      enabled: true,
+      staleTime: 5000,
+    });
   });
 
   it("retains enabled: false if caller explicitly disables it even when authenticated", () => {
     vi.mocked(useAuth).mockReturnValue({ isAuthenticated: true } as any);
     const options = { enabled: false };
     useAdminPermissions(options as any);
-    expect(useApiQuery).toHaveBeenCalledWith(
-      ["admin", "permissions", "me"],
-      expect.any(Function),
-      { enabled: false }
-    );
+    expect(useApiQuery).toHaveBeenCalledWith(["admin", "permissions", "me"], expect.any(Function), {
+      enabled: false,
+    });
   });
 });

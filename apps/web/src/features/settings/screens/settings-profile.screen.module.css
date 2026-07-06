@@ -97,7 +97,6 @@
   outline-offset: 2px;
 }
 
-
 .readOnly {
   font-size: var(--typo-body-sm-font-size);
   color: var(--content-muted);
@@ -153,7 +152,9 @@
   font-size: var(--typo-body-sm-font-size);
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 150ms ease, color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
 }
 
 .signOutButton:hover {
