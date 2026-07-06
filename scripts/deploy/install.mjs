@@ -22,6 +22,7 @@ try {
   const rootDir = findMonorepoRoot();
   validateEnvironment();
   log(`Monorepo root resolved: ${rootDir}`);
+  process.chdir(rootDir);
 
   // 2. Clean previous build workspace output directory if exists
   const outDir = path.join(rootDir, "out");
@@ -64,11 +65,11 @@ try {
   //    --frozen-lockfile on a subset of workspaces, so we let bun
   //    reconcile them in a non-frozen pass first.
   log("Cleaning up lockfile stale workspace aliases...");
-  await Bun.$`bun install --lockfile-only`.cwd(rootDir);
+  await Bun.$`bun install --lockfile-only`;
   log("Cleaning up lockfile stale workspace aliases... Done");
 
   log("Installing pruned dependency closure with frozen lockfile...");
-  await Bun.$`bun install --frozen-lockfile`.cwd(rootDir);
+  await Bun.$`bun install --frozen-lockfile`;
   log("Installing pruned dependency closure with frozen lockfile... Done");
 
   // 7. Write marker file so the build step knows we are pruned

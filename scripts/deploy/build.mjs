@@ -21,6 +21,7 @@ try {
   const rootDir = findMonorepoRoot();
   validateEnvironment();
   log(`Monorepo root resolved: ${rootDir}`);
+  process.chdir(rootDir);
 
   const markerPath = path.join(rootDir, ".pruned-target");
   let isAlreadyPruned = false;
@@ -72,11 +73,11 @@ try {
 
     // Install pruned dependencies, then freeze-verify.
     log("Cleaning up lockfile stale workspace aliases...");
-    await Bun.$`bun install --lockfile-only`.cwd(rootDir);
+    await Bun.$`bun install --lockfile-only`;
     log("Cleaning up lockfile stale workspace aliases... Done");
 
     log("Installing pruned dependency closure with frozen lockfile...");
-    await Bun.$`bun install --frozen-lockfile`.cwd(rootDir);
+    await Bun.$`bun install --frozen-lockfile`;
     log("Installing pruned dependency closure with frozen lockfile... Done");
 
     // Write marker
@@ -85,7 +86,7 @@ try {
 
   // Build the target application
   log(`Building application: "${target}"...`);
-  await Bun.$.cwd(rootDir)`bun run build --filter=${target}...`;
+  await Bun.$`bun run build --filter=${target}...`;
   log(`Building application: "${target}"... Done`);
 
   log(`Bun version: ${process.versions.bun}`);
