@@ -51,18 +51,23 @@ try {
     // Overwrite root
     overwriteRootWithPrunedWorkspace(rootDir, outDir);
 
-    // Strip postinstall from pruned package.json (scripts/ is not in turbo prune output)
+    // Strip lifecycle scripts from the pruned root package.json.
+    // turbo prune --docker does not include scripts/ or .git/, so
+    // postinstall and prepare (husky) would fail in the deploy env.
     const pkgPath = path.join(rootDir, "package.json");
     const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
-    delete pkg.scripts.postinstall;
+    if (pkg.scripts) {
+      delete pkg.scripts.postinstall;
+      delete pkg.scripts.prepare;
+    }
     fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
 
-    // Normalize the pruned lockfile, then freeze-verify.
+    // Install pruned dependencies, then freeze-verify.
     // turbo prune copies bun.lock with stale alias entries that break
-    // --frozen-lockfile on a subset of workspaces. The first install
-    // re-resolves those aliases; the second proves consistency.
-    log("Normalizing pruned lockfile...");
-    await Bun.$.cwd(rootDir)`bun install --lockfile-only`;
+    // --frozen-lockfile on a subset of workspaces, so we let bun
+    // reconcile them in a non-frozen pass first.
+    log("Installing pruned dependency closure...");
+    await Bun.$.cwd(rootDir)`bun install`;
     log("Verifying lockfile consistency...");
     await Bun.$.cwd(rootDir)`bun install --frozen-lockfile`;
 
