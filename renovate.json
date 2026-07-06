@@ -1,10 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended",
-    ":separatePatchReleases",
-    ":separateMultipleMinorReleases"
-  ],
+  "extends": ["config:recommended", ":separatePatchReleases", ":separateMultipleMinorReleases"],
   "timezone": "UTC",
   "schedule": ["before 7am every 2 day"],
   "prConcurrentLimit": 10,
@@ -90,14 +86,7 @@
       "automergeType": "pr",
       "platformAutomerge": true
     },
-    {
-      "description": "Group AWS SDK and Smithy packages with automerge",
-      "groupName": "aws-sdk",
-      "automerge": true,
-      "automergeType": "pr",
-      "platformAutomerge": true,
-      "matchPackageNames": ["@aws-sdk/{/,}**", "@smithy/{/,}**"]
-    },
+
     {
       "description": "Group GitHub Actions updates with automerge",
       "matchManagers": ["github-actions"],

@@ -23,8 +23,6 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "catalog:",
-    "@aws-sdk/s3-request-presigner": "catalog:",
     "@better-auth/expo": "catalog:",
     "@nestjs/common": "catalog:",
     "@nestjs/core": "catalog:",
