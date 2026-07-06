@@ -71,16 +71,13 @@ try {
     log("Stripping lifecycle scripts... Done");
 
     // Install pruned dependencies, then freeze-verify.
-    // turbo prune copies bun.lock with stale alias entries that break
-    // --frozen-lockfile on a subset of workspaces, so we let bun
-    // reconcile them in a non-frozen pass first.
-    log("Installing pruned dependency closure...");
-    await Bun.$.cwd(rootDir)`bun install`;
-    log("Installing pruned dependency closure... Done");
+    log("Cleaning up lockfile stale workspace aliases...");
+    await Bun.$`bun install --lockfile-only`.cwd(rootDir);
+    log("Cleaning up lockfile stale workspace aliases... Done");
 
-    log("Verifying lockfile consistency...");
-    await Bun.$.cwd(rootDir)`bun install --frozen-lockfile`;
-    log("Verifying lockfile consistency... Done");
+    log("Installing pruned dependency closure with frozen lockfile...");
+    await Bun.$`bun install --frozen-lockfile`.cwd(rootDir);
+    log("Installing pruned dependency closure with frozen lockfile... Done");
 
     // Write marker
     fs.writeFileSync(markerPath, target);
