@@ -10,7 +10,10 @@ import { fileURLToPath } from "node:url";
 export function findMonorepoRoot() {
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
   let currentDir = __dirname;
-  while (currentDir !== path.dirname(currentDir)) {
+  let depth = 0;
+  const maxDepth = 100;
+
+  while (currentDir !== path.dirname(currentDir) && depth < maxDepth) {
     if (
       fs.existsSync(path.join(currentDir, "bun.lock")) &&
       fs.existsSync(path.join(currentDir, "turbo.json"))
@@ -18,6 +21,7 @@ export function findMonorepoRoot() {
       return currentDir;
     }
     currentDir = path.dirname(currentDir);
+    depth++;
   }
   throw new Error("Monorepo root not found (missing bun.lock and turbo.json)");
 }
