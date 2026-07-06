@@ -2,4 +2,7 @@
 // .cjs extension required — commitlint's config loader expects CommonJS regardless of project module type.
 module.exports = {
   extends: ["@commitlint/config-conventional"],
+  rules: {
+    "header-max-length": [2, "always", 90],
+  },
 };
