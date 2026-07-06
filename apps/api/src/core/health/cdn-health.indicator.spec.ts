@@ -2,21 +2,7 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { Test } from '@nestjs/testing';
 import { CDNHealthIndicator } from './cdn-health.indicator';
 import { ConfigService } from '../../shared/config/config.service';
-
-// Mock AWS SDK
-const mockSend = vi.fn();
-vi.mock('@aws-sdk/client-s3', () => {
-  class MockS3Client {
-    send = mockSend;
-  }
-  class MockHeadBucketCommand {
-    constructor(public input: any) {}
-  }
-  return {
-    S3Client: MockS3Client,
-    HeadBucketCommand: MockHeadBucketCommand,
-  };
-});
+import { mockList } from '../../test/mocks/bun.mock';
 
 describe('CDNHealthIndicator', () => {
   let indicator: CDNHealthIndicator;
@@ -41,16 +27,25 @@ describe('CDNHealthIndicator', () => {
     indicator = module.get(CDNHealthIndicator);
   });
 
-  it('returns up status when head command succeeds', async () => {
-    mockSend.mockResolvedValueOnce({});
+  it('returns up status when s3.list succeeds', async () => {
+    mockList.mockResolvedValueOnce({ contents: [] });
 
     const result = await indicator.pingCheck('cdn');
     expect(result).toEqual({ cdn: { status: 'up' } });
+    expect(mockList).toHaveBeenCalledWith({ maxKeys: 1 });
   });
 
-  it('throws HealthCheckError when head command fails', async () => {
-    mockSend.mockRejectedValueOnce(new Error('S3 Connection Failed'));
+  it('throws HealthCheckError when s3.list fails', async () => {
+    mockList.mockRejectedValueOnce(new Error('S3 Connection Failed'));
 
     await expect(indicator.pingCheck('cdn')).rejects.toThrow('R2 storage check failed');
+  });
+
+  it('throws HealthCheckError on timeout', async () => {
+    mockList.mockImplementationOnce(() => new Promise((resolve) => setTimeout(resolve, 2000)));
+
+    await expect(indicator.pingCheck('cdn', { timeout: 100 })).rejects.toThrow(
+      'R2 storage check failed',
+    );
   });
 });

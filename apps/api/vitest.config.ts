@@ -1,8 +1,14 @@
 import { defineConfig } from 'vitest/config';
 import swc from 'unplugin-swc';
+import path from 'node:path';
 
 export default defineConfig({
-  resolve: { tsconfigPaths: true },
+  resolve: {
+    tsconfigPaths: true,
+    alias: {
+      bun: path.resolve(__dirname, './src/test/mocks/bun.mock.ts'),
+    },
+  },
   plugins: [
     swc.vite({
       module: { type: 'es6' },
