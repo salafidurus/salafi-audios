@@ -16,7 +16,7 @@ if (target !== "web" && target !== "api") {
 }
 
 try {
-  log(`Starting build process for target: "${target}"`);
+  log(`Starting build process for target: "${target}" (Bun v${process.versions.bun})`);
 
   const rootDir = findMonorepoRoot();
   validateEnvironment();
@@ -89,7 +89,6 @@ try {
   await Bun.$`bun run build --filter=${target}...`;
   log(`Building application: "${target}"... Done`);
 
-  log(`Bun version: ${process.versions.bun}`);
   success(`Build process completed successfully for "${target}"!`);
 } catch (err) {
   error(`Build failed: ${err.stack || err.message || err}`);
