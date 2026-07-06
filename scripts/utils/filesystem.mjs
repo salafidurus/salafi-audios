@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { log } from "./logging.mjs";
+import { log, warn } from "./logging.mjs";
 
 /**
  * Cleaves directories that might pollute dependency resolution and overwrites
@@ -23,9 +23,11 @@ export function overwriteRootWithPrunedWorkspace(rootDir, outDir) {
 
   log(`Cleaving monorepo root. Overwriting entries: ${Array.from(prunedEntries).join(", ")}`);
 
-  // Delete node_modules in the root to ensure no dependency pollution/leakage
-  log("Purging root node_modules for clean installation...");
-  fs.rmSync(path.join(rootDir, "node_modules"), { recursive: true, force: true });
+  try {
+    fs.rmSync(path.join(rootDir, "node_modules"), { recursive: true, force: true });
+  } catch (err) {
+    warn(`Failed to purge root node_modules: ${err.message}. Continuing...`);
+  }
 
   // Copy pruned workspaces over the monorepo root
   for (const entry of prunedEntries) {
