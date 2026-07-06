@@ -18,10 +18,14 @@ try {
 
   if (target === "api") {
     // Start NestJS backend in production mode (compiled JS entry point)
+    log("Starting api production server...");
     await Bun.$.cwd(rootDir)`bun run --filter=api start:prod`;
+    log("Starting api production server... Done");
   } else if (target === "web") {
     // Start Next.js web application in production mode
+    log("Starting web production server...");
     await Bun.$.cwd(rootDir)`bun run --filter=web start`;
+    log("Starting web production server... Done");
   }
 } catch (err) {
   error(`Application execution failed: ${err.message}`);

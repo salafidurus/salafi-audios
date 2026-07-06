@@ -40,20 +40,27 @@ try {
     // Clean out/
     const outDir = path.join(rootDir, "out");
     if (fs.existsSync(outDir)) {
+      log("Cleaning existing out/ directory...");
       fs.rmSync(outDir, { recursive: true, force: true });
+      log("Cleaning existing out/ directory... Done");
     }
 
     // Execute Turborepo prune
     const turboVersion = await getTurboVersion(rootDir);
     const turboCmd = turboVersion ? `turbo@${turboVersion}` : "turbo";
+    log(`Running turbo prune for "${target}" using turbo version: ${turboVersion || "latest"}...`);
     await Bun.$`bunx ${turboCmd} prune ${target} --docker`;
+    log(`Running turbo prune for "${target}"... Done`);
 
     // Overwrite root
+    log("Cleaving monorepo root...");
     overwriteRootWithPrunedWorkspace(rootDir, outDir);
+    log("Cleaving monorepo root... Done");
 
     // Strip lifecycle scripts from the pruned root package.json.
     // turbo prune --docker does not include scripts/ or .git/, so
     // postinstall and prepare (husky) would fail in the deploy env.
+    log("Stripping lifecycle scripts...");
     const pkgPath = path.join(rootDir, "package.json");
     const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
     if (pkg.scripts) {
@@ -61,6 +68,7 @@ try {
       delete pkg.scripts.prepare;
     }
     fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
+    log("Stripping lifecycle scripts... Done");
 
     // Install pruned dependencies, then freeze-verify.
     // turbo prune copies bun.lock with stale alias entries that break
@@ -68,16 +76,20 @@ try {
     // reconcile them in a non-frozen pass first.
     log("Installing pruned dependency closure...");
     await Bun.$.cwd(rootDir)`bun install`;
+    log("Installing pruned dependency closure... Done");
+
     log("Verifying lockfile consistency...");
     await Bun.$.cwd(rootDir)`bun install --frozen-lockfile`;
+    log("Verifying lockfile consistency... Done");
 
     // Write marker
     fs.writeFileSync(markerPath, target);
   }
 
   // Build the target application
-  log(`Building application: "${target}"`);
+  log(`Building application: "${target}"...`);
   await Bun.$.cwd(rootDir)`bun run build --filter=${target}...`;
+  log(`Building application: "${target}"... Done`);
 
   success(`Build process completed successfully for "${target}"!`);
 } catch (err) {
