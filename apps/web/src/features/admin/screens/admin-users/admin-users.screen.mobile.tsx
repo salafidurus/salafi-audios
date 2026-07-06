@@ -29,11 +29,7 @@ export function AdminUsersMobileScreen(): ReactNode {
       <h1 className={styles.pageTitle}>Admin Users</h1>
 
       <div className={styles.searchRow}>
-        <UserSearchBar
-          value={query}
-          onChange={setQuery}
-          onSubmit={() => setSearch(query)}
-        />
+        <UserSearchBar value={query} onChange={setQuery} onSubmit={() => setSearch(query)} />
       </div>
 
       {isFetching ? (

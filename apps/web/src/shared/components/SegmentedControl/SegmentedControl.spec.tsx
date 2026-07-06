@@ -10,33 +10,21 @@ const OPTIONS = [
 
 describe("SegmentedControl", () => {
   it("renders all options", () => {
-    render(
-      <SegmentedControl options={OPTIONS} value="system" onChange={vi.fn()} />,
-    );
+    render(<SegmentedControl options={OPTIONS} value="system" onChange={vi.fn()} />);
     expect(screen.getByRole("button", { name: "System" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Light" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Dark" })).toBeInTheDocument();
   });
 
   it("marks the selected option as pressed", () => {
-    render(
-      <SegmentedControl options={OPTIONS} value="light" onChange={vi.fn()} />,
-    );
-    expect(screen.getByRole("button", { name: "Light" })).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
-    expect(screen.getByRole("button", { name: "System" })).toHaveAttribute(
-      "aria-pressed",
-      "false",
-    );
+    render(<SegmentedControl options={OPTIONS} value="light" onChange={vi.fn()} />);
+    expect(screen.getByRole("button", { name: "Light" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "System" })).toHaveAttribute("aria-pressed", "false");
   });
 
   it("calls onChange with the new value when a segment is clicked", () => {
     const handleChange = vi.fn();
-    render(
-      <SegmentedControl options={OPTIONS} value="system" onChange={handleChange} />,
-    );
+    render(<SegmentedControl options={OPTIONS} value="system" onChange={handleChange} />);
     fireEvent.click(screen.getByRole("button", { name: "Dark" }));
     expect(handleChange).toHaveBeenCalledWith("dark");
   });

@@ -10,8 +10,9 @@ const buildTargets = [
 ];
 
 for (const target of buildTargets) {
-  log(`Executing postinstall compile for: ${target}`);
+  log(`Executing postinstall compile for: ${target}...`);
 
   // Run using Bun Shell natively. Throws automatically on failure.
   await Bun.$`bun run --filter ${target} build`;
+  log(`Executing postinstall compile for: ${target}... Done`);
 }

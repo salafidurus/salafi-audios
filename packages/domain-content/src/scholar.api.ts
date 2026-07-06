@@ -40,7 +40,10 @@ export function useScholarDetail(slug: string) {
 
 export function useScholarContent(
   slug: string,
-  options?: Omit<UseQueryOptions<ScholarContentUnifiedDto, Error, ScholarContentUnifiedDto>, "queryKey" | "queryFn">,
+  options?: Omit<
+    UseQueryOptions<ScholarContentUnifiedDto, Error, ScholarContentUnifiedDto>,
+    "queryKey" | "queryFn"
+  >,
 ) {
   return useApiQuery(
     queryKeys.scholars.content(slug),

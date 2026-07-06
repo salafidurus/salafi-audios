@@ -35,11 +35,11 @@ const mockEndedSession: LiveSessionDto = {
 describe("LiveSessionRow", () => {
   it("renders active session with LIVE badge and telegram link opening in a new tab", () => {
     render(<LiveSessionRow session={mockLiveSession} />);
-    
+
     expect(screen.getByTestId("live-badge")).toBeInTheDocument();
     expect(screen.getByText("Awesome Live Session")).toBeInTheDocument();
     expect(screen.getByText("Scholar Name · Live Channel")).toBeInTheDocument();
-    
+
     const link = screen.getByRole("link");
     expect(link).toHaveAttribute("href", "https://t.me/telegram-slug");
     expect(link).toHaveAttribute("target", "_blank");
@@ -48,7 +48,7 @@ describe("LiveSessionRow", () => {
 
   it("renders scheduled session with formatted date/time badge", () => {
     render(<LiveSessionRow session={mockScheduledSession} />);
-    
+
     expect(screen.getByTestId("scheduled-badge")).toBeInTheDocument();
     expect(screen.getByText(formatScheduledTime("2026-07-04T10:00:00.000Z"))).toBeInTheDocument();
     expect(screen.getByText("Upcoming Session")).toBeInTheDocument();
@@ -56,7 +56,7 @@ describe("LiveSessionRow", () => {
 
   it("renders ended session with recording available badge", () => {
     render(<LiveSessionRow session={mockEndedSession} />);
-    
+
     expect(screen.getByTestId("recording-badge")).toBeInTheDocument();
     expect(screen.getByText("Recording Available")).toBeInTheDocument();
     expect(screen.getByText("Past Session")).toBeInTheDocument();

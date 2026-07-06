@@ -108,7 +108,7 @@ export function ScholarContentList({ slug }: ScholarContentListProps) {
 
   // Topic-grouped display — sort alphabetically by topicName for consistent ordering
   if (hasTopics && topicsData) {
-    const sortedTopics = [...topicsData.topics].sort((a, b) =>
+    const sortedTopics = topicsData.topics.toSorted((a, b) =>
       a.topicName.localeCompare(b.topicName),
     );
     return (
@@ -135,9 +135,7 @@ export function ScholarContentList({ slug }: ScholarContentListProps) {
   const flatItems = flatContent?.items ?? [];
 
   if (flatItems.length === 0) {
-    return (
-      <p className={styles.empty}>{t("scholarContent.empty", "No published content yet.")}</p>
-    );
+    return <p className={styles.empty}>{t("scholarContent.empty", "No published content yet.")}</p>;
   }
 
   return (

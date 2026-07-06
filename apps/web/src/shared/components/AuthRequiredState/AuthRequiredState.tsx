@@ -4,9 +4,7 @@ import React, { useState } from "react";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { useIsHydrated } from "@/shared/hooks/use-is-hydrated";
 import { AuthModal } from "@/features/auth";
-import {
-  AuthRequiredStateDesktop,
-} from "./AuthRequiredState.desktop";
+import { AuthRequiredStateDesktop } from "./AuthRequiredState.desktop";
 import { AuthRequiredStateMobile } from "./AuthRequiredState.mobile";
 
 export type AuthRequiredStateProps = {
@@ -45,11 +43,7 @@ export function AuthRequiredState({ title, description, actionLabel }: AuthRequi
           onPress={handlePress}
         />
       )}
-      <AuthModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        message={title}
-      />
+      <AuthModal isOpen={showModal} onClose={() => setShowModal(false)} message={title} />
     </>
   );
 }

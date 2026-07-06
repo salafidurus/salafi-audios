@@ -44,7 +44,9 @@
   height: 1.25rem;
   border-radius: 50%;
   background: var(--surface-default);
-  transition: transform 200ms ease, box-shadow 200ms ease;
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 

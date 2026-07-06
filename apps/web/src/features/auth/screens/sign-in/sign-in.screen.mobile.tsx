@@ -26,9 +26,7 @@ export function SignInMobileScreen({ onSignInWithGoogle, onSignInWithApple }: Si
             />
           </div>
           <h1 style={titleStyle}>Salafi Durus</h1>
-          <p style={taglineStyle}>
-            {t("auth.signIn.tagline", "Join the community of learners")}
-          </p>
+          <p style={taglineStyle}>{t("auth.signIn.tagline", "Join the community of learners")}</p>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
