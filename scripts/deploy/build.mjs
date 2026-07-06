@@ -40,39 +40,56 @@ try {
     // Clean out/
     const outDir = path.join(rootDir, "out");
     if (fs.existsSync(outDir)) {
+      log("Cleaning existing out/ directory...");
       fs.rmSync(outDir, { recursive: true, force: true });
+      log("Cleaning existing out/ directory... Done");
     }
 
     // Execute Turborepo prune
     const turboVersion = await getTurboVersion(rootDir);
     const turboCmd = turboVersion ? `turbo@${turboVersion}` : "turbo";
+    log(`Running turbo prune for "${target}" using turbo version: ${turboVersion || "latest"}...`);
     await Bun.$`bunx ${turboCmd} prune ${target} --docker`;
+    log(`Running turbo prune for "${target}"... Done`);
 
     // Overwrite root
+    log("Cleaving monorepo root...");
     overwriteRootWithPrunedWorkspace(rootDir, outDir);
+    log("Cleaving monorepo root... Done");
 
-    // Strip postinstall from pruned package.json (scripts/ is not in turbo prune output)
+    // Strip lifecycle scripts from the pruned root package.json.
+    // turbo prune --docker does not include scripts/ or .git/, so
+    // postinstall and prepare (husky) would fail in the deploy env.
+    log("Stripping lifecycle scripts...");
     const pkgPath = path.join(rootDir, "package.json");
     const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
-    delete pkg.scripts.postinstall;
+    if (pkg.scripts) {
+      delete pkg.scripts.postinstall;
+      delete pkg.scripts.prepare;
+    }
     fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
+    log("Stripping lifecycle scripts... Done");
 
-    // Normalize the pruned lockfile, then freeze-verify.
+    // Install pruned dependencies, then freeze-verify.
     // turbo prune copies bun.lock with stale alias entries that break
-    // --frozen-lockfile on a subset of workspaces. The first install
-    // re-resolves those aliases; the second proves consistency.
-    log("Normalizing pruned lockfile...");
-    await Bun.$.cwd(rootDir)`bun install --lockfile-only`;
+    // --frozen-lockfile on a subset of workspaces, so we let bun
+    // reconcile them in a non-frozen pass first.
+    log("Installing pruned dependency closure...");
+    await Bun.$.cwd(rootDir)`bun install`;
+    log("Installing pruned dependency closure... Done");
+
     log("Verifying lockfile consistency...");
     await Bun.$.cwd(rootDir)`bun install --frozen-lockfile`;
+    log("Verifying lockfile consistency... Done");
 
     // Write marker
     fs.writeFileSync(markerPath, target);
   }
 
   // Build the target application
-  log(`Building application: "${target}"`);
+  log(`Building application: "${target}"...`);
   await Bun.$.cwd(rootDir)`bun run build --filter=${target}...`;
+  log(`Building application: "${target}"... Done`);
 
   success(`Build process completed successfully for "${target}"!`);
 } catch (err) {
