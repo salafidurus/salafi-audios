@@ -20,7 +20,7 @@ for (const dirent of entries) {
 
   const packageDir = join(packagesDir, dirent.name);
   const packageJsonPath = join(packageDir, "package.json");
-  
+
   // Check existence and read package.json using native Bun.file
   const packageJsonFile = Bun.file(packageJsonPath);
   if (!(await packageJsonFile.exists())) {

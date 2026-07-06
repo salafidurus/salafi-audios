@@ -21,7 +21,7 @@ describe("turbo utility", () => {
   it("extracts turbo version correctly from devDependencies", async () => {
     fs.writeFileSync(
       path.join(tmpPath, "package.json"),
-      JSON.stringify({ devDependencies: { turbo: "^2.9.14" } })
+      JSON.stringify({ devDependencies: { turbo: "^2.9.14" } }),
     );
     const version = await getTurboVersion(tmpPath);
     expect(version).toBe("2.9.14");
@@ -30,17 +30,14 @@ describe("turbo utility", () => {
   it("extracts turbo version correctly from dependencies with tilde", async () => {
     fs.writeFileSync(
       path.join(tmpPath, "package.json"),
-      JSON.stringify({ dependencies: { turbo: "~3.0.1" } })
+      JSON.stringify({ dependencies: { turbo: "~3.0.1" } }),
     );
     const version = await getTurboVersion(tmpPath);
     expect(version).toBe("3.0.1");
   });
 
   it("returns null if turbo is missing in package.json", async () => {
-    fs.writeFileSync(
-      path.join(tmpPath, "package.json"),
-      JSON.stringify({ devDependencies: {} })
-    );
+    fs.writeFileSync(path.join(tmpPath, "package.json"), JSON.stringify({ devDependencies: {} }));
     const version = await getTurboVersion(tmpPath);
     expect(version).toBeNull();
   });

@@ -35,7 +35,7 @@ try {
   const turboCmd = turboVersion ? `turbo@${turboVersion}` : "turbo";
 
   log(`Running turbo prune for "${target}" using turbo version: ${turboVersion || "latest"}`);
-  
+
   // Execute via Bun Shell; throws automatically if command fails
   await Bun.$`bunx ${turboCmd} prune ${target} --docker`;
 

@@ -12,7 +12,7 @@ export async function getTurboVersion(rootDir) {
     const file = Bun.file(pkgJsonPath);
     const pkgJson = await file.json();
     const turboVer = pkgJson.devDependencies?.turbo || pkgJson.dependencies?.turbo;
-    
+
     if (!turboVer) {
       return null;
     }
