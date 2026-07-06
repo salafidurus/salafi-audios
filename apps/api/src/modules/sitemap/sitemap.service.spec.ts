@@ -77,13 +77,14 @@ describe('SitemapService', () => {
     expect(repo.findPublishedTopLevelListings).toHaveBeenCalledOnce();
   });
 
-  it('returns valid empty urlset when there are no scholars or listings', async () => {
+  it('returns sitemap with homepage entry when there are no scholars or listings', async () => {
     repo.findActiveScholars.mockResolvedValue([]);
     repo.findPublishedTopLevelListings.mockResolvedValue([]);
     const xml = await service.generate(baseUrl);
     expect(xml).toContain('<urlset');
     expect(xml).toContain('</urlset>');
-    expect(xml.match(/<url>/g)).toBeNull();
+    expect(xml.match(/<url>/g)).toHaveLength(1);
+    expect(xml).toContain(`<loc>${baseUrl}</loc>`);
   });
 
   it('XML-escapes special characters in slugs', async () => {
