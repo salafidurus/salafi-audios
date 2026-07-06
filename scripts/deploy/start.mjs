@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
-import { findMonorepoRoot } from "./utils/paths.mjs";
-import { log, error } from "./utils/logging.mjs";
+import { findMonorepoRoot } from "../utils/paths.mjs";
+import { log, error } from "../utils/logging.mjs";
 
 const target = process.argv[2];
 

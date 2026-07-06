@@ -1,7 +1,9 @@
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
+import { findMonorepoRoot } from "./utils/paths.mjs";
+import { log, error } from "./utils/logging.mjs";
 
-const repoRoot = process.cwd();
+const repoRoot = findMonorepoRoot();
 const packagesDir = join(repoRoot, "packages");
 
 const missingConfigs = [];
@@ -39,11 +41,11 @@ for (const dirent of entries) {
 }
 
 if (missingConfigs.length > 0) {
-  console.error("Missing tsconfig.build.json for package build scripts:");
+  error("Missing tsconfig.build.json for package build scripts:");
   for (const configPath of missingConfigs) {
-    console.error(`- ${configPath}`);
+    error(`- ${configPath}`);
   }
   process.exit(1);
 }
 
-console.log("verify-build-configs: ok");
+log("verify-build-configs: ok");
