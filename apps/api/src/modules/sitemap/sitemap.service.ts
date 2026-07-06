@@ -44,8 +44,8 @@ export class SitemapService {
   }
 
   private formatDate(date: Date | null | undefined): string {
-    if (!date) return new Date().toISOString().split('T')[0];
-    return date.toISOString().split('T')[0];
+    const d = date ?? new Date();
+    return d.toISOString().split('T')[0] ?? '';
   }
 
   private escapeXml(value: string): string {
