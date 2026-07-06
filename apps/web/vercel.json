@@ -1,4 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "bunVersion": "1.x"
+  "bunVersion": "1.x",
+  "buildCommand": "bun ../../scripts/deploy/build.mjs web",
+  "installCommand": "echo 'Skipping default install'"
 }

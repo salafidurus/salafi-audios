@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 /**
  * Normalizes the repo's agent resource links.
  *
@@ -28,8 +28,12 @@ import {
   rmdirSync,
 } from "node:fs";
 import { join, resolve } from "node:path";
+import { findMonorepoRoot } from "./utils/paths.mjs";
+import { warn, success, setPrefix } from "./utils/logging.mjs";
 
-const root = process.cwd();
+setPrefix("[SyncAgents]");
+
+const root = findMonorepoRoot();
 const AGENTS_DIR = join(root, ".agents");
 const SKILLS = join(AGENTS_DIR, "skills");
 const PLANS = join(AGENTS_DIR, "plans");
@@ -65,7 +69,7 @@ function removeLink(p) {
   }
   if (stat.isDirectory()) {
     if (!isJunction(p)) {
-      console.warn(`  skip (real dir): ${p}`);
+      warn(`  skip (real dir): ${p}`);
       return false;
     }
     // Junction — Native rmdirSync deletes the directory junction itself on Windows without touching the target folder contents
@@ -82,7 +86,7 @@ function linkFile(link, target) {
   try {
     symlinkSync(target, link, "file");
   } catch (err) {
-    console.warn(`  warn (file link): ${link} — ${err.message}`);
+    warn(`  warn (file link): ${link} — ${err.message}`);
   }
 }
 
@@ -164,4 +168,4 @@ function syncAliases(dir) {
 
 syncAliases(root);
 
-console.log("[OK] Repo normalized");
+success("Repo normalized successfully.");
