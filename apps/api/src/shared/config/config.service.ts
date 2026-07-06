@@ -31,6 +31,10 @@ export class ConfigService {
     return this.env.ASSET_CDN_BASE_URL;
   }
 
+  get SITEMAP_BASE_URL(): string | undefined {
+    return this.env.SITEMAP_BASE_URL;
+  }
+
   // better-auth
   get BETTER_AUTH_SECRET(): string {
     return this.env.BETTER_AUTH_SECRET;
