@@ -1,4 +1,4 @@
-import { log, success, setPrefix } from "./utils/logging.mjs";
+import { log, setPrefix } from "./utils/logging.mjs";
 
 setPrefix("[Postinstall]");
 

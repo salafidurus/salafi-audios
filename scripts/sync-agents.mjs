@@ -29,7 +29,7 @@ import {
 } from "node:fs";
 import { join, resolve } from "node:path";
 import { findMonorepoRoot } from "./utils/paths.mjs";
-import { log, warn, success, setPrefix } from "./utils/logging.mjs";
+import { warn, success, setPrefix } from "./utils/logging.mjs";
 
 setPrefix("[SyncAgents]");
 
