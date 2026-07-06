@@ -1,7 +1,9 @@
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 import { findMonorepoRoot } from "./utils/paths.mjs";
-import { log, error } from "./utils/logging.mjs";
+import { log, error, success, setPrefix } from "./utils/logging.mjs";
+
+setPrefix("[VerifyBuild]");
 
 const repoRoot = findMonorepoRoot();
 const packagesDir = join(repoRoot, "packages");
@@ -48,4 +50,4 @@ if (missingConfigs.length > 0) {
   process.exit(1);
 }
 
-log("verify-build-configs: ok");
+success("verify-build-configs: ok");

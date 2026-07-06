@@ -1,4 +1,6 @@
-import { log } from "./utils/logging.mjs";
+import { log, success, setPrefix } from "./utils/logging.mjs";
+
+setPrefix("[Postinstall]");
 
 const buildTargets = [
   // Keep postinstall minimal for EAS and local fresh installs.

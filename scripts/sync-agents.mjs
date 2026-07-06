@@ -29,7 +29,9 @@ import {
 } from "node:fs";
 import { join, resolve } from "node:path";
 import { findMonorepoRoot } from "./utils/paths.mjs";
-import { log, warn } from "./utils/logging.mjs";
+import { log, warn, success, setPrefix } from "./utils/logging.mjs";
+
+setPrefix("[SyncAgents]");
 
 const root = findMonorepoRoot();
 const AGENTS_DIR = join(root, ".agents");
@@ -166,4 +168,4 @@ function syncAliases(dir) {
 
 syncAliases(root);
 
-log("Repo normalized successfully.");
+success("Repo normalized successfully.");

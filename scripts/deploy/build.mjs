@@ -4,7 +4,9 @@ import path from "node:path";
 import { findMonorepoRoot } from "../utils/paths.mjs";
 import { overwriteRootWithPrunedWorkspace } from "../utils/filesystem.mjs";
 import { getTurboVersion, validateEnvironment } from "../utils/turbo.mjs";
-import { log, error } from "../utils/logging.mjs";
+import { log, error, success, setPrefix } from "../utils/logging.mjs";
+
+setPrefix("[Deploy:Build]");
 
 const target = process.argv[2];
 
@@ -48,7 +50,7 @@ try {
   log(`Building application: "${target}"`);
   await Bun.$.cwd(rootDir)`bun run build --filter=${target}...`;
 
-  log(`Build process completed successfully for "${target}"!`);
+  success(`Build process completed successfully for "${target}"!`);
 } catch (err) {
   error(`Build failed: ${err.message}`);
   process.exit(1);

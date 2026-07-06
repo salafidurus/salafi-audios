@@ -1,6 +1,8 @@
 #!/usr/bin/env bun
 import { findMonorepoRoot } from "../utils/paths.mjs";
-import { log, error } from "../utils/logging.mjs";
+import { log, error, setPrefix } from "../utils/logging.mjs";
+
+setPrefix("[Deploy:Start]");
 
 const target = process.argv[2];
 
