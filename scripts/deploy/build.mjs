@@ -51,8 +51,19 @@ try {
     // Overwrite root
     overwriteRootWithPrunedWorkspace(rootDir, outDir);
 
-    // Clean install
-    log("Installing pruned dependencies...");
+    // Strip postinstall from pruned package.json (scripts/ is not in turbo prune output)
+    const pkgPath = path.join(rootDir, "package.json");
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
+    delete pkg.scripts.postinstall;
+    fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
+
+    // Normalize the pruned lockfile, then freeze-verify.
+    // turbo prune copies bun.lock with stale alias entries that break
+    // --frozen-lockfile on a subset of workspaces. The first install
+    // re-resolves those aliases; the second proves consistency.
+    log("Normalizing pruned lockfile...");
+    await Bun.$.cwd(rootDir)`bun install --lockfile-only`;
+    log("Verifying lockfile consistency...");
     await Bun.$.cwd(rootDir)`bun install --frozen-lockfile`;
 
     // Write marker
