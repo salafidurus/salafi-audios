@@ -71,7 +71,7 @@
     "build:web": "turbo run build --filter=web...",
     "build:native": "turbo run build --filter=native...",
     "build:android": "bun run --filter native android",
-    "lint": "turbo run lint",
+    "lint": "turbo run lint && oxlint scripts && oxfmt --check scripts",
     "typecheck": "turbo run typecheck",
     "typecheck:affected": "turbo run typecheck --affected",
     "test": "turbo run test",
