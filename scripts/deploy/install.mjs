@@ -44,7 +44,7 @@ try {
 
   // 5. Clean installation of pruned dependencies in the workspace
   log("Installing pruned dependency closure...");
-  await Bun.$.cwd(rootDir)`bun install --frozen-lockfile`;
+  await Bun.$.cwd(rootDir)`bun install`;
 
   // 6. Write marker file so the build step knows we are pruned
   fs.writeFileSync(path.join(rootDir, ".pruned-target"), target);

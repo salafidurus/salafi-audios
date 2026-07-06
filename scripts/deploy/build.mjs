@@ -53,7 +53,7 @@ try {
 
     // Clean install
     log("Installing pruned dependencies...");
-    await Bun.$.cwd(rootDir)`bun install --frozen-lockfile`;
+    await Bun.$.cwd(rootDir)`bun install`;
 
     // Write marker
     fs.writeFileSync(markerPath, target);
