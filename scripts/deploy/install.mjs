@@ -74,8 +74,9 @@ try {
   // 7. Write marker file so the build step knows we are pruned
   fs.writeFileSync(path.join(rootDir, ".pruned-target"), target);
 
+  log(`Bun version: ${process.versions.bun}`);
   success(`Install and prune process completed successfully for "${target}"!`);
 } catch (err) {
-  error(`Install failed: ${err.message}`);
+  error(`Install failed: ${err.stack || err.message || err}`);
   process.exit(1);
 }

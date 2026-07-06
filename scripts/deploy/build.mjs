@@ -88,8 +88,9 @@ try {
   await Bun.$.cwd(rootDir)`bun run build --filter=${target}...`;
   log(`Building application: "${target}"... Done`);
 
+  log(`Bun version: ${process.versions.bun}`);
   success(`Build process completed successfully for "${target}"!`);
 } catch (err) {
-  error(`Build failed: ${err.message}`);
+  error(`Build failed: ${err.stack || err.message || err}`);
   process.exit(1);
 }
