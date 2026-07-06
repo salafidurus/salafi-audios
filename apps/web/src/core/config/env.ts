@@ -2,40 +2,43 @@ import { z } from "zod";
 
 const WebPublicEnvSchema = z.object({
   NEXT_PUBLIC_API_URL: z.string().url(),
-  NEXT_PUBLIC_WEB_URL: z.string().url().optional(),
+  NEXT_PUBLIC_WEB_URL: z.string().url(),
 });
 
 export type WebPublicEnv = z.infer<typeof WebPublicEnvSchema>;
 
-function getWebPublicEnv(raw: Record<string, unknown> = process.env): WebPublicEnv {
+export function validateEnv(raw: Record<string, unknown> = process.env): WebPublicEnv {
   const parsed = WebPublicEnvSchema.safeParse(raw);
   if (!parsed.success) {
-    throw new Error(`Invalid WEB PUBLIC environment variables:\n${parsed.error.message}`);
+    const details = parsed.error.issues
+      .map((err) => `- ${err.path.join(".")}: ${err.message}`)
+      .join("\n");
+    throw new Error(`\n\n❌ Invalid WEB environment variables:\n${details}\n`);
   }
   return parsed.data;
 }
 
 export type WebRuntimeEnv = {
   apiUrl?: string;
+  webUrl?: string;
 };
 
-const nodeEnv = process.env.NODE_ENV;
-
-export const isDev = nodeEnv === "development";
-export const isProduction = nodeEnv === "production";
+export const isDev = process.env.NODE_ENV === "development";
+export const isProduction = process.env.NODE_ENV === "production";
 export const isPreview = !isDev && !isProduction;
 
 export function getWebRuntimeEnv(): WebRuntimeEnv {
-  let env: ReturnType<typeof getWebPublicEnv> | null = null;
-
-  try {
-    env = getWebPublicEnv();
-  } catch {
-    env = null;
+  if (process.env.NODE_ENV === "test") {
+    return {
+      apiUrl: process.env.NEXT_PUBLIC_API_URL,
+      webUrl: process.env.NEXT_PUBLIC_WEB_URL,
+    };
   }
 
+  const env = validateEnv();
   return {
-    apiUrl: env?.NEXT_PUBLIC_API_URL,
+    apiUrl: env.NEXT_PUBLIC_API_URL,
+    webUrl: env.NEXT_PUBLIC_WEB_URL,
   };
 }
 
