@@ -11,7 +11,7 @@ export function findMonorepoRoot() {
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
   let currentDir = __dirname;
   let depth = 0;
-  const maxDepth = 100;
+  const maxDepth = 5;
 
   while (currentDir !== path.dirname(currentDir) && depth < maxDepth) {
     if (
