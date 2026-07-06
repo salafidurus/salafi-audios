@@ -42,4 +42,12 @@ describe("deploy install script logic", () => {
     expect(updatedPkg.scripts.postinstall).toBeUndefined();
     expect(updatedPkg.scripts.build).toBe("turbo run build");
   });
+
+  it("does not use Bun.$ cwd method to prevent sandboxed native crashes", () => {
+    const installScript = fs.readFileSync(path.join(import.meta.dir, "install.mjs"), "utf8");
+    const buildScript = fs.readFileSync(path.join(import.meta.dir, "build.mjs"), "utf8");
+
+    expect(installScript).not.toContain(".cwd(");
+    expect(buildScript).not.toContain(".cwd(");
+  });
 });
