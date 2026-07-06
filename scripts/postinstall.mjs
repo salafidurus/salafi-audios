@@ -8,12 +8,6 @@ const buildTargets = [
 for (const target of buildTargets) {
   console.log(`\n> bun run --filter ${target} build`);
 
-  // Run using Bun.spawnSync natively without requiring node:child_process.
-  const result = Bun.spawnSync(["bun", "run", "--filter", target, "build"], {
-    stdio: ["inherit", "inherit", "inherit"],
-  });
-
-  if (result.exitCode !== 0) {
-    process.exit(result.exitCode ?? 1);
-  }
+  // Run using Bun Shell natively. Throws automatically on failure.
+  await Bun.$`bun run --filter ${target} build`;
 }

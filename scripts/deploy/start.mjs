@@ -1,22 +1,27 @@
 #!/usr/bin/env bun
-import { findMonorepoRoot, runCommand } from "./utils.mjs";
+import { findMonorepoRoot } from "./utils/paths.mjs";
+import { log, error } from "./utils/logging.mjs";
 
 const target = process.argv[2];
 
 if (target !== "web" && target !== "api") {
-  console.error(`[Deploy] Error: Invalid target "${target}". Supported targets are "web" and "api".`);
+  error(`Invalid target "${target}". Supported targets are "web" and "api".`);
   process.exit(1);
 }
 
-console.log(`[Deploy] Starting application for target: "${target}"`);
+try {
+  log(`Starting application for target: "${target}"`);
 
-const rootDir = findMonorepoRoot();
-process.chdir(rootDir);
+  const rootDir = findMonorepoRoot();
 
-if (target === "api") {
-  // Start the NestJS backend in production mode (compiled JS entry point)
-  runCommand("bun", ["run", "--filter=api", "start:prod"]);
-} else if (target === "web") {
-  // Start the Next.js web application in production mode
-  runCommand("bun", ["run", "--filter=web", "start"]);
+  if (target === "api") {
+    // Start NestJS backend in production mode (compiled JS entry point)
+    await Bun.$.cwd(rootDir)`bun run --filter=api start:prod`;
+  } else if (target === "web") {
+    // Start Next.js web application in production mode
+    await Bun.$.cwd(rootDir)`bun run --filter=web start`;
+  }
+} catch (err) {
+  error(`Application execution failed: ${err.message}`);
+  process.exit(1);
 }

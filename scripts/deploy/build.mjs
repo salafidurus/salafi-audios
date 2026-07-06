@@ -1,88 +1,55 @@
 #!/usr/bin/env bun
 import fs from "node:fs";
 import path from "node:path";
-import { findMonorepoRoot, runCommand, getTurboVersion } from "./utils.mjs";
+import { findMonorepoRoot } from "./utils/paths.mjs";
+import { overwriteRootWithPrunedWorkspace } from "./utils/filesystem.mjs";
+import { getTurboVersion, validateEnvironment } from "./utils/turbo.mjs";
+import { log, error } from "./utils/logging.mjs";
 
 const target = process.argv[2];
 
 if (target !== "web" && target !== "api") {
-  console.error(`[Deploy] Error: Invalid target "${target}". Supported targets are "web" and "api".`);
+  error(`Invalid target "${target}". Supported targets are "web" and "api".`);
   process.exit(1);
 }
 
-console.log(`[Deploy] Starting build process for target: "${target}"`);
+try {
+  log(`Starting build process for target: "${target}"`);
 
-// 1. Resolve monorepo root and transition working directory
-const rootDir = findMonorepoRoot();
-process.chdir(rootDir);
-console.log(`[Deploy] Monorepo root resolved: ${rootDir}`);
+  // 1. Resolve monorepo root and validate environment
+  const rootDir = findMonorepoRoot();
+  validateEnvironment();
+  log(`Monorepo root resolved: ${rootDir}`);
 
-// 2. Clean previous build workspace output directory if exists
-const outDir = path.join(rootDir, "out");
-if (fs.existsSync(outDir)) {
-  console.log("[Deploy] Cleaning existing out/ directory...");
-  fs.rmSync(outDir, { recursive: true, force: true });
-}
+  // 2. Clean previous build workspace output directory if exists
+  const outDir = path.join(rootDir, "out");
+  if (fs.existsSync(outDir)) {
+    log("Cleaning existing out/ directory...");
+    fs.rmSync(outDir, { recursive: true, force: true });
+  }
 
-// 3. Execute Turborepo prune to isolate target dependencies
-const turboVersion = await getTurboVersion(rootDir);
-const pruneArgs = ["prune", target, "--docker"];
-const turboCmd = turboVersion ? `turbo@${turboVersion}` : "turbo";
+  // 3. Execute Turborepo prune to isolate target dependencies
+  const turboVersion = await getTurboVersion(rootDir);
+  const turboCmd = turboVersion ? `turbo@${turboVersion}` : "turbo";
 
-console.log(`[Deploy] Running turbo prune for "${target}" using turbo version: ${turboVersion || "latest"}`);
-runCommand("bunx", [turboCmd, ...pruneArgs]);
-
-// 4. Overwrite root with the pruned workspace closure
-const outJson = path.join(outDir, "json");
-const outFull = path.join(outDir, "full");
-
-if (!fs.existsSync(outJson) || !fs.existsSync(outFull)) {
-  console.error("[Deploy] Error: Pruned workspace folders are missing inside out/");
-  process.exit(1);
-}
-
-// Identify all unique top-level entries to copy from the pruned outputs
-const prunedEntries = new Set();
-fs.readdirSync(outJson).forEach((item) => prunedEntries.add(item));
-fs.readdirSync(outFull).forEach((item) => prunedEntries.add(item));
-
-console.log(`[Deploy] Cleaving monorepo root. Overwriting entries: ${Array.from(prunedEntries).join(", ")}`);
-
-// Delete node_modules in the root to ensure no dependency pollution/leakage
-console.log("[Deploy] Purging root node_modules for clean installation...");
-fs.rmSync(path.join(rootDir, "node_modules"), { recursive: true, force: true });
-
-// Copy pruned workspaces over the monorepo root
-for (const entry of prunedEntries) {
-  const rootEntryPath = path.join(rootDir, entry);
+  log(`Running turbo prune for "${target}" using turbo version: ${turboVersion || "latest"}`);
   
-  // Safely clean target destination path first
-  fs.rmSync(rootEntryPath, { recursive: true, force: true });
+  // Execute via Bun Shell; throws automatically if command fails
+  await Bun.$`bunx ${turboCmd} prune ${target} --docker`;
 
-  const fullPath = path.join(outFull, entry);
-  const jsonPath = path.join(outJson, entry);
+  // 4. Overwrite root with the pruned workspace closure
+  overwriteRootWithPrunedWorkspace(rootDir, outDir);
 
-  // Copy full source directory/files
-  if (fs.existsSync(fullPath)) {
-    fs.cpSync(fullPath, rootEntryPath, { recursive: true });
-  }
+  // 5. Clean installation of pruned dependencies in the workspace
+  log("Installing pruned dependency closure...");
+  await Bun.$.cwd(rootDir)`bun install --frozen-lockfile`;
 
-  // Overwrite with pruned package.json/lockfile descriptors
-  if (fs.existsSync(jsonPath)) {
-    fs.cpSync(jsonPath, rootEntryPath, { recursive: true });
-  }
+  // 6. Build the target application
+  log(`Building application: "${target}"`);
+  await Bun.$.cwd(rootDir)`bun run build --filter=${target}...`;
+
+  log(`Build process completed successfully for "${target}"!`);
+} catch (err) {
+  error(`Build failed: ${err.message}`);
+  process.exit(1);
 }
-
-// Remove temporary out/ directory to clean up
-console.log("[Deploy] Cleaning up prune artifacts...");
-fs.rmSync(outDir, { recursive: true, force: true });
-
-// 5. Clean installation of pruned dependencies
-console.log("[Deploy] Installing pruned dependency closure...");
-runCommand("bun", ["install", "--frozen-lockfile"]);
-
-// 6. Build the target application
-console.log(`[Deploy] Building application: "${target}"`);
-runCommand("bun", ["run", "build", `--filter=${target}...`]);
-
-console.log(`[Deploy] Build process completed successfully for "${target}"!`);

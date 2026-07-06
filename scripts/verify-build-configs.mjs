@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, statSync } from "node:fs";
+import { readdirSync } from "node:fs";
 import { join } from "node:path";
 
 const repoRoot = process.cwd();
@@ -6,29 +6,35 @@ const packagesDir = join(repoRoot, "packages");
 
 const missingConfigs = [];
 
-for (const entry of readdirSync(packagesDir)) {
-  const packageDir = join(packagesDir, entry);
-  if (!statSync(packageDir).isDirectory()) {
+// Avoid redundant stat calls by reading entries with file types
+const entries = readdirSync(packagesDir, { withFileTypes: true });
+
+for (const dirent of entries) {
+  if (!dirent.isDirectory()) {
     continue;
   }
 
+  const packageDir = join(packagesDir, dirent.name);
   const packageJsonPath = join(packageDir, "package.json");
-  if (!existsSync(packageJsonPath)) {
+  
+  // Check existence and read package.json using native Bun.file
+  const packageJsonFile = Bun.file(packageJsonPath);
+  if (!(await packageJsonFile.exists())) {
     continue;
   }
 
-  // Use Bun.file and top-level await to read package.json
-  const file = Bun.file(packageJsonPath);
-  const packageJson = await file.json();
+  const packageJson = await packageJsonFile.json();
   const buildScript = packageJson?.scripts?.build;
 
   if (buildScript !== "tsc -p tsconfig.build.json") {
     continue;
   }
 
+  // Check existence of tsconfig.build.json using Bun.file
   const buildConfigPath = join(packageDir, "tsconfig.build.json");
-  if (!existsSync(buildConfigPath)) {
-    missingConfigs.push(`packages/${entry}/tsconfig.build.json`);
+  const buildConfigFile = Bun.file(buildConfigPath);
+  if (!(await buildConfigFile.exists())) {
+    missingConfigs.push(`packages/${dirent.name}/tsconfig.build.json`);
   }
 }
 
