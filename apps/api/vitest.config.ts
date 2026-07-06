@@ -3,6 +3,7 @@ import swc from 'unplugin-swc';
 import path from 'node:path';
 
 export default defineConfig({
+  oxc: false,
   resolve: {
     tsconfigPaths: true,
     alias: {
@@ -20,7 +21,6 @@ export default defineConfig({
     clearMocks: true,
     retry: 2,
     passWithNoTests: true,
-    oxc: false,
     include: ['src/**/*.spec.ts'],
   },
 });
