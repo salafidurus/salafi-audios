@@ -28,9 +28,7 @@ export function LibrarySavedDesktopScreen() {
   return (
     <ScreenView>
       <div className={styles.container}>
-        <h2 className={styles.title}>
-          {t("library.saved", "Saved")}
-        </h2>
+        <h2 className={styles.title}>{t("library.saved", "Saved")}</h2>
 
         {isFetching && items.length === 0 ? (
           <div className={styles.loading}>
@@ -40,10 +38,7 @@ export function LibrarySavedDesktopScreen() {
           </div>
         ) : items.length === 0 ? (
           <div className={styles.emptyState}>
-            {t(
-              "library.emptySaved",
-              "No saved lectures yet. Save lectures to listen to later.",
-            )}
+            {t("library.emptySaved", "No saved lectures yet. Save lectures to listen to later.")}
           </div>
         ) : (
           <div className={styles.list}>

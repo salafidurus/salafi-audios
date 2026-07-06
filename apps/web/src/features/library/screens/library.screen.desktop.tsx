@@ -28,9 +28,7 @@ export function LibraryDesktopScreen() {
   return (
     <ScreenView>
       <div className={styles.container}>
-        <h2 className={styles.title}>
-          {t("library.inProgress", "In Progress")}
-        </h2>
+        <h2 className={styles.title}>{t("library.inProgress", "In Progress")}</h2>
 
         {isFetching && items.length === 0 ? (
           <div className={styles.loading}>

@@ -93,7 +93,9 @@
 }
 
 .chevron {
-  transition: transform 150ms ease, color 150ms ease;
+  transition:
+    transform 150ms ease,
+    color 150ms ease;
   color: var(--content-muted);
 }
 

@@ -26,9 +26,7 @@ export function UserRow({ user }: UserRowProps): ReactNode {
       <td className={styles.cell}>
         <div className={styles.permissions}>
           {user.permissions.length > 0 ? (
-            user.permissions.map((perm) => (
-              <PermissionBadge key={perm} permission={perm} />
-            ))
+            user.permissions.map((perm) => <PermissionBadge key={perm} permission={perm} />)
           ) : (
             <span className={styles.noPerms}>
               <ShieldOff className={styles.noPermsIcon} />
