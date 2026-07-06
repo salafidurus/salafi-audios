@@ -1,0 +1,47 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px var(--space-scale-xs);
+  border-radius: var(--radius-scale-sm);
+  font-size: var(--typo-xs-font-size);
+  font-weight: 600;
+}
+
+.icon {
+  display: inline-flex;
+  width: 12px;
+  height: 12px;
+}
+
+/* Role variant styles */
+.admin {
+  background: var(--surface-primary-subtle);
+  color: var(--content-primary-strong);
+}
+
+.user {
+  background: var(--surface-subtle);
+  color: var(--content-muted);
+}
+
+/* Status variant styles */
+.primary {
+  background: var(--surface-primary-subtle);
+  color: var(--content-primary-strong);
+}
+
+.muted {
+  background: var(--surface-subtle);
+  color: var(--content-muted);
+}
+
+.success {
+  background: var(--surface-success-subtle);
+  color: var(--content-success-strong);
+}
+
+.warning {
+  background: var(--surface-warning-subtle);
+  color: var(--content-warning-strong);
+}
