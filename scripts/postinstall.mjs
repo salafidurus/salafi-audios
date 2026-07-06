@@ -1,5 +1,3 @@
-import { spawnSync } from "node:child_process";
-
 const buildTargets = [
   // Keep postinstall minimal for EAS and local fresh installs.
   // Only build the workspace packages that must exist as install-time
@@ -7,18 +5,15 @@ const buildTargets = [
   "@sd/design-tokens",
 ];
 
-const cmd = "bun";
-
 for (const target of buildTargets) {
   console.log(`\n> bun run --filter ${target} build`);
 
-  // Run without shell: true to avoid shell-spawn vulnerabilities.
-  const args = ["run", "--filter", target, "build"];
-  const result = spawnSync(cmd, args, {
-    stdio: "inherit",
+  // Run using Bun.spawnSync natively without requiring node:child_process.
+  const result = Bun.spawnSync(["bun", "run", "--filter", target, "build"], {
+    stdio: ["inherit", "inherit", "inherit"],
   });
 
-  if (result.status !== 0) {
-    process.exit(result.status ?? 1);
+  if (result.exitCode !== 0) {
+    process.exit(result.exitCode ?? 1);
   }
 }

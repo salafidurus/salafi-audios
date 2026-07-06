@@ -91,3 +91,40 @@ CI enforces these automatically; reviewers should verify all checks are green be
 ### Playwright Browser Caching in CI
 
 The CI workflow caches Playwright browser binaries at `$GITHUB_WORKSPACE/.cache/ms-playwright`, keyed on `bun.lock`. When Renovate bumps `playwright` or `@playwright/test`, the lockfile hash changes, causing a cache miss. The CI job detects this and re-installs browsers automatically (`playwright install --with-deps`). No manual intervention is required — the next run after a Playwright bump simply takes slightly longer.
+
+## 8. Production Deployment Configuration
+
+To reduce dependency footprint and prevent Out-of-Memory (OOM) errors during build stages, production deployments utilize Turborepo's pruning mechanism. Unused workspaces and packages are stripped before dependency installation begins.
+
+### 8.1 Vercel (Next.js Web Deployment)
+
+- **Root Directory**: `apps/web` (configured under project settings in Vercel)
+- **Install Command**: Enable the override switch in Vercel settings and set it to:
+
+```bash
+echo "Skipping default install"
+```
+
+- **Build Command**: Enable the override switch and set it to:
+
+```bash
+bun ../../scripts/deploy/build.mjs web
+```
+
+This ensures that the build script runs from the repository root (dynamically resolved) to prune, install, and compile the web workspace.
+
+### 8.2 Render (NestJS API Deployment)
+
+Configure the Render Web Service with the following values:
+
+- **Build Command**:
+
+```bash
+bun scripts/deploy/build.mjs api
+```
+
+- **Start Command**:
+
+```bash
+bun scripts/deploy/start.mjs api
+```

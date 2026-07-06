@@ -1,4 +1,4 @@
-import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const repoRoot = process.cwd();
@@ -17,7 +17,9 @@ for (const entry of readdirSync(packagesDir)) {
     continue;
   }
 
-  const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
+  // Use Bun.file and top-level await to read package.json
+  const file = Bun.file(packageJsonPath);
+  const packageJson = await file.json();
   const buildScript = packageJson?.scripts?.build;
 
   if (buildScript !== "tsc -p tsconfig.build.json") {
