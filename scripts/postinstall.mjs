@@ -1,4 +1,6 @@
-import { spawnSync } from "node:child_process";
+import { log, setPrefix } from "./utils/logging.mjs";
+
+setPrefix("[Postinstall]");
 
 const buildTargets = [
   // Keep postinstall minimal for EAS and local fresh installs.
@@ -7,18 +9,9 @@ const buildTargets = [
   "@sd/design-tokens",
 ];
 
-const cmd = "bun";
-
 for (const target of buildTargets) {
-  console.log(`\n> bun run --filter ${target} build`);
+  log(`Executing postinstall compile for: ${target}`);
 
-  // Run without shell: true to avoid shell-spawn vulnerabilities.
-  const args = ["run", "--filter", target, "build"];
-  const result = spawnSync(cmd, args, {
-    stdio: "inherit",
-  });
-
-  if (result.status !== 0) {
-    process.exit(result.status ?? 1);
-  }
+  // Run using Bun Shell natively. Throws automatically on failure.
+  await Bun.$`bun run --filter ${target} build`;
 }
