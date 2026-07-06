@@ -2,6 +2,14 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended", ":separatePatchReleases", ":separateMultipleMinorReleases"],
   "timezone": "UTC",
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/bower_components/**",
+    ".agents/**",
+    ".gemini/**",
+    ".worktrees/**",
+    ".worktree/**"
+  ],
   "schedule": ["before 7am every 2 day"],
   "prConcurrentLimit": 10,
   "prHourlyLimit": 10,

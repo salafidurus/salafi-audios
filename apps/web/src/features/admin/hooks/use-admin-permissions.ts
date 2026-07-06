@@ -6,7 +6,10 @@ import { useAuth } from "@/core/auth";
 type MyPermissionsDto = { permissions: AdminPermission[] };
 
 export function useAdminPermissions(
-  options?: Omit<UseQueryOptions<MyPermissionsDto, Error, MyPermissionsDto, QueryKey>, "queryKey" | "queryFn">
+  options?: Omit<
+    UseQueryOptions<MyPermissionsDto, Error, MyPermissionsDto, QueryKey>,
+    "queryKey" | "queryFn"
+  >,
 ) {
   const { isAuthenticated } = useAuth();
 
@@ -19,7 +22,7 @@ export function useAdminPermissions(
       }),
     {
       ...options,
-      enabled: isAuthenticated && (options?.enabled !== false),
+      enabled: isAuthenticated && options?.enabled !== false,
     },
   );
 }

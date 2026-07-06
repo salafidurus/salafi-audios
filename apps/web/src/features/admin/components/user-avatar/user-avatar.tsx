@@ -10,14 +10,7 @@ type UserAvatarProps = {
 export function UserAvatar({ image, name }: UserAvatarProps): ReactNode {
   if (image) {
     return (
-      <Image
-        src={image}
-        alt=""
-        className={styles.avatar}
-        width={32}
-        height={32}
-        unoptimized
-      />
+      <Image src={image} alt="" className={styles.avatar} width={32} height={32} unoptimized />
     );
   }
 

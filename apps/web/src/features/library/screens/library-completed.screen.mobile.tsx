@@ -28,9 +28,7 @@ export function LibraryCompletedMobileScreen() {
   return (
     <ScreenView>
       <div className={styles.container}>
-        <h2 className={styles.title}>
-          {t("library.completed", "Completed")}
-        </h2>
+        <h2 className={styles.title}>{t("library.completed", "Completed")}</h2>
 
         {isFetching && items.length === 0 ? (
           <div className={styles.loading}>

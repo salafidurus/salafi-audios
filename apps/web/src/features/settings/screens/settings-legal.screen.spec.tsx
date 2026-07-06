@@ -10,7 +10,15 @@ vi.mock("@/shared/components/ScreenView/ScreenView", () => ({
 }));
 
 vi.mock("@/shared/components/SettingsSection/SettingsSection", () => ({
-  SettingsSection: ({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) => (
+  SettingsSection: ({
+    title,
+    description,
+    children,
+  }: {
+    title: string;
+    description?: string;
+    children: React.ReactNode;
+  }) => (
     <section>
       <h2>{title}</h2>
       {description && <p>{description}</p>}
@@ -20,7 +28,15 @@ vi.mock("@/shared/components/SettingsSection/SettingsSection", () => ({
 }));
 
 vi.mock("@/shared/components/SettingsRow/SettingsRow", () => ({
-  SettingsRow: ({ label, sublabel, children }: { label: string; sublabel?: string; children?: React.ReactNode }) => (
+  SettingsRow: ({
+    label,
+    sublabel,
+    children,
+  }: {
+    label: string;
+    sublabel?: string;
+    children?: React.ReactNode;
+  }) => (
     <div>
       <span>{label}</span>
       {sublabel && <span>{sublabel}</span>}

@@ -32,7 +32,7 @@ describe("ScholarHeader", () => {
 
   it("renders avatar image when imageUrl is present", () => {
     const { container } = render(
-      <ScholarHeader scholar={{ ...mockScholar, imageUrl: "/images/binbaz.jpg" }} />
+      <ScholarHeader scholar={{ ...mockScholar, imageUrl: "/images/binbaz.jpg" }} />,
     );
     const img = container.querySelector("img");
     expect(img).toBeInTheDocument();

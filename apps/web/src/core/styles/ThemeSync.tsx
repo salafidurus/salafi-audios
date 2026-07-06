@@ -8,9 +8,7 @@ const THEME_KEY = "theme-preference";
 const THEME_CHANGE_EVENT = "theme-change";
 
 function applyTheme(preference: ThemePreference, mediaQuery: MediaQueryList) {
-  const resolved = preference === "system"
-    ? (mediaQuery.matches ? "dark" : "light")
-    : preference;
+  const resolved = preference === "system" ? (mediaQuery.matches ? "dark" : "light") : preference;
   document.documentElement.setAttribute("data-theme", resolved);
 }
 

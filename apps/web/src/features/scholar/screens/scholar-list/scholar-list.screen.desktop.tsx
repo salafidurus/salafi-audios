@@ -46,4 +46,3 @@ export function ScholarListDesktopScreen({ onSelectScholar }: ScholarListDesktop
     </ScreenView>
   );
 }
-

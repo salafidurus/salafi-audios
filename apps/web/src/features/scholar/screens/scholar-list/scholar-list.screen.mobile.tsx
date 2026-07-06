@@ -46,4 +46,3 @@ export function ScholarListMobileScreen({ onSelectScholar }: ScholarListMobileSc
     </ScreenView>
   );
 }
-

@@ -24,9 +24,7 @@ export function UserCard({ user }: UserCardProps): ReactNode {
 
       <div className={styles.permissions}>
         {user.permissions.length > 0 ? (
-          user.permissions.map((perm) => (
-            <PermissionBadge key={perm} permission={perm} />
-          ))
+          user.permissions.map((perm) => <PermissionBadge key={perm} permission={perm} />)
         ) : (
           <span className={styles.noPerms}>
             <ShieldOff className={styles.noPermsIcon} />
@@ -35,9 +33,7 @@ export function UserCard({ user }: UserCardProps): ReactNode {
         )}
       </div>
 
-      <div className={styles.joined}>
-        Joined {new Date(user.createdAt).toLocaleDateString()}
-      </div>
+      <div className={styles.joined}>Joined {new Date(user.createdAt).toLocaleDateString()}</div>
     </div>
   );
 }

@@ -73,11 +73,7 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
             className={styles.avatar}
           />
         ) : (
-          <div
-            className={styles.avatarFallback}
-            role="img"
-            aria-label={scholar.name}
-          >
+          <div className={styles.avatarFallback} role="img" aria-label={scholar.name}>
             {initial}
           </div>
         )}

@@ -93,10 +93,7 @@ export function SettingsGeneralScreen() {
           </SettingsRow>
         </SettingsSection>
 
-        <SettingsSection
-          title="Notifications"
-          description="Manage what notifications you receive."
-        >
+        <SettingsSection title="Notifications" description="Manage what notifications you receive.">
           <SettingsRow label="Enable Notifications" sublabel="Master toggle for all notifications">
             <label className={styles.toggle}>
               <input

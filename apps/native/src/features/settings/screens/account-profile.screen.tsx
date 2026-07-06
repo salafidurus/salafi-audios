@@ -96,7 +96,9 @@ export function AccountProfileScreen(_props: AccountProfileScreenProps) {
   if (!profile) {
     return (
       <View style={styles.centered}>
-        <AppText variant="bodyMd">{t("account.profileUnavailable", "Profile not available")}</AppText>
+        <AppText variant="bodyMd">
+          {t("account.profileUnavailable", "Profile not available")}
+        </AppText>
       </View>
     );
   }
