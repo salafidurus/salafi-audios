@@ -102,7 +102,7 @@ To reduce dependency footprint and prevent Out-of-Memory (OOM) errors during bui
 - **Install Command**: Enable the override switch in Vercel settings and set it to:
 
 ```bash
-echo "Skipping default install"
+bun ../../scripts/deploy/install.mjs web
 ```
 
 - **Build Command**: Enable the override switch and set it to:

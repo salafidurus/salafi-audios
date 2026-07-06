@@ -60,3 +60,8 @@ packages/db/src/generated/
 # Kilo config and state
 .kilo/
 .kilocode/
+
+# Deployment artifacts
+.pruned-target
+out/
+

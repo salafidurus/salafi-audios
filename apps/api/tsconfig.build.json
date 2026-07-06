@@ -3,6 +3,7 @@
   "extends": "../../tsconfig.nest.json",
   "compilerOptions": {
     "declaration": false,
+    "types": ["node", "bun-types"],
     "removeComments": true,
     "sourceMap": true,
     "outDir": "./dist",
