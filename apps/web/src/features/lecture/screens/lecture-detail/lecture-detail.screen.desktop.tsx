@@ -11,6 +11,7 @@ import { LectureSaveButton } from "@/features/lecture/components/lecture-save-bu
 import { pickContentField } from "@sd/core-i18n";
 import { useShowOriginalContent } from "@/features/i18n/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
+import styles from "./lecture-detail.screen.desktop.module.css";
 
 export type LectureDetailDesktopScreenProps = {
   id: string;
@@ -44,16 +45,16 @@ export function LectureDetailDesktopScreen({ id }: LectureDetailDesktopScreenPro
 
   return (
     <ScreenView>
-      <div style={{ maxWidth: 960, margin: "0 auto", display: "flex", gap: 40 }}>
+      <div className={styles.layout}>
         {/* Left column: content */}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div className={styles.contentColumn}>
           <AppText variant="displayMd">{title}</AppText>
           <LectureMeta lecture={lecture} />
           <TopicChips topics={lecture.topics} />
 
           {description && (
-            <div style={{ marginTop: 20 }}>
-              <AppText variant="bodyMd" style={{ lineHeight: "1.7" }}>
+            <div className={styles.descriptionSection}>
+              <AppText variant="bodyMd" className={styles.descriptionText}>
                 {description}
               </AppText>
             </div>
@@ -63,7 +64,7 @@ export function LectureDetailDesktopScreen({ id }: LectureDetailDesktopScreenPro
         </div>
 
         {/* Right column: play action */}
-        <div style={{ width: 240, flexShrink: 0, paddingTop: 8 }}>
+        <div className={styles.actionColumn}>
           <LecturePlayButton lecture={lecture} />
           <LectureSaveButton lectureId={lecture.id} />
         </div>

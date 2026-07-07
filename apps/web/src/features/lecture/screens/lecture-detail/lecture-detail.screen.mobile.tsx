@@ -11,6 +11,7 @@ import { LectureSaveButton } from "@/features/lecture/components/lecture-save-bu
 import { pickContentField } from "@sd/core-i18n";
 import { useShowOriginalContent } from "@/features/i18n/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
+import styles from "./lecture-detail.screen.mobile.module.css";
 
 export type LectureDetailMobileScreenProps = {
   id: string;
@@ -48,14 +49,14 @@ export function LectureDetailMobileScreen({ id }: LectureDetailMobileScreenProps
       <LectureMeta lecture={lecture} />
       <TopicChips topics={lecture.topics} />
 
-      <div style={{ marginTop: 20 }}>
+      <div className={styles.actionSection}>
         <LecturePlayButton lecture={lecture} />
         <LectureSaveButton lectureId={lecture.id} />
       </div>
 
       {description && (
-        <div style={{ marginTop: 16 }}>
-          <AppText variant="bodyMd" style={{ lineHeight: "1.7" }}>
+        <div className={styles.descriptionSection}>
+          <AppText variant="bodyMd" className={styles.descriptionText}>
             {description}
           </AppText>
         </div>

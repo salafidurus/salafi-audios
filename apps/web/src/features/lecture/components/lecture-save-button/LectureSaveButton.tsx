@@ -5,6 +5,7 @@ import { useProgressStore } from "@sd/domain-audio";
 import { Button } from "@/shared/components/Button/Button";
 import { useAuth } from "@/core/auth";
 import { AuthModal } from "@/features/auth";
+import styles from "./LectureSaveButton.module.css";
 
 export type LectureSaveButtonProps = {
   lectureId: string;
@@ -36,7 +37,7 @@ export function LectureSaveButton({ lectureId }: LectureSaveButtonProps) {
         variant={isSaved ? "surface" : "outline"}
         size="lg"
         onClick={handleClick}
-        style={{ width: "100%", marginTop: 8 }}
+        className={styles.button}
       >
         {isSaved ? "✓ Saved" : "Save"}
       </Button>

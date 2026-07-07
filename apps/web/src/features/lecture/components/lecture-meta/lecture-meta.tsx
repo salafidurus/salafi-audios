@@ -3,6 +3,7 @@
 import Image from "next/image";
 import type { ListingDetailDto } from "@sd/core-contracts";
 import { AppText } from "@/shared/components/AppText/AppText";
+import styles from "./lecture-meta.module.css";
 
 function formatDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -25,20 +26,9 @@ export type LectureMetaProps = {
 
 export function LectureMeta({ lecture }: LectureMetaProps) {
   return (
-    <div
-      style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12, marginTop: 12 }}
-    >
+    <div className={styles.container}>
       {/* Scholar chip */}
-      <div
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 8,
-          padding: "4px 12px 4px 4px",
-          borderRadius: 999,
-          background: "var(--surface-subtle, #f5f5f5)",
-        }}
-      >
+      <div className={styles.scholarChip}>
         {lecture.scholar.imageUrl && (
           <Image
             src={lecture.scholar.imageUrl}
@@ -46,7 +36,7 @@ export function LectureMeta({ lecture }: LectureMetaProps) {
             width={28}
             height={28}
             unoptimized
-            style={{ borderRadius: 14, objectFit: "cover" }}
+            className={styles.scholarImage}
           />
         )}
         <AppText variant="labelMd">{lecture.scholar.name}</AppText>
@@ -54,21 +44,21 @@ export function LectureMeta({ lecture }: LectureMetaProps) {
 
       {/* Published date */}
       {lecture.publishedAt && (
-        <AppText variant="bodySm" style={{ color: "var(--content-muted, #888)" }}>
+        <AppText variant="bodySm" className={styles.mutedText}>
           {formatDate(lecture.publishedAt)}
         </AppText>
       )}
 
       {/* Duration */}
       {lecture.durationSeconds != null && (
-        <AppText variant="bodySm" style={{ color: "var(--content-muted, #888)" }}>
+        <AppText variant="bodySm" className={styles.mutedText}>
           {formatDuration(lecture.durationSeconds)}
         </AppText>
       )}
 
       {/* Language */}
       {lecture.language && (
-        <AppText variant="bodySm" style={{ color: "var(--content-muted, #888)" }}>
+        <AppText variant="bodySm" className={styles.mutedText}>
           {lecture.language}
         </AppText>
       )}

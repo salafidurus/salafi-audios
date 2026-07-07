@@ -6,6 +6,7 @@ import { useAudio } from "@sd/domain-audio";
 import type { Track } from "@sd/domain-audio";
 import { audioService } from "@/features/audio";
 import { Button } from "@/shared/components/Button/Button";
+import styles from "./LecturePlayButton.module.css";
 
 export type LecturePlayButtonProps = {
   lecture: ListingDetailDto;
@@ -64,7 +65,7 @@ export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
   const label = isCurrentLecture && isPlaying ? "⏸ Pause Lecture" : "▶ Play Lecture";
 
   return (
-    <Button variant="primary" size="lg" onClick={handlePlay} style={{ width: "100%" }}>
+    <Button variant="primary" size="lg" onClick={handlePlay} className={styles.button}>
       {label}
     </Button>
   );
