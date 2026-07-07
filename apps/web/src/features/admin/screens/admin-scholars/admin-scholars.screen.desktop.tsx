@@ -9,6 +9,7 @@ import {
   updateScholar,
   type AdminScholarInput,
 } from "@/features/admin/api/admin.api";
+import styles from "./admin-scholars.screen.desktop.module.css";
 
 type ScholarsListDto = { scholars: ScholarListItemDto[] };
 
@@ -42,7 +43,7 @@ export function AdminScholarsDesktopScreen() {
   if (isFetching) {
     return (
       <ScreenView>
-        <div style={{ textAlign: "center" }}>Loading scholars…</div>
+        <div className={styles.loading}>Loading scholars…</div>
       </ScreenView>
     );
   }
@@ -51,16 +52,9 @@ export function AdminScholarsDesktopScreen() {
 
   return (
     <ScreenView>
-      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 24,
-          }}
-        >
-          <h1 style={{ fontSize: 28, fontWeight: 700 }}>Manage Scholars</h1>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h1 className={styles.pageTitle}>Manage Scholars</h1>
           <button
             type="button"
             onClick={() => {
@@ -68,57 +62,46 @@ export function AdminScholarsDesktopScreen() {
               setEditing(null);
               setFormData({ name: "", slug: "" });
             }}
-            style={{
-              padding: "8px 16px",
-              borderRadius: 8,
-              border: "none",
-              background: "#2563eb",
-              color: "#fff",
-              cursor: "pointer",
-            }}
+            className={styles.addButton}
           >
             + Add Scholar
           </button>
         </div>
 
         {(creating || editing) && (
-          <div
-            style={{ padding: 16, border: "1px solid #e0e0e0", borderRadius: 8, marginBottom: 24 }}
-          >
-            <h3 style={{ marginBottom: 12 }}>{editing ? "Edit Scholar" : "New Scholar"}</h3>
-            <div
-              style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}
-            >
+          <div className={styles.form}>
+            <h3 className={styles.formTitle}>{editing ? "Edit Scholar" : "New Scholar"}</h3>
+            <div className={styles.formGrid}>
               <input
                 aria-label="Scholar name"
                 placeholder="Name"
                 value={formData.name}
                 onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
-                style={{ padding: 8, border: "1px solid #ccc", borderRadius: 4 }}
+                className={styles.input}
               />
               <input
                 aria-label="Scholar slug"
                 placeholder="Slug"
                 value={formData.slug}
                 onChange={(e) => setFormData((p) => ({ ...p, slug: e.target.value }))}
-                style={{ padding: 8, border: "1px solid #ccc", borderRadius: 4 }}
+                className={styles.input}
               />
               <input
                 aria-label="Scholar bio"
                 placeholder="Bio"
                 value={formData.bio ?? ""}
                 onChange={(e) => setFormData((p) => ({ ...p, bio: e.target.value }))}
-                style={{ padding: 8, border: "1px solid #ccc", borderRadius: 4 }}
+                className={styles.input}
               />
               <input
                 aria-label="Scholar image URL"
                 placeholder="Image URL"
                 value={formData.imageUrl ?? ""}
                 onChange={(e) => setFormData((p) => ({ ...p, imageUrl: e.target.value }))}
-                style={{ padding: 8, border: "1px solid #ccc", borderRadius: 4 }}
+                className={styles.input}
               />
             </div>
-            <div style={{ display: "flex", gap: 16, marginBottom: 12 }}>
+            <div className={styles.checkboxGroup}>
               <label>
                 <input
                   type="checkbox"
@@ -144,19 +127,12 @@ export function AdminScholarsDesktopScreen() {
                 Active
               </label>
             </div>
-            <div style={{ display: "flex", gap: 8 }}>
+            <div className={styles.buttonGroup}>
               <button
                 type="button"
                 onClick={handleSave}
                 disabled={saving}
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: 8,
-                  border: "none",
-                  background: "#16a34a",
-                  color: "#fff",
-                  cursor: "pointer",
-                }}
+                className={styles.saveButton}
               >
                 {saving ? "Saving…" : "Save"}
               </button>
@@ -166,13 +142,7 @@ export function AdminScholarsDesktopScreen() {
                   setCreating(false);
                   setEditing(null);
                 }}
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: 8,
-                  border: "1px solid #ccc",
-                  background: "#fff",
-                  cursor: "pointer",
-                }}
+                className={styles.cancelButton}
               >
                 Cancel
               </button>
@@ -180,24 +150,24 @@ export function AdminScholarsDesktopScreen() {
           </div>
         )}
 
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <table className={styles.table}>
           <thead>
-            <tr style={{ borderBottom: "2px solid #e0e0e0", textAlign: "left" }}>
-              <th style={{ padding: 8 }}>Name</th>
-              <th style={{ padding: 8 }}>Slug</th>
-              <th style={{ padding: 8 }}>Kibar</th>
-              <th style={{ padding: 8 }}>Lectures</th>
-              <th style={{ padding: 8 }}>Actions</th>
+            <tr className={styles.tableHeader}>
+              <th className={styles.tableHead}>Name</th>
+              <th className={styles.tableHead}>Slug</th>
+              <th className={styles.tableHead}>Kibar</th>
+              <th className={styles.tableHead}>Lectures</th>
+              <th className={styles.tableHead}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {scholars.map((s) => (
-              <tr key={s.id} style={{ borderBottom: "1px solid #f0f0f0" }}>
-                <td style={{ padding: 8 }}>{s.name}</td>
-                <td style={{ padding: 8, color: "#666" }}>{s.slug}</td>
-                <td style={{ padding: 8 }}>{s.isKibar ? "Yes" : "No"}</td>
-                <td style={{ padding: 8 }}>{s.lectureCount}</td>
-                <td style={{ padding: 8 }}>
+              <tr key={s.id} className={styles.tableRow}>
+                <td className={styles.tableCell}>{s.name}</td>
+                <td className={`${styles.tableCell} ${styles.tableCellMuted}`}>{s.slug}</td>
+                <td className={styles.tableCell}>{s.isKibar ? "Yes" : "No"}</td>
+                <td className={styles.tableCell}>{s.lectureCount}</td>
+                <td className={styles.tableCell}>
                   <button
                     type="button"
                     onClick={() => {
@@ -205,13 +175,7 @@ export function AdminScholarsDesktopScreen() {
                       setCreating(false);
                       setFormData({ name: s.name, slug: s.slug, isKibar: s.isKibar });
                     }}
-                    style={{
-                      padding: "4px 12px",
-                      borderRadius: 4,
-                      border: "1px solid #ccc",
-                      background: "#fff",
-                      cursor: "pointer",
-                    }}
+                    className={styles.editButton}
                   >
                     Edit
                   </button>
