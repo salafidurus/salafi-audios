@@ -4,6 +4,7 @@ import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contract
 import type { LiveSessionDeltaDto } from "@sd/core-contracts";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { updateLiveSessionStatus } from "@/features/admin/api/admin.api";
+import styles from "./admin-livestreams.screen.desktop.module.css";
 
 type Session = LiveSessionDeltaDto["sessions"][number];
 
@@ -13,49 +14,27 @@ type SessionRowProps = {
 };
 
 function SessionRow({ session, onStatusChange }: SessionRowProps) {
+  const getStatusBadgeClass = () => {
+    if (session.status === "live") return styles.statusLive;
+    if (session.status === "scheduled") return styles.statusScheduled;
+    return styles.statusEnded;
+  };
+
   return (
-    <tr style={{ borderBottom: "1px solid #f0f0f0" }}>
-      <td style={{ padding: 8 }}>{session.title ?? "Untitled"}</td>
-      <td style={{ padding: 8 }}>{session.channelDisplayName}</td>
-      <td style={{ padding: 8 }}>{session.scholarName ?? "—"}</td>
-      <td style={{ padding: 8 }}>
-        <span
-          style={{
-            padding: "2px 8px",
-            borderRadius: 4,
-            fontSize: 12,
-            background:
-              session.status === "live"
-                ? "#dcfce7"
-                : session.status === "scheduled"
-                  ? "#dbeafe"
-                  : "#f3f4f6",
-            color:
-              session.status === "live"
-                ? "#16a34a"
-                : session.status === "scheduled"
-                  ? "#2563eb"
-                  : "#666",
-          }}
-        >
-          {session.status}
-        </span>
+    <tr className={styles.tableRow}>
+      <td className={styles.tableCell}>{session.title ?? "Untitled"}</td>
+      <td className={styles.tableCell}>{session.channelDisplayName}</td>
+      <td className={styles.tableCell}>{session.scholarName ?? "—"}</td>
+      <td className={styles.tableCell}>
+        <span className={`${styles.statusBadge} ${getStatusBadgeClass()}`}>{session.status}</span>
       </td>
-      <td style={{ padding: 8 }}>
-        <div style={{ display: "flex", gap: 4 }}>
+      <td className={styles.tableCell}>
+        <div className={styles.actionButtons}>
           {session.status === "scheduled" && (
             <button
               type="button"
               onClick={() => onStatusChange(session.id, "live")}
-              style={{
-                padding: "4px 8px",
-                borderRadius: 4,
-                border: "none",
-                background: "#16a34a",
-                color: "#fff",
-                cursor: "pointer",
-                fontSize: 12,
-              }}
+              className={styles.goLiveButton}
             >
               Go Live
             </button>
@@ -64,15 +43,7 @@ function SessionRow({ session, onStatusChange }: SessionRowProps) {
             <button
               type="button"
               onClick={() => onStatusChange(session.id, "ended")}
-              style={{
-                padding: "4px 8px",
-                borderRadius: 4,
-                border: "none",
-                background: "#dc2626",
-                color: "#fff",
-                cursor: "pointer",
-                fontSize: 12,
-              }}
+              className={styles.endButton}
             >
               End
             </button>
@@ -81,14 +52,7 @@ function SessionRow({ session, onStatusChange }: SessionRowProps) {
             <button
               type="button"
               onClick={() => onStatusChange(session.id, "scheduled")}
-              style={{
-                padding: "4px 8px",
-                borderRadius: 4,
-                border: "1px solid #ccc",
-                background: "#fff",
-                cursor: "pointer",
-                fontSize: 12,
-              }}
+              className={styles.rescheduleButton}
             >
               Reschedule
             </button>
@@ -136,7 +100,7 @@ export function AdminLivestreamsDesktopScreen() {
   if (loadingActive || loadingScheduled || loadingEnded) {
     return (
       <ScreenView>
-        <div style={{ textAlign: "center" }}>Loading live sessions…</div>
+        <div className={styles.loading}>Loading live sessions…</div>
       </ScreenView>
     );
   }
@@ -147,20 +111,20 @@ export function AdminLivestreamsDesktopScreen() {
 
   return (
     <ScreenView>
-      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-        <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 24 }}>Manage Livestreams</h1>
+      <div className={styles.container}>
+        <h1 className={styles.pageTitle}>Manage Livestreams</h1>
 
-        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 12, color: "#16a34a" }}>
+        <h2 className={`${styles.sectionTitle} ${styles.activeSectionTitle}`}>
           Active ({active.length})
         </h2>
-        <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 32 }}>
-          <thead>
-            <tr style={{ borderBottom: "2px solid #e0e0e0", textAlign: "left" }}>
-              <th style={{ padding: 8 }}>Title</th>
-              <th style={{ padding: 8 }}>Channel</th>
-              <th style={{ padding: 8 }}>Scholar</th>
-              <th style={{ padding: 8 }}>Status</th>
-              <th style={{ padding: 8 }}>Actions</th>
+        <table className={styles.table}>
+          <thead className={styles.tableHeader}>
+            <tr>
+              <th className={styles.tableHead}>Title</th>
+              <th className={styles.tableHead}>Channel</th>
+              <th className={styles.tableHead}>Scholar</th>
+              <th className={styles.tableHead}>Status</th>
+              <th className={styles.tableHead}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -170,17 +134,17 @@ export function AdminLivestreamsDesktopScreen() {
           </tbody>
         </table>
 
-        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 12, color: "#2563eb" }}>
+        <h2 className={`${styles.sectionTitle} ${styles.scheduledSectionTitle}`}>
           Scheduled ({scheduled.length})
         </h2>
-        <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 32 }}>
-          <thead>
-            <tr style={{ borderBottom: "2px solid #e0e0e0", textAlign: "left" }}>
-              <th style={{ padding: 8 }}>Title</th>
-              <th style={{ padding: 8 }}>Channel</th>
-              <th style={{ padding: 8 }}>Scholar</th>
-              <th style={{ padding: 8 }}>Status</th>
-              <th style={{ padding: 8 }}>Actions</th>
+        <table className={styles.table}>
+          <thead className={styles.tableHeader}>
+            <tr>
+              <th className={styles.tableHead}>Title</th>
+              <th className={styles.tableHead}>Channel</th>
+              <th className={styles.tableHead}>Scholar</th>
+              <th className={styles.tableHead}>Status</th>
+              <th className={styles.tableHead}>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -190,17 +154,17 @@ export function AdminLivestreamsDesktopScreen() {
           </tbody>
         </table>
 
-        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 12, color: "#666" }}>
+        <h2 className={`${styles.sectionTitle} ${styles.endedSectionTitle}`}>
           Ended ({ended.length})
         </h2>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ borderBottom: "2px solid #e0e0e0", textAlign: "left" }}>
-              <th style={{ padding: 8 }}>Title</th>
-              <th style={{ padding: 8 }}>Channel</th>
-              <th style={{ padding: 8 }}>Scholar</th>
-              <th style={{ padding: 8 }}>Status</th>
-              <th style={{ padding: 8 }}>Actions</th>
+        <table className={styles.table}>
+          <thead className={styles.tableHeader}>
+            <tr>
+              <th className={styles.tableHead}>Title</th>
+              <th className={styles.tableHead}>Channel</th>
+              <th className={styles.tableHead}>Scholar</th>
+              <th className={styles.tableHead}>Status</th>
+              <th className={styles.tableHead}>Actions</th>
             </tr>
           </thead>
           <tbody>

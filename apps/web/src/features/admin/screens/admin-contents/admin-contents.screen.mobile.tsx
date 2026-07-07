@@ -1,10 +1,12 @@
 "use client";
 
+import styles from "./admin-contents.screen.mobile.module.css";
+
 export function AdminContentsMobileScreen() {
   return (
-    <div style={{ padding: 16 }}>
-      <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 16 }}>Admin Contents</h1>
-      <p style={{ color: "#666" }}>
+    <div className={styles.container}>
+      <h1 className={styles.pageTitle}>Admin Contents</h1>
+      <p className={styles.description}>
         Content management for series, collections, and metadata will appear here.
       </p>
     </div>

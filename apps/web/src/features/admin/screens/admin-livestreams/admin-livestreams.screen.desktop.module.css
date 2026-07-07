@@ -1,0 +1,112 @@
+.container {
+  max-width: var(--space-layout-content-max);
+  margin: 0 auto;
+}
+
+.pageTitle {
+  font-size: var(--typo-display-lg-font-size);
+  font-weight: 700;
+  margin-bottom: var(--space-layout-section-y);
+}
+
+.sectionTitle {
+  font-size: var(--typo-title-md-font-size);
+  font-weight: 600;
+  margin-bottom: var(--space-component-gap-sm);
+}
+
+.activeSectionTitle {
+  color: var(--content-success);
+}
+
+.scheduledSectionTitle {
+  color: var(--action-primary);
+}
+
+.endedSectionTitle {
+  color: var(--content-muted);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--space-layout-section-y);
+}
+
+.tableHeader {
+  border-bottom: 2px solid var(--border-default);
+  text-align: left;
+}
+
+.tableHead {
+  padding: var(--space-sm);
+  font-weight: 600;
+}
+
+.tableRow {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.tableCell {
+  padding: var(--space-sm);
+}
+
+.statusBadge {
+  padding: 2px var(--space-xs);
+  border-radius: var(--radius-xs);
+  font-size: 12px;
+  display: inline-block;
+}
+
+.statusLive {
+  background: var(--surface-success-subtle);
+  color: var(--content-success);
+}
+
+.statusScheduled {
+  background: var(--surface-primary-subtle);
+  color: var(--action-primary);
+}
+
+.statusEnded {
+  background: var(--surface-neutral-subtle);
+  color: var(--content-muted);
+}
+
+.actionButtons {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.goLiveButton {
+  padding: 4px var(--space-xs);
+  border-radius: var(--radius-xs);
+  border: none;
+  background: var(--content-success);
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.endButton {
+  padding: 4px var(--space-xs);
+  border-radius: var(--radius-xs);
+  border: none;
+  background: var(--content-critical);
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.rescheduleButton {
+  padding: 4px var(--space-xs);
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border-default);
+  background: var(--surface-default);
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.loading {
+  text-align: center;
+}

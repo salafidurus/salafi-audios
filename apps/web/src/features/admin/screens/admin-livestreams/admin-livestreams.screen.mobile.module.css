@@ -1,0 +1,78 @@
+.container {
+  padding: var(--space-md);
+}
+
+.pageTitle {
+  font-size: var(--typo-title-lg-font-size);
+  font-weight: 700;
+  margin-bottom: var(--space-md);
+}
+
+.sectionTitle {
+  font-size: var(--typo-title-sm-font-size);
+  font-weight: 600;
+  margin-bottom: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.activeSectionTitle {
+  color: var(--content-success);
+}
+
+.scheduledSectionTitle {
+  color: var(--action-primary);
+}
+
+.sessionCard {
+  padding: var(--space-sm);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.sessionCardContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sessionInfo {
+  flex: 1;
+}
+
+.sessionTitle {
+  font-weight: 600;
+}
+
+.sessionDetails {
+  font-size: 12px;
+  color: var(--content-muted);
+}
+
+.actionButtons {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.liveButton {
+  padding: 4px var(--space-xs);
+  border-radius: var(--radius-xs);
+  border: none;
+  background: var(--content-success);
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.endButton {
+  padding: 4px var(--space-xs);
+  border-radius: var(--radius-xs);
+  border: none;
+  background: var(--content-critical);
+  color: white;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.loading {
+  text-align: center;
+  padding: var(--space-md);
+}

@@ -8,6 +8,7 @@ import {
   revokePermission,
   type AdminPermissionsListResponse,
 } from "@/features/admin/api/admin.api";
+import styles from "./admin-permissions.screen.mobile.module.css";
 
 export function AdminPermissionsMobileScreen() {
   const [userId, setUserId] = useState("");
@@ -50,29 +51,22 @@ export function AdminPermissionsMobileScreen() {
   const currentPermissions = userPerms?.permissions.map((p) => p.permission) ?? [];
 
   return (
-    <div style={{ padding: 16 }}>
-      <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 16 }}>Permissions</h1>
+    <div className={styles.container}>
+      <h1 className={styles.pageTitle}>Permissions</h1>
 
-      <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+      <div className={styles.lookupSection}>
         <input
           aria-label="User ID"
           placeholder="User ID"
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
-          style={{ flex: 1, padding: 8, border: "1px solid #ccc", borderRadius: 4 }}
+          className={styles.input}
         />
         <button
           type="button"
           onClick={handleLookup}
           disabled={loading}
-          style={{
-            padding: "6px 12px",
-            borderRadius: 6,
-            border: "none",
-            background: "#2563eb",
-            color: "#fff",
-            fontSize: 13,
-          }}
+          className={styles.lookupButton}
         >
           {loading ? "…" : "Lookup"}
         </button>
@@ -83,19 +77,14 @@ export function AdminPermissionsMobileScreen() {
           {ADMIN_PERMISSIONS.map((perm) => {
             const hasIt = currentPermissions.includes(perm);
             return (
-              <div
-                key={perm}
-                style={{
-                  padding: 12,
-                  borderBottom: "1px solid #f0f0f0",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <div>
-                  <div style={{ fontFamily: "monospace", fontSize: 13 }}>{perm}</div>
-                  <div style={{ fontSize: 12, color: hasIt ? "#16a34a" : "#999" }}>
+              <div key={perm} className={styles.permissionCard}>
+                <div className={styles.permissionInfo}>
+                  <div className={styles.permissionName}>{perm}</div>
+                  <div
+                    className={`${styles.permissionStatus} ${
+                      hasIt ? styles.statusGranted : styles.statusNotGranted
+                    }`}
+                  >
                     {hasIt ? "Granted" : "Not granted"}
                   </div>
                 </div>
@@ -104,14 +93,7 @@ export function AdminPermissionsMobileScreen() {
                     type="button"
                     onClick={() => handleRevoke(perm)}
                     disabled={loading}
-                    style={{
-                      padding: "4px 10px",
-                      borderRadius: 4,
-                      border: "1px solid #fca5a5",
-                      background: "#fef2f2",
-                      color: "#dc2626",
-                      fontSize: 12,
-                    }}
+                    className={styles.revokeButton}
                   >
                     Revoke
                   </button>
@@ -120,14 +102,7 @@ export function AdminPermissionsMobileScreen() {
                     type="button"
                     onClick={() => handleGrant(perm)}
                     disabled={loading}
-                    style={{
-                      padding: "4px 10px",
-                      borderRadius: 4,
-                      border: "none",
-                      background: "#16a34a",
-                      color: "#fff",
-                      fontSize: 12,
-                    }}
+                    className={styles.grantButton}
                   >
                     Grant
                   </button>
