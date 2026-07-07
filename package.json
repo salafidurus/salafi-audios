@@ -91,6 +91,9 @@
     "native:expo:fix": "bun run --filter native expo:fix",
     "native:expo:check": "bun run --filter native expo:check"
   },
+  "dependencies": {
+    "jose": "^6.2.3"
+  },
   "devDependencies": {
     "@babel/runtime": "^7.29.7",
     "@commitlint/cli": "20.3.1",
