@@ -1,8 +1,10 @@
 import { vi } from 'vitest';
-import { INestApplication } from '@nestjs/common';
+import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
+import { CacheModule } from '@nestjs/cache-manager';
 import request from 'supertest';
+import { createTestApp } from '../../test/create-test-app';
 import { AuthGuard } from '../auth/auth.guard';
 import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { ScholarsController } from './scholars.controller';
@@ -21,12 +23,13 @@ const mockScholarsService = {
 };
 
 describe('ScholarsController — auth boundaries', () => {
-  let app: INestApplication;
+  let app: NestFastifyApplication;
 
   beforeEach(async () => {
     mockAuth.api.getSession.mockReset();
 
-    const module = await Test.createTestingModule({
+    const moduleBuilder = Test.createTestingModule({
+      imports: [CacheModule.register({ isGlobal: true, ttl: 0 })],
       controllers: [ScholarsController, AdminScholarsController],
       providers: [
         { provide: APP_GUARD, useClass: AuthGuard },
@@ -34,14 +37,12 @@ describe('ScholarsController — auth boundaries', () => {
       ],
     })
       .overrideGuard(AdminPermissionGuard)
-      .useValue({ canActivate: () => true })
-      .compile();
+      .useValue({ canActivate: () => true });
 
-    app = module.createNestApplication();
-    await app.init();
+    app = await createTestApp(moduleBuilder);
   });
 
-  afterEach(() => app.close());
+  afterEach(() => app?.close());
 
   describe('public endpoints', () => {
     it('GET /scholars returns 200 without auth', () => {

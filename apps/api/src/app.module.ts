@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import type { MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { CacheModule } from '@nestjs/cache-manager';
 
 import { HealthModule } from './core/health/health.module';
 import { ConfigModule } from './shared/config/config.module';
@@ -35,6 +36,11 @@ import { LocaleMiddleware } from './shared/i18n/locale.middleware';
     AppLoggerModule,
     AppThrottlerModule,
     DbModule,
+    CacheModule.register({
+      isGlobal: true,
+      ttl: 300000, // 5 minutes default TTL (in milliseconds)
+      max: 100, // Maximum number of items in cache
+    }),
     AuthModule,
     AccountModule,
     SearchModule,
