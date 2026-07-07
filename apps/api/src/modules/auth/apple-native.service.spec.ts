@@ -66,7 +66,7 @@ describe('AppleNativeService', () => {
         expect.objectContaining({
           userId: 'user_1',
           providerId: 'apple',
-          providerAccountId: 'apple_001',
+          accountId: 'apple_001',
         }),
       );
       expect(repo.createSession).toHaveBeenCalledWith('user_1');

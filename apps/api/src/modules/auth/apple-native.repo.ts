@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../shared/db/prisma.service';
+import { randomBytes } from 'crypto';
 
 @Injectable()
 export class AppleNativeRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAccountByProviderId(providerId: string, providerAccountId: string) {
+  async findAccountByProviderId(providerId: string, accountId: string) {
     return this.prisma.account.findFirst({
-      where: { providerId, providerAccountId },
+      where: { providerId, accountId },
     });
   }
 
@@ -17,16 +18,17 @@ export class AppleNativeRepository {
     });
   }
 
-  async createAccount(data: { userId: string; providerId: string; providerAccountId: string }) {
+  async createAccount(data: { userId: string; providerId: string; accountId: string }) {
     return this.prisma.account.create({
-      data: { ...data, type: 'oidc' },
+      data,
     });
   }
 
   async createSession(userId: string) {
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    const token = randomBytes(32).toString('hex');
     return this.prisma.session.create({
-      data: { userId, expiresAt },
+      data: { userId, expiresAt, token },
     });
   }
 }

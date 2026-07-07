@@ -36,7 +36,7 @@ describe('AppleNativeRepository', () => {
       prisma.account.findFirst.mockResolvedValue({ userId: 'u1' });
       const result = await repo.findAccountByProviderId('apple', 'abc123');
       expect(prisma.account.findFirst).toHaveBeenCalledWith({
-        where: { providerId: 'apple', providerAccountId: 'abc123' },
+        where: { providerId: 'apple', accountId: 'abc123' },
       });
       expect(result).toEqual({ userId: 'u1' });
     });
@@ -60,10 +60,10 @@ describe('AppleNativeRepository', () => {
       const result = await repo.createAccount({
         userId: 'u1',
         providerId: 'apple',
-        providerAccountId: 'abc',
+        accountId: 'abc',
       });
       expect(prisma.account.create).toHaveBeenCalledWith({
-        data: { userId: 'u1', providerId: 'apple', providerAccountId: 'abc', type: 'oidc' },
+        data: { userId: 'u1', providerId: 'apple', accountId: 'abc' },
       });
       expect(result.id).toBe('acct1');
     });
@@ -75,7 +75,7 @@ describe('AppleNativeRepository', () => {
       prisma.session.create.mockResolvedValue({ id: 's1', expiresAt });
       const result = await repo.createSession('u1');
       expect(prisma.session.create).toHaveBeenCalledWith({
-        data: { userId: 'u1', expiresAt: expect.any(Date) },
+        data: { userId: 'u1', expiresAt: expect.any(Date), token: expect.any(String) },
       });
       expect(result.id).toBe('s1');
     });

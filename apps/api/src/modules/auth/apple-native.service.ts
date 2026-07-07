@@ -78,7 +78,7 @@ export class AppleNativeService {
       await this.repo.createAccount({
         userId,
         providerId: 'apple',
-        providerAccountId: appleUserId,
+        accountId: appleUserId,
       });
     }
 
