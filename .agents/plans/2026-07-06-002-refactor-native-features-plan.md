@@ -4,8 +4,8 @@
 > or superpowers:executing-plans to implement this plan task-by-task.
 
 **Goal:** Consolidate native feature slices, eliminate dead routes, rename Feed→Explore
-across all layers, and merge orphan features (support, legal, i18n, progress, admin\*)
-into their logical homes.
+across all layers, and merge orphan features (support, legal, progress, admin\*)
+into their logical homes. Note: i18n merge already complete.
 
 **Architecture:** Purely refactoring — no new functionality. File moves, import path
 updates, spec mock path updates, and route rewiring. No behavioral changes.
@@ -24,6 +24,52 @@ updates, spec mock path updates, and route rewiring. No behavioral changes.
 - All moves preserve git history (use `git mv` via filesystem rename).
 - Every stage must pass `bun run typecheck` and `bun run test` scoped to native before stage commit.
 - Breaking change on `"feed"` section key is acceptable — no public users.
+
+## Rollback Procedures
+
+**Before starting any stage:**
+
+1. Create backup branch: `git branch backup/refactor-native-features-$(date +%Y%m%d)`
+2. Document current git SHA: `git rev-parse HEAD > .agents/plans/refactor-checkpoint.txt`
+3. Verify clean working tree: `git status --porcelain` should return empty
+
+**If a stage fails:**
+
+1. Assess whether to fix forward or roll back
+2. To roll back: `git reset --hard <stage-start-sha>` and `git clean -fd`
+3. Document failure reason in plan file before retrying
+
+**Emergency rollback:**
+
+```bash
+git reset --hard $(cat .agents/plans/refactor-checkpoint.txt)
+git clean -fd
+```
+
+---
+
+## Pre-Stage: Cleanup redundant settings/i18n barrel
+
+**Status:** Needed
+**Goal:** Remove unnecessary `features/settings/i18n/` directory — it's a redundant barrel since main `settings/index.ts` already exports the same components.
+
+**Changes:**
+
+1. Update `features/settings/screens/account.screen.tsx`:
+   - Change: `import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings/i18n";`
+   - To: `import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings";`
+2. Delete: `features/settings/i18n/` directory
+
+**Completion Criteria:**
+
+- `bun run typecheck --filter native` passes
+- No imports from `@/features/settings/i18n` remain
+
+**Commit Message:**
+
+```
+refactor(native): remove redundant settings/i18n barrel
+```
 
 ---
 
@@ -129,6 +175,61 @@ export { useAdminScholars } from "./hooks/use-admin-scholars";
 - `admin/components/LectureEditSheet/LectureEditSheet.spec.ts`
 - `admin/hooks/use-admin-live.spec.ts`
 
+**Execution Steps:**
+
+1. Create target directory structure:
+
+   ```bash
+   mkdir -p features/admin/{api,hooks,screens,components}
+   ```
+
+2. Move files using git mv (preserves history):
+
+   ```bash
+   # API files
+   git mv features/admin/api/admin-permissions.api.ts features/admin/api/
+   git mv features/admin-lectures/api/admin-lectures.api.ts features/admin/api/
+   git mv features/admin-live/api/admin-live.api.ts features/admin/api/
+   git mv features/admin-scholars/api/admin-scholars.api.ts features/admin/api/
+
+   # Hooks
+   git mv features/admin/hooks/use-admin-permissions.ts features/admin/hooks/
+   git mv features/admin-lectures/hooks/use-admin-lectures.ts features/admin/hooks/
+   git mv features/admin-live/hooks/use-admin-live.ts features/admin/hooks/
+   git mv features/admin-scholars/hooks/use-admin-scholars.ts features/admin/hooks/
+
+   # Screens (entire directories)
+   git mv features/admin/screens/admin-dashboard features/admin/screens/
+   git mv features/admin-lectures/screens/admin-lectures features/admin/screens/
+   git mv features/admin-live/screens/admin-live features/admin/screens/
+   git mv features/admin-scholars/screens/admin-scholars features/admin/screens/
+   git mv features/admin-scholars/screens/admin-scholar-detail features/admin/screens/
+
+   # Components (entire directories)
+   git mv features/admin-lectures/components/AudioUploaderSheet features/admin/components/
+   git mv features/admin-lectures/components/BulkActionBar features/admin/components/
+   git mv features/admin-lectures/components/LectureEditSheet features/admin/components/
+   git mv features/admin-live/components/ChannelSheet features/admin/components/
+   git mv features/admin-live/components/SessionSheet features/admin/components/
+   git mv features/admin-scholars/components/CollectionSheet features/admin/components/
+   git mv features/admin-scholars/components/SeriesSheet features/admin/components/
+   ```
+
+3. Create barrel at `features/admin/index.ts` with exports listed above
+
+4. Update internal imports within admin feature to use relative paths
+
+5. Update route imports:
+   - Find all files importing from `@/features/admin-lectures`, `@/features/admin-live`, `@/features/admin-scholars`
+   - Change to `@/features/admin`
+
+6. Update spec mock paths (jest.mock calls) in 6 test files
+
+7. Delete empty feature directories:
+   ```bash
+   rm -rf features/admin-lectures features/admin-live features/admin-scholars
+   ```
+
 **Blockers:** None currently identified.
 
 **Dependencies:** Standalone.
@@ -137,6 +238,8 @@ export { useAdminScholars } from "./hooks/use-admin-scholars";
 
 - `bun run typecheck --filter native` passes
 - `bun run test --filter native` passes
+- All route imports use `@/features/admin` barrel
+- No `admin-lectures`, `admin-live`, `admin-scholars` directories remain
 
 **Suggested Commit Message:**
 
@@ -206,6 +309,53 @@ export { ScholarRow } from "./components/scholar-row/scholar-row";
 - `app/(content)/scholars/index.tsx` — `@/features/listing/screens/...`
 - `app/(content)/scholars/[slug].tsx` — `@/features/listing/screens/...`
 
+**Execution Steps:**
+
+1. Create target directory structure:
+
+   ```bash
+   mkdir -p features/listing/{screens,components}
+   ```
+
+2. Move screen directories using git mv:
+
+   ```bash
+   git mv features/lecture/screens/lecture-detail features/listing/screens/
+   git mv features/scholar/screens/scholar-list features/listing/screens/
+   git mv features/scholar/screens/scholar-detail features/listing/screens/
+   ```
+
+3. Move component directories using git mv:
+
+   ```bash
+   # Lecture components
+   git mv features/lecture/components/lecture-meta features/listing/components/
+   git mv features/lecture/components/lecture-play-button features/listing/components/
+   git mv features/lecture/components/lecture-save-button features/listing/components/
+   git mv features/lecture/components/series-context-bar features/listing/components/
+   git mv features/lecture/components/topic-chips features/listing/components/
+
+   # Scholar components
+   git mv features/scholar/components/scholar-card features/listing/components/
+   git mv features/scholar/components/scholar-content-list features/listing/components/
+   git mv features/scholar/components/scholar-header features/listing/components/
+   git mv features/scholar/components/scholar-row features/listing/components/
+   ```
+
+4. Create barrel at `features/listing/index.ts` with exports listed above
+
+5. Update 3 route file imports:
+   - `app/(content)/lectures/[id].tsx`: change `@/features/lecture` → `@/features/listing`
+   - `app/(content)/scholars/index.tsx`: change `@/features/scholar` → `@/features/listing`
+   - `app/(content)/scholars/[slug].tsx`: change `@/features/scholar` → `@/features/listing`
+
+6. Update spec mock paths in 5 test files
+
+7. Delete empty feature directories:
+   ```bash
+   rm -rf features/lecture features/scholar
+   ```
+
 **Blockers:** None currently identified.
 
 **Dependencies:** Standalone — no file overlap with Stage 1.
@@ -214,6 +364,8 @@ export { ScholarRow } from "./components/scholar-row/scholar-row";
 
 - `bun run typecheck --filter native` passes
 - `bun run test --filter native` passes
+- All route imports use `@/features/listing` barrel
+- No `lecture` or `scholar` feature directories remain
 
 **Suggested Commit Message:**
 
@@ -223,63 +375,7 @@ refactor(native): merge lecture + scholar into features/listing/ to match web
 
 ---
 
-### Stage 3: Merge i18n into settings
-
-**Status:** Planned
-**Goal:** Merge `features/i18n/` content into `features/settings/` with flat structure. Update all external
-import paths (`content-preference.ts` is used by 10 files across 7 features). Add barrel.
-
-**Files:**
-
-i18n's contents move into a flat feature structure at `features/settings/`:
-
-```
-features/settings/
-  screens/                              (existing)
-    account.screen.tsx
-    account-profile.screen.tsx
-  components/
-    language-switch/                    ← from features/i18n/components/
-    content-language-toggle/            ← from features/i18n/components/
-  content-preference.ts                 ← from features/i18n/ (root)
-  index.ts                             (update barrel)
-```
-
-- Delete: `features/i18n/`
-
-**Import path updates across codebase (all `@/features/i18n/` → `@/features/settings/`):**
-
-- `content-preference.ts` — 10 files across: search, feed, lecture, scholar, library, settings
-- `LanguageSwitch` — used in settings screens
-- `ContentLanguageToggle` — used in settings screens
-
-**Settings barrel updates:**
-
-```typescript
-export { AccountScreen } from "./screens/account.screen";
-export { AccountProfileScreen } from "./screens/account-profile.screen";
-export { LanguageSwitch } from "./components/language-switch/language-switch";
-export { ContentLanguageToggle } from "./components/content-language-toggle/content-language-toggle";
-```
-
-**Blockers:** Need exact grep of all import sites for `@/features/i18n/` to update them all in one pass.
-
-**Dependencies:** Standalone.
-
-**Completion Criteria:**
-
-- `bun run typecheck --filter native` passes
-- `bun run test --filter native` passes (check i18n spec mock paths)
-
-**Suggested Commit Message:**
-
-```
-refactor(native): merge i18n feature into settings/ flat
-```
-
----
-
-### Stage 4: Merge progress into library
+### Stage 3: Merge progress into library
 
 **Status:** Planned
 **Goal:** Merge `features/progress/` content into `features/library/` with flat structure. Zero external
@@ -315,6 +411,24 @@ export { ProgressIndicator } from "./components/progress-indicator/progress-indi
 export { ResumeBadge } from "./components/resume-badge/resume-badge";
 ```
 
+**Execution Steps:**
+
+1. Move component directories using git mv:
+
+   ```bash
+   git mv features/progress/components/progress-indicator features/library/components/
+   git mv features/progress/components/resume-badge features/library/components/
+   ```
+
+2. Update `features/library/index.ts` barrel to add progress component exports
+
+3. Verify no external imports exist (confirmed: 0 external imports)
+
+4. Delete empty feature directory:
+   ```bash
+   rm -rf features/progress
+   ```
+
 **Blockers:** None — 0 external imports confirmed.
 
 **Dependencies:** Standalone.
@@ -322,6 +436,8 @@ export { ResumeBadge } from "./components/resume-badge/resume-badge";
 **Completion Criteria:**
 
 - `bun run typecheck --filter native` passes
+- No `progress` feature directory remains
+- Library barrel exports progress components
 
 **Suggested Commit Message:**
 
@@ -331,7 +447,7 @@ refactor(native): merge progress feature into library/ flat
 
 ---
 
-### Stage 5: Merge support + legal into settings
+### Stage 4: Merge support + legal into settings
 
 **Status:** Planned
 **Goal:** Move `features/support/` and `features/legal/` into `features/settings/`.
@@ -385,10 +501,54 @@ export { LegalToggleScreen } from "./screens/legal-toggle.screen";
 export { SupportScreen } from "./screens/support.screen";
 ```
 
-**Blockers:**
+**Execution Steps:**
 
-- Need to determine exact content of `features/legal/screens/privacy.screen.tsx` to merge into toggle view
-- `features/legal/screens/terms-of-use.screen.tsx` content needs to be embeddable in toggle
+1. Move support screen using git mv:
+
+   ```bash
+   git mv features/support/screens/support.screen.tsx features/settings/screens/
+   ```
+
+2. Create new `LegalToggleScreen`:
+   - Extract section-rendering logic from `PrivacyScreen` and `TermsOfUseScreen`
+   - Both screens use identical structure: ScrollView > Title > Sections
+   - Create segment control with "Terms" | "Privacy" tabs
+   - Render appropriate content based on selected segment
+   - Already use Unistyles — no hardcoded colors
+
+3. Convert SupportScreen hardcoded colors to Unistyles theme tokens:
+   - `#e5e7eb` → `theme.colors.surface.subtle`
+   - `#555` → `theme.colors.content.muted`
+
+4. Create route file `app/(tabs)/settings/support.tsx`:
+
+   ```tsx
+   import { SupportScreen } from "@/features/settings";
+   export default function SupportRoute() {
+     return <SupportScreen />;
+   }
+   ```
+
+5. Update `app/(tabs)/settings/legal.tsx` to use LegalToggleScreen:
+
+   ```tsx
+   import { LegalToggleScreen } from "@/features/settings";
+   export default function LegalRoute() {
+     return <LegalToggleScreen />;
+   }
+   ```
+
+6. Update `features/settings/screens/account.screen.tsx`:
+   - Add navigation to support route
+
+7. Update `features/settings/index.ts` barrel
+
+8. Delete empty feature directories:
+   ```bash
+   rm -rf features/support features/legal
+   ```
+
+**Blockers:** None — legal screens verified as embeddable (identical structure, already use Unistyles).
 
 **Dependencies:** Standalone.
 
@@ -398,6 +558,7 @@ export { SupportScreen } from "./screens/support.screen";
 - Legal toggle renders both Terms and Privacy
 - Support route navigable from AccountScreen
 - No `#e5e7eb` or `#555` hardcoded in support files
+- No `support` or `legal` feature directories remain
 
 **Suggested Commit Message:**
 
@@ -407,7 +568,7 @@ refactor(native): merge support + legal into settings with Unistyles conversion
 
 ---
 
-### Stage 6: Feed → Explore cross-cutting rename
+### Stage 5: Feed → Explore cross-cutting rename
 
 **Status:** Planned
 **Goal:** Rename `"feed"` section to `"explore"` across ALL layers — shared packages,
@@ -463,22 +624,83 @@ i18n keys, types, and exports. Breaking change with no migration needed.
 | `apps/web/src/features/navigation/components/sidebar/adaptive-bottom-bar.tsx` | `feed: Cloud` → `explore: Cloud`, `SECTION_ORDER`                   |
 | `apps/web/src/features/navigation/components/sidebar/sidebar.desktop.tsx`     | `routes.feed.index` → `routes.explore.index`                        |
 
-**Verification methodology:**
+**Execution Approach: Sub-Stages with Version Coordination**
 
-- Step 1: Shared packages — update contracts routes/endpoints/navigation/query → typecheck
-- Step 2: i18n — update keys → typecheck
-- Step 3: domain-content — rename hooks → typecheck all packages
-- Step 4: API — rename module, update controller + routes
-- Step 5: Native + Web features + routes + navigation utils in parallel
+This stage is executed as 5 coordinated sub-stages to allow incremental review and easier rollback:
 
-**Blockers:** Large cross-repo change; must be committed as a single atomic commit
-to avoid broken intermediate states across shared packages. Best done as one commit
-(final stage) or as sub-stages with coordinated version bumps.
+**Sub-Stage 5.1: Shared packages (contracts, i18n, domain-content)**
 
-**Dependencies:** All Stages 0-5 complete (pure native refactoring). This is the final stage.
+1. Update `@sd/core-contracts`:
+   - `src/routes.ts`: `feed` → `explore` (all route definitions)
+   - `src/endpoints.ts`: `/feed/*` → `/explore/*`
+   - `src/navigation.ts`: Section type, SECTION_TABS, SECTION_LABELS, SECTION_ROUTES
+   - `src/query/index.ts`: queryKeys.feed → queryKeys.explore
+   - Bump patch version
+2. Update `@sd/core-i18n`:
+   - `locales/en.json`: `tabs.feed` → `tabs.explore`, `navigation.subnav.feed.*` → `explore.*`
+   - `locales/ar.json`: matching key renames
+   - `src/translation-helpers.ts`: SUBNAV_KEYS, getEmptyStateText
+   - Bump patch version
+3. Update `@sd/domain-content`:
+   - Rename files: `feed.api.ts` → `explore.api.ts`, `use-feed*.ts` → `use-explore*.ts`
+   - Update internal references and exports in `index.ts`
+   - Bump patch version
+4. Verify: `bun run typecheck` and `bun run build` in packages/
+5. Commit: `refactor(packages): rename feed → explore in shared contracts`
+
+**Sub-Stage 5.2: API module**
+
+1. Update package.json to use new contract versions
+2. Rename `apps/api/src/modules/feed/` → `explore/`
+3. Update class names, controller decorators to `/explore/*`
+4. Update module imports in app.module.ts
+5. Verify: `bun run typecheck --filter api && bun run build --filter api`
+6. Commit: `refactor(api): rename feed module to explore`
+
+**Sub-Stage 5.3: Native app**
+
+1. Update package.json to use new package versions
+2. Rename `features/feed/` → `features/explore/`
+3. Rename `app/(tabs)/feed/` → `app/(tabs)/explore/`
+4. Update navigation utils:
+   - `tab-route-config.ts`: routeName, id, GROUP_NAME_TO_TAB
+   - `section-tab-icons.ts`: icon keys and type
+5. Update component/hook names in explore feature
+6. Verify: `bun run typecheck --filter native && bun run test --filter native`
+7. Commit: `refactor(native): rename feed → explore across features and routes`
+
+**Sub-Stage 5.4: Web app**
+
+1. Update package.json to use new package versions
+2. Rename `features/feed/` → `features/explore/`
+3. Rename `app/(main)/(feed)/feed/` → `(explore)/explore/`
+4. Update navigation utils:
+   - `section-tab-icons.ts`, `get-current-section.ts`
+   - `adaptive-bottom-bar.tsx`, `sidebar.desktop.tsx`
+5. Update test assertions in navigation specs
+6. Verify: `bun run typecheck --filter web && bun run test --filter web && bun run build --filter web`
+7. Commit: `refactor(web): rename feed → explore across features and routes`
+
+**Sub-Stage 5.5: Final verification and version bump**
+
+1. Run full monorepo verification:
+   - `bun run typecheck` (all workspaces)
+   - `bun run test` (all workspaces)
+   - `bun run build` (all packages and apps)
+2. Manual testing:
+   - API: `/explore/*` routes return 200, `/feed/*` return 404
+   - Native: "Explore" tab navigates correctly
+   - Web: "Explore" nav item navigates correctly
+3. Document breaking change in CHANGELOG if needed
+4. Commit: `chore: final verification for feed → explore rename`
+
+**Blockers:** None — sub-stage approach mitigates risk of broken intermediate states.
+
+**Dependencies:** All Stages 0-4 complete (pure native refactoring). This is the final stage.
 
 **Completion Criteria:**
 
+- All 5 sub-stages committed
 - `bun run typecheck` passes across entire monorepo
 - `bun run build` succeeds for all affected packages and apps
 - `bun run test` passes with no regressions
@@ -486,29 +708,61 @@ to avoid broken intermediate states across shared packages. Best done as one com
 - Native app navigation works with "Explore" tab
 - Web app navigation works with "Explore" nav item
 
-**Suggested Commit Message:**
-
-```
-refactor: rename Feed → Explore across all layers (contracts, API, web, native)
-```
+**Rollback Strategy:**
+Each sub-stage is independently reversible via `git revert`. If Sub-Stage 5.3 fails, revert 5.3, 5.2, and 5.1 in reverse order.
 
 ---
 
 ### Final Verification
 
+After all stages complete, verify:
+
+**Monorepo health:**
+
 - `bun run typecheck` passes across entire monorepo
 - `bun run test` passes with no regressions
 - `bun run build` succeeds for all affected packages and apps
-- No `features/feed/`, `features/admin-\*/`, `features/lecture/`, `features/scholar/`,
-  `features/i18n/`, `features/progress/`, `features/support/`, `features/legal/`
-  directories remain in `apps/native/src/`
-- No `\*feed\*` references in tab-route-config or section-tab-icons (native + web)
-- API `/feed/\*` routes return 404, `/explore/\*` routes return 200
+
+**Native feature structure:**
+
+- No `features/admin-lectures/`, `features/admin-live/`, `features/admin-scholars/` directories
+- No `features/lecture/` or `features/scholar/` directories
+- No `features/progress/` directory
+- No `features/support/` or `features/legal/` directories
+- No `features/settings/i18n/` directory
+- All consolidated features have barrel exports at `index.ts`
+
+**Feed → Explore rename:**
+
+- No `features/feed/` directories in native or web
+- No `*feed*` references in tab-route-config or section-tab-icons (native + web)
+- API `/feed/*` routes return 404, `/explore/*` routes return 200
+- Native app "Explore" tab navigates correctly
+- Web app "Explore" nav item navigates correctly
+
+**Settings consolidation:**
+
 - Legal toggle screen shows both Terms and Privacy
-- Support screen uses Unistyles theme tokens (no hardcoded colors)
+- Support screen uses Unistyles theme tokens (no hardcoded `#e5e7eb` or `#555`)
+- Support route navigable from AccountScreen
 
 ### Plan Completion
 
-- All 7 stages completed and committed
+- Pre-stage + Stages 0-4 completed and committed
+- Stage 5 sub-stages 5.1-5.5 completed
 - Final verification checks pass
 - Plan moved to `.agents/plans/completed/2026-07-06-002-refactor-native-features-plan.md`
+
+### Summary
+
+**Stages executed:**
+
+- Pre-stage: Cleanup redundant settings/i18n barrel
+- Stage 0: Delete placeholder routes (series, collections)
+- Stage 1: Merge 4 admin features → single admin/
+- Stage 2: Merge lecture + scholar → listing/
+- Stage 3: Merge progress → library/
+- Stage 4: Merge support + legal → settings/
+- Stage 5: Feed → Explore rename (5 sub-stages)
+
+**Total commits:** ~8-9 commits (1 pre-stage + 5 native stages + 5 feed→explore sub-stages, some may be combined)
