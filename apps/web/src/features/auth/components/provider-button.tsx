@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import styles from "./provider-button.module.css";
 
 type ThemeMode = "light" | "dark";
