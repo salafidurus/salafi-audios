@@ -6,7 +6,21 @@
 
 **Architecture:** Four independent workstreams: (1) backend Apple identity token verification via JWKS, (2) native Apple config + signInAsync flow, (3) native Google button CSS redesign, (4) web auth button CSS redesign incorporating official Apple and Google brand guidelines.
 
-**Tech Stack:** `jose` (JWT/JWKS verification on backend), `react-native-svg` (native Google icon), `lucide-react` (web Apple icon), `expo-apple-authentication` (native `signInAsync`), `better-auth` (session management), CSS Modules + Unistyles (web/native styling)
+**Tech Stack:** `jose` (JWT/JWKS verification on backend), `react-native-svg` (native Google icon), `appleid.auth.js` (Apple JS SDK — official button rendering + OAuth flow on web), `expo-apple-authentication` (native `signInAsync`), `better-auth` (session management, Google OAuth on web), Prisma (direct DB access for Apple native sign-in), CSS Modules + Unistyles (web/native styling)
+
+## Reference Links
+
+- [Apple — Displaying Sign in with Apple Buttons on the Web](https://developer.apple.com/documentation/signinwithapple/displaying-sign-in-with-apple-buttons-on-the-web)
+- [Apple — Sign in with Apple JS SDK](https://developer.apple.com/documentation/signinwithapplejs)
+- [Apple JS SDK CDN](https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js)
+- [Apple — Authenticating Users with Sign in with Apple](https://developer.apple.com/documentation/signinwithapple/authenticating_users_with_sign_in_with_apple)
+- [Apple — Verifying a User Token Service](https://developer.apple.com/documentation/signinwithapple/verifying_a_user_token_service) (JWKS verification)
+- [Apple — Apple JWKS endpoint](https://appleid.apple.com/auth/keys)
+- [Google — Branding Guidelines for Sign In With Google](https://developers.google.com/identity/branding-guidelines)
+- [`expo-apple-authentication` SDK docs](https://docs.expo.dev/versions/latest/sdk/apple-authentication/)
+- [`jose` JWT/JWKS library](https://github.com/panva/jose)
+- [`react-native-svg`](https://github.com/react-native-svg/react-native-svg)
+- [better-auth social sign-in docs](https://better-auth.com)
 
 ## Global Constraints
 
@@ -27,8 +41,8 @@
 - Create: `apps/api/src/modules/auth/apple-native.service.ts`
 - Create: `apps/api/src/modules/auth/apple-native.controller.ts`
 - Create: `apps/api/src/modules/auth/dto/apple-native-sign-in.dto.ts`
-- Create: `apps/api/src/modules/auth/__tests__/apple-native.service.spec.ts`
-- Create: `apps/api/src/modules/auth/__tests__/apple-native.controller.spec.ts`
+- Create: `apps/api/src/modules/auth/apple-native.service.spec.ts`
+- Create: `apps/api/src/modules/auth/apple-native.controller.spec.ts`
 - Modify: `apps/api/src/modules/auth/auth.module.ts`
 - Modify: `apps/api/package.json` (add `jose`)
 
@@ -40,7 +54,7 @@
 
 - [ ] **Step 1: Write the failing AppleNativeService test**
 
-Create `apps/api/src/modules/auth/__tests__/apple-native.service.spec.ts`:
+Create `apps/api/src/modules/auth/apple-native.service.spec.ts`:
 
 ```typescript
 import { Test, TestingModule } from "@nestjs/testing";
@@ -77,7 +91,7 @@ describe("AppleNativeService", () => {
 Run:
 
 ```bash
-bun run --filter api test -- src/modules/auth/__tests__/apple-native.service.spec.ts
+bun run --filter api test -- src/modules/auth/apple-native.service.spec.ts
 ```
 
 Expected: FAIL — `AppleNativeService`, `verifyIdentityToken` not defined.
@@ -89,6 +103,7 @@ Create `apps/api/src/modules/auth/apple-native.service.ts`:
 ```typescript
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "../../shared/config/config.service";
+import { createRemoteJWKSet, jwtVerify, errors } from "jose";
 
 export interface AppleIdentityPayload {
   sub: string;
@@ -105,8 +120,7 @@ export class AppleNativeService {
     }
 
     const clientId = this.config.APPLE_CLIENT_ID;
-
-    const { createRemoteJWKSet, jwtVerify, errors } = await import("jose");
+    const JWKS = createRemoteJWKSet(new URL("https://appleid.apple.com/auth/keys"));
 
     const JWKS = createRemoteJWKSet(new URL("https://appleid.apple.com/auth/keys"));
 
@@ -141,14 +155,14 @@ export class AppleNativeService {
 Run:
 
 ```bash
-bun run --filter api test -- src/modules/auth/__tests__/apple-native.service.spec.ts
+bun run --filter api test -- src/modules/auth/apple-native.service.spec.ts
 ```
 
 Expected: PASS.
 
 - [ ] **Step 5: Write the failing controller test**
 
-Create `apps/api/src/modules/auth/__tests__/apple-native.controller.spec.ts`:
+Create `apps/api/src/modules/auth/apple-native.controller.spec.ts`:
 
 ```typescript
 import { Test, TestingModule } from "@nestjs/testing";
@@ -222,7 +236,7 @@ describe("AppleNativeController", () => {
 Run:
 
 ```bash
-bun run --filter api test -- src/modules/auth/__tests__/apple-native.controller.spec.ts
+bun run --filter api test -- src/modules/auth/apple-native.controller.spec.ts
 ```
 
 Expected: FAIL — Controller not found.
@@ -263,24 +277,22 @@ export class AppleNativeSignInDto {
 Create `apps/api/src/modules/auth/apple-native.controller.ts`:
 
 ```typescript
-import { Controller, Post, Body, HttpCode } from '@nestjs/common';
-import { ApiExcludeController } from '@nestjs/swagger';
-import { AppleNativeService } from './apple-native.service';
-import { AppleNativeSignInDto } from './dto/apple-native-sign-in.dto';
-import { Public } from './decorators';
-import { ConfigService } from '../../shared/config/config.service';
-import { getAuth } from './auth.instance';
+import { Controller, Post, Body, HttpCode } from "@nestjs/common";
+import { ApiExcludeController } from "@nestjs/swagger";
+import { AppleNativeService } from "./apple-native.service";
+import { AppleNativeSignInDto } from "./dto/apple-native-sign-in.dto";
+import { Public } from "./decorators";
+import { PrismaClient } from "@sd/core-db";
+
+const prisma = new PrismaClient();
 
 @ApiExcludeController()
-@Controller('auth/apple')
+@Controller("auth/apple")
 export class AppleNativeController {
-  constructor(
-    private readonly appleNativeService: AppleNativeService,
-    private readonly config: ConfigService,
-  ) {}
+  constructor(private readonly appleNativeService: AppleNativeService) {}
 
   @Public()
-  @Post('native')
+  @Post("native")
   @HttpCode(200)
   async nativeSignIn(@Body() dto: AppleNativeSignInDto) {
     const { identityToken, user: appleUser } = dto;
@@ -288,17 +300,10 @@ export class AppleNativeController {
     const { sub: appleUserId, email } =
       await this.appleNativeService.verifyIdentityToken(identityToken);
 
-    // Use Prisma through better-auth's own adapter to find/create user and session.
-    // This calls better-auth's internal Prisma client that matches the adapter schema.
-    const auth = getAuth();
-
-    // Perform the DB operations using better-auth's internal context.
-    // The auth instance has access to the adapter which manages user/account/session tables.
-    const db = (auth as unknown as { adapter: { db: { $queryRawUnsafe: Function; user: { findFirst: Function; create: Function }; account: { findFirst: Function; create: Function }; session: { create: Function } } }).adapter.db;
-
-    // Look for existing account linked to this Apple user
-    let account = await db.account.findFirst({
-      where: { providerId: 'apple', providerAccountId: appleUserId },
+    // Use Prisma directly (not better-auth's adapter) to find/create user
+    // and account. Better-auth's user/account/session tables follow its schema.
+    let account = await prisma.account.findFirst({
+      where: { providerId: "apple", providerAccountId: appleUserId },
     });
 
     let userId: string;
@@ -306,12 +311,10 @@ export class AppleNativeController {
     if (account) {
       userId = account.userId;
     } else {
-      const displayName = [appleUser.firstName, appleUser.lastName]
-        .filter(Boolean)
-        .join(' ')
-        .trim() || 'Apple User';
+      const displayName =
+        [appleUser.firstName, appleUser.lastName].filter(Boolean).join(" ").trim() || "Apple User";
 
-      const user = await db.user.create({
+      const user = await prisma.user.create({
         data: {
           name: displayName,
           email: appleUser.email ?? email ?? `${appleUserId}@privaterelay.appleid.com`,
@@ -321,18 +324,18 @@ export class AppleNativeController {
 
       userId = user.id;
 
-      await db.account.create({
+      await prisma.account.create({
         data: {
           userId,
-          providerId: 'apple',
+          providerId: "apple",
           providerAccountId: appleUserId,
-          type: 'oidc',
+          type: "oidc",
         },
       });
     }
 
-    // Create session
-    const session = await db.session.create({
+    // Create session via Prisma directly
+    const session = await prisma.session.create({
       data: {
         userId,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
@@ -347,14 +350,14 @@ export class AppleNativeController {
 }
 ```
 
-> **Note:** The exact path to better-auth's internal Prisma client depends on the runtime adapter. If the typed `db` accessor above does not match, fall back to importing `PrismaClient` directly from `@sd/core-db` (as done in `auth.instance.ts`) and querying the `user`, `account`, and `session` tables by their better-auth schema names.
+> **Note:** This uses `PrismaClient` directly from `@sd/core-db`, not through better-auth's adapter. The `user`, `account`, and `session` tables follow better-auth's Prisma schema naming. The PrismaClient must connect (NestJS lifecycle will manage this; for the initial implementation a new instance is created — refactor to inject via DI if needed).
 
 - [ ] **Step 8: Run test to verify it passes**
 
 Run:
 
 ```bash
-bun run --filter api test -- src/modules/auth/__tests__/apple-native.controller.spec.ts
+bun run --filter api test -- src/modules/auth/apple-native.controller.spec.ts
 ```
 
 Expected: PASS (note: the controller may need adjustment if `getAuth()` or the adapter path doesn't match — adjust the Prisma access strategy as needed).
@@ -405,7 +408,7 @@ Expected: All tests pass.
 git add apps/api/src/modules/auth/apple-native.service.ts \
        apps/api/src/modules/auth/apple-native.controller.ts \
        apps/api/src/modules/auth/dto/apple-native-sign-in.dto.ts \
-       apps/api/src/modules/auth/__tests__/ \
+       apps/api/src/modules/auth/ \
        apps/api/src/modules/auth/auth.module.ts \
        apps/api/package.json
 git commit -m "feat(api): add Apple identity token verification endpoint for native sign-in"
@@ -421,7 +424,7 @@ git commit -m "feat(api): add Apple identity token verification endpoint for nat
 - Modify: `apps/native/src/app/(auth)/sign-in.tsx`
 - Modify: `apps/native/src/features/auth/screens/sign-in/sign-in.screen.tsx`
 - Create: `apps/native/src/features/auth/hooks/use-native-apple-sign-in.ts`
-- Create: `apps/native/src/features/auth/hooks/__tests__/use-native-apple-sign-in.spec.ts`
+- Create: `apps/native/src/features/auth/hooks/use-native-apple-sign-in.spec.ts`
 
 **Interfaces:**
 
@@ -432,7 +435,7 @@ git commit -m "feat(api): add Apple identity token verification endpoint for nat
 
 - [ ] **Step 1: Write the failing test for the hook**
 
-Create `apps/native/src/features/auth/hooks/__tests__/use-native-apple-sign-in.spec.ts`:
+Create `apps/native/src/features/auth/hooks/use-native-apple-sign-in.spec.ts`:
 
 ```typescript
 import { renderHook, act } from "@testing-library/react-native";
@@ -476,7 +479,7 @@ describe("useNativeAppleSignIn", () => {
 Run:
 
 ```bash
-bun run --filter native test -- src/features/auth/hooks/__tests__/use-native-apple-sign-in.spec.ts
+bun run --filter native test -- src/features/auth/hooks/use-native-apple-sign-in.spec.ts
 ```
 
 Expected: FAIL — module not found.
@@ -565,7 +568,7 @@ export function useNativeAppleSignIn() {
 Run:
 
 ```bash
-bun run --filter native test -- src/features/auth/hooks/__tests__/use-native-apple-sign-in.spec.ts
+bun run --filter native test -- src/features/auth/hooks/use-native-apple-sign-in.spec.ts
 ```
 
 Expected: PASS.
@@ -708,7 +711,7 @@ git add apps/native/app.config.ts \
        apps/native/src/app/\(auth\)/sign-in.tsx \
        apps/native/src/features/auth/screens/sign-in/sign-in.screen.tsx \
        apps/native/src/features/auth/hooks/use-native-apple-sign-in.ts \
-       apps/native/src/features/auth/hooks/__tests__/
+       apps/native/src/features/auth/hooks/
 git commit -m "feat(native): implement native Apple sign-in with backend identity token verification"
 ```
 
@@ -720,7 +723,7 @@ git commit -m "feat(native): implement native Apple sign-in with backend identit
 
 - Modify: `apps/native/src/features/auth/screens/sign-in/sign-in.screen.tsx`
 - Modify: `apps/native/src/app/(auth)/sign-in.tsx`
-- Create: `apps/native/src/features/auth/screens/sign-in/__tests__/sign-in.screen.spec.ts`
+- Create: `apps/native/src/features/auth/screens/sign-in/sign-in.screen.spec.ts`
 - Delete: `apps/native/assets/auth/google-continue-*.png` (8 files, after verified)
 
 **Interfaces:**
@@ -730,7 +733,7 @@ git commit -m "feat(native): implement native Apple sign-in with backend identit
 
 - [ ] **Step 1: Write the failing test for the Google button**
 
-Create `apps/native/src/features/auth/screens/sign-in/__tests__/sign-in.screen.spec.ts`:
+Create `apps/native/src/features/auth/screens/sign-in/sign-in.screen.spec.ts`:
 
 ```typescript
 import React from "react";
@@ -770,7 +773,7 @@ describe("SignInScreen", () => {
 Run:
 
 ```bash
-bun run --filter native test -- src/features/auth/screens/sign-in/__tests__/sign-in.screen.spec.ts
+bun run --filter native test -- src/features/auth/screens/sign-in/sign-in.screen.spec.ts
 ```
 
 Expected: Initially the test will fail to find "Continue with Google" text since the current button is an image. After implementation, it passes.
@@ -912,7 +915,7 @@ Remove-Item apps/native/assets/auth/google-continue-*.png
 
 ```bash
 git add apps/native/src/features/auth/screens/sign-in/sign-in.screen.tsx \
-       apps/native/src/features/auth/screens/sign-in/__tests__/ \
+       apps/native/src/features/auth/screens/sign-in/ \
        apps/native/src/app/\(auth\)/sign-in.tsx
 git rm apps/native/assets/auth/google-continue-*.png
 git commit -m "feat(native): replace Google button image with CSS-styled SVG button"
@@ -932,7 +935,9 @@ git commit -m "feat(native): replace Google button image with CSS-styled SVG but
 **Interfaces:**
 
 - Consumes: Same `AuthProviderButtonProps` (`provider`, `onClick`, `disabled`) — no breaking changes
-- Produces: CSS-styled buttons using lucide-react Apple icon + Google SVG, preserving aria-labels
+- Produces: Apple JS SDK rendered button (via `appleid.auth.js`) for Apple + CSS-styled Google button with Google SVG, preserving aria-labels
+
+> **Design decision — Apple JS SDK:** The Apple button is rendered natively by Apple's JS SDK (`appleid.auth.js`) loaded from CDN. This produces the authentic Apple-branded button per Apple's HIG with proper dark/light mode, border radius, sizing, etc. The SDK also handles the OAuth popup flow natively. On success it dispatches `AppleIDSignInOnSuccess` custom event with the authorization code/id_token. The `onClick` prop is NOT used for Apple — the OAuth flow goes through Apple's JS SDK directly. Backend endpoint `POST /api/auth/apple/web` handles the code exchange.
 
 - [ ] **Step 1: Write the failing test for the new button**
 
@@ -954,20 +959,20 @@ describe("AuthProviderButton", () => {
     expect(screen.getByLabelText("Continue with Google")).toBeInTheDocument();
   });
 
-  it("renders the provider icon as an SVG", () => {
-    const { container } = render(<AuthProviderButton provider="apple" />);
+  it("renders Google button SVG icon", () => {
+    const { container } = render(<AuthProviderButton provider="google" />);
     expect(container.querySelector("svg")).toBeInTheDocument();
   });
 
-  it("renders button text", () => {
+  it("renders Google button text", () => {
     render(<AuthProviderButton provider="google" />);
     expect(screen.getByText("Continue with Google")).toBeInTheDocument();
   });
 
-  it("calls onClick when clicked", () => {
+  it("calls onClick when Google button is clicked", () => {
     const onClick = vi.fn();
-    render(<AuthProviderButton provider="apple" onClick={onClick} />);
-    screen.getByLabelText("Continue with Apple").click();
+    render(<AuthProviderButton provider="google" onClick={onClick} />);
+    screen.getByLabelText("Continue with Google").click();
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
@@ -982,6 +987,8 @@ describe("AuthProviderButton", () => {
 });
 ```
 
+> **Note:** Apple button tests only check aria-label on the container div (`#appleid-signin`). The Apple JS SDK's rendered content (SVG, text) is not testable via RTL since the SDK renders asynchronously. E2E tests verify the actual button appearance.
+
 - [ ] **Step 2: Run test to verify it fails**
 
 Run:
@@ -990,31 +997,27 @@ Run:
 bun run --filter web test src/features/auth/components/provider-button.spec.tsx
 ```
 
-Expected: The first two tests (aria-label) may pass since the existing button already has those labels. Tests 3 (SVG) and 4 (text) will fail because the current implementation uses `<Image>` with no text/SVG.
+Expected: The aria-label tests pass (existing buttons already have labels). SVG and text tests for Google fail (current uses `<Image>`). Apple button aria-label container test passes.
 
-- [ ] **Step 3: Rewrite provider-button.tsx with CSS-styled buttons**
+- [ ] **Step 3: Rewrite provider-button.tsx — Apple via JS SDK, Google via CSS**
 
 Replace `apps/web/src/features/auth/components/provider-button.tsx`:
 
 ```typescript
 "use client";
 
-import { Apple } from "lucide-react";
-import { useEffect, useState, type CSSProperties } from "react";
+import Script from "next/script";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 type Provider = "apple" | "google";
 type ThemeMode = "light" | "dark";
 
 export type AuthProviderButtonProps = {
   provider: Provider;
+  /** Only used for Google. Apple JS SDK handles its own OAuth popup flow. */
   onClick?: () => void;
   disabled?: boolean;
 };
-
-const providerConfig = {
-  apple: { label: "Continue with Apple" },
-  google: { label: "Continue with Google" },
-} as const;
 
 function GoogleSvg() {
   return (
@@ -1039,25 +1042,71 @@ export function AuthProviderButton({
     }
     return "light";
   });
+  const appleBtnRef = useRef<HTMLDivElement>(null);
+  const renderedRef = useRef(false);
 
   useEffect(() => {
     const root = document.documentElement;
     const readTheme = (): ThemeMode =>
       root.getAttribute("data-theme") === "dark" ? "dark" : "light";
-
     const syncTheme = () => setThemeMode(readTheme());
     const observer = new MutationObserver(syncTheme);
     observer.observe(root, { attributes: true, attributeFilter: ["data-theme"] });
     return () => observer.disconnect();
   }, []);
 
-  const config = providerConfig[provider];
-  const isApple = provider === "apple";
-  const isDark = themeMode === "dark";
+  // Apple JS SDK: render the native button after script loads
+  useEffect(() => {
+    if (provider !== "apple" || renderedRef.current || !appleBtnRef.current) return;
 
-  // Apple button: black bg / white text (light), white bg / black text (dark)
-  // Google button: follows gsi-material-button spec from Google's branding
-  const btnStyle: CSSProperties = {
+    const renderAppleBtn = () => {
+      if (typeof AppleID !== "undefined" && AppleID.auth && appleBtnRef.current) {
+        try {
+          AppleID.auth.renderButton();
+          renderedRef.current = true;
+        } catch {
+          // SDK may already have auto-rendered
+          renderedRef.current = true;
+        }
+      }
+    };
+
+    renderAppleBtn();
+    // Poll in case script hasn't loaded yet
+    const id = setInterval(() => {
+      if (!renderedRef.current) renderAppleBtn();
+    }, 200);
+    return () => clearInterval(id);
+  }, [provider, themeMode]);
+
+  if (provider === "apple") {
+    return (
+      <>
+        <Script
+          src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"
+          strategy="lazyOnload"
+        />
+        <div
+          id="appleid-signin"
+          ref={appleBtnRef}
+          data-color={themeMode === "dark" ? "white" : "black"}
+          data-border="true"
+          data-type="sign-in"
+          role="button"
+          aria-label="Continue with Apple"
+          style={{
+            width: "100%",
+            minHeight: "2.9rem",
+            cursor: disabled ? "not-allowed" : "pointer",
+            opacity: disabled ? 0.45 : 1,
+          }}
+        />
+      </>
+    );
+  }
+
+  const isDark = themeMode === "dark";
+  const googleBtnStyle: CSSProperties = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -1065,10 +1114,8 @@ export function AuthProviderButton({
     width: "100%",
     height: "40px",
     padding: "0 24px",
-    border: isApple
-      ? "none"
-      : `1px solid ${isDark ? "#8e918f" : "#747775"}`,
-    borderRadius: isApple ? "4px" : "4px",
+    border: `1px solid ${isDark ? "#8e918f" : "#747775"}`,
+    borderRadius: "4px",
     cursor: disabled ? "default" : "pointer",
     opacity: disabled ? 0.45 : 1,
     fontFamily: "'Roboto', arial, sans-serif",
@@ -1080,22 +1127,9 @@ export function AuthProviderButton({
     position: "relative",
     textAlign: "center",
     whiteSpace: "nowrap",
-    ...(isApple
-      ? {
-          backgroundColor: isDark ? "#fff" : "#000",
-          color: isDark ? "#000" : "#fff",
-        }
-      : {
-          backgroundColor: isDark ? "#131314" : "#fff",
-          color: isDark ? "#e3e3e3" : "#1f1f1f",
-        }),
-    ...(isApple
-      ? {}
-      : {
-          transition:
-            "background-color .218s, border-color .218s, box-shadow .218s",
-        }),
-    // Remove `maxWidth: "100%"` to let it fill the parent container
+    backgroundColor: isDark ? "#131314" : "#fff",
+    color: isDark ? "#e3e3e3" : "#1f1f1f",
+    transition: "background-color .218s, border-color .218s, box-shadow .218s",
   };
 
   return (
@@ -1103,19 +1137,17 @@ export function AuthProviderButton({
       type="button"
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
-      aria-label={config.label}
-      style={btnStyle}
+      aria-label="Continue with Google"
+      style={googleBtnStyle}
     >
-      {isApple ? (
-        <Apple size={20} strokeWidth={1.5} />
-      ) : (
-        <GoogleSvg />
-      )}
-      <span>{config.label}</span>
+      <GoogleSvg />
+      <span>Continue with Google</span>
     </button>
   );
 }
 ```
+
+> **Note:** The Apple JS SDK reads `data-color`, `data-border`, `data-type` from the container div. For dark mode we pass `data-color="white"`, for light mode `data-color="black"`. The Apple OAuth redirect URI is configured via `<meta>` tags in the app layout (or `AppleID.auth.init()` in a layout effect). The button click triggers Apple's native popup OAuth flow (`usePopup: true`). On success, `AppleIDSignInOnSuccess` custom event fires with the authorization code — a parent listener sends it to `POST /api/auth/apple/web`.
 
 - [ ] **Step 4: Run test to verify they pass**
 
