@@ -12,6 +12,12 @@ export type FeedFollowingDesktopScreenProps = {
   onNavigateToScholar?: (slug: string) => void;
 };
 
+function getFeedItemKey(item: FeedItemDto): string {
+  if (item.kind === "scholar_row") return "scholar-row";
+  if (item.kind === "topic_row") return `topic-row-${item.topicName}`;
+  return item.id;
+}
+
 type FeedBlocksProps = {
   items: FeedItemDto[];
   onNavigateToLecture?: (slug: string) => void;
@@ -36,7 +42,7 @@ function FeedBlocks({ items, onNavigateToLecture, onNavigateToScholar }: FeedBlo
     if (item.kind === "scholar_row") {
       flushCards(String(index));
       blocks.push(
-        <section className={styles.section} key={`scholar-row-${index}`}>
+        <section className={styles.section} key={getFeedItemKey(item)}>
           <FeedScholarRow scholars={item.scholars} onScholarPress={onNavigateToScholar} />
         </section>,
       );

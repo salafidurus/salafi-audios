@@ -6,7 +6,7 @@ import { useExploreRecentScreen } from "@sd/domain-content";
 import { FeedListRow } from "../components/feed-list-row/feed-list-row";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import styles from "./feed-recent.screen.mobile.module.css";
+import styles from "./explore-recent.screen.mobile.module.css";
 
 export type FeedMobileScreenProps = {
   onNavigateToLecture?: (slug: string) => void;
@@ -18,6 +18,12 @@ type FeedBlocksProps = {
   onNavigateToLecture?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
 };
+
+function getFeedItemKey(item: FeedItemDto): string {
+  if (item.kind === "scholar_row") return "scholar-row";
+  if (item.kind === "topic_row") return `topic-row-${item.topicName}`;
+  return item.id;
+}
 
 function FeedBlocks({ items, onNavigateToLecture, onNavigateToScholar }: FeedBlocksProps) {
   const blocks: React.ReactNode[] = [];
@@ -37,7 +43,7 @@ function FeedBlocks({ items, onNavigateToLecture, onNavigateToScholar }: FeedBlo
     if (item.kind === "scholar_row") {
       flushCards(String(index));
       blocks.push(
-        <section className={styles.section} key={`scholar-row-${index}`}>
+        <section className={styles.section} key={getFeedItemKey(item)}>
           <FeedScholarRow scholars={item.scholars} onScholarPress={onNavigateToScholar} />
         </section>,
       );
