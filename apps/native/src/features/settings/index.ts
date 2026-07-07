@@ -4,10 +4,14 @@ export {
   AccountProfileScreen,
   type AccountProfileScreenProps,
 } from "./screens/account-profile.screen";
+export { SupportScreen } from "./screens/support.screen";
+export { LegalToggleScreen } from "./screens/legal-toggle.screen";
 
-// i18n components and utilities
+// Components
 export { LanguageSwitch } from "./components/language-switch/language-switch";
 export { ContentLanguageToggle } from "./components/content-language-toggle/content-language-toggle";
+
+// i18n utilities
 export {
   contentPreferenceStore,
   useShowOriginalContent,
