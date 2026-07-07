@@ -21,8 +21,9 @@
   "constraints": {
     "git": {
       "disallowedFlags": ["--no-verify"],
-      "reason": "Pre-commit hooks enforce code quality (react-doctor, typecheck, linting). Always fix the actual issues instead of bypassing hooks.",
-      "enforced": true
+      "reason": "Pre-commit and pre-push hooks enforce code quality and test validation. Always fix the actual issues instead of bypassing hooks.",
+      "enforced": true,
+      "appliesTo": ["commit", "push"]
     }
   },
   "codeQuality": {
