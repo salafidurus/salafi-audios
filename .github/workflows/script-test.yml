@@ -40,4 +40,7 @@ jobs:
         run: bun ./scripts/deploy/install.mjs web
 
       - name: Verify Web Deploy Build Script
+        env:
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api' }}
+          NEXT_PUBLIC_WEB_URL: ${{ secrets.NEXT_PUBLIC_WEB_URL || 'http://localhost:3000' }}
         run: bun ./scripts/deploy/build.mjs web
