@@ -29,7 +29,7 @@ jest.mock("@/shared/components/AppText/AppText", () => ({
   },
 }));
 
-jest.mock("@/features/scholar/components/scholar-header/scholar-header", () => ({
+jest.mock("@/features/listing/components/scholar-header/scholar-header", () => ({
   ScholarHeader: ({ scholar }: { scholar: { name: string } }) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const ReactM = require("react");
@@ -39,7 +39,7 @@ jest.mock("@/features/scholar/components/scholar-header/scholar-header", () => (
   },
 }));
 
-jest.mock("@/features/scholar/components/scholar-content-list/scholar-content-list", () => ({
+jest.mock("@/features/listing/components/scholar-content-list/scholar-content-list", () => ({
   ScholarContentList: ({ items }: { items: unknown[] }) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const ReactM = require("react");

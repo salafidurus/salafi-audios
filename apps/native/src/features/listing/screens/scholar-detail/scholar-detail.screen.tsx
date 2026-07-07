@@ -5,8 +5,8 @@ import { useScholarDetail, useScholarContent, useScholarTopics } from "@sd/domai
 import { ChevronDown } from "lucide-react-native";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { ScholarContentList } from "@/features/scholar/components/scholar-content-list/scholar-content-list";
-import { ScholarHeader } from "@/features/scholar/components/scholar-header/scholar-header";
+import { ScholarContentList } from "@/features/listing/components/scholar-content-list/scholar-content-list";
+import { ScholarHeader } from "@/features/listing/components/scholar-header/scholar-header";
 
 if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);

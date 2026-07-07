@@ -4,7 +4,7 @@ import type { ScholarListItemDto } from "@sd/core-contracts";
 import { useScholarsList } from "@sd/domain-content";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { ScholarRow } from "@/features/scholar/components/scholar-row/scholar-row";
+import { ScholarRow } from "@/features/listing/components/scholar-row/scholar-row";
 
 export type ScholarListScreenProps = {
   onSelectScholar?: (slug: string) => void;

@@ -41,7 +41,7 @@ jest.mock("@/shared/components/AppText/AppText", () => ({
   },
 }));
 
-jest.mock("@/features/lecture/components/lecture-meta/lecture-meta", () => ({
+jest.mock("@/features/listing/components/lecture-meta/lecture-meta", () => ({
   LectureMeta: ({ lecture }: { lecture: { scholar: { name: string } } }) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const ReactM = require("react");
@@ -51,7 +51,7 @@ jest.mock("@/features/lecture/components/lecture-meta/lecture-meta", () => ({
   },
 }));
 
-jest.mock("@/features/lecture/components/topic-chips/topic-chips", () => ({
+jest.mock("@/features/listing/components/topic-chips/topic-chips", () => ({
   TopicChips: ({ topics }: { topics: { name: string }[] }) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const ReactM = require("react");
@@ -61,7 +61,7 @@ jest.mock("@/features/lecture/components/topic-chips/topic-chips", () => ({
   },
 }));
 
-jest.mock("@/features/lecture/components/series-context-bar/series-context-bar", () => ({
+jest.mock("@/features/listing/components/series-context-bar/series-context-bar", () => ({
   SeriesContextBar: ({ seriesContext }: { seriesContext: { seriesTitle: string } }) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const ReactM = require("react");

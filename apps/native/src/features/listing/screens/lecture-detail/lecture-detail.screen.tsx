@@ -4,9 +4,9 @@ import { useListingDetail } from "@sd/domain-content";
 import { pickContentField } from "@sd/core-i18n";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { LectureMeta } from "@/features/lecture/components/lecture-meta/lecture-meta";
-import { SeriesContextBar } from "@/features/lecture/components/series-context-bar/series-context-bar";
-import { TopicChips } from "@/features/lecture/components/topic-chips/topic-chips";
+import { LectureMeta } from "@/features/listing/components/lecture-meta/lecture-meta";
+import { SeriesContextBar } from "@/features/listing/components/series-context-bar/series-context-bar";
+import { TopicChips } from "@/features/listing/components/topic-chips/topic-chips";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
 
