@@ -14,10 +14,10 @@ import { resolveContentTranslation } from '../../shared/utils/resolve-content-tr
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 
 @Injectable()
-export class FeedRepo {
+export class ExploreRepo {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getFeed(
+  async getExplore(
     cursor?: string,
     limit = 20,
     topicSlugs?: string[],
@@ -141,7 +141,7 @@ export class FeedRepo {
     return { items, nextCursor };
   }
 
-  async getFeedRecent(cursor?: string, limit = 20): Promise<FeedPageDto> {
+  async getExploreRecent(cursor?: string, limit = 20): Promise<FeedPageDto> {
     const locale = getRequestLocale();
     const cursorDate = cursor ? new Date(cursor) : undefined;
 

@@ -2,12 +2,12 @@ import { vi, type Mocked } from 'vitest';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Test, TestingModule } from '@nestjs/testing';
 import type { FeedPageDto } from '@sd/core-contracts';
-import { FeedRepo } from './feed.repo';
-import { FeedService } from './feed.service';
+import { ExploreRepo } from './explore.repo';
+import { ExploreService } from './explore.service';
 
-describe('FeedService', () => {
-  let service: FeedService;
-  let repo: Mocked<FeedRepo>;
+describe('ExploreService', () => {
+  let service: ExploreService;
+  let repo: Mocked<ExploreRepo>;
 
   const mockFeedPage: FeedPageDto = {
     items: [
@@ -34,55 +34,55 @@ describe('FeedService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        FeedService,
+        ExploreService,
         {
-          provide: FeedRepo,
+          provide: ExploreRepo,
           useValue: {
-            getFeed: vi.fn(),
-            getFeedRecent: vi.fn(),
+            getExplore: vi.fn(),
+            getExploreRecent: vi.fn(),
             getScholars: vi.fn(),
-          } satisfies Partial<Mocked<FeedRepo>>,
+          } satisfies Partial<Mocked<ExploreRepo>>,
         },
       ],
     }).compile();
 
-    service = module.get(FeedService);
-    repo = module.get(FeedRepo) as Mocked<FeedRepo>;
+    service = module.get(ExploreService);
+    repo = module.get(ExploreRepo) as Mocked<ExploreRepo>;
   });
 
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('getFeed', () => {
+  describe('getExplore', () => {
     it('should pass all parameters to repository and return result', async () => {
-      repo.getFeed.mockResolvedValue(mockFeedPage);
+      repo.getExplore.mockResolvedValue(mockFeedPage);
 
-      const result = await service.getFeed('cursor1', 10, ['aqeedah'], ['scholar-1']);
+      const result = await service.getExplore('cursor1', 10, ['aqeedah'], ['scholar-1']);
 
       expect(result).toEqual(mockFeedPage);
-      expect(repo.getFeed).toHaveBeenCalledWith('cursor1', 10, ['aqeedah'], ['scholar-1']);
+      expect(repo.getExplore).toHaveBeenCalledWith('cursor1', 10, ['aqeedah'], ['scholar-1']);
     });
 
     it('should use default limit of 20 when not provided', async () => {
-      repo.getFeed.mockResolvedValue(mockFeedPage);
+      repo.getExplore.mockResolvedValue(mockFeedPage);
 
-      await service.getFeed();
+      await service.getExplore();
 
-      expect(repo.getFeed).toHaveBeenCalledWith(undefined, 20, undefined, undefined);
+      expect(repo.getExplore).toHaveBeenCalledWith(undefined, 20, undefined, undefined);
     });
 
     it('should forward undefined optional params to repository', async () => {
-      repo.getFeed.mockResolvedValue(mockFeedPage);
+      repo.getExplore.mockResolvedValue(mockFeedPage);
 
-      await service.getFeed('cursor1');
+      await service.getExplore('cursor1');
 
-      expect(repo.getFeed).toHaveBeenCalledWith('cursor1', 20, undefined, undefined);
+      expect(repo.getExplore).toHaveBeenCalledWith('cursor1', 20, undefined, undefined);
     });
   });
 
-  describe('getFeedRecent', () => {
-    it('should delegate to repo.getFeedRecent and return result sorted by createdAt DESC', async () => {
+  describe('getExploreRecent', () => {
+    it('should delegate to repo.getExploreRecent and return result sorted by createdAt DESC', async () => {
       const recentPage: FeedPageDto = {
         items: [
           {
@@ -99,39 +99,39 @@ describe('FeedService', () => {
         ],
         nextCursor: undefined,
       };
-      repo.getFeedRecent.mockResolvedValue(recentPage);
+      repo.getExploreRecent.mockResolvedValue(recentPage);
 
-      const result = await service.getFeedRecent('cursor1', 10);
+      const result = await service.getExploreRecent('cursor1', 10);
 
       expect(result).toEqual(recentPage);
-      expect(repo.getFeedRecent).toHaveBeenCalledWith('cursor1', 10);
+      expect(repo.getExploreRecent).toHaveBeenCalledWith('cursor1', 10);
     });
 
     it('should use default limit of 20 when not provided', async () => {
-      repo.getFeedRecent.mockResolvedValue(mockFeedPage);
+      repo.getExploreRecent.mockResolvedValue(mockFeedPage);
 
-      await service.getFeedRecent();
+      await service.getExploreRecent();
 
-      expect(repo.getFeedRecent).toHaveBeenCalledWith(undefined, 20);
+      expect(repo.getExploreRecent).toHaveBeenCalledWith(undefined, 20);
     });
   });
 
-  describe('getFollowingFeed', () => {
-    it('should delegate to repo.getFeed and return result', async () => {
-      repo.getFeed.mockResolvedValue(mockFeedPage);
+  describe('getFollowingExplore', () => {
+    it('should delegate to repo.getExplore and return result', async () => {
+      repo.getExplore.mockResolvedValue(mockFeedPage);
 
-      const result = await service.getFollowingFeed('cursor1', 10);
+      const result = await service.getFollowingExplore('cursor1', 10);
 
       expect(result).toEqual(mockFeedPage);
-      expect(repo.getFeed).toHaveBeenCalledWith('cursor1', 10);
+      expect(repo.getExplore).toHaveBeenCalledWith('cursor1', 10);
     });
 
     it('should use default limit of 20 when not provided', async () => {
-      repo.getFeed.mockResolvedValue(mockFeedPage);
+      repo.getExplore.mockResolvedValue(mockFeedPage);
 
-      await service.getFollowingFeed();
+      await service.getFollowingExplore();
 
-      expect(repo.getFeed).toHaveBeenCalledWith(undefined, 20);
+      expect(repo.getExplore).toHaveBeenCalledWith(undefined, 20);
     });
   });
 

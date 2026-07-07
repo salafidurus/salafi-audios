@@ -7,14 +7,14 @@ import {
   type FeedPageDto,
 } from "@sd/core-contracts";
 
-export function useFeedRecent() {
+export function useExploreRecent() {
   return useInfiniteQuery<FeedPageDto>({
-    queryKey: [...queryKeys.feed.all, "recent"],
+    queryKey: [...queryKeys.explore.all, "recent"],
     queryFn: async ({ pageParam }) => {
       const params: Record<string, string> = {};
       if (pageParam) params.cursor = pageParam as string;
       return httpClient<FeedPageDto>({
-        url: endpoints.feed.recent,
+        url: endpoints.explore.recent,
         method: "GET",
         params,
       });
@@ -24,14 +24,14 @@ export function useFeedRecent() {
   });
 }
 
-export function useFeedFollowing() {
+export function useExploreFollowing() {
   return useInfiniteQuery<FeedPageDto>({
-    queryKey: [...queryKeys.feed.all, "following"],
+    queryKey: [...queryKeys.explore.all, "following"],
     queryFn: async ({ pageParam }) => {
       const params: Record<string, string> = {};
       if (pageParam) params.cursor = pageParam as string;
       return httpClient<FeedPageDto>({
-        url: endpoints.feed.following,
+        url: endpoints.explore.following,
         method: "GET",
         params,
       });
@@ -41,10 +41,10 @@ export function useFeedFollowing() {
   });
 }
 
-export function useFeedList() {
-  return useApiQuery(queryKeys.feed.list(), () =>
+export function useExploreList() {
+  return useApiQuery(queryKeys.explore.list(), () =>
     httpClient<FeedPageDto>({
-      url: endpoints.feed.list,
+      url: endpoints.explore.list,
       method: "GET",
     }),
   );

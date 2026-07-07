@@ -17,11 +17,11 @@ export const endpoints = {
     detail: (id: string) => `/listings/${id}`,
     related: (id: string) => `/listings/${id}/related`,
   },
-  feed: {
-    list: "/feed",
-    scholars: "/feed/scholars",
-    recent: "/feed/recent",
-    following: "/feed/following",
+  explore: {
+    list: "/explore",
+    scholars: "/explore/scholars",
+    recent: "/explore/recent",
+    following: "/explore/following",
   },
   library: {
     saved: "/me/library/saved",

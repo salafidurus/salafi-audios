@@ -7,16 +7,16 @@ import {
   type ScholarChipDto,
 } from "@sd/core-contracts";
 
-export function useFeed(topicSlugs?: string[], scholarSlugs?: string[]) {
+export function useExplore(topicSlugs?: string[], scholarSlugs?: string[]) {
   return useInfiniteQuery<FeedPageDto>({
-    queryKey: [...queryKeys.feed.all, "list", { topicSlugs, scholarSlugs }],
+    queryKey: [...queryKeys.explore.all, "list", { topicSlugs, scholarSlugs }],
     queryFn: async ({ pageParam }) => {
       const params: Record<string, string> = {};
       if (pageParam) params.cursor = pageParam as string;
       if (topicSlugs?.length) params.topicSlugs = topicSlugs.join(",");
       if (scholarSlugs?.length) params.scholarSlugs = scholarSlugs.join(",");
       return httpClient<FeedPageDto>({
-        url: endpoints.feed.list,
+        url: endpoints.explore.list,
         method: "GET",
         params,
       });
@@ -26,12 +26,12 @@ export function useFeed(topicSlugs?: string[], scholarSlugs?: string[]) {
   });
 }
 
-export function useFeedScholars() {
+export function useExploreScholars() {
   return useQuery<{ scholars: ScholarChipDto[] }>({
-    queryKey: [...queryKeys.feed.all, "scholars"],
+    queryKey: [...queryKeys.explore.all, "scholars"],
     queryFn: () =>
       httpClient<{ scholars: ScholarChipDto[] }>({
-        url: endpoints.feed.scholars,
+        url: endpoints.explore.scholars,
         method: "GET",
       }),
   });

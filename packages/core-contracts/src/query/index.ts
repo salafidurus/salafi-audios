@@ -61,12 +61,12 @@ export const queryKeys = {
     all: ["search"] as const,
     catalog: (params: SearchCatalogParams) => [...queryKeys.search.all, "catalog", params] as const,
   },
-  feed: {
-    all: ["feed"] as const,
-    list: (params?: Record<string, unknown>) => [...queryKeys.feed.all, "list", params] as const,
-    scholars: () => [...queryKeys.feed.all, "scholars"] as const,
-    recent: (cursor?: string) => [...queryKeys.feed.all, "recent", cursor] as const,
-    following: (cursor?: string) => [...queryKeys.feed.all, "following", cursor] as const,
+  explore: {
+    all: ["explore"] as const,
+    list: (params?: Record<string, unknown>) => [...queryKeys.explore.all, "list", params] as const,
+    scholars: () => [...queryKeys.explore.all, "scholars"] as const,
+    recent: (cursor?: string) => [...queryKeys.explore.all, "recent", cursor] as const,
+    following: (cursor?: string) => [...queryKeys.explore.all, "following", cursor] as const,
   },
   library: {
     all: ["library"] as const,

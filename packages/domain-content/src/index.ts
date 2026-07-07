@@ -1,7 +1,7 @@
-export { useFeed, useFeedScholars } from "./use-feed";
-export { useFeedRecentScreen } from "./use-feed-recent";
-export { useFeedFollowingScreen } from "./use-feed-following";
-export { useFeedRecent, useFeedFollowing, useFeedList } from "./feed.api";
+export { useExplore, useExploreScholars } from "./use-explore";
+export { useExploreRecentScreen } from "./use-explore-recent";
+export { useExploreFollowingScreen } from "./use-explore-following";
+export { useExploreRecent, useExploreFollowing, useExploreList } from "./explore.api";
 export { useLibrarySaved, useLibraryCompleted, useLibraryProgress } from "./library.api";
 export { useLibrarySavedScreen } from "./use-library-saved";
 export { useLibraryCompletedScreen } from "./use-library-completed";

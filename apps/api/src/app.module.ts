@@ -18,7 +18,7 @@ import { LiveModule } from './modules/live/live.module';
 import { LibraryModule } from './modules/library/library.module';
 import { AudioModule } from './modules/audio/audio.module';
 import { HomeModule } from './modules/home/home.module';
-import { FeedModule } from './modules/feed/feed.module';
+import { ExploreModule } from './modules/explore/explore.module';
 import { MediaModule } from './modules/media/media.module';
 import { ListingModule } from './modules/listing/listing.module';
 import { SitemapModule } from './modules/sitemap/sitemap.module';
@@ -44,7 +44,7 @@ import { LocaleMiddleware } from './shared/i18n/locale.middleware';
     LibraryModule,
     AudioModule,
     HomeModule,
-    FeedModule,
+    ExploreModule,
     MediaModule,
     ListingModule,
     SitemapModule,

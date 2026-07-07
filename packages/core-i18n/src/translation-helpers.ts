@@ -6,10 +6,10 @@
  */
 
 export const SUBNAV_KEYS: Record<string, Record<string, string>> = {
-  feed: {
-    popular: "navigation.subnav.feed.popular",
-    recent: "navigation.subnav.feed.recent",
-    following: "navigation.subnav.feed.following",
+  explore: {
+    popular: "navigation.subnav.explore.popular",
+    recent: "navigation.subnav.explore.recent",
+    following: "navigation.subnav.explore.following",
   },
   live: {
     ongoing: "navigation.subnav.live.ongoing",

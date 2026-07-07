@@ -3,14 +3,14 @@ import { ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger'
 import { SkipThrottle } from '@nestjs/throttler';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { Public } from '../../modules/auth/decorators';
-import { FeedService } from './feed.service';
+import { ExploreService } from './explore.service';
 
 @SkipThrottle()
-@ApiTags('Feed')
+@ApiTags('Explore')
 @ApiCommonErrors()
-@Controller('feed')
-export class FeedController {
-  constructor(private readonly feed: FeedService) {}
+@Controller('explore')
+export class ExploreController {
+  constructor(private readonly explore: ExploreService) {}
 
   @Get()
   @Public()
@@ -30,7 +30,7 @@ export class FeedController {
     type: String,
     description: 'Comma-separated scholar slugs',
   })
-  getFeed(
+  getExplore(
     @Query('cursor') cursor?: string,
     @Query('limit') limitStr?: string,
     @Query('topicSlugs') topicSlugs?: string,
@@ -40,7 +40,7 @@ export class FeedController {
     const topics = topicSlugs ? topicSlugs.split(',').map((s) => s.trim()) : undefined;
     const scholars = scholarSlugs ? scholarSlugs.split(',').map((s) => s.trim()) : undefined;
 
-    return this.feed.getFeed(cursor, limit, topics, scholars);
+    return this.explore.getExplore(cursor, limit, topics, scholars);
   }
 
   @Get('recent')
@@ -49,9 +49,9 @@ export class FeedController {
   @ApiOkResponse({ description: 'Paginated recent feed items' })
   @ApiQuery({ name: 'cursor', required: false, type: String })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  getFeedRecent(@Query('cursor') cursor?: string, @Query('limit') limitStr?: string) {
+  getExploreRecent(@Query('cursor') cursor?: string, @Query('limit') limitStr?: string) {
     const limit = Math.min(Math.max(Number(limitStr) || 20, 1), 40);
-    return this.feed.getFeedRecent(cursor, limit);
+    return this.explore.getExploreRecent(cursor, limit);
   }
 
   @Get('following')
@@ -61,9 +61,9 @@ export class FeedController {
   @ApiOkResponse({ description: 'Paginated following feed items' })
   @ApiQuery({ name: 'cursor', required: false, type: String })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  getFollowingFeed(@Query('cursor') cursor?: string, @Query('limit') limitStr?: string) {
+  getFollowingExplore(@Query('cursor') cursor?: string, @Query('limit') limitStr?: string) {
     const limit = Math.min(Math.max(Number(limitStr) || 20, 1), 40);
-    return this.feed.getFollowingFeed(cursor, limit);
+    return this.explore.getFollowingExplore(cursor, limit);
   }
 
   @Get('scholars')
@@ -71,6 +71,6 @@ export class FeedController {
   @ApiOperation({ summary: 'Get ranked scholars for feed' })
   @ApiOkResponse({ description: 'Top scholars for horizontal section' })
   getScholars() {
-    return this.feed.getScholars();
+    return this.explore.getScholars();
   }
 }
