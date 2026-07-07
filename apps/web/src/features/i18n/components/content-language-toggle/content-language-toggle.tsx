@@ -2,6 +2,7 @@
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { setShowOriginalContent, useShowOriginalContent } from "@/features/i18n/content-preference";
+import styles from "./content-language-toggle.module.css";
 
 /** Settings toggle that switches catalogue content (lectures, series,
  * collections) between the selected language and its original language. */
@@ -10,13 +11,13 @@ export function ContentLanguageToggle() {
   const showOriginal = useShowOriginalContent();
 
   return (
-    <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+    <label className={styles.label}>
       <input
         type="checkbox"
         checked={showOriginal}
         onChange={(event) => setShowOriginalContent(event.target.checked)}
       />
-      <span style={{ fontSize: 14 }}>
+      <span className={styles.labelText}>
         {t("account.showOriginalContent", "Show content in its original language")}
       </span>
     </label>
