@@ -4,6 +4,9 @@
   "workspaces": {
     "": {
       "name": "salafi-durus",
+      "dependencies": {
+        "jose": "^6.2.3",
+      },
       "devDependencies": {
         "@babel/runtime": "^7.29.7",
         "@commitlint/cli": "20.3.1",
@@ -54,9 +57,11 @@
         "@prisma/client": "catalog:",
         "@sd/core-i18n": "workspace:*",
         "better-auth": "catalog:",
+        "class-validator": "^0.14.1",
         "cookie-parser": "^1.4.7",
         "dotenv": "^17.4.2",
         "helmet": "catalog:",
+        "jose": "^6.2.3",
         "nestjs-pino": "^4.6.1",
         "nestjs-zod": "^5.4.0",
         "pg": "catalog:",
@@ -2057,7 +2062,7 @@
 
     "class-transformer": ["class-transformer@0.5.1", "", {}, "sha512-SQa1Ws6hUbfC98vKGxZH3KFY0Y1lm5Zm0SY8XX9zbK7FJCyVEac3ATW0RIpwzW+oOfmHE5PMPufDG9hCfoEOMw=="],
 
-    "class-validator": ["class-validator@0.15.1", "", { "dependencies": { "@types/validator": "^13.15.3", "libphonenumber-js": "^1.11.1", "validator": "^13.15.22" } }, "sha512-LqoS80HBBSCVhz/3KloUly0ovokxpdOLR++Al3J3+dHXWt9sTKlKd4eYtoxhxyUjoe5+UcIM+5k9MIxyBWnRTw=="],
+    "class-validator": ["class-validator@0.14.4", "", { "dependencies": { "@types/validator": "^13.15.3", "libphonenumber-js": "^1.11.1", "validator": "^13.15.22" } }, "sha512-AwNusCCam51q703dW82x95tOqQp6oC9HNUl724KxJJOfnKscI8dOloXFgyez7LbTTKWuRBA37FScqVbJEoq8Yw=="],
 
     "cli-boxes": ["cli-boxes@2.2.1", "", {}, "sha512-y4coMcylgSCdVinjiDBuR8PCC2bLjyGTwEmPb9NHR/QaNU6EUOXcTY/s6VjGMD6ENSEaeQYHCY0GNGS5jfMwPw=="],
 
