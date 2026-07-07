@@ -12,12 +12,12 @@ export type SeriesContextBarProps = {
 export function SeriesContextBar({ seriesContext, onNavigate }: SeriesContextBarProps) {
   return (
     <div className={styles.container}>
-      <AppText variant="caption" className={styles.seriesLabel}>
-        Part of series
-      </AppText>
-      <AppText variant="titleMd" className={styles.seriesTitle}>
-        {seriesContext.seriesTitle}
-      </AppText>
+      <div className={styles.seriesLabel}>
+        <AppText variant="caption">Part of series</AppText>
+      </div>
+      <div className={styles.seriesTitle}>
+        <AppText variant="titleMd">{seriesContext.seriesTitle}</AppText>
+      </div>
 
       <div className={styles.navButtonsRow}>
         {seriesContext.prevLecture ? (

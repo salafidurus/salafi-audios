@@ -23,8 +23,8 @@ describe("Badge", () => {
 
     const badge = screen.getByText("admin");
     expect(badge).toBeInTheDocument();
-    expect(badge).toHaveClass(styles.badge);
-    expect(badge).toHaveClass(styles.admin);
+    expect(badge).toHaveClass(styles.badge as string);
+    expect(badge).toHaveClass(styles.admin as string);
   });
 
   it("renders user role badge with muted styling", () => {
@@ -32,8 +32,8 @@ describe("Badge", () => {
 
     const badge = screen.getByText("user");
     expect(badge).toBeInTheDocument();
-    expect(badge).toHaveClass(styles.badge);
-    expect(badge).toHaveClass(styles.user);
+    expect(badge).toHaveClass(styles.badge as string);
+    expect(badge).toHaveClass(styles.user as string);
   });
 
   it("renders status badge with custom color variant", () => {
@@ -41,8 +41,8 @@ describe("Badge", () => {
 
     const badge = screen.getByText("Active");
     expect(badge).toBeInTheDocument();
-    expect(badge).toHaveClass(styles.badge);
-    expect(badge).toHaveClass(styles.success);
+    expect(badge).toHaveClass(styles.badge as string);
+    expect(badge).toHaveClass(styles.success as string);
   });
 
   it("renders without icon when not provided", () => {
@@ -58,7 +58,7 @@ describe("Badge", () => {
 
     const badge = screen.getByText("Pending");
     expect(badge).toBeInTheDocument();
-    expect(badge).toHaveClass(styles.badge);
-    expect(badge).toHaveClass(styles.primary);
+    expect(badge).toHaveClass(styles.badge as string);
+    expect(badge).toHaveClass(styles.primary as string);
   });
 });

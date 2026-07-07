@@ -709,7 +709,8 @@ Create `apps/native/src/features/auth/hooks/use-native-apple-sign-in.ts`:
 ```typescript
 import { useState, useCallback } from "react";
 import * as AppleAuthentication from "expo-apple-authentication";
-import { Platform } from "react-native";
+import * as SecureStore from "expo-secure-store";
+import { authClient } from "@/core/auth";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -720,10 +721,7 @@ export function useNativeAppleSignIn() {
   const signIn = useCallback(async () => {
     setError(null);
 
-    if (Platform.OS !== "ios") {
-      setError("Apple Sign-In is only available on iOS");
-      return;
-    }
+    // Platform check removed - button should be conditionally rendered in screen component
 
     try {
       const isSupported = await AppleAuthentication.isSupportedAsync();
@@ -769,7 +767,19 @@ export function useNativeAppleSignIn() {
         throw new Error(`Server returned ${response.status}: ${body}`);
       }
 
+      const { session } = await response.json();
+
+      // Persist session token using better-auth expo client storage
+      await SecureStore.setItemAsync("better-auth.session_token", session.id);
+
+      // Trigger better-auth client session refresh
+      await authClient.$fetch("/api/auth/get-session", {
+        method: "GET",
+        headers: { Authorization: `Bearer ${session.id}` },
+      });
+
       setIsLoading(false);
+      // Router navigation handled by parent component watching auth state via useAuth()
     } catch (err) {
       const message = err instanceof Error ? err.message : "Apple Sign-In failed";
       setError(message);
@@ -1141,22 +1151,27 @@ git commit -m "feat(native): replace Google button image with CSS-styled SVG but
 
 ---
 
-### Task 4: Web — CSS-styled auth buttons
+### Task 4: Web — CSS-styled auth buttons with better-auth OAuth
 
 **Files:**
 
 - Create: `apps/web/src/features/auth/components/provider-button.spec.tsx`
 - Create: `apps/web/src/features/auth/components/provider-button.module.css`
 - Modify: `apps/web/src/features/auth/components/provider-button.tsx`
+- Modify: `apps/web/src/features/auth/components/social-buttons.tsx`
 - Delete: `apps/web/public/auth/apple-continue-*.png` (4 files, after verified)
 - Delete: `apps/web/public/auth/google-continue-*.png` (4 files, after verified)
 
 **Interfaces:**
 
-- Consumes: Same `AuthProviderButtonProps` (`provider`, `onClick`, `disabled`) — no breaking changes
-- Produces: Apple JS SDK rendered button (via `appleid.auth.js`) for Apple + CSS-styled Google button with Google SVG, preserving aria-labels
+- Consumes: Better-auth Apple + Google OAuth providers (already configured in `apps/api/src/modules/auth/auth.instance.ts`)
+- Produces: Separate `GoogleButton` and `AppleButton` components with distinct prop types
+- Both buttons use `authClient.signIn.social({ provider, callbackURL })` — identical OAuth flow
+- Preserves aria-labels for test compatibility
 
-> **Design decision — Apple JS SDK:** The Apple button is rendered natively by Apple's JS SDK (`appleid.auth.js`) loaded from CDN. This produces the authentic Apple-branded button per Apple's HIG with proper dark/light mode, border radius, sizing, etc. The SDK also handles the OAuth popup flow natively. On success it dispatches `AppleIDSignInOnSuccess` custom event with the authorization code/id_token. The `onClick` prop is NOT used for Apple — the OAuth flow goes through Apple's JS SDK directly. Backend endpoint `POST /api/auth/apple/web` handles the code exchange.
+**Key Architecture Decision:**
+
+Better-auth **already has Apple OAuth configured** server-side (identical to Google). Web Apple auth uses the same `authClient.signIn.social({ provider: 'apple' })` flow as Google — **NO Apple JS SDK, NO event listeners, NO meta tags**. The backend handles the entire OAuth exchange via better-auth's built-in Apple provider.
 
 - [ ] **Step 1: Write the failing test for the new button**
 

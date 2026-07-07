@@ -44,23 +44,23 @@ export function LectureMeta({ lecture }: LectureMetaProps) {
 
       {/* Published date */}
       {lecture.publishedAt && (
-        <AppText variant="bodySm" className={styles.mutedText}>
-          {formatDate(lecture.publishedAt)}
-        </AppText>
+        <div className={styles.mutedText}>
+          <AppText variant="bodySm">{formatDate(lecture.publishedAt)}</AppText>
+        </div>
       )}
 
       {/* Duration */}
       {lecture.durationSeconds != null && (
-        <AppText variant="bodySm" className={styles.mutedText}>
-          {formatDuration(lecture.durationSeconds)}
-        </AppText>
+        <div className={styles.mutedText}>
+          <AppText variant="bodySm">{formatDuration(lecture.durationSeconds)}</AppText>
+        </div>
       )}
 
       {/* Language */}
       {lecture.language && (
-        <AppText variant="bodySm" className={styles.mutedText}>
-          {lecture.language}
-        </AppText>
+        <div className={styles.mutedText}>
+          <AppText variant="bodySm">{lecture.language}</AppText>
+        </div>
       )}
     </div>
   );

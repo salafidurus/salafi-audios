@@ -56,9 +56,9 @@ export function LectureDetailMobileScreen({ id }: LectureDetailMobileScreenProps
 
       {description && (
         <div className={styles.descriptionSection}>
-          <AppText variant="bodyMd" className={styles.descriptionText}>
-            {description}
-          </AppText>
+          <div className={styles.descriptionText}>
+            <AppText variant="bodyMd">{description}</AppText>
+          </div>
         </div>
       )}
 
