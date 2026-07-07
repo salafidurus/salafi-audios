@@ -2,7 +2,7 @@
 "use client";
 
 import { useAuth } from "@/core/auth";
-import { FeedFollowingScreen } from "@/features/feed/screens/feed-following.screen";
+import { FeedFollowingScreen } from "@/features/explore/screens/explore-following.screen";
 import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
 
 export default function FeedFollowingPage() {

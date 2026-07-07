@@ -99,8 +99,8 @@ export function Sidebar() {
     {
       label: t("navigation.explore", "Explore"),
       Icon: Cloud,
-      href: routes.feed.index,
-      activeMatch: routes.feed.index,
+      href: routes.explore.index,
+      activeMatch: routes.explore.index,
     },
     {
       label: t("navigation.live", "Live"),

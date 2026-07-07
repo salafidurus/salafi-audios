@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { FeedScreen } from "@/features/feed/screens/feed.screen";
+import { FeedScreen } from "@/features/explore/screens/feed.screen";
 
 export const metadata: Metadata = {
   title: "Feed",

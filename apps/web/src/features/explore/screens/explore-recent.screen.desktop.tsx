@@ -3,14 +3,14 @@
 import type { ReactNode } from "react";
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
-import { useFeedRecentScreen } from "@sd/domain-content";
+import { useExploreRecentScreen } from "@sd/domain-content";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { FeedListRow } from "../components/feed-list-row/feed-list-row";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import { FeedTopicRow } from "../components/feed-topic-row/feed-topic-row";
 import { FeedSkeleton } from "../components/feed-skeleton/feed-skeleton";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import styles from "./feed-recent.screen.desktop.module.css";
+import styles from "./explore-recent.screen.desktop.module.css";
 
 export type FeedDesktopScreenProps = {
   onNavigateToLecture?: (slug: string) => void;
@@ -86,7 +86,7 @@ export function FeedDesktopScreen({
   onNavigateToScholar,
 }: FeedDesktopScreenProps) {
   const { t } = useTranslation();
-  const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } = useFeedRecentScreen();
+  const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } = useExploreRecentScreen();
   const items = data?.pages.flatMap((p) => p.items) ?? [];
 
   const hero = (

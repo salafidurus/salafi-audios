@@ -2,7 +2,7 @@
 
 import React from "react";
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
-import { useFeedRecentScreen } from "@sd/domain-content";
+import { useExploreRecentScreen } from "@sd/domain-content";
 import { FeedListRow } from "../components/feed-list-row/feed-list-row";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
@@ -62,7 +62,7 @@ export function FeedMobileScreen({
   onNavigateToLecture,
   onNavigateToScholar,
 }: FeedMobileScreenProps) {
-  const { data, isFetching, hasNextPage, fetchNextPage } = useFeedRecentScreen();
+  const { data, isFetching, hasNextPage, fetchNextPage } = useExploreRecentScreen();
   const items = data?.pages.flatMap((p) => p.items) ?? [];
 
   return (

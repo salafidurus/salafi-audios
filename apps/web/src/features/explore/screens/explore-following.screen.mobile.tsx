@@ -4,8 +4,8 @@ import type { ReactNode } from "react";
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
 import { FeedListRow } from "../components/feed-list-row/feed-list-row";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
-import { useFeedFollowingScreen } from "@sd/domain-content";
-import styles from "./feed-recent.screen.mobile.module.css";
+import { useExploreFollowingScreen } from "@sd/domain-content";
+import styles from "./explore-following.screen.mobile.module.css";
 
 export type FeedFollowingMobileScreenProps = {
   onNavigateToLecture?: (slug: string) => void;
@@ -60,7 +60,7 @@ export function FeedFollowingMobileScreen({
   onNavigateToLecture,
   onNavigateToScholar,
 }: FeedFollowingMobileScreenProps) {
-  const { data, isFetching, hasNextPage, fetchNextPage } = useFeedFollowingScreen();
+  const { data, isFetching, hasNextPage, fetchNextPage } = useExploreFollowingScreen();
   const items = data?.pages.flatMap((p) => p.items) ?? [];
 
   if (isFetching && items.length === 0) {

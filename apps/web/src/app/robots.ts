@@ -5,7 +5,7 @@ const DISALLOW_PATHS = [
   "/settings",
   "/sign-in",
   "/library",
-  "/feed/following",
+  "/explore/following",
   "/auth",
 ] as const;
 

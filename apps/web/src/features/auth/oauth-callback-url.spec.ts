@@ -27,9 +27,9 @@ describe("buildOAuthCallbackURL", () => {
   });
 
   it("round-trips the post-login path through both layers of encoding", () => {
-    const url = buildOAuthCallbackURL("/feed/following");
+    const url = buildOAuthCallbackURL("/explore/following");
     const bridgeRedirect = new URL(url).searchParams.get("redirect")!;
     const webNext = new URL(bridgeRedirect).searchParams.get("redirect");
-    expect(webNext).toBe("/feed/following");
+    expect(webNext).toBe("/explore/following");
   });
 });

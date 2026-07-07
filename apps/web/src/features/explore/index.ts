@@ -8,21 +8,21 @@ export { FeedTopicRow, type FeedTopicRowProps } from "./components/feed-topic-ro
 
 // Screens
 export { FeedScreen, type FeedScreenProps } from "./screens/feed.screen";
-export { FeedRecentScreen, type FeedRecentScreenProps } from "./screens/feed-recent.screen";
+export { FeedRecentScreen, type FeedRecentScreenProps } from "./screens/explore-recent.screen";
 export {
   FeedDesktopScreen,
   type FeedDesktopScreenProps,
-} from "./screens/feed-recent.screen.desktop";
-export { FeedMobileScreen, type FeedMobileScreenProps } from "./screens/feed-recent.screen.mobile";
+} from "./screens/explore-recent.screen.desktop";
+export { FeedMobileScreen, type FeedMobileScreenProps } from "./screens/explore-recent.screen.mobile";
 export {
   FeedFollowingScreen,
   type FeedFollowingScreenProps,
-} from "./screens/feed-following.screen";
+} from "./screens/explore-following.screen";
 export {
   FeedFollowingDesktopScreen,
   type FeedFollowingDesktopScreenProps,
-} from "./screens/feed-following.screen.desktop";
+} from "./screens/explore-following.screen.desktop";
 export {
   FeedFollowingMobileScreen,
   type FeedFollowingMobileScreenProps,
-} from "./screens/feed-following.screen.mobile";
+} from "./screens/explore-following.screen.mobile";
