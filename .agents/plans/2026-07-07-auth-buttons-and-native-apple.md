@@ -1146,6 +1146,7 @@ git commit -m "feat(native): replace Google button image with CSS-styled SVG but
 **Files:**
 
 - Create: `apps/web/src/features/auth/components/provider-button.spec.tsx`
+- Create: `apps/web/src/features/auth/components/provider-button.module.css`
 - Modify: `apps/web/src/features/auth/components/provider-button.tsx`
 - Delete: `apps/web/public/auth/apple-continue-*.png` (4 files, after verified)
 - Delete: `apps/web/public/auth/google-continue-*.png` (4 files, after verified)
@@ -1182,9 +1183,9 @@ describe("AuthProviderButton", () => {
     expect(container.querySelector("svg")).toBeInTheDocument();
   });
 
-  it("renders Google button text", () => {
+  it("renders Google button with official gsi-material-button text", () => {
     render(<AuthProviderButton provider="google" />);
-    expect(screen.getByText("Continue with Google")).toBeInTheDocument();
+    expect(screen.getByText("Sign in with Google")).toBeInTheDocument();
   });
 
   it("calls onClick when Google button is clicked", () => {
@@ -1215,9 +1216,86 @@ Run:
 bun run --filter web test src/features/auth/components/provider-button.spec.tsx
 ```
 
-Expected: The aria-label tests pass (existing buttons already have labels). SVG and text tests for Google fail (current uses `<Image>`). Apple button aria-label container test passes.
+Expected: The aria-label tests pass (existing buttons already have labels). SVG and text tests for Google fail (current uses `<Image>` which renders `<img>`, no `<svg>` or "Sign in with Google" text). Apple button aria-label container test passes.
 
-- [ ] **Step 3: Rewrite provider-button.tsx — Apple via JS SDK, Google via CSS**
+- [ ] **Step 3: Add Google button CSS module**
+
+Create `apps/web/src/features/auth/components/provider-button.module.css`:
+
+```css
+/* Google gsi-material-button — https://developers.google.com/identity/branding-guidelines */
+.gsiMaterialButton {
+  user-select: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: none;
+  border: 1px solid var(--gsi-border-color, #747775);
+  box-sizing: border-box;
+  color: var(--gsi-text-color, #1f1f1f);
+  cursor: pointer;
+  flex-shrink: 0;
+  font-family: "Roboto", arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  height: 40px;
+  letter-spacing: 0.25px;
+  line-height: normal;
+  outline: none;
+  overflow: hidden;
+  padding: 0 12px;
+  position: relative;
+  text-align: center;
+  transition:
+    background-color 0.218s,
+    border-color 0.218s,
+    box-shadow 0.218s;
+  vertical-align: middle;
+  white-space: nowrap;
+  width: 100%;
+  background-color: var(--gsi-bg-color, #fff);
+  opacity: var(--gsi-opacity, 1);
+  border-radius: 4px;
+}
+.gsiMaterialButton:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+.gsiMaterialButtonState {
+  transition: opacity 0.218s;
+  bottom: 0;
+  left: 0;
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.gsiMaterialButtonContentWrapper {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  height: 100%;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+}
+.gsiMaterialButtonIcon {
+  height: 20px;
+  margin-right: 12px;
+  min-width: 20px;
+  width: 20px;
+}
+.gsiMaterialButtonContents {
+  flex-grow: 1;
+  font-family: "Roboto", arial, sans-serif;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+}
+```
+
+- [ ] **Step 4: Rewrite provider-button.tsx — Apple via JS SDK, Google via gsi-material-button HTML**
 
 Replace `apps/web/src/features/auth/components/provider-button.tsx`:
 
@@ -1226,6 +1304,7 @@ Replace `apps/web/src/features/auth/components/provider-button.tsx`:
 
 import Script from "next/script";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
+import styles from "./provider-button.module.css";
 
 type Provider = "apple" | "google";
 type ThemeMode = "light" | "dark";
@@ -1239,7 +1318,7 @@ export type AuthProviderButtonProps = {
 
 function GoogleSvg() {
   return (
-    <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden>
+    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" aria-hidden style={{ display: "block" }}>
       <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
       <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
       <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
@@ -1283,14 +1362,12 @@ export function AuthProviderButton({
           AppleID.auth.renderButton();
           renderedRef.current = true;
         } catch {
-          // SDK may already have auto-rendered
           renderedRef.current = true;
         }
       }
     };
 
     renderAppleBtn();
-    // Poll in case script hasn't loaded yet
     const id = setInterval(() => {
       if (!renderedRef.current) renderAppleBtn();
     }, 200);
@@ -1324,42 +1401,29 @@ export function AuthProviderButton({
   }
 
   const isDark = themeMode === "dark";
-  const googleBtnStyle: CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "10px",
-    width: "100%",
-    height: "40px",
-    padding: "0 24px",
-    border: `1px solid ${isDark ? "#8e918f" : "#747775"}`,
-    borderRadius: "4px",
-    cursor: disabled ? "default" : "pointer",
-    opacity: disabled ? 0.45 : 1,
-    fontFamily: "'Roboto', arial, sans-serif",
-    fontSize: "14px",
-    fontWeight: 500,
-    letterSpacing: "0.25px",
-    outline: "none",
-    overflow: "hidden",
-    position: "relative",
-    textAlign: "center",
-    whiteSpace: "nowrap",
-    backgroundColor: isDark ? "#131314" : "#fff",
-    color: isDark ? "#e3e3e3" : "#1f1f1f",
-    transition: "background-color .218s, border-color .218s, box-shadow .218s",
-  };
 
   return (
     <button
       type="button"
+      className={styles.gsiMaterialButton}
       onClick={disabled ? undefined : onClick}
       disabled={disabled}
       aria-label="Continue with Google"
-      style={googleBtnStyle}
+      style={{
+        "--gsi-bg-color": isDark ? "#131314" : "#fff",
+        "--gsi-border-color": isDark ? "#8e918f" : "#747775",
+        "--gsi-text-color": isDark ? "#e3e3e3" : "#1f1f1f",
+        "--gsi-opacity": disabled ? "0.45" : "1",
+      } as CSSProperties}
     >
-      <GoogleSvg />
-      <span>Continue with Google</span>
+      <div className={styles.gsiMaterialButtonState} />
+      <div className={styles.gsiMaterialButtonContentWrapper}>
+        <div className={styles.gsiMaterialButtonIcon}>
+          <GoogleSvg />
+        </div>
+        <span className={styles.gsiMaterialButtonContents}>Sign in with Google</span>
+        <span style={{ display: "none" }}>Sign in with Google</span>
+      </div>
     </button>
   );
 }
@@ -1367,7 +1431,7 @@ export function AuthProviderButton({
 
 > **Note:** The Apple JS SDK reads `data-color`, `data-border`, `data-type` from the container div. For dark mode we pass `data-color="white"`, for light mode `data-color="black"`. The Apple OAuth redirect URI is configured via `<meta>` tags in the app layout (or `AppleID.auth.init()` in a layout effect). The button click triggers Apple's native popup OAuth flow (`usePopup: true`). On success, `AppleIDSignInOnSuccess` custom event fires with the authorization code — a parent listener sends it to `POST /api/auth/apple/web`.
 
-- [ ] **Step 4: Run test to verify they pass**
+- [ ] **Step 5: Run test to verify they pass**
 
 Run:
 
@@ -1377,7 +1441,7 @@ bun run --filter web test src/features/auth/components/provider-button.spec.tsx
 
 Expected: All 6 tests PASS.
 
-- [ ] **Step 5: Verify existing tests still pass**
+- [ ] **Step 6: Verify existing tests still pass**
 
 Run:
 
@@ -1387,7 +1451,7 @@ bun run --filter web test
 
 Expected: `auth-modal.spec.tsx` and `AuthRequiredState.spec.tsx` still pass (they query by aria-label which is preserved).
 
-- [ ] **Step 6: Verify E2E tests still work**
+- [ ] **Step 7: Verify E2E tests still work**
 
 Run:
 
@@ -1397,7 +1461,7 @@ bun run --filter web test:e2e -- e2e/auth.spec.ts
 
 Expected: PASS (E2E queries `getByRole("button", { name: "Continue with Apple/Google" })` — preserved).
 
-- [ ] **Step 7: Run web typecheck**
+- [ ] **Step 8: Run web typecheck**
 
 Run:
 
@@ -1407,7 +1471,7 @@ bun run --filter web typecheck
 
 Expected: PASS.
 
-- [ ] **Step 8: Remove old PNG images** (after confirming new buttons work visually)
+- [ ] **Step 9: Remove old PNG images** (after confirming new buttons work visually)
 
 Run:
 
@@ -1416,14 +1480,15 @@ Remove-Item apps/web/public/auth/apple-continue-*.png
 Remove-Item apps/web/public/auth/google-continue-*.png
 ```
 
-- [ ] **Step 9: Commit**
+- [ ] **Step 10: Commit**
 
 ```bash
 git add apps/web/src/features/auth/components/provider-button.tsx \
-       apps/web/src/features/auth/components/provider-button.spec.tsx
+       apps/web/src/features/auth/components/provider-button.spec.tsx \
+       apps/web/src/features/auth/components/provider-button.module.css
 git rm apps/web/public/auth/apple-continue-*.png \
        apps/web/public/auth/google-continue-*.png
-git commit -m "feat(web): replace image-based auth buttons with CSS-styled SVG buttons"
+git commit -m "feat(web): replace image-based auth buttons with gsi-material-button and Apple JS SDK"
 ```
 
 ---
