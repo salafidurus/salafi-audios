@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react-native";
 import { ChannelSheet } from "./ChannelSheet";
 
-jest.mock("@/features/admin-live/api/admin-live.api", () => ({
+jest.mock("@/features/admin/api/admin-live.api", () => ({
   createChannel: jest.fn(),
   updateChannel: jest.fn(),
 }));

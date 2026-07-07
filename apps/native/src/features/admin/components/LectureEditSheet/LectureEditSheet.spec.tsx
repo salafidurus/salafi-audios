@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react-native";
 import { LectureEditSheet } from "./LectureEditSheet";
 
-jest.mock("@/features/admin-lectures/api/admin-lectures.api", () => ({
+jest.mock("@/features/admin/api/admin-lectures.api", () => ({
   fetchAdminLectureDetail: jest.fn().mockResolvedValue({
     id: "lec-1",
     title: "Test Lecture",

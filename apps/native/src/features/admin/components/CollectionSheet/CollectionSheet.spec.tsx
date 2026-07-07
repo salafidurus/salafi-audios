@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react-native";
 import { CollectionSheet } from "./CollectionSheet";
 
-jest.mock("@/features/admin-scholars/api/admin-scholars.api", () => ({
+jest.mock("@/features/admin/api/admin-scholars.api", () => ({
   createCollection: jest.fn(),
   updateCollection: jest.fn(),
 }));

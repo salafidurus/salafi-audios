@@ -40,7 +40,7 @@ jest.mock("@sd/domain-content", () => ({
     isLoading: false,
   }),
 }));
-jest.mock("@/features/admin-lectures/api/admin-lectures.api", () => ({
+jest.mock("@/features/admin/api/admin-lectures.api", () => ({
   getPresignedUrl: jest.fn(),
   uploadToR2: jest.fn(),
   createLecture: jest.fn(),

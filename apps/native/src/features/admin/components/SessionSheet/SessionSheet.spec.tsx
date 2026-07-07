@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react-native";
 import { SessionSheet } from "./SessionSheet";
 
-jest.mock("@/features/admin-live/api/admin-live.api", () => ({
+jest.mock("@/features/admin/api/admin-live.api", () => ({
   createSession: jest.fn(),
 }));
 
