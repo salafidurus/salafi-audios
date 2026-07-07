@@ -16,11 +16,11 @@ vi.mock("@/shared/components/AppText/AppText", () => ({
   AppText: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
 }));
 
-vi.mock("@/features/scholar/components/scholar-header/scholar-header", () => ({
+vi.mock("@/features/listing/components/scholar/scholar-header/scholar-header", () => ({
   ScholarHeader: ({ scholar }: { scholar: { name: string } }) => <div>Header:{scholar.name}</div>,
 }));
 
-vi.mock("@/features/scholar/components/scholar-content-list/scholar-content-list", () => ({
+vi.mock("@/features/listing/components/scholar/scholar-content-list/scholar-content-list", () => ({
   ScholarContentList: ({ slug }: { slug: string }) => <div>Content:{slug}</div>,
 }));
 

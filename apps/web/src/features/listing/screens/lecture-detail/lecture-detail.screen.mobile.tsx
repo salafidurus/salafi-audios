@@ -3,11 +3,11 @@
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { useListingDetail } from "@sd/domain-content";
-import { LectureMeta } from "@/features/lecture/components/lecture-meta/lecture-meta";
-import { TopicChips } from "@/features/lecture/components/topic-chips/topic-chips";
-import { SeriesContextBar } from "@/features/lecture/components/series-context-bar/series-context-bar";
-import { LecturePlayButton } from "@/features/lecture/components/lecture-play-button/LecturePlayButton";
-import { LectureSaveButton } from "@/features/lecture/components/lecture-save-button/LectureSaveButton";
+import { LectureMeta } from "@/features/listing/components/lecture/lecture-meta/lecture-meta";
+import { TopicChips } from "@/features/listing/components/lecture/topic-chips/topic-chips";
+import { SeriesContextBar } from "@/features/listing/components/lecture/series-context-bar/series-context-bar";
+import { LecturePlayButton } from "@/features/listing/components/lecture/lecture-play-button/LecturePlayButton";
+import { LectureSaveButton } from "@/features/listing/components/lecture/lecture-save-button/LectureSaveButton";
 import { pickContentField } from "@sd/core-i18n";
 import { useShowOriginalContent } from "@/features/i18n/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";

@@ -3,14 +3,14 @@
 import { useScholarsList } from "@sd/domain-content";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { AppText } from "@/shared/components/AppText/AppText";
-import { ScholarListRow } from "@/features/scholar/components/scholar-list-row/scholar-list-row";
+import { ScholarListRow } from "@/features/listing/components/scholar/scholar-list-row/scholar-list-row";
 import styles from "./scholar-list.module.css";
 
-export type ScholarListDesktopScreenProps = {
+export type ScholarListMobileScreenProps = {
   onSelectScholar?: (slug: string) => void;
 };
 
-export function ScholarListDesktopScreen({ onSelectScholar }: ScholarListDesktopScreenProps) {
+export function ScholarListMobileScreen({ onSelectScholar }: ScholarListMobileScreenProps) {
   const { data, isFetching } = useScholarsList();
   const scholars = data?.scholars ?? [];
 

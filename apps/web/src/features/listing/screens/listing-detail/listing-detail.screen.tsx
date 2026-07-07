@@ -2,10 +2,14 @@
 
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { ListingViewDto } from "@sd/core-contracts";
-import { LectureDetailScreen } from "@/features/lecture/screens/lecture-detail/lecture-detail.screen";
+import { LectureDetailScreen } from "@/features/listing/screens/lecture-detail/lecture-detail.screen";
 import { ScreenInProgressResponsive } from "@/shared/components/ScreenInProgress/ScreenInProgress";
 
-export function ListingDetailScreen({ id }: { id: string }) {
+export type ListingDetailScreenProps = {
+  id: string;
+};
+
+export function ListingDetailScreen({ id }: ListingDetailScreenProps) {
   const { data, isFetching } = useApiQuery<ListingViewDto>(
     queryKeys.listings.detail(id),
     () =>
