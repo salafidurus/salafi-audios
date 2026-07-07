@@ -2,7 +2,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { ScholarDetailScreen } from "@/features/scholar/screens/scholar-detail/scholar-detail.screen";
+import { ScholarDetailScreen } from "@/features/listing/screens/scholar-detail/scholar-detail.screen";
 
 export default function ScholarPage() {
   const params = useParams<{ slug: string }>();

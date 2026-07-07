@@ -1,0 +1,45 @@
+"use client";
+
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { AppText } from "@/shared/components/AppText/AppText";
+import { useScholarDetail } from "@sd/domain-content";
+import { ScholarHeader } from "@/features/listing/components/scholar/scholar-header/scholar-header";
+import { ScholarContentList } from "@/features/listing/components/scholar/scholar-content-list/scholar-content-list";
+import styles from "./scholar-detail.screen.desktop.module.css";
+
+export type ScholarDetailDesktopScreenProps = {
+  slug: string;
+};
+
+export function ScholarDetailDesktopScreen({ slug }: ScholarDetailDesktopScreenProps) {
+  const { data: scholar, isFetching } = useScholarDetail(slug);
+
+  if (isFetching) {
+    return (
+      <ScreenView center>
+        <AppText variant="bodyMd">Loading scholar…</AppText>
+      </ScreenView>
+    );
+  }
+
+  if (!scholar) {
+    return (
+      <ScreenView center>
+        <AppText variant="titleMd">Scholar not found</AppText>
+      </ScreenView>
+    );
+  }
+
+  return (
+    <ScreenView>
+      <div className={styles.layout}>
+        <div className={styles.sidebar}>
+          <ScholarHeader scholar={scholar} />
+        </div>
+        <div className={styles.main}>
+          <ScholarContentList slug={slug} />
+        </div>
+      </div>
+    </ScreenView>
+  );
+}

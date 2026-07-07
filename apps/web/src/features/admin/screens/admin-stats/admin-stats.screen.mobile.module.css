@@ -1,0 +1,13 @@
+.container {
+  padding: var(--space-md);
+}
+
+.pageTitle {
+  font-size: var(--typo-title-lg-font-size);
+  font-weight: 700;
+  margin-bottom: var(--space-md);
+}
+
+.description {
+  color: var(--content-muted);
+}

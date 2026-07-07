@@ -1,0 +1,108 @@
+.container {
+  padding: var(--space-layout-page-x);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.pageTitle {
+  font-size: var(--typo-display-lg-font-size);
+  font-weight: 700;
+  margin-bottom: var(--space-layout-section-y);
+}
+
+.lookupSection {
+  display: flex;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-layout-section-y);
+}
+
+.input {
+  flex: 1;
+  padding: var(--space-xs);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xs);
+}
+
+.lookupButton {
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--action-primary);
+  color: var(--content-on-primary);
+  cursor: pointer;
+}
+
+.sectionTitle {
+  font-size: var(--typo-title-md-font-size);
+  font-weight: 600;
+  margin-bottom: var(--space-md);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tableHeader {
+  border-bottom: 2px solid var(--border-default);
+  text-align: left;
+}
+
+.tableHead {
+  padding: var(--space-xs);
+}
+
+.tableRow {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.tableCell {
+  padding: var(--space-xs);
+}
+
+.cellMonospace {
+  font-family: monospace;
+}
+
+.statusBadge {
+  padding: 2px var(--space-xs);
+  border-radius: var(--radius-xs);
+  font-size: 12px;
+  display: inline-block;
+}
+
+.statusGranted {
+  background: var(--surface-success-subtle);
+  color: var(--content-success);
+}
+
+.statusNotGranted {
+  background: var(--surface-neutral-subtle);
+  color: var(--content-disabled);
+}
+
+.grantButton {
+  padding: 4px var(--space-xs);
+  border-radius: var(--radius-xs);
+  border: none;
+  background: var(--content-success);
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.revokeButton {
+  padding: 4px var(--space-xs);
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--border-critical-subtle);
+  background: var(--surface-critical-subtle);
+  color: var(--content-critical);
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.revokeButton:disabled,
+.grantButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

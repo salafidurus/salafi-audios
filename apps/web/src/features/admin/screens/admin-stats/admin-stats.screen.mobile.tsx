@@ -1,10 +1,12 @@
 "use client";
 
+import styles from "./admin-stats.screen.mobile.module.css";
+
 export function AdminStatsMobileScreen() {
   return (
-    <div style={{ padding: 16 }}>
-      <h1 style={{ fontSize: 24, fontWeight: 700, marginBottom: 16 }}>Admin Stats</h1>
-      <p style={{ color: "#666" }}>Platform statistics and analytics will appear here.</p>
+    <div className={styles.container}>
+      <h1 className={styles.pageTitle}>Admin Stats</h1>
+      <p className={styles.description}>Platform statistics and analytics will appear here.</p>
     </div>
   );
 }

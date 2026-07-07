@@ -3,7 +3,7 @@
 import Image from "next/image";
 import type { ScholarChipDto, ContentSuggestionDto, RecentProgressDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
-import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import { useShowOriginalContent } from "@/features/settings/content-preference";
 
 const SCHOLAR_SKELETON_COUNT = 5;
 const SUGGESTION_SKELETON_COUNT = 3;

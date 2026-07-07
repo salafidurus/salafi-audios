@@ -10,6 +10,7 @@ import {
   deleteTopic,
   type AdminTopicInput,
 } from "@/features/admin/api/admin.api";
+import styles from "./admin-topics.screen.desktop.module.css";
 
 export function AdminTopicsDesktopScreen() {
   const { data, isFetching, refetch } = useApiQuery<TopicDetailDto[]>(queryKeys.topics.list(), () =>
@@ -46,7 +47,7 @@ export function AdminTopicsDesktopScreen() {
   if (isFetching) {
     return (
       <ScreenView>
-        <div style={{ textAlign: "center" }}>Loading topics…</div>
+        <div className={styles.loading}>Loading topics…</div>
       </ScreenView>
     );
   }
@@ -55,16 +56,9 @@ export function AdminTopicsDesktopScreen() {
 
   return (
     <ScreenView>
-      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 24,
-          }}
-        >
-          <h1 style={{ fontSize: 28, fontWeight: 700 }}>Manage Topics</h1>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h1 className={styles.pageTitle}>Manage Topics</h1>
           <button
             type="button"
             onClick={() => {
@@ -72,45 +66,29 @@ export function AdminTopicsDesktopScreen() {
               setEditing(null);
               setFormData({ slug: "", name: "" });
             }}
-            style={{
-              padding: "8px 16px",
-              borderRadius: 8,
-              border: "none",
-              background: "#2563eb",
-              color: "#fff",
-              cursor: "pointer",
-            }}
+            className={styles.addButton}
           >
             + Add Topic
           </button>
         </div>
 
         {(creating || editing) && (
-          <div
-            style={{ padding: 16, border: "1px solid #e0e0e0", borderRadius: 8, marginBottom: 24 }}
-          >
-            <h3 style={{ marginBottom: 12 }}>{editing ? "Edit Topic" : "New Topic"}</h3>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr 1fr",
-                gap: 12,
-                marginBottom: 12,
-              }}
-            >
+          <div className={styles.form}>
+            <h3 className={styles.formTitle}>{editing ? "Edit Topic" : "New Topic"}</h3>
+            <div className={styles.formGrid}>
               <input
                 aria-label="Topic slug"
                 placeholder="Slug"
                 value={formData.slug}
                 onChange={(e) => setFormData((p) => ({ ...p, slug: e.target.value }))}
-                style={{ padding: 8, border: "1px solid #ccc", borderRadius: 4 }}
+                className={styles.input}
               />
               <input
                 aria-label="Topic name"
                 placeholder="Name"
                 value={formData.name}
                 onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
-                style={{ padding: 8, border: "1px solid #ccc", borderRadius: 4 }}
+                className={styles.input}
               />
               <input
                 aria-label="Parent topic slug"
@@ -119,22 +97,15 @@ export function AdminTopicsDesktopScreen() {
                 onChange={(e) =>
                   setFormData((p) => ({ ...p, parentSlug: e.target.value || undefined }))
                 }
-                style={{ padding: 8, border: "1px solid #ccc", borderRadius: 4 }}
+                className={styles.input}
               />
             </div>
-            <div style={{ display: "flex", gap: 8 }}>
+            <div className={styles.buttonGroup}>
               <button
                 type="button"
                 onClick={handleSave}
                 disabled={saving}
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: 8,
-                  border: "none",
-                  background: "#16a34a",
-                  color: "#fff",
-                  cursor: "pointer",
-                }}
+                className={styles.saveButton}
               >
                 {saving ? "Saving…" : "Save"}
               </button>
@@ -144,13 +115,7 @@ export function AdminTopicsDesktopScreen() {
                   setCreating(false);
                   setEditing(null);
                 }}
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: 8,
-                  border: "1px solid #ccc",
-                  background: "#fff",
-                  cursor: "pointer",
-                }}
+                className={styles.cancelButton}
               >
                 Cancel
               </button>
@@ -158,23 +123,25 @@ export function AdminTopicsDesktopScreen() {
           </div>
         )}
 
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <table className={styles.table}>
           <thead>
-            <tr style={{ borderBottom: "2px solid #e0e0e0", textAlign: "left" }}>
-              <th style={{ padding: 8 }}>Name</th>
-              <th style={{ padding: 8 }}>Slug</th>
-              <th style={{ padding: 8 }}>Parent</th>
-              <th style={{ padding: 8 }}>Actions</th>
+            <tr className={styles.tableHeader}>
+              <th className={styles.tableHead}>Name</th>
+              <th className={styles.tableHead}>Slug</th>
+              <th className={styles.tableHead}>Parent</th>
+              <th className={styles.tableHead}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {topics.map((t) => (
-              <tr key={t.id} style={{ borderBottom: "1px solid #f0f0f0" }}>
-                <td style={{ padding: 8 }}>{t.name}</td>
-                <td style={{ padding: 8, color: "#666" }}>{t.slug}</td>
-                <td style={{ padding: 8, color: "#999" }}>{t.parentId ?? "—"}</td>
-                <td style={{ padding: 8 }}>
-                  <div style={{ display: "flex", gap: 8 }}>
+              <tr key={t.id} className={styles.tableRow}>
+                <td className={styles.tableCell}>{t.name}</td>
+                <td className={`${styles.tableCell} ${styles.tableCellMuted}`}>{t.slug}</td>
+                <td className={`${styles.tableCell} ${styles.tableCellFaint}`}>
+                  {t.parentId ?? "—"}
+                </td>
+                <td className={styles.tableCell}>
+                  <div className={styles.actionButtons}>
                     <button
                       type="button"
                       onClick={() => {
@@ -182,27 +149,14 @@ export function AdminTopicsDesktopScreen() {
                         setCreating(false);
                         setFormData({ slug: t.slug, name: t.name });
                       }}
-                      style={{
-                        padding: "4px 12px",
-                        borderRadius: 4,
-                        border: "1px solid #ccc",
-                        background: "#fff",
-                        cursor: "pointer",
-                      }}
+                      className={styles.editButton}
                     >
                       Edit
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDelete(t.slug)}
-                      style={{
-                        padding: "4px 12px",
-                        borderRadius: 4,
-                        border: "1px solid #fca5a5",
-                        background: "#fef2f2",
-                        color: "#dc2626",
-                        cursor: "pointer",
-                      }}
+                      className={styles.deleteButton}
                     >
                       Delete
                     </button>

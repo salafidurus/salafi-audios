@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { routes } from "@sd/core-contracts";
-import { LanguageSwitch } from "@/features/i18n";
+import { LanguageSwitch } from "@/features/settings/i18n";
 import styles from "./footer.module.css";
 
 export function Footer() {

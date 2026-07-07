@@ -12,7 +12,7 @@ import {
   type SearchResultRow,
 } from "@/features/search/components/SearchResultsList/SearchResultsList";
 import { useSearchProcessing } from "@sd/domain-search";
-import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 

@@ -3,6 +3,7 @@
 import type { AdminPermission } from "@sd/core-contracts";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
+import styles from "./admin-dashboard.screen.desktop.module.css";
 
 type AdminSection = {
   title: string;
@@ -50,7 +51,7 @@ export function AdminDashboardDesktopScreen() {
   if (isFetching) {
     return (
       <ScreenView>
-        <div style={{ textAlign: "center" }}>Loading…</div>
+        <div className={styles.loading}>Loading…</div>
       </ScreenView>
     );
   }
@@ -60,35 +61,18 @@ export function AdminDashboardDesktopScreen() {
 
   return (
     <ScreenView>
-      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-        <h1 style={{ fontSize: 28, fontWeight: 700, marginBottom: 24 }}>Admin Dashboard</h1>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-            gap: 16,
-          }}
-        >
+      <div className={styles.container}>
+        <h1 className={styles.pageTitle}>Admin Dashboard</h1>
+        <div className={styles.grid}>
           {visibleSections.map((section) => (
-            <a
-              key={section.href}
-              href={section.href}
-              style={{
-                display: "block",
-                padding: 24,
-                borderRadius: 12,
-                border: "1px solid #e0e0e0",
-                textDecoration: "none",
-                color: "inherit",
-              }}
-            >
-              <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 8 }}>{section.title}</h2>
-              <p style={{ fontSize: 14, color: "#666", margin: 0 }}>{section.description}</p>
+            <a key={section.href} href={section.href} className={styles.sectionCard}>
+              <h2 className={styles.sectionTitle}>{section.title}</h2>
+              <p className={styles.sectionDescription}>{section.description}</p>
             </a>
           ))}
         </div>
         {visibleSections.length === 0 && (
-          <p style={{ color: "#999" }}>You don&apos;t have any admin permissions.</p>
+          <p className={styles.empty}>You don&apos;t have any admin permissions.</p>
         )}
       </div>
     </ScreenView>

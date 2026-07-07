@@ -3,7 +3,7 @@
 import type { CSSProperties } from "react";
 import type { ContentSuggestionDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
-import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
 
 const itemButtonStyle: CSSProperties = {

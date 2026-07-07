@@ -1,0 +1,41 @@
+.pageTitle {
+  font-size: var(--typo-display-md-font-size);
+  font-weight: 700;
+  margin-bottom: var(--space-lg);
+}
+
+.loading {
+  text-align: center;
+}
+
+.sectionList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-sm);
+}
+
+.sectionCard {
+  display: block;
+  padding: var(--space-component-card-padding);
+  border-radius: var(--radius-component-card);
+  border: 1px solid var(--border-default);
+  text-decoration: none;
+  color: inherit;
+  background-color: var(--surface-default);
+}
+
+.sectionTitle {
+  font-size: var(--typo-title-md-font-size);
+  font-weight: 600;
+  margin-bottom: var(--space-xs);
+}
+
+.sectionDescription {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+  margin: 0;
+}
+
+.empty {
+  color: var(--content-subtle);
+}

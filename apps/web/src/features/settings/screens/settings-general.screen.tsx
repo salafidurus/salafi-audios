@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { LanguageSwitch, ContentLanguageToggle } from "@/features/i18n";
+import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings/i18n";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { SettingsSection } from "@/shared/components/SettingsSection/SettingsSection";
 import { SettingsRow } from "@/shared/components/SettingsRow/SettingsRow";

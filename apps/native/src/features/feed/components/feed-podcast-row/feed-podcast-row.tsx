@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native-unistyles";
 import type { FeedContentItemDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import { useListingProgress } from "@sd/domain-audio";
-import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { AppText } from "@/shared/components/AppText/AppText";
 
 export type FeedPodcastRowProps = {
