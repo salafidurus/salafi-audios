@@ -6,7 +6,8 @@ export {
 } from "./screens/account-profile.screen";
 
 // i18n components and utilities
-export { LanguageSwitch, ContentLanguageToggle } from "./components/i18n";
+export { LanguageSwitch } from "./components/language-switch/language-switch";
+export { ContentLanguageToggle } from "./components/content-language-toggle/content-language-toggle";
 export {
   contentPreferenceStore,
   useShowOriginalContent,
