@@ -4,7 +4,7 @@ import type { ListRenderItemInfo } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
 import { getErrorStateText } from "@sd/core-i18n";
-import { useFeedFollowingScreen } from "@sd/domain-content";
+import { useExploreFollowingScreen } from "@sd/domain-content";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { FeedContentCard } from "../components/feed-content-card/feed-content-card";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
@@ -48,7 +48,7 @@ export function FeedFollowingScreen({
 }: FeedFollowingScreenProps) {
   const { t } = useTranslation();
   const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } =
-    useFeedFollowingScreen();
+    useExploreFollowingScreen();
   const items = data?.pages.flatMap((p) => p.items) ?? [];
 
   const renderItem = useCallback(

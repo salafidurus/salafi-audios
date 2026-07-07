@@ -1,8 +1,8 @@
 import { type Href, useRouter } from "expo-router";
 import { routes } from "@sd/core-contracts";
-import { FeedRecentScreen } from "@/features/feed/screens/feed-recent.screen";
+import { FeedRecentScreen } from "@/features/explore/screens/explore-recent.screen";
 
-export default function FeedRecent() {
+export default function ExploreRecent() {
   const router = useRouter();
 
   return (

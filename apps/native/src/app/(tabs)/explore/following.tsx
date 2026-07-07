@@ -1,8 +1,8 @@
 import { type Href, useRouter } from "expo-router";
-import { FeedFollowingScreen } from "@/features/feed/screens/feed-following.screen";
+import { FeedFollowingScreen } from "@/features/explore/screens/explore-following.screen";
 import { routes } from "@sd/core-contracts";
 
-export default function FeedFollowing() {
+export default function ExploreFollowing() {
   const router = useRouter();
 
   return (

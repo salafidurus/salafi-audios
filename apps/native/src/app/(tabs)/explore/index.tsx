@@ -2,7 +2,7 @@ import type { ErrorBoundaryProps, Href } from "expo-router";
 import { useRouter } from "expo-router";
 import { View, Text, Pressable } from "react-native";
 import { routes } from "@sd/core-contracts";
-import { FeedScreen } from "@/features/feed/screens/feed.screen";
+import { FeedScreen } from "@/features/explore/screens/explore.screen";
 
 export function ErrorBoundary({ error: _error, retry }: ErrorBoundaryProps) {
   return (
@@ -15,7 +15,7 @@ export function ErrorBoundary({ error: _error, retry }: ErrorBoundaryProps) {
   );
 }
 
-export default function FeedIndexRoute() {
+export default function ExploreIndexRoute() {
   const router = useRouter();
 
   return (

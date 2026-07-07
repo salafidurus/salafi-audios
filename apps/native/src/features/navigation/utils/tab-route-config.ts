@@ -7,7 +7,7 @@ export type RootTab = Section | "search";
 
 export type RootTabConfig = {
   id: RootTab;
-  routeName: "feed" | "live" | "(search)" | "library" | "settings";
+  routeName: "explore" | "live" | "(search)" | "library" | "settings";
   /** English fallback label. */
   label: string;
   /** i18n key (under the `tabs` namespace) resolved at render time. */
@@ -16,7 +16,7 @@ export type RootTabConfig = {
 };
 
 export const ROOT_TABS: RootTabConfig[] = [
-  { id: "feed", routeName: "feed", label: "Feed", labelKey: "tabs.feed", Icon: Cloud },
+  { id: "explore", routeName: "explore", label: "Explore", labelKey: "tabs.explore", Icon: Cloud },
   { id: "live", routeName: "live", label: "Live", labelKey: "tabs.live", Icon: Mic },
   { id: "search", routeName: "(search)", label: "Search", labelKey: "tabs.search", Icon: Search },
   {
@@ -36,7 +36,7 @@ export const ROOT_TABS: RootTabConfig[] = [
 ];
 
 const GROUP_NAME_TO_TAB: Record<RootTabConfig["routeName"], RootTab> = {
-  feed: "feed",
+  explore: "explore",
   live: "live",
   "(search)": "search",
   library: "library",
@@ -53,8 +53,8 @@ export function getRootTabFromPathname(pathname: string): RootTab {
     return "search";
   }
 
-  if (pathname.startsWith(routes.feed.index)) {
-    return "feed";
+  if (pathname.startsWith(routes.explore.index)) {
+    return "explore";
   }
 
   if (pathname.startsWith(routes.live.index)) {

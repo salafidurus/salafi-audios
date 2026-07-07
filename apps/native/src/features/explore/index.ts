@@ -14,9 +14,9 @@ export {
 export { FeedTopicRow, type FeedTopicRowProps } from "./components/feed-topic-row/feed-topic-row";
 
 // Screens
-export { FeedScreen, type FeedScreenProps } from "./screens/feed.screen";
-export { FeedRecentScreen, type FeedRecentScreenProps } from "./screens/feed-recent.screen";
+export { FeedScreen, type FeedScreenProps } from "./screens/explore.screen";
+export { FeedRecentScreen, type FeedRecentScreenProps } from "./screens/explore-recent.screen";
 export {
   FeedFollowingScreen,
   type FeedFollowingScreenProps,
-} from "./screens/feed-following.screen";
+} from "./screens/explore-following.screen";

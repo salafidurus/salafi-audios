@@ -4,7 +4,7 @@ import type { ListRenderItemInfo } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
-import { useFeedRecentScreen } from "@sd/domain-content";
+import { useExploreRecentScreen } from "@sd/domain-content";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import { FeedTopicRow } from "../components/feed-topic-row/feed-topic-row";
@@ -54,7 +54,8 @@ export function FeedRecentScreen({
   onNavigateToScholar,
 }: FeedRecentScreenProps) {
   const { t } = useTranslation();
-  const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } = useFeedRecentScreen();
+  const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } =
+    useExploreRecentScreen();
   const items = data?.pages.flatMap((p) => p.items) ?? [];
 
   const renderItem = useCallback(
