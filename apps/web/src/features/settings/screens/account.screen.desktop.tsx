@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useAccountProfile } from "@sd/domain-account";
-import { LanguageSwitch, ContentLanguageToggle } from "@/features/i18n";
+import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings/i18n";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import styles from "./account.screen.desktop.module.css";
 

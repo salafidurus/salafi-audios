@@ -4,7 +4,7 @@ import { render, screen } from "@testing-library/react";
 import { ScholarContentList } from "./scholar-content-list";
 import type { ScholarContentItemDto } from "@sd/core-contracts";
 
-vi.mock("@/features/i18n/content-preference", () => ({
+vi.mock("@/features/settings/content-preference", () => ({
   useShowOriginalContent: () => false,
 }));
 

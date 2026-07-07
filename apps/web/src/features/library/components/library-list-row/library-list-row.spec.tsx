@@ -5,7 +5,7 @@ import type { LibraryItemDto } from "@sd/core-contracts";
 import { LibraryListRow } from "./library-list-row";
 import styles from "./library-list-row.module.css";
 
-vi.mock("@/features/i18n/content-preference", () => ({
+vi.mock("@/features/settings/content-preference", () => ({
   useShowOriginalContent: () => false,
 }));
 

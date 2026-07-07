@@ -2,7 +2,7 @@ import { Pressable, ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useAccountProfile } from "@sd/domain-account";
-import { LanguageSwitch, ContentLanguageToggle } from "@/features/i18n";
+import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings/i18n";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 import { AppText } from "@/shared/components/AppText/AppText";
 

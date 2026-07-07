@@ -7,7 +7,7 @@ import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { LectureMeta } from "@/features/lecture/components/lecture-meta/lecture-meta";
 import { SeriesContextBar } from "@/features/lecture/components/series-context-bar/series-context-bar";
 import { TopicChips } from "@/features/lecture/components/topic-chips/topic-chips";
-import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
 
 export type LectureDetailScreenProps = {

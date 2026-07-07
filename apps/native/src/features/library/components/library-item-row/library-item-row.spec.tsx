@@ -23,7 +23,7 @@ jest.mock("@/core/i18n/use-translation", () => ({
   }),
 }));
 
-jest.mock("@/features/i18n/content-preference", () => ({
+jest.mock("@/features/settings/content-preference", () => ({
   useShowOriginalContent: () => false,
 }));
 

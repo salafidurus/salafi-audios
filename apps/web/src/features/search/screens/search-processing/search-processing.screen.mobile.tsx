@@ -14,7 +14,7 @@ import {
   type SearchResultRow,
 } from "@/features/search/components/SearchResultsList/SearchResultsList.mobile";
 import { useSearchProcessing } from "@sd/domain-search";
-import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useRouter } from "next/navigation";
 import { routes } from "@sd/core-contracts";

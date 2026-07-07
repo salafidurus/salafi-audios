@@ -9,7 +9,7 @@ import { SeriesContextBar } from "@/features/listing/components/lecture/series-c
 import { LecturePlayButton } from "@/features/listing/components/lecture/lecture-play-button/LecturePlayButton";
 import { LectureSaveButton } from "@/features/listing/components/lecture/lecture-save-button/LectureSaveButton";
 import { pickContentField } from "@sd/core-i18n";
-import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./lecture-detail.screen.desktop.module.css";
 

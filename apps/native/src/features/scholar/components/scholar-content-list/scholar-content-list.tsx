@@ -6,7 +6,7 @@ import type { Href } from "expo-router";
 import { useState } from "react";
 import { pickContentField } from "@sd/core-i18n";
 import { AppText } from "@/shared/components/AppText/AppText";
-import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
 
 export type ScholarContentListProps = {

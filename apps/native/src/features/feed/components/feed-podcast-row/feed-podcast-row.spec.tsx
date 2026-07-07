@@ -23,7 +23,7 @@ jest.mock("@sd/domain-audio", () => ({
   })),
 }));
 
-jest.mock("@/features/i18n/content-preference", () => ({
+jest.mock("@/features/settings/content-preference", () => ({
   useShowOriginalContent: jest.fn(() => false),
 }));
 

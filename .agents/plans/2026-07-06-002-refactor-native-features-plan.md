@@ -65,42 +65,69 @@ into single `features/admin/` with subdirectories. Add barrel. Update 6 spec moc
 
 **Files:**
 
-- Move: `features/admin/` → `features/admin/base/` (existing dashboard + permissions)
-- Move: `features/admin-lectures/` → `features/admin/lectures/`
-- Move: `features/admin-live/` → `features/admin/live/`
-- Move: `features/admin-scholars/` → `features/admin/scholars/`
-- Create: `features/admin/index.ts` (barrel)
+All 4 source features' contents move into a flat feature structure at `features/admin/`:
+
+```
+features/admin/
+  api/
+    admin-permissions.api.ts           ← from admin/
+    admin-lectures.api.ts              ← from admin-lectures/
+    admin-live.api.ts                  ← from admin-live/
+    admin-scholars.api.ts               ← from admin-scholars/
+  hooks/
+    use-admin-permissions.ts           ← from admin/
+    use-admin-lectures.ts              ← from admin-lectures/
+    use-admin-live.ts                  ← from admin-live/
+    use-admin-scholars.ts              ← from admin-scholars/
+  screens/
+    admin-dashboard/                   ← from admin/
+    admin-lectures/                    ← from admin-lectures/
+    admin-live/                        ← from admin-live/
+    admin-scholars/                    ← from admin-scholars/
+    admin-scholar-detail/              ← from admin-scholars/
+  components/
+    AudioUploaderSheet/                ← from admin-lectures/
+    BulkActionBar/                     ← from admin-lectures/
+    LectureEditSheet/                  ← from admin-lectures/
+    ChannelSheet/                      ← from admin-live/
+    SessionSheet/                      ← from admin-live/
+    CollectionSheet/                   ← from admin-scholars/
+    SeriesSheet/                       ← from admin-scholars/
+  index.ts                            ← create
+```
+
 - Delete: `features/admin-lectures/`, `features/admin-live/`, `features/admin-scholars/`
+- Delete: old `features/admin/` contents after moving files
 
 **Barrel exports:**
 
 ```typescript
-export { AdminDashboardScreen } from "./base/screens/admin-dashboard/admin-dashboard.screen";
-export { AdminLecturesScreen } from "./lectures/screens/admin-lectures/admin-lectures.screen";
-export { AdminLiveScreen } from "./live/screens/admin-live/admin-live.screen";
-export { AdminScholarsScreen } from "./scholars/screens/admin-scholars/admin-scholars.screen";
-export { AdminScholarDetailScreen } from "./scholars/screens/admin-scholar-detail/admin-scholar-detail.screen";
-export { AudioUploaderSheet } from "./lectures/components/AudioUploaderSheet/AudioUploaderSheet";
-export { BulkActionBar } from "./lectures/components/BulkActionBar/BulkActionBar";
-export { LectureEditSheet } from "./lectures/components/LectureEditSheet/LectureEditSheet";
-export { ChannelSheet } from "./live/components/ChannelSheet/ChannelSheet";
-export { SessionSheet } from "./live/components/SessionSheet/SessionSheet";
-export { CollectionSheet } from "./scholars/components/CollectionSheet/CollectionSheet";
-export { SeriesSheet } from "./scholars/components/SeriesSheet/SeriesSheet";
-export { useAdminPermissions } from "./base/hooks/use-admin-permissions";
-export { useAdminLectures } from "./lectures/hooks/use-admin-lectures";
-export { useAdminLive } from "./live/hooks/use-admin-live";
-export { useAdminScholars } from "./scholars/hooks/use-admin-scholars";
+export { AdminDashboardScreen } from "./screens/admin-dashboard/admin-dashboard.screen";
+export { AdminLecturesScreen } from "./screens/admin-lectures/admin-lectures.screen";
+export { AdminLiveScreen } from "./screens/admin-live/admin-live.screen";
+export { AdminScholarsScreen } from "./screens/admin-scholars/admin-scholars.screen";
+export { AdminScholarDetailScreen } from "./screens/admin-scholar-detail/admin-scholar-detail.screen";
+export { AudioUploaderSheet } from "./components/AudioUploaderSheet/AudioUploaderSheet";
+export { BulkActionBar } from "./components/BulkActionBar/BulkActionBar";
+export { LectureEditSheet } from "./components/LectureEditSheet/LectureEditSheet";
+export { ChannelSheet } from "./components/ChannelSheet/ChannelSheet";
+export { SessionSheet } from "./components/SessionSheet/SessionSheet";
+export { CollectionSheet } from "./components/CollectionSheet/CollectionSheet";
+export { SeriesSheet } from "./components/SeriesSheet/SeriesSheet";
+export { useAdminPermissions } from "./hooks/use-admin-permissions";
+export { useAdminLectures } from "./hooks/use-admin-lectures";
+export { useAdminLive } from "./hooks/use-admin-live";
+export { useAdminScholars } from "./hooks/use-admin-scholars";
 ```
 
 **Spec mock path updates (6 files):**
 
-- `admin/base/hooks/use-admin-permissions.spec.ts`
-- `admin/lectures/hooks/use-admin-lectures.spec.ts`
-- `admin/lectures/components/AudioUploaderSheet/AudioUploaderSheet.spec.ts`
-- `admin/lectures/components/BulkActionBar/BulkActionBar.spec.ts`
-- `admin/lectures/components/LectureEditSheet/LectureEditSheet.spec.ts`
-- `admin/live/hooks/use-admin-live.spec.ts`
+- `admin/hooks/use-admin-permissions.spec.ts`
+- `admin/hooks/use-admin-lectures.spec.ts`
+- `admin/components/AudioUploaderSheet/AudioUploaderSheet.spec.ts`
+- `admin/components/BulkActionBar/BulkActionBar.spec.ts`
+- `admin/components/LectureEditSheet/LectureEditSheet.spec.ts`
+- `admin/hooks/use-admin-live.spec.ts`
 
 **Blockers:** None currently identified.
 
@@ -127,42 +154,57 @@ to match web's already-refactored structure. Update 5 spec mock paths + 3 route 
 
 **Files:**
 
-- Move: `features/lecture/` → `features/listing/lecture/`
-- Move: `features/scholar/` → `features/listing/scholar/`
-- Create: `features/listing/index.ts` (new combined barrel)
+Both source features' contents move into a flat feature structure at `features/listing/`:
+
+```
+features/listing/
+  screens/
+    lecture-detail/                      ← from features/lecture/screens/
+    scholar-list/                        ← from features/scholar/screens/
+    scholar-detail/                      ← from features/scholar/screens/
+  components/
+    lecture-meta/                        ← from features/lecture/components/
+    lecture-play-button/                 ← from features/lecture/components/
+    lecture-save-button/                 ← from features/lecture/components/
+    series-context-bar/                  ← from features/lecture/components/
+    topic-chips/                         ← from features/lecture/components/
+    scholar-card/                        ← from features/scholar/components/
+    scholar-content-list/                ← from features/scholar/components/
+    scholar-header/                      ← from features/scholar/components/
+    scholar-row/                         ← from features/scholar/components/
+  index.ts                              ← create
+```
+
 - Delete: `features/lecture/`, `features/scholar/`
 
 **New barrel exports:**
 
 ```typescript
-// Lecture
-export { LectureDetailScreen } from "./lecture/screens/lecture-detail/lecture-detail.screen";
-export { LecturePlayButton } from "./lecture/components/lecture-play-button/LecturePlayButton";
-export { LectureSaveButton } from "./lecture/components/lecture-save-button/LectureSaveButton";
-export { LectureMeta } from "./lecture/components/lecture-meta/lecture-meta";
-export { TopicChips } from "./lecture/components/topic-chips/topic-chips";
-export { SeriesContextBar } from "./lecture/components/series-context-bar/series-context-bar";
-
-// Scholar
-export { ScholarListScreen } from "./scholar/screens/scholar-list/scholar-list.screen";
-export { ScholarDetailScreen } from "./scholar/screens/scholar-detail/scholar-detail.screen";
-export { ScholarCard } from "./scholar/components/scholar-card/scholar-card";
-export { ScholarRow } from "./scholar/components/scholar-row/scholar-row";
+export { LectureDetailScreen } from "./screens/lecture-detail/lecture-detail.screen";
+export { ScholarListScreen } from "./screens/scholar-list/scholar-list.screen";
+export { ScholarDetailScreen } from "./screens/scholar-detail/scholar-detail.screen";
+export { LecturePlayButton } from "./components/lecture-play-button/LecturePlayButton";
+export { LectureSaveButton } from "./components/lecture-save-button/LectureSaveButton";
+export { LectureMeta } from "./components/lecture-meta/lecture-meta";
+export { TopicChips } from "./components/topic-chips/topic-chips";
+export { SeriesContextBar } from "./components/series-context-bar/series-context-bar";
+export { ScholarCard } from "./components/scholar-card/scholar-card";
+export { ScholarRow } from "./components/scholar-row/scholar-row";
 ```
 
 **Spec mock path updates (5 files):**
 
-- `listing/lecture/screens/lecture-detail/lecture-detail.screen.spec.ts`
-- `listing/lecture/components/lecture-play-button/LecturePlayButton.spec.ts`
-- `listing/lecture/components/lecture-save-button/LectureSaveButton.spec.ts`
-- `listing/scholar/screens/scholar-detail/scholar-detail.screen.spec.ts`
-- `listing/scholar/components/scholar-row/scholar-row.spec.ts`
+- `listing/screens/lecture-detail/lecture-detail.screen.spec.ts`
+- `listing/components/lecture-play-button/LecturePlayButton.spec.ts`
+- `listing/components/lecture-save-button/LectureSaveButton.spec.ts`
+- `listing/screens/scholar-detail/scholar-detail.screen.spec.ts`
+- `listing/components/scholar-row/scholar-row.spec.ts`
 
 **Route file import updates (3 files):**
 
-- `app/(content)/lectures/[id].tsx` — `@/features/listing/lecture/screens/...`
-- `app/(content)/scholars/index.tsx` — `@/features/listing/scholar/screens/...`
-- `app/(content)/scholars/[slug].tsx` — `@/features/listing/scholar/screens/...`
+- `app/(content)/lectures/[id].tsx` — `@/features/listing/screens/...`
+- `app/(content)/scholars/index.tsx` — `@/features/listing/screens/...`
+- `app/(content)/scholars/[slug].tsx` — `@/features/listing/screens/...`
 
 **Blockers:** None currently identified.
 
@@ -184,16 +226,28 @@ refactor(native): merge lecture + scholar into features/listing/ to match web
 ### Stage 3: Merge i18n into settings
 
 **Status:** Planned
-**Goal:** Move `features/i18n/` into `features/settings/i18n/`. Update all external
+**Goal:** Merge `features/i18n/` content into `features/settings/` with flat structure. Update all external
 import paths (`content-preference.ts` is used by 10 files across 7 features). Add barrel.
 
 **Files:**
 
-- Move: `features/i18n/` → `features/settings/i18n/`
-- Delete: `features/i18n/`
-- Update: `features/settings/index.ts` to include i18n exports
+i18n's contents move into a flat feature structure at `features/settings/`:
 
-**Import path updates across codebase (all `@/features/i18n/` → `@/features/settings/i18n/`):**
+```
+features/settings/
+  screens/                              (existing)
+    account.screen.tsx
+    account-profile.screen.tsx
+  components/
+    language-switch/                    ← from features/i18n/components/
+    content-language-toggle/            ← from features/i18n/components/
+  content-preference.ts                 ← from features/i18n/ (root)
+  index.ts                             (update barrel)
+```
+
+- Delete: `features/i18n/`
+
+**Import path updates across codebase (all `@/features/i18n/` → `@/features/settings/`):**
 
 - `content-preference.ts` — 10 files across: search, feed, lecture, scholar, library, settings
 - `LanguageSwitch` — used in settings screens
@@ -202,13 +256,10 @@ import paths (`content-preference.ts` is used by 10 files across 7 features). Ad
 **Settings barrel updates:**
 
 ```typescript
-// Existing settings exports...
 export { AccountScreen } from "./screens/account.screen";
 export { AccountProfileScreen } from "./screens/account-profile.screen";
-
-// New i18n exports
-export { LanguageSwitch } from "./i18n/components/language-switch/language-switch";
-export { ContentLanguageToggle } from "./i18n/components/content-language-toggle/content-language-toggle";
+export { LanguageSwitch } from "./components/language-switch/language-switch";
+export { ContentLanguageToggle } from "./components/content-language-toggle/content-language-toggle";
 ```
 
 **Blockers:** Need exact grep of all import sites for `@/features/i18n/` to update them all in one pass.
@@ -223,7 +274,7 @@ export { ContentLanguageToggle } from "./i18n/components/content-language-toggle
 **Suggested Commit Message:**
 
 ```
-refactor(native): merge i18n feature into settings/i18n/
+refactor(native): merge i18n feature into settings/ flat
 ```
 
 ---
@@ -231,14 +282,27 @@ refactor(native): merge i18n feature into settings/i18n/
 ### Stage 4: Merge progress into library
 
 **Status:** Planned
-**Goal:** Move `features/progress/` into `features/library/progress/`. Zero external
+**Goal:** Merge `features/progress/` content into `features/library/` with flat structure. Zero external
 imports — only the barrel needs updating. Components are Phase 05 stubs.
 
 **Files:**
 
-- Move: `features/progress/` → `features/library/progress/`
+progress's contents move into a flat feature structure at `features/library/`:
+
+```
+features/library/
+  screens/                              (existing)
+    library.screen.tsx
+    library-saved.screen.tsx
+    library-completed.screen.tsx
+  components/
+    library-item-row/                   (existing)
+    progress-indicator/                 ← from features/progress/components/
+    resume-badge/                       ← from features/progress/components/
+  index.ts                             (update barrel)
+```
+
 - Delete: `features/progress/`
-- Update: `features/library/index.ts` to re-export ProgressIndicator, ResumeBadge
 
 **Library barrel updates:**
 
@@ -247,9 +311,8 @@ export { LibraryScreen } from "./screens/library.screen";
 export { LibrarySavedScreen } from "./screens/library-saved.screen";
 export { LibraryCompletedScreen } from "./screens/library-completed.screen";
 export { LibraryItemRow } from "./components/library-item-row/library-item-row";
-
-export { ProgressIndicator } from "./progress/components/progress-indicator/progress-indicator";
-export { ResumeBadge } from "./progress/components/resume-badge/resume-badge";
+export { ProgressIndicator } from "./components/progress-indicator/progress-indicator";
+export { ResumeBadge } from "./components/resume-badge/resume-badge";
 ```
 
 **Blockers:** None — 0 external imports confirmed.
@@ -263,7 +326,7 @@ export { ResumeBadge } from "./progress/components/resume-badge/resume-badge";
 **Suggested Commit Message:**
 
 ```
-refactor(native): merge progress feature into library/progress/
+refactor(native): merge progress feature into library/ flat
 ```
 
 ---
@@ -279,21 +342,31 @@ to use the new LegalToggleScreen.
 
 **Files:**
 
-- Move: `features/support/` → `features/settings/support/`
-- Move: `features/legal/` → `features/settings/legal/`
+Both source features' contents move into the flat structure at `features/settings/`:
+
+```
+features/settings/
+  screens/
+    account.screen.tsx                   (existing)
+    account-profile.screen.tsx           (existing)
+    support.screen.tsx                   ← from features/support/screens/
+    legal-toggle.screen.tsx              ← new, replaces old legal/screens/
+  components/                            (created if needed for shared support/legal UI)
+  index.ts                              (update barrel)
+```
+
 - Delete: `features/support/`, `features/legal/`
 - Create: `apps/native/src/app/(tabs)/settings/support.tsx`
 - Modify: `apps/native/src/app/(tabs)/settings/legal.tsx` (rewrite to use LegalToggleScreen)
-- Modify: `features/settings/index.ts` (add new exports)
 - Modify: `features/settings/screens/account.screen.tsx` (add navigation to support route)
 
 **New LegalToggleScreen:**
 
 ```tsx
-// features/settings/legal/legal-toggle.screen.tsx
+// features/settings/screens/legal-toggle.screen.tsx
 // Single screen with a segment control (e.g., SegmentedControl from react-native)
 // Two segments: "Terms of Use" | "Privacy Policy"
-// Content rendered from existing TermsOfUseScreen and PrivacyScreen content
+// Content rendered from existing TermsOfUseScreen and PrivacyScreen source
 ```
 
 **SupportScreen Unistyles conversion:**
@@ -308,8 +381,8 @@ to use the new LegalToggleScreen.
 ```typescript
 export { AccountScreen } from "./screens/account.screen";
 export { AccountProfileScreen } from "./screens/account-profile.screen";
-export { LegalToggleScreen } from "./legal/legal-toggle.screen";
-export { SupportScreen } from "./support/screens/support.screen";
+export { LegalToggleScreen } from "./screens/legal-toggle.screen";
+export { SupportScreen } from "./screens/support.screen";
 ```
 
 **Blockers:**

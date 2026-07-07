@@ -4,7 +4,7 @@ import type { LibraryItemDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import { Bookmark, Clock, CheckCircle } from "lucide-react-native";
 import { AppText } from "@/shared/components/AppText/AppText";
-import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
 
 export type LibraryItemRowProps = {

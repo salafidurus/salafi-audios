@@ -1,10 +1,3 @@
-// Screens
-export { AccountScreen, type AccountScreenProps } from "./screens/account.screen";
-export {
-  AccountProfileScreen,
-  type AccountProfileScreenProps,
-} from "./screens/account-profile.screen";
-
 // i18n components and utilities
 export { LanguageSwitch, ContentLanguageToggle } from "./components/i18n";
 export {
@@ -12,3 +5,6 @@ export {
   useShowOriginalContent,
   setShowOriginalContent,
 } from "./content-preference";
+
+// Re-export settings components
+export type {} from "./index";

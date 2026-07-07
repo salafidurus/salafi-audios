@@ -7,7 +7,7 @@ import { SearchInputDesktop } from "@/features/search/components/SearchInput/Sea
 import { SearchResultItemDesktop } from "@/features/search/components/SearchResultItem/SearchResultItem.desktop";
 import { SearchResultsListDesktop } from "@/features/search/components/SearchResultsList/SearchResultsList.desktop";
 import { useSearchProcessing, type SearchResultRow } from "@sd/domain-search";
-import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useRouter } from "next/navigation";
 import { routes } from "@sd/core-contracts";

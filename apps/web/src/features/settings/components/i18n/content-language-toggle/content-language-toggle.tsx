@@ -1,7 +1,10 @@
 "use client";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { setShowOriginalContent, useShowOriginalContent } from "@/features/i18n/content-preference";
+import {
+  setShowOriginalContent,
+  useShowOriginalContent,
+} from "@/features/settings/content-preference";
 import styles from "./content-language-toggle.module.css";
 
 /** Settings toggle that switches catalogue content (lectures, series,

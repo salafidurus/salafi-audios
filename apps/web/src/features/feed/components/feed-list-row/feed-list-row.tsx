@@ -7,7 +7,7 @@ import { useAudio, useProgressStore } from "@sd/domain-audio";
 import type { Track } from "@sd/domain-audio";
 import type { FeedContentItemDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
-import { useShowOriginalContent } from "@/features/i18n/content-preference";
+import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { audioService } from "@/features/audio";
 import styles from "./feed-list-row.module.css";
 

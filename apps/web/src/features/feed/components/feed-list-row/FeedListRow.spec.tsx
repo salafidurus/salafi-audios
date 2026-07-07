@@ -23,7 +23,7 @@ vi.mock("@/features/audio", () => ({
   },
 }));
 
-vi.mock("@/features/i18n/content-preference", () => ({
+vi.mock("@/features/settings/content-preference", () => ({
   useShowOriginalContent: () => false,
 }));
 

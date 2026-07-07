@@ -3,7 +3,7 @@ import React from "react";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { SettingsGeneralScreen } from "./settings-general.screen";
 
-vi.mock("@/features/i18n", () => ({
+vi.mock("@/features/settings/i18n", () => ({
   LanguageSwitch: () => <div data-testid="language-switch">LanguageSwitch</div>,
   ContentLanguageToggle: () => (
     <div data-testid="content-language-toggle">ContentLanguageToggle</div>
