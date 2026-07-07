@@ -51,7 +51,7 @@ test.describe("Theme — system-preference based", () => {
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
 
     // Navigate to another page
-    await page.goto("/feed");
+    await page.goto("/explore");
 
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   });

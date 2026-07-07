@@ -31,8 +31,8 @@ test.describe("Auth flows", () => {
       await expect(page).not.toHaveURL(/\/sign-in/);
     });
 
-    test("accessing /feed/following without session redirects to /sign-in", async ({ page }) => {
-      await page.goto("/feed/following");
+    test("accessing /explore/following without session redirects to /sign-in", async ({ page }) => {
+      await page.goto("/explore/following");
 
       // auth-required leaf — unauthenticated users are redirected to sign-in
       await expect(page).toHaveURL(/\/sign-in/);
