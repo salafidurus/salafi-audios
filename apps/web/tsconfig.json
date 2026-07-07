@@ -6,6 +6,7 @@
     // Note: composite disabled due to Better Auth type inference issue
     // See: https://better-auth.com/docs/concepts/typescript
     "incremental": true,
+    "lib": ["ESNext", "dom"],
     "paths": {
       "@/*": ["./src/*"]
     }

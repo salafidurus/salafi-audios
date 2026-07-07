@@ -9,10 +9,11 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 import { initAuth, getAuth } from './modules/auth/auth.instance';
-import { toNodeHandler } from 'better-auth/node';
+import { fromNodeHeaders } from 'better-auth/node';
 import helmet from '@fastify/helmet';
 import cookie from '@fastify/cookie';
 import cors from '@fastify/cors';
+import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { ZodValidationPipe } from 'nestjs-zod';
 
 async function bootstrap() {
@@ -60,9 +61,42 @@ async function bootstrap() {
   app.useGlobalPipes(new ZodValidationPipe());
   app.useGlobalFilters(new AllExceptionsFilter(app.get(ConfigService)));
 
-  // Mount better-auth as Fastify middleware — handles all /api/auth/* routes
-  // before NestJS routing, bypassing ValidationPipe and wildcard issues.
-  app.use('/api/auth', toNodeHandler(getAuth()));
+  // Mount Better Auth as a Fastify route (not raw middleware). Raw middleware
+  // bypasses @fastify/cors onRequest hooks, so preflight OPTIONS to /api/auth/*
+  // returned no CORS headers. A proper route stays inside Fastify's hook
+  // pipeline, letting the CORS plugin handle preflight automatically. See
+  // https://better-auth.com/docs/integrations/fastify
+  const fastify = app.getHttpAdapter().getInstance() as FastifyInstance;
+  fastify.route({
+    method: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    url: '/api/auth/*',
+    async handler(request: FastifyRequest, reply: FastifyReply) {
+      const url = new URL(request.url, `http://${request.headers.host}`);
+      const headers = fromNodeHeaders(request.headers);
+      const req = new Request(url.toString(), {
+        method: request.method,
+        headers,
+        ...(request.body ? { body: JSON.stringify(request.body) } : {}),
+      });
+
+      try {
+        const response = await getAuth().handler(req);
+        reply.status(response.status);
+        response.headers.forEach((value, key) => reply.header(key, value));
+        // Safe: proxying Better Auth's handler response. Better Auth is a trusted
+        // authentication library responsible for its own output sanitization. This
+        // is not rendering user-provided content directly.
+        // nosemgrep: javascript.express.security.audit.xss.direct-response-write.direct-response-write
+        return reply.send(response.body ? await response.text() : null);
+      } catch (error) {
+        fastify.log.error(error as Error, 'Authentication Error:');
+        return reply.status(500).send({
+          error: 'Internal authentication error',
+          code: 'AUTH_FAILURE',
+        });
+      }
+    },
+  });
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Salafi Durus API')

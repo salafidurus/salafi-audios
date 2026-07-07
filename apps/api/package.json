@@ -46,6 +46,7 @@
     "cache-manager": "^7.2.9",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.4.2",
+    "fastify": "^5.8.5",
     "helmet": "catalog:",
     "jose": "^6.2.3",
     "nestjs-pino": "^4.6.1",

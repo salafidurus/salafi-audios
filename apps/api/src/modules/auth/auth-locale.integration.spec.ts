@@ -1,7 +1,8 @@
 import { vi } from 'vitest';
-import { INestApplication } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
+import { FastifyAdapter } from '@nestjs/platform-fastify';
+import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { AuthGuard } from './auth.guard';
 import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
@@ -24,7 +25,7 @@ const mockConfigService = {
 };
 
 describe('AuthLocaleController — auth boundaries', () => {
-  let app: INestApplication;
+  let app: NestFastifyApplication;
 
   beforeEach(async () => {
     mockAuth.api.getSession.mockReset();
@@ -44,10 +45,11 @@ describe('AuthLocaleController — auth boundaries', () => {
       .useValue({ canActivate: () => true })
       .compile();
 
-    app = module.createNestApplication();
+    app = module.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
     app.useGlobalPipes(new ZodValidationPipe());
     app.useGlobalFilters(new AllExceptionsFilter(mockConfigService as any));
     await app.init();
+    await app.getHttpAdapter().getInstance().ready();
   });
 
   afterEach(() => app.close());

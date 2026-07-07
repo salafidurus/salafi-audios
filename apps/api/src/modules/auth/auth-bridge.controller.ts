@@ -1,7 +1,7 @@
-import { Controller, Get, Query, Req, Res } from '@nestjs/common';
+import { Controller, Get, Query, Req, Redirect } from '@nestjs/common';
 import { ApiExcludeController } from '@nestjs/swagger';
 import type { IncomingHttpHeaders } from 'http';
-import type { Request, Response } from 'express';
+import type { FastifyRequest } from 'fastify';
 import { ConfigService } from '../../shared/config/config.service';
 import { getAuth } from './auth.instance';
 import { Public } from './decorators';
@@ -37,18 +37,16 @@ export class AuthBridgeController {
 
   @Public()
   @Get('oauth-complete')
+  @Redirect()
   async oauthComplete(
     @Query('redirect') redirect: string | undefined,
-    @Req() req: Request,
-    @Res() res: Response,
-  ): Promise<void> {
+    @Req() req: FastifyRequest,
+  ): Promise<{ url: string; statusCode: number }> {
     const fallback = `${this.config.CORS_ORIGINS[0] ?? ''}/sign-in`;
 
     const target = this.resolveAllowedRedirect(redirect);
-    if (!target) {
-      res.redirect(302, fallback);
-      return;
-    }
+    // nosemgrep: typescript.nestjs.security.audit.nestjs-open-redirect.nestjs-open-redirect
+    if (!target) return { url: fallback, statusCode: 302 };
 
     let token: string | undefined;
     try {
@@ -60,14 +58,12 @@ export class AuthBridgeController {
       token = undefined;
     }
 
-    if (!token) {
-      res.redirect(302, fallback);
-      return;
-    }
+    // nosemgrep: typescript.nestjs.security.audit.nestjs-open-redirect.nestjs-open-redirect
+    if (!token) return { url: fallback, statusCode: 302 };
 
     const sep = target.includes('?') ? '&' : '?';
-    // nosemgrep: javascript.express.web.tainted-redirect-express.tainted-redirect-express
-    res.redirect(302, `${target}${sep}ott=${encodeURIComponent(token)}`);
+    // nosemgrep: javascript.express.web.tainted-redirect-express.tainted-redirect-express, typescript.nestjs.security.audit.nestjs-open-redirect.nestjs-open-redirect
+    return { url: `${target}${sep}ott=${encodeURIComponent(token)}`, statusCode: 302 };
   }
 
   private resolveAllowedRedirect(redirect: string | undefined): string | null {

@@ -1,6 +1,7 @@
 import { vi } from 'vitest';
-import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { FastifyAdapter } from '@nestjs/platform-fastify';
+import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { AuthBridgeController } from './auth-bridge.controller';
 import { ConfigService } from '../../shared/config/config.service';
@@ -9,7 +10,7 @@ const mockAuth = { api: { generateOneTimeToken: vi.fn() } };
 vi.mock('./auth.instance', () => ({ getAuth: () => mockAuth }));
 
 describe('AuthBridgeController — OAuth handoff', () => {
-  let app: INestApplication;
+  let app: NestFastifyApplication;
   const WEB = 'http://localhost:3000';
 
   beforeEach(async () => {
@@ -20,8 +21,9 @@ describe('AuthBridgeController — OAuth handoff', () => {
       providers: [{ provide: ConfigService, useValue: { CORS_ORIGINS: [WEB] } }],
     }).compile();
 
-    app = moduleRef.createNestApplication();
+    app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
     await app.init();
+    await app.getHttpAdapter().getInstance().ready();
   });
 
   afterEach(() => app.close());

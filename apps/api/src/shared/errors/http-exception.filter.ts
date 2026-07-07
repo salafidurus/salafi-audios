@@ -2,7 +2,7 @@ import { Catch, HttpException, HttpStatus } from '@nestjs/common';
 import type { ArgumentsHost, ExceptionFilter } from '@nestjs/common';
 import { Prisma } from '@sd/core-db';
 import { ConfigService } from '../../shared/config/config.service';
-import type { Request, Response } from 'express';
+import type { FastifyRequest, FastifyReply } from 'fastify';
 import { ZodValidationException } from 'nestjs-zod';
 
 @Catch()
@@ -11,8 +11,8 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const req = ctx.getRequest<Request>();
-    const res = ctx.getResponse<Response>();
+    const req = ctx.getRequest<FastifyRequest>();
+    const res = ctx.getResponse<FastifyReply>();
 
     const requestId = req.id ?? res.getHeader('x-request-id') ?? '';
     const timestamp = new Date().toISOString();
@@ -50,7 +50,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const isProd = this.config.NODE_ENV === 'production';
     const devDetails = isProd ? undefined : this.buildDevDetails(exception, details);
 
-    res.status(statusCode).json({
+    res.status(statusCode).send({
       statusCode,
       message,
       details: devDetails,
