@@ -11,12 +11,6 @@ describe('AppleNativeRepository', () => {
     session: { create: ReturnType<typeof vi.fn> };
   };
 
-  const mockPrisma = {
-    account: { findFirst: vi.fn() },
-    user: { create: vi.fn() },
-    session: { create: vi.fn() },
-  };
-
   beforeEach(async () => {
     prisma = {
       account: { findFirst: vi.fn(), create: vi.fn() },
