@@ -104,6 +104,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         },
       ],
       "expo-asset",
+      "expo-apple-authentication",
       "expo-audio",
       [
         "expo-document-picker",
@@ -137,6 +138,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       ...config.ios,
       bundleIdentifier: iosBundleId,
       supportsTablet: true,
+      usesAppleSignIn: true,
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
         UIBackgroundModes: ["audio"],

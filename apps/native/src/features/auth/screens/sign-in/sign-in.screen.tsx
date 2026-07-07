@@ -1,4 +1,11 @@
-import { Platform, Pressable, Text, View, type ImageSourcePropType } from "react-native";
+import {
+  ActivityIndicator,
+  Platform,
+  Pressable,
+  Text,
+  View,
+  type ImageSourcePropType,
+} from "react-native";
 import { Image } from "expo-image";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
@@ -10,6 +17,7 @@ export type SignInScreenProps = {
   onSignInWithApple: () => void;
   onBack?: () => void;
   googleButtonSource?: ImageSourcePropType;
+  appleLoading?: boolean;
 };
 
 export function SignInScreen({
@@ -17,6 +25,7 @@ export function SignInScreen({
   onSignInWithApple,
   onBack,
   googleButtonSource,
+  appleLoading,
 }: SignInScreenProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();
@@ -51,13 +60,21 @@ export function SignInScreen({
         </View>
 
         {Platform.OS === "ios" && (
-          <AppleAuthentication.AppleAuthenticationButton
-            buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
-            buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-            cornerRadius={8}
-            style={styles.appleBtn}
-            onPress={onSignInWithApple}
-          />
+          <View style={styles.appleBtnContainer}>
+            {appleLoading ? (
+              <View style={[styles.appleBtn, styles.appleBtnLoading]}>
+                <ActivityIndicator color="#fff" />
+              </View>
+            ) : (
+              <AppleAuthentication.AppleAuthenticationButton
+                buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
+                buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+                cornerRadius={8}
+                style={styles.appleBtn}
+                onPress={onSignInWithApple}
+              />
+            )}
+          </View>
         )}
 
         <Pressable
@@ -109,7 +126,14 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.content.strong,
     ...theme.typography.displayMd,
   },
-  appleBtn: { width: "100%", height: 48, marginBottom: theme.spacing.component.gapSm },
+  appleBtnContainer: { width: "100%", marginBottom: theme.spacing.component.gapSm },
+  appleBtn: { width: "100%", height: 48 },
+  appleBtnLoading: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#000",
+    borderRadius: 8,
+  },
   googleBtn: {
     borderRadius: 8,
     overflow: "hidden",
