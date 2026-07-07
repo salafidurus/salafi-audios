@@ -38,37 +38,216 @@
 
 **Files:**
 
+- Create: `apps/api/src/modules/auth/apple-native.repo.ts`
+- Create: `apps/api/src/modules/auth/apple-native.repo.spec.ts`
 - Create: `apps/api/src/modules/auth/apple-native.service.ts`
-- Create: `apps/api/src/modules/auth/apple-native.controller.ts`
-- Create: `apps/api/src/modules/auth/dto/apple-native-sign-in.dto.ts`
 - Create: `apps/api/src/modules/auth/apple-native.service.spec.ts`
+- Create: `apps/api/src/modules/auth/apple-native.controller.ts`
 - Create: `apps/api/src/modules/auth/apple-native.controller.spec.ts`
+- Create: `apps/api/src/modules/auth/dto/apple-native-sign-in.dto.ts`
 - Modify: `apps/api/src/modules/auth/auth.module.ts`
 - Modify: `apps/api/package.json` (add `jose`)
 
 **Interfaces:**
 
-- Consumes: `ConfigService` (for `APPLE_CLIENT_ID`)
+- Consumes: `ConfigService` (for `APPLE_CLIENT_ID`), `PrismaService` (NestJS DI — already `@Global()`) via repo layer
 - Produces: `POST /api/auth/apple/native` endpoint
-- Produces: `AppleNativeService.verifyIdentityToken(token: string): Promise<AppleIdentityPayload>`
+- Produces: `AppleNativeRepository` — `findAccountByProviderId(providerId, accountId)`, `createUser(data)`, `createAccount(data)`, `createSession(data)`
+- Produces: `AppleNativeService.verifyIdentityToken(token): Promise<AppleIdentityPayload>`
+- Produces: `AppleNativeService.handleAppleSignIn(payload, appleUser?): Promise<{ session, user }>`
+- Layering: controller orchestrates → service owns business logic + token verification → repo owns all DB queries via injected `PrismaService`
+- Do NOT create a standalone `PrismaClient` instance; use NestJS-managed `PrismaService`
 
-- [ ] **Step 1: Write the failing AppleNativeService test**
+- [ ] **Step 1: Write the failing AppleNativeRepository test**
+
+Create `apps/api/src/modules/auth/apple-native.repo.spec.ts`:
+
+```typescript
+import { Test, TestingModule } from "@nestjs/testing";
+import { PrismaService } from "../../../shared/db/prisma.service";
+import { AppleNativeRepository } from "../apple-native.repo";
+
+describe("AppleNativeRepository", () => {
+  let repo: AppleNativeRepository;
+  let prisma: {
+    account: { findFirst: ReturnType<typeof vi.fn> };
+    user: { create: ReturnType<typeof vi.fn> };
+    accountCreate: ReturnType<typeof vi.fn>;
+    session: { create: ReturnType<typeof vi.fn> };
+  };
+
+  const mockPrisma = {
+    account: { findFirst: vi.fn() },
+    user: { create: vi.fn() },
+    session: { create: vi.fn() },
+  };
+
+  beforeEach(async () => {
+    prisma = {
+      account: { findFirst: vi.fn() },
+      user: { create: vi.fn() },
+      accountCreate: vi.fn(),
+      session: { create: vi.fn() },
+    };
+    mockPrisma.account.findFirst.mockReset();
+    mockPrisma.user.create.mockReset();
+    mockPrisma.session.create.mockReset();
+    // Attach accountCreate mock for the repo's this.prisma.account.create call
+    mockPrisma.account.create = vi.fn();
+
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [AppleNativeRepository, { provide: PrismaService, useValue: mockPrisma }],
+    }).compile();
+
+    repo = module.get<AppleNativeRepository>(AppleNativeRepository);
+  });
+
+  describe("findAccountByProviderId", () => {
+    it("calls prisma.account.findFirst with correct args", async () => {
+      mockPrisma.account.findFirst.mockResolvedValue({ userId: "u1" });
+      const result = await repo.findAccountByProviderId("apple", "abc123");
+      expect(mockPrisma.account.findFirst).toHaveBeenCalledWith({
+        where: { providerId: "apple", providerAccountId: "abc123" },
+      });
+      expect(result).toEqual({ userId: "u1" });
+    });
+  });
+
+  describe("createUser", () => {
+    it("creates a user with the given data", async () => {
+      const data = { name: "John Doe", email: "j@test.com" };
+      mockPrisma.user.create.mockResolvedValue({ id: "u1", ...data });
+      const result = await repo.createUser(data, true);
+      expect(mockPrisma.user.create).toHaveBeenCalledWith({
+        data: { ...data, emailVerified: true },
+      });
+      expect(result.id).toBe("u1");
+    });
+  });
+
+  describe("createAccount", () => {
+    it("creates an account record", async () => {
+      mockPrisma.account.create = vi.fn().mockResolvedValue({ id: "acct1" });
+      const result = await repo.createAccount({
+        userId: "u1",
+        providerId: "apple",
+        providerAccountId: "abc",
+      });
+      expect(mockPrisma.account.create).toHaveBeenCalledWith({
+        data: { userId: "u1", providerId: "apple", providerAccountId: "abc", type: "oidc" },
+      });
+      expect(result.id).toBe("acct1");
+    });
+  });
+
+  describe("createSession", () => {
+    it("creates a session and returns id + expiresAt", async () => {
+      const expiresAt = new Date();
+      mockPrisma.session.create.mockResolvedValue({ id: "s1", expiresAt });
+      const result = await repo.createSession("u1");
+      expect(mockPrisma.session.create).toHaveBeenCalledWith({
+        data: { userId: "u1", expiresAt: expect.any(Date) },
+      });
+      expect(result.id).toBe("s1");
+    });
+  });
+});
+```
+
+- [ ] **Step 2: Run repo test to verify it fails**
+
+Run:
+
+```bash
+bun run --filter api test -- src/modules/auth/apple-native.repo.spec.ts
+```
+
+Expected: FAIL — `AppleNativeRepository` not found.
+
+- [ ] **Step 3: Write AppleNativeRepository**
+
+Create `apps/api/src/modules/auth/apple-native.repo.ts`:
+
+```typescript
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../../shared/db/prisma.service";
+
+@Injectable()
+export class AppleNativeRepository {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async findAccountByProviderId(providerId: string, providerAccountId: string) {
+    return this.prisma.account.findFirst({
+      where: { providerId, providerAccountId },
+    });
+  }
+
+  async createUser(data: { name: string; email: string }, emailVerified: boolean) {
+    return this.prisma.user.create({
+      data: { ...data, emailVerified },
+    });
+  }
+
+  async createAccount(data: { userId: string; providerId: string; providerAccountId: string }) {
+    return this.prisma.account.create({
+      data: { ...data, type: "oidc" },
+    });
+  }
+
+  async createSession(userId: string) {
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    return this.prisma.session.create({
+      data: { userId, expiresAt },
+    });
+  }
+}
+```
+
+- [ ] **Step 4: Run repo test to verify it passes**
+
+Run:
+
+```bash
+bun run --filter api test -- src/modules/auth/apple-native.repo.spec.ts
+```
+
+Expected: PASS.
+
+- [ ] **Step 5: Write the failing AppleNativeService test**
 
 Create `apps/api/src/modules/auth/apple-native.service.spec.ts`:
 
 ```typescript
 import { Test, TestingModule } from "@nestjs/testing";
 import { ConfigService } from "../../../shared/config/config.service";
+import { AppleNativeRepository } from "../apple-native.repo";
 import { AppleNativeService } from "../apple-native.service";
 
 describe("AppleNativeService", () => {
   let service: AppleNativeService;
   let config: { APPLE_CLIENT_ID: string };
+  let repo: {
+    findAccountByProviderId: ReturnType<typeof vi.fn>;
+    createUser: ReturnType<typeof vi.fn>;
+    createAccount: ReturnType<typeof vi.fn>;
+    createSession: ReturnType<typeof vi.fn>;
+  };
 
   beforeEach(async () => {
     config = { APPLE_CLIENT_ID: "com.example.app" };
+    repo = {
+      findAccountByProviderId: vi.fn(),
+      createUser: vi.fn(),
+      createAccount: vi.fn(),
+      createSession: vi.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
-      providers: [AppleNativeService, { provide: ConfigService, useValue: config }],
+      providers: [
+        AppleNativeService,
+        { provide: ConfigService, useValue: config },
+        { provide: AppleNativeRepository, useValue: repo },
+      ],
     }).compile();
 
     service = module.get<AppleNativeService>(AppleNativeService);
@@ -83,10 +262,54 @@ describe("AppleNativeService", () => {
       await expect(service.verifyIdentityToken("not-a-jwt")).rejects.toThrow();
     });
   });
+
+  describe("handleAppleSignIn", () => {
+    it("creates user, account, and session for new Apple user", async () => {
+      repo.findAccountByProviderId.mockResolvedValue(null);
+      repo.createUser.mockResolvedValue({ id: "user_1", name: "John Doe" });
+      repo.createSession.mockResolvedValue({ id: "sess_1", expiresAt: new Date() });
+
+      const result = await service.handleAppleSignIn(
+        { sub: "apple_001", email: "test@icloud.com" },
+        { firstName: "John", lastName: "Doe" },
+      );
+
+      expect(result).toHaveProperty("session");
+      expect(result).toHaveProperty("user");
+      expect(repo.findAccountByProviderId).toHaveBeenCalledWith("apple", "apple_001");
+      expect(repo.createUser).toHaveBeenCalledWith(
+        { name: "John Doe", email: "test@icloud.com" },
+        true,
+      );
+      expect(repo.createAccount).toHaveBeenCalledWith(
+        expect.objectContaining({
+          userId: "user_1",
+          providerId: "apple",
+          providerAccountId: "apple_001",
+        }),
+      );
+      expect(repo.createSession).toHaveBeenCalledWith("user_1");
+    });
+
+    it("returns existing user when account already exists", async () => {
+      repo.findAccountByProviderId.mockResolvedValue({ userId: "existing_user" });
+      repo.createSession.mockResolvedValue({ id: "sess_2", expiresAt: new Date() });
+
+      const result = await service.handleAppleSignIn(
+        { sub: "apple_001" },
+        { email: "existing@icloud.com" },
+      );
+
+      expect(result.user.id).toBe("existing_user");
+      expect(repo.createUser).not.toHaveBeenCalled();
+      expect(repo.createAccount).not.toHaveBeenCalled();
+      expect(repo.createSession).toHaveBeenCalledWith("existing_user");
+    });
+  });
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [ ] **Step 6: Run service test to verify it fails**
 
 Run:
 
@@ -96,13 +319,14 @@ bun run --filter api test -- src/modules/auth/apple-native.service.spec.ts
 
 Expected: FAIL — `AppleNativeService`, `verifyIdentityToken` not defined.
 
-- [ ] **Step 3: Write minimal AppleNativeService**
+- [ ] **Step 7: Write minimal AppleNativeService**
 
 Create `apps/api/src/modules/auth/apple-native.service.ts`:
 
 ```typescript
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "../../shared/config/config.service";
+import { AppleNativeRepository } from "./apple-native.repo";
 import { createRemoteJWKSet, jwtVerify, errors } from "jose";
 
 export interface AppleIdentityPayload {
@@ -110,9 +334,22 @@ export interface AppleIdentityPayload {
   email?: string;
 }
 
+export interface AppleUserInfo {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+}
+
 @Injectable()
 export class AppleNativeService {
-  constructor(private readonly config: ConfigService) {}
+  private readonly JWKS: ReturnType<typeof createRemoteJWKSet>;
+
+  constructor(
+    private readonly config: ConfigService,
+    private readonly repo: AppleNativeRepository,
+  ) {
+    this.JWKS = createRemoteJWKSet(new URL("https://appleid.apple.com/auth/keys"));
+  }
 
   async verifyIdentityToken(identityToken: string): Promise<AppleIdentityPayload> {
     if (!identityToken) {
@@ -120,13 +357,10 @@ export class AppleNativeService {
     }
 
     const clientId = this.config.APPLE_CLIENT_ID;
-    const JWKS = createRemoteJWKSet(new URL("https://appleid.apple.com/auth/keys"));
-
-    const JWKS = createRemoteJWKSet(new URL("https://appleid.apple.com/auth/keys"));
 
     let payload: { sub?: string; email?: string; iss?: string; aud?: string };
     try {
-      const result = await jwtVerify(identityToken, JWKS, {
+      const result = await jwtVerify(identityToken, this.JWKS, {
         issuer: "https://appleid.apple.com",
         audience: clientId,
       });
@@ -147,10 +381,44 @@ export class AppleNativeService {
 
     return { sub: payload.sub, email: payload.email };
   }
+
+  async handleAppleSignIn(payload: AppleIdentityPayload, appleUser?: AppleUserInfo) {
+    const { sub: appleUserId, email } = payload;
+    const appleUserEmail = appleUser?.email;
+
+    const account = await this.repo.findAccountByProviderId("apple", appleUserId);
+
+    let userId: string;
+
+    if (account) {
+      userId = account.userId;
+    } else {
+      const displayName =
+        [appleUser?.firstName, appleUser?.lastName].filter(Boolean).join(" ").trim() ||
+        "Apple User";
+      const resolvedEmail = appleUserEmail ?? email ?? `${appleUserId}@privaterelay.appleid.com`;
+
+      const user = await this.repo.createUser({ name: displayName, email: resolvedEmail }, true);
+      userId = user.id;
+
+      await this.repo.createAccount({
+        userId,
+        providerId: "apple",
+        providerAccountId: appleUserId,
+      });
+    }
+
+    const session = await this.repo.createSession(userId);
+
+    return {
+      session: { id: session.id, expiresAt: session.expiresAt },
+      user: { id: userId },
+    };
+  }
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [ ] **Step 8: Run service test to verify it passes**
 
 Run:
 
@@ -160,7 +428,7 @@ bun run --filter api test -- src/modules/auth/apple-native.service.spec.ts
 
 Expected: PASS.
 
-- [ ] **Step 5: Write the failing controller test**
+- [ ] **Step 9: Write the failing controller test**
 
 Create `apps/api/src/modules/auth/apple-native.controller.spec.ts`:
 
@@ -168,70 +436,67 @@ Create `apps/api/src/modules/auth/apple-native.controller.spec.ts`:
 import { Test, TestingModule } from "@nestjs/testing";
 import { AppleNativeController } from "../apple-native.controller";
 import { AppleNativeService } from "../apple-native.service";
-import { ConfigService } from "../../../shared/config/config.service";
 
 describe("AppleNativeController", () => {
   let controller: AppleNativeController;
-  let service: { verifyIdentityToken: ReturnType<typeof vi.fn> };
-  let config: {
-    APPLE_CLIENT_ID: string;
-    BETTER_AUTH_URL: string;
-    BETTER_AUTH_SECRET: string;
-    CORS_ORIGINS: string[];
-    DATABASE_URL: string;
+  let service: {
+    verifyIdentityToken: ReturnType<typeof vi.fn>;
+    handleAppleSignIn: ReturnType<typeof vi.fn>;
   };
 
   beforeEach(async () => {
-    service = { verifyIdentityToken: vi.fn() };
-    config = {
-      APPLE_CLIENT_ID: "com.example.app",
-      BETTER_AUTH_URL: "http://localhost:3001",
-      BETTER_AUTH_SECRET: "test-secret-at-least-32-characters-long!!",
-      CORS_ORIGINS: ["http://localhost:3000"],
-      DATABASE_URL: process.env.DATABASE_URL ?? "postgresql://localhost:5432/test",
+    service = {
+      verifyIdentityToken: vi.fn(),
+      handleAppleSignIn: vi.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AppleNativeController],
-      providers: [
-        { provide: AppleNativeService, useValue: service },
-        { provide: ConfigService, useValue: config },
-      ],
+      providers: [{ provide: AppleNativeService, useValue: service }],
     }).compile();
 
     controller = module.get<AppleNativeController>(AppleNativeController);
   });
 
   it("returns session on valid identity token", async () => {
-    service.verifyIdentityToken.mockResolvedValue({
-      sub: "000123.abc",
-      email: "user@icloud.com",
-    });
+    const payload = { sub: "000123.abc", email: "user@icloud.com" };
+    const sessionResult = {
+      session: { id: "sess_1", expiresAt: new Date() },
+      user: { id: "user_1" },
+    };
+
+    service.verifyIdentityToken.mockResolvedValue(payload);
+    service.handleAppleSignIn.mockResolvedValue(sessionResult);
 
     const result = await controller.nativeSignIn({
       identityToken: "valid.jwt.token",
-      user: { id: "000123.abc", email: "user@icloud.com", firstName: "John", lastName: "Doe" },
+      user: { firstName: "John", lastName: "Doe" },
     });
 
-    expect(result).toHaveProperty("session");
-    expect(result).toHaveProperty("user");
+    expect(result).toEqual(sessionResult);
     expect(service.verifyIdentityToken).toHaveBeenCalledWith("valid.jwt.token");
+    expect(service.handleAppleSignIn).toHaveBeenCalledWith(payload, {
+      firstName: "John",
+      lastName: "Doe",
+    });
   });
 
-  it("throws on invalid identity token", async () => {
+  it("throws when identity token verification fails", async () => {
     service.verifyIdentityToken.mockRejectedValue(new Error("verification failed"));
 
     await expect(
       controller.nativeSignIn({
         identityToken: "invalid.token",
-        user: { id: "000123.abc" },
+        user: {},
       }),
     ).rejects.toThrow("verification failed");
+
+    expect(service.handleAppleSignIn).not.toHaveBeenCalled();
   });
 });
 ```
 
-- [ ] **Step 6: Run test to verify it fails**
+- [ ] **Step 10: Run controller test to verify it fails**
 
 Run:
 
@@ -241,7 +506,7 @@ bun run --filter api test -- src/modules/auth/apple-native.controller.spec.ts
 
 Expected: FAIL — Controller not found.
 
-- [ ] **Step 7: Create DTO and AppleNativeController**
+- [ ] **Step 11: Create DTO and AppleNativeController**
 
 Create `apps/api/src/modules/auth/dto/apple-native-sign-in.dto.ts`:
 
@@ -249,9 +514,6 @@ Create `apps/api/src/modules/auth/dto/apple-native-sign-in.dto.ts`:
 import { IsString, IsOptional, IsObject } from "class-validator";
 
 class AppleUserInfo {
-  @IsString()
-  id!: string;
-
   @IsOptional()
   @IsString()
   email?: string;
@@ -269,8 +531,9 @@ export class AppleNativeSignInDto {
   @IsString()
   identityToken!: string;
 
+  @IsOptional()
   @IsObject()
-  user!: AppleUserInfo;
+  user?: AppleUserInfo;
 }
 ```
 
@@ -282,9 +545,6 @@ import { ApiExcludeController } from "@nestjs/swagger";
 import { AppleNativeService } from "./apple-native.service";
 import { AppleNativeSignInDto } from "./dto/apple-native-sign-in.dto";
 import { Public } from "./decorators";
-import { PrismaClient } from "@sd/core-db";
-
-const prisma = new PrismaClient();
 
 @ApiExcludeController()
 @Controller("auth/apple")
@@ -297,62 +557,16 @@ export class AppleNativeController {
   async nativeSignIn(@Body() dto: AppleNativeSignInDto) {
     const { identityToken, user: appleUser } = dto;
 
-    const { sub: appleUserId, email } =
-      await this.appleNativeService.verifyIdentityToken(identityToken);
+    const payload = await this.appleNativeService.verifyIdentityToken(identityToken);
 
-    // Use Prisma directly (not better-auth's adapter) to find/create user
-    // and account. Better-auth's user/account/session tables follow its schema.
-    let account = await prisma.account.findFirst({
-      where: { providerId: "apple", providerAccountId: appleUserId },
-    });
-
-    let userId: string;
-
-    if (account) {
-      userId = account.userId;
-    } else {
-      const displayName =
-        [appleUser.firstName, appleUser.lastName].filter(Boolean).join(" ").trim() || "Apple User";
-
-      const user = await prisma.user.create({
-        data: {
-          name: displayName,
-          email: appleUser.email ?? email ?? `${appleUserId}@privaterelay.appleid.com`,
-          emailVerified: true,
-        },
-      });
-
-      userId = user.id;
-
-      await prisma.account.create({
-        data: {
-          userId,
-          providerId: "apple",
-          providerAccountId: appleUserId,
-          type: "oidc",
-        },
-      });
-    }
-
-    // Create session via Prisma directly
-    const session = await prisma.session.create({
-      data: {
-        userId,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      },
-    });
-
-    return {
-      session: { id: session.id, expiresAt: session.expiresAt },
-      user: { id: userId },
-    };
+    return this.appleNativeService.handleAppleSignIn(payload, appleUser);
   }
 }
 ```
 
-> **Note:** This uses `PrismaClient` directly from `@sd/core-db`, not through better-auth's adapter. The `user`, `account`, and `session` tables follow better-auth's Prisma schema naming. The PrismaClient must connect (NestJS lifecycle will manage this; for the initial implementation a new instance is created — refactor to inject via DI if needed).
+> **Note:** The controller is pure orchestration — validate input, call service, return result. DB operations are handled by `AppleNativeRepository`, which is injected into the service.
 
-- [ ] **Step 8: Run test to verify it passes**
+- [ ] **Step 12: Run controller test to verify it passes**
 
 Run:
 
@@ -360,9 +574,9 @@ Run:
 bun run --filter api test -- src/modules/auth/apple-native.controller.spec.ts
 ```
 
-Expected: PASS (note: the controller may need adjustment if `getAuth()` or the adapter path doesn't match — adjust the Prisma access strategy as needed).
+Expected: PASS.
 
-- [ ] **Step 9: Wire controller into AuthModule**
+- [ ] **Step 13: Wire controller, service, and repo into AuthModule**
 
 Modify `apps/api/src/modules/auth/auth.module.ts`:
 
@@ -373,16 +587,17 @@ import { AuthLocaleController } from "./auth-locale.controller";
 import { AuthBridgeController } from "./auth-bridge.controller";
 import { AppleNativeController } from "./apple-native.controller";
 import { AppleNativeService } from "./apple-native.service";
+import { AppleNativeRepository } from "./apple-native.repo";
 
 @Module({
   controllers: [AuthLocaleController, AuthBridgeController, AppleNativeController],
-  providers: [AuthGuard, AppleNativeService],
+  providers: [AuthGuard, AppleNativeService, AppleNativeRepository],
   exports: [AuthGuard],
 })
 export class AuthModule {}
 ```
 
-- [ ] **Step 10: Install jose dependency**
+- [ ] **Step 14: Install jose dependency**
 
 Run:
 
@@ -392,7 +607,7 @@ bun add --filter api jose
 
 Expected: `jose` added to `apps/api/package.json`.
 
-- [ ] **Step 11: Run full API test suite**
+- [ ] **Step 15: Run full API test suite**
 
 Run:
 
@@ -402,16 +617,19 @@ bun run --filter api test
 
 Expected: All tests pass.
 
-- [ ] **Step 12: Commit**
+- [ ] **Step 16: Commit**
 
 ```bash
 git add apps/api/src/modules/auth/apple-native.service.ts \
        apps/api/src/modules/auth/apple-native.controller.ts \
+       apps/api/src/modules/auth/apple-native.repo.ts \
        apps/api/src/modules/auth/dto/apple-native-sign-in.dto.ts \
-       apps/api/src/modules/auth/ \
+       apps/api/src/modules/auth/apple-native.service.spec.ts \
+       apps/api/src/modules/auth/apple-native.controller.spec.ts \
+       apps/api/src/modules/auth/apple-native.repo.spec.ts \
        apps/api/src/modules/auth/auth.module.ts \
        apps/api/package.json
-git commit -m "feat(api): add Apple identity token verification endpoint for native sign-in"
+git commit -m "feat(api): add Apple identity token verification for native sign-in with repo layer"
 ```
 
 ---
