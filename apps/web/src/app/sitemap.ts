@@ -21,13 +21,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
-      url: `${baseUrl}/feed`,
+      url: `${baseUrl}/explore`,
       lastModified: new Date(),
       changeFrequency: "daily" as const,
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/feed/recent`,
+      url: `${baseUrl}/explore/recent`,
       lastModified: new Date(),
       changeFrequency: "daily" as const,
       priority: 0.7,

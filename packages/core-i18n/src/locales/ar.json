@@ -55,7 +55,7 @@
     "siteFooter": "تذييل الموقع",
     "languageSwitch": "تغيير اللغة",
     "subnav": {
-      "feed": { "popular": "الأكثر شيوعًا", "recent": "الأحدث", "following": "المتابَعون" },
+      "explore": { "popular": "الأكثر شيوعًا", "recent": "الأحدث", "following": "المتابَعون" },
       "live": { "ongoing": "مباشر الآن", "scheduled": "مجدولة", "ended": "منتهية" },
       "library": { "started": "قيد التشغيل", "saved": "المحفوظة", "completed": "المكتملة" },
       "account": { "general": "عام", "profile": "الملف الشخصي", "legal": "قانوني" }

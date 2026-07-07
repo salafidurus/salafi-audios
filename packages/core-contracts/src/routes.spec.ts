@@ -91,9 +91,9 @@ describe("routeDefinitions – validity", () => {
 
 describe("resolveRouteAccess", () => {
   it("matches the longest prefix, not a parent rule", () => {
-    expect(resolveRouteAccess("/feed/following")).toBe("auth-required");
-    expect(resolveRouteAccess("/feed")).toBe("public");
-    expect(resolveRouteAccess("/feed/recent")).toBe("public");
+    expect(resolveRouteAccess("/explore/following")).toBe("auth-required");
+    expect(resolveRouteAccess("/explore")).toBe("public");
+    expect(resolveRouteAccess("/explore/recent")).toBe("public");
   });
 
   it("normalizes a trailing slash", () => {
@@ -127,7 +127,7 @@ describe("resolveRouteAccess", () => {
   });
 
   it("gates the newly protected leaves", () => {
-    expect(resolveRouteAccess("/feed/following")).toBe("auth-required");
+    expect(resolveRouteAccess("/explore/following")).toBe("auth-required");
     expect(resolveRouteAccess("/admin")).toBe("auth-required");
   });
 

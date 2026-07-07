@@ -2,7 +2,7 @@ import { DEFAULT_TABS, type Section } from "../types";
 import { routes } from "@sd/core-contracts";
 
 const PATH_TO_SECTION: Record<string, Section> = {
-  [routes.feed.index]: "feed",
+  [routes.explore.index]: "explore",
   [routes.live.index]: "live",
   [routes.library.index]: "library",
   [routes.settings.index]: "settings",

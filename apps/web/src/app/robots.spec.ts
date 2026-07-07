@@ -30,7 +30,7 @@ describe("robots", () => {
       rules: {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin", "/settings", "/sign-in", "/library", "/feed/following", "/auth"],
+        disallow: ["/admin", "/settings", "/sign-in", "/library", "/explore/following", "/auth"],
       },
       sitemap: [
         "https://www.salafidurus.com/sitemap.xml",

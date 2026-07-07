@@ -11,19 +11,19 @@ test.describe("Navigation — sidebar & routing", () => {
     });
 
     test("brand link navigates to home", async ({ page }) => {
-      await page.goto("/feed");
+      await page.goto("/explore");
       const brand = page.locator('[aria-label="Salafi Durus"]');
       await expect(brand).toBeVisible();
       await brand.click();
       await expect(page).toHaveURL("/");
     });
 
-    test("clicking Explore sidebar link navigates to /feed", async ({ page }) => {
+    test("clicking Explore sidebar link navigates to /explore", async ({ page }) => {
       await page.goto("/");
       const sidebar = page.locator('[aria-label="Primary sidebar"]');
       const feedLink = sidebar.getByText("Explore", { exact: true });
       await feedLink.click();
-      await expect(page).toHaveURL(/\/feed/);
+      await expect(page).toHaveURL(/\/explore/);
     });
 
     test("clicking Live sidebar link navigates to /live", async ({ page }) => {
@@ -47,8 +47,8 @@ test.describe("Navigation — sidebar & routing", () => {
       const homeTitle = await page.title();
       expect(homeTitle).toBeTruthy();
 
-      await page.goto("/feed", { waitUntil: "domcontentloaded" });
-      await expect(page).toHaveURL(/\/feed/);
+      await page.goto("/explore", { waitUntil: "domcontentloaded" });
+      await expect(page).toHaveURL(/\/explore/);
       const feedTitle = await page.title();
       expect(feedTitle).toBeTruthy();
     });

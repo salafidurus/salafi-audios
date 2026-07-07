@@ -12,10 +12,10 @@ export const routes = {
   home: "/",
   search: "/search",
 
-  feed: {
-    index: "/feed",
-    recent: "/feed/recent",
-    following: "/feed/following",
+  explore: {
+    index: "/explore",
+    recent: "/explore/recent",
+    following: "/explore/following",
   },
 
   library: {
@@ -93,8 +93,8 @@ export interface RouteDefinition {
  * preserve their prior semantics. Routes not listed fall back to "public".
  */
 export const routeDefinitions: RouteDefinition[] = [
-  { path: routes.feed.following, access: "auth-required" },
-  { path: routes.feed.index, access: "public" },
+  { path: routes.explore.following, access: "auth-required" },
+  { path: routes.explore.index, access: "public" },
   { path: routes.settings.profile, access: "auth-optional" },
   { path: routes.settings.legal, access: "public" },
   { path: routes.settings.index, access: "auth-optional" },

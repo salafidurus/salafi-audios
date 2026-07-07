@@ -8,23 +8,28 @@
     "server-memory": {},
     "next-devtools": {
       "command": "npx",
-      "args": [
-        "-y",
-        "next-devtools-mcp@latest"
-      ]
+      "args": ["-y", "next-devtools-mcp@latest"]
     },
     "prisma": {
       "command": "npx",
-      "args": [
-        "-y",
-        "prisma",
-        "mcp"
-      ]
+      "args": ["-y", "prisma", "mcp"]
     }
   },
   "instructions": [
     "Read the relevant AGENT.md file before working in any workspace (apps/api/AGENT.md, apps/web/AGENT.md, apps/mobile/AGENT.md, or packages/*/AGENT.md)"
   ],
+  "constraints": {
+    "git": {
+      "disallowedFlags": ["--no-verify"],
+      "reason": "Pre-commit and pre-push hooks enforce code quality and test validation. Always fix the actual issues instead of bypassing hooks.",
+      "enforced": true,
+      "appliesTo": ["commit", "push"]
+    }
+  },
+  "codeQuality": {
+    "requirePreCommitHooks": true,
+    "description": "All git commits must pass pre-commit hooks. If a hook fails, investigate and fix the underlying issue."
+  },
   "permissions": {
     "allow": [
       "Read(*)",

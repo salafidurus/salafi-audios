@@ -2,13 +2,14 @@ import { Pressable, ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useAccountProfile } from "@sd/domain-account";
-import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings/i18n";
+import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 import { AppText } from "@/shared/components/AppText/AppText";
 
 export type AccountScreenProps = {
   onNavigateToProfile?: () => void;
   onNavigateToLegal?: () => void;
+  onNavigateToSupport?: () => void;
   onNavigateToAdmin?: () => void;
   onSignOut?: () => void;
 };
@@ -16,6 +17,7 @@ export type AccountScreenProps = {
 export function AccountScreen({
   onNavigateToProfile,
   onNavigateToLegal,
+  onNavigateToSupport,
   onNavigateToAdmin,
   onSignOut,
 }: AccountScreenProps) {
@@ -61,6 +63,9 @@ export function AccountScreen({
             )}
             <Pressable onPress={onNavigateToProfile} style={styles.actionButton}>
               <AppText variant="bodySm">{t("account.editProfile", "Edit Profile")}</AppText>
+            </Pressable>
+            <Pressable onPress={onNavigateToSupport} style={styles.actionButton}>
+              <AppText variant="bodySm">{t("account.support", "Support")}</AppText>
             </Pressable>
             <Pressable onPress={onNavigateToLegal} style={styles.actionButton}>
               <AppText variant="bodySm">{t("account.legal", "Legal")}</AppText>

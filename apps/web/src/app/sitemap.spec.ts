@@ -23,8 +23,8 @@ describe("sitemap", () => {
     const urls = result.map((e) => e.url);
     expect(urls).toContain("https://www.salafidurus.com");
     expect(urls).toContain("https://www.salafidurus.com/search");
-    expect(urls).toContain("https://www.salafidurus.com/feed");
-    expect(urls).toContain("https://www.salafidurus.com/feed/recent");
+    expect(urls).toContain("https://www.salafidurus.com/explore");
+    expect(urls).toContain("https://www.salafidurus.com/explore/recent");
     expect(urls).toContain("https://www.salafidurus.com/live");
     expect(urls).toContain("https://www.salafidurus.com/scholars");
     expect(urls).toContain("https://www.salafidurus.com/terms-of-use");
@@ -32,11 +32,11 @@ describe("sitemap", () => {
     expect(urls).toContain("https://www.salafidurus.com/support");
   });
 
-  it("does not include auth-required routes like /feed/following", () => {
+  it("does not include auth-required routes like /explore/following", () => {
     vi.stubEnv("NODE_ENV", "production");
     vi.stubEnv("NEXT_PUBLIC_WEB_URL", "https://www.salafidurus.com");
     const urls = sitemap().map((e) => e.url);
-    expect(urls).not.toContain("https://www.salafidurus.com/feed/following");
+    expect(urls).not.toContain("https://www.salafidurus.com/explore/following");
   });
 
   it("falls back to localhost when NEXT_PUBLIC_WEB_URL is not set", () => {

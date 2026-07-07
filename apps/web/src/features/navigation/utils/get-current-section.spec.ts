@@ -1,11 +1,11 @@
 import { getCurrentSection, getActiveTabFromPath } from "./get-current-section";
 
 describe("getCurrentSection", () => {
-  it("returns feed for /feed", () => {
-    expect(getCurrentSection("/feed")).toBe("feed");
+  it("returns explore for /explore", () => {
+    expect(getCurrentSection("/explore")).toBe("explore");
   });
-  it("returns feed for /feed/recent", () => {
-    expect(getCurrentSection("/feed/recent")).toBe("feed");
+  it("returns explore for /explore/recent", () => {
+    expect(getCurrentSection("/explore/recent")).toBe("explore");
   });
   it("returns library for /library", () => {
     expect(getCurrentSection("/library")).toBe("library");
@@ -26,10 +26,10 @@ describe("getCurrentSection", () => {
 
 describe("getActiveTabFromPath", () => {
   it("returns null for single-segment paths", () => {
-    expect(getActiveTabFromPath("/feed")).toBeNull();
+    expect(getActiveTabFromPath("/explore")).toBeNull();
   });
   it("returns the second segment", () => {
-    expect(getActiveTabFromPath("/feed/recent")).toBe("recent");
+    expect(getActiveTabFromPath("/explore/recent")).toBe("recent");
   });
   it("returns null for root path", () => {
     expect(getActiveTabFromPath("/")).toBeNull();

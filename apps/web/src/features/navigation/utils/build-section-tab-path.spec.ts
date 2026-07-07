@@ -1,12 +1,12 @@
 import { buildSectionTabPath } from "./get-current-section";
 
 describe("buildSectionTabPath", () => {
-  it("collapses default feed tab to /feed", () => {
-    expect(buildSectionTabPath("feed")).toBe("/feed");
-    expect(buildSectionTabPath("feed", "popular")).toBe("/feed");
+  it("collapses default explore tab to /explore", () => {
+    expect(buildSectionTabPath("explore")).toBe("/explore");
+    expect(buildSectionTabPath("explore", "popular")).toBe("/explore");
   });
-  it("appends non-default feed tab", () => {
-    expect(buildSectionTabPath("feed", "recent")).toBe("/feed/recent");
+  it("appends non-default explore tab", () => {
+    expect(buildSectionTabPath("explore", "recent")).toBe("/explore/recent");
   });
   it("collapses default library tab to /library", () => {
     expect(buildSectionTabPath("library")).toBe("/library");

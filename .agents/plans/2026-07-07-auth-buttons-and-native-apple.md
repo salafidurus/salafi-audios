@@ -6,16 +6,14 @@
 
 **Architecture:** Four independent workstreams: (1) backend Apple identity token verification via JWKS, (2) native Apple config + signInAsync flow, (3) native Google button CSS redesign, (4) web auth button CSS redesign incorporating official Apple and Google brand guidelines.
 
-**Tech Stack:** `jose` (JWT/JWKS verification on backend), `react-native-svg` (native Google icon), `appleid.auth.js` (Apple JS SDK — official button rendering + OAuth flow on web), `expo-apple-authentication` (native `signInAsync`), `better-auth` (session management, Google OAuth on web), Prisma (direct DB access for Apple native sign-in), CSS Modules + Unistyles (web/native styling)
+**Tech Stack:** `jose` (JWT/JWKS verification on backend), `react-native-svg` (native Google icon), `better-auth` (OAuth for both Apple and Google on web + session management), `expo-apple-authentication` (native `signInAsync`), Prisma (direct DB access for Apple native sign-in), CSS Modules + Unistyles (web/native styling)
 
 ## Reference Links
 
-- [Apple — Displaying Sign in with Apple Buttons on the Web](https://developer.apple.com/documentation/signinwithapple/displaying-sign-in-with-apple-buttons-on-the-web)
-- [Apple — Sign in with Apple JS SDK](https://developer.apple.com/documentation/signinwithapplejs)
-- [Apple JS SDK CDN](https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js)
 - [Apple — Authenticating Users with Sign in with Apple](https://developer.apple.com/documentation/signinwithapple/authenticating_users_with_sign_in_with_apple)
 - [Apple — Verifying a User Token Service](https://developer.apple.com/documentation/signinwithapple/verifying_a_user_token_service) (JWKS verification)
 - [Apple — Apple JWKS endpoint](https://appleid.apple.com/auth/keys)
+- [Apple — Human Interface Guidelines for Sign in with Apple](https://developer.apple.com/design/human-interface-guidelines/sign-in-with-apple)
 - [Google — Branding Guidelines for Sign In With Google](https://developers.google.com/identity/branding-guidelines)
 - [`expo-apple-authentication` SDK docs](https://docs.expo.dev/versions/latest/sdk/apple-authentication/)
 - [`jose` JWT/JWKS library](https://github.com/panva/jose)
@@ -1173,55 +1171,81 @@ git commit -m "feat(native): replace Google button image with CSS-styled SVG but
 
 Better-auth **already has Apple OAuth configured** server-side (identical to Google). Web Apple auth uses the same `authClient.signIn.social({ provider: 'apple' })` flow as Google — **NO Apple JS SDK, NO event listeners, NO meta tags**. The backend handles the entire OAuth exchange via better-auth's built-in Apple provider.
 
-- [ ] **Step 1: Write the failing test for the new button**
+- [ ] **Step 1: Write the failing tests for the new buttons**
 
 Create `apps/web/src/features/auth/components/provider-button.spec.tsx`:
 
 ```typescript
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { AuthProviderButton } from "./provider-button";
+import { GoogleButton, AppleButton } from "./provider-button";
 
-describe("AuthProviderButton", () => {
-  it("renders Apple button with correct aria-label", () => {
-    render(<AuthProviderButton provider="apple" />);
-    expect(screen.getByLabelText("Continue with Apple")).toBeInTheDocument();
-  });
-
-  it("renders Google button with correct aria-label", () => {
-    render(<AuthProviderButton provider="google" />);
+describe("GoogleButton", () => {
+  it("renders with correct aria-label", () => {
+    render(<GoogleButton onClick={vi.fn()} />);
     expect(screen.getByLabelText("Continue with Google")).toBeInTheDocument();
   });
 
-  it("renders Google button SVG icon", () => {
-    const { container } = render(<AuthProviderButton provider="google" />);
+  it("renders Google SVG icon", () => {
+    const { container } = render(<GoogleButton onClick={vi.fn()} />);
     expect(container.querySelector("svg")).toBeInTheDocument();
   });
 
-  it("renders Google button with official gsi-material-button text", () => {
-    render(<AuthProviderButton provider="google" />);
+  it("renders with 'Sign in with Google' text", () => {
+    render(<GoogleButton onClick={vi.fn()} />);
     expect(screen.getByText("Sign in with Google")).toBeInTheDocument();
   });
 
-  it("calls onClick when Google button is clicked", () => {
+  it("calls onClick when clicked", () => {
     const onClick = vi.fn();
-    render(<AuthProviderButton provider="google" onClick={onClick} />);
+    render(<GoogleButton onClick={onClick} />);
     screen.getByLabelText("Continue with Google").click();
     expect(onClick).toHaveBeenCalledTimes(1);
   });
 
   it("does not call onClick when disabled", () => {
     const onClick = vi.fn();
-    render(<AuthProviderButton provider="google" onClick={onClick} disabled />);
+    render(<GoogleButton onClick={onClick} disabled />);
     const button = screen.getByLabelText("Continue with Google");
     expect(button).toBeDisabled();
     button.click();
     expect(onClick).not.toHaveBeenCalled();
   });
 });
-```
 
-> **Note:** Apple button tests only check aria-label on the container div (`#appleid-signin`). The Apple JS SDK's rendered content (SVG, text) is not testable via RTL since the SDK renders asynchronously. E2E tests verify the actual button appearance.
+describe("AppleButton", () => {
+  it("renders with correct aria-label", () => {
+    render(<AppleButton onClick={vi.fn()} />);
+    expect(screen.getByLabelText("Continue with Apple")).toBeInTheDocument();
+  });
+
+  it("renders Apple SVG icon", () => {
+    const { container } = render(<AppleButton onClick={vi.fn()} />);
+    expect(container.querySelector("svg")).toBeInTheDocument();
+  });
+
+  it("renders with 'Sign in with Apple' text", () => {
+    render(<AppleButton onClick={vi.fn()} />);
+    expect(screen.getByText("Sign in with Apple")).toBeInTheDocument();
+  });
+
+  it("calls onClick when clicked", () => {
+    const onClick = vi.fn();
+    render(<AppleButton onClick={onClick} />);
+    screen.getByLabelText("Continue with Apple").click();
+    expect(onClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not call onClick when disabled", () => {
+    const onClick = vi.fn();
+    render(<AppleButton onClick={onClick} disabled />);
+    const button = screen.getByLabelText("Continue with Apple");
+    expect(button).toBeDisabled();
+    button.click();
+    expect(onClick).not.toHaveBeenCalled();
+  });
+});
+```
 
 - [ ] **Step 2: Run test to verify it fails**
 
@@ -1231,9 +1255,9 @@ Run:
 bun run --filter web test src/features/auth/components/provider-button.spec.tsx
 ```
 
-Expected: The aria-label tests pass (existing buttons already have labels). SVG and text tests for Google fail (current uses `<Image>` which renders `<img>`, no `<svg>` or "Sign in with Google" text). Apple button aria-label container test passes.
+Expected: FAIL — modules not found, tests reference new component names.
 
-- [ ] **Step 3: Add Google button CSS module**
+- [ ] **Step 3: Add CSS module for both buttons**
 
 Create `apps/web/src/features/auth/components/provider-button.module.css`:
 
@@ -1308,9 +1332,71 @@ Create `apps/web/src/features/auth/components/provider-button.module.css`:
   text-overflow: ellipsis;
   vertical-align: top;
 }
+
+/* Apple button — follows Apple HIG color specs */
+.appleButton {
+  user-select: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: none;
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  cursor: pointer;
+  flex-shrink: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  height: 44px;
+  letter-spacing: -0.02em;
+  line-height: normal;
+  outline: none;
+  overflow: hidden;
+  padding: 0 16px;
+  position: relative;
+  text-align: center;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
+  vertical-align: middle;
+  white-space: nowrap;
+  width: 100%;
+  border-radius: 8px;
+  color: var(--apple-text-color, #fff);
+  background-color: var(--apple-bg-color, #000);
+}
+
+.appleButton:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+.appleButtonContentWrapper {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  height: 100%;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  width: 100%;
+}
+
+.appleButtonIcon {
+  height: 18px;
+  width: 18px;
+}
+
+.appleButtonContents {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+}
 ```
 
-- [ ] **Step 4: Rewrite provider-button.tsx — Apple via JS SDK, Google via gsi-material-button HTML**
+- [ ] **Step 4: Rewrite provider-button.tsx with separated components**
 
 Replace `apps/web/src/features/auth/components/provider-button.tsx`:
 

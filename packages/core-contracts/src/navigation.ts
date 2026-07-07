@@ -6,18 +6,23 @@
  */
 import { routes } from "./routes";
 
-export type Section = "feed" | "live" | "library" | "settings";
+export type Section = "explore" | "live" | "library" | "settings";
 
 export type TabConfig = { id: string; label: string; labelKey: string; icon: string };
 
 export const SECTION_TABS: Record<Section, TabConfig[]> = {
-  feed: [
-    { id: "popular", label: "Popular", labelKey: "navigation.subnav.feed.popular", icon: "flame" },
-    { id: "recent", label: "Recent", labelKey: "navigation.subnav.feed.recent", icon: "clock" },
+  explore: [
+    {
+      id: "popular",
+      label: "Popular",
+      labelKey: "navigation.subnav.explore.popular",
+      icon: "flame",
+    },
+    { id: "recent", label: "Recent", labelKey: "navigation.subnav.explore.recent", icon: "clock" },
     {
       id: "following",
       label: "Following",
-      labelKey: "navigation.subnav.feed.following",
+      labelKey: "navigation.subnav.explore.following",
       icon: "heart",
     },
   ],
@@ -69,21 +74,21 @@ export const SECTION_TABS: Record<Section, TabConfig[]> = {
 };
 
 export const DEFAULT_TABS: Record<Section, string> = {
-  feed: "popular",
+  explore: "popular",
   live: "ongoing",
   library: "started",
   settings: "general",
 };
 
 export const SECTION_LABELS: Record<Section, string> = {
-  feed: "Explore",
+  explore: "Explore",
   live: "Live",
   library: "Library",
   settings: "Settings",
 };
 
 export const SECTION_ROUTES: Record<Section, string> = {
-  feed: routes.feed.index,
+  explore: routes.explore.index,
   live: routes.live.index,
   library: routes.library.index,
   settings: routes.settings.index,

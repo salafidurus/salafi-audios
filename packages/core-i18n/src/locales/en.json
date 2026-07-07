@@ -55,7 +55,7 @@
     "siteFooter": "Site footer",
     "languageSwitch": "Language switch",
     "subnav": {
-      "feed": { "popular": "Popular", "recent": "Recent", "following": "Following" },
+      "explore": { "popular": "Popular", "recent": "Recent", "following": "Following" },
       "live": { "ongoing": "Live Now", "scheduled": "Scheduled", "ended": "Ended" },
       "library": { "started": "Started", "saved": "Saved", "completed": "Completed" },
       "account": { "general": "General", "profile": "Profile", "legal": "Legal" }
