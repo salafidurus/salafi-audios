@@ -40,6 +40,7 @@
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.4.2",
     "helmet": "catalog:",
+    "jose": "^6.2.3",
     "nestjs-pino": "^4.6.1",
     "nestjs-zod": "^5.4.0",
     "pg": "catalog:",
