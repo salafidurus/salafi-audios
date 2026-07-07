@@ -35,7 +35,7 @@ export class AudioRepository {
     userId: string,
     listingId: string,
     positionSeconds: number,
-    durationSeconds?: number,
+    _durationSeconds?: number,
     isCompleted?: boolean,
   ): Promise<void> {
     await this.prisma.userListingProgress.upsert({

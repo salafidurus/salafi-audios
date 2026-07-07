@@ -19,7 +19,7 @@ describe("Badge", () => {
   });
 
   it("renders admin role badge with primary styling", () => {
-    const { container } = render(<Badge variant="role" role="admin" />);
+    render(<Badge variant="role" role="admin" />);
 
     const badge = screen.getByText("admin");
     expect(badge).toBeInTheDocument();
@@ -28,7 +28,7 @@ describe("Badge", () => {
   });
 
   it("renders user role badge with muted styling", () => {
-    const { container } = render(<Badge variant="role" role="user" />);
+    render(<Badge variant="role" role="user" />);
 
     const badge = screen.getByText("user");
     expect(badge).toBeInTheDocument();
@@ -37,7 +37,7 @@ describe("Badge", () => {
   });
 
   it("renders status badge with custom color variant", () => {
-    const { container } = render(<Badge variant="status" status="Active" color="success" />);
+    render(<Badge variant="status" status="Active" color="success" />);
 
     const badge = screen.getByText("Active");
     expect(badge).toBeInTheDocument();
@@ -54,7 +54,7 @@ describe("Badge", () => {
   });
 
   it("renders status badge with default primary color when color not specified", () => {
-    const { container } = render(<Badge variant="status" status="Pending" />);
+    render(<Badge variant="status" status="Pending" />);
 
     const badge = screen.getByText("Pending");
     expect(badge).toBeInTheDocument();

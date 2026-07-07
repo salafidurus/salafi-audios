@@ -7,8 +7,8 @@ export class HomeService {
   constructor(private readonly repo: HomeRepo) {}
 
   async getQuickBrowse(
-    topicSlugs?: string[],
-    scholarSlugs?: string[],
+    _topicSlugs?: string[],
+    _scholarSlugs?: string[],
     userId?: string,
   ): Promise<QuickBrowseDto> {
     const [scholars, suggestions, recentProgress] = await Promise.all([

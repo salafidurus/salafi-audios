@@ -33,7 +33,7 @@ const slugify = (text: string) => {
       .trim()
       .toLowerCase()
       .replace(/\s+/g, "-")
-      .replace(/[^\w\u0600-\u06FF\-]/g, "")
+      .replace(/[^\w\u0600-\u06FF-]/g, "")
       .replace(/-+/g, "-") || `listing-${Date.now()}`
   );
 };

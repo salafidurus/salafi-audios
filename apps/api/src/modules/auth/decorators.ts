@@ -1,4 +1,5 @@
-import { createParamDecorator, ExecutionContext, SetMetadata } from '@nestjs/common';
+import { createParamDecorator, SetMetadata } from '@nestjs/common';
+import type { ExecutionContext } from '@nestjs/common';
 import type { Request } from 'express';
 
 export const IS_PUBLIC_KEY = 'isPublic';

@@ -1,16 +1,12 @@
 {
   // Bundler-first preset for shared libraries and bundler-consumed apps (web, native).
   // These are always consumed through a bundler (Metro/Next/tsup), never run directly by Node.
+  // Most settings now inherited from tsconfig.base.json (module, moduleResolution, isolatedModules, noEmit).
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    // "preserve" keeps import/require as authored and implies Bundler resolution (TS 5.4+)
-    "module": "preserve",
-    "moduleResolution": "bundler",
-    // Each file must be transpilable in isolation — required by Metro/SWC/esbuild/tsup
-    "isolatedModules": true,
     // Many React Native / Expo packages only ship CJS — enables default imports from them
     "esModuleInterop": true,
-    "noEmit": true,
-    "types": ["vitest/globals", "node"]
+    // Include test globals, Node types, and Bun types
+    "types": ["bun-types", "vitest/globals", "node"]
   }
 }

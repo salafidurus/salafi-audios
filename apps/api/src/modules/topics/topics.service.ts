@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import {
+import type {
   TopicDetailDto,
   TopicViewDto,
   TopicLectureViewDto,

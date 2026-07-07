@@ -1,4 +1,5 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import type { OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { PrismaClient } from '@sd/core-db';
 import { ConfigService } from '../../shared/config/config.service';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -9,11 +10,11 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   private isConnected = false;
 
   constructor(
-    private readonly config: ConfigService,
+    config: ConfigService,
     private readonly logger: PinoLogger,
   ) {
     const connectionString =
-      config?.DATABASE_URL ?? process.env.DATABASE_URL ?? process.env.DIRECT_DB_URL;
+      config?.DATABASE_URL ?? process.env['DATABASE_URL'] ?? process.env['DIRECT_DB_URL'];
 
     if (!connectionString) {
       throw new Error('DATABASE_URL is required and no DB fallback is allowed.');

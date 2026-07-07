@@ -1,4 +1,5 @@
 import i18next from "i18next";
+import type { i18n } from "i18next";
 import { initReactI18next } from "react-i18next";
 import type { Locale } from "@sd/core-i18n";
 import { mergeLocaleMessages } from "./merge-locale-messages";
@@ -10,7 +11,7 @@ const arShared = require("@sd/core-i18n/locales/ar.json") as Record<string, unkn
 const enOverrides = require("./overrides.en.json") as Partial<Record<string, unknown>>;
 const arOverrides = require("./overrides.ar.json") as Partial<Record<string, unknown>>;
 
-export function createI18n(initialLocale: Locale) {
+export function createI18n(initialLocale: Locale): i18n {
   const instance = i18next.createInstance();
   void instance.use(initReactI18next).init({
     lng: initialLocale,

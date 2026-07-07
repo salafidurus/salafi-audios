@@ -57,7 +57,6 @@
         "@prisma/client": "catalog:",
         "@sd/core-i18n": "workspace:*",
         "better-auth": "catalog:",
-        "class-validator": "^0.14.1",
         "cookie-parser": "^1.4.7",
         "dotenv": "^17.4.2",
         "helmet": "catalog:",

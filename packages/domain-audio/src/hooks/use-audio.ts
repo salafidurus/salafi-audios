@@ -1,5 +1,4 @@
 import { usePlaybackStore } from "../store/playback.store";
-import { useProgressStore } from "../progress/progress.store";
 
 export function useAudio() {
   const currentTrack = usePlaybackStore((s) => s.currentTrack);

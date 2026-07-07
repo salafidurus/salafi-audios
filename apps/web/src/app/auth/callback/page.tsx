@@ -32,7 +32,7 @@ function AuthCallbackInner() {
     // header; the auth client's onSuccess hook stores the bearer token.
     authClient.oneTimeToken
       .verify({ token: ott })
-      .then((res) => {
+      .then((res: { error?: unknown }) => {
         router.replace(res.error ? routes.signIn : next);
       })
       .catch(() => router.replace(routes.signIn));

@@ -1,4 +1,5 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
+import { Catch, HttpException, HttpStatus } from '@nestjs/common';
+import type { ArgumentsHost, ExceptionFilter } from '@nestjs/common';
 import { Prisma } from '@sd/core-db';
 import { ConfigService } from '../../shared/config/config.service';
 import type { Request, Response } from 'express';

@@ -1,15 +1,18 @@
 {
   // Build config — drives NestJS CLI compilation and produces the dist/ output.
-  "extends": "../../tsconfig.nest.json",
+  "extends": ["../../tsconfig.nest.json", "../../tsconfig.strict.json"],
   "compilerOptions": {
     "declaration": false,
-    "types": ["node", "bun-types"],
+    "types": ["bun-types", "node"],
     "removeComments": true,
     "sourceMap": true,
+    "declarationMap": false,
     "outDir": "./dist",
     "incremental": true,
     "noFallthroughCasesInSwitch": true,
-    "noEmit": false
+    "noEmit": false,
+    // Must disable this for emitting builds
+    "allowImportingTsExtensions": false
   },
   "exclude": ["node_modules", "dist", "test", "**/*.spec.ts"],
   "include": ["src/**/*.ts"]

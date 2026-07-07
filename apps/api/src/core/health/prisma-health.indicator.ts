@@ -1,6 +1,7 @@
 import { PrismaService } from '../../shared/db/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { HealthCheckError, HealthIndicator, HealthIndicatorResult } from '@nestjs/terminus';
+import { HealthCheckError, HealthIndicator } from '@nestjs/terminus';
+import type { HealthIndicatorResult } from '@nestjs/terminus';
 
 @Injectable()
 export class PrismaHealthIndicator extends HealthIndicator {

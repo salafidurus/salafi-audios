@@ -1,9 +1,6 @@
 import React, { useState } from "react";
-import { ScrollView, Text, View, Platform } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-
-// Import SegmentedControlIOS with proper typing
-const SegmentedControlIOS = require("react-native").SegmentedControlIOS as React.ComponentType<any>;
 
 // Terms of Use content
 const TERMS_SECTIONS = [
@@ -122,41 +119,25 @@ export function LegalToggleScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Segmented Control for iOS */}
-      {Platform.OS === "ios" && (
-        <View style={styles.controlContainer}>
-          <SegmentedControlIOS
-            values={["Terms", "Privacy"]}
-            selectedIndex={activeTab === "terms" ? 0 : 1}
-            onChange={(event: any) => {
-              setActiveTab(event.nativeEvent.selectedSegmentIndex === 0 ? "terms" : "privacy");
-            }}
-            style={styles.segmentedControl}
-          />
+      {/* Text tabs for both platforms */}
+      <View style={styles.tabsContainer}>
+        <View style={[styles.tabButton, activeTab === "terms" && styles.tabButtonActive]}>
+          <Text
+            style={[styles.tabText, activeTab === "terms" && styles.tabTextActive]}
+            onPress={() => setActiveTab("terms")}
+          >
+            Terms
+          </Text>
         </View>
-      )}
-
-      {/* Fallback for Android: simple text tabs */}
-      {Platform.OS === "android" && (
-        <View style={styles.tabsContainer}>
-          <View style={[styles.tabButton, activeTab === "terms" && styles.tabButtonActive]}>
-            <Text
-              style={[styles.tabText, activeTab === "terms" && styles.tabTextActive]}
-              onPress={() => setActiveTab("terms")}
-            >
-              Terms
-            </Text>
-          </View>
-          <View style={[styles.tabButton, activeTab === "privacy" && styles.tabButtonActive]}>
-            <Text
-              style={[styles.tabText, activeTab === "privacy" && styles.tabTextActive]}
-              onPress={() => setActiveTab("privacy")}
-            >
-              Privacy
-            </Text>
-          </View>
+        <View style={[styles.tabButton, activeTab === "privacy" && styles.tabButtonActive]}>
+          <Text
+            style={[styles.tabText, activeTab === "privacy" && styles.tabTextActive]}
+            onPress={() => setActiveTab("privacy")}
+          >
+            Privacy
+          </Text>
         </View>
-      )}
+      </View>
 
       {/* Content */}
       <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
