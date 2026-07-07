@@ -32,26 +32,6 @@ const SUPPORT_SECTIONS = [
   },
 ];
 
-export function SupportScreen() {
-  return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-      <Text style={styles.title}>Support</Text>
-      {/* react-doctor-disable-next-line react-doctor/rn-no-scrollview-mapped-list */}
-      {SUPPORT_SECTIONS.map((section) => (
-        <View key={section.title} style={styles.section}>
-          <Text style={styles.sectionTitle}>{section.title}</Text>
-          {section.items.map((item) => (
-            <View key={item.q} style={styles.itemContainer}>
-              <Text style={styles.itemQuestion}>{item.q}</Text>
-              <Text style={styles.itemAnswer}>{item.a}</Text>
-            </View>
-          ))}
-        </View>
-      ))}
-    </ScrollView>
-  );
-}
-
 const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
@@ -91,3 +71,23 @@ const styles = StyleSheet.create((theme) => ({
     lineHeight: 20,
   },
 }));
+
+export function SupportScreen() {
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+      <Text style={styles.title}>Support</Text>
+      {/* react-doctor-disable-next-line react-doctor/rn-no-scrollview-mapped-list */}
+      {SUPPORT_SECTIONS.map((section) => (
+        <View key={section.title} style={styles.section}>
+          <Text style={styles.sectionTitle}>{section.title}</Text>
+          {section.items.map((item) => (
+            <View key={item.q} style={styles.itemContainer}>
+              <Text style={styles.itemQuestion}>{item.q}</Text>
+              <Text style={styles.itemAnswer}>{item.a}</Text>
+            </View>
+          ))}
+        </View>
+      ))}
+    </ScrollView>
+  );
+}
