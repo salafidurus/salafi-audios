@@ -37,7 +37,7 @@ export function MobileHeader({ onMenuClick }: MobileHeaderProps) {
             className={styles.brandImg}
           />
         </span>
-        <span className={styles.brandText}>{t("navigation.shortTitle", "Salafi")}</span>
+        <span className={styles.brandText}>{t("navigation.siteTitle", "Salafi Durus")}</span>
       </Link>
 
       <div className={styles.spacer} />

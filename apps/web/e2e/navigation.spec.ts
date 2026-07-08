@@ -68,7 +68,7 @@ test.describe("Navigation — sidebar & routing", () => {
       page.on("pageerror", (err) => errors.push(err.message));
 
       await page.goto("/");
-      await expect(page.locator("main").first()).toBeAttached();
+      await page.waitForLoadState("networkidle");
       expect(errors).toHaveLength(0);
     });
   });

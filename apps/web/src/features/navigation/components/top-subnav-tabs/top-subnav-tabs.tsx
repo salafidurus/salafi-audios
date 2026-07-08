@@ -29,7 +29,8 @@ export function TopSubnavTabs() {
 
   const section = getCurrentSection(pathname);
 
-  if (!isHydrated || isMobile || isTablet || section === "home") {
+  // Show tabs on all screen sizes (responsive CSS handles mobile styling)
+  if (!isHydrated || section === "home") {
     return null;
   }
 

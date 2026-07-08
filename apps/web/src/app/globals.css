@@ -27,6 +27,9 @@
    Form screens: auth, settings, profile
    ============================================= */
 :root {
+  /* Mobile header height */
+  --mobile-header-height: 3.5rem;
+
   /* Content screen widths (70%/90%/100%) */
   --content-width-desktop: 70%;
   --content-width-tablet: 90%;
