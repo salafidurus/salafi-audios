@@ -5,6 +5,8 @@ import type { ReactNode } from "react";
 import { useApiQuery, queryKeys, httpClient } from "@sd/core-contracts";
 import { endpoints, type AdminUserListDto } from "@sd/core-contracts";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { EmptyState } from "@/shared/components/EmptyState";
 import { UserSearchBar } from "@/features/admin/components/user-search-bar/user-search-bar";
 import { UserRow } from "@/features/admin/components/user-row/user-row";
 import styles from "./admin-users.screen.desktop.module.css";
@@ -27,23 +29,25 @@ export function AdminUsersDesktopScreen(): ReactNode {
 
   return (
     <ScreenView>
-      <div className={styles.container}>
-        <h1 className={styles.pageTitle}>Admin Users</h1>
+      <PageHeader title="Admin Users" />
 
-        <div className={styles.searchRow}>
-          <UserSearchBar value={query} onChange={setQuery} onSubmit={() => setSearch(query)} />
-        </div>
+      <div className={styles.searchRow}>
+        <UserSearchBar value={query} onChange={setQuery} onSubmit={() => setSearch(query)} />
+      </div>
 
-        {isFetching ? (
-          <div className={styles.loading}>Loading users…</div>
-        ) : (
-          <>
-            <div className={styles.toolbar}>
-              <p className={styles.resultCount}>
-                {total} user{total !== 1 ? "s" : ""} found
-              </p>
-            </div>
+      {isFetching ? (
+        <EmptyState variant="loading" message="Loading users…" />
+      ) : (
+        <>
+          <div className={styles.toolbar}>
+            <p className={styles.resultCount}>
+              {total} user{total !== 1 ? "s" : ""} found
+            </p>
+          </div>
 
+          {users.length === 0 ? (
+            <EmptyState message={search ? "No users match your search." : "No users found."} />
+          ) : (
             <table className={styles.table}>
               <thead>
                 <tr>
@@ -60,15 +64,9 @@ export function AdminUsersDesktopScreen(): ReactNode {
                 ))}
               </tbody>
             </table>
-
-            {users.length === 0 && (
-              <div className={styles.empty}>
-                {search ? "No users match your search." : "No users found."}
-              </div>
-            )}
-          </>
-        )}
-      </div>
+          )}
+        </>
+      )}
     </ScreenView>
   );
 }

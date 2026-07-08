@@ -4,6 +4,9 @@ import React, { useReducer } from "react";
 import { useApiQuery } from "@sd/core-contracts";
 import type { AdminListingDetailDto, AdminListingListDto } from "@sd/core-contracts";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { EmptyState } from "@/shared/components/EmptyState";
+import { Button } from "@/shared/components/Button";
 import { fetchAdminLectures, fetchAdminLectureDetail } from "../../api/admin-lectures.api";
 import { AudioUploader } from "../../components/AudioUploader/AudioUploader";
 import { LectureEditModal } from "../../components/LectureEditModal/LectureEditModal";
@@ -89,78 +92,80 @@ export function AdminLecturesMobileScreen() {
 
   return (
     <ScreenView>
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Manage Lectures</h1>
-          <button
-            type="button"
-            className={styles.uploadTriggerBtn}
+      <PageHeader
+        title="Manage Lectures"
+        actions={
+          <Button
+            variant="primary"
+            icon={isUploaderOpen ? <X size={20} /> : <Plus size={20} />}
             onClick={() => dispatch({ isUploaderOpen: !isUploaderOpen })}
             aria-label="Upload Audio Toggle"
+          />
+        }
+      />
+
+      {isUploaderOpen && (
+        <div className={styles.uploaderWrapper}>
+          <AudioUploader onUploadComplete={handleUploadComplete} />
+        </div>
+      )}
+
+      <div className={styles.searchSection}>
+        <div className={styles.searchWrapper}>
+          <Search className={styles.searchIcon} size={16} />
+          <input
+            type="text"
+            placeholder="Search lectures..."
+            aria-label="Search lectures"
+            className={styles.searchInput}
+            value={search}
+            onChange={(e) => {
+              dispatch({ search: e.target.value, page: 1 });
+            }}
+          />
+        </div>
+      </div>
+
+      <div className={styles.tabsSection}>
+        <div className={styles.statusTabs}>
+          <button
+            type="button"
+            className={`${styles.tab} ${status === "" ? styles.tabActive : ""}`}
+            onClick={() => dispatch({ status: "", page: 1 })}
           >
-            {isUploaderOpen ? <X size={20} /> : <Plus size={20} />}
+            All
+          </button>
+          <button
+            type="button"
+            className={`${styles.tab} ${status === "published" ? styles.tabActive : ""}`}
+            onClick={() => dispatch({ status: "published", page: 1 })}
+          >
+            Pub
+          </button>
+          <button
+            type="button"
+            className={`${styles.tab} ${status === "draft" ? styles.tabActive : ""}`}
+            onClick={() => dispatch({ status: "draft", page: 1 })}
+          >
+            Draft
+          </button>
+          <button
+            type="button"
+            className={`${styles.tab} ${status === "archived" ? styles.tabActive : ""}`}
+            onClick={() => dispatch({ status: "archived", page: 1 })}
+          >
+            Arch
           </button>
         </div>
+      </div>
 
-        {isUploaderOpen && (
-          <div className={styles.uploaderWrapper}>
-            <AudioUploader onUploadComplete={handleUploadComplete} />
-          </div>
-        )}
-
-        <div className={styles.searchSection}>
-          <div className={styles.searchWrapper}>
-            <Search className={styles.searchIcon} size={16} />
-            <input
-              type="text"
-              placeholder="Search lectures..."
-              aria-label="Search lectures"
-              className={styles.searchInput}
-              value={search}
-              onChange={(e) => {
-                dispatch({ search: e.target.value, page: 1 });
-              }}
-            />
-          </div>
-        </div>
-
-        <div className={styles.tabsSection}>
-          <div className={styles.statusTabs}>
-            <button
-              type="button"
-              className={`${styles.tab} ${status === "" ? styles.tabActive : ""}`}
-              onClick={() => dispatch({ status: "", page: 1 })}
-            >
-              All
-            </button>
-            <button
-              type="button"
-              className={`${styles.tab} ${status === "published" ? styles.tabActive : ""}`}
-              onClick={() => dispatch({ status: "published", page: 1 })}
-            >
-              Pub
-            </button>
-            <button
-              type="button"
-              className={`${styles.tab} ${status === "draft" ? styles.tabActive : ""}`}
-              onClick={() => dispatch({ status: "draft", page: 1 })}
-            >
-              Draft
-            </button>
-            <button
-              type="button"
-              className={`${styles.tab} ${status === "archived" ? styles.tabActive : ""}`}
-              onClick={() => dispatch({ status: "archived", page: 1 })}
-            >
-              Arch
-            </button>
-          </div>
-        </div>
-
-        {isFetching ? (
-          <div className={styles.loading}>Loading lectures...</div>
-        ) : (
-          <>
+      {isFetching ? (
+        <EmptyState variant="loading" message="Loading lectures..." />
+      ) : (
+        <>
+          {lectures.length === 0 ? (
+            <EmptyState message="No lectures found matching the filters." />
+          ) : (
             <div className={styles.cardsList}>
               {lectures.map((lecture) => (
                 <div key={lecture.id} className={styles.card}>
@@ -198,45 +203,42 @@ export function AdminLecturesMobileScreen() {
                   </div>
                 </div>
               ))}
-              {lectures.length === 0 && (
-                <div className={styles.noData}>No lectures found matching the filters.</div>
-              )}
             </div>
+          )}
 
-            {totalPages > 1 && (
-              <div className={styles.pagination}>
-                <button
-                  type="button"
-                  className={styles.pageBtn}
-                  disabled={page <= 1}
-                  onClick={() => dispatch({ page: page - 1 })}
-                >
-                  Prev
-                </button>
-                <span className={styles.pageInfo}>
-                  {page} / {totalPages}
-                </span>
-                <button
-                  type="button"
-                  className={styles.pageBtn}
-                  disabled={page >= totalPages}
-                  onClick={() => dispatch({ page: page + 1 })}
-                >
-                  Next
-                </button>
-              </div>
-            )}
-          </>
-        )}
+          {totalPages > 1 && (
+            <div className={styles.pagination}>
+              <button
+                type="button"
+                className={styles.pageBtn}
+                disabled={page <= 1}
+                onClick={() => dispatch({ page: page - 1 })}
+              >
+                Prev
+              </button>
+              <span className={styles.pageInfo}>
+                {page} / {totalPages}
+              </span>
+              <button
+                type="button"
+                className={styles.pageBtn}
+                disabled={page >= totalPages}
+                onClick={() => dispatch({ page: page + 1 })}
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
+      )}
 
-        <LectureEditModal
-          isOpen={isModalOpen}
-          onClose={() => dispatch({ isModalOpen: false })}
-          onSuccess={refetch}
-          lecture={selectedLecture}
-          initialAudioData={initialAudioData}
-        />
-      </div>
+      <LectureEditModal
+        isOpen={isModalOpen}
+        onClose={() => dispatch({ isModalOpen: false })}
+        onSuccess={refetch}
+        lecture={selectedLecture}
+        initialAudioData={initialAudioData}
+      />
     </ScreenView>
   );
 }

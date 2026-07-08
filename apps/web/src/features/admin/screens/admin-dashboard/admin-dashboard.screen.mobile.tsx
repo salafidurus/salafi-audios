@@ -2,6 +2,8 @@
 
 import type { AdminPermission } from "@sd/core-contracts";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { EmptyState } from "@/shared/components/EmptyState";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 import styles from "./admin-dashboard.screen.mobile.module.css";
 
@@ -51,7 +53,8 @@ export function AdminDashboardMobileScreen() {
   if (isFetching) {
     return (
       <ScreenView>
-        <div className={styles.loading}>Loading…</div>
+        <PageHeader title="Admin" />
+        <EmptyState variant="loading" message="Loading…" />
       </ScreenView>
     );
   }
@@ -61,8 +64,10 @@ export function AdminDashboardMobileScreen() {
 
   return (
     <ScreenView>
-      <div>
-        <h1 className={styles.pageTitle}>Admin</h1>
+      <PageHeader title="Admin" />
+      {visibleSections.length === 0 ? (
+        <EmptyState message="No admin permissions." />
+      ) : (
         <div className={styles.sectionList}>
           {visibleSections.map((section) => (
             <a key={section.href} href={section.href} className={styles.sectionCard}>
@@ -71,8 +76,7 @@ export function AdminDashboardMobileScreen() {
             </a>
           ))}
         </div>
-        {visibleSections.length === 0 && <p className={styles.empty}>No admin permissions.</p>}
-      </div>
+      )}
     </ScreenView>
   );
 }

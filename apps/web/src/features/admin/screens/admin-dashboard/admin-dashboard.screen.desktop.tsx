@@ -2,6 +2,8 @@
 
 import type { AdminPermission } from "@sd/core-contracts";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { EmptyState } from "@/shared/components/EmptyState";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 import styles from "./admin-dashboard.screen.desktop.module.css";
 
@@ -51,7 +53,8 @@ export function AdminDashboardDesktopScreen() {
   if (isFetching) {
     return (
       <ScreenView>
-        <div className={styles.loading}>Loading…</div>
+        <PageHeader title="Admin Dashboard" />
+        <EmptyState variant="loading" message="Loading…" />
       </ScreenView>
     );
   }
@@ -61,8 +64,10 @@ export function AdminDashboardDesktopScreen() {
 
   return (
     <ScreenView>
-      <div className={styles.container}>
-        <h1 className={styles.pageTitle}>Admin Dashboard</h1>
+      <PageHeader title="Admin Dashboard" />
+      {visibleSections.length === 0 ? (
+        <EmptyState message="You don't have any admin permissions." />
+      ) : (
         <div className={styles.grid}>
           {visibleSections.map((section) => (
             <a key={section.href} href={section.href} className={styles.sectionCard}>
@@ -71,10 +76,7 @@ export function AdminDashboardDesktopScreen() {
             </a>
           ))}
         </div>
-        {visibleSections.length === 0 && (
-          <p className={styles.empty}>You don&apos;t have any admin permissions.</p>
-        )}
-      </div>
+      )}
     </ScreenView>
   );
 }
