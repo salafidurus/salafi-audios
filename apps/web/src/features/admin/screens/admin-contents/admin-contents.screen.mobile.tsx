@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { Plus, Trash2 } from "lucide-react";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
@@ -17,6 +18,7 @@ import { TopicFormModal, type TopicForEdit } from "@/features/admin/components/T
 import styles from "./admin-contents.screen.mobile.module.css";
 
 export function AdminContentsMobileScreen() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<AdminContentsTab>("topics");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -73,68 +75,74 @@ export function AdminContentsMobileScreen() {
 
   return (
     <ScreenView>
-      <div className={styles.container}>
-        <PageHeader
-          title="Content"
-          actions={
-            activeTab === "topics" && (
-              <Button
-                variant="primary"
-                size="sm"
-                icon={<Plus size={16} />}
-                onClick={handleOpenAddTopic}
-              >
-                Topic
-              </Button>
-            )
-          }
-        />
+      <PageHeader
+        title="Content"
+        actions={
+          activeTab === "topics" ? (
+            <Button
+              variant="primary"
+              size="sm"
+              icon={<Plus size={16} />}
+              onClick={handleOpenAddTopic}
+            >
+              Topic
+            </Button>
+          ) : (
+            <Button
+              variant="primary"
+              size="sm"
+              icon={<Plus size={16} />}
+              onClick={() => router.push("/admin/lectures")}
+            >
+              Listing
+            </Button>
+          )
+        }
+      />
 
-        <AdminContentsTabs activeTab={activeTab} onTabChange={setActiveTab} />
+      <AdminContentsTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
-        <AdminSearchBar
-          value={searchQuery}
-          onChange={setSearchQuery}
-          onSearch={() => {}}
-          placeholder={activeTab === "topics" ? "Search topics..." : "Search listings..."}
-        />
+      <AdminSearchBar
+        value={searchQuery}
+        onChange={setSearchQuery}
+        onSearch={() => {}}
+        placeholder={activeTab === "topics" ? "Search topics..." : "Search listings..."}
+      />
 
-        {activeTab === "topics" && (
-          <div className={styles.topicsList}>
-            {filteredTopics.map((topic) => (
-              <div key={topic.slug} className={styles.topicItem}>
-                <div className={styles.topicInfo}>
-                  <span className={styles.topicName}>{topic.name}</span>
-                  <span className={styles.topicSlug}>{topic.slug}</span>
-                </div>
-                <div className={styles.topicActions}>
-                  <Button variant="ghost" size="sm" onClick={() => handleOpenEditTopic(topic)}>
-                    Edit
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    icon={<Trash2 size={14} />}
-                    onClick={() => handleDeleteTopic(topic.slug)}
-                  />
-                </div>
+      {activeTab === "topics" && (
+        <div className={styles.topicsList}>
+          {filteredTopics.map((topic) => (
+            <div key={topic.slug} className={styles.topicItem}>
+              <div className={styles.topicInfo}>
+                <span className={styles.topicName}>{topic.name}</span>
+                <span className={styles.topicSlug}>{topic.slug}</span>
               </div>
-            ))}
-            {filteredTopics.length === 0 && (
-              <div className={styles.empty}>
-                {searchQuery ? "No topics match your search." : "No topics yet."}
+              <div className={styles.topicActions}>
+                <Button variant="ghost" size="sm" onClick={() => handleOpenEditTopic(topic)}>
+                  Edit
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  icon={<Trash2 size={14} />}
+                  onClick={() => handleDeleteTopic(topic.slug)}
+                />
               </div>
-            )}
-          </div>
-        )}
+            </div>
+          ))}
+          {filteredTopics.length === 0 && (
+            <div className={styles.empty}>
+              {searchQuery ? "No topics match your search." : "No topics yet."}
+            </div>
+          )}
+        </div>
+      )}
 
-        {activeTab === "listings" && (
-          <div className={styles.listingsInfo}>
-            <p>Use the button above to create new content with audio upload.</p>
-            <p>For full management, see the Lectures section.</p>
-          </div>
-        )}
-      </div>
+      {activeTab === "listings" && (
+        <div className={styles.listingsInfo}>
+          <p>See the Lectures section for full listing management.</p>
+        </div>
+      )}
 
       {/* Topic Modal */}
       <TopicFormModal
