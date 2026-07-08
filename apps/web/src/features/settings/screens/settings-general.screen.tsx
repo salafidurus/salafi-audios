@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings/i18n";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { PageHeader } from "@/shared/components/PageHeader";
 import { SettingsSection } from "@/shared/components/SettingsSection/SettingsSection";
 import { SettingsRow } from "@/shared/components/SettingsRow/SettingsRow";
 import { SegmentedControl } from "@/shared/components/SegmentedControl/SegmentedControl";
@@ -70,95 +71,90 @@ export function SettingsGeneralScreen() {
 
   return (
     <ScreenView>
-      <div className={styles.page}>
-        <h1 className={styles.title}>Settings</h1>
+      <PageHeader title="Settings" />
 
-        <SettingsSection title="Language" description="Configure app and content language.">
-          <SettingsRow label="App Language" sublabel="Interface language for the app">
-            <LanguageSwitch />
-          </SettingsRow>
-          <SettingsRow label="Content Language" sublabel="Preferred translation language">
-            <ContentLanguageToggle />
-          </SettingsRow>
-        </SettingsSection>
+      <SettingsSection title="Language" description="Configure app and content language.">
+        <SettingsRow label="App Language" sublabel="Interface language for the app">
+          <LanguageSwitch />
+        </SettingsRow>
+        <SettingsRow label="Content Language" sublabel="Preferred translation language">
+          <ContentLanguageToggle />
+        </SettingsRow>
+      </SettingsSection>
 
-        <SettingsSection title="Display" description="Choose a theme for the interface.">
-          <SettingsRow label="Theme" sublabel="System follows your OS preference">
-            <SegmentedControl
-              options={THEME_OPTIONS}
-              value={themePreference}
-              onChange={handleThemeChange}
-              ariaLabel="Theme preference"
+      <SettingsSection title="Display" description="Choose a theme for the interface.">
+        <SettingsRow label="Theme" sublabel="System follows your OS preference">
+          <SegmentedControl
+            options={THEME_OPTIONS}
+            value={themePreference}
+            onChange={handleThemeChange}
+            ariaLabel="Theme preference"
+          />
+        </SettingsRow>
+      </SettingsSection>
+
+      <SettingsSection title="Notifications" description="Manage what notifications you receive.">
+        <SettingsRow label="Enable Notifications" sublabel="Master toggle for all notifications">
+          <label className={styles.toggle}>
+            <input
+              type="checkbox"
+              role="switch"
+              aria-checked={notif.master}
+              aria-label="Enable Notifications"
+              checked={notif.master}
+              onChange={handleNotifChange("master")}
+              className={styles.toggleInput}
             />
-          </SettingsRow>
-        </SettingsSection>
-
-        <SettingsSection title="Notifications" description="Manage what notifications you receive.">
-          <SettingsRow label="Enable Notifications" sublabel="Master toggle for all notifications">
-            <label className={styles.toggle}>
-              <input
-                type="checkbox"
-                role="switch"
-                aria-checked={notif.master}
-                aria-label="Enable Notifications"
-                checked={notif.master}
-                onChange={handleNotifChange("master")}
-                className={styles.toggleInput}
-              />
-              <span className={styles.toggleTrack} />
-            </label>
-          </SettingsRow>
-          {notif.master && (
-            <>
-              <SettingsRow label="Live Sessions" sublabel="Notify when a live session starts">
-                <label className={styles.toggle}>
-                  <input
-                    type="checkbox"
-                    role="switch"
-                    aria-checked={notif.live}
-                    aria-label="Notify for Live Sessions"
-                    checked={notif.live}
-                    onChange={handleNotifChange("live")}
-                    className={styles.toggleInput}
-                  />
-                  <span className={styles.toggleTrack} />
-                </label>
-              </SettingsRow>
-              <SettingsRow
-                label="Followed Scholars"
-                sublabel="Notify when a followed scholar posts"
-              >
-                <label className={styles.toggle}>
-                  <input
-                    type="checkbox"
-                    role="switch"
-                    aria-checked={notif.scholars}
-                    aria-label="Notify for Followed Scholars"
-                    checked={notif.scholars}
-                    onChange={handleNotifChange("scholars")}
-                    className={styles.toggleInput}
-                  />
-                  <span className={styles.toggleTrack} />
-                </label>
-              </SettingsRow>
-              <SettingsRow label="New Lectures" sublabel="Notify when new lectures are published">
-                <label className={styles.toggle}>
-                  <input
-                    type="checkbox"
-                    role="switch"
-                    aria-checked={notif.lectures}
-                    aria-label="Notify for New Lectures"
-                    checked={notif.lectures}
-                    onChange={handleNotifChange("lectures")}
-                    className={styles.toggleInput}
-                  />
-                  <span className={styles.toggleTrack} />
-                </label>
-              </SettingsRow>
-            </>
-          )}
-        </SettingsSection>
-      </div>
+            <span className={styles.toggleTrack} />
+          </label>
+        </SettingsRow>
+        {notif.master && (
+          <>
+            <SettingsRow label="Live Sessions" sublabel="Notify when a live session starts">
+              <label className={styles.toggle}>
+                <input
+                  type="checkbox"
+                  role="switch"
+                  aria-checked={notif.live}
+                  aria-label="Notify for Live Sessions"
+                  checked={notif.live}
+                  onChange={handleNotifChange("live")}
+                  className={styles.toggleInput}
+                />
+                <span className={styles.toggleTrack} />
+              </label>
+            </SettingsRow>
+            <SettingsRow label="Followed Scholars" sublabel="Notify when a followed scholar posts">
+              <label className={styles.toggle}>
+                <input
+                  type="checkbox"
+                  role="switch"
+                  aria-checked={notif.scholars}
+                  aria-label="Notify for Followed Scholars"
+                  checked={notif.scholars}
+                  onChange={handleNotifChange("scholars")}
+                  className={styles.toggleInput}
+                />
+                <span className={styles.toggleTrack} />
+              </label>
+            </SettingsRow>
+            <SettingsRow label="New Lectures" sublabel="Notify when new lectures are published">
+              <label className={styles.toggle}>
+                <input
+                  type="checkbox"
+                  role="switch"
+                  aria-checked={notif.lectures}
+                  aria-label="Notify for New Lectures"
+                  checked={notif.lectures}
+                  onChange={handleNotifChange("lectures")}
+                  className={styles.toggleInput}
+                />
+                <span className={styles.toggleTrack} />
+              </label>
+            </SettingsRow>
+          </>
+        )}
+      </SettingsSection>
     </ScreenView>
   );
 }

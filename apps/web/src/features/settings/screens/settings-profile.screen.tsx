@@ -6,6 +6,8 @@ import { useAccountProfile, useUpdateProfile } from "@sd/domain-account";
 import { authClient } from "@/core/auth/auth-client";
 import { AuthModal } from "@/features/auth";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { EmptyState } from "@/shared/components/EmptyState";
 import { SettingsSection } from "@/shared/components/SettingsSection/SettingsSection";
 import { SettingsRow } from "@/shared/components/SettingsRow/SettingsRow";
 import { useRouter } from "next/navigation";
@@ -38,11 +40,11 @@ function ProfileContent() {
   };
 
   if (isFetching) {
-    return <p className={styles.loading}>Loading profile…</p>;
+    return <EmptyState variant="loading" message="Loading profile…" />;
   }
 
   if (!profile) {
-    return <p className={styles.empty}>Profile not available.</p>;
+    return <EmptyState message="Profile not available." />;
   }
 
   const currentDisplayName = displayName;
@@ -145,10 +147,8 @@ export function SettingsProfileScreen() {
 
   return (
     <ScreenView>
-      <div className={styles.page}>
-        <h1 className={styles.title}>Profile</h1>
-        {isLoading ? null : isAuthenticated ? <ProfileContent /> : <SignInCta />}
-      </div>
+      <PageHeader title="Profile" />
+      {isLoading ? null : isAuthenticated ? <ProfileContent /> : <SignInCta />}
     </ScreenView>
   );
 }
