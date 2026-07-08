@@ -109,7 +109,7 @@ export function AdminTopicsMobileScreen() {
               {saving ? "Saving…" : "Save"}
             </Button>
             <Button
-              variant="secondary"
+              variant="outline"
               onClick={() => {
                 setCreating(false);
                 setEditing(null);
@@ -129,7 +129,7 @@ export function AdminTopicsMobileScreen() {
           </div>
           <div className={styles.actionButtons}>
             <Button
-              variant="secondary"
+              variant="outline"
               onClick={() => {
                 setEditing(t);
                 setCreating(false);

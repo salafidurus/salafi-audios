@@ -44,7 +44,7 @@ function SessionRow({ session, onStatusChange }: SessionRowProps) {
             </Button>
           )}
           {session.status === "ended" && (
-            <Button variant="secondary" onClick={() => onStatusChange(session.id, "scheduled")}>
+            <Button variant="outline" onClick={() => onStatusChange(session.id, "scheduled")}>
               Reschedule
             </Button>
           )}

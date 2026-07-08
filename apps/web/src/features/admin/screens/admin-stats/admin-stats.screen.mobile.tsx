@@ -1,12 +1,14 @@
 "use client";
 
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { PageHeader } from "@/shared/components/PageHeader";
 import styles from "./admin-stats.screen.mobile.module.css";
 
 export function AdminStatsMobileScreen() {
   return (
-    <div className={styles.container}>
-      <h1 className={styles.pageTitle}>Admin Stats</h1>
+    <ScreenView>
+      <PageHeader title="Admin Stats" />
       <p className={styles.description}>Platform statistics and analytics will appear here.</p>
-    </div>
+    </ScreenView>
   );
 }

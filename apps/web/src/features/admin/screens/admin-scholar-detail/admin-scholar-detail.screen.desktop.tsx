@@ -193,7 +193,7 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
                   <Button variant="primary" onClick={handleCreateSeries}>
                     Save
                   </Button>
-                  <Button variant="secondary" onClick={() => dispatch({ creatingSeries: false })}>
+                  <Button variant="outline" onClick={() => dispatch({ creatingSeries: false })}>
                     Cancel
                   </Button>
                 </div>
@@ -263,10 +263,7 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
                   <Button variant="primary" onClick={handleCreateCollection}>
                     Save
                   </Button>
-                  <Button
-                    variant="secondary"
-                    onClick={() => dispatch({ creatingCollection: false })}
-                  >
+                  <Button variant="outline" onClick={() => dispatch({ creatingCollection: false })}>
                     Cancel
                   </Button>
                 </div>

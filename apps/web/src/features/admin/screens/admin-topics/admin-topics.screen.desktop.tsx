@@ -111,7 +111,7 @@ export function AdminTopicsDesktopScreen() {
               {saving ? "Saving…" : "Save"}
             </Button>
             <Button
-              variant="secondary"
+              variant="outline"
               onClick={() => {
                 setCreating(false);
                 setEditing(null);
@@ -143,7 +143,7 @@ export function AdminTopicsDesktopScreen() {
               <td className={styles.tableCell}>
                 <div className={styles.actionButtons}>
                   <Button
-                    variant="secondary"
+                    variant="outline"
                     onClick={() => {
                       setEditing(t);
                       setCreating(false);
