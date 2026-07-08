@@ -43,6 +43,20 @@
   --form-max-width: 720px;
 }
 
+/*
+  Font aliases — resolved to the correct font family based on locale.
+  :root:lang(ar) overrides the variables when Arabic is the active language.
+  GeistMono (--font-mono) is shared across both locales.
+*/
+:root {
+  --font-display: var(--font-display-en), serif;
+  --font-body: var(--font-body-en), sans-serif;
+}
+:root:lang(ar) {
+  --font-display: var(--font-display-ar), serif;
+  --font-body: var(--font-body-ar), sans-serif;
+}
+
 html,
 body {
   height: 100%;
