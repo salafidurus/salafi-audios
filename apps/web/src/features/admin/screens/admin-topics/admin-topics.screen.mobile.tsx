@@ -4,12 +4,17 @@ import { useState } from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { TopicDetailDto } from "@sd/core-contracts";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { EmptyState } from "@/shared/components/EmptyState";
+import { Button } from "@/shared/components/Button";
+import { Plus } from "lucide-react";
 import {
   createTopic,
   updateTopic,
   deleteTopic,
   type AdminTopicInput,
 } from "@/features/admin/api/admin.api";
+import styles from "./admin-topics.screen.mobile.module.css";
 
 export function AdminTopicsMobileScreen() {
   const { data, isFetching, refetch } = useApiQuery<TopicDetailDto[]>(queryKeys.topics.list(), () =>
@@ -46,7 +51,8 @@ export function AdminTopicsMobileScreen() {
   if (isFetching) {
     return (
       <ScreenView>
-        <div style={{ textAlign: "center" }}>Loading topics…</div>
+        <PageHeader title="Topics" />
+        <EmptyState variant="loading" message="Loading topics…" />
       </ScreenView>
     );
   }
@@ -55,167 +61,89 @@ export function AdminTopicsMobileScreen() {
 
   return (
     <ScreenView>
-      <div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 16,
-          }}
-        >
-          <h1 style={{ fontSize: 22, fontWeight: 700 }}>Topics</h1>
-          <button
-            type="button"
+      <PageHeader
+        title="Topics"
+        actions={
+          <Button
+            variant="primary"
+            icon={<Plus size={16} />}
             onClick={() => {
               setCreating(true);
               setEditing(null);
               setFormData({ slug: "", name: "" });
             }}
-            style={{
-              padding: "6px 12px",
-              borderRadius: 6,
-              border: "none",
-              background: "#2563eb",
-              color: "#fff",
-              fontSize: 13,
-            }}
           >
-            + Add
-          </button>
+            Add
+          </Button>
+        }
+      />
+
+      {(creating || editing) && (
+        <div className={styles.form}>
+          <h3 className={styles.formTitle}>{editing ? "Edit" : "New Topic"}</h3>
+          <input
+            aria-label="Topic slug"
+            placeholder="Slug"
+            value={formData.slug}
+            onChange={(e) => setFormData((p) => ({ ...p, slug: e.target.value }))}
+            className={styles.input}
+          />
+          <input
+            aria-label="Topic name"
+            placeholder="Name"
+            value={formData.name}
+            onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
+            className={styles.input}
+          />
+          <input
+            aria-label="Parent topic slug"
+            placeholder="Parent slug (optional)"
+            value={formData.parentSlug ?? ""}
+            onChange={(e) =>
+              setFormData((p) => ({ ...p, parentSlug: e.target.value || undefined }))
+            }
+            className={styles.input}
+          />
+          <div className={styles.buttonGroup}>
+            <Button variant="primary" onClick={handleSave} disabled={saving}>
+              {saving ? "Saving…" : "Save"}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setCreating(false);
+                setEditing(null);
+              }}
+            >
+              Cancel
+            </Button>
+          </div>
         </div>
+      )}
 
-        {(creating || editing) && (
-          <div
-            style={{ padding: 12, border: "1px solid #e0e0e0", borderRadius: 8, marginBottom: 16 }}
-          >
-            <h3 style={{ marginBottom: 8, fontSize: 16 }}>{editing ? "Edit" : "New Topic"}</h3>
-            <input
-              aria-label="Topic slug"
-              placeholder="Slug"
-              value={formData.slug}
-              onChange={(e) => setFormData((p) => ({ ...p, slug: e.target.value }))}
-              style={{
-                width: "100%",
-                padding: 8,
-                border: "1px solid #ccc",
-                borderRadius: 4,
-                marginBottom: 8,
-              }}
-            />
-            <input
-              aria-label="Topic name"
-              placeholder="Name"
-              value={formData.name}
-              onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
-              style={{
-                width: "100%",
-                padding: 8,
-                border: "1px solid #ccc",
-                borderRadius: 4,
-                marginBottom: 8,
-              }}
-            />
-            <input
-              aria-label="Parent topic slug"
-              placeholder="Parent slug (optional)"
-              value={formData.parentSlug ?? ""}
-              onChange={(e) =>
-                setFormData((p) => ({ ...p, parentSlug: e.target.value || undefined }))
-              }
-              style={{
-                width: "100%",
-                padding: 8,
-                border: "1px solid #ccc",
-                borderRadius: 4,
-                marginBottom: 8,
-              }}
-            />
-            <div style={{ display: "flex", gap: 8 }}>
-              <button
-                type="button"
-                onClick={handleSave}
-                disabled={saving}
-                style={{
-                  padding: "6px 12px",
-                  borderRadius: 6,
-                  border: "none",
-                  background: "#16a34a",
-                  color: "#fff",
-                }}
-              >
-                {saving ? "Saving…" : "Save"}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setCreating(false);
-                  setEditing(null);
-                }}
-                style={{
-                  padding: "6px 12px",
-                  borderRadius: 6,
-                  border: "1px solid #ccc",
-                  background: "#fff",
-                }}
-              >
-                Cancel
-              </button>
-            </div>
+      {topics.map((t) => (
+        <div key={t.id} className={styles.topicCard}>
+          <div className={styles.topicInfo}>
+            <div className={styles.topicName}>{t.name}</div>
+            <div className={styles.topicSlug}>{t.slug}</div>
           </div>
-        )}
-
-        {topics.map((t) => (
-          <div
-            key={t.id}
-            style={{
-              padding: 12,
-              borderBottom: "1px solid #f0f0f0",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <div>
-              <div style={{ fontWeight: 600 }}>{t.name}</div>
-              <div style={{ fontSize: 12, color: "#666" }}>{t.slug}</div>
-            </div>
-            <div style={{ display: "flex", gap: 8 }}>
-              <button
-                type="button"
-                onClick={() => {
-                  setEditing(t);
-                  setCreating(false);
-                  setFormData({ slug: t.slug, name: t.name });
-                }}
-                style={{
-                  padding: "4px 10px",
-                  borderRadius: 4,
-                  border: "1px solid #ccc",
-                  background: "#fff",
-                  fontSize: 12,
-                }}
-              >
-                Edit
-              </button>
-              <button
-                type="button"
-                onClick={() => handleDelete(t.slug)}
-                style={{
-                  padding: "4px 10px",
-                  borderRadius: 4,
-                  border: "1px solid #fca5a5",
-                  background: "#fef2f2",
-                  color: "#dc2626",
-                  fontSize: 12,
-                }}
-              >
-                Del
-              </button>
-            </div>
+          <div className={styles.actionButtons}>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setEditing(t);
+                setCreating(false);
+                setFormData({ slug: t.slug, name: t.name });
+              }}
+            >
+              Edit
+            </Button>
+            <Button variant="danger" onClick={() => handleDelete(t.slug)}>
+              Delete
+            </Button>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </ScreenView>
   );
 }
