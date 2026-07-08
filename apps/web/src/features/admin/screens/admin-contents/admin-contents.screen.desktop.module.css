@@ -1,13 +1,63 @@
 .container {
-  /* Width handled by ScreenView (content screen: 70%/90%/100%) */
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
 }
 
-.pageTitle {
-  font-size: var(--typo-display-lg-font-size);
-  font-weight: 700;
-  margin-bottom: var(--space-layout-section-y);
+.topicsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
 }
 
-.description {
+.topicItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--surface-default);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.topicInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.topicName {
+  font-weight: 500;
+  color: var(--content-strong);
+}
+
+.topicSlug {
+  font-size: var(--typo-body-sm-font-size);
   color: var(--content-muted);
+}
+
+.topicActions {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.listingsInfo {
+  padding: var(--space-lg);
+  background-color: var(--surface-subtle);
+  border-radius: var(--radius-component-card);
+  text-align: center;
+  color: var(--content-default);
+}
+
+.listingsInfo p {
+  margin: 0;
+  padding: var(--space-xs) 0;
+  font-size: var(--typo-body-md-font-size);
+}
+
+.empty {
+  padding: var(--space-lg);
+  text-align: center;
+  color: var(--content-muted);
+  font-size: var(--typo-body-md-font-size);
 }
