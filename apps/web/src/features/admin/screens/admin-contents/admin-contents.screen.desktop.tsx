@@ -127,7 +127,7 @@ export function AdminContentsDesktopScreen() {
           <div className={styles.listingsInfo}>
             {/* The existing admin-lectures screen already handles listing management.
                 This tab provides an alternative entry point using the same modal. */}
-            <p>Use the "Add Listing" button to create new content with audio upload.</p>
+            <p>Use the &quot;Add Listing&quot; button to create new content with audio upload.</p>
             <p>For full listing management, see the Lectures admin page.</p>
           </div>
         )}

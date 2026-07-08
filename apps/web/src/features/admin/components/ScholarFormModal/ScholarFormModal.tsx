@@ -41,6 +41,7 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
 
   useEffect(() => {
     if (scholar) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         name: scholar.name,
         slug: scholar.slug,
@@ -51,6 +52,7 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
         isActive: true,
       });
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData(initialFormData);
     }
     setError(null);

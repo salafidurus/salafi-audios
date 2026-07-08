@@ -28,12 +28,14 @@ export function TopicFormModal({ isOpen, onClose, onSave, topic }: TopicFormModa
 
   useEffect(() => {
     if (topic) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         name: topic.name,
         slug: topic.slug,
         parentSlug: topic.parentSlug ?? undefined,
       });
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({ name: "", slug: "" });
     }
     setError(null);
