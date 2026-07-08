@@ -28,6 +28,7 @@ function ProfileContent() {
   const router = useRouter();
   const [prevProfileId, setPrevProfileId] = useState(profile?.id);
   const [displayName, setDisplayName] = useState(profile?.displayName ?? "");
+  const [isEditing, setIsEditing] = useState(false);
 
   if (profile && profile.id !== prevProfileId) {
     setPrevProfileId(profile.id);
@@ -37,6 +38,20 @@ function ProfileContent() {
   const handleSignOut = async () => {
     await authClient.signOut();
     router.push("/");
+  };
+
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    setDisplayName(profile?.displayName ?? "");
+    setIsEditing(false);
+  };
+
+  const handleSave = () => {
+    updateProfile({ displayName });
+    setIsEditing(false);
   };
 
   if (isFetching) {
@@ -80,15 +95,32 @@ function ProfileContent() {
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder="Your display name"
               aria-label="Display name"
+              disabled={!isEditing}
             />
-            <button
-              type="button"
-              className={styles.saveButton}
-              disabled={!isDirty || isPending}
-              onClick={() => updateProfile({ displayName: currentDisplayName })}
-            >
-              {isPending ? "Saving…" : "Save"}
-            </button>
+            {!isEditing ? (
+              <button type="button" className={styles.saveButton} onClick={handleEdit}>
+                Edit
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className={styles.cancelButton}
+                  onClick={handleCancel}
+                  disabled={isPending}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className={styles.saveButton}
+                  disabled={!isDirty || isPending}
+                  onClick={handleSave}
+                >
+                  {isPending ? "Saving…" : "Save"}
+                </button>
+              </>
+            )}
           </div>
         </SettingsRow>
         <SettingsRow label="Email">
