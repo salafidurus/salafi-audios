@@ -1,6 +1,5 @@
 .page {
-  max-width: 37.5rem;
-  margin-inline: auto;
+  /* Width handled by ScreenView (form screen: 50%/70%/100%) */
 }
 
 .title {

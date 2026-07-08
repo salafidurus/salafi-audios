@@ -6,6 +6,7 @@ import { SearchFilterDesktop } from "@/features/search/components/SearchFilter/S
 import { SearchInputDesktop } from "@/features/search/components/SearchInput/SearchInput.desktop";
 import { SearchResultItemDesktop } from "@/features/search/components/SearchResultItem/SearchResultItem.desktop";
 import { SearchResultsListDesktop } from "@/features/search/components/SearchResultsList/SearchResultsList.desktop";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { useSearchProcessing, type SearchResultRow } from "@sd/domain-search";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -46,16 +47,16 @@ export function SearchProcessingDesktopScreen() {
   };
 
   return (
-    <main className="flex flex-1 flex-col">
+    <ScreenView>
       <div
-        className="sticky top-0 z-10 border-b border-[var(--chrome-border)] px-[var(--space-layout-page-x)] pt-[var(--space-layout-page-y)] pb-[var(--space-component-gap-md)]"
+        className="sticky top-0 z-10 -mx-[var(--space-layout-page-x)] border-b border-[var(--chrome-border)] px-[var(--space-layout-page-x)] pt-[var(--space-layout-page-y)] pb-[var(--space-component-gap-md)]"
         style={{
           background: "color-mix(in srgb, var(--surface-canvas) 80%, transparent)",
           backdropFilter: "blur(8px)",
           WebkitBackdropFilter: "blur(8px)",
         }}
       >
-        <div className="mx-auto flex w-full max-w-[52rem] flex-col gap-[var(--space-component-gap-md)]">
+        <div className="flex flex-col gap-[var(--space-component-gap-md)]">
           <SearchInputDesktop
             ref={inputRef}
             placeholder={t("search.placeholder", "Search")}
@@ -66,7 +67,7 @@ export function SearchProcessingDesktopScreen() {
           <SearchFilterDesktop value={filter} onChange={setFilter} topics={topics} />
         </div>
       </div>
-      <section className="mx-auto w-full max-w-[70rem] px-[var(--space-layout-page-x)] pb-[var(--space-layout-page-y)]">
+      <section className="pb-[var(--space-layout-page-y)]">
         <Suspense fallback={<p className="text-[var(--content-muted)]">Loading results…</p>}>
           <SearchResultsListDesktop
             items={items}
@@ -79,6 +80,6 @@ export function SearchProcessingDesktopScreen() {
           />
         </Suspense>
       </section>
-    </main>
+    </ScreenView>
   );
 }
