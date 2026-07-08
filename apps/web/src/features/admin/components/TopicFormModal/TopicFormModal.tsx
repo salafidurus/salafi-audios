@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button";
 import type { UpsertTopicDto } from "@sd/core-contracts";
@@ -19,27 +19,23 @@ export interface TopicFormModalProps {
   topic?: TopicForEdit | null;
 }
 
+function getInitialFormData(topic: TopicForEdit | null): UpsertTopicDto {
+  if (topic) {
+    return {
+      name: topic.name,
+      slug: topic.slug,
+      parentSlug: topic.parentSlug ?? undefined,
+    };
+  }
+  return { name: "", slug: "" };
+}
+
 export function TopicFormModal({ isOpen, onClose, onSave, topic }: TopicFormModalProps) {
-  const [formData, setFormData] = useState<UpsertTopicDto>({ name: "", slug: "" });
+  const [formData, setFormData] = useState<UpsertTopicDto>(() => getInitialFormData(topic ?? null));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const isEditing = !!topic;
-
-  useEffect(() => {
-    if (topic) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setFormData({
-        name: topic.name,
-        slug: topic.slug,
-        parentSlug: topic.parentSlug ?? undefined,
-      });
-    } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setFormData({ name: "", slug: "" });
-    }
-    setError(null);
-  }, [topic, isOpen]);
 
   // Auto-generate slug from name (for new topics only)
   const handleNameChange = (value: string) => {

@@ -17,6 +17,7 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { getApiBaseUrl } from "./config/runtime-env";
 import { i18n, initI18n } from "./i18n/i18n";
+import { syncTypographyToLocale } from "./styles/theme/typography-sync";
 
 LogBox.ignoreLogs(["API client initialization failed", "Open debugger to view warnings"]);
 
@@ -35,6 +36,14 @@ function AppFontsProvider({ children }: { children: ReactNode }) {
     "GeistMono-Medium": require("../../assets/fonts/GeistMono-Medium.ttf"),
     "GeistMono-SemiBold": require("../../assets/fonts/GeistMono-SemiBold.ttf"),
     "GeistMono-Bold": require("../../assets/fonts/GeistMono-Bold.ttf"),
+    "Alexandria-Regular": require("../../assets/fonts/Alexandria-Regular.ttf"),
+    "Alexandria-Medium": require("../../assets/fonts/Alexandria-Medium.ttf"),
+    "Alexandria-SemiBold": require("../../assets/fonts/Alexandria-SemiBold.ttf"),
+    "Alexandria-Bold": require("../../assets/fonts/Alexandria-Bold.ttf"),
+    "IBMPlexSansArabic-Regular": require("../../assets/fonts/IBMPlexSansArabic-Regular.ttf"),
+    "IBMPlexSansArabic-Medium": require("../../assets/fonts/IBMPlexSansArabic-Medium.ttf"),
+    "IBMPlexSansArabic-SemiBold": require("../../assets/fonts/IBMPlexSansArabic-SemiBold.ttf"),
+    "IBMPlexSansArabic-Bold": require("../../assets/fonts/IBMPlexSansArabic-Bold.ttf"),
   });
 
   if (!loaded) {
@@ -77,7 +86,10 @@ export function Providers({ children }: Props) {
 
   useEffect(() => {
     void initI18n()
-      .then(() => setI18nReady(true))
+      .then(() => {
+        setI18nReady(true);
+        syncTypographyToLocale(i18n.language as "en" | "ar");
+      })
       .catch((err) => {
         console.warn("[i18n] init failed, falling back to default:", err);
         setI18nReady(true);
