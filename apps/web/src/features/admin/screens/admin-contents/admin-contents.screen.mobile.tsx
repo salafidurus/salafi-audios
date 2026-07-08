@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import { Plus, Trash2 } from "lucide-react";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
@@ -18,7 +17,6 @@ import { TopicFormModal, type TopicForEdit } from "@/features/admin/components/T
 import styles from "./admin-contents.screen.mobile.module.css";
 
 export function AdminContentsMobileScreen() {
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState<AdminContentsTab>("topics");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -85,16 +83,11 @@ export function AdminContentsMobileScreen() {
               icon={<Plus size={16} />}
               onClick={handleOpenAddTopic}
             >
-              Topic
+              Add Topic
             </Button>
           ) : (
-            <Button
-              variant="primary"
-              size="sm"
-              icon={<Plus size={16} />}
-              onClick={() => router.push("/admin/lectures")}
-            >
-              Listing
+            <Button variant="primary" size="sm" icon={<Plus size={16} />} onClick={() => {}}>
+              Add Listing
             </Button>
           )
         }

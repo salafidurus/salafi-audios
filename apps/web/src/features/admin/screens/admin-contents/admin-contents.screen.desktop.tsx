@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import { Plus, Trash2 } from "lucide-react";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
@@ -18,7 +17,6 @@ import { TopicFormModal, type TopicForEdit } from "@/features/admin/components/T
 import styles from "./admin-contents.screen.desktop.module.css";
 
 export function AdminContentsDesktopScreen() {
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState<AdminContentsTab>("topics");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -83,11 +81,7 @@ export function AdminContentsDesktopScreen() {
               Add Topic
             </Button>
           ) : (
-            <Button
-              variant="primary"
-              icon={<Plus size={18} />}
-              onClick={() => router.push("/admin/lectures")}
-            >
+            <Button variant="primary" icon={<Plus size={18} />} onClick={() => {}}>
               Add Listing
             </Button>
           )
