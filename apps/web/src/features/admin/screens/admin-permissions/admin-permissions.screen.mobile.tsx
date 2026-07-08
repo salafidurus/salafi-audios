@@ -8,6 +8,9 @@ import {
   revokePermission,
   type AdminPermissionsListResponse,
 } from "@/features/admin/api/admin.api";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { Button } from "@/shared/components/Button";
 import styles from "./admin-permissions.screen.mobile.module.css";
 
 export function AdminPermissionsMobileScreen() {
@@ -51,8 +54,8 @@ export function AdminPermissionsMobileScreen() {
   const currentPermissions = userPerms?.permissions.map((p) => p.permission) ?? [];
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.pageTitle}>Permissions</h1>
+    <ScreenView>
+      <PageHeader title="Permissions" />
 
       <div className={styles.lookupSection}>
         <input
@@ -62,14 +65,9 @@ export function AdminPermissionsMobileScreen() {
           onChange={(e) => setUserId(e.target.value)}
           className={styles.input}
         />
-        <button
-          type="button"
-          onClick={handleLookup}
-          disabled={loading}
-          className={styles.lookupButton}
-        >
+        <Button variant="primary" onClick={handleLookup} disabled={loading}>
           {loading ? "…" : "Lookup"}
-        </button>
+        </Button>
       </div>
 
       {userPerms && (
@@ -89,29 +87,19 @@ export function AdminPermissionsMobileScreen() {
                   </div>
                 </div>
                 {hasIt ? (
-                  <button
-                    type="button"
-                    onClick={() => handleRevoke(perm)}
-                    disabled={loading}
-                    className={styles.revokeButton}
-                  >
+                  <Button variant="danger" onClick={() => handleRevoke(perm)} disabled={loading}>
                     Revoke
-                  </button>
+                  </Button>
                 ) : (
-                  <button
-                    type="button"
-                    onClick={() => handleGrant(perm)}
-                    disabled={loading}
-                    className={styles.grantButton}
-                  >
+                  <Button variant="primary" onClick={() => handleGrant(perm)} disabled={loading}>
                     Grant
-                  </button>
+                  </Button>
                 )}
               </div>
             );
           })}
         </div>
       )}
-    </div>
+    </ScreenView>
   );
 }

@@ -8,6 +8,9 @@ import {
   revokePermission,
   type AdminPermissionsListResponse,
 } from "@/features/admin/api/admin.api";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { Button } from "@/shared/components/Button";
 import styles from "./admin-permissions.screen.desktop.module.css";
 
 export function AdminPermissionsDesktopScreen() {
@@ -51,8 +54,8 @@ export function AdminPermissionsDesktopScreen() {
   const currentPermissions = userPerms?.permissions.map((p) => p.permission) ?? [];
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.pageTitle}>Manage Permissions</h1>
+    <ScreenView>
+      <PageHeader title="Manage Permissions" />
 
       <div className={styles.lookupSection}>
         <input
@@ -63,14 +66,9 @@ export function AdminPermissionsDesktopScreen() {
           onKeyDown={(e) => e.key === "Enter" && handleLookup()}
           className={styles.input}
         />
-        <button
-          type="button"
-          onClick={handleLookup}
-          disabled={loading}
-          className={styles.lookupButton}
-        >
+        <Button variant="primary" onClick={handleLookup} disabled={loading}>
           {loading ? "Loading…" : "Lookup"}
-        </button>
+        </Button>
       </div>
 
       {userPerms && (
@@ -101,23 +99,21 @@ export function AdminPermissionsDesktopScreen() {
                     </td>
                     <td className={styles.tableCell}>
                       {hasIt ? (
-                        <button
-                          type="button"
+                        <Button
+                          variant="danger"
                           onClick={() => handleRevoke(perm)}
                           disabled={loading}
-                          className={styles.revokeButton}
                         >
                           Revoke
-                        </button>
+                        </Button>
                       ) : (
-                        <button
-                          type="button"
+                        <Button
+                          variant="primary"
                           onClick={() => handleGrant(perm)}
                           disabled={loading}
-                          className={styles.grantButton}
                         >
                           Grant
-                        </button>
+                        </Button>
                       )}
                     </td>
                   </tr>
@@ -127,6 +123,6 @@ export function AdminPermissionsDesktopScreen() {
           </table>
         </div>
       )}
-    </div>
+    </ScreenView>
   );
 }
