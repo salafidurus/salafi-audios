@@ -1,8 +1,7 @@
+/* Library screens - width is handled by ScreenView wrapper */
+
 .container {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: var(--space-scale-md) var(--space-scale-lg);
-  box-sizing: border-box;
+  padding: var(--space-layout-page-y) 0;
 }
 
 .title {
@@ -41,4 +40,15 @@
   text-align: center;
   font-family: var(--typo-body-md-font-family);
   font-size: var(--typo-body-md-font-size);
+}
+
+/* Mobile adjustments */
+@media (max-width: 899px) {
+  .container {
+    padding: var(--space-scale-lg) 0;
+  }
+
+  .title {
+    font-size: var(--typo-title-lg-font-size);
+  }
 }
