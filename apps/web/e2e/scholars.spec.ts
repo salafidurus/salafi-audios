@@ -17,7 +17,6 @@ test.describe("Scholar browsing", () => {
       await expect(page).toHaveTitle(/./);
 
       // Wait for the page to fully load
-      await page.waitForLoadState("networkidle");
     });
   });
 
@@ -26,7 +25,6 @@ test.describe("Scholar browsing", () => {
       // The search home (/) includes a quick-browse area that may list scholars.
       // Availability depends on backend data, so we only assert the page loads.
       await page.goto("/");
-      await page.waitForLoadState("networkidle");
     });
 
     test("clicking a scholar card navigates to /scholars/:slug", async () => {

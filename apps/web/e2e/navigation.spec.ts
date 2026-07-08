@@ -6,14 +6,12 @@ test.describe("Navigation — sidebar & routing", () => {
 
     test("sidebar is visible with primary aria label", async ({ page }) => {
       await page.goto("/");
-      await page.waitForLoadState("networkidle");
       const sidebar = page.locator('[aria-label="Primary sidebar"]');
       await expect(sidebar).toBeVisible();
     });
 
     test("brand link navigates to home", async ({ page }) => {
       await page.goto("/explore");
-      await page.waitForLoadState("networkidle");
       const brand = page.locator('[aria-label="Salafi Durus"]');
       await expect(brand).toBeVisible();
       await brand.click();
@@ -22,7 +20,6 @@ test.describe("Navigation — sidebar & routing", () => {
 
     test("clicking Explore sidebar link navigates to /explore", async ({ page }) => {
       await page.goto("/");
-      await page.waitForLoadState("networkidle");
       const sidebar = page.locator('[aria-label="Primary sidebar"]');
       const feedLink = sidebar.getByText("Explore", { exact: true });
       await feedLink.click();
@@ -31,7 +28,6 @@ test.describe("Navigation — sidebar & routing", () => {
 
     test("clicking Live sidebar link navigates to /live", async ({ page }) => {
       await page.goto("/");
-      await page.waitForLoadState("networkidle");
       const sidebar = page.locator('[aria-label="Primary sidebar"]');
       const liveLink = sidebar.getByText("Live", { exact: true });
       await liveLink.click();
@@ -40,7 +36,6 @@ test.describe("Navigation — sidebar & routing", () => {
 
     test("clicking Library sidebar link navigates to /library", async ({ page }) => {
       await page.goto("/");
-      await page.waitForLoadState("networkidle");
       const sidebar = page.locator('[aria-label="Primary sidebar"]');
       const libraryLink = sidebar.getByText("Library", { exact: true });
       await libraryLink.click();
@@ -73,7 +68,6 @@ test.describe("Navigation — sidebar & routing", () => {
       page.on("pageerror", (err) => errors.push(err.message));
 
       await page.goto("/");
-      await page.waitForLoadState("networkidle");
       expect(errors).toHaveLength(0);
     });
   });
