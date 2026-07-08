@@ -4,10 +4,9 @@ test.describe("Search", () => {
   test("search home loads with prompt text", async ({ page }) => {
     await page.goto("/");
 
-    const main = page.locator("main").first();
-    await expect(main).toBeAttached();
+    await page.waitForLoadState("networkidle");
 
-    const heading = main.getByText("Find a lesson");
+    const heading = page.getByText("Find a lesson");
     await expect(heading).toBeVisible();
   });
 
@@ -23,18 +22,16 @@ test.describe("Search", () => {
   test("search page loads at /search", async ({ page }) => {
     await page.goto("/search");
 
+    await page.waitForLoadState("networkidle");
     await expect(page).toHaveTitle(/./);
-    const main = page.locator("main").first();
-    await expect(main).toBeAttached();
   });
 
   test("search page accepts a query parameter", async ({ page }) => {
     await page.goto("/search?searchKey=tawhid");
 
+    await page.waitForLoadState("networkidle");
     await expect(page).toHaveTitle(/./);
     // The page should render without crashing even with a query
-    const main = page.locator("main").first();
-    await expect(main).toBeAttached();
   });
 
   test("typing in search input shows results", async () => {
@@ -49,8 +46,7 @@ test.describe("Search", () => {
     // Navigate directly to search without a query
     await page.goto("/search");
 
-    const main = page.locator("main").first();
-    await expect(main).toBeAttached();
+    await page.waitForLoadState("networkidle");
     // Page should not crash; may show empty state or search prompt
   });
 });

@@ -1,0 +1,13 @@
+.main {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-lg);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-xl);
+  width: 100%;
+}

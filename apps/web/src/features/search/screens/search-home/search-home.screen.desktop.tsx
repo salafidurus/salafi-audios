@@ -6,7 +6,7 @@ import { TitleTextDesktop } from "@/features/search/components/TitleText/TitleTe
 import { useQuickBrowse } from "@sd/domain-search";
 
 import type { ListingFormat } from "@sd/core-contracts";
-import styles from "./search-home.screen.module.css";
+import styles from "./search-home.screen.desktop.module.css";
 
 export type SearchHomeDesktopScreenProps = {
   onOpenSearch?: () => void;
