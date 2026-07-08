@@ -1,7 +1,16 @@
 "use client";
 
-import { AdaptiveBottomBar } from "./adaptive-bottom-bar";
+import { MobileHeader } from "./mobile-header";
+import { SidebarDrawer } from "./sidebar-drawer";
+import { useNavigationStore } from "../../store/navigation-store";
 
 export function SidebarMobile() {
-  return <AdaptiveBottomBar />;
+  const { isMobileDrawerOpen, openMobileDrawer, closeMobileDrawer } = useNavigationStore();
+
+  return (
+    <>
+      <MobileHeader onMenuClick={openMobileDrawer} />
+      <SidebarDrawer isOpen={isMobileDrawerOpen} onClose={closeMobileDrawer} />
+    </>
+  );
 }

@@ -20,6 +20,12 @@
   --typo-display-lg-font-family: var(--typo-display-lg-font-family);
 }
 
+/* Navigation layout variables */
+:root {
+  --mobile-header-height: 3.5rem;
+  --sidebar-width: 16.5rem;
+}
+
 html,
 body {
   height: 100%;
@@ -76,14 +82,28 @@ body {
   flex-direction: column;
 }
 
-@media (max-width: 900px) {
+/* Tablet: collapsed sidebar (641px - 900px) */
+@media (min-width: 641px) and (max-width: 900px) {
+  .appShell {
+    flex-direction: row;
+  }
+
+  .appMain {
+    padding-inline-start: var(--sidebar-width, 4.5rem);
+    padding-bottom: 0;
+  }
+}
+
+/* Mobile: header at top, drawer navigation (<= 640px) */
+@media (max-width: 640px) {
   .appShell {
     flex-direction: column;
   }
 
   .appMain {
     padding-inline-start: 0;
-    padding-bottom: var(--bottom-tab-height, 4.25rem);
+    padding-top: calc(var(--mobile-header-height) + env(safe-area-inset-top));
+    padding-bottom: 0;
   }
 }
 
