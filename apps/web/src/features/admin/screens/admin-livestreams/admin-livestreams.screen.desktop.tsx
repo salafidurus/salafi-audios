@@ -3,6 +3,9 @@
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { LiveSessionDeltaDto } from "@sd/core-contracts";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { EmptyState } from "@/shared/components/EmptyState";
+import { Button } from "@/shared/components/Button";
 import { updateLiveSessionStatus } from "@/features/admin/api/admin.api";
 import styles from "./admin-livestreams.screen.desktop.module.css";
 
@@ -31,31 +34,19 @@ function SessionRow({ session, onStatusChange }: SessionRowProps) {
       <td className={styles.tableCell}>
         <div className={styles.actionButtons}>
           {session.status === "scheduled" && (
-            <button
-              type="button"
-              onClick={() => onStatusChange(session.id, "live")}
-              className={styles.goLiveButton}
-            >
+            <Button variant="primary" onClick={() => onStatusChange(session.id, "live")}>
               Go Live
-            </button>
+            </Button>
           )}
           {session.status === "live" && (
-            <button
-              type="button"
-              onClick={() => onStatusChange(session.id, "ended")}
-              className={styles.endButton}
-            >
+            <Button variant="danger" onClick={() => onStatusChange(session.id, "ended")}>
               End
-            </button>
+            </Button>
           )}
           {session.status === "ended" && (
-            <button
-              type="button"
-              onClick={() => onStatusChange(session.id, "scheduled")}
-              className={styles.rescheduleButton}
-            >
+            <Button variant="secondary" onClick={() => onStatusChange(session.id, "scheduled")}>
               Reschedule
-            </button>
+            </Button>
           )}
         </div>
       </td>
@@ -100,7 +91,8 @@ export function AdminLivestreamsDesktopScreen() {
   if (loadingActive || loadingScheduled || loadingEnded) {
     return (
       <ScreenView>
-        <div className={styles.loading}>Loading live sessions…</div>
+        <PageHeader title="Manage Livestreams" />
+        <EmptyState variant="loading" message="Loading live sessions…" />
       </ScreenView>
     );
   }
@@ -111,69 +103,67 @@ export function AdminLivestreamsDesktopScreen() {
 
   return (
     <ScreenView>
-      <div className={styles.container}>
-        <h1 className={styles.pageTitle}>Manage Livestreams</h1>
+      <PageHeader title="Manage Livestreams" />
 
-        <h2 className={`${styles.sectionTitle} ${styles.activeSectionTitle}`}>
-          Active ({active.length})
-        </h2>
-        <table className={styles.table}>
-          <thead className={styles.tableHeader}>
-            <tr>
-              <th className={styles.tableHead}>Title</th>
-              <th className={styles.tableHead}>Channel</th>
-              <th className={styles.tableHead}>Scholar</th>
-              <th className={styles.tableHead}>Status</th>
-              <th className={styles.tableHead}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {active.map((session) => (
-              <SessionRow key={session.id} session={session} onStatusChange={handleStatusChange} />
-            ))}
-          </tbody>
-        </table>
+      <h2 className={`${styles.sectionTitle} ${styles.activeSectionTitle}`}>
+        Active ({active.length})
+      </h2>
+      <table className={styles.table}>
+        <thead className={styles.tableHeader}>
+          <tr>
+            <th className={styles.tableHead}>Title</th>
+            <th className={styles.tableHead}>Channel</th>
+            <th className={styles.tableHead}>Scholar</th>
+            <th className={styles.tableHead}>Status</th>
+            <th className={styles.tableHead}>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {active.map((session) => (
+            <SessionRow key={session.id} session={session} onStatusChange={handleStatusChange} />
+          ))}
+        </tbody>
+      </table>
 
-        <h2 className={`${styles.sectionTitle} ${styles.scheduledSectionTitle}`}>
-          Scheduled ({scheduled.length})
-        </h2>
-        <table className={styles.table}>
-          <thead className={styles.tableHeader}>
-            <tr>
-              <th className={styles.tableHead}>Title</th>
-              <th className={styles.tableHead}>Channel</th>
-              <th className={styles.tableHead}>Scholar</th>
-              <th className={styles.tableHead}>Status</th>
-              <th className={styles.tableHead}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {scheduled.map((session) => (
-              <SessionRow key={session.id} session={session} onStatusChange={handleStatusChange} />
-            ))}
-          </tbody>
-        </table>
+      <h2 className={`${styles.sectionTitle} ${styles.scheduledSectionTitle}`}>
+        Scheduled ({scheduled.length})
+      </h2>
+      <table className={styles.table}>
+        <thead className={styles.tableHeader}>
+          <tr>
+            <th className={styles.tableHead}>Title</th>
+            <th className={styles.tableHead}>Channel</th>
+            <th className={styles.tableHead}>Scholar</th>
+            <th className={styles.tableHead}>Status</th>
+            <th className={styles.tableHead}>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {scheduled.map((session) => (
+            <SessionRow key={session.id} session={session} onStatusChange={handleStatusChange} />
+          ))}
+        </tbody>
+      </table>
 
-        <h2 className={`${styles.sectionTitle} ${styles.endedSectionTitle}`}>
-          Ended ({ended.length})
-        </h2>
-        <table className={styles.table}>
-          <thead className={styles.tableHeader}>
-            <tr>
-              <th className={styles.tableHead}>Title</th>
-              <th className={styles.tableHead}>Channel</th>
-              <th className={styles.tableHead}>Scholar</th>
-              <th className={styles.tableHead}>Status</th>
-              <th className={styles.tableHead}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {ended.map((session) => (
-              <SessionRow key={session.id} session={session} onStatusChange={handleStatusChange} />
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <h2 className={`${styles.sectionTitle} ${styles.endedSectionTitle}`}>
+        Ended ({ended.length})
+      </h2>
+      <table className={styles.table}>
+        <thead className={styles.tableHeader}>
+          <tr>
+            <th className={styles.tableHead}>Title</th>
+            <th className={styles.tableHead}>Channel</th>
+            <th className={styles.tableHead}>Scholar</th>
+            <th className={styles.tableHead}>Status</th>
+            <th className={styles.tableHead}>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {ended.map((session) => (
+            <SessionRow key={session.id} session={session} onStatusChange={handleStatusChange} />
+          ))}
+        </tbody>
+      </table>
     </ScreenView>
   );
 }
