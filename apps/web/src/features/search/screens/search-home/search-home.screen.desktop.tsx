@@ -7,6 +7,7 @@ import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { useQuickBrowse } from "@sd/domain-search";
 
 import type { ListingFormat } from "@sd/core-contracts";
+import styles from "./search-home.screen.desktop.module.css";
 
 export type SearchHomeDesktopScreenProps = {
   onOpenSearch?: () => void;
