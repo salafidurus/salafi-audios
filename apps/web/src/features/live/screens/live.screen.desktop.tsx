@@ -2,7 +2,8 @@
 
 import React from "react";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { AppText } from "@/shared/components/AppText/AppText";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { EmptyState } from "@/shared/components/EmptyState";
 import { useLiveSessions } from "@sd/domain-live";
 import { LiveSessionRow } from "../components/live-session-row/live-session-row";
 import { LiveSkeleton } from "../components/live-skeleton/live-skeleton";
@@ -20,17 +21,9 @@ export function LiveDesktopScreen() {
     content = <LiveSkeleton />;
   } else if (active.sessions.length === 0) {
     content = (
-      <AppText
-        variant="bodyMd"
-        style={{
-          color: "var(--content-subtle)",
-          padding: 24,
-          textAlign: "center",
-          display: "block",
-        }}
-      >
-        {t("live.sections.ongoing.empty", "No live sessions right now — check back soon.")}
-      </AppText>
+      <EmptyState
+        message={t("live.sections.ongoing.empty", "No live sessions right now — check back soon.")}
+      />
     );
   } else {
     content = (
@@ -44,14 +37,8 @@ export function LiveDesktopScreen() {
 
   return (
     <ScreenView>
-      <div className={styles.page}>
-        <div className={styles.listContainer}>
-          <AppText variant="displayMd" style={{ display: "block", marginBottom: 24 }}>
-            {t("live.title", "Live Sessions")}
-          </AppText>
-          {content}
-        </div>
-      </div>
+      <PageHeader title={t("live.title", "Live Sessions")} />
+      {content}
     </ScreenView>
   );
 }

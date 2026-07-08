@@ -2,6 +2,8 @@
 
 import type { ReactNode } from "react";
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { PageHeader } from "@/shared/components/PageHeader";
 import { FeedListRow } from "../components/feed-list-row/feed-list-row";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import { useExploreFollowingScreen } from "@sd/domain-content";
@@ -70,20 +72,26 @@ export function FeedFollowingMobileScreen({
   const items = data?.pages.flatMap((p) => p.items) ?? [];
 
   if (isFetching && items.length === 0) {
-    return <div style={{ padding: 16 }}>Loading followed scholars…</div>;
+    return (
+      <ScreenView>
+        <PageHeader title="Following" />
+        <div className={styles.loading}>Loading followed scholars…</div>
+      </ScreenView>
+    );
   }
 
   if (items.length === 0) {
     return (
-      <div style={{ padding: 16, color: "var(--content-muted)" }}>
-        Follow scholars to see their latest lectures here.
-      </div>
+      <ScreenView>
+        <PageHeader title="Following" />
+        <div className={styles.empty}>Follow scholars to see their latest lectures here.</div>
+      </ScreenView>
     );
   }
 
   return (
-    <div style={{ padding: 12 }}>
-      <h2 className={styles.title}>Following</h2>
+    <ScreenView>
+      <PageHeader title="Following" />
       <FeedBlocks
         items={items}
         onNavigateToLecture={onNavigateToLecture}
@@ -96,6 +104,6 @@ export function FeedFollowingMobileScreen({
           </button>
         </div>
       )}
-    </div>
+    </ScreenView>
   );
 }

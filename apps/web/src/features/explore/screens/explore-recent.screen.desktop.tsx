@@ -10,6 +10,7 @@ import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row"
 import { FeedTopicRow } from "../components/feed-topic-row/feed-topic-row";
 import { FeedSkeleton } from "../components/feed-skeleton/feed-skeleton";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { PageHeader } from "@/shared/components/PageHeader";
 import styles from "./explore-recent.screen.desktop.module.css";
 
 export type FeedDesktopScreenProps = {
@@ -89,13 +90,6 @@ export function FeedDesktopScreen({
   const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } = useExploreRecentScreen();
   const items = data?.pages.flatMap((p) => p.items) ?? [];
 
-  const hero = (
-    <header className={styles.hero}>
-      <h2 className={styles.heroTitle}>Feed</h2>
-      <p className={styles.heroSubtitle}>Scholarly, calm, and authentic Islamic knowledge</p>
-    </header>
-  );
-
   let body: ReactNode;
   if (isError && items.length === 0) {
     body = (
@@ -140,10 +134,8 @@ export function FeedDesktopScreen({
 
   return (
     <ScreenView>
-      <div className={styles.page}>
-        {hero}
-        {body}
-      </div>
+      <PageHeader title="Feed" />
+      <div className={styles.page}>{body}</div>
     </ScreenView>
   );
 }

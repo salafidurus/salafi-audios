@@ -2,7 +2,8 @@
 
 import React from "react";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { AppText } from "@/shared/components/AppText/AppText";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { EmptyState } from "@/shared/components/EmptyState";
 import { useLiveScheduledScreen } from "@sd/domain-live";
 import { LiveSessionRow } from "../components/live-session-row/live-session-row";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -20,26 +21,12 @@ export function LiveScheduledDesktopScreen({
 
   const renderContent = () => {
     if (isFetching && sessions.length === 0) {
-      return (
-        <div style={{ padding: 32, textAlign: "center", color: "var(--content-muted)" }}>
-          {t("common.loading", "Loading…")}
-        </div>
-      );
+      return <EmptyState variant="loading" message={t("common.loading", "Loading…")} />;
     }
 
     if (sessions.length === 0) {
       return (
-        <AppText
-          variant="bodyMd"
-          style={{
-            color: "var(--content-subtle)",
-            padding: 24,
-            textAlign: "center",
-            display: "block",
-          }}
-        >
-          {t("live.sections.scheduled.empty", "No upcoming sessions scheduled.")}
-        </AppText>
+        <EmptyState message={t("live.sections.scheduled.empty", "No upcoming sessions scheduled.")} />
       );
     }
 
@@ -58,14 +45,8 @@ export function LiveScheduledDesktopScreen({
 
   return (
     <ScreenView>
-      <div className={styles.page}>
-        <div className={styles.listContainer}>
-          <AppText variant="displayMd" style={{ display: "block", marginBottom: 24 }}>
-            {t("live.sections.scheduled.header", "Scheduled Sessions")}
-          </AppText>
-          {renderContent()}
-        </div>
-      </div>
+      <PageHeader title={t("live.sections.scheduled.header", "Scheduled Sessions")} />
+      {renderContent()}
     </ScreenView>
   );
 }

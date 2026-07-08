@@ -2,7 +2,8 @@
 
 import React from "react";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { AppText } from "@/shared/components/AppText/AppText";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { EmptyState } from "@/shared/components/EmptyState";
 import { useLiveScheduledScreen } from "@sd/domain-live";
 import { LiveSessionRow } from "../components/live-session-row/live-session-row";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -18,24 +19,10 @@ export function LiveScheduledMobileScreen({ onNavigateToSession }: LiveScheduled
 
   let content;
   if (isFetching && sessions.length === 0) {
-    content = (
-      <div style={{ padding: 16, textAlign: "center", color: "var(--content-muted)" }}>
-        {t("common.loading", "Loading…")}
-      </div>
-    );
+    content = <EmptyState variant="loading" message={t("common.loading", "Loading…")} />;
   } else if (sessions.length === 0) {
     content = (
-      <AppText
-        variant="bodyMd"
-        style={{
-          color: "var(--content-subtle)",
-          padding: 16,
-          textAlign: "center",
-          display: "block",
-        }}
-      >
-        {t("live.sections.scheduled.empty", "No upcoming sessions scheduled.")}
-      </AppText>
+      <EmptyState message={t("live.sections.scheduled.empty", "No upcoming sessions scheduled.")} />
     );
   } else {
     content = (
@@ -53,14 +40,8 @@ export function LiveScheduledMobileScreen({ onNavigateToSession }: LiveScheduled
 
   return (
     <ScreenView>
-      <div className={styles.page}>
-        <div className={styles.listContainer}>
-          <AppText variant="titleLg" style={{ display: "block", marginBottom: 16 }}>
-            {t("live.sections.scheduled.header", "Upcoming Sessions")}
-          </AppText>
-          {content}
-        </div>
-      </div>
+      <PageHeader title={t("live.sections.scheduled.header", "Upcoming Sessions")} />
+      {content}
     </ScreenView>
   );
 }
