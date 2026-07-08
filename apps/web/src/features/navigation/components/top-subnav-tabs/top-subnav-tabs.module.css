@@ -9,15 +9,29 @@
 }
 
 .inner {
-  width: 100%;
-  max-width: min(calc(var(--space-layout-content-max) + (var(--space-layout-page-x) * 2)), 100%);
+  /* Match ScreenView content widths for alignment */
+  width: var(--content-width-desktop);
+  max-width: var(--content-max-width);
   margin-inline: auto;
   height: 100%;
-  padding: 0 var(--space-layout-page-x);
+  padding: 0;
   display: flex;
   align-items: stretch;
   gap: var(--space-component-gap-sm);
   justify-content: flex-start;
+}
+
+@media (max-width: 1199px) {
+  .inner {
+    width: var(--content-width-tablet);
+  }
+}
+
+@media (max-width: 899px) {
+  .inner {
+    width: var(--content-width-mobile);
+    padding: 0 var(--space-layout-page-x);
+  }
 }
 
 .tabLink {

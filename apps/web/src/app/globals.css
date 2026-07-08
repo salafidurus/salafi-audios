@@ -20,6 +20,26 @@
   --typo-display-lg-font-family: var(--typo-display-lg-font-family);
 }
 
+/* =============================================
+   Screen Width System
+   =============================================
+   Content screens: explore, library, legal, live, search
+   Form screens: auth, settings, profile
+   ============================================= */
+:root {
+  /* Content screen widths (70%/90%/100%) */
+  --content-width-desktop: 70%;
+  --content-width-tablet: 90%;
+  --content-width-mobile: 100%;
+  --content-max-width: 1400px;
+
+  /* Form screen widths (50%/70%/100%) */
+  --form-width-desktop: 50%;
+  --form-width-tablet: 70%;
+  --form-width-mobile: 100%;
+  --form-max-width: 720px;
+}
+
 html,
 body {
   height: 100%;
