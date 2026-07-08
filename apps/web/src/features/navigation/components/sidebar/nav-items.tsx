@@ -7,6 +7,7 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { routes } from "@sd/core-contracts";
 import { useAuth, authClient } from "@/core/auth";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
+import { Button } from "@/shared/components/Button/Button";
 import { SectionLabel } from "./section-label";
 import {
   Cloud,
@@ -230,7 +231,19 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
             >
               <LogIn size={18} />
             </Link>
-          ) : null
+          ) : (
+            <Button
+              variant="primary"
+              size="sm"
+              className={styles.signInButton}
+              onClick={() => {
+                handleNavClick();
+                router.push(routes.signIn);
+              }}
+            >
+              {t("authStrip.signIn", "Sign In")}
+            </Button>
+          )
         ) : null}
       </div>
     </>
