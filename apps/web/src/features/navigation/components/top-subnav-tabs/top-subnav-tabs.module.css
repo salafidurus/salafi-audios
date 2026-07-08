@@ -8,6 +8,13 @@
   border-bottom: 1px solid var(--chrome-border);
 }
 
+/* Mobile: subnav sticks below fixed header */
+@media (max-width: 640px) {
+  .tabsContainer {
+    top: calc(var(--mobile-header-height) + env(safe-area-inset-top));
+  }
+}
+
 .inner {
   /* Match ScreenView content widths for alignment */
   width: var(--content-width-desktop);
