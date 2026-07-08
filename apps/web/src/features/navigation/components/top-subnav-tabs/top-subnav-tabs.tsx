@@ -6,7 +6,6 @@ import clsx from "clsx";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { getSubnavLabel } from "@sd/core-i18n";
 import { DEFAULT_TABS, SECTION_TABS } from "@/features/navigation/types";
-import { useResponsive } from "@/shared/hooks/use-responsive";
 import { useIsHydrated } from "@/shared/hooks/use-is-hydrated";
 import {
   buildSectionTabPath,

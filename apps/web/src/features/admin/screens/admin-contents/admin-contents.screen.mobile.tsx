@@ -41,6 +41,7 @@ export function AdminContentsMobileScreen() {
   // Topics state
   const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
   const [editingTopic, setEditingTopic] = useState<TopicForEdit | null>(null);
+  const [topicModalKey, setTopicModalKey] = useState(0);
 
   // Listings state
   const [isAudioUploaderOpen, setIsAudioUploaderOpen] = useState(false);
@@ -54,8 +55,6 @@ export function AdminContentsMobileScreen() {
     () => httpClient<TopicDetailDto[]>({ url: endpoints.topics.list, method: "GET" }),
   );
 
-  const topics = topicsData ?? [];
-
   // Fetch listings
   const { data: listingsData, refetch: refetchListings } = useApiQuery<AdminListingListDto>(
     ["admin", "listings", "list", { search: searchQuery }],
@@ -66,16 +65,18 @@ export function AdminContentsMobileScreen() {
   const listings = listingsData?.items ?? [];
 
   const filteredTopics = useMemo(() => {
-    if (!searchQuery.trim()) return topics;
+    const list = topicsData ?? [];
+    if (!searchQuery.trim()) return list;
     const query = searchQuery.toLowerCase();
-    return topics.filter(
+    return list.filter(
       (t) => t.name.toLowerCase().includes(query) || t.slug.toLowerCase().includes(query),
     );
-  }, [topics, searchQuery]);
+  }, [topicsData, searchQuery]);
 
   // Topic handlers
   const handleOpenAddTopic = () => {
     setEditingTopic(null);
+    setTopicModalKey((k) => k + 1);
     setIsTopicModalOpen(true);
   };
 
@@ -85,6 +86,7 @@ export function AdminContentsMobileScreen() {
       name: topic.name,
       parentSlug: undefined, // parentId from API doesn't map to parentSlug
     });
+    setTopicModalKey((k) => k + 1);
     setIsTopicModalOpen(true);
   };
 
@@ -228,6 +230,7 @@ export function AdminContentsMobileScreen() {
 
       {/* Topic Modal */}
       <TopicFormModal
+        key={topicModalKey}
         isOpen={isTopicModalOpen}
         onClose={() => setIsTopicModalOpen(false)}
         onSave={handleSaveTopic}

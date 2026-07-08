@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button";
 import type { CreateScholarDto } from "@sd/core-contracts";
@@ -22,41 +22,37 @@ export interface ScholarFormModalProps {
   scholar?: ScholarForEdit | null;
 }
 
-const initialFormData: CreateScholarDto = {
-  name: "",
-  slug: "",
-  bio: "",
-  imageUrl: "",
-  isKibar: false,
-  isFeatured: false,
-  isActive: true,
-};
+function getInitialFormData(scholar: ScholarForEdit | null): CreateScholarDto {
+  if (scholar) {
+    return {
+      name: scholar.name,
+      slug: scholar.slug,
+      bio: "",
+      imageUrl: scholar.imageUrl ?? "",
+      isKibar: scholar.isKibar ?? false,
+      isFeatured: false,
+      isActive: true,
+    };
+  }
+  return {
+    name: "",
+    slug: "",
+    bio: "",
+    imageUrl: "",
+    isKibar: false,
+    isFeatured: false,
+    isActive: true,
+  };
+}
 
 export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFormModalProps) {
-  const [formData, setFormData] = useState<CreateScholarDto>(initialFormData);
+  const [formData, setFormData] = useState<CreateScholarDto>(() =>
+    getInitialFormData(scholar ?? null),
+  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const isEditing = !!scholar;
-
-  useEffect(() => {
-    if (scholar) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setFormData({
-        name: scholar.name,
-        slug: scholar.slug,
-        bio: "",
-        imageUrl: scholar.imageUrl ?? "",
-        isKibar: scholar.isKibar ?? false,
-        isFeatured: false,
-        isActive: true,
-      });
-    } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setFormData(initialFormData);
-    }
-    setError(null);
-  }, [scholar, isOpen]);
 
   // Auto-generate slug from name (for new scholars only)
   const handleNameChange = (value: string) => {

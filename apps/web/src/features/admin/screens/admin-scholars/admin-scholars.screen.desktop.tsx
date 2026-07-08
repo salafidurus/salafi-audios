@@ -29,19 +29,20 @@ export function AdminScholarsDesktopScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingScholar, setEditingScholar] = useState<ScholarForEdit | null>(null);
-
-  const scholars = data?.scholars ?? [];
+  const [modalKey, setModalKey] = useState(0);
 
   const filteredScholars = useMemo(() => {
-    if (!searchQuery.trim()) return scholars;
+    const list = data?.scholars ?? [];
+    if (!searchQuery.trim()) return list;
     const query = searchQuery.toLowerCase();
-    return scholars.filter(
+    return list.filter(
       (s) => s.name.toLowerCase().includes(query) || s.slug.toLowerCase().includes(query),
     );
-  }, [scholars, searchQuery]);
+  }, [data, searchQuery]);
 
   const handleOpenAdd = () => {
     setEditingScholar(null);
+    setModalKey((k) => k + 1);
     setIsModalOpen(true);
   };
 
@@ -53,6 +54,7 @@ export function AdminScholarsDesktopScreen() {
       imageUrl: scholar.imageUrl,
       isKibar: scholar.isKibar,
     });
+    setModalKey((k) => k + 1);
     setIsModalOpen(true);
   };
 
@@ -120,6 +122,7 @@ export function AdminScholarsDesktopScreen() {
       </div>
 
       <ScholarFormModal
+        key={modalKey}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSave}
