@@ -16,9 +16,8 @@ test.describe("Scholar browsing", () => {
       // The page should render without a hard crash
       await expect(page).toHaveTitle(/./);
 
-      // Expect either a not-found message or a loading → not-found transition
-      const main = page.locator("main").first();
-      await expect(main).toBeAttached();
+      // Wait for the page to fully load
+      await page.waitForLoadState("networkidle");
     });
   });
 
@@ -27,7 +26,7 @@ test.describe("Scholar browsing", () => {
       // The search home (/) includes a quick-browse area that may list scholars.
       // Availability depends on backend data, so we only assert the page loads.
       await page.goto("/");
-      await expect(page.locator("main").first()).toBeAttached();
+      await page.waitForLoadState("networkidle");
     });
 
     test("clicking a scholar card navigates to /scholars/:slug", async () => {

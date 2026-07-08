@@ -3,10 +3,10 @@
 import { QuickBrowseDesktop } from "@/features/search/components/QuickBrowse/QuickBrowse.desktop";
 import { SearchButtonDesktop } from "@/features/search/components/SearchButton/SearchButton.desktop";
 import { TitleTextDesktop } from "@/features/search/components/TitleText/TitleText.desktop";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { useQuickBrowse } from "@sd/domain-search";
 
 import type { ListingFormat } from "@sd/core-contracts";
+import styles from "./search-home.screen.module.css";
 
 export type SearchHomeDesktopScreenProps = {
   onOpenSearch?: () => void;
@@ -26,8 +26,8 @@ export function SearchHomeDesktopScreen({
   const { data, isLoading } = useQuickBrowse();
 
   return (
-    <ScreenView>
-      <section className="flex flex-col items-center justify-center gap-[var(--space-scale-4xl)] text-center">
+    <main className={styles.main}>
+      <section className={styles.content}>
         <div className="flex w-full flex-col items-center gap-[var(--space-component-gap-lg)]">
           <TitleTextDesktop>Find a lesson</TitleTextDesktop>
           <SearchButtonDesktop label="What do you want to listen to?" onClick={onOpenSearch} />
@@ -43,6 +43,6 @@ export function SearchHomeDesktopScreen({
           onSelectCategory={onSelectCategory}
         />
       </section>
-    </ScreenView>
+    </main>
   );
 }
