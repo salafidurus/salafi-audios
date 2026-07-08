@@ -3,6 +3,9 @@
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { LiveSessionDeltaDto } from "@sd/core-contracts";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { EmptyState } from "@/shared/components/EmptyState";
+import { Button } from "@/shared/components/Button";
 import { updateLiveSessionStatus } from "@/features/admin/api/admin.api";
 import styles from "./admin-livestreams.screen.mobile.module.css";
 
@@ -25,22 +28,14 @@ function SessionCard({ session, onStatusChange }: SessionCardProps) {
         </div>
         <div className={styles.actionButtons}>
           {session.status === "scheduled" && (
-            <button
-              type="button"
-              onClick={() => onStatusChange(session.id, "live")}
-              className={styles.liveButton}
-            >
+            <Button variant="primary" onClick={() => onStatusChange(session.id, "live")}>
               Live
-            </button>
+            </Button>
           )}
           {session.status === "live" && (
-            <button
-              type="button"
-              onClick={() => onStatusChange(session.id, "ended")}
-              className={styles.endButton}
-            >
+            <Button variant="danger" onClick={() => onStatusChange(session.id, "ended")}>
               End
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -77,7 +72,8 @@ export function AdminLivestreamsMobileScreen() {
   if (loadingActive || loadingScheduled) {
     return (
       <ScreenView>
-        <div className={styles.loading}>Loading…</div>
+        <PageHeader title="Livestreams" />
+        <EmptyState variant="loading" message="Loading…" />
       </ScreenView>
     );
   }
@@ -87,25 +83,23 @@ export function AdminLivestreamsMobileScreen() {
 
   return (
     <ScreenView>
-      <div className={styles.container}>
-        <h1 className={styles.pageTitle}>Livestreams</h1>
-        {active.length > 0 && (
-          <>
-            <h2 className={`${styles.sectionTitle} ${styles.activeSectionTitle}`}>
-              Active ({active.length})
-            </h2>
-            {active.map((session) => (
-              <SessionCard key={session.id} session={session} onStatusChange={handleStatusChange} />
-            ))}
-          </>
-        )}
-        <h2 className={`${styles.sectionTitle} ${styles.scheduledSectionTitle}`}>
-          Scheduled ({scheduled.length})
-        </h2>
-        {scheduled.map((session) => (
-          <SessionCard key={session.id} session={session} onStatusChange={handleStatusChange} />
-        ))}
-      </div>
+      <PageHeader title="Livestreams" />
+      {active.length > 0 && (
+        <>
+          <h2 className={`${styles.sectionTitle} ${styles.activeSectionTitle}`}>
+            Active ({active.length})
+          </h2>
+          {active.map((session) => (
+            <SessionCard key={session.id} session={session} onStatusChange={handleStatusChange} />
+          ))}
+        </>
+      )}
+      <h2 className={`${styles.sectionTitle} ${styles.scheduledSectionTitle}`}>
+        Scheduled ({scheduled.length})
+      </h2>
+      {scheduled.map((session) => (
+        <SessionCard key={session.id} session={session} onStatusChange={handleStatusChange} />
+      ))}
     </ScreenView>
   );
 }

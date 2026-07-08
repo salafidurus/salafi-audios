@@ -2,6 +2,8 @@
 
 import type { ReactNode } from "react";
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { PageHeader } from "@/shared/components/PageHeader";
 import { FeedListRow } from "../components/feed-list-row/feed-list-row";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import { useExploreFollowingScreen } from "@sd/domain-content";
@@ -70,42 +72,42 @@ export function FeedFollowingDesktopScreen({
   const items = data?.pages.flatMap((p) => p.items) ?? [];
 
   if (isFetching && items.length === 0) {
-    return <div style={{ padding: 32 }}>Loading followed scholars…</div>;
+    return (
+      <ScreenView>
+        <PageHeader title="Following" />
+        <div className={styles.loading}>Loading followed scholars…</div>
+      </ScreenView>
+    );
   }
 
   if (items.length === 0) {
     return (
-      <div style={{ padding: 32, color: "var(--content-muted)" }}>
-        Follow scholars to see their latest lectures here.
-      </div>
+      <ScreenView>
+        <PageHeader title="Following" />
+        <div className={styles.empty}>Follow scholars to see their latest lectures here.</div>
+      </ScreenView>
     );
   }
 
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto", padding: 24 }}>
-      <h2 style={{ margin: 0, fontSize: 22, marginBottom: 16 }}>Following</h2>
+    <ScreenView>
+      <PageHeader title="Following" />
       <FeedBlocks
         items={items}
         onNavigateToLecture={onNavigateToLecture}
         onNavigateToScholar={onNavigateToScholar}
       />
       {hasNextPage && (
-        <div style={{ padding: 16, textAlign: "center" }}>
+        <div className={styles.loadMoreRow}>
           <button
             type="button"
             onClick={() => fetchNextPage()}
-            style={{
-              padding: "8px 24px",
-              border: "1px solid var(--border-default)",
-              borderRadius: 6,
-              cursor: "pointer",
-              background: "var(--surface-default)",
-            }}
+            className={styles.button}
           >
             {isFetching ? "Loading…" : "Load more"}
           </button>
         </div>
       )}
-    </div>
+    </ScreenView>
   );
 }

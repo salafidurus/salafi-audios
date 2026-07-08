@@ -1,0 +1,77 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.error {
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--surface-subtle);
+  border: 1px solid var(--border-danger);
+  color: var(--content-danger);
+  border-radius: var(--radius-sm);
+  font-size: var(--typo-body-sm-font-size);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.label {
+  font-size: var(--typo-label-md-font-size);
+  font-weight: 500;
+  color: var(--content-default);
+}
+
+.input,
+.textarea {
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--typo-body-md-font-size);
+  background-color: var(--surface-default);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--content-default);
+  transition: border-color 150ms;
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--border-focus);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.checkboxGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--typo-body-md-font-size);
+  color: var(--content-default);
+  cursor: pointer;
+}
+
+.checkbox input {
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border-subtle);
+}

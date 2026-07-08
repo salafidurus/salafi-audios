@@ -2,7 +2,8 @@
 
 import React from "react";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { AppText } from "@/shared/components/AppText/AppText";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { EmptyState } from "@/shared/components/EmptyState";
 import { useLiveEndedScreen } from "@sd/domain-live";
 import { LiveSessionRow } from "../components/live-session-row/live-session-row";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -18,25 +19,9 @@ export function LiveEndedMobileScreen({ onNavigateToSession }: LiveEndedMobileSc
 
   let content;
   if (isFetching && sessions.length === 0) {
-    content = (
-      <div style={{ padding: 16, textAlign: "center", color: "var(--content-muted)" }}>
-        {t("common.loading", "Loading…")}
-      </div>
-    );
+    content = <EmptyState variant="loading" message={t("common.loading", "Loading…")} />;
   } else if (sessions.length === 0) {
-    content = (
-      <AppText
-        variant="bodyMd"
-        style={{
-          color: "var(--content-subtle)",
-          padding: 16,
-          textAlign: "center",
-          display: "block",
-        }}
-      >
-        {t("live.sections.ended.empty", "No recent sessions.")}
-      </AppText>
-    );
+    content = <EmptyState message={t("live.sections.ended.empty", "No recent sessions.")} />;
   } else {
     content = (
       <div className={styles.list}>
@@ -53,14 +38,8 @@ export function LiveEndedMobileScreen({ onNavigateToSession }: LiveEndedMobileSc
 
   return (
     <ScreenView>
-      <div className={styles.page}>
-        <div className={styles.listContainer}>
-          <AppText variant="titleLg" style={{ display: "block", marginBottom: 16 }}>
-            {t("live.sections.ended.header", "Past Sessions")}
-          </AppText>
-          {content}
-        </div>
-      </div>
+      <PageHeader title={t("live.sections.ended.header", "Past Sessions")} />
+      {content}
     </ScreenView>
   );
 }

@@ -5,7 +5,6 @@ test.describe("Auth flows", () => {
     test("renders without errors", async ({ page }) => {
       await page.goto("/sign-in");
 
-      await page.waitForLoadState("networkidle");
       await expect(page).toHaveTitle(/./);
       const heading = page.getByRole("heading", { name: "Salafi Durus" });
       await expect(heading).toBeVisible();
@@ -14,7 +13,6 @@ test.describe("Auth flows", () => {
     test("social sign-in buttons are present", async ({ page }) => {
       await page.goto("/sign-in");
 
-      await page.waitForLoadState("networkidle");
       const appleButton = page.getByRole("button", { name: "Continue with Apple" });
       const googleButton = page.getByRole("button", { name: "Continue with Google" });
       await expect(appleButton).toBeVisible();

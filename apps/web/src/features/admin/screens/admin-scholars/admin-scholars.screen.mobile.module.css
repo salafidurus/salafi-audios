@@ -1,100 +1,25 @@
-.loading {
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.loading,
+.empty {
+  padding: var(--space-xl);
   text-align: center;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-md);
-}
-
-.pageTitle {
-  font-size: var(--typo-title-lg-font-size);
-  font-weight: 700;
-}
-
-.addButton {
-  padding: var(--space-xs) var(--space-component-gap-sm);
-  border-radius: var(--radius-xs);
-  border: none;
-  background: var(--action-primary);
-  color: var(--content-on-primary);
-  font-size: var(--typo-body-sm-font-size);
-}
-
-.form {
-  padding: var(--space-component-gap-sm);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-component-card);
-  margin-bottom: var(--space-md);
-}
-
-.formTitle {
-  margin-bottom: var(--space-sm);
-  font-size: var(--typo-title-md-font-size);
-}
-
-.input {
-  width: 100%;
-  padding: var(--space-sm);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-xs);
-  margin-bottom: var(--space-sm);
-}
-
-.checkboxGroup {
-  display: flex;
-  gap: var(--space-component-gap-sm);
-  margin-bottom: var(--space-sm);
-  font-size: var(--typo-body-sm-font-size);
-}
-
-.buttonGroup {
-  display: flex;
-  gap: var(--space-sm);
-}
-
-.saveButton {
-  padding: var(--space-xs) var(--space-component-gap-sm);
-  border-radius: var(--radius-xs);
-  border: none;
-  background: var(--action-success);
-  color: var(--content-on-success);
-}
-
-.cancelButton {
-  padding: var(--space-xs) var(--space-component-gap-sm);
-  border-radius: var(--radius-xs);
-  border: 1px solid var(--border-default);
-  background: var(--surface-default);
-}
-
-.scholarCard {
-  padding: var(--space-component-gap-sm);
-  border-bottom: 1px solid var(--border-subtle);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.scholarInfo {
-  flex: 1;
-}
-
-.scholarName {
-  font-weight: 600;
-}
-
-.scholarMeta {
-  font-size: var(--typo-caption-font-size);
   color: var(--content-muted);
+  font-size: var(--typo-body-md-font-size);
 }
 
-.editButton {
-  padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-xs);
-  border: 1px solid var(--border-default);
-  background: var(--surface-default);
-  font-size: var(--typo-caption-font-size);
+.toolbar {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
 }

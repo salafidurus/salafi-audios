@@ -5,11 +5,11 @@ import { SidebarDrawer } from "./sidebar-drawer";
 import { useNavigationStore } from "../../store/navigation-store";
 
 export function SidebarMobile() {
-  const { isMobileDrawerOpen, openMobileDrawer, closeMobileDrawer } = useNavigationStore();
+  const { isMobileDrawerOpen, toggleMobileDrawer, closeMobileDrawer } = useNavigationStore();
 
   return (
     <>
-      <MobileHeader onMenuClick={openMobileDrawer} />
+      <MobileHeader onMenuClick={toggleMobileDrawer} />
       <SidebarDrawer isOpen={isMobileDrawerOpen} onClose={closeMobileDrawer} />
     </>
   );

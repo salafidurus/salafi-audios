@@ -4,6 +4,9 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 import { useApiQuery, queryKeys, httpClient } from "@sd/core-contracts";
 import { endpoints, type AdminUserListDto } from "@sd/core-contracts";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { EmptyState } from "@/shared/components/EmptyState";
 import { UserSearchBar } from "@/features/admin/components/user-search-bar/user-search-bar";
 import { UserCard } from "@/features/admin/components/user-card/user-card";
 import styles from "./admin-users.screen.mobile.module.css";
@@ -25,32 +28,31 @@ export function AdminUsersMobileScreen(): ReactNode {
   const total = data?.total ?? 0;
 
   return (
-    <div className={styles.container}>
-      <h1 className={styles.pageTitle}>Admin Users</h1>
+    <ScreenView>
+      <PageHeader title="Admin Users" />
 
       <div className={styles.searchRow}>
         <UserSearchBar value={query} onChange={setQuery} onSubmit={() => setSearch(query)} />
       </div>
 
       {isFetching ? (
-        <div className={styles.loading}>Loading users…</div>
+        <EmptyState variant="loading" message="Loading users…" />
       ) : (
         <>
           <p className={styles.resultCount}>
             {total} user{total !== 1 ? "s" : ""} found
           </p>
-          <div className={styles.list}>
-            {users.map((user) => (
-              <UserCard key={user.id} user={user} />
-            ))}
-          </div>
-          {users.length === 0 && (
-            <div className={styles.empty}>
-              {search ? "No users match your search." : "No users found."}
+          {users.length === 0 ? (
+            <EmptyState message={search ? "No users match your search." : "No users found."} />
+          ) : (
+            <div className={styles.list}>
+              {users.map((user) => (
+                <UserCard key={user.id} user={user} />
+              ))}
             </div>
           )}
         </>
       )}
-    </div>
+    </ScreenView>
   );
 }

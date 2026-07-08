@@ -17,15 +17,13 @@ import { getSectionTabIcon } from "@/features/navigation/utils/section-tab-icons
 import styles from "./top-subnav-tabs.module.css";
 
 /**
- * Sticky horizontal subsection tabs shown below the TopAuthStrip on desktop.
- * On tablet/mobile the bottom bar handles subsection navigation, so this
- * renders nothing.
+ * Sticky horizontal subsection tabs shown below the TopAuthStrip on all screen sizes.
+ * On mobile, tabs are horizontally scrollable and hidden behind the mobile header.
  */
 export function TopSubnavTabs() {
   const pathname = usePathname();
   const { t } = useTranslation();
   const isHydrated = useIsHydrated();
-  const { isMobile, isTablet } = useResponsive();
 
   const section = getCurrentSection(pathname);
 

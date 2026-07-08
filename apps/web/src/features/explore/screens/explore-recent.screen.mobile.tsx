@@ -6,6 +6,7 @@ import { useExploreRecentScreen } from "@sd/domain-content";
 import { FeedListRow } from "../components/feed-list-row/feed-list-row";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { PageHeader } from "@/shared/components/PageHeader";
 import styles from "./explore-recent.screen.mobile.module.css";
 
 export type FeedMobileScreenProps = {
@@ -73,14 +74,13 @@ export function FeedMobileScreen({
 
   return (
     <ScreenView>
+      <PageHeader title="Feed" />
       {isFetching && items.length === 0 ? (
-        <p>Loading feed…</p>
+        <p className={styles.loading}>Loading feed…</p>
       ) : items.length === 0 ? (
-        <p>No content yet. Check back soon.</p>
+        <p className={styles.empty}>No content yet. Check back soon.</p>
       ) : (
         <>
-          <h2 className={styles.title}>Feed</h2>
-          <p className={styles.subtitle}>Scholarly, calm, and authentic Islamic knowledge</p>
           <FeedBlocks
             items={items}
             onNavigateToLecture={onNavigateToLecture}

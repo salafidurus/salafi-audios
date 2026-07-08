@@ -5,6 +5,7 @@ import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contract
 import type { ScholarListItemDto, AdminListingListItemDto } from "@sd/core-contracts";
 import Link from "next/link";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { Button } from "@/shared/components/Button";
 import styles from "./admin-scholar-detail.screen.mobile.module.css";
 import { ArrowLeft, Plus } from "lucide-react";
 
@@ -163,13 +164,13 @@ export function AdminScholarDetailMobileScreen({ id }: AdminScholarDetailMobileS
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>Series</h2>
-              <button
-                type="button"
-                className={styles.addBtn}
+              <Button
+                variant="primary"
+                icon={<Plus size={16} />}
                 onClick={() => dispatchForm({ creatingSeries: !creatingSeries })}
               >
-                <Plus size={16} /> Add
-              </button>
+                Add
+              </Button>
             </div>
 
             {creatingSeries && (
@@ -183,9 +184,9 @@ export function AdminScholarDetailMobileScreen({ id }: AdminScholarDetailMobileS
                   onChange={(e) => dispatchForm({ newSeriesTitle: e.target.value })}
                   required
                 />
-                <button type="submit" className={styles.saveBtn}>
+                <Button variant="primary" onClick={handleCreateSeries}>
                   Save
-                </button>
+                </Button>
               </form>
             )}
 
@@ -220,13 +221,13 @@ export function AdminScholarDetailMobileScreen({ id }: AdminScholarDetailMobileS
           <div className={styles.section}>
             <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>Collections</h2>
-              <button
-                type="button"
-                className={styles.addBtn}
+              <Button
+                variant="primary"
+                icon={<Plus size={16} />}
                 onClick={() => dispatchForm({ creatingCollection: !creatingCollection })}
               >
-                <Plus size={16} /> Add
-              </button>
+                Add
+              </Button>
             </div>
 
             {creatingCollection && (
@@ -240,9 +241,9 @@ export function AdminScholarDetailMobileScreen({ id }: AdminScholarDetailMobileS
                   onChange={(e) => dispatchForm({ newCollectionTitle: e.target.value })}
                   required
                 />
-                <button type="submit" className={styles.saveBtn}>
+                <Button variant="primary" onClick={handleCreateCollection}>
                   Save
-                </button>
+                </Button>
               </form>
             )}
 

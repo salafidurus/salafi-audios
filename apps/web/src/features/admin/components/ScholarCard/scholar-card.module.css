@@ -1,0 +1,80 @@
+.card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background-color: var(--surface-default);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-component-card);
+  transition: border-color 150ms, box-shadow 150ms;
+}
+
+.card:hover {
+  border-color: var(--border-default);
+  box-shadow: var(--shadow-sm);
+}
+
+.avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background-color: var(--surface-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarFallback {
+  font-size: var(--typo-title-md-font-size);
+  font-weight: 600;
+  color: var(--content-muted);
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+}
+
+.name {
+  font-size: var(--typo-body-md-font-size);
+  font-weight: 600;
+  color: var(--content-strong);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slug {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+  margin: 0;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+}
+
+.badge {
+  font-size: var(--typo-caption-font-size);
+  padding: 2px 6px;
+  background-color: var(--surface-primary-subtle);
+  color: var(--content-primary);
+  border-radius: var(--radius-sm);
+}
+
+.lectures {
+  font-size: var(--typo-caption-font-size);
+  color: var(--content-muted);
+}

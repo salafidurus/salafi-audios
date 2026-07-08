@@ -5,8 +5,6 @@ test("home page loads search landing", async ({ page }) => {
 
   await expect(page).toHaveTitle(/./);
 
-  await page.waitForLoadState("networkidle");
-
   const heading = page.getByText("Find a lesson");
   await expect(heading).toBeVisible();
 

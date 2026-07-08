@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { ScholarListItemDto, AdminListingListItemDto } from "@sd/core-contracts";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { Button } from "@/shared/components/Button";
 import styles from "./admin-scholar-detail.screen.desktop.module.css";
 import { ArrowLeft, Plus } from "lucide-react";
 
@@ -159,13 +160,13 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
           <div className={styles.panel}>
             <div className={styles.panelHeader}>
               <h2 className={styles.panelTitle}>Series</h2>
-              <button
-                type="button"
-                className={styles.addBtn}
+              <Button
+                variant="primary"
+                icon={<Plus size={16} />}
                 onClick={() => dispatch({ creatingSeries: !creatingSeries })}
               >
-                <Plus size={16} /> Add Series
-              </button>
+                Add Series
+              </Button>
             </div>
 
             {creatingSeries && (
@@ -188,16 +189,12 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
                   aria-label="Series order index"
                 />
                 <div className={styles.formActions}>
-                  <button type="submit" className={styles.saveBtn}>
+                  <Button variant="primary" onClick={handleCreateSeries}>
                     Save
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.cancelBtn}
-                    onClick={() => dispatch({ creatingSeries: false })}
-                  >
+                  </Button>
+                  <Button variant="outline" onClick={() => dispatch({ creatingSeries: false })}>
                     Cancel
-                  </button>
+                  </Button>
                 </div>
               </form>
             )}
@@ -233,13 +230,13 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
           <div className={styles.panel}>
             <div className={styles.panelHeader}>
               <h2 className={styles.panelTitle}>Collections</h2>
-              <button
-                type="button"
-                className={styles.addBtn}
+              <Button
+                variant="primary"
+                icon={<Plus size={16} />}
                 onClick={() => dispatch({ creatingCollection: !creatingCollection })}
               >
-                <Plus size={16} /> Add Collection
-              </button>
+                Add Collection
+              </Button>
             </div>
 
             {creatingCollection && (
@@ -262,16 +259,12 @@ export function AdminScholarDetailDesktopScreen({ id }: AdminScholarDetailDeskto
                   aria-label="Collection order index"
                 />
                 <div className={styles.formActions}>
-                  <button type="submit" className={styles.saveBtn}>
+                  <Button variant="primary" onClick={handleCreateCollection}>
                     Save
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.cancelBtn}
-                    onClick={() => dispatch({ creatingCollection: false })}
-                  >
+                  </Button>
+                  <Button variant="outline" onClick={() => dispatch({ creatingCollection: false })}>
                     Cancel
-                  </button>
+                  </Button>
                 </div>
               </form>
             )}
