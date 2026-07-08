@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import clsx from "clsx";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { routes } from "@sd/core-contracts";
 import { Menu } from "lucide-react";
