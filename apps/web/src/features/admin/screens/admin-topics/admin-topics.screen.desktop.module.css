@@ -1,6 +1,5 @@
 .container {
-  max-width: var(--space-layout-content-max);
-  margin: 0 auto;
+  /* Width handled by ScreenView (content screen: 70%/90%/100%) */
 }
 
 .loading {
