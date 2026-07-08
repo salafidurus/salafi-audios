@@ -11,6 +11,7 @@ type NavigationState = {
   isMobileDrawerOpen: boolean;
   openMobileDrawer: () => void;
   closeMobileDrawer: () => void;
+  toggleMobileDrawer: () => void;
 
   // Tablet sidebar (persisted, default collapsed)
   isTabletSidebarCollapsed: boolean;
@@ -35,6 +36,10 @@ export const useNavigationStore = create<NavigationState>()(
       isMobileDrawerOpen: false,
       openMobileDrawer: () => set({ isMobileDrawerOpen: true }),
       closeMobileDrawer: () => set({ isMobileDrawerOpen: false }),
+      toggleMobileDrawer: () =>
+        set((state) => ({
+          isMobileDrawerOpen: !state.isMobileDrawerOpen,
+        })),
 
       // Tablet sidebar (persisted, default collapsed)
       isTabletSidebarCollapsed: true,

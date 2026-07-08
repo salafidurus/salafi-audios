@@ -11,7 +11,20 @@
 /* Mobile: subnav sticks below fixed header */
 @media (max-width: 640px) {
   .tabsContainer {
-    top: calc(var(--mobile-header-height) + env(safe-area-inset-top));
+    display: block;
+    top: calc(var(--mobile-header-height, 3.5rem) + env(safe-area-inset-top));
+  }
+
+  .inner {
+    width: 100%;
+    padding: 0 var(--space-layout-page-x);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .inner::-webkit-scrollbar {
+    display: none;
   }
 }
 
