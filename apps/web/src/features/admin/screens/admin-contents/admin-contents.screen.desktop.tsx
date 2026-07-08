@@ -1,20 +1,38 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Edit } from "lucide-react";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
-import type { TopicDetailDto } from "@sd/core-contracts";
+import type {
+  TopicDetailDto,
+  AdminListingDetailDto,
+  AdminListingListDto,
+} from "@sd/core-contracts";
 import { createTopic, updateTopic, deleteTopic } from "@/features/admin/api/admin.api";
+import {
+  fetchAdminLectures,
+  fetchAdminLectureDetail,
+} from "@/features/admin/api/admin-lectures.api";
 import {
   AdminContentsTabs,
   type AdminContentsTab,
 } from "@/features/admin/components/AdminContentsTabs";
 import { AdminSearchBar } from "@/features/admin/components/AdminSearchBar";
 import { TopicFormModal, type TopicForEdit } from "@/features/admin/components/TopicFormModal";
+import { AudioUploader } from "@/features/admin/components/AudioUploader/AudioUploader";
+import { LectureEditModal } from "@/features/admin/components/LectureEditModal";
 import styles from "./admin-contents.screen.desktop.module.css";
+
+type AudioData = {
+  audioKey: string;
+  durationSeconds: number;
+  sizeBytes: number;
+  format: string;
+  filename: string;
+};
 
 export function AdminContentsDesktopScreen() {
   const [activeTab, setActiveTab] = useState<AdminContentsTab>("topics");
@@ -24,6 +42,12 @@ export function AdminContentsDesktopScreen() {
   const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
   const [editingTopic, setEditingTopic] = useState<TopicForEdit | null>(null);
 
+  // Listings state
+  const [isAudioUploaderOpen, setIsAudioUploaderOpen] = useState(false);
+  const [isListingModalOpen, setIsListingModalOpen] = useState(false);
+  const [selectedListing, setSelectedListing] = useState<AdminListingDetailDto | null>(null);
+  const [initialAudioData, setInitialAudioData] = useState<AudioData | null>(null);
+
   // Fetch topics
   const { data: topicsData, refetch: refetchTopics } = useApiQuery<TopicDetailDto[]>(
     queryKeys.topics.list(),
@@ -31,6 +55,15 @@ export function AdminContentsDesktopScreen() {
   );
 
   const topics = topicsData ?? [];
+
+  // Fetch listings
+  const { data: listingsData, refetch: refetchListings } = useApiQuery<AdminListingListDto>(
+    ["admin", "listings", "list", { search: searchQuery }],
+    () => fetchAdminLectures({ search: searchQuery, page: 1, limit: 100 }),
+    { enabled: activeTab === "listings" },
+  );
+
+  const listings = listingsData?.items ?? [];
 
   const filteredTopics = useMemo(() => {
     if (!searchQuery.trim()) return topics;
@@ -71,6 +104,36 @@ export function AdminContentsDesktopScreen() {
     }
   };
 
+  // Listing handlers
+  const handleOpenAddListing = () => {
+    setIsAudioUploaderOpen(true);
+  };
+
+  const handleUploadComplete = (audioInfo: AudioData | null) => {
+    setInitialAudioData(audioInfo);
+    setSelectedListing(null);
+    setIsAudioUploaderOpen(false);
+    setIsListingModalOpen(true);
+  };
+
+  const handleEditListing = async (listingId: string) => {
+    try {
+      const details = await fetchAdminLectureDetail(listingId);
+      setSelectedListing(details);
+      setInitialAudioData(null);
+      setIsListingModalOpen(true);
+    } catch {
+      // Stay on current view
+    }
+  };
+
+  const handleListingSaved = () => {
+    setIsListingModalOpen(false);
+    setSelectedListing(null);
+    setInitialAudioData(null);
+    refetchListings();
+  };
+
   return (
     <ScreenView>
       <PageHeader
@@ -81,7 +144,7 @@ export function AdminContentsDesktopScreen() {
               Add Topic
             </Button>
           ) : (
-            <Button variant="primary" icon={<Plus size={18} />} onClick={() => {}}>
+            <Button variant="primary" icon={<Plus size={18} />} onClick={handleOpenAddListing}>
               Add Listing
             </Button>
           )
@@ -127,9 +190,29 @@ export function AdminContentsDesktopScreen() {
       )}
 
       {activeTab === "listings" && (
-        <div className={styles.listingsInfo}>
-          {/* The existing admin-lectures screen already handles listing management. */}
-          <p>See the Lectures admin page for full listing management.</p>
+        <div className={styles.listingsList}>
+          {listings.map((listing) => (
+            <div key={listing.id} className={styles.listingItem}>
+              <div className={styles.listingInfo}>
+                <span className={styles.listingTitle}>{listing.title}</span>
+                <span className={styles.listingMeta}>
+                  {listing.scholarName} • {listing.status}
+                </span>
+              </div>
+              <div className={styles.listingActions}>
+                <Button variant="ghost" size="sm" onClick={() => handleEditListing(listing.id)}>
+                  <Edit size={14} />
+                </Button>
+              </div>
+            </div>
+          ))}
+          {listings.length === 0 && (
+            <div className={styles.empty}>
+              {searchQuery
+                ? "No listings match your search."
+                : "No listings yet. Add audio to create a listing."}
+            </div>
+          )}
         </div>
       )}
 
@@ -139,6 +222,22 @@ export function AdminContentsDesktopScreen() {
         onClose={() => setIsTopicModalOpen(false)}
         onSave={handleSaveTopic}
         topic={editingTopic}
+      />
+
+      {/* Audio Uploader */}
+      <AudioUploader
+        isOpen={isAudioUploaderOpen}
+        onClose={() => setIsAudioUploaderOpen(false)}
+        onComplete={handleUploadComplete}
+      />
+
+      {/* Listing Modal */}
+      <LectureEditModal
+        isOpen={isListingModalOpen}
+        onClose={() => setIsListingModalOpen(false)}
+        onSuccess={handleListingSaved}
+        lecture={selectedListing}
+        initialAudioData={initialAudioData}
       />
     </ScreenView>
   );

@@ -55,3 +55,40 @@
   color: var(--content-muted);
   font-size: var(--typo-body-md-font-size);
 }
+
+.listingsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.listingItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--surface-default);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.listingInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.listingTitle {
+  font-weight: 500;
+  color: var(--content-strong);
+}
+
+.listingMeta {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+}
+
+.listingActions {
+  display: flex;
+  gap: var(--space-xs);
+}
