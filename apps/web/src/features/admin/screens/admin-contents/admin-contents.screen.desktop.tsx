@@ -225,11 +225,7 @@ export function AdminContentsDesktopScreen() {
       />
 
       {/* Audio Uploader */}
-      <AudioUploader
-        isOpen={isAudioUploaderOpen}
-        onClose={() => setIsAudioUploaderOpen(false)}
-        onComplete={handleUploadComplete}
-      />
+      {isAudioUploaderOpen && <AudioUploader onUploadComplete={handleUploadComplete} />}
 
       {/* Listing Modal */}
       <LectureEditModal
