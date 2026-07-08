@@ -35,6 +35,14 @@ function AppFontsProvider({ children }: { children: ReactNode }) {
     "GeistMono-Medium": require("../../assets/fonts/GeistMono-Medium.ttf"),
     "GeistMono-SemiBold": require("../../assets/fonts/GeistMono-SemiBold.ttf"),
     "GeistMono-Bold": require("../../assets/fonts/GeistMono-Bold.ttf"),
+    "Alexandria-Regular": require("../../assets/fonts/Alexandria-Regular.ttf"),
+    "Alexandria-Medium": require("../../assets/fonts/Alexandria-Medium.ttf"),
+    "Alexandria-SemiBold": require("../../assets/fonts/Alexandria-SemiBold.ttf"),
+    "Alexandria-Bold": require("../../assets/fonts/Alexandria-Bold.ttf"),
+    "IBMPlexSansArabic-Regular": require("../../assets/fonts/IBMPlexSansArabic-Regular.ttf"),
+    "IBMPlexSansArabic-Medium": require("../../assets/fonts/IBMPlexSansArabic-Medium.ttf"),
+    "IBMPlexSansArabic-SemiBold": require("../../assets/fonts/IBMPlexSansArabic-SemiBold.ttf"),
+    "IBMPlexSansArabic-Bold": require("../../assets/fonts/IBMPlexSansArabic-Bold.ttf"),
   });
 
   if (!loaded) {
