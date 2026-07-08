@@ -5,7 +5,6 @@ import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contract
 import type { ScholarListItemDto, AdminListingListItemDto } from "@sd/core-contracts";
 import Link from "next/link";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
 import styles from "./admin-scholar-detail.screen.mobile.module.css";
 import { ArrowLeft, Plus } from "lucide-react";
