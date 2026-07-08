@@ -1,8 +1,9 @@
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { Public } from '../../modules/auth/decorators';
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseInterceptors } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import type { TopicDetailDto, TopicViewDto, TopicLectureViewDto } from '@sd/core-contracts';
 import { TopicsService } from './topics.service';
 
@@ -11,6 +12,8 @@ import { TopicsService } from './topics.service';
 @ApiCommonErrors()
 @Public()
 @Controller('topics')
+@UseInterceptors(CacheInterceptor) // Cache all routes in this controller
+@CacheTTL(600) // 10 minutes cache (topics change infrequently)
 export class TopicsController {
   constructor(private readonly topics: TopicsService) {}
 

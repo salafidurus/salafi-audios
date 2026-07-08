@@ -1,0 +1,24 @@
+{
+  // Root tsconfig for project references — enables incremental type-checking across the monorepo.
+  // Use `tsc -b` to type-check all referenced projects in dependency order.
+  // This provides:
+  // - Faster incremental builds (only changed projects are re-checked)
+  // - Better IDE performance (watches only relevant files)
+  // - Proper cross-package type resolution
+  "files": [],
+  "references": [
+    { "path": "./packages/core-api" },
+    { "path": "./packages/core-db" },
+    { "path": "./packages/core-contracts" },
+    { "path": "./packages/core-i18n" },
+    { "path": "./packages/design-tokens" },
+    { "path": "./packages/domain-account" },
+    { "path": "./packages/domain-audio" },
+    { "path": "./packages/domain-content" },
+    { "path": "./packages/domain-live" },
+    { "path": "./packages/domain-search" },
+    { "path": "./apps/api" },
+    { "path": "./apps/web" },
+    { "path": "./apps/native" }
+  ]
+}

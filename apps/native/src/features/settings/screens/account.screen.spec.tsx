@@ -19,7 +19,9 @@ jest.mock("@/core/i18n/use-translation", () => ({
 }));
 
 jest.mock("@/features/settings/components/language-switch/language-switch", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require("react");
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { Text } = require("react-native");
   return {
     LanguageSwitch: () => React.createElement(Text, null, "LanguageSwitch"),
@@ -27,7 +29,9 @@ jest.mock("@/features/settings/components/language-switch/language-switch", () =
 });
 
 jest.mock("@/features/settings/components/content-language-toggle/content-language-toggle", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require("react");
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { Text } = require("react-native");
   return {
     ContentLanguageToggle: () => React.createElement(Text, null, "ContentLanguageToggle"),

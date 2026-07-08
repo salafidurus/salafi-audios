@@ -2,8 +2,12 @@
   // Editor / typecheck only — build settings live in tsconfig.build.json.
   "extends": "../../tsconfig.packages.json",
   "compilerOptions": {
-    "noEmit": true
+    "noEmit": true,
+    // Project reference support for incremental builds
+    "composite": true,
+    "incremental": true,
+    "types": ["bun-types", "vitest/globals", "node"]
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist", "**/*.spec.ts", "**/*.test.ts"]
 }

@@ -1,4 +1,5 @@
-import { Controller, Get, Query, Param, Sse, MessageEvent } from '@nestjs/common';
+import { Controller, Get, Query, Param, Sse } from '@nestjs/common';
+import type { MessageEvent } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import { Observable, merge, interval, map } from 'rxjs';

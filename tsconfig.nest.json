@@ -1,15 +1,17 @@
 {
-  // NestJS/Node backend services: CommonJS runtime with classic node resolution.
-  // apps/api relies on classic "node" resolution to read built core-* .d.ts files.
+  // NestJS/Node backend services: CommonJS runtime with Bun-compatible bundler resolution.
+  // Updated for Bun compatibility while maintaining NestJS decorator requirements.
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
+    // NestJS CLI expects CommonJS output
     "module": "CommonJS",
+    // CommonJS requires "node" resolution; "bundler" only works with ES modules
     "moduleResolution": "node",
     // Required for NestJS decorator-based dependency injection and metadata reflection
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    // esModuleInterop inherited from base, but explicit here for CommonJS interop
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
     // emitDecoratorMetadata synthesises require() for type imports — incompatible with verbatimModuleSyntax
     "verbatimModuleSyntax": false
   }

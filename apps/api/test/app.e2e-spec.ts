@@ -1,25 +1,26 @@
 import '../src/shared/utils/env.bootstrap';
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { Test } from '@nestjs/testing';
+import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
-import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
+import { createTestApp } from '../src/test/create-test-app';
 
 describe('AppController (e2e)', () => {
-  let app: INestApplication<App>;
+  let app: NestFastifyApplication;
 
   beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
+    const moduleBuilder = Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    });
 
-    app = moduleFixture.createNestApplication();
-    await app.init();
+    app = await createTestApp(moduleBuilder);
   });
 
-  it('/health/live (GET)', () => {
+  afterEach(() => app.close());
+
+  it('/health/healthz (GET)', () => {
     return request(app.getHttpServer())
-      .get('/health/live')
+      .get('/health/healthz')
       .expect(200)
       .expect((res) => {
         expect(res.body.status).toBe('ok');

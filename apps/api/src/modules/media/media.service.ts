@@ -9,7 +9,7 @@ export class MediaService {
   private readonly s3: S3Client;
   private readonly publicBaseUrl: string;
 
-  constructor(private readonly config: ConfigService) {
+  constructor(config: ConfigService) {
     this.publicBaseUrl = config.R2_PUBLIC_BASE_URL;
     this.s3 = new S3Client({
       accessKeyId: config.R2_ACCESS_KEY_ID,

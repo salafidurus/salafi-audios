@@ -35,7 +35,7 @@ export class AudioRepository {
     userId: string,
     listingId: string,
     positionSeconds: number,
-    durationSeconds?: number,
+    _durationSeconds?: number,
     isCompleted?: boolean,
   ): Promise<void> {
     await this.prisma.userListingProgress.upsert({
@@ -90,18 +90,29 @@ export class AudioRepository {
   async findListingById(listingId: string) {
     return this.prisma.listing.findUnique({
       where: { id: listingId },
+      select: { id: true, durationSeconds: true }, // Only fetch fields needed for stream response
     });
   }
 
   async findPrimaryAsset(listingId: string) {
     return this.prisma.audioAsset.findFirst({
       where: { listingId, isPrimary: true },
+      select: {
+        url: true,
+        durationSeconds: true,
+        format: true,
+      }, // Only fetch fields needed for stream response
     });
   }
 
   async findFirstAsset(listingId: string) {
     return this.prisma.audioAsset.findFirst({
       where: { listingId },
+      select: {
+        url: true,
+        durationSeconds: true,
+        format: true,
+      }, // Only fetch fields needed for stream response
     });
   }
 }

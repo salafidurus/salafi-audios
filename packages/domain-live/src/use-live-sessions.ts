@@ -15,7 +15,8 @@ export function useLiveSessions() {
   );
 
   useEffect(() => {
-    if (typeof window === "undefined" || !("EventSource" in window)) {
+    const win = globalThis as any;
+    if (typeof win.window === "undefined" || !("EventSource" in win.window)) {
       return;
     }
 
@@ -23,9 +24,10 @@ export function useLiveSessions() {
     if (!baseUrl) return;
 
     // Connect to SSE stream
+    const EventSource = win.window.EventSource;
     const eventSource = new EventSource(`${baseUrl}/live/stream`);
 
-    eventSource.onmessage = (event) => {
+    eventSource.onmessage = (event: any) => {
       try {
         const payload = JSON.parse(event.data);
         if (payload.type === "session_update" && payload.session) {
@@ -59,12 +61,12 @@ export function useLiveSessions() {
             upcoming.setSessions(remove);
           }
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Failed to parse SSE livestream message:", err);
       }
     };
 
-    eventSource.onerror = (err) => {
+    eventSource.onerror = (err: any) => {
       console.error("SSE livestream connection error. Browser will auto-reconnect.", err);
     };
 

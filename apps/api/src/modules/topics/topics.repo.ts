@@ -1,12 +1,12 @@
 import { PrismaService } from '../../shared/db/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { Prisma, Status } from '@sd/core-db';
-import {
+import type {
   TopicDetailDto,
   TopicViewDto,
   TopicLectureViewDto,
   TranslationViewDto,
-  type Locale,
+  Locale,
 } from '@sd/core-contracts';
 import { UpsertTopicDto } from './dto/upsert-topic.dto';
 import { SaveTopicTranslationDto } from './dto/save-topic-translation.dto';

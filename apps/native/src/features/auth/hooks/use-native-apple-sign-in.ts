@@ -56,7 +56,7 @@ export function useNativeAppleSignIn() {
         throw new Error(`Server returned ${response.status}: ${body}`);
       }
 
-      const { session } = await response.json();
+      const { session } = (await response.json()) as { session: { id: string } };
 
       // Persist session token using better-auth expo client storage
       await SecureStore.setItemAsync("better-auth.session_token", session.id);

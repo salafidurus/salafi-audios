@@ -3,10 +3,14 @@
   "compilerOptions": {
     // Next.js handles JSX transformation via SWC; TS should not transform it
     "jsx": "preserve",
+    // Note: composite disabled due to Better Auth type inference issue
+    // See: https://better-auth.com/docs/concepts/typescript
+    "incremental": true,
+    "lib": ["ESNext", "dom"],
     "paths": {
       "@/*": ["./src/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", ".next"]
 }

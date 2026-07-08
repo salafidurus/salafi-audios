@@ -719,7 +719,7 @@ export class SearchRepository {
   }
 
   private async fetchTitleTranslations(
-    entity: SearchEntity,
+    _entity: SearchEntity,
     ids: string[],
     locale: Locale,
   ): Promise<Map<string, { title: string }>> {

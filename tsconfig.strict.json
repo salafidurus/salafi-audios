@@ -1,0 +1,19 @@
+{
+  // Stricter TypeScript preset - opt-in for packages/apps that want maximum type safety.
+  // Extends base config with additional checks for code quality.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    // Detect unused variables and imports
+    "noUnusedLocals": true,
+    // Detect unused function parameters
+    "noUnusedParameters": true,
+    // Require explicit types when accessing object properties with index signatures
+    "noPropertyAccessFromIndexSignature": true,
+    // Ensure all code paths return a value in functions with return type
+    "noImplicitReturns": true,
+    // Require explicit 'override' keyword when overriding base class members
+    "noImplicitOverride": true,
+    // Catch implicit any in ...rest parameters
+    "noUncheckedSideEffectImports": true
+  }
+}

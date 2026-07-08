@@ -10,55 +10,55 @@ import { Shield } from "lucide-react";
 import { Badge } from "./Badge";
 
 // ✅ Valid: Permission badge with icon
-const PermissionWithIcon = () => (
+const _PermissionWithIcon = () => (
   <Badge variant="permission" permission="read:users" icon={<Shield />} />
 );
 
 // ✅ Valid: Permission badge without icon
-const PermissionWithoutIcon = () => <Badge variant="permission" permission="write:posts" />;
+const _PermissionWithoutIcon = () => <Badge variant="permission" permission="write:posts" />;
 
 // ✅ Valid: Admin role badge
-const AdminRole = () => <Badge variant="role" role="admin" />;
+const _AdminRole = () => <Badge variant="role" role="admin" />;
 
 // ✅ Valid: User role badge
-const UserRole = () => <Badge variant="role" role="user" />;
+const _UserRole = () => <Badge variant="role" role="user" />;
 
 // ✅ Valid: Status badge with explicit color
-const StatusWithColor = () => <Badge variant="status" status="Active" color="success" />;
+const _StatusWithColor = () => <Badge variant="status" status="Active" color="success" />;
 
 // ✅ Valid: Status badge with default color
-const StatusWithDefaultColor = () => <Badge variant="status" status="Pending" />;
+const _StatusWithDefaultColor = () => <Badge variant="status" status="Pending" />;
 
 // Invalid: permission variant missing required permission prop
 // @ts-expect-error
-const InvalidPermissionMissingProp = () => <Badge variant="permission" />;
+const _InvalidPermissionMissingProp = () => <Badge variant="permission" />;
 
 // Invalid: role variant missing required role prop
 // @ts-expect-error
-const InvalidRoleMissingProp = () => <Badge variant="role" />;
+const _InvalidRoleMissingProp = () => <Badge variant="role" />;
 
 // Invalid: role variant with invalid role value
 // @ts-expect-error
-const InvalidRoleValue = () => <Badge variant="role" role="superadmin" />;
+const _InvalidRoleValue = () => <Badge variant="role" role="superadmin" />;
 
 // Invalid: status variant missing required status prop
 // @ts-expect-error
-const InvalidStatusMissingProp = () => <Badge variant="status" />;
+const _InvalidStatusMissingProp = () => <Badge variant="status" />;
 
 // Invalid: status variant with invalid color value
-const InvalidStatusColor = () => (
+const _InvalidStatusColor = () => (
   // @ts-expect-error
   <Badge variant="status" status="Active" color="danger" />
 );
 
 // Invalid: permission variant cannot have role prop
-const InvalidPermissionWithRole = () => (
+const _InvalidPermissionWithRole = () => (
   // @ts-expect-error
   <Badge variant="permission" permission="read:users" role="admin" />
 );
 
 // Invalid: role variant cannot have permission prop
-const InvalidRoleWithPermission = () => (
+const _InvalidRoleWithPermission = () => (
   // @ts-expect-error
   <Badge variant="role" role="admin" permission="read:users" />
 );

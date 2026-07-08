@@ -1,7 +1,8 @@
 import { vi } from 'vitest';
-import { INestApplication } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
+import { FastifyAdapter } from '@nestjs/platform-fastify';
+import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { AuthGuard } from '../auth/auth.guard';
 import { ExploreController } from './explore.controller';
@@ -18,7 +19,7 @@ const mockExploreService = {
 };
 
 describe('ExploreController — auth boundaries', () => {
-  let app: INestApplication;
+  let app: NestFastifyApplication;
 
   beforeEach(async () => {
     mockAuth.api.getSession.mockReset();
@@ -31,8 +32,9 @@ describe('ExploreController — auth boundaries', () => {
       ],
     }).compile();
 
-    app = module.createNestApplication();
+    app = module.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
     await app.init();
+    await app.getHttpAdapter().getInstance().ready();
   });
 
   afterEach(() => app.close());

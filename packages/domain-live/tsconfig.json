@@ -8,7 +8,13 @@
     // react-jsx uses the automatic runtime (React 17+) — no manual React import needed
     "jsx": "react-jsx",
     // Many React Native / Expo packages ship CJS — esModuleInterop enables default imports from them
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    // Add DOM types for EventSource and window - remove types array to allow DOM lib types
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    // Project reference support for incremental builds
+    "composite": true,
+    "incremental": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "**/*.spec.ts", "**/*.test.ts"]
 }

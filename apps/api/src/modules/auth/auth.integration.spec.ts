@@ -1,7 +1,9 @@
 import { vi } from 'vitest';
-import { Controller, Get, INestApplication } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
+import { FastifyAdapter } from '@nestjs/platform-fastify';
+import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { Public } from './decorators';
 import { AuthGuard } from './auth.guard';
@@ -24,7 +26,7 @@ class TestController {
 }
 
 describe('AuthGuard — HTTP integration', () => {
-  let app: INestApplication;
+  let app: NestFastifyApplication;
 
   beforeEach(async () => {
     mockAuth.api.getSession.mockReset();
@@ -34,8 +36,9 @@ describe('AuthGuard — HTTP integration', () => {
       providers: [{ provide: APP_GUARD, useClass: AuthGuard }],
     }).compile();
 
-    app = module.createNestApplication();
+    app = module.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
     await app.init();
+    await app.getHttpAdapter().getInstance().ready();
   });
 
   afterEach(() => app.close());

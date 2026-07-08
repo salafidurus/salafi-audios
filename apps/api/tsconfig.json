@@ -1,10 +1,14 @@
 {
   // Editor / typecheck only — does not emit. NestJS CLI uses tsconfig.build.json.
+  // Project reference support for incremental builds.
   "extends": "../../tsconfig.nest.json",
   "compilerOptions": {
     "noEmit": true,
     "noFallthroughCasesInSwitch": true,
-    "types": ["vitest/globals", "node", "bun-types"]
+    "composite": true,
+    "incremental": true,
+    "types": ["bun-types", "vitest/globals", "node"]
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "test/**/*.ts"]
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "test/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

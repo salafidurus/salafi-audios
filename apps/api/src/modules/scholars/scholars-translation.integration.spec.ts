@@ -1,8 +1,11 @@
 import { vi } from 'vitest';
-import { ForbiddenException, INestApplication } from '@nestjs/common';
+import { ForbiddenException } from '@nestjs/common';
+import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
+import { CacheModule } from '@nestjs/cache-manager';
 import request from 'supertest';
+import { createTestApp } from '../../test/create-test-app';
 import { AuthGuard } from '../auth/auth.guard';
 import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { ScholarsController } from './scholars.controller';
@@ -35,8 +38,9 @@ const mockScholarsService = {
   unpublishTranslation: vi.fn().mockResolvedValue(draftTranslation),
 };
 
-async function buildApp(overrideGuard?: () => boolean | never): Promise<INestApplication> {
+async function buildApp(overrideGuard?: () => boolean | never): Promise<NestFastifyApplication> {
   const builder = Test.createTestingModule({
+    imports: [CacheModule.register({ isGlobal: true, ttl: 0 })],
     controllers: [ScholarsController, ScholarsTranslationsController],
     providers: [
       { provide: APP_GUARD, useClass: AuthGuard },
@@ -48,14 +52,11 @@ async function buildApp(overrideGuard?: () => boolean | never): Promise<INestApp
       canActivate: overrideGuard ?? (() => true),
     });
 
-  const module = await builder.compile();
-  const app = module.createNestApplication();
-  await app.init();
-  return app;
+  return createTestApp(builder);
 }
 
 describe('ScholarsTranslationsController — auth boundaries', () => {
-  let app: INestApplication;
+  let app: NestFastifyApplication;
 
   beforeEach(async () => {
     mockAuth.api.getSession.mockReset();
@@ -133,7 +134,7 @@ describe('ScholarsTranslationsController — auth boundaries', () => {
   });
 
   describe('missing manage:content permission', () => {
-    let forbiddenApp: INestApplication;
+    let forbiddenApp: NestFastifyApplication;
 
     beforeEach(async () => {
       mockAuth.api.getSession.mockResolvedValue({
