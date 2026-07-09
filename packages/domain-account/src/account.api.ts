@@ -31,3 +31,17 @@ export function useUpdateProfile() {
     },
   });
 }
+
+export function useDeleteAccount() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () =>
+      httpClient<void>({
+        url: endpoints.account.deleteAccount,
+        method: "DELETE",
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.account.all });
+    },
+  });
+}

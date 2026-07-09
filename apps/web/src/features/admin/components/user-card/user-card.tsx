@@ -1,16 +1,18 @@
 import type { ReactNode } from "react";
 import type { AdminUserListItemDto } from "@sd/core-contracts";
-import { ShieldOff } from "lucide-react";
+import { Shield, ShieldOff } from "lucide-react";
 import { UserAvatar } from "@/features/admin/components/user-avatar/user-avatar";
 import { PermissionBadge } from "@/features/admin/components/permission-badge/permission-badge";
 import { RoleBadge } from "@/features/admin/components/role-badge/role-badge";
+import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
 import styles from "./user-card.module.css";
 
 type UserCardProps = {
   user: AdminUserListItemDto;
+  onManagePermissions?: () => void;
 };
 
-export function UserCard({ user }: UserCardProps): ReactNode {
+export function UserCard({ user, onManagePermissions }: UserCardProps): ReactNode {
   return (
     <div className={styles.card}>
       <div className={styles.topRow}>
@@ -34,6 +36,13 @@ export function UserCard({ user }: UserCardProps): ReactNode {
       </div>
 
       <div className={styles.joined}>Joined {new Date(user.createdAt).toLocaleDateString()}</div>
+
+      <PermissionGate requires="manage:users">
+        <button type="button" className={styles.manageButton} onClick={onManagePermissions}>
+          <Shield className={styles.manageIcon} />
+          Manage Permissions
+        </button>
+      </PermissionGate>
     </div>
   );
 }

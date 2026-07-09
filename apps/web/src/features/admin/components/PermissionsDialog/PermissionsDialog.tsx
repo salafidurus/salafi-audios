@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import type { ReactNode } from "react";
 import { ADMIN_PERMISSIONS, type AdminPermission } from "@sd/core-contracts";
 import {
   fetchUserPermissions,
@@ -8,69 +9,72 @@ import {
   revokePermission,
   type AdminPermissionsListResponse,
 } from "@/features/admin/api/admin.api";
+import { PERMISSION_LABELS, PERMISSION_DESCRIPTIONS } from "@/features/admin/constants/permissions";
 import { Modal } from "@/shared/components/Modal/Modal";
 import { Button } from "@/shared/components/Button";
 import styles from "./PermissionsDialog.module.css";
 
 export interface PermissionsDialogProps {
-  /** Whether dialog is open */
   isOpen: boolean;
-  /** Callback to close dialog */
   onClose: () => void;
-  /** User ID for which to manage permissions */
+  onPermissionsChange?: () => void;
   userId: string;
-  /** User display name (for header) */
   userName?: string;
 }
 
 export function PermissionsDialog({
   isOpen,
   onClose,
+  onPermissionsChange,
   userId,
   userName = userId,
-}: PermissionsDialogProps) {
+}: PermissionsDialogProps): ReactNode {
   const [userPerms, setUserPerms] = useState<AdminPermissionsListResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string | null>>({});
 
-  // Load permissions when dialog opens
+  const loadPermissions = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchUserPermissions(userId);
+      setUserPerms(data);
+    } catch {
+      setUserPerms({ permissions: [] });
+    } finally {
+      setLoading(false);
+    }
+  }, [userId]);
+
   useEffect(() => {
     if (!isOpen) return;
-
-    const loadPermissions = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchUserPermissions(userId);
-        setUserPerms(data);
-      } catch (error) {
-        console.error("Failed to load permissions:", error);
-        setUserPerms({ permissions: [] });
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadPermissions();
-  }, [isOpen, userId]);
+  }, [isOpen, loadPermissions]);
 
   const handleGrant = async (permission: AdminPermission) => {
     setLoading(true);
+    setErrors((prev) => ({ ...prev, [permission]: null }));
     try {
       const data = await grantPermission(userId, permission);
       setUserPerms(data);
+      onPermissionsChange?.();
     } catch (error) {
-      console.error("Failed to grant permission:", error);
+      const message = error instanceof Error ? error.message : "Failed to grant permission";
+      setErrors((prev) => ({ ...prev, [permission]: message }));
     } finally {
       setLoading(false);
     }
   };
 
-  const handleRevoke = async (permission: string) => {
+  const handleRevoke = async (permission: AdminPermission) => {
     setLoading(true);
+    setErrors((prev) => ({ ...prev, [permission]: null }));
     try {
       const data = await revokePermission(userId, permission);
       setUserPerms(data);
+      onPermissionsChange?.();
     } catch (error) {
-      console.error("Failed to revoke permission:", error);
+      const message = error instanceof Error ? error.message : "Failed to revoke permission";
+      setErrors((prev) => ({ ...prev, [permission]: message }));
     } finally {
       setLoading(false);
     }
@@ -81,7 +85,7 @@ export function PermissionsDialog({
   if (!isOpen) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={`Manage Permissions - ${userName}`}>
+    <Modal isOpen={isOpen} onClose={onClose} title={`Manage Permissions — ${userName}`}>
       <div className={styles.container}>
         {loading && !userPerms ? (
           <div className={styles.loading}>Loading permissions…</div>
@@ -89,17 +93,15 @@ export function PermissionsDialog({
           <div className={styles.permissionsList}>
             {ADMIN_PERMISSIONS.map((perm) => {
               const hasIt = currentPermissions.includes(perm);
+              const error = errors[perm];
               return (
                 <div key={perm} className={styles.permissionItem}>
                   <div className={styles.permissionInfo}>
-                    <code className={styles.permissionName}>{perm}</code>
-                    <span
-                      className={`${styles.permissionStatus} ${
-                        hasIt ? styles.statusGranted : styles.statusNotGranted
-                      }`}
-                    >
-                      {hasIt ? "Granted" : "Not granted"}
+                    <span className={styles.permissionName}>{PERMISSION_LABELS[perm]}</span>
+                    <span className={styles.permissionDescription}>
+                      {PERMISSION_DESCRIPTIONS[perm]}
                     </span>
+                    {error && <span className={styles.error}>{error}</span>}
                   </div>
                   <div className={styles.actions}>
                     {hasIt ? (
