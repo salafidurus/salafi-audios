@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { Plus, Trash2, Edit } from "lucide-react";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
@@ -40,8 +41,12 @@ const EMPTY_LISTINGS_ARRAY: AdminListingDetailDto[] = [];
 
 export function AdminContentsScreen() {
   const isDesktop = useIsDesktop();
-  const [activeTab, setActiveTab] = useState<AdminContentsTab>("topics");
+  const pathname = usePathname();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Derive active tab from URL pathname
+  const activeTab: AdminContentsTab = pathname.includes("/listings") ? "listings" : "topics";
 
   // Topics state
   const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
@@ -166,7 +171,13 @@ export function AdminContentsScreen() {
         }
       />
 
-      <AdminContentsTabs activeTab={activeTab} onTabChange={setActiveTab} />
+      <AdminContentsTabs
+        activeTab={activeTab}
+        onTabChange={(tab) => {
+          const path = tab === "topics" ? "/admin/contents" : "/admin/contents/listings";
+          router.push(path);
+        }}
+      />
 
       <AdminSearchBar
         value={searchQuery}
