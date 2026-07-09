@@ -1,7 +1,7 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .error {
@@ -13,37 +13,206 @@
   font-size: var(--typo-body-sm-font-size);
 }
 
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: var(--typo-title-md-font-size);
+  font-weight: 600;
+  color: var(--content-default);
+}
+
 .field {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
+}
+
+/* Desktop/Tablet: horizontal layout with label and input+button on same line */
+@media (min-width: 641px) {
+  .field {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-lg);
+  }
+
+  .label {
+    flex-shrink: 0;
+    width: 120px;
+    text-align: right;
+  }
+
+  .fieldInputGroup {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+}
+
+/* Mobile: vertical layout with label on top, input+button below */
+@media (max-width: 640px) {
+  .label {
+    width: 100%;
+    padding-left: var(--space-xs);
+  }
+
+  .fieldInputGroup {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
 }
 
 .label {
   font-size: var(--typo-label-md-font-size);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--content-default);
+  letter-spacing: 0.5px;
+}
+
+.fieldInputGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.editIconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xs) var(--space-sm);
+  background-color: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--content-subtle);
+  transition: all 150ms ease-out;
+  flex-shrink: 0;
+  min-width: 36px;
+  height: 36px;
+}
+
+.editIconButton:hover {
+  background-color: var(--action-primary);
+  border-color: var(--action-primary);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.editIconButton:active {
+  transform: translateY(0);
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.editIconButton:focus {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
 }
 
 .input {
+  flex: 1;
   padding: var(--space-sm) var(--space-md);
   font-size: var(--typo-body-md-font-size);
   background-color: var(--surface-default);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
   color: var(--content-default);
-  transition: border-color 150ms;
+  transition: all 150ms ease-out;
+  font-family: inherit;
 }
 
 .input:focus {
   outline: none;
-  border-color: var(--border-focus);
+  border-color: var(--action-primary);
+  box-shadow: 0 0 0 3px rgba(0, 200, 180, 0.1);
 }
 
-.actions {
+.input:disabled {
+  background-color: var(--surface-canvas);
+  color: var(--content-subtle);
+  border-color: var(--border-subtle);
+  cursor: not-allowed;
+}
+
+.input::placeholder {
+  color: var(--content-subtle);
+}
+
+/* Locale Tabs */
+.localeTabs {
   display: flex;
-  justify-content: flex-end;
   gap: var(--space-sm);
-  padding-top: var(--space-md);
-  border-top: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: var(--space-md);
+}
+
+.localeTab {
+  padding: var(--space-xs) var(--space-sm);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: 500;
+  color: var(--content-subtle);
+  cursor: pointer;
+  transition: all 150ms;
+}
+
+.localeTab:hover:not(:disabled) {
+  color: var(--content-default);
+}
+
+.localeTabActive {
+  color: var(--action-primary);
+  border-bottom-color: var(--action-primary);
+}
+
+.localeTab:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Locale Content */
+.localeContent {
+  display: none;
+}
+
+.localeContentActive {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Translation Status */
+.translationStatus {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-subtle);
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--typo-label-sm-font-size);
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-draft {
+  background-color: var(--surface-subtle);
+  color: var(--content-default);
+  border: 1px solid var(--border-subtle);
+}
+
+.status-published {
+  background-color: var(--action-success);
+  color: white;
 }
