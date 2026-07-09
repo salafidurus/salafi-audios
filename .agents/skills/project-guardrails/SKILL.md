@@ -30,6 +30,10 @@ These rules are NON-NEGOTIABLE. Violations will be rejected.
 | Environments, configuration, and CI/CD            | `docs/dev-ops.md`      |
 | Current roadmap and phase progress                | `docs/AGENT.md`        |
 
+## Git Discipline
+
+- Never use `git --no-verify`. If a hook fails, fix the underlying problem — do not circumvent it.
+
 ## Backend Authority
 
 - Backend (`apps/api`) is the SINGLE SOURCE OF TRUTH for all business rules.
