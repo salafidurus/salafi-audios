@@ -28,7 +28,6 @@ vi.mock("@/features/listing/components/scholar/scholar-content-list/scholar-cont
   ScholarContentList: ({ slug }: { slug: string }) => <div>Content:{slug}</div>,
 }));
 
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { useScholarDetail } from "@sd/domain-content";
 
 const mockDetail = vi.mocked(useScholarDetail);

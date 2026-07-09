@@ -65,10 +65,6 @@
   padding: var(--space-scale-md) var(--space-scale-sm);
 }
 
-td {
-  padding: var(--space-scale-md) var(--space-scale-sm);
-}
-
 .list {
   display: flex;
   flex-direction: column;
