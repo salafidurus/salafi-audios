@@ -42,7 +42,7 @@ const ADMIN_SECTIONS: AdminSection[] = [
     title: "Livestreams",
     description: "Manage live sessions and channel status",
     descriptionMobile: "Manage livestreams",
-    href: "/admin/livestreams",
+    href: "/admin/live",
     permission: "manage:livestreams",
   },
 ];

@@ -58,7 +58,7 @@ export const routes = {
     users: "/admin/users",
     contents: "/admin/contents",
     scholars: "/admin/scholars",
-    livestreams: "/admin/livestreams",
+    live: "/admin/live",
   },
 
   signIn: "/sign-in",
@@ -105,7 +105,7 @@ export const routeDefinitions: RouteDefinition[] = [
   { path: routes.scholars.index, access: "public" },
   { path: routes.support, access: "public" },
   { path: routes.admin.index, access: "auth-required" },
-  { path: routes.admin.livestreams, access: "auth-required" },
+  { path: routes.admin.live, access: "auth-required" },
   { path: routes.home, access: "public" },
 ];
 

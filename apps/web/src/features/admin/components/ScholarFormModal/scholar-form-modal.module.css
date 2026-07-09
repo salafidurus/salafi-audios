@@ -26,20 +26,25 @@
 }
 
 .input,
-.textarea {
+.textarea,
+.select {
   padding: var(--space-sm) var(--space-md);
   font-size: var(--typo-body-md-font-size);
   background-color: var(--surface-default);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
   color: var(--content-default);
-  transition: border-color 150ms;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
 }
 
 .input:focus,
-.textarea:focus {
+.textarea:focus,
+.select:focus {
   outline: none;
-  border-color: var(--border-focus);
+  border-color: var(--action-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-focus-ring) 24%, transparent);
 }
 
 .textarea {
@@ -68,10 +73,28 @@
   cursor: pointer;
 }
 
+.imagePreview {
+  margin-top: var(--space-component-gap-sm);
+  padding: var(--space-component-padding-sm);
+  border: 1px solid var(--chrome-border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--surface-secondary);
+}
+
+.previewImage {
+  max-width: 200px;
+  max-height: 200px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--radius-xs);
+}
+
 .actions {
   display: flex;
   justify-content: flex-end;
   gap: var(--space-sm);
   padding-top: var(--space-md);
+  margin-top: var(--space-component-gap-md);
   border-top: 1px solid var(--border-subtle);
 }

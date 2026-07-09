@@ -1,23 +1,24 @@
 /* Card container */
 .card {
   display: flex;
-  gap: var(--space-component-gap-md);
-  padding: var(--space-card-padding);
+  gap: var(--space-component-gap-lg);
+  padding: var(--space-card-padding-lg);
   border: 1px solid var(--chrome-border);
   border-radius: var(--radius-md);
   background: var(--surface-card);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
   transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 8px 0 rgb(0 0 0 / 0.08);
+  border-color: var(--chrome-border-hover);
 }
 
 .card.clickable {
   cursor: pointer;
-}
-
-.card.clickable:hover {
-  border-color: var(--chrome-border-hover);
-  box-shadow: var(--shadow-card-hover);
 }
 
 .card.clickable:active {
@@ -59,31 +60,35 @@
 }
 
 .title {
-  font-size: var(--text-heading-sm-size);
-  font-weight: var(--text-heading-weight);
-  line-height: var(--text-heading-sm-line-height);
+  font-size: var(--text-heading-md-size);
+  font-weight: 600;
+  line-height: var(--text-heading-md-line-height);
   color: var(--content-primary);
   margin: 0;
 }
 
 .subtitle {
-  font-size: var(--text-body-sm-size);
-  line-height: var(--text-body-sm-line-height);
+  font-size: var(--text-body-md-size);
+  line-height: var(--text-body-md-line-height);
   color: var(--content-secondary);
   margin: 0;
+  margin-top: var(--space-text-gap-xs);
 }
 
 .metadata {
   display: flex;
   flex-direction: column;
-  gap: var(--space-text-gap-xs);
+  gap: var(--space-text-gap-sm);
+  margin-top: var(--space-component-gap-sm);
+  padding-top: var(--space-component-gap-sm);
+  border-top: 1px solid var(--chrome-border-subtle);
 }
 
 .metadataItem {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-text-gap-xs);
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 100px 1fr auto;
+  gap: var(--space-component-gap-sm);
+  align-items: center;
 }
 
 .metadataLabel {
@@ -129,7 +134,9 @@
   flex-shrink: 0;
   display: flex;
   gap: var(--space-component-gap-sm);
-  align-items: flex-start;
+  align-items: center;
+  padding-left: var(--space-component-gap-md);
+  border-left: 1px solid var(--chrome-border-subtle);
 }
 
 /* Mobile responsive */

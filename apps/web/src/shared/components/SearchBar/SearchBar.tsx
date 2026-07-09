@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, X } from "lucide-react";
+import { X } from "lucide-react";
 import styles from "./SearchBar.module.css";
 
 export interface SearchBarProps {
@@ -39,8 +39,8 @@ export function SearchBar({
 
   return (
     <div className={`${styles.container} ${className || ""}`}>
-      <div className={styles.inputWrapper}>
-        <Search size={18} className={styles.searchIcon} aria-hidden="true" />
+      <label className={styles.inputWrapper} aria-label="Search">
+        <SearchGlyph />
         <input
           type="text"
           className={styles.input}
@@ -59,8 +59,24 @@ export function SearchBar({
             <X size={16} />
           </button>
         )}
-      </div>
+      </label>
       {filters && <div className={styles.filters}>{filters}</div>}
     </div>
+  );
+}
+
+function SearchGlyph() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 20 20"
+      className={styles.searchIcon}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+    >
+      <circle cx="9" cy="9" r="6" />
+      <path d="M14.5 14.5L18 18" />
+    </svg>
   );
 }

@@ -6,7 +6,7 @@
  */
 import { routes } from "./routes";
 
-export type Section = "explore" | "live" | "library" | "settings";
+export type Section = "explore" | "live" | "library" | "settings" | "admin";
 
 export type TabConfig = { id: string; label: string; labelKey: string; icon: string };
 
@@ -71,6 +71,20 @@ export const SECTION_TABS: Record<Section, TabConfig[]> = {
     },
     { id: "legal", label: "Legal", labelKey: "navigation.subnav.settings.legal", icon: "scale" },
   ],
+  admin: [
+    {
+      id: "topics",
+      label: "Topics",
+      labelKey: "navigation.subnav.admin.topics",
+      icon: "folder",
+    },
+    {
+      id: "listings",
+      label: "Listings",
+      labelKey: "navigation.subnav.admin.listings",
+      icon: "list",
+    },
+  ],
 };
 
 export const DEFAULT_TABS: Record<Section, string> = {
@@ -78,6 +92,7 @@ export const DEFAULT_TABS: Record<Section, string> = {
   live: "ongoing",
   library: "started",
   settings: "general",
+  admin: "topics",
 };
 
 export const SECTION_LABELS: Record<Section, string> = {
@@ -85,6 +100,7 @@ export const SECTION_LABELS: Record<Section, string> = {
   live: "Live",
   library: "Library",
   settings: "Settings",
+  admin: "Admin",
 };
 
 export const SECTION_ROUTES: Record<Section, string> = {
@@ -92,4 +108,5 @@ export const SECTION_ROUTES: Record<Section, string> = {
   live: routes.live.index,
   library: routes.library.index,
   settings: routes.settings.index,
+  admin: routes.admin.contents,
 };

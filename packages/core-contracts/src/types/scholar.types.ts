@@ -137,6 +137,12 @@ export const CreateScholarDtoSchema = z.object({
   isKibar: z.boolean().optional(),
   isFeatured: z.boolean().optional(),
   isActive: z.boolean().optional(),
+  country: z.string().optional(),
+  mainLanguage: LocaleSchema.optional(),
+  socialTwitter: z.string().url().optional().or(z.literal("")),
+  socialTelegram: z.string().url().optional().or(z.literal("")),
+  socialYoutube: z.string().url().optional().or(z.literal("")),
+  socialWebsite: z.string().url().optional().or(z.literal("")),
 });
 export type CreateScholarDto = z.infer<typeof CreateScholarDtoSchema>;
 
