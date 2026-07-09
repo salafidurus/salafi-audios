@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useState } from "react";
 import type { ReactNode } from "react";
 import { ADMIN_PERMISSIONS, type AdminPermission } from "@sd/core-contracts";
 import {
@@ -12,6 +12,7 @@ import {
 import { PERMISSION_LABELS, PERMISSION_DESCRIPTIONS } from "@/features/admin/constants/permissions";
 import { Modal } from "@/shared/components/Modal/Modal";
 import { Button } from "@/shared/components/Button";
+import { Toggle } from "@/shared/components/Toggle";
 import styles from "./PermissionsDialog.module.css";
 
 export interface PermissionsDialogProps {
@@ -73,6 +74,10 @@ export function PermissionsDialog({
   userName = userId,
 }: PermissionsDialogProps): ReactNode {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [pendingPermissions, setPendingPermissions] = useState<Set<AdminPermission>>(new Set());
+  const [saving, setSaving] = useState(false);
+
+  const currentPermissions = state.userPerms?.permissions.map((p) => p.permission) ?? [];
 
   useEffect(() => {
     if (!isOpen) return;
@@ -80,96 +85,128 @@ export function PermissionsDialog({
     dispatch({ type: "LOAD_START" });
 
     fetchUserPermissions(userId)
-      .then((data) => dispatch({ type: "LOAD_SUCCESS", payload: data }))
+      .then((data) => {
+        dispatch({ type: "LOAD_SUCCESS", payload: data });
+        setPendingPermissions(new Set(data.permissions.map((p) => p.permission)));
+      })
       .catch(() => dispatch({ type: "LOAD_ERROR" }));
   }, [isOpen, userId]);
 
-  const handleGrant = async (permission: AdminPermission) => {
-    dispatch({ type: "LOAD_START" });
-    dispatch({ type: "CLEAR_ERROR", permission });
-    try {
-      const data = await grantPermission(userId, permission);
-      dispatch({ type: "SET_PERMS", payload: data });
-      onPermissionsChange?.();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to grant permission";
-      dispatch({ type: "SET_ERROR", permission, message });
-    } finally {
-      /* loading handled by the fetch completion */
-    }
+  const handleToggle = (permission: AdminPermission) => {
+    setPendingPermissions((prev) => {
+      const next = new Set(prev);
+      if (next.has(permission)) {
+        next.delete(permission);
+      } else {
+        next.add(permission);
+      }
+      return next;
+    });
   };
 
-  const handleRevoke = async (permission: AdminPermission) => {
-    dispatch({ type: "LOAD_START" });
-    dispatch({ type: "CLEAR_ERROR", permission });
+  const handleDone = async () => {
+    setSaving(true);
     try {
-      const data = await revokePermission(userId, permission);
-      dispatch({ type: "SET_PERMS", payload: data });
+      // Determine which permissions to grant and revoke
+      const toGrant: AdminPermission[] = [];
+      const toRevoke: AdminPermission[] = [];
+
+      for (const perm of ADMIN_PERMISSIONS) {
+        const hadIt = currentPermissions.includes(perm);
+        const hasItNow = pendingPermissions.has(perm);
+
+        if (!hadIt && hasItNow) {
+          toGrant.push(perm);
+        } else if (hadIt && !hasItNow) {
+          toRevoke.push(perm);
+        }
+      }
+
+      // Apply changes in parallel
+      toGrant.forEach((perm) => dispatch({ type: "CLEAR_ERROR", permission: perm }));
+      toRevoke.forEach((perm) => dispatch({ type: "CLEAR_ERROR", permission: perm }));
+
+      await Promise.all([
+        ...toGrant.map(async (perm) => {
+          try {
+            const data = await grantPermission(userId, perm);
+            dispatch({ type: "SET_PERMS", payload: data });
+          } catch (error) {
+            const message = getErrorMessage(error, "Failed to grant permission");
+            dispatch({ type: "SET_ERROR", permission: perm, message });
+          }
+        }),
+        ...toRevoke.map(async (perm) => {
+          try {
+            const data = await revokePermission(userId, perm);
+            dispatch({ type: "SET_PERMS", payload: data });
+          } catch (error) {
+            const message = getErrorMessage(error, "Failed to revoke permission");
+            dispatch({ type: "SET_ERROR", permission: perm, message });
+          }
+        }),
+      ]);
+
       onPermissionsChange?.();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to revoke permission";
-      dispatch({ type: "SET_ERROR", permission, message });
+      onClose();
     } finally {
-      /* loading handled by the fetch completion */
+      setSaving(false);
     }
   };
-
-  const currentPermissions = state.userPerms?.permissions.map((p) => p.permission) ?? [];
 
   if (!isOpen) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={`Manage Permissions — ${userName}`}>
-      <div className={styles.container}>
-        {state.loading && !state.userPerms ? (
-          <div className={styles.loading}>Loading permissions…</div>
-        ) : (
-          <div className={styles.permissionsList}>
-            {ADMIN_PERMISSIONS.map((perm) => {
-              const hasIt = currentPermissions.includes(perm);
-              const error = state.errors[perm];
-              return (
-                <div key={perm} className={styles.permissionItem}>
-                  <div className={styles.permissionInfo}>
-                    <span className={styles.permissionName}>{PERMISSION_LABELS[perm]}</span>
-                    <span className={styles.permissionDescription}>
-                      {PERMISSION_DESCRIPTIONS[perm]}
-                    </span>
-                    {error && <span className={styles.error}>{error}</span>}
-                  </div>
-                  <div className={styles.actions}>
-                    {hasIt ? (
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        onClick={() => handleRevoke(perm)}
-                        disabled={state.loading}
-                      >
-                        Revoke
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={() => handleGrant(perm)}
-                        disabled={state.loading}
-                      >
-                        Grant
-                      </Button>
-                    )}
-                  </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={`Manage Permissions — ${userName}`}
+      footer={
+        <Button variant="primary" onClick={handleDone} disabled={saving}>
+          {saving ? "Saving…" : "Done"}
+        </Button>
+      }
+    >
+      {state.loading && !state.userPerms ? (
+        <div className={styles.loading}>Loading permissions…</div>
+      ) : (
+        <div className={styles.permissionsList}>
+          {ADMIN_PERMISSIONS.map((perm) => {
+            const isPending = pendingPermissions.has(perm);
+            const error = state.errors[perm];
+            return (
+              <div key={perm} className={styles.permissionItem}>
+                <div className={styles.permissionInfo}>
+                  <span className={styles.permissionName}>{PERMISSION_LABELS[perm]}</span>
+                  <span className={styles.permissionDescription}>
+                    {PERMISSION_DESCRIPTIONS[perm]}
+                  </span>
+                  {error && <span className={styles.error}>{error}</span>}
                 </div>
-              );
-            })}
-          </div>
-        )}
-
-        <div className={styles.footer}>
-          <Button variant="outline" onClick={onClose} disabled={state.loading}>
-            Done
-          </Button>
+                <Toggle
+                  checked={isPending}
+                  onChange={() => handleToggle(perm)}
+                  disabled={saving}
+                  aria-label={`${isPending ? "Revoke" : "Grant"} ${PERMISSION_LABELS[perm]}`}
+                />
+              </div>
+            );
+          })}
         </div>
-      </div>
+      )}
     </Modal>
   );
+}
+
+function getErrorMessage(error: unknown, defaultMessage: string): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === "object" && error !== null && "message" in error) {
+    const msg = (error as Record<string, unknown>).message;
+    if (typeof msg === "string") {
+      return msg;
+    }
+  }
+  return defaultMessage;
 }

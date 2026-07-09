@@ -44,7 +44,33 @@ export function ConfirmModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title={title} size="sm">
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title={title}
+      size="sm"
+      footer={
+        <>
+          <button
+            type="button"
+            data-testid="confirm-modal-cancel"
+            className={styles.cancelButton}
+            onClick={handleClose}
+          >
+            {cancelLabel}
+          </button>
+          <button
+            type="button"
+            data-testid="confirm-modal-confirm"
+            className={`${styles.confirmButton} ${confirmVariant === "danger" ? styles.confirmDanger : styles.confirmPrimary}`}
+            onClick={handleConfirm}
+            disabled={!isWordConfirmed}
+          >
+            {confirmLabel}
+          </button>
+        </>
+      }
+    >
       <div className={styles.body} data-testid={testId}>
         <p className={styles.message}>{message}</p>
 
@@ -63,26 +89,6 @@ export function ConfirmModal({
           </div>
         )}
       </div>
-
-      <footer className={styles.footer}>
-        <button
-          type="button"
-          data-testid="confirm-modal-cancel"
-          className={styles.cancelButton}
-          onClick={handleClose}
-        >
-          {cancelLabel}
-        </button>
-        <button
-          type="button"
-          data-testid="confirm-modal-confirm"
-          className={`${styles.confirmButton} ${confirmVariant === "danger" ? styles.confirmDanger : styles.confirmPrimary}`}
-          onClick={handleConfirm}
-          disabled={!isWordConfirmed}
-        >
-          {confirmLabel}
-        </button>
-      </footer>
     </Modal>
   );
 }

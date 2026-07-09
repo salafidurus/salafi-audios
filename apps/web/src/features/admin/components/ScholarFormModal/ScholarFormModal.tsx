@@ -117,8 +117,18 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
       onClose={onClose}
       title={isEditing ? "Edit Scholar" : "Add Scholar"}
       size="lg"
+      footer={
+        <>
+          <Button type="button" variant="ghost" onClick={onClose} disabled={saving}>
+            Cancel
+          </Button>
+          <Button type="submit" variant="primary" loading={saving} form="scholar-form">
+            {isEditing ? "Save Changes" : "Add Scholar"}
+          </Button>
+        </>
+      }
     >
-      <form onSubmit={handleSubmit} className={styles.form}>
+      <form id="scholar-form" onSubmit={handleSubmit} className={styles.form}>
         {error && <div className={styles.error}>{error}</div>}
 
         <FormSection title="Basic Information">
@@ -286,15 +296,6 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
             </label>
           </div>
         </FormSection>
-
-        <div className={styles.actions}>
-          <Button type="button" variant="ghost" onClick={onClose} disabled={saving}>
-            Cancel
-          </Button>
-          <Button type="submit" variant="primary" loading={saving}>
-            {isEditing ? "Save Changes" : "Add Scholar"}
-          </Button>
-        </div>
       </form>
     </Modal>
   );

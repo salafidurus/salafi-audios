@@ -5,7 +5,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-md);
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .overlay {
+    padding: 1.5rem;
+  }
 }
 
 .backdrop {
@@ -20,28 +26,40 @@
   background-color: var(--surface-default);
   border-radius: var(--radius-component-card);
   box-shadow: var(--shadow-lg);
-  max-height: calc(100vh - 2rem);
+  max-height: calc(100vh - 3rem);
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
 .size-sm {
-  width: min(24rem, 100%);
+  width: min(26rem, calc(100% - var(--space-lg)));
 }
+
 .size-md {
-  width: min(32rem, 100%);
+  width: min(36rem, calc(100% - var(--space-lg)));
 }
+
 .size-lg {
-  width: min(48rem, 100%);
+  width: min(52rem, calc(100% - var(--space-lg)));
+}
+
+.size-xl {
+  width: min(64rem, calc(100% - var(--space-lg)));
 }
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-md) var(--space-lg);
-  border-bottom: 1px solid var(--border-subtle);
+  padding: 1rem 1.5rem;
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .header {
+    padding: 0.875rem 1.25rem;
+  }
 }
 
 .title {
@@ -55,8 +73,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.5rem;
+  height: 2.5rem;
   padding: 0;
   background: transparent;
   border: none;
@@ -66,14 +84,66 @@
   transition:
     background-color 150ms,
     color 150ms;
+  flex-shrink: 0;
 }
 
-.closeButton:hover {
+.closeButton:hover:not(:disabled) {
   background-color: var(--surface-hover);
   color: var(--content-default);
 }
 
+.closeButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .body {
-  padding: var(--space-lg);
+  padding: 1rem 1.5rem;
   overflow-y: auto;
+  flex: 1;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.body::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .body {
+    padding: 0.875rem 1.25rem;
+  }
+}
+
+.footer {
+  flex-shrink: 0;
+  padding: 1rem 1.5rem;
+  display: flex;
+  gap: var(--space-component-gap-sm);
+  align-items: center;
+  background-color: var(--surface-default);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .footer {
+    padding: 0.875rem 1.25rem;
+    flex-direction: column-reverse;
+    gap: var(--space-component-gap-md);
+  }
+
+  .footer > * {
+    width: 100%;
+  }
+}
+
+.loadingOverlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  border-radius: var(--radius-component-card);
 }

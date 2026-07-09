@@ -39,13 +39,6 @@
   border-color: var(--border-focus);
 }
 
-.footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-component-gap-sm);
-  padding: 0 var(--space-lg) var(--space-lg);
-}
-
 .cancelButton {
   padding: var(--space-component-chip-y) var(--space-component-chip-x);
   border: 1px solid var(--border-default);

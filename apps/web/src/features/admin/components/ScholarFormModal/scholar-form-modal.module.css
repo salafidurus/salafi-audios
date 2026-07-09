@@ -87,12 +87,3 @@
   object-fit: contain;
   border-radius: var(--radius-xs);
 }
-
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-sm);
-  padding-top: var(--space-md);
-  margin-top: var(--space-component-gap-md);
-  border-top: 1px solid var(--border-subtle);
-}
