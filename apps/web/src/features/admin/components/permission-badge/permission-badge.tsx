@@ -1,16 +1,21 @@
 import type { ReactNode } from "react";
+import type { AdminPermission } from "@sd/core-contracts";
 import { Shield } from "lucide-react";
+import { PERMISSION_LABELS, PERMISSION_DESCRIPTIONS } from "@/features/admin/constants/permissions";
 import styles from "./permission-badge.module.css";
 
 type PermissionBadgeProps = {
-  permission: string;
+  permission: AdminPermission;
 };
 
 export function PermissionBadge({ permission }: PermissionBadgeProps): ReactNode {
+  const label = PERMISSION_LABELS[permission] ?? permission;
+  const description = PERMISSION_DESCRIPTIONS[permission];
+
   return (
-    <span className={styles.badge}>
+    <span className={styles.badge} title={description}>
       <Shield className={styles.icon} />
-      {permission}
+      {label}
     </span>
   );
 }

@@ -11,8 +11,8 @@
   align-items: center;
   justify-content: center;
   min-height: 200px;
-  color: var(--content-secondary);
-  font-size: var(--text-body-md-size);
+  color: var(--content-muted);
+  font-size: var(--typo-body-md-font-size);
 }
 
 .permissionsList {
@@ -27,46 +27,38 @@
   justify-content: space-between;
   gap: var(--space-component-gap-md);
   padding: var(--space-component-gap-sm);
-  border: 1px solid var(--chrome-border);
-  border-radius: var(--radius-sm);
-  background: var(--surface-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-scale-sm);
+  background: var(--surface-subtle);
 }
 
 .permissionInfo {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--space-scale-xs);
   flex: 1;
   min-width: 0;
 }
 
 .permissionName {
-  font-family: monospace;
-  font-size: var(--text-body-sm-size);
-  color: var(--content-primary);
-  word-break: break-all;
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: 600;
+  color: var(--content-strong);
 }
 
-.permissionStatus {
-  font-size: var(--text-body-xs-size);
-  padding: 2px 6px;
-  border-radius: var(--radius-xs);
-  width: fit-content;
+.permissionDescription {
+  font-size: var(--typo-caption-font-size);
+  color: var(--content-muted);
 }
 
-.statusGranted {
-  background: var(--status-success-bg);
-  color: var(--status-success);
-}
-
-.statusNotGranted {
-  background: var(--status-error-bg);
-  color: var(--status-error);
+.error {
+  font-size: var(--typo-xs-font-size);
+  color: var(--state-danger-content);
 }
 
 .actions {
   display: flex;
-  gap: var(--space-component-gap-xs);
+  gap: var(--space-scale-xs);
   flex-shrink: 0;
 }
 
@@ -76,10 +68,9 @@
   justify-content: flex-end;
   margin-top: var(--space-component-gap-md);
   padding-top: var(--space-component-gap-md);
-  border-top: 1px solid var(--chrome-border);
+  border-top: 1px solid var(--border-default);
 }
 
-/* Mobile responsive */
 @media (max-width: 640px) {
   .container {
     max-height: 80vh;

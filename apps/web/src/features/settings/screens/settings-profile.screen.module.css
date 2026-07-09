@@ -162,6 +162,34 @@
   color: var(--content-on-primary);
 }
 
+.deleteAccountRow {
+  margin-top: var(--space-scale-xl);
+}
+
+.deleteAccountButton {
+  padding: var(--space-scale-sm) var(--space-scale-xl);
+  border: var(--border-width-default) solid var(--border-disabled);
+  border-radius: var(--radius-component-chip);
+  background: transparent;
+  color: var(--content-muted);
+  font-size: var(--typo-body-sm-font-size);
+  cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    color 150ms ease,
+    background-color 150ms ease;
+}
+
+.deleteAccountButton:hover:not(:disabled) {
+  border-color: var(--action-danger);
+  color: var(--action-danger);
+}
+
+.deleteAccountButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Sign-in CTA */
 .signInCta {
   text-align: center;

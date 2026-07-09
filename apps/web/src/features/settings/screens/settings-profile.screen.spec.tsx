@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { SettingsProfileScreen } from "./settings-profile.screen";
 
 const mockUseAuth = vi.fn();
@@ -19,6 +19,8 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: vi.fn() }),
 }));
 
+const mockDeleteAccountMutate = vi.fn();
+
 vi.mock("@sd/domain-account", () => ({
   useAccountProfile: vi.fn(),
   useUpdateProfile: vi.fn(() => ({
@@ -26,6 +28,10 @@ vi.mock("@sd/domain-account", () => ({
     isPending: false,
     isSuccess: false,
     isError: false,
+  })),
+  useDeleteAccount: vi.fn(() => ({
+    mutate: mockDeleteAccountMutate,
+    isPending: false,
   })),
 }));
 
@@ -59,6 +65,7 @@ vi.mock("@/shared/components/SettingsRow/SettingsRow", () => ({
 }));
 
 import { useAccountProfile } from "@sd/domain-account";
+import { authClient } from "@/core/auth/auth-client";
 
 const mockProfile = vi.mocked(useAccountProfile);
 
@@ -137,5 +144,111 @@ describe("SettingsProfileScreen", () => {
     } as ReturnType<typeof useAccountProfile>);
     render(<SettingsProfileScreen />);
     expect(screen.getByLabelText("Display name")).toBeInTheDocument();
+  });
+
+  it("opens confirm modal when Sign Out is clicked", () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false });
+    mockProfile.mockReturnValue({
+      data: PROFILE,
+      isFetching: false,
+    } as ReturnType<typeof useAccountProfile>);
+    render(<SettingsProfileScreen />);
+    fireEvent.click(screen.getByTestId("sign-out-trigger"));
+    expect(screen.getByTestId("confirm-modal")).toBeInTheDocument();
+  });
+
+  it("calls signOut when sign-out is confirmed in modal", () => {
+    const mockSignOut = vi.fn().mockResolvedValue(undefined);
+    vi.mocked(authClient.signOut).mockImplementation(mockSignOut);
+
+    mockUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false });
+    mockProfile.mockReturnValue({
+      data: PROFILE,
+      isFetching: false,
+    } as ReturnType<typeof useAccountProfile>);
+    render(<SettingsProfileScreen />);
+    fireEvent.click(screen.getByTestId("sign-out-trigger"));
+    fireEvent.click(screen.getByTestId("confirm-modal-confirm"));
+    expect(mockSignOut).toHaveBeenCalledTimes(1);
+  });
+
+  it("closes modal without signing out when cancel is clicked", () => {
+    const mockSignOut = vi.fn().mockResolvedValue(undefined);
+    vi.mocked(authClient.signOut).mockImplementation(mockSignOut);
+
+    mockUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false });
+    mockProfile.mockReturnValue({
+      data: PROFILE,
+      isFetching: false,
+    } as ReturnType<typeof useAccountProfile>);
+    render(<SettingsProfileScreen />);
+    fireEvent.click(screen.getByTestId("sign-out-trigger"));
+    fireEvent.click(screen.getByTestId("confirm-modal-cancel"));
+    expect(mockSignOut).not.toHaveBeenCalled();
+  });
+
+  describe("delete account", () => {
+    beforeEach(() => {
+      mockDeleteAccountMutate.mockReset();
+    });
+
+    it("shows delete account section", () => {
+      mockUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false });
+      mockProfile.mockReturnValue({
+        data: PROFILE,
+        isFetching: false,
+      } as ReturnType<typeof useAccountProfile>);
+      render(<SettingsProfileScreen />);
+      expect(screen.getByTestId("delete-account-trigger")).toBeInTheDocument();
+    });
+
+    it("opens confirm modal when delete account is clicked", () => {
+      mockUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false });
+      mockProfile.mockReturnValue({
+        data: PROFILE,
+        isFetching: false,
+      } as ReturnType<typeof useAccountProfile>);
+      render(<SettingsProfileScreen />);
+      fireEvent.click(screen.getByTestId("delete-account-trigger"));
+      expect(screen.getByTestId("delete-account-modal")).toBeInTheDocument();
+    });
+
+    it("has confirm button disabled when input does not match DELETE", () => {
+      mockUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false });
+      mockProfile.mockReturnValue({
+        data: PROFILE,
+        isFetching: false,
+      } as ReturnType<typeof useAccountProfile>);
+      render(<SettingsProfileScreen />);
+      fireEvent.click(screen.getByTestId("delete-account-trigger"));
+      expect(screen.getByTestId("confirm-modal-confirm")).toBeDisabled();
+    });
+
+    it("enables confirm when user types DELETE", () => {
+      mockUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false });
+      mockProfile.mockReturnValue({
+        data: PROFILE,
+        isFetching: false,
+      } as ReturnType<typeof useAccountProfile>);
+      render(<SettingsProfileScreen />);
+      fireEvent.click(screen.getByTestId("delete-account-trigger"));
+      const input = screen.getByPlaceholderText('Type "DELETE" to confirm');
+      fireEvent.change(input, { target: { value: "DELETE" } });
+      expect(screen.getByTestId("confirm-modal-confirm")).not.toBeDisabled();
+    });
+
+    it("calls deleteAccount mutate on confirm with matching word", () => {
+      mockUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false });
+      mockProfile.mockReturnValue({
+        data: PROFILE,
+        isFetching: false,
+      } as ReturnType<typeof useAccountProfile>);
+      render(<SettingsProfileScreen />);
+      fireEvent.click(screen.getByTestId("delete-account-trigger"));
+      const input = screen.getByPlaceholderText('Type "DELETE" to confirm');
+      fireEvent.change(input, { target: { value: "DELETE" } });
+      fireEvent.click(screen.getByTestId("confirm-modal-confirm"));
+      expect(mockDeleteAccountMutate).toHaveBeenCalledTimes(1);
+    });
   });
 });

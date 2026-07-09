@@ -1,1 +1,1 @@
-export { useAccountProfile, useUpdateProfile } from "./account.api";
+export { useAccountProfile, useUpdateProfile, useDeleteAccount } from "./account.api";

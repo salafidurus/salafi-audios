@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useAuth } from "@/core/auth";
-import { useAccountProfile, useUpdateProfile } from "@sd/domain-account";
+import { useAccountProfile, useUpdateProfile, useDeleteAccount } from "@sd/domain-account";
 import { authClient } from "@/core/auth/auth-client";
 import { AuthModal } from "@/features/auth";
+import { ConfirmModal } from "@/shared/components/ConfirmModal/ConfirmModal";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { EmptyState } from "@/shared/components/EmptyState";
@@ -29,6 +30,9 @@ function ProfileContent() {
   const [prevProfileId, setPrevProfileId] = useState(profile?.id);
   const [displayName, setDisplayName] = useState(profile?.displayName ?? "");
   const [isEditing, setIsEditing] = useState(false);
+  const [showSignOutModal, setShowSignOutModal] = useState(false);
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
+  const { mutate: deleteAccount, isPending: isDeleting } = useDeleteAccount();
 
   if (profile && profile.id !== prevProfileId) {
     setPrevProfileId(profile.id);
@@ -38,6 +42,15 @@ function ProfileContent() {
   const handleSignOut = async () => {
     await authClient.signOut();
     router.push("/");
+  };
+
+  const handleDeleteAccount = () => {
+    deleteAccount(undefined, {
+      onSuccess: () => {
+        authClient.signOut();
+        router.push("/");
+      },
+    });
   };
 
   const handleEdit = () => {
@@ -146,10 +159,50 @@ function ProfileContent() {
       </SettingsSection>
 
       <div className={styles.signOutRow}>
-        <button type="button" className={styles.signOutButton} onClick={handleSignOut}>
+        <button
+          type="button"
+          data-testid="sign-out-trigger"
+          className={styles.signOutButton}
+          onClick={() => setShowSignOutModal(true)}
+        >
           Sign Out
         </button>
       </div>
+
+      <ConfirmModal
+        isOpen={showSignOutModal}
+        onClose={() => setShowSignOutModal(false)}
+        onConfirm={handleSignOut}
+        title="Sign Out?"
+        message="Are you sure you want to sign out?"
+        confirmLabel="Sign Out"
+        confirmVariant="danger"
+        testId="confirm-modal"
+      />
+
+      <div className={styles.deleteAccountRow}>
+        <button
+          type="button"
+          data-testid="delete-account-trigger"
+          className={styles.deleteAccountButton}
+          onClick={() => setShowDeleteAccountModal(true)}
+          disabled={isDeleting}
+        >
+          {isDeleting ? "Deleting…" : "Delete Account"}
+        </button>
+      </div>
+
+      <ConfirmModal
+        isOpen={showDeleteAccountModal}
+        onClose={() => setShowDeleteAccountModal(false)}
+        onConfirm={handleDeleteAccount}
+        title="Delete Account"
+        message="This action is permanent and cannot be undone. All your data will be deleted."
+        confirmLabel="Delete Account"
+        confirmVariant="danger"
+        confirmWord="DELETE"
+        testId="delete-account-modal"
+      />
     </>
   );
 }

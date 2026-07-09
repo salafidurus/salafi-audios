@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import type { ReactNode } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useApiQuery, queryKeys, httpClient } from "@sd/core-contracts";
 import { endpoints, type AdminUserListDto } from "@sd/core-contracts";
 import { useResponsive } from "@/shared/hooks/use-responsive";
@@ -10,14 +11,16 @@ import { PageHeader } from "@/shared/components/PageHeader";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { SearchBar } from "@/shared/components/SearchBar";
 import { UserCard } from "@/features/admin/components/user-card/user-card";
+import { PermissionsDialog } from "@/features/admin/components/PermissionsDialog";
 import styles from "./admin-users.screen.module.css";
 
 export function AdminUsersScreen(): ReactNode {
+  const queryClient = useQueryClient();
   const { isMobile } = useResponsive();
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [permUser, setPermUser] = useState<{ id: string; name: string } | null>(null);
 
-  // Debounce search input to avoid excessive API calls
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchQuery);
@@ -37,6 +40,10 @@ export function AdminUsersScreen(): ReactNode {
 
   const users = useMemo(() => data?.users ?? [], [data]);
   const total = useMemo(() => data?.total ?? 0, [data]);
+
+  const handlePermissionsChange = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
+  }, [queryClient]);
 
   return (
     <ScreenView>
@@ -67,11 +74,25 @@ export function AdminUsersScreen(): ReactNode {
           ) : (
             <div className={styles.cardList}>
               {users.map((user) => (
-                <UserCard key={user.id} user={user} />
+                <UserCard
+                  key={user.id}
+                  user={user}
+                  onManagePermissions={() => setPermUser({ id: user.id, name: user.name })}
+                />
               ))}
             </div>
           )}
         </>
+      )}
+
+      {permUser && (
+        <PermissionsDialog
+          isOpen
+          userId={permUser.id}
+          userName={permUser.name}
+          onClose={() => setPermUser(null)}
+          onPermissionsChange={handlePermissionsChange}
+        />
       )}
     </ScreenView>
   );

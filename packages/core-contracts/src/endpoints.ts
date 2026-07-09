@@ -32,6 +32,7 @@ export const endpoints = {
   },
   account: {
     profile: "/account/profile",
+    deleteAccount: "/account",
   },
   live: {
     channels: "/live/channels",
