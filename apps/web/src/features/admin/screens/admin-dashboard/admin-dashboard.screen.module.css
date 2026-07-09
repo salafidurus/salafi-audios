@@ -1,0 +1,54 @@
+.sectionList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-component-gap-md);
+}
+
+.sectionCard {
+  display: block;
+  padding: var(--space-component-card-padding);
+  border-radius: var(--radius-component-card);
+  border: 1px solid var(--border-default);
+  text-decoration: none;
+  color: inherit;
+  background-color: var(--surface-default);
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.sectionCard:hover {
+  border-color: var(--border-hover);
+  background-color: var(--surface-hover);
+}
+
+.sectionTitle {
+  font-size: var(--typo-title-md-font-size);
+  font-weight: 600;
+  margin-bottom: var(--space-sm);
+}
+
+.sectionDescription {
+  font-size: var(--typo-body-md-font-size);
+  color: var(--content-muted);
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .sectionList {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-component-gap-sm);
+  }
+
+  .sectionCard:hover {
+    border-color: var(--border-default);
+    background-color: var(--surface-default);
+  }
+
+  .sectionTitle {
+    margin-bottom: var(--space-xs);
+  }
+
+  .sectionDescription {
+    font-size: var(--typo-body-sm-font-size);
+  }
+}

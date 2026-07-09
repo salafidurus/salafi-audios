@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { ScholarDetailDesktopScreen } from "./scholar-detail.screen.desktop";
+import { ScholarDetailScreen } from "./scholar-detail.screen";
+
+vi.mock("@/shared/hooks/use-responsive", () => ({
+  useIsDesktop: vi.fn().mockReturnValue(true),
+}));
 
 vi.mock("@sd/domain-content", () => ({
   useScholarDetail: vi.fn(),
@@ -24,6 +28,7 @@ vi.mock("@/features/listing/components/scholar/scholar-content-list/scholar-cont
   ScholarContentList: ({ slug }: { slug: string }) => <div>Content:{slug}</div>,
 }));
 
+import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { useScholarDetail } from "@sd/domain-content";
 
 const mockDetail = vi.mocked(useScholarDetail);
@@ -46,17 +51,17 @@ beforeEach(() => {
   >);
 });
 
-describe("ScholarDetailDesktopScreen", () => {
+describe("ScholarDetailScreen", () => {
   it("shows loading state", () => {
     mockDetail.mockReturnValue({ data: undefined, isFetching: true } as ReturnType<
       typeof useScholarDetail
     >);
-    render(<ScholarDetailDesktopScreen slug="ibn-baz" />);
+    render(<ScholarDetailScreen slug="ibn-baz" />);
     expect(screen.getByText("Loading scholar…")).toBeTruthy();
   });
 
   it("shows not-found state", () => {
-    render(<ScholarDetailDesktopScreen slug="missing" />);
+    render(<ScholarDetailScreen slug="missing" />);
     expect(screen.getByText("Scholar not found")).toBeTruthy();
   });
 
@@ -64,7 +69,7 @@ describe("ScholarDetailDesktopScreen", () => {
     mockDetail.mockReturnValue({ data: mockScholar, isFetching: false } as ReturnType<
       typeof useScholarDetail
     >);
-    render(<ScholarDetailDesktopScreen slug="ibn-baz" />);
+    render(<ScholarDetailScreen slug="ibn-baz" />);
     expect(screen.getByText("Header:Ibn Baz")).toBeTruthy();
     expect(screen.getByText("Content:ibn-baz")).toBeTruthy();
   });
@@ -73,7 +78,7 @@ describe("ScholarDetailDesktopScreen", () => {
     mockDetail.mockReturnValue({ data: mockScholar, isFetching: false } as ReturnType<
       typeof useScholarDetail
     >);
-    render(<ScholarDetailDesktopScreen slug="ibn-baz" />);
+    render(<ScholarDetailScreen slug="ibn-baz" />);
     expect(screen.queryByText(/kibar/i)).toBeNull();
   });
 });

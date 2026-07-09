@@ -3,37 +3,13 @@ export {
   LectureDetailScreen,
   type LectureDetailScreenProps,
 } from "./screens/lecture-detail/lecture-detail.screen";
-export {
-  LectureDetailDesktopScreen,
-  type LectureDetailDesktopScreenProps,
-} from "./screens/lecture-detail/lecture-detail.screen.desktop";
-export {
-  LectureDetailMobileScreen,
-  type LectureDetailMobileScreenProps,
-} from "./screens/lecture-detail/lecture-detail.screen.mobile";
 
 // Scholar Screens
 export {
   ScholarDetailScreen,
   type ScholarDetailScreenProps,
 } from "./screens/scholar-detail/scholar-detail.screen";
-export {
-  ScholarDetailDesktopScreen,
-  type ScholarDetailDesktopScreenProps,
-} from "./screens/scholar-detail/scholar-detail.screen.desktop";
-export {
-  ScholarDetailMobileScreen,
-  type ScholarDetailMobileScreenProps,
-} from "./screens/scholar-detail/scholar-detail.screen.mobile";
-export { ScholarListScreen, type ScholarListScreenProps } from "./screens/scholar-list.screen";
-export {
-  ScholarListDesktopScreen,
-  type ScholarListDesktopScreenProps,
-} from "./screens/scholar-list.screen.desktop";
-export {
-  ScholarListMobileScreen,
-  type ScholarListMobileScreenProps,
-} from "./screens/scholar-list.screen.mobile";
+export { ScholarListScreen } from "./screens/scholar-list.screen";
 
 // Listing Screens
 export {

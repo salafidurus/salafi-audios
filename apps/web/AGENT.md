@@ -119,7 +119,7 @@ Merge desktop and mobile CSS into a single `.module.css` file with media queries
 
 ### Legacy `.desktop.tsx` and `.mobile.tsx` files
 
-Existing multi-file screens (with `.desktop.tsx` and `.mobile.tsx` variants) should be consolidated into the unified pattern above when refactoring or touching those screens. See `Consolidation Rules` above for the specific patterns to use when merging.
+All screens have been consolidated into the unified pattern above. No multi-file screen variants remain.
 
 ### Naming Conventions
 
