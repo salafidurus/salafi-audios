@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
 import { SearchBar } from "./SearchBar";
 
 describe("SearchBar", () => {
@@ -8,7 +9,7 @@ describe("SearchBar", () => {
   });
 
   it("calls onChange as user types", () => {
-    const handleChange = jest.fn();
+    const handleChange = vi.fn();
     render(<SearchBar value="" onChange={handleChange} />);
 
     const input = screen.getByRole("textbox");
@@ -26,8 +27,8 @@ describe("SearchBar", () => {
   });
 
   it("clears input when clear button clicked", () => {
-    const handleChange = jest.fn();
-    const handleClear = jest.fn();
+    const handleChange = vi.fn();
+    const handleClear = vi.fn();
 
     render(<SearchBar value="test" onChange={handleChange} onClear={handleClear} />);
 

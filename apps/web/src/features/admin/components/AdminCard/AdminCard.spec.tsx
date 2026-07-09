@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
 import { AdminCard, AdminCardProps } from "./AdminCard";
 
 const mockActions = <div data-testid="actions">Actions</div>;
@@ -94,7 +95,7 @@ describe("AdminCard", () => {
   });
 
   it("calls onClick when card is clicked", () => {
-    const handleClick = jest.fn();
+    const handleClick = vi.fn();
     render(<AdminCard {...defaultProps} onClick={handleClick} />);
 
     const card = screen.getByRole("button");
@@ -103,7 +104,7 @@ describe("AdminCard", () => {
   });
 
   it("prevents action clicks from triggering card click", () => {
-    const handleClick = jest.fn();
+    const handleClick = vi.fn();
     render(
       <AdminCard
         {...defaultProps}

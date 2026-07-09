@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
 import { AdminStatsCard } from "./AdminStatsCard";
 
 describe("AdminStatsCard", () => {
@@ -32,7 +33,7 @@ describe("AdminStatsCard", () => {
   });
 
   it("calls onClick when clicked as button", () => {
-    const handleClick = jest.fn();
+    const handleClick = vi.fn();
     render(
       <AdminStatsCard
         icon={mockIcon}
