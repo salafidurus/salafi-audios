@@ -11,7 +11,7 @@ import { getServerLocale } from "../core/i18n/locale-cookie.server";
 import { localeToDir } from "@sd/core-i18n";
 
 const fraunces = localFont({
-  variable: "--font-display",
+  variable: "--font-display-en",
   display: "swap",
   src: [
     {
@@ -33,7 +33,7 @@ const fraunces = localFont({
 });
 
 const manrope = localFont({
-  variable: "--font-body",
+  variable: "--font-body-en",
   display: "swap",
   src: [
     {
@@ -86,6 +86,60 @@ const geistMono = localFont({
   ],
 });
 
+const alexandria = localFont({
+  variable: "--font-display-ar",
+  display: "swap",
+  src: [
+    {
+      path: "../../public/fonts/Alexandria-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Alexandria-Medium.ttf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Alexandria-SemiBold.ttf",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Alexandria-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+});
+
+const ibmPlexSansArabic = localFont({
+  variable: "--font-body-ar",
+  display: "swap",
+  src: [
+    {
+      path: "../../public/fonts/IBMPlexSansArabic-Regular.ttf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/IBMPlexSansArabic-Medium.ttf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/IBMPlexSansArabic-SemiBold.ttf",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/IBMPlexSansArabic-Bold.ttf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+});
+
 const metadataBase =
   process.env.NEXT_PUBLIC_WEB_URL && process.env.NEXT_PUBLIC_WEB_URL.length > 0
     ? new URL(process.env.NEXT_PUBLIC_WEB_URL)
@@ -122,7 +176,7 @@ export default async function RootLayout({
     <html
       lang={locale}
       dir={dir}
-      className={`${fraunces.variable} ${manrope.variable} ${geistMono.variable}`}
+      className={`${fraunces.variable} ${manrope.variable} ${geistMono.variable} ${alexandria.variable} ${ibmPlexSansArabic.variable}`}
     >
       <body className="antialiased">
         {process.env.NODE_ENV === "production" && !apiBaseUrl?.includes("localhost") ? (

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Pencil } from "lucide-react";
 import { Button } from "@/shared/components/Button";
 import styles from "./scholar-card.module.css";
@@ -24,7 +25,14 @@ export function ScholarCard({
     <div className={styles.card}>
       <div className={styles.avatar}>
         {imageUrl ? (
-          <img src={imageUrl} alt={name} className={styles.avatarImg} />
+          <Image
+            src={imageUrl}
+            alt={name}
+            className={styles.avatarImg}
+            width={48}
+            height={48}
+            unoptimized
+          />
         ) : (
           <span className={styles.avatarFallback}>{name.charAt(0)}</span>
         )}

@@ -1,4 +1,4 @@
-.sectionList {
+.grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--space-component-gap-md);
@@ -33,10 +33,14 @@
 }
 
 @media (max-width: 640px) {
-  .sectionList {
+  .grid {
     display: flex;
     flex-direction: column;
     gap: var(--space-component-gap-sm);
+  }
+
+  .sectionCard {
+    transition: none;
   }
 
   .sectionCard:hover {
