@@ -117,6 +117,12 @@ describe("Sidebar component", () => {
       fireEvent.click(signOutBtn);
     });
 
+    // Click the confirm button in the SignOutConfirmDialog
+    const confirmBtn = await screen.findByRole("button", { name: /sign out/i });
+    await act(async () => {
+      fireEvent.click(confirmBtn);
+    });
+
     expect(authClient.signOut).toHaveBeenCalled();
     await vi.waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith(routes.home);

@@ -101,7 +101,7 @@ describe("TranslationEditor", () => {
     expect(mutateFn).toHaveBeenCalledTimes(1);
   });
 
-  it("calls unpublishTranslation.mutate when Unpublish is clicked", () => {
+  it("calls unpublishTranslation.mutate when Unpublish is clicked", async () => {
     const mutateFn = vi.fn();
     (useUnpublishTranslation as Mock).mockReturnValue(makeMutation(mutateFn));
     (useContentTranslations as Mock).mockReturnValue({
@@ -116,6 +116,9 @@ describe("TranslationEditor", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: /ar/i }));
     fireEvent.click(screen.getByRole("button", { name: /unpublish/i }));
+    // Wait for modal to appear and click confirm button
+    const confirmButtons = await screen.findAllByRole("button", { name: /unpublish/i });
+    fireEvent.click(confirmButtons[confirmButtons.length - 1]); // Click the last (modal) Unpublish button
     expect(mutateFn).toHaveBeenCalledTimes(1);
   });
 
