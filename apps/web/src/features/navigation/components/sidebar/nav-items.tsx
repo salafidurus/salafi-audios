@@ -22,6 +22,7 @@ import {
   Users,
   FolderOpen,
   GraduationCap,
+  Radio,
   type LucideIcon,
 } from "lucide-react";
 import styles from "./sidebar.module.css";
@@ -70,6 +71,12 @@ const adminNavItems: AdminNavItem[] = [
     Icon: GraduationCap,
     href: routes.admin.scholars,
     activeMatch: routes.admin.scholars,
+  },
+  {
+    label: "Livestreams",
+    Icon: Radio,
+    href: routes.admin.livestreams,
+    activeMatch: routes.admin.livestreams,
   },
 ];
 
