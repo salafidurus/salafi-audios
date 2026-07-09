@@ -1,0 +1,33 @@
+.layout {
+  display: flex;
+  gap: var(--space-scale-3xl);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.sidebar {
+  flex: 0 0 280px;
+  position: sticky;
+  top: var(--space-scale-md);
+  align-self: flex-start;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+}
+
+.content {
+  margin-top: var(--space-scale-lg);
+}
+
+@media (max-width: 640px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    position: static;
+    flex: none;
+  }
+}

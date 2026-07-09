@@ -1,9 +1,17 @@
 "use client";
 
-import { Responsive } from "@/shared/components/Responsive";
+import { useIsDesktop } from "@/shared/hooks/use-responsive";
+import { QuickBrowseDesktop } from "@/features/search/components/QuickBrowse/QuickBrowse.desktop";
+import { QuickBrowseMobile } from "@/features/search/components/QuickBrowse/QuickBrowse.mobile";
+import { SearchButtonDesktop } from "@/features/search/components/SearchButton/SearchButton.desktop";
+import { SearchButtonMobile } from "@/features/search/components/SearchButton/SearchButton.mobile";
+import { TitleTextDesktop } from "@/features/search/components/TitleText/TitleText.desktop";
+import { TitleTextMobile } from "@/features/search/components/TitleText/TitleText.mobile";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { useQuickBrowse } from "@sd/domain-search";
+
 import type { ListingFormat } from "@sd/core-contracts";
-import { SearchHomeMobileScreen } from "./search-home.screen.mobile";
-import { SearchHomeDesktopScreen } from "./search-home.screen.desktop";
+import styles from "./search-home.screen.module.css";
 
 export type SearchHomeScreenProps = {
   onOpenSearch?: () => void;
@@ -20,24 +28,52 @@ export function SearchHomeScreen({
   onSelectSuggestion,
   onContinueListening,
 }: SearchHomeScreenProps) {
-  const mobile = (
-    <SearchHomeMobileScreen
-      onOpenSearch={onOpenSearch}
-      onSelectCategory={onSelectCategory}
-      onSelectScholar={onSelectScholar}
-      onSelectSuggestion={onSelectSuggestion}
-      onContinueListening={onContinueListening}
-    />
+  const isDesktop = useIsDesktop();
+  const { data, isLoading } = useQuickBrowse();
+
+  if (isDesktop) {
+    return (
+      <ScreenView>
+        <section className="flex flex-col items-center justify-center gap-[var(--space-scale-4xl)] text-center">
+          <div className="flex w-full flex-col items-center gap-[var(--space-component-gap-lg)]">
+            <TitleTextDesktop>Find a lesson</TitleTextDesktop>
+            <SearchButtonDesktop label="What do you want to listen to?" onClick={onOpenSearch} />
+          </div>
+          <QuickBrowseDesktop
+            isLoading={isLoading}
+            scholars={data?.scholars}
+            suggestions={data?.suggestions}
+            recentProgress={data?.recentProgress}
+            onSelectScholar={onSelectScholar}
+            onSelectSuggestion={onSelectSuggestion}
+            onContinueListening={onContinueListening}
+            onSelectCategory={onSelectCategory}
+          />
+        </section>
+      </ScreenView>
+    );
+  }
+
+  return (
+    <ScreenView center>
+      <div className={styles.content}>
+        <div className={styles.searchGroup}>
+          <div className={styles.header}>
+            <TitleTextMobile>Find a lesson</TitleTextMobile>
+          </div>
+          <SearchButtonMobile placeholder="What do you want to listen to?" onPress={onOpenSearch} />
+        </div>
+        <QuickBrowseMobile
+          isLoading={isLoading}
+          scholars={data?.scholars}
+          suggestions={data?.suggestions}
+          recentProgress={data?.recentProgress}
+          onSelectScholar={onSelectScholar}
+          onSelectSuggestion={onSelectSuggestion}
+          onContinueListening={onContinueListening}
+          onSelectCategory={onSelectCategory}
+        />
+      </div>
+    </ScreenView>
   );
-  const desktop = (
-    <SearchHomeDesktopScreen
-      onOpenSearch={onOpenSearch}
-      onSelectCategory={onSelectCategory}
-      onSelectScholar={onSelectScholar}
-      onSelectSuggestion={onSelectSuggestion}
-      onContinueListening={onContinueListening}
-    />
-  );
-  // react-doctor-disable-next-line react-doctor/jsx-no-jsx-as-prop
-  return <Responsive mobile={mobile} desktop={desktop} />;
 }

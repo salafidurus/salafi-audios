@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { LibraryDesktopScreen } from "./library.screen.desktop";
-import { LibrarySavedDesktopScreen } from "./library-saved.screen.desktop";
-import { LibraryCompletedDesktopScreen } from "./library-completed.screen.desktop";
+import { LibraryScreen } from "./library.screen";
+import { LibrarySavedScreen } from "./library-saved.screen";
+import { LibraryCompletedScreen } from "./library-completed.screen";
 import {
   useLibraryProgressScreen,
   useLibrarySavedScreen,
@@ -69,82 +69,82 @@ describe("Library screens", () => {
     mockUseAuth.mockReturnValue({ isAuthenticated: true });
   });
 
-  describe("LibraryDesktopScreen (Started)", () => {
+  describe("LibraryScreen (Started)", () => {
     it("renders loading state", () => {
       mockProgress.mockReturnValue({ items: [], isFetching: true } as any);
-      render(<LibraryDesktopScreen />);
+      render(<LibraryScreen />);
       expect(screen.getByText(/Loading/)).toBeInTheDocument();
     });
 
     it("renders empty state", () => {
       mockProgress.mockReturnValue({ items: [], isFetching: false } as any);
-      render(<LibraryDesktopScreen />);
+      render(<LibraryScreen />);
       expect(screen.getByText("No lectures in progress.")).toBeInTheDocument();
     });
 
     it("renders items", () => {
       mockProgress.mockReturnValue({ items: [mockItem], isFetching: false } as any);
-      render(<LibraryDesktopScreen />);
+      render(<LibraryScreen />);
       expect(screen.getByTestId("library-row")).toHaveTextContent("Lecture Title 1");
     });
 
     it("renders AuthRequiredState when unauthenticated", () => {
       mockUseAuth.mockReturnValue({ isAuthenticated: false });
-      render(<LibraryDesktopScreen />);
+      render(<LibraryScreen />);
       expect(screen.getByTestId("auth-required-state")).toBeInTheDocument();
       expect(screen.getByText("Sign in to view your progress")).toBeInTheDocument();
     });
   });
 
-  describe("LibrarySavedDesktopScreen (Saved)", () => {
+  describe("LibrarySavedScreen (Saved)", () => {
     it("renders loading state", () => {
       mockSaved.mockReturnValue({ items: [], isFetching: true } as any);
-      render(<LibrarySavedDesktopScreen />);
+      render(<LibrarySavedScreen />);
       expect(screen.getByText(/Loading/)).toBeInTheDocument();
     });
 
     it("renders empty state", () => {
       mockSaved.mockReturnValue({ items: [], isFetching: false } as any);
-      render(<LibrarySavedDesktopScreen />);
+      render(<LibrarySavedScreen />);
       expect(screen.getByText(/No saved lectures yet/)).toBeInTheDocument();
     });
 
     it("renders items", () => {
       mockSaved.mockReturnValue({ items: [mockItem], isFetching: false } as any);
-      render(<LibrarySavedDesktopScreen />);
+      render(<LibrarySavedScreen />);
       expect(screen.getByTestId("library-row")).toHaveTextContent("Lecture Title 1");
     });
 
     it("renders AuthRequiredState when unauthenticated", () => {
       mockUseAuth.mockReturnValue({ isAuthenticated: false });
-      render(<LibrarySavedDesktopScreen />);
+      render(<LibrarySavedScreen />);
       expect(screen.getByTestId("auth-required-state")).toBeInTheDocument();
       expect(screen.getByText("Sign in to view saved lectures")).toBeInTheDocument();
     });
   });
 
-  describe("LibraryCompletedDesktopScreen (Completed)", () => {
+  describe("LibraryCompletedScreen (Completed)", () => {
     it("renders loading state", () => {
       mockCompleted.mockReturnValue({ items: [], isFetching: true } as any);
-      render(<LibraryCompletedDesktopScreen />);
+      render(<LibraryCompletedScreen />);
       expect(screen.getByText(/Loading/)).toBeInTheDocument();
     });
 
     it("renders empty state", () => {
       mockCompleted.mockReturnValue({ items: [], isFetching: false } as any);
-      render(<LibraryCompletedDesktopScreen />);
+      render(<LibraryCompletedScreen />);
       expect(screen.getByText(/No completed lectures yet/)).toBeInTheDocument();
     });
 
     it("renders items", () => {
       mockCompleted.mockReturnValue({ items: [mockItem], isFetching: false } as any);
-      render(<LibraryCompletedDesktopScreen />);
+      render(<LibraryCompletedScreen />);
       expect(screen.getByTestId("library-row")).toHaveTextContent("Lecture Title 1");
     });
 
     it("renders AuthRequiredState when unauthenticated", () => {
       mockUseAuth.mockReturnValue({ isAuthenticated: false });
-      render(<LibraryCompletedDesktopScreen />);
+      render(<LibraryCompletedScreen />);
       expect(screen.getByTestId("auth-required-state")).toBeInTheDocument();
       expect(screen.getByText("Sign in to view completed history")).toBeInTheDocument();
     });

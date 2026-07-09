@@ -1,16 +1,45 @@
 "use client";
 
-import { Responsive } from "@/shared/components/Responsive";
-import { LiveEndedDesktopScreen } from "./live-ended.screen.desktop";
-import { LiveEndedMobileScreen } from "./live-ended.screen.mobile";
+import React from "react";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { EmptyState } from "@/shared/components/EmptyState";
+import { useLiveEndedScreen } from "@sd/domain-live";
+import { LiveSessionRow } from "../components/live-session-row/live-session-row";
+import { useTranslation } from "@/core/i18n/use-translation";
+import styles from "./live.screen.module.css";
 
 export type LiveEndedScreenProps = {
   onNavigateToSession?: (id: string) => void;
 };
 
-export function LiveEndedScreen(props: LiveEndedScreenProps) {
-  const mobile = <LiveEndedMobileScreen {...props} />;
-  const desktop = <LiveEndedDesktopScreen {...props} />;
-  // react-doctor-disable-next-line react-doctor/jsx-no-jsx-as-prop
-  return <Responsive mobile={mobile} desktop={desktop} />;
+export function LiveEndedScreen({ onNavigateToSession }: LiveEndedScreenProps) {
+  const { sessions, isFetching } = useLiveEndedScreen();
+  const { t } = useTranslation();
+
+  let content;
+  if (isFetching && sessions.length === 0) {
+    content = <EmptyState variant="loading" message={t("common.loading", "Loading\u2026")} />;
+  } else if (sessions.length === 0) {
+    content = <EmptyState message={t("live.sections.ended.empty", "No recent sessions.")} />;
+  } else {
+    content = (
+      <div className={styles.list}>
+        {sessions.map((session) => (
+          <LiveSessionRow
+            key={session.id}
+            session={session}
+            onPress={() => onNavigateToSession?.(session.id)}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <ScreenView>
+      <PageHeader title={t("live.sections.ended.header", "Past Sessions")} />
+      {content}
+    </ScreenView>
+  );
 }

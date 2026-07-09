@@ -19,7 +19,7 @@ describe("AdminDashboardScreen", () => {
     });
 
     render(<AdminDashboardScreen />);
-    expect(screen.getByText("Loading...")).toBeInTheDocument();
+    expect(screen.getByText("Loading…")).toBeInTheDocument();
   });
 
   it("renders sections based on user permissions", () => {

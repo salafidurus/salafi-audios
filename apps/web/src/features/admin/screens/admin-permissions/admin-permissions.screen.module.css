@@ -1,0 +1,92 @@
+.lookupSection {
+  display: flex;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-layout-section-y);
+}
+
+.input {
+  flex: 1;
+  padding: var(--space-xs);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xs);
+}
+
+.sectionTitle {
+  font-size: var(--typo-title-md-font-size);
+  font-weight: 600;
+  margin-bottom: var(--space-md);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tableHeader {
+  border-bottom: 2px solid var(--border-default);
+  text-align: left;
+}
+
+.tableHead {
+  padding: var(--space-xs);
+}
+
+.tableRow {
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.tableCell {
+  padding: var(--space-xs);
+}
+
+.cellMonospace {
+  font-family: monospace;
+}
+
+.statusBadge {
+  padding: 2px var(--space-xs);
+  border-radius: var(--radius-xs);
+  font-size: 12px;
+  display: inline-block;
+}
+
+.statusGranted {
+  background: var(--surface-success-subtle);
+  color: var(--content-success);
+}
+
+.statusNotGranted {
+  background: var(--surface-neutral-subtle);
+  color: var(--content-disabled);
+}
+
+.permissionCard {
+  padding: var(--space-sm);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.permissionInfo {
+  flex: 1;
+}
+
+.permissionName {
+  font-family: monospace;
+  font-size: 13px;
+}
+
+.permissionStatus {
+  font-size: 12px;
+}
+
+@media (max-width: 640px) {
+  .sectionTitle {
+    font-size: var(--typo-title-sm-font-size);
+  }
+
+  .lookupSection {
+    margin-bottom: var(--space-md);
+  }
+}

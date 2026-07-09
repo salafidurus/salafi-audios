@@ -2,27 +2,50 @@
 
 import { useRouter } from "next/navigation";
 import { routes } from "@sd/core-contracts";
-import { Responsive } from "@/shared/components/Responsive";
-import {
-  ScholarListDesktopScreen,
-  type ScholarListDesktopScreenProps,
-} from "./scholar-list.screen.desktop";
-import {
-  ScholarListMobileScreen,
-  type ScholarListMobileScreenProps,
-} from "./scholar-list.screen.mobile";
-
-export type ScholarListScreenProps = ScholarListDesktopScreenProps & ScholarListMobileScreenProps;
+import { useScholarsList } from "@sd/domain-content";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { AppText } from "@/shared/components/AppText/AppText";
+import { ScholarListRow } from "@/features/listing/components/scholar/scholar-list-row/scholar-list-row";
+import styles from "./scholar-list.screen.module.css";
 
 export function ScholarListScreen() {
   const { push } = useRouter();
+  const { data, isFetching } = useScholarsList();
+  const scholars = data?.scholars ?? [];
 
   const handleSelectScholar = (slug: string) => {
     push(routes.scholars.detail(slug));
   };
 
-  const mobile = <ScholarListMobileScreen onSelectScholar={handleSelectScholar} />;
-  const desktop = <ScholarListDesktopScreen onSelectScholar={handleSelectScholar} />;
-  // react-doctor-disable-next-line react-doctor/jsx-no-jsx-as-prop
-  return <Responsive mobile={mobile} desktop={desktop} />;
+  if (isFetching && scholars.length === 0) {
+    return (
+      <ScreenView center>
+        <AppText variant="bodyMd">Loading scholars…</AppText>
+      </ScreenView>
+    );
+  }
+
+  if (!isFetching && scholars.length === 0) {
+    return (
+      <ScreenView center>
+        <AppText variant="bodyMd">No scholars found.</AppText>
+      </ScreenView>
+    );
+  }
+
+  return (
+    <ScreenView>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>Scholars</h1>
+          <p className={styles.tagline}>Browse our database of authentic scholars</p>
+        </div>
+        <div className={styles.list}>
+          {scholars.map((scholar) => (
+            <ScholarListRow key={scholar.id} scholar={scholar} onPress={handleSelectScholar} />
+          ))}
+        </div>
+      </div>
+    </ScreenView>
+  );
 }

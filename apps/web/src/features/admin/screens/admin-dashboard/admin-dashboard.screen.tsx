@@ -62,7 +62,7 @@ export function AdminDashboardScreen() {
     return (
       <ScreenView>
         <PageHeader title={isDesktop ? "Admin Dashboard" : "Admin"} />
-        <EmptyState variant="loading" message="Loading..." />
+        <EmptyState variant="loading" message="Loading…" />
       </ScreenView>
     );
   }

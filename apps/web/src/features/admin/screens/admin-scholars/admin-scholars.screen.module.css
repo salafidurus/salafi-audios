@@ -1,0 +1,31 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.loading,
+.empty {
+  padding: var(--space-xl);
+  text-align: center;
+  color: var(--content-muted);
+  font-size: var(--typo-body-md-font-size);
+}
+
+.toolbar {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-md);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}

@@ -28,54 +28,98 @@ The web app consumes shared packages directly: `@sd/core-*` and `@sd/domain-*`. 
 
 ---
 
-## Responsive Routing Architecture
+## Responsive Screen Architecture
 
-**CRITICAL — this is how all feature screens are structured:**
+**CRITICAL — this is how all feature screens are structured (unified consolidation pattern):**
 
 ```text
 app/(feature)/page.tsx                         ← server component, metadata only
 features/<feature>/screens/<name>/
-  <name>.screen.tsx                            ← responsive router (client component)
-  <name>.screen.desktop.tsx                    ← desktop-only implementation
-  <name>.screen.mobile.tsx                     ← mobile-web implementation (if needed)
+  <name>.screen.tsx                            ← unified implementation (client component)
+  <name>.screen.module.css                     ← single CSS file with @media queries
 ```
 
-### Responsive rendering
+### Unified responsive pattern
 
-The canonical branching primitive is `<Responsive>` from `src/shared/components/Responsive`:
+Feature screens now use a **single unified file** with CSS media queries for layout/spacing differences and `useIsDesktop()` for conditional text/sizes:
 
 ```tsx
-import { Responsive } from "@/shared/components/Responsive";
-import { FeedDesktopScreen } from "./feed.screen.desktop";
-import { FeedMobileScreen } from "./feed.screen.mobile";
+"use client";
 
-export function FeedScreen(props: FeedScreenProps) {
+import { useIsDesktop } from "@/shared/hooks/use-responsive";
+import styles from "./<name>.screen.module.css";
+
+export function ExampleScreen(props: ExampleScreenProps) {
+  const isDesktop = useIsDesktop();
+
   return (
-    <Responsive
-      mobile={<FeedMobileScreen {...props} />}
-      desktop={<FeedDesktopScreen {...props} />}
-    />
+    <ScreenView>
+      <PageHeader
+        title={isDesktop ? "Full Title" : "Title"}
+        actions={<Button size={isDesktop ? "md" : "sm"}>Action</Button>}
+      />
+      {/* Desktop has grid, mobile uses CSS media query for flex-direction */}
+      <div className={styles.container}>
+        <section>Content</section>
+      </div>
+    </ScreenView>
   );
 }
 ```
 
-- **SSR default is desktop.** The mobile branch activates only after the first `useEffect` on narrow viewports. This avoids server/client hydration mismatches.
+### CSS consolidation pattern
+
+Merge desktop and mobile CSS into a single `.module.css` file with media queries:
+
+```css
+/* Base styles (desktop-first) */
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-component-gap-md);
+}
+
+/* Mobile overrides */
+@media (max-width: 640px) {
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-component-gap-sm);
+  }
+}
+```
+
+### Consolidation rules
+
+| Scenario                                    | Implementation                                                            |
+| ------------------------------------------- | ------------------------------------------------------------------------- |
+| Layout changes (grid/flex, sidebar/stacked) | CSS `@media (max-width: 640px)`                                           |
+| Spacing/padding differences                 | CSS media queries using semantic token variants                           |
+| Text label differences                      | `useIsDesktop()` in JSX: `{isDesktop ? "Desktop Label" : "Mobile Label"}` |
+| Icon/button size differences                | `useIsDesktop()` for `size` prop: `size={isDesktop ? "md" : "sm"}`        |
+| Component structure branches                | Conditional JSX: `{isDesktop ? <DesktopLayout /> : <MobileLayout />}`     |
+
+- **SSR default is desktop.** The `useIsDesktop()` hook defaults to `true` on the server, and CSS media queries work server-side. Mobile layout switches happen client-side after hydration.
 - **Do not use `display: none` to hide one tree.** Render exactly one branch at a time.
-- `useResponsive()` from `src/shared/hooks/use-responsive` is the underlying hook; prefer `<Responsive>` for screen-level branching.
-- `useIsDesktop()` from the same module returns a plain `boolean` when you only need a single condition.
+- `useResponsive()` from `src/shared/hooks/use-responsive` returns multi-branch state and is reserved for complex navigation/layout components with 3+ branches (mobile/tablet/desktop). Use `useIsDesktop()` for feature screens.
 - The shared `src/shared/styles/responsive.module.css` (`.mobileOnly` / `.desktopOnly`) is a CSS-only fallback for non-React contexts. Do not use it in feature screens.
+- CSS variables (design tokens) are still the single source of truth for colors, spacing, and typography — never hardcode values.
 
 ### Rules
 
 - **`app/**/page.tsx`\*\* — server component, no hooks, imports one screen component, adds metadata
-- **`features/**/screens/<name>/<name>.screen.tsx`\*\* — responsive router only:
-  - Uses `<Responsive>` to decide mobile vs desktop
-  - For simple cases where mobile and desktop share ≥80% markup, collapse into one file using CSS
-- **`features/**/screens/<name>/<name>.screen.desktop.tsx`\*\* — desktop-only UI:
-  - Uses CSS Modules + CSS variables (`var(--token-name)`)
-  - No `useResponsive()`, no mobile imports
+- **`features/**/screens/<name>/<name>.screen.tsx`\*\* — unified implementation:
+  - Imports `useIsDesktop` hook when conditional text/sizes are needed
+  - Uses single CSS module with `@media (max-width: 640px)` for layout differences
   - All styles use design token CSS variables — never hardcode colors/spacing
-- **`features/**/screens/<name>/<name>.screen.mobile.tsx`\*\* — mobile-web variant (only when truly needed)
+- **`features/**/screens/<name>/<name>.screen.module.css`\*\* — single responsive stylesheet:
+  - Desktop styles as base (no media query prefix)
+  - Mobile overrides inside `@media (max-width: 640px)` block
+  - Only override differing properties (avoid duplication)
+
+### Legacy `.desktop.tsx` and `.mobile.tsx` files
+
+All screens have been consolidated into the unified pattern above. No multi-file screen variants remain.
 
 ### Naming Conventions
 

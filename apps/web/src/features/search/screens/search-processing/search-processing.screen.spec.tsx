@@ -1,8 +1,7 @@
 import { vi, type Mock } from "vitest";
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { SearchProcessingDesktopScreen } from "./search-processing.screen.desktop";
-import { SearchProcessingMobileScreen } from "./search-processing.screen.mobile";
+import { SearchProcessingScreen } from "./search-processing.screen";
 import { useSearchProcessing } from "@sd/domain-search";
 import { routes } from "@sd/core-contracts";
 
@@ -16,9 +15,15 @@ vi.mock("@sd/domain-search", () => ({
   useSearchProcessing: vi.fn(),
 }));
 
+const mockUseIsDesktop = vi.fn().mockReturnValue(true);
+vi.mock("@/shared/hooks/use-responsive", () => ({
+  useIsDesktop: () => mockUseIsDesktop(),
+}));
+
 describe("SearchProcessingScreen", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseIsDesktop.mockReturnValue(true);
   });
 
   it("navigates to series detail on series item click (desktop)", () => {
@@ -42,7 +47,7 @@ describe("SearchProcessingScreen", () => {
       errorMessage: undefined,
     });
 
-    render(<SearchProcessingDesktopScreen />);
+    render(<SearchProcessingScreen searchKey="jurisprudence" />);
 
     // Click the search result item
     const item = screen.getByText("Test Series");
@@ -52,6 +57,7 @@ describe("SearchProcessingScreen", () => {
   });
 
   it("navigates to series detail on series item click (mobile)", () => {
+    mockUseIsDesktop.mockReturnValue(false);
     (useSearchProcessing as Mock).mockReturnValue({
       query: "jurisprudence",
       setQuery: vi.fn(),
@@ -72,7 +78,7 @@ describe("SearchProcessingScreen", () => {
       errorMessage: undefined,
     });
 
-    render(<SearchProcessingMobileScreen />);
+    render(<SearchProcessingScreen searchKey="jurisprudence" />);
 
     // Click the search result item
     const item = screen.getByText("Test Series");

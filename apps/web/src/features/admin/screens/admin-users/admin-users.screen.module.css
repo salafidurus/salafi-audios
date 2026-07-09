@@ -1,0 +1,99 @@
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.pageTitle {
+  font-family: var(--typo-display-md-font-family);
+  font-size: var(--typo-display-md-font-size);
+  font-weight: 700;
+  color: var(--content-strong);
+  margin: 0 0 var(--space-scale-2xl);
+}
+
+.searchRow {
+  display: flex;
+  gap: var(--space-scale-sm);
+  margin-bottom: var(--space-scale-2xl);
+  align-items: center;
+}
+
+.toolbar {
+  margin-bottom: var(--space-scale-md);
+}
+
+.resultCount {
+  font-family: var(--typo-caption-font-family);
+  font-size: var(--typo-caption-font-size);
+  color: var(--content-muted);
+  margin: 0 0 var(--space-scale-md);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tableHead th {
+  padding: var(--space-scale-md) var(--space-scale-sm);
+  border-bottom: 2px solid var(--border-default);
+  font-family: var(--typo-label-md-font-family);
+  font-size: var(--typo-caption-font-size);
+  color: var(--content-muted);
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.table th {
+  padding: var(--space-scale-md) var(--space-scale-sm);
+  border-bottom: 2px solid var(--border-default);
+  font-family: var(--typo-label-md-font-family);
+  font-size: var(--typo-caption-font-size);
+  color: var(--content-muted);
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tableRow {
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+}
+
+.tableRow td {
+  padding: var(--space-scale-md) var(--space-scale-sm);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-md);
+}
+
+.loading {
+  text-align: center;
+  color: var(--content-muted);
+  padding: var(--space-scale-3xl) 0;
+}
+
+.empty {
+  text-align: center;
+  color: var(--content-muted);
+  padding: var(--space-scale-3xl) 0;
+}
+
+@media (max-width: 640px) {
+  .searchRow {
+    margin-bottom: var(--space-scale-lg);
+  }
+
+  .resultCount {
+    margin: 0 0 var(--space-scale-md);
+  }
+
+  .pageTitle {
+    font-size: var(--typo-title-lg-font-size);
+    margin: 0 0 var(--space-scale-lg);
+  }
+}
