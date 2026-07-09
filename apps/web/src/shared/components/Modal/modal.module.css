@@ -26,9 +26,15 @@
   flex-direction: column;
 }
 
-.size-sm { width: min(24rem, 100%); }
-.size-md { width: min(32rem, 100%); }
-.size-lg { width: min(48rem, 100%); }
+.size-sm {
+  width: min(24rem, 100%);
+}
+.size-md {
+  width: min(32rem, 100%);
+}
+.size-lg {
+  width: min(48rem, 100%);
+}
 
 .header {
   display: flex;
@@ -57,7 +63,9 @@
   border-radius: var(--radius-sm);
   color: var(--content-muted);
   cursor: pointer;
-  transition: background-color 150ms, color 150ms;
+  transition:
+    background-color 150ms,
+    color 150ms;
 }
 
 .closeButton:hover {

@@ -9,7 +9,7 @@ import { Button } from "@/shared/components/Button";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { ScholarListItemDto, CreateScholarDto } from "@sd/core-contracts";
 import { createScholar, updateScholar } from "@/features/admin/api/admin.api";
-import { AdminSearchBar } from "@/features/admin/components/AdminSearchBar";
+import { SearchBar } from "@/shared/components/SearchBar";
 import { ScholarCard } from "@/features/admin/components/ScholarCard";
 import {
   ScholarFormModal,
@@ -93,10 +93,9 @@ export function AdminScholarsScreen() {
         />
 
         <div className={styles.toolbar}>
-          <AdminSearchBar
+          <SearchBar
             value={searchQuery}
             onChange={setSearchQuery}
-            onSearch={() => {}}
             placeholder={isDesktop ? "Search scholars by name or slug..." : "Search scholars..."}
           />
         </div>

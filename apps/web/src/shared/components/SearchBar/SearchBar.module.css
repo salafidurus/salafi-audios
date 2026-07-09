@@ -1,0 +1,100 @@
+/* Container - full width on all screen sizes */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-sm);
+  width: 100%;
+}
+
+/* Input wrapper - search icon + input + clear button */
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* Search icon on left */
+.searchIcon {
+  position: absolute;
+  left: var(--space-input-padding-inline);
+  color: var(--content-muted);
+  pointer-events: none;
+}
+
+/* Input field */
+.input {
+  width: 100%;
+  padding: var(--space-input-padding-block) var(--space-input-padding-inline);
+  padding-left: calc(var(--space-input-padding-inline) + 24px); /* Space for icon */
+  padding-right: calc(var(--space-input-padding-inline) + 32px); /* Space for clear button */
+  border: 1px solid var(--chrome-border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-input);
+  color: var(--content-primary);
+  font-size: var(--text-body-md-size);
+  line-height: var(--text-body-md-line-height);
+  transition: border-color 0.15s ease;
+}
+
+.input::placeholder {
+  color: var(--content-placeholder);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--action-primary);
+}
+
+/* Clear button on right (only visible when value exists) */
+.clearButton {
+  position: absolute;
+  right: var(--space-input-padding-inline);
+  padding: 4px;
+  border: none;
+  background: transparent;
+  color: var(--content-muted);
+  cursor: pointer;
+  border-radius: var(--radius-xs);
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.clearButton:hover {
+  background: var(--surface-hover);
+  color: var(--content-primary);
+}
+
+.clearButton:active {
+  background: var(--surface-active);
+}
+
+/* Filter controls below input */
+.filters {
+  display: flex;
+  gap: var(--space-component-gap-sm);
+  flex-wrap: wrap;
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .input {
+    font-size: var(--text-body-sm-size);
+    padding: var(--space-input-padding-block-sm) var(--space-input-padding-inline-sm);
+    padding-left: calc(var(--space-input-padding-inline-sm) + 20px);
+    padding-right: calc(var(--space-input-padding-inline-sm) + 28px);
+  }
+
+  .searchIcon {
+    left: var(--space-input-padding-inline-sm);
+  }
+
+  .clearButton {
+    right: var(--space-input-padding-inline-sm);
+  }
+
+  .filters {
+    flex-direction: column;
+  }
+}

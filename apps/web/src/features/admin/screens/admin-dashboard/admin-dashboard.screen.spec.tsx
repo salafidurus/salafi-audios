@@ -25,7 +25,7 @@ describe("AdminDashboardScreen", () => {
   it("renders sections based on user permissions", () => {
     (useAdminPermissions as Mock).mockReturnValue({
       data: {
-        permissions: ["manage:scholars", "manage:content", "manage:livestreams"],
+        permissions: ["manage:scholars", "manage:content", "manage:admin", "manage:livestreams"],
       },
       isFetching: false,
     });
@@ -37,14 +37,19 @@ describe("AdminDashboardScreen", () => {
     expect(scholarsLink).toBeInTheDocument();
     expect(scholarsLink).toHaveAttribute("href", "/admin/scholars");
 
-    // Check Lectures section (uses manage:content)
-    const lecturesLink = screen.getByRole("link", { name: /lectures/i });
-    expect(lecturesLink).toBeInTheDocument();
-    expect(lecturesLink).toHaveAttribute("href", "/admin/lectures");
+    // Check Contents section (uses manage:content, consolidated Topics/Lectures)
+    const contentsLink = screen.getByRole("link", { name: /contents/i });
+    expect(contentsLink).toBeInTheDocument();
+    expect(contentsLink).toHaveAttribute("href", "/admin/contents");
 
-    // Check Livestreams section (links to /admin/live)
+    // Check Users section (uses manage:admin, consolidated permissions)
+    const usersLink = screen.getByRole("link", { name: /users/i });
+    expect(usersLink).toBeInTheDocument();
+    expect(usersLink).toHaveAttribute("href", "/admin/users");
+
+    // Check Livestreams section
     const livestreamsLink = screen.getByRole("link", { name: /livestreams/i });
     expect(livestreamsLink).toBeInTheDocument();
-    expect(livestreamsLink).toHaveAttribute("href", "/admin/live");
+    expect(livestreamsLink).toHaveAttribute("href", "/admin/livestreams");
   });
 });

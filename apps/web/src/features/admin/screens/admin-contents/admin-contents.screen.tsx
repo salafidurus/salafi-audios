@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { Plus, Trash2, Edit } from "lucide-react";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
@@ -20,7 +21,7 @@ import {
   AdminContentsTabs,
   type AdminContentsTab,
 } from "@/features/admin/components/AdminContentsTabs";
-import { AdminSearchBar } from "@/features/admin/components/AdminSearchBar";
+import { SearchBar } from "@/shared/components/SearchBar";
 import { TopicFormModal, type TopicForEdit } from "@/features/admin/components/TopicFormModal";
 import { AudioUploader } from "@/features/admin/components/AudioUploader/AudioUploader";
 import { LectureEditModal } from "@/features/admin/components/LectureEditModal";
@@ -35,10 +36,17 @@ type AudioData = {
   filename: string;
 };
 
+const EMPTY_TOPICS_ARRAY: TopicDetailDto[] = [];
+const EMPTY_LISTINGS_ARRAY: AdminListingDetailDto[] = [];
+
 export function AdminContentsScreen() {
   const isDesktop = useIsDesktop();
-  const [activeTab, setActiveTab] = useState<AdminContentsTab>("topics");
+  const pathname = usePathname();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Derive active tab from URL pathname
+  const activeTab: AdminContentsTab = pathname.includes("/listings") ? "listings" : "topics";
 
   // Topics state
   const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
@@ -56,7 +64,7 @@ export function AdminContentsScreen() {
     () => httpClient<TopicDetailDto[]>({ url: endpoints.topics.list, method: "GET" }),
   );
 
-  const topics = topicsData ?? [];
+  const topics = topicsData ?? EMPTY_TOPICS_ARRAY;
 
   // Fetch listings
   const { data: listingsData, refetch: refetchListings } = useApiQuery<AdminListingListDto>(
@@ -65,7 +73,7 @@ export function AdminContentsScreen() {
     { enabled: activeTab === "listings" },
   );
 
-  const listings = listingsData?.items ?? [];
+  const listings = listingsData?.items ?? EMPTY_LISTINGS_ARRAY;
 
   const filteredTopics = useMemo(() => {
     if (!searchQuery.trim()) return topics;
@@ -163,12 +171,17 @@ export function AdminContentsScreen() {
         }
       />
 
-      <AdminContentsTabs activeTab={activeTab} onTabChange={setActiveTab} />
+      <AdminContentsTabs
+        activeTab={activeTab}
+        onTabChange={(tab) => {
+          const path = tab === "topics" ? "/admin/contents" : "/admin/contents/listings";
+          router.push(path);
+        }}
+      />
 
-      <AdminSearchBar
+      <SearchBar
         value={searchQuery}
         onChange={setSearchQuery}
-        onSearch={() => {}}
         placeholder={activeTab === "topics" ? "Search topics..." : "Search listings..."}
       />
 

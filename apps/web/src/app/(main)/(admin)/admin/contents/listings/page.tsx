@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { AdminContentsScreen } from "@/features/admin/screens/admin-contents/admin-contents.screen";
 
 export const metadata: Metadata = {
-  title: "Topics | Admin",
-  description: "Manage content topics and categories.",
+  title: "Listings | Admin",
+  description: "Manage lectures, series, and audio content.",
 };
 
-export default function AdminContentsPage() {
+export default function AdminContentsListingsPage() {
   return <AdminContentsScreen />;
 }

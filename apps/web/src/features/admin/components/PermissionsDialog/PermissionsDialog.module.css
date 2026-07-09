@@ -1,0 +1,104 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-md);
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: var(--content-secondary);
+  font-size: var(--text-body-md-size);
+}
+
+.permissionsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-sm);
+}
+
+.permissionItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-component-gap-md);
+  padding: var(--space-component-gap-sm);
+  border: 1px solid var(--chrome-border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-secondary);
+}
+
+.permissionInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+}
+
+.permissionName {
+  font-family: monospace;
+  font-size: var(--text-body-sm-size);
+  color: var(--content-primary);
+  word-break: break-all;
+}
+
+.permissionStatus {
+  font-size: var(--text-body-xs-size);
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+  width: fit-content;
+}
+
+.statusGranted {
+  background: var(--status-success-bg);
+  color: var(--status-success);
+}
+
+.statusNotGranted {
+  background: var(--status-error-bg);
+  color: var(--status-error);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-component-gap-xs);
+  flex-shrink: 0;
+}
+
+.footer {
+  display: flex;
+  gap: var(--space-component-gap-sm);
+  justify-content: flex-end;
+  margin-top: var(--space-component-gap-md);
+  padding-top: var(--space-component-gap-md);
+  border-top: 1px solid var(--chrome-border);
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .container {
+    max-height: 80vh;
+  }
+
+  .permissionItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .actions {
+    width: 100%;
+  }
+
+  .footer {
+    justify-content: stretch;
+  }
+
+  .footer button {
+    flex: 1;
+  }
+}

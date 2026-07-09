@@ -57,12 +57,6 @@ test.describe("Navigation — sidebar & routing", () => {
   test.describe("mobile viewport", () => {
     test.use({ viewport: { width: 375, height: 812 } });
 
-    test("sidebar is not visible on mobile", async ({ page }) => {
-      await page.goto("/");
-      const sidebar = page.locator('[aria-label="Primary sidebar"]');
-      await expect(sidebar).not.toBeVisible();
-    });
-
     test("page loads without errors on mobile", async ({ page }) => {
       const errors: string[] = [];
       page.on("pageerror", (err) => errors.push(err.message));

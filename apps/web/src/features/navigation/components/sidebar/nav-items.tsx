@@ -22,6 +22,7 @@ import {
   Users,
   FolderOpen,
   GraduationCap,
+  Radio,
   type LucideIcon,
 } from "lucide-react";
 import styles from "./sidebar.module.css";
@@ -71,25 +72,20 @@ const adminNavItems: AdminNavItem[] = [
     href: routes.admin.scholars,
     activeMatch: routes.admin.scholars,
   },
+  {
+    label: "Livestreams",
+    Icon: Radio,
+    href: routes.admin.livestreams,
+    activeMatch: routes.admin.livestreams,
+  },
 ];
 
-interface NavItemsProps {
-  collapsed?: boolean;
-  onItemClick?: () => void;
-}
-
-export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
-  const pathname = usePathname();
-  const router = useRouter();
-  const { t } = useTranslation();
-  const { isAuthenticated, user, isLoading } = useAuth();
-
-  const { data: adminPermissionsData } = useAdminPermissions();
-
-  const hasAdminAccess = isAuthenticated && (adminPermissionsData?.permissions ?? []).length > 0;
-  const settingsHref = routes.settings.index;
-
-  const navItems: NavItem[] = [
+/**
+ * Factory function to create main nav items with translations
+ * Takes translation function to avoid recreating array on every render
+ */
+function getNavItems(t: (key: string, fallback: string) => string): NavItem[] {
+  return [
     {
       label: t("authStrip.search", "Search"),
       Icon: Search,
@@ -115,6 +111,25 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
       activeMatch: routes.library.index,
     },
   ];
+}
+
+interface NavItemsProps {
+  collapsed?: boolean;
+  onItemClick?: () => void;
+}
+
+export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { t } = useTranslation();
+  const { isAuthenticated, user, isLoading } = useAuth();
+
+  const { data: adminPermissionsData } = useAdminPermissions();
+
+  const hasAdminAccess = isAuthenticated && (adminPermissionsData?.permissions ?? []).length > 0;
+  const settingsHref = routes.settings.index;
+
+  const navItems = getNavItems(t);
 
   const userInitial = (user?.name || user?.email || "?").charAt(0).toUpperCase();
 
@@ -149,10 +164,7 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
         {/* Settings */}
         <Link
           href={settingsHref}
-          className={clsx(
-            styles.link,
-            pathname.startsWith(routes.settings.index) && styles.active,
-          )}
+          className={clsx(styles.link, pathname.startsWith(routes.settings.index) && styles.active)}
           aria-label={t("navigation.settings", "Settings")}
           title={collapsed ? t("navigation.settings", "Settings") : undefined}
           onClick={handleNavClick}
