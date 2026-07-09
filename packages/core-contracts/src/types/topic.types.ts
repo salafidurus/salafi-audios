@@ -43,6 +43,14 @@ export const UpsertTopicDtoSchema = z.object({
   slug: z.string().min(1, "Slug must not be empty"),
   name: z.string().min(1, "Name must not be empty"),
   parentSlug: z.string().optional(),
+  translations: z
+    .record(
+      LocaleSchema,
+      z.object({
+        name: z.string().optional(),
+      }),
+    )
+    .optional(),
 });
 export type UpsertTopicDto = z.infer<typeof UpsertTopicDtoSchema>;
 

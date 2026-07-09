@@ -31,6 +31,7 @@ export function revokePermission(userId: string, permission: string) {
   return httpClient<AdminPermissionsListResponse>({
     url: endpoints.admin.permissions.revoke(userId, permission),
     method: "DELETE",
+    body: {},
   });
 }
 

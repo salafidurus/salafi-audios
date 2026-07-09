@@ -158,7 +158,7 @@ function ProfileContent() {
         </SettingsRow>
       </SettingsSection>
 
-      <div className={styles.signOutRow}>
+      <div className={styles.actionRow}>
         <button
           type="button"
           data-testid="sign-out-trigger"
@@ -166,6 +166,15 @@ function ProfileContent() {
           onClick={() => setShowSignOutModal(true)}
         >
           Sign Out
+        </button>
+        <button
+          type="button"
+          data-testid="delete-account-trigger"
+          className={styles.deleteAccountButton}
+          onClick={() => setShowDeleteAccountModal(true)}
+          disabled={isDeleting}
+        >
+          {isDeleting ? "Deleting…" : "Delete Account"}
         </button>
       </div>
 
@@ -179,18 +188,6 @@ function ProfileContent() {
         confirmVariant="danger"
         testId="confirm-modal"
       />
-
-      <div className={styles.deleteAccountRow}>
-        <button
-          type="button"
-          data-testid="delete-account-trigger"
-          className={styles.deleteAccountButton}
-          onClick={() => setShowDeleteAccountModal(true)}
-          disabled={isDeleting}
-        >
-          {isDeleting ? "Deleting…" : "Delete Account"}
-        </button>
-      </div>
 
       <ConfirmModal
         isOpen={showDeleteAccountModal}

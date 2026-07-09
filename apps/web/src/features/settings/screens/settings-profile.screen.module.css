@@ -137,7 +137,9 @@
   margin: var(--space-scale-sm) 0;
 }
 
-.signOutRow {
+.actionRow {
+  display: flex;
+  gap: var(--space-component-gap-md);
   margin-top: var(--space-scale-3xl);
   padding-top: var(--space-scale-xl);
   border-top: var(--border-width-default) solid var(--border-subtle);
@@ -162,10 +164,6 @@
   color: var(--content-on-primary);
 }
 
-.deleteAccountRow {
-  margin-top: var(--space-scale-xl);
-}
-
 .deleteAccountButton {
   padding: var(--space-scale-sm) var(--space-scale-xl);
   border: var(--border-width-default) solid var(--border-disabled);
@@ -188,6 +186,18 @@
 .deleteAccountButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .actionRow {
+    flex-direction: column;
+    gap: var(--space-component-gap-sm);
+  }
+
+  .signOutButton,
+  .deleteAccountButton {
+    width: 100%;
+  }
 }
 
 /* Sign-in CTA */

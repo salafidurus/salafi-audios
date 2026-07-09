@@ -21,6 +21,7 @@ import { SearchBar } from "@/shared/components/SearchBar";
 import { TopicFormModal, type TopicForEdit } from "@/features/admin/components/TopicFormModal";
 import { AudioUploader } from "@/features/admin/components/AudioUploader/AudioUploader";
 import { LectureEditModal } from "@/features/admin/components/LectureEditModal";
+import { DeleteTopicConfirmModal } from "@/shared/components/DeleteTopicConfirmModal";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import styles from "./admin-contents.screen.module.css";
 
@@ -46,6 +47,9 @@ export function AdminContentsScreen() {
   // Topics state
   const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
   const [editingTopic, setEditingTopic] = useState<TopicForEdit | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deletingTopicSlug, setDeletingTopicSlug] = useState<string | null>(null);
+  const [deletingTopicName, setDeletingTopicName] = useState<string>("");
 
   // Listings state
   const [isAudioUploaderOpen, setIsAudioUploaderOpen] = useState(false);
@@ -86,6 +90,7 @@ export function AdminContentsScreen() {
 
   const handleOpenEditTopic = (topic: TopicDetailDto) => {
     setEditingTopic({
+      id: topic.id,
       slug: topic.slug,
       name: topic.name,
       parentSlug: undefined, // parentId from API doesn't map to parentSlug
@@ -102,11 +107,19 @@ export function AdminContentsScreen() {
     refetchTopics();
   };
 
-  const handleDeleteTopic = async (slug: string) => {
-    if (confirm("Are you sure you want to delete this topic?")) {
-      await deleteTopic(slug);
-      refetchTopics();
-    }
+  const handleDeleteClick = (slug: string, name: string) => {
+    setDeletingTopicSlug(slug);
+    setDeletingTopicName(name);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingTopicSlug) return;
+    await deleteTopic(deletingTopicSlug);
+    setDeleteModalOpen(false);
+    setDeletingTopicSlug(null);
+    setDeletingTopicName("");
+    refetchTopics();
   };
 
   // Listing handlers
@@ -141,6 +154,17 @@ export function AdminContentsScreen() {
 
   return (
     <ScreenView>
+      <DeleteTopicConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          setDeleteModalOpen(false);
+          setDeletingTopicSlug(null);
+          setDeletingTopicName("");
+        }}
+        onConfirm={handleConfirmDelete}
+        topicName={deletingTopicName}
+      />
+
       <PageHeader
         title={isMobile ? "Content" : "Content Management"}
         actions={
@@ -188,7 +212,7 @@ export function AdminContentsScreen() {
                   variant="ghost"
                   size="sm"
                   icon={<Trash2 size={14} />}
-                  onClick={() => handleDeleteTopic(topic.slug)}
+                  onClick={() => handleDeleteClick(topic.slug, topic.name)}
                 />
               </div>
             </div>
