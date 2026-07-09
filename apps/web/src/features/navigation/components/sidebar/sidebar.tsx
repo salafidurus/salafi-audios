@@ -39,10 +39,16 @@ export function Sidebar() {
     <aside
       className={clsx(styles.sidebar, collapsed && styles.collapsed)}
       aria-label={t("navigation.primarySidebar")}
+      data-testid="sidebar"
       data-collapsed={collapsed}
     >
       <div className={styles.brandRow}>
-        <Link href={routes.home} className={styles.brand} aria-label={t("navigation.siteTitle")}>
+        <Link
+          href={routes.home}
+          className={styles.brand}
+          aria-label={t("navigation.siteTitle")}
+          data-testid="brand-link"
+        >
           <span className={styles.brandMark} aria-hidden="true">
             <Image
               src="/logo/logo_72.png"

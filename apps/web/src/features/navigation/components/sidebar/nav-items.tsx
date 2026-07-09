@@ -150,6 +150,7 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
               href={item.href}
               className={clsx(styles.link, isActive && styles.active)}
               aria-label={item.label}
+              data-testid={`nav-link-${item.label.toLowerCase()}`}
               title={collapsed ? item.label : undefined}
               onClick={handleNavClick}
             >
