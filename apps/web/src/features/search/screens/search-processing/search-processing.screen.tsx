@@ -2,20 +2,14 @@
 
 import { useEffect, useRef } from "react";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
-import { SearchFilterDesktop } from "@/features/search/components/SearchFilter/SearchFilter.desktop";
-import { SearchInputDesktop } from "@/features/search/components/SearchInput/SearchInput.desktop";
-import { SearchFilterMobile } from "@/features/search/components/SearchFilter/SearchFilter.mobile";
+import { SearchFilter } from "@/features/search/components/SearchFilter/SearchFilter";
 import {
-  SearchInputMobile,
-  type SearchInputMobileRef,
-} from "@/features/search/components/SearchInput/SearchInput.mobile";
-import { SearchResultItemDesktop } from "@/features/search/components/SearchResultItem/SearchResultItem.desktop";
-import { SearchResultItemMobile } from "@/features/search/components/SearchResultItem/SearchResultItem.mobile";
-import { SearchResultsListDesktop } from "@/features/search/components/SearchResultsList/SearchResultsList.desktop";
-import {
-  SearchResultsListMobile,
-  type SearchResultRow,
-} from "@/features/search/components/SearchResultsList/SearchResultsList.mobile";
+  SearchInput,
+  type SearchInputRef,
+} from "@/features/search/components/SearchInput/SearchInput";
+import { SearchResultItem } from "@/features/search/components/SearchResultItem/SearchResultItem";
+import { SearchResultsList } from "@/features/search/components/SearchResultsList/SearchResultsList";
+import type { SearchResultRow } from "@sd/domain-search";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { useSearchProcessing } from "@sd/domain-search";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
@@ -31,8 +25,7 @@ export type SearchProcessingScreenProps = {
 
 export function SearchProcessingScreen({ searchKey, onBackPress }: SearchProcessingScreenProps) {
   const isDesktop = useIsDesktop();
-  const desktopInputRef = useRef<HTMLInputElement>(null);
-  const mobileInputRef = useRef<SearchInputMobileRef>(null);
+  const inputRef = useRef<SearchInputRef>(null);
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
   const {
@@ -49,12 +42,8 @@ export function SearchProcessingScreen({ searchKey, onBackPress }: SearchProcess
   const { push } = useRouter();
 
   useEffect(() => {
-    if (isDesktop) {
-      desktopInputRef.current?.focus();
-    } else {
-      mobileInputRef.current?.focus();
-    }
-  }, [isDesktop]);
+    inputRef.current?.focus();
+  }, []);
 
   const handleItemPress = (item: SearchResultRow) => {
     const [kind, id] = item.id.split(":");
@@ -80,24 +69,24 @@ export function SearchProcessingScreen({ searchKey, onBackPress }: SearchProcess
           }}
         >
           <div className="flex flex-col gap-[var(--space-component-gap-md)]">
-            <SearchInputDesktop
-              ref={desktopInputRef}
+            <SearchInput
+              ref={inputRef}
               placeholder={t("search.placeholder", "Search")}
               value={query}
               onChange={setQuery}
               autoFocus
             />
-            <SearchFilterDesktop value={filter} onChange={setFilter} topics={topics} />
+            <SearchFilter value={filter} onChange={setFilter} topics={topics} />
           </div>
         </div>
         <section className="pb-[var(--space-layout-page-y)]">
-          <SearchResultsListDesktop
+          <SearchResultsList
             items={items}
             isFetching={isFetching}
             shouldSearch={shouldSearch}
             errorMessage={errorMessage}
             renderItem={(item) => (
-              <SearchResultItemDesktop {...item} onClick={() => handleItemPress(item)} />
+              <SearchResultItem item={item} onPress={() => handleItemPress(item)} />
             )}
           />
         </section>
@@ -108,31 +97,22 @@ export function SearchProcessingScreen({ searchKey, onBackPress }: SearchProcess
   return (
     <ScreenView contentStyle={{ flex: 1 }}>
       <div className={styles.searchGroup}>
-        <SearchInputMobile
-          ref={mobileInputRef}
+        <SearchInput
+          ref={inputRef}
           placeholder={t("search.placeholder", "Search")}
           value={query}
           onChange={setQuery}
           onBackPress={onBackPress}
         />
-        {shouldSearch ? (
-          <SearchFilterMobile value={filter} onChange={setFilter} topics={topics} />
-        ) : null}
+        {shouldSearch ? <SearchFilter value={filter} onChange={setFilter} topics={topics} /> : null}
       </div>
-      <SearchResultsListMobile
+      <SearchResultsList
         items={items}
         isFetching={isFetching}
         shouldSearch={shouldSearch}
         errorMessage={errorMessage}
         renderItem={(item: SearchResultRow) => (
-          <SearchResultItemMobile
-            title={item.title}
-            scholarName={item.scholarName}
-            imageUrl={item.imageUrl}
-            lectureCount={item.lectureCount}
-            durationSeconds={item.durationSeconds}
-            onPress={() => handleItemPress(item)}
-          />
+          <SearchResultItem item={item} onPress={() => handleItemPress(item)} />
         )}
       />
     </ScreenView>

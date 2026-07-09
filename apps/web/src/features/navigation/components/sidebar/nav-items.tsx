@@ -75,8 +75,8 @@ const adminNavItems: AdminNavItem[] = [
   {
     label: "Livestreams",
     Icon: Radio,
-    href: routes.admin.livestreams,
-    activeMatch: routes.admin.livestreams,
+    href: routes.admin.live,
+    activeMatch: routes.admin.live,
   },
 ];
 

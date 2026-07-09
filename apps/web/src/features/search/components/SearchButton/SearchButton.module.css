@@ -1,0 +1,30 @@
+.searchButton {
+  justify-content: flex-start;
+  gap: 0.75rem;
+  --btn-bg: var(--accent-primary-subtle-surface, var(--surface-default));
+  --btn-bg-hover: var(--accent-primary-subtle-surface, var(--surface-hover));
+  --btn-border: var(--accent-primary-subtle-border, var(--border-default));
+  --btn-border-hover: var(--accent-primary-subtle-border, var(--border-hover));
+  --btn-fg: var(--accent-primary-subtle-fg, var(--content-default));
+  --btn-shadow: var(--shadow-sm);
+}
+
+.pillButton {
+  border-radius: var(--radius-component-panel-sm);
+  justify-content: flex-start;
+  gap: var(--space-component-gap-sm);
+  padding: var(--space-scale-md) var(--space-scale-lg);
+  --btn-bg: var(--accent-primary-subtle-surface, var(--surface-default));
+  --btn-bg-hover: var(--accent-primary-subtle-surface, var(--surface-hover));
+  --btn-border: var(--accent-primary-subtle-border, var(--border-default));
+  --btn-border-hover: var(--accent-primary-subtle-border, var(--border-hover));
+  --btn-fg: var(--accent-primary-subtle-fg, var(--content-default));
+}
+
+.pressed {
+  opacity: 0.9;
+}
+
+.glyph {
+  color: var(--content-muted);
+}

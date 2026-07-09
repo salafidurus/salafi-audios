@@ -50,6 +50,6 @@ describe("AdminDashboardScreen", () => {
     // Check Livestreams section
     const livestreamsLink = screen.getByRole("link", { name: /livestreams/i });
     expect(livestreamsLink).toBeInTheDocument();
-    expect(livestreamsLink).toHaveAttribute("href", "/admin/livestreams");
+    expect(livestreamsLink).toHaveAttribute("href", "/admin/live");
   });
 });

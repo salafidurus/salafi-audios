@@ -1,10 +1,9 @@
 import { AppText } from "@/shared/components/AppText/AppText";
 
-export type TitleTextMobileProps = {
+export type TitleTextProps = {
   children: string;
-  delay?: number;
 };
 
-export function TitleTextMobile({ children }: TitleTextMobileProps) {
+export function TitleText({ children }: TitleTextProps) {
   return <AppText variant="displayMd">{children}</AppText>;
 }

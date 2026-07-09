@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
+import { useResponsive } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
@@ -22,7 +22,7 @@ interface ScholarsListResponse {
 }
 
 export function AdminScholarsScreen() {
-  const isDesktop = useIsDesktop();
+  const { isMobile } = useResponsive();
   const { data, isFetching, refetch } = useApiQuery<ScholarsListResponse>(
     queryKeys.scholars.list(),
     () => httpClient<ScholarsListResponse>({ url: endpoints.scholars.list, method: "GET" }),
@@ -79,15 +79,15 @@ export function AdminScholarsScreen() {
     <ScreenView>
       <div className={styles.container}>
         <PageHeader
-          title={isDesktop ? "Manage Scholars" : "Scholars"}
+          title={!isMobile ? "Manage Scholars" : "Scholars"}
           actions={
             <Button
               variant="primary"
-              size={isDesktop ? "md" : "sm"}
-              icon={<Plus size={isDesktop ? 18 : 16} />}
+              size={!isMobile ? "md" : "sm"}
+              icon={<Plus size={!isMobile ? 18 : 16} />}
               onClick={handleOpenAdd}
             >
-              {isDesktop ? "Add Scholar" : "Add"}
+              {!isMobile ? "Add Scholar" : "Add"}
             </Button>
           }
         />
@@ -96,11 +96,11 @@ export function AdminScholarsScreen() {
           <SearchBar
             value={searchQuery}
             onChange={setSearchQuery}
-            placeholder={isDesktop ? "Search scholars by name or slug..." : "Search scholars..."}
+            placeholder={!isMobile ? "Search scholars by name or slug..." : "Search scholars..."}
           />
         </div>
 
-        <div className={isDesktop ? styles.grid : styles.list}>
+        <div className={!isMobile ? styles.grid : styles.list}>
           {filteredScholars.map((scholar) => (
             <ScholarCard
               key={scholar.id}

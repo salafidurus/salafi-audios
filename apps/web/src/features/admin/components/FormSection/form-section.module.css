@@ -1,0 +1,24 @@
+.section {
+  margin-top: var(--space-component-gap-lg);
+  padding: var(--space-component-padding-md);
+  border: 1px solid var(--chrome-border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--surface-secondary);
+}
+
+.section:first-child {
+  margin-top: 0;
+}
+
+.sectionTitle {
+  font-size: var(--text-heading-sm-size);
+  font-weight: 600;
+  color: var(--content-primary);
+  margin: 0 0 var(--space-component-gap-md);
+}
+
+.sectionContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-md);
+}

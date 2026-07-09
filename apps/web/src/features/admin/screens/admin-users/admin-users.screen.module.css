@@ -29,43 +29,7 @@
   margin: 0 0 var(--space-scale-md);
 }
 
-.table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.tableHead th {
-  padding: var(--space-scale-md) var(--space-scale-sm);
-  border-bottom: 2px solid var(--border-default);
-  font-family: var(--typo-label-md-font-family);
-  font-size: var(--typo-caption-font-size);
-  color: var(--content-muted);
-  text-align: left;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.table th {
-  padding: var(--space-scale-md) var(--space-scale-sm);
-  border-bottom: 2px solid var(--border-default);
-  font-family: var(--typo-label-md-font-family);
-  font-size: var(--typo-caption-font-size);
-  color: var(--content-muted);
-  text-align: left;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.tableRow {
-  border-bottom: 1px solid var(--border-subtle);
-  vertical-align: middle;
-}
-
-.tableRow td {
-  padding: var(--space-scale-md) var(--space-scale-sm);
-}
-
-.list {
+.cardList {
   display: flex;
   flex-direction: column;
   gap: var(--space-component-gap-md);

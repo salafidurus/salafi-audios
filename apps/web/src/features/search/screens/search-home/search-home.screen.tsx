@@ -1,12 +1,9 @@
 "use client";
 
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
-import { QuickBrowseDesktop } from "@/features/search/components/QuickBrowse/QuickBrowse.desktop";
-import { QuickBrowseMobile } from "@/features/search/components/QuickBrowse/QuickBrowse.mobile";
-import { SearchButtonDesktop } from "@/features/search/components/SearchButton/SearchButton.desktop";
-import { SearchButtonMobile } from "@/features/search/components/SearchButton/SearchButton.mobile";
-import { TitleTextDesktop } from "@/features/search/components/TitleText/TitleText.desktop";
-import { TitleTextMobile } from "@/features/search/components/TitleText/TitleText.mobile";
+import { QuickBrowse } from "@/features/search/components/QuickBrowse/QuickBrowse";
+import { SearchButton } from "@/features/search/components/SearchButton/SearchButton";
+import { TitleText } from "@/features/search/components/TitleText/TitleText";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { useQuickBrowse } from "@sd/domain-search";
 
@@ -36,10 +33,10 @@ export function SearchHomeScreen({
       <ScreenView>
         <section className="flex flex-col items-center justify-center gap-[var(--space-scale-4xl)] text-center">
           <div className="flex w-full flex-col items-center gap-[var(--space-component-gap-lg)]">
-            <TitleTextDesktop>Find a lesson</TitleTextDesktop>
-            <SearchButtonDesktop label="What do you want to listen to?" onClick={onOpenSearch} />
+            <TitleText>Find a lesson</TitleText>
+            <SearchButton label="What do you want to listen to?" onClick={onOpenSearch} />
           </div>
-          <QuickBrowseDesktop
+          <QuickBrowse
             isLoading={isLoading}
             scholars={data?.scholars}
             suggestions={data?.suggestions}
@@ -59,11 +56,11 @@ export function SearchHomeScreen({
       <div className={styles.content}>
         <div className={styles.searchGroup}>
           <div className={styles.header}>
-            <TitleTextMobile>Find a lesson</TitleTextMobile>
+            <TitleText>Find a lesson</TitleText>
           </div>
-          <SearchButtonMobile placeholder="What do you want to listen to?" onPress={onOpenSearch} />
+          <SearchButton label="What do you want to listen to?" onClick={onOpenSearch} />
         </div>
-        <QuickBrowseMobile
+        <QuickBrowse
           isLoading={isLoading}
           scholars={data?.scholars}
           suggestions={data?.suggestions}
