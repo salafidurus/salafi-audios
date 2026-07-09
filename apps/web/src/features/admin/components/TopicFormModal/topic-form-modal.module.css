@@ -45,14 +45,6 @@
     width: 140px;
     text-align: left;
   }
-
-  .fieldInputGroup {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    max-width: 350px;
-  }
 }
 
 /* Mobile: vertical layout with label on top, input+button below */
@@ -61,12 +53,6 @@
     width: 100%;
     padding-left: var(--space-xs);
   }
-
-  .fieldInputGroup {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-  }
 }
 
 .label {
@@ -74,23 +60,6 @@
   font-weight: 600;
   color: var(--content-default);
   letter-spacing: 0.5px;
-}
-
-.fieldInputGroup {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-xs) var(--space-md);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  background-color: var(--surface-default);
-  transition: all 150ms ease-out;
-}
-
-.fieldInputGroup:focus-within {
-  border-color: var(--action-primary);
-  background-color: var(--surface-default);
-  box-shadow: 0 0 0 3px rgba(0, 200, 180, 0.1);
 }
 
 .editIconButton {
@@ -124,28 +93,6 @@
 .editIconButton:focus {
   outline: 2px solid var(--border-focus);
   outline-offset: 2px;
-}
-
-.input {
-  flex: 1;
-  min-width: 0;
-  padding: 0;
-  padding-left: var(--space-sm);
-  font-size: var(--typo-body-md-font-size);
-  font-family: inherit;
-  background-color: transparent;
-  border: none;
-  color: var(--content-default);
-  outline: none;
-}
-
-.input::placeholder {
-  color: var(--content-muted);
-}
-
-.input:disabled {
-  color: var(--content-subtle);
-  cursor: not-allowed;
 }
 
 /* Locale Tabs */

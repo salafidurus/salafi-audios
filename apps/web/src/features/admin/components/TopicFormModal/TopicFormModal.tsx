@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Edit2, RotateCcw } from "lucide-react";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button";
+import { EditableInput } from "@/shared/components/EditableInput";
 import { useContentTranslations } from "@sd/domain-content";
 import type { UpsertTopicDto } from "@sd/core-contracts";
 import { SUPPORTED_LOCALES } from "@sd/core-i18n";
@@ -87,6 +88,27 @@ export function TopicFormModal({ isOpen, onClose, onSave, topic }: TopicFormModa
   }, [isOpen]);
 
   const toggleFieldEdit = (fieldName: string) => {
+    const isCurrentlyEditing = editingFields.has(fieldName);
+
+    if (isCurrentlyEditing) {
+      // Revert the value to original when toggling off
+      if (fieldName === "slug") {
+        setFormData((p) => ({ ...p, slug: originalFormData.slug ?? "" }));
+      } else if (fieldName === "name") {
+        setFormData((p) => ({ ...p, name: originalFormData.name ?? "" }));
+      } else if (fieldName === "translation-ar-name") {
+        const originalArabicName = translations.find((t) => t.locale === "ar")?.fields.name ?? "";
+        setTranslationChanges((prev) => ({
+          ...prev,
+          ar: {
+            ...prev.ar,
+            name: originalArabicName,
+          },
+        }));
+      }
+    }
+
+    // Toggle the editing state
     setEditingFields((prev) => {
       const next = new Set(prev);
       if (next.has(fieldName)) {
@@ -134,7 +156,12 @@ export function TopicFormModal({ isOpen, onClose, onSave, topic }: TopicFormModa
     setSaving(true);
     setError(null);
     try {
-      await onSave(formData);
+      // Prepare data with translations for single API round trip
+      const dataWithTranslations: UpsertTopicDto = {
+        ...formData,
+        translations: isEditing ? translationChanges : undefined,
+      };
+      await onSave(dataWithTranslations);
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save");
@@ -163,126 +190,88 @@ export function TopicFormModal({ isOpen, onClose, onSave, topic }: TopicFormModa
       <form id="topic-form" onSubmit={handleSubmit} className={styles.form}>
         {error && <div className={styles.error}>{error}</div>}
 
-        {/* Name Field */}
-        <div className={styles.field}>
-          <label className={styles.label}>Name *</label>
-          <div className={styles.fieldInputGroup}>
-            <input
-              type="text"
-              className={styles.input}
-              value={formData.name}
-              onChange={(e) => handleNameChange(e.target.value)}
-              placeholder="Topic name"
-              disabled={isEditing && !isFieldEditing("name")}
-            />
-            {isEditing && (
-              <button
-                type="button"
-                className={styles.editIconButton}
-                onClick={() => toggleFieldEdit("name")}
-                aria-label={isFieldEditing("name") ? "Cancel edit" : "Edit name"}
-              >
-                {isFieldEditing("name") ? <RotateCcw size={16} /> : <Edit2 size={16} />}
-              </button>
-            )}
-          </div>
-        </div>
-
         {/* Slug Field */}
         <div className={styles.field}>
           <label className={styles.label}>Slug *</label>
-          <div className={styles.fieldInputGroup}>
-            <input
-              type="text"
-              className={styles.input}
-              value={formData.slug}
-              onChange={(e) => setFormData((p) => ({ ...p, slug: e.target.value }))}
-              placeholder="topic-slug"
-              disabled={isEditing && !isFieldEditing("slug")}
-            />
-            {isEditing && (
-              <button
-                type="button"
-                className={styles.editIconButton}
-                onClick={() => toggleFieldEdit("slug")}
-                aria-label={isFieldEditing("slug") ? "Cancel edit" : "Edit slug"}
-              >
-                {isFieldEditing("slug") ? <RotateCcw size={16} /> : <Edit2 size={16} />}
-              </button>
-            )}
-          </div>
+          <EditableInput
+            value={formData.slug}
+            onChange={(value) => setFormData((p) => ({ ...p, slug: value }))}
+            placeholder="topic-slug"
+            disabled={isEditing && !isFieldEditing("slug")}
+            rightButton={
+              isEditing && (
+                <button
+                  type="button"
+                  className={styles.editIconButton}
+                  onClick={() => toggleFieldEdit("slug")}
+                  aria-label={isFieldEditing("slug") ? "Cancel edit" : "Edit slug"}
+                >
+                  {isFieldEditing("slug") ? <RotateCcw size={16} /> : <Edit2 size={16} />}
+                </button>
+              )
+            }
+          />
         </div>
 
-        {/* Translations Section */}
-        {isEditing && translations.length > 0 && (
-          <div className={styles.section}>
-            <h3 className={styles.sectionTitle}>Translations</h3>
-
-            <div className={styles.localeTabs}>
-              {SUPPORTED_LOCALES.map((locale: "en" | "ar") => (
+        {/* English Name Field */}
+        <div className={styles.field}>
+          <label className={styles.label}>English Name *</label>
+          <EditableInput
+            value={formData.name}
+            onChange={handleNameChange}
+            placeholder="Topic name in English"
+            disabled={isEditing && !isFieldEditing("name")}
+            rightButton={
+              isEditing && (
                 <button
-                  key={locale}
                   type="button"
-                  className={`${styles.localeTab} ${selectedLocale === locale ? styles.localeTabActive : ""}`}
-                  onClick={() => setSelectedLocale(locale)}
+                  className={styles.editIconButton}
+                  onClick={() => toggleFieldEdit("name")}
+                  aria-label={isFieldEditing("name") ? "Cancel edit" : "Edit English name"}
                 >
-                  {locale.toUpperCase()}
+                  {isFieldEditing("name") ? <RotateCcw size={16} /> : <Edit2 size={16} />}
                 </button>
-              ))}
-            </div>
+              )
+            }
+          />
+        </div>
 
-            {SUPPORTED_LOCALES.map((locale: "en" | "ar") => {
-              const translation = translations.find((t) => t.locale === locale);
-              if (!translation) return null;
-
-              const translationFieldKey = `translation-${locale}-name`;
-
-              return (
-                <div
-                  key={locale}
-                  className={`${styles.localeContent} ${selectedLocale === locale ? styles.localeContentActive : ""}`}
+        {/* Arabic Name Field */}
+        {isEditing && translations.length > 0 && (
+          <div className={styles.field}>
+            <label className={styles.label}>Arabic Name</label>
+            <EditableInput
+              value={translationChanges.ar?.name ?? ""}
+              onChange={(value) => handleTranslationNameChange("ar", value)}
+              placeholder="Topic name in Arabic"
+              disabled={!isFieldEditing("translation-ar-name")}
+              rightButton={
+                <button
+                  type="button"
+                  className={styles.editIconButton}
+                  onClick={() => toggleFieldEdit("translation-ar-name")}
+                  aria-label={
+                    isFieldEditing("translation-ar-name") ? "Cancel edit" : "Edit Arabic name"
+                  }
                 >
-                  <div className={styles.field}>
-                    <label className={styles.label}>Name ({locale.toUpperCase()})</label>
-                    <div className={styles.fieldInputGroup}>
-                      <input
-                        type="text"
-                        className={styles.input}
-                        value={translationChanges[locale]?.name ?? ""}
-                        onChange={(e) => handleTranslationNameChange(locale, e.target.value)}
-                        placeholder={`Topic name in ${locale}`}
-                        disabled={!isFieldEditing(translationFieldKey)}
-                      />
-                      <button
-                        type="button"
-                        className={styles.editIconButton}
-                        onClick={() => toggleFieldEdit(translationFieldKey)}
-                        aria-label={
-                          isFieldEditing(translationFieldKey)
-                            ? `Cancel ${locale} edit`
-                            : `Edit ${locale} translation`
-                        }
-                      >
-                        {isFieldEditing(translationFieldKey) ? (
-                          <RotateCcw size={16} />
-                        ) : (
-                          <Edit2 size={16} />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className={styles.translationStatus}>
-                    Status:{" "}
-                    <span
-                      className={`${styles.statusBadge} ${styles[`status-${translation.status}`]}`}
-                    >
-                      {translation.status}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+                  {isFieldEditing("translation-ar-name") ? (
+                    <RotateCcw size={16} />
+                  ) : (
+                    <Edit2 size={16} />
+                  )}
+                </button>
+              }
+            />
+            {translations.find((t) => t.locale === "ar") && (
+              <div className={styles.translationStatus}>
+                Status:{" "}
+                <span
+                  className={`${styles.statusBadge} ${styles[`status-${translations.find((t) => t.locale === "ar")?.status}`]}`}
+                >
+                  {translations.find((t) => t.locale === "ar")?.status}
+                </span>
+              </div>
+            )}
           </div>
         )}
       </form>
