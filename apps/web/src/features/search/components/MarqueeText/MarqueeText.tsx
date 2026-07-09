@@ -2,13 +2,12 @@
 
 import { useEffect, useRef } from "react";
 
-export type MarqueeTextDesktopProps = {
+export type MarqueeTextProps = {
   text: string;
   className?: string;
-  style?: React.CSSProperties;
 };
 
-export function MarqueeTextDesktop({ text, className, style }: MarqueeTextDesktopProps) {
+export function MarqueeText({ text, className }: MarqueeTextProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
   const animationRef = useRef<Animation | null>(null);
@@ -52,7 +51,7 @@ export function MarqueeTextDesktop({ text, className, style }: MarqueeTextDeskto
       <span
         ref={textRef}
         className={className}
-        style={{ ...style, display: "inline-block", whiteSpace: "nowrap" }}
+        style={{ display: "inline-block", whiteSpace: "nowrap" }}
       >
         {text}
       </span>

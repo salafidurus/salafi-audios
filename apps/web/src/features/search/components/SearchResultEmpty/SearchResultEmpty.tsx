@@ -1,29 +1,31 @@
-import { useTranslation } from "@/core/i18n/use-translation";
-import styles from "./SearchResultEmpty.mobile.module.css";
+"use client";
 
-export type SearchResultEmptyMobileProps = {
+import { useTranslation } from "@/core/i18n/use-translation";
+import styles from "./SearchResultEmpty.module.css";
+
+export type SearchResultEmptyProps = {
   shouldSearch: boolean;
   isFetching: boolean;
   errorMessage?: string;
 };
 
-export function SearchResultEmptyMobile({
+export function SearchResultEmpty({
   shouldSearch,
   isFetching,
   errorMessage,
-}: SearchResultEmptyMobileProps) {
+}: SearchResultEmptyProps) {
   const { t } = useTranslation();
   const message = shouldSearch
     ? errorMessage
       ? errorMessage
       : isFetching
-        ? t("search.searching", "Searching…")
+        ? t("search.searching", "Searching.")
         : t("search.noResults", "No results found.")
     : t("search.startTyping", "Start typing to search.");
 
   return (
     <div className={styles.container}>
-      <span className={styles.message}>{message}</span>
+      <p className={styles.message}>{message}</p>
     </div>
   );
 }

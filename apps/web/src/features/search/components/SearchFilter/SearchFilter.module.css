@@ -1,16 +1,40 @@
+.scrollContainer {
+  display: flex;
+  cursor: grab;
+  flex-direction: row;
+  gap: var(--space-component-gap-sm);
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: var(--space-component-gap-sm) 0;
+  scrollbar-width: none;
+}
+
+.scrollContainer::-webkit-scrollbar {
+  display: none;
+}
+
 .chip {
   flex-shrink: 0;
-  border: 1px solid;
   border-radius: var(--radius-component-chip);
+  border: 1px solid var(--border-subtle);
   padding: var(--space-component-chip-y) var(--space-component-chip-x);
-  cursor: pointer;
+  transition: opacity 100ms ease, background 150ms ease, border-color 150ms ease;
   white-space: nowrap;
+  cursor: pointer;
   font-family: var(--typo-label-md-font-family);
   font-size: var(--typo-label-md-font-size);
   line-height: var(--typo-label-md-line-height);
   letter-spacing: var(--typo-label-md-letter-spacing);
   font-weight: var(--typo-label-md-font-weight);
-  transition: opacity 0.1s;
+}
+
+.chipInactive {
+  background: var(--surface-subtle);
+  color: var(--content-muted);
+}
+
+.chipInactive:hover {
+  opacity: 0.9;
 }
 
 .chipActive {
@@ -19,24 +43,6 @@
   color: var(--accent-primary-subtle-fg);
 }
 
-.chipInactive {
-  background: var(--surface-subtle);
-  border-color: var(--border-subtle);
-  color: var(--content-muted);
-}
-
 .chipPressed {
   opacity: 0.85;
-}
-
-.scrollContainer {
-  display: flex;
-  flex-direction: row;
-  overflow-x: auto;
-  overflow-y: hidden;
-  gap: var(--space-component-gap-sm);
-  padding-top: var(--space-component-gap-sm);
-  padding-bottom: var(--space-component-gap-sm);
-  scrollbar-width: none;
-  cursor: grab;
 }
