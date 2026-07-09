@@ -8,7 +8,6 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { routes } from "@sd/core-contracts";
 import { PanelLeftOpen, PanelRightOpen } from "lucide-react";
 import { useResponsive } from "@/shared/hooks/use-responsive";
-import { useIsHydrated } from "@/shared/hooks/use-is-hydrated";
 import { NavItems } from "./nav-items";
 import { SidebarMobile } from "./sidebar.mobile";
 import { useNavigationStore } from "../../store/navigation-store";
@@ -16,7 +15,6 @@ import styles from "./sidebar.module.css";
 
 export function Sidebar() {
   const { t } = useTranslation();
-  const isHydrated = useIsHydrated();
   const { isMobile, isTablet } = useResponsive();
   const {
     isDesktopSidebarCollapsed,
@@ -32,10 +30,6 @@ export function Sidebar() {
     const root = document.documentElement;
     root.style.setProperty("--sidebar-width", collapsed ? "4.5rem" : "16.5rem");
   }, [collapsed]);
-
-  if (!isHydrated) {
-    return null;
-  }
 
   if (isMobile) {
     return <SidebarMobile />;
