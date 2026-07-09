@@ -21,7 +21,7 @@
   flex: 1;
   min-width: 0;
   padding: 0;
-  padding-left: var(--space-sm);
+  padding-left: var(--space-md);
   font-size: var(--typo-body-md-font-size);
   font-family: inherit;
   background-color: transparent;
