@@ -37,13 +37,13 @@
   .field {
     flex-direction: row;
     align-items: center;
-    gap: var(--space-lg);
+    gap: var(--space-md);
   }
 
   .label {
     flex-shrink: 0;
-    width: 120px;
-    text-align: right;
+    width: 140px;
+    text-align: left;
   }
 
   .fieldInputGroup {
@@ -51,6 +51,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-sm);
+    max-width: 350px;
   }
 }
 
@@ -78,7 +79,18 @@
 .fieldInputGroup {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-md);
+  padding: var(--space-xs) var(--space-md);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-default);
+  transition: all 150ms ease-out;
+}
+
+.fieldInputGroup:focus-within {
+  border-color: var(--action-primary);
+  background-color: var(--surface-default);
+  box-shadow: 0 0 0 3px rgba(0, 200, 180, 0.1);
 }
 
 .editIconButton {
@@ -116,31 +128,23 @@
 
 .input {
   flex: 1;
-  padding: var(--space-sm) var(--space-md);
+  min-width: 0;
+  padding: 0 0 0 var(--space-sm);
   font-size: var(--typo-body-md-font-size);
-  background-color: var(--surface-default);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  color: var(--content-default);
-  transition: all 150ms ease-out;
   font-family: inherit;
-}
-
-.input:focus {
+  background-color: transparent;
+  border: none;
+  color: var(--content-default);
   outline: none;
-  border-color: var(--action-primary);
-  box-shadow: 0 0 0 3px rgba(0, 200, 180, 0.1);
-}
-
-.input:disabled {
-  background-color: var(--surface-canvas);
-  color: var(--content-subtle);
-  border-color: var(--border-subtle);
-  cursor: not-allowed;
 }
 
 .input::placeholder {
+  color: var(--content-muted);
+}
+
+.input:disabled {
   color: var(--content-subtle);
+  cursor: not-allowed;
 }
 
 /* Locale Tabs */
