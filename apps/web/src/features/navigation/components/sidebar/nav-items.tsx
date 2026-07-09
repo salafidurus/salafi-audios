@@ -80,23 +80,12 @@ const adminNavItems: AdminNavItem[] = [
   },
 ];
 
-interface NavItemsProps {
-  collapsed?: boolean;
-  onItemClick?: () => void;
-}
-
-export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
-  const pathname = usePathname();
-  const router = useRouter();
-  const { t } = useTranslation();
-  const { isAuthenticated, user, isLoading } = useAuth();
-
-  const { data: adminPermissionsData } = useAdminPermissions();
-
-  const hasAdminAccess = isAuthenticated && (adminPermissionsData?.permissions ?? []).length > 0;
-  const settingsHref = routes.settings.index;
-
-  const navItems: NavItem[] = [
+/**
+ * Factory function to create main nav items with translations
+ * Takes translation function to avoid recreating array on every render
+ */
+function getNavItems(t: (key: string, fallback: string) => string): NavItem[] {
+  return [
     {
       label: t("authStrip.search", "Search"),
       Icon: Search,
@@ -122,6 +111,25 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
       activeMatch: routes.library.index,
     },
   ];
+}
+
+interface NavItemsProps {
+  collapsed?: boolean;
+  onItemClick?: () => void;
+}
+
+export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { t } = useTranslation();
+  const { isAuthenticated, user, isLoading } = useAuth();
+
+  const { data: adminPermissionsData } = useAdminPermissions();
+
+  const hasAdminAccess = isAuthenticated && (adminPermissionsData?.permissions ?? []).length > 0;
+  const settingsHref = routes.settings.index;
+
+  const navItems = getNavItems(t);
 
   const userInitial = (user?.name || user?.email || "?").charAt(0).toUpperCase();
 
