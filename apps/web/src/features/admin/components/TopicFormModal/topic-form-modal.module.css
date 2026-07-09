@@ -129,7 +129,7 @@
 .input {
   flex: 1;
   min-width: 0;
-  padding: 0 0 0 var(--space-sm);
+  padding: 0 0 0 var(--space-md);
   font-size: var(--typo-body-md-font-size);
   font-family: inherit;
   background-color: transparent;
