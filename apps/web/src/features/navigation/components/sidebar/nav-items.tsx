@@ -164,10 +164,7 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
         {/* Settings */}
         <Link
           href={settingsHref}
-          className={clsx(
-            styles.link,
-            pathname.startsWith(routes.settings.index) && styles.active,
-          )}
+          className={clsx(styles.link, pathname.startsWith(routes.settings.index) && styles.active)}
           aria-label={t("navigation.settings", "Settings")}
           title={collapsed ? t("navigation.settings", "Settings") : undefined}
           onClick={handleNavClick}

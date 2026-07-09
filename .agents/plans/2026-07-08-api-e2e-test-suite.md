@@ -71,17 +71,9 @@ the next stage starts.
      provides a no-op `TelegramService` stub and omits the `TelegramMonitor` cron entirely.
   6. **`test/helpers/mock-cdn.health.ts`** — A mock `CDNHealthIndicator` that returns
      `{ cdn: { status: 'up' } }`.
-  7. **`test/infrastructure.e2e-spec.ts`** — Baseline + throttler tests:
-     - `GET /health` returns 200 with `{ status: 'ok', info: { db: ..., cdn: ... },
-error: {}, details: ... }`
-     - `GET /health/healthz` returns 200 with `{ status: 'ok' }`
-     - `GET /health/readyz` returns 200 with `{ status: 'ok' }`
-     - `GET /docs` returns 200 HTML (Swagger UI)
-     - `GET /nonexistent` returns 404 with structured error body
-     - CORS preflight `OPTIONS /scholars` returns correct headers
-     - Helmet security headers present on any response
-     - **Throttler**: rapid-fire a throttled endpoint and verify at least one response is 429
-       with the correct error shape
+  7. **`test/infrastructure.e2e-spec.ts`** — Baseline + throttler tests: - `GET /health` returns 200 with `{ status: 'ok', info: { db: ..., cdn: ... },
+error: {}, details: ... }` - `GET /health/healthz` returns 200 with `{ status: 'ok' }` - `GET /health/readyz` returns 200 with `{ status: 'ok' }` - `GET /docs` returns 200 HTML (Swagger UI) - `GET /nonexistent` returns 404 with structured error body - CORS preflight `OPTIONS /scholars` returns correct headers - Helmet security headers present on any response - **Throttler**: rapid-fire a throttled endpoint and verify at least one response is 429
+     with the correct error shape
   8. **`test/app.e2e-spec.ts`** — Update the existing test to use the new helper and test
      correct health path (`/health/healthz` instead of `/health/live`).
 - **Blockers**: None currently identified.

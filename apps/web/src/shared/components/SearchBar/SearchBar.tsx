@@ -10,8 +10,6 @@ export interface SearchBarProps {
   onChange: (value: string) => void;
   /** Placeholder text */
   placeholder?: string;
-  /** Loading state (shows spinner in icon area) */
-  loading?: boolean;
   /** Callback when clear button clicked */
   onClear?: () => void;
   /** Optional filter controls (status dropdown, etc.) */
@@ -24,7 +22,6 @@ export function SearchBar({
   value,
   onChange,
   placeholder = "Search...",
-  loading = false,
   onClear,
   filters,
   className,

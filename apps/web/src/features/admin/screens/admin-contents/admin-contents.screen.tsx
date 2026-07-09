@@ -35,6 +35,9 @@ type AudioData = {
   filename: string;
 };
 
+const EMPTY_TOPICS_ARRAY: TopicDetailDto[] = [];
+const EMPTY_LISTINGS_ARRAY: AdminListingDetailDto[] = [];
+
 export function AdminContentsScreen() {
   const isDesktop = useIsDesktop();
   const [activeTab, setActiveTab] = useState<AdminContentsTab>("topics");
@@ -56,7 +59,7 @@ export function AdminContentsScreen() {
     () => httpClient<TopicDetailDto[]>({ url: endpoints.topics.list, method: "GET" }),
   );
 
-  const topics = topicsData ?? [];
+  const topics = topicsData ?? EMPTY_TOPICS_ARRAY;
 
   // Fetch listings
   const { data: listingsData, refetch: refetchListings } = useApiQuery<AdminListingListDto>(
@@ -65,7 +68,7 @@ export function AdminContentsScreen() {
     { enabled: activeTab === "listings" },
   );
 
-  const listings = listingsData?.items ?? [];
+  const listings = listingsData?.items ?? EMPTY_LISTINGS_ARRAY;
 
   const filteredTopics = useMemo(() => {
     if (!searchQuery.trim()) return topics;

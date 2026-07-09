@@ -12,7 +12,9 @@
   text-decoration: none;
   color: inherit;
   background-color: var(--surface-default);
-  transition: border-color 0.2s, background-color 0.2s;
+  transition:
+    border-color 0.2s,
+    background-color 0.2s;
 }
 
 .sectionCard:hover {

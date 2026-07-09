@@ -6,7 +6,9 @@
   border: 1px solid var(--chrome-border);
   border-radius: var(--radius-md);
   background: var(--surface-card);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .card.clickable {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import styles from "./AdminCard.module.css";
 
@@ -41,16 +42,16 @@ export function AdminCard({
   onClick,
   className,
 }: AdminCardProps) {
-  // Track which expandable items are expanded
-  const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
+  // Track which expandable items are expanded by label
+  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
-  const toggleExpand = (index: number) => {
+  const toggleExpand = (label: string) => {
     setExpandedItems((prev) => {
       const next = new Set(prev);
-      if (next.has(index)) {
-        next.delete(index);
+      if (next.has(label)) {
+        next.delete(label);
       } else {
-        next.add(index);
+        next.add(label);
       }
       return next;
     });
@@ -68,7 +69,13 @@ export function AdminCard({
       {thumbnail && (
         <div className={styles.thumbnail}>
           {isThumbnailImage ? (
-            <img src={thumbnail.src} alt={thumbnail.alt} className={styles.image} />
+            <Image
+              src={thumbnail.src}
+              alt={thumbnail.alt}
+              className={styles.image}
+              width={64}
+              height={64}
+            />
           ) : (
             thumbnail
           )}
@@ -82,14 +89,16 @@ export function AdminCard({
         </div>
 
         <div className={styles.metadata}>
-          {metadata.map((item, index) => {
-            const isExpanded = expandedItems.has(index);
+          {metadata.map((item) => {
+            const isExpanded = expandedItems.has(item.label);
             const shouldTruncate = item.truncate && !isExpanded;
 
             return (
-              <div key={index} className={styles.metadataItem}>
+              <div key={item.label} className={styles.metadataItem}>
                 <span className={styles.metadataLabel}>{item.label}:</span>
-                <span className={shouldTruncate ? styles.metadataValueTruncated : styles.metadataValue}>
+                <span
+                  className={shouldTruncate ? styles.metadataValueTruncated : styles.metadataValue}
+                >
                   {item.value}
                 </span>
                 {item.expandable && (
@@ -98,7 +107,7 @@ export function AdminCard({
                     className={styles.expandButton}
                     onClick={(e) => {
                       e.stopPropagation();
-                      toggleExpand(index);
+                      toggleExpand(item.label);
                     }}
                   >
                     {isExpanded ? (

@@ -6,7 +6,9 @@
   background-color: var(--surface-default);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-component-card);
-  transition: border-color 150ms, box-shadow 150ms;
+  transition:
+    border-color 150ms,
+    box-shadow 150ms;
 }
 
 .card:hover {

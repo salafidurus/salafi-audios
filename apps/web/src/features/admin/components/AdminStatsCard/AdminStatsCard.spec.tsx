@@ -6,9 +6,7 @@ describe("AdminStatsCard", () => {
   const mockIcon = <div data-testid="icon">📊</div>;
 
   it("renders with required props", () => {
-    render(
-      <AdminStatsCard icon={mockIcon} label="Total Scholars" value={42} />,
-    );
+    render(<AdminStatsCard icon={mockIcon} label="Total Scholars" value={42} />);
     expect(screen.getByText("Total Scholars")).toBeInTheDocument();
     expect(screen.getByText("42")).toBeInTheDocument();
   });
@@ -26,21 +24,14 @@ describe("AdminStatsCard", () => {
   });
 
   it("renders without trend indicator", () => {
-    render(
-      <AdminStatsCard icon={mockIcon} label="Total Scholars" value={42} />,
-    );
+    render(<AdminStatsCard icon={mockIcon} label="Total Scholars" value={42} />);
     expect(screen.queryByText("+12%")).not.toBeInTheDocument();
   });
 
   it("calls onClick when clicked as button", () => {
     const handleClick = vi.fn();
     render(
-      <AdminStatsCard
-        icon={mockIcon}
-        label="Total Scholars"
-        value={42}
-        onClick={handleClick}
-      />,
+      <AdminStatsCard icon={mockIcon} label="Total Scholars" value={42} onClick={handleClick} />,
     );
 
     const button = screen.getByRole("button");
@@ -50,12 +41,7 @@ describe("AdminStatsCard", () => {
 
   it("renders as link when href is provided", () => {
     render(
-      <AdminStatsCard
-        icon={mockIcon}
-        label="Total Scholars"
-        value={42}
-        href="/admin/scholars"
-      />,
+      <AdminStatsCard icon={mockIcon} label="Total Scholars" value={42} href="/admin/scholars" />,
     );
 
     const link = screen.getByRole("link");
@@ -63,9 +49,7 @@ describe("AdminStatsCard", () => {
   });
 
   it("renders icon element", () => {
-    render(
-      <AdminStatsCard icon={mockIcon} label="Total Scholars" value={42} />,
-    );
+    render(<AdminStatsCard icon={mockIcon} label="Total Scholars" value={42} />);
     expect(screen.getByTestId("icon")).toBeInTheDocument();
   });
 
@@ -80,20 +64,13 @@ describe("AdminStatsCard", () => {
   });
 
   it("displays string values", () => {
-    render(
-      <AdminStatsCard icon={mockIcon} label="Status" value="Active" />,
-    );
+    render(<AdminStatsCard icon={mockIcon} label="Status" value="Active" />);
     expect(screen.getByText("Active")).toBeInTheDocument();
   });
 
   it("applies className to card", () => {
     const { container } = render(
-      <AdminStatsCard
-        icon={mockIcon}
-        label="Total Scholars"
-        value={42}
-        className="custom-class"
-      />,
+      <AdminStatsCard icon={mockIcon} label="Total Scholars" value={42} className="custom-class" />,
     );
 
     const card = container.querySelector(".custom-class");
