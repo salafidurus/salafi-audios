@@ -35,11 +35,11 @@
 
 @media (max-width: 640px) {
   .header {
-    flex-direction: column;
-    align-items: stretch;
+    align-items: center;
   }
 
-  .actions {
-    width: 100%;
+  .title {
+    font-size: var(--typo-title-lg-font-size);
+    line-height: var(--typo-title-lg-line-height);
   }
 }

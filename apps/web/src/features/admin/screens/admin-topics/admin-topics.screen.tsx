@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { TopicDetailDto } from "@sd/core-contracts";
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
+import { useResponsive } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { EmptyState } from "@/shared/components/EmptyState";
@@ -18,7 +18,7 @@ import {
 import styles from "./admin-topics.screen.module.css";
 
 export function AdminTopicsScreen() {
-  const isDesktop = useIsDesktop();
+  const { isMobile } = useResponsive();
   const { data, isFetching, refetch } = useApiQuery<TopicDetailDto[]>(queryKeys.topics.list(), () =>
     httpClient<TopicDetailDto[]>({ url: endpoints.topics.list, method: "GET" }),
   );
@@ -53,7 +53,7 @@ export function AdminTopicsScreen() {
   if (isFetching) {
     return (
       <ScreenView>
-        <PageHeader title={isDesktop ? "Manage Topics" : "Topics"} />
+        <PageHeader title={!isMobile ? "Manage Topics" : "Topics"} />
         <EmptyState variant="loading" message="Loading topics…" />
       </ScreenView>
     );
@@ -64,19 +64,19 @@ export function AdminTopicsScreen() {
   return (
     <ScreenView>
       <PageHeader
-        title={isDesktop ? "Manage Topics" : "Topics"}
+        title={!isMobile ? "Manage Topics" : "Topics"}
         actions={
           <Button
             variant="primary"
-            size={isDesktop ? "md" : "sm"}
-            icon={<Plus size={isDesktop ? 18 : 16} />}
+            size={!isMobile ? "md" : "sm"}
+            icon={<Plus size={!isMobile ? 18 : 16} />}
             onClick={() => {
               setCreating(true);
               setEditing(null);
               setFormData({ slug: "", name: "" });
             }}
           >
-            {isDesktop ? "Add Topic" : "Add"}
+            {!isMobile ? "Add Topic" : "Add"}
           </Button>
         }
       />
@@ -84,9 +84,9 @@ export function AdminTopicsScreen() {
       {(creating || editing) && (
         <div className={styles.form}>
           <h3 className={styles.formTitle}>
-            {editing ? (isDesktop ? "Edit Topic" : "Edit") : "New Topic"}
+            {editing ? (!isMobile ? "Edit Topic" : "Edit") : "New Topic"}
           </h3>
-          {isDesktop ? (
+          {!isMobile ? (
             <div className={styles.formGrid}>
               <input
                 aria-label="Topic slug"
@@ -156,7 +156,7 @@ export function AdminTopicsScreen() {
         </div>
       )}
 
-      {isDesktop ? (
+      {!isMobile ? (
         <table className={styles.table}>
           <thead>
             <tr className={styles.tableHeader}>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button";
 import { FormSection } from "@/features/admin/components/FormSection";
@@ -167,7 +168,14 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
             />
             {formData.imageUrl && (
               <div className={styles.imagePreview}>
-                <img src={formData.imageUrl} alt="Preview" className={styles.previewImage} />
+                <Image
+                  src={formData.imageUrl}
+                  alt="Preview"
+                  width={200}
+                  height={200}
+                  style={{ objectFit: "contain" }}
+                  className={styles.previewImage}
+                />
               </div>
             )}
           </div>

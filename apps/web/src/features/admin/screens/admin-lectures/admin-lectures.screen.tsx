@@ -10,7 +10,7 @@ import { Button } from "@/shared/components/Button";
 import { fetchAdminLectures, fetchAdminLectureDetail } from "../../api/admin-lectures.api";
 import { AudioUploader } from "../../components/AudioUploader/AudioUploader";
 import { LectureEditModal } from "../../components/LectureEditModal/LectureEditModal";
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
+import { useResponsive } from "@/shared/hooks/use-responsive";
 import styles from "./admin-lectures.screen.module.css";
 import { Search, Plus, X, Edit } from "lucide-react";
 
@@ -50,7 +50,7 @@ function formatDuration(secs?: number): string {
 }
 
 export function AdminLecturesScreen() {
-  const isDesktop = useIsDesktop();
+  const { isMobile } = useResponsive();
   const [state, dispatch] = useReducer(screenReducer, {
     search: "",
     status: "",
@@ -63,7 +63,7 @@ export function AdminLecturesScreen() {
 
   const { search, status, page, isUploaderOpen, isModalOpen, selectedLecture, initialAudioData } =
     state;
-  const limit = isDesktop ? 20 : 15;
+  const limit = !isMobile ? 20 : 15;
 
   const { data, isFetching, refetch } = useApiQuery<AdminListingListDto>(
     ["admin", "lectures", "list", { search, status, page }],
@@ -101,15 +101,15 @@ export function AdminLecturesScreen() {
             variant="primary"
             icon={
               isUploaderOpen ? (
-                <X size={isDesktop ? 16 : 20} />
+                <X size={!isMobile ? 16 : 20} />
               ) : (
-                <Plus size={isDesktop ? 16 : 20} />
+                <Plus size={!isMobile ? 16 : 20} />
               )
             }
             onClick={() => dispatch({ isUploaderOpen: !isUploaderOpen })}
             aria-label="Upload Audio Toggle"
           >
-            {isDesktop ? (isUploaderOpen ? "Close Uploader" : "Upload Audio") : undefined}
+            {!isMobile ? (isUploaderOpen ? "Close Uploader" : "Upload Audio") : undefined}
           </Button>
         }
       />
@@ -122,7 +122,7 @@ export function AdminLecturesScreen() {
 
       <div className={styles.filterBar}>
         <div className={styles.searchWrapper}>
-          <Search className={styles.searchIcon} size={isDesktop ? 18 : 16} />
+          <Search className={styles.searchIcon} size={!isMobile ? 18 : 16} />
           <input
             type="text"
             placeholder="Search lectures..."
@@ -141,28 +141,28 @@ export function AdminLecturesScreen() {
             className={`${styles.tab} ${status === "" ? styles.tabActive : ""}`}
             onClick={() => dispatch({ status: "", page: 1 })}
           >
-            {isDesktop ? "All" : "All"}
+            {!isMobile ? "All" : "All"}
           </button>
           <button
             type="button"
             className={`${styles.tab} ${status === "published" ? styles.tabActive : ""}`}
             onClick={() => dispatch({ status: "published", page: 1 })}
           >
-            {isDesktop ? "Published" : "Pub"}
+            {!isMobile ? "Published" : "Pub"}
           </button>
           <button
             type="button"
             className={`${styles.tab} ${status === "draft" ? styles.tabActive : ""}`}
             onClick={() => dispatch({ status: "draft", page: 1 })}
           >
-            {isDesktop ? "Draft" : "Draft"}
+            {!isMobile ? "Draft" : "Draft"}
           </button>
           <button
             type="button"
             className={`${styles.tab} ${status === "archived" ? styles.tabActive : ""}`}
             onClick={() => dispatch({ status: "archived", page: 1 })}
           >
-            {isDesktop ? "Archived" : "Arch"}
+            {!isMobile ? "Archived" : "Arch"}
           </button>
         </div>
       </div>
@@ -173,7 +173,7 @@ export function AdminLecturesScreen() {
         <>
           {lectures.length === 0 ? (
             <EmptyState message="No lectures found matching the filters." />
-          ) : isDesktop ? (
+          ) : !isMobile ? (
             <div className={styles.tableWrapper}>
               <table className={styles.table}>
                 <thead>
@@ -264,10 +264,10 @@ export function AdminLecturesScreen() {
                 disabled={page <= 1}
                 onClick={() => dispatch({ page: page - 1 })}
               >
-                {isDesktop ? "Previous" : "Prev"}
+                {!isMobile ? "Previous" : "Prev"}
               </button>
               <span className={styles.pageInfo}>
-                {isDesktop ? `Page ${page} of ${totalPages}` : `${page} / ${totalPages}`}
+                {!isMobile ? `Page ${page} of ${totalPages}` : `${page} / ${totalPages}`}
               </span>
               <button
                 type="button"

@@ -2,7 +2,7 @@
 
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { LiveSessionDeltaDto } from "@sd/core-contracts";
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
+import { useResponsive } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { EmptyState } from "@/shared/components/EmptyState";
@@ -90,7 +90,7 @@ function SessionCard({
 }
 
 export function AdminLivestreamsScreen() {
-  const isDesktop = useIsDesktop();
+  const { isMobile } = useResponsive();
 
   const {
     data: activeData,
@@ -113,13 +113,13 @@ export function AdminLivestreamsScreen() {
   } = useApiQuery<LiveSessionDeltaDto>(
     queryKeys.live.ended(),
     () => httpClient<LiveSessionDeltaDto>({ url: endpoints.live.ended, method: "GET" }),
-    { enabled: isDesktop },
+    { enabled: !isMobile },
   );
 
   const refetchAll = () => {
     refetchActive();
     refetchScheduled();
-    if (isDesktop) refetchEnded();
+    if (!isMobile) refetchEnded();
   };
 
   const handleStatusChange = async (id: string, status: string) => {
@@ -127,11 +127,11 @@ export function AdminLivestreamsScreen() {
     refetchAll();
   };
 
-  if (loadingActive || loadingScheduled || (isDesktop && loadingEnded)) {
+  if (loadingActive || loadingScheduled || (!isMobile && loadingEnded)) {
     return (
       <ScreenView>
-        <PageHeader title={isDesktop ? "Manage Livestreams" : "Livestreams"} />
-        <EmptyState variant="loading" message={isDesktop ? "Loading live sessions…" : "Loading…"} />
+        <PageHeader title={!isMobile ? "Manage Livestreams" : "Livestreams"} />
+        <EmptyState variant="loading" message={!isMobile ? "Loading live sessions…" : "Loading…"} />
       </ScreenView>
     );
   }
@@ -142,14 +142,14 @@ export function AdminLivestreamsScreen() {
 
   return (
     <ScreenView>
-      <PageHeader title={isDesktop ? "Manage Livestreams" : "Livestreams"} />
+      <PageHeader title={!isMobile ? "Manage Livestreams" : "Livestreams"} />
 
       {active.length > 0 && (
         <>
           <h2 className={`${styles.sectionTitle} ${styles.activeSectionTitle}`}>
             Active ({active.length})
           </h2>
-          {isDesktop ? (
+          {!isMobile ? (
             <table className={styles.table}>
               <thead className={styles.tableHeader}>
                 <tr>
@@ -181,7 +181,7 @@ export function AdminLivestreamsScreen() {
       <h2 className={`${styles.sectionTitle} ${styles.scheduledSectionTitle}`}>
         Scheduled ({scheduled.length})
       </h2>
-      {isDesktop ? (
+      {!isMobile ? (
         <table className={styles.table}>
           <thead className={styles.tableHeader}>
             <tr>
@@ -204,7 +204,7 @@ export function AdminLivestreamsScreen() {
         ))
       )}
 
-      {isDesktop && (
+      {!isMobile && (
         <>
           <h2 className={`${styles.sectionTitle} ${styles.endedSectionTitle}`}>
             Ended ({ended.length})

@@ -5,7 +5,7 @@ import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
+import { useResponsive } from "@/shared/hooks/use-responsive";
 import styles from "./admin-dashboard.screen.module.css";
 
 type AdminSection = {
@@ -48,13 +48,13 @@ const ADMIN_SECTIONS: AdminSection[] = [
 ];
 
 export function AdminDashboardScreen() {
-  const isDesktop = useIsDesktop();
+  const { isMobile } = useResponsive();
   const { data, isFetching } = useAdminPermissions();
 
   if (isFetching) {
     return (
       <ScreenView>
-        <PageHeader title={isDesktop ? "Admin Dashboard" : "Admin"} />
+        <PageHeader title={!isMobile ? "Admin Dashboard" : "Admin"} />
         <EmptyState variant="loading" message="Loading…" />
       </ScreenView>
     );
@@ -65,10 +65,10 @@ export function AdminDashboardScreen() {
 
   return (
     <ScreenView>
-      <PageHeader title={isDesktop ? "Admin Dashboard" : "Admin"} />
+      <PageHeader title={!isMobile ? "Admin Dashboard" : "Admin"} />
       {visibleSections.length === 0 ? (
         <EmptyState
-          message={isDesktop ? "You don't have any admin permissions." : "No admin permissions."}
+          message={!isMobile ? "You don't have any admin permissions." : "No admin permissions."}
         />
       ) : (
         <div className={styles.grid}>
@@ -76,7 +76,7 @@ export function AdminDashboardScreen() {
             <a key={section.href} href={section.href} className={styles.sectionCard}>
               <h2 className={styles.sectionTitle}>{section.title}</h2>
               <p className={styles.sectionDescription}>
-                {isDesktop ? section.description : section.descriptionMobile}
+                {!isMobile ? section.description : section.descriptionMobile}
               </p>
             </a>
           ))}

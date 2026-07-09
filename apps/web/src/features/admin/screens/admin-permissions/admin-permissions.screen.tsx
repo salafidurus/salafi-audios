@@ -8,14 +8,14 @@ import {
   revokePermission,
   type AdminPermissionsListResponse,
 } from "@/features/admin/api/admin.api";
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
+import { useResponsive } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
 import styles from "./admin-permissions.screen.module.css";
 
 export function AdminPermissionsScreen() {
-  const isDesktop = useIsDesktop();
+  const { isMobile } = useResponsive();
   const [userId, setUserId] = useState("");
   const [userPerms, setUserPerms] = useState<AdminPermissionsListResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -57,7 +57,7 @@ export function AdminPermissionsScreen() {
 
   return (
     <ScreenView>
-      <PageHeader title={isDesktop ? "Manage Permissions" : "Permissions"} />
+      <PageHeader title={!isMobile ? "Manage Permissions" : "Permissions"} />
 
       <div className={styles.lookupSection}>
         <input
@@ -69,13 +69,13 @@ export function AdminPermissionsScreen() {
           className={styles.input}
         />
         <Button variant="primary" onClick={handleLookup} disabled={loading}>
-          {loading ? (isDesktop ? "Loading…" : "…") : "Lookup"}
+          {loading ? (!isMobile ? "Loading…" : "…") : "Lookup"}
         </Button>
       </div>
 
-      {userPerms && isDesktop && <h2 className={styles.sectionTitle}>Permissions for {userId}</h2>}
+      {userPerms && !isMobile && <h2 className={styles.sectionTitle}>Permissions for {userId}</h2>}
 
-      {userPerms && isDesktop ? (
+      {userPerms && !isMobile ? (
         <table className={styles.table}>
           <thead className={styles.tableHeader}>
             <tr>

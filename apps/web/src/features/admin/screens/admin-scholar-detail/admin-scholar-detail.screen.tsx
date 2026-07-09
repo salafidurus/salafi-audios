@@ -4,7 +4,7 @@ import React, { useReducer } from "react";
 import Link from "next/link";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { ScholarListItemDto, AdminListingListItemDto } from "@sd/core-contracts";
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
+import { useResponsive } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { Button } from "@/shared/components/Button";
 import styles from "./admin-scholar-detail.screen.module.css";
@@ -56,7 +56,7 @@ function reduceMobile(state: MobileFormState, patch: Partial<MobileFormState>): 
 }
 
 export function AdminScholarDetailScreen({ id }: AdminScholarDetailScreenProps) {
-  const isDesktop = useIsDesktop();
+  const { isMobile } = useResponsive();
 
   const { data: scholarsData } = useApiQuery<ScholarsListDto>(queryKeys.scholars.list(), () =>
     httpClient<ScholarsListDto>({ url: endpoints.scholars.list, method: "GET" }),
@@ -92,7 +92,7 @@ export function AdminScholarDetailScreen({ id }: AdminScholarDetailScreenProps) 
 
   const handleCreateSeries = async (e: React.FormEvent) => {
     e.preventDefault();
-    const title = isDesktop ? desktopState.newSeriesTitle : mobileState.newSeriesTitle;
+    const title = !isMobile ? desktopState.newSeriesTitle : mobileState.newSeriesTitle;
     if (!title.trim()) return;
 
     try {
@@ -105,10 +105,10 @@ export function AdminScholarDetailScreen({ id }: AdminScholarDetailScreenProps) 
           slug: slugify(title),
           format: "series",
           language: scholar?.mainLanguage || "ar",
-          orderIndex: isDesktop ? Number(desktopState.newSeriesOrder) : undefined,
+          orderIndex: !isMobile ? Number(desktopState.newSeriesOrder) : undefined,
         },
       });
-      if (isDesktop) {
+      if (!isMobile) {
         dispatchDesktop({ newSeriesTitle: "", newSeriesOrder: 0, creatingSeries: false });
       } else {
         dispatchMobile({ newSeriesTitle: "", creatingSeries: false });
@@ -121,7 +121,7 @@ export function AdminScholarDetailScreen({ id }: AdminScholarDetailScreenProps) 
 
   const handleCreateCollection = async (e: React.FormEvent) => {
     e.preventDefault();
-    const title = isDesktop ? desktopState.newCollectionTitle : mobileState.newCollectionTitle;
+    const title = !isMobile ? desktopState.newCollectionTitle : mobileState.newCollectionTitle;
     if (!title.trim()) return;
 
     try {
@@ -134,10 +134,10 @@ export function AdminScholarDetailScreen({ id }: AdminScholarDetailScreenProps) 
           slug: slugify(title),
           format: "collection",
           language: scholar?.mainLanguage || "ar",
-          orderIndex: isDesktop ? Number(desktopState.newCollectionOrder) : undefined,
+          orderIndex: !isMobile ? Number(desktopState.newCollectionOrder) : undefined,
         },
       });
-      if (isDesktop) {
+      if (!isMobile) {
         dispatchDesktop({
           newCollectionTitle: "",
           newCollectionOrder: 0,
@@ -173,20 +173,20 @@ export function AdminScholarDetailScreen({ id }: AdminScholarDetailScreenProps) 
       <div className={styles.container}>
         <div className={styles.backNav}>
           <Link href="/admin/scholars" className={styles.backLink}>
-            <ArrowLeft size={16} /> {isDesktop ? "Back to Scholars" : "Back"}
+            <ArrowLeft size={16} /> {!isMobile ? "Back to Scholars" : "Back"}
           </Link>
         </div>
 
         <div className={styles.header}>
           <span className={styles.subtitle}>
-            {isDesktop ? "Manage Scholar Details" : "Manage Scholar"}
+            {!isMobile ? "Manage Scholar Details" : "Manage Scholar"}
           </span>
           <h1 className={styles.title}>
-            {scholar?.name || (isDesktop ? "Loading Scholar..." : "Loading...")}
+            {scholar?.name || (!isMobile ? "Loading Scholar..." : "Loading...")}
           </h1>
         </div>
 
-        {isDesktop ? (
+        {!isMobile ? (
           <div className={styles.grid}>
             {/* Series Panel */}
             <div className={styles.panel}>

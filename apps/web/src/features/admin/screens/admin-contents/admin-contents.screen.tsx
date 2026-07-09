@@ -21,7 +21,7 @@ import { SearchBar } from "@/shared/components/SearchBar";
 import { TopicFormModal, type TopicForEdit } from "@/features/admin/components/TopicFormModal";
 import { AudioUploader } from "@/features/admin/components/AudioUploader/AudioUploader";
 import { LectureEditModal } from "@/features/admin/components/LectureEditModal";
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
+import { useResponsive } from "@/shared/hooks/use-responsive";
 import styles from "./admin-contents.screen.module.css";
 
 type AudioData = {
@@ -36,7 +36,7 @@ const EMPTY_TOPICS_ARRAY: TopicDetailDto[] = [];
 const EMPTY_LISTINGS_ARRAY: AdminListingDetailDto[] = [];
 
 export function AdminContentsScreen() {
-  const isDesktop = useIsDesktop();
+  const { isMobile } = useResponsive();
   const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -142,25 +142,25 @@ export function AdminContentsScreen() {
   return (
     <ScreenView>
       <PageHeader
-        title={isDesktop ? "Content Management" : "Content"}
+        title={isMobile ? "Content" : "Content Management"}
         actions={
           activeTab === "topics" ? (
             <Button
               variant="primary"
-              size={isDesktop ? "md" : "sm"}
-              icon={<Plus size={isDesktop ? 18 : 16} />}
+              size={!isMobile ? "md" : "sm"}
+              icon={<Plus size={!isMobile ? 18 : 16} />}
               onClick={handleOpenAddTopic}
             >
-              {isDesktop ? "Add Topic" : "Topic"}
+              {!isMobile ? "Add Topic" : "Topic"}
             </Button>
           ) : (
             <Button
               variant="primary"
-              size={isDesktop ? "md" : "sm"}
-              icon={<Plus size={isDesktop ? 18 : 16} />}
+              size={!isMobile ? "md" : "sm"}
+              icon={<Plus size={!isMobile ? 18 : 16} />}
               onClick={handleOpenAddListing}
             >
-              {isDesktop ? "Add Listing" : "Listing"}
+              {!isMobile ? "Add Listing" : "Listing"}
             </Button>
           )
         }

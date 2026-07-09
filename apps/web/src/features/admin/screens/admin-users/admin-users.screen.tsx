@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import type { ReactNode } from "react";
 import { useApiQuery, queryKeys, httpClient } from "@sd/core-contracts";
 import { endpoints, type AdminUserListDto } from "@sd/core-contracts";
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
+import { useResponsive } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { EmptyState } from "@/shared/components/EmptyState";
@@ -13,7 +13,7 @@ import { UserCard } from "@/features/admin/components/user-card/user-card";
 import styles from "./admin-users.screen.module.css";
 
 export function AdminUsersScreen(): ReactNode {
-  const isDesktop = useIsDesktop();
+  const { isMobile } = useResponsive();
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
@@ -35,12 +35,12 @@ export function AdminUsersScreen(): ReactNode {
       }),
   );
 
-  const users = data?.users ?? [];
-  const total = data?.total ?? 0;
+  const users = useMemo(() => data?.users ?? [], [data]);
+  const total = useMemo(() => data?.total ?? 0, [data]);
 
   return (
     <ScreenView>
-      <PageHeader title={isDesktop ? "Manage Users" : "Users"} />
+      <PageHeader title={isMobile ? "Users" : "Manage Users"} />
 
       <div className={styles.searchRow}>
         <SearchBar
