@@ -21,7 +21,7 @@ import {
   AdminContentsTabs,
   type AdminContentsTab,
 } from "@/features/admin/components/AdminContentsTabs";
-import { AdminSearchBar } from "@/features/admin/components/AdminSearchBar";
+import { SearchBar } from "@/shared/components/SearchBar";
 import { TopicFormModal, type TopicForEdit } from "@/features/admin/components/TopicFormModal";
 import { AudioUploader } from "@/features/admin/components/AudioUploader/AudioUploader";
 import { LectureEditModal } from "@/features/admin/components/LectureEditModal";
@@ -179,10 +179,9 @@ export function AdminContentsScreen() {
         }}
       />
 
-      <AdminSearchBar
+      <SearchBar
         value={searchQuery}
         onChange={setSearchQuery}
-        onSearch={() => {}}
         placeholder={activeTab === "topics" ? "Search topics..." : "Search listings..."}
       />
 
