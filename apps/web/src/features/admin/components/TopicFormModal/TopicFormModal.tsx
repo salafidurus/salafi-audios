@@ -87,16 +87,18 @@ function formReducer(state: FormState, action: FormAction): FormState {
       if (isCurrentlyEditing) {
         // Revert value when toggling off
         if (action.fieldName === "slug") {
+          next.delete(action.fieldName);
           return {
             ...state,
             formData: { ...state.formData, slug: state.originalFormData.slug ?? "" },
-            editingFields: new Set(next).delete(action.fieldName) && next,
+            editingFields: next,
           };
         } else if (action.fieldName === "name") {
+          next.delete(action.fieldName);
           return {
             ...state,
             formData: { ...state.formData, name: state.originalFormData.name ?? "" },
-            editingFields: new Set(next).delete(action.fieldName) && next,
+            editingFields: next,
           };
         } else if (action.fieldName === "translation-ar-name") {
           const originalArabicName =
@@ -159,7 +161,7 @@ export function TopicFormModal({ isOpen, onClose, onSave, topic }: TopicFormModa
   };
 
   const [state, dispatch] = useReducer(formReducer, initialFormState);
-  const { formData, editingFields, translationChanges, saving, error } = state;
+  const { formData, originalFormData, editingFields, translationChanges, saving, error } = state;
 
   // Fetch translations only when editing
   const { data: translationsResponse } = useContentTranslations(
