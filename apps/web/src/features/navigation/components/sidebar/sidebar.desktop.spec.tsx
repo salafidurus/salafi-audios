@@ -1,11 +1,19 @@
 import React from "react";
 import { vi, type Mock } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import { Sidebar } from "./sidebar.desktop";
+import { Sidebar } from "./sidebar";
 import { useAuth, authClient } from "@/core/auth";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 import { usePathname, useRouter } from "next/navigation";
 import { routes } from "@sd/core-contracts";
+
+vi.mock("@/shared/hooks/use-responsive", () => ({
+  useResponsive: vi.fn().mockReturnValue({ isMobile: false, isTablet: false, isWeb: true }),
+}));
+
+vi.mock("@/shared/hooks/use-is-hydrated", () => ({
+  useIsHydrated: vi.fn().mockReturnValue(true),
+}));
 
 vi.mock("@/core/auth", () => ({
   useAuth: vi.fn(),
