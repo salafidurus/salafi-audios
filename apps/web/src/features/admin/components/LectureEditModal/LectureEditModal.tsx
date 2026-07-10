@@ -298,6 +298,7 @@ export function LectureEditModal({
                 id="lecture-scholar"
                 placeholder="Select Scholar"
                 disabled={!!lecture}
+                testId="scholar-dropdown"
               />
               <DropdownContent searchable>
                 <DropdownItem value="">Select Scholar</DropdownItem>
@@ -319,6 +320,7 @@ export function LectureEditModal({
                 id="lecture-series"
                 placeholder="Select Series (Optional)"
                 disabled={!!lecture}
+                testId="series-dropdown"
               />
               <DropdownContent searchable>
                 <DropdownItem value="">Select Series (Optional)</DropdownItem>
@@ -343,7 +345,11 @@ export function LectureEditModal({
                 dispatch({ status: value as "draft" | "published" | "archived" })
               }
             >
-              <DropdownTrigger id="lecture-status" placeholder="Select Status" />
+              <DropdownTrigger
+                id="lecture-status"
+                placeholder="Select Status"
+                testId="status-dropdown"
+              />
               <DropdownContent>
                 <DropdownItem value="draft">Draft</DropdownItem>
                 <DropdownItem value="published">Published</DropdownItem>

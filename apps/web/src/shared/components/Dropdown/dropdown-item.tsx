@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useLayoutEffect, type ReactNode } from "react";
 import { Check } from "lucide-react";
 import { useDropdownContext } from "./context";
 import styles from "./dropdown.module.css";
@@ -23,7 +23,7 @@ export function DropdownItem({ value, children, disabled }: DropdownItemProps) {
   const isSelected = selectedValue === value;
   const label = typeof children === "string" ? children : "";
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const unregister = registerItem(value, label, disabled);
     return unregister;
   }, [value, label, disabled, registerItem]);

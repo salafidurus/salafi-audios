@@ -95,8 +95,10 @@ describe("LectureEditModal", () => {
     fireEvent.change(titleInput, { target: { value: "My Great Lecture" } });
 
     // Select Scholar
-    const scholarSelect = screen.getByLabelText(/scholar/i);
-    fireEvent.change(scholarSelect, { target: { value: "scholar-1" } });
+    const scholarTrigger = screen.getByTestId("scholar-dropdown");
+    fireEvent.click(scholarTrigger);
+    const scholarOption = await screen.findByRole("option", { name: /scholar one/i });
+    fireEvent.click(scholarOption);
 
     // Click Save
     const saveButton = screen.getByRole("button", { name: /save/i });
@@ -154,8 +156,10 @@ describe("LectureEditModal", () => {
     expect(screen.getByText(/edit lecture details/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/title/i)).toHaveValue("Existing Title");
     expect(screen.getByLabelText(/description/i)).toHaveValue("Existing Description");
-    expect(screen.getByLabelText(/scholar/i)).toHaveValue("scholar-2");
-    expect(screen.getByLabelText(/series/i)).toHaveValue("series-1");
+    await waitFor(() => {
+      expect(screen.getByTestId("scholar-dropdown")).toHaveTextContent("Scholar Two");
+      expect(screen.getByTestId("series-dropdown")).toHaveTextContent("Series One");
+    });
     expect(screen.getByLabelText(/order index/i)).toHaveValue(5);
 
     // Modify some values

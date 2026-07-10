@@ -1,8 +1,36 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  Children,
+  isValidElement,
+  type ReactNode,
+} from "react";
 import { DropdownContext } from "./context";
+import { DropdownItem as DropdownItemComponent } from "./dropdown-item";
 import type { DropdownItem, DropdownContextValue } from "./types";
+
+function extractItemsFromChildren(children: ReactNode): DropdownItem[] {
+  const extracted: DropdownItem[] = [];
+  Children.forEach(children, (child) => {
+    if (!isValidElement<{ children?: ReactNode }>(child)) return;
+    if (child.type === DropdownItemComponent) {
+      const label = typeof child.props.children === "string" ? child.props.children : "";
+      extracted.push({
+        value: (child.props as Record<string, unknown>).value as string,
+        label,
+        disabled: (child.props as Record<string, unknown>).disabled as boolean | undefined,
+      });
+    }
+    if (child.props.children) {
+      extracted.push(...extractItemsFromChildren(child.props.children));
+    }
+  });
+  return extracted;
+}
 
 let contentCounter = 0;
 
@@ -18,7 +46,7 @@ export function Dropdown({ value, onValueChange, children }: DropdownProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const triggerRef = useRef<HTMLButtonElement>(null);
   const [contentId] = useState(() => "dropdown-content-" + ++contentCounter);
-  const [items, setItems] = useState<DropdownItem[]>([]);
+  const [items, setItems] = useState<DropdownItem[]>(() => extractItemsFromChildren(children));
 
   const registerItem = useCallback((itemValue: string, label: string, disabled?: boolean) => {
     setItems((prev) => {
