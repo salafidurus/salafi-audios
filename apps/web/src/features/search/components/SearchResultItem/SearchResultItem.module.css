@@ -4,16 +4,21 @@
   align-items: center;
   gap: var(--space-component-gap-md);
   border-radius: var(--radius-component-card);
-  border: 1px solid var(--border-subtle);
-  background: var(--surface-default);
+  border: 1px solid transparent;
+  background: transparent;
   padding: 0.75rem;
   transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
 }
 
 .card:hover {
-  border-color: var(--accent-primary-subtle-border);
-  background: var(--accent-primary-subtle-surface);
-  box-shadow: 0 18px 36px -30px var(--accent-primary-border);
+  border-color: var(--border-hover);
+  background: var(--surface-hover);
+  box-shadow: var(--shadow-sm);
+}
+
+.card:active {
+  background: var(--surface-active);
+  border-color: var(--border-active);
 }
 
 .media {
@@ -101,11 +106,21 @@
   align-items: center;
   gap: var(--space-component-gap-md);
   border-radius: var(--radius-component-card);
-  border: 1px solid var(--border-subtle);
-  background: var(--surface-default);
+  border: 1px solid transparent;
+  background: transparent;
   padding: var(--space-component-card-padding);
   text-align: start;
   transition: background 100ms ease, border-color 100ms ease;
+}
+
+.mobileCard:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-hover);
+}
+
+.mobileCard:active {
+  background: var(--surface-active);
+  border-color: var(--border-active);
 }
 
 .mobileMedia {

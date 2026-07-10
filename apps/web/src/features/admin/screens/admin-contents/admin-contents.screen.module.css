@@ -1,17 +1,13 @@
-.topicsList {
+.content {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-component-gap-lg);
 }
 
 .topicItem {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-sm) var(--space-md);
-  background-color: var(--surface-default);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
 }
 
 .topicInfo {
@@ -56,20 +52,10 @@
   font-size: var(--typo-body-md-font-size);
 }
 
-.listingsList {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-
 .listingItem {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-sm) var(--space-md);
-  background-color: var(--surface-default);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
 }
 
 .listingInfo {

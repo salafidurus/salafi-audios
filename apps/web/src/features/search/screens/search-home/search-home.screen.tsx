@@ -31,8 +31,8 @@ export function SearchHomeScreen({
   if (isDesktop) {
     return (
       <ScreenView>
-        <section className="flex flex-col items-center justify-center gap-[var(--space-scale-4xl)] text-center">
-          <div className="flex w-full flex-col items-center gap-[var(--space-component-gap-lg)]">
+        <section className={styles.desktopSection}>
+          <div className={styles.desktopSearchContainer}>
             <TitleText>Find a lesson</TitleText>
             <SearchButton label="What do you want to listen to?" onClick={onOpenSearch} />
           </div>

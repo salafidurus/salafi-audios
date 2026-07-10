@@ -311,7 +311,7 @@ export function TopicFormModal({ isOpen, onClose, onSave, topic }: TopicFormModa
         </div>
 
         {/* Arabic Name Field */}
-        {isEditing && translations.length > 0 && (
+        {isEditing && (
           <div className={styles.field}>
             <label className={styles.label}>Arabic Name</label>
             <EditableInput

@@ -11,15 +11,21 @@
   margin: 0 0 var(--space-scale-2xl);
 }
 
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-lg);
+}
+
 .searchRow {
   display: flex;
   gap: var(--space-scale-sm);
-  margin-bottom: var(--space-scale-2xl);
   align-items: center;
 }
 
 .toolbar {
-  margin-bottom: var(--space-scale-md);
+  display: flex;
+  flex-direction: column;
 }
 
 .resultCount {
@@ -27,12 +33,6 @@
   font-size: var(--typo-caption-font-size);
   color: var(--content-muted);
   margin: 0 0 var(--space-scale-md);
-}
-
-.cardList {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-component-gap-md);
 }
 
 .loading {

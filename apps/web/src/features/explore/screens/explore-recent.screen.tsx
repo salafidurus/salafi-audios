@@ -6,6 +6,7 @@ import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { useExploreRecentScreen } from "@sd/domain-content";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
+import { ListContainer } from "@/shared/components/ListContainer";
 import { FeedListRow } from "../components/feed-list-row/feed-list-row";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import { FeedTopicRow } from "../components/feed-topic-row/feed-topic-row";
@@ -37,11 +38,7 @@ function FeedBlocks({ items, onNavigateToLecture, onNavigateToScholar }: FeedBlo
 
   const flushCards = (key: string) => {
     if (cards.length === 0) return;
-    blocks.push(
-      <div className={styles.list} key={`list-${key}`}>
-        {cards}
-      </div>,
-    );
+    blocks.push(<ListContainer key={`list-${key}`}>{cards}</ListContainer>);
     cards = [];
   };
 

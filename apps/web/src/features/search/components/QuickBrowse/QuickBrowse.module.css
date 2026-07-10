@@ -33,17 +33,23 @@
   flex-direction: column;
   gap: var(--space-scale-sm);
   border-radius: var(--radius-component-card);
-  border: 1px solid var(--border-default);
-  background: var(--surface-default);
+  border: 1px solid transparent;
+  background: transparent;
   padding: var(--space-component-card-padding);
   text-align: left;
-  transition: border-color 150ms ease, background 150ms ease;
+  transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
   cursor: pointer;
 }
 
 .continueCard:hover {
-  border-color: var(--accent-primary-subtle-border);
-  background: var(--accent-primary-subtle-surface);
+  border-color: var(--border-hover);
+  background: var(--surface-hover);
+  box-shadow: var(--shadow-sm);
+}
+
+.continueCard:active {
+  background: var(--surface-active);
+  border-color: var(--border-active);
 }
 
 .label {
@@ -219,17 +225,23 @@
   flex-direction: column;
   gap: var(--space-scale-xs);
   border-radius: var(--radius-component-card);
-  border: 1px solid var(--border-default);
-  background: var(--surface-default);
+  border: 1px solid transparent;
+  background: transparent;
   padding: var(--space-component-card-padding);
   text-align: left;
-  transition: border-color 150ms ease, background 150ms ease;
+  transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
   cursor: pointer;
 }
 
 .suggestionCard:hover {
-  border-color: var(--accent-primary-subtle-border);
-  background: var(--accent-primary-subtle-surface);
+  border-color: var(--border-hover);
+  background: var(--surface-hover);
+  box-shadow: var(--shadow-sm);
+}
+
+.suggestionCard:active {
+  background: var(--surface-active);
+  border-color: var(--border-active);
 }
 
 @media (min-width: 640px) {
