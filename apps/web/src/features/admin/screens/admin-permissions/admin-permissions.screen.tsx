@@ -12,6 +12,7 @@ import { useResponsive } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
+import { RevokePermissionConfirmModal } from "@/shared/components/RevokePermissionConfirmModal";
 import styles from "./admin-permissions.screen.module.css";
 
 export function AdminPermissionsScreen() {
@@ -19,6 +20,8 @@ export function AdminPermissionsScreen() {
   const [userId, setUserId] = useState("");
   const [userPerms, setUserPerms] = useState<AdminPermissionsListResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [revokeModalOpen, setRevokeModalOpen] = useState(false);
+  const [permissionToRevoke, setPermissionToRevoke] = useState<string | null>(null);
 
   const handleLookup = async () => {
     if (!userId.trim()) return;
@@ -43,11 +46,19 @@ export function AdminPermissionsScreen() {
     }
   };
 
-  const handleRevoke = async (permission: string) => {
+  const handleRevokeClick = (permission: string) => {
+    setPermissionToRevoke(permission);
+    setRevokeModalOpen(true);
+  };
+
+  const handleConfirmRevoke = async () => {
+    if (!permissionToRevoke) return;
     setLoading(true);
     try {
-      const data = await revokePermission(userId.trim(), permission);
+      const data = await revokePermission(userId.trim(), permissionToRevoke);
       setUserPerms(data);
+      setRevokeModalOpen(false);
+      setPermissionToRevoke(null);
     } finally {
       setLoading(false);
     }
@@ -57,6 +68,17 @@ export function AdminPermissionsScreen() {
 
   return (
     <ScreenView>
+      <RevokePermissionConfirmModal
+        isOpen={revokeModalOpen}
+        onClose={() => {
+          setRevokeModalOpen(false);
+          setPermissionToRevoke(null);
+        }}
+        onConfirm={handleConfirmRevoke}
+        permissionName={permissionToRevoke ?? ""}
+        userName={userId}
+      />
+
       <PageHeader title={!isMobile ? "Manage Permissions" : "Permissions"} />
 
       <div className={styles.lookupSection}>
@@ -103,7 +125,7 @@ export function AdminPermissionsScreen() {
                     {hasIt ? (
                       <Button
                         variant="danger"
-                        onClick={() => handleRevoke(perm)}
+                        onClick={() => handleRevokeClick(perm)}
                         disabled={loading}
                       >
                         Revoke
@@ -140,7 +162,11 @@ export function AdminPermissionsScreen() {
                   </div>
                 </div>
                 {hasIt ? (
-                  <Button variant="danger" onClick={() => handleRevoke(perm)} disabled={loading}>
+                  <Button
+                    variant="danger"
+                    onClick={() => handleRevokeClick(perm)}
+                    disabled={loading}
+                  >
                     Revoke
                   </Button>
                 ) : (

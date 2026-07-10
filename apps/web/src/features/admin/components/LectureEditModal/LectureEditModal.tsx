@@ -9,6 +9,7 @@ import type {
   AdminListingDetailDto,
 } from "@sd/core-contracts";
 import { createLecture, updateLecture } from "../../api/admin-lectures.api";
+import { Modal } from "../../../../shared/components/Modal";
 import styles from "./lecture-edit-modal.module.css";
 import { X } from "lucide-react";
 
@@ -211,178 +212,172 @@ export function LectureEditModal({
     });
   };
 
-  if (!isOpen) return null;
-
   const scholars = scholarsData?.scholars ?? [];
   const topics = topicsData ?? [];
   const series = seriesData ?? [];
-
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) onClose();
-  };
+  const selectedTopicsSet = new Set(selectedTopics);
 
   return (
-    // react-doctor-disable-next-line react-doctor/no-static-element-interactions, react-doctor/click-events-have-key-events
-    <div className={styles.overlay} onClick={handleOverlayClick}>
-      <div className={styles.modal}>
-        <div className={styles.header}>
-          <h2 className={styles.title}>
-            {lecture ? "Edit Lecture Details" : "New Lecture Details"}
-          </h2>
-          <button type="button" className={styles.closeBtn} onClick={onClose} aria-label="Close">
-            <X size={20} />
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={lecture ? "Edit Lecture Details" : "New Lecture Details"}
+      size="xl"
+      footer={
+        <>
+          <button type="button" className={styles.cancelBtn} onClick={onClose} disabled={saving}>
+            Cancel
           </button>
+          <button
+            type="submit"
+            className={styles.saveBtn}
+            disabled={saving}
+            form="lecture-edit-form"
+          >
+            {saving ? "Saving..." : "Save"}
+          </button>
+        </>
+      }
+    >
+      <form id="lecture-edit-form" onSubmit={handleSave} className={styles.form}>
+        {formError && <div className={styles.errorBanner}>{formError}</div>}
+
+        <div className={styles.formGroup}>
+          <label htmlFor="lecture-title" className={styles.label}>
+            Title
+          </label>
+          <input
+            id="lecture-title"
+            type="text"
+            className={styles.input}
+            value={title}
+            onChange={(e) => handleTitleChange(e.target.value)}
+            required
+          />
         </div>
 
-        <form onSubmit={handleSave} className={styles.form}>
-          {formError && <div className={styles.errorBanner}>{formError}</div>}
+        <div className={styles.formGroup}>
+          <label htmlFor="lecture-slug" className={styles.label}>
+            Slug
+          </label>
+          <input
+            id="lecture-slug"
+            type="text"
+            className={styles.input}
+            value={slug}
+            onChange={(e) => dispatch({ slug: e.target.value })}
+            placeholder="Auto-generated if left blank"
+          />
+        </div>
 
+        <div className={styles.formGroup}>
+          <label htmlFor="lecture-description" className={styles.label}>
+            Description
+          </label>
+          <textarea
+            id="lecture-description"
+            className={styles.textarea}
+            value={description}
+            onChange={(e) => dispatch({ description: e.target.value })}
+            rows={3}
+          />
+        </div>
+
+        <div className={styles.formRow}>
           <div className={styles.formGroup}>
-            <label htmlFor="lecture-title" className={styles.label}>
-              Title
+            <label htmlFor="lecture-scholar" className={styles.label}>
+              Scholar
             </label>
-            <input
-              id="lecture-title"
-              type="text"
-              className={styles.input}
-              value={title}
-              onChange={(e) => handleTitleChange(e.target.value)}
+            <select
+              id="lecture-scholar"
+              className={styles.select}
+              value={scholarId}
+              onChange={(e) => dispatch({ scholarId: e.target.value })}
               required
-            />
+              disabled={!!lecture}
+            >
+              <option value="">Select Scholar</option>
+              {scholars.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="lecture-slug" className={styles.label}>
-              Slug
+            <label htmlFor="lecture-series" className={styles.label}>
+              Series
+            </label>
+            <select
+              id="lecture-series"
+              className={styles.select}
+              value={seriesId}
+              onChange={(e) => dispatch({ seriesId: e.target.value })}
+              disabled={!!lecture}
+            >
+              <option value="">Select Series (Optional)</option>
+              {series.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.title}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className={styles.formRow}>
+          <div className={styles.formGroup}>
+            <label htmlFor="lecture-status" className={styles.label}>
+              Status
+            </label>
+            <select
+              id="lecture-status"
+              className={styles.select}
+              value={status}
+              onChange={(e) =>
+                dispatch({ status: e.target.value as "draft" | "published" | "archived" })
+              }
+            >
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="lecture-order" className={styles.label}>
+              Order Index
             </label>
             <input
-              id="lecture-slug"
-              type="text"
+              id="lecture-order"
+              type="number"
               className={styles.input}
-              value={slug}
-              onChange={(e) => dispatch({ slug: e.target.value })}
-              placeholder="Auto-generated if left blank"
+              value={orderIndex}
+              onChange={(e) => dispatch({ orderIndex: Number(e.target.value) })}
             />
           </div>
+        </div>
 
-          <div className={styles.formGroup}>
-            <label htmlFor="lecture-description" className={styles.label}>
-              Description
-            </label>
-            <textarea
-              id="lecture-description"
-              className={styles.textarea}
-              value={description}
-              onChange={(e) => dispatch({ description: e.target.value })}
-              rows={3}
-            />
-          </div>
-
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label htmlFor="lecture-scholar" className={styles.label}>
-                Scholar
+        <div className={styles.formGroup}>
+          <span className={styles.label}>Topics</span>
+          <div className={styles.topicsGrid}>
+            {topics.map((t) => (
+              <label key={t.id} className={styles.topicCheckboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={selectedTopicsSet.has(t.id)}
+                  onChange={() => handleTopicToggle(t.id)}
+                  className={styles.checkbox}
+                  disabled={!!lecture}
+                />
+                <span>{t.name}</span>
               </label>
-              <select
-                id="lecture-scholar"
-                className={styles.select}
-                value={scholarId}
-                onChange={(e) => dispatch({ scholarId: e.target.value })}
-                required
-                disabled={!!lecture}
-              >
-                <option value="">Select Scholar</option>
-                {scholars.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className={styles.formGroup}>
-              <label htmlFor="lecture-series" className={styles.label}>
-                Series
-              </label>
-              <select
-                id="lecture-series"
-                className={styles.select}
-                value={seriesId}
-                onChange={(e) => dispatch({ seriesId: e.target.value })}
-                disabled={!!lecture}
-              >
-                <option value="">Select Series (Optional)</option>
-                {series.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.title}
-                  </option>
-                ))}
-              </select>
-            </div>
+            ))}
+            {topics.length === 0 && <span className={styles.noData}>No topics available</span>}
           </div>
-
-          <div className={styles.formRow}>
-            <div className={styles.formGroup}>
-              <label htmlFor="lecture-status" className={styles.label}>
-                Status
-              </label>
-              <select
-                id="lecture-status"
-                className={styles.select}
-                value={status}
-                onChange={(e) =>
-                  dispatch({ status: e.target.value as "draft" | "published" | "archived" })
-                }
-              >
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
-                <option value="archived">Archived</option>
-              </select>
-            </div>
-
-            <div className={styles.formGroup}>
-              <label htmlFor="lecture-order" className={styles.label}>
-                Order Index
-              </label>
-              <input
-                id="lecture-order"
-                type="number"
-                className={styles.input}
-                value={orderIndex}
-                onChange={(e) => dispatch({ orderIndex: Number(e.target.value) })}
-              />
-            </div>
-          </div>
-
-          <div className={styles.formGroup}>
-            <span className={styles.label}>Topics</span>
-            <div className={styles.topicsGrid}>
-              {topics.map((t) => (
-                <label key={t.id} className={styles.topicCheckboxLabel}>
-                  <input
-                    type="checkbox"
-                    checked={selectedTopics.includes(t.id)}
-                    onChange={() => handleTopicToggle(t.id)}
-                    className={styles.checkbox}
-                    disabled={!!lecture}
-                  />
-                  <span>{t.name}</span>
-                </label>
-              ))}
-              {topics.length === 0 && <span className={styles.noData}>No topics available</span>}
-            </div>
-          </div>
-
-          <div className={styles.actions}>
-            <button type="button" className={styles.cancelBtn} onClick={onClose} disabled={saving}>
-              Cancel
-            </button>
-            <button type="submit" className={styles.saveBtn} disabled={saving}>
-              {saving ? "Saving..." : "Save"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        </div>
+      </form>
+    </Modal>
   );
 }

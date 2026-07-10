@@ -15,6 +15,7 @@ import {
   deleteTopic,
   type AdminTopicInput,
 } from "@/features/admin/api/admin.api";
+import { DeleteTopicConfirmModal } from "@/shared/components/DeleteTopicConfirmModal";
 import styles from "./admin-topics.screen.module.css";
 
 export function AdminTopicsScreen() {
@@ -26,6 +27,9 @@ export function AdminTopicsScreen() {
   const [creating, setCreating] = useState(false);
   const [formData, setFormData] = useState<AdminTopicInput>({ slug: "", name: "" });
   const [saving, setSaving] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deletingTopicSlug, setDeletingTopicSlug] = useState<string | null>(null);
+  const [deletingTopicName, setDeletingTopicName] = useState<string>("");
 
   const handleSave = async () => {
     setSaving(true);
@@ -44,9 +48,18 @@ export function AdminTopicsScreen() {
     }
   };
 
-  const handleDelete = async (slug: string) => {
-    if (!confirm(`Delete topic "${slug}"?`)) return;
-    await deleteTopic(slug);
+  const handleDeleteClick = (slug: string, name: string) => {
+    setDeletingTopicSlug(slug);
+    setDeletingTopicName(name);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deletingTopicSlug) return;
+    await deleteTopic(deletingTopicSlug);
+    setDeleteModalOpen(false);
+    setDeletingTopicSlug(null);
+    setDeletingTopicName("");
     refetch();
   };
 
@@ -63,6 +76,17 @@ export function AdminTopicsScreen() {
 
   return (
     <ScreenView>
+      <DeleteTopicConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={() => {
+          setDeleteModalOpen(false);
+          setDeletingTopicSlug(null);
+          setDeletingTopicName("");
+        }}
+        onConfirm={handleConfirmDelete}
+        topicName={deletingTopicName}
+      />
+
       <PageHeader
         title={!isMobile ? "Manage Topics" : "Topics"}
         actions={
@@ -186,7 +210,7 @@ export function AdminTopicsScreen() {
                     >
                       Edit
                     </Button>
-                    <Button variant="danger" onClick={() => handleDelete(t.slug)}>
+                    <Button variant="danger" onClick={() => handleDeleteClick(t.slug, t.name)}>
                       Delete
                     </Button>
                   </div>
@@ -214,7 +238,7 @@ export function AdminTopicsScreen() {
                 >
                   Edit
                 </Button>
-                <Button variant="danger" onClick={() => handleDelete(t.slug)}>
+                <Button variant="danger" onClick={() => handleDeleteClick(t.slug, t.name)}>
                   Delete
                 </Button>
               </div>

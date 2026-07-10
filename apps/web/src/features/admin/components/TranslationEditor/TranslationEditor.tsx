@@ -9,6 +9,7 @@ import {
   useUnpublishTranslation,
 } from "@sd/domain-content";
 import type { TranslationTarget } from "@sd/core-contracts";
+import { UnpublishTranslationConfirmModal } from "@/features/admin/components/UnpublishTranslationConfirmModal";
 
 type Field = { key: string; label: string; multiline?: boolean };
 
@@ -21,6 +22,7 @@ export type TranslationEditorProps = {
 export function TranslationEditor({ target, fields, originalValues }: TranslationEditorProps) {
   const [activeLocale, setActiveLocale] = useState<Locale>(SUPPORTED_LOCALES[0]);
   const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
+  const [unpublishModalOpen, setUnpublishModalOpen] = useState(false);
 
   const { data } = useContentTranslations(target);
   const saveTranslation = useSaveTranslation(target);
@@ -43,12 +45,23 @@ export function TranslationEditor({ target, fields, originalValues }: Translatio
     publishTranslation.mutate(activeLocale);
   };
 
-  const handleUnpublish = () => {
+  const handleUnpublishClick = () => {
+    setUnpublishModalOpen(true);
+  };
+
+  const handleConfirmUnpublish = async () => {
     unpublishTranslation.mutate(activeLocale);
+    setUnpublishModalOpen(false);
   };
 
   return (
     <div>
+      <UnpublishTranslationConfirmModal
+        isOpen={unpublishModalOpen}
+        onClose={() => setUnpublishModalOpen(false)}
+        onConfirm={handleConfirmUnpublish}
+      />
+
       <div>
         {SUPPORTED_LOCALES.map((locale) => (
           <button
@@ -100,7 +113,11 @@ export function TranslationEditor({ target, fields, originalValues }: Translatio
           </button>
         )}
         {active?.status === "published" && (
-          <button type="button" onClick={handleUnpublish} disabled={unpublishTranslation.isPending}>
+          <button
+            type="button"
+            onClick={handleUnpublishClick}
+            disabled={unpublishTranslation.isPending}
+          >
             Unpublish
           </button>
         )}

@@ -117,6 +117,14 @@ describe("Sidebar component", () => {
       fireEvent.click(signOutBtn);
     });
 
+    // Click the confirm button in the SignOutConfirmDialog
+    // Wait for modal to appear, then get all Sign Out buttons and click the one in the modal footer
+    const signOutButtons = await screen.findAllByRole("button", { name: /sign out/i });
+    const modalSignOutBtn = signOutButtons[signOutButtons.length - 1]!; // Get the modal's Sign Out button
+    await act(async () => {
+      fireEvent.click(modalSignOutBtn);
+    });
+
     expect(authClient.signOut).toHaveBeenCalled();
     await vi.waitFor(() => {
       expect(mockPush).toHaveBeenCalledWith(routes.home);

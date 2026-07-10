@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import clsx from "clsx";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { routes } from "@sd/core-contracts";
-import { useAuth, authClient } from "@/core/auth";
+import { useAuth } from "@/core/auth";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
+import { SignOutConfirmDialog } from "@/features/auth/components/signout-confirm-dialog/signout-confirm-dialog";
 import { Button } from "@/shared/components/Button/Button";
 import { SectionLabel } from "./section-label";
 import {
@@ -123,6 +125,7 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
   const router = useRouter();
   const { t } = useTranslation();
   const { isAuthenticated, user, isLoading } = useAuth();
+  const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
 
   const { data: adminPermissionsData } = useAdminPermissions();
 
@@ -227,7 +230,7 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
               className={styles.signOutButton}
               onClick={() => {
                 handleNavClick();
-                void authClient.signOut().then(() => router.push(routes.home));
+                setIsSignOutDialogOpen(true);
               }}
               aria-label={t("authStrip.signOut", "Sign Out")}
             >
@@ -259,6 +262,11 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
           )
         ) : null}
       </div>
+
+      <SignOutConfirmDialog
+        isOpen={isSignOutDialogOpen}
+        onClose={() => setIsSignOutDialogOpen(false)}
+      />
     </>
   );
 }

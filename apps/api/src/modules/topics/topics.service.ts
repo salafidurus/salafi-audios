@@ -28,7 +28,22 @@ export class TopicsService {
     if (!result && dto.parentSlug) {
       throw new NotFoundException(`Parent topic "${dto.parentSlug}" not found`);
     }
-    return result ?? (await this.getBySlug(dto.slug)); // safe fallback if upsert somehow returns null without parentSlug
+
+    const topic = result ?? (await this.getBySlug(dto.slug));
+
+    // Save translations if provided
+    if (dto.translations && topic.id) {
+      for (const [locale, fields] of Object.entries(dto.translations)) {
+        if (fields.name) {
+          await this.repo.upsertTopicTranslation(topic.id, {
+            locale: locale as any,
+            name: fields.name,
+          });
+        }
+      }
+    }
+
+    return topic;
   }
 
   async listChildren(slug: string): Promise<TopicViewDto[]> {
