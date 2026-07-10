@@ -118,8 +118,9 @@ describe("TranslationEditor", () => {
     fireEvent.click(screen.getByRole("button", { name: /unpublish/i }));
     // Wait for modal to appear and click confirm button
     const confirmButtons = await screen.findAllByRole("button", { name: /unpublish/i });
+    const modalUnpublishBtn = confirmButtons[confirmButtons.length - 1]!;
     await act(async () => {
-      fireEvent.click(confirmButtons[confirmButtons.length - 1]); // Click the last (modal) Unpublish button
+      fireEvent.click(modalUnpublishBtn);
     });
     expect(mutateFn).toHaveBeenCalledTimes(1);
   });

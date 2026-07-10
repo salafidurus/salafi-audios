@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "RUST_BACKTRACE=1 NEXT_TURBOPACK_TRACING=1 bun --bun next dev",
+    "dev": "RUST_BACKTRACE=1 bun --bun next dev",
     "build": "bun --bun next build",
     "start": "bun --bun next start",
     "lint": "oxlint . && eslint .",
