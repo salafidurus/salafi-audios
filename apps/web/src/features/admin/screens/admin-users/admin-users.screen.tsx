@@ -9,8 +9,8 @@ import { useResponsive } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { EmptyState } from "@/shared/components/EmptyState";
-import { SearchBar } from "@/shared/components/SearchBar";
-import { ListContainer } from "@/shared/components/ListContainer";
+import { Search } from "@/shared/components/Search";
+import { List } from "@/shared/components/List";
 import { UserItem } from "@/features/admin/components/user-item";
 import { PermissionsDialog } from "@/features/admin/components/PermissionsDialog";
 import styles from "./admin-users.screen.module.css";
@@ -52,7 +52,7 @@ export function AdminUsersScreen(): ReactNode {
 
       <div className={styles.content}>
         <div className={styles.searchRow}>
-          <SearchBar
+          <Search.Bar
             value={searchQuery}
             onChange={setSearchQuery}
             placeholder="Search users by name or email..."
@@ -74,7 +74,7 @@ export function AdminUsersScreen(): ReactNode {
                 message={debouncedSearch ? "No users match your search." : "No users found."}
               />
             ) : (
-              <ListContainer>
+              <List>
                 {users.map((user) => (
                   <UserItem
                     key={user.id}
@@ -82,7 +82,7 @@ export function AdminUsersScreen(): ReactNode {
                     onManagePermissions={() => setPermUser({ id: user.id, name: user.name })}
                   />
                 ))}
-              </ListContainer>
+              </List>
             )}
           </>
         )}

@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useMemo } from "react";
+import { ChevronLeft } from "lucide-react";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
-import { SearchFilter } from "@/features/search/components/SearchFilter/SearchFilter";
-import {
-  SearchInput,
-  type SearchInputRef,
-} from "@/features/search/components/SearchInput/SearchInput";
+import { Search } from "@/shared/components/Search";
+import { Button } from "@/shared/components/Button/Button";
 import { SearchResultItem } from "@/features/search/components/SearchResultItem/SearchResultItem";
 import { SearchResultsList } from "@/features/search/components/SearchResultsList/SearchResultsList";
 import type { SearchResultRow } from "@sd/domain-search";
@@ -25,7 +23,6 @@ export type SearchProcessingScreenProps = {
 
 export function SearchProcessingScreen({ searchKey, onBackPress }: SearchProcessingScreenProps) {
   const isDesktop = useIsDesktop();
-  const inputRef = useRef<SearchInputRef>(null);
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
   const {
@@ -41,9 +38,15 @@ export function SearchProcessingScreen({ searchKey, onBackPress }: SearchProcess
   } = useSearchProcessing({ prefill: searchKey, showOriginal });
   const { push } = useRouter();
 
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+  // Transform topics into chips format for Search.Filter
+  const filterChips = useMemo(() => {
+    return topics
+      .toSorted((a, b) => a.name.localeCompare(b.name))
+      .map((topic) => ({
+        id: topic.slug,
+        label: topic.name,
+      }));
+  }, [topics]);
 
   const handleItemPress = (item: SearchResultRow) => {
     const [kind, id] = item.id.split(":");
@@ -69,14 +72,23 @@ export function SearchProcessingScreen({ searchKey, onBackPress }: SearchProcess
           }}
         >
           <div className="flex flex-col gap-[var(--space-component-gap-md)]">
-            <SearchInput
-              ref={inputRef}
+            <Search.Bar
               placeholder={t("search.placeholder", "Search")}
               value={query}
               onChange={setQuery}
-              autoFocus
             />
-            <SearchFilter value={filter} onChange={setFilter} topics={topics} />
+            <Search.Filter
+              chips={filterChips}
+              selected={filter}
+              onChipChange={(chipId: string) => {
+                setFilter(
+                  filter.includes(chipId)
+                    ? filter.filter((f) => f !== chipId)
+                    : [...filter, chipId],
+                );
+              }}
+              multiple
+            />
           </div>
         </div>
         <section className="pb-[var(--space-layout-page-y)]">
@@ -97,14 +109,33 @@ export function SearchProcessingScreen({ searchKey, onBackPress }: SearchProcess
   return (
     <ScreenView contentStyle={{ flex: 1 }}>
       <div className={styles.searchGroup}>
-        <SearchInput
-          ref={inputRef}
-          placeholder={t("search.placeholder", "Search")}
-          value={query}
-          onChange={setQuery}
-          onBackPress={onBackPress}
-        />
-        {shouldSearch ? <SearchFilter value={filter} onChange={setFilter} topics={topics} /> : null}
+        <div className="flex items-center gap-[var(--space-component-gap-sm)]">
+          <Button
+            variant="ghost"
+            size="icon"
+            icon={<ChevronLeft size={20} />}
+            onClick={onBackPress}
+            aria-label="Go back"
+          />
+          <Search.Bar
+            placeholder={t("search.placeholder", "Search")}
+            value={query}
+            onChange={setQuery}
+            className="flex-1"
+          />
+        </div>
+        {shouldSearch ? (
+          <Search.Filter
+            chips={filterChips}
+            selected={filter}
+            onChipChange={(chipId: string) => {
+              setFilter(
+                filter.includes(chipId) ? filter.filter((f) => f !== chipId) : [...filter, chipId],
+              );
+            }}
+            multiple
+          />
+        ) : null}
       </div>
       <SearchResultsList
         items={items}

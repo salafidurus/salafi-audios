@@ -3,37 +3,37 @@
   "instructions": ["**/AGENT.md", ".agents/skills/project-guardrails/SKILL.md"],
   "mcp": {
     "tailwindcss": {
-      "enabled": true
+      "enabled": true,
     },
     "playwright": {
-      "enabled": false
+      "enabled": false,
     },
     "stitch": {
-      "enabled": false
+      "enabled": false,
     },
     "antigravity": {
-      "enabled": false
+      "enabled": false,
     },
     "hugeicons": {
-      "enabled": false
+      "enabled": false,
     },
     "server-github": {
-      "enabled": true
+      "enabled": true,
     },
     "in-memoria": {
-      "enabled": true
+      "enabled": true,
     },
     "sequential-thinking": {
-      "enabled": true
+      "enabled": true,
     },
     "kratos": {
-      "enabled": false
+      "enabled": false,
     },
     "context7": {
-      "enabled": true
+      "enabled": true,
     },
     "server-memory": {
-      "enabled": true
-    }
-  }
+      "enabled": true,
+    },
+  },
 }

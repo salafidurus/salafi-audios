@@ -3,7 +3,7 @@ import styles from "./ListItemActions.module.css";
 
 export type ListItemActionsProps = {
   /** Action buttons or any interactive elements */
-  children: ReactNode;
+  children?: ReactNode;
   /** Optional custom className to merge with default styles */
   className?: string;
   /** Controls action stacking on desktop/tablet: 'horizontal' (default) for row layout, 'vertical' for column */
@@ -39,6 +39,7 @@ export function ListItemActions({
 }: ListItemActionsProps) {
   return (
     <div
+      data-testid="list-item-actions"
       className={`${styles.actions} ${styles[`orientation-${orientation}`]} ${styles[`mobile-orientation-${mobileOrientation}`]} ${className ?? ""}`}
     >
       {children}

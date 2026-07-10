@@ -1,10 +1,10 @@
 import Image from "next/image";
 import { Pencil } from "lucide-react";
 import { Button } from "@/shared/components/Button";
-import { ListItem } from "@/shared/components/ListItem";
-import styles from "./scholar-card.module.css";
+import { List } from "@/shared/components/List";
+import styles from "./scholar-item.module.css";
 
-export interface ScholarCardProps {
+export interface ScholarItemProps {
   id: string;
   name: string;
   slug: string;
@@ -14,16 +14,16 @@ export interface ScholarCardProps {
   onEdit: () => void;
 }
 
-export function ScholarCard({
+export function ScholarItem({
   name,
   slug,
   isKibar,
   lectureCount,
   imageUrl,
   onEdit,
-}: ScholarCardProps) {
+}: ScholarItemProps) {
   return (
-    <ListItem interactive className={styles.card}>
+    <List.Item interactive className={styles.card}>
       <div className={styles.avatar}>
         {imageUrl ? (
           <Image
@@ -46,13 +46,15 @@ export function ScholarCard({
           <span className={styles.lectures}>{lectureCount} lectures</span>
         </div>
       </div>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={onEdit}
-        aria-label={`Edit ${name}`}
-        icon={<Pencil size={16} />}
-      />
-    </ListItem>
+      <List.Item.Actions>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onEdit}
+          aria-label={`Edit ${name}`}
+          icon={<Pencil size={16} />}
+        />
+      </List.Item.Actions>
+    </List.Item>
   );
 }

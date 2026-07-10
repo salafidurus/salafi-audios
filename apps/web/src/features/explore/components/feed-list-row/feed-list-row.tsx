@@ -7,7 +7,7 @@ import { useAudio, useProgressStore } from "@sd/domain-audio";
 import type { Track } from "@sd/domain-audio";
 import type { FeedContentItemDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
-import { ListItem } from "@/shared/components/ListItem";
+import { List } from "@/shared/components/List";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { audioService } from "@/features/audio";
 import styles from "./feed-list-row.module.css";
@@ -77,7 +77,7 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
   const publishedDateText = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString() : "";
 
   return (
-    <ListItem interactive className={styles.row} onClick={onPress}>
+    <List.Item interactive className={styles.row} onClick={onPress}>
       <div className={styles.container}>
         <div className={styles.avatarSection}>
           {item.thumbnailUrl ? (
@@ -141,6 +141,6 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
           <div className={styles.progressBar} style={{ width: `${progressPercent}%` }} />
         </div>
       )}
-    </ListItem>
+    </List.Item>
   );
 }

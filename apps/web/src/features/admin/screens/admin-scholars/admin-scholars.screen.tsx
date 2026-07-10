@@ -6,12 +6,12 @@ import { useResponsive } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
-import { ListContainer } from "@/shared/components/ListContainer";
+import { List } from "@/shared/components/List";
+import { Search } from "@/shared/components/Search";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { ScholarListItemDto, CreateScholarDto } from "@sd/core-contracts";
 import { createScholar, updateScholar } from "@/features/admin/api/admin.api";
-import { SearchBar } from "@/shared/components/SearchBar";
-import { ScholarCard } from "@/features/admin/components/ScholarCard";
+import { ScholarItem } from "@/features/admin/components/ScholarItem";
 import {
   ScholarFormModal,
   type ScholarForEdit,
@@ -94,7 +94,7 @@ export function AdminScholarsScreen() {
         />
 
         <div className={styles.toolbar}>
-          <SearchBar
+          <Search.Bar
             value={searchQuery}
             onChange={setSearchQuery}
             placeholder={!isMobile ? "Search scholars by name or slug..." : "Search scholars..."}
@@ -102,9 +102,9 @@ export function AdminScholarsScreen() {
         </div>
 
         {filteredScholars.length > 0 ? (
-          <ListContainer>
+          <List>
             {filteredScholars.map((scholar) => (
-              <ScholarCard
+              <ScholarItem
                 key={scholar.id}
                 id={scholar.id}
                 name={scholar.name}
@@ -115,7 +115,7 @@ export function AdminScholarsScreen() {
                 onEdit={() => handleOpenEdit(scholar)}
               />
             ))}
-          </ListContainer>
+          </List>
         ) : (
           <div className={styles.empty}>
             {searchQuery ? "No scholars match your search." : "No scholars yet."}

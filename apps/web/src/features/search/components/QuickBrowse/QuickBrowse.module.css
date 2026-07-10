@@ -37,7 +37,10 @@
   background: transparent;
   padding: var(--space-component-card-padding);
   text-align: left;
-  transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    box-shadow 150ms ease;
   cursor: pointer;
 }
 
@@ -229,7 +232,10 @@
   background: transparent;
   padding: var(--space-component-card-padding);
   text-align: left;
-  transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    box-shadow 150ms ease;
   cursor: pointer;
 }
 

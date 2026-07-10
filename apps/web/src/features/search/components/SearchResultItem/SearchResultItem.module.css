@@ -7,7 +7,10 @@
   border: 1px solid transparent;
   background: transparent;
   padding: 0.75rem;
-  transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    box-shadow 150ms ease;
 }
 
 .card:hover {
@@ -88,7 +91,10 @@
   border: 1px solid var(--border-default);
   background: var(--surface-subtle);
   color: var(--content-muted);
-  transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    color 150ms ease;
 }
 
 .playButtonInner:hover {
@@ -110,7 +116,9 @@
   background: transparent;
   padding: var(--space-component-card-padding);
   text-align: start;
-  transition: background 100ms ease, border-color 100ms ease;
+  transition:
+    background 100ms ease,
+    border-color 100ms ease;
 }
 
 .mobileCard:hover {

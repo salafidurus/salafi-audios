@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import styles from "./ListContainer.module.css";
+import styles from "./list-container.module.css";
 
 export type ListContainerProps = {
   children: ReactNode;

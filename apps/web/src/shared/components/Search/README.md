@@ -77,6 +77,7 @@ const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
 - `onChipRemove?: (id: string) => void` — Optional callback when close button is clicked
 - `showCloseButton?: boolean` — Show close button on selected chips (default: `true`)
 - `multiple?: boolean` — Allow multiple selections; enables checkbox-like multi-select behavior (default: `false` for single-select/radio)
+- `includeAllOption?: boolean` — Show an "All" chip that clears all filters when clicked (default: `true`)
 - `className?: string` — Optional additional CSS class
 
 ## Selection Modes
@@ -103,23 +104,42 @@ Set `multiple={true}` to enable multi-select (checkbox) mode where users can sel
 - Use an array state variable for selected values
 - Pass selected values directly: `selected={selectedValues}`
 
+## "All" Option
+
+By default, `Search.Filter` includes an "All" chip that clears all filters. The "All" chip:
+
+- Appears as the first chip in the filter group
+- Is selected when no other chips are selected (i.e., showing all content)
+- When clicked while other filters are active, clears all selections
+- When other filter chips are clicked, "All" is automatically deselected
+
+To disable the "All" chip, set `includeAllOption={false}`.
+
+**Characteristics:**
+
+- "All" is automatically selected when `selected.length === 0`
+- Clicking "All" when filters are active clears all selections by calling `onChipChange()` for each selected filter
+- "All" cannot be manually removed (no close button)
+- Works in both single-select and multi-select modes
+
 ## Examples
 
-### Single-Select Filter (Category)
+### Single-Select Filter with "All" Option (Default)
 
 ```tsx
 const [selectedCategory, setSelectedCategory] = useState<string>("");
 
 <Search.Filter
   chips={[
-    { id: "all", label: "All" },
     { id: "lecture", label: "Lectures" },
     { id: "article", label: "Articles" },
+    { id: "series", label: "Series" },
   ]}
   selected={selectedCategory ? [selectedCategory] : []}
   onChipChange={(id) => {
     setSelectedCategory((prev) => (prev === id ? "" : id));
   }}
+  includeAllOption={true}
 />;
 ```
 

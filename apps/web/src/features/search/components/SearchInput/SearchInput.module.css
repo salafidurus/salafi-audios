@@ -12,7 +12,10 @@
   line-height: var(--typo-body-lg-line-height);
   letter-spacing: var(--typo-body-lg-letter-spacing);
   font-weight: var(--typo-body-lg-font-weight);
-  transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease,
+    box-shadow 150ms ease;
 }
 
 .label:focus-within {
@@ -54,7 +57,9 @@
   border: 1px solid var(--border-default);
   padding: var(--space-scale-md) var(--space-scale-lg);
   background: var(--surface-subtle);
-  transition: border-color 150ms ease, background 150ms ease;
+  transition:
+    border-color 150ms ease,
+    background 150ms ease;
 }
 
 .focused {

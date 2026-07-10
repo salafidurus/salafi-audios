@@ -25,6 +25,8 @@ export interface SearchFilterProps {
   showCloseButton?: boolean;
   /** Whether to allow multiple selections (default: false for single-select/radio) */
   multiple?: boolean;
+  /** Whether to include an "All" chip that clears all filters (default: true) */
+  includeAllOption?: boolean;
 }
 
 /**
@@ -33,6 +35,7 @@ export interface SearchFilterProps {
  * Provides:
  * - Single-select (radio button) or multi-select filter chips
  * - Optional close button for removing selections
+ * - Optional "All" chip to clear all filters
  * - Visual selection state (background, border, weight changes)
  * - Responsive layout that wraps on smaller screens
  * - Design token spacing and colors
@@ -50,6 +53,7 @@ export interface SearchFilterProps {
  *   onChipChange={(id) => {
  *     setSelectedFilter(prev => prev === id ? '' : id);
  *   }}
+ *   includeAllOption
  * />
  * ```
  *
@@ -69,6 +73,7 @@ export interface SearchFilterProps {
  *     );
  *   }}
  *   multiple
+ *   includeAllOption
  * />
  * ```
  *
@@ -82,21 +87,45 @@ export function SearchFilter({
   className,
   showCloseButton = true,
   multiple = false,
+  includeAllOption = true,
 }: SearchFilterProps) {
   const handleChipClick = (chipId: string) => {
-    onChipChange(chipId);
+    if (chipId === "all") {
+      // "All" chip clears all selections
+      selected.forEach((id) => onChipChange(id));
+    } else {
+      onChipChange(chipId);
+    }
   };
 
   const handleRemoveClick = (e: React.MouseEvent<HTMLButtonElement>, chipId: string) => {
     e.stopPropagation();
+    // First call the optional remove callback if provided
     onChipRemove?.(chipId);
+    // Then deselect the filter using onChipChange to ensure it's removed
+    onChipChange(chipId);
   };
 
   // Convert selected array to Set for O(1) lookup performance
   const selectedSet = new Set(selected);
+  // "All" is selected when no other chips are selected
+  const isAllSelected = selected.length === 0;
 
   return (
     <div className={`${styles.filterContainer} ${className || ""}`}>
+      {includeAllOption && (
+        <div className={`${styles.filterChip} ${isAllSelected ? styles.selected : ""}`}>
+          <button
+            type="button"
+            className={styles.filterChipButton}
+            onClick={() => handleChipClick("all")}
+            aria-pressed={isAllSelected}
+            aria-label="Show all items"
+          >
+            <span>All</span>
+          </button>
+        </div>
+      )}
       {chips.map((chip) => {
         const isSelected = selectedSet.has(chip.id);
         return (

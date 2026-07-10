@@ -18,7 +18,10 @@
   border-radius: var(--radius-component-chip);
   border: 1px solid var(--border-subtle);
   padding: var(--space-component-chip-y) var(--space-component-chip-x);
-  transition: opacity 100ms ease, background 150ms ease, border-color 150ms ease;
+  transition:
+    opacity 100ms ease,
+    background 150ms ease,
+    border-color 150ms ease;
   white-space: nowrap;
   cursor: pointer;
   font-family: var(--typo-label-md-font-family);

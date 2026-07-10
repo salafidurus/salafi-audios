@@ -1,10 +1,10 @@
-// Import ListContainer from parent directory structure
-import { ListContainer } from "../ListContainer/ListContainer";
-import type { ListContainerProps } from "../ListContainer/ListContainer";
+// Import ListContainer from current directory
+import { ListContainer } from "./ListContainer";
+import type { ListContainerProps } from "./ListContainer";
 
-// Import ListItem from parent directory structure
-import { ListItem } from "../ListItem/ListItem";
-import type { ListItemProps } from "../ListItem/ListItem";
+// Import ListItem from current directory
+import { ListItem } from "./ListItem";
+import type { ListItemProps } from "./ListItem";
 
 // Import ListItemActions from current directory
 import { ListItemActions } from "./ListItemActions";
