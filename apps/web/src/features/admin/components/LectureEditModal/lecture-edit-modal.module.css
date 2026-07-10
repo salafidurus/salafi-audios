@@ -36,7 +36,6 @@
 }
 
 .input,
-.select,
 .textarea {
   width: 100%;
   padding: var(--space-scale-sm) var(--space-scale-md);
@@ -52,7 +51,6 @@
 }
 
 .input:focus,
-.select:focus,
 .textarea:focus {
   outline: none;
   border-color: var(--input-border-focus);

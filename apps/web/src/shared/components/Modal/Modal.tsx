@@ -39,7 +39,7 @@ export function Modal({
   width,
   hideFooter,
   footerAlignment = "right",
-  footerBorder = false,
+  _footerBorder = false,
   loading,
 }: ModalProps) {
   const mounted = useSyncExternalStore(

@@ -7,6 +7,12 @@ import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button";
 import { EditableInput } from "@/shared/components/EditableInput";
 import { EditableTextarea } from "@/shared/components/EditableTextarea";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownContent,
+  DropdownItem,
+} from "@/shared/components/Dropdown";
 import { FormSection } from "@/features/admin/components/FormSection";
 import type { CreateScholarDto } from "@sd/core-contracts";
 import styles from "./scholar-form-modal.module.css";
@@ -384,22 +390,22 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
 
           <div className={styles.field}>
             <label className={styles.label}>Main Language</label>
-            <select
-              className={styles.selectField}
+            <Dropdown
               value={formData.mainLanguage ?? ""}
-              onChange={(e) =>
-                dispatch({
-                  type: "UPDATE_FORM_FIELD",
-                  field: "mainLanguage",
-                  value: e.target.value ? (e.target.value as "en" | "ar") : "",
-                })
+              onValueChange={(value) =>
+                dispatch({ type: "UPDATE_FORM_FIELD", field: "mainLanguage", value: value || "" })
               }
-              disabled={isEditing && !isFieldEditing("mainLanguage")}
             >
-              <option value="">-- Select Language --</option>
-              <option value="en">English</option>
-              <option value="ar">Arabic (عربي)</option>
-            </select>
+              <DropdownTrigger
+                placeholder="-- Select Language --"
+                disabled={isEditing && !isFieldEditing("mainLanguage")}
+              />
+              <DropdownContent>
+                <DropdownItem value="">-- Select Language --</DropdownItem>
+                <DropdownItem value="en">English</DropdownItem>
+                <DropdownItem value="ar">Arabic (عربي)</DropdownItem>
+              </DropdownContent>
+            </Dropdown>
             {isEditing && (
               <button
                 type="button"

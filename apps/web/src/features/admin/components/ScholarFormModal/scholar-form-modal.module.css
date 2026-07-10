@@ -25,29 +25,6 @@
   color: var(--content-default);
 }
 
-.selectField {
-  padding: var(--space-sm) var(--space-md);
-  font-size: var(--typo-body-md-font-size);
-  background-color: var(--surface-default);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  color: var(--content-default);
-  transition:
-    border-color 150ms ease,
-    box-shadow 150ms ease;
-}
-
-.selectField:focus {
-  outline: none;
-  border-color: var(--action-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-focus-ring) 24%, transparent);
-}
-
-.selectField:disabled {
-  color: var(--content-subtle);
-  cursor: not-allowed;
-}
-
 .editIconButton {
   display: flex;
   align-items: center;
