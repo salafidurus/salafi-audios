@@ -280,4 +280,46 @@ describe("SearchFilter", () => {
     expect(lectureCloseButton).toBeInTheDocument();
     expect(articleCloseButton).toBeInTheDocument();
   });
+
+  it("accepts multiple prop for single-select mode (default)", () => {
+    const handleChipChange = vi.fn();
+
+    render(
+      <SearchFilter
+        chips={mockChips}
+        selected={["lecture"]}
+        onChipChange={handleChipChange}
+        multiple={false}
+      />,
+    );
+
+    const lectureChip = screen.getByLabelText("Filter by Lectures");
+    expect(lectureChip).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("accepts multiple prop for multi-select mode", () => {
+    const handleChipChange = vi.fn();
+
+    render(
+      <SearchFilter
+        chips={mockChips}
+        selected={["lecture", "article"]}
+        onChipChange={handleChipChange}
+        multiple={true}
+      />,
+    );
+
+    const lectureChip = screen.getByLabelText("Filter by Lectures");
+    const articleChip = screen.getByLabelText("Filter by Articles");
+
+    expect(lectureChip).toHaveAttribute("aria-pressed", "true");
+    expect(articleChip).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("defaults to single-select mode when multiple prop is not provided", () => {
+    render(<SearchFilter chips={mockChips} selected={["lecture"]} onChipChange={() => {}} />);
+
+    const lectureChip = screen.getByLabelText("Filter by Lectures");
+    expect(lectureChip).toHaveAttribute("aria-pressed", "true");
+  });
 });

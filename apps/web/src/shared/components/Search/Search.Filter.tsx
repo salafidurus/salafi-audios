@@ -23,19 +23,37 @@ export interface SearchFilterProps {
   className?: string;
   /** Whether to show close button on selected chips (default: true) */
   showCloseButton?: boolean;
+  /** Whether to allow multiple selections (default: false for single-select/radio) */
+  multiple?: boolean;
 }
 
 /**
  * Search.Filter — Standardized filter chip group.
  *
  * Provides:
- * - Selectable filter chips with toggle behavior
+ * - Single-select (radio button) or multi-select filter chips
  * - Optional close button for removing selections
  * - Visual selection state (background, border, weight changes)
  * - Responsive layout that wraps on smaller screens
  * - Design token spacing and colors
  *
- * Usage:
+ * Single-Select Usage (Default - radio button behavior):
+ * ```tsx
+ * const [selectedFilter, setSelectedFilter] = useState<string>('');
+ *
+ * <Search.Filter
+ *   chips={[
+ *     { id: 'category-lectures', label: 'Lectures' },
+ *     { id: 'category-articles', label: 'Articles' },
+ *   ]}
+ *   selected={selectedFilter ? [selectedFilter] : []}
+ *   onChipChange={(id) => {
+ *     setSelectedFilter(prev => prev === id ? '' : id);
+ *   }}
+ * />
+ * ```
+ *
+ * Multi-Select Usage:
  * ```tsx
  * const [filters, setFilters] = useState<string[]>([]);
  *
@@ -50,6 +68,7 @@ export interface SearchFilterProps {
  *       prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
  *     );
  *   }}
+ *   multiple
  * />
  * ```
  *
@@ -62,6 +81,7 @@ export function SearchFilter({
   onChipRemove,
   className,
   showCloseButton = true,
+  multiple = false,
 }: SearchFilterProps) {
   const handleChipClick = (chipId: string) => {
     onChipChange(chipId);
