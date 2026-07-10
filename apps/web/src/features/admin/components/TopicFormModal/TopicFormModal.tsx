@@ -161,7 +161,7 @@ export function TopicFormModal({ isOpen, onClose, onSave, topic }: TopicFormModa
   };
 
   const [state, dispatch] = useReducer(formReducer, initialFormState);
-  const { formData, originalFormData, editingFields, translationChanges, saving, error } = state;
+  const { formData, editingFields, translationChanges, saving, error } = state;
 
   // Fetch translations only when editing
   const { data: translationsResponse } = useContentTranslations(

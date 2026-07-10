@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { authClient } from "@/core/auth";
 import { Modal } from "@/shared/components/Modal/Modal";
 import { Button } from "@/shared/components/Button";
-import styles from "./signout-confirm-dialog.module.css";
 
 export interface SignOutConfirmDialogProps {
   isOpen: boolean;
