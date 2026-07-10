@@ -38,9 +38,17 @@ export interface DropdownProps {
   value: string;
   onValueChange: (value: string) => void;
   children: ReactNode;
+  disabled?: boolean;
+  error?: boolean | string;
 }
 
-export function Dropdown({ value, onValueChange, children }: DropdownProps) {
+export function Dropdown({
+  value,
+  onValueChange,
+  children,
+  disabled = false,
+  error,
+}: DropdownProps) {
   const [open, setOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [searchQuery, setSearchQuery] = useState("");
@@ -72,8 +80,21 @@ export function Dropdown({ value, onValueChange, children }: DropdownProps) {
       registerItem,
       searchQuery,
       setSearchQuery,
+      disabled,
+      error,
     }),
-    [open, value, onValueChange, highlightedIndex, items, registerItem, contentId, searchQuery],
+    [
+      open,
+      value,
+      onValueChange,
+      highlightedIndex,
+      items,
+      registerItem,
+      contentId,
+      searchQuery,
+      disabled,
+      error,
+    ],
   );
 
   return <DropdownContext.Provider value={ctx}>{children}</DropdownContext.Provider>;

@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { LazyMotion, m, domAnimation, AnimatePresence } from "framer-motion";
+import { useFloating, offset, flip, shift, autoUpdate } from "@floating-ui/react";
 import { SearchBar } from "@/shared/components/SearchBar";
 import { useDropdownContext } from "./context";
 import styles from "./dropdown.module.css";
@@ -27,6 +28,27 @@ export function DropdownContent({ children, searchable = false, className }: Dro
     onValueChange,
   } = useDropdownContext();
   const contentRef = useRef<HTMLDivElement>(null);
+
+  const { floatingStyles, refs } = useFloating({
+    whileElementsMounted: autoUpdate,
+    placement: "bottom-start",
+    middleware: [
+      offset(6),
+      flip({
+        fallbackPlacements: ["top-start"],
+        padding: 8,
+      }),
+      shift({ padding: 8 }),
+    ],
+  });
+
+  // Connect the refs after they are mounted
+  useEffect(() => {
+    if (triggerRef.current && contentRef.current) {
+      refs.setReference(triggerRef.current);
+      refs.setFloating(contentRef.current);
+    }
+  }, [refs, triggerRef]);
 
   useEffect(() => {
     if (!open) return;
@@ -129,6 +151,7 @@ export function DropdownContent({ children, searchable = false, className }: Dro
             exit={{ opacity: 0, transform: "scale(0.98) translateY(-4px)" }}
             transition={{ duration: 0.15, ease: "easeOut" }}
             className={[styles.content, className].filter(Boolean).join(" ")}
+            style={floatingStyles as React.CSSProperties}
           >
             {searchable && (
               <div className={styles.searchWrapper}>

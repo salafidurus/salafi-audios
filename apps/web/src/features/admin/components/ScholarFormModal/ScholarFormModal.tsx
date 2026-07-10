@@ -15,6 +15,7 @@ import {
 } from "@/shared/components/Dropdown";
 import { FormSection } from "@/features/admin/components/FormSection";
 import type { CreateScholarDto } from "@sd/core-contracts";
+import { validateLanguageCode, COUNTRY_LIST } from "@/shared/types/form-types";
 import styles from "./scholar-form-modal.module.css";
 
 // Minimal edit data extracted from ScholarListItemDto
@@ -143,7 +144,7 @@ function getInitialFormData(scholar: ScholarForEdit | null): CreateScholarDto {
       isFeatured: scholar.isFeatured ?? false,
       isActive: scholar.isActive ?? true,
       country: scholar.country ?? "",
-      mainLanguage: scholar.mainLanguage ?? undefined,
+      mainLanguage: (scholar.mainLanguage ?? "ar") as "en" | "ar",
       socialTwitter: scholar.socialTwitter ?? "",
       socialTelegram: scholar.socialTelegram ?? "",
       socialYoutube: scholar.socialYoutube ?? "",
@@ -159,7 +160,7 @@ function getInitialFormData(scholar: ScholarForEdit | null): CreateScholarDto {
     isFeatured: false,
     isActive: true,
     country: "",
-    mainLanguage: undefined,
+    mainLanguage: "ar",
     socialTwitter: "",
     socialTelegram: "",
     socialYoutube: "",
@@ -379,29 +380,51 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
         <FormSection title="Location & Language">
           <div className={styles.field}>
             <label className={styles.label}>Country</label>
-            <EditableInput
+            <Dropdown
               value={formData.country ?? ""}
-              onChange={(value) => dispatch({ type: "UPDATE_FORM_FIELD", field: "country", value })}
-              placeholder="e.g., Saudi Arabia, Egypt"
+              onValueChange={(value) =>
+                dispatch({ type: "UPDATE_FORM_FIELD", field: "country", value })
+              }
               disabled={isEditing && !isFieldEditing("country")}
-              rightButton={getEditButton("country")}
-            />
+            >
+              <DropdownTrigger placeholder="Select Country" />
+              <DropdownContent searchable>
+                {COUNTRY_LIST.map((country) => (
+                  <DropdownItem key={country.code} value={country.code}>
+                    {country.name}
+                  </DropdownItem>
+                ))}
+              </DropdownContent>
+            </Dropdown>
+            {isEditing && (
+              <button
+                type="button"
+                className={styles.editIconButton}
+                onClick={() => toggleFieldEdit("country")}
+                aria-label={isFieldEditing("country") ? "Cancel edit" : "Edit field"}
+              >
+                {isFieldEditing("country") ? <RotateCcw size={16} /> : <Edit2 size={16} />}
+              </button>
+            )}
           </div>
 
           <div className={styles.field}>
             <label className={styles.label}>Main Language</label>
             <Dropdown
-              value={formData.mainLanguage ?? ""}
+              value={formData.mainLanguage}
               onValueChange={(value) =>
-                dispatch({ type: "UPDATE_FORM_FIELD", field: "mainLanguage", value: value || "" })
+                dispatch({
+                  type: "UPDATE_FORM_FIELD",
+                  field: "mainLanguage",
+                  value: validateLanguageCode(value) as any,
+                })
               }
             >
               <DropdownTrigger
-                placeholder="-- Select Language --"
+                placeholder="Select Language"
                 disabled={isEditing && !isFieldEditing("mainLanguage")}
               />
               <DropdownContent>
-                <DropdownItem value="">-- Select Language --</DropdownItem>
                 <DropdownItem value="en">English</DropdownItem>
                 <DropdownItem value="ar">Arabic (عربي)</DropdownItem>
               </DropdownContent>

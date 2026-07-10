@@ -10,7 +10,6 @@ export async function seedScholars(prisma: PrismaClient): Promise<void> {
     await prisma.scholar.create({
       data: {
         ...scholar,
-        mainLanguage: "ar",
         isActive: true,
         isFeatured: false,
       },

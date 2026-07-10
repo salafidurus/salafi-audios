@@ -49,6 +49,11 @@ infra/envs/*.env
 # generated DB artifacts (derived, never committed)
 packages/db/src/generated/
 
+# Python cache files
+__pycache__/
+**/__pycache__/
+*.pyc
+
 # IDE and Tool settings
 .vscode/mcp.json
 
@@ -68,4 +73,8 @@ packages/db/src/generated/
 # Deployment artifacts
 .pruned-target
 out/
+
+# Generated uploads and local API routes (should not be committed)
+apps/web/public/uploads/
+apps/web/src/app/api/
 

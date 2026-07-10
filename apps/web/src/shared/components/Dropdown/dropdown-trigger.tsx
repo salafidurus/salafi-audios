@@ -15,13 +15,24 @@ export interface DropdownTriggerProps {
 export function DropdownTrigger({
   placeholder = "Select...",
   className,
-  disabled,
+  disabled: disabledProp,
   id,
   testId,
 }: DropdownTriggerProps) {
-  const { open, setOpen, value, triggerRef, items, contentId } = useDropdownContext();
+  const {
+    open,
+    setOpen,
+    value,
+    triggerRef,
+    items,
+    contentId,
+    disabled: disabledContext,
+    error,
+  } = useDropdownContext();
 
+  const disabled = disabledProp ?? disabledContext;
   const selectedLabel = items.find((i) => i.value === value)?.label ?? "";
+  const hasError = !!error;
 
   return (
     <button
@@ -30,10 +41,16 @@ export function DropdownTrigger({
       role="combobox"
       aria-haspopup="listbox"
       aria-expanded={open}
+      aria-invalid={hasError}
       aria-controls={contentId}
       id={id}
       data-testid={testId}
-      className={[styles.trigger, open ? styles.triggerOpen : "", className]
+      className={[
+        styles.trigger,
+        open ? styles.triggerOpen : "",
+        hasError ? styles.triggerError : "",
+        className,
+      ]
         .filter(Boolean)
         .join(" ")}
       onClick={() => {

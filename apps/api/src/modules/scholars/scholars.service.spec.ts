@@ -142,6 +142,8 @@ describe('ScholarsService', () => {
         isKibar: false,
         isFeatured: false,
         isActive: true,
+        country: 'Saudi Arabia',
+        mainLanguage: 'ar',
       };
       const created = {
         id: 's2',
@@ -165,7 +167,7 @@ describe('ScholarsService', () => {
         deletedBy: null,
       };
 
-      repo.create.mockResolvedValue(created);
+      repo.create.mockResolvedValue(created as any);
 
       const result = await service.create(dto);
 
@@ -201,8 +203,8 @@ describe('ScholarsService', () => {
       };
       const updated = { ...existing, name: dto.name! };
 
-      repo.findById.mockResolvedValue(existing);
-      repo.update.mockResolvedValue(updated);
+      repo.findById.mockResolvedValue(existing as any);
+      repo.update.mockResolvedValue(updated as any);
 
       const result = await service.update('s1', dto);
 

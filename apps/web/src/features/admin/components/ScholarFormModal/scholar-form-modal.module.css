@@ -1,7 +1,7 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-component-gap-xl);
 }
 
 .error {
@@ -16,6 +16,7 @@
 .field {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
   gap: var(--space-xs);
 }
 
@@ -23,6 +24,47 @@
   font-size: var(--typo-label-md-font-size);
   font-weight: 500;
   color: var(--content-default);
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-component-gap-md);
+}
+
+@media (max-width: 640px) {
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fullRow {
+  grid-column: 1 / -1;
+}
+
+/* Removed .fieldVertical - all fields are now vertical by default */
+
+.selectField {
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--typo-body-md-font-size);
+  background-color: var(--surface-default);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--content-default);
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.selectField:focus {
+  outline: none;
+  border-color: var(--action-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-focus-ring) 24%, transparent);
+}
+
+.selectField:disabled {
+  color: var(--content-subtle);
+  cursor: not-allowed;
 }
 
 .editIconButton {
@@ -58,25 +100,28 @@
   outline-offset: 2px;
 }
 
-.checkboxGroup {
+.toggleGroup {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+}
+
+@media (max-width: 640px) {
+  .toggleGroup {
+    grid-template-columns: 1fr;
+  }
+}
+
+.toggleField {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--space-md);
 }
 
-.checkbox {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  font-size: var(--typo-body-md-font-size);
+.toggleLabel {
+  font-size: var(--font-size-md);
   color: var(--content-default);
-  cursor: pointer;
-}
-
-.checkbox input {
-  width: 1rem;
-  height: 1rem;
-  cursor: pointer;
 }
 
 .imagePreview {
@@ -88,12 +133,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 120px;
+  min-height: 260px;
+  max-height: 260px;
 }
 
 .previewImage {
-  max-width: 200px;
-  max-height: 200px;
+  max-width: 240px;
+  max-height: 240px;
   object-fit: contain;
   border-radius: var(--radius-xs);
 }
@@ -129,4 +175,33 @@
   gap: var(--space-sm);
   color: var(--content-danger);
   font-size: var(--typo-body-sm-font-size);
+}
+
+/* Translation Status */
+.translationStatus {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-subtle);
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--typo-label-sm-font-size);
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-draft {
+  background-color: var(--surface-subtle);
+  color: var(--content-default);
+  border: 1px solid var(--border-subtle);
+}
+
+.status-published {
+  background-color: var(--action-success);
+  color: white;
 }

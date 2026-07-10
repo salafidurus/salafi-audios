@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Pencil } from "lucide-react";
 import { Button } from "@/shared/components/Button";
+import { ListItem } from "@/shared/components/ListItem";
 import styles from "./scholar-card.module.css";
 
 export interface ScholarCardProps {
@@ -22,7 +23,7 @@ export function ScholarCard({
   onEdit,
 }: ScholarCardProps) {
   return (
-    <div className={styles.card}>
+    <ListItem interactive className={styles.card}>
       <div className={styles.avatar}>
         {imageUrl ? (
           <Image
@@ -52,6 +53,6 @@ export function ScholarCard({
         aria-label={`Edit ${name}`}
         icon={<Pencil size={16} />}
       />
-    </div>
+    </ListItem>
   );
 }

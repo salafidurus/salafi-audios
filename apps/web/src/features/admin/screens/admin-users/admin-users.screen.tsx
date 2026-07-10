@@ -10,6 +10,7 @@ import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { SearchBar } from "@/shared/components/SearchBar";
+import { ListContainer } from "@/shared/components/ListContainer";
 import { UserCard } from "@/features/admin/components/user-card/user-card";
 import { PermissionsDialog } from "@/features/admin/components/PermissionsDialog";
 import styles from "./admin-users.screen.module.css";
@@ -49,41 +50,43 @@ export function AdminUsersScreen(): ReactNode {
     <ScreenView>
       <PageHeader title={isMobile ? "Users" : "Manage Users"} />
 
-      <div className={styles.searchRow}>
-        <SearchBar
-          value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder="Search users by name or email..."
-        />
-      </div>
+      <div className={styles.content}>
+        <div className={styles.searchRow}>
+          <SearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search users by name or email..."
+          />
+        </div>
 
-      {isFetching ? (
-        <EmptyState variant="loading" message="Loading users…" />
-      ) : (
-        <>
-          <div className={styles.toolbar}>
-            <p className={styles.resultCount}>
-              {total} user{total !== 1 ? "s" : ""} found
-            </p>
-          </div>
-
-          {users.length === 0 ? (
-            <EmptyState
-              message={debouncedSearch ? "No users match your search." : "No users found."}
-            />
-          ) : (
-            <div className={styles.cardList}>
-              {users.map((user) => (
-                <UserCard
-                  key={user.id}
-                  user={user}
-                  onManagePermissions={() => setPermUser({ id: user.id, name: user.name })}
-                />
-              ))}
+        {isFetching ? (
+          <EmptyState variant="loading" message="Loading users…" />
+        ) : (
+          <>
+            <div className={styles.toolbar}>
+              <p className={styles.resultCount}>
+                {total} user{total !== 1 ? "s" : ""} found
+              </p>
             </div>
-          )}
-        </>
-      )}
+
+            {users.length === 0 ? (
+              <EmptyState
+                message={debouncedSearch ? "No users match your search." : "No users found."}
+              />
+            ) : (
+              <ListContainer>
+                {users.map((user) => (
+                  <UserCard
+                    key={user.id}
+                    user={user}
+                    onManagePermissions={() => setPermUser({ id: user.id, name: user.name })}
+                  />
+                ))}
+              </ListContainer>
+            )}
+          </>
+        )}
+      </div>
 
       {permUser && (
         <PermissionsDialog

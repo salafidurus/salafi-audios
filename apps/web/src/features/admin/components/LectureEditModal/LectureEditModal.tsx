@@ -8,6 +8,7 @@ import type {
   AdminListingListItemDto,
   AdminListingDetailDto,
 } from "@sd/core-contracts";
+import { validateLectureStatus } from "@/shared/types/form-types";
 import { createLecture, updateLecture } from "../../api/admin-lectures.api";
 import { Modal } from "../../../../shared/components/Modal";
 import {
@@ -301,7 +302,6 @@ export function LectureEditModal({
                 testId="scholar-dropdown"
               />
               <DropdownContent searchable>
-                <DropdownItem value="">Select Scholar</DropdownItem>
                 {scholars.map((s) => (
                   <DropdownItem key={s.id} value={s.id}>
                     {s.name}
@@ -323,7 +323,6 @@ export function LectureEditModal({
                 testId="series-dropdown"
               />
               <DropdownContent searchable>
-                <DropdownItem value="">Select Series (Optional)</DropdownItem>
                 {series.map((s) => (
                   <DropdownItem key={s.id} value={s.id}>
                     {s.title}
@@ -341,9 +340,7 @@ export function LectureEditModal({
             </label>
             <Dropdown
               value={status}
-              onValueChange={(value) =>
-                dispatch({ status: value as "draft" | "published" | "archived" })
-              }
+              onValueChange={(value) => dispatch({ status: validateLectureStatus(value) })}
             >
               <DropdownTrigger
                 id="lecture-status"

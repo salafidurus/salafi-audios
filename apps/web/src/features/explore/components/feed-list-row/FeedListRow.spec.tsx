@@ -125,7 +125,7 @@ describe("FeedListRow", () => {
   it("triggers onPress prop when row is clicked", () => {
     const onPressMock = vi.fn();
     const { container } = render(<FeedListRow item={baseItem} onPress={onPressMock} />);
-    const row = container.querySelector(".listRow");
+    const row = container.querySelector(`.${styles.row}`);
     expect(row).toBeInTheDocument();
     fireEvent.click(row!);
     expect(onPressMock).toHaveBeenCalled();

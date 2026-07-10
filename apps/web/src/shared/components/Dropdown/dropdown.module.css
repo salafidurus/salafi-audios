@@ -43,6 +43,25 @@
   border-color: var(--border-focus);
 }
 
+.triggerError {
+  border-color: var(--border-error);
+  background-color: color-mix(in srgb, var(--border-error) 8%, var(--surface-default));
+}
+
+.triggerError:hover {
+  border-color: var(--border-error);
+}
+
+.triggerError:focus-visible {
+  border-color: var(--border-error);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--border-error) 20%, transparent);
+}
+
+.triggerError:disabled {
+  border-color: var(--border-disabled);
+  background-color: var(--surface-disabled);
+}
+
 .triggerText {
   color: var(--content-default);
   overflow: hidden;
@@ -70,7 +89,7 @@
   z-index: 1000;
   min-width: 180px;
   max-width: min(320px, calc(100vw - var(--space-lg)));
-  max-height: 300px;
+  max-height: 280px;
   background-color: var(--surface-elevated);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-component-panel);
@@ -80,6 +99,9 @@
   flex-direction: column;
   transform-origin: top center;
   pointer-events: auto;
+  /* Allow floating-ui inline styles to control top/left positioning */
+  top: auto !important;
+  left: auto !important;
 }
 
 .searchWrapper {

@@ -17,4 +17,6 @@ export interface DropdownContextValue {
   registerItem: (value: string, label: string, disabled?: boolean) => () => void;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  disabled?: boolean;
+  error?: boolean | string;
 }
