@@ -23,7 +23,7 @@ export function ListItem({ children, onClick, className, interactive = false }: 
   const isClickable = Boolean(onClick);
   const showHoverStates = isClickable || interactive;
 
-  const handleClick = (e: MouseEvent<HTMLDivElement>) => {
+  const handleClick = (_e: MouseEvent<HTMLDivElement>) => {
     if (onClick) {
       onClick();
     }

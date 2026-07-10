@@ -11,7 +11,6 @@ import type {
 import { createLecture, updateLecture } from "../../api/admin-lectures.api";
 import { Modal } from "../../../../shared/components/Modal";
 import styles from "./lecture-edit-modal.module.css";
-import { X } from "lucide-react";
 
 interface LectureEditModalProps {
   isOpen: boolean;

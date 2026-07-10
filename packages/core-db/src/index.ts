@@ -10,6 +10,12 @@ export type LiveSessionStatus = client.LiveSessionStatus;
 export type Locale = client.Locale;
 export type TranslationStatus = client.TranslationStatus;
 export type PrismaClient = client.PrismaClient;
+export type Scholar = client.Scholar;
+export type User = client.User;
+export type Collection = client.Collection;
+export type Series = client.Series;
+export type Lecture = client.Lecture;
+export type Translation = client.Translation;
 
 // Export values
 export const Status = client.Status;

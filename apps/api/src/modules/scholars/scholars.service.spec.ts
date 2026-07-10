@@ -6,6 +6,7 @@ import type {
   ScholarContentUnifiedDto,
   ScholarListItemDto,
 } from '@sd/core-contracts';
+import type { Scholar } from '@sd/core-db';
 import { CreateScholarDto } from './dto/create-scholar.dto';
 import { UpdateScholarDto } from './dto/update-scholar.dto';
 import { ScholarsRepository } from './scholars.repo';
@@ -142,6 +143,8 @@ describe('ScholarsService', () => {
         isKibar: false,
         isFeatured: false,
         isActive: true,
+        country: 'Saudi Arabia',
+        mainLanguage: 'ar',
       };
       const created = {
         id: 's2',
@@ -165,7 +168,7 @@ describe('ScholarsService', () => {
         deletedBy: null,
       };
 
-      repo.create.mockResolvedValue(created);
+      repo.create.mockResolvedValue(created as Scholar);
 
       const result = await service.create(dto);
 
@@ -201,8 +204,8 @@ describe('ScholarsService', () => {
       };
       const updated = { ...existing, name: dto.name! };
 
-      repo.findById.mockResolvedValue(existing);
-      repo.update.mockResolvedValue(updated);
+      repo.findById.mockResolvedValue(existing as Scholar);
+      repo.update.mockResolvedValue(updated as Scholar);
 
       const result = await service.update('s1', dto);
 

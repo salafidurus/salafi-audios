@@ -70,14 +70,6 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.target !== e.currentTarget) return;
-    if (onPress && (e.key === "Enter" || e.key === " ")) {
-      e.preventDefault();
-      onPress();
-    }
-  };
-
   const initial = item.scholarName ? item.scholarName.trim().charAt(0).toUpperCase() : "?";
 
   const durationText = item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : "";

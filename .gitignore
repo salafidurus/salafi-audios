@@ -49,6 +49,11 @@ infra/envs/*.env
 # generated DB artifacts (derived, never committed)
 packages/db/src/generated/
 
+# Python cache files
+__pycache__/
+**/__pycache__/
+*.pyc
+
 # IDE and Tool settings
 .vscode/mcp.json
 

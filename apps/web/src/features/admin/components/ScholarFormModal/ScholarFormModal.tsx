@@ -1,8 +1,7 @@
 "use client";
 
-import { useReducer, useEffect } from "react";
-import Image from "next/image";
-import { Edit2, RotateCcw, AlertCircle, Loader } from "lucide-react";
+import { useReducer, useEffect, useMemo } from "react";
+import { Edit2, RotateCcw } from "lucide-react";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button";
 import { EditableInput } from "@/shared/components/EditableInput";
@@ -211,8 +210,7 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
   };
 
   const [state, dispatch] = useReducer(formReducer, initialFormState);
-  const { formData, editingFields, translationChanges, saving, error, imageLoading, imageError } =
-    state;
+  const { formData, editingFields, translationChanges, saving, error } = state;
 
   // Fetch translations only when editing
   const { data: translationsResponse } = useContentTranslations(
@@ -221,7 +219,10 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
       : { entity: "scholar", scholarId: "" },
   );
 
-  const translations = translationsResponse?.translations ?? [];
+  const translations = useMemo(
+    () => translationsResponse?.translations ?? [],
+    [translationsResponse],
+  );
 
   // Sync form data when scholar changes or modal opens
   useEffect(() => {
@@ -267,12 +268,6 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
     }
   };
 
-  const handleImageUrlChange = (value: string) => {
-    dispatch({ type: "UPDATE_FORM_FIELD", field: "imageUrl", value });
-    dispatch({ type: "SET_IMAGE_ERROR", error: false });
-    dispatch({ type: "SET_IMAGE_LOADING", loading: false });
-  };
-
   const handleTranslationNameChange = (locale: string, value: string) => {
     dispatch({ type: "UPDATE_TRANSLATION", locale, field: "name", value });
   };
@@ -302,20 +297,6 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
     } finally {
       dispatch({ type: "SET_SAVING", saving: false });
     }
-  };
-
-  const getEditButton = (fieldName: string) => {
-    if (!isEditing) return null;
-    return (
-      <button
-        type="button"
-        className={styles.editIconButton}
-        onClick={() => toggleFieldEdit(fieldName)}
-        aria-label={isFieldEditing(fieldName) ? "Cancel edit" : "Edit field"}
-      >
-        {isFieldEditing(fieldName) ? <RotateCcw size={16} /> : <Edit2 size={16} />}
-      </button>
-    );
   };
 
   return (
