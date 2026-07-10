@@ -59,6 +59,7 @@
     "dev:api": "turbo run dev --filter=api",
     "dev:web": "turbo run dev --filter=web",
     "dev:native": "turbo run dev --filter=native",
+    "dev:api+web": "turbo run dev --filter=api --filter=web",
     "dev:native:build:android": "bun run --filter native android",
     "dev:native:build:ios": "bun run --filter native ios",
     "dev:native:clean-build:android": "bun run --filter native prebuild:clean && bun run --filter native android",
