@@ -17,7 +17,9 @@ export type ListItemProps = {
  * - Transparent background by default
  * - Hover state with surface-hover when interactive
  * - Divider border between items (handled by + selector in CSS)
+ * - Flex layout with media query for responsive behavior: flex-row on desktop/tablet, flex-column on mobile
  * - Should be used inside ListContainer
+ * - Compatible with List.Item.Actions which positions on right (desktop/tablet) or below (mobile)
  */
 export function ListItem({ children, onClick, className, interactive = false }: ListItemProps) {
   const isClickable = Boolean(onClick);
