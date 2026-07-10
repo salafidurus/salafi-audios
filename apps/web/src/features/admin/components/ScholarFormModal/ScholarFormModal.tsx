@@ -1,9 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useReducer, useEffect } from "react";
 import Image from "next/image";
+import { Edit2, RotateCcw, AlertCircle, Loader } from "lucide-react";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button";
+import { EditableInput } from "@/shared/components/EditableInput";
+import { EditableTextarea } from "@/shared/components/EditableTextarea";
 import { FormSection } from "@/features/admin/components/FormSection";
 import type { CreateScholarDto } from "@sd/core-contracts";
 import styles from "./scholar-form-modal.module.css";
@@ -31,6 +34,96 @@ export interface ScholarFormModalProps {
   onClose: () => void;
   onSave: (data: CreateScholarDto) => Promise<void>;
   scholar?: ScholarForEdit | null;
+}
+
+interface FormState {
+  formData: CreateScholarDto;
+  originalFormData: CreateScholarDto;
+  editingFields: Set<string>;
+  saving: boolean;
+  error: string | null;
+  imageLoading: boolean;
+  imageError: boolean;
+}
+
+type FormAction =
+  | { type: "INIT_FORM"; scholar: ScholarForEdit | null; isNewScholar: boolean }
+  | { type: "UPDATE_FORM_FIELD"; field: keyof CreateScholarDto; value: string | boolean }
+  | { type: "TOGGLE_FIELD_EDIT"; fieldName: string }
+  | { type: "SET_SAVING"; saving: boolean }
+  | { type: "SET_ERROR"; error: string | null }
+  | { type: "SET_IMAGE_LOADING"; loading: boolean }
+  | { type: "SET_IMAGE_ERROR"; error: boolean }
+  | { type: "RESET_STATE" };
+
+function formReducer(state: FormState, action: FormAction): FormState {
+  switch (action.type) {
+    case "INIT_FORM": {
+      const initialData = getInitialFormData(action.scholar);
+      return {
+        ...state,
+        formData: initialData,
+        originalFormData: initialData,
+        editingFields: new Set(
+          action.isNewScholar
+            ? [
+                "name",
+                "slug",
+                "bio",
+                "imageUrl",
+                "country",
+                "mainLanguage",
+                "socialTwitter",
+                "socialTelegram",
+                "socialYoutube",
+                "socialWebsite",
+              ]
+            : [],
+        ),
+      };
+    }
+    case "UPDATE_FORM_FIELD": {
+      return {
+        ...state,
+        formData: { ...state.formData, [action.field]: action.value },
+      };
+    }
+    case "TOGGLE_FIELD_EDIT": {
+      const isCurrentlyEditing = state.editingFields.has(action.fieldName);
+      const next = new Set(state.editingFields);
+
+      if (isCurrentlyEditing) {
+        // Revert value when toggling off
+        const originalValue = state.originalFormData[action.fieldName as keyof CreateScholarDto];
+        next.delete(action.fieldName);
+        return {
+          ...state,
+          formData: { ...state.formData, [action.fieldName]: originalValue ?? "" },
+          editingFields: next,
+        };
+      }
+
+      next.add(action.fieldName);
+      return { ...state, editingFields: next };
+    }
+    case "SET_SAVING":
+      return { ...state, saving: action.saving };
+    case "SET_ERROR":
+      return { ...state, error: action.error };
+    case "SET_IMAGE_LOADING":
+      return { ...state, imageLoading: action.loading };
+    case "SET_IMAGE_ERROR":
+      return { ...state, imageError: action.error };
+    case "RESET_STATE":
+      return {
+        ...state,
+        error: null,
+        imageLoading: false,
+        imageError: false,
+      };
+    default:
+      return state;
+  }
 }
 
 function getInitialFormData(scholar: ScholarForEdit | null): CreateScholarDto {
@@ -69,46 +162,110 @@ function getInitialFormData(scholar: ScholarForEdit | null): CreateScholarDto {
 }
 
 export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFormModalProps) {
-  const [formData, setFormData] = useState<CreateScholarDto>(() =>
-    getInitialFormData(scholar ?? null),
-  );
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
   const isEditing = !!scholar;
+  const isNewScholar = !isEditing;
+
+  const initialFormState: FormState = {
+    formData: getInitialFormData(scholar ?? null),
+    originalFormData: getInitialFormData(scholar ?? null),
+    editingFields: new Set(
+      isNewScholar
+        ? [
+            "name",
+            "slug",
+            "bio",
+            "imageUrl",
+            "country",
+            "mainLanguage",
+            "socialTwitter",
+            "socialTelegram",
+            "socialYoutube",
+            "socialWebsite",
+          ]
+        : [],
+    ),
+    saving: false,
+    error: null,
+    imageLoading: false,
+    imageError: false,
+  };
+
+  const [state, dispatch] = useReducer(formReducer, initialFormState);
+  const { formData, editingFields, saving, error, imageLoading, imageError } = state;
+
+  // Sync form data when scholar changes or modal opens
+  useEffect(() => {
+    if (isOpen) {
+      dispatch({ type: "INIT_FORM", scholar: scholar ?? null, isNewScholar });
+      dispatch({ type: "SET_IMAGE_ERROR", error: false });
+    }
+  }, [isOpen, scholar, isNewScholar]);
+
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      dispatch({ type: "RESET_STATE" });
+    }
+  }, [isOpen]);
+
+  const toggleFieldEdit = (fieldName: string) => {
+    dispatch({ type: "TOGGLE_FIELD_EDIT", fieldName });
+  };
+
+  const isFieldEditing = (fieldName: string) => editingFields.has(fieldName);
 
   // Auto-generate slug from name (for new scholars only)
   const handleNameChange = (value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      name: value,
-      // Only auto-slug for new scholars
-      slug: !isEditing
-        ? value
-            .toLowerCase()
-            .replace(/[^a-z0-9\s-]/g, "")
-            .replace(/\s+/g, "-")
-        : prev.slug,
-    }));
+    dispatch({ type: "UPDATE_FORM_FIELD", field: "name", value });
+    if (isNewScholar) {
+      const generatedSlug = value
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-");
+      dispatch({ type: "UPDATE_FORM_FIELD", field: "slug", value: generatedSlug });
+    }
+  };
+
+  const handleImageUrlChange = (value: string) => {
+    dispatch({ type: "UPDATE_FORM_FIELD", field: "imageUrl", value });
+    dispatch({ type: "SET_IMAGE_ERROR", error: false });
+    dispatch({ type: "SET_IMAGE_LOADING", loading: false });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.slug.trim()) {
-      setError("Name and slug are required");
+      dispatch({ type: "SET_ERROR", error: "Name and slug are required" });
       return;
     }
 
-    setSaving(true);
-    setError(null);
+    dispatch({ type: "SET_SAVING", saving: true });
+    dispatch({ type: "SET_ERROR", error: null });
     try {
       await onSave(formData);
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save");
+      dispatch({
+        type: "SET_ERROR",
+        error: err instanceof Error ? err.message : "Failed to save",
+      });
     } finally {
-      setSaving(false);
+      dispatch({ type: "SET_SAVING", saving: false });
     }
+  };
+
+  const getEditButton = (fieldName: string) => {
+    if (!isEditing) return null;
+    return (
+      <button
+        type="button"
+        className={styles.editIconButton}
+        onClick={() => toggleFieldEdit(fieldName)}
+        aria-label={isFieldEditing(fieldName) ? "Cancel edit" : "Edit field"}
+      >
+        {isFieldEditing(fieldName) ? <RotateCcw size={16} /> : <Edit2 size={16} />}
+      </button>
+    );
   };
 
   return (
@@ -134,58 +291,80 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
         <FormSection title="Basic Information">
           <div className={styles.field}>
             <label className={styles.label}>Name *</label>
-            <input
-              type="text"
-              className={styles.input}
+            <EditableInput
               value={formData.name}
-              onChange={(e) => handleNameChange(e.target.value)}
+              onChange={handleNameChange}
               placeholder="Scholar name"
-              required
+              disabled={isEditing && !isFieldEditing("name")}
+              rightButton={getEditButton("name")}
             />
           </div>
 
           <div className={styles.field}>
             <label className={styles.label}>Slug *</label>
-            <input
-              type="text"
-              className={styles.input}
+            <EditableInput
               value={formData.slug}
-              onChange={(e) => setFormData((p) => ({ ...p, slug: e.target.value }))}
+              onChange={(value) => dispatch({ type: "UPDATE_FORM_FIELD", field: "slug", value })}
               placeholder="scholar-slug"
-              required
+              disabled={isEditing && !isFieldEditing("slug")}
+              rightButton={getEditButton("slug")}
             />
           </div>
 
           <div className={styles.field}>
             <label className={styles.label}>Bio</label>
-            <textarea
-              className={styles.textarea}
+            <EditableTextarea
               value={formData.bio ?? ""}
-              onChange={(e) => setFormData((p) => ({ ...p, bio: e.target.value }))}
+              onChange={(value) => dispatch({ type: "UPDATE_FORM_FIELD", field: "bio", value })}
               placeholder="Brief biography..."
+              disabled={isEditing && !isFieldEditing("bio")}
               rows={4}
+              rightButton={getEditButton("bio")}
             />
           </div>
 
           <div className={styles.field}>
             <label className={styles.label}>Image URL</label>
-            <input
+            <EditableInput
               type="url"
-              className={styles.input}
               value={formData.imageUrl ?? ""}
-              onChange={(e) => setFormData((p) => ({ ...p, imageUrl: e.target.value }))}
+              onChange={handleImageUrlChange}
               placeholder="https://..."
+              disabled={isEditing && !isFieldEditing("imageUrl")}
+              rightButton={getEditButton("imageUrl")}
             />
             {formData.imageUrl && (
               <div className={styles.imagePreview}>
-                <Image
-                  src={formData.imageUrl}
-                  alt="Preview"
-                  width={200}
-                  height={200}
-                  style={{ objectFit: "contain" }}
-                  className={styles.previewImage}
-                />
+                {imageLoading && (
+                  <div className={styles.imageLoadingState}>
+                    <Loader size={24} className={styles.loadingSpinner} />
+                    <span>Loading image...</span>
+                  </div>
+                )}
+                {imageError && (
+                  <div className={styles.imageErrorState}>
+                    <AlertCircle size={24} />
+                    <span>Failed to load image</span>
+                  </div>
+                )}
+                {!imageError && (
+                  <Image
+                    src={formData.imageUrl}
+                    alt="Preview"
+                    width={200}
+                    height={200}
+                    style={{ objectFit: "contain" }}
+                    className={styles.previewImage}
+                    onLoadingComplete={() =>
+                      dispatch({ type: "SET_IMAGE_LOADING", loading: false })
+                    }
+                    onError={() => {
+                      dispatch({ type: "SET_IMAGE_ERROR", error: true });
+                      dispatch({ type: "SET_IMAGE_LOADING", loading: false });
+                    }}
+                    onLoad={() => dispatch({ type: "SET_IMAGE_LOADING", loading: true })}
+                  />
+                )}
               </div>
             )}
           </div>
@@ -194,76 +373,100 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
         <FormSection title="Location & Language">
           <div className={styles.field}>
             <label className={styles.label}>Country</label>
-            <input
-              type="text"
-              className={styles.input}
+            <EditableInput
               value={formData.country ?? ""}
-              onChange={(e) => setFormData((p) => ({ ...p, country: e.target.value }))}
+              onChange={(value) => dispatch({ type: "UPDATE_FORM_FIELD", field: "country", value })}
               placeholder="e.g., Saudi Arabia, Egypt"
+              disabled={isEditing && !isFieldEditing("country")}
+              rightButton={getEditButton("country")}
             />
           </div>
 
           <div className={styles.field}>
             <label className={styles.label}>Main Language</label>
             <select
-              className={styles.select}
+              className={styles.selectField}
               value={formData.mainLanguage ?? ""}
               onChange={(e) =>
-                setFormData((p) => ({
-                  ...p,
-                  mainLanguage: e.target.value ? (e.target.value as "en" | "ar") : undefined,
-                }))
+                dispatch({
+                  type: "UPDATE_FORM_FIELD",
+                  field: "mainLanguage",
+                  value: e.target.value ? (e.target.value as "en" | "ar") : "",
+                })
               }
+              disabled={isEditing && !isFieldEditing("mainLanguage")}
             >
               <option value="">-- Select Language --</option>
               <option value="en">English</option>
               <option value="ar">Arabic (عربي)</option>
             </select>
+            {isEditing && (
+              <button
+                type="button"
+                className={styles.editIconButton}
+                onClick={() => toggleFieldEdit("mainLanguage")}
+                aria-label={isFieldEditing("mainLanguage") ? "Cancel edit" : "Edit field"}
+              >
+                {isFieldEditing("mainLanguage") ? <RotateCcw size={16} /> : <Edit2 size={16} />}
+              </button>
+            )}
           </div>
         </FormSection>
 
         <FormSection title="Social Media">
           <div className={styles.field}>
             <label className={styles.label}>Twitter</label>
-            <input
+            <EditableInput
               type="url"
-              className={styles.input}
               value={formData.socialTwitter ?? ""}
-              onChange={(e) => setFormData((p) => ({ ...p, socialTwitter: e.target.value }))}
+              onChange={(value) =>
+                dispatch({ type: "UPDATE_FORM_FIELD", field: "socialTwitter", value })
+              }
               placeholder="https://twitter.com/..."
+              disabled={isEditing && !isFieldEditing("socialTwitter")}
+              rightButton={getEditButton("socialTwitter")}
             />
           </div>
 
           <div className={styles.field}>
             <label className={styles.label}>Telegram</label>
-            <input
+            <EditableInput
               type="url"
-              className={styles.input}
               value={formData.socialTelegram ?? ""}
-              onChange={(e) => setFormData((p) => ({ ...p, socialTelegram: e.target.value }))}
+              onChange={(value) =>
+                dispatch({ type: "UPDATE_FORM_FIELD", field: "socialTelegram", value })
+              }
               placeholder="https://t.me/..."
+              disabled={isEditing && !isFieldEditing("socialTelegram")}
+              rightButton={getEditButton("socialTelegram")}
             />
           </div>
 
           <div className={styles.field}>
             <label className={styles.label}>YouTube</label>
-            <input
+            <EditableInput
               type="url"
-              className={styles.input}
               value={formData.socialYoutube ?? ""}
-              onChange={(e) => setFormData((p) => ({ ...p, socialYoutube: e.target.value }))}
+              onChange={(value) =>
+                dispatch({ type: "UPDATE_FORM_FIELD", field: "socialYoutube", value })
+              }
               placeholder="https://youtube.com/..."
+              disabled={isEditing && !isFieldEditing("socialYoutube")}
+              rightButton={getEditButton("socialYoutube")}
             />
           </div>
 
           <div className={styles.field}>
             <label className={styles.label}>Website</label>
-            <input
+            <EditableInput
               type="url"
-              className={styles.input}
               value={formData.socialWebsite ?? ""}
-              onChange={(e) => setFormData((p) => ({ ...p, socialWebsite: e.target.value }))}
+              onChange={(value) =>
+                dispatch({ type: "UPDATE_FORM_FIELD", field: "socialWebsite", value })
+              }
               placeholder="https://..."
+              disabled={isEditing && !isFieldEditing("socialWebsite")}
+              rightButton={getEditButton("socialWebsite")}
             />
           </div>
         </FormSection>
@@ -274,7 +477,9 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
               <input
                 type="checkbox"
                 checked={formData.isKibar ?? false}
-                onChange={(e) => setFormData((p) => ({ ...p, isKibar: e.target.checked }))}
+                onChange={(e) =>
+                  dispatch({ type: "UPDATE_FORM_FIELD", field: "isKibar", value: e.target.checked })
+                }
               />
               <span>Kibar Scholar</span>
             </label>
@@ -282,7 +487,13 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
               <input
                 type="checkbox"
                 checked={formData.isFeatured ?? false}
-                onChange={(e) => setFormData((p) => ({ ...p, isFeatured: e.target.checked }))}
+                onChange={(e) =>
+                  dispatch({
+                    type: "UPDATE_FORM_FIELD",
+                    field: "isFeatured",
+                    value: e.target.checked,
+                  })
+                }
               />
               <span>Featured</span>
             </label>
@@ -290,7 +501,13 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
               <input
                 type="checkbox"
                 checked={formData.isActive ?? true}
-                onChange={(e) => setFormData((p) => ({ ...p, isActive: e.target.checked }))}
+                onChange={(e) =>
+                  dispatch({
+                    type: "UPDATE_FORM_FIELD",
+                    field: "isActive",
+                    value: e.target.checked,
+                  })
+                }
               />
               <span>Active</span>
             </label>
