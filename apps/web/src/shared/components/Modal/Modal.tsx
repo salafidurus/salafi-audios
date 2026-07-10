@@ -25,7 +25,7 @@ export interface ModalProps {
   width?: string | number;
   hideFooter?: boolean;
   footerAlignment?: "left" | "right" | "center" | "space-between";
-  _footerBorder?: boolean;
+  footerBorder?: boolean;
   loading?: boolean;
 }
 
@@ -39,7 +39,7 @@ export function Modal({
   width,
   hideFooter,
   footerAlignment = "right",
-  _footerBorder = false,
+  footerBorder: _footerBorder = false,
   loading,
 }: ModalProps) {
   const mounted = useSyncExternalStore(

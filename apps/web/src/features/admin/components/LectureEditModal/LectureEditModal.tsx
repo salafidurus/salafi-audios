@@ -8,8 +8,15 @@ import type {
   AdminListingListItemDto,
   AdminListingDetailDto,
 } from "@sd/core-contracts";
+import { validateLectureStatus } from "@/shared/types/form-types";
 import { createLecture, updateLecture } from "../../api/admin-lectures.api";
 import { Modal } from "../../../../shared/components/Modal";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownContent,
+  DropdownItem,
+} from "@/shared/components/Dropdown";
 import styles from "./lecture-edit-modal.module.css";
 
 interface LectureEditModalProps {
@@ -287,41 +294,42 @@ export function LectureEditModal({
             <label htmlFor="lecture-scholar" className={styles.label}>
               Scholar
             </label>
-            <select
-              id="lecture-scholar"
-              className={styles.select}
-              value={scholarId}
-              onChange={(e) => dispatch({ scholarId: e.target.value })}
-              required
-              disabled={!!lecture}
-            >
-              <option value="">Select Scholar</option>
-              {scholars.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
+            <Dropdown value={scholarId} onValueChange={(value) => dispatch({ scholarId: value })}>
+              <DropdownTrigger
+                id="lecture-scholar"
+                placeholder="Select Scholar"
+                disabled={!!lecture}
+                testId="scholar-dropdown"
+              />
+              <DropdownContent searchable>
+                {scholars.map((s) => (
+                  <DropdownItem key={s.id} value={s.id}>
+                    {s.name}
+                  </DropdownItem>
+                ))}
+              </DropdownContent>
+            </Dropdown>
           </div>
 
           <div className={styles.formGroup}>
             <label htmlFor="lecture-series" className={styles.label}>
               Series
             </label>
-            <select
-              id="lecture-series"
-              className={styles.select}
-              value={seriesId}
-              onChange={(e) => dispatch({ seriesId: e.target.value })}
-              disabled={!!lecture}
-            >
-              <option value="">Select Series (Optional)</option>
-              {series.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.title}
-                </option>
-              ))}
-            </select>
+            <Dropdown value={seriesId} onValueChange={(value) => dispatch({ seriesId: value })}>
+              <DropdownTrigger
+                id="lecture-series"
+                placeholder="Select Series (Optional)"
+                disabled={!!lecture}
+                testId="series-dropdown"
+              />
+              <DropdownContent searchable>
+                {series.map((s) => (
+                  <DropdownItem key={s.id} value={s.id}>
+                    {s.title}
+                  </DropdownItem>
+                ))}
+              </DropdownContent>
+            </Dropdown>
           </div>
         </div>
 
@@ -330,18 +338,21 @@ export function LectureEditModal({
             <label htmlFor="lecture-status" className={styles.label}>
               Status
             </label>
-            <select
-              id="lecture-status"
-              className={styles.select}
+            <Dropdown
               value={status}
-              onChange={(e) =>
-                dispatch({ status: e.target.value as "draft" | "published" | "archived" })
-              }
+              onValueChange={(value) => dispatch({ status: validateLectureStatus(value) })}
             >
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
-              <option value="archived">Archived</option>
-            </select>
+              <DropdownTrigger
+                id="lecture-status"
+                placeholder="Select Status"
+                testId="status-dropdown"
+              />
+              <DropdownContent>
+                <DropdownItem value="draft">Draft</DropdownItem>
+                <DropdownItem value="published">Published</DropdownItem>
+                <DropdownItem value="archived">Archived</DropdownItem>
+              </DropdownContent>
+            </Dropdown>
           </div>
 
           <div className={styles.formGroup}>

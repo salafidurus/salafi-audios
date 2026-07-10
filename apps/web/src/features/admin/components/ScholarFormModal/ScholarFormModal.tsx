@@ -1,16 +1,21 @@
 "use client";
 
-import { useReducer, useEffect, useMemo } from "react";
-import { Edit2, RotateCcw } from "lucide-react";
+import { useReducer, useEffect } from "react";
+import Image from "next/image";
+import { Edit2, RotateCcw, AlertCircle, Loader } from "lucide-react";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button";
 import { EditableInput } from "@/shared/components/EditableInput";
 import { EditableTextarea } from "@/shared/components/EditableTextarea";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownContent,
+  DropdownItem,
+} from "@/shared/components/Dropdown";
 import { FormSection } from "@/features/admin/components/FormSection";
-import { Toggle } from "@/shared/components/Toggle";
-import { ImageUpload } from "@/shared/components/ImageUpload";
-import { useContentTranslations } from "@sd/domain-content";
 import type { CreateScholarDto } from "@sd/core-contracts";
+import { validateLanguageCode, COUNTRY_LIST } from "@/shared/types/form-types";
 import styles from "./scholar-form-modal.module.css";
 
 // Minimal edit data extracted from ScholarListItemDto
@@ -42,7 +47,6 @@ interface FormState {
   formData: CreateScholarDto;
   originalFormData: CreateScholarDto;
   editingFields: Set<string>;
-  translationChanges: Record<string, Record<string, string | null>>;
   saving: boolean;
   error: string | null;
   imageLoading: boolean;
@@ -52,8 +56,6 @@ interface FormState {
 type FormAction =
   | { type: "INIT_FORM"; scholar: ScholarForEdit | null; isNewScholar: boolean }
   | { type: "UPDATE_FORM_FIELD"; field: keyof CreateScholarDto; value: string | boolean }
-  | { type: "UPDATE_TRANSLATION"; locale: string; field: string; value: string }
-  | { type: "SET_TRANSLATION_CHANGES"; changes: Record<string, Record<string, string | null>> }
   | { type: "TOGGLE_FIELD_EDIT"; fieldName: string }
   | { type: "SET_SAVING"; saving: boolean }
   | { type: "SET_ERROR"; error: string | null }
@@ -93,19 +95,6 @@ function formReducer(state: FormState, action: FormAction): FormState {
         formData: { ...state.formData, [action.field]: action.value },
       };
     }
-    case "UPDATE_TRANSLATION":
-      return {
-        ...state,
-        translationChanges: {
-          ...state.translationChanges,
-          [action.locale]: {
-            ...state.translationChanges[action.locale],
-            [action.field]: action.value,
-          },
-        },
-      };
-    case "SET_TRANSLATION_CHANGES":
-      return { ...state, translationChanges: action.changes };
     case "TOGGLE_FIELD_EDIT": {
       const isCurrentlyEditing = state.editingFields.has(action.fieldName);
       const next = new Set(state.editingFields);
@@ -154,8 +143,8 @@ function getInitialFormData(scholar: ScholarForEdit | null): CreateScholarDto {
       isKibar: scholar.isKibar ?? false,
       isFeatured: scholar.isFeatured ?? false,
       isActive: scholar.isActive ?? true,
-      country: scholar.country ?? "Saudi Arabia",
-      mainLanguage: scholar.mainLanguage ?? "ar",
+      country: scholar.country ?? "",
+      mainLanguage: (scholar.mainLanguage ?? "ar") as "en" | "ar",
       socialTwitter: scholar.socialTwitter ?? "",
       socialTelegram: scholar.socialTelegram ?? "",
       socialYoutube: scholar.socialYoutube ?? "",
@@ -170,7 +159,7 @@ function getInitialFormData(scholar: ScholarForEdit | null): CreateScholarDto {
     isKibar: false,
     isFeatured: false,
     isActive: true,
-    country: "Saudi Arabia",
+    country: "",
     mainLanguage: "ar",
     socialTwitter: "",
     socialTelegram: "",
@@ -202,7 +191,6 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
           ]
         : [],
     ),
-    translationChanges: {},
     saving: false,
     error: null,
     imageLoading: false,
@@ -210,19 +198,7 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
   };
 
   const [state, dispatch] = useReducer(formReducer, initialFormState);
-  const { formData, editingFields, translationChanges, saving, error } = state;
-
-  // Fetch translations only when editing
-  const { data: translationsResponse } = useContentTranslations(
-    isEditing && scholar
-      ? { entity: "scholar", scholarId: scholar.id }
-      : { entity: "scholar", scholarId: "" },
-  );
-
-  const translations = useMemo(
-    () => translationsResponse?.translations ?? [],
-    [translationsResponse],
-  );
+  const { formData, editingFields, saving, error, imageLoading, imageError } = state;
 
   // Sync form data when scholar changes or modal opens
   useEffect(() => {
@@ -231,17 +207,6 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
       dispatch({ type: "SET_IMAGE_ERROR", error: false });
     }
   }, [isOpen, scholar, isNewScholar]);
-
-  // Initialize translation changes when modal opens
-  useEffect(() => {
-    if (isOpen && isEditing && translations.length > 0) {
-      const changes: Record<string, Record<string, string | null>> = {};
-      translations.forEach((trans) => {
-        changes[trans.locale] = trans.fields;
-      });
-      dispatch({ type: "SET_TRANSLATION_CHANGES", changes });
-    }
-  }, [isOpen, isEditing, translations]);
 
   // Reset state when modal closes
   useEffect(() => {
@@ -268,8 +233,10 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
     }
   };
 
-  const handleTranslationNameChange = (locale: string, value: string) => {
-    dispatch({ type: "UPDATE_TRANSLATION", locale, field: "name", value });
+  const handleImageUrlChange = (value: string) => {
+    dispatch({ type: "UPDATE_FORM_FIELD", field: "imageUrl", value });
+    dispatch({ type: "SET_IMAGE_ERROR", error: false });
+    dispatch({ type: "SET_IMAGE_LOADING", loading: false });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -282,12 +249,7 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
     dispatch({ type: "SET_SAVING", saving: true });
     dispatch({ type: "SET_ERROR", error: null });
     try {
-      // Prepare data with translations for single API round trip
-      const dataWithTranslations = {
-        ...formData,
-        translations: isEditing ? translationChanges : undefined,
-      };
-      await onSave(dataWithTranslations as CreateScholarDto);
+      await onSave(formData);
       onClose();
     } catch (err) {
       dispatch({
@@ -297,6 +259,20 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
     } finally {
       dispatch({ type: "SET_SAVING", saving: false });
     }
+  };
+
+  const getEditButton = (fieldName: string) => {
+    if (!isEditing) return null;
+    return (
+      <button
+        type="button"
+        className={styles.editIconButton}
+        onClick={() => toggleFieldEdit(fieldName)}
+        aria-label={isFieldEditing(fieldName) ? "Cancel edit" : "Edit field"}
+      >
+        {isFieldEditing(fieldName) ? <RotateCcw size={16} /> : <Edit2 size={16} />}
+      </button>
+    );
   };
 
   return (
@@ -317,258 +293,253 @@ export function ScholarFormModal({ isOpen, onClose, onSave, scholar }: ScholarFo
       }
     >
       <form id="scholar-form" onSubmit={handleSubmit} className={styles.form}>
-        {error && (
-          <div className={styles.error} role="alert" aria-live="polite">
-            {error}
-          </div>
-        )}
+        {error && <div className={styles.error}>{error}</div>}
 
         <FormSection title="Basic Information">
-          {/* Row 1: Name + Slug */}
-          <div className={styles.formRow}>
-            <div className={styles.field}>
-              <label className={styles.label}>Name *</label>
-              <EditableInput
-                value={formData.name}
-                onChange={handleNameChange}
-                placeholder="Scholar name"
-              />
-            </div>
-
-            <div className={styles.field}>
-              <label className={styles.label}>Slug *</label>
-              <EditableInput
-                value={formData.slug}
-                onChange={(value) => dispatch({ type: "UPDATE_FORM_FIELD", field: "slug", value })}
-                placeholder="scholar-slug"
-              />
-            </div>
+          <div className={styles.field}>
+            <label className={styles.label}>Name *</label>
+            <EditableInput
+              value={formData.name}
+              onChange={handleNameChange}
+              placeholder="Scholar name"
+              disabled={isEditing && !isFieldEditing("name")}
+              rightButton={getEditButton("name")}
+            />
           </div>
 
-          {/* Arabic Name Field */}
-          {isEditing && (
-            <div className={styles.field}>
-              <label className={styles.label}>Arabic Name</label>
-              <EditableInput
-                value={translationChanges.ar?.name ?? ""}
-                onChange={(value) => handleTranslationNameChange("ar", value)}
-                placeholder="Scholar name in Arabic"
-                disabled={!isFieldEditing("translation-ar-name")}
-                rightButton={
-                  <button
-                    type="button"
-                    className={styles.editIconButton}
-                    onClick={() => toggleFieldEdit("translation-ar-name")}
-                    aria-label={
-                      isFieldEditing("translation-ar-name") ? "Cancel edit" : "Edit Arabic name"
-                    }
-                  >
-                    {isFieldEditing("translation-ar-name") ? (
-                      <RotateCcw size={16} />
-                    ) : (
-                      <Edit2 size={16} />
-                    )}
-                  </button>
-                }
-              />
-              {translations.find((t) => t.locale === "ar") && (
-                <div className={styles.translationStatus}>
-                  Status:{" "}
-                  <span
-                    className={`${styles.statusBadge} ${styles[`status-${translations.find((t) => t.locale === "ar")?.status}`]}`}
-                  >
-                    {translations.find((t) => t.locale === "ar")?.status}
-                  </span>
-                </div>
-              )}
-            </div>
-          )}
+          <div className={styles.field}>
+            <label className={styles.label}>Slug *</label>
+            <EditableInput
+              value={formData.slug}
+              onChange={(value) => dispatch({ type: "UPDATE_FORM_FIELD", field: "slug", value })}
+              placeholder="scholar-slug"
+              disabled={isEditing && !isFieldEditing("slug")}
+              rightButton={getEditButton("slug")}
+            />
+          </div>
 
-          {/* Row 2: Bio (full width) */}
-          <div className={`${styles.field} ${styles.fullRow}`}>
+          <div className={styles.field}>
             <label className={styles.label}>Bio</label>
             <EditableTextarea
               value={formData.bio ?? ""}
               onChange={(value) => dispatch({ type: "UPDATE_FORM_FIELD", field: "bio", value })}
               placeholder="Brief biography..."
+              disabled={isEditing && !isFieldEditing("bio")}
               rows={4}
+              rightButton={getEditButton("bio")}
             />
           </div>
 
-          {/* Row 3: Image Upload (full width) */}
-          <div className={`${styles.field} ${styles.fullRow}`}>
-            <label className={styles.label}>Scholar Image</label>
-            <ImageUpload
+          <div className={styles.field}>
+            <label className={styles.label}>Image URL</label>
+            <EditableInput
+              type="url"
               value={formData.imageUrl ?? ""}
-              onChange={(url) =>
-                dispatch({ type: "UPDATE_FORM_FIELD", field: "imageUrl", value: url })
-              }
-              onError={(error) => dispatch({ type: "SET_ERROR", error })}
-              disabled={saving}
-              slug={formData.slug || undefined}
-              maxSizeMB={1}
+              onChange={handleImageUrlChange}
+              placeholder="https://..."
+              disabled={isEditing && !isFieldEditing("imageUrl")}
+              rightButton={getEditButton("imageUrl")}
             />
+            {formData.imageUrl && (
+              <div className={styles.imagePreview}>
+                {imageLoading && (
+                  <div className={styles.imageLoadingState}>
+                    <Loader size={24} className={styles.loadingSpinner} />
+                    <span>Loading image...</span>
+                  </div>
+                )}
+                {imageError && (
+                  <div className={styles.imageErrorState}>
+                    <AlertCircle size={24} />
+                    <span>Failed to load image</span>
+                  </div>
+                )}
+                {!imageError && (
+                  <Image
+                    src={formData.imageUrl}
+                    alt="Preview"
+                    width={200}
+                    height={200}
+                    style={{ objectFit: "contain" }}
+                    className={styles.previewImage}
+                    onLoadingComplete={() =>
+                      dispatch({ type: "SET_IMAGE_LOADING", loading: false })
+                    }
+                    onError={() => {
+                      dispatch({ type: "SET_IMAGE_ERROR", error: true });
+                      dispatch({ type: "SET_IMAGE_LOADING", loading: false });
+                    }}
+                    onLoad={() => dispatch({ type: "SET_IMAGE_LOADING", loading: true })}
+                  />
+                )}
+              </div>
+            )}
           </div>
         </FormSection>
 
         <FormSection title="Location & Language">
-          <div className={styles.formRow}>
-            {/* Country field */}
-            <div className={styles.field}>
-              <label className={styles.label}>Country</label>
-              <select
-                className={styles.selectField}
-                value={formData.country ?? ""}
-                onChange={(e) =>
-                  dispatch({
-                    type: "UPDATE_FORM_FIELD",
-                    field: "country",
-                    value: e.target.value || "",
-                  })
-                }
+          <div className={styles.field}>
+            <label className={styles.label}>Country</label>
+            <Dropdown
+              value={formData.country ?? ""}
+              onValueChange={(value) =>
+                dispatch({ type: "UPDATE_FORM_FIELD", field: "country", value })
+              }
+              disabled={isEditing && !isFieldEditing("country")}
+            >
+              <DropdownTrigger placeholder="Select Country" />
+              <DropdownContent searchable>
+                {COUNTRY_LIST.map((country) => (
+                  <DropdownItem key={country.code} value={country.code}>
+                    {country.name}
+                  </DropdownItem>
+                ))}
+              </DropdownContent>
+            </Dropdown>
+            {isEditing && (
+              <button
+                type="button"
+                className={styles.editIconButton}
+                onClick={() => toggleFieldEdit("country")}
+                aria-label={isFieldEditing("country") ? "Cancel edit" : "Edit field"}
               >
-                <option value="">-- Select Country --</option>
-                <option value="Algeria">Algeria</option>
-                <option value="Bahrain">Bahrain</option>
-                <option value="Egypt">Egypt</option>
-                <option value="Iraq">Iraq</option>
-                <option value="Jordan">Jordan</option>
-                <option value="Kuwait">Kuwait</option>
-                <option value="Lebanon">Lebanon</option>
-                <option value="Libya">Libya</option>
-                <option value="Morocco">Morocco</option>
-                <option value="Oman">Oman</option>
-                <option value="Palestine">Palestine</option>
-                <option value="Qatar">Qatar</option>
-                <option value="Saudi Arabia">Saudi Arabia</option>
-                <option value="Sudan">Sudan</option>
-                <option value="Syria">Syria</option>
-                <option value="Tunisia">Tunisia</option>
-                <option value="United Arab Emirates">United Arab Emirates</option>
-                <option value="Yemen">Yemen</option>
-                <option value="Australia">Australia</option>
-                <option value="Canada">Canada</option>
-                <option value="United States">United States</option>
-                <option value="United Kingdom">United Kingdom</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
+                {isFieldEditing("country") ? <RotateCcw size={16} /> : <Edit2 size={16} />}
+              </button>
+            )}
+          </div>
 
-            {/* Main Language field */}
-            <div className={styles.field}>
-              <label className={styles.label}>Main Language</label>
-              <select
-                className={styles.selectField}
-                value={formData.mainLanguage ?? ""}
-                onChange={(e) =>
-                  dispatch({
-                    type: "UPDATE_FORM_FIELD",
-                    field: "mainLanguage",
-                    value: e.target.value ? (e.target.value as "en" | "ar") : "",
-                  })
-                }
+          <div className={styles.field}>
+            <label className={styles.label}>Main Language</label>
+            <Dropdown
+              value={formData.mainLanguage}
+              onValueChange={(value) =>
+                dispatch({
+                  type: "UPDATE_FORM_FIELD",
+                  field: "mainLanguage",
+                  value: validateLanguageCode(value) as any,
+                })
+              }
+            >
+              <DropdownTrigger
+                placeholder="Select Language"
+                disabled={isEditing && !isFieldEditing("mainLanguage")}
+              />
+              <DropdownContent>
+                <DropdownItem value="en">English</DropdownItem>
+                <DropdownItem value="ar">Arabic (عربي)</DropdownItem>
+              </DropdownContent>
+            </Dropdown>
+            {isEditing && (
+              <button
+                type="button"
+                className={styles.editIconButton}
+                onClick={() => toggleFieldEdit("mainLanguage")}
+                aria-label={isFieldEditing("mainLanguage") ? "Cancel edit" : "Edit field"}
               >
-                <option value="">-- Select Language --</option>
-                <option value="en">English</option>
-                <option value="ar">Arabic (عربي)</option>
-              </select>
-            </div>
+                {isFieldEditing("mainLanguage") ? <RotateCcw size={16} /> : <Edit2 size={16} />}
+              </button>
+            )}
           </div>
         </FormSection>
 
         <FormSection title="Social Media">
-          {/* Row 1: Twitter + Telegram */}
-          <div className={styles.formRow}>
-            <div className={styles.field}>
-              <label className={styles.label}>Twitter</label>
-              <EditableInput
-                type="url"
-                value={formData.socialTwitter ?? ""}
-                onChange={(value) =>
-                  dispatch({ type: "UPDATE_FORM_FIELD", field: "socialTwitter", value })
-                }
-                placeholder="https://twitter.com/..."
-              />
-            </div>
-
-            <div className={styles.field}>
-              <label className={styles.label}>Telegram</label>
-              <EditableInput
-                type="url"
-                value={formData.socialTelegram ?? ""}
-                onChange={(value) =>
-                  dispatch({ type: "UPDATE_FORM_FIELD", field: "socialTelegram", value })
-                }
-                placeholder="https://t.me/..."
-              />
-            </div>
+          <div className={styles.field}>
+            <label className={styles.label}>Twitter</label>
+            <EditableInput
+              type="url"
+              value={formData.socialTwitter ?? ""}
+              onChange={(value) =>
+                dispatch({ type: "UPDATE_FORM_FIELD", field: "socialTwitter", value })
+              }
+              placeholder="https://twitter.com/..."
+              disabled={isEditing && !isFieldEditing("socialTwitter")}
+              rightButton={getEditButton("socialTwitter")}
+            />
           </div>
 
-          {/* Row 2: YouTube + Website */}
-          <div className={styles.formRow}>
-            <div className={styles.field}>
-              <label className={styles.label}>YouTube</label>
-              <EditableInput
-                type="url"
-                value={formData.socialYoutube ?? ""}
-                onChange={(value) =>
-                  dispatch({ type: "UPDATE_FORM_FIELD", field: "socialYoutube", value })
-                }
-                placeholder="https://youtube.com/..."
-              />
-            </div>
+          <div className={styles.field}>
+            <label className={styles.label}>Telegram</label>
+            <EditableInput
+              type="url"
+              value={formData.socialTelegram ?? ""}
+              onChange={(value) =>
+                dispatch({ type: "UPDATE_FORM_FIELD", field: "socialTelegram", value })
+              }
+              placeholder="https://t.me/..."
+              disabled={isEditing && !isFieldEditing("socialTelegram")}
+              rightButton={getEditButton("socialTelegram")}
+            />
+          </div>
 
-            <div className={styles.field}>
-              <label className={styles.label}>Website</label>
-              <EditableInput
-                type="url"
-                value={formData.socialWebsite ?? ""}
-                onChange={(value) =>
-                  dispatch({ type: "UPDATE_FORM_FIELD", field: "socialWebsite", value })
-                }
-                placeholder="https://..."
-              />
-            </div>
+          <div className={styles.field}>
+            <label className={styles.label}>YouTube</label>
+            <EditableInput
+              type="url"
+              value={formData.socialYoutube ?? ""}
+              onChange={(value) =>
+                dispatch({ type: "UPDATE_FORM_FIELD", field: "socialYoutube", value })
+              }
+              placeholder="https://youtube.com/..."
+              disabled={isEditing && !isFieldEditing("socialYoutube")}
+              rightButton={getEditButton("socialYoutube")}
+            />
+          </div>
+
+          <div className={styles.field}>
+            <label className={styles.label}>Website</label>
+            <EditableInput
+              type="url"
+              value={formData.socialWebsite ?? ""}
+              onChange={(value) =>
+                dispatch({ type: "UPDATE_FORM_FIELD", field: "socialWebsite", value })
+              }
+              placeholder="https://..."
+              disabled={isEditing && !isFieldEditing("socialWebsite")}
+              rightButton={getEditButton("socialWebsite")}
+            />
           </div>
         </FormSection>
 
         <FormSection title="Settings">
-          <div className={styles.toggleGroup}>
-            <div className={styles.toggleField}>
-              <label className={styles.toggleLabel}>Kibar Scholar</label>
-              <Toggle
+          <div className={styles.checkboxGroup}>
+            <label className={styles.checkbox}>
+              <input
+                type="checkbox"
                 checked={formData.isKibar ?? false}
-                onChange={(checked) =>
-                  dispatch({ type: "UPDATE_FORM_FIELD", field: "isKibar", value: checked })
+                onChange={(e) =>
+                  dispatch({ type: "UPDATE_FORM_FIELD", field: "isKibar", value: e.target.checked })
                 }
-                disabled={saving}
-                aria-label="Kibar Scholar"
               />
-            </div>
-
-            <div className={styles.toggleField}>
-              <label className={styles.toggleLabel}>Featured</label>
-              <Toggle
+              <span>Kibar Scholar</span>
+            </label>
+            <label className={styles.checkbox}>
+              <input
+                type="checkbox"
                 checked={formData.isFeatured ?? false}
-                onChange={(checked) =>
-                  dispatch({ type: "UPDATE_FORM_FIELD", field: "isFeatured", value: checked })
+                onChange={(e) =>
+                  dispatch({
+                    type: "UPDATE_FORM_FIELD",
+                    field: "isFeatured",
+                    value: e.target.checked,
+                  })
                 }
-                disabled={saving}
-                aria-label="Featured"
               />
-            </div>
-
-            <div className={styles.toggleField}>
-              <label className={styles.toggleLabel}>Active</label>
-              <Toggle
+              <span>Featured</span>
+            </label>
+            <label className={styles.checkbox}>
+              <input
+                type="checkbox"
                 checked={formData.isActive ?? true}
-                onChange={(checked) =>
-                  dispatch({ type: "UPDATE_FORM_FIELD", field: "isActive", value: checked })
+                onChange={(e) =>
+                  dispatch({
+                    type: "UPDATE_FORM_FIELD",
+                    field: "isActive",
+                    value: e.target.checked,
+                  })
                 }
-                disabled={saving}
-                aria-label="Active"
               />
-            </div>
+              <span>Active</span>
+            </label>
           </div>
         </FormSection>
       </form>
