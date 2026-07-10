@@ -12,13 +12,15 @@ Search                  — Namespace object for compound components
 
 ## Basic Usage
 
+### Single-Select Mode (Default)
+
 ```tsx
 import { Search } from "@/shared/components/Search";
 import { useState } from "react";
 
 export function SearchScreen() {
   const [searchValue, setSearchValue] = useState("");
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
 
   return (
     <div>
@@ -29,16 +31,31 @@ export function SearchScreen() {
           { id: "article", label: "Articles" },
           { id: "series", label: "Series" },
         ]}
-        selected={selectedFilters}
+        selected={selectedCategory ? [selectedCategory] : []}
         onChipChange={(id) => {
-          setSelectedFilters((prev) =>
-            prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id],
-          );
+          setSelectedCategory((prev) => (prev === id ? "" : id));
         }}
       />
     </div>
   );
 }
+```
+
+### Multi-Select Mode
+
+```tsx
+const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+
+<Search.Filter
+  chips={[...]}
+  selected={selectedFilters}
+  onChipChange={(id) => {
+    setSelectedFilters((prev) =>
+      prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id],
+    );
+  }}
+  multiple
+/>
 ```
 
 ## Props
@@ -59,26 +76,73 @@ export function SearchScreen() {
 - `onChipChange: (id: string) => void` — Called when a chip is clicked (toggles selection)
 - `onChipRemove?: (id: string) => void` — Optional callback when close button is clicked
 - `showCloseButton?: boolean` — Show close button on selected chips (default: `true`)
+- `multiple?: boolean` — Allow multiple selections; enables checkbox-like multi-select behavior (default: `false` for single-select/radio)
 - `className?: string` — Optional additional CSS class
+
+## Selection Modes
+
+### Single-Select Mode (Default)
+
+By default, `Search.Filter` operates in single-select (radio button) mode where only one chip can be selected at a time. When the user clicks a selected chip, it becomes deselected. This is ideal for content type filtering, category selection, or any mutually-exclusive choice.
+
+**Characteristics:**
+
+- Only one chip selected at a time
+- Clicking a selected chip deselects it
+- Use a single string state variable for the selected value
+- Convert to array format: `selected={selectedValue ? [selectedValue] : []}`
+
+### Multi-Select Mode
+
+Set `multiple={true}` to enable multi-select (checkbox) mode where users can select multiple chips simultaneously. This is useful for filtering by multiple criteria that are not mutually exclusive.
+
+**Characteristics:**
+
+- Multiple chips can be selected
+- Clicking a chip toggles its selection
+- Use an array state variable for selected values
+- Pass selected values directly: `selected={selectedValues}`
 
 ## Examples
 
-### Basic Search with Filters
+### Single-Select Filter (Category)
 
 ```tsx
-<Search.Bar
-  value={searchValue}
-  onChange={setSearchValue}
-  placeholder="Find content..."
-/>
+const [selectedCategory, setSelectedCategory] = useState<string>("");
+
 <Search.Filter
-  chips={filterOptions}
-  selected={activeFilters}
-  onChipChange={handleFilterToggle}
-/>
+  chips={[
+    { id: "all", label: "All" },
+    { id: "lecture", label: "Lectures" },
+    { id: "article", label: "Articles" },
+  ]}
+  selected={selectedCategory ? [selectedCategory] : []}
+  onChipChange={(id) => {
+    setSelectedCategory((prev) => (prev === id ? "" : id));
+  }}
+/>;
 ```
 
-### With Optional Clear Callback
+### Multi-Select Filter (Tags)
+
+```tsx
+const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+<Search.Filter
+  chips={[
+    { id: "fiqh", label: "Fiqh" },
+    { id: "aqeedah", label: "Aqeedah" },
+    { id: "adab", label: "Adab" },
+  ]}
+  selected={selectedTags}
+  onChipChange={(id) => {
+    setSelectedTags((prev) => (prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]));
+  }}
+  multiple
+/>;
+```
+
+### Search Bar with Clear Callback
 
 ```tsx
 <Search.Bar
@@ -88,6 +152,7 @@ export function SearchScreen() {
     console.log("Search cleared");
     resetFilters();
   }}
+  placeholder="Find content..."
 />
 ```
 
@@ -96,10 +161,12 @@ export function SearchScreen() {
 ```tsx
 <Search.Filter
   chips={filterOptions}
-  selected={activeFilters}
-  onChipChange={handleFilterToggle}
+  selected={selectedCategory ? [selectedCategory] : []}
+  onChipChange={(id) => {
+    setSelectedCategory((prev) => (prev === id ? "" : id));
+  }}
   onChipRemove={(id) => {
-    setActiveFilters((prev) => prev.filter((f) => f !== id));
+    setSelectedCategory("");
   }}
 />
 ```
@@ -109,8 +176,10 @@ export function SearchScreen() {
 ```tsx
 <Search.Filter
   chips={filterOptions}
-  selected={activeFilters}
-  onChipChange={handleFilterToggle}
+  selected={selectedCategory ? [selectedCategory] : []}
+  onChipChange={(id) => {
+    setSelectedCategory((prev) => (prev === id ? "" : id));
+  }}
   showCloseButton={false}
 />
 ```
