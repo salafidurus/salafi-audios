@@ -25,9 +25,7 @@
   color: var(--content-default);
 }
 
-.input,
-.textarea,
-.select {
+.selectField {
   padding: var(--space-sm) var(--space-md);
   font-size: var(--typo-body-md-font-size);
   background-color: var(--surface-default);
@@ -39,17 +37,48 @@
     box-shadow 150ms ease;
 }
 
-.input:focus,
-.textarea:focus,
-.select:focus {
+.selectField:focus {
   outline: none;
   border-color: var(--action-primary);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-focus-ring) 24%, transparent);
 }
 
-.textarea {
-  resize: vertical;
-  min-height: 80px;
+.selectField:disabled {
+  color: var(--content-subtle);
+  cursor: not-allowed;
+}
+
+.editIconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xs) var(--space-sm);
+  background-color: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--content-subtle);
+  transition: all 150ms ease-out;
+  flex-shrink: 0;
+  min-width: 36px;
+  height: 36px;
+}
+
+.editIconButton:hover {
+  background-color: var(--action-primary);
+  border-color: var(--action-primary);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.editIconButton:active {
+  transform: translateY(0);
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.editIconButton:focus {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
 }
 
 .checkboxGroup {
@@ -79,6 +108,10 @@
   border: 1px solid var(--chrome-border-subtle);
   border-radius: var(--radius-sm);
   background: var(--surface-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 120px;
 }
 
 .previewImage {
@@ -86,4 +119,37 @@
   max-height: 200px;
   object-fit: contain;
   border-radius: var(--radius-xs);
+}
+
+.imageLoadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  color: var(--content-subtle);
+  font-size: var(--typo-body-sm-font-size);
+}
+
+.loadingSpinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.imageErrorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  color: var(--content-danger);
+  font-size: var(--typo-body-sm-font-size);
 }
