@@ -11,7 +11,7 @@ import { PageHeader } from "@/shared/components/PageHeader";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { SearchBar } from "@/shared/components/SearchBar";
 import { ListContainer } from "@/shared/components/ListContainer";
-import { UserCard } from "@/features/admin/components/user-card/user-card";
+import { UserItem } from "@/features/admin/components/user-item";
 import { PermissionsDialog } from "@/features/admin/components/PermissionsDialog";
 import styles from "./admin-users.screen.module.css";
 
@@ -76,7 +76,7 @@ export function AdminUsersScreen(): ReactNode {
             ) : (
               <ListContainer>
                 {users.map((user) => (
-                  <UserCard
+                  <UserItem
                     key={user.id}
                     user={user}
                     onManagePermissions={() => setPermUser({ id: user.id, name: user.name })}
