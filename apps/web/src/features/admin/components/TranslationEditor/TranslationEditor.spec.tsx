@@ -1,5 +1,5 @@
 import { vi, type Mock } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import type { TranslationTarget, TranslationViewDto } from "@sd/core-contracts";
 
 vi.mock("@sd/core-i18n", () => ({
@@ -118,7 +118,9 @@ describe("TranslationEditor", () => {
     fireEvent.click(screen.getByRole("button", { name: /unpublish/i }));
     // Wait for modal to appear and click confirm button
     const confirmButtons = await screen.findAllByRole("button", { name: /unpublish/i });
-    fireEvent.click(confirmButtons[confirmButtons.length - 1]); // Click the last (modal) Unpublish button
+    await act(async () => {
+      fireEvent.click(confirmButtons[confirmButtons.length - 1]); // Click the last (modal) Unpublish button
+    });
     expect(mutateFn).toHaveBeenCalledTimes(1);
   });
 
