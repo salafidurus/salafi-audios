@@ -10,6 +10,8 @@ export interface ScholarData {
   name: string;
   bio: string;
   isKibar: boolean;
+  country: string;
+  mainLanguage: "en" | "ar";
 }
 
 export const SCHOLARS: ScholarData[] = [
@@ -19,6 +21,8 @@ export const SCHOLARS: ScholarData[] = [
     name: "Muhammad ibn Salih al-Uthaymin",
     bio: "Foremost scholar of Ahl al-Sunnah in the 20th century. Expert in fiqh, aqeedah, and tafsir.",
     isKibar: true,
+    country: "Saudi Arabia",
+    mainLanguage: "ar",
   },
   {
     id: uuid(2),
@@ -26,6 +30,8 @@ export const SCHOLARS: ScholarData[] = [
     name: "Salih ibn Fawzan al-Fawzan",
     bio: "Senior member of the Permanent Committee for Ifta. Expert in fiqh and aqeedah.",
     isKibar: true,
+    country: "Saudi Arabia",
+    mainLanguage: "ar",
   },
   {
     id: uuid(3),
@@ -33,6 +39,8 @@ export const SCHOLARS: ScholarData[] = [
     name: "Ahmad ibn 'Umar Arafat",
     bio: "Contemporary Salafi scholar based in Egypt. Known for aqeedah and hadith series.",
     isKibar: false,
+    country: "Egypt",
+    mainLanguage: "ar",
   },
   {
     id: uuid(4),
@@ -40,6 +48,8 @@ export const SCHOLARS: ScholarData[] = [
     name: "Mustafa bn Mabram",
     bio: "Specialist in Arabic grammar (nahw and sarf). Author of textbooks on i'rab.",
     isKibar: false,
+    country: "Saudi Arabia",
+    mainLanguage: "ar",
   },
   {
     id: uuid(5),
@@ -47,5 +57,7 @@ export const SCHOLARS: ScholarData[] = [
     name: "Abdullah al-Bukhari",
     bio: "Contemporary muhaddith specializing in hadith sciences and mustalah al-hadith.",
     isKibar: false,
+    country: "Saudi Arabia",
+    mainLanguage: "ar",
   },
 ];

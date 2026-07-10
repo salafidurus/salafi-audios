@@ -362,6 +362,12 @@ export class ScholarsRepository {
         isKibar: dto.isKibar ?? false,
         isFeatured: dto.isFeatured ?? false,
         isActive: dto.isActive ?? true,
+        country: dto.country,
+        mainLanguage: dto.mainLanguage,
+        socialTwitter: dto.socialTwitter,
+        socialTelegram: dto.socialTelegram,
+        socialYoutube: dto.socialYoutube,
+        socialWebsite: dto.socialWebsite,
       },
     });
   }
@@ -377,6 +383,12 @@ export class ScholarsRepository {
         ...(dto.isKibar !== undefined && { isKibar: dto.isKibar }),
         ...(dto.isFeatured !== undefined && { isFeatured: dto.isFeatured }),
         ...(dto.isActive !== undefined && { isActive: dto.isActive }),
+        ...(dto.country !== undefined && { country: dto.country }),
+        ...(dto.mainLanguage !== undefined && { mainLanguage: dto.mainLanguage }),
+        ...(dto.socialTwitter !== undefined && { socialTwitter: dto.socialTwitter }),
+        ...(dto.socialTelegram !== undefined && { socialTelegram: dto.socialTelegram }),
+        ...(dto.socialYoutube !== undefined && { socialYoutube: dto.socialYoutube }),
+        ...(dto.socialWebsite !== undefined && { socialWebsite: dto.socialWebsite }),
         updatedAt: new Date(),
       },
     });

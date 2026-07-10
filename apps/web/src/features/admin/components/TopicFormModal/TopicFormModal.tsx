@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useEffect } from "react";
+import { useReducer, useEffect, useMemo } from "react";
 import { Edit2, RotateCcw } from "lucide-react";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button";
@@ -168,7 +168,10 @@ export function TopicFormModal({ isOpen, onClose, onSave, topic }: TopicFormModa
     isEditing && topic ? { entity: "topic", topicId: topic.id } : { entity: "topic", topicId: "" },
   );
 
-  const translations = translationsResponse?.translations ?? [];
+  const translations = useMemo(
+    () => translationsResponse?.translations ?? [],
+    [translationsResponse],
+  );
 
   // Sync form data when topic changes or modal opens
   useEffect(() => {
@@ -311,7 +314,7 @@ export function TopicFormModal({ isOpen, onClose, onSave, topic }: TopicFormModa
         </div>
 
         {/* Arabic Name Field */}
-        {isEditing && translations.length > 0 && (
+        {isEditing && (
           <div className={styles.field}>
             <label className={styles.label}>Arabic Name</label>
             <EditableInput

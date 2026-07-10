@@ -20,7 +20,23 @@ export class MediaService {
   }
 
   async getPresignedUploadUrl(dto: PresignedUrlRequestDto): Promise<PresignedUrlResponseDto> {
-    const objectKey = `${dto.purpose}/${createId()}-${dto.filename}`;
+    let objectKey: string;
+
+    // Slug-based naming for scholar images: /images/scholars/{slug}.{ext}
+    if (dto.slug && dto.purpose === 'image') {
+      const ext = dto.filename.split('.').pop()?.toLowerCase() || '';
+
+      // Validate file extension for scholar images
+      if (!['png', 'jpg', 'jpeg'].includes(ext)) {
+        throw new Error('Scholar images must be png, jpg, or jpeg');
+      }
+
+      objectKey = `images/scholars/${dto.slug}.${ext}`;
+    } else {
+      // Default naming: {purpose}/{cuid}-{filename}
+      objectKey = `${dto.purpose}/${createId()}-${dto.filename}`;
+    }
+
     const file = this.s3.file(objectKey);
     const uploadUrl = file.presign({
       method: 'PUT',

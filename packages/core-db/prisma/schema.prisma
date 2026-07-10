@@ -151,8 +151,8 @@ model Scholar {
   slug         String
   name         String
   bio          String?
-  country      String?
-  mainLanguage Locale?
+  country      String   @default("Saudi Arabia")
+  mainLanguage Locale   @default(ar)
   imageUrl     String?
   isActive     Boolean  @default(true)
   isKibar      Boolean  @default(false)

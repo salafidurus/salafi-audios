@@ -6,6 +6,7 @@ import { useResponsive } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
+import { ListContainer } from "@/shared/components/ListContainer";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type { ScholarListItemDto, CreateScholarDto } from "@sd/core-contracts";
 import { createScholar, updateScholar } from "@/features/admin/api/admin.api";
@@ -100,22 +101,22 @@ export function AdminScholarsScreen() {
           />
         </div>
 
-        <div className={!isMobile ? styles.grid : styles.list}>
-          {filteredScholars.map((scholar) => (
-            <ScholarCard
-              key={scholar.id}
-              id={scholar.id}
-              name={scholar.name}
-              slug={scholar.slug}
-              isKibar={scholar.isKibar ?? false}
-              lectureCount={scholar.lectureCount ?? 0}
-              imageUrl={scholar.imageUrl ?? undefined}
-              onEdit={() => handleOpenEdit(scholar)}
-            />
-          ))}
-        </div>
-
-        {filteredScholars.length === 0 && (
+        {filteredScholars.length > 0 ? (
+          <ListContainer>
+            {filteredScholars.map((scholar) => (
+              <ScholarCard
+                key={scholar.id}
+                id={scholar.id}
+                name={scholar.name}
+                slug={scholar.slug}
+                isKibar={scholar.isKibar ?? false}
+                lectureCount={scholar.lectureCount ?? 0}
+                imageUrl={scholar.imageUrl ?? undefined}
+                onEdit={() => handleOpenEdit(scholar)}
+              />
+            ))}
+          </ListContainer>
+        ) : (
           <div className={styles.empty}>
             {searchQuery ? "No scholars match your search." : "No scholars yet."}
           </div>

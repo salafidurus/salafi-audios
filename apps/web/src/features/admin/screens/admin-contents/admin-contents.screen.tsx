@@ -18,6 +18,8 @@ import {
   fetchAdminLectureDetail,
 } from "@/features/admin/api/admin-lectures.api";
 import { SearchBar } from "@/shared/components/SearchBar";
+import { ListContainer } from "@/shared/components/ListContainer";
+import { ListItem } from "@/shared/components/ListItem";
 import { TopicFormModal, type TopicForEdit } from "@/features/admin/components/TopicFormModal";
 import { AudioUploader } from "@/features/admin/components/AudioUploader/AudioUploader";
 import { LectureEditModal } from "@/features/admin/components/LectureEditModal";
@@ -190,67 +192,79 @@ export function AdminContentsScreen() {
         }
       />
 
-      <SearchBar
-        value={searchQuery}
-        onChange={setSearchQuery}
-        placeholder={activeTab === "topics" ? "Search topics..." : "Search listings..."}
-      />
+      <div className={styles.content}>
+        <SearchBar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder={activeTab === "topics" ? "Search topics..." : "Search listings..."}
+        />
 
-      {activeTab === "topics" && (
-        <div className={styles.topicsList}>
-          {filteredTopics.map((topic) => (
-            <div key={topic.slug} className={styles.topicItem}>
-              <div className={styles.topicInfo}>
-                <span className={styles.topicName}>{topic.name}</span>
-                <span className={styles.topicSlug}>{topic.slug}</span>
+        {activeTab === "topics" && (
+          <>
+            {filteredTopics.length > 0 ? (
+              <ListContainer>
+                {filteredTopics.map((topic) => (
+                  <ListItem key={topic.slug} interactive className={styles.topicItem}>
+                    <div className={styles.topicInfo}>
+                      <span className={styles.topicName}>{topic.name}</span>
+                      <span className={styles.topicSlug}>{topic.slug}</span>
+                    </div>
+                    <div className={styles.topicActions}>
+                      <Button variant="ghost" size="sm" onClick={() => handleOpenEditTopic(topic)}>
+                        Edit
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        icon={<Trash2 size={14} />}
+                        onClick={() => handleDeleteClick(topic.slug, topic.name)}
+                      />
+                    </div>
+                  </ListItem>
+                ))}
+              </ListContainer>
+            ) : (
+              <div className={styles.empty}>
+                {searchQuery ? "No topics match your search." : "No topics yet."}
               </div>
-              <div className={styles.topicActions}>
-                <Button variant="ghost" size="sm" onClick={() => handleOpenEditTopic(topic)}>
-                  Edit
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  icon={<Trash2 size={14} />}
-                  onClick={() => handleDeleteClick(topic.slug, topic.name)}
-                />
-              </div>
-            </div>
-          ))}
-          {filteredTopics.length === 0 && (
-            <div className={styles.empty}>
-              {searchQuery ? "No topics match your search." : "No topics yet."}
-            </div>
-          )}
-        </div>
-      )}
+            )}
+          </>
+        )}
 
-      {activeTab === "listings" && (
-        <div className={styles.listingsList}>
-          {listings.map((listing) => (
-            <div key={listing.id} className={styles.listingItem}>
-              <div className={styles.listingInfo}>
-                <span className={styles.listingTitle}>{listing.title}</span>
-                <span className={styles.listingMeta}>
-                  {listing.scholarName} • {listing.status}
-                </span>
+        {activeTab === "listings" && (
+          <>
+            {listings.length > 0 ? (
+              <ListContainer>
+                {listings.map((listing) => (
+                  <ListItem key={listing.id} interactive className={styles.listingItem}>
+                    <div className={styles.listingInfo}>
+                      <span className={styles.listingTitle}>{listing.title}</span>
+                      <span className={styles.listingMeta}>
+                        {listing.scholarName} • {listing.status}
+                      </span>
+                    </div>
+                    <div className={styles.listingActions}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleEditListing(listing.id)}
+                      >
+                        <Edit size={14} />
+                      </Button>
+                    </div>
+                  </ListItem>
+                ))}
+              </ListContainer>
+            ) : (
+              <div className={styles.empty}>
+                {searchQuery
+                  ? "No listings match your search."
+                  : "No listings yet. Add audio to create a listing."}
               </div>
-              <div className={styles.listingActions}>
-                <Button variant="ghost" size="sm" onClick={() => handleEditListing(listing.id)}>
-                  <Edit size={14} />
-                </Button>
-              </div>
-            </div>
-          ))}
-          {listings.length === 0 && (
-            <div className={styles.empty}>
-              {searchQuery
-                ? "No listings match your search."
-                : "No listings yet. Add audio to create a listing."}
-            </div>
-          )}
-        </div>
-      )}
+            )}
+          </>
+        )}
+      </div>
 
       {/* Topic Modal */}
       <TopicFormModal

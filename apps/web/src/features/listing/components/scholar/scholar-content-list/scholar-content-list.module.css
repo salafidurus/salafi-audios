@@ -15,16 +15,11 @@
 .list {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: var(--space-component-gap-md);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-component-card, 12px);
   background-color: var(--surface-default);
   overflow: hidden;
-}
-
-/* Row dividers via adjacent sibling — avoids double-borders */
-.list > * + * {
-  border-top: 1px solid var(--border-subtle);
 }
 
 /* List Row */

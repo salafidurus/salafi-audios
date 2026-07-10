@@ -1,7 +1,7 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: var(--space-component-gap-lg);
 }
 
 .loading,
@@ -14,18 +14,6 @@
 
 .toolbar {
   display: flex;
-  gap: var(--space-md);
+  gap: var(--space-component-gap-md);
   flex-wrap: wrap;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: var(--space-md);
-}
-
-.list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
 }

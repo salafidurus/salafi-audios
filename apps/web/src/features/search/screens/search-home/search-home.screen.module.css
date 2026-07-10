@@ -1,7 +1,7 @@
 .content {
   display: flex;
   flex-direction: column;
-  gap: var(--space-component-gap-xl);
+  gap: var(--space-component-gap-lg);
   width: 100%;
 }
 
@@ -15,4 +15,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.desktopSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-scale-4xl);
+  text-align: center;
+}
+
+.desktopSearchContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-component-gap-lg);
+  width: 100%;
 }

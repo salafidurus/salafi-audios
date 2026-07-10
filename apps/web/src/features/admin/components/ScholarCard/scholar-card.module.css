@@ -2,18 +2,6 @@
   display: flex;
   align-items: center;
   gap: var(--space-md);
-  padding: var(--space-md);
-  background-color: var(--surface-default);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-component-card);
-  transition:
-    border-color 150ms,
-    box-shadow 150ms;
-}
-
-.card:hover {
-  border-color: var(--border-default);
-  box-shadow: var(--shadow-sm);
 }
 
 .avatar {

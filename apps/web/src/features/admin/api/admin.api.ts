@@ -45,6 +45,12 @@ export type AdminScholarInput = {
   isKibar?: boolean;
   isFeatured?: boolean;
   isActive?: boolean;
+  country?: string;
+  mainLanguage?: "en" | "ar";
+  socialTwitter?: string;
+  socialTelegram?: string;
+  socialYoutube?: string;
+  socialWebsite?: string;
 };
 
 export function createScholar(data: AdminScholarInput) {
