@@ -3,6 +3,7 @@
 import React from "react";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { useDragScroll } from "@/shared/hooks/use-drag-scroll";
+import { List } from "@/shared/components/List";
 import { SearchResultEmpty } from "../SearchResultEmpty/SearchResultEmpty";
 import styles from "./SearchResultsList.module.css";
 
@@ -27,43 +28,28 @@ export function SearchResultsList({
   const scrollRef = useDragScroll("vertical");
   const shouldShowEmpty = items.length === 0 || Boolean(errorMessage);
 
-  if (isDesktop) {
+  if (shouldShowEmpty) {
     return (
-      <div className={styles.list}>
-        {shouldShowEmpty ? (
-          <SearchResultEmpty
-            shouldSearch={shouldSearch}
-            isFetching={isFetching}
-            errorMessage={errorMessage}
-          />
-        ) : null}
-        <div className={styles.items}>
-          {items.map((item) => (
-            <React.Fragment key={item.id}>{renderItem(item)}</React.Fragment>
-          ))}
-        </div>
-      </div>
+      <List>
+        <SearchResultEmpty
+          shouldSearch={shouldSearch}
+          isFetching={isFetching}
+          errorMessage={errorMessage}
+        />
+      </List>
     );
   }
 
   return (
-    <div ref={scrollRef} className={styles.scrollContainer}>
-      <div className={styles.inner}>
-        {shouldShowEmpty ? (
-          <SearchResultEmpty
-            shouldSearch={shouldSearch}
-            isFetching={isFetching}
-            errorMessage={errorMessage}
-          />
-        ) : (
-          items.map((item, index) => (
-            <React.Fragment key={item.id}>
-              {index > 0 && <div className={styles.separator} />}
-              {renderItem(item)}
-            </React.Fragment>
-          ))
-        )}
-      </div>
+    <div
+      ref={isDesktop ? undefined : scrollRef}
+      className={isDesktop ? styles.desktopContainer : styles.mobileContainer}
+    >
+      <List>
+        {items.map((item) => (
+          <List.Item key={item.id}>{renderItem(item)}</List.Item>
+        ))}
+      </List>
     </div>
   );
 }

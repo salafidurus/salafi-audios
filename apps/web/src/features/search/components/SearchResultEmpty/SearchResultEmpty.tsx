@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import { List } from "@/shared/components/List";
 import styles from "./SearchResultEmpty.module.css";
 
 export type SearchResultEmptyProps = {
@@ -24,8 +25,8 @@ export function SearchResultEmpty({
     : t("search.startTyping", "Start typing to search.");
 
   return (
-    <div className={styles.container}>
+    <List.Item className={styles.container}>
       <p className={styles.message}>{message}</p>
-    </div>
+    </List.Item>
   );
 }
