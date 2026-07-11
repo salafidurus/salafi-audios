@@ -3,21 +3,28 @@
 import { useCallback, useState } from "react";
 import { useListingDetail } from "@sd/domain-content";
 import type { Track } from "@sd/domain-audio";
-import { useToast } from "@/core/toast";
+import { sanitizeError } from "@sd/utils-error";
 import { audioService } from "../index";
+
+export type UsePlayListingOptions = {
+  /**
+   * Optional callback to handle errors. If provided, errors will be passed here
+   * instead of being stored in the error state.
+   */
+  onError?: (message: string) => void;
+};
 
 /**
  * Hook to play a listing by ID.
  * Fetches the full listing detail and initiates playback via the audio service.
- * Shows error toasts for user feedback.
  *
  * @param listingId - The ID of the listing to play (in format "prefix:id")
+ * @param options - Configuration options including error callback
  * @returns Object with play function, loading state, and error state
  */
-export function usePlayListing(listingId: string | null) {
+export function usePlayListing(listingId: string | null, options?: UsePlayListingOptions) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { addToast } = useToast();
 
   // Extract actual ID if it's in "prefix:id" format
   const actualId = listingId ? listingId.split(":")[1] || listingId : null;
@@ -27,16 +34,16 @@ export function usePlayListing(listingId: string | null) {
 
   const play = useCallback(async () => {
     if (!listingDetail) {
-      const errorMsg = "Listing detail not loaded";
+      const errorMsg = "Unable to load audio. Please try again.";
       setError(errorMsg);
-      addToast(errorMsg, "error");
+      options?.onError?.(errorMsg);
       return;
     }
 
     if (!listingDetail.primaryAudioAsset?.url) {
-      const errorMsg = "No audio available for this listing";
+      const errorMsg = "No audio available for this lecture.";
       setError(errorMsg);
-      addToast(errorMsg, "error");
+      options?.onError?.(errorMsg);
       return;
     }
 
@@ -60,14 +67,14 @@ export function usePlayListing(listingId: string | null) {
       // Play the track using the audio service
       await audioService.playListing(track);
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to play audio";
-      setError(message);
-      addToast(message, "error");
+      const sanitized = sanitizeError(err);
+      setError(sanitized);
+      options?.onError?.(sanitized);
       console.error("Failed to play listing:", err);
     } finally {
       setIsLoading(false);
     }
-  }, [listingDetail, addToast]);
+  }, [listingDetail, options]);
 
   return {
     play,

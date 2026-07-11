@@ -42,8 +42,7 @@ export const useToastStore = create<ToastStore>((set) => ({
 }));
 
 export function useToast() {
-  return useToastStore((state) => ({
-    addToast: state.addToast,
-    removeToast: state.removeToast,
-  }));
+  const addToast = useToastStore((state) => state.addToast);
+  const removeToast = useToastStore((state) => state.removeToast);
+  return { addToast, removeToast };
 }

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { Play, Headphones, Clock } from "lucide-react";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
+import { useToast } from "@/core/toast";
 import { List } from "@/shared/components/List";
 import { Button } from "@/shared/components/Button";
 import { MarqueeText } from "../MarqueeText/MarqueeText";
@@ -36,7 +37,10 @@ function formatDuration(durationSeconds?: number): string {
 
 export function SearchResultItem({ item, onPress }: SearchResultItemProps) {
   const isDesktop = useIsDesktop();
-  const { play, isLoading, error } = usePlayListing(item.id);
+  const { addToast } = useToast();
+  const { play, isLoading, error } = usePlayListing(item.id, {
+    onError: (message) => addToast(message, "error"),
+  });
 
   const handlePlayClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     // Stop event propagation to prevent List.Item onClick
