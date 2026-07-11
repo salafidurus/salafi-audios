@@ -79,8 +79,13 @@
 
 .filterContainer {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: var(--space-component-gap-sm);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: var(--space-scale-xs);
 }
 
 .filterChip {
@@ -166,6 +171,10 @@
 /* Responsive layout */
 
 @media (max-width: 640px) {
+  .barContainer {
+    margin-bottom: var(--space-component-gap-md);
+  }
+
   .barInputWrapper {
     gap: var(--space-component-gap-md);
     padding: var(--space-scale-md) var(--space-scale-lg);

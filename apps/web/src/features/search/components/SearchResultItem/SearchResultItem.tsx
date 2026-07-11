@@ -92,7 +92,7 @@ export function SearchResultItem({ item, onPress }: SearchResultItemProps) {
 
       <List.Item.Actions>
         <Button
-          variant="ghost"
+          variant={isDesktop ? "ghost" : "outline"}
           size={isDesktop ? "icon" : "sm"}
           aria-label={`Play ${item.title}`}
           icon={<Play size={16} fill="currentColor" />}
