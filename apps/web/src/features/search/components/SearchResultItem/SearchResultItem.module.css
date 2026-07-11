@@ -1,17 +1,10 @@
-.card {
-  gap: var(--space-component-gap-md);
+/* Content wrapper: keeps media and body side-by-side on all breakpoints */
+.content {
   display: flex;
   flex-direction: row;
   align-items: center;
   width: 100%;
-}
-
-/* Keep media and body side-by-side on mobile (override List.Item's mobile stacking) */
-@media (max-width: 640px) {
-  .card {
-    flex-direction: row;
-    align-items: center;
-  }
+  gap: var(--space-component-gap-md);
 }
 
 .media {
@@ -22,7 +15,6 @@
   overflow: hidden;
   border-radius: var(--radius-component-panel-sm);
   background: var(--surface-subtle);
-  margin-right: var(--space-component-gap-md);
 }
 
 @media (min-width: 1280px) {

@@ -38,53 +38,55 @@ export function SearchResultItem({ item, onPress }: SearchResultItemProps) {
 
   return (
     <List.Item interactive onClick={onPress} className={styles.card}>
-      <div className={styles.media}>
-        {item.imageUrl ? (
-          <Image
-            src={item.imageUrl}
-            alt=""
-            fill
-            sizes={isDesktop ? "(max-width: 768px) 20vw, 10vw" : "(max-width: 640px) 30vw, 20vw"}
-            className={styles.cover}
-          />
-        ) : (
-          <div className={styles.fallback}>
-            <Headphones
-              size={isDesktop ? 22 : 20}
-              style={{ color: "var(--content-subtle)" }}
-              aria-hidden
+      <div className={styles.content}>
+        <div className={styles.media}>
+          {item.imageUrl ? (
+            <Image
+              src={item.imageUrl}
+              alt=""
+              fill
+              sizes={isDesktop ? "(max-width: 768px) 20vw, 10vw" : "(max-width: 640px) 30vw, 20vw"}
+              className={styles.cover}
             />
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className={styles.fallback}>
+              <Headphones
+                size={isDesktop ? 22 : 20}
+                style={{ color: "var(--content-subtle)" }}
+                aria-hidden
+              />
+            </div>
+          )}
+        </div>
 
-      <div className={styles.body}>
-        <MarqueeText
-          text={item.title}
-          className={
-            isDesktop
-              ? "truncate text-[var(--content-strong)] [font-size:var(--typo-title-md-font-size)] xl:[font-size:var(--typo-title-lg-font-size)]"
-              : "text-[var(--content-strong)]"
-          }
-        />
-        <MarqueeText
-          text={item.scholarName}
-          className={
-            isDesktop
-              ? "truncate text-[var(--content-muted)] [font-size:var(--typo-body-sm-font-size)] xl:[font-size:var(--typo-body-md-font-size)]"
-              : "text-[var(--content-muted)]"
-          }
-        />
-        <div className={styles.metaRow}>
-          <Headphones size={11} aria-hidden />
-          <span>{formatLectureCount(item.lectureCount)}</span>
-          {formatDuration(item.durationSeconds) ? (
-            <>
-              <span aria-hidden> · </span>
-              <Clock size={11} aria-hidden />
-              <span>{formatDuration(item.durationSeconds)}</span>
-            </>
-          ) : null}
+        <div className={styles.body}>
+          <MarqueeText
+            text={item.title}
+            className={
+              isDesktop
+                ? "truncate text-[var(--content-strong)] [font-size:var(--typo-title-md-font-size)] xl:[font-size:var(--typo-title-lg-font-size)]"
+                : "text-[var(--content-strong)]"
+            }
+          />
+          <MarqueeText
+            text={item.scholarName}
+            className={
+              isDesktop
+                ? "truncate text-[var(--content-muted)] [font-size:var(--typo-body-sm-font-size)] xl:[font-size:var(--typo-body-md-font-size)]"
+                : "text-[var(--content-muted)]"
+            }
+          />
+          <div className={styles.metaRow}>
+            <Headphones size={11} aria-hidden />
+            <span>{formatLectureCount(item.lectureCount)}</span>
+            {formatDuration(item.durationSeconds) ? (
+              <>
+                <span aria-hidden> · </span>
+                <Clock size={11} aria-hidden />
+                <span>{formatDuration(item.durationSeconds)}</span>
+              </>
+            ) : null}
+          </div>
         </div>
       </div>
 
