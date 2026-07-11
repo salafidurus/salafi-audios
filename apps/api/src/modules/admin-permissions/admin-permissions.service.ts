@@ -42,8 +42,8 @@ export class AdminPermissionsService {
     return this.getPermissions(userId);
   }
 
-  async listUsers(query?: string): Promise<AdminUserListDto> {
-    const { users, total } = await this.repo.listUsers(query);
+  async listUsers(query?: string, role?: string): Promise<AdminUserListDto> {
+    const { users, total } = await this.repo.listUsers(query, role);
     return {
       users: users.map((u) => ({
         id: u.id,

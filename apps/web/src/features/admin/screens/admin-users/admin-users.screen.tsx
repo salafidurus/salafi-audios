@@ -15,11 +15,19 @@ import { UserItem } from "@/features/admin/components/user-item";
 import { PermissionsDialog } from "@/features/admin/components/PermissionsDialog";
 import styles from "./admin-users.screen.module.css";
 
+const ROLE_CHIPS = [
+  { id: "user", label: "User" },
+  { id: "editor", label: "Editor" },
+  { id: "admin", label: "Admin" },
+  { id: "superadmin", label: "Super Admin" },
+] as const;
+
 export function AdminUsersScreen(): ReactNode {
   const queryClient = useQueryClient();
   const { isMobile } = useResponsive();
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [role, setRole] = useState("");
   const [permUser, setPermUser] = useState<{ id: string; name: string } | null>(null);
 
   useEffect(() => {
@@ -31,10 +39,10 @@ export function AdminUsersScreen(): ReactNode {
   }, [searchQuery]);
 
   const { data, isFetching } = useApiQuery<AdminUserListDto>(
-    queryKeys.admin.users.list(debouncedSearch),
+    queryKeys.admin.users.list(debouncedSearch, role),
     () =>
       httpClient<AdminUserListDto>({
-        url: `${endpoints.admin.users.list}${debouncedSearch ? `?q=${encodeURIComponent(debouncedSearch)}` : ""}`,
+        url: `${endpoints.admin.users.list}${debouncedSearch || role ? `?${new URLSearchParams({ ...(debouncedSearch && { q: debouncedSearch }), ...(role && { role }) }).toString()}` : ""}`,
         method: "GET",
       }),
   );
@@ -59,6 +67,14 @@ export function AdminUsersScreen(): ReactNode {
           />
         </div>
 
+        <Search.Filter
+          chips={ROLE_CHIPS}
+          selected={role ? [role] : []}
+          onChipChange={(chipId: string) => {
+            setRole(role === chipId ? "" : chipId);
+          }}
+        />
+
         {isFetching ? (
           <EmptyState variant="loading" message="Loading users…" />
         ) : (
@@ -71,7 +87,9 @@ export function AdminUsersScreen(): ReactNode {
 
             {users.length === 0 ? (
               <EmptyState
-                message={debouncedSearch ? "No users match your search." : "No users found."}
+                message={
+                  debouncedSearch || role ? "No users match your search." : "No users found."
+                }
               />
             ) : (
               <List>

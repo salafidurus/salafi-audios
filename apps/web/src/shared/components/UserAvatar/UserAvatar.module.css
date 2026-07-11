@@ -1,18 +1,13 @@
 .avatar {
-  width: 32px;
-  height: 32px;
   border-radius: var(--radius-scale-full);
   object-fit: cover;
 }
 
 .fallback {
-  width: 32px;
-  height: 32px;
   border-radius: var(--radius-scale-full);
   background: var(--surface-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: var(--typo-body-sm-font-size);
   color: var(--content-muted);
 }

@@ -201,7 +201,7 @@ describe('AdminPermissionsService', () => {
         ],
         total: 2,
       });
-      expect(repo.listUsers).toHaveBeenCalledWith(undefined);
+      expect(repo.listUsers).toHaveBeenCalledWith(undefined, undefined);
     });
 
     it('should filter users by query string', async () => {
@@ -232,7 +232,7 @@ describe('AdminPermissionsService', () => {
       const result = await service.listUsers('alice');
 
       expect(result.users).toHaveLength(1);
-      expect(repo.listUsers).toHaveBeenCalledWith('alice');
+      expect(repo.listUsers).toHaveBeenCalledWith('alice', undefined);
     });
 
     it('should return empty list when no users match', async () => {

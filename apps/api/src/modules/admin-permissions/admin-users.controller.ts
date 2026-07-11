@@ -17,9 +17,11 @@ export class AdminUsersController {
 
   @Get()
   @RequiresPermission('manage:admin')
-  @ApiOperation({ summary: 'List all users with their admin permissions' })
-  listUsers(@Query('q') query?: string) {
-    return this.service.listUsers(query);
+  @ApiOperation({
+    summary: 'List all users with their admin permissions, optionally filtered by role',
+  })
+  listUsers(@Query('q') query?: string, @Query('role') role?: string) {
+    return this.service.listUsers(query, role);
   }
 
   @Get(':userId/permissions')

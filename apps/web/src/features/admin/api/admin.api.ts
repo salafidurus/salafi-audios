@@ -102,11 +102,14 @@ export function deleteTopic(slug: string) {
 
 // --- Users ---
 
-export function fetchAdminUsers(q?: string) {
+export function fetchAdminUsers(params?: { q?: string; role?: string }) {
   const url = endpoints.admin.users.list;
-  const query = q ? `?q=${encodeURIComponent(q)}` : "";
+  const query = new URLSearchParams();
+  if (params?.q) query.append("q", params.q);
+  if (params?.role) query.append("role", params.role);
+  const queryString = query.toString();
   return httpClient<AdminUserListDto>({
-    url: `${url}${query}`,
+    url: queryString ? `${url}?${queryString}` : url,
     method: "GET",
   });
 }

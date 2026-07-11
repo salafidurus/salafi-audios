@@ -105,7 +105,8 @@ export const queryKeys = {
     },
     users: {
       all: () => [...queryKeys.admin.all, "users"] as const,
-      list: (query?: string) => [...queryKeys.admin.all, "users", "list", query] as const,
+      list: (query?: string, role?: string) =>
+        [...queryKeys.admin.all, "users", "list", query, role] as const,
     },
     scholars: {
       all: () => [...queryKeys.admin.all, "scholars"] as const,

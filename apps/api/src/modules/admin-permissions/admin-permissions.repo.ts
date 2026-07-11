@@ -49,15 +49,29 @@ export class AdminPermissionsRepository {
     return count > 0;
   }
 
-  async listUsers(query?: string) {
-    const where = query
-      ? {
-          OR: [
-            { name: { contains: query, mode: 'insensitive' as const } },
-            { email: { contains: query, mode: 'insensitive' as const } },
-          ],
-        }
-      : {};
+  async listUsers(query?: string, role?: string) {
+    const where: any = {};
+
+    // Add search filter (name or email)
+    if (query) {
+      where.OR = [
+        { name: { contains: query, mode: 'insensitive' as const } },
+        { email: { contains: query, mode: 'insensitive' as const } },
+      ];
+    }
+
+    // Add role filter (silently ignore invalid values with warning)
+    if (role) {
+      const validRoles = ['user', 'admin', 'editor', 'superadmin'];
+      if (validRoles.includes(role)) {
+        where.role = role;
+      } else {
+        // Log warning for invalid role but continue processing
+        console.warn(
+          `[AdminPermissionsRepo] Invalid role filter value: "${role}". Valid values: ${validRoles.join(', ')}`,
+        );
+      }
+    }
 
     const [users, total] = await Promise.all([
       this.prisma.user.findMany({
