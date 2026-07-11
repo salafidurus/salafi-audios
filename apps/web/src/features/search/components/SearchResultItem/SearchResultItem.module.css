@@ -17,9 +17,9 @@
   background: var(--surface-subtle);
 }
 
-@media (min-width: 1280px) {
+@media (min-width: 640px) {
   .media {
-    width: 10%;
+    width: 14%;
   }
 }
 

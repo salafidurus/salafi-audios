@@ -125,8 +125,11 @@
 
 @media (max-width: 640px) {
   .container {
-    left: var(--space-component-gap-md);
-    right: var(--space-component-gap-md);
-    max-width: none;
+    right: var(--space-component-gap-sm);
+  }
+
+  .message {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
   }
 }

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { Play, Headphones, Clock } from "lucide-react";
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
+import { useIsDesktop, useResponsive } from "@/shared/hooks/use-responsive";
 import { useToast } from "@/core/toast";
 import { List } from "@/shared/components/List";
 import { Button } from "@/shared/components/Button";
@@ -37,8 +37,9 @@ function formatDuration(durationSeconds?: number): string {
 
 export function SearchResultItem({ item, onPress }: SearchResultItemProps) {
   const isDesktop = useIsDesktop();
+  const { isMobile } = useResponsive();
   const { addToast } = useToast();
-  const { play, isLoading, error } = usePlayListing(item.id, {
+  const { play, isLoading } = usePlayListing(item.id, {
     onError: (message) => addToast(message, "error"),
   });
 
@@ -104,14 +105,14 @@ export function SearchResultItem({ item, onPress }: SearchResultItemProps) {
 
       <List.Item.Actions>
         <Button
-          variant={isDesktop ? "ghost" : "outline"}
-          size={isDesktop ? "icon" : "sm"}
+          variant={!isMobile ? "ghost" : "outline"}
+          size={!isMobile ? "icon" : "sm"}
           aria-label={`Play ${item.title}`}
           icon={<Play size={16} fill="currentColor" />}
           onClick={handlePlayClick}
           disabled={isLoading}
         >
-          {!isDesktop && "Play"}
+          {isMobile && "Play"}
         </Button>
       </List.Item.Actions>
     </List.Item>

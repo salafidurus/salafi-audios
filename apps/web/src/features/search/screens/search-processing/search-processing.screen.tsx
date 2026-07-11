@@ -20,7 +20,6 @@ export type SearchProcessingScreenProps = {
 };
 
 export function SearchProcessingScreen({ searchKey }: SearchProcessingScreenProps) {
-  const isDesktop = useIsDesktop();
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
   const {
