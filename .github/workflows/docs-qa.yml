@@ -7,7 +7,6 @@ on:
       - "**/README.md"
       - "docs/**/*.md"
       - "AGENT.md"
-      - "AGENTS.md"
       - ".github/copilot-instructions.md"
 
 permissions:
@@ -28,7 +27,6 @@ jobs:
             **/README.md
             docs/**/*.md
             AGENT.md
-            AGENTS.md
             .github/copilot-instructions.md
 
       - name: Check internal markdown links
@@ -42,5 +40,4 @@ jobs:
             README.md
             docs
             AGENT.md
-            AGENTS.md
             .github/copilot-instructions.md
