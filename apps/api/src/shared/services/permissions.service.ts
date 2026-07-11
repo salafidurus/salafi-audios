@@ -20,8 +20,25 @@ export class PermissionsService {
   /**
    * Assign a role to a user
    * Automatically grants default permissions for that role
+   *
+   * SECURITY NOTE: Only superadmin can grant superadmin role.
+   * To create/demote superadmin, use direct database operations (SQL or script).
+   *
+   * @throws BadRequestException if:
+   * - User already has the role
+   * - Attempting to grant superadmin without being superadmin
    */
   async grantRoleToUser(userId: string, role: UserRole, grantedBy: string): Promise<void> {
+    // Enforce: Only superadmin can grant superadmin role
+    if (role === 'superadmin') {
+      const isGranterSuperadmin = await this.hasRole(grantedBy, 'superadmin');
+      if (!isGranterSuperadmin) {
+        throw new BadRequestException(
+          'Only superadmin can grant superadmin role. Use direct database operations for superadmin management.',
+        );
+      }
+    }
+
     // Check if user already has this role
     const existingRole = await this.prisma.userRoleAssignment.findUnique({
       where: {
@@ -54,8 +71,22 @@ export class PermissionsService {
 
   /**
    * Revoke a role from a user
+   *
+   * SECURITY NOTE: SuperAdmin role cannot be revoked through this API.
+   * To demote a superadmin, use direct database operations (SQL or script).
+   *
+   * @throws BadRequestException if:
+   * - User does not have the role
+   * - Attempting to revoke superadmin role (use direct DB operations instead)
    */
   async revokeRoleFromUser(userId: string, role: UserRole): Promise<void> {
+    // Prevent superadmin demotion through API
+    if (role === 'superadmin') {
+      throw new BadRequestException(
+        'SuperAdmin role cannot be revoked through the API. Use direct database operations (SQL or script) for superadmin management.',
+      );
+    }
+
     const roleAssignment = await this.prisma.userRoleAssignment.findUnique({
       where: {
         userId_role: {
