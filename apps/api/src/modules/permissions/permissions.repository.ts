@@ -1,0 +1,220 @@
+import { Injectable } from '@nestjs/common';
+import type { Permission, ScholarPermissionType, UserRole } from '@sd/core-contracts';
+import { PrismaService } from '../../shared/db/prisma.service';
+import type { Locale } from '@sd/core-db';
+
+/**
+ * Permissions Repository
+ *
+ * Handles all database operations for permissions and roles management
+ */
+@Injectable()
+export class PermissionsRepository {
+  constructor(private readonly prisma: PrismaService) {}
+
+  // ========== UserRoleAssignment Operations ==========
+
+  async findRoleAssignment(userId: string, role: UserRole) {
+    return this.prisma.userRoleAssignment.findUnique({
+      where: {
+        userId_role: {
+          userId,
+          role,
+        },
+      },
+    });
+  }
+
+  async createRoleAssignment(userId: string, role: UserRole, grantedBy: string) {
+    return this.prisma.userRoleAssignment.create({
+      data: {
+        userId,
+        role,
+        grantedBy,
+      },
+    });
+  }
+
+  async deleteRoleAssignment(id: string) {
+    return this.prisma.userRoleAssignment.delete({
+      where: { id },
+    });
+  }
+
+  async getUserRoles(userId: string): Promise<UserRole[]> {
+    const roles = await this.prisma.userRoleAssignment.findMany({
+      where: { userId },
+      select: { role: true },
+    });
+    return roles.map((r) => r.role);
+  }
+
+  async hasRole(userId: string, role: UserRole): Promise<boolean> {
+    const roleAssignment = await this.findRoleAssignment(userId, role);
+    return !!roleAssignment;
+  }
+
+  // ========== UserPermission Operations ==========
+
+  async findUserPermission(userId: string, permission: Permission) {
+    return this.prisma.userPermission.findUnique({
+      where: {
+        userId_permission: {
+          userId,
+          permission,
+        },
+      },
+    });
+  }
+
+  async createUserPermission(userId: string, permission: Permission, grantedBy: string) {
+    return this.prisma.userPermission.create({
+      data: {
+        userId,
+        permission,
+        grantedBy,
+      },
+    });
+  }
+
+  async deleteUserPermission(id: string) {
+    return this.prisma.userPermission.delete({
+      where: { id },
+    });
+  }
+
+  async getUserPermissions(userId: string): Promise<Permission[]> {
+    const permissions = await this.prisma.userPermission.findMany({
+      where: { userId },
+      select: { permission: true },
+    });
+    return permissions.map((p) => p.permission);
+  }
+
+  async hasPermission(userId: string, permission: Permission): Promise<boolean> {
+    const userPermission = await this.findUserPermission(userId, permission);
+    return !!userPermission;
+  }
+
+  // ========== UserScholarRole Operations (Scholar Linking) ==========
+
+  async findScholarLink(userId: string, scholarId: string, permissionType: ScholarPermissionType) {
+    return this.prisma.userScholarRole.findFirst({
+      where: {
+        userId,
+        scholarId,
+        permissionType,
+      },
+    });
+  }
+
+  async findScholarLinkById(id: string) {
+    return this.prisma.userScholarRole.findUnique({
+      where: { id },
+    });
+  }
+
+  async createScholarLink(
+    userId: string,
+    scholarId: string,
+    permissionType: ScholarPermissionType,
+    createdBy: string,
+  ) {
+    return this.prisma.userScholarRole.create({
+      data: {
+        userId,
+        scholarId,
+        permissionType,
+        createdBy,
+      },
+    });
+  }
+
+  async deleteScholarLink(id: string) {
+    return this.prisma.userScholarRole.delete({
+      where: { id },
+    });
+  }
+
+  async canAccessScholar(userId: string, scholarId: string): Promise<boolean> {
+    const link = await this.prisma.userScholarRole.findFirst({
+      where: {
+        userId,
+        scholarId,
+      },
+    });
+    return !!link;
+  }
+
+  async getScholarsByUser(userId: string) {
+    return this.prisma.userScholarRole.findMany({
+      where: { userId },
+    });
+  }
+
+  // ========== UserTranslatorRole Operations (Language Scoping) ==========
+
+  async findTranslatorRole(userId: string, locale: Locale) {
+    return this.prisma.userTranslatorRole.findUnique({
+      where: {
+        userId_locale: {
+          userId,
+          locale,
+        },
+      },
+    });
+  }
+
+  async createTranslatorRole(
+    userId: string,
+    locale: Locale,
+    canPublish: boolean,
+    createdBy: string,
+  ) {
+    return this.prisma.userTranslatorRole.create({
+      data: {
+        userId,
+        locale,
+        canPublish,
+        createdBy,
+      },
+    });
+  }
+
+  async deleteTranslatorRole(id: string) {
+    return this.prisma.userTranslatorRole.delete({
+      where: { id },
+    });
+  }
+
+  async updateTranslatorPublishPermission(id: string, canPublish: boolean) {
+    return this.prisma.userTranslatorRole.update({
+      where: { id },
+      data: { canPublish },
+    });
+  }
+
+  async canTranslateToLocale(userId: string, locale: Locale): Promise<boolean> {
+    const translatorRole = await this.findTranslatorRole(userId, locale);
+    return !!translatorRole;
+  }
+
+  async canPublishTranslations(userId: string, locale: Locale): Promise<boolean> {
+    const translatorRole = await this.findTranslatorRole(userId, locale);
+    return translatorRole?.canPublish ?? false;
+  }
+
+  async getTranslatorLanguages(userId: string) {
+    return this.prisma.userTranslatorRole.findMany({
+      where: { userId },
+    });
+  }
+
+  // ========== Verification Operations ==========
+
+  async scholarExists(scholarId: string) {
+    return this.prisma.scholar.findUnique({
+      where: { id: scholarId },
+    });
+  }
+}

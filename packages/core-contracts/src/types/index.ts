@@ -230,6 +230,7 @@ export {
 } from "../types/progress.types";
 export {
   PermissionEnum,
+  Permissions,
   type Permission,
   UserRoleEnum,
   type UserRole,
