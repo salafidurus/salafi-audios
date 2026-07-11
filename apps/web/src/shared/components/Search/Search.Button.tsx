@@ -1,5 +1,6 @@
 "use client";
 
+import { SearchGlyph } from "./SearchGlyph";
 import styles from "./Search.module.css";
 
 export interface SearchButtonProps {
@@ -42,23 +43,5 @@ export function SearchButton({ label, onClick }: SearchButtonProps) {
         <span className={styles.barPlaceholder}>{label}</span>
       </button>
     </div>
-  );
-}
-
-function SearchGlyph() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 20 20"
-      width="16"
-      height="16"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      className={styles.barSearchIcon}
-    >
-      <circle cx="9" cy="9" r="6" />
-      <path d="M14.5 14.5L18 18" />
-    </svg>
   );
 }

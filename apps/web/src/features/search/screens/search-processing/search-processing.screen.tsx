@@ -68,6 +68,7 @@ export function SearchProcessingScreen({ searchKey }: SearchProcessingScreenProp
           placeholder={t("search.placeholder", "Search")}
           value={query}
           onChange={setQuery}
+          autoFocus
         />
 
         {/* Filter: Always visible and horizontally scrollable */}

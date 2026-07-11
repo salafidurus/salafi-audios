@@ -1,6 +1,8 @@
 "use client";
 
+import { useRef, useEffect } from "react";
 import { X } from "lucide-react";
+import { SearchGlyph } from "./SearchGlyph";
 import styles from "./Search.module.css";
 
 export interface SearchBarProps {
@@ -14,6 +16,8 @@ export interface SearchBarProps {
   onClear?: () => void;
   /** Optional className for container */
   className?: string;
+  /** Auto-focus the input on mount */
+  autoFocus?: boolean;
 }
 
 /**
@@ -44,7 +48,21 @@ export function SearchBar({
   placeholder = "Search...",
   onClear,
   className,
+  autoFocus,
 }: SearchBarProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!autoFocus || !inputRef.current) {
+      return;
+    }
+    // Use setTimeout to ensure focus happens after render
+    const timeoutId = setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
+    return () => clearTimeout(timeoutId);
+  }, [autoFocus]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.value);
   };
@@ -61,6 +79,7 @@ export function SearchBar({
       <label className={styles.barInputWrapper} aria-label="Search">
         <SearchGlyph />
         <input
+          ref={inputRef}
           type="text"
           className={styles.barInput}
           placeholder={placeholder}
@@ -80,21 +99,5 @@ export function SearchBar({
         )}
       </label>
     </div>
-  );
-}
-
-function SearchGlyph() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 20 20"
-      className={styles.barSearchIcon}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    >
-      <circle cx="9" cy="9" r="6" />
-      <path d="M14.5 14.5L18 18" />
-    </svg>
   );
 }
