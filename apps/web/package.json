@@ -29,6 +29,7 @@
     "@sd/domain-content": "workspace:*",
     "@sd/domain-live": "workspace:*",
     "@sd/domain-search": "workspace:*",
+    "@sd/utils-error": "workspace:*",
     "@tanstack/react-query": "catalog:",
     "better-auth": "catalog:",
     "clsx": "^2.1.1",

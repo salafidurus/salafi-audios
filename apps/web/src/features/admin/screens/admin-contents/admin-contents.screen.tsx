@@ -6,6 +6,7 @@ import { Plus, Trash2, Edit } from "lucide-react";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
+import { Search } from "@/shared/components/Search";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type {
   TopicDetailDto,
@@ -17,9 +18,7 @@ import {
   fetchAdminLectures,
   fetchAdminLectureDetail,
 } from "@/features/admin/api/admin-lectures.api";
-import { SearchBar } from "@/shared/components/SearchBar";
-import { ListContainer } from "@/shared/components/ListContainer";
-import { ListItem } from "@/shared/components/ListItem";
+import { List } from "@/shared/components/List";
 import { TopicFormModal, type TopicForEdit } from "@/features/admin/components/TopicFormModal";
 import { AudioUploader } from "@/features/admin/components/AudioUploader/AudioUploader";
 import { LectureEditModal } from "@/features/admin/components/LectureEditModal";
@@ -193,7 +192,7 @@ export function AdminContentsScreen() {
       />
 
       <div className={styles.content}>
-        <SearchBar
+        <Search.Bar
           value={searchQuery}
           onChange={setSearchQuery}
           placeholder={activeTab === "topics" ? "Search topics..." : "Search listings..."}
@@ -202,9 +201,9 @@ export function AdminContentsScreen() {
         {activeTab === "topics" && (
           <>
             {filteredTopics.length > 0 ? (
-              <ListContainer>
+              <List>
                 {filteredTopics.map((topic) => (
-                  <ListItem key={topic.slug} interactive className={styles.topicItem}>
+                  <List.Item key={topic.slug} interactive className={styles.topicItem}>
                     <div className={styles.topicInfo}>
                       <span className={styles.topicName}>{topic.name}</span>
                       <span className={styles.topicSlug}>{topic.slug}</span>
@@ -220,9 +219,9 @@ export function AdminContentsScreen() {
                         onClick={() => handleDeleteClick(topic.slug, topic.name)}
                       />
                     </div>
-                  </ListItem>
+                  </List.Item>
                 ))}
-              </ListContainer>
+              </List>
             ) : (
               <div className={styles.empty}>
                 {searchQuery ? "No topics match your search." : "No topics yet."}
@@ -234,9 +233,9 @@ export function AdminContentsScreen() {
         {activeTab === "listings" && (
           <>
             {listings.length > 0 ? (
-              <ListContainer>
+              <List>
                 {listings.map((listing) => (
-                  <ListItem key={listing.id} interactive className={styles.listingItem}>
+                  <List.Item key={listing.id} interactive className={styles.listingItem}>
                     <div className={styles.listingInfo}>
                       <span className={styles.listingTitle}>{listing.title}</span>
                       <span className={styles.listingMeta}>
@@ -252,9 +251,9 @@ export function AdminContentsScreen() {
                         <Edit size={14} />
                       </Button>
                     </div>
-                  </ListItem>
+                  </List.Item>
                 ))}
-              </ListContainer>
+              </List>
             ) : (
               <div className={styles.empty}>
                 {searchQuery

@@ -1,14 +1,11 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useMemo } from "react";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
-import { SearchFilter } from "@/features/search/components/SearchFilter/SearchFilter";
-import {
-  SearchInput,
-  type SearchInputRef,
-} from "@/features/search/components/SearchInput/SearchInput";
+import { Search } from "@/shared/components/Search";
 import { SearchResultItem } from "@/features/search/components/SearchResultItem/SearchResultItem";
-import { SearchResultsList } from "@/features/search/components/SearchResultsList/SearchResultsList";
+import { SearchResultEmpty } from "@/features/search/components/SearchResultEmpty/SearchResultEmpty";
+import { List } from "@/shared/components/List";
 import type { SearchResultRow } from "@sd/domain-search";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { useSearchProcessing } from "@sd/domain-search";
@@ -20,12 +17,9 @@ import styles from "./search-processing.screen.module.css";
 
 export type SearchProcessingScreenProps = {
   searchKey?: string;
-  onBackPress?: () => void;
 };
 
-export function SearchProcessingScreen({ searchKey, onBackPress }: SearchProcessingScreenProps) {
-  const isDesktop = useIsDesktop();
-  const inputRef = useRef<SearchInputRef>(null);
+export function SearchProcessingScreen({ searchKey }: SearchProcessingScreenProps) {
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
   const {
@@ -41,9 +35,15 @@ export function SearchProcessingScreen({ searchKey, onBackPress }: SearchProcess
   } = useSearchProcessing({ prefill: searchKey, showOriginal });
   const { push } = useRouter();
 
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+  // Transform topics into chips format for Search.Filter
+  const filterChips = useMemo(() => {
+    return topics
+      .toSorted((a, b) => a.name.localeCompare(b.name))
+      .map((topic) => ({
+        id: topic.slug,
+        label: topic.name,
+      }));
+  }, [topics]);
 
   const handleItemPress = (item: SearchResultRow) => {
     const [kind, id] = item.id.split(":");
@@ -57,64 +57,48 @@ export function SearchProcessingScreen({ searchKey, onBackPress }: SearchProcess
     }
   };
 
-  if (isDesktop) {
-    return (
-      <ScreenView>
-        <div
-          className={styles.stickyHeader}
-          style={{
-            background: "color-mix(in srgb, var(--surface-canvas) 80%, transparent)",
-            backdropFilter: "blur(8px)",
-            WebkitBackdropFilter: "blur(8px)",
-          }}
-        >
-          <div className="flex flex-col gap-[var(--space-component-gap-md)]">
-            <SearchInput
-              ref={inputRef}
-              placeholder={t("search.placeholder", "Search")}
-              value={query}
-              onChange={setQuery}
-              autoFocus
-            />
-            <SearchFilter value={filter} onChange={setFilter} topics={topics} />
-          </div>
-        </div>
-        <section className="pb-[var(--space-layout-page-y)]">
-          <SearchResultsList
-            items={items}
-            isFetching={isFetching}
-            shouldSearch={shouldSearch}
-            errorMessage={errorMessage}
-            renderItem={(item) => (
-              <SearchResultItem item={item} onPress={() => handleItemPress(item)} />
-            )}
-          />
-        </section>
-      </ScreenView>
-    );
-  }
+  const shouldShowEmpty = items.length === 0 || Boolean(errorMessage);
 
   return (
     <ScreenView contentStyle={{ flex: 1 }}>
-      <div className={styles.searchGroup}>
-        <SearchInput
-          ref={inputRef}
+      {/* Unified sticky header */}
+      <div className={styles.stickyHeader}>
+        {/* Search bar */}
+        <Search.Bar
           placeholder={t("search.placeholder", "Search")}
           value={query}
           onChange={setQuery}
-          onBackPress={onBackPress}
+          autoFocus
         />
-        {shouldSearch ? <SearchFilter value={filter} onChange={setFilter} topics={topics} /> : null}
+
+        {/* Filter: Always visible and horizontally scrollable */}
+        <Search.Filter
+          chips={filterChips}
+          selected={filter}
+          onChipChange={(chipId: string) => {
+            setFilter(filter.includes(chipId) ? [] : [chipId]);
+          }}
+        />
       </div>
-      <SearchResultsList
-        items={items}
-        isFetching={isFetching}
-        shouldSearch={shouldSearch}
-        errorMessage={errorMessage}
-        renderItem={(item: SearchResultRow) => (
-          <SearchResultItem item={item} onPress={() => handleItemPress(item)} />
+
+      {/* Results list */}
+      <section className={styles.results}>
+        {shouldShowEmpty ? (
+          <List>
+            <SearchResultEmpty
+              shouldSearch={shouldSearch}
+              isFetching={isFetching}
+              errorMessage={errorMessage}
+            />
+          </List>
+        ) : (
+          <List>
+            {items.map((item) => (
+              <SearchResultItem key={item.id} item={item} onPress={() => handleItemPress(item)} />
+            ))}
+          </List>
         )}
-      />
+      </section>
     </ScreenView>
   );
 }

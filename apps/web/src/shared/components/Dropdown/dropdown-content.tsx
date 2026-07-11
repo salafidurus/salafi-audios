@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { LazyMotion, m, domAnimation, AnimatePresence } from "framer-motion";
 import { useFloating, offset, flip, shift, autoUpdate } from "@floating-ui/react";
-import { SearchBar } from "@/shared/components/SearchBar";
+import { Search } from "@/shared/components/Search";
 import { useDropdownContext } from "./context";
 import styles from "./dropdown.module.css";
 
@@ -155,7 +155,7 @@ export function DropdownContent({ children, searchable = false, className }: Dro
           >
             {searchable && (
               <div className={styles.searchWrapper}>
-                <SearchBar
+                <Search.Bar
                   value={searchQuery}
                   onChange={handleSearchChange}
                   placeholder="Search..."

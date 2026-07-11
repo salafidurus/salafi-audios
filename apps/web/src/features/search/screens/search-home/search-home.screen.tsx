@@ -2,7 +2,7 @@
 
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { QuickBrowse } from "@/features/search/components/QuickBrowse/QuickBrowse";
-import { SearchButton } from "@/features/search/components/SearchButton/SearchButton";
+import { Search } from "@/shared/components/Search";
 import { TitleText } from "@/features/search/components/TitleText/TitleText";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { useQuickBrowse } from "@sd/domain-search";
@@ -34,7 +34,7 @@ export function SearchHomeScreen({
         <section className={styles.desktopSection}>
           <div className={styles.desktopSearchContainer}>
             <TitleText>Find a lesson</TitleText>
-            <SearchButton label="What do you want to listen to?" onClick={onOpenSearch} />
+            <Search.Button label="What do you want to listen to?" onClick={onOpenSearch} />
           </div>
           <QuickBrowse
             isLoading={isLoading}
@@ -58,7 +58,7 @@ export function SearchHomeScreen({
           <div className={styles.header}>
             <TitleText>Find a lesson</TitleText>
           </div>
-          <SearchButton label="What do you want to listen to?" onClick={onOpenSearch} />
+          <Search.Button label="What do you want to listen to?" onClick={onOpenSearch} />
         </div>
         <QuickBrowse
           isLoading={isLoading}

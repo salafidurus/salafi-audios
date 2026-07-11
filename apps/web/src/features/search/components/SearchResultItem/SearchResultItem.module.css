@@ -1,24 +1,10 @@
-.card {
+/* Content wrapper: keeps media and body side-by-side on all breakpoints */
+.content {
   display: flex;
-  cursor: pointer;
+  flex-direction: row;
   align-items: center;
+  width: 100%;
   gap: var(--space-component-gap-md);
-  border-radius: var(--radius-component-card);
-  border: 1px solid transparent;
-  background: transparent;
-  padding: 0.75rem;
-  transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
-}
-
-.card:hover {
-  border-color: var(--border-hover);
-  background: var(--surface-hover);
-  box-shadow: var(--shadow-sm);
-}
-
-.card:active {
-  background: var(--surface-active);
-  border-color: var(--border-active);
 }
 
 .media {
@@ -31,9 +17,9 @@
   background: var(--surface-subtle);
 }
 
-@media (min-width: 1280px) {
+@media (min-width: 640px) {
   .media {
-    width: 10%;
+    width: 14%;
   }
 }
 
@@ -50,11 +36,8 @@
 }
 
 .body {
-  display: flex;
   min-width: 0;
   flex: 1;
-  flex-direction: column;
-  gap: var(--space-scale-xs);
 }
 
 .metaRow {
@@ -71,75 +54,11 @@
   }
 }
 
-.playButton {
-  display: flex;
-  width: 10%;
-  flex-shrink: 0;
-  justify-content: center;
+/* Mobile: button inside List.Item.Actions should be full width */
+@media (max-width: 640px) {
+  :global(button) {
+    width: 100%;
+    margin-top: var(--space-component-gap-sm);
+  }
 }
 
-.playButtonInner {
-  display: flex;
-  width: 2.25rem;
-  height: 2.25rem;
-  align-items: center;
-  justify-content: center;
-  border-radius: 9999px;
-  border: 1px solid var(--border-default);
-  background: var(--surface-subtle);
-  color: var(--content-muted);
-  transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
-}
-
-.playButtonInner:hover {
-  border-color: var(--border-primary);
-  background: var(--surface-selected);
-  color: var(--content-primary);
-}
-
-/* Mobile card (button) */
-.mobileCard {
-  display: flex;
-  width: 100%;
-  cursor: pointer;
-  flex-direction: row;
-  align-items: center;
-  gap: var(--space-component-gap-md);
-  border-radius: var(--radius-component-card);
-  border: 1px solid transparent;
-  background: transparent;
-  padding: var(--space-component-card-padding);
-  text-align: start;
-  transition: background 100ms ease, border-color 100ms ease;
-}
-
-.mobileCard:hover {
-  background: var(--surface-hover);
-  border-color: var(--border-hover);
-}
-
-.mobileCard:active {
-  background: var(--surface-active);
-  border-color: var(--border-active);
-}
-
-.mobileMedia {
-  display: flex;
-  width: 20%;
-  flex-shrink: 0;
-  aspect-ratio: 4 / 5;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border-radius: var(--radius-component-panel-sm);
-  background: var(--surface-subtle);
-}
-
-.mobileBody {
-  display: flex;
-  min-width: 0;
-  flex: 1;
-  flex-direction: column;
-  gap: var(--space-scale-xs);
-  overflow: hidden;
-}

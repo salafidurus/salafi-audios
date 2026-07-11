@@ -7,12 +7,13 @@ import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { Button } from "@/shared/components/Button";
+import { Search } from "@/shared/components/Search";
 import { fetchAdminLectures, fetchAdminLectureDetail } from "../../api/admin-lectures.api";
 import { AudioUploader } from "../../components/AudioUploader/AudioUploader";
 import { LectureEditModal } from "../../components/LectureEditModal/LectureEditModal";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import styles from "./admin-lectures.screen.module.css";
-import { Search, Plus, X, Edit } from "lucide-react";
+import { Plus, X, Edit } from "lucide-react";
 
 type AudioData = {
   audioKey: string;
@@ -121,50 +122,24 @@ export function AdminLecturesScreen() {
       )}
 
       <div className={styles.filterBar}>
-        <div className={styles.searchWrapper}>
-          <Search className={styles.searchIcon} size={!isMobile ? 18 : 16} />
-          <input
-            type="text"
-            placeholder="Search lectures..."
-            aria-label="Search lectures"
-            className={styles.searchInput}
-            value={search}
-            onChange={(e) => {
-              dispatch({ search: e.target.value, page: 1 });
-            }}
-          />
-        </div>
+        <Search.Bar
+          value={search}
+          onChange={(value: string) => dispatch({ search: value, page: 1 })}
+          placeholder="Search lectures..."
+        />
 
-        <div className={styles.statusTabs}>
-          <button
-            type="button"
-            className={`${styles.tab} ${status === "" ? styles.tabActive : ""}`}
-            onClick={() => dispatch({ status: "", page: 1 })}
-          >
-            {!isMobile ? "All" : "All"}
-          </button>
-          <button
-            type="button"
-            className={`${styles.tab} ${status === "published" ? styles.tabActive : ""}`}
-            onClick={() => dispatch({ status: "published", page: 1 })}
-          >
-            {!isMobile ? "Published" : "Pub"}
-          </button>
-          <button
-            type="button"
-            className={`${styles.tab} ${status === "draft" ? styles.tabActive : ""}`}
-            onClick={() => dispatch({ status: "draft", page: 1 })}
-          >
-            {!isMobile ? "Draft" : "Draft"}
-          </button>
-          <button
-            type="button"
-            className={`${styles.tab} ${status === "archived" ? styles.tabActive : ""}`}
-            onClick={() => dispatch({ status: "archived", page: 1 })}
-          >
-            {!isMobile ? "Archived" : "Arch"}
-          </button>
-        </div>
+        <Search.Filter
+          chips={[
+            { id: "", label: !isMobile ? "All" : "All" },
+            { id: "published", label: !isMobile ? "Published" : "Pub" },
+            { id: "draft", label: !isMobile ? "Draft" : "Draft" },
+            { id: "archived", label: !isMobile ? "Archived" : "Arch" },
+          ]}
+          selected={status ? [status] : []}
+          onChipChange={(chipId: string) => {
+            dispatch({ status: status === chipId ? "" : chipId, page: 1 });
+          }}
+        />
       </div>
 
       {isFetching ? (

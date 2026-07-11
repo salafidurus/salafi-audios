@@ -1,0 +1,135 @@
+.container {
+  position: fixed;
+  bottom: var(--space-component-gap-md);
+  right: var(--space-component-gap-md);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-sm);
+  max-width: 420px;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-component-gap-sm) var(--space-component-gap-md);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-canvas);
+  border: 1px solid var(--border-default);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: slideIn 0.3s ease-out;
+  pointer-events: auto;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-component-gap-sm);
+  flex: 1;
+}
+
+.icon {
+  flex-shrink: 0;
+}
+
+.message {
+  color: var(--content-strong);
+  font-size: var(--typo-body-sm-font-size);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.closeButton {
+  flex-shrink: 0;
+  margin-left: var(--space-component-gap-sm);
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--content-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.closeButton:hover {
+  color: var(--content-strong);
+}
+
+/* Type variants */
+.error {
+  background-color: hsl(0, 100%, 97%);
+  border-color: hsl(0, 100%, 88%);
+}
+
+.error .icon {
+  color: var(--color-error);
+}
+
+.error .message {
+  color: var(--color-error);
+}
+
+.success {
+  background-color: hsl(140, 100%, 96%);
+  border-color: hsl(140, 100%, 85%);
+}
+
+.success .icon {
+  color: var(--color-success);
+}
+
+.success .message {
+  color: var(--color-success);
+}
+
+.warning {
+  background-color: hsl(45, 100%, 96%);
+  border-color: hsl(45, 100%, 85%);
+}
+
+.warning .icon {
+  color: var(--color-warning);
+}
+
+.warning .message {
+  color: var(--color-warning);
+}
+
+.info {
+  background-color: hsl(220, 100%, 96%);
+  border-color: hsl(220, 100%, 85%);
+}
+
+.info .icon {
+  color: var(--color-info);
+}
+
+.info .message {
+  color: var(--color-info);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    right: var(--space-component-gap-sm);
+  }
+
+  .message {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+}

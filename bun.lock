@@ -198,6 +198,7 @@
         "@sd/domain-content": "workspace:*",
         "@sd/domain-live": "workspace:*",
         "@sd/domain-search": "workspace:*",
+        "@sd/utils-error": "workspace:*",
         "@tanstack/react-query": "catalog:",
         "better-auth": "catalog:",
         "clsx": "^2.1.1",
@@ -342,6 +343,14 @@
       },
       "peerDependencies": {
         "react": "^19.0.0",
+      },
+    },
+    "packages/utils-error": {
+      "name": "@sd/utils-error",
+      "version": "0.0.0",
+      "devDependencies": {
+        "rimraf": "catalog:",
+        "tsup": "catalog:",
       },
     },
   },
@@ -1495,6 +1504,8 @@
     "@sd/domain-live": ["@sd/domain-live@workspace:packages/domain-live"],
 
     "@sd/domain-search": ["@sd/domain-search@workspace:packages/domain-search"],
+
+    "@sd/utils-error": ["@sd/utils-error@workspace:packages/utils-error"],
 
     "@sec-ant/readable-stream": ["@sec-ant/readable-stream@0.4.1", "", {}, "sha512-831qok9r2t8AlxLko40y2ebgSDhenenCatLVeW/uBtnHPyhHOvG0C7TvfgecV+wHzIm5KUICgzmVpWS+IMEAeg=="],
 

@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
 import { useExploreFollowingScreen } from "@sd/domain-content";
-import { ListContainer } from "@/shared/components/ListContainer";
+import { List } from "@/shared/components/List";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { FeedListRow } from "../components/feed-list-row/feed-list-row";
@@ -33,7 +33,7 @@ function FeedBlocks({ items, onNavigateToLecture, onNavigateToScholar }: FeedBlo
 
   const flushCards = (key: string) => {
     if (cards.length === 0) return;
-    blocks.push(<ListContainer key={`list-${key}`}>{cards}</ListContainer>);
+    blocks.push(<List key={`list-${key}`}>{cards}</List>);
     cards = [];
   };
 
