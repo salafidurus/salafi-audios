@@ -96,6 +96,7 @@ export function SearchResultItem({ item, onPress }: SearchResultItemProps) {
           size={isDesktop ? "icon" : "sm"}
           aria-label={`Play ${item.title}`}
           icon={<Play size={16} fill="currentColor" />}
+          onClick={(e) => e.stopPropagation()}
         >
           {!isDesktop && "Play"}
         </Button>
