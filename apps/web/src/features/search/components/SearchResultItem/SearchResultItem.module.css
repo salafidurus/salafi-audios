@@ -6,7 +6,7 @@
   width: 100%;
 }
 
-/* Keep horizontal layout on mobile (override List.Item's mobile stacking) */
+/* Keep media and body side-by-side on mobile (override List.Item's mobile stacking) */
 @media (max-width: 640px) {
   .card {
     flex-direction: row;
