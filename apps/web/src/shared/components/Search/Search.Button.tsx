@@ -1,9 +1,5 @@
 "use client";
 
-import { useState } from "react";
-import { Search } from "lucide-react";
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
-import { Button } from "@/shared/components/Button";
 import styles from "./Search.module.css";
 
 export interface SearchButtonProps {
@@ -14,11 +10,11 @@ export interface SearchButtonProps {
 }
 
 /**
- * Search.Button — Responsive search trigger button.
+ * Search.Button — Visually identical to Search.Bar but clickable.
  *
- * Adapts to screen size:
- * - Desktop: Full-width surface button with search glyph and text label
- * - Mobile: Pill-shaped button with search icon only, visual press feedback
+ * Renders the same search input appearance as Search.Bar, but instead of
+ * being an editable input, it's a clickable button that navigates to the
+ * search page or performs another action.
  *
  * Usage:
  * ```tsx
@@ -29,36 +25,24 @@ export interface SearchButtonProps {
  * ```
  */
 export function SearchButton({ label, onClick }: SearchButtonProps) {
-  const isDesktop = useIsDesktop();
-  const [isPressed, setIsPressed] = useState(false);
-
-  if (isDesktop) {
-    return (
-      <Button
-        variant="surface"
-        size="lg"
-        fullWidth
-        className={styles.searchButton}
-        icon={<SearchGlyph />}
-        label={label}
-        onClick={onClick}
-        aria-label={label}
-      />
-    );
-  }
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    onClick?.();
+  };
 
   return (
-    <Button
-      variant="surface"
-      fullWidth
-      className={`${styles.pillButton} ${isPressed ? styles.pressed : ""}`}
-      icon={<Search size={20} />}
-      label={label}
-      onClick={onClick}
-      onMouseDown={() => setIsPressed(true)}
-      onMouseUp={() => setIsPressed(false)}
-      onMouseLeave={() => setIsPressed(false)}
-    />
+    <div className={styles.barContainer}>
+      <button
+        type="button"
+        className={styles.barInputWrapper}
+        onClick={handleClick}
+        aria-label={label}
+        style={{ all: "unset", display: "contents" }}
+      >
+        <SearchGlyph />
+        <span className={styles.barPlaceholder}>{label}</span>
+      </button>
+    </div>
   );
 }
 
@@ -72,7 +56,7 @@ function SearchGlyph() {
       fill="none"
       stroke="currentColor"
       strokeWidth="1.8"
-      className={styles.glyph}
+      className={styles.barSearchIcon}
     >
       <circle cx="9" cy="9" r="6" />
       <path d="M14.5 14.5L18 18" />

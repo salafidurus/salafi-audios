@@ -7,6 +7,7 @@ Standardized compound component system for search input and filtering with consi
 ```text
 Search                  — Namespace object for compound components
 ├── Search.Bar          — Search input with icon and clear button
+├── Search.Button       — Search trigger button (visually identical to Bar)
 └── Search.Filter       — Filter chip group with toggle selection
 ```
 
@@ -68,6 +69,11 @@ const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
 - `placeholder?: string` — Input placeholder text (default: `"Search..."`)
 - `disabled?: boolean` — Disable input and clear button
 - `className?: string` — Optional additional CSS class
+
+### Search.Button
+
+- `label: string` — Placeholder text displayed in the button (e.g., "What do you want to listen to?")
+- `onClick?: () => void` — Callback when the button is clicked (typically navigates to search page)
 
 ### Search.Filter
 
@@ -162,6 +168,17 @@ const [selectedTags, setSelectedTags] = useState<string[]>([]);
 />;
 ```
 
+### Search Button Trigger
+
+```tsx
+<Search.Button
+  label="What do you want to listen to?"
+  onClick={() => {
+    navigateToSearchPage();
+  }}
+/>
+```
+
 ### Search Bar with Clear Callback
 
 ```tsx
@@ -213,6 +230,15 @@ const [selectedTags, setSelectedTags] = useState<string[]>([]);
 - **Input**: Fills remaining width, no border (underline style via border-bottom)
 - **Clear Button**: Appears only when `value.length > 0`, right-aligned
 - **Spacing**: `--space-component-gap-sm` between icon and input
+
+### Search.Button
+
+- **Layout**: Identical to Search.Bar visually
+- **Search Icon**: 20x20px, left-aligned inside input wrapper
+- **Placeholder Text**: Fills remaining width, styled like Search.Bar placeholder
+- **Interaction**: Entire component is clickable (button), navigates on click
+- **Spacing**: `--space-component-gap-sm` between icon and text
+- **No Clear Button**: Unlike Search.Bar, does not have a clear button
 
 ### Search.Filter
 
