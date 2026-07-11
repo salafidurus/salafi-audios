@@ -1,14 +1,9 @@
 .container {
-  margin-top: var(--space-scale-3xl);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-component-card);
-  border: 1px solid var(--border-subtle);
-  background: var(--surface-subtle);
-  padding: var(--space-scale-3xl) var(--space-component-card-padding);
+  width: 100%;
   text-align: center;
-  color: var(--content-muted);
 }
 
 .message {

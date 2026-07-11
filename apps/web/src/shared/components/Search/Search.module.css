@@ -86,6 +86,14 @@
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   padding-bottom: var(--space-scale-xs);
+  /* Hide scrollbar while keeping it scrollable */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* Hide scrollbar in webkit browsers (Chrome, Safari) */
+.filterContainer::-webkit-scrollbar {
+  display: none;
 }
 
 .filterChip {

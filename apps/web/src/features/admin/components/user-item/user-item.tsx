@@ -38,7 +38,7 @@ export function UserItem({ user, onManagePermissions }: UserItemProps): ReactNod
 
       <div className={styles.joined}>Joined {new Date(user.createdAt).toLocaleDateString()}</div>
 
-      <List.Item.Actions>
+      <List.Item.Actions widthPercentDesktop="30%">
         <div onClick={(e) => e.stopPropagation()}>
           <PermissionGate requires="manage:users">
             <button type="button" className={styles.manageButton} onClick={onManagePermissions}>

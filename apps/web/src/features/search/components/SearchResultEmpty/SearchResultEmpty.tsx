@@ -25,8 +25,10 @@ export function SearchResultEmpty({
     : t("search.startTyping", "Start typing to search.");
 
   return (
-    <List.Item className={styles.container}>
-      <p className={styles.message}>{message}</p>
+    <List.Item>
+      <div className={styles.container}>
+        <p className={styles.message}>{message}</p>
+      </div>
     </List.Item>
   );
 }

@@ -6,6 +6,7 @@ import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { List } from "@/shared/components/List";
 import { Button } from "@/shared/components/Button";
 import { MarqueeText } from "../MarqueeText/MarqueeText";
+import { usePlayListing } from "@/features/audio";
 import type { SearchResultRow } from "@sd/domain-search";
 import styles from "./SearchResultItem.module.css";
 
@@ -35,6 +36,13 @@ function formatDuration(durationSeconds?: number): string {
 
 export function SearchResultItem({ item, onPress }: SearchResultItemProps) {
   const isDesktop = useIsDesktop();
+  const { play, isLoading, error } = usePlayListing(item.id);
+
+  const handlePlayClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    // Stop event propagation to prevent List.Item onClick
+    e.stopPropagation();
+    await play();
+  };
 
   return (
     <List.Item interactive onClick={onPress} className={styles.card}>
@@ -96,6 +104,8 @@ export function SearchResultItem({ item, onPress }: SearchResultItemProps) {
           size={isDesktop ? "icon" : "sm"}
           aria-label={`Play ${item.title}`}
           icon={<Play size={16} fill="currentColor" />}
+          onClick={handlePlayClick}
+          disabled={isLoading}
         >
           {!isDesktop && "Play"}
         </Button>

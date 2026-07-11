@@ -2,7 +2,10 @@
 .actions {
   display: flex;
   flex-shrink: 0;
+  width: var(--actions-width-desktop, 10%);
   gap: var(--space-component-gap-sm);
+  align-items: center;
+  justify-content: center;
 }
 
 /* Desktop/Tablet orientation: horizontal (default) */
@@ -21,6 +24,7 @@
 /* Mobile responsive: actions appear below content (parent ListItem flex-direction: column) */
 @media (max-width: 640px) {
   .actions {
+    width: 100%;
     margin-left: 0;
     gap: var(--space-scale-xs);
   }

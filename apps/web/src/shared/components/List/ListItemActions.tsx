@@ -10,6 +10,8 @@ export type ListItemActionsProps = {
   orientation?: "horizontal" | "vertical";
   /** Controls action stacking on mobile: 'horizontal' (default) for row layout, 'vertical' for column */
   mobileOrientation?: "horizontal" | "vertical";
+  /** Fixed width percentage for actions on desktop/tablet (e.g. '10%', '20%'). Default: '10%'. Mobile is 100% */
+  widthPercentDesktop?: string;
 };
 
 /**
@@ -36,11 +38,13 @@ export function ListItemActions({
   className,
   orientation = "horizontal",
   mobileOrientation = "horizontal",
+  widthPercentDesktop = "10%",
 }: ListItemActionsProps) {
   return (
     <div
       data-testid="list-item-actions"
       className={`${styles.actions} ${styles[`orientation-${orientation}`]} ${styles[`mobile-orientation-${mobileOrientation}`]} ${className ?? ""}`}
+      style={{ "--actions-width-desktop": widthPercentDesktop } as React.CSSProperties}
     >
       {children}
     </div>

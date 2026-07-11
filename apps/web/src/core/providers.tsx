@@ -13,6 +13,7 @@ import { createQueryClient } from "@sd/core-contracts/query";
 import type { Locale } from "@sd/core-contracts";
 import { authClient } from "@/core/auth/auth-client";
 import { clearBearerToken, getBearerToken } from "@/core/auth/bearer-token";
+import { ToastContainer } from "@/core/toast";
 import { createI18n } from "./i18n/i18n";
 import { setLocaleCookie } from "./i18n/locale-cookie";
 
@@ -50,7 +51,10 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
 
   return (
     <I18nextProvider i18n={i18n}>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        {children}
+        <ToastContainer />
+      </QueryClientProvider>
     </I18nextProvider>
   );
 }
