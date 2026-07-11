@@ -49,10 +49,14 @@ import type { SearchBarProps } from "./Search.Bar";
 import { SearchFilter } from "./Search.Filter";
 import type { SearchFilterProps, FilterChip } from "./Search.Filter";
 
+import { SearchButton } from "./Search.Button";
+import type { SearchButtonProps } from "./Search.Button";
+
 export const Search = Object.assign({
   Bar: SearchBar,
   Filter: SearchFilter,
+  Button: SearchButton,
 });
 
 // Re-export types
-export type { SearchBarProps, SearchFilterProps, FilterChip };
+export type { SearchBarProps, SearchFilterProps, FilterChip, SearchButtonProps };
