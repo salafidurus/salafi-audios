@@ -25,7 +25,17 @@ export function ListItem({ children, onClick, className, interactive = false }: 
   const isClickable = Boolean(onClick);
   const showHoverStates = isClickable || interactive;
 
-  const handleClick = (_e: MouseEvent<HTMLDivElement>) => {
+  const handleClick = (e: MouseEvent<HTMLDivElement>) => {
+    // Don't trigger onClick if the click came from a nested interactive element
+    const target = e.target as HTMLElement;
+    if (
+      target.tagName === "BUTTON" ||
+      target.closest("button") ||
+      target.closest("[data-testid='list-item-actions']")
+    ) {
+      return;
+    }
+
     if (onClick) {
       onClick();
     }
