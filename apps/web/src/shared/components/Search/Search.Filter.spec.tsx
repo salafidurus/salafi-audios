@@ -18,7 +18,9 @@ describe("SearchFilter", () => {
   });
 
   it("renders no chips when chips array is empty", () => {
-    render(<SearchFilter chips={[]} selected={[]} onChipChange={() => {}} />);
+    render(
+      <SearchFilter chips={[]} selected={[]} onChipChange={() => {}} includeAllOption={false} />,
+    );
 
     const buttons = screen.queryAllByRole("button");
     expect(buttons).toHaveLength(0);
@@ -122,7 +124,7 @@ describe("SearchFilter", () => {
     expect(handleRemove).toHaveBeenCalledWith("lecture");
   });
 
-  it("does not trigger onChipChange when close button is clicked", () => {
+  it("triggers both onChipRemove and onChipChange when close button is clicked", () => {
     const handleChipChange = vi.fn();
     const handleRemove = vi.fn();
 
@@ -139,7 +141,7 @@ describe("SearchFilter", () => {
     fireEvent.click(lectureCloseButton);
 
     expect(handleRemove).toHaveBeenCalledWith("lecture");
-    expect(handleChipChange).not.toHaveBeenCalled();
+    expect(handleChipChange).toHaveBeenCalledWith("lecture");
   });
 
   it("does not call onChipRemove if not provided", () => {
@@ -222,9 +224,11 @@ describe("SearchFilter", () => {
     render(<SearchFilter chips={mockChips} selected={[]} onChipChange={() => {}} />);
 
     const buttons = screen.getAllByRole("button");
-    expect(buttons[0]).toHaveTextContent("Lectures");
-    expect(buttons[1]).toHaveTextContent("Articles");
-    expect(buttons[2]).toHaveTextContent("Series");
+    // All chip is rendered first by default (index 0)
+    expect(buttons[0]).toHaveTextContent("All");
+    expect(buttons[1]).toHaveTextContent("Lectures");
+    expect(buttons[2]).toHaveTextContent("Articles");
+    expect(buttons[3]).toHaveTextContent("Series");
   });
 
   it("handles chip with special characters in label", () => {

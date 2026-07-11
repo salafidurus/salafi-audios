@@ -1,6 +1,7 @@
 import { vi, type Mock } from "vitest";
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SearchProcessingScreen } from "./search-processing.screen";
 import { useSearchProcessing } from "@sd/domain-search";
 import { routes } from "@sd/core-contracts";
@@ -18,13 +19,25 @@ vi.mock("@sd/domain-search", () => ({
 const mockUseIsDesktop = vi.fn().mockReturnValue(true);
 vi.mock("@/shared/hooks/use-responsive", () => ({
   useIsDesktop: () => mockUseIsDesktop(),
+  useResponsive: () => ({ isDesktop: mockUseIsDesktop() }),
 }));
 
 describe("SearchProcessingScreen", () => {
+  let queryClient: QueryClient;
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseIsDesktop.mockReturnValue(true);
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+      },
+    });
   });
+
+  const renderWithProviders = (component: React.ReactElement) => {
+    return render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>);
+  };
 
   it("navigates to series detail on series item click (desktop)", () => {
     (useSearchProcessing as Mock).mockReturnValue({
@@ -47,7 +60,7 @@ describe("SearchProcessingScreen", () => {
       errorMessage: undefined,
     });
 
-    render(<SearchProcessingScreen searchKey="jurisprudence" />);
+    renderWithProviders(<SearchProcessingScreen searchKey="jurisprudence" />);
 
     // Click the search result item
     const item = screen.getByText("Test Series");
@@ -78,7 +91,7 @@ describe("SearchProcessingScreen", () => {
       errorMessage: undefined,
     });
 
-    render(<SearchProcessingScreen searchKey="jurisprudence" />);
+    renderWithProviders(<SearchProcessingScreen searchKey="jurisprudence" />);
 
     // Click the search result item
     const item = screen.getByText("Test Series");
