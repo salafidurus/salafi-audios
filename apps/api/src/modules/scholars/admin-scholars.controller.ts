@@ -1,5 +1,6 @@
 import { Controller, Post, Patch, Param, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { Permissions } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { RequiresPermission } from '../../shared/decorators/requires-permission.decorator';
 import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
@@ -15,14 +16,14 @@ export class AdminScholarsController {
   constructor(private readonly service: ScholarsService) {}
 
   @Post()
-  @RequiresPermission('manage:scholars')
+  @RequiresPermission(Permissions.SCHOLARS_CREATE)
   @ApiOperation({ summary: 'Create a scholar' })
   create(@Body() dto: CreateScholarDto) {
     return this.service.create(dto);
   }
 
   @Patch(':id')
-  @RequiresPermission('manage:scholars')
+  @RequiresPermission(Permissions.SCHOLARS_EDIT)
   @ApiOperation({ summary: 'Update a scholar' })
   update(@Param('id') id: string, @Body() dto: UpdateScholarDto) {
     return this.service.update(id, dto);
