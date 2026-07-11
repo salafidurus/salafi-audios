@@ -37,7 +37,6 @@ export function SearchButton({ label, onClick }: SearchButtonProps) {
         className={styles.barInputWrapper}
         onClick={handleClick}
         aria-label={label}
-        style={{ all: "unset", display: "contents" }}
       >
         <SearchGlyph />
         <span className={styles.barPlaceholder}>{label}</span>
