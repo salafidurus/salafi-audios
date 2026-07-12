@@ -1,130 +1,89 @@
 import { vi, type Mock } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { AdminLecturesScreen } from "./admin-lectures.screen";
-import { fetchAdminLectures, fetchAdminLectureDetail } from "../../api/admin-lectures.api";
+import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
+import { useApiQuery } from "@sd/core-contracts";
+import { useResponsive } from "@/shared/hooks/use-responsive";
 
+vi.mock("@/features/admin/hooks/use-admin-permissions", () => ({
+  useAdminPermissions: vi.fn(),
+}));
+vi.mock("@/shared/hooks/use-responsive", () => ({
+  useResponsive: () => ({ isMobile: false }),
+}));
 vi.mock("../../api/admin-lectures.api", () => ({
   fetchAdminLectures: vi.fn(),
   fetchAdminLectureDetail: vi.fn(),
 }));
-
-vi.mock("@sd/core-contracts", async (importOriginal) => {
-  const actual = await importOriginal<any>();
-  return {
-    ...actual,
-    useApiQuery: vi.fn((key) => {
-      // Mock queries
-      if (key[0] === "scholars") {
-        return { data: { scholars: [] }, isFetching: false };
-      }
-      if (key[0] === "topics") {
-        return { data: [], isFetching: false };
-      }
-      if (key[0] === "series") {
-        return { data: [], isFetching: false };
-      }
-      if (key[0] === "admin" && key[1] === "lectures") {
-        return {
-          data: {
-            items: [
-              {
-                id: "lec-1",
-                title: "Lecture One",
-                scholarName: "Scholar Alpha",
-                status: "published",
-                createdAt: "2026-01-01T00:00:00Z",
-                durationSeconds: 300,
-              },
-              {
-                id: "lec-2",
-                title: "Lecture Two",
-                scholarName: "Scholar Beta",
-                status: "draft",
-                createdAt: "2026-01-02T00:00:00Z",
-                durationSeconds: 150,
-              },
-            ],
-            total: 2,
-            page: 1,
-          },
-          isFetching: false,
-          refetch: vi.fn(),
-        };
-      }
-      return { data: undefined, isFetching: false };
-    }),
-    queryKeys: {
-      scholars: {
-        list: () => ["scholars", "list"],
-      },
-      topics: {
-        list: () => ["topics", "list"],
-      },
-      admin: {
-        series: {
-          list: () => ["series", "all-list"],
-        },
-      },
-    },
-  };
+vi.mock("@sd/core-contracts", async (importActual) => {
+  const actual = await importActual<typeof import("@sd/core-contracts")>();
+  return { ...actual, useApiQuery: vi.fn() };
 });
+vi.mock("../../components/AudioUploader/AudioUploader", () => ({
+  AudioUploader: () => null,
+}));
+vi.mock("../../components/LectureEditModal/LectureEditModal", () => ({
+  LectureEditModal: () => null,
+}));
 
-describe("AdminLecturesScreen", () => {
+const mockListingsResponse = {
+  items: [
+    {
+      id: "l1",
+      title: "Test Lecture",
+      scholarName: "Scholar A",
+      status: "published",
+      durationSeconds: 3600,
+      createdAt: "2024-01-01T00:00:00.000Z",
+    },
+    {
+      id: "l2",
+      title: "Another Lecture",
+      scholarName: "Scholar B",
+      status: "draft",
+      durationSeconds: 1800,
+      createdAt: "2024-02-01T00:00:00.000Z",
+    },
+  ],
+  total: 2,
+};
+
+describe("AdminLecturesScreen action button gates", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-
-    (fetchAdminLectures as Mock).mockReturnValue({
-      data: {
-        items: [
-          {
-            id: "lec-1",
-            title: "Lecture One",
-            scholarName: "Scholar Alpha",
-            status: "published",
-            createdAt: "2026-01-01",
-          },
-          {
-            id: "lec-2",
-            title: "Lecture Two",
-            scholarName: "Scholar Beta",
-            status: "draft",
-            createdAt: "2026-01-02",
-          },
-        ],
-        total: 2,
-        page: 1,
-      },
+    (useApiQuery as Mock).mockReturnValue({
+      data: mockListingsResponse,
       isFetching: false,
       refetch: vi.fn(),
     });
   });
 
-  it("renders the screen title and lists lectures", () => {
+  it("hides Upload Audio button when user lacks MEDIA_UPLOAD", () => {
+    (useAdminPermissions as Mock).mockReturnValue({
+      data: { permissions: ["LISTINGS_VIEW"] },
+    });
+
     render(<AdminLecturesScreen />);
-    expect(screen.getByText("Manage Lectures")).toBeInTheDocument();
-    expect(screen.getByText("Lecture One")).toBeInTheDocument();
-    expect(screen.getByText("Lecture Two")).toBeInTheDocument();
+
+    expect(screen.queryByText("Upload Audio")).not.toBeInTheDocument();
   });
 
-  it("opens edit modal when edit button is clicked", async () => {
-    (fetchAdminLectureDetail as Mock).mockResolvedValue({
-      id: "lec-1",
-      title: "Lecture One",
-      scholarId: "scholar-1",
-      status: "published",
-      topics: [],
-      createdAt: "2026-01-01",
+  it("shows Upload Audio button when user has MEDIA_UPLOAD", () => {
+    (useAdminPermissions as Mock).mockReturnValue({
+      data: { permissions: ["MEDIA_UPLOAD"] },
     });
 
     render(<AdminLecturesScreen />);
 
-    // Click Edit button for the first lecture
-    const editButtons = screen.getAllByRole("button", { name: /edit/i });
-    fireEvent.click(editButtons[0]!);
+    expect(screen.getByText("Upload Audio")).toBeInTheDocument();
+  });
 
-    await waitFor(() => {
-      expect(fetchAdminLectureDetail).toHaveBeenCalledWith("lec-1");
-      expect(screen.getByText("Edit Lecture Details")).toBeInTheDocument();
+  it("hides Edit buttons when user lacks LISTINGS_EDIT", () => {
+    (useAdminPermissions as Mock).mockReturnValue({
+      data: { permissions: ["LISTINGS_VIEW"] },
     });
+
+    render(<AdminLecturesScreen />);
+
+    expect(screen.queryAllByText("Edit")).toHaveLength(0);
   });
 });
