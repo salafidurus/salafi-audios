@@ -71,10 +71,11 @@ export function ConfirmText({
 
         {confirmWord && (
           <div className={styles.wordConfirm}>
-            <label className={styles.wordLabel}>
+            <label className={styles.wordLabel} htmlFor="confirm-text-input">
               Type <strong>{confirmWord}</strong> to confirm:
             </label>
             <input
+              id="confirm-text-input"
               type="text"
               className={styles.wordInput}
               placeholder={`Type "${confirmWord}" to confirm`}
