@@ -62,7 +62,8 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     TelegramModule,
   ],
   providers: [
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
+    ThrottlerGuard,
+    { provide: APP_GUARD, useExisting: ThrottlerGuard },
     { provide: APP_GUARD, useClass: AuthGuard },
     { provide: APP_GUARD, useClass: PermissionGuard },
     { provide: APP_INTERCEPTOR, useClass: LocaleInterceptor },

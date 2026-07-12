@@ -13,6 +13,7 @@ export class TestAuthFactory {
     const uniqueEmail = email ?? `e2e-test-${createId()}@salafidurus.com`;
     const user = await this.prisma.user.create({
       data: {
+        id: crypto.randomUUID(),
         name: 'E2E Test User',
         email: uniqueEmail,
         role: 'user',

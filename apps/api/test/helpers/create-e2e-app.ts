@@ -11,18 +11,25 @@ import { ZodValidationPipe } from 'nestjs-zod';
 import { AllExceptionsFilter } from '../../src/shared/errors/http-exception.filter';
 import { ConfigService } from '../../src/shared/config/config.service';
 import { initAuth } from '../../src/modules/auth/auth.instance';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
-export async function createE2eApp(): Promise<{
+export async function createE2eApp(options?: { disableThrottler?: boolean }): Promise<{
   app: NestFastifyApplication;
   moduleRef: TestingModule;
 }> {
-  const moduleBuilder = Test.createTestingModule({
+  let moduleBuilder = Test.createTestingModule({
     imports: [AppModule],
   })
     .overrideModule(TelegramModule)
     .useModule(MockTelegramModule)
     .overrideProvider(CDNHealthIndicator)
     .useClass(MockCDNHealthIndicator);
+
+  if (options?.disableThrottler) {
+    moduleBuilder = moduleBuilder.overrideProvider(ThrottlerGuard).useValue({
+      canActivate: () => true,
+    });
+  }
 
   const module = await moduleBuilder.compile();
   const app = module.createNestApplication<NestFastifyApplication>(new FastifyAdapter());

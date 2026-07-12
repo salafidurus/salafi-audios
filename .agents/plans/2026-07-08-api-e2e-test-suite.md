@@ -235,7 +235,6 @@ Add a new GitHub Actions workflow `.github/workflows/e2e-api.yml` to execute API
 
 - **On Pull Request**: Triggers when changes occur in `apps/api/**`, `packages/core-db/prisma/**`, `packages/core-contracts/**`, `bun.lock`, `turbo.json`, or the workflow itself.
 - **On Push**: Triggers on pushes to the `main` branch.
-- **Manual (Workflow Dispatch)**: Supported.
 
 ### Concurrent Executions
 
