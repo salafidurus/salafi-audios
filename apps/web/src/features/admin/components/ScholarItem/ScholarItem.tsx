@@ -1,4 +1,5 @@
 import { Pencil } from "lucide-react";
+import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
 import { Button } from "@/shared/components/Button";
 import { List } from "@/shared/components/List";
 import { UserAvatar } from "@/shared/components/UserAvatar";
@@ -36,13 +37,15 @@ export function ScholarItem({
         </div>
       </div>
       <List.Item.Actions>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onEdit}
-          aria-label={`Edit ${name}`}
-          icon={<Pencil size={16} />}
-        />
+        <PermissionGate requires="SCHOLARS_EDIT">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onEdit}
+            aria-label={`Edit ${name}`}
+            icon={<Pencil size={16} />}
+          />
+        </PermissionGate>
       </List.Item.Actions>
     </List.Item>
   );
