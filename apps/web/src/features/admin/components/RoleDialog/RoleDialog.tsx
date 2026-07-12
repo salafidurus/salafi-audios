@@ -14,6 +14,7 @@ import {
 import { Modal } from "@/shared/components/Modal/Modal";
 import { Button } from "@/shared/components/Button";
 import { RoleItem } from "./RoleItem";
+import { ROLE_LABELS, ROLE_DESCRIPTIONS, ROLES_ARRAY } from "./constants";
 import styles from "./RoleDialog.module.css";
 
 export interface RoleDialogProps {
@@ -23,36 +24,6 @@ export interface RoleDialogProps {
   userId: string;
   userName?: string;
 }
-
-// Role labels matching ROLE_CHIPS
-export const ROLE_LABELS: Record<UserRole, string> = {
-  listener: "Listener",
-  scholar: "Scholar",
-  translator: "Translator",
-  editor: "Editor",
-  admin: "Admin",
-  superadmin: "Super Admin",
-};
-
-// Available roles in order
-const ROLES_ARRAY: UserRole[] = [
-  "listener",
-  "scholar",
-  "translator",
-  "editor",
-  "admin",
-  "superadmin",
-];
-
-// Role descriptions
-export const ROLE_DESCRIPTIONS: Record<UserRole, string> = {
-  listener: "Regular user who listens to lectures",
-  scholar: "Content creator who manages their own lectures",
-  translator: "Translates content to assigned languages",
-  editor: "Manages content for assigned scholars",
-  admin: "Platform administrator with elevated permissions",
-  superadmin: "Full system access and override permissions",
-};
 
 interface State {
   userRoles: AdminRolesListResponse | null;

@@ -2,7 +2,7 @@
 
 import { Toggle } from "@/shared/components/Toggle";
 import type { UserRole } from "@sd/core-contracts";
-import { ROLE_LABELS, ROLE_DESCRIPTIONS } from "./RoleDialog";
+import { ROLE_LABELS, ROLE_DESCRIPTIONS } from "./constants";
 import styles from "./RoleDialog.module.css";
 
 interface RoleItemProps {
