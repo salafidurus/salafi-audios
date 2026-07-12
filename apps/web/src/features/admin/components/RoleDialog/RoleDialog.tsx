@@ -14,7 +14,7 @@ import {
 import { Modal } from "@/shared/components/Modal/Modal";
 import { Button } from "@/shared/components/Button";
 import { RoleItem } from "./RoleItem";
-import { ROLE_LABELS, ROLE_DESCRIPTIONS, ROLES_ARRAY } from "./constants";
+import { ROLES_ARRAY } from "./constants";
 import styles from "./RoleDialog.module.css";
 
 export interface RoleDialogProps {
