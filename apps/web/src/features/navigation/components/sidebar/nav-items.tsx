@@ -7,6 +7,7 @@ import clsx from "clsx";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { routes } from "@sd/core-contracts";
 import { useAuth } from "@/core/auth";
+import type { AdminPermission } from "@sd/core-contracts";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 import { SignOutConfirmDialog } from "@/features/auth/components/signout-confirm-dialog/signout-confirm-dialog";
 import { Button } from "@/shared/components/Button/Button";
@@ -41,6 +42,7 @@ type AdminNavItem = {
   Icon: LucideIcon;
   href: string;
   activeMatch: string;
+  requiredPermission?: AdminPermission;
 };
 
 const adminNavItems: AdminNavItem[] = [
@@ -61,24 +63,28 @@ const adminNavItems: AdminNavItem[] = [
     Icon: Users,
     href: routes.admin.users,
     activeMatch: routes.admin.users,
+    requiredPermission: "USERS_VIEW",
   },
   {
     label: "Contents",
     Icon: FolderOpen,
     href: routes.admin.contents,
     activeMatch: routes.admin.contents,
+    requiredPermission: "LISTINGS_VIEW",
   },
   {
     label: "Scholars",
     Icon: GraduationCap,
     href: routes.admin.scholars,
     activeMatch: routes.admin.scholars,
+    requiredPermission: "SCHOLARS_VIEW",
   },
   {
     label: "Livestreams",
     Icon: Radio,
     href: routes.admin.live,
     activeMatch: routes.admin.live,
+    requiredPermission: "LIVE_VIEW",
   },
 ];
 
@@ -129,7 +135,13 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
 
   const { data: adminPermissionsData } = useAdminPermissions();
 
-  const hasAdminAccess = isAuthenticated && (adminPermissionsData?.permissions ?? []).length > 0;
+  const adminPermissions: AdminPermission[] = adminPermissionsData?.permissions ?? [];
+  const hasAdminAccess = isAuthenticated && adminPermissions.length > 0;
+
+  const visibleAdminNavItems = adminNavItems.filter(
+    (item) =>
+      item.requiredPermission === undefined || adminPermissions.includes(item.requiredPermission),
+  );
   const settingsHref = routes.settings.index;
 
   const navItems = getNavItems(t);
@@ -184,7 +196,7 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
           <>
             <hr className={styles.divider} />
             <SectionLabel collapsed={collapsed}>ADMIN</SectionLabel>
-            {adminNavItems.map((item) => {
+            {visibleAdminNavItems.map((item) => {
               const isActive =
                 item.href === routes.admin.index
                   ? pathname === routes.admin.index

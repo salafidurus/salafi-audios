@@ -131,14 +131,14 @@ describe("Sidebar component", () => {
     });
   });
 
-  it("renders ADMIN section with sub-routes only when user has admin permissions", () => {
+  it("shows only the nav items matching the user's specific admin permissions", () => {
     (useAuth as Mock).mockReturnValue({
       isAuthenticated: true,
       isLoading: false,
       user: { name: "Admin User", email: "admin@example.com" },
     });
     (useAdminPermissions as Mock).mockReturnValue({
-      data: { permissions: [{ permission: "manage:scholars" }] },
+      data: { permissions: ["SCHOLARS_VIEW"] },
     });
 
     render(<Sidebar />);
@@ -146,8 +146,32 @@ describe("Sidebar component", () => {
     expect(screen.getByText("ADMIN")).toBeInTheDocument();
     expect(screen.getByText("Home")).toBeInTheDocument();
     expect(screen.getByText("Stats")).toBeInTheDocument();
-    expect(screen.getByText("Users")).toBeInTheDocument();
-    expect(screen.getByText("Contents")).toBeInTheDocument();
     expect(screen.getByText("Scholars")).toBeInTheDocument();
+    expect(screen.queryByText("Users")).not.toBeInTheDocument();
+    expect(screen.queryByText("Contents")).not.toBeInTheDocument();
+    expect(screen.queryByText("Livestreams")).not.toBeInTheDocument();
+  });
+
+  it("shows all nav items when user has all required permissions", () => {
+    (useAuth as Mock).mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      user: { name: "Super Admin", email: "super@example.com" },
+    });
+    (useAdminPermissions as Mock).mockReturnValue({
+      data: {
+        permissions: ["SCHOLARS_VIEW", "LISTINGS_VIEW", "USERS_VIEW", "LIVE_VIEW"],
+      },
+    });
+
+    render(<Sidebar />);
+
+    expect(screen.getByText("ADMIN")).toBeInTheDocument();
+    expect(screen.getByText("Home")).toBeInTheDocument();
+    expect(screen.getByText("Stats")).toBeInTheDocument();
+    expect(screen.getByText("Scholars")).toBeInTheDocument();
+    expect(screen.getByText("Contents")).toBeInTheDocument();
+    expect(screen.getByText("Users")).toBeInTheDocument();
+    expect(screen.getByText("Livestreams")).toBeInTheDocument();
   });
 });
