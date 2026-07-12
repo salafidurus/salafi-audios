@@ -25,11 +25,13 @@ export function UserItem({ user, onManagePermissions, onManageRoles }: UserItemP
 
       <List.Item.Actions widthPercentDesktop="30%">
         <div onClick={(e) => e.stopPropagation()}>
-          <PermissionGate requires="USERS_VIEW">
+          <PermissionGate requires="USERS_GRANT_PERMISSIONS">
             <button type="button" className={styles.manageButton} onClick={onManagePermissions}>
               <Shield className={styles.manageIcon} />
               {isTablet ? "Permissions" : "Manage Permissions"}
             </button>
+          </PermissionGate>
+          <PermissionGate requires="USERS_GRANT_ROLES">
             <button type="button" className={styles.manageButton} onClick={onManageRoles}>
               <Users className={styles.manageIcon} />
               {isTablet ? "Roles" : "Manage Roles"}
