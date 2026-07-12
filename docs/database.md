@@ -84,5 +84,5 @@ Client persistence improves continuity but never becomes authoritative.
 ## 10. Admin Roles and Permissions
 
 - Promoting a user to admin and granting the `AdminPermission` capabilities is documented in
-  [database-admin-setup.md](./database-admin-setup.md) — covers the automated `make-admin`
+  [admin-management.md](./admin-management.md) — covers the automated `make-admin`
   script, manual SQL, and Prisma Studio.
