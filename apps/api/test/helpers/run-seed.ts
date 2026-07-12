@@ -17,6 +17,13 @@ if (!connectionString) {
 const adapter = new PrismaPg({ connectionString });
 const prisma = new PrismaClient({ adapter });
 
-const { seedTestData } = await import('./seed-test-data');
-await seedTestData(prisma);
-await prisma.$disconnect();
+async function main() {
+  const { seedTestData } = await import('./seed-test-data');
+  await seedTestData(prisma);
+  await prisma.$disconnect();
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

@@ -1,6 +1,6 @@
 import './set-env';
 import '../../src/shared/utils/env.bootstrap';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import { spawn } from 'node:child_process';
 
 function spawnSeed(script: string): Promise<void> {
@@ -15,6 +15,6 @@ function spawnSeed(script: string): Promise<void> {
 }
 
 export async function setup() {
-  const seedScript = fileURLToPath(new URL('./run-seed.ts', import.meta.url));
+  const seedScript = join(__dirname, 'run-seed.ts');
   await spawnSeed(seedScript);
 }

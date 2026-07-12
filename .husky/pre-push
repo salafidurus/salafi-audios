@@ -48,8 +48,8 @@ TURBO_SCM_BASE="$COMPARISON_BASE" bun run turbo lint typecheck test:prepush buil
 if git diff --quiet "$COMPARISON_BASE"...HEAD -- ':(glob)apps/web/**' ':(glob)packages/core-api/**' ':(glob)packages/core-contracts/**' ':(glob)packages/core-i18n/**' ':(glob)packages/design-tokens/**' ':(glob)packages/domain-account/**' ':(glob)packages/domain-audio/**' ':(glob)packages/domain-content/**' ':(glob)packages/domain-live/**' ':(glob)packages/domain-search/**' ':(glob)tsconfig.base.json' ':(glob)tsconfig.packages.json'; then
   printf "pre-push: skipping web e2e (no web-affecting changes)\n"
 else
-  printf "pre-push: running web e2e\n"
-  PW_SKIP_WEB_BUILD=1 bun run turbo test:e2e --filter=web
+  printf "pre-push: running e2e\n"
+  PW_SKIP_WEB_BUILD=1 bun run turbo test:e2e
 fi
 
 if git diff --quiet "$COMPARISON_BASE"...HEAD -- README.md ':(glob)docs/**/*.md' AGENT.md AGENTS.md .github/copilot-instructions.md; then
