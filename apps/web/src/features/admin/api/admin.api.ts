@@ -44,14 +44,14 @@ export type AdminRolesListResponse = {
 
 export function fetchUserRoles(userId: string) {
   return httpClient<AdminRolesListResponse>({
-    url: `/admin/users/${userId}/roles`,
+    url: endpoints.admin.roles.grant(userId),
     method: "GET",
   });
 }
 
 export function grantRole(userId: string, role: UserRole) {
   return httpClient<AdminRolesListResponse>({
-    url: `/admin/users/${userId}/roles`,
+    url: endpoints.admin.roles.grant(userId),
     method: "POST",
     body: { role },
   });
@@ -59,7 +59,7 @@ export function grantRole(userId: string, role: UserRole) {
 
 export function revokeRole(userId: string, role: UserRole) {
   return httpClient<AdminRolesListResponse>({
-    url: `/admin/users/${userId}/roles/${role}`,
+    url: endpoints.admin.roles.revoke(userId, role),
     method: "DELETE",
     body: {},
   });

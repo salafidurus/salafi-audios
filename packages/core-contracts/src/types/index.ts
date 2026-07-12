@@ -254,4 +254,7 @@ export {
   type AssignTranslatorLanguageRequest,
   PERMISSION_GROUPS,
   ROLE_DEFAULT_PERMISSIONS,
+  PERMISSIONS_ARRAY,
+  PERMISSION_LABELS,
+  PERMISSION_DESCRIPTIONS,
 } from "../types/permissions.types";

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { AdminUserListItemDto } from "@sd/core-contracts";
-import { Shield } from "lucide-react";
+import { Shield, Users } from "lucide-react";
 import { List } from "@/shared/components/List";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
@@ -11,9 +11,10 @@ import styles from "./user-item.module.css";
 export type UserItemProps = {
   user: AdminUserListItemDto;
   onManagePermissions?: () => void;
+  onManageRoles?: () => void;
 };
 
-export function UserItem({ user, onManagePermissions }: UserItemProps): ReactNode {
+export function UserItem({ user, onManagePermissions, onManageRoles }: UserItemProps): ReactNode {
   const { isTablet } = useResponsive();
   return (
     <List.Item interactive>
@@ -28,6 +29,10 @@ export function UserItem({ user, onManagePermissions }: UserItemProps): ReactNod
             <button type="button" className={styles.manageButton} onClick={onManagePermissions}>
               <Shield className={styles.manageIcon} />
               {isTablet ? "Permissions" : "Manage Permissions"}
+            </button>
+            <button type="button" className={styles.manageButton} onClick={onManageRoles}>
+              <Users className={styles.manageIcon} />
+              {isTablet ? "Roles" : "Manage Roles"}
             </button>
           </PermissionGate>
         </div>

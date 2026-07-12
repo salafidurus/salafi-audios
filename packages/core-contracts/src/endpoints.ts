@@ -65,6 +65,10 @@ export const endpoints = {
       revoke: (userId: string, permission: string) =>
         `/admin/users/${userId}/permissions/${permission}`,
     },
+    roles: {
+      grant: (userId: string) => `/admin/permissions/${userId}/roles`,
+      revoke: (userId: string, role: string) => `/admin/permissions/${userId}/roles/${role}`,
+    },
     scholars: {
       create: "/admin/scholars",
       update: (id: string) => `/admin/scholars/${id}`,

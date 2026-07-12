@@ -2,14 +2,18 @@
 
 import { useEffect, useReducer, useState } from "react";
 import type { ReactNode } from "react";
-import { ADMIN_PERMISSIONS, type AdminPermission } from "@sd/core-contracts";
+import {
+  type Permission,
+  PERMISSIONS_ARRAY,
+  PERMISSION_LABELS,
+  PERMISSION_DESCRIPTIONS,
+} from "@sd/core-contracts";
 import {
   fetchUserPermissions,
   grantPermission,
   revokePermission,
   type AdminPermissionsListResponse,
 } from "@/features/admin/api/admin.api";
-import { PERMISSION_LABELS, PERMISSION_DESCRIPTIONS } from "@/features/admin/constants/permissions";
 import { Modal } from "@/shared/components/Modal/Modal";
 import { Button } from "@/shared/components/Button";
 import { Toggle } from "@/shared/components/Toggle";
@@ -74,7 +78,7 @@ export function PermissionsDialog({
   userName = userId,
 }: PermissionsDialogProps): ReactNode {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [pendingPermissions, setPendingPermissions] = useState<Set<AdminPermission>>(new Set());
+  const [pendingPermissions, setPendingPermissions] = useState<Set<Permission>>(new Set());
   const [saving, setSaving] = useState(false);
 
   const currentPermissions = state.userPerms?.permissions.map((p) => p.permission) ?? [];
@@ -92,7 +96,7 @@ export function PermissionsDialog({
       .catch(() => dispatch({ type: "LOAD_ERROR" }));
   }, [isOpen, userId]);
 
-  const handleToggle = (permission: AdminPermission) => {
+  const handleToggle = (permission: Permission) => {
     setPendingPermissions((prev) => {
       const next = new Set(prev);
       if (next.has(permission)) {
@@ -108,10 +112,10 @@ export function PermissionsDialog({
     setSaving(true);
     try {
       // Determine which permissions to grant and revoke
-      const toGrant: AdminPermission[] = [];
-      const toRevoke: AdminPermission[] = [];
+      const toGrant: Permission[] = [];
+      const toRevoke: Permission[] = [];
 
-      for (const perm of ADMIN_PERMISSIONS) {
+      for (const perm of PERMISSIONS_ARRAY) {
         const hadIt = currentPermissions.includes(perm);
         const hasItNow = pendingPermissions.has(perm);
 
@@ -171,7 +175,7 @@ export function PermissionsDialog({
         <div className={styles.loading}>Loading permissions…</div>
       ) : (
         <div className={styles.permissionsList}>
-          {ADMIN_PERMISSIONS.map((perm) => {
+          {PERMISSIONS_ARRAY.map((perm) => {
             const isPending = pendingPermissions.has(perm);
             const error = state.errors[perm];
             return (

@@ -7,6 +7,7 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { getSubnavLabel } from "@sd/core-i18n";
 import { DEFAULT_TABS, SECTION_TABS } from "@/features/navigation/types";
 import { useIsHydrated } from "@/shared/hooks/use-is-hydrated";
+import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 import {
   buildSectionTabPath,
   getActiveTabFromPath,
@@ -23,11 +24,15 @@ export function TopSubnavTabs() {
   const pathname = usePathname();
   const { t } = useTranslation();
   const isHydrated = useIsHydrated();
+  const { data: adminPermissionsData } = useAdminPermissions();
 
   const section = getCurrentSection(pathname);
+  const hasAdminAccess =
+    adminPermissionsData && (adminPermissionsData.permissions ?? []).length > 0;
 
   // Show tabs on all screen sizes (responsive CSS handles mobile styling)
-  if (!isHydrated || section === "home") {
+  // Hide tabs for admin section if user doesn't have admin permissions
+  if (!isHydrated || section === "home" || (section === "admin" && !hasAdminAccess)) {
     return null;
   }
 

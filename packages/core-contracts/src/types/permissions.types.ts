@@ -249,3 +249,106 @@ export const ROLE_DEFAULT_PERMISSIONS: Record<UserRole, readonly Permission[]> =
     ...PERMISSION_GROUPS.LIVE,
   ],
 };
+
+// Array of all permissions (for iteration and management UI)
+export const PERMISSIONS_ARRAY = Object.values(Permissions) as Permission[];
+
+// User-facing labels for permissions
+export const PERMISSION_LABELS: Record<Permission, string> = {
+  // Scholar Permissions
+  SCHOLARS_VIEW: "View Scholars",
+  SCHOLARS_CREATE: "Create Scholars",
+  SCHOLARS_EDIT: "Edit Scholars",
+  SCHOLARS_DELETE: "Delete Scholars",
+  SCHOLARS_PUBLISH: "Publish Scholars",
+
+  // Listing Permissions
+  LISTINGS_VIEW: "View Listings",
+  LISTINGS_CREATE: "Create Listings",
+  LISTINGS_EDIT: "Edit Listings",
+  LISTINGS_DELETE: "Delete Listings",
+  LISTINGS_PUBLISH: "Publish Listings",
+
+  // Topic Permissions
+  TOPICS_VIEW: "View Topics",
+  TOPICS_CREATE: "Create Topics",
+  TOPICS_EDIT: "Edit Topics",
+  TOPICS_DELETE: "Delete Topics",
+  TOPICS_PUBLISH: "Publish Topics",
+
+  // Translation Permissions
+  TRANSLATIONS_VIEW: "View Translations",
+  TRANSLATIONS_CREATE: "Create Translations",
+  TRANSLATIONS_EDIT: "Edit Translations",
+  TRANSLATIONS_DELETE: "Delete Translations",
+  TRANSLATIONS_PUBLISH: "Publish Translations",
+
+  // Media Permissions
+  MEDIA_UPLOAD: "Upload Media",
+  MEDIA_DELETE: "Delete Media",
+
+  // User Management Permissions
+  USERS_VIEW: "View Users",
+  USERS_EDIT: "Edit Users",
+  USERS_DELETE: "Delete Users",
+  USERS_GRANT_PERMISSIONS: "Grant Permissions",
+  USERS_GRANT_ROLES: "Grant Roles",
+
+  // Live Session Permissions
+  LIVE_VIEW: "View Live Sessions",
+  LIVE_CREATE: "Create Live Sessions",
+  LIVE_EDIT: "Edit Live Sessions",
+  LIVE_DELETE: "Delete Live Sessions",
+  LIVE_START: "Start Live Sessions",
+  LIVE_STOP: "Stop Live Sessions",
+};
+
+// Detailed descriptions for permissions
+export const PERMISSION_DESCRIPTIONS: Record<Permission, string> = {
+  // Scholar Permissions
+  SCHOLARS_VIEW: "View scholar profiles and information",
+  SCHOLARS_CREATE: "Create new scholar accounts",
+  SCHOLARS_EDIT: "Edit scholar profiles and details",
+  SCHOLARS_DELETE: "Delete scholar accounts",
+  SCHOLARS_PUBLISH: "Publish scholar content",
+
+  // Listing Permissions
+  LISTINGS_VIEW: "View all listings (series, modules, lessons, singles)",
+  LISTINGS_CREATE: "Create new listings",
+  LISTINGS_EDIT: "Edit existing listings",
+  LISTINGS_DELETE: "Delete listings",
+  LISTINGS_PUBLISH: "Publish listings to catalog",
+
+  // Topic Permissions
+  TOPICS_VIEW: "View all topics",
+  TOPICS_CREATE: "Create new topics",
+  TOPICS_EDIT: "Edit existing topics",
+  TOPICS_DELETE: "Delete topics",
+  TOPICS_PUBLISH: "Publish topics",
+
+  // Translation Permissions
+  TRANSLATIONS_VIEW: "View translations",
+  TRANSLATIONS_CREATE: "Create translations for content",
+  TRANSLATIONS_EDIT: "Edit existing translations",
+  TRANSLATIONS_DELETE: "Delete translations",
+  TRANSLATIONS_PUBLISH: "Publish translations to users",
+
+  // Media Permissions
+  MEDIA_UPLOAD: "Upload media files (audio, images, etc.)",
+  MEDIA_DELETE: "Delete uploaded media",
+
+  // User Management Permissions
+  USERS_VIEW: "View user accounts and details",
+  USERS_EDIT: "Edit user profiles and settings",
+  USERS_DELETE: "Delete user accounts",
+  USERS_GRANT_PERMISSIONS: "Grant individual permissions to users",
+  USERS_GRANT_ROLES: "Assign roles to users",
+
+  // Live Session Permissions
+  LIVE_VIEW: "View active live sessions",
+  LIVE_CREATE: "Create new live sessions",
+  LIVE_EDIT: "Edit live session details",
+  LIVE_DELETE: "Cancel live sessions",
+  LIVE_START: "Start broadcasting live sessions",
+  LIVE_STOP: "Stop live sessions",
+};

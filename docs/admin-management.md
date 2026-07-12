@@ -4,6 +4,58 @@ Complete guide for managing admin accounts, granting permissions, and handling S
 
 ---
 
+## Troubleshooting: "type 'permission' does not exist"
+
+If you encounter `ERROR: type "permission" does not exist` when running SQL commands, your database may be in an inconsistent state. The Permission enum type should have been created by migrations but isn't present.
+
+### Step 1: Check Migration Status
+
+```bash
+# Check if migrations are applied
+bun run --filter @sd/core-db migrate:status
+```
+
+If it says "No pending migrations" but the enum doesn't exist, the migration likely failed or was rolled back.
+
+### Step 2: Reset and Redeploy Migrations (Safe Approach)
+
+**Option A: Hard reset** (if you can afford to lose dev data):
+
+```bash
+# 1. Reset the migration history and drop all tables
+bun run --filter @sd/core-db migrate:reset --force
+
+# 2. Redeploy all migrations
+bun run --filter @sd/core-db migrate:deploy
+
+# 3. Re-seed if needed
+bun run ingest:content
+```
+
+**Option B: Manual Enum Creation** (if you need to preserve data):
+
+If the tables exist but the enum is missing, manually create it:
+
+```sql
+-- Create Permission enum if it doesn't exist
+CREATE TYPE "Permission" AS ENUM (
+  'SCHOLARS_VIEW', 'SCHOLARS_CREATE', 'SCHOLARS_EDIT', 'SCHOLARS_DELETE', 'SCHOLARS_PUBLISH',
+  'LISTINGS_VIEW', 'LISTINGS_CREATE', 'LISTINGS_EDIT', 'LISTINGS_DELETE', 'LISTINGS_PUBLISH',
+  'TOPICS_VIEW', 'TOPICS_CREATE', 'TOPICS_EDIT', 'TOPICS_DELETE', 'TOPICS_PUBLISH',
+  'TRANSLATIONS_VIEW', 'TRANSLATIONS_CREATE', 'TRANSLATIONS_EDIT', 'TRANSLATIONS_DELETE', 'TRANSLATIONS_PUBLISH',
+  'MEDIA_UPLOAD', 'MEDIA_DELETE',
+  'USERS_VIEW', 'USERS_EDIT', 'USERS_DELETE', 'USERS_GRANT_PERMISSIONS', 'USERS_GRANT_ROLES',
+  'LIVE_VIEW', 'LIVE_CREATE', 'LIVE_EDIT', 'LIVE_DELETE', 'LIVE_START', 'LIVE_STOP'
+);
+
+-- If UserPermission table exists but permission column is TEXT, alter it:
+-- ALTER TABLE "UserPermission" ALTER COLUMN "permission" TYPE "Permission" USING "permission"::"Permission";
+```
+
+After the enum is created, the SQL commands below will work with enum casting (`::permission`).
+
+---
+
 ## Quick Start
 
 ### Make a User an Admin (All Permissions)
@@ -17,12 +69,16 @@ bun run --filter @sd/core-db make-admin user@example.com
 **Manual SQL**:
 
 ```sql
--- Promote role
-UPDATE "User" SET role = 'admin' WHERE email = 'user@example.com';
+-- 1. Assign the admin role via UserRoleAssignment (not User.role, which no longer exists)
+INSERT INTO "UserRoleAssignment" (id, "userId", role, "grantedAt")
+SELECT gen_random_uuid()::text, u.id, 'admin', NOW()
+FROM "User" u
+WHERE u.email = 'user@example.com'
+ON CONFLICT ("userId", "role") DO NOTHING;
 
--- Grant all permissions (33 total)
+-- 2. Grant all permissions (33 total)
 INSERT INTO "UserPermission" ("userId", "permission", "grantedAt")
-SELECT u.id, perm, NOW()
+SELECT u.id, perm::permission, NOW()
 FROM "User" u, (
   VALUES
     ('SCHOLARS_VIEW'), ('SCHOLARS_CREATE'), ('SCHOLARS_EDIT'), ('SCHOLARS_DELETE'), ('SCHOLARS_PUBLISH'),
@@ -49,7 +105,7 @@ bun run --filter @sd/core-db grant-permission user@example.com SCHOLARS_VIEW LIS
 
 ```sql
 INSERT INTO "UserPermission" ("userId", "permission", "grantedAt")
-SELECT u.id, 'SCHOLARS_VIEW', NOW()
+SELECT u.id, 'SCHOLARS_VIEW'::permission, NOW()
 FROM "User" u
 WHERE u.email = 'user@example.com'
 ON CONFLICT DO NOTHING;
@@ -61,8 +117,12 @@ ON CONFLICT DO NOTHING;
 
 The admin system has two components:
 
-1. **Role** (`User.role` or `UserRoleAssignment.role`) — coarse access level (admin, superadmin, etc.)
+1. **Role** (`UserRoleAssignment.role`) — coarse access level (admin, superadmin, etc.). Note: `User.role` field is deprecated; use `UserRoleAssignment` table instead.
 2. **Permissions** (`UserPermission` table) — fine-grained capabilities
+
+### Migration Note
+
+**The `User.role` field is no longer used.** All role assignments now use the `UserRoleAssignment` table, enabling multi-role support. A user can have multiple roles simultaneously (e.g., scholar + translator). All SQL examples and scripts in this guide use `UserRoleAssignment` instead of the deprecated `User.role` field.
 
 ### Role Types
 
@@ -135,15 +195,17 @@ Execute in the database console (Neon SQL Editor, psql, etc.):
 -- 1. Find the user ID by email
 SELECT id, email FROM "User" WHERE email = 'user@example.com';
 
--- 2. Promote the user's role to 'admin'
-UPDATE "User"
-SET role = 'admin'
-WHERE email = 'user@example.com';
+-- 2. Assign the admin role via UserRoleAssignment
+INSERT INTO "UserRoleAssignment" (id, "userId", role, "grantedAt", "grantedBy")
+SELECT gen_random_uuid()::text, id, 'admin', NOW(), NULL
+FROM "User"
+WHERE email = 'user@example.com'
+ON CONFLICT ("userId", "role") DO NOTHING;
 
 -- 3. Grant all admin permissions
 --    UserPermission uses composite unique constraint on (userId, permission)
 INSERT INTO "UserPermission" ("userId", "permission", "grantedAt", "grantedBy")
-SELECT id, perm, NOW(), NULL
+SELECT id, perm::permission, NOW(), NULL
 FROM "User",
   (VALUES
     ('SCHOLARS_VIEW'),
@@ -184,11 +246,12 @@ WHERE email = 'user@example.com'
 ON CONFLICT ("userId", "permission") DO NOTHING;
 
 -- 4. Verify
-SELECT u.email, u.role, COUNT(p.id) as permission_count
+SELECT u.email, ura.role, COUNT(p.id) as permission_count
 FROM "User" u
+LEFT JOIN "UserRoleAssignment" ura ON u.id = ura."userId"
 LEFT JOIN "UserPermission" p ON u.id = p."userId"
 WHERE u.email = 'user@example.com'
-GROUP BY u.id, u.email, u.role;
+GROUP BY u.id, u.email, ura.role;
 ```
 
 ### Option C: Prisma Studio
@@ -197,7 +260,12 @@ GROUP BY u.id, u.email, u.role;
 bun run --filter @sd/core-db prisma studio
 ```
 
-1. Open the `User` table and set `role` to `admin` for the target user
+1. Open the `UserRoleAssignment` table and create a new row:
+   - `id`: generate a UUID (Prisma will provide a helper)
+   - `userId`: select the target user's ID
+   - `role`: set to `admin`
+   - `grantedAt`: set to current timestamp
+   - `grantedBy`: leave NULL (optional audit field)
 2. Open the `UserPermission` table and add one row per permission for that user ID
 3. Grant the 33 permissions listed in the permission types section above
 
@@ -227,14 +295,14 @@ bun run --filter @sd/core-db grant-permission --list
 ```sql
 -- Grant a single permission
 INSERT INTO "UserPermission" ("userId", "permission", "grantedAt")
-SELECT u.id, 'SCHOLARS_VIEW', NOW()
+SELECT u.id, 'SCHOLARS_VIEW'::permission, NOW()
 FROM "User" u
 WHERE u.email = 'user@example.com'
 ON CONFLICT ("userId", "permission") DO NOTHING;
 
 -- Grant multiple permissions
 INSERT INTO "UserPermission" ("userId", "permission", "grantedAt")
-SELECT u.id, perm, NOW()
+SELECT u.id, perm::permission, NOW()
 FROM "User" u,
   (VALUES
     ('SCHOLARS_VIEW'),
@@ -282,14 +350,33 @@ WHERE "userId" = (SELECT id FROM "User" WHERE email = 'user@example.com');
 
 ### Creating a SuperAdmin
 
+**Prerequisites:** The PBAC migrations must have been run first to create the `permission` enum type and tables. If you encounter `ERROR: type "permission" does not exist`, run the migrations first:
+
+```bash
+bun run --filter @sd/core-db migrate:deploy
+```
+
 #### Method 1: SQL Script (Recommended)
 
+##### Explicit SQL Command — Execute in your database client (psql, pgAdmin, etc.)
+
+Replace `admin@example.com` with the actual email address of the user to promote to superadmin.
+
 ```sql
--- Step 1: Find the user ID (or use a known ID)
+-- ============================================================================
+-- STEP 1: Retrieve the user ID
+-- ============================================================================
+-- First, find the user ID by email. Copy the ID from the result.
 SELECT id, email FROM "User" WHERE email = 'admin@example.com';
 
--- Step 2: Create the superadmin role assignment
--- Replace 'user-id-here' with the actual user ID from step 1
+-- If the user exists, proceed to STEP 2. Otherwise, create the user first.
+
+-- ============================================================================
+-- STEP 2: Grant the superadmin role
+-- ============================================================================
+-- This creates the superadmin role assignment. Replace the id in the WHERE
+-- clause below with the actual UUID from STEP 1.
+-- If a superadmin role already exists for this user, this does nothing (no error).
 INSERT INTO "UserRoleAssignment" (
   id,
   "userId",
@@ -299,45 +386,185 @@ INSERT INTO "UserRoleAssignment" (
 )
 VALUES (
   gen_random_uuid()::text,
-  'user-id-here',
+  (SELECT id FROM "User" WHERE email = 'admin@example.com'),
   'superadmin',
   CURRENT_TIMESTAMP,
   NULL
-);
+)
+ON CONFLICT ("userId", "role") DO NOTHING;
 
--- Step 3: Grant all permissions to the superadmin
+-- ============================================================================
+-- STEP 3: Grant all platform permissions
+-- ============================================================================
+-- This assigns every permission to the superadmin account.
+-- The ON CONFLICT clause ensures idempotency (safe to run multiple times).
+WITH admin_user AS (
+  SELECT id FROM "User" WHERE email = 'admin@example.com'
+)
 INSERT INTO "UserPermission" (
   id,
   "userId",
   permission,
-  "grantedAt",
-  "grantedBy"
+  "grantedAt"
 )
 SELECT
   gen_random_uuid()::text,
-  'user-id-here',
+  au.id,
   perm,
-  CURRENT_TIMESTAMP,
-  NULL
-FROM (
+  CURRENT_TIMESTAMP
+FROM admin_user au
+CROSS JOIN (
   VALUES
-    ('SCHOLARS_VIEW'), ('SCHOLARS_CREATE'), ('SCHOLARS_EDIT'), ('SCHOLARS_DELETE'), ('SCHOLARS_PUBLISH'),
-    ('LISTINGS_VIEW'), ('LISTINGS_CREATE'), ('LISTINGS_EDIT'), ('LISTINGS_DELETE'), ('LISTINGS_PUBLISH'),
-    ('TOPICS_VIEW'), ('TOPICS_CREATE'), ('TOPICS_EDIT'), ('TOPICS_DELETE'), ('TOPICS_PUBLISH'),
-    ('TRANSLATIONS_VIEW'), ('TRANSLATIONS_CREATE'), ('TRANSLATIONS_EDIT'), ('TRANSLATIONS_DELETE'), ('TRANSLATIONS_PUBLISH'),
-    ('MEDIA_UPLOAD'), ('MEDIA_DELETE'),
-    ('USERS_VIEW'), ('USERS_EDIT'), ('USERS_DELETE'), ('USERS_GRANT_PERMISSIONS'), ('USERS_GRANT_ROLES'),
-    ('LIVE_VIEW'), ('LIVE_CREATE'), ('LIVE_EDIT'), ('LIVE_DELETE'), ('LIVE_START'), ('LIVE_STOP')
+    ('SCHOLARS_VIEW'::permission), ('SCHOLARS_CREATE'::permission), ('SCHOLARS_EDIT'::permission), ('SCHOLARS_DELETE'::permission), ('SCHOLARS_PUBLISH'::permission),
+    ('LISTINGS_VIEW'::permission), ('LISTINGS_CREATE'::permission), ('LISTINGS_EDIT'::permission), ('LISTINGS_DELETE'::permission), ('LISTINGS_PUBLISH'::permission),
+    ('TOPICS_VIEW'::permission), ('TOPICS_CREATE'::permission), ('TOPICS_EDIT'::permission), ('TOPICS_DELETE'::permission), ('TOPICS_PUBLISH'::permission),
+    ('TRANSLATIONS_VIEW'::permission), ('TRANSLATIONS_CREATE'::permission), ('TRANSLATIONS_EDIT'::permission), ('TRANSLATIONS_DELETE'::permission), ('TRANSLATIONS_PUBLISH'::permission),
+    ('MEDIA_UPLOAD'::permission), ('MEDIA_DELETE'::permission),
+    ('USERS_VIEW'::permission), ('USERS_EDIT'::permission), ('USERS_DELETE'::permission), ('USERS_GRANT_PERMISSIONS'::permission), ('USERS_GRANT_ROLES'::permission),
+    ('LIVE_VIEW'::permission), ('LIVE_CREATE'::permission), ('LIVE_EDIT'::permission), ('LIVE_DELETE'::permission), ('LIVE_START'::permission), ('LIVE_STOP'::permission)
 ) AS perms(perm)
-ON CONFLICT DO NOTHING;
+ON CONFLICT ("userId", "permission") DO NOTHING;
 
--- Step 4: Verify
-SELECT u.email, ura.role, COUNT(p.id) as permission_count
+-- ============================================================================
+-- STEP 4: Verify the superadmin was created successfully
+-- ============================================================================
+-- This query should show the superadmin role and a permission count of 33.
+SELECT
+  u.email,
+  ura.role,
+  COUNT(p.id) as total_permissions
 FROM "User" u
 LEFT JOIN "UserRoleAssignment" ura ON u.id = ura."userId"
 LEFT JOIN "UserPermission" p ON u.id = p."userId"
 WHERE u.email = 'admin@example.com'
 GROUP BY u.id, u.email, ura.role;
+```
+
+**If you get "type permission does not exist" error:**
+
+The `permission` enum hasn't been created yet. Either:
+
+1. Run migrations first: `bun run --filter @sd/core-db migrate:deploy`
+2. Or use this alternative approach without enum casting (works immediately):
+
+```sql
+-- Alternative: Without enum type casting (works before migrations)
+BEGIN;
+
+INSERT INTO "UserRoleAssignment" (id, "userId", role, "grantedAt")
+VALUES (gen_random_uuid()::text, (SELECT id FROM "User" WHERE email = 'admin@example.com'), 'superadmin', CURRENT_TIMESTAMP)
+ON CONFLICT ("userId", "role") DO NOTHING;
+
+WITH admin_user AS (
+  SELECT id FROM "User" WHERE email = 'admin@example.com'
+)
+INSERT INTO "UserPermission" (id, "userId", permission, "grantedAt")
+SELECT
+  gen_random_uuid()::text,
+  au.id,
+  perm,
+  CURRENT_TIMESTAMP
+FROM admin_user au
+CROSS JOIN (VALUES
+  ('SCHOLARS_VIEW'),
+  ('SCHOLARS_CREATE'),
+  ('SCHOLARS_EDIT'),
+  ('SCHOLARS_DELETE'),
+  ('SCHOLARS_PUBLISH'),
+  ('LISTINGS_VIEW'),
+  ('LISTINGS_CREATE'),
+  ('LISTINGS_EDIT'),
+  ('LISTINGS_DELETE'),
+  ('LISTINGS_PUBLISH'),
+  ('TOPICS_VIEW'),
+  ('TOPICS_CREATE'),
+  ('TOPICS_EDIT'),
+  ('TOPICS_DELETE'),
+  ('TOPICS_PUBLISH'),
+  ('TRANSLATIONS_VIEW'),
+  ('TRANSLATIONS_CREATE'),
+  ('TRANSLATIONS_EDIT'),
+  ('TRANSLATIONS_DELETE'),
+  ('TRANSLATIONS_PUBLISH'),
+  ('MEDIA_UPLOAD'),
+  ('MEDIA_DELETE'),
+  ('USERS_VIEW'),
+  ('USERS_EDIT'),
+  ('USERS_DELETE'),
+  ('USERS_GRANT_PERMISSIONS'),
+  ('USERS_GRANT_ROLES'),
+  ('LIVE_VIEW'),
+  ('LIVE_CREATE'),
+  ('LIVE_EDIT'),
+  ('LIVE_DELETE'),
+  ('LIVE_START'),
+  ('LIVE_STOP')
+) AS perms(perm)
+ON CONFLICT ("userId", permission) DO NOTHING;
+
+COMMIT;
+```
+
+**Shorthand Single SQL (copy-paste friendly):**
+
+If you prefer a consolidated statement and have already run migrations, use this:
+
+```sql
+-- Execute all three INSERTs in one transaction (or separately if needed)
+BEGIN;
+
+INSERT INTO "UserRoleAssignment" (id, "userId", role, "grantedAt")
+VALUES (gen_random_uuid()::text, (SELECT id FROM "User" WHERE email = 'admin@example.com'), 'superadmin', CURRENT_TIMESTAMP)
+ON CONFLICT ("userId", "role") DO NOTHING;
+
+WITH admin_user AS (
+  SELECT id FROM "User" WHERE email = 'admin@example.com'
+)
+INSERT INTO "UserPermission" (id, "userId", permission, "grantedAt")
+SELECT
+  gen_random_uuid()::text,
+  au.id,
+  perm,
+  CURRENT_TIMESTAMP
+FROM admin_user au
+CROSS JOIN (VALUES
+  ('SCHOLARS_VIEW'::permission),
+  ('SCHOLARS_CREATE'::permission),
+  ('SCHOLARS_EDIT'::permission),
+  ('SCHOLARS_DELETE'::permission),
+  ('SCHOLARS_PUBLISH'::permission),
+  ('LISTINGS_VIEW'::permission),
+  ('LISTINGS_CREATE'::permission),
+  ('LISTINGS_EDIT'::permission),
+  ('LISTINGS_DELETE'::permission),
+  ('LISTINGS_PUBLISH'::permission),
+  ('TOPICS_VIEW'::permission),
+  ('TOPICS_CREATE'::permission),
+  ('TOPICS_EDIT'::permission),
+  ('TOPICS_DELETE'::permission),
+  ('TOPICS_PUBLISH'::permission),
+  ('TRANSLATIONS_VIEW'::permission),
+  ('TRANSLATIONS_CREATE'::permission),
+  ('TRANSLATIONS_EDIT'::permission),
+  ('TRANSLATIONS_DELETE'::permission),
+  ('TRANSLATIONS_PUBLISH'::permission),
+  ('MEDIA_UPLOAD'::permission),
+  ('MEDIA_DELETE'::permission),
+  ('USERS_VIEW'::permission),
+  ('USERS_EDIT'::permission),
+  ('USERS_DELETE'::permission),
+  ('USERS_GRANT_PERMISSIONS'::permission),
+  ('USERS_GRANT_ROLES'::permission),
+  ('LIVE_VIEW'::permission),
+  ('LIVE_CREATE'::permission),
+  ('LIVE_EDIT'::permission),
+  ('LIVE_DELETE'::permission),
+  ('LIVE_START'::permission),
+  ('LIVE_STOP'::permission)
+) AS perms(perm)
+ON CONFLICT ("userId", permission) DO NOTHING;
+
+COMMIT;
 ```
 
 #### Method 2: Node.js Script
@@ -435,11 +662,12 @@ GROUP BY u.id, u.email;
 ### Find All Admins
 
 ```sql
-SELECT DISTINCT u.id, u.email, u.name, u.role, COUNT(p.id) as permission_count
+SELECT DISTINCT u.id, u.email, u.name, ura.role, COUNT(p.id) as permission_count
 FROM "User" u
+JOIN "UserRoleAssignment" ura ON u.id = ura."userId"
 LEFT JOIN "UserPermission" p ON u.id = p."userId"
-WHERE u.role = 'admin' OR ura.role = 'admin'
-GROUP BY u.id, u.email, u.name, u.role
+WHERE ura.role = 'admin'
+GROUP BY u.id, u.email, u.name, ura.role
 ORDER BY u.email;
 ```
 
