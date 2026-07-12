@@ -13,7 +13,7 @@ import {
 } from "@/features/admin/api/admin.api";
 import { Modal } from "@/shared/components/Modal/Modal";
 import { Button } from "@/shared/components/Button";
-import { Toggle } from "@/shared/components/Toggle";
+import { RoleItem } from "./RoleItem";
 import styles from "./RoleDialog.module.css";
 
 export interface RoleDialogProps {
@@ -25,7 +25,7 @@ export interface RoleDialogProps {
 }
 
 // Role labels matching ROLE_CHIPS
-const ROLE_LABELS: Record<UserRole, string> = {
+export const ROLE_LABELS: Record<UserRole, string> = {
   listener: "Listener",
   scholar: "Scholar",
   translator: "Translator",
@@ -45,7 +45,7 @@ const ROLES_ARRAY: UserRole[] = [
 ];
 
 // Role descriptions
-const ROLE_DESCRIPTIONS: Record<UserRole, string> = {
+export const ROLE_DESCRIPTIONS: Record<UserRole, string> = {
   listener: "Regular user who listens to lectures",
   scholar: "Content creator who manages their own lectures",
   translator: "Translates content to assigned languages",
@@ -221,25 +221,16 @@ export function RoleDialog({
         <div className={styles.loading}>Loading roles…</div>
       ) : (
         <div className={styles.rolesList}>
-          {ROLES_ARRAY.map((role) => {
-            const isPending = pendingRoles.has(role);
-            const error = state.errors[role];
-            return (
-              <div key={role} className={styles.roleItem}>
-                <div className={styles.roleInfo}>
-                  <span className={styles.roleName}>{ROLE_LABELS[role]}</span>
-                  <span className={styles.roleDescription}>{ROLE_DESCRIPTIONS[role]}</span>
-                  {error && <span className={styles.error}>{error}</span>}
-                </div>
-                <Toggle
-                  checked={isPending}
-                  onChange={() => handleToggle(role)}
-                  disabled={saving}
-                  aria-label={`${isPending ? "Revoke" : "Grant"} ${ROLE_LABELS[role]}`}
-                />
-              </div>
-            );
-          })}
+          {ROLES_ARRAY.map((role) => (
+            <RoleItem
+              key={role}
+              role={role}
+              isPending={pendingRoles.has(role)}
+              error={state.errors[role] ?? null}
+              saving={saving}
+              onToggle={handleToggle}
+            />
+          ))}
         </div>
       )}
     </Modal>

@@ -18,7 +18,7 @@ import {
 } from "@/features/admin/api/admin.api";
 import { Modal } from "@/shared/components/Modal/Modal";
 import { Button } from "@/shared/components/Button";
-import { Toggle } from "@/shared/components/Toggle";
+import { PermissionSection } from "./PermissionSection";
 import styles from "./PermissionsDialog.module.css";
 
 export interface PermissionsDialogProps {
@@ -268,32 +268,15 @@ export function PermissionsDialog({
       ) : (
         <div className={styles.sectionsGrid}>
           {SECTIONS.map((section) => (
-            <div key={section.title} className={styles.section}>
-              <h3 className={styles.sectionTitle}>{section.title}</h3>
-              <div className={styles.permissionsList}>
-                {section.permissions.map((perm) => {
-                  const isPending = pendingPermissions.has(perm);
-                  const error = state.errors[perm];
-                  return (
-                    <div key={perm} className={styles.permissionItem}>
-                      <div className={styles.permissionInfo}>
-                        <span className={styles.permissionName}>{PERMISSION_LABELS[perm]}</span>
-                        <span className={styles.permissionDescription}>
-                          {PERMISSION_DESCRIPTIONS[perm]}
-                        </span>
-                        {error && <span className={styles.error}>{error}</span>}
-                      </div>
-                      <Toggle
-                        checked={isPending}
-                        onChange={() => handleToggle(perm)}
-                        disabled={saving}
-                        aria-label={`${isPending ? "Revoke" : "Grant"} ${PERMISSION_LABELS[perm]}`}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+            <PermissionSection
+              key={section.title}
+              title={section.title}
+              permissions={section.permissions}
+              pendingPermissions={pendingPermissions}
+              errors={state.errors}
+              saving={saving}
+              onToggle={handleToggle}
+            />
           ))}
         </div>
       )}
