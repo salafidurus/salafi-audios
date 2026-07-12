@@ -1,9 +1,8 @@
-import { Controller, Get, Post, Patch, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { Permissions } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { RequiresPermission } from '../../shared/decorators/requires-permission.decorator';
-import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { ScholarsService } from './scholars.service';
 import { SaveScholarTranslationDto } from './dto/save-scholar-translation.dto';
 import { UpdateScholarTranslationDto } from './dto/update-scholar-translation.dto';
@@ -11,7 +10,6 @@ import { UpdateScholarTranslationDto } from './dto/update-scholar-translation.dt
 @ApiTags('Scholar Translations')
 @ApiCommonErrors()
 @Controller('scholars')
-@UseGuards(AdminPermissionGuard)
 export class ScholarsTranslationsController {
   constructor(private readonly service: ScholarsService) {}
 

@@ -18,6 +18,9 @@ const mockPrismaService = {
   user: {
     update: vi.fn().mockResolvedValue({ preferredLanguage: 'ar' }),
   },
+  userRoleAssignment: {
+    findMany: vi.fn().mockResolvedValue([{ role: 'user' }]),
+  },
 };
 
 const mockConfigService = {

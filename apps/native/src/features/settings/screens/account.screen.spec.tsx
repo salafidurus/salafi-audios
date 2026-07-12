@@ -129,14 +129,14 @@ describe("AccountScreen", () => {
     mockedUseAdminPermissions.mockReturnValue({
       permissions: [
         {
-          permission: "manage:content",
+          permission: "USERS_VIEW",
           grantedAt: "2026-01-01",
           userId: "user-1",
           grantedById: null,
         },
       ],
       hasAnyPermission: true,
-      hasPermission: jest.fn((perm) => perm === "manage:content"),
+      hasPermission: jest.fn((perm) => perm === "USERS_VIEW"),
       isLoading: false,
     });
 

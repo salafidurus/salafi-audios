@@ -1,34 +1,34 @@
-import {
-  Controller,
-  Post,
-  Delete,
-  Param,
-  Body,
-  BadRequestException,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, BadRequestException } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { RequiresPermission } from '../../shared/decorators/requires-permission.decorator';
-import { PermissionGuard } from '../../shared/guards/permission.guard';
-import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { PermissionsService } from './permissions.service';
 import { CurrentUser } from '../auth/decorators';
 import {
   Permissions,
-  UserRole,
-  GrantPermissionRequest,
-  GrantRoleRequest,
+  type UserRole,
+  type GrantPermissionRequest,
+  type GrantRoleRequest,
   type Permission,
-  type AdminPermissionsListDto,
 } from '@sd/core-contracts';
 
 @ApiTags('Permissions')
 @ApiCommonErrors()
 @Controller('admin/permissions')
-@UseGuards(PermissionGuard, AdminPermissionGuard)
 export class PermissionsController {
   constructor(private readonly permissionsService: PermissionsService) {}
+
+  /**
+   * Current User Permission Endpoints
+   */
+
+  @Get('me')
+  @ApiOperation({ summary: 'Get current user permissions and roles' })
+  async getMyPermissions(
+    @CurrentUser() user: { id: string },
+  ): Promise<{ permissions: Permission[]; roles: UserRole[] }> {
+    return this.permissionsService.getMyPermissions(user.id);
+  }
 
   /**
    * Permission Management Endpoints

@@ -147,10 +147,7 @@ function ProfileContent() {
         </p>
       )}
 
-      <SettingsSection title="Roles &amp; Access">
-        <SettingsRow label="Role">
-          <span className={styles.roleBadge}>{profile.role}</span>
-        </SettingsRow>
+      <SettingsSection title="Account">
         <SettingsRow label="Email Verified">
           <span className={profile.emailVerified ? styles.verifiedBadge : styles.unverifiedBadge}>
             {profile.emailVerified ? "Verified" : "Unverified"}

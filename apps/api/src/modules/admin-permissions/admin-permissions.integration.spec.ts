@@ -5,44 +5,50 @@ import { FastifyAdapter } from '@nestjs/platform-fastify';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { AuthGuard } from '../auth/auth.guard';
-import { AdminPermissionsController } from './admin-permissions.controller';
 import { AdminUsersController } from './admin-users.controller';
-import { AdminPermissionsService } from './admin-permissions.service';
+import { PermissionsService } from '../permissions/permissions.service';
+import { PermissionGuard } from '../../shared/guards/permission.guard';
 import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { PrismaService } from '../../shared/db/prisma.service';
+import { Permissions } from '@sd/core-contracts';
 
 const mockAuth = { api: { getSession: vi.fn() } };
 vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
-const mockAdminPermissionsService = {
-  getMyPermissions: vi.fn().mockResolvedValue([]),
-  getPermissions: vi.fn().mockResolvedValue([]),
-  grant: vi.fn().mockResolvedValue({}),
-  revoke: vi.fn().mockResolvedValue({}),
+const mockPermissionsService = {
+  listUsers: vi.fn().mockResolvedValue({ users: [] }),
+  getPermissions: vi.fn().mockResolvedValue({ permissions: [] }),
 };
 
 const mockPrisma = {
-  adminPermission: {
-    findUnique: vi.fn(),
+  userPermission: {
+    findMany: vi.fn().mockResolvedValue([]),
+    findUnique: vi.fn().mockResolvedValue(null),
+  },
+  userRoleAssignment: {
+    findMany: vi.fn().mockResolvedValue([]),
+    findUnique: vi.fn().mockResolvedValue(null),
   },
 };
 
-describe('AdminPermissionsController — auth boundaries', () => {
+describe('AdminUsersController — auth boundaries', () => {
   let app: NestFastifyApplication;
 
   beforeEach(async () => {
     mockAuth.api.getSession.mockReset();
-    mockPrisma.adminPermission.findUnique.mockReset();
+    mockPrisma.userPermission.findMany.mockReset();
+    mockPrisma.userRoleAssignment.findMany.mockReset();
     vi.clearAllMocks();
 
     const module = await Test.createTestingModule({
-      controllers: [AdminPermissionsController, AdminUsersController],
+      controllers: [AdminUsersController],
       providers: [
         { provide: APP_GUARD, useClass: AuthGuard },
+        { provide: APP_GUARD, useClass: PermissionGuard },
         AdminPermissionGuard,
         {
-          provide: AdminPermissionsService,
-          useValue: mockAdminPermissionsService,
+          provide: PermissionsService,
+          useValue: mockPermissionsService,
         },
         { provide: PrismaService, useValue: mockPrisma },
       ],
@@ -60,65 +66,68 @@ describe('AdminPermissionsController — auth boundaries', () => {
       mockAuth.api.getSession.mockResolvedValue(null);
     });
 
-    it('GET /admin/permissions/me returns 401 without a session', () => {
-      return request(app.getHttpServer()).get('/admin/permissions/me').expect(401);
+    it('GET /admin/users returns 401 without a session', () => {
+      return request(app.getHttpServer()).get('/admin/users').expect(401);
     });
 
     it('GET /admin/users/:userId/permissions returns 401 without a session', () => {
       return request(app.getHttpServer()).get('/admin/users/u2/permissions').expect(401);
     });
-
-    it('POST /admin/users/:userId/permissions returns 401 without a session', () => {
-      return request(app.getHttpServer())
-        .post('/admin/users/u2/permissions')
-        .send({ permission: 'manage:admin' })
-        .expect(401);
-    });
-
-    it('DELETE /admin/users/:userId/permissions/:permission returns 401 without a session', () => {
-      return request(app.getHttpServer())
-        .delete('/admin/users/u2/permissions/manage:admin')
-        .expect(401);
-    });
   });
 
-  describe('403 — authenticated but missing manage:admin permission', () => {
+  describe('403 — authenticated but missing USERS_VIEW permission', () => {
     beforeEach(() => {
       mockAuth.api.getSession.mockResolvedValue({
-        user: { id: 'u1', role: 'user', email: 'user@example.com' },
+        user: { id: 'u1', email: 'user@example.com' },
         session: {},
       });
-      // User has no manage:admin permission
-      mockPrisma.adminPermission.findUnique.mockResolvedValue(null);
+      // User has at least one role (so AuthGuard passes)
+      mockPrisma.userRoleAssignment.findMany.mockResolvedValue([{ role: 'listener' }]);
+      // For PermissionGuard: user is not superadmin
+      mockPrisma.userRoleAssignment.findUnique.mockResolvedValue(null);
+      // User has no USERS_VIEW permission
+      mockPrisma.userPermission.findMany.mockResolvedValue([]);
+      mockPrisma.userPermission.findUnique.mockResolvedValue(null);
     });
 
-    it('GET /admin/users/:userId/permissions returns 403 without manage:admin', () => {
+    it('GET /admin/users returns 403 without USERS_VIEW permission', () => {
+      return request(app.getHttpServer()).get('/admin/users').expect(403);
+    });
+
+    it('GET /admin/users/:userId/permissions returns 403 without USERS_VIEW permission', () => {
       return request(app.getHttpServer()).get('/admin/users/u2/permissions').expect(403);
-    });
-
-    it('POST /admin/users/:userId/permissions returns 403 without manage:admin', () => {
-      return request(app.getHttpServer())
-        .post('/admin/users/u2/permissions')
-        .send({ permission: 'manage:admin' })
-        .expect(403);
-    });
-
-    it('DELETE /admin/users/:userId/permissions/:permission returns 403 without manage:admin', () => {
-      return request(app.getHttpServer())
-        .delete('/admin/users/u2/permissions/manage:admin')
-        .expect(403);
     });
   });
 
-  describe('200 — authenticated, GET /me (no permission required)', () => {
-    it('GET /admin/permissions/me returns 200 with a valid session', () => {
+  describe('200 — authenticated with USERS_VIEW permission', () => {
+    beforeEach(() => {
       mockAuth.api.getSession.mockResolvedValue({
-        user: { id: 'u1', role: 'user', email: 'user@example.com' },
+        user: { id: 'u1', email: 'user@example.com' },
         session: {},
       });
-      mockAdminPermissionsService.getMyPermissions.mockResolvedValue([]);
+      // User has at least one role (so AuthGuard passes)
+      mockPrisma.userRoleAssignment.findMany.mockResolvedValue([{ role: 'admin' }]);
+      // For PermissionGuard: user is not superadmin
+      mockPrisma.userRoleAssignment.findUnique.mockResolvedValue(null);
+      // User has USERS_VIEW permission
+      mockPrisma.userPermission.findMany.mockResolvedValue([
+        { permission: Permissions.USERS_VIEW },
+      ]);
+      mockPrisma.userPermission.findUnique.mockResolvedValue({
+        userId: 'u1',
+        permission: Permissions.USERS_VIEW,
+        grantedAt: new Date(),
+      });
+    });
 
-      return request(app.getHttpServer()).get('/admin/permissions/me').expect(200);
+    it('GET /admin/users returns 200 with USERS_VIEW permission', () => {
+      mockPermissionsService.listUsers.mockResolvedValue({ users: [] });
+      return request(app.getHttpServer()).get('/admin/users').expect(200);
+    });
+
+    it('GET /admin/users/:userId/permissions returns 200 with USERS_VIEW permission', () => {
+      mockPermissionsService.getPermissions.mockResolvedValue({ permissions: [] });
+      return request(app.getHttpServer()).get('/admin/users/u2/permissions').expect(200);
     });
   });
 });

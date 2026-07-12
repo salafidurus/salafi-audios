@@ -7,9 +7,16 @@ import request from 'supertest';
 import { AuthGuard } from '../auth/auth.guard';
 import { AudioController } from './audio.controller';
 import { AudioService } from './audio.service';
+import { PrismaService } from '../../shared/db/prisma.service';
 
 const mockAuth = { api: { getSession: vi.fn() } };
 vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
+
+const mockPrisma = {
+  userRoleAssignment: {
+    findMany: vi.fn().mockResolvedValue([{ role: 'user' }]),
+  },
+};
 
 const mockAudioService = {
   getUserProgress: vi.fn().mockResolvedValue([]),
@@ -34,6 +41,7 @@ describe('AudioController — boundaries', () => {
       providers: [
         { provide: APP_GUARD, useClass: AuthGuard },
         { provide: AudioService, useValue: mockAudioService },
+        { provide: PrismaService, useValue: mockPrisma },
       ],
     }).compile();
 

@@ -24,7 +24,7 @@ export function UserItem({ user, onManagePermissions }: UserItemProps): ReactNod
 
       <List.Item.Actions widthPercentDesktop="30%">
         <div onClick={(e) => e.stopPropagation()}>
-          <PermissionGate requires="manage:users">
+          <PermissionGate requires="USERS_VIEW">
             <button type="button" className={styles.manageButton} onClick={onManagePermissions}>
               <Shield className={styles.manageIcon} />
               {isTablet ? "Permissions" : "Manage Permissions"}

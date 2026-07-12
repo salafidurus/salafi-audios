@@ -1,15 +1,16 @@
 import { httpClient, endpoints } from "@sd/core-contracts";
-import type { AdminPermission, AdminUserListDto } from "@sd/core-contracts";
+import type {
+  Permission,
+  UserPermissionDto,
+  UserRoleAssignmentDto,
+  UserRole,
+  AdminUserListDto,
+} from "@sd/core-contracts";
 
 // --- Permissions ---
 
 export type AdminPermissionsListResponse = {
-  permissions: Array<{
-    userId: string;
-    permission: AdminPermission;
-    grantedAt: string;
-    grantedById: string | null;
-  }>;
+  permissions: UserPermissionDto[];
 };
 
 export function fetchUserPermissions(userId: string) {
@@ -19,7 +20,7 @@ export function fetchUserPermissions(userId: string) {
   });
 }
 
-export function grantPermission(userId: string, permission: AdminPermission) {
+export function grantPermission(userId: string, permission: Permission) {
   return httpClient<AdminPermissionsListResponse>({
     url: endpoints.admin.permissions.grant(userId),
     method: "POST",
@@ -30,6 +31,35 @@ export function grantPermission(userId: string, permission: AdminPermission) {
 export function revokePermission(userId: string, permission: string) {
   return httpClient<AdminPermissionsListResponse>({
     url: endpoints.admin.permissions.revoke(userId, permission),
+    method: "DELETE",
+    body: {},
+  });
+}
+
+// --- Roles ---
+
+export type AdminRolesListResponse = {
+  roles: UserRoleAssignmentDto[];
+};
+
+export function fetchUserRoles(userId: string) {
+  return httpClient<AdminRolesListResponse>({
+    url: `/admin/users/${userId}/roles`,
+    method: "GET",
+  });
+}
+
+export function grantRole(userId: string, role: UserRole) {
+  return httpClient<AdminRolesListResponse>({
+    url: `/admin/users/${userId}/roles`,
+    method: "POST",
+    body: { role },
+  });
+}
+
+export function revokeRole(userId: string, role: UserRole) {
+  return httpClient<AdminRolesListResponse>({
+    url: `/admin/users/${userId}/roles/${role}`,
     method: "DELETE",
     body: {},
   });

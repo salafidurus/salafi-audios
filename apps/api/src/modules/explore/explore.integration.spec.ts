@@ -7,9 +7,16 @@ import request from 'supertest';
 import { AuthGuard } from '../auth/auth.guard';
 import { ExploreController } from './explore.controller';
 import { ExploreService } from './explore.service';
+import { PrismaService } from '../../shared/db/prisma.service';
 
 const mockAuth = { api: { getSession: vi.fn() } };
 vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
+
+const mockPrisma = {
+  userRoleAssignment: {
+    findMany: vi.fn().mockResolvedValue([{ role: 'user' }]),
+  },
+};
 
 const mockExploreService = {
   getExplore: vi.fn().mockResolvedValue({ items: [], nextCursor: null, hasMore: false }),
@@ -29,6 +36,7 @@ describe('ExploreController — auth boundaries', () => {
       providers: [
         { provide: APP_GUARD, useClass: AuthGuard },
         { provide: ExploreService, useValue: mockExploreService },
+        { provide: PrismaService, useValue: mockPrisma },
       ],
     }).compile();
 

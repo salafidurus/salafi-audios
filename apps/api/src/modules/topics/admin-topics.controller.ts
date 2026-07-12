@@ -1,16 +1,14 @@
-import { Controller, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Patch, Delete, Param, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { Permissions } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { RequiresPermission } from '../../shared/decorators/requires-permission.decorator';
-import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { TopicsService } from './topics.service';
 import { UpsertTopicDto } from './dto/upsert-topic.dto';
 
 @ApiTags('Admin Topics')
 @ApiCommonErrors()
 @Controller('admin/topics')
-@UseGuards(AdminPermissionGuard)
 export class AdminTopicsController {
   constructor(private readonly service: TopicsService) {}
 

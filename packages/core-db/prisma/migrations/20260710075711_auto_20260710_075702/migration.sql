@@ -38,10 +38,10 @@ CREATE TYPE "Permission" AS ENUM (
 CREATE TYPE "ScholarPermissionType" AS ENUM ('OWN_CONTENT', 'ASSIGNED_EDITOR');
 
 -- Alter UserRole enum to add new roles and replace 'user' with 'listener'
+-- Note: 'editor' already exists in the enum from migration 20260704210014
 ALTER TYPE "UserRole" RENAME VALUE 'user' TO 'listener';
 ALTER TYPE "UserRole" ADD VALUE 'scholar' AFTER 'listener';
 ALTER TYPE "UserRole" ADD VALUE 'translator' AFTER 'scholar';
-ALTER TYPE "UserRole" ADD VALUE 'editor' AFTER 'translator';
 
 -- Create UserRoleAssignment table for multi-role support
 CREATE TABLE "UserRoleAssignment" (
@@ -73,12 +73,12 @@ SELECT
     gen_random_uuid()::text,
     "userId",
     CASE
-        WHEN "permission" LIKE 'manage:scholars' THEN 'SCHOLARS_EDIT'::permission
-        WHEN "permission" LIKE 'manage:content' THEN 'LISTINGS_EDIT'::permission
-        WHEN "permission" LIKE 'manage:admin' THEN 'USERS_GRANT_ROLES'::permission
-        WHEN "permission" LIKE 'manage:translations' THEN 'TRANSLATIONS_PUBLISH'::permission
-        WHEN "permission" LIKE '%view%' THEN 'SCHOLARS_VIEW'::permission
-        ELSE 'SCHOLARS_VIEW'::permission
+        WHEN "permission" LIKE 'manage:scholars' THEN 'SCHOLARS_EDIT'::"Permission"
+        WHEN "permission" LIKE 'manage:content' THEN 'LISTINGS_EDIT'::"Permission"
+        WHEN "permission" LIKE 'manage:admin' THEN 'USERS_GRANT_ROLES'::"Permission"
+        WHEN "permission" LIKE 'manage:translations' THEN 'TRANSLATIONS_PUBLISH'::"Permission"
+        WHEN "permission" LIKE '%view%' THEN 'SCHOLARS_VIEW'::"Permission"
+        ELSE 'SCHOLARS_VIEW'::"Permission"
     END,
     "grantedAt",
     "grantedById"
@@ -88,24 +88,34 @@ ON CONFLICT DO NOTHING;
 -- Drop the old AdminPermission table
 DROP TABLE "AdminPermission";
 
--- Drop the old ScholarRole enum (no longer used)
-DROP TYPE IF EXISTS "ScholarRole";
-
 -- Update UserScholarRole table to use permissionType instead of role
--- First, backup existing data
-CREATE TABLE "UserScholarRole_backup" AS SELECT * FROM "UserScholarRole";
+-- CRITICAL: Must drop ScholarRole type dependencies BEFORE dropping the type itself
 
--- Drop old UserScholarRole table
+-- Drop old UserScholarRole constraints and indexes
 ALTER TABLE "UserScholarRole" DROP CONSTRAINT "UserScholarRole_pkey";
 DROP INDEX IF EXISTS "idx_user_scholar_role_scholar_role";
 DROP INDEX IF EXISTS "idx_user_scholar_role_user";
 
--- Add id and permissionType columns, update createdByUserId to createdBy
+-- Drop old foreign key constraints
+ALTER TABLE "UserScholarRole" DROP CONSTRAINT IF EXISTS "UserScholarRole_userId_fkey";
+ALTER TABLE "UserScholarRole" DROP CONSTRAINT IF EXISTS "UserScholarRole_scholarId_fkey";
+ALTER TABLE "UserScholarRole" DROP CONSTRAINT IF EXISTS "UserScholarRole_createdByUser_fkey";
+
+-- Add id and permissionType columns, update createdByUserId to createdBy, and DROP the role column
+-- This MUST happen before dropping the ScholarRole type
+-- Split into separate ALTER statements because PostgreSQL doesn't allow mixing RENAME with other operations
 ALTER TABLE "UserScholarRole"
   ADD COLUMN "id" TEXT DEFAULT gen_random_uuid()::text,
-  ADD COLUMN "permissionType" "ScholarPermissionType" NOT NULL DEFAULT 'OWN_CONTENT',
-  RENAME COLUMN "createdByUserId" TO "createdBy",
+  ADD COLUMN "permissionType" "ScholarPermissionType" NOT NULL DEFAULT 'OWN_CONTENT';
+
+ALTER TABLE "UserScholarRole"
+  RENAME COLUMN "createdByUserId" TO "createdBy";
+
+ALTER TABLE "UserScholarRole"
   DROP COLUMN "role";
+
+-- NOW we can safely drop the ScholarRole enum (no longer referenced by any column)
+DROP TYPE IF EXISTS "ScholarRole";
 
 -- Set the id column as primary key
 ALTER TABLE "UserScholarRole"
@@ -119,11 +129,7 @@ ALTER TABLE "UserScholarRole"
 CREATE INDEX "idx_user_scholar_role_scholar_permission" ON "UserScholarRole"("scholarId", "permissionType");
 CREATE INDEX "idx_user_scholar_role_user" ON "UserScholarRole"("userId");
 
--- Update foreign key constraints to use CASCADE
-ALTER TABLE "UserScholarRole" DROP CONSTRAINT "UserScholarRole_userId_fkey";
-ALTER TABLE "UserScholarRole" DROP CONSTRAINT "UserScholarRole_scholarId_fkey";
-ALTER TABLE "UserScholarRole" DROP CONSTRAINT "UserScholarRole_createdByUser_fkey";
-
+-- Add new foreign key constraints with CASCADE
 ALTER TABLE "UserScholarRole"
   ADD CONSTRAINT "UserScholarRole_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT "UserScholarRole_scholarId_fkey" FOREIGN KEY ("scholarId") REFERENCES "Scholar"("id") ON DELETE CASCADE ON UPDATE CASCADE,
@@ -175,6 +181,3 @@ ON CONFLICT DO NOTHING;
 
 -- Drop the User.role column
 ALTER TABLE "User" DROP COLUMN "role";
-
--- Clean up backup table
-DROP TABLE "UserScholarRole_backup";

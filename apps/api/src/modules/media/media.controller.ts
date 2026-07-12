@@ -1,16 +1,14 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { Permissions } from '@sd/core-contracts';
 import type { PresignedUrlRequestDto, PresignedUrlResponseDto } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { RequiresPermission } from '../../shared/decorators/requires-permission.decorator';
-import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { MediaService } from './media.service';
 
 @ApiTags('Admin Media')
 @ApiCommonErrors()
 @Controller('admin/media')
-@UseGuards(AdminPermissionGuard)
 export class MediaController {
   constructor(private readonly service: MediaService) {}
 

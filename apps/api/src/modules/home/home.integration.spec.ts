@@ -7,9 +7,16 @@ import request from 'supertest';
 import { AuthGuard } from '../auth/auth.guard';
 import { HomeController } from './home.controller';
 import { HomeService } from './home.service';
+import { PrismaService } from '../../shared/db/prisma.service';
 
 const mockAuth = { api: { getSession: vi.fn() } };
 vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
+
+const mockPrisma = {
+  userRoleAssignment: {
+    findMany: vi.fn().mockResolvedValue([{ role: 'user' }]),
+  },
+};
 
 const mockHomeService = {
   getQuickBrowse: vi.fn().mockResolvedValue({
@@ -31,6 +38,7 @@ describe('HomeController — auth boundaries', () => {
       providers: [
         { provide: APP_GUARD, useClass: AuthGuard },
         { provide: HomeService, useValue: mockHomeService },
+        { provide: PrismaService, useValue: mockPrisma },
       ],
     }).compile();
 

@@ -311,4 +311,67 @@ export class PermissionsService {
   async canPublishTranslations(userId: string, locale: Locale): Promise<boolean> {
     return this.repository.canPublishTranslations(userId, locale);
   }
+
+  /**
+   * List all users with optional filtering by name, email, or role
+   * Used by the admin users listing endpoint
+   * Returns data in AdminUserListDto format for API compatibility
+   *
+   * @param query - Optional search query (matches name or email, case-insensitive)
+   * @param role - Optional role filter (filters by UserRoleAssignment)
+   * @returns AdminUserListDto with users array and total count
+   */
+  async listUsers(query?: string, role?: string) {
+    const { users, total } = await this.repository.listUsers(query, role);
+    return {
+      users: users.map((u) => ({
+        id: u.id,
+        name: u.name,
+        email: u.email,
+        image: u.image,
+        roles: u.roles.map((r) => r.role),
+        createdAt: u.createdAt.toISOString(),
+        permissions: u.permissions.map((p) => p.permission),
+      })),
+      total,
+    };
+  }
+
+  /**
+   * Get current user's permissions with role and permission details
+   * Used by the /me endpoint to return the current user's permission state
+   *
+   * @param userId - User ID
+   * @returns Object with permissions array (Permission enum values) and roles array
+   */
+  async getMyPermissions(userId: string) {
+    const [permissions, roles] = await Promise.all([
+      this.repository.findPermissionStringsByUserId(userId),
+      this.repository.getUserRoles(userId),
+    ]);
+
+    return {
+      permissions,
+      roles,
+    };
+  }
+
+  /**
+   * Get detailed permission information for a user (with full audit trail)
+   * Used by admin endpoints to show user permissions with timestamps and who granted them
+   *
+   * @param userId - User ID
+   * @returns AdminPermissionsListDto with detailed permission information
+   */
+  async getPermissions(userId: string) {
+    const perms = await this.repository.getUserPermissionsDetail(userId);
+    return {
+      permissions: perms.map((p) => ({
+        userId: p.userId,
+        permission: p.permission,
+        grantedAt: p.grantedAt.toISOString(),
+        grantedById: p.grantedBy,
+      })),
+    };
+  }
 }

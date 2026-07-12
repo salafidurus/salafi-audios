@@ -7,9 +7,16 @@ import request from 'supertest';
 import { AuthGuard } from '../auth/auth.guard';
 import { LibraryController } from './library.controller';
 import { LibraryService } from './library.service';
+import { PrismaService } from '../../shared/db/prisma.service';
 
 const mockAuth = { api: { getSession: vi.fn() } };
 vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
+
+const mockPrisma = {
+  userRoleAssignment: {
+    findMany: vi.fn().mockResolvedValue([{ role: 'user' }]),
+  },
+};
 
 const mockLibraryService = {
   getInProgress: vi.fn().mockResolvedValue({ items: [], hasMore: false }),
@@ -32,6 +39,7 @@ describe('LibraryController — auth boundaries', () => {
       providers: [
         { provide: APP_GUARD, useClass: AuthGuard },
         { provide: LibraryService, useValue: mockLibraryService },
+        { provide: PrismaService, useValue: mockPrisma },
       ],
     }).compile();
 

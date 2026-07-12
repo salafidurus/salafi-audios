@@ -217,4 +217,88 @@ export class PermissionsRepository {
       where: { id: scholarId },
     });
   }
+
+  // ========== User Listing Operations ==========
+
+  /**
+   * List all users with optional filtering by name, email, or role
+   * Returns user data with their permissions and roles included
+   */
+  async listUsers(query?: string, role?: string) {
+    const where: any = {};
+
+    // Add search filter (name or email)
+    if (query) {
+      where.OR = [
+        { name: { contains: query, mode: 'insensitive' as const } },
+        { email: { contains: query, mode: 'insensitive' as const } },
+      ];
+    }
+
+    // Add role filter via UserRoleAssignment (silently ignore invalid values with warning)
+    if (role) {
+      const validRoles = ['listener', 'scholar', 'translator', 'editor', 'admin', 'superadmin'];
+      if (validRoles.includes(role)) {
+        where.roles = {
+          some: { role },
+        };
+      } else {
+        // Log warning for invalid role but continue processing
+        console.warn(
+          `[PermissionsRepository] Invalid role filter value: "${role}". Valid values: ${validRoles.join(', ')}`,
+        );
+      }
+    }
+
+    const [users, total] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        include: {
+          permissions: {
+            select: { permission: true },
+          },
+          roles: {
+            select: { role: true },
+          },
+        },
+        orderBy: { createdAt: 'desc' as const },
+      }),
+      this.prisma.user.count({ where }),
+    ]);
+
+    return { users, total };
+  }
+
+  /**
+   * Get permission strings for a user (ordered by grant date)
+   */
+  async findPermissionStringsByUserId(userId: string): Promise<Permission[]> {
+    const perms = await this.prisma.userPermission.findMany({
+      where: { userId },
+      select: { permission: true },
+      orderBy: { grantedAt: 'desc' },
+    });
+    return perms.map((p) => p.permission);
+  }
+
+  /**
+   * Check if a user has any permissions at all
+   */
+  async hasAnyPermission(userId: string): Promise<boolean> {
+    const count = await this.prisma.userPermission.count({
+      where: { userId },
+    });
+    return count > 0;
+  }
+
+  /**
+   * Get detailed permission information for a user (includes grantedAt and grantedBy)
+   * Used by admin endpoints to show full permission audit trail
+   */
+  async getUserPermissionsDetail(userId: string) {
+    return this.prisma.userPermission.findMany({
+      where: { userId },
+      orderBy: { grantedAt: 'desc' },
+    });
+  }
 }

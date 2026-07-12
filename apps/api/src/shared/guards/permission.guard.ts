@@ -2,7 +2,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import type { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { FastifyRequest } from 'fastify';
-import type { Permission, UserRole } from '@sd/core-contracts';
+import type { Permission, UserRole } from '@sd/core-db';
 import { REQUIRES_PERMISSION_KEY } from '../decorators/requires-permission.decorator';
 import { PrismaService } from '../db/prisma.service';
 
@@ -31,8 +31,8 @@ export class PermissionGuard implements CanActivate {
     // Routes without @RequiresPermission are guarded only by AuthGuard
     if (!requiredPermission) return true;
 
-    const request = context.switchToHttp().getRequest<FastifyRequest>();
-    const user = request.user as { id: string } | undefined;
+    const request = context.switchToHttp().getRequest<FastifyRequest & { user?: { id: string } }>();
+    const user = request.user;
 
     if (!user?.id) throw new ForbiddenException('Authentication required');
 

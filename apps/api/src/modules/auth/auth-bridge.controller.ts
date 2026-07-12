@@ -3,6 +3,7 @@ import { ApiExcludeController } from '@nestjs/swagger';
 import type { IncomingHttpHeaders } from 'http';
 import type { FastifyRequest } from 'fastify';
 import { ConfigService } from '../../shared/config/config.service';
+import { PrismaService } from '../../shared/db/prisma.service';
 import { getAuth } from './auth.instance';
 import { Public } from './decorators';
 
@@ -33,7 +34,10 @@ function toFetchHeaders(nodeHeaders: IncomingHttpHeaders): Headers {
 @ApiExcludeController()
 @Controller('auth-bridge')
 export class AuthBridgeController {
-  constructor(private readonly config: ConfigService) {}
+  constructor(
+    private readonly config: ConfigService,
+    private readonly prisma: PrismaService,
+  ) {}
 
   @Public()
   @Get('oauth-complete')
@@ -47,6 +51,39 @@ export class AuthBridgeController {
     const target = this.resolveAllowedRedirect(redirect);
     // nosemgrep: typescript.nestjs.security.audit.nestjs-open-redirect.nestjs-open-redirect
     if (!target) return { url: fallback, statusCode: 302 };
+
+    // Get the authenticated session (created by Better Auth during OAuth)
+    let session;
+    try {
+      session = await getAuth().api.getSession({
+        headers: toFetchHeaders(req.headers),
+      });
+    } catch {
+      // nosemgrep: typescript.nestjs.security.audit.nestjs-open-redirect.nestjs-open-redirect
+      return { url: fallback, statusCode: 302 };
+    }
+
+    // nosemgrep: typescript.nestjs.security.audit.nestjs-open-redirect.nestjs-open-redirect
+    if (!session?.user?.id) return { url: fallback, statusCode: 302 };
+
+    // Assign default 'listener' role to new users who have no roles yet
+    const existingRoles = await this.prisma.userRoleAssignment.findMany({
+      where: { userId: session.user.id },
+    });
+
+    if (!existingRoles.length) {
+      try {
+        await this.prisma.userRoleAssignment.create({
+          data: {
+            userId: session.user.id,
+            role: 'listener',
+            grantedAt: new Date(),
+          },
+        });
+      } catch {
+        // If role assignment fails, proceed anyway (don't fail the OAuth flow)
+      }
+    }
 
     let token: string | undefined;
     try {

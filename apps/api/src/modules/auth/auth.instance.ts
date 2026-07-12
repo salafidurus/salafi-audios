@@ -21,15 +21,20 @@ function getAuthPrisma(config: ConfigService): PrismaClient {
 
   const adapter = new PrismaPg({ connectionString });
   prisma = new PrismaClient({ adapter });
+
   return prisma;
 }
 
 function createAuthInstance(config: ConfigService) {
+  const prismaClient = getAuthPrisma(config);
+
   return betterAuth({
     secret: config.BETTER_AUTH_SECRET,
     baseURL: config.BETTER_AUTH_URL,
     basePath: '/api/auth',
-    database: prismaAdapter(getAuthPrisma(config), { provider: 'postgresql' }),
+    database: prismaAdapter(prismaClient, {
+      provider: 'postgresql',
+    }),
     trustedOrigins: config.CORS_ORIGINS,
     emailAndPassword: { enabled: false },
     socialProviders: {

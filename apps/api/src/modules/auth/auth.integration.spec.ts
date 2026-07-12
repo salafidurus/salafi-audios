@@ -7,9 +7,16 @@ import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { Public } from './decorators';
 import { AuthGuard } from './auth.guard';
+import { PrismaService } from '../../shared/db/prisma.service';
 
 const mockAuth = { api: { getSession: vi.fn() } };
 vi.mock('./auth.instance', () => ({ getAuth: () => mockAuth }));
+
+const mockPrisma = {
+  userRoleAssignment: {
+    findMany: vi.fn().mockResolvedValue([{ role: 'user' }]),
+  },
+};
 
 @Controller('auth-test')
 class TestController {
@@ -33,7 +40,10 @@ describe('AuthGuard — HTTP integration', () => {
 
     const module = await Test.createTestingModule({
       controllers: [TestController],
-      providers: [{ provide: APP_GUARD, useClass: AuthGuard }],
+      providers: [
+        { provide: APP_GUARD, useClass: AuthGuard },
+        { provide: PrismaService, useValue: mockPrisma },
+      ],
     }).compile();
 
     app = module.createNestApplication<NestFastifyApplication>(new FastifyAdapter());

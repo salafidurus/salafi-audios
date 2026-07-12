@@ -8,7 +8,7 @@ type MetaDetailsProps = {
     name: string | null;
     email: string;
     image: string | null;
-    role: string;
+    roles: string[];
     createdAt: string;
   };
 };
@@ -22,7 +22,7 @@ export function MetaDetails({ user }: MetaDetailsProps): ReactNode {
       <div className={styles.content}>
         <div className={styles.nameRow}>
           <div className={styles.name}>{user.name ?? "Unnamed"}</div>
-          <RoleBadge role={user.role} />
+          <RoleBadge roles={user.roles} />
         </div>
         <div className={styles.details}>
           <div className={styles.email}>{user.email}</div>

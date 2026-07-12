@@ -1,10 +1,9 @@
-import { Controller, Patch, Param, Body, UseGuards, Post, Put, Get } from '@nestjs/common';
+import { Controller, Patch, Param, Body, Post, Put, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import type { LivestreamChannelDto } from '@sd/core-contracts';
 import { Permissions } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { RequiresPermission } from '../../shared/decorators/requires-permission.decorator';
-import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { LiveService } from './live.service';
 import { CreateLivestreamChannelDto } from './dto/create-livestream-channel.dto';
 import { UpdateLivestreamChannelDto } from './dto/update-livestream-channel.dto';
@@ -15,7 +14,6 @@ import { UpdateLiveSessionStatusDto } from './dto/update-live-session-status.dto
 @ApiTags('Admin Live')
 @ApiCommonErrors()
 @Controller('admin/live')
-@UseGuards(AdminPermissionGuard)
 export class AdminLiveController {
   constructor(private readonly service: LiveService) {}
 

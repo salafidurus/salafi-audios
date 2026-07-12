@@ -10,9 +10,16 @@ import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard
 import { ScholarsController } from './scholars.controller';
 import { AdminScholarsController } from './admin-scholars.controller';
 import { ScholarsService } from './scholars.service';
+import { PrismaService } from '../../shared/db/prisma.service';
 
 const mockAuth = { api: { getSession: vi.fn() } };
 vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
+
+const mockPrisma = {
+  userRoleAssignment: {
+    findMany: vi.fn().mockResolvedValue([{ role: 'user' }]),
+  },
+};
 
 const mockScholarsService = {
   list: vi.fn().mockResolvedValue({ scholars: [] }),
@@ -34,6 +41,7 @@ describe('ScholarsController — auth boundaries', () => {
       providers: [
         { provide: APP_GUARD, useClass: AuthGuard },
         { provide: ScholarsService, useValue: mockScholarsService },
+        { provide: PrismaService, useValue: mockPrisma },
       ],
     })
       .overrideGuard(AdminPermissionGuard)

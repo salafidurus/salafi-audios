@@ -1,3 +1,9 @@
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-scale-xs);
+}
+
 .badge {
   padding: 2px var(--space-scale-xs);
   border-radius: var(--radius-scale-sm);

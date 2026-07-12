@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type {
   AdminListingActionDto,
@@ -10,7 +10,6 @@ import type {
 import { Permissions } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { RequiresPermission } from '../../shared/decorators/requires-permission.decorator';
-import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { ListingService } from './listing.service';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { BulkActionDto } from '../../shared/dto/bulk-action.dto';
@@ -18,7 +17,6 @@ import { BulkActionDto } from '../../shared/dto/bulk-action.dto';
 @ApiTags('Admin Listings')
 @ApiCommonErrors()
 @Controller('admin/listings')
-@UseGuards(AdminPermissionGuard)
 export class AdminListingsController {
   constructor(private readonly service: ListingService) {}
 

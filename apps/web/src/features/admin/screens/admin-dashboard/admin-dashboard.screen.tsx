@@ -22,28 +22,28 @@ const ADMIN_SECTIONS: AdminSection[] = [
     description: "Manage scholars, their profiles and visibility",
     descriptionMobile: "Manage scholars",
     href: "/admin/scholars",
-    permission: "manage:scholars",
+    permission: "SCHOLARS_EDIT" as const,
   },
   {
     title: "Contents",
     description: "Manage topics, lectures, and content hierarchy",
     descriptionMobile: "Manage content",
     href: "/admin/contents",
-    permission: "manage:content",
+    permission: "LISTINGS_EDIT" as const,
   },
   {
     title: "Users",
     description: "Manage admin users and permissions",
     descriptionMobile: "Manage users",
     href: "/admin/users",
-    permission: "manage:admin",
+    permission: "USERS_GRANT_PERMISSIONS" as const,
   },
   {
     title: "Livestreams",
     description: "Manage live sessions and channel status",
     descriptionMobile: "Manage livestreams",
     href: "/admin/live",
-    permission: "manage:livestreams",
+    permission: "LIVE_EDIT" as const,
   },
 ];
 
