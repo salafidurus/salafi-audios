@@ -36,6 +36,7 @@
     "prisma:format": "prisma format --schema=./prisma/schema.prisma --config=./prisma.config.ts",
     "prisma:validate": "prisma validate --schema=./prisma/schema.prisma --config=./prisma.config.ts",
     "prisma:seed": "bun run scripts/seed.ts",
+    "prisma:reset:hard": "prisma migrate reset --force && bun run prisma:seed",
     "migrate:create-only": "bun ./scripts/migrate-with-auto-name.js",
     "migrate:deploy": "prisma migrate deploy --schema=./prisma/schema.prisma --config=./prisma.config.ts",
     "grant:role": "bun ./scripts/grant-role.js",
