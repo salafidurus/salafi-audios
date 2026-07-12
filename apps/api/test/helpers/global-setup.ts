@@ -1,5 +1,6 @@
-import { seedTestData } from './seed-test-data';
+process.env.NODE_ENV = 'test';
 import '../../src/shared/utils/env.bootstrap';
+import { seedTestData } from './seed-test-data';
 
 export async function setup() {
   console.log('--- Initializing E2E Test Suite Seed Data ---');

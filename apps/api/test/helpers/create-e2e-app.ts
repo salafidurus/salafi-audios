@@ -1,6 +1,5 @@
-import { Test } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { TelegramModule } from '../../src/modules/telegram/telegram.module';
-import { TelegramService } from '../../src/modules/telegram/telegram.service';
 import { CDNHealthIndicator } from '../../src/core/health/cdn-health.indicator';
 import { AppModule } from '../../src/app.module';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
@@ -11,8 +10,12 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { AllExceptionsFilter } from '../../src/shared/errors/http-exception.filter';
 import { ConfigService } from '../../src/shared/config/config.service';
+import { initAuth } from '../../src/modules/auth/auth.instance';
 
-export async function createE2eApp(): Promise<NestFastifyApplication> {
+export async function createE2eApp(): Promise<{
+  app: NestFastifyApplication;
+  moduleRef: TestingModule;
+}> {
   const moduleBuilder = Test.createTestingModule({
     imports: [AppModule],
   })
@@ -24,8 +27,11 @@ export async function createE2eApp(): Promise<NestFastifyApplication> {
   const module = await moduleBuilder.compile();
   const app = module.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
 
+  const config = app.get(ConfigService);
+  initAuth(config);
+
   app.useGlobalPipes(new ZodValidationPipe());
-  app.useGlobalFilters(new AllExceptionsFilter(app.get(ConfigService)));
+  app.useGlobalFilters(new AllExceptionsFilter(config));
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Salafi Durus API')
@@ -39,5 +45,5 @@ export async function createE2eApp(): Promise<NestFastifyApplication> {
 
   await app.init();
   await app.getHttpAdapter().getInstance().ready();
-  return app;
+  return { app, moduleRef: module };
 }

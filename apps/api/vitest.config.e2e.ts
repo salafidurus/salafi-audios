@@ -24,6 +24,7 @@ export default defineConfig({
     include: ['test/**/*.e2e-spec.ts'],
     testTimeout: 30000,
     hookTimeout: 30000,
+    setupFiles: ['./test/helpers/setup.ts'],
     globalSetup: ['./test/helpers/global-setup.ts'],
   },
 });

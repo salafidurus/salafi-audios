@@ -10,7 +10,7 @@ describe('Infrastructure & Basic API Features (e2e)', () => {
   let authFactory: TestAuthFactory;
 
   beforeAll(async () => {
-    app = await createE2eApp();
+    ({ app } = await createE2eApp());
     prisma = app.get(PrismaService);
     authFactory = new TestAuthFactory(prisma);
   });

@@ -6,7 +6,7 @@ describe('AppController (e2e)', () => {
   let app: NestFastifyApplication;
 
   beforeEach(async () => {
-    app = await createE2eApp();
+    ({ app } = await createE2eApp());
   });
 
   afterEach(() => app.close());
