@@ -146,10 +146,16 @@ export function fetchAdminUsers(params?: { q?: string; role?: string }) {
 
 // --- Live ---
 
-export function updateLiveSessionStatus(id: string, status: string) {
-  return httpClient<unknown>({
-    url: endpoints.admin.live.updateStatus(id),
+export async function updateLiveSessionStatus(id: string, status: string): Promise<void> {
+  const actionMap: Record<string, string> = {
+    live: "go-live",
+    ended: "end",
+    scheduled: "reschedule",
+  };
+  const action = actionMap[status];
+  if (!action) throw new Error(`Unknown live session status: ${status}`);
+  await httpClient<void>({
+    url: `/admin/live/sessions/${id}/${action}`,
     method: "PATCH",
-    body: { status },
   });
 }

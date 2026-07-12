@@ -9,7 +9,6 @@ import { CreateLivestreamChannelDto } from './dto/create-livestream-channel.dto'
 import { UpdateLivestreamChannelDto } from './dto/update-livestream-channel.dto';
 import { CreateLiveSessionDto } from './dto/create-live-session.dto';
 import { UpdateLiveSessionDto } from './dto/update-live-session.dto';
-import { UpdateLiveSessionStatusDto } from './dto/update-live-session-status.dto';
 
 @ApiTags('Admin Live')
 @ApiCommonErrors()
@@ -52,10 +51,24 @@ export class AdminLiveController {
     return this.service.updateSession(id, body);
   }
 
-  @Patch('sessions/:id/status')
+  @Patch('sessions/:id/go-live')
+  @RequiresPermission(Permissions.LIVE_START)
+  @ApiOperation({ summary: 'Go live — transition session to live status' })
+  goLive(@Param('id') id: string): Promise<unknown> {
+    return this.service.updateSessionStatus(id, 'live');
+  }
+
+  @Patch('sessions/:id/end')
+  @RequiresPermission(Permissions.LIVE_STOP)
+  @ApiOperation({ summary: 'End live session — transition to ended status' })
+  endSession(@Param('id') id: string): Promise<unknown> {
+    return this.service.updateSessionStatus(id, 'ended');
+  }
+
+  @Patch('sessions/:id/reschedule')
   @RequiresPermission(Permissions.LIVE_EDIT)
-  @ApiOperation({ summary: 'Update a live session status' })
-  updateSessionStatus(@Param('id') id: string, @Body() body: UpdateLiveSessionStatusDto) {
-    return this.service.updateSessionStatus(id, body.status);
+  @ApiOperation({ summary: 'Reschedule — transition session back to scheduled' })
+  rescheduleSession(@Param('id') id: string): Promise<unknown> {
+    return this.service.updateSessionStatus(id, 'scheduled');
   }
 }
