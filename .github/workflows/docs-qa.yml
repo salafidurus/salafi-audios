@@ -28,6 +28,7 @@ jobs:
             docs/**/*.md
             AGENT.md
             .github/copilot-instructions.md
+            !.serena/**/*.md
 
       - name: Check internal markdown links
         uses: lycheeverse/lychee-action@v2

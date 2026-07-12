@@ -8,12 +8,25 @@ import request from 'supertest';
 import { createTestApp } from '../../test/create-test-app';
 import { AuthGuard } from '../auth/auth.guard';
 import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
+import { PermissionGuard } from '../../shared/guards/permission.guard';
 import { TopicsController } from './topics.controller';
 import { TopicsTranslationsController } from './topics-translations.controller';
 import { TopicsService } from './topics.service';
+import { PrismaService } from '../../shared/db/prisma.service';
 
 const mockAuth = { api: { getSession: vi.fn() } };
 vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
+
+const mockPrisma = {
+  userPermission: {
+    findMany: vi.fn().mockResolvedValue([]),
+    findUnique: vi.fn().mockResolvedValue(null),
+  },
+  userRoleAssignment: {
+    findMany: vi.fn().mockResolvedValue([{ role: 'user' }]),
+    findUnique: vi.fn().mockResolvedValue(null),
+  },
+};
 
 const draftTranslation = {
   locale: 'ar',
@@ -45,7 +58,9 @@ async function buildApp(overrideGuard?: () => boolean | never): Promise<NestFast
     controllers: [TopicsController, TopicsTranslationsController],
     providers: [
       { provide: APP_GUARD, useClass: AuthGuard },
+      { provide: APP_GUARD, useClass: PermissionGuard },
       { provide: TopicsService, useValue: mockTopicsService },
+      { provide: PrismaService, useValue: mockPrisma },
     ],
   })
     .overrideGuard(AdminPermissionGuard)
@@ -75,6 +90,22 @@ describe('TopicsTranslationsController — auth boundaries', () => {
       mockAuth.api.getSession.mockResolvedValue({
         user: { id: 'u1', role: 'admin' },
         session: {},
+      });
+      // Mock userPermission.findUnique to return permissions for admin
+      mockPrisma.userPermission.findUnique.mockImplementation(async ({ where }) => {
+        const { userId, permission } = where.userId_permission;
+        if (
+          userId === 'u1' &&
+          [
+            'TRANSLATIONS_VIEW',
+            'TRANSLATIONS_CREATE',
+            'TRANSLATIONS_EDIT',
+            'TRANSLATIONS_PUBLISH',
+          ].includes(permission)
+        ) {
+          return { userId, permission, grantedAt: new Date() };
+        }
+        return null;
       });
     });
 
@@ -125,9 +156,10 @@ describe('TopicsTranslationsController — auth boundaries', () => {
         user: { id: 'u1', role: 'user' },
         session: {},
       });
-      forbiddenApp = await buildApp(() => {
-        throw new ForbiddenException('Missing permission: manage:content');
-      });
+      // Reset userPermission.findUnique to return null for all queries
+      // This ensures PermissionGuard will throw ForbiddenException
+      mockPrisma.userPermission.findUnique.mockResolvedValue(null);
+      forbiddenApp = await buildApp();
     });
 
     afterEach(() => forbiddenApp.close());

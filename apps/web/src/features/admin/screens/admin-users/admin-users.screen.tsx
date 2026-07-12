@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import type { ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useApiQuery, queryKeys, httpClient } from "@sd/core-contracts";
-import { endpoints, type AdminUserListDto } from "@sd/core-contracts";
+import { endpoints, type AdminUserListDto, type UserRole } from "@sd/core-contracts";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
@@ -13,14 +13,26 @@ import { Search } from "@/shared/components/Search";
 import { List } from "@/shared/components/List";
 import { UserItem } from "@/features/admin/components/user-item";
 import { PermissionsDialog } from "@/features/admin/components/PermissionsDialog";
+import { RoleDialog } from "@/features/admin/components/RoleDialog";
 import styles from "./admin-users.screen.module.css";
+
+const ROLE_CHIPS: Array<{ id: UserRole; label: string }> = [
+  { id: "listener", label: "Listener" },
+  { id: "scholar", label: "Scholar" },
+  { id: "translator", label: "Translator" },
+  { id: "editor", label: "Editor" },
+  { id: "admin", label: "Admin" },
+  { id: "superadmin", label: "Super Admin" },
+];
 
 export function AdminUsersScreen(): ReactNode {
   const queryClient = useQueryClient();
   const { isMobile } = useResponsive();
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [role, setRole] = useState("");
   const [permUser, setPermUser] = useState<{ id: string; name: string } | null>(null);
+  const [roleUser, setRoleUser] = useState<{ id: string; name: string } | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -31,10 +43,10 @@ export function AdminUsersScreen(): ReactNode {
   }, [searchQuery]);
 
   const { data, isFetching } = useApiQuery<AdminUserListDto>(
-    queryKeys.admin.users.list(debouncedSearch),
+    queryKeys.admin.users.list(debouncedSearch, role),
     () =>
       httpClient<AdminUserListDto>({
-        url: `${endpoints.admin.users.list}${debouncedSearch ? `?q=${encodeURIComponent(debouncedSearch)}` : ""}`,
+        url: `${endpoints.admin.users.list}${debouncedSearch || role ? `?${new URLSearchParams({ ...(debouncedSearch && { q: debouncedSearch }), ...(role && { role }) }).toString()}` : ""}`,
         method: "GET",
       }),
   );
@@ -43,6 +55,10 @@ export function AdminUsersScreen(): ReactNode {
   const total = useMemo(() => data?.total ?? 0, [data]);
 
   const handlePermissionsChange = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
+  }, [queryClient]);
+
+  const handleRolesChange = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
   }, [queryClient]);
 
@@ -59,6 +75,14 @@ export function AdminUsersScreen(): ReactNode {
           />
         </div>
 
+        <Search.Filter
+          chips={ROLE_CHIPS}
+          selected={role ? [role] : []}
+          onChipChange={(chipId: string) => {
+            setRole(role === chipId ? "" : chipId);
+          }}
+        />
+
         {isFetching ? (
           <EmptyState variant="loading" message="Loading users…" />
         ) : (
@@ -71,7 +95,9 @@ export function AdminUsersScreen(): ReactNode {
 
             {users.length === 0 ? (
               <EmptyState
-                message={debouncedSearch ? "No users match your search." : "No users found."}
+                message={
+                  debouncedSearch || role ? "No users match your search." : "No users found."
+                }
               />
             ) : (
               <List>
@@ -80,6 +106,7 @@ export function AdminUsersScreen(): ReactNode {
                     key={user.id}
                     user={user}
                     onManagePermissions={() => setPermUser({ id: user.id, name: user.name })}
+                    onManageRoles={() => setRoleUser({ id: user.id, name: user.name })}
                   />
                 ))}
               </List>
@@ -95,6 +122,16 @@ export function AdminUsersScreen(): ReactNode {
           userName={permUser.name}
           onClose={() => setPermUser(null)}
           onPermissionsChange={handlePermissionsChange}
+        />
+      )}
+
+      {roleUser && (
+        <RoleDialog
+          isOpen
+          userId={roleUser.id}
+          userName={roleUser.name}
+          onClose={() => setRoleUser(null)}
+          onRolesChange={handleRolesChange}
         />
       )}
     </ScreenView>

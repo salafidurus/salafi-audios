@@ -9,9 +9,16 @@ import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard
 import { LiveController } from './live.controller';
 import { AdminLiveController } from './admin-live.controller';
 import { LiveService } from './live.service';
+import { PrismaService } from '../../shared/db/prisma.service';
 
 const mockAuth = { api: { getSession: vi.fn() } };
 vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
+
+const mockPrisma = {
+  userRoleAssignment: {
+    findMany: vi.fn().mockResolvedValue([{ role: 'user' }]),
+  },
+};
 
 const mockLiveService = {
   getChannels: vi.fn().mockResolvedValue([]),
@@ -35,6 +42,7 @@ describe('LiveController — auth boundaries', () => {
       providers: [
         { provide: APP_GUARD, useClass: AuthGuard },
         { provide: LiveService, useValue: mockLiveService },
+        { provide: PrismaService, useValue: mockPrisma },
       ],
     })
       .overrideGuard(AdminPermissionGuard)

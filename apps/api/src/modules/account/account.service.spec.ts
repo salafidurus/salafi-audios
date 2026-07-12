@@ -11,7 +11,6 @@ describe('AccountService', () => {
     email: 'test@example.com',
     name: 'Test User',
     image: 'https://example.com/avatar.png',
-    role: 'user',
     emailVerified: true,
     createdAt: new Date('2024-01-01T00:00:00.000Z'),
     updatedAt: new Date('2024-06-01T00:00:00.000Z'),
@@ -42,7 +41,6 @@ describe('AccountService', () => {
         email: 'test@example.com',
         displayName: 'Test User',
         avatarUrl: 'https://example.com/avatar.png',
-        role: 'user',
         emailVerified: true,
         createdAt: '2024-01-01T00:00:00.000Z',
         updatedAt: '2024-06-01T00:00:00.000Z',
@@ -82,13 +80,11 @@ describe('AccountService', () => {
       expect(result.updatedAt).toBe('2024-06-01T00:00:00.000Z');
     });
 
-    it('should include role and emailVerified', () => {
+    it('should include emailVerified', () => {
       const result = service.getProfile({
         ...mockUser,
-        role: 'admin',
         emailVerified: false,
       });
-      expect(result.role).toBe('admin');
       expect(result.emailVerified).toBe(false);
     });
   });

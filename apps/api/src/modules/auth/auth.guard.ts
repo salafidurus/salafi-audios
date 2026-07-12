@@ -2,11 +2,15 @@ import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/c
 import type { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
+import { PrismaService } from '../../shared/db/prisma.service';
 import { IS_PUBLIC_KEY, ROLES_KEY } from './decorators';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private readonly reflector: Reflector) {}
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly prisma: PrismaService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
@@ -39,15 +43,47 @@ export class AuthGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    if (!session.user.role) throw new UnauthorizedException();
+    // Fetch user's roles from UserRoleAssignment table
+    const userRoles = await this.prisma.userRoleAssignment.findMany({
+      where: { userId: session.user.id },
+      select: { role: true },
+    });
 
-    if (requiredRoles?.length && !requiredRoles.includes(session.user.role)) {
+    let roles: string[] = userRoles.map((r) => r.role);
+
+    // If user has no roles (edge case: race condition during OAuth), assign default 'listener' role
+    if (!roles.length) {
+      try {
+        await this.prisma.userRoleAssignment.create({
+          data: {
+            userId: session.user.id,
+            role: 'listener',
+            grantedAt: new Date(),
+          },
+        });
+        roles = ['listener'];
+      } catch {
+        // If creation fails (e.g., unique constraint), fetch again
+        const retryRoles = await this.prisma.userRoleAssignment.findMany({
+          where: { userId: session.user.id },
+          select: { role: true },
+        });
+        roles = retryRoles.map((r) => r.role);
+
+        // Still no roles after retry, reject the request
+        if (!roles.length) throw new UnauthorizedException();
+      }
+    }
+
+    // If specific roles are required via @Roles decorator, check if user has one of them
+    if (requiredRoles?.length && !requiredRoles.some((r) => roles.includes(r as string))) {
       throw new UnauthorizedException();
     }
 
+    // Attach user info to request (for use by controllers and other services)
     request.user = {
       ...session.user,
-      role: session.user.role,
+      roles, // Attach actual roles from database
     };
     return true;
   }

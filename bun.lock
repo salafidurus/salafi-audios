@@ -334,6 +334,17 @@
         "react": "^19.0.0",
       },
     },
+    "packages/domain-permissions": {
+      "name": "@sd/domain-permissions",
+      "version": "0.0.0",
+      "dependencies": {
+        "@sd/core-contracts": "workspace:*",
+        "@tanstack/react-query": "catalog:",
+      },
+      "peerDependencies": {
+        "react": "^19.0.0",
+      },
+    },
     "packages/domain-search": {
       "name": "@sd/domain-search",
       "version": "0.0.0",
@@ -1502,6 +1513,8 @@
     "@sd/domain-content": ["@sd/domain-content@workspace:packages/domain-content"],
 
     "@sd/domain-live": ["@sd/domain-live@workspace:packages/domain-live"],
+
+    "@sd/domain-permissions": ["@sd/domain-permissions@workspace:packages/domain-permissions"],
 
     "@sd/domain-search": ["@sd/domain-search@workspace:packages/domain-search"],
 

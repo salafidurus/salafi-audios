@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put, Query, UseGuards, Req } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type {
   AdminListingActionDto,
@@ -7,9 +7,9 @@ import type {
   AdminListingDetailDto,
   BulkActionResultDto,
 } from '@sd/core-contracts';
+import { Permissions } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { RequiresPermission } from '../../shared/decorators/requires-permission.decorator';
-import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { ListingService } from './listing.service';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { BulkActionDto } from '../../shared/dto/bulk-action.dto';
@@ -17,12 +17,11 @@ import { BulkActionDto } from '../../shared/dto/bulk-action.dto';
 @ApiTags('Admin Listings')
 @ApiCommonErrors()
 @Controller('admin/listings')
-@UseGuards(AdminPermissionGuard)
 export class AdminListingsController {
   constructor(private readonly service: ListingService) {}
 
   @Get()
-  @RequiresPermission('manage:content')
+  @RequiresPermission(Permissions.LISTINGS_VIEW)
   @ApiOperation({ summary: 'List all listings (admin)' })
   listAdmin(
     @Query('page') page = '1',
@@ -39,14 +38,14 @@ export class AdminListingsController {
   }
 
   @Get(':id')
-  @RequiresPermission('manage:content')
+  @RequiresPermission(Permissions.LISTINGS_VIEW)
   @ApiOperation({ summary: 'Get listing detail (admin)' })
   getAdminDetail(@Param('id') id: string): Promise<AdminListingDetailDto> {
     return this.service.getAdminDetail(id);
   }
 
   @Post()
-  @RequiresPermission('manage:content')
+  @RequiresPermission(Permissions.LISTINGS_CREATE)
   @ApiOperation({ summary: 'Create a listing after R2 upload' })
   createListing(
     @Body() dto: CreateListingDto,
@@ -59,14 +58,14 @@ export class AdminListingsController {
   }
 
   @Post('bulk')
-  @RequiresPermission('manage:content')
+  @RequiresPermission(Permissions.LISTINGS_PUBLISH)
   @ApiOperation({ summary: 'Bulk publish or archive listings' })
   bulkAction(@Body() dto: BulkActionDto): Promise<BulkActionResultDto> {
     return this.service.bulkAction(dto);
   }
 
   @Put(':id')
-  @RequiresPermission('manage:content')
+  @RequiresPermission(Permissions.LISTINGS_EDIT)
   @ApiOperation({ summary: 'Update listing metadata' })
   @ApiOkResponse({ description: 'Listing updated successfully' })
   async updateListing(
@@ -79,7 +78,7 @@ export class AdminListingsController {
   }
 
   @Post(':id/publish')
-  @RequiresPermission('manage:content')
+  @RequiresPermission(Permissions.LISTINGS_PUBLISH)
   @ApiOperation({ summary: 'Publish a listing' })
   @ApiOkResponse({ description: 'Listing published successfully' })
   async publishListing(@Param('id') id: string): Promise<AdminListingActionDto> {
@@ -88,7 +87,7 @@ export class AdminListingsController {
   }
 
   @Post(':id/archive')
-  @RequiresPermission('manage:content')
+  @RequiresPermission(Permissions.LISTINGS_PUBLISH)
   @ApiOperation({ summary: 'Archive a listing' })
   @ApiOkResponse({ description: 'Listing archived successfully' })
   async archiveListing(@Param('id') id: string): Promise<AdminListingActionDto> {

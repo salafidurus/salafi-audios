@@ -25,7 +25,7 @@ describe("AdminDashboardScreen", () => {
   it("renders sections based on user permissions", () => {
     (useAdminPermissions as Mock).mockReturnValue({
       data: {
-        permissions: ["manage:scholars", "manage:content", "manage:admin", "manage:livestreams"],
+        permissions: ["SCHOLARS_EDIT", "LISTINGS_EDIT", "USERS_GRANT_PERMISSIONS", "LIVE_EDIT"],
       },
       isFetching: false,
     });
@@ -37,12 +37,12 @@ describe("AdminDashboardScreen", () => {
     expect(scholarsLink).toBeInTheDocument();
     expect(scholarsLink).toHaveAttribute("href", "/admin/scholars");
 
-    // Check Contents section (uses manage:content, consolidated Topics/Lectures)
+    // Check Contents section (consolidated Topics/Lectures)
     const contentsLink = screen.getByRole("link", { name: /contents/i });
     expect(contentsLink).toBeInTheDocument();
     expect(contentsLink).toHaveAttribute("href", "/admin/contents");
 
-    // Check Users section (uses manage:admin, consolidated permissions)
+    // Check Users section
     const usersLink = screen.getByRole("link", { name: /users/i });
     expect(usersLink).toBeInTheDocument();
     expect(usersLink).toHaveAttribute("href", "/admin/users");

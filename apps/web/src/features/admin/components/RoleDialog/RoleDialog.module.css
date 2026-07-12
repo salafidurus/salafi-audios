@@ -1,0 +1,83 @@
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 240px;
+  color: var(--content-muted);
+  font-size: var(--typo-body-md-font-size);
+}
+
+.rolesList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-sm);
+}
+
+.roleItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-component-gap-md);
+  padding: var(--space-component-gap-sm) 0;
+  transition: background-color 0.2s ease;
+}
+
+.roleItem:last-child {
+  /* No border needed */
+}
+
+.roleItem:hover {
+  background: transparent;
+}
+
+.roleInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-sm);
+  flex: 1;
+  min-width: 0;
+}
+
+.roleName {
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: 600;
+  color: var(--content-strong);
+  letter-spacing: -0.3px;
+}
+
+.roleDescription {
+  font-size: var(--typo-caption-font-size);
+  color: var(--content-muted);
+  line-height: 1.4;
+}
+
+.error {
+  font-size: var(--typo-xs-font-size);
+  color: var(--state-danger-content);
+  margin-top: var(--space-scale-xs);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-component-gap-sm);
+  flex-shrink: 0;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .roleItem {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-component-gap-sm);
+    padding: var(--space-component-gap-xs) 0;
+  }
+
+  .actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .actions button {
+    flex: 1;
+  }
+}

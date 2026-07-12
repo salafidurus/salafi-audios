@@ -73,7 +73,7 @@ const PROFILE = {
   id: "u1",
   email: "user@example.com",
   displayName: "Test User",
-  role: "user",
+
   emailVerified: true,
   createdAt: "2024-01-01",
   updatedAt: "2024-01-01",

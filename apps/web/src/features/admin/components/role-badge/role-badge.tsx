@@ -2,11 +2,20 @@ import type { ReactNode } from "react";
 import styles from "./role-badge.module.css";
 
 type RoleBadgeProps = {
-  role: string;
+  roles: string[];
 };
 
-export function RoleBadge({ role }: RoleBadgeProps): ReactNode {
-  const isAdmin = role === "admin";
-
-  return <span className={`${styles.badge} ${isAdmin ? styles.admin : styles.user}`}>{role}</span>;
+export function RoleBadge({ roles }: RoleBadgeProps): ReactNode {
+  return (
+    <div className={styles.badges}>
+      {roles.map((role) => {
+        const isAdmin = role === "admin";
+        return (
+          <span key={role} className={`${styles.badge} ${isAdmin ? styles.admin : styles.user}`}>
+            {role}
+          </span>
+        );
+      })}
+    </div>
+  );
 }

@@ -16,10 +16,66 @@ datasource db {
 //////////////////////////
 
 enum UserRole {
-  user
-  admin
-  editor
-  superadmin
+  listener // Default role - regular authenticated user
+  scholar // Content creator
+  translator // Language translator
+  editor // Content editor
+  admin // Platform administrator
+  superadmin // Full system access
+}
+
+enum Permission {
+  // Scholar Permissions
+  SCHOLARS_VIEW
+  SCHOLARS_CREATE
+  SCHOLARS_EDIT
+  SCHOLARS_DELETE
+  SCHOLARS_PUBLISH
+
+  // Listing Permissions (Collections, Series, Singles, Modules, Lessons)
+  LISTINGS_VIEW
+  LISTINGS_CREATE
+  LISTINGS_EDIT
+  LISTINGS_DELETE
+  LISTINGS_PUBLISH
+
+  // Topic Permissions
+  TOPICS_VIEW
+  TOPICS_CREATE
+  TOPICS_EDIT
+  TOPICS_DELETE
+  TOPICS_PUBLISH
+
+  // Translation Permissions
+  TRANSLATIONS_VIEW
+  TRANSLATIONS_CREATE
+  TRANSLATIONS_EDIT
+  TRANSLATIONS_DELETE
+  TRANSLATIONS_PUBLISH
+
+  // Media Permissions
+  MEDIA_UPLOAD
+  MEDIA_DELETE
+
+  // User Management Permissions
+  USERS_VIEW
+  USERS_EDIT
+  USERS_DELETE
+  USERS_GRANT_PERMISSIONS
+  USERS_GRANT_ROLES
+
+  // Live Session Permissions
+  LIVE_VIEW
+  LIVE_CREATE
+  LIVE_EDIT
+  LIVE_DELETE
+  LIVE_START
+  LIVE_STOP
+}
+
+enum ScholarPermissionType {
+  OWN_CONTENT
+  ASSIGNED_EDITOR
 }
 
 enum Status {
@@ -90,9 +146,9 @@ model User {
   email         String    @unique
   emailVerified Boolean   @default(false)
   image         String?
+  role          String    @default("user")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  role          UserRole  @default(user)
   banned        Boolean   @default(false)
   banReason     String?
   banExpires    DateTime?
@@ -101,45 +157,87 @@ model User {
   preferredLanguage Locale?
 
   // Relations
-  sessions            Session[]
-  accounts            Account[]
-  scholarRoles        UserScholarRole[]
-  createdScholarRoles UserScholarRole[]     @relation("createdByUser")
-  progress            UserListingProgress[]
-  favorites           FavoriteListing[]
+  sessions Session[]
+  accounts Account[]
 
-  adminPermissions        AdminPermission[]
-  adminPermissionsGranted AdminPermission[] @relation("AdminPermissionGranter")
+  // Role and Permission Management
+  roles                  UserRoleAssignment[]
+  roleAssignmentsGranted UserRoleAssignment[] @relation("UserRoleGranter")
+  permissions            UserPermission[]
+  permissionsGranted     UserPermission[]     @relation("UserPermissionGranter")
+
+  // Scholar and Translator Management
+  scholarRoles           UserScholarRole[]
+  createdScholarRoles    UserScholarRole[]    @relation("createdByUser")
+  translatorRoles        UserTranslatorRole[]
+  createdTranslatorRoles UserTranslatorRole[] @relation("createdByUser")
+
+  // Content Management
+  progress  UserListingProgress[]
+  favorites FavoriteListing[]
 }
 
-model AdminPermission {
-  userId      String
-  permission  String
-  grantedAt   DateTime @default(now())
-  grantedById String?
+model UserRoleAssignment {
+  id        String   @id @default(cuid())
+  userId    String
+  role      UserRole
+  grantedAt DateTime @default(now())
+  grantedBy String?
 
-  user      User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  grantedBy User? @relation("AdminPermissionGranter", fields: [grantedById], references: [id], onDelete: SetNull)
+  user          User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grantedByUser User? @relation("UserRoleGranter", fields: [grantedBy], references: [id], onDelete: SetNull)
 
-  @@id([userId, permission])
+  @@unique([userId, role])
+  @@index([userId])
+  @@index([role])
+}
+
+model UserPermission {
+  id         String     @id @default(cuid())
+  userId     String
+  permission Permission
+  grantedAt  DateTime   @default(now())
+  grantedBy  String?
+
+  user          User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grantedByUser User? @relation("UserPermissionGranter", fields: [grantedBy], references: [id], onDelete: SetNull)
+
+  @@unique([userId, permission])
   @@index([userId])
   @@index([permission])
 }
 
 model UserScholarRole {
-  userId          String
-  scholarId       String
-  role            ScholarRole
-  createdAt       DateTime    @default(now())
-  createdByUserId String?
+  id             String                @id @default(cuid())
+  userId         String
+  scholarId      String
+  permissionType ScholarPermissionType
+  createdAt      DateTime              @default(now())
+  createdBy      String?
 
-  user          User    @relation(fields: [userId], references: [id], onDelete: Restrict)
-  scholar       Scholar @relation(fields: [scholarId], references: [id], onDelete: Restrict)
-  createdByUser User?   @relation("createdByUser", fields: [createdByUserId], references: [id], onDelete: SetNull)
+  user          User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scholar       Scholar @relation(fields: [scholarId], references: [id], onDelete: Cascade)
+  createdByUser User?   @relation("createdByUser", fields: [createdBy], references: [id], onDelete: SetNull)
 
-  @@id([userId, scholarId, role])
-  @@index([scholarId, role], map: "idx_user_scholar_role_scholar_role")
+  @@unique([userId, scholarId, permissionType])
+  @@index([scholarId, permissionType], map: "idx_user_scholar_role_scholar_permission")
   @@index([userId], map: "idx_user_scholar_role_user")
+}
+
+model UserTranslatorRole {
+  id         String   @id @default(cuid())
+  userId     String
+  locale     Locale
+  canPublish Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  createdBy  String?
+
+  user          User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdByUser User? @relation("createdByUser", fields: [createdBy], references: [id], onDelete: SetNull)
+
+  @@unique([userId, locale])
+  @@index([userId])
+  @@index([locale])
 }
 
 //////////////////////////

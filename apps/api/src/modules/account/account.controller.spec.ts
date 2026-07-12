@@ -7,9 +7,16 @@ import request from 'supertest';
 import { AuthGuard } from '../auth/auth.guard';
 import { AccountController } from './account.controller';
 import { AccountService } from './account.service';
+import { PrismaService } from '../../shared/db/prisma.service';
 
 const mockAuth = { api: { getSession: vi.fn() } };
 vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
+
+const mockPrisma = {
+  userRoleAssignment: {
+    findMany: vi.fn().mockResolvedValue([{ role: 'user' }]),
+  },
+};
 
 const mockProfile = {
   id: 'user-1',
@@ -40,6 +47,7 @@ describe('AccountController — auth boundaries', () => {
       providers: [
         { provide: APP_GUARD, useClass: AuthGuard },
         { provide: AccountService, useValue: mockAccountService },
+        { provide: PrismaService, useValue: mockPrisma },
       ],
     }).compile();
 

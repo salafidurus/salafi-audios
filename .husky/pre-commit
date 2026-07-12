@@ -2,7 +2,7 @@
 
 # react-doctor hook start
 react_doctor_scan_staged_files() {
-  bunx react-doctor@latest --staged --fail-on warning
+  bunx react-doctor@latest --staged --blocking warning
 }
 
 react_doctor_output=$(mktemp "${TMPDIR:-/tmp}/react-doctor-hook.XXXXXX")
@@ -11,7 +11,7 @@ if react_doctor_scan_staged_files > "$react_doctor_output" 2>&1; then
 else
   cat "$react_doctor_output" >&2
   rm -f "$react_doctor_output"
-  printf '%s\n' "React Doctor found staged regressions. Commit blocked." "Run: bunx react-doctor --staged --fail-on warning" >&2
+  printf '%s\n' "React Doctor found staged regressions. Commit blocked." "Run: bunx react-doctor --staged --blocking warning" >&2
   exit 1
 fi
 # react-doctor hook end

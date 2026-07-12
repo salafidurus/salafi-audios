@@ -19,13 +19,15 @@ describe("UserRole enum", () => {
     expect(mod).toHaveProperty("UserRole");
   });
 
-  it("contains exactly the four expected values", async () => {
+  it("contains exactly the expected values", async () => {
     const { UserRole } = await import("./index");
     // The enum object should expose each member as a key mapped to itself.
     expect(UserRole).toMatchObject({
-      user: "user",
-      admin: "admin",
+      listener: "listener",
+      scholar: "scholar",
+      translator: "translator",
       editor: "editor",
+      admin: "admin",
       superadmin: "superadmin",
     });
   });
