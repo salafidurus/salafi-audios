@@ -69,6 +69,9 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Build dependencies
+        env:
+          DIRECT_DB_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+          DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
         run: bun run turbo run build --filter=api...
 
       - name: Run Prisma migrations
