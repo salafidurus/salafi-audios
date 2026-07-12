@@ -60,4 +60,13 @@ export const SCHOLARS: ScholarData[] = [
     country: "Saudi Arabia",
     mainLanguage: "ar",
   },
+  {
+    id: uuid(6),
+    slug: "e2e-scholar-slug",
+    name: "Scholar Name (English)",
+    bio: "English biography",
+    isKibar: false,
+    country: "Saudi Arabia",
+    mainLanguage: "ar",
+  },
 ];

@@ -36,6 +36,7 @@
     "prisma:format": "prisma format --schema=./prisma/schema.prisma --config=./prisma.config.ts",
     "prisma:validate": "prisma validate --schema=./prisma/schema.prisma --config=./prisma.config.ts",
     "prisma:seed": "bun run scripts/seed.ts",
+    "prisma:seed:clean": "bun run scripts/seed-clean.ts",
     "prisma:reset:seed": "prisma migrate reset --force && bun run prisma:seed",
     "prisma:reset": "prisma migrate reset --force",
     "migrate:create-only": "bun ./scripts/migrate-with-auto-name.js",
