@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
+import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
@@ -82,14 +83,16 @@ export function AdminScholarsScreen() {
         <PageHeader
           title={!isMobile ? "Manage Scholars" : "Scholars"}
           actions={
-            <Button
-              variant="primary"
-              size={!isMobile ? "md" : "sm"}
-              icon={<Plus size={!isMobile ? 18 : 16} />}
-              onClick={handleOpenAdd}
-            >
-              {!isMobile ? "Add Scholar" : "Add"}
-            </Button>
+            <PermissionGate requires="SCHOLARS_CREATE">
+              <Button
+                variant="primary"
+                size={!isMobile ? "md" : "sm"}
+                icon={<Plus size={!isMobile ? 18 : 16} />}
+                onClick={handleOpenAdd}
+              >
+                {!isMobile ? "Add Scholar" : "Add"}
+              </Button>
+            </PermissionGate>
           }
         />
 

@@ -23,6 +23,7 @@ import { TopicFormModal, type TopicForEdit } from "@/features/admin/components/T
 import { AudioUploader } from "@/features/admin/components/AudioUploader/AudioUploader";
 import { LectureEditModal } from "@/features/admin/components/LectureEditModal";
 import { DeleteTopicConfirmModal } from "@/shared/components/DeleteTopicConfirmModal";
+import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import styles from "./admin-contents.screen.module.css";
 
@@ -170,23 +171,27 @@ export function AdminContentsScreen() {
         title={isMobile ? "Content" : "Content Management"}
         actions={
           activeTab === "topics" ? (
-            <Button
-              variant="primary"
-              size={!isMobile ? "md" : "sm"}
-              icon={<Plus size={!isMobile ? 18 : 16} />}
-              onClick={handleOpenAddTopic}
-            >
-              {!isMobile ? "Add Topic" : "Topic"}
-            </Button>
+            <PermissionGate requires="TOPICS_CREATE">
+              <Button
+                variant="primary"
+                size={!isMobile ? "md" : "sm"}
+                icon={<Plus size={!isMobile ? 18 : 16} />}
+                onClick={handleOpenAddTopic}
+              >
+                {!isMobile ? "Add Topic" : "Topic"}
+              </Button>
+            </PermissionGate>
           ) : (
-            <Button
-              variant="primary"
-              size={!isMobile ? "md" : "sm"}
-              icon={<Plus size={!isMobile ? 18 : 16} />}
-              onClick={handleOpenAddListing}
-            >
-              {!isMobile ? "Add Listing" : "Listing"}
-            </Button>
+            <PermissionGate requires="LISTINGS_CREATE">
+              <Button
+                variant="primary"
+                size={!isMobile ? "md" : "sm"}
+                icon={<Plus size={!isMobile ? 18 : 16} />}
+                onClick={handleOpenAddListing}
+              >
+                {!isMobile ? "Add Listing" : "Listing"}
+              </Button>
+            </PermissionGate>
           )
         }
       />
@@ -209,15 +214,23 @@ export function AdminContentsScreen() {
                       <span className={styles.topicSlug}>{topic.slug}</span>
                     </div>
                     <div className={styles.topicActions}>
-                      <Button variant="ghost" size="sm" onClick={() => handleOpenEditTopic(topic)}>
-                        Edit
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        icon={<Trash2 size={14} />}
-                        onClick={() => handleDeleteClick(topic.slug, topic.name)}
-                      />
+                      <PermissionGate requires="TOPICS_EDIT">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleOpenEditTopic(topic)}
+                        >
+                          Edit
+                        </Button>
+                      </PermissionGate>
+                      <PermissionGate requires="TOPICS_DELETE">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          icon={<Trash2 size={14} />}
+                          onClick={() => handleDeleteClick(topic.slug, topic.name)}
+                        />
+                      </PermissionGate>
                     </div>
                   </List.Item>
                 ))}
@@ -243,13 +256,15 @@ export function AdminContentsScreen() {
                       </span>
                     </div>
                     <div className={styles.listingActions}>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEditListing(listing.id)}
-                      >
-                        <Edit size={14} />
-                      </Button>
+                      <PermissionGate requires="LISTINGS_EDIT">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEditListing(listing.id)}
+                        >
+                          <Edit size={14} />
+                        </Button>
+                      </PermissionGate>
                     </div>
                   </List.Item>
                 ))}

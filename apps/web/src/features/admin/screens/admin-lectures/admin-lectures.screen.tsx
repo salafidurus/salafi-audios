@@ -11,6 +11,7 @@ import { Search } from "@/shared/components/Search";
 import { fetchAdminLectures, fetchAdminLectureDetail } from "../../api/admin-lectures.api";
 import { AudioUploader } from "../../components/AudioUploader/AudioUploader";
 import { LectureEditModal } from "../../components/LectureEditModal/LectureEditModal";
+import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import styles from "./admin-lectures.screen.module.css";
 import { Plus, X, Edit } from "lucide-react";
@@ -98,20 +99,22 @@ export function AdminLecturesScreen() {
       <PageHeader
         title="Manage Lectures"
         actions={
-          <Button
-            variant="primary"
-            icon={
-              isUploaderOpen ? (
-                <X size={!isMobile ? 16 : 20} />
-              ) : (
-                <Plus size={!isMobile ? 16 : 20} />
-              )
-            }
-            onClick={() => dispatch({ isUploaderOpen: !isUploaderOpen })}
-            aria-label="Upload Audio Toggle"
-          >
-            {!isMobile ? (isUploaderOpen ? "Close Uploader" : "Upload Audio") : undefined}
-          </Button>
+          <PermissionGate requires="MEDIA_UPLOAD">
+            <Button
+              variant="primary"
+              icon={
+                isUploaderOpen ? (
+                  <X size={!isMobile ? 16 : 20} />
+                ) : (
+                  <Plus size={!isMobile ? 16 : 20} />
+                )
+              }
+              onClick={() => dispatch({ isUploaderOpen: !isUploaderOpen })}
+              aria-label="Upload Audio Toggle"
+            >
+              {!isMobile ? (isUploaderOpen ? "Close Uploader" : "Upload Audio") : undefined}
+            </Button>
+          </PermissionGate>
         }
       />
 
@@ -175,14 +178,16 @@ export function AdminLecturesScreen() {
                       <td>{new Date(lecture.createdAt).toLocaleDateString()}</td>
                       <td>
                         <div className={styles.actions}>
-                          <button
-                            type="button"
-                            className={styles.actionBtn}
-                            onClick={() => handleEditClick(lecture.id)}
-                            aria-label="Edit"
-                          >
-                            <Edit size={16} /> Edit
-                          </button>
+                          <PermissionGate requires="LISTINGS_EDIT">
+                            <button
+                              type="button"
+                              className={styles.actionBtn}
+                              onClick={() => handleEditClick(lecture.id)}
+                              aria-label="Edit"
+                            >
+                              <Edit size={16} /> Edit
+                            </button>
+                          </PermissionGate>
                         </div>
                       </td>
                     </tr>
@@ -217,14 +222,16 @@ export function AdminLecturesScreen() {
                     </span>
                   </div>
                   <div className={styles.cardActions}>
-                    <button
-                      type="button"
-                      className={styles.cardEditBtn}
-                      onClick={() => handleEditClick(lecture.id)}
-                      aria-label="Edit lecture"
-                    >
-                      <Edit size={14} /> Edit
-                    </button>
+                    <PermissionGate requires="LISTINGS_EDIT">
+                      <button
+                        type="button"
+                        className={styles.cardEditBtn}
+                        onClick={() => handleEditClick(lecture.id)}
+                        aria-label="Edit lecture"
+                      >
+                        <Edit size={14} /> Edit
+                      </button>
+                    </PermissionGate>
                   </div>
                 </div>
               ))}
