@@ -7,6 +7,7 @@ import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { Button } from "@/shared/components/Button";
+import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
 import { updateLiveSessionStatus } from "@/features/admin/api/admin.api";
 import styles from "./admin-livestreams.screen.module.css";
 
@@ -36,19 +37,25 @@ function SessionRow({
       <td className={styles.tableCell}>
         <div className={styles.actionButtons}>
           {session.status === "scheduled" && (
-            <Button variant="primary" onClick={() => onStatusChange(session.id, "live")}>
-              Go Live
-            </Button>
+            <PermissionGate requires="LIVE_START">
+              <Button variant="primary" onClick={() => onStatusChange(session.id, "live")}>
+                Go Live
+              </Button>
+            </PermissionGate>
           )}
           {session.status === "live" && (
-            <Button variant="danger" onClick={() => onStatusChange(session.id, "ended")}>
-              End
-            </Button>
+            <PermissionGate requires="LIVE_STOP">
+              <Button variant="danger" onClick={() => onStatusChange(session.id, "ended")}>
+                End
+              </Button>
+            </PermissionGate>
           )}
           {session.status === "ended" && (
-            <Button variant="outline" onClick={() => onStatusChange(session.id, "scheduled")}>
-              Reschedule
-            </Button>
+            <PermissionGate requires="LIVE_START">
+              <Button variant="outline" onClick={() => onStatusChange(session.id, "scheduled")}>
+                Reschedule
+              </Button>
+            </PermissionGate>
           )}
         </div>
       </td>
@@ -74,14 +81,18 @@ function SessionCard({
         </div>
         <div className={styles.actionButtons}>
           {session.status === "scheduled" && (
-            <Button variant="primary" onClick={() => onStatusChange(session.id, "live")}>
-              Live
-            </Button>
+            <PermissionGate requires="LIVE_START">
+              <Button variant="primary" onClick={() => onStatusChange(session.id, "live")}>
+                Live
+              </Button>
+            </PermissionGate>
           )}
           {session.status === "live" && (
-            <Button variant="danger" onClick={() => onStatusChange(session.id, "ended")}>
-              End
-            </Button>
+            <PermissionGate requires="LIVE_STOP">
+              <Button variant="danger" onClick={() => onStatusChange(session.id, "ended")}>
+                End
+              </Button>
+            </PermissionGate>
           )}
         </div>
       </div>
