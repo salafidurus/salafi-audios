@@ -87,4 +87,8 @@ export class ConfigService {
   get R2_PUBLIC_BASE_URL(): string {
     return this.env.R2_PUBLIC_BASE_URL;
   }
+
+  get DISABLE_THROTTLER(): boolean {
+    return this.env.DISABLE_THROTTLER;
+  }
 }

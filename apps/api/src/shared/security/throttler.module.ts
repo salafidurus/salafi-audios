@@ -1,25 +1,21 @@
 import { Global, Module } from '@nestjs/common';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { ConfigModule } from '../config/config.module';
+import { ConfigService } from '../config/config.service';
 
 @Global()
 @Module({
   imports: [
-    ThrottlerModule.forRoot([
-      {
-        ttl:
-          process.env.DISABLE_THROTTLER === 'true'
-            ? 1000
-            : process.env.NODE_ENV === 'test'
-              ? 1000
-              : 60_000,
-        limit:
-          process.env.DISABLE_THROTTLER === 'true'
-            ? 10000
-            : process.env.NODE_ENV === 'test'
-              ? 2
-              : 100,
-      },
-    ]),
+    ThrottlerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => [
+        {
+          ttl: config.DISABLE_THROTTLER ? 1000 : config.NODE_ENV === 'test' ? 1000 : 60_000,
+          limit: config.DISABLE_THROTTLER ? 10000 : config.NODE_ENV === 'test' ? 2 : 100,
+        },
+      ],
+    }),
   ],
   exports: [ThrottlerModule],
 })

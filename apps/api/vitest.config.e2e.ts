@@ -2,13 +2,20 @@ import { defineConfig } from 'vitest/config';
 import swc from 'unplugin-swc';
 import path from 'node:path';
 
+const isBun = typeof process.versions.bun !== 'undefined';
+
 export default defineConfig({
   oxc: false,
   resolve: {
     tsconfigPaths: true,
-    alias: {
-      bun: path.resolve(__dirname, './src/test/mocks/bun.mock.ts'),
-    },
+    alias: isBun
+      ? []
+      : [
+          {
+            find: /^bun$/,
+            replacement: path.resolve(__dirname, './src/test/mocks/bun.mock.ts'),
+          },
+        ],
   },
   plugins: [
     swc.vite({
