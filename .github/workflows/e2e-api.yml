@@ -87,6 +87,16 @@ jobs:
           BETTER_AUTH_SECRET: "e2e-test-secret-must-be-at-least-32-chars-long"
           BETTER_AUTH_URL: "http://localhost:4000"
           CORS_ORIGINS: "http://localhost:3000"
+          # Dummy values — E2E tests don't exercise OAuth or R2
+          GOOGLE_CLIENT_ID: "dummy"
+          GOOGLE_CLIENT_SECRET: "dummy"
+          APPLE_CLIENT_ID: "dummy"
+          APPLE_CLIENT_SECRET: "dummy"
+          R2_ACCOUNT_ID: "dummy"
+          R2_ACCESS_KEY_ID: "dummy"
+          R2_SECRET_ACCESS_KEY: "dummy"
+          R2_BUCKET_NAME: "dummy"
+          R2_PUBLIC_BASE_URL: "http://dummy.test"
         run: bun run --filter api test:e2e
 
       - name: Delete Neon Branch
