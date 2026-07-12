@@ -43,13 +43,54 @@ bun run verify:build-configs
 # TURBO_SCM_BASE instructs Turborepo what git commit/ref to compare changes against.
 TURBO_SCM_BASE="$COMPARISON_BASE" bun run turbo lint typecheck test:prepush build --affected --continue
 
-# Perform conditional checks (e2e, docs, DB schema, native build checks)
-# by diffing against the resolved comparison base.
-if git diff --quiet "$COMPARISON_BASE"...HEAD -- ':(glob)apps/web/**' ':(glob)packages/core-api/**' ':(glob)packages/core-contracts/**' ':(glob)packages/core-i18n/**' ':(glob)packages/design-tokens/**' ':(glob)packages/domain-account/**' ':(glob)packages/domain-audio/**' ':(glob)packages/domain-content/**' ':(glob)packages/domain-live/**' ':(glob)packages/domain-search/**' ':(glob)tsconfig.base.json' ':(glob)tsconfig.packages.json'; then
-  printf "pre-push: skipping web e2e (no web-affecting changes)\n"
-else
-  printf "pre-push: running e2e\n"
+# Determine scope of changes for conditional e2e checks.
+SHARED_CHANGED=false
+API_CHANGED=false
+WEB_CHANGED=false
+
+if ! git diff --quiet "$COMPARISON_BASE"...HEAD -- \
+  ':(glob)packages/core-contracts/**' \
+  ':(glob)packages/core-i18n/**' \
+  ':(glob)tsconfig.base.json' \
+  ':(glob)tsconfig.packages.json'; then
+  SHARED_CHANGED=true
+fi
+
+if ! git diff --quiet "$COMPARISON_BASE"...HEAD -- \
+  ':(glob)apps/api/**' \
+  ':(glob)packages/core-db/**' \
+  ':(glob)tsconfig.nest.json'; then
+  API_CHANGED=true
+fi
+
+if ! git diff --quiet "$COMPARISON_BASE"...HEAD -- \
+  ':(glob)apps/web/**' \
+  ':(glob)packages/core-api/**' \
+  ':(glob)packages/design-tokens/**' \
+  ':(glob)packages/domain-account/**' \
+  ':(glob)packages/domain-audio/**' \
+  ':(glob)packages/domain-content/**' \
+  ':(glob)packages/domain-live/**' \
+  ':(glob)packages/domain-search/**' \
+  ':(glob)packages/utils-error/**'; then
+  WEB_CHANGED=true
+fi
+
+# Branch on change scope
+if [ "$SHARED_CHANGED" = true ]; then
+  printf "pre-push: running full e2e (shared packages changed)\n"
   PW_SKIP_WEB_BUILD=1 bun run turbo test:e2e
+elif [ "$API_CHANGED" = true ] && [ "$WEB_CHANGED" = true ]; then
+  printf "pre-push: running full e2e (both api and web changed)\n"
+  PW_SKIP_WEB_BUILD=1 bun run turbo test:e2e
+elif [ "$API_CHANGED" = true ]; then
+  printf "pre-push: running api e2e\n"
+  bun run --filter api test:e2e
+elif [ "$WEB_CHANGED" = true ]; then
+  printf "pre-push: running web e2e\n"
+  PW_SKIP_WEB_BUILD=1 bun run --filter web test:e2e
+else
+  printf "pre-push: skipping e2e (no e2e-affecting changes)\n"
 fi
 
 if git diff --quiet "$COMPARISON_BASE"...HEAD -- README.md ':(glob)docs/**/*.md' AGENT.md AGENTS.md .github/copilot-instructions.md; then
