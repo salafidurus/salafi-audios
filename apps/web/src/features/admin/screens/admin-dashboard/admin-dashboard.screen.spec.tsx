@@ -22,10 +22,26 @@ describe("AdminDashboardScreen", () => {
     expect(screen.getByText("Loading…")).toBeInTheDocument();
   });
 
+  it("shows cards when user has only view-level permissions", () => {
+    (useAdminPermissions as Mock).mockReturnValue({
+      data: {
+        permissions: ["SCHOLARS_VIEW", "LISTINGS_VIEW", "USERS_VIEW", "LIVE_VIEW"],
+      },
+      isFetching: false,
+    });
+
+    render(<AdminDashboardScreen />);
+
+    expect(screen.getByRole("link", { name: /scholars/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /contents/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /users/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /livestreams/i })).toBeInTheDocument();
+  });
+
   it("renders sections based on user permissions", () => {
     (useAdminPermissions as Mock).mockReturnValue({
       data: {
-        permissions: ["SCHOLARS_EDIT", "LISTINGS_EDIT", "USERS_GRANT_PERMISSIONS", "LIVE_EDIT"],
+        permissions: ["SCHOLARS_VIEW", "LISTINGS_VIEW", "USERS_VIEW", "LIVE_VIEW"],
       },
       isFetching: false,
     });
