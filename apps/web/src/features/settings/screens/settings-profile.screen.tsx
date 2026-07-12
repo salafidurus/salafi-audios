@@ -5,7 +5,7 @@ import { useAuth } from "@/core/auth";
 import { useAccountProfile, useUpdateProfile, useDeleteAccount } from "@sd/domain-account";
 import { authClient } from "@/core/auth/auth-client";
 import { AuthModal } from "@/features/auth";
-import { ConfirmModal } from "@/shared/components/ConfirmModal/ConfirmModal";
+import { Modal } from "@/shared/components/Modal";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { EmptyState } from "@/shared/components/EmptyState";
@@ -40,8 +40,17 @@ function ProfileContent() {
   }
 
   const handleSignOut = async () => {
-    await authClient.signOut();
-    router.push("/");
+    try {
+      await authClient.signOut();
+    } catch (err) {
+      console.error("Sign out error", err);
+    } finally {
+      if (typeof window !== "undefined" && window.location && !process.env.VITEST) {
+        window.location.href = "/";
+      } else {
+        router.push("/");
+      }
+    }
   };
 
   const handleDeleteAccount = () => {
@@ -175,18 +184,19 @@ function ProfileContent() {
         </button>
       </div>
 
-      <ConfirmModal
+      <Modal.ConfirmDialog
         isOpen={showSignOutModal}
         onClose={() => setShowSignOutModal(false)}
         onConfirm={handleSignOut}
         title="Sign Out?"
-        message="Are you sure you want to sign out?"
         confirmLabel="Sign Out"
         confirmVariant="danger"
         testId="confirm-modal"
-      />
+      >
+        <p>Are you sure you want to sign out?</p>
+      </Modal.ConfirmDialog>
 
-      <ConfirmModal
+      <Modal.ConfirmText
         isOpen={showDeleteAccountModal}
         onClose={() => setShowDeleteAccountModal(false)}
         onConfirm={handleDeleteAccount}

@@ -2,6 +2,8 @@
 
 import { useEffect, useReducer, useState } from "react";
 import type { ReactNode } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys, type AdminUserListDto } from "@sd/core-contracts";
 import type { UserRole } from "@sd/core-contracts";
 import {
   fetchUserRoles,
@@ -11,7 +13,8 @@ import {
 } from "@/features/admin/api/admin.api";
 import { Modal } from "@/shared/components/Modal/Modal";
 import { Button } from "@/shared/components/Button";
-import { Toggle } from "@/shared/components/Toggle";
+import { RoleItem } from "./RoleItem";
+import { ROLES_ARRAY } from "./constants";
 import styles from "./RoleDialog.module.css";
 
 export interface RoleDialogProps {
@@ -21,36 +24,6 @@ export interface RoleDialogProps {
   userId: string;
   userName?: string;
 }
-
-// Role labels matching ROLE_CHIPS
-const ROLE_LABELS: Record<UserRole, string> = {
-  listener: "Listener",
-  scholar: "Scholar",
-  translator: "Translator",
-  editor: "Editor",
-  admin: "Admin",
-  superadmin: "Super Admin",
-};
-
-// Available roles in order
-const ROLES_ARRAY: UserRole[] = [
-  "listener",
-  "scholar",
-  "translator",
-  "editor",
-  "admin",
-  "superadmin",
-];
-
-// Role descriptions
-const ROLE_DESCRIPTIONS: Record<UserRole, string> = {
-  listener: "Regular user who listens to lectures",
-  scholar: "Content creator who manages their own lectures",
-  translator: "Translates content to assigned languages",
-  editor: "Manages content for assigned scholars",
-  admin: "Platform administrator with elevated permissions",
-  superadmin: "Full system access and override permissions",
-};
 
 interface State {
   userRoles: AdminRolesListResponse | null;
@@ -102,6 +75,7 @@ export function RoleDialog({
   userId,
   userName = userId,
 }: RoleDialogProps): ReactNode {
+  const queryClient = useQueryClient();
   const [state, dispatch] = useReducer(reducer, initialState);
   const [pendingRoles, setPendingRoles] = useState<Set<UserRole>>(new Set());
   const [saving, setSaving] = useState(false);
@@ -135,61 +109,79 @@ export function RoleDialog({
 
   const handleDone = async () => {
     setSaving(true);
-    try {
-      // Determine which roles to grant and revoke
-      const toGrant: UserRole[] = [];
-      const toRevoke: UserRole[] = [];
 
-      for (const role of ROLES_ARRAY) {
-        const hadIt = currentRoles.includes(role);
-        const hasItNow = pendingRoles.has(role);
+    const toGrant: UserRole[] = [];
+    const toRevoke: UserRole[] = [];
 
-        if (!hadIt && hasItNow) {
-          toGrant.push(role);
-        } else if (hadIt && !hasItNow) {
-          toRevoke.push(role);
-        }
+    for (const role of ROLES_ARRAY) {
+      const hadIt = currentRoles.includes(role);
+      const hasItNow = pendingRoles.has(role);
+
+      if (!hadIt && hasItNow) {
+        toGrant.push(role);
+      } else if (hadIt && !hasItNow) {
+        toRevoke.push(role);
       }
+    }
 
-      // Apply changes in parallel
-      toGrant.forEach((role) => dispatch({ type: "CLEAR_ERROR", role }));
-      toRevoke.forEach((role) => dispatch({ type: "CLEAR_ERROR", role }));
+    // Optimistic Update
+    const updatedRoles = Array.from(pendingRoles);
+    queryClient.setQueriesData<AdminUserListDto>(
+      { queryKey: queryKeys.admin.users.all() },
+      (oldData) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          users: oldData.users.map((u) => (u.id === userId ? { ...u, roles: updatedRoles } : u)),
+        };
+      },
+    );
 
+    // Call callback immediately to close or update parent view
+    onRolesChange?.();
+    onClose();
+
+    // Fire API calls in background
+    try {
       await Promise.all([
         ...toGrant.map(async (role) => {
           try {
-            const data = await grantRole(userId, role);
-            dispatch({ type: "SET_ROLES", payload: data });
+            await grantRole(userId, role);
           } catch (error) {
-            const message = getErrorMessage(error, "Failed to grant role");
-            dispatch({ type: "SET_ERROR", role, message });
+            console.error("Failed to grant role:", role, error);
           }
         }),
         ...toRevoke.map(async (role) => {
           try {
-            const data = await revokeRole(userId, role);
-            dispatch({ type: "SET_ROLES", payload: data });
+            await revokeRole(userId, role);
           } catch (error) {
-            const message = getErrorMessage(error, "Failed to revoke role");
-            dispatch({ type: "SET_ERROR", role, message });
+            console.error("Failed to revoke role:", role, error);
           }
         }),
       ]);
-
-      onRolesChange?.();
-      onClose();
+    } catch (error) {
+      console.error("Failed to complete batch role updates", error);
     } finally {
       setSaving(false);
+      // Re-fetch to ensure data integrity
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
     }
   };
 
   if (!isOpen) return null;
 
+  const customTitle = (
+    <div className={styles.titleContainer}>
+      <span className={styles.titleMain}>Manage Roles</span>
+      <span className={styles.titleSub}>{userName}</span>
+    </div>
+  );
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`Manage Roles — ${userName}`}
+      title={customTitle as any}
       footer={
         <Button variant="primary" onClick={handleDone} disabled={saving}>
           {saving ? "Saving…" : "Done"}
@@ -200,40 +192,18 @@ export function RoleDialog({
         <div className={styles.loading}>Loading roles…</div>
       ) : (
         <div className={styles.rolesList}>
-          {ROLES_ARRAY.map((role) => {
-            const isPending = pendingRoles.has(role);
-            const error = state.errors[role];
-            return (
-              <div key={role} className={styles.roleItem}>
-                <div className={styles.roleInfo}>
-                  <span className={styles.roleName}>{ROLE_LABELS[role]}</span>
-                  <span className={styles.roleDescription}>{ROLE_DESCRIPTIONS[role]}</span>
-                  {error && <span className={styles.error}>{error}</span>}
-                </div>
-                <Toggle
-                  checked={isPending}
-                  onChange={() => handleToggle(role)}
-                  disabled={saving}
-                  aria-label={`${isPending ? "Revoke" : "Grant"} ${ROLE_LABELS[role]}`}
-                />
-              </div>
-            );
-          })}
+          {ROLES_ARRAY.map((role) => (
+            <RoleItem
+              key={role}
+              role={role}
+              isPending={pendingRoles.has(role)}
+              error={state.errors[role] ?? null}
+              saving={saving}
+              onToggle={handleToggle}
+            />
+          ))}
         </div>
       )}
     </Modal>
   );
-}
-
-function getErrorMessage(error: unknown, defaultMessage: string): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  if (typeof error === "object" && error !== null && "message" in error) {
-    const msg = (error as Record<string, unknown>).message;
-    if (typeof msg === "string") {
-      return msg;
-    }
-  }
-  return defaultMessage;
 }

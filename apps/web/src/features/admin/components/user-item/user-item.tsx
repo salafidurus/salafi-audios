@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { AdminUserListItemDto } from "@sd/core-contracts";
 import { Shield, Users } from "lucide-react";
 import { List } from "@/shared/components/List";
+import { Button } from "@/shared/components/Button";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
 import { MetaDetails } from "./meta-details";
@@ -23,19 +24,33 @@ export function UserItem({ user, onManagePermissions, onManageRoles }: UserItemP
         <PermissionDetails permissions={user.permissions.map((p) => ({ permission: p }))} />
       </div>
 
-      <List.Item.Actions widthPercentDesktop="30%">
-        <div onClick={(e) => e.stopPropagation()}>
+      <List.Item.Actions
+        orientation="vertical"
+        mobileOrientation="vertical"
+        widthPercentDesktop="30%"
+      >
+        <div className={styles.actionsWrapper} onClick={(e) => e.stopPropagation()}>
           <PermissionGate requires="USERS_GRANT_PERMISSIONS">
-            <button type="button" className={styles.manageButton} onClick={onManagePermissions}>
-              <Shield className={styles.manageIcon} />
+            <Button
+              variant="outline"
+              size="sm"
+              fullWidth
+              onClick={onManagePermissions}
+              icon={<Shield className={styles.manageIcon} />}
+            >
               {isTablet ? "Permissions" : "Manage Permissions"}
-            </button>
+            </Button>
           </PermissionGate>
           <PermissionGate requires="USERS_GRANT_ROLES">
-            <button type="button" className={styles.manageButton} onClick={onManageRoles}>
-              <Users className={styles.manageIcon} />
+            <Button
+              variant="outline"
+              size="sm"
+              fullWidth
+              onClick={onManageRoles}
+              icon={<Users className={styles.manageIcon} />}
+            >
               {isTablet ? "Roles" : "Manage Roles"}
-            </button>
+            </Button>
           </PermissionGate>
         </div>
       </List.Item.Actions>

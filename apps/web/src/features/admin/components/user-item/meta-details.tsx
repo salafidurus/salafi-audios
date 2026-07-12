@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { UserAvatar } from "@/shared/components/UserAvatar";
+import { UserAvatar } from "@/shared/components/user-avatar";
 import { RoleBadge } from "../role-badge";
 import styles from "./meta-details.module.css";
 

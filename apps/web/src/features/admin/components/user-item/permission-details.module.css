@@ -1,13 +1,33 @@
 .container {
   display: flex;
+  flex-direction: column;
   gap: var(--space-scale-xs);
+}
+
+.groupRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-sm);
   flex-wrap: wrap;
+}
+
+.groupLabel {
+  font-size: var(--typo-caption-font-size);
+  font-weight: 600;
+  color: var(--content-muted);
+  min-width: 90px;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-scale-xs);
 }
 
 .noPerms {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: var(--space-scale-xs);
   font-size: var(--typo-caption-font-size);
   color: var(--content-muted);
 }

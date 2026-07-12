@@ -15,7 +15,7 @@ import {
   deleteTopic,
   type AdminTopicInput,
 } from "@/features/admin/api/admin.api";
-import { DeleteTopicConfirmModal } from "@/shared/components/DeleteTopicConfirmModal";
+import { Modal } from "@/shared/components/Modal";
 import styles from "./admin-topics.screen.module.css";
 
 export function AdminTopicsScreen() {
@@ -76,7 +76,7 @@ export function AdminTopicsScreen() {
 
   return (
     <ScreenView>
-      <DeleteTopicConfirmModal
+      <Modal.ConfirmDialog
         isOpen={deleteModalOpen}
         onClose={() => {
           setDeleteModalOpen(false);
@@ -84,8 +84,17 @@ export function AdminTopicsScreen() {
           setDeletingTopicName("");
         }}
         onConfirm={handleConfirmDelete}
-        topicName={deletingTopicName}
-      />
+        title="Delete Topic?"
+        confirmLabel="Delete Topic"
+        confirmVariant="danger"
+      >
+        <p>
+          Are you sure you want to delete the topic <strong>{deletingTopicName}</strong>?
+        </p>
+        <p style={{ fontSize: "0.875rem", color: "var(--content-muted)", marginTop: "0.5rem" }}>
+          This action cannot be undone.
+        </p>
+      </Modal.ConfirmDialog>
 
       <PageHeader
         title={!isMobile ? "Manage Topics" : "Topics"}
