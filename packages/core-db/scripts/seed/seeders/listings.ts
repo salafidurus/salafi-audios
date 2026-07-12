@@ -8,9 +8,9 @@ import { uuid, seedStatus, dur } from "../helpers.js";
 import type { TopicPair } from "../types.js";
 
 /**
- * Helper to create a listing record
+ * Helper to upsert a listing record
  */
-async function createListing(
+async function upsertListing(
   prisma: PrismaClient,
   id: string,
   slug: string,
@@ -23,8 +23,25 @@ async function createListing(
   orderIndex: number | undefined,
   durationSeconds: number | undefined,
 ) {
-  return prisma.listing.create({
-    data: {
+  // Try to find first
+  const existing = await prisma.listing.findUnique({
+    where: { id },
+  });
+
+  return prisma.listing.upsert({
+    where: { id },
+    update: {
+      slug,
+      title,
+      description,
+      format,
+      scholarId,
+      parentId,
+      status,
+      orderIndex,
+      durationSeconds,
+    },
+    create: {
       id,
       slug,
       title,
@@ -35,7 +52,7 @@ async function createListing(
       status,
       orderIndex,
       durationSeconds,
-      publishedAt: status === "published" ? new Date() : undefined,
+      publishedAt: status === "published" ? (existing?.publishedAt ?? new Date()) : undefined,
     },
   });
 }
@@ -59,8 +76,8 @@ export async function seedListings(prisma: PrismaClient): Promise<{
   let singleCount = 0;
   for (const single of SINGLES) {
     const listingId = uuid(single.id);
-    const status = seedStatus(currentGlobalIndex++);
-    await createListing(
+    const status = single.id === 110 ? "published" : seedStatus(currentGlobalIndex++);
+    await upsertListing(
       prisma,
       listingId,
       single.slug,
@@ -76,7 +93,7 @@ export async function seedListings(prisma: PrismaClient): Promise<{
     topicPairs.push({ listingId, topicId: TOPICS[single.topicIdx].id });
     singleCount++;
   }
-  console.log(`✓ Created ${singleCount} singles`);
+  console.log(`✓ Seeded ${singleCount} singles`);
 
   // ── Series ──
   let seriesCount = 0;
@@ -86,7 +103,7 @@ export async function seedListings(prisma: PrismaClient): Promise<{
     const scholarId = SCHOLARS[series.scholarIdx].id;
     const status = seedStatus(currentGlobalIndex++);
 
-    await createListing(
+    await upsertListing(
       prisma,
       seriesId,
       series.slug,
@@ -108,7 +125,7 @@ export async function seedListings(prisma: PrismaClient): Promise<{
       const lessonStatus = seedStatus(currentGlobalIndex++);
       const lessonTitle = `al-Dars ${i + 1}: ${series.title}`;
 
-      await createListing(
+      await upsertListing(
         prisma,
         lessonId,
         lesson.slug,
@@ -125,7 +142,7 @@ export async function seedListings(prisma: PrismaClient): Promise<{
       seriesLessonCount++;
     }
   }
-  console.log(`✓ Created ${seriesCount} series with ${seriesLessonCount} lessons`);
+  console.log(`✓ Seeded ${seriesCount} series with ${seriesLessonCount} lessons`);
 
   // ── Collections ──
   let collectionCount = 0;
@@ -137,7 +154,7 @@ export async function seedListings(prisma: PrismaClient): Promise<{
     const scholarId = SCHOLARS[collection.scholarIdx].id;
     const collectionStatus = seedStatus(currentGlobalIndex++);
 
-    await createListing(
+    await upsertListing(
       prisma,
       collectionId,
       collection.slug,
@@ -155,7 +172,7 @@ export async function seedListings(prisma: PrismaClient): Promise<{
 
     for (const [modIdx, mod] of collection.modules.entries()) {
       const moduleId = uuid(mod.id);
-      await createListing(
+      await upsertListing(
         prisma,
         moduleId,
         `${collection.slug}-mod-${mod.id}`,
@@ -171,18 +188,16 @@ export async function seedListings(prisma: PrismaClient): Promise<{
       topicPairs.push({ listingId: moduleId, topicId: TOPICS[collection.topicIdx].id });
       moduleCount++;
 
-      for (let i = 0; i < mod.lessonCount; i++) {
-        const lessonIndex = moduleLessonCount;
-        const lessonIdNum = 500 + lessonIndex;
-        const slug = `${collection.slug}-mod-${mod.id}-lsn-${i + 1}`;
-        const lessonId = uuid(lessonIdNum);
+      for (let i = 0; i < mod.lessons.length; i++) {
+        const lesson = mod.lessons[i];
+        const lessonId = uuid(lesson.id);
         const lessonStatus = seedStatus(currentGlobalIndex++);
         const lessonTitle = `al-Dars ${i + 1}: ${mod.title}`;
 
-        await createListing(
+        await upsertListing(
           prisma,
           lessonId,
-          slug,
+          lesson.slug,
           lessonTitle,
           `Lesson ${i + 1} of ${mod.title} - ${collection.title}`,
           "single",
@@ -198,7 +213,7 @@ export async function seedListings(prisma: PrismaClient): Promise<{
     }
   }
   console.log(
-    `✓ Created ${collectionCount} collections, ${moduleCount} modules, ${moduleLessonCount} lessons`,
+    `✓ Seeded ${collectionCount} collections, ${moduleCount} modules, ${moduleLessonCount} lessons`,
   );
 
   return {

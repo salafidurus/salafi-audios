@@ -16,6 +16,7 @@ export interface SingleSeed {
   desc: string;
   topicIdx: number;
   durationMin: number;
+  audioUrl: string;
 }
 
 /**
@@ -24,6 +25,7 @@ export interface SingleSeed {
 export interface SeriesLessonSeed {
   id: number;
   slug: string;
+  audioUrl: string;
 }
 
 /**
@@ -41,13 +43,22 @@ export interface SeriesSeed {
 }
 
 /**
+ * A single lesson within a collection module
+ */
+export interface ModuleLessonSeed {
+  id: number;
+  slug: string;
+  audioUrl: string;
+}
+
+/**
  * A module (sub-series) within a collection
  */
 export interface ModuleSeed {
   id: number;
   title: string;
   desc: string;
-  lessonCount: number;
+  lessons: ModuleLessonSeed[];
 }
 
 /**

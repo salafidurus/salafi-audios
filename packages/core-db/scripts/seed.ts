@@ -13,19 +13,16 @@
 import { prisma } from "./seed/database.js";
 import { SCHOLARS, TOPICS } from "./seed/data/index.js";
 import {
-  clearData,
   seedScholars,
   seedTopics,
   seedListings,
   seedAudio,
   seedTopicLinks,
+  seedLiveChannels,
 } from "./seed/seeders/index.js";
 
 async function main() {
-  console.log("Seeding database with unified Listings ...\n");
-
-  // Clear existing data
-  await clearData(prisma);
+  console.log("Seeding database with unified Listings (upsert mode) ...\n");
 
   // Seed base entities
   await seedTopics(prisma);
@@ -48,6 +45,9 @@ async function main() {
 
   // Link listings to topics
   await seedTopicLinks(prisma, topicPairs);
+
+  // Seed live channels
+  await seedLiveChannels(prisma);
 
   // Summary
   const totalListings =

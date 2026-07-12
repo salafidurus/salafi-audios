@@ -16,6 +16,7 @@ export const SINGLES: SingleSeed[] = [
     desc: "Sharh al-Qawa'id al-Arba' — the Four Fundamental Principles of Tawheed",
     topicIdx: 0,
     durationMin: 50,
+    audioUrl: "https://placeholder.dev/audio/uthaymin-al-qawaid-al-arba.mp3",
   },
   {
     id: 101,
@@ -25,6 +26,7 @@ export const SINGLES: SingleSeed[] = [
     desc: "Usul al-Tafsir wa Qawa'iduhu — Fundamentals of Qur'anic interpretation",
     topicIdx: 4,
     durationMin: 55,
+    audioUrl: "https://placeholder.dev/audio/uthaymin-usul-al-tafsir.mp3",
   },
   {
     id: 102,
@@ -34,6 +36,7 @@ export const SINGLES: SingleSeed[] = [
     desc: "The nullifiers of Islam — actions that remove one from the fold of Islam",
     topicIdx: 0,
     durationMin: 45,
+    audioUrl: "https://placeholder.dev/audio/fawzan-nawaqid-al-islam.mp3",
   },
   {
     id: 103,
@@ -43,6 +46,7 @@ export const SINGLES: SingleSeed[] = [
     desc: "A concise treatise on the fundamentals of fiqh jurisprudence",
     topicIdx: 3,
     durationMin: 40,
+    audioUrl: "https://placeholder.dev/audio/fawzan-risalah-latifah-fi-usul-al-fiqh.mp3",
   },
   {
     id: 104,
@@ -52,6 +56,7 @@ export const SINGLES: SingleSeed[] = [
     desc: "Explanation of the Three Fundamental Principles by Muhammad ibn 'Abd al-Wahhab",
     topicIdx: 0,
     durationMin: 60,
+    audioUrl: "https://placeholder.dev/audio/arafat-sharh-al-usul-al-thalathah.mp3",
   },
   {
     id: 105,
@@ -61,6 +66,7 @@ export const SINGLES: SingleSeed[] = [
     desc: "Important lessons for the Muslim community — essential Islamic knowledge",
     topicIdx: 0,
     durationMin: 50,
+    audioUrl: "https://placeholder.dev/audio/arafat-sharh-al-durus-al-muhimmah.mp3",
   },
   {
     id: 106,
@@ -70,6 +76,7 @@ export const SINGLES: SingleSeed[] = [
     desc: "Practical exercises in Arabic i'rab (syntactic analysis)",
     topicIdx: 1,
     durationMin: 45,
+    audioUrl: "https://placeholder.dev/audio/mustafa-tamrinat-al-irab.mp3",
   },
   {
     id: 107,
@@ -79,6 +86,7 @@ export const SINGLES: SingleSeed[] = [
     desc: "Summary of i'rab with grammatical analysis exercises",
     topicIdx: 1,
     durationMin: 40,
+    audioUrl: "https://placeholder.dev/audio/mustafa-khulasat-al-irab.mp3",
   },
   {
     id: 108,
@@ -88,6 +96,7 @@ export const SINGLES: SingleSeed[] = [
     desc: "Commentary on the Bayquniyyah poem in mustalah al-hadith",
     topicIdx: 2,
     durationMin: 55,
+    audioUrl: "https://placeholder.dev/audio/bukhari-sharh-al-mandhumah-al-bayquniyyah.mp3",
   },
   {
     id: 109,
@@ -97,5 +106,16 @@ export const SINGLES: SingleSeed[] = [
     desc: "An introduction to the science of hadith — terminology and classification",
     topicIdx: 2,
     durationMin: 50,
+    audioUrl: "https://placeholder.dev/audio/bukhari-madkhal-ila-ilm-al-hadith.mp3",
+  },
+  {
+    id: 110,
+    scholarIdx: 5,
+    slug: "e2e-listing-slug",
+    title: "E2E Test Listing",
+    desc: "E2E Listing Description",
+    topicIdx: 6,
+    durationMin: 5,
+    audioUrl: "https://placeholder.dev/audio/e2e-listing-slug.mp3",
   },
 ];

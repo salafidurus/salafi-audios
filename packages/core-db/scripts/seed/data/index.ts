@@ -7,3 +7,4 @@ export { TOPICS, type TopicData } from "./topics.js";
 export { SINGLES } from "./singles.js";
 export { SERIES } from "./series.js";
 export { COLLECTIONS } from "./collections.js";
+export { LIVE_CHANNELS, type LiveChannelData } from "./live-channels.js";

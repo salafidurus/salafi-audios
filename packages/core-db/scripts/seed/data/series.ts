@@ -18,10 +18,58 @@ export const SERIES: SeriesSeed[] = [
     desc: "Commentary on Ibn Taymiyyah's al-'Aqeedah al-Wasitiyyah on orthodox creed",
     topicIdx: 0,
     lessonDurationMin: 50,
-    lessons: [210, 211, 212, 213, 214, 215, 216, 217, 218, 219].map((id) => ({
-      id,
-      slug: `uthaymin-wasitiyyah-${id - 209}`,
-    })),
+    lessons: [
+      {
+        id: 210,
+        slug: "uthaymin-wasitiyyah-1",
+        audioUrl: "https://placeholder.dev/audio/uthaymin-wasitiyyah-1.mp3",
+      },
+      {
+        id: 211,
+        slug: "uthaymin-wasitiyyah-2",
+        audioUrl: "https://placeholder.dev/audio/uthaymin-wasitiyyah-2.mp3",
+      },
+      {
+        id: 212,
+        slug: "uthaymin-wasitiyyah-3",
+        audioUrl: "https://placeholder.dev/audio/uthaymin-wasitiyyah-3.mp3",
+      },
+      {
+        id: 213,
+        slug: "uthaymin-wasitiyyah-4",
+        audioUrl: "https://placeholder.dev/audio/uthaymin-wasitiyyah-4.mp3",
+      },
+      {
+        id: 214,
+        slug: "uthaymin-wasitiyyah-5",
+        audioUrl: "https://placeholder.dev/audio/uthaymin-wasitiyyah-5.mp3",
+      },
+      {
+        id: 215,
+        slug: "uthaymin-wasitiyyah-6",
+        audioUrl: "https://placeholder.dev/audio/uthaymin-wasitiyyah-6.mp3",
+      },
+      {
+        id: 216,
+        slug: "uthaymin-wasitiyyah-7",
+        audioUrl: "https://placeholder.dev/audio/uthaymin-wasitiyyah-7.mp3",
+      },
+      {
+        id: 217,
+        slug: "uthaymin-wasitiyyah-8",
+        audioUrl: "https://placeholder.dev/audio/uthaymin-wasitiyyah-8.mp3",
+      },
+      {
+        id: 218,
+        slug: "uthaymin-wasitiyyah-9",
+        audioUrl: "https://placeholder.dev/audio/uthaymin-wasitiyyah-9.mp3",
+      },
+      {
+        id: 219,
+        slug: "uthaymin-wasitiyyah-10",
+        audioUrl: "https://placeholder.dev/audio/uthaymin-wasitiyyah-10.mp3",
+      },
+    ],
   },
   {
     id: 201,
@@ -31,10 +79,33 @@ export const SERIES: SeriesSeed[] = [
     desc: "Commentary on Rawd al-Murbi' fi Fiqh al-Hanabilah — Hanbali fiqh",
     topicIdx: 3,
     lessonDurationMin: 45,
-    lessons: [220, 221, 222, 223, 224].map((id) => ({
-      id,
-      slug: `uthaymin-rawd-${id - 219}`,
-    })),
+    lessons: [
+      {
+        id: 220,
+        slug: "uthaymin-rawd-1",
+        audioUrl: "https://placeholder.dev/audio/uthaymin-rawd-1.mp3",
+      },
+      {
+        id: 221,
+        slug: "uthaymin-rawd-2",
+        audioUrl: "https://placeholder.dev/audio/uthaymin-rawd-2.mp3",
+      },
+      {
+        id: 222,
+        slug: "uthaymin-rawd-3",
+        audioUrl: "https://placeholder.dev/audio/uthaymin-rawd-3.mp3",
+      },
+      {
+        id: 223,
+        slug: "uthaymin-rawd-4",
+        audioUrl: "https://placeholder.dev/audio/uthaymin-rawd-4.mp3",
+      },
+      {
+        id: 224,
+        slug: "uthaymin-rawd-5",
+        audioUrl: "https://placeholder.dev/audio/uthaymin-rawd-5.mp3",
+      },
+    ],
   },
   {
     id: 202,
@@ -44,7 +115,18 @@ export const SERIES: SeriesSeed[] = [
     desc: "Uncovering the doubts — refuting misconceptions about Tawheed",
     topicIdx: 0,
     lessonDurationMin: 50,
-    lessons: [225, 226].map((id) => ({ id, slug: `fawzan-kashf-${id - 224}` })),
+    lessons: [
+      {
+        id: 225,
+        slug: "fawzan-kashf-1",
+        audioUrl: "https://placeholder.dev/audio/fawzan-kashf-1.mp3",
+      },
+      {
+        id: 226,
+        slug: "fawzan-kashf-2",
+        audioUrl: "https://placeholder.dev/audio/fawzan-kashf-2.mp3",
+      },
+    ],
   },
   {
     id: 203,
@@ -54,10 +136,58 @@ export const SERIES: SeriesSeed[] = [
     desc: "Commentary on 'Umdat al-Fiqh in Hanbali jurisprudence",
     topicIdx: 3,
     lessonDurationMin: 45,
-    lessons: [227, 228, 229, 230, 231, 232, 233, 234, 235, 236].map((id) => ({
-      id,
-      slug: `fawzan-umdat-${id - 226}`,
-    })),
+    lessons: [
+      {
+        id: 227,
+        slug: "fawzan-umdat-1",
+        audioUrl: "https://placeholder.dev/audio/fawzan-umdat-1.mp3",
+      },
+      {
+        id: 228,
+        slug: "fawzan-umdat-2",
+        audioUrl: "https://placeholder.dev/audio/fawzan-umdat-2.mp3",
+      },
+      {
+        id: 229,
+        slug: "fawzan-umdat-3",
+        audioUrl: "https://placeholder.dev/audio/fawzan-umdat-3.mp3",
+      },
+      {
+        id: 230,
+        slug: "fawzan-umdat-4",
+        audioUrl: "https://placeholder.dev/audio/fawzan-umdat-4.mp3",
+      },
+      {
+        id: 231,
+        slug: "fawzan-umdat-5",
+        audioUrl: "https://placeholder.dev/audio/fawzan-umdat-5.mp3",
+      },
+      {
+        id: 232,
+        slug: "fawzan-umdat-6",
+        audioUrl: "https://placeholder.dev/audio/fawzan-umdat-6.mp3",
+      },
+      {
+        id: 233,
+        slug: "fawzan-umdat-7",
+        audioUrl: "https://placeholder.dev/audio/fawzan-umdat-7.mp3",
+      },
+      {
+        id: 234,
+        slug: "fawzan-umdat-8",
+        audioUrl: "https://placeholder.dev/audio/fawzan-umdat-8.mp3",
+      },
+      {
+        id: 235,
+        slug: "fawzan-umdat-9",
+        audioUrl: "https://placeholder.dev/audio/fawzan-umdat-9.mp3",
+      },
+      {
+        id: 236,
+        slug: "fawzan-umdat-10",
+        audioUrl: "https://placeholder.dev/audio/fawzan-umdat-10.mp3",
+      },
+    ],
   },
   {
     id: 204,
@@ -67,10 +197,58 @@ export const SERIES: SeriesSeed[] = [
     desc: "Commentary on the issues of Jahiliyyah from the works of Muhammad ibn 'Abd al-Wahhab",
     topicIdx: 0,
     lessonDurationMin: 50,
-    lessons: [237, 238, 239, 240, 241, 242, 243, 244, 245, 246].map((id) => ({
-      id,
-      slug: `arafat-masail-${id - 236}`,
-    })),
+    lessons: [
+      {
+        id: 237,
+        slug: "arafat-masail-1",
+        audioUrl: "https://placeholder.dev/audio/arafat-masail-1.mp3",
+      },
+      {
+        id: 238,
+        slug: "arafat-masail-2",
+        audioUrl: "https://placeholder.dev/audio/arafat-masail-2.mp3",
+      },
+      {
+        id: 239,
+        slug: "arafat-masail-3",
+        audioUrl: "https://placeholder.dev/audio/arafat-masail-3.mp3",
+      },
+      {
+        id: 240,
+        slug: "arafat-masail-4",
+        audioUrl: "https://placeholder.dev/audio/arafat-masail-4.mp3",
+      },
+      {
+        id: 241,
+        slug: "arafat-masail-5",
+        audioUrl: "https://placeholder.dev/audio/arafat-masail-5.mp3",
+      },
+      {
+        id: 242,
+        slug: "arafat-masail-6",
+        audioUrl: "https://placeholder.dev/audio/arafat-masail-6.mp3",
+      },
+      {
+        id: 243,
+        slug: "arafat-masail-7",
+        audioUrl: "https://placeholder.dev/audio/arafat-masail-7.mp3",
+      },
+      {
+        id: 244,
+        slug: "arafat-masail-8",
+        audioUrl: "https://placeholder.dev/audio/arafat-masail-8.mp3",
+      },
+      {
+        id: 245,
+        slug: "arafat-masail-9",
+        audioUrl: "https://placeholder.dev/audio/arafat-masail-9.mp3",
+      },
+      {
+        id: 246,
+        slug: "arafat-masail-10",
+        audioUrl: "https://placeholder.dev/audio/arafat-masail-10.mp3",
+      },
+    ],
   },
   {
     id: 205,
@@ -80,10 +258,33 @@ export const SERIES: SeriesSeed[] = [
     desc: "Commentary on the classical Maliki fiqh treatise by Ibn Abi Zayd",
     topicIdx: 3,
     lessonDurationMin: 45,
-    lessons: [247, 248, 249, 250, 251].map((id) => ({
-      id,
-      slug: `arafat-risalah-${id - 246}`,
-    })),
+    lessons: [
+      {
+        id: 247,
+        slug: "arafat-risalah-1",
+        audioUrl: "https://placeholder.dev/audio/arafat-risalah-1.mp3",
+      },
+      {
+        id: 248,
+        slug: "arafat-risalah-2",
+        audioUrl: "https://placeholder.dev/audio/arafat-risalah-2.mp3",
+      },
+      {
+        id: 249,
+        slug: "arafat-risalah-3",
+        audioUrl: "https://placeholder.dev/audio/arafat-risalah-3.mp3",
+      },
+      {
+        id: 250,
+        slug: "arafat-risalah-4",
+        audioUrl: "https://placeholder.dev/audio/arafat-risalah-4.mp3",
+      },
+      {
+        id: 251,
+        slug: "arafat-risalah-5",
+        audioUrl: "https://placeholder.dev/audio/arafat-risalah-5.mp3",
+      },
+    ],
   },
   {
     id: 206,
@@ -93,10 +294,58 @@ export const SERIES: SeriesSeed[] = [
     desc: "The grammatical rules of i'rab — a systematic study of Arabic syntax",
     topicIdx: 1,
     lessonDurationMin: 45,
-    lessons: [252, 253, 254, 255, 256, 257, 258, 259, 260, 261].map((id) => ({
-      id,
-      slug: `mustafa-qawaid-${id - 251}`,
-    })),
+    lessons: [
+      {
+        id: 252,
+        slug: "mustafa-qawaid-1",
+        audioUrl: "https://placeholder.dev/audio/mustafa-qawaid-1.mp3",
+      },
+      {
+        id: 253,
+        slug: "mustafa-qawaid-2",
+        audioUrl: "https://placeholder.dev/audio/mustafa-qawaid-2.mp3",
+      },
+      {
+        id: 254,
+        slug: "mustafa-qawaid-3",
+        audioUrl: "https://placeholder.dev/audio/mustafa-qawaid-3.mp3",
+      },
+      {
+        id: 255,
+        slug: "mustafa-qawaid-4",
+        audioUrl: "https://placeholder.dev/audio/mustafa-qawaid-4.mp3",
+      },
+      {
+        id: 256,
+        slug: "mustafa-qawaid-5",
+        audioUrl: "https://placeholder.dev/audio/mustafa-qawaid-5.mp3",
+      },
+      {
+        id: 257,
+        slug: "mustafa-qawaid-6",
+        audioUrl: "https://placeholder.dev/audio/mustafa-qawaid-6.mp3",
+      },
+      {
+        id: 258,
+        slug: "mustafa-qawaid-7",
+        audioUrl: "https://placeholder.dev/audio/mustafa-qawaid-7.mp3",
+      },
+      {
+        id: 259,
+        slug: "mustafa-qawaid-8",
+        audioUrl: "https://placeholder.dev/audio/mustafa-qawaid-8.mp3",
+      },
+      {
+        id: 260,
+        slug: "mustafa-qawaid-9",
+        audioUrl: "https://placeholder.dev/audio/mustafa-qawaid-9.mp3",
+      },
+      {
+        id: 261,
+        slug: "mustafa-qawaid-10",
+        audioUrl: "https://placeholder.dev/audio/mustafa-qawaid-10.mp3",
+      },
+    ],
   },
   {
     id: 207,
@@ -106,10 +355,33 @@ export const SERIES: SeriesSeed[] = [
     desc: "Simplified study of Arabic morphology (sarf) and verb conjugation patterns",
     topicIdx: 1,
     lessonDurationMin: 40,
-    lessons: [262, 263, 264, 265, 266].map((id) => ({
-      id,
-      slug: `mustafa-sarf-${id - 261}`,
-    })),
+    lessons: [
+      {
+        id: 262,
+        slug: "mustafa-sarf-1",
+        audioUrl: "https://placeholder.dev/audio/mustafa-sarf-1.mp3",
+      },
+      {
+        id: 263,
+        slug: "mustafa-sarf-2",
+        audioUrl: "https://placeholder.dev/audio/mustafa-sarf-2.mp3",
+      },
+      {
+        id: 264,
+        slug: "mustafa-sarf-3",
+        audioUrl: "https://placeholder.dev/audio/mustafa-sarf-3.mp3",
+      },
+      {
+        id: 265,
+        slug: "mustafa-sarf-4",
+        audioUrl: "https://placeholder.dev/audio/mustafa-sarf-4.mp3",
+      },
+      {
+        id: 266,
+        slug: "mustafa-sarf-5",
+        audioUrl: "https://placeholder.dev/audio/mustafa-sarf-5.mp3",
+      },
+    ],
   },
   {
     id: 208,
@@ -119,10 +391,33 @@ export const SERIES: SeriesSeed[] = [
     desc: "Principles and controls of jarh wa ta'dil — evaluating hadith narrators",
     topicIdx: 2,
     lessonDurationMin: 50,
-    lessons: [267, 268, 269, 270, 271].map((id) => ({
-      id,
-      slug: `bukhari-dawabit-${id - 266}`,
-    })),
+    lessons: [
+      {
+        id: 267,
+        slug: "bukhari-dawabit-1",
+        audioUrl: "https://placeholder.dev/audio/bukhari-dawabit-1.mp3",
+      },
+      {
+        id: 268,
+        slug: "bukhari-dawabit-2",
+        audioUrl: "https://placeholder.dev/audio/bukhari-dawabit-2.mp3",
+      },
+      {
+        id: 269,
+        slug: "bukhari-dawabit-3",
+        audioUrl: "https://placeholder.dev/audio/bukhari-dawabit-3.mp3",
+      },
+      {
+        id: 270,
+        slug: "bukhari-dawabit-4",
+        audioUrl: "https://placeholder.dev/audio/bukhari-dawabit-4.mp3",
+      },
+      {
+        id: 271,
+        slug: "bukhari-dawabit-5",
+        audioUrl: "https://placeholder.dev/audio/bukhari-dawabit-5.mp3",
+      },
+    ],
   },
   {
     id: 209,
@@ -132,9 +427,57 @@ export const SERIES: SeriesSeed[] = [
     desc: "A comprehensive study of hadith sciences — classification and methodology",
     topicIdx: 2,
     lessonDurationMin: 50,
-    lessons: [272, 273, 274, 275, 276, 277, 278, 279, 280, 281].map((id) => ({
-      id,
-      slug: `bukhari-jami-${id - 271}`,
-    })),
+    lessons: [
+      {
+        id: 272,
+        slug: "bukhari-jami-1",
+        audioUrl: "https://placeholder.dev/audio/bukhari-jami-1.mp3",
+      },
+      {
+        id: 273,
+        slug: "bukhari-jami-2",
+        audioUrl: "https://placeholder.dev/audio/bukhari-jami-2.mp3",
+      },
+      {
+        id: 274,
+        slug: "bukhari-jami-3",
+        audioUrl: "https://placeholder.dev/audio/bukhari-jami-3.mp3",
+      },
+      {
+        id: 275,
+        slug: "bukhari-jami-4",
+        audioUrl: "https://placeholder.dev/audio/bukhari-jami-4.mp3",
+      },
+      {
+        id: 276,
+        slug: "bukhari-jami-5",
+        audioUrl: "https://placeholder.dev/audio/bukhari-jami-5.mp3",
+      },
+      {
+        id: 277,
+        slug: "bukhari-jami-6",
+        audioUrl: "https://placeholder.dev/audio/bukhari-jami-6.mp3",
+      },
+      {
+        id: 278,
+        slug: "bukhari-jami-7",
+        audioUrl: "https://placeholder.dev/audio/bukhari-jami-7.mp3",
+      },
+      {
+        id: 279,
+        slug: "bukhari-jami-8",
+        audioUrl: "https://placeholder.dev/audio/bukhari-jami-8.mp3",
+      },
+      {
+        id: 280,
+        slug: "bukhari-jami-9",
+        audioUrl: "https://placeholder.dev/audio/bukhari-jami-9.mp3",
+      },
+      {
+        id: 281,
+        slug: "bukhari-jami-10",
+        audioUrl: "https://placeholder.dev/audio/bukhari-jami-10.mp3",
+      },
+    ],
   },
 ];

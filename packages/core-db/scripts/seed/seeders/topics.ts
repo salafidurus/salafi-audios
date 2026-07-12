@@ -7,8 +7,21 @@ import { TOPICS } from "../data/index.js";
 
 export async function seedTopics(prisma: PrismaClient): Promise<void> {
   for (const topic of TOPICS) {
-    await prisma.topic.create({ data: topic });
+    await prisma.topic.upsert({
+      where: { id: topic.id },
+      update: {
+        slug: topic.slug,
+        name: topic.name,
+        parentId: topic.parentId ?? null,
+      },
+      create: {
+        id: topic.id,
+        slug: topic.slug,
+        name: topic.name,
+        parentId: topic.parentId ?? null,
+      },
+    });
   }
 
-  console.log(`✓ Created ${TOPICS.length} topics`);
+  console.log(`✓ Seeded ${TOPICS.length} topics`);
 }
