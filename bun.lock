@@ -97,6 +97,7 @@
         "ts-loader": "^9.6.1",
         "ts-node": "catalog:",
         "tsconfig-paths": "catalog:",
+        "vitest": "catalog:",
       },
     },
     "apps/native": {

@@ -22,6 +22,9 @@ const ApiEnvSchema = z.object({
   R2_SECRET_ACCESS_KEY: z.string().min(1),
   R2_BUCKET_NAME: z.string().min(1),
   R2_PUBLIC_BASE_URL: z.string().url(),
+  DISABLE_THROTTLER: z
+    .preprocess((val) => val === 'true' || val === true, z.boolean())
+    .default(false),
 });
 
 export type ApiEnv = z.infer<typeof ApiEnvSchema>;

@@ -30,6 +30,8 @@ import { TelegramModule } from './modules/telegram/telegram.module';
 import { LocaleInterceptor } from './shared/interceptors/locale.interceptor';
 import { LocaleMiddleware } from './shared/i18n/locale.middleware';
 
+import { ThrottlerGuard } from '@nestjs/throttler';
+
 @Module({
   imports: [
     ConfigModule,
@@ -60,6 +62,8 @@ import { LocaleMiddleware } from './shared/i18n/locale.middleware';
     TelegramModule,
   ],
   providers: [
+    ThrottlerGuard,
+    { provide: APP_GUARD, useExisting: ThrottlerGuard },
     { provide: APP_GUARD, useClass: AuthGuard },
     { provide: APP_GUARD, useClass: PermissionGuard },
     { provide: APP_INTERCEPTOR, useClass: LocaleInterceptor },
