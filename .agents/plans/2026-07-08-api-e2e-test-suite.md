@@ -265,18 +265,8 @@ on:
       - "bun.lock"
       - "turbo.json"
       - ".github/workflows/e2e-api.yml"
-  push:
     branches:
       - main
-    paths:
-      - "apps/api/**"
-      - "packages/core-db/prisma/**"
-      - "packages/core-db/package.json"
-      - "packages/core-contracts/**"
-      - "bun.lock"
-      - "turbo.json"
-      - ".github/workflows/e2e-api.yml"
-  workflow_dispatch:
 
 concurrency:
   group: e2e-api-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
