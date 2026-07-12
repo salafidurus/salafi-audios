@@ -11,8 +11,8 @@ If you encounter `ERROR: type "permission" does not exist` when running SQL comm
 ### Step 1: Check Migration Status
 
 ```bash
-# Check if migrations are applied
-bun run --filter @sd/core-db migrate:status
+# Deploy pending migrations
+bun run --filter @sd/core-db migrate:deploy
 ```
 
 If it says "No pending migrations" but the enum doesn't exist, the migration likely failed or was rolled back.
@@ -22,14 +22,12 @@ If it says "No pending migrations" but the enum doesn't exist, the migration lik
 **Option A: Hard reset** (if you can afford to lose dev data):
 
 ```bash
-# 1. Reset the migration history and drop all tables
-bun run --filter @sd/core-db migrate:reset --force
+# This drops the current database and re-runs all migrations from scratch
+cd packages/core-db
+npx prisma migrate reset --force
 
-# 2. Redeploy all migrations
-bun run --filter @sd/core-db migrate:deploy
-
-# 3. Re-seed if needed
-bun run ingest:content
+# Then re-seed if needed
+bun run prisma:seed
 ```
 
 **Option B: Manual Enum Creation** (if you need to preserve data):
@@ -37,8 +35,8 @@ bun run ingest:content
 If the tables exist but the enum is missing, manually create it:
 
 ```sql
--- Create Permission enum if it doesn't exist
-CREATE TYPE "Permission" AS ENUM (
+-- Create permission enum (lowercase type name)
+CREATE TYPE "permission" AS ENUM (
   'SCHOLARS_VIEW', 'SCHOLARS_CREATE', 'SCHOLARS_EDIT', 'SCHOLARS_DELETE', 'SCHOLARS_PUBLISH',
   'LISTINGS_VIEW', 'LISTINGS_CREATE', 'LISTINGS_EDIT', 'LISTINGS_DELETE', 'LISTINGS_PUBLISH',
   'TOPICS_VIEW', 'TOPICS_CREATE', 'TOPICS_EDIT', 'TOPICS_DELETE', 'TOPICS_PUBLISH',
@@ -49,7 +47,7 @@ CREATE TYPE "Permission" AS ENUM (
 );
 
 -- If UserPermission table exists but permission column is TEXT, alter it:
--- ALTER TABLE "UserPermission" ALTER COLUMN "permission" TYPE "Permission" USING "permission"::"Permission";
+-- ALTER TABLE "UserPermission" ALTER COLUMN "permission" TYPE "permission" USING "permission"::"permission";
 ```
 
 After the enum is created, the SQL commands below will work with enum casting (`::permission`).

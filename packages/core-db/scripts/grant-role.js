@@ -167,12 +167,12 @@ async function grantRole(email, role) {
     }
 
     // Warn about superadmin
-    if (role === "superadmin") {
-      console.warn(
-        `⚠️  Superadmin role assignment requires direct SQL.\n   See docs/admin-management.md for instructions.\n`,
-      );
-      process.exit(0);
-    }
+    // if (role === "superadmin") {
+    //   console.warn(
+    //     `⚠️  Superadmin role assignment requires direct SQL.\n   See docs/admin-management.md for instructions.\n`,
+    //   );
+    //   process.exit(0);
+    // }
 
     console.log(`\n📋 Assigning role '${role}' to ${user.email}...\n`);
 
