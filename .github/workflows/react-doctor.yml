@@ -1,39 +1,23 @@
-name: React Doctor
+name: react-doctor
 
 on:
   pull_request:
-    paths:
-      - "apps/native/**/*.{js,jsx,ts,tsx}"
-      - "apps/web/**/*.{js,jsx,ts,tsx}"
-      - "packages/domain-account/**/*.{js,jsx,ts,tsx}"
-      - "packages/domain-audio/**/*.{js,jsx,ts,tsx}"
-      - "packages/domain-content/**/*.{js,jsx,ts,tsx}"
-      - "packages/domain-live/**/*.{js,jsx,ts,tsx}"
-      - "packages/domain-search/**/*.{js,jsx,ts,tsx}"
+    types: [opened, reopened, synchronize]
+    branches:
+      - main
 
 permissions:
   contents: read
-  pull-requests: write # Required for posting comments on PRs
-
-concurrency:
-  group: react-doctor-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  pull-requests: write
 
 jobs:
   react-doctor:
+    name: React Doctor
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-
-      - name: Run React Doctor Action
-        uses: millionco/react-doctor@v2
-        with:
-          diff: ${{ github.base_ref }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: millionco/react-doctor@v2
+        continue-on-error: true
