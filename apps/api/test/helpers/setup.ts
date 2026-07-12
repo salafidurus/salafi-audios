@@ -1,4 +1,4 @@
-process.env.NODE_ENV = 'test';
+import './set-env';
 import '../../src/shared/utils/env.bootstrap';
 
 if (process.env.DATABASE_URL) {

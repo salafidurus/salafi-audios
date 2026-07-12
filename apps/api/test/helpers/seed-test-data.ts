@@ -1,5 +1,5 @@
-import { PrismaClient, Locale, Status, ListingFormat } from '@sd/core-db';
-import { PrismaPg } from '@prisma/adapter-pg';
+import type { PrismaClient } from '@sd/core-db';
+import { Locale, Status, ListingFormat } from '@sd/core-db';
 
 export const TEST_SCHOLAR_ID = 'e2e-scholar-1';
 export const TEST_SCHOLAR_SLUG = 'e2e-scholar-slug';
@@ -10,18 +10,13 @@ export const TEST_LISTING_SLUG = 'e2e-listing-slug';
 export const TEST_LIVE_CHANNEL_ID = 'e2e-live-channel-1';
 export const TEST_LIVE_CHANNEL_TELEGRAM_ID = '-10022334455';
 
-export async function seedTestData() {
-  const connectionString = process.env['DATABASE_URL'] || process.env['DIRECT_DB_URL'];
-  if (!connectionString) {
-    throw new Error('DATABASE_URL is required to seed test data');
-  }
-
-  const adapter = new PrismaPg({ connectionString });
-  const prisma = new PrismaClient({ adapter });
-
+/**
+ * Seeds reference data required by E2E tests.
+ * Accepts the NestJS app's own PrismaService so the connection is always
+ * managed by the DI container — no separate pg pool initialization needed.
+ */
+export async function seedTestData(prisma: PrismaClient) {
   try {
-    await prisma.$connect();
-
     // 1. Create a scholar with translations
     await prisma.scholar.upsert({
       where: { id: TEST_SCHOLAR_ID },
@@ -117,7 +112,7 @@ export async function seedTestData() {
         isActive: true,
       },
     });
-  } finally {
-    await prisma.$disconnect();
+  } catch (err) {
+    throw err;
   }
 }
