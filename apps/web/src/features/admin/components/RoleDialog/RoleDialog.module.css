@@ -1,3 +1,22 @@
+.titleContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-scale-xs);
+}
+
+.titleMain {
+  font-size: var(--typo-title-lg-font-size);
+  font-weight: 700;
+  color: var(--content-default);
+}
+
+.titleSub {
+  font-size: var(--typo-body-md-font-size);
+  font-weight: 400;
+  color: var(--content-muted);
+}
+
 .loading {
   display: flex;
   align-items: center;

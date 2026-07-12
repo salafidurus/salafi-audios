@@ -2,6 +2,8 @@
 
 import { useEffect, useReducer, useState } from "react";
 import type { ReactNode } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys, type AdminUserListDto } from "@sd/core-contracts";
 import {
   type Permission,
   PERMISSIONS_ARRAY,
@@ -70,6 +72,74 @@ const initialState: State = {
   errors: {},
 };
 
+const SECTIONS = [
+  {
+    title: "Scholars Management",
+    permissions: [
+      "SCHOLARS_VIEW",
+      "SCHOLARS_CREATE",
+      "SCHOLARS_EDIT",
+      "SCHOLARS_DELETE",
+      "SCHOLARS_PUBLISH",
+    ] as Permission[],
+  },
+  {
+    title: "Listings Management",
+    permissions: [
+      "LISTINGS_VIEW",
+      "LISTINGS_CREATE",
+      "LISTINGS_EDIT",
+      "LISTINGS_DELETE",
+      "LISTINGS_PUBLISH",
+    ] as Permission[],
+  },
+  {
+    title: "Topics Management",
+    permissions: [
+      "TOPICS_VIEW",
+      "TOPICS_CREATE",
+      "TOPICS_EDIT",
+      "TOPICS_DELETE",
+      "TOPICS_PUBLISH",
+    ] as Permission[],
+  },
+  {
+    title: "Translations Management",
+    permissions: [
+      "TRANSLATIONS_VIEW",
+      "TRANSLATIONS_CREATE",
+      "TRANSLATIONS_EDIT",
+      "TRANSLATIONS_DELETE",
+      "TRANSLATIONS_PUBLISH",
+    ] as Permission[],
+  },
+  {
+    title: "Media Management",
+    permissions: ["MEDIA_UPLOAD", "MEDIA_DELETE"] as Permission[],
+  },
+  {
+    title: "User Management",
+    permissions: [
+      "USERS_VIEW",
+      "USERS_EDIT",
+      "USERS_DELETE",
+      "USERS_GRANT_PERMISSIONS",
+      "USERS_GRANT_ROLES",
+    ] as Permission[],
+  },
+  {
+    title: "Livestream Management",
+    permissions: [
+      "LIVE_VIEW",
+      "LIVE_CREATE",
+      "LIVE_EDIT",
+      "LIVE_DELETE",
+      "LIVE_START",
+      "LIVE_STOP",
+    ] as Permission[],
+  },
+];
+
 export function PermissionsDialog({
   isOpen,
   onClose,
@@ -77,6 +147,7 @@ export function PermissionsDialog({
   userId,
   userName = userId,
 }: PermissionsDialogProps): ReactNode {
+  const queryClient = useQueryClient();
   const [state, dispatch] = useReducer(reducer, initialState);
   const [pendingPermissions, setPendingPermissions] = useState<Set<Permission>>(new Set());
   const [saving, setSaving] = useState(false);
@@ -110,61 +181,82 @@ export function PermissionsDialog({
 
   const handleDone = async () => {
     setSaving(true);
-    try {
-      // Determine which permissions to grant and revoke
-      const toGrant: Permission[] = [];
-      const toRevoke: Permission[] = [];
 
-      for (const perm of PERMISSIONS_ARRAY) {
-        const hadIt = currentPermissions.includes(perm);
-        const hasItNow = pendingPermissions.has(perm);
+    const toGrant: Permission[] = [];
+    const toRevoke: Permission[] = [];
 
-        if (!hadIt && hasItNow) {
-          toGrant.push(perm);
-        } else if (hadIt && !hasItNow) {
-          toRevoke.push(perm);
-        }
+    for (const perm of PERMISSIONS_ARRAY) {
+      const hadIt = currentPermissions.includes(perm);
+      const hasItNow = pendingPermissions.has(perm);
+
+      if (!hadIt && hasItNow) {
+        toGrant.push(perm);
+      } else if (hadIt && !hasItNow) {
+        toRevoke.push(perm);
       }
+    }
 
-      // Apply changes in parallel
-      toGrant.forEach((perm) => dispatch({ type: "CLEAR_ERROR", permission: perm }));
-      toRevoke.forEach((perm) => dispatch({ type: "CLEAR_ERROR", permission: perm }));
+    // Optimistic Update
+    const updatedPerms = Array.from(pendingPermissions);
+    queryClient.setQueriesData<AdminUserListDto>(
+      { queryKey: queryKeys.admin.users.all() },
+      (oldData) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          users: oldData.users.map((u) =>
+            u.id === userId ? { ...u, permissions: updatedPerms } : u,
+          ),
+        };
+      },
+    );
 
+    // Call callback immediately to close or update parent view
+    onPermissionsChange?.();
+    onClose();
+
+    // Fire API calls in background
+    try {
       await Promise.all([
         ...toGrant.map(async (perm) => {
           try {
-            const data = await grantPermission(userId, perm);
-            dispatch({ type: "SET_PERMS", payload: data });
+            await grantPermission(userId, perm);
           } catch (error) {
-            const message = getErrorMessage(error, "Failed to grant permission");
-            dispatch({ type: "SET_ERROR", permission: perm, message });
+            console.error("Failed to grant permission:", perm, error);
           }
         }),
         ...toRevoke.map(async (perm) => {
           try {
-            const data = await revokePermission(userId, perm);
-            dispatch({ type: "SET_PERMS", payload: data });
+            await revokePermission(userId, perm);
           } catch (error) {
-            const message = getErrorMessage(error, "Failed to revoke permission");
-            dispatch({ type: "SET_ERROR", permission: perm, message });
+            console.error("Failed to revoke permission:", perm, error);
           }
         }),
       ]);
-
-      onPermissionsChange?.();
-      onClose();
+    } catch (error) {
+      console.error("Failed to complete batch permission updates", error);
     } finally {
       setSaving(false);
+      // Re-fetch to ensure data integrity
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
     }
   };
 
   if (!isOpen) return null;
 
+  const customTitle = (
+    <div className={styles.titleContainer}>
+      <span className={styles.titleMain}>Manage Permissions</span>
+      <span className={styles.titleSub}>{userName}</span>
+    </div>
+  );
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`Manage Permissions — ${userName}`}
+      size="xl"
+      title={customTitle as any}
       footer={
         <Button variant="primary" onClick={handleDone} disabled={saving}>
           {saving ? "Saving…" : "Done"}
@@ -174,43 +266,37 @@ export function PermissionsDialog({
       {state.loading && !state.userPerms ? (
         <div className={styles.loading}>Loading permissions…</div>
       ) : (
-        <div className={styles.permissionsList}>
-          {PERMISSIONS_ARRAY.map((perm) => {
-            const isPending = pendingPermissions.has(perm);
-            const error = state.errors[perm];
-            return (
-              <div key={perm} className={styles.permissionItem}>
-                <div className={styles.permissionInfo}>
-                  <span className={styles.permissionName}>{PERMISSION_LABELS[perm]}</span>
-                  <span className={styles.permissionDescription}>
-                    {PERMISSION_DESCRIPTIONS[perm]}
-                  </span>
-                  {error && <span className={styles.error}>{error}</span>}
-                </div>
-                <Toggle
-                  checked={isPending}
-                  onChange={() => handleToggle(perm)}
-                  disabled={saving}
-                  aria-label={`${isPending ? "Revoke" : "Grant"} ${PERMISSION_LABELS[perm]}`}
-                />
+        <div className={styles.sectionsGrid}>
+          {SECTIONS.map((section) => (
+            <div key={section.title} className={styles.section}>
+              <h3 className={styles.sectionTitle}>{section.title}</h3>
+              <div className={styles.permissionsList}>
+                {section.permissions.map((perm) => {
+                  const isPending = pendingPermissions.has(perm);
+                  const error = state.errors[perm];
+                  return (
+                    <div key={perm} className={styles.permissionItem}>
+                      <div className={styles.permissionInfo}>
+                        <span className={styles.permissionName}>{PERMISSION_LABELS[perm]}</span>
+                        <span className={styles.permissionDescription}>
+                          {PERMISSION_DESCRIPTIONS[perm]}
+                        </span>
+                        {error && <span className={styles.error}>{error}</span>}
+                      </div>
+                      <Toggle
+                        checked={isPending}
+                        onChange={() => handleToggle(perm)}
+                        disabled={saving}
+                        aria-label={`${isPending ? "Revoke" : "Grant"} ${PERMISSION_LABELS[perm]}`}
+                      />
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       )}
     </Modal>
   );
-}
-
-function getErrorMessage(error: unknown, defaultMessage: string): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  if (typeof error === "object" && error !== null && "message" in error) {
-    const msg = (error as Record<string, unknown>).message;
-    if (typeof msg === "string") {
-      return msg;
-    }
-  }
-  return defaultMessage;
 }

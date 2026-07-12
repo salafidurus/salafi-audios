@@ -2,6 +2,8 @@
 
 import { useEffect, useReducer, useState } from "react";
 import type { ReactNode } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys, type AdminUserListDto } from "@sd/core-contracts";
 import type { UserRole } from "@sd/core-contracts";
 import {
   fetchUserRoles,
@@ -102,6 +104,7 @@ export function RoleDialog({
   userId,
   userName = userId,
 }: RoleDialogProps): ReactNode {
+  const queryClient = useQueryClient();
   const [state, dispatch] = useReducer(reducer, initialState);
   const [pendingRoles, setPendingRoles] = useState<Set<UserRole>>(new Set());
   const [saving, setSaving] = useState(false);
@@ -135,61 +138,79 @@ export function RoleDialog({
 
   const handleDone = async () => {
     setSaving(true);
-    try {
-      // Determine which roles to grant and revoke
-      const toGrant: UserRole[] = [];
-      const toRevoke: UserRole[] = [];
 
-      for (const role of ROLES_ARRAY) {
-        const hadIt = currentRoles.includes(role);
-        const hasItNow = pendingRoles.has(role);
+    const toGrant: UserRole[] = [];
+    const toRevoke: UserRole[] = [];
 
-        if (!hadIt && hasItNow) {
-          toGrant.push(role);
-        } else if (hadIt && !hasItNow) {
-          toRevoke.push(role);
-        }
+    for (const role of ROLES_ARRAY) {
+      const hadIt = currentRoles.includes(role);
+      const hasItNow = pendingRoles.has(role);
+
+      if (!hadIt && hasItNow) {
+        toGrant.push(role);
+      } else if (hadIt && !hasItNow) {
+        toRevoke.push(role);
       }
+    }
 
-      // Apply changes in parallel
-      toGrant.forEach((role) => dispatch({ type: "CLEAR_ERROR", role }));
-      toRevoke.forEach((role) => dispatch({ type: "CLEAR_ERROR", role }));
+    // Optimistic Update
+    const updatedRoles = Array.from(pendingRoles);
+    queryClient.setQueriesData<AdminUserListDto>(
+      { queryKey: queryKeys.admin.users.all() },
+      (oldData) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          users: oldData.users.map((u) => (u.id === userId ? { ...u, roles: updatedRoles } : u)),
+        };
+      },
+    );
 
+    // Call callback immediately to close or update parent view
+    onRolesChange?.();
+    onClose();
+
+    // Fire API calls in background
+    try {
       await Promise.all([
         ...toGrant.map(async (role) => {
           try {
-            const data = await grantRole(userId, role);
-            dispatch({ type: "SET_ROLES", payload: data });
+            await grantRole(userId, role);
           } catch (error) {
-            const message = getErrorMessage(error, "Failed to grant role");
-            dispatch({ type: "SET_ERROR", role, message });
+            console.error("Failed to grant role:", role, error);
           }
         }),
         ...toRevoke.map(async (role) => {
           try {
-            const data = await revokeRole(userId, role);
-            dispatch({ type: "SET_ROLES", payload: data });
+            await revokeRole(userId, role);
           } catch (error) {
-            const message = getErrorMessage(error, "Failed to revoke role");
-            dispatch({ type: "SET_ERROR", role, message });
+            console.error("Failed to revoke role:", role, error);
           }
         }),
       ]);
-
-      onRolesChange?.();
-      onClose();
+    } catch (error) {
+      console.error("Failed to complete batch role updates", error);
     } finally {
       setSaving(false);
+      // Re-fetch to ensure data integrity
+      queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
     }
   };
 
   if (!isOpen) return null;
 
+  const customTitle = (
+    <div className={styles.titleContainer}>
+      <span className={styles.titleMain}>Manage Roles</span>
+      <span className={styles.titleSub}>{userName}</span>
+    </div>
+  );
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={`Manage Roles — ${userName}`}
+      title={customTitle as any}
       footer={
         <Button variant="primary" onClick={handleDone} disabled={saving}>
           {saving ? "Saving…" : "Done"}
@@ -223,17 +244,4 @@ export function RoleDialog({
       )}
     </Modal>
   );
-}
-
-function getErrorMessage(error: unknown, defaultMessage: string): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  if (typeof error === "object" && error !== null && "message" in error) {
-    const msg = (error as Record<string, unknown>).message;
-    if (typeof msg === "string") {
-      return msg;
-    }
-  }
-  return defaultMessage;
 }

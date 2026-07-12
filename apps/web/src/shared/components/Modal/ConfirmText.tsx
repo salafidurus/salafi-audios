@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Modal } from "@/shared/components/Modal/Modal";
-import styles from "./ConfirmModal.module.css";
+import { Modal } from "./Modal";
+import { Button } from "../Button";
+import styles from "./confirm.module.css";
 
-export interface ConfirmModalProps {
+export interface ConfirmTextProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
@@ -17,7 +18,7 @@ export interface ConfirmModalProps {
   testId?: string;
 }
 
-export function ConfirmModal({
+export function ConfirmText({
   isOpen,
   onClose,
   onConfirm,
@@ -28,7 +29,7 @@ export function ConfirmModal({
   confirmVariant = "primary",
   confirmWord,
   testId,
-}: ConfirmModalProps) {
+}: ConfirmTextProps) {
   const [inputValue, setInputValue] = useState("");
 
   const isWordConfirmed = confirmWord ? inputValue === confirmWord : true;
@@ -51,23 +52,17 @@ export function ConfirmModal({
       size="sm"
       footer={
         <>
-          <button
-            type="button"
-            data-testid="confirm-modal-cancel"
-            className={styles.cancelButton}
-            onClick={handleClose}
-          >
+          <Button variant="outline" data-testid="confirm-modal-cancel" onClick={handleClose}>
             {cancelLabel}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant={confirmVariant}
             data-testid="confirm-modal-confirm"
-            className={`${styles.confirmButton} ${confirmVariant === "danger" ? styles.confirmDanger : styles.confirmPrimary}`}
             onClick={handleConfirm}
             disabled={!isWordConfirmed}
           >
             {confirmLabel}
-          </button>
+          </Button>
         </>
       }
     >

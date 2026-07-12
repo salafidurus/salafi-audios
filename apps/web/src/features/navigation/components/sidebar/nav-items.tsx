@@ -9,7 +9,8 @@ import { routes } from "@sd/core-contracts";
 import { useAuth } from "@/core/auth";
 import type { AdminPermission } from "@sd/core-contracts";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
-import { SignOutConfirmDialog } from "@/features/auth/components/signout-confirm-dialog/signout-confirm-dialog";
+import { Modal } from "@/shared/components/Modal";
+import { authClient } from "@/core/auth";
 import { Button } from "@/shared/components/Button/Button";
 import { SectionLabel } from "./section-label";
 import {
@@ -275,9 +276,25 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
         ) : null}
       </div>
 
-      <SignOutConfirmDialog
+      <Modal.ConfirmDialog
         isOpen={isSignOutDialogOpen}
         onClose={() => setIsSignOutDialogOpen(false)}
+        onConfirm={async () => {
+          try {
+            await authClient.signOut();
+          } catch (err) {
+            console.error("Sign out error", err);
+          } finally {
+            if (typeof window !== "undefined" && window.location && !process.env.VITEST) {
+              window.location.href = "/";
+            } else {
+              router.push("/");
+            }
+          }
+        }}
+        title="Are you sure you want to sign out?"
+        confirmLabel="Sign Out"
+        confirmVariant="danger"
       />
     </>
   );

@@ -22,7 +22,7 @@ import { List } from "@/shared/components/List";
 import { TopicFormModal, type TopicForEdit } from "@/features/admin/components/TopicFormModal";
 import { AudioUploader } from "@/features/admin/components/AudioUploader/AudioUploader";
 import { LectureEditModal } from "@/features/admin/components/LectureEditModal";
-import { DeleteTopicConfirmModal } from "@/shared/components/DeleteTopicConfirmModal";
+import { Modal } from "@/shared/components/Modal";
 import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import styles from "./admin-contents.screen.module.css";
@@ -156,7 +156,7 @@ export function AdminContentsScreen() {
 
   return (
     <ScreenView>
-      <DeleteTopicConfirmModal
+      <Modal.ConfirmDialog
         isOpen={deleteModalOpen}
         onClose={() => {
           setDeleteModalOpen(false);
@@ -164,8 +164,17 @@ export function AdminContentsScreen() {
           setDeletingTopicName("");
         }}
         onConfirm={handleConfirmDelete}
-        topicName={deletingTopicName}
-      />
+        title="Delete Topic?"
+        confirmLabel="Delete Topic"
+        confirmVariant="danger"
+      >
+        <p>
+          Are you sure you want to delete the topic <strong>{deletingTopicName}</strong>?
+        </p>
+        <p style={{ fontSize: "0.875rem", color: "var(--content-muted)", marginTop: "0.5rem" }}>
+          This action cannot be undone.
+        </p>
+      </Modal.ConfirmDialog>
 
       <PageHeader
         title={isMobile ? "Content" : "Content Management"}

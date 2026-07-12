@@ -6,6 +6,8 @@ import { LazyMotion, m, domAnimation, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { useSyncExternalStore } from "react";
 import styles from "./modal.module.css";
+import { ConfirmText } from "./ConfirmText";
+import { ConfirmDialog } from "./ConfirmDialog";
 
 const JUSTIFY_MAP = {
   left: "flex-start",
@@ -209,3 +211,5 @@ export function ModalFooter({ children, alignment = "right", border = true }: Mo
 Modal.Header = ModalHeader;
 Modal.Body = ModalBody;
 Modal.Footer = ModalFooter;
+Modal.ConfirmText = ConfirmText;
+Modal.ConfirmDialog = ConfirmDialog;

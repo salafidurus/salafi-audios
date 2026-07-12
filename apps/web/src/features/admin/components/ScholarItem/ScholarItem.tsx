@@ -2,7 +2,7 @@ import { Pencil } from "lucide-react";
 import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
 import { Button } from "@/shared/components/Button";
 import { List } from "@/shared/components/List";
-import { UserAvatar } from "@/shared/components/UserAvatar";
+import { UserAvatar } from "@/shared/components/user-avatar";
 import styles from "./scholar-item.module.css";
 
 export interface ScholarItemProps {
