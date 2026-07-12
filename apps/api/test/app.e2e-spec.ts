@@ -1,19 +1,12 @@
-import '../src/shared/utils/env.bootstrap';
-import { Test } from '@nestjs/testing';
+import { createE2eApp } from './helpers/create-e2e-app';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
-import { AppModule } from './../src/app.module';
-import { createTestApp } from '../src/test/create-test-app';
 
 describe('AppController (e2e)', () => {
   let app: NestFastifyApplication;
 
   beforeEach(async () => {
-    const moduleBuilder = Test.createTestingModule({
-      imports: [AppModule],
-    });
-
-    app = await createTestApp(moduleBuilder);
+    app = await createE2eApp();
   });
 
   afterEach(() => app.close());

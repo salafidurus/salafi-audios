@@ -77,9 +77,9 @@ the next stage starts.
 
   4. **`test/helpers/test-auth.factory.ts`** — A class `TestAuthFactory` that:
      - Creates a test user via `PrismaService` (unique email like `e2e-test-{random}@salafidurus.com`)
-     - Uses `better-auth` API to create a session (via `auth.instance.ts`)
+     - Bypasses OAuth redirects by inserting a `Session` record directly into the database linked to the user
      - Returns `{ user, session, headers: { Authorization: Bearer <token> } }`
-     - Provides `createAdminUser(permissions: string[])` that creates user + grants permissions
+     - Provides `createAdminUser(permissions: Permission[])` that creates user, assigns permissions in `UserPermission` table, and assigns roles
      - **No cleanup method** — all users deleted with branch after tests
 
   5. **`test/helpers/mock-telegram.module.ts`** — A `MockTelegramModule` with `@Global()` that
@@ -172,17 +172,18 @@ the next stage starts.
        - `DELETE /account` removes user, subsequent auth → 401
 
   2. **`test/admin-permissions.e2e-spec.ts`** — Permission boundary tests (12 tests):
-     - Each permission domain (manage:content, manage:scholars, manage:topics, manage:admin)
-       tested for: without permission → 403, with permission → success
-     - User with permission X but not Y → 403 on Y domain
+     - Gated by the global `PermissionGuard` via `@RequiresPermission(Permission.XYZ)`
+     - Each permission domain (Listings, Scholars, Topics, Users) tested using Prisma's `Permission` enum values
+     - Tested for: without required permission → 403, with required permission → success
+     - User with permission X (e.g., `SCHOLARS_CREATE`) but not Y (e.g., `LISTINGS_CREATE`) → 403 on Y domain
      - Test groups:
-       - **Content** (3 tests): create listing, publish, archive
-       - **Scholars** (2 tests): create scholar, update scholar
-       - **Topics** (2 tests): create topic, delete topic
-       - **User Admin** (2 tests): grant permission, revoke permission
-       - **Cross-isolation** (3 tests): verify permission boundaries strict
+       - **Content** (3 tests): `LISTINGS_CREATE` (create), `LISTINGS_PUBLISH` (publish/archive)
+       - **Scholars** (2 tests): `SCHOLARS_CREATE` (create), `SCHOLARS_EDIT` (update)
+       - **Topics** (2 tests): `TOPICS_CREATE` (create), `TOPICS_DELETE` (delete)
+       - **User Admin** (2 tests): `USERS_GRANT_PERMISSIONS` (grant/revoke permission)
+       - **Cross-isolation** (3 tests): verify permission boundaries are strict (e.g., `SCHOLARS_EDIT` does not grant `LISTINGS_EDIT`)
 
-- **Blockers**: Real better-auth session creation requires env vars.
+- **Blockers**: None (OAuth redirect flow is bypassed by inserting session records directly in the DB).
 - **Dependencies**: Stage 1 (infrastructure + test auth factory).
 - **Completion Criteria**:
   - `bun run test:e2e` passes with ~20 auth + permission tests
@@ -226,18 +227,135 @@ the next stage starts.
 
 ---
 
-## CI Integration: Neon Branch E2E Workflow
+## CI Integration: `e2e-api.yml` CI Workflow
 
-Add a new GitHub Actions workflow `test-api-e2e-neon.yml` that:
+Add a new GitHub Actions workflow `.github/workflows/e2e-api.yml` to execute API end-to-end tests against Neon ephemeral database branches:
 
-1. Creates a Neon branch (reuse our existing neon branch creation in `db-pr-test.yml` logic)
-2. Runs migrations on the Neon branch (`prisma migrate deploy`)
-3. Sets `DATABASE_URL` env var to Neon branch URL
-4. Runs `bun run test:e2e` in `apps/api`
-5. Deletes the Neon branch on completion
+### Trigger Strategy
 
-**Trigger**: Push to `main`, or manually
-**Result**: Clean E2E run with fresh DB, zero state pollution
+- **On Pull Request**: Triggers when changes occur in `apps/api/**`, `packages/core-db/prisma/**`, `packages/core-contracts/**`, `bun.lock`, `turbo.json`, or the workflow itself.
+- **On Push**: Triggers on pushes to the `main` branch.
+- **Manual (Workflow Dispatch)**: Supported.
+
+### Concurrent Executions
+
+- Cancel active runs for the same pull request automatically (`concurrency` group based on PR or branch ref).
+
+### Pipeline Steps Overview
+
+1. **Setup**: Calculate target git branch names.
+2. **Database Provisioning**: Create Neon preview branch using `neondatabase/create-branch-action@v6`. Expiration set to 2 hours.
+3. **Validation**: Check that database URL is correctly returned.
+4. **Environment & Dependency Setup**: Setup Bun and execute frozen-lockfile installation.
+5. **Database Migration**: Run `bun run --filter @sd/core-db migrate:deploy` with the Neon connection URL.
+6. **E2E Test Execution**: Execute `bun run --filter api test:e2e` with `DATABASE_URL`, `BETTER_AUTH_SECRET`, and local/test URLs set in environment variables.
+7. **Clean up**: Unconditionally delete the temporary Neon branch using `neondatabase/delete-branch-action@v3`.
+
+### Proposed YAML Structure
+
+```yaml
+name: e2e-api
+
+on:
+  pull_request:
+    paths:
+      - "apps/api/**"
+      - "packages/core-db/prisma/**"
+      - "packages/core-db/package.json"
+      - "packages/core-contracts/**"
+      - "bun.lock"
+      - "turbo.json"
+      - ".github/workflows/e2e-api.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "apps/api/**"
+      - "packages/core-db/prisma/**"
+      - "packages/core-db/package.json"
+      - "packages/core-contracts/**"
+      - "bun.lock"
+      - "turbo.json"
+      - ".github/workflows/e2e-api.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: e2e-api-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  setup:
+    name: Setup
+    outputs:
+      branch: ${{ steps.branch_name.outputs.current_branch }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get branch name
+        id: branch_name
+        uses: tj-actions/branch-names@v8
+
+  e2e_api:
+    name: e2e:api
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.3.14"
+
+      - name: Set branch expiration (2 hours)
+        run: echo "EXPIRES_AT=$(date -u --date '+2 hours' +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_ENV"
+
+      - name: Create Neon Branch
+        id: create_neon_branch
+        uses: neondatabase/create-branch-action@v6
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          branch_name: preview/e2e-api-${{ github.event.pull_request.number || github.sha }}-${{ needs.setup.outputs.branch }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+          expires_at: ${{ env.EXPIRES_AT }}
+
+      - name: Validate Neon Connection
+        run: |
+          if [ -z "${{ steps.create_neon_branch.outputs.db_url }}" ]; then
+            echo "::error::Neon branch database URL is empty"
+            exit 1
+          fi
+          echo "Neon branch created successfully"
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run Prisma migrations
+        env:
+          DIRECT_DB_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+          DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+        run: bun run --filter @sd/core-db migrate:deploy
+
+      - name: Run API E2E Tests
+        env:
+          DATABASE_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+          DIRECT_DB_URL: ${{ steps.create_neon_branch.outputs.db_url }}
+          BETTER_AUTH_SECRET: "e2e-test-secret-must-be-at-least-32-chars-long"
+          BETTER_AUTH_URL: "http://localhost:4000"
+          CORS_ORIGINS: "http://localhost:3000"
+        run: bun run --filter api test:e2e
+
+      - name: Delete Neon Branch
+        if: always()
+        uses: neondatabase/delete-branch-action@v3
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          branch: preview/e2e-api-${{ github.event.pull_request.number || github.sha }}-${{ needs.setup.outputs.branch }}
+          api_key: ${{ secrets.NEON_API_KEY }}
+```
 
 ---
 
