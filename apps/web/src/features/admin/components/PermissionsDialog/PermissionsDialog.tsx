@@ -4,12 +4,7 @@ import { useEffect, useReducer, useState } from "react";
 import type { ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys, type AdminUserListDto } from "@sd/core-contracts";
-import {
-  type Permission,
-  PERMISSIONS_ARRAY,
-  PERMISSION_LABELS,
-  PERMISSION_DESCRIPTIONS,
-} from "@sd/core-contracts";
+import { type Permission, PERMISSIONS_ARRAY } from "@sd/core-contracts";
 import {
   fetchUserPermissions,
   grantPermission,
