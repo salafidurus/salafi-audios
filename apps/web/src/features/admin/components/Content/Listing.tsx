@@ -1,4 +1,4 @@
-import type { AdminListingDetailDto } from "@sd/core-contracts";
+import type { AdminListingListItemDto } from "@sd/core-contracts";
 import { List } from "@/shared/components/List";
 import { Button } from "@/shared/components/Button";
 import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
@@ -6,7 +6,7 @@ import { Edit } from "lucide-react";
 import styles from "./Content.module.css";
 
 interface ListingProps {
-  listing: AdminListingDetailDto;
+  listing: AdminListingListItemDto;
   onEdit: (id: string) => void;
 }
 

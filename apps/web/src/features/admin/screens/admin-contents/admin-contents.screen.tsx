@@ -2,14 +2,16 @@
 
 import { useState, useMemo } from "react";
 import { usePathname } from "next/navigation";
-import { Plus, Trash2, Edit } from "lucide-react";
+import { Plus } from "lucide-react";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
 import { Search } from "@/shared/components/Search";
+import { List } from "@/shared/components/List";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type {
   TopicDetailDto,
+  AdminListingListItemDto,
   AdminListingDetailDto,
   AdminListingListDto,
 } from "@sd/core-contracts";
@@ -18,13 +20,13 @@ import {
   fetchAdminLectures,
   fetchAdminLectureDetail,
 } from "@/features/admin/api/admin-lectures.api";
-import { List } from "@/shared/components/List";
-import { TopicFormModal, type TopicForEdit } from "@/features/admin/components/TopicFormModal";
+import { Content } from "@/features/admin/components/Content";
+import type { TopicForEdit } from "@/features/admin/components/TopicFormModal";
 import { AudioUploader } from "@/features/admin/components/AudioUploader/AudioUploader";
-import { ListingEditModal } from "@/features/admin/components/ListingEditModal/ListingEditModal";
 import { Modal } from "@/shared/components/Modal";
 import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
 import { useResponsive } from "@/shared/hooks/use-responsive";
+import { sanitizeError } from "@sd/utils-error";
 import styles from "./admin-contents.screen.module.css";
 
 type AudioData = {
@@ -36,7 +38,7 @@ type AudioData = {
 };
 
 const EMPTY_TOPICS_ARRAY: TopicDetailDto[] = [];
-const EMPTY_LISTINGS_ARRAY: AdminListingDetailDto[] = [];
+const EMPTY_LISTINGS_ARRAY: AdminListingListItemDto[] = [];
 
 export function AdminContentsScreen() {
   const { isMobile } = useResponsive();
@@ -50,9 +52,10 @@ export function AdminContentsScreen() {
   const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
   const [editingTopic, setEditingTopic] = useState<TopicForEdit | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deletingTopicName, setDeletingTopicName] = useState<string>("");
   // react-doctor-disable-next-line react-doctor/rerender-state-only-in-handlers
   const [deletingTopicSlug, setDeletingTopicSlug] = useState<string | null>(null);
-  const [deletingTopicName, setDeletingTopicName] = useState<string>("");
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   // Listings state
   const [isAudioUploaderOpen, setIsAudioUploaderOpen] = useState(false);
@@ -119,16 +122,23 @@ export function AdminContentsScreen() {
     // react-doctor-disable-next-line react-doctor/no-impure-state-updater
     setDeletingTopicName(name);
     // react-doctor-disable-next-line react-doctor/no-impure-state-updater
+    setDeleteError(null);
+    // react-doctor-disable-next-line react-doctor/no-impure-state-updater
     setDeleteModalOpen(true);
   };
 
   const handleConfirmDelete = async () => {
     if (!deletingTopicSlug) return;
-    await deleteTopic(deletingTopicSlug);
-    setDeleteModalOpen(false);
-    setDeletingTopicSlug(null);
-    setDeletingTopicName("");
-    refetchTopics();
+    try {
+      await deleteTopic(deletingTopicSlug);
+      setDeleteModalOpen(false);
+      setDeletingTopicSlug(null);
+      setDeletingTopicName("");
+      setDeleteError(null);
+      refetchTopics();
+    } catch (err) {
+      setDeleteError(sanitizeError(err));
+    }
   };
 
   // Listing handlers
@@ -179,6 +189,7 @@ export function AdminContentsScreen() {
           setDeleteModalOpen(false);
           setDeletingTopicSlug(null);
           setDeletingTopicName("");
+          setDeleteError(null);
         }}
         onConfirm={handleConfirmDelete}
         title="Delete Topic?"
@@ -191,6 +202,11 @@ export function AdminContentsScreen() {
         <p style={{ fontSize: "0.875rem", color: "var(--content-muted)", marginTop: "0.5rem" }}>
           This action cannot be undone.
         </p>
+        {deleteError && (
+          <p style={{ fontSize: "0.875rem", color: "var(--color-danger)", marginTop: "0.5rem" }}>
+            {deleteError}
+          </p>
+        )}
       </Modal.ConfirmDialog>
 
       <PageHeader
@@ -234,31 +250,12 @@ export function AdminContentsScreen() {
             {filteredTopics.length > 0 ? (
               <List>
                 {filteredTopics.map((topic) => (
-                  <List.Item key={topic.slug} interactive className={styles.topicItem}>
-                    <div className={styles.topicInfo}>
-                      <span className={styles.topicName}>{topic.name.en}</span>
-                      <span className={styles.topicSlug}>{topic.slug}</span>
-                    </div>
-                    <div className={styles.topicActions}>
-                      <PermissionGate requires="TOPICS_EDIT">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleOpenEditTopic(topic)}
-                        >
-                          Edit
-                        </Button>
-                      </PermissionGate>
-                      <PermissionGate requires="TOPICS_DELETE">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          icon={<Trash2 size={14} />}
-                          onClick={() => handleDeleteClick(topic.slug, topic.name.en)}
-                        />
-                      </PermissionGate>
-                    </div>
-                  </List.Item>
+                  <Content.Topic
+                    key={topic.slug}
+                    topic={topic}
+                    onEdit={handleOpenEditTopic}
+                    onDelete={handleDeleteClick}
+                  />
                 ))}
               </List>
             ) : (
@@ -274,25 +271,7 @@ export function AdminContentsScreen() {
             {listings.length > 0 ? (
               <List>
                 {listings.map((listing) => (
-                  <List.Item key={listing.id} interactive className={styles.listingItem}>
-                    <div className={styles.listingInfo}>
-                      <span className={styles.listingTitle}>{listing.title}</span>
-                      <span className={styles.listingMeta}>
-                        {listing.scholarName} • {listing.status}
-                      </span>
-                    </div>
-                    <div className={styles.listingActions}>
-                      <PermissionGate requires="LISTINGS_EDIT">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEditListing(listing.id)}
-                        >
-                          <Edit size={14} />
-                        </Button>
-                      </PermissionGate>
-                    </div>
-                  </List.Item>
+                  <Content.Listing key={listing.id} listing={listing} onEdit={handleEditListing} />
                 ))}
               </List>
             ) : (
@@ -307,7 +286,7 @@ export function AdminContentsScreen() {
       </div>
 
       {/* Topic Modal */}
-      <TopicFormModal
+      <Content.TopicModal
         isOpen={isTopicModalOpen}
         onClose={() => setIsTopicModalOpen(false)}
         onSave={handleSaveTopic}
@@ -318,7 +297,7 @@ export function AdminContentsScreen() {
       {isAudioUploaderOpen && <AudioUploader onUploadComplete={handleUploadComplete} />}
 
       {/* Listing Modal */}
-      <ListingEditModal
+      <Content.ListingModal
         isOpen={isListingModalOpen}
         onClose={() => setIsListingModalOpen(false)}
         onSuccess={handleListingSaved}

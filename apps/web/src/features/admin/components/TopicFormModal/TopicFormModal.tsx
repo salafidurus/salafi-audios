@@ -36,6 +36,7 @@ type FormAction =
   | { type: "INIT_FORM"; topic: TopicForEdit | null; isNewTopic: boolean }
   | { type: "SET_FORM_DATA"; data: UpsertTopicDto }
   | { type: "UPDATE_FORM_FIELD"; field: keyof UpsertTopicDto; value: string }
+  | { type: "UPDATE_NAME_AR"; value: string }
   | { type: "UPDATE_TRANSLATION"; locale: string; field: string; value: string }
   | { type: "SET_TRANSLATION_CHANGES"; changes: Record<string, Record<string, string | null>> }
   | { type: "TOGGLE_FIELD_EDIT"; fieldName: string; translations: any[] }
@@ -78,6 +79,15 @@ function formReducer(state: FormState, action: FormAction): FormState {
       return {
         ...state,
         formData: { ...state.formData, [action.field]: action.value },
+      };
+    }
+    case "UPDATE_NAME_AR": {
+      return {
+        ...state,
+        formData: {
+          ...state.formData,
+          name: { ...state.formData.name, ar: action.value || undefined },
+        },
       };
     }
     case "UPDATE_TRANSLATION":
@@ -332,7 +342,17 @@ export function TopicFormModal({ isOpen, onClose, onSave, topic }: TopicFormModa
         </div>
 
         {/* Arabic Name Field */}
-        {isEditing && (
+        {isNewTopic ? (
+          <div className={styles.field}>
+            {/* react-doctor-disable-next-line react-doctor/label-has-associated-control */}
+            <label className={styles.label}>Arabic Name</label>
+            <EditableInput
+              value={formData.name.ar ?? ""}
+              onChange={(value) => dispatch({ type: "UPDATE_NAME_AR", value })}
+              placeholder="Topic name in Arabic (optional)"
+            />
+          </div>
+        ) : (
           <div className={styles.field}>
             {/* react-doctor-disable-next-line react-doctor/label-has-associated-control */}
             <label className={styles.label}>Arabic Name</label>
