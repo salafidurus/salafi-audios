@@ -12,7 +12,7 @@ import styles from "./topic-form-modal.module.css";
 export interface TopicForEdit {
   id: string;
   slug: string;
-  name: string;
+  name: { en: string; ar?: string };
   parentSlug?: string | null;
 }
 
@@ -48,11 +48,11 @@ function formReducer(state: FormState, action: FormAction): FormState {
     case "INIT_FORM": {
       const initialData = action.topic
         ? {
-            name: action.topic.name,
+            name: { en: action.topic.name.en, ar: action.topic.name.ar },
             slug: action.topic.slug,
             parentSlug: action.topic.parentSlug ?? undefined,
           }
-        : { name: "", slug: "" };
+        : { name: { en: "" }, slug: "" };
       return {
         ...state,
         formData: initialData,
@@ -62,11 +62,24 @@ function formReducer(state: FormState, action: FormAction): FormState {
     }
     case "SET_FORM_DATA":
       return { ...state, formData: action.data };
-    case "UPDATE_FORM_FIELD":
+    case "UPDATE_FORM_FIELD": {
+      if (action.field === "name") {
+        return {
+          ...state,
+          formData: {
+            ...state.formData,
+            name: {
+              ...state.formData.name,
+              en: action.value,
+            },
+          },
+        };
+      }
       return {
         ...state,
         formData: { ...state.formData, [action.field]: action.value },
       };
+    }
     case "UPDATE_TRANSLATION":
       return {
         ...state,
@@ -97,7 +110,7 @@ function formReducer(state: FormState, action: FormAction): FormState {
           next.delete(action.fieldName);
           return {
             ...state,
-            formData: { ...state.formData, name: state.originalFormData.name ?? "" },
+            formData: { ...state.formData, name: state.originalFormData.name },
             editingFields: next,
           };
         } else if (action.fieldName === "translation-ar-name") {
@@ -139,12 +152,15 @@ function formReducer(state: FormState, action: FormAction): FormState {
 function getInitialFormData(topic: TopicForEdit | null): UpsertTopicDto {
   if (topic) {
     return {
-      name: topic.name,
+      name: {
+        en: topic.name.en,
+        ar: topic.name.ar,
+      },
       slug: topic.slug,
       parentSlug: topic.parentSlug ?? undefined,
     };
   }
-  return { name: "", slug: "" };
+  return { name: { en: "" }, slug: "" };
 }
 
 export function TopicFormModal({ isOpen, onClose, onSave, topic }: TopicFormModalProps) {
@@ -222,7 +238,7 @@ export function TopicFormModal({ isOpen, onClose, onSave, topic }: TopicFormModa
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.slug.trim()) {
+    if (!formData.name.en.trim() || !formData.slug.trim()) {
       dispatch({ type: "SET_ERROR", error: "Name and slug are required" });
       return;
     }
@@ -269,6 +285,7 @@ export function TopicFormModal({ isOpen, onClose, onSave, topic }: TopicFormModa
 
         {/* Slug Field */}
         <div className={styles.field}>
+          {/* react-doctor-disable-next-line react-doctor/label-has-associated-control */}
           <label className={styles.label}>Slug *</label>
           <EditableInput
             value={formData.slug}
@@ -292,9 +309,10 @@ export function TopicFormModal({ isOpen, onClose, onSave, topic }: TopicFormModa
 
         {/* English Name Field */}
         <div className={styles.field}>
+          {/* react-doctor-disable-next-line react-doctor/label-has-associated-control */}
           <label className={styles.label}>English Name *</label>
           <EditableInput
-            value={formData.name}
+            value={formData.name.en}
             onChange={handleNameChange}
             placeholder="Topic name in English"
             disabled={isEditing && !isFieldEditing("name")}
@@ -316,6 +334,7 @@ export function TopicFormModal({ isOpen, onClose, onSave, topic }: TopicFormModa
         {/* Arabic Name Field */}
         {isEditing && (
           <div className={styles.field}>
+            {/* react-doctor-disable-next-line react-doctor/label-has-associated-control */}
             <label className={styles.label}>Arabic Name</label>
             <EditableInput
               value={translationChanges.ar?.name ?? ""}

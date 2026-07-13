@@ -5,10 +5,16 @@ import { ContentOriginalFieldsSchema, LocaleSchema } from "./localization.types"
 export const TopicSlugSchema = z.string();
 export type TopicSlug = z.infer<typeof TopicSlugSchema>;
 
+export const TopicNameSchema = z.object({
+  en: z.string().min(1, "English name is required"),
+  ar: z.string().optional(),
+});
+export type TopicName = z.infer<typeof TopicNameSchema>;
+
 export const TopicViewDtoSchema = z.object({
   id: z.string(),
   slug: TopicSlugSchema,
-  name: z.string(),
+  name: TopicNameSchema,
   parentId: z.string().optional(),
   createdAt: z.string(),
 });
@@ -17,7 +23,7 @@ export type TopicViewDto = z.infer<typeof TopicViewDtoSchema>;
 export const TopicDetailDtoSchema = z.object({
   id: z.string(),
   slug: TopicSlugSchema,
-  name: z.string(),
+  name: TopicNameSchema,
   parentId: z.string().optional(),
   createdAt: z.string(),
 });
@@ -41,7 +47,7 @@ export type TopicLectureViewDto = z.infer<typeof TopicLectureViewDtoSchema>;
 
 export const UpsertTopicDtoSchema = z.object({
   slug: z.string().min(1, "Slug must not be empty"),
-  name: z.string().min(1, "Name must not be empty"),
+  name: TopicNameSchema,
   parentSlug: z.string().optional(),
   translations: z
     .record(

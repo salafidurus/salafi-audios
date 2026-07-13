@@ -28,6 +28,7 @@
         "oxfmt": "catalog:",
         "oxlint": "catalog:",
         "prisma": "^7.3.0",
+        "react": "catalog:",
         "react-doctor": "^0.5.8",
         "rimraf": "catalog:",
         "secretlint": "^13.0.2",

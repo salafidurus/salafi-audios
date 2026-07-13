@@ -20,6 +20,12 @@ const topicViewSelect = {
   name: true,
   parentId: true,
   createdAt: true,
+  translations: {
+    select: {
+      locale: true,
+      name: true,
+    },
+  },
 } satisfies Prisma.TopicSelect;
 
 type TopicViewRecord = Prisma.TopicGetPayload<{
@@ -159,7 +165,11 @@ export class TopicsRepository {
    *
    * Returns null if parentSlug is provided but parent does not exist.
    */
-  async upsertBySlug(input: UpsertTopicDto): Promise<TopicDetailDto | null> {
+  async upsertBySlug(input: {
+    slug: string;
+    name: string;
+    parentSlug?: string;
+  }): Promise<TopicDetailDto | null> {
     const parentId = await this.resolveOptionalParentId(input.parentSlug);
     if (input.parentSlug && !parentId) return null;
 
@@ -338,10 +348,18 @@ export class TopicsRepository {
         ? record.createdAt.toISOString()
         : new Date(record.createdAt).toISOString();
 
+    const arTranslation =
+      'translations' in record && Array.isArray(record.translations)
+        ? record.translations.find((t) => t.locale === 'ar')?.name
+        : undefined;
+
     return {
       id: record.id,
       slug: record.slug,
-      name: record.name,
+      name: {
+        en: record.name,
+        ar: arTranslation,
+      },
       parentId: record.parentId ?? undefined,
       createdAt,
     };

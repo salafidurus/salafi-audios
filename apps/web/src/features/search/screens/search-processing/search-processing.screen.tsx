@@ -38,10 +38,10 @@ export function SearchProcessingScreen({ searchKey }: SearchProcessingScreenProp
   // Transform topics into chips format for Search.Filter
   const filterChips = useMemo(() => {
     return topics
-      .toSorted((a, b) => a.name.localeCompare(b.name))
+      .toSorted((a, b) => a.name.en.localeCompare(b.name.en))
       .map((topic) => ({
         id: topic.slug,
-        label: topic.name,
+        label: topic.name.en,
       }));
   }, [topics]);
 
