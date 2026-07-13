@@ -268,7 +268,7 @@ export function AdminLecturesScreen() {
         isOpen={isModalOpen}
         onClose={() => dispatch({ isModalOpen: false })}
         onSuccess={refetch}
-        lecture={selectedLecture}
+        listing={selectedLecture}
         initialAudioData={initialAudioData}
       />
     </ScreenView>

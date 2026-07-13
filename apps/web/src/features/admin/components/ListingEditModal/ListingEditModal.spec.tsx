@@ -149,7 +149,7 @@ describe("ListingEditModal", () => {
         isOpen={true}
         onClose={onCloseMock}
         onSuccess={onSuccessMock}
-        lecture={existingLecture}
+        listing={existingLecture}
       />,
     );
 

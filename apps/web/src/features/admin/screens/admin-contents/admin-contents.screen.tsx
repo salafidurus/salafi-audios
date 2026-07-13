@@ -322,7 +322,7 @@ export function AdminContentsScreen() {
         isOpen={isListingModalOpen}
         onClose={() => setIsListingModalOpen(false)}
         onSuccess={handleListingSaved}
-        lecture={selectedListing}
+        listing={selectedListing}
         initialAudioData={initialAudioData}
       />
     </ScreenView>

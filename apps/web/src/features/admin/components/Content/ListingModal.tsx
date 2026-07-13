@@ -16,5 +16,5 @@ interface ListingModalProps {
 }
 
 export function ListingModal({ listing, ...props }: ListingModalProps) {
-  return <ListingEditModal lecture={listing} {...props} />;
+  return <ListingEditModal listing={listing} {...props} />;
 }

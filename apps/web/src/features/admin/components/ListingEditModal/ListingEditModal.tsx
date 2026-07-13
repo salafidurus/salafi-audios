@@ -23,7 +23,7 @@ interface ListingEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  lecture?: AdminListingDetailDto | null;
+  listing?: AdminListingDetailDto | null;
   initialAudioData?: {
     audioKey: string;
     durationSeconds: number;
@@ -51,19 +51,19 @@ function formReducer(state: FormState, patch: Partial<FormState>): FormState {
 }
 
 function initFormState(
-  lecture: AdminListingDetailDto | null | undefined,
+  listing: AdminListingDetailDto | null | undefined,
   initialAudioData: ListingEditModalProps["initialAudioData"],
 ): FormState {
-  if (lecture) {
+  if (listing) {
     return {
-      title: lecture.title,
-      slug: lecture.slug,
-      description: lecture.description || "",
-      scholarId: lecture.scholarId,
-      seriesId: lecture.parentId || "",
-      status: lecture.status as "draft" | "published" | "archived",
-      orderIndex: lecture.orderIndex || 0,
-      selectedTopics: lecture.topics || [],
+      title: listing.title,
+      slug: listing.slug,
+      description: listing.description || "",
+      scholarId: listing.scholarId,
+      seriesId: listing.parentId || "",
+      status: listing.status as "draft" | "published" | "archived",
+      orderIndex: listing.orderIndex || 0,
+      selectedTopics: listing.topics || [],
       saving: false,
       formError: null,
     };
@@ -87,11 +87,11 @@ export function ListingEditModal({
   isOpen,
   onClose,
   onSuccess,
-  lecture,
+  listing,
   initialAudioData,
 }: ListingEditModalProps) {
   const [state, dispatch] = useReducer(formReducer, undefined, () =>
-    initFormState(lecture, initialAudioData),
+    initFormState(listing, initialAudioData),
   );
 
   const {
@@ -108,8 +108,8 @@ export function ListingEditModal({
   } = state;
 
   React.useEffect(() => {
-    dispatch(initFormState(lecture, initialAudioData));
-  }, [lecture, isOpen, initialAudioData]);
+    dispatch(initFormState(listing, initialAudioData));
+  }, [listing, isOpen, initialAudioData]);
 
   // Fetch scholars for dropdown
 
@@ -141,7 +141,7 @@ export function ListingEditModal({
 
   // Autogenerate slug from title if slug is empty
   const handleTitleChange = (val: string) => {
-    if (!lecture) {
+    if (!listing) {
       dispatch({
         title: val,
         slug: val
@@ -169,9 +169,9 @@ export function ListingEditModal({
     dispatch({ saving: true, formError: null });
 
     try {
-      if (lecture) {
+      if (listing) {
         // Edit mode
-        await updateLecture(lecture.id, {
+        await updateLecture(listing.id, {
           title,
           description,
           status,
@@ -221,7 +221,7 @@ export function ListingEditModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={lecture ? "Edit Lecture Details" : "New Lecture Details"}
+      title={listing ? "Edit Lecture Details" : "New Lecture Details"}
       size="xl"
       footer={
         <>
@@ -292,7 +292,7 @@ export function ListingEditModal({
               <DropdownTrigger
                 id="lecture-scholar"
                 placeholder="Select Scholar"
-                disabled={!!lecture}
+                disabled={!!listing}
                 testId="scholar-dropdown"
               />
               <DropdownContent searchable>
@@ -313,7 +313,7 @@ export function ListingEditModal({
               <DropdownTrigger
                 id="lecture-series"
                 placeholder="Select Series (Optional)"
-                disabled={!!lecture}
+                disabled={!!listing}
                 testId="series-dropdown"
               />
               <DropdownContent searchable>
@@ -373,7 +373,7 @@ export function ListingEditModal({
                   checked={selectedTopicsSet.has(t.id)}
                   onChange={() => handleTopicToggle(t.id)}
                   className={styles.checkbox}
-                  disabled={!!lecture}
+                  disabled={!!listing}
                 />
                 <span>{t.name}</span>
               </label>
