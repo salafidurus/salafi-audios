@@ -1,4 +1,4 @@
-import { Controller, Post, Patch, Param, Body } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { Permissions } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
@@ -12,6 +12,13 @@ import { UpdateScholarDto } from './dto/update-scholar.dto';
 @Controller('admin/scholars')
 export class AdminScholarsController {
   constructor(private readonly service: ScholarsService) {}
+
+  @Get()
+  @RequiresPermission(Permissions.SCHOLARS_VIEW)
+  @ApiOperation({ summary: 'List all scholars (including inactive)' })
+  list() {
+    return this.service.adminList();
+  }
 
   @Post()
   @RequiresPermission(Permissions.SCHOLARS_CREATE)

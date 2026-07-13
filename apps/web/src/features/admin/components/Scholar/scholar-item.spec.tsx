@@ -1,19 +1,29 @@
 import { vi, type Mock } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { ScholarItem } from "./ScholarItem";
+import { Scholar } from ".";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 
 vi.mock("@/features/admin/hooks/use-admin-permissions", () => ({
   useAdminPermissions: vi.fn(),
 }));
 
-const baseProps = {
+const baseScholar = {
   id: "s1",
-  name: "Ibn Baz",
   slug: "ibn-baz",
+  name: "Ibn Baz",
+  bio: "A great scholar.",
+  country: "SA" as const,
+  mainLanguage: "ar" as const,
+  imageUrl: undefined,
+  isActive: true,
   isKibar: true,
-  lectureCount: 12,
-  onEdit: vi.fn(),
+  socialTwitter: undefined,
+  socialTelegram: undefined,
+  socialYoutube: undefined,
+  socialWebsite: undefined,
+  createdAt: "2024-01-01T00:00:00Z",
+  updatedAt: undefined,
+  translations: [],
 };
 
 describe("ScholarItem", () => {
@@ -22,7 +32,7 @@ describe("ScholarItem", () => {
       data: { permissions: ["SCHOLARS_VIEW"] },
     });
 
-    render(<ScholarItem {...baseProps} />);
+    render(<Scholar.Item scholar={baseScholar} onEdit={vi.fn()} />);
 
     expect(screen.queryByRole("button", { name: /edit ibn baz/i })).not.toBeInTheDocument();
   });
@@ -32,7 +42,7 @@ describe("ScholarItem", () => {
       data: { permissions: ["SCHOLARS_EDIT"] },
     });
 
-    render(<ScholarItem {...baseProps} />);
+    render(<Scholar.Item scholar={baseScholar} onEdit={vi.fn()} />);
 
     expect(screen.getByRole("button", { name: /edit ibn baz/i })).toBeInTheDocument();
   });
