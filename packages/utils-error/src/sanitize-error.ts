@@ -9,6 +9,31 @@
 export function sanitizeError(error: unknown): string {
   const message = error instanceof Error ? error.message : String(error);
 
+  // Check for JSON block in the message (e.g. from NestJS validation filters)
+  const jsonStartIdx = message.indexOf("{");
+  if (jsonStartIdx !== -1) {
+    try {
+      const jsonStr = message.substring(jsonStartIdx);
+      const parsed = JSON.parse(jsonStr);
+
+      if (parsed.message === "Validation failed" && Array.isArray(parsed.details)) {
+        return parsed.details
+          .map((d: any) => {
+            // Join path array to form full dot-notation path
+            const field = Array.isArray(d.path) ? d.path.join(".") : "";
+            return `${field ? `${field}: ` : ""}${d.message}`;
+          })
+          .join(", ");
+      }
+
+      if (parsed.message) {
+        return parsed.message;
+      }
+    } catch {
+      // Ignore JSON parse errors and proceed to pattern matching
+    }
+  }
+
   // Map specific error patterns to user-friendly messages
   const patterns: Array<[RegExp, string]> = [
     // Network/API errors

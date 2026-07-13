@@ -24,10 +24,13 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "lint": "oxlint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
     "rimraf": "catalog:",
-    "tsup": "catalog:"
+    "tsup": "catalog:",
+    "vitest": "catalog:"
   }
 }
