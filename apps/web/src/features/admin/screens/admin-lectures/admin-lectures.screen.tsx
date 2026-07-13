@@ -10,7 +10,7 @@ import { Button } from "@/shared/components/Button";
 import { Search } from "@/shared/components/Search";
 import { fetchAdminLectures, fetchAdminLectureDetail } from "../../api/admin-lectures.api";
 import { AudioUploader } from "../../components/AudioUploader/AudioUploader";
-import { LectureEditModal } from "../../components/LectureEditModal/LectureEditModal";
+import { ListingEditModal } from "../../components/ListingEditModal/ListingEditModal";
 import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import styles from "./admin-lectures.screen.module.css";
@@ -264,7 +264,7 @@ export function AdminLecturesScreen() {
         </>
       )}
 
-      <LectureEditModal
+      <ListingEditModal
         isOpen={isModalOpen}
         onClose={() => dispatch({ isModalOpen: false })}
         onSuccess={refetch}

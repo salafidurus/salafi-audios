@@ -1,0 +1,96 @@
+.topicItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.topicInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.topicName {
+  font-weight: 500;
+  color: var(--content-strong);
+}
+
+.topicSlug {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+}
+
+.topicActions {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.listingItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.listingInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.listingTitle {
+  font-weight: 500;
+  color: var(--content-strong);
+}
+
+.listingMeta {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+}
+
+.listingActions {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.topicDetails {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background-color: var(--surface-subtle);
+  border-radius: var(--radius-component-card);
+}
+
+.translationsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.translationItem {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-default);
+}
+
+/* Mobile overrides */
+@media (max-width: 640px) {
+  .topicItem {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-sm);
+  }
+
+  .topicActions {
+    justify-content: flex-end;
+  }
+
+  .listingItem {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-sm);
+  }
+
+  .listingActions {
+    justify-content: flex-end;
+  }
+}

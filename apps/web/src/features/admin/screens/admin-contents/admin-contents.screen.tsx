@@ -21,7 +21,7 @@ import {
 import { List } from "@/shared/components/List";
 import { TopicFormModal, type TopicForEdit } from "@/features/admin/components/TopicFormModal";
 import { AudioUploader } from "@/features/admin/components/AudioUploader/AudioUploader";
-import { LectureEditModal } from "@/features/admin/components/LectureEditModal";
+import { ListingEditModal } from "@/features/admin/components/ListingEditModal/ListingEditModal";
 import { Modal } from "@/shared/components/Modal";
 import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
 import { useResponsive } from "@/shared/hooks/use-responsive";
@@ -318,7 +318,7 @@ export function AdminContentsScreen() {
       {isAudioUploaderOpen && <AudioUploader onUploadComplete={handleUploadComplete} />}
 
       {/* Listing Modal */}
-      <LectureEditModal
+      <ListingEditModal
         isOpen={isListingModalOpen}
         onClose={() => setIsListingModalOpen(false)}
         onSuccess={handleListingSaved}

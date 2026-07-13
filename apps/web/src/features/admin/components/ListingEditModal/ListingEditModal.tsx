@@ -17,9 +17,9 @@ import {
   DropdownContent,
   DropdownItem,
 } from "@/shared/components/Dropdown";
-import styles from "./lecture-edit-modal.module.css";
+import styles from "./listing-edit-modal.module.css";
 
-interface LectureEditModalProps {
+interface ListingEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
@@ -52,7 +52,7 @@ function formReducer(state: FormState, patch: Partial<FormState>): FormState {
 
 function initFormState(
   lecture: AdminListingDetailDto | null | undefined,
-  initialAudioData: LectureEditModalProps["initialAudioData"],
+  initialAudioData: ListingEditModalProps["initialAudioData"],
 ): FormState {
   if (lecture) {
     return {
@@ -83,13 +83,13 @@ function initFormState(
 }
 
 // react-doctor-disable-next-line react-doctor/no-giant-component
-export function LectureEditModal({
+export function ListingEditModal({
   isOpen,
   onClose,
   onSuccess,
   lecture,
   initialAudioData,
-}: LectureEditModalProps) {
+}: ListingEditModalProps) {
   const [state, dispatch] = useReducer(formReducer, undefined, () =>
     initFormState(lecture, initialAudioData),
   );
@@ -107,15 +107,9 @@ export function LectureEditModal({
     formError,
   } = state;
 
-  // react-doctor-disable-next-line react-doctor/no-derived-useState, react-doctor/rerender-state-only-in-handlers
-  const [prevLecture, setPrevLecture] = React.useState(lecture);
-  // react-doctor-disable-next-line react-doctor/no-derived-useState, react-doctor/rerender-state-only-in-handlers
-  const [prevIsOpen, setPrevIsOpen] = React.useState(isOpen);
-  if (lecture !== prevLecture || isOpen !== prevIsOpen) {
-    setPrevLecture(lecture);
-    setPrevIsOpen(isOpen);
+  React.useEffect(() => {
     dispatch(initFormState(lecture, initialAudioData));
-  }
+  }, [lecture, isOpen, initialAudioData]);
 
   // Fetch scholars for dropdown
 
