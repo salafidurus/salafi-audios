@@ -150,6 +150,40 @@ describe('Admin Permission Boundaries (e2e)', () => {
       });
       expect(hasPermission).toBeTruthy();
     });
+
+    it('9b. GET /admin/permissions/:userId/roles without USERS_VIEW -> 403', async () => {
+      const auth = await authFactory.createAdminUser([]);
+      const targetUser = await authFactory.createUser();
+
+      await request(app.getHttpServer())
+        .get(`/admin/permissions/${targetUser.user.id}/roles`)
+        .set(auth.headers)
+        .expect(403);
+    });
+
+    it('9c. GET /admin/permissions/:userId/roles with USERS_VIEW -> 200 success', async () => {
+      const auth = await authFactory.createAdminUser([Permission.USERS_VIEW]);
+      const targetUser = await authFactory.createUser();
+
+      // Seed a role for the target user to ensure we fetch something
+      await prisma.userRoleAssignment.create({
+        data: {
+          userId: targetUser.user.id,
+          role: 'editor',
+          grantedBy: auth.user.id,
+        },
+      });
+
+      const res = await request(app.getHttpServer())
+        .get(`/admin/permissions/${targetUser.user.id}/roles`)
+        .set(auth.headers)
+        .expect(200);
+
+      expect(res.body).toHaveProperty('roles');
+      expect(Array.isArray(res.body.roles)).toBe(true);
+      expect(res.body.roles.length).toBeGreaterThan(0);
+      expect(res.body.roles[0]).toHaveProperty('role', 'editor');
+    });
   });
 
   describe('Cross-isolation Boundary Strictness', () => {

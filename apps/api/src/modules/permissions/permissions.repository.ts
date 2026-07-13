@@ -301,4 +301,15 @@ export class PermissionsRepository {
       orderBy: { grantedAt: 'desc' },
     });
   }
+
+  /**
+   * Get detailed role assignment information for a user (includes grantedAt and grantedBy)
+   * Used by admin endpoints to show full role audit trail
+   */
+  async getUserRolesDetail(userId: string) {
+    return this.prisma.userRoleAssignment.findMany({
+      where: { userId },
+      orderBy: { grantedAt: 'desc' },
+    });
+  }
 }

@@ -51,9 +51,11 @@ export class PermissionsService {
 
     // Auto-grant default permissions for this role
     const defaultPermissions = ROLE_DEFAULT_PERMISSIONS[role] || [];
-    for (const permission of defaultPermissions) {
-      await this.grantPermissionToUser(userId, permission as Permission, grantedBy, true);
-    }
+    await Promise.all(
+      defaultPermissions.map((permission) =>
+        this.grantPermissionToUser(userId, permission as Permission, grantedBy, true),
+      ),
+    );
   }
 
   /**
@@ -209,9 +211,11 @@ export class PermissionsService {
       permissions.push('TRANSLATIONS_PUBLISH');
     }
 
-    for (const permission of permissions) {
-      await this.grantPermissionToUser(userId, permission, createdBy, true);
-    }
+    await Promise.all(
+      permissions.map((permission) =>
+        this.grantPermissionToUser(userId, permission, createdBy, true),
+      ),
+    );
   }
 
   /**
@@ -371,6 +375,26 @@ export class PermissionsService {
         permission: p.permission,
         grantedAt: p.grantedAt.toISOString(),
         grantedById: p.grantedBy,
+      })),
+    };
+  }
+
+  /**
+   * Get detailed role assignment information for a user
+   * Used by admin endpoints to show user roles with timestamps and who granted them
+   *
+   * @param userId - User ID
+   * @returns Object with roles array of UserRoleAssignmentDto
+   */
+  async getRoles(userId: string) {
+    const roles = await this.repository.getUserRolesDetail(userId);
+    return {
+      roles: roles.map((r) => ({
+        id: r.id,
+        userId: r.userId,
+        role: r.role as UserRole,
+        grantedAt: r.grantedAt.toISOString(),
+        grantedBy: r.grantedBy,
       })),
     };
   }
