@@ -70,6 +70,7 @@ export const endpoints = {
       revoke: (userId: string, role: string) => `/admin/permissions/${userId}/roles/${role}`,
     },
     scholars: {
+      list: "/admin/scholars",
       create: "/admin/scholars",
       update: (id: string) => `/admin/scholars/${id}`,
     },

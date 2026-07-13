@@ -1,0 +1,107 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-xl);
+}
+
+.error {
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--surface-subtle);
+  border: 1px solid var(--border-danger);
+  color: var(--content-danger);
+  border-radius: var(--radius-sm);
+  font-size: var(--typo-body-sm-font-size);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-xs);
+}
+
+.label {
+  font-size: var(--typo-label-md-font-size);
+  font-weight: 500;
+  color: var(--content-default);
+}
+
+.twoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-component-gap-md);
+}
+
+@media (max-width: 640px) {
+  .twoCol {
+    grid-template-columns: 1fr;
+  }
+}
+
+.imagePreview {
+  margin-top: var(--space-component-gap-sm);
+  padding: var(--space-md);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--surface-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 260px;
+  max-height: 260px;
+}
+
+.previewImage {
+  max-width: 240px;
+  max-height: 240px;
+  object-fit: contain;
+  border-radius: var(--radius-xs);
+}
+
+.imageLoadingState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  color: var(--content-subtle);
+  font-size: var(--typo-body-sm-font-size);
+}
+
+.loadingSpinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.imageErrorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  color: var(--content-danger);
+  font-size: var(--typo-body-sm-font-size);
+}
+
+.checkboxGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--typo-body-md-font-size);
+  color: var(--content-default);
+  cursor: pointer;
+}

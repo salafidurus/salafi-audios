@@ -92,10 +92,13 @@ export function createScholar(data: AdminScholarInput) {
 }
 
 export function updateScholar(id: string, data: Partial<AdminScholarInput>) {
+  const body = Object.fromEntries(
+    Object.entries(data).filter(([, v]) => v !== undefined && v !== ""),
+  );
   return httpClient<unknown>({
     url: endpoints.admin.scholars.update(id),
     method: "PATCH",
-    body: data,
+    body,
   });
 }
 

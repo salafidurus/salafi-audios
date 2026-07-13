@@ -25,7 +25,7 @@ describe('ScholarsService', () => {
     name: 'Shaykh Ibn Uthaymeen',
     bio: 'Great scholar',
     imageUrl: 'image1.jpg',
-    country: 'Saudi Arabia',
+    country: 'SA',
     mainLanguage: 'ar',
     isActive: true,
     isKibar: true,
@@ -142,7 +142,7 @@ describe('ScholarsService', () => {
         isKibar: false,
         isFeatured: false,
         isActive: true,
-        country: 'Saudi Arabia',
+        country: 'SA',
         mainLanguage: 'ar',
       };
       const created = {
