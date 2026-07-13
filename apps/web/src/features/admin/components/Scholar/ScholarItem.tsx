@@ -94,6 +94,7 @@ function ScholarMeta({ scholar }: { scholar: AdminScholarListItemDto }) {
               rel="noopener noreferrer"
               className={styles.socialLink}
               title="Twitter"
+              aria-label="Twitter"
             >
               <X size={14} />
             </a>
@@ -105,6 +106,7 @@ function ScholarMeta({ scholar }: { scholar: AdminScholarListItemDto }) {
               rel="noopener noreferrer"
               className={styles.socialLink}
               title="Telegram"
+              aria-label="Telegram"
             >
               <Send size={14} />
             </a>
@@ -116,6 +118,7 @@ function ScholarMeta({ scholar }: { scholar: AdminScholarListItemDto }) {
               rel="noopener noreferrer"
               className={styles.socialLink}
               title="YouTube"
+              aria-label="YouTube"
             >
               <Film size={14} />
             </a>
@@ -127,6 +130,7 @@ function ScholarMeta({ scholar }: { scholar: AdminScholarListItemDto }) {
               rel="noopener noreferrer"
               className={styles.socialLink}
               title="Website"
+              aria-label="Website"
             >
               <ExternalLink size={14} />
             </a>

@@ -200,16 +200,22 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
         <FormSection title="Basic Information">
           <div className={styles.twoCol}>
             <div className={styles.field}>
-              <label className={styles.label}>Name *</label>
+              <label className={styles.label} htmlFor="scholar-name">
+                Name *
+              </label>
               <EditableInput
+                id="scholar-name"
                 value={formData.name}
                 onChange={handleNameChange}
                 placeholder="Scholar name"
               />
             </div>
             <div className={styles.field}>
-              <label className={styles.label}>Slug *</label>
+              <label className={styles.label} htmlFor="scholar-slug">
+                Slug *
+              </label>
               <EditableInput
+                id="scholar-slug"
                 value={formData.slug}
                 onChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "slug", value })}
                 placeholder="scholar-slug"
@@ -218,8 +224,11 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
           </div>
 
           <div className={styles.field}>
-            <label className={styles.label}>Bio</label>
+            <label className={styles.label} htmlFor="scholar-bio">
+              Bio
+            </label>
             <EditableTextarea
+              id="scholar-bio"
               value={formData.bio ?? ""}
               onChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "bio", value })}
               placeholder="Brief biography..."
@@ -228,8 +237,11 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
           </div>
 
           <div className={styles.field}>
-            <label className={styles.label}>Image URL</label>
+            <label className={styles.label} htmlFor="scholar-image-url">
+              Image URL
+            </label>
             <EditableInput
+              id="scholar-image-url"
               type="url"
               value={formData.imageUrl ?? ""}
               onChange={handleImageUrlChange}
@@ -275,14 +287,16 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
         <FormSection title="Location & Language">
           <div className={styles.twoCol}>
             <div className={styles.field}>
-              <label className={styles.label}>Country</label>
+              <label className={styles.label} htmlFor="scholar-country">
+                Country
+              </label>
               <Dropdown
                 value={formData.country ?? ""}
                 onValueChange={(value) =>
                   dispatch({ type: "UPDATE_FIELD", field: "country", value })
                 }
               >
-                <DropdownTrigger placeholder="Select Country" />
+                <DropdownTrigger id="scholar-country" placeholder="Select Country" />
                 <DropdownContent searchable>
                   {COUNTRY_LIST.map((c) => (
                     <DropdownItem key={c.code} value={c.code}>
@@ -293,7 +307,9 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
               </Dropdown>
             </div>
             <div className={styles.field}>
-              <label className={styles.label}>Main Language</label>
+              <label className={styles.label} htmlFor="scholar-language">
+                Main Language
+              </label>
               <Dropdown
                 value={formData.mainLanguage}
                 onValueChange={(value) =>
@@ -304,7 +320,7 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
                   })
                 }
               >
-                <DropdownTrigger placeholder="Select Language" />
+                <DropdownTrigger id="scholar-language" placeholder="Select Language" />
                 <DropdownContent>
                   <DropdownItem value="en">English</DropdownItem>
                   <DropdownItem value="ar">Arabic (عربي)</DropdownItem>
@@ -317,8 +333,11 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
         <FormSection title="Social Media">
           <div className={styles.twoCol}>
             <div className={styles.field}>
-              <label className={styles.label}>Twitter</label>
+              <label className={styles.label} htmlFor="scholar-twitter">
+                Twitter
+              </label>
               <EditableInput
+                id="scholar-twitter"
                 type="url"
                 value={formData.socialTwitter ?? ""}
                 onChange={(value) =>
@@ -328,8 +347,11 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
               />
             </div>
             <div className={styles.field}>
-              <label className={styles.label}>Telegram</label>
+              <label className={styles.label} htmlFor="scholar-telegram">
+                Telegram
+              </label>
               <EditableInput
+                id="scholar-telegram"
                 type="url"
                 value={formData.socialTelegram ?? ""}
                 onChange={(value) =>
@@ -341,8 +363,11 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
           </div>
           <div className={styles.twoCol}>
             <div className={styles.field}>
-              <label className={styles.label}>YouTube</label>
+              <label className={styles.label} htmlFor="scholar-youtube">
+                YouTube
+              </label>
               <EditableInput
+                id="scholar-youtube"
                 type="url"
                 value={formData.socialYoutube ?? ""}
                 onChange={(value) =>
@@ -352,8 +377,11 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
               />
             </div>
             <div className={styles.field}>
-              <label className={styles.label}>Website</label>
+              <label className={styles.label} htmlFor="scholar-website">
+                Website
+              </label>
               <EditableInput
+                id="scholar-website"
                 type="url"
                 value={formData.socialWebsite ?? ""}
                 onChange={(value) =>
