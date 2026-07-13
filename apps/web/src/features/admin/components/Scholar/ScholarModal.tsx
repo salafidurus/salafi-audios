@@ -158,6 +158,7 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
       onClose={onClose}
       title={isEditing ? "Edit Scholar" : "Add Scholar"}
       size="xl"
+      width="80rem"
       footer={
         <>
           <Button type="button" variant="ghost" onClick={onClose} disabled={saving}>

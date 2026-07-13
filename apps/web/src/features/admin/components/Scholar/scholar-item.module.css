@@ -147,8 +147,7 @@
 
 @media (max-width: 640px) {
   .details {
-    flex-direction: column;
-    gap: var(--space-sm);
+    gap: var(--space-lg);
   }
 
   .name {
@@ -162,4 +161,9 @@
   .bio {
     -webkit-line-clamp: 3;
   }
+}
+
+.editButtonMobile {
+  width: 100%;
+  justify-content: center;
 }

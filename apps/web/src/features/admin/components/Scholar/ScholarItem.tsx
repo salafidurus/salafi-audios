@@ -5,7 +5,7 @@ import { PermissionGate } from "@/features/admin/components/permission-gate/perm
 import { Button } from "@/shared/components/Button";
 import { List } from "@/shared/components/List";
 import { UserAvatar } from "@/shared/components/user-avatar";
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
+import { useResponsive } from "@/shared/hooks/use-responsive";
 import type { AdminScholarListItemDto } from "@sd/core-contracts";
 import { COUNTRY_NAMES } from "@sd/core-contracts";
 import styles from "./scholar-item.module.css";
@@ -17,10 +17,10 @@ export interface ScholarItemProps {
 
 function ScholarDetails({
   scholar,
-  isDesktop,
+  isMobile,
 }: {
   scholar: AdminScholarListItemDto;
-  isDesktop: boolean;
+  isMobile: boolean;
 }) {
   const countryName = scholar.country
     ? (COUNTRY_NAMES[scholar.country as keyof typeof COUNTRY_NAMES] ?? scholar.country)
@@ -32,7 +32,7 @@ function ScholarDetails({
         <UserAvatar
           image={scholar.imageUrl ?? null}
           name={scholar.name}
-          size={isDesktop ? 56 : 48}
+          size={isMobile ? 48 : 56}
         />
       </div>
       <div className={styles.detailsBody}>
@@ -44,10 +44,10 @@ function ScholarDetails({
           {countryName && (
             <>
               <span className={styles.sep}>&bull;</span>
-              <span className={styles.country}>{isDesktop ? countryName : scholar.country}</span>
+              <span className={styles.country}>{isMobile ? scholar.country : countryName}</span>
             </>
           )}
-          {isDesktop && scholar.isKibar && (
+          {!isMobile && scholar.isKibar && (
             <>
               <span className={styles.sep}>&bull;</span>
               <span className={styles.kibarBadge}>KIBAR</span>
@@ -142,17 +142,23 @@ function ScholarMeta({ scholar }: { scholar: AdminScholarListItemDto }) {
 }
 
 export function ScholarItem({ scholar, onEdit }: ScholarItemProps) {
-  const isDesktop = useIsDesktop();
+  const { isMobile } = useResponsive();
 
   return (
     <List.Item interactive className={styles.listItem}>
       <div className={styles.content}>
-        <ScholarDetails scholar={scholar} isDesktop={isDesktop} />
+        <ScholarDetails scholar={scholar} isMobile={isMobile} />
         <ScholarMeta scholar={scholar} />
       </div>
       <List.Item.Actions>
         <PermissionGate requires="SCHOLARS_EDIT">
-          <Button variant="ghost" size="icon" onClick={onEdit} aria-label={`Edit ${scholar.name}`}>
+          <Button
+            variant={isMobile ? "outline" : "ghost"}
+            size={isMobile ? "md" : "icon"}
+            onClick={onEdit}
+            aria-label={`Edit ${scholar.name}`}
+            className={isMobile ? styles.editButtonMobile : undefined}
+          >
             <svg
               width="16"
               height="16"
@@ -165,6 +171,7 @@ export function ScholarItem({ scholar, onEdit }: ScholarItemProps) {
             >
               <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
             </svg>
+            {isMobile && " Edit"}
           </Button>
         </PermissionGate>
       </List.Item.Actions>
