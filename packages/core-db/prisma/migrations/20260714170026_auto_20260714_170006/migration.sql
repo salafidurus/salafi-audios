@@ -13,5 +13,5 @@ DROP INDEX "idx_topic_parent";
 -- AlterTable
 ALTER TABLE "Topic" DROP COLUMN "parentId";
 
--- RenameForeignKey
-ALTER TABLE "UserScholarRole" RENAME CONSTRAINT "UserScholarRole_createdByUser_fkey" TO "UserScholarRole_createdBy_fkey";
+-- DropForeignKey
+ALTER TABLE "UserScholarRole" DROP CONSTRAINT IF EXISTS "UserScholarRole_createdByUser_fkey";
