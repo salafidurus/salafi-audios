@@ -1,0 +1,241 @@
+# yaml-language-server: $schema=https://json.schemastore.org/dependabot-2.0.json
+#
+# Conservative Dependabot config for a PNPM + Turborepo monorepo.
+# Design goals:
+#   - One root npm entry (PNPM workspaces handle resolution)
+#   - Group low-risk patch/minor updates to reduce PR noise
+#   - Keep major bumps ungrouped so each is individually reviewable
+#   - Explicitly ignore SDK-coupled and infrastructure-managed deps
+#   - Separate github-actions ecosystem entry
+
+version: 2
+
+updates:
+  # ──────────────────────────────────────────────
+  # npm ecosystem (PNPM workspace root)
+  # ──────────────────────────────────────────────
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 10
+    versioning-strategy: increase
+
+    # ── Ignore list ──────────────────────────────
+    # These dependencies are tightly coupled to SDK releases, framework
+    # internals, or infrastructure tooling. Updating them independently
+    # risks breaking the build or diverging from coordinated upgrade plans.
+    ignore:
+      # Expo SDK — all Expo packages must move together during SDK upgrades.
+      # Partial bumps break native module compatibility.
+      - dependency-name: "expo"
+      - dependency-name: "expo-*"
+      - dependency-name: "@expo/*"
+      # eslint-config-expo — versioned in lockstep with the Expo SDK. A
+      # standalone bump crashes the native flat ESLint config; upgrade it
+      # only as part of a coordinated Expo SDK upgrade.
+      - dependency-name: "eslint-config-expo"
+
+      # React & React DOM — pinned to the version supported by the current
+      # Expo SDK and Next.js major. Bumping independently causes type and
+      # runtime mismatches across web and mobile.
+      - dependency-name: "react"
+      - dependency-name: "react-dom"
+      - dependency-name: "@types/react"
+      - dependency-name: "@types/react-dom"
+
+      # React Native — version-locked to the Expo SDK. Independent bumps
+      # break the managed workflow and native builds.
+      - dependency-name: "react-native"
+      - dependency-name: "react-native-*"
+      - dependency-name: "@react-native/*"
+
+      # React Navigation — version matrix is coupled to React Native and
+      # Expo Router; must be upgraded as a coordinated set.
+      - dependency-name: "@react-navigation/*"
+
+      # @sentry/* — version-locked to Sentry SDK releases; bump only as
+      # part of a coordinated Expo SDK or Sentry upgrade.
+      - dependency-name: "@sentry/*"
+
+      # @react-native-async-storage/async-storage — tied to Expo SDK
+      # managed workflow; independent bumps break native builds.
+      - dependency-name: "@react-native-async-storage/*"
+
+    # ── Groups ───────────────────────────────────
+    groups:
+      # Linters and formatters.
+      dev-linters-formatters:
+        applies-to: version-updates
+        patterns:
+          - "eslint"
+          - "eslint-*"
+          - "@eslint/*"
+          - "prettier"
+          - "oxlint"
+          - "oxlint-*"
+          - "@oxlint/*"
+          - "react-doctor"
+          - "oxfmt"
+          - "markdownlint-cli2"
+          - "secretlint"
+          - "@secretlint/*"
+          - "lint-staged"
+          - "husky"
+          - "commitlint"
+          - "@commitlint/*"
+        update-types:
+          - major
+          - minor
+          - patch
+
+      # Build and bundler tooling.
+      dev-build-tools:
+        applies-to: version-updates
+        patterns:
+          - "tsup"
+          - "tsx"
+          - "ts-node"
+          - "tsconfig-paths"
+          - "ts-loader"
+          - "rimraf"
+          - "@swc/*"
+        update-types:
+          - major
+          - minor
+          - patch
+
+      # Type definitions and utilities.
+      dev-types-utils:
+        applies-to: version-updates
+        patterns:
+          - "@types/*"
+          - "source-map-support"
+          - "pino-pretty"
+          - "bun-types"
+        update-types:
+          - major
+          - minor
+          - patch
+
+      # CSS tooling.
+      dev-css:
+        applies-to: version-updates
+        patterns:
+          - "tailwindcss"
+          - "@tailwindcss/*"
+        update-types:
+          - major
+          - minor
+          - patch
+
+      # Turbo — build orchestrator; isolated from other dev tooling.
+      turbo:
+        applies-to: version-updates
+        patterns:
+          - "turbo"
+        update-types:
+          - major
+          - minor
+          - patch
+
+      # Unit test tooling (Jest + testing-library).
+      test-unit:
+        applies-to: version-updates
+        patterns:
+          - "jest"
+          - "jest-*"
+          - "@jest/*"
+          - "ts-jest"
+          - "@testing-library/*"
+        update-types:
+          - major
+          - minor
+          - patch
+
+      # E2E test tooling (Playwright + HTTP assertions).
+      test-e2e:
+        applies-to: version-updates
+        patterns:
+          - "playwright"
+          - "@playwright/*"
+          - "supertest"
+          - "@types/supertest"
+        update-types:
+          - major
+          - minor
+          - patch
+
+      # Fastify — plugin ecosystem shares version compatibility.
+      fastify:
+        applies-to: version-updates
+        patterns:
+          - "@fastify/*"
+        update-types:
+          - major
+          - minor
+          - patch
+
+      # NestJS — framework packages share a version matrix; always
+      # bump together to avoid decorator/DI incompatibilities.
+      nestjs:
+        applies-to: version-updates
+        patterns:
+          - "@nestjs/*"
+        update-types:
+          - major
+          - minor
+          - patch
+
+      # better-auth + @better-auth/expo — must be bumped together.
+      better-auth:
+        applies-to: version-updates
+        patterns:
+          - "better-auth"
+          - "@better-auth/*"
+        update-types:
+          - major
+          - minor
+          - patch
+
+      # Prisma — ORM + client + engine versions must match exactly.
+      prisma:
+        applies-to: version-updates
+        patterns:
+          - "prisma"
+          - "@prisma/*"
+        update-types:
+          - major
+          - minor
+          - patch
+
+      # Vitest and its ecosystem.
+      vitest:
+        applies-to: version-updates
+        patterns:
+          - "vitest"
+          - "vitest-*"
+          - "@vitest/*"
+          - "@vitejs/*"
+          - "vite-tsconfig-paths"
+          - "unplugin-swc"
+        update-types:
+          - major
+          - minor
+          - patch
+
+  # ──────────────────────────────────────────────
+  # GitHub Actions ecosystem
+  # ──────────────────────────────────────────────
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 5
+
+    groups:
+      # Group all Actions version bumps into a single PR.
+      github-actions:
+        applies-to: version-updates
+        patterns:
+          - "*"
