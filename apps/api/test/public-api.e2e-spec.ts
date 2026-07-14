@@ -104,7 +104,7 @@ describe('Public API (e2e)', () => {
 
       expect(res.body).toHaveProperty('id');
       expect(res.body).toHaveProperty('slug', 'e2e-parent-topic');
-      expect(res.body).toHaveProperty('name', 'Parent Topic');
+      expect(res.body.name).toEqual({ en: 'Parent Topic' });
     });
   });
 
