@@ -8,7 +8,6 @@ export interface TopicData {
   id: string;
   slug: string;
   name: string;
-  parentId?: string;
 }
 
 export const TOPICS: TopicData[] = [
@@ -18,5 +17,5 @@ export const TOPICS: TopicData[] = [
   { id: uuid(13), slug: "fiqh", name: "Fiqh" },
   { id: uuid(14), slug: "tafsir", name: "Tafsir" },
   { id: uuid(15), slug: "e2e-parent-topic", name: "Parent Topic" },
-  { id: uuid(16), slug: "e2e-child-topic", name: "Child Topic", parentId: uuid(15) },
+  { id: uuid(16), slug: "e2e-child-topic", name: "Child Topic" },
 ];

@@ -394,16 +394,12 @@ model Topic {
   id        String   @id @default(cuid())
   slug      String
   name      String
-  parentId  String?
   createdAt DateTime @default(now())
 
-  parent        Topic?             @relation("TopicToParent", fields: [parentId], references: [id], onDelete: Cascade)
-  children      Topic[]            @relation("TopicToParent")
   listingTopics ListingTopic[]
   translations  TopicTranslation[]
 
   @@unique([slug], map: "uq_topic_slug")
-  @@index([parentId], map: "idx_topic_parent")
 }
 
 model ListingTopic {

@@ -15,7 +15,6 @@ export const TopicViewDtoSchema = z.object({
   id: z.string(),
   slug: TopicSlugSchema,
   name: TopicNameSchema,
-  parentId: z.string().optional(),
   createdAt: z.string(),
 });
 export type TopicViewDto = z.infer<typeof TopicViewDtoSchema>;
@@ -24,7 +23,6 @@ export const TopicDetailDtoSchema = z.object({
   id: z.string(),
   slug: TopicSlugSchema,
   name: TopicNameSchema,
-  parentId: z.string().optional(),
   createdAt: z.string(),
 });
 export type TopicDetailDto = z.infer<typeof TopicDetailDtoSchema>;
@@ -48,7 +46,6 @@ export type TopicLectureViewDto = z.infer<typeof TopicLectureViewDtoSchema>;
 export const UpsertTopicDtoSchema = z.object({
   slug: z.string().min(1, "Slug must not be empty"),
   name: TopicNameSchema,
-  parentSlug: z.string().optional(),
   translations: z
     .record(
       LocaleSchema,
