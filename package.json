@@ -93,10 +93,6 @@
     "native:expo:fix": "bun run --filter native expo:fix",
     "native:expo:check": "bun run --filter native expo:check"
   },
-  "dependencies": {
-    "@floating-ui/react": "^0.27.19",
-    "jose": "^6.2.3"
-  },
   "devDependencies": {
     "@babel/runtime": "^7.29.7",
     "@commitlint/cli": "20.5.3",
@@ -130,6 +126,7 @@
     "vitest": "catalog:"
   },
   "engines": {
+    "bun": "1.3.14",
     "node": "22.x"
   },
   "packageManager": "bun@1.3.14",

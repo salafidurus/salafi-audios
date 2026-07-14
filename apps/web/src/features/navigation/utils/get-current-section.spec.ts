@@ -1,4 +1,8 @@
-import { getCurrentSection, getActiveTabFromPath } from "./get-current-section";
+import {
+  getCurrentSection,
+  getActiveTabFromPath,
+  buildSectionTabPath,
+} from "./get-current-section";
 
 describe("getCurrentSection", () => {
   it("returns explore for /explore", () => {
@@ -22,6 +26,18 @@ describe("getCurrentSection", () => {
   it("returns settings for /settings", () => {
     expect(getCurrentSection("/settings")).toBe("settings");
   });
+  it("returns adminContents for /admin/contents", () => {
+    expect(getCurrentSection("/admin/contents")).toBe("adminContents");
+  });
+  it("returns adminContents for /admin/contents/topics", () => {
+    expect(getCurrentSection("/admin/contents/topics")).toBe("adminContents");
+  });
+  it("returns adminLive for /admin/live", () => {
+    expect(getCurrentSection("/admin/live")).toBe("adminLive");
+  });
+  it("returns adminLive for /admin/live/sessions", () => {
+    expect(getCurrentSection("/admin/live/sessions")).toBe("adminLive");
+  });
 });
 
 describe("getActiveTabFromPath", () => {
@@ -33,5 +49,26 @@ describe("getActiveTabFromPath", () => {
   });
   it("returns null for root path", () => {
     expect(getActiveTabFromPath("/")).toBeNull();
+  });
+  it("returns tab for admin/contents", () => {
+    expect(getActiveTabFromPath("/admin/contents/listings")).toBe("listings");
+  });
+  it("returns tab for admin/live", () => {
+    expect(getActiveTabFromPath("/admin/live/channels")).toBe("channels");
+  });
+});
+
+describe("buildSectionTabPath", () => {
+  it("returns correct path for adminContents topics", () => {
+    expect(buildSectionTabPath("adminContents", "topics")).toBe("/admin/contents");
+  });
+  it("returns correct path for adminContents listings", () => {
+    expect(buildSectionTabPath("adminContents", "listings")).toBe("/admin/contents/listings");
+  });
+  it("returns correct path for adminLive sessions", () => {
+    expect(buildSectionTabPath("adminLive", "sessions")).toBe("/admin/live");
+  });
+  it("returns correct path for adminLive channels", () => {
+    expect(buildSectionTabPath("adminLive", "channels")).toBe("/admin/live/channels");
   });
 });

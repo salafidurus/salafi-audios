@@ -5,6 +5,9 @@ import type {
   UserRoleAssignmentDto,
   UserRole,
   AdminUserListDto,
+  CreateLivestreamChannelDto,
+  UpdateLivestreamChannelDto,
+  CreateLiveSessionDto,
 } from "@sd/core-contracts";
 
 // --- Permissions ---
@@ -159,5 +162,45 @@ export async function updateLiveSessionStatus(id: string, status: string): Promi
   await httpClient<void>({
     url: `/admin/live/sessions/${id}/${action}`,
     method: "PATCH",
+  });
+}
+
+// --- Live & Channels ---
+
+export function createLivestreamChannel(data: CreateLivestreamChannelDto) {
+  return httpClient<unknown>({
+    url: endpoints.admin.live.createChannel,
+    method: "POST",
+    body: data,
+  });
+}
+
+export function updateLivestreamChannel(id: string, data: UpdateLivestreamChannelDto) {
+  return httpClient<unknown>({
+    url: endpoints.admin.live.updateChannel(id),
+    method: "PUT",
+    body: data,
+  });
+}
+
+export function deleteLivestreamChannel(id: string) {
+  return httpClient<unknown>({
+    url: endpoints.admin.live.deleteChannel(id),
+    method: "DELETE",
+  });
+}
+
+export function createLiveSession(data: CreateLiveSessionDto) {
+  return httpClient<unknown>({
+    url: endpoints.admin.live.createSession,
+    method: "POST",
+    body: data,
+  });
+}
+
+export function deleteLiveSession(id: string) {
+  return httpClient<unknown>({
+    url: endpoints.admin.live.deleteSession(id),
+    method: "DELETE",
   });
 }

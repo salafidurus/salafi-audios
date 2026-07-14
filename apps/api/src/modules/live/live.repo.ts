@@ -234,4 +234,34 @@ export class LiveRepository {
       scholarImageUrl: r.scholar?.imageUrl ?? undefined,
     }));
   }
+
+  async findAdminSessions() {
+    const seventyTwoHoursAgo = new Date(Date.now() - 72 * 60 * 60 * 1000);
+    return this.prisma.liveSession.findMany({
+      where: {
+        OR: [
+          { status: 'live' satisfies LiveSessionStatus },
+          { status: 'scheduled' satisfies LiveSessionStatus },
+          {
+            status: 'ended' satisfies LiveSessionStatus,
+            endedAt: { gte: seventyTwoHoursAgo },
+          },
+        ],
+      },
+      select: sessionPublicSelect,
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async deleteSession(id: string) {
+    return this.prisma.liveSession.delete({
+      where: { id },
+    });
+  }
+
+  async deleteChannel(id: string) {
+    return this.prisma.livestreamChannel.delete({
+      where: { id },
+    });
+  }
 }

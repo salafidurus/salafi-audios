@@ -1,100 +1,33 @@
-.sectionTitle {
-  font-size: var(--typo-title-md-font-size);
-  font-weight: 600;
-  margin-bottom: var(--space-component-gap-sm);
-  margin-top: var(--space-md);
-}
-
-.activeSectionTitle {
-  color: var(--content-success);
-}
-
-.scheduledSectionTitle {
-  color: var(--action-primary);
-}
-
-.endedSectionTitle {
-  color: var(--content-muted);
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: var(--space-layout-section-y);
-}
-
-.tableHeader {
-  border-bottom: 2px solid var(--border-default);
-  text-align: left;
-}
-
-.tableHead {
-  padding: var(--space-sm);
-  font-weight: 600;
-}
-
-.tableRow {
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.tableCell {
-  padding: var(--space-sm);
-}
-
-.statusBadge {
-  padding: 2px var(--space-xs);
-  border-radius: var(--radius-xs);
-  font-size: 12px;
-  display: inline-block;
-}
-
-.statusLive {
-  background: var(--surface-success-subtle);
-  color: var(--content-success);
-}
-
-.statusScheduled {
-  background: var(--surface-primary-subtle);
-  color: var(--action-primary);
-}
-
-.statusEnded {
-  background: var(--surface-neutral-subtle);
-  color: var(--content-muted);
-}
-
-.actionButtons {
+.content {
   display: flex;
-  gap: var(--space-xs);
+  flex-direction: column;
+  gap: var(--space-component-gap-lg);
 }
 
-.sessionCard {
-  padding: var(--space-sm);
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.sessionCardContent {
+.searchRow {
   display: flex;
-  justify-content: space-between;
+  gap: var(--space-scale-sm);
   align-items: center;
 }
 
-.sessionInfo {
-  flex: 1;
+.toolbar {
+  display: flex;
+  flex-direction: column;
 }
 
-.sessionTitle {
-  font-weight: 600;
-}
-
-.sessionDetails {
-  font-size: 12px;
+.resultCount {
+  font-family: var(--typo-caption-font-family);
+  font-size: var(--typo-caption-font-size);
   color: var(--content-muted);
+  margin: 0 0 var(--space-scale-md);
 }
 
 @media (max-width: 640px) {
-  .sectionTitle {
-    font-size: var(--typo-title-sm-font-size);
-    margin-bottom: var(--space-sm);
+  .searchRow {
+    margin-bottom: var(--space-scale-lg);
+  }
+
+  .resultCount {
+    margin: 0 0 var(--space-scale-md);
   }
 }

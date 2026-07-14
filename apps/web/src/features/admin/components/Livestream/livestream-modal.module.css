@@ -1,0 +1,103 @@
+.form {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.errorBanner {
+  background-color: color-mix(in srgb, var(--state-danger) 10%, transparent);
+  border: 1px solid var(--state-danger);
+  color: var(--state-danger);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-component-chip);
+  font-size: var(--typo-body-sm-font-size);
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.label {
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: 600;
+  color: var(--content-strong);
+}
+
+.required {
+  color: var(--state-danger);
+  margin-left: 2px;
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) 0;
+}
+
+.toggleLabel {
+  display: flex;
+  flex-direction: column;
+}
+
+.toggleTitle {
+  font-size: var(--typo-body-md-font-size);
+  font-weight: 600;
+  color: var(--content-strong);
+}
+
+.toggleDescription {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+}
+
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+}
+
+.radioLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--typo-body-md-font-size);
+  color: var(--content-default);
+  cursor: pointer;
+}
+
+.radioInput {
+  width: 1.2rem;
+  height: 1.2rem;
+  accent-color: var(--action-primary);
+}
+
+@media (max-width: 640px) {
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.datetimeInput {
+  width: 100%;
+  min-height: 2.9rem;
+  padding: 0.78rem 0.95rem;
+  border: 1px solid var(--input-border-rest, var(--border-default));
+  border-radius: calc(var(--radius-component-chip) + 0.2rem);
+  background: var(--input-surface-rest, var(--surface-subtle));
+  color: var(--content-default);
+  font-family: inherit;
+  font-size: var(--typo-body-md-font-size);
+  box-sizing: border-box;
+  outline: none;
+}
