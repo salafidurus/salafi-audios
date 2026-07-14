@@ -6,6 +6,7 @@ import {
   Clock,
   Flame,
   Heart,
+  List,
   Play,
   Radio,
   Scale,
@@ -27,7 +28,9 @@ export type SectionTabIconKey =
   | "library-completed"
   | "account-general"
   | "account-profile"
-  | "account-legal";
+  | "account-legal"
+  | "adminLive-sessions"
+  | "adminLive-channels";
 
 const SECTION_TAB_ICONS: Record<SectionTabIconKey, LucideIcon> = {
   "feed-popular": Flame,
@@ -42,6 +45,8 @@ const SECTION_TAB_ICONS: Record<SectionTabIconKey, LucideIcon> = {
   "account-general": SlidersHorizontal,
   "account-profile": User,
   "account-legal": Scale,
+  "adminLive-sessions": Radio,
+  "adminLive-channels": List,
 };
 
 export function getSectionTabIcon(section: Section, tabId: string): LucideIcon | null {

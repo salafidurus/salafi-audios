@@ -30,9 +30,11 @@ export function TopSubnavTabs() {
   const hasAdminAccess =
     adminPermissionsData && (adminPermissionsData.permissions ?? []).length > 0;
 
+  const isAdminSection = section === "adminContents" || section === "adminLive";
+
   // Show tabs on all screen sizes (responsive CSS handles mobile styling)
   // Hide tabs for admin section if user doesn't have admin permissions
-  if (!isHydrated || section === "home" || (section === "admin" && !hasAdminAccess)) {
+  if (!isHydrated || section === "home" || (isAdminSection && !hasAdminAccess)) {
     return null;
   }
 
