@@ -1,5 +1,4 @@
 import { vi } from 'vitest';
-import { ForbiddenException } from '@nestjs/common';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';

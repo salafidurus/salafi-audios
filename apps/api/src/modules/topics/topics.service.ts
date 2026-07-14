@@ -1,10 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import type {
-  TopicDetailDto,
-  TopicViewDto,
-  TopicLectureViewDto,
-  TranslationViewDto,
-} from '@sd/core-contracts';
+import type { TopicDetailDto, TopicLectureViewDto, TranslationViewDto } from '@sd/core-contracts';
 import { UpsertTopicDto } from './dto/upsert-topic.dto';
 import { SaveTopicTranslationDto } from './dto/save-topic-translation.dto';
 import { TopicsRepository } from './topics.repo';
@@ -24,16 +19,10 @@ export class TopicsService {
   }
 
   async upsert(dto: UpsertTopicDto): Promise<TopicDetailDto> {
-    const result = await this.repo.upsertBySlug({
+    const topic = await this.repo.upsertBySlug({
       slug: dto.slug,
       name: dto.name.en,
-      parentSlug: dto.parentSlug,
     });
-    if (!result && dto.parentSlug) {
-      throw new NotFoundException(`Parent topic "${dto.parentSlug}" not found`);
-    }
-
-    const topic = result ?? (await this.getBySlug(dto.slug));
 
     if (dto.name.ar && topic.id) {
       await this.repo.upsertTopicTranslation(topic.id, {
@@ -56,12 +45,6 @@ export class TopicsService {
     }
 
     return this.getBySlug(topic.slug);
-  }
-
-  async listChildren(slug: string): Promise<TopicViewDto[]> {
-    const result = await this.repo.listChildrenBySlug(slug);
-    if (result === null) throw new NotFoundException('Topic not found');
-    return result;
   }
 
   async listLectures(slug: string, limit?: number): Promise<TopicLectureViewDto[]> {

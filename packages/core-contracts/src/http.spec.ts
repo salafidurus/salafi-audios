@@ -121,8 +121,14 @@ describe("httpClient – configured", () => {
 
   /* ---------- Headers ---------- */
 
-  it("sets Content-Type header to application/json", async () => {
+  it("omits Content-Type header when no payload is provided", async () => {
     await httpClient({ url: "/items", method: "GET" });
+    const init = fetchSpy.mock.calls[0]![1]! as RequestInit;
+    expect((init.headers as Record<string, string>)["Content-Type"]).toBeUndefined();
+  });
+
+  it("sets Content-Type header to application/json when payload is provided", async () => {
+    await httpClient({ url: "/items", method: "POST", body: { name: "test" } });
     const init = fetchSpy.mock.calls[0]![1]! as RequestInit;
     expect((init.headers as Record<string, string>)["Content-Type"]).toBe("application/json");
   });

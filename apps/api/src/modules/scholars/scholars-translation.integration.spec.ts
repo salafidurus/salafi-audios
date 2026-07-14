@@ -1,5 +1,4 @@
 import { vi } from 'vitest';
-import { ForbiddenException } from '@nestjs/common';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
@@ -7,7 +6,6 @@ import { CacheModule } from '@nestjs/cache-manager';
 import request from 'supertest';
 import { createTestApp } from '../../test/create-test-app';
 import { AuthGuard } from '../auth/auth.guard';
-import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { PermissionGuard } from '../../shared/guards/permission.guard';
 import { ScholarsController } from './scholars.controller';
 import { ScholarsTranslationsController } from './scholars-translations.controller';
@@ -51,7 +49,7 @@ const mockScholarsService = {
   unpublishTranslation: vi.fn().mockResolvedValue(draftTranslation),
 };
 
-async function buildApp(overrideGuard?: () => boolean | never): Promise<NestFastifyApplication> {
+async function buildApp(_overrideGuard?: () => boolean | never): Promise<NestFastifyApplication> {
   const builder = Test.createTestingModule({
     imports: [CacheModule.register({ isGlobal: true, ttl: 0 })],
     controllers: [ScholarsController, ScholarsTranslationsController],

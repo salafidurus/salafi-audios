@@ -80,7 +80,9 @@ export async function httpClient<T>(options: {
       // and dev cookie flows working; a caller-supplied Cookie header wins.
       credentials: "include",
       headers: {
-        "Content-Type": "application/json",
+        ...(payload !== undefined && payload !== null
+          ? { "Content-Type": "application/json" }
+          : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(cookie ? { Cookie: cookie } : {}),
         ...(locale ? { "Accept-Language": locale } : {}),

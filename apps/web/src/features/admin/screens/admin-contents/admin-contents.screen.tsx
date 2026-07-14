@@ -102,7 +102,6 @@ export function AdminContentsScreen() {
       id: topic.id,
       slug: topic.slug,
       name: topic.name,
-      parentSlug: undefined, // parentId from API doesn't map to parentSlug
     });
     setIsTopicModalOpen(true);
   };
