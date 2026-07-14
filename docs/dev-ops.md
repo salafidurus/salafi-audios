@@ -54,6 +54,10 @@ Deployments follow protected branch promotion:
 
 ## 7. Renovate Policy
 
+Renovate runs via `.github/workflows/renovate.yml` (GitHub Actions), triggered daily at 00:00 UTC or on-demand via `workflow_dispatch`. The workflow uses a fine-grained PAT (`RENOVATE_TOKEN` secret) with `contents: write`, `pull-requests: write`, `issues: write`, and `metadata: read`.
+
+If you previously had the Renovate GitHub App installed, remove it from the repo to avoid duplicate PRs.
+
 Renovate is configured in `renovate.json` with conservative defaults suited to this monorepo.
 
 ### Ignored Dependencies

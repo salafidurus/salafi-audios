@@ -10,7 +10,6 @@
     ".worktrees/**",
     ".worktree/**"
   ],
-  "schedule": ["before 7am every 2 day"],
   "prConcurrentLimit": 10,
   "prHourlyLimit": 10,
   "packageRules": [
