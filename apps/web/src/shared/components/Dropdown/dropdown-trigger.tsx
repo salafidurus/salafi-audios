@@ -10,6 +10,7 @@ export interface DropdownTriggerProps {
   disabled?: boolean;
   id?: string;
   testId?: string;
+  ariaLabel?: string;
 }
 
 export function DropdownTrigger({
@@ -18,6 +19,7 @@ export function DropdownTrigger({
   disabled: disabledProp,
   id,
   testId,
+  ariaLabel,
 }: DropdownTriggerProps) {
   const {
     open,
@@ -43,6 +45,7 @@ export function DropdownTrigger({
       aria-expanded={open}
       aria-invalid={hasError}
       aria-controls={contentId}
+      aria-label={ariaLabel}
       id={id}
       data-testid={testId}
       className={[

@@ -19,4 +19,5 @@ export interface DropdownContextValue {
   setSearchQuery: (query: string) => void;
   disabled?: boolean;
   error?: boolean | string;
+  direction: "up" | "down";
 }

@@ -1,3 +1,9 @@
+.wrapper {
+  position: relative;
+  display: inline-flex;
+  width: 100%;
+}
+
 .trigger {
   display: flex;
   align-items: center;
@@ -87,25 +93,43 @@
 }
 
 .content {
-  position: fixed;
-  z-index: 1000;
-  min-width: 180px;
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  inset-inline-start: 0;
+  z-index: 20;
+  min-width: 100%;
   max-width: min(320px, calc(100vw - var(--space-lg)));
   max-height: 280px;
-  background-color: var(--surface-elevated);
+  margin: 0;
+  padding: 0.25rem;
+  background-color: var(--surface-default);
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-component-panel);
-  box-shadow:
-    0 10px 25px rgba(0, 0, 0, 0.08),
-    0 4px 10px rgba(0, 0, 0, 0.04);
+  border-radius: var(--radius-component-card);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transform-origin: top center;
-  pointer-events: auto;
-  /* Allow floating-ui inline styles to control top/left positioning */
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+.content[hidden] {
+  display: none;
+}
+
+.contentUp {
   top: auto;
-  left: auto;
+  bottom: calc(100% + 0.25rem);
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .searchWrapper {
