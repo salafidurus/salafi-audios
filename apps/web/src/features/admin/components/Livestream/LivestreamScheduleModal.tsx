@@ -5,7 +5,7 @@ import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
 import type { LivestreamChannelDto, CreateLiveSessionDto } from "@sd/core-contracts";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button";
-import { TextInput } from "@/shared/components/TextInput";
+import { TextInput } from "@/shared/components/TextInput/TextInput";
 import {
   Dropdown,
   DropdownTrigger,

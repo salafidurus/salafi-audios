@@ -10,7 +10,7 @@ import type {
 } from "@sd/core-contracts";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button";
-import { TextInput } from "@/shared/components/TextInput";
+import { TextInput } from "@/shared/components/TextInput/TextInput";
 import { Toggle } from "@/shared/components/Toggle";
 import {
   Dropdown,

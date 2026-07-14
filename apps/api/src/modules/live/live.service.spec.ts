@@ -324,7 +324,7 @@ describe('LiveService', () => {
       repo.findAdminSessions.mockResolvedValue([mockSessionRecord] as any);
       const result = await service.listAdminSessions();
       expect(result).toHaveLength(1);
-      expect(result[0].id).toBe('session-1');
+      expect(result[0]!.id).toBe('session-1');
       expect(repo.findAdminSessions).toHaveBeenCalled();
     });
   });
