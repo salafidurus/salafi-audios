@@ -51,7 +51,8 @@
       "vite-tsconfig-paths": "^5.1.4",
       "vitest": "^4.1.9",
       "zod": "^4.4.3",
-      "zustand": "^5.0.11"
+      "zustand": "^5.0.11",
+      "oxlint-plugin-react-doctor": "^0.5.8"
     }
   },
   "scripts": {
@@ -118,6 +119,7 @@
     "prisma": "^7.3.0",
     "react": "catalog:",
     "react-doctor": "^0.5.8",
+    "oxlint-plugin-react-doctor": "catalog:",
     "rimraf": "catalog:",
     "secretlint": "^13.0.2",
     "tsup": "catalog:",
