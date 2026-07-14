@@ -21,7 +21,7 @@ import {
   fetchAdminLectureDetail,
 } from "@/features/admin/api/admin-lectures.api";
 import { Content } from "@/features/admin/components/Content";
-import type { TopicForEdit } from "@/features/admin/components/TopicFormModal";
+import type { TopicForEdit } from "@/features/admin/components/Content/TopicModal";
 import { AudioUploader } from "@/features/admin/components/AudioUploader/AudioUploader";
 import { Modal } from "@/shared/components/Modal";
 import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";

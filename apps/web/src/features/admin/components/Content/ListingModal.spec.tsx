@@ -1,6 +1,6 @@
 import { vi, type Mock } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { ListingEditModal } from "./ListingEditModal";
+import { ListingModal } from "./ListingModal";
 import { createLecture, updateLecture } from "../../api/admin-lectures.api";
 
 vi.mock("../../api/admin-lectures.api", () => ({
@@ -13,7 +13,6 @@ vi.mock("@sd/core-contracts", async (importOriginal) => {
   return {
     ...actual,
     useApiQuery: vi.fn((key) => {
-      // Mock queries return empty/mocked lists
       if (key[0] === "scholars") {
         return {
           data: {
@@ -58,13 +57,13 @@ vi.mock("@sd/core-contracts", async (importOriginal) => {
   };
 });
 
-describe("ListingEditModal", () => {
+describe("ListingModal", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it("does not render when isOpen is false", () => {
-    render(<ListingEditModal isOpen={false} onClose={vi.fn()} onSuccess={vi.fn()} />);
+    render(<ListingModal isOpen={false} onClose={vi.fn()} onSuccess={vi.fn()} />);
     expect(screen.queryByText(/lecture details/i)).not.toBeInTheDocument();
   });
 
@@ -74,7 +73,7 @@ describe("ListingEditModal", () => {
     (createLecture as Mock).mockResolvedValue({ id: "new-lecture-id" });
 
     render(
-      <ListingEditModal
+      <ListingModal
         isOpen={true}
         onClose={onCloseMock}
         onSuccess={onSuccessMock}
@@ -90,17 +89,14 @@ describe("ListingEditModal", () => {
 
     expect(screen.getByText(/new lecture details/i)).toBeInTheDocument();
 
-    // Fill in title
     const titleInput = screen.getByLabelText(/title/i);
     fireEvent.change(titleInput, { target: { value: "My Great Lecture" } });
 
-    // Select Scholar
     const scholarTrigger = screen.getByTestId("scholar-dropdown");
     fireEvent.click(scholarTrigger);
     const scholarOption = await screen.findByRole("option", { name: /scholar one/i });
     fireEvent.click(scholarOption);
 
-    // Click Save
     const saveButton = screen.getByRole("button", { name: /save/i });
     fireEvent.click(saveButton);
 
@@ -145,7 +141,7 @@ describe("ListingEditModal", () => {
     };
 
     render(
-      <ListingEditModal
+      <ListingModal
         isOpen={true}
         onClose={onCloseMock}
         onSuccess={onSuccessMock}
@@ -162,11 +158,9 @@ describe("ListingEditModal", () => {
     });
     expect(screen.getByLabelText(/order index/i)).toHaveValue(5);
 
-    // Modify some values
     fireEvent.change(screen.getByLabelText(/title/i), { target: { value: "Updated Title" } });
     fireEvent.change(screen.getByLabelText(/order index/i), { target: { value: "10" } });
 
-    // Click Save
     fireEvent.click(screen.getByRole("button", { name: /save/i }));
 
     await waitFor(() => {
