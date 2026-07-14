@@ -17,8 +17,7 @@ updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
-      day: monday
+      interval: daily
     open-pull-requests-limit: 10
     versioning-strategy: increase
 
@@ -55,31 +54,13 @@ updates:
       # Expo Router; must be upgraded as a coordinated set.
       - dependency-name: "@react-navigation/*"
 
-      # Next.js — major upgrades require migration guides, middleware
-      # changes, and build config updates. Handled manually.
-      - dependency-name: "next"
+      # @sentry/* — version-locked to Sentry SDK releases; bump only as
+      # part of a coordinated Expo SDK or Sentry upgrade.
+      - dependency-name: "@sentry/*"
 
-      # Prisma — ORM + client + engine versions must match exactly.
-      # Upgraded together via dedicated migration workflow.
-      - dependency-name: "prisma"
-      - dependency-name: "@prisma/*"
-
-      # Turborepo — build orchestrator; upgrades can change caching
-      # behavior and task resolution. Upgraded manually.
-      - dependency-name: "turbo"
-
-      # NestJS — framework packages share a version matrix. Partial
-      # bumps cause decorator/DI incompatibilities.
-      - dependency-name: "@nestjs/*"
-
-      # TypeScript — managed manually per ts-modernization plan.
-      # Compiler upgrades affect every package in the monorepo.
-      - dependency-name: "typescript"
-
-      # better-auth + @better-auth/expo — must be bumped together, exact same version
-      # (version skew breaks native auth typecheck). See guardrail in AGENT.md.
-      - dependency-name: "better-auth"
-      - dependency-name: "@better-auth/*"
+      # @react-native-async-storage/async-storage — tied to Expo SDK
+      # managed workflow; independent bumps break native builds.
+      - dependency-name: "@react-native-async-storage/*"
 
     # ── Groups ───────────────────────────────────
     groups:
@@ -115,9 +96,8 @@ updates:
           - "pino-pretty"
           - "tailwindcss"
           - "@tailwindcss/*"
-          - "argent"
           - "bun-types"
-          - "@sentry/cli"
+          - "turbo"
         update-types:
           - major
           - minor
@@ -141,7 +121,50 @@ updates:
           - minor
           - patch
 
-      # Vitest and its ecosystem — allow major updates to be grouped.
+      # Fastify — plugin ecosystem shares version compatibility.
+      fastify:
+        applies-to: version-updates
+        patterns:
+          - "@fastify/*"
+        update-types:
+          - major
+          - minor
+          - patch
+
+      # NestJS — framework packages share a version matrix; always
+      # bump together to avoid decorator/DI incompatibilities.
+      nestjs:
+        applies-to: version-updates
+        patterns:
+          - "@nestjs/*"
+        update-types:
+          - major
+          - minor
+          - patch
+
+      # better-auth + @better-auth/expo — must be bumped together.
+      better-auth:
+        applies-to: version-updates
+        patterns:
+          - "better-auth"
+          - "@better-auth/*"
+        update-types:
+          - major
+          - minor
+          - patch
+
+      # Prisma — ORM + client + engine versions must match exactly.
+      prisma:
+        applies-to: version-updates
+        patterns:
+          - "prisma"
+          - "@prisma/*"
+        update-types:
+          - major
+          - minor
+          - patch
+
+      # Vitest and its ecosystem.
       vitest:
         applies-to: version-updates
         patterns:
@@ -162,9 +185,8 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
-      day: monday
-    open-pull-requests-limit: 3
+      interval: daily
+    open-pull-requests-limit: 5
 
     groups:
       # Group all Actions version bumps into a single PR.
