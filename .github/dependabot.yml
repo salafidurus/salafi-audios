@@ -139,8 +139,8 @@ updates:
           - minor
           - patch
 
-      # Test-tooling — test runners, assertion libs, HTTP assertion libs.
-      test-tooling:
+      # Unit test tooling (Jest + testing-library).
+      test-unit:
         applies-to: version-updates
         patterns:
           - "jest"
@@ -148,6 +148,15 @@ updates:
           - "@jest/*"
           - "ts-jest"
           - "@testing-library/*"
+        update-types:
+          - major
+          - minor
+          - patch
+
+      # E2E test tooling (Playwright + HTTP assertions).
+      test-e2e:
+        applies-to: version-updates
+        patterns:
           - "playwright"
           - "@playwright/*"
           - "supertest"
