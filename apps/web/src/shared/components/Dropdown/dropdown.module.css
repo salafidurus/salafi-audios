@@ -104,15 +104,15 @@
   transform-origin: top center;
   pointer-events: auto;
   /* Allow floating-ui inline styles to control top/left positioning */
-  top: auto !important;
-  left: auto !important;
+  top: auto;
+  left: auto;
 }
 
 .searchWrapper {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
-  padding: var(--space-sm) var(--space-md);
+  padding: 0 var(--space-md);
   border-bottom: 1px solid var(--border-subtle);
   flex-shrink: 0;
 }
