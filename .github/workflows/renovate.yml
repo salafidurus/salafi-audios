@@ -20,5 +20,6 @@ jobs:
         uses: renovatebot/github-action@v46.1.19
         env:
           LOG_LEVEL: debug
+          RENOVATE_REPOSITORIES: salafidurus/salafi-audios
         with:
           token: ${{ secrets.SALAFIDURUS_RENOVATE_TOKEN }}
