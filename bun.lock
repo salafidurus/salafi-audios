@@ -30,7 +30,7 @@
         "oxlint-plugin-react-doctor": "catalog:",
         "prisma": "^7.3.0",
         "react": "catalog:",
-        "react-doctor": "^0.5.8",
+        "react-doctor": "^0.6.0",
         "rimraf": "catalog:",
         "secretlint": "^13.0.2",
         "tsup": "catalog:",
@@ -2399,7 +2399,7 @@
 
     "dequal": ["dequal@2.0.3", "", {}, "sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA=="],
 
-    "deslop-js": ["deslop-js@0.5.8", "", { "dependencies": { "@oxc-project/types": "^0.132.0", "fast-glob": "^3.3.3", "minimatch": "^10.2.5", "oxc-parser": "^0.132.0", "oxc-resolver": "^11.19.1", "typescript": "^6.0.3" } }, "sha512-Vq9D2x4dAIW24zcH55DTrl3/vi13UNKfXgw0yj7ULTssZ6KOdw/oyBHtlvE94KFC9yYEhgFTrGjaqqZKvV9pwA=="],
+    "deslop-js": ["deslop-js@0.6.3", "", { "dependencies": { "@oxc-project/types": "^0.132.0", "fast-glob": "^3.3.3", "minimatch": "^10.2.5", "oxc-parser": "^0.132.0", "oxc-resolver": "^11.19.1", "typescript": ">=5.0.4 <6" } }, "sha512-qKpTgvmW5hVBJLgZqf/wJccZ9NOqRGYH0bSJU6/zFWVpGrDXnrUcbwHcm9n1PrDndCQ6oD7mlB6Nv9YyvEcBKw=="],
 
     "destr": ["destr@2.0.5", "", {}, "sha512-ugFTXCtDZunbzasqBxrK93Ik/DRYsO6S/fedkWEMKqt04xZ4csmnmwGDBAb07QWNaGMAmnTIemsYZCksjATwsA=="],
 
@@ -3713,7 +3713,7 @@
 
     "react-devtools-core": ["react-devtools-core@6.1.5", "", { "dependencies": { "shell-quote": "^1.6.1", "ws": "^7" } }, "sha512-ePrwPfxAnB+7hgnEr8vpKxL9cmnp7F322t8oqcPshbIQQhDKgFDW4tjhF2wjVbdXF9O/nyuy3sQWd9JGpiLPvA=="],
 
-    "react-doctor": ["react-doctor@0.5.8", "", { "dependencies": { "@babel/code-frame": "^7.29.0", "@sentry/node": "^10.54.0", "agent-install": "0.0.5", "conf": "^15.1.0", "confbox": "^0.2.4", "deslop-js": "0.5.8", "eslint-plugin-react-hooks": "^7.1.1", "jiti": "^2.7.0", "magicast": "^0.5.3", "oxlint": ">=1.66.0 <1.67.0", "oxlint-plugin-react-doctor": "0.5.8", "prompts": "^2.4.2", "typescript": ">=5.0.4 <7", "vscode-languageserver": "^9.0.1", "vscode-languageserver-textdocument": "^1.0.12", "vscode-uri": "^3.1.0" }, "bin": { "react-doctor": "bin/react-doctor.js" } }, "sha512-gDXDQ+48KeFq2jkVgsUhQ67oQ+kUMdnIaA+YeS9VXXZFXSg9wxY5dDxurEpILSh8RwO06W8p6uCnTR+wn5B/GA=="],
+    "react-doctor": ["react-doctor@0.6.3", "", { "dependencies": { "@babel/code-frame": "^7.29.0", "@sentry/node": "^10.54.0", "agent-install": "0.0.5", "conf": "^15.1.0", "confbox": "^0.2.4", "deslop-js": "0.6.3", "eslint-plugin-react-hooks": "^7.1.1", "jiti": "^2.7.0", "magicast": "^0.5.3", "oxlint": ">=1.66.0 <1.67.0", "oxlint-plugin-react-doctor": "0.6.3", "prompts": "^2.4.2", "typescript": ">=5.0.4 <6", "vscode-languageserver": "^9.0.1", "vscode-languageserver-textdocument": "^1.0.12", "vscode-uri": "^3.1.0", "yaml": "^2.9.0" }, "bin": { "react-doctor": "bin/react-doctor.js" } }, "sha512-OwX/uel17c2zRKVlj0LMkJNTQlgjr8kls10b6b2f+52K/NX60px1xw7u64ml35SixwZzHwsjTw/Pkf8SwGKKug=="],
 
     "react-dom": ["react-dom@19.2.3", "", { "dependencies": { "scheduler": "^0.27.0" }, "peerDependencies": { "react": "^19.2.3" } }, "sha512-yELu4WmLPw5Mr/lmeEpox5rw3RETacE++JgHqQzd2dg+YbJuat3jH4ingc+WPZhxaoFzdv9y33G+F7Nl5O0GBg=="],
 
@@ -4757,8 +4757,6 @@
 
     "deslop-js/oxc-parser": ["oxc-parser@0.132.0", "", { "dependencies": { "@oxc-project/types": "^0.132.0" }, "optionalDependencies": { "@oxc-parser/binding-android-arm-eabi": "0.132.0", "@oxc-parser/binding-android-arm64": "0.132.0", "@oxc-parser/binding-darwin-arm64": "0.132.0", "@oxc-parser/binding-darwin-x64": "0.132.0", "@oxc-parser/binding-freebsd-x64": "0.132.0", "@oxc-parser/binding-linux-arm-gnueabihf": "0.132.0", "@oxc-parser/binding-linux-arm-musleabihf": "0.132.0", "@oxc-parser/binding-linux-arm64-gnu": "0.132.0", "@oxc-parser/binding-linux-arm64-musl": "0.132.0", "@oxc-parser/binding-linux-ppc64-gnu": "0.132.0", "@oxc-parser/binding-linux-riscv64-gnu": "0.132.0", "@oxc-parser/binding-linux-riscv64-musl": "0.132.0", "@oxc-parser/binding-linux-s390x-gnu": "0.132.0", "@oxc-parser/binding-linux-x64-gnu": "0.132.0", "@oxc-parser/binding-linux-x64-musl": "0.132.0", "@oxc-parser/binding-openharmony-arm64": "0.132.0", "@oxc-parser/binding-wasm32-wasi": "0.132.0", "@oxc-parser/binding-win32-arm64-msvc": "0.132.0", "@oxc-parser/binding-win32-ia32-msvc": "0.132.0", "@oxc-parser/binding-win32-x64-msvc": "0.132.0" } }, "sha512-+0LAPHaqtfQlvWdpaAa09SmOaZZgP8C552xosEkGJ4+ruEwP1Vgx+sqBgcBCNfR6KDCmagGOZTde8wmAvcI/Hg=="],
 
-    "deslop-js/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
-
     "dom-serializer/entities": ["entities@2.2.0", "", {}, "sha512-p92if5Nz619I0w+akJrLZH0MX0Pb5DX39XOwQTtXSdQQOaYH03S1uIQp4mhOZtAXrxq4ViO67YTiLBo2638o9A=="],
 
     "error-ex/is-arrayish": ["is-arrayish@0.2.1", "", {}, "sha512-zz06S8t0ozoDXMG+ube26zeCTNXcKIPJZJi8hBrF4idCLms4CG9QtK7qBl1boi5ODzFpjswb5JPmHCbMpjaYzg=="],
@@ -4970,6 +4968,8 @@
     "proxy-addr/ipaddr.js": ["ipaddr.js@1.9.1", "", {}, "sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g=="],
 
     "react-doctor/oxlint": ["oxlint@1.66.0", "", { "optionalDependencies": { "@oxlint/binding-android-arm-eabi": "1.66.0", "@oxlint/binding-android-arm64": "1.66.0", "@oxlint/binding-darwin-arm64": "1.66.0", "@oxlint/binding-darwin-x64": "1.66.0", "@oxlint/binding-freebsd-x64": "1.66.0", "@oxlint/binding-linux-arm-gnueabihf": "1.66.0", "@oxlint/binding-linux-arm-musleabihf": "1.66.0", "@oxlint/binding-linux-arm64-gnu": "1.66.0", "@oxlint/binding-linux-arm64-musl": "1.66.0", "@oxlint/binding-linux-ppc64-gnu": "1.66.0", "@oxlint/binding-linux-riscv64-gnu": "1.66.0", "@oxlint/binding-linux-riscv64-musl": "1.66.0", "@oxlint/binding-linux-s390x-gnu": "1.66.0", "@oxlint/binding-linux-x64-gnu": "1.66.0", "@oxlint/binding-linux-x64-musl": "1.66.0", "@oxlint/binding-openharmony-arm64": "1.66.0", "@oxlint/binding-win32-arm64-msvc": "1.66.0", "@oxlint/binding-win32-ia32-msvc": "1.66.0", "@oxlint/binding-win32-x64-msvc": "1.66.0" }, "peerDependencies": { "oxlint-tsgolint": ">=0.22.1" }, "optionalPeers": ["oxlint-tsgolint"], "bin": { "oxlint": "bin/oxlint" } }, "sha512-N4LLxYLd94KEBqXDMDM5f+2PUpItTjDLreXe2Gn5KhjhCK4Qp2YUXaBi8Yu325ryOgKwt22m45fpD7nPOn69Yw=="],
+
+    "react-doctor/oxlint-plugin-react-doctor": ["oxlint-plugin-react-doctor@0.6.3", "", { "dependencies": { "@typescript-eslint/types": "^8.59.3", "eslint-scope": "^9.1.2", "eslint-visitor-keys": "^5.0.1", "oxc-parser": "^0.135.0" } }, "sha512-2hx9tcSdel9kPkzimHlkCqPQlxNGgrhEGiWXa9yreL3JZ6TXcUOx6l8ajsRnScKd4iWaqSollQdkRGZf3IrCoA=="],
 
     "react-native/commander": ["commander@12.1.0", "", {}, "sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA=="],
 
@@ -5384,6 +5384,10 @@
     "react-doctor/oxlint/@oxlint/binding-win32-ia32-msvc": ["@oxlint/binding-win32-ia32-msvc@1.66.0", "", { "os": "win32", "cpu": "ia32" }, "sha512-m3Pjwc2MfTcom4E4gOv7DyuGyt7OfGNCbmqDHd+N7EzXmP+ppHuudm2NjcA3AjV5TSeGxaguVF4SbTKHe1USYA=="],
 
     "react-doctor/oxlint/@oxlint/binding-win32-x64-msvc": ["@oxlint/binding-win32-x64-msvc@1.66.0", "", { "os": "win32", "cpu": "x64" }, "sha512-/DbBvw8UFBhja6PqudUjV4UtfsJr0Oa7jUjWVKB0g86lj/VwnPrkngn0sFql3c9RDA0O16dh7ozsXb6GjNAzBQ=="],
+
+    "react-doctor/oxlint-plugin-react-doctor/eslint-scope": ["eslint-scope@9.1.2", "", { "dependencies": { "@types/esrecurse": "^4.3.1", "@types/estree": "^1.0.8", "esrecurse": "^4.3.0", "estraverse": "^5.2.0" } }, "sha512-xS90H51cKw0jltxmvmHy2Iai1LIqrfbw57b79w/J7MfvDfkIkFZ+kj6zC3BjtUwh150HsSSdxXZcsuv72miDFQ=="],
+
+    "react-doctor/oxlint-plugin-react-doctor/eslint-visitor-keys": ["eslint-visitor-keys@5.0.1", "", {}, "sha512-tD40eHxA35h0PEIZNeIjkHoDR4YjjJp34biM0mDvplBe//mB+IHCqHDGV7pxF+7MklTvighcCPPZC7ynWyjdTA=="],
 
     "string-length/strip-ansi/ansi-regex": ["ansi-regex@6.2.2", "", {}, "sha512-Bq3SmSpyFHaWjPk8If9yc6svM8c56dB5BAtW4Qbw5jHTwwXXcTLoRMkpDJp6VL0XzlWaCHTXrkFURMYmD0sLqg=="],
 
