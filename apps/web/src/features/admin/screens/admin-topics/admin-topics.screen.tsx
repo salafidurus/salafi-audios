@@ -9,12 +9,7 @@ import { PageHeader } from "@/shared/components/PageHeader";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { Button } from "@/shared/components/Button";
 import { Plus } from "lucide-react";
-import {
-  createTopic,
-  updateTopic,
-  deleteTopic,
-  type AdminTopicInput,
-} from "@/features/admin/api/admin.api";
+import { createTopic, updateTopic, deleteTopic } from "@/features/admin/api/admin.api";
 import { Modal } from "@/shared/components/Modal";
 import styles from "./admin-topics.screen.module.css";
 

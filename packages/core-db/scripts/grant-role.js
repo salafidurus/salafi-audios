@@ -177,7 +177,7 @@ async function grantRole(email, role) {
     console.log(`\n📋 Assigning role '${role}' to ${user.email}...\n`);
 
     // 1. Assign the role via UserRoleAssignment
-    let roleAssignmentStatus = "exists";
+
     try {
       await prisma.userRoleAssignment.create({
         data: {
@@ -187,12 +187,12 @@ async function grantRole(email, role) {
           grantedBy: null, // Manual grant via script
         },
       });
-      roleAssignmentStatus = "created";
+
       console.log(`  ✓ Assigned role: ${role}`);
     } catch (err) {
       if (err.code === "P2002") {
         // Role already exists for this user
-        roleAssignmentStatus = "exists";
+
         console.log(`  ⊘ Already has role: ${role}`);
       } else {
         throw err;
