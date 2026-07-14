@@ -64,18 +64,14 @@ updates:
 
     # ── Groups ───────────────────────────────────
     groups:
-      # Dev-tooling — formatters, linters, bundlers, type defs, utilities.
-      dev-tooling:
+      # Linters and formatters.
+      dev-linters-formatters:
         applies-to: version-updates
         patterns:
           - "eslint"
           - "eslint-*"
           - "@eslint/*"
           - "prettier"
-          - "lint-staged"
-          - "husky"
-          - "commitlint"
-          - "@commitlint/*"
           - "oxlint"
           - "oxlint-*"
           - "@oxlint/*"
@@ -84,19 +80,59 @@ updates:
           - "markdownlint-cli2"
           - "secretlint"
           - "@secretlint/*"
+          - "lint-staged"
+          - "husky"
+          - "commitlint"
+          - "@commitlint/*"
+        update-types:
+          - major
+          - minor
+          - patch
+
+      # Build and bundler tooling.
+      dev-build-tools:
+        applies-to: version-updates
+        patterns:
           - "tsup"
           - "tsx"
           - "ts-node"
           - "tsconfig-paths"
           - "ts-loader"
           - "rimraf"
+          - "@swc/*"
+        update-types:
+          - major
+          - minor
+          - patch
+
+      # Type definitions and utilities.
+      dev-types-utils:
+        applies-to: version-updates
+        patterns:
           - "@types/*"
           - "source-map-support"
-          - "@swc/*"
           - "pino-pretty"
+          - "bun-types"
+        update-types:
+          - major
+          - minor
+          - patch
+
+      # CSS tooling.
+      dev-css:
+        applies-to: version-updates
+        patterns:
           - "tailwindcss"
           - "@tailwindcss/*"
-          - "bun-types"
+        update-types:
+          - major
+          - minor
+          - patch
+
+      # Turbo — build orchestrator; isolated from other dev tooling.
+      turbo:
+        applies-to: version-updates
+        patterns:
           - "turbo"
         update-types:
           - major
