@@ -98,7 +98,7 @@
     "jose": "^6.2.3"
   },
   "devDependencies": {
-    "@babel/runtime": "^7.29.7",
+    "@babel/runtime": "^8.0.0",
     "@commitlint/cli": "20.5.3",
     "@commitlint/config-conventional": "21.0.2",
     "@nestjs/cli": "catalog:",
