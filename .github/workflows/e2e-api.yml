@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@v7
       - name: Get branch name
         id: branch_name
-        uses: tj-actions/branch-names@v8
+        uses: tj-actions/branch-names@v9
 
   e2e_api:
     name: e2e:api

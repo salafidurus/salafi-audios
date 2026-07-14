@@ -35,36 +35,34 @@ describe("LanguageSwitch", () => {
     vi.clearAllMocks();
   });
 
-  it("shows the active locale and opens a menu of locales on click", () => {
+  it("shows the active locale and opens a listbox of locales on click", () => {
     render(<LanguageSwitch />);
 
-    // Trigger shows the current language.
-    const trigger = screen.getByRole("button", { name: "Language" });
+    const trigger = screen.getByRole("combobox", { name: "Language" });
     expect(trigger).toHaveTextContent("English");
 
-    // Menu is closed initially.
-    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
 
     fireEvent.click(trigger);
 
-    expect(screen.getByRole("menu")).toBeInTheDocument();
-    expect(screen.getByRole("menuitemradio", { name: "العربية" })).toBeInTheDocument();
+    expect(screen.getByRole("listbox")).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "العربية" })).toBeInTheDocument();
   });
 
-  it("applies menuUp class when direction is up", () => {
+  it("applies contentUp class when direction is up", () => {
     render(<LanguageSwitch direction="up" />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Language" }));
+    fireEvent.click(screen.getByRole("combobox", { name: "Language" }));
 
-    const menu = screen.getByRole("menu");
-    expect(menu.className).toContain("menuUp");
+    const listbox = screen.getByRole("listbox");
+    expect(listbox.className).toContain("contentUp");
   });
 
   it("switches locale, persists it, invalidates queries, and refreshes", async () => {
     render(<LanguageSwitch />);
 
-    fireEvent.click(screen.getByRole("button", { name: "Language" }));
-    fireEvent.click(screen.getByRole("menuitemradio", { name: "العربية" }));
+    fireEvent.click(screen.getByRole("combobox", { name: "Language" }));
+    fireEvent.click(screen.getByRole("option", { name: "العربية" }));
 
     await waitFor(() => expect(mockRefresh).toHaveBeenCalled());
 

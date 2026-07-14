@@ -52,13 +52,13 @@ Deployments follow protected branch promotion:
 - Credentials must be revocable and scoped to minimum required access.
 - Hard-coded secrets, runtime config mutation, and implicit environment inference are avoided.
 
-## 7. Renovate Policy
+## 7. Dependabot Policy
 
-Renovate is configured in `renovate.json` with conservative defaults suited to this monorepo.
+Dependency updates are handled by GitHub Dependabot, configured in `.github/dependabot.yml`. It runs on GitHub's schedule, scanning weekly on Mondays. Dependabot is a simpler alternative to Renovate; it is natively integrated into GitHub and requires no workflow or secret configuration.
 
 ### Ignored Dependencies
 
-The following dependency groups are **explicitly ignored** by Renovate because they are version-locked to SDK releases or framework internals. Updating them independently risks breaking native builds, type compatibility, or coordinated version matrices:
+The following dependency groups are **explicitly ignored** by Dependabot because they are version-locked to SDK releases or framework internals. Updating them independently risks breaking native builds, type compatibility, or coordinated version matrices:
 
 - **Expo / React Native / React Navigation** — all pinned to the current Expo SDK. Upgrades follow the [Expo SDK upgrade guide](https://docs.expo.dev/workflow/upgrading-expo-sdk-walkthrough/) as a coordinated batch.
 - **React / React DOM / @types/react** — shared across web (Next.js) and mobile (Expo). Version is dictated by the Expo SDK and Next.js major.
@@ -67,6 +67,8 @@ The following dependency groups are **explicitly ignored** by Renovate because t
 - **NestJS / @nestjs/\*** — framework packages share a strict version matrix.
 - **Turborepo** — build orchestrator; caching behavior can change between versions.
 - **TypeScript** — compiler upgrades affect every package; managed manually per the ts-modernization plan.
+
+Updates to these dependencies must be done manually as coordinated version upgrades.
 
 ### How to Handle SDK-Aligned Updates
 
@@ -77,7 +79,7 @@ The following dependency groups are **explicitly ignored** by Renovate because t
 
 ### Validation Commands for Dependency PRs
 
-Every Renovate PR (and any manual dependency update) must pass:
+Every Dependabot PR (and any manual dependency update) must pass:
 
 ```bash
 bun run typecheck   # Ensures no type regressions across the monorepo
@@ -90,7 +92,7 @@ CI enforces these automatically; reviewers should verify all checks are green be
 
 ### Playwright Browser Caching in CI
 
-The CI workflow caches Playwright browser binaries at `$GITHUB_WORKSPACE/.cache/ms-playwright`, keyed on `bun.lock`. When Renovate bumps `playwright` or `@playwright/test`, the lockfile hash changes, causing a cache miss. The CI job detects this and re-installs browsers automatically (`playwright install --with-deps`). No manual intervention is required — the next run after a Playwright bump simply takes slightly longer.
+The CI workflow caches Playwright browser binaries at `$GITHUB_WORKSPACE/.cache/ms-playwright`, keyed on `bun.lock`. When Dependabot bumps `playwright` or `@playwright/test`, the lockfile hash changes, causing a cache miss. The CI job detects this and re-installs browsers automatically (`playwright install --with-deps`). No manual intervention is required — the next run after a Playwright bump simply takes slightly longer.
 
 ## 8. Production Deployment Configuration
 
