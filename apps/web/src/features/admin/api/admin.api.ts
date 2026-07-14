@@ -107,7 +107,6 @@ export function updateScholar(id: string, data: Partial<AdminScholarInput>) {
 export type AdminTopicInput = {
   slug: string;
   name: { en: string; ar?: string };
-  parentSlug?: string;
 };
 
 export function createTopic(data: AdminTopicInput) {

@@ -56,6 +56,7 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-Id', 'Cookie'],
     exposedHeaders: ['X-Request-Id', 'Set-Cookie', 'set-auth-token'],
+    maxAge: 86400,
   });
 
   app.useGlobalPipes(new ZodValidationPipe());
