@@ -96,7 +96,7 @@
     "@sentry/cli": "~2.58.4",
     "@testing-library/react-native": "catalog:",
     "@types/jest": "catalog:",
-    "@types/node": "^26.0.0",
+    "@types/node": "^26.1.1",
     "@types/react": "19.2.9",
     "babel-preset-expo": "~56.0.15",
     "eslint": "catalog:",
