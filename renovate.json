@@ -10,7 +10,8 @@
     ".worktrees/**",
     ".worktree/**"
   ],
-  "prConcurrentLimit": 10,
+  "rebaseWhen": "behind-base-branch",
+  "prConcurrentLimit": 20,
   "prHourlyLimit": 10,
   "packageRules": [
     {
