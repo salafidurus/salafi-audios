@@ -32,7 +32,6 @@
   gap: var(--space-sm);
 }
 
-/* Desktop/Tablet: horizontal layout with label and input+button on same line */
 @media (min-width: 641px) {
   .field {
     flex-direction: row;
@@ -47,7 +46,6 @@
   }
 }
 
-/* Mobile: vertical layout with label on top, input+button below */
 @media (max-width: 640px) {
   .label {
     width: 100%;
@@ -95,7 +93,6 @@
   outline-offset: 2px;
 }
 
-/* Locale Tabs */
 .localeTabs {
   display: flex;
   gap: var(--space-sm);
@@ -129,7 +126,6 @@
   opacity: 0.5;
 }
 
-/* Locale Content */
 .localeContent {
   display: none;
 }
@@ -140,7 +136,6 @@
   gap: var(--space-md);
 }
 
-/* Translation Status */
 .translationStatus {
   display: flex;
   align-items: center;
