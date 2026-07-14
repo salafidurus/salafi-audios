@@ -1,8 +1,8 @@
 # yaml-language-server: $schema=https://json.schemastore.org/dependabot-2.0.json
 #
-# Conservative Dependabot config for a PNPM + Turborepo monorepo.
+# Conservative Dependabot config for a Bun + Turborepo monorepo.
 # Design goals:
-#   - One root npm entry (PNPM workspaces handle resolution)
+#   - One root bun entry (Bun workspaces handle resolution)
 #   - Group low-risk patch/minor updates to reduce PR noise
 #   - Keep major bumps ungrouped so each is individually reviewable
 #   - Explicitly ignore SDK-coupled and infrastructure-managed deps
@@ -12,9 +12,9 @@ version: 2
 
 updates:
   # ──────────────────────────────────────────────
-  # npm ecosystem (PNPM workspace root)
+  # bun ecosystem (Bun workspace root)
   # ──────────────────────────────────────────────
-  - package-ecosystem: npm
+  - package-ecosystem: bun
     directory: /
     schedule:
       interval: daily
