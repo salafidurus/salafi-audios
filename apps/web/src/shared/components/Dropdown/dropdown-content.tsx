@@ -1,9 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { createPortal } from "react-dom";
-import { LazyMotion, m, domAnimation, AnimatePresence } from "framer-motion";
-import { useFloating, offset, flip, shift, autoUpdate } from "@floating-ui/react";
 import { Search } from "@/shared/components/Search";
 import { useDropdownContext } from "./context";
 import styles from "./dropdown.module.css";
@@ -26,29 +23,9 @@ export function DropdownContent({ children, searchable = false, className }: Dro
     items,
     highlightedIndex,
     onValueChange,
+    direction,
   } = useDropdownContext();
   const contentRef = useRef<HTMLDivElement>(null);
-
-  const { floatingStyles, refs } = useFloating({
-    whileElementsMounted: autoUpdate,
-    placement: "bottom-start",
-    middleware: [
-      offset(6),
-      flip({
-        fallbackPlacements: ["top-start"],
-        padding: 8,
-      }),
-      shift({ padding: 8 }),
-    ],
-  });
-
-  // Connect the refs after they are mounted
-  useEffect(() => {
-    if (triggerRef.current && contentRef.current) {
-      refs.setReference(triggerRef.current);
-      refs.setFloating(contentRef.current);
-    }
-  }, [refs, triggerRef]);
 
   useEffect(() => {
     if (!open) return;
@@ -135,38 +112,23 @@ export function DropdownContent({ children, searchable = false, className }: Dro
     setHighlightedIndex(-1);
   };
 
-  if (typeof window === "undefined") return null;
-
-  return createPortal(
-    <LazyMotion features={domAnimation}>
-      <AnimatePresence>
-        {open && (
-          <m.div
-            ref={contentRef}
-            role="listbox"
-            id={contentId}
-            tabIndex={-1}
-            initial={{ opacity: 0, transform: "scale(0.98) translateY(-4px)" }}
-            animate={{ opacity: 1, transform: "scale(1) translateY(0)" }}
-            exit={{ opacity: 0, transform: "scale(0.98) translateY(-4px)" }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
-            className={[styles.content, className].filter(Boolean).join(" ")}
-            style={floatingStyles as React.CSSProperties}
-          >
-            {searchable && (
-              <div className={styles.searchWrapper}>
-                <Search.Bar
-                  value={searchQuery}
-                  onChange={handleSearchChange}
-                  placeholder="Search..."
-                />
-              </div>
-            )}
-            <div className={styles.itemsList}>{children}</div>
-          </m.div>
-        )}
-      </AnimatePresence>
-    </LazyMotion>,
-    document.body,
+  return (
+    <div
+      ref={contentRef}
+      role="listbox"
+      id={contentId}
+      tabIndex={-1}
+      className={[styles.content, direction === "up" ? styles.contentUp : "", className]
+        .filter(Boolean)
+        .join(" ")}
+      hidden={!open}
+    >
+      {searchable && (
+        <div className={styles.searchWrapper}>
+          <Search.Bar value={searchQuery} onChange={handleSearchChange} placeholder="Search..." />
+        </div>
+      )}
+      <div className={styles.itemsList}>{children}</div>
+    </div>
   );
 }

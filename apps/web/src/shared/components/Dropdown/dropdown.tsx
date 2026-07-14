@@ -12,6 +12,7 @@ import {
 import { DropdownContext } from "./context";
 import { DropdownItem as DropdownItemComponent } from "./dropdown-item";
 import type { DropdownItem, DropdownContextValue } from "./types";
+import styles from "./dropdown.module.css";
 
 function extractItemsFromChildren(children: ReactNode): DropdownItem[] {
   const extracted: DropdownItem[] = [];
@@ -40,6 +41,7 @@ export interface DropdownProps {
   children: ReactNode;
   disabled?: boolean;
   error?: boolean | string;
+  direction?: "up" | "down";
 }
 
 export function Dropdown({
@@ -48,6 +50,7 @@ export function Dropdown({
   children,
   disabled = false,
   error,
+  direction = "down",
 }: DropdownProps) {
   const [open, setOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -82,6 +85,7 @@ export function Dropdown({
       setSearchQuery,
       disabled,
       error,
+      direction,
     }),
     [
       open,
@@ -94,8 +98,13 @@ export function Dropdown({
       searchQuery,
       disabled,
       error,
+      direction,
     ],
   );
 
-  return <DropdownContext.Provider value={ctx}>{children}</DropdownContext.Provider>;
+  return (
+    <DropdownContext.Provider value={ctx}>
+      <div className={styles.wrapper}>{children}</div>
+    </DropdownContext.Provider>
+  );
 }
