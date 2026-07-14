@@ -93,9 +93,11 @@ export const endpoints = {
       listChannels: "/admin/live/channels",
       createChannel: "/admin/live/channels",
       updateChannel: (id: string) => `/admin/live/channels/${id}`,
+      deleteChannel: (id: string) => `/admin/live/channels/${id}`,
       createSession: "/admin/live/sessions",
       updateSession: (id: string) => `/admin/live/sessions/${id}`,
       updateStatus: (id: string) => `/admin/live/sessions/${id}/status`,
+      deleteSession: (id: string) => `/admin/live/sessions/${id}`,
     },
     media: {
       presignedUrl: "/admin/media/presigned-url",

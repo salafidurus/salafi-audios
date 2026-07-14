@@ -67,6 +67,9 @@ describe('LiveService', () => {
             createSession: vi.fn(),
             updateSession: vi.fn(),
             listChannels: vi.fn(),
+            findAdminSessions: vi.fn(),
+            deleteSession: vi.fn(),
+            deleteChannel: vi.fn(),
           } satisfies Partial<Mocked<LiveRepository>>,
         },
       ],
@@ -313,6 +316,50 @@ describe('LiveService', () => {
       ] as any);
       const result = await service.listChannels();
       expect(result).toHaveLength(1);
+    });
+  });
+
+  describe('listAdminSessions', () => {
+    it('should return mapped admin sessions', async () => {
+      repo.findAdminSessions.mockResolvedValue([mockSessionRecord] as any);
+      const result = await service.listAdminSessions();
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toBe('session-1');
+      expect(repo.findAdminSessions).toHaveBeenCalled();
+    });
+  });
+
+  describe('deleteSession', () => {
+    it('should throw NotFoundException when session not found', async () => {
+      repo.findSessionById.mockResolvedValue(null);
+      await expect(service.deleteSession('unknown')).rejects.toThrow(
+        new NotFoundException('Live session "unknown" not found'),
+      );
+      expect(repo.deleteSession).not.toHaveBeenCalled();
+    });
+
+    it('should call repo.deleteSession when found', async () => {
+      repo.findSessionById.mockResolvedValue({ id: 'session-1' } as any);
+      repo.deleteSession.mockResolvedValue({ id: 'session-1' } as any);
+      await service.deleteSession('session-1');
+      expect(repo.deleteSession).toHaveBeenCalledWith('session-1');
+    });
+  });
+
+  describe('deleteChannel', () => {
+    it('should throw NotFoundException when channel not found', async () => {
+      repo.findChannelById.mockResolvedValue(null);
+      await expect(service.deleteChannel('unknown')).rejects.toThrow(
+        new NotFoundException('Livestream channel "unknown" not found'),
+      );
+      expect(repo.deleteChannel).not.toHaveBeenCalled();
+    });
+
+    it('should call repo.deleteChannel when found', async () => {
+      repo.findChannelById.mockResolvedValue({ id: 'channel-1' } as any);
+      repo.deleteChannel.mockResolvedValue({ id: 'channel-1' } as any);
+      await service.deleteChannel('channel-1');
+      expect(repo.deleteChannel).toHaveBeenCalledWith('channel-1');
     });
   });
 });

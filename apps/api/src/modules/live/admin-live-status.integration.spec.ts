@@ -22,6 +22,9 @@ const mockPrisma = {
 
 const mockLiveService = {
   updateSessionStatus: vi.fn().mockResolvedValue({}),
+  listAdminSessions: vi.fn().mockResolvedValue([]),
+  deleteSession: vi.fn().mockResolvedValue(undefined),
+  deleteChannel: vi.fn().mockResolvedValue(undefined),
 };
 
 const sessionUser = { id: 'user-1', email: 'admin@example.com' };
@@ -49,6 +52,9 @@ describe('AdminLiveController — granular LIVE_START/LIVE_STOP enforcement', ()
     mockAuth.api.getSession.mockReset();
     mockPrisma.userPermission.findUnique.mockReset();
     mockLiveService.updateSessionStatus.mockClear();
+    mockLiveService.listAdminSessions.mockClear();
+    mockLiveService.deleteSession.mockClear();
+    mockLiveService.deleteChannel.mockClear();
   });
 
   afterAll(() => app.close());
@@ -100,5 +106,42 @@ describe('AdminLiveController — granular LIVE_START/LIVE_STOP enforcement', ()
       .expect(200);
 
     expect(mockLiveService.updateSessionStatus).toHaveBeenCalledWith('session-1', 'scheduled');
+  });
+
+  it('GET /sessions returns 200 and calls listAdminSessions() when user has LIVE_VIEW', async () => {
+    mockAuth.api.getSession.mockResolvedValue({ user: sessionUser });
+    mockPrisma.userPermission.findUnique.mockResolvedValue({ permission: 'LIVE_VIEW' });
+
+    await request(app.getHttpServer()).get('/admin/live/sessions').expect(200);
+
+    expect(mockLiveService.listAdminSessions).toHaveBeenCalled();
+  });
+
+  it('DELETE /sessions/:id returns 200 and calls deleteSession() when user has LIVE_DELETE', async () => {
+    mockAuth.api.getSession.mockResolvedValue({ user: sessionUser });
+    mockPrisma.userPermission.findUnique.mockResolvedValue({ permission: 'LIVE_DELETE' });
+
+    await request(app.getHttpServer()).delete('/admin/live/sessions/session-1').expect(200);
+
+    expect(mockLiveService.deleteSession).toHaveBeenCalledWith('session-1');
+  });
+
+  it('DELETE /channels/:id returns 200 and calls deleteChannel() when user has LIVE_DELETE', async () => {
+    mockAuth.api.getSession.mockResolvedValue({ user: sessionUser });
+    mockPrisma.userPermission.findUnique.mockResolvedValue({ permission: 'LIVE_DELETE' });
+
+    await request(app.getHttpServer()).delete('/admin/live/channels/channel-1').expect(200);
+
+    expect(mockLiveService.deleteChannel).toHaveBeenCalledWith('channel-1');
+  });
+
+  it('DELETE /sessions/:id returns 403 when user has LIVE_VIEW but not LIVE_DELETE', async () => {
+    mockAuth.api.getSession.mockResolvedValue({ user: sessionUser });
+    mockPrisma.userPermission.findUnique.mockImplementation(
+      ({ where }: { where: { userId_permission: { permission: string } } }) =>
+        where.userId_permission.permission === 'LIVE_VIEW' ? { permission: 'LIVE_VIEW' } : null,
+    );
+
+    await request(app.getHttpServer()).delete('/admin/live/sessions/session-1').expect(403);
   });
 });

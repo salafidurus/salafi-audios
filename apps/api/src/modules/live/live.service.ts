@@ -235,4 +235,25 @@ export class LiveService {
       updatedAt: channel.updatedAt.toISOString(),
     };
   }
+
+  async listAdminSessions(): Promise<LiveSessionPublicDto[]> {
+    const sessions = await this.repo.findAdminSessions();
+    return sessions.map((s) => this.mapSession(s));
+  }
+
+  async deleteSession(id: string): Promise<void> {
+    const existing = await this.repo.findSessionById(id);
+    if (!existing) {
+      throw new NotFoundException(`Live session "${id}" not found`);
+    }
+    await this.repo.deleteSession(id);
+  }
+
+  async deleteChannel(id: string): Promise<void> {
+    const existing = await this.repo.findChannelById(id);
+    if (!existing) {
+      throw new NotFoundException(`Livestream channel "${id}" not found`);
+    }
+    await this.repo.deleteChannel(id);
+  }
 }

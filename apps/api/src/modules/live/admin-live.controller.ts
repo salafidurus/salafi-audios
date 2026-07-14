@@ -1,6 +1,6 @@
-import { Controller, Patch, Param, Body, Post, Put, Get } from '@nestjs/common';
+import { Controller, Patch, Param, Body, Post, Put, Get, Delete } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import type { LivestreamChannelDto } from '@sd/core-contracts';
+import type { LivestreamChannelDto, LiveSessionPublicDto } from '@sd/core-contracts';
 import { Permissions } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { RequiresPermission } from '../../shared/decorators/requires-permission.decorator';
@@ -70,5 +70,26 @@ export class AdminLiveController {
   @ApiOperation({ summary: 'Reschedule — transition session back to scheduled' })
   rescheduleSession(@Param('id') id: string): Promise<unknown> {
     return this.service.updateSessionStatus(id, 'scheduled');
+  }
+
+  @Get('sessions')
+  @RequiresPermission(Permissions.LIVE_VIEW)
+  @ApiOperation({ summary: 'List all livestream sessions for admin' })
+  listSessions(): Promise<LiveSessionPublicDto[]> {
+    return this.service.listAdminSessions();
+  }
+
+  @Delete('sessions/:id')
+  @RequiresPermission(Permissions.LIVE_DELETE)
+  @ApiOperation({ summary: 'Delete a live session' })
+  async deleteSession(@Param('id') id: string): Promise<void> {
+    await this.service.deleteSession(id);
+  }
+
+  @Delete('channels/:id')
+  @RequiresPermission(Permissions.LIVE_DELETE)
+  @ApiOperation({ summary: 'Delete a livestream channel' })
+  async deleteChannel(@Param('id') id: string): Promise<void> {
+    await this.service.deleteChannel(id);
   }
 }
