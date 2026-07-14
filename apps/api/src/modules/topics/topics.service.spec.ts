@@ -42,17 +42,6 @@ describe('TopicsService', () => {
     await expect(service.getBySlug('missing')).rejects.toBeInstanceOf(NotFoundException);
   });
 
-  it('upsert throws NotFoundException when parentSlug is missing', async () => {
-    const dto: UpsertTopicDto = {
-      slug: 'child',
-      name: { en: 'Child' },
-      parentSlug: 'missing-parent',
-    };
-    repo.upsertBySlug.mockResolvedValue(null);
-
-    await expect(service.upsert(dto)).rejects.toBeInstanceOf(NotFoundException);
-  });
-
   it('upsert returns DTO from repo', async () => {
     const dto: UpsertTopicDto = { slug: 'aqeedah', name: { en: 'Aqeedah' } };
     repo.upsertBySlug.mockResolvedValue(sample);

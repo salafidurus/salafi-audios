@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { Prisma, Status } from '@sd/core-db';
 import type {
   TopicDetailDto,
-  TopicViewDto,
   TopicLectureViewDto,
   TranslationViewDto,
   Locale,
@@ -16,7 +15,6 @@ const topicViewSelect = {
   id: true,
   slug: true,
   name: true,
-  parentId: true,
   createdAt: true,
   translations: {
     select: {
@@ -38,18 +36,6 @@ export class TopicsRepository {
     const records = await this.findManyTopics();
 
     return records.map((r) => this.toViewDto(r));
-  }
-
-  async listChildrenBySlug(slug: string): Promise<TopicViewDto[] | null> {
-    const parent = await this.prisma.topic.findUnique({
-      where: { slug },
-      select: { id: true },
-    });
-    if (!parent) return null;
-
-    const records = await this.findManyTopics({ parentId: parent.id });
-
-    return records.map((t) => this.toViewDto(t));
   }
 
   async listPublishedLecturesByTopicSlug(
@@ -151,29 +137,18 @@ export class TopicsRepository {
   }
 
   /**
-   * Upsert Topic by slug, optionally setting parent by parentSlug.
-   *
-   * Returns null if parentSlug is provided but parent does not exist.
+   * Upsert Topic by slug.
    */
-  async upsertBySlug(input: {
-    slug: string;
-    name: string;
-    parentSlug?: string;
-  }): Promise<TopicDetailDto | null> {
-    const parentId = await this.resolveOptionalParentId(input.parentSlug);
-    if (input.parentSlug && !parentId) return null;
-
+  async upsertBySlug(input: { slug: string; name: string }): Promise<TopicDetailDto> {
     const record = await this.prisma.topic.upsert({
       where: { slug: input.slug },
       select: topicViewSelect,
       create: {
         slug: input.slug,
         name: input.name,
-        parentId,
       },
       update: {
         name: input.name,
-        parentId,
       },
     });
 
@@ -252,19 +227,8 @@ export class TopicsRepository {
     return this.mapTopicTranslation(record);
   }
 
-  private async resolveOptionalParentId(parentSlug?: string): Promise<string | null> {
-    if (!parentSlug) return null;
-
-    const parent = await this.prisma.topic.findUnique({
-      where: { slug: parentSlug },
-      select: { id: true },
-    });
-
-    return parent?.id ?? null;
-  }
-
   private async findManyTopics(
-    where?: { slug?: string; parentId?: string },
+    where?: { slug?: string },
     take?: number,
   ): Promise<TopicViewRecord[]> {
     return this.prisma.topic.findMany({
@@ -287,7 +251,6 @@ export class TopicsRepository {
         en: record.name,
         ar: arTranslation,
       },
-      parentId: record.parentId ?? undefined,
       createdAt,
     };
   }

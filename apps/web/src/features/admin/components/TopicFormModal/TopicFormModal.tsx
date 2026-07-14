@@ -13,7 +13,6 @@ export interface TopicForEdit {
   id: string;
   slug: string;
   name: { en: string; ar?: string };
-  parentSlug?: string | null;
 }
 
 export interface TopicFormModalProps {
@@ -51,7 +50,6 @@ function formReducer(state: FormState, action: FormAction): FormState {
         ? {
             name: { en: action.topic.name.en, ar: action.topic.name.ar },
             slug: action.topic.slug,
-            parentSlug: action.topic.parentSlug ?? undefined,
           }
         : { name: { en: "" }, slug: "" };
       return {
@@ -167,7 +165,6 @@ function getInitialFormData(topic: TopicForEdit | null): UpsertTopicDto {
         ar: topic.name.ar,
       },
       slug: topic.slug,
-      parentSlug: topic.parentSlug ?? undefined,
     };
   }
   return { name: { en: "" }, slug: "" };

@@ -4,7 +4,7 @@ import { Controller, Get, Param, Query, UseInterceptors } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
-import type { TopicDetailDto, TopicViewDto, TopicLectureViewDto } from '@sd/core-contracts';
+import type { TopicDetailDto, TopicLectureViewDto } from '@sd/core-contracts';
 import { TopicsService } from './topics.service';
 
 @SkipThrottle()
@@ -29,13 +29,6 @@ export class TopicsController {
   @ApiOkResponse({ description: 'Topic details' })
   getBySlug(@Param('slug') slug: string): Promise<TopicDetailDto> {
     return this.topics.getBySlug(slug);
-  }
-
-  @Get(':slug/children')
-  @ApiOperation({ summary: 'List direct children of a topic' })
-  @ApiOkResponse({ description: 'List of child topics' })
-  listChildren(@Param('slug') slug: string): Promise<TopicViewDto[]> {
-    return this.topics.listChildren(slug);
   }
 
   @Get(':slug/lectures')
