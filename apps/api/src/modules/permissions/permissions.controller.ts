@@ -10,6 +10,7 @@ import {
   type GrantPermissionRequest,
   type GrantRoleRequest,
   type Permission,
+  type UserRoleAssignmentDto,
 } from '@sd/core-contracts';
 
 @ApiTags('Permissions')
@@ -87,6 +88,13 @@ export class PermissionsController {
    * - Only SuperAdmin can grant SuperAdmin role
    * - SuperAdmin cannot be demoted via API (requires direct database operations)
    */
+
+  @Get(':userId/roles')
+  @RequiresPermission(Permissions.USERS_VIEW)
+  @ApiOperation({ summary: 'Get roles for a user' })
+  async getRoles(@Param('userId') userId: string): Promise<{ roles: UserRoleAssignmentDto[] }> {
+    return this.permissionsService.getRoles(userId);
+  }
 
   @Post(':userId/roles')
   @RequiresPermission(Permissions.USERS_GRANT_ROLES)

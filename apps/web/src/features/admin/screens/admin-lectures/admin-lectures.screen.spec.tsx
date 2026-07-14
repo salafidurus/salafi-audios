@@ -21,8 +21,8 @@ vi.mock("@sd/core-contracts", async (importActual) => {
 vi.mock("../../components/AudioUploader/AudioUploader", () => ({
   AudioUploader: () => null,
 }));
-vi.mock("../../components/LectureEditModal/LectureEditModal", () => ({
-  LectureEditModal: () => null,
+vi.mock("../../components/ListingEditModal/ListingEditModal", () => ({
+  ListingEditModal: () => null,
 }));
 
 const mockListingsResponse = {

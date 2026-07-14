@@ -1,1 +1,0 @@
-export { LectureEditModal } from "./LectureEditModal";

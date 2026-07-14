@@ -1,6 +1,6 @@
 import { vi, type Mock } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { LectureEditModal } from "./LectureEditModal";
+import { ListingEditModal } from "./ListingEditModal";
 import { createLecture, updateLecture } from "../../api/admin-lectures.api";
 
 vi.mock("../../api/admin-lectures.api", () => ({
@@ -58,13 +58,13 @@ vi.mock("@sd/core-contracts", async (importOriginal) => {
   };
 });
 
-describe("LectureEditModal", () => {
+describe("ListingEditModal", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it("does not render when isOpen is false", () => {
-    render(<LectureEditModal isOpen={false} onClose={vi.fn()} onSuccess={vi.fn()} />);
+    render(<ListingEditModal isOpen={false} onClose={vi.fn()} onSuccess={vi.fn()} />);
     expect(screen.queryByText(/lecture details/i)).not.toBeInTheDocument();
   });
 
@@ -74,7 +74,7 @@ describe("LectureEditModal", () => {
     (createLecture as Mock).mockResolvedValue({ id: "new-lecture-id" });
 
     render(
-      <LectureEditModal
+      <ListingEditModal
         isOpen={true}
         onClose={onCloseMock}
         onSuccess={onSuccessMock}
@@ -145,11 +145,11 @@ describe("LectureEditModal", () => {
     };
 
     render(
-      <LectureEditModal
+      <ListingEditModal
         isOpen={true}
         onClose={onCloseMock}
         onSuccess={onSuccessMock}
-        lecture={existingLecture}
+        listing={existingLecture}
       />,
     );
 

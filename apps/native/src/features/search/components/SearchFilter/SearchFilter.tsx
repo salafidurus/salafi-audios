@@ -18,10 +18,10 @@ export type SearchFilterProps = {
 
 export function SearchFilter({ value, onChange, topics }: SearchFilterProps) {
   const options = useMemo<FilterOption[]>(() => {
-    const sortedTopics = topics.toSorted((a, b) => a.name.localeCompare(b.name));
+    const sortedTopics = topics.toSorted((a, b) => a.name.en.localeCompare(b.name.en));
     return [
       { id: "all", label: "All" },
-      ...sortedTopics.map((topic) => ({ id: topic.slug, label: topic.name })),
+      ...sortedTopics.map((topic) => ({ id: topic.slug, label: topic.name.en })),
     ];
   }, [topics]);
 

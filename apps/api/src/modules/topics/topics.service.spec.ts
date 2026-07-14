@@ -13,7 +13,7 @@ describe('TopicsService', () => {
   const sample: TopicDetailDto = {
     id: 't1',
     slug: 'aqeedah',
-    name: 'Aqeedah',
+    name: { en: 'Aqeedah' },
     createdAt: new Date().toISOString(),
   };
 
@@ -27,6 +27,7 @@ describe('TopicsService', () => {
             list: vi.fn(),
             findBySlug: vi.fn(),
             upsertBySlug: vi.fn(),
+            upsertTopicTranslation: vi.fn(),
           } satisfies Partial<Mocked<TopicsRepository>>,
         },
       ],
@@ -44,7 +45,7 @@ describe('TopicsService', () => {
   it('upsert throws NotFoundException when parentSlug is missing', async () => {
     const dto: UpsertTopicDto = {
       slug: 'child',
-      name: 'Child',
+      name: { en: 'Child' },
       parentSlug: 'missing-parent',
     };
     repo.upsertBySlug.mockResolvedValue(null);
@@ -53,8 +54,9 @@ describe('TopicsService', () => {
   });
 
   it('upsert returns DTO from repo', async () => {
-    const dto: UpsertTopicDto = { slug: 'aqeedah', name: 'Aqeedah' };
+    const dto: UpsertTopicDto = { slug: 'aqeedah', name: { en: 'Aqeedah' } };
     repo.upsertBySlug.mockResolvedValue(sample);
+    repo.findBySlug.mockResolvedValue(sample);
 
     await expect(service.upsert(dto)).resolves.toEqual(sample);
   });
