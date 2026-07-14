@@ -83,7 +83,7 @@ updates:
 
     # ── Groups ───────────────────────────────────
     groups:
-      # Dev-tooling patches & minors — linting, formatting, git hooks.
+      # Dev-tooling — formatters, linters, bundlers, type defs, utilities.
       dev-tooling:
         applies-to: version-updates
         patterns:
@@ -99,11 +99,31 @@ updates:
           - "oxlint-*"
           - "@oxlint/*"
           - "react-doctor"
+          - "oxfmt"
+          - "markdownlint-cli2"
+          - "secretlint"
+          - "@secretlint/*"
+          - "tsup"
+          - "tsx"
+          - "ts-node"
+          - "tsconfig-paths"
+          - "ts-loader"
+          - "rimraf"
+          - "@types/*"
+          - "source-map-support"
+          - "@swc/*"
+          - "pino-pretty"
+          - "tailwindcss"
+          - "@tailwindcss/*"
+          - "argent"
+          - "bun-types"
+          - "@sentry/cli"
         update-types:
+          - major
           - minor
           - patch
 
-      # Test-tooling patches & minors — test runners and assertion libs.
+      # Test-tooling — test runners, assertion libs, HTTP assertion libs.
       test-tooling:
         applies-to: version-updates
         patterns:
@@ -114,7 +134,10 @@ updates:
           - "@testing-library/*"
           - "playwright"
           - "@playwright/*"
+          - "supertest"
+          - "@types/supertest"
         update-types:
+          - major
           - minor
           - patch
 
