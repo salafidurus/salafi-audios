@@ -15,7 +15,7 @@ const mockScholar: ScholarHeaderProps["scholar"] = {
   seriesCount: 5,
   totalDurationSeconds: 7200, // 2 hours
   bio: "This is a short bio.",
-  country: "Saudi Arabia",
+  country: "SA",
   isActive: true,
   createdAt: "2024-01-01T00:00:00Z",
 };
@@ -24,7 +24,7 @@ describe("ScholarHeader", () => {
   it("renders scholar details successfully", () => {
     render(<ScholarHeader scholar={mockScholar} />);
     expect(screen.getByText("Abdul Aziz bin Baz")).toBeInTheDocument();
-    expect(screen.getByText("Saudi Arabia · ar")).toBeInTheDocument();
+    expect(screen.getByText("SA · ar")).toBeInTheDocument();
     expect(screen.getByText("42")).toBeInTheDocument(); // lectures count
     expect(screen.getByText("5")).toBeInTheDocument(); // series count
     expect(screen.getByText("2h")).toBeInTheDocument(); // duration hours

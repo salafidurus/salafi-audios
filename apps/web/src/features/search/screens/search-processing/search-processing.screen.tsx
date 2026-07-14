@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { Search } from "@/shared/components/Search";
 import { SearchResultItem } from "@/features/search/components/SearchResultItem/SearchResultItem";
 import { SearchResultEmpty } from "@/features/search/components/SearchResultEmpty/SearchResultEmpty";

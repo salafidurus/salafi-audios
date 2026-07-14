@@ -3,7 +3,6 @@ import { render, screen } from "@testing-library/react";
 import { AdminLecturesScreen } from "./admin-lectures.screen";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 import { useApiQuery } from "@sd/core-contracts";
-import { useResponsive } from "@/shared/hooks/use-responsive";
 
 vi.mock("@/features/admin/hooks/use-admin-permissions", () => ({
   useAdminPermissions: vi.fn(),

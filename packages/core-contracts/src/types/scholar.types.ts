@@ -4,6 +4,7 @@ import {
   LocaleSchema,
   ScholarOriginalFieldsSchema,
 } from "./localization.types";
+import { CountryCodeSchema } from "./country.types";
 
 export const ScholarContentItemDtoSchema = z.object({
   id: z.string(),
@@ -39,7 +40,7 @@ export const ScholarDetailDtoSchema = z.object({
   slug: z.string(),
   name: z.string(),
   bio: z.string().optional(),
-  country: z.string().optional(),
+  country: CountryCodeSchema.optional(),
   mainLanguage: LocaleSchema.optional(),
   /** Language the original (untranslated) name/bio are written in. */
   originalLanguage: LocaleSchema.optional(),
@@ -137,7 +138,7 @@ export const CreateScholarDtoSchema = z.object({
   isKibar: z.boolean().optional(),
   isFeatured: z.boolean().optional(),
   isActive: z.boolean().optional(),
-  country: z.string().min(1, "Country must not be empty").default("Saudi Arabia"),
+  country: CountryCodeSchema.default("SA"),
   mainLanguage: LocaleSchema.default("ar"),
   socialTwitter: z.string().url().optional().or(z.literal("")),
   socialTelegram: z.string().url().optional().or(z.literal("")),
@@ -161,3 +162,29 @@ export const UpdateScholarTranslationDtoSchema = z.object({
   bio: z.string().nullable().optional(),
 });
 export type UpdateScholarTranslationDto = z.infer<typeof UpdateScholarTranslationDtoSchema>;
+
+const AdminScholarTranslationSchema = z.object({
+  locale: z.string(),
+  name: z.string(),
+  status: z.enum(["draft", "published"]),
+});
+
+export const AdminScholarListItemDtoSchema = z.object({
+  id: z.string(),
+  slug: z.string(),
+  name: z.string(),
+  bio: z.string().optional(),
+  country: CountryCodeSchema.optional(),
+  mainLanguage: LocaleSchema.optional(),
+  imageUrl: z.string().optional(),
+  isActive: z.boolean(),
+  isKibar: z.boolean(),
+  socialTwitter: z.string().optional(),
+  socialTelegram: z.string().optional(),
+  socialYoutube: z.string().optional(),
+  socialWebsite: z.string().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string().optional(),
+  translations: z.array(AdminScholarTranslationSchema),
+});
+export type AdminScholarListItemDto = z.infer<typeof AdminScholarListItemDtoSchema>;

@@ -21,7 +21,7 @@ export const SCHOLARS: ScholarData[] = [
     name: "Muhammad ibn Salih al-Uthaymin",
     bio: "Foremost scholar of Ahl al-Sunnah in the 20th century. Expert in fiqh, aqeedah, and tafsir.",
     isKibar: true,
-    country: "Saudi Arabia",
+    country: "SA",
     mainLanguage: "ar",
   },
   {
@@ -30,7 +30,7 @@ export const SCHOLARS: ScholarData[] = [
     name: "Salih ibn Fawzan al-Fawzan",
     bio: "The Grand Mufti of the Kingdom of Saudi Arabia. Expert in various field of Islamic knowledge: Aqeedah, Fiqh, Tafsir, etc.",
     isKibar: true,
-    country: "Saudi Arabia",
+    country: "SA",
     mainLanguage: "ar",
   },
   {
@@ -39,7 +39,7 @@ export const SCHOLARS: ScholarData[] = [
     name: "Arafat bn Hasan Al-Muhammadi",
     bio: "Contemporary Salafi scholar based in Saudi Arabia. Known for aqeedah and fiqh series.",
     isKibar: false,
-    country: "Yemen",
+    country: "YE",
     mainLanguage: "ar",
   },
   {
@@ -48,7 +48,7 @@ export const SCHOLARS: ScholarData[] = [
     name: "Mustafa bn Mabram",
     bio: "Specialist in Arabic grammar (nahw and sarf). Author of textbooks on i'rab.",
     isKibar: false,
-    country: "Yemen",
+    country: "YE",
     mainLanguage: "ar",
   },
   {
@@ -57,7 +57,7 @@ export const SCHOLARS: ScholarData[] = [
     name: "Abdullah al-Bukhari",
     bio: "Contemporary muhaddith specializing in hadith sciences and mustalah al-hadith.",
     isKibar: true,
-    country: "Saudi Arabia",
+    country: "SA",
     mainLanguage: "ar",
   },
   {
@@ -66,7 +66,7 @@ export const SCHOLARS: ScholarData[] = [
     name: "Scholar Name (English)",
     bio: "English biography",
     isKibar: false,
-    country: "Saudi Arabia",
+    country: "SA",
     mainLanguage: "ar",
   },
 ];

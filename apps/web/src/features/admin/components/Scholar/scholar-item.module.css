@@ -1,0 +1,169 @@
+.listItem {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.details {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.avatarBlock {
+  flex-shrink: 0;
+}
+
+.detailsBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.name {
+  font-size: var(--typo-body-md-font-size);
+  font-weight: 600;
+  color: var(--content-strong);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
+  margin-top: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+.slug {
+  color: var(--content-subtle);
+}
+
+.sep {
+  color: var(--border-strong);
+}
+
+.country {
+  color: var(--content-muted);
+}
+
+.kibarBadge {
+  font-size: var(--typo-caption-font-size);
+  padding: 1px 6px;
+  background-color: var(--surface-primary-subtle);
+  color: var(--content-primary);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.translationRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+.translationChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--typo-xs-font-size);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-subtle);
+  color: var(--content-subtle);
+}
+
+.translationDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dotPublished {
+  background-color: var(--action-success);
+}
+
+.dotDraft {
+  background-color: var(--border-muted);
+}
+
+.meta {
+  margin-top: var(--space-sm);
+  padding-left: 0;
+}
+
+.bio {
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-default);
+  margin: 0 0 var(--space-xs);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.socialRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.socialLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background-color: var(--surface-subtle);
+  color: var(--content-muted);
+  transition: all 150ms ease;
+}
+
+.socialLink:hover {
+  background-color: var(--action-primary);
+  color: var(--content-on-primary);
+}
+
+@media (max-width: 640px) {
+  .details {
+    gap: var(--space-lg);
+  }
+
+  .name {
+    font-size: var(--typo-body-sm-font-size);
+  }
+
+  .kibarBadge {
+    display: none;
+  }
+
+  .bio {
+    -webkit-line-clamp: 3;
+  }
+}
+
+.editButtonMobile {
+  width: 100%;
+  justify-content: center;
+}

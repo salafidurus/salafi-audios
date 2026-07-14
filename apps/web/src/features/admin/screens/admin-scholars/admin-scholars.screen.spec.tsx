@@ -13,6 +13,7 @@ vi.mock("@sd/core-contracts", async (importActual) => {
 });
 vi.mock("@/shared/hooks/use-responsive", () => ({
   useResponsive: () => ({ isMobile: false }),
+  useIsDesktop: () => true,
 }));
 
 describe("AdminScholarsScreen", () => {

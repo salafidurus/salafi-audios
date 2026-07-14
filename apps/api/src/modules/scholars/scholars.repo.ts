@@ -8,6 +8,7 @@ import type {
   ScholarContentItemDto,
   ScholarTopicsDto,
   TranslationViewDto,
+  AdminScholarListItemDto,
   Locale,
 } from '@sd/core-contracts';
 import type { CreateScholarDto } from './dto/create-scholar.dto';
@@ -145,7 +146,7 @@ export class ScholarsRepository {
       slug: record.slug,
       name: resolved.fields.name,
       bio: resolved.fields.bio ?? undefined,
-      country: record.country ?? undefined,
+      country: (record.country ?? undefined) as ScholarDetailDto['country'],
       mainLanguage: record.mainLanguage ?? undefined,
       originalLanguage: resolved.originalLanguage,
       original: resolved.original
@@ -350,6 +351,56 @@ export class ScholarsRepository {
     return this.prisma.scholar.findUnique({
       where: { id },
     });
+  }
+
+  async adminList(): Promise<AdminScholarListItemDto[]> {
+    const records = await this.prisma.scholar.findMany({
+      orderBy: { name: 'asc' },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        bio: true,
+        country: true,
+        mainLanguage: true,
+        imageUrl: true,
+        isActive: true,
+        isKibar: true,
+        socialTwitter: true,
+        socialTelegram: true,
+        socialYoutube: true,
+        socialWebsite: true,
+        createdAt: true,
+        updatedAt: true,
+        translations: {
+          select: { locale: true, name: true, status: true },
+          orderBy: { locale: 'asc' },
+        },
+      },
+    });
+
+    return records.map((r) => ({
+      id: r.id,
+      slug: r.slug,
+      name: r.name,
+      bio: r.bio ?? undefined,
+      country: (r.country ?? undefined) as AdminScholarListItemDto['country'],
+      mainLanguage: r.mainLanguage ?? undefined,
+      imageUrl: r.imageUrl ?? undefined,
+      isActive: r.isActive,
+      isKibar: r.isKibar,
+      socialTwitter: r.socialTwitter ?? undefined,
+      socialTelegram: r.socialTelegram ?? undefined,
+      socialYoutube: r.socialYoutube ?? undefined,
+      socialWebsite: r.socialWebsite ?? undefined,
+      createdAt: r.createdAt.toISOString(),
+      updatedAt: r.updatedAt?.toISOString(),
+      translations: r.translations.map((t) => ({
+        locale: t.locale,
+        name: t.name,
+        status: t.status === 'published' ? 'published' : ('draft' as const),
+      })),
+    }));
   }
 
   async create(dto: CreateScholarDto) {

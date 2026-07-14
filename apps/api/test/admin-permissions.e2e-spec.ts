@@ -73,7 +73,7 @@ describe('Admin Permission Boundaries (e2e)', () => {
         .send({
           name: 'Forbidden Scholar',
           slug: 'forbidden-scholar-slug',
-          country: 'Saudi Arabia',
+          country: 'SA',
           mainLanguage: 'ar',
         })
         .expect(403);
@@ -206,7 +206,7 @@ describe('Admin Permission Boundaries (e2e)', () => {
         .send({
           name: 'Attempted Scholar',
           slug: 'attempted-scholar-slug',
-          country: 'Saudi Arabia',
+          country: 'SA',
           mainLanguage: 'ar',
         })
         .expect(403);

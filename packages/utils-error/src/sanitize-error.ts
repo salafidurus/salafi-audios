@@ -47,6 +47,7 @@ export function sanitizeError(error: unknown): string {
     ],
     [/401|unauthorized/i, "Your session expired. Please sign in again."],
     [/403|forbidden/i, "You don't have permission to perform this action."],
+    [/400|validation|invalid data/i, "Invalid input. Please check your entries."],
     [/404|not found|does not exist/i, "Item not found."],
     [/500|server error|internal error/i, "Server error. Please try again later."],
     [/timeout|took too long/i, "Request took too long. Please try again."],

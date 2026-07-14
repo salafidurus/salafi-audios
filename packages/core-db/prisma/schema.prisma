@@ -249,7 +249,7 @@ model Scholar {
   slug         String
   name         String
   bio          String?
-  country      String   @default("Saudi Arabia")
+  country      String   @default("SA")
   mainLanguage Locale   @default(ar)
   imageUrl     String?
   isActive     Boolean  @default(true)

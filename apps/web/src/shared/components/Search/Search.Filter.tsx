@@ -86,7 +86,6 @@ export function SearchFilter({
   onChipRemove,
   className,
   showCloseButton = true,
-  multiple = false,
   includeAllOption = true,
 }: SearchFilterProps) {
   const handleChipClick = (chipId: string) => {
