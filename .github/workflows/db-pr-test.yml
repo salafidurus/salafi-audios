@@ -28,7 +28,7 @@ jobs:
     steps:
       - name: Get branch name
         id: branch_name
-        uses: tj-actions/branch-names@v8
+        uses: tj-actions/branch-names@v9
 
   validate_and_migrate:
     name: Create Branch & Validate Schema & Run Migrations
