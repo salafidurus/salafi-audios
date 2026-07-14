@@ -1,0 +1,10 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "onboarding": false,
+  "platform": "github",
+  "forkProcessing": "enabled",
+  "branchPrefix": "test-renovate/",
+  "username": "renovate-release",
+  "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
+  "repositories": ["salafidurus/salafi-audios"]
+}
