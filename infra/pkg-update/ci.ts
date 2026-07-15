@@ -36,8 +36,8 @@ function exec(
   args: string[],
   opts?: { cwd?: string },
 ): { stdout: string; stderr: string; status: number | null } {
+  // nosemgrep
   const result = spawnSync(cmd, args, {
-    // nosemgrep
     encoding: "utf-8",
     cwd: opts?.cwd,
   });
@@ -306,6 +306,11 @@ async function processBatch(
     if (!lockfileUpdated(wtDir)) {
       throw new Error("Lockfile verification failed: bun.lock was not updated by bun install");
     }
+
+    exec("git", ["config", "user.email", "github-actions[bot]@users.noreply.github.com"], {
+      cwd: wtDir,
+    });
+    exec("git", ["config", "user.name", "github-actions[bot]"], { cwd: wtDir });
 
     const baseMsg =
       batch.groupName === "ungrouped"
