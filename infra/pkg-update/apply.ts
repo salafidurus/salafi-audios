@@ -1,5 +1,5 @@
-import { readFileSync, writeFileSync, existsSync, readdirSync } from "fs";
-import { resolve } from "path";
+import { readFileSync, writeFileSync, existsSync, readdirSync, mkdirSync } from "fs";
+import { resolve, dirname } from "path";
 import { spawnSync } from "child_process";
 import type { UpdateCandidate } from "./utils/ui";
 import { config, type PkupdateConfig } from "./pkg-update.config";
@@ -166,12 +166,24 @@ export async function applyBunUpdate(
   const version = candidate.latestVersion.replace("bun@", "");
   content.packageManager = `bun@${version}`;
 
+  const engines = content.engines as Record<string, string> | undefined;
+  if (engines) {
+    engines.bun = version;
+  } else {
+    content.engines = { bun: version };
+  }
+
   const devDeps = content.devDependencies as Record<string, string> | undefined;
   if (devDeps?.["bun-types"]) {
     devDeps["bun-types"] = `^${version}`;
   }
 
   writeFileSync(pkgPath, JSON.stringify(content, null, 2) + "\n");
+
+  const bunVerPath = resolve(rootDir, ".bun-version"); // nosemgrep
+  mkdirSync(dirname(bunVerPath), { recursive: true });
+  writeFileSync(bunVerPath, `${version}\n`);
+
   return true;
 }
 
