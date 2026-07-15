@@ -108,6 +108,7 @@ describe("catalog-scanner", () => {
     const hardcodedZod = issues.find(i => i.depName === "zod" && i.type === "hardcoded");
     expect(hardcodedZod).toBeDefined();
     expect(hardcodedZod?.pkgName).toBe("@sd/web");
+    expect(hardcodedZod?.details).toContain("@sd/web");
 
     // Verify duplicates outside catalog
     const pgDuplicate = duplicates.find(d => d.depName === "pg");

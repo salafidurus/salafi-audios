@@ -111,7 +111,7 @@ export function runCatalogCheck(rootDir: string): { issues: CatalogIssue[], dupl
               type: "missing",
               pkgName: pkg.name,
               depName: name,
-              details: `'${name}' uses "catalog:" but is missing from default catalog`
+              details: `'${pkg.name}': '${name}' uses "catalog:" but is missing from default catalog`
             });
           }
         } else if (version.startsWith("catalog:")) {
@@ -121,7 +121,7 @@ export function runCatalogCheck(rootDir: string): { issues: CatalogIssue[], dupl
               type: "missing",
               pkgName: pkg.name,
               depName: name,
-              details: `'${name}' uses "${version}" but is missing from catalogs.${groupName}`
+              details: `'${pkg.name}': '${name}' uses "${version}" but is missing from catalogs.${groupName}`
             });
           }
         } else {
@@ -134,7 +134,7 @@ export function runCatalogCheck(rootDir: string): { issues: CatalogIssue[], dupl
                 depName: name,
                 expectedVersion: catalogs.default[name],
                 actualVersion: version,
-                details: `'${name}' specifies "${version}" explicitly but matches default catalog`
+                details: `'${pkg.name}': '${name}' specifies "${version}" explicitly but matches default catalog (should use "catalog:")`
               });
             } else {
               issues.push({
@@ -143,7 +143,7 @@ export function runCatalogCheck(rootDir: string): { issues: CatalogIssue[], dupl
                 depName: name,
                 expectedVersion: catalogs.default[name],
                 actualVersion: version,
-                details: `'${name}' specifies "${version}" explicitly but default catalog has "${catalogs.default[name]}"`
+                details: `'${pkg.name}': '${name}' specifies "${version}" explicitly but default catalog has "${catalogs.default[name]}"`
               });
             }
           }
@@ -157,7 +157,7 @@ export function runCatalogCheck(rootDir: string): { issues: CatalogIssue[], dupl
                   depName: name,
                   expectedVersion: groupDeps[name],
                   actualVersion: version,
-                  details: `'${name}' specifies "${version}" explicitly but matches catalogs.${groupName}`
+                  details: `'${pkg.name}': '${name}' specifies "${version}" explicitly but matches catalogs.${groupName} (should use "catalog:${groupName}")`
                 });
               }
             }
