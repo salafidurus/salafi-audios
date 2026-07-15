@@ -95,6 +95,7 @@
       "name": "native",
       "version": "1.0.0",
       "dependencies": {
+        "@babel/runtime": "^7.29.7",
         "@better-auth/expo": "catalog:",
         "@expo/dom-webview": "~56.0.6",
         "@expo/metro-runtime": "~56.0.16",
@@ -164,7 +165,6 @@
         "zustand": "catalog:",
       },
       "devDependencies": {
-        "@babel/runtime": "^7.29.7",
         "@sentry/cli": "~2.58.4",
         "@testing-library/react-native": "^14.0.0",
         "@types/jest": "^29.5.14",
