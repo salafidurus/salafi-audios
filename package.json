@@ -4,6 +4,7 @@
   "workspaces": {
     "packages": [
       "apps/*",
+      "infra/*",
       "packages/*"
     ],
     "catalog": {
@@ -60,6 +61,7 @@
     "clean": "turbo run clean",
     "clean:hard": "(turbo run clean || true) && rimraf node_modules .turbo \"**/node_modules\" \"**/.next\" \"**/dist\" \"**/build\" \"**/coverage\"",
     "local-clean": "rimraf node_modules **/node_modules **/.turbo .turbo",
+    "pkg-update": "bun run infra/pkg-update/index.ts",
     "prepare": "husky",
     "postinstall": "bun ./scripts/postinstall.mjs",
     "lint:staged": "lint-staged",
