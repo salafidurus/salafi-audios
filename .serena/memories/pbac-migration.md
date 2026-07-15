@@ -68,7 +68,7 @@ Comprehensive migration from role-based access control (RBAC) to permission-base
 ### Permission Naming
 
 - Enum values use UPPER_SNAKE_CASE (e.g., `SCHOLARS_EDIT`, `LISTINGS_CREATE`)
-- Organized by entity: SCHOLARS*\*, LISTINGS*\_, TOPICS\__, TRANSLATIONS*\*, MEDIA*_, USERS\_\_, LIVE\_\*
+- Organized by entity: SCHOLARS*\*, LISTINGS*\_, TOPICS\__, TRANSLATIONS\*\*, MEDIA*_, USERS\_\_, LIVE\_\*
 - Follows action pattern: VIEW, CREATE, EDIT, DELETE, PUBLISH
 
 ### Role to Permission Mapping
