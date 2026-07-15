@@ -63,3 +63,120 @@ export function getWorkspaces(rootDir: string): Workspace[] {
 
   return workspaces;
 }
+
+export interface CatalogIssue {
+  type: "missing" | "mismatch" | "hardcoded";
+  pkgName: string;
+  depName: string;
+  expectedVersion?: string;
+  actualVersion?: string;
+  details: string;
+}
+
+export interface CatalogDuplicate {
+  depName: string;
+  workspaces: string[];
+  versions: string[];
+}
+
+export function runCatalogCheck(rootDir: string): { issues: CatalogIssue[], duplicates: CatalogDuplicate[] } {
+  const rootJsonPath = path.join(rootDir, "package.json");
+  const rootJson: PackageJson = JSON.parse(fs.readFileSync(rootJsonPath, "utf-8"));
+  const catalogs = parseCatalogs(rootJson);
+  const workspaces = getWorkspaces(rootDir);
+  const allPackages = [{ name: "root", content: rootJson }, ...workspaces];
+
+  const dependencyMap: Record<string, { workspaces: string[]; versions: string[] }> = {};
+  const issues: CatalogIssue[] = [];
+  const duplicates: CatalogDuplicate[] = [];
+
+  for (const pkg of allPackages) {
+    const depTypes = ["dependencies", "devDependencies"] as const;
+    for (const depType of depTypes) {
+      const deps = pkg.content[depType] || {};
+      for (const [name, version] of Object.entries(deps)) {
+        if (version.startsWith("workspace:") || name.startsWith("@sd/")) continue;
+
+        if (!version.startsWith("catalog:")) {
+          if (!dependencyMap[name]) {
+            dependencyMap[name] = { workspaces: [], versions: [] };
+          }
+          dependencyMap[name].workspaces.push(pkg.name);
+          dependencyMap[name].versions.push(version);
+        }
+
+        if (version === "catalog:") {
+          if (!catalogs.default[name]) {
+            issues.push({
+              type: "missing",
+              pkgName: pkg.name,
+              depName: name,
+              details: `'${name}' uses "catalog:" but is missing from default catalog`
+            });
+          }
+        } else if (version.startsWith("catalog:")) {
+          const groupName = version.split(":")[1];
+          if (!catalogs.named[groupName] || !catalogs.named[groupName][name]) {
+            issues.push({
+              type: "missing",
+              pkgName: pkg.name,
+              depName: name,
+              details: `'${name}' uses "${version}" but is missing from catalogs.${groupName}`
+            });
+          }
+        } else {
+          // Explicit version check
+          if (catalogs.default[name]) {
+            if (catalogs.default[name] === version) {
+              issues.push({
+                type: "hardcoded",
+                pkgName: pkg.name,
+                depName: name,
+                expectedVersion: catalogs.default[name],
+                actualVersion: version,
+                details: `'${name}' specifies "${version}" explicitly but matches default catalog`
+              });
+            } else {
+              issues.push({
+                type: "mismatch",
+                pkgName: pkg.name,
+                depName: name,
+                expectedVersion: catalogs.default[name],
+                actualVersion: version,
+                details: `'${name}' specifies "${version}" explicitly but default catalog has "${catalogs.default[name]}"`
+              });
+            }
+          }
+
+          for (const [groupName, groupDeps] of Object.entries(catalogs.named)) {
+            if (groupDeps[name]) {
+              if (groupDeps[name] === version) {
+                issues.push({
+                  type: "hardcoded",
+                  pkgName: pkg.name,
+                  depName: name,
+                  expectedVersion: groupDeps[name],
+                  actualVersion: version,
+                  details: `'${name}' specifies "${version}" explicitly but matches catalogs.${groupName}`
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  for (const [name, info] of Object.entries(dependencyMap)) {
+    const isCataloged = catalogs.default[name] || Object.values(catalogs.named).some(g => g[name]);
+    if (!isCataloged && info.workspaces.length >= 2) {
+      duplicates.push({
+        depName: name,
+        workspaces: info.workspaces,
+        versions: info.versions
+      });
+    }
+  }
+
+  return { issues, duplicates };
+}
