@@ -324,7 +324,7 @@ async function processBatch(
       throw new Error(`git commit failed: ${commitResult.stderr}`);
     }
 
-    const pushResult = exec("git", ["push", "origin", `HEAD:${branch}`], {
+    const pushResult = exec("git", ["push", "origin", `HEAD:refs/heads/${branch}`], {
       cwd: wtDir,
     });
     if (pushResult.status !== 0) {
