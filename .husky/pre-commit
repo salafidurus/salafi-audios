@@ -40,7 +40,21 @@ else
   printf '%s\n' "Semgrep check failed. Commit blocked." >&2
   exit 1
 fi
-# semgrep hook end
+# catalog fix start
+printf "pre-commit: running catalog auto-fixer...\n"
+bun run catalog fix
+
+# Stage any package.json files modified by the fixer
+git diff --name-only | grep 'package.json' | while read -r file; do
+  git add "$file"
+done
+
+# Run check to verify no outstanding blocking issues remain
+if ! bun run catalog; then
+  printf "\x1b[31mCatalog validation failed. Commit blocked.\x1b[0m\n" >&2
+  exit 1
+fi
+# catalog fix end
 
 bun run lint:staged
 
