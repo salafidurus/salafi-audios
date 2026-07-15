@@ -15,11 +15,12 @@ function printHelp() {
 Bun Dependency Catalog Manager
 
 Usage:
-  bun catalog [command]
+  bun catalog [command] [options]
 
 Commands:
   check      Scans workspaces and reports misalignment or duplicates (Default)
-  fix        Safely fixes explicit dependency references matching catalog versions
+  fix        Safely fixes explicit dependency references matching catalog versions.
+             Use --force (-f) to forcefully align mismatches to the highest catalog version.
   stats      Shows catalog alignment metrics
   unused     Lists catalog items that are not referenced anywhere
   prune      Removes unused catalog items from the root package.json
@@ -53,12 +54,13 @@ async function main() {
     }
 
     case "fix": {
-      const { updatedFiles } = runCatalogFix(rootDir);
+      const force = process.argv.includes("--force") || process.argv.includes("-f");
+      const { updatedFiles } = runCatalogFix(rootDir, { force });
       if (updatedFiles.length > 0) {
         console.log(`\x1b[32mSuccessfully aligned catalog references in: ${updatedFiles.join(", ")}\x1b[0m`);
         console.log("Run 'bun install' to regenerate the lockfile.");
       } else {
-        console.log("No exact version alignments to fix.");
+        console.log(force ? "No catalog references found to forcefully fix." : "No exact version alignments to fix.");
       }
       break;
     }

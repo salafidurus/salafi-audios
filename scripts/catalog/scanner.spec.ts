@@ -214,4 +214,39 @@ describe("catalog-scanner", () => {
     expect(rootContent.workspaces.catalogs.frontend.react).toBeDefined();
     expect(rootContent.workspaces.catalogs.frontend.lodash).toBeUndefined();
   });
+
+  it("force-fixes mismatches to the highest catalog version", () => {
+    setupMockMonorepo({
+      rootPackageJson: {
+        name: "root",
+        workspaces: {
+          packages: ["apps/*"],
+          catalog: {
+            zod: "^4.0.0"
+          },
+          catalogs: {
+            backend: {
+              zod: "^4.5.0"
+            }
+          }
+        }
+      },
+      workspaces: {
+        "apps/web/package.json": {
+          name: "@sd/web",
+          dependencies: {
+            zod: "^3.0.0"
+          }
+        }
+      }
+    });
+
+    const { updatedFiles } = runCatalogFix(TEMP_DIR, { force: true });
+    expect(updatedFiles).toContain("@sd/web");
+
+    const pkgContent = JSON.parse(
+      fs.readFileSync(path.join(TEMP_DIR, "apps/web/package.json"), "utf-8")
+    );
+    expect(pkgContent.dependencies.zod).toBe("catalog:backend");
+  });
 });

@@ -181,13 +181,25 @@ export function runCatalogCheck(rootDir: string): { issues: CatalogIssue[], dupl
   return { issues, duplicates };
 }
 
-export function runCatalogFix(rootDir: string): { updatedFiles: string[] } {
+export function runCatalogFix(rootDir: string, options: { force?: boolean } = {}): { updatedFiles: string[] } {
   const rootJsonPath = path.join(rootDir, "package.json");
   const rootJson = JSON.parse(fs.readFileSync(rootJsonPath, "utf-8"));
   const catalogs = parseCatalogs(rootJson);
   const workspaces = getWorkspaces(rootDir);
   const allPackages = [{ name: "root", path: rootJsonPath, content: rootJson }, ...workspaces];
   const updatedFiles: string[] = [];
+
+  const compareSemver = (v1: string, v2: string): number => {
+    const clean = (v: string) => v.replace(/^[\^~v]/, "").split(".");
+    const parts1 = clean(v1).map(Number);
+    const parts2 = clean(v2).map(Number);
+    for (let i = 0; i < 3; i++) {
+      const p1 = parts1[i] || 0;
+      const p2 = parts2[i] || 0;
+      if (p1 !== p2) return p1 - p2;
+    }
+    return 0;
+  };
 
   for (const pkg of allPackages) {
     let modified = false;
@@ -207,11 +219,38 @@ export function runCatalogFix(rootDir: string): { updatedFiles: string[] } {
           continue;
         }
 
+        let matchedNamed = false;
         for (const [groupName, groupDeps] of Object.entries(catalogs.named)) {
           if (groupDeps[name] && groupDeps[name] === version) {
             deps[name] = `catalog:${groupName}`;
             modified = true;
+            matchedNamed = true;
             break;
+          }
+        }
+        if (matchedNamed) continue;
+
+        // Mismatch force-fix (if enabled)
+        if (options.force) {
+          const candidates: { groupName?: string; version: string }[] = [];
+          if (catalogs.default[name]) {
+            candidates.push({ version: catalogs.default[name] });
+          }
+          for (const [groupName, groupDeps] of Object.entries(catalogs.named)) {
+            if (groupDeps[name]) {
+              candidates.push({ groupName, version: groupDeps[name] });
+            }
+          }
+
+          if (candidates.length > 0) {
+            candidates.sort((a, b) => compareSemver(b.version, a.version));
+            const highest = candidates[0];
+            if (highest.groupName) {
+              deps[name] = `catalog:${highest.groupName}`;
+            } else {
+              deps[name] = "catalog:";
+            }
+            modified = true;
           }
         }
       }
