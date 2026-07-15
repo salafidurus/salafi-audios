@@ -104,6 +104,28 @@ describe("buildChangelogSection", () => {
     expect(result).not.toContain(".git");
   });
 
+  it("rejects non-github.com hosts even if URL contains 'github.com' substring", async () => {
+    setMockFetch((url: string) => {
+      if (url.startsWith("https://registry.npmjs.org/")) {
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              repository: { url: "https://evil-github.com/foo/bar.git" },
+            }),
+            { status: 200 },
+          ),
+        );
+      }
+      return Promise.resolve(new Response("Not found", { status: 404 }));
+    });
+
+    const { buildChangelogSection } = await getModule();
+    const result = await buildChangelogSection("zod", "3.0.0", "4.0.0");
+
+    expect(result).toContain("npmjs.com");
+    expect(result).not.toContain("compare");
+  });
+
   it("returns npm URL when registry has no repository field", async () => {
     setMockFetch((url: string) => {
       return Promise.resolve(new Response(JSON.stringify({ name: "zod" }), { status: 200 }));

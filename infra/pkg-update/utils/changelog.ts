@@ -8,6 +8,14 @@ function stripRepoUrl(url: string): string {
   return url.replace(/^git\+/, "").replace(/\.git$/, "");
 }
 
+function isGitHubUrl(url: string): boolean {
+  try {
+    return new URL(url).hostname === "github.com";
+  } catch {
+    return /(?:^|[/@])github\.com[:/]/.test(url);
+  }
+}
+
 async function fetchNpmRepoUrl(packageName: string): Promise<string | null> {
   const cached = npmRepoCache.get(packageName);
   if (cached) return cached;
@@ -89,7 +97,7 @@ async function fetchGitHubCompareUrl(
   const repoUrl = await fetchNpmRepoUrl(packageName);
   if (!repoUrl) return null;
 
-  if (repoUrl.includes("github.com")) {
+  if (isGitHubUrl(repoUrl)) {
     const compareResult = await fetchGitCompareUrl(repoUrl, fromVersion, toVersion, token);
     if (compareResult) return compareResult;
   }
@@ -110,7 +118,7 @@ export async function buildChangelogSection(
   const repoUrl = await fetchNpmRepoUrl(packageName);
   const path = repoUrl?.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
-  if (repoUrl && repoUrl.includes("github.com")) {
+  if (repoUrl && isGitHubUrl(repoUrl)) {
     const compareContent = await fetchGitCompareUrl(repoUrl, fromVersion, toVersion, token);
     if (compareContent) {
       lines.push(compareContent);
