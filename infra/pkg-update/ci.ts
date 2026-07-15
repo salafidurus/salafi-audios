@@ -292,20 +292,34 @@ async function processBatch(
     if (addResult.status !== 0) {
       throw new Error(`worktree add failed: ${addResult.stderr}`);
     }
+    console.log(`[${batch.groupName}] Worktree created at ${wtDir}`);
 
+    const baseInstallResult = exec("bun", ["install", "--frozen-lockfile"], { cwd: wtDir });
+    if (baseInstallResult.status !== 0) {
+      throw new Error(
+        `worktree base install failed: ${baseInstallResult.stderr || baseInstallResult.stdout}`,
+      );
+    }
+    console.log(`[${batch.groupName}] Baseline dependencies installed`);
+
+    console.log(`[${batch.groupName}] Applying updates for ${batch.candidates.length} packages...`);
     const applyOk = await applyUpdatesToWorktree(batch.candidates, wtDir);
     if (!applyOk) {
       throw new Error("applyUpdate failed for one or more packages");
     }
+    console.log(`[${batch.groupName}] Package updates applied`);
 
+    console.log(`[${batch.groupName}] Installing updated dependencies...`);
     const verifyResult = exec("bun", ["install"], { cwd: wtDir });
     if (verifyResult.status !== 0) {
       throw new Error(`bun install failed: ${verifyResult.stderr || verifyResult.stdout}`);
     }
+    console.log(`[${batch.groupName}] Updated dependencies installed`);
 
     if (!lockfileUpdated(wtDir)) {
       throw new Error("Lockfile verification failed: bun.lock was not updated by bun install");
     }
+    console.log(`[${batch.groupName}] Lockfile updated`);
 
     exec("git", ["config", "user.email", "github-actions[bot]@users.noreply.github.com"], {
       cwd: wtDir,
@@ -317,19 +331,23 @@ async function processBatch(
         ? "chore(deps): update ungrouped packages"
         : `chore(deps): update ${batch.groupName}`;
     exec("git", ["add", "-A"], { cwd: wtDir });
+    console.log(`[${batch.groupName}] Committing changes...`);
     const commitResult = exec("git", ["commit", "-m", baseMsg], {
       cwd: wtDir,
     });
     if (commitResult.status !== 0) {
       throw new Error(`git commit failed: ${commitResult.stderr}`);
     }
+    console.log(`[${batch.groupName}] Changes committed`);
 
+    console.log(`[${batch.groupName}] Pushing to origin/${branch}...`);
     const pushResult = exec("git", ["push", "origin", `HEAD:refs/heads/${branch}`], {
       cwd: wtDir,
     });
     if (pushResult.status !== 0) {
       throw new Error(`git push failed: ${pushResult.stderr}`);
     }
+    console.log(`[${batch.groupName}] Push succeeded`);
 
     const bump = highestBump(batch.candidates);
     const body = await retry(() => buildPrBody(batch.candidates, options), retryOpts);
