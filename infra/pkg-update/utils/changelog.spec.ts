@@ -2,6 +2,10 @@ import { describe, it, expect, mock, beforeEach } from "bun:test";
 
 const originalFetch = globalThis.fetch;
 
+function setMockFetch(impl: (url: string, init?: RequestInit) => Promise<Response>): void {
+  globalThis.fetch = mock(impl) as unknown as typeof globalThis.fetch;
+}
+
 let changelog: typeof import("./changelog");
 
 beforeEach(() => {
@@ -17,7 +21,7 @@ async function getModule(): Promise<typeof import("./changelog")> {
 
 describe("buildChangelogSection", () => {
   it("falls back to npm URL when fetch fails entirely", async () => {
-    globalThis.fetch = mock(() => Promise.reject(new Error("Network error")));
+    setMockFetch(() => Promise.reject(new Error("Network error")));
 
     const { buildChangelogSection } = await getModule();
     const result = await buildChangelogSection("zod", "3.0.0", "4.0.0");
@@ -29,7 +33,7 @@ describe("buildChangelogSection", () => {
   });
 
   it("uses GitHub compare URL when repo URL is available but no releases", async () => {
-    globalThis.fetch = mock((url: string) => {
+    setMockFetch((url: string) => {
       if (url.startsWith("https://registry.npmjs.org/")) {
         return Promise.resolve(
           new Response(
@@ -55,7 +59,7 @@ describe("buildChangelogSection", () => {
 
   it("caches npm registry lookups across calls", async () => {
     let npmCallCount = 0;
-    globalThis.fetch = mock((url: string) => {
+    setMockFetch((url: string) => {
       if (url.startsWith("https://registry.npmjs.org/")) {
         npmCallCount++;
         return Promise.resolve(
@@ -78,7 +82,7 @@ describe("buildChangelogSection", () => {
   });
 
   it("strips git+ and trailing .git from repo URL", async () => {
-    globalThis.fetch = mock((url: string) => {
+    setMockFetch((url: string) => {
       if (url.startsWith("https://registry.npmjs.org/")) {
         return Promise.resolve(
           new Response(
@@ -101,7 +105,7 @@ describe("buildChangelogSection", () => {
   });
 
   it("returns npm URL when registry has no repository field", async () => {
-    globalThis.fetch = mock((url: string) => {
+    setMockFetch((url: string) => {
       return Promise.resolve(new Response(JSON.stringify({ name: "zod" }), { status: 200 }));
     });
 

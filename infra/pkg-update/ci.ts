@@ -78,8 +78,8 @@ export function highestBump(candidates: UpdateCandidate[]): "major" | "minor" | 
   for (const c of candidates) {
     const bump = categorizeBump(c.currentVersion, c.latestVersion);
     if (bump === "major") return "major";
-    if (bump === "minor" && result !== "major") result = "minor";
-    if (bump === "patch" && !result) result = "patch";
+    if (bump === "minor") result = "minor";
+    else if (bump === "patch" && result === null) result = "patch";
   }
   return result;
 }
@@ -176,7 +176,7 @@ async function createOrUpdatePr(
   dryRun: boolean,
 ): Promise<number | null> {
   const title = `chore(deps): update ${group}`;
-  const labels = [bump ?? "patch"] as string[];
+  const labels = ["deps", bump ?? "patch"] as string[];
   const autoMerge = bump === "minor" || bump === "patch";
 
   if (dryRun) {
