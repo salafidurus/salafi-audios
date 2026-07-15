@@ -1,7 +1,13 @@
 import { describe, it, expect, afterEach } from "bun:test";
 import fs from "node:fs";
 import path from "node:path";
-import { parseCatalogs, runCatalogCheck, runCatalogFix } from "./catalog-scanner";
+import {
+  parseCatalogs,
+  runCatalogCheck,
+  runCatalogFix,
+  getUnusedCatalogEntries,
+  runCatalogPrune
+} from "./catalog-scanner";
 
 const TEMP_DIR = path.join(import.meta.dirname || "", "temp_test_monorepo");
 
@@ -156,5 +162,55 @@ describe("catalog-scanner", () => {
     // Mismatches must not be updated
     expect(pkgContent.devDependencies.zod).toBe("^3.0.0");
     expect(pkgContent.devDependencies.react).toBe("18.0.0");
+  });
+
+  it("finds and prunes unused catalog dependencies correctly", () => {
+    setupMockMonorepo({
+      rootPackageJson: {
+        name: "root",
+        workspaces: {
+          packages: ["apps/*"],
+          catalog: {
+            zod: "^4.4.3",
+            typescript: "5.0.0" // unused
+          },
+          catalogs: {
+            frontend: {
+              react: "19.0.0",
+              lodash: "4.17.21" // unused
+            }
+          }
+        }
+      },
+      workspaces: {
+        "apps/web/package.json": {
+          name: "@sd/web",
+          dependencies: {
+            zod: "catalog:",
+            react: "catalog:frontend"
+          }
+        }
+      }
+    });
+
+    // 1. Check unused
+    const { unusedDefault, unusedNamed } = getUnusedCatalogEntries(TEMP_DIR);
+    expect(unusedDefault).toContain("typescript");
+    expect(unusedDefault).not.toContain("zod");
+    expect(unusedNamed.frontend).toContain("lodash");
+    expect(unusedNamed.frontend).not.toContain("react");
+
+    // 2. Prune them
+    const { prunedCount } = runCatalogPrune(TEMP_DIR);
+    expect(prunedCount).toBe(2);
+
+    // 3. Verify on disk
+    const rootContent = JSON.parse(
+      fs.readFileSync(path.join(TEMP_DIR, "package.json"), "utf-8")
+    );
+    expect(rootContent.workspaces.catalog.zod).toBeDefined();
+    expect(rootContent.workspaces.catalog.typescript).toBeUndefined();
+    expect(rootContent.workspaces.catalogs.frontend.react).toBeDefined();
+    expect(rootContent.workspaces.catalogs.frontend.lodash).toBeUndefined();
   });
 });
