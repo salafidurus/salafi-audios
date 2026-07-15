@@ -1,7 +1,7 @@
 import { describe, it, expect, afterEach } from "bun:test";
 import fs from "node:fs";
 import path from "node:path";
-import { parseCatalogs, runCatalogCheck } from "./catalog-scanner";
+import { parseCatalogs, runCatalogCheck, runCatalogFix } from "./catalog-scanner";
 
 const TEMP_DIR = path.join(import.meta.dirname || "", "temp_test_monorepo");
 
@@ -108,5 +108,53 @@ describe("catalog-scanner", () => {
     expect(pgDuplicate).toBeDefined();
     expect(pgDuplicate?.workspaces).toContain("@sd/core-db");
     expect(pgDuplicate?.workspaces).toContain("@sd/api");
+  });
+
+  it("safely auto-fixes exact matches and ignores mismatches", () => {
+    setupMockMonorepo({
+      rootPackageJson: {
+        name: "root",
+        workspaces: {
+          packages: ["apps/*"],
+          catalog: {
+            zod: "^4.4.3"
+          },
+          catalogs: {
+            frontend: {
+              react: "19.0.0"
+            }
+          }
+        }
+      },
+      workspaces: {
+        "apps/web/package.json": {
+          name: "@sd/web",
+          dependencies: {
+            zod: "^4.4.3", // exact match -> should fix to "catalog:"
+            react: "19.0.0" // exact match -> should fix to "catalog:frontend"
+          },
+          devDependencies: {
+            zod: "^3.0.0", // mismatch -> should NOT fix
+            react: "18.0.0" // mismatch -> should NOT fix
+          }
+        }
+      }
+    });
+
+    const { updatedFiles } = runCatalogFix(TEMP_DIR);
+    expect(updatedFiles).toContain("@sd/web");
+
+    // Read file back and assert
+    const pkgContent = JSON.parse(
+      fs.readFileSync(path.join(TEMP_DIR, "apps/web/package.json"), "utf-8")
+    );
+
+    // Exact matches must be updated
+    expect(pkgContent.dependencies.zod).toBe("catalog:");
+    expect(pkgContent.dependencies.react).toBe("catalog:frontend");
+
+    // Mismatches must not be updated
+    expect(pkgContent.devDependencies.zod).toBe("^3.0.0");
+    expect(pkgContent.devDependencies.react).toBe("18.0.0");
   });
 });

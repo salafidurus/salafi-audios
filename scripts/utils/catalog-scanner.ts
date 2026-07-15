@@ -180,3 +180,49 @@ export function runCatalogCheck(rootDir: string): { issues: CatalogIssue[], dupl
 
   return { issues, duplicates };
 }
+
+export function runCatalogFix(rootDir: string): { updatedFiles: string[] } {
+  const rootJsonPath = path.join(rootDir, "package.json");
+  const rootJson = JSON.parse(fs.readFileSync(rootJsonPath, "utf-8"));
+  const catalogs = parseCatalogs(rootJson);
+  const workspaces = getWorkspaces(rootDir);
+  const allPackages = [{ name: "root", path: rootJsonPath, content: rootJson }, ...workspaces];
+  const updatedFiles: string[] = [];
+
+  for (const pkg of allPackages) {
+    let modified = false;
+    const depTypes = ["dependencies", "devDependencies"] as const;
+
+    for (const depType of depTypes) {
+      const deps = pkg.content[depType];
+      if (!deps) continue;
+
+      for (const [name, version] of Object.entries(deps)) {
+        if (version.startsWith("workspace:") || name.startsWith("@sd/")) continue;
+        if (version.startsWith("catalog:")) continue;
+
+        if (catalogs.default[name] && catalogs.default[name] === version) {
+          deps[name] = "catalog:";
+          modified = true;
+          continue;
+        }
+
+        for (const [groupName, groupDeps] of Object.entries(catalogs.named)) {
+          if (groupDeps[name] && groupDeps[name] === version) {
+            deps[name] = `catalog:${groupName}`;
+            modified = true;
+            break;
+          }
+        }
+      }
+    }
+
+    if (modified) {
+      const pathToWrite = (pkg as any).path || (pkg as any).packageJsonPath;
+      fs.writeFileSync(pathToWrite, JSON.stringify(pkg.content, null, 2) + "\n");
+      updatedFiles.push(pkg.name);
+    }
+  }
+
+  return { updatedFiles };
+}
