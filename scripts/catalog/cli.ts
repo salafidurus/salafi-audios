@@ -1,5 +1,5 @@
 import path from "node:path";
-import { findMonorepoRoot } from "./utils/paths.mjs";
+import { findMonorepoRoot } from "../utils/paths.mjs";
 import {
   runCatalogCheck,
   runCatalogFix,
@@ -7,7 +7,7 @@ import {
   runCatalogPrune,
   getWorkspaces,
   parseCatalogs
-} from "./utils/catalog-scanner";
+} from "./scanner";
 import fs from "node:fs";
 
 function printHelp() {

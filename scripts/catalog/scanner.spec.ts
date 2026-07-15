@@ -7,7 +7,7 @@ import {
   runCatalogFix,
   getUnusedCatalogEntries,
   runCatalogPrune
-} from "./catalog-scanner";
+} from "./scanner";
 
 const TEMP_DIR = path.join(import.meta.dirname || "", "temp_test_monorepo");
 
