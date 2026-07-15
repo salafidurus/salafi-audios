@@ -27,6 +27,7 @@ beforeAll(() => {
     JSON.stringify({
       name: "test-monorepo",
       packageManager: "bun@1.2.5",
+      engines: { bun: "1.2.5" },
       workspaces: {
         packages: ["apps/*", "packages/*"],
         catalog: {
@@ -134,6 +135,20 @@ describe("applyBunUpdate", () => {
     const content = JSON.parse(readFileSync(join(tmpDir, "package.json"), "utf-8"));
     expect(content.packageManager).toBe("bun@1.3.0");
     expect(content.devDependencies["bun-types"]).toBe("^1.3.0");
+    expect(content.engines.bun).toBe("1.3.0");
+  });
+
+  it("writes .bun-version file", async () => {
+    const candidate: UpdateCandidate = {
+      type: "bun",
+      packageName: "bun",
+      currentVersion: "bun@1.2.5",
+      latestVersion: "bun@1.3.14",
+    };
+    await applyBunUpdate(candidate, tmpDir);
+
+    const bunVersion = readFileSync(join(tmpDir, ".bun-version"), "utf-8").trim();
+    expect(bunVersion).toBe("1.3.14");
   });
 });
 
