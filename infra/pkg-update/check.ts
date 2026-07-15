@@ -40,10 +40,20 @@ function readJson(path: string): Record<string, unknown> {
   return JSON.parse(readFileSync(path, "utf-8")) as Record<string, unknown>;
 }
 
-function matchesSkip(name: string, skip: string[]): boolean {
-  return skip.some((s) => {
-    if (s.endsWith("*")) return name.startsWith(s.slice(0, -1));
-    return name === s;
+function matchesSkip(name: string, skip: string[], cfg: PkupdateConfig): boolean {
+  if (
+    skip.some((s) => {
+      if (s.endsWith("*")) return name.startsWith(s.slice(0, -1));
+      return name === s;
+    })
+  )
+    return true;
+
+  const expoGroup = cfg.groups["expo"];
+  if (!expoGroup) return false;
+  return expoGroup.patterns.some((p) => {
+    if (p.endsWith("*")) return name.startsWith(p.slice(0, -1));
+    return name === p;
   });
 }
 
@@ -55,7 +65,7 @@ export async function checkCatalog(
   const workspaces = rootPkg.workspaces as Record<string, unknown> | undefined;
   const catalog = (workspaces?.catalog ?? {}) as Record<string, string>;
 
-  const entries = Object.entries(catalog).filter(([pkg]) => !matchesSkip(pkg, cfg.skip));
+  const entries = Object.entries(catalog).filter(([pkg]) => !matchesSkip(pkg, cfg.skip, cfg));
 
   const versions = await Promise.all(entries.map(([pkg]) => fetchLatestVersion(pkg)));
 

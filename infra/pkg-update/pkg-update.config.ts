@@ -1,6 +1,8 @@
 export interface PkupdateConfig {
   groups: Record<string, { patterns: string[] }>;
   skip: string[];
+  never: string[];
+  versionLocked: string[];
   bun: { enabled: boolean };
   expo: { enabled: boolean };
 }
@@ -16,22 +18,28 @@ export const config: PkupdateConfig = {
     "better-auth": { patterns: ["better-auth", "@better-auth/*"] },
     turbo: { patterns: ["turbo"] },
     testing: { patterns: ["@testing-library/*"] },
+    expo: {
+      patterns: [
+        "expo",
+        "expo-*",
+        "@expo/*",
+        "eslint-config-expo",
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom",
+        "react-native",
+        "react-native-*",
+        "@react-native/*",
+        "@react-navigation/*",
+        "@sentry/*",
+        "@react-native-async-storage/*",
+      ],
+    },
   },
-  skip: [
-    "expo",
-    "expo-*",
-    "@expo/*",
-    "react",
-    "react-dom",
-    "@types/react",
-    "@types/react-dom",
-    "react-native",
-    "react-native-*",
-    "@react-native/*",
-    "@react-navigation/*",
-    "@sentry/*",
-    "@react-native-async-storage/*",
-  ],
+  skip: [],
+  never: ["typescript", "@babel/runtime", "eslint"],
+  versionLocked: ["better-auth", "prisma"],
   bun: { enabled: true },
   expo: { enabled: true },
 };

@@ -56,10 +56,19 @@ async function main(): Promise<void> {
 
   const shouldCommit = await confirmCommit();
   if (shouldCommit) {
-    const names = selected.map((c) => c.packageName).join(", ");
-    const ok = commitChanges(`chore(deps): update ${names}`);
+    const maxLen = 90;
+    const prefix = "chore(deps): update ";
+    const allNames = selected.map((c) => c.packageName).join(", ");
+    let message: string;
+    if (`${prefix}${allNames}`.length <= maxLen) {
+      message = `${prefix}${allNames}`;
+    } else {
+      const suffix = `, +${selected.length - 1} more`;
+      message = `${prefix}${selected[0]!.packageName}${suffix}`;
+    }
+    const ok = commitChanges(message);
     if (ok) {
-      note(`Committed: chore(deps): update ${names}", "\u2705 Committed`);
+      note(`Committed: ${message}`, "\u2705 Committed");
     } else {
       note("Nothing to commit.", "\u2139\uFE0F");
     }

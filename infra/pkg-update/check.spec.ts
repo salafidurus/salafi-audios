@@ -95,6 +95,8 @@ describe("checkCatalog", () => {
   const testConfig: PkupdateConfig = {
     groups: {},
     skip: ["react"],
+    never: [],
+    versionLocked: [],
     bun: { enabled: false },
     expo: { enabled: false },
   };
