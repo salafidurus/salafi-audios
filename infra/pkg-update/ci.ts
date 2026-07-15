@@ -8,6 +8,8 @@ import { buildChangelogSection } from "./utils/changelog";
 import { categorizeBump, type UpdateCandidate } from "./utils/ui";
 import { retry, type RetryOptions } from "./utils/retry";
 
+const __ciMain = import.meta.path.replace(/\\/g, "/") === process.argv[1]?.replace(/\\/g, "/");
+
 export interface CiOptions {
   dryRun?: boolean;
   gitHubRunId?: string;
@@ -373,4 +375,26 @@ export async function runCi(rootDir: string, options: CiOptions = {}): Promise<C
   await scheduleBatches(batches, rootDir, options, retryOpts, summaries);
 
   return summaries;
+}
+
+if (__ciMain) {
+  const { findMonorepoRoot } = await import("../../scripts/utils/paths.mjs");
+  const rootDir = findMonorepoRoot();
+  const options: CiOptions = {};
+  if (process.argv.includes("--dry-run")) options.dryRun = true;
+  if (process.env.GITHUB_RUN_ID) options.gitHubRunId = process.env.GITHUB_RUN_ID;
+  if (process.env.GITHUB_SHA) options.gitHubSha = process.env.GITHUB_SHA;
+  if (process.env.PAT_TOKEN) options.patToken = process.env.PAT_TOKEN;
+
+  const summaries = await runCi(rootDir, options);
+
+  for (const s of summaries) {
+    if (s.skipped) {
+      console.log(`${s.groupName}: skipped`);
+    } else if (s.error) {
+      console.log(`${s.groupName}: error (${s.error})`);
+    } else {
+      console.log(`${s.groupName}: success${s.prNumber ? ` (PR #${s.prNumber})` : ""}`);
+    }
+  }
 }
