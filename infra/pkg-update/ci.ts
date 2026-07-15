@@ -133,14 +133,13 @@ async function ensureBranchCleanup(
   return "existing";
 }
 
-function lockfileOnlyChanged(cwd: string): boolean {
+function lockfileUpdated(cwd: string): boolean {
   const result = exec("git", ["diff", "--name-only"], { cwd });
   const files = result.stdout
     .split("\n")
     .map((f) => f.trim())
     .filter(Boolean);
-  const nonLockfile = files.filter((f) => f !== "bun.lock");
-  return nonLockfile.length === 0;
+  return files.includes("bun.lock");
 }
 
 export async function buildPrBody(
@@ -304,8 +303,8 @@ async function processBatch(
       throw new Error(`bun install failed: ${verifyResult.stderr || verifyResult.stdout}`);
     }
 
-    if (!lockfileOnlyChanged(wtDir)) {
-      throw new Error("Lockfile verification failed: unexpected files changed besides bun.lock");
+    if (!lockfileUpdated(wtDir)) {
+      throw new Error("Lockfile verification failed: bun.lock was not updated by bun install");
     }
 
     const baseMsg =
