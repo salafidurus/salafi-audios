@@ -841,7 +841,7 @@ where the framework requires them:
   `src/features/**`, `src/shared/**`, `src/core/**`. Override to `off` for the allowed
   Next.js paths listed above.
   - **`src/app/**/route.ts` is NOT in the exception list.** Next.js App Router route
-handlers use named exports (`GET`, `POST`, etc.) and must not use default exports.
+    handlers use named exports (`GET`, `POST`, etc.) and must not use default exports.
     Do not add an override for route files.
 - `packages/util-config/eslint/expo.js` — this is the shared ESLint config consumed by
   `apps/mobile/eslint.config.js`. Add `import/no-default-export` at `error` for

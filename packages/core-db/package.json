@@ -53,8 +53,8 @@
     "@sd/core-contracts": "workspace:*"
   },
   "devDependencies": {
-    "dotenv": "^16.4.5",
-    "pg": "^8.0.0",
+    "dotenv": "catalog:",
+    "pg": "catalog:",
     "prisma": "^7.3.0",
     "tsup": "catalog:"
   }

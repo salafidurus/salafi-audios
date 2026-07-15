@@ -94,14 +94,14 @@
   "devDependencies": {
     "@babel/runtime": "^7.29.7",
     "@sentry/cli": "~2.58.4",
-    "@testing-library/react-native": "catalog:",
-    "@types/jest": "catalog:",
-    "@types/node": "^26.0.0",
-    "@types/react": "19.2.9",
+    "@testing-library/react-native": "^14.0.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
     "babel-preset-expo": "~56.0.15",
     "eslint": "catalog:",
     "eslint-config-expo": "~56.0.0",
-    "jest": "catalog:",
+    "jest": "^29.7.0",
     "jest-expo": "~56.0.5"
   },
   "expo": {
