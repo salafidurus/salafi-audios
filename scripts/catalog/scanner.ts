@@ -8,13 +8,7 @@ import {
   sanitizeGroupName,
   matchPattern,
 } from "./helpers";
-import type {
-  PackageJson,
-  CatalogConfig,
-  CatalogConfigGroup,
-  CatalogIssue,
-  CatalogDuplicate,
-} from "./helpers";
+import type { PackageJson, CatalogConfigGroup, CatalogIssue, CatalogDuplicate } from "./helpers";
 
 export type {
   PackageJson,
@@ -233,7 +227,6 @@ export function runCatalogFix(rootDir: string): { updatedFiles: string[] } {
   const rootJson: PackageJson = JSON.parse(fs.readFileSync(rootJsonPath, "utf-8"));
   const catalogs = parseCatalogs(rootJson);
   const config = loadConfig(rootDir);
-  const hasConfigFile = fs.existsSync(path.join(rootDir, "catalog.config.json"));
   const workspaces = getWorkspaces(rootDir);
 
   const allWorkspacePkgs = workspaces.map((w) => ({
