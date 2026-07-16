@@ -30,6 +30,6 @@ jobs:
         run: bun run pkg-update:ci
         env:
           PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          GH_TOKEN: ${{ secrets.SALAFIDURUS_PR_WRITE }}
           GITHUB_RUN_ID: ${{ github.run_id }}
           GITHUB_SHA: ${{ github.sha }}
