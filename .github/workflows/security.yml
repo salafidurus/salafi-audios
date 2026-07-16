@@ -19,8 +19,11 @@ jobs:
         with:
           bun-version: "1.3.14"
 
-      - name: Install Dependencies
-        run: bun install --frozen-lockfile
+      - name: Install Dependencies (scripts disabled)
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Run workspace postinstall
+        run: bun run postinstall
 
       - name: Run Secretlint
         run: bun run security:secrets
