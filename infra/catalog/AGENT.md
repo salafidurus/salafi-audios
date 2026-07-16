@@ -24,5 +24,5 @@ Two-directional sync between workspaces and root `package.json` catalogs:
 ## Testing
 
 - Tests use `bun:test` with mock temp directories. Each test creates and tears down its own monorepo.
-- Run: `bun test scripts/catalog/scanner.spec.ts`
+- Run: `bun test infra/catalog/scanner.spec.ts`
 - Follow strict TDD when modifying scanner behavior.

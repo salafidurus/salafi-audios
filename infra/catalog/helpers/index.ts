@@ -1,57 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { Glob } from "bun";
-
-export interface PackageJson {
-  name: string;
-  version?: string;
-  workspaces?: {
-    packages?: string[];
-    catalog?: Record<string, string>;
-    catalogs?: Record<string, Record<string, string>>;
-  };
-  dependencies?: Record<string, string>;
-  devDependencies?: Record<string, string>;
-  peerDependencies?: Record<string, string>;
-}
-
-export interface Workspace {
-  name: string;
-  relativePath: string;
-  absolutePath: string;
-  packageJsonPath: string;
-  content: PackageJson;
-}
-
-export interface Catalogs {
-  default: Record<string, string>;
-  named: Record<string, Record<string, string>>;
-}
-
-export interface CatalogIssue {
-  type: "missing" | "mismatch" | "hardcoded" | "orphan";
-  pkgName: string;
-  depName: string;
-  expectedVersion?: string;
-  actualVersion?: string;
-  details: string;
-}
-
-export interface CatalogDuplicate {
-  depName: string;
-  workspaces: string[];
-  versions: string[];
-}
-
-export interface CatalogConfigGroup {
-  name: string;
-  packages: string | string[];
-  workspaces: string | string[];
-}
-
-export interface CatalogConfig {
-  groups: CatalogConfigGroup[];
-}
+import type { PackageJson, Workspace, Catalogs, CatalogConfig } from "../types";
 
 export function parseCatalogs(rootJson: PackageJson): Catalogs {
   const workspaces = rootJson.workspaces;
@@ -112,10 +62,10 @@ export function matchPattern(value: string, pattern: string | string[]): boolean
     if (pat === "*") return true;
 
     const parts = pat.split("*");
-    if (!pat.startsWith("*") && !val.startsWith(parts[0])) {
+    if (!pat.startsWith("*") && !val.startsWith(parts[0]!)) {
       return false;
     }
-    if (!pat.endsWith("*") && !val.endsWith(parts[parts.length - 1])) {
+    if (!pat.endsWith("*") && !val.endsWith(parts[parts.length - 1]!)) {
       return false;
     }
 

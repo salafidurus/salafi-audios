@@ -26,9 +26,25 @@ jobs:
       - name: Install
         run: bun install --frozen-lockfile
 
+      - name: Restore deps state cache
+        id: cache-restore
+        uses: actions/cache@v4
+        with:
+          path: .cache/deps-state.json
+          key: deps-state-${{ github.run_id }}
+          restore-keys: |
+            deps-state-
+
       - name: Run dependency update
         run: bun run pkg-update:ci
         env:
           GH_TOKEN: ${{ secrets.SALAFIDURUS_PR_WRITE }}
           GITHUB_RUN_ID: ${{ github.run_id }}
           GITHUB_SHA: ${{ github.sha }}
+
+      - name: Save deps state cache
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: .cache/deps-state.json
+          key: deps-state-${{ github.run_id }}

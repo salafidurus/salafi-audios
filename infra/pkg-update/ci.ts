@@ -7,6 +7,14 @@ import { config } from "./pkg-update.config";
 import { buildChangelogSection } from "./utils/changelog";
 import { categorizeBump, type UpdateCandidate } from "./utils/ui";
 import { retry, type RetryOptions } from "./utils/retry";
+import {
+  readCache,
+  writeCache,
+  updateCacheFromBatch,
+  areAllCandidatesCached,
+  cachePath,
+} from "./utils/cache";
+import { runCatalogFix } from "../catalog/scanner/fix";
 
 const __ciMain = import.meta.path.replace(/\\/g, "/") === process.argv[1]?.replace(/\\/g, "/");
 
@@ -104,6 +112,19 @@ export function branchName(group: string): string {
 
 export function worktreeDir(rootDir: string, group: string): string {
   return resolve(rootDir, ".worktrees", `deps-${sanitizeBranchName(group)}`); // nosemgrep
+}
+
+async function isPrMergeable(prNumber: number): Promise<boolean> {
+  const result = exec("gh", [
+    "pr",
+    "view",
+    String(prNumber),
+    "--json",
+    "mergeable",
+    "-q",
+    ".mergeable",
+  ]);
+  return result.stdout === "MERGEABLE";
 }
 
 async function remoteBranchExists(branch: string): Promise<boolean> {
@@ -250,7 +271,12 @@ async function createOrUpdatePr(
   }
 
   if (prNumber && autoMerge) {
-    exec("gh", ["pr", "merge", String(prNumber), "--auto", "--squash"]);
+    const mergeable = await isPrMergeable(prNumber);
+    if (mergeable) {
+      exec("gh", ["pr", "merge", String(prNumber), "--auto", "--squash"]);
+    } else {
+      console.log(`[${group}] PR #${prNumber} has conflicts — auto-merge disabled`);
+    }
   }
 
   return prNumber;
@@ -324,6 +350,20 @@ async function processBatch(
       throw new Error("applyUpdate failed for one or more packages");
     }
     console.log(`[${batch.groupName}] Package updates applied`);
+
+    console.log(`[${batch.groupName}] Running catalog alignment fix...`);
+    try {
+      const fixResult = runCatalogFix(wtDir);
+      if (fixResult.updatedFiles.length > 0) {
+        console.log(
+          `[${batch.groupName}] Catalog fix updated: ${fixResult.updatedFiles.join(", ")}`,
+        );
+      } else {
+        console.log(`[${batch.groupName}] Catalog already aligned`);
+      }
+    } catch (fixErr) {
+      console.log(`[${batch.groupName}] Catalog fix warning: ${fixErr}`);
+    }
 
     console.log(`[${batch.groupName}] Installing updated dependencies...`);
     const verifyResult = exec("bun", ["install"], { cwd: wtDir });
@@ -415,11 +455,43 @@ export async function runCi(rootDir: string, options: CiOptions = {}): Promise<C
   const summaries: CiSummary[] = [];
   const retryOpts = options.retry ?? { retries: 3, minTimeout: 1000 };
 
+  const cache = readCache(rootDir);
   const candidates = await retry(() => checkAll(rootDir, config), retryOpts);
-  const batches = groupCandidates(candidates);
+  const allBatches = groupCandidates(candidates);
 
-  await scheduleBatches(batches, rootDir, options, retryOpts, summaries);
+  const batchesToProcess: GroupBatch[] = [];
+  for (const batch of allBatches) {
+    if (areAllCandidatesCached(batch.candidates, cache)) {
+      console.log(`[${batch.groupName}] All candidates already cached — skipping batch`);
+      summaries.push({
+        groupName: batch.groupName,
+        branch: branchName(batch.groupName),
+        prNumber: null,
+        skipped: true,
+      });
+    } else {
+      batchesToProcess.push(batch);
+    }
+  }
 
+  if (batchesToProcess.length > 0) {
+    await scheduleBatches(batchesToProcess, rootDir, options, retryOpts, summaries);
+
+    const batchByGroup = new Map(batchesToProcess.map((b) => [b.groupName, b]));
+    for (const s of summaries) {
+      if (!s.skipped && !s.error) {
+        const batch = batchByGroup.get(s.groupName);
+        if (batch) {
+          updateCacheFromBatch(cache, batch.candidates, batch.groupName, s.prNumber);
+        }
+      }
+    }
+  }
+
+  writeCache(rootDir, cache);
+  console.log(
+    `Cache written to ${cachePath(rootDir)} with ${Object.keys(cache.packages).length} packages`,
+  );
   return summaries;
 }
 
