@@ -16,7 +16,9 @@ jest.mock("@/core/i18n/use-translation", () => ({
 }));
 
 jest.mock("@tanstack/react-query", () => ({
-  useQueryClient: () => ({ invalidateQueries: jest.fn().mockResolvedValue(undefined) }),
+  useQueryClient: jest.fn(() => ({
+    invalidateQueries: jest.fn().mockResolvedValue(undefined),
+  })),
 }));
 
 jest.mock("@/core/i18n/i18n", () => ({
