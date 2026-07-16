@@ -27,8 +27,7 @@
       "@types/react": "~19.2.14",
       "dotenv": "^17.4.2",
       "@babel/runtime": "^8.0.0"
-    },
-    "catalogs": {}
+    }
   },
   "scripts": {
     "catalog": "bun ./infra/catalog/cli.ts",

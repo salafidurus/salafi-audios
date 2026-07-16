@@ -65,6 +65,7 @@
     "tsup": "catalog:"
   },
   "peerDependencies": {
+    "@tanstack/react-query": "catalog:",
     "react": ">=18"
   }
 }

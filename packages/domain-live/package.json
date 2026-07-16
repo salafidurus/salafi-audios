@@ -22,6 +22,7 @@
     "@testing-library/react": "catalog:"
   },
   "peerDependencies": {
+    "@tanstack/react-query": "catalog:",
     "react": "^19.0.0"
   }
 }
