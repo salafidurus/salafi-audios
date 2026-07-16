@@ -87,7 +87,7 @@ export function syncWorkspaceDeps(
         for (const depName of Object.keys(deps)) {
           const matchesGroup = groupPatterns.some((p) => matchesPattern(depName, p));
           if (matchesGroup && !shouldSkipPackage(depName, cfg)) {
-            const depVer = deps[depName];
+            const depVer = deps[depName]!;
             const depPrefix = depVer.match(/^([\^~])\s*/)?.[1] ?? "";
             deps[depName] = `${depPrefix}${candidate.latestVersion}`;
             dirty = true;
