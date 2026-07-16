@@ -38,7 +38,7 @@ export const config: PkupdateConfig = {
     },
   },
   skip: [],
-  never: ["typescript", "@babel/runtime", "eslint"],
+  never: ["typescript", "@babel/runtime"],
   versionLocked: ["better-auth", "prisma"],
   bun: { enabled: true },
   expo: { enabled: true },
