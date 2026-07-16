@@ -9,6 +9,8 @@ type Props = {
 
 export function PermissionGate({ requires, children, fallback = null }: Props) {
   const { data } = useAdminPermissions();
-  if (!data?.permissions.includes(requires)) return <>{fallback}</>;
+  if (!data?.permissions.includes(requires)) {
+    return <>{fallback}</>;
+  }
   return <>{children}</>;
 }

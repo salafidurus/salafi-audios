@@ -6,8 +6,9 @@ export class HTMLAudioAdapter implements PlaybackEngine {
   private activeListeners: { [K in string]?: (e: Event) => void } = {};
 
   async setup(): Promise<void> {
-    if (typeof window === "undefined") return;
-
+    if (typeof window === "undefined") {
+      return;
+    }
     if (!this.audio) {
       this.audio = new Audio();
       this.bindListeners();
@@ -17,8 +18,9 @@ export class HTMLAudioAdapter implements PlaybackEngine {
   async load(track: Track): Promise<void> {
     // react-doctor-disable-next-line react-doctor/async-defer-await
     await this.setup();
-    if (!this.audio) return;
-
+    if (!this.audio) {
+      return;
+    }
     if (this.events.onStatusChange) {
       this.events.onStatusChange("loading");
     }
@@ -28,7 +30,9 @@ export class HTMLAudioAdapter implements PlaybackEngine {
   }
 
   async play(): Promise<void> {
-    if (!this.audio) return;
+    if (!this.audio) {
+      return;
+    }
     try {
       await this.audio.play();
     } catch (err) {
@@ -40,23 +44,31 @@ export class HTMLAudioAdapter implements PlaybackEngine {
   }
 
   async pause(): Promise<void> {
-    if (!this.audio) return;
+    if (!this.audio) {
+      return;
+    }
     this.audio.pause();
   }
 
   async seek(positionSeconds: number): Promise<void> {
-    if (!this.audio) return;
+    if (!this.audio) {
+      return;
+    }
     this.audio.currentTime = positionSeconds;
   }
 
   async setSpeed(speed: number): Promise<void> {
-    if (!this.audio) return;
+    if (!this.audio) {
+      return;
+    }
     this.audio.playbackRate = speed;
     this.audio.defaultPlaybackRate = speed;
   }
 
   async stop(): Promise<void> {
-    if (!this.audio) return;
+    if (!this.audio) {
+      return;
+    }
     this.audio.pause();
     this.audio.currentTime = 0;
     if (this.events.onStatusChange) {
@@ -78,8 +90,9 @@ export class HTMLAudioAdapter implements PlaybackEngine {
   }
 
   private bindListeners() {
-    if (!this.audio) return;
-
+    if (!this.audio) {
+      return;
+    }
     const timeUpdate = () => {
       if (this.events.onPositionChange && this.audio) {
         this.events.onPositionChange(this.audio.currentTime);
@@ -142,8 +155,9 @@ export class HTMLAudioAdapter implements PlaybackEngine {
   }
 
   private unbindListeners() {
-    if (!this.audio) return;
-
+    if (!this.audio) {
+      return;
+    }
     Object.entries(this.activeListeners).forEach(([event, listener]) => {
       if (listener) {
         this.audio?.removeEventListener(event, listener);

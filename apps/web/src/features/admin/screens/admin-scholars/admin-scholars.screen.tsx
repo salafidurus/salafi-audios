@@ -9,8 +9,14 @@ import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
 import { List } from "@/shared/components/List";
 import { Search } from "@/shared/components/Search";
-import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
-import type { CreateScholarDto, AdminScholarListItemDto } from "@sd/core-contracts";
+import {
+  useApiQuery,
+  queryKeys,
+  httpClient,
+  endpoints,
+  type CreateScholarDto,
+  type AdminScholarListItemDto,
+} from "@sd/core-contracts";
 import { createScholar, updateScholar } from "@/features/admin/api/admin.api";
 import { Scholar, type ScholarForEdit } from "@/features/admin/components/Scholar";
 import styles from "./admin-scholars.screen.module.css";

@@ -6,6 +6,7 @@
  * This file is not executed - it exists purely to verify type checking.
  */
 
+/* eslint-disable typescript/no-unused-vars -- verification file: all sample components are intentionally unused */
 import { Shield } from "lucide-react";
 import { Badge } from "./Badge";
 

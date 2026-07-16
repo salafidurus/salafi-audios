@@ -64,9 +64,6 @@ vi.mock("@/shared/components/SettingsRow/SettingsRow", () => ({
   ),
 }));
 
-import { useAccountProfile } from "@sd/domain-account";
-import { authClient } from "@/core/auth/auth-client";
-
 const mockProfile = vi.mocked(useAccountProfile);
 
 const PROFILE = {

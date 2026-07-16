@@ -74,7 +74,7 @@ describe("ListingModal", () => {
 
     render(
       <ListingModal
-        isOpen={true}
+        isOpen
         onClose={onCloseMock}
         onSuccess={onSuccessMock}
         initialAudioData={{
@@ -142,7 +142,7 @@ describe("ListingModal", () => {
 
     render(
       <ListingModal
-        isOpen={true}
+        isOpen
         onClose={onCloseMock}
         onSuccess={onSuccessMock}
         listing={existingLecture}

@@ -25,7 +25,9 @@ export function AdminPermissionsScreen() {
   const [permissionToRevoke, setPermissionToRevoke] = useState<string | null>(null);
 
   const handleLookup = async () => {
-    if (!userId.trim()) return;
+    if (!userId.trim()) {
+      return;
+    }
     setLoading(true);
     try {
       const data = await fetchUserPermissions(userId.trim());
@@ -53,7 +55,9 @@ export function AdminPermissionsScreen() {
   };
 
   const handleConfirmRevoke = async () => {
-    if (!permissionToRevoke) return;
+    if (!permissionToRevoke) {
+      return;
+    }
     setLoading(true);
     try {
       const data = await revokePermission(userId.trim(), permissionToRevoke);

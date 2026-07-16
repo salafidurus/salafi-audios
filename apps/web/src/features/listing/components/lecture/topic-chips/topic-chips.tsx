@@ -9,8 +9,9 @@ export type TopicChipsProps = {
 };
 
 export function TopicChips({ topics }: TopicChipsProps) {
-  if (topics.length === 0) return null;
-
+  if (topics.length === 0) {
+    return null;
+  }
   return (
     <div className={styles.container}>
       {topics.map((topic) => (

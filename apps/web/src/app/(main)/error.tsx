@@ -10,7 +10,7 @@ type ErrorProps = {
 
 export default function MainError({ error, reset }: ErrorProps) {
   useEffect(() => {
-    void error;
+    error satisfies Error;
   }, [error]);
 
   return (

@@ -8,8 +8,9 @@ import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthReq
 export default function FeedFollowingPage() {
   const { isAuthenticated, isLoading } = useAuth();
 
-  if (isLoading) return null;
-
+  if (isLoading) {
+    return null;
+  }
   if (!isAuthenticated) {
     return (
       <AuthRequiredState

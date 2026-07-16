@@ -31,7 +31,9 @@ describe("HomePage", () => {
     const calls = mockSearchHomeScreen.mock.calls;
     expect(calls.length).toBeGreaterThan(0);
     const props = calls[0]?.[0];
-    if (!props) throw new Error("No props passed to SearchHomeScreen");
+    if (!props) {
+      throw new Error("No props passed to SearchHomeScreen");
+    }
     const { push } = useRouter();
 
     props.onOpenSearch();

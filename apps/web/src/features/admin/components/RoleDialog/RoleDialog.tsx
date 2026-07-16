@@ -1,10 +1,8 @@
 "use client";
 
-import { useEffect, useReducer, useState } from "react";
-import type { ReactNode } from "react";
+import { useEffect, useReducer, useState, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { queryKeys, type AdminUserListDto } from "@sd/core-contracts";
-import type { UserRole } from "@sd/core-contracts";
+import { queryKeys, type AdminUserListDto, type UserRole } from "@sd/core-contracts";
 import {
   fetchUserRoles,
   grantRole,
@@ -83,8 +81,9 @@ export function RoleDialog({
   const currentRoles = state.userRoles?.roles.map((r) => r.role) ?? [];
 
   useEffect(() => {
-    if (!isOpen) return;
-
+    if (!isOpen) {
+      return;
+    }
     dispatch({ type: "LOAD_START" });
 
     fetchUserRoles(userId)
@@ -129,7 +128,9 @@ export function RoleDialog({
     queryClient.setQueriesData<AdminUserListDto>(
       { queryKey: queryKeys.admin.users.all() },
       (oldData) => {
-        if (!oldData) return oldData;
+        if (!oldData) {
+          return oldData;
+        }
         return {
           ...oldData,
           users: oldData.users.map((u) => (u.id === userId ? { ...u, roles: updatedRoles } : u)),
@@ -168,8 +169,9 @@ export function RoleDialog({
     }
   };
 
-  if (!isOpen) return null;
-
+  if (!isOpen) {
+    return null;
+  }
   const customTitle = (
     <div className={styles.titleContainer}>
       <span className={styles.titleMain}>Manage Roles</span>

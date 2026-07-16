@@ -1,7 +1,5 @@
-import { ScholarItem } from "./ScholarItem";
-import type { ScholarItemProps } from "./ScholarItem";
-import { ScholarModal } from "./ScholarModal";
-import type { ScholarModalProps, ScholarForEdit } from "./ScholarModal";
+import { ScholarItem, type ScholarItemProps } from "./ScholarItem";
+import { ScholarModal, type ScholarModalProps, type ScholarForEdit } from "./ScholarModal";
 
 export const Scholar = Object.assign(
   {},

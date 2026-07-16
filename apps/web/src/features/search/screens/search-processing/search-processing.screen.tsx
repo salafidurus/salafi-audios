@@ -5,9 +5,8 @@ import { Search } from "@/shared/components/Search";
 import { SearchResultItem } from "@/features/search/components/SearchResultItem/SearchResultItem";
 import { SearchResultEmpty } from "@/features/search/components/SearchResultEmpty/SearchResultEmpty";
 import { List } from "@/shared/components/List";
-import type { SearchResultRow } from "@sd/domain-search";
+import { type SearchResultRow, useSearchProcessing } from "@sd/domain-search";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { useSearchProcessing } from "@sd/domain-search";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useRouter } from "next/navigation";
@@ -46,7 +45,9 @@ export function SearchProcessingScreen({ searchKey }: SearchProcessingScreenProp
 
   const handleItemPress = (item: SearchResultRow) => {
     const [kind, id] = item.id.split(":");
-    if (!id) return;
+    if (!id) {
+      return;
+    }
     if (kind === "collection") {
       push(routes.collections.detail(id));
     } else if (kind === "series") {

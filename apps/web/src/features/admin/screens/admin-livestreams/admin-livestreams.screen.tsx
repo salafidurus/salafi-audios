@@ -12,8 +12,13 @@ import { Search } from "@/shared/components/Search";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
-import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
-import type { LiveSessionPublicDto, LivestreamChannelDto } from "@sd/core-contracts";
+import {
+  useApiQuery,
+  httpClient,
+  endpoints,
+  type LiveSessionPublicDto,
+  type LivestreamChannelDto,
+} from "@sd/core-contracts";
 import {
   createLivestreamChannel,
   updateLivestreamChannel,
@@ -168,7 +173,9 @@ export function AdminLivestreamsScreen() {
 
   if (activeSubtab === "sessions") {
     const filteredSessions = sessions.filter((s) => {
-      if (statusFilter !== "all" && s.status !== statusFilter) return false;
+      if (statusFilter !== "all" && s.status !== statusFilter) {
+        return false;
+      }
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
         return (

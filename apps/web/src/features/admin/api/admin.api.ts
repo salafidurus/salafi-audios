@@ -140,8 +140,12 @@ export function deleteTopic(slug: string) {
 export function fetchAdminUsers(params?: { q?: string; role?: string }) {
   const url = endpoints.admin.users.list;
   const query = new URLSearchParams();
-  if (params?.q) query.append("q", params.q);
-  if (params?.role) query.append("role", params.role);
+  if (params?.q) {
+    query.append("q", params.q);
+  }
+  if (params?.role) {
+    query.append("role", params.role);
+  }
   const queryString = query.toString();
   return httpClient<AdminUserListDto>({
     url: queryString ? `${url}?${queryString}` : url,
@@ -158,7 +162,9 @@ export async function updateLiveSessionStatus(id: string, status: string): Promi
     scheduled: "reschedule",
   };
   const action = actionMap[status];
-  if (!action) throw new Error(`Unknown live session status: ${status}`);
+  if (!action) {
+    throw new Error(`Unknown live session status: ${status}`);
+  }
   await httpClient<void>({
     url: `/admin/live/sessions/${id}/${action}`,
     method: "PATCH",

@@ -73,7 +73,7 @@ describe("SearchFilter", () => {
         chips={mockChips}
         selected={["lecture"]}
         onChipChange={() => {}}
-        showCloseButton={true}
+        showCloseButton
       />,
     );
 
@@ -309,7 +309,7 @@ describe("SearchFilter", () => {
         chips={mockChips}
         selected={["lecture", "article"]}
         onChipChange={handleChipChange}
-        multiple={true}
+        multiple
       />,
     );
 

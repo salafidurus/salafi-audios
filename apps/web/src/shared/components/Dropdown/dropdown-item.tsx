@@ -45,7 +45,9 @@ export function DropdownItem({ value, children, disabled }: DropdownItemProps) {
         .filter(Boolean)
         .join(" ")}
       onClick={() => {
-        if (disabled) return;
+        if (disabled) {
+          return;
+        }
         onValueChange(value);
         setOpen(false);
         triggerRef.current?.focus();

@@ -1,7 +1,6 @@
 "use client";
 
-import type { CreateScholarDto } from "@sd/core-contracts";
-import { COUNTRY_LIST } from "@sd/core-contracts";
+import { type CreateScholarDto, COUNTRY_LIST } from "@sd/core-contracts";
 import {
   Dropdown,
   DropdownTrigger,

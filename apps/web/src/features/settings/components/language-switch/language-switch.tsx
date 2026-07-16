@@ -30,8 +30,9 @@ export function LanguageSwitch({ direction = "down" }: LanguageSwitchProps) {
     (i18n.language as Locale) in LOCALE_LABELS ? (i18n.language as Locale) : "en";
 
   const handleSelect = async (locale: string) => {
-    if (i18n.language === locale) return;
-
+    if (i18n.language === locale) {
+      return;
+    }
     await i18n.changeLanguage(locale as Locale);
     setLocaleCookie(locale as Locale);
     await queryClient.invalidateQueries();

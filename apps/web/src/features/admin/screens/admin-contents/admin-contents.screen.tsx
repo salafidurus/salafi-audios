@@ -81,7 +81,9 @@ export function AdminContentsScreen() {
   const listings = listingsData?.items ?? EMPTY_LISTINGS_ARRAY;
 
   const filteredTopics = useMemo(() => {
-    if (!searchQuery.trim()) return topics;
+    if (!searchQuery.trim()) {
+      return topics;
+    }
     const query = searchQuery.toLowerCase();
     return topics.filter(
       (t) =>
@@ -127,7 +129,9 @@ export function AdminContentsScreen() {
   };
 
   const handleConfirmDelete = async () => {
-    if (!deletingTopicSlug) return;
+    if (!deletingTopicSlug) {
+      return;
+    }
     try {
       await deleteTopic(deletingTopicSlug);
       setDeleteModalOpen(false);

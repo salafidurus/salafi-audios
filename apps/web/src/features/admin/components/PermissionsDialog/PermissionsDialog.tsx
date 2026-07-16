@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useReducer, useState } from "react";
-import type { ReactNode } from "react";
+import { useEffect, useReducer, useState, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { queryKeys, type AdminUserListDto } from "@sd/core-contracts";
-import { type Permission, PERMISSIONS_ARRAY } from "@sd/core-contracts";
+import {
+  queryKeys,
+  type AdminUserListDto,
+  type Permission,
+  PERMISSIONS_ARRAY,
+} from "@sd/core-contracts";
 import {
   fetchUserPermissions,
   grantPermission,
@@ -150,8 +153,9 @@ export function PermissionsDialog({
   const currentPermissions = state.userPerms?.permissions.map((p) => p.permission) ?? [];
 
   useEffect(() => {
-    if (!isOpen) return;
-
+    if (!isOpen) {
+      return;
+    }
     dispatch({ type: "LOAD_START" });
 
     fetchUserPermissions(userId)
@@ -196,7 +200,9 @@ export function PermissionsDialog({
     queryClient.setQueriesData<AdminUserListDto>(
       { queryKey: queryKeys.admin.users.all() },
       (oldData) => {
-        if (!oldData) return oldData;
+        if (!oldData) {
+          return oldData;
+        }
         return {
           ...oldData,
           users: oldData.users.map((u) =>
@@ -237,8 +243,9 @@ export function PermissionsDialog({
     }
   };
 
-  if (!isOpen) return null;
-
+  if (!isOpen) {
+    return null;
+  }
   const customTitle = (
     <div className={styles.titleContainer}>
       <span className={styles.titleMain}>Manage Permissions</span>

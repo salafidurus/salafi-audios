@@ -6,8 +6,7 @@ import { Button } from "@/shared/components/Button";
 import { List } from "@/shared/components/List";
 import { UserAvatar } from "@/shared/components/user-avatar";
 import { useResponsive } from "@/shared/hooks/use-responsive";
-import type { AdminScholarListItemDto } from "@sd/core-contracts";
-import { COUNTRY_NAMES } from "@sd/core-contracts";
+import { type AdminScholarListItemDto, COUNTRY_NAMES } from "@sd/core-contracts";
 import styles from "./scholar-item.module.css";
 
 export interface ScholarItemProps {
@@ -80,8 +79,9 @@ function ScholarMeta({ scholar }: { scholar: AdminScholarListItemDto }) {
     scholar.socialYoutube ||
     scholar.socialWebsite;
 
-  if (!hasSocials && !scholar.bio) return null;
-
+  if (!hasSocials && !scholar.bio) {
+    return null;
+  }
   return (
     <div className={styles.meta}>
       {scholar.bio && <p className={styles.bio}>{scholar.bio}</p>}

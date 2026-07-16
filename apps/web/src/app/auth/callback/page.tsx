@@ -7,7 +7,9 @@ import { authClient } from "@/core/auth";
 
 // Only allow in-app destinations to prevent open redirects via ?redirect=.
 function safeNext(value: string | null): string {
-  if (value && value.startsWith("/") && !value.startsWith("//")) return value;
+  if (value && value.startsWith("/") && !value.startsWith("//")) {
+    return value;
+  }
   return routes.home;
 }
 
@@ -17,7 +19,9 @@ function AuthCallbackInner() {
   const handled = useRef(false);
 
   useEffect(() => {
-    if (handled.current) return;
+    if (handled.current) {
+      return;
+    }
     handled.current = true;
 
     const ott = params.get("ott");

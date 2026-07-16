@@ -1,6 +1,5 @@
 import { vi, type Mock } from "vitest";
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { proxy } from "./proxy";
 
 vi.mock("next/server", () => ({

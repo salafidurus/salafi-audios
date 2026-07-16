@@ -35,7 +35,9 @@ export function ConfirmText({
   const isWordConfirmed = confirmWord ? inputValue === confirmWord : true;
 
   const handleConfirm = () => {
-    if (!isWordConfirmed) return;
+    if (!isWordConfirmed) {
+      return;
+    }
     onConfirm();
   };
 

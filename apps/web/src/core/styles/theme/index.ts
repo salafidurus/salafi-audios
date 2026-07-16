@@ -1,5 +1,4 @@
-import { createColors } from "@sd/design-tokens";
-import type { AppColors } from "@sd/design-tokens";
+import { createColors, type AppColors } from "@sd/design-tokens";
 import { createAccentRecipesWeb, type AccentRecipesWeb } from "./recipes";
 import { spacingWeb, type SpacingWeb } from "./spacing";
 import { radiusWeb, type RadiusWeb } from "./radius";

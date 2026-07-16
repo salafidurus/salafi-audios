@@ -16,8 +16,12 @@ export const authClient = createAuthClient({
       // The server emits `set-auth-token` whenever it issues/refreshes a
       // session (notably the one-time-token verify that completes OAuth).
       const token = ctx.response.headers.get("set-auth-token");
-      if (token) setBearerToken(token);
-      if (String(ctx.request.url).endsWith("/sign-out")) clearBearerToken();
+      if (token) {
+        setBearerToken(token);
+      }
+      if (String(ctx.request.url).endsWith("/sign-out")) {
+        clearBearerToken();
+      }
     },
   },
 });

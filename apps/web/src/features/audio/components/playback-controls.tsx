@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import type { CSSProperties } from "react";
+import React, { type CSSProperties } from "react";
 import { useAudio } from "@sd/domain-audio";
 import { audioService } from "../index";
 import { Play, Pause, RotateCw, RotateCcw } from "lucide-react";
@@ -70,8 +69,9 @@ export function PlaybackControls() {
     audioService.setSpeed(speeds[nextIndex]!);
   };
 
-  if (!hasTrack) return null;
-
+  if (!hasTrack) {
+    return null;
+  }
   const playButtonStyle: CSSProperties = {
     width: 40,
     height: 40,

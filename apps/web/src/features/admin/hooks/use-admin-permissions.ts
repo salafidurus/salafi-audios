@@ -1,5 +1,10 @@
-import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
-import type { AdminPermission } from "@sd/core-contracts";
+import {
+  useApiQuery,
+  queryKeys,
+  httpClient,
+  endpoints,
+  type AdminPermission,
+} from "@sd/core-contracts";
 import type { UseQueryOptions, QueryKey } from "@tanstack/react-query";
 import { useAuth } from "@/core/auth";
 

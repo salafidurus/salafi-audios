@@ -17,7 +17,9 @@ import styles from "./dropdown.module.css";
 function extractItemsFromChildren(children: ReactNode): DropdownItem[] {
   const extracted: DropdownItem[] = [];
   Children.forEach(children, (child) => {
-    if (!isValidElement<{ children?: ReactNode }>(child)) return;
+    if (!isValidElement<{ children?: ReactNode }>(child)) {
+      return;
+    }
     if (child.type === DropdownItemComponent) {
       const label = typeof child.props.children === "string" ? child.props.children : "";
       extracted.push({
@@ -61,7 +63,9 @@ export function Dropdown({
 
   const registerItem = useCallback((itemValue: string, label: string, disabled?: boolean) => {
     setItems((prev) => {
-      if (prev.some((i) => i.value === itemValue)) return prev;
+      if (prev.some((i) => i.value === itemValue)) {
+        return prev;
+      }
       return [...prev, { value: itemValue, label, disabled }];
     });
     return () => {

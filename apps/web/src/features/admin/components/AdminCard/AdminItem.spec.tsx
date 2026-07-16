@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { AdminItem } from "./AdminItem";
-import type { AdminItemProps } from "./AdminItem";
+import { AdminItem, type AdminItemProps } from "./AdminItem";
 
 const mockActions = <div data-testid="actions">Actions</div>;
 

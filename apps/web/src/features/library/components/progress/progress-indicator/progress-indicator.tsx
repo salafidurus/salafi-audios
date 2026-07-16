@@ -10,8 +10,9 @@ type ProgressIndicatorProps = {
 export function ProgressIndicator({ listingId, size = 32 }: ProgressIndicatorProps) {
   const { progressPercent, isCompleted } = useListingProgress(listingId);
 
-  if (progressPercent === 0 && !isCompleted) return null;
-
+  if (progressPercent === 0 && !isCompleted) {
+    return null;
+  }
   const strokeWidth = 3;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
