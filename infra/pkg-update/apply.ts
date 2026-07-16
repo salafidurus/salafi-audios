@@ -62,6 +62,15 @@ export function syncWorkspaceDeps(
   const files = findWorkspacePkgFiles(rootDir);
   const updated: string[] = [];
 
+  // nosemgrep
+  const rootPkg = JSON.parse(readFileSync(resolve(rootDir, "package.json"), "utf-8")) as Record<
+    string,
+    unknown
+  >;
+  const catalog = (rootPkg.workspaces as Record<string, unknown> | undefined)?.catalog as
+    | Record<string, string>
+    | undefined;
+
   const groupPatterns = getGroupPatterns(candidate.packageName, cfg);
   const groupName = groupPatterns
     ? Object.entries(cfg.groups).find(([, g]) => g.patterns === groupPatterns)?.[0]
@@ -78,8 +87,7 @@ export function syncWorkspaceDeps(
 
       const currentDep = deps[candidate.packageName];
       if (currentDep !== undefined && !shouldSkipPackage(candidate.packageName, cfg)) {
-        const prefix = currentDep.match(/^([\^~])\s*/)?.[1] ?? "";
-        deps[candidate.packageName] = `${prefix}${candidate.latestVersion}`;
+        deps[candidate.packageName] = catalog?.[candidate.packageName] ?? candidate.latestVersion;
         dirty = true;
       }
 
@@ -87,9 +95,7 @@ export function syncWorkspaceDeps(
         for (const depName of Object.keys(deps)) {
           const matchesGroup = groupPatterns.some((p) => matchesPattern(depName, p));
           if (matchesGroup && !shouldSkipPackage(depName, cfg)) {
-            const depVer = deps[depName]!;
-            const depPrefix = depVer.match(/^([\^~])\s*/)?.[1] ?? "";
-            deps[depName] = `${depPrefix}${candidate.latestVersion}`;
+            deps[depName] = catalog?.[depName] ?? candidate.latestVersion;
             dirty = true;
           }
         }
