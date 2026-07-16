@@ -112,6 +112,7 @@ export class ExploreRepo {
     // Build feed with mixed content and horizontal rows
     const items: FeedItemDto[] = [];
     const scholarRow = await this.getScholarRowItems(locale);
+    const topicRow = topicSlugs?.length ? await this.getTopicRowItems(topicSlugs[0]!, locale) : null;
     let scholarRowInjected = false;
     let topicRowInjected = false;
 
@@ -125,12 +126,9 @@ export class ExploreRepo {
       }
 
       // Inject topic row after 7th item if we have topic suggestions
-      if (!topicRowInjected && i === 7 && topicSlugs?.length) {
-        const topicRow = await this.getTopicRowItems(topicSlugs[0]!, locale);
-        if (topicRow) {
-          items.push(topicRow);
-          topicRowInjected = true;
-        }
+      if (!topicRowInjected && i === 7 && topicRow) {
+        items.push(topicRow);
+        topicRowInjected = true;
       }
     }
 

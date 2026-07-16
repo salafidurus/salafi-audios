@@ -9,12 +9,12 @@ import { AccountController } from './account.controller';
 import { AccountService } from './account.service';
 import { PrismaService } from '../../shared/db/prisma.service';
 
-const mockAuth = { api: { getSession: vi.fn() } };
+const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockPrisma = {
   userRoleAssignment: {
-    findMany: vi.fn().mockResolvedValue([{ role: 'user' }]),
+    findMany: vi.fn<any>().mockResolvedValue([{ role: 'user' }]),
   },
 };
 
@@ -30,8 +30,8 @@ const mockProfile = {
 };
 
 const mockAccountService = {
-  getProfile: vi.fn().mockReturnValue(mockProfile),
-  updateProfile: vi.fn().mockResolvedValue(mockProfile),
+  getProfile: vi.fn<any>().mockReturnValue(mockProfile),
+  updateProfile: vi.fn<any>().mockResolvedValue(mockProfile),
 };
 
 describe('AccountController — auth boundaries', () => {
@@ -59,9 +59,10 @@ describe('AccountController — auth boundaries', () => {
   afterEach(() => app.close());
 
   describe('401 — no session', () => {
-    it('GET /account/profile returns 401 without a session', () => {
+    it('GET /account/profile returns 401 without a session', async () => {
       mockAuth.api.getSession.mockResolvedValue(null);
-      return request(app.getHttpServer()).get('/account/profile').expect(401);
+      const response = await request(app.getHttpServer()).get('/account/profile');
+      expect(response.status).toBe(401);
     });
   });
 
@@ -105,12 +106,12 @@ describe('AccountController — auth boundaries', () => {
   });
 
   describe('401 — unauthenticated PATCH', () => {
-    it('PATCH /account/profile returns 401 without a session', () => {
+    it('PATCH /account/profile returns 401 without a session', async () => {
       mockAuth.api.getSession.mockResolvedValue(null);
-      return request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .patch('/account/profile')
-        .send({ displayName: 'X' })
-        .expect(401);
+        .send({ displayName: 'X' });
+      expect(response.status).toBe(401);
     });
   });
 });

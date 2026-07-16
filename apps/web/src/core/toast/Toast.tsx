@@ -23,6 +23,7 @@ export function ToastContainer() {
             <span className={styles.message}>{toast.message}</span>
           </div>
           <button
+            type="button"
             onClick={() => removeToast(toast.id)}
             className={styles.closeButton}
             aria-label="Close notification"

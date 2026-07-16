@@ -7,6 +7,7 @@ import type { LibraryItemDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { useFormattedDate } from "@/shared/hooks/use-formatted-date";
 import styles from "./library-list-row.module.css";
 
 export type LibraryListRowProps = {
@@ -26,16 +27,27 @@ export function LibraryListRow({ item, variant }: LibraryListRowProps) {
       ? Math.round((item.progressSeconds / item.durationSeconds) * 100)
       : null;
 
+  const savedAtFormatted = useFormattedDate(item.savedAt || "", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+  const completedAtFormatted = useFormattedDate(item.completedAt || "", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+
   let rightLabelText = "";
   if (variant === "progress" && progress !== null) {
     rightLabelText = t("library.percentListened", "{{percent}}% listened", { percent: progress });
   } else if (variant === "saved" && item.savedAt) {
     rightLabelText = t("library.savedOn", "Saved {{date}}", {
-      date: new Date(item.savedAt).toLocaleDateString(),
+      date: savedAtFormatted,
     });
   } else if (variant === "completed" && item.completedAt) {
     rightLabelText = t("library.completedOn", "Completed {{date}}", {
-      date: new Date(item.completedAt).toLocaleDateString(),
+      date: completedAtFormatted,
     });
   } else if (item.durationSeconds) {
     rightLabelText = t("lecture.minutes", "{{count}} min", {

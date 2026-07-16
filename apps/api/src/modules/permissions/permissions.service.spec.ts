@@ -15,8 +15,8 @@ describe('PermissionsService', () => {
         {
           provide: PermissionsRepository,
           useValue: {
-            getUserRolesDetail: vi.fn(),
-          } satisfies Partial<Mocked<PermissionsRepository>>,
+            getUserRolesDetail: vi.fn<any>(),
+          } as Partial<Mocked<PermissionsRepository>>,
         },
       ],
     }).compile();

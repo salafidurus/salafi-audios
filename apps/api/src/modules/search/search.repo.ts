@@ -518,7 +518,7 @@ export class SearchRepository {
   }
 
   private collectionFallbackOrderBySql(query: string, includeRelated: boolean): Prisma.Sql {
-    const clauses = this.fallbackRankingClauses('c."title"', 's."name"', query, includeRelated);
+    const clauses = this.collectionFallbackRankingClauses(query, includeRelated);
 
     clauses.push(Prisma.sql`c."publishedLectureCount" DESC NULLS LAST`, Prisma.sql`c."id" ASC`);
 
@@ -526,7 +526,7 @@ export class SearchRepository {
   }
 
   private seriesFallbackOrderBySql(query: string, includeRelated: boolean): Prisma.Sql {
-    const clauses = this.fallbackRankingClauses('se."title"', 's."name"', query, includeRelated);
+    const clauses = this.seriesFallbackRankingClauses(query, includeRelated);
 
     clauses.push(Prisma.sql`se."publishedLectureCount" DESC NULLS LAST`, Prisma.sql`se."id" ASC`);
 
@@ -534,7 +534,7 @@ export class SearchRepository {
   }
 
   private lectureFallbackOrderBySql(query: string, includeRelated: boolean): Prisma.Sql {
-    const clauses = this.fallbackRankingClauses('l."title"', 's."name"', query, includeRelated);
+    const clauses = this.lectureFallbackRankingClauses(query, includeRelated);
 
     clauses.push(Prisma.sql`l."publishedAt" DESC NULLS LAST`, Prisma.sql`l."id" ASC`);
 
@@ -634,9 +634,7 @@ export class SearchRepository {
     return Prisma.sql`${Prisma.join(clauses, ', ')}`;
   }
 
-  private fallbackRankingClauses(
-    titleColumn: string,
-    scholarColumn: string,
+  private collectionFallbackRankingClauses(
     query: string,
     includeRelated: boolean,
   ): Prisma.Sql[] {
@@ -645,18 +643,74 @@ export class SearchRepository {
     const contains = this.likeContainsPattern(query);
     const scholarCases = includeRelated
       ? Prisma.sql`
-          WHEN ${Prisma.raw(scholarColumn)} ILIKE ${exact} ESCAPE '\\' THEN 3
-          WHEN ${Prisma.raw(scholarColumn)} ILIKE ${prefix} ESCAPE '\\' THEN 4
-          WHEN ${Prisma.raw(scholarColumn)} ILIKE ${contains} ESCAPE '\\' THEN 5
+          WHEN s."name" ILIKE ${exact} ESCAPE '\\' THEN 3
+          WHEN s."name" ILIKE ${prefix} ESCAPE '\\' THEN 4
+          WHEN s."name" ILIKE ${contains} ESCAPE '\\' THEN 5
         `
       : Prisma.sql``;
 
     return [
       Prisma.sql`
         CASE
-          WHEN ${Prisma.raw(titleColumn)} ILIKE ${exact} ESCAPE '\\' THEN 0
-          WHEN ${Prisma.raw(titleColumn)} ILIKE ${prefix} ESCAPE '\\' THEN 1
-          WHEN ${Prisma.raw(titleColumn)} ILIKE ${contains} ESCAPE '\\' THEN 2
+          WHEN c."title" ILIKE ${exact} ESCAPE '\\' THEN 0
+          WHEN c."title" ILIKE ${prefix} ESCAPE '\\' THEN 1
+          WHEN c."title" ILIKE ${contains} ESCAPE '\\' THEN 2
+          ${scholarCases}
+          ELSE 6
+        END ASC
+      `,
+    ];
+  }
+
+  private seriesFallbackRankingClauses(
+    query: string,
+    includeRelated: boolean,
+  ): Prisma.Sql[] {
+    const exact = this.likeExactPattern(query);
+    const prefix = this.likePrefixPattern(query);
+    const contains = this.likeContainsPattern(query);
+    const scholarCases = includeRelated
+      ? Prisma.sql`
+          WHEN s."name" ILIKE ${exact} ESCAPE '\\' THEN 3
+          WHEN s."name" ILIKE ${prefix} ESCAPE '\\' THEN 4
+          WHEN s."name" ILIKE ${contains} ESCAPE '\\' THEN 5
+        `
+      : Prisma.sql``;
+
+    return [
+      Prisma.sql`
+        CASE
+          WHEN se."title" ILIKE ${exact} ESCAPE '\\' THEN 0
+          WHEN se."title" ILIKE ${prefix} ESCAPE '\\' THEN 1
+          WHEN se."title" ILIKE ${contains} ESCAPE '\\' THEN 2
+          ${scholarCases}
+          ELSE 6
+        END ASC
+      `,
+    ];
+  }
+
+  private lectureFallbackRankingClauses(
+    query: string,
+    includeRelated: boolean,
+  ): Prisma.Sql[] {
+    const exact = this.likeExactPattern(query);
+    const prefix = this.likePrefixPattern(query);
+    const contains = this.likeContainsPattern(query);
+    const scholarCases = includeRelated
+      ? Prisma.sql`
+          WHEN s."name" ILIKE ${exact} ESCAPE '\\' THEN 3
+          WHEN s."name" ILIKE ${prefix} ESCAPE '\\' THEN 4
+          WHEN s."name" ILIKE ${contains} ESCAPE '\\' THEN 5
+        `
+      : Prisma.sql``;
+
+    return [
+      Prisma.sql`
+        CASE
+          WHEN l."title" ILIKE ${exact} ESCAPE '\\' THEN 0
+          WHEN l."title" ILIKE ${prefix} ESCAPE '\\' THEN 1
+          WHEN l."title" ILIKE ${contains} ESCAPE '\\' THEN 2
           ${scholarCases}
           ELSE 6
         END ASC

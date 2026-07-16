@@ -140,10 +140,10 @@ export const CreateScholarDtoSchema = z.object({
   isActive: z.boolean().optional(),
   country: CountryCodeSchema.default("SA"),
   mainLanguage: LocaleSchema.default("ar"),
-  socialTwitter: z.string().url().optional().or(z.literal("")),
-  socialTelegram: z.string().url().optional().or(z.literal("")),
-  socialYoutube: z.string().url().optional().or(z.literal("")),
-  socialWebsite: z.string().url().optional().or(z.literal("")),
+  socialTwitter: z.url().optional().or(z.literal("")),
+  socialTelegram: z.url().optional().or(z.literal("")),
+  socialYoutube: z.url().optional().or(z.literal("")),
+  socialWebsite: z.url().optional().or(z.literal("")),
 });
 export type CreateScholarDto = z.infer<typeof CreateScholarDtoSchema>;
 

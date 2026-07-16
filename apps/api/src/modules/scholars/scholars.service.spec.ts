@@ -51,13 +51,13 @@ describe('ScholarsService', () => {
         {
           provide: ScholarsRepository,
           useValue: {
-            list: vi.fn(),
-            findBySlug: vi.fn(),
-            getContent: vi.fn(),
-            create: vi.fn(),
-            update: vi.fn(),
-            findById: vi.fn(),
-          } satisfies Partial<Mocked<ScholarsRepository>>,
+            list: vi.fn<any>(),
+            findBySlug: vi.fn<any>(),
+            getContent: vi.fn<any>(),
+            create: vi.fn<any>(),
+            update: vi.fn<any>(),
+            findById: vi.fn<any>(),
+          } as Partial<Mocked<ScholarsRepository>>,
         },
       ],
     }).compile();

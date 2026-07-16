@@ -12,22 +12,22 @@ import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard
 import { PrismaService } from '../../shared/db/prisma.service';
 import { Permissions } from '@sd/core-contracts';
 
-const mockAuth = { api: { getSession: vi.fn() } };
+const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockPermissionsService = {
-  listUsers: vi.fn().mockResolvedValue({ users: [] }),
-  getPermissions: vi.fn().mockResolvedValue({ permissions: [] }),
+  listUsers: vi.fn<any>().mockResolvedValue({ users: [] }),
+  getPermissions: vi.fn<any>().mockResolvedValue({ permissions: [] }),
 };
 
 const mockPrisma = {
   userPermission: {
-    findMany: vi.fn().mockResolvedValue([]),
-    findUnique: vi.fn().mockResolvedValue(null),
+    findMany: vi.fn<any>().mockResolvedValue([]),
+    findUnique: vi.fn<any>().mockResolvedValue(null),
   },
   userRoleAssignment: {
-    findMany: vi.fn().mockResolvedValue([]),
-    findUnique: vi.fn().mockResolvedValue(null),
+    findMany: vi.fn<any>().mockResolvedValue([]),
+    findUnique: vi.fn<any>().mockResolvedValue(null),
   },
 };
 
@@ -66,12 +66,14 @@ describe('AdminUsersController — auth boundaries', () => {
       mockAuth.api.getSession.mockResolvedValue(null);
     });
 
-    it('GET /admin/users returns 401 without a session', () => {
-      return request(app.getHttpServer()).get('/admin/users').expect(401);
+    it('GET /admin/users returns 401 without a session', async () => {
+      const response = await request(app.getHttpServer()).get('/admin/users');
+      expect(response.status).toBe(401);
     });
 
-    it('GET /admin/users/:userId/permissions returns 401 without a session', () => {
-      return request(app.getHttpServer()).get('/admin/users/u2/permissions').expect(401);
+    it('GET /admin/users/:userId/permissions returns 401 without a session', async () => {
+      const response = await request(app.getHttpServer()).get('/admin/users/u2/permissions');
+      expect(response.status).toBe(401);
     });
   });
 
@@ -90,12 +92,14 @@ describe('AdminUsersController — auth boundaries', () => {
       mockPrisma.userPermission.findUnique.mockResolvedValue(null);
     });
 
-    it('GET /admin/users returns 403 without USERS_VIEW permission', () => {
-      return request(app.getHttpServer()).get('/admin/users').expect(403);
+    it('GET /admin/users returns 403 without USERS_VIEW permission', async () => {
+      const response = await request(app.getHttpServer()).get('/admin/users');
+      expect(response.status).toBe(403);
     });
 
-    it('GET /admin/users/:userId/permissions returns 403 without USERS_VIEW permission', () => {
-      return request(app.getHttpServer()).get('/admin/users/u2/permissions').expect(403);
+    it('GET /admin/users/:userId/permissions returns 403 without USERS_VIEW permission', async () => {
+      const response = await request(app.getHttpServer()).get('/admin/users/u2/permissions');
+      expect(response.status).toBe(403);
     });
   });
 
@@ -120,14 +124,18 @@ describe('AdminUsersController — auth boundaries', () => {
       });
     });
 
-    it('GET /admin/users returns 200 with USERS_VIEW permission', () => {
+    it('GET /admin/users returns 200 with USERS_VIEW permission', async () => {
       mockPermissionsService.listUsers.mockResolvedValue({ users: [] });
-      return request(app.getHttpServer()).get('/admin/users').expect(200);
+      const response = await request(app.getHttpServer()).get('/admin/users');
+      expect(response.status).toBe(200);
+      expect(response.body).toBeDefined();
     });
 
-    it('GET /admin/users/:userId/permissions returns 200 with USERS_VIEW permission', () => {
+    it('GET /admin/users/:userId/permissions returns 200 with USERS_VIEW permission', async () => {
       mockPermissionsService.getPermissions.mockResolvedValue({ permissions: [] });
-      return request(app.getHttpServer()).get('/admin/users/u2/permissions').expect(200);
+      const response = await request(app.getHttpServer()).get('/admin/users/u2/permissions');
+      expect(response.status).toBe(200);
+      expect(response.body).toBeDefined();
     });
   });
 });

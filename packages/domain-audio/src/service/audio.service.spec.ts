@@ -7,15 +7,15 @@ import type { Track } from "../types/track.types";
 
 // Mock progress sync module to avoid network triggers in tests
 vi.mock("../progress/progress.sync", () => ({
-  syncProgressToBackend: vi.fn(),
-  syncLocalToServer: vi.fn(),
-  saveListing: vi.fn(),
-  unsaveListing: vi.fn(),
+  syncProgressToBackend: vi.fn<() => void>(),
+  syncLocalToServer: vi.fn<() => void>(),
+  saveListing: vi.fn<() => void>(),
+  unsaveListing: vi.fn<() => void>(),
 }));
 
 // Mock httpClient used for lazy stream URL resolution
 vi.mock("@sd/core-contracts", () => ({
-  httpClient: vi.fn(),
+  httpClient: vi.fn<() => Promise<{ url: string }>>(),
   endpoints: {
     audio: {
       listings: {
@@ -47,15 +47,15 @@ describe("DurusAudioService", () => {
     vi.mocked(httpClient).mockResolvedValue({ url: "https://resolved.stream.mp3" });
 
     mockEngine = {
-      setup: vi.fn().mockResolvedValue(undefined),
-      load: vi.fn().mockResolvedValue(undefined),
-      play: vi.fn().mockResolvedValue(undefined),
-      pause: vi.fn().mockResolvedValue(undefined),
-      seek: vi.fn().mockResolvedValue(undefined),
-      setSpeed: vi.fn().mockResolvedValue(undefined),
-      stop: vi.fn().mockResolvedValue(undefined),
-      destroy: vi.fn().mockResolvedValue(undefined),
-      setEvents: vi.fn().mockImplementation((ev) => {
+      setup: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+      load: vi.fn<(track: Track) => Promise<void>>().mockResolvedValue(undefined),
+      play: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+      pause: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+      seek: vi.fn<(seconds: number) => Promise<void>>().mockResolvedValue(undefined),
+      setSpeed: vi.fn<(speed: number) => Promise<void>>().mockResolvedValue(undefined),
+      stop: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+      destroy: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
+      setEvents: vi.fn<(events: PlaybackEngineEvents) => void>().mockImplementation((ev) => {
         engineEvents = ev;
       }),
     } as unknown as Mocked<PlaybackEngine>;

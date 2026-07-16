@@ -3,6 +3,7 @@
 import Image from "next/image";
 import type { ListingDetailDto } from "@sd/core-contracts";
 import { AppText } from "@/shared/components/AppText/AppText";
+import { useFormattedDate } from "@/shared/hooks/use-formatted-date";
 import styles from "./lecture-meta.module.css";
 
 function formatDuration(seconds: number): string {
@@ -14,17 +15,18 @@ function formatDuration(seconds: number): string {
   return `${m} min`;
 }
 
-function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, {
+export type LectureMetaProps = {
+  lecture: ListingDetailDto;
+};
+
+function PublishedDateContent({ publishedAt }: { publishedAt: string }) {
+  const formatted = useFormattedDate(publishedAt, {
     year: "numeric",
     month: "short",
     day: "numeric",
   });
+  return <AppText variant="bodySm">{formatted}</AppText>;
 }
-
-export type LectureMetaProps = {
-  lecture: ListingDetailDto;
-};
 
 export function LectureMeta({ lecture }: LectureMetaProps) {
   return (
@@ -47,7 +49,7 @@ export function LectureMeta({ lecture }: LectureMetaProps) {
       {/* Published date */}
       {lecture.publishedAt && (
         <div className={styles.mutedText}>
-          <AppText variant="bodySm">{formatDate(lecture.publishedAt)}</AppText>
+          <PublishedDateContent publishedAt={lecture.publishedAt} />
         </div>
       )}
 

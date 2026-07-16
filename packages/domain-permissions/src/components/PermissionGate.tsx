@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useMemo } from "react";
 import type { Permission, UserRole } from "@sd/core-contracts";
 import {
   useHasPermission,
@@ -67,23 +68,32 @@ export function PermissionGate({
   fallback = null,
   mode = "any",
 }: PermissionGateProps): ReactNode {
-  // Single permission
-  if (typeof requires === "string") {
-    const hasPermission = useHasPermission(requires);
-    return hasPermission ? children : fallback;
-  }
+  // Determine if single permission
+  const isSingle = typeof requires === "string";
+  const singlePermission = isSingle ? (requires as Permission) : null;
 
-  // Multiple permissions
-  const permissionsArray = Array.from(requires || []);
+  // Normalize to array
+  const permissionsArray = useMemo(
+    () => (isSingle ? [singlePermission!] : Array.from(requires || [])),
+    [isSingle, singlePermission, requires]
+  );
 
-  if (mode === "all") {
-    const hasAllPermissions = useHasAllPermissions(permissionsArray);
-    return hasAllPermissions ? children : fallback;
-  }
-
-  // mode === "any" (default)
+  // Call all hooks unconditionally at top level
+  const hasSinglePermission = useHasPermission(
+    singlePermission || permissionsArray[0] || ("" as Permission)
+  );
+  const hasAllPermissions = useHasAllPermissions(permissionsArray);
   const hasAnyPermission = useHasAnyPermission(permissionsArray);
-  return hasAnyPermission ? children : fallback;
+
+  // Determine access based on mode
+  const hasAccess = useMemo(() => {
+    if (isSingle) {
+      return hasSinglePermission;
+    }
+    return mode === "all" ? hasAllPermissions : hasAnyPermission;
+  }, [isSingle, hasSinglePermission, hasAllPermissions, hasAnyPermission, mode]);
+
+  return hasAccess ? children : fallback;
 }
 
 interface RoleGateProps {
@@ -144,21 +154,30 @@ export function RoleGate({
   fallback = null,
   mode = "any",
 }: RoleGateProps): ReactNode {
-  // Single role
-  if (typeof requires === "string") {
-    const hasRole = useHasRole(requires);
-    return hasRole ? children : fallback;
-  }
+  // Determine if single role
+  const isSingle = typeof requires === "string";
+  const singleRole = isSingle ? (requires as UserRole) : null;
 
-  // Multiple roles
-  const rolesArray = Array.from(requires || []);
+  // Normalize to array
+  const rolesArray = useMemo(
+    () => (isSingle ? [singleRole!] : Array.from(requires || [])),
+    [isSingle, singleRole, requires]
+  );
 
-  if (mode === "all") {
-    const hasAllRoles = useHasAllRoles(rolesArray);
-    return hasAllRoles ? children : fallback;
-  }
-
-  // mode === "any" (default)
+  // Call all hooks unconditionally at top level
+  const hasSingleRole = useHasRole(
+    singleRole || rolesArray[0] || ("" as UserRole)
+  );
+  const hasAllRoles = useHasAllRoles(rolesArray);
   const hasAnyRole = useHasAnyRole(rolesArray);
-  return hasAnyRole ? children : fallback;
+
+  // Determine access based on mode
+  const hasAccess = useMemo(() => {
+    if (isSingle) {
+      return hasSingleRole;
+    }
+    return mode === "all" ? hasAllRoles : hasAnyRole;
+  }, [isSingle, hasSingleRole, hasAllRoles, hasAnyRole, mode]);
+
+  return hasAccess ? children : fallback;
 }

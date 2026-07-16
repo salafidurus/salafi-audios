@@ -1,16 +1,13 @@
 import { useState, useCallback } from "react";
-import { LayoutAnimation, Platform, Pressable, ScrollView, UIManager, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import "react-native-reanimated";
 import { useScholarDetail, useScholarContent, useScholarTopics } from "@sd/domain-content";
 import { ChevronDown } from "lucide-react-native";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { ScholarContentList } from "@/features/listing/components/scholar-content-list/scholar-content-list";
 import { ScholarHeader } from "@/features/listing/components/scholar-header/scholar-header";
-
-if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 
 export type ScholarDetailScreenProps = {
   slug: string;
@@ -26,7 +23,6 @@ function TopicSection({ topicName, children }: TopicSectionProps) {
   const { theme } = useUnistyles();
 
   const handleToggle = useCallback(() => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpanded((prev) => !prev);
   }, []);
 

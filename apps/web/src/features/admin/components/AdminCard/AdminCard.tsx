@@ -59,10 +59,18 @@ export function AdminCard({
 
   const isThumbnailImage = thumbnail && typeof thumbnail === "object" && "src" in thumbnail;
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if ((e.key === "Enter" || e.key === " ") && onClick) {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
   return (
     <div
       className={`${styles.card} ${onClick ? styles.clickable : ""} ${className || ""}`}
       onClick={onClick}
+      onKeyDown={handleKeyDown}
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
     >

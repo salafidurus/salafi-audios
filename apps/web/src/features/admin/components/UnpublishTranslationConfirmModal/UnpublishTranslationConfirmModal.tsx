@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
-import { Modal } from "../../../../shared/components/Modal";
-import { Button } from "../../../../shared/components/Button";
+import { useState } from "react";
+import type { ReactNode } from "react";
+import { Modal } from "@/shared/components/Modal/Modal";
+import { Button } from "@/shared/components/Button";
 
 interface UnpublishTranslationConfirmModalProps {
   isOpen: boolean;

@@ -165,6 +165,16 @@ export function ImageUpload({
     }
   }, [disabled]);
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if ((e.key === "Enter" || e.key === " ") && !disabled) {
+        e.preventDefault();
+        fileInputRef.current?.click();
+      }
+    },
+    [disabled],
+  );
+
   const handleRemove = useCallback(() => {
     setPreviewUrl(null);
     setUploadError(null);
@@ -183,6 +193,7 @@ export function ImageUpload({
         onChange={handleFileSelect}
         className={styles.hiddenInput}
         disabled={disabled}
+        aria-label="Select image file"
       />
 
       {!previewUrl ? (
@@ -192,6 +203,7 @@ export function ImageUpload({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onClick={handleClick}
+          onKeyDown={handleKeyDown}
           role="button"
           tabIndex={disabled ? -1 : 0}
           aria-label="Upload image"

@@ -38,10 +38,10 @@ describe('ExploreService', () => {
         {
           provide: ExploreRepo,
           useValue: {
-            getExplore: vi.fn(),
-            getExploreRecent: vi.fn(),
-            getScholars: vi.fn(),
-          } satisfies Partial<Mocked<ExploreRepo>>,
+            getExplore: vi.fn<any>(),
+            getExploreRecent: vi.fn<any>(),
+            getScholars: vi.fn<any>(),
+          } as Partial<Mocked<ExploreRepo>>,
         },
       ],
     }).compile();

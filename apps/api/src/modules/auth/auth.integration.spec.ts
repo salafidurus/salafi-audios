@@ -9,12 +9,12 @@ import { Public } from './decorators';
 import { AuthGuard } from './auth.guard';
 import { PrismaService } from '../../shared/db/prisma.service';
 
-const mockAuth = { api: { getSession: vi.fn() } };
+const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('./auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockPrisma = {
   userRoleAssignment: {
-    findMany: vi.fn().mockResolvedValue([{ role: 'user' }]),
+    findMany: vi.fn<any>().mockResolvedValue([{ role: 'user' }]),
   },
 };
 
@@ -53,13 +53,16 @@ describe('AuthGuard — HTTP integration', () => {
 
   afterEach(() => app.close());
 
-  it('GET /auth-test/public returns 200 without auth (public route)', () => {
-    return request(app.getHttpServer()).get('/auth-test/public').expect(200);
+  it('GET /auth-test/public returns 200 without auth (public route)', async () => {
+    const response = await request(app.getHttpServer()).get('/auth-test/public');
+    expect(response.status).toBe(200);
+    expect(response.body).toBeDefined();
   });
 
-  it('GET /auth-test/protected returns 401 without a session', () => {
+  it('GET /auth-test/protected returns 401 without a session', async () => {
     mockAuth.api.getSession.mockResolvedValue(null);
-    return request(app.getHttpServer()).get('/auth-test/protected').expect(401);
+    const response = await request(app.getHttpServer()).get('/auth-test/protected');
+    expect(response.status).toBe(401);
   });
 
   it('GET /auth-test/protected returns 200 with a valid session', async () => {
@@ -68,7 +71,9 @@ describe('AuthGuard — HTTP integration', () => {
       session: {},
     });
 
-    return request(app.getHttpServer()).get('/auth-test/protected').expect(200);
+    const response = await request(app.getHttpServer()).get('/auth-test/protected');
+    expect(response.status).toBe(200);
+    expect(response.body).toBeDefined();
   });
 
   it('GET /auth-test/protected returns 403 for a banned user', async () => {
@@ -83,6 +88,7 @@ describe('AuthGuard — HTTP integration', () => {
       session: {},
     });
 
-    return request(app.getHttpServer()).get('/auth-test/protected').expect(403);
+    const response = await request(app.getHttpServer()).get('/auth-test/protected');
+    expect(response.status).toBe(403);
   });
 });

@@ -9,9 +9,7 @@ import { SettingsRow } from "@/shared/components/SettingsRow/SettingsRow";
 import { SegmentedControl } from "@/shared/components/SegmentedControl/SegmentedControl";
 import { Toggle } from "@/shared/components/Toggle";
 import type { ThemePreference } from "@/core/styles/ThemeSync";
-
-const THEME_KEY = "theme-preference";
-const THEME_CHANGE_EVENT = "theme-change";
+import { THEME_KEY, THEME_CHANGE_EVENT } from "@/core/styles/ThemeSync";
 
 const THEME_OPTIONS: { value: ThemePreference; label: string }[] = [
   { value: "system", label: "System" },
@@ -73,6 +71,11 @@ export function SettingsGeneralScreen() {
     },
     [],
   );
+
+  // Persist notification state to localStorage
+  useEffect(() => {
+    localStorage.setItem(NOTIF_KEY, JSON.stringify(notif));
+  }, [notif]);
 
   return (
     <ScreenView>

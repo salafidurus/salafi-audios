@@ -59,7 +59,7 @@ export function MiniPlayer() {
             </Text>
           </View>
 
-          <Pressable onPress={handlePlayPause} style={styles.playButton}>
+          <Pressable onPress={handlePlayPause} style={styles.playButton} testID="play-button">
             {isLoading ? (
               <ActivityIndicator size="small" color={theme.colors.content.strong} />
             ) : isPlaying ? (

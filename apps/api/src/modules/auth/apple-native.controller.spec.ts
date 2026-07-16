@@ -12,8 +12,8 @@ describe('AppleNativeController', () => {
 
   beforeEach(async () => {
     service = {
-      verifyIdentityToken: vi.fn(),
-      handleAppleSignIn: vi.fn(),
+      verifyIdentityToken: vi.fn<any>(),
+      handleAppleSignIn: vi.fn<any>(),
     };
 
     const module: TestingModule = await Test.createTestingModule({

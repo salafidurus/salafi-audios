@@ -7,7 +7,7 @@ import { AuthBridgeController } from './auth-bridge.controller';
 import { ConfigService } from '../../shared/config/config.service';
 import { PrismaService } from '../../shared/db/prisma.service';
 
-const mockAuth = { api: { generateOneTimeToken: vi.fn(), getSession: vi.fn() } };
+const mockAuth = { api: { generateOneTimeToken: vi.fn<any>(), getSession: vi.fn<any>() } };
 vi.mock('./auth.instance', () => ({ getAuth: () => mockAuth }));
 
 describe('AuthBridgeController — OAuth handoff', () => {
@@ -16,8 +16,8 @@ describe('AuthBridgeController — OAuth handoff', () => {
 
   const mockPrisma = {
     userRoleAssignment: {
-      findMany: vi.fn(),
-      create: vi.fn(),
+      findMany: vi.fn<any>(),
+      create: vi.fn<any>(),
     },
   };
 

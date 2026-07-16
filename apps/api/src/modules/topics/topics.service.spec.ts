@@ -24,11 +24,11 @@ describe('TopicsService', () => {
         {
           provide: TopicsRepository,
           useValue: {
-            list: vi.fn(),
-            findBySlug: vi.fn(),
-            upsertBySlug: vi.fn(),
-            upsertTopicTranslation: vi.fn(),
-          } satisfies Partial<Mocked<TopicsRepository>>,
+            list: vi.fn<any>(),
+            findBySlug: vi.fn<any>(),
+            upsertBySlug: vi.fn<any>(),
+            upsertTopicTranslation: vi.fn<any>(),
+          } as Partial<Mocked<TopicsRepository>>,
         },
       ],
     }).compile();

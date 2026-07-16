@@ -76,8 +76,11 @@ export class AuthGuard implements CanActivate {
     }
 
     // If specific roles are required via @Roles decorator, check if user has one of them
-    if (requiredRoles?.length && !requiredRoles.some((r) => roles.includes(r as string))) {
-      throw new UnauthorizedException();
+    if (requiredRoles?.length) {
+      const roleSet = new Set(roles);
+      if (!requiredRoles.some((r) => roleSet.has(r as string))) {
+        throw new UnauthorizedException();
+      }
     }
 
     // Attach user info to request (for use by controllers and other services)

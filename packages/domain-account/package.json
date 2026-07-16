@@ -16,11 +16,11 @@
     "test:prepush": "vitest run --changed=origin/main"
   },
   "dependencies": {
-    "@sd/core-contracts": "workspace:*",
-    "@tanstack/react-query": "catalog:"
+    "@sd/core-contracts": "workspace:*"
   },
   "devDependencies": {},
   "peerDependencies": {
+    "@tanstack/react-query": "catalog:",
     "react": "^19.0.0"
   }
 }

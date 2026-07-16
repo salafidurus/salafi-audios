@@ -57,6 +57,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "catalog:",
+    "react": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -66,6 +67,7 @@
     "tsup": "catalog:"
   },
   "peerDependencies": {
+    "@tanstack/react-query": "catalog:",
     "react": ">=18"
   }
 }

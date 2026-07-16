@@ -17,10 +17,10 @@ describe('AppleNativeService', () => {
   beforeEach(async () => {
     config = { APPLE_CLIENT_ID: 'com.example.app' };
     repo = {
-      findAccountByProviderId: vi.fn(),
-      createUser: vi.fn(),
-      createAccount: vi.fn(),
-      createSession: vi.fn(),
+      findAccountByProviderId: vi.fn<any>(),
+      createUser: vi.fn<any>(),
+      createAccount: vi.fn<any>(),
+      createSession: vi.fn<any>(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -40,7 +40,9 @@ describe('AppleNativeService', () => {
     });
 
     it('throws on invalid JWT format', async () => {
-      await expect(service.verifyIdentityToken('not-a-jwt')).rejects.toThrow();
+      await expect(service.verifyIdentityToken('not-a-jwt')).rejects.toThrow(
+        'Apple identity token verification failed',
+      );
     });
   });
 

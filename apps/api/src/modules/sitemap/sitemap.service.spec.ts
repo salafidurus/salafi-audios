@@ -24,8 +24,8 @@ describe('SitemapService', () => {
 
   beforeEach(async () => {
     repo = {
-      findActiveScholars: vi.fn().mockResolvedValue(mockScholars),
-      findPublishedTopLevelListings: vi.fn().mockResolvedValue(mockListings),
+      findActiveScholars: vi.fn<any>().mockResolvedValue(mockScholars),
+      findPublishedTopLevelListings: vi.fn<any>().mockResolvedValue(mockListings),
     };
 
     const module: TestingModule = await Test.createTestingModule({

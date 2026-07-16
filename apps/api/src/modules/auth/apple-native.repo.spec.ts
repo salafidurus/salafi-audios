@@ -13,9 +13,9 @@ describe('AppleNativeRepository', () => {
 
   beforeEach(async () => {
     prisma = {
-      account: { findFirst: vi.fn(), create: vi.fn() },
-      user: { create: vi.fn() },
-      session: { create: vi.fn() },
+      account: { findFirst: vi.fn<any>(), create: vi.fn<any>() },
+      user: { create: vi.fn<any>() },
+      session: { create: vi.fn<any>() },
     };
 
     const module: TestingModule = await Test.createTestingModule({

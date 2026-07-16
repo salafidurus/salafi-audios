@@ -1,12 +1,27 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useEffectEvent,
+  useState,
+  type ReactNode,
+  useSyncExternalStore,
+} from "react";
 import { createPortal } from "react-dom";
 import { LazyMotion, m, domAnimation, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import { Button } from "../Button/Button";
 import styles from "./modal.module.css";
-import { ConfirmText } from "./ConfirmText";
-import { ConfirmDialog } from "./ConfirmDialog";
+
+function getModalPortalRoot(): HTMLElement | null {
+  if (typeof document === "undefined") return null;
+  return document.body;
+}
+
+function subscribeModalPortalRoot(): () => void {
+  return () => {};
+}
 
 const JUSTIFY_MAP = {
   left: "flex-start",
@@ -43,21 +58,19 @@ export function Modal({
   footerBorder: _footerBorder = false,
   loading,
 }: ModalProps) {
-  const mounted = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
-  );
+  const portalRoot = useSyncExternalStore(subscribeModalPortalRoot, getModalPortalRoot, () => null);
   const contentRef = useRef<HTMLDivElement>(null);
+
+  const handleCloseEvent = useEffectEvent(() => {
+    onClose();
+  });
 
   useEffect(() => {
     if (!isOpen) {
       return;
     }
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
+      if (e.key === "Escape") handleCloseEvent();
     };
     window.addEventListener("keydown", handleKeyDown);
 
@@ -68,7 +81,7 @@ export function Modal({
       window.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = originalOverflow;
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen && contentRef.current) {
@@ -76,14 +89,13 @@ export function Modal({
     }
   }, [isOpen]);
 
-  if (!mounted) {
-    return null;
-  }
   const justifyContent = JUSTIFY_MAP[footerAlignment as keyof typeof JUSTIFY_MAP] || "flex-end";
 
   const customWidth = width ? (typeof width === "number" ? `${width}px` : width) : undefined;
 
-  const modalContent = (
+  if (!portalRoot) return null;
+
+  return createPortal(
     <LazyMotion features={domAnimation}>
       <AnimatePresence>
         {isOpen && (
@@ -146,10 +158,9 @@ export function Modal({
           </div>
         )}
       </AnimatePresence>
-    </LazyMotion>
+    </LazyMotion>,
+    portalRoot!,
   );
-
-  return createPortal(modalContent, document.body);
 }
 
 // Compound components for advanced use cases
@@ -210,9 +221,159 @@ export function ModalFooter({ children, alignment = "right", border = true }: Mo
   );
 }
 
+interface ModalConfirmDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void | Promise<void>;
+  title: string;
+  confirmLabel: string;
+  confirmVariant?: "default" | "danger";
+  children?: ReactNode;
+  loading?: boolean;
+  testId?: string;
+  cancelTestId?: string;
+  modalTestId?: string;
+}
+
+export function ModalConfirmDialog({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  confirmLabel,
+  confirmVariant = "default",
+  children,
+  loading = false,
+  testId,
+  cancelTestId,
+  modalTestId,
+}: ModalConfirmDialogProps) {
+  return (
+    <div data-testid={modalTestId}>
+      <Modal isOpen={isOpen} onClose={onClose} title={title} loading={loading}>
+        {children && <ModalBody>{children}</ModalBody>}
+        <ModalFooter alignment="right">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onClose}
+            disabled={loading}
+            data-testid={cancelTestId}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant={confirmVariant === "danger" ? "danger" : "primary"}
+            size="sm"
+            onClick={onConfirm}
+            disabled={loading}
+            data-testid={testId}
+          >
+            {confirmLabel}
+          </Button>
+        </ModalFooter>
+      </Modal>
+    </div>
+  );
+}
+
+interface ModalConfirmTextProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void | Promise<void>;
+  title: string;
+  message: string;
+  confirmLabel: string;
+  confirmVariant?: "default" | "danger";
+  confirmWord: string;
+  loading?: boolean;
+  testId?: string;
+  modalTestId?: string;
+  cancelTestId?: string;
+}
+
+export function ModalConfirmText({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  confirmLabel,
+  confirmVariant = "default",
+  confirmWord,
+  loading = false,
+  testId,
+  modalTestId,
+  cancelTestId,
+}: ModalConfirmTextProps) {
+  const [inputValue, setInputValue] = useState("");
+
+  const handleClose = () => {
+    setInputValue("");
+    onClose();
+  };
+
+  const handleConfirm = async () => {
+    await onConfirm();
+  };
+
+  const isConfirmDisabled = inputValue !== confirmWord || loading;
+
+  return (
+    <div data-testid={modalTestId}>
+      <Modal isOpen={isOpen} onClose={handleClose} title={title} loading={loading}>
+        <ModalBody>
+          <p style={{ marginBottom: "1rem", color: "var(--content-default)" }}>{message}</p>
+          <p
+            style={{ marginBottom: "0.5rem", fontSize: "0.875rem", color: "var(--content-muted)" }}
+          >
+            Type <strong>{confirmWord}</strong> to confirm
+          </p>
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder={`Type "${confirmWord}" to confirm`}
+            style={{
+              width: "100%",
+              padding: "0.75rem",
+              border: "1px solid var(--border-default)",
+              borderRadius: "var(--radius-sm)",
+              fontSize: "0.875rem",
+              color: "var(--content-default)",
+              backgroundColor: "var(--surface-default)",
+            }}
+            disabled={loading}
+          />
+        </ModalBody>
+        <ModalFooter alignment="right">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleClose}
+            disabled={loading}
+            data-testid={cancelTestId}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant={confirmVariant === "danger" ? "danger" : "primary"}
+            size="sm"
+            onClick={handleConfirm}
+            disabled={isConfirmDisabled}
+            data-testid={testId}
+          >
+            {confirmLabel}
+          </Button>
+        </ModalFooter>
+      </Modal>
+    </div>
+  );
+}
+
 // Attach compound components to Modal
 Modal.Header = ModalHeader;
 Modal.Body = ModalBody;
 Modal.Footer = ModalFooter;
-Modal.ConfirmText = ConfirmText;
-Modal.ConfirmDialog = ConfirmDialog;
+Modal.ConfirmDialog = ModalConfirmDialog;
+Modal.ConfirmText = ModalConfirmText;

@@ -12,21 +12,21 @@ import { AdminScholarsController } from './admin-scholars.controller';
 import { ScholarsService } from './scholars.service';
 import { PrismaService } from '../../shared/db/prisma.service';
 
-const mockAuth = { api: { getSession: vi.fn() } };
+const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockPrisma = {
   userRoleAssignment: {
-    findMany: vi.fn().mockResolvedValue([{ role: 'user' }]),
+    findMany: vi.fn<any>().mockResolvedValue([{ role: 'user' }]),
   },
 };
 
 const mockScholarsService = {
-  list: vi.fn().mockResolvedValue({ scholars: [] }),
-  getBySlug: vi.fn().mockResolvedValue(null),
-  getContent: vi.fn().mockResolvedValue({ lectures: [], series: [] }),
-  create: vi.fn().mockResolvedValue({}),
-  update: vi.fn().mockResolvedValue({}),
+  list: vi.fn<any>().mockResolvedValue({ scholars: [] }),
+  getBySlug: vi.fn<any>().mockResolvedValue(null),
+  getContent: vi.fn<any>().mockResolvedValue({ lectures: [], series: [] }),
+  create: vi.fn<any>().mockResolvedValue({}),
+  update: vi.fn<any>().mockResolvedValue({}),
 };
 
 describe('ScholarsController — auth boundaries', () => {
@@ -53,11 +53,13 @@ describe('ScholarsController — auth boundaries', () => {
   afterEach(() => app?.close());
 
   describe('public endpoints', () => {
-    it('GET /scholars returns 200 without auth', () => {
-      return request(app.getHttpServer()).get('/scholars').expect(200);
+    it('GET /scholars returns 200 without auth', async () => {
+      const response = await request(app.getHttpServer()).get('/scholars');
+      expect(response.status).toBe(200);
+      expect(response.body).toBeDefined();
     });
 
-    it('GET /scholars/:slug returns 200 without auth', () => {
+    it('GET /scholars/:slug returns 200 without auth', async () => {
       mockScholarsService.getBySlug.mockResolvedValue({
         id: 's1',
         slug: 'ibn-taymiyyah',
@@ -66,25 +68,27 @@ describe('ScholarsController — auth boundaries', () => {
         seriesCount: 0,
         totalDurationSeconds: 0,
       });
-      return request(app.getHttpServer()).get('/scholars/ibn-taymiyyah').expect(200);
+      const response = await request(app.getHttpServer()).get('/scholars/ibn-taymiyyah');
+      expect(response.status).toBe(200);
+      expect(response.body).toBeDefined();
     });
   });
 
   describe('admin endpoints', () => {
-    it('POST /admin/scholars returns 401 without a session', () => {
+    it('POST /admin/scholars returns 401 without a session', async () => {
       mockAuth.api.getSession.mockResolvedValue(null);
-      return request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .post('/admin/scholars')
-        .send({ name: 'Test Scholar', slug: 'test-scholar' })
-        .expect(401);
+        .send({ name: 'Test Scholar', slug: 'test-scholar' });
+      expect(response.status).toBe(401);
     });
 
-    it('PATCH /admin/scholars/:id returns 401 without a session', () => {
+    it('PATCH /admin/scholars/:id returns 401 without a session', async () => {
       mockAuth.api.getSession.mockResolvedValue(null);
-      return request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .patch('/admin/scholars/s1')
-        .send({ name: 'Updated Scholar' })
-        .expect(401);
+        .send({ name: 'Updated Scholar' });
+      expect(response.status).toBe(401);
     });
   });
 });

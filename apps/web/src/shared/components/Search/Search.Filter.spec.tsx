@@ -151,6 +151,7 @@ describe("SearchFilter", () => {
 
     // Should not throw
     fireEvent.click(lectureCloseButton);
+    expect(lectureCloseButton).toBeInTheDocument();
   });
 
   it("applies custom className to container", () => {

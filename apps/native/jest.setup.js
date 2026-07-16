@@ -54,3 +54,18 @@ jest.mock("expo-secure-store", () => ({
   deleteItemAsync: jest.fn(),
   isAvailableAsync: jest.fn(() => Promise.resolve(true)),
 }));
+
+jest.mock("@tanstack/react-query", () => ({
+  useQueryClient: jest.fn(() => ({
+    invalidateQueries: jest.fn().mockResolvedValue(undefined),
+  })),
+}));
+
+jest.mock("react-native-reanimated", () => ({
+  useSharedValue: jest.fn((value) => ({ value })),
+  useAnimatedStyle: jest.fn(() => ({})),
+  useAnimatedReaction: jest.fn(),
+  runOnJS: jest.fn((fn) => fn),
+  interpolate: jest.fn(),
+  Extrapolate: { CLAMP: "clamp" },
+}));

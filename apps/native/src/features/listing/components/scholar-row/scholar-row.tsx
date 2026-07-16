@@ -1,4 +1,5 @@
-import { Pressable, View, Image } from "react-native";
+import { Pressable, View } from "react-native";
+import { Image } from "expo-image";
 import { StyleSheet } from "react-native-unistyles";
 import type { ScholarListItemDto } from "@sd/core-contracts";
 import { AppText } from "@/shared/components/AppText/AppText";

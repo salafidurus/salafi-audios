@@ -13,6 +13,27 @@ interface UserPermissionsData {
   roles: UserRole[];
 }
 
+/** Helper: Check if any item exists in a set (O(n) with O(1) lookups) */
+const checkAnyInSet = <T>(
+  items: readonly T[] | null | undefined,
+  set: readonly T[] | null | undefined,
+): boolean => {
+  if (!items || items.length === 0 || !set) return false;
+  const itemSet = new Set(set);
+  return items.some((item) => itemSet.has(item));
+};
+
+/** Helper: Check if all items exist in a set (O(n) with O(1) lookups) */
+const checkAllInSet = <T>(
+  items: readonly T[] | null | undefined,
+  set: readonly T[] | null | undefined,
+): boolean => {
+  if (!items || items.length === 0) return true;
+  if (!set) return false;
+  const itemSet = new Set(set);
+  return items.every((item) => itemSet.has(item));
+};
+
 /**
  * Fetch the current user's permissions and roles
  * Returns cached query data with permissions and roles arrays
@@ -49,11 +70,10 @@ export function useHasAnyPermission(
   permissions: readonly Permission[] | null | undefined,
 ): boolean {
   const { data } = useMyPermissions();
-
-  return useMemo(() => {
-    if (!permissions || permissions.length === 0 || !data?.permissions) return false;
-    return permissions.some((perm) => data.permissions.includes(perm));
-  }, [permissions, data?.permissions]);
+  return useMemo(
+    () => checkAnyInSet(permissions, data?.permissions),
+    [permissions, data?.permissions],
+  );
 }
 
 /**
@@ -65,12 +85,10 @@ export function useHasAllPermissions(
   permissions: readonly Permission[] | null | undefined,
 ): boolean {
   const { data } = useMyPermissions();
-
-  return useMemo(() => {
-    if (!permissions || permissions.length === 0) return true;
-    if (!data?.permissions) return false;
-    return permissions.every((perm) => data.permissions.includes(perm));
-  }, [permissions, data?.permissions]);
+  return useMemo(
+    () => checkAllInSet(permissions, data?.permissions),
+    [permissions, data?.permissions],
+  );
 }
 
 /**
@@ -94,11 +112,7 @@ export function useHasRole(role: UserRole | null | undefined): boolean {
  */
 export function useHasAnyRole(roles: readonly UserRole[] | null | undefined): boolean {
   const { data } = useMyPermissions();
-
-  return useMemo(() => {
-    if (!roles || roles.length === 0 || !data?.roles) return false;
-    return roles.some((r) => data.roles.includes(r));
-  }, [roles, data?.roles]);
+  return useMemo(() => checkAnyInSet(roles, data?.roles), [roles, data?.roles]);
 }
 
 /**
@@ -108,12 +122,7 @@ export function useHasAnyRole(roles: readonly UserRole[] | null | undefined): bo
  */
 export function useHasAllRoles(roles: readonly UserRole[] | null | undefined): boolean {
   const { data } = useMyPermissions();
-
-  return useMemo(() => {
-    if (!roles || roles.length === 0) return true;
-    if (!data?.roles) return false;
-    return roles.every((r) => data.roles.includes(r));
-  }, [roles, data?.roles]);
+  return useMemo(() => checkAllInSet(roles, data?.roles), [roles, data?.roles]);
 }
 
 /**
