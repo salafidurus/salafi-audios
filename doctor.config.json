@@ -10,6 +10,12 @@
       "**/.opencode/**",
       "**/coverage/**",
       "**/generated/**"
+    ],
+    "overrides": [
+      {
+        "files": ["package.json"],
+        "rules": ["deslop/unused-dev-dependency"]
+      }
     ]
   }
 }
