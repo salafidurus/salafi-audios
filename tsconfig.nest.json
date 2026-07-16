@@ -3,10 +3,10 @@
   // Updated for Bun compatibility while maintaining NestJS decorator requirements.
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    // NestJS CLI expects CommonJS output
+    // NestJS CLI expects CommonJS output; Node10 resolution is the classic
+    // Node.js resolution strategy compatible with CommonJS modules
     "module": "CommonJS",
-    // CommonJS requires "node" resolution; "bundler" only works with ES modules
-    "moduleResolution": "node",
+    "moduleResolution": "Node10",
     // Required for NestJS decorator-based dependency injection and metadata reflection
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
