@@ -33,12 +33,12 @@ describe('AudioService', () => {
         {
           provide: AudioRepository,
           useValue: {
-            getUserProgress: vi.fn(),
-            upsertProgress: vi.fn(),
-            bulkSync: vi.fn(),
-            findListingById: vi.fn(),
-            findPrimaryAsset: vi.fn(),
-            findFirstAsset: vi.fn(),
+            getUserProgress: vi.fn<any>(),
+            upsertProgress: vi.fn<any>(),
+            bulkSync: vi.fn<any>(),
+            findListingById: vi.fn<any>(),
+            findPrimaryAsset: vi.fn<any>(),
+            findFirstAsset: vi.fn<any>(),
           } satisfies Partial<Mocked<AudioRepository>>,
         },
       ],

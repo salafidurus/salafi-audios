@@ -4,8 +4,8 @@ import { proxy } from "./proxy";
 
 vi.mock("next/server", () => ({
   NextResponse: {
-    redirect: vi.fn(),
-    next: vi.fn(),
+    redirect: vi.fn<any>(),
+    next: vi.fn<any>(),
   },
 }));
 

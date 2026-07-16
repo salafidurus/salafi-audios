@@ -11,20 +11,20 @@ import { PrismaService } from '../../shared/db/prisma.service';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { AllExceptionsFilter } from '../../shared/errors/http-exception.filter';
 
-const mockAuth = { api: { getSession: vi.fn() } };
+const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('./auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockPrismaService = {
   user: {
-    update: vi.fn().mockResolvedValue({ preferredLanguage: 'ar' }),
+    update: vi.fn<any>().mockResolvedValue({ preferredLanguage: 'ar' }),
   },
   userRoleAssignment: {
-    findMany: vi.fn().mockResolvedValue([{ role: 'user' }]),
+    findMany: vi.fn<any>().mockResolvedValue([{ role: 'user' }]),
   },
 };
 
 const mockConfigService = {
-  get: vi.fn().mockReturnValue(false),
+  get: vi.fn<any>().mockReturnValue(false),
 };
 
 describe('AuthLocaleController — auth boundaries', () => {
@@ -68,8 +68,8 @@ describe('AuthLocaleController — auth boundaries', () => {
     it('PATCH /auth/me/locale updates the preferred language and returns 200', async () => {
       const res = await request(app.getHttpServer())
         .patch('/auth/me/locale')
-        .send({ preferredLanguage: 'ar' })
-        .expect(200);
+        .send({ preferredLanguage: 'ar' });
+      expect(res.status).toBe(200);
       expect(res.body.preferredLanguage).toBe('ar');
       expect(mockPrismaService.user.update).toHaveBeenCalledWith({
         where: { id: 'u1' },
@@ -88,12 +88,12 @@ describe('AuthLocaleController — auth boundaries', () => {
   });
 
   describe('unauthenticated requests', () => {
-    it('PATCH /auth/me/locale returns 401 without a session', () => {
+    it('PATCH /auth/me/locale returns 401 without a session', async () => {
       mockAuth.api.getSession.mockResolvedValue(null);
-      return request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .patch('/auth/me/locale')
-        .send({ preferredLanguage: 'ar' })
-        .expect(401);
+        .send({ preferredLanguage: 'ar' });
+      expect(response.status).toBe(401);
     });
   });
 });

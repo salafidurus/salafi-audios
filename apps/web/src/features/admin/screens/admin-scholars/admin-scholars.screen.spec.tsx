@@ -5,11 +5,11 @@ import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permission
 import { useApiQuery } from "@sd/core-contracts";
 
 vi.mock("@/features/admin/hooks/use-admin-permissions", () => ({
-  useAdminPermissions: vi.fn(),
+  useAdminPermissions: vi.fn<any>(),
 }));
 vi.mock("@sd/core-contracts", async (importActual) => {
   const actual = await importActual<typeof import("@sd/core-contracts")>();
-  return { ...actual, useApiQuery: vi.fn() };
+  return { ...actual, useApiQuery: vi.fn<any>() };
 });
 vi.mock("@/shared/hooks/use-responsive", () => ({
   useResponsive: () => ({ isMobile: false }),
@@ -21,7 +21,7 @@ describe("AdminScholarsScreen", () => {
     (useApiQuery as Mock).mockReturnValue({
       data: { scholars: [] },
       isFetching: false,
-      refetch: vi.fn(),
+      refetch: vi.fn<any>(),
     });
   });
 

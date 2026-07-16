@@ -14,6 +14,10 @@ export function useLiveSessions() {
     480_000,
   );
 
+  const activeSetSessions = active.setSessions;
+  const upcomingSetSessions = upcoming.setSessions;
+  const endedSetSessions = ended.setSessions;
+
   useEffect(() => {
     const win = globalThis as any;
     if (typeof win.window === "undefined" || !("EventSource" in win.window)) {
@@ -48,17 +52,17 @@ export function useLiveSessions() {
           };
 
           if (session.status === "live") {
-            active.setSessions(addOrUpdate);
-            upcoming.setSessions(remove);
-            ended.setSessions(remove);
+            activeSetSessions(addOrUpdate);
+            upcomingSetSessions(remove);
+            endedSetSessions(remove);
           } else if (session.status === "scheduled") {
-            upcoming.setSessions(addOrUpdate);
-            active.setSessions(remove);
-            ended.setSessions(remove);
+            upcomingSetSessions(addOrUpdate);
+            activeSetSessions(remove);
+            endedSetSessions(remove);
           } else if (session.status === "ended") {
-            ended.setSessions(addOrUpdate);
-            active.setSessions(remove);
-            upcoming.setSessions(remove);
+            endedSetSessions(addOrUpdate);
+            activeSetSessions(remove);
+            upcomingSetSessions(remove);
           }
         }
       } catch (err: any) {
@@ -73,7 +77,7 @@ export function useLiveSessions() {
     return () => {
       eventSource.close();
     };
-  }, [active.setSessions, upcoming.setSessions, ended.setSessions]);
+  }, [activeSetSessions, upcomingSetSessions, endedSetSessions]);
 
   return { active, upcoming, ended };
 }

@@ -9,14 +9,14 @@ vi.mock("next/navigation", () => ({
 }));
 
 vi.mock("@/features/admin/hooks/use-admin-permissions", () => ({
-  useAdminPermissions: vi.fn(),
+  useAdminPermissions: vi.fn<any>(),
 }));
 
 vi.mock("@sd/core-contracts", async (importActual) => {
   const actual = await importActual<typeof import("@sd/core-contracts")>();
   return {
     ...actual,
-    useApiQuery: vi.fn(),
+    useApiQuery: vi.fn<any>(),
   };
 });
 
@@ -37,12 +37,12 @@ describe("AdminLivestreamsScreen permission gates", () => {
     (useApiQuery as Mock).mockImplementation((key: readonly unknown[]) => {
       const keyStr = JSON.stringify(key);
       if (keyStr.includes("sessions")) {
-        return { data: [mockSession], isFetching: false, refetch: vi.fn() };
+        return { data: [mockSession], isFetching: false, refetch: vi.fn<any>() };
       }
       if (keyStr.includes("channels")) {
-        return { data: { channels: [] }, isFetching: false, refetch: vi.fn() };
+        return { data: { channels: [] }, isFetching: false, refetch: vi.fn<any>() };
       }
-      return { data: undefined, isFetching: false, refetch: vi.fn() };
+      return { data: undefined, isFetching: false, refetch: vi.fn<any>() };
     });
   });
 

@@ -12,17 +12,17 @@ import { ScholarsTranslationsController } from './scholars-translations.controll
 import { ScholarsService } from './scholars.service';
 import { PrismaService } from '../../shared/db/prisma.service';
 
-const mockAuth = { api: { getSession: vi.fn() } };
+const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockPrisma = {
   userPermission: {
-    findMany: vi.fn().mockResolvedValue([]),
-    findUnique: vi.fn().mockResolvedValue(null),
+    findMany: vi.fn<any>().mockResolvedValue([]),
+    findUnique: vi.fn<any>().mockResolvedValue(null),
   },
   userRoleAssignment: {
-    findMany: vi.fn().mockResolvedValue([{ role: 'user' }]),
-    findUnique: vi.fn().mockResolvedValue(null),
+    findMany: vi.fn<any>().mockResolvedValue([{ role: 'user' }]),
+    findUnique: vi.fn<any>().mockResolvedValue(null),
   },
 };
 
@@ -37,16 +37,16 @@ const draftTranslation = {
 const publishedTranslation = { ...draftTranslation, status: 'published' };
 
 const mockScholarsService = {
-  list: vi.fn().mockResolvedValue({ scholars: [] }),
-  getBySlug: vi.fn(),
-  getContent: vi.fn(),
-  create: vi.fn(),
-  update: vi.fn(),
-  listTranslations: vi.fn().mockResolvedValue([]),
-  upsertTranslation: vi.fn().mockResolvedValue(draftTranslation),
-  updateTranslation: vi.fn().mockResolvedValue(draftTranslation),
-  publishTranslation: vi.fn().mockResolvedValue(publishedTranslation),
-  unpublishTranslation: vi.fn().mockResolvedValue(draftTranslation),
+  list: vi.fn<any>().mockResolvedValue({ scholars: [] }),
+  getBySlug: vi.fn<any>(),
+  getContent: vi.fn<any>(),
+  create: vi.fn<any>(),
+  update: vi.fn<any>(),
+  listTranslations: vi.fn<any>().mockResolvedValue([]),
+  upsertTranslation: vi.fn<any>().mockResolvedValue(draftTranslation),
+  updateTranslation: vi.fn<any>().mockResolvedValue(draftTranslation),
+  publishTranslation: vi.fn<any>().mockResolvedValue(publishedTranslation),
+  unpublishTranslation: vi.fn<any>().mockResolvedValue(draftTranslation),
 };
 
 async function buildApp(_overrideGuard?: () => boolean | never): Promise<NestFastifyApplication> {
@@ -151,12 +151,12 @@ describe('ScholarsTranslationsController — auth boundaries', () => {
   });
 
   describe('unauthenticated requests', () => {
-    it('POST /scholars/:id/translations returns 401 without a session', () => {
+    it('POST /scholars/:id/translations returns 401 without a session', async () => {
       mockAuth.api.getSession.mockResolvedValue(null);
-      return request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .post('/scholars/s1/translations')
-        .send({ locale: 'ar', name: 'ابن تيمية' })
-        .expect(401);
+        .send({ locale: 'ar', name: 'ابن تيمية' });
+      expect(response.status).toBe(401);
     });
   });
 
@@ -176,11 +176,11 @@ describe('ScholarsTranslationsController — auth boundaries', () => {
 
     afterEach(() => forbiddenApp.close());
 
-    it('POST /scholars/:id/translations returns 403', () => {
-      return request(forbiddenApp.getHttpServer())
+    it('POST /scholars/:id/translations returns 403', async () => {
+      const response = await request(forbiddenApp.getHttpServer())
         .post('/scholars/s1/translations')
-        .send({ locale: 'ar', name: 'ابن تيمية' })
-        .expect(403);
+        .send({ locale: 'ar', name: 'ابن تيمية' });
+      expect(response.status).toBe(403);
     });
   });
 });

@@ -9,17 +9,17 @@ import { HomeController } from './home.controller';
 import { HomeService } from './home.service';
 import { PrismaService } from '../../shared/db/prisma.service';
 
-const mockAuth = { api: { getSession: vi.fn() } };
+const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockPrisma = {
   userRoleAssignment: {
-    findMany: vi.fn().mockResolvedValue([{ role: 'user' }]),
+    findMany: vi.fn<any>().mockResolvedValue([{ role: 'user' }]),
   },
 };
 
 const mockHomeService = {
-  getQuickBrowse: vi.fn().mockResolvedValue({
+  getQuickBrowse: vi.fn<any>().mockResolvedValue({
     recentLectures: [],
     topScholars: [],
     featuredCollections: [],
@@ -49,7 +49,9 @@ describe('HomeController — auth boundaries', () => {
 
   afterEach(() => app.close());
 
-  it('GET /home/quickbrowse returns 200 without auth (public route)', () => {
-    return request(app.getHttpServer()).get('/home/quickbrowse').expect(200);
+  it('GET /home/quickbrowse returns 200 without auth (public route)', async () => {
+    const response = await request(app.getHttpServer()).get('/home/quickbrowse');
+    expect(response.status).toBe(200);
+    expect(response.body).toBeDefined();
   });
 });

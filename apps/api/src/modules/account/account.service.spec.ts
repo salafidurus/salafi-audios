@@ -17,7 +17,7 @@ describe('AccountService', () => {
   };
 
   const mockPrisma = {
-    user: { update: vi.fn() },
+    user: { update: vi.fn<any>() },
   };
 
   beforeEach(async () => {

@@ -10,21 +10,21 @@ import { AdminLiveController } from './admin-live.controller';
 import { LiveService } from './live.service';
 import { PrismaService } from '../../shared/db/prisma.service';
 
-const mockAuth = { api: { getSession: vi.fn() } };
+const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockPrisma = {
   userRoleAssignment: {
-    findMany: vi.fn().mockResolvedValue([{ role: 'admin' }]),
+    findMany: vi.fn<any>().mockResolvedValue([{ role: 'admin' }]),
   },
-  userPermission: { findUnique: vi.fn() },
+  userPermission: { findUnique: vi.fn<any>() },
 };
 
 const mockLiveService = {
-  updateSessionStatus: vi.fn().mockResolvedValue({}),
-  listAdminSessions: vi.fn().mockResolvedValue([]),
-  deleteSession: vi.fn().mockResolvedValue(undefined),
-  deleteChannel: vi.fn().mockResolvedValue(undefined),
+  updateSessionStatus: vi.fn<any>().mockResolvedValue({}),
+  listAdminSessions: vi.fn<any>().mockResolvedValue([]),
+  deleteSession: vi.fn<any>().mockResolvedValue(undefined),
+  deleteChannel: vi.fn<any>().mockResolvedValue(undefined),
 };
 
 const sessionUser = { id: 'user-1', email: 'admin@example.com' };
@@ -66,15 +66,20 @@ describe('AdminLiveController — granular LIVE_START/LIVE_STOP enforcement', ()
         where.userId_permission.permission === 'LIVE_EDIT' ? { permission: 'LIVE_EDIT' } : null,
     );
 
-    await request(app.getHttpServer()).patch('/admin/live/sessions/session-1/go-live').expect(403);
+    const response = await request(app.getHttpServer()).patch(
+      '/admin/live/sessions/session-1/go-live',
+    );
+    expect(response.status).toBe(403);
   });
 
   it('PATCH /go-live returns 200 and calls updateSessionStatus(id, "live")', async () => {
     mockAuth.api.getSession.mockResolvedValue({ user: sessionUser });
     mockPrisma.userPermission.findUnique.mockResolvedValue({ permission: 'LIVE_START' });
 
-    await request(app.getHttpServer()).patch('/admin/live/sessions/session-1/go-live').expect(200);
-
+    const response = await request(app.getHttpServer()).patch(
+      '/admin/live/sessions/session-1/go-live',
+    );
+    expect(response.status).toBe(200);
     expect(mockLiveService.updateSessionStatus).toHaveBeenCalledWith('session-1', 'live');
   });
 
@@ -85,15 +90,16 @@ describe('AdminLiveController — granular LIVE_START/LIVE_STOP enforcement', ()
         where.userId_permission.permission === 'LIVE_EDIT' ? { permission: 'LIVE_EDIT' } : null,
     );
 
-    await request(app.getHttpServer()).patch('/admin/live/sessions/session-1/end').expect(403);
+    const response = await request(app.getHttpServer()).patch('/admin/live/sessions/session-1/end');
+    expect(response.status).toBe(403);
   });
 
   it('PATCH /end returns 200 and calls updateSessionStatus(id, "ended")', async () => {
     mockAuth.api.getSession.mockResolvedValue({ user: sessionUser });
     mockPrisma.userPermission.findUnique.mockResolvedValue({ permission: 'LIVE_STOP' });
 
-    await request(app.getHttpServer()).patch('/admin/live/sessions/session-1/end').expect(200);
-
+    const response = await request(app.getHttpServer()).patch('/admin/live/sessions/session-1/end');
+    expect(response.status).toBe(200);
     expect(mockLiveService.updateSessionStatus).toHaveBeenCalledWith('session-1', 'ended');
   });
 
@@ -101,10 +107,10 @@ describe('AdminLiveController — granular LIVE_START/LIVE_STOP enforcement', ()
     mockAuth.api.getSession.mockResolvedValue({ user: sessionUser });
     mockPrisma.userPermission.findUnique.mockResolvedValue({ permission: 'LIVE_EDIT' });
 
-    await request(app.getHttpServer())
-      .patch('/admin/live/sessions/session-1/reschedule')
-      .expect(200);
-
+    const response = await request(app.getHttpServer()).patch(
+      '/admin/live/sessions/session-1/reschedule',
+    );
+    expect(response.status).toBe(200);
     expect(mockLiveService.updateSessionStatus).toHaveBeenCalledWith('session-1', 'scheduled');
   });
 
@@ -112,8 +118,8 @@ describe('AdminLiveController — granular LIVE_START/LIVE_STOP enforcement', ()
     mockAuth.api.getSession.mockResolvedValue({ user: sessionUser });
     mockPrisma.userPermission.findUnique.mockResolvedValue({ permission: 'LIVE_VIEW' });
 
-    await request(app.getHttpServer()).get('/admin/live/sessions').expect(200);
-
+    const response = await request(app.getHttpServer()).get('/admin/live/sessions');
+    expect(response.status).toBe(200);
     expect(mockLiveService.listAdminSessions).toHaveBeenCalled();
   });
 
@@ -121,8 +127,8 @@ describe('AdminLiveController — granular LIVE_START/LIVE_STOP enforcement', ()
     mockAuth.api.getSession.mockResolvedValue({ user: sessionUser });
     mockPrisma.userPermission.findUnique.mockResolvedValue({ permission: 'LIVE_DELETE' });
 
-    await request(app.getHttpServer()).delete('/admin/live/sessions/session-1').expect(200);
-
+    const response = await request(app.getHttpServer()).delete('/admin/live/sessions/session-1');
+    expect(response.status).toBe(200);
     expect(mockLiveService.deleteSession).toHaveBeenCalledWith('session-1');
   });
 
@@ -130,8 +136,8 @@ describe('AdminLiveController — granular LIVE_START/LIVE_STOP enforcement', ()
     mockAuth.api.getSession.mockResolvedValue({ user: sessionUser });
     mockPrisma.userPermission.findUnique.mockResolvedValue({ permission: 'LIVE_DELETE' });
 
-    await request(app.getHttpServer()).delete('/admin/live/channels/channel-1').expect(200);
-
+    const response = await request(app.getHttpServer()).delete('/admin/live/channels/channel-1');
+    expect(response.status).toBe(200);
     expect(mockLiveService.deleteChannel).toHaveBeenCalledWith('channel-1');
   });
 
@@ -142,6 +148,7 @@ describe('AdminLiveController — granular LIVE_START/LIVE_STOP enforcement', ()
         where.userId_permission.permission === 'LIVE_VIEW' ? { permission: 'LIVE_VIEW' } : null,
     );
 
-    await request(app.getHttpServer()).delete('/admin/live/sessions/session-1').expect(403);
+    const response = await request(app.getHttpServer()).delete('/admin/live/sessions/session-1');
+    expect(response.status).toBe(403);
   });
 });

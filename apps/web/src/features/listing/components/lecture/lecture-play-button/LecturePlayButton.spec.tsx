@@ -7,14 +7,14 @@ import { useAudio } from "@sd/domain-audio";
 import { audioService } from "@/features/audio";
 
 vi.mock("@sd/domain-audio", () => ({
-  useAudio: vi.fn(),
+  useAudio: vi.fn<any>(),
 }));
 
 vi.mock("@/features/audio", () => ({
   audioService: {
-    playListing: vi.fn(),
-    pause: vi.fn(),
-    resume: vi.fn(),
+    playListing: vi.fn<any>(),
+    pause: vi.fn<any>(),
+    resume: vi.fn<any>(),
   },
 }));
 

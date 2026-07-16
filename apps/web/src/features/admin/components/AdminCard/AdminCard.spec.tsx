@@ -79,7 +79,7 @@ describe("AdminCard", () => {
   });
 
   it("calls onClick when card is clicked", () => {
-    const handleClick = vi.fn();
+    const handleClick = vi.fn<any>();
     render(<AdminCard {...defaultProps} onClick={handleClick} />);
 
     const card = screen.getByRole("button");
@@ -88,7 +88,7 @@ describe("AdminCard", () => {
   });
 
   it("prevents action clicks from triggering card click", () => {
-    const handleClick = vi.fn();
+    const handleClick = vi.fn<any>();
     render(
       <AdminCard
         {...defaultProps}

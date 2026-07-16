@@ -9,20 +9,22 @@ import { ExploreController } from './explore.controller';
 import { ExploreService } from './explore.service';
 import { PrismaService } from '../../shared/db/prisma.service';
 
-const mockAuth = { api: { getSession: vi.fn() } };
+const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockPrisma = {
   userRoleAssignment: {
-    findMany: vi.fn().mockResolvedValue([{ role: 'user' }]),
+    findMany: vi.fn<any>().mockResolvedValue([{ role: 'user' }]),
   },
 };
 
 const mockExploreService = {
-  getExplore: vi.fn().mockResolvedValue({ items: [], nextCursor: null, hasMore: false }),
-  getExploreRecent: vi.fn().mockResolvedValue({ items: [], nextCursor: null, hasMore: false }),
-  getFollowingExplore: vi.fn().mockResolvedValue({ items: [], nextCursor: null, hasMore: false }),
-  getScholars: vi.fn().mockResolvedValue({ scholars: [] }),
+  getExplore: vi.fn<any>().mockResolvedValue({ items: [], nextCursor: null, hasMore: false }),
+  getExploreRecent: vi.fn<any>().mockResolvedValue({ items: [], nextCursor: null, hasMore: false }),
+  getFollowingExplore: vi
+    .fn<any>()
+    .mockResolvedValue({ items: [], nextCursor: null, hasMore: false }),
+  getScholars: vi.fn<any>().mockResolvedValue({ scholars: [] }),
 };
 
 describe('ExploreController — auth boundaries', () => {
@@ -47,24 +49,32 @@ describe('ExploreController — auth boundaries', () => {
 
   afterEach(() => app.close());
 
-  it('GET /explore returns 200 without auth (public route)', () => {
-    return request(app.getHttpServer()).get('/explore').expect(200);
+  it('GET /explore returns 200 without auth (public route)', async () => {
+    const response = await request(app.getHttpServer()).get('/explore');
+    expect(response.status).toBe(200);
+    expect(response.body).toBeDefined();
   });
 
-  it('GET /explore/recent returns 200 without auth (public route)', () => {
-    return request(app.getHttpServer()).get('/explore/recent').expect(200);
+  it('GET /explore/recent returns 200 without auth (public route)', async () => {
+    const response = await request(app.getHttpServer()).get('/explore/recent');
+    expect(response.status).toBe(200);
+    expect(response.body).toBeDefined();
   });
 
-  it('GET /explore/scholars returns 200 without auth (public route)', () => {
-    return request(app.getHttpServer()).get('/explore/scholars').expect(200);
+  it('GET /explore/scholars returns 200 without auth (public route)', async () => {
+    const response = await request(app.getHttpServer()).get('/explore/scholars');
+    expect(response.status).toBe(200);
+    expect(response.body).toBeDefined();
   });
 
-  it('GET /explore/following returns 401 without auth session', () => {
+  it('GET /explore/following returns 401 without auth session', async () => {
     mockAuth.api.getSession.mockResolvedValue(null);
-    return request(app.getHttpServer()).get('/explore/following').expect(401);
+    const response = await request(app.getHttpServer()).get('/explore/following');
+    expect(response.status).toBe(401);
   });
 
-  it('GET /explore/personalized returns 404 (old route removed)', () => {
-    return request(app.getHttpServer()).get('/explore/personalized').expect(404);
+  it('GET /explore/personalized returns 404 (old route removed)', async () => {
+    const response = await request(app.getHttpServer()).get('/explore/personalized');
+    expect(response.status).toBe(404);
   });
 });

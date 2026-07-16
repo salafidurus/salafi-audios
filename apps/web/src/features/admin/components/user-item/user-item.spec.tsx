@@ -4,7 +4,7 @@ import { UserItem } from "./user-item";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 
 vi.mock("@/features/admin/hooks/use-admin-permissions", () => ({
-  useAdminPermissions: vi.fn(),
+  useAdminPermissions: vi.fn<any>(),
 }));
 vi.mock("@/shared/hooks/use-responsive", () => ({
   useResponsive: () => ({ isTablet: false }),
@@ -26,7 +26,9 @@ describe("UserItem", () => {
       data: { permissions: ["USERS_GRANT_PERMISSIONS"] },
     });
 
-    render(<UserItem user={baseUser} onManagePermissions={vi.fn()} onManageRoles={vi.fn()} />);
+    render(
+      <UserItem user={baseUser} onManagePermissions={vi.fn<any>()} onManageRoles={vi.fn<any>()} />,
+    );
 
     expect(screen.getByText("Manage Permissions")).toBeInTheDocument();
     expect(screen.queryByText("Manage Roles")).not.toBeInTheDocument();
@@ -37,7 +39,9 @@ describe("UserItem", () => {
       data: { permissions: ["USERS_GRANT_ROLES"] },
     });
 
-    render(<UserItem user={baseUser} onManagePermissions={vi.fn()} onManageRoles={vi.fn()} />);
+    render(
+      <UserItem user={baseUser} onManagePermissions={vi.fn<any>()} onManageRoles={vi.fn<any>()} />,
+    );
 
     expect(screen.queryByText("Manage Permissions")).not.toBeInTheDocument();
     expect(screen.getByText("Manage Roles")).toBeInTheDocument();
@@ -48,7 +52,9 @@ describe("UserItem", () => {
       data: { permissions: ["USERS_VIEW"] },
     });
 
-    render(<UserItem user={baseUser} onManagePermissions={vi.fn()} onManageRoles={vi.fn()} />);
+    render(
+      <UserItem user={baseUser} onManagePermissions={vi.fn<any>()} onManageRoles={vi.fn<any>()} />,
+    );
 
     expect(screen.queryByText("Manage Permissions")).not.toBeInTheDocument();
     expect(screen.queryByText("Manage Roles")).not.toBeInTheDocument();

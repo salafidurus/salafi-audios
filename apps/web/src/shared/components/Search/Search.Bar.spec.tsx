@@ -22,7 +22,7 @@ describe("SearchBar", () => {
   });
 
   it("calls onChange when user types", () => {
-    const handleChange = vi.fn();
+    const handleChange = vi.fn<any>();
 
     render(<SearchBar value="" onChange={handleChange} />);
     const input = screen.getByRole("textbox") as HTMLInputElement;
@@ -45,7 +45,7 @@ describe("SearchBar", () => {
   });
 
   it("clears input and calls onChange when clear button clicked", () => {
-    const handleChange = vi.fn();
+    const handleChange = vi.fn<any>();
 
     render(<SearchBar value="search term" onChange={handleChange} />);
     const clearButton = screen.getByLabelText("Clear search");
@@ -56,8 +56,8 @@ describe("SearchBar", () => {
   });
 
   it("calls onClear callback when clear button clicked", () => {
-    const handleChange = vi.fn();
-    const handleClear = vi.fn();
+    const handleChange = vi.fn<any>();
+    const handleClear = vi.fn<any>();
 
     render(<SearchBar value="search" onChange={handleChange} onClear={handleClear} />);
     const clearButton = screen.getByLabelText("Clear search");
@@ -68,7 +68,7 @@ describe("SearchBar", () => {
   });
 
   it("does not call onClear if not provided", () => {
-    const handleChange = vi.fn();
+    const handleChange = vi.fn<any>();
 
     render(<SearchBar value="search" onChange={handleChange} />);
     const clearButton = screen.getByLabelText("Clear search");
@@ -117,7 +117,7 @@ describe("SearchBar", () => {
   });
 
   it("handles rapid typing correctly", () => {
-    const handleChange = vi.fn();
+    const handleChange = vi.fn<any>();
 
     render(<SearchBar value="" onChange={handleChange} />);
     const input = screen.getByRole("textbox");

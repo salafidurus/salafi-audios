@@ -4,15 +4,15 @@ import { ListingModal } from "./ListingModal";
 import { createLecture, updateLecture } from "../../api/admin-lectures.api";
 
 vi.mock("../../api/admin-lectures.api", () => ({
-  createLecture: vi.fn(),
-  updateLecture: vi.fn(),
+  createLecture: vi.fn<any>(),
+  updateLecture: vi.fn<any>(),
 }));
 
 vi.mock("@sd/core-contracts", async (importOriginal) => {
   const actual = await importOriginal<any>();
   return {
     ...actual,
-    useApiQuery: vi.fn((key) => {
+    useApiQuery: vi.fn<(key: string[]) => any>((key) => {
       if (key[0] === "scholars") {
         return {
           data: {
@@ -63,13 +63,13 @@ describe("ListingModal", () => {
   });
 
   it("does not render when isOpen is false", () => {
-    render(<ListingModal isOpen={false} onClose={vi.fn()} onSuccess={vi.fn()} />);
+    render(<ListingModal isOpen={false} onClose={vi.fn<any>()} onSuccess={vi.fn<any>()} />);
     expect(screen.queryByText(/lecture details/i)).not.toBeInTheDocument();
   });
 
   it("renders with create form fields and triggers save", async () => {
-    const onSuccessMock = vi.fn();
-    const onCloseMock = vi.fn();
+    const onSuccessMock = vi.fn<any>();
+    const onCloseMock = vi.fn<any>();
     (createLecture as Mock).mockResolvedValue({ id: "new-lecture-id" });
 
     render(
@@ -119,8 +119,8 @@ describe("ListingModal", () => {
   });
 
   it("renders with edit form fields prefilled and updates details", async () => {
-    const onSuccessMock = vi.fn();
-    const onCloseMock = vi.fn();
+    const onSuccessMock = vi.fn<any>();
+    const onCloseMock = vi.fn<any>();
     (updateLecture as Mock).mockResolvedValue({ id: "edit-lecture-id" });
 
     const existingLecture = {

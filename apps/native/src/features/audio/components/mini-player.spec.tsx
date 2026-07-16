@@ -79,7 +79,8 @@ describe("MiniPlayer", () => {
       progressPercent: 0,
       positionSeconds: 0,
     });
-    await render(<MiniPlayer />);
+    const { getByTestId } = await render(<MiniPlayer />);
+    expect(getByTestId("play-button")).toBeTruthy();
   });
 
   it("calls pause when play button pressed while playing", async () => {

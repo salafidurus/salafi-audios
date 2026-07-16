@@ -14,10 +14,10 @@ describe('HealthController', () => {
 
   beforeEach(async () => {
     prismaHealth = {
-      pingCheck: vi.fn().mockResolvedValue({ database: { status: 'up' } }),
+      pingCheck: vi.fn<any>().mockResolvedValue({ database: { status: 'up' } }),
     };
     cdnHealth = {
-      pingCheck: vi.fn().mockResolvedValue({ cdn: { status: 'up' } }),
+      pingCheck: vi.fn<any>().mockResolvedValue({ cdn: { status: 'up' } }),
     };
 
     const module: TestingModule = await Test.createTestingModule({

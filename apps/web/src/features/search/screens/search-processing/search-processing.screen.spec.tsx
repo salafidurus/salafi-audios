@@ -6,17 +6,17 @@ import { SearchProcessingScreen } from "./search-processing.screen";
 import { useSearchProcessing } from "@sd/domain-search";
 import { routes } from "@sd/core-contracts";
 
-const mockPush = vi.fn();
+const mockPush = vi.fn<any>();
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
 vi.mock("@sd/domain-search", () => ({
-  useSearchProcessing: vi.fn(),
+  useSearchProcessing: vi.fn<any>(),
 }));
 
-const mockUseIsDesktop = vi.fn().mockReturnValue(true);
+const mockUseIsDesktop = vi.fn<any>().mockReturnValue(true);
 vi.mock("@/shared/hooks/use-responsive", () => ({
   useIsDesktop: () => mockUseIsDesktop(),
   useResponsive: () => ({ isDesktop: mockUseIsDesktop() }),
@@ -42,9 +42,9 @@ describe("SearchProcessingScreen", () => {
   it("navigates to series detail on series item click (desktop)", () => {
     (useSearchProcessing as Mock).mockReturnValue({
       query: "jurisprudence",
-      setQuery: vi.fn(),
+      setQuery: vi.fn<any>(),
       filter: [],
-      setFilter: vi.fn(),
+      setFilter: vi.fn<any>(),
       topics: [],
       items: [
         {
@@ -73,9 +73,9 @@ describe("SearchProcessingScreen", () => {
     mockUseIsDesktop.mockReturnValue(false);
     (useSearchProcessing as Mock).mockReturnValue({
       query: "jurisprudence",
-      setQuery: vi.fn(),
+      setQuery: vi.fn<any>(),
       filter: [],
-      setFilter: vi.fn(),
+      setFilter: vi.fn<any>(),
       topics: [],
       items: [
         {

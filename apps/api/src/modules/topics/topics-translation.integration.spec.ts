@@ -13,17 +13,17 @@ import { TopicsTranslationsController } from './topics-translations.controller';
 import { TopicsService } from './topics.service';
 import { PrismaService } from '../../shared/db/prisma.service';
 
-const mockAuth = { api: { getSession: vi.fn() } };
+const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockPrisma = {
   userPermission: {
-    findMany: vi.fn().mockResolvedValue([]),
-    findUnique: vi.fn().mockResolvedValue(null),
+    findMany: vi.fn<any>().mockResolvedValue([]),
+    findUnique: vi.fn<any>().mockResolvedValue(null),
   },
   userRoleAssignment: {
-    findMany: vi.fn().mockResolvedValue([{ role: 'user' }]),
-    findUnique: vi.fn().mockResolvedValue(null),
+    findMany: vi.fn<any>().mockResolvedValue([{ role: 'user' }]),
+    findUnique: vi.fn<any>().mockResolvedValue(null),
   },
 };
 
@@ -38,17 +38,17 @@ const draftTranslation = {
 const publishedTranslation = { ...draftTranslation, status: 'published' };
 
 const mockTopicsService = {
-  list: vi.fn().mockResolvedValue([]),
-  getBySlug: vi.fn(),
-  upsert: vi.fn(),
-  listChildren: vi.fn().mockResolvedValue([]),
-  listLectures: vi.fn().mockResolvedValue([]),
-  remove: vi.fn(),
-  listTranslations: vi.fn().mockResolvedValue([]),
-  upsertTranslation: vi.fn().mockResolvedValue(draftTranslation),
-  updateTranslation: vi.fn().mockResolvedValue(draftTranslation),
-  publishTranslation: vi.fn().mockResolvedValue(publishedTranslation),
-  unpublishTranslation: vi.fn().mockResolvedValue(draftTranslation),
+  list: vi.fn<any>().mockResolvedValue([]),
+  getBySlug: vi.fn<any>(),
+  upsert: vi.fn<any>(),
+  listChildren: vi.fn<any>().mockResolvedValue([]),
+  listLectures: vi.fn<any>().mockResolvedValue([]),
+  remove: vi.fn<any>(),
+  listTranslations: vi.fn<any>().mockResolvedValue([]),
+  upsertTranslation: vi.fn<any>().mockResolvedValue(draftTranslation),
+  updateTranslation: vi.fn<any>().mockResolvedValue(draftTranslation),
+  publishTranslation: vi.fn<any>().mockResolvedValue(publishedTranslation),
+  unpublishTranslation: vi.fn<any>().mockResolvedValue(draftTranslation),
 };
 
 async function buildApp(overrideGuard?: () => boolean | never): Promise<NestFastifyApplication> {
@@ -138,12 +138,12 @@ describe('TopicsTranslationsController — auth boundaries', () => {
   });
 
   describe('unauthenticated requests', () => {
-    it('POST /topics/:id/translations returns 401 without a session', () => {
+    it('POST /topics/:id/translations returns 401 without a session', async () => {
       mockAuth.api.getSession.mockResolvedValue(null);
-      return request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .post('/topics/t1/translations')
-        .send({ locale: 'ar', name: 'موضوع عربي' })
-        .expect(401);
+        .send({ locale: 'ar', name: 'موضوع عربي' });
+      expect(response.status).toBe(401);
     });
   });
 
@@ -163,11 +163,11 @@ describe('TopicsTranslationsController — auth boundaries', () => {
 
     afterEach(() => forbiddenApp.close());
 
-    it('POST /topics/:id/translations returns 403', () => {
-      return request(forbiddenApp.getHttpServer())
+    it('POST /topics/:id/translations returns 403', async () => {
+      const response = await request(forbiddenApp.getHttpServer())
         .post('/topics/t1/translations')
-        .send({ locale: 'ar', name: 'موضوع عربي' })
-        .expect(403);
+        .send({ locale: 'ar', name: 'موضوع عربي' });
+      expect(response.status).toBe(403);
     });
   });
 });

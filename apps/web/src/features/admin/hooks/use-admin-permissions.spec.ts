@@ -4,7 +4,7 @@ import { useApiQuery } from "@sd/core-contracts";
 import { useAuth } from "@/core/auth";
 
 vi.mock("@sd/core-contracts", () => ({
-  useApiQuery: vi.fn(),
+  useApiQuery: vi.fn<any>(),
   queryKeys: {
     admin: {
       permissions: {
@@ -12,7 +12,7 @@ vi.mock("@sd/core-contracts", () => ({
       },
     },
   },
-  httpClient: vi.fn(),
+  httpClient: vi.fn<any>(),
   endpoints: {
     admin: {
       permissions: {
@@ -23,7 +23,7 @@ vi.mock("@sd/core-contracts", () => ({
 }));
 
 vi.mock("@/core/auth", () => ({
-  useAuth: vi.fn(() => ({ isAuthenticated: true })),
+  useAuth: vi.fn<() => { isAuthenticated: boolean }>(() => ({ isAuthenticated: true })),
 }));
 
 describe("useAdminPermissions", () => {

@@ -9,22 +9,22 @@ import { LibraryController } from './library.controller';
 import { LibraryService } from './library.service';
 import { PrismaService } from '../../shared/db/prisma.service';
 
-const mockAuth = { api: { getSession: vi.fn() } };
+const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockPrisma = {
   userRoleAssignment: {
-    findMany: vi.fn().mockResolvedValue([{ role: 'user' }]),
+    findMany: vi.fn<any>().mockResolvedValue([{ role: 'user' }]),
   },
 };
 
 const mockLibraryService = {
-  getInProgress: vi.fn().mockResolvedValue({ items: [], hasMore: false }),
-  getCompleted: vi.fn().mockResolvedValue({ items: [], hasMore: false }),
-  getSaved: vi.fn().mockResolvedValue({ items: [], hasMore: false }),
-  saveLecture: vi.fn().mockResolvedValue(undefined),
-  unsaveLecture: vi.fn().mockResolvedValue(undefined),
-  bulkSave: vi.fn().mockResolvedValue(undefined),
+  getInProgress: vi.fn<any>().mockResolvedValue({ items: [], hasMore: false }),
+  getCompleted: vi.fn<any>().mockResolvedValue({ items: [], hasMore: false }),
+  getSaved: vi.fn<any>().mockResolvedValue({ items: [], hasMore: false }),
+  saveLecture: vi.fn<any>().mockResolvedValue(undefined),
+  unsaveLecture: vi.fn<any>().mockResolvedValue(undefined),
+  bulkSave: vi.fn<any>().mockResolvedValue(undefined),
 };
 
 describe('LibraryController — auth boundaries', () => {
@@ -50,31 +50,36 @@ describe('LibraryController — auth boundaries', () => {
 
   afterEach(() => app.close());
 
-  it('GET /me/library/progress returns 401 without a session', () => {
-    return request(app.getHttpServer()).get('/me/library/progress').expect(401);
+  it('GET /me/library/progress returns 401 without a session', async () => {
+    const response = await request(app.getHttpServer()).get('/me/library/progress');
+    expect(response.status).toBe(401);
   });
 
-  it('GET /me/library/completed returns 401 without a session', () => {
-    return request(app.getHttpServer()).get('/me/library/completed').expect(401);
+  it('GET /me/library/completed returns 401 without a session', async () => {
+    const response = await request(app.getHttpServer()).get('/me/library/completed');
+    expect(response.status).toBe(401);
   });
 
-  it('GET /me/library/saved returns 401 without a session', () => {
-    return request(app.getHttpServer()).get('/me/library/saved').expect(401);
+  it('GET /me/library/saved returns 401 without a session', async () => {
+    const response = await request(app.getHttpServer()).get('/me/library/saved');
+    expect(response.status).toBe(401);
   });
 
-  it('POST /me/library/save/:lectureId returns 401 without a session', () => {
-    return request(app.getHttpServer()).post('/me/library/save/l1').expect(401);
+  it('POST /me/library/save/:lectureId returns 401 without a session', async () => {
+    const response = await request(app.getHttpServer()).post('/me/library/save/l1');
+    expect(response.status).toBe(401);
   });
 
-  it('DELETE /me/library/save/:lectureId returns 401 without a session', () => {
-    return request(app.getHttpServer()).delete('/me/library/save/l1').expect(401);
+  it('DELETE /me/library/save/:lectureId returns 401 without a session', async () => {
+    const response = await request(app.getHttpServer()).delete('/me/library/save/l1');
+    expect(response.status).toBe(401);
   });
 
-  it('POST /me/library/saved/sync returns 401 without a session', () => {
-    return request(app.getHttpServer())
+  it('POST /me/library/saved/sync returns 401 without a session', async () => {
+    const response = await request(app.getHttpServer())
       .post('/me/library/saved/sync')
-      .send({ lectureIds: [] })
-      .expect(401);
+      .send({ lectureIds: [] });
+    expect(response.status).toBe(401);
   });
 
   it('GET /me/library/progress returns 200 with a valid session', async () => {
@@ -83,6 +88,8 @@ describe('LibraryController — auth boundaries', () => {
       session: {},
     });
 
-    return request(app.getHttpServer()).get('/me/library/progress').expect(200);
+    const response = await request(app.getHttpServer()).get('/me/library/progress');
+    expect(response.status).toBe(200);
+    expect(response.body).toBeDefined();
   });
 });

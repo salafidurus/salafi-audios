@@ -41,7 +41,7 @@ describe("SearchFilter", () => {
   });
 
   it("calls onChipChange when a chip is clicked", () => {
-    const handleChipChange = vi.fn();
+    const handleChipChange = vi.fn<any>();
 
     render(<SearchFilter chips={mockChips} selected={[]} onChipChange={handleChipChange} />);
 
@@ -52,7 +52,7 @@ describe("SearchFilter", () => {
   });
 
   it("calls onChipChange for each chip click independently", () => {
-    const handleChipChange = vi.fn();
+    const handleChipChange = vi.fn<any>();
 
     render(<SearchFilter chips={mockChips} selected={[]} onChipChange={handleChipChange} />);
 
@@ -107,7 +107,7 @@ describe("SearchFilter", () => {
   });
 
   it("calls onChipRemove when close button is clicked", () => {
-    const handleRemove = vi.fn();
+    const handleRemove = vi.fn<any>();
 
     render(
       <SearchFilter
@@ -125,8 +125,8 @@ describe("SearchFilter", () => {
   });
 
   it("triggers both onChipRemove and onChipChange when close button is clicked", () => {
-    const handleChipChange = vi.fn();
-    const handleRemove = vi.fn();
+    const handleChipChange = vi.fn<any>();
+    const handleRemove = vi.fn<any>();
 
     render(
       <SearchFilter
@@ -151,6 +151,7 @@ describe("SearchFilter", () => {
 
     // Should not throw
     fireEvent.click(lectureCloseButton);
+    expect(lectureCloseButton).toBeInTheDocument();
   });
 
   it("applies custom className to container", () => {
@@ -259,7 +260,7 @@ describe("SearchFilter", () => {
   });
 
   it("handles rapid chip clicks", () => {
-    const handleChipChange = vi.fn();
+    const handleChipChange = vi.fn<any>();
 
     render(<SearchFilter chips={mockChips} selected={[]} onChipChange={handleChipChange} />);
 
@@ -286,7 +287,7 @@ describe("SearchFilter", () => {
   });
 
   it("accepts multiple prop for single-select mode (default)", () => {
-    const handleChipChange = vi.fn();
+    const handleChipChange = vi.fn<any>();
 
     render(
       <SearchFilter
@@ -302,7 +303,7 @@ describe("SearchFilter", () => {
   });
 
   it("accepts multiple prop for multi-select mode", () => {
-    const handleChipChange = vi.fn();
+    const handleChipChange = vi.fn<any>();
 
     render(
       <SearchFilter

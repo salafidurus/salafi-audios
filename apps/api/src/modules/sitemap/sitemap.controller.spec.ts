@@ -10,7 +10,9 @@ describe('SitemapController', () => {
 
   beforeEach(async () => {
     sitemapService = {
-      generate: vi.fn().mockResolvedValue('<?xml version="1.0"?><urlset xmlns="..."></urlset>'),
+      generate: vi
+        .fn<any>()
+        .mockResolvedValue('<?xml version="1.0"?><urlset xmlns="..."></urlset>'),
     };
   });
 
@@ -30,7 +32,7 @@ describe('SitemapController', () => {
     });
 
     it('returns 404 and does not call generate', async () => {
-      const res = { status: vi.fn().mockReturnThis(), send: vi.fn() } as any;
+      const res = { status: vi.fn<any>().mockReturnThis(), send: vi.fn<any>() } as any;
       await controller.getSitemap(res);
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.send).toHaveBeenCalledWith('Not found');
@@ -54,7 +56,7 @@ describe('SitemapController', () => {
     });
 
     it('returns 404', async () => {
-      const res = { status: vi.fn().mockReturnThis(), send: vi.fn() } as any;
+      const res = { status: vi.fn<any>().mockReturnThis(), send: vi.fn<any>() } as any;
       await controller.getSitemap(res);
       expect(res.status).toHaveBeenCalledWith(404);
     });
@@ -76,7 +78,7 @@ describe('SitemapController', () => {
     });
 
     it('calls generate with base URL and returns XML with correct headers', async () => {
-      const res = { setHeader: vi.fn().mockReturnThis(), send: vi.fn() } as any;
+      const res = { setHeader: vi.fn<any>().mockReturnThis(), send: vi.fn<any>() } as any;
       await controller.getSitemap(res);
       expect(sitemapService.generate).toHaveBeenCalledWith('https://www.salafidurus.com');
       expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'application/xml');
@@ -99,7 +101,7 @@ describe('SitemapController', () => {
         ],
       }).compile();
       const ctrl = module.get<SitemapController>(SitemapController);
-      const res = { status: vi.fn().mockReturnThis(), send: vi.fn() } as any;
+      const res = { status: vi.fn<any>().mockReturnThis(), send: vi.fn<any>() } as any;
       await ctrl.getSitemap(res);
       expect(res.status).toHaveBeenCalledWith(503);
       expect(sitemapService.generate).not.toHaveBeenCalled();
@@ -119,7 +121,7 @@ describe('SitemapController', () => {
     });
 
     it('always returns Disallow for all, regardless of environment', async () => {
-      const res = { setHeader: vi.fn().mockReturnThis(), send: vi.fn() } as any;
+      const res = { setHeader: vi.fn<any>().mockReturnThis(), send: vi.fn<any>() } as any;
       controller.getRobots(res);
       expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'text/plain');
       expect(res.send).toHaveBeenCalledWith('User-agent: *\nDisallow: /\n');

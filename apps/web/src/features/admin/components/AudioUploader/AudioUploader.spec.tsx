@@ -4,8 +4,8 @@ import { AudioUploader } from "./AudioUploader";
 import { getPresignedUrl, uploadToR2 } from "../../api/admin-lectures.api";
 
 vi.mock("../../api/admin-lectures.api", () => ({
-  getPresignedUrl: vi.fn(),
-  uploadToR2: vi.fn(),
+  getPresignedUrl: vi.fn<any>(),
+  uploadToR2: vi.fn<any>(),
 }));
 
 describe("AudioUploader", () => {
@@ -20,34 +20,36 @@ describe("AudioUploader", () => {
     vi.clearAllMocks();
 
     // Mock URL.createObjectURL
-    global.URL.createObjectURL = vi.fn(() => "mock-audio-url");
-    global.URL.revokeObjectURL = vi.fn();
+    global.URL.createObjectURL = vi.fn<() => string>(() => "mock-audio-url");
+    global.URL.revokeObjectURL = vi.fn<any>();
 
     // Mock HTML5 Audio for metadata extraction
     mockAudio = {
       src: "",
       duration: 180,
-      addEventListener: vi.fn((event: string, callback: () => void) => {
-        if (event === "loadedmetadata") {
-          setTimeout(callback, 0);
-        }
-      }),
-      removeEventListener: vi.fn(),
+      addEventListener: vi.fn<(event: string, callback: () => void) => void>(
+        (event: string, callback: () => void) => {
+          if (event === "loadedmetadata") {
+            setTimeout(callback, 0);
+          }
+        },
+      ),
+      removeEventListener: vi.fn<any>(),
     };
 
-    global.Audio = vi.fn().mockImplementation(function () {
+    global.Audio = vi.fn<any>().mockImplementation(function () {
       return mockAudio;
     }) as unknown as typeof Audio;
   });
 
   it("renders the dropzone area", () => {
-    render(<AudioUploader onUploadComplete={vi.fn()} />);
+    render(<AudioUploader onUploadComplete={vi.fn<any>()} />);
     expect(screen.getByText(/drag & drop an audio file/i)).toBeInTheDocument();
     expect(screen.getByText(/or click to browse/i)).toBeInTheDocument();
   });
 
   it("handles file selection, extracts metadata, and performs upload", async () => {
-    const onUploadCompleteMock = vi.fn();
+    const onUploadCompleteMock = vi.fn<any>();
 
     let resolvePresigned!: () => void;
     const presignedPromise = new Promise((resolve) => {

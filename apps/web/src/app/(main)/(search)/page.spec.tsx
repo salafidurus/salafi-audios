@@ -7,14 +7,14 @@ import { useRouter } from "next/navigation";
 import { routes } from "@sd/core-contracts";
 
 vi.mock("next/navigation", () => {
-  const push = vi.fn();
+  const push = vi.fn<any>();
   return {
     useRouter: () => ({ push }),
   };
 });
 
 vi.mock("@/features/search/screens/search-home/search-home.screen", () => ({
-  SearchHomeScreen: vi.fn(() => <div data-testid="search-home" />),
+  SearchHomeScreen: vi.fn<() => JSX.Element>(() => <div data-testid="search-home" />),
 }));
 
 describe("HomePage", () => {

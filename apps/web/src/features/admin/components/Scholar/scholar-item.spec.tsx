@@ -4,7 +4,7 @@ import { Scholar } from ".";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 
 vi.mock("@/features/admin/hooks/use-admin-permissions", () => ({
-  useAdminPermissions: vi.fn(),
+  useAdminPermissions: vi.fn<any>(),
 }));
 
 const baseScholar = {
@@ -32,7 +32,7 @@ describe("ScholarItem", () => {
       data: { permissions: ["SCHOLARS_VIEW"] },
     });
 
-    render(<Scholar.Item scholar={baseScholar} onEdit={vi.fn()} />);
+    render(<Scholar.Item scholar={baseScholar} onEdit={vi.fn<any>()} />);
 
     expect(screen.queryByRole("button", { name: /edit ibn baz/i })).not.toBeInTheDocument();
   });
@@ -42,7 +42,7 @@ describe("ScholarItem", () => {
       data: { permissions: ["SCHOLARS_EDIT"] },
     });
 
-    render(<Scholar.Item scholar={baseScholar} onEdit={vi.fn()} />);
+    render(<Scholar.Item scholar={baseScholar} onEdit={vi.fn<any>()} />);
 
     expect(screen.getByRole("button", { name: /edit ibn baz/i })).toBeInTheDocument();
   });

@@ -42,9 +42,9 @@ describe('HomeService', () => {
         {
           provide: HomeRepo,
           useValue: {
-            getScholars: vi.fn(),
-            getSuggestions: vi.fn(),
-            getRecentProgress: vi.fn(),
+            getScholars: vi.fn<any>(),
+            getSuggestions: vi.fn<any>(),
+            getRecentProgress: vi.fn<any>(),
           } satisfies Partial<Mocked<HomeRepo>>,
         },
       ],

@@ -4,15 +4,15 @@ import { AdminPermissionsScreen } from "./admin-permissions.screen";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 
 vi.mock("@/features/admin/hooks/use-admin-permissions", () => ({
-  useAdminPermissions: vi.fn(),
+  useAdminPermissions: vi.fn<any>(),
 }));
 vi.mock("@/shared/hooks/use-responsive", () => ({
   useResponsive: () => ({ isMobile: false }),
 }));
 vi.mock("@/features/admin/api/admin.api", () => ({
-  fetchUserPermissions: vi.fn(),
-  grantPermission: vi.fn(),
-  revokePermission: vi.fn(),
+  fetchUserPermissions: vi.fn<any>(),
+  grantPermission: vi.fn<any>(),
+  revokePermission: vi.fn<any>(),
 }));
 vi.mock("@/shared/components/RevokePermissionConfirmModal", () => ({
   RevokePermissionConfirmModal: () => null,

@@ -4,7 +4,7 @@ import { AdminDashboardScreen } from "./admin-dashboard.screen";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 
 vi.mock("@/features/admin/hooks/use-admin-permissions", () => ({
-  useAdminPermissions: vi.fn(),
+  useAdminPermissions: vi.fn<any>(),
 }));
 
 describe("AdminDashboardScreen", () => {

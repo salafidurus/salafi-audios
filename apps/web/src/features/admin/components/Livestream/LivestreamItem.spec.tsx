@@ -4,7 +4,7 @@ import { LivestreamItem } from "./LivestreamItem";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 
 vi.mock("@/features/admin/hooks/use-admin-permissions", () => ({
-  useAdminPermissions: vi.fn(),
+  useAdminPermissions: vi.fn<any>(),
 }));
 
 const mockSession = {
@@ -40,7 +40,12 @@ describe("LivestreamItem", () => {
       });
 
       render(
-        <LivestreamItem type="session" item={mockSession} onEdit={vi.fn()} onDelete={vi.fn()} />,
+        <LivestreamItem
+          type="session"
+          item={mockSession}
+          onEdit={vi.fn<any>()}
+          onDelete={vi.fn<any>()}
+        />,
       );
 
       expect(screen.getByText("Live Class Title")).toBeInTheDocument();
@@ -55,7 +60,12 @@ describe("LivestreamItem", () => {
       });
 
       render(
-        <LivestreamItem type="session" item={mockSession} onEdit={vi.fn()} onDelete={vi.fn()} />,
+        <LivestreamItem
+          type="session"
+          item={mockSession}
+          onEdit={vi.fn<any>()}
+          onDelete={vi.fn<any>()}
+        />,
       );
 
       expect(screen.queryByRole("button", { name: /edit status/i })).not.toBeInTheDocument();
@@ -68,7 +78,12 @@ describe("LivestreamItem", () => {
       });
 
       render(
-        <LivestreamItem type="session" item={mockSession} onEdit={vi.fn()} onDelete={vi.fn()} />,
+        <LivestreamItem
+          type="session"
+          item={mockSession}
+          onEdit={vi.fn<any>()}
+          onDelete={vi.fn<any>()}
+        />,
       );
 
       expect(screen.getByRole("button", { name: /edit status/i })).toBeInTheDocument();
@@ -81,7 +96,12 @@ describe("LivestreamItem", () => {
       });
 
       render(
-        <LivestreamItem type="session" item={mockSession} onEdit={vi.fn()} onDelete={vi.fn()} />,
+        <LivestreamItem
+          type="session"
+          item={mockSession}
+          onEdit={vi.fn<any>()}
+          onDelete={vi.fn<any>()}
+        />,
       );
 
       expect(screen.queryByRole("button", { name: /edit status/i })).not.toBeInTheDocument();
@@ -96,7 +116,12 @@ describe("LivestreamItem", () => {
       });
 
       render(
-        <LivestreamItem type="channel" item={mockChannel} onEdit={vi.fn()} onDelete={vi.fn()} />,
+        <LivestreamItem
+          type="channel"
+          item={mockChannel}
+          onEdit={vi.fn<any>()}
+          onDelete={vi.fn<any>()}
+        />,
       );
 
       expect(screen.getByText("Channel One")).toBeInTheDocument();
@@ -105,13 +130,18 @@ describe("LivestreamItem", () => {
     });
 
     it("calls onEdit when clicking edit and onOpen is available", () => {
-      const onEdit = vi.fn();
+      const onEdit = vi.fn<any>();
       (useAdminPermissions as Mock).mockReturnValue({
         data: { permissions: ["LIVE_EDIT"] },
       });
 
       render(
-        <LivestreamItem type="channel" item={mockChannel} onEdit={onEdit} onDelete={vi.fn()} />,
+        <LivestreamItem
+          type="channel"
+          item={mockChannel}
+          onEdit={onEdit}
+          onDelete={vi.fn<any>()}
+        />,
       );
 
       const editBtn = screen.getByRole("button", { name: /edit channel/i });

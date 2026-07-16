@@ -5,7 +5,7 @@ import { AuthModal } from "./auth-modal";
 describe("AuthModal", () => {
   const defaultProps = {
     isOpen: true,
-    onClose: vi.fn(),
+    onClose: vi.fn<any>(),
     message: "Sign in to save lectures to your library",
   };
 

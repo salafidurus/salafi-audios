@@ -28,17 +28,17 @@ describe('SessionsService', () => {
         {
           provide: SessionsRepository,
           useValue: {
-            findLatestLiveSession: vi.fn(),
-            createSession: vi.fn(),
-            updateStatus: vi.fn(),
-            findByChannelAndStatus: vi.fn(),
+            findLatestLiveSession: vi.fn<any>(),
+            createSession: vi.fn<any>(),
+            updateStatus: vi.fn<any>(),
+            findByChannelAndStatus: vi.fn<any>(),
           } satisfies Partial<Mocked<SessionsRepository>>,
         },
         {
           provide: LiveService,
           useValue: {
-            getSessionPublic: vi.fn(),
-            emitSessionUpdate: vi.fn(),
+            getSessionPublic: vi.fn<any>(),
+            emitSessionUpdate: vi.fn<any>(),
           } satisfies Partial<Mocked<LiveService>>,
         },
       ],

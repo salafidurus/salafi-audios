@@ -10,12 +10,12 @@ import {
   useLibraryCompletedScreen,
 } from "@sd/domain-content";
 
-const mockUseAuth = vi.fn(() => ({ isAuthenticated: true }));
+const mockUseAuth = vi.fn<() => { isAuthenticated: boolean }>(() => ({ isAuthenticated: true }));
 
 vi.mock("@sd/domain-content", () => ({
-  useLibraryProgressScreen: vi.fn(),
-  useLibrarySavedScreen: vi.fn(),
-  useLibraryCompletedScreen: vi.fn(),
+  useLibraryProgressScreen: vi.fn<any>(),
+  useLibrarySavedScreen: vi.fn<any>(),
+  useLibraryCompletedScreen: vi.fn<any>(),
 }));
 
 vi.mock("@/core/auth/use-auth", () => ({

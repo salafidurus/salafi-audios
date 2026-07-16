@@ -11,26 +11,26 @@ import { AdminLiveController } from './admin-live.controller';
 import { LiveService } from './live.service';
 import { PrismaService } from '../../shared/db/prisma.service';
 
-const mockAuth = { api: { getSession: vi.fn() } };
+const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockPrisma = {
   userRoleAssignment: {
-    findMany: vi.fn().mockResolvedValue([{ role: 'user' }]),
+    findMany: vi.fn<any>().mockResolvedValue([{ role: 'user' }]),
   },
 };
 
 const mockLiveService = {
-  getChannels: vi.fn().mockResolvedValue([]),
-  getChannelBySlug: vi.fn().mockResolvedValue(null),
-  getActive: vi.fn().mockResolvedValue([]),
-  getUpcoming: vi.fn().mockResolvedValue([]),
-  getEnded: vi.fn().mockResolvedValue([]),
-  createChannel: vi.fn().mockResolvedValue({}),
-  updateChannel: vi.fn().mockResolvedValue({}),
-  createSession: vi.fn().mockResolvedValue({}),
-  updateSession: vi.fn().mockResolvedValue({}),
-  updateSessionStatus: vi.fn().mockResolvedValue({}),
+  getChannels: vi.fn<any>().mockResolvedValue([]),
+  getChannelBySlug: vi.fn<any>().mockResolvedValue(null),
+  getActive: vi.fn<any>().mockResolvedValue([]),
+  getUpcoming: vi.fn<any>().mockResolvedValue([]),
+  getEnded: vi.fn<any>().mockResolvedValue([]),
+  createChannel: vi.fn<any>().mockResolvedValue({}),
+  updateChannel: vi.fn<any>().mockResolvedValue({}),
+  createSession: vi.fn<any>().mockResolvedValue({}),
+  updateSession: vi.fn<any>().mockResolvedValue({}),
+  updateSessionStatus: vi.fn<any>().mockResolvedValue({}),
 };
 
 describe('LiveController — auth boundaries', () => {
@@ -61,38 +61,46 @@ describe('LiveController — auth boundaries', () => {
   afterAll(() => app.close());
 
   describe('public endpoints', () => {
-    it('GET /live/channels returns 200 without auth', () => {
-      return request(app.getHttpServer()).get('/live/channels').expect(200);
+    it('GET /live/channels returns 200 without auth', async () => {
+      const response = await request(app.getHttpServer()).get('/live/channels');
+      expect(response.status).toBe(200);
+      expect(response.body).toBeDefined();
     });
 
-    it('GET /live/sessions/active returns 200 without auth', () => {
-      return request(app.getHttpServer()).get('/live/sessions/active').expect(200);
+    it('GET /live/sessions/active returns 200 without auth', async () => {
+      const response = await request(app.getHttpServer()).get('/live/sessions/active');
+      expect(response.status).toBe(200);
+      expect(response.body).toBeDefined();
     });
 
-    it('GET /live/sessions/upcoming returns 200 without auth', () => {
-      return request(app.getHttpServer()).get('/live/sessions/upcoming').expect(200);
+    it('GET /live/sessions/upcoming returns 200 without auth', async () => {
+      const response = await request(app.getHttpServer()).get('/live/sessions/upcoming');
+      expect(response.status).toBe(200);
+      expect(response.body).toBeDefined();
     });
 
-    it('GET /live/ended returns 200 without auth', () => {
-      return request(app.getHttpServer()).get('/live/ended').expect(200);
+    it('GET /live/ended returns 200 without auth', async () => {
+      const response = await request(app.getHttpServer()).get('/live/ended');
+      expect(response.status).toBe(200);
+      expect(response.body).toBeDefined();
     });
   });
 
   describe('admin endpoints', () => {
-    it('POST /admin/live/channels returns 401 without a session', () => {
+    it('POST /admin/live/channels returns 401 without a session', async () => {
       mockAuth.api.getSession.mockResolvedValue(null);
-      return request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .post('/admin/live/channels')
-        .send({ name: 'Test', slug: 'test' })
-        .expect(401);
+        .send({ name: 'Test', slug: 'test' });
+      expect(response.status).toBe(401);
     });
 
-    it('POST /admin/live/sessions returns 401 without a session', () => {
+    it('POST /admin/live/sessions returns 401 without a session', async () => {
       mockAuth.api.getSession.mockResolvedValue(null);
-      return request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .post('/admin/live/sessions')
-        .send({ channelId: 'c1', title: 'Session' })
-        .expect(401);
+        .send({ channelId: 'c1', title: 'Session' });
+      expect(response.status).toBe(401);
     });
   });
 });

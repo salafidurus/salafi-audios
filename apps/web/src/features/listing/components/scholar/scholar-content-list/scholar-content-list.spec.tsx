@@ -6,8 +6,8 @@ import type { ScholarContentItemDto } from "@sd/core-contracts";
 import { useScholarTopics, useScholarContent } from "@sd/domain-content";
 
 vi.mock("@sd/domain-content", () => ({
-  useScholarTopics: vi.fn(),
-  useScholarContent: vi.fn(),
+  useScholarTopics: vi.fn<any>(),
+  useScholarContent: vi.fn<any>(),
 }));
 
 vi.mock("@/features/settings/content-preference", () => ({

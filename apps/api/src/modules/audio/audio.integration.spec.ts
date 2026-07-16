@@ -9,20 +9,20 @@ import { AudioController } from './audio.controller';
 import { AudioService } from './audio.service';
 import { PrismaService } from '../../shared/db/prisma.service';
 
-const mockAuth = { api: { getSession: vi.fn() } };
+const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockPrisma = {
   userRoleAssignment: {
-    findMany: vi.fn().mockResolvedValue([{ role: 'user' }]),
+    findMany: vi.fn<any>().mockResolvedValue([{ role: 'user' }]),
   },
 };
 
 const mockAudioService = {
-  getUserProgress: vi.fn().mockResolvedValue([]),
-  bulkSync: vi.fn().mockResolvedValue(undefined),
-  upsertProgress: vi.fn().mockResolvedValue(undefined),
-  resolveStreamUrl: vi.fn().mockResolvedValue({
+  getUserProgress: vi.fn<any>().mockResolvedValue([]),
+  bulkSync: vi.fn<any>().mockResolvedValue(undefined),
+  upsertProgress: vi.fn<any>().mockResolvedValue(undefined),
+  resolveStreamUrl: vi.fn<any>().mockResolvedValue({
     url: 'https://test.mp3',
     durationSeconds: 120,
     format: 'mp3',
@@ -53,8 +53,9 @@ describe('AudioController — boundaries', () => {
   afterEach(() => app.close());
 
   describe('GET /audio/progress', () => {
-    it('should return 401 without a session', () => {
-      return request(app.getHttpServer()).get('/audio/progress').expect(401);
+    it('should return 401 without a session', async () => {
+      const response = await request(app.getHttpServer()).get('/audio/progress');
+      expect(response.status).toBe(401);
     });
 
     it('should return 200 with a valid session', async () => {
@@ -63,16 +64,18 @@ describe('AudioController — boundaries', () => {
         session: {},
       });
 
-      return request(app.getHttpServer()).get('/audio/progress').expect(200);
+      const response = await request(app.getHttpServer()).get('/audio/progress');
+      expect(response.status).toBe(200);
+      expect(response.body).toBeDefined();
     });
   });
 
   describe('POST /audio/progress/sync', () => {
-    it('should return 401 without a session', () => {
-      return request(app.getHttpServer())
+    it('should return 401 without a session', async () => {
+      const response = await request(app.getHttpServer())
         .post('/audio/progress/sync')
-        .send({ items: [] })
-        .expect(401);
+        .send({ items: [] });
+      expect(response.status).toBe(401);
     });
 
     it('should return 201 with a valid session', async () => {
@@ -81,19 +84,19 @@ describe('AudioController — boundaries', () => {
         session: {},
       });
 
-      return request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .post('/audio/progress/sync')
-        .send({ items: [] })
-        .expect(201);
+        .send({ items: [] });
+      expect(response.status).toBe(201);
     });
   });
 
   describe('PUT /audio/progress/:listingId', () => {
-    it('should return 401 without a session', () => {
-      return request(app.getHttpServer())
+    it('should return 401 without a session', async () => {
+      const response = await request(app.getHttpServer())
         .put('/audio/progress/l1')
-        .send({ positionSeconds: 30 })
-        .expect(401);
+        .send({ positionSeconds: 30 });
+      expect(response.status).toBe(401);
     });
 
     it('should return 200 with a valid session', async () => {
@@ -102,16 +105,18 @@ describe('AudioController — boundaries', () => {
         session: {},
       });
 
-      return request(app.getHttpServer())
+      const response = await request(app.getHttpServer())
         .put('/audio/progress/l1')
-        .send({ positionSeconds: 30 })
-        .expect(200);
+        .send({ positionSeconds: 30 });
+      expect(response.status).toBe(200);
     });
   });
 
   describe('GET /audio/listings/:listingId/stream', () => {
-    it('should return 200 without a session (Public route)', () => {
-      return request(app.getHttpServer()).get('/audio/listings/l1/stream').expect(200);
+    it('should return 200 without a session (Public route)', async () => {
+      const response = await request(app.getHttpServer()).get('/audio/listings/l1/stream');
+      expect(response.status).toBe(200);
+      expect(response.body).toBeDefined();
     });
   });
 });

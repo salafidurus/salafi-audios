@@ -5,7 +5,7 @@ import { Reflector } from '@nestjs/core';
 import { ExecutionContext, ForbiddenException, UnauthorizedException } from '@nestjs/common';
 import type { PrismaService } from '../../shared/db/prisma.service';
 
-const mockAuth = { api: { getSession: vi.fn() } };
+const mockAuth = { api: { getSession: vi.fn<any>() } };
 vi.mock('./auth.instance', () => ({ getAuth: () => mockAuth }));
 
 function mockContext(headers: Record<string, string> = {}): ExecutionContext {
@@ -27,7 +27,7 @@ describe('AuthGuard', () => {
     reflector = new Reflector();
     mockPrisma = {
       userRoleAssignment: {
-        findMany: vi.fn(),
+        findMany: vi.fn<any>(),
       },
     } as unknown as Partial<PrismaService>;
     guard = new AuthGuard(reflector, mockPrisma as PrismaService);

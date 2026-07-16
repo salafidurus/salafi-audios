@@ -14,10 +14,10 @@ vi.mock("@sd/core-i18n", () => ({
 }));
 
 vi.mock("@sd/domain-content", () => ({
-  useContentTranslations: vi.fn(),
-  useSaveTranslation: vi.fn(),
-  usePublishTranslation: vi.fn(),
-  useUnpublishTranslation: vi.fn(),
+  useContentTranslations: vi.fn<any>(),
+  useSaveTranslation: vi.fn<any>(),
+  usePublishTranslation: vi.fn<any>(),
+  useUnpublishTranslation: vi.fn<any>(),
 }));
 
 vi.mock("react-i18next", () => ({
@@ -33,7 +33,7 @@ const mockFields = [
 
 const mockOriginalValues = { name: "Ibn Baz", bio: "A great scholar" };
 
-const makeMutation = (mutateFn = vi.fn()) => ({
+const makeMutation = (mutateFn = vi.fn<any>()) => ({
   mutate: mutateFn,
   isPending: false,
 });
@@ -69,7 +69,7 @@ describe("TranslationEditor", () => {
   });
 
   it("calls saveTranslation.mutate when Save draft is clicked", () => {
-    const mutateFn = vi.fn();
+    const mutateFn = vi.fn<any>();
     (useSaveTranslation as Mock).mockReturnValue(makeMutation(mutateFn));
     render(
       <TranslationEditor
@@ -83,7 +83,7 @@ describe("TranslationEditor", () => {
   });
 
   it("calls publishTranslation.mutate when Publish is clicked", () => {
-    const mutateFn = vi.fn();
+    const mutateFn = vi.fn<any>();
     (usePublishTranslation as Mock).mockReturnValue(makeMutation(mutateFn));
     (useContentTranslations as Mock).mockReturnValue({
       data: { translations: [makeTranslation({ status: "draft" })] },
@@ -101,7 +101,7 @@ describe("TranslationEditor", () => {
   });
 
   it("calls unpublishTranslation.mutate when Unpublish is clicked", async () => {
-    const mutateFn = vi.fn();
+    const mutateFn = vi.fn<any>();
     (useUnpublishTranslation as Mock).mockReturnValue(makeMutation(mutateFn));
     (useContentTranslations as Mock).mockReturnValue({
       data: { translations: [makeTranslation({ status: "published" })] },

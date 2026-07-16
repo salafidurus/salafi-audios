@@ -1,5 +1,5 @@
 import React from "react";
-import { vi } from "vitest";
+import { vi, describe, it, expect, beforeEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useLiveSection } from "./use-live-section";
@@ -10,7 +10,7 @@ vi.mock("@sd/core-contracts", async (importOriginal) => {
   const actual = await importOriginal<typeof import("@sd/core-contracts")>();
   return {
     ...actual,
-    httpClient: vi.fn(),
+    httpClient: vi.fn<(request: { url: string; method: string; params?: any }) => Promise<any>>(),
   };
 });
 

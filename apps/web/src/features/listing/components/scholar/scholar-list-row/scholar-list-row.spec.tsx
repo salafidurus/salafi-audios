@@ -47,7 +47,7 @@ describe("ScholarListRow", () => {
   });
 
   it("calls onPress with the scholar slug when clicked", () => {
-    const onPressMock = vi.fn();
+    const onPressMock = vi.fn<any>();
     render(<ScholarListRow scholar={mockScholar} onPress={onPressMock} />);
     const button = screen.getByRole("button");
     fireEvent.click(button);
