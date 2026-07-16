@@ -65,8 +65,11 @@ jobs:
           fi
           echo "Neon branch created successfully"
 
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+      - name: Install dependencies (scripts disabled)
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Run workspace postinstall
+        run: bun run postinstall
 
       - name: Build dependencies
         env:

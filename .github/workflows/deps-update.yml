@@ -23,8 +23,11 @@ jobs:
         with:
           bun-version: "1.3.14"
 
-      - name: Install
-        run: bun install --frozen-lockfile
+      - name: Install (scripts disabled)
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Run workspace postinstall
+        run: bun run postinstall
 
       - name: Restore deps state cache
         id: cache-restore

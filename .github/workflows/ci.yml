@@ -30,19 +30,12 @@ permissions:
 env:
   # Custom Playwright path enables GitHub Actions caching (default path is not cacheable)
   PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/ms-playwright
-  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
-  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-  NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'http://localhost:4000' }}
-  NEXT_PUBLIC_WEB_URL: ${{ secrets.NEXT_PUBLIC_WEB_URL || 'http://localhost:3000' }}
 
 jobs:
   verify:
     name: verify
     runs-on: ubuntu-latest
     environment: ${{ github.base_ref == 'preview' && 'preview' || github.base_ref == 'production' && 'production' || 'development' }}
-    env:
-      DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL || 'postgresql://ci:ci@localhost:5432/ci' }}
-      DATABASE_URL: ${{ secrets.DIRECT_DB_URL || 'postgresql://ci:ci@localhost:5432/ci' }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -52,8 +45,20 @@ jobs:
         with:
           bun-version: "1.3.14"
 
-      - name: Install
-        run: bun install --frozen-lockfile
+      # Install without running lifecycle scripts to avoid exposing secrets
+      # to untrusted package install code.
+      - name: Install dependencies (scripts disabled)
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Run workspace postinstall
+        run: bun run postinstall
 
       - name: Build, lint, typecheck, test
+        env:
+          TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL || 'http://localhost:4000' }}
+          NEXT_PUBLIC_WEB_URL: ${{ secrets.NEXT_PUBLIC_WEB_URL || 'http://localhost:3000' }}
+          DIRECT_DB_URL: ${{ secrets.DIRECT_DB_URL || 'postgresql://ci:ci@localhost:5432/ci' }}
+          DATABASE_URL: ${{ secrets.DIRECT_DB_URL || 'postgresql://ci:ci@localhost:5432/ci' }}
         run: bun run turbo run build lint typecheck test --continue
