@@ -634,10 +634,7 @@ export class SearchRepository {
     return Prisma.sql`${Prisma.join(clauses, ', ')}`;
   }
 
-  private collectionFallbackRankingClauses(
-    query: string,
-    includeRelated: boolean,
-  ): Prisma.Sql[] {
+  private collectionFallbackRankingClauses(query: string, includeRelated: boolean): Prisma.Sql[] {
     const exact = this.likeExactPattern(query);
     const prefix = this.likePrefixPattern(query);
     const contains = this.likeContainsPattern(query);
@@ -662,10 +659,7 @@ export class SearchRepository {
     ];
   }
 
-  private seriesFallbackRankingClauses(
-    query: string,
-    includeRelated: boolean,
-  ): Prisma.Sql[] {
+  private seriesFallbackRankingClauses(query: string, includeRelated: boolean): Prisma.Sql[] {
     const exact = this.likeExactPattern(query);
     const prefix = this.likePrefixPattern(query);
     const contains = this.likeContainsPattern(query);
@@ -690,10 +684,7 @@ export class SearchRepository {
     ];
   }
 
-  private lectureFallbackRankingClauses(
-    query: string,
-    includeRelated: boolean,
-  ): Prisma.Sql[] {
+  private lectureFallbackRankingClauses(query: string, includeRelated: boolean): Prisma.Sql[] {
     const exact = this.likeExactPattern(query);
     const prefix = this.likePrefixPattern(query);
     const contains = this.likeContainsPattern(query);

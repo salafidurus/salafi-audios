@@ -30,10 +30,7 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
     ({ item }: { item: ScholarContentItemDto }) => {
       const title = pickContentField(item.title, item.original?.title, showOriginal);
       return (
-        <Pressable
-          style={styles.card}
-          onPress={() => router.push(contentRoute(item) as Href)}
-        >
+        <Pressable style={styles.card} onPress={() => router.push(contentRoute(item) as Href)}>
           <AppText variant="caption" style={styles.typeLabel}>
             {item.type}
           </AppText>
@@ -50,10 +47,7 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
     ({ item }: { item: ScholarContentItemDto }) => {
       const title = pickContentField(item.title, item.original?.title, showOriginal);
       return (
-        <Pressable
-          style={styles.row}
-          onPress={() => router.push(contentRoute(item) as Href)}
-        >
+        <Pressable style={styles.row} onPress={() => router.push(contentRoute(item) as Href)}>
           <AppText variant="caption" style={styles.typeLabel}>
             {item.type}
           </AppText>

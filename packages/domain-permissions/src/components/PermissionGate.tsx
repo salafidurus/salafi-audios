@@ -75,12 +75,12 @@ export function PermissionGate({
   // Normalize to array
   const permissionsArray = useMemo(
     () => (isSingle ? [singlePermission!] : Array.from(requires || [])),
-    [isSingle, singlePermission, requires]
+    [isSingle, singlePermission, requires],
   );
 
   // Call all hooks unconditionally at top level
   const hasSinglePermission = useHasPermission(
-    singlePermission || permissionsArray[0] || ("" as Permission)
+    singlePermission || permissionsArray[0] || ("" as Permission),
   );
   const hasAllPermissions = useHasAllPermissions(permissionsArray);
   const hasAnyPermission = useHasAnyPermission(permissionsArray);
@@ -161,13 +161,11 @@ export function RoleGate({
   // Normalize to array
   const rolesArray = useMemo(
     () => (isSingle ? [singleRole!] : Array.from(requires || [])),
-    [isSingle, singleRole, requires]
+    [isSingle, singleRole, requires],
   );
 
   // Call all hooks unconditionally at top level
-  const hasSingleRole = useHasRole(
-    singleRole || rolesArray[0] || ("" as UserRole)
-  );
+  const hasSingleRole = useHasRole(singleRole || rolesArray[0] || ("" as UserRole));
   const hasAllRoles = useHasAllRoles(rolesArray);
   const hasAnyRole = useHasAnyRole(rolesArray);
 
