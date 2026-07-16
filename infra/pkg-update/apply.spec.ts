@@ -81,6 +81,30 @@ describe("updateCatalogEntry", () => {
     expect((result.workspaces as any).catalog.zod).toBe("^4.0.0");
   });
 
+  it("preserves caret prefix from catalog entry", () => {
+    const pkg = {
+      workspaces: { catalog: { zod: "^3.0.0" } },
+    };
+    const result = updateCatalogEntry(pkg as any, "zod", "4.0.0");
+    expect((result.workspaces as any).catalog.zod).toBe("^4.0.0");
+  });
+
+  it("preserves tilde prefix from catalog entry", () => {
+    const pkg = {
+      workspaces: { catalog: { zod: "~3.0.0" } },
+    };
+    const result = updateCatalogEntry(pkg as any, "zod", "4.0.0");
+    expect((result.workspaces as any).catalog.zod).toBe("~4.0.0");
+  });
+
+  it("handles version without prefix", () => {
+    const pkg = {
+      workspaces: { catalog: { zod: "3.0.0" } },
+    };
+    const result = updateCatalogEntry(pkg as any, "zod", "4.0.0");
+    expect((result.workspaces as any).catalog.zod).toBe("4.0.0");
+  });
+
   it("throws for unknown package", () => {
     const pkg = { workspaces: { catalog: {} } };
     expect(() => updateCatalogEntry(pkg as any, "nonexistent", "1.0.0")).toThrow(
@@ -100,7 +124,7 @@ describe("applyCatalogUpdate", () => {
     await applyCatalogUpdate(candidate, tmpDir, config);
 
     const content = JSON.parse(readFileSync(join(tmpDir, "package.json"), "utf-8"));
-    expect(content.workspaces.catalog.zod).toBe("5.0.0");
+    expect(content.workspaces.catalog.zod).toBe("^5.0.0");
   });
 
   it("syncs version-locked group members in catalog", async () => {
@@ -191,8 +215,21 @@ describe("syncWorkspaceDeps", () => {
     const updated = syncWorkspaceDeps(candidate, tmpDir, config);
 
     const apiPkg = JSON.parse(readFileSync(join(tmpDir, "apps", "api", "package.json"), "utf-8"));
-    expect(apiPkg.dependencies.zod).toBe("5.0.0");
+    expect(apiPkg.dependencies.zod).toBe("^5.0.0");
     expect(updated.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("preserves no prefix when dependency had none", () => {
+    const candidate: UpdateCandidate = {
+      type: "catalog",
+      packageName: "zod",
+      currentVersion: "4.4.3",
+      latestVersion: "5.0.0",
+    };
+    syncWorkspaceDeps(candidate, tmpDir, config);
+
+    const webPkg = JSON.parse(readFileSync(join(tmpDir, "apps", "web", "package.json"), "utf-8"));
+    expect(webPkg.dependencies.zod).toBe("5.0.0");
   });
 
   it("updates version-locked group members in workspace files", () => {
