@@ -40,7 +40,9 @@ describe('AppleNativeService', () => {
     });
 
     it('throws on invalid JWT format', async () => {
-      await expect(service.verifyIdentityToken('not-a-jwt')).rejects.toThrow('Failed to parse JWT');
+      await expect(service.verifyIdentityToken('not-a-jwt')).rejects.toThrow(
+        'Apple identity token verification failed',
+      );
     });
   });
 
