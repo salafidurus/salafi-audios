@@ -219,7 +219,7 @@ describe("syncWorkspaceDeps", () => {
     expect(updated.length).toBeGreaterThanOrEqual(1);
   });
 
-  it("preserves no prefix when dependency had none", () => {
+  it("uses catalog prefix for workspace deps", () => {
     const candidate: UpdateCandidate = {
       type: "catalog",
       packageName: "zod",
@@ -229,7 +229,7 @@ describe("syncWorkspaceDeps", () => {
     syncWorkspaceDeps(candidate, tmpDir, config);
 
     const webPkg = JSON.parse(readFileSync(join(tmpDir, "apps", "web", "package.json"), "utf-8"));
-    expect(webPkg.dependencies.zod).toBe("5.0.0");
+    expect(webPkg.dependencies.zod).toBe("^5.0.0");
   });
 
   it("updates version-locked group members in workspace files", () => {
