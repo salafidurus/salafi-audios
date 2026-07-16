@@ -87,7 +87,8 @@ describe('ScholarsTranslationsController — auth boundaries', () => {
         session: {},
       });
       // Mock userPermission.findUnique to return permissions for admin
-      mockPrisma.userPermission.findUnique.mockImplementation(async ({ where }) => {
+      mockPrisma.userPermission.findUnique.mockImplementation(async (args: any) => {
+        const { where } = args;
         const { userId, permission } = where.userId_permission;
         if (
           userId === 'u1' &&
