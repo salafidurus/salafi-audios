@@ -3,6 +3,46 @@ import { render, screen, fireEvent } from "@testing-library/react-native";
 import { useScholarDetail, useScholarContent, useScholarTopics } from "@sd/domain-content";
 import { ScholarDetailScreen } from "./scholar-detail.screen";
 
+jest.mock("react-native-reanimated", () => ({
+  // Mock Animated API
+  useSharedValue: jest.fn((value) => ({ value })),
+  useAnimatedStyle: jest.fn(() => ({})),
+  useAnimatedReaction: jest.fn(),
+  runOnJS: jest.fn((fn) => fn),
+  interpolate: jest.fn(),
+  Extrapolate: { CLAMP: "clamp" },
+}));
+
+jest.mock("react-native-unistyles", () => ({
+  StyleSheet: {
+    create: (styles: Record<string, unknown>) => styles,
+  },
+  useUnistyles: jest.fn(() => ({
+    theme: {
+      colors: {
+        content: {
+          muted: "#999999",
+          base: "#000000",
+          active: "#0066cc",
+        },
+        surface: {
+          canvas: "#ffffff",
+          inverse: "#1a1a1a",
+        },
+        border: {
+          default: "#e0e0e0",
+        },
+      },
+    },
+    styles: {
+      topicHeader: {},
+      topicContent: {},
+      chevronCollapsed: {},
+    },
+    screen: {},
+  })),
+}));
+
 jest.mock("@sd/domain-content", () => ({
   useScholarDetail: jest.fn(),
   useScholarContent: jest.fn(),
