@@ -9,9 +9,7 @@ import { SettingsRow } from "@/shared/components/SettingsRow/SettingsRow";
 import { SegmentedControl } from "@/shared/components/SegmentedControl/SegmentedControl";
 import { Toggle } from "@/shared/components/Toggle";
 import type { ThemePreference } from "@/core/styles/ThemeSync";
-
-const THEME_KEY = "theme-preference";
-const THEME_CHANGE_EVENT = "theme-change";
+import { THEME_KEY, THEME_CHANGE_EVENT } from "@/core/styles/ThemeSync";
 
 const THEME_OPTIONS: { value: ThemePreference; label: string }[] = [
   { value: "system", label: "System" },
@@ -26,7 +24,7 @@ interface NotificationState {
   lectures: boolean;
 }
 
-const NOTIF_KEY = "notification-settings";
+const NOTIF_KEY = "notification-settings:v1";
 
 function loadNotifState(): NotificationState {
   if (typeof window === "undefined") {
