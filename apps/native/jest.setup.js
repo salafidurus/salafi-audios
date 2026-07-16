@@ -60,3 +60,12 @@ jest.mock("@tanstack/react-query", () => ({
     invalidateQueries: jest.fn().mockResolvedValue(undefined),
   })),
 }));
+
+jest.mock("react-native-reanimated", () => ({
+  useSharedValue: jest.fn((value) => ({ value })),
+  useAnimatedStyle: jest.fn(() => ({})),
+  useAnimatedReaction: jest.fn(),
+  runOnJS: jest.fn((fn) => fn),
+  interpolate: jest.fn(),
+  Extrapolate: { CLAMP: "clamp" },
+}));
