@@ -1,9 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useEffectEvent, type ReactNode, useSyncExternalStore } from "react";
+import {
+  useEffect,
+  useRef,
+  useEffectEvent,
+  useState,
+  type ReactNode,
+  useSyncExternalStore,
+} from "react";
 import { createPortal } from "react-dom";
 import { LazyMotion, m, domAnimation, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import { Button } from "../Button/Button";
 import styles from "./modal.module.css";
 
 function getModalPortalRoot(): HTMLElement | null {
@@ -11,7 +19,7 @@ function getModalPortalRoot(): HTMLElement | null {
   return document.body;
 }
 
-function subscribeModalPortalRoot(): (() => void) {
+function subscribeModalPortalRoot(): () => void {
   return () => {};
 }
 
@@ -50,11 +58,7 @@ export function Modal({
   footerBorder: _footerBorder = false,
   loading,
 }: ModalProps) {
-  const portalRoot = useSyncExternalStore(
-    subscribeModalPortalRoot,
-    getModalPortalRoot,
-    () => null,
-  );
+  const portalRoot = useSyncExternalStore(subscribeModalPortalRoot, getModalPortalRoot, () => null);
   const contentRef = useRef<HTMLDivElement>(null);
 
   const handleCloseEvent = useEffectEvent(() => {
@@ -217,7 +221,159 @@ export function ModalFooter({ children, alignment = "right", border = true }: Mo
   );
 }
 
+interface ModalConfirmDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void | Promise<void>;
+  title: string;
+  confirmLabel: string;
+  confirmVariant?: "default" | "danger";
+  children?: ReactNode;
+  loading?: boolean;
+  testId?: string;
+  cancelTestId?: string;
+  modalTestId?: string;
+}
+
+export function ModalConfirmDialog({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  confirmLabel,
+  confirmVariant = "default",
+  children,
+  loading = false,
+  testId,
+  cancelTestId,
+  modalTestId,
+}: ModalConfirmDialogProps) {
+  return (
+    <div data-testid={modalTestId}>
+      <Modal isOpen={isOpen} onClose={onClose} title={title} loading={loading}>
+        {children && <ModalBody>{children}</ModalBody>}
+        <ModalFooter alignment="right">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onClose}
+            disabled={loading}
+            data-testid={cancelTestId}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant={confirmVariant === "danger" ? "danger" : "primary"}
+            size="sm"
+            onClick={onConfirm}
+            disabled={loading}
+            data-testid={testId}
+          >
+            {confirmLabel}
+          </Button>
+        </ModalFooter>
+      </Modal>
+    </div>
+  );
+}
+
+interface ModalConfirmTextProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void | Promise<void>;
+  title: string;
+  message: string;
+  confirmLabel: string;
+  confirmVariant?: "default" | "danger";
+  confirmWord: string;
+  loading?: boolean;
+  testId?: string;
+  modalTestId?: string;
+  cancelTestId?: string;
+}
+
+export function ModalConfirmText({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  confirmLabel,
+  confirmVariant = "default",
+  confirmWord,
+  loading = false,
+  testId,
+  modalTestId,
+  cancelTestId,
+}: ModalConfirmTextProps) {
+  const [inputValue, setInputValue] = useState("");
+
+  const handleClose = () => {
+    setInputValue("");
+    onClose();
+  };
+
+  const handleConfirm = async () => {
+    await onConfirm();
+  };
+
+  const isConfirmDisabled = inputValue !== confirmWord || loading;
+
+  return (
+    <div data-testid={modalTestId}>
+      <Modal isOpen={isOpen} onClose={handleClose} title={title} loading={loading}>
+        <ModalBody>
+          <p style={{ marginBottom: "1rem", color: "var(--content-default)" }}>{message}</p>
+          <p
+            style={{ marginBottom: "0.5rem", fontSize: "0.875rem", color: "var(--content-muted)" }}
+          >
+            Type <strong>{confirmWord}</strong> to confirm
+          </p>
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder={`Type "${confirmWord}" to confirm`}
+            style={{
+              width: "100%",
+              padding: "0.75rem",
+              border: "1px solid var(--border-default)",
+              borderRadius: "var(--radius-sm)",
+              fontSize: "0.875rem",
+              color: "var(--content-default)",
+              backgroundColor: "var(--surface-default)",
+            }}
+            disabled={loading}
+          />
+        </ModalBody>
+        <ModalFooter alignment="right">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleClose}
+            disabled={loading}
+            data-testid={cancelTestId}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant={confirmVariant === "danger" ? "danger" : "primary"}
+            size="sm"
+            onClick={handleConfirm}
+            disabled={isConfirmDisabled}
+            data-testid={testId}
+          >
+            {confirmLabel}
+          </Button>
+        </ModalFooter>
+      </Modal>
+    </div>
+  );
+}
+
 // Attach compound components to Modal
 Modal.Header = ModalHeader;
 Modal.Body = ModalBody;
 Modal.Footer = ModalFooter;
+Modal.ConfirmDialog = ModalConfirmDialog;
+Modal.ConfirmText = ModalConfirmText;

@@ -197,7 +197,9 @@ function ProfileContent() {
         title="Sign Out?"
         confirmLabel="Sign Out"
         confirmVariant="danger"
-        testId="confirm-modal"
+        testId="confirm-modal-confirm"
+        cancelTestId="confirm-modal-cancel"
+        modalTestId="confirm-modal"
       >
         <p>Are you sure you want to sign out?</p>
       </Modal.ConfirmDialog>
@@ -211,7 +213,8 @@ function ProfileContent() {
         confirmLabel="Delete Account"
         confirmVariant="danger"
         confirmWord="DELETE"
-        testId="delete-account-modal"
+        testId="confirm-modal-confirm"
+        modalTestId="delete-account-modal"
       />
     </>
   );

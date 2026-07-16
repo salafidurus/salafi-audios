@@ -121,7 +121,7 @@ describe("SettingsGeneralScreen", () => {
     const darkButton = screen.getByRole("button", { name: "Dark" });
     fireEvent.click(darkButton);
 
-    expect(localStorageMock.getItem("theme-preference")).toBe("dark");
+    expect(localStorageMock.getItem("theme-preference:v1")).toBe("dark");
     expect(dispatchSpy).toHaveBeenCalledWith(expect.any(Event));
   });
 
