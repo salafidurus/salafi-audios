@@ -33,7 +33,7 @@
     "catalogs": {}
   },
   "scripts": {
-    "catalog": "bun ./scripts/catalog/cli.ts",
+    "catalog": "bun ./infra/catalog/cli.ts",
     "dev": "turbo run dev --filter=api --filter=web --filter=native",
     "dev:api": "turbo run dev --filter=api",
     "dev:web": "turbo run dev --filter=web",

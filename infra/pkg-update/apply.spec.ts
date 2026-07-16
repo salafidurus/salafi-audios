@@ -273,4 +273,23 @@ describe("syncWorkspaceDeps", () => {
     const updated = syncWorkspaceDeps(candidate, tmpDir, config);
     expect(Array.isArray(updated)).toBe(true);
   });
+
+  it("preserves catalog: protocol references in workspace deps", () => {
+    const candidate: UpdateCandidate = {
+      type: "catalog",
+      packageName: "zod",
+      currentVersion: "^4.4.3",
+      latestVersion: "5.0.0",
+    };
+    const apiPkgPath = join(tmpDir, "apps", "api", "package.json");
+    const apiPkg = JSON.parse(readFileSync(apiPkgPath, "utf-8"));
+    apiPkg.dependencies.zod = "catalog:";
+    writeFileSync(apiPkgPath, JSON.stringify(apiPkg, null, 2) + "\n");
+
+    const updated = syncWorkspaceDeps(candidate, tmpDir, config);
+
+    const result = JSON.parse(readFileSync(apiPkgPath, "utf-8"));
+    expect(result.dependencies.zod).toBe("catalog:");
+    expect(updated.filter((f) => f === apiPkgPath)).toHaveLength(0);
+  });
 });

@@ -86,7 +86,11 @@ export function syncWorkspaceDeps(
       if (!deps) continue;
 
       const currentDep = deps[candidate.packageName];
-      if (currentDep !== undefined && !shouldSkipPackage(candidate.packageName, cfg)) {
+      if (
+        currentDep !== undefined &&
+        currentDep !== "catalog:" &&
+        !shouldSkipPackage(candidate.packageName, cfg)
+      ) {
         deps[candidate.packageName] = catalog?.[candidate.packageName] ?? candidate.latestVersion;
         dirty = true;
       }
@@ -95,8 +99,11 @@ export function syncWorkspaceDeps(
         for (const depName of Object.keys(deps)) {
           const matchesGroup = groupPatterns.some((p) => matchesPattern(depName, p));
           if (matchesGroup && !shouldSkipPackage(depName, cfg)) {
-            deps[depName] = catalog?.[depName] ?? candidate.latestVersion;
-            dirty = true;
+            const ld = deps[depName];
+            if (ld !== "catalog:") {
+              deps[depName] = catalog?.[depName] ?? candidate.latestVersion;
+              dirty = true;
+            }
           }
         }
       }

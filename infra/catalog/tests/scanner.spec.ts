@@ -12,7 +12,7 @@ import {
   getDependencyGroup,
   loadConfig,
   sanitizeGroupName,
-} from "./scanner";
+} from "../index";
 
 const TEMP_DIR = path.join(import.meta.dirname || "", "temp_test_monorepo");
 
@@ -472,6 +472,32 @@ describe("runCatalogFix (reality -> config)", () => {
     expect(webContent.dependencies.react).toBe("19.2.3");
   });
 
+  it("force-aligns single-workspace dep with pre-existing catalog entry", () => {
+    setupMockMonorepo({
+      rootPackageJson: {
+        name: "root",
+        workspaces: {
+          packages: ["apps/*"],
+          catalog: { zod: "^4.4.3" },
+        },
+      },
+      workspaces: {
+        "apps/web/package.json": {
+          name: "@sd/web",
+          dependencies: { zod: "^4.4.3" },
+        },
+      },
+    });
+
+    const { updatedFiles } = runCatalogFix(TEMP_DIR);
+    expect(updatedFiles).toContain("@sd/web");
+
+    const webContent = JSON.parse(
+      fs.readFileSync(path.join(TEMP_DIR, "apps/web/package.json"), "utf-8"),
+    );
+    expect(webContent.dependencies.zod).toBe("catalog:");
+  });
+
   it("adds dep to default catalog when all workspaces use same version", () => {
     setupMockMonorepo({
       rootPackageJson: {
@@ -594,8 +620,6 @@ describe("runCatalogFix (reality -> config)", () => {
     expect(updatedFiles).toContain("@sd/native");
     expect(updatedFiles).toContain("@sd/legacy");
 
-    // 18.0.0 is used by 2 workspaces (most common) → default catalog
-    // 19.2.3 is used by 1 workspace → gets a group
     const configContent = JSON.parse(
       fs.readFileSync(path.join(TEMP_DIR, "catalog.config.json"), "utf-8"),
     );
@@ -763,7 +787,6 @@ describe("runCatalogFix (reality -> config)", () => {
     expect(updatedFiles).toContain("@sd/api");
 
     const rootContent = JSON.parse(fs.readFileSync(path.join(TEMP_DIR, "package.json"), "utf-8"));
-    // ^8.17.2 is the canonical version (higher semver) → stays in default catalog
     expect(rootContent.workspaces.catalog.pg).toBe("^8.17.2");
     expect(rootContent.workspaces.catalogs.pg_8_0_0.pg).toBe("^8.0.0");
 
@@ -817,11 +840,8 @@ describe("runCatalogFix (reality -> config)", () => {
     expect(updatedFiles).toContain("root");
 
     const rootContent = JSON.parse(fs.readFileSync(path.join(TEMP_DIR, "package.json"), "utf-8"));
-    // unused entries should be removed
     expect(rootContent.workspaces.catalog.unused).toBeUndefined();
-    // frontend group was entirely orphaned and cleaned up
     expect(rootContent.workspaces.catalogs?.frontend).toBeUndefined();
-    // actively used entries stay
     expect(rootContent.workspaces.catalog.react).toBeDefined();
   });
 
@@ -853,7 +873,6 @@ describe("runCatalogFix (reality -> config)", () => {
     expect(updatedFiles).toContain("root");
 
     const rootContent = JSON.parse(fs.readFileSync(path.join(TEMP_DIR, "package.json"), "utf-8"));
-    // Empty named group should be removed entirely
     expect(rootContent.workspaces.catalogs.ephemeral).toBeUndefined();
   });
 
@@ -883,13 +902,11 @@ describe("runCatalogFix (reality -> config)", () => {
     expect(updatedFiles).toContain("@sd/web");
 
     const rootContent = JSON.parse(fs.readFileSync(path.join(TEMP_DIR, "package.json"), "utf-8"));
-    // Orphan removed from catalog
     expect(rootContent.workspaces.catalog.single).toBeUndefined();
 
     const webContent = JSON.parse(
       fs.readFileSync(path.join(TEMP_DIR, "apps/web/package.json"), "utf-8"),
     );
-    // Reverted from catalog: to explicit version
     expect(webContent.dependencies.single).toBe("^1.0.0");
   });
 });
@@ -1177,7 +1194,7 @@ describe("runCatalogStats", () => {
     expect(web).toBeDefined();
     expect(web!.totalDeps).toBe(1);
     expect(web!.catalogedEligible).toBe(0);
-    expect(web!.percent).toBe(0); // 0 correctly / (0+0+1 miscatalogued)
+    expect(web!.percent).toBe(0);
 
     const native = stats.perWorkspace.find((w) => w.relativePath === "apps/native");
     expect(native).toBeDefined();

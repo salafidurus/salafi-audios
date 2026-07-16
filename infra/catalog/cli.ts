@@ -1,12 +1,9 @@
-import { findMonorepoRoot } from "../utils/paths.mjs";
-import {
-  runCatalogCheck,
-  runCatalogFix,
-  runCatalogFixForce,
-  getUnusedCatalogEntries,
-  runCatalogPrune,
-  runCatalogStats,
-} from "./scanner";
+import { findMonorepoRoot } from "../../scripts/utils/paths.mjs";
+import { runCatalogCheck } from "./scanner/check";
+import { runCatalogFix } from "./scanner/fix";
+import { runCatalogFixForce } from "./scanner/fix-force";
+import { getUnusedCatalogEntries, runCatalogPrune } from "./scanner/prune";
+import { runCatalogStats } from "./scanner/stats";
 
 function printHelp() {
   console.log(`
