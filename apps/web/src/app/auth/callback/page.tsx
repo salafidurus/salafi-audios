@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { routes } from "@sd/core-contracts";
 import { authClient } from "@/core/auth";
@@ -15,7 +15,6 @@ function safeNext(value: string | null): string {
 
 function AuthCallbackInner() {
   const params = useSearchParams();
-  const [isProcessing, setIsProcessing] = useState(true);
 
   useEffect(() => {
     const processAuth = async () => {
@@ -42,7 +41,6 @@ function AuthCallbackInner() {
   }, [params]);
 
   // Show nothing while processing - redirect will happen via window.location
-  if (isProcessing) return null;
   return null;
 }
 
