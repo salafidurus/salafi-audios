@@ -34,6 +34,13 @@ const getRedirectTo = () => {
   return "/";
 };
 
+const handleSignIn = (provider: "google" | "apple") => {
+  authClient.signIn.social({
+    provider,
+    callbackURL: buildOAuthCallbackURL(getRedirectTo()),
+  });
+};
+
 export function AuthModal({ isOpen, onClose, message }: AuthModalProps) {
   const { t } = useTranslation();
   const portalRoot = useSyncExternalStore(
@@ -72,13 +79,6 @@ export function AuthModal({ isOpen, onClose, message }: AuthModalProps) {
       cardRef.current.focus();
     }
   }, [isOpen]);
-
-  const handleSignIn = (provider: "google" | "apple") => {
-    authClient.signIn.social({
-      provider,
-      callbackURL: buildOAuthCallbackURL(getRedirectTo()),
-    });
-  };
 
   if (!portalRoot) return null;
 
