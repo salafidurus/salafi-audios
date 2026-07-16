@@ -8,6 +8,7 @@
         "@babel/runtime": "catalog:",
         "@commitlint/cli": "21.2.1",
         "@commitlint/config-conventional": "21.2.0",
+        "@secretlint/secretlint-rule-preset-recommend": "^13.0.2",
         "@types/node": "catalog:",
         "@types/react": "catalog:",
         "bun-types": "^1.3.14",
@@ -1507,6 +1508,8 @@
     "@secretlint/profiler": ["@secretlint/profiler@13.0.2", "", {}, "sha512-vGaLZCoi9KewOF+sM0iIEBviWaH9mls1HmQFBgEPq4fnvmVO4PfKIkVr4CcAFm3Msg4NjzFE2RBAGwRR+5HEmQ=="],
 
     "@secretlint/resolver": ["@secretlint/resolver@13.0.2", "", {}, "sha512-Ko50V0P3YAtEO20xBTczOzguBVk6+taSqkoAPHoOSdsTsSq1gzeYggY1UC8vVEHPGyRp/mb2QOuwIShdJZ8JFg=="],
+
+    "@secretlint/secretlint-rule-preset-recommend": ["@secretlint/secretlint-rule-preset-recommend@13.0.2", "", {}, "sha512-D03Kw51qOgffj9zNlJFZUarVmP8zGcCZNi7A14+vZtHskbbBPEsS/f09idb48rrlMSaRMBN29IkqfbmPyL9xtw=="],
 
     "@secretlint/source-creator": ["@secretlint/source-creator@13.0.2", "", { "dependencies": { "@secretlint/types": "13.0.2", "istextorbinary": "^9.5.0" } }, "sha512-tSooHad8QL+lqHP88zH9F8GMoR7bHUqPja5M/QnNHGnvOq/8OT1V8t1uigm6jlD03oJWNLwwF8QeHIedWKJ13g=="],
 

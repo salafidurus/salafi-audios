@@ -9,5 +9,6 @@
     "**/.opencode/**",
     "**/coverage/**",
     "**/generated/**"
-  ]
+  ],
+  "usedPackages": ["@secretlint/secretlint-rule-preset-recommend"]
 }
