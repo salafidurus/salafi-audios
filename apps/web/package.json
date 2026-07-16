@@ -30,7 +30,7 @@
     "@sd/domain-live": "workspace:*",
     "@sd/domain-search": "workspace:*",
     "@sd/utils-error": "workspace:*",
-    "@tanstack/react-query": "^5.54.1",
+    "@tanstack/react-query": "catalog:",
     "better-auth": "catalog:",
     "clsx": "^2.1.1",
     "framer-motion": "^12.40.0",
