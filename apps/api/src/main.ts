@@ -109,8 +109,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('docs', app, document);
 
-  // TCP microservice listener — dormant until @MessagePattern handlers are added.
-  // Split-later: extract TelegramModule to a separate process pointing at this port.
+  // TCP microservice listener — reserved for future microservice-based workers.
   app.connectMicroservice({
     transport: Transport.TCP,
     options: { host: '127.0.0.1', port: 5001 },

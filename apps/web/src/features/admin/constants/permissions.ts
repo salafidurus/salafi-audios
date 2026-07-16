@@ -4,7 +4,6 @@ export const PERMISSION_LABELS: Record<Permission, string> = {
   SCHOLARS_EDIT: "Manage Scholars",
   TOPICS_EDIT: "Manage Topics",
   LISTINGS_EDIT: "Manage Content",
-  LIVE_EDIT: "Manage Livestreams",
   USERS_VIEW: "View Users",
   USERS_GRANT_PERMISSIONS: "Manage Permissions",
   USERS_GRANT_ROLES: "Manage Roles",
@@ -29,18 +28,12 @@ export const PERMISSION_LABELS: Record<Permission, string> = {
   MEDIA_DELETE: "Delete Media",
   USERS_EDIT: "Edit Users",
   USERS_DELETE: "Delete Users",
-  LIVE_VIEW: "View Livestreams",
-  LIVE_CREATE: "Create Livestreams",
-  LIVE_DELETE: "Delete Livestreams",
-  LIVE_START: "Start Live Session",
-  LIVE_STOP: "Stop Live Session",
 };
 
 export const PERMISSION_DESCRIPTIONS: Record<Permission, string> = {
   SCHOLARS_EDIT: "Add, edit, and remove scholar profiles",
   TOPICS_EDIT: "Create and organize topic categories",
   LISTINGS_EDIT: "Publish, archive, and manage lectures and series",
-  LIVE_EDIT: "Schedule and manage live streaming events",
   USERS_VIEW: "View user accounts and their details",
   USERS_GRANT_PERMISSIONS: "Grant and revoke user permissions",
   USERS_GRANT_ROLES: "Assign roles to users",
@@ -65,9 +58,4 @@ export const PERMISSION_DESCRIPTIONS: Record<Permission, string> = {
   MEDIA_DELETE: "Delete media files",
   USERS_EDIT: "Edit user accounts",
   USERS_DELETE: "Delete user accounts",
-  LIVE_VIEW: "View livestreams",
-  LIVE_CREATE: "Create livestreams",
-  LIVE_DELETE: "Delete livestreams",
-  LIVE_START: "Start live sessions",
-  LIVE_STOP: "Stop live sessions",
 };

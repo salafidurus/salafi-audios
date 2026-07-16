@@ -8,7 +8,6 @@ export default function TabsLayout() {
       <Tabs tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
         <Tabs.Screen name="(search)" options={{ title: "Search", tabBarLabel: "Search" }} />
         <Tabs.Screen name="feed" options={{ title: "Explore", tabBarLabel: "Explore" }} />
-        <Tabs.Screen name="live" options={{ title: "Live", tabBarLabel: "Live" }} />
         <Tabs.Screen name="library" options={{ title: "Library", tabBarLabel: "Library" }} />
         <Tabs.Screen name="settings" options={{ title: "Settings", tabBarLabel: "Settings" }} />
       </Tabs>

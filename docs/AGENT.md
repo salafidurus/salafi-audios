@@ -52,7 +52,6 @@ This directory contains the authoritative documentation for Salafi Durus.
 | ----------------- | ----------- | -------- | ---------------------------------------------------- |
 | Search            | IMPLEMENTED | CRITICAL | Home + active results                                |
 | Feed              | IMPLEMENTED | CRITICAL | Recent + following feeds                             |
-| Live              | IMPLEMENTED | CRITICAL | Live session screens                                 |
 | Library           | IMPLEMENTED | CRITICAL | Saved and completed lists                            |
 | Account           | IMPLEMENTED | CRITICAL | Profile and settings                                 |
 | Catalog browsing  | MISSING     | CRITICAL | Detail screens (scholar/listing) not yet implemented |

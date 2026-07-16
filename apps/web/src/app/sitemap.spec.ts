@@ -25,7 +25,6 @@ describe("sitemap", () => {
     expect(urls).toContain("https://www.salafidurus.com/search");
     expect(urls).toContain("https://www.salafidurus.com/explore");
     expect(urls).toContain("https://www.salafidurus.com/explore/recent");
-    expect(urls).toContain("https://www.salafidurus.com/live");
     expect(urls).toContain("https://www.salafidurus.com/scholars");
     expect(urls).toContain("https://www.salafidurus.com/terms-of-use");
     expect(urls).toContain("https://www.salafidurus.com/privacy");

@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { routes } from "@sd/core-contracts";
 
 vi.mock("next/navigation", () => {
-  const push = vi.fn<any>();
+  const push = vi.fn();
   return {
     useRouter: () => ({ push }),
   };

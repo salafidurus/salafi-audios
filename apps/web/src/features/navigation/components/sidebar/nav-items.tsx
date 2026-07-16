@@ -13,7 +13,6 @@ import { Button } from "@/shared/components/Button/Button";
 import { SectionLabel } from "./section-label";
 import {
   Cloud,
-  Mic,
   CassetteTape,
   Settings,
   Search,
@@ -24,7 +23,6 @@ import {
   Users,
   FolderOpen,
   GraduationCap,
-  Radio,
   type LucideIcon,
 } from "lucide-react";
 import styles from "./sidebar.module.css";
@@ -78,13 +76,6 @@ const adminNavItems: AdminNavItem[] = [
     activeMatch: routes.admin.scholars,
     requiredPermission: "SCHOLARS_VIEW",
   },
-  {
-    label: "Livestreams",
-    Icon: Radio,
-    href: routes.admin.live,
-    activeMatch: routes.admin.live,
-    requiredPermission: "LIVE_VIEW",
-  },
 ];
 
 /**
@@ -104,12 +95,6 @@ function getNavItems(t: (key: string, fallback: string) => string): NavItem[] {
       Icon: Cloud,
       href: routes.explore.index,
       activeMatch: routes.explore.index,
-    },
-    {
-      label: t("navigation.live", "Live"),
-      Icon: Mic,
-      href: routes.live.index,
-      activeMatch: routes.live.index,
     },
     {
       label: t("navigation.library", "Library"),

@@ -70,7 +70,6 @@ if ! git diff --quiet "$COMPARISON_BASE"...HEAD -- \
   ':(glob)packages/domain-account/**' \
   ':(glob)packages/domain-audio/**' \
   ':(glob)packages/domain-content/**' \
-  ':(glob)packages/domain-live/**' \
   ':(glob)packages/domain-search/**' \
   ':(glob)packages/utils-error/**'; then
   WEB_CHANGED=true

@@ -25,7 +25,7 @@ describe("AdminDashboardScreen", () => {
   it("shows cards when user has only view-level permissions", () => {
     (useAdminPermissions as Mock).mockReturnValue({
       data: {
-        permissions: ["SCHOLARS_VIEW", "LISTINGS_VIEW", "USERS_VIEW", "LIVE_VIEW"],
+        permissions: ["SCHOLARS_VIEW", "LISTINGS_VIEW", "USERS_VIEW"],
       },
       isFetching: false,
     });
@@ -35,13 +35,12 @@ describe("AdminDashboardScreen", () => {
     expect(screen.getByRole("link", { name: /scholars/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /contents/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /users/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /livestreams/i })).toBeInTheDocument();
   });
 
   it("renders sections based on user permissions", () => {
     (useAdminPermissions as Mock).mockReturnValue({
       data: {
-        permissions: ["SCHOLARS_VIEW", "LISTINGS_VIEW", "USERS_VIEW", "LIVE_VIEW"],
+        permissions: ["SCHOLARS_VIEW", "LISTINGS_VIEW", "USERS_VIEW"],
       },
       isFetching: false,
     });
@@ -62,10 +61,5 @@ describe("AdminDashboardScreen", () => {
     const usersLink = screen.getByRole("link", { name: /users/i });
     expect(usersLink).toBeInTheDocument();
     expect(usersLink).toHaveAttribute("href", "/admin/users");
-
-    // Check Livestreams section
-    const livestreamsLink = screen.getByRole("link", { name: /livestreams/i });
-    expect(livestreamsLink).toBeInTheDocument();
-    expect(livestreamsLink).toHaveAttribute("href", "/admin/live");
   });
 });

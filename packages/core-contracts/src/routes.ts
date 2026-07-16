@@ -24,11 +24,6 @@ export const routes = {
     completed: "/library/completed",
   },
 
-  live: {
-    index: "/live",
-    session: (id: string) => `/live/${id}` as const,
-  },
-
   settings: {
     index: "/settings",
     profile: "/settings/profile",
@@ -58,7 +53,6 @@ export const routes = {
     users: "/admin/users",
     contents: "/admin/contents",
     scholars: "/admin/scholars",
-    live: "/admin/live",
   },
 
   signIn: "/sign-in",
@@ -100,12 +94,10 @@ export const routeDefinitions: RouteDefinition[] = [
   { path: routes.settings.legal, access: "public" },
   { path: routes.settings.index, access: "auth-optional" },
   { path: routes.library.index, access: "auth-optional" },
-  { path: routes.live.index, access: "public" },
   { path: routes.search, access: "public" },
   { path: routes.scholars.index, access: "public" },
   { path: routes.support, access: "public" },
   { path: routes.admin.index, access: "auth-required" },
-  { path: routes.admin.live, access: "auth-required" },
   { path: routes.home, access: "public" },
 ];
 

@@ -38,13 +38,6 @@ const ADMIN_SECTIONS: AdminSection[] = [
     href: "/admin/users",
     permission: "USERS_VIEW" as const,
   },
-  {
-    title: "Livestreams",
-    description: "Manage live sessions and channel status",
-    descriptionMobile: "Manage livestreams",
-    href: "/admin/live",
-    permission: "LIVE_VIEW" as const,
-  },
 ];
 
 export function AdminDashboardScreen() {

@@ -30,12 +30,6 @@ const PERMISSION_VALUES = [
   "USERS_DELETE",
   "USERS_GRANT_PERMISSIONS",
   "USERS_GRANT_ROLES",
-  "LIVE_VIEW",
-  "LIVE_CREATE",
-  "LIVE_EDIT",
-  "LIVE_DELETE",
-  "LIVE_START",
-  "LIVE_STOP",
 ] as const;
 
 export type Permission = (typeof PERMISSION_VALUES)[number];

@@ -55,7 +55,6 @@ docs/      → authoritative documentation
 - **`@sd/core-*`**: Foundational infrastructure (auth, api, config, styles, i18n, env, db, contracts).
 - **`@sd/domain-content`**: Data hooks for lectures, scholars, series, feed, library.
 - **`@sd/domain-account`**: Data hooks for user profile and auth state.
-- **`@sd/domain-live`**: Data hooks for live sessions and channels.
 - **`@sd/domain-playback`**: Playback engine and player state (Zustand + hooks).
 - **`@sd/domain-progress`**: Progress tracking state (Zustand + hooks).
 - **`@sd/domain-search`**: Search and quick-browse hooks.

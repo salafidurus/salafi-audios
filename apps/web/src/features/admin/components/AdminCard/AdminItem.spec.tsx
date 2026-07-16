@@ -79,7 +79,7 @@ describe("AdminItem", () => {
   });
 
   it("calls onClick when item is clicked", () => {
-    const handleClick = vi.fn<any>();
+    const handleClick = vi.fn();
     render(<AdminItem {...defaultProps} onClick={handleClick} />);
 
     const item = screen.getByText("Test User").closest("div");
@@ -90,7 +90,7 @@ describe("AdminItem", () => {
   });
 
   it("prevents action clicks from triggering item click", () => {
-    const handleClick = vi.fn<any>();
+    const handleClick = vi.fn();
     render(
       <AdminItem
         {...defaultProps}

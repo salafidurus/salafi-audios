@@ -40,14 +40,6 @@ export const PermissionEnum = z.enum([
   "USERS_DELETE",
   "USERS_GRANT_PERMISSIONS",
   "USERS_GRANT_ROLES",
-
-  // Live Session Permissions
-  "LIVE_VIEW",
-  "LIVE_CREATE",
-  "LIVE_EDIT",
-  "LIVE_DELETE",
-  "LIVE_START",
-  "LIVE_STOP",
 ]);
 
 export type Permission = z.infer<typeof PermissionEnum>;
@@ -92,14 +84,6 @@ export const Permissions = {
   USERS_DELETE: "USERS_DELETE",
   USERS_GRANT_PERMISSIONS: "USERS_GRANT_PERMISSIONS",
   USERS_GRANT_ROLES: "USERS_GRANT_ROLES",
-
-  // Live Session Permissions
-  LIVE_VIEW: "LIVE_VIEW",
-  LIVE_CREATE: "LIVE_CREATE",
-  LIVE_EDIT: "LIVE_EDIT",
-  LIVE_DELETE: "LIVE_DELETE",
-  LIVE_START: "LIVE_START",
-  LIVE_STOP: "LIVE_STOP",
 } as const;
 
 // User Role Enum
@@ -215,7 +199,6 @@ export const PERMISSION_GROUPS = {
     "USERS_GRANT_PERMISSIONS",
     "USERS_GRANT_ROLES",
   ],
-  LIVE: ["LIVE_VIEW", "LIVE_CREATE", "LIVE_EDIT", "LIVE_DELETE", "LIVE_START", "LIVE_STOP"],
 } as const;
 
 // Role to default permissions mapping
@@ -237,7 +220,6 @@ export const ROLE_DEFAULT_PERMISSIONS: Record<UserRole, readonly Permission[]> =
     ...PERMISSION_GROUPS.TRANSLATIONS,
     ...PERMISSION_GROUPS.MEDIA,
     ...PERMISSION_GROUPS.USERS,
-    ...PERMISSION_GROUPS.LIVE,
   ],
   superadmin: [
     ...PERMISSION_GROUPS.SCHOLARS,
@@ -246,7 +228,6 @@ export const ROLE_DEFAULT_PERMISSIONS: Record<UserRole, readonly Permission[]> =
     ...PERMISSION_GROUPS.TRANSLATIONS,
     ...PERMISSION_GROUPS.MEDIA,
     ...PERMISSION_GROUPS.USERS,
-    ...PERMISSION_GROUPS.LIVE,
   ],
 };
 
@@ -293,14 +274,6 @@ export const PERMISSION_LABELS: Record<Permission, string> = {
   USERS_DELETE: "Delete Users",
   USERS_GRANT_PERMISSIONS: "Grant Permissions",
   USERS_GRANT_ROLES: "Grant Roles",
-
-  // Live Session Permissions
-  LIVE_VIEW: "View Live Sessions",
-  LIVE_CREATE: "Create Live Sessions",
-  LIVE_EDIT: "Edit Live Sessions",
-  LIVE_DELETE: "Delete Live Sessions",
-  LIVE_START: "Start Live Sessions",
-  LIVE_STOP: "Stop Live Sessions",
 };
 
 // Detailed descriptions for permissions
@@ -343,12 +316,4 @@ export const PERMISSION_DESCRIPTIONS: Record<Permission, string> = {
   USERS_DELETE: "Delete user accounts",
   USERS_GRANT_PERMISSIONS: "Grant individual permissions to users",
   USERS_GRANT_ROLES: "Assign roles to users",
-
-  // Live Session Permissions
-  LIVE_VIEW: "View active live sessions",
-  LIVE_CREATE: "Create new live sessions",
-  LIVE_EDIT: "Edit live session details",
-  LIVE_DELETE: "Cancel live sessions",
-  LIVE_START: "Start broadcasting live sessions",
-  LIVE_STOP: "Stop live sessions",
 };

@@ -19,7 +19,6 @@ const THEME_OPTIONS: { value: ThemePreference; label: string }[] = [
 
 interface NotificationState {
   master: boolean;
-  live: boolean;
   scholars: boolean;
   lectures: boolean;
 }
@@ -28,7 +27,7 @@ const NOTIF_KEY = "notification-settings:v1";
 
 function loadNotifState(): NotificationState {
   if (typeof window === "undefined") {
-    return { master: true, live: true, scholars: true, lectures: true };
+    return { master: true, scholars: true, lectures: true };
   }
   try {
     const raw = localStorage.getItem(NOTIF_KEY);
@@ -38,7 +37,7 @@ function loadNotifState(): NotificationState {
   } catch {
     // ignore parse errors
   }
-  return { master: true, live: true, scholars: true, lectures: true };
+  return { master: true, scholars: true, lectures: true };
 }
 
 function loadThemePreference(): ThemePreference {
@@ -61,6 +60,10 @@ export function SettingsGeneralScreen() {
     localStorage.setItem(THEME_KEY, value);
     window.dispatchEvent(new Event(THEME_CHANGE_EVENT));
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem(NOTIF_KEY, JSON.stringify(notif));
+  }, [notif]);
 
   const handleNotifChange = useCallback(
     (key: keyof NotificationState) => (checked: boolean) => {
@@ -108,13 +111,6 @@ export function SettingsGeneralScreen() {
         </SettingsRow>
         {notif.master && (
           <>
-            <SettingsRow label="Live Sessions" sublabel="Notify when a live session starts">
-              <Toggle
-                checked={notif.live}
-                onChange={handleNotifChange("live")}
-                aria-label="Notify for Live Sessions"
-              />
-            </SettingsRow>
             <SettingsRow label="Followed Scholars" sublabel="Notify when a followed scholar posts">
               <Toggle
                 checked={notif.scholars}

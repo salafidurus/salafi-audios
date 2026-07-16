@@ -33,24 +33,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/live`,
-      lastModified: new Date(),
-      changeFrequency: "weekly" as const,
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/live/scheduled`,
-      lastModified: new Date(),
-      changeFrequency: "weekly" as const,
-      priority: 0.4,
-    },
-    {
-      url: `${baseUrl}/live/ended`,
-      lastModified: new Date(),
-      changeFrequency: "weekly" as const,
-      priority: 0.4,
-    },
-    {
       url: `${baseUrl}/scholars`,
       lastModified: new Date(),
       changeFrequency: "weekly" as const,

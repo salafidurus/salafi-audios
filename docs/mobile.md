@@ -28,7 +28,7 @@ The navigation surface has been reworked into a tabs-owned structure:
 
 - the main app surface lives under `apps/native/src/app/(tabs)/`
 - the shared tabs boundary is `apps/native/src/app/(tabs)/_layout.tsx`
-- top-level sections are real tabs: feed, live, search, library, and account
+- top-level sections are real tabs: search, feed, library, and account
 - tab chrome UI is rendered by `apps/native/src/features/navigation/` components
 - route state is the source of truth for active tab and subsection
 - subsection selection happens inside each tab stack rather than through a shell-owned navigation store
@@ -88,7 +88,7 @@ The tab bar is a product-specific navigation surface layered over a standard Exp
 - Top-level section switches are owned by Expo Router tabs.
 - Subsection routes live inside each tab stack.
 - Current route state is authoritative for the active location.
-- Default subsection routes are canonical bare paths like `/feed` and `/live`.
+- Default subsection routes are canonical bare paths like `/feed`.
 
 ### Ownership
 
@@ -107,6 +107,6 @@ The tab bar is a product-specific navigation surface layered over a standard Exp
 ### Verification Status
 
 - The `(tabs)` route group is restored as the main app boundary
-- Mobile and web route defaults now align on `/feed`, `/live`, `/library`, and `/account`
+- Mobile and web route defaults now align on `/feed`, `/library`, and `/account`
 - Mobile and web typecheck/lint pass on the tabs migration
 - Native runtime smoke coverage is still required to confirm the old shell-era crash is gone on device

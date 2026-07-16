@@ -14,19 +14,16 @@ describe("AdminDashboardScreen", () => {
 
     expect(screen.getByText("Admin Dashboard")).toBeTruthy();
     expect(screen.getByText("Lectures")).toBeTruthy();
-    expect(screen.getByText("Live")).toBeTruthy();
     expect(screen.getByText("Scholars")).toBeTruthy();
   });
 
   it("calls navigation handlers when sections are pressed", async () => {
     const mockNavigateLectures = jest.fn();
-    const mockNavigateLive = jest.fn();
     const mockNavigateScholars = jest.fn();
 
     await render(
       <AdminDashboardScreen
         onNavigateToLectures={mockNavigateLectures}
-        onNavigateToLive={mockNavigateLive}
         onNavigateToScholars={mockNavigateScholars}
       />,
     );

@@ -46,7 +46,7 @@ describe("Sidebar component", () => {
     (useRouter as Mock).mockReturnValue({ push: mockPush });
   });
 
-  it("renders basic navigation links (Search, Explore, Live, Library, Settings)", () => {
+  it("renders basic navigation links (Search, Explore, Library, Settings)", () => {
     (useAuth as Mock).mockReturnValue({
       isAuthenticated: false,
       isLoading: false,
@@ -61,7 +61,6 @@ describe("Sidebar component", () => {
     // Basic nav checks
     expect(screen.getByText("Search")).toBeInTheDocument();
     expect(screen.getByText("Explore")).toBeInTheDocument();
-    expect(screen.getByText("Live")).toBeInTheDocument();
     expect(screen.getByText("Library")).toBeInTheDocument();
     expect(screen.getByText("Settings")).toBeInTheDocument();
   });
@@ -149,29 +148,5 @@ describe("Sidebar component", () => {
     expect(screen.getByText("Scholars")).toBeInTheDocument();
     expect(screen.queryByText("Users")).not.toBeInTheDocument();
     expect(screen.queryByText("Contents")).not.toBeInTheDocument();
-    expect(screen.queryByText("Livestreams")).not.toBeInTheDocument();
-  });
-
-  it("shows all nav items when user has all required permissions", () => {
-    (useAuth as Mock).mockReturnValue({
-      isAuthenticated: true,
-      isLoading: false,
-      user: { name: "Super Admin", email: "super@example.com" },
-    });
-    (useAdminPermissions as Mock).mockReturnValue({
-      data: {
-        permissions: ["SCHOLARS_VIEW", "LISTINGS_VIEW", "USERS_VIEW", "LIVE_VIEW"],
-      },
-    });
-
-    render(<Sidebar />);
-
-    expect(screen.getByText("ADMIN")).toBeInTheDocument();
-    expect(screen.getByText("Home")).toBeInTheDocument();
-    expect(screen.getByText("Stats")).toBeInTheDocument();
-    expect(screen.getByText("Scholars")).toBeInTheDocument();
-    expect(screen.getByText("Contents")).toBeInTheDocument();
-    expect(screen.getByText("Users")).toBeInTheDocument();
-    expect(screen.getByText("Livestreams")).toBeInTheDocument();
   });
 });
