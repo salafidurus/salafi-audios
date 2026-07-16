@@ -78,14 +78,6 @@ export const queryKeys = {
     all: ["account"] as const,
     profile: () => [...queryKeys.account.all, "profile"] as const,
   },
-  live: {
-    all: ["live"] as const,
-    channels: () => [...queryKeys.live.all, "channels"] as const,
-    channelBySlug: (slug: string) => [...queryKeys.live.all, "channel", slug] as const,
-    active: () => [...queryKeys.live.all, "active"] as const,
-    scheduled: () => [...queryKeys.live.all, "scheduled"] as const,
-    ended: (cursor?: string) => [...queryKeys.live.all, "ended", cursor] as const,
-  },
   progress: {
     all: ["progress"] as const,
     listing: (listingId: string) => [...queryKeys.progress.all, "listing", listingId] as const,
@@ -115,10 +107,6 @@ export const queryKeys = {
     topics: {
       all: () => [...queryKeys.admin.all, "topics"] as const,
       list: () => [...queryKeys.admin.all, "topics", "list"] as const,
-    },
-    live: {
-      all: () => [...queryKeys.admin.all, "live"] as const,
-      sessions: () => [...queryKeys.admin.all, "live", "sessions"] as const,
     },
   },
 } as const;

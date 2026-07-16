@@ -15,7 +15,6 @@
     { "path": "./packages/domain-account" },
     { "path": "./packages/domain-audio" },
     { "path": "./packages/domain-content" },
-    { "path": "./packages/domain-live" },
     { "path": "./packages/domain-search" },
     { "path": "./apps/api" },
     { "path": "./apps/web" },

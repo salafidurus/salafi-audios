@@ -22,8 +22,9 @@ async function main() {
   const seedDir = resolve(__dirname, '../../../../packages/core-db/scripts/seed');
 
   // Load canonical seeders
-  const { seedScholars, seedTopics, seedListings, seedAudio, seedTopicLinks, seedLiveChannels } =
-    await import(resolve(seedDir, 'seeders/index.js'));
+  const { seedScholars, seedTopics, seedListings, seedAudio, seedTopicLinks } = await import(
+    resolve(seedDir, 'seeders/index.js')
+  );
 
   // Run in upsert mode (no clearData so existing data is preserved)
   await seedTopics(prisma);
@@ -31,7 +32,6 @@ async function main() {
   const { topicPairs } = await seedListings(prisma);
   await seedAudio(prisma);
   await seedTopicLinks(prisma, topicPairs);
-  await seedLiveChannels(prisma);
 
   await prisma.$disconnect();
 }

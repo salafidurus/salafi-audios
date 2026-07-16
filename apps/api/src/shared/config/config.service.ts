@@ -60,18 +60,6 @@ export class ConfigService {
     return this.env.APPLE_CLIENT_SECRET;
   }
 
-  get TELEGRAM_API_ID(): number | undefined {
-    return this.env.TELEGRAM_API_ID;
-  }
-
-  get TELEGRAM_API_HASH(): string | undefined {
-    return this.env.TELEGRAM_API_HASH;
-  }
-
-  get TELEGRAM_SESSION(): string | undefined {
-    return this.env.TELEGRAM_SESSION;
-  }
-
   get R2_ACCOUNT_ID(): string {
     return this.env.R2_ACCOUNT_ID;
   }

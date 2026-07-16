@@ -59,14 +59,6 @@ const VALID_PERMISSIONS = [
   "USERS_DELETE",
   "USERS_GRANT_PERMISSIONS",
   "USERS_GRANT_ROLES",
-
-  // Live Session Permissions
-  "LIVE_VIEW",
-  "LIVE_CREATE",
-  "LIVE_EDIT",
-  "LIVE_DELETE",
-  "LIVE_START",
-  "LIVE_STOP",
 ];
 
 function printHelp() {
@@ -106,9 +98,6 @@ VALID PERMISSIONS
 
   User Management Permissions:
     USERS_VIEW, USERS_EDIT, USERS_DELETE, USERS_GRANT_PERMISSIONS, USERS_GRANT_ROLES
-
-  Live Session Permissions:
-    LIVE_VIEW, LIVE_CREATE, LIVE_EDIT, LIVE_DELETE, LIVE_START, LIVE_STOP
 
 NOTES
   - The script is idempotent — re-running with the same user and permission is a no-op.
@@ -238,13 +227,6 @@ async function main() {
           "USERS_GRANT_PERMISSIONS",
           "USERS_GRANT_ROLES",
         ].join(", "),
-    );
-    console.log("\nLive Session Permissions:");
-    console.log(
-      "  " +
-        ["LIVE_VIEW", "LIVE_CREATE", "LIVE_EDIT", "LIVE_DELETE", "LIVE_START", "LIVE_STOP"].join(
-          ", ",
-        ),
     );
     console.log("");
     process.exit(0);

@@ -11,7 +11,6 @@ on:
       - "packages/domain-account/**"
       - "packages/domain-audio/**"
       - "packages/domain-content/**"
-      - "packages/domain-live/**"
       - "packages/domain-search/**"
       - "tsconfig.base.json"
       - "tsconfig.packages.json"

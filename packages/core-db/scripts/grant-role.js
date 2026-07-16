@@ -67,12 +67,6 @@ const ROLE_PERMISSIONS = {
     "USERS_DELETE",
     "USERS_GRANT_PERMISSIONS",
     "USERS_GRANT_ROLES",
-    "LIVE_VIEW",
-    "LIVE_CREATE",
-    "LIVE_EDIT",
-    "LIVE_DELETE",
-    "LIVE_START",
-    "LIVE_STOP",
   ],
   // Superadmin role gets all permissions (break-glass account)
   // Note: Superadmin role assignment requires direct SQL, not API
@@ -104,12 +98,6 @@ const ROLE_PERMISSIONS = {
     "USERS_DELETE",
     "USERS_GRANT_PERMISSIONS",
     "USERS_GRANT_ROLES",
-    "LIVE_VIEW",
-    "LIVE_CREATE",
-    "LIVE_EDIT",
-    "LIVE_DELETE",
-    "LIVE_START",
-    "LIVE_STOP",
   ],
 };
 

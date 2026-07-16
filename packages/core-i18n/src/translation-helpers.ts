@@ -11,11 +11,6 @@ export const SUBNAV_KEYS: Record<string, Record<string, string>> = {
     recent: "navigation.subnav.explore.recent",
     following: "navigation.subnav.explore.following",
   },
-  live: {
-    ongoing: "navigation.subnav.live.ongoing",
-    scheduled: "navigation.subnav.live.scheduled",
-    ended: "navigation.subnav.live.ended",
-  },
   library: {
     started: "navigation.subnav.library.started",
     saved: "navigation.subnav.library.saved",
@@ -36,12 +31,12 @@ export function getSubnavLabel(section: string, tabId: string, t: TranslateFn): 
   return key ? t(key) : tabId;
 }
 
-/** Localized empty-state text for a feature feed (feed/live). */
-export function getEmptyStateText(feature: "feed" | "live", t: (key: string) => string): string {
+/** Localized empty-state text for a feature feed. */
+export function getEmptyStateText(feature: "feed", t: (key: string) => string): string {
   return t(`${feature}.empty`);
 }
 
-/** Localized error-state text for a feature feed (feed/live). */
-export function getErrorStateText(feature: "feed" | "live", t: (key: string) => string): string {
+/** Localized error-state text for a feature feed. */
+export function getErrorStateText(feature: "feed", t: (key: string) => string): string {
   return t(`${feature}.error`);
 }

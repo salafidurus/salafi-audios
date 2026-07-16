@@ -111,7 +111,6 @@
         "@sd/domain-account": "workspace:*",
         "@sd/domain-audio": "workspace:*",
         "@sd/domain-content": "workspace:*",
-        "@sd/domain-live": "workspace:*",
         "@sd/domain-search": "workspace:*",
         "@sentry/react-native": "~7.11.0",
         "@shopify/flash-list": "2.0.2",
@@ -188,7 +187,6 @@
         "@sd/domain-account": "workspace:*",
         "@sd/domain-audio": "workspace:*",
         "@sd/domain-content": "workspace:*",
-        "@sd/domain-live": "workspace:*",
         "@sd/domain-search": "workspace:*",
         "@sd/utils-error": "workspace:*",
         "@tanstack/react-query": "catalog:",
@@ -208,7 +206,7 @@
         "@playwright/test": "^1.61.0",
         "@tailwindcss/postcss": "^4",
         "@testing-library/jest-dom": "^6.9.1",
-        "@testing-library/react": "catalog:",
+        "@testing-library/react": "^16.3.2",
         "@types/node": "catalog:",
         "@types/react": "catalog:",
         "@types/react-dom": "^19",
@@ -317,20 +315,6 @@
         "react": "^19.0.0",
       },
     },
-    "packages/domain-live": {
-      "name": "@sd/domain-live",
-      "version": "0.0.0",
-      "dependencies": {
-        "@sd/core-contracts": "workspace:*",
-        "@tanstack/react-query": "catalog:",
-      },
-      "devDependencies": {
-        "@testing-library/react": "catalog:",
-      },
-      "peerDependencies": {
-        "react": "^19.0.0",
-      },
-    },
     "packages/domain-permissions": {
       "name": "@sd/domain-permissions",
       "version": "0.0.0",
@@ -372,7 +356,6 @@
     "@prisma/adapter-pg": "7.8.0",
     "@prisma/client": "7.8.0",
     "@tanstack/react-query": "^5.101.2",
-    "@testing-library/react": "^16.3.2",
     "@types/node": "26.1.1",
     "@types/react": "~19.2.14",
     "better-auth": "1.6.23",
@@ -1484,8 +1467,6 @@
     "@sd/domain-audio": ["@sd/domain-audio@workspace:packages/domain-audio"],
 
     "@sd/domain-content": ["@sd/domain-content@workspace:packages/domain-content"],
-
-    "@sd/domain-live": ["@sd/domain-live@workspace:packages/domain-live"],
 
     "@sd/domain-permissions": ["@sd/domain-permissions@workspace:packages/domain-permissions"],
 

@@ -38,13 +38,11 @@
   "tabs": {
     "search": "بحث",
     "feed": "الرئيسية",
-    "live": "مباشر",
     "library": "المكتبة",
     "account": "الحساب"
   },
   "navigation": {
     "explore": "استكشاف",
-    "live": "مباشر",
     "library": "المكتبة",
     "account": "الحساب",
     "siteTitle": "دروس سلفية",
@@ -56,7 +54,6 @@
     "languageSwitch": "تغيير اللغة",
     "subnav": {
       "explore": { "popular": "الأكثر شيوعًا", "recent": "الأحدث", "following": "المتابَعون" },
-      "live": { "ongoing": "مباشر الآن", "scheduled": "مجدولة", "ended": "منتهية" },
       "library": { "started": "قيد التشغيل", "saved": "المحفوظة", "completed": "المكتملة" },
       "account": { "general": "عام", "profile": "الملف الشخصي", "legal": "قانوني" }
     }
@@ -151,18 +148,6 @@
     "retry": "إعادة المحاولة",
     "loadMore": "تحميل المزيد",
     "followingEmpty": "تابِع العلماء لرؤية أحدث محاضراتهم هنا."
-  },
-  "live": {
-    "title": "البث المباشر",
-    "loading": "جارٍ تحميل البث...",
-    "empty": "لا توجد جلسات مباشرة الآن.",
-    "error": "تعذّر التحقق من الجلسات المباشرة.",
-    "retry": "إعادة المحاولة",
-    "sections": {
-      "ongoing": { "title": "مباشر الآن", "empty": "لا توجد جلسات مباشرة الآن." },
-      "scheduled": { "title": "القادمة", "empty": "لا توجد جلسات قادمة مجدولة." },
-      "ended": { "title": "المنتهية مؤخرًا", "empty": "لا توجد جلسات حديثة." }
-    }
   },
   "notFound": {
     "title": "عذرًا!",

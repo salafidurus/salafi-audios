@@ -6,7 +6,7 @@
  */
 import { routes } from "./routes";
 
-export type Section = "explore" | "live" | "library" | "settings" | "adminContents" | "adminLive";
+export type Section = "explore" | "library" | "settings" | "adminContents";
 
 export type TabConfig = { id: string; label: string; labelKey: string; icon: string };
 
@@ -24,21 +24,6 @@ export const SECTION_TABS: Record<Section, TabConfig[]> = {
       label: "Following",
       labelKey: "navigation.subnav.explore.following",
       icon: "heart",
-    },
-  ],
-  live: [
-    { id: "ongoing", label: "Live Now", labelKey: "navigation.subnav.live.ongoing", icon: "radio" },
-    {
-      id: "scheduled",
-      label: "Scheduled",
-      labelKey: "navigation.subnav.live.scheduled",
-      icon: "calendar",
-    },
-    {
-      id: "ended",
-      label: "Ended",
-      labelKey: "navigation.subnav.live.ended",
-      icon: "check-circle",
     },
   ],
   library: [
@@ -85,45 +70,25 @@ export const SECTION_TABS: Record<Section, TabConfig[]> = {
       icon: "list",
     },
   ],
-  adminLive: [
-    {
-      id: "sessions",
-      label: "Sessions",
-      labelKey: "navigation.subnav.adminLive.sessions",
-      icon: "radio",
-    },
-    {
-      id: "channels",
-      label: "Channels",
-      labelKey: "navigation.subnav.adminLive.channels",
-      icon: "list",
-    },
-  ],
 };
 
 export const DEFAULT_TABS: Record<Section, string> = {
   explore: "popular",
-  live: "ongoing",
   library: "started",
   settings: "general",
   adminContents: "topics",
-  adminLive: "sessions",
 };
 
 export const SECTION_LABELS: Record<Section, string> = {
   explore: "Explore",
-  live: "Live",
   library: "Library",
   settings: "Settings",
   adminContents: "Content",
-  adminLive: "Live Now",
 };
 
 export const SECTION_ROUTES: Record<Section, string> = {
   explore: routes.explore.index,
-  live: routes.live.index,
   library: routes.library.index,
   settings: routes.settings.index,
   adminContents: routes.admin.contents,
-  adminLive: routes.admin.live,
 };
