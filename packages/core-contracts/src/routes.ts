@@ -118,7 +118,7 @@ export function resolveRouteAccess(pathname: string): RouteAccess {
   const normalizedPath = pathname === "/" ? "/" : pathname.replace(/\/$/, "");
 
   // 2. Sort definitions by path length descending (longest-prefix matching)
-  const sortedDefs = [...routeDefinitions].sort((a, b) => b.path.length - a.path.length);
+  const sortedDefs = routeDefinitions.toSorted((a, b) => b.path.length - a.path.length);
 
   // 3. First exact or prefix match wins
   for (const def of sortedDefs) {
