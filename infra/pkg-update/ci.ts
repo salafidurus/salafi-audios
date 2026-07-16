@@ -177,7 +177,7 @@ async function createOrUpdatePr(
   dryRun: boolean,
 ): Promise<number | null> {
   const title = `chore(deps): update ${group}`;
-  const labels = ["deps", bump ?? "patch"] as string[];
+  const labels = ["dependencies"] as string[];
   const autoMerge = bump === "minor" || bump === "patch";
 
   if (dryRun) {
@@ -213,6 +213,8 @@ async function createOrUpdatePr(
     ]);
     if (updateResult.status === 0) {
       prNumber = Number(existingPr.stdout);
+    } else {
+      console.log(`[${group}] PR update failed: ${updateResult.stderr}`);
     }
   } else {
     const createResult = exec("gh", [
@@ -230,6 +232,8 @@ async function createOrUpdatePr(
     if (createResult.status === 0 && createResult.stdout) {
       const match = createResult.stdout.match(/#(\d+)/);
       prNumber = match ? Number(match[1]) : null;
+    } else {
+      console.log(`[${group}] PR create failed: ${createResult.stderr}`);
     }
   }
 
