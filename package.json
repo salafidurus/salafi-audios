@@ -14,7 +14,7 @@
       "@tanstack/react-query": "^5.101.2",
       "@testing-library/react": "^16.3.2",
       "better-auth": "1.6.23",
-      "eslint": "^9.7.0",
+      "eslint": "10.7.0",
       "i18next": "^26.3.6",
       "pg": "8.22.0",
       "react": "19.2.3",
@@ -28,7 +28,7 @@
       "@types/node": "26.1.1",
       "@types/react": "~19.2.14",
       "dotenv": "^17.4.2",
-      "@babel/runtime": "^7.29.7"
+      "@babel/runtime": "8.0.0"
     },
     "catalogs": {}
   },
