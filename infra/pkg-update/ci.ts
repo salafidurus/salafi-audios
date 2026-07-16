@@ -341,9 +341,16 @@ async function processBatch(
     console.log(`[${batch.groupName}] Changes committed`);
 
     console.log(`[${batch.groupName}] Pushing to origin/${branch}...`);
-    const pushResult = exec("git", ["push", "origin", `HEAD:refs/heads/${branch}`], {
-      cwd: wtDir,
-    });
+    const pushResult = exec(
+      "git",
+      [
+        "push",
+        ...(branchStatus === "existing" ? ["--force"] : []),
+        "origin",
+        `HEAD:refs/heads/${branch}`,
+      ],
+      { cwd: wtDir },
+    );
     if (pushResult.status !== 0) {
       throw new Error(`git push failed: ${pushResult.stderr}`);
     }
