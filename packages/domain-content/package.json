@@ -18,8 +18,7 @@
   "dependencies": {
     "@sd/core-contracts": "workspace:*",
     "@sd/core-i18n": "workspace:*",
-    "@sd/domain-audio": "workspace:*",
-    "@tanstack/react-query": "catalog:"
+    "@sd/domain-audio": "workspace:*"
   },
   "devDependencies": {},
   "peerDependencies": {

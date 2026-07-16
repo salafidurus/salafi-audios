@@ -16,8 +16,7 @@
     "test:prepush": "vitest run --changed=origin/main"
   },
   "dependencies": {
-    "@sd/core-contracts": "workspace:*",
-    "@tanstack/react-query": "catalog:"
+    "@sd/core-contracts": "workspace:*"
   },
   "devDependencies": {
     "@testing-library/react": "catalog:"

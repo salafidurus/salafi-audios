@@ -12,8 +12,8 @@ export const PresignedUrlRequestDtoSchema = z.object({
 export type PresignedUrlRequestDto = z.infer<typeof PresignedUrlRequestDtoSchema>;
 
 export const PresignedUrlResponseDtoSchema = z.object({
-  uploadUrl: z.string().url(),
-  publicUrl: z.string().url(),
+  uploadUrl: z.url(),
+  publicUrl: z.url(),
   objectKey: z.string(),
 });
 export type PresignedUrlResponseDto = z.infer<typeof PresignedUrlResponseDtoSchema>;

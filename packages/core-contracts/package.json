@@ -56,7 +56,6 @@
     "test:cov": "vitest run --coverage"
   },
   "dependencies": {
-    "@tanstack/react-query": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {

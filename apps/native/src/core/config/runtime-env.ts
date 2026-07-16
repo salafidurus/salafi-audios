@@ -3,8 +3,8 @@ import { z } from "zod";
 
 const NativeRuntimeExtraSchema = z.object({
   appEnv: z.enum(["development", "preview", "production"]).optional(),
-  apiUrl: z.string().url().optional(),
-  sentryDsn: z.string().url().optional(),
+  apiUrl: z.url().optional(),
+  sentryDsn: z.url().optional(),
   sentryOrg: z.string().optional(),
   sentryProject: z.string().optional(),
   vexoProjectId: z.string().optional(),

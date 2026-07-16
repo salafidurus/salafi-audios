@@ -4,6 +4,7 @@ import { Edit, Trash, Send, Globe, User } from "lucide-react";
 import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
 import { Button } from "@/shared/components/Button";
 import { List } from "@/shared/components/List";
+import { useFormattedDate } from "@/shared/hooks/use-formatted-date";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import type { LiveSessionPublicDto, LivestreamChannelDto } from "@sd/core-contracts";
 import styles from "./livestream-item.module.css";
@@ -13,6 +14,18 @@ export interface LivestreamItemProps {
   item: LiveSessionPublicDto | LivestreamChannelDto;
   onEdit: () => void;
   onDelete: () => void;
+}
+
+function SessionDateItem({ dateStr, label }: { dateStr: string; label: string }) {
+  const formatted = useFormattedDate(dateStr);
+  return (
+    <>
+      <span className={styles.sep}>&bull;</span>
+      <span className={styles.metaItem}>
+        {label} {formatted}
+      </span>
+    </>
+  );
 }
 
 export function LivestreamItem({ type, item, onEdit, onDelete }: LivestreamItemProps) {
@@ -57,20 +70,10 @@ export function LivestreamItem({ type, item, onEdit, onDelete }: LivestreamItemP
                   </>
                 )}
                 {session.scheduledAt && (
-                  <>
-                    <span className={styles.sep}>&bull;</span>
-                    <span className={styles.metaItem}>
-                      Sched: {new Date(session.scheduledAt).toLocaleString()}
-                    </span>
-                  </>
+                  <SessionDateItem dateStr={session.scheduledAt} label="Sched:" />
                 )}
                 {session.startedAt && (
-                  <>
-                    <span className={styles.sep}>&bull;</span>
-                    <span className={styles.metaItem}>
-                      Started: {new Date(session.startedAt).toLocaleString()}
-                    </span>
-                  </>
+                  <SessionDateItem dateStr={session.startedAt} label="Started:" />
                 )}
               </div>
             </div>

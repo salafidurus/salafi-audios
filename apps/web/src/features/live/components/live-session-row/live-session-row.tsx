@@ -4,29 +4,13 @@ import React from "react";
 import type { LiveSessionPublicDto, LiveSessionDto } from "@sd/core-contracts";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { Headphones } from "lucide-react";
+import { formatScheduledTime } from "@/features/live/utils/format-scheduled-time";
 import styles from "./live-session-row.module.css";
 
 export type LiveSessionRowProps = {
   session: LiveSessionPublicDto | LiveSessionDto;
   onPress?: () => void;
 };
-
-export function formatScheduledTime(dateStr: string) {
-  const date = new Date(dateStr);
-  const timeOptions: Intl.DateTimeFormatOptions = {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  };
-  const dateOptions: Intl.DateTimeFormatOptions = {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-  };
-  const timePart = date.toLocaleTimeString("en-US", timeOptions);
-  const datePart = date.toLocaleDateString("en-US", dateOptions);
-  return `${timePart} · ${datePart}`;
-}
 
 export function LiveSessionRow({ session, onPress }: LiveSessionRowProps) {
   const isLive = session.status === "live";

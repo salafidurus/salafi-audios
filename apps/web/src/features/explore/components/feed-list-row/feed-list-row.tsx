@@ -7,6 +7,7 @@ import { useAudio, useProgressStore, type Track } from "@sd/domain-audio";
 import type { FeedContentItemDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import { List } from "@/shared/components/List";
+import { useFormattedDate } from "@/shared/hooks/use-formatted-date";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { audioService } from "@/features/audio";
 import styles from "./feed-list-row.module.css";
@@ -73,7 +74,12 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
 
   const durationText = item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : "";
 
-  const publishedDateText = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString() : "";
+  const publishedDateFormatted = useFormattedDate(item.publishedAt || "", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+  const publishedDateText = item.publishedAt ? publishedDateFormatted : "";
 
   return (
     <List.Item interactive className={styles.row} onClick={onPress}>
