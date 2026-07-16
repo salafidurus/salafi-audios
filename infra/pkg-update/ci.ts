@@ -345,6 +345,7 @@ async function processBatch(
       "git",
       [
         "push",
+        "--no-verify",
         ...(branchStatus === "existing" ? ["--force"] : []),
         "origin",
         `HEAD:refs/heads/${branch}`,
