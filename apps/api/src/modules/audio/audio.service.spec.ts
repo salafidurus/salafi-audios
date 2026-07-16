@@ -33,12 +33,21 @@ describe('AudioService', () => {
         {
           provide: AudioRepository,
           useValue: {
-            getUserProgress: vi.fn<any>(),
-            upsertProgress: vi.fn<any>(),
-            bulkSync: vi.fn<any>(),
-            findListingById: vi.fn<any>(),
-            findPrimaryAsset: vi.fn<any>(),
-            findFirstAsset: vi.fn<any>(),
+            getUserProgress: vi.fn<(userId: string, since?: Date) => Promise<any>>(),
+            upsertProgress:
+              vi.fn<
+                (
+                  userId: string,
+                  listingId: string,
+                  positionSeconds: number,
+                  _durationSeconds?: number,
+                  isCompleted?: boolean,
+                ) => Promise<void>
+              >(),
+            bulkSync: vi.fn<(userId: string, items: any[]) => Promise<void>>(),
+            findListingById: vi.fn<(id: string) => Promise<any>>(),
+            findPrimaryAsset: vi.fn<(listingId: string) => Promise<any>>(),
+            findFirstAsset: vi.fn<(listingId: string) => Promise<any>>(),
           } satisfies Partial<Mocked<AudioRepository>>,
         },
       ],
