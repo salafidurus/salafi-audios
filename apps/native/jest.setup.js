@@ -54,3 +54,9 @@ jest.mock("expo-secure-store", () => ({
   deleteItemAsync: jest.fn(),
   isAvailableAsync: jest.fn(() => Promise.resolve(true)),
 }));
+
+jest.mock("@tanstack/react-query", () => ({
+  useQueryClient: jest.fn(() => ({
+    invalidateQueries: jest.fn().mockResolvedValue(undefined),
+  })),
+}));

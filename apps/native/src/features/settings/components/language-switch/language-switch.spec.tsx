@@ -15,12 +15,6 @@ jest.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => mockUseTranslation(),
 }));
 
-jest.mock("@tanstack/react-query", () => ({
-  useQueryClient: jest.fn(() => ({
-    invalidateQueries: jest.fn().mockResolvedValue(undefined),
-  })),
-}));
-
 jest.mock("@/core/i18n/i18n", () => ({
   changeLocale: jest.fn().mockResolvedValue(undefined),
 }));
