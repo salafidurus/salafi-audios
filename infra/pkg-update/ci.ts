@@ -65,9 +65,17 @@ export function groupCandidates(candidates: UpdateCandidate[]): GroupBatch[] {
   }
 
   const ordered: GroupBatch[] = [];
+  const seen = new Set<string>();
   for (const name of getGroupOrder()) {
     const list = groups.get(name);
     if (list) {
+      ordered.push({ groupName: name, candidates: list });
+      seen.add(name);
+    }
+  }
+
+  for (const [name, list] of groups.entries()) {
+    if (!seen.has(name)) {
       ordered.push({ groupName: name, candidates: list });
     }
   }
@@ -86,12 +94,16 @@ export function highestBump(candidates: UpdateCandidate[]): "major" | "minor" | 
   return result;
 }
 
+export function sanitizeBranchName(name: string): string {
+  return name.replace(/[@/]/g, "-").replace(/^-+/, "");
+}
+
 export function branchName(group: string): string {
-  return `deps/${group}`;
+  return `deps/${sanitizeBranchName(group)}`;
 }
 
 export function worktreeDir(rootDir: string, group: string): string {
-  return resolve(rootDir, ".worktrees", `deps-${group}`); // nosemgrep
+  return resolve(rootDir, ".worktrees", `deps-${sanitizeBranchName(group)}`); // nosemgrep
 }
 
 async function remoteBranchExists(branch: string): Promise<boolean> {

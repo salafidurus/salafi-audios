@@ -35,7 +35,7 @@ function matchesPattern(name: string, pattern: string): boolean {
 }
 
 function shouldSkipPackage(name: string, cfg: PkupdateConfig): boolean {
-  for (const s of [...cfg.skip, ...cfg.never]) {
+  for (const s of cfg.skip) {
     if (matchesPattern(name, s)) return true;
   }
   const expoGroup = cfg.groups["expo"];

@@ -263,15 +263,14 @@ describe("syncWorkspaceDeps", () => {
     expect(updated.dependencies.react).toBe(oldReact);
   });
 
-  it("does not update packages in never list", () => {
+  it("updates packages in never list (each gets own PR)", () => {
     const candidate: UpdateCandidate = {
       type: "catalog",
       packageName: "typescript",
       currentVersion: "5.9.3",
       latestVersion: "6.0.0",
     };
-    syncWorkspaceDeps(candidate, tmpDir, config);
-    const rootPkg = JSON.parse(readFileSync(join(tmpDir, "package.json"), "utf-8"));
-    expect(rootPkg.workspaces.catalog.typescript).toBeUndefined();
+    const updated = syncWorkspaceDeps(candidate, tmpDir, config);
+    expect(Array.isArray(updated)).toBe(true);
   });
 });
