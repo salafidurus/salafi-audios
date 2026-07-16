@@ -1,7 +1,12 @@
 "use client";
 
-import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
-import type { ListingViewDto } from "@sd/core-contracts";
+import {
+  useApiQuery,
+  queryKeys,
+  httpClient,
+  endpoints,
+  type ListingViewDto,
+} from "@sd/core-contracts";
 import { LectureDetailScreen } from "@/features/listing/screens/lecture-detail/lecture-detail.screen";
 import { ScreenInProgressResponsive } from "@/shared/components/ScreenInProgress/ScreenInProgress";
 

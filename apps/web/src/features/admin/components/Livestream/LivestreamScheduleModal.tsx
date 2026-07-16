@@ -1,8 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
-import type { LivestreamChannelDto, CreateLiveSessionDto } from "@sd/core-contracts";
+import {
+  useApiQuery,
+  httpClient,
+  endpoints,
+  type LivestreamChannelDto,
+  type CreateLiveSessionDto,
+} from "@sd/core-contracts";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button";
 import { TextInput } from "@/shared/components/TextInput/TextInput";

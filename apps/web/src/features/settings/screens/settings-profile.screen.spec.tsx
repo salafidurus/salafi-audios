@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { SettingsProfileScreen } from "./settings-profile.screen";
+import { useAccountProfile } from "@sd/domain-account";
+import { authClient } from "@/core/auth/auth-client";
 
 const mockUseAuth = vi.fn();
 
@@ -63,9 +65,6 @@ vi.mock("@/shared/components/SettingsRow/SettingsRow", () => ({
     </div>
   ),
 }));
-
-import { useAccountProfile } from "@sd/domain-account";
-import { authClient } from "@/core/auth/auth-client";
 
 const mockProfile = vi.mocked(useAccountProfile);
 

@@ -28,7 +28,9 @@ export function DropdownContent({ children, searchable = false, className }: Dro
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      return;
+    }
     setHighlightedIndex(-1);
     setSearchQuery("");
 
@@ -39,8 +41,9 @@ export function DropdownContent({ children, searchable = false, className }: Dro
   }, [open, setHighlightedIndex, setSearchQuery]);
 
   useEffect(() => {
-    if (!open) return;
-
+    if (!open) {
+      return;
+    }
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setOpen(false);
@@ -55,8 +58,9 @@ export function DropdownContent({ children, searchable = false, className }: Dro
       const filteredItems = searchable
         ? items.filter((item) => item.label.toLowerCase().includes(searchQuery.toLowerCase()))
         : items;
-      if (filteredItems.length === 0) return;
-
+      if (filteredItems.length === 0) {
+        return;
+      }
       if (e.key === "ArrowDown") {
         e.preventDefault();
         setHighlightedIndex((prev) => (prev < filteredItems.length - 1 ? prev + 1 : 0));
@@ -67,7 +71,9 @@ export function DropdownContent({ children, searchable = false, className }: Dro
         e.preventDefault();
         if (highlightedIndex >= 0 && highlightedIndex < filteredItems.length) {
           const selected = filteredItems[highlightedIndex];
-          if (!selected) return;
+          if (!selected) {
+            return;
+          }
           onValueChange(selected.value);
           setOpen(false);
           triggerRef.current?.focus();
@@ -90,8 +96,9 @@ export function DropdownContent({ children, searchable = false, className }: Dro
   ]);
 
   useEffect(() => {
-    if (!open) return;
-
+    if (!open) {
+      return;
+    }
     const handleClickOutside = (e: MouseEvent) => {
       if (
         contentRef.current &&

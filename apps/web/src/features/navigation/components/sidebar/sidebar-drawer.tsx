@@ -18,8 +18,9 @@ export function SidebarDrawer({ isOpen, onClose }: SidebarDrawerProps) {
 
   // Focus trap and keyboard handling
   useEffect(() => {
-    if (!isOpen) return;
-
+    if (!isOpen) {
+      return;
+    }
     // Lock body scroll
     const originalStyle = document.body.style.overflow;
     document.body.style.overflow = "hidden";

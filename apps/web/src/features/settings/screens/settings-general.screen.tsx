@@ -34,7 +34,9 @@ function loadNotifState(): NotificationState {
   }
   try {
     const raw = localStorage.getItem(NOTIF_KEY);
-    if (raw) return JSON.parse(raw) as NotificationState;
+    if (raw) {
+      return JSON.parse(raw) as NotificationState;
+    }
   } catch {
     // ignore parse errors
   }
@@ -42,9 +44,13 @@ function loadNotifState(): NotificationState {
 }
 
 function loadThemePreference(): ThemePreference {
-  if (typeof window === "undefined") return "system";
+  if (typeof window === "undefined") {
+    return "system";
+  }
   const stored = localStorage.getItem(THEME_KEY);
-  if (stored === "light" || stored === "dark") return stored;
+  if (stored === "light" || stored === "dark") {
+    return stored;
+  }
   return "system";
 }
 

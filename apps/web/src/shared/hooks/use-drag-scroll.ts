@@ -14,8 +14,9 @@ export function useDragScroll(direction: "horizontal" | "vertical") {
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
-
+    if (!el) {
+      return;
+    }
     let isDragging = false;
     let hasMoved = false;
     let startX = 0;
@@ -31,7 +32,9 @@ export function useDragScroll(direction: "horizontal" | "vertical") {
     };
 
     const onMouseMove = (e: MouseEvent) => {
-      if (!isDragging) return;
+      if (!isDragging) {
+        return;
+      }
       const currentX = e.clientX;
       const currentY = e.clientY;
       const dx = currentX - startX;
@@ -54,7 +57,9 @@ export function useDragScroll(direction: "horizontal" | "vertical") {
     };
 
     const onMouseUp = () => {
-      if (!isDragging) return;
+      if (!isDragging) {
+        return;
+      }
       isDragging = false;
       el.style.cursor = "grab";
     };
@@ -69,14 +74,24 @@ export function useDragScroll(direction: "horizontal" | "vertical") {
 
     const onWheel = (e: WheelEvent) => {
       if (direction === "horizontal") {
-        if (e.deltaX !== 0) return; // native horizontal trackpad — let browser handle
-        if (e.deltaY === 0) return;
-        if (el.scrollWidth <= el.clientWidth) return;
+        if (e.deltaX !== 0) {
+          return;
+        } // native horizontal trackpad — let browser handle
+        if (e.deltaY === 0) {
+          return;
+        }
+        if (el.scrollWidth <= el.clientWidth) {
+          return;
+        }
         e.preventDefault();
         el.scrollLeft += e.deltaY;
       } else {
-        if (e.deltaY === 0) return;
-        if (el.scrollHeight <= el.clientHeight) return;
+        if (e.deltaY === 0) {
+          return;
+        }
+        if (el.scrollHeight <= el.clientHeight) {
+          return;
+        }
         e.preventDefault();
         el.scrollTop += e.deltaY;
       }

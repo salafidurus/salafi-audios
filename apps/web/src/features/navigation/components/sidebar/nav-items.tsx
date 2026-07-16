@@ -5,12 +5,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import clsx from "clsx";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { routes } from "@sd/core-contracts";
-import { useAuth } from "@/core/auth";
-import type { AdminPermission } from "@sd/core-contracts";
+import { routes, type AdminPermission } from "@sd/core-contracts";
+import { useAuth, authClient } from "@/core/auth";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 import { Modal } from "@/shared/components/Modal";
-import { authClient } from "@/core/auth";
 import { Button } from "@/shared/components/Button/Button";
 import { SectionLabel } from "./section-label";
 import {

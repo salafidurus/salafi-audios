@@ -9,7 +9,9 @@
 const TOKEN_KEY = "sd.bearer_token";
 
 export function getBearerToken(): string | null {
-  if (typeof window === "undefined") return null;
+  if (typeof window === "undefined") {
+    return null;
+  }
   try {
     return window.localStorage.getItem(TOKEN_KEY);
   } catch {
@@ -18,7 +20,9 @@ export function getBearerToken(): string | null {
 }
 
 export function setBearerToken(token: string): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined") {
+    return;
+  }
   try {
     window.localStorage.setItem(TOKEN_KEY, token);
   } catch {
@@ -27,7 +31,9 @@ export function setBearerToken(token: string): void {
 }
 
 export function clearBearerToken(): void {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined") {
+    return;
+  }
   try {
     window.localStorage.removeItem(TOKEN_KEY);
   } catch {

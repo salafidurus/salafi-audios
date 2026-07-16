@@ -14,8 +14,9 @@ export function ResumeBadge({ listingId }: ResumeBadgeProps) {
     return <span className={styles.completedBadge}>✓ Completed</span>;
   }
 
-  if (resumePositionSeconds === 0 || progressPercent === 0) return null;
-
+  if (resumePositionSeconds === 0 || progressPercent === 0) {
+    return null;
+  }
   return <span className={styles.resumeBadge}>Resume at {formatTime(resumePositionSeconds)}</span>;
 }
 

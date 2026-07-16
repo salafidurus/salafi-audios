@@ -57,7 +57,9 @@ export function DropdownTrigger({
         .filter(Boolean)
         .join(" ")}
       onClick={() => {
-        if (!disabled) setOpen(!open);
+        if (!disabled) {
+          setOpen(!open);
+        }
       }}
       disabled={disabled}
     >

@@ -3,8 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { Play, Pause, Bookmark } from "lucide-react";
-import { useAudio, useProgressStore } from "@sd/domain-audio";
-import type { Track } from "@sd/domain-audio";
+import { useAudio, useProgressStore, type Track } from "@sd/domain-audio";
 import type { FeedContentItemDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import { List } from "@/shared/components/List";
@@ -49,7 +48,7 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
 
     const track: Track = {
       id: item.id,
-      title: title,
+      title,
       artist: item.scholarName,
       url: "", // resolved lazily by DurusAudioService
       durationSeconds: item.durationSeconds ?? 0,

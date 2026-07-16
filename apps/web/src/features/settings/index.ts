@@ -8,4 +8,3 @@ export {
 } from "./content-preference";
 
 // Re-export settings components
-export type {} from "./index";

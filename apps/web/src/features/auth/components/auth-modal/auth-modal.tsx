@@ -27,8 +27,9 @@ export function AuthModal({ isOpen, onClose, message }: AuthModalProps) {
   const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!isOpen) return;
-
+    if (!isOpen) {
+      return;
+    }
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onClose();

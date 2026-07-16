@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useSyncExternalStore, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { LazyMotion, m, domAnimation, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import { useSyncExternalStore } from "react";
 import styles from "./modal.module.css";
 import { ConfirmText } from "./ConfirmText";
 import { ConfirmDialog } from "./ConfirmDialog";
@@ -52,10 +51,13 @@ export function Modal({
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!isOpen) return;
-
+    if (!isOpen) {
+      return;
+    }
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+      }
     };
     window.addEventListener("keydown", handleKeyDown);
 
@@ -74,8 +76,9 @@ export function Modal({
     }
   }, [isOpen]);
 
-  if (!mounted) return null;
-
+  if (!mounted) {
+    return null;
+  }
   const justifyContent = JUSTIFY_MAP[footerAlignment as keyof typeof JUSTIFY_MAP] || "flex-end";
 
   const customWidth = width ? (typeof width === "number" ? `${width}px` : width) : undefined;

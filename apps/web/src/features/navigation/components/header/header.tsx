@@ -14,8 +14,9 @@ export function Header() {
 
   useEffect(() => {
     const el = headerRef.current;
-    if (!el) return;
-
+    if (!el) {
+      return;
+    }
     const html = document.documentElement;
 
     const update = () => {

@@ -10,8 +10,9 @@ import styles from "./mini-player.module.css";
 export function MiniPlayer() {
   const { currentTrack, hasTrack, progressPercent, durationSeconds, positionSeconds } = useAudio();
 
-  if (!hasTrack || !currentTrack) return null;
-
+  if (!hasTrack || !currentTrack) {
+    return null;
+  }
   const handleSeek = (percent: number) => {
     if (durationSeconds > 0) {
       audioService.seek((percent / 100) * durationSeconds);
@@ -41,7 +42,9 @@ export function MiniPlayer() {
 }
 
 function formatTime(seconds: number): string {
-  if (isNaN(seconds) || !isFinite(seconds)) return "0:00";
+  if (isNaN(seconds) || !isFinite(seconds)) {
+    return "0:00";
+  }
   const m = Math.floor(seconds / 60);
   const s = Math.floor(seconds % 60);
   return `${m}:${s.toString().padStart(2, "0")}`;

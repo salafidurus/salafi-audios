@@ -1,8 +1,7 @@
 "use client";
 
 import { Toggle } from "@/shared/components/Toggle";
-import type { Permission } from "@sd/core-contracts";
-import { PERMISSION_LABELS, PERMISSION_DESCRIPTIONS } from "@sd/core-contracts";
+import { type Permission, PERMISSION_LABELS, PERMISSION_DESCRIPTIONS } from "@sd/core-contracts";
 import styles from "./PermissionsDialog.module.css";
 
 interface PermissionItemProps {

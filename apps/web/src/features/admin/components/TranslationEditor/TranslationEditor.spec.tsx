@@ -1,6 +1,13 @@
 import { vi, type Mock } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import type { TranslationTarget, TranslationViewDto } from "@sd/core-contracts";
+import {
+  useContentTranslations,
+  useSaveTranslation,
+  usePublishTranslation,
+  useUnpublishTranslation,
+} from "@sd/domain-content";
+import { TranslationEditor } from "./TranslationEditor";
 
 vi.mock("@sd/core-i18n", () => ({
   SUPPORTED_LOCALES: ["en", "ar"],
@@ -16,14 +23,6 @@ vi.mock("@sd/domain-content", () => ({
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({ t: (k: string) => k }),
 }));
-
-import {
-  useContentTranslations,
-  useSaveTranslation,
-  usePublishTranslation,
-  useUnpublishTranslation,
-} from "@sd/domain-content";
-import { TranslationEditor } from "./TranslationEditor";
 
 const mockTarget: TranslationTarget = { entity: "scholar", scholarId: "scholar-1" };
 

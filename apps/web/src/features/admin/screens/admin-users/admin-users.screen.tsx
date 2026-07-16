@@ -1,10 +1,15 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
-import type { ReactNode } from "react";
+import { useState, useEffect, useMemo, useCallback, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useApiQuery, queryKeys, httpClient } from "@sd/core-contracts";
-import { endpoints, type AdminUserListDto, type UserRole } from "@sd/core-contracts";
+import {
+  useApiQuery,
+  queryKeys,
+  httpClient,
+  endpoints,
+  type AdminUserListDto,
+  type UserRole,
+} from "@sd/core-contracts";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
@@ -16,7 +21,7 @@ import { PermissionsDialog } from "@/features/admin/components/PermissionsDialog
 import { RoleDialog } from "@/features/admin/components/RoleDialog";
 import styles from "./admin-users.screen.module.css";
 
-const ROLE_CHIPS: Array<{ id: UserRole; label: string }> = [
+const ROLE_CHIPS: { id: UserRole; label: string }[] = [
   { id: "listener", label: "Listener" },
   { id: "scholar", label: "Scholar" },
   { id: "translator", label: "Translator" },

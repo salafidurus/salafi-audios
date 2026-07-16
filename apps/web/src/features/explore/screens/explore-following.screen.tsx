@@ -16,8 +16,12 @@ export type FeedFollowingScreenProps = {
 };
 
 function getFeedItemKey(item: FeedItemDto): string {
-  if (item.kind === "scholar_row") return "scholar-row";
-  if (item.kind === "topic_row") return `topic-row-${item.topicName}`;
+  if (item.kind === "scholar_row") {
+    return "scholar-row";
+  }
+  if (item.kind === "topic_row") {
+    return `topic-row-${item.topicName}`;
+  }
   return item.id;
 }
 
@@ -32,7 +36,9 @@ function FeedBlocks({ items, onNavigateToLecture, onNavigateToScholar }: FeedBlo
   let cards: ReactNode[] = [];
 
   const flushCards = (key: string) => {
-    if (cards.length === 0) return;
+    if (cards.length === 0) {
+      return;
+    }
     blocks.push(<List key={`list-${key}`}>{cards}</List>);
     cards = [];
   };

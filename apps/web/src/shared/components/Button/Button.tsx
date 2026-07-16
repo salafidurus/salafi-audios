@@ -1,5 +1,4 @@
-import type { ButtonHTMLAttributes } from "react";
-import React from "react";
+import React, { type ButtonHTMLAttributes } from "react";
 import styles from "./button.module.css";
 
 type ButtonVariant = "primary" | "surface" | "outline" | "ghost" | "danger";
@@ -15,7 +14,7 @@ export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   fullWidth?: boolean;
 };
 
-function cx(...values: Array<string | undefined | false>) {
+function cx(...values: (string | undefined | false)[]) {
   return values.filter(Boolean).join(" ");
 }
 

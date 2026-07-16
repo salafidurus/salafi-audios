@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { ScholarDetailScreen } from "./scholar-detail.screen";
+import { useScholarDetail } from "@sd/domain-content";
 
 vi.mock("@/shared/hooks/use-responsive", () => ({
   useIsDesktop: vi.fn().mockReturnValue(true),
@@ -27,8 +28,6 @@ vi.mock("@/features/listing/components/scholar/scholar-header/scholar-header", (
 vi.mock("@/features/listing/components/scholar/scholar-content-list/scholar-content-list", () => ({
   ScholarContentList: ({ slug }: { slug: string }) => <div>Content:{slug}</div>,
 }));
-
-import { useScholarDetail } from "@sd/domain-content";
 
 const mockDetail = vi.mocked(useScholarDetail);
 

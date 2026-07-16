@@ -3,6 +3,12 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { ScholarContentList } from "./scholar-content-list";
 import type { ScholarContentItemDto } from "@sd/core-contracts";
+import { useScholarTopics, useScholarContent } from "@sd/domain-content";
+
+vi.mock("@sd/domain-content", () => ({
+  useScholarTopics: vi.fn(),
+  useScholarContent: vi.fn(),
+}));
 
 vi.mock("@/features/settings/content-preference", () => ({
   useShowOriginalContent: () => false,
@@ -11,7 +17,9 @@ vi.mock("@/features/settings/content-preference", () => ({
 vi.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({
     t: (key: string, fallback: string, options?: any) => {
-      if (!options) return fallback;
+      if (!options) {
+        return fallback;
+      }
       let result = fallback;
       for (const k of Object.keys(options)) {
         result = result.replace(`{{${k}}}`, String(options[k]));
@@ -20,13 +28,6 @@ vi.mock("@/core/i18n/use-translation", () => ({
     },
   }),
 }));
-
-vi.mock("@sd/domain-content", () => ({
-  useScholarTopics: vi.fn(),
-  useScholarContent: vi.fn(),
-}));
-
-import { useScholarTopics, useScholarContent } from "@sd/domain-content";
 
 const mockUseTopics = vi.mocked(useScholarTopics);
 const mockUseContent = vi.mocked(useScholarContent);

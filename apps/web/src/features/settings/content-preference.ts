@@ -7,7 +7,9 @@ import { createContentPreferenceStore, type LanguageStorageAdapter } from "@sd/c
  * the server when rendering. Keyed by the storage key the store passes in. */
 const cookieAdapter: LanguageStorageAdapter = {
   getItem(key) {
-    if (typeof document === "undefined") return null;
+    if (typeof document === "undefined") {
+      return null;
+    }
     const cookies = document.cookie.split(";");
     for (const cookie of cookies) {
       const eqIdx = cookie.indexOf("=");
@@ -21,13 +23,15 @@ const cookieAdapter: LanguageStorageAdapter = {
     return null;
   },
   setItem(key, value) {
-    if (typeof document === "undefined") return;
+    if (typeof document === "undefined") {
+      return;
+    }
     document.cookie = `${key}=${encodeURIComponent(value)}; path=/; max-age=31536000; SameSite=Lax`;
   },
 };
 
 const store = createContentPreferenceStore(cookieAdapter);
-void store.hydrate();
+store.hydrate();
 
 export const contentPreferenceStore = store;
 

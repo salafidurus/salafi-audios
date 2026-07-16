@@ -13,7 +13,7 @@ type ErrorProps = {
 export default function Error({ error, reset }: ErrorProps) {
   useEffect(() => {
     // noop: we could wire reporting later
-    void error;
+    error satisfies Error;
   }, [error]);
 
   return (

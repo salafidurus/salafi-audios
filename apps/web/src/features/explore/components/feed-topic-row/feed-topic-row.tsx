@@ -27,8 +27,9 @@ export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProp
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
 
-  if (!items.length) return null;
-
+  if (!items.length) {
+    return null;
+  }
   return (
     <div style={{ marginBottom: 16 }}>
       <h3

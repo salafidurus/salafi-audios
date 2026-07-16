@@ -3,12 +3,12 @@ import { Button } from "./Button";
 
 describe("Button loading state", () => {
   it("is disabled when loading=true", () => {
-    render(<Button loading={true} label="Submit" />);
+    render(<Button loading label="Submit" />);
     expect(screen.getByRole("button")).toBeDisabled();
   });
 
   it("renders a spinner element when loading=true", () => {
-    const { container } = render(<Button loading={true} label="Submit" />);
+    const { container } = render(<Button loading label="Submit" />);
     // spinner has aria-hidden="true" and a .spinner class
     const spinner = container.querySelector("[aria-hidden='true']");
     expect(spinner).not.toBeNull();

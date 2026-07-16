@@ -2,8 +2,7 @@
 
 import React from "react";
 import type { ListingDetailDto } from "@sd/core-contracts";
-import { useAudio } from "@sd/domain-audio";
-import type { Track } from "@sd/domain-audio";
+import { useAudio, type Track } from "@sd/domain-audio";
 import { audioService } from "@/features/audio";
 import { Button } from "@/shared/components/Button/Button";
 import styles from "./LecturePlayButton.module.css";

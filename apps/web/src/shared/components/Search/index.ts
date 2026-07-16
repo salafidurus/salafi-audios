@@ -43,14 +43,11 @@
  * - Colors and surfaces via --surface-*, --content-*, --border-* tokens
  */
 
-import { SearchBar } from "./Search.Bar";
-import type { SearchBarProps } from "./Search.Bar";
+import { SearchBar, type SearchBarProps } from "./Search.Bar";
 
-import { SearchFilter } from "./Search.Filter";
-import type { SearchFilterProps, FilterChip } from "./Search.Filter";
+import { SearchFilter, type SearchFilterProps, type FilterChip } from "./Search.Filter";
 
-import { SearchButton } from "./Search.Button";
-import type { SearchButtonProps } from "./Search.Button";
+import { SearchButton, type SearchButtonProps } from "./Search.Button";
 
 export const Search = Object.assign({
   Bar: SearchBar,

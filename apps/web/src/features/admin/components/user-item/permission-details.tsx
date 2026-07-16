@@ -5,7 +5,7 @@ import { PermissionBadge } from "../permission-badge/permission-badge";
 import styles from "./permission-details.module.css";
 
 type PermissionDetailsProps = {
-  permissions: Array<{ permission: AdminPermission }>;
+  permissions: { permission: AdminPermission }[];
 };
 
 const GROUPS = [
@@ -34,8 +34,9 @@ export function PermissionDetails({ permissions }: PermissionDetailsProps): Reac
     <div className={styles.container}>
       {GROUPS.map((group) => {
         const groupPerms = userPermList.filter((perm) => perm.startsWith(group.prefix));
-        if (groupPerms.length === 0) return null;
-
+        if (groupPerms.length === 0) {
+          return null;
+        }
         return (
           <div key={group.key} className={styles.groupRow}>
             <span className={styles.groupLabel}>{group.label}:</span>
