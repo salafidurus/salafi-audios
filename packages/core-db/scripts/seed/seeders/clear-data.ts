@@ -8,7 +8,6 @@ import type { PrismaClient } from "../../../src/generated/prisma/client.js";
  * Delete all existing seed data in reverse foreign key order
  */
 export async function clearData(prisma: PrismaClient): Promise<void> {
-  await prisma.livestreamChannel.deleteMany();
   await prisma.listingTopic.deleteMany();
   await prisma.audioAsset.deleteMany();
   await prisma.listing.deleteMany();

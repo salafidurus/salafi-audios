@@ -103,7 +103,6 @@ describe("resolveRouteAccess", () => {
 
   it("matches nested sub-paths via prefix", () => {
     expect(resolveRouteAccess("/settings/profile/edit")).toBe("auth-optional");
-    expect(resolveRouteAccess("/live/session-123")).toBe("public");
     expect(resolveRouteAccess("/library/saved")).toBe("auth-optional");
     expect(resolveRouteAccess("/admin/users")).toBe("auth-required");
   });

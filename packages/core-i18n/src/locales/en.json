@@ -38,13 +38,11 @@
   "tabs": {
     "search": "Search",
     "feed": "Feed",
-    "live": "Live",
     "library": "Library",
     "account": "Account"
   },
   "navigation": {
     "explore": "Explore",
-    "live": "Live",
     "library": "Library",
     "account": "Account",
     "siteTitle": "Salafi Durus",
@@ -56,7 +54,6 @@
     "languageSwitch": "Language switch",
     "subnav": {
       "explore": { "popular": "Popular", "recent": "Recent", "following": "Following" },
-      "live": { "ongoing": "Live Now", "scheduled": "Scheduled", "ended": "Ended" },
       "library": { "started": "Started", "saved": "Saved", "completed": "Completed" },
       "account": { "general": "General", "profile": "Profile", "legal": "Legal" }
     }
@@ -151,18 +148,6 @@
     "retry": "Try Again",
     "loadMore": "Load more",
     "followingEmpty": "Follow scholars to see their latest lectures here."
-  },
-  "live": {
-    "title": "Live Sessions",
-    "loading": "Loading streams...",
-    "empty": "No live sessions right now.",
-    "error": "Failed to check live sessions.",
-    "retry": "Retry",
-    "sections": {
-      "ongoing": { "title": "Live Now", "empty": "No live sessions right now." },
-      "scheduled": { "title": "Upcoming", "empty": "No upcoming sessions scheduled." },
-      "ended": { "title": "Recently Ended", "empty": "No recent sessions." }
-    }
   },
   "notFound": {
     "title": "Oops!",

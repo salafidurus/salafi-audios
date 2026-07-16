@@ -3,7 +3,6 @@ import { getRootTabFromPathname, getActiveSubsection } from "./tab-route-config"
 jest.mock("lucide-react-native", () => ({
   BookOpen: "BookOpen",
   Cloud: "Cloud",
-  Mic: "Mic",
   Search: "Search",
   Settings: "Settings",
 }));
@@ -20,9 +19,6 @@ describe("getRootTabFromPathname", () => {
   });
   it("returns explore for /explore/recent", () => {
     expect(getRootTabFromPathname("/explore/recent")).toBe("explore");
-  });
-  it("returns live for /live", () => {
-    expect(getRootTabFromPathname("/live")).toBe("live");
   });
   it("returns library for /library", () => {
     expect(getRootTabFromPathname("/library")).toBe("library");

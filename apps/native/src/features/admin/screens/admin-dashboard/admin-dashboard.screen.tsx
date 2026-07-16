@@ -4,14 +4,12 @@ import { useTranslation } from "@/core/i18n/use-translation";
 
 type AdminDashboardScreenProps = {
   onNavigateToLectures?: () => void;
-  onNavigateToLive?: () => void;
   onNavigateToScholars?: () => void;
   onNavigateToPermissions?: () => void;
 };
 
 export function AdminDashboardScreen({
   onNavigateToLectures,
-  onNavigateToLive,
   onNavigateToScholars,
 }: AdminDashboardScreenProps) {
   const { t } = useTranslation();
@@ -23,11 +21,6 @@ export function AdminDashboardScreen({
       <Pressable onPress={onNavigateToLectures} style={[styles.card, styles.cardLectures]}>
         <Text style={styles.cardTitle}>{t("admin.lectures", "Lectures")}</Text>
         <Text style={styles.cardSubtitle}>{t("admin.manageAudios", "Manage audio content")}</Text>
-      </Pressable>
-
-      <Pressable onPress={onNavigateToLive} style={[styles.card, styles.cardLive]}>
-        <Text style={styles.cardTitle}>{t("admin.live", "Live")}</Text>
-        <Text style={styles.cardSubtitle}>{t("admin.manageSessions", "Manage live sessions")}</Text>
       </Pressable>
 
       <Pressable onPress={onNavigateToScholars} style={[styles.card, styles.cardScholars]}>
@@ -63,9 +56,6 @@ const styles = StyleSheet.create((theme) => ({
   },
   cardLectures: {
     borderStartColor: theme.colors.state.danger,
-  },
-  cardLive: {
-    borderStartColor: theme.colors.action.secondary,
   },
   cardScholars: {
     borderStartColor: theme.colors.state.success,

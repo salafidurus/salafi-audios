@@ -23,13 +23,6 @@ test.describe("Navigation — sidebar & routing", () => {
       await expect(page).toHaveURL(/\/explore/);
     });
 
-    test("clicking Live sidebar link navigates to /live", async ({ page }) => {
-      await page.goto("/");
-      await expect(page.getByTestId("nav-link-live")).toBeVisible();
-      await page.getByTestId("nav-link-live").click();
-      await expect(page).toHaveURL(/\/live/);
-    });
-
     test("clicking Library sidebar link navigates to /library", async ({ page }) => {
       await page.goto("/");
       await expect(page.getByTestId("nav-link-library")).toBeVisible();

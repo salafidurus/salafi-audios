@@ -125,17 +125,6 @@ const SECTIONS = [
       "USERS_GRANT_ROLES",
     ] as Permission[],
   },
-  {
-    title: "Livestream Management",
-    permissions: [
-      "LIVE_VIEW",
-      "LIVE_CREATE",
-      "LIVE_EDIT",
-      "LIVE_DELETE",
-      "LIVE_START",
-      "LIVE_STOP",
-    ] as Permission[],
-  },
 ];
 
 export function PermissionsDialog({

@@ -42,8 +42,7 @@ CREATE TYPE "Permission" AS ENUM (
   'TOPICS_VIEW', 'TOPICS_CREATE', 'TOPICS_EDIT', 'TOPICS_DELETE', 'TOPICS_PUBLISH',
   'TRANSLATIONS_VIEW', 'TRANSLATIONS_CREATE', 'TRANSLATIONS_EDIT', 'TRANSLATIONS_DELETE', 'TRANSLATIONS_PUBLISH',
   'MEDIA_UPLOAD', 'MEDIA_DELETE',
-  'USERS_VIEW', 'USERS_EDIT', 'USERS_DELETE', 'USERS_GRANT_PERMISSIONS', 'USERS_GRANT_ROLES',
-  'LIVE_VIEW', 'LIVE_CREATE', 'LIVE_EDIT', 'LIVE_DELETE', 'LIVE_START', 'LIVE_STOP'
+  'USERS_VIEW', 'USERS_EDIT', 'USERS_DELETE', 'USERS_GRANT_PERMISSIONS', 'USERS_GRANT_ROLES'
 );
 
 -- If UserPermission table exists but permission column is TEXT, alter it:
@@ -159,10 +158,6 @@ The admin system has two components:
 
 - `USERS_VIEW`, `USERS_EDIT`, `USERS_DELETE`, `USERS_GRANT_PERMISSIONS`, `USERS_GRANT_ROLES`
 
-**Live Session Permissions:**
-
-- `LIVE_VIEW`, `LIVE_CREATE`, `LIVE_EDIT`, `LIVE_DELETE`, `LIVE_START`, `LIVE_STOP`
-
 ---
 
 ## Creating an Admin User
@@ -197,7 +192,7 @@ FROM "User"
 WHERE email = 'user@example.com'
 ON CONFLICT ("userId", role) DO NOTHING;
 
--- Step 2: Grant all 33 admin permissions
+-- Step 2: Grant all 27 admin permissions
 INSERT INTO "UserPermission" (id, "userId", permission, "grantedAt", "grantedBy")
 SELECT
   gen_random_uuid()::text,
@@ -212,8 +207,7 @@ FROM "User",
     ('TOPICS_VIEW'), ('TOPICS_CREATE'), ('TOPICS_EDIT'), ('TOPICS_DELETE'), ('TOPICS_PUBLISH'),
     ('TRANSLATIONS_VIEW'), ('TRANSLATIONS_CREATE'), ('TRANSLATIONS_EDIT'), ('TRANSLATIONS_DELETE'), ('TRANSLATIONS_PUBLISH'),
     ('MEDIA_UPLOAD'), ('MEDIA_DELETE'),
-    ('USERS_VIEW'), ('USERS_EDIT'), ('USERS_DELETE'), ('USERS_GRANT_PERMISSIONS'), ('USERS_GRANT_ROLES'),
-    ('LIVE_VIEW'), ('LIVE_CREATE'), ('LIVE_EDIT'), ('LIVE_DELETE'), ('LIVE_START'), ('LIVE_STOP')
+    ('USERS_VIEW'), ('USERS_EDIT'), ('USERS_DELETE'), ('USERS_GRANT_PERMISSIONS'), ('USERS_GRANT_ROLES')
   ) AS p(perm)
 WHERE email = 'user@example.com'
 ON CONFLICT ("userId", permission) DO NOTHING;
@@ -232,7 +226,7 @@ bun run --filter @sd/core-db prisma studio
    - `grantedAt`: set to current timestamp
    - `grantedBy`: leave NULL (optional audit field)
 2. Open the `UserPermission` table and add one row per permission for that user ID
-3. Grant the 33 permissions listed in the permission types section above
+3. Grant the 27 permissions listed in the permission types section above
 
 ---
 
@@ -333,7 +327,7 @@ FROM "User"
 WHERE email = 'superadmin@example.com'
 ON CONFLICT ("userId", role) DO NOTHING;
 
--- Step 2: Grant all 33 superadmin permissions
+-- Step 2: Grant all 27 superadmin permissions
 INSERT INTO "UserPermission" (id, "userId", permission, "grantedAt", "grantedBy")
 SELECT
   gen_random_uuid()::text,
@@ -348,8 +342,7 @@ FROM "User",
     ('TOPICS_VIEW'), ('TOPICS_CREATE'), ('TOPICS_EDIT'), ('TOPICS_DELETE'), ('TOPICS_PUBLISH'),
     ('TRANSLATIONS_VIEW'), ('TRANSLATIONS_CREATE'), ('TRANSLATIONS_EDIT'), ('TRANSLATIONS_DELETE'), ('TRANSLATIONS_PUBLISH'),
     ('MEDIA_UPLOAD'), ('MEDIA_DELETE'),
-    ('USERS_VIEW'), ('USERS_EDIT'), ('USERS_DELETE'), ('USERS_GRANT_PERMISSIONS'), ('USERS_GRANT_ROLES'),
-    ('LIVE_VIEW'), ('LIVE_CREATE'), ('LIVE_EDIT'), ('LIVE_DELETE'), ('LIVE_START'), ('LIVE_STOP')
+    ('USERS_VIEW'), ('USERS_EDIT'), ('USERS_DELETE'), ('USERS_GRANT_PERMISSIONS'), ('USERS_GRANT_ROLES')
   ) AS p(perm)
 WHERE email = 'superadmin@example.com'
 ON CONFLICT ("userId", permission) DO NOTHING;
@@ -504,7 +497,7 @@ SELECT COUNT(*) as permission_count
 FROM "UserPermission"
 WHERE "userId" = (SELECT id FROM "User" WHERE email = 'user@example.com');
 
--- Should return 33 for full admin. If not, re-grant permissions.
+-- Should return 27 for full admin. If not, re-grant permissions.
 ```
 
 ### Permission changes not taking effect

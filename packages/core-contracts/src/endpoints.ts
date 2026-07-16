@@ -34,13 +34,6 @@ export const endpoints = {
     profile: "/account/profile",
     deleteAccount: "/account",
   },
-  live: {
-    channels: "/live/channels",
-    channelBySlug: (slug: string) => `/live/channels/${slug}`,
-    active: "/live/active",
-    upcoming: "/live/upcoming",
-    ended: "/live/ended",
-  },
   audio: {
     progress: {
       list: "/audio/progress",
@@ -87,17 +80,6 @@ export const endpoints = {
       publish: (id: string) => `/admin/listings/${id}/publish`,
       archive: (id: string) => `/admin/listings/${id}/archive`,
       bulk: "/admin/listings/bulk",
-    },
-    live: {
-      listSessions: "/admin/live/sessions",
-      listChannels: "/admin/live/channels",
-      createChannel: "/admin/live/channels",
-      updateChannel: (id: string) => `/admin/live/channels/${id}`,
-      deleteChannel: (id: string) => `/admin/live/channels/${id}`,
-      createSession: "/admin/live/sessions",
-      updateSession: (id: string) => `/admin/live/sessions/${id}`,
-      updateStatus: (id: string) => `/admin/live/sessions/${id}/status`,
-      deleteSession: (id: string) => `/admin/live/sessions/${id}`,
     },
     media: {
       presignedUrl: "/admin/media/presigned-url",

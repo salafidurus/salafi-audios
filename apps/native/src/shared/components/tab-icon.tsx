@@ -1,13 +1,12 @@
 import { useUnistyles } from "react-native-unistyles";
-import { Cloud, Search, Mic, Settings, BookOpen } from "lucide-react-native";
+import { Cloud, Search, Settings, BookOpen } from "lucide-react-native";
 import { EaseView } from "react-native-ease";
 import type { ComponentType } from "react";
 
-export type TabIconName = "feed" | "live" | "search" | "library" | "account";
+export type TabIconName = "feed" | "search" | "library" | "account";
 
 const ICONS = {
   feed: Cloud,
-  live: Mic,
   search: Search,
   library: BookOpen,
   account: Settings,

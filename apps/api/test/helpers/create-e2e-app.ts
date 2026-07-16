@@ -1,10 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TelegramModule } from '../../src/modules/telegram/telegram.module';
 import { CDNHealthIndicator } from '../../src/core/health/cdn-health.indicator';
 import { AppModule } from '../../src/app.module';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
-import { MockTelegramModule } from './mock-telegram.module';
 import { MockCDNHealthIndicator } from './mock-cdn.health';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ZodValidationPipe } from 'nestjs-zod';
@@ -20,8 +18,6 @@ export async function createE2eApp(options?: { disableThrottler?: boolean }): Pr
   let moduleBuilder = Test.createTestingModule({
     imports: [AppModule],
   })
-    .overrideModule(TelegramModule)
-    .useModule(MockTelegramModule)
     .overrideProvider(CDNHealthIndicator)
     .useClass(MockCDNHealthIndicator);
 

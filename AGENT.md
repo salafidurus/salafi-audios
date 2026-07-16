@@ -147,7 +147,6 @@ Web (`apps/web`):
 - `packages/core-*` - Shared platform infrastructure (auth, API, config, styling)
 - `packages/domain-content` - Lectures, scholars, series, feed, library data hooks
 - `packages/domain-account` - User profile and auth state hooks
-- `packages/domain-live` - Live session and channel hooks
 - `packages/domain-playback` - Playback engine and player state
 - `packages/domain-progress` - Progress tracking state
 - `packages/domain-search` - Search and quick-browse hooks

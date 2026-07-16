@@ -37,7 +37,6 @@
     "@sd/domain-account": "workspace:*",
     "@sd/domain-audio": "workspace:*",
     "@sd/domain-content": "workspace:*",
-    "@sd/domain-live": "workspace:*",
     "@sd/domain-search": "workspace:*",
     "@sentry/react-native": "~7.11.0",
     "@shopify/flash-list": "2.0.2",

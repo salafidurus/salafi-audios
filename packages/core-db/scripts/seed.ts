@@ -18,7 +18,6 @@ import {
   seedListings,
   seedAudio,
   seedTopicLinks,
-  seedLiveChannels,
 } from "./seed/seeders/index.js";
 
 async function main() {
@@ -45,9 +44,6 @@ async function main() {
 
   // Link listings to topics
   await seedTopicLinks(prisma, topicPairs);
-
-  // Seed live channels
-  await seedLiveChannels(prisma);
 
   // Summary
   const totalListings =

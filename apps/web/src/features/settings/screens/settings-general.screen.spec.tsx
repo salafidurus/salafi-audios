@@ -128,7 +128,6 @@ describe("SettingsGeneralScreen", () => {
   it("shows sub-toggles when master notification is ON", async () => {
     render(<SettingsGeneralScreen />);
     await act(async () => {});
-    expect(screen.getByText("Live Sessions")).toBeInTheDocument();
     expect(screen.getByText("Followed Scholars")).toBeInTheDocument();
     expect(screen.getByText("New Lectures")).toBeInTheDocument();
   });
@@ -141,7 +140,6 @@ describe("SettingsGeneralScreen", () => {
     const switches = screen.getAllByRole("switch");
     fireEvent.click(switches[0]!);
 
-    expect(screen.queryByText("Live Sessions")).not.toBeInTheDocument();
     expect(screen.queryByText("Followed Scholars")).not.toBeInTheDocument();
     expect(screen.queryByText("New Lectures")).not.toBeInTheDocument();
   });
