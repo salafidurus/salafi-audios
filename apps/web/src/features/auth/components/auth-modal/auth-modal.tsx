@@ -12,6 +12,15 @@ import { buildOAuthCallbackURL } from "@/features/auth/oauth-callback-url";
 import { AppleSignInButton, GoogleSignInButton } from "../social-buttons";
 import styles from "./auth-modal.module.css";
 
+function getPortalRoot(): HTMLElement | null {
+  if (typeof document === "undefined") return null;
+  return document.body;
+}
+
+function subscribePortalRoot(): (() => void) {
+  return () => {};
+}
+
 export type AuthModalProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -27,10 +36,10 @@ const getRedirectTo = () => {
 
 export function AuthModal({ isOpen, onClose, message }: AuthModalProps) {
   const { t } = useTranslation();
-  const mounted = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
+  const portalRoot = useSyncExternalStore(
+    subscribePortalRoot,
+    getPortalRoot,
+    () => null,
   );
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -71,11 +80,9 @@ export function AuthModal({ isOpen, onClose, message }: AuthModalProps) {
     });
   };
 
-  if (!mounted) {
-    return null;
-  }
+  if (!portalRoot) return null;
 
-  const modalContent = (
+  return createPortal(
     <LazyMotion features={domAnimation}>
       <AnimatePresence>
         {isOpen && (
@@ -149,8 +156,7 @@ export function AuthModal({ isOpen, onClose, message }: AuthModalProps) {
           </div>
         )}
       </AnimatePresence>
-    </LazyMotion>
+    </LazyMotion>,
+    portalRoot!,
   );
-
-  return createPortal(modalContent, document.body);
 }

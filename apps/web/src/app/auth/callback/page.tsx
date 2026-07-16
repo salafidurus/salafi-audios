@@ -1,7 +1,7 @@
 "use client";
 
-import { Suspense, useEffect, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { routes } from "@sd/core-contracts";
 import { authClient } from "@/core/auth";
 
@@ -14,34 +14,35 @@ function safeNext(value: string | null): string {
 }
 
 function AuthCallbackInner() {
-  const router = useRouter();
   const params = useSearchParams();
-  const handled = useRef(false);
+  const [isProcessing, setIsProcessing] = useState(true);
 
   useEffect(() => {
-    if (handled.current) {
-      return;
-    }
-    handled.current = true;
+    const processAuth = async () => {
+      const ott = params.get("ott");
+      const next = safeNext(params.get("redirect"));
 
-    const ott = params.get("ott");
-    const next = safeNext(params.get("redirect"));
+      if (!ott) {
+        window.location.href = routes.signIn;
+        return;
+      }
 
-    if (!ott) {
-      router.replace(routes.signIn);
-      return;
-    }
+      try {
+        // Exchanging the one-time token returns the session and a `set-auth-token`
+        // header; the auth client's onSuccess hook stores the bearer token.
+        const res = await authClient.oneTimeToken.verify({ token: ott });
+        const destination = res.error ? routes.signIn : next;
+        window.location.href = destination;
+      } catch {
+        window.location.href = routes.signIn;
+      }
+    };
 
-    // Exchanging the one-time token returns the session and a `set-auth-token`
-    // header; the auth client's onSuccess hook stores the bearer token.
-    authClient.oneTimeToken
-      .verify({ token: ott })
-      .then((res: { error?: unknown }) => {
-        router.replace(res.error ? routes.signIn : next);
-      })
-      .catch(() => router.replace(routes.signIn));
-  }, [params, router]);
+    processAuth();
+  }, [params]);
 
+  // Show nothing while processing - redirect will happen via window.location
+  if (isProcessing) return null;
   return null;
 }
 

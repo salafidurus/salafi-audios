@@ -3,7 +3,7 @@ import { FlatList, Pressable, TextInput, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { useRouter } from "expo-router";
 import type { Href } from "expo-router";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { pickContentField } from "@sd/core-i18n";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
@@ -24,6 +24,47 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
   const [filter, setFilter] = useState("");
+
+  // Define hooks unconditionally before any early returns
+  const renderRecommendedItem = useCallback(
+    ({ item }: { item: ScholarContentItemDto }) => {
+      const title = pickContentField(item.title, item.original?.title, showOriginal);
+      return (
+        <Pressable
+          style={styles.card}
+          onPress={() => router.push(contentRoute(item) as Href)}
+        >
+          <AppText variant="caption" style={styles.typeLabel}>
+            {item.type}
+          </AppText>
+          <AppText variant="labelMd" numberOfLines={2}>
+            {title}
+          </AppText>
+        </Pressable>
+      );
+    },
+    [showOriginal, router],
+  );
+
+  const renderBrowseItem = useCallback(
+    ({ item }: { item: ScholarContentItemDto }) => {
+      const title = pickContentField(item.title, item.original?.title, showOriginal);
+      return (
+        <Pressable
+          style={styles.row}
+          onPress={() => router.push(contentRoute(item) as Href)}
+        >
+          <AppText variant="caption" style={styles.typeLabel}>
+            {item.type}
+          </AppText>
+          <AppText variant="labelMd" style={{ flex: 1 }}>
+            {title}
+          </AppText>
+        </Pressable>
+      );
+    },
+    [showOriginal, router],
+  );
 
   const featured = items[0];
   if (!featured) {
@@ -76,22 +117,7 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
           data={recommended}
           keyExtractor={(item) => item.id}
           style={styles.recommendedList}
-          renderItem={({ item }) => {
-            const title = pickContentField(item.title, item.original?.title, showOriginal);
-            return (
-              <Pressable
-                style={styles.card}
-                onPress={() => router.push(contentRoute(item) as Href)}
-              >
-                <AppText variant="caption" style={styles.typeLabel}>
-                  {item.type}
-                </AppText>
-                <AppText variant="labelMd" numberOfLines={2}>
-                  {title}
-                </AppText>
-              </Pressable>
-            );
-          }}
+          renderItem={renderRecommendedItem}
         />
       )}
 
@@ -108,22 +134,7 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
             scrollEnabled={false}
             data={filteredBrowse}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => {
-              const title = pickContentField(item.title, item.original?.title, showOriginal);
-              return (
-                <Pressable
-                  style={styles.row}
-                  onPress={() => router.push(contentRoute(item) as Href)}
-                >
-                  <AppText variant="caption" style={styles.typeLabel}>
-                    {item.type}
-                  </AppText>
-                  <AppText variant="labelMd" style={{ flex: 1 }}>
-                    {title}
-                  </AppText>
-                </Pressable>
-              );
-            }}
+            renderItem={renderBrowseItem}
           />
         </View>
       )}

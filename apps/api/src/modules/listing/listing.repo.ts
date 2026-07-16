@@ -303,10 +303,11 @@ export class ListingRepository {
       },
     });
 
+    const topicIdSet = new Set(topicIds);
     const rankedRelated = related
       .map((item) => {
         const sharedTopicCount = item.topics.reduce(
-          (count, topic) => count + (topicIds.includes(topic.topicId) ? 1 : 0),
+          (count, topic) => count + (topicIdSet.has(topic.topicId) ? 1 : 0),
           0,
         );
         const relevanceScore =

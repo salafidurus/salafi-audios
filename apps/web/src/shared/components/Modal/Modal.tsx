@@ -1,12 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useRef, useEffectEvent, type ReactNode, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
 import { LazyMotion, m, domAnimation, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import styles from "./modal.module.css";
-import { ConfirmText } from "./ConfirmText";
-import { ConfirmDialog } from "./ConfirmDialog";
+
+function getModalPortalRoot(): HTMLElement | null {
+  if (typeof document === "undefined") return null;
+  return document.body;
+}
+
+function subscribeModalPortalRoot(): (() => void) {
+  return () => {};
+}
 
 const JUSTIFY_MAP = {
   left: "flex-start",
@@ -43,21 +50,23 @@ export function Modal({
   footerBorder: _footerBorder = false,
   loading,
 }: ModalProps) {
-  const mounted = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
+  const portalRoot = useSyncExternalStore(
+    subscribeModalPortalRoot,
+    getModalPortalRoot,
+    () => null,
   );
   const contentRef = useRef<HTMLDivElement>(null);
+
+  const handleCloseEvent = useEffectEvent(() => {
+    onClose();
+  });
 
   useEffect(() => {
     if (!isOpen) {
       return;
     }
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
+      if (e.key === "Escape") handleCloseEvent();
     };
     window.addEventListener("keydown", handleKeyDown);
 
@@ -68,7 +77,7 @@ export function Modal({
       window.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = originalOverflow;
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   useEffect(() => {
     if (isOpen && contentRef.current) {
@@ -76,14 +85,13 @@ export function Modal({
     }
   }, [isOpen]);
 
-  if (!mounted) {
-    return null;
-  }
   const justifyContent = JUSTIFY_MAP[footerAlignment as keyof typeof JUSTIFY_MAP] || "flex-end";
 
   const customWidth = width ? (typeof width === "number" ? `${width}px` : width) : undefined;
 
-  const modalContent = (
+  if (!portalRoot) return null;
+
+  return createPortal(
     <LazyMotion features={domAnimation}>
       <AnimatePresence>
         {isOpen && (
@@ -146,10 +154,9 @@ export function Modal({
           </div>
         )}
       </AnimatePresence>
-    </LazyMotion>
+    </LazyMotion>,
+    portalRoot!,
   );
-
-  return createPortal(modalContent, document.body);
 }
 
 // Compound components for advanced use cases
@@ -214,5 +221,3 @@ export function ModalFooter({ children, alignment = "right", border = true }: Mo
 Modal.Header = ModalHeader;
 Modal.Body = ModalBody;
 Modal.Footer = ModalFooter;
-Modal.ConfirmText = ConfirmText;
-Modal.ConfirmDialog = ConfirmDialog;

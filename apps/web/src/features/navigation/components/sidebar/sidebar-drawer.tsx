@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useEffectEvent } from "react";
 import { X } from "lucide-react";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { NavItems } from "./nav-items";
@@ -16,6 +16,10 @@ export function SidebarDrawer({ isOpen, onClose }: SidebarDrawerProps) {
   const drawerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
+  const handleCloseEvent = useEffectEvent(() => {
+    onClose();
+  });
+
   // Focus trap and keyboard handling
   useEffect(() => {
     if (!isOpen) {
@@ -28,7 +32,7 @@ export function SidebarDrawer({ isOpen, onClose }: SidebarDrawerProps) {
     // Trap focus within drawer
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        onClose();
+        handleCloseEvent();
       }
     };
 
@@ -41,7 +45,7 @@ export function SidebarDrawer({ isOpen, onClose }: SidebarDrawerProps) {
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = originalStyle;
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   // Close on backdrop click
   const handleBackdropClick = (e: React.MouseEvent) => {
@@ -58,11 +62,10 @@ export function SidebarDrawer({ isOpen, onClose }: SidebarDrawerProps) {
       )}
 
       {/* Drawer */}
-      <div
+      <nav
         ref={drawerRef}
         className={styles.drawer}
         data-open={isOpen}
-        role="navigation"
         aria-label={t("navigation.mobileNav", "Mobile navigation")}
       >
         <div className={styles.header}>
@@ -80,7 +83,7 @@ export function SidebarDrawer({ isOpen, onClose }: SidebarDrawerProps) {
         <div ref={contentRef} className={styles.content} tabIndex={-1}>
           <NavItems onItemClick={onClose} />
         </div>
-      </div>
+      </nav>
     </>
   );
 }

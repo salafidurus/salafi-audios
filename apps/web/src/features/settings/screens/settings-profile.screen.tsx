@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useAuth } from "@/core/auth";
 import { useAccountProfile, useUpdateProfile, useDeleteAccount } from "@sd/domain-account";
 import { authClient } from "@/core/auth/auth-client";
@@ -93,8 +94,13 @@ function ProfileContent() {
     <>
       <div className={styles.avatarRow}>
         {profile.avatarUrl ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img src={profile.avatarUrl} alt="" className={styles.avatarImage} />
+          <Image
+            src={profile.avatarUrl}
+            alt="User avatar"
+            width={72}
+            height={72}
+            className={styles.avatarImage}
+          />
         ) : (
           <div className={styles.avatarInitials} aria-hidden="true">
             {initials}

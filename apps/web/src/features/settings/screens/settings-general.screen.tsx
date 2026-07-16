@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings/i18n";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
@@ -66,14 +66,15 @@ export function SettingsGeneralScreen() {
 
   const handleNotifChange = useCallback(
     (key: keyof NotificationState) => (checked: boolean) => {
-      setNotif((prev) => {
-        const next = { ...prev, [key]: checked };
-        localStorage.setItem(NOTIF_KEY, JSON.stringify(next));
-        return next;
-      });
+      setNotif((prev) => ({ ...prev, [key]: checked }));
     },
     [],
   );
+
+  // Persist notification state to localStorage
+  useEffect(() => {
+    localStorage.setItem(NOTIF_KEY, JSON.stringify(notif));
+  }, [notif]);
 
   return (
     <ScreenView>
