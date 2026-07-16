@@ -39,7 +39,7 @@ describe('LibraryService', () => {
             saveLecture: vi.fn<any>(),
             unsaveLecture: vi.fn<any>(),
             bulkSave: vi.fn<any>(),
-          } satisfies Partial<Mocked<LibraryRepository>>,
+          } as Partial<Mocked<LibraryRepository>>,
         },
       ],
     }).compile();

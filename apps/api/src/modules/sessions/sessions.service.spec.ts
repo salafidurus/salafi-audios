@@ -32,14 +32,14 @@ describe('SessionsService', () => {
             createSession: vi.fn<any>(),
             updateStatus: vi.fn<any>(),
             findByChannelAndStatus: vi.fn<any>(),
-          } satisfies Partial<Mocked<SessionsRepository>>,
+          } as Partial<Mocked<SessionsRepository>>,
         },
         {
           provide: LiveService,
           useValue: {
             getSessionPublic: vi.fn<any>(),
             emitSessionUpdate: vi.fn<any>(),
-          } satisfies Partial<Mocked<LiveService>>,
+          } as Partial<Mocked<LiveService>>,
         },
       ],
     }).compile();

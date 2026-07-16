@@ -70,7 +70,7 @@ describe('LiveService', () => {
             findAdminSessions: vi.fn<any>(),
             deleteSession: vi.fn<any>(),
             deleteChannel: vi.fn<any>(),
-          } satisfies Partial<Mocked<LiveRepository>>,
+          } as Partial<Mocked<LiveRepository>>,
         },
       ],
     }).compile();

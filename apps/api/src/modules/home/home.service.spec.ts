@@ -45,7 +45,7 @@ describe('HomeService', () => {
             getScholars: vi.fn<any>(),
             getSuggestions: vi.fn<any>(),
             getRecentProgress: vi.fn<any>(),
-          } satisfies Partial<Mocked<HomeRepo>>,
+          } as Partial<Mocked<HomeRepo>>,
         },
       ],
     }).compile();

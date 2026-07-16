@@ -28,7 +28,7 @@ describe('TopicsService', () => {
             findBySlug: vi.fn<any>(),
             upsertBySlug: vi.fn<any>(),
             upsertTopicTranslation: vi.fn<any>(),
-          } satisfies Partial<Mocked<TopicsRepository>>,
+          } as Partial<Mocked<TopicsRepository>>,
         },
       ],
     }).compile();

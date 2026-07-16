@@ -57,7 +57,7 @@ describe('ScholarsService', () => {
             create: vi.fn<any>(),
             update: vi.fn<any>(),
             findById: vi.fn<any>(),
-          } satisfies Partial<Mocked<ScholarsRepository>>,
+          } as Partial<Mocked<ScholarsRepository>>,
         },
       ],
     }).compile();
