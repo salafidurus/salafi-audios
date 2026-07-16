@@ -87,5 +87,3 @@ export function LiveSessionRow({ session, onPress }: LiveSessionRowProps) {
 
   return <div className={`${styles.row} listRow`}>{content}</div>;
 }
-
-export { formatScheduledTime };

@@ -1,6 +1,7 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { LiveSessionRow, formatScheduledTime } from "./live-session-row";
+import { LiveSessionRow } from "./live-session-row";
+import { formatScheduledTime } from "../../utils/format-scheduled-time";
 import type { LiveSessionPublicDto, LiveSessionDto } from "@sd/core-contracts";
 
 const mockLiveSession: LiveSessionPublicDto = {
