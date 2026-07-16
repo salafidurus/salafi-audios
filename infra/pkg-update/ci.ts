@@ -419,6 +419,7 @@ if (__ciMain) {
   if (process.env.GITHUB_RUN_ID) options.gitHubRunId = process.env.GITHUB_RUN_ID;
   if (process.env.GITHUB_SHA) options.gitHubSha = process.env.GITHUB_SHA;
   if (process.env.PAT_TOKEN) options.patToken = process.env.PAT_TOKEN;
+  else if (process.env.GH_TOKEN) options.patToken = process.env.GH_TOKEN;
 
   const summaries = await runCi(rootDir, options);
 
