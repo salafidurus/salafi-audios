@@ -29,7 +29,7 @@ describe("AdminStatsCard", () => {
   });
 
   it("calls onClick when clicked as button", () => {
-    const handleClick = vi.fn<any>();
+    const handleClick = vi.fn();
     render(
       <AdminStatsCard icon={mockIcon} label="Total Scholars" value={42} onClick={handleClick} />,
     );

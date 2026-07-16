@@ -14,7 +14,7 @@ vi.mock("next/navigation", () => {
 });
 
 vi.mock("@/features/search/screens/search-home/search-home.screen", () => ({
-  SearchHomeScreen: vi.fn<() => JSX.Element>(() => <div data-testid="search-home" />),
+  SearchHomeScreen: vi.fn(() => <div data-testid="search-home" />),
 }));
 
 describe("HomePage", () => {

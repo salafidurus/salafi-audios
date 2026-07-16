@@ -5,7 +5,7 @@ import { SettingsProfileScreen } from "./settings-profile.screen";
 import { useAccountProfile } from "@sd/domain-account";
 import { authClient } from "@/core/auth/auth-client";
 
-const mockUseAuth = vi.fn<any>();
+const mockUseAuth = vi.fn();
 
 vi.mock("@/core/auth", () => ({
   useAuth: () => mockUseAuth(),
@@ -13,25 +13,25 @@ vi.mock("@/core/auth", () => ({
 
 vi.mock("@/core/auth/auth-client", () => ({
   authClient: {
-    signOut: vi.fn<any>().mockResolvedValue(undefined),
+    signOut: vi.fn().mockResolvedValue(undefined),
   },
 }));
 
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn<any>() }),
+  useRouter: () => ({ push: vi.fn() }),
 }));
 
-const mockDeleteAccountMutate = vi.fn<any>();
+const mockDeleteAccountMutate = vi.fn();
 
 vi.mock("@sd/domain-account", () => ({
-  useAccountProfile: vi.fn<any>(),
-  useUpdateProfile: vi.fn<any>(() => ({
-    mutate: vi.fn<any>(),
+  useAccountProfile: vi.fn(),
+  useUpdateProfile: vi.fn(() => ({
+    mutate: vi.fn(),
     isPending: false,
     isSuccess: false,
     isError: false,
   })),
-  useDeleteAccount: vi.fn<any>(() => ({
+  useDeleteAccount: vi.fn(() => ({
     mutate: mockDeleteAccountMutate,
     isPending: false,
   })),
@@ -157,7 +157,7 @@ describe("SettingsProfileScreen", () => {
   });
 
   it("calls signOut when sign-out is confirmed in modal", () => {
-    const mockSignOut = vi.fn<any>().mockResolvedValue(undefined);
+    const mockSignOut = vi.fn().mockResolvedValue(undefined);
     vi.mocked(authClient.signOut).mockImplementation(mockSignOut);
 
     mockUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false });
@@ -172,7 +172,7 @@ describe("SettingsProfileScreen", () => {
   });
 
   it("closes modal without signing out when cancel is clicked", () => {
-    const mockSignOut = vi.fn<any>().mockResolvedValue(undefined);
+    const mockSignOut = vi.fn().mockResolvedValue(undefined);
     vi.mocked(authClient.signOut).mockImplementation(mockSignOut);
 
     mockUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false });

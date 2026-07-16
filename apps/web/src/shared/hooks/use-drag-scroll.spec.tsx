@@ -22,7 +22,7 @@ function TestComponent({
 
 describe("useDragScroll", () => {
   it("allows standard clicks when no drag movement happens", () => {
-    const handleClick = vi.fn<any>();
+    const handleClick = vi.fn();
     render(<TestComponent direction="vertical" onClick={handleClick} />);
     const target = screen.getByTestId("click-target");
 
@@ -34,7 +34,7 @@ describe("useDragScroll", () => {
   });
 
   it("prevents click events when drag movement exceeds threshold", () => {
-    const handleClick = vi.fn<any>();
+    const handleClick = vi.fn();
     render(<TestComponent direction="vertical" onClick={handleClick} />);
     const container = screen.getByTestId("scroll-container");
     const target = screen.getByTestId("click-target");

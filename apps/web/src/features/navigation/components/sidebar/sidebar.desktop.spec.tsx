@@ -8,27 +8,27 @@ import { usePathname, useRouter } from "next/navigation";
 import { routes } from "@sd/core-contracts";
 
 vi.mock("@/shared/hooks/use-responsive", () => ({
-  useResponsive: vi.fn<any>().mockReturnValue({ isMobile: false, isTablet: false, isWeb: true }),
+  useResponsive: vi.fn().mockReturnValue({ isMobile: false, isTablet: false, isWeb: true }),
 }));
 
 vi.mock("@/shared/hooks/use-is-hydrated", () => ({
-  useIsHydrated: vi.fn<any>().mockReturnValue(true),
+  useIsHydrated: vi.fn().mockReturnValue(true),
 }));
 
 vi.mock("@/core/auth", () => ({
-  useAuth: vi.fn<any>(),
+  useAuth: vi.fn(),
   authClient: {
-    signOut: vi.fn<() => Promise<void>>(() => Promise.resolve()),
+    signOut: vi.fn(() => Promise.resolve()),
   },
 }));
 
 vi.mock("@/features/admin/hooks/use-admin-permissions", () => ({
-  useAdminPermissions: vi.fn<any>(),
+  useAdminPermissions: vi.fn(),
 }));
 
 vi.mock("next/navigation", () => ({
-  usePathname: vi.fn<any>(),
-  useRouter: vi.fn<any>(),
+  usePathname: vi.fn(),
+  useRouter: vi.fn(),
 }));
 
 vi.mock("@/core/i18n/use-translation", () => ({
@@ -38,7 +38,7 @@ vi.mock("@/core/i18n/use-translation", () => ({
 }));
 
 describe("Sidebar component", () => {
-  const mockPush = vi.fn<any>();
+  const mockPush = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();

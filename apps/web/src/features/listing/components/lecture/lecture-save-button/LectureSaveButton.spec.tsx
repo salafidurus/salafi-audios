@@ -4,7 +4,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { useProgressStore } from "@sd/domain-audio";
 import { LectureSaveButton } from "./LectureSaveButton";
 
-const mockUseAuth = vi.fn<() => { isAuthenticated: boolean }>(() => ({ isAuthenticated: true }));
+const mockUseAuth = vi.fn(() => ({ isAuthenticated: true }));
 
 vi.mock("@/core/auth/use-auth", () => ({
   useAuth: () => mockUseAuth(),

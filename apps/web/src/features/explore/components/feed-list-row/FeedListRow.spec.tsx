@@ -11,15 +11,15 @@ vi.mock("@sd/domain-audio", async (importOriginal) => {
   const original = await importOriginal<typeof import("@sd/domain-audio")>();
   return {
     ...original,
-    useAudio: vi.fn<any>(),
+    useAudio: vi.fn(),
   };
 });
 
 vi.mock("@/features/audio", () => ({
   audioService: {
-    playListing: vi.fn<any>(),
-    pause: vi.fn<any>(),
-    resume: vi.fn<any>(),
+    playListing: vi.fn(),
+    pause: vi.fn(),
+    resume: vi.fn(),
   },
 }));
 
@@ -123,7 +123,7 @@ describe("FeedListRow", () => {
   });
 
   it("triggers onPress prop when row is clicked", () => {
-    const onPressMock = vi.fn<any>();
+    const onPressMock = vi.fn();
     const { container } = render(<FeedListRow item={baseItem} onPress={onPressMock} />);
     const row = container.querySelector(`.${styles.row}`);
     expect(row).toBeInTheDocument();

@@ -4,13 +4,13 @@ import { ScholarDetailScreen } from "./scholar-detail.screen";
 import { useScholarDetail } from "@sd/domain-content";
 
 vi.mock("@/shared/hooks/use-responsive", () => ({
-  useIsDesktop: vi.fn<any>().mockReturnValue(true),
+  useIsDesktop: vi.fn().mockReturnValue(true),
 }));
 
 vi.mock("@sd/domain-content", () => ({
-  useScholarDetail: vi.fn<any>(),
-  useScholarContent: vi.fn<any>(),
-  useScholarTopics: vi.fn<any>(),
+  useScholarDetail: vi.fn(),
+  useScholarContent: vi.fn(),
+  useScholarTopics: vi.fn(),
 }));
 
 vi.mock("@/shared/components/ScreenView/ScreenView", () => ({

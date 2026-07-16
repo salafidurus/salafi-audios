@@ -6,13 +6,13 @@ import { useApiQuery } from "@sd/core-contracts";
 import { usePathname } from "next/navigation";
 
 vi.mock("@/features/admin/hooks/use-admin-permissions", () => ({
-  useAdminPermissions: vi.fn<any>(),
+  useAdminPermissions: vi.fn(),
 }));
 vi.mock("@sd/core-contracts", async (importActual) => {
   const actual = await importActual<typeof import("@sd/core-contracts")>();
-  return { ...actual, useApiQuery: vi.fn<any>() };
+  return { ...actual, useApiQuery: vi.fn() };
 });
-vi.mock("next/navigation", () => ({ usePathname: vi.fn<any>() }));
+vi.mock("next/navigation", () => ({ usePathname: vi.fn() }));
 vi.mock("@/shared/hooks/use-responsive", () => ({
   useResponsive: () => ({ isMobile: false }),
 }));
@@ -20,7 +20,7 @@ vi.mock("@/shared/hooks/use-responsive", () => ({
 describe("AdminContentsScreen — topics tab permission gates", () => {
   beforeEach(() => {
     (usePathname as Mock).mockReturnValue("/admin/contents");
-    (useApiQuery as Mock).mockReturnValue({ data: [], refetch: vi.fn<any>() });
+    (useApiQuery as Mock).mockReturnValue({ data: [], refetch: vi.fn() });
   });
 
   it("hides Add Topic button when user lacks TOPICS_CREATE", () => {

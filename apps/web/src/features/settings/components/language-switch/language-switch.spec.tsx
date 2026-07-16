@@ -3,9 +3,9 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { LanguageSwitch } from "./language-switch";
 import { setLocaleCookie } from "@/core/i18n/locale-cookie";
 
-const mockChangeLanguage = vi.fn<any>().mockResolvedValue(undefined);
-const mockRefresh = vi.fn<any>();
-const mockInvalidate = vi.fn<any>().mockResolvedValue(undefined);
+const mockChangeLanguage = vi.fn().mockResolvedValue(undefined);
+const mockRefresh = vi.fn();
+const mockInvalidate = vi.fn().mockResolvedValue(undefined);
 
 vi.mock("@sd/core-i18n", () => ({
   SUPPORTED_LOCALES: ["en", "ar"],
@@ -27,7 +27,7 @@ vi.mock("@tanstack/react-query", () => ({
 }));
 
 vi.mock("../../../../core/i18n/locale-cookie", () => ({
-  setLocaleCookie: vi.fn<any>(),
+  setLocaleCookie: vi.fn(),
 }));
 
 describe("LanguageSwitch", () => {
