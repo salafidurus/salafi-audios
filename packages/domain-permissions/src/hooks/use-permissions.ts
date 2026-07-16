@@ -52,7 +52,8 @@ export function useHasAnyPermission(
 
   return useMemo(() => {
     if (!permissions || permissions.length === 0 || !data?.permissions) return false;
-    return permissions.some((perm) => data.permissions.includes(perm));
+    const userPerms = new Set(data.permissions);
+    return permissions.some((perm) => userPerms.has(perm));
   }, [permissions, data?.permissions]);
 }
 
@@ -69,7 +70,8 @@ export function useHasAllPermissions(
   return useMemo(() => {
     if (!permissions || permissions.length === 0) return true;
     if (!data?.permissions) return false;
-    return permissions.every((perm) => data.permissions.includes(perm));
+    const userPerms = new Set(data.permissions);
+    return permissions.every((perm) => userPerms.has(perm));
   }, [permissions, data?.permissions]);
 }
 
@@ -97,7 +99,8 @@ export function useHasAnyRole(roles: readonly UserRole[] | null | undefined): bo
 
   return useMemo(() => {
     if (!roles || roles.length === 0 || !data?.roles) return false;
-    return roles.some((r) => data.roles.includes(r));
+    const userRoles = new Set(data.roles);
+    return roles.some((r) => userRoles.has(r));
   }, [roles, data?.roles]);
 }
 
@@ -112,7 +115,8 @@ export function useHasAllRoles(roles: readonly UserRole[] | null | undefined): b
   return useMemo(() => {
     if (!roles || roles.length === 0) return true;
     if (!data?.roles) return false;
-    return roles.every((r) => data.roles.includes(r));
+    const userRoles = new Set(data.roles);
+    return roles.every((r) => userRoles.has(r));
   }, [roles, data?.roles]);
 }
 
