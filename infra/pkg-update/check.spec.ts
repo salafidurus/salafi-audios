@@ -14,6 +14,8 @@ mock.module("./utils/npm", () => ({
       expo: "57.0.6",
       "@nestjs/core": "11.2.0",
       prisma: "7.4.1",
+      typescript: "5.6.3",
+      "@babel/runtime": "7.25.0",
     };
     return Promise.resolve(versions[name] ?? null);
   }),
@@ -131,6 +133,26 @@ describe("checkCatalog", () => {
     const result = await checkCatalog(dir, testConfig);
     expect(result).toHaveLength(0);
   });
+
+  it("assigns each never package its own group", async () => {
+    const cfg: PkupdateConfig = {
+      groups: {},
+      skip: [],
+      never: ["typescript", "@babel/runtime"],
+      versionLocked: [],
+      bun: { enabled: false },
+      expo: { enabled: false },
+    };
+    const dir = createTempPkg({
+      workspaces: { catalog: { typescript: "5.0.0", "@babel/runtime": "7.24.0" } },
+    });
+    const result = await checkCatalog(dir, cfg);
+    expect(result).toHaveLength(2);
+    const ts = result.find((c) => c.packageName === "typescript")!;
+    expect(ts.group).toBe("typescript");
+    const babel = result.find((c) => c.packageName === "@babel/runtime")!;
+    expect(babel.group).toBe("@babel/runtime");
+  });
 });
 
 describe("checkBun", () => {
@@ -200,6 +222,7 @@ describe("checkExpo", () => {
     const result = await checkExpo(dir);
     expect(result).not.toBeNull();
     expect(result!.type).toBe("expo");
+    expect(result!.group).toBe("expo");
   });
 });
 

@@ -57,6 +57,13 @@ function matchesSkip(name: string, skip: string[], cfg: PkupdateConfig): boolean
   });
 }
 
+function matchesNever(name: string, never: string[]): boolean {
+  return never.some((n) => {
+    if (n.endsWith("*")) return name.startsWith(n.slice(0, -1));
+    return name === n;
+  });
+}
+
 export async function checkCatalog(
   rootDir: string,
   cfg: PkupdateConfig,
@@ -79,12 +86,13 @@ export async function checkCatalog(
     if (latest === raw) continue;
 
     const group = filterByGroups(pkg, cfg.groups);
+    const isNever = matchesNever(pkg, cfg.never);
     results.push({
       type: "catalog",
       packageName: pkg,
       currentVersion: version,
       latestVersion: latest,
-      group: group ?? undefined,
+      group: isNever ? pkg : (group ?? undefined),
     });
   }
   return results;
@@ -130,6 +138,7 @@ export async function checkExpo(rootDir: string): Promise<UpdateCandidate | null
     packageName: "expo",
     currentVersion: current,
     latestVersion: latest,
+    group: "expo",
   };
 }
 

@@ -35,7 +35,7 @@ function matchesPattern(name: string, pattern: string): boolean {
 }
 
 function shouldSkipPackage(name: string, cfg: PkupdateConfig): boolean {
-  for (const s of [...cfg.skip, ...cfg.never]) {
+  for (const s of cfg.skip) {
     if (matchesPattern(name, s)) return true;
   }
   const expoGroup = cfg.groups["expo"];
@@ -76,11 +76,10 @@ export function syncWorkspaceDeps(
       const deps = content[section] as Record<string, string> | undefined;
       if (!deps) continue;
 
-      if (
-        deps[candidate.packageName] !== undefined &&
-        !shouldSkipPackage(candidate.packageName, cfg)
-      ) {
-        deps[candidate.packageName] = candidate.latestVersion;
+      const currentDep = deps[candidate.packageName];
+      if (currentDep !== undefined && !shouldSkipPackage(candidate.packageName, cfg)) {
+        const prefix = currentDep.match(/^([\^~])\s*/)?.[1] ?? "";
+        deps[candidate.packageName] = `${prefix}${candidate.latestVersion}`;
         dirty = true;
       }
 
@@ -88,7 +87,9 @@ export function syncWorkspaceDeps(
         for (const depName of Object.keys(deps)) {
           const matchesGroup = groupPatterns.some((p) => matchesPattern(depName, p));
           if (matchesGroup && !shouldSkipPackage(depName, cfg)) {
-            deps[depName] = candidate.latestVersion;
+            const depVer = deps[depName]!;
+            const depPrefix = depVer.match(/^([\^~])\s*/)?.[1] ?? "";
+            deps[depName] = `${depPrefix}${candidate.latestVersion}`;
             dirty = true;
           }
         }
@@ -114,7 +115,9 @@ export function updateCatalogEntry(
   if (!catalog?.[packageName]) {
     throw new Error(`Package "${packageName}" not found in catalog`);
   }
-  catalog[packageName] = newVersion;
+  const prefix = catalog[packageName].match(/^([\^~])\s*/)?.[1] ?? "";
+  const raw = newVersion.replace(/^[\^~]+\s*/, "");
+  catalog[packageName] = `${prefix}${raw}`;
   return rootPkg;
 }
 

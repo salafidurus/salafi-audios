@@ -5,6 +5,7 @@ import {
   highestBump,
   branchName,
   worktreeDir,
+  sanitizeBranchName,
   buildPrBody,
   runCi,
   type CiOptions,
@@ -78,6 +79,22 @@ describe("groupCandidates", () => {
     expect(turboIdx).toBeLessThan(ungroupedIdx);
     expect(vitestIdx).toBeLessThan(ungroupedIdx);
   });
+
+  it("includes dynamic groups (e.g. never packages) after known groups", () => {
+    const a = makeCandidate({ group: "ungrouped" });
+    const b = makeCandidate({ group: "typescript" });
+    const c = makeCandidate({ group: "vitest" });
+
+    const batches = groupCandidates([a, b, c]);
+    const names = batches.map((b) => b.groupName);
+
+    expect(names).toContain("typescript");
+    const tsIdx = names.indexOf("typescript");
+    const ungroupedIdx = names.indexOf("ungrouped");
+    const vitestIdx = names.indexOf("vitest");
+    expect(vitestIdx).toBeLessThan(tsIdx);
+    expect(ungroupedIdx).toBeLessThan(tsIdx);
+  });
 });
 
 describe("highestBump", () => {
@@ -107,11 +124,31 @@ describe("highestBump", () => {
   });
 });
 
+describe("sanitizeBranchName", () => {
+  it("replaces @ and / with - and strips leading dash", () => {
+    expect(sanitizeBranchName("@babel/runtime")).toBe("babel-runtime");
+    expect(sanitizeBranchName("@nestjs/core")).toBe("nestjs-core");
+  });
+
+  it("replaces / with -", () => {
+    expect(sanitizeBranchName("a/b/c")).toBe("a-b-c");
+  });
+
+  it("leaves plain names unchanged", () => {
+    expect(sanitizeBranchName("typescript")).toBe("typescript");
+    expect(sanitizeBranchName("vitest")).toBe("vitest");
+  });
+});
+
 describe("branchName", () => {
   it("formats branch name with deps/ prefix", () => {
     expect(branchName("vitest")).toBe("deps/vitest");
     expect(branchName("bun")).toBe("deps/bun");
     expect(branchName("ungrouped")).toBe("deps/ungrouped");
+  });
+
+  it("sanitizes special characters in group name", () => {
+    expect(branchName("@babel/runtime")).toBe("deps/babel-runtime");
   });
 });
 
@@ -120,6 +157,11 @@ describe("worktreeDir", () => {
     const result = worktreeDir("/repo", "vitest");
     expect(result).toContain(".worktrees");
     expect(result).toContain("deps-vitest");
+  });
+
+  it("sanitizes special characters in group name", () => {
+    const result = worktreeDir("/repo", "@babel/runtime");
+    expect(result).toContain("deps-babel-runtime");
   });
 });
 
