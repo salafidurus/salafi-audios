@@ -4,11 +4,12 @@ import {
   httpClient,
   endpoints,
   type AdminPermission,
+  type UserRole,
 } from "@sd/core-contracts";
 import type { UseQueryOptions, QueryKey } from "@tanstack/react-query";
 import { useAuth } from "@/core/auth";
 
-type MyPermissionsDto = { permissions: AdminPermission[] };
+type MyPermissionsDto = { permissions: AdminPermission[]; roles: UserRole[] };
 
 export function useAdminPermissions(
   options?: Omit<
