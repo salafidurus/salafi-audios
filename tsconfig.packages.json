@@ -7,6 +7,6 @@
     // Many React Native / Expo packages only ship CJS — enables default imports from them
     "esModuleInterop": true,
     // Include test globals, Node types, and Bun types
-    "types": ["bun-types", "vitest/globals", "node"]
+    "types": ["bun-types", "node"]
   }
 }

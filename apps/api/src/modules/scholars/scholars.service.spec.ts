@@ -1,4 +1,5 @@
-import { vi, type Mocked } from 'vitest';
+import type { Mocked } from '../../test/setup';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'bun:test';
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import type {
@@ -155,8 +156,8 @@ describe('ScholarsService', () => {
         isFeatured: dto.isFeatured ?? false,
         createdAt: new Date(),
         updatedAt: new Date(),
-        country: null,
-        mainLanguage: null,
+        country: dto.country,
+        mainLanguage: dto.mainLanguage,
         socialTwitter: null,
         socialTelegram: null,
         socialYoutube: null,
@@ -185,8 +186,8 @@ describe('ScholarsService', () => {
         name: 'Old Name',
         bio: null,
         createdAt: new Date(),
-        country: null,
-        mainLanguage: null,
+        country: 'SA',
+        mainLanguage: 'ar',
         imageUrl: null,
         isActive: true,
         isKibar: false,
@@ -208,7 +209,7 @@ describe('ScholarsService', () => {
 
       const result = await service.update('s1', dto);
 
-      expect(result).toEqual(updated);
+      expect(result).toEqual(updated as any);
       expect(repo.findById).toHaveBeenCalledWith('s1');
       expect(repo.update).toHaveBeenCalledWith('s1', dto);
     });

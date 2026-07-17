@@ -1,4 +1,4 @@
-import { vi, describe, it, expect, beforeEach, type Mocked } from "vitest";
+import { vi, describe, it, expect, beforeEach } from "bun:test";
 import { DurusAudioService } from "./audio.service";
 import type { PlaybackEngine, PlaybackEngineEvents } from "../engine/playback.engine";
 import { usePlaybackStore } from "../store/playback.store";
@@ -30,7 +30,7 @@ import { httpClient } from "@sd/core-contracts";
 
 describe("DurusAudioService", () => {
   let service: DurusAudioService;
-  let mockEngine: Mocked<PlaybackEngine>;
+  let mockEngine: PlaybackEngine;
   let engineEvents: PlaybackEngineEvents;
 
   const mockTrack: Track = {
@@ -44,7 +44,7 @@ describe("DurusAudioService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     usePlaybackStore.getState().actions.stop();
-    vi.mocked(httpClient).mockResolvedValue({ url: "https://resolved.stream.mp3" });
+    (httpClient as any).mockResolvedValue({ url: "https://resolved.stream.mp3" });
 
     mockEngine = {
       setup: vi.fn<() => Promise<void>>().mockResolvedValue(undefined),
@@ -58,7 +58,7 @@ describe("DurusAudioService", () => {
       setEvents: vi.fn<(events: PlaybackEngineEvents) => void>().mockImplementation((ev) => {
         engineEvents = ev;
       }),
-    } as unknown as Mocked<PlaybackEngine>;
+    } as unknown as PlaybackEngine;
 
     service = new DurusAudioService(mockEngine);
   });
@@ -141,7 +141,7 @@ describe("DurusAudioService", () => {
 
   it("should lazily resolve stream URL when track.url is empty", async () => {
     const stubTrack: Track = { ...mockTrack, url: "" };
-    vi.mocked(httpClient).mockResolvedValue({ url: "https://fresh-signed.mp3" });
+    (httpClient as any).mockResolvedValue({ url: "https://fresh-signed.mp3" });
 
     await service.playListing(stubTrack);
 

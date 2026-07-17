@@ -1,13 +1,22 @@
 import { createE2eApp } from './helpers/create-e2e-app';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
-import { TEST_SCHOLAR_SLUG, TEST_LISTING_ID, TEST_LISTING_SLUG } from './helpers/seed-test-data';
+import {
+  TEST_SCHOLAR_SLUG,
+  TEST_LISTING_ID,
+  TEST_LISTING_SLUG,
+  seedTestData,
+} from './helpers/seed-test-data';
+import { PrismaService } from '../src/shared/db/prisma.service';
 
 describe('Public API (e2e)', () => {
   let app: NestFastifyApplication;
+  let prisma: PrismaService;
 
   beforeAll(async () => {
     ({ app } = await createE2eApp());
+    prisma = app.get(PrismaService);
+    await seedTestData(prisma);
   });
 
   afterAll(async () => {

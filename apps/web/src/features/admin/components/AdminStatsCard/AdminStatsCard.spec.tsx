@@ -1,5 +1,5 @@
+import { describe, it, expect, vi } from "bun:test";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
 import { AdminStatsCard } from "./AdminStatsCard";
 
 describe("AdminStatsCard", () => {
@@ -54,13 +54,11 @@ describe("AdminStatsCard", () => {
   });
 
   it("renders as static card without onClick or href", () => {
-    const { container } = render(
-      <AdminStatsCard icon={mockIcon} label="Total Scholars" value={42} />,
-    );
+    render(<AdminStatsCard icon={mockIcon} label="Total Scholars" value={42} />);
 
-    const card = container.querySelector('[class*="card"]');
+    const card = screen.getByTestId("admin-stats-card");
     expect(card).toBeInTheDocument();
-    expect(card?.classList.contains("clickable")).toBe(false);
+    expect(card).not.toHaveClass("clickable");
   });
 
   it("displays string values", () => {

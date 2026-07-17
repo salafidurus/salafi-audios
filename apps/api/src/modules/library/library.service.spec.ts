@@ -1,4 +1,5 @@
-import { vi, type Mocked } from 'vitest';
+import type { Mocked } from '../../test/setup';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'bun:test';
 import { Test, TestingModule } from '@nestjs/testing';
 import type { LibraryPageDto } from '@sd/core-contracts';
 import { LibraryRepository } from './library.repo';

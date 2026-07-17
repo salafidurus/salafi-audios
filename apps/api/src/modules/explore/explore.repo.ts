@@ -112,7 +112,9 @@ export class ExploreRepo {
     // Build feed with mixed content and horizontal rows
     const items: FeedItemDto[] = [];
     const scholarRow = await this.getScholarRowItems(locale);
-    const topicRow = topicSlugs?.length ? await this.getTopicRowItems(topicSlugs[0]!, locale) : null;
+    const topicRow = topicSlugs?.length
+      ? await this.getTopicRowItems(topicSlugs[0]!, locale)
+      : null;
     let scholarRowInjected = false;
     let topicRowInjected = false;
 

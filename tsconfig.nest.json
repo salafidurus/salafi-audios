@@ -1,11 +1,10 @@
 {
-  // NestJS/Node backend services: CommonJS runtime with Bun-compatible bundler resolution.
-  // Updated for Bun compatibility while maintaining NestJS decorator requirements.
+  // NestJS/Node backend services: ESM module syntax preserved for Bun execution.
+  // Bun runs directly from .ts source instead of using NestJS CLI build.
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    // NestJS CLI expects CommonJS output; Node10 resolution is the classic
-    // Node.js resolution strategy compatible with CommonJS modules
-    "module": "CommonJS",
+    // Bun runs directly from .ts source; preserve ESM syntax instead of CommonJS
+    "module": "Preserve",
     "moduleResolution": "Node10",
     // Required for NestJS decorator-based dependency injection and metadata reflection
     "experimentalDecorators": true,
@@ -13,6 +12,8 @@
     // esModuleInterop inherited from base, but explicit here for CommonJS interop
     "esModuleInterop": true,
     // emitDecoratorMetadata synthesises require() for type imports — incompatible with verbatimModuleSyntax
-    "verbatimModuleSyntax": false
+    "verbatimModuleSyntax": false,
+    // Bun can import .ts extensions directly
+    "allowImportingTsExtensions": true
   }
 }

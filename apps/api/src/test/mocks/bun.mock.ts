@@ -1,14 +1,14 @@
-import { vi, type Mock } from 'vitest';
+import { vi } from 'bun:test';
 
-export const mockList: Mock = vi.fn<() => void>();
-export const mockPresign: Mock = vi.fn<() => void>();
-export const mockFile: Mock = vi
-  .fn<(_key: string) => { presign: Mock }>()
+export const mockList = vi.fn<() => void>();
+export const mockPresign = vi.fn<() => void>();
+export const mockFile = vi
+  .fn<(_key: string) => { presign: any }>()
   .mockImplementation((_key: string) => ({
     presign: mockPresign,
   }));
 
 export class S3Client {
-  list: Mock = mockList;
-  file: Mock = mockFile;
+  list = mockList;
+  file = mockFile;
 }

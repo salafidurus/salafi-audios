@@ -1,4 +1,4 @@
-import { vi, type Mock } from "vitest";
+import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import type { TranslationTarget, TranslationViewDto } from "@sd/core-contracts";
 import {
@@ -50,10 +50,10 @@ const makeTranslation = (overrides: Partial<TranslationViewDto> = {}): Translati
 describe("TranslationEditor", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (useContentTranslations as Mock).mockReturnValue({ data: undefined });
-    (useSaveTranslation as Mock).mockReturnValue(makeMutation());
-    (usePublishTranslation as Mock).mockReturnValue(makeMutation());
-    (useUnpublishTranslation as Mock).mockReturnValue(makeMutation());
+    (useContentTranslations as Mock<any>).mockReturnValue({ data: undefined });
+    (useSaveTranslation as Mock<any>).mockReturnValue(makeMutation());
+    (usePublishTranslation as Mock<any>).mockReturnValue(makeMutation());
+    (useUnpublishTranslation as Mock<any>).mockReturnValue(makeMutation());
   });
 
   it("shows original values as placeholder when no translation exists", () => {
@@ -70,7 +70,7 @@ describe("TranslationEditor", () => {
 
   it("calls saveTranslation.mutate when Save draft is clicked", () => {
     const mutateFn = vi.fn();
-    (useSaveTranslation as Mock).mockReturnValue(makeMutation(mutateFn));
+    (useSaveTranslation as Mock<any>).mockReturnValue(makeMutation(mutateFn));
     render(
       <TranslationEditor
         target={mockTarget}
@@ -84,8 +84,8 @@ describe("TranslationEditor", () => {
 
   it("calls publishTranslation.mutate when Publish is clicked", () => {
     const mutateFn = vi.fn();
-    (usePublishTranslation as Mock).mockReturnValue(makeMutation(mutateFn));
-    (useContentTranslations as Mock).mockReturnValue({
+    (usePublishTranslation as Mock<any>).mockReturnValue(makeMutation(mutateFn));
+    (useContentTranslations as Mock<any>).mockReturnValue({
       data: { translations: [makeTranslation({ status: "draft" })] },
     });
     render(
@@ -102,8 +102,8 @@ describe("TranslationEditor", () => {
 
   it("calls unpublishTranslation.mutate when Unpublish is clicked", async () => {
     const mutateFn = vi.fn();
-    (useUnpublishTranslation as Mock).mockReturnValue(makeMutation(mutateFn));
-    (useContentTranslations as Mock).mockReturnValue({
+    (useUnpublishTranslation as Mock<any>).mockReturnValue(makeMutation(mutateFn));
+    (useContentTranslations as Mock<any>).mockReturnValue({
       data: { translations: [makeTranslation({ status: "published" })] },
     });
     render(
@@ -125,7 +125,7 @@ describe("TranslationEditor", () => {
   });
 
   it("shows 'draft' status badge when translation status is draft", () => {
-    (useContentTranslations as Mock).mockReturnValue({
+    (useContentTranslations as Mock<any>).mockReturnValue({
       data: { translations: [makeTranslation({ status: "draft" })] },
     });
     render(
@@ -140,7 +140,7 @@ describe("TranslationEditor", () => {
   });
 
   it("shows 'published' status badge when translation status is published", () => {
-    (useContentTranslations as Mock).mockReturnValue({
+    (useContentTranslations as Mock<any>).mockReturnValue({
       data: { translations: [makeTranslation({ status: "published" })] },
     });
     render(

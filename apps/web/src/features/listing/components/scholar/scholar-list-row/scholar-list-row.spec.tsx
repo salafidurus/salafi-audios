@@ -1,4 +1,4 @@
-import { vi } from "vitest";
+import { describe, it, expect, vi } from "bun:test";
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import type { ScholarListItemDto } from "@sd/core-contracts";
@@ -34,7 +34,9 @@ describe("ScholarListRow", () => {
 
   it("renders avatar image when imageUrl is present", () => {
     const { container } = render(
-      <ScholarListRow scholar={{ ...mockScholar, imageUrl: "/images/binbaz.jpg" }} />,
+      <ScholarListRow
+        scholar={{ ...mockScholar, imageUrl: "https://example.com/images/binbaz.jpg" }}
+      />,
     );
     const img = container.querySelector("img");
     expect(img).toBeInTheDocument();

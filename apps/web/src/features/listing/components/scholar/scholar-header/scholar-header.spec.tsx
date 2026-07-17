@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect } from "bun:test";
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { ScholarHeader, type ScholarHeaderProps } from "./scholar-header";
@@ -31,7 +31,9 @@ describe("ScholarHeader", () => {
 
   it("renders avatar image when imageUrl is present", () => {
     const { container } = render(
-      <ScholarHeader scholar={{ ...mockScholar, imageUrl: "/images/binbaz.jpg" }} />,
+      <ScholarHeader
+        scholar={{ ...mockScholar, imageUrl: "https://example.com/images/binbaz.jpg" }}
+      />,
     );
     const img = container.querySelector("img");
     expect(img).toBeInTheDocument();
@@ -47,7 +49,9 @@ describe("ScholarHeader", () => {
 
   it("does not truncate bio if it is 160 characters or less", () => {
     render(<ScholarHeader scholar={mockScholar} />);
-    expect(screen.getByText("This is a short bio.")).toBeInTheDocument();
+    expect(
+      screen.getByText((content) => content.includes("This is a short bio.")),
+    ).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /show/i })).toBeNull();
   });
 
@@ -57,18 +61,18 @@ describe("ScholarHeader", () => {
 
     // Should show truncated bio with "..."
     const expectedTruncated = "A".repeat(160) + "...";
-    expect(screen.getByText(expectedTruncated)).toBeInTheDocument();
+    expect(screen.getByText((content) => content.includes(expectedTruncated))).toBeInTheDocument();
 
     const toggleBtn = screen.getByRole("button", { name: "Show more" });
     expect(toggleBtn).toBeInTheDocument();
 
     // Click to expand
     fireEvent.click(toggleBtn);
-    expect(screen.getByText(longBio)).toBeInTheDocument();
+    expect(screen.getByText((content) => content.includes(longBio))).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Show less" })).toBeInTheDocument();
 
     // Click to collapse
     fireEvent.click(screen.getByRole("button", { name: "Show less" }));
-    expect(screen.getByText(expectedTruncated)).toBeInTheDocument();
+    expect(screen.getByText((content) => content.includes(expectedTruncated))).toBeInTheDocument();
   });
 });

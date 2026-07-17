@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'bun:test';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SitemapController } from './sitemap.controller';
 import { SitemapService } from './sitemap.service';

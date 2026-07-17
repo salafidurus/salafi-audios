@@ -1,4 +1,4 @@
-import { vi, type Mock } from "vitest";
+import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { render, screen } from "@testing-library/react";
 import { AdminScholarsScreen } from "./admin-scholars.screen";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
@@ -7,8 +7,9 @@ import { useApiQuery } from "@sd/core-contracts";
 vi.mock("@/features/admin/hooks/use-admin-permissions", () => ({
   useAdminPermissions: vi.fn(),
 }));
-vi.mock("@sd/core-contracts", async (importActual) => {
-  const actual = await importActual<typeof import("@sd/core-contracts")>();
+vi.mock("@sd/core-contracts", () => {
+  // Import the real module to preserve all exports
+  const actual = require("@sd/core-contracts");
   return { ...actual, useApiQuery: vi.fn() };
 });
 vi.mock("@/shared/hooks/use-responsive", () => ({
@@ -18,7 +19,7 @@ vi.mock("@/shared/hooks/use-responsive", () => ({
 
 describe("AdminScholarsScreen", () => {
   beforeEach(() => {
-    (useApiQuery as Mock).mockReturnValue({
+    (useApiQuery as Mock<any>).mockReturnValue({
       data: { scholars: [] },
       isFetching: false,
       refetch: vi.fn(),
@@ -26,7 +27,7 @@ describe("AdminScholarsScreen", () => {
   });
 
   it("hides Add Scholar button when user lacks SCHOLARS_CREATE", () => {
-    (useAdminPermissions as Mock).mockReturnValue({
+    (useAdminPermissions as Mock<any>).mockReturnValue({
       data: { permissions: ["SCHOLARS_VIEW"] },
     });
 
@@ -37,7 +38,7 @@ describe("AdminScholarsScreen", () => {
   });
 
   it("shows Add Scholar button when user has SCHOLARS_CREATE", () => {
-    (useAdminPermissions as Mock).mockReturnValue({
+    (useAdminPermissions as Mock<any>).mockReturnValue({
       data: { permissions: ["SCHOLARS_CREATE"] },
     });
 

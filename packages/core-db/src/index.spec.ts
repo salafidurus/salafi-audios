@@ -8,7 +8,7 @@
  *  1. The `UserRole` enum is exported from @sd/core-db with the correct values.
  *  2. The User model's `banned` field defaults to `false` (non-nullable).
  */
-import { describe, it, expect } from "vitest";
+import { describe, it, expect } from "bun:test";
 
 // -- 1. UserRole enum --------------------------------------------------------
 

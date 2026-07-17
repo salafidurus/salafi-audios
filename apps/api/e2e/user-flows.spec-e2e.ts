@@ -3,7 +3,7 @@ import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { PrismaService } from '../src/shared/db/prisma.service';
 import { TestAuthFactory } from './helpers/test-auth.factory';
-import { TEST_LISTING_ID } from './helpers/seed-test-data';
+import { TEST_LISTING_ID, seedTestData } from './helpers/seed-test-data';
 
 describe('Core User Flows (e2e)', () => {
   let app: NestFastifyApplication;
@@ -14,6 +14,7 @@ describe('Core User Flows (e2e)', () => {
     ({ app } = await createE2eApp({ disableThrottler: true }));
     prisma = app.get(PrismaService);
     authFactory = new TestAuthFactory(prisma);
+    await seedTestData(prisma);
   });
 
   afterAll(async () => {

@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'bun:test';
 import { Test, TestingModule } from '@nestjs/testing';
 import { SitemapService } from './sitemap.service';
 import { SitemapRepo } from './sitemap.repo';
@@ -73,8 +73,8 @@ describe('SitemapService', () => {
 
   it('delegates to repo for active scholars and published top-level listings', async () => {
     await service.generate(baseUrl);
-    expect(repo.findActiveScholars).toHaveBeenCalledOnce();
-    expect(repo.findPublishedTopLevelListings).toHaveBeenCalledOnce();
+    expect(repo.findActiveScholars).toHaveBeenCalledTimes(1);
+    expect(repo.findPublishedTopLevelListings).toHaveBeenCalledTimes(1);
   });
 
   it('returns sitemap with homepage entry when there are no scholars or listings', async () => {

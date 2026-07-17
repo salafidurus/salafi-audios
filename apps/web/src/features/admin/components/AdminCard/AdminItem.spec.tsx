@@ -1,5 +1,5 @@
+import { describe, it, expect, vi } from "bun:test";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
 import { AdminItem, type AdminItemProps } from "./AdminItem";
 
 const mockActions = <div data-testid="actions">Actions</div>;
@@ -64,7 +64,12 @@ describe("AdminItem", () => {
   });
 
   it("renders thumbnail image when provided", () => {
-    render(<AdminItem {...defaultProps} thumbnail={{ src: "/test.jpg", alt: "Test image" }} />);
+    render(
+      <AdminItem
+        {...defaultProps}
+        thumbnail={{ src: "https://example.com/test.jpg", alt: "Test image" }}
+      />,
+    );
     const img = screen.getByAltText("Test image");
     expect(img).toBeInTheDocument();
     // Next.js Image component modifies src attribute, so just check alt attribute

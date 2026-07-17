@@ -142,8 +142,16 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
       </div>
 
       {isInProgress && (
-        <div className={styles.progressBarContainer} aria-hidden="true">
-          <div className={styles.progressBar} style={{ width: `${progressPercent}%` }} />
+        <div
+          className={styles.progressBarContainer}
+          aria-hidden="true"
+          data-testid="progress-bar-container"
+        >
+          <div
+            className={styles.progressBar}
+            style={{ width: `${progressPercent}%` }}
+            data-testid="progress-bar"
+          />
         </div>
       )}
     </List.Item>

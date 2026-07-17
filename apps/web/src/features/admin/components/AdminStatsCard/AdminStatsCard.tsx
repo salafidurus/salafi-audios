@@ -34,7 +34,10 @@ export function AdminStatsCard({
 }: AdminStatsCardProps) {
   const isClickable = onClick || href;
   const content = (
-    <div className={`${styles.card} ${isClickable ? styles.clickable : ""} ${className || ""}`}>
+    <div
+      className={`${styles.card} ${isClickable ? styles.clickable : ""} ${className || ""}`}
+      data-testid="admin-stats-card"
+    >
       <div className={styles.header}>
         <div className={styles.iconWrapper}>{icon}</div>
         <p className={styles.label}>{label}</p>

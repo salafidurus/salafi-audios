@@ -17,7 +17,7 @@ function getPortalRoot(): HTMLElement | null {
   return document.body;
 }
 
-function subscribePortalRoot(): (() => void) {
+function subscribePortalRoot(): () => void {
   return () => {};
 }
 
@@ -43,11 +43,7 @@ const handleSignIn = (provider: "google" | "apple") => {
 
 export function AuthModal({ isOpen, onClose, message }: AuthModalProps) {
   const { t } = useTranslation();
-  const portalRoot = useSyncExternalStore(
-    subscribePortalRoot,
-    getPortalRoot,
-    () => null,
-  );
+  const portalRoot = useSyncExternalStore(subscribePortalRoot, getPortalRoot, () => null);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const handleCloseKeydown = useCallback(
@@ -56,7 +52,7 @@ export function AuthModal({ isOpen, onClose, message }: AuthModalProps) {
         onClose();
       }
     },
-    [onClose]
+    [onClose],
   );
 
   useEffect(() => {

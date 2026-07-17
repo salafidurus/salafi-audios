@@ -18,10 +18,10 @@
     "build": "tsc -p tsconfig.build.json",
     "dev": "bun run build --watch",
     "lint": "oxlint .",
-    "test": "vitest run",
-    "test:prepush": "vitest run --changed=origin/main",
-    "test:watch": "vitest",
-    "test:cov": "vitest run --coverage",
+    "test": "bun test",
+    "test:prepush": "bun test",
+    "test:watch": "bun test --watch",
+    "test:cov": "bun test --coverage",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {

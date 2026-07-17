@@ -1,5 +1,5 @@
+import { describe, it, expect, vi } from "bun:test";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
 import { SearchBar } from "./Search.Bar";
 
 describe("SearchBar", () => {

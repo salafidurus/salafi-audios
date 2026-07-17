@@ -1,4 +1,4 @@
-import { vi, type Mock } from "vitest";
+import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { AudioUploader } from "./AudioUploader";
 import { getPresignedUrl, uploadToR2 } from "../../api/admin-lectures.api";
@@ -12,8 +12,8 @@ describe("AudioUploader", () => {
   let mockAudio: {
     src: string;
     duration: number;
-    addEventListener: Mock;
-    removeEventListener: Mock;
+    addEventListener: Mock<any>;
+    removeEventListener: Mock<any>;
   };
 
   beforeEach(() => {
@@ -59,8 +59,8 @@ describe("AudioUploader", () => {
         });
     });
 
-    (getPresignedUrl as Mock).mockReturnValue(presignedPromise);
-    (uploadToR2 as Mock).mockResolvedValue(undefined);
+    (getPresignedUrl as Mock<any>).mockReturnValue(presignedPromise);
+    (uploadToR2 as Mock<any>).mockResolvedValue(undefined);
 
     render(<AudioUploader onUploadComplete={onUploadCompleteMock} />);
 

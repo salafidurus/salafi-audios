@@ -25,10 +25,10 @@
     "build": "tsup src/index.ts --format esm,cjs --dts --tsconfig tsconfig.build.json --out-dir dist && node -e \"require('fs').cpSync('src/locales', 'dist/locales', {recursive:true})\"",
     "dev": "bun run build --watch",
     "lint": "oxlint .",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:cov": "vitest run --coverage",
-    "test:prepush": "vitest run --changed=origin/main",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "test:cov": "bun test --coverage",
+    "test:prepush": "bun test",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

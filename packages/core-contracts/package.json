@@ -49,11 +49,11 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "lint": "oxlint .",
-    "test": "vitest run",
-    "test:prepush": "vitest run --changed=origin/main",
+    "test": "bun test",
+    "test:prepush": "bun test",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test:watch": "vitest",
-    "test:cov": "vitest run --coverage"
+    "test:watch": "bun test --watch",
+    "test:cov": "bun test --coverage"
   },
   "dependencies": {
     "@tanstack/react-query": "catalog:",

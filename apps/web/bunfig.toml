@@ -1,0 +1,6 @@
+[test]
+preload = ["./src/test-setup.ts"]
+timeout = 5000
+bail = false
+include = ["src/**/*.spec.ts*", "src/**/*.spec.tsx"]
+root = "."

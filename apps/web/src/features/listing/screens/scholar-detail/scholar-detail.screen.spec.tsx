@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "bun:test";
 import { render, screen } from "@testing-library/react";
 import { ScholarDetailScreen } from "./scholar-detail.screen";
 import { useScholarDetail } from "@sd/domain-content";
@@ -29,7 +29,7 @@ vi.mock("@/features/listing/components/scholar/scholar-content-list/scholar-cont
   ScholarContentList: ({ slug }: { slug: string }) => <div>Content:{slug}</div>,
 }));
 
-const mockDetail = vi.mocked(useScholarDetail);
+const mockDetail = useScholarDetail as any;
 
 const mockScholar = {
   id: "s1",

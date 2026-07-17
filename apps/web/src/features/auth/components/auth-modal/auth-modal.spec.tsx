@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, vi } from "bun:test";
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { AuthModal } from "./auth-modal";

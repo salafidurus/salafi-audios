@@ -1,4 +1,4 @@
-import { vi, type Mock } from "vitest";
+import { vi, describe, it, expect, beforeEach, type Mock } from "bun:test";
 import { NextResponse, type NextRequest } from "next/server";
 import { proxy } from "./proxy";
 
@@ -9,8 +9,8 @@ vi.mock("next/server", () => ({
   },
 }));
 
-const mockRedirect = NextResponse.redirect as Mock;
-const mockNext = NextResponse.next as Mock;
+const mockRedirect = NextResponse.redirect as Mock<any>;
+const mockNext = NextResponse.next as Mock<any>;
 
 function makeRequest(pathname: string, cookieValue?: string): NextRequest {
   return {

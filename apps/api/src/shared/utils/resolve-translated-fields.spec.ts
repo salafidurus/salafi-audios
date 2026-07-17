@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'bun:test';
 import { resolveTranslatedFields } from './resolve-translated-fields';
 
 describe('resolveTranslatedFields', () => {

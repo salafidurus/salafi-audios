@@ -1,4 +1,4 @@
-import { vi, type Mock } from "vitest";
+import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -40,7 +40,7 @@ describe("SearchProcessingScreen", () => {
   };
 
   it("navigates to series detail on series item click (desktop)", () => {
-    (useSearchProcessing as Mock).mockReturnValue({
+    (useSearchProcessing as Mock<any>).mockReturnValue({
       query: "jurisprudence",
       setQuery: vi.fn(),
       filter: [],
@@ -71,7 +71,7 @@ describe("SearchProcessingScreen", () => {
 
   it("navigates to series detail on series item click (mobile)", () => {
     mockUseIsDesktop.mockReturnValue(false);
-    (useSearchProcessing as Mock).mockReturnValue({
+    (useSearchProcessing as Mock<any>).mockReturnValue({
       query: "jurisprudence",
       setQuery: vi.fn(),
       filter: [],

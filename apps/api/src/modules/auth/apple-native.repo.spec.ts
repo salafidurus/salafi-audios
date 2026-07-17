@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'bun:test';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../../shared/db/prisma.service';
 import { AppleNativeRepository } from './apple-native.repo';
@@ -27,12 +27,27 @@ describe('AppleNativeRepository', () => {
 
   describe('findAccountByProviderId', () => {
     it('calls prisma.account.findFirst with correct args', async () => {
-      prisma.account.findFirst.mockResolvedValue({ userId: 'u1' });
+      const mockAccount = {
+        id: 'a1',
+        userId: 'u1',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        accountId: 'abc123',
+        providerId: 'apple',
+        accessToken: null,
+        refreshToken: null,
+        idToken: null,
+        accessTokenExpiresAt: null,
+        refreshTokenExpiresAt: null,
+        scope: null,
+        password: null,
+      };
+      prisma.account.findFirst.mockResolvedValue(mockAccount);
       const result = await repo.findAccountByProviderId('apple', 'abc123');
       expect(prisma.account.findFirst).toHaveBeenCalledWith({
         where: { providerId: 'apple', accountId: 'abc123' },
       });
-      expect(result).toEqual({ userId: 'u1' });
+      expect(result).toEqual(mockAccount as any);
     });
   });
 

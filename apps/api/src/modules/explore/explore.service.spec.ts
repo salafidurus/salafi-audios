@@ -1,4 +1,5 @@
-import { vi, type Mocked } from 'vitest';
+import type { Mocked } from '../../test/setup';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'bun:test';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Test, TestingModule } from '@nestjs/testing';
 import type { FeedPageDto } from '@sd/core-contracts';

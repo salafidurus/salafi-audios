@@ -1,5 +1,5 @@
+import { describe, it, expect, beforeEach, vi } from "bun:test";
 import React from "react";
-import { vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { useProgressStore } from "@sd/domain-audio";
 import { LectureSaveButton } from "./LectureSaveButton";

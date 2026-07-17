@@ -1,4 +1,4 @@
-import { vi, type Mock } from "vitest";
+import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import React from "react";
 import { render } from "@testing-library/react";
 import HomePage from "./page";
@@ -25,12 +25,12 @@ describe("HomePage", () => {
   it("passes navigation callbacks to SearchHomeScreen", () => {
     render(<HomePage />);
 
-    const mockSearchHomeScreen = SearchHomeScreen as unknown as Mock;
+    const mockSearchHomeScreen = SearchHomeScreen as unknown as Mock<any>;
     expect(mockSearchHomeScreen).toHaveBeenCalled();
 
     const calls = mockSearchHomeScreen.mock.calls;
     expect(calls.length).toBeGreaterThan(0);
-    const props = calls[0]?.[0];
+    const props = calls[0]?.[0] as any;
     if (!props) {
       throw new Error("No props passed to SearchHomeScreen");
     }

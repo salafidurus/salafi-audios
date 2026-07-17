@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "bun:test";
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { LibraryScreen } from "./library.screen";
@@ -49,9 +49,9 @@ vi.mock("@/shared/components/AuthRequiredState/AuthRequiredState", () => ({
   ),
 }));
 
-const mockProgress = vi.mocked(useLibraryProgressScreen);
-const mockSaved = vi.mocked(useLibrarySavedScreen);
-const mockCompleted = vi.mocked(useLibraryCompletedScreen);
+const mockProgress = useLibraryProgressScreen as any;
+const mockSaved = useLibrarySavedScreen as any;
+const mockCompleted = useLibraryCompletedScreen as any;
 
 const mockItem = {
   id: "lib-1",
