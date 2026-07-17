@@ -1,4 +1,5 @@
-import { vi, describe, it, expect, beforeEach, afterEach, afterAll } from 'bun:test';
+import type { Mocked } from '../../test/setup';
+import { vi, describe, it, expect, beforeEach, afterEach } from 'bun:test';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PermissionsService } from './permissions.service';
 import { PermissionsRepository } from './permissions.repository';

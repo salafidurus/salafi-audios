@@ -7,6 +7,7 @@
     // See: https://better-auth.com/docs/concepts/typescript
     "incremental": true,
     "lib": ["ESNext", "dom"],
+    "types": ["bun-types", "node", "@testing-library/jest-dom"],
     "paths": {
       "@/*": ["./src/*"]
     }

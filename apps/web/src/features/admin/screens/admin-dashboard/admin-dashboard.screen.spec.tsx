@@ -1,4 +1,4 @@
-import { vi, type Mock } from "bun:test";
+import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { render, screen } from "@testing-library/react";
 import { AdminDashboardScreen } from "./admin-dashboard.screen";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
@@ -13,7 +13,7 @@ describe("AdminDashboardScreen", () => {
   });
 
   it("renders loading state when fetching permissions", () => {
-    (useAdminPermissions as Mock).mockReturnValue({
+    (useAdminPermissions as Mock<any>).mockReturnValue({
       data: undefined,
       isFetching: true,
     });
@@ -23,7 +23,7 @@ describe("AdminDashboardScreen", () => {
   });
 
   it("shows cards when user has only view-level permissions", () => {
-    (useAdminPermissions as Mock).mockReturnValue({
+    (useAdminPermissions as Mock<any>).mockReturnValue({
       data: {
         permissions: ["SCHOLARS_VIEW", "LISTINGS_VIEW", "USERS_VIEW"],
       },
@@ -38,7 +38,7 @@ describe("AdminDashboardScreen", () => {
   });
 
   it("renders sections based on user permissions", () => {
-    (useAdminPermissions as Mock).mockReturnValue({
+    (useAdminPermissions as Mock<any>).mockReturnValue({
       data: {
         permissions: ["SCHOLARS_VIEW", "LISTINGS_VIEW", "USERS_VIEW"],
       },

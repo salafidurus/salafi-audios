@@ -1,4 +1,4 @@
-import { vi, type Mock } from "bun:test";
+import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import type { ListingDetailDto } from "@sd/core-contracts";
@@ -20,7 +20,7 @@ vi.mock("@/features/audio", () => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
-  (useAudio as Mock).mockReturnValue({ isPlaying: false, currentTrack: null });
+  (useAudio as Mock<any>).mockReturnValue({ isPlaying: false, currentTrack: null });
 });
 
 const baseLecture: ListingDetailDto = {

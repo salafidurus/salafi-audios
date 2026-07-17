@@ -1,4 +1,4 @@
-import { vi, type Mock } from "bun:test";
+import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ListingModal } from "./ListingModal";
 import { createLecture, updateLecture } from "../../api/admin-lectures.api";
@@ -8,11 +8,12 @@ vi.mock("../../api/admin-lectures.api", () => ({
   updateLecture: vi.fn(),
 }));
 
-vi.mock("@sd/core-contracts", async (importOriginal) => {
-  const actual = await importOriginal<any>();
+vi.mock("@sd/core-contracts", () => {
+  // Import the real module to preserve all exports
+  const actual = require("@sd/core-contracts");
   return {
     ...actual,
-    useApiQuery: vi.fn((key) => {
+    useApiQuery: vi.fn((key: any) => {
       if (key[0] === "scholars") {
         return {
           data: {
@@ -41,19 +42,6 @@ vi.mock("@sd/core-contracts", async (importOriginal) => {
       }
       return { data: undefined, isFetching: false };
     }),
-    queryKeys: {
-      scholars: {
-        list: () => ["scholars", "list"],
-      },
-      topics: {
-        list: () => ["topics", "list"],
-      },
-      admin: {
-        series: {
-          list: () => ["series", "all-list"],
-        },
-      },
-    },
   };
 });
 
@@ -70,7 +58,7 @@ describe("ListingModal", () => {
   it("renders with create form fields and triggers save", async () => {
     const onSuccessMock = vi.fn();
     const onCloseMock = vi.fn();
-    (createLecture as Mock).mockResolvedValue({ id: "new-lecture-id" });
+    (createLecture as Mock<any>).mockResolvedValue({ id: "new-lecture-id" });
 
     render(
       <ListingModal
@@ -121,7 +109,7 @@ describe("ListingModal", () => {
   it("renders with edit form fields prefilled and updates details", async () => {
     const onSuccessMock = vi.fn();
     const onCloseMock = vi.fn();
-    (updateLecture as Mock).mockResolvedValue({ id: "edit-lecture-id" });
+    (updateLecture as Mock<any>).mockResolvedValue({ id: "edit-lecture-id" });
 
     const existingLecture = {
       id: "lecture-123",

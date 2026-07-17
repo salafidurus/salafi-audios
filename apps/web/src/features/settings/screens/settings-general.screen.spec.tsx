@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "bun:test";
+import { describe, it, expect, beforeEach, vi } from "bun:test";
 import React from "react";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { SettingsGeneralScreen } from "./settings-general.screen";

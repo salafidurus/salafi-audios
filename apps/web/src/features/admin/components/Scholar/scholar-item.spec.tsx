@@ -1,4 +1,4 @@
-import { vi, type Mock } from "bun:test";
+import { describe, it, expect, vi, type Mock } from "bun:test";
 import { render, screen } from "@testing-library/react";
 import { Scholar } from ".";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
@@ -28,7 +28,7 @@ const baseScholar = {
 
 describe("ScholarItem", () => {
   it("hides edit button when user lacks SCHOLARS_EDIT", () => {
-    (useAdminPermissions as Mock).mockReturnValue({
+    (useAdminPermissions as Mock<any>).mockReturnValue({
       data: { permissions: ["SCHOLARS_VIEW"] },
     });
 
@@ -38,7 +38,7 @@ describe("ScholarItem", () => {
   });
 
   it("shows edit button when user has SCHOLARS_EDIT", () => {
-    (useAdminPermissions as Mock).mockReturnValue({
+    (useAdminPermissions as Mock<any>).mockReturnValue({
       data: { permissions: ["SCHOLARS_EDIT"] },
     });
 

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "bun:test";
+import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { SettingsProfileScreen } from "./settings-profile.screen";
@@ -66,7 +66,7 @@ vi.mock("@/shared/components/SettingsRow/SettingsRow", () => ({
   ),
 }));
 
-const mockProfile = vi.mocked(useAccountProfile);
+const mockProfile = useAccountProfile as Mock<any>;
 
 const PROFILE = {
   id: "u1",
@@ -158,7 +158,7 @@ describe("SettingsProfileScreen", () => {
 
   it("calls signOut when sign-out is confirmed in modal", () => {
     const mockSignOut = vi.fn().mockResolvedValue(undefined);
-    vi.mocked(authClient.signOut).mockImplementation(mockSignOut);
+    (authClient.signOut as Mock<any>).mockImplementation(mockSignOut);
 
     mockUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false });
     mockProfile.mockReturnValue({
@@ -173,7 +173,7 @@ describe("SettingsProfileScreen", () => {
 
   it("closes modal without signing out when cancel is clicked", () => {
     const mockSignOut = vi.fn().mockResolvedValue(undefined);
-    vi.mocked(authClient.signOut).mockImplementation(mockSignOut);
+    (authClient.signOut as Mock<any>).mockImplementation(mockSignOut);
 
     mockUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false });
     mockProfile.mockReturnValue({

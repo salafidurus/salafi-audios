@@ -1,25 +1,29 @@
-import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import "@testing-library/jest-dom";
-import { describe, it, expect, beforeEach, afterEach, afterAll, beforeAll } from "bun:test";
-import React from "react";
+import { afterEach } from "bun:test";
+import { createI18n } from "./core/i18n/i18n";
 
-// Register happy-dom globals
+// Register happy-dom globals - this MUST run before any test imports
+const { GlobalRegistrator } = require("@happy-dom/global-registrator");
 GlobalRegistrator.register();
 
-// Make test functions global so they don't need to be imported
-(globalThis as any).describe = describe;
-(globalThis as any).it = it;
-(globalThis as any).expect = expect;
-(globalThis as any).beforeEach = beforeEach;
-(globalThis as any).afterEach = afterEach;
-(globalThis as any).afterAll = afterAll;
-(globalThis as any).beforeAll = beforeAll;
+// Initialize i18n for tests
+const testI18n = createI18n("en");
+// Make it globally available for react-i18next
+global.i18n = testI18n;
+
+// Set up environment variables for tests
+process.env.NEXT_PUBLIC_API_URL = "http://localhost:3000";
+process.env.NEXT_PUBLIC_WEB_URL = "http://localhost:3001";
 
 // Clean up after each test to prevent DOM pollution
 afterEach(() => {
-  // Clear all children from body without destroying the document
-  while (document.body.firstChild) {
-    document.body.removeChild(document.body.firstChild);
+  try {
+    // Reset innerHTML as the most reliable way to clear everything
+    if (document.body) {
+      document.body.innerHTML = "";
+    }
+  } catch (e) {
+    // Ignore cleanup errors - they shouldn't block test progression
   }
 });
 
@@ -54,3 +58,50 @@ global.IntersectionObserver = class IntersectionObserver {
 
 // Mock scrollIntoView
 Element.prototype.scrollIntoView = () => {};
+
+// Mock window.location
+Object.defineProperty(window, "location", {
+  writable: true,
+  value: {
+    href: "http://localhost:3001/",
+    pathname: "/",
+    search: "",
+    hash: "",
+    origin: "http://localhost:3001",
+    protocol: "http:",
+    host: "localhost:3001",
+    hostname: "localhost",
+    port: "3001",
+    reload: () => {},
+    replace: () => {},
+    assign: () => {},
+  },
+});
+
+// Global mocks for common hooks that need to work in test environment
+const { vi } = require("bun:test");
+vi.mock("@/shared/hooks/use-is-hydrated", () => ({
+  useIsHydrated: () => true,
+}));
+
+vi.mock("@/shared/hooks/use-responsive", () => ({
+  useResponsive: () => ({ isMobile: false, isTablet: false, isWeb: true }),
+  useIsDesktop: () => true,
+}));
+
+// Mock CSS modules to return class names based on property names
+// This is a workaround for CSS modules not being processed by happy-dom in Bun tests
+const mockCSSModule = () => {
+  return new Proxy(
+    {},
+    {
+      get(target, prop) {
+        return String(prop);
+      },
+    },
+  );
+};
+
+// Use require.resolve and custom require handler if possible
+// For now, we'll rely on Bun's native CSS module handling with a fallback
+// If CSS modules still aren't working, individual tests can import the mock

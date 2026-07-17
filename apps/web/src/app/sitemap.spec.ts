@@ -9,17 +9,17 @@ describe("sitemap", () => {
   });
 
   it("returns empty array when NODE_ENV is not production", () => {
-    process.env.NODE_ENV = "development";
+    (process.env as any).NODE_ENV = "development";
     expect(sitemap()).toEqual([]);
   });
 
   it("returns empty array in test environment", () => {
-    process.env.NODE_ENV = "test";
+    (process.env as any).NODE_ENV = "test";
     expect(sitemap()).toEqual([]);
   });
 
   it("includes expected static pages in production", () => {
-    process.env.NODE_ENV = "production";
+    (process.env as any).NODE_ENV = "production";
     process.env.NEXT_PUBLIC_WEB_URL = "https://www.salafidurus.com";
     const result = sitemap();
     const urls = result.map((e) => e.url);
@@ -34,14 +34,14 @@ describe("sitemap", () => {
   });
 
   it("does not include auth-required routes like /explore/following", () => {
-    process.env.NODE_ENV = "production";
+    (process.env as any).NODE_ENV = "production";
     process.env.NEXT_PUBLIC_WEB_URL = "https://www.salafidurus.com";
     const urls = sitemap().map((e) => e.url);
     expect(urls).not.toContain("https://www.salafidurus.com/explore/following");
   });
 
   it("falls back to localhost when NEXT_PUBLIC_WEB_URL is not set", () => {
-    process.env.NODE_ENV = "production";
+    (process.env as any).NODE_ENV = "production";
     delete process.env.NEXT_PUBLIC_WEB_URL;
     const result = sitemap();
     expect(result.length).toBeGreaterThan(0);

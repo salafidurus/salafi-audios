@@ -1,4 +1,4 @@
-import { vi, describe, it, expect, beforeEach, afterEach, afterAll } from 'bun:test';
+import { vi, describe, it, expect, beforeEach } from 'bun:test';
 import { Test } from '@nestjs/testing';
 import { CDNHealthIndicator } from './cdn-health.indicator';
 import { ConfigService } from '../../shared/config/config.service';

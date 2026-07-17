@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "bun:test";
+import { describe, it, expect, beforeEach, vi } from "bun:test";
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { ScholarContentList } from "./scholar-content-list";
@@ -29,8 +29,8 @@ vi.mock("@/core/i18n/use-translation", () => ({
   }),
 }));
 
-const mockUseTopics = vi.mocked(useScholarTopics);
-const mockUseContent = vi.mocked(useScholarContent);
+const mockUseTopics = useScholarTopics as any;
+const mockUseContent = useScholarContent as any;
 
 const mockItems: ScholarContentItemDto[] = [
   {

@@ -70,8 +70,16 @@ export function LibraryListRow({ item, variant }: LibraryListRowProps) {
           {item.seriesTitle && ` · ${item.seriesTitle}`}
         </div>
         {variant === "progress" && progress !== null && (
-          <div className={styles.progressBarContainer} aria-hidden="true">
-            <div className={styles.progressBar} style={{ width: `${progress}%` }} />
+          <div
+            className={styles.progressBarContainer}
+            aria-hidden="true"
+            data-testid="progress-bar-container"
+          >
+            <div
+              className={styles.progressBar}
+              style={{ width: `${progress}%` }}
+              data-testid="progress-bar"
+            />
           </div>
         )}
       </div>

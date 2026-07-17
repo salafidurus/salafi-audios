@@ -1,4 +1,4 @@
-import { vi } from "bun:test";
+import { describe, it, expect, vi } from "bun:test";
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import type { LibraryItemDto } from "@sd/core-contracts";
@@ -63,10 +63,10 @@ describe("LibraryListRow", () => {
   });
 
   it("renders progress percentage and bar when variant is progress", () => {
-    const { container } = render(<LibraryListRow item={mockItem} variant="progress" />);
+    render(<LibraryListRow item={mockItem} variant="progress" />);
 
     expect(screen.getByText(/50% listened/)).toBeInTheDocument();
-    const progressBar = container.querySelector(`.${styles.progressBar}`);
+    const progressBar = screen.getByTestId("progress-bar");
     expect(progressBar).toBeInTheDocument();
     expect((progressBar as HTMLElement).style.width).toBe("50%");
   });

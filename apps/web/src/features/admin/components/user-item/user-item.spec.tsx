@@ -1,4 +1,4 @@
-import { vi, type Mock } from "bun:test";
+import { describe, it, expect, vi, type Mock } from "bun:test";
 import { render, screen } from "@testing-library/react";
 import { UserItem } from "./user-item";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
@@ -22,7 +22,7 @@ const baseUser = {
 
 describe("UserItem", () => {
   it("shows Manage Permissions button only when user has USERS_GRANT_PERMISSIONS", () => {
-    (useAdminPermissions as Mock).mockReturnValue({
+    (useAdminPermissions as Mock<any>).mockReturnValue({
       data: { permissions: ["USERS_GRANT_PERMISSIONS"] },
     });
 
@@ -33,7 +33,7 @@ describe("UserItem", () => {
   });
 
   it("shows Manage Roles button only when user has USERS_GRANT_ROLES", () => {
-    (useAdminPermissions as Mock).mockReturnValue({
+    (useAdminPermissions as Mock<any>).mockReturnValue({
       data: { permissions: ["USERS_GRANT_ROLES"] },
     });
 
@@ -44,7 +44,7 @@ describe("UserItem", () => {
   });
 
   it("hides both buttons when user has only USERS_VIEW", () => {
-    (useAdminPermissions as Mock).mockReturnValue({
+    (useAdminPermissions as Mock<any>).mockReturnValue({
       data: { permissions: ["USERS_VIEW"] },
     });
 

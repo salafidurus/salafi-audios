@@ -9,8 +9,8 @@ vi.mock("next/server", () => ({
   },
 }));
 
-const mockRedirect = NextResponse.redirect as Mock;
-const mockNext = NextResponse.next as Mock;
+const mockRedirect = NextResponse.redirect as Mock<any>;
+const mockNext = NextResponse.next as Mock<any>;
 
 function makeRequest(pathname: string, cookieValue?: string): NextRequest {
   return {

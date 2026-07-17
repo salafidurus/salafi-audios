@@ -9,14 +9,14 @@ describe("robots", () => {
   });
 
   it("disallows all in development", () => {
-    process.env.NODE_ENV = "development";
+    (process.env as any).NODE_ENV = "development";
     expect(robots()).toEqual({
       rules: { userAgent: "*", disallow: "/" },
     });
   });
 
   it("disallows all on Vercel preview deployments", () => {
-    process.env.NODE_ENV = "production";
+    (process.env as any).NODE_ENV = "production";
     process.env.VERCEL_ENV = "preview";
     expect(robots()).toEqual({
       rules: { userAgent: "*", disallow: "/" },
@@ -24,7 +24,7 @@ describe("robots", () => {
   });
 
   it("allows crawling with disallow paths in production", () => {
-    process.env.NODE_ENV = "production";
+    (process.env as any).NODE_ENV = "production";
     process.env.NEXT_PUBLIC_WEB_URL = "https://www.salafidurus.com";
     process.env.NEXT_PUBLIC_API_URL = "https://api.salafidurus.com";
     const result = robots();
@@ -42,7 +42,7 @@ describe("robots", () => {
   });
 
   it("uses fallback URLs when env vars are not set", () => {
-    process.env.NODE_ENV = "production";
+    (process.env as any).NODE_ENV = "production";
     delete process.env.NEXT_PUBLIC_WEB_URL;
     delete process.env.NEXT_PUBLIC_API_URL;
     const result = robots();

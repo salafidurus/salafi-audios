@@ -1,5 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "bun:test";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { SearchFilter, type FilterChip } from "./Search.Filter";
 
 const mockChips: FilterChip[] = [

@@ -1,4 +1,4 @@
-import { vi, type Mock } from "bun:test";
+import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import type { FeedContentItemDto } from "@sd/core-contracts";
@@ -7,10 +7,11 @@ import { useAudio, useProgressStore } from "@sd/domain-audio";
 import { audioService } from "@/features/audio";
 import styles from "./feed-list-row.module.css";
 
-vi.mock("@sd/domain-audio", async (importOriginal) => {
-  const original = await importOriginal<typeof import("@sd/domain-audio")>();
+vi.mock("@sd/domain-audio", () => {
+  // Import the real module to preserve all exports
+  const actual = require("@sd/domain-audio");
   return {
-    ...original,
+    ...actual,
     useAudio: vi.fn(),
   };
 });
@@ -44,7 +45,7 @@ const progressInitialState = useProgressStore.getState();
 describe("FeedListRow", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    (useAudio as Mock).mockReturnValue({ isPlaying: false, currentTrack: null });
+    (useAudio as Mock<any>).mockReturnValue({ isPlaying: false, currentTrack: null });
     useProgressStore.setState(progressInitialState, true);
   });
 
@@ -86,7 +87,7 @@ describe("FeedListRow", () => {
   });
 
   it("calls audioService.pause on active playing track play button click", () => {
-    (useAudio as Mock).mockReturnValue({
+    (useAudio as Mock<any>).mockReturnValue({
       isPlaying: true,
       currentTrack: { id: "lec-1" },
     });
@@ -97,7 +98,7 @@ describe("FeedListRow", () => {
   });
 
   it("calls audioService.resume on active paused track play button click", () => {
-    (useAudio as Mock).mockReturnValue({
+    (useAudio as Mock<any>).mockReturnValue({
       isPlaying: false,
       currentTrack: { id: "lec-1" },
     });
@@ -133,8 +134,8 @@ describe("FeedListRow", () => {
 
   it("renders progress bar at calculated width when progress is in range", () => {
     useProgressStore.getState().actions.setProgress("lec-1", 450, 1800); // 25%
-    const { container } = render(<FeedListRow item={baseItem} />);
-    const progressBar = container.querySelector(`.${styles.progressBar}`);
+    render(<FeedListRow item={baseItem} />);
+    const progressBar = screen.getByTestId("progress-bar");
     expect(progressBar).toBeInTheDocument();
     expect((progressBar as HTMLElement).style.width).toBe("25%");
   });
