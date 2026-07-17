@@ -31,7 +31,7 @@ jobs:
 
       - name: Restore deps state cache
         id: cache-restore
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: .cache/deps-state.json
           key: deps-state-${{ github.run_id }}
@@ -46,7 +46,7 @@ jobs:
           GITHUB_SHA: ${{ github.sha }}
 
       - name: Save deps state cache
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         if: always()
         with:
           path: .cache/deps-state.json
