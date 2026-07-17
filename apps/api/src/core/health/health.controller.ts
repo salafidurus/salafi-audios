@@ -26,7 +26,7 @@ export class HealthController {
   @HealthCheck()
   getHealth(): Promise<HealthCheckResult> {
     return this.health.check([
-      () => this.prismaHealth.pingCheck('database', { timeout: 300 }),
+      () => this.prismaHealth.pingCheck('database', { timeout: 1000 }),
       () => this.cdnHealth.pingCheck('cdn', { timeout: 5000 }),
     ]);
   }
@@ -44,6 +44,6 @@ export class HealthController {
   @ApiOkResponse({ description: 'Ok when core dependencies (database) are available' })
   @HealthCheck()
   getReadiness(): Promise<HealthCheckResult> {
-    return this.health.check([() => this.prismaHealth.pingCheck('database', { timeout: 300 })]);
+    return this.health.check([() => this.prismaHealth.pingCheck('database', { timeout: 1000 })]);
   }
 }
