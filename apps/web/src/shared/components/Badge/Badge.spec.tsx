@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { Shield } from "lucide-react";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect } from "bun:test";
 import { Badge } from "./Badge";
 import styles from "./Badge.module.css";
 

@@ -1,24 +1,26 @@
-import { describe, it, expect, vi, afterEach } from "vitest";
+import { describe, it, expect, afterEach } from "bun:test";
 import sitemap from "./sitemap";
 
 describe("sitemap", () => {
+  const originalEnv = { ...process.env };
+
   afterEach(() => {
-    vi.unstubAllEnvs();
+    process.env = { ...originalEnv };
   });
 
   it("returns empty array when NODE_ENV is not production", () => {
-    vi.stubEnv("NODE_ENV", "development");
+    process.env.NODE_ENV = "development";
     expect(sitemap()).toEqual([]);
   });
 
   it("returns empty array in test environment", () => {
-    vi.stubEnv("NODE_ENV", "test");
+    process.env.NODE_ENV = "test";
     expect(sitemap()).toEqual([]);
   });
 
   it("includes expected static pages in production", () => {
-    vi.stubEnv("NODE_ENV", "production");
-    vi.stubEnv("NEXT_PUBLIC_WEB_URL", "https://www.salafidurus.com");
+    process.env.NODE_ENV = "production";
+    process.env.NEXT_PUBLIC_WEB_URL = "https://www.salafidurus.com";
     const result = sitemap();
     const urls = result.map((e) => e.url);
     expect(urls).toContain("https://www.salafidurus.com");
@@ -32,14 +34,15 @@ describe("sitemap", () => {
   });
 
   it("does not include auth-required routes like /explore/following", () => {
-    vi.stubEnv("NODE_ENV", "production");
-    vi.stubEnv("NEXT_PUBLIC_WEB_URL", "https://www.salafidurus.com");
+    process.env.NODE_ENV = "production";
+    process.env.NEXT_PUBLIC_WEB_URL = "https://www.salafidurus.com";
     const urls = sitemap().map((e) => e.url);
     expect(urls).not.toContain("https://www.salafidurus.com/explore/following");
   });
 
   it("falls back to localhost when NEXT_PUBLIC_WEB_URL is not set", () => {
-    vi.stubEnv("NODE_ENV", "production");
+    process.env.NODE_ENV = "production";
+    delete process.env.NEXT_PUBLIC_WEB_URL;
     const result = sitemap();
     expect(result.length).toBeGreaterThan(0);
     expect(result[0]!.url).toMatch(/^http:\/\/localhost:\d+/);

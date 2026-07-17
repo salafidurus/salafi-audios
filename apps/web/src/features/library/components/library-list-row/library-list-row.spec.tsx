@@ -1,4 +1,4 @@
-import { vi } from "vitest";
+import { vi } from "bun:test";
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import type { LibraryItemDto } from "@sd/core-contracts";

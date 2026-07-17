@@ -1,4 +1,4 @@
-import { vi, type Mock } from "vitest";
+import { vi, type Mock } from "bun:test";
 import { render, screen } from "@testing-library/react";
 import { AdminDashboardScreen } from "./admin-dashboard.screen";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";

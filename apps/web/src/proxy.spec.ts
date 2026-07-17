@@ -1,4 +1,4 @@
-import { vi, type Mock } from "vitest";
+import { vi, describe, it, expect, beforeEach, type Mock } from "bun:test";
 import { NextResponse, type NextRequest } from "next/server";
 import { proxy } from "./proxy";
 

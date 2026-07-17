@@ -1,4 +1,4 @@
-import { vi, type Mock } from "vitest";
+import { vi, type Mock } from "bun:test";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import type { TranslationTarget, TranslationViewDto } from "@sd/core-contracts";
 import {

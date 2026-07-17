@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi } from "bun:test";
 import { AdminCard, type AdminCardProps } from "./AdminCard";
 
 const mockActions = <div data-testid="actions">Actions</div>;

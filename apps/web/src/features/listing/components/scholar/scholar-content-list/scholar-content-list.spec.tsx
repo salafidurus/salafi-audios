@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "bun:test";
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { ScholarContentList } from "./scholar-content-list";

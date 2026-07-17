@@ -1,4 +1,4 @@
-import { vi, type Mock } from "vitest";
+import { vi, type Mock } from "bun:test";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { AudioUploader } from "./AudioUploader";
 import { getPresignedUrl, uploadToR2 } from "../../api/admin-lectures.api";

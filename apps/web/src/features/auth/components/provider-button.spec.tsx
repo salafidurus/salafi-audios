@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { vi } from "vitest";
+import { vi } from "bun:test";
 import { GoogleButton, AppleButton } from "./provider-button";
 
 describe("GoogleButton", () => {

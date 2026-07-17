@@ -1,4 +1,4 @@
-import { vi, type Mock } from "vitest";
+import { vi, type Mock } from "bun:test";
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import type { FeedContentItemDto } from "@sd/core-contracts";
