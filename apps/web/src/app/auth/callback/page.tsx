@@ -19,26 +19,26 @@ function AuthCallbackContent() {
 
   // Timeout after 10 seconds to prevent infinite loading
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (isLoading) {
+    if (isLoading) {
+      const timeout = setTimeout(() => {
         setTimeoutError(true);
-      }
-    }, 10000);
+      }, 10000);
 
-    return () => clearTimeout(timeout);
+      return () => clearTimeout(timeout);
+    }
   }, [isLoading]);
 
   // Main authentication flow
   useEffect(() => {
-    if (isLoading) return;
-
-    if (session?.user) {
-      // Session is valid (cookie was set during OAuth flow)
-      const redirect = searchParams.get('redirect') || '/';
-      router.replace(redirect);
-    } else if (!error && !oauthError && !timeoutError) {
-      // No session, OAuth failed silently
-      router.replace('/sign-in?error=no_session');
+    if (!isLoading) {
+      if (session?.user) {
+        // Session is valid (cookie was set during OAuth flow)
+        const redirect = searchParams.get('redirect') || '/';
+        router.replace(redirect);
+      } else if (!error && !oauthError && !timeoutError) {
+        // No session, OAuth failed silently
+        router.replace('/sign-in?error=no_session');
+      }
     }
   }, [session, isLoading, router, searchParams, error, oauthError, timeoutError]);
 
