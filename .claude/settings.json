@@ -124,13 +124,13 @@
       "Bash(rm -rf **/out*)",
       "Bash(rm -rf **/build*)",
       "Bash(rm -rf **/coverage*)",
-      "Bash(pnpm install)",
-      "Bash(pnpm install *)",
-      "Bash(pnpm --filter * add *)",
+      "Bash(bun install)",
+      "Bash(bun install *)",
+      "Bash(bun --filter * add *)",
       "mcp__argent"
     ],
     "ask": [
-      "Bash(npx kill-port*)",
+      "Bash(bunx kill-port*)",
       "Bash(git push *)",
       "Bash(git restore *)",
       "Bash(git reset *)",
@@ -144,7 +144,7 @@
       "Bash(curl * -X PUT*)",
       "Bash(curl * -X DELETE*)",
       "Bash(curl * -T *)",
-      "Bash(pnpm add *)"
+      "Bash(bun add *)"
     ]
   }
 }
