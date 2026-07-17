@@ -12,6 +12,7 @@ import { PageHeader } from "@/shared/components/PageHeader";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { SettingsSection } from "@/shared/components/SettingsSection/SettingsSection";
 import { SettingsRow } from "@/shared/components/SettingsRow/SettingsRow";
+import { Button } from "@/shared/components/Button/Button";
 import { useRouter } from "next/navigation";
 import styles from "./settings-profile.screen.module.css";
 
@@ -142,27 +143,19 @@ function ProfileContent() {
               disabled={!isEditing}
             />
             {!isEditing ? (
-              <button type="button" className={styles.saveButton} onClick={handleEdit}>
-                Edit
-              </button>
+              <Button onClick={handleEdit}>Edit</Button>
             ) : (
               <>
-                <button
-                  type="button"
-                  className={styles.cancelButton}
-                  onClick={handleCancel}
-                  disabled={isUpdatingProfile}
-                >
+                <Button variant="secondary" onClick={handleCancel} disabled={isUpdatingProfile}>
                   Cancel
-                </button>
-                <button
-                  type="button"
-                  className={styles.saveButton}
+                </Button>
+                <Button
                   disabled={!isDirty || isUpdatingProfile}
                   onClick={handleSave}
+                  loading={isUpdatingProfile}
                 >
                   {isUpdatingProfile ? "Saving…" : "Save"}
-                </button>
+                </Button>
               </>
             )}
           </div>
@@ -187,23 +180,22 @@ function ProfileContent() {
       </SettingsSection>
 
       <div className={styles.actionRow}>
-        <button
-          type="button"
+        <Button
+          variant="secondary"
           data-testid="sign-out-trigger"
-          className={styles.signOutButton}
           onClick={() => setShowSignOutModal(true)}
         >
           Sign Out
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
+          variant="danger"
           data-testid="delete-account-trigger"
-          className={styles.deleteAccountButton}
           onClick={() => setShowDeleteAccountModal(true)}
           disabled={isDeletingAccount}
+          loading={isDeletingAccount}
         >
           {isDeletingAccount ? "Deleting…" : "Delete Account"}
-        </button>
+        </Button>
       </div>
 
       <Modal.ConfirmDialog
