@@ -2,6 +2,7 @@ import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/c
 import type { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
+import { fromNodeHeaders } from 'better-auth/node';
 import { PrismaService } from '../../shared/db/prisma.service';
 import { IS_PUBLIC_KEY, ROLES_KEY } from './decorators';
 
@@ -24,7 +25,7 @@ export class AuthGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest<Request>();
     const session = await getAuth().api.getSession({
-      headers: new Headers(request.headers as Record<string, string>),
+      headers: fromNodeHeaders(request.headers),
     });
 
     if (!session) throw new UnauthorizedException();

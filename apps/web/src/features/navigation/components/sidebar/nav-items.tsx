@@ -120,7 +120,9 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
   const { data: adminPermissionsData } = useAdminPermissions();
 
   const adminPermissions: AdminPermission[] = adminPermissionsData?.permissions ?? [];
-  const hasAdminAccess = isAuthenticated && adminPermissions.length > 0;
+  const adminRoles = adminPermissionsData?.roles ?? [];
+  const hasAdminRole = adminRoles.some((role) => ["admin", "superadmin"].includes(role));
+  const hasAdminAccess = isAuthenticated && (adminPermissions.length > 0 || hasAdminRole);
 
   const visibleAdminNavItems = adminNavItems.filter(
     (item) =>

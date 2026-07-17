@@ -9,6 +9,7 @@ import {
   isValidElement,
   type ReactNode,
 } from "react";
+import clsx from "clsx";
 import { DropdownContext } from "./context";
 import { DropdownItem as DropdownItemComponent } from "./dropdown-item";
 import type { DropdownItem, DropdownContextValue } from "./types";
@@ -44,6 +45,7 @@ export interface DropdownProps {
   disabled?: boolean;
   error?: boolean | string;
   direction?: "up" | "down";
+  className?: string;
 }
 
 export function Dropdown({
@@ -53,6 +55,7 @@ export function Dropdown({
   disabled = false,
   error,
   direction = "down",
+  className,
 }: DropdownProps) {
   const [open, setOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -108,7 +111,7 @@ export function Dropdown({
 
   return (
     <DropdownContext.Provider value={ctx}>
-      <div className={styles.wrapper}>{children}</div>
+      <div className={clsx(styles.wrapper, className)}>{children}</div>
     </DropdownContext.Provider>
   );
 }

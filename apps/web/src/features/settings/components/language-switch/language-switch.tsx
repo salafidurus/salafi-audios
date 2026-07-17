@@ -11,6 +11,7 @@ import {
 } from "@/shared/components/Dropdown";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { setLocaleCookie } from "@/core/i18n/locale-cookie";
+import styles from "./language-switch.module.css";
 
 const LOCALE_LABELS: Record<Locale, string> = {
   en: "English",
@@ -40,7 +41,12 @@ export function LanguageSwitch({ direction = "down" }: LanguageSwitchProps) {
   };
 
   return (
-    <Dropdown value={activeLocale} onValueChange={handleSelect} direction={direction}>
+    <Dropdown
+      value={activeLocale}
+      onValueChange={handleSelect}
+      direction={direction}
+      className={styles.inline}
+    >
       <DropdownTrigger ariaLabel={t("navigation.languageSwitch", "Language")} />
       <DropdownContent>
         {SUPPORTED_LOCALES.map((locale) => (

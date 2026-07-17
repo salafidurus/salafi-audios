@@ -25,7 +25,12 @@ function getInitials(name: string): string {
 }
 
 function ProfileContent() {
-  const { data: profile, isFetching } = useAccountProfile();
+  const {
+    data: profile,
+    isFetching,
+    isError: isProfileError,
+    error: profileError,
+  } = useAccountProfile();
   const { mutate: updateProfile, isPending, isSuccess, isError } = useUpdateProfile();
   const router = useRouter();
   const [prevProfileId, setPrevProfileId] = useState(profile?.id);
@@ -79,6 +84,12 @@ function ProfileContent() {
 
   if (isFetching) {
     return <EmptyState variant="loading" message="Loading profile…" />;
+  }
+
+  if (isProfileError) {
+    const errorMessage =
+      profileError instanceof Error ? profileError.message : "Failed to load profile";
+    return <EmptyState variant="error" message={errorMessage} />;
   }
 
   if (!profile) {
