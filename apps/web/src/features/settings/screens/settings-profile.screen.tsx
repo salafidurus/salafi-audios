@@ -27,18 +27,23 @@ function getInitials(name: string): string {
 function ProfileContent() {
   const {
     data: profile,
-    isFetching,
-    isError: isProfileError,
-    error: profileError,
+    isFetching: isLoadingProfile,
+    isError: isProfileLoadError,
+    error: profileLoadError,
   } = useAccountProfile();
-  const { mutate: updateProfile, isPending, isSuccess, isError } = useUpdateProfile();
+  const {
+    mutate: updateProfile,
+    isPending: isUpdatingProfile,
+    isSuccess: isUpdateSuccess,
+    isError: isUpdateError,
+  } = useUpdateProfile();
   const router = useRouter();
   const [prevProfileId, setPrevProfileId] = useState(profile?.id);
   const [displayName, setDisplayName] = useState(profile?.displayName ?? "");
   const [isEditing, setIsEditing] = useState(false);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
-  const { mutate: deleteAccount, isPending: isDeleting } = useDeleteAccount();
+  const { mutate: deleteAccount, isPending: isDeletingAccount } = useDeleteAccount();
 
   if (profile && profile.id !== prevProfileId) {
     setPrevProfileId(profile.id);
@@ -82,13 +87,13 @@ function ProfileContent() {
     setIsEditing(false);
   };
 
-  if (isFetching) {
+  if (isLoadingProfile) {
     return <EmptyState variant="loading" message="Loading profile…" />;
   }
 
-  if (isProfileError) {
+  if (isProfileLoadError) {
     const errorMessage =
-      profileError instanceof Error ? profileError.message : "Failed to load profile";
+      profileLoadError instanceof Error ? profileLoadError.message : "Failed to load profile";
     return <EmptyState variant="error" message={errorMessage} />;
   }
 
@@ -146,17 +151,17 @@ function ProfileContent() {
                   type="button"
                   className={styles.cancelButton}
                   onClick={handleCancel}
-                  disabled={isPending}
+                  disabled={isUpdatingProfile}
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   className={styles.saveButton}
-                  disabled={!isDirty || isPending}
+                  disabled={!isDirty || isUpdatingProfile}
                   onClick={handleSave}
                 >
-                  {isPending ? "Saving…" : "Save"}
+                  {isUpdatingProfile ? "Saving…" : "Save"}
                 </button>
               </>
             )}
@@ -167,9 +172,9 @@ function ProfileContent() {
         </SettingsRow>
       </SettingsSection>
 
-      {(isSuccess || isError) && (
-        <p className={isSuccess ? styles.successText : styles.errorText}>
-          {isSuccess ? "Display name saved." : "Failed to save. Please try again."}
+      {(isUpdateSuccess || isUpdateError) && (
+        <p className={isUpdateSuccess ? styles.successText : styles.errorText}>
+          {isUpdateSuccess ? "Display name saved." : "Failed to save. Please try again."}
         </p>
       )}
 
@@ -195,9 +200,9 @@ function ProfileContent() {
           data-testid="delete-account-trigger"
           className={styles.deleteAccountButton}
           onClick={() => setShowDeleteAccountModal(true)}
-          disabled={isDeleting}
+          disabled={isDeletingAccount}
         >
-          {isDeleting ? "Deleting…" : "Delete Account"}
+          {isDeletingAccount ? "Deleting…" : "Delete Account"}
         </button>
       </div>
 
