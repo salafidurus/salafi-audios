@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { authClient } from "@/core/auth";
-import { buildOAuthCallbackURL } from "@/features/auth/oauth-callback-url";
 import { GoogleSignInButton, AppleSignInButton } from "@/features/auth/components/social-buttons";
 import { AuthProviderButton } from "@/features/auth/components/provider-button";
 import styles from "../auth-form.module.css";
@@ -40,20 +39,22 @@ export function SignInResponsiveScreen({ redirectTo }: SignInScreenProps) {
           <div className={styles.stack}>
             <div className={styles.socialStack}>
               <AppleSignInButton
-                onClick={() =>
+                onClick={() => {
+                  const webUrl = process.env.NEXT_PUBLIC_WEB_URL ?? "";
                   authClient.signIn.social({
                     provider: "apple",
-                    callbackURL: buildOAuthCallbackURL(redirectTo),
-                  })
-                }
+                    callbackURL: `${webUrl}/auth/callback?redirect=${encodeURIComponent(redirectTo)}`,
+                  });
+                }}
               />
               <GoogleSignInButton
-                onClick={() =>
+                onClick={() => {
+                  const webUrl = process.env.NEXT_PUBLIC_WEB_URL ?? "";
                   authClient.signIn.social({
                     provider: "google",
-                    callbackURL: buildOAuthCallbackURL(redirectTo),
-                  })
-                }
+                    callbackURL: `${webUrl}/auth/callback?redirect=${encodeURIComponent(redirectTo)}`,
+                  });
+                }}
               />
             </div>
           </div>
@@ -82,21 +83,23 @@ export function SignInResponsiveScreen({ redirectTo }: SignInScreenProps) {
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           <AuthProviderButton
             provider="apple"
-            onClick={() =>
+            onClick={() => {
+              const webUrl = process.env.NEXT_PUBLIC_WEB_URL ?? "";
               authClient.signIn.social({
                 provider: "apple",
-                callbackURL: buildOAuthCallbackURL(redirectTo),
-              })
-            }
+                callbackURL: `${webUrl}/auth/callback?redirect=${encodeURIComponent(redirectTo)}`,
+              });
+            }}
           />
           <AuthProviderButton
             provider="google"
-            onClick={() =>
+            onClick={() => {
+              const webUrl = process.env.NEXT_PUBLIC_WEB_URL ?? "";
               authClient.signIn.social({
                 provider: "google",
-                callbackURL: buildOAuthCallbackURL(redirectTo),
-              })
-            }
+                callbackURL: `${webUrl}/auth/callback?redirect=${encodeURIComponent(redirectTo)}`,
+              });
+            }}
           />
         </div>
       </div>

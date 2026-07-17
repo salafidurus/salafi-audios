@@ -44,6 +44,10 @@ export class ConfigService {
     return this.env.BETTER_AUTH_URL;
   }
 
+  get COOKIE_DOMAIN(): string {
+    return this.env.COOKIE_DOMAIN;
+  }
+
   get GOOGLE_CLIENT_ID(): string {
     return this.env.GOOGLE_CLIENT_ID;
   }

@@ -5,7 +5,6 @@ import { Sidebar } from "./sidebar";
 import { useAuth, authClient } from "@/core/auth";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 import { usePathname, useRouter } from "next/navigation";
-import { routes } from "@sd/core-contracts";
 
 vi.mock("@/shared/hooks/use-responsive", () => ({
   useResponsive: vi.fn().mockReturnValue({ isMobile: false, isTablet: false, isWeb: true }),
