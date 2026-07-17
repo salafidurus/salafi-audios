@@ -1,20 +1,16 @@
 'use client';
 
 import { Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { authClient } from '@/core/auth/auth-client';
 import Link from 'next/link';
 
 function AuthCallbackContent() {
-  // All hooks called at top level - no conditional hook calls
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, isLoading, error } = authClient.useSession();
   const [timeoutError, setTimeoutError] = useState(false);
 
-  // Handle OAuth provider errors (user denied, invalid state, etc.)
-  const oauthError = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
 
   // Timeout after 10 seconds to prevent infinite loading
@@ -27,36 +23,6 @@ function AuthCallbackContent() {
       return () => clearTimeout(timeout);
     }
   }, [isLoading]);
-
-  // Main authentication flow
-  useEffect(() => {
-    if (!isLoading) {
-      if (session?.user) {
-        // Session is valid (cookie was set during OAuth flow)
-        const redirect = searchParams.get('redirect') || '/';
-        router.replace(redirect);
-      } else if (!error && !oauthError && !timeoutError) {
-        // No session, OAuth failed silently
-        router.replace('/sign-in?error=no_session');
-      }
-    }
-  }, [session, isLoading, router, searchParams, error, oauthError, timeoutError]);
-
-  if (oauthError) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Authentication Failed</h1>
-          <p className="text-gray-600 mb-4">
-            {errorDescription || `Error: ${oauthError}`}
-          </p>
-          <Link href="/sign-in" className="text-blue-600 hover:underline">
-            Try again
-          </Link>
-        </div>
-      </div>
-    );
-  }
 
   if (timeoutError) {
     return (
@@ -90,6 +56,27 @@ function AuthCallbackContent() {
     );
   }
 
+  // Session found - show success message and link to home
+  if (session?.user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Sign In Successful</h1>
+          <p className="text-gray-600 mb-6">
+            You have been signed in successfully.
+          </p>
+          <Link
+            href={searchParams.get('redirect') || '/'}
+            className="inline-block bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+          >
+            Continue to App
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Loading state - session being verified
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="text-center">
