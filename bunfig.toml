@@ -1,3 +1,9 @@
 [install]
 linker = "isolated"
 globalStore = false
+
+[test]
+# Bun test passes by default when no tests are found
+# This is different from Vitest's --passWithNoTests flag which is not needed
+timeout = 10000
+bail = false
