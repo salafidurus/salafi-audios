@@ -7,7 +7,7 @@
     "noFallthroughCasesInSwitch": true,
     "composite": true,
     "incremental": true,
-    "types": ["bun-types", "vitest/globals", "node"]
+    "types": ["bun-types", "node"]
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "test/**/*.ts"],
   "exclude": ["node_modules", "dist"]

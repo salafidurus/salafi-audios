@@ -6,7 +6,7 @@
     // Project reference support for incremental builds
     "composite": true,
     "incremental": true,
-    "types": ["bun-types", "vitest/globals", "node"]
+    "types": ["bun-types", "node"]
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist", "**/*.spec.ts", "**/*.test.ts"]
