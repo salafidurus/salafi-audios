@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { resolveRouteAccess } from "@sd/core-contracts";
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const sessionCookie = request.cookies.get("better-auth.session_token");
   const isAuthenticated = !!sessionCookie?.value;
