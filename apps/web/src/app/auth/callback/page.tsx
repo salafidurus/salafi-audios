@@ -7,6 +7,7 @@ import { authClient } from '@/core/auth/auth-client';
 import Link from 'next/link';
 
 function AuthCallbackContent() {
+  // All hooks called at top level - no conditional hook calls
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, isLoading, error } = authClient.useSession();
