@@ -55,7 +55,7 @@ async function bootstrap() {
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Request-Id', 'Cookie'],
-    exposedHeaders: ['X-Request-Id', 'Set-Cookie', 'set-auth-token'],
+    exposedHeaders: ['X-Request-Id', 'Set-Cookie'],
     maxAge: 86400,
   });
 

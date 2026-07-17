@@ -1,6 +1,6 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
-import { admin, bearer, oneTimeToken } from 'better-auth/plugins';
+import { admin, bearer } from 'better-auth/plugins';
 import { expo } from '@better-auth/expo';
 import { PrismaClient } from '@sd/core-db';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -47,11 +47,26 @@ function createAuthInstance(config: ConfigService) {
         clientSecret: config.APPLE_CLIENT_SECRET,
       },
     },
-    // bearer: accept `Authorization: Bearer <token>` and emit `set-auth-token`
-    //   so the cross-site web SPA can authenticate without third-party cookies.
-    // oneTimeToken: mints the single-use token the OAuth bridge hands to the web
-    //   app (see auth-bridge.controller.ts).
-    plugins: [admin(), expo(), bearer(), oneTimeToken()],
+    // Same-domain session cookies for web, bearer for native
+    plugins: [admin(), expo(), bearer()],
+
+    // Session and cookie configuration for same-domain setup
+    session: {
+      expiresIn: 60 * 60 * 24 * 7, // 7 days
+      updateAge: 60 * 60 * 24, // Refresh if > 1 day old
+    },
+
+    advanced: {
+      // Cross-subdomain cookie sharing: allows session from api.* to be sent
+      // to web app (for OAuth callbacks)
+      crossSubDomainCookies: {
+        enabled: config.NODE_ENV !== 'development',
+        domain: config.COOKIE_DOMAIN,
+      },
+      // HTTPS-only cookies in production (XSS + MITM mitigation)
+      useSecureCookies: config.NODE_ENV === 'production',
+      // HttpOnly, SameSite=Lax are already defaults
+    },
   });
 }
 

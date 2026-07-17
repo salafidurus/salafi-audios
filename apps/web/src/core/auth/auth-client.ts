@@ -1,26 +1,14 @@
 import { createAuthClient } from "better-auth/react";
-import { adminClient, oneTimeTokenClient } from "better-auth/client/plugins";
-import { clearBearerToken, getBearerToken, setBearerToken } from "./bearer-token";
+import { adminClient } from "better-auth/client/plugins";
 
 export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_API_URL!,
-  plugins: [adminClient(), oneTimeTokenClient()],
+  plugins: [adminClient()],
   fetchOptions: {
-    // Cross-site: authenticate the client's own calls (useSession, sign-out,
-    // one-time-token verify) with the stored bearer token instead of a cookie.
-    auth: {
-      type: "Bearer",
-      token: () => getBearerToken() ?? "",
-    },
+    credentials: "include",
     onSuccess: (ctx) => {
-      // The server emits `set-auth-token` whenever it issues/refreshes a
-      // session (notably the one-time-token verify that completes OAuth).
-      const token = ctx.response.headers.get("set-auth-token");
-      if (token) {
-        setBearerToken(token);
-      }
       if (String(ctx.request.url).endsWith("/sign-out")) {
-        clearBearerToken();
+        window.location.href = "/";
       }
     },
   },

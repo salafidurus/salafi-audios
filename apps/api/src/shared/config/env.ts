@@ -9,6 +9,7 @@ const ApiEnvSchema = z.object({
   SITEMAP_BASE_URL: z.url().optional(),
   BETTER_AUTH_SECRET: z.string().min(32),
   BETTER_AUTH_URL: z.url(),
+  COOKIE_DOMAIN: z.string().default('salafidurus.com'),
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
   APPLE_CLIENT_ID: z.string(),

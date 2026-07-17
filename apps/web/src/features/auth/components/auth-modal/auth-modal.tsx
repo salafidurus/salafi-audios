@@ -8,7 +8,6 @@ import { LazyMotion, AnimatePresence, m } from "framer-motion";
 import { domAnimation } from "framer-motion";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { authClient } from "@/core/auth";
-import { buildOAuthCallbackURL } from "@/features/auth/oauth-callback-url";
 import { AppleSignInButton, GoogleSignInButton } from "../social-buttons";
 import styles from "./auth-modal.module.css";
 
@@ -35,9 +34,10 @@ const getRedirectTo = () => {
 };
 
 const handleSignIn = (provider: "google" | "apple") => {
+  const webUrl = process.env.NEXT_PUBLIC_WEB_URL ?? "";
   authClient.signIn.social({
     provider,
-    callbackURL: buildOAuthCallbackURL(getRedirectTo()),
+    callbackURL: `${webUrl}/auth/callback?redirect=${encodeURIComponent(getRedirectTo())}`,
   });
 };
 
