@@ -3,11 +3,7 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState, type ReactNode } from "react";
 import { I18nextProvider } from "react-i18next";
-import {
-  initApiClient,
-  setLocaleProvider,
-  setUnauthorizedHandler,
-} from "@sd/core-api";
+import { initApiClient, setLocaleProvider, setUnauthorizedHandler } from "@sd/core-api";
 import { createQueryClient } from "@sd/core-contracts/query";
 import type { Locale } from "@sd/core-contracts";
 import { authClient } from "@/core/auth/auth-client";

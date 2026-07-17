@@ -25,11 +25,11 @@ There is one shared HTTP client (`packages/core-contracts/src/http.ts`) used for
 all domain data calls (catalog, account, library, admin, …). Each platform
 handles credentials identically, using session cookies:
 
-| Platform | Session credential                       | Storage                                       | How                                                                                                                                      |
-| -------- | ---------------------------------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| Web      | `Cookie: better-auth.session_token=…`   | Browser cookie jar                            | Same-domain cookies automatically sent via `credentials: 'include'`. HttpOnly flag prevents XSS. Browser handles all cookie mechanics. |
-| Native   | `Cookie: better-auth.session_token=…`   | `expo-secure-store` (via `@better-auth/expo`) | `@better-auth/expo` stores session in SecureStore and forwards via `Cookie` header (RN has no cookie jar).                             |
-| API      | Validates cookies natively              | n/a                                           | Better Auth validates session cookies directly.                                                                                        |
+| Platform | Session credential                    | Storage                                       | How                                                                                                                                    |
+| -------- | ------------------------------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Web      | `Cookie: better-auth.session_token=…` | Browser cookie jar                            | Same-domain cookies automatically sent via `credentials: 'include'`. HttpOnly flag prevents XSS. Browser handles all cookie mechanics. |
+| Native   | `Cookie: better-auth.session_token=…` | `expo-secure-store` (via `@better-auth/expo`) | `@better-auth/expo` stores session in SecureStore and forwards via `Cookie` header (RN has no cookie jar).                             |
+| API      | Validates cookies natively            | n/a                                           | Better Auth validates session cookies directly.                                                                                        |
 
 The wiring happens once at app startup:
 
@@ -203,15 +203,15 @@ then configure cookies accordingly.
 
 ## File map
 
-| Concern                                | File                                                  |
-| -------------------------------------- | ----------------------------------------------------- |
-| Shared HTTP client (credential attach) | `packages/core-contracts/src/http.ts`                 |
-| Credential providers                   | `packages/core-api/src/utils/api-client.ts`           |
-| Better Auth server instance + plugins  | `apps/api/src/modules/auth/auth.instance.ts`          |
-| CORS + Fastify route mount             | `apps/api/src/main.ts`                                |
-| Session validation guard               | `apps/api/src/modules/auth/auth.guard.ts`             |
-| Web auth client + session detection    | `apps/web/src/core/auth/auth-client.ts`               |
-| Web OAuth callback page                | `apps/web/src/app/auth/callback/page.tsx`             |
-| Web startup wiring                     | `apps/web/src/core/providers.tsx`                     |
-| Native auth client (Expo)              | `apps/native/src/core/auth/auth-client.ts`            |
-| Native startup wiring                  | `apps/native/src/core/providers.tsx`                  |
+| Concern                                | File                                         |
+| -------------------------------------- | -------------------------------------------- |
+| Shared HTTP client (credential attach) | `packages/core-contracts/src/http.ts`        |
+| Credential providers                   | `packages/core-api/src/utils/api-client.ts`  |
+| Better Auth server instance + plugins  | `apps/api/src/modules/auth/auth.instance.ts` |
+| CORS + Fastify route mount             | `apps/api/src/main.ts`                       |
+| Session validation guard               | `apps/api/src/modules/auth/auth.guard.ts`    |
+| Web auth client + session detection    | `apps/web/src/core/auth/auth-client.ts`      |
+| Web OAuth callback page                | `apps/web/src/app/auth/callback/page.tsx`    |
+| Web startup wiring                     | `apps/web/src/core/providers.tsx`            |
+| Native auth client (Expo)              | `apps/native/src/core/auth/auth-client.ts`   |
+| Native startup wiring                  | `apps/native/src/core/providers.tsx`         |
