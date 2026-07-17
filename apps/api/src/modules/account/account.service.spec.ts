@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach, afterAll } from 'bun:test';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../../shared/db/prisma.service';
 import { AccountService } from './account.service';

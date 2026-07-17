@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach, afterAll } from 'bun:test';
 import { Test } from '@nestjs/testing';
 import { MediaService } from './media.service';
 import { ConfigService } from '../../shared/config/config.module';

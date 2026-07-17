@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach, afterAll } from 'bun:test';
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppleNativeController } from './apple-native.controller';
 import { AppleNativeService } from './apple-native.service';

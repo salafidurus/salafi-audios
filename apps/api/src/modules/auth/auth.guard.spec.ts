@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach, afterAll } from 'bun:test';
 // apps/api/src/modules/auth/auth.guard.spec.ts
 import { AuthGuard } from './auth.guard';
 import { Reflector } from '@nestjs/core';
