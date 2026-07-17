@@ -22,6 +22,7 @@ export async function seedTestData(prisma: PrismaService): Promise<void> {
       id: TEST_SCHOLAR_ID,
       slug: TEST_SCHOLAR_SLUG,
       name: 'E2E Test Scholar',
+      bio: 'E2E Scholar Biography',
       country: 'SA',
       mainLanguage: 'ar',
       isActive: true,
@@ -35,7 +36,7 @@ export async function seedTestData(prisma: PrismaService): Promise<void> {
     create: {
       id: TEST_PARENT_TOPIC_ID,
       slug: 'e2e-parent-topic',
-      name: 'E2E Parent Topic',
+      name: 'Parent Topic',
     },
   });
 
@@ -57,6 +58,7 @@ export async function seedTestData(prisma: PrismaService): Promise<void> {
       id: TEST_LISTING_ID,
       slug: TEST_LISTING_SLUG,
       title: 'E2E Test Listing',
+      description: 'E2E Listing Description',
       format: 'single',
       language: 'ar',
       status: 'published',
