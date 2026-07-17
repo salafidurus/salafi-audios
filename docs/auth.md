@@ -26,7 +26,7 @@ all domain data calls (catalog, account, library, admin, …). Each platform
 handles credentials identically, using session cookies:
 
 | Platform | Session credential                       | Storage                                       | How                                                                                                                                      |
-| -------- | ---------------------------------------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| -------- | ---------------------------------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | Web      | `Cookie: better-auth.session_token=…`   | Browser cookie jar                            | Same-domain cookies automatically sent via `credentials: 'include'`. HttpOnly flag prevents XSS. Browser handles all cookie mechanics. |
 | Native   | `Cookie: better-auth.session_token=…`   | `expo-secure-store` (via `@better-auth/expo`) | `@better-auth/expo` stores session in SecureStore and forwards via `Cookie` header (RN has no cookie jar).                             |
 | API      | Validates cookies natively              | n/a                                           | Better Auth validates session cookies directly.                                                                                        |
