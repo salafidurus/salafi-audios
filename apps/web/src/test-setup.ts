@@ -1,6 +1,7 @@
 import { GlobalRegistrator } from "@happy-dom/global-registrator";
 import "@testing-library/jest-dom";
 import { describe, it, expect, beforeEach, afterEach, afterAll, beforeAll } from "bun:test";
+import React from "react";
 
 // Register happy-dom globals
 GlobalRegistrator.register();
@@ -13,6 +14,14 @@ GlobalRegistrator.register();
 (globalThis as any).afterEach = afterEach;
 (globalThis as any).afterAll = afterAll;
 (globalThis as any).beforeAll = beforeAll;
+
+// Clean up after each test to prevent DOM pollution
+afterEach(() => {
+  // Clear all children from body without destroying the document
+  while (document.body.firstChild) {
+    document.body.removeChild(document.body.firstChild);
+  }
+});
 
 // Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {
