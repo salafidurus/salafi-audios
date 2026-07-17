@@ -1,11 +1,12 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { authClient } from '@/core/auth/auth-client';
 import Link from 'next/link';
 
-export default function AuthCallbackPage() {
+function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, isLoading, error } = authClient.useSession();
@@ -14,6 +15,31 @@ export default function AuthCallbackPage() {
   // Handle OAuth provider errors (user denied, invalid state, etc.)
   const oauthError = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
+
+  // Timeout after 10 seconds to prevent infinite loading
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (isLoading) {
+        setTimeoutError(true);
+      }
+    }, 10000);
+
+    return () => clearTimeout(timeout);
+  }, [isLoading]);
+
+  // Main authentication flow
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (session?.user) {
+      // Session is valid (cookie was set during OAuth flow)
+      const redirect = searchParams.get('redirect') || '/';
+      router.replace(redirect);
+    } else if (!error && !oauthError && !timeoutError) {
+      // No session, OAuth failed silently
+      router.replace('/sign-in?error=no_session');
+    }
+  }, [session, isLoading, router, searchParams, error, oauthError, timeoutError]);
 
   if (oauthError) {
     return (
@@ -31,17 +57,6 @@ export default function AuthCallbackPage() {
     );
   }
 
-  // Timeout after 10 seconds to prevent infinite loading
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (isLoading) {
-        setTimeoutError(true);
-      }
-    }, 10000);
-
-    return () => clearTimeout(timeout);
-  }, [isLoading]);
-
   if (timeoutError) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -58,7 +73,6 @@ export default function AuthCallbackPage() {
     );
   }
 
-  // Handle better-auth session errors
   if (error) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -75,30 +89,29 @@ export default function AuthCallbackPage() {
     );
   }
 
-  // Main authentication flow
-  useEffect(() => {
-    if (isLoading) return;
-
-    if (session?.user) {
-      // Session is valid (cookie was set during OAuth flow)
-      const redirect = searchParams.get('redirect') || '/';
-      router.replace(redirect);
-    } else {
-      // No session, OAuth failed silently
-      router.replace('/sign-in?error=no_session');
-    }
-  }, [session, isLoading, router, searchParams]);
-
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">Completing sign-in...</p>
-        </div>
+  return (
+    <div className="flex min-h-screen items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+        <p className="text-gray-600">Completing sign-in...</p>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
-  return null;
+export default function AuthCallbackPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading...</p>
+          </div>
+        </div>
+      }
+    >
+      <AuthCallbackContent />
+    </Suspense>
+  );
 }
