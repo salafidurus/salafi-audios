@@ -27,8 +27,8 @@
     "lint": "oxlint .",
     "test": "bun test",
     "test:watch": "bun test --watch",
-    "test:cov": "vitest run --coverage",
-    "test:prepush": "vitest run --changed=origin/main",
+    "test:cov": "bun test --coverage",
+    "test:prepush": "bun test",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

@@ -50,10 +50,10 @@
     "dev": "tsup --watch",
     "lint": "oxlint .",
     "test": "bun test",
-    "test:prepush": "vitest run --changed=origin/main",
+    "test:prepush": "bun test",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test:watch": "bun test --watch",
-    "test:cov": "vitest run --coverage"
+    "test:cov": "bun test --coverage"
   },
   "dependencies": {
     "@tanstack/react-query": "catalog:",

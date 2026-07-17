@@ -30,7 +30,6 @@
   },
   "devDependencies": {
     "rimraf": "catalog:",
-    "tsup": "catalog:",
-    "vitest": "catalog:"
+    "tsup": "catalog:"
   }
 }
