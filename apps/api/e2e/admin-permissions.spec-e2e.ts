@@ -6,7 +6,7 @@ import request from 'supertest';
 import { PrismaService } from '../src/shared/db/prisma.service';
 import { TestAuthFactory } from './helpers/test-auth.factory';
 import { Permission } from '@sd/core-db';
-import { TEST_SCHOLAR_ID, TEST_LISTING_ID } from './helpers/seed-test-data';
+import { TEST_SCHOLAR_ID, TEST_LISTING_ID, seedTestData } from './helpers/seed-test-data';
 
 describe('Admin Permission Boundaries (e2e)', () => {
   let app: NestFastifyApplication;
@@ -17,6 +17,7 @@ describe('Admin Permission Boundaries (e2e)', () => {
     ({ app } = await createE2eApp({ disableThrottler: true }));
     prisma = app.get(PrismaService);
     authFactory = new TestAuthFactory(prisma);
+    await seedTestData(prisma);
   });
 
   afterAll(async () => {
