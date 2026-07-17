@@ -22,7 +22,7 @@ afterEach(() => {
     if (document.body) {
       document.body.innerHTML = "";
     }
-  } catch (e) {
+  } catch {
     // Ignore cleanup errors - they shouldn't block test progression
   }
 });
@@ -89,19 +89,4 @@ vi.mock("@/shared/hooks/use-responsive", () => ({
   useIsDesktop: () => true,
 }));
 
-// Mock CSS modules to return class names based on property names
-// This is a workaround for CSS modules not being processed by happy-dom in Bun tests
-const mockCSSModule = () => {
-  return new Proxy(
-    {},
-    {
-      get(target, prop) {
-        return String(prop);
-      },
-    },
-  );
-};
-
-// Use require.resolve and custom require handler if possible
-// For now, we'll rely on Bun's native CSS module handling with a fallback
-// If CSS modules still aren't working, individual tests can import the mock
+// CSS modules are handled natively by Bun's test setup

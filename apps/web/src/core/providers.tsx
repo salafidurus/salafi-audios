@@ -5,7 +5,6 @@ import { useEffect, useState, type ReactNode } from "react";
 import { I18nextProvider } from "react-i18next";
 import {
   initApiClient,
-  setAccessTokenProvider,
   setLocaleProvider,
   setUnauthorizedHandler,
 } from "@sd/core-api";

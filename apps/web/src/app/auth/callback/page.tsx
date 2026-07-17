@@ -11,8 +11,6 @@ function AuthCallbackContent() {
   const { data: session, isLoading, error } = authClient.useSession();
   const [timeoutError, setTimeoutError] = useState(false);
 
-  const errorDescription = searchParams.get('error_description');
-
   // Timeout after 10 seconds to prevent infinite loading
   useEffect(() => {
     if (isLoading) {
