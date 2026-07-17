@@ -49,10 +49,10 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "lint": "oxlint .",
-    "test": "vitest run",
+    "test": "bun test",
     "test:prepush": "vitest run --changed=origin/main",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test:watch": "vitest",
+    "test:watch": "bun test --watch",
     "test:cov": "vitest run --coverage"
   },
   "dependencies": {

@@ -2,7 +2,6 @@ import { vi, describe, it, expect, beforeEach, afterEach, afterAll } from 'bun:t
 import { Test } from '@nestjs/testing';
 import { MediaService } from './media.service';
 import { ConfigService } from '../../shared/config/config.module';
-import { mockPresign } from '../../test/mocks/bun.mock';
 
 vi.mock('@paralleldrive/cuid2', () => ({
   createId: () => 'mock-cuid-12345',
@@ -33,9 +32,14 @@ describe('MediaService', () => {
   });
 
   it('generates an objectKey with the purpose prefix and presigned url', async () => {
-    mockPresign.mockReturnValueOnce(
-      'https://mock-s3-upload-url.com/audio/mock-cuid-12345-lecture.mp3',
-    );
+    // Mock the S3Client's file and presign methods
+    const mockPresign = vi
+      .fn()
+      .mockReturnValueOnce('https://mock-s3-upload-url.com/audio/mock-cuid-12345-lecture.mp3');
+
+    (service as any).s3.file = vi.fn().mockReturnValue({
+      presign: mockPresign,
+    });
 
     const result = await service.getPresignedUploadUrl({
       filename: 'lecture.mp3',

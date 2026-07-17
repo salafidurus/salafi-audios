@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect } from "bun:test";
 import { splitScholarContent } from "./scholar.api";
 import type { ScholarContentItemDto } from "@sd/core-contracts";
 

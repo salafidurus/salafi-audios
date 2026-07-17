@@ -2,7 +2,6 @@ import { vi, describe, it, expect, beforeEach, afterEach, afterAll } from 'bun:t
 import { Test } from '@nestjs/testing';
 import { CDNHealthIndicator } from './cdn-health.indicator';
 import { ConfigService } from '../../shared/config/config.service';
-import { mockList } from '../../test/mocks/bun.mock';
 
 describe('CDNHealthIndicator', () => {
   let indicator: CDNHealthIndicator;
@@ -28,21 +27,24 @@ describe('CDNHealthIndicator', () => {
   });
 
   it('returns up status when s3.list succeeds', async () => {
-    mockList.mockResolvedValueOnce({ contents: [] });
+    // Mock the list method on the indicator's s3 instance
+    (indicator as any).s3.list = vi.fn().mockResolvedValueOnce({ contents: [] });
 
     const result = await indicator.pingCheck('cdn');
     expect(result).toEqual({ cdn: { status: 'up' } });
-    expect(mockList).toHaveBeenCalledWith({ maxKeys: 1 });
+    expect((indicator as any).s3.list).toHaveBeenCalledWith({ maxKeys: 1 });
   });
 
   it('throws HealthCheckError when s3.list fails', async () => {
-    mockList.mockRejectedValueOnce(new Error('S3 Connection Failed'));
+    (indicator as any).s3.list = vi.fn().mockRejectedValueOnce(new Error('S3 Connection Failed'));
 
     await expect(indicator.pingCheck('cdn')).rejects.toThrow('R2 storage check failed');
   });
 
   it('throws HealthCheckError on timeout', async () => {
-    mockList.mockImplementationOnce(() => new Promise((resolve) => setTimeout(resolve, 2000)));
+    (indicator as any).s3.list = vi
+      .fn()
+      .mockImplementationOnce(() => new Promise((resolve) => setTimeout(resolve, 2000)));
 
     await expect(indicator.pingCheck('cdn', { timeout: 100 })).rejects.toThrow(
       'R2 storage check failed',

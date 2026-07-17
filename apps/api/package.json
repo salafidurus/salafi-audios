@@ -14,11 +14,11 @@
     "start:prod": "NODE_ENV=production bun --bun src/main.ts",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
-    "test": "bun test",
-    "test:watch": "bun test --watch",
-    "test:cov": "bun test --coverage",
-    "test:prepush": "bun test",
-    "test:e2e": "bun test --config ./bunfig.e2e.toml",
+    "test": "bun test --path-ignore-patterns 'e2e/'",
+    "test:watch": "bun test --watch --path-ignore-patterns 'e2e/'",
+    "test:cov": "bun test --coverage --path-ignore-patterns 'e2e/'",
+    "test:prepush": "bun test --path-ignore-patterns 'e2e/'",
+    "test:e2e": "bun test ./e2e/admin-permissions.spec-e2e.ts ./e2e/app.spec-e2e.ts ./e2e/auth.spec-e2e.ts ./e2e/infrastructure.spec-e2e.ts ./e2e/public-api.spec-e2e.ts ./e2e/user-flows.spec-e2e.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

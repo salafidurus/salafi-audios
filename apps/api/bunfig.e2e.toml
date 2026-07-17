@@ -1,4 +1,0 @@
-[test]
-timeout = 30000
-bail = true
-include = ["test/**/*.e2e-spec.ts"]

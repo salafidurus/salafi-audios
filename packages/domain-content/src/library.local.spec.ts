@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect } from "bun:test";
 import { localProgressItems, localSavedItems, localCompletedItems } from "./library.local";
 import type { ListingProgress } from "@sd/domain-audio";
 
