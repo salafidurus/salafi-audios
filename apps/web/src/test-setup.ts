@@ -9,7 +9,7 @@ GlobalRegistrator.register();
 // Initialize i18n for tests
 const testI18n = createI18n("en");
 // Make it globally available for react-i18next
-global.i18n = testI18n;
+(global as any).i18n = testI18n;
 
 // Set up environment variables for tests
 process.env.NEXT_PUBLIC_API_URL = "http://localhost:3000";
