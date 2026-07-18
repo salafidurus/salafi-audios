@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import type { Permission, ScholarPermissionType, UserRole } from '@sd/core-contracts';
+import { PermissionEnum } from '@sd/core-contracts';
 import { PrismaService } from '../../shared/db/prisma.service';
 import type { Locale } from '@sd/core-db';
 
@@ -271,14 +272,33 @@ export class PermissionsRepository {
 
   /**
    * Get permission strings for a user (ordered by grant date)
+   * Filters out stale/invalid permissions that don't match current Permission enum
    */
   async findPermissionStringsByUserId(userId: string): Promise<Permission[]> {
-    const perms = await this.prisma.userPermission.findMany({
-      where: { userId },
-      select: { permission: true },
-      orderBy: { grantedAt: 'desc' },
-    });
-    return perms.map((p) => p.permission);
+    try {
+      const perms = await this.prisma.userPermission.findMany({
+        where: { userId },
+        select: { permission: true },
+        orderBy: { grantedAt: 'desc' },
+      });
+      return perms.map((p) => p.permission);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('not found in enum')) {
+        const perms = await this.prisma.$queryRaw<Array<{ permission: string }>>`
+          SELECT "permission" FROM "UserPermission"
+          WHERE "userId" = ${userId}
+          ORDER BY "grantedAt" DESC
+        `;
+        const validPermissions = new Set(PermissionEnum._def.options);
+        return perms.reduce<Permission[]>((acc, p) => {
+          if (validPermissions.has(p.permission)) {
+            acc.push(p.permission as Permission);
+          }
+          return acc;
+        }, []);
+      }
+      throw error;
+    }
   }
 
   /**
