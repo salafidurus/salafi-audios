@@ -12,10 +12,10 @@
   ],
   "tasks": {
     "dev": {
-      // Build workspace dependencies first (cached) so dist/ exports resolve
-      "dependsOn": ["^build"],
+      // Run dev tasks in dependencies first for turbo watch to trigger rebuilds
+      "dependsOn": ["^dev"],
       "cache": false,
-      "persistent": true
+      "persistent": false
     },
     "build": {
       // Topological: packages build before apps that depend on them
