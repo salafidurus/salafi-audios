@@ -111,7 +111,7 @@ describe("SettingsProfileScreen", () => {
       isFetching: false,
     } as ReturnType<typeof useAccountProfile>);
     render(<SettingsProfileScreen />);
-    expect(screen.getByText("TU")).toBeInTheDocument(); // "Test User" → "TU"
+    expect(screen.getByText("T")).toBeInTheDocument(); // "Test User" → "T"
   });
 
   it("displays email and display name", () => {

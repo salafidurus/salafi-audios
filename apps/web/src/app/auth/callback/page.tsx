@@ -1,14 +1,13 @@
 "use client";
 
 import { Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import { authClient } from "@/core/auth/auth-client";
 import Link from "next/link";
 
 function AuthCallbackContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const { data: session, isPending, error } = authClient.useSession();
   const [timeoutError, setTimeoutError] = useState(false);
 
@@ -25,12 +24,10 @@ function AuthCallbackContent() {
     return () => clearTimeout(timeout);
   }, [isPending]);
 
-  // Auto-redirect when session is loaded
-  useEffect(() => {
-    if (session?.user) {
-      router.push(searchParams.get("redirect") || "/");
-    }
-  }, [session?.user, router, searchParams]);
+  // Redirect if session loaded successfully using Next.js redirect() function
+  if (session?.user && !isPending && !timeoutError && !error) {
+    redirect(searchParams.get("redirect") || "/");
+  }
 
   if (timeoutError) {
     return (
