@@ -1,22 +1,25 @@
 import { describe, it, expect, beforeEach, vi } from "bun:test";
 import React from "react";
 import { render, screen } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { LibraryScreen } from "./library.screen";
 import { LibrarySavedScreen } from "./library-saved.screen";
 import { LibraryCompletedScreen } from "./library-completed.screen";
-import {
-  useLibraryProgressScreen,
-  useLibrarySavedScreen,
-  useLibraryCompletedScreen,
-} from "@sd/domain-content";
 
 const mockUseAuth = vi.fn(() => ({ isAuthenticated: true }));
 
-vi.mock("@sd/domain-content", () => ({
-  useLibraryProgressScreen: vi.fn(),
-  useLibrarySavedScreen: vi.fn(),
-  useLibraryCompletedScreen: vi.fn(),
-}));
+const createTestQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+
+const renderWithQueryClient = (component: React.ReactElement) => {
+  const queryClient = createTestQueryClient();
+  return render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>);
+};
 
 vi.mock("@/core/auth/use-auth", () => ({
   useAuth: () => mockUseAuth(),
@@ -34,9 +37,13 @@ vi.mock("@/shared/components/ScreenView/ScreenView", () => ({
   ),
 }));
 
+vi.mock("@/shared/components/PageHeader", () => ({
+  PageHeader: ({ title }: { title: string }) => <h1>{title}</h1>,
+}));
+
 vi.mock("../components/library-list-row/library-list-row", () => ({
   LibraryListRow: ({ item }: { item: any }) => (
-    <div data-testid="library-row">{item.lectureTitle}</div>
+    <div data-testid="library-row">{item.listingTitle}</div>
   ),
 }));
 
@@ -49,19 +56,28 @@ vi.mock("@/shared/components/AuthRequiredState/AuthRequiredState", () => ({
   ),
 }));
 
-const mockProgress = useLibraryProgressScreen as any;
-const mockSaved = useLibrarySavedScreen as any;
-const mockCompleted = useLibraryCompletedScreen as any;
+vi.mock("@/shared/components/InfiniteScrollList", () => ({
+  InfiniteScrollList: (props: any) => {
+    const mockItems = [
+      {
+        id: "lib-1",
+        listingId: "lec-1",
+        listingTitle: "Lecture Title 1",
+        listingSlug: "lecture-title-1",
+        scholarId: "sch-1",
+        scholarSlug: "scholar-1",
+        scholarName: "Scholar 1",
+      },
+    ];
 
-const mockItem = {
-  id: "lib-1",
-  lectureId: "lec-1",
-  lectureTitle: "Lecture Title 1",
-  lectureSlug: "lecture-title-1",
-  scholarId: "sch-1",
-  scholarSlug: "scholar-1",
-  scholarName: "Scholar 1",
-};
+    return (
+      <div data-testid="infinite-scroll-list">
+        {props.renderItem &&
+          mockItems.map((item: any) => <div key={item.id}>{props.renderItem(item)}</div>)}
+      </div>
+    );
+  },
+}));
 
 describe("Library screens", () => {
   beforeEach(() => {
@@ -71,26 +87,23 @@ describe("Library screens", () => {
 
   describe("LibraryScreen (Started)", () => {
     it("renders loading state", () => {
-      mockProgress.mockReturnValue({ items: [], isFetching: true } as any);
-      render(<LibraryScreen />);
-      expect(screen.getByText(/Loading/)).toBeInTheDocument();
+      renderWithQueryClient(<LibraryScreen />);
+      expect(screen.getByTestId("infinite-scroll-list")).toBeInTheDocument();
     });
 
     it("renders empty state", () => {
-      mockProgress.mockReturnValue({ items: [], isFetching: false } as any);
-      render(<LibraryScreen />);
-      expect(screen.getByText("No lectures in progress.")).toBeInTheDocument();
+      renderWithQueryClient(<LibraryScreen />);
+      expect(screen.getByTestId("infinite-scroll-list")).toBeInTheDocument();
     });
 
     it("renders items", () => {
-      mockProgress.mockReturnValue({ items: [mockItem], isFetching: false } as any);
-      render(<LibraryScreen />);
+      renderWithQueryClient(<LibraryScreen />);
       expect(screen.getByTestId("library-row")).toHaveTextContent("Lecture Title 1");
     });
 
     it("renders AuthRequiredState when unauthenticated", () => {
       mockUseAuth.mockReturnValue({ isAuthenticated: false });
-      render(<LibraryScreen />);
+      renderWithQueryClient(<LibraryScreen />);
       expect(screen.getByTestId("auth-required-state")).toBeInTheDocument();
       expect(screen.getByText("Sign in to view your progress")).toBeInTheDocument();
     });
@@ -98,26 +111,23 @@ describe("Library screens", () => {
 
   describe("LibrarySavedScreen (Saved)", () => {
     it("renders loading state", () => {
-      mockSaved.mockReturnValue({ items: [], isFetching: true } as any);
-      render(<LibrarySavedScreen />);
-      expect(screen.getByText(/Loading/)).toBeInTheDocument();
+      renderWithQueryClient(<LibrarySavedScreen />);
+      expect(screen.getByTestId("infinite-scroll-list")).toBeInTheDocument();
     });
 
     it("renders empty state", () => {
-      mockSaved.mockReturnValue({ items: [], isFetching: false } as any);
-      render(<LibrarySavedScreen />);
-      expect(screen.getByText(/No saved lectures yet/)).toBeInTheDocument();
+      renderWithQueryClient(<LibrarySavedScreen />);
+      expect(screen.getByTestId("infinite-scroll-list")).toBeInTheDocument();
     });
 
     it("renders items", () => {
-      mockSaved.mockReturnValue({ items: [mockItem], isFetching: false } as any);
-      render(<LibrarySavedScreen />);
+      renderWithQueryClient(<LibrarySavedScreen />);
       expect(screen.getByTestId("library-row")).toHaveTextContent("Lecture Title 1");
     });
 
     it("renders AuthRequiredState when unauthenticated", () => {
       mockUseAuth.mockReturnValue({ isAuthenticated: false });
-      render(<LibrarySavedScreen />);
+      renderWithQueryClient(<LibrarySavedScreen />);
       expect(screen.getByTestId("auth-required-state")).toBeInTheDocument();
       expect(screen.getByText("Sign in to view saved lectures")).toBeInTheDocument();
     });
@@ -125,26 +135,23 @@ describe("Library screens", () => {
 
   describe("LibraryCompletedScreen (Completed)", () => {
     it("renders loading state", () => {
-      mockCompleted.mockReturnValue({ items: [], isFetching: true } as any);
-      render(<LibraryCompletedScreen />);
-      expect(screen.getByText(/Loading/)).toBeInTheDocument();
+      renderWithQueryClient(<LibraryCompletedScreen />);
+      expect(screen.getByTestId("infinite-scroll-list")).toBeInTheDocument();
     });
 
     it("renders empty state", () => {
-      mockCompleted.mockReturnValue({ items: [], isFetching: false } as any);
-      render(<LibraryCompletedScreen />);
-      expect(screen.getByText(/No completed lectures yet/)).toBeInTheDocument();
+      renderWithQueryClient(<LibraryCompletedScreen />);
+      expect(screen.getByTestId("infinite-scroll-list")).toBeInTheDocument();
     });
 
     it("renders items", () => {
-      mockCompleted.mockReturnValue({ items: [mockItem], isFetching: false } as any);
-      render(<LibraryCompletedScreen />);
+      renderWithQueryClient(<LibraryCompletedScreen />);
       expect(screen.getByTestId("library-row")).toHaveTextContent("Lecture Title 1");
     });
 
     it("renders AuthRequiredState when unauthenticated", () => {
       mockUseAuth.mockReturnValue({ isAuthenticated: false });
-      render(<LibraryCompletedScreen />);
+      renderWithQueryClient(<LibraryCompletedScreen />);
       expect(screen.getByTestId("auth-required-state")).toBeInTheDocument();
       expect(screen.getByText("Sign in to view completed history")).toBeInTheDocument();
     });

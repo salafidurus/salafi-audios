@@ -1,50 +1,54 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { routes } from "@sd/core-contracts";
-import { useScholarsList } from "@sd/domain-content";
+import { useInfiniteScholarsList } from "@sd/domain-content";
+import { useDebouncedSearch } from "@/shared/hooks";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { AppText } from "@/shared/components/AppText/AppText";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { Search } from "@/shared/components/Search";
+import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { ScholarListRow } from "@/features/listing/components/scholar/scholar-list-row/scholar-list-row";
 import styles from "./scholar-list.screen.module.css";
 
 export function ScholarListScreen() {
-  const { push } = useRouter();
-  const { data, isFetching } = useScholarsList();
-  const scholars = data?.scholars ?? [];
+  const {
+    query: searchQuery,
+    setQuery: setSearchQuery,
+    debouncedQuery: debouncedSearch,
+  } = useDebouncedSearch();
 
-  const handleSelectScholar = (slug: string) => {
-    push(routes.scholars.detail(slug));
-  };
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    useInfiniteScholarsList();
 
-  if (isFetching && scholars.length === 0) {
-    return (
-      <ScreenView center>
-        <AppText variant="bodyMd">Loading scholars…</AppText>
-      </ScreenView>
-    );
-  }
+  const allItems = data?.pages.flatMap((page) => page.items) ?? [];
 
-  if (!isFetching && scholars.length === 0) {
-    return (
-      <ScreenView center>
-        <AppText variant="bodyMd">No scholars found.</AppText>
-      </ScreenView>
-    );
-  }
+  const filteredItems = debouncedSearch.trim()
+    ? allItems.filter(
+        (scholar) =>
+          scholar.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+          scholar.slug.toLowerCase().includes(debouncedSearch.toLowerCase()),
+      )
+    : allItems;
 
   return (
-    <ScreenView>
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Scholars</h1>
-          <p className={styles.tagline}>Browse our database of authentic scholars</p>
-        </div>
-        <div className={styles.list}>
-          {scholars.map((scholar) => (
-            <ScholarListRow key={scholar.id} scholar={scholar} onPress={handleSelectScholar} />
-          ))}
-        </div>
+    <ScreenView contentStyle={{ flex: 1 }}>
+      <PageHeader title="Scholars" />
+
+      <div className={styles.content}>
+        <Search.Bar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search scholars..."
+        />
+
+        <InfiniteScrollList
+          data={filteredItems}
+          isLoading={isLoading && filteredItems.length === 0}
+          hasMore={hasNextPage ?? false}
+          onLoadMore={() => fetchNextPage()}
+          isFetchingNextPage={isFetchingNextPage}
+          renderItem={(scholar) => <ScholarListRow scholar={scholar} />}
+          emptyMessage={debouncedSearch ? "No scholars match your search." : "No scholars found."}
+        />
       </div>
     </ScreenView>
   );

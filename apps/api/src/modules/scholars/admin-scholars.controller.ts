@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Param, Body } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Body, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { Permissions } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
@@ -16,8 +16,8 @@ export class AdminScholarsController {
   @Get()
   @RequiresPermission(Permissions.SCHOLARS_VIEW)
   @ApiOperation({ summary: 'List all scholars (including inactive)' })
-  list() {
-    return this.service.adminList();
+  list(@Query('cursor') cursor?: string) {
+    return this.service.adminList(cursor);
   }
 
   @Post()

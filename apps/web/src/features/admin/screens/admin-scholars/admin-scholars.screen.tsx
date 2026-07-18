@@ -2,49 +2,32 @@
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
+import { useInfiniteAdminScholars } from "@sd/domain-content";
 import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
-import { List } from "@/shared/components/List";
 import { Search } from "@/shared/components/Search";
-import {
-  useApiQuery,
-  queryKeys,
-  httpClient,
-  endpoints,
-  type CreateScholarDto,
-  type AdminScholarListItemDto,
-} from "@sd/core-contracts";
+import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
+import { type CreateScholarDto, type AdminScholarListItemDto } from "@sd/core-contracts";
 import { createScholar, updateScholar } from "@/features/admin/api/admin.api";
 import { Scholar, type ScholarForEdit } from "@/features/admin/components/Scholar";
 import styles from "./admin-scholars.screen.module.css";
 
 export function AdminScholarsScreen() {
   const isDesktop = useIsDesktop();
-  const { data, isFetching, refetch } = useApiQuery<AdminScholarListItemDto[]>(
-    queryKeys.admin.scholars.list(),
-    () =>
-      httpClient<AdminScholarListItemDto[]>({
-        url: endpoints.admin.scholars.list,
-        method: "GET",
-      }),
-  );
 
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingScholar, setEditingScholar] = useState<ScholarForEdit | null>(null);
 
-  const scholars = data ?? [];
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    useInfiniteAdminScholars({
+      search: searchQuery,
+    });
 
-  const filteredScholars = !searchQuery.trim()
-    ? scholars
-    : scholars.filter(
-        (s) =>
-          s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          s.slug.toLowerCase().includes(searchQuery.toLowerCase()),
-      );
+  const allItems = data?.pages.flatMap((page) => page.items) ?? [];
 
   const handleOpenAdd = () => {
     setEditingScholar(null);
@@ -76,16 +59,9 @@ export function AdminScholarsScreen() {
     } else {
       await createScholar(formData);
     }
-    refetch();
+    setIsModalOpen(false);
+    setEditingScholar(null);
   };
-
-  if (isFetching && !data) {
-    return (
-      <ScreenView>
-        <div className={styles.loading}>Loading scholars...</div>
-      </ScreenView>
-    );
-  }
 
   return (
     <ScreenView>
@@ -114,29 +90,30 @@ export function AdminScholarsScreen() {
           />
         </div>
 
-        {filteredScholars.length > 0 ? (
-          <List>
-            {filteredScholars.map((scholar) => (
-              <Scholar.Item
-                key={scholar.id}
-                scholar={scholar}
-                onEdit={() => handleOpenEdit(scholar)}
-              />
-            ))}
-          </List>
-        ) : (
-          <div className={styles.empty}>
-            {searchQuery ? "No scholars match your search." : "No scholars yet."}
-          </div>
-        )}
+        <InfiniteScrollList
+          data={allItems}
+          isLoading={isLoading}
+          hasMore={hasNextPage ?? false}
+          onLoadMore={() => fetchNextPage()}
+          isFetchingNextPage={isFetchingNextPage}
+          renderItem={(scholar) => (
+            <Scholar.Item scholar={scholar} onEdit={() => handleOpenEdit(scholar)} />
+          )}
+          emptyMessage={searchQuery ? "No scholars match your search." : "No scholars found."}
+        />
       </div>
 
-      <Scholar.Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleSave}
-        scholar={editingScholar}
-      />
+      {isModalOpen && (
+        <Scholar.Modal
+          scholar={editingScholar}
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setEditingScholar(null);
+          }}
+          onSave={handleSave}
+        />
+      )}
     </ScreenView>
   );
 }

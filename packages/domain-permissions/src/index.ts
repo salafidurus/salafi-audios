@@ -12,5 +12,7 @@ export {
   usePermissions,
 } from "./hooks/use-permissions";
 
+export { useInfiniteAdminUsers, type UseInfiniteAdminUsersOptions } from "./hooks";
+
 // Components
 export { PermissionGate, RoleGate } from "./components/PermissionGate";

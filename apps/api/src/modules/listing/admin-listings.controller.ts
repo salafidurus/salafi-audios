@@ -24,13 +24,13 @@ export class AdminListingsController {
   @RequiresPermission(Permissions.LISTINGS_VIEW)
   @ApiOperation({ summary: 'List all listings (admin)' })
   listAdmin(
-    @Query('page') page = '1',
+    @Query('cursor') cursor?: string,
     @Query('scholarId') scholarId?: string,
     @Query('status') status?: string,
     @Query('search') search?: string,
   ): Promise<AdminListingListDto> {
     return this.service.listAdmin({
-      page: Number(page),
+      cursor,
       scholarId,
       status,
       search,

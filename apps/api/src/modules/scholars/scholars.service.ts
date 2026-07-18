@@ -5,7 +5,7 @@ import type {
   ScholarContentUnifiedDto,
   ScholarTopicsDto,
   TranslationViewDto,
-  AdminScholarListItemDto,
+  AdminScholarListDto,
 } from '@sd/core-contracts';
 import { ScholarsRepository } from './scholars.repo';
 import type { CreateScholarDto } from './dto/create-scholar.dto';
@@ -20,8 +20,8 @@ export class ScholarsService {
     return this.repo.list();
   }
 
-  adminList(): Promise<AdminScholarListItemDto[]> {
-    return this.repo.adminList();
+  adminList(cursor?: string): Promise<AdminScholarListDto> {
+    return this.repo.adminList(cursor);
   }
 
   async getBySlug(slug: string): Promise<

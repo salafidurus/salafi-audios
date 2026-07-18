@@ -24,7 +24,7 @@ export class SearchService {
   ): Promise<SearchCatalogResultsDto> {
     const trimmed = query.q?.trim();
     if (!trimmed) {
-      return { collections: [], series: [], singles: [] };
+      return { collections: [], series: [], singles: [], hasMore: false };
     }
 
     const limit = Math.min(query.limit ?? DEFAULT_SEARCH_LIMIT, MAX_SEARCH_LIMIT);
@@ -47,6 +47,7 @@ export class SearchService {
       collections,
       series,
       singles,
+      hasMore: false,
     };
   }
 }

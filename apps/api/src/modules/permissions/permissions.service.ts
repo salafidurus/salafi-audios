@@ -325,8 +325,8 @@ export class PermissionsService {
    * @param role - Optional role filter (filters by UserRoleAssignment)
    * @returns AdminUserListDto with users array and total count
    */
-  async listUsers(query?: string, role?: string) {
-    const { users, total } = await this.repository.listUsers(query, role);
+  async listUsers(query?: string, role?: string, cursor?: string) {
+    const { users, nextCursor, hasMore } = await this.repository.listUsers(query, role, cursor);
     return {
       users: users.map((u) => ({
         id: u.id,
@@ -337,7 +337,8 @@ export class PermissionsService {
         createdAt: u.createdAt.toISOString(),
         permissions: u.permissions.map((p) => p.permission),
       })),
-      total,
+      nextCursor,
+      hasMore,
     };
   }
 

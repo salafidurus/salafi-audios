@@ -3,7 +3,6 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import type { LibraryItemDto } from "@sd/core-contracts";
 import { LibraryListRow } from "./library-list-row";
-import styles from "./library-list-row.module.css";
 
 vi.mock("@/features/settings/content-preference", () => ({
   useShowOriginalContent: () => false,

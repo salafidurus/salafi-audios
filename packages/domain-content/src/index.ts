@@ -1,3 +1,21 @@
+// Infinite scroll hooks
+export {
+  useInfiniteScholarsList,
+  useInfiniteScholarContent,
+  useInfiniteLibrarySaved,
+  useInfiniteLibraryCompleted,
+  useInfiniteLibraryProgress,
+  useInfiniteAdminScholars,
+  useInfiniteAdminListings,
+  type UseInfiniteScholarsListOptions,
+  type UseInfiniteScholarContentOptions,
+  type UseInfiniteLibrarySavedOptions,
+  type UseInfiniteLibraryCompletedOptions,
+  type UseInfiniteLibraryProgressOptions,
+  type UseInfiniteAdminScholarsOptions,
+  type UseInfiniteAdminListingsOptions,
+} from "./hooks";
+
 export { useExplore, useExploreScholars } from "./use-explore";
 export { useExploreRecentScreen } from "./use-explore-recent";
 export { useExploreFollowingScreen } from "./use-explore-following";

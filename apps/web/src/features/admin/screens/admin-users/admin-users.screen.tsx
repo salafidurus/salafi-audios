@@ -1,27 +1,21 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback, type ReactNode } from "react";
+import { useState, useCallback, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  useApiQuery,
-  queryKeys,
-  httpClient,
-  endpoints,
-  type AdminUserListDto,
-  type UserRole,
-} from "@sd/core-contracts";
+import { queryKeys } from "@sd/core-contracts";
+import { useInfiniteAdminUsers } from "@sd/domain-permissions";
+import { useDebouncedSearch } from "@/shared/hooks";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
-import { EmptyState } from "@/shared/components/EmptyState";
 import { Search } from "@/shared/components/Search";
-import { List } from "@/shared/components/List";
+import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { UserItem } from "@/features/admin/components/user-item";
 import { PermissionsDialog } from "@/features/admin/components/PermissionsDialog";
 import { RoleDialog } from "@/features/admin/components/RoleDialog";
 import styles from "./admin-users.screen.module.css";
 
-const ROLE_CHIPS: { id: UserRole; label: string }[] = [
+const ROLE_CHIPS: { id: string; label: string }[] = [
   { id: "listener", label: "Listener" },
   { id: "scholar", label: "Scholar" },
   { id: "translator", label: "Translator" },
@@ -33,31 +27,19 @@ const ROLE_CHIPS: { id: UserRole; label: string }[] = [
 export function AdminUsersScreen(): ReactNode {
   const queryClient = useQueryClient();
   const { isMobile } = useResponsive();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const { query: searchQuery, setQuery: setSearchQuery, debouncedQuery } = useDebouncedSearch();
   const [role, setRole] = useState("");
   const [permUser, setPermUser] = useState<{ id: string; name: string } | null>(null);
   const [roleUser, setRoleUser] = useState<{ id: string; name: string } | null>(null);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchQuery);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  const { data, isFetching } = useApiQuery<AdminUserListDto>(
-    queryKeys.admin.users.list(debouncedSearch, role),
-    () =>
-      httpClient<AdminUserListDto>({
-        url: `${endpoints.admin.users.list}${debouncedSearch || role ? `?${new URLSearchParams({ ...(debouncedSearch && { q: debouncedSearch }), ...(role && { role }) }).toString()}` : ""}`,
-        method: "GET",
-      }),
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteAdminUsers(
+    {
+      search: debouncedQuery,
+      role,
+    },
   );
 
-  const users = useMemo(() => data?.users ?? [], [data]);
-  const total = useMemo(() => data?.total ?? 0, [data]);
+  const allItems = data?.pages.flatMap((page: any) => page.items) ?? [];
 
   const handlePermissionsChange = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
@@ -88,36 +70,21 @@ export function AdminUsersScreen(): ReactNode {
           }}
         />
 
-        {isFetching ? (
-          <EmptyState variant="loading" message="Loading users…" />
-        ) : (
-          <>
-            <div className={styles.toolbar}>
-              <p className={styles.resultCount}>
-                {total} user{total !== 1 ? "s" : ""} found
-              </p>
-            </div>
-
-            {users.length === 0 ? (
-              <EmptyState
-                message={
-                  debouncedSearch || role ? "No users match your search." : "No users found."
-                }
-              />
-            ) : (
-              <List>
-                {users.map((user) => (
-                  <UserItem
-                    key={user.id}
-                    user={user}
-                    onManagePermissions={() => setPermUser({ id: user.id, name: user.name })}
-                    onManageRoles={() => setRoleUser({ id: user.id, name: user.name })}
-                  />
-                ))}
-              </List>
-            )}
-          </>
-        )}
+        <InfiniteScrollList
+          data={allItems}
+          isLoading={isLoading}
+          hasMore={hasNextPage ?? false}
+          onLoadMore={() => fetchNextPage()}
+          isFetchingNextPage={isFetchingNextPage}
+          renderItem={(user) => (
+            <UserItem
+              user={user}
+              onManagePermissions={() => setPermUser({ id: user.id, name: user.name })}
+              onManageRoles={() => setRoleUser({ id: user.id, name: user.name })}
+            />
+          )}
+          emptyMessage={debouncedQuery || role ? "No users match your search." : "No users found."}
+        />
       </div>
 
       {permUser && (

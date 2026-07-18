@@ -29,7 +29,7 @@ export class ListingService {
   }
 
   listAdmin(params: {
-    page: number;
+    cursor?: string;
     scholarId?: string;
     status?: string;
     search?: string;

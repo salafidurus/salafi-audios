@@ -1,5 +1,7 @@
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
+import React from "react";
 import { render, screen } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AdminContentsScreen } from "./admin-contents.screen";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 import { useApiQuery } from "@sd/core-contracts";
@@ -17,19 +19,33 @@ vi.mock("next/navigation", () => ({ usePathname: vi.fn() }));
 vi.mock("@/shared/hooks/use-responsive", () => ({
   useResponsive: () => ({ isMobile: false }),
 }));
+vi.mock("@/shared/components/InfiniteScrollList", () => ({
+  InfiniteScrollList: () => <div data-testid="infinite-scroll-list" />,
+}));
 
 describe("AdminContentsScreen — topics tab permission gates", () => {
+  let queryClient: QueryClient;
+
   beforeEach(() => {
+    queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+      },
+    });
     (usePathname as Mock<any>).mockReturnValue("/admin/contents");
     (useApiQuery as Mock<any>).mockReturnValue({ data: [], refetch: vi.fn() });
   });
+
+  const renderWithProviders = (component: React.ReactElement) => {
+    return render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>);
+  };
 
   it("hides Add Topic button when user lacks TOPICS_CREATE", () => {
     (useAdminPermissions as Mock<any>).mockReturnValue({
       data: { permissions: ["LISTINGS_VIEW"] },
     });
 
-    render(<AdminContentsScreen />);
+    renderWithProviders(<AdminContentsScreen />);
 
     expect(screen.queryByText("Add Topic")).not.toBeInTheDocument();
   });
@@ -39,7 +55,7 @@ describe("AdminContentsScreen — topics tab permission gates", () => {
       data: { permissions: ["TOPICS_CREATE"] },
     });
 
-    render(<AdminContentsScreen />);
+    renderWithProviders(<AdminContentsScreen />);
 
     expect(screen.getByText("Add Topic")).toBeInTheDocument();
   });

@@ -31,14 +31,22 @@ export const createQueryClient = () =>
   });
 
 // Common query keys for type-safe cache management
+// NOTE: Extended with pagination/infinite keys while maintaining full backward compatibility
 export const queryKeys = {
   scholars: {
     all: ["scholars"] as const,
-    list: () => [...queryKeys.scholars.all, "list"] as const,
+    list: {
+      all: () => [...queryKeys.scholars.all, "list"] as const,
+      infinite: () => [...queryKeys.scholars.all, "list", "infinite"] as const,
+    },
     detail: (slug: string) => [...queryKeys.scholars.all, "detail", slug] as const,
     stats: (slug: string) => [...queryKeys.scholars.all, "stats", slug] as const,
     content: (slug: string) => [...queryKeys.scholars.all, "content", slug] as const,
     topics: (slug: string) => [...queryKeys.scholars.all, "topics", slug] as const,
+    // NEW: pagination support (legacy keys)
+    list_infinite: () => [...queryKeys.scholars.all, "list", "infinite"] as const,
+    content_infinite: (slug: string) =>
+      [...queryKeys.scholars.all, "content", slug, "infinite"] as const,
   },
   listings: {
     all: ["listings"] as const,
@@ -60,6 +68,8 @@ export const queryKeys = {
   search: {
     all: ["search"] as const,
     catalog: (params: SearchCatalogParams) => [...queryKeys.search.all, "catalog", params] as const,
+    // NEW: pagination support
+    infinite: (query: string) => [...queryKeys.search.all, "infinite", query] as const,
   },
   explore: {
     all: ["explore"] as const,
@@ -70,9 +80,18 @@ export const queryKeys = {
   },
   library: {
     all: ["library"] as const,
-    saved: (cursor?: string) => [...queryKeys.library.all, "saved", cursor] as const,
-    completed: (cursor?: string) => [...queryKeys.library.all, "completed", cursor] as const,
-    progress: (cursor?: string) => [...queryKeys.library.all, "progress", cursor] as const,
+    saved: {
+      all: () => [...queryKeys.library.all, "saved"] as const,
+      infinite: () => [...queryKeys.library.all, "saved", "infinite"] as const,
+    },
+    completed: {
+      all: () => [...queryKeys.library.all, "completed"] as const,
+      infinite: () => [...queryKeys.library.all, "completed", "infinite"] as const,
+    },
+    progress: {
+      all: () => [...queryKeys.library.all, "progress"] as const,
+      infinite: () => [...queryKeys.library.all, "progress", "infinite"] as const,
+    },
   },
   account: {
     all: ["account"] as const,
@@ -99,10 +118,22 @@ export const queryKeys = {
       all: () => [...queryKeys.admin.all, "users"] as const,
       list: (query?: string, role?: string) =>
         [...queryKeys.admin.all, "users", "list", query, role] as const,
+      // NEW: pagination support
+      infinite: (search?: string, role?: string) =>
+        [...queryKeys.admin.all, "users", "infinite", search ?? "", role ?? ""] as const,
     },
     scholars: {
       all: () => [...queryKeys.admin.all, "scholars"] as const,
       list: () => [...queryKeys.admin.all, "scholars", "list"] as const,
+      // NEW: pagination support
+      infinite: (search?: string) =>
+        [...queryKeys.admin.all, "scholars", "infinite", search ?? ""] as const,
+    },
+    listings: {
+      all: () => [...queryKeys.admin.all, "listings"] as const,
+      // NEW: pagination support
+      infinite: (search?: string) =>
+        [...queryKeys.admin.all, "listings", "infinite", search ?? ""] as const,
     },
     topics: {
       all: () => [...queryKeys.admin.all, "topics"] as const,

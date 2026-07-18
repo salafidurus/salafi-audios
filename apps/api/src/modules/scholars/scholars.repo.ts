@@ -1,6 +1,6 @@
 import { PrismaService } from '../../shared/db/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { Status, Locale as DbLocale } from '@sd/core-db';
+import { Status, Locale as DbLocale, Prisma } from '@sd/core-db';
 import type {
   ScholarListItemDto,
   ScholarDetailDto,
@@ -16,15 +16,24 @@ import type { UpdateScholarDto } from './dto/update-scholar.dto';
 import type { SaveScholarTranslationDto } from './dto/save-scholar-translation.dto';
 import { resolveContentTranslation } from '../../shared/utils/resolve-content-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
+import { decodeCursor, buildPaginatedResult } from '../../shared/utils/pagination';
 
 @Injectable()
 export class ScholarsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async list(): Promise<{ scholars: ScholarListItemDto[] }> {
+  async list(
+    cursor?: string,
+  ): Promise<{ scholars: ScholarListItemDto[]; nextCursor?: string; hasMore: boolean }> {
     const locale = getRequestLocale();
+    const pageSize = 20;
+    const take = pageSize + 1;
+    const decodedCursor = decodeCursor(cursor);
+
     const records = await this.prisma.scholar.findMany({
       where: { isActive: true },
+      take,
+      ...(decodedCursor ? { cursor: { id: decodedCursor }, skip: 1 } : {}),
       orderBy: { name: 'asc' },
       select: {
         id: true,
@@ -72,7 +81,8 @@ export class ScholarsRepository {
       };
     });
 
-    return { scholars };
+    const result = buildPaginatedResult(scholars, pageSize);
+    return { scholars: result.items, nextCursor: result.nextCursor, hasMore: result.hasMore };
   }
 
   async findBySlug(slug: string): Promise<
@@ -353,8 +363,21 @@ export class ScholarsRepository {
     });
   }
 
-  async adminList(): Promise<AdminScholarListItemDto[]> {
+  async adminList(
+    cursor?: string,
+    search?: string,
+  ): Promise<{ items: AdminScholarListItemDto[]; nextCursor?: string; hasMore: boolean }> {
+    const pageSize = 50;
+    const take = pageSize + 1;
+
+    const where: Prisma.ScholarWhereInput = search
+      ? { name: { contains: search, mode: 'insensitive' as const } }
+      : {};
+
     const records = await this.prisma.scholar.findMany({
+      where,
+      take,
+      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       orderBy: { name: 'asc' },
       select: {
         id: true,
@@ -379,28 +402,35 @@ export class ScholarsRepository {
       },
     });
 
-    return records.map((r) => ({
-      id: r.id,
-      slug: r.slug,
-      name: r.name,
-      bio: r.bio ?? undefined,
-      country: (r.country ?? undefined) as AdminScholarListItemDto['country'],
-      mainLanguage: r.mainLanguage ?? undefined,
-      imageUrl: r.imageUrl ?? undefined,
-      isActive: r.isActive,
-      isKibar: r.isKibar,
-      socialTwitter: r.socialTwitter ?? undefined,
-      socialTelegram: r.socialTelegram ?? undefined,
-      socialYoutube: r.socialYoutube ?? undefined,
-      socialWebsite: r.socialWebsite ?? undefined,
-      createdAt: r.createdAt.toISOString(),
-      updatedAt: r.updatedAt?.toISOString(),
-      translations: r.translations.map((t) => ({
-        locale: t.locale,
-        name: t.name,
-        status: t.status === 'published' ? 'published' : ('draft' as const),
-      })),
-    }));
+    const hasMore = records.length > pageSize;
+    const items: AdminScholarListItemDto[] = (hasMore ? records.slice(0, pageSize) : records).map(
+      (r) => ({
+        id: r.id,
+        slug: r.slug,
+        name: r.name,
+        bio: r.bio ?? undefined,
+        country: (r.country ?? undefined) as AdminScholarListItemDto['country'],
+        mainLanguage: r.mainLanguage ?? undefined,
+        imageUrl: r.imageUrl ?? undefined,
+        isActive: r.isActive,
+        isKibar: r.isKibar,
+        socialTwitter: r.socialTwitter ?? undefined,
+        socialTelegram: r.socialTelegram ?? undefined,
+        socialYoutube: r.socialYoutube ?? undefined,
+        socialWebsite: r.socialWebsite ?? undefined,
+        createdAt: r.createdAt.toISOString(),
+        updatedAt: r.updatedAt?.toISOString(),
+        translations: r.translations.map((t) => ({
+          locale: t.locale,
+          name: t.name,
+          status: t.status === 'published' ? ('published' as const) : ('draft' as const),
+        })),
+      }),
+    );
+
+    const nextCursor = hasMore ? items[items.length - 1]?.id : undefined;
+
+    return { items, nextCursor, hasMore };
   }
 
   async create(dto: CreateScholarDto) {
