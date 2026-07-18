@@ -32,7 +32,7 @@ initApiClient({ baseUrl: process.env.NEXT_PUBLIC_API_URL, getAccessToken: () => 
 
 1. Update types in `src/types/`.
 2. Update `src/query/hooks/` and `src/query/query-keys.ts` if the endpoint or hook signature changed.
-3. Run `bun run --filter @sd/core-contracts build` before testing downstream apps.
+3. No build is needed — exports resolve directly to `src/`, so web and API see changes instantly during dev.
 
 ## Quality rules
 

@@ -7,47 +7,37 @@
     "dist"
   ],
   "sideEffects": false,
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./src/index.ts",
       "react-native": "./src/index.ts",
       "source": "./src/index.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "default": "./dist/index.mjs"
-    },
-    "./node": {
-      "types": "./dist/index.node.d.ts",
-      "import": "./dist/index.node.mjs",
-      "require": "./dist/index.node.js",
-      "default": "./dist/index.node.mjs"
+      "import": "./src/index.ts",
+      "require": "./src/index.ts",
+      "default": "./src/index.ts"
     },
     "./query": {
-      "types": "./dist/query/index.d.ts",
-      "import": "./dist/query/index.mjs",
-      "require": "./dist/query/index.js",
-      "default": "./dist/query/index.mjs"
+      "types": "./src/query/index.ts",
+      "import": "./src/query/index.ts",
+      "require": "./src/query/index.ts",
+      "default": "./src/query/index.ts"
     },
     "./query/hooks": {
-      "types": "./dist/query/hooks/index.d.ts",
-      "import": "./dist/query/hooks/index.mjs",
-      "require": "./dist/query/hooks/index.js",
-      "default": "./dist/query/hooks/index.mjs"
+      "types": "./src/query/hooks/index.ts",
+      "import": "./src/query/hooks/index.ts",
+      "require": "./src/query/hooks/index.ts",
+      "default": "./src/query/hooks/index.ts"
     },
     "./http": {
-      "types": "./dist/http.d.ts",
-      "import": "./dist/http.mjs",
-      "require": "./dist/http.js",
-      "default": "./dist/http.mjs"
+      "types": "./src/http.ts",
+      "import": "./src/http.ts",
+      "require": "./src/http.ts",
+      "default": "./src/http.ts"
     }
   },
   "scripts": {
     "clean": "rimraf dist",
     "build": "tsup",
-    "dev": "tsup --watch",
     "lint": "oxlint .",
     "test": "bun test",
     "test:prepush": "bun test",
