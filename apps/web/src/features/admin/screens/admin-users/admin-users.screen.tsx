@@ -57,7 +57,6 @@ export function AdminUsersScreen(): ReactNode {
   );
 
   const users = useMemo(() => data?.users ?? [], [data]);
-  const total = useMemo(() => data?.total ?? 0, [data]);
 
   const handlePermissionsChange = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
@@ -94,7 +93,7 @@ export function AdminUsersScreen(): ReactNode {
           <>
             <div className={styles.toolbar}>
               <p className={styles.resultCount}>
-                {total} user{total !== 1 ? "s" : ""} found
+                {users.length} user{users.length !== 1 ? "s" : ""} found
               </p>
             </div>
 

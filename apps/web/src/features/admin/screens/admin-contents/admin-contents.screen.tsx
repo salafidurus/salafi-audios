@@ -74,7 +74,7 @@ export function AdminContentsScreen() {
   // Fetch listings
   const { data: listingsData, refetch: refetchListings } = useApiQuery<AdminListingListDto>(
     ["admin", "listings", "list", { search: searchQuery }],
-    () => fetchAdminLectures({ search: searchQuery, page: 1, limit: 100 }),
+    () => fetchAdminLectures({ search: searchQuery }),
     { enabled: activeTab === "listings" },
   );
 
