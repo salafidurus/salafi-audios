@@ -29,17 +29,3 @@ export function useAudio() {
     progressPercent,
   };
 }
-
-// Backwards compatibility alias for temporary web package compilation until Stage 7
-export function usePlayback() {
-  const audio = useAudio();
-  return {
-    ...audio,
-    play: () => {},
-    pause: () => {},
-    resume: () => {},
-    seek: () => {},
-    stop: () => {},
-    skipToNext: () => {},
-  };
-}
