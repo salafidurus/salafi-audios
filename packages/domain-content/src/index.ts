@@ -1,9 +1,15 @@
 // Infinite scroll hooks
 export {
   useInfiniteScholarsList,
+  useInfiniteLibrarySaved,
+  useInfiniteLibraryCompleted,
+  useInfiniteLibraryProgress,
   useInfiniteAdminScholars,
   useInfiniteAdminListings,
   type UseInfiniteScholarsListOptions,
+  type UseInfiniteLibrarySavedOptions,
+  type UseInfiniteLibraryCompletedOptions,
+  type UseInfiniteLibraryProgressOptions,
   type UseInfiniteAdminScholarsOptions,
   type UseInfiniteAdminListingsOptions,
 } from "./hooks";
