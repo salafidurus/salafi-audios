@@ -105,6 +105,8 @@ export {
   UpdateScholarTranslationDtoSchema,
   type AdminScholarListItemDto,
   AdminScholarListItemDtoSchema,
+  type AdminScholarListDto,
+  AdminScholarListDtoSchema,
 } from "../types/scholar.types";
 export {
   type PresignedUrlPurpose,

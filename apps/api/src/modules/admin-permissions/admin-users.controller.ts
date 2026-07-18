@@ -26,8 +26,9 @@ export class AdminUsersController {
   async listUsers(
     @Query('q') query?: string,
     @Query('role') role?: string,
+    @Query('cursor') cursor?: string,
   ): Promise<AdminUserListDto> {
-    return this.permissionsService.listUsers(query, role);
+    return this.permissionsService.listUsers(query, role, cursor);
   }
 
   @Get(':userId/permissions')

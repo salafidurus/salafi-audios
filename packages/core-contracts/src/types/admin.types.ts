@@ -72,6 +72,7 @@ export type AdminUserListItemDto = z.infer<typeof AdminUserListItemDtoSchema>;
 
 export const AdminUserListDtoSchema = z.object({
   users: z.array(AdminUserListItemDtoSchema),
-  total: z.number(),
+  nextCursor: z.string().optional(),
+  hasMore: z.boolean(),
 });
 export type AdminUserListDto = z.infer<typeof AdminUserListDtoSchema>;

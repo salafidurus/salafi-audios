@@ -421,13 +421,13 @@ export class ListingRepository {
   // ─── Admin Listing Methods ────────────────────────────────────────────────
 
   async listAdmin(params: {
-    page: number;
+    cursor?: string;
     scholarId?: string;
     status?: string;
     search?: string;
   }): Promise<AdminListingListDto> {
     const pageSize = 50;
-    const skip = (params.page - 1) * pageSize;
+    const take = pageSize + 1;
 
     const where: Prisma.ListingWhereInput = {
       deletedAt: null,
@@ -436,39 +436,40 @@ export class ListingRepository {
       ...(params.search ? { title: { contains: params.search } } : {}),
     };
 
-    const [records, total] = await Promise.all([
-      this.prisma.listing.findMany({
-        where,
-        skip,
-        take: pageSize,
-        orderBy: { createdAt: 'desc' },
-        select: {
-          id: true,
-          title: true,
-          status: true,
-          format: true,
-          durationSeconds: true,
-          orderIndex: true,
-          createdAt: true,
-          scholar: { select: { name: true } },
-        },
-      }),
-      this.prisma.listing.count({ where }),
-    ]);
+    const records = await this.prisma.listing.findMany({
+      where,
+      take,
+      ...(params.cursor ? { cursor: { id: params.cursor }, skip: 1 } : {}),
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        format: true,
+        durationSeconds: true,
+        orderIndex: true,
+        createdAt: true,
+        scholar: { select: { name: true } },
+      },
+    });
+
+    const hasMore = records.length > pageSize;
+    const items = (hasMore ? records.slice(0, pageSize) : records).map((r) => ({
+      id: r.id,
+      title: r.title,
+      scholarName: r.scholar.name,
+      format: r.format,
+      status: r.status,
+      durationSeconds: r.durationSeconds ?? undefined,
+      orderIndex: r.orderIndex ?? undefined,
+      createdAt: r.createdAt.toISOString(),
+    }));
+    const nextCursor = hasMore ? items[items.length - 1]?.id : undefined;
 
     return {
-      items: records.map((r) => ({
-        id: r.id,
-        title: r.title,
-        scholarName: r.scholar.name,
-        format: r.format,
-        status: r.status,
-        durationSeconds: r.durationSeconds ?? undefined,
-        orderIndex: r.orderIndex ?? undefined,
-        createdAt: r.createdAt.toISOString(),
-      })),
-      total,
-      page: params.page,
+      items,
+      nextCursor,
+      hasMore,
     };
   }
 

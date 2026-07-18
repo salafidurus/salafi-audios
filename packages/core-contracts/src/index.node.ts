@@ -28,6 +28,8 @@ export {
   type CollectionSummaryDto,
   type AdminScholarListItemDto,
   AdminScholarListItemDtoSchema,
+  type AdminScholarListDto,
+  AdminScholarListDtoSchema,
   type CountryCode,
   CountryCodeSchema,
   COUNTRY_CODES,

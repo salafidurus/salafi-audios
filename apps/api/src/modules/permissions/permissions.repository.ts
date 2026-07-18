@@ -227,7 +227,9 @@ export class PermissionsRepository {
    * List all users with optional filtering by name, email, or role
    * Returns user data with their permissions and roles included
    */
-  async listUsers(query?: string, role?: string) {
+  async listUsers(query?: string, role?: string, cursor?: string) {
+    const pageSize = 50;
+    const take = pageSize + 1;
     const where: any = {};
 
     // Add search filter (name or email)
@@ -254,38 +256,40 @@ export class PermissionsRepository {
     }
 
     try {
-      const [users, total] = await Promise.all([
-        this.prisma.user.findMany({
+      const users = await this.prisma.user.findMany({
+        where,
+        take,
+        ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+        include: {
+          permissions: {
+            select: { permission: true },
+          },
+          roles: {
+            select: { role: true },
+          },
+        },
+        orderBy: { createdAt: 'desc' as const },
+      });
+
+      const hasMore = users.length > pageSize;
+      const paginatedUsers = hasMore ? users.slice(0, pageSize) : users;
+      const nextCursor = hasMore ? paginatedUsers[paginatedUsers.length - 1]?.id : undefined;
+
+      return { users: paginatedUsers, nextCursor, hasMore };
+    } catch (error) {
+      // Fallback for stale/invalid enum values in permissions table
+      if (error instanceof Error && error.message.includes('not found in enum')) {
+        const users = await this.prisma.user.findMany({
           where,
+          take,
+          ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
           include: {
-            permissions: {
-              select: { permission: true },
-            },
             roles: {
               select: { role: true },
             },
           },
           orderBy: { createdAt: 'desc' as const },
-        }),
-        this.prisma.user.count({ where }),
-      ]);
-
-      return { users, total };
-    } catch (error) {
-      // Fallback for stale/invalid enum values in permissions table
-      if (error instanceof Error && error.message.includes('not found in enum')) {
-        const [users, total] = await Promise.all([
-          this.prisma.user.findMany({
-            where,
-            include: {
-              roles: {
-                select: { role: true },
-              },
-            },
-            orderBy: { createdAt: 'desc' as const },
-          }),
-          this.prisma.user.count({ where }),
-        ]);
+        });
 
         // Fetch permissions for each user using the graceful method
         const usersWithPermissions = await Promise.all(
@@ -297,7 +301,13 @@ export class PermissionsRepository {
           })),
         );
 
-        return { users: usersWithPermissions, total };
+        const hasMore = usersWithPermissions.length > pageSize;
+        const paginatedUsers = hasMore
+          ? usersWithPermissions.slice(0, pageSize)
+          : usersWithPermissions;
+        const nextCursor = hasMore ? paginatedUsers[paginatedUsers.length - 1]?.id : undefined;
+
+        return { users: paginatedUsers, nextCursor, hasMore };
       }
       throw error;
     }

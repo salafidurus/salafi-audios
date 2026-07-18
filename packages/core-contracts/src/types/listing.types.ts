@@ -158,8 +158,8 @@ export type AdminListingListItemDto = z.infer<typeof AdminListingListItemDtoSche
 
 export const AdminListingListDtoSchema = z.object({
   items: z.array(AdminListingListItemDtoSchema),
-  total: z.number(),
-  page: z.number(),
+  nextCursor: z.string().optional(),
+  hasMore: z.boolean(),
 });
 export type AdminListingListDto = z.infer<typeof AdminListingListDtoSchema>;
 

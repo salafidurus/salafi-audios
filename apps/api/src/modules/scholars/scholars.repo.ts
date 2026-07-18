@@ -353,8 +353,15 @@ export class ScholarsRepository {
     });
   }
 
-  async adminList(): Promise<AdminScholarListItemDto[]> {
+  async adminList(
+    cursor?: string,
+  ): Promise<{ items: AdminScholarListItemDto[]; nextCursor?: string; hasMore: boolean }> {
+    const pageSize = 50;
+    const take = pageSize + 1;
+
     const records = await this.prisma.scholar.findMany({
+      take,
+      ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       orderBy: { name: 'asc' },
       select: {
         id: true,
@@ -379,28 +386,35 @@ export class ScholarsRepository {
       },
     });
 
-    return records.map((r) => ({
-      id: r.id,
-      slug: r.slug,
-      name: r.name,
-      bio: r.bio ?? undefined,
-      country: (r.country ?? undefined) as AdminScholarListItemDto['country'],
-      mainLanguage: r.mainLanguage ?? undefined,
-      imageUrl: r.imageUrl ?? undefined,
-      isActive: r.isActive,
-      isKibar: r.isKibar,
-      socialTwitter: r.socialTwitter ?? undefined,
-      socialTelegram: r.socialTelegram ?? undefined,
-      socialYoutube: r.socialYoutube ?? undefined,
-      socialWebsite: r.socialWebsite ?? undefined,
-      createdAt: r.createdAt.toISOString(),
-      updatedAt: r.updatedAt?.toISOString(),
-      translations: r.translations.map((t) => ({
-        locale: t.locale,
-        name: t.name,
-        status: t.status === 'published' ? 'published' : ('draft' as const),
-      })),
-    }));
+    const hasMore = records.length > pageSize;
+    const items: AdminScholarListItemDto[] = (hasMore ? records.slice(0, pageSize) : records).map(
+      (r) => ({
+        id: r.id,
+        slug: r.slug,
+        name: r.name,
+        bio: r.bio ?? undefined,
+        country: (r.country ?? undefined) as AdminScholarListItemDto['country'],
+        mainLanguage: r.mainLanguage ?? undefined,
+        imageUrl: r.imageUrl ?? undefined,
+        isActive: r.isActive,
+        isKibar: r.isKibar,
+        socialTwitter: r.socialTwitter ?? undefined,
+        socialTelegram: r.socialTelegram ?? undefined,
+        socialYoutube: r.socialYoutube ?? undefined,
+        socialWebsite: r.socialWebsite ?? undefined,
+        createdAt: r.createdAt.toISOString(),
+        updatedAt: r.updatedAt?.toISOString(),
+        translations: r.translations.map((t) => ({
+          locale: t.locale,
+          name: t.name,
+          status: t.status === 'published' ? ('published' as const) : ('draft' as const),
+        })),
+      }),
+    );
+
+    const nextCursor = hasMore ? items[items.length - 1]?.id : undefined;
+
+    return { items, nextCursor, hasMore };
   }
 
   async create(dto: CreateScholarDto) {

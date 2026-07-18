@@ -76,6 +76,8 @@ export {
   ScholarTopicsDtoSchema,
   type AdminScholarListItemDto,
   AdminScholarListItemDtoSchema,
+  type AdminScholarListDto,
+  AdminScholarListDtoSchema,
   type CollectionSummaryDto,
   CollectionSummaryDtoSchema,
   type SeriesSummaryDto,
