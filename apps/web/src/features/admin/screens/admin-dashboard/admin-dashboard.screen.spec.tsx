@@ -1,15 +1,21 @@
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { render, screen } from "@testing-library/react";
 import { AdminDashboardScreen } from "./admin-dashboard.screen";
-import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
+import { useAdminPermissions } from "@sd/domain-permissions";
+import { useAuth } from "@/core/auth/use-auth";
 
-vi.mock("@/features/admin/hooks/use-admin-permissions", () => ({
+vi.mock("@sd/domain-permissions", () => ({
   useAdminPermissions: vi.fn(),
+}));
+
+vi.mock("@/core/auth/use-auth", () => ({
+  useAuth: vi.fn(),
 }));
 
 describe("AdminDashboardScreen", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    (useAuth as Mock<any>).mockReturnValue({ isAuthenticated: true });
   });
 
   it("renders loading state when fetching permissions", () => {

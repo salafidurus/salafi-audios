@@ -5,7 +5,6 @@ import { FastifyAdapter } from '@nestjs/platform-fastify';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { AuthGuard } from './auth.guard';
-import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { AuthLocaleController } from './auth-locale.controller';
 import { PrismaService } from '../../shared/db/prisma.service';
 import { ZodValidationPipe } from 'nestjs-zod';
@@ -43,10 +42,7 @@ describe('AuthLocaleController — auth boundaries', () => {
         { provide: APP_GUARD, useClass: AuthGuard },
         { provide: PrismaService, useValue: mockPrismaService },
       ],
-    })
-      .overrideGuard(AdminPermissionGuard)
-      .useValue({ canActivate: () => true })
-      .compile();
+    }).compile();
 
     app = module.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
     app.useGlobalPipes(new ZodValidationPipe());

@@ -1,10 +1,11 @@
 "use client";
 
 import type { AdminPermission } from "@sd/core-contracts";
+import { useAdminPermissions } from "@sd/domain-permissions";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { EmptyState } from "@/shared/components/EmptyState";
-import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
+import { useAuth } from "@/core/auth/use-auth";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import styles from "./admin-dashboard.screen.module.css";
 
@@ -42,7 +43,8 @@ const ADMIN_SECTIONS: AdminSection[] = [
 
 export function AdminDashboardScreen() {
   const { isMobile } = useResponsive();
-  const { data, isFetching } = useAdminPermissions();
+  const { isAuthenticated } = useAuth();
+  const { data, isFetching } = useAdminPermissions({ isAuthenticated });
 
   if (isFetching) {
     return (

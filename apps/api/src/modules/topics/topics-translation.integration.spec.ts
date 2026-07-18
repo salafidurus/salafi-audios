@@ -6,7 +6,6 @@ import { CacheModule } from '@nestjs/cache-manager';
 import request from 'supertest';
 import { createTestApp } from '../../test/create-test-app';
 import { AuthGuard } from '../auth/auth.guard';
-import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { PermissionGuard } from '../../shared/guards/permission.guard';
 import { TopicsController } from './topics.controller';
 import { TopicsTranslationsController } from './topics-translations.controller';
@@ -61,11 +60,7 @@ async function buildApp(overrideGuard?: () => boolean | never): Promise<NestFast
       { provide: TopicsService, useValue: mockTopicsService },
       { provide: PrismaService, useValue: mockPrisma },
     ],
-  })
-    .overrideGuard(AdminPermissionGuard)
-    .useValue({
-      canActivate: overrideGuard ?? (() => true),
-    });
+  });
 
   return createTestApp(builder);
 }
