@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import type { Permission, ScholarPermissionType, UserRole } from '@sd/core-contracts';
-import { PermissionEnum } from '@sd/core-contracts';
+import { ROLE_DEFAULT_PERMISSIONS } from '@sd/core-contracts';
 import { PrismaService } from '../../shared/db/prisma.service';
 import type { Locale } from '@sd/core-db';
 
@@ -289,9 +289,9 @@ export class PermissionsRepository {
           WHERE "userId" = ${userId}
           ORDER BY "grantedAt" DESC
         `;
-        const validPermissions = new Set(PermissionEnum._def.options);
+        const validPermissions = new Set(ROLE_DEFAULT_PERMISSIONS.superadmin);
         return perms.reduce<Permission[]>((acc, p) => {
-          if (validPermissions.has(p.permission)) {
+          if (validPermissions.has(p.permission as Permission)) {
             acc.push(p.permission as Permission);
           }
           return acc;
