@@ -9,20 +9,21 @@ export function useInfiniteLibraryCompleted(options?: UseInfiniteLibraryComplete
   return useInfiniteQuery({
     queryKey: queryKeys.library.completed.infinite(),
     queryFn: async ({ pageParam }) => {
-      const params = new URLSearchParams();
-      if (pageParam) params.append("cursor", pageParam);
+      if (pageParam) {
+        return { items: [], nextCursor: undefined, hasMore: false };
+      }
 
-      const url = `${endpoints.library.completed}${params.size > 0 ? `?${params}` : ""}`;
+      const url = endpoints.library.completed;
       const response = await httpClient<LibraryPageDto>({ url, method: "GET" });
 
       return {
         items: response.items,
-        nextCursor: response.nextCursor,
-        hasMore: response.hasMore ?? false,
+        nextCursor: undefined,
+        hasMore: false,
       };
     },
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    getNextPageParam: () => undefined,
     enabled: options?.enabled !== false,
   });
 }

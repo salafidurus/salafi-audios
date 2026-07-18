@@ -18,25 +18,24 @@ export function useInfiniteScholarContent({
   return useInfiniteQuery({
     queryKey: queryKeys.scholars.content_infinite(slug),
     queryFn: async ({ pageParam }) => {
-      const params = new URLSearchParams();
-      if (pageParam) params.append("cursor", pageParam);
+      if (pageParam) {
+        return { items: [], nextCursor: undefined, hasMore: false };
+      }
 
-      const url = `${endpoints.scholars.content(slug)}${params.size > 0 ? `?${params}` : ""}`;
-      const response = await httpClient<
-        ScholarContentUnifiedDto & { nextCursor?: string; hasMore?: boolean }
-      >({
+      const url = endpoints.scholars.content(slug);
+      const response = await httpClient<ScholarContentUnifiedDto>({
         url,
         method: "GET",
       });
 
       return {
         items: response.items,
-        nextCursor: response.nextCursor,
-        hasMore: response.hasMore ?? false,
+        nextCursor: undefined,
+        hasMore: false,
       };
     },
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    getNextPageParam: () => undefined,
     enabled: enabled && !!slug,
   });
 }

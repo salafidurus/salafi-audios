@@ -16,9 +16,13 @@ export function useInfiniteSearch(options: UseInfiniteSearchOptions) {
         return { items: [], nextCursor: undefined, hasMore: false };
       }
 
+      // API returns full list (non-paginated), only fetch on first page
+      if (pageParam) {
+        return { items: [], nextCursor: undefined, hasMore: false };
+      }
+
       const params = new URLSearchParams();
       params.append("q", options.query);
-      if (pageParam) params.append("cursor", pageParam);
 
       const url = `/api/search?${params}`;
       const response = await httpClient<SearchCatalogResultsDto>({ url, method: "GET" });
@@ -26,12 +30,12 @@ export function useInfiniteSearch(options: UseInfiniteSearchOptions) {
 
       return {
         items: rows,
-        nextCursor: response.nextCursor,
-        hasMore: response.hasMore ?? false,
+        nextCursor: undefined,
+        hasMore: false,
       };
     },
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    getNextPageParam: () => undefined,
     enabled: options.enabled !== false && !!options.query.trim(),
   });
 }

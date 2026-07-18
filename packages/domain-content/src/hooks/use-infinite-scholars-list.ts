@@ -9,20 +9,22 @@ export function useInfiniteScholarsList(options?: UseInfiniteScholarsListOptions
   return useInfiniteQuery({
     queryKey: queryKeys.scholars.list.infinite(),
     queryFn: async ({ pageParam }) => {
-      const params = new URLSearchParams();
-      if (pageParam) params.append("cursor", pageParam);
+      // API returns full list (non-paginated), only fetch on first page
+      if (pageParam) {
+        return { items: [], nextCursor: undefined, hasMore: false };
+      }
 
-      const url = `${endpoints.scholars.list}${params.size > 0 ? `?${params}` : ""}`;
+      const url = endpoints.scholars.list;
       const response = await httpClient<ScholarListDto>({ url, method: "GET" });
 
       return {
         items: response.scholars,
-        nextCursor: response.nextCursor,
-        hasMore: response.hasMore ?? false,
+        nextCursor: undefined,
+        hasMore: false,
       };
     },
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    getNextPageParam: () => undefined,
     enabled: options?.enabled !== false,
   });
 }

@@ -10,21 +10,25 @@ export function useInfiniteAdminListings(options?: UseInfiniteAdminListingsOptio
   return useInfiniteQuery({
     queryKey: queryKeys.admin.listings.infinite(options?.search),
     queryFn: async ({ pageParam }) => {
+      // API returns full list (non-paginated), only fetch on first page
+      if (pageParam) {
+        return { items: [], nextCursor: undefined, hasMore: false };
+      }
+
       const params = new URLSearchParams();
       if (options?.search) params.append("search", options.search);
-      if (pageParam) params.append("cursor", pageParam);
 
       const url = `${endpoints.admin.listings}${params.size > 0 ? `?${params}` : ""}`;
       const response = await httpClient<AdminListingListDto>({ url, method: "GET" });
 
       return {
         items: response.items,
-        nextCursor: response.nextCursor,
-        hasMore: response.hasMore ?? false,
+        nextCursor: undefined,
+        hasMore: false,
       };
     },
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    getNextPageParam: () => undefined,
     enabled: options?.enabled !== false,
   });
 }
