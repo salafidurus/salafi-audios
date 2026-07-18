@@ -1,10 +1,9 @@
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import {
   httpClient,
   endpoints,
   queryKeys,
   type FeedPageDto,
-  type ScholarChipDto,
 } from "@sd/core-contracts";
 
 export function useExplore(topicSlugs?: string[], scholarSlugs?: string[]) {
@@ -26,13 +25,3 @@ export function useExplore(topicSlugs?: string[], scholarSlugs?: string[]) {
   });
 }
 
-export function useExploreScholars() {
-  return useQuery<{ scholars: ScholarChipDto[] }>({
-    queryKey: [...queryKeys.explore.all, "scholars"],
-    queryFn: () =>
-      httpClient<{ scholars: ScholarChipDto[] }>({
-        url: endpoints.explore.scholars,
-        method: "GET",
-      }),
-  });
-}

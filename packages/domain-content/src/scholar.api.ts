@@ -4,7 +4,6 @@ import {
   queryKeys,
   useApiQuery,
   type ScholarDetailDto,
-  type ScholarContentItemDto,
   type ScholarContentUnifiedDto,
   type ScholarListItemDto,
   type ScholarTopicsDto,
@@ -54,21 +53,6 @@ export function useScholarContent(
       }),
     { enabled: !!slug, ...options },
   );
-}
-
-export function splitScholarContent(
-  items: ScholarContentItemDto[],
-  recommendedCount = 4,
-): {
-  featured: ScholarContentItemDto | undefined;
-  recommended: ScholarContentItemDto[];
-  browse: ScholarContentItemDto[];
-} {
-  return {
-    featured: items[0],
-    recommended: items.slice(1, 1 + recommendedCount),
-    browse: items.slice(1 + recommendedCount),
-  };
 }
 
 export function useScholarTopics(slug: string) {
