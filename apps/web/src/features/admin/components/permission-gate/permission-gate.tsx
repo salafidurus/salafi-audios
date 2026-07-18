@@ -1,5 +1,8 @@
+"use client";
+
 import type { AdminPermission } from "@sd/core-contracts";
-import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
+import { useAdminPermissions } from "@sd/domain-permissions";
+import { useAuth } from "@/core/auth/use-auth";
 
 type Props = {
   requires: AdminPermission;
@@ -8,7 +11,8 @@ type Props = {
 };
 
 export function PermissionGate({ requires, children, fallback = null }: Props) {
-  const { data } = useAdminPermissions();
+  const { isAuthenticated } = useAuth();
+  const { data } = useAdminPermissions({ isAuthenticated });
   if (!data?.permissions.includes(requires)) {
     return <>{fallback}</>;
   }

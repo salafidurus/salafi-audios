@@ -3,7 +3,7 @@ import React from "react";
 import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
 import { Sidebar } from "./sidebar";
 import { useAuth, authClient } from "@/core/auth";
-import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
+import { useAdminPermissions } from "@sd/domain-permissions";
 import { usePathname, useRouter } from "next/navigation";
 
 vi.mock("@/shared/hooks/use-responsive", () => ({
@@ -21,7 +21,7 @@ vi.mock("@/core/auth", () => ({
   },
 }));
 
-vi.mock("@/features/admin/hooks/use-admin-permissions", () => ({
+vi.mock("@sd/domain-permissions", () => ({
   useAdminPermissions: vi.fn(),
 }));
 
