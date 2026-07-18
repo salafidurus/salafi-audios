@@ -1,37 +1,19 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { routes } from "@sd/core-contracts";
-import { useScholarsList } from "@sd/domain-content";
+import { routes, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { AppText } from "@/shared/components/AppText/AppText";
+import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { ScholarListRow } from "@/features/listing/components/scholar/scholar-list-row/scholar-list-row";
+import type { ScholarListDto } from "@sd/core-contracts";
 import styles from "./scholar-list.screen.module.css";
 
 export function ScholarListScreen() {
   const { push } = useRouter();
-  const { data, isFetching } = useScholarsList();
-  const scholars = data?.scholars ?? [];
 
   const handleSelectScholar = (slug: string) => {
     push(routes.scholars.detail(slug));
   };
-
-  if (isFetching && scholars.length === 0) {
-    return (
-      <ScreenView center>
-        <AppText variant="bodyMd">Loading scholars…</AppText>
-      </ScreenView>
-    );
-  }
-
-  if (!isFetching && scholars.length === 0) {
-    return (
-      <ScreenView center>
-        <AppText variant="bodyMd">No scholars found.</AppText>
-      </ScreenView>
-    );
-  }
 
   return (
     <ScreenView>
@@ -41,9 +23,24 @@ export function ScholarListScreen() {
           <p className={styles.tagline}>Browse our database of authentic scholars</p>
         </div>
         <div className={styles.list}>
-          {scholars.map((scholar) => (
-            <ScholarListRow key={scholar.id} scholar={scholar} onPress={handleSelectScholar} />
-          ))}
+          <InfiniteScrollList
+            queryKey={[...queryKeys.scholars.list.infinite()]}
+            queryFn={async ({ pageParam }: { pageParam?: string | undefined }) => {
+              const params = new URLSearchParams();
+              if (pageParam) params.append("cursor", pageParam);
+              const url = `${endpoints.scholars.list}${params.size > 0 ? `?${params}` : ""}`;
+              const response = await httpClient<ScholarListDto>({ url, method: "GET" });
+              return {
+                items: response.scholars,
+                nextCursor: response.nextCursor,
+                hasMore: response.hasMore,
+              };
+            }}
+            renderItem={(scholar) => (
+              <ScholarListRow key={scholar.id} scholar={scholar} onPress={handleSelectScholar} />
+            )}
+            emptyMessage="No scholars found."
+          />
         </div>
       </div>
     </ScreenView>

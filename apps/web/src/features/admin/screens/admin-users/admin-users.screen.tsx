@@ -1,21 +1,13 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback, type ReactNode } from "react";
+import { useState, useEffect, useCallback, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  useApiQuery,
-  queryKeys,
-  httpClient,
-  endpoints,
-  type AdminUserListDto,
-  type UserRole,
-} from "@sd/core-contracts";
+import { queryKeys, type UserRole, httpClient, endpoints } from "@sd/core-contracts";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
-import { EmptyState } from "@/shared/components/EmptyState";
 import { Search } from "@/shared/components/Search";
-import { List } from "@/shared/components/List";
+import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { UserItem } from "@/features/admin/components/user-item";
 import { PermissionsDialog } from "@/features/admin/components/PermissionsDialog";
 import { RoleDialog } from "@/features/admin/components/RoleDialog";
@@ -47,17 +39,6 @@ export function AdminUsersScreen(): ReactNode {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const { data, isFetching } = useApiQuery<AdminUserListDto>(
-    queryKeys.admin.users.list(debouncedSearch, role),
-    () =>
-      httpClient<AdminUserListDto>({
-        url: `${endpoints.admin.users.list}${debouncedSearch || role ? `?${new URLSearchParams({ ...(debouncedSearch && { q: debouncedSearch }), ...(role && { role }) }).toString()}` : ""}`,
-        method: "GET",
-      }),
-  );
-
-  const users = useMemo(() => data?.users ?? [], [data]);
-
   const handlePermissionsChange = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
   }, [queryClient]);
@@ -87,36 +68,34 @@ export function AdminUsersScreen(): ReactNode {
           }}
         />
 
-        {isFetching ? (
-          <EmptyState variant="loading" message="Loading users…" />
-        ) : (
-          <>
-            <div className={styles.toolbar}>
-              <p className={styles.resultCount}>
-                {users.length} user{users.length !== 1 ? "s" : ""} found
-              </p>
-            </div>
-
-            {users.length === 0 ? (
-              <EmptyState
-                message={
-                  debouncedSearch || role ? "No users match your search." : "No users found."
-                }
-              />
-            ) : (
-              <List>
-                {users.map((user) => (
-                  <UserItem
-                    key={user.id}
-                    user={user}
-                    onManagePermissions={() => setPermUser({ id: user.id, name: user.name })}
-                    onManageRoles={() => setRoleUser({ id: user.id, name: user.name })}
-                  />
-                ))}
-              </List>
-            )}
-          </>
-        )}
+        <InfiniteScrollList
+          queryKey={[...queryKeys.admin.users.infinite(), debouncedSearch, role]}
+          queryFn={async ({ pageParam }: { pageParam?: string | undefined }) => {
+            const params = new URLSearchParams();
+            if (pageParam) params.append("cursor", pageParam);
+            if (debouncedSearch) params.append("q", debouncedSearch);
+            if (role) params.append("role", role);
+            const url = `${endpoints.admin.users.list}${params.size > 0 ? `?${params}` : ""}`;
+            const response = await httpClient<{
+              users: any[];
+              nextCursor?: string;
+              hasMore: boolean;
+            }>({ url, method: "GET" });
+            return {
+              items: response.users,
+              nextCursor: response.nextCursor,
+              hasMore: response.hasMore,
+            };
+          }}
+          renderItem={(user) => (
+            <UserItem
+              user={user}
+              onManagePermissions={() => setPermUser({ id: user.id, name: user.name })}
+              onManageRoles={() => setRoleUser({ id: user.id, name: user.name })}
+            />
+          )}
+          emptyMessage={debouncedSearch || role ? "No users match your search." : "No users found."}
+        />
       </div>
 
       {permUser && (

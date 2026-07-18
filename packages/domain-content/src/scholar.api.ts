@@ -12,7 +12,7 @@ import {
 import type { UseQueryOptions } from "@tanstack/react-query";
 
 export function useScholarsList() {
-  return useApiQuery(queryKeys.scholars.list(), () =>
+  return useApiQuery(queryKeys.scholars.list.all(), () =>
     httpClient<{ scholars: ScholarListItemDto[] }>({
       url: endpoints.scholars.list,
       method: "GET",

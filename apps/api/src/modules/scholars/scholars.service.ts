@@ -5,7 +5,6 @@ import type {
   ScholarContentUnifiedDto,
   ScholarTopicsDto,
   TranslationViewDto,
-  AdminScholarListItemDto,
   AdminScholarListDto,
 } from '@sd/core-contracts';
 import { ScholarsRepository } from './scholars.repo';

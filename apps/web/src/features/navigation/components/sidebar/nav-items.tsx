@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import clsx from "clsx";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { routes, type AdminPermission, type UserRole } from "@sd/core-contracts";

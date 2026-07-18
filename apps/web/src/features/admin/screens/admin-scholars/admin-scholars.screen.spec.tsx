@@ -16,6 +16,9 @@ vi.mock("@/shared/hooks/use-responsive", () => ({
   useResponsive: () => ({ isMobile: false }),
   useIsDesktop: () => true,
 }));
+vi.mock("@/shared/components/InfiniteScrollList", () => ({
+  InfiniteScrollList: () => <div data-testid="infinite-scroll-list" />,
+}));
 
 describe("AdminScholarsScreen", () => {
   beforeEach(() => {

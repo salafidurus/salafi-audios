@@ -195,3 +195,10 @@ export const AdminScholarListDtoSchema = z.object({
   hasMore: z.boolean(),
 });
 export type AdminScholarListDto = z.infer<typeof AdminScholarListDtoSchema>;
+
+export const ScholarListDtoSchema = z.object({
+  scholars: z.array(ScholarListItemDtoSchema),
+  nextCursor: z.string().optional(),
+  hasMore: z.boolean(),
+});
+export type ScholarListDto = z.infer<typeof ScholarListDtoSchema>;

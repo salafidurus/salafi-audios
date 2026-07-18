@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { usePathname } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
@@ -9,17 +10,14 @@ import { Button } from "@/shared/components/Button";
 import { Search } from "@/shared/components/Search";
 import { List } from "@/shared/components/List";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
+import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import type {
   TopicDetailDto,
-  AdminListingListItemDto,
   AdminListingDetailDto,
   AdminListingListDto,
 } from "@sd/core-contracts";
 import { createTopic, updateTopic, deleteTopic } from "@/features/admin/api/admin.api";
-import {
-  fetchAdminLectures,
-  fetchAdminLectureDetail,
-} from "@/features/admin/api/admin-lectures.api";
+import { fetchAdminLectureDetail } from "@/features/admin/api/admin-lectures.api";
 import { Content } from "@/features/admin/components/Content";
 import type { TopicForEdit } from "@/features/admin/components/Content/TopicModal";
 import { AudioUploader } from "@/features/admin/components/AudioUploader/AudioUploader";
@@ -38,9 +36,9 @@ type AudioData = {
 };
 
 const EMPTY_TOPICS_ARRAY: TopicDetailDto[] = [];
-const EMPTY_LISTINGS_ARRAY: AdminListingListItemDto[] = [];
 
 export function AdminContentsScreen() {
+  const queryClient = useQueryClient();
   const { isMobile } = useResponsive();
   const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState("");
@@ -71,14 +69,7 @@ export function AdminContentsScreen() {
 
   const topics = topicsData ?? EMPTY_TOPICS_ARRAY;
 
-  // Fetch listings
-  const { data: listingsData, refetch: refetchListings } = useApiQuery<AdminListingListDto>(
-    ["admin", "listings", "list", { search: searchQuery }],
-    () => fetchAdminLectures({ search: searchQuery }),
-    { enabled: activeTab === "listings" },
-  );
-
-  const listings = listingsData?.items ?? EMPTY_LISTINGS_ARRAY;
+  // Fetch listings via infinite query - removed old pagination query
 
   const filteredTopics = useMemo(() => {
     if (!searchQuery.trim()) {
@@ -181,7 +172,7 @@ export function AdminContentsScreen() {
     setSelectedListing(null);
     // react-doctor-disable-next-line react-doctor/no-impure-state-updater
     setInitialAudioData(null);
-    refetchListings();
+    queryClient.invalidateQueries({ queryKey: queryKeys.admin.listings.infinite() });
   };
 
   return (
@@ -270,21 +261,29 @@ export function AdminContentsScreen() {
         )}
 
         {activeTab === "listings" && (
-          <>
-            {listings.length > 0 ? (
-              <List>
-                {listings.map((listing) => (
-                  <Content.Listing key={listing.id} listing={listing} onEdit={handleEditListing} />
-                ))}
-              </List>
-            ) : (
-              <div className={styles.empty}>
-                {searchQuery
-                  ? "No listings match your search."
-                  : "No listings yet. Add audio to create a listing."}
-              </div>
+          <InfiniteScrollList
+            queryKey={[...queryKeys.admin.listings.infinite(), searchQuery]}
+            queryFn={async ({ pageParam }: { pageParam?: string | undefined }) => {
+              const params = new URLSearchParams();
+              if (pageParam) params.append("cursor", pageParam);
+              if (searchQuery) params.append("search", searchQuery);
+              const url = `${endpoints.admin.listings.list}${params.size > 0 ? `?${params}` : ""}`;
+              const response = await httpClient<AdminListingListDto>({ url, method: "GET" });
+              return {
+                items: response.items,
+                nextCursor: response.nextCursor,
+                hasMore: response.hasMore,
+              };
+            }}
+            renderItem={(listing) => (
+              <Content.Listing key={listing.id} listing={listing} onEdit={handleEditListing} />
             )}
-          </>
+            emptyMessage={
+              searchQuery
+                ? "No listings match your search."
+                : "No listings yet. Add audio to create a listing."
+            }
+          />
         )}
       </div>
 

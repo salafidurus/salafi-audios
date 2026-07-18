@@ -35,12 +35,15 @@ export const createQueryClient = () =>
 export const queryKeys = {
   scholars: {
     all: ["scholars"] as const,
-    list: () => [...queryKeys.scholars.all, "list"] as const,
+    list: {
+      all: () => [...queryKeys.scholars.all, "list"] as const,
+      infinite: () => [...queryKeys.scholars.all, "list", "infinite"] as const,
+    },
     detail: (slug: string) => [...queryKeys.scholars.all, "detail", slug] as const,
     stats: (slug: string) => [...queryKeys.scholars.all, "stats", slug] as const,
     content: (slug: string) => [...queryKeys.scholars.all, "content", slug] as const,
     topics: (slug: string) => [...queryKeys.scholars.all, "topics", slug] as const,
-    // NEW: pagination support
+    // NEW: pagination support (legacy keys)
     list_infinite: () => [...queryKeys.scholars.all, "list", "infinite"] as const,
     content_infinite: (slug: string) =>
       [...queryKeys.scholars.all, "content", slug, "infinite"] as const,
@@ -77,9 +80,18 @@ export const queryKeys = {
   },
   library: {
     all: ["library"] as const,
-    saved: (cursor?: string) => [...queryKeys.library.all, "saved", cursor] as const,
-    completed: (cursor?: string) => [...queryKeys.library.all, "completed", cursor] as const,
-    progress: (cursor?: string) => [...queryKeys.library.all, "progress", cursor] as const,
+    saved: {
+      all: () => [...queryKeys.library.all, "saved"] as const,
+      infinite: () => [...queryKeys.library.all, "saved", "infinite"] as const,
+    },
+    completed: {
+      all: () => [...queryKeys.library.all, "completed"] as const,
+      infinite: () => [...queryKeys.library.all, "completed", "infinite"] as const,
+    },
+    progress: {
+      all: () => [...queryKeys.library.all, "progress"] as const,
+      infinite: () => [...queryKeys.library.all, "progress", "infinite"] as const,
+    },
   },
   account: {
     all: ["account"] as const,

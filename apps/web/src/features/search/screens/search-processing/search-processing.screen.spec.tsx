@@ -1,9 +1,8 @@
-import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
+import { describe, it, expect, beforeEach, vi } from "bun:test";
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SearchProcessingScreen } from "./search-processing.screen";
-import { useSearchProcessing } from "@sd/domain-search";
 import { routes } from "@sd/core-contracts";
 
 const mockPush = vi.fn();
@@ -12,14 +11,51 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-vi.mock("@sd/domain-search", () => ({
-  useSearchProcessing: vi.fn(),
+vi.mock("@/shared/hooks/use-responsive", () => ({
+  useIsDesktop: () => true,
+  useResponsive: () => ({ isMobile: false }),
 }));
 
-const mockUseIsDesktop = vi.fn().mockReturnValue(true);
-vi.mock("@/shared/hooks/use-responsive", () => ({
-  useIsDesktop: () => mockUseIsDesktop(),
-  useResponsive: () => ({ isDesktop: mockUseIsDesktop() }),
+vi.mock("@/features/settings/content-preference", () => ({
+  useShowOriginalContent: () => false,
+}));
+
+vi.mock("@/core/i18n/use-translation", () => ({
+  useTranslation: () => ({
+    t: (key: string, fallback?: string) => fallback ?? key,
+  }),
+}));
+
+vi.mock("@/shared/components/InfiniteScrollList", () => ({
+  InfiniteScrollList: (props: any) => {
+    const mockItems = [
+      {
+        id: "series:123",
+        title: "Test Series",
+        scholarName: "Ibn Uthaymeen",
+        lectureCount: 10,
+        durationSeconds: 3600,
+      },
+    ];
+
+    return (
+      <div data-testid="infinite-scroll-list">
+        {mockItems.map((item: any) => (
+          <div key={item.id} onClick={() => props.renderItem?.(item)}>
+            {props.renderItem?.(item) ?? item.title}
+          </div>
+        ))}
+      </div>
+    );
+  },
+}));
+
+vi.mock("@/features/search/components/SearchResultItem/SearchResultItem", () => ({
+  SearchResultItem: ({ item, onPress }: { item: any; onPress?: () => void }) => (
+    <div data-testid="search-result-item" onClick={onPress}>
+      {item.title}
+    </div>
+  ),
 }));
 
 describe("SearchProcessingScreen", () => {
@@ -27,7 +63,6 @@ describe("SearchProcessingScreen", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseIsDesktop.mockReturnValue(true);
     queryClient = new QueryClient({
       defaultOptions: {
         queries: { retry: false },
@@ -40,26 +75,6 @@ describe("SearchProcessingScreen", () => {
   };
 
   it("navigates to series detail on series item click (desktop)", () => {
-    (useSearchProcessing as Mock<any>).mockReturnValue({
-      query: "jurisprudence",
-      setQuery: vi.fn(),
-      filter: [],
-      setFilter: vi.fn(),
-      topics: [],
-      items: [
-        {
-          id: "series:123",
-          title: "Test Series",
-          scholarName: "Ibn Uthaymeen",
-          lectureCount: 10,
-          durationSeconds: 3600,
-        },
-      ],
-      isFetching: false,
-      shouldSearch: true,
-      errorMessage: undefined,
-    });
-
     renderWithProviders(<SearchProcessingScreen searchKey="jurisprudence" />);
 
     // Click the search result item
@@ -70,27 +85,6 @@ describe("SearchProcessingScreen", () => {
   });
 
   it("navigates to series detail on series item click (mobile)", () => {
-    mockUseIsDesktop.mockReturnValue(false);
-    (useSearchProcessing as Mock<any>).mockReturnValue({
-      query: "jurisprudence",
-      setQuery: vi.fn(),
-      filter: [],
-      setFilter: vi.fn(),
-      topics: [],
-      items: [
-        {
-          id: "series:123",
-          title: "Test Series",
-          scholarName: "Ibn Uthaymeen",
-          lectureCount: 10,
-          durationSeconds: 3600,
-        },
-      ],
-      isFetching: false,
-      shouldSearch: true,
-      errorMessage: undefined,
-    });
-
     renderWithProviders(<SearchProcessingScreen searchKey="jurisprudence" />);
 
     // Click the search result item

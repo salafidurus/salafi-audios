@@ -111,7 +111,7 @@ export function ListingModal({
   }, [listing, isOpen, initialAudioData]);
 
   const { data: scholarsData } = useApiQuery<{ scholars: ScholarListItemDto[] }>(
-    queryKeys.scholars.list(),
+    [...queryKeys.scholars.list.all()],
     () =>
       httpClient<{ scholars: ScholarListItemDto[] }>({
         url: endpoints.scholars.list,

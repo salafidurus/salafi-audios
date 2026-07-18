@@ -78,6 +78,8 @@ export {
   AdminScholarListItemDtoSchema,
   type AdminScholarListDto,
   AdminScholarListDtoSchema,
+  type ScholarListDto,
+  ScholarListDtoSchema,
   type CollectionSummaryDto,
   CollectionSummaryDtoSchema,
   type SeriesSummaryDto,

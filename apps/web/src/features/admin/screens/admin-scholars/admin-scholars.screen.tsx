@@ -7,15 +7,15 @@ import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
-import { List } from "@/shared/components/List";
 import { Search } from "@/shared/components/Search";
+import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import {
-  useApiQuery,
   queryKeys,
   httpClient,
   endpoints,
   type CreateScholarDto,
   type AdminScholarListItemDto,
+  type AdminScholarListDto,
 } from "@sd/core-contracts";
 import { createScholar, updateScholar } from "@/features/admin/api/admin.api";
 import { Scholar, type ScholarForEdit } from "@/features/admin/components/Scholar";
@@ -23,28 +23,10 @@ import styles from "./admin-scholars.screen.module.css";
 
 export function AdminScholarsScreen() {
   const isDesktop = useIsDesktop();
-  const { data, isFetching, refetch } = useApiQuery<AdminScholarListItemDto[]>(
-    queryKeys.admin.scholars.list(),
-    () =>
-      httpClient<AdminScholarListItemDto[]>({
-        url: endpoints.admin.scholars.list,
-        method: "GET",
-      }),
-  );
 
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingScholar, setEditingScholar] = useState<ScholarForEdit | null>(null);
-
-  const scholars = data ?? [];
-
-  const filteredScholars = !searchQuery.trim()
-    ? scholars
-    : scholars.filter(
-        (s) =>
-          s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          s.slug.toLowerCase().includes(searchQuery.toLowerCase()),
-      );
 
   const handleOpenAdd = () => {
     setEditingScholar(null);
@@ -76,16 +58,9 @@ export function AdminScholarsScreen() {
     } else {
       await createScholar(formData);
     }
-    refetch();
+    setIsModalOpen(false);
+    setEditingScholar(null);
   };
-
-  if (isFetching && !data) {
-    return (
-      <ScreenView>
-        <div className={styles.loading}>Loading scholars...</div>
-      </ScreenView>
-    );
-  }
 
   return (
     <ScreenView>
@@ -114,21 +89,29 @@ export function AdminScholarsScreen() {
           />
         </div>
 
-        {filteredScholars.length > 0 ? (
-          <List>
-            {filteredScholars.map((scholar) => (
-              <Scholar.Item
-                key={scholar.id}
-                scholar={scholar}
-                onEdit={() => handleOpenEdit(scholar)}
-              />
-            ))}
-          </List>
-        ) : (
-          <div className={styles.empty}>
-            {searchQuery ? "No scholars match your search." : "No scholars yet."}
-          </div>
-        )}
+        <InfiniteScrollList
+          queryKey={[...queryKeys.admin.scholars.infinite(), searchQuery]}
+          queryFn={async ({ pageParam }: { pageParam?: string | undefined }) => {
+            const params = new URLSearchParams();
+            if (pageParam) params.append("cursor", pageParam);
+            if (searchQuery) params.append("search", searchQuery);
+            const url = `${endpoints.admin.scholars.list}${params.size > 0 ? `?${params}` : ""}`;
+            const response = await httpClient<AdminScholarListDto>({ url, method: "GET" });
+            return {
+              items: response.items,
+              nextCursor: response.nextCursor,
+              hasMore: response.hasMore,
+            };
+          }}
+          renderItem={(scholar) => (
+            <Scholar.Item
+              key={scholar.id}
+              scholar={scholar}
+              onEdit={() => handleOpenEdit(scholar)}
+            />
+          )}
+          emptyMessage={searchQuery ? "No scholars match your search." : "No scholars yet."}
+        />
       </div>
 
       <Scholar.Modal
