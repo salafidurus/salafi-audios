@@ -7,7 +7,7 @@ import clsx from "clsx";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { routes, type AdminPermission, type UserRole } from "@sd/core-contracts";
 import { useAuth, authClient } from "@/core/auth";
-import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
+import { useAdminPermissions } from "@sd/domain-permissions";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button/Button";
 import { SectionLabel } from "./section-label";
@@ -117,7 +117,7 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
   const { isAuthenticated, user, isLoading } = useAuth();
   const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
 
-  const { data: adminPermissionsData } = useAdminPermissions();
+  const { data: adminPermissionsData } = useAdminPermissions({ isAuthenticated });
 
   const adminPermissions: AdminPermission[] = adminPermissionsData?.permissions ?? [];
   const adminRoles: UserRole[] = adminPermissionsData?.roles ?? [];

@@ -8,7 +8,6 @@ import { AuthGuard } from '../auth/auth.guard';
 import { AdminUsersController } from './admin-users.controller';
 import { PermissionsService } from '../permissions/permissions.service';
 import { PermissionGuard } from '../../shared/guards/permission.guard';
-import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { PrismaService } from '../../shared/db/prisma.service';
 import { Permissions } from '@sd/core-contracts';
 
@@ -45,7 +44,6 @@ describe('AdminUsersController — auth boundaries', () => {
       providers: [
         { provide: APP_GUARD, useClass: AuthGuard },
         { provide: APP_GUARD, useClass: PermissionGuard },
-        AdminPermissionGuard,
         {
           provide: PermissionsService,
           useValue: mockPermissionsService,

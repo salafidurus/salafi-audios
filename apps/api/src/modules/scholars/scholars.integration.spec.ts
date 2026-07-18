@@ -6,7 +6,6 @@ import { CacheModule } from '@nestjs/cache-manager';
 import request from 'supertest';
 import { createTestApp } from '../../test/create-test-app';
 import { AuthGuard } from '../auth/auth.guard';
-import { AdminPermissionGuard } from '../../shared/guards/admin-permission.guard';
 import { ScholarsController } from './scholars.controller';
 import { AdminScholarsController } from './admin-scholars.controller';
 import { ScholarsService } from './scholars.service';
@@ -43,9 +42,7 @@ describe('ScholarsController — auth boundaries', () => {
         { provide: ScholarsService, useValue: mockScholarsService },
         { provide: PrismaService, useValue: mockPrisma },
       ],
-    })
-      .overrideGuard(AdminPermissionGuard)
-      .useValue({ canActivate: () => true });
+    });
 
     app = await createTestApp(moduleBuilder);
   });

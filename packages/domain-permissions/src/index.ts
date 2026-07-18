@@ -1,18 +1,7 @@
 // Hooks
 export {
-  useMyPermissions,
-  useHasPermission,
-  useHasAnyPermission,
-  useHasAllPermissions,
-  useHasRole,
-  useHasAnyRole,
-  useHasAllRoles,
-  useIsAdmin,
-  useIsSuperAdmin,
-  usePermissions,
-} from "./hooks/use-permissions";
+  useAdminPermissions,
+  type UseAdminPermissionsOptions,
+} from "./hooks/use-admin-permissions";
 
 export { useInfiniteAdminUsers, type UseInfiniteAdminUsersOptions } from "./hooks";
-
-// Components
-export { PermissionGate, RoleGate } from "./components/PermissionGate";

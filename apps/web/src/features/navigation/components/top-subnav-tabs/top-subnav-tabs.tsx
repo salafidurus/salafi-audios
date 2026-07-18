@@ -7,7 +7,8 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { getSubnavLabel } from "@sd/core-i18n";
 import { DEFAULT_TABS, SECTION_TABS } from "@/features/navigation/types";
 import { useIsHydrated } from "@/shared/hooks/use-is-hydrated";
-import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
+import { useAdminPermissions } from "@sd/domain-permissions";
+import { useAuth } from "@/core/auth/use-auth";
 import {
   buildSectionTabPath,
   getActiveTabFromPath,
@@ -24,7 +25,8 @@ export function TopSubnavTabs() {
   const pathname = usePathname();
   const { t } = useTranslation();
   const isHydrated = useIsHydrated();
-  const { data: adminPermissionsData } = useAdminPermissions();
+  const { isAuthenticated } = useAuth();
+  const { data: adminPermissionsData } = useAdminPermissions({ isAuthenticated });
 
   const section = getCurrentSection(pathname);
   const hasAdminAccess =
