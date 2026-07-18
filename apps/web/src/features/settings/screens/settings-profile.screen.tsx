@@ -181,7 +181,7 @@ function ProfileContent() {
 
       <div className={styles.actionRow}>
         <Button
-          variant="secondary"
+          variant="outline"
           data-testid="sign-out-trigger"
           onClick={() => setShowSignOutModal(true)}
         >
