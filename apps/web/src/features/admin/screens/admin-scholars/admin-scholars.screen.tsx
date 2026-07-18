@@ -97,7 +97,7 @@ export function AdminScholarsScreen() {
           onLoadMore={() => fetchNextPage()}
           isFetchingNextPage={isFetchingNextPage}
           renderItem={(scholar) => (
-            <Scholar.Row scholar={scholar} onEdit={() => handleOpenEdit(scholar)} />
+            <Scholar.Item scholar={scholar} onEdit={() => handleOpenEdit(scholar)} />
           )}
           emptyMessage={searchQuery ? "No scholars match your search." : "No scholars found."}
         />
