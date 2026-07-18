@@ -26,9 +26,6 @@ jobs:
       - name: Install (scripts disabled)
         run: bun install --frozen-lockfile --ignore-scripts
 
-      - name: Run workspace postinstall
-        run: bun run postinstall
-
       - name: Restore deps state cache
         id: cache-restore
         uses: actions/cache@v6

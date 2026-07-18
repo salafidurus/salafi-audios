@@ -33,9 +33,6 @@ jobs:
       - name: Install dependencies (scripts disabled)
         run: bun install --frozen-lockfile --ignore-scripts
 
-      - name: Run workspace postinstall
-        run: bun run postinstall
-
       - name: Get Playwright version
         id: playwright-version
         run: echo "version=$(bun run --filter web playwright:version | grep ^Version | cut -d' ' -f2)" >> $GITHUB_OUTPUT

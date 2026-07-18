@@ -74,9 +74,6 @@ jobs:
       - name: Install dependencies (scripts disabled)
         run: bun install --frozen-lockfile --ignore-scripts
 
-      - name: Run workspace postinstall
-        run: bun run postinstall
-
       - name: Build deps needed for typecheck
         run: bun run build --filter=@sd/core-db^...
 
@@ -115,9 +112,6 @@ jobs:
 
       - name: Install dependencies (scripts disabled)
         run: bun install --frozen-lockfile --ignore-scripts
-
-      - name: Run workspace postinstall
-        run: bun run postinstall
 
       - name: Generate Prisma client
         run: bun run --filter @sd/core-db prisma:generate
