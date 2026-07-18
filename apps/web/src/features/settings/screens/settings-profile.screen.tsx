@@ -146,7 +146,7 @@ function ProfileContent() {
               <Button onClick={handleEdit}>Edit</Button>
             ) : (
               <>
-                <Button variant="secondary" onClick={handleCancel} disabled={isUpdatingProfile}>
+                <Button variant="outline" onClick={handleCancel} disabled={isUpdatingProfile}>
                   Cancel
                 </Button>
                 <Button
