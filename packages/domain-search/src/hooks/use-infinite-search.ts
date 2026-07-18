@@ -24,7 +24,7 @@ export function useInfiniteSearch(options: UseInfiniteSearchOptions) {
       const params = new URLSearchParams();
       params.append("q", options.query);
 
-      const url = `/api/search?${params}`;
+      const url = `${endpoints.search.general}?${params}`;
       const response = await httpClient<SearchCatalogResultsDto>({ url, method: "GET" });
       const rows = buildSearchResultRows(response, options.showOriginal ?? false);
 

@@ -11,26 +11,22 @@ export function useInfiniteAdminUsers(options?: UseInfiniteAdminUsersOptions) {
   return useInfiniteQuery({
     queryKey: queryKeys.admin.users.infinite(options?.search, options?.role),
     queryFn: async ({ pageParam }) => {
-      // API returns full list (non-paginated), only fetch on first page
-      if (pageParam) {
-        return { items: [], nextCursor: undefined, hasMore: false };
-      }
-
       const params = new URLSearchParams();
-      if (options?.search) params.append("search", options.search);
+      if (options?.search) params.append("q", options.search);
       if (options?.role) params.append("role", options.role);
+      if (pageParam) params.append("cursor", pageParam);
 
-      const url = `${endpoints.admin.users}${params.size > 0 ? `?${params}` : ""}`;
+      const url = `${endpoints.admin.users.list}${params.size > 0 ? `?${params}` : ""}`;
       const response = await httpClient<AdminUserListDto>({ url, method: "GET" });
 
       return {
         items: response.users,
-        nextCursor: undefined,
-        hasMore: false,
+        nextCursor: response.nextCursor,
+        hasMore: response.hasMore ?? false,
       };
     },
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: () => undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
     enabled: options?.enabled !== false,
   });
 }

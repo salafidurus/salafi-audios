@@ -10,25 +10,21 @@ export function useInfiniteAdminScholars(options?: UseInfiniteAdminScholarsOptio
   return useInfiniteQuery({
     queryKey: queryKeys.admin.scholars.infinite(options?.search),
     queryFn: async ({ pageParam }) => {
-      // API returns full list (non-paginated), only fetch on first page
-      if (pageParam) {
-        return { items: [], nextCursor: undefined, hasMore: false };
-      }
-
       const params = new URLSearchParams();
       if (options?.search) params.append("search", options.search);
+      if (pageParam) params.append("cursor", pageParam);
 
-      const url = `${endpoints.admin.scholars}${params.size > 0 ? `?${params}` : ""}`;
+      const url = `${endpoints.admin.scholars.list}${params.size > 0 ? `?${params}` : ""}`;
       const response = await httpClient<AdminScholarListDto>({ url, method: "GET" });
 
       return {
         items: response.items,
-        nextCursor: undefined,
-        hasMore: false,
+        nextCursor: response.nextCursor,
+        hasMore: response.hasMore ?? false,
       };
     },
     initialPageParam: undefined as string | undefined,
-    getNextPageParam: () => undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
     enabled: options?.enabled !== false,
   });
 }
