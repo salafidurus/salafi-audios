@@ -1,6 +1,6 @@
 import { PrismaService } from '../../shared/db/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { Status, Locale as DbLocale } from '@sd/core-db';
+import { Status, Locale as DbLocale, Prisma } from '@sd/core-db';
 import type {
   ScholarListItemDto,
   ScholarDetailDto,
@@ -16,15 +16,24 @@ import type { UpdateScholarDto } from './dto/update-scholar.dto';
 import type { SaveScholarTranslationDto } from './dto/save-scholar-translation.dto';
 import { resolveContentTranslation } from '../../shared/utils/resolve-content-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
+import { decodeCursor, buildPaginatedResult } from '../../shared/utils/pagination';
 
 @Injectable()
 export class ScholarsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async list(): Promise<{ scholars: ScholarListItemDto[] }> {
+  async list(
+    cursor?: string,
+  ): Promise<{ scholars: ScholarListItemDto[]; nextCursor?: string; hasMore: boolean }> {
     const locale = getRequestLocale();
+    const pageSize = 20;
+    const take = pageSize + 1;
+    const decodedCursor = decodeCursor(cursor);
+
     const records = await this.prisma.scholar.findMany({
       where: { isActive: true },
+      take,
+      ...(decodedCursor ? { cursor: { id: decodedCursor }, skip: 1 } : {}),
       orderBy: { name: 'asc' },
       select: {
         id: true,
@@ -72,7 +81,8 @@ export class ScholarsRepository {
       };
     });
 
-    return { scholars };
+    const result = buildPaginatedResult(scholars, pageSize);
+    return { scholars: result.items, nextCursor: result.nextCursor, hasMore: result.hasMore };
   }
 
   async findBySlug(slug: string): Promise<
@@ -355,11 +365,17 @@ export class ScholarsRepository {
 
   async adminList(
     cursor?: string,
+    search?: string,
   ): Promise<{ items: AdminScholarListItemDto[]; nextCursor?: string; hasMore: boolean }> {
     const pageSize = 50;
     const take = pageSize + 1;
 
+    const where: Prisma.ScholarWhereInput = search
+      ? { name: { contains: search, mode: 'insensitive' as const } }
+      : {};
+
     const records = await this.prisma.scholar.findMany({
+      where,
       take,
       ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
       orderBy: { name: 'asc' },
