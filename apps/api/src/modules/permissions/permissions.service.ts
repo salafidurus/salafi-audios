@@ -358,7 +358,7 @@ export class PermissionsService {
     const isSuperadmin = roles.includes('superadmin');
     if (isSuperadmin) {
       return {
-        permissions: ROLE_DEFAULT_PERMISSIONS.superadmin as string[],
+        permissions: [...ROLE_DEFAULT_PERMISSIONS.superadmin],
         roles,
       };
     }
