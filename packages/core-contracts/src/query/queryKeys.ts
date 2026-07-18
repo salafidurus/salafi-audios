@@ -14,15 +14,16 @@ export const queryKeys = {
   admin: {
     listings: {
       all: ["admin", "listings"] as const,
-      infinite: () => ["admin", "listings", "infinite"] as const,
+      infinite: (search?: string) => ["admin", "listings", "infinite", search ?? ""] as const,
     },
     users: {
       all: ["admin", "users"] as const,
-      infinite: () => ["admin", "users", "infinite"] as const,
+      infinite: (search?: string, role?: string) =>
+        ["admin", "users", "infinite", search ?? "", role ?? ""] as const,
     },
     scholars: {
       all: ["admin", "scholars"] as const,
-      infinite: () => ["admin", "scholars", "infinite"] as const,
+      infinite: (search?: string) => ["admin", "scholars", "infinite", search ?? ""] as const,
     },
   },
 

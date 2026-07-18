@@ -16,7 +16,7 @@ export function useInfiniteScholarsList(options?: UseInfiniteScholarsListOptions
       const response = await httpClient<ScholarListDto>({ url, method: "GET" });
 
       return {
-        items: response.items,
+        items: response.scholars,
         nextCursor: response.nextCursor,
         hasMore: response.hasMore ?? false,
       };

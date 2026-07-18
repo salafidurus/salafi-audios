@@ -24,9 +24,7 @@ export function ScholarListScreen() {
   const filteredItems = debouncedSearch.trim()
     ? allItems.filter(
         (scholar) =>
-          scholar.name.en.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-          (scholar.name.ar &&
-            scholar.name.ar.toLowerCase().includes(debouncedSearch.toLowerCase())) ||
+          scholar.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
           scholar.slug.toLowerCase().includes(debouncedSearch.toLowerCase()),
       )
     : allItems;

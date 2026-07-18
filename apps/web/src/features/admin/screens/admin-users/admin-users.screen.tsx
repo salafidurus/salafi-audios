@@ -39,7 +39,7 @@ export function AdminUsersScreen(): ReactNode {
     },
   );
 
-  const allItems = data?.pages.flatMap((page) => page.items) ?? [];
+  const allItems = data?.pages.flatMap((page: any) => page.items) ?? [];
 
   const handlePermissionsChange = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
@@ -83,7 +83,7 @@ export function AdminUsersScreen(): ReactNode {
               onManageRoles={() => setRoleUser({ id: user.id, name: user.name })}
             />
           )}
-          emptyMessage={debouncedSearch || role ? "No users match your search." : "No users found."}
+          emptyMessage={debouncedQuery || role ? "No users match your search." : "No users found."}
         />
       </div>
 

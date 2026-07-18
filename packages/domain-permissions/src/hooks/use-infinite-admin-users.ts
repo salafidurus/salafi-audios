@@ -20,7 +20,7 @@ export function useInfiniteAdminUsers(options?: UseInfiniteAdminUsersOptions) {
       const response = await httpClient<AdminUserListDto>({ url, method: "GET" });
 
       return {
-        items: response.items,
+        items: response.users,
         nextCursor: response.nextCursor,
         hasMore: response.hasMore ?? false,
       };

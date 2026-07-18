@@ -119,18 +119,21 @@ export const queryKeys = {
       list: (query?: string, role?: string) =>
         [...queryKeys.admin.all, "users", "list", query, role] as const,
       // NEW: pagination support
-      infinite: () => [...queryKeys.admin.all, "users", "infinite"] as const,
+      infinite: (search?: string, role?: string) =>
+        [...queryKeys.admin.all, "users", "infinite", search ?? "", role ?? ""] as const,
     },
     scholars: {
       all: () => [...queryKeys.admin.all, "scholars"] as const,
       list: () => [...queryKeys.admin.all, "scholars", "list"] as const,
       // NEW: pagination support
-      infinite: () => [...queryKeys.admin.all, "scholars", "infinite"] as const,
+      infinite: (search?: string) =>
+        [...queryKeys.admin.all, "scholars", "infinite", search ?? ""] as const,
     },
     listings: {
       all: () => [...queryKeys.admin.all, "listings"] as const,
       // NEW: pagination support
-      infinite: () => [...queryKeys.admin.all, "listings", "infinite"] as const,
+      infinite: (search?: string) =>
+        [...queryKeys.admin.all, "listings", "infinite", search ?? ""] as const,
     },
     topics: {
       all: () => [...queryKeys.admin.all, "topics"] as const,
