@@ -26,7 +26,12 @@ function AuthCallbackContent() {
 
   // Redirect if session loaded successfully using Next.js redirect() function
   if (session?.user && !isPending && !timeoutError && !error) {
-    redirect(searchParams.get("redirect") || "/");
+    const redirectTo = searchParams.get("redirect");
+    const safeRedirect =
+      typeof redirectTo === "string" && redirectTo.startsWith("/")
+        ? redirectTo
+        : "/";
+    redirect(safeRedirect);
   }
 
   if (timeoutError) {

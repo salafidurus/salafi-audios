@@ -33,14 +33,14 @@
   "permissions": {
     "allow": [
       "Read(*)",
-      "Write(**/*.ts)",
-      "Write(**/*.tsx)",
-      "Write(**/*.js)",
-      "Write(**/*.jsx)",
-      "Write(**/*.json)",
-      "Write(**/*.css)",
-      "Write(**/*.md)",
-      "Write(**/*.mdx)",
+      "Edit(**/*.ts)",
+      "Edit(**/*.tsx)",
+      "Edit(**/*.js)",
+      "Edit(**/*.jsx)",
+      "Edit(**/*.json)",
+      "Edit(**/*.css)",
+      "Edit(**/*.md)",
+      "Edit(**/*.mdx)",
       "Bash(grep *)",
       "Bash(grep:*)",
       "Bash(cat *)",
@@ -135,7 +135,7 @@
       "Bash(git restore *)",
       "Bash(git reset *)",
       "Bash(rm *)",
-      "Write(**/*.env*)"
+      "Edit(**/*.env*)"
     ],
     "deny": [
       "Bash(curl * -d *)",
