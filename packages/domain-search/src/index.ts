@@ -8,6 +8,8 @@ export {
   type UseSearchProcessingOptions,
 } from "./hooks/use-search-processing";
 
+export { useInfiniteSearch, type UseInfiniteSearchOptions } from "./hooks";
+
 // Utils & types
 export { buildSearchResultRows, type SearchResultRow } from "./utils/build-search-result-rows";
 

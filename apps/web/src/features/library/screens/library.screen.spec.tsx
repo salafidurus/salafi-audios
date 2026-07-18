@@ -1,11 +1,25 @@
 import { describe, it, expect, beforeEach, vi } from "bun:test";
 import React from "react";
 import { render, screen } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { LibraryScreen } from "./library.screen";
 import { LibrarySavedScreen } from "./library-saved.screen";
 import { LibraryCompletedScreen } from "./library-completed.screen";
 
 const mockUseAuth = vi.fn(() => ({ isAuthenticated: true }));
+
+const createTestQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+
+const renderWithQueryClient = (component: React.ReactElement) => {
+  const queryClient = createTestQueryClient();
+  return render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>);
+};
 
 vi.mock("@/core/auth/use-auth", () => ({
   useAuth: () => mockUseAuth(),
@@ -73,23 +87,23 @@ describe("Library screens", () => {
 
   describe("LibraryScreen (Started)", () => {
     it("renders loading state", () => {
-      render(<LibraryScreen />);
+      renderWithQueryClient(<LibraryScreen />);
       expect(screen.getByTestId("infinite-scroll-list")).toBeInTheDocument();
     });
 
     it("renders empty state", () => {
-      render(<LibraryScreen />);
+      renderWithQueryClient(<LibraryScreen />);
       expect(screen.getByTestId("infinite-scroll-list")).toBeInTheDocument();
     });
 
     it("renders items", () => {
-      render(<LibraryScreen />);
+      renderWithQueryClient(<LibraryScreen />);
       expect(screen.getByTestId("library-row")).toHaveTextContent("Lecture Title 1");
     });
 
     it("renders AuthRequiredState when unauthenticated", () => {
       mockUseAuth.mockReturnValue({ isAuthenticated: false });
-      render(<LibraryScreen />);
+      renderWithQueryClient(<LibraryScreen />);
       expect(screen.getByTestId("auth-required-state")).toBeInTheDocument();
       expect(screen.getByText("Sign in to view your progress")).toBeInTheDocument();
     });
@@ -97,23 +111,23 @@ describe("Library screens", () => {
 
   describe("LibrarySavedScreen (Saved)", () => {
     it("renders loading state", () => {
-      render(<LibrarySavedScreen />);
+      renderWithQueryClient(<LibrarySavedScreen />);
       expect(screen.getByTestId("infinite-scroll-list")).toBeInTheDocument();
     });
 
     it("renders empty state", () => {
-      render(<LibrarySavedScreen />);
+      renderWithQueryClient(<LibrarySavedScreen />);
       expect(screen.getByTestId("infinite-scroll-list")).toBeInTheDocument();
     });
 
     it("renders items", () => {
-      render(<LibrarySavedScreen />);
+      renderWithQueryClient(<LibrarySavedScreen />);
       expect(screen.getByTestId("library-row")).toHaveTextContent("Lecture Title 1");
     });
 
     it("renders AuthRequiredState when unauthenticated", () => {
       mockUseAuth.mockReturnValue({ isAuthenticated: false });
-      render(<LibrarySavedScreen />);
+      renderWithQueryClient(<LibrarySavedScreen />);
       expect(screen.getByTestId("auth-required-state")).toBeInTheDocument();
       expect(screen.getByText("Sign in to view saved lectures")).toBeInTheDocument();
     });
@@ -121,23 +135,23 @@ describe("Library screens", () => {
 
   describe("LibraryCompletedScreen (Completed)", () => {
     it("renders loading state", () => {
-      render(<LibraryCompletedScreen />);
+      renderWithQueryClient(<LibraryCompletedScreen />);
       expect(screen.getByTestId("infinite-scroll-list")).toBeInTheDocument();
     });
 
     it("renders empty state", () => {
-      render(<LibraryCompletedScreen />);
+      renderWithQueryClient(<LibraryCompletedScreen />);
       expect(screen.getByTestId("infinite-scroll-list")).toBeInTheDocument();
     });
 
     it("renders items", () => {
-      render(<LibraryCompletedScreen />);
+      renderWithQueryClient(<LibraryCompletedScreen />);
       expect(screen.getByTestId("library-row")).toHaveTextContent("Lecture Title 1");
     });
 
     it("renders AuthRequiredState when unauthenticated", () => {
       mockUseAuth.mockReturnValue({ isAuthenticated: false });
-      render(<LibraryCompletedScreen />);
+      renderWithQueryClient(<LibraryCompletedScreen />);
       expect(screen.getByTestId("auth-required-state")).toBeInTheDocument();
       expect(screen.getByText("Sign in to view completed history")).toBeInTheDocument();
     });

@@ -1,47 +1,56 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { routes, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
+import { useInfiniteScholarsList } from "@sd/domain-content";
+import { useDebouncedSearch } from "@/shared/hooks";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { Search } from "@/shared/components/Search";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { ScholarListRow } from "@/features/listing/components/scholar/scholar-list-row/scholar-list-row";
-import type { ScholarListDto } from "@sd/core-contracts";
 import styles from "./scholar-list.screen.module.css";
 
 export function ScholarListScreen() {
-  const { push } = useRouter();
+  const {
+    query: searchQuery,
+    setQuery: setSearchQuery,
+    debouncedQuery: debouncedSearch,
+  } = useDebouncedSearch();
 
-  const handleSelectScholar = (slug: string) => {
-    push(routes.scholars.detail(slug));
-  };
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    useInfiniteScholarsList();
+
+  const allItems = data?.pages.flatMap((page) => page.items) ?? [];
+
+  const filteredItems = debouncedSearch.trim()
+    ? allItems.filter(
+        (scholar) =>
+          scholar.name.en.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+          (scholar.name.ar &&
+            scholar.name.ar.toLowerCase().includes(debouncedSearch.toLowerCase())) ||
+          scholar.slug.toLowerCase().includes(debouncedSearch.toLowerCase()),
+      )
+    : allItems;
 
   return (
-    <ScreenView>
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <h1 className={styles.title}>Scholars</h1>
-          <p className={styles.tagline}>Browse our database of authentic scholars</p>
-        </div>
-        <div className={styles.list}>
-          <InfiniteScrollList
-            queryKey={[...queryKeys.scholars.list.infinite()]}
-            queryFn={async ({ pageParam }: { pageParam?: string | undefined }) => {
-              const params = new URLSearchParams();
-              if (pageParam) params.append("cursor", pageParam);
-              const url = `${endpoints.scholars.list}${params.size > 0 ? `?${params}` : ""}`;
-              const response = await httpClient<ScholarListDto>({ url, method: "GET" });
-              return {
-                items: response.scholars,
-                nextCursor: response.nextCursor,
-                hasMore: response.hasMore,
-              };
-            }}
-            renderItem={(scholar) => (
-              <ScholarListRow key={scholar.id} scholar={scholar} onPress={handleSelectScholar} />
-            )}
-            emptyMessage="No scholars found."
-          />
-        </div>
+    <ScreenView contentStyle={{ flex: 1 }}>
+      <PageHeader title="Scholars" />
+
+      <div className={styles.content}>
+        <Search.Bar
+          value={searchQuery}
+          onChange={setSearchQuery}
+          placeholder="Search scholars..."
+        />
+
+        <InfiniteScrollList
+          data={filteredItems}
+          isLoading={isLoading && filteredItems.length === 0}
+          hasMore={hasNextPage ?? false}
+          onLoadMore={() => fetchNextPage()}
+          isFetchingNextPage={isFetchingNextPage}
+          renderItem={(scholar) => <ScholarListRow scholar={scholar} />}
+          emptyMessage={debouncedSearch ? "No scholars match your search." : "No scholars found."}
+        />
       </div>
     </ScreenView>
   );

@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback, type ReactNode } from "react";
+import { useState, useCallback, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { queryKeys, type UserRole, httpClient, endpoints } from "@sd/core-contracts";
+import { queryKeys } from "@sd/core-contracts";
+import { useInfiniteAdminUsers } from "@sd/domain-permissions";
+import { useDebouncedSearch } from "@/shared/hooks";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
@@ -13,7 +15,7 @@ import { PermissionsDialog } from "@/features/admin/components/PermissionsDialog
 import { RoleDialog } from "@/features/admin/components/RoleDialog";
 import styles from "./admin-users.screen.module.css";
 
-const ROLE_CHIPS: { id: UserRole; label: string }[] = [
+const ROLE_CHIPS: { id: string; label: string }[] = [
   { id: "listener", label: "Listener" },
   { id: "scholar", label: "Scholar" },
   { id: "translator", label: "Translator" },
@@ -25,19 +27,19 @@ const ROLE_CHIPS: { id: UserRole; label: string }[] = [
 export function AdminUsersScreen(): ReactNode {
   const queryClient = useQueryClient();
   const { isMobile } = useResponsive();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const { query: searchQuery, setQuery: setSearchQuery, debouncedQuery } = useDebouncedSearch();
   const [role, setRole] = useState("");
   const [permUser, setPermUser] = useState<{ id: string; name: string } | null>(null);
   const [roleUser, setRoleUser] = useState<{ id: string; name: string } | null>(null);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(searchQuery);
-    }, 300);
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteAdminUsers(
+    {
+      search: debouncedQuery,
+      role,
+    },
+  );
 
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
+  const allItems = data?.pages.flatMap((page) => page.items) ?? [];
 
   const handlePermissionsChange = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
@@ -69,24 +71,11 @@ export function AdminUsersScreen(): ReactNode {
         />
 
         <InfiniteScrollList
-          queryKey={[...queryKeys.admin.users.infinite(), debouncedSearch, role]}
-          queryFn={async ({ pageParam }: { pageParam?: string | undefined }) => {
-            const params = new URLSearchParams();
-            if (pageParam) params.append("cursor", pageParam);
-            if (debouncedSearch) params.append("q", debouncedSearch);
-            if (role) params.append("role", role);
-            const url = `${endpoints.admin.users.list}${params.size > 0 ? `?${params}` : ""}`;
-            const response = await httpClient<{
-              users: any[];
-              nextCursor?: string;
-              hasMore: boolean;
-            }>({ url, method: "GET" });
-            return {
-              items: response.users,
-              nextCursor: response.nextCursor,
-              hasMore: response.hasMore,
-            };
-          }}
+          data={allItems}
+          isLoading={isLoading}
+          hasMore={hasNextPage ?? false}
+          onLoadMore={() => fetchNextPage()}
+          isFetchingNextPage={isFetchingNextPage}
           renderItem={(user) => (
             <UserItem
               user={user}

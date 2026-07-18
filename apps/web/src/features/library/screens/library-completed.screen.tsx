@@ -1,54 +1,44 @@
 "use client";
 
-import React from "react";
-import { queryKeys, httpClient, endpoints } from "@sd/core-contracts";
-import { useAuth } from "@/core/auth";
-import { useTranslation } from "@/core/i18n/use-translation";
+import { useInfiniteLibraryCompleted } from "@sd/domain-content";
+import { useAuth } from "@/core/auth/use-auth";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
-import { LibraryListRow } from "../components/library-list-row/library-list-row";
-import type { LibraryPageDto } from "@sd/core-contracts";
-import styles from "./library-screens.module.css";
+import { LibraryListRow } from "@/features/library/components/library-list-row/library-list-row";
 
 export function LibraryCompletedScreen() {
   const { isAuthenticated } = useAuth();
-  const { t } = useTranslation();
+
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    useInfiniteLibraryCompleted();
+
+  const allItems = data?.pages.flatMap((page) => page.items) ?? [];
 
   if (!isAuthenticated) {
     return (
-      <ScreenView>
+      <ScreenView contentStyle={{ flex: 1 }}>
         <AuthRequiredState
           title="Sign in to view completed history"
-          description="Keep track of all lectures you have completed listening to."
+          description="Track lectures you've finished"
         />
       </ScreenView>
     );
   }
 
   return (
-    <ScreenView>
-      <PageHeader title={t("library.completed", "Completed")} />
-
-      <div className={styles.list}>
-        <InfiniteScrollList
-          queryKey={[...queryKeys.library.completed.infinite()]}
-          queryFn={async ({ pageParam }: { pageParam?: string | undefined }) => {
-            const params = new URLSearchParams();
-            if (pageParam) params.append("cursor", pageParam);
-            const url = `${endpoints.library.completed}${params.size > 0 ? `?${params}` : ""}`;
-            const response = await httpClient<LibraryPageDto>({ url, method: "GET" });
-            return {
-              items: response.items,
-              nextCursor: response.nextCursor,
-              hasMore: response.hasMore,
-            };
-          }}
-          renderItem={(item) => <LibraryListRow key={item.id} item={item} variant="completed" />}
-          emptyMessage={t("library.emptyCompleted", "No completed lectures yet. Keep listening!")}
-        />
-      </div>
+    <ScreenView contentStyle={{ flex: 1 }}>
+      <PageHeader title="Completed" />
+      <InfiniteScrollList
+        data={allItems}
+        isLoading={isLoading}
+        hasMore={hasNextPage ?? false}
+        onLoadMore={() => fetchNextPage()}
+        isFetchingNextPage={isFetchingNextPage}
+        renderItem={(item) => <LibraryListRow item={item} variant="completed" />}
+        emptyMessage="No completed lectures yet. Finish lectures to track your learning."
+      />
     </ScreenView>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
+import { useInfiniteAdminScholars } from "@sd/domain-content";
 import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
@@ -9,14 +10,7 @@ import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
 import { Search } from "@/shared/components/Search";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
-import {
-  queryKeys,
-  httpClient,
-  endpoints,
-  type CreateScholarDto,
-  type AdminScholarListItemDto,
-  type AdminScholarListDto,
-} from "@sd/core-contracts";
+import { type CreateScholarDto, type AdminScholarListItemDto } from "@sd/core-contracts";
 import { createScholar, updateScholar } from "@/features/admin/api/admin.api";
 import { Scholar, type ScholarForEdit } from "@/features/admin/components/Scholar";
 import styles from "./admin-scholars.screen.module.css";
@@ -27,6 +21,13 @@ export function AdminScholarsScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingScholar, setEditingScholar] = useState<ScholarForEdit | null>(null);
+
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    useInfiniteAdminScholars({
+      search: searchQuery,
+    });
+
+  const allItems = data?.pages.flatMap((page) => page.items) ?? [];
 
   const handleOpenAdd = () => {
     setEditingScholar(null);
@@ -90,36 +91,29 @@ export function AdminScholarsScreen() {
         </div>
 
         <InfiniteScrollList
-          queryKey={[...queryKeys.admin.scholars.infinite(), searchQuery]}
-          queryFn={async ({ pageParam }: { pageParam?: string | undefined }) => {
-            const params = new URLSearchParams();
-            if (pageParam) params.append("cursor", pageParam);
-            if (searchQuery) params.append("search", searchQuery);
-            const url = `${endpoints.admin.scholars.list}${params.size > 0 ? `?${params}` : ""}`;
-            const response = await httpClient<AdminScholarListDto>({ url, method: "GET" });
-            return {
-              items: response.items,
-              nextCursor: response.nextCursor,
-              hasMore: response.hasMore,
-            };
-          }}
+          data={allItems}
+          isLoading={isLoading}
+          hasMore={hasNextPage ?? false}
+          onLoadMore={() => fetchNextPage()}
+          isFetchingNextPage={isFetchingNextPage}
           renderItem={(scholar) => (
-            <Scholar.Item
-              key={scholar.id}
-              scholar={scholar}
-              onEdit={() => handleOpenEdit(scholar)}
-            />
+            <Scholar.Row scholar={scholar} onEdit={() => handleOpenEdit(scholar)} />
           )}
-          emptyMessage={searchQuery ? "No scholars match your search." : "No scholars yet."}
+          emptyMessage={searchQuery ? "No scholars match your search." : "No scholars found."}
         />
       </div>
 
-      <Scholar.Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleSave}
-        scholar={editingScholar}
-      />
+      {isModalOpen && (
+        <Scholar.Modal
+          scholar={editingScholar}
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setEditingScholar(null);
+          }}
+          onSave={handleSave}
+        />
+      )}
     </ScreenView>
   );
 }

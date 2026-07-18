@@ -4,18 +4,20 @@ import { useState, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
+import { useInfiniteAdminListings } from "@sd/domain-content";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
 import { Search } from "@/shared/components/Search";
 import { List } from "@/shared/components/List";
-import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
-import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
-import type {
-  TopicDetailDto,
-  AdminListingDetailDto,
-  AdminListingListDto,
+import {
+  useApiQuery,
+  queryKeys,
+  type TopicDetailDto,
+  type AdminListingDetailDto,
 } from "@sd/core-contracts";
+import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
+import { useDebouncedSearch } from "@/shared/hooks";
 import { createTopic, updateTopic, deleteTopic } from "@/features/admin/api/admin.api";
 import { fetchAdminLectureDetail } from "@/features/admin/api/admin-lectures.api";
 import { Content } from "@/features/admin/components/Content";
@@ -41,7 +43,11 @@ export function AdminContentsScreen() {
   const queryClient = useQueryClient();
   const { isMobile } = useResponsive();
   const pathname = usePathname();
-  const [searchQuery, setSearchQuery] = useState("");
+  const {
+    query: searchQuery,
+    setQuery: setSearchQuery,
+    debouncedQuery: debouncedSearch,
+  } = useDebouncedSearch();
 
   // Derive active tab from URL pathname
   const activeTab = pathname.includes("/listings") ? "listings" : "topics";
@@ -64,25 +70,31 @@ export function AdminContentsScreen() {
   // Fetch topics
   const { data: topicsData, refetch: refetchTopics } = useApiQuery<TopicDetailDto[]>(
     queryKeys.topics.list(),
-    () => httpClient<TopicDetailDto[]>({ url: endpoints.topics.list, method: "GET" }),
+    () => Promise.resolve(EMPTY_TOPICS_ARRAY),
   );
 
   const topics = topicsData ?? EMPTY_TOPICS_ARRAY;
 
-  // Fetch listings via infinite query - removed old pagination query
+  // Fetch listings via infinite query
+  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
+    useInfiniteAdminListings({
+      search: debouncedSearch,
+    });
+
+  const allListings = data?.pages.flatMap((page) => page.items) ?? [];
 
   const filteredTopics = useMemo(() => {
-    if (!searchQuery.trim()) {
+    if (!debouncedSearch.trim()) {
       return topics;
     }
-    const query = searchQuery.toLowerCase();
+    const query = debouncedSearch.toLowerCase();
     return topics.filter(
       (t) =>
         t.name.en.toLowerCase().includes(query) ||
         (t.name.ar && t.name.ar.toLowerCase().includes(query)) ||
         t.slug.toLowerCase().includes(query),
     );
-  }, [topics, searchQuery]);
+  }, [topics, debouncedSearch]);
 
   // Topic handlers
   const handleOpenAddTopic = () => {
@@ -262,24 +274,16 @@ export function AdminContentsScreen() {
 
         {activeTab === "listings" && (
           <InfiniteScrollList
-            queryKey={[...queryKeys.admin.listings.infinite(), searchQuery]}
-            queryFn={async ({ pageParam }: { pageParam?: string | undefined }) => {
-              const params = new URLSearchParams();
-              if (pageParam) params.append("cursor", pageParam);
-              if (searchQuery) params.append("search", searchQuery);
-              const url = `${endpoints.admin.listings.list}${params.size > 0 ? `?${params}` : ""}`;
-              const response = await httpClient<AdminListingListDto>({ url, method: "GET" });
-              return {
-                items: response.items,
-                nextCursor: response.nextCursor,
-                hasMore: response.hasMore,
-              };
-            }}
+            data={allListings}
+            isLoading={isLoading}
+            hasMore={hasNextPage ?? false}
+            onLoadMore={() => fetchNextPage()}
+            isFetchingNextPage={isFetchingNextPage}
             renderItem={(listing) => (
               <Content.Listing key={listing.id} listing={listing} onEdit={handleEditListing} />
             )}
             emptyMessage={
-              searchQuery
+              debouncedSearch
                 ? "No listings match your search."
                 : "No listings yet. Add audio to create a listing."
             }

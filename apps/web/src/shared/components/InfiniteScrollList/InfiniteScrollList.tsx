@@ -1,46 +1,34 @@
 import { useEffect, useRef, type ReactNode } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
 import { List } from "../List";
 import styles from "./InfiniteScrollList.module.css";
 
-export interface InfiniteScrollListProps<TData, TError = unknown> {
-  /** Query key for the infinite query */
-  queryKey: unknown[];
-  /** Function to fetch a page of data */
-  queryFn: (params: { pageParam?: string }) => Promise<{
-    items: TData[];
-    nextCursor?: string;
-    hasMore: boolean;
-  }>;
+export interface InfiniteScrollListProps<TData> {
+  /** Flattened array of all loaded items */
+  data: TData[];
   /** Render function for each item */
   renderItem: (item: TData, index: number) => ReactNode;
-  /** Loading state to show */
+  /** Whether data is loading */
   isLoading?: boolean;
-  /** Error to show */
-  error?: TError | null;
+  /** Whether more data can be loaded */
+  hasMore: boolean;
+  /** Callback to load more data */
+  onLoadMore: () => void;
+  /** Whether currently fetching next page */
+  isFetchingNextPage?: boolean;
   /** Message when no items */
   emptyMessage?: string;
 }
 
-export function InfiniteScrollList<TData, TError = unknown>({
-  queryKey,
-  queryFn,
+export function InfiniteScrollList<TData>({
+  data,
   renderItem,
   isLoading,
-  error: _error,
+  hasMore,
+  onLoadMore,
+  isFetchingNextPage,
   emptyMessage = "No items found",
-}: InfiniteScrollListProps<TData, TError>): ReactNode {
+}: InfiniteScrollListProps<TData>): ReactNode {
   const observerTarget = useRef<HTMLDivElement>(null);
-
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery({
-    queryKey,
-    queryFn,
-    initialPageParam: undefined as string | undefined,
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-  });
-
-  // Flatten all pages into a single array
-  const allItems = data?.pages.flatMap((page) => page.items) ?? [];
 
   // Setup intersection observer for infinite scroll
   useEffect(() => {
@@ -48,8 +36,8 @@ export function InfiniteScrollList<TData, TError = unknown>({
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0]?.isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
+        if (entries[0]?.isIntersecting && hasMore && !isFetchingNextPage) {
+          onLoadMore();
         }
       },
       { threshold: 0.1 },
@@ -57,24 +45,20 @@ export function InfiniteScrollList<TData, TError = unknown>({
 
     observer.observe(observerTarget.current);
     return () => observer.disconnect();
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+  }, [hasMore, onLoadMore, isFetchingNextPage]);
 
-  if (status === "error") {
-    return <div className={styles.error}>Failed to load items</div>;
-  }
-
-  if (status === "pending" || isLoading) {
+  if (isLoading && data.length === 0) {
     return <div className={styles.loading}>Loading items…</div>;
   }
 
-  if (allItems.length === 0) {
+  if (data.length === 0) {
     return <div className={styles.empty}>{emptyMessage}</div>;
   }
 
   // Render all items in a List with intersection observer for loading more
   return (
     <List>
-      {allItems.map((item, itemIndex) => (
+      {data.map((item, itemIndex) => (
         <div key={String((item as Record<string, unknown>)?.id)}>{renderItem(item, itemIndex)}</div>
       ))}
 
