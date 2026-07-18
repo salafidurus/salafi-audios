@@ -62,7 +62,6 @@
     "pkg-update": "bun run infra/pkg-update/index.ts",
     "pkg-update:ci": "bun run infra/pkg-update/ci.ts",
     "prepare": "husky",
-    "postinstall": "bun ./scripts/postinstall.mjs",
     "lint:staged": "lint-staged",
     "docs:quality": "markdownlint-cli2 README.md **/README.md docs/**/*.md AGENT.md .github/copilot-instructions.md '!.serena/**/*.md'",
     "security:secrets": "secretlint \"**/*\"",
