@@ -16,28 +16,6 @@
   margin-bottom: var(--space-scale-3xl);
 }
 
-.avatarImage {
-  width: 4rem;
-  height: 4rem;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-.avatarInitials {
-  width: 4rem;
-  height: 4rem;
-  border-radius: 50%;
-  background: var(--action-primary);
-  color: var(--content-on-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--typo-title-md-font-size);
-  font-weight: 700;
-  flex-shrink: 0;
-  letter-spacing: 0.05em;
-}
 
 .profileName {
   margin: 0;

@@ -1,13 +1,14 @@
 "use client";
 
 import { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { authClient } from "@/core/auth/auth-client";
 import Link from "next/link";
 
 function AuthCallbackContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { data: session, isPending, error } = authClient.useSession();
   const [timeoutError, setTimeoutError] = useState(false);
 
@@ -23,6 +24,13 @@ function AuthCallbackContent() {
 
     return () => clearTimeout(timeout);
   }, [isPending]);
+
+  // Auto-redirect when session is loaded
+  useEffect(() => {
+    if (session?.user) {
+      router.push(searchParams.get("redirect") || "/");
+    }
+  }, [session?.user, router, searchParams]);
 
   if (timeoutError) {
     return (
@@ -46,24 +54,6 @@ function AuthCallbackContent() {
           <p className="text-gray-600 mb-4">{error.message || "An unexpected error occurred."}</p>
           <Link href="/sign-in" className="text-blue-600 hover:underline">
             Try again
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  // Session found - show success message and link to home
-  if (session?.user) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Sign In Successful</h1>
-          <p className="text-gray-600 mb-6">You have been signed in successfully.</p>
-          <Link
-            href={searchParams.get("redirect") || "/"}
-            className="inline-block bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-          >
-            Continue to App
           </Link>
         </div>
       </div>

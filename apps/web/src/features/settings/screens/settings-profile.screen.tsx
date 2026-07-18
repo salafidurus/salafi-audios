@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/core/auth";
 import { useAccountProfile, useUpdateProfile, useDeleteAccount } from "@sd/domain-account";
 import { authClient } from "@/core/auth/auth-client";
@@ -13,17 +12,9 @@ import { EmptyState } from "@/shared/components/EmptyState";
 import { SettingsSection } from "@/shared/components/SettingsSection/SettingsSection";
 import { SettingsRow } from "@/shared/components/SettingsRow/SettingsRow";
 import { Button } from "@/shared/components/Button/Button";
+import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 import { useRouter } from "next/navigation";
 import styles from "./settings-profile.screen.module.css";
-
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((n) => n[0] ?? "")
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-}
 
 function ProfileContent() {
   const {
@@ -39,17 +30,17 @@ function ProfileContent() {
     isError: isUpdateError,
   } = useUpdateProfile();
   const router = useRouter();
-  const [prevProfileId, setPrevProfileId] = useState(profile?.id);
-  const [displayName, setDisplayName] = useState(profile?.displayName ?? "");
+  const [displayName, setDisplayName] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
   const { mutate: deleteAccount, isPending: isDeletingAccount } = useDeleteAccount();
 
-  if (profile && profile.id !== prevProfileId) {
-    setPrevProfileId(profile.id);
-    setDisplayName(profile.displayName ?? "");
-  }
+  useEffect(() => {
+    if (profile) {
+      setDisplayName(profile.displayName ?? "");
+    }
+  }, [profile]);
 
   const handleSignOut = async () => {
     try {
@@ -105,24 +96,14 @@ function ProfileContent() {
   const currentDisplayName = displayName;
   const isDirty = currentDisplayName !== (profile.displayName ?? "");
 
-  const initials = getInitials(profile.displayName || profile.email);
-
   return (
     <>
       <div className={styles.avatarRow}>
-        {profile.avatarUrl ? (
-          <Image
-            src={profile.avatarUrl}
-            alt="User avatar"
-            width={72}
-            height={72}
-            className={styles.avatarImage}
-          />
-        ) : (
-          <div className={styles.avatarInitials} aria-hidden="true">
-            {initials}
-          </div>
-        )}
+        <UserAvatar
+          image={profile.avatarUrl ?? null}
+          name={profile.displayName || profile.email}
+          size={72}
+        />
         <div>
           <p className={styles.profileName}>{profile.displayName}</p>
           <p className={styles.profileEmail}>{profile.email}</p>

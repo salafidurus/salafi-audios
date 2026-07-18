@@ -5,6 +5,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useId,
   Children,
   isValidElement,
   type ReactNode,
@@ -36,8 +37,6 @@ function extractItemsFromChildren(children: ReactNode): DropdownItem[] {
   return extracted;
 }
 
-let contentCounter = 0;
-
 export interface DropdownProps {
   value: string;
   onValueChange: (value: string) => void;
@@ -61,7 +60,7 @@ export function Dropdown({
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [searchQuery, setSearchQuery] = useState("");
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const [contentId] = useState(() => "dropdown-content-" + ++contentCounter);
+  const contentId = useId();
   const [items, setItems] = useState<DropdownItem[]>(() => extractItemsFromChildren(children));
 
   const registerItem = useCallback((itemValue: string, label: string, disabled?: boolean) => {
