@@ -44,7 +44,7 @@
     "grant:role": "bun ./scripts/grant-role.js",
     "grant:permission": "bun ./scripts/grant-permission.js",
     "build": "bun run prisma:generate && tsup src/index.ts --format esm,cjs --out-dir dist && bun ./scripts/copy-generated-to-dist.js && tsc -p tsconfig.build.json",
-    "dev": "bun run build --watch"
+    "dev": "bun run build"
   },
   "dependencies": {
     "@prisma/adapter-pg": "catalog:",

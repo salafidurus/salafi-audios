@@ -7,23 +7,20 @@
     "dist"
   ],
   "sideEffects": false,
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./src/index.ts",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
+      "types": "./dist/index.d.ts",
       "react-native": "./src/index.ts",
       "source": "./src/index.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./src/index.ts",
+      "require": "./src/index.ts"
     },
     "./locales/*": "./src/locales/*"
   },
   "scripts": {
     "clean": "rimraf dist",
     "build": "tsup src/index.ts --format esm,cjs --dts --tsconfig tsconfig.build.json --out-dir dist && node -e \"require('fs').cpSync('src/locales', 'dist/locales', {recursive:true})\"",
-    "dev": "bun run build --watch",
     "lint": "oxlint .",
     "test": "bun test",
     "test:watch": "bun test --watch",

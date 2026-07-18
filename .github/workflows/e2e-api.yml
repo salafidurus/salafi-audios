@@ -68,9 +68,6 @@ jobs:
       - name: Install dependencies (scripts disabled)
         run: bun install --frozen-lockfile --ignore-scripts
 
-      - name: Run workspace postinstall
-        run: bun run postinstall
-
       - name: Build dependencies
         env:
           DIRECT_DB_URL: ${{ steps.create_neon_branch.outputs.db_url }}

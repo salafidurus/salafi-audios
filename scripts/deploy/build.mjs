@@ -60,12 +60,11 @@ try {
 
     // Strip lifecycle scripts from the pruned root package.json.
     // turbo prune --docker does not include scripts/ or .git/, so
-    // postinstall and prepare (husky) would fail in the deploy env.
+    // prepare (husky) would fail in the deploy env.
     log("Stripping lifecycle scripts...");
     const pkgPath = path.join(rootDir, "package.json");
     const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
     if (pkg.scripts) {
-      delete pkg.scripts.postinstall;
       delete pkg.scripts.prepare;
     }
     fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");

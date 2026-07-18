@@ -50,9 +50,6 @@ jobs:
       - name: Install dependencies (scripts disabled)
         run: bun install --frozen-lockfile --ignore-scripts
 
-      - name: Run workspace postinstall
-        run: bun run postinstall
-
       - name: Build, lint, typecheck, test
         env:
           TURBO_TEAM: ${{ secrets.TURBO_TEAM }}

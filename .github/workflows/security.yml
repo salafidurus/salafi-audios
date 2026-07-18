@@ -22,8 +22,5 @@ jobs:
       - name: Install Dependencies (scripts disabled)
         run: bun install --frozen-lockfile --ignore-scripts
 
-      - name: Run workspace postinstall
-        run: bun run postinstall
-
       - name: Run Secretlint
         run: bun run security:secrets
