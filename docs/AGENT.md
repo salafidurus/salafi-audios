@@ -21,17 +21,16 @@ This directory contains the authoritative documentation for Salafi Durus.
 
 ### Backend (apps/api)
 
-| Module          | Status      | MVP        | Notes                                                                     |
-| --------------- | ----------- | ---------- | ------------------------------------------------------------------------- |
-| listings        | IMPLEMENTED | CRITICAL   | Unified Listing model (replaces collections/series/lectures)              |
-| scholars        | IMPLEMENTED | CRITICAL   | API complete; needs web/mobile screens                                    |
-| audio-assets    | IMPLEMENTED | CRITICAL   | Required for playback (Phase 05)                                          |
-| catalog         | IMPLEMENTED | CRITICAL   | Browse endpoints exist                                                    |
-| health          | IMPLEMENTED | SUPPORTING | Deployment and monitoring                                                 |
-| search          | INTEGRATED  | CRITICAL   | Active in web/mobile                                                      |
-| topics          | IMPLEMENTED | SUPPORTING | Used in search filter                                                     |
-| analytics       | REMOVED     | SUPPORTING | Clickstream table removed from PostgreSQL; deferred to dedicated pipeline |
-| recommendations | IMPLEMENTED | SUPPORTING | Multiple endpoints exist; may be narrowed later                           |
+| Module       | Status      | MVP        | Notes                                                                     |
+| ------------ | ----------- | ---------- | ------------------------------------------------------------------------- |
+| listings     | IMPLEMENTED | CRITICAL   | Unified Listing model (replaces collections/series/lectures)              |
+| scholars     | IMPLEMENTED | CRITICAL   | API complete; needs web/mobile screens                                    |
+| audio-assets | IMPLEMENTED | CRITICAL   | Required for playback (Phase 05)                                          |
+| catalog      | IMPLEMENTED | CRITICAL   | Browse endpoints exist                                                    |
+| health       | IMPLEMENTED | SUPPORTING | Deployment and monitoring                                                 |
+| search       | INTEGRATED  | CRITICAL   | Active in web/mobile                                                      |
+| topics       | IMPLEMENTED | SUPPORTING | Used in search filter                                                     |
+| analytics    | REMOVED     | SUPPORTING | Clickstream table removed from PostgreSQL; deferred to dedicated pipeline |
 
 ### Web (apps/web)
 
