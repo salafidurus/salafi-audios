@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/core/auth";
 import { useAccountProfile, useUpdateProfile, useDeleteAccount } from "@sd/domain-account";
 import { authClient } from "@/core/auth/auth-client";
@@ -12,33 +11,36 @@ import { PageHeader } from "@/shared/components/PageHeader";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { SettingsSection } from "@/shared/components/SettingsSection/SettingsSection";
 import { SettingsRow } from "@/shared/components/SettingsRow/SettingsRow";
+import { Button } from "@/shared/components/Button/Button";
+import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 import { useRouter } from "next/navigation";
 import styles from "./settings-profile.screen.module.css";
 
-function getInitials(name: string): string {
-  return name
-    .split(" ")
-    .map((n) => n[0] ?? "")
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-}
-
 function ProfileContent() {
-  const { data: profile, isFetching } = useAccountProfile();
-  const { mutate: updateProfile, isPending, isSuccess, isError } = useUpdateProfile();
+  const {
+    data: profile,
+    isFetching: isLoadingProfile,
+    isError: isProfileLoadError,
+    error: profileLoadError,
+  } = useAccountProfile();
+  const {
+    mutate: updateProfile,
+    isPending: isUpdatingProfile,
+    isSuccess: isUpdateSuccess,
+    isError: isUpdateError,
+  } = useUpdateProfile();
   const router = useRouter();
-  const [prevProfileId, setPrevProfileId] = useState(profile?.id);
-  const [displayName, setDisplayName] = useState(profile?.displayName ?? "");
+  const [displayName, setDisplayName] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
-  const { mutate: deleteAccount, isPending: isDeleting } = useDeleteAccount();
+  const { mutate: deleteAccount, isPending: isDeletingAccount } = useDeleteAccount();
 
-  if (profile && profile.id !== prevProfileId) {
-    setPrevProfileId(profile.id);
-    setDisplayName(profile.displayName ?? "");
-  }
+  useEffect(() => {
+    if (profile) {
+      setDisplayName(profile.displayName ?? "");
+    }
+  }, [profile]);
 
   const handleSignOut = async () => {
     try {
@@ -77,8 +79,14 @@ function ProfileContent() {
     setIsEditing(false);
   };
 
-  if (isFetching) {
+  if (isLoadingProfile) {
     return <EmptyState variant="loading" message="Loading profile…" />;
+  }
+
+  if (isProfileLoadError) {
+    const errorMessage =
+      profileLoadError instanceof Error ? profileLoadError.message : "Failed to load profile";
+    return <EmptyState variant="error" message={errorMessage} />;
   }
 
   if (!profile) {
@@ -88,24 +96,14 @@ function ProfileContent() {
   const currentDisplayName = displayName;
   const isDirty = currentDisplayName !== (profile.displayName ?? "");
 
-  const initials = getInitials(profile.displayName || profile.email);
-
   return (
     <>
       <div className={styles.avatarRow}>
-        {profile.avatarUrl ? (
-          <Image
-            src={profile.avatarUrl}
-            alt="User avatar"
-            width={72}
-            height={72}
-            className={styles.avatarImage}
-          />
-        ) : (
-          <div className={styles.avatarInitials} aria-hidden="true">
-            {initials}
-          </div>
-        )}
+        <UserAvatar
+          image={profile.avatarUrl ?? null}
+          name={profile.displayName || profile.email}
+          size={72}
+        />
         <div>
           <p className={styles.profileName}>{profile.displayName}</p>
           <p className={styles.profileEmail}>{profile.email}</p>
@@ -126,27 +124,19 @@ function ProfileContent() {
               disabled={!isEditing}
             />
             {!isEditing ? (
-              <button type="button" className={styles.saveButton} onClick={handleEdit}>
-                Edit
-              </button>
+              <Button onClick={handleEdit}>Edit</Button>
             ) : (
               <>
-                <button
-                  type="button"
-                  className={styles.cancelButton}
-                  onClick={handleCancel}
-                  disabled={isPending}
-                >
+                <Button variant="outline" onClick={handleCancel} disabled={isUpdatingProfile}>
                   Cancel
-                </button>
-                <button
-                  type="button"
-                  className={styles.saveButton}
-                  disabled={!isDirty || isPending}
+                </Button>
+                <Button
+                  disabled={!isDirty || isUpdatingProfile}
                   onClick={handleSave}
+                  loading={isUpdatingProfile}
                 >
-                  {isPending ? "Saving…" : "Save"}
-                </button>
+                  {isUpdatingProfile ? "Saving…" : "Save"}
+                </Button>
               </>
             )}
           </div>
@@ -156,9 +146,9 @@ function ProfileContent() {
         </SettingsRow>
       </SettingsSection>
 
-      {(isSuccess || isError) && (
-        <p className={isSuccess ? styles.successText : styles.errorText}>
-          {isSuccess ? "Display name saved." : "Failed to save. Please try again."}
+      {(isUpdateSuccess || isUpdateError) && (
+        <p className={isUpdateSuccess ? styles.successText : styles.errorText}>
+          {isUpdateSuccess ? "Display name saved." : "Failed to save. Please try again."}
         </p>
       )}
 
@@ -171,23 +161,22 @@ function ProfileContent() {
       </SettingsSection>
 
       <div className={styles.actionRow}>
-        <button
-          type="button"
+        <Button
+          variant="outline"
           data-testid="sign-out-trigger"
-          className={styles.signOutButton}
           onClick={() => setShowSignOutModal(true)}
         >
           Sign Out
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
+          variant="danger"
           data-testid="delete-account-trigger"
-          className={styles.deleteAccountButton}
           onClick={() => setShowDeleteAccountModal(true)}
-          disabled={isDeleting}
+          disabled={isDeletingAccount}
+          loading={isDeletingAccount}
         >
-          {isDeleting ? "Deleting…" : "Delete Account"}
-        </button>
+          {isDeletingAccount ? "Deleting…" : "Delete Account"}
+        </Button>
       </div>
 
       <Modal.ConfirmDialog

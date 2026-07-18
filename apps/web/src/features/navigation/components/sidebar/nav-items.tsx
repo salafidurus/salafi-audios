@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import clsx from "clsx";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { routes, type AdminPermission } from "@sd/core-contracts";
+import { routes, type AdminPermission, type UserRole } from "@sd/core-contracts";
 import { useAuth, authClient } from "@/core/auth";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 import { Modal } from "@/shared/components/Modal";
@@ -120,7 +120,9 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
   const { data: adminPermissionsData } = useAdminPermissions();
 
   const adminPermissions: AdminPermission[] = adminPermissionsData?.permissions ?? [];
-  const hasAdminAccess = isAuthenticated && adminPermissions.length > 0;
+  const adminRoles: UserRole[] = adminPermissionsData?.roles ?? [];
+  const hasAdminRole = adminRoles.some((role) => ["admin", "superadmin"].includes(role));
+  const hasAdminAccess = isAuthenticated && (adminPermissions.length > 0 || hasAdminRole);
 
   const visibleAdminNavItems = adminNavItems.filter(
     (item) =>

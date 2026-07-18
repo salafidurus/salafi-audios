@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import type { Permission, ScholarPermissionType, UserRole } from '@sd/core-contracts';
+import { ROLE_DEFAULT_PERMISSIONS } from '@sd/core-contracts';
 import { PrismaService } from '../../shared/db/prisma.service';
 import type { Locale } from '@sd/core-db';
 
@@ -10,6 +11,8 @@ import type { Locale } from '@sd/core-db';
  */
 @Injectable()
 export class PermissionsRepository {
+  private readonly validPermissionsSet = new Set(ROLE_DEFAULT_PERMISSIONS.superadmin);
+
   constructor(private readonly prisma: PrismaService) {}
 
   // ========== UserRoleAssignment Operations ==========
@@ -250,35 +253,85 @@ export class PermissionsRepository {
       }
     }
 
-    const [users, total] = await Promise.all([
-      this.prisma.user.findMany({
-        where,
-        include: {
-          permissions: {
-            select: { permission: true },
+    try {
+      const [users, total] = await Promise.all([
+        this.prisma.user.findMany({
+          where,
+          include: {
+            permissions: {
+              select: { permission: true },
+            },
+            roles: {
+              select: { role: true },
+            },
           },
-          roles: {
-            select: { role: true },
-          },
-        },
-        orderBy: { createdAt: 'desc' as const },
-      }),
-      this.prisma.user.count({ where }),
-    ]);
+          orderBy: { createdAt: 'desc' as const },
+        }),
+        this.prisma.user.count({ where }),
+      ]);
 
-    return { users, total };
+      return { users, total };
+    } catch (error) {
+      // Fallback for stale/invalid enum values in permissions table
+      if (error instanceof Error && error.message.includes('not found in enum')) {
+        const [users, total] = await Promise.all([
+          this.prisma.user.findMany({
+            where,
+            include: {
+              roles: {
+                select: { role: true },
+              },
+            },
+            orderBy: { createdAt: 'desc' as const },
+          }),
+          this.prisma.user.count({ where }),
+        ]);
+
+        // Fetch permissions for each user using the graceful method
+        const usersWithPermissions = await Promise.all(
+          users.map(async (u) => ({
+            ...u,
+            permissions: (await this.findPermissionStringsByUserId(u.id)).map((p) => ({
+              permission: p,
+            })),
+          })),
+        );
+
+        return { users: usersWithPermissions, total };
+      }
+      throw error;
+    }
   }
 
   /**
    * Get permission strings for a user (ordered by grant date)
+   * Filters out stale/invalid permissions that don't match current Permission enum
    */
   async findPermissionStringsByUserId(userId: string): Promise<Permission[]> {
-    const perms = await this.prisma.userPermission.findMany({
-      where: { userId },
-      select: { permission: true },
-      orderBy: { grantedAt: 'desc' },
-    });
-    return perms.map((p) => p.permission);
+    try {
+      const perms = await this.prisma.userPermission.findMany({
+        where: { userId },
+        select: { permission: true },
+        orderBy: { grantedAt: 'desc' },
+      });
+      return perms.map((p) => p.permission);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('not found in enum')) {
+        const perms = await this.prisma.$queryRaw<Array<{ permission: string }>>`
+          SELECT "permission" FROM "UserPermission"
+          WHERE "userId" = ${userId}
+          ORDER BY "grantedAt" DESC
+        `;
+        const validPermissions = new Set(ROLE_DEFAULT_PERMISSIONS.superadmin);
+        return perms.reduce<Permission[]>((acc, p) => {
+          if (validPermissions.has(p.permission as Permission)) {
+            acc.push(p.permission as Permission);
+          }
+          return acc;
+        }, []);
+      }
+      throw error;
+    }
   }
 
   /**
@@ -294,12 +347,45 @@ export class PermissionsRepository {
   /**
    * Get detailed permission information for a user (includes grantedAt and grantedBy)
    * Used by admin endpoints to show full permission audit trail
+   * Filters out stale/invalid permissions that don't match current Permission enum
    */
   async getUserPermissionsDetail(userId: string) {
-    return this.prisma.userPermission.findMany({
-      where: { userId },
-      orderBy: { grantedAt: 'desc' },
-    });
+    try {
+      return await this.prisma.userPermission.findMany({
+        where: { userId },
+        orderBy: { grantedAt: 'desc' },
+      });
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('not found in enum')) {
+        const perms = await this.prisma.$queryRaw<
+          Array<{
+            id: string;
+            userId: string;
+            permission: string;
+            grantedAt: Date;
+            grantedBy: string | null;
+          }>
+        >`
+          SELECT "id", "userId", "permission", "grantedAt", "grantedBy" FROM "UserPermission"
+          WHERE "userId" = ${userId}
+          ORDER BY "grantedAt" DESC
+        `;
+        return perms.flatMap((p) =>
+          this.validPermissionsSet.has(p.permission as Permission)
+            ? [
+                {
+                  id: p.id,
+                  userId: p.userId,
+                  permission: p.permission as Permission,
+                  grantedAt: p.grantedAt,
+                  grantedBy: p.grantedBy,
+                },
+              ]
+            : [],
+        );
+      }
+      throw error;
+    }
   }
 
   /**
