@@ -31,6 +31,7 @@ export const createQueryClient = () =>
   });
 
 // Common query keys for type-safe cache management
+// NOTE: Extended with pagination/infinite keys while maintaining full backward compatibility
 export const queryKeys = {
   scholars: {
     all: ["scholars"] as const,
@@ -39,6 +40,10 @@ export const queryKeys = {
     stats: (slug: string) => [...queryKeys.scholars.all, "stats", slug] as const,
     content: (slug: string) => [...queryKeys.scholars.all, "content", slug] as const,
     topics: (slug: string) => [...queryKeys.scholars.all, "topics", slug] as const,
+    // NEW: pagination support
+    list_infinite: () => [...queryKeys.scholars.all, "list", "infinite"] as const,
+    content_infinite: (slug: string) =>
+      [...queryKeys.scholars.all, "content", slug, "infinite"] as const,
   },
   listings: {
     all: ["listings"] as const,
@@ -60,6 +65,8 @@ export const queryKeys = {
   search: {
     all: ["search"] as const,
     catalog: (params: SearchCatalogParams) => [...queryKeys.search.all, "catalog", params] as const,
+    // NEW: pagination support
+    infinite: (query: string) => [...queryKeys.search.all, "infinite", query] as const,
   },
   explore: {
     all: ["explore"] as const,
@@ -99,10 +106,19 @@ export const queryKeys = {
       all: () => [...queryKeys.admin.all, "users"] as const,
       list: (query?: string, role?: string) =>
         [...queryKeys.admin.all, "users", "list", query, role] as const,
+      // NEW: pagination support
+      infinite: () => [...queryKeys.admin.all, "users", "infinite"] as const,
     },
     scholars: {
       all: () => [...queryKeys.admin.all, "scholars"] as const,
       list: () => [...queryKeys.admin.all, "scholars", "list"] as const,
+      // NEW: pagination support
+      infinite: () => [...queryKeys.admin.all, "scholars", "infinite"] as const,
+    },
+    listings: {
+      all: () => [...queryKeys.admin.all, "listings"] as const,
+      // NEW: pagination support
+      infinite: () => [...queryKeys.admin.all, "listings", "infinite"] as const,
     },
     topics: {
       all: () => [...queryKeys.admin.all, "topics"] as const,
