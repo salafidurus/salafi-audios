@@ -7,22 +7,19 @@
     "dist"
   ],
   "sideEffects": false,
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
+      "types": "./dist/index.d.ts",
       "source": "./src/index.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "default": "./dist/index.mjs"
+      "import": "./src/index.ts",
+      "require": "./src/index.ts",
+      "default": "./src/index.ts"
     }
   },
   "scripts": {
     "clean": "rimraf dist",
     "build": "tsup",
-    "dev": "tsup --watch",
     "lint": "oxlint .",
     "test": "bun test",
     "test:watch": "bun test --watch",
