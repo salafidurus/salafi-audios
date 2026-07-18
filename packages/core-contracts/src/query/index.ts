@@ -40,13 +40,8 @@ export const queryKeys = {
       infinite: () => [...queryKeys.scholars.all, "list", "infinite"] as const,
     },
     detail: (slug: string) => [...queryKeys.scholars.all, "detail", slug] as const,
-    stats: (slug: string) => [...queryKeys.scholars.all, "stats", slug] as const,
     content: (slug: string) => [...queryKeys.scholars.all, "content", slug] as const,
     topics: (slug: string) => [...queryKeys.scholars.all, "topics", slug] as const,
-    // NEW: pagination support (legacy keys)
-    list_infinite: () => [...queryKeys.scholars.all, "list", "infinite"] as const,
-    content_infinite: (slug: string) =>
-      [...queryKeys.scholars.all, "content", slug, "infinite"] as const,
   },
   listings: {
     all: ["listings"] as const,
@@ -55,15 +50,6 @@ export const queryKeys = {
   topics: {
     all: ["topics"] as const,
     list: () => [...queryKeys.topics.all, "list"] as const,
-    listings: (slug: string) => [...queryKeys.topics.all, "listings", slug] as const,
-  },
-  recommendations: {
-    all: ["recommendations"] as const,
-    hero: () => [...queryKeys.recommendations.all, "hero"] as const,
-    popular: (params?: Record<string, unknown>) =>
-      [...queryKeys.recommendations.all, "popular", params] as const,
-    latest: (params?: Record<string, unknown>) =>
-      [...queryKeys.recommendations.all, "latest", params] as const,
   },
   search: {
     all: ["search"] as const,
@@ -74,7 +60,6 @@ export const queryKeys = {
   explore: {
     all: ["explore"] as const,
     list: (params?: Record<string, unknown>) => [...queryKeys.explore.all, "list", params] as const,
-    scholars: () => [...queryKeys.explore.all, "scholars"] as const,
     recent: (cursor?: string) => [...queryKeys.explore.all, "recent", cursor] as const,
     following: (cursor?: string) => [...queryKeys.explore.all, "following", cursor] as const,
   },
@@ -96,11 +81,6 @@ export const queryKeys = {
   account: {
     all: ["account"] as const,
     profile: () => [...queryKeys.account.all, "profile"] as const,
-  },
-  progress: {
-    all: ["progress"] as const,
-    listing: (listingId: string) => [...queryKeys.progress.all, "listing", listingId] as const,
-    history: () => [...queryKeys.progress.all, "history"] as const,
   },
   home: {
     all: ["home"] as const,

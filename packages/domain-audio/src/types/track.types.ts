@@ -8,9 +8,3 @@ export type Track = {
   seriesId?: string | null;
   seriesTitle?: string | null;
 };
-
-export type AudioSource = {
-  listingId: string;
-  streamUrl: string;
-  localUri?: string;
-};

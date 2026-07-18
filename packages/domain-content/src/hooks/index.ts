@@ -1,9 +1,6 @@
 export { useInfiniteScholarsList } from "./use-infinite-scholars-list";
 export type { UseInfiniteScholarsListOptions } from "./use-infinite-scholars-list";
 
-export { useInfiniteScholarContent } from "./use-infinite-scholar-content";
-export type { UseInfiniteScholarContentOptions } from "./use-infinite-scholar-content";
-
 export { useInfiniteLibrarySaved } from "./use-infinite-library-saved";
 export type { UseInfiniteLibrarySavedOptions } from "./use-infinite-library-saved";
 

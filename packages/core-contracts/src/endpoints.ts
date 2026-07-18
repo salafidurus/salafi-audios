@@ -9,17 +9,14 @@ export const endpoints = {
   scholars: {
     list: "/scholars",
     detail: (slug: string) => `/scholars/${slug}`,
-    stats: (slug: string) => `/scholars/${slug}/stats`,
     content: (slug: string) => `/scholars/${slug}/content`,
     topics: (slug: string) => `/scholars/${slug}/topics`,
   },
   listings: {
     detail: (id: string) => `/listings/${id}`,
-    related: (id: string) => `/listings/${id}/related`,
   },
   explore: {
     list: "/explore",
-    scholars: "/explore/scholars",
     recent: "/explore/recent",
     following: "/explore/following",
   },
@@ -28,7 +25,6 @@ export const endpoints = {
     completed: "/me/library/completed",
     progress: "/me/library/progress",
     saveListing: (listingId: string) => `/me/library/save/${listingId}`,
-    syncSaved: "/me/library/saved/sync",
   },
   account: {
     profile: "/account/profile",
@@ -36,9 +32,7 @@ export const endpoints = {
   },
   audio: {
     progress: {
-      list: "/audio/progress",
       update: (listingId: string) => `/audio/progress/${listingId}`,
-      sync: "/audio/progress/sync",
     },
     listings: {
       stream: (id: string) => `/audio/listings/${id}/stream`,
@@ -108,7 +102,5 @@ export const endpoints = {
       unpublish: (id: string, locale: string) => `/topics/${id}/translations/${locale}/unpublish`,
     },
   },
-  auth: {
-    updateLocale: "/auth/me/locale",
-  },
+  auth: {},
 } as const;
