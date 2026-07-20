@@ -69,7 +69,6 @@ export function SidebarDrawer({ isOpen, onClose }: SidebarDrawerProps) {
         aria-label={t("navigation.mobileNav", "Mobile navigation")}
       >
         <div className={styles.header}>
-          <h2 className={styles.title}>{t("navigation.menu", "Menu")}</h2>
           <button
             type="button"
             className={styles.closeButton}

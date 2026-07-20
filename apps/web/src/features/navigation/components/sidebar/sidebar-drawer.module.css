@@ -30,17 +30,9 @@
 .header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding: var(--space-component-gap-md);
   border-bottom: 1px solid var(--border-subtle);
-}
-
-.title {
-  margin: 0;
-  font-family: var(--typo-title-md-font-family), serif;
-  font-size: var(--typo-title-md-font-size);
-  font-weight: var(--typo-title-md-font-weight);
-  color: var(--content-strong);
 }
 
 .closeButton {
