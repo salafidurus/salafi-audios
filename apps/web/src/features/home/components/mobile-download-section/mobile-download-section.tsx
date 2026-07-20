@@ -22,10 +22,10 @@ export function MobileDownloadSection({ availability }: MobileDownloadSectionPro
       aria-label="Mobile apps download"
       data-testid="mobile-download-section"
     >
-      <div className={styles.storeCard} data-testid="app-store-wrapper">
+      <div data-testid="app-store-wrapper">
         <StoreDownloadBadge store="appStore" isAvailable={iosAvailable} href={APP_STORE_URL} />
       </div>
-      <div className={styles.storeCard} data-testid="google-play-wrapper">
+      <div data-testid="google-play-wrapper">
         <StoreDownloadBadge
           store="googlePlay"
           isAvailable={androidAvailable}

@@ -34,6 +34,7 @@
 .searchWrapper:hover {
   transform: translateY(-2px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-component-chip);
 }
 
 @media (prefers-reduced-motion: reduce) {

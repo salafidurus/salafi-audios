@@ -8,32 +8,6 @@
   background: transparent;
 }
 
-.storeCard {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 0;
-  padding: 3rem 2.5rem;
-  border: none;
-  border-radius: 24px;
-  background: rgba(var(--surface-rgb, 255 255 255), 0.85);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-  transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
-}
-
-.storeCard:hover {
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .storeCard:hover {
-    transform: none;
-  }
-}
-
 @media (min-width: 900px) {
   .downloadSection {
     grid-template-columns: 1fr 1fr;
@@ -42,11 +16,6 @@
 }
 
 @media (max-width: 640px) {
-  .storeCard {
-    padding: 2.5rem 2rem;
-    gap: 1.5rem;
-  }
-
   .downloadSection {
     gap: 1.5rem;
   }
