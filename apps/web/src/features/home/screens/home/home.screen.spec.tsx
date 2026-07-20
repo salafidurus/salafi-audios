@@ -107,13 +107,15 @@ describe("HomeScreen", () => {
     const cardScholars = screen.getByTestId("feature-card-scholars");
     expect(cardScholars).toBeTruthy();
     expect(screen.getByTestId("feature-card-title-scholars").textContent).toBe(
-      "Known Salafi Scholars & Students of Knowledge",
+      "Salafi Scholars Only",
     );
 
     // Card 2
     const cardDistraction = screen.getByTestId("feature-card-distraction");
     expect(cardDistraction).toBeTruthy();
-    expect(screen.getByTestId("feature-card-title-distraction").textContent).toBe("No Distraction");
+    expect(screen.getByTestId("feature-card-title-distraction").textContent).toBe(
+      "Undistracted Learning",
+    );
   });
 
   it("renders disabled mobile app download buttons using testIDs", () => {

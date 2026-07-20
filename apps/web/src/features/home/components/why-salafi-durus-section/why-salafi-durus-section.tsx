@@ -7,13 +7,13 @@ import styles from "./why-salafi-durus-section.module.css";
 const FEATURES = [
   {
     icon: <Users size={24} />,
-    title: "Known Salafi Scholars & Students of Knowledge",
+    title: "Salafi Scholars Only",
     description: "Audio lectures from trusted scholars. Authentic Islamic knowledge.",
     testId: "feature-card-scholars",
   },
   {
     icon: <Sparkles size={24} />,
-    title: "No Distraction",
+    title: "Undistracted Learning",
     description: "Purely seeking the pleasure of Allah ﷻ. No ads, no social media.",
     testId: "feature-card-distraction",
   },
