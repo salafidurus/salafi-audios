@@ -1,0 +1,202 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-layout-section-y);
+  width: 100%;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-component-gap-md);
+  padding: var(--space-scale-4xl) 0 var(--space-scale-2xl);
+}
+
+.searchWrapper {
+  width: 100%;
+  max-width: 32rem;
+  margin-top: var(--space-scale-md);
+  transition: transform 200ms ease;
+}
+
+.searchWrapper:hover {
+  transform: scale(1.01);
+}
+
+.continueSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-md);
+}
+
+.continueCard {
+  all: unset;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-md);
+  padding: var(--space-component-card-padding);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-component-card);
+  background: var(--surface-default);
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+  text-align: left;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.continueCard:hover {
+  border-color: var(--border-primary);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+}
+
+.continueHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
+}
+
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-component-gap-md);
+  width: 100%;
+}
+
+.progressTrack {
+  flex: 1;
+  height: 4px;
+  background: var(--border-subtle);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--action-primary);
+  border-radius: var(--radius-full);
+}
+
+.featuresSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-lg);
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-component-gap-lg);
+}
+
+.featureCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-sm);
+  padding: var(--space-component-card-padding);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-component-card);
+  background: var(--surface-default);
+}
+
+.featureIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-component-chip);
+  background: var(--surface-primary-subtle);
+  color: var(--content-primary-strong);
+  margin-bottom: var(--space-scale-xs);
+}
+
+/* Download Split-Card Layout */
+.downloadSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-component-gap-xl);
+  padding: calc(var(--space-component-card-padding) * 1.5);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-component-card);
+  background: var(--surface-subtle);
+  align-items: center;
+}
+
+.downloadInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-sm);
+}
+
+.downloadActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-md);
+  align-items: flex-end;
+}
+
+.badgeWrapper {
+  position: relative;
+  width: 140px; /* Standard badge proportions */
+  height: 42px;
+}
+
+.badgeButton {
+  all: unset;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0.45;
+  filter: grayscale(1);
+  cursor: not-allowed;
+}
+
+.comingSoonBadge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--surface-inverse);
+  color: var(--content-inverse);
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: var(--radius-component-chip);
+  pointer-events: none;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Tablet & Mobile responsive override rules */
+@media (max-width: 900px) {
+  .downloadSection {
+    grid-template-columns: 1fr;
+    gap: var(--space-component-gap-lg);
+  }
+  .downloadActions {
+    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: var(--space-scale-2xl) 0 var(--space-scale-xl);
+  }
+  .featuresGrid {
+    grid-template-columns: 1fr;
+    gap: var(--space-component-gap-md);
+  }
+  .downloadActions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+  .badgeWrapper {
+    width: 100%;
+    max-width: 200px;
+  }
+}
