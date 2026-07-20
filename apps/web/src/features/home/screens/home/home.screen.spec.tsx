@@ -132,5 +132,9 @@ describe("HomeScreen", () => {
     const googlePlayBtn = screen.getByTestId("download-badge-google-play") as HTMLButtonElement;
     expect(googlePlayBtn).toBeTruthy();
     expect(googlePlayBtn.disabled).toBe(true);
+
+    // Verify "Coming Soon" badges exist via testID
+    expect(screen.getByTestId("coming-soon-badge-app-store").textContent).toBe("Coming soon");
+    expect(screen.getByTestId("coming-soon-badge-google-play").textContent).toBe("Coming soon");
   });
 });

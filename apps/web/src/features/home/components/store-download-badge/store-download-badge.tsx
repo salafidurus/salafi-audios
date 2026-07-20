@@ -57,6 +57,9 @@ export function StoreDownloadBadge({ store, isAvailable, href }: StoreDownloadBa
         className={styles.badgeImage}
         priority={false}
       />
+      <span className={styles.comingSoonBadge} data-testid={`coming-soon-badge-${testIdBase}`}>
+        Coming soon
+      </span>
     </button>
   );
 }
