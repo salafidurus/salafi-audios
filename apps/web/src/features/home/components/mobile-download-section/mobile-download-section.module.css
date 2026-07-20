@@ -20,6 +20,13 @@
 @media (max-width: 640px) {
   .downloadSection {
     gap: 1.5rem;
+    flex-direction: row;
+  }
+
+  .downloadSection > div {
+    flex: 1;
+    display: flex;
+    justify-content: center;
   }
 }
 
