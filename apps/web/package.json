@@ -31,7 +31,7 @@
     "@sd/domain-search": "workspace:*",
     "@sd/utils-error": "workspace:*",
     "@tanstack/react-query": "catalog:",
-    "@tanstack/react-query-persist-client": "^5.101.2",
+    "@tanstack/react-query-persist-client": "catalog:",
     "better-auth": "catalog:",
     "clsx": "^2.1.1",
     "framer-motion": "^12.40.0",

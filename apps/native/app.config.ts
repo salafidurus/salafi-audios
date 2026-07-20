@@ -113,6 +113,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           iCloudContainerEnvironment: appEnv === "production" ? "Production" : "Development",
         },
       ],
+      "expo-sqlite",
     ],
 
     experiments: {
