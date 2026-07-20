@@ -34,10 +34,8 @@
 }
 
 .badgeImage {
-  width: auto;
-  height: 100%;
-  max-width: 400px;
-  display: block;
+  object-fit: contain;
+  object-position: center;
 }
 
 .comingSoonBadge {
