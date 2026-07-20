@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useInfiniteSearch } from "@sd/domain-search";
+import { useInfiniteSearch, useTopicsList } from "@sd/domain-search";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useRouter } from "next/navigation";
@@ -23,7 +23,7 @@ export function SearchProcessingScreen({ searchKey }: SearchProcessingScreenProp
   const { t } = useTranslation();
   const { push } = useRouter();
   const { query, setQuery, debouncedQuery } = useDebouncedSearch({ initialValue: searchKey });
-  const [topics] = useState<any[]>([]);
+  const { data: topics = [] } = useTopicsList();
   const [filter, setFilter] = useState<string[]>([]);
 
   const filterChips = useMemo(() => {
@@ -38,6 +38,7 @@ export function SearchProcessingScreen({ searchKey }: SearchProcessingScreenProp
   const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteSearch({
     query: debouncedQuery,
     showOriginal,
+    topicSlugs: filter.length ? filter : undefined,
   });
 
   const allItems = data?.pages.flatMap((page) => page.items) ?? [];
