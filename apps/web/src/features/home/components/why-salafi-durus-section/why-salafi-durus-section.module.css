@@ -28,3 +28,12 @@
     gap: 2.5rem;
   }
 }
+
+/* RTL Support */
+[dir="rtl"] .featuresSection {
+  direction: rtl;
+}
+
+[dir="rtl"] .featuresGrid {
+  direction: rtl;
+}

@@ -67,3 +67,8 @@
     width: 100%;
   }
 }
+
+/* RTL Support */
+[dir="rtl"] .hero {
+  direction: rtl;
+}

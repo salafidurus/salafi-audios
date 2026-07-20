@@ -46,4 +46,15 @@
   flex-direction: column;
   gap: 0.5rem;
   flex: 1;
+  text-align: left;
+}
+
+/* RTL Support */
+[dir="rtl"] .featureCard {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="rtl"] .textContent {
+  text-align: right;
 }
