@@ -1,14 +1,11 @@
 "use client";
 
-import { Search } from "@/shared/components/Search";
 import { useIsRtl } from "@/shared/hooks/use-is-rtl";
 import styles from "./hero-section.module.css";
 
-export type HeroSectionProps = {
-  onOpenSearch?: () => void;
-};
+export type HeroSectionProps = Record<string, never>;
 
-export function HeroSection({ onOpenSearch }: HeroSectionProps) {
+export function HeroSection(_props: HeroSectionProps) {
   const isArabic = useIsRtl();
 
   return (
@@ -27,14 +24,6 @@ export function HeroSection({ onOpenSearch }: HeroSectionProps) {
             <span className={styles.surahReference}>Surah Az-Zumar (39:9)</span>
           </p>
         )}
-      </div>
-      <div className={styles.searchWrapper} data-testid="home-search-wrapper">
-        <Search.Button
-          label="What do you want to listen to?"
-          onClick={onOpenSearch}
-          inputWrapperClassName={styles.searchInputWrapper}
-          placeholderClassName={styles.searchPlaceholder}
-        />
       </div>
     </section>
   );

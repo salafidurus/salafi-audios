@@ -6,14 +6,17 @@
   transition: transform 150ms ease;
   height: 100px;
   position: relative;
+  aspect-ratio: 200 / 60;
+  flex: 1;
+  min-width: 0;
 }
 
 @media (max-width: 640px) {
   .badgeLink,
   .badgeButton {
     height: 60px;
-    width: 100%;
-    max-width: 200px;
+    flex: 1;
+    min-width: 0;
   }
 }
 
@@ -29,14 +32,16 @@
 
 .badgeButton {
   cursor: not-allowed;
-  opacity: 0.6;
 }
 
 .badgeImage {
-  width: auto;
-  height: 100%;
-  max-width: 400px;
-  display: block;
+  object-fit: contain;
+  object-position: center;
+}
+
+.badgeButton .badgeImage {
+  opacity: 0.6;
+  filter: grayscale(1);
 }
 
 .comingSoonBadge {
@@ -52,6 +57,7 @@
   white-space: nowrap;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   border: 2px solid var(--surface-default);
+  z-index: 1;
 }
 
 .comingSoonBadgeRtl {

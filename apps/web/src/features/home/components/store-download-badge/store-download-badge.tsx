@@ -36,8 +36,8 @@ export function StoreDownloadBadge({ store, isAvailable, href }: StoreDownloadBa
         <Image
           src={badgeSrc}
           alt={badgeAlt}
-          width={200}
-          height={60}
+          fill
+          sizes="(max-width: 900px) 45vw, 350px"
           className={styles.badgeImage}
           priority={false}
         />
@@ -56,8 +56,8 @@ export function StoreDownloadBadge({ store, isAvailable, href }: StoreDownloadBa
       <Image
         src={badgeSrc}
         alt={badgeAlt}
-        width={200}
-        height={60}
+        fill
+        sizes="(max-width: 900px) 45vw, 350px"
         className={styles.badgeImage}
         priority={false}
       />
