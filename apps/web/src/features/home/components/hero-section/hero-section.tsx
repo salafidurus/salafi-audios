@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Search } from "@/shared/components/Search";
+import { useIsRtl } from "@/shared/hooks/use-is-rtl";
 import styles from "./hero-section.module.css";
 
 export type HeroSectionProps = {
@@ -9,12 +9,7 @@ export type HeroSectionProps = {
 };
 
 export function HeroSection({ onOpenSearch }: HeroSectionProps) {
-  const [isArabic, setIsArabic] = useState(false);
-
-  useEffect(() => {
-    const htmlLang = document.documentElement.lang;
-    setIsArabic(htmlLang?.startsWith("ar") || document.documentElement.dir === "rtl");
-  }, []);
+  const isArabic = useIsRtl();
 
   return (
     <section className={styles.hero} data-testid="home-hero-section">

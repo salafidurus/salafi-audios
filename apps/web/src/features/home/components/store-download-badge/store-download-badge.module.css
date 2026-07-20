@@ -58,3 +58,17 @@
   right: auto;
   left: -12px;
 }
+
+@media (max-width: 640px) {
+  .comingSoonBadge {
+    top: -8px;
+    right: -8px;
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  .comingSoonBadgeRtl {
+    right: auto;
+    left: -8px;
+  }
+}

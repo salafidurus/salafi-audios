@@ -69,7 +69,7 @@
 
 @media (max-width: 640px) {
   .hero {
-    padding: 3rem 0 2rem;
+    padding: var(--space-scale-2xl) 0 var(--space-scale-xl);
     gap: 1.5rem;
   }
 
@@ -86,22 +86,16 @@
     font-size: clamp(0.85rem, 2vw, 1rem);
   }
 
+  .searchWrapper {
+    width: 100%;
+  }
+
   .searchInputWrapper {
     padding: 1rem 1.5rem !important;
   }
 
   .searchPlaceholder {
     font-size: 1rem !important;
-  }
-}
-
-@media (max-width: 640px) {
-  .hero {
-    padding: var(--space-scale-2xl) 0 var(--space-scale-xl);
-  }
-
-  .searchWrapper {
-    width: 100%;
   }
 }
 

@@ -1,6 +1,6 @@
 .downloadSection {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: space-around;
   align-items: center;
   gap: 2rem;
@@ -12,7 +12,6 @@
 
 @media (min-width: 900px) {
   .downloadSection {
-    flex-direction: row;
     gap: 2.5rem;
   }
 }
@@ -20,7 +19,6 @@
 @media (max-width: 640px) {
   .downloadSection {
     gap: 1.5rem;
-    flex-direction: row;
   }
 
   .downloadSection > div {
@@ -33,10 +31,5 @@
 /* RTL Support */
 [dir="rtl"] .downloadSection {
   direction: rtl;
-}
-
-@media (min-width: 900px) {
-  [dir="rtl"] .downloadSection {
-    flex-direction: row-reverse;
-  }
+  flex-direction: row-reverse;
 }

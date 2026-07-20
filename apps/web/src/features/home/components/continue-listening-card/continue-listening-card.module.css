@@ -58,3 +58,9 @@
   background: var(--action-primary);
   border-radius: var(--radius-full);
 }
+
+/* RTL Support */
+[dir="rtl"] .continueCard {
+  direction: rtl;
+  text-align: right;
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useIsRtl } from "@/shared/hooks/use-is-rtl";
 import styles from "./store-download-badge.module.css";
 
 export type StoreDownloadBadgeProps = {
@@ -11,25 +11,7 @@ export type StoreDownloadBadgeProps = {
 };
 
 export function StoreDownloadBadge({ store, isAvailable, href }: StoreDownloadBadgeProps) {
-  const [isRtl, setIsRtl] = useState(false);
-
-  useEffect(() => {
-    const updateLanguage = () => {
-      const htmlDir = document.documentElement.dir;
-      const htmlLang = document.documentElement.lang;
-      setIsRtl(htmlDir === "rtl" || htmlLang?.startsWith("ar"));
-    };
-
-    updateLanguage();
-
-    const observer = new MutationObserver(updateLanguage);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["dir", "lang"],
-    });
-
-    return () => observer.disconnect();
-  }, []);
+  const isRtl = useIsRtl();
 
   const testIdBase = store === "appStore" ? "app-store" : "google-play";
   const langSuffix = isRtl ? "ar" : "en";
