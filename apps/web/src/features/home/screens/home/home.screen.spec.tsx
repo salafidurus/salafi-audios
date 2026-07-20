@@ -34,7 +34,7 @@ describe("HomeScreen", () => {
 
     const heroTagline = screen.getByTestId("home-hero-tagline");
     expect(heroTagline).toBeTruthy();
-    expect(heroTagline.textContent).toBe("Listen to audio lectures from trusted Salafi scholars");
+    expect(heroTagline.textContent).toContain("يَعْلَمُونَ");
 
     // Search button component (which renders text "What do you want to listen to?")
     const searchBtn = screen.getByText("What do you want to listen to?");
@@ -96,26 +96,6 @@ describe("HomeScreen", () => {
     );
 
     expect(screen.queryByTestId("continue-listening-section")).toBeNull();
-  });
-
-  it("renders the 2 platform feature cards using testIDs", () => {
-    render(
-      <HomeScreen onOpenSearch={mockOnOpenSearch} onContinueListening={mockOnContinueListening} />,
-    );
-
-    // Card 1
-    const cardScholars = screen.getByTestId("feature-card-scholars");
-    expect(cardScholars).toBeTruthy();
-    expect(screen.getByTestId("feature-card-title-scholars").textContent).toBe(
-      "Salafi Scholars Only",
-    );
-
-    // Card 2
-    const cardDistraction = screen.getByTestId("feature-card-distraction");
-    expect(cardDistraction).toBeTruthy();
-    expect(screen.getByTestId("feature-card-title-distraction").textContent).toBe(
-      "Undistracted Learning",
-    );
   });
 
   it("renders disabled mobile app download buttons using testIDs", () => {

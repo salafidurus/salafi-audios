@@ -14,7 +14,7 @@ export function HeroSection({ onOpenSearch }: HeroSectionProps) {
         Salafi Durus
       </h1>
       <p className={styles.tagline} data-testid="home-hero-tagline">
-        Listen to audio lectures from trusted Salafi scholars
+        رَبِّهِۦ ۗ قُلْ هَلْ يَسْتَوِى ٱلَّذِينَ يَعْلَمُونَ وَٱلَّذِينَ لَا يَعْلَمُونَ ۗ إِنَّمَا يَتَذَكَّرُ أُو۟لُوا۟ ٱلْأَلْبَـٰبِ
       </p>
       <div className={styles.searchWrapper} data-testid="home-search-wrapper">
         <Search.Button
