@@ -48,8 +48,12 @@
 .links a {
   text-decoration: none;
   color: inherit;
+  transition: color 150ms ease;
 }
 
-.links a:hover {
+.links a:hover,
+.links a:focus-visible {
   color: var(--content-primary);
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
 }

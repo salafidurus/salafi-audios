@@ -11,8 +11,8 @@ const speedButtonStyle: CSSProperties = {
   padding: "4px 8px",
   borderRadius: 12,
   border: "none",
-  backgroundColor: "#f1f5f9",
-  color: "#475569",
+  backgroundColor: "var(--surface-subtle)",
+  color: "var(--content-muted)",
   fontSize: 12,
   fontWeight: "bold",
   cursor: "pointer",
@@ -25,7 +25,7 @@ const controlsGroupStyle: CSSProperties = { display: "flex", alignItems: "center
 const skipButtonStyle: CSSProperties = {
   background: "none",
   border: "none",
-  color: "#475569",
+  color: "var(--content-muted)",
   cursor: "pointer",
   display: "flex",
   flexDirection: "column",
@@ -38,7 +38,7 @@ const skipLabelStyle: CSSProperties = {
   fontWeight: "bold",
   position: "absolute",
   top: 8,
-  color: "#475569",
+  color: "var(--content-muted)",
 };
 
 export function PlaybackControls() {
@@ -77,13 +77,13 @@ export function PlaybackControls() {
     height: 40,
     borderRadius: 20,
     border: "none",
-    backgroundColor: "#2563eb",
-    color: "#fff",
+    backgroundColor: "var(--action-primary)",
+    color: "var(--content-on-primary)",
     cursor: isLoading ? "wait" : "pointer",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    boxShadow: "0 4px 6px -1px rgba(37, 99, 235, 0.2)",
+    boxShadow: "var(--shadow-sm)",
   };
 
   return (
@@ -118,9 +118,9 @@ export function PlaybackControls() {
           {isLoading ? (
             <span style={{ fontSize: 12 }}>…</span>
           ) : isPlaying ? (
-            <Pause size={18} fill="#fff" />
+            <Pause size={18} fill="currentColor" />
           ) : (
-            <Play size={18} fill="#fff" style={{ marginLeft: 2 }} />
+            <Play size={18} fill="currentColor" style={{ marginLeft: 2 }} />
           )}
         </button>
 

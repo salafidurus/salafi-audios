@@ -15,7 +15,7 @@ type RoleBadgeProps = {
 type StatusBadgeProps = {
   variant: "status";
   status: string;
-  color?: "primary" | "muted" | "success" | "warning";
+  color?: "primary" | "secondary" | "muted" | "success" | "warning";
 };
 
 export type BadgeProps = PermissionBadgeProps | RoleBadgeProps | StatusBadgeProps;

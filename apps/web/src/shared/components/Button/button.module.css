@@ -117,6 +117,16 @@
   --btn-shadow: none;
 }
 
+.variant-secondary {
+  --btn-bg: var(--action-secondary);
+  --btn-bg-hover: var(--action-secondary-hover);
+  --btn-bg-active: var(--action-secondary-active);
+  --btn-fg: var(--content-on-secondary);
+  --btn-border: var(--action-secondary);
+  --btn-border-hover: var(--action-secondary-hover);
+  --btn-shadow: var(--shadow-sm);
+}
+
 .variant-danger {
   --btn-bg: var(--action-danger);
   --btn-bg-hover: var(--action-danger-hover);

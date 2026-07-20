@@ -4,6 +4,7 @@
   align-items: center;
   text-align: center;
   gap: 1rem;
+  position: relative;
 }
 
 .title {
@@ -13,6 +14,19 @@
   line-height: 1.1;
   margin: 0;
   color: var(--content-default);
+  position: relative;
+  z-index: 1;
+}
+
+.title::before {
+  content: "";
+  position: absolute;
+  inset: -1.5rem -3rem;
+  background: var(--accent-primary-subtle-surface);
+  filter: blur(48px);
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 999px;
 }
 
 .taglineContainer {
@@ -45,7 +59,7 @@
 
 .surahReference {
   font-weight: 500;
-  color: var(--content-secondary);
+  color: var(--content-primary-strong);
 }
 
 @media (max-width: 640px) {
