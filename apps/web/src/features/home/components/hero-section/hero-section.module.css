@@ -1,0 +1,28 @@
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-component-gap-md);
+  padding: var(--space-scale-4xl) 0 var(--space-scale-2xl);
+}
+
+.searchWrapper {
+  width: 80%;
+  margin-top: var(--space-scale-md);
+  transition: transform 200ms ease;
+}
+
+.searchWrapper:hover {
+  transform: scale(1.01);
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: var(--space-scale-2xl) 0 var(--space-scale-xl);
+  }
+
+  .searchWrapper {
+    width: 100%;
+  }
+}

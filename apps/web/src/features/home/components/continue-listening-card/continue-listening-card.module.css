@@ -1,0 +1,54 @@
+.continueSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-md);
+}
+
+.continueCard {
+  all: unset;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-md);
+  padding: var(--space-component-card-padding);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-component-card);
+  background: var(--surface-default);
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+  text-align: left;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.continueCard:hover {
+  border-color: var(--border-primary);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+}
+
+.continueHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
+}
+
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-component-gap-md);
+  width: 100%;
+}
+
+.progressTrack {
+  flex: 1;
+  height: 4px;
+  background: var(--border-subtle);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--action-primary);
+  border-radius: var(--radius-full);
+}

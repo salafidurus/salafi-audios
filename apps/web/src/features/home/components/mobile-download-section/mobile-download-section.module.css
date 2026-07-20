@@ -1,0 +1,39 @@
+.downloadSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-component-gap-lg);
+  padding: var(--space-component-card-padding);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-component-card);
+  background: var(--surface-subtle);
+}
+
+.storeCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--space-component-gap-md);
+  padding: var(--space-component-card-padding);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-component-card);
+  background: var(--surface-default);
+}
+
+@media (max-width: 900px) {
+  .downloadSection {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .downloadSection {
+    grid-template-columns: 1fr;
+    gap: var(--space-component-gap-md);
+    padding: var(--space-component-card-padding);
+  }
+
+  .storeCard {
+    width: 100%;
+  }
+}

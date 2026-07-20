@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { httpClient, endpoints, queryKeys, type SearchCatalogResultsDto } from "@sd/core-contracts";
-import { buildSearchResultRows, type SearchResultRow } from "../utils/build-search-result-rows";
+import { buildSearchResultRows } from "../utils/build-search-result-rows";
 
 export interface UseInfiniteSearchOptions {
   query: string;

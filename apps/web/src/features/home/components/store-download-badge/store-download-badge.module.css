@@ -1,0 +1,25 @@
+.badgeLink,
+.badgeButton {
+  all: unset;
+  display: block;
+  width: 100%;
+  height: 42px;
+  cursor: pointer;
+}
+
+.badgeLink {
+  text-decoration: none;
+}
+
+.badgeButton {
+  opacity: 0.45;
+  filter: grayscale(1);
+  cursor: not-allowed;
+}
+
+.badgeContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-scale-sm);
+}

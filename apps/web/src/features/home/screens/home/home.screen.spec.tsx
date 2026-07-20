@@ -2,11 +2,11 @@ import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { HomeScreen } from "./home.screen";
-import { useQuickBrowse } from "@sd/domain-search";
+import { useContinueListening } from "@sd/domain-search";
 
-// Mock the useQuickBrowse hook from @sd/domain-search
+// Mock the useContinueListening hook from @sd/domain-search
 vi.mock("@sd/domain-search", () => ({
-  useQuickBrowse: vi.fn(),
+  useContinueListening: vi.fn(),
 }));
 
 describe("HomeScreen", () => {
@@ -16,8 +16,8 @@ describe("HomeScreen", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Default mock return value: loading false, no progress data
-    (useQuickBrowse as unknown as Mock<any>).mockReturnValue({
-      data: null,
+    (useContinueListening as unknown as Mock<any>).mockReturnValue({
+      recentProgress: null,
       isLoading: false,
     });
   });
@@ -46,16 +46,14 @@ describe("HomeScreen", () => {
   });
 
   it("renders continue listening section when recentProgress is provided", () => {
-    (useQuickBrowse as unknown as Mock<any>).mockReturnValue({
-      data: {
-        recentProgress: {
-          lectureId: "lecture-123",
-          lectureTitle: "Tauheed Explained",
-          lectureSlug: "tauheed-explained",
-          scholarName: "Shaikh Salih al-Fawzan",
-          durationSeconds: 1800, // 30 minutes
-          positionSeconds: 600, // 10 minutes
-        },
+    (useContinueListening as unknown as Mock<any>).mockReturnValue({
+      recentProgress: {
+        lectureId: "lecture-123",
+        lectureTitle: "Tauheed Explained",
+        lectureSlug: "tauheed-explained",
+        scholarName: "Shaikh Salih al-Fawzan",
+        durationSeconds: 1800, // 30 minutes
+        positionSeconds: 600, // 10 minutes
       },
       isLoading: false,
     });
@@ -88,10 +86,8 @@ describe("HomeScreen", () => {
   });
 
   it("hides continue listening section when recentProgress is null", () => {
-    (useQuickBrowse as unknown as Mock<any>).mockReturnValue({
-      data: {
-        recentProgress: null,
-      },
+    (useContinueListening as unknown as Mock<any>).mockReturnValue({
+      recentProgress: null,
       isLoading: false,
     });
 

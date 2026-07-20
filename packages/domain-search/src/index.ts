@@ -15,3 +15,4 @@ export { buildSearchResultRows, type SearchResultRow } from "./utils/build-searc
 
 // Quick browse
 export { useQuickBrowse } from "./use-quickbrowse";
+export { useContinueListening } from "./use-continue-listening";
