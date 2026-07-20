@@ -13,7 +13,11 @@ vi.mock("@sd/domain-permissions", () => ({
 vi.mock("@sd/core-contracts", () => {
   // Import the real module to preserve all exports
   const actual = require("@sd/core-contracts");
-  return { ...actual, useApiQuery: vi.fn() };
+  return {
+    ...actual,
+    useApiQuery: vi.fn(),
+    httpClient: vi.fn(),
+  };
 });
 vi.mock("next/navigation", () => ({ usePathname: vi.fn() }));
 vi.mock("@/shared/hooks/use-responsive", () => ({
@@ -58,5 +62,35 @@ describe("AdminContentsScreen — topics tab permission gates", () => {
     renderWithProviders(<AdminContentsScreen />);
 
     expect(screen.getByText("Add Topic")).toBeInTheDocument();
+  });
+
+  it("uses the correct query function to fetch topics", async () => {
+    const { httpClient, endpoints, queryKeys } = require("@sd/core-contracts");
+    (httpClient as Mock<any>).mockResolvedValue([]);
+
+    renderWithProviders(<AdminContentsScreen />);
+
+    // Find the call where the query key is queryKeys.topics.list()
+    const call = (useApiQuery as Mock<any>).mock.calls.find(
+      (c) => JSON.stringify(c[0]) === JSON.stringify(queryKeys.topics.list()),
+    );
+
+    expect(call).toBeDefined();
+    if (!call) {
+      throw new Error("useApiQuery was not called with topics list key");
+    }
+    const queryFn = call[1] as () => Promise<any>;
+    expect(queryFn).toBeTypeOf("function");
+
+    // Execute queryFn
+    await queryFn();
+
+    // Verify it called httpClient with correct url
+    expect(httpClient).toHaveBeenCalledWith(
+      expect.objectContaining({
+        url: endpoints.topics.list,
+        method: "GET",
+      }),
+    );
   });
 });

@@ -13,6 +13,8 @@ import { List } from "@/shared/components/List";
 import {
   useApiQuery,
   queryKeys,
+  httpClient,
+  endpoints,
   type TopicDetailDto,
   type AdminListingDetailDto,
 } from "@sd/core-contracts";
@@ -70,7 +72,7 @@ export function AdminContentsScreen() {
   // Fetch topics
   const { data: topicsData, refetch: refetchTopics } = useApiQuery<TopicDetailDto[]>(
     queryKeys.topics.list(),
-    () => Promise.resolve(EMPTY_TOPICS_ARRAY),
+    () => httpClient<TopicDetailDto[]>({ url: endpoints.topics.list, method: "GET" }),
   );
 
   const topics = topicsData ?? EMPTY_TOPICS_ARRAY;
