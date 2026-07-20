@@ -32,7 +32,7 @@
   margin: 0;
   max-width: 900px;
   color: var(--content-secondary);
-  font-family: var(--font-display-ar, serif);
+  font-family: var(--font-body-ar, sans-serif);
 }
 
 .taglineTranslation {
