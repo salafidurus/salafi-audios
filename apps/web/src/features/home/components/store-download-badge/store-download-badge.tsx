@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import styles from "./store-download-badge.module.css";
 
 export type StoreDownloadBadgeProps = {
@@ -10,12 +11,33 @@ export type StoreDownloadBadgeProps = {
 };
 
 export function StoreDownloadBadge({ store, isAvailable, href }: StoreDownloadBadgeProps) {
+  const [isRtl, setIsRtl] = useState(false);
+
+  useEffect(() => {
+    const updateLanguage = () => {
+      const htmlDir = document.documentElement.dir;
+      const htmlLang = document.documentElement.lang;
+      setIsRtl(htmlDir === "rtl" || htmlLang?.startsWith("ar"));
+    };
+
+    updateLanguage();
+
+    const observer = new MutationObserver(updateLanguage);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["dir", "lang"],
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   const testIdBase = store === "appStore" ? "app-store" : "google-play";
+  const langSuffix = isRtl ? "ar" : "en";
 
   const badgeSrc =
     store === "appStore"
-      ? "/store-buttons/app-store-black-en.svg"
-      : "/store-buttons/play-store-en.svg";
+      ? `/store-buttons/app-store-black-${langSuffix}.svg`
+      : `/store-buttons/play-store-${langSuffix}.svg`;
 
   const badgeAlt = store === "appStore" ? "Download on the App Store" : "Get it on Google Play";
 
@@ -57,7 +79,10 @@ export function StoreDownloadBadge({ store, isAvailable, href }: StoreDownloadBa
         className={styles.badgeImage}
         priority={false}
       />
-      <span className={styles.comingSoonBadge} data-testid={`coming-soon-badge-${testIdBase}`}>
+      <span
+        className={`${styles.comingSoonBadge} ${isRtl ? styles.comingSoonBadgeRtl : ""}`}
+        data-testid={`coming-soon-badge-${testIdBase}`}
+      >
         Coming soon
       </span>
     </button>

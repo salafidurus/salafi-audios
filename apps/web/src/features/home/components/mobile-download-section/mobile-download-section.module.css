@@ -22,3 +22,14 @@
     gap: 1.5rem;
   }
 }
+
+/* RTL Support */
+[dir="rtl"] .downloadSection {
+  direction: rtl;
+}
+
+@media (min-width: 900px) {
+  [dir="rtl"] .downloadSection {
+    flex-direction: row-reverse;
+  }
+}

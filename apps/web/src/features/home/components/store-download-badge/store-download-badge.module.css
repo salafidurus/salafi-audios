@@ -44,3 +44,8 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   border: 2px solid var(--surface-default);
 }
+
+.comingSoonBadgeRtl {
+  right: auto;
+  left: -12px;
+}
