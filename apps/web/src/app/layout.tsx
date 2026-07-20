@@ -7,8 +7,6 @@ import { themeCss } from "./theme-css";
 
 import { ThemeSync } from "../core/styles/ThemeSync";
 import { Providers } from "../core/providers";
-import { getServerLocale } from "../core/i18n/locale-cookie.server";
-import { localeToDir } from "@sd/core-i18n";
 
 const fraunces = localFont({
   variable: "--font-display-en",
@@ -163,28 +161,33 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;
-  const locale = await getServerLocale();
-  const dir = localeToDir(locale);
 
   return (
     <html
-      lang={locale}
-      dir={dir}
+      lang="en"
+      dir="ltr"
       className={`${fraunces.variable} ${manrope.variable} ${geistMono.variable} ${alexandria.variable} ${ibmPlexSansArabic.variable}`}
     >
+      {/* lang/dir defaults — overridden beforeInteractive by the script below.
+          Keeping root layout static avoids forcing every route to be dynamic. */}
       <body className="antialiased">
         {process.env.NODE_ENV === "production" && !apiBaseUrl?.includes("localhost") ? (
           <Script src="https://www.vexo.co/analytics.js" strategy="afterInteractive" />
         ) : null}
+        {/* Must be beforeInteractive so lang/dir are set before first paint.
+            Do NOT change to afterInteractive — it would cause RTL layout flash. */}
+        <Script id="locale-init" strategy="beforeInteractive">
+          {`!function(){var c=document.cookie.match(/(?:^|; )locale=([^;]*)/),l=c?c[1]:"en";document.documentElement.lang=l,document.documentElement.dir=l==="ar"?"rtl":"ltr"}()`}
+        </Script>
         <style>{themeCss}</style>
         <ThemeSync />
-        <Providers apiBaseUrl={apiBaseUrl} initialLocale={locale}>
+        <Providers apiBaseUrl={apiBaseUrl} initialLocale="en">
           {children}
         </Providers>
       </body>
