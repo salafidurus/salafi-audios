@@ -9,7 +9,6 @@ import type { Locale } from "@sd/core-contracts";
 import { authClient } from "@/core/auth/auth-client";
 import { ToastContainer } from "@/core/toast";
 import { createI18n } from "./i18n/i18n";
-import { setLocaleCookie } from "./i18n/locale-cookie";
 
 const queryClient = createQueryClient();
 
@@ -27,9 +26,16 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
     setLocaleProvider(() => i18n.language);
   }, [apiBaseUrl, i18n]);
 
+  // Sync i18n with cookie after hydration. The root layout is static so it
+  // always passes "en" as the default. The inline script in layout.tsx sets
+  // lang/dir before paint, but the i18n instance needs a post-hydration sync.
   useEffect(() => {
-    setLocaleCookie(initialLocale);
-  }, [initialLocale]);
+    const match = document.cookie.match(/(?:^|; )locale=([^;]*)/);
+    const locale = (match?.[1] ?? "en") as Locale;
+    if (locale !== i18n.language) {
+      i18n.changeLanguage(locale);
+    }
+  }, [i18n]);
 
   useEffect(() => {
     setUnauthorizedHandler(() => {
