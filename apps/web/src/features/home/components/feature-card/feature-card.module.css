@@ -5,9 +5,10 @@
   padding: 2rem;
   border: none;
   border-radius: 24px;
-  background: var(--surface-default);
+  background: rgba(var(--surface-rgb, 255 255 255), 0.85);
+  backdrop-filter: blur(8px);
   cursor: default;
-  transition: transform 150ms ease, box-shadow 150ms ease;
+  transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
 }
 
@@ -32,10 +33,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 3.5rem;
-  height: 3.5rem;
+  width: 3rem;
+  height: 3rem;
   flex-shrink: 0;
-  border-radius: 16px;
+  border-radius: 12px;
   background: var(--surface-primary-subtle);
   color: var(--content-primary-strong);
 }

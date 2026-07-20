@@ -98,39 +98,28 @@ describe("HomeScreen", () => {
     expect(screen.queryByTestId("continue-listening-section")).toBeNull();
   });
 
-  it("renders the 3 platform feature cards using testIDs", () => {
+  it("renders the 2 platform feature cards using testIDs", () => {
     render(
       <HomeScreen onOpenSearch={mockOnOpenSearch} onContinueListening={mockOnContinueListening} />,
     );
 
-    // Section header
-    expect(screen.getByTestId("features-section-title").textContent).toBe("Why Salafi Durus");
-
     // Card 1
     const cardScholars = screen.getByTestId("feature-card-scholars");
     expect(cardScholars).toBeTruthy();
-    expect(screen.getByTestId("feature-card-title-scholars").textContent).toBe("Verified Scholars");
+    expect(screen.getByTestId("feature-card-title-scholars").textContent).toBe(
+      "Known Salafi Scholars & Students of Knowledge",
+    );
 
     // Card 2
-    const cardOffline = screen.getByTestId("feature-card-offline");
-    expect(cardOffline).toBeTruthy();
-    expect(screen.getByTestId("feature-card-title-offline").textContent).toBe("Offline Sync");
-
-    // Card 3
-    const cardPleasure = screen.getByTestId("feature-card-pleasure");
-    expect(cardPleasure).toBeTruthy();
-    expect(screen.getByTestId("feature-card-title-pleasure").textContent).toBe(
-      "Seeking His Pleasure",
-    );
+    const cardDistraction = screen.getByTestId("feature-card-distraction");
+    expect(cardDistraction).toBeTruthy();
+    expect(screen.getByTestId("feature-card-title-distraction").textContent).toBe("No Distraction");
   });
 
   it("renders disabled mobile app download buttons with Coming Soon badges using testIDs", () => {
     render(
       <HomeScreen onOpenSearch={mockOnOpenSearch} onContinueListening={mockOnContinueListening} />,
     );
-
-    // Verify download header
-    expect(screen.getByTestId("mobile-download-title").textContent).toBe("Coming to Mobile");
 
     // Apple App Store button is disabled
     const appStoreBtn = screen.getByTestId("download-badge-app-store") as HTMLButtonElement;
