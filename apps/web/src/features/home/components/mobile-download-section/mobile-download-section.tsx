@@ -1,0 +1,37 @@
+"use client";
+
+import { StoreDownloadBadge } from "../store-download-badge/store-download-badge";
+import {
+  APP_STORE_URL,
+  GOOGLE_PLAY_URL,
+  type MobileAvailability,
+} from "../../screens/home/home.constants";
+import styles from "./mobile-download-section.module.css";
+
+export type MobileDownloadSectionProps = {
+  availability: MobileAvailability;
+};
+
+export function MobileDownloadSection({ availability }: MobileDownloadSectionProps) {
+  const iosAvailable = availability === "ios" || availability === "both";
+  const androidAvailable = availability === "android" || availability === "both";
+
+  return (
+    <section
+      className={styles.downloadSection}
+      aria-label="Mobile apps download"
+      data-testid="mobile-download-section"
+    >
+      <div data-testid="app-store-wrapper">
+        <StoreDownloadBadge store="appStore" isAvailable={iosAvailable} href={APP_STORE_URL} />
+      </div>
+      <div data-testid="google-play-wrapper">
+        <StoreDownloadBadge
+          store="googlePlay"
+          isAvailable={androidAvailable}
+          href={GOOGLE_PLAY_URL}
+        />
+      </div>
+    </section>
+  );
+}

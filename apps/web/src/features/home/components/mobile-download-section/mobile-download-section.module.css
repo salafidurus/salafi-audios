@@ -1,0 +1,45 @@
+.downloadSection {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  gap: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+@media (min-width: 641px) and (max-width: 900px) {
+  .downloadSection {
+    width: 85%;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 901px) {
+  .downloadSection {
+    gap: 2.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .downloadSection {
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 70%;
+    margin: 0 auto;
+  }
+
+  .downloadSection > div {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+}
+
+/* RTL Support */
+[dir="rtl"] .downloadSection {
+  direction: rtl;
+  flex-direction: row-reverse;
+}

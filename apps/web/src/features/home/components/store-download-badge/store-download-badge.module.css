@@ -1,0 +1,74 @@
+.badgeLink,
+.badgeButton {
+  all: unset;
+  display: inline-block;
+  cursor: pointer;
+  transition: transform 150ms ease;
+  height: 100px;
+  position: relative;
+}
+
+@media (max-width: 640px) {
+  .badgeLink,
+  .badgeButton {
+    height: 60px;
+    width: 100%;
+    max-width: 200px;
+  }
+}
+
+.badgeLink:hover {
+  transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badgeLink:hover {
+    transform: none;
+  }
+}
+
+.badgeButton {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.badgeImage {
+  width: auto;
+  height: 100%;
+  max-width: 400px;
+  display: block;
+}
+
+.comingSoonBadge {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 8px 14px;
+  border-radius: 6px;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  border: 2px solid var(--surface-default);
+}
+
+.comingSoonBadgeRtl {
+  right: auto;
+  left: -12px;
+}
+
+@media (max-width: 640px) {
+  .comingSoonBadge {
+    top: -8px;
+    right: -8px;
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  .comingSoonBadgeRtl {
+    right: auto;
+    left: -8px;
+  }
+}

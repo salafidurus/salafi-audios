@@ -1,0 +1,122 @@
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 2rem;
+  padding: 5rem 0 3rem;
+}
+
+.title {
+  font-size: clamp(3.5rem, 8vw, 5.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0;
+  color: var(--content-default);
+}
+
+.taglineContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.tagline {
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+  font-weight: 400;
+  line-height: 1.8;
+  letter-spacing: 0.03em;
+  margin: 0;
+  max-width: 900px;
+  color: var(--content-secondary);
+  font-family: var(--font-body-ar, sans-serif);
+}
+
+.taglineTranslation {
+  font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+  font-weight: 400;
+  line-height: 1.7;
+  margin: 0;
+  max-width: 800px;
+  color: var(--content-muted);
+}
+
+.surahReference {
+  font-weight: 500;
+  color: var(--content-secondary);
+}
+
+.searchWrapper {
+  width: 80%;
+  margin-top: 1.5rem;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.searchWrapper:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  border-radius: var(--radius-component-chip);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .searchWrapper:hover {
+    transform: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .searchWrapper {
+    width: 100%;
+  }
+}
+
+.searchInputWrapper {
+  padding: 1.5rem 2.5rem !important;
+}
+
+.searchPlaceholder {
+  font-size: 1.25rem !important;
+  font-weight: 500 !important;
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding: var(--space-scale-2xl) 0 var(--space-scale-xl);
+    gap: 1.5rem;
+  }
+
+  .title {
+    font-size: 2.5rem;
+  }
+
+  .tagline {
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    letter-spacing: 0.02em;
+  }
+
+  .taglineTranslation {
+    font-size: clamp(0.85rem, 2vw, 1rem);
+  }
+
+  .searchWrapper {
+    width: 100%;
+  }
+
+  .searchInputWrapper {
+    padding: 0.9rem 0.9rem !important;
+  }
+
+  .searchPlaceholder {
+    font-size: 0.9rem !important;
+  }
+}
+
+
+
+/* RTL Support */
+[dir="rtl"] .hero {
+  direction: rtl;
+}

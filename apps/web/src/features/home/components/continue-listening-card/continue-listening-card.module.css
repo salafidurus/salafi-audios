@@ -1,0 +1,66 @@
+.continueSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-md);
+}
+
+.continueCard {
+  all: unset;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-md);
+  padding: var(--space-component-card-padding);
+  border: none;
+  border-radius: 24px;
+  background: var(--surface-default);
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+  text-align: left;
+  box-sizing: border-box;
+  width: 100%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+}
+
+.continueCard:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .continueCard:hover {
+    transform: none;
+  }
+}
+
+.continueHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
+}
+
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-component-gap-md);
+  width: 100%;
+}
+
+.progressTrack {
+  flex: 1;
+  height: 4px;
+  background: var(--border-subtle);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--action-primary);
+  border-radius: var(--radius-full);
+}
+
+/* RTL Support */
+[dir="rtl"] .continueCard {
+  direction: rtl;
+  text-align: right;
+}
