@@ -2,7 +2,7 @@ import { type Href, useRouter } from "expo-router";
 import { routes } from "@sd/core-contracts";
 import { authClient } from "@/core/auth/auth-client";
 import { AccountScreen } from "@/features/settings/screens/account.screen";
-import { queryClient, persister } from "@/core/providers";
+import { queryClient, persister } from "@/core/query-client";
 
 export default function AccountIndexRoute() {
   const router = useRouter();

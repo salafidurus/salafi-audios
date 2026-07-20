@@ -4,7 +4,7 @@ import {
   setLocaleProvider,
   setUnauthorizedHandler,
 } from "@sd/core-api";
-import { createQueryClient, routes, shouldPersistQuery, DEFAULT_MAX_AGE } from "@sd/core-contracts";
+import { routes, shouldPersistQuery, DEFAULT_MAX_AGE } from "@sd/core-contracts";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { useFonts } from "expo-font";
 import { type Href, useRouter } from "expo-router";
@@ -18,12 +18,9 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { getApiBaseUrl } from "./config/runtime-env";
 import { i18n, initI18n } from "./i18n/i18n";
 import { syncTypographyToLocale } from "./styles/theme/typography-sync";
-import { createSqlitePersister } from "./persister";
+import { queryClient, persister } from "./query-client";
 
 LogBox.ignoreLogs(["API client initialization failed", "Open debugger to view warnings"]);
-
-export const queryClient = createQueryClient();
-export const persister = createSqlitePersister();
 
 function AppFontsProvider({ children }: { children: ReactNode }) {
   const [loaded] = useFonts({
