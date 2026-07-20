@@ -1,16 +1,18 @@
 "use client";
 
-import { QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState, type ReactNode } from "react";
 import { I18nextProvider } from "react-i18next";
 import { initApiClient, setLocaleProvider, setUnauthorizedHandler } from "@sd/core-api";
-import { createQueryClient } from "@sd/core-contracts/query";
+import { createQueryClient, shouldPersistQuery, DEFAULT_MAX_AGE } from "@sd/core-contracts";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import type { Locale } from "@sd/core-contracts";
 import { authClient } from "@/core/auth/auth-client";
 import { ToastContainer } from "@/core/toast";
 import { createI18n } from "./i18n/i18n";
+import { createIdbPersister } from "./persister";
 
 const queryClient = createQueryClient();
+const persister = createIdbPersister();
 
 type Props = {
   children: ReactNode;
@@ -39,7 +41,9 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
 
   useEffect(() => {
     setUnauthorizedHandler(() => {
-      authClient.signOut().then(() => {
+      authClient.signOut().then(async () => {
+        queryClient.clear();
+        await persister.removeClient();
         window.location.href = "/sign-in";
       });
     });
@@ -47,10 +51,19 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
 
   return (
     <I18nextProvider i18n={i18n}>
-      <QueryClientProvider client={queryClient}>
+      <PersistQueryClientProvider
+        client={queryClient}
+        persistOptions={{
+          persister,
+          maxAge: DEFAULT_MAX_AGE,
+          dehydrateOptions: {
+            shouldDehydrateQuery: (query: any) => shouldPersistQuery(query.queryKey),
+          },
+        }}
+      >
         {children}
         <ToastContainer />
-      </QueryClientProvider>
+      </PersistQueryClientProvider>
     </I18nextProvider>
   );
 }

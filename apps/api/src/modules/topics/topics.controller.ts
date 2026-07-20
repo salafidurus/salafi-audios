@@ -3,7 +3,9 @@ import { Public } from '../../modules/auth/decorators';
 import { Controller, Get, Param, Query, UseInterceptors } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
-import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
+import { CacheTTL } from '@nestjs/cache-manager';
+import { LocaleCacheInterceptor } from '../../shared/interceptors/locale-cache.interceptor';
+import { CacheControlInterceptor } from '../../shared/interceptors/cache-control.interceptor';
 import type { TopicDetailDto, TopicLectureViewDto } from '@sd/core-contracts';
 import { TopicsService } from './topics.service';
 
@@ -12,8 +14,8 @@ import { TopicsService } from './topics.service';
 @ApiCommonErrors()
 @Public()
 @Controller('topics')
-@UseInterceptors(CacheInterceptor) // Cache all routes in this controller
-@CacheTTL(600) // 10 minutes cache (topics change infrequently)
+@UseInterceptors(CacheControlInterceptor, LocaleCacheInterceptor) // Cache control must wrap cache interceptor to capture cache hits
+@CacheTTL(10 * 60 * 1000) // 10 minutes cache (topics change infrequently)
 export class TopicsController {
   constructor(private readonly topics: TopicsService) {}
 

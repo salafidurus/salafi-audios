@@ -39,7 +39,7 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     CacheModule.register({
       isGlobal: true,
       ttl: 300000, // 5 minutes default TTL (in milliseconds)
-      max: 100, // Maximum number of items in cache
+      max: 1000, // Maximum number of items in cache
     }),
     AuthModule,
     AccountModule,

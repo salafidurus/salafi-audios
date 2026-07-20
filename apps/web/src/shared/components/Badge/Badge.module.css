@@ -31,6 +31,11 @@
   color: var(--content-primary-strong);
 }
 
+.secondary {
+  background: var(--surface-secondary-subtle);
+  color: var(--content-secondary-strong);
+}
+
 .muted {
   background: var(--surface-subtle);
   color: var(--content-muted);

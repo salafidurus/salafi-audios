@@ -1,6 +1,7 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from 'bun:test';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
+import { CacheModule } from '@nestjs/cache-manager';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
@@ -37,6 +38,7 @@ describe('AudioController — boundaries', () => {
     mockAuth.api.getSession.mockResolvedValue(null);
 
     const module = await Test.createTestingModule({
+      imports: [CacheModule.register({ isGlobal: true, ttl: 0 })],
       controllers: [AudioController],
       providers: [
         { provide: APP_GUARD, useClass: AuthGuard },

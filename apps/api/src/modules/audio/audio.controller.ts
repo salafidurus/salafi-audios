@@ -1,9 +1,12 @@
-import { Controller, Get, Post, Put, Param, Query, Body } from '@nestjs/common';
+import { Controller, Get, Post, Put, Param, Query, Body, UseInterceptors } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { CurrentUser, Public } from '../auth/decorators';
 import type { AudioProgressDto, ProgressSyncDto, StreamResponseDto } from '@sd/core-contracts';
 import { AudioService } from './audio.service';
+import { CacheTTL } from '@nestjs/cache-manager';
+import { LocaleCacheInterceptor } from '../../shared/interceptors/locale-cache.interceptor';
+import { CacheControlInterceptor } from '../../shared/interceptors/cache-control.interceptor';
 
 @ApiTags('Audio')
 @ApiCommonErrors()
@@ -52,6 +55,8 @@ export class AudioController {
 
   @Public()
   @Get('listings/:listingId/stream')
+  @UseInterceptors(CacheControlInterceptor, LocaleCacheInterceptor)
+  @CacheTTL(1 * 60 * 1000) // 1 minute cache
   @ApiOperation({ summary: 'Resolve a listing primary audio stream' })
   @ApiOkResponse({ description: 'Primary audio asset URL and duration' })
   getListingStream(@Param('listingId') listingId: string): Promise<StreamResponseDto> {

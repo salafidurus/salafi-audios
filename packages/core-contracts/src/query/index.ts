@@ -1,5 +1,8 @@
 import { QueryClient } from "@tanstack/react-query";
 import type { SearchCatalogParams } from "../types";
+import { DEFAULT_MAX_AGE } from "./persist";
+
+export * from "./persist";
 
 // Centralized query client configuration
 export const createQueryClient = () =>
@@ -7,7 +10,7 @@ export const createQueryClient = () =>
     defaultOptions: {
       queries: {
         staleTime: 1000 * 60, // 1 minute
-        gcTime: 1000 * 60 * 5, // 5 minutes
+        gcTime: DEFAULT_MAX_AGE, // 24 hours (for persistence)
         retry: (failureCount, error: unknown) => {
           // Don't retry on 4xx errors (client errors)
           if (

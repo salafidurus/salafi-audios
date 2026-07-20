@@ -1,2 +1,1 @@
-export { getCachedData, setCachedData, clearQueryCache } from "./persister";
-export type { CacheEntry } from "./persister";
+// Empty index file (previously exported obsolete localStorage persister)
