@@ -10,7 +10,14 @@
   background: transparent;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 641px) and (max-width: 900px) {
+  .downloadSection {
+    width: 85%;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 901px) {
   .downloadSection {
     gap: 2.5rem;
   }
@@ -18,11 +25,14 @@
 
 @media (max-width: 640px) {
   .downloadSection {
+    flex-direction: column;
     gap: 1.5rem;
+    width: 70%;
+    margin: 0 auto;
   }
 
   .downloadSection > div {
-    flex: 1;
+    width: 100%;
     display: flex;
     justify-content: center;
   }
