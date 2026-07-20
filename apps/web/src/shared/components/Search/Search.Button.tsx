@@ -12,6 +12,8 @@ export interface SearchButtonProps {
   inputWrapperClassName?: string;
   /** Optional CSS class for the bar container */
   barContainerClassName?: string;
+  /** Optional CSS class for the placeholder text */
+  placeholderClassName?: string;
 }
 
 /**
@@ -34,6 +36,7 @@ export function SearchButton({
   onClick,
   inputWrapperClassName,
   barContainerClassName,
+  placeholderClassName,
 }: SearchButtonProps) {
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -49,7 +52,7 @@ export function SearchButton({
         aria-label={label}
       >
         <SearchGlyph />
-        <span className={styles.barPlaceholder}>{label}</span>
+        <span className={`${styles.barPlaceholder} ${placeholderClassName || ""}`}>{label}</span>
       </button>
     </div>
   );

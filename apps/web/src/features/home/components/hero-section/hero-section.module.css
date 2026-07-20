@@ -69,7 +69,12 @@
 }
 
 .searchInputWrapper {
-  padding: 1.25rem 1.5rem !important;
+  padding: 1.5rem 2.5rem !important;
+}
+
+.searchPlaceholder {
+  font-size: 1.25rem !important;
+  font-weight: 500 !important;
 }
 
 /* RTL Support */

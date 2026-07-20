@@ -21,6 +21,7 @@ export function HeroSection({ onOpenSearch }: HeroSectionProps) {
           label="What do you want to listen to?"
           onClick={onOpenSearch}
           inputWrapperClassName={styles.searchInputWrapper}
+          placeholderClassName={styles.searchPlaceholder}
         />
       </div>
     </section>
