@@ -1,6 +1,8 @@
 .downloadSection {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
   gap: 2rem;
   padding: 0;
   border: none;
@@ -10,7 +12,7 @@
 
 @media (min-width: 900px) {
   .downloadSection {
-    grid-template-columns: 1fr 1fr;
+    flex-direction: row;
     gap: 2.5rem;
   }
 }
