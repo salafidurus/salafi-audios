@@ -1,10 +1,10 @@
 .container {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
   width: 100%;
   scroll-behavior: smooth;
-  min-height: 100vh;
+  gap: 2.5rem;
+  padding: 2rem 0;
 }
 
 .searchWrapper {
