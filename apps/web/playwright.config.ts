@@ -13,7 +13,7 @@ export default defineConfig({
     timeout: 15_000,
   },
   use: {
-    baseURL: "http://localhost:3000",
+    baseURL: "http://localhost:3008",
     trace: "on-first-retry",
     actionTimeout: 20_000,
     navigationTimeout: 45_000,
@@ -23,9 +23,9 @@ export default defineConfig({
   webServer: {
     command:
       process.env.PW_SKIP_WEB_BUILD === "1"
-        ? "bun run start -p 3000"
-        : "bun run build && bun run start -p 3000",
-    url: "http://localhost:3000",
+        ? "bun run start -p 3008"
+        : "bun run build && bun run start -p 3008",
+    url: "http://localhost:3008",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },
