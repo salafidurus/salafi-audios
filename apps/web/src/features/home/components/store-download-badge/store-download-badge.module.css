@@ -7,14 +7,16 @@
   height: 100px;
   position: relative;
   aspect-ratio: 200 / 60;
+  flex: 1;
+  min-width: 0;
 }
 
 @media (max-width: 640px) {
   .badgeLink,
   .badgeButton {
     height: 60px;
-    width: 100%;
-    max-width: 200px;
+    flex: 1;
+    min-width: 0;
   }
 }
 
