@@ -24,6 +24,8 @@ export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProp
         display: "flex",
         flexDirection: "column",
         width: "100%",
+        maxWidth: "800px",
+        margin: "0 auto",
         gap: "2.5rem",
         padding: "2rem 0",
       }}
