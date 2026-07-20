@@ -1,6 +1,7 @@
 "use client";
 
 import { useContinueListening } from "@sd/domain-search";
+import { Search } from "@/shared/components/Search";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { HeroSection } from "../../components/hero-section/hero-section";
 import { ContinueListeningCard } from "../../components/continue-listening-card/continue-listening-card";
@@ -19,7 +20,15 @@ export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProp
   return (
     <ScreenView backgroundVariant="mixedWash">
       <div className={styles.container} data-testid="home-screen-container">
-        <HeroSection onOpenSearch={onOpenSearch} />
+        <HeroSection />
+        <div className={styles.searchWrapper} data-testid="home-search-wrapper">
+          <Search.Button
+            label="What do you want to listen to?"
+            onClick={onOpenSearch}
+            inputWrapperClassName={styles.searchInputWrapper}
+            placeholderClassName={styles.searchPlaceholder}
+          />
+        </div>
         {recentProgress && (
           <ContinueListeningCard
             recentProgress={recentProgress}
