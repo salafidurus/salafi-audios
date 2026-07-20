@@ -23,6 +23,7 @@ export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProp
       contentStyle={{
         display: "flex",
         flexDirection: "column",
+        width: "100%",
         gap: "2.5rem",
         padding: "2rem 0",
       }}
