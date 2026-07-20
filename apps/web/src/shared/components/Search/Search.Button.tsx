@@ -8,6 +8,10 @@ export interface SearchButtonProps {
   label: string;
   /** Callback when button is clicked */
   onClick?: () => void;
+  /** Optional CSS class for the input wrapper button */
+  inputWrapperClassName?: string;
+  /** Optional CSS class for the bar container */
+  barContainerClassName?: string;
 }
 
 /**
@@ -25,17 +29,22 @@ export interface SearchButtonProps {
  * />
  * ```
  */
-export function SearchButton({ label, onClick }: SearchButtonProps) {
+export function SearchButton({
+  label,
+  onClick,
+  inputWrapperClassName,
+  barContainerClassName,
+}: SearchButtonProps) {
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     onClick?.();
   };
 
   return (
-    <div className={styles.barContainer}>
+    <div className={`${styles.barContainer} ${barContainerClassName || ""}`}>
       <button
         type="button"
-        className={styles.barInputWrapper}
+        className={`${styles.barInputWrapper} ${inputWrapperClassName || ""}`}
         onClick={handleClick}
         aria-label={label}
       >

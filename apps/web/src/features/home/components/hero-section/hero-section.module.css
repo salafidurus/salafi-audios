@@ -68,6 +68,10 @@
   }
 }
 
+.searchInputWrapper {
+  padding: 1.25rem 1.5rem !important;
+}
+
 /* RTL Support */
 [dir="rtl"] .hero {
   direction: rtl;

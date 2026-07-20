@@ -17,7 +17,11 @@ export function HeroSection({ onOpenSearch }: HeroSectionProps) {
         Listen to audio lectures from trusted Salafi scholars
       </p>
       <div className={styles.searchWrapper} data-testid="home-search-wrapper">
-        <Search.Button label="What do you want to listen to?" onClick={onOpenSearch} />
+        <Search.Button
+          label="What do you want to listen to?"
+          onClick={onOpenSearch}
+          inputWrapperClassName={styles.searchInputWrapper}
+        />
       </div>
     </section>
   );
