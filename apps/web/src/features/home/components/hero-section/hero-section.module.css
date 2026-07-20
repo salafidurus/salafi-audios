@@ -16,13 +16,31 @@
   color: var(--content-default);
 }
 
+.taglineContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
 .tagline {
-  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
   font-weight: 500;
+  line-height: 1.8;
+  margin: 0;
+  max-width: 800px;
+  color: var(--content-secondary);
+  font-family: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.taglineTranslation {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  font-weight: 400;
   line-height: 1.6;
   margin: 0;
-  max-width: 700px;
-  color: var(--content-secondary);
+  max-width: 750px;
+  color: var(--content-muted);
 }
 
 .searchWrapper {

@@ -34,7 +34,7 @@ describe("HomeScreen", () => {
 
     const heroTagline = screen.getByTestId("home-hero-tagline");
     expect(heroTagline).toBeTruthy();
-    expect(heroTagline.textContent).toContain("يَعْلَمُونَ");
+    expect(heroTagline.textContent).toContain("قُلْ");
 
     // Search button component (which renders text "What do you want to listen to?")
     const searchBtn = screen.getByText("What do you want to listen to?");
