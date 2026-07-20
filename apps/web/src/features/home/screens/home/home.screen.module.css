@@ -1,6 +1,19 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: var(--space-layout-section-y);
+  gap: 4rem;
   width: 100%;
+  scroll-behavior: smooth;
+}
+
+@media (max-width: 900px) {
+  .container {
+    gap: 3rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .container {
+    gap: 2.5rem;
+  }
 }

@@ -10,20 +10,26 @@
   flex-direction: column;
   gap: var(--space-component-gap-md);
   padding: var(--space-component-card-padding);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-component-card);
+  border: none;
+  border-radius: 24px;
   background: var(--surface-default);
   cursor: pointer;
-  transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+  transition: transform 150ms ease, box-shadow 150ms ease;
   text-align: left;
   box-sizing: border-box;
   width: 100%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
 }
 
 .continueCard:hover {
-  border-color: var(--border-primary);
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-1px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .continueCard:hover {
+    transform: none;
+  }
 }
 
 .continueHeader {

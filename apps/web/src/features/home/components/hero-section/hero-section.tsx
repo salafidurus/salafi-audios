@@ -14,7 +14,7 @@ export function HeroSection({ onOpenSearch }: HeroSectionProps) {
       <AppText variant="displayLg" style={{ fontStyle: "normal" }}>
         <span data-testid="home-hero-title">Salafi Durus</span>
       </AppText>
-      <AppText variant="bodyLg" style={{ color: "var(--content-muted)" }}>
+      <AppText variant="bodyLg" style={{ color: "var(--content-secondary)", maxWidth: "600px" }}>
         <span data-testid="home-hero-tagline">
           Listen to audio lectures from trusted Salafi scholars
         </span>

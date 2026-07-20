@@ -1,24 +1,30 @@
 .featuresSection {
   display: flex;
   flex-direction: column;
-  gap: var(--space-component-gap-lg);
+  gap: 3rem;
 }
 
 .featuresGrid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-component-gap-lg);
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  grid-auto-rows: auto;
 }
 
 @media (max-width: 900px) {
   .featuresGrid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
   }
 }
 
 @media (max-width: 640px) {
   .featuresGrid {
     grid-template-columns: 1fr;
-    gap: var(--space-component-gap-md);
+    gap: 1.25rem;
+  }
+
+  .featuresSection {
+    gap: 2.5rem;
   }
 }

@@ -1,11 +1,11 @@
 .downloadSection {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-component-gap-lg);
-  padding: var(--space-component-card-padding);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-component-card);
-  background: var(--surface-subtle);
+  grid-template-columns: 1fr;
+  gap: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
 }
 
 .storeCard {
@@ -13,27 +13,36 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: var(--space-component-gap-md);
-  padding: var(--space-component-card-padding);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-component-card);
+  gap: 1.5rem;
+  padding: 2.5rem;
+  border: none;
+  border-radius: 24px;
   background: var(--surface-default);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  transition: transform 150ms ease, box-shadow 150ms ease;
 }
 
-@media (max-width: 900px) {
+.storeCard:hover {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .storeCard:hover {
+    transform: none;
+  }
+}
+
+@media (min-width: 900px) {
   .downloadSection {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
   }
 }
 
 @media (max-width: 640px) {
-  .downloadSection {
-    grid-template-columns: 1fr;
-    gap: var(--space-component-gap-md);
-    padding: var(--space-component-card-padding);
-  }
-
   .storeCard {
-    width: 100%;
+    padding: 2rem;
+    gap: 1.25rem;
   }
 }

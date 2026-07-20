@@ -22,7 +22,7 @@ export function FeatureCard({ icon, title, description, testId }: FeatureCardPro
           </span>
         </AppText>
       </div>
-      <AppText variant="bodySm" style={{ color: "var(--content-default)" }}>
+      <AppText variant="bodyMd" style={{ color: "var(--content-default)", lineHeight: "1.6" }}>
         {description}
       </AppText>
     </div>
