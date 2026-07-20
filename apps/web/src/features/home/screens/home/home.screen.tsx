@@ -18,25 +18,32 @@ export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProp
   const { recentProgress } = useContinueListening();
 
   return (
-    <ScreenView backgroundVariant="mixedWash">
-      <div className={styles.container} data-testid="home-screen-container">
-        <HeroSection />
-        <div className={styles.searchWrapper} data-testid="home-search-wrapper">
-          <Search.Button
-            label="What do you want to listen to?"
-            onClick={onOpenSearch}
-            inputWrapperClassName={styles.searchInputWrapper}
-            placeholderClassName={styles.searchPlaceholder}
-          />
-        </div>
-        {recentProgress && (
-          <ContinueListeningCard
-            recentProgress={recentProgress}
-            onContinueListening={onContinueListening}
-          />
-        )}
-        <MobileDownloadSection availability={MOBILE_APP_AVAILABILITY} />
+    <ScreenView
+      backgroundVariant="mixedWash"
+      contentStyle={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "2.5rem",
+        padding: "2rem 0",
+      }}
+      data-testid="home-screen-container"
+    >
+      <HeroSection />
+      <div className={styles.searchWrapper} data-testid="home-search-wrapper">
+        <Search.Button
+          label="What do you want to listen to?"
+          onClick={onOpenSearch}
+          inputWrapperClassName={styles.searchInputWrapper}
+          placeholderClassName={styles.searchPlaceholder}
+        />
       </div>
+      {recentProgress && (
+        <ContinueListeningCard
+          recentProgress={recentProgress}
+          onContinueListening={onContinueListening}
+        />
+      )}
+      <MobileDownloadSection availability={MOBILE_APP_AVAILABILITY} />
     </ScreenView>
   );
 }
