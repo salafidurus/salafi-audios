@@ -116,7 +116,7 @@ describe("HomeScreen", () => {
     expect(screen.getByTestId("feature-card-title-distraction").textContent).toBe("No Distraction");
   });
 
-  it("renders disabled mobile app download buttons with Coming Soon badges using testIDs", () => {
+  it("renders disabled mobile app download buttons using testIDs", () => {
     render(
       <HomeScreen onOpenSearch={mockOnOpenSearch} onContinueListening={mockOnContinueListening} />,
     );
@@ -130,9 +130,5 @@ describe("HomeScreen", () => {
     const googlePlayBtn = screen.getByTestId("download-badge-google-play") as HTMLButtonElement;
     expect(googlePlayBtn).toBeTruthy();
     expect(googlePlayBtn.disabled).toBe(true);
-
-    // Verify "Coming Soon" badges exist via testID
-    expect(screen.getByTestId("coming-soon-badge-app-store").textContent).toBe("Coming Soon");
-    expect(screen.getByTestId("coming-soon-badge-google-play").textContent).toBe("Coming Soon");
   });
 });

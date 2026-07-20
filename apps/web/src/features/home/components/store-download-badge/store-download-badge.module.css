@@ -4,10 +4,12 @@
   display: block;
   width: 100%;
   max-width: 320px;
-  height: 72px;
+  height: 80px;
+  padding: 8px;
   cursor: pointer;
   border-radius: 16px;
   transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease;
+  box-sizing: border-box;
 }
 
 .badgeLink {
@@ -31,13 +33,4 @@
   filter: grayscale(1);
   cursor: not-allowed;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.badgeContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.25rem;
-  width: 100%;
-  max-width: 320px;
 }

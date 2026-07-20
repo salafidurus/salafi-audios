@@ -1,6 +1,5 @@
 "use client";
 
-import { AppText } from "@/shared/components/AppText/AppText";
 import { StoreDownloadBadge } from "../store-download-badge/store-download-badge";
 import {
   APP_STORE_URL,
@@ -24,15 +23,9 @@ export function MobileDownloadSection({ availability }: MobileDownloadSectionPro
       data-testid="mobile-download-section"
     >
       <div className={styles.storeCard} data-testid="app-store-wrapper">
-        <AppText variant="titleMd">
-          <span>App Store</span>
-        </AppText>
         <StoreDownloadBadge store="appStore" isAvailable={iosAvailable} href={APP_STORE_URL} />
       </div>
       <div className={styles.storeCard} data-testid="google-play-wrapper">
-        <AppText variant="titleMd">
-          <span>Google Play</span>
-        </AppText>
         <StoreDownloadBadge
           store="googlePlay"
           isAvailable={androidAvailable}
