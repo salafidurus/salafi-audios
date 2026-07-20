@@ -1,6 +1,7 @@
 import { vi, describe, it, expect, beforeEach, afterEach } from 'bun:test';
 import { APP_GUARD } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
+import { CacheModule } from '@nestjs/cache-manager';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
@@ -34,6 +35,7 @@ describe('HomeController — auth boundaries', () => {
     mockAuth.api.getSession.mockReset();
 
     const module = await Test.createTestingModule({
+      imports: [CacheModule.register({ isGlobal: true, ttl: 0 })],
       controllers: [HomeController],
       providers: [
         { provide: APP_GUARD, useClass: AuthGuard },

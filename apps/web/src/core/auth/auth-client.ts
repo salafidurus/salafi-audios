@@ -8,6 +8,11 @@ export const authClient = createAuthClient({
     credentials: "include",
     onSuccess: (ctx) => {
       if (String(ctx.request.url).endsWith("/sign-out")) {
+        try {
+          indexedDB.deleteDatabase("sd-query-cache");
+        } catch (e) {
+          console.error("Failed to purge query cache database on sign-out:", e);
+        }
         window.location.href = "/";
       }
     },

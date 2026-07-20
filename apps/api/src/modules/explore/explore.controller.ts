@@ -1,9 +1,12 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, UseInterceptors } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { Public } from '../../modules/auth/decorators';
 import { ExploreService } from './explore.service';
+import { CacheTTL } from '@nestjs/cache-manager';
+import { LocaleCacheInterceptor } from '../../shared/interceptors/locale-cache.interceptor';
+import { CacheControlInterceptor } from '../../shared/interceptors/cache-control.interceptor';
 
 @SkipThrottle()
 @ApiTags('Explore')
@@ -14,6 +17,8 @@ export class ExploreController {
 
   @Get()
   @Public()
+  @UseInterceptors(CacheControlInterceptor, LocaleCacheInterceptor)
+  @CacheTTL(5 * 60 * 1000) // 5 minutes cache
   @ApiOperation({ summary: 'Get ranked content feed' })
   @ApiOkResponse({ description: 'Paginated feed items' })
   @ApiQuery({ name: 'cursor', required: false, type: String })
@@ -45,6 +50,8 @@ export class ExploreController {
 
   @Get('recent')
   @Public()
+  @UseInterceptors(CacheControlInterceptor, LocaleCacheInterceptor)
+  @CacheTTL(5 * 60 * 1000) // 5 minutes cache
   @ApiOperation({ summary: 'Get recent content feed sorted by creation date' })
   @ApiOkResponse({ description: 'Paginated recent feed items' })
   @ApiQuery({ name: 'cursor', required: false, type: String })
@@ -68,6 +75,8 @@ export class ExploreController {
 
   @Get('scholars')
   @Public()
+  @UseInterceptors(CacheControlInterceptor, LocaleCacheInterceptor)
+  @CacheTTL(5 * 60 * 1000) // 5 minutes cache
   @ApiOperation({ summary: 'Get ranked scholars for feed' })
   @ApiOkResponse({ description: 'Top scholars for horizontal section' })
   getScholars() {

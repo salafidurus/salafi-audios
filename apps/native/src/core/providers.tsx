@@ -4,8 +4,8 @@ import {
   setLocaleProvider,
   setUnauthorizedHandler,
 } from "@sd/core-api";
-import { createQueryClient, routes } from "@sd/core-contracts";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { routes, shouldPersistQuery, DEFAULT_MAX_AGE } from "@sd/core-contracts";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { useFonts } from "expo-font";
 import { type Href, useRouter } from "expo-router";
 import { type ReactNode, useEffect, useState } from "react";
@@ -18,10 +18,9 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { getApiBaseUrl } from "./config/runtime-env";
 import { i18n, initI18n } from "./i18n/i18n";
 import { syncTypographyToLocale } from "./styles/theme/typography-sync";
+import { queryClient, persister } from "./query-client";
 
 LogBox.ignoreLogs(["API client initialization failed", "Open debugger to view warnings"]);
-
-const queryClient = createQueryClient();
 
 function AppFontsProvider({ children }: { children: ReactNode }) {
   const [loaded] = useFonts({
@@ -78,7 +77,9 @@ export function Providers({ children }: Props) {
     setLocaleProvider(() => i18n.language);
 
     setUnauthorizedHandler(() => {
-      authClient.signOut().then(() => {
+      authClient.signOut().then(async () => {
+        queryClient.clear();
+        await persister.removeClient();
         router.replace(routes.home as Href);
       });
     });
@@ -104,11 +105,20 @@ export function Providers({ children }: Props) {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <KeyboardProvider>
-          <QueryClientProvider client={queryClient}>
+          <PersistQueryClientProvider
+            client={queryClient}
+            persistOptions={{
+              persister,
+              maxAge: DEFAULT_MAX_AGE,
+              dehydrateOptions: {
+                shouldDehydrateQuery: (query: any) => shouldPersistQuery(query.queryKey),
+              },
+            }}
+          >
             <I18nextProvider i18n={i18n}>
               <AppFontsProvider>{children}</AppFontsProvider>
             </I18nextProvider>
-          </QueryClientProvider>
+          </PersistQueryClientProvider>
         </KeyboardProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

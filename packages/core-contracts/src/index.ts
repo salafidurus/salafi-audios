@@ -240,5 +240,11 @@ export {
 } from "./navigation";
 
 // Export query utilities (client, keys, hooks)
-export { createQueryClient, queryKeys } from "./query";
+export {
+  createQueryClient,
+  queryKeys,
+  shouldPersistQuery,
+  getMaxAge,
+  DEFAULT_MAX_AGE,
+} from "./query";
 export { useApiQuery, initApiClient } from "./query/hooks";
