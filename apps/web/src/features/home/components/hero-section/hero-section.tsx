@@ -27,6 +27,8 @@ export function HeroSection({ onOpenSearch }: HeroSectionProps) {
         </p>
         {!isArabic && (
           <p className={styles.taglineTranslation}>
+            <span className={styles.surahReference}>Surah Az-Zumar (39:9)</span>
+            <br />
             Say: 'Are those who know equal to those who do not know?' It is only men of
             understanding who will remember
           </p>
