@@ -73,6 +73,15 @@
   }
 }
 
+.searchInputWrapper {
+  padding: 1.5rem 2.5rem !important;
+}
+
+.searchPlaceholder {
+  font-size: 1.25rem !important;
+  font-weight: 500 !important;
+}
+
 @media (max-width: 640px) {
   .hero {
     padding: var(--space-scale-2xl) 0 var(--space-scale-xl);
@@ -97,22 +106,15 @@
   }
 
   .searchInputWrapper {
-    padding: 0.75rem 0.75rem !important;
+    padding: 0.9rem 0.9rem !important;
   }
 
   .searchPlaceholder {
-    font-size: 0.8rem !important;
+    font-size: 0.9rem !important;
   }
 }
 
-.searchInputWrapper {
-  padding: 1.5rem 2.5rem !important;
-}
 
-.searchPlaceholder {
-  font-size: 1.25rem !important;
-  font-weight: 500 !important;
-}
 
 /* RTL Support */
 [dir="rtl"] .hero {
