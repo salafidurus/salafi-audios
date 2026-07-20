@@ -30,12 +30,16 @@
 
 .badgeButton {
   cursor: not-allowed;
-  opacity: 0.6;
 }
 
 .badgeImage {
   object-fit: contain;
   object-position: center;
+}
+
+.badgeButton .badgeImage {
+  opacity: 0.6;
+  filter: grayscale(1);
 }
 
 .comingSoonBadge {
@@ -51,6 +55,7 @@
   white-space: nowrap;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   border: 2px solid var(--surface-default);
+  z-index: 1;
 }
 
 .comingSoonBadgeRtl {
