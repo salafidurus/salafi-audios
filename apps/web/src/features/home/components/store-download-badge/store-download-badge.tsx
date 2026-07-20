@@ -33,7 +33,14 @@ export function StoreDownloadBadge({ store, isAvailable, href }: StoreDownloadBa
         data-testid={`download-badge-${testIdBase}`}
         className={styles.badgeLink}
       >
-        <Image src={badgeSrc} alt={badgeAlt} fill className={styles.badgeImage} priority={false} />
+        <Image
+          src={badgeSrc}
+          alt={badgeAlt}
+          fill
+          sizes="(max-width: 900px) 45vw, 350px"
+          className={styles.badgeImage}
+          priority={false}
+        />
       </a>
     );
   }
@@ -46,7 +53,14 @@ export function StoreDownloadBadge({ store, isAvailable, href }: StoreDownloadBa
       aria-label={badgeAlt}
       data-testid={`download-badge-${testIdBase}`}
     >
-      <Image src={badgeSrc} alt={badgeAlt} fill className={styles.badgeImage} priority={false} />
+      <Image
+        src={badgeSrc}
+        alt={badgeAlt}
+        fill
+        sizes="(max-width: 900px) 45vw, 350px"
+        className={styles.badgeImage}
+        priority={false}
+      />
       <span
         className={`${styles.comingSoonBadge} ${isRtl ? styles.comingSoonBadgeRtl : ""}`}
         data-testid={`coming-soon-badge-${testIdBase}`}
