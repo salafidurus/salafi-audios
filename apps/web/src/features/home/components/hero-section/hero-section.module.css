@@ -78,7 +78,12 @@
   }
 
   .tagline {
-    font-size: 1rem;
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    letter-spacing: 0.02em;
+  }
+
+  .taglineTranslation {
+    font-size: clamp(0.85rem, 2vw, 1rem);
   }
 }
 
