@@ -6,11 +6,19 @@ export interface UseInfiniteSearchOptions {
   query: string;
   showOriginal?: boolean;
   enabled?: boolean;
+  topicSlugs?: string[];
+  limit?: number;
 }
 
 export function useInfiniteSearch(options: UseInfiniteSearchOptions) {
+  const params = {
+    q: options.query,
+    limit: options.limit,
+    topicSlugs: options.topicSlugs,
+  };
+
   return useInfiniteQuery({
-    queryKey: queryKeys.search.infinite(options.query),
+    queryKey: queryKeys.search.infinite(params),
     queryFn: async ({ pageParam }) => {
       if (!options.query.trim()) {
         return { items: [], nextCursor: undefined, hasMore: false };
@@ -21,11 +29,11 @@ export function useInfiniteSearch(options: UseInfiniteSearchOptions) {
         return { items: [], nextCursor: undefined, hasMore: false };
       }
 
-      const params = new URLSearchParams();
-      params.append("q", options.query);
-
-      const url = `${endpoints.search.general}?${params}`;
-      const response = await httpClient<SearchCatalogResultsDto>({ url, method: "GET" });
+      const response = await httpClient<SearchCatalogResultsDto>({
+        url: endpoints.search.extended,
+        method: "GET",
+        params,
+      });
       const rows = buildSearchResultRows(response, options.showOriginal ?? false);
 
       return {

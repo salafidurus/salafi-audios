@@ -55,7 +55,8 @@ export const queryKeys = {
     all: ["search"] as const,
     catalog: (params: SearchCatalogParams) => [...queryKeys.search.all, "catalog", params] as const,
     // NEW: pagination support
-    infinite: (query: string) => [...queryKeys.search.all, "infinite", query] as const,
+    infinite: (params: SearchCatalogParams) =>
+      [...queryKeys.search.all, "infinite", params] as const,
   },
   explore: {
     all: ["explore"] as const,
