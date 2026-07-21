@@ -15,46 +15,46 @@ export function TermsScreen() {
           Please read these terms and conditions carefully before using Our Service.
         </p>
 
-        <section id="interpretation">
+        <section id="terms-interpretation">
           <TermsSections.InterpretationAndDefinitions />
         </section>
-        <section id="acknowledgment">
+        <section id="terms-acknowledgment">
           <TermsSections.Acknowledgment />
         </section>
-        <section id="links">
+        <section id="terms-links">
           <TermsSections.LinksToOtherWebsites />
         </section>
-        <section id="termination">
+        <section id="terms-termination">
           <TermsSections.Termination />
         </section>
-        <section id="liability">
+        <section id="terms-liability">
           <TermsSections.LimitationOfLiability />
         </section>
-        <section id="disclaimer">
+        <section id="terms-disclaimer">
           <TermsSections.DisclaimerSection />
         </section>
-        <section id="governing-law">
+        <section id="terms-governing-law">
           <TermsSections.GoverningLaw />
         </section>
-        <section id="disputes">
+        <section id="terms-disputes">
           <TermsSections.DisputeResolution />
         </section>
-        <section id="eu-users">
+        <section id="terms-eu-users">
           <TermsSections.EUUsers />
         </section>
-        <section id="us-compliance">
+        <section id="terms-us-compliance">
           <TermsSections.USCompliance />
         </section>
-        <section id="severability">
+        <section id="terms-severability">
           <TermsSections.SeverabilityAndWaiver />
         </section>
-        <section id="translation">
+        <section id="terms-translation">
           <TermsSections.TranslationInterpretation />
         </section>
-        <section id="changes">
+        <section id="terms-changes">
           <TermsSections.Changes />
         </section>
-        <section id="contact">
+        <section id="terms-contact">
           <TermsSections.ContactUs />
         </section>
       </div>

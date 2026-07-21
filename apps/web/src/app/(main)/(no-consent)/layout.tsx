@@ -19,25 +19,37 @@ const PRIVACY_SECTIONS = [
 ];
 
 const TERMS_SECTIONS = [
-  { id: "interpretation", title: "Interpretation and Definitions" },
-  { id: "acknowledgment", title: "Acknowledgment" },
-  { id: "links", title: "Links to Other Websites" },
-  { id: "termination", title: "Termination" },
-  { id: "liability", title: "Limitation of Liability" },
-  { id: "disclaimer", title: '"AS IS" and "AS AVAILABLE" Disclaimer' },
-  { id: "governing-law", title: "Governing Law" },
-  { id: "disputes", title: "Disputes Resolution" },
-  { id: "eu-users", title: "For European Union (EU) Users" },
-  { id: "us-compliance", title: "United States Legal Compliance" },
-  { id: "severability", title: "Severability and Waiver" },
-  { id: "translation", title: "Translation Interpretation" },
-  { id: "changes", title: "Changes to These Terms and Conditions" },
-  { id: "contact", title: "Contact Us" },
+  { id: "terms-interpretation", title: "Interpretation and Definitions" },
+  { id: "terms-acknowledgment", title: "Acknowledgment" },
+  { id: "terms-links", title: "Links to Other Websites" },
+  { id: "terms-termination", title: "Termination" },
+  { id: "terms-liability", title: "Limitation of Liability" },
+  { id: "terms-disclaimer", title: '"AS IS" and "AS AVAILABLE" Disclaimer' },
+  { id: "terms-governing-law", title: "Governing Law" },
+  { id: "terms-disputes", title: "Disputes Resolution" },
+  { id: "terms-eu-users", title: "For European Union (EU) Users" },
+  { id: "terms-us-compliance", title: "United States Legal Compliance" },
+  { id: "terms-severability", title: "Severability and Waiver" },
+  { id: "terms-translation", title: "Translation Interpretation" },
+  { id: "terms-changes", title: "Changes to These Terms and Conditions" },
+  { id: "terms-contact", title: "Contact Us" },
+];
+
+const COOKIE_SECTIONS = [
+  { id: "cookies-interpretation", title: "Interpretation and Definitions" },
+  { id: "cookies-use", title: "The use of the Cookies" },
+  { id: "cookies-changes", title: "Changes to this Cookies Policy" },
+  { id: "cookies-contact", title: "Contact Us" },
 ];
 
 export default function NoConsentLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const sections = pathname.includes("/privacy") ? PRIVACY_SECTIONS : TERMS_SECTIONS;
+  let sections = TERMS_SECTIONS;
+  if (pathname.includes("/privacy")) {
+    sections = PRIVACY_SECTIONS;
+  } else if (pathname.includes("/cookie-policy")) {
+    sections = COOKIE_SECTIONS;
+  }
 
   return (
     <div className="appFrame">
