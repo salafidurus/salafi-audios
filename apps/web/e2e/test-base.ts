@@ -13,6 +13,11 @@ import { test as base, expect } from "@playwright/test";
  */
 export const test = base.extend({
   page: async ({ page }, use) => {
+    // Pre-accept cookies to avoid modal blocking interactions
+    page.addInitScript(() => {
+      localStorage.setItem("cookie-consent:v1", "true");
+    });
+
     const originalGoto = page.goto.bind(page);
     page.goto = ((
       url: Parameters<typeof page.goto>[0],
