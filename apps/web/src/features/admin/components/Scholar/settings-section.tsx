@@ -19,6 +19,7 @@ export function SettingsSection({ formData, dispatch }: SettingsSectionProps) {
     <FormSection title={t("admin.scholars.settings", "Settings")}>
       <div className={styles.checkboxGroup}>
         <label className={styles.checkbox}>
+          <span>{t("admin.scholars.kibarLabel", "Kibar Scholar")}</span>
           <Toggle
             checked={formData.isKibar ?? false}
             onChange={(checked) =>
@@ -26,9 +27,9 @@ export function SettingsSection({ formData, dispatch }: SettingsSectionProps) {
             }
             aria-label="Kibar Scholar"
           />
-          <span>{t("admin.scholars.kibarLabel", "Kibar Scholar")}</span>
         </label>
         <label className={styles.checkbox}>
+          <span>{t("admin.scholars.featuredLabel", "Featured")}</span>
           <Toggle
             checked={formData.isFeatured ?? false}
             onChange={(checked) =>
@@ -36,9 +37,9 @@ export function SettingsSection({ formData, dispatch }: SettingsSectionProps) {
             }
             aria-label="Featured"
           />
-          <span>{t("admin.scholars.featuredLabel", "Featured")}</span>
         </label>
         <label className={styles.checkbox}>
+          <span>{t("admin.scholars.activeLabel", "Active")}</span>
           <Toggle
             checked={formData.isActive ?? true}
             onChange={(checked) =>
@@ -46,7 +47,6 @@ export function SettingsSection({ formData, dispatch }: SettingsSectionProps) {
             }
             aria-label="Active"
           />
-          <span>{t("admin.scholars.activeLabel", "Active")}</span>
         </label>
       </div>
     </FormSection>
