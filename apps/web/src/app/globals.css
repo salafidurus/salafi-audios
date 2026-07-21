@@ -114,19 +114,6 @@ body {
   flex-direction: column;
 }
 
-/* Legacy aliases for backwards compatibility */
-.appShell {
-  @apply appConsentShell;
-}
-
-.appMain {
-  @apply appConsentMain;
-}
-
-.appContent {
-  @apply appConsentContent;
-}
-
 /* No-consent layout (two-column grid with sidebar nav) */
 .appNoConsentShell {
   display: grid;
