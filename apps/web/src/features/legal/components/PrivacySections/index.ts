@@ -1,0 +1,12 @@
+export { InterpretationAndDefinitions } from "./InterpretationAndDefinitions";
+export { CollectingAndUsingData } from "./CollectingAndUsingData";
+export { UseOfPersonalData } from "./UseOfPersonalData";
+export { RetentionOfData } from "./RetentionOfData";
+export { TransferOfData } from "./TransferOfData";
+export { DeleteYourData } from "./DeleteYourData";
+export { DisclosureOfData } from "./DisclosureOfData";
+export { SecurityOfData } from "./SecurityOfData";
+export { ChildrensPrivacy } from "./ChildrensPrivacy";
+export { LinksToOtherWebsites } from "./LinksToOtherWebsites";
+export { ChangesToPrivacy } from "./ChangesToPrivacy";
+export { ContactUs } from "./ContactUs";

@@ -1,95 +1,37 @@
 "use client";
 
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./legal-screens.module.css";
+import * as PrivacySections from "../components/PrivacySections";
 
 export function PrivacyScreen() {
-  const isDesktop = useIsDesktop();
-  const { t } = useTranslation();
-
   return (
     <ScreenView>
       <div className={styles.container}>
-        <h1 className={styles.title}>{t("legal.privacy.title", "Privacy Policy")}</h1>
+        <h1 className={styles.title}>Privacy Policy</h1>
+        <p className={styles.lastUpdated}>Last updated: July 21, 2026</p>
+        <p className={styles.introduction}>
+          This Privacy Policy describes Our policies and procedures on the collection, use and
+          disclosure of Your information when You use the Service and tells You about Your privacy
+          rights and how the law protects You.
+        </p>
+        <p className={styles.introduction}>
+          We use Your Personal Data to provide and improve the Service. By using the Service, You
+          agree to the collection and use of information in accordance with this Privacy Policy.
+        </p>
 
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>
-            {t("legal.privacy.sections.collect.title", "Information We Collect")}
-          </h2>
-          <p className={styles.paragraph}>
-            {isDesktop
-              ? t(
-                  "legal.privacy.sections.collect.desktop",
-                  "We collect information you provide when creating an account (email, display name) and usage data such as listening history and saved lectures. We do not sell your personal information to third parties.",
-                )
-              : t(
-                  "legal.privacy.sections.collect.mobile",
-                  "We collect information you provide when creating an account and usage data such as listening history. We do not sell your personal information.",
-                )}
-          </p>
-        </section>
-
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>
-            {t("legal.privacy.sections.use.title", "How We Use Your Information")}
-          </h2>
-          <p className={styles.paragraph}>
-            {isDesktop
-              ? t(
-                  "legal.privacy.sections.use.desktop",
-                  "Your information is used to provide and improve the service, personalize your experience (e.g., resume playback, recommendations), and communicate important updates about the platform.",
-                )
-              : t(
-                  "legal.privacy.sections.use.mobile",
-                  "Your information is used to provide the service, personalize your experience, and communicate important updates.",
-                )}
-          </p>
-        </section>
-
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>
-            {t("legal.privacy.sections.storage.title", "Data Storage & Security")}
-          </h2>
-          <p className={styles.paragraph}>
-            {isDesktop
-              ? t(
-                  "legal.privacy.sections.storage.desktop",
-                  "Your data is stored securely using industry-standard encryption. Audio files are served via secure, time-limited URLs. We retain your data only as long as your account is active.",
-                )
-              : t(
-                  "legal.privacy.sections.storage.mobile",
-                  "Your data is stored securely with industry-standard encryption. We retain your data only while your account is active.",
-                )}
-          </p>
-        </section>
-
-        <section id="cookies" className={styles.section}>
-          <h2 className={styles.sectionTitle}>
-            {t("legal.privacy.sections.cookies.title", "Cookies & Tracking Technologies")}
-          </h2>
-          <p className={styles.paragraph}>
-            {t(
-              "legal.privacy.sections.cookies.text",
-              "We use Vexo Analytics, a third-party analytics service, to understand how users interact with our platform and to improve our service. By continuing to use Salafi Durus, you accept our use of tracking cookies and analytics. We do not sell your personal information to third parties. For more details, please see our Cookie Policy.",
-            )}
-          </p>
-        </section>
-
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>
-            {t("legal.privacy.sections.contact.title", "Contact")}
-          </h2>
-          <p className={styles.paragraph}>
-            {isDesktop
-              ? t(
-                  "legal.privacy.sections.contact.desktop",
-                  "For privacy-related inquiries, contact us at privacy@salafidurus.com.",
-                )
-              : t("legal.privacy.sections.contact.mobile", "privacy@salafidurus.com")}
-          </p>
-        </section>
+        <PrivacySections.InterpretationAndDefinitions />
+        <PrivacySections.CollectingAndUsingData />
+        <PrivacySections.UseOfPersonalData />
+        <PrivacySections.RetentionOfData />
+        <PrivacySections.TransferOfData />
+        <PrivacySections.DeleteYourData />
+        <PrivacySections.DisclosureOfData />
+        <PrivacySections.SecurityOfData />
+        <PrivacySections.ChildrensPrivacy />
+        <PrivacySections.LinksToOtherWebsites />
+        <PrivacySections.ChangesToPrivacy />
+        <PrivacySections.ContactUs />
       </div>
     </ScreenView>
   );
