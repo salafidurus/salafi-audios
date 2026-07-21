@@ -1,1 +1,1 @@
-export { StickyHeaderLayout, type StickyHeaderLayoutProps } from "./StickyHeaderLayout";
+export { StickyHeaderLayout } from "./StickyHeaderLayout";
