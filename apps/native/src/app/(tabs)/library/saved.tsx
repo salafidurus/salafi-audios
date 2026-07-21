@@ -3,10 +3,12 @@ import { useAuth } from "@/core/auth";
 import { LibrarySavedScreen } from "@/features/library/screens/library-saved.screen";
 import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
 import { routes } from "@sd/core-contracts";
+import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 export default function LibrarySaved() {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
+  const { navigateToListing } = useListingNavigation();
 
   if (isLoading) {
     return null;
@@ -22,9 +24,5 @@ export default function LibrarySaved() {
     );
   }
 
-  return (
-    <LibrarySavedScreen
-      onNavigateToLecture={(id) => router.push(routes.lectures.detail(id) as Href)}
-    />
-  );
+  return <LibrarySavedScreen onNavigateToListing={navigateToListing} />;
 }

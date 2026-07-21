@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useEffect, type ReactNode } from "react";
-import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
+import { useRouter } from "next/navigation";
+import { routes, type FeedItemDto, type FeedContentItemDto } from "@sd/core-contracts";
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { useExploreRecentScreen } from "@sd/domain-content";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -16,10 +17,11 @@ import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
+import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 import styles from "./explore-recent.screen.module.css";
 
 export type FeedRecentScreenProps = {
-  onNavigateToLecture?: (slug: string) => void;
+  onNavigateToListing?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
 };
 
@@ -35,11 +37,11 @@ function getFeedItemKey(item: FeedItemDto): string {
 
 type FeedBlocksProps = {
   items: FeedItemDto[];
-  onNavigateToLecture?: (slug: string) => void;
+  onNavigateToListing?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
 };
 
-function FeedBlocks({ items, onNavigateToLecture, onNavigateToScholar }: FeedBlocksProps) {
+function FeedBlocks({ items, onNavigateToListing, onNavigateToScholar }: FeedBlocksProps) {
   const blocks: ReactNode[] = [];
   let cards: ReactNode[] = [];
 
@@ -66,7 +68,7 @@ function FeedBlocks({ items, onNavigateToLecture, onNavigateToScholar }: FeedBlo
           <FeedTopicRow
             topicName={item.topicName}
             items={item.items}
-            onItemPress={onNavigateToLecture}
+            onItemPress={onNavigateToListing}
           />
         </section>,
       );
@@ -75,7 +77,7 @@ function FeedBlocks({ items, onNavigateToLecture, onNavigateToScholar }: FeedBlo
         <FeedListRow
           key={item.id}
           item={item as FeedContentItemDto}
-          onPress={() => onNavigateToLecture?.(item.slug)}
+          onPress={() => onNavigateToListing?.(item.slug)}
         />,
       );
     }
@@ -86,11 +88,17 @@ function FeedBlocks({ items, onNavigateToLecture, onNavigateToScholar }: FeedBlo
 }
 
 export function FeedRecentScreen({
-  onNavigateToLecture,
+  onNavigateToListing,
   onNavigateToScholar,
 }: FeedRecentScreenProps) {
   const isDesktop = useIsDesktop();
   const { t } = useTranslation();
+  const router = useRouter();
+  const { navigateToListing } = useListingNavigation();
+  const handleNavigateToListing = onNavigateToListing ?? navigateToListing;
+  const handleNavigateToScholar =
+    onNavigateToScholar ?? ((slug) => router.push(routes.scholars.detail(slug)));
+
   const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } =
     useExploreRecentScreen();
   const items = data?.pages.flatMap((p) => p.items) ?? [];
@@ -141,8 +149,8 @@ export function FeedRecentScreen({
         <>
           <FeedBlocks
             items={items}
-            onNavigateToLecture={onNavigateToLecture}
-            onNavigateToScholar={onNavigateToScholar}
+            onNavigateToListing={handleNavigateToListing}
+            onNavigateToScholar={handleNavigateToScholar}
           />
           <div ref={loadMoreRef} style={{ height: "20px" }} />
         </>
@@ -175,8 +183,8 @@ export function FeedRecentScreen({
       <>
         <FeedBlocks
           items={items}
-          onNavigateToLecture={onNavigateToLecture}
-          onNavigateToScholar={onNavigateToScholar}
+          onNavigateToListing={handleNavigateToListing}
+          onNavigateToScholar={handleNavigateToScholar}
         />
         <div ref={loadMoreRef} style={{ height: "20px" }} />
       </>

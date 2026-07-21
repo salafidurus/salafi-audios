@@ -27,7 +27,7 @@ export default function SearchIndexRoute() {
       onSelectSuggestion={(slug) =>
         router.push(`${routes.search}?searchKey=${encodeURIComponent(slug)}` as Href)
       }
-      onContinueListening={(id) => router.push(routes.lectures.detail(id) as Href)}
+      onContinueListening={(id) => router.push(routes.listings.detail(id) as Href)}
     />
   );
 }

@@ -9,19 +9,19 @@ import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { LibraryItemRow } from "@/features/library/components/library-item-row/library-item-row";
 
 export type LibraryCompletedScreenProps = {
-  onNavigateToLecture?: (id: string) => void;
+  onNavigateToListing?: (slug: string) => void;
 };
 
-export function LibraryCompletedScreen({ onNavigateToLecture }: LibraryCompletedScreenProps) {
+export function LibraryCompletedScreen({ onNavigateToListing }: LibraryCompletedScreenProps) {
   const { isAuthenticated } = useAuth();
   const { items, isFetching } = useLibraryCompletedScreen(isAuthenticated);
   const { t } = useTranslation();
 
   const handleItemPress = useCallback(
-    (lectureId: string) => {
-      onNavigateToLecture?.(lectureId);
+    (slug: string) => {
+      onNavigateToListing?.(slug);
     },
-    [onNavigateToLecture],
+    [onNavigateToListing],
   );
 
   const renderItem = useCallback(
@@ -29,7 +29,7 @@ export function LibraryCompletedScreen({ onNavigateToLecture }: LibraryCompleted
       <LibraryItemRow
         item={item}
         variant="completed"
-        onPress={() => handleItemPress(item.listingId)}
+        onPress={() => handleItemPress(item.listingSlug)}
       />
     ),
     [handleItemPress],

@@ -2,15 +2,9 @@ import React from "react";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { SearchResultEmpty } from "../SearchResultEmpty/SearchResultEmpty";
+import type { SearchResultRow } from "@sd/domain-search";
 
-export type SearchResultRow = {
-  id: string;
-  title: string;
-  scholarName: string;
-  imageUrl?: string;
-  lectureCount: number;
-  durationSeconds?: number;
-};
+export type { SearchResultRow };
 
 export type SearchResultsListProps = {
   items: SearchResultRow[];

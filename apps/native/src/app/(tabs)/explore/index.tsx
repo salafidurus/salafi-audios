@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { View, Text, Pressable } from "react-native";
 import { routes } from "@sd/core-contracts";
 import { FeedScreen } from "@/features/explore/screens/explore.screen";
+import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 export function ErrorBoundary({ error: _error, retry }: ErrorBoundaryProps) {
   return (
@@ -17,10 +18,11 @@ export function ErrorBoundary({ error: _error, retry }: ErrorBoundaryProps) {
 
 export default function ExploreIndexRoute() {
   const router = useRouter();
+  const { navigateToListing } = useListingNavigation();
 
   return (
     <FeedScreen
-      onNavigateToLecture={(id) => router.push(routes.lectures.detail(id) as Href)}
+      onNavigateToListing={navigateToListing}
       onNavigateToScholar={(slug) => router.push(routes.scholars.detail(slug) as Href)}
     />
   );

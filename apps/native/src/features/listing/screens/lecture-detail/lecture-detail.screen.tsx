@@ -11,11 +11,11 @@ import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
 
 export type LectureDetailScreenProps = {
-  id: string;
+  slug: string;
 };
 
-export function LectureDetailScreen({ id }: LectureDetailScreenProps) {
-  const { data: lecture, isFetching } = useListingDetail(id);
+export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
+  const { data: lecture, isFetching } = useListingDetail(slug);
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
 

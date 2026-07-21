@@ -13,13 +13,13 @@ import { FeedSkeleton } from "../components/feed-skeleton/feed-skeleton";
 import { FeedLoadingFooter, FeedStatusView } from "../components/feed-status/feed-status";
 
 export type FeedScreenProps = {
-  onNavigateToLecture?: (slug: string) => void;
+  onNavigateToListing?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
 };
 
 function renderFeedItem(
   item: FeedItemDto,
-  onNavigateToLecture?: (slug: string) => void,
+  onNavigateToListing?: (slug: string) => void,
   onNavigateToScholar?: (slug: string) => void,
 ) {
   switch (item.kind) {
@@ -30,14 +30,14 @@ function renderFeedItem(
         <FeedTopicRow
           topicName={item.topicName}
           items={item.items}
-          onItemPress={onNavigateToLecture}
+          onItemPress={onNavigateToListing}
         />
       );
     default:
       return (
         <FeedContentCard
           item={item as FeedContentItemDto}
-          onPress={() => onNavigateToLecture?.((item as FeedContentItemDto).slug)}
+          onPress={() => onNavigateToListing?.((item as FeedContentItemDto).slug)}
         />
       );
   }
@@ -49,15 +49,15 @@ function getItemKey(item: FeedItemDto, index: number): string {
   return item.id;
 }
 
-export function FeedScreen({ onNavigateToLecture, onNavigateToScholar }: FeedScreenProps) {
+export function FeedScreen({ onNavigateToListing, onNavigateToScholar }: FeedScreenProps) {
   const { t } = useTranslation();
   const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } = useExplore();
   const items = data?.pages.flatMap((p) => p.items) ?? [];
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<FeedItemDto>) =>
-      renderFeedItem(item, onNavigateToLecture, onNavigateToScholar),
-    [onNavigateToLecture, onNavigateToScholar],
+      renderFeedItem(item, onNavigateToListing, onNavigateToScholar),
+    [onNavigateToListing, onNavigateToScholar],
   );
 
   if (isError && items.length === 0) {

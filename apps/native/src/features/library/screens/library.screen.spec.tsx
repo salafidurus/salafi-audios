@@ -128,7 +128,7 @@ describe("LibraryScreen", () => {
   });
 
   it("navigates to a lecture when an item is pressed", async () => {
-    const onNavigateToLecture = jest.fn();
+    const onNavigateToListing = jest.fn();
 
     mockedUseAuth.mockReturnValue({
       isAuthenticated: true,
@@ -154,10 +154,10 @@ describe("LibraryScreen", () => {
       ]),
     );
 
-    await render(<LibraryScreen onNavigateToLecture={onNavigateToLecture} />);
+    await render(<LibraryScreen onNavigateToListing={onNavigateToListing} />);
 
     await fireEvent.press(screen.getByText("Library Lecture"));
 
-    expect(onNavigateToLecture).toHaveBeenCalledWith("lecture-1");
+    expect(onNavigateToListing).toHaveBeenCalledWith("library-lecture");
   });
 });

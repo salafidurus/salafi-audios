@@ -15,6 +15,7 @@ import { useSearchProcessing } from "@sd/domain-search";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 export type SearchProcessingScreenProps = {
   prefill?: string;
@@ -25,6 +26,7 @@ export function SearchProcessingScreen({ prefill, onBackPress }: SearchProcessin
   const inputRef = useRef<SearchInputRef>(null);
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
+  const { navigateToListing } = useListingNavigation();
   const {
     query,
     setQuery,
@@ -65,6 +67,7 @@ export function SearchProcessingScreen({ prefill, onBackPress }: SearchProcessin
             imageUrl={item.imageUrl}
             lectureCount={item.lectureCount}
             durationSeconds={item.durationSeconds}
+            onPress={() => navigateToListing(item.slug)}
           />
         )}
       />

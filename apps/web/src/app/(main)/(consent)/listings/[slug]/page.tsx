@@ -4,16 +4,16 @@ import { ListingDetailScreen } from "@/features/listing/screens/listing-detail/l
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { id } = await params;
+  const { slug } = await params;
   return {
-    title: `Content ${id}`,
+    title: `Content ${slug}`,
     description: "View content details.",
   };
 }
 
-export default async function ListingPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  return <ListingDetailScreen id={id} />;
+export default async function ListingPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  return <ListingDetailScreen slug={slug} />;
 }

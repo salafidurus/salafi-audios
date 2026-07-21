@@ -13,13 +13,13 @@ import { FeedSkeleton } from "../components/feed-skeleton/feed-skeleton";
 import { FeedLoadingFooter, FeedStatusView } from "../components/feed-status/feed-status";
 
 export type FeedRecentScreenProps = {
-  onNavigateToLecture?: (slug: string) => void;
+  onNavigateToListing?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
 };
 
 function renderFeedItem(
   item: FeedItemDto,
-  onNavigateToLecture?: (slug: string) => void,
+  onNavigateToListing?: (slug: string) => void,
   onNavigateToScholar?: (slug: string) => void,
 ) {
   switch (item.kind) {
@@ -30,14 +30,14 @@ function renderFeedItem(
         <FeedTopicRow
           topicName={item.topicName}
           items={item.items}
-          onItemPress={onNavigateToLecture}
+          onItemPress={onNavigateToListing}
         />
       );
     default:
       return (
         <FeedPodcastRow
           item={item as FeedContentItemDto}
-          onPress={() => onNavigateToLecture?.((item as FeedContentItemDto).slug)}
+          onPress={() => onNavigateToListing?.((item as FeedContentItemDto).slug)}
         />
       );
   }
@@ -50,7 +50,7 @@ function getItemKey(item: FeedItemDto, index: number): string {
 }
 
 export function FeedRecentScreen({
-  onNavigateToLecture,
+  onNavigateToListing,
   onNavigateToScholar,
 }: FeedRecentScreenProps) {
   const { t } = useTranslation();
@@ -60,8 +60,8 @@ export function FeedRecentScreen({
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<FeedItemDto>) =>
-      renderFeedItem(item, onNavigateToLecture, onNavigateToScholar),
-    [onNavigateToLecture, onNavigateToScholar],
+      renderFeedItem(item, onNavigateToListing, onNavigateToScholar),
+    [onNavigateToListing, onNavigateToScholar],
   );
 
   if (isError && items.length === 0) {
