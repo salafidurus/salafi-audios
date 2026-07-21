@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useRef, useEffect, type ReactNode } from "react";
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
 import { useExploreFollowingScreen } from "@sd/domain-content";
 import { List } from "@/shared/components/List";
@@ -78,6 +78,26 @@ export function FeedFollowingScreen({
   const { t } = useTranslation();
   const { data, isFetching, hasNextPage, fetchNextPage } = useExploreFollowingScreen();
   const items = data?.pages.flatMap((p) => p.items) ?? [];
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!hasNextPage || isFetching) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetching, fetchNextPage]);
 
   const followingTitle = t("navigation.subnav.explore.following", "Following");
 
@@ -128,18 +148,7 @@ export function FeedFollowingScreen({
           onNavigateToLecture={onNavigateToLecture}
           onNavigateToScholar={onNavigateToScholar}
         />
-        {hasNextPage && (
-          <div className={styles.loadMoreRow}>
-            <Button
-              variant="surface"
-              radius="md"
-              onClick={() => fetchNextPage()}
-              disabled={isFetching}
-            >
-              {isFetching ? t("common.loading", "Loading...") : t("feed.loadMore", "Load more")}
-            </Button>
-          </div>
-        )}
+        <div ref={loadMoreRef} style={{ height: "20px" }} />
       </section>
       <ScrollToTopButton />
     </ScreenView>

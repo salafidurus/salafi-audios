@@ -1,7 +1,8 @@
 .button {
   position: fixed;
   bottom: calc(var(--space-scale-xl) * 2 + 60px);
-  inset-inline-end: var(--space-scale-xl);
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 40;
 
   display: flex;
@@ -14,6 +15,7 @@
   background-color: var(--action-primary);
   border: none;
   cursor: pointer;
+  opacity: 0.5;
 
   box-shadow: var(--shadow-lg);
 
@@ -23,12 +25,13 @@
   transition: all 0.2s ease;
 
   &:hover {
+    opacity: 1;
     background-color: var(--action-primary-hover, var(--action-primary));
-    transform: translateY(-4px);
+    transform: translateX(-50%) translateY(-4px);
     box-shadow: var(--shadow-xl);
   }
 
   &:active {
-    transform: translateY(-2px);
+    transform: translateX(-50%) translateY(-2px);
   }
 }
