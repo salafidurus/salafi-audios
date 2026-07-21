@@ -83,6 +83,203 @@ function initFormState(
   };
 }
 
+interface ListingFormProps {
+  state: FormState;
+  dispatch: React.Dispatch<Partial<FormState>>;
+  scholars: ScholarListItemDto[];
+  topics: TopicRefDto[];
+  series: AdminListingListItemDto[];
+  listing?: AdminListingDetailDto | null;
+  handleTitleChange: (val: string) => void;
+  handleTopicToggle: (topicId: string) => void;
+  onSubmit: (e: React.FormEvent) => void;
+}
+
+function ListingForm({
+  state,
+  dispatch,
+  scholars,
+  topics,
+  series,
+  listing,
+  handleTitleChange,
+  handleTopicToggle,
+  onSubmit,
+}: ListingFormProps) {
+  const { t } = useTranslation();
+  const {
+    title,
+    slug,
+    description,
+    scholarId,
+    seriesId,
+    status,
+    orderIndex,
+    selectedTopics,
+    formError,
+  } = state;
+  const selectedTopicsSet = React.useMemo(() => new Set(selectedTopics), [selectedTopics]);
+
+  return (
+    <form id="lecture-edit-form" onSubmit={onSubmit} className={styles.form}>
+      {formError && <div className={styles.errorBanner}>{formError}</div>}
+
+      <div className={styles.formGroup}>
+        <label htmlFor="lecture-title" className={styles.label}>
+          {t("admin.contents.listing.titleLabel", "Title")}
+        </label>
+        <input
+          id="lecture-title"
+          type="text"
+          className={styles.input}
+          value={title}
+          onChange={(e) => handleTitleChange(e.target.value)}
+          required
+        />
+      </div>
+
+      <div className={styles.formGroup}>
+        <label htmlFor="lecture-slug" className={styles.label}>
+          {t("admin.contents.listing.slugLabel", "Slug")}
+        </label>
+        <input
+          id="lecture-slug"
+          type="text"
+          className={styles.input}
+          value={slug}
+          onChange={(e) => dispatch({ slug: e.target.value })}
+          placeholder={t("admin.contents.listing.slugPlaceholder", "Auto-generated if left blank")}
+        />
+      </div>
+
+      <div className={styles.formGroup}>
+        <label htmlFor="lecture-description" className={styles.label}>
+          {t("admin.contents.listing.descriptionLabel", "Description")}
+        </label>
+        <textarea
+          id="lecture-description"
+          className={styles.textarea}
+          value={description}
+          onChange={(e) => dispatch({ description: e.target.value })}
+          rows={3}
+        />
+      </div>
+
+      <div className={styles.formRow}>
+        <div className={styles.formGroup}>
+          <label htmlFor="lecture-scholar" className={styles.label}>
+            {t("admin.contents.listing.scholarLabel", "Scholar")}
+          </label>
+          <Dropdown value={scholarId} onValueChange={(value) => dispatch({ scholarId: value })}>
+            <DropdownTrigger
+              id="lecture-scholar"
+              placeholder={t("admin.contents.listing.scholarPlaceholder", "Select Scholar")}
+              disabled={!!listing}
+              testId="scholar-dropdown"
+            />
+            <DropdownContent searchable>
+              {scholars.map((s) => (
+                <DropdownItem key={s.id} value={s.id}>
+                  {s.name}
+                </DropdownItem>
+              ))}
+            </DropdownContent>
+          </Dropdown>
+        </div>
+
+        <div className={styles.formGroup}>
+          <label htmlFor="lecture-series" className={styles.label}>
+            {t("admin.contents.listing.seriesLabel", "Series")}
+          </label>
+          <Dropdown value={seriesId} onValueChange={(value) => dispatch({ seriesId: value })}>
+            <DropdownTrigger
+              id="lecture-series"
+              placeholder={t(
+                "admin.contents.listing.seriesPlaceholder",
+                "Select Series (Optional)",
+              )}
+              disabled={!!listing}
+              testId="series-dropdown"
+            />
+            <DropdownContent searchable>
+              {series.map((s) => (
+                <DropdownItem key={s.id} value={s.id}>
+                  {s.title}
+                </DropdownItem>
+              ))}
+            </DropdownContent>
+          </Dropdown>
+        </div>
+      </div>
+
+      <div className={styles.formRow}>
+        <div className={styles.formGroup}>
+          <label htmlFor="lecture-status" className={styles.label}>
+            {t("admin.contents.listing.statusLabel", "Status")}
+          </label>
+          <Dropdown
+            value={status}
+            onValueChange={(value) => dispatch({ status: validateLectureStatus(value) })}
+          >
+            <DropdownTrigger
+              id="lecture-status"
+              placeholder={t("admin.contents.listing.statusPlaceholder", "Select Status")}
+              testId="status-dropdown"
+            />
+            <DropdownContent>
+              <DropdownItem value="draft">
+                {t("admin.contents.listing.draft", "Draft")}
+              </DropdownItem>
+              <DropdownItem value="published">
+                {t("admin.contents.listing.published", "Published")}
+              </DropdownItem>
+              <DropdownItem value="archived">
+                {t("admin.contents.listing.archived", "Archived")}
+              </DropdownItem>
+            </DropdownContent>
+          </Dropdown>
+        </div>
+
+        <div className={styles.formGroup}>
+          <label htmlFor="lecture-order" className={styles.label}>
+            {t("admin.contents.listing.orderIndexLabel", "Order Index")}
+          </label>
+          <input
+            id="lecture-order"
+            type="number"
+            className={styles.input}
+            value={orderIndex}
+            onChange={(e) => dispatch({ orderIndex: Number(e.target.value) })}
+          />
+        </div>
+      </div>
+
+      <div className={styles.formGroup}>
+        <span className={styles.label}>{t("admin.contents.listing.topicsLabel", "Topics")}</span>
+        <div className={styles.topicsGrid}>
+          {topics.map((tItem) => (
+            <label key={tItem.id} className={styles.topicCheckboxLabel}>
+              <input
+                type="checkbox"
+                checked={selectedTopicsSet.has(tItem.id)}
+                onChange={() => handleTopicToggle(tItem.id)}
+                className={styles.checkbox}
+                disabled={!!listing}
+              />
+              <span>{tItem.name}</span>
+            </label>
+          ))}
+          {topics.length === 0 && (
+            <span className={styles.noData}>
+              {t("admin.contents.listing.noTopicsAvailable", "No topics available")}
+            </span>
+          )}
+        </div>
+      </div>
+    </form>
+  );
+}
+
 export function ListingModal({
   isOpen,
   onClose,
@@ -105,7 +302,6 @@ export function ListingModal({
     orderIndex,
     selectedTopics,
     saving,
-    formError,
   } = state;
 
   React.useEffect(() => {
@@ -219,7 +415,6 @@ export function ListingModal({
   const scholars = scholarsData?.scholars ?? [];
   const topics = topicsData ?? [];
   const series = seriesData ?? [];
-  const selectedTopicsSet = new Set(selectedTopics);
 
   return (
     <Modal
@@ -248,165 +443,17 @@ export function ListingModal({
         </>
       }
     >
-      <form id="lecture-edit-form" onSubmit={handleSave} className={styles.form}>
-        {formError && <div className={styles.errorBanner}>{formError}</div>}
-
-        <div className={styles.formGroup}>
-          <label htmlFor="lecture-title" className={styles.label}>
-            {t("admin.contents.listing.titleLabel", "Title")}
-          </label>
-          <input
-            id="lecture-title"
-            type="text"
-            className={styles.input}
-            value={title}
-            onChange={(e) => handleTitleChange(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className={styles.formGroup}>
-          <label htmlFor="lecture-slug" className={styles.label}>
-            {t("admin.contents.listing.slugLabel", "Slug")}
-          </label>
-          <input
-            id="lecture-slug"
-            type="text"
-            className={styles.input}
-            value={slug}
-            onChange={(e) => dispatch({ slug: e.target.value })}
-            placeholder={t(
-              "admin.contents.listing.slugPlaceholder",
-              "Auto-generated if left blank",
-            )}
-          />
-        </div>
-
-        <div className={styles.formGroup}>
-          <label htmlFor="lecture-description" className={styles.label}>
-            {t("admin.contents.listing.descriptionLabel", "Description")}
-          </label>
-          <textarea
-            id="lecture-description"
-            className={styles.textarea}
-            value={description}
-            onChange={(e) => dispatch({ description: e.target.value })}
-            rows={3}
-          />
-        </div>
-
-        <div className={styles.formRow}>
-          <div className={styles.formGroup}>
-            <label htmlFor="lecture-scholar" className={styles.label}>
-              {t("admin.contents.listing.scholarLabel", "Scholar")}
-            </label>
-            <Dropdown value={scholarId} onValueChange={(value) => dispatch({ scholarId: value })}>
-              <DropdownTrigger
-                id="lecture-scholar"
-                placeholder={t("admin.contents.listing.scholarPlaceholder", "Select Scholar")}
-                disabled={!!listing}
-                testId="scholar-dropdown"
-              />
-              <DropdownContent searchable>
-                {scholars.map((s) => (
-                  <DropdownItem key={s.id} value={s.id}>
-                    {s.name}
-                  </DropdownItem>
-                ))}
-              </DropdownContent>
-            </Dropdown>
-          </div>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="lecture-series" className={styles.label}>
-              {t("admin.contents.listing.seriesLabel", "Series")}
-            </label>
-            <Dropdown value={seriesId} onValueChange={(value) => dispatch({ seriesId: value })}>
-              <DropdownTrigger
-                id="lecture-series"
-                placeholder={t(
-                  "admin.contents.listing.seriesPlaceholder",
-                  "Select Series (Optional)",
-                )}
-                disabled={!!listing}
-                testId="series-dropdown"
-              />
-              <DropdownContent searchable>
-                {series.map((s) => (
-                  <DropdownItem key={s.id} value={s.id}>
-                    {s.title}
-                  </DropdownItem>
-                ))}
-              </DropdownContent>
-            </Dropdown>
-          </div>
-        </div>
-
-        <div className={styles.formRow}>
-          <div className={styles.formGroup}>
-            <label htmlFor="lecture-status" className={styles.label}>
-              {t("admin.contents.listing.statusLabel", "Status")}
-            </label>
-            <Dropdown
-              value={status}
-              onValueChange={(value) => dispatch({ status: validateLectureStatus(value) })}
-            >
-              <DropdownTrigger
-                id="lecture-status"
-                placeholder={t("admin.contents.listing.statusPlaceholder", "Select Status")}
-                testId="status-dropdown"
-              />
-              <DropdownContent>
-                <DropdownItem value="draft">
-                  {t("admin.contents.listing.draft", "Draft")}
-                </DropdownItem>
-                <DropdownItem value="published">
-                  {t("admin.contents.listing.published", "Published")}
-                </DropdownItem>
-                <DropdownItem value="archived">
-                  {t("admin.contents.listing.archived", "Archived")}
-                </DropdownItem>
-              </DropdownContent>
-            </Dropdown>
-          </div>
-
-          <div className={styles.formGroup}>
-            <label htmlFor="lecture-order" className={styles.label}>
-              {t("admin.contents.listing.orderIndexLabel", "Order Index")}
-            </label>
-            <input
-              id="lecture-order"
-              type="number"
-              className={styles.input}
-              value={orderIndex}
-              onChange={(e) => dispatch({ orderIndex: Number(e.target.value) })}
-            />
-          </div>
-        </div>
-
-        <div className={styles.formGroup}>
-          <span className={styles.label}>{t("admin.contents.listing.topicsLabel", "Topics")}</span>
-          <div className={styles.topicsGrid}>
-            {topics.map((t) => (
-              <label key={t.id} className={styles.topicCheckboxLabel}>
-                <input
-                  type="checkbox"
-                  checked={selectedTopicsSet.has(t.id)}
-                  onChange={() => handleTopicToggle(t.id)}
-                  className={styles.checkbox}
-                  disabled={!!listing}
-                />
-                <span>{t.name}</span>
-              </label>
-            ))}
-            {topics.length === 0 && (
-              <span className={styles.noData}>
-                {t("admin.contents.listing.noTopicsAvailable", "No topics available")}
-              </span>
-            )}
-          </div>
-        </div>
-      </form>
+      <ListingForm
+        state={state}
+        dispatch={dispatch}
+        scholars={scholars}
+        topics={topics}
+        series={series}
+        listing={listing}
+        handleTitleChange={handleTitleChange}
+        handleTopicToggle={handleTopicToggle}
+        onSubmit={handleSave}
+      />
     </Modal>
   );
 }
