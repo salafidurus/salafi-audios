@@ -95,7 +95,10 @@ export function SettingsGeneralScreen() {
         </SettingsRow>
         <SettingsRow
           label={t("settings.general.contentLanguage", "Content Language")}
-          sublabel={t("settings.general.contentLanguageDesc", "Preferred translation language")}
+          sublabel={t(
+            "settings.general.contentLanguageDesc",
+            "Show content in its original language",
+          )}
         >
           <ContentLanguageToggle />
         </SettingsRow>

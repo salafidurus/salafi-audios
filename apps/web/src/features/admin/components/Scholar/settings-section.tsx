@@ -2,6 +2,7 @@
 
 import type { CreateScholarDto } from "@sd/core-contracts";
 import { FormSection } from "@/features/admin/components/FormSection";
+import { Toggle } from "@/shared/components/Toggle";
 import { useTranslation } from "@/core/i18n/use-translation";
 import type { FormAction } from "./ScholarModal";
 import styles from "./scholar-modal.module.css";
@@ -18,32 +19,32 @@ export function SettingsSection({ formData, dispatch }: SettingsSectionProps) {
     <FormSection title={t("admin.scholars.settings", "Settings")}>
       <div className={styles.checkboxGroup}>
         <label className={styles.checkbox}>
-          <input
-            type="checkbox"
+          <Toggle
             checked={formData.isKibar ?? false}
-            onChange={(e) =>
-              dispatch({ type: "UPDATE_FIELD", field: "isKibar", value: e.target.checked })
+            onChange={(checked) =>
+              dispatch({ type: "UPDATE_FIELD", field: "isKibar", value: checked })
             }
+            aria-label="Kibar Scholar"
           />
           <span>{t("admin.scholars.kibarLabel", "Kibar Scholar")}</span>
         </label>
         <label className={styles.checkbox}>
-          <input
-            type="checkbox"
+          <Toggle
             checked={formData.isFeatured ?? false}
-            onChange={(e) =>
-              dispatch({ type: "UPDATE_FIELD", field: "isFeatured", value: e.target.checked })
+            onChange={(checked) =>
+              dispatch({ type: "UPDATE_FIELD", field: "isFeatured", value: checked })
             }
+            aria-label="Featured"
           />
           <span>{t("admin.scholars.featuredLabel", "Featured")}</span>
         </label>
         <label className={styles.checkbox}>
-          <input
-            type="checkbox"
+          <Toggle
             checked={formData.isActive ?? true}
-            onChange={(e) =>
-              dispatch({ type: "UPDATE_FIELD", field: "isActive", value: e.target.checked })
+            onChange={(checked) =>
+              dispatch({ type: "UPDATE_FIELD", field: "isActive", value: checked })
             }
+            aria-label="Active"
           />
           <span>{t("admin.scholars.activeLabel", "Active")}</span>
         </label>
