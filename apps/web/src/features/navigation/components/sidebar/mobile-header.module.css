@@ -1,12 +1,12 @@
 .header {
   position: fixed;
   top: 0;
-  left: 0;
-  right: 0;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
   height: 3.5rem;
   padding-top: env(safe-area-inset-top);
-  padding-left: var(--space-layout-page-x);
-  padding-right: var(--space-layout-page-x);
+  padding-inline-start: var(--space-layout-page-x);
+  padding-inline-end: var(--space-layout-page-x);
   padding-bottom: var(--space-scale-sm);
   background-color: var(--surface-default);
   border-bottom: 1px solid var(--border-subtle);

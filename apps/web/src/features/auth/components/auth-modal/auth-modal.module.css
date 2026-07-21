@@ -1,7 +1,7 @@
 .overlayWrapper {
   position: fixed;
   top: 0;
-  left: 0;
+  inset-inline-start: 0;
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -14,7 +14,7 @@
 .overlayBackdrop {
   position: absolute;
   top: 0;
-  left: 0;
+  inset-inline-start: 0;
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.4);
@@ -41,7 +41,7 @@
 .closeButton {
   position: absolute;
   top: var(--space-component-gap-md);
-  right: var(--space-component-gap-md);
+  inset-inline-end: var(--space-component-gap-md);
   border: none;
   background: transparent;
   color: var(--content-muted);

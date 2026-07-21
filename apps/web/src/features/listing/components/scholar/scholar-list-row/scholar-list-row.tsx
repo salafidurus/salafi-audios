@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { ScholarListItemDto } from "@sd/core-contracts";
+import { useIsRtl } from "@/shared/hooks/use-is-rtl";
 import styles from "./scholar-list-row.module.css";
 
 export type ScholarListRowProps = {
@@ -11,6 +12,7 @@ export type ScholarListRowProps = {
 };
 
 export function ScholarListRow({ scholar, onPress }: ScholarListRowProps) {
+  const isRtl = useIsRtl();
   const initial = scholar.name?.trim().charAt(0).toUpperCase() || "?";
 
   const content = (
@@ -44,7 +46,12 @@ export function ScholarListRow({ scholar, onPress }: ScholarListRowProps) {
       </div>
 
       <div className={styles.rightSection}>
-        {onPress && <ChevronRight className={styles.chevron} size={20} />}
+        {onPress &&
+          (isRtl ? (
+            <ChevronLeft className={styles.chevron} size={20} />
+          ) : (
+            <ChevronRight className={styles.chevron} size={20} />
+          ))}
       </div>
     </>
   );

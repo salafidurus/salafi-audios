@@ -24,14 +24,17 @@
 }
 
 .navButtonLeft {
-  text-align: left;
+  text-align: start;
 }
 
 .navButtonRight {
-  text-align: right;
+  text-align: end;
 }
 
 .navLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-xs, 4px);
   font-size: 12px;
   color: var(--content-muted, #888);
 }

@@ -42,14 +42,14 @@
   .label {
     flex-shrink: 0;
     width: 140px;
-    text-align: left;
+    text-align: start;
   }
 }
 
 @media (max-width: 640px) {
   .label {
     width: 100%;
-    padding-left: var(--space-xs);
+    padding-inline-start: var(--space-xs);
   }
 }
 

@@ -24,7 +24,7 @@
 
 .tableHeader {
   border-bottom: 2px solid var(--border-default);
-  text-align: left;
+  text-align: start;
 }
 
 .tableHead {

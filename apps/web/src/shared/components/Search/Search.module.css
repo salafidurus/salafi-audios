@@ -61,7 +61,7 @@ button.barInputWrapper:focus-visible {
   width: 18px;
   height: 18px;
   flex-shrink: 0;
-  margin-right: var(--space-scale-sm);
+  margin-inline-end: var(--space-scale-sm);
   color: var(--content-secondary);
   pointer-events: none;
 }
@@ -88,12 +88,12 @@ button.barInputWrapper:focus-visible {
   color: var(--content-tertiary);
   font-size: 1rem;
   line-height: 1.5;
-  text-align: left;
+  text-align: start;
 }
 
 .barClearButton {
   flex-shrink: 0;
-  margin-left: var(--space-scale-sm);
+  margin-inline-start: var(--space-scale-sm);
   padding: var(--space-scale-xs);
   background: none;
   border: none;

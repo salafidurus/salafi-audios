@@ -11,7 +11,7 @@
 .drawer {
   position: fixed;
   top: 3.5rem;
-  left: 0;
+  inset-inline-start: 0;
   bottom: 0;
   width: 16.5rem;
   max-width: 80vw;
@@ -24,6 +24,14 @@
 }
 
 .drawer[data-open="true"] {
+  transform: translateX(0);
+}
+
+[dir="rtl"] .drawer {
+  transform: translateX(100%);
+}
+
+[dir="rtl"] .drawer[data-open="true"] {
   transform: translateX(0);
 }
 

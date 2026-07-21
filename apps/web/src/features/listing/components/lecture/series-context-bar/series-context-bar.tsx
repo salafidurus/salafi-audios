@@ -1,7 +1,9 @@
 "use client";
 
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { SeriesContextDto } from "@sd/core-contracts";
 import { AppText } from "@/shared/components/AppText/AppText";
+import { useIsRtl } from "@/shared/hooks/use-is-rtl";
 import styles from "./series-context-bar.module.css";
 
 export type SeriesContextBarProps = {
@@ -10,6 +12,7 @@ export type SeriesContextBarProps = {
 };
 
 export function SeriesContextBar({ seriesContext, onNavigate }: SeriesContextBarProps) {
+  const isRtl = useIsRtl();
   return (
     <div className={styles.container}>
       <div className={styles.seriesLabel}>
@@ -26,7 +29,9 @@ export function SeriesContextBar({ seriesContext, onNavigate }: SeriesContextBar
             onClick={() => onNavigate?.(seriesContext.prevLecture!.id)}
             className={`${styles.navButton} ${styles.navButtonLeft}`}
           >
-            <div className={styles.navLabel}>← Previous</div>
+            <div className={styles.navLabel}>
+              {isRtl ? <ChevronRight size={14} /> : <ChevronLeft size={14} />} Previous
+            </div>
             <div className={styles.navTitle}>{seriesContext.prevLecture.title}</div>
           </button>
         ) : (
@@ -39,7 +44,9 @@ export function SeriesContextBar({ seriesContext, onNavigate }: SeriesContextBar
             onClick={() => onNavigate?.(seriesContext.nextLecture!.id)}
             className={`${styles.navButton} ${styles.navButtonRight}`}
           >
-            <div className={styles.navLabel}>Next →</div>
+            <div className={styles.navLabel}>
+              Next {isRtl ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
+            </div>
             <div className={styles.navTitle}>{seriesContext.nextLecture.title}</div>
           </button>
         ) : (
