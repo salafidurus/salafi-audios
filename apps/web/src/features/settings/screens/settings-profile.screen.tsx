@@ -217,9 +217,9 @@ function SignInCta() {
       <p className={styles.signInDesc}>
         Create an account or sign in to manage your profile and roles.
       </p>
-      <button type="button" className={styles.signInButton} onClick={() => setShowModal(true)}>
+      <Button variant="primary" onClick={() => setShowModal(true)}>
         Sign In
-      </button>
+      </Button>
       <AuthModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}

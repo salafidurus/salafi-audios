@@ -50,36 +50,6 @@
   padding: var(--space-component-gap-md);
 }
 
-.button {
-  padding: var(--space-component-chip-y) var(--space-component-gap-lg);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-component-chip);
-  background: var(--surface-default);
-  color: var(--content-default);
-  font-size: var(--typo-body-sm-font-size);
-  cursor: pointer;
-  transition: box-shadow 0.15s ease;
-}
-
-.button:hover {
-  box-shadow: var(--shadow-sm);
-}
-
-.button:focus-visible {
-  outline: none;
-  box-shadow: var(--shadow-focus);
-}
-
-.button:disabled {
-  cursor: default;
-  opacity: 0.6;
-}
-
-.retryButton {
-  border-color: var(--action-primary);
-  color: var(--action-primary);
-}
-
 .title {
   margin: 0 0 var(--space-scale-xs);
 }

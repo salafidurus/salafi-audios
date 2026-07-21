@@ -11,6 +11,7 @@ import type {
 import { validateLectureStatus } from "@/shared/types/form-types";
 import { createLecture, updateLecture } from "../../api/admin-lectures.api";
 import { Modal } from "@/shared/components/Modal";
+import { Button } from "@/shared/components/Button";
 import {
   Dropdown,
   DropdownTrigger,
@@ -218,17 +219,18 @@ export function ListingModal({
       width="var(--modal-listing-width)"
       footer={
         <>
-          <button type="button" className={styles.cancelBtn} onClick={onClose} disabled={saving}>
+          <Button variant="surface" radius="md" onClick={onClose} disabled={saving}>
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="primary"
+            radius="md"
             type="submit"
-            className={styles.saveBtn}
             disabled={saving}
             form="lecture-edit-form"
           >
             {saving ? "Saving..." : "Save"}
-          </button>
+          </Button>
         </>
       }
     >

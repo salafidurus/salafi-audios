@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { routes } from "@sd/core-contracts";
+import { Button } from "@/shared/components/Button";
 import styles from "./error.module.css";
 
 type ErrorProps = {
@@ -25,9 +26,9 @@ export default function Error({ error, reset }: ErrorProps) {
           The page could not be loaded right now. Please try again.
         </p>
         <div className={styles.actions}>
-          <button type="button" className={styles.button} onClick={reset}>
+          <Button variant="primary" onClick={reset}>
             Try again
-          </button>
+          </Button>
           <Link href={routes.home} className={styles.link}>
             Back to home
           </Link>
