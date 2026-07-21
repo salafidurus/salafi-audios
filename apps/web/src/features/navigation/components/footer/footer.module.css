@@ -1,4 +1,6 @@
 .footer {
+  position: relative;
+  z-index: 41;
   width: 100%;
   border-top: 1px solid var(--chrome-border-strong);
   margin-top: auto;

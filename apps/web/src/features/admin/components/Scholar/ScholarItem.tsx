@@ -1,12 +1,13 @@
 "use client";
 
-import { X, Send, Film, ExternalLink } from "lucide-react";
+import { X, Send, Film, ExternalLink, Pencil } from "lucide-react";
 import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
 import { Button } from "@/shared/components/Button";
 import { List } from "@/shared/components/List";
 import { UserAvatar } from "@/shared/components/user-avatar";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { type AdminScholarListItemDto, COUNTRY_NAMES } from "@sd/core-contracts";
+import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./scholar-item.module.css";
 
 export interface ScholarItemProps {
@@ -143,6 +144,7 @@ function ScholarMeta({ scholar }: { scholar: AdminScholarListItemDto }) {
 
 export function ScholarItem({ scholar, onEdit }: ScholarItemProps) {
   const { isMobile } = useResponsive();
+  const { t } = useTranslation();
 
   return (
     <List.Item interactive className={styles.listItem}>
@@ -154,24 +156,13 @@ export function ScholarItem({ scholar, onEdit }: ScholarItemProps) {
         <PermissionGate requires="SCHOLARS_EDIT">
           <Button
             variant={isMobile ? "outline" : "ghost"}
-            size={isMobile ? "md" : "icon"}
+            size={isMobile ? "sm" : "icon"}
+            fullWidth={isMobile}
             onClick={onEdit}
+            icon={<Pencil size={16} />}
             aria-label={`Edit ${scholar.name}`}
-            className={isMobile ? styles.editButtonMobile : undefined}
           >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-            </svg>
-            {isMobile && " Edit"}
+            {isMobile && t("common.edit", "Edit")}
           </Button>
         </PermissionGate>
       </List.Item.Actions>

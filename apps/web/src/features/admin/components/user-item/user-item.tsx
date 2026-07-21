@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { AdminUserListItemDto } from "@sd/core-contracts";
-import { Shield, Users } from "lucide-react";
+import { ShieldCog, UserCog } from "lucide-react";
 import { List } from "@/shared/components/List";
 import { Button } from "@/shared/components/Button";
 import { useResponsive } from "@/shared/hooks/use-responsive";
@@ -17,7 +17,7 @@ export type UserItemProps = {
 };
 
 export function UserItem({ user, onManagePermissions, onManageRoles }: UserItemProps): ReactNode {
-  const { isTablet } = useResponsive();
+  const { isMobile } = useResponsive();
   const { t } = useTranslation();
 
   return (
@@ -28,38 +28,34 @@ export function UserItem({ user, onManagePermissions, onManageRoles }: UserItemP
       </div>
 
       <List.Item.Actions
-        orientation="vertical"
+        orientation="horizontal"
         mobileOrientation="vertical"
-        widthPercentDesktop="30%"
+        widthPercentDesktop="15%"
       >
-        <div className={styles.actionsWrapper} onClick={(e) => e.stopPropagation()}>
-          <PermissionGate requires="USERS_GRANT_PERMISSIONS">
-            <Button
-              variant="outline"
-              size="sm"
-              fullWidth
-              onClick={onManagePermissions}
-              icon={<Shield className={styles.manageIcon} />}
-            >
-              {isTablet
-                ? t("admin.permissions.managePermissionsBtnShort", "Permissions")
-                : t("admin.permissions.managePermissionsBtn", "Manage Permissions")}
-            </Button>
-          </PermissionGate>
-          <PermissionGate requires="USERS_GRANT_ROLES">
-            <Button
-              variant="outline"
-              size="sm"
-              fullWidth
-              onClick={onManageRoles}
-              icon={<Users className={styles.manageIcon} />}
-            >
-              {isTablet
-                ? t("admin.permissions.manageRolesBtnShort", "Roles")
-                : t("admin.permissions.manageRolesBtn", "Manage Roles")}
-            </Button>
-          </PermissionGate>
-        </div>
+        <PermissionGate requires="USERS_GRANT_PERMISSIONS">
+          <Button
+            variant={isMobile ? "outline" : "ghost"}
+            size={isMobile ? "sm" : "icon"}
+            fullWidth={isMobile}
+            onClick={onManagePermissions}
+            icon={<ShieldCog size={16} />}
+            aria-label={t("admin.permissions.managePermissionsBtn", "Manage Permissions")}
+          >
+            {isMobile && t("admin.permissions.managePermissionsBtnShort", "Permissions")}
+          </Button>
+        </PermissionGate>
+        <PermissionGate requires="USERS_GRANT_ROLES">
+          <Button
+            variant={isMobile ? "outline" : "ghost"}
+            size={isMobile ? "sm" : "icon"}
+            fullWidth={isMobile}
+            onClick={onManageRoles}
+            icon={<UserCog size={16} />}
+            aria-label={t("admin.permissions.manageRolesBtn", "Manage Roles")}
+          >
+            {isMobile && t("admin.permissions.manageRolesBtnShort", "Roles")}
+          </Button>
+        </PermissionGate>
       </List.Item.Actions>
     </List.Item>
   );

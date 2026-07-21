@@ -54,8 +54,3 @@
   }
 }
 
-@media (max-width: 640px) {
-  :global(button) {
-    width: 100%;
-  }
-}

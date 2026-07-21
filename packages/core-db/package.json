@@ -49,13 +49,13 @@
   "dependencies": {
     "@prisma/adapter-pg": "catalog:",
     "@prisma/client": "catalog:",
-    "@prisma/client-runtime-utils": "^7.3.0",
+    "@prisma/client-runtime-utils": "7.9.0",
     "@sd/core-contracts": "workspace:*"
   },
   "devDependencies": {
     "dotenv": "catalog:",
     "pg": "catalog:",
-    "prisma": "^7.3.0",
+    "prisma": "7.9.0",
     "tsup": "catalog:"
   }
 }

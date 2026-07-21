@@ -73,6 +73,7 @@ export const endpoints = {
       update: (id: string) => `/admin/listings/${id}`,
       publish: (id: string) => `/admin/listings/${id}/publish`,
       archive: (id: string) => `/admin/listings/${id}/archive`,
+      series: "/admin/listings/series",
       bulk: "/admin/listings/bulk",
     },
     media: {

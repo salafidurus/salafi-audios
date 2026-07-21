@@ -107,6 +107,7 @@ export function SearchResultItem({ item, onPress }: SearchResultItemProps) {
         <Button
           variant={!isMobile ? "ghost" : "outline"}
           size={!isMobile ? "icon" : "sm"}
+          fullWidth={isMobile}
           aria-label={`Play ${item.title}`}
           icon={<Play size={16} fill="currentColor" style={{ color: "var(--content-primary)" }} />}
           onClick={handlePlayClick}

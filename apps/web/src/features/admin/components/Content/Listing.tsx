@@ -2,7 +2,9 @@ import type { AdminListingListItemDto } from "@sd/core-contracts";
 import { List } from "@/shared/components/List";
 import { Button } from "@/shared/components/Button";
 import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
-import { Edit } from "lucide-react";
+import { Pencil } from "lucide-react";
+import { useResponsive } from "@/shared/hooks/use-responsive";
+import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./Content.module.css";
 
 interface ListingProps {
@@ -11,21 +13,31 @@ interface ListingProps {
 }
 
 export function Listing({ listing, onEdit }: ListingProps) {
+  const { isMobile } = useResponsive();
+  const { t } = useTranslation();
+
   return (
-    <List.Item interactive className={styles.listingItem}>
+    <List.Item interactive>
       <div className={styles.listingInfo}>
         <span className={styles.listingTitle}>{listing.title}</span>
         <span className={styles.listingMeta}>
           {listing.scholarName} • {listing.status}
         </span>
       </div>
-      <div className={styles.listingActions}>
+      <List.Item.Actions>
         <PermissionGate requires="LISTINGS_EDIT">
-          <Button variant="ghost" size="sm" onClick={() => onEdit(listing.id)}>
-            <Edit size={14} />
+          <Button
+            variant={isMobile ? "outline" : "ghost"}
+            size={isMobile ? "sm" : "icon"}
+            fullWidth={isMobile}
+            icon={<Pencil size={16} />}
+            onClick={() => onEdit(listing.id)}
+            aria-label={`Edit ${listing.title}`}
+          >
+            {isMobile && t("common.edit", "Edit")}
           </Button>
         </PermissionGate>
-      </div>
+      </List.Item.Actions>
     </List.Item>
   );
 }

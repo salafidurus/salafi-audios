@@ -28,8 +28,8 @@ describe("UserItem", () => {
 
     render(<UserItem user={baseUser} onManagePermissions={vi.fn()} onManageRoles={vi.fn()} />);
 
-    expect(screen.getByText("Manage Permissions")).toBeInTheDocument();
-    expect(screen.queryByText("Manage Roles")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Manage Permissions" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Manage Roles" })).not.toBeInTheDocument();
   });
 
   it("shows Manage Roles button only when user has USERS_GRANT_ROLES", () => {
@@ -39,8 +39,8 @@ describe("UserItem", () => {
 
     render(<UserItem user={baseUser} onManagePermissions={vi.fn()} onManageRoles={vi.fn()} />);
 
-    expect(screen.queryByText("Manage Permissions")).not.toBeInTheDocument();
-    expect(screen.getByText("Manage Roles")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Manage Permissions" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Manage Roles" })).toBeInTheDocument();
   });
 
   it("hides both buttons when user has only USERS_VIEW", () => {
@@ -50,7 +50,7 @@ describe("UserItem", () => {
 
     render(<UserItem user={baseUser} onManagePermissions={vi.fn()} onManageRoles={vi.fn()} />);
 
-    expect(screen.queryByText("Manage Permissions")).not.toBeInTheDocument();
-    expect(screen.queryByText("Manage Roles")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Manage Permissions" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Manage Roles" })).not.toBeInTheDocument();
   });
 });

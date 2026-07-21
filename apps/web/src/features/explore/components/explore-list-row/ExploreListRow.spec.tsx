@@ -2,10 +2,10 @@ import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import type { FeedContentItemDto } from "@sd/core-contracts";
-import { FeedListRow } from "./feed-list-row";
+import { FeedListRow } from "./explore-list-row";
 import { useAudio, useProgressStore } from "@sd/domain-audio";
 import { audioService } from "@/features/audio";
-import styles from "./feed-list-row.module.css";
+import styles from "./explore-list-row.module.css";
 
 vi.mock("@sd/domain-audio", () => {
   // Import the real module to preserve all exports
