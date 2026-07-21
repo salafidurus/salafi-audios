@@ -1,82 +1,59 @@
 "use client";
 
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { useTranslation } from "@/core/i18n/use-translation";
+import { PRIVACY_LAST_UPDATE_DATE } from "@/features/legal/constants/update-date";
 import styles from "./legal-screens.module.css";
+import * as PrivacySections from "../components/PrivacySections";
 
 export function PrivacyScreen() {
-  const isDesktop = useIsDesktop();
-  const { t } = useTranslation();
-
   return (
     <ScreenView>
       <div className={styles.container}>
-        <h1 className={styles.title}>{t("legal.privacy.title", "Privacy Policy")}</h1>
+        <h1 className={styles.title}>Privacy Policy</h1>
+        <p className={styles.lastUpdated}>Last updated: {PRIVACY_LAST_UPDATE_DATE}</p>
+        <p className={styles.introduction}>
+          This Privacy Policy describes Our policies and procedures on the collection, use and
+          disclosure of Your information when You use the Service and tells You about Your privacy
+          rights and how the law protects You. We use Your Personal Data to provide and improve the
+          Service. By using the Service, You agree to the collection and use of information in
+          accordance with this Privacy Policy.
+        </p>
 
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>
-            {t("legal.privacy.sections.collect.title", "Information We Collect")}
-          </h2>
-          <p className={styles.paragraph}>
-            {isDesktop
-              ? t(
-                  "legal.privacy.sections.collect.desktop",
-                  "We collect information you provide when creating an account (email, display name) and usage data such as listening history and saved lectures. We do not sell your personal information to third parties.",
-                )
-              : t(
-                  "legal.privacy.sections.collect.mobile",
-                  "We collect information you provide when creating an account and usage data such as listening history. We do not sell your personal information.",
-                )}
-          </p>
+        <section id="privacy-interpretation">
+          <PrivacySections.InterpretationAndDefinitions />
         </section>
-
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>
-            {t("legal.privacy.sections.use.title", "How We Use Your Information")}
-          </h2>
-          <p className={styles.paragraph}>
-            {isDesktop
-              ? t(
-                  "legal.privacy.sections.use.desktop",
-                  "Your information is used to provide and improve the service, personalize your experience (e.g., resume playback, recommendations), and communicate important updates about the platform.",
-                )
-              : t(
-                  "legal.privacy.sections.use.mobile",
-                  "Your information is used to provide the service, personalize your experience, and communicate important updates.",
-                )}
-          </p>
+        <section id="privacy-collecting">
+          <PrivacySections.CollectingAndUsingData />
         </section>
-
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>
-            {t("legal.privacy.sections.storage.title", "Data Storage & Security")}
-          </h2>
-          <p className={styles.paragraph}>
-            {isDesktop
-              ? t(
-                  "legal.privacy.sections.storage.desktop",
-                  "Your data is stored securely using industry-standard encryption. Audio files are served via secure, time-limited URLs. We retain your data only as long as your account is active.",
-                )
-              : t(
-                  "legal.privacy.sections.storage.mobile",
-                  "Your data is stored securely with industry-standard encryption. We retain your data only while your account is active.",
-                )}
-          </p>
+        <section id="privacy-use">
+          <PrivacySections.UseOfPersonalData />
         </section>
-
-        <section className={styles.section}>
-          <h2 className={styles.sectionTitle}>
-            {t("legal.privacy.sections.contact.title", "Contact")}
-          </h2>
-          <p className={styles.paragraph}>
-            {isDesktop
-              ? t(
-                  "legal.privacy.sections.contact.desktop",
-                  "For privacy-related inquiries, contact us at privacy@salafidurus.com.",
-                )
-              : t("legal.privacy.sections.contact.mobile", "privacy@salafidurus.com")}
-          </p>
+        <section id="privacy-retention">
+          <PrivacySections.RetentionOfData />
+        </section>
+        <section id="privacy-transfer">
+          <PrivacySections.TransferOfData />
+        </section>
+        <section id="privacy-delete">
+          <PrivacySections.DeleteYourData />
+        </section>
+        <section id="privacy-disclosure">
+          <PrivacySections.DisclosureOfData />
+        </section>
+        <section id="privacy-security">
+          <PrivacySections.SecurityOfData />
+        </section>
+        <section id="privacy-children">
+          <PrivacySections.ChildrensPrivacy />
+        </section>
+        <section id="privacy-links">
+          <PrivacySections.LinksToOtherWebsites />
+        </section>
+        <section id="privacy-changes">
+          <PrivacySections.ChangesToPrivacy />
+        </section>
+        <section id="privacy-contact">
+          <PrivacySections.ContactUs />
         </section>
       </div>
     </ScreenView>

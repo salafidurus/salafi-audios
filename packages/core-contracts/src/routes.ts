@@ -59,6 +59,7 @@ export const routes = {
   support: "/support",
   privacy: "/privacy",
   termsOfUse: "/terms-of-use",
+  cookiePolicy: "/cookie-policy",
 } as const;
 
 /**
@@ -97,6 +98,7 @@ export const routeDefinitions: RouteDefinition[] = [
   { path: routes.search, access: "public" },
   { path: routes.scholars.index, access: "public" },
   { path: routes.support, access: "public" },
+  { path: routes.cookiePolicy, access: "public" },
   { path: routes.admin.index, access: "auth-required" },
   { path: routes.home, access: "public" },
 ];

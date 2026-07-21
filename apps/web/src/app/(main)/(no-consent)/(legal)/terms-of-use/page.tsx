@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { TermsOfUseScreen } from "@/features/legal/screens/terms-of-use.screen";
+import { TermsScreen } from "@/features/legal/screens/terms.screen";
 
 export const metadata: Metadata = {
   title: "Terms of Use",
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function TermsOfUsePage() {
-  return <TermsOfUseScreen />;
+  return <TermsScreen />;
 }

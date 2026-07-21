@@ -86,13 +86,14 @@ body {
   overflow: hidden;
 }
 
-.appShell {
+/* Consent-required layout (sidebar + main content) */
+.appConsentShell {
   display: flex;
   flex: 1;
   min-height: 0;
 }
 
-.appMain {
+.appConsentMain {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -104,7 +105,7 @@ body {
   box-sizing: border-box;
 }
 
-.appContent {
+.appConsentContent {
   flex: 1;
   min-height: 0;
   overflow-x: clip;
@@ -113,13 +114,47 @@ body {
   flex-direction: column;
 }
 
+/* No-consent layout (two-column grid with sidebar nav) */
+.appNoConsentShell {
+  display: grid;
+  grid-template-columns: 1fr 240px;
+  gap: var(--space-component-gap-xl);
+  align-items: stretch;
+  padding: var(--space-layout-page-y) var(--space-layout-page-x);
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+
+.appNoConsentContent {
+  grid-column: 1;
+  min-height: 0;
+  overflow-x: clip;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.appNoConsentContent::-webkit-scrollbar {
+  display: none;
+}
+
+/* Responsive: hide sidebar on tablet and below */
+@media (max-width: 1200px) {
+  .appNoConsentShell {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Tablet: collapsed sidebar (641px - 900px) */
 @media (min-width: 641px) and (max-width: 900px) {
-  .appShell {
+  .appConsentShell {
     flex-direction: row;
   }
 
-  .appMain {
+  .appConsentMain {
     padding-inline-start: var(--sidebar-width, 4.5rem);
     padding-bottom: 0;
   }
@@ -127,11 +162,11 @@ body {
 
 /* Mobile: header at top, drawer navigation (<= 640px) */
 @media (max-width: 640px) {
-  .appShell {
+  .appConsentShell {
     flex-direction: column;
   }
 
-  .appMain {
+  .appConsentMain {
     padding-inline-start: 0;
     padding-top: calc(var(--mobile-header-height) + env(safe-area-inset-top));
     padding-bottom: 0;

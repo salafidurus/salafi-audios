@@ -138,10 +138,16 @@ const ibmPlexSansArabic = localFont({
   ],
 });
 
-const metadataBase =
-  process.env.NEXT_PUBLIC_WEB_URL && process.env.NEXT_PUBLIC_WEB_URL.length > 0
-    ? new URL(process.env.NEXT_PUBLIC_WEB_URL)
-    : new URL("http://localhost:3000");
+let metadataBase: URL;
+try {
+  const webUrl =
+    process.env.NEXT_PUBLIC_WEB_URL && URL.canParse(process.env.NEXT_PUBLIC_WEB_URL)
+      ? process.env.NEXT_PUBLIC_WEB_URL
+      : "http://localhost:3000";
+  metadataBase = new URL(webUrl);
+} catch {
+  metadataBase = new URL("http://localhost:3000");
+}
 
 export const metadata: Metadata = {
   metadataBase,
@@ -177,9 +183,6 @@ export default function RootLayout({
       {/* lang/dir defaults — overridden beforeInteractive by the script below.
           Keeping root layout static avoids forcing every route to be dynamic. */}
       <body className="antialiased">
-        {process.env.NODE_ENV === "production" && !apiBaseUrl?.includes("localhost") ? (
-          <Script src="https://www.vexo.co/analytics.js" strategy="afterInteractive" />
-        ) : null}
         {/* Must be beforeInteractive so lang/dir are set before first paint.
             Do NOT change to afterInteractive — it would cause RTL layout flash. */}
         <Script id="locale-init" strategy="beforeInteractive">
