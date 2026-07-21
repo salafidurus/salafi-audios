@@ -119,15 +119,15 @@ body {
   display: grid;
   grid-template-columns: 1fr 240px;
   gap: var(--space-component-gap-xl);
-  align-items: flex-start;
+  align-items: stretch;
   padding: var(--space-layout-page-y) var(--space-layout-page-x);
   flex: 1;
   min-height: 0;
+  height: 100%;
 }
 
 .appNoConsentContent {
   grid-column: 1;
-  flex: 1;
   min-height: 0;
   overflow-x: clip;
   overflow-y: auto;

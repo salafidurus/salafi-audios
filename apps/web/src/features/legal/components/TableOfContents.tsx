@@ -16,17 +16,21 @@ export function TableOfContents({ sections }: TableOfContentsProps) {
   const [activeSection, setActiveSection] = useState<string>("");
 
   useEffect(() => {
+    const container = document.querySelector(".appNoConsentContent") as HTMLElement;
+    if (!container) return;
+
     const handleScroll = () => {
       const sectionElements = sections.map((s) => ({
         id: s.id,
         element: document.getElementById(s.id),
       }));
 
+      const containerRect = container.getBoundingClientRect();
       const currentSection = sectionElements
         .filter((s) => s.element)
         .find((s) => {
           const rect = s.element!.getBoundingClientRect();
-          return rect.top <= 150;
+          return rect.top <= containerRect.top + 150;
         });
 
       if (currentSection) {
@@ -34,14 +38,17 @@ export function TableOfContents({ sections }: TableOfContentsProps) {
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
   }, [sections]);
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+    const container = document.querySelector(".appNoConsentContent") as HTMLElement;
+
+    if (element && container) {
+      const elementTop = element.offsetTop - container.offsetTop;
+      container.scrollTo({ top: elementTop, behavior: "smooth" });
       setActiveSection(id);
     }
   };
