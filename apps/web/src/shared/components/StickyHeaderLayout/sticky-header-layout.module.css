@@ -5,7 +5,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-component-gap-sm);
-  padding-top: var(--space-layout-page-y);
   padding-bottom: var(--space-component-gap-md);
   background: color-mix(in srgb, var(--surface-canvas) 80%, transparent);
   backdrop-filter: blur(8px);
