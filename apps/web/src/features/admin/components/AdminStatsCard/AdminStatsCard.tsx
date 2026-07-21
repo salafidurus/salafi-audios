@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./AdminStatsCard.module.css";
 
 export interface AdminStatsCardProps {
@@ -32,6 +33,7 @@ export function AdminStatsCard({
   href,
   className,
 }: AdminStatsCardProps) {
+  const { t } = useTranslation();
   const isClickable = onClick || href;
   const content = (
     <div
@@ -70,7 +72,7 @@ export function AdminStatsCard({
         type="button"
         className={styles.buttonWrapper}
         onClick={onClick}
-        aria-label={`View ${label}`}
+        aria-label={t("admin.stats.viewStat", { defaultValue: `View ${label}`, label })}
       >
         {content}
       </button>

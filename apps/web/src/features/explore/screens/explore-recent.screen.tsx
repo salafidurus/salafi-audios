@@ -93,6 +93,7 @@ export function FeedRecentScreen({
   const items = data?.pages.flatMap((p) => p.items) ?? [];
 
   let body: ReactNode;
+  const feedTitle = t("explore.feedTitle", "Feed");
 
   if (isDesktop) {
     if (isError && items.length === 0) {
@@ -138,16 +139,18 @@ export function FeedRecentScreen({
 
     return (
       <ScreenView>
-        <PageHeader title="Feed" />
+        <PageHeader title={feedTitle} />
         <div className={styles.page}>{body}</div>
       </ScreenView>
     );
   }
 
   if (isFetching && items.length === 0) {
-    body = <p className={styles.loading}>Loading feed\u2026</p>;
+    body = <p className={styles.loading}>{t("explore.loadingFeed", "Loading feed…")}</p>;
   } else if (items.length === 0) {
-    body = <p className={styles.empty}>No content yet. Check back soon.</p>;
+    body = (
+      <p className={styles.empty}>{t("explore.noContent", "No content yet. Check back soon.")}</p>
+    );
   } else {
     body = (
       <>
@@ -159,7 +162,7 @@ export function FeedRecentScreen({
         {hasNextPage && (
           <div className={styles.loadMoreRow}>
             <button type="button" onClick={() => fetchNextPage()} className={styles.button}>
-              {isFetching ? "Loading\u2026" : "Load more"}
+              {isFetching ? t("feed.loading", "Loading\u2026") : t("feed.loadMore", "Load more")}
             </button>
           </div>
         )}
@@ -169,7 +172,7 @@ export function FeedRecentScreen({
 
   return (
     <ScreenView>
-      <PageHeader title="Feed" />
+      <PageHeader title={feedTitle} />
       {body}
     </ScreenView>
   );

@@ -6,6 +6,7 @@ import { useExploreFollowingScreen } from "@sd/domain-content";
 import { List } from "@/shared/components/List";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
+import { useTranslation } from "@/core/i18n/use-translation";
 import { FeedListRow } from "../components/feed-list-row/feed-list-row";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import styles from "./explore-following.screen.module.css";
@@ -71,14 +72,19 @@ export function FeedFollowingScreen({
   onNavigateToLecture,
   onNavigateToScholar,
 }: FeedFollowingScreenProps) {
+  const { t } = useTranslation();
   const { data, isFetching, hasNextPage, fetchNextPage } = useExploreFollowingScreen();
   const items = data?.pages.flatMap((p) => p.items) ?? [];
+
+  const followingTitle = t("navigation.subnav.explore.following", "Following");
 
   if (isFetching && items.length === 0) {
     return (
       <ScreenView>
-        <PageHeader title="Following" />
-        <div className={styles.loading}>Loading followed scholars\u2026</div>
+        <PageHeader title={followingTitle} />
+        <div className={styles.loading}>
+          {t("explore.loadingFollowing", "Loading followed scholars…")}
+        </div>
       </ScreenView>
     );
   }
@@ -86,15 +92,17 @@ export function FeedFollowingScreen({
   if (items.length === 0) {
     return (
       <ScreenView>
-        <PageHeader title="Following" />
-        <div className={styles.empty}>Follow scholars to see their latest lectures here.</div>
+        <PageHeader title={followingTitle} />
+        <div className={styles.empty}>
+          {t("explore.followToSee", "Follow scholars to see their latest lectures here.")}
+        </div>
       </ScreenView>
     );
   }
 
   return (
     <ScreenView>
-      <PageHeader title="Following" />
+      <PageHeader title={followingTitle} />
       <FeedBlocks
         items={items}
         onNavigateToLecture={onNavigateToLecture}
@@ -103,7 +111,7 @@ export function FeedFollowingScreen({
       {hasNextPage && (
         <div className={styles.loadMoreRow}>
           <button type="button" onClick={() => fetchNextPage()} className={styles.button}>
-            {isFetching ? "Loading\u2026" : "Load more"}
+            {isFetching ? t("common.loading", "Loading...") : t("feed.loadMore", "Load more")}
           </button>
         </div>
       )}

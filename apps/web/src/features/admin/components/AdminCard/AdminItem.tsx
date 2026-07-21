@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { List } from "@/shared/components/List";
+import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./admin-item.module.css";
 
 export interface AdminItemMetadataItem {
@@ -43,6 +44,7 @@ export function AdminItem({
   onClick,
   className,
 }: AdminItemProps) {
+  const { t } = useTranslation();
   // Track which expandable items are expanded by label
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
@@ -112,11 +114,11 @@ export function AdminItem({
                   >
                     {isExpanded ? (
                       <>
-                        <ChevronUp size={14} /> Hide
+                        <ChevronUp size={14} /> {t("common.hide", "Hide")}
                       </>
                     ) : (
                       <>
-                        <ChevronDown size={14} /> View all
+                        <ChevronDown size={14} /> {t("common.viewAll", "View all")}
                       </>
                     )}
                   </button>

@@ -13,7 +13,9 @@
     "save": "حفظ",
     "add": "إضافة",
     "english": "الإنجليزية",
-    "arabic": "العربية (عربي)"
+    "arabic": "العربية (عربي)",
+    "hide": "إخفاء",
+    "viewAll": "عرض الكل"
   },
   "auth": {
     "signIn": {
@@ -133,6 +135,16 @@
       "followedScholarsDesc": "إشعار عند نشر شيخ تتابعه",
       "newLectures": "المحاضرات الجديدة",
       "newLecturesDesc": "إشعار عند نشر محاضرات جديدة"
+    },
+    "legal": {
+      "title": "قانوني",
+      "privacyPolicy": "سياسة الخصوصية",
+      "privacyDesc": "كيف نقوم بجمع واستخدام بياناتك.",
+      "privacySublabel": "اقرأ سياسة الخصوصية الكاملة الخاصة بنا، بما في ذلك جمع البيانات وتخزينها وحقوقك.",
+      "view": "عرض ←",
+      "termsOfUse": "شروط الاستخدام",
+      "termsDesc": "القواعد التي تحكم استخدام هذه الخدمة.",
+      "termsSublabel": "اقرأ الشروط والأحكام التي تحكم استخدامك لسلفي دروس."
     }
   },
   "support": {
@@ -192,7 +204,8 @@
     "filterAll": "الكل",
     "filterAllAria": "عرض جميع العناصر",
     "filterByAria": "تصفية حسب {{label}}",
-    "filterRemoveAria": "إزالة تصفية {{label}}"
+    "filterRemoveAria": "إزالة تصفية {{label}}",
+    "enterQuery": "أدخل كلمة بحث للبدء"
   },
   "library": {
     "title": "مكتبتي",
@@ -460,7 +473,12 @@
         "translations": "إدارة التراجم",
         "media": "إدارة الوسائط",
         "users": "إدارة المستخدمين"
-      }
+      },
+      "revokeTitle": "إلغاء الصلاحية؟",
+      "revoking": "جارٍ إلغاء الصلاحية...",
+      "revokeButton": "إلغاء الصلاحية",
+      "revokePrompt": "هل أنت متأكد من رغبتك في إلغاء صلاحية {{permission}} من المستخدم {{user}}؟",
+      "revokeWarning": "سيؤدي ذلك إلى إزالة إمكانية وصولهم إلى هذه الوظيفة."
     },
     "contents": {
       "deleteTitle": "حذف الموضوع؟",
@@ -493,6 +511,13 @@
       "editEnglishName": "تعديل الاسم بالإنجليزية",
       "editArabicName": "تعديل الاسم بالعربية",
       "failedToSave": "فشل الحفظ",
+      "unpublish": {
+        "title": "إلغاء نشر الترجمة؟",
+        "unpublishing": "جارٍ إلغاء النشر...",
+        "unpublishBtn": "إلغاء النشر",
+        "prompt": "هل أنت متأكد من رغبتك في إلغاء نشر {{label}}؟",
+        "warning": "لن تعود مرئية للمستخدمين بعد الآن."
+      },
       "listing": {
         "editTitle": "تعديل تفاصيل المحاضرة",
         "newTitle": "تفاصيل محاضرة جديدة",

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./AdminCard.module.css";
 
 export interface AdminCardMetadataItem {
@@ -42,6 +43,7 @@ export function AdminCard({
   onClick,
   className,
 }: AdminCardProps) {
+  const { t } = useTranslation();
   // Track which expandable items are expanded by label
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
 
@@ -120,11 +122,11 @@ export function AdminCard({
                   >
                     {isExpanded ? (
                       <>
-                        <ChevronUp size={14} /> Hide
+                        <ChevronUp size={14} /> {t("common.hide", "Hide")}
                       </>
                     ) : (
                       <>
-                        <ChevronDown size={14} /> View all
+                        <ChevronDown size={14} /> {t("common.viewAll", "View all")}
                       </>
                     )}
                   </button>

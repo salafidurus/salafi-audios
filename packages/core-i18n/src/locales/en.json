@@ -13,7 +13,9 @@
     "save": "Save",
     "add": "Add",
     "english": "English",
-    "arabic": "Arabic (عربي)"
+    "arabic": "Arabic (عربي)",
+    "hide": "Hide",
+    "viewAll": "View all"
   },
   "auth": {
     "signIn": {
@@ -133,6 +135,16 @@
       "followedScholarsDesc": "Notify when a followed scholar posts",
       "newLectures": "New Lectures",
       "newLecturesDesc": "Notify when new lectures are published"
+    },
+    "legal": {
+      "title": "Legal",
+      "privacyPolicy": "Privacy Policy",
+      "privacyDesc": "How we collect and use your data.",
+      "privacySublabel": "Read our full privacy policy, including data collection, storage, and your rights.",
+      "view": "View →",
+      "termsOfUse": "Terms of Use",
+      "termsDesc": "Rules governing use of this service.",
+      "termsSublabel": "Read the terms and conditions governing your use of Salafi Durus."
     }
   },
   "support": {
@@ -192,7 +204,8 @@
     "filterAll": "All",
     "filterAllAria": "Show all items",
     "filterByAria": "Filter by {{label}}",
-    "filterRemoveAria": "Remove {{label}} filter"
+    "filterRemoveAria": "Remove {{label}} filter",
+    "enterQuery": "Enter a search query to begin"
   },
   "library": {
     "title": "My Library",
@@ -460,7 +473,12 @@
         "translations": "Translations Management",
         "media": "Media Management",
         "users": "User Management"
-      }
+      },
+      "revokeTitle": "Revoke Permission?",
+      "revoking": "Revoking…",
+      "revokeButton": "Revoke Permission",
+      "revokePrompt": "Are you sure you want to revoke {{permission}} from {{user}}?",
+      "revokeWarning": "This will remove their access to this functionality."
     },
     "contents": {
       "deleteTitle": "Delete Topic?",
@@ -493,6 +511,13 @@
       "editEnglishName": "Edit English name",
       "editArabicName": "Edit Arabic name",
       "failedToSave": "Failed to save",
+      "unpublish": {
+        "title": "Unpublish Translation?",
+        "unpublishing": "Unpublishing…",
+        "unpublishBtn": "Unpublish",
+        "prompt": "Are you sure you want to unpublish this {{label}}?",
+        "warning": "It will no longer be visible to users."
+      },
       "listing": {
         "editTitle": "Edit Lecture Details",
         "newTitle": "New Lecture Details",
