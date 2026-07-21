@@ -65,6 +65,18 @@ export function PrivacyScreen() {
           </p>
         </section>
 
+        <section id="cookies" className={styles.section}>
+          <h2 className={styles.sectionTitle}>
+            {t("legal.privacy.sections.cookies.title", "Cookies & Tracking Technologies")}
+          </h2>
+          <p className={styles.paragraph}>
+            {t(
+              "legal.privacy.sections.cookies.text",
+              "We use Vexo Analytics, a third-party analytics service, to understand how users interact with our platform and to improve our service. By continuing to use Salafi Durus, you accept our use of tracking cookies and analytics. We do not sell your personal information to third parties. For more details, please see our Cookie Policy.",
+            )}
+          </p>
+        </section>
+
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>
             {t("legal.privacy.sections.contact.title", "Contact")}

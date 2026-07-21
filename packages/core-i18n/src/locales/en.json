@@ -185,7 +185,8 @@
     "copyright": "© {{year}} Salafi Durus",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
-    "support": "Support"
+    "support": "Support",
+    "cookiePolicy": "Cookie Policy"
   },
   "authStrip": {
     "search": "Search",
@@ -327,6 +328,10 @@
           "desktop": "Your data is stored securely using industry-standard encryption. Audio files are served via secure, time-limited URLs. We retain your data only as long as your account is active.",
           "mobile": "Your data is stored securely with industry-standard encryption. We retain your data only while your account is active."
         },
+        "cookies": {
+          "title": "Cookies & Tracking Technologies",
+          "text": "We use Vexo Analytics to track site traffic and performance only. We do not collect personal data through cookies, do not use cookies to personalize content, and do not use cookies for marketing or advertisements. By continuing to use Salafi Durus, you accept our use of tracking cookies. We do not sell your personal information to third parties."
+        },
         "contact": {
           "title": "Contact",
           "desktop": "For privacy-related inquiries, contact us at privacy@salafidurus.com.",
@@ -368,6 +373,11 @@
         }
       }
     }
+  },
+  "cookieConsent": {
+    "message": "We use cookies to track site traffic and performance. We do not collect personal data, do not personalize content from cookies, and do not use cookies for marketing or advertisements. By continuing, you accept our use of tracking cookies.",
+    "accept": "Accept",
+    "policyLink": "Cookie Policy"
   },
   "role": {
     "listener": "Listener",

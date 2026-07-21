@@ -19,8 +19,12 @@ export function Footer() {
       <div className={styles.inner}>
         <span className={styles.meta}>{t("footer.copyright", { year })}</span>
         <div className={styles.links}>
-          <Link href={routes.privacy}>{t("footer.privacy")}</Link>
-          <Link href={routes.termsOfUse}>{t("footer.terms")}</Link>
+          <Link href={routes.privacy} target="_blank" rel="noopener noreferrer">
+            {t("footer.privacy")}
+          </Link>
+          <Link href={routes.termsOfUse} target="_blank" rel="noopener noreferrer">
+            {t("footer.terms")}
+          </Link>
           <Link href={routes.support}>{t("footer.support")}</Link>
         </div>
         <div className={styles.languageSwitchWrapper}>
