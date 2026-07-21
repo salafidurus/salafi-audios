@@ -4,10 +4,11 @@
 
 .sectionTitle {
   margin: var(--space-component-gap-lg) 0 var(--space-component-gap-md);
-  font-size: var(--typo-h3-font-size);
-  font-weight: 600;
+  font-size: calc(var(--typo-h3-font-size) * 1.1);
+  font-weight: 700;
   line-height: var(--typo-h3-line-height);
   color: var(--content-strong);
+  scroll-margin-top: 120px;
 }
 
 .subsectionTitle {
@@ -28,8 +29,8 @@
 
 .paragraph {
   margin: 0 0 var(--space-component-gap-md);
-  font-size: var(--typo-body-md-font-size);
-  line-height: var(--typo-body-md-line-height);
+  font-size: calc(var(--typo-body-md-font-size) * 1.05);
+  line-height: 1.7;
   color: var(--content-default);
 }
 
