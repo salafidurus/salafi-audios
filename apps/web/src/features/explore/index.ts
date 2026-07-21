@@ -1,5 +1,5 @@
 // Components
-export { FeedListRow, type FeedListRowProps } from "./components/feed-list-row/feed-list-row";
+export { FeedListRow, type FeedListRowProps } from "./components/explore-list-row/explore-list-row";
 export {
   FeedScholarRow,
   type FeedScholarRowProps,

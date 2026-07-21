@@ -1,8 +1,3 @@
-.topicItem {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
 
 .topicInfo {
   display: flex;
@@ -20,16 +15,7 @@
   color: var(--content-muted);
 }
 
-.topicActions {
-  display: flex;
-  gap: var(--space-xs);
-}
 
-.listingItem {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
 
 .listingInfo {
   display: flex;
@@ -47,10 +33,6 @@
   color: var(--content-muted);
 }
 
-.listingActions {
-  display: flex;
-  gap: var(--space-xs);
-}
 
 .topicDetails {
   display: flex;
@@ -72,25 +54,3 @@
   color: var(--content-default);
 }
 
-/* Mobile overrides */
-@media (max-width: 640px) {
-  .topicItem {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--space-sm);
-  }
-
-  .topicActions {
-    justify-content: flex-end;
-  }
-
-  .listingItem {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--space-sm);
-  }
-
-  .listingActions {
-    justify-content: flex-end;
-  }
-}

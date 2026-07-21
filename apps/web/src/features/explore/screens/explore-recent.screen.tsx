@@ -7,7 +7,7 @@ import { useExploreRecentScreen } from "@sd/domain-content";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { List } from "@/shared/components/List";
-import { FeedListRow } from "../components/feed-list-row/feed-list-row";
+import { FeedListRow } from "../components/explore-list-row/explore-list-row";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import { FeedTopicRow } from "../components/feed-topic-row/feed-topic-row";
 import { FeedSkeleton } from "../components/feed-skeleton/feed-skeleton";

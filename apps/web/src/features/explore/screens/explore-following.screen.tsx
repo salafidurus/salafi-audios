@@ -10,7 +10,7 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { Button } from "@/shared/components/Button";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
-import { FeedListRow } from "../components/feed-list-row/feed-list-row";
+import { FeedListRow } from "../components/explore-list-row/explore-list-row";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import styles from "./explore-following.screen.module.css";
 
