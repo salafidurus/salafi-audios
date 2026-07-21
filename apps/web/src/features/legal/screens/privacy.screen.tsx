@@ -1,71 +1,60 @@
 "use client";
 
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { LegalPageLayout } from "../components/LegalPageLayout";
 import styles from "./legal-screens.module.css";
 import * as PrivacySections from "../components/PrivacySections";
-
-const PRIVACY_SECTIONS = [
-  { id: "interpretation", title: "Interpretation and Definitions" },
-  { id: "collecting", title: "Collecting and Using Your Personal Data" },
-  { id: "use-of-data", title: "Use of Your Personal Data" },
-  { id: "retention", title: "Retention of Your Personal Data" },
-  { id: "transfer", title: "Transfer of Your Personal Data" },
-  { id: "delete-data", title: "Delete Your Personal Data" },
-  { id: "disclosure", title: "Disclosure of Your Personal Data" },
-  { id: "security", title: "Security of Your Personal Data" },
-  { id: "children", title: "Children's Privacy" },
-  { id: "links", title: "Links to Other Websites" },
-  { id: "changes", title: "Changes to this Privacy Policy" },
-  { id: "contact", title: "Contact Us" },
-];
 
 export function PrivacyScreen() {
   return (
     <ScreenView>
-      <LegalPageLayout
-        title="Privacy Policy"
-        lastUpdated="Last updated: July 21, 2026"
-        introduction="This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the Service and tells You about Your privacy rights and how the law protects You. We use Your Personal Data to provide and improve the Service. By using the Service, You agree to the collection and use of information in accordance with this Privacy Policy."
-        sections={PRIVACY_SECTIONS}
-      >
-        <section id="interpretation">
+      <div className={styles.container}>
+        <h1 className={styles.title}>Privacy Policy</h1>
+        <p className={styles.lastUpdated}>Last updated: July 21, 2026</p>
+        <p className={styles.introduction}>
+          This Privacy Policy describes Our policies and procedures on the collection, use and
+          disclosure of Your information when You use the Service and tells You about Your privacy
+          rights and how the law protects You. We use Your Personal Data to provide and improve the
+          Service. By using the Service, You agree to the collection and use of information in
+          accordance with this Privacy Policy.
+        </p>
+
+        <section id="privacy-interpretation">
           <PrivacySections.InterpretationAndDefinitions />
         </section>
-        <section id="collecting">
+        <section id="privacy-collecting">
           <PrivacySections.CollectingAndUsingData />
         </section>
-        <section id="use-of-data">
+        <section id="privacy-use">
           <PrivacySections.UseOfPersonalData />
         </section>
-        <section id="retention">
+        <section id="privacy-retention">
           <PrivacySections.RetentionOfData />
         </section>
-        <section id="transfer">
+        <section id="privacy-transfer">
           <PrivacySections.TransferOfData />
         </section>
-        <section id="delete-data">
+        <section id="privacy-delete">
           <PrivacySections.DeleteYourData />
         </section>
-        <section id="disclosure">
+        <section id="privacy-disclosure">
           <PrivacySections.DisclosureOfData />
         </section>
-        <section id="security">
+        <section id="privacy-security">
           <PrivacySections.SecurityOfData />
         </section>
-        <section id="children">
+        <section id="privacy-children">
           <PrivacySections.ChildrensPrivacy />
         </section>
-        <section id="links">
+        <section id="privacy-links">
           <PrivacySections.LinksToOtherWebsites />
         </section>
-        <section id="changes">
+        <section id="privacy-changes">
           <PrivacySections.ChangesToPrivacy />
         </section>
-        <section id="contact">
+        <section id="privacy-contact">
           <PrivacySections.ContactUs />
         </section>
-      </LegalPageLayout>
+      </div>
     </ScreenView>
   );
 }

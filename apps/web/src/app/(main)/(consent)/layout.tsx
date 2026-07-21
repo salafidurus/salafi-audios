@@ -14,11 +14,11 @@ export default function ConsentLayout({ children }: { children: React.ReactNode 
       <CookieConsentGate />
       <AnalyticsScripts apiBaseUrl={apiBaseUrl} />
       <div className="appFrame">
-        <div className="appShell">
+        <div className="appConsentShell">
           <Sidebar />
-          <div className="appMain">
+          <div className="appConsentMain">
             <TopSubnavTabs />
-            <div className="appContent">{children}</div>
+            <div className="appConsentContent">{children}</div>
             <MiniPlayer />
             <Footer />
           </div>
