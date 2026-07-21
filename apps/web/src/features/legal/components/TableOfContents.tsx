@@ -47,7 +47,10 @@ export function TableOfContents({ sections }: TableOfContentsProps) {
     const container = document.querySelector(".appNoConsentContent") as HTMLElement;
 
     if (element && container) {
-      const elementTop = element.offsetTop - container.offsetTop;
+      const elementTop =
+        element.getBoundingClientRect().top -
+        container.getBoundingClientRect().top +
+        container.scrollTop;
       container.scrollTo({ top: elementTop, behavior: "smooth" });
       setActiveSection(id);
     }

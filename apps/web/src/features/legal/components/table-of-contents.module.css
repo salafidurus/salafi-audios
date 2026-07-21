@@ -1,13 +1,14 @@
 .nav {
   position: sticky;
-  top: 120px;
-  max-height: calc(100vh - 140px);
+  top: 0;
+  max-height: 100vh;
   overflow-y: auto;
   width: 240px;
-  padding: var(--space-component-gap-lg);
   background-color: var(--surface-canvas);
   border-radius: var(--radius-md);
   border: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
 }
 
 .header {
@@ -16,15 +17,20 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--content-muted);
-  margin-bottom: var(--space-component-gap-md);
-  padding-bottom: var(--space-component-gap-sm);
+  padding: var(--space-component-gap-lg) var(--space-component-gap-lg) var(--space-component-gap-sm);
   border-bottom: 1px solid var(--border-subtle);
+  position: sticky;
+  top: 0;
+  background-color: var(--surface-canvas);
+  flex-shrink: 0;
 }
 
 .list {
   list-style: none;
-  padding: 0;
+  padding: var(--space-component-gap-md) var(--space-component-gap-lg);
   margin: 0;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .link {
