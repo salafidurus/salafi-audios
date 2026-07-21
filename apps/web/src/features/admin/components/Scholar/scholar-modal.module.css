@@ -100,7 +100,7 @@
 .checkbox {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  justify-content: space-between;
   font-size: var(--typo-body-md-font-size);
   color: var(--content-default);
   cursor: pointer;
