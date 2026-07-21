@@ -3,7 +3,7 @@
   align-items: center;
   width: 100%;
   gap: var(--space-component-gap-md, 16px);
-  text-align: left;
+  text-align: start;
   background-color: transparent;
   border: none;
   outline: none;
@@ -120,4 +120,8 @@
 .interactive:hover .chevron {
   color: var(--content-default);
   transform: translateX(2px);
+}
+
+[dir="rtl"] .interactive:hover .chevron {
+  transform: translateX(-2px);
 }

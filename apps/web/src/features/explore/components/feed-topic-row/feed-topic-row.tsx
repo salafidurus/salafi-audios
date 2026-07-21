@@ -14,7 +14,7 @@ const itemButtonStyle: CSSProperties = {
   backgroundColor: "var(--surface-default)",
   cursor: "pointer",
   transition: "box-shadow 0.2s ease",
-  textAlign: "left",
+  textAlign: "start",
 };
 
 export type FeedTopicRowProps = {

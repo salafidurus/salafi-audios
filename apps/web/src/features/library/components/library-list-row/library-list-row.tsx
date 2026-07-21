@@ -2,12 +2,13 @@
 
 import React from "react";
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { LibraryItemDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useFormattedDate } from "@/shared/hooks/use-formatted-date";
+import { useIsRtl } from "@/shared/hooks/use-is-rtl";
 import styles from "./library-list-row.module.css";
 
 export type LibraryListRowProps = {
@@ -18,6 +19,7 @@ export type LibraryListRowProps = {
 export function LibraryListRow({ item, variant }: LibraryListRowProps) {
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
+  const isRtl = useIsRtl();
 
   const title = pickContentField(item.listingTitle, item.originalListingTitle, showOriginal);
   const initial = item.scholarName ? item.scholarName.trim().charAt(0).toUpperCase() : "?";
@@ -90,7 +92,11 @@ export function LibraryListRow({ item, variant }: LibraryListRowProps) {
             {rightLabelText}
           </span>
         )}
-        <ChevronRight className={styles.chevron} size={20} />
+        {isRtl ? (
+          <ChevronLeft className={styles.chevron} size={20} />
+        ) : (
+          <ChevronRight className={styles.chevron} size={20} />
+        )}
       </div>
     </Link>
   );

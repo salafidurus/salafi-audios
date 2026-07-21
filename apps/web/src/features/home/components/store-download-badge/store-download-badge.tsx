@@ -61,10 +61,7 @@ export function StoreDownloadBadge({ store, isAvailable, href }: StoreDownloadBa
         className={styles.badgeImage}
         priority={false}
       />
-      <span
-        className={`${styles.comingSoonBadge} ${isRtl ? styles.comingSoonBadgeRtl : ""}`}
-        data-testid={`coming-soon-badge-${testIdBase}`}
-      >
+      <span className={styles.comingSoonBadge} data-testid={`coming-soon-badge-${testIdBase}`}>
         Coming soon
       </span>
     </button>

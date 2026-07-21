@@ -11,13 +11,13 @@
 /* Desktop/Tablet orientation: horizontal (default) */
 .orientation-horizontal {
   flex-direction: row;
-  margin-left: auto;
+  margin-inline-start: auto;
 }
 
 /* Desktop/Tablet orientation: vertical */
 .orientation-vertical {
   flex-direction: column;
-  margin-left: auto;
+  margin-inline-start: auto;
   gap: var(--space-scale-xs);
 }
 
@@ -25,7 +25,7 @@
 @media (max-width: 640px) {
   .actions {
     width: 100%;
-    margin-left: 0;
+    margin-inline-start: 0;
     margin-top: var(--space-component-gap-sm);
     gap: var(--space-scale-xs);
   }

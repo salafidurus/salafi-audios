@@ -108,7 +108,7 @@
 
 .meta {
   margin-top: var(--space-sm);
-  padding-left: 0;
+  padding-inline-start: 0;
 }
 
 .bio {

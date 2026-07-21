@@ -2,11 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { FolderClosed, BookOpen, Play, ChevronRight } from "lucide-react";
+import { FolderClosed, BookOpen, Play, ChevronLeft, ChevronRight } from "lucide-react";
 import type { ScholarContentItemDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { useIsRtl } from "@/shared/hooks/use-is-rtl";
 import { useScholarTopics, useScholarContent } from "@sd/domain-content";
 import styles from "./scholar-content-list.module.css";
 
@@ -21,6 +22,7 @@ function contentHref(item: ScholarContentItemDto): string {
 function ContentRow({ item }: { item: ScholarContentItemDto }) {
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
+  const isRtl = useIsRtl();
 
   const title = pickContentField(item.title, item.original?.title, showOriginal);
 
@@ -81,7 +83,11 @@ function ContentRow({ item }: { item: ScholarContentItemDto }) {
       </div>
 
       <div className={styles.rightSection}>
-        <ChevronRight size={20} className={styles.chevron} />
+        {isRtl ? (
+          <ChevronLeft size={20} className={styles.chevron} />
+        ) : (
+          <ChevronRight size={20} className={styles.chevron} />
+        )}
       </div>
     </Link>
   );

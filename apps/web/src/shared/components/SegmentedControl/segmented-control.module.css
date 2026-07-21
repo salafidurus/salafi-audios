@@ -36,5 +36,5 @@
 }
 
 .segment + .segment {
-  border-left: var(--border-width-default) solid var(--border-subtle);
+  border-inline-start: var(--border-width-default) solid var(--border-subtle);
 }

@@ -135,8 +135,8 @@
   display: flex;
   gap: var(--space-component-gap-sm);
   align-items: center;
-  padding-left: var(--space-component-gap-md);
-  border-left: 1px solid var(--chrome-border-subtle);
+  padding-inline-start: var(--space-component-gap-md);
+  border-inline-start: 1px solid var(--chrome-border-subtle);
 }
 
 /* Mobile responsive */

@@ -12,10 +12,10 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   flex-shrink: 0;
-  margin-left: calc(-1 * var(--space-layout-page-x));
-  margin-right: calc(-1 * var(--space-layout-page-x));
-  padding-left: var(--space-layout-page-x);
-  padding-right: var(--space-layout-page-x);
+  margin-inline-start: calc(-1 * var(--space-layout-page-x));
+  margin-inline-end: calc(-1 * var(--space-layout-page-x));
+  padding-inline-start: var(--space-layout-page-x);
+  padding-inline-end: var(--space-layout-page-x);
   border-bottom: 1px solid var(--chrome-border);
 }
 

@@ -1,7 +1,7 @@
 .container {
   position: fixed;
   bottom: var(--space-component-gap-md);
-  right: var(--space-component-gap-md);
+  inset-inline-end: var(--space-component-gap-md);
   z-index: 9999;
   display: flex;
   flex-direction: column;
@@ -43,7 +43,7 @@
 
 .closeButton {
   flex-shrink: 0;
-  margin-left: var(--space-component-gap-sm);
+  margin-inline-start: var(--space-component-gap-sm);
   padding: 0;
   background: none;
   border: none;
@@ -125,7 +125,7 @@
 
 @media (max-width: 640px) {
   .container {
-    right: var(--space-component-gap-sm);
+    inset-inline-end: var(--space-component-gap-sm);
   }
 
   .message {

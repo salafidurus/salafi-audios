@@ -8,6 +8,7 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { routes } from "@sd/core-contracts";
 import { PanelLeftOpen, PanelRightOpen } from "lucide-react";
 import { useResponsive } from "@/shared/hooks/use-responsive";
+import { useIsRtl } from "@/shared/hooks/use-is-rtl";
 import { NavItems } from "./nav-items";
 import { SidebarMobile } from "./sidebar.mobile";
 import { useNavigationStore } from "../../store/navigation-store";
@@ -16,6 +17,7 @@ import styles from "./sidebar.module.css";
 export function Sidebar() {
   const { t } = useTranslation();
   const { isMobile, isTablet } = useResponsive();
+  const isRtl = useIsRtl();
   const {
     isDesktopSidebarCollapsed,
     toggleDesktopSidebar,
@@ -67,7 +69,7 @@ export function Sidebar() {
           onClick={onToggle}
           aria-label={collapsed ? t("navigation.expandSidebar") : t("navigation.collapseSidebar")}
         >
-          {collapsed ? <PanelRightOpen size={16} /> : <PanelLeftOpen size={16} />}
+          {collapsed !== isRtl ? <PanelRightOpen size={16} /> : <PanelLeftOpen size={16} />}
         </button>
       </div>
 

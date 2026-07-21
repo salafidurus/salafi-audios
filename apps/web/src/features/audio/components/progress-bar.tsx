@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import styles from "./progress-bar.module.css";
 
 type ProgressBarProps = {
   progressPercent: number;
@@ -15,14 +16,7 @@ export function ProgressBar({ progressPercent, onSeek }: ProgressBarProps) {
   };
 
   return (
-    <div
-      style={{
-        width: "100%",
-        display: "flex",
-        alignItems: "center",
-        padding: "4px 0",
-      }}
-    >
+    <div className={styles.wrapper}>
       <input
         type="range"
         min={0}
@@ -32,14 +26,8 @@ export function ProgressBar({ progressPercent, onSeek }: ProgressBarProps) {
         onChange={handleSeek}
         aria-label="Audio progress"
         disabled={!onSeek}
-        style={{
-          width: "100%",
-          height: 4,
-          borderRadius: 2,
-          cursor: onSeek ? "pointer" : "default",
-          WebkitAppearance: "none",
-          background: `linear-gradient(to right, var(--action-primary) 0%, var(--action-primary) ${progressPercent}%, var(--border-subtle) ${progressPercent}%, var(--border-subtle) 100%)`,
-        }}
+        className={`${styles.range} ${onSeek ? styles.rangeSeekable : styles.rangeDisabled}`}
+        style={{ "--progress-percent": `${progressPercent}%` } as React.CSSProperties}
       />
     </div>
   );
