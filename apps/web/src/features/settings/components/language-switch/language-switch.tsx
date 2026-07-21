@@ -1,5 +1,7 @@
 "use client";
 
+import clsx from "clsx";
+import { Languages } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { SUPPORTED_LOCALES, type Locale } from "@sd/core-i18n";
@@ -20,9 +22,10 @@ const LOCALE_LABELS: Record<Locale, string> = {
 
 interface LanguageSwitchProps {
   direction?: "up" | "down";
+  collapsed?: boolean;
 }
 
-export function LanguageSwitch({ direction = "down" }: LanguageSwitchProps) {
+export function LanguageSwitch({ direction = "down", collapsed = false }: LanguageSwitchProps) {
   const { i18n, t } = useTranslation();
   const { refresh } = useRouter();
   const queryClient = useQueryClient();
@@ -45,9 +48,14 @@ export function LanguageSwitch({ direction = "down" }: LanguageSwitchProps) {
       value={activeLocale}
       onValueChange={handleSelect}
       direction={direction}
-      className={styles.inline}
+      className={clsx(styles.languageSwitch, collapsed && styles.collapsed)}
     >
-      <DropdownTrigger ariaLabel={t("navigation.languageSwitch", "Language")} />
+      <DropdownTrigger
+        ariaLabel={t("navigation.languageSwitch", "Language")}
+        className={styles.trigger}
+      >
+        {collapsed ? <Languages size={18} /> : undefined}
+      </DropdownTrigger>
       <DropdownContent>
         {SUPPORTED_LOCALES.map((locale) => (
           <DropdownItem key={locale} value={locale}>
