@@ -25,25 +25,27 @@ vi.mock("@sd/core-contracts", () => {
           isFetching: false,
         };
       }
-      if (key[0] === "topics") {
-        return {
-          data: [
-            { id: "topic-1", name: "Topic One", slug: "topic-1" },
-            { id: "topic-2", name: "Topic Two", slug: "topic-2" },
-          ],
-          isFetching: false,
-        };
-      }
-      if (key[0] === "series") {
-        return {
-          data: [{ id: "series-1", title: "Series One", scholarId: "scholar-2" }],
-          isFetching: false,
-        };
-      }
       return { data: undefined, isFetching: false };
     }),
   };
 });
+
+vi.mock("@sd/domain-search", () => ({
+  useTopicsList: vi.fn(() => ({
+    data: [
+      { id: "topic-1", name: { en: "Topic One" }, slug: "topic-1" },
+      { id: "topic-2", name: { en: "Topic Two" }, slug: "topic-2" },
+    ],
+    isFetching: false,
+  })),
+}));
+
+vi.mock("@sd/domain-content", () => ({
+  useAdminListingSeriesByScholar: vi.fn(() => ({
+    data: [{ id: "series-1", slug: "series-one", title: "Series One" }],
+    isFetching: false,
+  })),
+}));
 
 describe("ListingModal", () => {
   beforeEach(() => {

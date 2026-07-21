@@ -1,4 +1,14 @@
-import { Body, Controller, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  Req,
+} from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type {
   AdminListingActionDto,
@@ -6,6 +16,7 @@ import type {
   AdminListingListDto,
   AdminListingDetailDto,
   BulkActionResultDto,
+  ListingRefDto,
 } from '@sd/core-contracts';
 import { Permissions } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
@@ -35,6 +46,17 @@ export class AdminListingsController {
       status,
       search,
     });
+  }
+
+  @Get('series')
+  @RequiresPermission(Permissions.LISTINGS_VIEW)
+  @ApiOperation({ summary: 'Get series listings for a scholar (for picker dropdowns)' })
+  @ApiOkResponse({ description: 'List of series-format listings' })
+  async seriesOptions(@Query('scholarId') scholarId?: string): Promise<ListingRefDto[]> {
+    if (!scholarId) {
+      throw new BadRequestException('scholarId query parameter is required');
+    }
+    return this.service.getSeriesOptions(scholarId);
   }
 
   @Get(':id')

@@ -315,6 +315,7 @@ model Listing {
   @@index([title(ops: raw("gin_trgm_ops"))], type: Gin)
   @@index([parentId])
   @@index([scholarId, status])
+  @@index([scholarId, format])
   @@index([publishedAt])
   @@index([deletedAt])
   @@index([deleteAfterAt])

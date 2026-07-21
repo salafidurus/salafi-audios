@@ -3,9 +3,12 @@
  * Ensures type safety when casting dropdown/select values.
  */
 
-// Status type for lectures
-export const LECTURE_STATUS_VALUES = ["draft", "published", "archived"] as const;
-export type LectureStatus = (typeof LECTURE_STATUS_VALUES)[number];
+import { StatusValueSchema, type StatusValue } from "@sd/core-contracts";
+
+// Status type for lectures — sourced from the shared backend contract so the
+// web form can't silently drift out of sync with the API's status enum.
+export const LECTURE_STATUS_VALUES = StatusValueSchema.options;
+export type LectureStatus = StatusValue;
 
 export function isLectureStatus(val: unknown): val is LectureStatus {
   return typeof val === "string" && LECTURE_STATUS_VALUES.includes(val as any);

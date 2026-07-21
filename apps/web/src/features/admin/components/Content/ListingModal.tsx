@@ -4,11 +4,13 @@ import React, { useReducer } from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import type {
   ScholarListItemDto,
-  TopicRefDto,
-  AdminListingListItemDto,
+  TopicDetailDto,
+  ListingRefDto,
   AdminListingDetailDto,
 } from "@sd/core-contracts";
-import { validateLectureStatus } from "@/shared/types/form-types";
+import { useTopicsList } from "@sd/domain-search";
+import { useAdminListingSeriesByScholar } from "@sd/domain-content";
+import { validateLectureStatus, type LectureStatus } from "@/shared/types/form-types";
 import { createLecture, updateLecture } from "../../api/admin-lectures.api";
 import { Modal } from "@/shared/components/Modal";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -41,7 +43,7 @@ type FormState = {
   description: string;
   scholarId: string;
   seriesId: string;
-  status: "draft" | "published" | "archived";
+  status: LectureStatus;
   orderIndex: number;
   selectedTopics: string[];
   saving: boolean;
@@ -63,7 +65,7 @@ function initFormState(
       description: listing.description || "",
       scholarId: listing.scholarId,
       seriesId: listing.parentId || "",
-      status: listing.status as "draft" | "published" | "archived",
+      status: validateLectureStatus(listing.status),
       orderIndex: listing.orderIndex || 0,
       selectedTopics: listing.topics || [],
       saving: false,
@@ -88,8 +90,8 @@ interface ListingFormProps {
   state: FormState;
   dispatch: React.Dispatch<Partial<FormState>>;
   scholars: ScholarListItemDto[];
-  topics: TopicRefDto[];
-  series: AdminListingListItemDto[];
+  topics: TopicDetailDto[];
+  series: ListingRefDto[];
   listing?: AdminListingDetailDto | null;
   handleTitleChange: (val: string) => void;
   handleTopicToggle: (topicId: string) => void;
@@ -231,6 +233,9 @@ function ListingForm({
               <DropdownItem value="draft">
                 {t("admin.contents.listing.draft", "Draft")}
               </DropdownItem>
+              <DropdownItem value="review">
+                {t("admin.contents.listing.review", "In Review")}
+              </DropdownItem>
               <DropdownItem value="published">
                 {t("admin.contents.listing.published", "Published")}
               </DropdownItem>
@@ -250,7 +255,11 @@ function ListingForm({
             type="number"
             className={styles.input}
             value={orderIndex}
-            onChange={(e) => dispatch({ orderIndex: Number(e.target.value) })}
+            onChange={(e) => {
+              const value = e.target.value;
+              const parsed = value ? Number(value) : undefined;
+              dispatch({ orderIndex: Number.isNaN(parsed) ? 0 : (parsed ?? 0) });
+            }}
           />
         </div>
       </div>
@@ -267,7 +276,7 @@ function ListingForm({
                 className={styles.checkbox}
                 disabled={!!listing}
               />
-              <span>{tItem.name}</span>
+              <span>{tItem.name.en}</span>
             </label>
           ))}
           {topics.length === 0 && (
@@ -318,20 +327,9 @@ export function ListingModal({
       }),
   );
 
-  const { data: topicsData } = useApiQuery<TopicRefDto[]>(queryKeys.topics.list(), () =>
-    httpClient<TopicRefDto[]>({ url: endpoints.topics.list, method: "GET" }),
-  );
+  const { data: topicsData } = useTopicsList();
 
-  const { data: seriesData } = useApiQuery<AdminListingListItemDto[]>(
-    ["series", "list", scholarId],
-    () =>
-      scholarId
-        ? httpClient<AdminListingListItemDto[]>({
-            url: `${endpoints.admin.listings.list}?scholarId=${scholarId}&format=series`,
-            method: "GET",
-          })
-        : Promise.resolve([]),
-  );
+  const { data: seriesData } = useAdminListingSeriesByScholar(scholarId);
 
   const handleTitleChange = (val: string) => {
     if (!listing) {
