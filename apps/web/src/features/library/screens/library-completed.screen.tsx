@@ -39,19 +39,20 @@ export function LibraryCompletedScreen() {
           <PageHeader title={t("library.completed", "Completed")} />
         </StickyHeaderLayout.Header>
         <StickyHeaderLayout.Content>
-        <InfiniteScrollList
-          data={allItems}
-          isLoading={isLoading}
-          hasMore={hasNextPage ?? false}
-          onLoadMore={() => fetchNextPage()}
-          isFetchingNextPage={isFetchingNextPage}
-          renderItem={(item) => <LibraryListRow item={item} variant="completed" />}
-          emptyMessage={t(
-            "library.emptyCompleted",
-            "No completed lectures yet. Finish lectures to track your learning.",
-          )}
-        />
-      </section>
+          <InfiniteScrollList
+            data={allItems}
+            isLoading={isLoading}
+            hasMore={hasNextPage ?? false}
+            onLoadMore={() => fetchNextPage()}
+            isFetchingNextPage={isFetchingNextPage}
+            renderItem={(item) => <LibraryListRow item={item} variant="completed" />}
+            emptyMessage={t(
+              "library.emptyCompleted",
+              "No completed lectures yet. Finish lectures to track your learning.",
+            )}
+          />
+        </StickyHeaderLayout.Content>
+      </StickyHeaderLayout>
       <ScrollToTopButton />
     </ScreenView>
   );

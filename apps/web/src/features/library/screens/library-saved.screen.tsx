@@ -10,7 +10,6 @@ import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { LibraryListRow } from "@/features/library/components/library-list-row/library-list-row";
-import styles from "./library-screens.module.css";
 
 export function LibrarySavedScreen() {
   const { isAuthenticated } = useAuth();

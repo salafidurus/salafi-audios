@@ -89,10 +89,11 @@ export function FeedFollowingScreen({
             <PageHeader title={followingTitle} />
           </StickyHeaderLayout.Header>
           <StickyHeaderLayout.Content>
-          <div className={styles.loading}>
-            {t("explore.loadingFollowing", "Loading followed scholars…")}
-          </div>
-        </section>
+            <div className={styles.loading}>
+              {t("explore.loadingFollowing", "Loading followed scholars…")}
+            </div>
+          </StickyHeaderLayout.Content>
+        </StickyHeaderLayout>
         <ScrollToTopButton />
       </ScreenView>
     );
@@ -106,10 +107,11 @@ export function FeedFollowingScreen({
             <PageHeader title={followingTitle} />
           </StickyHeaderLayout.Header>
           <StickyHeaderLayout.Content>
-          <div className={styles.empty}>
-            {t("explore.followToSee", "Follow scholars to see their latest lectures here.")}
-          </div>
-        </section>
+            <div className={styles.empty}>
+              {t("explore.followToSee", "Follow scholars to see their latest lectures here.")}
+            </div>
+          </StickyHeaderLayout.Content>
+        </StickyHeaderLayout>
         <ScrollToTopButton />
       </ScreenView>
     );

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Plus } from "lucide-react";
 import {
@@ -101,13 +100,10 @@ export function AdminContentsScreen() {
               <TopicsContent
                 searchQuery={searchQuery}
                 debouncedSearch={debouncedSearch}
-                isMobile={isMobile}
                 topics={topics}
               />
             )}
-            {activeTab === "listings" && (
-              <ListingsContent debouncedSearch={debouncedSearch} isMobile={isMobile} />
-            )}
+            {activeTab === "listings" && <ListingsContent debouncedSearch={debouncedSearch} />}
           </StickyHeaderLayout.Content>
         </StickyHeaderLayout>
       </div>

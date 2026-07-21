@@ -20,10 +20,9 @@ type AudioData = {
 
 export type ListingsContentProps = {
   debouncedSearch: string;
-  isMobile: boolean;
 };
 
-export function ListingsContent({ debouncedSearch, isMobile }: ListingsContentProps) {
+export function ListingsContent({ debouncedSearch }: ListingsContentProps) {
   const { t } = useTranslation();
   const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useInfiniteAdminListings({

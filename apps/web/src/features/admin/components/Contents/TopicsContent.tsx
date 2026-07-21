@@ -15,16 +15,10 @@ import styles from "../../screens/admin-contents/admin-contents.screen.module.cs
 export type TopicsContentProps = {
   searchQuery: string;
   debouncedSearch: string;
-  isMobile: boolean;
   topics: TopicDetailDto[];
 };
 
-export function TopicsContent({
-  searchQuery,
-  debouncedSearch,
-  isMobile,
-  topics,
-}: TopicsContentProps) {
+export function TopicsContent({ searchQuery, debouncedSearch, topics }: TopicsContentProps) {
   const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTopic, setEditingTopic] = useState<TopicForEdit | null>(null);
