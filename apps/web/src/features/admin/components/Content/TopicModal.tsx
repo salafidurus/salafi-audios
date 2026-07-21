@@ -7,6 +7,7 @@ import { Button } from "@/shared/components/Button";
 import { EditableInput } from "@/shared/components/EditableInput";
 import { useContentTranslations } from "@sd/domain-content";
 import type { UpsertTopicDto } from "@sd/core-contracts";
+import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./topic-modal.module.css";
 
 export interface TopicForEdit {
@@ -122,7 +123,7 @@ function formReducer(state: FormState, action: FormAction): FormState {
           };
         } else if (action.fieldName === "translation-ar-name") {
           const originalArabicName =
-            action.translations.find((t) => t.locale === "ar")?.fields.name ?? "";
+            action.translations.find((t: any) => t.locale === "ar")?.fields.name ?? "";
           next.delete(action.fieldName);
           return {
             ...state,
@@ -170,6 +171,7 @@ function getInitialFormData(topic: TopicForEdit | null): UpsertTopicDto {
 }
 
 export function TopicModal({ isOpen, onClose, onSave, topic }: TopicModalProps) {
+  const { t } = useTranslation();
   const isEditing = !!topic;
   const isNewTopic = !isEditing;
 
@@ -240,7 +242,10 @@ export function TopicModal({ isOpen, onClose, onSave, topic }: TopicModalProps) 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.en.trim() || !formData.slug.trim()) {
-      dispatch({ type: "SET_ERROR", error: "Name and slug are required" });
+      dispatch({
+        type: "SET_ERROR",
+        error: t("admin.scholars.nameSlugRequired", "Name and slug are required"),
+      });
       return;
     }
 
@@ -256,7 +261,8 @@ export function TopicModal({ isOpen, onClose, onSave, topic }: TopicModalProps) 
     } catch (err) {
       dispatch({
         type: "SET_ERROR",
-        error: err instanceof Error ? err.message : "Failed to save",
+        error:
+          err instanceof Error ? err.message : t("admin.contents.failedToSave", "Failed to save"),
       });
     } finally {
       dispatch({ type: "SET_SAVING", saving: false });
@@ -267,15 +273,19 @@ export function TopicModal({ isOpen, onClose, onSave, topic }: TopicModalProps) 
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? "Edit Topic" : "Add Topic"}
+      title={
+        isEditing
+          ? t("admin.contents.editTopic", "Edit Topic")
+          : t("admin.contents.addTopic", "Add Topic")
+      }
       size="md"
       footer={
         <>
           <Button type="button" variant="ghost" onClick={onClose} disabled={saving}>
-            Cancel
+            {t("common.cancel", "Cancel")}
           </Button>
           <Button type="submit" variant="primary" loading={saving} form="topic-form">
-            Done
+            {t("admin.permissions.done", "Done")}
           </Button>
         </>
       }
@@ -285,13 +295,13 @@ export function TopicModal({ isOpen, onClose, onSave, topic }: TopicModalProps) 
 
         <div className={styles.field}>
           <label htmlFor="topic-slug" className={styles.label}>
-            Slug *
+            {t("admin.contents.slugLabel", "Slug *")}
           </label>
           <EditableInput
             id="topic-slug"
             value={formData.slug}
             onChange={(value) => dispatch({ type: "UPDATE_FORM_FIELD", field: "slug", value })}
-            placeholder="topic-slug"
+            placeholder={t("admin.contents.slugPlaceholder", "topic-slug")}
             disabled={isEditing && !isFieldEditing("slug")}
             rightButton={
               isEditing && (
@@ -299,7 +309,11 @@ export function TopicModal({ isOpen, onClose, onSave, topic }: TopicModalProps) 
                   type="button"
                   className={styles.editIconButton}
                   onClick={() => toggleFieldEdit("slug")}
-                  aria-label={isFieldEditing("slug") ? "Cancel edit" : "Edit slug"}
+                  aria-label={
+                    isFieldEditing("slug")
+                      ? t("admin.contents.cancelEdit", "Cancel edit")
+                      : t("admin.contents.editSlug", "Edit slug")
+                  }
                 >
                   {isFieldEditing("slug") ? <RotateCcw size={16} /> : <Edit2 size={16} />}
                 </button>
@@ -310,13 +324,13 @@ export function TopicModal({ isOpen, onClose, onSave, topic }: TopicModalProps) 
 
         <div className={styles.field}>
           <label htmlFor="topic-name-en" className={styles.label}>
-            English Name *
+            {t("admin.contents.englishNameLabel", "English Name *")}
           </label>
           <EditableInput
             id="topic-name-en"
             value={formData.name.en}
             onChange={handleNameChange}
-            placeholder="Topic name in English"
+            placeholder={t("admin.contents.englishNamePlaceholder", "Topic name in English")}
             disabled={isEditing && !isFieldEditing("name")}
             rightButton={
               isEditing && (
@@ -324,7 +338,11 @@ export function TopicModal({ isOpen, onClose, onSave, topic }: TopicModalProps) 
                   type="button"
                   className={styles.editIconButton}
                   onClick={() => toggleFieldEdit("name")}
-                  aria-label={isFieldEditing("name") ? "Cancel edit" : "Edit English name"}
+                  aria-label={
+                    isFieldEditing("name")
+                      ? t("admin.contents.cancelEdit", "Cancel edit")
+                      : t("admin.contents.editEnglishName", "Edit English name")
+                  }
                 >
                   {isFieldEditing("name") ? <RotateCcw size={16} /> : <Edit2 size={16} />}
                 </button>
@@ -336,25 +354,28 @@ export function TopicModal({ isOpen, onClose, onSave, topic }: TopicModalProps) 
         {isNewTopic ? (
           <div className={styles.field}>
             <label htmlFor="topic-name-ar" className={styles.label}>
-              Arabic Name
+              {t("admin.contents.arabicNameLabel", "Arabic Name")}
             </label>
             <EditableInput
               id="topic-name-ar"
               value={formData.name.ar ?? ""}
               onChange={(value) => dispatch({ type: "UPDATE_NAME_AR", value })}
-              placeholder="Topic name in Arabic (optional)"
+              placeholder={t(
+                "admin.contents.arabicNamePlaceholderOptional",
+                "Topic name in Arabic (optional)",
+              )}
             />
           </div>
         ) : (
           <div className={styles.field}>
             <label htmlFor="topic-name-ar" className={styles.label}>
-              Arabic Name
+              {t("admin.contents.arabicNameLabel", "Arabic Name")}
             </label>
             <EditableInput
               id="topic-name-ar"
               value={translationChanges.ar?.name ?? ""}
               onChange={(value) => handleTranslationNameChange("ar", value)}
-              placeholder="Topic name in Arabic"
+              placeholder={t("admin.contents.arabicNamePlaceholder", "Topic name in Arabic")}
               disabled={!isFieldEditing("translation-ar-name")}
               rightButton={
                 <button
@@ -362,7 +383,9 @@ export function TopicModal({ isOpen, onClose, onSave, topic }: TopicModalProps) 
                   className={styles.editIconButton}
                   onClick={() => toggleFieldEdit("translation-ar-name")}
                   aria-label={
-                    isFieldEditing("translation-ar-name") ? "Cancel edit" : "Edit Arabic name"
+                    isFieldEditing("translation-ar-name")
+                      ? t("admin.contents.cancelEdit", "Cancel edit")
+                      : t("admin.contents.editArabicName", "Edit Arabic name")
                   }
                 >
                   {isFieldEditing("translation-ar-name") ? (
@@ -373,13 +396,13 @@ export function TopicModal({ isOpen, onClose, onSave, topic }: TopicModalProps) 
                 </button>
               }
             />
-            {translations.find((t) => t.locale === "ar") && (
+            {translations.find((t: any) => t.locale === "ar") && (
               <div className={styles.translationStatus}>
-                Status:{" "}
+                {t("admin.contents.statusLabel", "Status:")}{" "}
                 <span
-                  className={`${styles.statusBadge} ${styles[`status-${translations.find((t) => t.locale === "ar")?.status}`]}`}
+                  className={`${styles.statusBadge} ${styles[`status-${translations.find((t: any) => t.locale === "ar")?.status}`]}`}
                 >
-                  {translations.find((t) => t.locale === "ar")?.status}
+                  {translations.find((t: any) => t.locale === "ar")?.status}
                 </span>
               </div>
             )}

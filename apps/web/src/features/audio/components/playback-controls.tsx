@@ -4,6 +4,7 @@ import React, { type CSSProperties } from "react";
 import { useAudio } from "@sd/domain-audio";
 import { audioService } from "../index";
 import { Play, Pause, RotateCw, RotateCcw } from "lucide-react";
+import { useTranslation } from "@/core/i18n/use-translation";
 
 const outerStyle: CSSProperties = { display: "flex", alignItems: "center", gap: 16 };
 
@@ -43,6 +44,7 @@ const skipLabelStyle: CSSProperties = {
 
 export function PlaybackControls() {
   const { isPlaying, isLoading, speed, positionSeconds, durationSeconds, hasTrack } = useAudio();
+  const { t } = useTranslation();
 
   const handlePlayPause = () => {
     if (isPlaying) {
@@ -92,7 +94,7 @@ export function PlaybackControls() {
         type="button"
         onClick={handleCycleSpeed}
         style={speedButtonStyle}
-        title="Playback Speed"
+        title={t("audio.playbackSpeed", "Playback Speed")}
       >
         {speed.toFixed(2)}x
       </button>
@@ -102,7 +104,7 @@ export function PlaybackControls() {
           type="button"
           onClick={handleSkipBackward}
           style={skipButtonStyle}
-          aria-label="Skip backward 30 seconds"
+          aria-label={t("audio.skipBackward", "Skip backward 30 seconds")}
         >
           <RotateCcw size={22} />
           <span style={skipLabelStyle}>30</span>
@@ -113,7 +115,7 @@ export function PlaybackControls() {
           onClick={handlePlayPause}
           disabled={isLoading}
           style={playButtonStyle}
-          aria-label={isPlaying ? "Pause" : "Play"}
+          aria-label={isPlaying ? t("audio.pause", "Pause") : t("audio.play", "Play")}
         >
           {isLoading ? (
             <span style={{ fontSize: 12 }}>…</span>
@@ -128,7 +130,7 @@ export function PlaybackControls() {
           type="button"
           onClick={handleSkipForward}
           style={skipButtonStyle}
-          aria-label="Skip forward 30 seconds"
+          aria-label={t("audio.skipForward", "Skip forward 30 seconds")}
         >
           <RotateCw size={22} />
           <span style={skipLabelStyle}>30</span>

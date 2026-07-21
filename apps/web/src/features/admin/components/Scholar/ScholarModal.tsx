@@ -5,6 +5,7 @@ import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button";
 import type { CreateScholarDto } from "@sd/core-contracts";
 import { sanitizeError } from "@sd/utils-error";
+import { useTranslation } from "@/core/i18n/use-translation";
 import { BasicInfoSection } from "./basic-info-section";
 import { LocationSection } from "./location-section";
 import { SocialSection } from "./social-section";
@@ -123,6 +124,7 @@ const initialFormState: FormState = {
 };
 
 export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalProps) {
+  const { t } = useTranslation();
   const isEditing = !!scholar;
 
   const [state, dispatch] = useReducer(formReducer, initialFormState);
@@ -137,7 +139,10 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.slug.trim()) {
-      dispatch({ type: "SET_ERROR", error: "Name and slug are required" });
+      dispatch({
+        type: "SET_ERROR",
+        error: t("admin.scholars.nameSlugRequired", "Name and slug are required"),
+      });
       return;
     }
     dispatch({ type: "SET_SAVING", saving: true });
@@ -156,16 +161,22 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? "Edit Scholar" : "Add Scholar"}
+      title={
+        isEditing
+          ? t("admin.scholars.editScholar", "Edit Scholar")
+          : t("admin.scholars.addScholar", "Add Scholar")
+      }
       size="xl"
       width="80rem"
       footer={
         <>
           <Button type="button" variant="ghost" onClick={onClose} disabled={saving}>
-            Cancel
+            {t("common.cancel", "Cancel")}
           </Button>
           <Button type="submit" variant="primary" loading={saving} form="scholar-form">
-            {isEditing ? "Save Changes" : "Add Scholar"}
+            {isEditing
+              ? t("admin.scholars.saveChanges", "Save Changes")
+              : t("admin.scholars.addScholar", "Add Scholar")}
           </Button>
         </>
       }

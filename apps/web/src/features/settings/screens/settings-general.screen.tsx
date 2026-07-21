@@ -10,12 +10,7 @@ import { SegmentedControl } from "@/shared/components/SegmentedControl/Segmented
 import { Toggle } from "@/shared/components/Toggle";
 import type { ThemePreference } from "@/core/styles/ThemeSync";
 import { THEME_KEY, THEME_CHANGE_EVENT } from "@/core/styles/ThemeSync";
-
-const THEME_OPTIONS: { value: ThemePreference; label: string }[] = [
-  { value: "system", label: "System" },
-  { value: "light", label: "Light" },
-  { value: "dark", label: "Dark" },
-];
+import { useTranslation } from "@/core/i18n/use-translation";
 
 interface NotificationState {
   master: boolean;
@@ -52,8 +47,15 @@ function loadThemePreference(): ThemePreference {
 }
 
 export function SettingsGeneralScreen() {
+  const { t } = useTranslation();
   const [themePreference, setThemePreference] = useState<ThemePreference>(loadThemePreference);
   const [notif, setNotif] = useState<NotificationState>(loadNotifState);
+
+  const themeOptions: { value: ThemePreference; label: string }[] = [
+    { value: "system", label: t("settings.general.themeOptions.system", "System") },
+    { value: "light", label: t("settings.general.themeOptions.light", "Light") },
+    { value: "dark", label: t("settings.general.themeOptions.dark", "Dark") },
+  ];
 
   const handleThemeChange = useCallback((value: ThemePreference) => {
     setThemePreference(value);
@@ -79,50 +81,83 @@ export function SettingsGeneralScreen() {
 
   return (
     <ScreenView>
-      <PageHeader title="Settings" />
+      <PageHeader title={t("settings.general.title", "Settings")} />
 
-      <SettingsSection title="Language" description="Configure app and content language.">
-        <SettingsRow label="App Language" sublabel="Interface language for the app">
+      <SettingsSection
+        title={t("settings.general.languageSection", "Language")}
+        description={t("settings.general.languageDesc", "Configure app and content language.")}
+      >
+        <SettingsRow
+          label={t("settings.general.appLanguage", "App Language")}
+          sublabel={t("settings.general.appLanguageDesc", "Interface language for the app")}
+        >
           <LanguageSwitch />
         </SettingsRow>
-        <SettingsRow label="Content Language" sublabel="Preferred translation language">
+        <SettingsRow
+          label={t("settings.general.contentLanguage", "Content Language")}
+          sublabel={t("settings.general.contentLanguageDesc", "Preferred translation language")}
+        >
           <ContentLanguageToggle />
         </SettingsRow>
       </SettingsSection>
 
-      <SettingsSection title="Display" description="Choose a theme for the interface.">
-        <SettingsRow label="Theme" sublabel="System follows your OS preference">
+      <SettingsSection
+        title={t("settings.general.displaySection", "Display")}
+        description={t("settings.general.displayDesc", "Choose a theme for the interface.")}
+      >
+        <SettingsRow
+          label={t("settings.general.theme", "Theme")}
+          sublabel={t("settings.general.themeDesc", "System follows your OS preference")}
+        >
           <SegmentedControl
-            options={THEME_OPTIONS}
+            options={themeOptions}
             value={themePreference}
             onChange={handleThemeChange}
-            ariaLabel="Theme preference"
+            ariaLabel={t("settings.general.themeAria", "Theme preference")}
           />
         </SettingsRow>
       </SettingsSection>
 
-      <SettingsSection title="Notifications" description="Manage what notifications you receive.">
-        <SettingsRow label="Enable Notifications" sublabel="Master toggle for all notifications">
+      <SettingsSection
+        title={t("settings.general.notifSection", "Notifications")}
+        description={t("settings.general.notifDesc", "Manage what notifications you receive.")}
+      >
+        <SettingsRow
+          label={t("settings.general.enableNotif", "Enable Notifications")}
+          sublabel={t("settings.general.enableNotifDesc", "Master toggle for all notifications")}
+        >
           <Toggle
             checked={notif.master}
             onChange={handleNotifChange("master")}
-            aria-label="Enable Notifications"
+            aria-label={t("settings.general.enableNotif", "Enable Notifications")}
           />
         </SettingsRow>
         {notif.master && (
           <>
-            <SettingsRow label="Followed Scholars" sublabel="Notify when a followed scholar posts">
+            <SettingsRow
+              label={t("settings.general.followedScholars", "Followed Scholars")}
+              sublabel={t(
+                "settings.general.followedScholarsDesc",
+                "Notify when a followed scholar posts",
+              )}
+            >
               <Toggle
                 checked={notif.scholars}
                 onChange={handleNotifChange("scholars")}
-                aria-label="Notify for Followed Scholars"
+                aria-label={t("settings.general.followedScholars", "Notify for Followed Scholars")}
               />
             </SettingsRow>
-            <SettingsRow label="New Lectures" sublabel="Notify when new lectures are published">
+            <SettingsRow
+              label={t("settings.general.newLectures", "New Lectures")}
+              sublabel={t(
+                "settings.general.newLecturesDesc",
+                "Notify when new lectures are published",
+              )}
+            >
               <Toggle
                 checked={notif.lectures}
                 onChange={handleNotifChange("lectures")}
-                aria-label="Notify for New Lectures"
+                aria-label={t("settings.general.newLectures", "Notify for New Lectures")}
               />
             </SettingsRow>
           </>

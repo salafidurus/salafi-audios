@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useReducer, useState, type ReactNode } from "react";
+import { useEffect, useReducer, useState, type ReactNode, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import {
   queryKeys,
@@ -16,6 +16,7 @@ import {
 } from "@/features/admin/api/admin.api";
 import { Modal } from "@/shared/components/Modal/Modal";
 import { Button } from "@/shared/components/Button";
+import { useTranslation } from "@/core/i18n/use-translation";
 import { PermissionSection } from "./PermissionSection";
 import styles from "./PermissionsDialog.module.css";
 
@@ -70,63 +71,6 @@ const initialState: State = {
   errors: {},
 };
 
-const SECTIONS = [
-  {
-    title: "Scholars Management",
-    permissions: [
-      "SCHOLARS_VIEW",
-      "SCHOLARS_CREATE",
-      "SCHOLARS_EDIT",
-      "SCHOLARS_DELETE",
-      "SCHOLARS_PUBLISH",
-    ] as Permission[],
-  },
-  {
-    title: "Listings Management",
-    permissions: [
-      "LISTINGS_VIEW",
-      "LISTINGS_CREATE",
-      "LISTINGS_EDIT",
-      "LISTINGS_DELETE",
-      "LISTINGS_PUBLISH",
-    ] as Permission[],
-  },
-  {
-    title: "Topics Management",
-    permissions: [
-      "TOPICS_VIEW",
-      "TOPICS_CREATE",
-      "TOPICS_EDIT",
-      "TOPICS_DELETE",
-      "TOPICS_PUBLISH",
-    ] as Permission[],
-  },
-  {
-    title: "Translations Management",
-    permissions: [
-      "TRANSLATIONS_VIEW",
-      "TRANSLATIONS_CREATE",
-      "TRANSLATIONS_EDIT",
-      "TRANSLATIONS_DELETE",
-      "TRANSLATIONS_PUBLISH",
-    ] as Permission[],
-  },
-  {
-    title: "Media Management",
-    permissions: ["MEDIA_UPLOAD", "MEDIA_DELETE"] as Permission[],
-  },
-  {
-    title: "User Management",
-    permissions: [
-      "USERS_VIEW",
-      "USERS_EDIT",
-      "USERS_DELETE",
-      "USERS_GRANT_PERMISSIONS",
-      "USERS_GRANT_ROLES",
-    ] as Permission[],
-  },
-];
-
 export function PermissionsDialog({
   isOpen,
   onClose,
@@ -135,11 +79,72 @@ export function PermissionsDialog({
   userName = userId,
 }: PermissionsDialogProps): ReactNode {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const [state, dispatch] = useReducer(reducer, initialState);
   const [pendingPermissions, setPendingPermissions] = useState<Set<Permission>>(new Set());
   const [saving, setSaving] = useState(false);
 
   const currentPermissions = state.userPerms?.permissions.map((p) => p.permission) ?? [];
+
+  const sections = useMemo(
+    () => [
+      {
+        title: t("admin.permissions.sections.scholars", "Scholars Management"),
+        permissions: [
+          "SCHOLARS_VIEW",
+          "SCHOLARS_CREATE",
+          "SCHOLARS_EDIT",
+          "SCHOLARS_DELETE",
+          "SCHOLARS_PUBLISH",
+        ] as Permission[],
+      },
+      {
+        title: t("admin.permissions.sections.listings", "Listings Management"),
+        permissions: [
+          "LISTINGS_VIEW",
+          "LISTINGS_CREATE",
+          "LISTINGS_EDIT",
+          "LISTINGS_DELETE",
+          "LISTINGS_PUBLISH",
+        ] as Permission[],
+      },
+      {
+        title: t("admin.permissions.sections.topics", "Topics Management"),
+        permissions: [
+          "TOPICS_VIEW",
+          "TOPICS_CREATE",
+          "TOPICS_EDIT",
+          "TOPICS_DELETE",
+          "TOPICS_PUBLISH",
+        ] as Permission[],
+      },
+      {
+        title: t("admin.permissions.sections.translations", "Translations Management"),
+        permissions: [
+          "TRANSLATIONS_VIEW",
+          "TRANSLATIONS_CREATE",
+          "TRANSLATIONS_EDIT",
+          "TRANSLATIONS_DELETE",
+          "TRANSLATIONS_PUBLISH",
+        ] as Permission[],
+      },
+      {
+        title: t("admin.permissions.sections.media", "Media Management"),
+        permissions: ["MEDIA_UPLOAD", "MEDIA_DELETE"] as Permission[],
+      },
+      {
+        title: t("admin.permissions.sections.users", "User Management"),
+        permissions: [
+          "USERS_VIEW",
+          "USERS_EDIT",
+          "USERS_DELETE",
+          "USERS_GRANT_PERMISSIONS",
+          "USERS_GRANT_ROLES",
+        ] as Permission[],
+      },
+    ],
+    [t],
+  );
 
   useEffect(() => {
     if (!isOpen) {
@@ -237,7 +242,9 @@ export function PermissionsDialog({
   }
   const customTitle = (
     <div className={styles.titleContainer}>
-      <span className={styles.titleMain}>Manage Permissions</span>
+      <span className={styles.titleMain}>
+        {t("admin.permissions.managePermissions", "Manage Permissions")}
+      </span>
       <span className={styles.titleSub}>{userName}</span>
     </div>
   );
@@ -250,15 +257,17 @@ export function PermissionsDialog({
       title={customTitle as any}
       footer={
         <Button variant="primary" onClick={handleDone} disabled={saving}>
-          {saving ? "Saving…" : "Done"}
+          {saving ? t("admin.permissions.saving", "Saving…") : t("admin.permissions.done", "Done")}
         </Button>
       }
     >
       {state.loading && !state.userPerms ? (
-        <div className={styles.loading}>Loading permissions…</div>
+        <div className={styles.loading}>
+          {t("admin.permissions.loading", "Loading permissions…")}
+        </div>
       ) : (
         <div className={styles.sectionsGrid}>
-          {SECTIONS.map((section) => (
+          {sections.map((section) => (
             <PermissionSection
               key={section.title}
               title={section.title}

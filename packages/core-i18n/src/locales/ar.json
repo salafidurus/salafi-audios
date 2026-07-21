@@ -7,7 +7,15 @@
     "name": "الاسم",
     "termsOfService": "شروط الخدمة",
     "privacyPolicy": "سياسة الخصوصية",
-    "and": "و"
+    "and": "و",
+    "comingSoon": "قريبًا",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "add": "إضافة",
+    "english": "الإنجليزية",
+    "arabic": "العربية (عربي)",
+    "hide": "إخفاء",
+    "viewAll": "عرض الكل"
   },
   "auth": {
     "signIn": {
@@ -33,7 +41,38 @@
     "legal": "الشؤون القانونية",
     "signOut": "تسجيل الخروج",
     "language": "اللغة",
-    "showOriginalContent": "عرض المحتوى بلغته الأصلية"
+    "showOriginalContent": "عرض المحتوى بلغته الأصلية",
+    "profile": {
+      "title": "الملف الشخصي",
+      "loading": "جارٍ تحميل الملف الشخصي...",
+      "loadError": "فشل تحميل الملف الشخصي",
+      "notAvailable": "الملف الشخصي غير متاح.",
+      "displayName": "الاسم المستعار",
+      "displayNameSublabel": "يظهر في جميع أنحاء التطبيق",
+      "displayNamePlaceholder": "اسمك المستعار",
+      "displayNameAria": "الاسم المستعار",
+      "edit": "تعديل",
+      "cancel": "إلغاء",
+      "saving": "جارٍ الحفظ...",
+      "save": "حفظ",
+      "email": "البريد الإلكتروني",
+      "displayNameSaved": "تم حفظ الاسم المستعار.",
+      "displayNameSaveFailed": "فشل الحفظ. يرجى المحاولة مرة أخرى.",
+      "emailVerified": "التحقق من البريد الإلكتروني",
+      "verified": "تم التحقق",
+      "unverified": "غير متحقق منه",
+      "deleting": "جارٍ الحذف...",
+      "deleteAccount": "حذف الحساب",
+      "signOutTitle": "تسجيل الخروج؟",
+      "signOutConfirm": "تسجيل الخروج",
+      "signOutPrompt": "هل أنت متأكد من رغبتك في تسجيل الخروج؟",
+      "deleteAccountConfirm": "حذف الحساب",
+      "deleteAccountPrompt": "هذا الإجراء دائم ولا يمكن التراجع عنه. سيتم حذف جميع بياناتك.",
+      "deleteConfirmWord": "حذف",
+      "signInCta": "سجّل الدخول لعرض ملفك الشخصي وصلاحياتك.",
+      "signInDesc": "أنشئ حسابًا أو سجّل الدخول لإدارة ملفك الشخصي وصلاحياتك.",
+      "signIn": "تسجيل الدخول"
+    }
   },
   "tabs": {
     "search": "بحث",
@@ -52,10 +91,60 @@
     "collapseSidebar": "طيّ الشريط الجانبي",
     "siteFooter": "تذييل الموقع",
     "languageSwitch": "تغيير اللغة",
+    "settings": "الإعدادات",
+    "adminSection": "إدارة",
+    "admin": {
+      "home": "الرئيسية",
+      "stats": "الإحصائيات",
+      "users": "المستخدمون",
+      "contents": "المحتوى",
+      "scholars": "العلماء"
+    },
     "subnav": {
       "explore": { "popular": "الأكثر شيوعًا", "recent": "الأحدث", "following": "المتابَعون" },
       "library": { "started": "قيد التشغيل", "saved": "المحفوظة", "completed": "المكتملة" },
-      "account": { "general": "عام", "profile": "الملف الشخصي", "legal": "قانوني" }
+      "account": { "general": "عام", "profile": "الملف الشخصي", "legal": "قانوني" },
+      "settings": { "general": "عام", "profile": "الملف الشخصي", "legal": "قانوني" },
+      "admin": { "topics": "المواضيع", "listings": "المحتوى" }
+    }
+  },
+  "settings": {
+    "general": {
+      "title": "الإعدادات",
+      "languageSection": "اللغة",
+      "languageDesc": "ضبط لغة التطبيق والمحتوى.",
+      "appLanguage": "لغة التطبيق",
+      "appLanguageDesc": "لغة واجهة التطبيق",
+      "contentLanguage": "لغة المحتوى",
+      "contentLanguageDesc": "اللغة المفضلة للترجمة",
+      "displaySection": "العرض",
+      "displayDesc": "اختر مظهرًا للواجهة.",
+      "theme": "المظهر",
+      "themeDesc": "يتبع النظام تفضيلات نظام التشغيل الخاص بك",
+      "themeAria": "تفضيل المظهر",
+      "themeOptions": {
+        "system": "تلقائي",
+        "light": "فاتح",
+        "dark": "داكن"
+      },
+      "notifSection": "الإشعارات",
+      "notifDesc": "إدارة الإشعارات التي تتلقاها.",
+      "enableNotif": "تفعيل الإشعارات",
+      "enableNotifDesc": "التحكم الرئيسي لجميع الإشعارات",
+      "followedScholars": "العلماء المتابَعون",
+      "followedScholarsDesc": "إشعار عند نشر شيخ تتابعه",
+      "newLectures": "المحاضرات الجديدة",
+      "newLecturesDesc": "إشعار عند نشر محاضرات جديدة"
+    },
+    "legal": {
+      "title": "قانوني",
+      "privacyPolicy": "سياسة الخصوصية",
+      "privacyDesc": "كيف نقوم بجمع واستخدام بياناتك.",
+      "privacySublabel": "اقرأ سياسة الخصوصية الكاملة الخاصة بنا، بما في ذلك جمع البيانات وتخزينها وحقوقك.",
+      "view": "عرض ←",
+      "termsOfUse": "شروط الاستخدام",
+      "termsDesc": "القواعد التي تحكم استخدام هذه الخدمة.",
+      "termsSublabel": "اقرأ الشروط والأحكام التي تحكم استخدامك لسلفي دروس."
     }
   },
   "support": {
@@ -111,7 +200,12 @@
     "startTyping": "ابدأ الكتابة للبحث.",
     "suggestions": "اقتراحات",
     "scholars": "العلماء",
-    "continueListening": "متابعة الاستماع"
+    "continueListening": "متابعة الاستماع",
+    "filterAll": "الكل",
+    "filterAllAria": "عرض جميع العناصر",
+    "filterByAria": "تصفية حسب {{label}}",
+    "filterRemoveAria": "إزالة تصفية {{label}}",
+    "enterQuery": "أدخل كلمة بحث للبدء"
   },
   "library": {
     "title": "مكتبتي",
@@ -119,12 +213,18 @@
     "saved": "المحفوظة",
     "completed": "المكتملة",
     "loadingSection": "جارٍ تحميل {{section}}…",
-    "emptyProgress": "لا توجد محاضرات قيد الاستماع.",
-    "emptySaved": "لا توجد محاضرات محفوظة بعد. احفظ المحاضرات للاستماع إليها لاحقًا.",
-    "emptyCompleted": "لا توجد محاضرات مكتملة بعد. واصل الاستماع!",
+    "emptyProgress": "لم تبدأ أي محاضرات بعد. تصفح الفهرس لبدء الاستماع.",
+    "emptySaved": "لا توجد محاضرات محفوظة بعد. احفظ بعض المحاضرات لمتابعتها.",
+    "emptyCompleted": "لا توجد محاضرات مكتملة بعد. أكمل المحاضرات لمتابعة تعلمك.",
     "percentListened": "{{percent}}٪ تم الاستماع",
     "savedOn": "حُفظت في {{date}}",
-    "completedOn": "اكتملت في {{date}}"
+    "completedOn": "اكتملت في {{date}}",
+    "authProgressTitle": "سجل الدخول لعرض تقدمك",
+    "authProgressDesc": "ابدأ الاستماع إلى المحاضرات ومتابعة تقدمك",
+    "authSavedTitle": "سجل الدخول لعرض المحاضرات المحفوظة",
+    "authSavedDesc": "احفظ المحاضرات للرجوع إليها لاحقًا",
+    "authCompletedTitle": "سجل الدخول لعرض المحاضرات المكتملة",
+    "authCompletedDesc": "تابع المحاضرات التي انتهيت منها"
   },
   "lecture": {
     "loading": "جارٍ تحميل المحاضرة…",
@@ -138,7 +238,12 @@
     "lectures": "المحاضرات",
     "empty": "لا يوجد محتوى منشور بعد.",
     "seriesCount": "{{count}} سلسلة",
-    "lectureCount": "{{count}} محاضرة"
+    "lectureCount": "{{count}} محاضرة",
+    "showLess": "عرض أقل",
+    "showMore": "عرض المزيد",
+    "statLectures": "المحاضرات",
+    "statSeries": "السلاسل",
+    "statTotal": "الإجمالي"
   },
   "feed": {
     "newInTopic": "جديد في {{topic}}",
@@ -152,6 +257,291 @@
   "notFound": {
     "title": "عذرًا!",
     "message": "الصفحة غير موجودة",
-    "nativeDescription": "لم يتم نقل هذا المسار الأصلي بعد. ارجع داخل التطبيق أو عد إلى الصفحة الرئيسية."
+    "nativeDescription": "لم يتم نقل هذا المسار الأصلي بعد. ارجع داخل التطبيق أو عد إلى الصفحة الرئيسية.",
+    "description": "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
+    "backHome": "العودة إلى الصفحة الرئيسية"
+  },
+  "serverError": {
+    "title": "حدث خطأ ما",
+    "description": "تعذر تحميل الصفحة الآن. يرجى المحاولة مرة أخرى.",
+    "retry": "أعد المحاولة"
+  },
+  "home": {
+    "hero": {
+      "taglineTranslation": "",
+      "surahReference": ""
+    },
+    "searchLabel": "ماذا تريد أن تستمع إليه؟",
+    "downloadAppStore": "تنزيل من متجر التطبيقات",
+    "getGooglePlay": "تنزيل من متجر جوجل"
+  },
+  "audio": {
+    "playbackSpeed": "سرعة التشغيل",
+    "skipBackward": "رجوع ٣٠ ثانية",
+    "skipForward": "تقديم ٣٠ ثانية",
+    "play": "تشغيل",
+    "pause": "إيقاف مؤقت"
+  },
+  "imageUpload": {
+    "selectImage": "حدد ملف الصورة",
+    "uploadImage": "رفع صورة",
+    "uploading": "جارٍ الرفع...",
+    "clickToUpload": "انقر للرفع",
+    "orDragDrop": "أو اسحب وأفلت",
+    "hint": "بصيغة PNG، JPG، GIF وبحجم أقصى {{maxSizeMB}} ميجابايت",
+    "previewAlt": "معاينة",
+    "removeImage": "إزالة الصورة",
+    "errorFileType": "يرجى رفع ملف صورة",
+    "errorFileExt": "مسموح فقط بالصور من نوع PNG و JPG و JPEG",
+    "errorFileSize": "يجب أن يكون حجم الصورة أقل من {{maxSizeMB}} ميجابايت (الحالي: {{current}} ميجابايت)"
+  },
+  "authCallback": {
+    "timeoutTitle": "انتهت مهلة المصادقة",
+    "timeoutDesc": "تستغرق المصادقة وقتًا أطول من المتوقع.",
+    "pleaseTryAgain": "يرجى المحاولة مرة أخرى",
+    "errorTitle": "خطأ في المصادقة",
+    "unexpectedError": "حدث خطأ غير متوقع.",
+    "tryAgain": "أعد المحاولة",
+    "completingSignIn": "جارٍ إكمال تسجيل الدخول..."
+  },
+  "legal": {
+    "privacy": {
+      "title": "سياسة الخصوصية",
+      "sections": {
+        "collect": {
+          "title": "المعلومات التي نجمعها",
+          "desktop": "نجمع المعلومات التي تقدمها عند إنشاء حسابك (البريد الإلكتروني، والاسم المستعار) وبيانات الاستخدام مثل سجل الاستماع والمحاضرات المحفوظة. ولا نبيع معلوماتك الشخصية لأي طرف ثالث.",
+          "mobile": "نجمع المعلومات التي تقدمها عند إنشاء الحساب وبيانات الاستخدام مثل سجل الاستماع. ولا نبيع معلوماتك الشخصية."
+        },
+        "use": {
+          "title": "كيفية استخدام معلوماتك",
+          "desktop": "تُستخدم معلوماتك لتقديم الخدمة وتحسينها، وتخصيص تجربتك (مثل استئناف التشغيل، والتوصيات)، والتواصل معك بشأن التحديثات الهامة حول المنصة.",
+          "mobile": "تُستخدم معلوماتك لتقديم الخدمة، وتخصيص تجربتك، وإرسال التحديثات الهامة."
+        },
+        "storage": {
+          "title": "تخزين البيانات وحمايتها",
+          "desktop": "يتم تخزين بياناتك بشكل آمن باستخدام تشفير متوافق مع معايير الصناعة. وتُقدّم الملفات الصوتية عبر روابط آمنة ومحددة بوقت. ونحتفظ ببياناتك طالما أن حسابك نشط.",
+          "mobile": "يتم تخزين بياناتك بشكل آمن باستخدام تشفير متوافق مع المعايير. ونحتفظ ببياناتك طالما أن حسابك نشط فقط."
+        },
+        "contact": {
+          "title": "التواصل",
+          "desktop": "للاستفسارات المتعلقة بالخصوصية، تواصل معنا عبر البريد الإلكتروني privacy@salafidurus.com.",
+          "mobile": "privacy@salafidurus.com"
+        }
+      }
+    },
+    "terms": {
+      "title": "شروط الاستخدام",
+      "sections": {
+        "acceptance": {
+          "title": "الموافقة على الشروط",
+          "desktop": "من خلال الدخول إلى سلفي دروس أو استخدامه، فإنك توافق على الالتزام بشروط الاستخدام هذه. وإذا كنت لا توافق، فلا تستخدم الخدمة.",
+          "mobile": "باستخدامك سلفي دروس، فإنك توافق على هذه الشروط. وإذا كنت لا توافق، فلا تستخدم الخدمة."
+        },
+        "use": {
+          "title": "استخدام الخدمة",
+          "desktop": "يوفر سلفي دروس إمكانية الوصول إلى المحاضرات الصوتية الإسلامية للاستخدام الشخصي وغير التجاري. ولا يجوز لك إعادة توزيع المحتوى أو تعديله أو استغلاله تجاريًا دون إذن صريح من أصحاب المحتوى.",
+          "mobile": "المحتوى مخصص للاستخدام الشخصي وغير التجاري. ولا تقم بإعادة توزيع المحتوى أو استغلاله تجاريًا."
+        },
+        "accounts": {
+          "title": "حسابات المستخدمين",
+          "desktop": "أنت مسؤول عن الحفاظ على سرية بيانات اعتماد حسابك وعن جميع الأنشطة التي تتم بموجب حسابك. ويرجى إخطارنا على الفور بأي استخدام غير مصرح به.",
+          "mobile": "أنت مسؤول عن بيانات اعتماد حسابك وجميع الأنشطة التي تتم بموجبه."
+        },
+        "property": {
+          "title": "المحتوى والملكية الفكرية",
+          "desktop": "جميع المحتويات الصوتية مقدمة من العلماء وتظل ملكيتهم الفكرية الخاصة. وتصميم المنصة ورمزها وعلامتها التجارية مملوكة لـ سلفي دروس.",
+          "mobile": "المحتوى الصوتي ملك للعلماء. وتصميم المنصة ورمزها ملك لـ سلفي دروس."
+        },
+        "termination": {
+          "title": "إنهاء الخدمة",
+          "text": "قد نقوم بتعليق حسابك أو إنهائه إذا انتهكت هذه الشروط. ويمكنك حذف حسابك في أي وقت من إعدادات حسابك."
+        },
+        "contact": {
+          "title": "التواصل",
+          "desktop": "للأسئلة حول هذه الشروط، يرجى التواصل معنا عبر البريد الإلكتروني legal@salafidurus.com.",
+          "mobile": "legal@salafidurus.com"
+        }
+      }
+    }
+  },
+  "role": {
+    "listener": "مستمع",
+    "scholar": "شيخ/عالم",
+    "translator": "مترجم",
+    "editor": "محرر",
+    "admin": "مدير",
+    "superadmin": "مدير عام",
+    "descriptions": {
+      "listener": "مستخدم عادي يستمع للمحاضرات",
+      "scholar": "منشئ محتوى يدير محاضراته الخاصة",
+      "translator": "يترجم المحتوى إلى اللغات المحددة",
+      "editor": "يحرر ويراجع قوائم المحتوى",
+      "admin": "يدير المستخدمين والعلماء وفهرس المحتوى",
+      "superadmin": "صلاحيات النظام الكاملة والإعدادات"
+    },
+    "grant": "منح دور {{role}}",
+    "revoke": "إلغاء دور {{role}}"
+  },
+  "admin": {
+    "dashboard": {
+      "title": "لوحة تحكم الإدارة",
+      "titleMobile": "إدارة",
+      "loading": "جارٍ التحميل...",
+      "noPermissions": "ليس لديك أي صلاحيات إدارة.",
+      "noPermissionsMobile": "لا توجد صلاحيات إدارة.",
+      "scholarsDesc": "إدارة العلماء، ملفاتهم الشخصية وظهورهم",
+      "scholarsDescMobile": "إدارة العلماء",
+      "contentsDesc": "إدارة المواضيع، المحاضرات، والتسلسل الهرمي للمحتوى",
+      "contentsDescMobile": "إدارة المحتوى",
+      "usersDesc": "إدارة المستخدمين المسؤولين والصلاحيات",
+      "usersDescMobile": "إدارة المستخدمين"
+    },
+    "stats": {
+      "title": "إحصائيات الإدارة",
+      "desc": "ستظهر إحصائيات المنصة والتحليلات هنا."
+    },
+    "scholars": {
+      "manageTitle": "إدارة العلماء",
+      "addScholar": "إضافة عالم",
+      "editScholar": "تعديل بيانات عالم",
+      "saveChanges": "حفظ التغييرات",
+      "nameSlugRequired": "الاسم والمعرف مطلوبان",
+      "basicInfo": "المعلومات الأساسية",
+      "nameLabel": "الاسم *",
+      "namePlaceholder": "اسم العالم",
+      "slugLabel": "المعرف *",
+      "slugPlaceholder": "معرف-العالم",
+      "bioLabel": "السيرة الذاتية",
+      "bioPlaceholder": "سيرة ذاتية مختصرة...",
+      "imageUrlLabel": "رابط الصورة",
+      "imageUrlPlaceholder": "https://...",
+      "loadingImage": "جارٍ تحميل الصورة...",
+      "failedImage": "فشل تحميل الصورة",
+      "imagePreviewAlt": "معاينة",
+      "locationLanguage": "الموقع واللغة",
+      "countryLabel": "البلد",
+      "countryPlaceholder": "اختر البلد",
+      "languageLabel": "اللغة الأساسية",
+      "languagePlaceholder": "اختر اللغة",
+      "socialMedia": "وسائل التواصل الاجتماعي",
+      "twitterLabel": "تويتر",
+      "telegramLabel": "تيليجرام",
+      "youtubeLabel": "يوتيوب",
+      "websiteLabel": "الموقع الإلكتروني",
+      "settings": "الإعدادات",
+      "kibarLabel": "من كبار العلماء",
+      "featuredLabel": "مميز",
+      "activeLabel": "نشط",
+      "searchPlaceholderDesktop": "البحث عن العلماء بالاسم أو المعرف..."
+    },
+    "users": {
+      "title": "إدارة المستخدمين",
+      "titleMobile": "المستخدمون",
+      "searchPlaceholder": "البحث عن المستخدمين بالاسم أو البريد الإلكتروني...",
+      "searchNoMatch": "لم يتم العثور على مستخدمين يطابقون بحثك.",
+      "noUsersFound": "لم يتم العثور على مستخدمين."
+    },
+    "permissions": {
+      "title": "إدارة الصلاحيات",
+      "titleMobile": "الصلاحيات",
+      "userIdLabel": "معرف المستخدم",
+      "userIdPlaceholder": "معرف المستخدم",
+      "lookup": "بحث",
+      "userPermissionsHeader": "صلاحيات المستخدم {{userId}}",
+      "permissionTableHeader": "الصلاحية",
+      "statusTableHeader": "الحالة",
+      "actionTableHeader": "الإجراء",
+      "granted": "ممنوحة",
+      "notGranted": "غير ممنوحة",
+      "revoke": "إلغاء",
+      "grant": "منح",
+      "managePermissions": "إدارة الصلاحيات",
+      "managePermissionsBtn": "إدارة الصلاحيات",
+      "managePermissionsBtnShort": "الصلاحيات",
+      "manageRoles": "إدارة الأدوار",
+      "manageRolesBtn": "إدارة الأدوار",
+      "manageRolesBtnShort": "الأدوار",
+      "saving": "جارٍ الحفظ...",
+      "done": "تم",
+      "loading": "جارٍ تحميل الصلاحيات...",
+      "loadingRoles": "جارٍ تحميل الأدوار...",
+      "sections": {
+        "scholars": "إدارة العلماء",
+        "listings": "إدارة القوائم",
+        "topics": "إدارة المواضيع",
+        "translations": "إدارة التراجم",
+        "media": "إدارة الوسائط",
+        "users": "إدارة المستخدمين"
+      },
+      "revokeTitle": "إلغاء الصلاحية؟",
+      "revoking": "جارٍ إلغاء الصلاحية...",
+      "revokeButton": "إلغاء الصلاحية",
+      "revokePrompt": "هل أنت متأكد من رغبتك في إلغاء صلاحية {{permission}} من المستخدم {{user}}؟",
+      "revokeWarning": "سيؤدي ذلك إلى إزالة إمكانية وصولهم إلى هذه الوظيفة."
+    },
+    "contents": {
+      "deleteTitle": "حذف الموضوع؟",
+      "deleteConfirm": "حذف الموضوع",
+      "deletePrompt": "هل أنت متأكد من رغبتك في حذف موضوع {{name}}؟",
+      "deleteWarning": "لا يمكن التراجع عن هذا الإجراء.",
+      "title": "إدارة المحتوى",
+      "titleMobile": "المحتوى",
+      "addTopic": "إضافة موضوع",
+      "addTopicMobile": "موضوع",
+      "addListing": "إضافة محتوى",
+      "addListingMobile": "محتوى",
+      "searchPlaceholderTopics": "البحث عن المواضيع...",
+      "searchPlaceholderListings": "البحث عن القوائم...",
+      "searchNoMatchTopics": "لم يتم العثور على مواضيع تطابق بحثك.",
+      "noTopicsFound": "لا توجد مواضيع بعد.",
+      "searchNoMatchListings": "لم يتم العثور على محتوى يطابق بحثك.",
+      "noListingsFound": "لا يوجد محتوى بعد. أضف ملفًا صوتيًا لإنشاء قائمة.",
+      "editTopic": "تعديل الموضوع",
+      "slugLabel": "المعرف *",
+      "slugPlaceholder": "معرف-الموضوع",
+      "englishNameLabel": "الاسم بالإنجليزية *",
+      "englishNamePlaceholder": "اسم الموضوع بالإنجليزية",
+      "arabicNameLabel": "الاسم بالعربية",
+      "arabicNamePlaceholderOptional": "اسم الموضوع بالعربية (اختياري)",
+      "arabicNamePlaceholder": "اسم الموضوع بالعربية",
+      "statusLabel": "الحالة:",
+      "cancelEdit": "إلغاء التعديل",
+      "editSlug": "تعديل المعرف",
+      "editEnglishName": "تعديل الاسم بالإنجليزية",
+      "editArabicName": "تعديل الاسم بالعربية",
+      "failedToSave": "فشل الحفظ",
+      "unpublish": {
+        "title": "إلغاء نشر الترجمة؟",
+        "unpublishing": "جارٍ إلغاء النشر...",
+        "unpublishBtn": "إلغاء النشر",
+        "prompt": "هل أنت متأكد من رغبتك في إلغاء نشر {{label}}؟",
+        "warning": "لن تعود مرئية للمستخدمين بعد الآن."
+      },
+      "listing": {
+        "editTitle": "تعديل تفاصيل المحاضرة",
+        "newTitle": "تفاصيل محاضرة جديدة",
+        "titleLabel": "العنوان",
+        "slugLabel": "المعرف",
+        "slugPlaceholder": "توليد تلقائي في حال تركه فارغًا",
+        "descriptionLabel": "الوصف",
+        "scholarLabel": "العالم/الشيخ",
+        "scholarPlaceholder": "اختر العالم",
+        "seriesLabel": "السلسلة",
+        "seriesPlaceholder": "اختر السلسلة (اختياري)",
+        "statusLabel": "الحالة",
+        "statusPlaceholder": "اختر الحالة",
+        "draft": "مسودة",
+        "published": "منشور",
+        "archived": "مؤرشف",
+        "orderIndexLabel": "مؤشر الترتيب",
+        "topicsLabel": "المواضيع",
+        "noTopicsAvailable": "لا توجد مواضيع متاحة",
+        "titleRequired": "العنوان مطلوب.",
+        "scholarRequired": "العالم مطلوب.",
+        "audioKeyRequired": "مفتاح الملف الصوتي مطلوب للإنشاء.",
+        "failedToSave": "فشل حفظ تفاصيل المحاضرة."
+      }
+    }
   }
 }

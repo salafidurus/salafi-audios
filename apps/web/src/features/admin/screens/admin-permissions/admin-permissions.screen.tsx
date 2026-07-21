@@ -14,10 +14,12 @@ import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
 import { RevokePermissionConfirmModal } from "@/shared/components/RevokePermissionConfirmModal";
 import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
+import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./admin-permissions.screen.module.css";
 
 export function AdminPermissionsScreen() {
   const { isMobile } = useResponsive();
+  const { t } = useTranslation();
   const [userId, setUserId] = useState("");
   const [userPerms, setUserPerms] = useState<AdminPermissionsListResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -84,34 +86,55 @@ export function AdminPermissionsScreen() {
         userName={userId}
       />
 
-      <PageHeader title={!isMobile ? "Manage Permissions" : "Permissions"} />
+      <PageHeader
+        title={
+          !isMobile
+            ? t("admin.permissions.title", "Manage Permissions")
+            : t("admin.permissions.titleMobile", "Permissions")
+        }
+      />
 
       <PermissionGate requires="USERS_GRANT_PERMISSIONS">
         <div className={styles.lookupSection}>
           <input
-            aria-label="User ID"
-            placeholder="User ID"
+            aria-label={t("admin.permissions.userIdLabel", "User ID")}
+            placeholder={t("admin.permissions.userIdPlaceholder", "User ID")}
             value={userId}
             onChange={(e) => setUserId(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleLookup()}
             className={styles.input}
           />
           <Button variant="primary" onClick={handleLookup} disabled={loading}>
-            {loading ? (!isMobile ? "Loading…" : "…") : "Lookup"}
+            {loading
+              ? !isMobile
+                ? t("admin.permissions.saving", "Loading…")
+                : "…"
+              : t("admin.permissions.lookup", "Lookup")}
           </Button>
         </div>
 
         {userPerms && !isMobile && (
-          <h2 className={styles.sectionTitle}>Permissions for {userId}</h2>
+          <h2 className={styles.sectionTitle}>
+            {t("admin.permissions.userPermissionsHeader", {
+              defaultValue: "Permissions for {{userId}}",
+              userId,
+            })}
+          </h2>
         )}
 
         {userPerms && !isMobile ? (
           <table className={styles.table}>
             <thead className={styles.tableHeader}>
               <tr>
-                <th className={styles.tableHead}>Permission</th>
-                <th className={styles.tableHead}>Status</th>
-                <th className={styles.tableHead}>Action</th>
+                <th className={styles.tableHead}>
+                  {t("admin.permissions.permissionTableHeader", "Permission")}
+                </th>
+                <th className={styles.tableHead}>
+                  {t("admin.permissions.statusTableHeader", "Status")}
+                </th>
+                <th className={styles.tableHead}>
+                  {t("admin.permissions.actionTableHeader", "Action")}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -126,7 +149,9 @@ export function AdminPermissionsScreen() {
                           hasIt ? styles.statusGranted : styles.statusNotGranted
                         }`}
                       >
-                        {hasIt ? "Granted" : "Not granted"}
+                        {hasIt
+                          ? t("admin.permissions.granted", "Granted")
+                          : t("admin.permissions.notGranted", "Not granted")}
                       </span>
                     </td>
                     <td className={styles.tableCell}>
@@ -136,7 +161,7 @@ export function AdminPermissionsScreen() {
                           onClick={() => handleRevokeClick(perm)}
                           disabled={loading}
                         >
-                          Revoke
+                          {t("admin.permissions.revoke", "Revoke")}
                         </Button>
                       ) : (
                         <Button
@@ -144,7 +169,7 @@ export function AdminPermissionsScreen() {
                           onClick={() => handleGrant(perm)}
                           disabled={loading}
                         >
-                          Grant
+                          {t("admin.permissions.grant", "Grant")}
                         </Button>
                       )}
                     </td>
@@ -166,7 +191,9 @@ export function AdminPermissionsScreen() {
                         hasIt ? styles.statusGranted : styles.statusNotGranted
                       }`}
                     >
-                      {hasIt ? "Granted" : "Not granted"}
+                      {hasIt
+                        ? t("admin.permissions.granted", "Granted")
+                        : t("admin.permissions.notGranted", "Not granted")}
                     </div>
                   </div>
                   {hasIt ? (
@@ -175,11 +202,11 @@ export function AdminPermissionsScreen() {
                       onClick={() => handleRevokeClick(perm)}
                       disabled={loading}
                     >
-                      Revoke
+                      {t("admin.permissions.revoke", "Revoke")}
                     </Button>
                   ) : (
                     <Button variant="primary" onClick={() => handleGrant(perm)} disabled={loading}>
-                      Grant
+                      {t("admin.permissions.grant", "Grant")}
                     </Button>
                   )}
                 </div>

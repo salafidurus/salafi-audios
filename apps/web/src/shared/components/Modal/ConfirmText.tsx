@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Modal } from "./Modal";
 import { Button } from "../Button";
+import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./confirm.module.css";
 
 export interface ConfirmTextProps {
@@ -24,14 +25,17 @@ export function ConfirmText({
   onConfirm,
   title,
   message,
-  confirmLabel = "Confirm",
-  cancelLabel = "Cancel",
+  confirmLabel,
+  cancelLabel,
   confirmVariant = "primary",
   confirmWord,
   testId,
 }: ConfirmTextProps) {
+  const { t } = useTranslation();
   const [inputValue, setInputValue] = useState("");
 
+  const displayConfirmLabel = confirmLabel || t("common.confirm", "Confirm");
+  const displayCancelLabel = cancelLabel || t("common.cancel", "Cancel");
   const isWordConfirmed = confirmWord ? inputValue === confirmWord : true;
 
   const handleConfirm = () => {
@@ -55,7 +59,7 @@ export function ConfirmText({
       footer={
         <>
           <Button variant="outline" data-testid="confirm-modal-cancel" onClick={handleClose}>
-            {cancelLabel}
+            {displayCancelLabel}
           </Button>
           <Button
             variant={confirmVariant}
@@ -63,7 +67,7 @@ export function ConfirmText({
             onClick={handleConfirm}
             disabled={!isWordConfirmed}
           >
-            {confirmLabel}
+            {displayConfirmLabel}
           </Button>
         </>
       }
@@ -74,13 +78,17 @@ export function ConfirmText({
         {confirmWord && (
           <div className={styles.wordConfirm}>
             <label className={styles.wordLabel} htmlFor="confirm-text-input">
-              Type <strong>{confirmWord}</strong> to confirm:
+              {t("modal.typeLabel", "Type")} <strong>{confirmWord}</strong>{" "}
+              {t("modal.toConfirmLabel", "to confirm:")}
             </label>
             <input
               id="confirm-text-input"
               type="text"
               className={styles.wordInput}
-              placeholder={`Type "${confirmWord}" to confirm`}
+              placeholder={t("modal.confirmPlaceholder", {
+                defaultValue: `Type "${confirmWord}" to confirm`,
+                confirmWord,
+              })}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
             />

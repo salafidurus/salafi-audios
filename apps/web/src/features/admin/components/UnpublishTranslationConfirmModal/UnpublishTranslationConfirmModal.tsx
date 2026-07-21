@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { ReactNode } from "react";
 import { Modal } from "@/shared/components/Modal/Modal";
 import { Button } from "@/shared/components/Button";
+import { useTranslation } from "@/core/i18n/use-translation";
 
 interface UnpublishTranslationConfirmModalProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export function UnpublishTranslationConfirmModal({
   translationLabel = "translation",
 }: UnpublishTranslationConfirmModalProps): ReactNode {
   const [isUnpublishing, setIsUnpublishing] = useState(false);
+  const { t } = useTranslation();
 
   const handleConfirm = async () => {
     setIsUnpublishing(true);
@@ -34,23 +36,30 @@ export function UnpublishTranslationConfirmModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Unpublish Translation?"
+      title={t("admin.contents.unpublish.title", "Unpublish Translation?")}
       size="sm"
       loading={isUnpublishing}
       footer={
         <>
           <Button variant="outline" onClick={onClose} disabled={isUnpublishing}>
-            Cancel
+            {t("common.cancel", "Cancel")}
           </Button>
           <Button variant="danger" onClick={handleConfirm} loading={isUnpublishing}>
-            {isUnpublishing ? "Unpublishing…" : "Unpublish"}
+            {isUnpublishing
+              ? t("admin.contents.unpublish.unpublishing", "Unpublishing…")
+              : t("admin.contents.unpublish.unpublishBtn", "Unpublish")}
           </Button>
         </>
       }
     >
-      <p>Are you sure you want to unpublish this {translationLabel}?</p>
+      <p>
+        {t("admin.contents.unpublish.prompt", {
+          defaultValue: "Are you sure you want to unpublish this {{label}}?",
+          label: translationLabel,
+        })}
+      </p>
       <p style={{ fontSize: "0.875rem", color: "var(--content-muted)", marginTop: "0.5rem" }}>
-        It will no longer be visible to users.
+        {t("admin.contents.unpublish.warning", "It will no longer be visible to users.")}
       </p>
     </Modal>
   );

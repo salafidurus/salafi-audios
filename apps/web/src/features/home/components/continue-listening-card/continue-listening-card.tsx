@@ -2,6 +2,7 @@
 
 import type { RecentProgressDto } from "@sd/core-contracts";
 import { AppText } from "@/shared/components/AppText/AppText";
+import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./continue-listening-card.module.css";
 
 export type ContinueListeningCardProps = {
@@ -13,14 +14,18 @@ export function ContinueListeningCard({
   recentProgress,
   onContinueListening,
 }: ContinueListeningCardProps) {
+  const { t } = useTranslation();
+
   return (
     <section
       className={styles.continueSection}
-      aria-label="Resume playback"
+      aria-label={t("audio.resumePlayback", "Resume playback")}
       data-testid="continue-listening-section"
     >
       <AppText variant="titleMd">
-        <span data-testid="continue-listening-title">Continue Listening</span>
+        <span data-testid="continue-listening-title">
+          {t("search.continueListening", "Continue Listening")}
+        </span>
       </AppText>
       <button
         type="button"
@@ -29,18 +34,13 @@ export function ContinueListeningCard({
         className={styles.continueCard}
       >
         <div className={styles.continueHeader}>
-          <AppText
-            variant="bodyLg"
-            style={{ fontWeight: "var(--typo-body-lg-font-weight-bold)" }}
-          >
+          <AppText variant="bodyLg" style={{ fontWeight: "var(--typo-body-lg-font-weight-bold)" }}>
             <span data-testid="continue-listening-lecture-title">
               {recentProgress.lectureTitle}
             </span>
           </AppText>
           <AppText variant="caption" style={{ color: "var(--content-secondary)" }}>
-            <span data-testid="continue-listening-scholar-name">
-              {recentProgress.scholarName}
-            </span>
+            <span data-testid="continue-listening-scholar-name">{recentProgress.scholarName}</span>
           </AppText>
         </div>
         <div className={styles.progressRow}>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import type { ScholarDetailDto } from "@sd/core-contracts";
 import { Globe, Send } from "lucide-react";
+import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./scholar-header.module.css";
 
 function YoutubeIcon({ size = 18 }: { size?: number }) {
@@ -52,6 +53,7 @@ export type ScholarHeaderProps = {
 };
 
 export function ScholarHeader({ scholar }: ScholarHeaderProps) {
+  const { t } = useTranslation();
   const [isBioExpanded, setIsBioExpanded] = useState(false);
   const totalHours = Math.round(scholar.totalDurationSeconds / 3600);
   const initial = scholar.name?.trim().charAt(0).toUpperCase() || "?";
@@ -96,7 +98,9 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
               className={styles.toggleBtn}
               onClick={() => setIsBioExpanded(!isBioExpanded)}
             >
-              {isBioExpanded ? "Show less" : "Show more"}
+              {isBioExpanded
+                ? t("scholarContent.showLess", "Show less")
+                : t("scholarContent.showMore", "Show more")}
             </button>
           )}
         </div>
@@ -105,16 +109,16 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
       <div className={styles.stats}>
         <div className={styles.stat}>
           <span className={styles.statValue}>{scholar.lectureCount}</span>
-          <span className={styles.statLabel}>Lectures</span>
+          <span className={styles.statLabel}>{t("scholarContent.statLectures", "Lectures")}</span>
         </div>
         <div className={styles.stat}>
           <span className={styles.statValue}>{scholar.seriesCount}</span>
-          <span className={styles.statLabel}>Series</span>
+          <span className={styles.statLabel}>{t("scholarContent.statSeries", "Series")}</span>
         </div>
         {totalHours > 0 && (
           <div className={styles.stat}>
             <span className={styles.statValue}>{totalHours}h</span>
-            <span className={styles.statLabel}>Total</span>
+            <span className={styles.statLabel}>{t("scholarContent.statTotal", "Total")}</span>
           </div>
         )}
       </div>
