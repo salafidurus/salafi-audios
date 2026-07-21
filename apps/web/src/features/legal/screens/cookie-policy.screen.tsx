@@ -14,16 +14,7 @@ export function CookiePolicyScreen() {
         <p className={styles.introduction}>
           This Cookies Policy explains what Cookies are and how We use them. You should read this
           policy so You can understand what type of cookies We use, or the information We collect
-          using Cookies and how that information is used. This Cookies Policy has been created with
-          the help of the{" "}
-          <a
-            href="https://www.termsfeed.com/cookies-policy-generator/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            TermsFeed Cookies Policy Generator
-          </a>
-          .
+          using Cookies and how that information is used.
         </p>
         <p className={styles.paragraph}>
           Cookies do not typically contain any information that personally identifies a user, but

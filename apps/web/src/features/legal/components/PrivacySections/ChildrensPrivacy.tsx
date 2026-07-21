@@ -5,12 +5,11 @@ export function ChildrensPrivacy() {
     <section className={styles.section}>
       <h2 className={styles.sectionTitle}>Children's Privacy</h2>
       <p className={styles.paragraph}>
-        Our Service does not address anyone under the age of 16. We do not knowingly collect
-        personally identifiable information from anyone under the age of 16. If You are a parent or
-        guardian and You are aware that Your child has provided Us with Personal Data, please
-        contact Us. If We become aware that We have collected Personal Data from anyone under the
-        age of 16 without verification of parental consent, We take steps to remove that information
-        from Our servers.
+        Our Service does not knowingly collect personally identifiable information from children
+        under the age of 13. If You are a parent or guardian and You are aware that Your child has
+        provided Us with Personal Data, please contact Us. If We become aware that We have collected
+        Personal Data from anyone under the age of 13 without verifiable parental consent, We take
+        steps to remove that information from Our servers as soon as possible.
       </p>
       <p className={styles.paragraph}>
         If We need to rely on consent as a legal basis for processing Your information and Your

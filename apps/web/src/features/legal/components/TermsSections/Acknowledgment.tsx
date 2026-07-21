@@ -20,10 +20,6 @@ export function Acknowledgment() {
         Service.
       </p>
       <p className={styles.paragraph}>
-        You represent that you are over the age of 18. The Company does not permit those under 18 to
-        use the Service.
-      </p>
-      <p className={styles.paragraph}>
         Your access to and use of the Service is also subject to Our Privacy Policy, which describes
         how We collect, use, and disclose personal information. Please read Our Privacy Policy
         carefully before using Our Service.

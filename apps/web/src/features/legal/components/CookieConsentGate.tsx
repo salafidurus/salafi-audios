@@ -46,14 +46,8 @@ export function CookieConsentGate() {
             )}
           </h1>
           <p className={styles.policyLink}>
-            {t("cookieConsent.policyLink", "Cookie Policy")}:{" "}
-            <Link
-              href={routes.cookiePolicy}
-              className={styles.link}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {t("cookieConsent.policyLink", "Cookie Policy")}
+            <Link href={routes.cookiePolicy} className={styles.link}>
+              {t("cookieConsent.readPolicy", "Read our Cookie Policy for details")}
             </Link>
           </p>
         </div>

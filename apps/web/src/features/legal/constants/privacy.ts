@@ -1,3 +1,5 @@
+import { COMPANY_NAME, COMPANY_URL, COMPANY_COUNTRY } from "./company";
+
 export const PRIVACY_DEFINITIONS = [
   {
     term: "Account",
@@ -5,27 +7,21 @@ export const PRIVACY_DEFINITIONS = [
       "means a unique account created for You to access our Service or parts of our Service.",
   },
   {
-    term: "Affiliate",
-    definition:
-      'means an entity that controls, is controlled by, or is under common control with a party, where "control" means ownership of 50% or more of the shares, equity interest or other securities entitled to vote for election of directors or other managing authority.',
-  },
-  {
     term: "Application",
-    definition: "refers to Salafi Durus, the software program provided by the Company.",
+    definition: `refers to ${COMPANY_NAME}, the software program provided by the Company.`,
   },
   {
     term: "Company",
-    definition:
-      'referred to as either "the Company", "We", "Us" or "Our" in this Privacy Policy) refers to Salafi Durus.',
+    definition: `(referred to as either "the Company", "We", "Us" or "Our" in this Privacy Policy) refers to ${COMPANY_NAME}.`,
   },
   {
     term: "Cookies",
     definition:
-      "are small files that are placed on Your computer, mobile device or any other device by a website, containing the details of Your browsing history on that website among its many uses.",
+      "are small files or similar technologies (such as browser local storage) that are placed on Your computer, mobile device or any other device by a website, containing the details of Your browsing history on that website among its many uses.",
   },
   {
     term: "Country",
-    definition: "refers to: Nigeria",
+    definition: `refers to: ${COMPANY_COUNTRY}`,
   },
   {
     term: "Device",
@@ -35,7 +31,7 @@ export const PRIVACY_DEFINITIONS = [
   {
     term: "Personal Data",
     definition:
-      'or "Personal Information") is any information that relates to an identified or identifiable individual. We use "Personal Data" and "Personal Information" interchangeably unless a law uses a specific term.',
+      '(referred to as "Personal Information") is any information that relates to an identified or identifiable individual. We use "Personal Data" and "Personal Information" interchangeably unless a law uses a specific term.',
   },
   {
     term: "Service",
@@ -53,7 +49,7 @@ export const PRIVACY_DEFINITIONS = [
   },
   {
     term: "Website",
-    definition: "refers to Salafi Durus, accessible from https://www.salafidurus.com.",
+    definition: `refers to ${COMPANY_NAME}, accessible from ${COMPANY_URL}.`,
   },
   {
     term: "You",
@@ -72,16 +68,8 @@ export const DATA_USE_PURPOSES = [
     desc: "to manage Your registration as a user of the Service. The Personal Data You provide can give You access to different functionalities of the Service that are available to You as a registered user.",
   },
   {
-    title: "For the performance of a contract",
-    desc: "the development, compliance and undertaking of the purchase contract for the products, items or services You have purchased or of any other contract with Us through the Service.",
-  },
-  {
-    title: "To contact You",
-    desc: "To contact You by email, telephone calls, SMS, or other equivalent forms of electronic communication, such as a mobile application's push notifications regarding updates or informative communications related to the functionalities, products or contracted services, including the security updates, when necessary or reasonable for their implementation.",
-  },
-  {
-    title: "To provide You with news",
-    desc: "with news, special offers, and general information about other goods, services and events which We offer that are similar to those that you have already purchased or inquired about unless You have opted not to receive such information.",
+    title: "For support and communication",
+    desc: "We collect Your email address to enable You to contact Us for support if You experience issues with our Service. We do not use Your email to contact You proactively. Any communications from Us to You will be delivered through in-app notifications only.",
   },
   {
     title: "To manage Your requests",
@@ -93,30 +81,18 @@ export const DATA_USE_PURPOSES = [
   },
   {
     title: "For other purposes",
-    desc: "We may use Your information for other purposes, such as data analysis, identifying usage trends, determining the effectiveness of our promotional campaigns and to evaluate and improve our Service, products, services, marketing and your experience.",
+    desc: "We may use Your information for other purposes, such as data analysis, identifying usage trends, and to evaluate and improve our Service and your experience.",
   },
 ];
 
 export const DATA_SHARING = [
   {
     title: "With Service Providers",
-    desc: "We may share Your Personal Data with Service Providers to monitor and analyze the use of our Service, to contact You.",
+    desc: "We may share Your Personal Data with Service Providers to monitor and analyze the use of our Service.",
   },
   {
     title: "For business transfers",
     desc: "We may share or transfer Your Personal Data in connection with, or during negotiations of, any merger, sale of Company assets, financing, or acquisition of all or a portion of Our business to another company.",
-  },
-  {
-    title: "With Affiliates",
-    desc: "We may share Your Personal Data with Our affiliates, in which case we will require those affiliates to honor this Privacy Policy. Affiliates include Our parent company and any other subsidiaries, joint venture partners or other companies that We control or that are under common control with Us.",
-  },
-  {
-    title: "With business partners",
-    desc: "We may share Your Personal Data with Our business partners to offer You certain products, services or promotions.",
-  },
-  {
-    title: "With other users",
-    desc: "If Our Service offers public areas, when You share Personal Data or otherwise interact in the public areas with other users, such information may be viewed by all users and may be publicly distributed outside.",
   },
   {
     title: "With Your consent",

@@ -5,10 +5,9 @@ export function LimitationOfLiability() {
     <section className={styles.section}>
       <h2 className={styles.sectionTitle}>Limitation of Liability</h2>
       <p className={styles.paragraph}>
-        Notwithstanding any damages that You might incur, the entire liability of the Company and
-        any of its suppliers under any provision of these Terms and Your exclusive remedy for all of
-        the foregoing shall be limited to the amount actually paid by You through the Service or 100
-        USD if You haven't purchased anything through the Service.
+        To the maximum extent permitted by applicable law, the entire liability of the Company and
+        any of its suppliers under any provision of these Terms shall not exceed the amount of any
+        damages directly caused by a proven breach of these Terms.
       </p>
       <p className={styles.paragraph}>
         To the maximum extent permitted by applicable law, in no event shall the Company or its

@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { routes } from "@sd/core-contracts";
 import styles from "../legal-sections.module.css";
 
 export function ContactUs() {
@@ -10,9 +12,9 @@ export function ContactUs() {
       <ul className={styles.paragraph}>
         <li>
           By visiting this page on our website:{" "}
-          <a href="https://www.salafidurus.com/support" target="_blank" rel="noopener noreferrer">
-            https://www.salafidurus.com/support
-          </a>
+          <Link href={routes.support} className={styles.link}>
+            Support
+          </Link>
         </li>
       </ul>
     </section>

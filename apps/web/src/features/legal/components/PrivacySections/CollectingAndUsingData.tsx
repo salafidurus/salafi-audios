@@ -14,9 +14,19 @@ export function CollectingAndUsingData() {
         may include, but is not limited to:
       </p>
       <ul className={styles.bulletList}>
-        <li>Email address</li>
-        <li>First name and last name</li>
+        <li>Email address (used to enable You to contact Us for support)</li>
+        <li>Name</li>
+        <li>Profile picture (avatar image)</li>
       </ul>
+      <p className={styles.paragraph}>
+        Please note that We do not use Your email address to contact You proactively. You may
+        provide Your email so that You can reach Us for support if You experience issues with our
+        Service. Any messages from Us to You will be delivered through in-app notifications only.
+      </p>
+      <p className={styles.paragraph}>
+        If Your profile is onboarded as a Scholar, publicly curated social media links (Facebook,
+        Twitter/X, Telegram, YouTube) for that profile may be displayed within the Service.
+      </p>
 
       <h4 className={styles.subsubsectionTitle}>Usage Data</h4>
       <p className={styles.paragraph}>
@@ -93,13 +103,14 @@ export function CollectingAndUsingData() {
           services.
         </li>
         <li>
-          <strong>Cookies Policy / Notice Acceptance Cookies</strong>
+          <strong>Cookies Policy / Notice Acceptance</strong>
           <br />
-          Type: Persistent Cookies
+          Type: Persistent (browser local storage)
           <br />
           Administered by: Us
           <br />
-          Purpose: These Cookies identify if users have accepted the use of cookies on the Website.
+          Purpose: This records whether You have accepted the use of analytics and non-essential
+          cookies on the Website.
         </li>
         <li>
           <strong>Functionality Cookies</strong>
@@ -112,6 +123,18 @@ export function CollectingAndUsingData() {
           such as remembering your login details or language preference. The purpose of these
           Cookies is to provide You with a more personal experience and to avoid You having to
           re-enter your preferences every time You use the Website.
+        </li>
+        <li>
+          <strong>Analytics Cookies</strong>
+          <br />
+          Type: Persistent Cookies
+          <br />
+          Administered by: Vexo Analytics (third-party)
+          <br />
+          Purpose: These Cookies collect anonymized usage and performance data such as pages viewed,
+          session duration, device type, and browser information to help Us understand how You use
+          the Service and improve our features. This data is not used for advertising or individual
+          profiling.
         </li>
       </ul>
       <p className={styles.paragraph}>

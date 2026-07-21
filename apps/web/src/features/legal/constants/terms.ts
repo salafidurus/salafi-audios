@@ -1,8 +1,9 @@
+import { COMPANY_NAME, COMPANY_URL, COMPANY_COUNTRY } from "./company";
+
 export const TERMS_DEFINITIONS = [
   {
     term: "Application",
-    definition:
-      "means the software program provided by the Company downloaded by You on any electronic device, named Salafi Durus",
+    definition: `means the software program provided by the Company downloaded by You on any electronic device, named ${COMPANY_NAME}`,
   },
   {
     term: "Application Store",
@@ -10,18 +11,12 @@ export const TERMS_DEFINITIONS = [
       "means the digital distribution service operated and developed by Apple Inc. (Apple App Store) or Google Inc. (Google Play Store) in which the Application has been downloaded.",
   },
   {
-    term: "Affiliate",
-    definition:
-      'means an entity that controls, is controlled by, or is under common control with a party, where "control" means ownership of 50% or more of the shares, equity interest or other securities entitled to vote for election of directors or other managing authority.',
-  },
-  {
     term: "Country",
-    definition: "refers to: Nigeria",
+    definition: `refers to: ${COMPANY_COUNTRY}`,
   },
   {
     term: "Company",
-    definition:
-      'referred to as either "the Company", "We", "Us" or "Our" in these Terms and Conditions) refers to Salafi Durus.',
+    definition: `(referred to as either "the Company", "We", "Us" or "Our" in these Terms and Conditions) refers to ${COMPANY_NAME}.`,
   },
   {
     term: "Device",
@@ -40,11 +35,11 @@ export const TERMS_DEFINITIONS = [
   {
     term: "Third-Party Social Media Service",
     definition:
-      "means any services or content (including data, information, products or services) provided by a third party that is displayed, included, made available, or linked to through the Service.",
+      "means outbound links to the public social media profiles (including Facebook, Twitter/X, Telegram, and YouTube) of Scholars affiliated with the Service, which are displayed on Scholar profile pages within the Service.",
   },
   {
     term: "Website",
-    definition: "refers to Salafi Durus, accessible from https://www.salafidurus.com",
+    definition: `refers to ${COMPANY_NAME}, accessible from ${COMPANY_URL}`,
   },
   {
     term: "You",

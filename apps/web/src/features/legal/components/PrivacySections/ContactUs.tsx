@@ -12,12 +12,7 @@ export function ContactUs() {
       <ul className={styles.contactList}>
         <li>
           By visiting this page on our website:{" "}
-          <Link
-            href={routes.support}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.link}
-          >
+          <Link href={routes.support} className={styles.link}>
             Support
           </Link>
         </li>

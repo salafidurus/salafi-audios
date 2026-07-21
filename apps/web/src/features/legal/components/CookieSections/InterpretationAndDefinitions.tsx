@@ -26,10 +26,7 @@ export function InterpretationAndDefinitions() {
         </li>
         <li>
           <strong>Website</strong> refers to Salafi Durus, accessible from{" "}
-          <a href="https://www.salafidurus.com" target="_blank" rel="noopener noreferrer">
-            https://www.salafidurus.com
-          </a>
-          .
+          <a href="https://www.salafidurus.com">https://www.salafidurus.com</a>.
         </li>
         <li>
           <strong>You</strong> means the individual accessing or using the Website, or a company, or

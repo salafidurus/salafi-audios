@@ -47,6 +47,19 @@ export function UseOfCookies() {
             re-enter your preferences every time You use the Website.
           </p>
         </li>
+        <li>
+          <p>
+            <strong>Analytics Cookies</strong>
+          </p>
+          <p>Type: Persistent Cookies</p>
+          <p>Administered by: Vexo Analytics (third-party)</p>
+          <p>
+            Purpose: These Cookies collect anonymized usage and performance data such as pages
+            viewed, session duration, device type, and browser information to help Us understand how
+            You use the Website and improve our features. This data is not used for advertising or
+            individual profiling.
+          </p>
+        </li>
       </ul>
 
       <h3 className={styles.subsectionTitle}>Your Choices Regarding Cookies</h3>

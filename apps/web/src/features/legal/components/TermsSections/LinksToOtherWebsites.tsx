@@ -21,19 +21,19 @@ export function LinksToOtherWebsites() {
         third-party websites or services that You visit.
       </p>
 
-      <h3 className={styles.subsectionTitle}>Links from a Third-Party Social Media Service</h3>
+      <h3 className={styles.subsectionTitle}>Links to Scholars' Social Media Profiles</h3>
       <p className={styles.paragraph}>
-        The Service may display, include, make available, or link to content or services provided by
-        a Third-Party Social Media Service. A Third-Party Social Media Service is not owned or
-        controlled by the Company, and the Company does not endorse or assume responsibility for any
-        Third-Party Social Media Service.
+        The Service may display outbound links to the public social media profiles (including
+        Facebook, Twitter/X, Telegram, and YouTube) of Scholars affiliated with the Service. These
+        links are provided for informational purposes only and do not imply any endorsement or
+        affiliation with those social media platforms.
       </p>
       <p className={styles.paragraph}>
-        You acknowledge and agree that the Company shall not be responsible or liable, directly or
-        indirectly, for any damage or loss caused or alleged to be caused by or in connection with
-        Your access to or use of any Third-Party Social Media Service, including any content, goods,
-        or services made available through them. Your use of any Third-Party Social Media Service is
-        governed by that Third-Party Social Media Service's terms and privacy policies.
+        These links do not involve any embedded content from Your personal social media account, nor
+        do they collect Your social media handles or account information. You acknowledge and agree
+        that the Company shall not be responsible or liable for any content, goods, or services
+        provided through those external social media platforms, and Your use of those platforms is
+        governed by their respective terms and privacy policies.
       </p>
     </section>
   );
