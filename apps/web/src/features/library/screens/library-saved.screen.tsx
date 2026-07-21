@@ -39,19 +39,20 @@ export function LibrarySavedScreen() {
           <PageHeader title={t("library.saved", "Saved")} />
         </StickyHeaderLayout.Header>
         <StickyHeaderLayout.Content>
-        <InfiniteScrollList
-          data={allItems}
-          isLoading={isLoading}
-          hasMore={hasNextPage ?? false}
-          onLoadMore={() => fetchNextPage()}
-          isFetchingNextPage={isFetchingNextPage}
-          renderItem={(item) => <LibraryListRow item={item} variant="saved" />}
-          emptyMessage={t(
-            "library.emptySaved",
-            "No saved lectures yet. Save lectures to keep track of them.",
-          )}
-        />
-      </section>
+          <InfiniteScrollList
+            data={allItems}
+            isLoading={isLoading}
+            hasMore={hasNextPage ?? false}
+            onLoadMore={() => fetchNextPage()}
+            isFetchingNextPage={isFetchingNextPage}
+            renderItem={(item) => <LibraryListRow item={item} variant="saved" />}
+            emptyMessage={t(
+              "library.emptySaved",
+              "No saved lectures yet. Save lectures to keep track of them.",
+            )}
+          />
+        </StickyHeaderLayout.Content>
+      </StickyHeaderLayout>
       <ScrollToTopButton />
     </ScreenView>
   );
