@@ -2,6 +2,7 @@
 
 import type { CreateScholarDto } from "@sd/core-contracts";
 import { FormSection } from "@/features/admin/components/FormSection";
+import { useTranslation } from "@/core/i18n/use-translation";
 import type { FormAction } from "./ScholarModal";
 import styles from "./scholar-modal.module.css";
 
@@ -11,8 +12,10 @@ interface SettingsSectionProps {
 }
 
 export function SettingsSection({ formData, dispatch }: SettingsSectionProps) {
+  const { t } = useTranslation();
+
   return (
-    <FormSection title="Settings">
+    <FormSection title={t("admin.scholars.settings", "Settings")}>
       <div className={styles.checkboxGroup}>
         <label className={styles.checkbox}>
           <input
@@ -22,7 +25,7 @@ export function SettingsSection({ formData, dispatch }: SettingsSectionProps) {
               dispatch({ type: "UPDATE_FIELD", field: "isKibar", value: e.target.checked })
             }
           />
-          <span>Kibar Scholar</span>
+          <span>{t("admin.scholars.kibarLabel", "Kibar Scholar")}</span>
         </label>
         <label className={styles.checkbox}>
           <input
@@ -32,7 +35,7 @@ export function SettingsSection({ formData, dispatch }: SettingsSectionProps) {
               dispatch({ type: "UPDATE_FIELD", field: "isFeatured", value: e.target.checked })
             }
           />
-          <span>Featured</span>
+          <span>{t("admin.scholars.featuredLabel", "Featured")}</span>
         </label>
         <label className={styles.checkbox}>
           <input
@@ -42,7 +45,7 @@ export function SettingsSection({ formData, dispatch }: SettingsSectionProps) {
               dispatch({ type: "UPDATE_FIELD", field: "isActive", value: e.target.checked })
             }
           />
-          <span>Active</span>
+          <span>{t("admin.scholars.activeLabel", "Active")}</span>
         </label>
       </div>
     </FormSection>

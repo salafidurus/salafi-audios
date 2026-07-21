@@ -42,41 +42,43 @@ type AdminNavItem = {
   requiredPermission?: AdminPermission;
 };
 
-const adminNavItems: AdminNavItem[] = [
-  {
-    label: "Home",
-    Icon: LayoutDashboard,
-    href: routes.admin.index,
-    activeMatch: routes.admin.index,
-  },
-  {
-    label: "Stats",
-    Icon: BarChart3,
-    href: routes.admin.stats,
-    activeMatch: routes.admin.stats,
-  },
-  {
-    label: "Users",
-    Icon: Users,
-    href: routes.admin.users,
-    activeMatch: routes.admin.users,
-    requiredPermission: "USERS_VIEW",
-  },
-  {
-    label: "Contents",
-    Icon: FolderOpen,
-    href: routes.admin.contents,
-    activeMatch: routes.admin.contents,
-    requiredPermission: "LISTINGS_VIEW",
-  },
-  {
-    label: "Scholars",
-    Icon: GraduationCap,
-    href: routes.admin.scholars,
-    activeMatch: routes.admin.scholars,
-    requiredPermission: "SCHOLARS_VIEW",
-  },
-];
+function getAdminNavItems(t: (key: string, fallback: string) => string): AdminNavItem[] {
+  return [
+    {
+      label: t("navigation.admin.home", "Home"),
+      Icon: LayoutDashboard,
+      href: routes.admin.index,
+      activeMatch: routes.admin.index,
+    },
+    {
+      label: t("navigation.admin.stats", "Stats"),
+      Icon: BarChart3,
+      href: routes.admin.stats,
+      activeMatch: routes.admin.stats,
+    },
+    {
+      label: t("navigation.admin.users", "Users"),
+      Icon: Users,
+      href: routes.admin.users,
+      activeMatch: routes.admin.users,
+      requiredPermission: "USERS_VIEW",
+    },
+    {
+      label: t("navigation.admin.contents", "Contents"),
+      Icon: FolderOpen,
+      href: routes.admin.contents,
+      activeMatch: routes.admin.contents,
+      requiredPermission: "LISTINGS_VIEW",
+    },
+    {
+      label: t("navigation.admin.scholars", "Scholars"),
+      Icon: GraduationCap,
+      href: routes.admin.scholars,
+      activeMatch: routes.admin.scholars,
+      requiredPermission: "SCHOLARS_VIEW",
+    },
+  ];
+}
 
 /**
  * Factory function to create main nav items with translations
@@ -123,10 +125,10 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
   const adminRoles: UserRole[] = adminPermissionsData?.roles ?? [];
   const hasAdminRole = adminRoles.some((role) => ["admin", "superadmin"].includes(role));
   const hasAdminAccess = isAuthenticated && (adminPermissions.length > 0 || hasAdminRole);
-
-  const visibleAdminNavItems = adminNavItems.filter(
+  const adminPermissionsSet = new Set(adminPermissions);
+  const visibleAdminNavItems = getAdminNavItems(t).filter(
     (item) =>
-      item.requiredPermission === undefined || adminPermissions.includes(item.requiredPermission),
+      item.requiredPermission === undefined || adminPermissionsSet.has(item.requiredPermission),
   );
   const settingsHref = routes.settings.index;
 
@@ -181,7 +183,9 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
         {hasAdminAccess && (
           <>
             <hr className={styles.divider} />
-            <SectionLabel collapsed={collapsed}>ADMIN</SectionLabel>
+            <SectionLabel collapsed={collapsed}>
+              {t("navigation.adminSection", "ADMIN")}
+            </SectionLabel>
             {visibleAdminNavItems.map((item) => {
               const isActive =
                 item.href === routes.admin.index
@@ -218,7 +222,9 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
               <div className={styles.avatar}>{userInitial}</div>
               {!collapsed && (
                 <div className={styles.profileDetails}>
-                  <span className={styles.profileName}>{user.name || user.email || "User"}</span>
+                  <span className={styles.profileName}>
+                    {user.name || user.email || t("account.defaultUser", "User")}
+                  </span>
                   <span className={styles.profileEmail}>{user.email}</span>
                 </div>
               )}
@@ -277,8 +283,8 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
             }
           }
         }}
-        title="Are you sure you want to sign out?"
-        confirmLabel="Sign Out"
+        title={t("account.profile.signOutPrompt", "Are you sure you want to sign out?")}
+        confirmLabel={t("account.signOut", "Sign Out")}
         confirmVariant="danger"
       />
     </>

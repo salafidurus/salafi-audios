@@ -28,6 +28,7 @@ import { AudioUploader } from "@/features/admin/components/AudioUploader/AudioUp
 import { Modal } from "@/shared/components/Modal";
 import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
 import { useResponsive } from "@/shared/hooks/use-responsive";
+import { useTranslation } from "@/core/i18n/use-translation";
 import { sanitizeError } from "@sd/utils-error";
 import styles from "./admin-contents.screen.module.css";
 
@@ -45,6 +46,7 @@ export function AdminContentsScreen() {
   const queryClient = useQueryClient();
   const { isMobile } = useResponsive();
   const pathname = usePathname();
+  const { t } = useTranslation();
   const {
     query: searchQuery,
     setQuery: setSearchQuery,
@@ -200,15 +202,18 @@ export function AdminContentsScreen() {
           setDeleteError(null);
         }}
         onConfirm={handleConfirmDelete}
-        title="Delete Topic?"
-        confirmLabel="Delete Topic"
+        title={t("admin.contents.deleteTitle", "Delete Topic?")}
+        confirmLabel={t("admin.contents.deleteConfirm", "Delete Topic")}
         confirmVariant="danger"
       >
         <p>
-          Are you sure you want to delete the topic <strong>{deletingTopicName}</strong>?
+          {t("admin.contents.deletePrompt", {
+            defaultValue: "Are you sure you want to delete the topic {{name}}?",
+            name: deletingTopicName,
+          })}
         </p>
         <p style={{ fontSize: "0.875rem", color: "var(--content-muted)", marginTop: "0.5rem" }}>
-          This action cannot be undone.
+          {t("admin.contents.deleteWarning", "This action cannot be undone.")}
         </p>
         {deleteError && (
           <p style={{ fontSize: "0.875rem", color: "var(--color-danger)", marginTop: "0.5rem" }}>
@@ -218,7 +223,11 @@ export function AdminContentsScreen() {
       </Modal.ConfirmDialog>
 
       <PageHeader
-        title={isMobile ? "Content" : "Content Management"}
+        title={
+          isMobile
+            ? t("admin.contents.titleMobile", "Content")
+            : t("admin.contents.title", "Content Management")
+        }
         actions={
           activeTab === "topics" ? (
             <PermissionGate requires="TOPICS_CREATE">
@@ -228,7 +237,9 @@ export function AdminContentsScreen() {
                 icon={<Plus size={!isMobile ? 18 : 16} />}
                 onClick={handleOpenAddTopic}
               >
-                {!isMobile ? "Add Topic" : "Topic"}
+                {!isMobile
+                  ? t("admin.contents.addTopic", "Add Topic")
+                  : t("admin.contents.addTopicMobile", "Topic")}
               </Button>
             </PermissionGate>
           ) : (
@@ -239,7 +250,9 @@ export function AdminContentsScreen() {
                 icon={<Plus size={!isMobile ? 18 : 16} />}
                 onClick={handleOpenAddListing}
               >
-                {!isMobile ? "Add Listing" : "Listing"}
+                {!isMobile
+                  ? t("admin.contents.addListing", "Add Listing")
+                  : t("admin.contents.addListingMobile", "Listing")}
               </Button>
             </PermissionGate>
           )
@@ -250,7 +263,11 @@ export function AdminContentsScreen() {
         <Search.Bar
           value={searchQuery}
           onChange={setSearchQuery}
-          placeholder={activeTab === "topics" ? "Search topics..." : "Search listings..."}
+          placeholder={
+            activeTab === "topics"
+              ? t("admin.contents.searchPlaceholderTopics", "Search topics...")
+              : t("admin.contents.searchPlaceholderListings", "Search listings...")
+          }
         />
 
         {activeTab === "topics" && (
@@ -268,7 +285,9 @@ export function AdminContentsScreen() {
               </List>
             ) : (
               <div className={styles.empty}>
-                {searchQuery ? "No topics match your search." : "No topics yet."}
+                {searchQuery
+                  ? t("admin.contents.searchNoMatchTopics", "No topics match your search.")
+                  : t("admin.contents.noTopicsFound", "No topics yet.")}
               </div>
             )}
           </>
@@ -286,8 +305,11 @@ export function AdminContentsScreen() {
             )}
             emptyMessage={
               debouncedSearch
-                ? "No listings match your search."
-                : "No listings yet. Add audio to create a listing."
+                ? t("admin.contents.searchNoMatchListings", "No listings match your search.")
+                : t(
+                    "admin.contents.noListingsFound",
+                    "No listings yet. Add audio to create a listing.",
+                  )
             }
           />
         )}

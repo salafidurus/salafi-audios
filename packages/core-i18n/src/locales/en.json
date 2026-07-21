@@ -7,7 +7,15 @@
     "name": "Name",
     "termsOfService": "Terms of Service",
     "privacyPolicy": "Privacy Policy",
-    "and": "and"
+    "and": "and",
+    "comingSoon": "Coming soon",
+    "cancel": "Cancel",
+    "save": "Save",
+    "add": "Add",
+    "english": "English",
+    "arabic": "Arabic (عربي)",
+    "hide": "Hide",
+    "viewAll": "View all"
   },
   "auth": {
     "signIn": {
@@ -16,7 +24,7 @@
       "orEmail": "or sign in with email",
       "orContinue": "or continue with email",
       "submit": "Sign In",
-      "submitting": "Signing in\u2026",
+      "submitting": "Signing in…",
       "noAccount": "Don't have an account? Create one",
       "noAccountSplit": "Don't have an account?",
       "noAccountLink": "Create one",
@@ -33,7 +41,38 @@
     "legal": "Legal",
     "signOut": "Sign Out",
     "language": "Language",
-    "showOriginalContent": "Show content in its original language"
+    "showOriginalContent": "Show content in its original language",
+    "profile": {
+      "title": "Profile",
+      "loading": "Loading profile…",
+      "loadError": "Failed to load profile",
+      "notAvailable": "Profile not available.",
+      "displayName": "Display Name",
+      "displayNameSublabel": "Shown across the app",
+      "displayNamePlaceholder": "Your display name",
+      "displayNameAria": "Display name",
+      "edit": "Edit",
+      "cancel": "Cancel",
+      "saving": "Saving…",
+      "save": "Save",
+      "email": "Email",
+      "displayNameSaved": "Display name saved.",
+      "displayNameSaveFailed": "Failed to save. Please try again.",
+      "emailVerified": "Email Verified",
+      "verified": "Verified",
+      "unverified": "Unverified",
+      "deleting": "Deleting…",
+      "deleteAccount": "Delete Account",
+      "signOutTitle": "Sign Out?",
+      "signOutConfirm": "Sign Out",
+      "signOutPrompt": "Are you sure you want to sign out?",
+      "deleteAccountConfirm": "Delete Account",
+      "deleteAccountPrompt": "This action is permanent and cannot be undone. All your data will be deleted.",
+      "deleteConfirmWord": "DELETE",
+      "signInCta": "Sign in to view your profile and roles.",
+      "signInDesc": "Create an account or sign in to manage your profile and roles.",
+      "signIn": "Sign In"
+    }
   },
   "tabs": {
     "search": "Search",
@@ -52,10 +91,60 @@
     "collapseSidebar": "Collapse sidebar",
     "siteFooter": "Site footer",
     "languageSwitch": "Language switch",
+    "settings": "Settings",
+    "adminSection": "ADMIN",
+    "admin": {
+      "home": "Home",
+      "stats": "Stats",
+      "users": "Users",
+      "contents": "Contents",
+      "scholars": "Scholars"
+    },
     "subnav": {
       "explore": { "popular": "Popular", "recent": "Recent", "following": "Following" },
       "library": { "started": "Started", "saved": "Saved", "completed": "Completed" },
-      "account": { "general": "General", "profile": "Profile", "legal": "Legal" }
+      "account": { "general": "General", "profile": "Profile", "legal": "Legal" },
+      "settings": { "general": "General", "profile": "Profile", "legal": "Legal" },
+      "admin": { "topics": "Topics", "listings": "Listings" }
+    }
+  },
+  "settings": {
+    "general": {
+      "title": "Settings",
+      "languageSection": "Language",
+      "languageDesc": "Configure app and content language.",
+      "appLanguage": "App Language",
+      "appLanguageDesc": "Interface language for the app",
+      "contentLanguage": "Content Language",
+      "contentLanguageDesc": "Preferred translation language",
+      "displaySection": "Display",
+      "displayDesc": "Choose a theme for the interface.",
+      "theme": "Theme",
+      "themeDesc": "System follows your OS preference",
+      "themeAria": "Theme preference",
+      "themeOptions": {
+        "system": "System",
+        "light": "Light",
+        "dark": "Dark"
+      },
+      "notifSection": "Notifications",
+      "notifDesc": "Manage what notifications you receive.",
+      "enableNotif": "Enable Notifications",
+      "enableNotifDesc": "Master toggle for all notifications",
+      "followedScholars": "Followed Scholars",
+      "followedScholarsDesc": "Notify when a followed scholar posts",
+      "newLectures": "New Lectures",
+      "newLecturesDesc": "Notify when new lectures are published"
+    },
+    "legal": {
+      "title": "Legal",
+      "privacyPolicy": "Privacy Policy",
+      "privacyDesc": "How we collect and use your data.",
+      "privacySublabel": "Read our full privacy policy, including data collection, storage, and your rights.",
+      "view": "View →",
+      "termsOfUse": "Terms of Use",
+      "termsDesc": "Rules governing use of this service.",
+      "termsSublabel": "Read the terms and conditions governing your use of Salafi Durus."
     }
   },
   "support": {
@@ -111,7 +200,12 @@
     "startTyping": "Start typing to search.",
     "suggestions": "Suggestions",
     "scholars": "Scholars",
-    "continueListening": "Continue Listening"
+    "continueListening": "Continue Listening",
+    "filterAll": "All",
+    "filterAllAria": "Show all items",
+    "filterByAria": "Filter by {{label}}",
+    "filterRemoveAria": "Remove {{label}} filter",
+    "enterQuery": "Enter a search query to begin"
   },
   "library": {
     "title": "My Library",
@@ -119,12 +213,18 @@
     "saved": "Saved",
     "completed": "Completed",
     "loadingSection": "Loading {{section}}…",
-    "emptyProgress": "No lectures in progress.",
-    "emptySaved": "No saved lectures yet. Save lectures to listen to later.",
-    "emptyCompleted": "No completed lectures yet. Keep listening!",
+    "emptyProgress": "No lectures started yet. Browse the catalog to begin listening.",
+    "emptySaved": "No saved lectures yet. Save lectures to keep track of them.",
+    "emptyCompleted": "No completed lectures yet. Finish lectures to track your learning.",
     "percentListened": "{{percent}}% listened",
     "savedOn": "Saved {{date}}",
-    "completedOn": "Completed {{date}}"
+    "completedOn": "Completed {{date}}",
+    "authProgressTitle": "Sign in to view your progress",
+    "authProgressDesc": "Start listening to lectures and track your progress",
+    "authSavedTitle": "Sign in to view saved lectures",
+    "authSavedDesc": "Save lectures to revisit them later",
+    "authCompletedTitle": "Sign in to view completed history",
+    "authCompletedDesc": "Track lectures you've finished"
   },
   "lecture": {
     "loading": "Loading lecture…",
@@ -138,7 +238,12 @@
     "lectures": "Lectures",
     "empty": "No published content yet.",
     "seriesCount": "{{count}} series",
-    "lectureCount": "{{count}} lectures"
+    "lectureCount": "{{count}} lectures",
+    "showLess": "Show less",
+    "showMore": "Show more",
+    "statLectures": "Lectures",
+    "statSeries": "Series",
+    "statTotal": "Total"
   },
   "feed": {
     "newInTopic": "New in {{topic}}",
@@ -152,6 +257,291 @@
   "notFound": {
     "title": "Oops!",
     "message": "Page not found",
-    "nativeDescription": "This native route has not been migrated yet. Tap back in the app or return home."
+    "nativeDescription": "This native route has not been migrated yet. Tap back in the app or return home.",
+    "description": "The page you are looking for does not exist or has been moved.",
+    "backHome": "Back to home"
+  },
+  "serverError": {
+    "title": "Something went wrong",
+    "description": "The page could not be loaded right now. Please try again.",
+    "retry": "Try again"
+  },
+  "home": {
+    "hero": {
+      "taglineTranslation": "Say: 'Are those who know equal to those who do not know?' It is only men of understanding who will remember",
+      "surahReference": "Surah Az-Zumar (39:9)"
+    },
+    "searchLabel": "What do you want to listen to?",
+    "downloadAppStore": "Download on the App Store",
+    "getGooglePlay": "Get it on Google Play"
+  },
+  "audio": {
+    "playbackSpeed": "Playback Speed",
+    "skipBackward": "Skip backward 30 seconds",
+    "skipForward": "Skip forward 30 seconds",
+    "play": "Play",
+    "pause": "Pause"
+  },
+  "imageUpload": {
+    "selectImage": "Select image file",
+    "uploadImage": "Upload image",
+    "uploading": "Uploading...",
+    "clickToUpload": "Click to upload",
+    "orDragDrop": "or drag and drop",
+    "hint": "PNG, JPG, GIF up to {{maxSizeMB}}MB",
+    "previewAlt": "Preview",
+    "removeImage": "Remove image",
+    "errorFileType": "Please upload an image file",
+    "errorFileExt": "Only PNG, JPG, and JPEG images are allowed",
+    "errorFileSize": "Image must be less than {{maxSizeMB}}MB (current: {{current}}MB)"
+  },
+  "authCallback": {
+    "timeoutTitle": "Authentication Timeout",
+    "timeoutDesc": "Authentication is taking longer than expected.",
+    "pleaseTryAgain": "Please try again",
+    "errorTitle": "Authentication Error",
+    "unexpectedError": "An unexpected error occurred.",
+    "tryAgain": "Try again",
+    "completingSignIn": "Completing sign-in..."
+  },
+  "legal": {
+    "privacy": {
+      "title": "Privacy Policy",
+      "sections": {
+        "collect": {
+          "title": "Information We Collect",
+          "desktop": "We collect information you provide when creating an account (email, display name) and usage data such as listening history and saved lectures. We do not sell your personal information to third parties.",
+          "mobile": "We collect information you provide when creating an account and usage data such as listening history. We do not sell your personal information."
+        },
+        "use": {
+          "title": "How We Use Your Information",
+          "desktop": "Your information is used to provide and improve the service, personalize your experience (e.g., resume playback, recommendations), and communicate important updates about the platform.",
+          "mobile": "Your information is used to provide the service, personalize your experience, and communicate important updates."
+        },
+        "storage": {
+          "title": "Data Storage & Security",
+          "desktop": "Your data is stored securely using industry-standard encryption. Audio files are served via secure, time-limited URLs. We retain your data only as long as your account is active.",
+          "mobile": "Your data is stored securely with industry-standard encryption. We retain your data only while your account is active."
+        },
+        "contact": {
+          "title": "Contact",
+          "desktop": "For privacy-related inquiries, contact us at privacy@salafidurus.com.",
+          "mobile": "privacy@salafidurus.com"
+        }
+      }
+    },
+    "terms": {
+      "title": "Terms of Use",
+      "sections": {
+        "acceptance": {
+          "title": "Acceptance of Terms",
+          "desktop": "By accessing or using Salafi Durus, you agree to be bound by these Terms of Use. If you do not agree, do not use the service.",
+          "mobile": "By using Salafi Durus, you agree to these Terms. If you do not agree, do not use the service."
+        },
+        "use": {
+          "title": "Use of the Service",
+          "desktop": "Salafi Durus provides access to Islamic audio lectures for personal, non-commercial use. You may not redistribute, modify, or commercially exploit the content without explicit permission from the content owners.",
+          "mobile": "Content is for personal, non-commercial use. Do not redistribute or commercially exploit the content."
+        },
+        "accounts": {
+          "title": "User Accounts",
+          "desktop": "You are responsible for maintaining the confidentiality of your account credentials and for all activities under your account. Notify us immediately of any unauthorized use.",
+          "mobile": "You are responsible for your account credentials and all activity under your account."
+        },
+        "property": {
+          "title": "Content & Intellectual Property",
+          "desktop": "All audio content is provided by scholars and remains their intellectual property. The platform design, code, and branding are owned by Salafi Durus.",
+          "mobile": "Audio content belongs to the scholars. Platform design and code belong to Salafi Durus."
+        },
+        "termination": {
+          "title": "Termination",
+          "text": "We may suspend or terminate your account if you violate these terms. You may delete your account at any time from your account settings."
+        },
+        "contact": {
+          "title": "Contact",
+          "desktop": "For questions about these terms, contact legal@salafidurus.com.",
+          "mobile": "legal@salafidurus.com"
+        }
+      }
+    }
+  },
+  "role": {
+    "listener": "Listener",
+    "scholar": "Scholar",
+    "translator": "Translator",
+    "editor": "Editor",
+    "admin": "Admin",
+    "superadmin": "Super Admin",
+    "descriptions": {
+      "listener": "Regular user who listens to lectures",
+      "scholar": "Content creator who manages their own lectures",
+      "translator": "Translates content to assigned languages",
+      "editor": "Edits and reviews content listings",
+      "admin": "Manages users, scholars, and content catalog",
+      "superadmin": "Full system control and configurations"
+    },
+    "grant": "Grant {{role}}",
+    "revoke": "Revoke {{role}}"
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Admin Dashboard",
+      "titleMobile": "Admin",
+      "loading": "Loading…",
+      "noPermissions": "You don't have any admin permissions.",
+      "noPermissionsMobile": "No admin permissions.",
+      "scholarsDesc": "Manage scholars, their profiles and visibility",
+      "scholarsDescMobile": "Manage scholars",
+      "contentsDesc": "Manage topics, lectures, and content hierarchy",
+      "contentsDescMobile": "Manage content",
+      "usersDesc": "Manage admin users and permissions",
+      "usersDescMobile": "Manage users"
+    },
+    "stats": {
+      "title": "Admin Stats",
+      "desc": "Platform statistics and analytics will appear here."
+    },
+    "scholars": {
+      "manageTitle": "Manage Scholars",
+      "addScholar": "Add Scholar",
+      "editScholar": "Edit Scholar",
+      "saveChanges": "Save Changes",
+      "nameSlugRequired": "Name and slug are required",
+      "basicInfo": "Basic Information",
+      "nameLabel": "Name *",
+      "namePlaceholder": "Scholar name",
+      "slugLabel": "Slug *",
+      "slugPlaceholder": "scholar-slug",
+      "bioLabel": "Bio",
+      "bioPlaceholder": "Brief biography...",
+      "imageUrlLabel": "Image URL",
+      "imageUrlPlaceholder": "https://...",
+      "loadingImage": "Loading image...",
+      "failedImage": "Failed to load image",
+      "imagePreviewAlt": "Preview",
+      "locationLanguage": "Location & Language",
+      "countryLabel": "Country",
+      "countryPlaceholder": "Select Country",
+      "languageLabel": "Main Language",
+      "languagePlaceholder": "Select Language",
+      "socialMedia": "Social Media",
+      "twitterLabel": "Twitter",
+      "telegramLabel": "Telegram",
+      "youtubeLabel": "YouTube",
+      "websiteLabel": "Website",
+      "settings": "Settings",
+      "kibarLabel": "Kibar Scholar",
+      "featuredLabel": "Featured",
+      "activeLabel": "Active",
+      "searchPlaceholderDesktop": "Search scholars by name or slug..."
+    },
+    "users": {
+      "title": "Manage Users",
+      "titleMobile": "Users",
+      "searchPlaceholder": "Search users by name or email...",
+      "searchNoMatch": "No users match your search.",
+      "noUsersFound": "No users found."
+    },
+    "permissions": {
+      "title": "Manage Permissions",
+      "titleMobile": "Permissions",
+      "userIdLabel": "User ID",
+      "userIdPlaceholder": "User ID",
+      "lookup": "Lookup",
+      "userPermissionsHeader": "Permissions for {{userId}}",
+      "permissionTableHeader": "Permission",
+      "statusTableHeader": "Status",
+      "actionTableHeader": "Action",
+      "granted": "Granted",
+      "notGranted": "Not granted",
+      "revoke": "Revoke",
+      "grant": "Grant",
+      "managePermissions": "Manage Permissions",
+      "managePermissionsBtn": "Manage Permissions",
+      "managePermissionsBtnShort": "Permissions",
+      "manageRoles": "Manage Roles",
+      "manageRolesBtn": "Manage Roles",
+      "manageRolesBtnShort": "Roles",
+      "saving": "Saving…",
+      "done": "Done",
+      "loading": "Loading permissions…",
+      "loadingRoles": "Loading roles…",
+      "sections": {
+        "scholars": "Scholars Management",
+        "listings": "Listings Management",
+        "topics": "Topics Management",
+        "translations": "Translations Management",
+        "media": "Media Management",
+        "users": "User Management"
+      },
+      "revokeTitle": "Revoke Permission?",
+      "revoking": "Revoking…",
+      "revokeButton": "Revoke Permission",
+      "revokePrompt": "Are you sure you want to revoke {{permission}} from {{user}}?",
+      "revokeWarning": "This will remove their access to this functionality."
+    },
+    "contents": {
+      "deleteTitle": "Delete Topic?",
+      "deleteConfirm": "Delete Topic",
+      "deletePrompt": "Are you sure you want to delete the topic {{name}}?",
+      "deleteWarning": "This action cannot be undone.",
+      "title": "Content Management",
+      "titleMobile": "Content",
+      "addTopic": "Add Topic",
+      "addTopicMobile": "Topic",
+      "addListing": "Add Listing",
+      "addListingMobile": "Listing",
+      "searchPlaceholderTopics": "Search topics...",
+      "searchPlaceholderListings": "Search listings...",
+      "searchNoMatchTopics": "No topics match your search.",
+      "noTopicsFound": "No topics yet.",
+      "searchNoMatchListings": "No listings match your search.",
+      "noListingsFound": "No listings yet. Add audio to create a listing.",
+      "editTopic": "Edit Topic",
+      "slugLabel": "Slug *",
+      "slugPlaceholder": "topic-slug",
+      "englishNameLabel": "English Name *",
+      "englishNamePlaceholder": "Topic name in English",
+      "arabicNameLabel": "Arabic Name",
+      "arabicNamePlaceholderOptional": "Topic name in Arabic (optional)",
+      "arabicNamePlaceholder": "Topic name in Arabic",
+      "statusLabel": "Status:",
+      "cancelEdit": "Cancel edit",
+      "editSlug": "Edit slug",
+      "editEnglishName": "Edit English name",
+      "editArabicName": "Edit Arabic name",
+      "failedToSave": "Failed to save",
+      "unpublish": {
+        "title": "Unpublish Translation?",
+        "unpublishing": "Unpublishing…",
+        "unpublishBtn": "Unpublish",
+        "prompt": "Are you sure you want to unpublish this {{label}}?",
+        "warning": "It will no longer be visible to users."
+      },
+      "listing": {
+        "editTitle": "Edit Lecture Details",
+        "newTitle": "New Lecture Details",
+        "titleLabel": "Title",
+        "slugLabel": "Slug",
+        "slugPlaceholder": "Auto-generated if left blank",
+        "descriptionLabel": "Description",
+        "scholarLabel": "Scholar",
+        "scholarPlaceholder": "Select Scholar",
+        "seriesLabel": "Series",
+        "seriesPlaceholder": "Select Series (Optional)",
+        "statusLabel": "Status",
+        "statusPlaceholder": "Select Status",
+        "draft": "Draft",
+        "published": "Published",
+        "archived": "Archived",
+        "orderIndexLabel": "Order Index",
+        "topicsLabel": "Topics",
+        "noTopicsAvailable": "No topics available",
+        "titleRequired": "Title is required.",
+        "scholarRequired": "Scholar is required.",
+        "audioKeyRequired": "Audio file key is required for creation.",
+        "failedToSave": "Failed to save lecture details."
+      }
+    }
   }
 }

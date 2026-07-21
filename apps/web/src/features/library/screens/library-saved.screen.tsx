@@ -2,6 +2,7 @@
 
 import { useInfiniteLibrarySaved } from "@sd/domain-content";
 import { useAuth } from "@/core/auth/use-auth";
+import { useTranslation } from "@/core/i18n/use-translation";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
@@ -10,6 +11,7 @@ import { LibraryListRow } from "@/features/library/components/library-list-row/l
 
 export function LibrarySavedScreen() {
   const { isAuthenticated } = useAuth();
+  const { t } = useTranslation();
 
   const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useInfiniteLibrarySaved();
@@ -20,8 +22,8 @@ export function LibrarySavedScreen() {
     return (
       <ScreenView contentStyle={{ flex: 1 }}>
         <AuthRequiredState
-          title="Sign in to view saved lectures"
-          description="Save lectures to revisit them later"
+          title={t("library.authSavedTitle", "Sign in to view saved lectures")}
+          description={t("library.authSavedDesc", "Save lectures to revisit them later")}
         />
       </ScreenView>
     );
@@ -29,7 +31,7 @@ export function LibrarySavedScreen() {
 
   return (
     <ScreenView contentStyle={{ flex: 1 }}>
-      <PageHeader title="Saved" />
+      <PageHeader title={t("library.saved", "Saved")} />
       <InfiniteScrollList
         data={allItems}
         isLoading={isLoading}
@@ -37,7 +39,10 @@ export function LibrarySavedScreen() {
         onLoadMore={() => fetchNextPage()}
         isFetchingNextPage={isFetchingNextPage}
         renderItem={(item) => <LibraryListRow item={item} variant="saved" />}
-        emptyMessage="No saved lectures yet. Save lectures to keep track of them."
+        emptyMessage={t(
+          "library.emptySaved",
+          "No saved lectures yet. Save lectures to keep track of them.",
+        )}
       />
     </ScreenView>
   );

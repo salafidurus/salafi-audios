@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { Search } from "@/shared/components/Search";
 import { useDropdownContext } from "./context";
+import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./dropdown.module.css";
 
 export interface DropdownContentProps {
@@ -12,6 +13,7 @@ export interface DropdownContentProps {
 }
 
 export function DropdownContent({ children, searchable = false, className }: DropdownContentProps) {
+  const { t } = useTranslation();
   const {
     open,
     setOpen,
@@ -132,7 +134,11 @@ export function DropdownContent({ children, searchable = false, className }: Dro
     >
       {searchable && (
         <div className={styles.searchWrapper}>
-          <Search.Bar value={searchQuery} onChange={handleSearchChange} placeholder="Search..." />
+          <Search.Bar
+            value={searchQuery}
+            onChange={handleSearchChange}
+            placeholder={t("search.placeholder", "Search")}
+          />
         </div>
       )}
       <div className={styles.itemsList}>{children}</div>

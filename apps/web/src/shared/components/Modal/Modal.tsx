@@ -12,6 +12,7 @@ import { createPortal } from "react-dom";
 import { LazyMotion, m, domAnimation, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { Button } from "../Button/Button";
+import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./modal.module.css";
 
 function getModalPortalRoot(): HTMLElement | null {
@@ -248,6 +249,8 @@ export function ModalConfirmDialog({
   cancelTestId,
   modalTestId,
 }: ModalConfirmDialogProps) {
+  const { t } = useTranslation();
+
   return (
     <div data-testid={modalTestId}>
       <Modal isOpen={isOpen} onClose={onClose} title={title} loading={loading}>
@@ -260,7 +263,7 @@ export function ModalConfirmDialog({
             disabled={loading}
             data-testid={cancelTestId}
           >
-            Cancel
+            {t("common.cancel", "Cancel")}
           </Button>
           <Button
             variant={confirmVariant === "danger" ? "danger" : "primary"}
@@ -306,6 +309,7 @@ export function ModalConfirmText({
   modalTestId,
   cancelTestId,
 }: ModalConfirmTextProps) {
+  const { t } = useTranslation();
   const [inputValue, setInputValue] = useState("");
 
   const handleClose = () => {
@@ -327,13 +331,17 @@ export function ModalConfirmText({
           <p
             style={{ marginBottom: "0.5rem", fontSize: "0.875rem", color: "var(--content-muted)" }}
           >
-            Type <strong>{confirmWord}</strong> to confirm
+            {t("modal.typeLabel", "Type")} <strong>{confirmWord}</strong>{" "}
+            {t("modal.toConfirmLabel", "to confirm")}
           </p>
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder={`Type "${confirmWord}" to confirm`}
+            placeholder={t("modal.confirmPlaceholder", {
+              defaultValue: `Type "${confirmWord}" to confirm`,
+              confirmWord,
+            })}
             style={{
               width: "100%",
               padding: "0.75rem",
@@ -354,7 +362,7 @@ export function ModalConfirmText({
             disabled={loading}
             data-testid={cancelTestId}
           >
-            Cancel
+            {t("common.cancel", "Cancel")}
           </Button>
           <Button
             variant={confirmVariant === "danger" ? "danger" : "primary"}

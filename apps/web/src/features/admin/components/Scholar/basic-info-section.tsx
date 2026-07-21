@@ -6,6 +6,7 @@ import type { CreateScholarDto } from "@sd/core-contracts";
 import { EditableInput } from "@/shared/components/EditableInput";
 import { EditableTextarea } from "@/shared/components/EditableTextarea";
 import { FormSection } from "@/features/admin/components/FormSection";
+import { useTranslation } from "@/core/i18n/use-translation";
 import type { FormAction } from "./ScholarModal";
 import styles from "./scholar-modal.module.css";
 
@@ -24,6 +25,8 @@ export function BasicInfoSection({
   imageLoading,
   imageError,
 }: BasicInfoSectionProps) {
+  const { t } = useTranslation();
+
   const handleNameChange = (value: string) => {
     dispatch({ type: "UPDATE_FIELD", field: "name", value });
     if (!isEditing) {
@@ -42,74 +45,74 @@ export function BasicInfoSection({
   };
 
   return (
-    <FormSection title="Basic Information">
+    <FormSection title={t("admin.scholars.basicInfo", "Basic Information")}>
       <div className={styles.twoCol}>
         <div className={styles.field}>
           <label className={styles.label} htmlFor="scholar-name">
-            Name *
+            {t("admin.scholars.nameLabel", "Name *")}
           </label>
           <EditableInput
             id="scholar-name"
             value={formData.name}
             onChange={handleNameChange}
-            placeholder="Scholar name"
+            placeholder={t("admin.scholars.namePlaceholder", "Scholar name")}
           />
         </div>
         <div className={styles.field}>
           <label className={styles.label} htmlFor="scholar-slug">
-            Slug *
+            {t("admin.scholars.slugLabel", "Slug *")}
           </label>
           <EditableInput
             id="scholar-slug"
             value={formData.slug}
             onChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "slug", value })}
-            placeholder="scholar-slug"
+            placeholder={t("admin.scholars.slugPlaceholder", "scholar-slug")}
           />
         </div>
       </div>
 
       <div className={styles.field}>
         <label className={styles.label} htmlFor="scholar-bio">
-          Bio
+          {t("admin.scholars.bioLabel", "Bio")}
         </label>
         <EditableTextarea
           id="scholar-bio"
           value={formData.bio ?? ""}
           onChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "bio", value })}
-          placeholder="Brief biography..."
+          placeholder={t("admin.scholars.bioPlaceholder", "Brief biography...")}
           rows={4}
         />
       </div>
 
       <div className={styles.field}>
         <label className={styles.label} htmlFor="scholar-image-url">
-          Image URL
+          {t("admin.scholars.imageUrlLabel", "Image URL")}
         </label>
         <EditableInput
           id="scholar-image-url"
           type="url"
           value={formData.imageUrl ?? ""}
           onChange={handleImageUrlChange}
-          placeholder="https://..."
+          placeholder={t("admin.scholars.imageUrlPlaceholder", "https://...")}
         />
         {formData.imageUrl && (
           <div className={styles.imagePreview}>
             {imageLoading && (
               <div className={styles.imageLoadingState}>
                 <Loader size={24} className={styles.loadingSpinner} />
-                <span>Loading image...</span>
+                <span>{t("admin.scholars.loadingImage", "Loading image...")}</span>
               </div>
             )}
             {imageError && (
               <div className={styles.imageErrorState}>
                 <AlertCircle size={24} />
-                <span>Failed to load image</span>
+                <span>{t("admin.scholars.failedImage", "Failed to load image")}</span>
               </div>
             )}
             {!imageError && (
               <Image
                 src={formData.imageUrl}
-                alt="Preview"
+                alt={t("admin.scholars.imagePreviewAlt", "Preview")}
                 width={200}
                 height={200}
                 style={{ objectFit: "contain" }}

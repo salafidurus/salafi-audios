@@ -11,6 +11,7 @@ import {
 } from "@/features/admin/api/admin.api";
 import { Modal } from "@/shared/components/Modal/Modal";
 import { Button } from "@/shared/components/Button";
+import { useTranslation } from "@/core/i18n/use-translation";
 import { RoleItem } from "./RoleItem";
 import { ROLES_ARRAY } from "./constants";
 import styles from "./RoleDialog.module.css";
@@ -74,6 +75,7 @@ export function RoleDialog({
   userName = userId,
 }: RoleDialogProps): ReactNode {
   const queryClient = useQueryClient();
+  const { t } = useTranslation();
   const [state, dispatch] = useReducer(reducer, initialState);
   const [pendingRoles, setPendingRoles] = useState<Set<UserRole>>(new Set());
   const [saving, setSaving] = useState(false);
@@ -174,7 +176,7 @@ export function RoleDialog({
   }
   const customTitle = (
     <div className={styles.titleContainer}>
-      <span className={styles.titleMain}>Manage Roles</span>
+      <span className={styles.titleMain}>{t("admin.permissions.manageRoles", "Manage Roles")}</span>
       <span className={styles.titleSub}>{userName}</span>
     </div>
   );
@@ -186,12 +188,14 @@ export function RoleDialog({
       title={customTitle as any}
       footer={
         <Button variant="primary" onClick={handleDone} disabled={saving}>
-          {saving ? "Saving…" : "Done"}
+          {saving ? t("admin.permissions.saving", "Saving…") : t("admin.permissions.done", "Done")}
         </Button>
       }
     >
       {state.loading && !state.userRoles ? (
-        <div className={styles.loading}>Loading roles…</div>
+        <div className={styles.loading}>
+          {t("admin.permissions.loadingRoles", "Loading roles…")}
+        </div>
       ) : (
         <div className={styles.rolesList}>
           {ROLES_ARRAY.map((role) => (

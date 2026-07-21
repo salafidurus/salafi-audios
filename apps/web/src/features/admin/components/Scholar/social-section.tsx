@@ -3,6 +3,7 @@
 import type { CreateScholarDto } from "@sd/core-contracts";
 import { EditableInput } from "@/shared/components/EditableInput";
 import { FormSection } from "@/features/admin/components/FormSection";
+import { useTranslation } from "@/core/i18n/use-translation";
 import type { FormAction } from "./ScholarModal";
 import styles from "./scholar-modal.module.css";
 
@@ -12,12 +13,14 @@ interface SocialSectionProps {
 }
 
 export function SocialSection({ formData, dispatch }: SocialSectionProps) {
+  const { t } = useTranslation();
+
   return (
-    <FormSection title="Social Media">
+    <FormSection title={t("admin.scholars.socialMedia", "Social Media")}>
       <div className={styles.twoCol}>
         <div className={styles.field}>
           <label className={styles.label} htmlFor="scholar-twitter">
-            Twitter
+            {t("admin.scholars.twitterLabel", "Twitter")}
           </label>
           <EditableInput
             id="scholar-twitter"
@@ -29,7 +32,7 @@ export function SocialSection({ formData, dispatch }: SocialSectionProps) {
         </div>
         <div className={styles.field}>
           <label className={styles.label} htmlFor="scholar-telegram">
-            Telegram
+            {t("admin.scholars.telegramLabel", "Telegram")}
           </label>
           <EditableInput
             id="scholar-telegram"
@@ -43,7 +46,7 @@ export function SocialSection({ formData, dispatch }: SocialSectionProps) {
       <div className={styles.twoCol}>
         <div className={styles.field}>
           <label className={styles.label} htmlFor="scholar-youtube">
-            YouTube
+            {t("admin.scholars.youtubeLabel", "YouTube")}
           </label>
           <EditableInput
             id="scholar-youtube"
@@ -55,7 +58,7 @@ export function SocialSection({ formData, dispatch }: SocialSectionProps) {
         </div>
         <div className={styles.field}>
           <label className={styles.label} htmlFor="scholar-website">
-            Website
+            {t("admin.scholars.websiteLabel", "Website")}
           </label>
           <EditableInput
             id="scholar-website"

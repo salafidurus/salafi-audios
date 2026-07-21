@@ -22,8 +22,11 @@ export function LibraryScreen() {
     return (
       <ScreenView contentStyle={{ flex: 1 }}>
         <AuthRequiredState
-          title="Sign in to view your progress"
-          description="Start listening to lectures and track your progress"
+          title={t("library.authProgressTitle", "Sign in to view your progress")}
+          description={t(
+            "library.authProgressDesc",
+            "Start listening to lectures and track your progress",
+          )}
         />
       </ScreenView>
     );
@@ -39,7 +42,10 @@ export function LibraryScreen() {
         onLoadMore={() => fetchNextPage()}
         isFetchingNextPage={isFetchingNextPage}
         renderItem={(item) => <LibraryListRow item={item} variant="progress" />}
-        emptyMessage="No lectures started yet. Browse the catalog to begin listening."
+        emptyMessage={t(
+          "library.emptyProgress",
+          "No lectures started yet. Browse the catalog to begin listening.",
+        )}
       />
     </ScreenView>
   );

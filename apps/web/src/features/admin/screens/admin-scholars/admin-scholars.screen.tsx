@@ -13,10 +13,12 @@ import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { type CreateScholarDto, type AdminScholarListItemDto } from "@sd/core-contracts";
 import { createScholar, updateScholar } from "@/features/admin/api/admin.api";
 import { Scholar, type ScholarForEdit } from "@/features/admin/components/Scholar";
+import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./admin-scholars.screen.module.css";
 
 export function AdminScholarsScreen() {
   const isDesktop = useIsDesktop();
+  const { t } = useTranslation();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -67,7 +69,11 @@ export function AdminScholarsScreen() {
     <ScreenView>
       <div className={styles.container}>
         <PageHeader
-          title={isDesktop ? "Manage Scholars" : "Scholars"}
+          title={
+            isDesktop
+              ? t("admin.scholars.manageTitle", "Manage Scholars")
+              : t("navigation.admin.scholars", "Scholars")
+          }
           actions={
             <PermissionGate requires="SCHOLARS_CREATE">
               <Button
@@ -76,7 +82,7 @@ export function AdminScholarsScreen() {
                 icon={<Plus size={isDesktop ? 18 : 16} />}
                 onClick={handleOpenAdd}
               >
-                {isDesktop ? "Add Scholar" : "Add"}
+                {isDesktop ? t("admin.scholars.addScholar", "Add Scholar") : t("common.add", "Add")}
               </Button>
             </PermissionGate>
           }
@@ -86,7 +92,11 @@ export function AdminScholarsScreen() {
           <Search.Bar
             value={searchQuery}
             onChange={setSearchQuery}
-            placeholder={isDesktop ? "Search scholars by name or slug..." : "Search scholars..."}
+            placeholder={
+              isDesktop
+                ? t("admin.scholars.searchPlaceholderDesktop", "Search scholars by name or slug...")
+                : t("scholarContent.searchScholars", "Search scholars...")
+            }
           />
         </div>
 
@@ -99,7 +109,11 @@ export function AdminScholarsScreen() {
           renderItem={(scholar) => (
             <Scholar.Item scholar={scholar} onEdit={() => handleOpenEdit(scholar)} />
           )}
-          emptyMessage={searchQuery ? "No scholars match your search." : "No scholars found."}
+          emptyMessage={
+            searchQuery
+              ? t("scholarContent.searchNoMatch", "No scholars match your search.")
+              : t("scholarContent.noScholarsFound", "No scholars found.")
+          }
         />
       </div>
 
