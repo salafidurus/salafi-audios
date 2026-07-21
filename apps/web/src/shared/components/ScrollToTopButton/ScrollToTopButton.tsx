@@ -7,6 +7,13 @@ import styles from "./scroll-to-top-button.module.css";
 
 const SCROLL_THRESHOLD = 320;
 
+const scrollToTop = () => {
+  const scrollContainer = document.querySelector(".appContent") as HTMLElement;
+  if (scrollContainer) {
+    scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
+  }
+};
+
 export function ScrollToTopButton() {
   const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
@@ -25,24 +32,18 @@ export function ScrollToTopButton() {
 
   if (!isVisible) return null;
 
-  const handleClick = () => {
-    const scrollContainer = document.querySelector(".appContent") as HTMLElement;
-    if (scrollContainer) {
-      scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
-
   const label = t("common.scrollToTop", "Return to top");
 
   return (
     <button
       className={styles.button}
-      onClick={handleClick}
+      onClick={scrollToTop}
       aria-label={label}
       title={label}
       type="button"
     >
       <ArrowUp size={20} />
+      <span>{label}</span>
     </button>
   );
 }

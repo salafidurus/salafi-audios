@@ -1,32 +1,34 @@
 .button {
   position: fixed;
-  bottom: var(--space-scale-xl);
+  bottom: calc(var(--space-scale-xl) * 2 + 60px);
   inset-inline-end: var(--space-scale-xl);
   z-index: 40;
 
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  gap: var(--space-component-gap-sm);
+  padding: var(--space-component-gap-md) var(--space-component-gap-lg);
   border-radius: 9999px;
 
-  background-color: var(--surface-default);
-  border: 1px solid var(--chrome-border);
+  background-color: var(--action-primary);
+  border: none;
   cursor: pointer;
 
   box-shadow: var(--shadow-lg);
 
-  color: var(--content-default);
+  color: white;
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: 500;
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: var(--surface-canvas);
-    transform: translateY(-2px);
+    background-color: var(--action-primary-hover, var(--action-primary));
+    transform: translateY(-4px);
     box-shadow: var(--shadow-xl);
   }
 
   &:active {
-    transform: translateY(0);
+    transform: translateY(-2px);
   }
 }
