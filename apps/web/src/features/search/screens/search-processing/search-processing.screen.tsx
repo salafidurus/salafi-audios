@@ -10,6 +10,8 @@ import { routes } from "@sd/core-contracts";
 import { Search } from "@/shared/components/Search";
 import { SearchResultItem } from "@/features/search/components/SearchResultItem/SearchResultItem";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
+import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
+import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import type { SearchResultRow } from "@sd/domain-search";
 import styles from "./search-processing.screen.module.css";
@@ -59,40 +61,43 @@ export function SearchProcessingScreen({ searchKey }: SearchProcessingScreenProp
 
   return (
     <ScreenView contentStyle={{ flex: 1 }}>
-      <div className={styles.stickyHeader}>
-        <Search.Bar
-          placeholder={t("search.placeholder", "Search")}
-          value={query}
-          onChange={setQuery}
-          autoFocus
-        />
+      <StickyHeaderLayout>
+        <StickyHeaderLayout.Header>
+          <Search.Bar
+            placeholder={t("search.placeholder", "Search")}
+            value={query}
+            onChange={setQuery}
+            autoFocus
+          />
 
-        <Search.Filter
-          chips={filterChips}
-          selected={filter}
-          onChipChange={(chipId: string) => {
-            setFilter(filter.includes(chipId) ? [] : [chipId]);
-          }}
-        />
-      </div>
+          <Search.Filter
+            chips={filterChips}
+            selected={filter}
+            onChipChange={(chipId: string) => {
+              setFilter(filter.includes(chipId) ? [] : [chipId]);
+            }}
+          />
+        </StickyHeaderLayout.Header>
 
-      <section className={styles.results}>
-        <InfiniteScrollList
-          data={allItems}
-          isLoading={isLoading}
-          hasMore={hasNextPage ?? false}
-          onLoadMore={() => fetchNextPage()}
-          isFetchingNextPage={isFetchingNextPage}
-          renderItem={(item) => (
-            <SearchResultItem item={item} onPress={() => handleItemPress(item)} />
-          )}
-          emptyMessage={
-            debouncedQuery.trim()
-              ? t("search.noResults", "No results found for your search")
-              : t("search.enterQuery", "Enter a search query to begin")
-          }
-        />
-      </section>
+        <StickyHeaderLayout.Content>
+          <InfiniteScrollList
+            data={allItems}
+            isLoading={isLoading}
+            hasMore={hasNextPage ?? false}
+            onLoadMore={() => fetchNextPage()}
+            isFetchingNextPage={isFetchingNextPage}
+            renderItem={(item) => (
+              <SearchResultItem item={item} onPress={() => handleItemPress(item)} />
+            )}
+            emptyMessage={
+              debouncedQuery.trim()
+                ? t("search.noResults", "No results found for your search")
+                : t("search.enterQuery", "Enter a search query to begin")
+            }
+          />
+        </StickyHeaderLayout.Content>
+      </StickyHeaderLayout>
+      <ScrollToTopButton />
     </ScreenView>
   );
 }

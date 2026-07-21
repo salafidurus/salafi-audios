@@ -14,6 +14,8 @@ import { FeedSkeleton } from "../components/feed-skeleton/feed-skeleton";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
+import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
+import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import styles from "./explore-recent.screen.module.css";
 
 export type FeedRecentScreenProps = {
@@ -139,9 +141,16 @@ export function FeedRecentScreen({
     }
 
     return (
-      <ScreenView>
-        <PageHeader title={feedTitle} />
-        <div className={styles.page}>{body}</div>
+      <ScreenView contentStyle={{ flex: 1 }}>
+        <StickyHeaderLayout>
+          <StickyHeaderLayout.Header>
+            <PageHeader title={feedTitle} />
+          </StickyHeaderLayout.Header>
+          <StickyHeaderLayout.Content>
+            <div className={styles.page}>{body}</div>
+          </StickyHeaderLayout.Content>
+        </StickyHeaderLayout>
+        <ScrollToTopButton />
       </ScreenView>
     );
   }
@@ -177,9 +186,16 @@ export function FeedRecentScreen({
   }
 
   return (
-    <ScreenView>
-      <PageHeader title={feedTitle} />
-      {body}
+    <ScreenView contentStyle={{ flex: 1 }}>
+      <StickyHeaderLayout>
+        <StickyHeaderLayout.Header>
+          <PageHeader title={feedTitle} />
+        </StickyHeaderLayout.Header>
+        <StickyHeaderLayout.Content>
+          {body}
+        </StickyHeaderLayout.Content>
+      </StickyHeaderLayout>
+      <ScrollToTopButton />
     </ScreenView>
   );
 }

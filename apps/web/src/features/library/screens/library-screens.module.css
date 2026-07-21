@@ -1,4 +1,4 @@
-/* Library screens - width is handled by ScreenView wrapper */
+/* Library screens - sticky header layout now in shared StickyHeaderLayout component */
 
 .container {
   padding: var(--space-layout-page-y) 0;

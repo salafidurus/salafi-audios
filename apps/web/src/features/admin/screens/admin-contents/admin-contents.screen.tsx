@@ -30,6 +30,8 @@ import { PermissionGate } from "@/features/admin/components/permission-gate/perm
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { sanitizeError } from "@sd/utils-error";
+import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
+import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import styles from "./admin-contents.screen.module.css";
 
 type AudioData = {
@@ -192,7 +194,7 @@ export function AdminContentsScreen() {
   };
 
   return (
-    <ScreenView>
+    <ScreenView contentStyle={{ flex: 1 }}>
       <Modal.ConfirmDialog
         isOpen={deleteModalOpen}
         onClose={() => {
@@ -260,17 +262,20 @@ export function AdminContentsScreen() {
       />
 
       <div className={styles.content}>
-        <Search.Bar
-          value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder={
-            activeTab === "topics"
-              ? t("admin.contents.searchPlaceholderTopics", "Search topics...")
-              : t("admin.contents.searchPlaceholderListings", "Search listings...")
-          }
-        />
+        <StickyHeaderLayout>
+          <Search.Bar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder={
+              activeTab === "topics"
+                ? t("admin.contents.searchPlaceholderTopics", "Search topics...")
+                : t("admin.contents.searchPlaceholderListings", "Search listings...")
+            }
+          />
+        </StickyHeaderLayout.Header>
 
-        {activeTab === "topics" && (
+        <StickyHeaderLayout.Content>
+          {activeTab === "topics" && (
           <>
             {filteredTopics.length > 0 ? (
               <List>
@@ -312,8 +317,12 @@ export function AdminContentsScreen() {
                   )
             }
           />
-        )}
+          )}
+        </StickyHeaderLayout.Content>
+        </StickyHeaderLayout>
       </div>
+
+      <ScrollToTopButton />
 
       {/* Topic Modal */}
       <Content.TopicModal

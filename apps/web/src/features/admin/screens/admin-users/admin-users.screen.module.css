@@ -14,7 +14,9 @@
 .content {
   display: flex;
   flex-direction: column;
-  gap: var(--space-component-gap-lg);
+  gap: 0;
+  flex: 1;
+  min-height: 0;
 }
 
 .searchRow {
@@ -49,7 +51,7 @@
 
 @media (max-width: 640px) {
   .searchRow {
-    margin-bottom: var(--space-scale-lg);
+    margin-bottom: 0;
   }
 
   .resultCount {

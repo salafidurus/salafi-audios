@@ -8,6 +8,8 @@ import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { Button } from "@/shared/components/Button";
+import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
+import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { FeedListRow } from "../components/feed-list-row/feed-list-row";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import styles from "./explore-following.screen.module.css";
@@ -81,46 +83,63 @@ export function FeedFollowingScreen({
 
   if (isFetching && items.length === 0) {
     return (
-      <ScreenView>
-        <PageHeader title={followingTitle} />
-        <div className={styles.loading}>
-          {t("explore.loadingFollowing", "Loading followed scholars…")}
-        </div>
+      <ScreenView contentStyle={{ flex: 1 }}>
+        <StickyHeaderLayout>
+          <StickyHeaderLayout.Header>
+            <PageHeader title={followingTitle} />
+          </StickyHeaderLayout.Header>
+          <StickyHeaderLayout.Content>
+          <div className={styles.loading}>
+            {t("explore.loadingFollowing", "Loading followed scholars…")}
+          </div>
+        </section>
+        <ScrollToTopButton />
       </ScreenView>
     );
   }
 
   if (items.length === 0) {
     return (
-      <ScreenView>
-        <PageHeader title={followingTitle} />
-        <div className={styles.empty}>
-          {t("explore.followToSee", "Follow scholars to see their latest lectures here.")}
-        </div>
+      <ScreenView contentStyle={{ flex: 1 }}>
+        <StickyHeaderLayout>
+          <StickyHeaderLayout.Header>
+            <PageHeader title={followingTitle} />
+          </StickyHeaderLayout.Header>
+          <StickyHeaderLayout.Content>
+          <div className={styles.empty}>
+            {t("explore.followToSee", "Follow scholars to see their latest lectures here.")}
+          </div>
+        </section>
+        <ScrollToTopButton />
       </ScreenView>
     );
   }
 
   return (
-    <ScreenView>
-      <PageHeader title={followingTitle} />
-      <FeedBlocks
-        items={items}
-        onNavigateToLecture={onNavigateToLecture}
-        onNavigateToScholar={onNavigateToScholar}
-      />
-      {hasNextPage && (
-        <div className={styles.loadMoreRow}>
-          <Button
-            variant="surface"
-            radius="md"
-            onClick={() => fetchNextPage()}
-            disabled={isFetching}
-          >
-            {isFetching ? t("common.loading", "Loading...") : t("feed.loadMore", "Load more")}
-          </Button>
-        </div>
-      )}
+    <ScreenView contentStyle={{ flex: 1 }}>
+      <div className={styles.stickyHeader}>
+        <PageHeader title={followingTitle} />
+      </div>
+      <section className={styles.results}>
+        <FeedBlocks
+          items={items}
+          onNavigateToLecture={onNavigateToLecture}
+          onNavigateToScholar={onNavigateToScholar}
+        />
+        {hasNextPage && (
+          <div className={styles.loadMoreRow}>
+            <Button
+              variant="surface"
+              radius="md"
+              onClick={() => fetchNextPage()}
+              disabled={isFetching}
+            >
+              {isFetching ? t("common.loading", "Loading...") : t("feed.loadMore", "Load more")}
+            </Button>
+          </div>
+        )}
+      </section>
+      <ScrollToTopButton />
     </ScreenView>
   );
 }

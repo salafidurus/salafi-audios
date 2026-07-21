@@ -1,0 +1,32 @@
+.button {
+  position: fixed;
+  bottom: var(--space-scale-xl);
+  inset-inline-end: var(--space-scale-xl);
+  z-index: 40;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+
+  background-color: var(--surface-default);
+  border: 1px solid var(--chrome-border);
+  cursor: pointer;
+
+  box-shadow: var(--shadow-lg);
+
+  color: var(--content-default);
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: var(--surface-canvas);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}

@@ -7,7 +7,10 @@ import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
+import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
+import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { LibraryListRow } from "@/features/library/components/library-list-row/library-list-row";
+import styles from "./library-screens.module.css";
 
 export function LibraryCompletedScreen() {
   const { isAuthenticated } = useAuth();
@@ -31,19 +34,25 @@ export function LibraryCompletedScreen() {
 
   return (
     <ScreenView contentStyle={{ flex: 1 }}>
-      <PageHeader title={t("library.completed", "Completed")} />
-      <InfiniteScrollList
-        data={allItems}
-        isLoading={isLoading}
-        hasMore={hasNextPage ?? false}
-        onLoadMore={() => fetchNextPage()}
-        isFetchingNextPage={isFetchingNextPage}
-        renderItem={(item) => <LibraryListRow item={item} variant="completed" />}
-        emptyMessage={t(
-          "library.emptyCompleted",
-          "No completed lectures yet. Finish lectures to track your learning.",
-        )}
-      />
+      <StickyHeaderLayout>
+        <StickyHeaderLayout.Header>
+          <PageHeader title={t("library.completed", "Completed")} />
+        </StickyHeaderLayout.Header>
+        <StickyHeaderLayout.Content>
+        <InfiniteScrollList
+          data={allItems}
+          isLoading={isLoading}
+          hasMore={hasNextPage ?? false}
+          onLoadMore={() => fetchNextPage()}
+          isFetchingNextPage={isFetchingNextPage}
+          renderItem={(item) => <LibraryListRow item={item} variant="completed" />}
+          emptyMessage={t(
+            "library.emptyCompleted",
+            "No completed lectures yet. Finish lectures to track your learning.",
+          )}
+        />
+      </section>
+      <ScrollToTopButton />
     </ScreenView>
   );
 }
