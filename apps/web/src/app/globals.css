@@ -135,6 +135,24 @@ body {
   flex-direction: column;
 }
 
+/* Scrollbar styling for appNoConsentContent */
+.appNoConsentContent::-webkit-scrollbar {
+  width: 6px;
+}
+
+.appNoConsentContent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.appNoConsentContent::-webkit-scrollbar-thumb {
+  background-color: var(--border-default);
+  border-radius: 3px;
+}
+
+.appNoConsentContent::-webkit-scrollbar-thumb:hover {
+  background-color: var(--border-strong);
+}
+
 /* Responsive: hide sidebar on tablet and below */
 @media (max-width: 1200px) {
   .appNoConsentShell {
