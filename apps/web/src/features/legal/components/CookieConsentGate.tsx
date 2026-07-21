@@ -48,7 +48,7 @@ export function CookieConsentGate() {
           <p className={styles.policyLink}>
             {t("cookieConsent.policyLink", "Cookie Policy")}:{" "}
             <Link
-              href={`${routes.privacy}#cookies`}
+              href={routes.cookiePolicy}
               className={styles.link}
               target="_blank"
               rel="noopener noreferrer"
