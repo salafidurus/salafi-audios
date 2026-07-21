@@ -58,53 +58,56 @@ export function AdminUsersScreen(): ReactNode {
 
   return (
     <ScreenView contentStyle={{ flex: 1 }}>
-      <PageHeader
-        title={
-          isMobile ? t("admin.users.titleMobile", "Users") : t("admin.users.title", "Manage Users")
-        }
-      />
-
       <div className={styles.content}>
         <StickyHeaderLayout>
-          <div className={styles.searchRow}>
-            <Search.Bar
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder={t("admin.users.searchPlaceholder", "Search users by name or email...")}
+          <StickyHeaderLayout.Header>
+            <PageHeader
+              title={
+                isMobile
+                  ? t("admin.users.titleMobile", "Users")
+                  : t("admin.users.title", "Manage Users")
+              }
             />
-          </div>
 
-          <Search.Filter
-            chips={roleChips}
-            selected={role ? [role] : []}
-            onChipChange={(chipId: string) => {
-              setRole(role === chipId ? "" : chipId);
-            }}
-          />
-        </StickyHeaderLayout.Header>
-
-        <StickyHeaderLayout.Content>
-          <InfiniteScrollList
-            data={allItems}
-            isLoading={isLoading}
-            hasMore={hasNextPage ?? false}
-            onLoadMore={() => fetchNextPage()}
-            isFetchingNextPage={isFetchingNextPage}
-            renderItem={(user) => (
-              <UserItem
-                user={user}
-                onManagePermissions={() => setPermUser({ id: user.id, name: user.name })}
-                onManageRoles={() => setRoleUser({ id: user.id, name: user.name })}
+            <div className={styles.searchRow}>
+              <Search.Bar
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder={t("admin.users.searchPlaceholder", "Search users by name or email...")}
               />
-            )}
-            emptyMessage={
-              debouncedQuery || role
-                ? t("admin.users.searchNoMatch", "No users match your search.")
-                : t("admin.users.noUsersFound", "No users found.")
-            }
-          />
-        </StickyHeaderLayout.Content>
-      </StickyHeaderLayout>
+            </div>
+
+            <Search.Filter
+              chips={roleChips}
+              selected={role ? [role] : []}
+              onChipChange={(chipId: string) => {
+                setRole(role === chipId ? "" : chipId);
+              }}
+            />
+          </StickyHeaderLayout.Header>
+
+          <StickyHeaderLayout.Content>
+            <InfiniteScrollList
+              data={allItems}
+              isLoading={isLoading}
+              hasMore={hasNextPage ?? false}
+              onLoadMore={() => fetchNextPage()}
+              isFetchingNextPage={isFetchingNextPage}
+              renderItem={(user) => (
+                <UserItem
+                  user={user}
+                  onManagePermissions={() => setPermUser({ id: user.id, name: user.name })}
+                  onManageRoles={() => setRoleUser({ id: user.id, name: user.name })}
+                />
+              )}
+              emptyMessage={
+                debouncedQuery || role
+                  ? t("admin.users.searchNoMatch", "No users match your search.")
+                  : t("admin.users.noUsersFound", "No users found.")
+              }
+            />
+          </StickyHeaderLayout.Content>
+        </StickyHeaderLayout>
       </div>
 
       <ScrollToTopButton />

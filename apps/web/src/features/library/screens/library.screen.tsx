@@ -10,7 +10,6 @@ import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { LibraryListRow } from "@/features/library/components/library-list-row/library-list-row";
-import styles from "./library-screens.module.css";
 
 export function LibraryScreen() {
   const { isAuthenticated } = useAuth();
@@ -43,16 +42,16 @@ export function LibraryScreen() {
         </StickyHeaderLayout.Header>
         <StickyHeaderLayout.Content>
           <InfiniteScrollList
-          data={allItems}
-          isLoading={isLoading}
-          hasMore={hasNextPage ?? false}
-          onLoadMore={() => fetchNextPage()}
-          isFetchingNextPage={isFetchingNextPage}
-          renderItem={(item) => <LibraryListRow item={item} variant="progress" />}
-          emptyMessage={t(
-            "library.emptyProgress",
-            "No lectures started yet. Browse the catalog to begin listening.",
-          )}
+            data={allItems}
+            isLoading={isLoading}
+            hasMore={hasNextPage ?? false}
+            onLoadMore={() => fetchNextPage()}
+            isFetchingNextPage={isFetchingNextPage}
+            renderItem={(item) => <LibraryListRow item={item} variant="progress" />}
+            emptyMessage={t(
+              "library.emptyProgress",
+              "No lectures started yet. Browse the catalog to begin listening.",
+            )}
           />
         </StickyHeaderLayout.Content>
       </StickyHeaderLayout>

@@ -70,57 +70,62 @@ export function AdminScholarsScreen() {
   return (
     <ScreenView contentStyle={{ flex: 1 }}>
       <div className={styles.container}>
-        <PageHeader
-          title={
-            isDesktop
-              ? t("admin.scholars.manageTitle", "Manage Scholars")
-              : t("navigation.admin.scholars", "Scholars")
-          }
-          actions={
-            <PermissionGate requires="SCHOLARS_CREATE">
-              <Button
-                variant="primary"
-                size={isDesktop ? "md" : "sm"}
-                icon={<Plus size={isDesktop ? 18 : 16} />}
-                onClick={handleOpenAdd}
-              >
-                {isDesktop ? t("admin.scholars.addScholar", "Add Scholar") : t("common.add", "Add")}
-              </Button>
-            </PermissionGate>
-          }
-        />
-
         <StickyHeaderLayout>
           <StickyHeaderLayout.Header>
-            <div className={styles.toolbar}>
-            <Search.Bar
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder={
+            <PageHeader
+              title={
                 isDesktop
-                  ? t("admin.scholars.searchPlaceholderDesktop", "Search scholars by name or slug...")
-                  : t("scholarContent.searchScholars", "Search scholars...")
+                  ? t("admin.scholars.manageTitle", "Manage Scholars")
+                  : t("navigation.admin.scholars", "Scholars")
+              }
+              actions={
+                <PermissionGate requires="SCHOLARS_CREATE">
+                  <Button
+                    variant="primary"
+                    size={isDesktop ? "md" : "sm"}
+                    icon={<Plus size={isDesktop ? 18 : 16} />}
+                    onClick={handleOpenAdd}
+                  >
+                    {isDesktop
+                      ? t("admin.scholars.addScholar", "Add Scholar")
+                      : t("common.add", "Add")}
+                  </Button>
+                </PermissionGate>
               }
             />
+
+            <div className={styles.toolbar}>
+              <Search.Bar
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder={
+                  isDesktop
+                    ? t(
+                        "admin.scholars.searchPlaceholderDesktop",
+                        "Search scholars by name or slug...",
+                      )
+                    : t("scholarContent.searchScholars", "Search scholars...")
+                }
+              />
             </div>
           </StickyHeaderLayout.Header>
 
           <StickyHeaderLayout.Content>
-          <InfiniteScrollList
-            data={allItems}
-            isLoading={isLoading}
-            hasMore={hasNextPage ?? false}
-            onLoadMore={() => fetchNextPage()}
-            isFetchingNextPage={isFetchingNextPage}
-            renderItem={(scholar) => (
-              <Scholar.Item scholar={scholar} onEdit={() => handleOpenEdit(scholar)} />
-            )}
-            emptyMessage={
-              searchQuery
-                ? t("scholarContent.searchNoMatch", "No scholars match your search.")
-                : t("scholarContent.noScholarsFound", "No scholars found.")
-            }
-          />
+            <InfiniteScrollList
+              data={allItems}
+              isLoading={isLoading}
+              hasMore={hasNextPage ?? false}
+              onLoadMore={() => fetchNextPage()}
+              isFetchingNextPage={isFetchingNextPage}
+              renderItem={(scholar) => (
+                <Scholar.Item scholar={scholar} onEdit={() => handleOpenEdit(scholar)} />
+              )}
+              emptyMessage={
+                searchQuery
+                  ? t("scholarContent.searchNoMatch", "No scholars match your search.")
+                  : t("scholarContent.noScholarsFound", "No scholars found.")
+              }
+            />
           </StickyHeaderLayout.Content>
         </StickyHeaderLayout>
       </div>

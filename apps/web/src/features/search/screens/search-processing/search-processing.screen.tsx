@@ -14,7 +14,6 @@ import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import type { SearchResultRow } from "@sd/domain-search";
-import styles from "./search-processing.screen.module.css";
 
 export type SearchProcessingScreenProps = {
   searchKey?: string;

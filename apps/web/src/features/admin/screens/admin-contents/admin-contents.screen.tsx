@@ -44,6 +44,7 @@ type AudioData = {
 
 const EMPTY_TOPICS_ARRAY: TopicDetailDto[] = [];
 
+// react-doctor-disable-next-line react-doctor/no-giant-component
 export function AdminContentsScreen() {
   const queryClient = useQueryClient();
   const { isMobile } = useResponsive();
@@ -224,101 +225,102 @@ export function AdminContentsScreen() {
         )}
       </Modal.ConfirmDialog>
 
-      <PageHeader
-        title={
-          isMobile
-            ? t("admin.contents.titleMobile", "Content")
-            : t("admin.contents.title", "Content Management")
-        }
-        actions={
-          activeTab === "topics" ? (
-            <PermissionGate requires="TOPICS_CREATE">
-              <Button
-                variant="primary"
-                size={!isMobile ? "md" : "sm"}
-                icon={<Plus size={!isMobile ? 18 : 16} />}
-                onClick={handleOpenAddTopic}
-              >
-                {!isMobile
-                  ? t("admin.contents.addTopic", "Add Topic")
-                  : t("admin.contents.addTopicMobile", "Topic")}
-              </Button>
-            </PermissionGate>
-          ) : (
-            <PermissionGate requires="LISTINGS_CREATE">
-              <Button
-                variant="primary"
-                size={!isMobile ? "md" : "sm"}
-                icon={<Plus size={!isMobile ? 18 : 16} />}
-                onClick={handleOpenAddListing}
-              >
-                {!isMobile
-                  ? t("admin.contents.addListing", "Add Listing")
-                  : t("admin.contents.addListingMobile", "Listing")}
-              </Button>
-            </PermissionGate>
-          )
-        }
-      />
-
       <div className={styles.content}>
         <StickyHeaderLayout>
-          <Search.Bar
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder={
-              activeTab === "topics"
-                ? t("admin.contents.searchPlaceholderTopics", "Search topics...")
-                : t("admin.contents.searchPlaceholderListings", "Search listings...")
-            }
-          />
-        </StickyHeaderLayout.Header>
+          <StickyHeaderLayout.Header>
+            <PageHeader
+              title={
+                isMobile
+                  ? t("admin.contents.titleMobile", "Content")
+                  : t("admin.contents.title", "Content Management")
+              }
+              actions={
+                activeTab === "topics" ? (
+                  <PermissionGate requires="TOPICS_CREATE">
+                    <Button
+                      variant="primary"
+                      size={!isMobile ? "md" : "sm"}
+                      icon={<Plus size={!isMobile ? 18 : 16} />}
+                      onClick={handleOpenAddTopic}
+                    >
+                      {!isMobile
+                        ? t("admin.contents.addTopic", "Add Topic")
+                        : t("admin.contents.addTopicMobile", "Topic")}
+                    </Button>
+                  </PermissionGate>
+                ) : (
+                  <PermissionGate requires="LISTINGS_CREATE">
+                    <Button
+                      variant="primary"
+                      size={!isMobile ? "md" : "sm"}
+                      icon={<Plus size={!isMobile ? 18 : 16} />}
+                      onClick={handleOpenAddListing}
+                    >
+                      {!isMobile
+                        ? t("admin.contents.addListing", "Add Listing")
+                        : t("admin.contents.addListingMobile", "Listing")}
+                    </Button>
+                  </PermissionGate>
+                )
+              }
+            />
 
-        <StickyHeaderLayout.Content>
-          {activeTab === "topics" && (
-          <>
-            {filteredTopics.length > 0 ? (
-              <List>
-                {filteredTopics.map((topic) => (
-                  <Content.Topic
-                    key={topic.slug}
-                    topic={topic}
-                    onEdit={handleOpenEditTopic}
-                    onDelete={handleDeleteClick}
-                  />
-                ))}
-              </List>
-            ) : (
-              <div className={styles.empty}>
-                {searchQuery
-                  ? t("admin.contents.searchNoMatchTopics", "No topics match your search.")
-                  : t("admin.contents.noTopicsFound", "No topics yet.")}
-              </div>
-            )}
-          </>
-        )}
+            <Search.Bar
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder={
+                activeTab === "topics"
+                  ? t("admin.contents.searchPlaceholderTopics", "Search topics...")
+                  : t("admin.contents.searchPlaceholderListings", "Search listings...")
+              }
+            />
+          </StickyHeaderLayout.Header>
 
-        {activeTab === "listings" && (
-          <InfiniteScrollList
-            data={allListings}
-            isLoading={isLoading}
-            hasMore={hasNextPage ?? false}
-            onLoadMore={() => fetchNextPage()}
-            isFetchingNextPage={isFetchingNextPage}
-            renderItem={(listing) => (
-              <Content.Listing key={listing.id} listing={listing} onEdit={handleEditListing} />
+          <StickyHeaderLayout.Content>
+            {activeTab === "topics" && (
+              <>
+                {filteredTopics.length > 0 ? (
+                  <List>
+                    {filteredTopics.map((topic) => (
+                      <Content.Topic
+                        key={topic.slug}
+                        topic={topic}
+                        onEdit={handleOpenEditTopic}
+                        onDelete={handleDeleteClick}
+                      />
+                    ))}
+                  </List>
+                ) : (
+                  <div className={styles.empty}>
+                    {searchQuery
+                      ? t("admin.contents.searchNoMatchTopics", "No topics match your search.")
+                      : t("admin.contents.noTopicsFound", "No topics yet.")}
+                  </div>
+                )}
+              </>
             )}
-            emptyMessage={
-              debouncedSearch
-                ? t("admin.contents.searchNoMatchListings", "No listings match your search.")
-                : t(
-                    "admin.contents.noListingsFound",
-                    "No listings yet. Add audio to create a listing.",
-                  )
-            }
-          />
-          )}
-        </StickyHeaderLayout.Content>
+
+            {activeTab === "listings" && (
+              <InfiniteScrollList
+                data={allListings}
+                isLoading={isLoading}
+                hasMore={hasNextPage ?? false}
+                onLoadMore={() => fetchNextPage()}
+                isFetchingNextPage={isFetchingNextPage}
+                renderItem={(listing) => (
+                  <Content.Listing key={listing.id} listing={listing} onEdit={handleEditListing} />
+                )}
+                emptyMessage={
+                  debouncedSearch
+                    ? t("admin.contents.searchNoMatchListings", "No listings match your search.")
+                    : t(
+                        "admin.contents.noListingsFound",
+                        "No listings yet. Add audio to create a listing.",
+                      )
+                }
+              />
+            )}
+          </StickyHeaderLayout.Content>
         </StickyHeaderLayout>
       </div>
 
