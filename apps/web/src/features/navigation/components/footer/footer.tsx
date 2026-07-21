@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { routes } from "@sd/core-contracts";
-import { LanguageSwitch } from "@/features/settings/i18n";
+import { LanguageSwitch } from "@/features/settings";
 import styles from "./footer.module.css";
 
 export function Footer() {
@@ -23,7 +23,9 @@ export function Footer() {
           <Link href={routes.termsOfUse}>{t("footer.terms")}</Link>
           <Link href={routes.support}>{t("footer.support")}</Link>
         </div>
-        <LanguageSwitch direction="up" />
+        <div className={styles.languageSwitchWrapper}>
+          <LanguageSwitch direction="up" />
+        </div>
       </div>
     </footer>
   );

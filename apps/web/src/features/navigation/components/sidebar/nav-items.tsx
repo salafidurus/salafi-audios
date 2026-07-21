@@ -11,6 +11,8 @@ import { useAdminPermissions } from "@sd/domain-permissions";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button/Button";
 import { SectionLabel } from "./section-label";
+import { useResponsive } from "@/shared/hooks/use-responsive";
+import { LanguageSwitch } from "@/features/settings";
 import {
   Cloud,
   CassetteTape,
@@ -117,9 +119,11 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
   const router = useRouter();
   const { t } = useTranslation();
   const { isAuthenticated, user, isLoading } = useAuth();
-  const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
-
   const { data: adminPermissionsData } = useAdminPermissions({ isAuthenticated });
+  const { isMobile, isTablet } = useResponsive();
+  const showLanguageSwitch = isMobile || isTablet;
+
+  const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
 
   const adminPermissions: AdminPermission[] = adminPermissionsData?.permissions ?? [];
   const adminRoles: UserRole[] = adminPermissionsData?.roles ?? [];
@@ -216,6 +220,11 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
 
       {/* Footer - User Profile / Auth */}
       <div className={styles.footer}>
+        {showLanguageSwitch && (
+          <div className={styles.sidebarLanguageSwitch}>
+            <LanguageSwitch direction="up" collapsed={collapsed} />
+          </div>
+        )}
         {!isLoading && isAuthenticated && user ? (
           <div className={styles.profileRow}>
             <div className={styles.profileInfo}>

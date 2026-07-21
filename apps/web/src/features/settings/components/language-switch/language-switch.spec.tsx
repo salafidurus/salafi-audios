@@ -61,6 +61,14 @@ describe("LanguageSwitch", () => {
     expect(listbox).toHaveAttribute("role", "listbox");
   });
 
+  it("renders collapsed version when collapsed is true", () => {
+    render(<LanguageSwitch collapsed={true} />);
+
+    const trigger = screen.getByRole("combobox", { name: "Language" });
+    expect(trigger).not.toHaveTextContent("English");
+    expect(trigger.querySelector("svg")).toBeInTheDocument();
+  });
+
   it("switches locale, persists it, invalidates queries, and refreshes", async () => {
     render(<LanguageSwitch />);
 

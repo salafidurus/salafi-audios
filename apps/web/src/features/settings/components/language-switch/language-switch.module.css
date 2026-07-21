@@ -1,3 +1,40 @@
-.inline {
-  width: fit-content;
+.languageSwitch {
+  width: 100%;
+}
+
+/* Desktop styles: footer and settings screen */
+@media (min-width: 901px) {
+  .languageSwitch {
+    width: 160px;
+  }
+
+  .trigger {
+    padding: var(--space-md) var(--space-lg);
+  }
+}
+
+/* Collapsed sidebar adjustments */
+.collapsed {
+  width: auto;
+  margin: 0 auto;
+}
+
+.collapsed .trigger {
+  padding: 0;
+  width: 2.2rem;
+  height: 2.2rem;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-component-chip);
+  border: 1px solid var(--border-subtle);
+  background: var(--surface-default);
+  color: var(--content-muted);
+}
+
+.collapsed .trigger:hover {
+  color: var(--content-strong);
+  background: var(--surface-hover);
+  border-color: var(--border-default);
 }

@@ -11,6 +11,7 @@ export interface DropdownTriggerProps {
   id?: string;
   testId?: string;
   ariaLabel?: string;
+  children?: React.ReactNode;
 }
 
 export function DropdownTrigger({
@@ -20,6 +21,7 @@ export function DropdownTrigger({
   id,
   testId,
   ariaLabel,
+  children,
 }: DropdownTriggerProps) {
   const {
     open,
@@ -63,13 +65,19 @@ export function DropdownTrigger({
       }}
       disabled={disabled}
     >
-      <span className={selectedLabel ? styles.triggerText : styles.triggerPlaceholder}>
-        {selectedLabel || placeholder}
-      </span>
-      <ChevronDown
-        size={16}
-        className={[styles.chevron, open ? styles.chevronOpen : ""].filter(Boolean).join(" ")}
-      />
+      {children ? (
+        children
+      ) : (
+        <>
+          <span className={selectedLabel ? styles.triggerText : styles.triggerPlaceholder}>
+            {selectedLabel || placeholder}
+          </span>
+          <ChevronDown
+            size={16}
+            className={[styles.chevron, open ? styles.chevronOpen : ""].filter(Boolean).join(" ")}
+          />
+        </>
+      )}
     </button>
   );
 }
