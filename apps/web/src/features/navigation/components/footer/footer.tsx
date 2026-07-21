@@ -25,6 +25,9 @@ export function Footer() {
           <Link href={routes.termsOfUse} target="_blank" rel="noopener noreferrer">
             {t("footer.terms")}
           </Link>
+          <Link href={routes.cookiePolicy} target="_blank" rel="noopener noreferrer">
+            {t("footer.cookiePolicy")}
+          </Link>
           <Link href={routes.support}>{t("footer.support")}</Link>
         </div>
         <div className={styles.languageSwitchWrapper}>
