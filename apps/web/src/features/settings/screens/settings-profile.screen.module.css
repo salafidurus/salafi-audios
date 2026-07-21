@@ -51,29 +51,6 @@
   border-color: var(--action-primary);
 }
 
-.saveButton {
-  padding: var(--space-scale-xs) var(--space-scale-md);
-  background: var(--action-primary);
-  color: var(--content-on-primary);
-  border: none;
-  border-radius: var(--radius-component-chip);
-  font-size: var(--typo-body-sm-font-size);
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: opacity 150ms ease;
-}
-
-.saveButton:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.saveButton:focus-visible {
-  outline: 2px solid var(--action-primary);
-  outline-offset: 2px;
-}
-
 .readOnly {
   font-size: var(--typo-body-sm-font-size);
   color: var(--content-muted);
@@ -122,58 +99,10 @@
   border-top: var(--border-width-default) solid var(--border-subtle);
 }
 
-.signOutButton {
-  padding: var(--space-scale-sm) var(--space-scale-xl);
-  border: var(--border-width-default) solid var(--action-danger);
-  border-radius: var(--radius-component-chip);
-  background: transparent;
-  color: var(--action-danger);
-  font-size: var(--typo-body-sm-font-size);
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background-color 150ms ease,
-    color 150ms ease;
-}
-
-.signOutButton:hover {
-  background: var(--action-danger);
-  color: var(--content-on-primary);
-}
-
-.deleteAccountButton {
-  padding: var(--space-scale-sm) var(--space-scale-xl);
-  border: var(--border-width-default) solid var(--border-disabled);
-  border-radius: var(--radius-component-chip);
-  background: transparent;
-  color: var(--content-muted);
-  font-size: var(--typo-body-sm-font-size);
-  cursor: pointer;
-  transition:
-    border-color 150ms ease,
-    color 150ms ease,
-    background-color 150ms ease;
-}
-
-.deleteAccountButton:hover:not(:disabled) {
-  border-color: var(--action-danger);
-  color: var(--action-danger);
-}
-
-.deleteAccountButton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 @media (max-width: 640px) {
   .actionRow {
     flex-direction: column;
     gap: var(--space-component-gap-sm);
-  }
-
-  .signOutButton,
-  .deleteAccountButton {
-    width: 100%;
   }
 }
 
@@ -196,22 +125,6 @@
   margin: 0 0 var(--space-scale-xl);
   font-size: var(--typo-body-sm-font-size);
   color: var(--content-muted);
-}
-
-.signInButton {
-  padding: var(--space-scale-sm) var(--space-scale-2xl);
-  background: var(--action-primary);
-  color: var(--content-on-primary);
-  border: none;
-  border-radius: var(--radius-component-chip);
-  font-size: var(--typo-body-md-font-size);
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 150ms ease;
-}
-
-.signInButton:hover {
-  opacity: 0.88;
 }
 
 .loading,

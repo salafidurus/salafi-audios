@@ -13,6 +13,7 @@ import { FeedTopicRow } from "../components/feed-topic-row/feed-topic-row";
 import { FeedSkeleton } from "../components/feed-skeleton/feed-skeleton";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
+import { Button } from "@/shared/components/Button";
 import styles from "./explore-recent.screen.module.css";
 
 export type FeedRecentScreenProps = {
@@ -123,14 +124,14 @@ export function FeedRecentScreen({
           />
           {hasNextPage && (
             <div className={styles.loadMoreRow}>
-              <button
-                type="button"
-                className={styles.button}
+              <Button
+                variant="surface"
+                radius="md"
                 onClick={() => fetchNextPage()}
                 disabled={isFetching}
               >
                 {isFetching ? t("feed.loading", "Loading\u2026") : t("feed.loadMore", "Load more")}
-              </button>
+              </Button>
             </div>
           )}
         </>
@@ -161,9 +162,14 @@ export function FeedRecentScreen({
         />
         {hasNextPage && (
           <div className={styles.loadMoreRow}>
-            <button type="button" onClick={() => fetchNextPage()} className={styles.button}>
+            <Button
+              variant="surface"
+              radius="md"
+              onClick={() => fetchNextPage()}
+              disabled={isFetching}
+            >
               {isFetching ? t("feed.loading", "Loading\u2026") : t("feed.loadMore", "Load more")}
-            </button>
+            </Button>
           </div>
         )}
       </>

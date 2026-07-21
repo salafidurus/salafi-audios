@@ -26,3 +26,20 @@ describe("Button loading state", () => {
     expect(screen.getByRole("button")).not.toBeDisabled();
   });
 });
+
+describe("Button radius", () => {
+  it("defaults to pill radius", () => {
+    render(<Button label="Submit" />);
+    expect(screen.getByRole("button")).toBeInTheDocument();
+  });
+
+  it("accepts md radius", () => {
+    render(<Button radius="md" label="Submit" />);
+    expect(screen.getByRole("button")).toBeInTheDocument();
+  });
+
+  it("accepts sm radius", () => {
+    render(<Button radius="sm" label="Submit" />);
+    expect(screen.getByRole("button")).toBeInTheDocument();
+  });
+});

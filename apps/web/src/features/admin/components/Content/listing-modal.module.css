@@ -112,44 +112,6 @@
   grid-column: 1 / -1;
 }
 
-.cancelBtn {
-  padding: var(--space-scale-sm) var(--space-scale-lg);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-scale-md);
-  background-color: var(--surface-default);
-  color: var(--content-default);
-  font-family: var(--typo-label-md-font-family);
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-}
-
-.cancelBtn:hover {
-  background-color: var(--surface-hover);
-}
-
-.saveBtn {
-  padding: var(--space-scale-sm) var(--space-scale-xl);
-  border: 1px solid var(--accent-primary-border);
-  border-radius: var(--radius-scale-md);
-  background-color: var(--accent-primary-bg);
-  color: var(--accent-primary-fg);
-  font-family: var(--typo-label-md-font-family);
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-}
-
-.saveBtn:hover {
-  background-color: var(--accent-primary-bg-hover);
-}
-
-.saveBtn:disabled,
-.cancelBtn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
 @media (max-width: 640px) {
   .formRow {
     grid-template-columns: 1fr;

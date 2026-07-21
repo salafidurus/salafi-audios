@@ -7,6 +7,7 @@ import { List } from "@/shared/components/List";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { Button } from "@/shared/components/Button";
 import { FeedListRow } from "../components/feed-list-row/feed-list-row";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import styles from "./explore-following.screen.module.css";
@@ -110,9 +111,14 @@ export function FeedFollowingScreen({
       />
       {hasNextPage && (
         <div className={styles.loadMoreRow}>
-          <button type="button" onClick={() => fetchNextPage()} className={styles.button}>
+          <Button
+            variant="surface"
+            radius="md"
+            onClick={() => fetchNextPage()}
+            disabled={isFetching}
+          >
             {isFetching ? t("common.loading", "Loading...") : t("feed.loadMore", "Load more")}
-          </button>
+          </Button>
         </div>
       )}
     </ScreenView>

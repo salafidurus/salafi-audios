@@ -9,6 +9,7 @@ import {
   useUnpublishTranslation,
 } from "@sd/domain-content";
 import type { TranslationTarget } from "@sd/core-contracts";
+import { Button } from "@/shared/components/Button";
 import { UnpublishTranslationConfirmModal } from "@/features/admin/components/UnpublishTranslationConfirmModal";
 
 type Field = { key: string; label: string; multiline?: boolean };
@@ -64,9 +65,10 @@ export function TranslationEditor({ target, fields, originalValues }: Translatio
 
       <div>
         {SUPPORTED_LOCALES.map((locale) => (
-          <button
+          <Button
             key={locale}
-            type="button"
+            variant="surface"
+            radius="sm"
             aria-pressed={locale === activeLocale}
             onClick={() => {
               setActiveLocale(locale);
@@ -74,7 +76,7 @@ export function TranslationEditor({ target, fields, originalValues }: Translatio
             }}
           >
             {locale}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -104,22 +106,33 @@ export function TranslationEditor({ target, fields, originalValues }: Translatio
       </div>
 
       <div>
-        <button type="button" onClick={handleSave} disabled={saveTranslation.isPending}>
+        <Button
+          variant="surface"
+          radius="md"
+          onClick={handleSave}
+          disabled={saveTranslation.isPending}
+        >
           Save draft
-        </button>
+        </Button>
         {active?.status === "draft" && (
-          <button type="button" onClick={handlePublish} disabled={publishTranslation.isPending}>
+          <Button
+            variant="primary"
+            radius="md"
+            onClick={handlePublish}
+            disabled={publishTranslation.isPending}
+          >
             Publish
-          </button>
+          </Button>
         )}
         {active?.status === "published" && (
-          <button
-            type="button"
+          <Button
+            variant="danger"
+            radius="md"
             onClick={handleUnpublishClick}
             disabled={unpublishTranslation.isPending}
           >
             Unpublish
-          </button>
+          </Button>
         )}
       </div>
     </div>
