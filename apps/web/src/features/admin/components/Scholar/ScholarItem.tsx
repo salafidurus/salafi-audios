@@ -157,8 +157,9 @@ export function ScholarItem({ scholar, onEdit }: ScholarItemProps) {
           <Button
             variant={isMobile ? "outline" : "ghost"}
             size={isMobile ? "sm" : "icon"}
+            fullWidth={isMobile}
             onClick={onEdit}
-            icon={<Pencil size={14} />}
+            icon={<Pencil size={16} />}
             aria-label={`Edit ${scholar.name}`}
           >
             {isMobile && t("common.edit", "Edit")}

@@ -36,6 +36,7 @@ export function UserItem({ user, onManagePermissions, onManageRoles }: UserItemP
           <Button
             variant={isMobile ? "outline" : "ghost"}
             size={isMobile ? "sm" : "icon"}
+            fullWidth={isMobile}
             onClick={onManagePermissions}
             icon={<ShieldCog size={16} />}
             aria-label={t("admin.permissions.managePermissionsBtn", "Manage Permissions")}
@@ -47,6 +48,7 @@ export function UserItem({ user, onManagePermissions, onManageRoles }: UserItemP
           <Button
             variant={isMobile ? "outline" : "ghost"}
             size={isMobile ? "sm" : "icon"}
+            fullWidth={isMobile}
             onClick={onManageRoles}
             icon={<UserCog size={16} />}
             aria-label={t("admin.permissions.manageRolesBtn", "Manage Roles")}

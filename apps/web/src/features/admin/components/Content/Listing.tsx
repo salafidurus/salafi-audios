@@ -29,7 +29,8 @@ export function Listing({ listing, onEdit }: ListingProps) {
           <Button
             variant={isMobile ? "outline" : "ghost"}
             size={isMobile ? "sm" : "icon"}
-            icon={<Pencil size={14} />}
+            fullWidth={isMobile}
+            icon={<Pencil size={16} />}
             onClick={() => onEdit(listing.id)}
             aria-label={`Edit ${listing.title}`}
           >

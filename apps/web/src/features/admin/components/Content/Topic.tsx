@@ -28,7 +28,8 @@ export function Topic({ topic, onEdit, onDelete }: TopicProps) {
           <Button
             variant={isMobile ? "outline" : "ghost"}
             size={isMobile ? "sm" : "icon"}
-            icon={<Pencil size={14} />}
+            fullWidth={isMobile}
+            icon={<Pencil size={16} />}
             onClick={() => onEdit(topic)}
             aria-label={`Edit topic ${topic.name.en}`}
           >
@@ -39,7 +40,8 @@ export function Topic({ topic, onEdit, onDelete }: TopicProps) {
           <Button
             variant={isMobile ? "outline" : "ghost"}
             size={isMobile ? "sm" : "icon"}
-            icon={<Trash2 size={14} />}
+            fullWidth={isMobile}
+            icon={<Trash2 size={16} />}
             onClick={() => onDelete(topic.slug, topic.name.en)}
             aria-label={`Delete topic ${topic.name.en}`}
           >
