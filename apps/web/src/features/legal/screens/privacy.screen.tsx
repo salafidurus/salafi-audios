@@ -1,6 +1,7 @@
 "use client";
 
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { PRIVACY_LAST_UPDATE_DATE } from "@/features/legal/constants/update-date";
 import styles from "./legal-screens.module.css";
 import * as PrivacySections from "../components/PrivacySections";
 
@@ -9,7 +10,7 @@ export function PrivacyScreen() {
     <ScreenView>
       <div className={styles.container}>
         <h1 className={styles.title}>Privacy Policy</h1>
-        <p className={styles.lastUpdated}>Last updated: July 21, 2026</p>
+        <p className={styles.lastUpdated}>Last updated: {PRIVACY_LAST_UPDATE_DATE}</p>
         <p className={styles.introduction}>
           This Privacy Policy describes Our policies and procedures on the collection, use and
           disclosure of Your information when You use the Service and tells You about Your privacy

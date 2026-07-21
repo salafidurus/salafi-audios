@@ -1,6 +1,7 @@
 "use client";
 
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { TERMS_LAST_UPDATE_DATE } from "@/features/legal/constants/update-date";
 import styles from "./legal-screens.module.css";
 import * as TermsSections from "../components/TermsSections";
 
@@ -9,7 +10,7 @@ export function TermsScreen() {
     <ScreenView>
       <div className={styles.container}>
         <h1 className={styles.title}>Terms and Conditions</h1>
-        <p className={styles.lastUpdated}>Last updated: July 21, 2026</p>
+        <p className={styles.lastUpdated}>Last updated: {TERMS_LAST_UPDATE_DATE}</p>
         <p className={styles.introduction}>
           Please read these terms and conditions carefully before using Our Service.
         </p>
