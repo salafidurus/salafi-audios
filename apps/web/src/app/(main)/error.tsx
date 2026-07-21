@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { Button } from "@/shared/components/Button";
 import styles from "./error.module.css";
 
 type ErrorProps = {
@@ -18,9 +19,9 @@ export default function MainError({ error, reset }: ErrorProps) {
       <div className={styles.card}>
         <h2 className={styles.title}>Something went wrong</h2>
         <p className={styles.description}>This section could not be loaded. Please try again.</p>
-        <button type="button" className={styles.button} onClick={reset}>
+        <Button variant="primary" onClick={reset}>
           Try again
-        </button>
+        </Button>
       </div>
     </div>
   );

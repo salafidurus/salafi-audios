@@ -2,6 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { getPresignedUrl, uploadToR2 } from "../../api/admin-lectures.api";
+import { Button } from "@/shared/components/Button";
 import styles from "./audio-uploader.module.css";
 import { Upload, FileAudio, CheckCircle, AlertCircle } from "lucide-react";
 
@@ -138,9 +139,9 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
             <>
               <Upload className={styles.icon} size={40} />
               <p className={styles.primaryText}>Drag & drop an audio file here</p>
-              <button type="button" className={styles.secondaryText} onClick={onButtonClick}>
+              <Button variant="ghost" className={styles.secondaryText} onClick={onButtonClick}>
                 or click to browse files
-              </button>
+              </Button>
             </>
           )}
 
@@ -173,9 +174,9 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
               <AlertCircle className={styles.iconError} size={40} />
               <p className={styles.primaryText}>Upload failed</p>
               <p className={styles.errorMessage}>{error}</p>
-              <button type="button" className={styles.secondaryText} onClick={onButtonClick}>
+              <Button variant="ghost" className={styles.secondaryText} onClick={onButtonClick}>
                 Click to try again
-              </button>
+              </Button>
             </>
           )}
         </div>

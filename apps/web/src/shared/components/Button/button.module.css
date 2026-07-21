@@ -137,6 +137,14 @@
   --btn-shadow: var(--shadow-sm);
 }
 
+.radius-md {
+  border-radius: var(--radius-scale-md);
+}
+
+.radius-sm {
+  border-radius: var(--radius-scale-sm);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .button {
     transition: none;

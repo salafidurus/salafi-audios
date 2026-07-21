@@ -3,10 +3,12 @@ import styles from "./button.module.css";
 
 type ButtonVariant = "primary" | "secondary" | "surface" | "outline" | "ghost" | "danger";
 type ButtonSize = "sm" | "md" | "lg" | "icon";
+type ButtonRadius = "pill" | "md" | "sm";
 
 export type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;
   size?: ButtonSize;
+  radius?: ButtonRadius;
   label?: string;
   loading?: boolean;
   icon?: React.ReactNode;
@@ -21,6 +23,7 @@ function cx(...values: (string | undefined | false)[]) {
 export function Button({
   variant = "surface",
   size = "md",
+  radius = "pill",
   className,
   type,
   label,
@@ -42,6 +45,7 @@ export function Button({
         styles.button,
         styles[`variant-${variant}`],
         styles[`size-${size}`],
+        styles[`radius-${radius}`],
         fullWidth && styles["full-width"],
         className,
       )}
