@@ -5,6 +5,7 @@ import { List } from "@/shared/components/List";
 import { Button } from "@/shared/components/Button";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
+import { useTranslation } from "@/core/i18n/use-translation";
 import { MetaDetails } from "./meta-details";
 import { PermissionDetails } from "./permission-details";
 import styles from "./user-item.module.css";
@@ -17,6 +18,8 @@ export type UserItemProps = {
 
 export function UserItem({ user, onManagePermissions, onManageRoles }: UserItemProps): ReactNode {
   const { isTablet } = useResponsive();
+  const { t } = useTranslation();
+
   return (
     <List.Item interactive>
       <div className={styles.card}>
@@ -38,7 +41,9 @@ export function UserItem({ user, onManagePermissions, onManageRoles }: UserItemP
               onClick={onManagePermissions}
               icon={<Shield className={styles.manageIcon} />}
             >
-              {isTablet ? "Permissions" : "Manage Permissions"}
+              {isTablet
+                ? t("admin.permissions.managePermissionsBtnShort", "Permissions")
+                : t("admin.permissions.managePermissionsBtn", "Manage Permissions")}
             </Button>
           </PermissionGate>
           <PermissionGate requires="USERS_GRANT_ROLES">
@@ -49,7 +54,9 @@ export function UserItem({ user, onManagePermissions, onManageRoles }: UserItemP
               onClick={onManageRoles}
               icon={<Users className={styles.manageIcon} />}
             >
-              {isTablet ? "Roles" : "Manage Roles"}
+              {isTablet
+                ? t("admin.permissions.manageRolesBtnShort", "Roles")
+                : t("admin.permissions.manageRolesBtn", "Manage Roles")}
             </Button>
           </PermissionGate>
         </div>

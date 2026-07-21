@@ -16,10 +16,14 @@ export const SUBNAV_KEYS: Record<string, Record<string, string>> = {
     saved: "navigation.subnav.library.saved",
     completed: "navigation.subnav.library.completed",
   },
-  account: {
-    general: "navigation.subnav.account.general",
-    profile: "navigation.subnav.account.profile",
-    legal: "navigation.subnav.account.legal",
+  settings: {
+    general: "navigation.subnav.settings.general",
+    profile: "navigation.subnav.settings.profile",
+    legal: "navigation.subnav.settings.legal",
+  },
+  adminContents: {
+    topics: "navigation.subnav.admin.topics",
+    listings: "navigation.subnav.admin.listings",
   },
 };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, type ReactNode } from "react";
+import { useState, useCallback, type ReactNode, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@sd/core-contracts";
 import { useInfiniteAdminUsers } from "@sd/domain-permissions";
@@ -13,24 +13,29 @@ import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { UserItem } from "@/features/admin/components/user-item";
 import { PermissionsDialog } from "@/features/admin/components/PermissionsDialog";
 import { RoleDialog } from "@/features/admin/components/RoleDialog";
+import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./admin-users.screen.module.css";
-
-const ROLE_CHIPS: { id: string; label: string }[] = [
-  { id: "listener", label: "Listener" },
-  { id: "scholar", label: "Scholar" },
-  { id: "translator", label: "Translator" },
-  { id: "editor", label: "Editor" },
-  { id: "admin", label: "Admin" },
-  { id: "superadmin", label: "Super Admin" },
-];
 
 export function AdminUsersScreen(): ReactNode {
   const queryClient = useQueryClient();
   const { isMobile } = useResponsive();
+  const { t } = useTranslation();
   const { query: searchQuery, setQuery: setSearchQuery, debouncedQuery } = useDebouncedSearch();
   const [role, setRole] = useState("");
   const [permUser, setPermUser] = useState<{ id: string; name: string } | null>(null);
   const [roleUser, setRoleUser] = useState<{ id: string; name: string } | null>(null);
+
+  const roleChips = useMemo(
+    () => [
+      { id: "listener", label: t("role.listener", "Listener") },
+      { id: "scholar", label: t("role.scholar", "Scholar") },
+      { id: "translator", label: t("role.translator", "Translator") },
+      { id: "editor", label: t("role.editor", "Editor") },
+      { id: "admin", label: t("role.admin", "Admin") },
+      { id: "superadmin", label: t("role.superadmin", "Super Admin") },
+    ],
+    [t],
+  );
 
   const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteAdminUsers(
     {
@@ -51,19 +56,23 @@ export function AdminUsersScreen(): ReactNode {
 
   return (
     <ScreenView>
-      <PageHeader title={isMobile ? "Users" : "Manage Users"} />
+      <PageHeader
+        title={
+          isMobile ? t("admin.users.titleMobile", "Users") : t("admin.users.title", "Manage Users")
+        }
+      />
 
       <div className={styles.content}>
         <div className={styles.searchRow}>
           <Search.Bar
             value={searchQuery}
             onChange={setSearchQuery}
-            placeholder="Search users by name or email..."
+            placeholder={t("admin.users.searchPlaceholder", "Search users by name or email...")}
           />
         </div>
 
         <Search.Filter
-          chips={ROLE_CHIPS}
+          chips={roleChips}
           selected={role ? [role] : []}
           onChipChange={(chipId: string) => {
             setRole(role === chipId ? "" : chipId);
@@ -83,7 +92,11 @@ export function AdminUsersScreen(): ReactNode {
               onManageRoles={() => setRoleUser({ id: user.id, name: user.name })}
             />
           )}
-          emptyMessage={debouncedQuery || role ? "No users match your search." : "No users found."}
+          emptyMessage={
+            debouncedQuery || role
+              ? t("admin.users.searchNoMatch", "No users match your search.")
+              : t("admin.users.noUsersFound", "No users found.")
+          }
         />
       </div>
 

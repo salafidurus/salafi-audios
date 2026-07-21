@@ -11,6 +11,7 @@ import type {
 import { validateLectureStatus } from "@/shared/types/form-types";
 import { createLecture, updateLecture } from "../../api/admin-lectures.api";
 import { Modal } from "@/shared/components/Modal";
+import { useTranslation } from "@/core/i18n/use-translation";
 import {
   Dropdown,
   DropdownTrigger,
@@ -89,6 +90,7 @@ export function ListingModal({
   listing,
   initialAudioData,
 }: ListingModalProps) {
+  const { t } = useTranslation();
   const [state, dispatch] = useReducer(formReducer, undefined, () =>
     initFormState(listing, initialAudioData),
   );
@@ -152,11 +154,11 @@ export function ListingModal({
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
-      dispatch({ formError: "Title is required." });
+      dispatch({ formError: t("admin.contents.listing.titleRequired", "Title is required.") });
       return;
     }
     if (!scholarId) {
-      dispatch({ formError: "Scholar is required." });
+      dispatch({ formError: t("admin.contents.listing.scholarRequired", "Scholar is required.") });
       return;
     }
 
@@ -172,7 +174,13 @@ export function ListingModal({
         });
       } else {
         if (!initialAudioData) {
-          dispatch({ formError: "Audio file key is required for creation.", saving: false });
+          dispatch({
+            formError: t(
+              "admin.contents.listing.audioKeyRequired",
+              "Audio file key is required for creation.",
+            ),
+            saving: false,
+          });
           return;
         }
         await createLecture({
@@ -190,7 +198,11 @@ export function ListingModal({
       onSuccess();
       onClose();
     } catch (err) {
-      dispatch({ formError: (err as Error)?.message || "Failed to save lecture details." });
+      dispatch({
+        formError:
+          (err as Error)?.message ||
+          t("admin.contents.listing.failedToSave", "Failed to save lecture details."),
+      });
     } finally {
       dispatch({ saving: false });
     }
@@ -213,13 +225,17 @@ export function ListingModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={listing ? "Edit Lecture Details" : "New Lecture Details"}
+      title={
+        listing
+          ? t("admin.contents.listing.editTitle", "Edit Lecture Details")
+          : t("admin.contents.listing.newTitle", "New Lecture Details")
+      }
       size="xl"
       width="var(--modal-listing-width)"
       footer={
         <>
           <button type="button" className={styles.cancelBtn} onClick={onClose} disabled={saving}>
-            Cancel
+            {t("common.cancel", "Cancel")}
           </button>
           <button
             type="submit"
@@ -227,7 +243,7 @@ export function ListingModal({
             disabled={saving}
             form="lecture-edit-form"
           >
-            {saving ? "Saving..." : "Save"}
+            {saving ? t("admin.permissions.saving", "Saving…") : t("common.save", "Save")}
           </button>
         </>
       }
@@ -237,7 +253,7 @@ export function ListingModal({
 
         <div className={styles.formGroup}>
           <label htmlFor="lecture-title" className={styles.label}>
-            Title
+            {t("admin.contents.listing.titleLabel", "Title")}
           </label>
           <input
             id="lecture-title"
@@ -251,7 +267,7 @@ export function ListingModal({
 
         <div className={styles.formGroup}>
           <label htmlFor="lecture-slug" className={styles.label}>
-            Slug
+            {t("admin.contents.listing.slugLabel", "Slug")}
           </label>
           <input
             id="lecture-slug"
@@ -259,13 +275,16 @@ export function ListingModal({
             className={styles.input}
             value={slug}
             onChange={(e) => dispatch({ slug: e.target.value })}
-            placeholder="Auto-generated if left blank"
+            placeholder={t(
+              "admin.contents.listing.slugPlaceholder",
+              "Auto-generated if left blank",
+            )}
           />
         </div>
 
         <div className={styles.formGroup}>
           <label htmlFor="lecture-description" className={styles.label}>
-            Description
+            {t("admin.contents.listing.descriptionLabel", "Description")}
           </label>
           <textarea
             id="lecture-description"
@@ -279,12 +298,12 @@ export function ListingModal({
         <div className={styles.formRow}>
           <div className={styles.formGroup}>
             <label htmlFor="lecture-scholar" className={styles.label}>
-              Scholar
+              {t("admin.contents.listing.scholarLabel", "Scholar")}
             </label>
             <Dropdown value={scholarId} onValueChange={(value) => dispatch({ scholarId: value })}>
               <DropdownTrigger
                 id="lecture-scholar"
-                placeholder="Select Scholar"
+                placeholder={t("admin.contents.listing.scholarPlaceholder", "Select Scholar")}
                 disabled={!!listing}
                 testId="scholar-dropdown"
               />
@@ -300,12 +319,15 @@ export function ListingModal({
 
           <div className={styles.formGroup}>
             <label htmlFor="lecture-series" className={styles.label}>
-              Series
+              {t("admin.contents.listing.seriesLabel", "Series")}
             </label>
             <Dropdown value={seriesId} onValueChange={(value) => dispatch({ seriesId: value })}>
               <DropdownTrigger
                 id="lecture-series"
-                placeholder="Select Series (Optional)"
+                placeholder={t(
+                  "admin.contents.listing.seriesPlaceholder",
+                  "Select Series (Optional)",
+                )}
                 disabled={!!listing}
                 testId="series-dropdown"
               />
@@ -323,7 +345,7 @@ export function ListingModal({
         <div className={styles.formRow}>
           <div className={styles.formGroup}>
             <label htmlFor="lecture-status" className={styles.label}>
-              Status
+              {t("admin.contents.listing.statusLabel", "Status")}
             </label>
             <Dropdown
               value={status}
@@ -331,20 +353,26 @@ export function ListingModal({
             >
               <DropdownTrigger
                 id="lecture-status"
-                placeholder="Select Status"
+                placeholder={t("admin.contents.listing.statusPlaceholder", "Select Status")}
                 testId="status-dropdown"
               />
               <DropdownContent>
-                <DropdownItem value="draft">Draft</DropdownItem>
-                <DropdownItem value="published">Published</DropdownItem>
-                <DropdownItem value="archived">Archived</DropdownItem>
+                <DropdownItem value="draft">
+                  {t("admin.contents.listing.draft", "Draft")}
+                </DropdownItem>
+                <DropdownItem value="published">
+                  {t("admin.contents.listing.published", "Published")}
+                </DropdownItem>
+                <DropdownItem value="archived">
+                  {t("admin.contents.listing.archived", "Archived")}
+                </DropdownItem>
               </DropdownContent>
             </Dropdown>
           </div>
 
           <div className={styles.formGroup}>
             <label htmlFor="lecture-order" className={styles.label}>
-              Order Index
+              {t("admin.contents.listing.orderIndexLabel", "Order Index")}
             </label>
             <input
               id="lecture-order"
@@ -357,7 +385,7 @@ export function ListingModal({
         </div>
 
         <div className={styles.formGroup}>
-          <span className={styles.label}>Topics</span>
+          <span className={styles.label}>{t("admin.contents.listing.topicsLabel", "Topics")}</span>
           <div className={styles.topicsGrid}>
             {topics.map((t) => (
               <label key={t.id} className={styles.topicCheckboxLabel}>
@@ -371,7 +399,11 @@ export function ListingModal({
                 <span>{t.name}</span>
               </label>
             ))}
-            {topics.length === 0 && <span className={styles.noData}>No topics available</span>}
+            {topics.length === 0 && (
+              <span className={styles.noData}>
+                {t("admin.contents.listing.noTopicsAvailable", "No topics available")}
+              </span>
+            )}
           </div>
         </div>
       </form>
