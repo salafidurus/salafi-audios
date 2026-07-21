@@ -35,7 +35,7 @@ describe("ListItemActions", () => {
     expect(actionsContainer).toBeInTheDocument();
   });
 
-  it("applies mobile orientation class (horizontal by default)", () => {
+  it("applies default mobile orientation class (vertical)", () => {
     render(
       <ListItemActions>
         <button type="button">Action 1</button>

@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
+  position: relative;
 }
 
 .container {
@@ -80,13 +81,6 @@
   color: var(--content-muted);
 }
 
-.rightSection {
-  display: flex;
-  align-items: center;
-  gap: var(--space-scale-sm);
-  flex-shrink: 0;
-}
-
 .actionButton {
   display: flex;
   align-items: center;
@@ -99,6 +93,7 @@
   color: var(--content-default);
   cursor: pointer;
   transition: all 150ms ease;
+  gap: 0;
 }
 
 .actionButton:hover {
@@ -110,6 +105,21 @@
 .actionButton:focus-visible {
   outline: none;
   box-shadow: var(--shadow-focus);
+}
+
+/* Mobile: outline variant with label — full width, pill shape */
+.actionButtonMobile {
+  width: 100%;
+  height: auto;
+  border-radius: 999px;
+  padding: 0.52rem 0.82rem;
+  gap: 0.45rem;
+  font-size: 0.9rem;
+  font-weight: 750;
+}
+
+.actionLabel {
+  white-space: nowrap;
 }
 
 .playButton.playing {

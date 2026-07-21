@@ -9,8 +9,9 @@ import { pickContentField } from "@sd/core-i18n";
 import { List } from "@/shared/components/List";
 import { useFormattedDate } from "@/shared/hooks/use-formatted-date";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
+import { useResponsive } from "@/shared/hooks/use-responsive";
 import { audioService } from "@/features/audio";
-import styles from "./feed-list-row.module.css";
+import styles from "./explore-list-row.module.css";
 
 export type FeedListRowProps = {
   item: FeedContentItemDto;
@@ -20,6 +21,7 @@ export type FeedListRowProps = {
 export function FeedListRow({ item, onPress }: FeedListRowProps) {
   const showOriginal = useShowOriginalContent();
   const title = pickContentField(item.title, item.original?.title, showOriginal);
+  const { isMobile } = useResponsive();
 
   const { isPlaying, currentTrack } = useAudio();
   const isCurrentTrack = currentTrack?.id === item.id;
@@ -111,35 +113,45 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
             {publishedDateText}
           </div>
         </div>
-
-        <div className={styles.rightSection}>
-          <button
-            type="button"
-            className={`${styles.actionButton} ${styles.playButton} ${isCurrentTrack && isPlaying ? styles.playing : ""}`}
-            onClick={handlePlay}
-            aria-label={isCurrentTrack && isPlaying ? "Pause lecture" : "Play lecture"}
-          >
-            {isCurrentTrack && isPlaying ? (
-              <Pause className={styles.playIcon} size={20} fill="currentColor" />
-            ) : (
-              <Play className={styles.playIcon} size={20} fill="currentColor" />
-            )}
-          </button>
-
-          <button
-            type="button"
-            className={`${styles.actionButton} ${styles.saveButton} ${isSaved ? styles.saved : ""}`}
-            onClick={handleSave}
-            aria-label={isSaved ? "Remove from saved" : "Save lecture"}
-          >
-            <Bookmark
-              className={styles.saveIcon}
-              size={20}
-              fill={isSaved ? "currentColor" : "none"}
-            />
-          </button>
-        </div>
       </div>
+
+      <List.Item.Actions>
+        <button
+          type="button"
+          className={`${styles.actionButton} ${styles.playButton} ${
+            isCurrentTrack && isPlaying ? styles.playing : ""
+          } ${isMobile ? styles.actionButtonMobile : ""}`}
+          onClick={handlePlay}
+          aria-label={isCurrentTrack && isPlaying ? "Pause lecture" : "Play lecture"}
+        >
+          {isCurrentTrack && isPlaying ? (
+            <Pause className={styles.playIcon} size={20} fill="currentColor" />
+          ) : (
+            <Play className={styles.playIcon} size={20} fill="currentColor" />
+          )}
+          {isMobile && (
+            <span className={styles.actionLabel}>
+              {isCurrentTrack && isPlaying ? "Pause" : "Play"}
+            </span>
+          )}
+        </button>
+
+        <button
+          type="button"
+          className={`${styles.actionButton} ${styles.saveButton} ${
+            isSaved ? styles.saved : ""
+          } ${isMobile ? styles.actionButtonMobile : ""}`}
+          onClick={handleSave}
+          aria-label={isSaved ? "Remove from saved" : "Save lecture"}
+        >
+          <Bookmark
+            className={styles.saveIcon}
+            size={20}
+            fill={isSaved ? "currentColor" : "none"}
+          />
+          {isMobile && <span className={styles.actionLabel}>{isSaved ? "Saved" : "Save"}</span>}
+        </button>
+      </List.Item.Actions>
 
       {isInProgress && (
         <div
