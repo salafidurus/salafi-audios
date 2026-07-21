@@ -6,6 +6,7 @@ export {
   useInfiniteLibraryProgress,
   useInfiniteAdminScholars,
   useInfiniteAdminListings,
+  useAdminListingSeriesByScholar,
   type UseInfiniteScholarsListOptions,
   type UseInfiniteLibrarySavedOptions,
   type UseInfiniteLibraryCompletedOptions,

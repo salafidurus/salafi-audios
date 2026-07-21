@@ -521,6 +521,15 @@ export class ListingRepository {
     };
   }
 
+  async findSeriesOptionsByScholar(scholarId: string) {
+    const listings = await this.prisma.listing.findMany({
+      where: { scholarId, format: 'series' as const, deletedAt: null },
+      select: { id: true, slug: true, title: true },
+      orderBy: { title: 'asc' },
+    });
+    return listings;
+  }
+
   async createWithAudioAsset(
     dto: CreateListingDto & { publicUrl?: string },
     createdBy?: string,

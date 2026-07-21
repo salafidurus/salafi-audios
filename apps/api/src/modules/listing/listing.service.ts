@@ -11,6 +11,7 @@ import type {
   BulkActionResultDto,
   TranslationViewDto,
   SaveListingTranslationDto,
+  ListingRefDto,
 } from '@sd/core-contracts';
 import { ListingRepository } from './listing.repo';
 
@@ -41,6 +42,10 @@ export class ListingService {
     const listing = await this.repo.findAdminDetail(id);
     if (!listing) throw new NotFoundException(`Listing "${id}" not found`);
     return listing;
+  }
+
+  getSeriesOptions(scholarId: string): Promise<ListingRefDto[]> {
+    return this.repo.findSeriesOptionsByScholar(scholarId);
   }
 
   createListing(
