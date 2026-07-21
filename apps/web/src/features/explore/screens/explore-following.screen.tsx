@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useRef, useEffect, type ReactNode } from "react";
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
 import { useExploreFollowingScreen } from "@sd/domain-content";
 import { List } from "@/shared/components/List";
@@ -8,6 +8,8 @@ import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { Button } from "@/shared/components/Button";
+import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
+import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { FeedListRow } from "../components/feed-list-row/feed-list-row";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import styles from "./explore-following.screen.module.css";
@@ -76,51 +78,79 @@ export function FeedFollowingScreen({
   const { t } = useTranslation();
   const { data, isFetching, hasNextPage, fetchNextPage } = useExploreFollowingScreen();
   const items = data?.pages.flatMap((p) => p.items) ?? [];
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!hasNextPage || isFetching) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetching, fetchNextPage]);
 
   const followingTitle = t("navigation.subnav.explore.following", "Following");
 
   if (isFetching && items.length === 0) {
     return (
-      <ScreenView>
-        <PageHeader title={followingTitle} />
-        <div className={styles.loading}>
-          {t("explore.loadingFollowing", "Loading followed scholars…")}
-        </div>
+      <ScreenView contentStyle={{ flex: 1 }}>
+        <StickyHeaderLayout>
+          <StickyHeaderLayout.Header>
+            <PageHeader title={followingTitle} />
+          </StickyHeaderLayout.Header>
+          <StickyHeaderLayout.Content>
+            <div className={styles.loading}>
+              {t("explore.loadingFollowing", "Loading followed scholars…")}
+            </div>
+          </StickyHeaderLayout.Content>
+        </StickyHeaderLayout>
+        <ScrollToTopButton />
       </ScreenView>
     );
   }
 
   if (items.length === 0) {
     return (
-      <ScreenView>
-        <PageHeader title={followingTitle} />
-        <div className={styles.empty}>
-          {t("explore.followToSee", "Follow scholars to see their latest lectures here.")}
-        </div>
+      <ScreenView contentStyle={{ flex: 1 }}>
+        <StickyHeaderLayout>
+          <StickyHeaderLayout.Header>
+            <PageHeader title={followingTitle} />
+          </StickyHeaderLayout.Header>
+          <StickyHeaderLayout.Content>
+            <div className={styles.empty}>
+              {t("explore.followToSee", "Follow scholars to see their latest lectures here.")}
+            </div>
+          </StickyHeaderLayout.Content>
+        </StickyHeaderLayout>
+        <ScrollToTopButton />
       </ScreenView>
     );
   }
 
   return (
-    <ScreenView>
-      <PageHeader title={followingTitle} />
-      <FeedBlocks
-        items={items}
-        onNavigateToLecture={onNavigateToLecture}
-        onNavigateToScholar={onNavigateToScholar}
-      />
-      {hasNextPage && (
-        <div className={styles.loadMoreRow}>
-          <Button
-            variant="surface"
-            radius="md"
-            onClick={() => fetchNextPage()}
-            disabled={isFetching}
-          >
-            {isFetching ? t("common.loading", "Loading...") : t("feed.loadMore", "Load more")}
-          </Button>
-        </div>
-      )}
+    <ScreenView contentStyle={{ flex: 1 }}>
+      <div className={styles.stickyHeader}>
+        <PageHeader title={followingTitle} />
+      </div>
+      <section className={styles.results}>
+        <FeedBlocks
+          items={items}
+          onNavigateToLecture={onNavigateToLecture}
+          onNavigateToScholar={onNavigateToScholar}
+        />
+        <div ref={loadMoreRef} style={{ height: "20px" }} />
+      </section>
+      <ScrollToTopButton />
     </ScreenView>
   );
 }

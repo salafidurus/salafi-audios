@@ -15,7 +15,8 @@
     "english": "الإنجليزية",
     "arabic": "العربية (عربي)",
     "hide": "إخفاء",
-    "viewAll": "عرض الكل"
+    "viewAll": "عرض الكل",
+    "scrollToTop": "العودة إلى الأعلى"
   },
   "auth": {
     "signIn": {

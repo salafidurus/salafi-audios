@@ -7,6 +7,8 @@ import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
+import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
+import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { LibraryListRow } from "@/features/library/components/library-list-row/library-list-row";
 
 export function LibraryScreen() {
@@ -34,19 +36,26 @@ export function LibraryScreen() {
 
   return (
     <ScreenView contentStyle={{ flex: 1 }}>
-      <PageHeader title={t("library.inProgress", "In Progress")} />
-      <InfiniteScrollList
-        data={allItems}
-        isLoading={isLoading}
-        hasMore={hasNextPage ?? false}
-        onLoadMore={() => fetchNextPage()}
-        isFetchingNextPage={isFetchingNextPage}
-        renderItem={(item) => <LibraryListRow item={item} variant="progress" />}
-        emptyMessage={t(
-          "library.emptyProgress",
-          "No lectures started yet. Browse the catalog to begin listening.",
-        )}
-      />
+      <StickyHeaderLayout>
+        <StickyHeaderLayout.Header>
+          <PageHeader title={t("library.inProgress", "In Progress")} />
+        </StickyHeaderLayout.Header>
+        <StickyHeaderLayout.Content>
+          <InfiniteScrollList
+            data={allItems}
+            isLoading={isLoading}
+            hasMore={hasNextPage ?? false}
+            onLoadMore={() => fetchNextPage()}
+            isFetchingNextPage={isFetchingNextPage}
+            renderItem={(item) => <LibraryListRow item={item} variant="progress" />}
+            emptyMessage={t(
+              "library.emptyProgress",
+              "No lectures started yet. Browse the catalog to begin listening.",
+            )}
+          />
+        </StickyHeaderLayout.Content>
+      </StickyHeaderLayout>
+      <ScrollToTopButton />
     </ScreenView>
   );
 }

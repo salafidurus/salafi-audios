@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useRef, useEffect, type ReactNode } from "react";
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { useExploreRecentScreen } from "@sd/domain-content";
@@ -14,6 +14,8 @@ import { FeedSkeleton } from "../components/feed-skeleton/feed-skeleton";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
+import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
+import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import styles from "./explore-recent.screen.module.css";
 
 export type FeedRecentScreenProps = {
@@ -92,6 +94,26 @@ export function FeedRecentScreen({
   const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } =
     useExploreRecentScreen();
   const items = data?.pages.flatMap((p) => p.items) ?? [];
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!hasNextPage || isFetching) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetching, fetchNextPage]);
 
   let body: ReactNode;
   const feedTitle = t("explore.feedTitle", "Feed");
@@ -122,26 +144,22 @@ export function FeedRecentScreen({
             onNavigateToLecture={onNavigateToLecture}
             onNavigateToScholar={onNavigateToScholar}
           />
-          {hasNextPage && (
-            <div className={styles.loadMoreRow}>
-              <Button
-                variant="surface"
-                radius="md"
-                onClick={() => fetchNextPage()}
-                disabled={isFetching}
-              >
-                {isFetching ? t("feed.loading", "Loading\u2026") : t("feed.loadMore", "Load more")}
-              </Button>
-            </div>
-          )}
+          <div ref={loadMoreRef} style={{ height: "20px" }} />
         </>
       );
     }
 
     return (
-      <ScreenView>
-        <PageHeader title={feedTitle} />
-        <div className={styles.page}>{body}</div>
+      <ScreenView contentStyle={{ flex: 1 }}>
+        <StickyHeaderLayout>
+          <StickyHeaderLayout.Header>
+            <PageHeader title={feedTitle} />
+          </StickyHeaderLayout.Header>
+          <StickyHeaderLayout.Content>
+            <div className={styles.page}>{body}</div>
+          </StickyHeaderLayout.Content>
+        </StickyHeaderLayout>
+        <ScrollToTopButton />
       </ScreenView>
     );
   }
@@ -160,26 +178,20 @@ export function FeedRecentScreen({
           onNavigateToLecture={onNavigateToLecture}
           onNavigateToScholar={onNavigateToScholar}
         />
-        {hasNextPage && (
-          <div className={styles.loadMoreRow}>
-            <Button
-              variant="surface"
-              radius="md"
-              onClick={() => fetchNextPage()}
-              disabled={isFetching}
-            >
-              {isFetching ? t("feed.loading", "Loading\u2026") : t("feed.loadMore", "Load more")}
-            </Button>
-          </div>
-        )}
+        <div ref={loadMoreRef} style={{ height: "20px" }} />
       </>
     );
   }
 
   return (
-    <ScreenView>
-      <PageHeader title={feedTitle} />
-      {body}
+    <ScreenView contentStyle={{ flex: 1 }}>
+      <StickyHeaderLayout>
+        <StickyHeaderLayout.Header>
+          <PageHeader title={feedTitle} />
+        </StickyHeaderLayout.Header>
+        <StickyHeaderLayout.Content>{body}</StickyHeaderLayout.Content>
+      </StickyHeaderLayout>
+      <ScrollToTopButton />
     </ScreenView>
   );
 }

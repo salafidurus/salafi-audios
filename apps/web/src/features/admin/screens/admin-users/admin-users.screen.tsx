@@ -10,6 +10,8 @@ import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { Search } from "@/shared/components/Search";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
+import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
+import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { UserItem } from "@/features/admin/components/user-item";
 import { PermissionsDialog } from "@/features/admin/components/PermissionsDialog";
 import { RoleDialog } from "@/features/admin/components/RoleDialog";
@@ -55,50 +57,60 @@ export function AdminUsersScreen(): ReactNode {
   }, [queryClient]);
 
   return (
-    <ScreenView>
-      <PageHeader
-        title={
-          isMobile ? t("admin.users.titleMobile", "Users") : t("admin.users.title", "Manage Users")
-        }
-      />
-
+    <ScreenView contentStyle={{ flex: 1 }}>
       <div className={styles.content}>
-        <div className={styles.searchRow}>
-          <Search.Bar
-            value={searchQuery}
-            onChange={setSearchQuery}
-            placeholder={t("admin.users.searchPlaceholder", "Search users by name or email...")}
-          />
-        </div>
-
-        <Search.Filter
-          chips={roleChips}
-          selected={role ? [role] : []}
-          onChipChange={(chipId: string) => {
-            setRole(role === chipId ? "" : chipId);
-          }}
-        />
-
-        <InfiniteScrollList
-          data={allItems}
-          isLoading={isLoading}
-          hasMore={hasNextPage ?? false}
-          onLoadMore={() => fetchNextPage()}
-          isFetchingNextPage={isFetchingNextPage}
-          renderItem={(user) => (
-            <UserItem
-              user={user}
-              onManagePermissions={() => setPermUser({ id: user.id, name: user.name })}
-              onManageRoles={() => setRoleUser({ id: user.id, name: user.name })}
+        <StickyHeaderLayout>
+          <StickyHeaderLayout.Header>
+            <PageHeader
+              title={
+                isMobile
+                  ? t("admin.users.titleMobile", "Users")
+                  : t("admin.users.title", "Manage Users")
+              }
             />
-          )}
-          emptyMessage={
-            debouncedQuery || role
-              ? t("admin.users.searchNoMatch", "No users match your search.")
-              : t("admin.users.noUsersFound", "No users found.")
-          }
-        />
+
+            <div className={styles.searchRow}>
+              <Search.Bar
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder={t("admin.users.searchPlaceholder", "Search users by name or email...")}
+              />
+            </div>
+
+            <Search.Filter
+              chips={roleChips}
+              selected={role ? [role] : []}
+              onChipChange={(chipId: string) => {
+                setRole(role === chipId ? "" : chipId);
+              }}
+            />
+          </StickyHeaderLayout.Header>
+
+          <StickyHeaderLayout.Content>
+            <InfiniteScrollList
+              data={allItems}
+              isLoading={isLoading}
+              hasMore={hasNextPage ?? false}
+              onLoadMore={() => fetchNextPage()}
+              isFetchingNextPage={isFetchingNextPage}
+              renderItem={(user) => (
+                <UserItem
+                  user={user}
+                  onManagePermissions={() => setPermUser({ id: user.id, name: user.name })}
+                  onManageRoles={() => setRoleUser({ id: user.id, name: user.name })}
+                />
+              )}
+              emptyMessage={
+                debouncedQuery || role
+                  ? t("admin.users.searchNoMatch", "No users match your search.")
+                  : t("admin.users.noUsersFound", "No users found.")
+              }
+            />
+          </StickyHeaderLayout.Content>
+        </StickyHeaderLayout>
       </div>
+
+      <ScrollToTopButton />
 
       {permUser && (
         <PermissionsDialog
