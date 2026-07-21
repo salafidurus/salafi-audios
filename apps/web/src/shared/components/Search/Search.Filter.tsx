@@ -1,6 +1,7 @@
 "use client";
 
 import { X } from "lucide-react";
+import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./Search.module.css";
 
 export interface FilterChip {
@@ -31,53 +32,6 @@ export interface SearchFilterProps {
 
 /**
  * Search.Filter — Standardized filter chip group.
- *
- * Provides:
- * - Single-select (radio button) or multi-select filter chips
- * - Optional close button for removing selections
- * - Optional "All" chip to clear all filters
- * - Visual selection state (background, border, weight changes)
- * - Responsive layout that wraps on smaller screens
- * - Design token spacing and colors
- *
- * Single-Select Usage (Default - radio button behavior):
- * ```tsx
- * const [selectedFilter, setSelectedFilter] = useState<string>('');
- *
- * <Search.Filter
- *   chips={[
- *     { id: 'category-lectures', label: 'Lectures' },
- *     { id: 'category-articles', label: 'Articles' },
- *   ]}
- *   selected={selectedFilter ? [selectedFilter] : []}
- *   onChipChange={(id) => {
- *     setSelectedFilter(prev => prev === id ? '' : id);
- *   }}
- *   includeAllOption
- * />
- * ```
- *
- * Multi-Select Usage:
- * ```tsx
- * const [filters, setFilters] = useState<string[]>([]);
- *
- * <Search.Filter
- *   chips={[
- *     { id: 'category-lectures', label: 'Lectures' },
- *     { id: 'category-articles', label: 'Articles' },
- *   ]}
- *   selected={filters}
- *   onChipChange={(id) => {
- *     setFilters(prev =>
- *       prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
- *     );
- *   }}
- *   multiple
- *   includeAllOption
- * />
- * ```
- *
- * For search input, pair with Search.Bar to create a complete search UI.
  */
 export function SearchFilter({
   chips,
@@ -88,6 +42,8 @@ export function SearchFilter({
   showCloseButton = true,
   includeAllOption = true,
 }: SearchFilterProps) {
+  const { t } = useTranslation();
+
   const handleChipClick = (chipId: string) => {
     if (chipId === "all") {
       // "All" chip clears all selections
@@ -119,9 +75,9 @@ export function SearchFilter({
             className={styles.filterChipButton}
             onClick={() => handleChipClick("all")}
             aria-pressed={isAllSelected}
-            aria-label="Show all items"
+            aria-label={t("search.filterAllAria", "Show all items")}
           >
-            <span>All</span>
+            <span>{t("search.filterAll", "All")}</span>
           </button>
         </div>
       )}
@@ -137,7 +93,10 @@ export function SearchFilter({
               className={styles.filterChipButton}
               onClick={() => handleChipClick(chip.id)}
               aria-pressed={isSelected}
-              aria-label={`Filter by ${chip.label}`}
+              aria-label={t("search.filterByAria", {
+                defaultValue: `Filter by ${chip.label}`,
+                label: chip.label,
+              })}
             >
               <span>{chip.label}</span>
             </button>
@@ -146,7 +105,10 @@ export function SearchFilter({
                 type="button"
                 className={styles.filterChipClose}
                 onClick={(e) => handleRemoveClick(e, chip.id)}
-                aria-label={`Remove ${chip.label} filter`}
+                aria-label={t("search.filterRemoveAria", {
+                  defaultValue: `Remove ${chip.label} filter`,
+                  label: chip.label,
+                })}
               >
                 <X size={12} strokeWidth={2.5} />
               </button>

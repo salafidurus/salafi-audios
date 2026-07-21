@@ -6,6 +6,7 @@ import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { HeroSection } from "../../components/hero-section/hero-section";
 import { ContinueListeningCard } from "../../components/continue-listening-card/continue-listening-card";
 import { MobileDownloadSection } from "../../components/mobile-download-section/mobile-download-section";
+import { useTranslation } from "@/core/i18n/use-translation";
 import { MOBILE_APP_AVAILABILITY } from "./home.constants";
 import styles from "./home.screen.module.css";
 
@@ -16,6 +17,7 @@ export type HomeScreenProps = {
 
 export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProps) {
   const { recentProgress } = useContinueListening();
+  const { t } = useTranslation();
 
   return (
     <ScreenView
@@ -32,7 +34,7 @@ export function HomeScreen({ onOpenSearch, onContinueListening }: HomeScreenProp
       <HeroSection />
       <div className={styles.searchWrapper} data-testid="home-search-wrapper">
         <Search.Button
-          label="What do you want to listen to?"
+          label={t("home.searchLabel", "What do you want to listen to?")}
           onClick={onOpenSearch}
           inputWrapperClassName={styles.searchInputWrapper}
           placeholderClassName={styles.searchPlaceholder}

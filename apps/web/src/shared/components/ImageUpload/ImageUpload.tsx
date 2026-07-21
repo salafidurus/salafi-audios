@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from "react";
 import Image from "next/image";
 import { Upload, X, AlertCircle, Loader } from "lucide-react";
+import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./image-upload.module.css";
 
 export interface ImageUploadProps {
@@ -22,6 +23,7 @@ export function ImageUpload({
   disabled = false,
   slug,
 }: ImageUploadProps) {
+  const { t } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -32,7 +34,7 @@ export function ImageUpload({
     async (file: File) => {
       // Validate file type
       if (!file.type.startsWith("image/")) {
-        const error = "Please upload an image file";
+        const error = t("imageUpload.errorFileType", "Please upload an image file");
         setUploadError(error);
         onError?.(error);
         return;
@@ -42,7 +44,7 @@ export function ImageUpload({
       if (slug) {
         const ext = file.name.split(".").pop()?.toLowerCase() || "";
         if (!["png", "jpg", "jpeg"].includes(ext)) {
-          const error = "Only PNG, JPG, and JPEG images are allowed";
+          const error = t("imageUpload.errorFileExt", "Only PNG, JPG, and JPEG images are allowed");
           setUploadError(error);
           onError?.(error);
           return;
@@ -52,12 +54,17 @@ export function ImageUpload({
       // Validate file size
       const sizeMB = file.size / (1024 * 1024);
       if (sizeMB > maxSizeMB) {
-        const error = `Image must be less than ${maxSizeMB}MB (current: ${sizeMB.toFixed(1)}MB)`;
+        const error = t("imageUpload.errorFileSize", {
+          defaultValue: `Image must be less than ${maxSizeMB}MB (current: ${sizeMB.toFixed(1)}MB)`,
+          maxSizeMB,
+          current: sizeMB.toFixed(1),
+        });
         setUploadError(error);
         onError?.(error);
         return;
       }
 
+      // Clear error and set uploading state
       setUploadError(null);
       setIsUploading(true);
 
@@ -107,7 +114,8 @@ export function ImageUpload({
           onChange(publicUrl);
         }
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "Upload failed";
+        const errorMessage =
+          error instanceof Error ? error.message : t("imageUpload.uploadFailed", "Upload failed");
         setUploadError(errorMessage);
         onError?.(errorMessage);
         setPreviewUrl(null);
@@ -115,7 +123,7 @@ export function ImageUpload({
         setIsUploading(false);
       }
     },
-    [maxSizeMB, onChange, onError, slug],
+    [maxSizeMB, onChange, onError, slug, t],
   );
 
   const handleDragOver = useCallback(
@@ -149,51 +157,41 @@ export function ImageUpload({
     [disabled, handleFile],
   );
 
-  const handleFileSelect = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (file) {
-        handleFile(file);
-      }
-    },
-    [handleFile],
-  );
-
-  const handleClick = useCallback(() => {
-    if (!disabled) {
+  const handleClick = () => {
+    if (!disabled && !isUploading) {
       fileInputRef.current?.click();
     }
-  }, [disabled]);
+  };
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if ((e.key === "Enter" || e.key === " ") && !disabled) {
-        e.preventDefault();
-        fileInputRef.current?.click();
-      }
-    },
-    [disabled],
-  );
-
-  const handleRemove = useCallback(() => {
-    setPreviewUrl(null);
-    setUploadError(null);
-    onChange("");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleClick();
     }
-  }, [onChange]);
+  };
+
+  const handleRemove = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setPreviewUrl(null);
+    onChange("");
+    setUploadError(null);
+  };
 
   return (
     <div className={styles.container}>
       <input
-        ref={fileInputRef}
         type="file"
-        accept="image/*"
-        onChange={handleFileSelect}
-        className={styles.hiddenInput}
+        ref={fileInputRef}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            handleFile(file);
+          }
+        }}
+        style={{ display: "none" }}
+        accept={slug ? ".png,.jpg,.jpeg" : "image/*"}
         disabled={disabled}
-        aria-label="Select image file"
+        aria-label={t("imageUpload.selectImage", "Select image file")}
       />
 
       {!previewUrl ? (
@@ -206,20 +204,26 @@ export function ImageUpload({
           onKeyDown={handleKeyDown}
           role="button"
           tabIndex={disabled ? -1 : 0}
-          aria-label="Upload image"
+          aria-label={t("imageUpload.uploadImage", "Upload image")}
         >
           {isUploading ? (
             <div className={styles.uploadingState}>
               <Loader size={32} className={styles.spinner} />
-              <p>Uploading...</p>
+              <p>{t("imageUpload.uploading", "Uploading...")}</p>
             </div>
           ) : (
             <>
               <Upload size={32} className={styles.uploadIcon} />
               <p className={styles.dropText}>
-                <strong>Click to upload</strong> or drag and drop
+                <strong>{t("imageUpload.clickToUpload", "Click to upload")}</strong>{" "}
+                {t("imageUpload.orDragDrop", "or drag and drop")}
               </p>
-              <p className={styles.dropHint}>PNG, JPG, GIF up to {maxSizeMB}MB</p>
+              <p className={styles.dropHint}>
+                {t("imageUpload.hint", {
+                  defaultValue: `PNG, JPG, GIF up to ${maxSizeMB}MB`,
+                  maxSizeMB,
+                })}
+              </p>
             </>
           )}
         </div>
@@ -228,7 +232,7 @@ export function ImageUpload({
           <div className={styles.preview}>
             <Image
               src={previewUrl}
-              alt="Preview"
+              alt={t("imageUpload.previewAlt", "Preview")}
               width={240}
               height={240}
               style={{ objectFit: "contain" }}
@@ -239,7 +243,7 @@ export function ImageUpload({
                 type="button"
                 className={styles.removeButton}
                 onClick={handleRemove}
-                aria-label="Remove image"
+                aria-label={t("imageUpload.removeImage", "Remove image")}
               >
                 <X size={16} />
               </button>

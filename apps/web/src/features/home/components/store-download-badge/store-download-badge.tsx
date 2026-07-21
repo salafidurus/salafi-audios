@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslation } from "@/core/i18n/use-translation";
 import { useIsRtl } from "@/shared/hooks/use-is-rtl";
 import styles from "./store-download-badge.module.css";
 
@@ -12,6 +13,7 @@ export type StoreDownloadBadgeProps = {
 
 export function StoreDownloadBadge({ store, isAvailable, href }: StoreDownloadBadgeProps) {
   const isRtl = useIsRtl();
+  const { t } = useTranslation();
 
   const testIdBase = store === "appStore" ? "app-store" : "google-play";
   const langSuffix = isRtl ? "ar" : "en";
@@ -21,7 +23,10 @@ export function StoreDownloadBadge({ store, isAvailable, href }: StoreDownloadBa
       ? `/store-buttons/app-store-black-${langSuffix}.svg`
       : `/store-buttons/play-store-${langSuffix}.svg`;
 
-  const badgeAlt = store === "appStore" ? "Download on the App Store" : "Get it on Google Play";
+  const badgeAlt =
+    store === "appStore"
+      ? t("home.downloadAppStore", "Download on the App Store")
+      : t("home.getGooglePlay", "Get it on Google Play");
 
   if (isAvailable && href) {
     return (
@@ -65,7 +70,7 @@ export function StoreDownloadBadge({ store, isAvailable, href }: StoreDownloadBa
         className={`${styles.comingSoonBadge} ${isRtl ? styles.comingSoonBadgeRtl : ""}`}
         data-testid={`coming-soon-badge-${testIdBase}`}
       >
-        Coming soon
+        {t("common.comingSoon", "Coming soon")}
       </span>
     </button>
   );
