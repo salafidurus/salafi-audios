@@ -255,6 +255,9 @@
     "loadMore": "تحميل المزيد",
     "followingEmpty": "تابِع العلماء لرؤية أحدث محاضراتهم هنا."
   },
+  "explore": {
+    "feedTitle": "الرئيسية"
+  },
   "notFound": {
     "title": "عذرًا!",
     "message": "الصفحة غير موجودة",

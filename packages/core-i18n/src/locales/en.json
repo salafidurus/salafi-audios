@@ -255,6 +255,9 @@
     "loadMore": "Load more",
     "followingEmpty": "Follow scholars to see their latest lectures here."
   },
+  "explore": {
+    "feedTitle": "Feed"
+  },
   "notFound": {
     "title": "Oops!",
     "message": "Page not found",

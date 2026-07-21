@@ -35,38 +35,12 @@
   transform: translateX(0);
 }
 
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: var(--space-component-gap-md);
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.closeButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  padding: 0;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  color: var(--content-default);
-  transition: color 150ms ease;
-}
-
-.closeButton:active {
-  color: var(--action-primary);
-}
-
 .content {
   flex: 1;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  padding: var(--space-component-gap-md) 0;
+  padding: var(--space-component-gap-md) var(--space-component-gap-md);
 
   /* Remove scrollbar for iOS */
   -webkit-overflow-scrolling: touch;

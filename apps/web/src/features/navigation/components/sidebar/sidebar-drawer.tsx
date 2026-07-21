@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useEffectEvent } from "react";
-import { X } from "lucide-react";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { NavItems } from "./nav-items";
 import styles from "./sidebar-drawer.module.css";
@@ -68,17 +67,6 @@ export function SidebarDrawer({ isOpen, onClose }: SidebarDrawerProps) {
         data-open={isOpen}
         aria-label={t("navigation.mobileNav", "Mobile navigation")}
       >
-        <div className={styles.header}>
-          <button
-            type="button"
-            className={styles.closeButton}
-            onClick={onClose}
-            aria-label={t("navigation.closeMenu", "Close menu")}
-          >
-            <X size={24} />
-          </button>
-        </div>
-
         <div ref={contentRef} className={styles.content} tabIndex={-1}>
           <NavItems onItemClick={onClose} />
         </div>
