@@ -2,27 +2,15 @@
 
 import { useState, useMemo, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { queryKeys, type TopicDetailDto, type AdminListingDetailDto } from "@sd/core-contracts";
-import { useInfiniteAdminListings, useApiQuery, httpClient, endpoints } from "@sd/domain-content";
+import { queryKeys, type TopicDetailDto } from "@sd/core-contracts";
 import { List } from "@/shared/components/List";
-import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { Modal } from "@/shared/components/Modal";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { sanitizeError } from "@sd/utils-error";
-import { Content } from "./Content";
-import type { TopicForEdit } from "./Content/TopicModal";
-import { AudioUploader } from "./AudioUploader/AudioUploader";
-import { createTopic, updateTopic, deleteTopic } from "../api/admin.api";
-import { fetchAdminLectureDetail } from "../api/admin-lectures.api";
-import styles from "../screens/admin-contents/admin-contents.screen.module.css";
-
-type AudioData = {
-  audioKey: string;
-  durationSeconds: number;
-  sizeBytes: number;
-  format: string;
-  filename: string;
-};
+import { Content } from "../Content";
+import type { TopicForEdit } from "../Content/TopicModal";
+import { createTopic, updateTopic, deleteTopic } from "../../api/admin.api";
+import styles from "../../screens/admin-contents/admin-contents.screen.module.css";
 
 export type TopicsContentProps = {
   searchQuery: string;
@@ -154,82 +142,6 @@ export function TopicsContent({
         onClose={() => setIsModalOpen(false)}
         onSave={handleSave}
         topic={editingTopic}
-      />
-    </>
-  );
-}
-
-export type ListingsContentProps = {
-  debouncedSearch: string;
-  isMobile: boolean;
-};
-
-export function ListingsContent({ debouncedSearch, isMobile }: ListingsContentProps) {
-  const { t } = useTranslation();
-  const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
-    useInfiniteAdminListings({
-      search: debouncedSearch,
-    });
-
-  const [isAudioUploaderOpen, setIsAudioUploaderOpen] = useState(false);
-  const [isListingModalOpen, setIsListingModalOpen] = useState(false);
-  const [selectedListing, setSelectedListing] = useState<AdminListingDetailDto | null>(null);
-  const [initialAudioData, setInitialAudioData] = useState<AudioData | null>(null);
-  const queryClient = useQueryClient();
-
-  const allListings = data?.pages.flatMap((page) => page.items) ?? [];
-
-  const handleUploadComplete = (audioInfo: AudioData | null) => {
-    setInitialAudioData(audioInfo);
-    setSelectedListing(null);
-    setIsAudioUploaderOpen(false);
-    setIsListingModalOpen(true);
-  };
-
-  const handleEditListing = async (listingId: string) => {
-    try {
-      const details = await fetchAdminLectureDetail(listingId);
-      setSelectedListing(details);
-      setInitialAudioData(null);
-      setIsListingModalOpen(true);
-    } catch {
-      // Stay on current view
-    }
-  };
-
-  const handleListingSaved = () => {
-    setIsListingModalOpen(false);
-    setSelectedListing(null);
-    setInitialAudioData(null);
-    queryClient.invalidateQueries({ queryKey: queryKeys.admin.listings.infinite() });
-  };
-
-  return (
-    <>
-      <InfiniteScrollList
-        data={allListings}
-        isLoading={isLoading}
-        hasMore={hasNextPage ?? false}
-        onLoadMore={() => fetchNextPage()}
-        isFetchingNextPage={isFetchingNextPage}
-        renderItem={(listing) => (
-          <Content.Listing key={listing.id} listing={listing} onEdit={handleEditListing} />
-        )}
-        emptyMessage={
-          debouncedSearch
-            ? t("admin.contents.searchNoMatchListings", "No listings match your search.")
-            : t("admin.contents.noListingsFound", "No listings yet. Add audio to create a listing.")
-        }
-      />
-
-      {isAudioUploaderOpen && <AudioUploader onUploadComplete={handleUploadComplete} />}
-
-      <Content.ListingModal
-        isOpen={isListingModalOpen}
-        onClose={() => setIsListingModalOpen(false)}
-        onSuccess={handleListingSaved}
-        listing={selectedListing}
-        initialAudioData={initialAudioData}
       />
     </>
   );

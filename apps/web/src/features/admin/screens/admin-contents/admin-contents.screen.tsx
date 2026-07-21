@@ -19,10 +19,7 @@ import { useResponsive } from "@/shared/hooks/use-responsive";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
-import {
-  TopicsContent,
-  ListingsContent,
-} from "@/features/admin/components/AdminContentsTabContent";
+import { TopicsContent, ListingsContent } from "@/features/admin/components/Contents";
 import { useDebouncedSearch } from "@/shared/hooks";
 import styles from "./admin-contents.screen.module.css";
 
