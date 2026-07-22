@@ -5,97 +5,119 @@ import { EditableInput } from "@/shared/components/EditableInput";
 import { FormSection } from "@/features/admin/components/FormSection";
 import { useTranslation } from "@/core/i18n/use-translation";
 import type { FormAction } from "./ScholarModal";
-import styles from "./scholar-modal.module.css";
+import styles from "./social-section.module.css";
 
 interface SocialSectionProps {
   formData: CreateScholarDto;
   dispatch: React.Dispatch<FormAction>;
 }
 
+const SOCIAL_FIELDS = [
+  {
+    key: "socialTwitter",
+    label: "admin.scholars.twitterLabel",
+    defaultLabel: "X (Twitter)",
+    prefix: "https://x.com/",
+    id: "scholar-twitter",
+  },
+  {
+    key: "socialTelegram",
+    label: "admin.scholars.telegramLabel",
+    defaultLabel: "Telegram",
+    prefix: "https://t.me/",
+    id: "scholar-telegram",
+  },
+  {
+    key: "socialYoutube",
+    label: "admin.scholars.youtubeLabel",
+    defaultLabel: "YouTube",
+    prefix: "https://youtube.com/@",
+    id: "scholar-youtube",
+  },
+  {
+    key: "socialWebsite",
+    label: "admin.scholars.websiteLabel",
+    defaultLabel: "Website",
+    prefix: null, // No fixed prefix for website
+    id: "scholar-website",
+  },
+];
+
+function extractHandle(url: string, prefix: string | null): string {
+  if (!prefix) return url;
+  if (url.startsWith(prefix)) {
+    return url.slice(prefix.length);
+  }
+  return url;
+}
+
+function reconstructUrl(handle: string, prefix: string | null): string {
+  if (!prefix) return handle;
+  return handle ? `${prefix}${handle}` : "";
+}
+
 export function SocialSection({ formData, dispatch }: SocialSectionProps) {
   const { t } = useTranslation();
 
+  const handleSocialChange = (
+    key: keyof CreateScholarDto,
+    handle: string,
+    prefix: string | null,
+  ) => {
+    const fullUrl = reconstructUrl(handle, prefix);
+    dispatch({ type: "UPDATE_FIELD", field: key, value: fullUrl });
+  };
+
   return (
     <FormSection title={t("admin.scholars.socialMedia", "Social Media")}>
-      <div className={styles.twoCol}>
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="scholar-twitter">
-            {t("admin.scholars.twitterLabel", "X (Twitter)")}
-          </label>
-          <EditableInput
-            id="scholar-twitter"
-            type="url"
-            value={formData.socialTwitter ?? ""}
-            onChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "socialTwitter", value })}
-            placeholder="https://x.com/..."
-          />
-        </div>
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="scholar-telegram">
-            {t("admin.scholars.telegramLabel", "Telegram")}
-          </label>
-          <EditableInput
-            id="scholar-telegram"
-            type="url"
-            value={formData.socialTelegram ?? ""}
-            onChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "socialTelegram", value })}
-            placeholder="https://t.me/..."
-          />
-        </div>
-      </div>
-      <div className={styles.twoCol}>
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="scholar-youtube">
-            {t("admin.scholars.youtubeLabel", "YouTube")}
-          </label>
-          <EditableInput
-            id="scholar-youtube"
-            type="url"
-            value={formData.socialYoutube ?? ""}
-            onChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "socialYoutube", value })}
-            placeholder="https://youtube.com/..."
-          />
-        </div>
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="scholar-website">
-            {t("admin.scholars.websiteLabel", "Website")}
-          </label>
-          <EditableInput
-            id="scholar-website"
-            type="url"
-            value={formData.socialWebsite ?? ""}
-            onChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "socialWebsite", value })}
-            placeholder="https://..."
-          />
-        </div>
-      </div>
-      <div className={styles.twoCol}>
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="scholar-facebook">
-            {t("admin.scholars.facebookLabel", "Facebook")}
-          </label>
-          <EditableInput
-            id="scholar-facebook"
-            type="url"
-            value={formData.socialFacebook ?? ""}
-            onChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "socialFacebook", value })}
-            placeholder="https://facebook.com/..."
-          />
-        </div>
-        <div className={styles.field}>
-          <label className={styles.label} htmlFor="scholar-instagram">
-            {t("admin.scholars.instagramLabel", "Instagram")}
-          </label>
-          <EditableInput
-            id="scholar-instagram"
-            type="url"
-            value={formData.socialInstagram ?? ""}
-            onChange={(value) =>
-              dispatch({ type: "UPDATE_FIELD", field: "socialInstagram", value })
-            }
-            placeholder="https://instagram.com/..."
-          />
-        </div>
+      <div className={styles.fieldsGrid}>
+        {SOCIAL_FIELDS.map((field) => {
+          const value = (formData[field.key as keyof CreateScholarDto] as string) ?? "";
+          const handle = extractHandle(value, field.prefix);
+
+          return (
+            <div key={field.key} className={styles.field}>
+              <label className={styles.label} htmlFor={field.id}>
+                {t(field.label, field.defaultLabel)}
+              </label>
+              {field.prefix ? (
+                <div className={styles.prefixedContainer}>
+                  <div className={styles.prefixedInput}>
+                    <span className={styles.prefix}>{field.prefix}</span>
+                    <input
+                      id={field.id}
+                      type="text"
+                      value={handle}
+                      onChange={(e) =>
+                        handleSocialChange(
+                          field.key as keyof CreateScholarDto,
+                          e.target.value,
+                          field.prefix,
+                        )
+                      }
+                      placeholder={t("admin.scholars.handlePlaceholder", "username")}
+                      className={styles.input}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <EditableInput
+                  id={field.id}
+                  type="url"
+                  value={value}
+                  onChange={(newValue) =>
+                    dispatch({
+                      type: "UPDATE_FIELD",
+                      field: field.key as keyof CreateScholarDto,
+                      value: newValue,
+                    })
+                  }
+                  placeholder="https://..."
+                />
+              )}
+            </div>
+          );
+        })}
       </div>
     </FormSection>
   );
