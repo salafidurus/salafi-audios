@@ -40,6 +40,7 @@ export function MetaDataSection({ listing }: MetaDataSectionProps) {
             src={imageUrl}
             alt={listing.scholar.name}
             fill
+            sizes="(max-width: 640px) 96px, 136px"
             unoptimized
             className={styles.artwork}
           />
