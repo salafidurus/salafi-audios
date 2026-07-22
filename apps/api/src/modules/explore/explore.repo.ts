@@ -30,6 +30,7 @@ export class ExploreRepo {
       format: 'single' as const,
       status: Status.published,
       deletedAt: null,
+      parentId: null,
       scholar: { isActive: true },
       ...(cursorDate && { publishedAt: { lt: cursorDate } }),
       ...(scholarSlugs?.length && {
@@ -149,6 +150,7 @@ export class ExploreRepo {
       format: 'single' as const,
       status: Status.published,
       deletedAt: null,
+      parentId: null,
       scholar: { isActive: true },
       ...(cursorDate && { createdAt: { lt: cursorDate } }),
     };
@@ -286,6 +288,7 @@ export class ExploreRepo {
         format: 'single' as const,
         status: Status.published,
         deletedAt: null,
+        parentId: null,
         scholar: { isActive: true },
         topics: {
           some: {

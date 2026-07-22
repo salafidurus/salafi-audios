@@ -431,6 +431,7 @@ export class ListingRepository {
 
     const where: Prisma.ListingWhereInput = {
       deletedAt: null,
+      parentId: null,
       ...(params.scholarId ? { scholarId: params.scholarId } : {}),
       ...(params.status ? { status: params.status as Status } : {}),
       ...(params.search ? { title: { contains: params.search } } : {}),
