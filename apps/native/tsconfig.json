@@ -7,7 +7,7 @@
     // Note: composite disabled due to Better Auth type inference issue
     // See: https://better-auth.com/docs/concepts/typescript
     "incremental": true,
-    "types": ["bun-types", "jest", "node"],
+    "types": ["jest", "node"],
     "moduleSuffixes": [".native", ".web", ""],
     "paths": {
       "@/*": ["./src/*"],
