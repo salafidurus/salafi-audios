@@ -70,7 +70,19 @@ export class SearchRepository {
             AND (${matchSql})
             ${topicFilterSql}
         )
-        SELECT * FROM ranked WHERE rn <= ${take} ORDER BY "format", rn
+        SELECT
+          "id",
+          "slug",
+          "title",
+          "format",
+          "scholarName",
+          "scholarSlug",
+          "coverImageUrl",
+          "scholarImageUrl",
+          "lectureCount",
+          "durationSeconds",
+          "originalLanguage"
+        FROM ranked WHERE rn <= ${take} ORDER BY "format", rn
       `),
       () =>
         this.prisma.$queryRaw<(SearchRow & { format: string })[]>(Prisma.sql`
@@ -102,7 +114,19 @@ export class SearchRepository {
             AND (${fallbackMatchSql})
             ${topicFilterSql}
         )
-        SELECT * FROM ranked WHERE rn <= ${take} ORDER BY "format", rn
+        SELECT
+          "id",
+          "slug",
+          "title",
+          "format",
+          "scholarName",
+          "scholarSlug",
+          "coverImageUrl",
+          "scholarImageUrl",
+          "lectureCount",
+          "durationSeconds",
+          "originalLanguage"
+        FROM ranked WHERE rn <= ${take} ORDER BY "format", rn
       `),
     );
 
