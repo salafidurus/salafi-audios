@@ -48,7 +48,7 @@ describe("LibraryListRow", () => {
   it("links to the lecture details using lectureSlug", () => {
     render(<LibraryListRow item={mockItem} variant="saved" />);
     const link = screen.getByRole("link");
-    expect(link).toHaveAttribute("href", "/listing/explanation-of-three-principles");
+    expect(link).toHaveAttribute("href", "/listings/explanation-of-three-principles");
   });
 
   it("renders saved date when variant is saved", () => {

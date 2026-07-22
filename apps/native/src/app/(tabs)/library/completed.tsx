@@ -1,12 +1,14 @@
-import { type Href, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useAuth } from "@/core/auth";
 import { LibraryCompletedScreen } from "@/features/library/screens/library-completed.screen";
 import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
 import { routes } from "@sd/core-contracts";
+import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 export default function LibraryCompleted() {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
+  const { navigateToListing } = useListingNavigation();
 
   if (isLoading) {
     return null;
@@ -22,9 +24,5 @@ export default function LibraryCompleted() {
     );
   }
 
-  return (
-    <LibraryCompletedScreen
-      onNavigateToLecture={(id) => router.push(routes.lectures.detail(id) as Href)}
-    />
-  );
+  return <LibraryCompletedScreen onNavigateToListing={navigateToListing} />;
 }

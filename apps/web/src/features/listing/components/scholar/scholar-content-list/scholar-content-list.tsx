@@ -16,7 +16,7 @@ export type ScholarContentListProps = {
 };
 
 function contentHref(item: ScholarContentItemDto): string {
-  return `/listing/${item.id}`;
+  return `/listings/${item.slug}`;
 }
 
 function ContentRow({ item }: { item: ScholarContentItemDto }) {

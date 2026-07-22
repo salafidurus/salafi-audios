@@ -12,13 +12,13 @@ import { FeedSkeleton } from "../components/feed-skeleton/feed-skeleton";
 import { FeedLoadingFooter, FeedStatusView } from "../components/feed-status/feed-status";
 
 export type FeedFollowingScreenProps = {
-  onNavigateToLecture?: (slug: string) => void;
+  onNavigateToListing?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
 };
 
 function renderFeedItem(
   item: FeedItemDto,
-  onNavigateToLecture?: (slug: string) => void,
+  onNavigateToListing?: (slug: string) => void,
   onNavigateToScholar?: (slug: string) => void,
 ) {
   switch (item.kind) {
@@ -30,7 +30,7 @@ function renderFeedItem(
       return (
         <FeedContentCard
           item={item as FeedContentItemDto}
-          onPress={() => onNavigateToLecture?.((item as FeedContentItemDto).slug)}
+          onPress={() => onNavigateToListing?.((item as FeedContentItemDto).slug)}
         />
       );
   }
@@ -43,7 +43,7 @@ function getItemKey(item: FeedItemDto, index: number): string {
 }
 
 export function FeedFollowingScreen({
-  onNavigateToLecture,
+  onNavigateToListing,
   onNavigateToScholar,
 }: FeedFollowingScreenProps) {
   const { t } = useTranslation();
@@ -53,8 +53,8 @@ export function FeedFollowingScreen({
 
   const renderItem = useCallback(
     ({ item }: ListRenderItemInfo<FeedItemDto>) =>
-      renderFeedItem(item, onNavigateToLecture, onNavigateToScholar),
-    [onNavigateToLecture, onNavigateToScholar],
+      renderFeedItem(item, onNavigateToListing, onNavigateToScholar),
+    [onNavigateToListing, onNavigateToScholar],
   );
 
   if (isError && items.length === 0) {

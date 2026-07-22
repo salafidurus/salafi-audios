@@ -81,7 +81,7 @@ describe("LectureDetailScreen", () => {
       error: null,
     });
 
-    await render(<LectureDetailScreen id="lecture-1" />);
+    await render(<LectureDetailScreen slug="lecture-1" />);
 
     expect(screen.getByText("Loading lecture…")).toBeTruthy();
   });
@@ -93,7 +93,7 @@ describe("LectureDetailScreen", () => {
       error: null,
     });
 
-    await render(<LectureDetailScreen id="missing" />);
+    await render(<LectureDetailScreen slug="missing" />);
 
     expect(screen.getByText("Lecture not found")).toBeTruthy();
   });
@@ -132,7 +132,7 @@ describe("LectureDetailScreen", () => {
       error: null,
     });
 
-    await render(<LectureDetailScreen id="lecture-1" />);
+    await render(<LectureDetailScreen slug="lecture-1" />);
 
     expect(screen.getByText("An Example Lecture")).toBeTruthy();
     expect(screen.getByText("Meta:Ibn Baz")).toBeTruthy();

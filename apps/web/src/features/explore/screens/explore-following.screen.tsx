@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useEffect, type ReactNode } from "react";
-import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
+import { useRouter } from "next/navigation";
+import { routes, type FeedItemDto, type FeedContentItemDto } from "@sd/core-contracts";
 import { useExploreFollowingScreen } from "@sd/domain-content";
 import { List } from "@/shared/components/List";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
@@ -12,10 +13,11 @@ import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { FeedListRow } from "../components/explore-list-row/explore-list-row";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
+import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 import styles from "./explore-following.screen.module.css";
 
 export type FeedFollowingScreenProps = {
-  onNavigateToLecture?: (slug: string) => void;
+  onNavigateToListing?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
 };
 
@@ -31,11 +33,11 @@ function getFeedItemKey(item: FeedItemDto): string {
 
 type FeedBlocksProps = {
   items: FeedItemDto[];
-  onNavigateToLecture?: (slug: string) => void;
+  onNavigateToListing?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
 };
 
-function FeedBlocks({ items, onNavigateToLecture, onNavigateToScholar }: FeedBlocksProps) {
+function FeedBlocks({ items, onNavigateToListing, onNavigateToScholar }: FeedBlocksProps) {
   const blocks: ReactNode[] = [];
   let cards: ReactNode[] = [];
 
@@ -61,7 +63,7 @@ function FeedBlocks({ items, onNavigateToLecture, onNavigateToScholar }: FeedBlo
         <FeedListRow
           key={contentItem.id}
           item={contentItem}
-          onPress={() => onNavigateToLecture?.(contentItem.slug)}
+          onPress={() => onNavigateToListing?.(contentItem.slug)}
         />,
       );
     }
@@ -72,10 +74,16 @@ function FeedBlocks({ items, onNavigateToLecture, onNavigateToScholar }: FeedBlo
 }
 
 export function FeedFollowingScreen({
-  onNavigateToLecture,
+  onNavigateToListing,
   onNavigateToScholar,
 }: FeedFollowingScreenProps) {
   const { t } = useTranslation();
+  const router = useRouter();
+  const { navigateToListing } = useListingNavigation();
+  const handleNavigateToListing = onNavigateToListing ?? navigateToListing;
+  const handleNavigateToScholar =
+    onNavigateToScholar ?? ((slug) => router.push(routes.scholars.detail(slug)));
+
   const { data, isFetching, hasNextPage, fetchNextPage } = useExploreFollowingScreen();
   const items = data?.pages.flatMap((p) => p.items) ?? [];
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -145,8 +153,8 @@ export function FeedFollowingScreen({
       <section className={styles.results}>
         <FeedBlocks
           items={items}
-          onNavigateToLecture={onNavigateToLecture}
-          onNavigateToScholar={onNavigateToScholar}
+          onNavigateToListing={handleNavigateToListing}
+          onNavigateToScholar={handleNavigateToScholar}
         />
         <div ref={loadMoreRef} style={{ height: "20px" }} />
       </section>

@@ -4,16 +4,14 @@ import { useState, useMemo } from "react";
 import { useInfiniteSearch, useTopicsList } from "@sd/domain-search";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { useRouter } from "next/navigation";
 import { useDebouncedSearch } from "@/shared/hooks";
-import { routes } from "@sd/core-contracts";
 import { Search } from "@/shared/components/Search";
 import { SearchResultItem } from "@/features/search/components/SearchResultItem/SearchResultItem";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import type { SearchResultRow } from "@sd/domain-search";
+import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 export type SearchProcessingScreenProps = {
   searchKey?: string;
@@ -22,7 +20,7 @@ export type SearchProcessingScreenProps = {
 export function SearchProcessingScreen({ searchKey }: SearchProcessingScreenProps) {
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
-  const { push } = useRouter();
+  const { navigateToListing } = useListingNavigation();
   const { query, setQuery, debouncedQuery } = useDebouncedSearch({ initialValue: searchKey });
   const { data: topics = [] } = useTopicsList();
   const [filter, setFilter] = useState<string[]>([]);
@@ -44,18 +42,8 @@ export function SearchProcessingScreen({ searchKey }: SearchProcessingScreenProp
 
   const allItems = data?.pages.flatMap((page) => page.items) ?? [];
 
-  const handleItemPress = (item: SearchResultRow) => {
-    const [kind, id] = item.id.split(":");
-    if (!id) {
-      return;
-    }
-    if (kind === "collection") {
-      push(routes.collections.detail(id));
-    } else if (kind === "series") {
-      push(routes.series.detail(id));
-    } else if (kind === "single") {
-      push(routes.lectures.detail(id));
-    }
+  const handleItemPress = (slug: string) => {
+    navigateToListing(slug);
   };
 
   return (
@@ -86,7 +74,7 @@ export function SearchProcessingScreen({ searchKey }: SearchProcessingScreenProp
             onLoadMore={() => fetchNextPage()}
             isFetchingNextPage={isFetchingNextPage}
             renderItem={(item) => (
-              <SearchResultItem item={item} onPress={() => handleItemPress(item)} />
+              <SearchResultItem item={item} onPress={() => handleItemPress(item.slug)} />
             )}
             emptyMessage={
               debouncedQuery.trim()

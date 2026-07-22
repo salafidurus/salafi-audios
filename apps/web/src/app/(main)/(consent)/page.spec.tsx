@@ -42,6 +42,6 @@ describe("HomePage Route", () => {
 
     // Test continue listening callback
     props.onContinueListening("lecture-abc");
-    expect(push).toHaveBeenCalledWith(routes.lectures.detail("lecture-abc"));
+    expect(push).toHaveBeenCalledWith(routes.listings.detail("lecture-abc"));
   });
 });

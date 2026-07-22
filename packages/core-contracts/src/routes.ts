@@ -35,16 +35,8 @@ export const routes = {
     detail: (slug: string) => `/scholars/${slug}` as const,
   },
 
-  collections: {
-    detail: (id: string) => `/collections/${id}` as const,
-  },
-
-  series: {
-    detail: (id: string) => `/series/${id}` as const,
-  },
-
-  lectures: {
-    detail: (id: string) => `/lectures/${id}` as const,
+  listings: {
+    detail: (slug: string) => `/listings/${slug}` as const,
   },
 
   admin: {

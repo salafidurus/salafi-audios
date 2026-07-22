@@ -13,7 +13,7 @@ import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { LibraryItemRow } from "@/features/library/components/library-item-row/library-item-row";
 
 export type LibraryScreenProps = {
-  onNavigateToLecture?: (id: string) => void;
+  onNavigateToListing?: (slug: string) => void;
 };
 
 type Section = {
@@ -24,7 +24,7 @@ type Section = {
   isFetching: boolean;
 };
 
-export function LibraryScreen({ onNavigateToLecture }: LibraryScreenProps) {
+export function LibraryScreen({ onNavigateToListing }: LibraryScreenProps) {
   const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
   const progressData = useLibraryProgressScreen(isAuthenticated);
@@ -67,10 +67,10 @@ export function LibraryScreen({ onNavigateToLecture }: LibraryScreenProps) {
     completedData.items.length === 0;
 
   const handleItemPress = useCallback(
-    (lectureId: string) => {
-      onNavigateToLecture?.(lectureId);
+    (slug: string) => {
+      onNavigateToListing?.(slug);
     },
-    [onNavigateToLecture],
+    [onNavigateToListing],
   );
 
   if (isAllLoading) {
@@ -99,7 +99,7 @@ export function LibraryScreen({ onNavigateToLecture }: LibraryScreenProps) {
                 key={item.id}
                 item={item}
                 variant={section.variant}
-                onPress={() => handleItemPress(item.listingId)}
+                onPress={() => handleItemPress(item.listingSlug)}
               />
             ))}
 

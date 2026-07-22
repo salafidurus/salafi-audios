@@ -11,18 +11,18 @@ import { LectureDetailScreen } from "@/features/listing/screens/lecture-detail/l
 import { ScreenInProgressResponsive } from "@/shared/components/ScreenInProgress/ScreenInProgress";
 
 export type ListingDetailScreenProps = {
-  id: string;
+  slug: string;
 };
 
-export function ListingDetailScreen({ id }: ListingDetailScreenProps) {
+export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
   const { data, isFetching } = useApiQuery<ListingViewDto>(
-    queryKeys.listings.detail(id),
+    queryKeys.listings.detail(slug),
     () =>
       httpClient<ListingViewDto>({
-        url: endpoints.listings.detail(id),
+        url: endpoints.listings.detail(slug),
         method: "GET",
       }),
-    { enabled: !!id },
+    { enabled: !!slug },
   );
 
   if (isFetching) {

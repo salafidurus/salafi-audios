@@ -9,24 +9,28 @@ import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { LibraryItemRow } from "@/features/library/components/library-item-row/library-item-row";
 
 export type LibrarySavedScreenProps = {
-  onNavigateToLecture?: (id: string) => void;
+  onNavigateToListing?: (slug: string) => void;
 };
 
-export function LibrarySavedScreen({ onNavigateToLecture }: LibrarySavedScreenProps) {
+export function LibrarySavedScreen({ onNavigateToListing }: LibrarySavedScreenProps) {
   const { isAuthenticated } = useAuth();
   const { items, isFetching } = useLibrarySavedScreen(isAuthenticated);
   const { t } = useTranslation();
 
   const handleItemPress = useCallback(
-    (lectureId: string) => {
-      onNavigateToLecture?.(lectureId);
+    (slug: string) => {
+      onNavigateToListing?.(slug);
     },
-    [onNavigateToLecture],
+    [onNavigateToListing],
   );
 
   const renderItem = useCallback(
     ({ item }: { item: LibraryItemDto }) => (
-      <LibraryItemRow item={item} variant="saved" onPress={() => handleItemPress(item.listingId)} />
+      <LibraryItemRow
+        item={item}
+        variant="saved"
+        onPress={() => handleItemPress(item.listingSlug)}
+      />
     ),
     [handleItemPress],
   );

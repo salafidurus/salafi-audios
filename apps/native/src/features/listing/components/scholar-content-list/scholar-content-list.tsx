@@ -1,26 +1,19 @@
 import type { ScholarContentItemDto } from "@sd/core-contracts";
 import { FlatList, Pressable, TextInput, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { useRouter } from "expo-router";
-import type { Href } from "expo-router";
 import { useState, useCallback } from "react";
 import { pickContentField } from "@sd/core-i18n";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 export type ScholarContentListProps = {
   items: ScholarContentItemDto[];
 };
 
-function contentRoute(item: ScholarContentItemDto): Href {
-  if (item.type === "series") return `/(content)/series/${item.id}` as Href;
-  if (item.type === "collection") return `/(content)/collections/${item.id}` as Href;
-  return `/(content)/lectures/${item.id}` as Href;
-}
-
 export function ScholarContentList({ items }: ScholarContentListProps) {
-  const router = useRouter();
+  const { navigateToListing } = useListingNavigation();
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
   const [filter, setFilter] = useState("");
@@ -30,7 +23,7 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
     ({ item }: { item: ScholarContentItemDto }) => {
       const title = pickContentField(item.title, item.original?.title, showOriginal);
       return (
-        <Pressable style={styles.card} onPress={() => router.push(contentRoute(item) as Href)}>
+        <Pressable style={styles.card} onPress={() => navigateToListing(item.slug)}>
           <AppText variant="caption" style={styles.typeLabel}>
             {item.type}
           </AppText>
@@ -40,14 +33,14 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
         </Pressable>
       );
     },
-    [showOriginal, router],
+    [showOriginal, navigateToListing],
   );
 
   const renderBrowseItem = useCallback(
     ({ item }: { item: ScholarContentItemDto }) => {
       const title = pickContentField(item.title, item.original?.title, showOriginal);
       return (
-        <Pressable style={styles.row} onPress={() => router.push(contentRoute(item) as Href)}>
+        <Pressable style={styles.row} onPress={() => navigateToListing(item.slug)}>
           <AppText variant="caption" style={styles.typeLabel}>
             {item.type}
           </AppText>
@@ -57,7 +50,7 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
         </Pressable>
       );
     },
-    [showOriginal, router],
+    [showOriginal, navigateToListing],
   );
 
   const featured = items[0];
@@ -86,10 +79,7 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
   return (
     <View style={styles.root}>
       {/* Featured */}
-      <Pressable
-        style={styles.featured}
-        onPress={() => router.push(contentRoute(featured) as Href)}
-      >
+      <Pressable style={styles.featured} onPress={() => navigateToListing(featured.slug)}>
         <AppText variant="caption" style={styles.typeLabel}>
           {featured.type}
         </AppText>

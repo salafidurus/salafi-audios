@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { SearchFilter } from "@/features/search/components/SearchFilter/SearchFilter";
@@ -15,6 +15,7 @@ import { useSearchProcessing } from "@sd/domain-search";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 export type SearchProcessingScreenProps = {
   prefill?: string;
@@ -25,6 +26,7 @@ export function SearchProcessingScreen({ prefill, onBackPress }: SearchProcessin
   const inputRef = useRef<SearchInputRef>(null);
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
+  const { navigateToListing } = useListingNavigation();
   const {
     query,
     setQuery,
@@ -36,6 +38,20 @@ export function SearchProcessingScreen({ prefill, onBackPress }: SearchProcessin
     shouldSearch,
     errorMessage,
   } = useSearchProcessing({ prefill, showOriginal });
+
+  const renderItem = useCallback(
+    (item: SearchResultRow) => (
+      <SearchResultItem
+        title={item.title}
+        scholarName={item.scholarName}
+        imageUrl={item.imageUrl}
+        lectureCount={item.lectureCount}
+        durationSeconds={item.durationSeconds}
+        onPress={() => navigateToListing(item.slug)}
+      />
+    ),
+    [navigateToListing],
+  );
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -58,15 +74,7 @@ export function SearchProcessingScreen({ prefill, onBackPress }: SearchProcessin
         isFetching={isFetching}
         shouldSearch={shouldSearch}
         errorMessage={errorMessage}
-        renderItem={(item: SearchResultRow) => (
-          <SearchResultItem
-            title={item.title}
-            scholarName={item.scholarName}
-            imageUrl={item.imageUrl}
-            lectureCount={item.lectureCount}
-            durationSeconds={item.durationSeconds}
-          />
-        )}
+        renderItem={renderItem}
       />
     </ScreenView>
   );

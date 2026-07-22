@@ -30,7 +30,8 @@ vi.mock("@/shared/components/InfiniteScrollList", () => ({
   InfiniteScrollList: (props: any) => {
     const mockItems = [
       {
-        id: "series:123",
+        id: "series-123",
+        slug: "test-series",
         title: "Test Series",
         scholarName: "Ibn Uthaymeen",
         lectureCount: 10,
@@ -81,7 +82,7 @@ describe("SearchProcessingScreen", () => {
     const item = screen.getByText("Test Series");
     fireEvent.click(item);
 
-    expect(mockPush).toHaveBeenCalledWith(routes.series.detail("123"));
+    expect(mockPush).toHaveBeenCalledWith(routes.listings.detail("test-series"));
   });
 
   it("navigates to series detail on series item click (mobile)", () => {
@@ -91,6 +92,6 @@ describe("SearchProcessingScreen", () => {
     const item = screen.getByText("Test Series");
     fireEvent.click(item);
 
-    expect(mockPush).toHaveBeenCalledWith(routes.series.detail("123"));
+    expect(mockPush).toHaveBeenCalledWith(routes.listings.detail("test-series"));
   });
 });
