@@ -16,6 +16,7 @@ export const ScholarContentItemDtoSchema = z.object({
   type: z.enum(["collection", "series", "single"]),
   recencyAt: z.string(),
   coverImageUrl: z.string().optional(),
+  scholarImageUrl: z.string().optional(),
   lectureCount: z.number().optional(),
   durationSeconds: z.number().optional(),
   originalLanguage: LocaleSchema.optional(),
@@ -58,6 +59,8 @@ export const ScholarDetailDtoSchema = z.object({
   socialTelegram: z.string().optional(),
   socialYoutube: z.string().optional(),
   socialWebsite: z.string().optional(),
+  socialFacebook: z.string().optional(),
+  socialInstagram: z.string().optional(),
   createdAt: z.string(),
   updatedAt: z.string().optional(),
 });
@@ -151,6 +154,8 @@ export const CreateScholarDtoSchema = z.object({
   socialTelegram: z.url().optional().or(z.literal("")),
   socialYoutube: z.url().optional().or(z.literal("")),
   socialWebsite: z.url().optional().or(z.literal("")),
+  socialFacebook: z.url().optional().or(z.literal("")),
+  socialInstagram: z.url().optional().or(z.literal("")),
   translations: z.record(LocaleSchema, z.object({ name: z.string() })).optional(),
 });
 export type CreateScholarDto = z.infer<typeof CreateScholarDtoSchema>;
@@ -192,6 +197,8 @@ export const AdminScholarListItemDtoSchema = z.object({
   socialTelegram: z.string().optional(),
   socialYoutube: z.string().optional(),
   socialWebsite: z.string().optional(),
+  socialFacebook: z.string().optional(),
+  socialInstagram: z.string().optional(),
   createdAt: z.string(),
   updatedAt: z.string().optional(),
   translations: z.array(AdminScholarTranslationSchema),

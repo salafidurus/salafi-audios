@@ -258,10 +258,12 @@ model Scholar {
   deletedBy String? @db.Uuid
 
   // Social links
-  socialTwitter  String?
-  socialTelegram String?
-  socialYoutube  String?
-  socialWebsite  String?
+  socialTwitter   String?
+  socialTelegram  String?
+  socialYoutube   String?
+  socialWebsite   String?
+  socialFacebook  String?
+  socialInstagram String?
 
   ingestionBatchId String?
   ingestionBatch   IngestionBatch? @relation("IngestBatchScholars", fields: [ingestionBatchId], references: [id])

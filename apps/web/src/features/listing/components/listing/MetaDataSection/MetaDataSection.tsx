@@ -58,7 +58,7 @@ export function MetaDataSection({ listing }: MetaDataSectionProps) {
         </AppText>
 
         {/* Row 2: Scholar Name Link (Primary strong color Title Md) */}
-        <Link href={`/scholar/${listing.scholar.slug}`} className={styles.scholarLink}>
+        <Link href={`/scholars/${listing.scholar.slug}`} className={styles.scholarLink}>
           {listing.scholar.imageUrl && (
             <Image
               src={listing.scholar.imageUrl}

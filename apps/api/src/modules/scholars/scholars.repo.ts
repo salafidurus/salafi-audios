@@ -111,6 +111,8 @@ export class ScholarsRepository {
         socialTelegram: true,
         socialYoutube: true,
         socialWebsite: true,
+        socialFacebook: true,
+        socialInstagram: true,
         createdAt: true,
         updatedAt: true,
         translations: {
@@ -173,6 +175,8 @@ export class ScholarsRepository {
       socialTelegram: record.socialTelegram ?? undefined,
       socialYoutube: record.socialYoutube ?? undefined,
       socialWebsite: record.socialWebsite ?? undefined,
+      socialFacebook: record.socialFacebook ?? undefined,
+      socialInstagram: record.socialInstagram ?? undefined,
       createdAt: record.createdAt.toISOString(),
       updatedAt: record.updatedAt?.toISOString(),
       lectureCount: lectureStats._count.id,
@@ -185,7 +189,7 @@ export class ScholarsRepository {
     const locale = getRequestLocale();
     const scholar = await this.prisma.scholar.findFirst({
       where: { slug, isActive: true },
-      select: { id: true },
+      select: { id: true, imageUrl: true },
     });
 
     if (!scholar) return null;
@@ -225,7 +229,7 @@ export class ScholarsRepository {
         publishedTranslation: r.translations[0] ?? null,
       });
 
-      const lectureCount = r.format === 'single' ? undefined : (r.publishedLectureCount ?? 0);
+      const lectureCount = r.format === 'single' ? 1 : (r.publishedLectureCount ?? 0);
 
       const durationSeconds =
         r.format === 'single'
@@ -241,6 +245,7 @@ export class ScholarsRepository {
         type: r.format as 'collection' | 'series' | 'single',
         recencyAt,
         coverImageUrl: r.coverImageUrl ?? undefined,
+        scholarImageUrl: scholar.imageUrl ?? undefined,
         lectureCount,
         durationSeconds,
         originalLanguage: resolved.originalLanguage,
@@ -257,7 +262,7 @@ export class ScholarsRepository {
     const locale = getRequestLocale();
     const scholar = await this.prisma.scholar.findFirst({
       where: { slug, isActive: true },
-      select: { id: true },
+      select: { id: true, imageUrl: true },
     });
 
     if (!scholar) return null;
@@ -324,7 +329,7 @@ export class ScholarsRepository {
         publishedTranslation: r.translations[0] ?? null,
       });
 
-      const lectureCount = r.format === 'single' ? undefined : (r.publishedLectureCount ?? 0);
+      const lectureCount = r.format === 'single' ? 1 : (r.publishedLectureCount ?? 0);
 
       const durationSeconds =
         r.format === 'single'
@@ -341,6 +346,7 @@ export class ScholarsRepository {
         type: r.format as 'collection' | 'series' | 'single',
         recencyAt,
         coverImageUrl: r.coverImageUrl ?? undefined,
+        scholarImageUrl: scholar.imageUrl ?? undefined,
         lectureCount,
         durationSeconds,
         originalLanguage: resolved.originalLanguage,
@@ -395,6 +401,8 @@ export class ScholarsRepository {
         socialTelegram: true,
         socialYoutube: true,
         socialWebsite: true,
+        socialFacebook: true,
+        socialInstagram: true,
         createdAt: true,
         updatedAt: true,
         translations: {
@@ -421,6 +429,8 @@ export class ScholarsRepository {
         socialTelegram: r.socialTelegram ?? undefined,
         socialYoutube: r.socialYoutube ?? undefined,
         socialWebsite: r.socialWebsite ?? undefined,
+        socialFacebook: r.socialFacebook ?? undefined,
+        socialInstagram: r.socialInstagram ?? undefined,
         createdAt: r.createdAt.toISOString(),
         updatedAt: r.updatedAt?.toISOString(),
         translations: r.translations.map((t) => ({
@@ -453,6 +463,8 @@ export class ScholarsRepository {
         socialTelegram: dto.socialTelegram,
         socialYoutube: dto.socialYoutube,
         socialWebsite: dto.socialWebsite,
+        socialFacebook: dto.socialFacebook,
+        socialInstagram: dto.socialInstagram,
       },
     });
   }
@@ -474,6 +486,8 @@ export class ScholarsRepository {
         ...(dto.socialTelegram !== undefined && { socialTelegram: dto.socialTelegram }),
         ...(dto.socialYoutube !== undefined && { socialYoutube: dto.socialYoutube }),
         ...(dto.socialWebsite !== undefined && { socialWebsite: dto.socialWebsite }),
+        ...(dto.socialFacebook !== undefined && { socialFacebook: dto.socialFacebook }),
+        ...(dto.socialInstagram !== undefined && { socialInstagram: dto.socialInstagram }),
         updatedAt: new Date(),
       },
     });

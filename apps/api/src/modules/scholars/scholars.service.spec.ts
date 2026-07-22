@@ -162,6 +162,8 @@ describe('ScholarsService', () => {
         socialTelegram: null,
         socialYoutube: null,
         socialWebsite: null,
+        socialFacebook: null,
+        socialInstagram: null,
         ingestionBatchId: null,
         createdBy: null,
         updatedBy: null,
