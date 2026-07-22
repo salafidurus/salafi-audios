@@ -7,6 +7,7 @@ import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { Search } from "@/shared/components/Search";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { formatScholarName } from "@/shared/utils/format-scholar-name";
 
 import { MetaDataSection } from "../../components/listing/MetaDataSection/MetaDataSection";
 import { QuickButtonSection } from "../../components/listing/QuickButtonSection/QuickButtonSection";
@@ -119,13 +120,16 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
             )}
 
             {contents?.format === "single" && (
-              <ContentList items={filteredSingleOrSeriesItems} scholarName={listing.scholar.name} />
+              <ContentList
+                items={filteredSingleOrSeriesItems}
+                scholarName={formatScholarName(listing.scholar)}
+              />
             )}
 
             {contents?.format === "series" && (
               <ContentList
                 items={filteredSingleOrSeriesItems}
-                scholarName={listing.scholar.name}
+                scholarName={formatScholarName(listing.scholar)}
                 seriesId={listing.id}
                 seriesTitle={listing.title}
               />
@@ -134,7 +138,7 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
             {contents?.format === "collection" && (
               <CollectionContentLayout
                 modules={filteredModules}
-                scholarName={listing.scholar.name}
+                scholarName={formatScholarName(listing.scholar)}
                 collectionId={listing.id}
               />
             )}

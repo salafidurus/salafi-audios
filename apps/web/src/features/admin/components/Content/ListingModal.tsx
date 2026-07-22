@@ -425,7 +425,7 @@ export function ListingModal({
           : t("admin.contents.listing.newTitle", "New Lecture Details")
       }
       size="xl"
-      width="var(--modal-listing-width)"
+      width="var(--modal-width-standard)"
       footer={
         <>
           <Button variant="surface" radius="md" onClick={onClose} disabled={saving}>

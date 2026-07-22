@@ -186,6 +186,7 @@ export function RoleDialog({
       isOpen={isOpen}
       onClose={onClose}
       title={customTitle as any}
+      width="var(--modal-width-standard)"
       footer={
         <Button variant="primary" onClick={handleDone} disabled={saving}>
           {saving ? t("admin.permissions.saving", "Saving…") : t("admin.permissions.done", "Done")}

@@ -9,19 +9,23 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { sanitizeError } from "@sd/utils-error";
 import { Content } from "../Content";
 import type { TopicForEdit } from "../Content/TopicModal";
-import { createTopic, updateTopic, deleteTopic } from "../../api/admin.api";
+import { deleteTopic } from "../../api/admin.api";
 import styles from "../../screens/admin-contents/admin-contents.screen.module.css";
 
 export type TopicsContentProps = {
   searchQuery: string;
   debouncedSearch: string;
   topics: TopicDetailDto[];
+  onEditTopic: (topic: TopicDetailDto) => void;
 };
 
-export function TopicsContent({ searchQuery, debouncedSearch, topics }: TopicsContentProps) {
+export function TopicsContent({
+  searchQuery,
+  debouncedSearch,
+  topics,
+  onEditTopic,
+}: TopicsContentProps) {
   const { t } = useTranslation();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingTopic, setEditingTopic] = useState<TopicForEdit | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deletingTopicName, setDeletingTopicName] = useState<string>("");
   const deletingTopicSlugRef = useRef<string | null>(null);
@@ -42,22 +46,7 @@ export function TopicsContent({ searchQuery, debouncedSearch, topics }: TopicsCo
   }, [topics, debouncedSearch]);
 
   const handleOpenEdit = (topic: TopicDetailDto) => {
-    setEditingTopic({
-      id: topic.id,
-      slug: topic.slug,
-      name: topic.name,
-    });
-    setIsModalOpen(true);
-  };
-
-  const handleSave = async (formData: any) => {
-    if (editingTopic) {
-      await updateTopic(editingTopic.slug, formData);
-    } else {
-      await createTopic(formData);
-    }
-    setIsModalOpen(false);
-    queryClient.invalidateQueries({ queryKey: queryKeys.topics.list() });
+    onEditTopic(topic);
   };
 
   const handleDeleteClick = (slug: string, name: string) => {
@@ -130,13 +119,6 @@ export function TopicsContent({ searchQuery, debouncedSearch, topics }: TopicsCo
             : t("admin.contents.noTopicsFound", "No topics yet.")}
         </div>
       )}
-
-      <Content.TopicModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleSave}
-        topic={editingTopic}
-      />
     </>
   );
 }

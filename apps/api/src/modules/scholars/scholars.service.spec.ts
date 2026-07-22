@@ -58,6 +58,7 @@ describe('ScholarsService', () => {
             create: vi.fn<any>(),
             update: vi.fn<any>(),
             findById: vi.fn<any>(),
+            upsertScholarTranslation: vi.fn<any>(),
           } as Partial<Mocked<ScholarsRepository>>,
         },
       ],
@@ -177,6 +178,69 @@ describe('ScholarsService', () => {
       expect(result).toEqual(created);
       expect(repo.create).toHaveBeenCalledWith(dto);
     });
+
+    it('should create a new scholar with inline translations', async () => {
+      const dto: CreateScholarDto = {
+        name: 'New Scholar',
+        slug: 'new-scholar',
+        bio: 'Bio details',
+        imageUrl: 'new.jpg',
+        isKibar: false,
+        isFeatured: false,
+        isActive: true,
+        country: 'SA',
+        mainLanguage: 'ar',
+        translations: {
+          en: { name: 'New Scholar - English' },
+          fr: { name: 'Nouveau Savant - Français' },
+        },
+      };
+      const created = {
+        id: 's2',
+        name: dto.name,
+        slug: dto.slug,
+        bio: dto.bio ?? null,
+        imageUrl: dto.imageUrl ?? null,
+        isActive: dto.isActive ?? true,
+        isKibar: dto.isKibar ?? false,
+        isFeatured: dto.isFeatured ?? false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        country: dto.country,
+        mainLanguage: dto.mainLanguage,
+        socialTwitter: null,
+        socialTelegram: null,
+        socialYoutube: null,
+        socialWebsite: null,
+        socialFacebook: null,
+        socialInstagram: null,
+        ingestionBatchId: null,
+        createdBy: null,
+        updatedBy: null,
+        deletedBy: null,
+      };
+
+      repo.create.mockResolvedValue(created as any);
+      repo.upsertScholarTranslation.mockResolvedValue({
+        locale: 'en',
+        name: 'New Scholar - English',
+        status: 'draft',
+      } as any);
+
+      const result = await service.create(dto);
+
+      expect(result).toEqual(created);
+      expect(repo.create).toHaveBeenCalledWith(dto);
+      expect(repo.upsertScholarTranslation).toHaveBeenCalledTimes(2);
+      expect(repo.upsertScholarTranslation).toHaveBeenCalledWith('s2', {
+        locale: 'en',
+        name: 'New Scholar - English',
+      });
+      expect(repo.upsertScholarTranslation).toHaveBeenCalledWith('s2', {
+        locale: 'fr',
+        name: 'Nouveau Savant - Français',
+      });
+    });
   });
 
   describe('update', () => {
@@ -214,6 +278,56 @@ describe('ScholarsService', () => {
       expect(result).toEqual(updated as any);
       expect(repo.findById).toHaveBeenCalledWith('s1');
       expect(repo.update).toHaveBeenCalledWith('s1', dto);
+    });
+
+    it('should update existing scholar with inline translations', async () => {
+      const dto: UpdateScholarDto = {
+        name: 'Updated Name',
+        translations: {
+          en: { name: 'Updated Name - English' },
+        },
+      };
+      const existing = {
+        id: 's1',
+        slug: 'test',
+        name: 'Old Name',
+        bio: null,
+        createdAt: new Date(),
+        country: 'SA',
+        mainLanguage: 'ar',
+        imageUrl: null,
+        isActive: true,
+        isKibar: false,
+        isFeatured: false,
+        socialTwitter: null,
+        socialTelegram: null,
+        socialYoutube: null,
+        socialWebsite: null,
+        updatedAt: new Date(),
+        ingestionBatchId: null,
+        createdBy: null,
+        updatedBy: null,
+        deletedBy: null,
+      };
+      const updated = { ...existing, name: dto.name! };
+
+      repo.findById.mockResolvedValue(existing as any);
+      repo.update.mockResolvedValue(updated as any);
+      repo.upsertScholarTranslation.mockResolvedValue({
+        locale: 'en',
+        name: 'Updated Name - English',
+        status: 'draft',
+      } as any);
+
+      const result = await service.update('s1', dto);
+
+      expect(result).toEqual(updated as any);
+      expect(repo.findById).toHaveBeenCalledWith('s1');
+      expect(repo.update).toHaveBeenCalledWith('s1', dto);
+      expect(repo.upsertScholarTranslation).toHaveBeenCalledWith('s1', {
+        locale: 'en',
+        name: 'Updated Name - English',
+      });
     });
 
     it('should throw NotFoundException when scholar to update not found', async () => {

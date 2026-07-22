@@ -96,6 +96,8 @@ export {
   SingleSummaryDtoSchema,
   type ListingFormat,
   ListingFormatSchema,
+  type ScholarTitle,
+  ScholarTitleSchema,
   type PresignedUrlPurpose,
   PresignedUrlPurposeSchema,
   type PresignedUrlRequestDto,

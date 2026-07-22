@@ -4,6 +4,7 @@ import Image from "next/image";
 import type { ScholarDetailDto } from "@sd/core-contracts";
 import { Globe } from "lucide-react";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { formatScholarName } from "@/shared/utils/format-scholar-name";
 import styles from "./scholar-header.module.css";
 
 export type ScholarHeaderProps = {
@@ -56,7 +57,7 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
 
       <div className={styles.infoColumn}>
         {/* Row 1: Name */}
-        <h1 className={styles.name}>{scholar.name}</h1>
+        <h1 className={styles.name}>{formatScholarName(scholar)}</h1>
 
         {/* Row 2: Stats */}
         <div className={styles.stats}>

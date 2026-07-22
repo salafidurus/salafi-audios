@@ -119,13 +119,9 @@ export function Modal({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ type: "spring", damping: 25, stiffness: 350 }}
-              className={`${styles.content} ${styles[`size-${size}`]}`}
+              className={`${styles.content} ${customWidth ? undefined : styles[`size-${size}`]}`}
               onClick={(e) => e.stopPropagation()}
-              style={
-                customWidth
-                  ? { width: `min(${customWidth}, calc(100% - var(--space-lg)))` }
-                  : undefined
-              }
+              style={customWidth ? { width: customWidth } : undefined}
             >
               {title && (
                 <header className={styles.header}>

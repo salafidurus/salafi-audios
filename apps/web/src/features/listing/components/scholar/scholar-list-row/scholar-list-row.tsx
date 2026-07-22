@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { ScholarListItemDto } from "@sd/core-contracts";
 import { useIsRtl } from "@/shared/hooks/use-is-rtl";
+import { formatScholarName } from "@/shared/utils/format-scholar-name";
 import styles from "./scholar-list-row.module.css";
 
 export type ScholarListRowProps = {
@@ -37,7 +38,7 @@ export function ScholarListRow({ scholar, onPress }: ScholarListRowProps) {
       </div>
 
       <div className={styles.centerSection}>
-        <div className={styles.name}>{scholar.name}</div>
+        <div className={styles.name}>{formatScholarName(scholar)}</div>
         <div className={styles.meta}>
           {scholar.mainLanguage && <span className={styles.language}>{scholar.mainLanguage}</span>}
           {scholar.isKibar && <span className={styles.kibarBadge}>Senior Scholar</span>}
