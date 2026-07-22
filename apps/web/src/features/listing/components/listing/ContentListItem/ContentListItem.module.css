@@ -1,0 +1,119 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: var(--space-component-gap-md, 16px) var(--space-component-gap-lg, 24px);
+  width: 100%;
+  gap: var(--space-component-gap-sm, 12px);
+  text-align: left;
+}
+
+.contentCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-component-gap-xs, 6px);
+  min-width: 0;
+  width: 100%;
+  text-align: left;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--space-component-gap-sm, 12px);
+  width: 100%;
+  text-align: left;
+}
+
+.titleText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--content-strong);
+  text-align: left;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--space-component-gap-xs, 8px);
+  color: var(--content-muted);
+  font-size: var(--typo-caption-font-size);
+  width: 100%;
+  text-align: left;
+}
+
+.progressBarContainer {
+  margin-top: var(--space-component-gap-xs, 8px);
+  height: 3px;
+  background-color: var(--border-subtle);
+  border-radius: var(--radius-component-card);
+  overflow: hidden;
+  width: 100%;
+}
+
+.progressBarFill {
+  height: 100%;
+  background-color: var(--action-primary);
+}
+
+.playButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-component-gap-xs, 8px);
+  padding: 0 16px;
+  height: 40px;
+  width: 100%; /* Full width on mobile */
+  border-radius: var(--radius-component-chip, 6px);
+  border: 1px solid var(--border-default);
+  background: var(--surface-subtle);
+  color: var(--content-strong);
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: 500;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.playButton:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-strong);
+}
+
+.playing {
+  background: var(--action-primary);
+  color: var(--content-on-primary);
+  border-color: var(--action-primary);
+}
+
+.playText {
+  display: inline;
+}
+
+@media (min-width: 641px) {
+  .container {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-component-gap-lg, 24px);
+  }
+
+  .contentCol {
+    flex: 1;
+  }
+
+  .playButton {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 50%;
+  }
+
+  .playText {
+    display: none;
+  }
+}

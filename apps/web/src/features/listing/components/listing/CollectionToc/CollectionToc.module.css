@@ -1,0 +1,91 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-component-gap-md, 16px);
+  border-radius: var(--radius-component-panel-sm, 8px);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-default);
+  max-height: calc(100vh - 180px);
+  overflow-y: auto;
+  transition: width 0.2s ease, padding 0.2s ease;
+}
+
+.container.collapsed {
+  padding: var(--space-component-gap-sm, 12px) var(--space-component-gap-xs, 8px);
+  align-items: center;
+  width: 48px;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-bottom: var(--space-component-gap-xs, 8px);
+}
+
+.collapsed .headerRow {
+  flex-direction: column;
+  padding-bottom: 0;
+  justify-content: center;
+}
+
+.title {
+  color: var(--content-strong);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.toggleButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-component-chip, 4px);
+  border: none;
+  background: transparent;
+  color: var(--content-muted);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.toggleButton:hover {
+  background: var(--surface-hover);
+  color: var(--content-strong);
+}
+
+.moduleList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-xs, 6px);
+  margin-top: var(--space-component-gap-xs, 6px);
+  border-top: 1px solid var(--border-subtle);
+  padding-top: var(--space-component-gap-sm, 10px);
+}
+
+.moduleButton {
+  display: flex;
+  align-items: center;
+  padding: var(--space-component-gap-xs, 8px) var(--space-component-gap-sm, 12px);
+  border-radius: var(--radius-component-chip, 6px);
+  border: none;
+  background: transparent;
+  color: var(--content-muted);
+  text-align: left;
+  cursor: pointer;
+  font-size: var(--typo-body-md-font-size);
+  font-weight: 500;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.moduleButton:hover {
+  background: var(--surface-hover);
+  color: var(--content-strong);
+}
+
+.moduleText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

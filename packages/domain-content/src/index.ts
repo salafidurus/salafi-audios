@@ -21,7 +21,7 @@ export { useExploreFollowingScreen } from "./use-explore-following";
 export { useLibrarySavedScreen } from "./use-library-saved";
 export { useLibraryCompletedScreen } from "./use-library-completed";
 export { useLibraryProgressScreen } from "./use-library-progress";
-export { useListingDetail } from "./listing.api";
+export { useListingDetail, useListingContents, useLastPlayedLesson } from "./listing.api";
 export {
   useScholarsList,
   useScholarDetail,

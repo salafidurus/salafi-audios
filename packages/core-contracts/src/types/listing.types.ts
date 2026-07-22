@@ -221,3 +221,36 @@ export const UpdateListingTranslationDtoSchema = z.object({
   description: z.string().nullable().optional(),
 });
 export type UpdateListingTranslationDto = z.infer<typeof UpdateListingTranslationDtoSchema>;
+
+export const ListingContentItemDtoSchema = z.object({
+  id: z.string(),
+  slug: z.string(),
+  title: z.string(),
+  durationSeconds: z.number().optional(),
+  orderIndex: z.number().optional(),
+  primaryAudioAsset: AudioAssetDtoSchema.nullable(),
+});
+export type ListingContentItemDto = z.infer<typeof ListingContentItemDtoSchema>;
+
+export const ListingModuleDtoSchema = z.object({
+  id: z.string(),
+  slug: z.string(),
+  title: z.string(),
+  lessons: z.array(ListingContentItemDtoSchema),
+});
+export type ListingModuleDto = z.infer<typeof ListingModuleDtoSchema>;
+
+export const ListingContentsDtoSchema = z.discriminatedUnion("format", [
+  z.object({ format: z.literal("single"), items: z.array(ListingContentItemDtoSchema) }),
+  z.object({ format: z.literal("series"), items: z.array(ListingContentItemDtoSchema) }),
+  z.object({ format: z.literal("collection"), modules: z.array(ListingModuleDtoSchema) }),
+]);
+export type ListingContentsDto = z.infer<typeof ListingContentsDtoSchema>;
+
+export const LastPlayedLessonDtoSchema = z.object({
+  listingId: z.string(),
+  positionSeconds: z.number(),
+  isCompleted: z.boolean(),
+  updatedAt: z.string(),
+});
+export type LastPlayedLessonDto = z.infer<typeof LastPlayedLessonDtoSchema>;

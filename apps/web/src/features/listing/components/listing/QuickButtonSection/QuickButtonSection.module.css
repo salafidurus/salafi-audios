@@ -1,0 +1,42 @@
+.container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-component-gap-md, 16px);
+  width: 100%;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-component-gap-xs, 8px);
+  flex: 1; /* equal width side-by-side on mobile */
+  width: 100%;
+}
+
+.saveWrapper {
+  flex: 1; /* equal width side-by-side on mobile */
+  width: 100%;
+  display: flex;
+}
+
+@media (min-width: 768px) {
+  .container {
+    flex-direction: column;
+    align-items: stretch;
+    width: 180px;
+    gap: var(--space-component-gap-sm, 12px);
+    flex-shrink: 0;
+  }
+
+  .button {
+    flex: initial;
+    width: 100%; /* equal full width vertically stacked on desktop/tablet */
+  }
+
+  .saveWrapper {
+    flex: initial;
+    width: 100%;
+  }
+}

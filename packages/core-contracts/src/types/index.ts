@@ -64,6 +64,14 @@ export {
   UpdateListingTranslationDtoSchema,
   type ListingFormat,
   ListingFormatSchema,
+  type ListingContentItemDto,
+  ListingContentItemDtoSchema,
+  type ListingModuleDto,
+  ListingModuleDtoSchema,
+  type ListingContentsDto,
+  ListingContentsDtoSchema,
+  type LastPlayedLessonDto,
+  LastPlayedLessonDtoSchema,
 } from "../types/listing.types";
 export {
   COUNTRY_CODES,

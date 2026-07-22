@@ -7,9 +7,16 @@ export type AppTextProps = {
   children: React.ReactNode;
   style?: React.CSSProperties;
   numberOfLines?: number;
+  color?: "primary" | "secondary" | "muted" | "inherit";
 };
 
-export function AppText({ variant, children, style, numberOfLines }: AppTextProps) {
+export function AppText({
+  variant,
+  children,
+  style,
+  numberOfLines,
+  color = "inherit",
+}: AppTextProps) {
   const clampStyle: React.CSSProperties =
     numberOfLines != null
       ? {
@@ -20,8 +27,11 @@ export function AppText({ variant, children, style, numberOfLines }: AppTextProp
         }
       : {};
 
+  const colorKey = `color${color.charAt(0).toUpperCase()}${color.slice(1)}` as keyof typeof styles;
+  const colorClass = styles[colorKey] ?? "";
+
   return (
-    <span className={styles[variant]} style={{ ...clampStyle, ...style }}>
+    <span className={`${styles[variant]} ${colorClass}`} style={{ ...clampStyle, ...style }}>
       {children}
     </span>
   );

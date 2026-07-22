@@ -12,6 +12,8 @@ import type {
   Locale,
   CreateListingDto,
   SaveListingTranslationDto,
+  ListingContentsDto,
+  LastPlayedLessonDto,
 } from '@sd/core-contracts';
 import { resolveContentTranslation } from '../../shared/utils/resolve-content-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
@@ -217,6 +219,245 @@ export class ListingRepository {
       seriesSlug: parentSeries.slug,
       prevLecture: prev ? { id: prev.id, slug: prev.slug, title: titleOf(prev) } : null,
       nextLecture: next ? { id: next.id, slug: next.slug, title: titleOf(next) } : null,
+    };
+  }
+
+  async findContentsById(id: string): Promise<ListingContentsDto | null> {
+    const locale = getRequestLocale();
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+    const listing = await this.prisma.listing.findFirst({
+      where: {
+        ...(isUuid ? { id } : { slug: id }),
+        deletedAt: null,
+        status: Status.published,
+        scholar: { isActive: true },
+      },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        format: true,
+        durationSeconds: true,
+        language: true,
+        translations: {
+          where: { locale, status: 'published' },
+          select: { title: true },
+          take: 1,
+        },
+        audioAssets: {
+          where: { isPrimary: true },
+          take: 1,
+          select: {
+            id: true,
+            url: true,
+            format: true,
+            bitrateKbps: true,
+            durationSeconds: true,
+          },
+        },
+      },
+    });
+
+    if (!listing) return null;
+
+    const resolveTitle = (item: {
+      title: string;
+      language?: Locale | null;
+      translations?: { title: string }[];
+    }) =>
+      resolveContentTranslation({
+        base: { title: item.title },
+        originalLanguage: item.language ?? undefined,
+        targetLocale: locale,
+        publishedTranslation: item.translations?.[0] ?? null,
+      }).fields.title;
+
+    const mapAsset = (asset: (typeof listing.audioAssets)[0] | undefined) =>
+      asset
+        ? {
+            id: asset.id,
+            url: asset.url,
+            format: asset.format ?? undefined,
+            bitrateKbps: asset.bitrateKbps ?? undefined,
+            durationSeconds: asset.durationSeconds ?? undefined,
+          }
+        : null;
+
+    if (listing.format === 'single') {
+      return {
+        format: 'single',
+        items: [
+          {
+            id: listing.id,
+            slug: listing.slug,
+            title: resolveTitle(listing),
+            durationSeconds: listing.durationSeconds ?? undefined,
+            primaryAudioAsset: mapAsset(listing.audioAssets[0]),
+          },
+        ],
+      };
+    }
+
+    if (listing.format === 'series') {
+      const children = await this.prisma.listing.findMany({
+        where: {
+          parentId: listing.id,
+          deletedAt: null,
+          status: Status.published,
+        },
+        orderBy: [{ orderIndex: 'asc' }, { title: 'asc' }],
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          durationSeconds: true,
+          orderIndex: true,
+          language: true,
+          translations: {
+            where: { locale, status: 'published' },
+            select: { title: true },
+            take: 1,
+          },
+          audioAssets: {
+            where: { isPrimary: true },
+            take: 1,
+            select: {
+              id: true,
+              url: true,
+              format: true,
+              bitrateKbps: true,
+              durationSeconds: true,
+            },
+          },
+        },
+      });
+
+      return {
+        format: 'series',
+        items: children.map((c) => ({
+          id: c.id,
+          slug: c.slug,
+          title: resolveTitle(c),
+          durationSeconds: c.durationSeconds ?? undefined,
+          orderIndex: c.orderIndex ?? undefined,
+          primaryAudioAsset: mapAsset(c.audioAssets[0]),
+        })),
+      };
+    }
+
+    if (listing.format === 'collection') {
+      const modules = await this.prisma.listing.findMany({
+        where: {
+          parentId: listing.id,
+          deletedAt: null,
+          status: Status.published,
+        },
+        orderBy: [{ orderIndex: 'asc' }, { title: 'asc' }],
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          language: true,
+          translations: {
+            where: { locale, status: 'published' },
+            select: { title: true },
+            take: 1,
+          },
+          children: {
+            where: { deletedAt: null, status: Status.published },
+            orderBy: [{ orderIndex: 'asc' }, { title: 'asc' }],
+            select: {
+              id: true,
+              slug: true,
+              title: true,
+              durationSeconds: true,
+              orderIndex: true,
+              language: true,
+              translations: {
+                where: { locale, status: 'published' },
+                select: { title: true },
+                take: 1,
+              },
+              audioAssets: {
+                where: { isPrimary: true },
+                take: 1,
+                select: {
+                  id: true,
+                  url: true,
+                  format: true,
+                  bitrateKbps: true,
+                  durationSeconds: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      return {
+        format: 'collection',
+        modules: modules.map((m) => ({
+          id: m.id,
+          slug: m.slug,
+          title: resolveTitle(m),
+          lessons: m.children.map((c) => ({
+            id: c.id,
+            slug: c.slug,
+            title: resolveTitle(c),
+            durationSeconds: c.durationSeconds ?? undefined,
+            orderIndex: c.orderIndex ?? undefined,
+            primaryAudioAsset: mapAsset(c.audioAssets[0]),
+          })),
+        })),
+      };
+    }
+
+    return null;
+  }
+
+  async findLastPlayedLesson(id: string, userId: string): Promise<LastPlayedLessonDto | null> {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+    const targetListing = await this.prisma.listing.findFirst({
+      where: {
+        ...(isUuid ? { id } : { slug: id }),
+        deletedAt: null,
+      },
+      select: { id: true },
+    });
+
+    if (!targetListing) return null;
+
+    const actualId = targetListing.id;
+
+    const progress = await this.prisma.$queryRaw<
+      {
+        listingId: string;
+        positionSeconds: number;
+        isCompleted: boolean;
+        updatedAt: Date;
+      }[]
+    >`
+      SELECT ulp."listingId", ulp."positionSeconds", ulp."isCompleted", ulp."updatedAt"
+      FROM "UserListingProgress" ulp
+      JOIN "Listing" l ON ulp."listingId" = l.id
+      LEFT JOIN "Listing" m ON l."parentId" = m.id
+      WHERE (l."parentId" = ${actualId}::uuid OR m."parentId" = ${actualId}::uuid)
+        AND ulp."userId" = ${userId}
+        AND l."deletedAt" IS NULL
+      ORDER BY ulp."updatedAt" DESC
+      LIMIT 1
+    `;
+
+    const p = progress[0];
+    if (!p) return null;
+
+    return {
+      listingId: p.listingId,
+      positionSeconds: p.positionSeconds,
+      isCompleted: p.isCompleted,
+      updatedAt: p.updatedAt.toISOString(),
     };
   }
 

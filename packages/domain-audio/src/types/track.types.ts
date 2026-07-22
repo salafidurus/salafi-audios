@@ -7,4 +7,5 @@ export type Track = {
   artworkUrl?: string;
   seriesId?: string | null;
   seriesTitle?: string | null;
+  collectionId?: string | null;
 };
