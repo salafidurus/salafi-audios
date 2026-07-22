@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { SearchFilter } from "@/features/search/components/SearchFilter/SearchFilter";
@@ -39,6 +39,20 @@ export function SearchProcessingScreen({ prefill, onBackPress }: SearchProcessin
     errorMessage,
   } = useSearchProcessing({ prefill, showOriginal });
 
+  const renderItem = useCallback(
+    (item: SearchResultRow) => (
+      <SearchResultItem
+        title={item.title}
+        scholarName={item.scholarName}
+        imageUrl={item.imageUrl}
+        lectureCount={item.lectureCount}
+        durationSeconds={item.durationSeconds}
+        onPress={() => navigateToListing(item.slug)}
+      />
+    ),
+    [navigateToListing],
+  );
+
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
@@ -60,16 +74,7 @@ export function SearchProcessingScreen({ prefill, onBackPress }: SearchProcessin
         isFetching={isFetching}
         shouldSearch={shouldSearch}
         errorMessage={errorMessage}
-        renderItem={(item: SearchResultRow) => (
-          <SearchResultItem
-            title={item.title}
-            scholarName={item.scholarName}
-            imageUrl={item.imageUrl}
-            lectureCount={item.lectureCount}
-            durationSeconds={item.durationSeconds}
-            onPress={() => navigateToListing(item.slug)}
-          />
-        )}
+        renderItem={renderItem}
       />
     </ScreenView>
   );
