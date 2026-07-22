@@ -42,6 +42,7 @@ export class ScholarsRepository {
         imageUrl: true,
         mainLanguage: true,
         isKibar: true,
+        title: true,
         translations: {
           where: { locale, status: 'published' },
           select: { name: true },

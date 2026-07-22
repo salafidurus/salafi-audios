@@ -159,6 +159,7 @@ describe('ScholarsService', () => {
         updatedAt: new Date(),
         country: dto.country,
         mainLanguage: dto.mainLanguage,
+        title: null,
         socialTwitter: null,
         socialTelegram: null,
         socialYoutube: null,
@@ -192,7 +193,7 @@ describe('ScholarsService', () => {
         mainLanguage: 'ar',
         translations: {
           en: { name: 'New Scholar - English' },
-          fr: { name: 'Nouveau Savant - Français' },
+          ar: { name: 'عالم جديد' },
         },
       };
       const created = {
@@ -208,6 +209,7 @@ describe('ScholarsService', () => {
         updatedAt: new Date(),
         country: dto.country,
         mainLanguage: dto.mainLanguage,
+        title: null,
         socialTwitter: null,
         socialTelegram: null,
         socialYoutube: null,
@@ -237,8 +239,8 @@ describe('ScholarsService', () => {
         name: 'New Scholar - English',
       });
       expect(repo.upsertScholarTranslation).toHaveBeenCalledWith('s2', {
-        locale: 'fr',
-        name: 'Nouveau Savant - Français',
+        locale: 'ar',
+        name: 'عالم جديد',
       });
     });
   });
@@ -285,6 +287,7 @@ describe('ScholarsService', () => {
         name: 'Updated Name',
         translations: {
           en: { name: 'Updated Name - English' },
+          ar: { name: 'اسم محدث' },
         },
       };
       const existing = {

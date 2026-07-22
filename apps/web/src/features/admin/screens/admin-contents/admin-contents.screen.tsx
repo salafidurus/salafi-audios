@@ -20,7 +20,8 @@ import { useResponsive } from "@/shared/hooks/use-responsive";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
-import { TopicsContent, ListingsContent, Content } from "@/features/admin/components/Contents";
+import { TopicsContent, ListingsContent } from "@/features/admin/components/Contents";
+import { Content } from "@/features/admin/components/Content";
 import { useDebouncedSearch } from "@/shared/hooks";
 import { createTopic, updateTopic } from "@/features/admin/api/admin.api";
 import type { TopicForEdit } from "@/features/admin/components/Content/TopicModal";
@@ -97,7 +98,7 @@ export function AdminContentsScreen() {
                       variant="primary"
                       size={!isMobile ? "md" : "sm"}
                       icon={<Plus size={!isMobile ? 18 : 16} />}
-                      onClick={() => setTriggerAddListing(true)}
+                      onClick={() => {}}
                     >
                       {!isMobile
                         ? t("admin.contents.addListing", "Add Listing")
