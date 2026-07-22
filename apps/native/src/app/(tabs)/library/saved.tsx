@@ -1,4 +1,4 @@
-import { type Href, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { useAuth } from "@/core/auth";
 import { LibrarySavedScreen } from "@/features/library/screens/library-saved.screen";
 import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
