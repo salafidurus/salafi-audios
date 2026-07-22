@@ -112,8 +112,6 @@ export class ScholarsRepository {
         socialTelegram: true,
         socialYoutube: true,
         socialWebsite: true,
-        socialFacebook: true,
-        socialInstagram: true,
         createdAt: true,
         updatedAt: true,
         translations: {
@@ -176,8 +174,6 @@ export class ScholarsRepository {
       socialTelegram: record.socialTelegram ?? undefined,
       socialYoutube: record.socialYoutube ?? undefined,
       socialWebsite: record.socialWebsite ?? undefined,
-      socialFacebook: record.socialFacebook ?? undefined,
-      socialInstagram: record.socialInstagram ?? undefined,
       createdAt: record.createdAt.toISOString(),
       updatedAt: record.updatedAt?.toISOString(),
       lectureCount: lectureStats._count.id,
@@ -402,8 +398,6 @@ export class ScholarsRepository {
         socialTelegram: true,
         socialYoutube: true,
         socialWebsite: true,
-        socialFacebook: true,
-        socialInstagram: true,
         createdAt: true,
         updatedAt: true,
         translations: {
@@ -430,8 +424,6 @@ export class ScholarsRepository {
         socialTelegram: r.socialTelegram ?? undefined,
         socialYoutube: r.socialYoutube ?? undefined,
         socialWebsite: r.socialWebsite ?? undefined,
-        socialFacebook: r.socialFacebook ?? undefined,
-        socialInstagram: r.socialInstagram ?? undefined,
         createdAt: r.createdAt.toISOString(),
         updatedAt: r.updatedAt?.toISOString(),
         translations: r.translations.map((t) => ({
@@ -464,8 +456,6 @@ export class ScholarsRepository {
         socialTelegram: dto.socialTelegram,
         socialYoutube: dto.socialYoutube,
         socialWebsite: dto.socialWebsite,
-        socialFacebook: dto.socialFacebook,
-        socialInstagram: dto.socialInstagram,
       },
     });
   }
@@ -487,8 +477,6 @@ export class ScholarsRepository {
         ...(dto.socialTelegram !== undefined && { socialTelegram: dto.socialTelegram }),
         ...(dto.socialYoutube !== undefined && { socialYoutube: dto.socialYoutube }),
         ...(dto.socialWebsite !== undefined && { socialWebsite: dto.socialWebsite }),
-        ...(dto.socialFacebook !== undefined && { socialFacebook: dto.socialFacebook }),
-        ...(dto.socialInstagram !== undefined && { socialInstagram: dto.socialInstagram }),
         updatedAt: new Date(),
       },
     });
