@@ -20,14 +20,14 @@ export function SocialSection({ formData, dispatch }: SocialSectionProps) {
       <div className={styles.twoCol}>
         <div className={styles.field}>
           <label className={styles.label} htmlFor="scholar-twitter">
-            {t("admin.scholars.twitterLabel", "Twitter")}
+            {t("admin.scholars.twitterLabel", "X (Twitter)")}
           </label>
           <EditableInput
             id="scholar-twitter"
             type="url"
             value={formData.socialTwitter ?? ""}
             onChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "socialTwitter", value })}
-            placeholder="https://twitter.com/..."
+            placeholder="https://x.com/..."
           />
         </div>
         <div className={styles.field}>
@@ -66,6 +66,34 @@ export function SocialSection({ formData, dispatch }: SocialSectionProps) {
             value={formData.socialWebsite ?? ""}
             onChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "socialWebsite", value })}
             placeholder="https://..."
+          />
+        </div>
+      </div>
+      <div className={styles.twoCol}>
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="scholar-facebook">
+            {t("admin.scholars.facebookLabel", "Facebook")}
+          </label>
+          <EditableInput
+            id="scholar-facebook"
+            type="url"
+            value={formData.socialFacebook ?? ""}
+            onChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "socialFacebook", value })}
+            placeholder="https://facebook.com/..."
+          />
+        </div>
+        <div className={styles.field}>
+          <label className={styles.label} htmlFor="scholar-instagram">
+            {t("admin.scholars.instagramLabel", "Instagram")}
+          </label>
+          <EditableInput
+            id="scholar-instagram"
+            type="url"
+            value={formData.socialInstagram ?? ""}
+            onChange={(value) =>
+              dispatch({ type: "UPDATE_FIELD", field: "socialInstagram", value })
+            }
+            placeholder="https://instagram.com/..."
           />
         </div>
       </div>

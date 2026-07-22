@@ -1,179 +1,170 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import type { ScholarDetailDto } from "@sd/core-contracts";
-import { Globe, Send } from "lucide-react";
+import { Globe } from "lucide-react";
 import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./scholar-header.module.css";
-
-function YoutubeIcon({ size = 18 }: { size?: number }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 11.54a29 29 0 0 0 .46 5.12 2.78 2.78 0 0 0 1.95 1.96C5.12 19.08 12 19.08 12 19.08s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96 29 29 0 0 0 .46-5.12 29 29 0 0 0-.46-5.12z" />
-      <polygon points="9.75 15.02 15.5 11.54 9.75 8.06 9.75 15.02" />
-    </svg>
-  );
-}
-
-function TwitterIcon({ size = 18 }: { size?: number }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
-    </svg>
-  );
-}
 
 export type ScholarHeaderProps = {
   scholar: ScholarDetailDto & {
     lectureCount: number;
     seriesCount: number;
     totalDurationSeconds: number;
+    socialFacebook?: string;
+    socialInstagram?: string;
   };
 };
 
 export function ScholarHeader({ scholar }: ScholarHeaderProps) {
   const { t } = useTranslation();
-  const [isBioExpanded, setIsBioExpanded] = useState(false);
   const totalHours = Math.round(scholar.totalDurationSeconds / 3600);
   const initial = scholar.name?.trim().charAt(0).toUpperCase() || "?";
 
-  const bio = scholar.bio || "";
-  const isLongBio = bio.length > 160;
-  const displayBio = isLongBio && !isBioExpanded ? `${bio.substring(0, 160)}...` : bio;
+  const statsParts = [
+    t("scholarContent.statLecturesFormat", "{{count}} Lectures", { count: scholar.lectureCount }),
+    t("scholarContent.statSeriesFormat", "{{count}} Series", { count: scholar.seriesCount }),
+    totalHours > 0
+      ? t("scholarContent.statTotalHoursFormat", "{{hours}}h Total", { hours: totalHours })
+      : null,
+  ].filter(Boolean);
+
+  const hasSocials =
+    scholar.socialWebsite ||
+    scholar.socialYoutube ||
+    scholar.socialTwitter ||
+    scholar.socialTelegram ||
+    scholar.socialFacebook ||
+    scholar.socialInstagram;
 
   return (
     <div className={styles.root}>
-      <div className={styles.headerTop}>
-        {scholar.imageUrl ? (
-          <Image
-            src={scholar.imageUrl}
-            alt={scholar.name}
-            width={144}
-            height={144}
-            unoptimized
-            className={styles.avatar}
-          />
-        ) : (
-          <div className={styles.avatarFallback} role="img" aria-label={scholar.name}>
-            {initial}
-          </div>
-        )}
-        <div className={styles.headerInfo}>
-          <h1 className={styles.name}>{scholar.name}</h1>
-          {(scholar.country || scholar.mainLanguage) && (
-            <p className={styles.meta}>
-              {[scholar.country, scholar.mainLanguage].filter(Boolean).join(" · ")}
-            </p>
-          )}
-        </div>
-      </div>
-
-      {scholar.bio && (
-        <div className={styles.bioContainer}>
-          <p className={styles.bio}>{displayBio}</p>
-          {isLongBio && (
-            <button
-              type="button"
-              className={styles.toggleBtn}
-              onClick={() => setIsBioExpanded(!isBioExpanded)}
-            >
-              {isBioExpanded
-                ? t("scholarContent.showLess", "Show less")
-                : t("scholarContent.showMore", "Show more")}
-            </button>
-          )}
+      {scholar.imageUrl ? (
+        <Image
+          src={scholar.imageUrl}
+          alt={scholar.name}
+          width={120}
+          height={120}
+          unoptimized
+          className={styles.avatar}
+        />
+      ) : (
+        <div className={styles.avatarFallback} role="img" aria-label={scholar.name}>
+          {initial}
         </div>
       )}
 
-      <div className={styles.stats}>
-        <div className={styles.stat}>
-          <span className={styles.statValue}>{scholar.lectureCount}</span>
-          <span className={styles.statLabel}>{t("scholarContent.statLectures", "Lectures")}</span>
+      <div className={styles.infoColumn}>
+        {/* Row 1: Name */}
+        <h1 className={styles.name}>{scholar.name}</h1>
+
+        {/* Row 2: Stats */}
+        <div className={styles.stats}>
+          <span className={styles.statText}>{statsParts.join(" · ")}</span>
         </div>
-        <div className={styles.stat}>
-          <span className={styles.statValue}>{scholar.seriesCount}</span>
-          <span className={styles.statLabel}>{t("scholarContent.statSeries", "Series")}</span>
-        </div>
-        {totalHours > 0 && (
-          <div className={styles.stat}>
-            <span className={styles.statValue}>{totalHours}h</span>
-            <span className={styles.statLabel}>{t("scholarContent.statTotal", "Total")}</span>
+
+        {/* Row 3: Social Icons */}
+        {hasSocials && (
+          <div className={styles.socials}>
+            {scholar.socialWebsite && (
+              <a
+                href={scholar.socialWebsite}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.socialLink}
+                aria-label="Website"
+              >
+                <Globe size={18} />
+              </a>
+            )}
+            {scholar.socialYoutube && (
+              <a
+                href={scholar.socialYoutube}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.socialLink}
+                aria-label="YouTube"
+              >
+                <Image
+                  src="/social-icons/youtube-dark.svg"
+                  alt="YouTube"
+                  width={18}
+                  height={18}
+                  unoptimized
+                />
+              </a>
+            )}
+            {scholar.socialTwitter && (
+              <a
+                href={scholar.socialTwitter}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.socialLink}
+                aria-label="X (Twitter)"
+              >
+                <Image
+                  src="/social-icons/x-dark.svg"
+                  alt="X (Twitter)"
+                  width={18}
+                  height={18}
+                  unoptimized
+                />
+              </a>
+            )}
+            {scholar.socialTelegram && (
+              <a
+                href={scholar.socialTelegram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.socialLink}
+                aria-label="Telegram"
+              >
+                <Image
+                  src="/social-icons/telegram-dark.svg"
+                  alt="Telegram"
+                  width={18}
+                  height={18}
+                  unoptimized
+                />
+              </a>
+            )}
+            {scholar.socialFacebook && (
+              <a
+                href={scholar.socialFacebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.socialLink}
+                aria-label="Facebook"
+              >
+                <Image
+                  src="/social-icons/facebook-dark.svg"
+                  alt="Facebook"
+                  width={18}
+                  height={18}
+                  unoptimized
+                />
+              </a>
+            )}
+            {scholar.socialInstagram && (
+              <a
+                href={scholar.socialInstagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.socialLink}
+                aria-label="Instagram"
+              >
+                <Image
+                  src="/social-icons/instagram-dark.svg"
+                  alt="Instagram"
+                  width={18}
+                  height={18}
+                  unoptimized
+                />
+              </a>
+            )}
           </div>
         )}
       </div>
-
-      {(scholar.socialTwitter ||
-        scholar.socialTelegram ||
-        scholar.socialYoutube ||
-        scholar.socialWebsite) && (
-        <div className={styles.socials}>
-          {scholar.socialWebsite && (
-            <a
-              href={scholar.socialWebsite}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.socialLink}
-              aria-label="Website"
-            >
-              <Globe size={18} />
-            </a>
-          )}
-          {scholar.socialYoutube && (
-            <a
-              href={scholar.socialYoutube}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.socialLink}
-              aria-label="YouTube"
-            >
-              <YoutubeIcon size={18} />
-            </a>
-          )}
-          {scholar.socialTwitter && (
-            <a
-              href={scholar.socialTwitter}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.socialLink}
-              aria-label="Twitter"
-            >
-              <TwitterIcon size={18} />
-            </a>
-          )}
-          {scholar.socialTelegram && (
-            <a
-              href={scholar.socialTelegram}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.socialLink}
-              aria-label="Telegram"
-            >
-              <Send size={18} />
-            </a>
-          )}
-        </div>
-      )}
     </div>
   );
 }

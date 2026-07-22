@@ -1,6 +1,6 @@
 import { describe, it, expect } from "bun:test";
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { ScholarHeader, type ScholarHeaderProps } from "./scholar-header";
 
 const mockScholar: ScholarHeaderProps["scholar"] = {
@@ -15,18 +15,21 @@ const mockScholar: ScholarHeaderProps["scholar"] = {
   totalDurationSeconds: 7200, // 2 hours
   bio: "This is a short bio.",
   country: "SA",
+  socialWebsite: "https://binbaz.org.sa",
+  socialYoutube: "https://youtube.com/binbaz",
+  socialTwitter: "https://x.com/binbaz",
+  socialTelegram: "https://t.me/binbaz",
+  socialFacebook: "https://facebook.com/binbaz",
+  socialInstagram: "https://instagram.com/binbaz",
   isActive: true,
   createdAt: "2024-01-01T00:00:00Z",
 };
 
 describe("ScholarHeader", () => {
-  it("renders scholar details successfully", () => {
+  it("renders scholar name and stats in row 1 and row 2", () => {
     render(<ScholarHeader scholar={mockScholar} />);
     expect(screen.getByText("Abdul Aziz bin Baz")).toBeInTheDocument();
-    expect(screen.getByText("SA · ar")).toBeInTheDocument();
-    expect(screen.getByText("42")).toBeInTheDocument(); // lectures count
-    expect(screen.getByText("5")).toBeInTheDocument(); // series count
-    expect(screen.getByText("2h")).toBeInTheDocument(); // duration hours
+    expect(screen.getByText(/42 Lectures · 5 Series · 2h Total/)).toBeInTheDocument();
   });
 
   it("renders avatar image when imageUrl is present", () => {
@@ -38,8 +41,8 @@ describe("ScholarHeader", () => {
     const img = container.querySelector("img");
     expect(img).toBeInTheDocument();
     expect(img?.getAttribute("src")).toContain("binbaz.jpg");
-    expect(img?.getAttribute("width")).toBe("144");
-    expect(img?.getAttribute("height")).toBe("144");
+    expect(img?.getAttribute("width")).toBe("120");
+    expect(img?.getAttribute("height")).toBe("120");
   });
 
   it("renders fallback initial avatar when imageUrl is not present", () => {
@@ -47,32 +50,19 @@ describe("ScholarHeader", () => {
     expect(screen.getByText("A")).toBeInTheDocument();
   });
 
-  it("does not truncate bio if it is 160 characters or less", () => {
+  it("renders social icon links in row 3", () => {
     render(<ScholarHeader scholar={mockScholar} />);
-    expect(
-      screen.getByText((content) => content.includes("This is a short bio.")),
-    ).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /show/i })).toBeNull();
+    expect(screen.getByRole("link", { name: "Website" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "YouTube" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "X (Twitter)" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Telegram" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Facebook" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Instagram" })).toBeInTheDocument();
   });
 
-  it("truncates bio if it is longer than 160 characters and shows expand toggle", () => {
-    const longBio = "A".repeat(170);
-    render(<ScholarHeader scholar={{ ...mockScholar, bio: longBio }} />);
-
-    // Should show truncated bio with "..."
-    const expectedTruncated = "A".repeat(160) + "...";
-    expect(screen.getByText((content) => content.includes(expectedTruncated))).toBeInTheDocument();
-
-    const toggleBtn = screen.getByRole("button", { name: "Show more" });
-    expect(toggleBtn).toBeInTheDocument();
-
-    // Click to expand
-    fireEvent.click(toggleBtn);
-    expect(screen.getByText((content) => content.includes(longBio))).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Show less" })).toBeInTheDocument();
-
-    // Click to collapse
-    fireEvent.click(screen.getByRole("button", { name: "Show less" }));
-    expect(screen.getByText((content) => content.includes(expectedTruncated))).toBeInTheDocument();
+  it("does not render country, language, or bio text", () => {
+    render(<ScholarHeader scholar={mockScholar} />);
+    expect(screen.queryByText("SA · ar")).toBeNull();
+    expect(screen.queryByText("This is a short bio.")).toBeNull();
   });
 });

@@ -47,6 +47,7 @@ const mockItems: ScholarContentItemDto[] = [
     title: "Insightful Single",
     type: "single",
     recencyAt: "2024-01-02T00:00:00Z",
+    lectureCount: 1,
     durationSeconds: 2700,
   },
   {
@@ -72,7 +73,7 @@ beforeEach(() => {
 });
 
 describe("ScholarContentList", () => {
-  it("shows loading state while topics are fetching", () => {
+  it("shows loading state while topics or content are fetching", () => {
     mockUseTopics.mockReturnValue({
       data: undefined,
       isFetching: true,
@@ -81,7 +82,18 @@ describe("ScholarContentList", () => {
     expect(screen.getByText("Loading…")).toBeTruthy();
   });
 
-  it("renders topic-grouped sections when topics are available", () => {
+  it("renders flat content list when topics are available without section headers", () => {
+    mockUseContent.mockReturnValue({
+      data: { items: mockItems },
+      isFetching: false,
+    } as unknown as ReturnType<typeof useScholarContent>);
+    render(<ScholarContentList slug="ibn-baz" />);
+    expect(screen.queryAllByRole("heading", { level: 2 }).length).toBe(0);
+    expect(screen.getByText("Awesome Series")).toBeTruthy();
+    expect(screen.getByText("Insightful Single")).toBeTruthy();
+  });
+
+  it("filters items by selectedTopicId", () => {
     mockUseTopics.mockReturnValue({
       data: {
         topics: [
@@ -91,13 +103,21 @@ describe("ScholarContentList", () => {
       },
       isFetching: false,
     } as unknown as ReturnType<typeof useScholarTopics>);
-    render(<ScholarContentList slug="ibn-baz" />);
-    // Topics should be sorted alphabetically: Aqeedah before Tawheed
-    const headers = screen.getAllByRole("heading", { level: 2 });
-    expect(headers[0]?.textContent).toBe("Aqeedah");
-    expect(headers[1]?.textContent).toBe("Tawheed");
-    expect(screen.getByText("Awesome Series")).toBeTruthy();
+    render(<ScholarContentList slug="ibn-baz" selectedTopicId="t2" />);
+    expect(screen.queryByText("Tawheed")).toBeNull();
+    expect(screen.queryByText("Aqeedah")).toBeNull();
     expect(screen.getByText("Insightful Single")).toBeTruthy();
+    expect(screen.queryByText("Awesome Series")).toBeNull();
+  });
+
+  it("filters items by searchQuery", () => {
+    mockUseContent.mockReturnValue({
+      data: { items: mockItems },
+      isFetching: false,
+    } as unknown as ReturnType<typeof useScholarContent>);
+    render(<ScholarContentList slug="ibn-baz" searchQuery="Insightful" />);
+    expect(screen.getByText("Insightful Single")).toBeTruthy();
+    expect(screen.queryByText("Awesome Series")).toBeNull();
   });
 
   it("renders flat fallback list when no topics exist", () => {
@@ -107,24 +127,19 @@ describe("ScholarContentList", () => {
     } as unknown as ReturnType<typeof useScholarContent>);
     render(<ScholarContentList slug="ibn-baz" />);
     expect(screen.getByText("Awesome Series")).toBeTruthy();
+    expect(screen.getByText("12 lectures")).toBeTruthy();
     expect(screen.getByText("Insightful Single")).toBeTruthy();
-    expect(screen.getByText("Single · 45m")).toBeTruthy();
+    expect(screen.getByText("1 lecture · 45m")).toBeTruthy();
     expect(screen.getByText("Rich Collection")).toBeTruthy();
+    expect(screen.getByText("5 lectures")).toBeTruthy();
   });
 
-  it("renders empty state when no topics and no content", () => {
-    render(<ScholarContentList slug="ibn-baz" />);
-    expect(screen.getByText("No published content yet.")).toBeTruthy();
-  });
-
-  it("renders cover image or type icon fallback in flat list", () => {
+  it("renders empty state when search query matches nothing", () => {
     mockUseContent.mockReturnValue({
       data: { items: mockItems },
       isFetching: false,
     } as unknown as ReturnType<typeof useScholarContent>);
-    const { container } = render(<ScholarContentList slug="ibn-baz" />);
-    const img = container.querySelector("img");
-    expect(img).toBeInTheDocument();
-    expect(img?.getAttribute("src")).toContain("cover.jpg");
+    render(<ScholarContentList slug="ibn-baz" searchQuery="NonExistent" />);
+    expect(screen.getByText("No published content found.")).toBeTruthy();
   });
 });
