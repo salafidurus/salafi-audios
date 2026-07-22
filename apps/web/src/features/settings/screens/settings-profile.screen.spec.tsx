@@ -74,6 +74,7 @@ const PROFILE = {
   displayName: "Test User",
 
   emailVerified: true,
+  roles: ["listener"],
   createdAt: "2024-01-01",
   updatedAt: "2024-01-01",
 };
@@ -143,6 +144,26 @@ describe("SettingsProfileScreen", () => {
     } as ReturnType<typeof useAccountProfile>);
     render(<SettingsProfileScreen />);
     expect(screen.getByLabelText("Display name")).toBeInTheDocument();
+  });
+
+  it("does not show roles row when user only has listener role", () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false });
+    mockProfile.mockReturnValue({
+      data: PROFILE,
+      isFetching: false,
+    } as ReturnType<typeof useAccountProfile>);
+    render(<SettingsProfileScreen />);
+    expect(screen.queryByText("Roles")).not.toBeInTheDocument();
+  });
+
+  it("shows roles row when user has non-listener roles", () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false });
+    mockProfile.mockReturnValue({
+      data: { ...PROFILE, roles: ["listener", "admin"] },
+      isFetching: false,
+    } as ReturnType<typeof useAccountProfile>);
+    render(<SettingsProfileScreen />);
+    expect(screen.getByText("admin")).toBeInTheDocument();
   });
 
   it("opens confirm modal when Sign Out is clicked", () => {

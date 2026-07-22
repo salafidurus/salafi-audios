@@ -127,6 +127,12 @@
   color: var(--content-muted);
 }
 
+.rolesRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-scale-sm);
+}
+
 .loading,
 .empty {
   margin: 0;

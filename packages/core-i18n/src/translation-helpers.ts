@@ -19,7 +19,6 @@ export const SUBNAV_KEYS: Record<string, Record<string, string>> = {
   settings: {
     general: "navigation.subnav.settings.general",
     profile: "navigation.subnav.settings.profile",
-    legal: "navigation.subnav.settings.legal",
   },
   adminContents: {
     topics: "navigation.subnav.admin.topics",

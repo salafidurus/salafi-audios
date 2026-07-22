@@ -72,7 +72,8 @@
       "deleteConfirmWord": "حذف",
       "signInCta": "سجّل الدخول لعرض ملفك الشخصي وصلاحياتك.",
       "signInDesc": "أنشئ حسابًا أو سجّل الدخول لإدارة ملفك الشخصي وصلاحياتك.",
-      "signIn": "تسجيل الدخول"
+      "signIn": "تسجيل الدخول",
+      "roles": "الأدوار"
     }
   },
   "tabs": {
@@ -104,8 +105,8 @@
     "subnav": {
       "explore": { "popular": "الأكثر شيوعًا", "recent": "الأحدث", "following": "المتابَعون" },
       "library": { "started": "قيد التشغيل", "saved": "المحفوظة", "completed": "المكتملة" },
-      "account": { "general": "عام", "profile": "الملف الشخصي", "legal": "قانوني" },
-      "settings": { "general": "عام", "profile": "الملف الشخصي", "legal": "قانوني" },
+      "account": { "general": "عام", "profile": "الملف الشخصي" },
+      "settings": { "general": "عام", "profile": "الملف الشخصي" },
       "admin": { "topics": "المواضيع", "listings": "المحتوى" }
     }
   },
@@ -136,16 +137,6 @@
       "followedScholarsDesc": "إشعار عند نشر شيخ تتابعه",
       "newLectures": "المحاضرات الجديدة",
       "newLecturesDesc": "إشعار عند نشر محاضرات جديدة"
-    },
-    "legal": {
-      "title": "قانوني",
-      "privacyPolicy": "سياسة الخصوصية",
-      "privacyDesc": "كيف نقوم بجمع واستخدام بياناتك.",
-      "privacySublabel": "اقرأ سياسة الخصوصية الكاملة الخاصة بنا، بما في ذلك جمع البيانات وتخزينها وحقوقك.",
-      "view": "عرض ←",
-      "termsOfUse": "شروط الاستخدام",
-      "termsDesc": "القواعد التي تحكم استخدام هذه الخدمة.",
-      "termsSublabel": "اقرأ الشروط والأحكام التي تحكم استخدامك لسلفي دروس."
     }
   },
   "support": {

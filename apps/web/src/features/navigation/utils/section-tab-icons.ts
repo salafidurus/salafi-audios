@@ -5,7 +5,6 @@ import {
   Flame,
   Heart,
   Play,
-  Scale,
   SlidersHorizontal,
   User,
   type LucideIcon,
@@ -20,8 +19,7 @@ export type SectionTabIconKey =
   | "library-saved"
   | "library-completed"
   | "account-general"
-  | "account-profile"
-  | "account-legal";
+  | "account-profile";
 
 const SECTION_TAB_ICONS: Record<SectionTabIconKey, LucideIcon> = {
   "feed-popular": Flame,
@@ -32,7 +30,6 @@ const SECTION_TAB_ICONS: Record<SectionTabIconKey, LucideIcon> = {
   "library-completed": CheckCircle,
   "account-general": SlidersHorizontal,
   "account-profile": User,
-  "account-legal": Scale,
 };
 
 export function getSectionTabIcon(section: Section, tabId: string): LucideIcon | null {

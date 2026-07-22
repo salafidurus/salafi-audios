@@ -12,6 +12,7 @@ describe('AccountService', () => {
     name: 'Test User',
     image: 'https://example.com/avatar.png',
     emailVerified: true,
+    roles: ['listener'],
     createdAt: new Date('2024-01-01T00:00:00.000Z'),
     updatedAt: new Date('2024-06-01T00:00:00.000Z'),
   };
@@ -42,6 +43,7 @@ describe('AccountService', () => {
         displayName: 'Test User',
         avatarUrl: 'https://example.com/avatar.png',
         emailVerified: true,
+        roles: ['listener'],
         createdAt: '2024-01-01T00:00:00.000Z',
         updatedAt: '2024-06-01T00:00:00.000Z',
       });
@@ -91,7 +93,11 @@ describe('AccountService', () => {
 
   describe('updateProfile', () => {
     it('should update name via prisma and return mapped profile', async () => {
-      const updatedUser = { ...mockUser, name: 'New Name' };
+      const updatedUser = {
+        ...mockUser,
+        name: 'New Name',
+        roles: [{ role: 'listener' }],
+      };
       mockPrisma.user.update.mockResolvedValue(updatedUser);
 
       const result = await service.updateProfile('user-1', 'New Name');
@@ -99,9 +105,11 @@ describe('AccountService', () => {
       expect(mockPrisma.user.update).toHaveBeenCalledWith({
         where: { id: 'user-1' },
         data: { name: 'New Name' },
+        include: { roles: true },
       });
       expect(result.displayName).toBe('New Name');
       expect(result.id).toBe('user-1');
+      expect(result.roles).toEqual(['listener']);
     });
   });
 });

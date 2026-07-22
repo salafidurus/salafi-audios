@@ -101,6 +101,7 @@ function ProfileContent() {
 
   const currentDisplayName = displayName;
   const isDirty = currentDisplayName !== (profile.displayName ?? "");
+  const nonListenerRoles = profile.roles.filter((r) => r !== "listener");
 
   return (
     <>
@@ -173,6 +174,17 @@ function ProfileContent() {
               : t("account.profile.unverified", "Unverified")}
           </span>
         </SettingsRow>
+        {nonListenerRoles.length > 0 && (
+          <SettingsRow label={t("account.profile.roles", "Roles")}>
+            <div className={styles.rolesRow}>
+              {nonListenerRoles.map((r) => (
+                <span key={r} className={styles.roleBadge}>
+                  {r}
+                </span>
+              ))}
+            </div>
+          </SettingsRow>
+        )}
       </SettingsSection>
 
       <div className={styles.actionRow}>

@@ -54,7 +54,6 @@ export const SECTION_TABS: Record<Section, TabConfig[]> = {
       labelKey: "navigation.subnav.settings.profile",
       icon: "user",
     },
-    { id: "legal", label: "Legal", labelKey: "navigation.subnav.settings.legal", icon: "scale" },
   ],
   adminContents: [
     {
