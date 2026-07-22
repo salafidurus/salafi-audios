@@ -77,6 +77,7 @@ export class ScholarsRepository {
         originalLanguage: resolved.originalLanguage,
         original: resolved.original ? { name: resolved.original.name } : undefined,
         isKibar: r.isKibar,
+        title: r.title ?? undefined,
         lectureCount: r._count.listings,
       };
     });
@@ -389,6 +390,7 @@ export class ScholarsRepository {
         imageUrl: true,
         isActive: true,
         isKibar: true,
+        title: true,
         socialTwitter: true,
         socialTelegram: true,
         socialYoutube: true,
@@ -414,6 +416,7 @@ export class ScholarsRepository {
         imageUrl: r.imageUrl ?? undefined,
         isActive: r.isActive,
         isKibar: r.isKibar,
+        title: r.title ?? undefined,
         socialTwitter: r.socialTwitter ?? undefined,
         socialTelegram: r.socialTelegram ?? undefined,
         socialYoutube: r.socialYoutube ?? undefined,
@@ -443,6 +446,7 @@ export class ScholarsRepository {
         isKibar: dto.isKibar ?? false,
         isFeatured: dto.isFeatured ?? false,
         isActive: dto.isActive ?? true,
+        title: dto.title,
         country: dto.country,
         mainLanguage: dto.mainLanguage,
         socialTwitter: dto.socialTwitter,
