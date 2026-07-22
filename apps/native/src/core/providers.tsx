@@ -111,7 +111,8 @@ export function Providers({ children }: Props) {
               persister,
               maxAge: DEFAULT_MAX_AGE,
               dehydrateOptions: {
-                shouldDehydrateQuery: (query: any) => shouldPersistQuery(query.queryKey),
+                shouldDehydrateQuery: (query: any) =>
+                  query.state.status === "success" && shouldPersistQuery(query.queryKey),
               },
             }}
           >
