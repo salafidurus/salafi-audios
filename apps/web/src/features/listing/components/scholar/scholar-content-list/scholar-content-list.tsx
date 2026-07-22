@@ -13,51 +13,63 @@ import styles from "./scholar-content-list.module.css";
 
 export type ScholarContentListProps = {
   slug: string;
+  searchQuery?: string;
+  selectedTopicId?: string | null;
+  scholarImageUrl?: string;
 };
 
 function contentHref(item: ScholarContentItemDto): string {
   return `/listings/${item.slug}`;
 }
 
-function ContentRow({ item }: { item: ScholarContentItemDto }) {
+export function ContentRow({
+  item,
+  scholarImageUrl,
+}: {
+  item: ScholarContentItemDto;
+  scholarImageUrl?: string;
+}) {
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
   const isRtl = useIsRtl();
 
   const title = pickContentField(item.title, item.original?.title, showOriginal);
+  const artworkUrl = item.coverImageUrl || item.scholarImageUrl || scholarImageUrl;
 
   const getMetadataText = () => {
-    const typeLabel =
-      item.type === "series"
-        ? t("scholarContent.typeSeries", "Series")
-        : item.type === "collection"
-          ? t("scholarContent.typeCollection", "Collection")
-          : t("scholarContent.typeSingle", "Single");
+    const parts: string[] = [];
 
-    if (item.type !== "single" && item.lectureCount != null) {
-      return t("scholarContent.metadataWithCount", "{{type}} · {{count}} lectures", {
-        type: typeLabel,
-        count: item.lectureCount,
-      });
+    if (item.lectureCount != null && item.lectureCount > 0) {
+      if (item.lectureCount === 1) {
+        parts.push(t("scholarContent.statLectureSingular", "1 lecture"));
+      } else {
+        parts.push(
+          t("scholarContent.statLecturesFormat", "{{count}} lectures", {
+            count: item.lectureCount,
+          }),
+        );
+      }
     }
 
-    if (item.type === "single" && item.durationSeconds != null) {
-      const minutes = Math.round(item.durationSeconds / 60);
-      return t("scholarContent.metadataWithDuration", "{{type}} · {{minutes}}m", {
-        type: typeLabel,
-        minutes,
-      });
+    if (item.durationSeconds != null && item.durationSeconds > 0) {
+      const hours = Math.floor(item.durationSeconds / 3600);
+      const minutes = Math.round((item.durationSeconds % 3600) / 60);
+      if (hours > 0) {
+        parts.push(minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`);
+      } else {
+        parts.push(`${minutes}m`);
+      }
     }
 
-    return typeLabel;
+    return parts.join(" · ");
   };
 
   return (
     <Link href={contentHref(item)} className={`${styles.row} listRow`}>
       <div className={styles.iconSection}>
-        {item.coverImageUrl ? (
+        {artworkUrl ? (
           <Image
-            src={item.coverImageUrl}
+            src={artworkUrl}
             alt=""
             width={48}
             height={48}
@@ -66,13 +78,7 @@ function ContentRow({ item }: { item: ScholarContentItemDto }) {
           />
         ) : (
           <div className={styles.fallbackIcon}>
-            {item.type === "collection" ? (
-              <FolderClosed size={20} />
-            ) : item.type === "series" ? (
-              <BookOpen size={20} />
-            ) : (
-              <Play size={20} fill="currentColor" />
-            )}
+            <Play size={20} fill="currentColor" />
           </div>
         )}
       </div>
@@ -93,62 +99,53 @@ function ContentRow({ item }: { item: ScholarContentItemDto }) {
   );
 }
 
-export function ScholarContentList({ slug }: ScholarContentListProps) {
+export function ScholarContentList({
+  slug,
+  searchQuery = "",
+  selectedTopicId = null,
+  scholarImageUrl,
+}: ScholarContentListProps) {
   const { t } = useTranslation();
-  const {
-    data: topicsData,
-    isFetching: isTopicsFetching,
-    isSuccess: isTopicsSettled,
-    isError: isTopicsError,
-  } = useScholarTopics(slug);
-  const hasTopics = (topicsData?.topics?.length ?? 0) > 0;
+  const { data: topicsData, isFetching: isTopicsFetching } = useScholarTopics(slug);
+  const { data: flatContent, isFetching: isFlatFetching } = useScholarContent(slug);
 
-  // Flat-list fallback: only fetch once topics query has settled (success or error) AND returned empty
-  const { data: flatContent, isFetching: isFlatFetching } = useScholarContent(slug, {
-    enabled: (isTopicsSettled || isTopicsError) && !hasTopics,
-  });
+  const query = searchQuery.trim().toLowerCase();
 
-  if (isTopicsFetching && !topicsData) {
+  if ((isTopicsFetching && !topicsData) || (isFlatFetching && !flatContent && !topicsData)) {
     return <p className={styles.empty}>{t("common.loading", "Loading…")}</p>;
   }
 
-  // Topic-grouped display — sort alphabetically by topicName for consistent ordering
-  if (hasTopics && topicsData) {
-    const sortedTopics = topicsData.topics.toSorted((a, b) =>
-      a.topicName.localeCompare(b.topicName),
-    );
+  const matchesQuery = (item: ScholarContentItemDto) => {
+    if (!query) return true;
+    const title = item.title.toLowerCase();
+    const originalTitle = item.original?.title?.toLowerCase() ?? "";
+    return title.includes(query) || originalTitle.includes(query);
+  };
+
+  // Determine items to display:
+  // If a single topic filter chip is selected, retrieve items for that topic.
+  // Otherwise, fallback to flat top-level content list.
+  let rawItems: ScholarContentItemDto[] = [];
+  if (selectedTopicId && topicsData?.topics) {
+    const topic = topicsData.topics.find((t) => t.topicId === selectedTopicId);
+    rawItems = topic?.items ?? [];
+  } else {
+    rawItems = flatContent?.items ?? [];
+  }
+
+  const filteredItems = rawItems.filter(matchesQuery);
+
+  if (filteredItems.length === 0) {
     return (
-      <div className={styles.root}>
-        {sortedTopics.map((topic) => (
-          <div key={topic.topicId} className={styles.topicSection}>
-            <h2 className={styles.topicHeader}>{topic.topicName}</h2>
-            <div className={styles.list}>
-              {topic.items.map((item) => (
-                <ContentRow key={item.id} item={item} />
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
+      <p className={styles.empty}>{t("scholarContent.empty", "No published content found.")}</p>
     );
-  }
-
-  // Graceful fallback: flat list for scholars without topic tags
-  if (isFlatFetching && !flatContent) {
-    return <p className={styles.empty}>{t("common.loading", "Loading…")}</p>;
-  }
-
-  const flatItems = flatContent?.items ?? [];
-
-  if (flatItems.length === 0) {
-    return <p className={styles.empty}>{t("scholarContent.empty", "No published content yet.")}</p>;
   }
 
   return (
     <div className={styles.root}>
       <div className={styles.list}>
-        {flatItems.map((item) => (
-          <ContentRow key={item.id} item={item} />
+        {filteredItems.map((item) => (
+          <ContentRow key={item.id} item={item} scholarImageUrl={scholarImageUrl} />
         ))}
       </div>
     </div>
