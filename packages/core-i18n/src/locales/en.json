@@ -72,7 +72,8 @@
       "deleteConfirmWord": "DELETE",
       "signInCta": "Sign in to view your profile and roles.",
       "signInDesc": "Create an account or sign in to manage your profile and roles.",
-      "signIn": "Sign In"
+      "signIn": "Sign In",
+      "roles": "Roles"
     }
   },
   "tabs": {
@@ -104,8 +105,8 @@
     "subnav": {
       "explore": { "popular": "Popular", "recent": "Recent", "following": "Following" },
       "library": { "started": "Started", "saved": "Saved", "completed": "Completed" },
-      "account": { "general": "General", "profile": "Profile", "legal": "Legal" },
-      "settings": { "general": "General", "profile": "Profile", "legal": "Legal" },
+      "account": { "general": "General", "profile": "Profile" },
+      "settings": { "general": "General", "profile": "Profile" },
       "admin": { "topics": "Topics", "listings": "Listings" }
     }
   },
@@ -136,16 +137,6 @@
       "followedScholarsDesc": "Notify when a followed scholar posts",
       "newLectures": "New Lectures",
       "newLecturesDesc": "Notify when new lectures are published"
-    },
-    "legal": {
-      "title": "Legal",
-      "privacyPolicy": "Privacy Policy",
-      "privacyDesc": "How we collect and use your data.",
-      "privacySublabel": "Read our full privacy policy, including data collection, storage, and your rights.",
-      "view": "View →",
-      "termsOfUse": "Terms of Use",
-      "termsDesc": "Rules governing use of this service.",
-      "termsSublabel": "Read the terms and conditions governing your use of Salafi Durus."
     }
   },
   "support": {

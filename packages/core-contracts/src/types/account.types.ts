@@ -6,6 +6,7 @@ export const UserProfileDtoSchema = z.object({
   displayName: z.string(),
   avatarUrl: z.string().optional(),
   emailVerified: z.boolean(),
+  roles: z.array(z.string()),
   createdAt: z.string(),
   updatedAt: z.string(),
 });

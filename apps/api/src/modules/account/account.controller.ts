@@ -23,6 +23,7 @@ export class AccountController {
       name: string;
       image?: string | null;
       role: string;
+      roles: string[];
       emailVerified: boolean;
       createdAt: Date;
       updatedAt: Date;
