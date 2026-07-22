@@ -262,8 +262,6 @@ model Scholar {
   socialTelegram  String?
   socialYoutube   String?
   socialWebsite   String?
-  socialFacebook  String?
-  socialInstagram String?
 
   ingestionBatchId String?
   ingestionBatch   IngestionBatch? @relation("IngestBatchScholars", fields: [ingestionBatchId], references: [id])
