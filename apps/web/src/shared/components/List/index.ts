@@ -40,5 +40,6 @@ export const List = Object.assign(ListContainer, {
   }),
 });
 
-// Re-export types
+// Re-export components and types
+export { ListContainer, ListItem, ListItemActions };
 export type { ListContainerProps, ListItemProps, ListItemActionsProps };

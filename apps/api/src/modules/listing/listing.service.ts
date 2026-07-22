@@ -12,6 +12,8 @@ import type {
   TranslationViewDto,
   SaveListingTranslationDto,
   ListingRefDto,
+  ListingContentsDto,
+  LastPlayedLessonDto,
 } from '@sd/core-contracts';
 import { ListingRepository } from './listing.repo';
 
@@ -27,6 +29,16 @@ export class ListingService {
 
   async getRelated(id: string): Promise<RelatedListingDto[]> {
     return this.repo.findRelated(id);
+  }
+
+  async getContents(id: string): Promise<ListingContentsDto> {
+    const contents = await this.repo.findContentsById(id);
+    if (!contents) throw new NotFoundException(`Listing "${id}" not found`);
+    return contents;
+  }
+
+  async getLastPlayedLesson(id: string, userId: string): Promise<LastPlayedLessonDto | null> {
+    return this.repo.findLastPlayedLesson(id, userId);
   }
 
   listAdmin(params: {

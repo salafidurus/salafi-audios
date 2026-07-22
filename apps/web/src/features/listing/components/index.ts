@@ -1,18 +1,18 @@
-// Lecture Components
+// Listing Components
 export {
   LecturePlayButton,
   type LecturePlayButtonProps,
-} from "./lecture/lecture-play-button/LecturePlayButton";
+} from "./listing/lecture-play-button/LecturePlayButton";
 export {
   LectureSaveButton,
   type LectureSaveButtonProps,
-} from "./lecture/lecture-save-button/LectureSaveButton";
-export { LectureMeta, type LectureMetaProps } from "./lecture/lecture-meta/lecture-meta";
-export { TopicChips, type TopicChipsProps } from "./lecture/topic-chips/topic-chips";
+} from "./listing/lecture-save-button/LectureSaveButton";
+export { LectureMeta, type LectureMetaProps } from "./listing/lecture-meta/lecture-meta";
+export { TopicChips, type TopicChipsProps } from "./listing/topic-chips/topic-chips";
 export {
   SeriesContextBar,
   type SeriesContextBarProps,
-} from "./lecture/series-context-bar/series-context-bar";
+} from "./listing/series-context-bar/series-context-bar";
 
 // Scholar Components
 export {

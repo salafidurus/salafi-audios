@@ -14,6 +14,8 @@ export const endpoints = {
   },
   listings: {
     detail: (id: string) => `/listings/${id}`,
+    contents: (id: string) => `/listings/${id}/contents`,
+    lastPlayed: (id: string) => `/listings/${id}/last-played`,
   },
   explore: {
     list: "/explore",

@@ -1,9 +1,3 @@
-// Lecture Screens
-export {
-  LectureDetailScreen,
-  type LectureDetailScreenProps,
-} from "./lecture-detail/lecture-detail.screen";
-
 // Scholar Screens
 export {
   ScholarDetailScreen,
