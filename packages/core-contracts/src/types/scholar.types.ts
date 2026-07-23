@@ -35,7 +35,6 @@ export const ScholarViewDtoSchema = z.object({
   name: z.string(),
   bio: z.string().optional(),
   isActive: z.boolean(),
-  isKibar: z.boolean(),
   title: ScholarTitleSchema.optional(),
 });
 export type ScholarViewDto = z.infer<typeof ScholarViewDtoSchema>;
@@ -53,7 +52,6 @@ export const ScholarDetailDtoSchema = z.object({
   original: ScholarOriginalFieldsSchema.optional(),
   imageUrl: z.string().optional(),
   isActive: z.boolean(),
-  isKibar: z.boolean(),
   title: ScholarTitleSchema.optional(),
   socialTwitter: z.string().optional(),
   socialTelegram: z.string().optional(),
@@ -82,7 +80,6 @@ export const ScholarListItemDtoSchema = z.object({
   mainLanguage: LocaleSchema.optional(),
   originalLanguage: LocaleSchema.optional(),
   original: ScholarOriginalFieldsSchema.optional(),
-  isKibar: z.boolean(),
   title: ScholarTitleSchema.optional(),
   lectureCount: z.number(),
 });
@@ -142,8 +139,6 @@ export const CreateScholarDtoSchema = z.object({
   slug: z.string().min(1, "Slug must not be empty"),
   bio: z.string().optional(),
   imageUrl: z.string().optional(),
-  isKibar: z.boolean().optional(),
-  isFeatured: z.boolean().optional(),
   isActive: z.boolean().optional(),
   country: CountryCodeSchema.default("SA"),
   mainLanguage: LocaleSchema.default("ar"),
@@ -187,7 +182,6 @@ export const AdminScholarListItemDtoSchema = z.object({
   mainLanguage: LocaleSchema.optional(),
   imageUrl: z.string().optional(),
   isActive: z.boolean(),
-  isKibar: z.boolean(),
   title: ScholarTitleSchema.optional(),
   socialTwitter: z.string().optional(),
   socialTelegram: z.string().optional(),

@@ -246,8 +246,6 @@ model Scholar {
   mainLanguage Locale        @default(ar)
   imageUrl     String?
   isActive     Boolean       @default(true)
-  isKibar      Boolean       @default(false)
-  isFeatured   Boolean       @default(false)
   title        ScholarTitle?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
@@ -258,10 +256,10 @@ model Scholar {
   deletedBy String? @db.Uuid
 
   // Social links
-  socialTwitter   String?
-  socialTelegram  String?
-  socialYoutube   String?
-  socialWebsite   String?
+  socialTwitter  String?
+  socialTelegram String?
+  socialYoutube  String?
+  socialWebsite  String?
 
   ingestionBatchId String?
   ingestionBatch   IngestionBatch? @relation("IngestBatchScholars", fields: [ingestionBatchId], references: [id])

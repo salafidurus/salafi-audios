@@ -46,4 +46,14 @@ describe("ScholarItem", () => {
 
     expect(screen.getByRole("button", { name: /edit ibn baz/i })).toBeInTheDocument();
   });
+
+  it("never renders a KIBAR badge (isKibar removed)", () => {
+    (useAdminPermissions as Mock<any>).mockReturnValue({
+      data: { permissions: ["SCHOLARS_VIEW"] },
+    });
+
+    render(<Scholar.Item scholar={baseScholar} onEdit={vi.fn()} />);
+
+    expect(screen.queryByText("KIBAR")).not.toBeInTheDocument();
+  });
 });
