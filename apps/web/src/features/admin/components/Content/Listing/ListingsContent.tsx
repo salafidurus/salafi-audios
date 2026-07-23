@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { queryKeys, type AdminListingDetailDto } from "@sd/core-contracts";
+import { queryKeys } from "@sd/core-contracts";
 import { useInfiniteAdminListings } from "@sd/domain-content";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { useTranslation } from "@/core/i18n/use-translation";

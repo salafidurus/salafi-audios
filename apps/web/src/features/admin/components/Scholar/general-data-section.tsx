@@ -30,7 +30,6 @@ export function GeneralDataSection({ formData, dispatch, onImageStaged }: Genera
         <div className={styles.avatarColumn}>
           <ScholarAvatarEditor
             imageUrl={formData.imageUrl}
-            slug={formData.slug}
             onImageStaged={onImageStaged}
           />
         </div>

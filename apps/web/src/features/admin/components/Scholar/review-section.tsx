@@ -10,7 +10,6 @@ import styles from "./review-section.module.css";
 interface ReviewSectionProps {
   formData: CreateScholarDto;
   changedFields: Record<string, boolean>;
-  mainLanguageName?: string;
   translations?: Array<{ locale: Locale; name?: string; bio?: string | null }>;
   stagedImagePreview: string | null;
 }
@@ -18,7 +17,6 @@ interface ReviewSectionProps {
 export function ReviewSection({
   formData,
   changedFields,
-  mainLanguageName,
   translations = [],
   stagedImagePreview,
 }: ReviewSectionProps) {

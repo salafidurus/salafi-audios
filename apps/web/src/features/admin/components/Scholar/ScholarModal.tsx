@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { Modal } from "@/shared/components/Modal";
 import type { CreateScholarDto } from "@sd/core-contracts";
-import { SUPPORTED_LOCALES, type Locale } from "@sd/core-contracts";
+import type { Locale } from "@sd/core-contracts";
 import { sanitizeError } from "@sd/utils-error";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { GeneralDataSection } from "./general-data-section";
@@ -284,7 +284,6 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar, scholarId }: Sc
             <ReviewSection
               formData={formData}
               changedFields={changedFields}
-              mainLanguageName={getLocaleLabel(formData.mainLanguage as Locale)}
               translations={secondaryLocales.reduce<Array<{ locale: Locale; name?: string; bio?: string | null }>>((acc, locale) => {
                 const initial = state.initialTranslationChanges[locale];
                 const trans = { locale, name: translationChanges[locale]?.name, bio: translationChanges[locale]?.bio };

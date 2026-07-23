@@ -11,11 +11,10 @@ const MAX_SIZE_MB = 1;
 
 interface ScholarAvatarEditorProps {
   imageUrl?: string | null;
-  slug: string;
   onImageStaged: (file: File | null, preview: string | null) => void;
 }
 
-export function ScholarAvatarEditor({ imageUrl, slug, onImageStaged }: ScholarAvatarEditorProps) {
+export function ScholarAvatarEditor({ imageUrl, onImageStaged }: ScholarAvatarEditorProps) {
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(imageUrl ?? null);

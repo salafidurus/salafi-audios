@@ -2,12 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints, type Locale } from "@sd/core-contracts";
-import type {
-  ScholarListItemDto,
-  TopicDetailDto,
-  ListingRefDto,
-  AdminListingDetailDto,
-} from "@sd/core-contracts";
+import type { ScholarListItemDto, AdminListingDetailDto } from "@sd/core-contracts";
 import { useTopicsList } from "@sd/domain-search";
 import { useAdminListingSeriesByScholar } from "@sd/domain-content";
 import { useTranslation } from "@/core/i18n/use-translation";

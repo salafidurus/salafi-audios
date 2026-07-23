@@ -47,7 +47,6 @@ export function PersonalDataSection({
         <div className={styles.avatarColumn}>
           <ScholarAvatarEditor
             imageUrl={formData.imageUrl}
-            slug={formData.slug}
             onImageStaged={onImageStaged}
           />
         </div>
