@@ -438,7 +438,8 @@
       "kibarLabel": "من كبار العلماء",
       "featuredLabel": "مميز",
       "activeLabel": "نشط",
-      "searchPlaceholderDesktop": "البحث عن العلماء بالاسم أو المعرف..."
+      "searchPlaceholderDesktop": "البحث عن العلماء بالاسم أو المعرف...",
+      "noChangesMadeYet": "لا توجد تغييرات حتى الآن"
     },
     "users": {
       "title": "إدارة المستخدمين",
@@ -471,6 +472,16 @@
       "done": "تم",
       "loading": "جارٍ تحميل الصلاحيات...",
       "loadingRoles": "جارٍ تحميل الأدوار...",
+      "noPermissions": "لا توجد صلاحيات",
+      "groups": {
+        "scholars": "العلماء",
+        "listings": "المحتوى",
+        "topics": "المواضيع",
+        "translations": "التراجم",
+        "media": "الوسائط",
+        "users": "المستخدمون",
+        "live": "البث المباشر"
+      },
       "sections": {
         "scholars": "إدارة العلماء",
         "listings": "إدارة القوائم",
@@ -483,7 +494,42 @@
       "revoking": "جارٍ إلغاء الصلاحية...",
       "revokeButton": "إلغاء الصلاحية",
       "revokePrompt": "هل أنت متأكد من رغبتك في إلغاء صلاحية {{permission}} من المستخدم {{user}}؟",
-      "revokeWarning": "سيؤدي ذلك إلى إزالة إمكانية وصولهم إلى هذه الوظيفة."
+      "revokeWarning": "سيؤدي ذلك إلى إزالة إمكانية وصولهم إلى هذه الوظيفة.",
+      "items": {
+        "SCHOLARS_VIEW": { "label": "عرض العلماء", "desc": "عرض الملفات الشخصية للعلماء" },
+        "SCHOLARS_CREATE": { "label": "إضافة عالم", "desc": "إنشاء ملف شخصي جديد لعالم" },
+        "SCHOLARS_EDIT": { "label": "إدارة العلماء", "desc": "إضافة وتعديل وإزالة ملفات العلماء" },
+        "SCHOLARS_DELETE": { "label": "حذف العلماء", "desc": "حذف ملفات العلماء" },
+        "SCHOLARS_PUBLISH": { "label": "نشر العلماء", "desc": "نشر ملفات العلماء" },
+        "LISTINGS_VIEW": { "label": "عرض المحتوى", "desc": "عرض قائمة المحتوى" },
+        "LISTINGS_CREATE": { "label": "إنشاء محتوى", "desc": "إنشاء محتوى جديد" },
+        "LISTINGS_EDIT": {
+          "label": "إدارة المحتوى",
+          "desc": "نشر وأرشفة وإدارة المحاضرات والسلاسل"
+        },
+        "LISTINGS_DELETE": { "label": "حذف المحتوى", "desc": "حذف قائمة المحتوى" },
+        "LISTINGS_PUBLISH": { "label": "نشر المحتوى", "desc": "نشر المحتوى" },
+        "TOPICS_VIEW": { "label": "عرض المواضيع", "desc": "عرض المواضيع" },
+        "TOPICS_CREATE": { "label": "إنشاء مواضيع", "desc": "إنشاء مواضيع جديدة" },
+        "TOPICS_EDIT": { "label": "إدارة المواضيع", "desc": "إنشاء وتنظيم تصنيفات المواضيع" },
+        "TOPICS_DELETE": { "label": "حذف المواضيع", "desc": "حذف المواضيع" },
+        "TOPICS_PUBLISH": { "label": "نشر المواضيع", "desc": "نشر المواضيع" },
+        "TRANSLATIONS_VIEW": { "label": "عرض التراجم", "desc": "عرض التراجم" },
+        "TRANSLATIONS_CREATE": { "label": "إنشاء تراجم", "desc": "إنشاء تراجم جديدة" },
+        "TRANSLATIONS_EDIT": { "label": "تعديل التراجم", "desc": "تعديل التراجم" },
+        "TRANSLATIONS_DELETE": { "label": "حذف التراجم", "desc": "حذف التراجم" },
+        "TRANSLATIONS_PUBLISH": { "label": "نشر التراجم", "desc": "نشر التراجم" },
+        "MEDIA_UPLOAD": { "label": "رفع الوسائط", "desc": "رفع الملفات الصوتية والوسائط" },
+        "MEDIA_DELETE": { "label": "حذف الوسائط", "desc": "حذف ملفات الوسائط" },
+        "USERS_VIEW": { "label": "عرض المستخدمين", "desc": "عرض حسابات المستخدمين وتفاصيلهم" },
+        "USERS_EDIT": { "label": "تعديل المستخدمين", "desc": "تعديل حسابات المستخدمين" },
+        "USERS_DELETE": { "label": "حذف المستخدمين", "desc": "حذف حسابات المستخدمين" },
+        "USERS_GRANT_PERMISSIONS": {
+          "label": "إدارة الصلاحيات",
+          "desc": "منح وإلغاء صلاحيات المستخدمين"
+        },
+        "USERS_GRANT_ROLES": { "label": "إدارة الأدوار", "desc": "تعيين الأدوار للمستخدمين" }
+      }
     },
     "contents": {
       "deleteTitle": "حذف الموضوع؟",
@@ -524,8 +570,8 @@
         "warning": "لن تعود مرئية للمستخدمين بعد الآن."
       },
       "listing": {
-        "editTitle": "تعديل تفاصيل المحاضرة",
-        "newTitle": "تفاصيل محاضرة جديدة",
+        "editTitle": "تعديل تفاصيل المحتوى",
+        "newTitle": "تفاصيل محتوى جديدة",
         "titleLabel": "العنوان",
         "slugLabel": "المعرف",
         "slugPlaceholder": "توليد تلقائي في حال تركه فارغًا",
@@ -537,18 +583,28 @@
         "statusLabel": "الحالة",
         "statusPlaceholder": "اختر الحالة",
         "draft": "مسودة",
+        "review": "قيد المراجعة",
         "published": "منشور",
         "archived": "مؤرشف",
         "orderIndexLabel": "مؤشر الترتيب",
         "topicsLabel": "المواضيع",
         "noTopicsAvailable": "لا توجد مواضيع متاحة",
+        "uploadTab": "رفع الصوت",
+        "arrangeTab": "ترتيب",
+        "arrangeComingSoon": "قريبًا",
+        "languageLabel": "اللغة",
+        "audioDropzone": "اسحب وإفلت ملف الصوت هنا",
+        "clickToBrowse": "أو انقر لتصفح الملفات",
+        "extractingAudio": "جارٍ تحليل الملف الصوتي...",
+        "uploadingStorage": "جارٍ الرفع إلى التخزين...",
         "titleRequired": "العنوان مطلوب.",
         "scholarRequired": "العالم مطلوب.",
         "audioKeyRequired": "مفتاح الملف الصوتي مطلوب للإنشاء.",
-        "failedToSave": "فشل حفظ تفاصيل المحاضرة."
+        "failedToSave": "فشل حفظ تفاصيل المحتوى."
       }
     },
     "modal": {
+      "generalTab": "عام",
       "reviewTab": "مراجعة"
     }
   }

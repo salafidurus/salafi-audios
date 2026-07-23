@@ -22,6 +22,7 @@ vi.mock("@/features/settings/content-preference", () => ({
 
 vi.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({
+    i18n: { language: "en" },
     t: (key: string, fallback?: string) => fallback ?? key,
   }),
 }));

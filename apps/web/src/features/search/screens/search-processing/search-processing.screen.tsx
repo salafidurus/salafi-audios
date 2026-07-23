@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useInfiniteSearch, useTopicsList } from "@sd/domain-search";
+import { getLocalizedName } from "@sd/core-i18n";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useDebouncedSearch } from "@/shared/hooks";
@@ -19,7 +20,7 @@ export type SearchProcessingScreenProps = {
 
 export function SearchProcessingScreen({ searchKey }: SearchProcessingScreenProps) {
   const showOriginal = useShowOriginalContent();
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
   const { navigateToListing } = useListingNavigation();
   const { query, setQuery, debouncedQuery } = useDebouncedSearch({ initialValue: searchKey });
   const { data: topics = [] } = useTopicsList();
@@ -27,12 +28,16 @@ export function SearchProcessingScreen({ searchKey }: SearchProcessingScreenProp
 
   const filterChips = useMemo(() => {
     return topics
-      .toSorted((a, b) => a.name.en.localeCompare(b.name.en))
+      .toSorted((a, b) =>
+        getLocalizedName(a.name, i18n.language).localeCompare(
+          getLocalizedName(b.name, i18n.language),
+        ),
+      )
       .map((topic) => ({
         id: topic.slug,
-        label: topic.name.en,
+        label: getLocalizedName(topic.name, i18n.language),
       }));
-  }, [topics]);
+  }, [topics, i18n.language]);
 
   const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteSearch({
     query: debouncedQuery,
