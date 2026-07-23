@@ -26,15 +26,12 @@ const mockPrisma = {
   },
 };
 
-const draftTranslation = {
+const mockTranslation = {
   locale: 'ar',
-  status: 'draft',
   fields: { name: 'موضوع عربي' },
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
 };
-
-const publishedTranslation = { ...draftTranslation, status: 'published' };
 
 const mockTopicsService = {
   list: vi.fn<any>().mockResolvedValue([]),
@@ -44,10 +41,8 @@ const mockTopicsService = {
   listLectures: vi.fn<any>().mockResolvedValue([]),
   remove: vi.fn<any>(),
   listTranslations: vi.fn<any>().mockResolvedValue([]),
-  upsertTranslation: vi.fn<any>().mockResolvedValue(draftTranslation),
-  updateTranslation: vi.fn<any>().mockResolvedValue(draftTranslation),
-  publishTranslation: vi.fn<any>().mockResolvedValue(publishedTranslation),
-  unpublishTranslation: vi.fn<any>().mockResolvedValue(draftTranslation),
+  upsertTranslation: vi.fn<any>().mockResolvedValue(mockTranslation),
+  updateTranslation: vi.fn<any>().mockResolvedValue(mockTranslation),
 };
 
 async function buildApp(overrideGuard?: () => boolean | never): Promise<NestFastifyApplication> {
@@ -71,9 +66,7 @@ describe('TopicsTranslationsController — auth boundaries', () => {
   beforeEach(async () => {
     mockAuth.api.getSession.mockReset();
     vi.clearAllMocks();
-    mockTopicsService.upsertTranslation.mockResolvedValue(draftTranslation);
-    mockTopicsService.publishTranslation.mockResolvedValue(publishedTranslation);
-    mockTopicsService.unpublishTranslation.mockResolvedValue(draftTranslation);
+    mockTopicsService.upsertTranslation.mockResolvedValue(mockTranslation);
     app = await buildApp();
   });
 
@@ -91,12 +84,7 @@ describe('TopicsTranslationsController — auth boundaries', () => {
         const { userId, permission } = where.userId_permission;
         if (
           userId === 'u1' &&
-          [
-            'TRANSLATIONS_VIEW',
-            'TRANSLATIONS_CREATE',
-            'TRANSLATIONS_EDIT',
-            'TRANSLATIONS_PUBLISH',
-          ].includes(permission)
+          ['TRANSLATIONS_VIEW', 'TRANSLATIONS_CREATE', 'TRANSLATIONS_EDIT'].includes(permission)
         ) {
           return { userId, permission, grantedAt: new Date() };
         }
@@ -104,30 +92,16 @@ describe('TopicsTranslationsController — auth boundaries', () => {
       });
     });
 
-    it('POST /topics/:id/translations creates a draft translation', async () => {
+    it('POST /topics/:id/translations creates a translation', async () => {
       const res = await request(app.getHttpServer())
         .post('/topics/t1/translations')
         .send({ locale: 'ar', name: 'موضوع عربي' })
         .expect(201);
-      expect(res.body.status).toBe('draft');
-    });
-
-    it('POST /topics/:id/translations/:locale/publish publishes the translation', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/topics/t1/translations/ar/publish')
-        .expect(201);
-      expect(res.body.status).toBe('published');
-    });
-
-    it('POST /topics/:id/translations/:locale/unpublish unpublishes the translation', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/topics/t1/translations/ar/unpublish')
-        .expect(201);
-      expect(res.body.status).toBe('draft');
+      expect(res.body.locale).toBe('ar');
     });
 
     it('GET /topics/:id/translations lists translations', async () => {
-      mockTopicsService.listTranslations.mockResolvedValue([draftTranslation]);
+      mockTopicsService.listTranslations.mockResolvedValue([mockTranslation]);
       const res = await request(app.getHttpServer()).get('/topics/t1/translations').expect(200);
       expect(Array.isArray(res.body)).toBe(true);
     });

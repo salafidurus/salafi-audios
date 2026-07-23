@@ -8,7 +8,6 @@ import { Modal } from "@/shared/components/Modal";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { sanitizeError } from "@sd/utils-error";
 import { Content } from "../Content";
-import type { TopicForEdit } from "../Content/TopicModal";
 import { deleteTopic } from "../../api/admin.api";
 import styles from "../../screens/admin-contents/admin-contents.screen.module.css";
 

@@ -274,13 +274,12 @@ export class ScholarsRepository {
         },
       },
       select: {
-        topicId: true,
         topic: {
           select: {
             id: true,
             name: true,
             translations: {
-              where: { locale: locale as DbLocale, status: 'published' },
+              where: { locale: locale as DbLocale },
               select: { name: true },
               take: 1,
             },
@@ -335,7 +334,7 @@ export class ScholarsRepository {
 
       const recencyAt = (r.publishedAt ?? r.createdAt).toISOString();
 
-      const bucket = ensureTopic(row.topicId, topicName);
+      const bucket = ensureTopic(row.topic.id, topicName);
       bucket.items.push({
         id: r.id,
         slug: r.slug,
