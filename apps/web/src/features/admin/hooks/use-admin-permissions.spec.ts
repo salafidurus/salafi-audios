@@ -2,13 +2,9 @@ import { describe, it, expect, beforeEach, vi } from "bun:test";
 import { useAdminPermissions } from "./use-admin-permissions";
 import { useAccountProfile } from "@sd/domain-account";
 
-vi.mock("@sd/domain-account", () => {
-  const actual = vi.importActual("@sd/domain-account");
-  return {
-    ...actual,
-    useAccountProfile: vi.fn<any>(),
-  };
-});
+vi.mock("@sd/domain-account", () => ({
+  useAccountProfile: vi.fn(),
+}));
 
 describe("useAdminPermissions", () => {
   beforeEach(() => {
