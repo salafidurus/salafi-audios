@@ -5,6 +5,7 @@ import {
   ScholarOriginalFieldsSchema,
 } from "./localization.types";
 import { CountryCodeSchema } from "./country.types";
+import { TranslationViewDtoSchema } from "./translation.types";
 
 export const ScholarTitleSchema = z.enum(["allamah", "sheikh", "ustadh", "akh"]);
 export type ScholarTitle = z.infer<typeof ScholarTitleSchema>;
@@ -170,6 +171,28 @@ export const UpdateScholarTranslationDtoSchema = z.object({
   bio: z.string().nullable().optional(),
 });
 export type UpdateScholarTranslationDto = z.infer<typeof UpdateScholarTranslationDtoSchema>;
+
+export const ScholarFormDataDtoSchema = z.object({
+  scholar: z.object({
+    id: z.string(),
+    name: z.string(),
+    slug: z.string(),
+    bio: z.string().optional(),
+    imageUrl: z.string().optional(),
+    country: CountryCodeSchema.optional(),
+    mainLanguage: LocaleSchema.optional(),
+    isActive: z.boolean(),
+    title: ScholarTitleSchema.optional(),
+    socialTwitter: z.string().optional(),
+    socialTelegram: z.string().optional(),
+    socialYoutube: z.string().optional(),
+    socialWebsite: z.string().optional(),
+    createdAt: z.string(),
+    updatedAt: z.string().optional(),
+  }),
+  translations: z.array(TranslationViewDtoSchema),
+});
+export type ScholarFormDataDto = z.infer<typeof ScholarFormDataDtoSchema>;
 
 const AdminScholarTranslationSchema = z.object({
   locale: LocaleSchema,

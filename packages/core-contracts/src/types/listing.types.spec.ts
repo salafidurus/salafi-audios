@@ -3,6 +3,7 @@ import {
   AdminListingDetailDtoSchema,
   CreateListingDtoSchema,
   AdminListingUpdateDtoSchema,
+  ListingFormDataDtoSchema,
 } from "./listing.types";
 
 describe("AdminListingDetailDtoSchema (Bug 4 fix: language type)", () => {
@@ -139,5 +140,82 @@ describe("AdminListingUpdateDtoSchema (array-shaped translations - Bug 1 fix)", 
       ],
     });
     expect(result.translations).toHaveLength(2);
+  });
+});
+
+describe("ListingFormDataDtoSchema (getFormData response shape)", () => {
+  it("parses valid form data with listing and translations array", () => {
+    const result = ListingFormDataDtoSchema.parse({
+      listing: {
+        id: "listing-1",
+        slug: "test-lecture",
+        title: "Test Lecture",
+        format: "single",
+        language: "ar",
+        status: "draft",
+        scholarId: "scholar-1",
+        scholarName: "Scholar Name",
+        topics: ["topic-1"],
+        createdAt: "2026-07-23T00:00:00.000Z",
+      },
+      translations: [
+        {
+          locale: "en",
+          status: "draft",
+          fields: { title: "Test Lecture", description: "Description in English" },
+          createdAt: "2026-07-23T00:00:00.000Z",
+          updatedAt: "2026-07-23T00:00:00.000Z",
+        },
+      ],
+    });
+    expect(result.listing.id).toBe("listing-1");
+    expect(result.translations).toHaveLength(1);
+    expect(result.translations[0].locale).toBe("en");
+    expect(result.translations[0].fields.title).toBe("Test Lecture");
+  });
+
+  it("accepts form data with empty translations array", () => {
+    const result = ListingFormDataDtoSchema.parse({
+      listing: {
+        id: "listing-1",
+        slug: "test-lecture",
+        title: "Test Lecture",
+        format: "single",
+        status: "draft",
+        scholarId: "scholar-1",
+        scholarName: "Scholar Name",
+        topics: [],
+        createdAt: "2026-07-23T00:00:00.000Z",
+      },
+      translations: [],
+    });
+    expect(result.translations).toHaveLength(0);
+  });
+
+  it("includes optional listing fields when present", () => {
+    const result = ListingFormDataDtoSchema.parse({
+      listing: {
+        id: "listing-1",
+        slug: "test-lecture",
+        title: "Test Lecture",
+        description: "Lecture description",
+        format: "series",
+        language: "ar",
+        status: "published",
+        orderIndex: 5,
+        durationSeconds: 3600,
+        scholarId: "scholar-1",
+        scholarName: "Scholar Name",
+        parentId: "parent-1",
+        topics: ["topic-1", "topic-2"],
+        audioUrl: "https://example.com/audio.mp3",
+        createdAt: "2026-07-23T00:00:00.000Z",
+        updatedAt: "2026-07-23T00:00:00.000Z",
+      },
+      translations: [],
+    });
+    expect(result.listing.description).toBe("Lecture description");
+    expect(result.listing.orderIndex).toBe(5);
+    expect(result.listing.topics).toHaveLength(2);
   });
 });

@@ -1,5 +1,9 @@
 import { describe, it, expect } from "bun:test";
-import { AdminScholarListItemDtoSchema, CreateScholarDtoSchema } from "./scholar.types";
+import {
+  AdminScholarListItemDtoSchema,
+  CreateScholarDtoSchema,
+  ScholarFormDataDtoSchema,
+} from "./scholar.types";
 
 describe("AdminScholarTranslationSchema (via AdminScholarListItemDtoSchema)", () => {
   it("parses valid scholar list item with translation locale", () => {
@@ -107,5 +111,69 @@ describe("CreateScholarDtoSchema (array-shaped translations - Bug 1 fix)", () =>
         translations: [{ locale: "fr", name: "test", bio: null }],
       }),
     ).toThrow();
+  });
+});
+
+describe("ScholarFormDataDtoSchema (getFormData response shape)", () => {
+  it("parses valid form data with scholar and translations array", () => {
+    const result = ScholarFormDataDtoSchema.parse({
+      scholar: {
+        id: "scholar-1",
+        name: "Test Scholar",
+        slug: "test-scholar",
+        mainLanguage: "ar",
+        isActive: true,
+        createdAt: "2026-07-23T00:00:00.000Z",
+      },
+      translations: [
+        {
+          locale: "en",
+          status: "draft",
+          fields: { name: "Test Scholar", bio: "Bio in English" },
+          createdAt: "2026-07-23T00:00:00.000Z",
+          updatedAt: "2026-07-23T00:00:00.000Z",
+        },
+      ],
+    });
+    expect(result.scholar.id).toBe("scholar-1");
+    expect(result.translations).toHaveLength(1);
+    expect(result.translations[0].locale).toBe("en");
+    expect(result.translations[0].fields.name).toBe("Test Scholar");
+  });
+
+  it("accepts form data with empty translations array", () => {
+    const result = ScholarFormDataDtoSchema.parse({
+      scholar: {
+        id: "scholar-1",
+        name: "Test Scholar",
+        slug: "test-scholar",
+        isActive: true,
+        createdAt: "2026-07-23T00:00:00.000Z",
+      },
+      translations: [],
+    });
+    expect(result.translations).toHaveLength(0);
+  });
+
+  it("includes optional scholar fields when present", () => {
+    const result = ScholarFormDataDtoSchema.parse({
+      scholar: {
+        id: "scholar-1",
+        name: "Test Scholar",
+        slug: "test-scholar",
+        bio: "Bio text",
+        imageUrl: "https://example.com/image.jpg",
+        country: "SA",
+        mainLanguage: "ar",
+        title: "allamah",
+        socialTwitter: "https://twitter.com/test",
+        isActive: true,
+        createdAt: "2026-07-23T00:00:00.000Z",
+        updatedAt: "2026-07-23T00:00:00.000Z",
+      },
+      translations: [],
+    });
+    expect(result.scholar.bio).toBe("Bio text");
+    expect(result.scholar.title).toBe("allamah");
   });
 });

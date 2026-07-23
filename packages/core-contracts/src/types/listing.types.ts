@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { StatusValueSchema } from "./common.types";
 import { ContentOriginalFieldsSchema, LocaleSchema } from "./localization.types";
+import { TranslationViewDtoSchema } from "./translation.types";
 
 /**
  * A **Listing** is any top-level, browsable content unit — the thing users
@@ -227,6 +228,29 @@ export const CreateListingDtoSchema = z.object({
     .optional(),
 });
 export type CreateListingDto = z.infer<typeof CreateListingDtoSchema>;
+
+export const ListingFormDataDtoSchema = z.object({
+  listing: z.object({
+    id: z.string(),
+    slug: z.string(),
+    title: z.string(),
+    description: z.string().optional(),
+    format: ListingFormatSchema,
+    language: LocaleSchema.optional(),
+    status: StatusValueSchema,
+    orderIndex: z.number().optional(),
+    durationSeconds: z.number().optional(),
+    scholarId: z.string(),
+    scholarName: z.string(),
+    parentId: z.string().optional(),
+    topics: z.array(z.string()),
+    audioUrl: z.string().optional(),
+    createdAt: z.string(),
+    updatedAt: z.string().optional(),
+  }),
+  translations: z.array(TranslationViewDtoSchema),
+});
+export type ListingFormDataDto = z.infer<typeof ListingFormDataDtoSchema>;
 
 export const SaveListingTranslationDtoSchema = z.object({
   locale: LocaleSchema,
