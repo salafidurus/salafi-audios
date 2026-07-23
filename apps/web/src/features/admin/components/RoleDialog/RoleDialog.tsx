@@ -140,6 +140,9 @@ export function RoleDialog({
       },
     );
 
+    // Invalidate query immediately to trigger refetch
+    queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
+
     // Call callback immediately to close or update parent view
     onRolesChange?.();
     onClose();
@@ -166,8 +169,6 @@ export function RoleDialog({
       console.error("Failed to complete batch role updates", error);
     } finally {
       setSaving(false);
-      // Re-fetch to ensure data integrity
-      queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
     }
   };
 

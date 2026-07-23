@@ -207,6 +207,9 @@ export function PermissionsDialog({
     );
 
     // Call callback immediately to close or update parent view
+    // Invalidate query immediately to trigger refetch
+    queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
+
     onPermissionsChange?.();
     onClose();
 
@@ -232,8 +235,6 @@ export function PermissionsDialog({
       console.error("Failed to complete batch permission updates", error);
     } finally {
       setSaving(false);
-      // Re-fetch to ensure data integrity
-      queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
     }
   };
 
