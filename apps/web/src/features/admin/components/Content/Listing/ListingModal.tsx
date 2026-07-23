@@ -1,23 +1,29 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
-import type {
-  ScholarListItemDto,
-  TopicDetailDto,
-  ListingRefDto,
-  AdminListingDetailDto,
-} from "@sd/core-contracts";
+import React, { useState, useEffect, useRef } from "react";
+import { useApiQuery, queryKeys, httpClient, endpoints, type Locale } from "@sd/core-contracts";
+import type { ScholarListItemDto, AdminListingDetailDto } from "@sd/core-contracts";
 import { useTopicsList } from "@sd/domain-search";
 import { useAdminListingSeriesByScholar } from "@sd/domain-content";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { Modal } from "@/shared/components/Modal";
 import { AudioUploader as AudioUploaderComponent } from "./AudioUploader/AudioUploader";
-import { createLecture, updateLecture } from "@/features/admin/api/admin-lectures.api";
+import {
+  createLecture,
+  updateLecture,
+  fetchListingFormData,
+} from "@/features/admin/api/admin-lectures.api";
+import { sanitizeError } from "@sd/utils-error";
+import {
+  getSecondaryLocales,
+  buildTranslationsPayload,
+  getLocaleLabel,
+} from "@/features/admin/utils/locale-tabs";
+import { SUPPORTED_LOCALES } from "@sd/core-contracts";
 import { ListingGeneralSection } from "./ListingGeneralSection";
 import { ListingTranslatableFields } from "./ListingTranslatableFields";
 import { ListingReviewSection } from "./ListingReviewSection";
-import { useListingForm, type Locale } from "@/features/admin/hooks/Content/useListingForm";
+import { useListingForm } from "@/features/admin/hooks/Content/useListingForm";
 import styles from "./listing-modal.module.css";
 
 interface ListingModalProps {
@@ -25,6 +31,7 @@ interface ListingModalProps {
   onClose: () => void;
   onSuccess: () => void;
   listing?: AdminListingDetailDto | null;
+  listingId?: string | null;
   initialAudioData?: {
     audioKey: string;
     durationSeconds: number;
@@ -41,21 +48,68 @@ export function ListingModal({
   onClose,
   onSuccess,
   listing,
+  listingId,
   initialAudioData,
   showAudioUploadTab,
   onAudioUploadComplete,
 }: ListingModalProps) {
   const { t } = useTranslation();
+  const loadingRef = useRef(false);
+  const fetchErrorRef = useRef<string | null>(null);
   const [activeTab, setActiveTab] = useState<
     "general" | "main" | "other" | "upload" | "arrange" | "review"
   >(showAudioUploadTab && !listing && !initialAudioData ? "upload" : "general");
   const { state, dispatch } = useListingForm(listing, initialAudioData);
   const { title, slug, description, scholarId, language, translationChanges, saving } = state;
 
+  const mainLocale = (language || "ar") as Locale;
+  const otherLocale: Locale = mainLocale === "en" ? "ar" : "en";
+
   useEffect(() => {
     if (!isOpen) return;
-    setActiveTab(!listing && !initialAudioData ? "upload" : "general");
-  }, [isOpen, listing, initialAudioData]);
+    setActiveTab(!listing && !listingId && !initialAudioData ? "upload" : "general");
+  }, [isOpen, listing, listingId, initialAudioData]);
+
+  // Fetch form data when opening modal in edit mode with listingId
+  useEffect(() => {
+    if (!isOpen) {
+      loadingRef.current = false;
+      fetchErrorRef.current = null;
+      return;
+    }
+
+    if (!listingId) {
+      // Create mode - no fetch needed
+      loadingRef.current = false;
+      fetchErrorRef.current = null;
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadFormData = async () => {
+      loadingRef.current = true;
+      fetchErrorRef.current = null;
+      try {
+        const data = await fetchListingFormData(listingId);
+        if (!cancelled) {
+          dispatch({ type: "INIT_STATE", data });
+        }
+      } catch (err) {
+        if (!cancelled) {
+          fetchErrorRef.current = sanitizeError(err);
+        }
+      } finally {
+        loadingRef.current = false;
+      }
+    };
+
+    loadFormData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, listingId, dispatch]);
 
   const { data: scholarsData } = useApiQuery<{ scholars: ScholarListItemDto[] }>(
     [...queryKeys.scholars.list.all()],
@@ -139,18 +193,13 @@ export function ListingModal({
           language,
         };
 
-        const otherLocale = language === "en" ? "ar" : "en";
-        const translation = translationChanges[otherLocale];
-        if (translation.title || translation.description) {
-          payload.translations = {
-            [otherLocale]: {
-              ...(translation.title && { title: translation.title }),
-              ...(translation.description !== undefined && {
-                description: translation.description,
-              }),
-            },
-          };
-        }
+        // Build translations array using utility (N-locale safe)
+        const secondaryLocales = getSecondaryLocales(mainLocale);
+        payload.translations = buildTranslationsPayload(
+          translationChanges,
+          secondaryLocales,
+          (v) => !!(v?.title || v?.description),
+        );
 
         await updateLecture(listing.id, payload);
       } else {
@@ -178,18 +227,13 @@ export function ListingModal({
           language,
         };
 
-        const otherLocale = language === "en" ? "ar" : "en";
-        const translation = translationChanges[otherLocale];
-        if (translation.title || translation.description) {
-          payload.translations = {
-            [otherLocale]: {
-              ...(translation.title && { title: translation.title }),
-              ...(translation.description !== undefined && {
-                description: translation.description,
-              }),
-            },
-          };
-        }
+        // Build translations array using utility (N-locale safe)
+        const secondaryLocales = getSecondaryLocales(mainLocale);
+        payload.translations = buildTranslationsPayload(
+          translationChanges,
+          secondaryLocales,
+          (v) => !!(v?.title || v?.description),
+        );
 
         await createLecture(payload);
       }
@@ -210,8 +254,6 @@ export function ListingModal({
   const scholars = scholarsData?.scholars ?? [];
   const topics = topicsData ?? [];
   const series = seriesData ?? [];
-  const mainLocale = language;
-  const otherLocale = language === "en" ? "ar" : "en";
 
   return (
     <Modal

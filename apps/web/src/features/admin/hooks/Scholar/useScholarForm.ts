@@ -1,11 +1,12 @@
 import { useReducer } from "react";
-import type { CreateScholarDto } from "@sd/core-contracts";
+import type { CreateScholarDto, ScholarFormDataDto, Locale } from "@sd/core-contracts";
 import type { ScholarForEdit } from "../../components/Scholar/ScholarModal";
 
 export type FormState = {
   formData: CreateScholarDto;
   initialFormData: CreateScholarDto;
-  translationChanges: Record<"en" | "ar", { name?: string; bio?: string | null }>;
+  translationChanges: Partial<Record<Locale, { name?: string; bio?: string | null }>>;
+  initialTranslationChanges: Partial<Record<Locale, { name?: string; bio?: string | null }>>;
   saving: boolean;
   error: string | null;
   stagedImageFile: File | null;
@@ -14,12 +15,13 @@ export type FormState = {
 
 export type FormAction =
   | { type: "INIT_FORM"; scholar: ScholarForEdit | null }
+  | { type: "INIT_FORM"; data: ScholarFormDataDto }
   | {
       type: "UPDATE_FIELD";
       field: keyof CreateScholarDto;
       value: string | boolean | Record<string, { name: string }> | undefined;
     }
-  | { type: "UPDATE_TRANSLATION"; locale: "en" | "ar"; field: "name" | "bio"; value: string }
+  | { type: "UPDATE_TRANSLATION"; locale: Locale; field: "name" | "bio"; value: string }
   | { type: "SET_SAVING"; saving: boolean }
   | { type: "SET_ERROR"; error: string | null }
   | { type: "SET_STAGED_IMAGE"; file: File | null; preview: string | null };
@@ -59,16 +61,60 @@ function getInitialFormData(scholar: ScholarForEdit | null): CreateScholarDto {
 function formReducer(state: FormState, action: FormAction): FormState {
   switch (action.type) {
     case "INIT_FORM": {
-      const initialData = getInitialFormData(action.scholar);
-      return {
-        ...state,
-        formData: initialData,
-        initialFormData: initialData,
-        translationChanges: { en: {}, ar: {} },
-        error: null,
-        stagedImageFile: null,
-        stagedImagePreview: null,
-      };
+      if ("data" in action && action.data) {
+        // New pattern: initialize from fetched ScholarFormDataDto
+        const { scholar, translations } = action.data;
+        const formData: CreateScholarDto = {
+          name: scholar.name,
+          slug: scholar.slug,
+          bio: scholar.bio ?? "",
+          imageUrl: scholar.imageUrl ?? "",
+          isActive: scholar.isActive ?? true,
+          country: (scholar.country ?? "") as CreateScholarDto["country"],
+          mainLanguage: (scholar.mainLanguage ?? "ar") as Locale,
+          title: (scholar.title ?? undefined) as CreateScholarDto["title"],
+          socialTwitter: scholar.socialTwitter ?? "",
+          socialTelegram: scholar.socialTelegram ?? "",
+          socialYoutube: scholar.socialYoutube ?? "",
+          socialWebsite: scholar.socialWebsite ?? "",
+        };
+
+        // Map translations array to translationChanges Record, excluding mainLanguage
+        const translationChanges: Partial<Record<Locale, { name?: string; bio?: string | null }>> = {};
+        for (const trans of translations) {
+          if (trans.locale !== formData.mainLanguage) {
+            translationChanges[trans.locale] = {
+              name: trans.fields?.name ?? undefined,
+              bio: trans.fields?.bio ?? undefined,
+            };
+          }
+        }
+
+        return {
+          ...state,
+          formData,
+          initialFormData: formData,
+          translationChanges,
+          initialTranslationChanges: translationChanges,
+          error: null,
+          stagedImageFile: null,
+          stagedImagePreview: null,
+        };
+      } else if ("scholar" in action) {
+        // Old pattern: initialize from ScholarForEdit (backward compat)
+        const initialData = getInitialFormData(action.scholar);
+        return {
+          ...state,
+          formData: initialData,
+          initialFormData: initialData,
+          translationChanges: {},
+          initialTranslationChanges: {},
+          error: null,
+          stagedImageFile: null,
+          stagedImagePreview: null,
+        };
+      }
+      return state;
     }
     case "UPDATE_FIELD":
       return {
@@ -106,7 +152,8 @@ function initFormState(scholar: ScholarForEdit | null): FormState {
   return {
     formData,
     initialFormData: formData,
-    translationChanges: { en: {}, ar: {} },
+    translationChanges: {},
+    initialTranslationChanges: {},
     saving: false,
     error: null,
     stagedImageFile: null,

@@ -57,14 +57,6 @@ describe('TopicsService', () => {
     await expect(service.getBySlug('missing')).rejects.toBeInstanceOf(NotFoundException);
   });
 
-  it('upsert returns DTO from repo', async () => {
-    const dto = { slug: 'aqeedah', name: { en: 'Aqeedah' } } as any;
-    repo.upsertBySlug.mockResolvedValue(sampleTopic);
-    repo.findBySlug.mockResolvedValue(sampleTopic);
-
-    await expect(service.upsert(dto)).resolves.toEqual(sampleTopic);
-  });
-
   // ─── getAdminDetail ────────────────────────────────────────────────────
 
   it('getAdminDetail returns topic with translations', async () => {

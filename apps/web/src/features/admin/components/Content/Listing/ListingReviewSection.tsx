@@ -1,7 +1,9 @@
 "use client";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import type { FormState, Locale } from "@/features/admin/hooks/Content/useListingForm";
+import type { Locale } from "@sd/core-contracts";
+import type { FormState } from "@/features/admin/hooks/Content/useListingForm";
+import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
 
 interface ListingReviewSectionProps {
   state: FormState;
@@ -17,12 +19,13 @@ export function ListingReviewSection({
   const { t } = useTranslation();
   const { title, description, translationChanges } = state;
 
-  if (
-    !title &&
-    !description &&
-    !translationChanges[otherLocale].title &&
-    !translationChanges[otherLocale].description
-  ) {
+  const otherTranslation = translationChanges[otherLocale];
+  const otherTranslationInitial = state.initialTranslationChanges?.[otherLocale];
+  const otherTranslationChanged =
+    otherTranslation?.title !== otherTranslationInitial?.title ||
+    otherTranslation?.description !== otherTranslationInitial?.description;
+
+  if (!title && !description && !otherTranslationChanged) {
     return (
       <div
         style={{
@@ -41,33 +44,33 @@ export function ListingReviewSection({
       {(title || description) && (
         <div style={{ marginBottom: "1.5rem" }}>
           <h4 style={{ marginBottom: "0.5rem", color: "var(--content-default)" }}>
-            {mainLocale === "en" ? "English" : "العربية"}
+            {getLocaleLabel(mainLocale)}
           </h4>
           {title && (
             <p>
-              <strong>Title:</strong> {title}
+              <strong>{t("admin.contents.listing.titleLabel", "Title")}:</strong> {title}
             </p>
           )}
           {description && (
             <p>
-              <strong>Description:</strong> {description}
+              <strong>{t("admin.contents.listing.descriptionLabel", "Description")}:</strong> {description}
             </p>
           )}
         </div>
       )}
-      {(translationChanges[otherLocale].title || translationChanges[otherLocale].description) && (
+      {otherTranslationChanged && (
         <div>
           <h4 style={{ marginBottom: "0.5rem", color: "var(--content-default)" }}>
-            {otherLocale === "en" ? "English" : "العربية"}
+            {getLocaleLabel(otherLocale)}
           </h4>
-          {translationChanges[otherLocale].title && (
+          {otherTranslation?.title !== otherTranslationInitial?.title && (
             <p>
-              <strong>Title:</strong> {translationChanges[otherLocale].title}
+              <strong>{t("admin.contents.listing.titleLabel", "Title")}:</strong> {otherTranslation?.title}
             </p>
           )}
-          {translationChanges[otherLocale].description && (
+          {otherTranslation?.description !== otherTranslationInitial?.description && (
             <p>
-              <strong>Description:</strong> {translationChanges[otherLocale].description}
+              <strong>{t("admin.contents.listing.descriptionLabel", "Description")}:</strong> {otherTranslation?.description}
             </p>
           )}
         </div>

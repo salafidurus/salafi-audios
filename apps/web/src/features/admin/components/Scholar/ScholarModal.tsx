@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Modal } from "@/shared/components/Modal";
 import type { CreateScholarDto } from "@sd/core-contracts";
+import type { Locale } from "@sd/core-contracts";
 import { sanitizeError } from "@sd/utils-error";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { GeneralDataSection } from "./general-data-section";
@@ -12,7 +13,13 @@ import { SettingsSection } from "./settings-section";
 import { TranslationFieldsSection } from "./translation-fields-section";
 import { ReviewSection } from "./review-section";
 import { getPresignedUrl, uploadToR2 } from "@/features/admin/api/admin-lectures.api";
+import { fetchScholarFormData } from "@/features/admin/api/admin.api";
 import { useScholarForm } from "../../hooks/Scholar/useScholarForm";
+import {
+  getSecondaryLocales,
+  buildTranslationsPayload,
+  getLocaleLabel,
+} from "@/features/admin/utils/locale-tabs";
 import styles from "./scholar-modal.module.css";
 
 export interface ScholarForEdit {
@@ -34,20 +41,20 @@ export interface ScholarForEdit {
 export interface ScholarModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (
-    data: CreateScholarDto & {
-      translations?: Record<string, { name?: string; bio?: string | null }>;
-    },
-  ) => Promise<void>;
+  onSave: (data: CreateScholarDto) => Promise<void>;
   scholar?: ScholarForEdit | null;
+  scholarId?: string | null;
 }
 
-export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalProps) {
+export function ScholarModal({ isOpen, onClose, onSave, scholar, scholarId }: ScholarModalProps) {
   const { t } = useTranslation();
-  const isEditing = !!scholar;
+  const isEditing = !!scholar || !!scholarId;
+  const loadingRef = useRef(false);
+  const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   const { state, dispatch } = useScholarForm(scholar ?? null);
-  const [activeTab, setActiveTab] = useState<"general" | "main" | "other" | "review">("general");
+  const [activeTab, setActiveTab] = useState<string>("general");
   const {
     formData,
     initialFormData,
@@ -57,6 +64,50 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
     stagedImageFile,
     stagedImagePreview,
   } = state;
+  const secondaryLocales = getSecondaryLocales(formData.mainLanguage as Locale);
+
+  // Fetch form data when opening modal in edit mode with scholarId
+  useEffect(() => {
+    if (!isOpen) {
+      loadingRef.current = false;
+      setLoading(false);
+      setFetchError(null);
+      return;
+    }
+
+    if (!scholarId) {
+      // Create mode - no fetch needed
+      loadingRef.current = false;
+      setLoading(false);
+      setFetchError(null);
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+    setFetchError(null);
+
+    fetchScholarFormData(scholarId)
+      .then((data) => {
+        loadingRef.current = false;
+        if (cancelled) return;
+        dispatch({ type: "INIT_FORM", data });
+      })
+      .catch((err) => {
+        loadingRef.current = false;
+        if (cancelled) return;
+        setFetchError(sanitizeError(err));
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, scholarId, dispatch]);
 
   // Compute which fields have changed for the review tab
   const changedFields = useMemo(() => {
@@ -110,17 +161,13 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
     try {
       const payloadData = { ...formData };
 
-      // Add translations if the non-main locale has content
-      const otherLocale = formData.mainLanguage === "en" ? "ar" : "en";
-      const translation = translationChanges[otherLocale];
-      if (translation.name) {
-        payloadData.translations = {
-          [otherLocale]: {
-            name: translation.name,
-            ...(translation.bio !== undefined && { bio: translation.bio }),
-          },
-        } as Record<"en" | "ar", { name: string; bio?: string | null }>;
-      }
+      // Build translations array using utility (N-locale safe)
+      const secondaryLocales = getSecondaryLocales(formData.mainLanguage as Locale);
+      payloadData.translations = buildTranslationsPayload(
+        translationChanges,
+        secondaryLocales,
+        (v) => !!v?.name,
+      ) as CreateScholarDto["translations"];
 
       // Handle image upload if file is staged
       if (stagedImageFile) {
@@ -175,15 +222,17 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
     >
       <form id="scholar-form" onSubmit={handleSubmit} className={styles.form}>
         {error && <div className={styles.error}>{error}</div>}
+        {loading && <div className={styles.loading}>{t("common.loading", "Loading...")}</div>}
+        {fetchError && <div className={styles.error}>{fetchError}</div>}
 
         <Modal.Tabs>
           <Modal.TabItem id="general">{t("admin.modal.generalTab", "General")}</Modal.TabItem>
-          <Modal.TabItem id="main">
-            {formData.mainLanguage === "en" ? "English" : "العربية"}
-          </Modal.TabItem>
-          <Modal.TabItem id="other">
-            {formData.mainLanguage === "en" ? "العربية" : "English"}
-          </Modal.TabItem>
+          <Modal.TabItem id="main">{getLocaleLabel(formData.mainLanguage as Locale)}</Modal.TabItem>
+          {secondaryLocales.map((locale) => (
+            <Modal.TabItem key={locale} id={locale}>
+              {getLocaleLabel(locale)}
+            </Modal.TabItem>
+          ))}
           <Modal.TabItem id="review">{t("admin.modal.reviewTab", "Review")}</Modal.TabItem>
         </Modal.Tabs>
 
@@ -201,7 +250,7 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
 
           <Modal.ContentItem id="main">
             <TranslationFieldsSection
-              locale={formData.mainLanguage as "en" | "ar"}
+              locale={formData.mainLanguage as Locale}
               name={formData.name}
               bio={formData.bio}
               onNameChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "name", value })}
@@ -210,47 +259,51 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
             />
           </Modal.ContentItem>
 
-          <Modal.ContentItem id="other">
-            <TranslationFieldsSection
-              locale={formData.mainLanguage === "en" ? "ar" : "en"}
-              name={translationChanges[formData.mainLanguage === "en" ? "ar" : "en"].name ?? ""}
-              bio={
-                translationChanges[formData.mainLanguage === "en" ? "ar" : "en"].bio ?? undefined
-              }
-              onNameChange={(value) =>
-                dispatch({
-                  type: "UPDATE_TRANSLATION",
-                  locale: formData.mainLanguage === "en" ? "ar" : "en",
-                  field: "name",
-                  value,
-                })
-              }
-              onBioChange={(value) =>
-                dispatch({
-                  type: "UPDATE_TRANSLATION",
-                  locale: formData.mainLanguage === "en" ? "ar" : "en",
-                  field: "bio",
-                  value,
-                })
-              }
-              title={t(
-                "admin.modal.translateContent",
-                `Translate to ${formData.mainLanguage === "en" ? "العربية" : "English"}`,
-              )}
-            />
-          </Modal.ContentItem>
+          {secondaryLocales.map((locale) => (
+            <Modal.ContentItem key={locale} id={locale}>
+              <TranslationFieldsSection
+                locale={locale}
+                name={translationChanges[locale]?.name ?? ""}
+                bio={translationChanges[locale]?.bio ?? undefined}
+                onNameChange={(value) =>
+                  dispatch({
+                    type: "UPDATE_TRANSLATION",
+                    locale,
+                    field: "name",
+                    value,
+                  })
+                }
+                onBioChange={(value) =>
+                  dispatch({
+                    type: "UPDATE_TRANSLATION",
+                    locale,
+                    field: "bio",
+                    value,
+                  })
+                }
+                title={t("admin.modal.translateContent", `Translate to ${getLocaleLabel(locale)}`)}
+              />
+            </Modal.ContentItem>
+          ))}
 
           <Modal.ContentItem id="review">
             <ReviewSection
               formData={formData}
               changedFields={changedFields}
-              mainLanguageName={formData.mainLanguage === "en" ? "English" : "العربية"}
-              translationName={
-                translationChanges[formData.mainLanguage === "en" ? "ar" : "en"].name
-              }
-              translationBio={
-                translationChanges[formData.mainLanguage === "en" ? "ar" : "en"].bio ?? undefined
-              }
+              translations={secondaryLocales.reduce<
+                Array<{ locale: Locale; name?: string; bio?: string | null }>
+              >((acc, locale) => {
+                const initial = state.initialTranslationChanges[locale];
+                const trans = {
+                  locale,
+                  name: translationChanges[locale]?.name,
+                  bio: translationChanges[locale]?.bio,
+                };
+                if (trans.name !== initial?.name || trans.bio !== initial?.bio) {
+                  acc.push(trans);
+                }
+                return acc;
+              }, [])}
               stagedImagePreview={stagedImagePreview}
             />
           </Modal.ContentItem>

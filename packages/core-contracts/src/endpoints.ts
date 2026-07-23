@@ -61,6 +61,7 @@ export const endpoints = {
       list: "/admin/scholars",
       create: "/admin/scholars",
       update: (id: string) => `/admin/scholars/${id}`,
+      formData: (id: string) => `/admin/scholars/${id}/form-data`,
     },
     topics: {
       create: "/admin/topics",
@@ -73,6 +74,7 @@ export const endpoints = {
       detail: (id: string) => `/admin/listings/${id}`,
       create: "/admin/listings",
       update: (id: string) => `/admin/listings/${id}`,
+      formData: (id: string) => `/admin/listings/${id}/form-data`,
       publish: (id: string) => `/admin/listings/${id}/publish`,
       archive: (id: string) => `/admin/listings/${id}/archive`,
       series: "/admin/listings/series",

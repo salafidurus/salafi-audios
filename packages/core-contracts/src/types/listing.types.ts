@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { StatusValueSchema } from "./common.types";
 import { ContentOriginalFieldsSchema, LocaleSchema } from "./localization.types";
+import { TranslationViewDtoSchema } from "./translation.types";
 
 /**
  * A **Listing** is any top-level, browsable content unit — the thing users
@@ -136,9 +137,12 @@ export const AdminListingUpdateDtoSchema = z.object({
   orderIndex: z.number().optional(),
   status: StatusValueSchema.optional(),
   translations: z
-    .record(
-      LocaleSchema,
-      z.object({ title: z.string(), description: z.string().nullable().optional() }),
+    .array(
+      z.object({
+        locale: LocaleSchema,
+        title: z.string(),
+        description: z.string().nullable().optional(),
+      }),
     )
     .optional(),
 });
@@ -175,7 +179,7 @@ export const AdminListingDetailDtoSchema = z.object({
   title: z.string(),
   description: z.string().optional(),
   format: ListingFormatSchema,
-  language: z.string().optional(),
+  language: LocaleSchema.optional(),
   status: StatusValueSchema,
   orderIndex: z.number().optional(),
   durationSeconds: z.number().optional(),
@@ -214,13 +218,39 @@ export const CreateListingDtoSchema = z.object({
   durationSeconds: z.number().optional(),
   sizeBytes: z.number().optional(),
   translations: z
-    .record(
-      LocaleSchema,
-      z.object({ title: z.string(), description: z.string().nullable().optional() }),
+    .array(
+      z.object({
+        locale: LocaleSchema,
+        title: z.string(),
+        description: z.string().nullable().optional(),
+      }),
     )
     .optional(),
 });
 export type CreateListingDto = z.infer<typeof CreateListingDtoSchema>;
+
+export const ListingFormDataDtoSchema = z.object({
+  listing: z.object({
+    id: z.string(),
+    slug: z.string(),
+    title: z.string(),
+    description: z.string().optional(),
+    format: ListingFormatSchema,
+    language: LocaleSchema.optional(),
+    status: StatusValueSchema,
+    orderIndex: z.number().optional(),
+    durationSeconds: z.number().optional(),
+    scholarId: z.string(),
+    scholarName: z.string(),
+    parentId: z.string().optional(),
+    topics: z.array(z.string()),
+    audioUrl: z.string().optional(),
+    createdAt: z.string(),
+    updatedAt: z.string().optional(),
+  }),
+  translations: z.array(TranslationViewDtoSchema),
+});
+export type ListingFormDataDto = z.infer<typeof ListingFormDataDtoSchema>;
 
 export const SaveListingTranslationDtoSchema = z.object({
   locale: LocaleSchema,

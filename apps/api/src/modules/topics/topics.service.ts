@@ -7,7 +7,6 @@ import type {
 } from '@sd/core-contracts';
 import type { CreateTopicWithTranslationsDto } from '@sd/core-contracts';
 import type { UpdateTopicWithTranslationsDto } from '@sd/core-contracts';
-import { UpsertTopicDto } from './dto/upsert-topic.dto';
 import { SaveTopicTranslationDto } from './dto/save-topic-translation.dto';
 import { TopicsRepository } from './topics.repo';
 
@@ -23,36 +22,6 @@ export class TopicsService {
     const found = await this.repo.findBySlug(slug);
     if (!found) throw new NotFoundException(`Topic "${slug}" not found`);
     return found;
-  }
-
-  async upsert(dto: UpsertTopicDto): Promise<TopicDetailDto> {
-    const topic = await this.repo.upsertBySlug({
-      slug: dto.slug,
-      name: dto.name.en,
-    });
-
-    if (dto.name.ar && topic.id) {
-      await this.repo.upsertTopicTranslation(topic.id, {
-        locale: 'ar',
-        name: dto.name.ar,
-      });
-    }
-
-    if (dto.translations && topic.id) {
-      await Promise.all(
-        Object.entries(dto.translations).map(([locale, fields]) => {
-          if (fields.name) {
-            return this.repo.upsertTopicTranslation(topic.id, {
-              locale: locale as any,
-              name: fields.name,
-            });
-          }
-          return Promise.resolve();
-        }),
-      );
-    }
-
-    return this.getBySlug(topic.slug);
   }
 
   async listLectures(slug: string, limit?: number): Promise<TopicLectureViewDto[]> {

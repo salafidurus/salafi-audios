@@ -8,6 +8,7 @@ import type {
   AdminTopicDetailDto,
   CreateTopicWithTranslationsDto,
   UpdateTopicWithTranslationsDto,
+  ScholarFormDataDto,
 } from "@sd/core-contracts";
 
 // --- Permissions ---
@@ -100,6 +101,13 @@ export function updateScholar(id: string, data: Partial<AdminScholarInput>) {
     url: endpoints.admin.scholars.update(id),
     method: "PATCH",
     body,
+  });
+}
+
+export function fetchScholarFormData(id: string) {
+  return httpClient<ScholarFormDataDto>({
+    url: endpoints.admin.scholars.formData(id),
+    method: "GET",
   });
 }
 
