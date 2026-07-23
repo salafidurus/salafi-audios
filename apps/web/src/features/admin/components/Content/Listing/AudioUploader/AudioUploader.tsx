@@ -18,44 +18,54 @@ interface AudioUploaderProps {
   }) => void;
 }
 
-function extractMetadata(file: File): Promise<number> {
-  return new Promise((resolve, reject) => {
-    // react-doctor-disable-next-line no-create-object-url-without-revoke - cleanup guaranteed via listener or timeout
-    const objectUrl = URL.createObjectURL(file);
-    const audio = new Audio();
-    audio.src = objectUrl;
+async function extractMetadata(file: File): Promise<number> {
+  let duration = 0;
+  let error: Error | null = null;
 
-    let isSettled = false;
-    const cleanup = () => URL.revokeObjectURL(objectUrl);
+  const objectUrl = URL.createObjectURL(file);
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const audio = new Audio();
+      audio.src = objectUrl;
+      let isSettled = false;
 
-    const loadedmetadataHandler = () => {
-      if (isSettled) return;
-      isSettled = true;
-      clearTimeout(timeoutId);
-      cleanup();
-      resolve(audio.duration);
-    };
+      const cleanup = () => {
+        audio.removeEventListener("loadedmetadata", onLoadedMetadata);
+        audio.removeEventListener("error", onError);
+      };
 
-    const errorHandler = () => {
-      if (isSettled) return;
-      isSettled = true;
-      clearTimeout(timeoutId);
-      cleanup();
-      reject(new Error("Failed to load audio metadata"));
-    };
+      const onLoadedMetadata = () => {
+        if (isSettled) return;
+        isSettled = true;
+        clearTimeout(timeoutId);
+        cleanup();
+        duration = audio.duration;
+        resolve();
+      };
 
-    audio.addEventListener("loadedmetadata", loadedmetadataHandler);
-    audio.addEventListener("error", errorHandler);
+      const onError = () => {
+        if (isSettled) return;
+        isSettled = true;
+        clearTimeout(timeoutId);
+        cleanup();
+        reject(new Error("Failed to load audio metadata"));
+      };
 
-    const timeoutId = setTimeout(() => {
-      if (isSettled) return;
-      isSettled = true;
-      audio.removeEventListener("loadedmetadata", loadedmetadataHandler);
-      audio.removeEventListener("error", errorHandler);
-      cleanup();
-      reject(new Error("Audio metadata loading timeout"));
-    }, 5000);
-  });
+      const timeoutId = setTimeout(() => {
+        if (isSettled) return;
+        isSettled = true;
+        cleanup();
+        reject(new Error("Audio metadata loading timeout"));
+      }, 5000);
+
+      audio.addEventListener("loadedmetadata", onLoadedMetadata);
+      audio.addEventListener("error", onError);
+    });
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+
+  return duration;
 }
 
 export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
