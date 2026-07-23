@@ -4,7 +4,7 @@ import type { CreateScholarDto } from "@sd/core-contracts";
 import { FormSection } from "@/features/admin/components/FormSection";
 import { Toggle } from "@/shared/components/Toggle";
 import { useTranslation } from "@/core/i18n/use-translation";
-import type { FormAction } from "./ScholarModal";
+import type { FormAction } from "../../hooks/Scholar/useScholarForm";
 import styles from "./scholar-modal.module.css";
 
 interface SettingsSectionProps {

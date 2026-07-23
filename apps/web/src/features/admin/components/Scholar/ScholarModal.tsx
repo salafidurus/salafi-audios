@@ -113,13 +113,13 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
       // Add translations if the non-main locale has content
       const otherLocale = formData.mainLanguage === "en" ? "ar" : "en";
       const translation = translationChanges[otherLocale];
-      if (translation.name || translation.bio) {
-        const translationPayload: Record<"en" | "ar", { name?: string; bio?: string | null }> = {};
-        translationPayload[otherLocale] = {
-          ...(translation.name && { name: translation.name }),
-          ...(translation.bio !== undefined && { bio: translation.bio }),
-        };
-        payloadData.translations = translationPayload;
+      if (translation.name) {
+        payloadData.translations = {
+          [otherLocale]: {
+            name: translation.name,
+            ...(translation.bio !== undefined && { bio: translation.bio }),
+          },
+        } as Record<"en" | "ar", { name: string; bio?: string | null }>;
       }
 
       // Handle image upload if file is staged

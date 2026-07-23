@@ -114,10 +114,10 @@ describe("ScholarModal", () => {
 
     await waitFor(() => {
       expect(onSave).toHaveBeenCalled();
-      const callArgs = onSave.mock.calls[0][0];
-      expect(callArgs.translations).toBeDefined();
-      expect(callArgs.translations.en).toBeDefined();
-      expect(callArgs.translations.en.name).toBe("Scholar Name");
+      const callArgs = onSave.mock.calls?.[0]?.[0] as any;
+      expect(callArgs?.translations).toBeDefined();
+      expect(callArgs?.translations?.en).toBeDefined();
+      expect(callArgs?.translations?.en?.name).toBe("Scholar Name");
     });
 
     expect(onClose).toHaveBeenCalled();
@@ -150,9 +150,9 @@ describe("ScholarModal", () => {
 
     await waitFor(() => {
       expect(onSave).toHaveBeenCalled();
-      const callArgs = onSave.mock.calls[0][0];
+      const callArgs = onSave.mock.calls?.[0]?.[0] as any;
       // translations should be omitted if empty
-      expect(callArgs.translations).toBeUndefined();
+      expect(callArgs?.translations).toBeUndefined();
     });
   });
 

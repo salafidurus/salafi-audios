@@ -928,8 +928,11 @@ export class ListingRepository {
 
         if (!original) throw new Error('Not found');
 
+        // Exclude translations from the main update data
+        const { translations, ...dtoWithoutTranslations } = dto;
+
         const updateData: Prisma.ListingUpdateInput = {
-          ...dto,
+          ...dtoWithoutTranslations,
           updatedAt: new Date(),
           updatedBy,
         };
@@ -944,9 +947,9 @@ export class ListingRepository {
         });
 
         // If translations were provided in the DTO, upsert them
-        if (dto.translations) {
+        if (translations) {
           await Promise.all(
-            Object.entries(dto.translations).map(([locale, fields]) =>
+            Object.entries(translations).map(([locale, fields]) =>
               tx.listingTranslation.upsert({
                 where: { listingId_locale: { listingId: id, locale: locale as any } },
                 update: { title: fields.title, description: fields.description ?? null },

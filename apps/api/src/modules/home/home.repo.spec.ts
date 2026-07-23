@@ -11,10 +11,10 @@ describe('HomeRepo', () => {
       await repo.getScholars();
 
       expect(findMany).toHaveBeenCalledTimes(1);
-      const args = findMany.mock.calls[0][0];
-      expect(args.orderBy).toEqual({ createdAt: 'desc' });
-      expect(args.select).not.toHaveProperty('isFeatured');
-      expect(args.select).not.toHaveProperty('isKibar');
+      const args = findMany.mock.calls?.[0]?.[0] as any;
+      expect(args?.orderBy).toEqual({ createdAt: 'desc' });
+      expect(args?.select).not.toHaveProperty('isFeatured');
+      expect(args?.select).not.toHaveProperty('isKibar');
     });
   });
 });

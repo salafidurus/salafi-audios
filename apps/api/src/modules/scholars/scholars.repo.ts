@@ -523,7 +523,7 @@ export class ScholarsRepository {
             tx.scholarTranslation.create({
               data: {
                 scholarId: scholar.id,
-                locale,
+                locale: locale as Locale,
                 name: fields.name,
                 bio: fields.bio ?? null,
                 status: 'draft',
@@ -564,10 +564,10 @@ export class ScholarsRepository {
         await Promise.all(
           Object.entries(dto.translations).map(([locale, fields]) =>
             tx.scholarTranslation.upsert({
-              where: { scholarId_locale: { scholarId: id, locale } },
+              where: { scholarId_locale: { scholarId: id, locale: locale as Locale } },
               create: {
                 scholarId: id,
-                locale,
+                locale: locale as Locale,
                 name: fields.name,
                 bio: fields.bio ?? null,
                 status: 'draft',

@@ -1,6 +1,6 @@
 import { useReducer } from "react";
 import type { CreateScholarDto } from "@sd/core-contracts";
-import type { ScholarForEdit } from "../components/Scholar/ScholarModal";
+import type { ScholarForEdit } from "../../components/Scholar/ScholarModal";
 
 export type FormState = {
   formData: CreateScholarDto;

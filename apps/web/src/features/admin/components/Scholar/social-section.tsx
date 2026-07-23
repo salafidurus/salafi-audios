@@ -5,7 +5,7 @@ import type { CreateScholarDto } from "@sd/core-contracts";
 import { EditableInput } from "@/shared/components/EditableInput";
 import { FormSection } from "@/features/admin/components/FormSection";
 import { useTranslation } from "@/core/i18n/use-translation";
-import type { FormAction } from "./ScholarModal";
+import type { FormAction } from "../../hooks/Scholar/useScholarForm";
 import styles from "./social-section.module.css";
 
 interface SocialSectionProps {

@@ -11,7 +11,7 @@ import { EditableInput } from "@/shared/components/EditableInput";
 import { FormSection } from "@/features/admin/components/FormSection";
 import { ScholarAvatarEditor } from "./scholar-avatar-editor";
 import { useTranslation } from "@/core/i18n/use-translation";
-import type { FormAction } from "./ScholarModal";
+import type { FormAction } from "../../hooks/Scholar/useScholarForm";
 import { SCHOLAR_TITLE_LABELS, SCHOLAR_TITLES_ARRAY } from "./constants";
 import styles from "./personal-data-section.module.css";
 
@@ -21,11 +21,7 @@ interface GeneralDataSectionProps {
   onImageStaged: (file: File | null, preview: string | null) => void;
 }
 
-export function GeneralDataSection({
-  formData,
-  dispatch,
-  onImageStaged,
-}: GeneralDataSectionProps) {
+export function GeneralDataSection({ formData, dispatch, onImageStaged }: GeneralDataSectionProps) {
   const { t } = useTranslation();
 
   return (
