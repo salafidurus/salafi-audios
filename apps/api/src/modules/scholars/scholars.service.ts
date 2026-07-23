@@ -59,6 +59,7 @@ export class ScholarsService {
         await this.upsertTranslation(scholar.id, {
           locale: locale as Locale,
           name: fields.name,
+          bio: fields.bio ?? null,
         } as SaveScholarTranslationDto);
       }
     }
@@ -78,6 +79,7 @@ export class ScholarsService {
         await this.upsertTranslation(id, {
           locale: locale as Locale,
           name: fields.name,
+          bio: fields.bio ?? null,
         } as SaveScholarTranslationDto);
       }
     }

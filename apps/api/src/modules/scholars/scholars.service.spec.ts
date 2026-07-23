@@ -174,7 +174,7 @@ describe('ScholarsService', () => {
       expect(repo.create).toHaveBeenCalledWith(dto);
     });
 
-    it('should create a new scholar with inline translations', async () => {
+    it('should create a new scholar with inline translations including bio', async () => {
       const dto: CreateScholarDto = {
         name: 'New Scholar',
         slug: 'new-scholar',
@@ -184,8 +184,8 @@ describe('ScholarsService', () => {
         country: 'SA',
         mainLanguage: 'ar',
         translations: {
-          en: { name: 'New Scholar - English' },
-          ar: { name: 'عالم جديد' },
+          en: { name: 'New Scholar - English', bio: 'English bio' },
+          ar: { name: 'عالم جديد', bio: 'سيرة عربية' },
         },
       };
       const created = {
@@ -216,6 +216,7 @@ describe('ScholarsService', () => {
       repo.upsertScholarTranslation.mockResolvedValue({
         locale: 'en',
         name: 'New Scholar - English',
+        bio: 'English bio',
         status: 'draft',
       } as any);
 
@@ -227,10 +228,12 @@ describe('ScholarsService', () => {
       expect(repo.upsertScholarTranslation).toHaveBeenCalledWith('s2', {
         locale: 'en',
         name: 'New Scholar - English',
+        bio: 'English bio',
       });
       expect(repo.upsertScholarTranslation).toHaveBeenCalledWith('s2', {
         locale: 'ar',
         name: 'عالم جديد',
+        bio: 'سيرة عربية',
       });
     });
   });

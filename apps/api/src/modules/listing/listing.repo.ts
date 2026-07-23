@@ -785,6 +785,7 @@ export class ListingRepository {
           slug,
           format: dto.format,
           status: Status.draft,
+          language: dto.language ?? 'ar',
           durationSeconds: dto.durationSeconds ?? undefined,
           scholarId: dto.scholarId,
           parentId: dto.parentId ?? undefined,
@@ -820,6 +821,24 @@ export class ListingRepository {
         await this.syncListingCounters(listing.parentId, tx);
       }
 
+      // If translations were provided in the DTO, upsert them
+      if (dto.translations) {
+        await Promise.all(
+          Object.entries(dto.translations).map(([locale, fields]) =>
+            tx.listingTranslation.upsert({
+              where: { listingId_locale: { listingId: listing.id, locale: locale as any } },
+              update: { title: fields.title, description: fields.description ?? null },
+              create: {
+                listingId: listing.id,
+                locale: locale as any,
+                title: fields.title,
+                description: fields.description ?? null,
+              },
+            }),
+          ),
+        );
+      }
+
       return { id: listing.id, title: listing.title };
     });
   }
@@ -852,6 +871,24 @@ export class ListingRepository {
           where: { id },
           data: updateData,
         });
+
+        // If translations were provided in the DTO, upsert them
+        if (dto.translations) {
+          await Promise.all(
+            Object.entries(dto.translations).map(([locale, fields]) =>
+              tx.listingTranslation.upsert({
+                where: { listingId_locale: { listingId: id, locale: locale as any } },
+                update: { title: fields.title, description: fields.description ?? null },
+                create: {
+                  listingId: id,
+                  locale: locale as any,
+                  title: fields.title,
+                  description: fields.description ?? null,
+                },
+              }),
+            ),
+          );
+        }
 
         // Sync old parent if parent changed or status changed or duration changed
         if (original.parentId) {
