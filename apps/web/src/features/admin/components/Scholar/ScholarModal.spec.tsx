@@ -21,12 +21,13 @@ describe("ScholarModal", () => {
     render(<ScholarModal isOpen onClose={vi.fn()} onSave={vi.fn()} />);
 
     expect(screen.getByRole("tablist")).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "English" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /general/i })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "العربية" })).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: "English" })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /review/i })).toBeInTheDocument();
   });
 
-  it("shows personal data section only on main language tab", () => {
+  it("shows general info section on general tab", () => {
     const onSave = vi.fn();
     render(
       <ScholarModal
@@ -37,26 +38,24 @@ describe("ScholarModal", () => {
       />,
     );
 
-    // Arabic is the main language, so personal data should be visible on ar tab (should have an asterisk)
-    const arTab = screen.getByRole("tab", { name: "العربية" });
-    fireEvent.click(arTab);
-
-    expect(screen.getByLabelText(/name \*/i)).toBeInTheDocument();
+    // General tab should be active by default and show general fields (slug, title, image)
     expect(screen.getByLabelText(/slug \*/i)).toBeInTheDocument();
+    // Name should not be on general tab (it's translatable content)
+    expect(screen.queryByLabelText(/name \*/i)).not.toBeInTheDocument();
 
-    // Switch to en tab - should show translation fields instead of personal data
-    const enTab = screen.getByRole("tab", { name: "English" });
-    fireEvent.click(enTab);
+    // Switch to main language tab (Arabic) - should show name and bio for main language content
+    const mainTab = screen.getByRole("tab", { name: "العربية" });
+    fireEvent.click(mainTab);
 
-    // The slug field should not be visible on translation tab (only personal data has slug)
+    // The slug field should not be visible on main language tab (only on general)
     expect(screen.queryByLabelText(/slug \*/i)).not.toBeInTheDocument();
 
-    // But the translation name field should be visible (without the asterisk)
-    const translationLabels = screen.queryAllByText(/name/i);
-    expect(translationLabels.length).toBeGreaterThan(0);
+    // But the name field should be visible (as main language content)
+    const nameInputs = screen.getAllByPlaceholderText(/scholar name/i);
+    expect(nameInputs.length).toBeGreaterThan(0);
   });
 
-  it("shows translation fields on non-main language tab", () => {
+  it("shows translation fields on other language tab", () => {
     render(
       <ScholarModal
         isOpen
@@ -66,17 +65,17 @@ describe("ScholarModal", () => {
       />,
     );
 
-    // Get initial name fields (should be on ar tab which is the main language)
-    const initialInputs = screen.getAllByPlaceholderText(/scholar name/i);
-    expect(initialInputs.length).toBeGreaterThan(0);
+    // Switch to other tab (English when main is Arabic)
+    const otherTab = screen.getByRole("tab", { name: "English" });
+    fireEvent.click(otherTab);
 
-    // Switch to en tab (non-main language)
-    const enTab = screen.getByRole("tab", { name: /english/i });
-    fireEvent.click(enTab);
-
-    // Should see translation-specific fields - translation inputs won't have the same placeholder
+    // Should see translation name input
     const translationNameLabel = screen.getByLabelText(/name/i);
     expect(translationNameLabel).toBeInTheDocument();
+
+    // Should also see bio field for translation
+    const bioLabel = screen.getByLabelText(/bio/i);
+    expect(bioLabel).toBeInTheDocument();
   });
 
   it("calls onSave with translations when non-main locale has content", async () => {
@@ -168,7 +167,7 @@ describe("ScholarModal", () => {
     expect(onClose).toHaveBeenCalled();
   });
 
-  it("includes bio in personal data section", () => {
+  it("includes bio in main language tab", () => {
     render(
       <ScholarModal
         isOpen
@@ -184,7 +183,11 @@ describe("ScholarModal", () => {
       />,
     );
 
-    // Arabic is the main language by default, so personal data is shown
+    // Switch to main language tab (Arabic)
+    const mainTab = screen.getByRole("tab", { name: "العربية" });
+    fireEvent.click(mainTab);
+
+    // Bio should be visible on main language tab
     const bioLabel = screen.getByLabelText(/bio/i);
     expect(bioLabel).toBeInTheDocument();
 

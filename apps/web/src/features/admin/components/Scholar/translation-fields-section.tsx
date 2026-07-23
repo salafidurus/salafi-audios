@@ -13,6 +13,7 @@ interface TranslationFieldsSectionProps {
   bio?: string;
   onNameChange: (value: string) => void;
   onBioChange: (value: string) => void;
+  title?: string;
 }
 
 export function TranslationFieldsSection({
@@ -21,13 +22,15 @@ export function TranslationFieldsSection({
   bio,
   onNameChange,
   onBioChange,
+  title,
 }: TranslationFieldsSectionProps) {
   const { t } = useTranslation();
 
   const localeName = locale === "en" ? "English" : "العربية";
+  const sectionTitle = title ?? t("admin.scholars.translation", `Translation (${localeName})`);
 
   return (
-    <FormSection title={t("admin.scholars.translation", `Translation (${localeName})`)}>
+    <FormSection title={sectionTitle}>
       <div className={styles.container}>
         <div className={styles.field}>
           <label className={styles.label} htmlFor={`scholar-name-${locale}`}>

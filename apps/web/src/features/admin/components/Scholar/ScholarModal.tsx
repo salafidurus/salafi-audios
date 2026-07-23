@@ -5,7 +5,7 @@ import { Modal } from "@/shared/components/Modal";
 import type { CreateScholarDto } from "@sd/core-contracts";
 import { sanitizeError } from "@sd/utils-error";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { PersonalDataSection } from "./personal-data-section";
+import { GeneralDataSection } from "./general-data-section";
 import { LocationSection } from "./location-section";
 import { SocialSection } from "./social-section";
 import { SettingsSection } from "./settings-section";
@@ -150,14 +150,14 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
   const isEditing = !!scholar;
 
   const [state, dispatch] = useReducer(formReducer, initialFormState);
-  const [activeTab, setActiveTab] = useState<"en" | "ar" | "review">("ar");
+  const [activeTab, setActiveTab] = useState<"general" | "main" | "other" | "review">("general");
   const { formData, translationChanges, saving, error, stagedImageFile, stagedImagePreview } =
     state;
 
   useEffect(() => {
     if (isOpen) {
       dispatch({ type: "INIT_FORM", scholar: scholar ?? null });
-      setActiveTab((scholar?.mainLanguage as "en" | "ar") ?? "ar");
+      setActiveTab("general");
     }
   }, [isOpen, scholar]);
 
@@ -233,8 +233,8 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
       multiTab
       requireReview
       activeTab={activeTab}
-      onActiveTabChange={(id) => setActiveTab(id as "en" | "ar" | "review")}
-      defaultActiveTab={formData.mainLanguage ?? "ar"}
+      onActiveTabChange={(id) => setActiveTab(id as "general" | "main" | "other" | "review")}
+      defaultActiveTab="general"
       saveFormId="scholar-form"
       saving={saving}
       reviewTabId="review"
@@ -248,66 +248,52 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
         {error && <div className={styles.error}>{error}</div>}
 
         <Modal.Tabs>
-          <Modal.TabItem id="en">English</Modal.TabItem>
-          <Modal.TabItem id="ar">العربية</Modal.TabItem>
+          <Modal.TabItem id="general">{t("admin.modal.generalTab", "General")}</Modal.TabItem>
+          <Modal.TabItem id="main">{formData.mainLanguage === "en" ? "English" : "العربية"}</Modal.TabItem>
+          <Modal.TabItem id="other">{formData.mainLanguage === "en" ? "العربية" : "English"}</Modal.TabItem>
           <Modal.TabItem id="review">{t("admin.modal.reviewTab", "Review")}</Modal.TabItem>
         </Modal.Tabs>
 
         <Modal.Content>
-          <Modal.ContentItem id="en">
-            {formData.mainLanguage === "en" ? (
-              <>
-                <PersonalDataSection
-                  formData={formData}
-                  dispatch={dispatch}
-                  isEditing={isEditing}
-                  onImageStaged={handleImageStaged}
-                />
-                <LocationSection formData={formData} dispatch={dispatch} />
-                <SocialSection formData={formData} dispatch={dispatch} />
-                <SettingsSection formData={formData} dispatch={dispatch} />
-              </>
-            ) : (
-              <TranslationFieldsSection
-                locale="en"
-                name={translationChanges.en.name ?? ""}
-                bio={translationChanges.en.bio ?? undefined}
-                onNameChange={(value) =>
-                  dispatch({ type: "UPDATE_TRANSLATION", locale: "en", field: "name", value })
-                }
-                onBioChange={(value) =>
-                  dispatch({ type: "UPDATE_TRANSLATION", locale: "en", field: "bio", value })
-                }
-              />
-            )}
+          <Modal.ContentItem id="general">
+            <GeneralDataSection
+              formData={formData}
+              dispatch={dispatch}
+              onImageStaged={handleImageStaged}
+            />
+            <LocationSection formData={formData} dispatch={dispatch} />
+            <SocialSection formData={formData} dispatch={dispatch} />
+            <SettingsSection formData={formData} dispatch={dispatch} />
           </Modal.ContentItem>
 
-          <Modal.ContentItem id="ar">
-            {formData.mainLanguage === "ar" ? (
-              <>
-                <PersonalDataSection
-                  formData={formData}
-                  dispatch={dispatch}
-                  isEditing={isEditing}
-                  onImageStaged={handleImageStaged}
-                />
-                <LocationSection formData={formData} dispatch={dispatch} />
-                <SocialSection formData={formData} dispatch={dispatch} />
-                <SettingsSection formData={formData} dispatch={dispatch} />
-              </>
-            ) : (
-              <TranslationFieldsSection
-                locale="ar"
-                name={translationChanges.ar.name ?? ""}
-                bio={translationChanges.ar.bio ?? undefined}
-                onNameChange={(value) =>
-                  dispatch({ type: "UPDATE_TRANSLATION", locale: "ar", field: "name", value })
-                }
-                onBioChange={(value) =>
-                  dispatch({ type: "UPDATE_TRANSLATION", locale: "ar", field: "bio", value })
-                }
-              />
-            )}
+          <Modal.ContentItem id="main">
+            <TranslationFieldsSection
+              locale={formData.mainLanguage as "en" | "ar"}
+              name={formData.name}
+              bio={formData.bio}
+              onNameChange={(value) =>
+                dispatch({ type: "UPDATE_FIELD", field: "name", value })
+              }
+              onBioChange={(value) =>
+                dispatch({ type: "UPDATE_FIELD", field: "bio", value })
+              }
+              title={t("admin.modal.mainLanguageContent", "Main Language Content")}
+            />
+          </Modal.ContentItem>
+
+          <Modal.ContentItem id="other">
+            <TranslationFieldsSection
+              locale={formData.mainLanguage === "en" ? "ar" : "en"}
+              name={translationChanges[formData.mainLanguage === "en" ? "ar" : "en"].name ?? ""}
+              bio={translationChanges[formData.mainLanguage === "en" ? "ar" : "en"].bio ?? undefined}
+              onNameChange={(value) =>
+                dispatch({ type: "UPDATE_TRANSLATION", locale: formData.mainLanguage === "en" ? "ar" : "en", field: "name", value })
+              }
+              onBioChange={(value) =>
+                dispatch({ type: "UPDATE_TRANSLATION", locale: formData.mainLanguage === "en" ? "ar" : "en", field: "bio", value })
+              }
+              title={t("admin.modal.translateContent", `Translate to ${formData.mainLanguage === "en" ? "العربية" : "English"}`)}
+            />
           </Modal.ContentItem>
 
           <Modal.ContentItem id="review">
