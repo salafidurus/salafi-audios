@@ -240,7 +240,9 @@ export function Modal({
                         <Button
                           type="button"
                           variant="primary"
-                          onClick={() => {
+                          onClick={(e: React.MouseEvent) => {
+                            e.preventDefault();
+                            e.stopPropagation();
                             if (onActiveTabChange) {
                               onActiveTabChange(reviewTabId);
                             } else {
