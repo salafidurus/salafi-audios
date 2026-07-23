@@ -7,6 +7,11 @@ import {
   useState,
   type ReactNode,
   useSyncExternalStore,
+  createContext,
+  useContext,
+  Children,
+  type ReactElement,
+  useMemo,
 } from "react";
 import { createPortal } from "react-dom";
 import { LazyMotion, m, domAnimation, AnimatePresence } from "framer-motion";
@@ -14,6 +19,21 @@ import { X } from "lucide-react";
 import { Button } from "../Button/Button";
 import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./modal.module.css";
+
+interface ModalTabsContextType {
+  activeTab: string;
+  onActiveTabChange: (id: string) => void;
+}
+
+const ModalTabsContext = createContext<ModalTabsContextType | undefined>(undefined);
+
+function useModalTabs() {
+  const context = useContext(ModalTabsContext);
+  if (!context) {
+    throw new Error("useModalTabs must be used within a Modal with multiTab enabled");
+  }
+  return context;
+}
 
 function getModalPortalRoot(): HTMLElement | null {
   if (typeof document === "undefined") return null;
@@ -44,6 +64,18 @@ export interface ModalProps {
   footerAlignment?: "left" | "right" | "center" | "space-between";
   footerBorder?: boolean;
   loading?: boolean;
+  multiTab?: boolean;
+  requireReview?: boolean;
+  activeTab?: string;
+  onActiveTabChange?: (id: string) => void;
+  defaultActiveTab?: string;
+  reviewTabId?: string;
+  saveFormId?: string;
+  saving?: boolean;
+  saveLabel?: ReactNode;
+  savingLabel?: ReactNode;
+  reviewLabel?: ReactNode;
+  cancelLabel?: ReactNode;
 }
 
 export function Modal({
@@ -58,9 +90,26 @@ export function Modal({
   footerAlignment = "right",
   footerBorder: _footerBorder = false,
   loading,
+  multiTab = false,
+  requireReview = false,
+  activeTab: controlledActiveTab,
+  onActiveTabChange,
+  defaultActiveTab = "en",
+  reviewTabId = "review",
+  saveFormId,
+  saving = false,
+  saveLabel,
+  savingLabel,
+  reviewLabel,
+  cancelLabel,
 }: ModalProps) {
   const portalRoot = useSyncExternalStore(subscribeModalPortalRoot, getModalPortalRoot, () => null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const [uncontrolledActiveTab, setUncontrolledActiveTab] = useState(defaultActiveTab);
+
+  const { t } = useTranslation();
+
+  const activeTab = controlledActiveTab ?? uncontrolledActiveTab;
 
   const handleCloseEvent = useEffectEvent(() => {
     onClose();
@@ -93,6 +142,20 @@ export function Modal({
   const justifyContent = JUSTIFY_MAP[footerAlignment as keyof typeof JUSTIFY_MAP] || "flex-end";
 
   const customWidth = width ? (typeof width === "number" ? `${width}px` : width) : undefined;
+
+  const tabContextValue = useMemo(
+    () => ({
+      activeTab,
+      onActiveTabChange: (id: string) => {
+        if (onActiveTabChange) {
+          onActiveTabChange(id);
+        } else {
+          setUncontrolledActiveTab(id);
+        }
+      },
+    }),
+    [activeTab, onActiveTabChange],
+  );
 
   if (!portalRoot) return null;
 
@@ -139,15 +202,59 @@ export function Modal({
                   </button>
                 </header>
               )}
-              {children && <div className={styles.body}>{children}</div>}
-              {footer && !hideFooter && (
+              {children && (
+                <div className={styles.body}>
+                  {multiTab && tabContextValue ? (
+                    <ModalTabsContext.Provider value={tabContextValue}>
+                      {children}
+                    </ModalTabsContext.Provider>
+                  ) : (
+                    children
+                  )}
+                </div>
+              )}
+              {!hideFooter && (
                 <footer
                   className={styles.footer}
                   style={{
                     justifyContent,
                   }}
                 >
-                  {footer}
+                  {requireReview ? (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={onClose}
+                        disabled={loading || saving}
+                      >
+                        {cancelLabel ?? t("common.cancel", "Cancel")}
+                      </Button>
+                      {activeTab === reviewTabId ? (
+                        <Button type="submit" form={saveFormId} variant="primary" loading={saving}>
+                          {saving
+                            ? (savingLabel ?? t("admin.permissions.saving", "Saving…"))
+                            : (saveLabel ?? t("common.save", "Save"))}
+                        </Button>
+                      ) : (
+                        <Button
+                          type="button"
+                          variant="primary"
+                          onClick={() => {
+                            if (onActiveTabChange) {
+                              onActiveTabChange(reviewTabId);
+                            } else {
+                              setUncontrolledActiveTab(reviewTabId);
+                            }
+                          }}
+                        >
+                          {reviewLabel ?? t("admin.modal.reviewTab", "Review")}
+                        </Button>
+                      )}
+                    </>
+                  ) : (
+                    footer
+                  )}
                 </footer>
               )}
               {loading && <div className={styles.loadingOverlay} />}
@@ -158,6 +265,74 @@ export function Modal({
     </LazyMotion>,
     portalRoot!,
   );
+}
+
+// Tab compound components
+interface ModalTabItemProps {
+  id: string;
+  children?: ReactNode;
+  disabled?: boolean;
+}
+
+function ModalTabItem({ id: _id, children: _children }: ModalTabItemProps) {
+  return null;
+}
+
+interface ModalTabsProps {
+  children?: ReactNode;
+}
+
+function ModalTabs({ children }: ModalTabsProps) {
+  const { activeTab, onActiveTabChange } = useModalTabs();
+
+  const tabs = Children.toArray(children).reduce<ModalTabItemProps[]>((acc, child) => {
+    if ((child as ReactElement)?.type === ModalTabItem) {
+      acc.push((child as ReactElement)?.props);
+    }
+    return acc;
+  }, []);
+
+  return (
+    <div className={styles.tabBar} role="tablist">
+      {tabs.map((tab: ModalTabItemProps) => (
+        <button
+          key={tab.id}
+          role="tab"
+          aria-selected={activeTab === tab.id}
+          type="button"
+          className={`${styles.tabButton} ${activeTab === tab.id ? styles.tabButtonActive : ""}`}
+          onClick={() => onActiveTabChange(tab.id)}
+          disabled={tab.disabled}
+        >
+          {tab.children}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+interface ModalContentItemProps {
+  id: string;
+  children?: ReactNode;
+}
+
+function ModalContentItem({ id: _id, children: _children }: ModalContentItemProps) {
+  return null;
+}
+
+interface ModalContentProps {
+  children?: ReactNode;
+}
+
+function ModalContent({ children }: ModalContentProps) {
+  const { activeTab } = useModalTabs();
+
+  const activeContent = Children.toArray(children).find((child) => {
+    const element = child as ReactElement;
+    return element?.type === ModalContentItem && element?.props?.id === activeTab;
+  }) as ReactElement<ModalContentItemProps> | undefined;
+
+  return <>{activeContent?.props?.children}</>;
 }
 
 // Compound components for advanced use cases
@@ -381,3 +556,7 @@ Modal.Body = ModalBody;
 Modal.Footer = ModalFooter;
 Modal.ConfirmDialog = ModalConfirmDialog;
 Modal.ConfirmText = ModalConfirmText;
+Modal.Tabs = ModalTabs;
+Modal.TabItem = ModalTabItem;
+Modal.Content = ModalContent;
+Modal.ContentItem = ModalContentItem;

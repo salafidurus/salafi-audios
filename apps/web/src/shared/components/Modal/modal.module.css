@@ -159,3 +159,52 @@
   z-index: 200;
   border-radius: var(--radius-component-card);
 }
+
+.tabBar {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 1.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex-shrink: 0;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tabBar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .tabBar {
+    padding: 0 1.25rem;
+  }
+}
+
+.tabButton {
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--content-muted);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 150ms;
+}
+
+.tabButton:hover:not(:disabled) {
+  color: var(--content-default);
+}
+
+.tabButtonActive {
+  color: var(--content-accent);
+  border-bottom-color: var(--content-accent);
+}
+
+.tabButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
