@@ -43,7 +43,7 @@ export interface ScholarModalProps {
 
 interface FormState {
   formData: CreateScholarDto;
-  translationChanges: Record<"en" | "ar", { name?: string; bio?: string }>;
+  translationChanges: Record<"en" | "ar", { name?: string; bio?: string | null }>;
   saving: boolean;
   error: string | null;
   stagedImageFile: File | null;
@@ -186,12 +186,12 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
       const otherLocale = formData.mainLanguage === "en" ? "ar" : "en";
       const translation = translationChanges[otherLocale];
       if (translation.name || translation.bio) {
-        payloadData.translations = {
-          [otherLocale]: {
-            name: translation.name,
-            bio: translation.bio || null,
-          },
+        const translationPayload: Record<"en" | "ar", { name?: string; bio?: string | null }> = {};
+        translationPayload[otherLocale] = {
+          ...(translation.name && { name: translation.name }),
+          ...(translation.bio !== undefined && { bio: translation.bio }),
         };
+        payloadData.translations = translationPayload;
       }
 
       // Handle image upload if file is staged
@@ -233,7 +233,7 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
       multiTab
       requireReview
       activeTab={activeTab}
-      onActiveTabChange={setActiveTab}
+      onActiveTabChange={(id) => setActiveTab(id as "en" | "ar" | "review")}
       defaultActiveTab={formData.mainLanguage ?? "ar"}
       saveFormId="scholar-form"
       saving={saving}
@@ -271,7 +271,7 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
               <TranslationFieldsSection
                 locale="en"
                 name={translationChanges.en.name ?? ""}
-                bio={translationChanges.en.bio}
+                bio={translationChanges.en.bio ?? undefined}
                 onNameChange={(value) =>
                   dispatch({ type: "UPDATE_TRANSLATION", locale: "en", field: "name", value })
                 }
@@ -299,7 +299,7 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
               <TranslationFieldsSection
                 locale="ar"
                 name={translationChanges.ar.name ?? ""}
-                bio={translationChanges.ar.bio}
+                bio={translationChanges.ar.bio ?? undefined}
                 onNameChange={(value) =>
                   dispatch({ type: "UPDATE_TRANSLATION", locale: "ar", field: "name", value })
                 }
@@ -317,7 +317,9 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
               translationName={
                 translationChanges[formData.mainLanguage === "en" ? "ar" : "en"].name
               }
-              translationBio={translationChanges[formData.mainLanguage === "en" ? "ar" : "en"].bio}
+              translationBio={
+                translationChanges[formData.mainLanguage === "en" ? "ar" : "en"].bio ?? undefined
+              }
               stagedImagePreview={stagedImagePreview}
             />
           </Modal.ContentItem>

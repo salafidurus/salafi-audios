@@ -289,7 +289,7 @@ function ModalTabs({ children }: ModalTabsProps) {
 
   const tabs = Children.toArray(children).reduce<ModalTabItemProps[]>((acc, child) => {
     if ((child as ReactElement)?.type === ModalTabItem) {
-      acc.push((child as ReactElement)?.props);
+      acc.push((child as ReactElement<ModalTabItemProps>)?.props);
     }
     return acc;
   }, []);
@@ -330,7 +330,7 @@ function ModalContent({ children }: ModalContentProps) {
   const { activeTab } = useModalTabs();
 
   const activeContent = Children.toArray(children).find((child) => {
-    const element = child as ReactElement;
+    const element = child as ReactElement<ModalContentItemProps>;
     return element?.type === ModalContentItem && element?.props?.id === activeTab;
   }) as ReactElement<ModalContentItemProps> | undefined;
 
