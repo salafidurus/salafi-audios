@@ -1,5 +1,5 @@
 import { describe, it, expect } from "bun:test";
-import { getSecondaryLocales, buildTranslationsPayload } from "./locale-tabs";
+import { getSecondaryLocales, buildTranslationsPayload, getLocaleLabel } from "./locale-tabs";
 
 describe("getSecondaryLocales", () => {
   it("returns locales excluding the main locale", () => {
@@ -54,7 +54,7 @@ describe("buildTranslationsPayload", () => {
       (v) => !!v?.name,
     );
     expect(result).toHaveLength(1);
-    expect(result![0].locale).toBe("en");
+    expect(result?.[0]?.locale).toBe("en");
   });
 
   it("works with complex object types", () => {
@@ -68,8 +68,8 @@ describe("buildTranslationsPayload", () => {
       (v) => !!(v?.title || v?.description),
     );
     expect(result).toHaveLength(2);
-    expect(result![0].title).toBe("Lecture");
-    expect(result![1].title).toBe("محاضرة");
+    expect(result?.[0]?.title).toBe("Lecture");
+    expect(result?.[1]?.title).toBe("محاضرة");
   });
 
   it("returns undefined when input array is empty", () => {
@@ -93,5 +93,17 @@ describe("buildTranslationsPayload", () => {
       bio: "Bio",
       status: "published",
     });
+  });
+});
+
+describe("getLocaleLabel", () => {
+  it("returns 'English' for en locale", () => {
+    const result = getLocaleLabel("en");
+    expect(result).toBe("English");
+  });
+
+  it("returns Arabic label for ar locale", () => {
+    const result = getLocaleLabel("ar");
+    expect(result).toBe("العربية");
   });
 });

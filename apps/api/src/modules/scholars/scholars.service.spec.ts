@@ -191,10 +191,9 @@ describe('ScholarsService', () => {
         isActive: true,
         country: 'SA',
         mainLanguage: 'ar',
-        translations: {
-          en: { name: 'New Scholar - English', bio: 'English bio' },
-          ar: { name: 'عالم جديد', bio: 'سيرة عربية' },
-        },
+        translations: [
+          { locale: 'en', name: 'New Scholar - English', bio: 'English bio' },
+        ],
       };
       const created = {
         id: 's2',
@@ -268,10 +267,9 @@ describe('ScholarsService', () => {
     it('should update existing scholar with inline translations', async () => {
       const dto: UpdateScholarDto = {
         name: 'Updated Name',
-        translations: {
-          en: { name: 'Updated Name - English' },
-          ar: { name: 'اسم محدث' },
-        },
+        translations: [
+          { locale: 'en', name: 'Updated Name - English' },
+        ],
       };
       const existing = {
         id: 's1',

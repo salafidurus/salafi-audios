@@ -193,4 +193,20 @@ describe("ListingModal", () => {
     expect(onSuccessMock).toHaveBeenCalledTimes(1);
     expect(onCloseMock).toHaveBeenCalledTimes(1);
   });
+
+  it("accepts listingId prop for fetch-on-open pattern", () => {
+    const onClose = vi.fn();
+    const onSuccess = vi.fn();
+
+    expect(() => {
+      render(
+        <ListingModal
+          isOpen
+          listingId="listing-1"
+          onClose={onClose}
+          onSuccess={onSuccess}
+        />,
+      );
+    }).not.toThrow();
+  });
 });

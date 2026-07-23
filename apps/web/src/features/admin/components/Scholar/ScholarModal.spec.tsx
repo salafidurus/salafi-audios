@@ -7,6 +7,10 @@ vi.mock("../../api/admin-lectures.api", () => ({
   uploadToR2: vi.fn(),
 }));
 
+vi.mock("@/features/admin/api/admin.api", () => ({
+  fetchScholarFormData: vi.fn(),
+}));
+
 describe("ScholarModal", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -116,8 +120,9 @@ describe("ScholarModal", () => {
       expect(onSave).toHaveBeenCalled();
       const callArgs = onSave.mock.calls?.[0]?.[0] as any;
       expect(callArgs?.translations).toBeDefined();
-      expect(callArgs?.translations?.en).toBeDefined();
-      expect(callArgs?.translations?.en?.name).toBe("Scholar Name");
+      const enTranslation = callArgs?.translations?.find((t: any) => t.locale === "en");
+      expect(enTranslation).toBeDefined();
+      expect(enTranslation?.name).toBe("Scholar Name");
     });
 
     expect(onClose).toHaveBeenCalled();

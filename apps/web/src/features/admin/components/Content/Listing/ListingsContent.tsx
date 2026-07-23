@@ -7,7 +7,6 @@ import { useInfiniteAdminListings } from "@sd/domain-content";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { Content } from "../Content";
-import { fetchAdminLectureDetail } from "@/features/admin/api/admin-lectures.api";
 
 type AudioData = {
   audioKey: string;
@@ -36,7 +35,7 @@ export function ListingsContent({
 
   const setIsAudioUploaderOpen = onAudioUploaderOpenChange;
   const [isListingModalOpen, setIsListingModalOpen] = useState(false);
-  const [selectedListing, setSelectedListing] = useState<AdminListingDetailDto | null>(null);
+  const [selectedListingId, setSelectedListingId] = useState<string | null>(null);
   const [initialAudioData, setInitialAudioData] = useState<AudioData | null>(null);
   const queryClient = useQueryClient();
 
@@ -44,26 +43,21 @@ export function ListingsContent({
 
   const handleUploadComplete = (audioInfo: AudioData | null) => {
     setInitialAudioData(audioInfo);
-    setSelectedListing(null);
+    setSelectedListingId(null);
     setIsAudioUploaderOpen(false);
     setIsListingModalOpen(true);
   };
 
-  const handleEditListing = async (listingId: string) => {
-    try {
-      const details = await fetchAdminLectureDetail(listingId);
-      setSelectedListing(details);
-      setInitialAudioData(null);
-      setIsListingModalOpen(true);
-    } catch {
-      // Stay on current view
-    }
+  const handleEditListing = (listingId: string) => {
+    setSelectedListingId(listingId);
+    setInitialAudioData(null);
+    setIsListingModalOpen(true);
   };
 
   const handleListingSaved = () => {
     queryClient.invalidateQueries({ queryKey: queryKeys.admin.listings.infinite() });
     setIsListingModalOpen(false);
-    setSelectedListing(null);
+    setSelectedListingId(null);
     setInitialAudioData(null);
   };
 
@@ -92,9 +86,9 @@ export function ListingsContent({
           setIsAudioUploaderOpen(false);
         }}
         onSuccess={handleListingSaved}
-        listing={selectedListing}
+        listingId={selectedListingId}
         initialAudioData={initialAudioData}
-        showAudioUploadTab={isAudioUploaderOpen && !selectedListing}
+        showAudioUploadTab={isAudioUploaderOpen && !selectedListingId}
         onAudioUploadComplete={handleUploadComplete}
       />
     </>

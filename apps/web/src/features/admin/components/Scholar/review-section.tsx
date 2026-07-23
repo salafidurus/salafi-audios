@@ -1,17 +1,17 @@
 "use client";
 
 import Image from "next/image";
-import type { CreateScholarDto } from "@sd/core-contracts";
+import type { CreateScholarDto, Locale } from "@sd/core-contracts";
 import { FormSection } from "@/features/admin/components/FormSection";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
 import styles from "./review-section.module.css";
 
 interface ReviewSectionProps {
   formData: CreateScholarDto;
   changedFields: Record<string, boolean>;
   mainLanguageName?: string;
-  translationName?: string;
-  translationBio?: string;
+  translations?: Array<{ locale: Locale; name?: string; bio?: string | null }>;
   stagedImagePreview: string | null;
 }
 
@@ -19,15 +19,12 @@ export function ReviewSection({
   formData,
   changedFields,
   mainLanguageName,
-  translationName,
-  translationBio,
+  translations = [],
   stagedImagePreview,
 }: ReviewSectionProps) {
   const { t } = useTranslation();
 
-  const otherLanguage = formData.mainLanguage === "en" ? "ar" : "en";
-  const otherLanguageName = otherLanguage === "en" ? "English" : "العربية";
-  const hasTranslations = translationName || translationBio;
+  const hasTranslations = translations.some((trans) => trans.name || trans.bio);
 
   // Check if any changed field should be displayed
   const hasDetailChanges =
@@ -106,24 +103,28 @@ export function ReviewSection({
         </FormSection>
       )}
 
-      {(translationName || translationBio) && (
-        <FormSection title={t("admin.scholars.translation", `Translation (${otherLanguageName})`)}>
-          <div className={styles.grid}>
-            {translationName && (
-              <div className={styles.field}>
-                <div className={styles.label}>{t("admin.scholars.nameLabel", "Name")}</div>
-                <div className={styles.value}>{translationName}</div>
-              </div>
-            )}
-            {translationBio && (
-              <div className={styles.field}>
-                <div className={styles.label}>{t("admin.scholars.bioLabel", "Bio")}</div>
-                <div className={styles.value}>{translationBio}</div>
-              </div>
-            )}
-          </div>
-        </FormSection>
-      )}
+      {translations.map((trans) => {
+        if (!trans.name && !trans.bio) return null;
+        const localeLabel = getLocaleLabel(trans.locale);
+        return (
+          <FormSection key={trans.locale} title={t("admin.scholars.translation", `Translation (${localeLabel})`)}>
+            <div className={styles.grid}>
+              {trans.name && (
+                <div className={styles.field}>
+                  <div className={styles.label}>{t("admin.scholars.nameLabel", "Name")}</div>
+                  <div className={styles.value}>{trans.name}</div>
+                </div>
+              )}
+              {trans.bio && (
+                <div className={styles.field}>
+                  <div className={styles.label}>{t("admin.scholars.bioLabel", "Bio")}</div>
+                  <div className={styles.value}>{trans.bio}</div>
+                </div>
+              )}
+            </div>
+          </FormSection>
+        );
+      })}
 
       {hasSocialChanges && (
         <FormSection title={t("admin.scholars.socialMedia", "Social Media")}>

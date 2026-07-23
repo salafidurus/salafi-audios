@@ -6,6 +6,7 @@ import type {
   AdminListingUpdateDto,
   AdminListingListDto,
   AdminListingDetailDto,
+  ListingFormDataDto,
 } from "@sd/core-contracts";
 
 export function getPresignedUrl(data: PresignedUrlRequestDto) {
@@ -96,6 +97,13 @@ export function fetchAdminLectures(params?: {
 export function fetchAdminLectureDetail(id: string) {
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.detail(id),
+    method: "GET",
+  });
+}
+
+export function fetchListingFormData(id: string) {
+  return httpClient<ListingFormDataDto>({
+    url: endpoints.admin.listings.formData(id),
     method: "GET",
   });
 }

@@ -1,8 +1,6 @@
 import { useReducer } from "react";
-import type { AdminListingDetailDto } from "@sd/core-contracts";
+import type { AdminListingDetailDto, ListingFormDataDto, Locale } from "@sd/core-contracts";
 import { validateLectureStatus, type LectureStatus } from "@/shared/types/form-types";
-
-export type Locale = "en" | "ar";
 
 export type FormState = {
   title: string;
@@ -14,7 +12,8 @@ export type FormState = {
   orderIndex: number;
   selectedTopics: string[];
   language: Locale;
-  translationChanges: Record<Locale, { title?: string; description?: string }>;
+  translationChanges: Partial<Record<Locale, { title?: string; description?: string }>>;
+  initialTranslationChanges: Partial<Record<Locale, { title?: string; description?: string }>>;
   saving: boolean;
   formError: string | null;
 };
@@ -24,7 +23,8 @@ export type FormAction =
   | { type: "UPDATE_TRANSLATION"; locale: Locale; field: "title" | "description"; value: string }
   | { type: "SET_SAVING"; saving: boolean }
   | { type: "SET_ERROR"; error: string | null }
-  | { type: "INIT_STATE"; state: FormState };
+  | { type: "INIT_STATE"; state: FormState }
+  | { type: "INIT_STATE"; data: ListingFormDataDto };
 
 function formReducer(state: FormState, action: FormAction): FormState {
   switch (action.type) {
@@ -45,8 +45,47 @@ function formReducer(state: FormState, action: FormAction): FormState {
       return { ...state, saving: action.saving };
     case "SET_ERROR":
       return { ...state, formError: action.error };
-    case "INIT_STATE":
-      return action.state;
+    case "INIT_STATE": {
+      if ("data" in action && action.data) {
+        // New pattern: initialize from fetched ListingFormDataDto
+        const { listing, translations } = action.data;
+        const newState: FormState = {
+          title: listing.title,
+          slug: listing.slug,
+          description: listing.description || "",
+          scholarId: listing.scholarId,
+          seriesId: listing.parentId || "",
+          status: validateLectureStatus(listing.status),
+          orderIndex: listing.orderIndex || 0,
+          selectedTopics: listing.topics || [],
+          language: (listing.language as Locale) || "ar",
+          saving: false,
+          formError: null,
+          translationChanges: {},
+          initialTranslationChanges: {},
+        };
+
+        // Map translations array to translationChanges Record, excluding mainLanguage
+        for (const trans of translations) {
+          if (trans.locale !== newState.language) {
+            newState.translationChanges[trans.locale] = {
+              title: trans.fields?.title ?? undefined,
+              description: trans.fields?.description ?? undefined,
+            };
+            newState.initialTranslationChanges[trans.locale] = {
+              title: trans.fields?.title ?? undefined,
+              description: trans.fields?.description ?? undefined,
+            };
+          }
+        }
+
+        return newState;
+      } else if ("state" in action) {
+        // Old pattern: initialize from FormState
+        return action.state;
+      }
+      return state;
+    }
     default:
       return state;
   }
@@ -67,7 +106,8 @@ export function getInitialFormData(
       orderIndex: listing.orderIndex || 0,
       selectedTopics: listing.topics || [],
       language: (listing.language as Locale) || "ar",
-      translationChanges: { en: {}, ar: {} },
+      translationChanges: {},
+      initialTranslationChanges: {},
       saving: false,
       formError: null,
     };
@@ -82,7 +122,8 @@ export function getInitialFormData(
     orderIndex: 0,
     selectedTopics: [],
     language: "ar",
-    translationChanges: { en: {}, ar: {} },
+    translationChanges: {},
+    initialTranslationChanges: {},
     saving: false,
     formError: null,
   };

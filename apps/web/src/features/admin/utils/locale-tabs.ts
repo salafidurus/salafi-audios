@@ -4,6 +4,10 @@ export function getSecondaryLocales(mainLocale: Locale): Locale[] {
   return SUPPORTED_LOCALES.filter((locale) => locale !== mainLocale);
 }
 
+export function getLocaleLabel(locale: Locale): string {
+  return locale === "en" ? "English" : "العربية";
+}
+
 export function buildTranslationsPayload<T extends Record<string, unknown>>(
   translationChanges: Partial<Record<Locale, T>>,
   locales: Locale[],

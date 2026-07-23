@@ -5,11 +5,13 @@ import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button";
 import { EditableInput } from "@/shared/components/EditableInput";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { type Locale } from "@sd/core-contracts";
 import {
   fetchAdminTopic,
   createTopicWithTranslations,
   updateTopicWithTranslations,
 } from "@/features/admin/api/admin.api";
+import { getSecondaryLocales } from "@/features/admin/utils/locale-tabs";
 import type {
   CreateTopicWithTranslationsDto,
   UpdateTopicWithTranslationsDto,
@@ -117,7 +119,7 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
       if (isEditing) {
         const body: UpdateTopicWithTranslationsDto = {
           name: { en: nameEn },
-          translations: translationEntries,
+          translations: translationEntries.filter((t) => t.name.trim()),
         };
         await updateTopicWithTranslations(topicSlug, body);
         onSaved(topicSlug);

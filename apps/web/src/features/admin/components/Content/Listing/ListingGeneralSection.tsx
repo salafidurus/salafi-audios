@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import type { ScholarListItemDto, TopicDetailDto, ListingRefDto } from "@sd/core-contracts";
+import type { ScholarListItemDto, TopicDetailDto, ListingRefDto, Locale } from "@sd/core-contracts";
 import { getLocalizedName } from "@sd/core-i18n";
 import { validateLectureStatus } from "@/shared/types/form-types";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -12,7 +12,7 @@ import {
   DropdownContent,
   DropdownItem,
 } from "@/shared/components/Dropdown";
-import type { FormState, FormAction, Locale } from "@/features/admin/hooks/Content/useListingForm";
+import type { FormState, FormAction } from "@/features/admin/hooks/Content/useListingForm";
 import styles from "./listing-modal.module.css";
 
 interface ListingGeneralSectionProps {

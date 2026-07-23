@@ -14,7 +14,7 @@ import { Search } from "@/shared/components/Search";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { type CreateScholarDto, type AdminScholarListItemDto } from "@sd/core-contracts";
 import { createScholar, updateScholar } from "@/features/admin/api/admin.api";
-import { Scholar, type ScholarForEdit } from "@/features/admin/components/Scholar";
+import { Scholar } from "@/features/admin/components/Scholar";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
@@ -27,7 +27,7 @@ export function AdminScholarsScreen() {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingScholar, setEditingScholar] = useState<ScholarForEdit | null>(null);
+  const [editingScholarId, setEditingScholarId] = useState<string | null>(null);
 
   const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useInfiniteAdminScholars({
@@ -37,31 +37,18 @@ export function AdminScholarsScreen() {
   const allItems = data?.pages.flatMap((page) => page.items) ?? [];
 
   const handleOpenAdd = () => {
-    setEditingScholar(null);
+    setEditingScholarId(null);
     setIsModalOpen(true);
   };
 
   const handleOpenEdit = (scholar: AdminScholarListItemDto) => {
-    setEditingScholar({
-      id: scholar.id,
-      name: scholar.name,
-      slug: scholar.slug,
-      bio: scholar.bio,
-      imageUrl: scholar.imageUrl,
-      isActive: scholar.isActive,
-      country: scholar.country,
-      mainLanguage: scholar.mainLanguage ?? "ar",
-      socialTwitter: scholar.socialTwitter,
-      socialTelegram: scholar.socialTelegram,
-      socialYoutube: scholar.socialYoutube,
-      socialWebsite: scholar.socialWebsite,
-    });
+    setEditingScholarId(scholar.id);
     setIsModalOpen(true);
   };
 
   const handleSave = async (formData: CreateScholarDto) => {
-    if (editingScholar) {
-      await updateScholar(editingScholar.id, formData);
+    if (editingScholarId) {
+      await updateScholar(editingScholarId, formData);
     } else {
       await createScholar(formData);
     }
@@ -70,7 +57,7 @@ export function AdminScholarsScreen() {
       queryKey: queryKeys.admin.scholars.infinite(),
     });
     setIsModalOpen(false);
-    setEditingScholar(null);
+    setEditingScholarId(null);
   };
 
   return (
@@ -138,17 +125,15 @@ export function AdminScholarsScreen() {
 
       <ScrollToTopButton />
 
-      {isModalOpen && (
-        <Scholar.Modal
-          scholar={editingScholar}
-          isOpen={isModalOpen}
-          onClose={() => {
-            setIsModalOpen(false);
-            setEditingScholar(null);
-          }}
-          onSave={handleSave}
-        />
-      )}
+      <Scholar.Modal
+        scholarId={editingScholarId}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setEditingScholarId(null);
+        }}
+        onSave={handleSave}
+      />
     </ScreenView>
   );
 }
