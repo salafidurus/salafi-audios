@@ -180,7 +180,6 @@ function ListingForm({
             <DropdownTrigger
               id="lecture-scholar"
               placeholder={t("admin.contents.listing.scholarPlaceholder", "Select Scholar")}
-              disabled={!!listing}
               testId="scholar-dropdown"
             />
             <DropdownContent searchable>
@@ -204,7 +203,6 @@ function ListingForm({
                 "admin.contents.listing.seriesPlaceholder",
                 "Select Series (Optional)",
               )}
-              disabled={!!listing}
               testId="series-dropdown"
             />
             <DropdownContent searchable>
