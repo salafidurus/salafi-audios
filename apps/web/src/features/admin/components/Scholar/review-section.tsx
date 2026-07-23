@@ -24,6 +24,23 @@ export function ReviewSection({
 
   const otherLanguage = formData.mainLanguage === "en" ? "ar" : "en";
   const otherLanguageName = otherLanguage === "en" ? "English" : "العربية";
+  const hasTranslations = translationName || translationBio;
+  const hasSocialMedia =
+    formData.socialTwitter ||
+    formData.socialTelegram ||
+    formData.socialYoutube ||
+    formData.socialWebsite;
+  const hasNoChanges = !hasTranslations && !hasSocialMedia && !stagedImagePreview;
+
+  if (hasNoChanges) {
+    return (
+      <div className={styles.emptyState}>
+        <p className={styles.emptyStateText}>
+          {t("admin.scholars.noChangesMadeYet", "No changes made yet")}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <>
