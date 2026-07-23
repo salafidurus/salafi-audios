@@ -44,20 +44,6 @@ export const TopicLectureViewDtoSchema = z.object({
 });
 export type TopicLectureViewDto = z.infer<typeof TopicLectureViewDtoSchema>;
 
-export const UpsertTopicDtoSchema = z.object({
-  slug: z.string().min(1, "Slug must not be empty"),
-  name: TopicNameSchema,
-  translations: z
-    .record(
-      LocaleSchema,
-      z.object({
-        name: z.string().optional(),
-      }),
-    )
-    .optional(),
-});
-export type UpsertTopicDto = z.infer<typeof UpsertTopicDtoSchema>;
-
 export const SaveTopicTranslationDtoSchema = z.object({
   locale: LocaleSchema,
   name: z.string().min(1, "Name must not be empty"),

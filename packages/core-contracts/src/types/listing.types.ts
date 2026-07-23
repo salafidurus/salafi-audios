@@ -136,9 +136,12 @@ export const AdminListingUpdateDtoSchema = z.object({
   orderIndex: z.number().optional(),
   status: StatusValueSchema.optional(),
   translations: z
-    .record(
-      LocaleSchema,
-      z.object({ title: z.string(), description: z.string().nullable().optional() }),
+    .array(
+      z.object({
+        locale: LocaleSchema,
+        title: z.string(),
+        description: z.string().nullable().optional(),
+      }),
     )
     .optional(),
 });
@@ -214,9 +217,12 @@ export const CreateListingDtoSchema = z.object({
   durationSeconds: z.number().optional(),
   sizeBytes: z.number().optional(),
   translations: z
-    .record(
-      LocaleSchema,
-      z.object({ title: z.string(), description: z.string().nullable().optional() }),
+    .array(
+      z.object({
+        locale: LocaleSchema,
+        title: z.string(),
+        description: z.string().nullable().optional(),
+      }),
     )
     .optional(),
 });

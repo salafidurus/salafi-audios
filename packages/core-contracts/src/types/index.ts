@@ -16,8 +16,6 @@ export {
   TopicDetailDtoSchema,
   type TopicLectureViewDto,
   TopicLectureViewDtoSchema,
-  type UpsertTopicDto,
-  UpsertTopicDtoSchema,
   type SaveTopicTranslationDto,
   SaveTopicTranslationDtoSchema,
   type UpdateTopicTranslationDto,

@@ -213,8 +213,6 @@ export {
   SaveListingTranslationDtoSchema,
   type UpdateListingTranslationDto,
   UpdateListingTranslationDtoSchema,
-  type UpsertTopicDto,
-  UpsertTopicDtoSchema,
   type SaveTopicTranslationDto,
   SaveTopicTranslationDtoSchema,
   type UpdateTopicTranslationDto,

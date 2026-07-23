@@ -148,7 +148,9 @@ export const CreateScholarDtoSchema = z.object({
   socialYoutube: z.url().optional().or(z.literal("")),
   socialWebsite: z.url().optional().or(z.literal("")),
   translations: z
-    .record(LocaleSchema, z.object({ name: z.string(), bio: z.string().nullable().optional() }))
+    .array(
+      z.object({ locale: LocaleSchema, name: z.string(), bio: z.string().nullable().optional() }),
+    )
     .optional(),
 });
 export type CreateScholarDto = z.infer<typeof CreateScholarDtoSchema>;
