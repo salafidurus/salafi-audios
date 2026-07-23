@@ -45,7 +45,6 @@ export function AdminScholarsScreen() {
       slug: scholar.slug,
       bio: scholar.bio,
       imageUrl: scholar.imageUrl,
-      isKibar: scholar.isKibar,
       isActive: scholar.isActive,
       country: scholar.country,
       mainLanguage: scholar.mainLanguage ?? "ar",

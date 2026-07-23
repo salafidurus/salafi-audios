@@ -9,7 +9,6 @@ const baseScholar: ScholarListItemDto = {
   name: "Scholar One",
   imageUrl: undefined,
   mainLanguage: "ar",
-  isKibar: true,
   lectureCount: 45,
 };
 

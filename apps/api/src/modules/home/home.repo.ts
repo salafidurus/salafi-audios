@@ -13,7 +13,7 @@ export class HomeRepo {
     const locale = getRequestLocale();
     const records = await this.prisma.scholar.findMany({
       where: { isActive: true },
-      orderBy: [{ isFeatured: 'desc' }, { isKibar: 'desc' }],
+      orderBy: { createdAt: 'desc' },
       take: 8,
       select: {
         id: true,

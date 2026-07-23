@@ -62,7 +62,6 @@ const baseScholar = {
   country: undefined,
   mainLanguage: undefined,
   isActive: true,
-  isKibar: true,
   socialTelegram: undefined,
   socialTwitter: undefined,
   socialWebsite: undefined,

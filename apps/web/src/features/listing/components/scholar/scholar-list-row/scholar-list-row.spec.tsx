@@ -10,7 +10,6 @@ const mockScholar: ScholarListItemDto = {
   name: "Abdul Aziz bin Baz",
   imageUrl: undefined,
   mainLanguage: "ar" as any,
-  isKibar: true,
   lectureCount: 42,
 };
 

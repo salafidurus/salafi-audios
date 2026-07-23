@@ -13,14 +13,12 @@ export async function seedScholars(prisma: PrismaClient): Promise<void> {
         slug: scholar.slug,
         name: scholar.name,
         bio: scholar.bio,
-        isKibar: scholar.isKibar,
         country: scholar.country,
         mainLanguage: scholar.mainLanguage,
       },
       create: {
         ...scholar,
         isActive: true,
-        isFeatured: false,
       },
     });
   }

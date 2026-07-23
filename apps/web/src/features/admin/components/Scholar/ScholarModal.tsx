@@ -20,8 +20,6 @@ export interface ScholarForEdit {
   slug: string;
   bio?: string | null;
   imageUrl?: string | null;
-  isKibar?: boolean;
-  isFeatured?: boolean;
   isActive?: boolean;
   country?: string | null;
   mainLanguage?: "en" | "ar" | null;

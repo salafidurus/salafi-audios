@@ -48,12 +48,6 @@ function ScholarDetails({
               <span className={styles.country}>{isMobile ? scholar.country : countryName}</span>
             </>
           )}
-          {!isMobile && scholar.isKibar && (
-            <>
-              <span className={styles.sep}>&bull;</span>
-              <span className={styles.kibarBadge}>KIBAR</span>
-            </>
-          )}
         </div>
         {scholar.translations.length > 0 && (
           <div className={styles.translationRow}>

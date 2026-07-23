@@ -9,7 +9,6 @@ export interface ScholarData {
   slug: string;
   name: string;
   bio: string;
-  isKibar: boolean;
   country: string;
   mainLanguage: "en" | "ar";
 }
@@ -20,7 +19,6 @@ export const SCHOLARS: ScholarData[] = [
     slug: "uthaymin",
     name: "Muhammad ibn Salih al-Uthaymin",
     bio: "Foremost scholar of Ahl al-Sunnah in the 20th century. Expert in fiqh, aqeedah, and tafsir.",
-    isKibar: true,
     country: "SA",
     mainLanguage: "ar",
   },
@@ -29,7 +27,6 @@ export const SCHOLARS: ScholarData[] = [
     slug: "fawzan",
     name: "Salih ibn Fawzan al-Fawzan",
     bio: "The Grand Mufti of the Kingdom of Saudi Arabia. Expert in various field of Islamic knowledge: Aqeedah, Fiqh, Tafsir, etc.",
-    isKibar: true,
     country: "SA",
     mainLanguage: "ar",
   },
@@ -38,7 +35,6 @@ export const SCHOLARS: ScholarData[] = [
     slug: "arafat",
     name: "Arafat bn Hasan Al-Muhammadi",
     bio: "Contemporary Salafi scholar based in Saudi Arabia. Known for aqeedah and fiqh series.",
-    isKibar: false,
     country: "YE",
     mainLanguage: "ar",
   },
@@ -47,7 +43,6 @@ export const SCHOLARS: ScholarData[] = [
     slug: "mustafa-bn-mabram",
     name: "Mustafa bn Mabram",
     bio: "Specialist in Arabic grammar (nahw and sarf). Author of textbooks on i'rab.",
-    isKibar: false,
     country: "YE",
     mainLanguage: "ar",
   },
@@ -56,7 +51,6 @@ export const SCHOLARS: ScholarData[] = [
     slug: "abdullah-al-bukhari",
     name: "Abdullah al-Bukhari",
     bio: "Contemporary muhaddith specializing in hadith sciences and mustalah al-hadith.",
-    isKibar: true,
     country: "SA",
     mainLanguage: "ar",
   },
@@ -65,7 +59,6 @@ export const SCHOLARS: ScholarData[] = [
     slug: "e2e-scholar-slug",
     name: "Scholar Name (English)",
     bio: "English biography",
-    isKibar: false,
     country: "SA",
     mainLanguage: "ar",
   },

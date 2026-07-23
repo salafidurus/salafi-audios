@@ -72,8 +72,6 @@ export type AdminScholarInput = {
   slug: string;
   bio?: string;
   imageUrl?: string;
-  isKibar?: boolean;
-  isFeatured?: boolean;
   isActive?: boolean;
   country?: string;
   mainLanguage?: "en" | "ar";
