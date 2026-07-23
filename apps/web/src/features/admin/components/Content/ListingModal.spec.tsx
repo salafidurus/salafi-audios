@@ -79,13 +79,16 @@ describe("ListingModal", () => {
 
     expect(screen.getByText(/new lecture details/i)).toBeInTheDocument();
 
-    const titleInput = screen.getByLabelText(/title/i);
-    fireEvent.change(titleInput, { target: { value: "My Great Lecture" } });
-
     const scholarTrigger = screen.getByTestId("scholar-dropdown");
     fireEvent.click(scholarTrigger);
     const scholarOption = await screen.findByRole("option", { name: /scholar one/i });
     fireEvent.click(scholarOption);
+
+    const mainTabButton = screen.getByRole("tab", { name: /العربية/i });
+    fireEvent.click(mainTabButton);
+
+    const titleInput = await screen.findByLabelText(/title/i);
+    fireEvent.change(titleInput, { target: { value: "My Great Lecture" } });
 
     const reviewButton = screen.getByRole("button", { name: /review/i });
     fireEvent.click(reviewButton);
@@ -145,16 +148,28 @@ describe("ListingModal", () => {
     );
 
     expect(screen.getByText(/edit lecture details/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/title/i)).toHaveValue("Existing Title");
-    expect(screen.getByLabelText(/description/i)).toHaveValue("Existing Description");
+
     await waitFor(() => {
       expect(screen.getByTestId("scholar-dropdown")).toHaveTextContent("Scholar Two");
       expect(screen.getByTestId("series-dropdown")).toHaveTextContent("Series One");
     });
-    expect(screen.getByLabelText(/order index/i)).toHaveValue(5);
 
-    fireEvent.change(screen.getByLabelText(/title/i), { target: { value: "Updated Title" } });
-    fireEvent.change(screen.getByLabelText(/order index/i), { target: { value: "10" } });
+    const mainTabButton = screen.getByRole("tab", { name: /العربية/i });
+    fireEvent.click(mainTabButton);
+
+    const titleInput = await screen.findByLabelText(/title/i);
+    const descriptionInput = await screen.findByLabelText(/description/i);
+    expect(titleInput).toHaveValue("Existing Title");
+    expect(descriptionInput).toHaveValue("Existing Description");
+
+    fireEvent.change(titleInput, { target: { value: "Updated Title" } });
+
+    const generalTabButton = screen.getByRole("tab", { name: /general/i });
+    fireEvent.click(generalTabButton);
+
+    const orderIndexInput = await screen.findByLabelText(/order index/i);
+    expect(orderIndexInput).toHaveValue(5);
+    fireEvent.change(orderIndexInput, { target: { value: "10" } });
 
     const reviewButton = screen.getByRole("button", { name: /review/i });
     fireEvent.click(reviewButton);
