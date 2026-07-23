@@ -8,12 +8,12 @@
       "packages/*"
     ],
     "catalog": {
-      "@better-auth/expo": "1.6.23",
+      "@better-auth/expo": "1.6.24",
       "@prisma/adapter-pg": "7.9.0",
       "@prisma/client": "7.9.0",
       "@tanstack/react-query": "^5.101.4",
       "@tanstack/react-query-persist-client": "^5.101.4",
-      "better-auth": "1.6.23",
+      "better-auth": "1.6.24",
       "i18next": "^26.3.6",
       "pg": "8.22.0",
       "react": "19.2.3",
