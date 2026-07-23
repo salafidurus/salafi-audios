@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import type { CreateScholarDto } from "@sd/core-contracts";
 import { EditableInput } from "@/shared/components/EditableInput";
 import { FormSection } from "@/features/admin/components/FormSection";
@@ -82,7 +83,13 @@ export function SocialSection({ formData, dispatch }: SocialSectionProps) {
           return (
             <div key={field.key} className={styles.fieldWithIcon}>
               {field.icon && (
-                <img src={field.icon} alt={field.defaultLabel} className={styles.iconOnly} />
+                <Image
+                  src={field.icon}
+                  alt={field.defaultLabel}
+                  width={24}
+                  height={24}
+                  className={styles.iconOnly}
+                />
               )}
               <div className={styles.inputWrapper}>
                 {field.prefix ? (

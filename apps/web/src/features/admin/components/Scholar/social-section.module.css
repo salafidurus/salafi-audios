@@ -20,7 +20,7 @@
 .fieldWithIcon {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-sm);
+  gap: var(--space-md);
 }
 
 .iconOnly {
