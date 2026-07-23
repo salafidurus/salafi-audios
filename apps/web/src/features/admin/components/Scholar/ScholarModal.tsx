@@ -199,7 +199,7 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
           : t("admin.scholars.addScholar", "Add Scholar")
       }
       size="xl"
-      width="80rem"
+      width="var(--modal-width-wide)"
       footer={
         <>
           <Button type="button" variant="ghost" onClick={onClose} disabled={saving}>
