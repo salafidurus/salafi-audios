@@ -30,9 +30,10 @@ export function ReviewSection({
     formData.socialTelegram ||
     formData.socialYoutube ||
     formData.socialWebsite;
-  const hasNoChanges = !hasTranslations && !hasSocialMedia && !stagedImagePreview;
+  const hasMainLanguageData = formData.name || formData.bio || formData.title || formData.country;
+  const hasAnyData = hasMainLanguageData || hasTranslations || hasSocialMedia || stagedImagePreview;
 
-  if (hasNoChanges) {
+  if (!hasAnyData) {
     return (
       <div className={styles.emptyState}>
         <p className={styles.emptyStateText}>
