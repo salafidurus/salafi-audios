@@ -221,28 +221,12 @@ describe('ScholarsService', () => {
       };
 
       repo.create.mockResolvedValue(created as any);
-      repo.upsertScholarTranslation.mockResolvedValue({
-        locale: 'en',
-        name: 'New Scholar - English',
-        bio: 'English bio',
-        status: 'draft',
-      } as any);
 
       const result = await service.create(dto);
 
       expect(result).toEqual(created);
+      // Repository now handles translations in a single transaction
       expect(repo.create).toHaveBeenCalledWith(dto);
-      expect(repo.upsertScholarTranslation).toHaveBeenCalledTimes(2);
-      expect(repo.upsertScholarTranslation).toHaveBeenCalledWith('s2', {
-        locale: 'en',
-        name: 'New Scholar - English',
-        bio: 'English bio',
-      });
-      expect(repo.upsertScholarTranslation).toHaveBeenCalledWith('s2', {
-        locale: 'ar',
-        name: 'عالم جديد',
-        bio: 'سيرة عربية',
-      });
     });
   });
 
@@ -313,27 +297,13 @@ describe('ScholarsService', () => {
 
       repo.findById.mockResolvedValue(existing as any);
       repo.update.mockResolvedValue(updated as any);
-      repo.upsertScholarTranslation.mockResolvedValue({
-        locale: 'en',
-        name: 'Updated Name - English',
-        status: 'draft',
-      } as any);
 
       const result = await service.update('s1', dto);
 
       expect(result).toEqual(updated as any);
       expect(repo.findById).toHaveBeenCalledWith('s1');
+      // Repository now handles translations in a single transaction
       expect(repo.update).toHaveBeenCalledWith('s1', dto);
-      expect(repo.upsertScholarTranslation).toHaveBeenCalledWith('s1', {
-        locale: 'en',
-        name: 'Updated Name - English',
-        bio: null,
-      });
-      expect(repo.upsertScholarTranslation).toHaveBeenCalledWith('s1', {
-        locale: 'ar',
-        name: 'اسم محدث',
-        bio: null,
-      });
     });
 
     it('should throw NotFoundException when scholar to update not found', async () => {

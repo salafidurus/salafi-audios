@@ -498,41 +498,90 @@ export class ScholarsRepository {
   }
 
   async create(dto: CreateScholarDto) {
-    return this.prisma.scholar.create({
-      data: {
-        name: dto.name,
-        slug: dto.slug,
-        bio: dto.bio,
-        imageUrl: dto.imageUrl,
-        isActive: dto.isActive ?? true,
-        title: dto.title,
-        country: dto.country,
-        mainLanguage: dto.mainLanguage,
-        socialTwitter: dto.socialTwitter,
-        socialTelegram: dto.socialTelegram,
-        socialYoutube: dto.socialYoutube,
-        socialWebsite: dto.socialWebsite,
-      },
+    return this.prisma.$transaction(async (tx) => {
+      const scholar = await tx.scholar.create({
+        data: {
+          name: dto.name,
+          slug: dto.slug,
+          bio: dto.bio,
+          imageUrl: dto.imageUrl,
+          isActive: dto.isActive ?? true,
+          title: dto.title,
+          country: dto.country,
+          mainLanguage: dto.mainLanguage,
+          socialTwitter: dto.socialTwitter,
+          socialTelegram: dto.socialTelegram,
+          socialYoutube: dto.socialYoutube,
+          socialWebsite: dto.socialWebsite,
+        },
+      });
+
+      // Create translations if provided
+      if (dto.translations) {
+        await Promise.all(
+          Object.entries(dto.translations).map(([locale, fields]) =>
+            tx.scholarTranslation.create({
+              data: {
+                scholarId: scholar.id,
+                locale,
+                name: fields.name,
+                bio: fields.bio ?? null,
+                status: 'draft',
+              },
+            }),
+          ),
+        );
+      }
+
+      return scholar;
     });
   }
 
   async update(id: string, dto: UpdateScholarDto) {
-    return this.prisma.scholar.update({
-      where: { id },
-      data: {
-        ...(dto.name !== undefined && { name: dto.name }),
-        ...(dto.slug !== undefined && { slug: dto.slug }),
-        ...(dto.bio !== undefined && { bio: dto.bio }),
-        ...(dto.imageUrl !== undefined && { imageUrl: dto.imageUrl }),
-        ...(dto.isActive !== undefined && { isActive: dto.isActive }),
-        ...(dto.country !== undefined && { country: dto.country }),
-        ...(dto.mainLanguage !== undefined && { mainLanguage: dto.mainLanguage }),
-        ...(dto.socialTwitter !== undefined && { socialTwitter: dto.socialTwitter }),
-        ...(dto.socialTelegram !== undefined && { socialTelegram: dto.socialTelegram }),
-        ...(dto.socialYoutube !== undefined && { socialYoutube: dto.socialYoutube }),
-        ...(dto.socialWebsite !== undefined && { socialWebsite: dto.socialWebsite }),
-        updatedAt: new Date(),
-      },
+    return this.prisma.$transaction(async (tx) => {
+      // Update scholar fields if provided
+      const updateData: Record<string, any> = {};
+      if (dto.name !== undefined) updateData.name = dto.name;
+      if (dto.slug !== undefined) updateData.slug = dto.slug;
+      if (dto.bio !== undefined) updateData.bio = dto.bio;
+      if (dto.imageUrl !== undefined) updateData.imageUrl = dto.imageUrl;
+      if (dto.isActive !== undefined) updateData.isActive = dto.isActive;
+      if (dto.country !== undefined) updateData.country = dto.country;
+      if (dto.mainLanguage !== undefined) updateData.mainLanguage = dto.mainLanguage;
+      if (dto.socialTwitter !== undefined) updateData.socialTwitter = dto.socialTwitter;
+      if (dto.socialTelegram !== undefined) updateData.socialTelegram = dto.socialTelegram;
+      if (dto.socialYoutube !== undefined) updateData.socialYoutube = dto.socialYoutube;
+      if (dto.socialWebsite !== undefined) updateData.socialWebsite = dto.socialWebsite;
+      updateData.updatedAt = new Date();
+
+      const scholar = await tx.scholar.update({
+        where: { id },
+        data: updateData,
+      });
+
+      // Upsert translations if provided
+      if (dto.translations) {
+        await Promise.all(
+          Object.entries(dto.translations).map(([locale, fields]) =>
+            tx.scholarTranslation.upsert({
+              where: { scholarId_locale: { scholarId: id, locale } },
+              create: {
+                scholarId: id,
+                locale,
+                name: fields.name,
+                bio: fields.bio ?? null,
+                status: 'draft',
+              },
+              update: {
+                name: fields.name,
+                bio: fields.bio ?? null,
+              },
+            }),
+          ),
+        );
+      }
+
+      return scholar;
     });
   }
 
