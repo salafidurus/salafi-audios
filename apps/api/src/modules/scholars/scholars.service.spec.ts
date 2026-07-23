@@ -327,6 +327,12 @@ describe('ScholarsService', () => {
       expect(repo.upsertScholarTranslation).toHaveBeenCalledWith('s1', {
         locale: 'en',
         name: 'Updated Name - English',
+        bio: null,
+      });
+      expect(repo.upsertScholarTranslation).toHaveBeenCalledWith('s1', {
+        locale: 'ar',
+        name: 'اسم محدث',
+        bio: null,
       });
     });
 
