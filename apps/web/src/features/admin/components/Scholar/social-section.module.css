@@ -17,6 +17,23 @@
   gap: var(--space-xs);
 }
 
+.fieldWithIcon {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+
+.iconOnly {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  margin-top: var(--space-xs);
+}
+
+.inputWrapper {
+  flex: 1;
+}
+
 .label {
   display: flex;
   align-items: center;

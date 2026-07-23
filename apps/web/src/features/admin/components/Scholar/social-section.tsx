@@ -80,48 +80,47 @@ export function SocialSection({ formData, dispatch }: SocialSectionProps) {
           const handle = extractHandle(value, field.prefix);
 
           return (
-            <div key={field.key} className={styles.field}>
-              <label className={styles.label} htmlFor={field.id}>
-                {field.icon && (
-                  <img src={field.icon} alt={field.defaultLabel} className={styles.icon} />
-                )}
-                {t(field.label, field.defaultLabel)}
-              </label>
-              {field.prefix ? (
-                <div className={styles.prefixedContainer}>
-                  <div className={styles.prefixedInput}>
-                    <span className={styles.prefix}>{field.prefix}</span>
-                    <input
-                      id={field.id}
-                      type="text"
-                      value={handle}
-                      onChange={(e) =>
-                        handleSocialChange(
-                          field.key as keyof CreateScholarDto,
-                          e.target.value,
-                          field.prefix,
-                        )
-                      }
-                      placeholder={t("admin.scholars.handlePlaceholder", "username")}
-                      className={styles.input}
-                    />
-                  </div>
-                </div>
-              ) : (
-                <EditableInput
-                  id={field.id}
-                  type="url"
-                  value={value}
-                  onChange={(newValue) =>
-                    dispatch({
-                      type: "UPDATE_FIELD",
-                      field: field.key as keyof CreateScholarDto,
-                      value: newValue,
-                    })
-                  }
-                  placeholder="https://..."
-                />
+            <div key={field.key} className={styles.fieldWithIcon}>
+              {field.icon && (
+                <img src={field.icon} alt={field.defaultLabel} className={styles.iconOnly} />
               )}
+              <div className={styles.inputWrapper}>
+                {field.prefix ? (
+                  <div className={styles.prefixedContainer}>
+                    <div className={styles.prefixedInput}>
+                      <span className={styles.prefix}>{field.prefix}</span>
+                      <input
+                        id={field.id}
+                        type="text"
+                        value={handle}
+                        onChange={(e) =>
+                          handleSocialChange(
+                            field.key as keyof CreateScholarDto,
+                            e.target.value,
+                            field.prefix,
+                          )
+                        }
+                        placeholder={t("admin.scholars.handlePlaceholder", "username")}
+                        className={styles.input}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <EditableInput
+                    id={field.id}
+                    type="url"
+                    value={value}
+                    onChange={(newValue) =>
+                      dispatch({
+                        type: "UPDATE_FIELD",
+                        field: field.key as keyof CreateScholarDto,
+                        value: newValue,
+                      })
+                    }
+                    placeholder="https://..."
+                  />
+                )}
+              </div>
             </div>
           );
         })}
