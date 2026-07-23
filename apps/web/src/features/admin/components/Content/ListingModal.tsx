@@ -414,8 +414,8 @@ export function ListingModal({
   onAudioUploadComplete,
 }: ListingModalProps) {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<"en" | "ar" | "upload" | "arrange" | "review">(
-    showAudioUploadTab && !listing && !initialAudioData ? "upload" : "en",
+  const [activeTab, setActiveTab] = useState<"general" | "en" | "ar" | "upload" | "arrange" | "review">(
+    showAudioUploadTab && !listing && !initialAudioData ? "upload" : "general",
   );
   const [state, dispatch] = useReducer(formReducer, listing ?? null, initFormState);
   const {
@@ -436,7 +436,7 @@ export function ListingModal({
     if (!isOpen) return;
     const initialState = initFormState(listing, initialAudioData);
     dispatch({ type: "INIT_STATE", state: initialState });
-    setActiveTab(!listing && !initialAudioData ? "upload" : (listing?.language as Locale) || "ar");
+    setActiveTab(!listing && !initialAudioData ? "upload" : "general");
   }, [isOpen, listing, initialAudioData]);
 
   const { data: scholarsData } = useApiQuery<{ scholars: ScholarListItemDto[] }>(
@@ -609,13 +609,14 @@ export function ListingModal({
       requireReview={!showAudioUploadTab || !!initialAudioData}
       activeTab={activeTab}
       onActiveTabChange={(id) => setActiveTab(id as typeof activeTab)}
-      defaultActiveTab="en"
+      defaultActiveTab="general"
       saveFormId="lecture-edit-form"
       saving={saving}
       reviewTabId="review"
     >
       <form id="lecture-edit-form" onSubmit={handleSave} className={styles.form}>
         <Modal.Tabs>
+          <Modal.TabItem id="general">{t("admin.modal.generalTab", "General")}</Modal.TabItem>
           <Modal.TabItem id="en">English</Modal.TabItem>
           <Modal.TabItem id="ar">العربية</Modal.TabItem>
           {showAudioUploadTab && !listing && (
@@ -630,6 +631,21 @@ export function ListingModal({
         </Modal.Tabs>
 
         <Modal.Content>
+          <Modal.ContentItem id="general">
+            <ListingForm
+              state={state}
+              dispatch={dispatch}
+              scholars={scholars}
+              topics={topics}
+              series={series}
+              listing={listing}
+              activeLocale={language}
+              handleTitleChange={handleTitleChange}
+              handleTopicToggle={handleTopicToggle}
+              onSubmit={handleSave}
+            />
+          </Modal.ContentItem>
+
           <Modal.ContentItem id="en">
             <ListingForm
               state={state}
@@ -681,19 +697,19 @@ export function ListingModal({
               <div style={{ marginBottom: "1.5rem" }}>
                 <h4 style={{ marginBottom: "0.5rem", color: "var(--content-default)" }}>English</h4>
                 <p>
-                  <strong>Title:</strong> {title || "—"}
+                  <strong>Title:</strong> {language === "en" ? title : translationChanges.en.title || "—"}
                 </p>
                 <p>
-                  <strong>Description:</strong> {description || "—"}
+                  <strong>Description:</strong> {language === "en" ? description : translationChanges.en.description || "—"}
                 </p>
               </div>
               <div>
                 <h4 style={{ marginBottom: "0.5rem", color: "var(--content-default)" }}>العربية</h4>
                 <p>
-                  <strong>Title:</strong> {translationChanges.ar.title || "—"}
+                  <strong>Title:</strong> {language === "ar" ? title : translationChanges.ar.title || "—"}
                 </p>
                 <p>
-                  <strong>Description:</strong> {translationChanges.ar.description || "—"}
+                  <strong>Description:</strong> {language === "ar" ? description : translationChanges.ar.description || "—"}
                 </p>
               </div>
             </div>
