@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useState } from "react";
-import { getPresignedUrl, uploadToR2 } from "../../api/admin-lectures.api";
+import { getPresignedUrl, uploadToR2 } from "@/features/admin/api/admin-lectures.api";
 import { Button } from "@/shared/components/Button";
 import styles from "./audio-uploader.module.css";
 import { Upload, FileAudio, CheckCircle, AlertCircle } from "lucide-react";
@@ -20,17 +20,41 @@ interface AudioUploaderProps {
 
 function extractMetadata(file: File): Promise<number> {
   return new Promise((resolve, reject) => {
+    // react-doctor-disable-next-line no-create-object-url-without-revoke - cleanup guaranteed via listener or timeout
     const objectUrl = URL.createObjectURL(file);
     const audio = new Audio();
     audio.src = objectUrl;
-    audio.addEventListener("loadedmetadata", () => {
-      URL.revokeObjectURL(objectUrl);
+
+    let isSettled = false;
+    const cleanup = () => URL.revokeObjectURL(objectUrl);
+
+    const loadedmetadataHandler = () => {
+      if (isSettled) return;
+      isSettled = true;
+      clearTimeout(timeoutId);
+      cleanup();
       resolve(audio.duration);
-    });
-    audio.addEventListener("error", () => {
-      URL.revokeObjectURL(objectUrl);
+    };
+
+    const errorHandler = () => {
+      if (isSettled) return;
+      isSettled = true;
+      clearTimeout(timeoutId);
+      cleanup();
       reject(new Error("Failed to load audio metadata"));
-    });
+    };
+
+    audio.addEventListener("loadedmetadata", loadedmetadataHandler);
+    audio.addEventListener("error", errorHandler);
+
+    const timeoutId = setTimeout(() => {
+      if (isSettled) return;
+      isSettled = true;
+      audio.removeEventListener("loadedmetadata", loadedmetadataHandler);
+      audio.removeEventListener("error", errorHandler);
+      cleanup();
+      reject(new Error("Audio metadata loading timeout"));
+    }, 5000);
   });
 }
 

@@ -1,2 +1,2 @@
-export { AudioUploader } from "./components/AudioUploader/AudioUploader";
+export { AudioUploader } from "./components/Content/Listing/AudioUploader/AudioUploader";
 export { Content } from "./components/Content";

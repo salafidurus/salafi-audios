@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
-import { AudioUploader } from "../AudioUploader/AudioUploader";
 import type {
   ScholarListItemDto,
   TopicDetailDto,
@@ -13,12 +12,12 @@ import { useTopicsList } from "@sd/domain-search";
 import { useAdminListingSeriesByScholar } from "@sd/domain-content";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { Modal } from "@/shared/components/Modal";
-import { AudioUploader as AudioUploaderComponent } from "../AudioUploader/AudioUploader";
-import { createLecture, updateLecture } from "../../api/admin-lectures.api";
+import { AudioUploader as AudioUploaderComponent } from "./AudioUploader/AudioUploader";
+import { createLecture, updateLecture } from "@/features/admin/api/admin-lectures.api";
 import { ListingGeneralSection } from "./ListingGeneralSection";
 import { ListingTranslatableFields } from "./ListingTranslatableFields";
 import { ListingReviewSection } from "./ListingReviewSection";
-import { useListingForm, type Locale } from "../../hooks/Content/useListingForm";
+import { useListingForm, type Locale } from "@/features/admin/hooks/Content/useListingForm";
 import styles from "./listing-modal.module.css";
 
 interface ListingModalProps {

@@ -11,7 +11,7 @@ import {
   DropdownContent,
   DropdownItem,
 } from "@/shared/components/Dropdown";
-import type { FormState, FormAction, Locale } from "../../hooks/Content/useListingForm";
+import type { FormState, FormAction, Locale } from "@/features/admin/hooks/Content/useListingForm";
 import styles from "./listing-modal.module.css";
 
 interface ListingGeneralSectionProps {

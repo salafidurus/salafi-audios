@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import type { FormState, Locale } from "../../hooks/Content/useListingForm";
+import type { FormState, Locale } from "@/features/admin/hooks/Content/useListingForm";
 
 interface ListingReviewSectionProps {
   state: FormState;

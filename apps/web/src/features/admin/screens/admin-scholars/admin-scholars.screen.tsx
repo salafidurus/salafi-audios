@@ -5,7 +5,7 @@ import { Plus } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@sd/core-contracts";
 import { useInfiniteAdminScholars } from "@sd/domain-content";
-import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
+import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";

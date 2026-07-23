@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { AudioUploader } from "./AudioUploader";
-import { getPresignedUrl, uploadToR2 } from "../../api/admin-lectures.api";
+import { getPresignedUrl, uploadToR2 } from "@/features/admin/api/admin-lectures.api";
 
-vi.mock("../../api/admin-lectures.api", () => ({
+vi.mock("@/features/admin/api/admin-lectures.api", () => ({
   getPresignedUrl: vi.fn(),
   uploadToR2: vi.fn(),
 }));

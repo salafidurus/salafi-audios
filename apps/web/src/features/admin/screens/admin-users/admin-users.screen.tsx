@@ -12,9 +12,9 @@ import { Search } from "@/shared/components/Search";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
-import { UserItem } from "@/features/admin/components/user-item";
-import { PermissionsDialog } from "@/features/admin/components/PermissionsDialog";
-import { RoleDialog } from "@/features/admin/components/RoleDialog";
+import { UserItem } from "@/features/admin/components/Content/Users/user-item";
+import { PermissionsDialog } from "@/features/admin/components/Content/Users/PermissionsDialog";
+import { RoleDialog } from "@/features/admin/components/Content/Users/RoleDialog";
 import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./admin-users.screen.module.css";
 

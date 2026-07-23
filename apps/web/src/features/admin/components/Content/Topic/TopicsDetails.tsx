@@ -1,5 +1,5 @@
 import type { TopicDetailDto } from "@sd/core-contracts";
-import styles from "./Content.module.css";
+import styles from "../Content.module.css";
 
 export function TopicsDetails({ topic }: { topic: TopicDetailDto }) {
   return (

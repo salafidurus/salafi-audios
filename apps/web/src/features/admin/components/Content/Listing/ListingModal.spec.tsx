@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ListingModal } from "./ListingModal";
-import { createLecture, updateLecture } from "../../api/admin-lectures.api";
+import { createLecture, updateLecture } from "@/features/admin/api/admin-lectures.api";
 
-vi.mock("../../api/admin-lectures.api", () => ({
+vi.mock("@/features/admin/api/admin-lectures.api", () => ({
   createLecture: vi.fn(),
   updateLecture: vi.fn(),
 }));

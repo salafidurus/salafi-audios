@@ -1,7 +1,7 @@
 "use client";
 
 import { X, Send, Film, ExternalLink, Pencil } from "lucide-react";
-import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
+import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
 import { Button } from "@/shared/components/Button";
 import { List } from "@/shared/components/List";
 import { UserAvatar } from "@/shared/components/user-avatar";

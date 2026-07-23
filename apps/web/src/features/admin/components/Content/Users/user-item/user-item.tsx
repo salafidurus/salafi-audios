@@ -4,7 +4,7 @@ import { ShieldCog, UserCog } from "lucide-react";
 import { List } from "@/shared/components/List";
 import { Button } from "@/shared/components/Button";
 import { useResponsive } from "@/shared/hooks/use-responsive";
-import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
+import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { MetaDetails } from "./meta-details";
 import { PermissionDetails } from "./permission-details";
