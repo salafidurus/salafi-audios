@@ -1,0 +1,298 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
+import type {
+  ScholarListItemDto,
+  TopicDetailDto,
+  ListingRefDto,
+  AdminListingDetailDto,
+} from "@sd/core-contracts";
+import { useTopicsList } from "@sd/domain-search";
+import { useAdminListingSeriesByScholar } from "@sd/domain-content";
+import { useTranslation } from "@/core/i18n/use-translation";
+import { Modal } from "@/shared/components/Modal";
+import { AudioUploader as AudioUploaderComponent } from "./AudioUploader/AudioUploader";
+import { createLecture, updateLecture } from "@/features/admin/api/admin-lectures.api";
+import { ListingGeneralSection } from "./ListingGeneralSection";
+import { ListingTranslatableFields } from "./ListingTranslatableFields";
+import { ListingReviewSection } from "./ListingReviewSection";
+import { useListingForm, type Locale } from "@/features/admin/hooks/Content/useListingForm";
+import styles from "./listing-modal.module.css";
+
+interface ListingModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+  listing?: AdminListingDetailDto | null;
+  initialAudioData?: {
+    audioKey: string;
+    durationSeconds: number;
+    sizeBytes: number;
+    format: string;
+    filename: string;
+  } | null;
+  showAudioUploadTab?: boolean;
+  onAudioUploadComplete?: (audioData: any) => void;
+}
+
+export function ListingModal({
+  isOpen,
+  onClose,
+  onSuccess,
+  listing,
+  initialAudioData,
+  showAudioUploadTab,
+  onAudioUploadComplete,
+}: ListingModalProps) {
+  const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useState<
+    "general" | "main" | "other" | "upload" | "arrange" | "review"
+  >(showAudioUploadTab && !listing && !initialAudioData ? "upload" : "general");
+  const { state, dispatch } = useListingForm(listing, initialAudioData);
+  const { title, slug, description, scholarId, language, translationChanges, saving } = state;
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setActiveTab(!listing && !initialAudioData ? "upload" : "general");
+  }, [isOpen, listing, initialAudioData]);
+
+  const { data: scholarsData } = useApiQuery<{ scholars: ScholarListItemDto[] }>(
+    [...queryKeys.scholars.list.all()],
+    () =>
+      httpClient<{ scholars: ScholarListItemDto[] }>({
+        url: endpoints.scholars.list,
+        method: "GET",
+      }),
+  );
+
+  const { data: topicsData } = useTopicsList();
+  const { data: seriesData } = useAdminListingSeriesByScholar(scholarId);
+
+  useEffect(() => {
+    if (!listing || !scholarId || !scholarsData?.scholars) return;
+    const selectedScholar = scholarsData.scholars.find((s) => s.id === scholarId);
+    if (selectedScholar && selectedScholar.mainLanguage) {
+      dispatch({
+        type: "UPDATE_FIELD",
+        field: "language",
+        value: selectedScholar.mainLanguage as Locale,
+      });
+    }
+  }, [scholarId, scholarsData, listing, dispatch]);
+
+  const handleTitleChange = (val: string) => {
+    if (!listing) {
+      dispatch({ type: "UPDATE_FIELD", field: "title", value: val });
+      dispatch({
+        type: "UPDATE_FIELD",
+        field: "slug",
+        value: val
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, "")
+          .trim()
+          .replace(/\s+/g, "-"),
+      });
+    } else {
+      dispatch({ type: "UPDATE_FIELD", field: "title", value: val });
+    }
+  };
+
+  const handleTopicToggle = (topicId: string) => {
+    const selectedTopics = state.selectedTopics;
+    dispatch({
+      type: "UPDATE_FIELD",
+      field: "selectedTopics",
+      value: selectedTopics.includes(topicId)
+        ? selectedTopics.filter((id) => id !== topicId)
+        : [...selectedTopics, topicId],
+    });
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim()) {
+      dispatch({
+        type: "SET_ERROR",
+        error: t("admin.contents.listing.titleRequired", "Title is required."),
+      });
+      return;
+    }
+    if (!scholarId) {
+      dispatch({
+        type: "SET_ERROR",
+        error: t("admin.contents.listing.scholarRequired", "Scholar is required."),
+      });
+      return;
+    }
+
+    dispatch({ type: "SET_SAVING", saving: true });
+    dispatch({ type: "SET_ERROR", error: null });
+
+    try {
+      if (listing) {
+        const payload: any = {
+          title,
+          description: state.description,
+          status: state.status,
+          orderIndex: Number(state.orderIndex),
+          language,
+        };
+
+        const otherLocale = language === "en" ? "ar" : "en";
+        const translation = translationChanges[otherLocale];
+        if (translation.title || translation.description) {
+          payload.translations = {
+            [otherLocale]: {
+              ...(translation.title && { title: translation.title }),
+              ...(translation.description !== undefined && {
+                description: translation.description,
+              }),
+            },
+          };
+        }
+
+        await updateLecture(listing.id, payload);
+      } else {
+        if (!initialAudioData) {
+          dispatch({
+            type: "SET_ERROR",
+            error: t(
+              "admin.contents.listing.audioKeyRequired",
+              "Audio file key is required for creation.",
+            ),
+          });
+          dispatch({ type: "SET_SAVING", saving: false });
+          return;
+        }
+        const payload: any = {
+          title,
+          slug: slug || undefined,
+          scholarId,
+          parentId: state.seriesId || undefined,
+          topics: state.selectedTopics,
+          format: "single",
+          audioKey: initialAudioData.audioKey,
+          durationSeconds: initialAudioData.durationSeconds,
+          sizeBytes: initialAudioData.sizeBytes,
+          language,
+        };
+
+        const otherLocale = language === "en" ? "ar" : "en";
+        const translation = translationChanges[otherLocale];
+        if (translation.title || translation.description) {
+          payload.translations = {
+            [otherLocale]: {
+              ...(translation.title && { title: translation.title }),
+              ...(translation.description !== undefined && {
+                description: translation.description,
+              }),
+            },
+          };
+        }
+
+        await createLecture(payload);
+      }
+      onSuccess();
+      onClose();
+    } catch (err) {
+      dispatch({
+        type: "SET_ERROR",
+        error:
+          (err as Error)?.message ||
+          t("admin.contents.listing.failedToSave", "Failed to save lecture details."),
+      });
+    } finally {
+      dispatch({ type: "SET_SAVING", saving: false });
+    }
+  };
+
+  const scholars = scholarsData?.scholars ?? [];
+  const topics = topicsData ?? [];
+  const series = seriesData ?? [];
+  const mainLocale = language;
+  const otherLocale = language === "en" ? "ar" : "en";
+
+  return (
+    <Modal
+      key={listing?.id ?? "create"}
+      isOpen={isOpen}
+      onClose={onClose}
+      title={
+        listing
+          ? t("admin.contents.listing.editTitle", "Edit Listing Details")
+          : t("admin.contents.listing.newTitle", "Add Listing")
+      }
+      size="xl"
+      width="var(--modal-width-wide)"
+      multiTab
+      requireReview={!showAudioUploadTab || !!initialAudioData}
+      activeTab={activeTab}
+      onActiveTabChange={(id) => setActiveTab(id as typeof activeTab)}
+      defaultActiveTab="general"
+      saveFormId="lecture-edit-form"
+      saving={saving}
+      reviewTabId="review"
+    >
+      <form id="lecture-edit-form" onSubmit={handleSave} className={styles.form}>
+        <Modal.Tabs>
+          <Modal.TabItem id="general">{t("admin.modal.generalTab", "General")}</Modal.TabItem>
+          <Modal.TabItem id="main">{mainLocale === "en" ? "English" : "العربية"}</Modal.TabItem>
+          <Modal.TabItem id="other">{otherLocale === "en" ? "English" : "العربية"}</Modal.TabItem>
+          <Modal.TabItem id="upload">
+            {t("admin.contents.listing.uploadTab", "Upload Audio")}
+          </Modal.TabItem>
+          <Modal.TabItem id="arrange">
+            {t("admin.contents.listing.arrangeTab", "Arrange")}
+          </Modal.TabItem>
+          <Modal.TabItem id="review">{t("admin.modal.reviewTab", "Review")}</Modal.TabItem>
+        </Modal.Tabs>
+
+        <Modal.Content>
+          <Modal.ContentItem id="general">
+            <ListingGeneralSection
+              state={state}
+              dispatch={dispatch}
+              scholars={scholars}
+              topics={topics}
+              series={series}
+              handleTopicToggle={handleTopicToggle}
+            />
+          </Modal.ContentItem>
+
+          <Modal.ContentItem id="main">
+            <ListingTranslatableFields
+              state={state}
+              dispatch={dispatch}
+              locale={mainLocale}
+              handleTitleChange={handleTitleChange}
+            />
+          </Modal.ContentItem>
+
+          <Modal.ContentItem id="other">
+            <ListingTranslatableFields
+              state={state}
+              dispatch={dispatch}
+              locale={otherLocale}
+              handleTitleChange={handleTitleChange}
+            />
+          </Modal.ContentItem>
+
+          <Modal.ContentItem id="upload">
+            <AudioUploaderComponent onUploadComplete={onAudioUploadComplete || (() => {})} />
+          </Modal.ContentItem>
+
+          <Modal.ContentItem id="arrange">
+            <div style={{ padding: "2rem", textAlign: "center", color: "var(--content-tertiary)" }}>
+              {t("admin.contents.listing.arrangeComingSoon", "Coming soon")}
+            </div>
+          </Modal.ContentItem>
+
+          <Modal.ContentItem id="review">
+            <ListingReviewSection state={state} mainLocale={mainLocale} otherLocale={otherLocale} />
+          </Modal.ContentItem>
+        </Modal.Content>
+      </form>
+    </Modal>
+  );
+}

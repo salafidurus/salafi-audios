@@ -1,11 +1,11 @@
 import type { AdminListingListItemDto } from "@sd/core-contracts";
 import { List } from "@/shared/components/List";
 import { Button } from "@/shared/components/Button";
-import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
+import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
 import { Pencil } from "lucide-react";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { useTranslation } from "@/core/i18n/use-translation";
-import styles from "./Content.module.css";
+import styles from "../Content.module.css";
 
 interface ListingProps {
   listing: AdminListingListItemDto;

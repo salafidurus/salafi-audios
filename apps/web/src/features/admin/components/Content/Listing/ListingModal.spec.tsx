@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ListingModal } from "./ListingModal";
-import { createLecture, updateLecture } from "../../api/admin-lectures.api";
+import { createLecture, updateLecture } from "@/features/admin/api/admin-lectures.api";
 
-vi.mock("../../api/admin-lectures.api", () => ({
+vi.mock("@/features/admin/api/admin-lectures.api", () => ({
   createLecture: vi.fn(),
   updateLecture: vi.fn(),
 }));
@@ -79,29 +79,36 @@ describe("ListingModal", () => {
 
     expect(screen.getByText(/new lecture details/i)).toBeInTheDocument();
 
-    const titleInput = screen.getByLabelText(/title/i);
-    fireEvent.change(titleInput, { target: { value: "My Great Lecture" } });
-
     const scholarTrigger = screen.getByTestId("scholar-dropdown");
     fireEvent.click(scholarTrigger);
     const scholarOption = await screen.findByRole("option", { name: /scholar one/i });
     fireEvent.click(scholarOption);
 
-    const saveButton = screen.getByRole("button", { name: /save/i });
+    const mainTabButton = screen.getByRole("tab", { name: /العربية/i });
+    fireEvent.click(mainTabButton);
+
+    const titleInput = await screen.findByLabelText(/title/i);
+    fireEvent.change(titleInput, { target: { value: "My Great Lecture" } });
+
+    const reviewButton = screen.getByRole("button", { name: /review/i });
+    fireEvent.click(reviewButton);
+
+    const saveButton = await screen.findByRole("button", { name: /save/i });
     fireEvent.click(saveButton);
 
     await waitFor(() => {
-      expect(createLecture).toHaveBeenCalledWith({
-        title: "My Great Lecture",
-        slug: "my-great-lecture",
-        scholarId: "scholar-1",
-        parentId: undefined,
-        topics: [],
-        format: "single",
-        audioKey: "audio/new-key.mp3",
-        durationSeconds: 300,
-        sizeBytes: 50000,
-      });
+      expect(createLecture).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: "My Great Lecture",
+          slug: "my-great-lecture",
+          scholarId: "scholar-1",
+          format: "single",
+          audioKey: "audio/new-key.mp3",
+          durationSeconds: 300,
+          sizeBytes: 50000,
+          language: "ar",
+        }),
+      );
     });
 
     expect(onSuccessMock).toHaveBeenCalledTimes(1);
@@ -125,6 +132,7 @@ describe("ListingModal", () => {
       parentId: "series-1",
       orderIndex: 5,
       topics: ["topic-1"],
+      language: "ar" as const,
       audioKey: "audio/old-key.mp3",
       createdAt: "2024-01-01",
       audioAssets: [],
@@ -140,26 +148,46 @@ describe("ListingModal", () => {
     );
 
     expect(screen.getByText(/edit lecture details/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/title/i)).toHaveValue("Existing Title");
-    expect(screen.getByLabelText(/description/i)).toHaveValue("Existing Description");
+
     await waitFor(() => {
       expect(screen.getByTestId("scholar-dropdown")).toHaveTextContent("Scholar Two");
       expect(screen.getByTestId("series-dropdown")).toHaveTextContent("Series One");
     });
-    expect(screen.getByLabelText(/order index/i)).toHaveValue(5);
 
-    fireEvent.change(screen.getByLabelText(/title/i), { target: { value: "Updated Title" } });
-    fireEvent.change(screen.getByLabelText(/order index/i), { target: { value: "10" } });
+    const mainTabButton = screen.getByRole("tab", { name: /العربية/i });
+    fireEvent.click(mainTabButton);
 
-    fireEvent.click(screen.getByRole("button", { name: /save/i }));
+    const titleInput = await screen.findByLabelText(/title/i);
+    const descriptionInput = await screen.findByLabelText(/description/i);
+    expect(titleInput).toHaveValue("Existing Title");
+    expect(descriptionInput).toHaveValue("Existing Description");
+
+    fireEvent.change(titleInput, { target: { value: "Updated Title" } });
+
+    const generalTabButton = screen.getByRole("tab", { name: /general/i });
+    fireEvent.click(generalTabButton);
+
+    const orderIndexInput = await screen.findByLabelText(/order index/i);
+    expect(orderIndexInput).toHaveValue(5);
+    fireEvent.change(orderIndexInput, { target: { value: "10" } });
+
+    const reviewButton = screen.getByRole("button", { name: /review/i });
+    fireEvent.click(reviewButton);
+
+    const saveButton = await screen.findByRole("button", { name: /save/i });
+    fireEvent.click(saveButton);
 
     await waitFor(() => {
-      expect(updateLecture).toHaveBeenCalledWith("lecture-123", {
-        title: "Updated Title",
-        description: "Existing Description",
-        status: "draft",
-        orderIndex: 10,
-      });
+      expect(updateLecture).toHaveBeenCalledWith(
+        "lecture-123",
+        expect.objectContaining({
+          title: "Updated Title",
+          description: "Existing Description",
+          status: "draft",
+          orderIndex: 10,
+          language: "ar",
+        }),
+      );
     });
 
     expect(onSuccessMock).toHaveBeenCalledTimes(1);

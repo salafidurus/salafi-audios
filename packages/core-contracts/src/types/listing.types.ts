@@ -135,6 +135,12 @@ export const AdminListingUpdateDtoSchema = z.object({
   language: LocaleSchema.optional(),
   orderIndex: z.number().optional(),
   status: StatusValueSchema.optional(),
+  translations: z
+    .record(
+      LocaleSchema,
+      z.object({ title: z.string(), description: z.string().nullable().optional() }),
+    )
+    .optional(),
 });
 export type AdminListingUpdateDto = z.infer<typeof AdminListingUpdateDtoSchema>;
 
@@ -202,10 +208,17 @@ export const CreateListingDtoSchema = z.object({
   format: ListingFormatSchema,
   scholarId: z.string().min(1, "Scholar ID must not be empty"),
   parentId: z.string().optional(),
+  language: LocaleSchema.optional(),
   topics: z.array(z.string()).optional(),
   audioKey: z.string().optional(),
   durationSeconds: z.number().optional(),
   sizeBytes: z.number().optional(),
+  translations: z
+    .record(
+      LocaleSchema,
+      z.object({ title: z.string(), description: z.string().nullable().optional() }),
+    )
+    .optional(),
 });
 export type CreateListingDto = z.infer<typeof CreateListingDtoSchema>;
 

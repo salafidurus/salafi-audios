@@ -9,7 +9,6 @@ const mockScholar: ScholarHeaderProps["scholar"] = {
   name: "Abdul Aziz bin Baz",
   imageUrl: undefined,
   mainLanguage: "ar" as any,
-  isKibar: false,
   lectureCount: 42,
   seriesCount: 5,
   totalDurationSeconds: 7200, // 2 hours

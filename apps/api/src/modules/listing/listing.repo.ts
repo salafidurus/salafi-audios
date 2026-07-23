@@ -772,6 +772,77 @@ export class ListingRepository {
     return listings;
   }
 
+  async getFormData(listingId: string) {
+    const listing = await this.prisma.listing.findUnique({
+      where: { id: listingId },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        description: true,
+        format: true,
+        language: true,
+        status: true,
+        orderIndex: true,
+        durationSeconds: true,
+        createdAt: true,
+        updatedAt: true,
+        scholarId: true,
+        parentId: true,
+        scholar: { select: { name: true } },
+        topics: { select: { topic: { select: { id: true } } } },
+        audioAssets: {
+          where: { isPrimary: true },
+          take: 1,
+          select: { url: true },
+        },
+        translations: {
+          select: {
+            locale: true,
+            status: true,
+            title: true,
+            description: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+      },
+    });
+
+    if (!listing) return null;
+
+    return {
+      listing: {
+        id: listing.id,
+        slug: listing.slug,
+        title: listing.title,
+        description: listing.description ?? undefined,
+        format: listing.format,
+        language: listing.language ?? undefined,
+        status: listing.status,
+        orderIndex: listing.orderIndex ?? undefined,
+        durationSeconds: listing.durationSeconds ?? undefined,
+        scholarId: listing.scholarId,
+        scholarName: listing.scholar.name,
+        parentId: listing.parentId ?? undefined,
+        topics: listing.topics.map((t) => t.topic.id),
+        audioUrl: listing.audioAssets[0]?.url,
+        createdAt: listing.createdAt.toISOString(),
+        updatedAt: listing.updatedAt?.toISOString(),
+      },
+      translations: listing.translations.map((t) => ({
+        locale: t.locale,
+        status: t.status,
+        fields: {
+          title: t.title,
+          description: t.description ?? null,
+        },
+        createdAt: t.createdAt.toISOString(),
+        updatedAt: t.updatedAt.toISOString(),
+      })),
+    };
+  }
+
   async createWithAudioAsset(
     dto: CreateListingDto & { publicUrl?: string },
     createdBy?: string,
@@ -785,6 +856,7 @@ export class ListingRepository {
           slug,
           format: dto.format,
           status: Status.draft,
+          language: dto.language ?? 'ar',
           durationSeconds: dto.durationSeconds ?? undefined,
           scholarId: dto.scholarId,
           parentId: dto.parentId ?? undefined,
@@ -820,6 +892,24 @@ export class ListingRepository {
         await this.syncListingCounters(listing.parentId, tx);
       }
 
+      // If translations were provided in the DTO, upsert them
+      if (dto.translations) {
+        await Promise.all(
+          Object.entries(dto.translations).map(([locale, fields]) =>
+            tx.listingTranslation.upsert({
+              where: { listingId_locale: { listingId: listing.id, locale: locale as any } },
+              update: { title: fields.title, description: fields.description ?? null },
+              create: {
+                listingId: listing.id,
+                locale: locale as any,
+                title: fields.title,
+                description: fields.description ?? null,
+              },
+            }),
+          ),
+        );
+      }
+
       return { id: listing.id, title: listing.title };
     });
   }
@@ -838,8 +928,11 @@ export class ListingRepository {
 
         if (!original) throw new Error('Not found');
 
+        // Exclude translations from the main update data
+        const { translations, ...dtoWithoutTranslations } = dto;
+
         const updateData: Prisma.ListingUpdateInput = {
-          ...dto,
+          ...dtoWithoutTranslations,
           updatedAt: new Date(),
           updatedBy,
         };
@@ -852,6 +945,24 @@ export class ListingRepository {
           where: { id },
           data: updateData,
         });
+
+        // If translations were provided in the DTO, upsert them
+        if (translations) {
+          await Promise.all(
+            Object.entries(translations).map(([locale, fields]) =>
+              tx.listingTranslation.upsert({
+                where: { listingId_locale: { listingId: id, locale: locale as any } },
+                update: { title: fields.title, description: fields.description ?? null },
+                create: {
+                  listingId: id,
+                  locale: locale as any,
+                  title: fields.title,
+                  description: fields.description ?? null,
+                },
+              }),
+            ),
+          );
+        }
 
         // Sync old parent if parent changed or status changed or duration changed
         if (original.parentId) {

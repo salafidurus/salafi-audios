@@ -58,7 +58,6 @@ const mockScholar = {
   slug: "ibn-baz",
   name: "Ibn Baz",
   isActive: true,
-  isKibar: false,
   createdAt: "2024-01-01T00:00:00Z",
   lectureCount: 10,
   seriesCount: 2,

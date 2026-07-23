@@ -547,6 +547,9 @@
         "audioKeyRequired": "Audio file key is required for creation.",
         "failedToSave": "Failed to save lecture details."
       }
+    },
+    "modal": {
+      "reviewTab": "Review"
     }
   }
 }

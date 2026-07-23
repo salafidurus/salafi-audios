@@ -1,17 +1,18 @@
 "use client";
 
-import { useReducer, useEffect, useState } from "react";
+import { useState, useMemo } from "react";
 import { Modal } from "@/shared/components/Modal";
-import { Button } from "@/shared/components/Button";
 import type { CreateScholarDto } from "@sd/core-contracts";
 import { sanitizeError } from "@sd/utils-error";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { LanguageBar } from "./language-bar";
-import { PersonalDataSection } from "./personal-data-section";
+import { GeneralDataSection } from "./general-data-section";
 import { LocationSection } from "./location-section";
 import { SocialSection } from "./social-section";
 import { SettingsSection } from "./settings-section";
+import { TranslationFieldsSection } from "./translation-fields-section";
+import { ReviewSection } from "./review-section";
 import { getPresignedUrl, uploadToR2 } from "@/features/admin/api/admin-lectures.api";
+import { useScholarForm } from "../../hooks/Scholar/useScholarForm";
 import styles from "./scholar-modal.module.css";
 
 export interface ScholarForEdit {
@@ -20,8 +21,6 @@ export interface ScholarForEdit {
   slug: string;
   bio?: string | null;
   imageUrl?: string | null;
-  isKibar?: boolean;
-  isFeatured?: boolean;
   isActive?: boolean;
   country?: string | null;
   mainLanguage?: "en" | "ar" | null;
@@ -35,116 +34,64 @@ export interface ScholarForEdit {
 export interface ScholarModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: CreateScholarDto) => Promise<void>;
+  onSave: (
+    data: CreateScholarDto & {
+      translations?: Record<string, { name?: string; bio?: string | null }>;
+    },
+  ) => Promise<void>;
   scholar?: ScholarForEdit | null;
 }
-
-interface FormState {
-  formData: CreateScholarDto;
-  saving: boolean;
-  error: string | null;
-  stagedImageFile: File | null;
-  stagedImagePreview: string | null;
-}
-
-export type FormAction =
-  | { type: "INIT_FORM"; scholar: ScholarForEdit | null }
-  | {
-      type: "UPDATE_FIELD";
-      field: keyof CreateScholarDto;
-      value: string | boolean | Record<string, { name: string }> | undefined;
-    }
-  | { type: "SET_SAVING"; saving: boolean }
-  | { type: "SET_ERROR"; error: string | null }
-  | { type: "SET_STAGED_IMAGE"; file: File | null; preview: string | null };
-
-function formReducer(state: FormState, action: FormAction): FormState {
-  switch (action.type) {
-    case "INIT_FORM":
-      return {
-        ...state,
-        formData: getInitialFormData(action.scholar),
-        error: null,
-        stagedImageFile: null,
-        stagedImagePreview: null,
-      };
-    case "UPDATE_FIELD":
-      return {
-        ...state,
-        formData: { ...state.formData, [action.field]: action.value },
-      };
-    case "SET_SAVING":
-      return { ...state, saving: action.saving };
-    case "SET_ERROR":
-      return { ...state, error: action.error };
-    case "SET_STAGED_IMAGE":
-      return {
-        ...state,
-        stagedImageFile: action.file,
-        stagedImagePreview: action.preview,
-      };
-    default:
-      return state;
-  }
-}
-
-function getInitialFormData(scholar: ScholarForEdit | null): CreateScholarDto {
-  if (scholar) {
-    return {
-      name: scholar.name,
-      slug: scholar.slug,
-      imageUrl: scholar.imageUrl ?? "",
-      isActive: scholar.isActive ?? true,
-      country: (scholar.country ?? "") as CreateScholarDto["country"],
-      mainLanguage: (scholar.mainLanguage ?? "ar") as "en" | "ar",
-      title: (scholar.title ?? undefined) as CreateScholarDto["title"],
-      socialTwitter: scholar.socialTwitter ?? "",
-      socialTelegram: scholar.socialTelegram ?? "",
-      socialYoutube: scholar.socialYoutube ?? "",
-      socialWebsite: scholar.socialWebsite ?? "",
-    };
-  }
-  return {
-    name: "",
-    slug: "",
-    imageUrl: "",
-    isActive: true,
-    country: "" as CreateScholarDto["country"],
-    mainLanguage: "ar",
-    socialTwitter: "",
-    socialTelegram: "",
-    socialYoutube: "",
-    socialWebsite: "",
-  };
-}
-
-const initialFormState: FormState = {
-  formData: getInitialFormData(null),
-  saving: false,
-  error: null,
-  stagedImageFile: null,
-  stagedImagePreview: null,
-};
 
 export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalProps) {
   const { t } = useTranslation();
   const isEditing = !!scholar;
 
-  const [state, dispatch] = useReducer(formReducer, initialFormState);
-  const [activeLocale, setActiveLocale] = useState<"en" | "ar">("ar");
-  const { formData, saving, error, stagedImageFile, stagedImagePreview } = state;
+  const { state, dispatch } = useScholarForm(scholar ?? null);
+  const [activeTab, setActiveTab] = useState<"general" | "main" | "other" | "review">("general");
+  const {
+    formData,
+    initialFormData,
+    translationChanges,
+    saving,
+    error,
+    stagedImageFile,
+    stagedImagePreview,
+  } = state;
 
-  useEffect(() => {
-    if (isOpen) {
-      dispatch({ type: "INIT_FORM", scholar: scholar ?? null });
-      setActiveLocale((scholar?.mainLanguage as "en" | "ar") ?? "ar");
+  // Compute which fields have changed for the review tab
+  const changedFields = useMemo(() => {
+    if (!isEditing) {
+      // For create mode, show all non-empty fields
+      return {
+        name: !!formData.name,
+        slug: !!formData.slug,
+        bio: !!formData.bio,
+        title: !!formData.title,
+        country: !!formData.country,
+        socialTwitter: !!formData.socialTwitter,
+        socialTelegram: !!formData.socialTelegram,
+        socialYoutube: !!formData.socialYoutube,
+        socialWebsite: !!formData.socialWebsite,
+      };
     }
-  }, [isOpen, scholar]);
+
+    // For edit mode, only show changed fields
+    return {
+      name: formData.name !== initialFormData.name,
+      slug: formData.slug !== initialFormData.slug,
+      bio: formData.bio !== initialFormData.bio,
+      title: formData.title !== initialFormData.title,
+      country: formData.country !== initialFormData.country,
+      socialTwitter: formData.socialTwitter !== initialFormData.socialTwitter,
+      socialTelegram: formData.socialTelegram !== initialFormData.socialTelegram,
+      socialYoutube: formData.socialYoutube !== initialFormData.socialYoutube,
+      socialWebsite: formData.socialWebsite !== initialFormData.socialWebsite,
+    };
+  }, [isEditing, formData, initialFormData]);
 
   const handleImageStaged = (file: File | null, preview: string | null) => {
     dispatch({ type: "SET_STAGED_IMAGE", file, preview });
     if (file && preview) {
-      // Update the imageUrl temporarily to show the preview
       dispatch({ type: "UPDATE_FIELD", field: "imageUrl", value: preview });
     }
   };
@@ -163,6 +110,18 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
     try {
       const payloadData = { ...formData };
 
+      // Add translations if the non-main locale has content
+      const otherLocale = formData.mainLanguage === "en" ? "ar" : "en";
+      const translation = translationChanges[otherLocale];
+      if (translation.name) {
+        payloadData.translations = {
+          [otherLocale]: {
+            name: translation.name,
+            ...(translation.bio !== undefined && { bio: translation.bio }),
+          },
+        } as Record<"en" | "ar", { name: string; bio?: string | null }>;
+      }
+
       // Handle image upload if file is staged
       if (stagedImageFile) {
         const ext = stagedImageFile.name.split(".").pop()?.toLowerCase() || "png";
@@ -176,7 +135,6 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
 
         await uploadToR2(presignedResponse.uploadUrl, stagedImageFile, stagedImageFile.type);
 
-        // Update imageUrl to the public URL from presigned response
         payloadData.imageUrl = presignedResponse.publicUrl;
       }
 
@@ -191,6 +149,7 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
 
   return (
     <Modal
+      key={scholar?.id ?? "create"}
       isOpen={isOpen}
       onClose={onClose}
       title={
@@ -200,37 +159,102 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
       }
       size="xl"
       width="var(--modal-width-wide)"
-      footer={
-        <>
-          <Button type="button" variant="ghost" onClick={onClose} disabled={saving}>
-            {t("common.cancel", "Cancel")}
-          </Button>
-          <Button type="submit" variant="primary" loading={saving} form="scholar-form">
-            {isEditing
-              ? t("admin.scholars.saveChanges", "Save Changes")
-              : t("admin.scholars.addScholar", "Add Scholar")}
-          </Button>
-        </>
+      multiTab
+      requireReview
+      activeTab={activeTab}
+      onActiveTabChange={(id) => setActiveTab(id as "general" | "main" | "other" | "review")}
+      defaultActiveTab="general"
+      saveFormId="scholar-form"
+      saving={saving}
+      reviewTabId="review"
+      saveLabel={
+        isEditing
+          ? t("admin.scholars.saveChanges", "Save Changes")
+          : t("admin.scholars.addScholar", "Add Scholar")
       }
     >
       <form id="scholar-form" onSubmit={handleSubmit} className={styles.form}>
         {error && <div className={styles.error}>{error}</div>}
 
-        <LanguageBar
-          mainLanguage={formData.mainLanguage}
-          activeLocale={activeLocale}
-          onLocaleChange={setActiveLocale}
-        />
+        <Modal.Tabs>
+          <Modal.TabItem id="general">{t("admin.modal.generalTab", "General")}</Modal.TabItem>
+          <Modal.TabItem id="main">
+            {formData.mainLanguage === "en" ? "English" : "العربية"}
+          </Modal.TabItem>
+          <Modal.TabItem id="other">
+            {formData.mainLanguage === "en" ? "العربية" : "English"}
+          </Modal.TabItem>
+          <Modal.TabItem id="review">{t("admin.modal.reviewTab", "Review")}</Modal.TabItem>
+        </Modal.Tabs>
 
-        <PersonalDataSection
-          formData={formData}
-          dispatch={dispatch}
-          isEditing={isEditing}
-          onImageStaged={handleImageStaged}
-        />
-        <LocationSection formData={formData} dispatch={dispatch} />
-        <SocialSection formData={formData} dispatch={dispatch} />
-        <SettingsSection formData={formData} dispatch={dispatch} />
+        <Modal.Content>
+          <Modal.ContentItem id="general">
+            <GeneralDataSection
+              formData={formData}
+              dispatch={dispatch}
+              onImageStaged={handleImageStaged}
+            />
+            <LocationSection formData={formData} dispatch={dispatch} />
+            <SocialSection formData={formData} dispatch={dispatch} />
+            <SettingsSection formData={formData} dispatch={dispatch} />
+          </Modal.ContentItem>
+
+          <Modal.ContentItem id="main">
+            <TranslationFieldsSection
+              locale={formData.mainLanguage as "en" | "ar"}
+              name={formData.name}
+              bio={formData.bio}
+              onNameChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "name", value })}
+              onBioChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "bio", value })}
+              title={t("admin.modal.mainLanguageContent", "Main Language Content")}
+            />
+          </Modal.ContentItem>
+
+          <Modal.ContentItem id="other">
+            <TranslationFieldsSection
+              locale={formData.mainLanguage === "en" ? "ar" : "en"}
+              name={translationChanges[formData.mainLanguage === "en" ? "ar" : "en"].name ?? ""}
+              bio={
+                translationChanges[formData.mainLanguage === "en" ? "ar" : "en"].bio ?? undefined
+              }
+              onNameChange={(value) =>
+                dispatch({
+                  type: "UPDATE_TRANSLATION",
+                  locale: formData.mainLanguage === "en" ? "ar" : "en",
+                  field: "name",
+                  value,
+                })
+              }
+              onBioChange={(value) =>
+                dispatch({
+                  type: "UPDATE_TRANSLATION",
+                  locale: formData.mainLanguage === "en" ? "ar" : "en",
+                  field: "bio",
+                  value,
+                })
+              }
+              title={t(
+                "admin.modal.translateContent",
+                `Translate to ${formData.mainLanguage === "en" ? "العربية" : "English"}`,
+              )}
+            />
+          </Modal.ContentItem>
+
+          <Modal.ContentItem id="review">
+            <ReviewSection
+              formData={formData}
+              changedFields={changedFields}
+              mainLanguageName={formData.mainLanguage === "en" ? "English" : "العربية"}
+              translationName={
+                translationChanges[formData.mainLanguage === "en" ? "ar" : "en"].name
+              }
+              translationBio={
+                translationChanges[formData.mainLanguage === "en" ? "ar" : "en"].bio ?? undefined
+              }
+              stagedImagePreview={stagedImagePreview}
+            />
+          </Modal.ContentItem>
+        </Modal.Content>
       </form>
     </Modal>
   );

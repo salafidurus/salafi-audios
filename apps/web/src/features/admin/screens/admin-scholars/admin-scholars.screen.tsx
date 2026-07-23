@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { Plus } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@sd/core-contracts";
 import { useInfiniteAdminScholars } from "@sd/domain-content";
-import { PermissionGate } from "@/features/admin/components/permission-gate/permission-gate";
+import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
@@ -21,6 +23,7 @@ import styles from "./admin-scholars.screen.module.css";
 export function AdminScholarsScreen() {
   const isDesktop = useIsDesktop();
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,7 +48,6 @@ export function AdminScholarsScreen() {
       slug: scholar.slug,
       bio: scholar.bio,
       imageUrl: scholar.imageUrl,
-      isKibar: scholar.isKibar,
       isActive: scholar.isActive,
       country: scholar.country,
       mainLanguage: scholar.mainLanguage ?? "ar",
@@ -63,6 +65,10 @@ export function AdminScholarsScreen() {
     } else {
       await createScholar(formData);
     }
+    // Invalidate all scholar queries to refetch updated data
+    await queryClient.invalidateQueries({
+      queryKey: queryKeys.admin.scholars.infinite(),
+    });
     setIsModalOpen(false);
     setEditingScholar(null);
   };

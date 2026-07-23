@@ -16,7 +16,6 @@ const baseScholar = {
   mainLanguage: "ar" as const,
   imageUrl: undefined,
   isActive: true,
-  isKibar: true,
   socialTwitter: undefined,
   socialTelegram: undefined,
   socialYoutube: undefined,
@@ -45,5 +44,15 @@ describe("ScholarItem", () => {
     render(<Scholar.Item scholar={baseScholar} onEdit={vi.fn()} />);
 
     expect(screen.getByRole("button", { name: /edit ibn baz/i })).toBeInTheDocument();
+  });
+
+  it("never renders a KIBAR badge (isKibar removed)", () => {
+    (useAdminPermissions as Mock<any>).mockReturnValue({
+      data: { permissions: ["SCHOLARS_VIEW"] },
+    });
+
+    render(<Scholar.Item scholar={baseScholar} onEdit={vi.fn()} />);
+
+    expect(screen.queryByText("KIBAR")).not.toBeInTheDocument();
   });
 });

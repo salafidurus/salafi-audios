@@ -10,7 +10,6 @@ const mockScholar: ScholarListItemDto = {
   name: "Abdul Aziz bin Baz",
   imageUrl: undefined,
   mainLanguage: "ar" as any,
-  isKibar: false,
   lectureCount: 42,
 };
 
@@ -22,12 +21,7 @@ describe("ScholarListRow", () => {
     expect(screen.getByText("42 lectures")).toBeInTheDocument();
   });
 
-  it("renders Senior Scholar badge when isKibar is true", () => {
-    render(<ScholarListRow scholar={{ ...mockScholar, isKibar: true }} />);
-    expect(screen.getByText("Senior Scholar")).toBeInTheDocument();
-  });
-
-  it("does not render Senior Scholar badge when isKibar is false", () => {
+  it("never renders a Senior Scholar badge (isKibar removed)", () => {
     render(<ScholarListRow scholar={mockScholar} />);
     expect(screen.queryByText("Senior Scholar")).not.toBeInTheDocument();
   });

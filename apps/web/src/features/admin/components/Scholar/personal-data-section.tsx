@@ -11,7 +11,7 @@ import { EditableInput } from "@/shared/components/EditableInput";
 import { FormSection } from "@/features/admin/components/FormSection";
 import { ScholarAvatarEditor } from "./scholar-avatar-editor";
 import { useTranslation } from "@/core/i18n/use-translation";
-import type { FormAction } from "./ScholarModal";
+import type { FormAction } from "../../hooks/Scholar/useScholarForm";
 import { SCHOLAR_TITLE_LABELS, SCHOLAR_TITLES_ARRAY } from "./constants";
 import styles from "./personal-data-section.module.css";
 
@@ -103,6 +103,21 @@ export function PersonalDataSection({
                 ))}
               </DropdownContent>
             </Dropdown>
+          </div>
+
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="scholar-bio">
+              {t("admin.scholars.bioLabel", "Bio")}
+            </label>
+            <textarea
+              id="scholar-bio"
+              value={formData.bio ?? ""}
+              onChange={(e) =>
+                dispatch({ type: "UPDATE_FIELD", field: "bio", value: e.target.value })
+              }
+              placeholder={t("admin.scholars.bioPlaceholder", "Scholar biography")}
+              className={styles.textarea}
+            />
           </div>
         </div>
       </div>

@@ -58,7 +58,6 @@ export class ExploreRepo {
           select: {
             name: true,
             slug: true,
-            isFeatured: true,
             mainLanguage: true,
             translations: {
               where: { locale, status: 'published' },
@@ -167,7 +166,6 @@ export class ExploreRepo {
           select: {
             name: true,
             slug: true,
-            isFeatured: true,
             mainLanguage: true,
             translations: {
               where: { locale, status: 'published' },
@@ -236,7 +234,7 @@ export class ExploreRepo {
   private async fetchScholarChips(locale: Locale, take: number): Promise<ScholarChipDto[]> {
     const records = await this.prisma.scholar.findMany({
       where: { isActive: true },
-      orderBy: [{ isFeatured: 'desc' }, { isKibar: 'desc' }],
+      orderBy: { createdAt: 'desc' },
       take,
       select: {
         id: true,

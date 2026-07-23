@@ -29,7 +29,6 @@ describe('ScholarsService', () => {
     country: 'SA',
     mainLanguage: 'ar',
     isActive: true,
-    isKibar: true,
     socialTwitter: '@example',
     socialTelegram: 'example',
     socialYoutube: 'example',
@@ -55,6 +54,7 @@ describe('ScholarsService', () => {
             list: vi.fn<any>(),
             findBySlug: vi.fn<any>(),
             getContent: vi.fn<any>(),
+            getFormData: vi.fn<any>(),
             create: vi.fn<any>(),
             update: vi.fn<any>(),
             findById: vi.fn<any>(),
@@ -82,7 +82,6 @@ describe('ScholarsService', () => {
             slug: 'test-scholar',
             imageUrl: 'test.jpg',
             mainLanguage: 'en',
-            isKibar: false,
             lectureCount: 10,
           },
         ],
@@ -134,6 +133,13 @@ describe('ScholarsService', () => {
     });
   });
 
+  describe('getFormData', () => {
+    it('method exists and is callable', () => {
+      expect(service.getFormData).toBeDefined();
+      expect(typeof service.getFormData).toBe('function');
+    });
+  });
+
   describe('create', () => {
     it('should create a new scholar', async () => {
       const dto: CreateScholarDto = {
@@ -141,8 +147,6 @@ describe('ScholarsService', () => {
         slug: 'new-scholar',
         bio: 'Bio details',
         imageUrl: 'new.jpg',
-        isKibar: false,
-        isFeatured: false,
         isActive: true,
         country: 'SA',
         mainLanguage: 'ar',
@@ -153,8 +157,6 @@ describe('ScholarsService', () => {
         bio: dto.bio ?? null,
         imageUrl: dto.imageUrl ?? null,
         isActive: dto.isActive ?? true,
-        isKibar: dto.isKibar ?? false,
-        isFeatured: dto.isFeatured ?? false,
         createdAt: new Date(),
         updatedAt: new Date(),
         country: dto.country,
@@ -180,20 +182,18 @@ describe('ScholarsService', () => {
       expect(repo.create).toHaveBeenCalledWith(dto);
     });
 
-    it('should create a new scholar with inline translations', async () => {
+    it('should create a new scholar with inline translations including bio', async () => {
       const dto: CreateScholarDto = {
         name: 'New Scholar',
         slug: 'new-scholar',
         bio: 'Bio details',
         imageUrl: 'new.jpg',
-        isKibar: false,
-        isFeatured: false,
         isActive: true,
         country: 'SA',
         mainLanguage: 'ar',
         translations: {
-          en: { name: 'New Scholar - English' },
-          ar: { name: 'عالم جديد' },
+          en: { name: 'New Scholar - English', bio: 'English bio' },
+          ar: { name: 'عالم جديد', bio: 'سيرة عربية' },
         },
       };
       const created = {
@@ -203,8 +203,6 @@ describe('ScholarsService', () => {
         bio: dto.bio ?? null,
         imageUrl: dto.imageUrl ?? null,
         isActive: dto.isActive ?? true,
-        isKibar: dto.isKibar ?? false,
-        isFeatured: dto.isFeatured ?? false,
         createdAt: new Date(),
         updatedAt: new Date(),
         country: dto.country,
@@ -223,25 +221,12 @@ describe('ScholarsService', () => {
       };
 
       repo.create.mockResolvedValue(created as any);
-      repo.upsertScholarTranslation.mockResolvedValue({
-        locale: 'en',
-        name: 'New Scholar - English',
-        status: 'draft',
-      } as any);
 
       const result = await service.create(dto);
 
       expect(result).toEqual(created);
+      // Repository now handles translations in a single transaction
       expect(repo.create).toHaveBeenCalledWith(dto);
-      expect(repo.upsertScholarTranslation).toHaveBeenCalledTimes(2);
-      expect(repo.upsertScholarTranslation).toHaveBeenCalledWith('s2', {
-        locale: 'en',
-        name: 'New Scholar - English',
-      });
-      expect(repo.upsertScholarTranslation).toHaveBeenCalledWith('s2', {
-        locale: 'ar',
-        name: 'عالم جديد',
-      });
     });
   });
 
@@ -258,8 +243,6 @@ describe('ScholarsService', () => {
         mainLanguage: 'ar',
         imageUrl: null,
         isActive: true,
-        isKibar: false,
-        isFeatured: false,
         socialTwitter: null,
         socialTelegram: null,
         socialYoutube: null,
@@ -300,8 +283,6 @@ describe('ScholarsService', () => {
         mainLanguage: 'ar',
         imageUrl: null,
         isActive: true,
-        isKibar: false,
-        isFeatured: false,
         socialTwitter: null,
         socialTelegram: null,
         socialYoutube: null,
@@ -316,21 +297,13 @@ describe('ScholarsService', () => {
 
       repo.findById.mockResolvedValue(existing as any);
       repo.update.mockResolvedValue(updated as any);
-      repo.upsertScholarTranslation.mockResolvedValue({
-        locale: 'en',
-        name: 'Updated Name - English',
-        status: 'draft',
-      } as any);
 
       const result = await service.update('s1', dto);
 
       expect(result).toEqual(updated as any);
       expect(repo.findById).toHaveBeenCalledWith('s1');
+      // Repository now handles translations in a single transaction
       expect(repo.update).toHaveBeenCalledWith('s1', dto);
-      expect(repo.upsertScholarTranslation).toHaveBeenCalledWith('s1', {
-        locale: 'en',
-        name: 'Updated Name - English',
-      });
     });
 
     it('should throw NotFoundException when scholar to update not found', async () => {

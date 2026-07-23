@@ -17,10 +17,36 @@
   gap: var(--space-xs);
 }
 
+.fieldWithIcon {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+}
+
+.iconOnly {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  margin-top: var(--space-xs);
+}
+
+.inputWrapper {
+  flex: 1;
+}
+
 .label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
   font-size: var(--typo-label-md-font-size);
   font-weight: 500;
   color: var(--content-default);
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 
 .prefixedContainer {

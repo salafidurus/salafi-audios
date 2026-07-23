@@ -33,9 +33,7 @@ jest.mock("expo-audio", () => ({
 jest.mock("@sd/domain-content", () => ({
   useScholarsList: () => ({
     data: {
-      scholars: [
-        { id: "sch-1", slug: "scholar-one", name: "Scholar One", isKibar: false, lectureCount: 1 },
-      ],
+      scholars: [{ id: "sch-1", slug: "scholar-one", name: "Scholar One", lectureCount: 1 }],
     },
     isLoading: false,
   }),

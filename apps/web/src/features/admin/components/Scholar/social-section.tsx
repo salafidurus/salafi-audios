@@ -1,10 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import type { CreateScholarDto } from "@sd/core-contracts";
 import { EditableInput } from "@/shared/components/EditableInput";
 import { FormSection } from "@/features/admin/components/FormSection";
 import { useTranslation } from "@/core/i18n/use-translation";
-import type { FormAction } from "./ScholarModal";
+import type { FormAction } from "../../hooks/Scholar/useScholarForm";
 import styles from "./social-section.module.css";
 
 interface SocialSectionProps {
@@ -19,6 +20,7 @@ const SOCIAL_FIELDS = [
     defaultLabel: "X (Twitter)",
     prefix: "https://x.com/",
     id: "scholar-twitter",
+    icon: "/social-icons/x-light.svg",
   },
   {
     key: "socialTelegram",
@@ -26,6 +28,7 @@ const SOCIAL_FIELDS = [
     defaultLabel: "Telegram",
     prefix: "https://t.me/",
     id: "scholar-telegram",
+    icon: "/social-icons/telegram-light.svg",
   },
   {
     key: "socialYoutube",
@@ -33,6 +36,7 @@ const SOCIAL_FIELDS = [
     defaultLabel: "YouTube",
     prefix: "https://youtube.com/@",
     id: "scholar-youtube",
+    icon: "/social-icons/youtube-light.svg",
   },
   {
     key: "socialWebsite",
@@ -40,6 +44,7 @@ const SOCIAL_FIELDS = [
     defaultLabel: "Website",
     prefix: null, // No fixed prefix for website
     id: "scholar-website",
+    icon: null,
   },
 ];
 
@@ -76,45 +81,53 @@ export function SocialSection({ formData, dispatch }: SocialSectionProps) {
           const handle = extractHandle(value, field.prefix);
 
           return (
-            <div key={field.key} className={styles.field}>
-              <label className={styles.label} htmlFor={field.id}>
-                {t(field.label, field.defaultLabel)}
-              </label>
-              {field.prefix ? (
-                <div className={styles.prefixedContainer}>
-                  <div className={styles.prefixedInput}>
-                    <span className={styles.prefix}>{field.prefix}</span>
-                    <input
-                      id={field.id}
-                      type="text"
-                      value={handle}
-                      onChange={(e) =>
-                        handleSocialChange(
-                          field.key as keyof CreateScholarDto,
-                          e.target.value,
-                          field.prefix,
-                        )
-                      }
-                      placeholder={t("admin.scholars.handlePlaceholder", "username")}
-                      className={styles.input}
-                    />
-                  </div>
-                </div>
-              ) : (
-                <EditableInput
-                  id={field.id}
-                  type="url"
-                  value={value}
-                  onChange={(newValue) =>
-                    dispatch({
-                      type: "UPDATE_FIELD",
-                      field: field.key as keyof CreateScholarDto,
-                      value: newValue,
-                    })
-                  }
-                  placeholder="https://..."
+            <div key={field.key} className={styles.fieldWithIcon}>
+              {field.icon && (
+                <Image
+                  src={field.icon}
+                  alt={field.defaultLabel}
+                  width={24}
+                  height={24}
+                  className={styles.iconOnly}
                 />
               )}
+              <div className={styles.inputWrapper}>
+                {field.prefix ? (
+                  <div className={styles.prefixedContainer}>
+                    <div className={styles.prefixedInput}>
+                      <span className={styles.prefix}>{field.prefix}</span>
+                      <input
+                        id={field.id}
+                        type="text"
+                        value={handle}
+                        onChange={(e) =>
+                          handleSocialChange(
+                            field.key as keyof CreateScholarDto,
+                            e.target.value,
+                            field.prefix,
+                          )
+                        }
+                        placeholder={t("admin.scholars.handlePlaceholder", "username")}
+                        className={styles.input}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <EditableInput
+                    id={field.id}
+                    type="url"
+                    value={value}
+                    onChange={(newValue) =>
+                      dispatch({
+                        type: "UPDATE_FIELD",
+                        field: field.key as keyof CreateScholarDto,
+                        value: newValue,
+                      })
+                    }
+                    placeholder="https://..."
+                  />
+                )}
+              </div>
             </div>
           );
         })}

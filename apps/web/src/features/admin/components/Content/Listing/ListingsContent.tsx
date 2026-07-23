@@ -7,7 +7,7 @@ import { useInfiniteAdminListings } from "@sd/domain-content";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { Content } from "../Content";
-import { fetchAdminLectureDetail } from "../../api/admin-lectures.api";
+import { fetchAdminLectureDetail } from "@/features/admin/api/admin-lectures.api";
 
 type AudioData = {
   audioKey: string;

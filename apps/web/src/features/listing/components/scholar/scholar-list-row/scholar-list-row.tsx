@@ -41,7 +41,6 @@ export function ScholarListRow({ scholar, onPress }: ScholarListRowProps) {
         <div className={styles.name}>{formatScholarName(scholar)}</div>
         <div className={styles.meta}>
           {scholar.mainLanguage && <span className={styles.language}>{scholar.mainLanguage}</span>}
-          {scholar.isKibar && <span className={styles.kibarBadge}>Senior Scholar</span>}
         </div>
         <div className={styles.lectureCount}>{scholar.lectureCount} lectures</div>
       </div>

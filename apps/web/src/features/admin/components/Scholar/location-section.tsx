@@ -9,7 +9,7 @@ import {
 } from "@/shared/components/Dropdown";
 import { FormSection } from "@/features/admin/components/FormSection";
 import { useTranslation } from "@/core/i18n/use-translation";
-import type { FormAction } from "./ScholarModal";
+import type { FormAction } from "../../hooks/Scholar/useScholarForm";
 import styles from "./scholar-modal.module.css";
 
 interface LocationSectionProps {

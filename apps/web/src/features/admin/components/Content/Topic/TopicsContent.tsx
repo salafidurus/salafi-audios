@@ -8,8 +8,8 @@ import { Modal } from "@/shared/components/Modal";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { sanitizeError } from "@sd/utils-error";
 import { Content } from "../Content";
-import { deleteTopic } from "../../api/admin.api";
-import styles from "../../screens/admin-contents/admin-contents.screen.module.css";
+import { deleteTopic } from "@/features/admin/api/admin.api";
+import styles from "../../../screens/admin-contents/admin-contents.screen.module.css";
 
 export type TopicsContentProps = {
   searchQuery: string;

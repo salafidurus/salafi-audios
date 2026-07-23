@@ -246,8 +246,6 @@ model Scholar {
   mainLanguage Locale        @default(ar)
   imageUrl     String?
   isActive     Boolean       @default(true)
-  isKibar      Boolean       @default(false)
-  isFeatured   Boolean       @default(false)
   title        ScholarTitle?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
