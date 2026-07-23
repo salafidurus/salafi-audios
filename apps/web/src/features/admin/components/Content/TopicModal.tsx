@@ -200,16 +200,19 @@ export function TopicModal({ isOpen, onClose, onSave, topic }: TopicModalProps) 
     dispatch({ type: "SET_SAVING", saving: true });
     dispatch({ type: "SET_ERROR", error: null });
     try {
-      const translations = isEditing
-        ? Object.fromEntries(
-            Object.entries(translationChanges).filter(([, fields]) => fields?.name?.trim()),
-          )
-        : undefined;
+      let translations: Record<string, { name?: string }> | undefined;
+      if (isEditing) {
+        const filtered = Object.fromEntries(
+          Object.entries(translationChanges).filter(([, fields]) => fields?.name?.trim()),
+        );
+        if (Object.keys(filtered).length > 0) {
+          translations = filtered as Record<string, { name?: string }>;
+        }
+      }
 
       const dataWithTranslations: UpsertTopicDto = {
         ...formData,
-        translations:
-          translations && Object.keys(translations).length > 0 ? translations : undefined,
+        translations,
       };
       await onSave(dataWithTranslations);
       onClose();
