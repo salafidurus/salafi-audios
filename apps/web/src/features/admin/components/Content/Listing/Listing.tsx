@@ -16,12 +16,14 @@ export function Listing({ listing, onEdit }: ListingProps) {
   const { isMobile } = useResponsive();
   const { t } = useTranslation();
 
+  const statusText = t(`admin.contents.listing.${listing.status}`, listing.status);
+
   return (
     <List.Item interactive>
       <div className={styles.listingInfo}>
         <span className={styles.listingTitle}>{listing.title}</span>
         <span className={styles.listingMeta}>
-          {listing.scholarName} • {listing.status}
+          {listing.scholarName} • {statusText}
         </span>
       </div>
       <List.Item.Actions>

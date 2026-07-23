@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { AdminPermission } from "@sd/core-contracts";
 import { ShieldOff } from "lucide-react";
+import { useTranslation } from "@/core/i18n/use-translation";
 import { PermissionBadge } from "../permission-badge/permission-badge";
 import styles from "./permission-details.module.css";
 
@@ -19,11 +20,13 @@ const GROUPS = [
 ] as const;
 
 export function PermissionDetails({ permissions }: PermissionDetailsProps): ReactNode {
+  const { t } = useTranslation();
+
   if (permissions.length === 0) {
     return (
       <div className={styles.noPerms}>
         <ShieldOff className={styles.noPermsIcon} />
-        <span>No permissions</span>
+        <span>{t("admin.permissions.noPermissions", "No permissions")}</span>
       </div>
     );
   }
@@ -37,9 +40,10 @@ export function PermissionDetails({ permissions }: PermissionDetailsProps): Reac
         if (groupPerms.length === 0) {
           return null;
         }
+        const groupLabel = t(`admin.permissions.groups.${group.key.toLowerCase()}`, group.label);
         return (
           <div key={group.key} className={styles.groupRow}>
-            <span className={styles.groupLabel}>{group.label}:</span>
+            <span className={styles.groupLabel}>{groupLabel}:</span>
             <div className={styles.badges}>
               {groupPerms.map((perm) => (
                 <PermissionBadge key={perm} permission={perm} />

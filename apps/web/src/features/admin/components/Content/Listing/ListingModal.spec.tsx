@@ -147,7 +147,7 @@ describe("ListingModal", () => {
       />,
     );
 
-    expect(screen.getByText(/edit lecture details/i)).toBeInTheDocument();
+    expect(screen.getByText(/edit listing details/i)).toBeInTheDocument();
 
     await waitFor(() => {
       expect(screen.getByTestId("scholar-dropdown")).toHaveTextContent("Scholar Two");

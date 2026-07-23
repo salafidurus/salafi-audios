@@ -3,6 +3,7 @@
 import React, { useRef, useState } from "react";
 import { getPresignedUrl, uploadToR2 } from "@/features/admin/api/admin-lectures.api";
 import { Button } from "@/shared/components/Button";
+import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./audio-uploader.module.css";
 import { Upload, FileAudio, CheckCircle, AlertCircle } from "lucide-react";
 
@@ -69,6 +70,7 @@ async function extractMetadata(file: File): Promise<number> {
 }
 
 export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
+  const { t } = useTranslation();
   const [dragActive, setDragActive] = useState(false);
   const [uploadState, setUploadState] = useState<UploadState>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -172,9 +174,11 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
           {uploadState === "idle" && (
             <>
               <Upload className={styles.icon} size={40} />
-              <p className={styles.primaryText}>Drag & drop an audio file here</p>
+              <p className={styles.primaryText}>
+                {t("admin.contents.listing.audioDropzone", "Drag & drop an audio file here")}
+              </p>
               <Button variant="ghost" className={styles.secondaryText} onClick={onButtonClick}>
-                or click to browse files
+                {t("admin.contents.listing.clickToBrowse", "or click to browse files")}
               </Button>
             </>
           )}
@@ -182,7 +186,9 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
           {uploadState === "extracting" && (
             <>
               <FileAudio className={`${styles.icon} ${styles.spin}`} size={40} />
-              <p className={styles.primaryText}>Analyzing audio file...</p>
+              <p className={styles.primaryText}>
+                {t("admin.contents.listing.extractingAudio", "Analyzing audio file...")}
+              </p>
               <p className={styles.fileName}>{fileName}</p>
             </>
           )}
@@ -190,7 +196,9 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
           {uploadState === "uploading" && (
             <>
               <Upload className={`${styles.icon} ${styles.pulse}`} size={40} />
-              <p className={styles.primaryText}>Uploading to storage...</p>
+              <p className={styles.primaryText}>
+                {t("admin.contents.listing.uploadingStorage", "Uploading to storage...")}
+              </p>
               <p className={styles.fileName}>{fileName}</p>
             </>
           )}

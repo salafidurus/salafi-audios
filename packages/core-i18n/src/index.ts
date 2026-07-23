@@ -12,4 +12,5 @@ export {
   getSubnavLabel,
   getEmptyStateText,
   getErrorStateText,
+  getLocalizedName,
 } from "./translation-helpers";

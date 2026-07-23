@@ -20,7 +20,7 @@ describe("Badge", () => {
   it("renders admin role badge with primary styling", () => {
     render(<Badge variant="role" role="admin" />);
 
-    const badge = screen.getByText("admin");
+    const badge = screen.getByText(/admin/i);
     expect(badge).toBeInTheDocument();
     expect(badge.tagName).toBe("SPAN");
   });
@@ -28,7 +28,7 @@ describe("Badge", () => {
   it("renders user role badge with muted styling", () => {
     render(<Badge variant="role" role="user" />);
 
-    const badge = screen.getByText("user");
+    const badge = screen.getByText(/user/i);
     expect(badge).toBeInTheDocument();
     expect(badge.tagName).toBe("SPAN");
   });

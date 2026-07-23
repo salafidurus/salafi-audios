@@ -43,3 +43,16 @@ export function getEmptyStateText(feature: "feed", t: (key: string) => string): 
 export function getErrorStateText(feature: "feed", t: (key: string) => string): string {
   return t(`${feature}.error`);
 }
+
+/**
+ * Resolve localized entity name from `{ en: string; ar?: string }` or plain string.
+ */
+export function getLocalizedName(
+  name: { en: string; ar?: string } | string | undefined | null,
+  locale: string,
+): string {
+  if (!name) return "";
+  if (typeof name === "string") return name;
+  if (locale === "ar" && name.ar) return name.ar;
+  return name.en || name.ar || "";
+}

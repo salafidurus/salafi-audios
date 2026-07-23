@@ -275,7 +275,14 @@ export class ExploreRepo {
     // Get the topic name
     const topic = await this.prisma.topic.findUnique({
       where: { slug: topicSlug },
-      select: { name: true },
+      select: {
+        name: true,
+        translations: {
+          where: { locale },
+          select: { name: true },
+          take: 1,
+        },
+      },
     });
 
     if (!topic) return null;
@@ -348,7 +355,7 @@ export class ExploreRepo {
 
     return {
       kind: 'topic_row' as const,
-      topicName: topic.name,
+      topicName: topic.translations?.[0]?.name || topic.name,
       items,
     };
   }
