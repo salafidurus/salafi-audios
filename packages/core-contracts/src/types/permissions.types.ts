@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { LocaleSchema } from "./localization.types";
 
 // Permission Enum - Granular permission model
 export const PermissionEnum = z.enum([
@@ -133,7 +134,7 @@ export type UserScholarRoleDto = z.infer<typeof UserScholarRoleDtoSchema>;
 export const UserTranslatorRoleDtoSchema = z.object({
   id: z.string(),
   userId: z.string(),
-  locale: z.enum(["en", "ar"]),
+  locale: LocaleSchema,
   canPublish: z.boolean(),
   createdAt: z.string(),
   createdBy: z.string().nullable(),
@@ -162,7 +163,7 @@ export type AssignScholarRequest = z.infer<typeof AssignScholarRequestSchema>;
 
 export const AssignTranslatorLanguageRequestSchema = z.object({
   userId: z.string(),
-  locale: z.enum(["en", "ar"]),
+  locale: LocaleSchema,
   canPublish: z.boolean().default(false),
 });
 export type AssignTranslatorLanguageRequest = z.infer<typeof AssignTranslatorLanguageRequestSchema>;

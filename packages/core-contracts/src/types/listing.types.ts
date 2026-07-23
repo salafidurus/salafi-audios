@@ -175,7 +175,7 @@ export const AdminListingDetailDtoSchema = z.object({
   title: z.string(),
   description: z.string().optional(),
   format: ListingFormatSchema,
-  language: z.string().optional(),
+  language: LocaleSchema.optional(),
   status: StatusValueSchema,
   orderIndex: z.number().optional(),
   durationSeconds: z.number().optional(),

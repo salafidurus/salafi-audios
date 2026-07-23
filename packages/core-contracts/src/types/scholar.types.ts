@@ -170,7 +170,7 @@ export const UpdateScholarTranslationDtoSchema = z.object({
 export type UpdateScholarTranslationDto = z.infer<typeof UpdateScholarTranslationDtoSchema>;
 
 const AdminScholarTranslationSchema = z.object({
-  locale: z.string(),
+  locale: LocaleSchema,
   name: z.string(),
   status: z.enum(["draft", "published"]),
 });
