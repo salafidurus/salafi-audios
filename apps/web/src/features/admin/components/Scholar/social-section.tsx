@@ -19,6 +19,7 @@ const SOCIAL_FIELDS = [
     defaultLabel: "X (Twitter)",
     prefix: "https://x.com/",
     id: "scholar-twitter",
+    icon: "/social-icons/x-light.svg",
   },
   {
     key: "socialTelegram",
@@ -26,6 +27,7 @@ const SOCIAL_FIELDS = [
     defaultLabel: "Telegram",
     prefix: "https://t.me/",
     id: "scholar-telegram",
+    icon: "/social-icons/telegram-light.svg",
   },
   {
     key: "socialYoutube",
@@ -33,6 +35,7 @@ const SOCIAL_FIELDS = [
     defaultLabel: "YouTube",
     prefix: "https://youtube.com/@",
     id: "scholar-youtube",
+    icon: "/social-icons/youtube-light.svg",
   },
   {
     key: "socialWebsite",
@@ -40,6 +43,7 @@ const SOCIAL_FIELDS = [
     defaultLabel: "Website",
     prefix: null, // No fixed prefix for website
     id: "scholar-website",
+    icon: null,
   },
 ];
 
@@ -78,6 +82,9 @@ export function SocialSection({ formData, dispatch }: SocialSectionProps) {
           return (
             <div key={field.key} className={styles.field}>
               <label className={styles.label} htmlFor={field.id}>
+                {field.icon && (
+                  <img src={field.icon} alt={field.defaultLabel} className={styles.icon} />
+                )}
                 {t(field.label, field.defaultLabel)}
               </label>
               {field.prefix ? (
