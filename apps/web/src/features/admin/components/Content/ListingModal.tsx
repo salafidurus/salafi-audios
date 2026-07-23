@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useReducer } from "react";
+import React, { useReducer, useState, useEffect } from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
 import { AudioUploader } from "../AudioUploader/AudioUploader";
 import type {
@@ -41,6 +41,8 @@ interface ListingModalProps {
   onAudioUploadComplete?: (audioData: any) => void;
 }
 
+type Locale = "en" | "ar";
+
 type FormState = {
   title: string;
   slug: string;
@@ -50,12 +52,43 @@ type FormState = {
   status: LectureStatus;
   orderIndex: number;
   selectedTopics: string[];
+  language: Locale;
+  translationChanges: Record<Locale, { title?: string; description?: string }>;
   saving: boolean;
   formError: string | null;
 };
 
-function formReducer(state: FormState, patch: Partial<FormState>): FormState {
-  return { ...state, ...patch };
+export type FormAction =
+  | { type: "UPDATE_FIELD"; field: keyof FormState; value: any }
+  | { type: "UPDATE_TRANSLATION"; locale: Locale; field: "title" | "description"; value: string }
+  | { type: "SET_SAVING"; saving: boolean }
+  | { type: "SET_ERROR"; error: string | null }
+  | { type: "INIT_STATE"; state: FormState };
+
+function formReducer(state: FormState, action: FormAction): FormState {
+  switch (action.type) {
+    case "UPDATE_FIELD":
+      return { ...state, [action.field]: action.value };
+    case "UPDATE_TRANSLATION":
+      return {
+        ...state,
+        translationChanges: {
+          ...state.translationChanges,
+          [action.locale]: {
+            ...state.translationChanges[action.locale],
+            [action.field]: action.value,
+          },
+        },
+      };
+    case "SET_SAVING":
+      return { ...state, saving: action.saving };
+    case "SET_ERROR":
+      return { ...state, formError: action.error };
+    case "INIT_STATE":
+      return action.state;
+    default:
+      return state;
+  }
 }
 
 function initFormState(
@@ -72,6 +105,8 @@ function initFormState(
       status: validateLectureStatus(listing.status),
       orderIndex: listing.orderIndex || 0,
       selectedTopics: listing.topics || [],
+      language: (listing.language as Locale) || "ar",
+      translationChanges: { en: {}, ar: {} },
       saving: false,
       formError: null,
     };
@@ -85,6 +120,8 @@ function initFormState(
     status: "draft",
     orderIndex: 0,
     selectedTopics: [],
+    language: "ar",
+    translationChanges: { en: {}, ar: {} },
     saving: false,
     formError: null,
   };
@@ -92,11 +129,12 @@ function initFormState(
 
 interface ListingFormProps {
   state: FormState;
-  dispatch: React.Dispatch<Partial<FormState>>;
+  dispatch: React.Dispatch<FormAction>;
   scholars: ScholarListItemDto[];
   topics: TopicDetailDto[];
   series: ListingRefDto[];
   listing?: AdminListingDetailDto | null;
+  activeLocale: Locale;
   handleTitleChange: (val: string) => void;
   handleTopicToggle: (topicId: string) => void;
   onSubmit: (e: React.FormEvent) => void;
@@ -109,6 +147,7 @@ function ListingForm({
   topics,
   series,
   listing,
+  activeLocale,
   handleTitleChange,
   handleTopicToggle,
   onSubmit,
@@ -123,12 +162,16 @@ function ListingForm({
     status,
     orderIndex,
     selectedTopics,
+    language,
+    translationChanges,
     formError,
   } = state;
   const selectedTopicsSet = React.useMemo(() => new Set(selectedTopics), [selectedTopics]);
+  const isMainLocale = activeLocale === language;
+  const translation = translationChanges[activeLocale];
 
   return (
-    <form id="lecture-edit-form" onSubmit={onSubmit} className={styles.form}>
+    <>
       {formError && <div className={styles.errorBanner}>{formError}</div>}
 
       <div className={styles.formGroup}>
@@ -139,25 +182,63 @@ function ListingForm({
           id="lecture-title"
           type="text"
           className={styles.input}
-          value={title}
-          onChange={(e) => handleTitleChange(e.target.value)}
+          value={isMainLocale ? title : translation.title || ""}
+          onChange={(e) => {
+            if (isMainLocale) {
+              handleTitleChange(e.target.value);
+            } else {
+              dispatch({
+                type: "UPDATE_TRANSLATION",
+                locale: activeLocale,
+                field: "title",
+                value: e.target.value,
+              });
+            }
+          }}
           required
         />
       </div>
 
-      <div className={styles.formGroup}>
-        <label htmlFor="lecture-slug" className={styles.label}>
-          {t("admin.contents.listing.slugLabel", "Slug")}
-        </label>
-        <input
-          id="lecture-slug"
-          type="text"
-          className={styles.input}
-          value={slug}
-          onChange={(e) => dispatch({ slug: e.target.value })}
-          placeholder={t("admin.contents.listing.slugPlaceholder", "Auto-generated if left blank")}
-        />
-      </div>
+      {isMainLocale && (
+        <>
+          <div className={styles.formGroup}>
+            <label htmlFor="lecture-slug" className={styles.label}>
+              {t("admin.contents.listing.slugLabel", "Slug")}
+            </label>
+            <input
+              id="lecture-slug"
+              type="text"
+              className={styles.input}
+              value={slug}
+              onChange={(e) =>
+                dispatch({ type: "UPDATE_FIELD", field: "slug", value: e.target.value })
+              }
+              placeholder={t(
+                "admin.contents.listing.slugPlaceholder",
+                "Auto-generated if left blank",
+              )}
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="lecture-language" className={styles.label}>
+              {t("admin.contents.listing.languageLabel", "Language")}
+            </label>
+            <Dropdown
+              value={language}
+              onValueChange={(value) =>
+                dispatch({ type: "UPDATE_FIELD", field: "language", value: value as Locale })
+              }
+            >
+              <DropdownTrigger id="lecture-language" />
+              <DropdownContent>
+                <DropdownItem value="ar">العربية</DropdownItem>
+                <DropdownItem value="en">English</DropdownItem>
+              </DropdownContent>
+            </Dropdown>
+          </div>
+        </>
+      )}
 
       <div className={styles.formGroup}>
         <label htmlFor="lecture-description" className={styles.label}>
@@ -166,123 +247,160 @@ function ListingForm({
         <textarea
           id="lecture-description"
           className={styles.textarea}
-          value={description}
-          onChange={(e) => dispatch({ description: e.target.value })}
+          value={isMainLocale ? description : translation.description || ""}
+          onChange={(e) => {
+            if (isMainLocale) {
+              dispatch({ type: "UPDATE_FIELD", field: "description", value: e.target.value });
+            } else {
+              dispatch({
+                type: "UPDATE_TRANSLATION",
+                locale: activeLocale,
+                field: "description",
+                value: e.target.value,
+              });
+            }
+          }}
           rows={3}
         />
       </div>
 
-      <div className={styles.formRow}>
-        <div className={styles.formGroup}>
-          <label htmlFor="lecture-scholar" className={styles.label}>
-            {t("admin.contents.listing.scholarLabel", "Scholar")}
-          </label>
-          <Dropdown value={scholarId} onValueChange={(value) => dispatch({ scholarId: value })}>
-            <DropdownTrigger
-              id="lecture-scholar"
-              placeholder={t("admin.contents.listing.scholarPlaceholder", "Select Scholar")}
-              testId="scholar-dropdown"
-            />
-            <DropdownContent searchable>
-              {scholars.map((s) => (
-                <DropdownItem key={s.id} value={s.id}>
-                  {s.name}
-                </DropdownItem>
-              ))}
-            </DropdownContent>
-          </Dropdown>
-        </div>
+      {isMainLocale && (
+        <>
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label htmlFor="lecture-scholar" className={styles.label}>
+                {t("admin.contents.listing.scholarLabel", "Scholar")}
+              </label>
+              <Dropdown
+                value={scholarId}
+                onValueChange={(value) =>
+                  dispatch({ type: "UPDATE_FIELD", field: "scholarId", value })
+                }
+              >
+                <DropdownTrigger
+                  id="lecture-scholar"
+                  placeholder={t("admin.contents.listing.scholarPlaceholder", "Select Scholar")}
+                  testId="scholar-dropdown"
+                />
+                <DropdownContent searchable>
+                  {scholars.map((s) => (
+                    <DropdownItem key={s.id} value={s.id}>
+                      {s.name}
+                    </DropdownItem>
+                  ))}
+                </DropdownContent>
+              </Dropdown>
+            </div>
 
-        <div className={styles.formGroup}>
-          <label htmlFor="lecture-series" className={styles.label}>
-            {t("admin.contents.listing.seriesLabel", "Series")}
-          </label>
-          <Dropdown value={seriesId} onValueChange={(value) => dispatch({ seriesId: value })}>
-            <DropdownTrigger
-              id="lecture-series"
-              placeholder={t(
-                "admin.contents.listing.seriesPlaceholder",
-                "Select Series (Optional)",
-              )}
-              testId="series-dropdown"
-            />
-            <DropdownContent searchable>
-              {series.map((s) => (
-                <DropdownItem key={s.id} value={s.id}>
-                  {s.title}
-                </DropdownItem>
-              ))}
-            </DropdownContent>
-          </Dropdown>
-        </div>
-      </div>
+            <div className={styles.formGroup}>
+              <label htmlFor="lecture-series" className={styles.label}>
+                {t("admin.contents.listing.seriesLabel", "Series")}
+              </label>
+              <Dropdown
+                value={seriesId}
+                onValueChange={(value) =>
+                  dispatch({ type: "UPDATE_FIELD", field: "seriesId", value })
+                }
+              >
+                <DropdownTrigger
+                  id="lecture-series"
+                  placeholder={t(
+                    "admin.contents.listing.seriesPlaceholder",
+                    "Select Series (Optional)",
+                  )}
+                  testId="series-dropdown"
+                />
+                <DropdownContent searchable>
+                  {series.map((s) => (
+                    <DropdownItem key={s.id} value={s.id}>
+                      {s.title}
+                    </DropdownItem>
+                  ))}
+                </DropdownContent>
+              </Dropdown>
+            </div>
+          </div>
 
-      <div className={styles.formRow}>
-        <div className={styles.formGroup}>
-          <label htmlFor="lecture-status" className={styles.label}>
-            {t("admin.contents.listing.statusLabel", "Status")}
-          </label>
-          <Dropdown
-            value={status}
-            onValueChange={(value) => dispatch({ status: validateLectureStatus(value) })}
-          >
-            <DropdownTrigger
-              id="lecture-status"
-              placeholder={t("admin.contents.listing.statusPlaceholder", "Select Status")}
-              testId="status-dropdown"
-            />
-            <DropdownContent>
-              <DropdownItem value="draft">
-                {t("admin.contents.listing.draft", "Draft")}
-              </DropdownItem>
-              <DropdownItem value="review">
-                {t("admin.contents.listing.review", "In Review")}
-              </DropdownItem>
-              <DropdownItem value="published">
-                {t("admin.contents.listing.published", "Published")}
-              </DropdownItem>
-              <DropdownItem value="archived">
-                {t("admin.contents.listing.archived", "Archived")}
-              </DropdownItem>
-            </DropdownContent>
-          </Dropdown>
-        </div>
+          <div className={styles.formRow}>
+            <div className={styles.formGroup}>
+              <label htmlFor="lecture-status" className={styles.label}>
+                {t("admin.contents.listing.statusLabel", "Status")}
+              </label>
+              <Dropdown
+                value={status}
+                onValueChange={(value) =>
+                  dispatch({
+                    type: "UPDATE_FIELD",
+                    field: "status",
+                    value: validateLectureStatus(value),
+                  })
+                }
+              >
+                <DropdownTrigger
+                  id="lecture-status"
+                  placeholder={t("admin.contents.listing.statusPlaceholder", "Select Status")}
+                  testId="status-dropdown"
+                />
+                <DropdownContent>
+                  <DropdownItem value="draft">
+                    {t("admin.contents.listing.draft", "Draft")}
+                  </DropdownItem>
+                  <DropdownItem value="review">
+                    {t("admin.contents.listing.review", "In Review")}
+                  </DropdownItem>
+                  <DropdownItem value="published">
+                    {t("admin.contents.listing.published", "Published")}
+                  </DropdownItem>
+                  <DropdownItem value="archived">
+                    {t("admin.contents.listing.archived", "Archived")}
+                  </DropdownItem>
+                </DropdownContent>
+              </Dropdown>
+            </div>
 
-        <div className={styles.formGroup}>
-          <label htmlFor="lecture-order" className={styles.label}>
-            {t("admin.contents.listing.orderIndexLabel", "Order Index")}
-          </label>
-          <input
-            id="lecture-order"
-            type="number"
-            className={styles.input}
-            value={orderIndex}
-            onChange={(e) => {
-              const value = e.target.value;
-              const parsed = value ? Number(value) : undefined;
-              dispatch({ orderIndex: Number.isNaN(parsed) ? 0 : (parsed ?? 0) });
-            }}
-          />
-        </div>
-      </div>
+            <div className={styles.formGroup}>
+              <label htmlFor="lecture-order" className={styles.label}>
+                {t("admin.contents.listing.orderIndexLabel", "Order Index")}
+              </label>
+              <input
+                id="lecture-order"
+                type="number"
+                className={styles.input}
+                value={orderIndex}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const parsed = value ? Number(value) : undefined;
+                  dispatch({
+                    type: "UPDATE_FIELD",
+                    field: "orderIndex",
+                    value: Number.isNaN(parsed) ? 0 : (parsed ?? 0),
+                  });
+                }}
+              />
+            </div>
+          </div>
 
-      <div className={styles.formGroup}>
-        <span className={styles.label}>{t("admin.contents.listing.topicsLabel", "Topics")}</span>
-        {topics.length > 0 ? (
-          <Search.Filter
-            chips={topics.map((t) => ({ id: t.id, label: t.name.en }))}
-            selected={selectedTopics}
-            onChipChange={handleTopicToggle}
-            multiple
-            includeAllOption={false}
-          />
-        ) : (
-          <span className={styles.noData}>
-            {t("admin.contents.listing.noTopicsAvailable", "No topics available")}
-          </span>
-        )}
-      </div>
-    </form>
+          <div className={styles.formGroup}>
+            <span className={styles.label}>
+              {t("admin.contents.listing.topicsLabel", "Topics")}
+            </span>
+            {topics.length > 0 ? (
+              <Search.Filter
+                chips={topics.map((t) => ({ id: t.id, label: t.name.en }))}
+                selected={selectedTopics}
+                onChipChange={handleTopicToggle}
+                multiple
+                includeAllOption={false}
+              />
+            ) : (
+              <span className={styles.noData}>
+                {t("admin.contents.listing.noTopicsAvailable", "No topics available")}
+              </span>
+            )}
+          </div>
+        </>
+      )}
+    </>
   );
 }
 
@@ -296,13 +414,10 @@ export function ListingModal({
   onAudioUploadComplete,
 }: ListingModalProps) {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = React.useState<"audio" | "details">(
-    showAudioUploadTab && !initialAudioData ? "audio" : "details",
+  const [activeTab, setActiveTab] = useState<"en" | "ar" | "upload" | "arrange" | "review">(
+    showAudioUploadTab && !listing && !initialAudioData ? "upload" : "en",
   );
-  const [state, dispatch] = useReducer(formReducer, undefined, () =>
-    initFormState(listing, initialAudioData),
-  );
-
+  const [state, dispatch] = useReducer(formReducer, listing ?? null, initFormState);
   const {
     title,
     slug,
@@ -313,11 +428,16 @@ export function ListingModal({
     orderIndex,
     selectedTopics,
     saving,
+    language,
+    translationChanges,
   } = state;
 
-  React.useEffect(() => {
-    dispatch(initFormState(listing, initialAudioData));
-  }, [listing, isOpen, initialAudioData]);
+  useEffect(() => {
+    if (!isOpen) return;
+    const initialState = initFormState(listing, initialAudioData);
+    dispatch({ type: "INIT_STATE", state: initialState });
+    setActiveTab(!listing && !initialAudioData ? "upload" : (listing?.language as Locale) || "ar");
+  }, [isOpen, listing, initialAudioData]);
 
   const { data: scholarsData } = useApiQuery<{ scholars: ScholarListItemDto[] }>(
     [...queryKeys.scholars.list.all()],
@@ -334,52 +454,78 @@ export function ListingModal({
 
   const handleTitleChange = (val: string) => {
     if (!listing) {
+      dispatch({ type: "UPDATE_FIELD", field: "title", value: val });
       dispatch({
-        title: val,
-        slug: val
+        type: "UPDATE_FIELD",
+        field: "slug",
+        value: val
           .toLowerCase()
           .replace(/[^a-z0-9\s-]/g, "")
           .trim()
           .replace(/\s+/g, "-"),
       });
     } else {
-      dispatch({ title: val });
+      dispatch({ type: "UPDATE_FIELD", field: "title", value: val });
     }
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) {
-      dispatch({ formError: t("admin.contents.listing.titleRequired", "Title is required.") });
+      dispatch({
+        type: "SET_ERROR",
+        error: t("admin.contents.listing.titleRequired", "Title is required."),
+      });
       return;
     }
     if (!scholarId) {
-      dispatch({ formError: t("admin.contents.listing.scholarRequired", "Scholar is required.") });
+      dispatch({
+        type: "SET_ERROR",
+        error: t("admin.contents.listing.scholarRequired", "Scholar is required."),
+      });
       return;
     }
 
-    dispatch({ saving: true, formError: null });
+    dispatch({ type: "SET_SAVING", saving: true });
+    dispatch({ type: "SET_ERROR", error: null });
 
     try {
       if (listing) {
-        await updateLecture(listing.id, {
+        const payload: any = {
           title,
           description,
           status,
           orderIndex: Number(orderIndex),
-        });
+          language,
+        };
+
+        const otherLocale = language === "en" ? "ar" : "en";
+        const translation = translationChanges[otherLocale];
+        if (translation.title || translation.description) {
+          payload.translations = {
+            [otherLocale]: {
+              ...(translation.title && { title: translation.title }),
+              ...(translation.description !== undefined && {
+                description: translation.description,
+              }),
+            },
+          };
+        }
+
+        await updateLecture(listing.id, payload);
       } else {
         if (!initialAudioData) {
           dispatch({
-            formError: t(
+            type: "SET_ERROR",
+            error: t(
               "admin.contents.listing.audioKeyRequired",
               "Audio file key is required for creation.",
             ),
-            saving: false,
           });
+          dispatch({ type: "SET_SAVING", saving: false });
           return;
         }
-        await createLecture({
+        const payload: any = {
           title,
           slug: slug || undefined,
           scholarId,
@@ -389,24 +535,43 @@ export function ListingModal({
           audioKey: initialAudioData.audioKey,
           durationSeconds: initialAudioData.durationSeconds,
           sizeBytes: initialAudioData.sizeBytes,
-        });
+          language,
+        };
+
+        const otherLocale = language === "en" ? "ar" : "en";
+        const translation = translationChanges[otherLocale];
+        if (translation.title || translation.description) {
+          payload.translations = {
+            [otherLocale]: {
+              ...(translation.title && { title: translation.title }),
+              ...(translation.description !== undefined && {
+                description: translation.description,
+              }),
+            },
+          };
+        }
+
+        await createLecture(payload);
       }
       onSuccess();
       onClose();
     } catch (err) {
       dispatch({
-        formError:
+        type: "SET_ERROR",
+        error:
           (err as Error)?.message ||
           t("admin.contents.listing.failedToSave", "Failed to save lecture details."),
       });
     } finally {
-      dispatch({ saving: false });
+      dispatch({ type: "SET_SAVING", saving: false });
     }
   };
 
   const handleTopicToggle = (topicId: string) => {
     dispatch({
-      selectedTopics: selectedTopics.includes(topicId)
+      type: "UPDATE_FIELD",
+      field: "selectedTopics",
+      value: selectedTopics.includes(topicId)
         ? selectedTopics.filter((id) => id !== topicId)
         : [...selectedTopics, topicId],
     });
@@ -416,8 +581,21 @@ export function ListingModal({
   const topics = topicsData ?? [];
   const series = seriesData ?? [];
 
+  useEffect(() => {
+    if (!listing || !scholarId || !scholarsData?.scholars) return;
+    const selectedScholar = scholarsData.scholars.find((s) => s.id === scholarId);
+    if (selectedScholar && selectedScholar.mainLanguage) {
+      dispatch({
+        type: "UPDATE_FIELD",
+        field: "language",
+        value: selectedScholar.mainLanguage as Locale,
+      });
+    }
+  }, [scholarId, scholarsData, listing]);
+
   return (
     <Modal
+      key={listing?.id ?? "create"}
       isOpen={isOpen}
       onClose={onClose}
       title={
@@ -426,64 +604,102 @@ export function ListingModal({
           : t("admin.contents.listing.newTitle", "Add Listing")
       }
       size="xl"
-      width="var(--modal-width-standard)"
-      footer={
-        <>
-          <Button variant="surface" radius="md" onClick={onClose} disabled={saving}>
-            {t("common.cancel", "Cancel")}
-          </Button>
-          <Button
-            variant="primary"
-            radius="md"
-            type="submit"
-            disabled={saving}
-            form="lecture-edit-form"
-          >
-            {saving ? t("admin.permissions.saving", "Saving…") : t("common.save", "Save")}
-          </Button>
-        </>
-      }
+      width="var(--modal-width-wide)"
+      multiTab
+      requireReview={!showAudioUploadTab || !!initialAudioData}
+      activeTab={activeTab}
+      onActiveTabChange={(id) => setActiveTab(id as typeof activeTab)}
+      defaultActiveTab="en"
+      saveFormId="lecture-edit-form"
+      saving={saving}
+      reviewTabId="review"
     >
-      {showAudioUploadTab && !listing && (
-        <div
-          style={{
-            display: "flex",
-            gap: "1rem",
-            marginBottom: "1.5rem",
-            borderBottom: "1px solid var(--border-default)",
-            paddingBottom: "1rem",
-          }}
-        >
-          <Button
-            variant={activeTab === "audio" ? "primary" : "ghost"}
-            onClick={() => setActiveTab("audio")}
-          >
-            {t("admin.contents.listing.uploadTab", "Upload Audio")}
-          </Button>
-          <Button
-            variant={activeTab === "details" ? "primary" : "ghost"}
-            onClick={() => setActiveTab("details")}
-          >
-            {t("admin.contents.listing.detailsTab", "Listing Details")}
-          </Button>
-        </div>
-      )}
+      <form id="lecture-edit-form" onSubmit={handleSave} className={styles.form}>
+        <Modal.Tabs>
+          <Modal.TabItem id="en">English</Modal.TabItem>
+          <Modal.TabItem id="ar">العربية</Modal.TabItem>
+          {showAudioUploadTab && !listing && (
+            <Modal.TabItem id="upload">
+              {t("admin.contents.listing.uploadTab", "Upload Audio")}
+            </Modal.TabItem>
+          )}
+          <Modal.TabItem id="arrange">
+            {t("admin.contents.listing.arrangeTab", "Arrange")}
+          </Modal.TabItem>
+          <Modal.TabItem id="review">{t("admin.modal.reviewTab", "Review")}</Modal.TabItem>
+        </Modal.Tabs>
 
-      {activeTab === "audio" ? (
-        <AudioUploader onUploadComplete={onAudioUploadComplete || (() => {})} />
-      ) : (
-        <ListingForm
-          state={state}
-          dispatch={dispatch}
-          scholars={scholars}
-          topics={topics}
-          series={series}
-          listing={listing}
-          handleTitleChange={handleTitleChange}
-          handleTopicToggle={handleTopicToggle}
-          onSubmit={handleSave}
-        />
-      )}
+        <Modal.Content>
+          <Modal.ContentItem id="en">
+            <ListingForm
+              state={state}
+              dispatch={dispatch}
+              scholars={scholars}
+              topics={topics}
+              series={series}
+              listing={listing}
+              activeLocale="en"
+              handleTitleChange={handleTitleChange}
+              handleTopicToggle={handleTopicToggle}
+              onSubmit={handleSave}
+            />
+          </Modal.ContentItem>
+
+          <Modal.ContentItem id="ar">
+            <ListingForm
+              state={state}
+              dispatch={dispatch}
+              scholars={scholars}
+              topics={topics}
+              series={series}
+              listing={listing}
+              activeLocale="ar"
+              handleTitleChange={handleTitleChange}
+              handleTopicToggle={handleTopicToggle}
+              onSubmit={handleSave}
+            />
+          </Modal.ContentItem>
+
+          {showAudioUploadTab && !listing && (
+            <Modal.ContentItem id="upload">
+              <AudioUploader onUploadComplete={onAudioUploadComplete || (() => {})} />
+            </Modal.ContentItem>
+          )}
+
+          <Modal.ContentItem id="arrange">
+            <div style={{ padding: "2rem", textAlign: "center", color: "var(--content-tertiary)" }}>
+              {t("admin.contents.listing.arrangeComingSoon", "Coming soon")}
+            </div>
+          </Modal.ContentItem>
+
+          <Modal.ContentItem id="review">
+            <div style={{ padding: "2rem" }}>
+              <div style={{ marginBottom: "1.5rem" }}>
+                <h4 style={{ marginBottom: "0.5rem", color: "var(--content-default)" }}>Scholar</h4>
+                <p>{scholars.find((s) => s.id === scholarId)?.name || "—"}</p>
+              </div>
+              <div style={{ marginBottom: "1.5rem" }}>
+                <h4 style={{ marginBottom: "0.5rem", color: "var(--content-default)" }}>English</h4>
+                <p>
+                  <strong>Title:</strong> {title || "—"}
+                </p>
+                <p>
+                  <strong>Description:</strong> {description || "—"}
+                </p>
+              </div>
+              <div>
+                <h4 style={{ marginBottom: "0.5rem", color: "var(--content-default)" }}>العربية</h4>
+                <p>
+                  <strong>Title:</strong> {translationChanges.ar.title || "—"}
+                </p>
+                <p>
+                  <strong>Description:</strong> {translationChanges.ar.description || "—"}
+                </p>
+              </div>
+            </div>
+          </Modal.ContentItem>
+        </Modal.Content>
+      </form>
     </Modal>
   );
 }

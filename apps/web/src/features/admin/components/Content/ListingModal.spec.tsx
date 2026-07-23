@@ -87,21 +87,25 @@ describe("ListingModal", () => {
     const scholarOption = await screen.findByRole("option", { name: /scholar one/i });
     fireEvent.click(scholarOption);
 
-    const saveButton = screen.getByRole("button", { name: /save/i });
+    const reviewButton = screen.getByRole("button", { name: /review/i });
+    fireEvent.click(reviewButton);
+
+    const saveButton = await screen.findByRole("button", { name: /save/i });
     fireEvent.click(saveButton);
 
     await waitFor(() => {
-      expect(createLecture).toHaveBeenCalledWith({
-        title: "My Great Lecture",
-        slug: "my-great-lecture",
-        scholarId: "scholar-1",
-        parentId: undefined,
-        topics: [],
-        format: "single",
-        audioKey: "audio/new-key.mp3",
-        durationSeconds: 300,
-        sizeBytes: 50000,
-      });
+      expect(createLecture).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: "My Great Lecture",
+          slug: "my-great-lecture",
+          scholarId: "scholar-1",
+          format: "single",
+          audioKey: "audio/new-key.mp3",
+          durationSeconds: 300,
+          sizeBytes: 50000,
+          language: "ar",
+        }),
+      );
     });
 
     expect(onSuccessMock).toHaveBeenCalledTimes(1);
@@ -125,6 +129,7 @@ describe("ListingModal", () => {
       parentId: "series-1",
       orderIndex: 5,
       topics: ["topic-1"],
+      language: "ar" as const,
       audioKey: "audio/old-key.mp3",
       createdAt: "2024-01-01",
       audioAssets: [],
@@ -151,15 +156,23 @@ describe("ListingModal", () => {
     fireEvent.change(screen.getByLabelText(/title/i), { target: { value: "Updated Title" } });
     fireEvent.change(screen.getByLabelText(/order index/i), { target: { value: "10" } });
 
-    fireEvent.click(screen.getByRole("button", { name: /save/i }));
+    const reviewButton = screen.getByRole("button", { name: /review/i });
+    fireEvent.click(reviewButton);
+
+    const saveButton = await screen.findByRole("button", { name: /save/i });
+    fireEvent.click(saveButton);
 
     await waitFor(() => {
-      expect(updateLecture).toHaveBeenCalledWith("lecture-123", {
-        title: "Updated Title",
-        description: "Existing Description",
-        status: "draft",
-        orderIndex: 10,
-      });
+      expect(updateLecture).toHaveBeenCalledWith(
+        "lecture-123",
+        expect.objectContaining({
+          title: "Updated Title",
+          description: "Existing Description",
+          status: "draft",
+          orderIndex: 10,
+          language: "ar",
+        }),
+      );
     });
 
     expect(onSuccessMock).toHaveBeenCalledTimes(1);
