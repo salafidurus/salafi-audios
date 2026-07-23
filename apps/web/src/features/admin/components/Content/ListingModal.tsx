@@ -619,11 +619,9 @@ export function ListingModal({
           <Modal.TabItem id="general">{t("admin.modal.generalTab", "General")}</Modal.TabItem>
           <Modal.TabItem id="en">English</Modal.TabItem>
           <Modal.TabItem id="ar">العربية</Modal.TabItem>
-          {showAudioUploadTab && !listing && (
-            <Modal.TabItem id="upload">
-              {t("admin.contents.listing.uploadTab", "Upload Audio")}
-            </Modal.TabItem>
-          )}
+          <Modal.TabItem id="upload">
+            {t("admin.contents.listing.uploadTab", "Upload Audio")}
+          </Modal.TabItem>
           <Modal.TabItem id="arrange">
             {t("admin.contents.listing.arrangeTab", "Arrange")}
           </Modal.TabItem>
@@ -676,11 +674,9 @@ export function ListingModal({
             />
           </Modal.ContentItem>
 
-          {showAudioUploadTab && !listing && (
-            <Modal.ContentItem id="upload">
-              <AudioUploader onUploadComplete={onAudioUploadComplete || (() => {})} />
-            </Modal.ContentItem>
-          )}
+          <Modal.ContentItem id="upload">
+            <AudioUploader onUploadComplete={onAudioUploadComplete || (() => {})} />
+          </Modal.ContentItem>
 
           <Modal.ContentItem id="arrange">
             <div style={{ padding: "2rem", textAlign: "center", color: "var(--content-tertiary)" }}>
