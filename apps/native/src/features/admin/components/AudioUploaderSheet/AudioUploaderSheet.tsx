@@ -138,38 +138,41 @@ export function AudioUploaderSheet({ isOpen, onClose, onUploadComplete }: AudioU
     if (!selectedScholarId) return;
     setIsUploading(true);
     let anySuccess = false;
-    for (let i = 0; i < queue.length; i++) {
-      const item = queue[i]!;
-      if (item.status === "done") continue;
-      try {
-        setItemState(i, { progress: 0, status: "uploading" });
-        // react-doctor-disable-next-line react-doctor/async-await-in-loop, react-doctor/async-parallel
-        const [{ uploadUrl, objectKey }, durationSeconds] = await Promise.all([
-          getPresignedUrl({
-            filename: item.name,
-            contentType: item.mimeType,
-            purpose: "audio",
-          }),
-          getNativeAudioDuration(item.uri),
-        ]);
-        await uploadToR2(uploadUrl, item.uri, item.mimeType, (p) =>
-          setItemState(i, { progress: p, status: "uploading" }),
-        );
-        await createLecture({
-          title: item.name.replace(/\.[^.]+$/, ""),
-          audioKey: objectKey,
-          scholarId: selectedScholarId,
-          format: "single",
-          ...(durationSeconds != null ? { durationSeconds } : {}),
-        });
-        setItemState(i, { progress: 1, status: "done" });
-        anySuccess = true;
-      } catch (err) {
-        setItemState(i, { status: "error", error: (err as Error).message });
+    try {
+      for (let i = 0; i < queue.length; i++) {
+        const item = queue[i]!;
+        if (item.status === "done") continue;
+        try {
+          setItemState(i, { progress: 0, status: "uploading" });
+          // react-doctor-disable-next-line react-doctor/async-await-in-loop, react-doctor/async-parallel
+          const [{ uploadUrl, objectKey }, durationSeconds] = await Promise.all([
+            getPresignedUrl({
+              filename: item.name,
+              contentType: item.mimeType,
+              purpose: "audio",
+            }),
+            getNativeAudioDuration(item.uri),
+          ]);
+          await uploadToR2(uploadUrl, item.uri, item.mimeType, (p) =>
+            setItemState(i, { progress: p, status: "uploading" }),
+          );
+          await createLecture({
+            title: item.name.replace(/\.[^.]+$/, ""),
+            audioKey: objectKey,
+            scholarId: selectedScholarId,
+            format: "single",
+            ...(durationSeconds != null ? { durationSeconds } : {}),
+          });
+          setItemState(i, { progress: 1, status: "done" });
+          anySuccess = true;
+        } catch (err) {
+          setItemState(i, { status: "error", error: (err as Error).message });
+        }
       }
+    } finally {
+      setIsUploading(false);
+      if (anySuccess) onUploadComplete();
     }
-    setIsUploading(false);
-    if (anySuccess) onUploadComplete();
   }, [selectedScholarId, queue, setItemState, onUploadComplete]);
 
   const isUploadDisabled = queue.length === 0 || isUploading || !selectedScholarId;

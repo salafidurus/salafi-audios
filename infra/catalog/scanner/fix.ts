@@ -99,7 +99,8 @@ export function runCatalogFix(rootDir: string): { updatedFiles: string[] } {
   const depsByName = new Map<string, DepUsage[]>();
   for (const dep of explicitDeps) {
     if (!depsByName.has(dep.depName)) depsByName.set(dep.depName, []);
-    depsByName.get(dep.depName)!.push(dep);
+    const usages = depsByName.get(dep.depName);
+    if (usages) usages.push(dep);
   }
 
   // Step 1: Explicit deps processing — catalog deps used by 2+ workspaces

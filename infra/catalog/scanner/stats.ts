@@ -41,7 +41,8 @@ export function runCatalogStats(rootDir: string): CatalogStats {
     const versionMap = new Map<string, string[]>();
     for (const u of usage) {
       if (!versionMap.has(u.version)) versionMap.set(u.version, []);
-      versionMap.get(u.version)!.push(u.pkgName);
+      const versions = versionMap.get(u.version);
+      if (versions) versions.push(u.pkgName);
     }
 
     candidates.push({

@@ -35,19 +35,21 @@ global.ResizeObserver = class ResizeObserver {
 } as any;
 
 // Mock matchMedia
-Object.defineProperty(window, "matchMedia", {
-  writable: true,
-  value: (query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: () => {},
-    removeListener: () => {},
-    addEventListener: () => {},
-    removeEventListener: () => {},
-    dispatchEvent: () => true,
-  }),
-});
+if (typeof window !== "undefined") {
+  Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: (query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => true,
+    }),
+  });
+}
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {
@@ -60,23 +62,25 @@ global.IntersectionObserver = class IntersectionObserver {
 Element.prototype.scrollIntoView = () => {};
 
 // Mock window.location
-Object.defineProperty(window, "location", {
-  writable: true,
-  value: {
-    href: "http://localhost:3001/",
-    pathname: "/",
-    search: "",
-    hash: "",
-    origin: "http://localhost:3001",
-    protocol: "http:",
-    host: "localhost:3001",
-    hostname: "localhost",
-    port: "3001",
-    reload: () => {},
-    replace: () => {},
-    assign: () => {},
-  },
-});
+if (typeof window !== "undefined") {
+  Object.defineProperty(window, "location", {
+    writable: true,
+    value: {
+      href: "http://localhost:3001/",
+      pathname: "/",
+      search: "",
+      hash: "",
+      origin: "http://localhost:3001",
+      protocol: "http:",
+      host: "localhost:3001",
+      hostname: "localhost",
+      port: "3001",
+      reload: () => {},
+      replace: () => {},
+      assign: () => {},
+    },
+  });
+}
 
 // Global mocks for common hooks that need to work in test environment
 const { vi } = require("bun:test");
