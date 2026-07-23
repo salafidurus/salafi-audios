@@ -16,6 +16,7 @@ import { createLecture, updateLecture } from "../../api/admin-lectures.api";
 import { Modal } from "@/shared/components/Modal";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { Button } from "@/shared/components/Button";
+import { Search } from "@/shared/components/Search";
 import {
   Dropdown,
   DropdownTrigger,
@@ -267,24 +268,19 @@ function ListingForm({
 
       <div className={styles.formGroup}>
         <span className={styles.label}>{t("admin.contents.listing.topicsLabel", "Topics")}</span>
-        <div className={styles.topicsGrid}>
-          {topics.map((tItem) => (
-            <label key={tItem.id} className={styles.topicCheckboxLabel}>
-              <input
-                type="checkbox"
-                checked={selectedTopicsSet.has(tItem.id)}
-                onChange={() => handleTopicToggle(tItem.id)}
-                className={styles.checkbox}
-              />
-              <span>{tItem.name.en}</span>
-            </label>
-          ))}
-          {topics.length === 0 && (
-            <span className={styles.noData}>
-              {t("admin.contents.listing.noTopicsAvailable", "No topics available")}
-            </span>
-          )}
-        </div>
+        {topics.length > 0 ? (
+          <Search.Filter
+            chips={topics.map((t) => ({ id: t.id, label: t.name.en }))}
+            selected={selectedTopics}
+            onChipChange={handleTopicToggle}
+            multiple
+            includeAllOption={false}
+          />
+        ) : (
+          <span className={styles.noData}>
+            {t("admin.contents.listing.noTopicsAvailable", "No topics available")}
+          </span>
+        )}
       </div>
     </form>
   );
