@@ -6,6 +6,9 @@ import {
 } from "./localization.types";
 import { CountryCodeSchema } from "./country.types";
 
+export const ScholarTitleSchema = z.enum(["allamah", "sheikh", "ustadh", "akh"]);
+export type ScholarTitle = z.infer<typeof ScholarTitleSchema>;
+
 export const ScholarContentItemDtoSchema = z.object({
   id: z.string(),
   slug: z.string(),
@@ -33,6 +36,7 @@ export const ScholarViewDtoSchema = z.object({
   bio: z.string().optional(),
   isActive: z.boolean(),
   isKibar: z.boolean(),
+  title: ScholarTitleSchema.optional(),
 });
 export type ScholarViewDto = z.infer<typeof ScholarViewDtoSchema>;
 
@@ -50,12 +54,11 @@ export const ScholarDetailDtoSchema = z.object({
   imageUrl: z.string().optional(),
   isActive: z.boolean(),
   isKibar: z.boolean(),
+  title: ScholarTitleSchema.optional(),
   socialTwitter: z.string().optional(),
   socialTelegram: z.string().optional(),
   socialYoutube: z.string().optional(),
   socialWebsite: z.string().optional(),
-  socialFacebook: z.string().optional(),
-  socialInstagram: z.string().optional(),
   createdAt: z.string(),
   updatedAt: z.string().optional(),
 });
@@ -80,6 +83,7 @@ export const ScholarListItemDtoSchema = z.object({
   originalLanguage: LocaleSchema.optional(),
   original: ScholarOriginalFieldsSchema.optional(),
   isKibar: z.boolean(),
+  title: ScholarTitleSchema.optional(),
   lectureCount: z.number(),
 });
 export type ScholarListItemDto = z.infer<typeof ScholarListItemDtoSchema>;
@@ -143,12 +147,12 @@ export const CreateScholarDtoSchema = z.object({
   isActive: z.boolean().optional(),
   country: CountryCodeSchema.default("SA"),
   mainLanguage: LocaleSchema.default("ar"),
+  title: ScholarTitleSchema.optional(),
   socialTwitter: z.url().optional().or(z.literal("")),
   socialTelegram: z.url().optional().or(z.literal("")),
   socialYoutube: z.url().optional().or(z.literal("")),
   socialWebsite: z.url().optional().or(z.literal("")),
-  socialFacebook: z.url().optional().or(z.literal("")),
-  socialInstagram: z.url().optional().or(z.literal("")),
+  translations: z.record(LocaleSchema, z.object({ name: z.string() })).optional(),
 });
 export type CreateScholarDto = z.infer<typeof CreateScholarDtoSchema>;
 
@@ -184,12 +188,11 @@ export const AdminScholarListItemDtoSchema = z.object({
   imageUrl: z.string().optional(),
   isActive: z.boolean(),
   isKibar: z.boolean(),
+  title: ScholarTitleSchema.optional(),
   socialTwitter: z.string().optional(),
   socialTelegram: z.string().optional(),
   socialYoutube: z.string().optional(),
   socialWebsite: z.string().optional(),
-  socialFacebook: z.string().optional(),
-  socialInstagram: z.string().optional(),
   createdAt: z.string(),
   updatedAt: z.string().optional(),
   translations: z.array(AdminScholarTranslationSchema),

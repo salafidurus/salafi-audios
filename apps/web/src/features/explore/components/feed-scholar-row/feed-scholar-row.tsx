@@ -3,6 +3,7 @@
 import type React from "react";
 import Image from "next/image";
 import type { ScholarChipDto } from "@sd/core-contracts";
+import { formatScholarName } from "@/shared/utils/format-scholar-name";
 
 export type FeedScholarRowProps = {
   scholars: ScholarChipDto[];
@@ -82,7 +83,7 @@ export function FeedScholarRow({ scholars, onScholarPress }: FeedScholarRowProps
                 whiteSpace: "nowrap",
               }}
             >
-              {scholar.name}
+              {formatScholarName(scholar)}
             </div>
           </button>
         ))}

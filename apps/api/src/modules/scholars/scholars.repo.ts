@@ -42,6 +42,7 @@ export class ScholarsRepository {
         imageUrl: true,
         mainLanguage: true,
         isKibar: true,
+        title: true,
         translations: {
           where: { locale, status: 'published' },
           select: { name: true },
@@ -77,6 +78,7 @@ export class ScholarsRepository {
         originalLanguage: resolved.originalLanguage,
         original: resolved.original ? { name: resolved.original.name } : undefined,
         isKibar: r.isKibar,
+        title: r.title ?? undefined,
         lectureCount: r._count.listings,
       };
     });
@@ -110,8 +112,6 @@ export class ScholarsRepository {
         socialTelegram: true,
         socialYoutube: true,
         socialWebsite: true,
-        socialFacebook: true,
-        socialInstagram: true,
         createdAt: true,
         updatedAt: true,
         translations: {
@@ -174,8 +174,6 @@ export class ScholarsRepository {
       socialTelegram: record.socialTelegram ?? undefined,
       socialYoutube: record.socialYoutube ?? undefined,
       socialWebsite: record.socialWebsite ?? undefined,
-      socialFacebook: record.socialFacebook ?? undefined,
-      socialInstagram: record.socialInstagram ?? undefined,
       createdAt: record.createdAt.toISOString(),
       updatedAt: record.updatedAt?.toISOString(),
       lectureCount: lectureStats._count.id,
@@ -395,12 +393,11 @@ export class ScholarsRepository {
         imageUrl: true,
         isActive: true,
         isKibar: true,
+        title: true,
         socialTwitter: true,
         socialTelegram: true,
         socialYoutube: true,
         socialWebsite: true,
-        socialFacebook: true,
-        socialInstagram: true,
         createdAt: true,
         updatedAt: true,
         translations: {
@@ -422,12 +419,11 @@ export class ScholarsRepository {
         imageUrl: r.imageUrl ?? undefined,
         isActive: r.isActive,
         isKibar: r.isKibar,
+        title: r.title ?? undefined,
         socialTwitter: r.socialTwitter ?? undefined,
         socialTelegram: r.socialTelegram ?? undefined,
         socialYoutube: r.socialYoutube ?? undefined,
         socialWebsite: r.socialWebsite ?? undefined,
-        socialFacebook: r.socialFacebook ?? undefined,
-        socialInstagram: r.socialInstagram ?? undefined,
         createdAt: r.createdAt.toISOString(),
         updatedAt: r.updatedAt?.toISOString(),
         translations: r.translations.map((t) => ({
@@ -453,14 +449,13 @@ export class ScholarsRepository {
         isKibar: dto.isKibar ?? false,
         isFeatured: dto.isFeatured ?? false,
         isActive: dto.isActive ?? true,
+        title: dto.title,
         country: dto.country,
         mainLanguage: dto.mainLanguage,
         socialTwitter: dto.socialTwitter,
         socialTelegram: dto.socialTelegram,
         socialYoutube: dto.socialYoutube,
         socialWebsite: dto.socialWebsite,
-        socialFacebook: dto.socialFacebook,
-        socialInstagram: dto.socialInstagram,
       },
     });
   }
@@ -482,8 +477,6 @@ export class ScholarsRepository {
         ...(dto.socialTelegram !== undefined && { socialTelegram: dto.socialTelegram }),
         ...(dto.socialYoutube !== undefined && { socialYoutube: dto.socialYoutube }),
         ...(dto.socialWebsite !== undefined && { socialWebsite: dto.socialWebsite }),
-        ...(dto.socialFacebook !== undefined && { socialFacebook: dto.socialFacebook }),
-        ...(dto.socialInstagram !== undefined && { socialInstagram: dto.socialInstagram }),
         updatedAt: new Date(),
       },
     });

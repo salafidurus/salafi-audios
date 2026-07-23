@@ -194,7 +194,7 @@ export function PermissionsDialog({
     queryClient.setQueriesData<AdminUserListDto>(
       { queryKey: queryKeys.admin.users.all() },
       (oldData) => {
-        if (!oldData) {
+        if (!oldData?.users) {
           return oldData;
         }
         return {
@@ -207,6 +207,9 @@ export function PermissionsDialog({
     );
 
     // Call callback immediately to close or update parent view
+    // Invalidate query immediately to trigger refetch
+    queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
+
     onPermissionsChange?.();
     onClose();
 
@@ -232,8 +235,6 @@ export function PermissionsDialog({
       console.error("Failed to complete batch permission updates", error);
     } finally {
       setSaving(false);
-      // Re-fetch to ensure data integrity
-      queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
     }
   };
 
@@ -255,6 +256,7 @@ export function PermissionsDialog({
       onClose={onClose}
       size="xl"
       title={customTitle as any}
+      width="var(--modal-width-wide)"
       footer={
         <Button variant="primary" onClick={handleDone} disabled={saving}>
           {saving ? t("admin.permissions.saving", "Saving…") : t("admin.permissions.done", "Done")}

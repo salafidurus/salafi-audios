@@ -4,6 +4,7 @@ import React from "react";
 import type { ListingDetailDto } from "@sd/core-contracts";
 import { useAudio, type Track } from "@sd/domain-audio";
 import { audioService } from "@/features/audio";
+import { formatScholarName } from "@/shared/utils/format-scholar-name";
 import { Button } from "@/shared/components/Button/Button";
 import styles from "./LecturePlayButton.module.css";
 
@@ -34,7 +35,7 @@ export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
     const track: Track = {
       id: lecture.id,
       title: lecture.title,
-      artist: lecture.scholar.name,
+      artist: formatScholarName(lecture.scholar),
       url: asset.url,
       durationSeconds: asset.durationSeconds ?? lecture.durationSeconds ?? 0,
       artworkUrl: undefined,
@@ -49,7 +50,7 @@ export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
           {
             id: nextLecture.id,
             title: nextLecture.title,
-            artist: lecture.scholar.name,
+            artist: formatScholarName(lecture.scholar),
             url: "", // resolved lazily by DurusAudioService
             durationSeconds: 0,
             seriesId: lecture.seriesContext?.seriesId ?? null,

@@ -130,7 +130,7 @@ export function RoleDialog({
     queryClient.setQueriesData<AdminUserListDto>(
       { queryKey: queryKeys.admin.users.all() },
       (oldData) => {
-        if (!oldData) {
+        if (!oldData?.users) {
           return oldData;
         }
         return {
@@ -139,6 +139,9 @@ export function RoleDialog({
         };
       },
     );
+
+    // Invalidate query immediately to trigger refetch
+    queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
 
     // Call callback immediately to close or update parent view
     onRolesChange?.();
@@ -166,8 +169,6 @@ export function RoleDialog({
       console.error("Failed to complete batch role updates", error);
     } finally {
       setSaving(false);
-      // Re-fetch to ensure data integrity
-      queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
     }
   };
 
@@ -186,6 +187,7 @@ export function RoleDialog({
       isOpen={isOpen}
       onClose={onClose}
       title={customTitle as any}
+      width="var(--modal-width-standard)"
       footer={
         <Button variant="primary" onClick={handleDone} disabled={saving}>
           {saving ? t("admin.permissions.saving", "Saving…") : t("admin.permissions.done", "Done")}

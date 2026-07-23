@@ -117,6 +117,8 @@ export {
   AdminScholarListDtoSchema,
   type ScholarListDto,
   ScholarListDtoSchema,
+  type ScholarTitle,
+  ScholarTitleSchema,
 } from "../types/scholar.types";
 export {
   type PresignedUrlPurpose,

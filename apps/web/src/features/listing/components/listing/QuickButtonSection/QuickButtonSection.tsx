@@ -8,6 +8,7 @@ import { useLastPlayedLesson } from "@sd/domain-content";
 import { audioService } from "@/features/audio";
 import { useAuth } from "@/core/auth";
 import { Button } from "@/shared/components/Button/Button";
+import { formatScholarName } from "@/shared/utils/format-scholar-name";
 import { LectureSaveButton } from "../lecture-save-button/LectureSaveButton";
 import styles from "./QuickButtonSection.module.css";
 
@@ -54,7 +55,7 @@ export function QuickButtonSection({ listing, contents }: QuickButtonSectionProp
           {
             id: listing.id,
             title: listing.title,
-            artist: listing.scholar.name,
+            artist: formatScholarName(listing.scholar),
             url: listing.primaryAudioAsset.url,
             durationSeconds:
               listing.durationSeconds || listing.primaryAudioAsset.durationSeconds || 0,
@@ -69,7 +70,7 @@ export function QuickButtonSection({ listing, contents }: QuickButtonSectionProp
       return contents.items.map((item, i) => ({
         id: item.id,
         title: item.title,
-        artist: listing.scholar.name,
+        artist: formatScholarName(listing.scholar),
         // Only first track gets immediate URL upfront, others are lazily resolved by audioService
         url: i === 0 ? (item.primaryAudioAsset?.url ?? "") : "",
         durationSeconds: item.durationSeconds || item.primaryAudioAsset?.durationSeconds || 0,
@@ -87,7 +88,7 @@ export function QuickButtonSection({ listing, contents }: QuickButtonSectionProp
         allTracks.push({
           id: lesson.id,
           title: lesson.title,
-          artist: listing.scholar.name,
+          artist: formatScholarName(listing.scholar),
           url: first ? (lesson.primaryAudioAsset?.url ?? "") : "",
           durationSeconds: lesson.durationSeconds || lesson.primaryAudioAsset?.durationSeconds || 0,
           artworkUrl: listing.scholar.imageUrl,

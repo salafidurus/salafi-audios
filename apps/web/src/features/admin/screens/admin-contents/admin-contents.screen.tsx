@@ -1,14 +1,11 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
-import {
-  useApiQuery,
-  queryKeys,
-  httpClient,
-  endpoints,
-  type TopicDetailDto,
-} from "@sd/core-contracts";
+import { queryKeys, type TopicDetailDto } from "@sd/core-contracts";
+import { useTopicsList } from "@sd/domain-search";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
@@ -19,7 +16,10 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { TopicsContent, ListingsContent } from "@/features/admin/components/Contents";
+import { Content } from "@/features/admin/components/Content";
 import { useDebouncedSearch } from "@/shared/hooks";
+import { createTopic, updateTopic } from "@/features/admin/api/admin.api";
+import type { TopicForEdit } from "@/features/admin/components/Content/TopicModal";
 import styles from "./admin-contents.screen.module.css";
 
 const EMPTY_TOPICS_ARRAY: TopicDetailDto[] = [];
@@ -28,6 +28,7 @@ export function AdminContentsScreen() {
   const { isMobile } = useResponsive();
   const pathname = usePathname();
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
   const {
     query: searchQuery,
     setQuery: setSearchQuery,
@@ -36,11 +37,35 @@ export function AdminContentsScreen() {
 
   const activeTab = pathname.includes("/listings") ? "listings" : "topics";
 
-  const { data: topicsData } = useApiQuery<TopicDetailDto[]>(queryKeys.topics.list(), () =>
-    httpClient<TopicDetailDto[]>({ url: endpoints.topics.list, method: "GET" }),
-  );
+  const { data: topicsData } = useTopicsList();
 
   const topics = topicsData ?? EMPTY_TOPICS_ARRAY;
+
+  // Topic modal state
+  const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
+  const [editingTopic, setEditingTopic] = useState<TopicForEdit | null>(null);
+
+  const handleOpenAddTopic = () => {
+    setEditingTopic(null);
+    setIsTopicModalOpen(true);
+  };
+
+  const handleSaveTopic = async (formData: any) => {
+    if (editingTopic) {
+      await updateTopic(editingTopic.slug, formData);
+    } else {
+      await createTopic(formData);
+    }
+    queryClient.invalidateQueries({ queryKey: queryKeys.topics.list() });
+    setIsTopicModalOpen(false);
+  };
+
+  // Listing modal state
+  const [isListingAudioUploaderOpen, setIsListingAudioUploaderOpen] = useState(false);
+
+  const handleOpenAddListing = () => {
+    setIsListingAudioUploaderOpen(true);
+  };
 
   return (
     <ScreenView contentStyle={{ flex: 1 }}>
@@ -60,7 +85,7 @@ export function AdminContentsScreen() {
                       variant="primary"
                       size={!isMobile ? "md" : "sm"}
                       icon={<Plus size={!isMobile ? 18 : 16} />}
-                      onClick={() => {}}
+                      onClick={handleOpenAddTopic}
                     >
                       {!isMobile
                         ? t("admin.contents.addTopic", "Add Topic")
@@ -73,7 +98,7 @@ export function AdminContentsScreen() {
                       variant="primary"
                       size={!isMobile ? "md" : "sm"}
                       icon={<Plus size={!isMobile ? 18 : 16} />}
-                      onClick={() => {}}
+                      onClick={handleOpenAddListing}
                     >
                       {!isMobile
                         ? t("admin.contents.addListing", "Add Listing")
@@ -97,13 +122,35 @@ export function AdminContentsScreen() {
 
           <StickyHeaderLayout.Content>
             {activeTab === "topics" && (
-              <TopicsContent
-                searchQuery={searchQuery}
+              <>
+                <TopicsContent
+                  searchQuery={searchQuery}
+                  debouncedSearch={debouncedSearch}
+                  topics={topics}
+                  onEditTopic={(topic) => {
+                    setEditingTopic({
+                      id: topic.id,
+                      slug: topic.slug,
+                      name: topic.name,
+                    });
+                    setIsTopicModalOpen(true);
+                  }}
+                />
+                <Content.TopicModal
+                  isOpen={isTopicModalOpen}
+                  onClose={() => setIsTopicModalOpen(false)}
+                  onSave={handleSaveTopic}
+                  topic={editingTopic}
+                />
+              </>
+            )}
+            {activeTab === "listings" && (
+              <ListingsContent
                 debouncedSearch={debouncedSearch}
-                topics={topics}
+                isAudioUploaderOpen={isListingAudioUploaderOpen}
+                onAudioUploaderOpenChange={setIsListingAudioUploaderOpen}
               />
             )}
-            {activeTab === "listings" && <ListingsContent debouncedSearch={debouncedSearch} />}
           </StickyHeaderLayout.Content>
         </StickyHeaderLayout>
       </div>

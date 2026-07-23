@@ -1,7 +1,6 @@
 "use client";
 
 import { useReducer, useEffect, useMemo } from "react";
-import { Edit2, RotateCcw } from "lucide-react";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button";
 import { EditableInput } from "@/shared/components/EditableInput";
@@ -26,7 +25,6 @@ interface TopicModalProps {
 interface FormState {
   formData: UpsertTopicDto;
   originalFormData: UpsertTopicDto;
-  editingFields: Set<string>;
   translationChanges: Record<string, Record<string, string | null>>;
   saving: boolean;
   error: string | null;
@@ -39,7 +37,6 @@ type FormAction =
   | { type: "UPDATE_NAME_AR"; value: string }
   | { type: "UPDATE_TRANSLATION"; locale: string; field: string; value: string }
   | { type: "SET_TRANSLATION_CHANGES"; changes: Record<string, Record<string, string | null>> }
-  | { type: "TOGGLE_FIELD_EDIT"; fieldName: string; translations: any[] }
   | { type: "SET_SAVING"; saving: boolean }
   | { type: "SET_ERROR"; error: string | null }
   | { type: "RESET_STATE" };
@@ -57,7 +54,6 @@ function formReducer(state: FormState, action: FormAction): FormState {
         ...state,
         formData: initialData,
         originalFormData: initialData,
-        editingFields: new Set(action.isNewTopic ? ["name", "slug"] : []),
       };
     }
     case "SET_FORM_DATA":
@@ -102,47 +98,6 @@ function formReducer(state: FormState, action: FormAction): FormState {
       };
     case "SET_TRANSLATION_CHANGES":
       return { ...state, translationChanges: action.changes };
-    case "TOGGLE_FIELD_EDIT": {
-      const isCurrentlyEditing = state.editingFields.has(action.fieldName);
-      const next = new Set(state.editingFields);
-
-      if (isCurrentlyEditing) {
-        if (action.fieldName === "slug") {
-          next.delete(action.fieldName);
-          return {
-            ...state,
-            formData: { ...state.formData, slug: state.originalFormData.slug ?? "" },
-            editingFields: next,
-          };
-        } else if (action.fieldName === "name") {
-          next.delete(action.fieldName);
-          return {
-            ...state,
-            formData: { ...state.formData, name: state.originalFormData.name },
-            editingFields: next,
-          };
-        } else if (action.fieldName === "translation-ar-name") {
-          const originalArabicName =
-            action.translations.find((t: any) => t.locale === "ar")?.fields.name ?? "";
-          next.delete(action.fieldName);
-          return {
-            ...state,
-            translationChanges: {
-              ...state.translationChanges,
-              ar: { ...state.translationChanges.ar, name: originalArabicName },
-            },
-            editingFields: next,
-          };
-        }
-      }
-
-      if (next.has(action.fieldName)) {
-        next.delete(action.fieldName);
-      } else {
-        next.add(action.fieldName);
-      }
-      return { ...state, editingFields: next };
-    }
     case "SET_SAVING":
       return { ...state, saving: action.saving };
     case "SET_ERROR":
@@ -178,14 +133,13 @@ export function TopicModal({ isOpen, onClose, onSave, topic }: TopicModalProps) 
   const initialFormState: FormState = {
     formData: getInitialFormData(topic ?? null),
     originalFormData: getInitialFormData(topic ?? null),
-    editingFields: new Set(isNewTopic ? ["name", "slug"] : []),
     translationChanges: {},
     saving: false,
     error: null,
   };
 
   const [state, dispatch] = useReducer(formReducer, initialFormState);
-  const { formData, editingFields, translationChanges, saving, error } = state;
+  const { formData, translationChanges, saving, error } = state;
 
   const { data: translationsResponse } = useContentTranslations(
     isEditing && topic ? { entity: "topic", topicId: topic.id } : { entity: "topic", topicId: "" },
@@ -218,12 +172,6 @@ export function TopicModal({ isOpen, onClose, onSave, topic }: TopicModalProps) 
     }
   }, [isOpen]);
 
-  const toggleFieldEdit = (fieldName: string) => {
-    dispatch({ type: "TOGGLE_FIELD_EDIT", fieldName, translations });
-  };
-
-  const isFieldEditing = (fieldName: string) => editingFields.has(fieldName);
-
   const handleNameChange = (value: string) => {
     dispatch({ type: "UPDATE_FORM_FIELD", field: "name", value });
     if (isNewTopic) {
@@ -252,9 +200,19 @@ export function TopicModal({ isOpen, onClose, onSave, topic }: TopicModalProps) 
     dispatch({ type: "SET_SAVING", saving: true });
     dispatch({ type: "SET_ERROR", error: null });
     try {
+      let translations: Record<string, { name?: string }> | undefined;
+      if (isEditing) {
+        const filtered = Object.fromEntries(
+          Object.entries(translationChanges).filter(([, fields]) => fields?.name?.trim()),
+        );
+        if (Object.keys(filtered).length > 0) {
+          translations = filtered as Record<string, { name?: string }>;
+        }
+      }
+
       const dataWithTranslations: UpsertTopicDto = {
         ...formData,
-        translations: isEditing ? translationChanges : undefined,
+        translations,
       };
       await onSave(dataWithTranslations);
       onClose();
@@ -279,6 +237,7 @@ export function TopicModal({ isOpen, onClose, onSave, topic }: TopicModalProps) 
           : t("admin.contents.addTopic", "Add Topic")
       }
       size="md"
+      width="var(--modal-width-standard)"
       footer={
         <>
           <Button type="button" variant="ghost" onClick={onClose} disabled={saving}>
@@ -302,23 +261,6 @@ export function TopicModal({ isOpen, onClose, onSave, topic }: TopicModalProps) 
             value={formData.slug}
             onChange={(value) => dispatch({ type: "UPDATE_FORM_FIELD", field: "slug", value })}
             placeholder={t("admin.contents.slugPlaceholder", "topic-slug")}
-            disabled={isEditing && !isFieldEditing("slug")}
-            rightButton={
-              isEditing && (
-                <button
-                  type="button"
-                  className={styles.editIconButton}
-                  onClick={() => toggleFieldEdit("slug")}
-                  aria-label={
-                    isFieldEditing("slug")
-                      ? t("admin.contents.cancelEdit", "Cancel edit")
-                      : t("admin.contents.editSlug", "Edit slug")
-                  }
-                >
-                  {isFieldEditing("slug") ? <RotateCcw size={16} /> : <Edit2 size={16} />}
-                </button>
-              )
-            }
           />
         </div>
 
@@ -331,23 +273,6 @@ export function TopicModal({ isOpen, onClose, onSave, topic }: TopicModalProps) 
             value={formData.name.en}
             onChange={handleNameChange}
             placeholder={t("admin.contents.englishNamePlaceholder", "Topic name in English")}
-            disabled={isEditing && !isFieldEditing("name")}
-            rightButton={
-              isEditing && (
-                <button
-                  type="button"
-                  className={styles.editIconButton}
-                  onClick={() => toggleFieldEdit("name")}
-                  aria-label={
-                    isFieldEditing("name")
-                      ? t("admin.contents.cancelEdit", "Cancel edit")
-                      : t("admin.contents.editEnglishName", "Edit English name")
-                  }
-                >
-                  {isFieldEditing("name") ? <RotateCcw size={16} /> : <Edit2 size={16} />}
-                </button>
-              )
-            }
           />
         </div>
 
@@ -376,25 +301,6 @@ export function TopicModal({ isOpen, onClose, onSave, topic }: TopicModalProps) 
               value={translationChanges.ar?.name ?? ""}
               onChange={(value) => handleTranslationNameChange("ar", value)}
               placeholder={t("admin.contents.arabicNamePlaceholder", "Topic name in Arabic")}
-              disabled={!isFieldEditing("translation-ar-name")}
-              rightButton={
-                <button
-                  type="button"
-                  className={styles.editIconButton}
-                  onClick={() => toggleFieldEdit("translation-ar-name")}
-                  aria-label={
-                    isFieldEditing("translation-ar-name")
-                      ? t("admin.contents.cancelEdit", "Cancel edit")
-                      : t("admin.contents.editArabicName", "Edit Arabic name")
-                  }
-                >
-                  {isFieldEditing("translation-ar-name") ? (
-                    <RotateCcw size={16} />
-                  ) : (
-                    <Edit2 size={16} />
-                  )}
-                </button>
-              }
             />
             {translations.find((t: any) => t.locale === "ar") && (
               <div className={styles.translationStatus}>

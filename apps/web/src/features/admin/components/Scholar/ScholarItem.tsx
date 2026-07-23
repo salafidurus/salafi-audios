@@ -8,6 +8,7 @@ import { UserAvatar } from "@/shared/components/user-avatar";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { type AdminScholarListItemDto, COUNTRY_NAMES } from "@sd/core-contracts";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { formatScholarName } from "@/shared/utils/format-scholar-name";
 import styles from "./scholar-item.module.css";
 
 export interface ScholarItemProps {
@@ -37,7 +38,7 @@ function ScholarDetails({
       </div>
       <div className={styles.detailsBody}>
         <div className={styles.nameRow}>
-          <h3 className={styles.name}>{scholar.name}</h3>
+          <h3 className={styles.name}>{formatScholarName(scholar)}</h3>
         </div>
         <div className={styles.metaRow}>
           <span className={styles.slug}>{scholar.slug}</span>

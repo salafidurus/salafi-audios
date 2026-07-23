@@ -1,3 +1,15 @@
+:root {
+  --modal-width-standard: 95%;
+  --modal-width-wide: 95%;
+}
+
+@media (min-width: 641px) {
+  :root {
+    --modal-width-standard: 60%;
+    --modal-width-wide: 80%;
+  }
+}
+
 .overlay {
   position: fixed;
   inset: 0;

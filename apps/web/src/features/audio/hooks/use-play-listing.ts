@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import { useListingDetail } from "@sd/domain-content";
 import type { Track } from "@sd/domain-audio";
 import { sanitizeError } from "@sd/utils-error";
+import { formatScholarName } from "@/shared/utils/format-scholar-name";
 import { audioService } from "../index";
 
 export type UsePlayListingOptions = {
@@ -55,7 +56,7 @@ export function usePlayListing(listingId: string | null, options?: UsePlayListin
       const track: Track = {
         id: listingDetail.id,
         title: listingDetail.title,
-        artist: listingDetail.scholar.name,
+        artist: formatScholarName(listingDetail.scholar),
         url: listingDetail.primaryAudioAsset.url,
         durationSeconds:
           listingDetail.durationSeconds || listingDetail.primaryAudioAsset.durationSeconds || 0,

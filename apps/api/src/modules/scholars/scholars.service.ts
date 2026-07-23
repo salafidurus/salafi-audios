@@ -6,6 +6,7 @@ import type {
   ScholarTopicsDto,
   TranslationViewDto,
   AdminScholarListDto,
+  Locale,
 } from '@sd/core-contracts';
 import { ScholarsRepository } from './scholars.repo';
 import type { CreateScholarDto } from './dto/create-scholar.dto';
@@ -49,13 +50,39 @@ export class ScholarsService {
   }
 
   async create(dto: CreateScholarDto) {
-    return this.repo.create(dto);
+    const scholar = await this.repo.create(dto);
+
+    // If translations were provided in the DTO, upsert them
+    if (dto.translations && scholar.id) {
+      for (const [locale, fields] of Object.entries(dto.translations)) {
+        // react-doctor-disable-next-line react-doctor/async-await-in-loop
+        await this.upsertTranslation(scholar.id, {
+          locale: locale as Locale,
+          name: fields.name,
+        } as SaveScholarTranslationDto);
+      }
+    }
+
+    return scholar;
   }
 
   async update(id: string, dto: UpdateScholarDto) {
     const existing = await this.repo.findById(id);
     if (!existing) throw new NotFoundException(`Scholar "${id}" not found`);
-    return this.repo.update(id, dto);
+    const updated = await this.repo.update(id, dto);
+
+    // If translations were provided in the DTO, upsert them
+    if (dto.translations && id) {
+      for (const [locale, fields] of Object.entries(dto.translations)) {
+        // react-doctor-disable-next-line react-doctor/async-await-in-loop
+        await this.upsertTranslation(id, {
+          locale: locale as Locale,
+          name: fields.name,
+        } as SaveScholarTranslationDto);
+      }
+    }
+
+    return updated;
   }
 
   // ─── Scholar translations ─────────────────────────────────────────────────

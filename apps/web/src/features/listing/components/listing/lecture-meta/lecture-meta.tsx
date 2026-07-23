@@ -4,6 +4,7 @@ import Image from "next/image";
 import type { ListingDetailDto } from "@sd/core-contracts";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { useFormattedDate } from "@/shared/hooks/use-formatted-date";
+import { formatScholarName } from "@/shared/utils/format-scholar-name";
 import styles from "./lecture-meta.module.css";
 
 function formatDuration(seconds: number): string {
@@ -43,7 +44,7 @@ export function LectureMeta({ lecture }: LectureMetaProps) {
             className={styles.scholarImage}
           />
         )}
-        <AppText variant="labelMd">{lecture.scholar.name}</AppText>
+        <AppText variant="labelMd">{formatScholarName(lecture.scholar)}</AppText>
       </div>
 
       {/* Published date */}

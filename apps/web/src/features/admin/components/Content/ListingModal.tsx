@@ -2,6 +2,7 @@
 
 import React, { useReducer } from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
+import { AudioUploader } from "../AudioUploader/AudioUploader";
 import type {
   ScholarListItemDto,
   TopicDetailDto,
@@ -15,6 +16,7 @@ import { createLecture, updateLecture } from "../../api/admin-lectures.api";
 import { Modal } from "@/shared/components/Modal";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { Button } from "@/shared/components/Button";
+import { Search } from "@/shared/components/Search";
 import {
   Dropdown,
   DropdownTrigger,
@@ -35,6 +37,8 @@ interface ListingModalProps {
     format: string;
     filename: string;
   } | null;
+  showAudioUploadTab?: boolean;
+  onAudioUploadComplete?: (audioData: any) => void;
 }
 
 type FormState = {
@@ -177,7 +181,6 @@ function ListingForm({
             <DropdownTrigger
               id="lecture-scholar"
               placeholder={t("admin.contents.listing.scholarPlaceholder", "Select Scholar")}
-              disabled={!!listing}
               testId="scholar-dropdown"
             />
             <DropdownContent searchable>
@@ -201,7 +204,6 @@ function ListingForm({
                 "admin.contents.listing.seriesPlaceholder",
                 "Select Series (Optional)",
               )}
-              disabled={!!listing}
               testId="series-dropdown"
             />
             <DropdownContent searchable>
@@ -266,25 +268,19 @@ function ListingForm({
 
       <div className={styles.formGroup}>
         <span className={styles.label}>{t("admin.contents.listing.topicsLabel", "Topics")}</span>
-        <div className={styles.topicsGrid}>
-          {topics.map((tItem) => (
-            <label key={tItem.id} className={styles.topicCheckboxLabel}>
-              <input
-                type="checkbox"
-                checked={selectedTopicsSet.has(tItem.id)}
-                onChange={() => handleTopicToggle(tItem.id)}
-                className={styles.checkbox}
-                disabled={!!listing}
-              />
-              <span>{tItem.name.en}</span>
-            </label>
-          ))}
-          {topics.length === 0 && (
-            <span className={styles.noData}>
-              {t("admin.contents.listing.noTopicsAvailable", "No topics available")}
-            </span>
-          )}
-        </div>
+        {topics.length > 0 ? (
+          <Search.Filter
+            chips={topics.map((t) => ({ id: t.id, label: t.name.en }))}
+            selected={selectedTopics}
+            onChipChange={handleTopicToggle}
+            multiple
+            includeAllOption={false}
+          />
+        ) : (
+          <span className={styles.noData}>
+            {t("admin.contents.listing.noTopicsAvailable", "No topics available")}
+          </span>
+        )}
       </div>
     </form>
   );
@@ -296,8 +292,13 @@ export function ListingModal({
   onSuccess,
   listing,
   initialAudioData,
+  showAudioUploadTab,
+  onAudioUploadComplete,
 }: ListingModalProps) {
   const { t } = useTranslation();
+  const [activeTab, setActiveTab] = React.useState<"audio" | "details">(
+    showAudioUploadTab && !initialAudioData ? "audio" : "details",
+  );
   const [state, dispatch] = useReducer(formReducer, undefined, () =>
     initFormState(listing, initialAudioData),
   );
@@ -421,11 +422,11 @@ export function ListingModal({
       onClose={onClose}
       title={
         listing
-          ? t("admin.contents.listing.editTitle", "Edit Lecture Details")
-          : t("admin.contents.listing.newTitle", "New Lecture Details")
+          ? t("admin.contents.listing.editTitle", "Edit Listing Details")
+          : t("admin.contents.listing.newTitle", "Add Listing")
       }
       size="xl"
-      width="var(--modal-listing-width)"
+      width="var(--modal-width-standard)"
       footer={
         <>
           <Button variant="surface" radius="md" onClick={onClose} disabled={saving}>
@@ -443,17 +444,46 @@ export function ListingModal({
         </>
       }
     >
-      <ListingForm
-        state={state}
-        dispatch={dispatch}
-        scholars={scholars}
-        topics={topics}
-        series={series}
-        listing={listing}
-        handleTitleChange={handleTitleChange}
-        handleTopicToggle={handleTopicToggle}
-        onSubmit={handleSave}
-      />
+      {showAudioUploadTab && !listing && (
+        <div
+          style={{
+            display: "flex",
+            gap: "1rem",
+            marginBottom: "1.5rem",
+            borderBottom: "1px solid var(--border-default)",
+            paddingBottom: "1rem",
+          }}
+        >
+          <Button
+            variant={activeTab === "audio" ? "primary" : "ghost"}
+            onClick={() => setActiveTab("audio")}
+          >
+            {t("admin.contents.listing.uploadTab", "Upload Audio")}
+          </Button>
+          <Button
+            variant={activeTab === "details" ? "primary" : "ghost"}
+            onClick={() => setActiveTab("details")}
+          >
+            {t("admin.contents.listing.detailsTab", "Listing Details")}
+          </Button>
+        </div>
+      )}
+
+      {activeTab === "audio" ? (
+        <AudioUploader onUploadComplete={onAudioUploadComplete || (() => {})} />
+      ) : (
+        <ListingForm
+          state={state}
+          dispatch={dispatch}
+          scholars={scholars}
+          topics={topics}
+          series={series}
+          listing={listing}
+          handleTitleChange={handleTitleChange}
+          handleTopicToggle={handleTopicToggle}
+          onSubmit={handleSave}
+        />
+      )}
     </Modal>
   );
 }

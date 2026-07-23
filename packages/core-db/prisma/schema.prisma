@@ -103,6 +103,13 @@ enum TranslationStatus {
   published
 }
 
+enum ScholarTitle {
+  allamah
+  sheikh
+  ustadh
+  akh
+}
+
 //////////////////////////
 // Ingestion batch (for seed/dummy dataset lifecycle)
 //////////////////////////
@@ -231,18 +238,19 @@ model UserTranslatorRole {
 //////////////////////////
 
 model Scholar {
-  id           String   @id @default(cuid())
+  id           String        @id @default(cuid())
   slug         String
   name         String
   bio          String?
-  country      String   @default("SA")
-  mainLanguage Locale   @default(ar)
+  country      String        @default("SA")
+  mainLanguage Locale        @default(ar)
   imageUrl     String?
-  isActive     Boolean  @default(true)
-  isKibar      Boolean  @default(false)
-  isFeatured   Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  isActive     Boolean       @default(true)
+  isKibar      Boolean       @default(false)
+  isFeatured   Boolean       @default(false)
+  title        ScholarTitle?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
   // Decoupled audit columns
   createdBy String? @db.Uuid
@@ -254,8 +262,6 @@ model Scholar {
   socialTelegram  String?
   socialYoutube   String?
   socialWebsite   String?
-  socialFacebook  String?
-  socialInstagram String?
 
   ingestionBatchId String?
   ingestionBatch   IngestionBatch? @relation("IngestBatchScholars", fields: [ingestionBatchId], references: [id])
