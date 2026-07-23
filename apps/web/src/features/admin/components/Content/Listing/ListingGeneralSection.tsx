@@ -2,6 +2,7 @@
 
 import React from "react";
 import type { ScholarListItemDto, TopicDetailDto, ListingRefDto } from "@sd/core-contracts";
+import { getLocalizedName } from "@sd/core-i18n";
 import { validateLectureStatus } from "@/shared/types/form-types";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { Search } from "@/shared/components/Search";
@@ -31,7 +32,7 @@ export function ListingGeneralSection({
   series,
   handleTopicToggle,
 }: ListingGeneralSectionProps) {
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
   const { scholarId, seriesId, status, orderIndex, selectedTopics, language, formError } = state;
 
   return (
@@ -152,7 +153,7 @@ export function ListingGeneralSection({
             id="lecture-order"
             type="number"
             className={styles.input}
-            value={orderIndex}
+            value={orderIndex ?? ""}
             onChange={(e) => {
               const value = e.target.value;
               const parsed = value ? Number(value) : undefined;
@@ -170,7 +171,10 @@ export function ListingGeneralSection({
         <span className={styles.label}>{t("admin.contents.listing.topicsLabel", "Topics")}</span>
         {topics.length > 0 ? (
           <Search.Filter
-            chips={topics.map((t) => ({ id: t.id, label: t.name.en }))}
+            chips={topics.map((t) => ({
+              id: t.id,
+              label: getLocalizedName(t.name, i18n.language),
+            }))}
             selected={selectedTopics}
             onChipChange={handleTopicToggle}
             multiple

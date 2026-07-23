@@ -1,4 +1,5 @@
 import type { TopicDetailDto } from "@sd/core-contracts";
+import { getLocalizedName } from "@sd/core-i18n";
 import { List } from "@/shared/components/List";
 import { Button } from "@/shared/components/Button";
 import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
@@ -15,12 +16,13 @@ interface TopicProps {
 
 export function Topic({ topic, onEdit, onDelete }: TopicProps) {
   const { isMobile } = useResponsive();
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
+  const displayName = getLocalizedName(topic.name, i18n.language);
 
   return (
     <List.Item interactive>
       <div className={styles.topicInfo}>
-        <span className={styles.topicName}>{topic.name.en}</span>
+        <span className={styles.topicName}>{displayName}</span>
         <span className={styles.topicSlug}>{topic.slug}</span>
       </div>
       <List.Item.Actions>
@@ -31,7 +33,7 @@ export function Topic({ topic, onEdit, onDelete }: TopicProps) {
             fullWidth={isMobile}
             icon={<Pencil size={16} />}
             onClick={() => onEdit(topic)}
-            aria-label={`Edit topic ${topic.name.en}`}
+            aria-label={`Edit topic ${displayName}`}
           >
             {isMobile && t("common.edit", "Edit")}
           </Button>
@@ -42,8 +44,8 @@ export function Topic({ topic, onEdit, onDelete }: TopicProps) {
             size={isMobile ? "sm" : "icon"}
             fullWidth={isMobile}
             icon={<Trash2 size={16} />}
-            onClick={() => onDelete(topic.slug, topic.name.en)}
-            aria-label={`Delete topic ${topic.name.en}`}
+            onClick={() => onDelete(topic.slug, displayName)}
+            aria-label={`Delete topic ${displayName}`}
           >
             {isMobile && t("common.delete", "Delete")}
           </Button>

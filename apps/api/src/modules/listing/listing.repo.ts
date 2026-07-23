@@ -69,6 +69,11 @@ export class ListingRepository {
                 id: true,
                 slug: true,
                 name: true,
+                translations: {
+                  where: { locale },
+                  select: { name: true },
+                  take: 1,
+                },
               },
             },
           },
@@ -131,7 +136,7 @@ export class ListingRepository {
       topics: listing.topics.map((lt) => ({
         id: lt.topic.id,
         slug: lt.topic.slug,
-        name: lt.topic.name,
+        name: lt.topic.translations?.[0]?.name || lt.topic.name,
       })),
       primaryAudioAsset: primaryAudio
         ? {

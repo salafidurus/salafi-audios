@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./Badge.module.css";
 
 type PermissionBadgeProps = {
@@ -21,6 +22,8 @@ type StatusBadgeProps = {
 export type BadgeProps = PermissionBadgeProps | RoleBadgeProps | StatusBadgeProps;
 
 export function Badge(props: BadgeProps): ReactNode {
+  const { t } = useTranslation();
+
   if (props.variant === "permission") {
     return (
       <span className={styles.badge}>
@@ -32,7 +35,8 @@ export function Badge(props: BadgeProps): ReactNode {
 
   if (props.variant === "role") {
     const roleClass = props.role === "admin" ? styles.admin : styles.user;
-    return <span className={`${styles.badge} ${roleClass}`}>{props.role}</span>;
+    const localizedRole = t(`role.${props.role}`, props.role);
+    return <span className={`${styles.badge} ${roleClass}`}>{localizedRole}</span>;
   }
 
   // variant === "status"
