@@ -60,11 +60,11 @@ export function TopicsContent({
     if (!deletingTopicSlugRef.current) return;
     try {
       await deleteTopic(deletingTopicSlugRef.current);
+      queryClient.invalidateQueries({ queryKey: queryKeys.topics.list() });
       setDeleteModalOpen(false);
       deletingTopicSlugRef.current = null;
       setDeletingTopicName("");
       setDeleteError(null);
-      queryClient.invalidateQueries({ queryKey: queryKeys.topics.list() });
     } catch (err) {
       setDeleteError(sanitizeError(err));
     }

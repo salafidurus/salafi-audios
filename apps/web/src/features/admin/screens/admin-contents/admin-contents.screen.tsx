@@ -56,8 +56,8 @@ export function AdminContentsScreen() {
     } else {
       await createTopic(formData);
     }
-    setIsTopicModalOpen(false);
     queryClient.invalidateQueries({ queryKey: queryKeys.topics.list() });
+    setIsTopicModalOpen(false);
   };
 
   // Listing modal state
