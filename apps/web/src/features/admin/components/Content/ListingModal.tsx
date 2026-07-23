@@ -470,7 +470,6 @@ export function ListingModal({
           <Button
             variant={activeTab === "details" ? "primary" : "ghost"}
             onClick={() => setActiveTab("details")}
-            disabled={!initialAudioData}
           >
             {t("admin.contents.listing.detailsTab", "Listing Details")}
           </Button>
