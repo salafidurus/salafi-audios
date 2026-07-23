@@ -275,7 +275,6 @@ function ListingForm({
                 checked={selectedTopicsSet.has(tItem.id)}
                 onChange={() => handleTopicToggle(tItem.id)}
                 className={styles.checkbox}
-                disabled={!!listing}
               />
               <span>{tItem.name.en}</span>
             </label>
