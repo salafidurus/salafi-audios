@@ -126,6 +126,7 @@ export const queryKeys = {
     topics: {
       all: () => [...queryKeys.admin.all, "topics"] as const,
       list: () => [...queryKeys.admin.all, "topics", "list"] as const,
+      detail: (slug: string) => [...queryKeys.admin.topics.all(), "detail", slug] as const,
     },
   },
 } as const;

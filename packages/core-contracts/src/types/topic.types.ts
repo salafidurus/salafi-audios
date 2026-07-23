@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { StatusValueSchema } from "./common.types";
 import { ContentOriginalFieldsSchema, LocaleSchema } from "./localization.types";
+import { TranslationViewDtoSchema } from "./translation.types";
 
 export const TopicSlugSchema = z.string();
 export type TopicSlug = z.infer<typeof TopicSlugSchema>;
@@ -67,3 +68,41 @@ export const UpdateTopicTranslationDtoSchema = z.object({
   name: z.string().optional(),
 });
 export type UpdateTopicTranslationDto = z.infer<typeof UpdateTopicTranslationDtoSchema>;
+
+export const AdminTopicDetailDtoSchema = z.object({
+  id: z.string(),
+  slug: z.string(),
+  name: TopicNameSchema,
+  createdAt: z.string(),
+  translations: z.array(TranslationViewDtoSchema),
+});
+export type AdminTopicDetailDto = z.infer<typeof AdminTopicDetailDtoSchema>;
+
+export const CreateTopicWithTranslationsDtoSchema = z.object({
+  slug: z.string().min(1, "Slug is required"),
+  name: z.object({
+    en: z.string().min(1, "English name is required"),
+  }),
+  translations: z
+    .array(
+      z.object({
+        locale: LocaleSchema,
+        name: z.string(),
+      }),
+    )
+    .optional(),
+});
+export type CreateTopicWithTranslationsDto = z.infer<typeof CreateTopicWithTranslationsDtoSchema>;
+
+export const UpdateTopicWithTranslationsDtoSchema = z.object({
+  name: z.object({
+    en: z.string().min(1, "English name is required"),
+  }),
+  translations: z.array(
+    z.object({
+      locale: LocaleSchema,
+      name: z.string(),
+    }),
+  ),
+});
+export type UpdateTopicWithTranslationsDto = z.infer<typeof UpdateTopicWithTranslationsDtoSchema>;

@@ -165,14 +165,12 @@ export class TopicsRepository {
 
   private mapTopicTranslation(t: {
     locale: string;
-    status: string;
     name: string;
     createdAt: Date;
     updatedAt: Date;
   }): TranslationViewDto {
     return {
       locale: t.locale as Locale,
-      status: t.status === 'published' ? 'published' : 'draft',
       fields: { name: t.name },
       createdAt: t.createdAt.toISOString(),
       updatedAt: t.updatedAt.toISOString(),
@@ -193,7 +191,7 @@ export class TopicsRepository {
   ): Promise<TranslationViewDto> {
     const record = await this.prisma.topicTranslation.upsert({
       where: { topicId_locale: { topicId, locale: dto.locale } },
-      create: { topicId, locale: dto.locale, name: dto.name, status: 'draft' },
+      create: { topicId, locale: dto.locale, name: dto.name },
       update: { name: dto.name },
     });
     return this.mapTopicTranslation(record);
@@ -211,20 +209,17 @@ export class TopicsRepository {
     return this.mapTopicTranslation(record);
   }
 
-  async publishTopicTranslation(topicId: string, locale: string): Promise<TranslationViewDto> {
-    const record = await this.prisma.topicTranslation.update({
-      where: { topicId_locale: { topicId, locale: locale as Locale } },
-      data: { status: 'published' },
-    });
-    return this.mapTopicTranslation(record);
-  }
-
-  async unpublishTopicTranslation(topicId: string, locale: string): Promise<TranslationViewDto> {
-    const record = await this.prisma.topicTranslation.update({
-      where: { topicId_locale: { topicId, locale: locale as Locale } },
-      data: { status: 'draft' },
-    });
-    return this.mapTopicTranslation(record);
+  async deleteTopicTranslation(topicId: string, locale: string): Promise<void> {
+    try {
+      await this.prisma.topicTranslation.delete({
+        where: { topicId_locale: { topicId, locale: locale as Locale } },
+      });
+    } catch (e: unknown) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
+        return;
+      }
+      throw e;
+    }
   }
 
   private async findManyTopics(
