@@ -20,6 +20,13 @@ export class AdminScholarsController {
     return this.service.adminList(cursor);
   }
 
+  @Get(':id/form-data')
+  @RequiresPermission(Permissions.SCHOLARS_EDIT)
+  @ApiOperation({ summary: 'Get scholar with translations for edit form' })
+  getFormData(@Param('id') id: string) {
+    return this.service.getFormData(id);
+  }
+
   @Post()
   @RequiresPermission(Permissions.SCHOLARS_CREATE)
   @ApiOperation({ summary: 'Create a scholar' })
