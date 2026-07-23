@@ -31,16 +31,24 @@ export class PermissionGuard implements CanActivate {
     // Routes without @RequiresPermission are guarded only by AuthGuard
     if (!requiredPermission) return true;
 
-    const request = context.switchToHttp().getRequest<FastifyRequest & { user?: { id: string } }>();
+    const request = context
+      .switchToHttp()
+      .getRequest<
+        FastifyRequest & { user?: { id: string; roles?: string[]; permissions?: string[] } }
+      >();
     const user = request.user;
 
     if (!user?.id) throw new ForbiddenException('Authentication required');
 
-    // Check if user has superadmin role (bypass all)
+    // Fast path: session roles and permissions
+    if (user.roles?.includes('superadmin')) return true;
+    if (user.permissions?.includes(requiredPermission as string)) return true;
+
+    // DB Fallback: Check if user has superadmin role
     const isSuperadmin = await this.hasRole(user.id, 'superadmin');
     if (isSuperadmin) return true;
 
-    // Check if user has the required permission
+    // DB Fallback: Check if user has the required permission
     const hasPermission = await this.hasPermission(user.id, requiredPermission);
     if (!hasPermission) {
       throw new ForbiddenException(`Missing permission: ${requiredPermission}`);

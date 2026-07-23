@@ -1,7 +1,7 @@
 "use client";
 
 import type { AdminPermission } from "@sd/core-contracts";
-import { useAdminPermissions } from "@sd/domain-permissions";
+import { useAdminPermissions } from "@sd/domain-account";
 import { useAuth } from "@/core/auth/use-auth";
 
 type Props = {

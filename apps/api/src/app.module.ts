@@ -15,7 +15,6 @@ import { PermissionGuard } from './shared/guards/permission.guard';
 import { AccountModule } from './modules/account/account.module';
 import { SearchModule } from './modules/search/search.module';
 import { TopicsModule } from './modules/topics/topics.module';
-import { PermissionsModule } from './modules/permissions/permissions.module';
 import { ScholarsModule } from './modules/scholars/scholars.module';
 import { LibraryModule } from './modules/library/library.module';
 import { AudioModule } from './modules/audio/audio.module';
@@ -45,7 +44,6 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     AccountModule,
     SearchModule,
     TopicsModule,
-    PermissionsModule,
     ScholarsModule,
     LibraryModule,
     AudioModule,

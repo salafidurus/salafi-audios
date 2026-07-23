@@ -58,15 +58,22 @@ describe('AuthGuard', () => {
       switchToHttp: () => ({ getRequest: () => req }),
     } as unknown as ExecutionContext;
     await expect(guard.canActivate(ctx)).resolves.toBe(true);
-    expect(req.user).toEqual({ ...fakeUser, roles: ['listener'] });
+    expect(req.user).toEqual({ ...fakeUser, roles: ['listener'], permissions: [] });
   });
 
-  it('throws 401 when user has no roles', async () => {
+  it('assigns default listener role when user has no roles in DB or session', async () => {
     const fakeUser = { id: 'u1', email: 'a@b.com' };
     vi.spyOn(reflector, 'getAllAndOverride').mockReturnValue(false);
     mockAuth.api.getSession.mockResolvedValue({ user: fakeUser, session: {} });
     (mockPrisma.userRoleAssignment!.findMany as any).mockResolvedValue([]);
-    await expect(guard.canActivate(mockContext())).rejects.toThrow(UnauthorizedException);
+    const req: Record<string, unknown> = { headers: {}, user: undefined };
+    const ctx = {
+      getHandler: () => ({}),
+      getClass: () => ({}),
+      switchToHttp: () => ({ getRequest: () => req }),
+    } as unknown as ExecutionContext;
+    await expect(guard.canActivate(ctx)).resolves.toBe(true);
+    expect(req.user).toEqual({ ...fakeUser, roles: ['listener'], permissions: [] });
   });
 
   it('throws 401 when user role does not match @Roles()', async () => {

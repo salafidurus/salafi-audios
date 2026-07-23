@@ -1,18 +1,9 @@
-import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
-import type { AdminPermissionsListDto } from "@sd/core-contracts";
+import { useAccountProfile } from "@sd/domain-account";
 
 export function useAdminPermissions() {
-  const query = useApiQuery<AdminPermissionsListDto>(
-    ["admin", "permissions", "me"],
-    () =>
-      httpClient<AdminPermissionsListDto>({
-        url: endpoints.admin.permissions.me,
-        method: "GET",
-      }),
-    { staleTime: Infinity }, // cache for session lifetime
-  );
+  const { data: profile, isLoading } = useAccountProfile();
 
-  const permissions = query.data?.permissions ?? [];
+  const permissions = (profile?.permissions ?? []).map((p) => ({ permission: p }));
   const hasAnyPermission = permissions.length > 0;
   const hasPermission = (perm: string) => permissions.some((p) => p.permission === perm);
 
@@ -20,6 +11,6 @@ export function useAdminPermissions() {
     permissions,
     hasAnyPermission,
     hasPermission,
-    isLoading: query.isLoading,
+    isLoading,
   };
 }

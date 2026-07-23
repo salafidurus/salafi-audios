@@ -7,7 +7,7 @@ import clsx from "clsx";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { routes, type AdminPermission, type UserRole } from "@sd/core-contracts";
 import { useAuth, authClient } from "@/core/auth";
-import { useAdminPermissions } from "@sd/domain-permissions";
+import { useAdminPermissions } from "@sd/domain-account";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button/Button";
 import { SectionLabel } from "./section-label";

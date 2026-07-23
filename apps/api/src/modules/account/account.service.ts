@@ -9,6 +9,7 @@ type AuthenticatedUser = {
   image?: string | null;
   emailVerified: boolean;
   roles: string[];
+  permissions?: string[];
   createdAt: Date;
   updatedAt: Date;
 };
@@ -25,6 +26,7 @@ export class AccountService {
       avatarUrl: user.image ?? undefined,
       emailVerified: user.emailVerified,
       roles: user.roles,
+      permissions: user.permissions ?? [],
       createdAt: user.createdAt.toISOString(),
       updatedAt: user.updatedAt.toISOString(),
     };

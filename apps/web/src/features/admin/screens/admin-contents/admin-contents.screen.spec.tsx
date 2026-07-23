@@ -3,11 +3,11 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AdminContentsScreen } from "./admin-contents.screen";
-import { useAdminPermissions } from "@sd/domain-permissions";
+import { useAdminPermissions } from "@sd/domain-account";
 import { useApiQuery } from "@sd/core-contracts";
 import { usePathname } from "next/navigation";
 
-vi.mock("@sd/domain-permissions", () => ({
+vi.mock("@sd/domain-account", () => ({
   useAdminPermissions: vi.fn(),
 }));
 vi.mock("@sd/core-contracts", () => {

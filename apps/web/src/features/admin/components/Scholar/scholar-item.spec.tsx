@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, type Mock } from "bun:test";
 import { render, screen } from "@testing-library/react";
 import { Scholar } from ".";
-import { useAdminPermissions } from "@sd/domain-permissions";
+import { useAdminPermissions } from "@sd/domain-account";
 
-vi.mock("@sd/domain-permissions", () => ({
+vi.mock("@sd/domain-account", () => ({
   useAdminPermissions: vi.fn(),
 }));
 

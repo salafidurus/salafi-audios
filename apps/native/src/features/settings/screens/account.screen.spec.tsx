@@ -130,9 +130,6 @@ describe("AccountScreen", () => {
       permissions: [
         {
           permission: "USERS_VIEW",
-          grantedAt: "2026-01-01",
-          userId: "user-1",
-          grantedById: null,
         },
       ],
       hasAnyPermission: true,

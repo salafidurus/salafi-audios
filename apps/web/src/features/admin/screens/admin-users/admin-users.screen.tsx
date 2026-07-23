@@ -3,7 +3,7 @@
 import { useState, useCallback, type ReactNode, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@sd/core-contracts";
-import { useInfiniteAdminUsers } from "@sd/domain-permissions";
+import { useInfiniteAdminUsers } from "@sd/domain-account";
 import { useDebouncedSearch } from "@/shared/hooks";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";

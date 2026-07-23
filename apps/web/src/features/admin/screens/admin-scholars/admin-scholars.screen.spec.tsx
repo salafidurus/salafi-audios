@@ -3,9 +3,9 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AdminScholarsScreen } from "./admin-scholars.screen";
-import { useAdminPermissions } from "@sd/domain-permissions";
+import { useAdminPermissions } from "@sd/domain-account";
 
-vi.mock("@sd/domain-permissions", () => ({
+vi.mock("@sd/domain-account", () => ({
   useAdminPermissions: vi.fn(),
 }));
 vi.mock("@sd/core-contracts", () => {

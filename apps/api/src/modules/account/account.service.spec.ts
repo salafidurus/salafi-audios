@@ -44,6 +44,7 @@ describe('AccountService', () => {
         avatarUrl: 'https://example.com/avatar.png',
         emailVerified: true,
         roles: ['listener'],
+        permissions: [],
         createdAt: '2024-01-01T00:00:00.000Z',
         updatedAt: '2024-06-01T00:00:00.000Z',
       });
