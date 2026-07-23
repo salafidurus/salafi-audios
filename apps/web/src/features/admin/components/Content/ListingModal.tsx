@@ -36,8 +36,7 @@ interface ListingModalProps {
     format: string;
     filename: string;
   } | null;
-  isAudioUploaderMode?: boolean;
-  onAudioUploaderClose?: () => void;
+  showAudioUploadTab?: boolean;
   onAudioUploadComplete?: (audioData: any) => void;
 }
 
@@ -300,11 +299,13 @@ export function ListingModal({
   onSuccess,
   listing,
   initialAudioData,
-  isAudioUploaderMode,
-  onAudioUploaderClose,
+  showAudioUploadTab,
   onAudioUploadComplete,
 }: ListingModalProps) {
   const { t } = useTranslation();
+  const [activeTab, setActiveTab] = React.useState<"audio" | "details">(
+    showAudioUploadTab && !initialAudioData ? "audio" : "details",
+  );
   const [state, dispatch] = useReducer(formReducer, undefined, () =>
     initFormState(listing, initialAudioData),
   );
@@ -422,19 +423,6 @@ export function ListingModal({
   const topics = topicsData ?? [];
   const series = seriesData ?? [];
 
-  if (isAudioUploaderMode) {
-    return (
-      <Modal
-        isOpen={isOpen}
-        onClose={onClose}
-        title={t("admin.contents.listing.uploadTitle", "Upload Audio")}
-        width="var(--modal-width-wide)"
-      >
-        <AudioUploader onUploadComplete={onAudioUploadComplete || (() => {})} />
-      </Modal>
-    );
-  }
-
   return (
     <Modal
       isOpen={isOpen}
@@ -463,17 +451,47 @@ export function ListingModal({
         </>
       }
     >
-      <ListingForm
-        state={state}
-        dispatch={dispatch}
-        scholars={scholars}
-        topics={topics}
-        series={series}
-        listing={listing}
-        handleTitleChange={handleTitleChange}
-        handleTopicToggle={handleTopicToggle}
-        onSubmit={handleSave}
-      />
+      {showAudioUploadTab && !listing && (
+        <div
+          style={{
+            display: "flex",
+            gap: "1rem",
+            marginBottom: "1.5rem",
+            borderBottom: "1px solid var(--border-default)",
+            paddingBottom: "1rem",
+          }}
+        >
+          <Button
+            variant={activeTab === "audio" ? "primary" : "ghost"}
+            onClick={() => setActiveTab("audio")}
+          >
+            {t("admin.contents.listing.uploadTab", "Upload Audio")}
+          </Button>
+          <Button
+            variant={activeTab === "details" ? "primary" : "ghost"}
+            onClick={() => setActiveTab("details")}
+            disabled={!initialAudioData}
+          >
+            {t("admin.contents.listing.detailsTab", "Listing Details")}
+          </Button>
+        </div>
+      )}
+
+      {activeTab === "audio" ? (
+        <AudioUploader onUploadComplete={onAudioUploadComplete || (() => {})} />
+      ) : (
+        <ListingForm
+          state={state}
+          dispatch={dispatch}
+          scholars={scholars}
+          topics={topics}
+          series={series}
+          listing={listing}
+          handleTitleChange={handleTitleChange}
+          handleTopicToggle={handleTopicToggle}
+          onSubmit={handleSave}
+        />
+      )}
     </Modal>
   );
 }

@@ -86,16 +86,15 @@ export function ListingsContent({
       />
 
       <Content.ListingModal
-        isOpen={isAudioUploaderOpen || isListingModalOpen}
+        isOpen={isListingModalOpen || isAudioUploaderOpen}
         onClose={() => {
-          setIsAudioUploaderOpen(false);
           setIsListingModalOpen(false);
+          setIsAudioUploaderOpen(false);
         }}
         onSuccess={handleListingSaved}
         listing={selectedListing}
         initialAudioData={initialAudioData}
-        isAudioUploaderMode={isAudioUploaderOpen && !initialAudioData}
-        onAudioUploaderClose={() => setIsAudioUploaderOpen(false)}
+        showAudioUploadTab={isAudioUploaderOpen && !selectedListing}
         onAudioUploadComplete={handleUploadComplete}
       />
     </>
