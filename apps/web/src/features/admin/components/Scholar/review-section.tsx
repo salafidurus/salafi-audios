@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import type { CreateScholarDto } from "@sd/core-contracts";
 import { FormSection } from "@/features/admin/components/FormSection";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -7,6 +8,7 @@ import styles from "./review-section.module.css";
 
 interface ReviewSectionProps {
   formData: CreateScholarDto;
+  changedFields: Record<string, boolean>;
   mainLanguageName?: string;
   translationName?: string;
   translationBio?: string;
@@ -15,6 +17,7 @@ interface ReviewSectionProps {
 
 export function ReviewSection({
   formData,
+  changedFields,
   mainLanguageName,
   translationName,
   translationBio,
@@ -25,13 +28,20 @@ export function ReviewSection({
   const otherLanguage = formData.mainLanguage === "en" ? "ar" : "en";
   const otherLanguageName = otherLanguage === "en" ? "English" : "العربية";
   const hasTranslations = translationName || translationBio;
-  const hasSocialMedia =
-    formData.socialTwitter ||
-    formData.socialTelegram ||
-    formData.socialYoutube ||
-    formData.socialWebsite;
-  const hasMainLanguageData = formData.name || formData.bio || formData.title || formData.country;
-  const hasAnyData = hasMainLanguageData || hasTranslations || hasSocialMedia || stagedImagePreview;
+
+  // Check if any changed field should be displayed
+  const hasDetailChanges =
+    changedFields.name ||
+    changedFields.slug ||
+    changedFields.bio ||
+    changedFields.title ||
+    changedFields.country;
+  const hasSocialChanges =
+    changedFields.socialTwitter ||
+    changedFields.socialTelegram ||
+    changedFields.socialYoutube ||
+    changedFields.socialWebsite;
+  const hasAnyData = hasDetailChanges || hasTranslations || hasSocialChanges || stagedImagePreview;
 
   if (!hasAnyData) {
     return (
@@ -48,49 +58,53 @@ export function ReviewSection({
       {stagedImagePreview && (
         <FormSection title={t("admin.scholars.avatar", "Avatar")}>
           <div className={styles.imagePreview}>
-            <img src={stagedImagePreview} alt={formData.name} />
+            <Image
+              src={stagedImagePreview}
+              alt={formData.name}
+              fill
+              sizes="200px"
+              className={styles.imageContent}
+            />
           </div>
         </FormSection>
       )}
 
-      <FormSection title={t("admin.scholars.details", "Details")}>
-        <div className={styles.grid}>
-          <div className={styles.field}>
-            <div className={styles.label}>{t("admin.scholars.nameLabel", "Name")}</div>
-            <div className={styles.value}>{formData.name}</div>
+      {hasDetailChanges && (
+        <FormSection title={t("admin.scholars.details", "Details")}>
+          <div className={styles.grid}>
+            {changedFields.name && formData.name && (
+              <div className={styles.field}>
+                <div className={styles.label}>{t("admin.scholars.nameLabel", "Name")}</div>
+                <div className={styles.value}>{formData.name}</div>
+              </div>
+            )}
+            {changedFields.slug && formData.slug && (
+              <div className={styles.field}>
+                <div className={styles.label}>{t("admin.scholars.slugLabel", "Slug")}</div>
+                <div className={styles.value}>{formData.slug}</div>
+              </div>
+            )}
+            {changedFields.bio && formData.bio && (
+              <div className={styles.field}>
+                <div className={styles.label}>{t("admin.scholars.bioLabel", "Bio")}</div>
+                <div className={styles.value}>{formData.bio}</div>
+              </div>
+            )}
+            {changedFields.title && formData.title && (
+              <div className={styles.field}>
+                <div className={styles.label}>{t("admin.scholars.titleLabel", "Title")}</div>
+                <div className={styles.value}>{formData.title}</div>
+              </div>
+            )}
+            {changedFields.country && formData.country && (
+              <div className={styles.field}>
+                <div className={styles.label}>{t("admin.scholars.countryLabel", "Country")}</div>
+                <div className={styles.value}>{formData.country}</div>
+              </div>
+            )}
           </div>
-          <div className={styles.field}>
-            <div className={styles.label}>{t("admin.scholars.slugLabel", "Slug")}</div>
-            <div className={styles.value}>{formData.slug}</div>
-          </div>
-          {formData.bio && (
-            <div className={styles.field}>
-              <div className={styles.label}>{t("admin.scholars.bioLabel", "Bio")}</div>
-              <div className={styles.value}>{formData.bio}</div>
-            </div>
-          )}
-          {formData.title && (
-            <div className={styles.field}>
-              <div className={styles.label}>{t("admin.scholars.titleLabel", "Title")}</div>
-              <div className={styles.value}>{formData.title}</div>
-            </div>
-          )}
-          {formData.country && (
-            <div className={styles.field}>
-              <div className={styles.label}>{t("admin.scholars.countryLabel", "Country")}</div>
-              <div className={styles.value}>{formData.country}</div>
-            </div>
-          )}
-          <div className={styles.field}>
-            <div className={styles.label}>
-              {t("admin.scholars.mainLanguageLabel", "Main Language")}
-            </div>
-            <div className={styles.value}>
-              {formData.mainLanguage === "en" ? "English" : "العربية"}
-            </div>
-          </div>
-        </div>
-      </FormSection>
+        </FormSection>
+      )}
 
       {(translationName || translationBio) && (
         <FormSection title={t("admin.scholars.translation", `Translation (${otherLanguageName})`)}>
@@ -111,31 +125,28 @@ export function ReviewSection({
         </FormSection>
       )}
 
-      {(formData.socialTwitter ||
-        formData.socialTelegram ||
-        formData.socialYoutube ||
-        formData.socialWebsite) && (
+      {hasSocialChanges && (
         <FormSection title={t("admin.scholars.socialMedia", "Social Media")}>
           <div className={styles.grid}>
-            {formData.socialTwitter && (
+            {changedFields.socialTwitter && formData.socialTwitter && (
               <div className={styles.field}>
                 <div className={styles.label}>Twitter</div>
                 <div className={styles.value}>{formData.socialTwitter}</div>
               </div>
             )}
-            {formData.socialTelegram && (
+            {changedFields.socialTelegram && formData.socialTelegram && (
               <div className={styles.field}>
                 <div className={styles.label}>Telegram</div>
                 <div className={styles.value}>{formData.socialTelegram}</div>
               </div>
             )}
-            {formData.socialYoutube && (
+            {changedFields.socialYoutube && formData.socialYoutube && (
               <div className={styles.field}>
                 <div className={styles.label}>YouTube</div>
                 <div className={styles.value}>{formData.socialYoutube}</div>
               </div>
             )}
-            {formData.socialWebsite && (
+            {changedFields.socialWebsite && formData.socialWebsite && (
               <div className={styles.field}>
                 <div className={styles.label}>Website</div>
                 <div className={styles.value}>{formData.socialWebsite}</div>

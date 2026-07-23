@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useEffect, useState } from "react";
+import { useReducer, useState, useMemo } from "react";
 import { Modal } from "@/shared/components/Modal";
 import type { CreateScholarDto } from "@sd/core-contracts";
 import { sanitizeError } from "@sd/utils-error";
@@ -43,6 +43,7 @@ export interface ScholarModalProps {
 
 interface FormState {
   formData: CreateScholarDto;
+  initialFormData: CreateScholarDto;
   translationChanges: Record<"en" | "ar", { name?: string; bio?: string | null }>;
   saving: boolean;
   error: string | null;
@@ -64,15 +65,18 @@ export type FormAction =
 
 function formReducer(state: FormState, action: FormAction): FormState {
   switch (action.type) {
-    case "INIT_FORM":
+    case "INIT_FORM": {
+      const initialData = getInitialFormData(action.scholar);
       return {
         ...state,
-        formData: getInitialFormData(action.scholar),
+        formData: initialData,
+        initialFormData: initialData,
         translationChanges: { en: {}, ar: {} },
         error: null,
         stagedImageFile: null,
         stagedImagePreview: null,
       };
+    }
     case "UPDATE_FIELD":
       return {
         ...state,
@@ -136,30 +140,65 @@ function getInitialFormData(scholar: ScholarForEdit | null): CreateScholarDto {
   };
 }
 
-const initialFormState: FormState = {
-  formData: getInitialFormData(null),
-  translationChanges: { en: {}, ar: {} },
-  saving: false,
-  error: null,
-  stagedImageFile: null,
-  stagedImagePreview: null,
-};
+function initFormState(scholar: ScholarForEdit | null): FormState {
+  const formData = getInitialFormData(scholar);
+  return {
+    formData,
+    initialFormData: formData,
+    translationChanges: { en: {}, ar: {} },
+    saving: false,
+    error: null,
+    stagedImageFile: null,
+    stagedImagePreview: null,
+  };
+}
 
 export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalProps) {
   const { t } = useTranslation();
   const isEditing = !!scholar;
 
-  const [state, dispatch] = useReducer(formReducer, initialFormState);
+  const [state, dispatch] = useReducer(formReducer, scholar ?? null, initFormState);
   const [activeTab, setActiveTab] = useState<"general" | "main" | "other" | "review">("general");
-  const { formData, translationChanges, saving, error, stagedImageFile, stagedImagePreview } =
-    state;
+  const {
+    formData,
+    initialFormData,
+    translationChanges,
+    saving,
+    error,
+    stagedImageFile,
+    stagedImagePreview,
+  } = state;
 
-  useEffect(() => {
-    if (isOpen) {
-      dispatch({ type: "INIT_FORM", scholar: scholar ?? null });
-      setActiveTab("general");
+  // Compute which fields have changed for the review tab
+  const changedFields = useMemo(() => {
+    if (!isEditing) {
+      // For create mode, show all non-empty fields
+      return {
+        name: !!formData.name,
+        slug: !!formData.slug,
+        bio: !!formData.bio,
+        title: !!formData.title,
+        country: !!formData.country,
+        socialTwitter: !!formData.socialTwitter,
+        socialTelegram: !!formData.socialTelegram,
+        socialYoutube: !!formData.socialYoutube,
+        socialWebsite: !!formData.socialWebsite,
+      };
     }
-  }, [isOpen, scholar]);
+
+    // For edit mode, only show changed fields
+    return {
+      name: formData.name !== initialFormData.name,
+      slug: formData.slug !== initialFormData.slug,
+      bio: formData.bio !== initialFormData.bio,
+      title: formData.title !== initialFormData.title,
+      country: formData.country !== initialFormData.country,
+      socialTwitter: formData.socialTwitter !== initialFormData.socialTwitter,
+      socialTelegram: formData.socialTelegram !== initialFormData.socialTelegram,
+      socialYoutube: formData.socialYoutube !== initialFormData.socialYoutube,
+      socialWebsite: formData.socialWebsite !== initialFormData.socialWebsite,
+    };
+  }, [isEditing, formData, initialFormData]);
 
   const handleImageStaged = (file: File | null, preview: string | null) => {
     dispatch({ type: "SET_STAGED_IMAGE", file, preview });
@@ -221,6 +260,7 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
 
   return (
     <Modal
+      key={scholar?.id ?? "create"}
       isOpen={isOpen}
       onClose={onClose}
       title={
@@ -249,8 +289,12 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
 
         <Modal.Tabs>
           <Modal.TabItem id="general">{t("admin.modal.generalTab", "General")}</Modal.TabItem>
-          <Modal.TabItem id="main">{formData.mainLanguage === "en" ? "English" : "العربية"}</Modal.TabItem>
-          <Modal.TabItem id="other">{formData.mainLanguage === "en" ? "العربية" : "English"}</Modal.TabItem>
+          <Modal.TabItem id="main">
+            {formData.mainLanguage === "en" ? "English" : "العربية"}
+          </Modal.TabItem>
+          <Modal.TabItem id="other">
+            {formData.mainLanguage === "en" ? "العربية" : "English"}
+          </Modal.TabItem>
           <Modal.TabItem id="review">{t("admin.modal.reviewTab", "Review")}</Modal.TabItem>
         </Modal.Tabs>
 
@@ -271,12 +315,8 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
               locale={formData.mainLanguage as "en" | "ar"}
               name={formData.name}
               bio={formData.bio}
-              onNameChange={(value) =>
-                dispatch({ type: "UPDATE_FIELD", field: "name", value })
-              }
-              onBioChange={(value) =>
-                dispatch({ type: "UPDATE_FIELD", field: "bio", value })
-              }
+              onNameChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "name", value })}
+              onBioChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "bio", value })}
               title={t("admin.modal.mainLanguageContent", "Main Language Content")}
             />
           </Modal.ContentItem>
@@ -285,20 +325,36 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar }: ScholarModalP
             <TranslationFieldsSection
               locale={formData.mainLanguage === "en" ? "ar" : "en"}
               name={translationChanges[formData.mainLanguage === "en" ? "ar" : "en"].name ?? ""}
-              bio={translationChanges[formData.mainLanguage === "en" ? "ar" : "en"].bio ?? undefined}
+              bio={
+                translationChanges[formData.mainLanguage === "en" ? "ar" : "en"].bio ?? undefined
+              }
               onNameChange={(value) =>
-                dispatch({ type: "UPDATE_TRANSLATION", locale: formData.mainLanguage === "en" ? "ar" : "en", field: "name", value })
+                dispatch({
+                  type: "UPDATE_TRANSLATION",
+                  locale: formData.mainLanguage === "en" ? "ar" : "en",
+                  field: "name",
+                  value,
+                })
               }
               onBioChange={(value) =>
-                dispatch({ type: "UPDATE_TRANSLATION", locale: formData.mainLanguage === "en" ? "ar" : "en", field: "bio", value })
+                dispatch({
+                  type: "UPDATE_TRANSLATION",
+                  locale: formData.mainLanguage === "en" ? "ar" : "en",
+                  field: "bio",
+                  value,
+                })
               }
-              title={t("admin.modal.translateContent", `Translate to ${formData.mainLanguage === "en" ? "العربية" : "English"}`)}
+              title={t(
+                "admin.modal.translateContent",
+                `Translate to ${formData.mainLanguage === "en" ? "العربية" : "English"}`,
+              )}
             />
           </Modal.ContentItem>
 
           <Modal.ContentItem id="review">
             <ReviewSection
               formData={formData}
+              changedFields={changedFields}
               mainLanguageName={formData.mainLanguage === "en" ? "English" : "العربية"}
               translationName={
                 translationChanges[formData.mainLanguage === "en" ? "ar" : "en"].name

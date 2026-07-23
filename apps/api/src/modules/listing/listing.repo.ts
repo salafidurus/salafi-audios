@@ -772,6 +772,77 @@ export class ListingRepository {
     return listings;
   }
 
+  async getFormData(listingId: string) {
+    const listing = await this.prisma.listing.findUnique({
+      where: { id: listingId },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        description: true,
+        format: true,
+        language: true,
+        status: true,
+        orderIndex: true,
+        durationSeconds: true,
+        createdAt: true,
+        updatedAt: true,
+        scholarId: true,
+        parentId: true,
+        scholar: { select: { name: true } },
+        topics: { select: { topic: { select: { id: true } } } },
+        audioAssets: {
+          where: { isPrimary: true },
+          take: 1,
+          select: { url: true },
+        },
+        translations: {
+          select: {
+            locale: true,
+            status: true,
+            title: true,
+            description: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+      },
+    });
+
+    if (!listing) return null;
+
+    return {
+      listing: {
+        id: listing.id,
+        slug: listing.slug,
+        title: listing.title,
+        description: listing.description ?? undefined,
+        format: listing.format,
+        language: listing.language ?? undefined,
+        status: listing.status,
+        orderIndex: listing.orderIndex ?? undefined,
+        durationSeconds: listing.durationSeconds ?? undefined,
+        scholarId: listing.scholarId,
+        scholarName: listing.scholar.name,
+        parentId: listing.parentId ?? undefined,
+        topics: listing.topics.map((t) => t.topic.id),
+        audioUrl: listing.audioAssets[0]?.url,
+        createdAt: listing.createdAt.toISOString(),
+        updatedAt: listing.updatedAt?.toISOString(),
+      },
+      translations: listing.translations.map((t) => ({
+        locale: t.locale,
+        status: t.status,
+        fields: {
+          title: t.title,
+          description: t.description ?? null,
+        },
+        createdAt: t.createdAt.toISOString(),
+        updatedAt: t.updatedAt.toISOString(),
+      })),
+    };
+  }
+
   async createWithAudioAsset(
     dto: CreateListingDto & { publicUrl?: string },
     createdBy?: string,

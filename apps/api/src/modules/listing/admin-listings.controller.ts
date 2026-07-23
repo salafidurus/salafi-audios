@@ -66,6 +66,13 @@ export class AdminListingsController {
     return this.service.getAdminDetail(id);
   }
 
+  @Get(':id/form-data')
+  @RequiresPermission(Permissions.LISTINGS_EDIT)
+  @ApiOperation({ summary: 'Get listing with translations for edit form' })
+  getFormData(@Param('id') id: string) {
+    return this.service.getFormData(id);
+  }
+
   @Post()
   @RequiresPermission(Permissions.LISTINGS_CREATE)
   @ApiOperation({ summary: 'Create a listing after R2 upload' })

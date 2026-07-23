@@ -1,15 +1,18 @@
 .imagePreview {
+  position: relative;
   display: flex;
   justify-content: center;
+  align-items: center;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
   padding: var(--space-lg);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   background-color: var(--surface-subtle);
 }
 
-.imagePreview img {
-  max-width: 200px;
-  max-height: 200px;
+.imageContent {
   object-fit: cover;
   border-radius: var(--radius-sm);
 }

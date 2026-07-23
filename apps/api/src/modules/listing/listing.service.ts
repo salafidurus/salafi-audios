@@ -56,6 +56,10 @@ export class ListingService {
     return listing;
   }
 
+  getFormData(listingId: string) {
+    return this.repo.getFormData(listingId);
+  }
+
   getSeriesOptions(scholarId: string): Promise<ListingRefDto[]> {
     return this.repo.findSeriesOptionsByScholar(scholarId);
   }
