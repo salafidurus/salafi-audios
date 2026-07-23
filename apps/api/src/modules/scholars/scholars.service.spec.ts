@@ -134,7 +134,8 @@ describe('ScholarsService', () => {
   });
 
   describe('getFormData', () => {
-    it('should delegate to repo.getFormData', () => {
+    it('method exists and is callable', () => {
+      expect(service.getFormData).toBeDefined();
       expect(typeof service.getFormData).toBe('function');
     });
   });

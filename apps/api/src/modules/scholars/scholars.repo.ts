@@ -356,6 +356,71 @@ export class ScholarsRepository {
     return { topics };
   }
 
+  async getFormData(scholarId: string) {
+    const scholar = await this.prisma.scholar.findUnique({
+      where: { id: scholarId },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        bio: true,
+        imageUrl: true,
+        country: true,
+        mainLanguage: true,
+        isActive: true,
+        title: true,
+        socialTwitter: true,
+        socialTelegram: true,
+        socialYoutube: true,
+        socialWebsite: true,
+        createdAt: true,
+        updatedAt: true,
+        translations: {
+          select: {
+            locale: true,
+            status: true,
+            name: true,
+            bio: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+      },
+    });
+
+    if (!scholar) return null;
+
+    return {
+      scholar: {
+        id: scholar.id,
+        name: scholar.name,
+        slug: scholar.slug,
+        bio: scholar.bio ?? undefined,
+        imageUrl: scholar.imageUrl ?? undefined,
+        country: (scholar.country ?? undefined) as any,
+        mainLanguage: scholar.mainLanguage ?? undefined,
+        isActive: scholar.isActive,
+        title: scholar.title ?? undefined,
+        socialTwitter: scholar.socialTwitter ?? undefined,
+        socialTelegram: scholar.socialTelegram ?? undefined,
+        socialYoutube: scholar.socialYoutube ?? undefined,
+        socialWebsite: scholar.socialWebsite ?? undefined,
+        createdAt: scholar.createdAt.toISOString(),
+        updatedAt: scholar.updatedAt?.toISOString(),
+      },
+      translations: scholar.translations.map((t) => ({
+        locale: t.locale,
+        status: t.status,
+        fields: {
+          name: t.name,
+          bio: t.bio ?? null,
+        },
+        createdAt: t.createdAt.toISOString(),
+        updatedAt: t.updatedAt.toISOString(),
+      })),
+    };
+  }
+
   async findById(id: string) {
     return this.prisma.scholar.findUnique({
       where: { id },
