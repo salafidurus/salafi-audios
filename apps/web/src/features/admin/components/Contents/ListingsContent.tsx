@@ -20,13 +20,13 @@ type AudioData = {
 
 export type ListingsContentProps = {
   debouncedSearch: string;
-  isAudioUploaderOpen?: boolean;
-  onAudioUploaderOpenChange?: (open: boolean) => void;
+  isAudioUploaderOpen: boolean;
+  onAudioUploaderOpenChange: (open: boolean) => void;
 };
 
 export function ListingsContent({
   debouncedSearch,
-  isAudioUploaderOpen: externalIsAudioUploaderOpen,
+  isAudioUploaderOpen,
   onAudioUploaderOpenChange,
 }: ListingsContentProps) {
   const { t } = useTranslation();
@@ -35,15 +35,7 @@ export function ListingsContent({
       search: debouncedSearch,
     });
 
-  const [internalIsAudioUploaderOpen, setInternalIsAudioUploaderOpen] = useState(false);
-  const isAudioUploaderOpen = externalIsAudioUploaderOpen ?? internalIsAudioUploaderOpen;
-  const setIsAudioUploaderOpen = (open: boolean) => {
-    if (onAudioUploaderOpenChange) {
-      onAudioUploaderOpenChange(open);
-    } else {
-      setInternalIsAudioUploaderOpen(open);
-    }
-  };
+  const setIsAudioUploaderOpen = onAudioUploaderOpenChange;
   const [isListingModalOpen, setIsListingModalOpen] = useState(false);
   const [selectedListing, setSelectedListing] = useState<AdminListingDetailDto | null>(null);
   const [initialAudioData, setInitialAudioData] = useState<AudioData | null>(null);
