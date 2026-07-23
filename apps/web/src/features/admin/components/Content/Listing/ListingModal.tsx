@@ -8,9 +8,17 @@ import { useAdminListingSeriesByScholar } from "@sd/domain-content";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { Modal } from "@/shared/components/Modal";
 import { AudioUploader as AudioUploaderComponent } from "./AudioUploader/AudioUploader";
-import { createLecture, updateLecture, fetchListingFormData } from "@/features/admin/api/admin-lectures.api";
+import {
+  createLecture,
+  updateLecture,
+  fetchListingFormData,
+} from "@/features/admin/api/admin-lectures.api";
 import { sanitizeError } from "@sd/utils-error";
-import { getSecondaryLocales, buildTranslationsPayload, getLocaleLabel } from "@/features/admin/utils/locale-tabs";
+import {
+  getSecondaryLocales,
+  buildTranslationsPayload,
+  getLocaleLabel,
+} from "@/features/admin/utils/locale-tabs";
 import { SUPPORTED_LOCALES } from "@sd/core-contracts";
 import { ListingGeneralSection } from "./ListingGeneralSection";
 import { ListingTranslatableFields } from "./ListingTranslatableFields";
@@ -84,13 +92,15 @@ export function ListingModal({
       fetchErrorRef.current = null;
       try {
         const data = await fetchListingFormData(listingId);
-        if (cancelled) return;
-        dispatch({ type: "INIT_STATE", data });
+        if (!cancelled) {
+          dispatch({ type: "INIT_STATE", data });
+        }
       } catch (err) {
-        if (cancelled) return;
-        fetchErrorRef.current = sanitizeError(err);
+        if (!cancelled) {
+          fetchErrorRef.current = sanitizeError(err);
+        }
       } finally {
-        if (!cancelled) loadingRef.current = false;
+        loadingRef.current = false;
       }
     };
 

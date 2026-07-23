@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Modal } from "@/shared/components/Modal";
 import type { CreateScholarDto } from "@sd/core-contracts";
 import type { Locale } from "@sd/core-contracts";
@@ -15,7 +15,11 @@ import { ReviewSection } from "./review-section";
 import { getPresignedUrl, uploadToR2 } from "@/features/admin/api/admin-lectures.api";
 import { fetchScholarFormData } from "@/features/admin/api/admin.api";
 import { useScholarForm } from "../../hooks/Scholar/useScholarForm";
-import { getSecondaryLocales, buildTranslationsPayload, getLocaleLabel } from "@/features/admin/utils/locale-tabs";
+import {
+  getSecondaryLocales,
+  buildTranslationsPayload,
+  getLocaleLabel,
+} from "@/features/admin/utils/locale-tabs";
 import styles from "./scholar-modal.module.css";
 
 export interface ScholarForEdit {
@@ -45,6 +49,7 @@ export interface ScholarModalProps {
 export function ScholarModal({ isOpen, onClose, onSave, scholar, scholarId }: ScholarModalProps) {
   const { t } = useTranslation();
   const isEditing = !!scholar || !!scholarId;
+  const loadingRef = useRef(false);
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
 
@@ -64,6 +69,7 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar, scholarId }: Sc
   // Fetch form data when opening modal in edit mode with scholarId
   useEffect(() => {
     if (!isOpen) {
+      loadingRef.current = false;
       setLoading(false);
       setFetchError(null);
       return;
@@ -71,29 +77,32 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar, scholarId }: Sc
 
     if (!scholarId) {
       // Create mode - no fetch needed
+      loadingRef.current = false;
       setLoading(false);
       setFetchError(null);
       return;
     }
 
     let cancelled = false;
+    setLoading(true);
+    setFetchError(null);
 
-    const loadFormData = async () => {
-      setLoading(true);
-      setFetchError(null);
-      try {
-        const data = await fetchScholarFormData(scholarId);
+    fetchScholarFormData(scholarId)
+      .then((data) => {
+        loadingRef.current = false;
         if (cancelled) return;
         dispatch({ type: "INIT_FORM", data });
-      } catch (err) {
+      })
+      .catch((err) => {
+        loadingRef.current = false;
         if (cancelled) return;
         setFetchError(sanitizeError(err));
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-
-    loadFormData();
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
 
     return () => {
       cancelled = true;
@@ -272,10 +281,7 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar, scholarId }: Sc
                     value,
                   })
                 }
-                title={t(
-                  "admin.modal.translateContent",
-                  `Translate to ${getLocaleLabel(locale)}`,
-                )}
+                title={t("admin.modal.translateContent", `Translate to ${getLocaleLabel(locale)}`)}
               />
             </Modal.ContentItem>
           ))}
@@ -284,9 +290,15 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar, scholarId }: Sc
             <ReviewSection
               formData={formData}
               changedFields={changedFields}
-              translations={secondaryLocales.reduce<Array<{ locale: Locale; name?: string; bio?: string | null }>>((acc, locale) => {
+              translations={secondaryLocales.reduce<
+                Array<{ locale: Locale; name?: string; bio?: string | null }>
+              >((acc, locale) => {
                 const initial = state.initialTranslationChanges[locale];
-                const trans = { locale, name: translationChanges[locale]?.name, bio: translationChanges[locale]?.bio };
+                const trans = {
+                  locale,
+                  name: translationChanges[locale]?.name,
+                  bio: translationChanges[locale]?.bio,
+                };
                 if (trans.name !== initial?.name || trans.bio !== initial?.bio) {
                   acc.push(trans);
                 }
