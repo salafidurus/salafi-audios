@@ -67,6 +67,13 @@ export function AdminContentsScreen() {
     queryClient.invalidateQueries({ queryKey: queryKeys.topics.list() });
   };
 
+  // Listing modal state
+  const [isListingAudioUploaderOpen, setIsListingAudioUploaderOpen] = useState(false);
+
+  const handleOpenAddListing = () => {
+    setIsListingAudioUploaderOpen(true);
+  };
+
   return (
     <ScreenView contentStyle={{ flex: 1 }}>
       <div className={styles.content}>
@@ -98,7 +105,7 @@ export function AdminContentsScreen() {
                       variant="primary"
                       size={!isMobile ? "md" : "sm"}
                       icon={<Plus size={!isMobile ? 18 : 16} />}
-                      onClick={() => {}}
+                      onClick={handleOpenAddListing}
                     >
                       {!isMobile
                         ? t("admin.contents.addListing", "Add Listing")
@@ -144,7 +151,13 @@ export function AdminContentsScreen() {
                 />
               </>
             )}
-            {activeTab === "listings" && <ListingsContent debouncedSearch={debouncedSearch} />}
+            {activeTab === "listings" && (
+              <ListingsContent
+                debouncedSearch={debouncedSearch}
+                isAudioUploaderOpen={isListingAudioUploaderOpen}
+                onAudioUploaderOpenChange={setIsListingAudioUploaderOpen}
+              />
+            )}
           </StickyHeaderLayout.Content>
         </StickyHeaderLayout>
       </div>

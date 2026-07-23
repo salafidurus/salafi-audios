@@ -194,7 +194,7 @@ export function PermissionsDialog({
     queryClient.setQueriesData<AdminUserListDto>(
       { queryKey: queryKeys.admin.users.all() },
       (oldData) => {
-        if (!oldData) {
+        if (!oldData?.users) {
           return oldData;
         }
         return {

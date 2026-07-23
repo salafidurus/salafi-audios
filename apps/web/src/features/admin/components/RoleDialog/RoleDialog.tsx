@@ -130,7 +130,7 @@ export function RoleDialog({
     queryClient.setQueriesData<AdminUserListDto>(
       { queryKey: queryKeys.admin.users.all() },
       (oldData) => {
-        if (!oldData) {
+        if (!oldData?.users) {
           return oldData;
         }
         return {
