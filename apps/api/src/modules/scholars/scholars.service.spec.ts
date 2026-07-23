@@ -54,6 +54,7 @@ describe('ScholarsService', () => {
             list: vi.fn<any>(),
             findBySlug: vi.fn<any>(),
             getContent: vi.fn<any>(),
+            getFormData: vi.fn<any>(),
             create: vi.fn<any>(),
             update: vi.fn<any>(),
             findById: vi.fn<any>(),
@@ -129,6 +130,12 @@ describe('ScholarsService', () => {
       await expect(service.getContent('unknown')).rejects.toThrow(
         new NotFoundException('Scholar "unknown" not found'),
       );
+    });
+  });
+
+  describe('getFormData', () => {
+    it('should delegate to repo.getFormData', () => {
+      expect(typeof service.getFormData).toBe('function');
     });
   });
 

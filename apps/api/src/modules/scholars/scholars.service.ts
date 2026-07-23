@@ -49,6 +49,10 @@ export class ScholarsService {
     return topics;
   }
 
+  getFormData(scholarId: string) {
+    return this.repo.getFormData(scholarId);
+  }
+
   async create(dto: CreateScholarDto) {
     const scholar = await this.repo.create(dto);
 
