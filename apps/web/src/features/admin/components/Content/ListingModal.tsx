@@ -2,6 +2,7 @@
 
 import React, { useReducer } from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints } from "@sd/core-contracts";
+import { AudioUploader } from "../AudioUploader/AudioUploader";
 import type {
   ScholarListItemDto,
   TopicDetailDto,
@@ -35,6 +36,9 @@ interface ListingModalProps {
     format: string;
     filename: string;
   } | null;
+  isAudioUploaderMode?: boolean;
+  onAudioUploaderClose?: () => void;
+  onAudioUploadComplete?: (audioData: any) => void;
 }
 
 type FormState = {
@@ -296,6 +300,9 @@ export function ListingModal({
   onSuccess,
   listing,
   initialAudioData,
+  isAudioUploaderMode,
+  onAudioUploaderClose,
+  onAudioUploadComplete,
 }: ListingModalProps) {
   const { t } = useTranslation();
   const [state, dispatch] = useReducer(formReducer, undefined, () =>
@@ -415,14 +422,27 @@ export function ListingModal({
   const topics = topicsData ?? [];
   const series = seriesData ?? [];
 
+  if (isAudioUploaderMode) {
+    return (
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        title={t("admin.contents.listing.uploadTitle", "Upload Audio")}
+        width="var(--modal-width-wide)"
+      >
+        <AudioUploader onUploadComplete={onAudioUploadComplete || (() => {})} />
+      </Modal>
+    );
+  }
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       title={
         listing
-          ? t("admin.contents.listing.editTitle", "Edit Lecture Details")
-          : t("admin.contents.listing.newTitle", "New Lecture Details")
+          ? t("admin.contents.listing.editTitle", "Edit Listing Details")
+          : t("admin.contents.listing.newTitle", "Add Listing")
       }
       size="xl"
       width="var(--modal-width-standard)"

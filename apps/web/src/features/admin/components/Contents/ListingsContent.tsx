@@ -5,10 +5,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys, type AdminListingDetailDto } from "@sd/core-contracts";
 import { useInfiniteAdminListings } from "@sd/domain-content";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
-import { Modal } from "@/shared/components/Modal";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { Content } from "../Content";
-import { AudioUploader } from "../AudioUploader/AudioUploader";
 import { fetchAdminLectureDetail } from "../../api/admin-lectures.api";
 
 type AudioData = {
@@ -87,21 +85,18 @@ export function ListingsContent({
         }
       />
 
-      <Modal
-        isOpen={isAudioUploaderOpen}
-        onClose={() => setIsAudioUploaderOpen(false)}
-        title={t("admin.contents.uploadAudio", "Upload Audio")}
-        width="var(--modal-width-wide)"
-      >
-        <AudioUploader onUploadComplete={handleUploadComplete} />
-      </Modal>
-
       <Content.ListingModal
-        isOpen={isListingModalOpen}
-        onClose={() => setIsListingModalOpen(false)}
+        isOpen={isAudioUploaderOpen || isListingModalOpen}
+        onClose={() => {
+          setIsAudioUploaderOpen(false);
+          setIsListingModalOpen(false);
+        }}
         onSuccess={handleListingSaved}
         listing={selectedListing}
         initialAudioData={initialAudioData}
+        isAudioUploaderMode={isAudioUploaderOpen && !initialAudioData}
+        onAudioUploaderClose={() => setIsAudioUploaderOpen(false)}
+        onAudioUploadComplete={handleUploadComplete}
       />
     </>
   );
