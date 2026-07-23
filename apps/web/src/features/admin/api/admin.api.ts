@@ -5,6 +5,9 @@ import type {
   UserRoleAssignmentDto,
   UserRole,
   AdminUserListDto,
+  AdminTopicDetailDto,
+  CreateTopicWithTranslationsDto,
+  UpdateTopicWithTranslationsDto,
 } from "@sd/core-contracts";
 
 // --- Permissions ---
@@ -127,6 +130,31 @@ export function deleteTopic(slug: string) {
   return httpClient<unknown>({
     url: endpoints.admin.topics.delete(slug),
     method: "DELETE",
+  });
+}
+
+// --- Topics — combined with translations ---
+
+export function fetchAdminTopic(slug: string) {
+  return httpClient<AdminTopicDetailDto>({
+    url: endpoints.admin.topics.detail(slug),
+    method: "GET",
+  });
+}
+
+export function createTopicWithTranslations(data: CreateTopicWithTranslationsDto) {
+  return httpClient<AdminTopicDetailDto>({
+    url: endpoints.admin.topics.create,
+    method: "POST",
+    body: data,
+  });
+}
+
+export function updateTopicWithTranslations(slug: string, data: UpdateTopicWithTranslationsDto) {
+  return httpClient<AdminTopicDetailDto>({
+    url: endpoints.admin.topics.update(slug),
+    method: "PUT",
+    body: data,
   });
 }
 

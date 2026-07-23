@@ -22,6 +22,12 @@ export {
   SaveTopicTranslationDtoSchema,
   type UpdateTopicTranslationDto,
   UpdateTopicTranslationDtoSchema,
+  type AdminTopicDetailDto,
+  AdminTopicDetailDtoSchema,
+  type CreateTopicWithTranslationsDto,
+  CreateTopicWithTranslationsDtoSchema,
+  type UpdateTopicWithTranslationsDto,
+  UpdateTopicWithTranslationsDtoSchema,
 } from "../types/topic.types";
 export {
   type AudioAssetViewDto,

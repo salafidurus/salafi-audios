@@ -64,6 +64,7 @@ export const endpoints = {
     },
     topics: {
       create: "/admin/topics",
+      detail: (slug: string) => `/admin/topics/${slug}`,
       update: (slug: string) => `/admin/topics/${slug}`,
       delete: (slug: string) => `/admin/topics/${slug}`,
     },

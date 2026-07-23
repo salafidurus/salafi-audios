@@ -36,18 +36,4 @@ export class TopicsTranslationsController {
   ) {
     return this.service.updateTranslation(id, locale, body);
   }
-
-  @Post(':id/translations/:locale/publish')
-  @RequiresPermission(Permissions.TRANSLATIONS_PUBLISH)
-  @ApiOperation({ summary: 'Publish a topic translation' })
-  publishTranslation(@Param('id') id: string, @Param('locale') locale: string) {
-    return this.service.publishTranslation(id, locale);
-  }
-
-  @Post(':id/translations/:locale/unpublish')
-  @RequiresPermission(Permissions.TRANSLATIONS_PUBLISH)
-  @ApiOperation({ summary: 'Unpublish a topic translation' })
-  unpublishTranslation(@Param('id') id: string, @Param('locale') locale: string) {
-    return this.service.unpublishTranslation(id, locale);
-  }
 }

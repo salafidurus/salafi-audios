@@ -6,7 +6,7 @@ export type TranslationStatus = z.infer<typeof TranslationStatusSchema>;
 
 export const TranslationViewDtoSchema = z.object({
   locale: LocaleSchema,
-  status: TranslationStatusSchema,
+  status: TranslationStatusSchema.optional(),
   fields: z.record(z.string(), z.string().nullable()),
   createdAt: z.string(),
   updatedAt: z.string(),

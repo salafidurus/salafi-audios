@@ -1,5 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import type { TopicDetailDto, TopicLectureViewDto, TranslationViewDto } from '@sd/core-contracts';
+import type {
+  TopicDetailDto,
+  TopicLectureViewDto,
+  TranslationViewDto,
+  AdminTopicDetailDto,
+} from '@sd/core-contracts';
+import type { CreateTopicWithTranslationsDto } from '@sd/core-contracts';
+import type { UpdateTopicWithTranslationsDto } from '@sd/core-contracts';
 import { UpsertTopicDto } from './dto/upsert-topic.dto';
 import { SaveTopicTranslationDto } from './dto/save-topic-translation.dto';
 import { TopicsRepository } from './topics.repo';
@@ -31,17 +38,18 @@ export class TopicsService {
       });
     }
 
-    // Save additional translations if provided in legacy format (or just keep it if needed, but the brief instructs to return refetched topic details)
     if (dto.translations && topic.id) {
-      for (const [locale, fields] of Object.entries(dto.translations)) {
-        if (fields.name) {
-          // react-doctor-disable-next-line react-doctor/async-await-in-loop
-          await this.repo.upsertTopicTranslation(topic.id, {
-            locale: locale as any,
-            name: fields.name,
-          });
-        }
-      }
+      await Promise.all(
+        Object.entries(dto.translations).map(([locale, fields]) => {
+          if (fields.name) {
+            return this.repo.upsertTopicTranslation(topic.id, {
+              locale: locale as any,
+              name: fields.name,
+            });
+          }
+          return Promise.resolve();
+        }),
+      );
     }
 
     return this.getBySlug(topic.slug);
@@ -59,7 +67,58 @@ export class TopicsService {
     await this.repo.deleteBySlug(slug);
   }
 
-  // ─── Topic translations ───────────────────────────────────────────────────
+  // ─── New admin combined methods ─────────────────────────────────────────
+
+  async getAdminDetail(slug: string): Promise<AdminTopicDetailDto> {
+    const found = await this.repo.findBySlug(slug);
+    if (!found) throw new NotFoundException(`Topic "${slug}" not found`);
+    const translations = await this.repo.listTopicTranslations(found.id);
+    return { ...found, translations };
+  }
+
+  async createWithTranslations(dto: CreateTopicWithTranslationsDto): Promise<AdminTopicDetailDto> {
+    return this.upsertWithTranslations(dto.slug, {
+      name: dto.name,
+      translations: dto.translations ?? [],
+    });
+  }
+
+  async updateWithTranslations(
+    slug: string,
+    dto: UpdateTopicWithTranslationsDto,
+  ): Promise<AdminTopicDetailDto> {
+    return this.upsertWithTranslations(slug, {
+      name: dto.name,
+      translations: dto.translations,
+    });
+  }
+
+  private async upsertWithTranslations(
+    slug: string,
+    data: {
+      name: { en: string };
+      translations: Array<{ locale: string; name: string }>;
+    },
+  ): Promise<AdminTopicDetailDto> {
+    const topic = await this.repo.upsertBySlug({ slug, name: data.name.en });
+
+    await Promise.all(
+      data.translations.map((t) => {
+        if (t.name.trim()) {
+          return this.repo.upsertTopicTranslation(topic.id, {
+            locale: t.locale as any,
+            name: t.name,
+          });
+        } else {
+          return this.repo.deleteTopicTranslation(topic.id, t.locale);
+        }
+      }),
+    );
+
+    return this.getAdminDetail(topic.slug);
+  }
+
+  // ─── Topic translations (separate endpoints) ───────────────────────────
 
   listTranslations(topicId: string): Promise<TranslationViewDto[]> {
     return this.repo.listTopicTranslations(topicId);
@@ -75,13 +134,5 @@ export class TopicsService {
     fields: Partial<{ name: string }>,
   ): Promise<TranslationViewDto> {
     return this.repo.updateTopicTranslation(topicId, locale, fields);
-  }
-
-  publishTranslation(topicId: string, locale: string): Promise<TranslationViewDto> {
-    return this.repo.publishTopicTranslation(topicId, locale);
-  }
-
-  unpublishTranslation(topicId: string, locale: string): Promise<TranslationViewDto> {
-    return this.repo.unpublishTopicTranslation(topicId, locale);
   }
 }

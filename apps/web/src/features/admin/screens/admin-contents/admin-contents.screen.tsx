@@ -18,8 +18,6 @@ import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { TopicsContent, ListingsContent } from "@/features/admin/components/Contents";
 import { Content } from "@/features/admin/components/Content";
 import { useDebouncedSearch } from "@/shared/hooks";
-import { createTopic, updateTopic } from "@/features/admin/api/admin.api";
-import type { TopicForEdit } from "@/features/admin/components/Content/TopicModal";
 import styles from "./admin-contents.screen.module.css";
 
 const EMPTY_TOPICS_ARRAY: TopicDetailDto[] = [];
@@ -43,21 +41,15 @@ export function AdminContentsScreen() {
 
   // Topic modal state
   const [isTopicModalOpen, setIsTopicModalOpen] = useState(false);
-  const [editingTopic, setEditingTopic] = useState<TopicForEdit | null>(null);
+  const [editingTopicSlug, setEditingTopicSlug] = useState<string | undefined>(undefined);
 
   const handleOpenAddTopic = () => {
-    setEditingTopic(null);
+    setEditingTopicSlug(undefined);
     setIsTopicModalOpen(true);
   };
 
-  const handleSaveTopic = async (formData: any) => {
-    if (editingTopic) {
-      await updateTopic(editingTopic.slug, formData);
-    } else {
-      await createTopic(formData);
-    }
+  const handleTopicSaved = (_slug: string) => {
     queryClient.invalidateQueries({ queryKey: queryKeys.topics.list() });
-    setIsTopicModalOpen(false);
   };
 
   // Listing modal state
@@ -128,19 +120,15 @@ export function AdminContentsScreen() {
                   debouncedSearch={debouncedSearch}
                   topics={topics}
                   onEditTopic={(topic) => {
-                    setEditingTopic({
-                      id: topic.id,
-                      slug: topic.slug,
-                      name: topic.name,
-                    });
+                    setEditingTopicSlug(topic.slug);
                     setIsTopicModalOpen(true);
                   }}
                 />
                 <Content.TopicModal
                   isOpen={isTopicModalOpen}
                   onClose={() => setIsTopicModalOpen(false)}
-                  onSave={handleSaveTopic}
-                  topic={editingTopic}
+                  onSaved={handleTopicSaved}
+                  topicSlug={editingTopicSlug}
                 />
               </>
             )}

@@ -515,13 +515,12 @@ model ListingTranslation {
 }
 
 model TopicTranslation {
-  id        String            @id @default(cuid())
+  id        String   @id @default(cuid())
   topicId   String
   locale    Locale
-  status    TranslationStatus @default(draft)
   name      String
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   topic Topic @relation(fields: [topicId], references: [id], onDelete: Cascade)
 

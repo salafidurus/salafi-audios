@@ -59,31 +59,3 @@
   color: var(--content-default);
   letter-spacing: 0.5px;
 }
-
-.translationStatus {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  font-size: var(--typo-body-sm-font-size);
-  color: var(--content-subtle);
-}
-
-.statusBadge {
-  display: inline-block;
-  padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-sm);
-  font-size: var(--typo-label-sm-font-size);
-  font-weight: 500;
-  text-transform: capitalize;
-}
-
-.status-draft {
-  background-color: var(--surface-subtle);
-  color: var(--content-default);
-  border: 1px solid var(--border-subtle);
-}
-
-.status-published {
-  background-color: var(--action-success);
-  color: white;
-}

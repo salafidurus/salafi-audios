@@ -1,10 +1,11 @@
-import { Controller, Post, Patch, Delete, Param, Body } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { Permissions } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { RequiresPermission } from '../../shared/decorators/requires-permission.decorator';
 import { TopicsService } from './topics.service';
-import { UpsertTopicDto } from './dto/upsert-topic.dto';
+import { CreateTopicDto } from './dto/create-topic.dto';
+import { UpdateTopicDto } from './dto/update-topic.dto';
 
 @ApiTags('Admin Topics')
 @ApiCommonErrors()
@@ -12,18 +13,25 @@ import { UpsertTopicDto } from './dto/upsert-topic.dto';
 export class AdminTopicsController {
   constructor(private readonly service: TopicsService) {}
 
-  @Post()
-  @RequiresPermission(Permissions.TOPICS_CREATE)
-  @ApiOperation({ summary: 'Create a topic' })
-  create(@Body() dto: UpsertTopicDto) {
-    return this.service.upsert(dto);
+  @Get(':slug')
+  @RequiresPermission(Permissions.TOPICS_EDIT)
+  @ApiOperation({ summary: 'Get topic detail with translations' })
+  getDetail(@Param('slug') slug: string) {
+    return this.service.getAdminDetail(slug);
   }
 
-  @Patch(':slug')
+  @Post()
+  @RequiresPermission(Permissions.TOPICS_CREATE)
+  @ApiOperation({ summary: 'Create a topic with translations' })
+  create(@Body() dto: CreateTopicDto) {
+    return this.service.createWithTranslations(dto);
+  }
+
+  @Put(':slug')
   @RequiresPermission(Permissions.TOPICS_EDIT)
-  @ApiOperation({ summary: 'Update a topic' })
-  update(@Param('slug') slug: string, @Body() dto: UpsertTopicDto) {
-    return this.service.upsert({ ...dto, slug });
+  @ApiOperation({ summary: 'Update a topic with translations' })
+  update(@Param('slug') slug: string, @Body() dto: UpdateTopicDto) {
+    return this.service.updateWithTranslations(slug, dto);
   }
 
   @Delete(':slug')
