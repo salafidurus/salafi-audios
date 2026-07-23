@@ -48,7 +48,6 @@ export const endpoints = {
       list: "/admin/users",
     },
     permissions: {
-      me: "/admin/permissions/me",
       list: (userId: string) => `/admin/users/${userId}/permissions`,
       grant: (userId: string) => `/admin/permissions/${userId}/permissions`,
       revoke: (userId: string, permission: string) =>

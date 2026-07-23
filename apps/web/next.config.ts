@@ -9,7 +9,6 @@ const nextConfig: NextConfig = {
     "@sd/domain-account",
     "@sd/domain-audio",
     "@sd/domain-content",
-    "@sd/domain-permissions",
     "@sd/domain-search",
     "@sd/utils-error",
   ],

@@ -44,35 +44,24 @@ export class AuthGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    // Fetch user's roles from UserRoleAssignment table
-    const userRoles = await this.prisma.userRoleAssignment.findMany({
-      where: { userId: session.user.id },
-      select: { role: true },
-    });
+    const sessionUser = session.user as {
+      id: string;
+      roles?: string[];
+      permissions?: string[];
+      banned?: boolean | null;
+      banExpires?: Date | string | null;
+    };
 
-    let roles: string[] = userRoles.map((r) => r.role);
+    let roles: string[] = sessionUser.roles || [];
 
-    // If user has no roles (edge case: race condition during OAuth), assign default 'listener' role
     if (!roles.length) {
-      try {
-        await this.prisma.userRoleAssignment.create({
-          data: {
-            userId: session.user.id,
-            role: 'listener',
-            grantedAt: new Date(),
-          },
-        });
+      const userRoles = await this.prisma.userRoleAssignment.findMany({
+        where: { userId: sessionUser.id },
+        select: { role: true },
+      });
+      roles = userRoles.map((r) => r.role);
+      if (!roles.length) {
         roles = ['listener'];
-      } catch {
-        // If creation fails (e.g., unique constraint), fetch again
-        const retryRoles = await this.prisma.userRoleAssignment.findMany({
-          where: { userId: session.user.id },
-          select: { role: true },
-        });
-        roles = retryRoles.map((r) => r.role);
-
-        // Still no roles after retry, reject the request
-        if (!roles.length) throw new UnauthorizedException();
       }
     }
 
@@ -85,9 +74,10 @@ export class AuthGuard implements CanActivate {
     }
 
     // Attach user info to request (for use by controllers and other services)
-    request.user = {
+    (request as any).user = {
       ...session.user,
-      roles, // Attach actual roles from database
+      roles,
+      permissions: sessionUser.permissions || [],
     };
     return true;
   }

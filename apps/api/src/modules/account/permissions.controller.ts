@@ -20,18 +20,6 @@ export class PermissionsController {
   constructor(private readonly permissionsService: PermissionsService) {}
 
   /**
-   * Current User Permission Endpoints
-   */
-
-  @Get('me')
-  @ApiOperation({ summary: 'Get current user permissions and roles' })
-  async getMyPermissions(
-    @CurrentUser() user: { id: string },
-  ): Promise<{ permissions: Permission[]; roles: UserRole[] }> {
-    return this.permissionsService.getMyPermissions(user.id);
-  }
-
-  /**
    * Permission Management Endpoints
    */
 

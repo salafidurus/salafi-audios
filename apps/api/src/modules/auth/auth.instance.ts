@@ -1,6 +1,7 @@
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
-import { admin, bearer } from 'better-auth/plugins';
+import { admin, bearer, customSession } from 'better-auth/plugins';
+import { ROLE_DEFAULT_PERMISSIONS } from '@sd/core-contracts';
 import { expo } from '@better-auth/expo';
 import { PrismaClient } from '@sd/core-db';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -48,7 +49,42 @@ function createAuthInstance(config: ConfigService) {
       },
     },
     // Same-domain session cookies for web, bearer for native
-    plugins: [admin(), expo(), bearer()],
+    plugins: [
+      admin(),
+      expo(),
+      bearer(),
+      customSession(async ({ user, session }) => {
+        const prismaInstance = getAuthPrisma(config);
+        const userRoles = await prismaInstance.userRoleAssignment.findMany({
+          where: { userId: user.id },
+          select: { role: true },
+        });
+        let roles = userRoles.map((r) => r.role as string);
+        if (!roles.length) {
+          roles = ['listener'];
+        }
+
+        let permissions: string[] = [];
+        if (roles.includes('superadmin')) {
+          permissions = [...ROLE_DEFAULT_PERMISSIONS.superadmin];
+        } else {
+          const userPerms = await prismaInstance.userPermission.findMany({
+            where: { userId: user.id },
+            select: { permission: true },
+          });
+          permissions = userPerms.map((p) => p.permission as string);
+        }
+
+        return {
+          user: {
+            ...user,
+            roles,
+            permissions,
+          },
+          session,
+        };
+      }),
+    ],
 
     // Session and cookie configuration for same-domain setup
     session: {

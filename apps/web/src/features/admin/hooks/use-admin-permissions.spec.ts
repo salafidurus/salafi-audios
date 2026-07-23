@@ -1,29 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from "bun:test";
 import { useAdminPermissions } from "./use-admin-permissions";
-import { useApiQuery } from "@sd/core-contracts";
-import { useAuth } from "@/core/auth";
+import { useAccountProfile } from "@sd/domain-account";
 
-vi.mock("@sd/core-contracts", () => ({
-  useApiQuery: vi.fn<any>(),
-  queryKeys: {
-    admin: {
-      permissions: {
-        me: () => ["admin", "permissions", "me"],
-      },
-    },
-  },
-  httpClient: vi.fn<any>(),
-  endpoints: {
-    admin: {
-      permissions: {
-        me: "/api/admin/permissions/me",
-      },
-    },
-  },
-}));
-
-vi.mock("@/core/auth", () => ({
-  useAuth: vi.fn<() => { isAuthenticated: boolean }>(() => ({ isAuthenticated: true })),
+vi.mock("@sd/domain-account", () => ({
+  useAccountProfile: vi.fn(),
 }));
 
 describe("useAdminPermissions", () => {
@@ -31,38 +11,23 @@ describe("useAdminPermissions", () => {
     vi.clearAllMocks();
   });
 
-  it("calls useApiQuery with enabled: true when authenticated by default", () => {
-    (useAuth as any).mockReturnValue({ isAuthenticated: true } as any);
-    useAdminPermissions();
-    expect(useApiQuery).toHaveBeenCalledWith(["admin", "permissions", "me"], expect.any(Function), {
-      enabled: true,
+  it("returns permissions when authenticated", () => {
+    (useAccountProfile as any).mockReturnValue({
+      data: { permissions: ["USERS_VIEW"], roles: ["admin"] },
+      isLoading: false,
     });
+
+    const result = useAdminPermissions({ isAuthenticated: true });
+    expect(result.data?.permissions).toEqual(["USERS_VIEW"]);
   });
 
-  it("calls useApiQuery with enabled: false when unauthenticated", () => {
-    (useAuth as any).mockReturnValue({ isAuthenticated: false } as any);
-    useAdminPermissions();
-    expect(useApiQuery).toHaveBeenCalledWith(["admin", "permissions", "me"], expect.any(Function), {
-      enabled: false,
+  it("returns undefined data when unauthenticated", () => {
+    (useAccountProfile as any).mockReturnValue({
+      data: { permissions: ["USERS_VIEW"], roles: ["admin"] },
+      isLoading: false,
     });
-  });
 
-  it("respects caller-provided options while merging enabled flag", () => {
-    (useAuth as any).mockReturnValue({ isAuthenticated: true } as any);
-    const options = { staleTime: 5000 };
-    useAdminPermissions(options as any);
-    expect(useApiQuery).toHaveBeenCalledWith(["admin", "permissions", "me"], expect.any(Function), {
-      enabled: true,
-      staleTime: 5000,
-    });
-  });
-
-  it("retains enabled: false if caller explicitly disables it even when authenticated", () => {
-    (useAuth as any).mockReturnValue({ isAuthenticated: true } as any);
-    const options = { enabled: false };
-    useAdminPermissions(options as any);
-    expect(useApiQuery).toHaveBeenCalledWith(["admin", "permissions", "me"], expect.any(Function), {
-      enabled: false,
-    });
+    const result = useAdminPermissions({ isAuthenticated: false });
+    expect(result.data).toBeUndefined();
   });
 });

@@ -3,7 +3,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { NavItems } from "./nav-items";
 import { useAuth } from "@/core/auth";
-import { useAdminPermissions } from "@sd/domain-permissions";
+import { useAdminPermissions } from "@sd/domain-account";
 import { usePathname, useRouter } from "next/navigation";
 
 vi.mock("@/shared/hooks/use-responsive", () => ({
@@ -19,7 +19,7 @@ vi.mock("@/core/auth", () => ({
   authClient: { signOut: vi.fn(() => Promise.resolve()) },
 }));
 
-vi.mock("@sd/domain-permissions", () => ({
+vi.mock("@sd/domain-account", () => ({
   useAdminPermissions: vi.fn(),
 }));
 

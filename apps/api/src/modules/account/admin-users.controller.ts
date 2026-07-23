@@ -2,7 +2,7 @@ import { Controller, Get, Query, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { RequiresPermission } from '../../shared/decorators/requires-permission.decorator';
-import { PermissionsService } from '../permissions/permissions.service';
+import { PermissionsService } from './permissions.service';
 import { Permissions } from '@sd/core-contracts';
 import type { AdminPermissionsListDto, AdminUserListDto } from '@sd/core-contracts';
 

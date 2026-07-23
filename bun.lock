@@ -185,7 +185,6 @@
         "@sd/domain-account": "workspace:*",
         "@sd/domain-audio": "workspace:*",
         "@sd/domain-content": "workspace:*",
-        "@sd/domain-permissions": "workspace:*",
         "@sd/domain-search": "workspace:*",
         "@sd/utils-error": "workspace:*",
         "@tanstack/react-query": "catalog:",
@@ -312,17 +311,6 @@
         "@sd/core-contracts": "workspace:*",
         "@sd/core-i18n": "workspace:*",
         "@sd/domain-audio": "workspace:*",
-      },
-      "peerDependencies": {
-        "@tanstack/react-query": "catalog:",
-        "react": "^19.0.0",
-      },
-    },
-    "packages/domain-permissions": {
-      "name": "@sd/domain-permissions",
-      "version": "0.0.0",
-      "dependencies": {
-        "@sd/core-contracts": "workspace:*",
       },
       "peerDependencies": {
         "@tanstack/react-query": "catalog:",
@@ -1469,8 +1457,6 @@
     "@sd/domain-audio": ["@sd/domain-audio@workspace:packages/domain-audio"],
 
     "@sd/domain-content": ["@sd/domain-content@workspace:packages/domain-content"],
-
-    "@sd/domain-permissions": ["@sd/domain-permissions@workspace:packages/domain-permissions"],
 
     "@sd/domain-search": ["@sd/domain-search@workspace:packages/domain-search"],
 

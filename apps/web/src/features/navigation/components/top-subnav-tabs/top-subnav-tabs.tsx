@@ -7,7 +7,7 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { getSubnavLabel } from "@sd/core-i18n";
 import { DEFAULT_TABS, SECTION_TABS } from "@/features/navigation/types";
 import { useIsHydrated } from "@/shared/hooks/use-is-hydrated";
-import { useAdminPermissions } from "@sd/domain-permissions";
+import { useAdminPermissions } from "@sd/domain-account";
 import { useAuth } from "@/core/auth/use-auth";
 import {
   buildSectionTabPath,

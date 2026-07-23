@@ -1,12 +1,6 @@
 import { useMemo } from "react";
-import {
-  endpoints,
-  httpClient,
-  queryKeys,
-  useApiQuery,
-  type Permission,
-  type UserRole,
-} from "@sd/core-contracts";
+import type { Permission, UserRole } from "@sd/core-contracts";
+import { useAccountProfile } from "../../account.api";
 
 interface UserPermissionsData {
   permissions: Permission[];
@@ -36,15 +30,20 @@ const checkAllInSet = <T>(
 
 /**
  * Fetch the current user's permissions and roles
- * Returns cached query data with permissions and roles arrays
+ * Returns cached profile data with permissions and roles arrays
  */
 export function useMyPermissions() {
-  return useApiQuery(queryKeys.admin.permissions.me(), () =>
-    httpClient<UserPermissionsData>({
-      url: endpoints.admin.permissions.me,
-      method: "GET",
-    }),
-  );
+  const { data: profile, isLoading, error } = useAccountProfile();
+  return {
+    data: profile
+      ? {
+          permissions: (profile.permissions || []) as Permission[],
+          roles: (profile.roles || []) as UserRole[],
+        }
+      : undefined,
+    isLoading,
+    error,
+  };
 }
 
 /**
