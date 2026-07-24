@@ -53,6 +53,7 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar, scholarId }: Sc
   const loadingRef = useRef(false);
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [errorTabs, setErrorTabs] = useState<string[]>([]);
 
   const { state, dispatch } = useScholarForm(scholar ?? null);
   const [activeTab, setActiveTab] = useState<string>("general");
@@ -66,23 +67,16 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar, scholarId }: Sc
     stagedImagePreview,
   } = state;
   const secondaryLocales = getSecondaryLocales(formData.mainLanguage as Locale);
+  const errorTabSet = new Set(errorTabs);
+
+  const handleClose = () => {
+    setErrorTabs([]);
+    onClose();
+  };
 
   // Fetch form data when opening modal in edit mode with scholarId
   useEffect(() => {
-    if (!isOpen) {
-      loadingRef.current = false;
-      setLoading(false);
-      setFetchError(null);
-      return;
-    }
-
-    if (!scholarId) {
-      // Create mode - no fetch needed
-      loadingRef.current = false;
-      setLoading(false);
-      setFetchError(null);
-      return;
-    }
+    if (!isOpen || !scholarId) return;
 
     let cancelled = false;
     setLoading(true);
@@ -152,13 +146,24 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar, scholarId }: Sc
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.slug.trim()) {
+    const errTabs: string[] = [];
+    if (!formData.slug?.trim() || !formData.mainLanguage) {
+      errTabs.push("general");
+    }
+    if (!formData.name?.trim()) {
+      errTabs.push("main");
+    }
+
+    if (errTabs.length > 0) {
+      setErrorTabs(errTabs);
       dispatch({
         type: "SET_ERROR",
-        error: t("admin.scholars.nameSlugRequired", "Name and slug are required"),
+        error: t("admin.scholars.nameSlugRequired", "Name, slug, and main language are required"),
       });
       return;
     }
+
+    setErrorTabs([]);
     dispatch({ type: "SET_SAVING", saving: true });
     dispatch({ type: "SET_ERROR", error: null });
     try {
@@ -201,7 +206,7 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar, scholarId }: Sc
     <Modal
       key={scholarId ?? "create"}
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       title={
         isEditing
           ? t("admin.scholars.editScholar", "Edit Scholar")
@@ -212,6 +217,7 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar, scholarId }: Sc
       height="long"
       multiTab
       requireReview
+      errorTabs={errorTabs}
       activeTab={activeTab}
       onActiveTabChange={(id) => setActiveTab(id as "general" | "main" | "other" | "review")}
       defaultActiveTab="general"
@@ -225,11 +231,10 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar, scholarId }: Sc
       }
     >
       <form id="scholar-form" onSubmit={handleSubmit} className={styles.form}>
-        {error && <div className={styles.error}>{error}</div>}
         {loading && <div className={styles.loading}>{t("common.loading", "Loading...")}</div>}
         {fetchError && <div className={styles.error}>{fetchError}</div>}
 
-        <Modal.Tabs>
+        <Modal.Tabs errorTabs={errorTabs}>
           <Modal.TabItem id="general">{t("admin.modal.generalTab", "General")}</Modal.TabItem>
           <Modal.TabItem id="main">{getLocaleLabel(formData.mainLanguage as Locale)}</Modal.TabItem>
           {secondaryLocales.map((locale) => (
@@ -242,6 +247,9 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar, scholarId }: Sc
 
         <Modal.Content>
           <Modal.ContentItem id="general">
+            {(errorTabSet.has("general") || activeTab === "general") && error && (
+              <div className={styles.error}>{error}</div>
+            )}
             <GeneralDataSection
               formData={formData}
               dispatch={dispatch}
@@ -253,6 +261,9 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar, scholarId }: Sc
           </Modal.ContentItem>
 
           <Modal.ContentItem id="main">
+            {(errorTabSet.has("main") || activeTab === "main") && error && (
+              <div className={styles.error}>{error}</div>
+            )}
             <TranslationFieldsSection
               locale={formData.mainLanguage as Locale}
               name={formData.name}
@@ -265,6 +276,9 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar, scholarId }: Sc
 
           {secondaryLocales.map((locale) => (
             <Modal.ContentItem key={locale} id={locale}>
+              {(errorTabSet.has(locale) || activeTab === locale) && error && (
+                <div className={styles.error}>{error}</div>
+              )}
               <TranslationFieldsSection
                 locale={locale}
                 name={translationChanges[locale]?.name ?? ""}
@@ -291,6 +305,7 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar, scholarId }: Sc
           ))}
 
           <Modal.ContentItem id="review">
+            {error && <div className={styles.error}>{error}</div>}
             <ReviewSection
               formData={formData}
               changedFields={changedFields}

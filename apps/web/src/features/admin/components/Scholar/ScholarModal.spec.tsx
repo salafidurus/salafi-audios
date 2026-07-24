@@ -201,4 +201,32 @@ describe("ScholarModal", () => {
     expect(bioInput).toBeInTheDocument();
     expect(bioInput?.value).toBe("Test bio");
   });
+
+  it("defaults scholar title to Akh for new scholars", () => {
+    render(<ScholarModal isOpen onClose={vi.fn()} onSave={vi.fn()} />);
+
+    const titleTrigger = screen.getByLabelText(/title/i);
+    expect(titleTrigger).toBeInTheDocument();
+    expect(titleTrigger.textContent).toContain("Akh");
+  });
+
+  it("displays error on review tab and highlights error tab when required fields missing", async () => {
+    render(<ScholarModal isOpen onClose={vi.fn()} onSave={vi.fn()} />);
+
+    // Go directly to review tab without filling name/slug
+    const reviewTab = screen.getByRole("tab", { name: /review/i });
+    fireEvent.click(reviewTab);
+
+    const saveButton = screen.getByRole("button", { name: /add scholar|إضافة|save/i });
+    fireEvent.click(saveButton);
+
+    await waitFor(() => {
+      expect(screen.getByText(/required/i)).toBeInTheDocument();
+      const generalTab = screen.getByRole("tab", { name: /general/i });
+      const mainLanguageTab = screen.getByRole("tab", { name: "العربية" });
+
+      expect(generalTab.className).toContain("tabButtonError");
+      expect(mainLanguageTab.className).toContain("tabButtonError");
+    });
+  });
 });

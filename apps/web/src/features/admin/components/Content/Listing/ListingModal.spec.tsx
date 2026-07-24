@@ -89,6 +89,9 @@ describe("ListingModal", () => {
     const scholarOption = await screen.findByRole("option", { name: /scholar one/i });
     fireEvent.click(scholarOption);
 
+    const topicChip = screen.getByText("Topic One");
+    fireEvent.click(topicChip);
+
     const mainTabButton = screen.getByRole("tab", { name: /العربية/i });
     fireEvent.click(mainTabButton);
 

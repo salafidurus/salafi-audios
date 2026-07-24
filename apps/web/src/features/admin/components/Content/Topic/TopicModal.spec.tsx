@@ -15,4 +15,18 @@ describe("TopicModal", () => {
     expect(screen.getByLabelText(/english name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/arabic name/i)).toBeInTheDocument();
   });
+
+  it("shows error when slug or any language name is missing on submit", async () => {
+    const { fireEvent, waitFor } = await import("@testing-library/react");
+    render(<TopicModal isOpen onClose={() => {}} onSaved={() => {}} />);
+
+    const doneButton = screen.getByRole("button", { name: /done/i });
+    fireEvent.click(doneButton);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/slug and at least one language name are required/i),
+      ).toBeInTheDocument();
+    });
+  });
 });

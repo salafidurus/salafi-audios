@@ -23,6 +23,8 @@ import styles from "./modal.module.css";
 interface ModalTabsContextType {
   activeTab: string;
   onActiveTabChange: (id: string) => void;
+  tabsSlot: HTMLElement | null;
+  errorTabs?: string[];
 }
 
 const ModalTabsContext = createContext<ModalTabsContextType | undefined>(undefined);
@@ -74,6 +76,7 @@ export interface ModalProps {
   onActiveTabChange?: (id: string) => void;
   defaultActiveTab?: string;
   reviewTabId?: string;
+  errorTabs?: string[];
   saveFormId?: string;
   saving?: boolean;
   saveLabel?: ReactNode;
@@ -101,6 +104,7 @@ export function Modal({
   onActiveTabChange,
   defaultActiveTab = "en",
   reviewTabId = "review",
+  errorTabs,
   saveFormId,
   saving = false,
   saveLabel,
@@ -111,6 +115,7 @@ export function Modal({
   const portalRoot = useSyncExternalStore(subscribeModalPortalRoot, getModalPortalRoot, () => null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [uncontrolledActiveTab, setUncontrolledActiveTab] = useState(defaultActiveTab);
+  const [tabsSlot, setTabsSlot] = useState<HTMLElement | null>(null);
 
   const { t } = useTranslation();
 
@@ -184,8 +189,10 @@ export function Modal({
           setUncontrolledActiveTab(id);
         }
       },
+      tabsSlot,
+      errorTabs,
     }),
-    [activeTab, onActiveTabChange],
+    [activeTab, onActiveTabChange, tabsSlot, errorTabs],
   );
 
   if (!portalRoot) return null;
@@ -227,20 +234,27 @@ export function Modal({
                 ...(customHeight ? { height: customHeight } : {}),
               }}
             >
-              {title && (
-                <header className={styles.header}>
-                  <h2 id="modal-title" className={styles.title}>
-                    {title}
-                  </h2>
-                  <button
-                    type="button"
-                    className={styles.closeButton}
-                    onClick={onClose}
-                    aria-label="Close dialog"
-                    disabled={loading}
-                  >
-                    <X size={20} />
-                  </button>
+              {(title || multiTab) && (
+                <header className={`${styles.header} ${multiTab ? styles.headerWithTabs : ""}`}>
+                  <div className={styles.headerTitleRow}>
+                    {title ? (
+                      <h2 id="modal-title" className={styles.title}>
+                        {title}
+                      </h2>
+                    ) : (
+                      <div />
+                    )}
+                    <button
+                      type="button"
+                      className={styles.closeButton}
+                      onClick={onClose}
+                      aria-label="Close dialog"
+                      disabled={loading}
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+                  {multiTab && <div ref={setTabsSlot} className={styles.headerTabsSlot} />}
                 </header>
               )}
               {children && (
@@ -315,6 +329,7 @@ interface ModalTabItemProps {
   id: string;
   children?: ReactNode;
   disabled?: boolean;
+  hasError?: boolean;
 }
 
 function ModalTabItem({ id: _id, children: _children }: ModalTabItemProps) {
@@ -323,10 +338,14 @@ function ModalTabItem({ id: _id, children: _children }: ModalTabItemProps) {
 
 interface ModalTabsProps {
   children?: ReactNode;
+  errorTabs?: string[];
 }
 
-function ModalTabs({ children }: ModalTabsProps) {
-  const { activeTab, onActiveTabChange } = useModalTabs();
+function ModalTabs({ children, errorTabs: propsErrorTabs }: ModalTabsProps) {
+  const { activeTab, onActiveTabChange, tabsSlot, errorTabs: contextErrorTabs } = useModalTabs();
+  const errorTabs = propsErrorTabs ?? contextErrorTabs ?? [];
+
+  const errorTabSet = new Set(errorTabs);
 
   const tabs = Children.toArray(children).reduce<ModalTabItemProps[]>((acc, child) => {
     const props = (child as ReactElement<ModalTabItemProps>)?.props;
@@ -336,23 +355,38 @@ function ModalTabs({ children }: ModalTabsProps) {
     return acc;
   }, []);
 
-  return (
+  const tabList = (
     <div className={styles.tabBar} role="tablist">
-      {tabs.map((tab: ModalTabItemProps) => (
-        <button
-          key={tab.id}
-          role="tab"
-          aria-selected={activeTab === tab.id}
-          type="button"
-          className={`${styles.tabButton} ${activeTab === tab.id ? styles.tabButtonActive : ""}`}
-          onClick={() => onActiveTabChange(tab.id)}
-          disabled={tab.disabled}
-        >
-          {tab.children}
-        </button>
-      ))}
+      {tabs.map((tab: ModalTabItemProps) => {
+        const hasError = tab.hasError || errorTabSet.has(tab.id);
+        return (
+          <button
+            key={tab.id}
+            role="tab"
+            aria-selected={activeTab === tab.id}
+            type="button"
+            className={[
+              styles.tabButton || "tabButton",
+              activeTab === tab.id ? styles.tabButtonActive || "tabButtonActive" : "",
+              hasError ? styles.tabButtonError || "tabButtonError" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            onClick={() => onActiveTabChange(tab.id)}
+            disabled={tab.disabled}
+          >
+            {tab.children}
+          </button>
+        );
+      })}
     </div>
   );
+
+  if (tabsSlot) {
+    return createPortal(tabList, tabsSlot);
+  }
+
+  return tabList;
 }
 
 interface ModalContentItemProps {
