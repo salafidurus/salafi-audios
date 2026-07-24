@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseInterceptors } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { Public, CurrentUser } from '../../core/auth/decorators';
@@ -8,6 +8,7 @@ import type {
   RelatedListingDto,
   ListingContentsDto,
   LastPlayedLessonDto,
+  FeedPageDto,
 } from '@sd/core-contracts';
 import { SkipThrottle } from '@nestjs/throttler';
 import { CacheTTL } from '@nestjs/cache-manager';
@@ -23,6 +24,18 @@ import { CacheControlInterceptor } from '../../shared/interceptors/cache-control
 @CacheTTL(10 * 60 * 1000) // 10 minutes cache
 export class ListingController {
   constructor(private readonly service: ListingService) {}
+
+  @Get('recent')
+  @CacheTTL(5 * 60 * 1000) // 5 minutes cache
+  @ApiOperation({ summary: 'Get recent top-level listings' })
+  @ApiOkResponse({ description: 'Paginated recent listings feed (single, series, collection)' })
+  async getRecentListings(
+    @Query('cursor') cursor?: string,
+    @Query('limit') limitStr?: string,
+  ): Promise<FeedPageDto> {
+    const limit = Math.min(Math.max(Number(limitStr) || 20, 1), 40);
+    return this.service.getRecentListings(cursor, limit);
+  }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get listing detail by ID or slug' })
