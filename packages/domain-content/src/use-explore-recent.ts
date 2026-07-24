@@ -3,12 +3,12 @@ import { httpClient, endpoints, queryKeys, type FeedPageDto } from "@sd/core-con
 
 export function useExploreRecentScreen() {
   return useInfiniteQuery<FeedPageDto>({
-    queryKey: [...queryKeys.explore.all, "recent"],
+    queryKey: [queryKeys.listings.recent],
     queryFn: async ({ pageParam }) => {
       const params: Record<string, string> = {};
       if (pageParam) params.cursor = pageParam as string;
       return httpClient<FeedPageDto>({
-        url: endpoints.explore.recent,
+        url: endpoints.listings.recent,
         method: "GET",
         params,
       });

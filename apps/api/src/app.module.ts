@@ -20,7 +20,6 @@ import { TopicsModule } from './modules/topics/topics.module';
 import { ScholarsModule } from './modules/scholars/scholars.module';
 import { LibraryModule } from './modules/library/library.module';
 import { AudioModule } from './modules/audio/audio.module';
-import { ExploreModule } from './modules/explore/explore.module';
 import { MediaModule } from './modules/media/media.module';
 import { ListingModule } from './modules/listing/listing.module';
 import { LocaleInterceptor } from './shared/interceptors/locale.interceptor';
@@ -48,7 +47,6 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     ScholarsModule,
     LibraryModule,
     AudioModule,
-    ExploreModule,
     MediaModule,
     ListingModule,
   ],

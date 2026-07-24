@@ -16,9 +16,7 @@ export {
   type UseInfiniteAdminListingsOptions,
 } from "./hooks";
 
-export { useExplore } from "./use-explore";
 export { useExploreRecentScreen } from "./use-explore-recent";
-export { useExploreFollowingScreen } from "./use-explore-following";
 export { useLibrarySavedScreen } from "./use-library-saved";
 export { useLibraryCompletedScreen } from "./use-library-completed";
 export { useLibraryProgressScreen } from "./use-library-progress";

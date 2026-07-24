@@ -16,14 +16,17 @@ import type {
   ListingRefDto,
   ListingContentsDto,
   LastPlayedLessonDto,
+  FeedPageDto,
 } from '@sd/core-contracts';
 import { SUPPORTED_LOCALES } from '@sd/core-contracts';
 import { ListingRepository } from './listing.repo';
+import { RecentListingsRepo } from './listing-recent.repo';
 
 @Injectable()
 export class ListingService {
   constructor(
     private readonly repo: ListingRepository,
+    private readonly recentRepo: RecentListingsRepo,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
@@ -35,6 +38,10 @@ export class ListingService {
 
   async getRelated(id: string): Promise<RelatedListingDto[]> {
     return this.repo.findRelated(id);
+  }
+
+  async getRecentListings(cursor?: string, limit?: number): Promise<FeedPageDto> {
+    return this.recentRepo.getRecentListings(cursor, limit);
   }
 
   async getContents(id: string): Promise<ListingContentsDto> {

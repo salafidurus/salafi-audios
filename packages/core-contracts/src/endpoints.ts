@@ -16,11 +16,7 @@ export const endpoints = {
     detail: (id: string) => `/listings/${id}`,
     contents: (id: string) => `/listings/${id}/contents`,
     lastPlayed: (id: string) => `/listings/${id}/last-played`,
-  },
-  explore: {
-    list: "/explore",
-    recent: "/explore/recent",
-    following: "/explore/following",
+    recent: "/listings/recent",
   },
   library: {
     saved: "/me/library/saved",

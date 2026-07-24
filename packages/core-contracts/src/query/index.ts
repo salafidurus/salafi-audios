@@ -51,6 +51,7 @@ export const queryKeys = {
     detail: (id: string, slug?: string) => [...queryKeys.listings.all, "detail", id, slug] as const,
     contents: (id: string) => [...queryKeys.listings.all, "contents", id] as const,
     lastPlayed: (id: string) => [...queryKeys.listings.all, "last-played", id] as const,
+    recent: (cursor?: string) => [...queryKeys.listings.all, "recent", cursor] as const,
   },
   topics: {
     all: ["topics"] as const,
@@ -61,12 +62,6 @@ export const queryKeys = {
     // NEW: pagination support
     infinite: (params: SearchCatalogParams) =>
       [...queryKeys.search.all, "infinite", params] as const,
-  },
-  explore: {
-    all: ["explore"] as const,
-    list: (params?: Record<string, unknown>) => [...queryKeys.explore.all, "list", params] as const,
-    recent: (cursor?: string) => [...queryKeys.explore.all, "recent", cursor] as const,
-    following: (cursor?: string) => [...queryKeys.explore.all, "following", cursor] as const,
   },
   library: {
     all: ["library"] as const,

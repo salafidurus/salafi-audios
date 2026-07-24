@@ -52,24 +52,26 @@ describe('Public API (e2e)', () => {
     });
   });
 
-  describe('Explore', () => {
-    it('GET /explore returns FeedPageDto with items', async () => {
-      const res = await request(app.getHttpServer()).get('/explore').expect(200);
+  describe('Listings - Recent Feed', () => {
+    it('GET /listings/recent returns FeedPageDto with items', async () => {
+      const res = await request(app.getHttpServer()).get('/listings/recent').expect(200);
 
       expect(res.body).toHaveProperty('items');
       expect(Array.isArray(res.body.items)).toBe(true);
+      // Should return mixed format items (single, series, collection)
+      const kinds = res.body.items.map((item: any) => item.kind);
+      expect(kinds.some((k: string) => k === 'single')).toBe(true);
     });
 
-    it('GET /explore?limit=5 returns <= 5 items', async () => {
+    it('GET /listings/recent?limit=5 returns <= 5 items', async () => {
       const res = await request(app.getHttpServer())
-        .get('/explore')
+        .get('/listings/recent')
         .query({ limit: 5 })
         .expect(200);
 
       expect(res.body).toHaveProperty('items');
       expect(Array.isArray(res.body.items)).toBe(true);
-      const contentItems = res.body.items.filter((item: any) => item.kind === 'single');
-      expect(contentItems.length).toBeLessThanOrEqual(5);
+      expect(res.body.items.length).toBeLessThanOrEqual(5);
     });
   });
 
