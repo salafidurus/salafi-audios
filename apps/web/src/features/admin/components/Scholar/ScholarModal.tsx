@@ -205,7 +205,8 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar, scholarId }: Sc
           : t("admin.scholars.addScholar", "Add Scholar")
       }
       size="xl"
-      width="var(--modal-width-wide)"
+      width="wide"
+      height="long"
       multiTab
       requireReview
       activeTab={activeTab}

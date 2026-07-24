@@ -14,7 +14,7 @@ vi.mock("@/features/admin/api/admin.api", () => ({
   grantPermission: vi.fn(),
   revokePermission: vi.fn(),
 }));
-vi.mock("@/shared/components/RevokePermissionConfirmModal", () => ({
+vi.mock("@/features/admin/components/RevokePermissionConfirmModal", () => ({
   RevokePermissionConfirmModal: () => null,
 }));
 

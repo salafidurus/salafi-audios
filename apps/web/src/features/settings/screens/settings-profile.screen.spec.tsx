@@ -48,7 +48,7 @@ vi.mock("@/shared/components/ScreenView/ScreenView", () => ({
   ),
 }));
 
-vi.mock("@/shared/components/SettingsSection/SettingsSection", () => ({
+vi.mock("@/features/settings/components/SettingsSection/SettingsSection", () => ({
   SettingsSection: ({ title, children }: { title: string; children: React.ReactNode }) => (
     <section>
       <h2>{title}</h2>
@@ -57,7 +57,7 @@ vi.mock("@/shared/components/SettingsSection/SettingsSection", () => ({
   ),
 }));
 
-vi.mock("@/shared/components/SettingsRow/SettingsRow", () => ({
+vi.mock("@/features/settings/components/SettingsRow/SettingsRow", () => ({
   SettingsRow: ({ label, children }: { label: string; children?: React.ReactNode }) => (
     <div>
       <span>{label}</span>

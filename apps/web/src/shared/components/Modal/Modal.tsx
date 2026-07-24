@@ -52,6 +52,9 @@ const JUSTIFY_MAP = {
   "space-between": "space-between",
 } as const;
 
+export type ModalWidthVariant = "wide" | "standard" | "narrow" | "auto";
+export type ModalHeightVariant = "long" | "standard" | "short" | "auto";
+
 export interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -59,7 +62,8 @@ export interface ModalProps {
   children?: ReactNode;
   footer?: ReactNode;
   size?: "sm" | "md" | "lg" | "xl";
-  width?: string | number;
+  width?: ModalWidthVariant | string | number;
+  height?: ModalHeightVariant | string | number;
   hideFooter?: boolean;
   footerAlignment?: "left" | "right" | "center" | "space-between";
   footerBorder?: boolean;
@@ -86,6 +90,7 @@ export function Modal({
   footer,
   size = "md",
   width,
+  height,
   hideFooter,
   footerAlignment = "right",
   footerBorder: _footerBorder = false,
@@ -141,7 +146,33 @@ export function Modal({
 
   const justifyContent = JUSTIFY_MAP[footerAlignment as keyof typeof JUSTIFY_MAP] || "flex-end";
 
-  const customWidth = width ? (typeof width === "number" ? `${width}px` : width) : undefined;
+  const widthClass =
+    width === "wide"
+      ? styles["width-wide"]
+      : width === "standard"
+        ? styles["width-standard"]
+        : width === "narrow"
+          ? styles["width-narrow"]
+          : width === "auto"
+            ? styles["width-auto"]
+            : undefined;
+
+  const customWidth =
+    width && !widthClass ? (typeof width === "number" ? `${width}px` : width) : undefined;
+
+  const heightClass =
+    height === "long"
+      ? styles["height-long"]
+      : height === "standard"
+        ? styles["height-standard"]
+        : height === "short"
+          ? styles["height-short"]
+          : height === "auto"
+            ? styles["height-auto"]
+            : undefined;
+
+  const customHeight =
+    height && !heightClass ? (typeof height === "number" ? `${height}px` : height) : undefined;
 
   const tabContextValue = useMemo(
     () => ({
@@ -182,9 +213,19 @@ export function Modal({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               transition={{ type: "spring", damping: 25, stiffness: 350 }}
-              className={`${styles.content} ${customWidth ? undefined : styles[`size-${size}`]}`}
+              className={[
+                styles.content,
+                widthClass,
+                !widthClass && !customWidth ? styles[`size-${size}`] : undefined,
+                heightClass,
+              ]
+                .filter(Boolean)
+                .join(" ")}
               onClick={(e) => e.stopPropagation()}
-              style={customWidth ? { width: customWidth } : undefined}
+              style={{
+                ...(customWidth ? { width: customWidth } : {}),
+                ...(customHeight ? { height: customHeight } : {}),
+              }}
             >
               {title && (
                 <header className={styles.header}>
@@ -288,8 +329,9 @@ function ModalTabs({ children }: ModalTabsProps) {
   const { activeTab, onActiveTabChange } = useModalTabs();
 
   const tabs = Children.toArray(children).reduce<ModalTabItemProps[]>((acc, child) => {
-    if ((child as ReactElement)?.type === ModalTabItem) {
-      acc.push((child as ReactElement<ModalTabItemProps>)?.props);
+    const props = (child as ReactElement<ModalTabItemProps>)?.props;
+    if (props && props.id) {
+      acc.push(props);
     }
     return acc;
   }, []);
@@ -330,8 +372,8 @@ function ModalContent({ children }: ModalContentProps) {
   const { activeTab } = useModalTabs();
 
   const activeContent = Children.toArray(children).find((child) => {
-    const element = child as ReactElement<ModalContentItemProps>;
-    return element?.type === ModalContentItem && element?.props?.id === activeTab;
+    const props = (child as ReactElement<ModalContentItemProps>)?.props;
+    return props?.id === activeTab;
   }) as ReactElement<ModalContentItemProps> | undefined;
 
   return <>{activeContent?.props?.children}</>;
@@ -426,7 +468,14 @@ export function ModalConfirmDialog({
 
   return (
     <div data-testid={modalTestId}>
-      <Modal isOpen={isOpen} onClose={onClose} title={title} loading={loading}>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        title={title}
+        loading={loading}
+        width="auto"
+        height="auto"
+      >
         {children && <ModalBody>{children}</ModalBody>}
         <ModalFooter alignment="right">
           <Button
@@ -498,7 +547,14 @@ export function ModalConfirmText({
 
   return (
     <div data-testid={modalTestId}>
-      <Modal isOpen={isOpen} onClose={handleClose} title={title} loading={loading}>
+      <Modal
+        isOpen={isOpen}
+        onClose={handleClose}
+        title={title}
+        loading={loading}
+        width="narrow"
+        height="auto"
+      >
         <ModalBody>
           <p style={{ marginBottom: "1rem", color: "var(--content-default)" }}>{message}</p>
           <p

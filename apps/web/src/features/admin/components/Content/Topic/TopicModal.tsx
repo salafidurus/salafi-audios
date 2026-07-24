@@ -152,7 +152,8 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
           : t("admin.contents.addTopic", "Add Topic")
       }
       size="md"
-      width="var(--modal-width-standard)"
+      width="narrow"
+      height="auto"
       footer={
         loading ? null : (
           <>

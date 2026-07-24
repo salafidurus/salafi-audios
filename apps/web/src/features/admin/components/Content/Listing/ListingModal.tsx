@@ -266,7 +266,8 @@ export function ListingModal({
           : t("admin.contents.listing.newTitle", "Add Listing")
       }
       size="xl"
-      width="var(--modal-width-wide)"
+      width="wide"
+      height="long"
       multiTab
       requireReview={!showAudioUploadTab || !!initialAudioData}
       activeTab={activeTab}

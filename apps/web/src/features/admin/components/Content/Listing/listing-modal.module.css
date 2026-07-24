@@ -1,6 +1,5 @@
 .form {
   padding: 0;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: var(--space-component-gap-md);

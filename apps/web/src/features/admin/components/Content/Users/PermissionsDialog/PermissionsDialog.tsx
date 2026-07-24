@@ -256,7 +256,8 @@ export function PermissionsDialog({
       onClose={onClose}
       size="xl"
       title={customTitle as any}
-      width="var(--modal-width-wide)"
+      width="standard"
+      height="auto"
       footer={
         <Button variant="primary" onClick={handleDone} disabled={saving}>
           {saving ? t("admin.permissions.saving", "Saving…") : t("admin.permissions.done", "Done")}
