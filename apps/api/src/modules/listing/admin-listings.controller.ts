@@ -17,6 +17,8 @@ import type {
   AdminListingDetailDto,
   BulkActionResultDto,
   ListingRefDto,
+  AdminListingFormatTransitionDto,
+  DemoteListingDto,
 } from '@sd/core-contracts';
 import { Permissions } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
@@ -73,6 +75,13 @@ export class AdminListingsController {
     return this.service.getFormData(id);
   }
 
+  @Get(':id/format-transition')
+  @RequiresPermission(Permissions.LISTINGS_VIEW)
+  @ApiOperation({ summary: 'Get format transition eligibility for a listing' })
+  getFormatTransition(@Param('id') id: string): Promise<AdminListingFormatTransitionDto> {
+    return this.service.getFormatTransitionInfo(id);
+  }
+
   @Post()
   @RequiresPermission(Permissions.LISTINGS_CREATE)
   @ApiOperation({ summary: 'Create a listing after R2 upload' })
@@ -122,5 +131,28 @@ export class AdminListingsController {
   async archiveListing(@Param('id') id: string): Promise<AdminListingActionDto> {
     const res = await this.service.archiveListing(id);
     return { ...res, message: 'Listing archived successfully' };
+  }
+
+  @Post(':id/promote')
+  @RequiresPermission(Permissions.LISTINGS_EDIT)
+  @ApiOperation({ summary: 'Promote a listing to next format level' })
+  @ApiOkResponse({ description: 'Listing promoted successfully' })
+  async promoteListing(
+    @Param('id') id: string,
+    @Req() req: { user?: { id: string } },
+  ): Promise<{ id: string; title: string }> {
+    return this.service.promoteListing(id, req.user?.id);
+  }
+
+  @Post(':id/demote')
+  @RequiresPermission(Permissions.LISTINGS_EDIT)
+  @ApiOperation({ summary: 'Demote a listing to previous format level' })
+  @ApiOkResponse({ description: 'Listing demoted successfully' })
+  async demoteListing(
+    @Param('id') id: string,
+    @Body() dto: DemoteListingDto,
+    @Req() req: { user?: { id: string } },
+  ): Promise<{ id: string }> {
+    return this.service.demoteListing(id, dto.target, req.user?.id);
   }
 }

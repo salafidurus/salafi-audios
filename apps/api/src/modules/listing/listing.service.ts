@@ -73,6 +73,22 @@ export class ListingService {
     return this.repo.getFormData(listingId);
   }
 
+  async getFormatTransitionInfo(id: string) {
+    return this.repo.getFormatTransitionInfo(id);
+  }
+
+  async promoteListing(id: string, updatedBy?: string) {
+    const result = await this.repo.promoteListing(id, updatedBy);
+    await this.invalidateCache(id);
+    return result;
+  }
+
+  async demoteListing(id: string, target: 'series' | 'single', updatedBy?: string) {
+    const result = await this.repo.demoteListing(id, target, updatedBy);
+    await this.invalidateCache(id);
+    return result;
+  }
+
   getSeriesOptions(scholarId: string): Promise<ListingRefDto[]> {
     return this.repo.findSeriesOptionsByScholar(scholarId);
   }

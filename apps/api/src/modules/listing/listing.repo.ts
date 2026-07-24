@@ -835,6 +835,73 @@ export class ListingRepository {
     });
   }
 
+  async getFormatTransitionInfo(id: string) {
+    const results = await Promise.all([
+      this.prisma.listing.findUniqueOrThrow({
+        where: { id },
+        select: { format: true },
+      }),
+      this.prisma.listing.count({
+        where: { parentId: id, deletedAt: null },
+      }),
+    ]);
+    const listing = results[0];
+    const childCount = results[1];
+
+    let onlyChildLessonCount: number | undefined;
+    if (listing.format === 'collection' && childCount === 1) {
+      const child = await this.prisma.listing.findFirstOrThrow({
+        where: { parentId: id, deletedAt: null },
+        select: { id: true },
+      });
+      onlyChildLessonCount = await this.prisma.listing.count({
+        where: { parentId: child.id, deletedAt: null },
+      });
+    }
+
+    const canPromote = listing.format !== 'collection';
+
+    const demoteOptions: Array<{ target: 'series' | 'single'; allowed: boolean; reason?: string }> =
+      [];
+
+    if (listing.format === 'series') {
+      demoteOptions.push({
+        target: 'single',
+        allowed: childCount <= 1,
+        reason: childCount > 1 ? `${childCount} lessons — merge down to 1 first` : undefined,
+      });
+    } else if (listing.format === 'collection') {
+      demoteOptions.push({
+        target: 'series',
+        allowed: childCount <= 1,
+        reason: childCount > 1 ? `${childCount} modules — merge down to 1 first` : undefined,
+      });
+
+      const singleAllowed =
+        childCount === 0 || (childCount === 1 && (onlyChildLessonCount ?? 0) <= 1);
+      demoteOptions.push({
+        target: 'single',
+        allowed: singleAllowed,
+        reason:
+          childCount > 1
+            ? `${childCount} modules — merge down to 1 first`
+            : childCount === 1 && (onlyChildLessonCount ?? 0) > 1
+              ? `Module has ${onlyChildLessonCount} lessons — merge down to 1 first`
+              : undefined,
+      });
+    } else if (listing.format === 'single') {
+      // Single cannot be demoted
+    }
+
+    return {
+      format: listing.format as 'collection' | 'series' | 'single',
+      childCount,
+      ...(onlyChildLessonCount !== undefined && { onlyChildLessonCount }),
+      canPromote,
+      demoteOptions,
+    };
+  }
+
   // ─── Admin Listing Methods ────────────────────────────────────────────────
 
   async listAdmin(params: {

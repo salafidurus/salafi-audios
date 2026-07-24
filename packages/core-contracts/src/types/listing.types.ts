@@ -194,6 +194,26 @@ export const AdminListingDetailDtoSchema = z.object({
 });
 export type AdminListingDetailDto = z.infer<typeof AdminListingDetailDtoSchema>;
 
+export const AdminListingFormatTransitionDtoSchema = z.object({
+  format: ListingFormatSchema,
+  childCount: z.number(),
+  onlyChildLessonCount: z.number().optional(),
+  canPromote: z.boolean(),
+  demoteOptions: z.array(
+    z.object({
+      target: z.enum(["series", "single"]),
+      allowed: z.boolean(),
+      reason: z.string().optional(),
+    }),
+  ),
+});
+export type AdminListingFormatTransitionDto = z.infer<typeof AdminListingFormatTransitionDtoSchema>;
+
+export const DemoteListingDtoSchema = z.object({
+  target: z.enum(["series", "single"]),
+});
+export type DemoteListingDto = z.infer<typeof DemoteListingDtoSchema>;
+
 export const BulkActionDtoSchema = z.object({
   action: z.enum(["publish", "archive"]),
   ids: z.array(z.string()),
