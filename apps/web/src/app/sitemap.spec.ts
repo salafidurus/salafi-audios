@@ -33,11 +33,11 @@ describe("sitemap", () => {
     expect(urls).toContain("https://www.salafidurus.com/support");
   });
 
-  it("does not include auth-required routes like /explore/following", () => {
+  it("does not include auth-required routes like /admin", () => {
     (process.env as any).NODE_ENV = "production";
     process.env.NEXT_PUBLIC_WEB_URL = "https://www.salafidurus.com";
     const urls = sitemap().map((e) => e.url);
-    expect(urls).not.toContain("https://www.salafidurus.com/explore/following");
+    expect(urls).not.toContain("https://www.salafidurus.com/admin");
   });
 
   it("falls back to localhost when NEXT_PUBLIC_WEB_URL is not set", () => {

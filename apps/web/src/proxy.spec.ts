@@ -31,7 +31,7 @@ describe("proxy", () => {
   });
 
   describe("auth-required paths", () => {
-    it.each(["/explore/following", "/admin", "/admin/dashboard"])(
+    it.each(["/admin", "/admin/dashboard", "/admin/scholars"])(
       "redirects unauthenticated request to %s → /sign-in",
       (pathname) => {
         proxy(makeRequest(pathname, undefined));
@@ -41,10 +41,10 @@ describe("proxy", () => {
     );
 
     it("redirects to /sign-in carrying the original path in the `from` query", () => {
-      proxy(makeRequest("/explore/following", undefined));
+      proxy(makeRequest("/admin", undefined));
       const redirectedTo = mockRedirect.mock.calls[0]![0] as URL;
       expect(redirectedTo.pathname).toBe("/sign-in");
-      expect(redirectedTo.searchParams.get("from")).toBe("/explore/following");
+      expect(redirectedTo.searchParams.get("from")).toBe("/admin");
     });
 
     it.each(["/account/profile", "/admin/dashboard"])(
