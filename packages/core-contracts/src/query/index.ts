@@ -54,7 +54,6 @@ export const queryKeys = {
   },
   topics: {
     all: ["topics"] as const,
-    list: () => [...queryKeys.topics.all, "list"] as const,
   },
   search: {
     all: ["search"] as const,
@@ -121,7 +120,6 @@ export const queryKeys = {
     },
     topics: {
       all: () => [...queryKeys.admin.all, "topics"] as const,
-      list: () => [...queryKeys.admin.all, "topics", "list"] as const,
       detail: (slug: string) => [...queryKeys.admin.topics.all(), "detail", slug] as const,
     },
   },
