@@ -34,7 +34,7 @@ export class ScholarsRepository {
       where: { isActive: true },
       take,
       ...(decodedCursor ? { cursor: { id: decodedCursor }, skip: 1 } : {}),
-      orderBy: { name: 'asc' },
+      orderBy: [{ title: 'asc' }, { orderIndex: 'asc' }],
       select: {
         id: true,
         slug: true,

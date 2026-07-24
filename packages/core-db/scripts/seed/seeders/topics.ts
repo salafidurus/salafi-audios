@@ -12,11 +12,13 @@ export async function seedTopics(prisma: PrismaClient): Promise<void> {
       update: {
         slug: topic.slug,
         name: topic.name,
+        orderIndex: topic.orderIndex,
       },
       create: {
         id: topic.id,
         slug: topic.slug,
         name: topic.name,
+        orderIndex: topic.orderIndex,
       },
     });
   }

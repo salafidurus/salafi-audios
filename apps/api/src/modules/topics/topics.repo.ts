@@ -228,7 +228,7 @@ export class TopicsRepository {
   ): Promise<TopicViewRecord[]> {
     return this.prisma.topic.findMany({
       where,
-      orderBy: [{ name: 'asc' }],
+      orderBy: [{ orderIndex: 'asc' }],
       select: topicViewSelect,
       take,
     });
