@@ -2,12 +2,7 @@
 
 import { useEffect, useReducer, useState, type ReactNode, useMemo } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  queryKeys,
-  type AdminUserListDto,
-  type Permission,
-  PERMISSIONS_ARRAY,
-} from "@sd/core-contracts";
+import { queryKeys, type Permission, PERMISSIONS_ARRAY } from "@sd/core-contracts";
 import {
   fetchUserPermissions,
   grantPermission,
@@ -189,48 +184,15 @@ export function PermissionsDialog({
       }
     }
 
-    // Optimistic Update
-    const updatedPerms = Array.from(pendingPermissions);
-    queryClient.setQueriesData<AdminUserListDto>(
-      { queryKey: queryKeys.admin.users.all() },
-      (oldData) => {
-        if (!oldData?.users) {
-          return oldData;
-        }
-        return {
-          ...oldData,
-          users: oldData.users.map((u) =>
-            u.id === userId ? { ...u, permissions: updatedPerms } : u,
-          ),
-        };
-      },
-    );
-
-    // Call callback immediately to close or update parent view
-    // Invalidate query immediately to trigger refetch
-    queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
-
-    onPermissionsChange?.();
-    onClose();
-
-    // Fire API calls in background
     try {
       await Promise.all([
-        ...toGrant.map(async (perm) => {
-          try {
-            await grantPermission(userId, perm);
-          } catch (error) {
-            console.error("Failed to grant permission:", perm, error);
-          }
-        }),
-        ...toRevoke.map(async (perm) => {
-          try {
-            await revokePermission(userId, perm);
-          } catch (error) {
-            console.error("Failed to revoke permission:", perm, error);
-          }
-        }),
+        ...toGrant.map((perm) => grantPermission(userId, perm)),
+        ...toRevoke.map((perm) => revokePermission(userId, perm)),
       ]);
+
+      await queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
+      onPermissionsChange?.();
+      onClose();
     } catch (error) {
       console.error("Failed to complete batch permission updates", error);
     } finally {

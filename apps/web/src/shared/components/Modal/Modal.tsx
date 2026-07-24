@@ -459,12 +459,23 @@ export function ModalConfirmDialog({
   confirmLabel,
   confirmVariant = "default",
   children,
-  loading = false,
+  loading: externalLoading = false,
   testId,
   cancelTestId,
   modalTestId,
 }: ModalConfirmDialogProps) {
   const { t } = useTranslation();
+  const [internalLoading, setInternalLoading] = useState(false);
+  const isLoading = externalLoading || internalLoading;
+
+  const handleConfirm = async () => {
+    setInternalLoading(true);
+    try {
+      await onConfirm();
+    } finally {
+      setInternalLoading(false);
+    }
+  };
 
   return (
     <div data-testid={modalTestId}>
@@ -472,7 +483,7 @@ export function ModalConfirmDialog({
         isOpen={isOpen}
         onClose={onClose}
         title={title}
-        loading={loading}
+        loading={isLoading}
         width="auto"
         height="auto"
       >
@@ -482,7 +493,7 @@ export function ModalConfirmDialog({
             variant="outline"
             size="sm"
             onClick={onClose}
-            disabled={loading}
+            disabled={isLoading}
             data-testid={cancelTestId}
           >
             {t("common.cancel", "Cancel")}
@@ -490,8 +501,8 @@ export function ModalConfirmDialog({
           <Button
             variant={confirmVariant === "danger" ? "danger" : "primary"}
             size="sm"
-            onClick={onConfirm}
-            disabled={loading}
+            onClick={handleConfirm}
+            loading={isLoading}
             data-testid={testId}
           >
             {confirmLabel}

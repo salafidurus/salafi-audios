@@ -55,7 +55,7 @@ export function ListingsContent({
   };
 
   const handleListingSaved = () => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.admin.listings.infinite() });
+    queryClient.invalidateQueries({ queryKey: queryKeys.admin.listings.all() });
     setIsListingModalOpen(false);
     setSelectedListingId(null);
     setInitialAudioData(null);
