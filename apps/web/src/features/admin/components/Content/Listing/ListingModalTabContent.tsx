@@ -8,15 +8,12 @@ import { ListingGeneralSection } from "./ListingGeneralSection";
 import { ListingTranslatableFields } from "./ListingTranslatableFields";
 import { ListingReviewSection } from "./ListingReviewSection";
 import { useTranslation } from "@/core/i18n/use-translation";
-import type {
-  ListingFormState,
-  ListingFormAction,
-} from "@/features/admin/hooks/Content/useListingForm";
+import type { FormState, FormAction } from "@/features/admin/hooks/Content/useListingForm";
 import styles from "./listing-modal.module.css";
 
 interface ListingModalTabContentProps {
-  state: ListingFormState;
-  dispatch: React.Dispatch<ListingFormAction>;
+  state: FormState;
+  dispatch: React.Dispatch<FormAction>;
   activeTab: string;
   errorTabSet: Set<string>;
   scholars: ScholarListItemDto[];
