@@ -1,7 +1,7 @@
 import { Controller, Get, Query, UseInterceptors } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SkipThrottle } from '@nestjs/throttler';
-import { Public } from '../../modules/auth/decorators';
+import { Public } from '../../core/auth/decorators';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import type { SearchCatalogResultsDto as CatalogSearchResultsContractDto } from '@sd/core-contracts';
 import { SearchService } from './search.service';

@@ -1,4 +1,4 @@
-import { PrismaService } from '../../src/shared/db/prisma.service';
+import { PrismaService } from '../../src/core/db/prisma.service';
 import { Permission, UserRole } from '@sd/core-db';
 import { createId } from '@paralleldrive/cuid2';
 

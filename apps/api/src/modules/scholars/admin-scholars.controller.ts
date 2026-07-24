@@ -2,7 +2,7 @@ import { Controller, Get, Post, Patch, Param, Body, Query } from '@nestjs/common
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { Permissions } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
-import { RequiresPermission } from '../../shared/decorators/requires-permission.decorator';
+import { RequiresPermission } from '../../core/auth/decorators';
 import { ScholarsService } from './scholars.service';
 import { CreateScholarDto } from './dto/create-scholar.dto';
 import { UpdateScholarDto } from './dto/update-scholar.dto';

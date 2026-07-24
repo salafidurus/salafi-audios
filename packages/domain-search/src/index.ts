@@ -14,5 +14,4 @@ export { useInfiniteSearch, type UseInfiniteSearchOptions } from "./hooks";
 export { buildSearchResultRows, type SearchResultRow } from "./utils/build-search-result-rows";
 
 // Quick browse
-export { useQuickBrowse } from "./use-quickbrowse";
 export { useContinueListening } from "./use-continue-listening";

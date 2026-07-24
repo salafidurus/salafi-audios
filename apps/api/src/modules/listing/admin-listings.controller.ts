@@ -20,7 +20,7 @@ import type {
 } from '@sd/core-contracts';
 import { Permissions } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
-import { RequiresPermission } from '../../shared/decorators/requires-permission.decorator';
+import { RequiresPermission } from '../../core/auth/decorators';
 import { ListingService } from './listing.service';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { BulkActionDto } from '../../shared/dto/bulk-action.dto';

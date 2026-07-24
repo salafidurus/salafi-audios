@@ -83,15 +83,11 @@ export const queryKeys = {
       all: () => [...queryKeys.library.all, "progress"] as const,
       infinite: () => [...queryKeys.library.all, "progress", "infinite"] as const,
     },
+    recentProgress: () => [...queryKeys.library.all, "recentProgress"] as const,
   },
   account: {
     all: ["account"] as const,
     profile: () => [...queryKeys.account.all, "profile"] as const,
-  },
-  home: {
-    all: ["home"] as const,
-    quickbrowse: (params?: Record<string, unknown>) =>
-      [...queryKeys.home.all, "quickbrowse", params] as const,
   },
   admin: {
     all: ["admin"] as const,
