@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints, type Locale } from "@sd/core-contracts";
 import type { ScholarListItemDto, AdminListingDetailDto } from "@sd/core-contracts";
 import { useTopicsList } from "@sd/domain-search";
-import { useAdminListingSeriesByScholar } from "@sd/domain-content";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { Modal } from "@/shared/components/Modal";
@@ -110,7 +109,6 @@ export function ListingModal({
   );
 
   const { data: topicsData } = useTopicsList();
-  const { data: seriesData } = useAdminListingSeriesByScholar(scholarId);
 
   useEffect(() => {
     if (!listingId || !scholarId || !scholarsData?.scholars) return;
@@ -260,7 +258,6 @@ export function ListingModal({
 
   const scholars = scholarsData?.scholars ?? [];
   const topics = topicsData ?? [];
-  const series = seriesData ?? [];
 
   return (
     <Modal
@@ -306,7 +303,6 @@ export function ListingModal({
           errorTabSet={errorTabSet}
           scholars={scholars}
           topics={topics}
-          series={series}
           handleTopicToggle={handleTopicToggle}
           handleTitleChange={handleTitleChange}
           onAudioUploadComplete={onAudioUploadComplete}
