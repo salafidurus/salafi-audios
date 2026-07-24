@@ -4,10 +4,10 @@ import { buildSectionTabPath } from "./get-current-section";
 describe("buildSectionTabPath", () => {
   it("collapses default explore tab to /explore", () => {
     expect(buildSectionTabPath("explore")).toBe("/explore");
-    expect(buildSectionTabPath("explore", "popular")).toBe("/explore");
+    expect(buildSectionTabPath("explore", "recent")).toBe("/explore");
   });
   it("appends non-default explore tab", () => {
-    expect(buildSectionTabPath("explore", "recent")).toBe("/explore/recent");
+    expect(buildSectionTabPath("explore", "scholar")).toBe("/explore/scholar");
   });
   it("collapses default library tab to /library", () => {
     expect(buildSectionTabPath("library")).toBe("/library");
