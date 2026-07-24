@@ -5,14 +5,14 @@ import { Test } from '@nestjs/testing';
 import { CacheModule } from '@nestjs/cache-manager';
 import request from 'supertest';
 import { createTestApp } from '../../test/create-test-app';
-import { AuthGuard } from '../auth/auth.guard';
+import { AuthGuard } from '../../core/auth/auth.guard';
 import { ScholarsController } from './scholars.controller';
 import { AdminScholarsController } from './admin-scholars.controller';
 import { ScholarsService } from './scholars.service';
-import { PrismaService } from '../../shared/db/prisma.service';
+import { PrismaService } from '../../core/db/prisma.service';
 
 const mockAuth = { api: { getSession: vi.fn<any>() } };
-vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
+vi.mock('../../core/auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockPrisma = {
   userRoleAssignment: {

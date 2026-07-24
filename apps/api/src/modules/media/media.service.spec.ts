@@ -1,7 +1,7 @@
 import { vi, describe, it, expect, beforeEach } from 'bun:test';
 import { Test } from '@nestjs/testing';
 import { MediaService } from './media.service';
-import { ConfigService } from '../../shared/config/config.module';
+import { ConfigService } from '../../core/config/config.service';
 
 vi.mock('@paralleldrive/cuid2', () => ({
   createId: () => 'mock-cuid-12345',

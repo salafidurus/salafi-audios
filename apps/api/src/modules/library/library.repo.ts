@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@sd/core-db';
-import type { Locale, LibraryItemDto } from '@sd/core-contracts';
-import { PrismaService } from '../../shared/db/prisma.service';
-import { resolveContentTranslation } from '../../shared/utils/resolve-content-translation';
+import type { Locale, LibraryItemDto, RecentProgressDto } from '@sd/core-contracts';
+import { PrismaService } from '../../core/db/prisma.service';
+import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 
 const DEFAULT_PAGE_SIZE = 20;
@@ -189,6 +189,68 @@ export class LibraryRepository {
       }),
     );
     await this.prisma.$transaction(operations);
+  }
+
+  async getRecentProgress(userId: string): Promise<RecentProgressDto | null> {
+    const locale = getRequestLocale();
+    const record = await this.prisma.userListingProgress.findFirst({
+      where: {
+        userId,
+        isCompleted: false,
+      },
+      orderBy: { updatedAt: 'desc' },
+      include: {
+        listing: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            language: true,
+            durationSeconds: true,
+            translations: {
+              where: { locale, status: 'published' },
+              select: { title: true },
+              take: 1,
+            },
+            scholar: {
+              select: {
+                name: true,
+                mainLanguage: true,
+                translations: {
+                  where: { locale, status: 'published' },
+                  select: { name: true },
+                  take: 1,
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!record) return null;
+
+    const listingTitle = resolveContentTranslation({
+      base: { title: record.listing.title },
+      originalLanguage: record.listing.language,
+      targetLocale: locale,
+      publishedTranslation: record.listing.translations[0] ?? null,
+    }).fields.title;
+    const scholarName = resolveContentTranslation({
+      base: { name: record.listing.scholar.name },
+      originalLanguage: record.listing.scholar.mainLanguage,
+      targetLocale: locale,
+      publishedTranslation: record.listing.scholar.translations[0] ?? null,
+    }).fields.name;
+
+    return {
+      lectureId: record.listing.id,
+      lectureTitle: listingTitle,
+      lectureSlug: record.listing.slug,
+      scholarName,
+      durationSeconds: record.listing.durationSeconds ?? 0,
+      positionSeconds: record.positionSeconds,
+    };
   }
 
   /** Shared resolution of the translatable listing relation shared by the

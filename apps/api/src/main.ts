@@ -1,5 +1,5 @@
 import './shared/utils/env.bootstrap';
-import { ConfigService } from './shared/config/config.service';
+import { ConfigService } from './core/config/config.service';
 import { AllExceptionsFilter } from './shared/errors/http-exception.filter';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
@@ -8,7 +8,7 @@ import { Transport } from '@nestjs/microservices';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
-import { initAuth, getAuth } from './modules/auth/auth.instance';
+import { initAuth, getAuth } from './core/auth/auth.instance';
 import { fromNodeHeaders } from 'better-auth/node';
 import helmet from '@fastify/helmet';
 import cookie from '@fastify/cookie';

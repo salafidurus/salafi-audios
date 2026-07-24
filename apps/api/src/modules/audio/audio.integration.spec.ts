@@ -5,13 +5,13 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
-import { AuthGuard } from '../auth/auth.guard';
+import { AuthGuard } from '../../core/auth/auth.guard';
 import { AudioController } from './audio.controller';
 import { AudioService } from './audio.service';
-import { PrismaService } from '../../shared/db/prisma.service';
+import { PrismaService } from '../../core/db/prisma.service';
 
 const mockAuth = { api: { getSession: vi.fn<any>() } };
-vi.mock('../auth/auth.instance', () => ({ getAuth: () => mockAuth }));
+vi.mock('../../core/auth/auth.instance', () => ({ getAuth: () => mockAuth }));
 
 const mockPrisma = {
   userRoleAssignment: {

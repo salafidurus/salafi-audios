@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { S3Client } from 'bun';
 import { createId } from '@paralleldrive/cuid2';
 import type { PresignedUrlRequestDto, PresignedUrlResponseDto } from '@sd/core-contracts';
-import { ConfigService } from '../../shared/config/config.module';
+import { ConfigService } from '../../core/config/config.service';
 
 @Injectable()
 export class MediaService {

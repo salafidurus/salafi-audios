@@ -26,6 +26,7 @@ export const endpoints = {
     saved: "/me/library/saved",
     completed: "/me/library/completed",
     progress: "/me/library/progress",
+    recentProgress: "/me/library/recent-progress",
     saveListing: (listingId: string) => `/me/library/save/${listingId}`,
   },
   account: {
@@ -39,9 +40,6 @@ export const endpoints = {
     listings: {
       stream: (id: string) => `/audio/listings/${id}/stream`,
     },
-  },
-  home: {
-    quickbrowse: "/home/quickbrowse",
   },
   admin: {
     users: {

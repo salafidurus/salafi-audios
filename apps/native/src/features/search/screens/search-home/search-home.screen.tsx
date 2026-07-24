@@ -1,8 +1,6 @@
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { QuickBrowse } from "@/features/search/components/QuickBrowse/QuickBrowse";
-import { useQuickBrowse } from "@sd/domain-search";
 
 export type SearchHomeScreenProps = {
   onOpenSearch?: () => void;
@@ -12,15 +10,7 @@ export type SearchHomeScreenProps = {
   onContinueListening?: (lectureSlug: string) => void;
 };
 
-export function SearchHomeScreen({
-  onOpenSearch,
-  onSelectCategory,
-  onSelectScholar,
-  onSelectSuggestion,
-  onContinueListening,
-}: SearchHomeScreenProps) {
-  const { data, isLoading } = useQuickBrowse();
-
+export function SearchHomeScreen({ onOpenSearch }: SearchHomeScreenProps) {
   return (
     <ScreenView>
       <ScrollView
@@ -40,16 +30,6 @@ export function SearchHomeScreen({
             <Text style={styles.searchButtonText}>What do you want to listen to?</Text>
           </Pressable>
         </View>
-        <QuickBrowse
-          isLoading={isLoading}
-          scholars={data?.scholars}
-          suggestions={data?.suggestions}
-          recentProgress={data?.recentProgress}
-          onSelectScholar={onSelectScholar}
-          onSelectSuggestion={onSelectSuggestion}
-          onContinueListening={onContinueListening}
-          onSelectCategory={onSelectCategory}
-        />
       </ScrollView>
     </ScreenView>
   );

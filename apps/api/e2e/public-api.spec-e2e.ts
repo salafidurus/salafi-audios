@@ -7,7 +7,7 @@ import {
   TEST_LISTING_SLUG,
   seedTestData,
 } from './helpers/seed-test-data';
-import { PrismaService } from '../src/shared/db/prisma.service';
+import { PrismaService } from '../src/core/db/prisma.service';
 
 describe('Public API (e2e)', () => {
   let app: NestFastifyApplication;

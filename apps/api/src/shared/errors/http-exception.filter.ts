@@ -1,7 +1,7 @@
 import { Catch, HttpException, HttpStatus } from '@nestjs/common';
 import type { ArgumentsHost, ExceptionFilter } from '@nestjs/common';
 import { Prisma } from '@sd/core-db';
-import { ConfigService } from '../../shared/config/config.service';
+import { ConfigService } from '../../core/config/config.service';
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import { ZodValidationException } from 'nestjs-zod';
 

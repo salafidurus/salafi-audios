@@ -1,4 +1,4 @@
-import { PrismaService } from '../../shared/db/prisma.service';
+import { PrismaService } from '../../core/db/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { Status, Locale as DbLocale, Prisma } from '@sd/core-db';
 import type {
@@ -14,7 +14,7 @@ import type {
 import type { CreateScholarDto } from './dto/create-scholar.dto';
 import type { UpdateScholarDto } from './dto/update-scholar.dto';
 import type { SaveScholarTranslationDto } from './dto/save-scholar-translation.dto';
-import { resolveContentTranslation } from '../../shared/utils/resolve-content-translation';
+import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 import { decodeCursor, buildPaginatedResult } from '../../shared/utils/pagination';
 
