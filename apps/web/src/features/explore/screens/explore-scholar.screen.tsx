@@ -6,6 +6,7 @@ import { routes } from "@sd/core-contracts";
 import { useInfiniteScholarsList } from "@sd/domain-content";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
+import { useDebouncedSearch } from "@/shared/hooks";
 import { Search } from "@/shared/components/Search";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
@@ -26,12 +27,24 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
   const handleNavigateToScholar =
     onNavigateToScholar ?? ((slug) => router.push(routes.scholars.detail(slug)));
 
-  const [searchValue, setSearchValue] = useState("");
+  const {
+    query: searchQuery,
+    setQuery: setSearchQuery,
+    debouncedQuery: debouncedSearch,
+  } = useDebouncedSearch();
 
   const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } =
     useInfiniteScholarsList();
 
-  const scholars = data?.pages.flatMap((p) => p.items) ?? [];
+  const allScholars = data?.pages.flatMap((p) => p.items) ?? [];
+
+  const filteredScholars = debouncedSearch.trim()
+    ? allScholars.filter(
+        (scholar) =>
+          scholar.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+          scholar.slug.toLowerCase().includes(debouncedSearch.toLowerCase()),
+      )
+    : allScholars;
 
   const title = t("explore.scholarsTitle", "Scholars");
 
@@ -43,23 +56,27 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
             <div className={styles.header}>
               <PageHeader title={title} />
               <Search.Bar
-                value={searchValue}
-                onChange={setSearchValue}
+                value={searchQuery}
+                onChange={setSearchQuery}
                 placeholder={t("scholarContent.searchScholars", "Search scholars...")}
               />
             </div>
           </StickyHeaderLayout.Header>
           <StickyHeaderLayout.Content>
             <InfiniteScrollList
-              data={scholars}
-              isLoading={isFetching && scholars.length === 0}
+              data={filteredScholars}
+              isLoading={isFetching && allScholars.length === 0}
               hasMore={hasNextPage ?? false}
               onLoadMore={() => fetchNextPage()}
-              isFetchingNextPage={isFetching && scholars.length > 0}
+              isFetchingNextPage={isFetching && allScholars.length > 0}
               renderItem={(scholar) => (
                 <ScholarListRow scholar={scholar} onPress={handleNavigateToScholar} />
               )}
-              emptyMessage={t("explore.noScholars", "No scholars available.")}
+              emptyMessage={
+                debouncedSearch
+                  ? t("scholarContent.searchNoMatch", "No scholars match your search.")
+                  : t("explore.noScholars", "No scholars available.")
+              }
             />
           </StickyHeaderLayout.Content>
         </StickyHeaderLayout>
@@ -75,23 +92,27 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
           <div className={styles.header}>
             <PageHeader title={title} />
             <Search.Bar
-              value={searchValue}
-              onChange={setSearchValue}
+              value={searchQuery}
+              onChange={setSearchQuery}
               placeholder={t("scholarContent.searchScholars", "Search scholars...")}
             />
           </div>
         </StickyHeaderLayout.Header>
         <StickyHeaderLayout.Content>
           <InfiniteScrollList
-            data={scholars}
-            isLoading={isFetching && scholars.length === 0}
+            data={filteredScholars}
+            isLoading={isFetching && allScholars.length === 0}
             hasMore={hasNextPage ?? false}
             onLoadMore={() => fetchNextPage()}
-            isFetchingNextPage={isFetching && scholars.length > 0}
+            isFetchingNextPage={isFetching && allScholars.length > 0}
             renderItem={(scholar) => (
               <ScholarListRow scholar={scholar} onPress={handleNavigateToScholar} />
             )}
-            emptyMessage={t("explore.noScholars", "No scholars available.")}
+            emptyMessage={
+              debouncedSearch
+                ? t("scholarContent.searchNoMatch", "No scholars match your search.")
+                : t("explore.noScholars", "No scholars available.")
+            }
           />
         </StickyHeaderLayout.Content>
       </StickyHeaderLayout>
