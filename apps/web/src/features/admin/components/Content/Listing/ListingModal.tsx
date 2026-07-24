@@ -30,7 +30,7 @@ import styles from "./listing-modal.module.css";
 interface ListingModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: () => void | Promise<void>;
   listing?: AdminListingDetailDto | null;
   listingId?: string | null;
   initialAudioData?: {
@@ -239,7 +239,7 @@ export function ListingModal({
 
         await createLecture(payload);
       }
-      onSuccess();
+      await onSuccess();
       onClose();
     } catch (err) {
       dispatch({
