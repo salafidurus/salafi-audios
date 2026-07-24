@@ -12,18 +12,18 @@ export type TabConfig = { id: string; label: string; labelKey: string; icon: str
 
 export const SECTION_TABS: Record<Section, TabConfig[]> = {
   explore: [
-    {
-      id: "popular",
-      label: "Popular",
-      labelKey: "navigation.subnav.explore.popular",
-      icon: "flame",
-    },
     { id: "recent", label: "Recent", labelKey: "navigation.subnav.explore.recent", icon: "clock" },
     {
-      id: "following",
-      label: "Following",
-      labelKey: "navigation.subnav.explore.following",
-      icon: "heart",
+      id: "scholar",
+      label: "Scholars",
+      labelKey: "navigation.subnav.explore.scholar",
+      icon: "graduation-cap",
+    },
+    {
+      id: "curation",
+      label: "Curation",
+      labelKey: "navigation.subnav.explore.curation",
+      icon: "sparkles",
     },
   ],
   library: [
@@ -72,7 +72,7 @@ export const SECTION_TABS: Record<Section, TabConfig[]> = {
 };
 
 export const DEFAULT_TABS: Record<Section, string> = {
-  explore: "popular",
+  explore: "recent",
   library: "started",
   settings: "general",
   adminContents: "topics",

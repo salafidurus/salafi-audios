@@ -2,11 +2,11 @@ import {
   Bookmark,
   CheckCircle,
   Clock,
-  Flame,
-  Heart,
+  GraduationCap,
   Play,
   Scale,
   SlidersHorizontal,
+  Sparkles,
   User,
 } from "lucide-react-native";
 import type { ComponentType } from "react";
@@ -19,9 +19,9 @@ export type NativeNavigationIcon = ComponentType<{
 }>;
 
 export type SectionTabIconKey =
-  | "feed-popular"
-  | "feed-recent"
-  | "feed-following"
+  | "explore-recent"
+  | "explore-scholar"
+  | "explore-curation"
   | "library-started"
   | "library-saved"
   | "library-completed"
@@ -30,9 +30,9 @@ export type SectionTabIconKey =
   | "settings-legal";
 
 const SECTION_TAB_ICONS: Record<SectionTabIconKey, NativeNavigationIcon> = {
-  "feed-popular": Flame,
-  "feed-recent": Clock,
-  "feed-following": Heart,
+  "explore-recent": Clock,
+  "explore-scholar": GraduationCap,
+  "explore-curation": Sparkles,
   "library-started": Play,
   "library-saved": Bookmark,
   "library-completed": CheckCircle,

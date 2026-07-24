@@ -103,7 +103,7 @@
       "scholars": "Scholars"
     },
     "subnav": {
-      "explore": { "popular": "Popular", "recent": "Recent", "following": "Following" },
+      "explore": { "recent": "Recent", "scholar": "Scholars", "curation": "Curation" },
       "library": { "started": "Started", "saved": "Saved", "completed": "Completed" },
       "account": { "general": "General", "profile": "Profile" },
       "settings": { "general": "General", "profile": "Profile" },

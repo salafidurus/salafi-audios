@@ -103,7 +103,7 @@
       "scholars": "العلماء"
     },
     "subnav": {
-      "explore": { "popular": "الأكثر شيوعًا", "recent": "الأحدث", "following": "المتابَعون" },
+      "explore": { "recent": "الأحدث", "scholar": "العلماء", "curation": "المنتقى" },
       "library": { "started": "قيد التشغيل", "saved": "المحفوظة", "completed": "المكتملة" },
       "account": { "general": "عام", "profile": "الملف الشخصي" },
       "settings": { "general": "عام", "profile": "الملف الشخصي" },

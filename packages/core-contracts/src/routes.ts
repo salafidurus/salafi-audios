@@ -15,6 +15,8 @@ export const routes = {
   explore: {
     index: "/explore",
     recent: "/explore/recent",
+    scholar: "/explore/scholar",
+    curation: "/explore/curation",
     following: "/explore/following",
   },
 
@@ -83,6 +85,9 @@ export interface RouteDefinition {
 export const routeDefinitions: RouteDefinition[] = [
   { path: routes.explore.following, access: "auth-required" },
   { path: routes.explore.index, access: "public" },
+  { path: routes.explore.recent, access: "public" },
+  { path: routes.explore.scholar, access: "public" },
+  { path: routes.explore.curation, access: "public" },
   { path: routes.settings.profile, access: "auth-optional" },
   { path: routes.settings.legal, access: "public" },
   { path: routes.settings.index, access: "auth-optional" },
