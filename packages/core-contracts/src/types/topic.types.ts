@@ -16,6 +16,7 @@ export const TopicViewDtoSchema = z.object({
   id: z.string(),
   slug: TopicSlugSchema,
   name: TopicNameSchema,
+  orderIndex: z.number().default(99),
   createdAt: z.string(),
 });
 export type TopicViewDto = z.infer<typeof TopicViewDtoSchema>;
@@ -24,6 +25,7 @@ export const TopicDetailDtoSchema = z.object({
   id: z.string(),
   slug: TopicSlugSchema,
   name: TopicNameSchema,
+  orderIndex: z.number().default(99),
   createdAt: z.string(),
 });
 export type TopicDetailDto = z.infer<typeof TopicDetailDtoSchema>;
@@ -59,6 +61,7 @@ export const AdminTopicDetailDtoSchema = z.object({
   id: z.string(),
   slug: z.string(),
   name: TopicNameSchema,
+  orderIndex: z.number().default(99),
   createdAt: z.string(),
   translations: z.array(TranslationViewDtoSchema),
 });
@@ -69,6 +72,7 @@ export const CreateTopicWithTranslationsDtoSchema = z.object({
   name: z.object({
     en: z.string().min(1, "English name is required"),
   }),
+  orderIndex: z.number().optional(),
   translations: z
     .array(
       z.object({
@@ -84,6 +88,7 @@ export const UpdateTopicWithTranslationsDtoSchema = z.object({
   name: z.object({
     en: z.string().min(1, "English name is required"),
   }),
+  orderIndex: z.number().optional(),
   translations: z.array(
     z.object({
       locale: LocaleSchema,
