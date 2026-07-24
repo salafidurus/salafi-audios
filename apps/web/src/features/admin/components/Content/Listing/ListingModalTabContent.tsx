@@ -18,7 +18,9 @@ interface ListingModalTabContentProps {
   errorTabSet: Set<string>;
   scholars: ScholarListItemDto[];
   topics: any[];
-  series: any[];
+  mode: "create" | "edit";
+  listingId?: string;
+  onTransitioned?: () => void;
   handleTopicToggle: (topicId: string) => void;
   handleTitleChange: (val: string) => void;
   onAudioUploadComplete?: (audioData: any) => void;
@@ -33,7 +35,9 @@ export function ListingModalTabContent({
   errorTabSet,
   scholars,
   topics,
-  series,
+  mode,
+  listingId,
+  onTransitioned,
   handleTopicToggle,
   handleTitleChange,
   onAudioUploadComplete,
@@ -54,7 +58,9 @@ export function ListingModalTabContent({
           dispatch={dispatch}
           scholars={scholars}
           topics={topics}
-          series={series}
+          mode={mode}
+          listingId={listingId}
+          onTransitioned={onTransitioned}
           handleTopicToggle={handleTopicToggle}
         />
       </Modal.ContentItem>

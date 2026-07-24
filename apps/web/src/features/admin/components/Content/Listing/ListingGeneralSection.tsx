@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import type { ScholarListItemDto, TopicDetailDto, ListingRefDto, Locale } from "@sd/core-contracts";
+import type { ScholarListItemDto, TopicDetailDto, Locale } from "@sd/core-contracts";
 import { getLocalizedName } from "@sd/core-i18n";
 import { validateLectureStatus } from "@/shared/types/form-types";
 import { InputField } from "@/shared/components/InputField";
@@ -14,6 +14,7 @@ import {
   DropdownItem,
 } from "@/shared/components/Dropdown";
 import type { FormState, FormAction } from "@/features/admin/hooks/Content/useListingForm";
+import { ListingFormatField } from "./ListingFormatField";
 import styles from "./listing-modal.module.css";
 
 interface ListingGeneralSectionProps {
@@ -21,7 +22,9 @@ interface ListingGeneralSectionProps {
   dispatch: React.Dispatch<FormAction>;
   scholars: ScholarListItemDto[];
   topics: TopicDetailDto[];
-  series: ListingRefDto[];
+  mode: "create" | "edit";
+  listingId?: string;
+  onTransitioned?: () => void;
   handleTopicToggle: (topicId: string) => void;
 }
 
@@ -30,11 +33,13 @@ export function ListingGeneralSection({
   dispatch,
   scholars,
   topics,
-  series,
+  mode,
+  listingId,
+  onTransitioned,
   handleTopicToggle,
 }: ListingGeneralSectionProps) {
   const { i18n, t } = useTranslation();
-  const { scholarId, seriesId, status, orderIndex, selectedTopics, language, formError } = state;
+  const { scholarId, format, status, orderIndex, selectedTopics, language, formError } = state;
 
   return (
     <>
@@ -83,29 +88,15 @@ export function ListingGeneralSection({
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="lecture-series" className={styles.label}>
-            {t("admin.contents.listing.seriesLabel", "Series")}
-          </label>
-          <Dropdown
-            value={seriesId}
-            onValueChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "seriesId", value })}
-          >
-            <DropdownTrigger
-              id="lecture-series"
-              placeholder={t(
-                "admin.contents.listing.seriesPlaceholder",
-                "Select Series (Optional)",
-              )}
-              testId="series-dropdown"
-            />
-            <DropdownContent searchable>
-              {series.map((s) => (
-                <DropdownItem key={s.id} value={s.id}>
-                  {s.title}
-                </DropdownItem>
-              ))}
-            </DropdownContent>
-          </Dropdown>
+          <ListingFormatField
+            mode={mode}
+            format={format}
+            listingId={listingId}
+            onCreateFormatChange={(newFormat) =>
+              dispatch({ type: "UPDATE_FIELD", field: "format", value: newFormat })
+            }
+            onTransitioned={onTransitioned}
+          />
         </div>
       </div>
 
