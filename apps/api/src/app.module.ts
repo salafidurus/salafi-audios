@@ -4,25 +4,25 @@ import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { CacheModule } from '@nestjs/cache-manager';
 
 import { HealthModule } from './core/health/health.module';
-import { ConfigModule } from './shared/config/config.module';
-import { DbModule } from './shared/db/db.module';
-import { AppLoggerModule } from './shared/logger/logger.module';
-import { AppThrottlerModule } from './shared/security/throttler.module';
+import { ConfigModule } from './core/config/config.module';
+import { DbModule } from './core/db/db.module';
+import { AppLoggerModule } from './core/logger/logger.module';
+import { AppThrottlerModule } from './core/security/throttler.module';
 
-import { AuthModule } from './modules/auth/auth.module';
-import { AuthGuard } from './modules/auth/auth.guard';
-import { PermissionGuard } from './shared/guards/permission.guard';
-import { AccountModule } from './modules/account/account.module';
+import { AuthModule } from './core/auth/auth.module';
+import { AuthGuard } from './core/auth/auth.guard';
+import { PermissionGuard } from './core/auth/permission.guard';
+import { AccountModule } from './core/account/account.module';
+import { SitemapModule } from './core/sitemap/sitemap.module';
+
 import { SearchModule } from './modules/search/search.module';
 import { TopicsModule } from './modules/topics/topics.module';
 import { ScholarsModule } from './modules/scholars/scholars.module';
 import { LibraryModule } from './modules/library/library.module';
 import { AudioModule } from './modules/audio/audio.module';
-import { HomeModule } from './modules/home/home.module';
 import { ExploreModule } from './modules/explore/explore.module';
 import { MediaModule } from './modules/media/media.module';
 import { ListingModule } from './modules/listing/listing.module';
-import { SitemapModule } from './modules/sitemap/sitemap.module';
 import { LocaleInterceptor } from './shared/interceptors/locale.interceptor';
 import { LocaleMiddleware } from './shared/i18n/locale.middleware';
 
@@ -42,16 +42,15 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     }),
     AuthModule,
     AccountModule,
+    SitemapModule,
     SearchModule,
     TopicsModule,
     ScholarsModule,
     LibraryModule,
     AudioModule,
-    HomeModule,
     ExploreModule,
     MediaModule,
     ListingModule,
-    SitemapModule,
   ],
   providers: [
     ThrottlerGuard,

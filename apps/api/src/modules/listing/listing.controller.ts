@@ -1,7 +1,7 @@
 import { Controller, Get, Param, UseInterceptors } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
-import { Public, CurrentUser } from '../../modules/auth/decorators';
+import { Public, CurrentUser } from '../../core/auth/decorators';
 import { ListingService } from './listing.service';
 import type {
   ListingDetailDto,

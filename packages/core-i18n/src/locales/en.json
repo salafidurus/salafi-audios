@@ -585,8 +585,8 @@
         "warning": "It will no longer be visible to users."
       },
       "listing": {
-        "editTitle": "Edit Listing Details",
-        "newTitle": "New Lecture Details",
+        "editTitle": "Editing Listing Details",
+        "newTitle": "New Listing Details",
         "titleLabel": "Title",
         "slugLabel": "Slug",
         "slugPlaceholder": "Auto-generated if left blank",

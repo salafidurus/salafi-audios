@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Put, Param, Query, Body, UseInterceptors } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
-import { CurrentUser, Public } from '../auth/decorators';
+import { CurrentUser, Public } from '../../core/auth/decorators';
 import type { AudioProgressDto, ProgressSyncDto, StreamResponseDto } from '@sd/core-contracts';
 import { AudioService } from './audio.service';
 import { CacheTTL } from '@nestjs/cache-manager';

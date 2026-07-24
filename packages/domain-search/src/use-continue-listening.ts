@@ -3,16 +3,16 @@ import {
   httpClient,
   queryKeys,
   useApiQuery,
-  type QuickBrowseDto,
+  type RecentProgressDto,
 } from "@sd/core-contracts";
 
 export function useContinueListening() {
-  const query = useApiQuery<QuickBrowseDto>(queryKeys.home.quickbrowse(), () =>
-    httpClient<QuickBrowseDto>({
-      url: endpoints.home.quickbrowse,
+  const query = useApiQuery<RecentProgressDto | null>(queryKeys.library.recentProgress(), () =>
+    httpClient<RecentProgressDto | null>({
+      url: endpoints.library.recentProgress,
       method: "GET",
     }),
   );
 
-  return { ...query, recentProgress: query.data?.recentProgress ?? null };
+  return { ...query, recentProgress: query.data ?? null };
 }

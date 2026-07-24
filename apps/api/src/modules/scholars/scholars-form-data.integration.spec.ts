@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
 import { PrismaClient } from '@sd/core-db';
 import { ScholarsRepository } from './scholars.repo';
-import { PrismaService } from '../../shared/db/prisma.service';
+import { PrismaService } from '../../core/db/prisma.service';
 
 describe('ScholarsRepository.getFormData - Integration', () => {
   let repo: ScholarsRepository;

@@ -7,8 +7,8 @@ import { MockCDNHealthIndicator } from './mock-cdn.health';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { AllExceptionsFilter } from '../../src/shared/errors/http-exception.filter';
-import { ConfigService } from '../../src/shared/config/config.service';
-import { initAuth } from '../../src/modules/auth/auth.instance';
+import { ConfigService } from '../../src/core/config/config.service';
+import { initAuth } from '../../src/core/auth/auth.instance';
 import { ThrottlerGuard } from '@nestjs/throttler';
 
 export async function createE2eApp(options?: { disableThrottler?: boolean }): Promise<{

@@ -1,4 +1,4 @@
-import { PrismaService } from '../../src/shared/db/prisma.service';
+import { PrismaService } from '../../src/core/db/prisma.service';
 
 function uuid(index: number): string {
   return `a0000000-0000-0000-0000-${String(index).padStart(12, '0')}`;
