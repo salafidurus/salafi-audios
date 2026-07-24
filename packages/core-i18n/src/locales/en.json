@@ -248,7 +248,17 @@
     "followingEmpty": "Follow scholars to see their latest lectures here."
   },
   "explore": {
-    "feedTitle": "Feed"
+    "feedTitle": "Feed",
+    "recentTitleMobile": "Recent",
+    "recentTitleWide": "Recent Listings",
+    "scholarsTitle": "Scholars",
+    "errorScholars": "Failed to load scholars.",
+    "loadingScholars": "Loading scholars…",
+    "noScholars": "No scholars available.",
+    "curation": {
+      "title": "Curation",
+      "description": "Coming soon"
+    }
   },
   "notFound": {
     "title": "Oops!",

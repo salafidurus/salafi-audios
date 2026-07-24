@@ -248,7 +248,17 @@
     "followingEmpty": "تابِع العلماء لرؤية أحدث محاضراتهم هنا."
   },
   "explore": {
-    "feedTitle": "الرئيسية"
+    "feedTitle": "الرئيسية",
+    "recentTitleMobile": "الأحدث",
+    "recentTitleWide": "أحدث القوائم",
+    "scholarsTitle": "العلماء",
+    "errorScholars": "فشل تحميل العلماء.",
+    "loadingScholars": "جارٍ تحميل العلماء…",
+    "noScholars": "لا توجد علماء متاحون.",
+    "curation": {
+      "title": "المنتقى",
+      "description": "قريبًا"
+    }
   },
   "notFound": {
     "title": "عذرًا!",
