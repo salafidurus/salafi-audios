@@ -1,4 +1,3 @@
-import { describe, it, expect, beforeAll, afterAll } from 'bun:test';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { createE2eApp } from './helpers/create-e2e-app';
