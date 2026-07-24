@@ -20,7 +20,6 @@ interface ListingModalTabContentProps {
   topics: any[];
   mode: "create" | "edit";
   listingId?: string;
-  onTransitioned?: () => void;
   handleTopicToggle: (topicId: string) => void;
   handleTitleChange: (val: string) => void;
   onAudioUploadComplete?: (audioData: any) => void;
@@ -37,7 +36,6 @@ export function ListingModalTabContent({
   topics,
   mode,
   listingId,
-  onTransitioned,
   handleTopicToggle,
   handleTitleChange,
   onAudioUploadComplete,
@@ -60,7 +58,6 @@ export function ListingModalTabContent({
           topics={topics}
           mode={mode}
           listingId={listingId}
-          onTransitioned={onTransitioned}
           handleTopicToggle={handleTopicToggle}
         />
       </Modal.ContentItem>

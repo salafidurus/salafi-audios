@@ -60,7 +60,6 @@ export function ListingModal({
     "general" | "main" | "other" | "upload" | "arrange" | "review"
   >(showAudioUploadTab && !listingId && !initialAudioData ? "upload" : "general");
   const [errorTabs, setErrorTabs] = useState<string[]>([]);
-  const [createdListingId, setCreatedListingId] = useState<string | null>(null);
   const { state, dispatch } = useListingForm(null, initialAudioData);
   const {
     title,
@@ -83,36 +82,31 @@ export function ListingModal({
     onClose();
   };
 
-  const handleLoadFormData = React.useCallback(
-    async (id: string) => {
-      try {
-        const data = await fetchListingFormData(id);
-        dispatch({ type: "INIT_STATE", data });
-      } catch (err) {
-        fetchErrorRef.current = sanitizeError(err);
-      }
-    },
-    [dispatch],
-  );
-
   // Fetch form data when opening modal in edit mode with listingId
   useEffect(() => {
     if (!isOpen || !listingId) return;
 
     let cancelled = false;
 
-    const load = async () => {
-      if (!cancelled) {
-        await handleLoadFormData(listingId);
+    const loadFormData = async () => {
+      try {
+        const data = await fetchListingFormData(listingId);
+        if (!cancelled) {
+          dispatch({ type: "INIT_STATE", data });
+        }
+      } catch (err) {
+        if (!cancelled) {
+          fetchErrorRef.current = sanitizeError(err);
+        }
       }
     };
 
-    load();
+    loadFormData();
 
     return () => {
       cancelled = true;
     };
-  }, [isOpen, listingId, handleLoadFormData]);
+  }, [isOpen, listingId, dispatch]);
 
   const { data: scholarsData } = useApiQuery<{ scholars: ScholarListItemDto[] }>(
     [...queryKeys.scholars.list.all()],
@@ -258,15 +252,9 @@ export function ListingModal({
           (v) => !!(v?.title || v?.description),
         );
 
-        const response = await createLecture(payload);
-        if (format !== "single" && response?.id) {
-          setCreatedListingId(response.id);
-          await handleLoadFormData(response.id);
-          setActiveTab("arrange");
-        } else {
-          await onSuccess();
-          onClose();
-        }
+        await createLecture(payload);
+        await onSuccess();
+        onClose();
       }
     } catch (err) {
       dispatch({
@@ -327,12 +315,8 @@ export function ListingModal({
           errorTabSet={errorTabSet}
           scholars={scholars}
           topics={topics}
-          mode={createdListingId || listingId ? "edit" : "create"}
-          listingId={createdListingId || listingId || undefined}
-          onTransitioned={() => {
-            const id = createdListingId || listingId;
-            if (id) handleLoadFormData(id);
-          }}
+          mode={listingId ? "edit" : "create"}
+          listingId={listingId || undefined}
           handleTopicToggle={handleTopicToggle}
           handleTitleChange={handleTitleChange}
           onAudioUploadComplete={onAudioUploadComplete}

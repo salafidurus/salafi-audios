@@ -24,7 +24,6 @@ interface ListingGeneralSectionProps {
   topics: TopicDetailDto[];
   mode: "create" | "edit";
   listingId?: string;
-  onTransitioned?: () => void;
   handleTopicToggle: (topicId: string) => void;
 }
 
@@ -35,7 +34,6 @@ export function ListingGeneralSection({
   topics,
   mode,
   listingId,
-  onTransitioned,
   handleTopicToggle,
 }: ListingGeneralSectionProps) {
   const { i18n, t } = useTranslation();
@@ -92,10 +90,9 @@ export function ListingGeneralSection({
             mode={mode}
             format={format}
             listingId={listingId}
-            onCreateFormatChange={(newFormat) =>
+            onFormatChange={(newFormat) =>
               dispatch({ type: "UPDATE_FIELD", field: "format", value: newFormat })
             }
-            onTransitioned={onTransitioned}
           />
         </div>
       </div>
