@@ -7,6 +7,7 @@ import { AudioUploader as AudioUploaderComponent } from "./AudioUploader/AudioUp
 import { ListingGeneralSection } from "./ListingGeneralSection";
 import { ListingTranslatableFields } from "./ListingTranslatableFields";
 import { ListingReviewSection } from "./ListingReviewSection";
+import { AudioAssetsPanel } from "./AudioAssetsPanel/AudioAssetsPanel";
 import { useTranslation } from "@/core/i18n/use-translation";
 import type { FormState, FormAction } from "@/features/admin/hooks/Content/useListingForm";
 import styles from "./listing-modal.module.css";
@@ -96,7 +97,24 @@ export function ListingModalTabContent({
         {(errorTabSet.has("upload") || activeTab === "upload") && formError && (
           <div className={styles.errorBanner}>{formError}</div>
         )}
-        <AudioUploaderComponent onUploadComplete={onAudioUploadComplete || (() => {})} />
+        {mode === "edit" && state.format === "single" && listingId ? (
+          <>
+            <div style={{ marginBottom: "1.5rem" }}>
+              <h3 style={{ margin: "0 0 0.75rem 0", fontSize: "1rem" }}>
+                {t("admin.contents.listing.audioAssets", "Audio Assets")}
+              </h3>
+              <AudioAssetsPanel listingId={listingId} />
+            </div>
+            <div style={{ borderTop: "1px solid var(--border-secondary)", paddingTop: "1.5rem" }}>
+              <h3 style={{ margin: "0 0 0.75rem 0", fontSize: "1rem" }}>
+                {t("admin.contents.listing.addAudio", "Add Audio")}
+              </h3>
+              <AudioUploaderComponent onUploadComplete={onAudioUploadComplete || (() => {})} />
+            </div>
+          </>
+        ) : (
+          <AudioUploaderComponent onUploadComplete={onAudioUploadComplete || (() => {})} />
+        )}
       </Modal.ContentItem>
 
       <Modal.ContentItem id="arrange">
