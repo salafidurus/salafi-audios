@@ -2,7 +2,7 @@ import { Controller, Get, Post, Put, Delete, Param, Body, Inject } from '@nestjs
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
-import { Permissions } from '@sd/core-contracts';
+import { Permissions, SUPPORTED_LOCALES } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { RequiresPermission } from '../../core/auth/decorators';
 import { TopicsService } from './topics.service';
@@ -27,9 +27,10 @@ export class AdminTopicsController {
 
   private async invalidateTopicsCache() {
     // LocaleCacheInterceptor uses format: ${url}:${locale}[:${userId}]
-    // Invalidate cache for all locales in parallel
-    const locales = ['en', 'ar'];
-    await Promise.all(locales.map((locale) => this.cacheManager.del(`/topics:${locale}`)));
+    // Invalidate cache for all supported locales in parallel
+    await Promise.all(
+      SUPPORTED_LOCALES.map((locale) => this.cacheManager.del(`/topics:${locale}`)),
+    );
   }
 
   @Post()
