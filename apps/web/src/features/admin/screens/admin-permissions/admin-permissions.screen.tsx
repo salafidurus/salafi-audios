@@ -12,7 +12,7 @@ import { useResponsive } from "@/shared/hooks/use-responsive";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
-import { RevokePermissionConfirmModal } from "@/shared/components/RevokePermissionConfirmModal";
+import { RevokePermissionConfirmModal } from "@/features/admin/components/RevokePermissionConfirmModal";
 import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
 import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./admin-permissions.screen.module.css";

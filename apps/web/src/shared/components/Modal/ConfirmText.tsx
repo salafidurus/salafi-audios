@@ -55,7 +55,8 @@ export function ConfirmText({
       isOpen={isOpen}
       onClose={handleClose}
       title={title}
-      size="sm"
+      width="narrow"
+      height="auto"
       footer={
         <>
           <Button variant="outline" data-testid="confirm-modal-cancel" onClick={handleClose}>

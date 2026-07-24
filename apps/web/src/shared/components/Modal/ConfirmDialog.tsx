@@ -54,7 +54,8 @@ export function ConfirmDialog({
       isOpen={isOpen}
       onClose={onClose}
       title={title}
-      size="sm"
+      width="auto"
+      height="auto"
       loading={isLoading}
       footer={
         <>

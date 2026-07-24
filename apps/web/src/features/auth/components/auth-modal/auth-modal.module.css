@@ -25,7 +25,10 @@
 
 .card {
   position: relative;
-  width: min(24rem, 100%);
+  width: var(--modal-width-standard);
+  height: var(--modal-height-standard);
+  max-height: calc(100vh - 3rem);
+  overflow-y: auto;
   padding: var(--space-layout-page-y) var(--space-layout-page-x);
   border: 1px solid var(--accent-mixed-border, var(--chrome-border-strong));
   border-radius: var(--radius-component-panel);

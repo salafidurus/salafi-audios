@@ -39,7 +39,8 @@ export function RevokePermissionConfirmModal({
       isOpen={isOpen}
       onClose={onClose}
       title={t("admin.permissions.revokeTitle", "Revoke Permission?")}
-      size="sm"
+      width="narrow"
+      height="auto"
       loading={isRevoking}
       footer={
         <>
