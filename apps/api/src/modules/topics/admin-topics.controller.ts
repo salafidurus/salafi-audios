@@ -26,7 +26,10 @@ export class AdminTopicsController {
   }
 
   private async invalidateTopicsCache() {
-    await this.cacheManager.del('GET /topics');
+    // LocaleCacheInterceptor uses format: ${url}:${locale}[:${userId}]
+    // Invalidate cache for all locales in parallel
+    const locales = ['en', 'ar'];
+    await Promise.all(locales.map((locale) => this.cacheManager.del(`/topics:${locale}`)));
   }
 
   @Post()
