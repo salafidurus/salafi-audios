@@ -1,5 +1,10 @@
 import { useReducer } from "react";
-import type { AdminListingDetailDto, ListingFormDataDto, Locale } from "@sd/core-contracts";
+import type {
+  AdminListingDetailDto,
+  ListingFormDataDto,
+  Locale,
+  ListingFormat,
+} from "@sd/core-contracts";
 import { validateLectureStatus, type LectureStatus } from "@/shared/types/form-types";
 
 export type FormState = {
@@ -7,7 +12,8 @@ export type FormState = {
   slug: string;
   description: string;
   scholarId: string;
-  seriesId: string;
+  format: ListingFormat;
+  parentRef?: { id: string; title: string; format: ListingFormat };
   status: LectureStatus;
   orderIndex: number;
   selectedTopics: string[];
@@ -54,7 +60,8 @@ function formReducer(state: FormState, action: FormAction): FormState {
           slug: listing.slug,
           description: listing.description || "",
           scholarId: listing.scholarId,
-          seriesId: listing.parentId || "",
+          format: listing.format as ListingFormat,
+          ...(listing.parentRef && { parentRef: listing.parentRef }),
           status: validateLectureStatus(listing.status),
           orderIndex: listing.orderIndex || 0,
           selectedTopics: listing.topics || [],
@@ -101,7 +108,8 @@ export function getInitialFormData(
       slug: listing.slug,
       description: listing.description || "",
       scholarId: listing.scholarId,
-      seriesId: listing.parentId || "",
+      format: listing.format as ListingFormat,
+      ...(listing.parentRef && { parentRef: listing.parentRef }),
       status: validateLectureStatus(listing.status),
       orderIndex: listing.orderIndex || 0,
       selectedTopics: listing.topics || [],
@@ -117,7 +125,7 @@ export function getInitialFormData(
     slug: "",
     description: "",
     scholarId: "",
-    seriesId: "",
+    format: "single" as const,
     status: "draft",
     orderIndex: 0,
     selectedTopics: [],

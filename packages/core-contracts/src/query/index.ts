@@ -110,8 +110,8 @@ export const queryKeys = {
       // NEW: pagination support
       infinite: (search?: string) =>
         [...queryKeys.admin.all, "listings", "infinite", search ?? ""] as const,
-      series: (scholarId?: string) =>
-        [...queryKeys.admin.all, "listings", "series", scholarId ?? ""] as const,
+      formatTransition: (id: string) =>
+        [...queryKeys.admin.all, "listings", "format-transition", id] as const,
     },
     topics: {
       all: () => [...queryKeys.admin.all, "topics"] as const,

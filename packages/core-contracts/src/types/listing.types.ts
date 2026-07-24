@@ -186,6 +186,9 @@ export const AdminListingDetailDtoSchema = z.object({
   scholarId: z.string(),
   scholarName: z.string(),
   parentId: z.string().optional(),
+  parentRef: z
+    .object({ id: z.string(), title: z.string(), format: ListingFormatSchema })
+    .optional(),
   topics: z.array(z.string()),
   audioKey: z.string().optional(),
   audioUrl: z.string().optional(),
@@ -263,6 +266,9 @@ export const ListingFormDataDtoSchema = z.object({
     scholarId: z.string(),
     scholarName: z.string(),
     parentId: z.string().optional(),
+    parentRef: z
+      .object({ id: z.string(), title: z.string(), format: ListingFormatSchema })
+      .optional(),
     topics: z.array(z.string()),
     audioUrl: z.string().optional(),
     createdAt: z.string(),

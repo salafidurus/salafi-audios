@@ -976,6 +976,7 @@ export class ListingRepository {
         scholarId: true,
         parentId: true,
         scholar: { select: { name: true } },
+        parent: { select: { id: true, title: true, format: true } },
         topics: { select: { topic: { select: { id: true } } } },
         audioAssets: {
           where: { isPrimary: true },
@@ -999,6 +1000,7 @@ export class ListingRepository {
       scholarId: listing.scholarId,
       scholarName: listing.scholar.name,
       parentId: listing.parentId ?? undefined,
+      ...(listing.parent && { parentRef: listing.parent }),
       topics: listing.topics.map((t) => t.topic.id),
       audioUrl: listing.audioAssets[0]?.url,
       createdAt: listing.createdAt.toISOString(),
@@ -1033,6 +1035,7 @@ export class ListingRepository {
         scholarId: true,
         parentId: true,
         scholar: { select: { name: true } },
+        parent: { select: { id: true, title: true, format: true } },
         topics: { select: { topic: { select: { id: true } } } },
         audioAssets: {
           where: { isPrimary: true },
@@ -1068,6 +1071,7 @@ export class ListingRepository {
         scholarId: listing.scholarId,
         scholarName: listing.scholar.name,
         parentId: listing.parentId ?? undefined,
+        ...(listing.parent && { parentRef: listing.parent }),
         topics: listing.topics.map((t) => t.topic.id),
         audioUrl: listing.audioAssets[0]?.url,
         createdAt: listing.createdAt.toISOString(),

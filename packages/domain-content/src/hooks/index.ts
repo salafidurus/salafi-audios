@@ -16,6 +16,4 @@ export type { UseInfiniteAdminScholarsOptions } from "./use-infinite-admin-schol
 export { useInfiniteAdminListings } from "./use-infinite-admin-listings";
 export type { UseInfiniteAdminListingsOptions } from "./use-infinite-admin-listings";
 
-export { useAdminListingSeriesByScholar } from "./use-admin-listing-series-by-scholar";
-
 export { useAdminTopicsList } from "./use-admin-topics-list";
