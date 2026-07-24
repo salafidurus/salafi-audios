@@ -3,7 +3,6 @@ export {
   ScholarDetailScreen,
   type ScholarDetailScreenProps,
 } from "./screens/scholar-detail/scholar-detail.screen";
-export { ScholarListScreen } from "./screens/scholar-list.screen";
 
 // Listing Screens
 export {
