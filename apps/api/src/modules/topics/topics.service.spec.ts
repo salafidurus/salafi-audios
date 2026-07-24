@@ -15,6 +15,7 @@ describe('TopicsService', () => {
     id: 't1',
     slug: 'aqeedah',
     name: { en: 'Aqeedah' },
+    orderIndex: 0,
     createdAt: new Date().toISOString(),
   };
 

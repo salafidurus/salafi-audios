@@ -1,6 +1,5 @@
 // Screens
 export { LectureDetailScreen } from "./screens/lecture-detail/lecture-detail.screen";
-export { ScholarListScreen } from "./screens/scholar-list/scholar-list.screen";
 export { ScholarDetailScreen } from "./screens/scholar-detail/scholar-detail.screen";
 
 // Components

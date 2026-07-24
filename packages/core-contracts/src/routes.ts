@@ -17,7 +17,6 @@ export const routes = {
     recent: "/explore/recent",
     scholar: "/explore/scholar",
     curation: "/explore/curation",
-    following: "/explore/following",
   },
 
   library: {
@@ -83,7 +82,6 @@ export interface RouteDefinition {
  * preserve their prior semantics. Routes not listed fall back to "public".
  */
 export const routeDefinitions: RouteDefinition[] = [
-  { path: routes.explore.following, access: "auth-required" },
   { path: routes.explore.index, access: "public" },
   { path: routes.explore.recent, access: "public" },
   { path: routes.explore.scholar, access: "public" },

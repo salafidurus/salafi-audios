@@ -2,7 +2,7 @@ import type { ErrorBoundaryProps, Href } from "expo-router";
 import { useRouter } from "expo-router";
 import { View, Text, Pressable } from "react-native";
 import { routes } from "@sd/core-contracts";
-import { FeedScreen } from "@/features/explore/screens/explore.screen";
+import { FeedRecentScreen } from "@/features/explore/screens/explore-recent.screen";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 export function ErrorBoundary({ error: _error, retry }: ErrorBoundaryProps) {
@@ -21,7 +21,7 @@ export default function ExploreIndexRoute() {
   const { navigateToListing } = useListingNavigation();
 
   return (
-    <FeedScreen
+    <FeedRecentScreen
       onNavigateToListing={navigateToListing}
       onNavigateToScholar={(slug) => router.push(routes.scholars.detail(slug) as Href)}
     />
