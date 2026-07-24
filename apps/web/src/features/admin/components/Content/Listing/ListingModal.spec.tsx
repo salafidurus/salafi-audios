@@ -77,7 +77,7 @@ describe("ListingModal", () => {
       />,
     );
 
-    expect(screen.getByText(/new lecture details/i)).toBeInTheDocument();
+    expect(screen.getByText(/new listing details/i)).toBeInTheDocument();
 
     const scholarTrigger = screen.getByTestId("scholar-dropdown");
     fireEvent.click(scholarTrigger);
@@ -87,7 +87,7 @@ describe("ListingModal", () => {
     const mainTabButton = screen.getByRole("tab", { name: /العربية/i });
     fireEvent.click(mainTabButton);
 
-    const titleInput = await screen.findByLabelText(/title/i);
+    const titleInput = await screen.findByLabelText("Title");
     fireEvent.change(titleInput, { target: { value: "My Great Lecture" } });
 
     const reviewButton = screen.getByRole("button", { name: /review/i });
@@ -147,7 +147,7 @@ describe("ListingModal", () => {
       />,
     );
 
-    expect(screen.getByText(/edit listing details/i)).toBeInTheDocument();
+    expect(screen.getByText(/editing listing details.*existing title/i)).toBeInTheDocument();
 
     await waitFor(() => {
       expect(screen.getByTestId("scholar-dropdown")).toHaveTextContent("Scholar Two");
@@ -157,7 +157,7 @@ describe("ListingModal", () => {
     const mainTabButton = screen.getByRole("tab", { name: /العربية/i });
     fireEvent.click(mainTabButton);
 
-    const titleInput = await screen.findByLabelText(/title/i);
+    const titleInput = await screen.findByLabelText("Title");
     const descriptionInput = await screen.findByLabelText(/description/i);
     expect(titleInput).toHaveValue("Existing Title");
     expect(descriptionInput).toHaveValue("Existing Description");
@@ -199,14 +199,7 @@ describe("ListingModal", () => {
     const onSuccess = vi.fn();
 
     expect(() => {
-      render(
-        <ListingModal
-          isOpen
-          listingId="listing-1"
-          onClose={onClose}
-          onSuccess={onSuccess}
-        />,
-      );
+      render(<ListingModal isOpen listingId="listing-1" onClose={onClose} onSuccess={onSuccess} />);
     }).not.toThrow();
   });
 });
