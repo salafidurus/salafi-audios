@@ -68,7 +68,6 @@ export function ListingFormatField({
           <DropdownTrigger
             id="format-dropdown"
             placeholder={t("admin.contents.listing.formatPlaceholder", "Select Format")}
-            disabled={mode === "edit"}
           />
           <DropdownContent>
             {eligibleFormats.includes("single") && (
