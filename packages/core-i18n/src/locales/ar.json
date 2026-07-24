@@ -549,6 +549,8 @@
       "deleteWarning": "لا يمكن التراجع عن هذا الإجراء.",
       "title": "إدارة المحتوى",
       "titleMobile": "المحتوى",
+      "topicManagement": "إدارة المواضيع",
+      "listingManagement": "إدارة المحتوى",
       "addTopic": "إضافة موضوع",
       "addTopicMobile": "موضوع",
       "addListing": "إضافة محتوى",

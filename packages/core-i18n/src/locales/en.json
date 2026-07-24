@@ -551,6 +551,8 @@
       "deleteWarning": "This action cannot be undone.",
       "title": "Content Management",
       "titleMobile": "Content",
+      "topicManagement": "Topic Management",
+      "listingManagement": "Listing Management",
       "addTopic": "Add Topic",
       "addTopicMobile": "Topic",
       "addListing": "Add Listing",
