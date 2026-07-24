@@ -7,6 +7,7 @@ export {
   useInfiniteAdminScholars,
   useInfiniteAdminListings,
   useAdminListingSeriesByScholar,
+  useAdminTopicsList,
   type UseInfiniteScholarsListOptions,
   type UseInfiniteLibrarySavedOptions,
   type UseInfiniteLibraryCompletedOptions,

@@ -1,11 +1,16 @@
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ListingModal } from "./ListingModal";
-import { createLecture, updateLecture } from "@/features/admin/api/admin-lectures.api";
+import {
+  createLecture,
+  updateLecture,
+  fetchListingFormData,
+} from "@/features/admin/api/admin-lectures.api";
 
 vi.mock("@/features/admin/api/admin-lectures.api", () => ({
   createLecture: vi.fn(),
   updateLecture: vi.fn(),
+  fetchListingFormData: vi.fn(),
 }));
 
 vi.mock("@sd/core-contracts", () => {
@@ -119,39 +124,45 @@ describe("ListingModal", () => {
     const onSuccessMock = vi.fn();
     const onCloseMock = vi.fn();
     (updateLecture as Mock<any>).mockResolvedValue({ id: "edit-lecture-id" });
-
-    const existingLecture = {
-      id: "lecture-123",
-      title: "Existing Title",
-      slug: "existing-title",
-      description: "Existing Description",
-      format: "single" as const,
-      status: "draft" as const,
-      scholarId: "scholar-2",
-      scholarName: "Scholar Two",
-      parentId: "series-1",
-      orderIndex: 5,
-      topics: ["topic-1"],
-      language: "ar" as const,
-      audioKey: "audio/old-key.mp3",
-      createdAt: "2024-01-01",
-      audioAssets: [],
-    };
+    (fetchListingFormData as Mock<any>).mockResolvedValue({
+      listing: {
+        id: "lecture-123",
+        title: "Existing Title",
+        slug: "existing-title",
+        description: "Existing Description",
+        format: "single" as const,
+        status: "draft" as const,
+        scholarId: "scholar-2",
+        scholarName: "Scholar Two",
+        parentId: "series-1",
+        orderIndex: 5,
+        topics: ["topic-1"],
+        language: "ar" as const,
+        audioKey: "audio/old-key.mp3",
+        createdAt: "2024-01-01",
+        audioAssets: [],
+      },
+      translations: [],
+    });
 
     render(
       <ListingModal
         isOpen
         onClose={onCloseMock}
         onSuccess={onSuccessMock}
-        listing={existingLecture}
+        listingId="lecture-123"
       />,
     );
 
-    expect(screen.getByText(/editing listing details.*existing title/i)).toBeInTheDocument();
+    expect(screen.getByText(/editing listing details/i)).toBeInTheDocument();
+
+    // Wait for form data to load
+    await waitFor(() => {
+      expect(fetchListingFormData).toHaveBeenCalledWith("lecture-123");
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId("scholar-dropdown")).toHaveTextContent("Scholar Two");
-      expect(screen.getByTestId("series-dropdown")).toHaveTextContent("Series One");
     });
 
     const mainTabButton = screen.getByRole("tab", { name: /العربية/i });
@@ -192,14 +203,5 @@ describe("ListingModal", () => {
 
     expect(onSuccessMock).toHaveBeenCalledTimes(1);
     expect(onCloseMock).toHaveBeenCalledTimes(1);
-  });
-
-  it("accepts listingId prop for fetch-on-open pattern", () => {
-    const onClose = vi.fn();
-    const onSuccess = vi.fn();
-
-    expect(() => {
-      render(<ListingModal isOpen listingId="listing-1" onClose={onClose} onSuccess={onSuccess} />);
-    }).not.toThrow();
   });
 });

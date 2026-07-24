@@ -199,7 +199,7 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar, scholarId }: Sc
 
   return (
     <Modal
-      key={scholar?.id ?? "create"}
+      key={scholarId ?? "create"}
       isOpen={isOpen}
       onClose={onClose}
       title={

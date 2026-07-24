@@ -48,6 +48,7 @@ export class TopicsService {
   async createWithTranslations(dto: CreateTopicWithTranslationsDto): Promise<AdminTopicDetailDto> {
     return this.upsertWithTranslations(dto.slug, {
       name: dto.name,
+      orderIndex: dto.orderIndex,
       translations: dto.translations ?? [],
     });
   }
@@ -58,6 +59,7 @@ export class TopicsService {
   ): Promise<AdminTopicDetailDto> {
     return this.upsertWithTranslations(slug, {
       name: dto.name,
+      orderIndex: dto.orderIndex,
       translations: dto.translations,
     });
   }
@@ -66,10 +68,15 @@ export class TopicsService {
     slug: string,
     data: {
       name: { en: string };
+      orderIndex?: number;
       translations: Array<{ locale: string; name: string }>;
     },
   ): Promise<AdminTopicDetailDto> {
-    const topic = await this.repo.upsertBySlug({ slug, name: data.name.en });
+    const topic = await this.repo.upsertBySlug({
+      slug,
+      name: data.name.en,
+      orderIndex: data.orderIndex,
+    });
 
     await Promise.all(
       data.translations.map((t) => {

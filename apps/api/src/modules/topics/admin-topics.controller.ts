@@ -18,6 +18,13 @@ export class AdminTopicsController {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
+  @Get()
+  @RequiresPermission(Permissions.TOPICS_VIEW)
+  @ApiOperation({ summary: 'List all topics' })
+  list() {
+    return this.service.list();
+  }
+
   @Get(':slug')
   @RequiresPermission(Permissions.TOPICS_EDIT)
   @ApiOperation({ summary: 'Get topic detail with translations' })
@@ -25,7 +32,7 @@ export class AdminTopicsController {
     return this.service.getAdminDetail(slug);
   }
 
-  private async invalidateTopicsCache() {
+  private async invalidateTopicsCache(slug?: string) {
     // LocaleCacheInterceptor uses format: ${url}:${locale}[:${userId}]
     // Must invalidate both list cache AND detail caches for all locales
     const cacheKeysToInvalidate: string[] = [];
@@ -35,26 +42,22 @@ export class AdminTopicsController {
       cacheKeysToInvalidate.push(`/topics:${locale}`);
     }
 
-    // Also invalidate detail caches (attempted slugs from recent operations)
-    // This catches the current topic being edited
-    if (this.lastModifiedTopicSlug) {
+    // Also invalidate detail caches when a specific slug is provided
+    if (slug) {
       for (const locale of SUPPORTED_LOCALES) {
-        cacheKeysToInvalidate.push(`/topics/${this.lastModifiedTopicSlug}:${locale}`);
+        cacheKeysToInvalidate.push(`/topics/${slug}:${locale}`);
       }
     }
 
     await Promise.all(cacheKeysToInvalidate.map((key) => this.cacheManager.del(key)));
   }
 
-  private lastModifiedTopicSlug?: string;
-
   @Post()
   @RequiresPermission(Permissions.TOPICS_CREATE)
   @ApiOperation({ summary: 'Create a topic with translations' })
   async create(@Body() dto: CreateTopicDto) {
     const result = await this.service.createWithTranslations(dto);
-    this.lastModifiedTopicSlug = result.slug;
-    await this.invalidateTopicsCache();
+    await this.invalidateTopicsCache(result.slug);
     return result;
   }
 
@@ -63,8 +66,7 @@ export class AdminTopicsController {
   @ApiOperation({ summary: 'Update a topic with translations' })
   async update(@Param('slug') slug: string, @Body() dto: UpdateTopicDto) {
     const result = await this.service.updateWithTranslations(slug, dto);
-    this.lastModifiedTopicSlug = slug;
-    await this.invalidateTopicsCache();
+    await this.invalidateTopicsCache(slug);
     return result;
   }
 
@@ -73,8 +75,7 @@ export class AdminTopicsController {
   @ApiOperation({ summary: 'Delete a topic' })
   async remove(@Param('slug') slug: string) {
     const result = await this.service.remove(slug);
-    this.lastModifiedTopicSlug = slug;
-    await this.invalidateTopicsCache();
+    await this.invalidateTopicsCache(slug);
     return result;
   }
 }

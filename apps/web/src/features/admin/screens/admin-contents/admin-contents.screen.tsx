@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { queryKeys, type TopicDetailDto } from "@sd/core-contracts";
-import { useTopicsList } from "@sd/domain-search";
+import { useAdminTopicsList } from "@sd/domain-content";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
@@ -36,7 +36,7 @@ export function AdminContentsScreen() {
 
   const activeTab = pathname.includes("/listings") ? "listings" : "topics";
 
-  const { data: topicsData } = useTopicsList();
+  const { data: topicsData } = useAdminTopicsList();
 
   const topics = topicsData ?? EMPTY_TOPICS_ARRAY;
 
