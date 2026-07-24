@@ -6,6 +6,7 @@ import type { ScholarListItemDto, AdminListingDetailDto } from "@sd/core-contrac
 import { useTopicsList } from "@sd/domain-search";
 import { useAdminListingSeriesByScholar } from "@sd/domain-content";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { Modal } from "@/shared/components/Modal";
 import { AudioUploader as AudioUploaderComponent } from "./AudioUploader/AudioUploader";
 import {
@@ -54,6 +55,7 @@ export function ListingModal({
   onAudioUploadComplete,
 }: ListingModalProps) {
   const { t } = useTranslation();
+  const isDesktop = useIsDesktop();
   const loadingRef = useRef(false);
   const fetchErrorRef = useRef<string | null>(null);
   const [activeTab, setActiveTab] = useState<
@@ -262,8 +264,8 @@ export function ListingModal({
       onClose={onClose}
       title={
         listing
-          ? t("admin.contents.listing.editTitle", "Edit Listing Details")
-          : t("admin.contents.listing.newTitle", "Add Listing")
+          ? `${t("admin.contents.listing.editTitle", "Editing Listing Details")}${isDesktop ? ` (${listing.title})` : ""}`
+          : t("admin.contents.listing.newTitle", "New Listing Details")
       }
       size="xl"
       width="wide"

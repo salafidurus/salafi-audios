@@ -8,7 +8,15 @@
   --modal-height-short: 35%;
 }
 
-@media (min-width: 641px) {
+@media (min-width: 641px) and (max-width: 900px) {
+  :root {
+    --modal-width-wide: 80%;
+    --modal-width-standard: 80%;
+    --modal-width-narrow: 80%;
+  }
+}
+
+@media (min-width: 901px) {
   :root {
     --modal-width-wide: 70%;
     --modal-width-standard: 50%;
