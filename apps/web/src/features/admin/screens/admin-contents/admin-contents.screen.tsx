@@ -50,7 +50,7 @@ export function AdminContentsScreen() {
   };
 
   const handleTopicSaved = async (_slug: string) => {
-    await queryClient.invalidateQueries({ queryKey: queryKeys.topics.all });
+    await queryClient.refetchQueries({ queryKey: queryKeys.topics.all });
   };
 
   // Listing modal state

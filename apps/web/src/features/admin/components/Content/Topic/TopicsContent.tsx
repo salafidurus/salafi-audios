@@ -59,7 +59,7 @@ export function TopicsContent({
     if (!deletingTopicSlugRef.current) return;
     try {
       await deleteTopic(deletingTopicSlugRef.current);
-      await queryClient.invalidateQueries({ queryKey: queryKeys.topics.all });
+      await queryClient.refetchQueries({ queryKey: queryKeys.topics.all });
       setDeleteModalOpen(false);
       deletingTopicSlugRef.current = null;
       setDeletingTopicName("");
