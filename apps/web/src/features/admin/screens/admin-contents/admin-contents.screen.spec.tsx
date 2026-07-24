@@ -70,9 +70,9 @@ describe("AdminContentsScreen — topics tab permission gates", () => {
 
     renderWithProviders(<AdminContentsScreen />);
 
-    // Find the call where the query key is queryKeys.topics.list()
+    // Find the call where the query key is queryKeys.topics.all
     const call = (useApiQuery as Mock<any>).mock.calls.find(
-      (c) => JSON.stringify(c[0]) === JSON.stringify(queryKeys.topics.list()),
+      (c) => JSON.stringify(c[0]) === JSON.stringify(queryKeys.topics.all),
     );
 
     expect(call).toBeDefined();
