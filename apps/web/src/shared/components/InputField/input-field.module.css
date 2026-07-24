@@ -1,0 +1,70 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-sm);
+  width: 100%;
+  padding: var(--space-scale-xs) var(--space-scale-md);
+  border: var(--border-width-default) solid var(--border-default);
+  border-radius: var(--radius-component-chip);
+  background-color: var(--surface-default);
+  transition: border-color 150ms ease-out;
+}
+
+.wrapper:has(.textarea) {
+  border-radius: var(--radius-scale-md);
+}
+
+.wrapper:focus-within {
+  border-color: var(--action-primary);
+}
+
+.wrapper:has(.input:disabled),
+.wrapper:has(.textarea:disabled) {
+  background-color: var(--surface-disabled);
+  border-color: var(--border-disabled);
+}
+
+.input,
+.textarea {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background-color: transparent;
+  font-family: inherit;
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-default);
+  outline: none;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--content-muted);
+}
+
+.input:disabled,
+.textarea:disabled {
+  color: var(--content-subtle);
+  cursor: not-allowed;
+}
+
+.textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.wrapper:has(.textarea) {
+  align-items: flex-start;
+}
+
+.prefix {
+  flex-shrink: 0;
+  padding-inline-end: var(--space-scale-sm);
+  margin-inline-end: var(--space-scale-sm);
+  border-inline-end: var(--border-width-default) solid var(--border-subtle);
+  color: var(--content-subtle);
+  font-family: monospace;
+  font-size: var(--typo-body-sm-font-size);
+  white-space: nowrap;
+}

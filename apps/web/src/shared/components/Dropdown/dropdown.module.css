@@ -8,36 +8,32 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-sm);
+  gap: var(--space-scale-sm);
   width: 100%;
-  padding: var(--space-sm) var(--space-md);
-  font-size: var(--typo-body-md-font-size);
-  font-family: var(--typo-body-md-font-family);
+  padding: var(--space-scale-xs) var(--space-scale-md);
+  font-size: var(--typo-body-sm-font-size);
+  font-family: inherit;
   background-color: var(--surface-default);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
+  border: var(--border-width-default) solid var(--border-default);
+  border-radius: var(--radius-component-chip);
   color: var(--content-default);
   cursor: pointer;
-  transition:
-    border-color 150ms ease,
-    box-shadow 150ms ease;
+  transition: border-color 150ms ease-out;
   text-align: left;
   line-height: 1.5;
   user-select: none;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-height: 40px;
 }
 
 .trigger:hover {
-  border-color: var(--border-hover);
+  border-color: var(--border-default);
 }
 
 .trigger:focus-visible {
   outline: none;
-  border-color: var(--border-focus);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--border-focus) 20%, transparent);
+  border-color: var(--action-primary);
 }
 
 .trigger:disabled {
@@ -135,8 +131,8 @@
 .searchWrapper {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
-  padding: 0 var(--space-md);
+  gap: var(--space-scale-xs);
+  padding: 0 var(--space-scale-xs);
   border-bottom: 1px solid var(--border-subtle);
   flex-shrink: 0;
 }

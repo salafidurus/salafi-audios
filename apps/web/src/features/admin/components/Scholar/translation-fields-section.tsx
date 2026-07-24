@@ -1,6 +1,6 @@
 "use client";
 
-import { EditableInput } from "@/shared/components/EditableInput";
+import { InputField } from "@/shared/components/InputField";
 import { FormSection } from "@/features/admin/components/FormSection";
 import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./translation-fields-section.module.css";
@@ -37,8 +37,9 @@ export function TranslationFieldsSection({
             {t("admin.scholars.nameLabel", "Name")}
             {isRequired ? " *" : ""}
           </label>
-          <EditableInput
+          <InputField
             id={`scholar-name-${locale}`}
+            type="text"
             value={name}
             onChange={onNameChange}
             placeholder={t("admin.scholars.namePlaceholder", "Scholar name")}
@@ -49,12 +50,12 @@ export function TranslationFieldsSection({
           <label className={styles.label} htmlFor={`scholar-bio-${locale}`}>
             {t("admin.scholars.bioLabel", "Bio")}
           </label>
-          <textarea
+          <InputField
             id={`scholar-bio-${locale}`}
+            type="textarea"
             value={bio ?? ""}
-            onChange={(e) => onBioChange(e.target.value)}
+            onChange={onBioChange}
             placeholder={t("admin.scholars.bioPlaceholder", "Scholar biography")}
-            className={styles.textarea}
           />
         </div>
       </div>

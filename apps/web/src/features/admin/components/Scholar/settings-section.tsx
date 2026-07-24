@@ -3,6 +3,7 @@
 import type { CreateScholarDto } from "@sd/core-contracts";
 import { FormSection } from "@/features/admin/components/FormSection";
 import { Toggle } from "@/shared/components/Toggle";
+import { InputField } from "@/shared/components/InputField";
 import { useTranslation } from "@/core/i18n/use-translation";
 import type { FormAction } from "../../hooks/Scholar/useScholarForm";
 import styles from "./scholar-modal.module.css";
@@ -30,17 +31,15 @@ export function SettingsSection({ formData, dispatch }: SettingsSectionProps) {
         </label>
       </div>
 
-      <div className={styles.formGroup}>
+      <div className={styles.field}>
         <label htmlFor="scholar-order" className={styles.label}>
           {t("admin.scholars.orderIndexLabel", "Order Index")}
         </label>
-        <input
+        <InputField
           id="scholar-order"
           type="number"
-          className={styles.input}
-          value={formData.orderIndex ?? ""}
-          onChange={(e) => {
-            const value = e.target.value;
+          value={String(formData.orderIndex ?? "")}
+          onChange={(value) => {
             const parsed = value ? Number(value) : undefined;
             dispatch({
               type: "UPDATE_FIELD",

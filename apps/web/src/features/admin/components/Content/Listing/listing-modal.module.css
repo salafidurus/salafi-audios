@@ -34,32 +34,6 @@
   color: var(--content-default);
 }
 
-.input,
-.textarea {
-  width: 100%;
-  padding: var(--space-scale-sm) var(--space-scale-md);
-  border: 1px solid var(--input-border-rest);
-  border-radius: var(--radius-scale-md);
-  background-color: var(--input-surface-rest);
-  color: var(--content-default);
-  font-family: var(--typo-body-md-font-family);
-  font-size: var(--typo-body-md-font-size);
-  transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
-}
-
-.input:focus,
-.textarea:focus {
-  outline: none;
-  border-color: var(--input-border-focus);
-  box-shadow: var(--shadow-focus);
-}
-
-.textarea {
-  resize: vertical;
-}
-
 .topicsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));

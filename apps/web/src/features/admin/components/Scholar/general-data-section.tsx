@@ -7,7 +7,7 @@ import {
   DropdownContent,
   DropdownItem,
 } from "@/shared/components/Dropdown";
-import { EditableInput } from "@/shared/components/EditableInput";
+import { InputField } from "@/shared/components/InputField";
 import { FormSection } from "@/features/admin/components/FormSection";
 import { ScholarAvatarEditor } from "./scholar-avatar-editor";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -36,8 +36,9 @@ export function GeneralDataSection({ formData, dispatch, onImageStaged }: Genera
             <label className={styles.label} htmlFor="scholar-slug">
               {t("admin.scholars.slugLabel", "Slug")} *
             </label>
-            <EditableInput
+            <InputField
               id="scholar-slug"
+              type="text"
               value={formData.slug}
               onChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "slug", value })}
               placeholder={t("admin.scholars.slugPlaceholder", "scholar-slug")}

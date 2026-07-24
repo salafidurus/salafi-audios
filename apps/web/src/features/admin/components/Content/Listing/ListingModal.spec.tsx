@@ -182,7 +182,7 @@ describe("ListingModal", () => {
     fireEvent.click(generalTabButton);
 
     const orderIndexInput = await screen.findByLabelText(/order index/i);
-    expect(orderIndexInput).toHaveValue(5);
+    expect(orderIndexInput).toHaveValue("5");
     fireEvent.change(orderIndexInput, { target: { value: "10" } });
 
     const reviewButton = screen.getByRole("button", { name: /review/i });

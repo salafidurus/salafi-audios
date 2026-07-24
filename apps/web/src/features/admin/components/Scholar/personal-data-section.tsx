@@ -7,7 +7,7 @@ import {
   DropdownContent,
   DropdownItem,
 } from "@/shared/components/Dropdown";
-import { EditableInput } from "@/shared/components/EditableInput";
+import { InputField } from "@/shared/components/InputField";
 import { FormSection } from "@/features/admin/components/FormSection";
 import { ScholarAvatarEditor } from "./scholar-avatar-editor";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -45,10 +45,7 @@ export function PersonalDataSection({
     <FormSection title={t("admin.scholars.personalData", "Personal Data")}>
       <div className={styles.container}>
         <div className={styles.avatarColumn}>
-          <ScholarAvatarEditor
-            imageUrl={formData.imageUrl}
-            onImageStaged={onImageStaged}
-          />
+          <ScholarAvatarEditor imageUrl={formData.imageUrl} onImageStaged={onImageStaged} />
         </div>
 
         <div className={styles.fieldsColumn}>
@@ -56,8 +53,9 @@ export function PersonalDataSection({
             <label className={styles.label} htmlFor="scholar-name">
               {t("admin.scholars.nameLabel", "Name *")}
             </label>
-            <EditableInput
+            <InputField
               id="scholar-name"
+              type="text"
               value={formData.name}
               onChange={handleNameChange}
               placeholder={t("admin.scholars.namePlaceholder", "Scholar name")}
@@ -68,8 +66,9 @@ export function PersonalDataSection({
             <label className={styles.label} htmlFor="scholar-slug">
               {t("admin.scholars.slugLabel", "Slug *")}
             </label>
-            <EditableInput
+            <InputField
               id="scholar-slug"
+              type="text"
               value={formData.slug}
               onChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "slug", value })}
               placeholder={t("admin.scholars.slugPlaceholder", "scholar-slug")}
@@ -108,14 +107,12 @@ export function PersonalDataSection({
             <label className={styles.label} htmlFor="scholar-bio">
               {t("admin.scholars.bioLabel", "Bio")}
             </label>
-            <textarea
+            <InputField
               id="scholar-bio"
+              type="textarea"
               value={formData.bio ?? ""}
-              onChange={(e) =>
-                dispatch({ type: "UPDATE_FIELD", field: "bio", value: e.target.value })
-              }
+              onChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "bio", value })}
               placeholder={t("admin.scholars.bioPlaceholder", "Scholar biography")}
-              className={styles.textarea}
             />
           </div>
         </div>
