@@ -22,6 +22,7 @@ import { LibraryModule } from './modules/library/library.module';
 import { AudioModule } from './modules/audio/audio.module';
 import { MediaModule } from './modules/media/media.module';
 import { ListingModule } from './modules/listing/listing.module';
+import { AudioAssetsModule } from './modules/audio-assets/audio-assets.module';
 import { LocaleInterceptor } from './shared/interceptors/locale.interceptor';
 import { LocaleMiddleware } from './shared/i18n/locale.middleware';
 
@@ -49,6 +50,7 @@ import { ThrottlerGuard } from '@nestjs/throttler';
     AudioModule,
     MediaModule,
     ListingModule,
+    AudioAssetsModule,
   ],
   providers: [
     ThrottlerGuard,

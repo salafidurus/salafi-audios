@@ -112,6 +112,8 @@ export const queryKeys = {
         [...queryKeys.admin.all, "listings", "infinite", search ?? ""] as const,
       formatTransition: (id: string) =>
         [...queryKeys.admin.all, "listings", "format-transition", id] as const,
+      audioAssets: (listingId: string) =>
+        [...queryKeys.admin.all, "listings", "audio-assets", listingId] as const,
     },
     topics: {
       all: () => [...queryKeys.admin.all, "topics"] as const,

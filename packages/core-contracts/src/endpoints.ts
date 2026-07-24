@@ -75,6 +75,14 @@ export const endpoints = {
       formatTransition: (id: string) => `/admin/listings/${id}/format-transition`,
       promote: (id: string) => `/admin/listings/${id}/promote`,
       demote: (id: string) => `/admin/listings/${id}/demote`,
+      audioAssets: {
+        list: (listingId: string) => `/admin/listings/${listingId}/audio-assets`,
+        add: (listingId: string) => `/admin/listings/${listingId}/audio-assets`,
+        promote: (listingId: string, assetId: string) =>
+          `/admin/listings/${listingId}/audio-assets/${assetId}/promote`,
+        delete: (listingId: string, assetId: string) =>
+          `/admin/listings/${listingId}/audio-assets/${assetId}`,
+      },
       series: "/admin/listings/series",
       bulk: "/admin/listings/bulk",
     },

@@ -82,6 +82,14 @@ export const AudioAssetDtoSchema = z.object({
 });
 export type AudioAssetDto = z.infer<typeof AudioAssetDtoSchema>;
 
+export const AddAudioAssetDtoSchema = z.object({
+  audioKey: z.string().min(1),
+  durationSeconds: z.number().optional(),
+  sizeBytes: z.number().optional(),
+  format: z.string().optional(),
+});
+export type AddAudioAssetDto = z.infer<typeof AddAudioAssetDtoSchema>;
+
 export const ListingRefDtoSchema = z.object({
   id: z.string(),
   slug: z.string(),

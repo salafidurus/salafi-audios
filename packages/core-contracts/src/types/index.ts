@@ -38,6 +38,8 @@ export {
   TopicRefDtoSchema,
   type AudioAssetDto,
   AudioAssetDtoSchema,
+  type AddAudioAssetDto,
+  AddAudioAssetDtoSchema,
   type ListingRefDto,
   ListingRefDtoSchema,
   type SeriesContextDto,
