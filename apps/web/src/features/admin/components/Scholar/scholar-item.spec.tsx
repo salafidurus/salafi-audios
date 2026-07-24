@@ -16,6 +16,7 @@ const baseScholar = {
   mainLanguage: "ar" as const,
   imageUrl: undefined,
   isActive: true,
+  orderIndex: 999,
   socialTwitter: undefined,
   socialTelegram: undefined,
   socialYoutube: undefined,

@@ -6,7 +6,7 @@ import { routes, type FeedItemDto, type FeedContentItemDto } from "@sd/core-cont
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { useExploreRecentScreen } from "@sd/domain-content";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
+import { useIsDesktop, useResponsive } from "@/shared/hooks/use-responsive";
 import { List } from "@/shared/components/List";
 import { FeedListRow } from "../components/explore-list-row/explore-list-row";
 import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
@@ -92,6 +92,7 @@ export function FeedRecentScreen({
   onNavigateToScholar,
 }: FeedRecentScreenProps) {
   const isDesktop = useIsDesktop();
+  const { isMobile } = useResponsive();
   const { t } = useTranslation();
   const router = useRouter();
   const { navigateToListing } = useListingNavigation();
@@ -124,7 +125,9 @@ export function FeedRecentScreen({
   }, [hasNextPage, isFetching, fetchNextPage]);
 
   let body: ReactNode;
-  const feedTitle = t("explore.feedTitle", "Feed");
+  const feedTitle = isMobile
+    ? t("explore.recentTitleMobile", "Recent")
+    : t("explore.recentTitleWide", "Recent Listings");
 
   if (isDesktop) {
     if (isError && items.length === 0) {

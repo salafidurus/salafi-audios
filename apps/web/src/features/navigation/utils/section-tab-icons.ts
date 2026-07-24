@@ -2,19 +2,19 @@ import {
   Bookmark,
   CheckCircle,
   Clock,
-  Flame,
-  Heart,
+  GraduationCap,
   Play,
   SlidersHorizontal,
+  Sparkles,
   User,
   type LucideIcon,
 } from "lucide-react";
 import type { Section } from "../types";
 
 export type SectionTabIconKey =
-  | "feed-popular"
-  | "feed-recent"
-  | "feed-following"
+  | "explore-recent"
+  | "explore-scholar"
+  | "explore-curation"
   | "library-started"
   | "library-saved"
   | "library-completed"
@@ -22,9 +22,9 @@ export type SectionTabIconKey =
   | "account-profile";
 
 const SECTION_TAB_ICONS: Record<SectionTabIconKey, LucideIcon> = {
-  "feed-popular": Flame,
-  "feed-recent": Clock,
-  "feed-following": Heart,
+  "explore-recent": Clock,
+  "explore-scholar": GraduationCap,
+  "explore-curation": Sparkles,
   "library-started": Play,
   "library-saved": Bookmark,
   "library-completed": CheckCircle,

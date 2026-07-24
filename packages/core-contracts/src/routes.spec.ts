@@ -91,9 +91,9 @@ describe("routeDefinitions – validity", () => {
 
 describe("resolveRouteAccess", () => {
   it("matches the longest prefix, not a parent rule", () => {
-    expect(resolveRouteAccess("/explore/following")).toBe("auth-required");
-    expect(resolveRouteAccess("/explore")).toBe("public");
-    expect(resolveRouteAccess("/explore/recent")).toBe("public");
+    expect(resolveRouteAccess("/admin/users")).toBe("auth-required");
+    expect(resolveRouteAccess("/admin")).toBe("auth-required");
+    expect(resolveRouteAccess("/explore/scholar")).toBe("public");
   });
 
   it("normalizes a trailing slash", () => {
@@ -125,9 +125,9 @@ describe("resolveRouteAccess", () => {
     expect(resolveRouteAccess("/search")).toBe("public");
   });
 
-  it("gates the newly protected leaves", () => {
-    expect(resolveRouteAccess("/explore/following")).toBe("auth-required");
-    expect(resolveRouteAccess("/admin")).toBe("auth-required");
+  it("gates auth-required paths", () => {
+    expect(resolveRouteAccess("/admin/dashboard")).toBe("auth-required");
+    expect(resolveRouteAccess("/admin/scholars")).toBe("auth-required");
   });
 
   it("/settings/profile is auth-optional — shows AuthRequiredState, does not redirect", () => {

@@ -247,6 +247,7 @@ model Scholar {
   imageUrl     String?
   isActive     Boolean       @default(true)
   title        ScholarTitle?
+  orderIndex   Int           @default(999)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
@@ -270,6 +271,7 @@ model Scholar {
 
   @@unique([slug], map: "uq_scholar_slug")
   @@index([isActive], map: "idx_scholar_active")
+  @@index([title, orderIndex], map: "idx_scholar_title_order")
 }
 
 //////////////////////////
@@ -383,15 +385,17 @@ model AudioAsset {
 //////////////////////////
 
 model Topic {
-  id        String   @id @default(cuid())
-  slug      String
-  name      String
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  slug       String
+  name       String
+  orderIndex Int      @default(99)
+  createdAt  DateTime @default(now())
 
   listingTopics ListingTopic[]
   translations  TopicTranslation[]
 
   @@unique([slug], map: "uq_topic_slug")
+  @@index([orderIndex], map: "idx_topic_order")
 }
 
 model ListingTopic {

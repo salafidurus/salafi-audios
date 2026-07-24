@@ -34,7 +34,7 @@ export class ScholarsRepository {
       where: { isActive: true },
       take,
       ...(decodedCursor ? { cursor: { id: decodedCursor }, skip: 1 } : {}),
-      orderBy: { name: 'asc' },
+      orderBy: [{ title: 'asc' }, { orderIndex: 'asc' }],
       select: {
         id: true,
         slug: true,
@@ -369,6 +369,7 @@ export class ScholarsRepository {
         mainLanguage: true,
         isActive: true,
         title: true,
+        orderIndex: true,
         socialTwitter: true,
         socialTelegram: true,
         socialYoutube: true,
@@ -401,6 +402,7 @@ export class ScholarsRepository {
         mainLanguage: scholar.mainLanguage ?? undefined,
         isActive: scholar.isActive,
         title: scholar.title ?? undefined,
+        orderIndex: scholar.orderIndex,
         socialTwitter: scholar.socialTwitter ?? undefined,
         socialTelegram: scholar.socialTelegram ?? undefined,
         socialYoutube: scholar.socialYoutube ?? undefined,
@@ -453,6 +455,7 @@ export class ScholarsRepository {
         imageUrl: true,
         isActive: true,
         title: true,
+        orderIndex: true,
         socialTwitter: true,
         socialTelegram: true,
         socialYoutube: true,
@@ -478,6 +481,7 @@ export class ScholarsRepository {
         imageUrl: r.imageUrl ?? undefined,
         isActive: r.isActive,
         title: r.title ?? undefined,
+        orderIndex: r.orderIndex,
         socialTwitter: r.socialTwitter ?? undefined,
         socialTelegram: r.socialTelegram ?? undefined,
         socialYoutube: r.socialYoutube ?? undefined,
@@ -507,6 +511,7 @@ export class ScholarsRepository {
           imageUrl: dto.imageUrl,
           isActive: dto.isActive ?? true,
           title: dto.title,
+          orderIndex: dto.orderIndex ?? 999,
           country: dto.country,
           mainLanguage: dto.mainLanguage,
           socialTwitter: dto.socialTwitter,
@@ -548,6 +553,7 @@ export class ScholarsRepository {
       if (dto.isActive !== undefined) updateData.isActive = dto.isActive;
       if (dto.country !== undefined) updateData.country = dto.country;
       if (dto.mainLanguage !== undefined) updateData.mainLanguage = dto.mainLanguage;
+      if (dto.orderIndex !== undefined) updateData.orderIndex = dto.orderIndex;
       if (dto.socialTwitter !== undefined) updateData.socialTwitter = dto.socialTwitter;
       if (dto.socialTelegram !== undefined) updateData.socialTelegram = dto.socialTelegram;
       if (dto.socialYoutube !== undefined) updateData.socialYoutube = dto.socialYoutube;

@@ -103,7 +103,7 @@
       "scholars": "Scholars"
     },
     "subnav": {
-      "explore": { "popular": "Popular", "recent": "Recent", "following": "Following" },
+      "explore": { "recent": "Recent", "scholar": "Scholars", "curation": "Curation" },
       "library": { "started": "Started", "saved": "Saved", "completed": "Completed" },
       "account": { "general": "General", "profile": "Profile" },
       "settings": { "general": "General", "profile": "Profile" },
@@ -248,7 +248,17 @@
     "followingEmpty": "Follow scholars to see their latest lectures here."
   },
   "explore": {
-    "feedTitle": "Feed"
+    "feedTitle": "Feed",
+    "recentTitleMobile": "Recent",
+    "recentTitleWide": "Recent Listings",
+    "scholarsTitle": "Scholars",
+    "errorScholars": "Failed to load scholars.",
+    "loadingScholars": "Loading scholars…",
+    "noScholars": "No scholars available.",
+    "curation": {
+      "title": "Curation",
+      "description": "Coming soon"
+    }
   },
   "notFound": {
     "title": "Oops!",
@@ -438,6 +448,7 @@
       "kibarLabel": "Kibar Scholar",
       "featuredLabel": "Featured",
       "activeLabel": "Active",
+      "orderIndexLabel": "Order Index",
       "searchPlaceholderDesktop": "Search scholars by name or slug..."
     },
     "users": {
@@ -540,6 +551,8 @@
       "deleteWarning": "This action cannot be undone.",
       "title": "Content Management",
       "titleMobile": "Content",
+      "topicManagement": "Topic Management",
+      "listingManagement": "Listing Management",
       "addTopic": "Add Topic",
       "addTopicMobile": "Topic",
       "addListing": "Add Listing",
@@ -603,6 +616,9 @@
         "scholarRequired": "Scholar is required.",
         "audioKeyRequired": "Audio file key is required for creation.",
         "failedToSave": "Failed to save lecture details."
+      },
+      "topic": {
+        "orderIndexLabel": "Order Index"
       }
     },
     "modal": {

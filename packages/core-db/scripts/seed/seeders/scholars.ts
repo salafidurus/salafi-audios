@@ -15,6 +15,8 @@ export async function seedScholars(prisma: PrismaClient): Promise<void> {
         bio: scholar.bio,
         country: scholar.country,
         mainLanguage: scholar.mainLanguage,
+        title: scholar.title,
+        orderIndex: scholar.orderIndex,
       },
       create: {
         ...scholar,

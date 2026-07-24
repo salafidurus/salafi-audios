@@ -103,7 +103,7 @@
       "scholars": "العلماء"
     },
     "subnav": {
-      "explore": { "popular": "الأكثر شيوعًا", "recent": "الأحدث", "following": "المتابَعون" },
+      "explore": { "recent": "الأحدث", "scholar": "العلماء", "curation": "المنتقى" },
       "library": { "started": "قيد التشغيل", "saved": "المحفوظة", "completed": "المكتملة" },
       "account": { "general": "عام", "profile": "الملف الشخصي" },
       "settings": { "general": "عام", "profile": "الملف الشخصي" },
@@ -248,7 +248,17 @@
     "followingEmpty": "تابِع العلماء لرؤية أحدث محاضراتهم هنا."
   },
   "explore": {
-    "feedTitle": "الرئيسية"
+    "feedTitle": "الرئيسية",
+    "recentTitleMobile": "الأحدث",
+    "recentTitleWide": "أحدث القوائم",
+    "scholarsTitle": "العلماء",
+    "errorScholars": "فشل تحميل العلماء.",
+    "loadingScholars": "جارٍ تحميل العلماء…",
+    "noScholars": "لا توجد علماء متاحون.",
+    "curation": {
+      "title": "المنتقى",
+      "description": "قريبًا"
+    }
   },
   "notFound": {
     "title": "عذرًا!",
@@ -438,6 +448,7 @@
       "kibarLabel": "من كبار العلماء",
       "featuredLabel": "مميز",
       "activeLabel": "نشط",
+      "orderIndexLabel": "ترتيب الفهرس",
       "searchPlaceholderDesktop": "البحث عن العلماء بالاسم أو المعرف...",
       "noChangesMadeYet": "لا توجد تغييرات حتى الآن"
     },
@@ -538,6 +549,8 @@
       "deleteWarning": "لا يمكن التراجع عن هذا الإجراء.",
       "title": "إدارة المحتوى",
       "titleMobile": "المحتوى",
+      "topicManagement": "إدارة المواضيع",
+      "listingManagement": "إدارة المحتوى",
       "addTopic": "إضافة موضوع",
       "addTopicMobile": "موضوع",
       "addListing": "إضافة محتوى",
@@ -601,6 +614,9 @@
         "scholarRequired": "العالم مطلوب.",
         "audioKeyRequired": "مفتاح الملف الصوتي مطلوب للإنشاء.",
         "failedToSave": "فشل حفظ تفاصيل المحتوى."
+      },
+      "topic": {
+        "orderIndexLabel": "ترتيب الفهرس"
       }
     },
     "modal": {

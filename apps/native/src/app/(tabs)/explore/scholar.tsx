@@ -1,13 +1,13 @@
 import { type Href, useRouter } from "expo-router";
 import { routes } from "@sd/core-contracts";
-import { ScholarListScreen } from "@/features/listing/screens/scholar-list/scholar-list.screen";
+import { ExploreScholarScreen } from "@/features/explore/screens/explore-scholar.screen";
 
-export default function ScholarsIndexRoute() {
+export default function ExploreScholarRoute() {
   const router = useRouter();
 
   return (
-    <ScholarListScreen
-      onSelectScholar={(slug: string) => {
+    <ExploreScholarScreen
+      onNavigateToScholar={(slug: string) => {
         const path = routes.scholars.detail(slug);
         router.push(path as Href);
       }}

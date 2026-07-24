@@ -19,7 +19,7 @@ export type FormAction =
   | {
       type: "UPDATE_FIELD";
       field: keyof CreateScholarDto;
-      value: string | boolean | Record<string, { name: string }> | undefined;
+      value: string | number | boolean | Record<string, { name: string }> | undefined;
     }
   | { type: "UPDATE_TRANSLATION"; locale: Locale; field: "name" | "bio"; value: string }
   | { type: "SET_SAVING"; saving: boolean }
@@ -37,6 +37,7 @@ function getInitialFormData(scholar: ScholarForEdit | null): CreateScholarDto {
       country: (scholar.country ?? "") as CreateScholarDto["country"],
       mainLanguage: (scholar.mainLanguage ?? "ar") as "en" | "ar",
       title: (scholar.title ?? undefined) as CreateScholarDto["title"],
+      orderIndex: scholar.orderIndex ?? 999,
       socialTwitter: scholar.socialTwitter ?? "",
       socialTelegram: scholar.socialTelegram ?? "",
       socialYoutube: scholar.socialYoutube ?? "",
@@ -51,6 +52,7 @@ function getInitialFormData(scholar: ScholarForEdit | null): CreateScholarDto {
     isActive: true,
     country: "" as CreateScholarDto["country"],
     mainLanguage: "ar",
+    orderIndex: 999,
     socialTwitter: "",
     socialTelegram: "",
     socialYoutube: "",
@@ -73,6 +75,7 @@ function formReducer(state: FormState, action: FormAction): FormState {
           country: (scholar.country ?? "") as CreateScholarDto["country"],
           mainLanguage: (scholar.mainLanguage ?? "ar") as Locale,
           title: (scholar.title ?? undefined) as CreateScholarDto["title"],
+          orderIndex: scholar.orderIndex ?? 999,
           socialTwitter: scholar.socialTwitter ?? "",
           socialTelegram: scholar.socialTelegram ?? "",
           socialYoutube: scholar.socialYoutube ?? "",
@@ -80,7 +83,8 @@ function formReducer(state: FormState, action: FormAction): FormState {
         };
 
         // Map translations array to translationChanges Record, excluding mainLanguage
-        const translationChanges: Partial<Record<Locale, { name?: string; bio?: string | null }>> = {};
+        const translationChanges: Partial<Record<Locale, { name?: string; bio?: string | null }>> =
+          {};
         for (const trans of translations) {
           if (trans.locale !== formData.mainLanguage) {
             translationChanges[trans.locale] = {

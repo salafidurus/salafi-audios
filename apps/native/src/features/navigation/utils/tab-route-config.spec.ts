@@ -36,13 +36,13 @@ describe("getRootTabFromPathname", () => {
 
 describe("getActiveSubsection", () => {
   it("returns default tab when no subsection", () => {
-    expect(getActiveSubsection("/explore", "explore")).toBe("popular");
+    expect(getActiveSubsection("/explore", "explore")).toBe("recent");
   });
   it("returns matched subsection", () => {
     expect(getActiveSubsection("/explore/recent", "explore")).toBe("recent");
   });
   it("returns default tab for unrecognized subsection", () => {
-    expect(getActiveSubsection("/explore/unknown", "explore")).toBe("popular");
+    expect(getActiveSubsection("/explore/unknown", "explore")).toBe("recent");
   });
   it("returns matched library subsection", () => {
     expect(getActiveSubsection("/library/saved", "library")).toBe("saved");

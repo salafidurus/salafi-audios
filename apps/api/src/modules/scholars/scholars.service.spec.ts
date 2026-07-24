@@ -162,6 +162,7 @@ describe('ScholarsService', () => {
         country: dto.country,
         mainLanguage: dto.mainLanguage,
         title: null,
+        orderIndex: 999,
         socialTwitter: null,
         socialTelegram: null,
         socialYoutube: null,
@@ -191,9 +192,7 @@ describe('ScholarsService', () => {
         isActive: true,
         country: 'SA',
         mainLanguage: 'ar',
-        translations: [
-          { locale: 'en', name: 'New Scholar - English', bio: 'English bio' },
-        ],
+        translations: [{ locale: 'en', name: 'New Scholar - English', bio: 'English bio' }],
       };
       const created = {
         id: 's2',
@@ -207,6 +206,7 @@ describe('ScholarsService', () => {
         country: dto.country,
         mainLanguage: dto.mainLanguage,
         title: null,
+        orderIndex: dto.orderIndex ?? 999,
         socialTwitter: null,
         socialTelegram: null,
         socialYoutube: null,
@@ -267,9 +267,7 @@ describe('ScholarsService', () => {
     it('should update existing scholar with inline translations', async () => {
       const dto: UpdateScholarDto = {
         name: 'Updated Name',
-        translations: [
-          { locale: 'en', name: 'Updated Name - English' },
-        ],
+        translations: [{ locale: 'en', name: 'Updated Name - English' }],
       };
       const existing = {
         id: 's1',

@@ -30,7 +30,8 @@ export function ReviewSection({
     changedFields.slug ||
     changedFields.bio ||
     changedFields.title ||
-    changedFields.country;
+    changedFields.country ||
+    changedFields.orderIndex;
   const hasSocialChanges =
     changedFields.socialTwitter ||
     changedFields.socialTelegram ||
@@ -97,6 +98,14 @@ export function ReviewSection({
                 <div className={styles.value}>{formData.country}</div>
               </div>
             )}
+            {changedFields.orderIndex && formData.orderIndex !== undefined && (
+              <div className={styles.field}>
+                <div className={styles.label}>
+                  {t("admin.scholars.orderIndexLabel", "Order Index")}
+                </div>
+                <div className={styles.value}>{formData.orderIndex}</div>
+              </div>
+            )}
           </div>
         </FormSection>
       )}
@@ -105,7 +114,10 @@ export function ReviewSection({
         if (!trans.name && !trans.bio) return null;
         const localeLabel = getLocaleLabel(trans.locale);
         return (
-          <FormSection key={trans.locale} title={t("admin.scholars.translation", `Translation (${localeLabel})`)}>
+          <FormSection
+            key={trans.locale}
+            title={t("admin.scholars.translation", `Translation (${localeLabel})`)}
+          >
             <div className={styles.grid}>
               {trans.name && (
                 <div className={styles.field}>

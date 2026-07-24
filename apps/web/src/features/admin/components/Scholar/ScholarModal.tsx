@@ -36,6 +36,7 @@ export interface ScholarForEdit {
   socialYoutube?: string | null;
   socialWebsite?: string | null;
   title?: string | null;
+  orderIndex?: number;
 }
 
 export interface ScholarModalProps {
@@ -119,6 +120,7 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar, scholarId }: Sc
         bio: !!formData.bio,
         title: !!formData.title,
         country: !!formData.country,
+        orderIndex: formData.orderIndex !== 999,
         socialTwitter: !!formData.socialTwitter,
         socialTelegram: !!formData.socialTelegram,
         socialYoutube: !!formData.socialYoutube,
@@ -133,6 +135,7 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar, scholarId }: Sc
       bio: formData.bio !== initialFormData.bio,
       title: formData.title !== initialFormData.title,
       country: formData.country !== initialFormData.country,
+      orderIndex: formData.orderIndex !== initialFormData.orderIndex,
       socialTwitter: formData.socialTwitter !== initialFormData.socialTwitter,
       socialTelegram: formData.socialTelegram !== initialFormData.socialTelegram,
       socialYoutube: formData.socialYoutube !== initialFormData.socialYoutube,

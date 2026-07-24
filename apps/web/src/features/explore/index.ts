@@ -9,7 +9,3 @@ export { FeedTopicRow, type FeedTopicRowProps } from "./components/feed-topic-ro
 // Screens
 export { FeedScreen, type FeedScreenProps } from "./screens/feed.screen";
 export { FeedRecentScreen, type FeedRecentScreenProps } from "./screens/explore-recent.screen";
-export {
-  FeedFollowingScreen,
-  type FeedFollowingScreenProps,
-} from "./screens/explore-following.screen";

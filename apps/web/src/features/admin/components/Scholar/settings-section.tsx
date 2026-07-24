@@ -29,6 +29,27 @@ export function SettingsSection({ formData, dispatch }: SettingsSectionProps) {
           />
         </label>
       </div>
+
+      <div className={styles.formGroup}>
+        <label htmlFor="scholar-order" className={styles.label}>
+          {t("admin.scholars.orderIndexLabel", "Order Index")}
+        </label>
+        <input
+          id="scholar-order"
+          type="number"
+          className={styles.input}
+          value={formData.orderIndex ?? ""}
+          onChange={(e) => {
+            const value = e.target.value;
+            const parsed = value ? Number(value) : undefined;
+            dispatch({
+              type: "UPDATE_FIELD",
+              field: "orderIndex",
+              value: Number.isNaN(parsed) ? 999 : (parsed ?? 999),
+            });
+          }}
+        />
+      </div>
     </FormSection>
   );
 }

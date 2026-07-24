@@ -7,9 +7,9 @@
 
 export const SUBNAV_KEYS: Record<string, Record<string, string>> = {
   explore: {
-    popular: "navigation.subnav.explore.popular",
     recent: "navigation.subnav.explore.recent",
-    following: "navigation.subnav.explore.following",
+    scholar: "navigation.subnav.explore.scholar",
+    curation: "navigation.subnav.explore.curation",
   },
   library: {
     started: "navigation.subnav.library.started",

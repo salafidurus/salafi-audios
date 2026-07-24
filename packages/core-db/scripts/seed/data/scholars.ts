@@ -11,6 +11,8 @@ export interface ScholarData {
   bio: string;
   country: string;
   mainLanguage: "en" | "ar";
+  title?: "allamah" | "sheikh" | "ustadh" | "akh";
+  orderIndex?: number;
 }
 
 export const SCHOLARS: ScholarData[] = [
@@ -21,6 +23,8 @@ export const SCHOLARS: ScholarData[] = [
     bio: "Foremost scholar of Ahl al-Sunnah in the 20th century. Expert in fiqh, aqeedah, and tafsir.",
     country: "SA",
     mainLanguage: "ar",
+    title: "allamah",
+    orderIndex: 1,
   },
   {
     id: uuid(2),
@@ -29,6 +33,8 @@ export const SCHOLARS: ScholarData[] = [
     bio: "The Grand Mufti of the Kingdom of Saudi Arabia. Expert in various field of Islamic knowledge: Aqeedah, Fiqh, Tafsir, etc.",
     country: "SA",
     mainLanguage: "ar",
+    title: "allamah",
+    orderIndex: 0,
   },
   {
     id: uuid(3),
@@ -37,6 +43,8 @@ export const SCHOLARS: ScholarData[] = [
     bio: "Contemporary Salafi scholar based in Saudi Arabia. Known for aqeedah and fiqh series.",
     country: "YE",
     mainLanguage: "ar",
+    title: "sheikh",
+    orderIndex: 0,
   },
   {
     id: uuid(4),
@@ -45,6 +53,8 @@ export const SCHOLARS: ScholarData[] = [
     bio: "Specialist in Arabic grammar (nahw and sarf). Author of textbooks on i'rab.",
     country: "YE",
     mainLanguage: "ar",
+    title: "ustadh",
+    orderIndex: 0,
   },
   {
     id: uuid(5),
@@ -53,6 +63,8 @@ export const SCHOLARS: ScholarData[] = [
     bio: "Contemporary muhaddith specializing in hadith sciences and mustalah al-hadith.",
     country: "SA",
     mainLanguage: "ar",
+    title: "akh",
+    orderIndex: 0,
   },
   {
     id: uuid(6),

@@ -69,7 +69,9 @@ export function AdminContentsScreen() {
               title={
                 isMobile
                   ? t("admin.contents.titleMobile", "Content")
-                  : t("admin.contents.title", "Content Management")
+                  : activeTab === "topics"
+                    ? t("admin.contents.topicManagement", "Topic Management")
+                    : t("admin.contents.listingManagement", "Listing Management")
               }
               actions={
                 activeTab === "topics" ? (

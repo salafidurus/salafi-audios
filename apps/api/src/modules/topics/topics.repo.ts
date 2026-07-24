@@ -15,6 +15,7 @@ const topicViewSelect = {
   id: true,
   slug: true,
   name: true,
+  orderIndex: true,
   createdAt: true,
   translations: {
     select: {
@@ -139,16 +140,22 @@ export class TopicsRepository {
   /**
    * Upsert Topic by slug.
    */
-  async upsertBySlug(input: { slug: string; name: string }): Promise<TopicDetailDto> {
+  async upsertBySlug(input: {
+    slug: string;
+    name: string;
+    orderIndex?: number;
+  }): Promise<TopicDetailDto> {
     const record = await this.prisma.topic.upsert({
       where: { slug: input.slug },
       select: topicViewSelect,
       create: {
         slug: input.slug,
         name: input.name,
+        orderIndex: input.orderIndex ?? 99,
       },
       update: {
         name: input.name,
+        orderIndex: input.orderIndex,
       },
     });
 
@@ -228,7 +235,7 @@ export class TopicsRepository {
   ): Promise<TopicViewRecord[]> {
     return this.prisma.topic.findMany({
       where,
-      orderBy: [{ name: 'asc' }],
+      orderBy: [{ orderIndex: 'asc' }],
       select: topicViewSelect,
       take,
     });
@@ -246,6 +253,7 @@ export class TopicsRepository {
         en: record.name,
         ar: arTranslation,
       },
+      orderIndex: record.orderIndex,
       createdAt,
     };
   }
