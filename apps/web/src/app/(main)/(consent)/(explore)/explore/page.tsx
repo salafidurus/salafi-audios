@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { FeedScreen } from "@/features/explore/screens/feed.screen";
+import { FeedRecentScreen } from "@/features/explore/screens/explore-recent.screen";
 
 export const metadata: Metadata = {
-  title: "Feed",
-  description: "Your personalized feed of Islamic lectures and content.",
+  title: "Recent",
+  description: "Your personalized feed of recent Islamic lectures and content.",
 };
 
-export default function FeedPage() {
-  return <FeedScreen />;
+export default function ExplorePage() {
+  return <FeedRecentScreen />;
 }
