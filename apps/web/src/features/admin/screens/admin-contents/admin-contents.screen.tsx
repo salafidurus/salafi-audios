@@ -50,7 +50,10 @@ export function AdminContentsScreen() {
   };
 
   const handleTopicSaved = async (_slug: string) => {
-    await queryClient.refetchQueries({ queryKey: queryKeys.topics.all });
+    await Promise.all([
+      queryClient.refetchQueries({ queryKey: queryKeys.topics.all }),
+      queryClient.refetchQueries({ queryKey: queryKeys.admin.topics.all() }),
+    ]);
   };
 
   // Listing modal state
@@ -128,8 +131,12 @@ export function AdminContentsScreen() {
                   }}
                 />
                 <Content.TopicModal
+                  key={editingTopicSlug}
                   isOpen={isTopicModalOpen}
-                  onClose={() => setIsTopicModalOpen(false)}
+                  onClose={() => {
+                    setIsTopicModalOpen(false);
+                    setEditingTopicSlug(undefined);
+                  }}
                   onSaved={handleTopicSaved}
                   topicSlug={editingTopicSlug}
                 />

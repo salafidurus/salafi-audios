@@ -189,6 +189,7 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
               id="topic-slug"
               value={slug}
               onChange={setSlug}
+              disabled={isEditing}
               placeholder={t("admin.contents.slugPlaceholder", "topic-slug")}
             />
           </div>
