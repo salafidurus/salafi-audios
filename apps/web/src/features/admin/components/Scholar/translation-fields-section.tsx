@@ -12,6 +12,7 @@ interface TranslationFieldsSectionProps {
   onNameChange: (value: string) => void;
   onBioChange: (value: string) => void;
   title?: string;
+  isRequired?: boolean;
 }
 
 export function TranslationFieldsSection({
@@ -21,6 +22,7 @@ export function TranslationFieldsSection({
   onNameChange,
   onBioChange,
   title,
+  isRequired,
 }: TranslationFieldsSectionProps) {
   const { t } = useTranslation();
 
@@ -33,6 +35,7 @@ export function TranslationFieldsSection({
         <div className={styles.field}>
           <label className={styles.label} htmlFor={`scholar-name-${locale}`}>
             {t("admin.scholars.nameLabel", "Name")}
+            {isRequired ? " *" : ""}
           </label>
           <EditableInput
             id={`scholar-name-${locale}`}

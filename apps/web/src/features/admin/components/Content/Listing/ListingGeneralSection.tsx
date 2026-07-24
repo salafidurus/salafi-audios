@@ -41,7 +41,7 @@ export function ListingGeneralSection({
 
       <div className={styles.formGroup}>
         <label htmlFor="lecture-language" className={styles.label}>
-          {t("admin.contents.listing.languageLabel", "Language")}
+          {t("admin.contents.listing.languageLabel", "Language")} *
         </label>
         <Dropdown
           value={language}
@@ -60,7 +60,7 @@ export function ListingGeneralSection({
       <div className={styles.formRow}>
         <div className={styles.formGroup}>
           <label htmlFor="lecture-scholar" className={styles.label}>
-            {t("admin.contents.listing.scholarLabel", "Scholar")}
+            {t("admin.contents.listing.scholarLabel", "Scholar")} *
           </label>
           <Dropdown
             value={scholarId}
@@ -168,7 +168,7 @@ export function ListingGeneralSection({
       </div>
 
       <div className={styles.formGroup}>
-        <span className={styles.label}>{t("admin.contents.listing.topicsLabel", "Topics")}</span>
+        <span className={styles.label}>{t("admin.contents.listing.topicsLabel", "Topics")} *</span>
         {topics.length > 0 ? (
           <Search.Filter
             chips={topics.map((t) => ({

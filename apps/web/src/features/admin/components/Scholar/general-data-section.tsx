@@ -28,16 +28,13 @@ export function GeneralDataSection({ formData, dispatch, onImageStaged }: Genera
     <FormSection title={t("admin.scholars.generalInfo", "General Information")}>
       <div className={styles.container}>
         <div className={styles.avatarColumn}>
-          <ScholarAvatarEditor
-            imageUrl={formData.imageUrl}
-            onImageStaged={onImageStaged}
-          />
+          <ScholarAvatarEditor imageUrl={formData.imageUrl} onImageStaged={onImageStaged} />
         </div>
 
         <div className={styles.fieldsColumn}>
           <div className={styles.field}>
             <label className={styles.label} htmlFor="scholar-slug">
-              {t("admin.scholars.slugLabel", "Slug *")}
+              {t("admin.scholars.slugLabel", "Slug")} *
             </label>
             <EditableInput
               id="scholar-slug"

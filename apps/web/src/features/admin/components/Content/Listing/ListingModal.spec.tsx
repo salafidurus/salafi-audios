@@ -95,7 +95,7 @@ describe("ListingModal", () => {
     const mainTabButton = screen.getByRole("tab", { name: /العربية/i });
     fireEvent.click(mainTabButton);
 
-    const titleInput = await screen.findByLabelText("Title");
+    const titleInput = await screen.findByLabelText(/^Title/i);
     fireEvent.change(titleInput, { target: { value: "My Great Lecture" } });
 
     const reviewButton = screen.getByRole("button", { name: /review/i });
@@ -171,7 +171,7 @@ describe("ListingModal", () => {
     const mainTabButton = screen.getByRole("tab", { name: /العربية/i });
     fireEvent.click(mainTabButton);
 
-    const titleInput = await screen.findByLabelText("Title");
+    const titleInput = await screen.findByLabelText(/^Title/i);
     const descriptionInput = await screen.findByLabelText(/description/i);
     expect(titleInput).toHaveValue("Existing Title");
     expect(descriptionInput).toHaveValue("Existing Description");

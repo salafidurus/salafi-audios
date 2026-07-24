@@ -46,7 +46,7 @@ export function LocationSection({ formData, dispatch }: LocationSectionProps) {
         </div>
         <div className={styles.field}>
           <label className={styles.label} htmlFor="scholar-language">
-            {t("admin.scholars.languageLabel", "Main Language")}
+            {t("admin.scholars.languageLabel", "Main Language")} *
           </label>
           <Dropdown
             value={formData.mainLanguage}

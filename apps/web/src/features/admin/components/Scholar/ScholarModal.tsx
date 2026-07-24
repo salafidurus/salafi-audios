@@ -271,6 +271,7 @@ export function ScholarModal({ isOpen, onClose, onSave, scholar, scholarId }: Sc
               onNameChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "name", value })}
               onBioChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "bio", value })}
               title={t("admin.modal.mainLanguageContent", "Main Language Content")}
+              isRequired
             />
           </Modal.ContentItem>
 

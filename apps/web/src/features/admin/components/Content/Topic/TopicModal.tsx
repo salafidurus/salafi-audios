@@ -191,7 +191,7 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
 
           <div className={styles.field}>
             <label htmlFor="topic-slug" className={styles.label}>
-              {t("admin.contents.slugLabel", "Slug *")}
+              {t("admin.contents.slugLabel", "Slug")} *
             </label>
             <EditableInput
               id="topic-slug"
@@ -204,7 +204,7 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
 
           <div className={styles.field}>
             <label htmlFor="topic-name-en" className={styles.label}>
-              {t("admin.contents.englishNameLabel", "English Name *")}
+              {t("admin.contents.englishNameLabel", "English Name")} *
             </label>
             <EditableInput
               id="topic-name-en"
