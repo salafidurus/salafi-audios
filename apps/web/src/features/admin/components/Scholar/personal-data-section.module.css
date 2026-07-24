@@ -35,21 +35,3 @@
   color: var(--content-default);
 }
 
-.textarea {
-  padding: var(--space-sm);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  background-color: var(--surface-default);
-  color: var(--content-default);
-  font-family: inherit;
-  font-size: 0.875rem;
-  line-height: 1.5;
-  min-height: 100px;
-  resize: vertical;
-}
-
-.textarea:focus {
-  outline: none;
-  border-color: var(--border-focus);
-  box-shadow: 0 0 0 2px var(--content-accent);
-}

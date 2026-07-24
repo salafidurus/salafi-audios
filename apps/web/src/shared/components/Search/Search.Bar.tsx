@@ -18,6 +18,8 @@ export interface SearchBarProps {
   className?: string;
   /** Auto-focus the input on mount */
   autoFocus?: boolean;
+  /** Optional inline style for the input wrapper (barInputWrapper label) */
+  inputWrapperStyle?: React.CSSProperties;
 }
 
 /**
@@ -49,6 +51,7 @@ export function SearchBar({
   onClear,
   className,
   autoFocus,
+  inputWrapperStyle,
 }: SearchBarProps) {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -76,7 +79,7 @@ export function SearchBar({
 
   return (
     <div className={`${styles.barContainer} ${className || ""}`}>
-      <label className={styles.barInputWrapper} aria-label="Search">
+      <label className={styles.barInputWrapper} style={inputWrapperStyle} aria-label="Search">
         <SearchGlyph />
         <input
           ref={inputRef}

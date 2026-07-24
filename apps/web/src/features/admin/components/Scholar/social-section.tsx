@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import type { CreateScholarDto } from "@sd/core-contracts";
-import { EditableInput } from "@/shared/components/EditableInput";
+import { InputField } from "@/shared/components/InputField";
 import { FormSection } from "@/features/admin/components/FormSection";
 import { useTranslation } from "@/core/i18n/use-translation";
 import type { FormAction } from "../../hooks/Scholar/useScholarForm";
@@ -92,41 +92,30 @@ export function SocialSection({ formData, dispatch }: SocialSectionProps) {
                 />
               )}
               <div className={styles.inputWrapper}>
-                {field.prefix ? (
-                  <div className={styles.prefixedContainer}>
-                    <div className={styles.prefixedInput}>
-                      <span className={styles.prefix}>{field.prefix}</span>
-                      <input
-                        id={field.id}
-                        type="text"
-                        value={handle}
-                        onChange={(e) =>
-                          handleSocialChange(
-                            field.key as keyof CreateScholarDto,
-                            e.target.value,
-                            field.prefix,
-                          )
-                        }
-                        placeholder={t("admin.scholars.handlePlaceholder", "username")}
-                        className={styles.input}
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  <EditableInput
-                    id={field.id}
-                    type="url"
-                    value={value}
-                    onChange={(newValue) =>
+                <InputField
+                  id={field.id}
+                  type={field.prefix ? "text" : "url"}
+                  value={field.prefix ? handle : value}
+                  onChange={(newValue) => {
+                    if (field.prefix) {
+                      handleSocialChange(
+                        field.key as keyof CreateScholarDto,
+                        newValue,
+                        field.prefix,
+                      );
+                    } else {
                       dispatch({
                         type: "UPDATE_FIELD",
                         field: field.key as keyof CreateScholarDto,
                         value: newValue,
-                      })
+                      });
                     }
-                    placeholder="https://..."
-                  />
-                )}
+                  }}
+                  prefix={field.prefix}
+                  placeholder={
+                    field.prefix ? t("admin.scholars.handlePlaceholder", "username") : "https://..."
+                  }
+                />
               </div>
             </div>
           );

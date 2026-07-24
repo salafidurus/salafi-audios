@@ -2,6 +2,7 @@
 
 import React from "react";
 import type { Locale } from "@sd/core-contracts";
+import { InputField } from "@/shared/components/InputField";
 import { useTranslation } from "@/core/i18n/use-translation";
 import type { FormState, FormAction } from "@/features/admin/hooks/Content/useListingForm";
 import styles from "./listing-modal.module.css";
@@ -31,20 +32,19 @@ export function ListingTranslatableFields({
           {t("admin.contents.listing.titleLabel", "Title")}
           {isMainLocale ? " *" : ""}
         </label>
-        <input
+        <InputField
           id="lecture-title"
           type="text"
-          className={styles.input}
           value={isMainLocale ? title : translation?.title || ""}
-          onChange={(e) => {
+          onChange={(value) => {
             if (isMainLocale) {
-              handleTitleChange(e.target.value);
+              handleTitleChange(value);
             } else {
               dispatch({
                 type: "UPDATE_TRANSLATION",
                 locale,
                 field: "title",
-                value: e.target.value,
+                value,
               });
             }
           }}
@@ -57,14 +57,11 @@ export function ListingTranslatableFields({
           <label htmlFor="lecture-slug" className={styles.label}>
             {t("admin.contents.listing.slugLabel", "Slug")} *
           </label>
-          <input
+          <InputField
             id="lecture-slug"
             type="text"
-            className={styles.input}
             value={slug}
-            onChange={(e) =>
-              dispatch({ type: "UPDATE_FIELD", field: "slug", value: e.target.value })
-            }
+            onChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "slug", value })}
             placeholder={t(
               "admin.contents.listing.slugPlaceholder",
               "Auto-generated if left blank",
@@ -77,19 +74,19 @@ export function ListingTranslatableFields({
         <label htmlFor="lecture-description" className={styles.label}>
           {t("admin.contents.listing.descriptionLabel", "Description")}
         </label>
-        <textarea
+        <InputField
           id="lecture-description"
-          className={styles.textarea}
+          type="textarea"
           value={isMainLocale ? description : translation?.description || ""}
-          onChange={(e) => {
+          onChange={(value) => {
             if (isMainLocale) {
-              dispatch({ type: "UPDATE_FIELD", field: "description", value: e.target.value });
+              dispatch({ type: "UPDATE_FIELD", field: "description", value });
             } else {
               dispatch({
                 type: "UPDATE_TRANSLATION",
                 locale,
                 field: "description",
-                value: e.target.value,
+                value,
               });
             }
           }}

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button";
-import { EditableInput } from "@/shared/components/EditableInput";
+import { InputField } from "@/shared/components/InputField";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { type Locale } from "@sd/core-contracts";
 import {
@@ -193,8 +193,9 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
             <label htmlFor="topic-slug" className={styles.label}>
               {t("admin.contents.slugLabel", "Slug")} *
             </label>
-            <EditableInput
+            <InputField
               id="topic-slug"
+              type="text"
               value={slug}
               onChange={setSlug}
               disabled={isEditing}
@@ -206,8 +207,9 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
             <label htmlFor="topic-name-en" className={styles.label}>
               {t("admin.contents.englishNameLabel", "English Name")} *
             </label>
-            <EditableInput
+            <InputField
               id="topic-name-en"
+              type="text"
               value={nameEn}
               onChange={handleNameEnChange}
               placeholder={t("admin.contents.englishNamePlaceholder", "Topic name in English")}
@@ -218,8 +220,9 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
             <label htmlFor="topic-name-ar" className={styles.label}>
               {t("admin.contents.arabicNameLabel", "Arabic Name")}
             </label>
-            <EditableInput
+            <InputField
               id="topic-name-ar"
+              type="text"
               value={translations.ar ?? ""}
               onChange={(value) => handleTranslationChange("ar", value)}
               placeholder={t("admin.contents.arabicNamePlaceholder", "Topic name in Arabic")}
@@ -230,13 +233,11 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
             <label htmlFor="topic-order" className={styles.label}>
               {t("admin.contents.topic.orderIndexLabel", "Order Index")}
             </label>
-            <input
+            <InputField
               id="topic-order"
               type="number"
-              className={styles.input}
-              value={orderIndex ?? ""}
-              onChange={(e) => {
-                const value = e.target.value;
+              value={String(orderIndex ?? "")}
+              onChange={(value) => {
                 const parsed = value ? Number(value) : 99;
                 setOrderIndex(Number.isNaN(parsed) ? 99 : parsed);
               }}

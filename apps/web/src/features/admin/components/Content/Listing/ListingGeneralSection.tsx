@@ -4,6 +4,7 @@ import React from "react";
 import type { ScholarListItemDto, TopicDetailDto, ListingRefDto, Locale } from "@sd/core-contracts";
 import { getLocalizedName } from "@sd/core-i18n";
 import { validateLectureStatus } from "@/shared/types/form-types";
+import { InputField } from "@/shared/components/InputField";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { Search } from "@/shared/components/Search";
 import {
@@ -149,13 +150,11 @@ export function ListingGeneralSection({
           <label htmlFor="lecture-order" className={styles.label}>
             {t("admin.contents.listing.orderIndexLabel", "Order Index")}
           </label>
-          <input
+          <InputField
             id="lecture-order"
             type="number"
-            className={styles.input}
-            value={orderIndex ?? ""}
-            onChange={(e) => {
-              const value = e.target.value;
+            value={String(orderIndex ?? "")}
+            onChange={(value) => {
               const parsed = value ? Number(value) : undefined;
               dispatch({
                 type: "UPDATE_FIELD",
