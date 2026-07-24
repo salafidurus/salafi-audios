@@ -24,6 +24,8 @@ interface ListingGeneralSectionProps {
   topics: TopicDetailDto[];
   mode: "create" | "edit";
   listingId?: string;
+  childCount?: number;
+  onlyChildLessonCount?: number;
   handleTopicToggle: (topicId: string) => void;
 }
 
@@ -34,6 +36,8 @@ export function ListingGeneralSection({
   topics,
   mode,
   listingId,
+  childCount,
+  onlyChildLessonCount,
   handleTopicToggle,
 }: ListingGeneralSectionProps) {
   const { i18n, t } = useTranslation();
@@ -89,7 +93,8 @@ export function ListingGeneralSection({
           <ListingFormatField
             mode={mode}
             format={format}
-            listingId={listingId}
+            childCount={childCount}
+            onlyChildLessonCount={onlyChildLessonCount}
             onFormatChange={(newFormat) =>
               dispatch({ type: "UPDATE_FIELD", field: "format", value: newFormat })
             }

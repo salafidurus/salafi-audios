@@ -20,6 +20,8 @@ interface ListingModalTabContentProps {
   topics: any[];
   mode: "create" | "edit";
   listingId?: string;
+  childCount?: number;
+  onlyChildLessonCount?: number;
   handleTopicToggle: (topicId: string) => void;
   handleTitleChange: (val: string) => void;
   onAudioUploadComplete?: (audioData: any) => void;
@@ -36,6 +38,8 @@ export function ListingModalTabContent({
   topics,
   mode,
   listingId,
+  childCount,
+  onlyChildLessonCount,
   handleTopicToggle,
   handleTitleChange,
   onAudioUploadComplete,
@@ -58,6 +62,8 @@ export function ListingModalTabContent({
           topics={topics}
           mode={mode}
           listingId={listingId}
+          childCount={childCount}
+          onlyChildLessonCount={onlyChildLessonCount}
           handleTopicToggle={handleTopicToggle}
         />
       </Modal.ContentItem>

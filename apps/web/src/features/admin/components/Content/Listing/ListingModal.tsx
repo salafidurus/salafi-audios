@@ -317,6 +317,8 @@ export function ListingModal({
           topics={topics}
           mode={listingId ? "edit" : "create"}
           listingId={listingId || undefined}
+          childCount={0}
+          onlyChildLessonCount={0}
           handleTopicToggle={handleTopicToggle}
           handleTitleChange={handleTitleChange}
           onAudioUploadComplete={onAudioUploadComplete}

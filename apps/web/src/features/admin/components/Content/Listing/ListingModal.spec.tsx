@@ -52,17 +52,6 @@ vi.mock("@sd/domain-content", () => ({
   })),
 }));
 
-vi.mock("@/features/admin/hooks/Content/useListingFormatTransition", () => ({
-  useListingFormatTransition: vi.fn(() => ({
-    data: {
-      format: "single",
-      childCount: 0,
-      canPromote: false,
-      demoteOptions: [],
-    },
-  })),
-}));
-
 describe("ListingModal", () => {
   beforeEach(() => {
     vi.clearAllMocks();
