@@ -110,16 +110,36 @@
 
 .header {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   padding: 1rem 1.5rem;
   flex-shrink: 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.headerWithTabs {
+  padding: 1rem 1.5rem 0 1.5rem;
 }
 
 @media (max-width: 640px) {
   .header {
     padding: 0.875rem 1.25rem;
   }
+  .headerWithTabs {
+    padding: 0.875rem 1.25rem 0 1.25rem;
+  }
+}
+
+.headerTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.headerTabsSlot {
+  display: flex;
+  width: 100%;
 }
 
 .title {
@@ -211,8 +231,8 @@
 .tabBar {
   display: flex;
   gap: 0.5rem;
-  padding: 0 1.5rem;
-  border-bottom: 1px solid var(--border-subtle);
+  padding: 0;
+  width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
   flex-shrink: 0;
@@ -224,14 +244,8 @@
   display: none;
 }
 
-@media (max-width: 640px) {
-  .tabBar {
-    padding: 0 1.25rem;
-  }
-}
-
 .tabButton {
-  padding: 0.75rem 1rem;
+  padding: 0.625rem 0.875rem;
   background: transparent;
   border: none;
   border-bottom: 2px solid transparent;
@@ -250,6 +264,14 @@
 .tabButtonActive {
   color: var(--content-accent);
   border-bottom-color: var(--content-accent);
+}
+
+.tabButtonError {
+  outline: 2px solid var(--status-error, #ef4444);
+  outline-offset: -2px;
+  border-radius: var(--radius-sm, 4px);
+  color: var(--status-error, #ef4444);
+  background-color: var(--status-error-bg, rgba(239, 68, 68, 0.08));
 }
 
 .tabButton:disabled {

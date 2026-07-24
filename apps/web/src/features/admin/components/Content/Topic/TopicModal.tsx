@@ -106,8 +106,16 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!nameEn.trim() || !slug.trim()) {
-      setError(t("admin.scholars.nameSlugRequired", "Name and slug are required"));
+    const hasAnyLanguage =
+      nameEn.trim().length > 0 || Object.values(translations).some((v) => v && v.trim().length > 0);
+
+    if (!slug.trim() || !hasAnyLanguage) {
+      setError(
+        t(
+          "admin.contents.slugAndLanguageRequired",
+          "Slug and at least one language name are required.",
+        ),
+      );
       return;
     }
 
@@ -183,7 +191,7 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
 
           <div className={styles.field}>
             <label htmlFor="topic-slug" className={styles.label}>
-              {t("admin.contents.slugLabel", "Slug *")}
+              {t("admin.contents.slugLabel", "Slug")} *
             </label>
             <EditableInput
               id="topic-slug"
@@ -196,7 +204,7 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
 
           <div className={styles.field}>
             <label htmlFor="topic-name-en" className={styles.label}>
-              {t("admin.contents.englishNameLabel", "English Name *")}
+              {t("admin.contents.englishNameLabel", "English Name")} *
             </label>
             <EditableInput
               id="topic-name-en"

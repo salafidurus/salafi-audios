@@ -29,6 +29,7 @@ export function ListingTranslatableFields({
       <div className={styles.formGroup}>
         <label htmlFor="lecture-title" className={styles.label}>
           {t("admin.contents.listing.titleLabel", "Title")}
+          {isMainLocale ? " *" : ""}
         </label>
         <input
           id="lecture-title"
@@ -47,14 +48,14 @@ export function ListingTranslatableFields({
               });
             }
           }}
-          required
+          required={isMainLocale}
         />
       </div>
 
       {isMainLocale && (
         <div className={styles.formGroup}>
           <label htmlFor="lecture-slug" className={styles.label}>
-            {t("admin.contents.listing.slugLabel", "Slug")}
+            {t("admin.contents.listing.slugLabel", "Slug")} *
           </label>
           <input
             id="lecture-slug"
