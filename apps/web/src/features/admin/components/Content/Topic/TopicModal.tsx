@@ -22,7 +22,7 @@ import styles from "./topic-modal.module.css";
 interface TopicModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSaved: (slug: string) => void;
+  onSaved: (slug: string) => void | Promise<void>;
   topicSlug?: string;
 }
 
@@ -127,7 +127,7 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
           translations: translationEntries.filter((t) => t.name.trim()),
         };
         await updateTopicWithTranslations(topicSlug, body);
-        onSaved(topicSlug);
+        await onSaved(topicSlug);
       } else {
         const body: CreateTopicWithTranslationsDto = {
           slug,
@@ -136,7 +136,7 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
           translations: translationEntries.filter((t) => t.name.trim()),
         };
         const result = await createTopicWithTranslations(body);
-        onSaved(result.slug);
+        await onSaved(result.slug);
       }
       onClose();
     } catch (err: unknown) {

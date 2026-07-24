@@ -49,8 +49,8 @@ export function AdminContentsScreen() {
     setIsTopicModalOpen(true);
   };
 
-  const handleTopicSaved = (_slug: string) => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.topics.list() });
+  const handleTopicSaved = async (_slug: string) => {
+    await queryClient.invalidateQueries({ queryKey: queryKeys.topics.list() });
   };
 
   // Listing modal state
