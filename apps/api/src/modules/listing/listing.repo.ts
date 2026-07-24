@@ -1,5 +1,5 @@
 import { PrismaService } from '../../core/db/prisma.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { Prisma, Status } from '@sd/core-db';
 import type {
   ListingDetailDto,
@@ -662,6 +662,175 @@ export class ListingRepository {
     if (listing?.parentId) {
       await this.syncListingCounters(listing.parentId, tx);
     }
+  }
+
+  // ─── Format Transitions (promote/demote) ──────────────────────────────────
+
+  private async generateUniqueChildSlug(prisma: PrismaService, baseSlug: string): Promise<string> {
+    let counter = 1;
+    let candidateSlug = `${baseSlug}-${counter}`;
+    while (
+      await prisma.listing.findFirst({
+        where: { slug: candidateSlug, deletedAt: null },
+      })
+    ) {
+      counter++;
+      candidateSlug = `${baseSlug}-${counter}`;
+    }
+    return candidateSlug;
+  }
+
+  async promoteListing(id: string, updatedBy?: string): Promise<{ id: string; title: string }> {
+    return this.prisma.$transaction(async (tx) => {
+      const row = await tx.listing.findUniqueOrThrow({ where: { id } });
+
+      if (row.format === 'collection') {
+        throw new BadRequestException('Collection cannot be promoted further');
+      }
+
+      const targetFormat = row.format === 'single' ? 'series' : 'collection';
+      const childSlug = await this.generateUniqueChildSlug(this.prisma, row.slug);
+
+      const child = await tx.listing.create({
+        data: {
+          format: row.format,
+          parentId: id,
+          scholarId: row.scholarId,
+          title: row.title,
+          slug: childSlug,
+          language: row.language,
+          status: row.status,
+          orderIndex: 0,
+          createdBy: updatedBy,
+        },
+      });
+
+      if (row.format === 'single') {
+        await tx.audioAsset.updateMany({
+          where: { listingId: id },
+          data: { listingId: child.id },
+        });
+      } else {
+        await tx.listing.updateMany({
+          where: { parentId: id, id: { not: child.id }, deletedAt: null },
+          data: { parentId: child.id },
+        });
+      }
+
+      await tx.listing.update({
+        where: { id },
+        data: { format: targetFormat, durationSeconds: null, updatedBy },
+      });
+
+      if (row.parentId) {
+        await this.syncListingCounters(row.parentId, tx);
+      }
+      await this.syncListingCounters(id, tx);
+
+      return { id, title: row.title };
+    });
+  }
+
+  async demoteListing(
+    id: string,
+    target: 'series' | 'single',
+    updatedBy?: string,
+  ): Promise<{ id: string }> {
+    return this.prisma.$transaction(async (tx) => {
+      const [row, children] = await Promise.all([
+        tx.listing.findUniqueOrThrow({ where: { id } }),
+        tx.listing.findMany({
+          where: { parentId: id, deletedAt: null },
+        }),
+      ]);
+
+      if (row.format === 'single') {
+        throw new BadRequestException('Single format cannot be demoted');
+      }
+
+      if (row.format === 'series' && target === 'single') {
+        if (children.length > 1) {
+          throw new BadRequestException(
+            `Can't demote: this Series has ${children.length} lessons — merge down to 1 first`,
+          );
+        }
+        if (children.length === 1) {
+          await tx.audioAsset.updateMany({
+            where: { listingId: children[0].id },
+            data: { listingId: id },
+          });
+          await tx.listing.update({
+            where: { id: children[0].id },
+            data: { deletedAt: new Date(), deletedBy: updatedBy },
+          });
+        }
+        await tx.listing.update({
+          where: { id },
+          data: { format: 'single', updatedBy },
+        });
+      } else if (row.format === 'collection' && target === 'series') {
+        if (children.length > 1) {
+          throw new BadRequestException(
+            `Can't demote: this Collection has ${children.length} modules — merge down to 1 first`,
+          );
+        }
+        if (children.length === 1) {
+          await tx.listing.updateMany({
+            where: { parentId: children[0].id, deletedAt: null },
+            data: { parentId: id },
+          });
+          await tx.listing.update({
+            where: { id: children[0].id },
+            data: { deletedAt: new Date(), deletedBy: updatedBy },
+          });
+        }
+        await tx.listing.update({
+          where: { id },
+          data: { format: 'series', updatedBy },
+        });
+      } else if (row.format === 'collection' && target === 'single') {
+        if (children.length > 1) {
+          throw new BadRequestException(
+            `Can't demote: this Collection has ${children.length} modules — merge down to 1 first`,
+          );
+        }
+        if (children.length === 1) {
+          const module = children[0];
+          const moduleLessons = await tx.listing.findMany({
+            where: { parentId: module.id, deletedAt: null },
+          });
+          if (moduleLessons.length > 1) {
+            throw new BadRequestException(
+              `Can't demote: the Module has ${moduleLessons.length} lessons — merge down to 1 first`,
+            );
+          }
+          if (moduleLessons.length === 1) {
+            await tx.audioAsset.updateMany({
+              where: { listingId: moduleLessons[0].id },
+              data: { listingId: id },
+            });
+            await tx.listing.update({
+              where: { id: moduleLessons[0].id },
+              data: { deletedAt: new Date(), deletedBy: updatedBy },
+            });
+          }
+          await tx.listing.update({
+            where: { id: module.id },
+            data: { deletedAt: new Date(), deletedBy: updatedBy },
+          });
+        }
+        await tx.listing.update({
+          where: { id },
+          data: { format: 'single', updatedBy },
+        });
+      }
+
+      if (row.parentId) {
+        await this.syncListingCounters(row.parentId, tx);
+      }
+
+      return { id };
+    });
   }
 
   // ─── Admin Listing Methods ────────────────────────────────────────────────
