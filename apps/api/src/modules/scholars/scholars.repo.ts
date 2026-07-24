@@ -553,6 +553,7 @@ export class ScholarsRepository {
       if (dto.isActive !== undefined) updateData.isActive = dto.isActive;
       if (dto.country !== undefined) updateData.country = dto.country;
       if (dto.mainLanguage !== undefined) updateData.mainLanguage = dto.mainLanguage;
+      if (dto.title !== undefined) updateData.title = dto.title;
       if (dto.orderIndex !== undefined) updateData.orderIndex = dto.orderIndex;
       if (dto.socialTwitter !== undefined) updateData.socialTwitter = dto.socialTwitter;
       if (dto.socialTelegram !== undefined) updateData.socialTelegram = dto.socialTelegram;

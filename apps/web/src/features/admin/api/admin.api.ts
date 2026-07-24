@@ -9,6 +9,7 @@ import type {
   CreateTopicWithTranslationsDto,
   UpdateTopicWithTranslationsDto,
   ScholarFormDataDto,
+  ScholarTitle,
 } from "@sd/core-contracts";
 
 // --- Permissions ---
@@ -79,6 +80,8 @@ export type AdminScholarInput = {
   isActive?: boolean;
   country?: string;
   mainLanguage?: "en" | "ar";
+  title?: ScholarTitle;
+  orderIndex?: number;
   socialTwitter?: string;
   socialTelegram?: string;
   socialYoutube?: string;

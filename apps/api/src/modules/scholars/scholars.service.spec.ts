@@ -241,7 +241,7 @@ describe('ScholarsService', () => {
 
   describe('update', () => {
     it('should update existing scholar', async () => {
-      const dto: UpdateScholarDto = { name: 'Updated Name' };
+      const dto: UpdateScholarDto = { name: 'Updated Name', title: 'sheikh' };
       const existing = {
         id: 's1',
         slug: 'test',
