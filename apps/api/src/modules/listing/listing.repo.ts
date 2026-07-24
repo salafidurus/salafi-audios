@@ -737,12 +737,14 @@ export class ListingRepository {
     updatedBy?: string,
   ): Promise<{ id: string }> {
     return this.prisma.$transaction(async (tx) => {
-      const [row, children] = await Promise.all([
+      const results = await Promise.all([
         tx.listing.findUniqueOrThrow({ where: { id } }),
         tx.listing.findMany({
           where: { parentId: id, deletedAt: null },
         }),
       ]);
+      const row = results[0];
+      const children = results[1];
 
       if (row.format === 'single') {
         throw new BadRequestException('Single format cannot be demoted');
@@ -756,11 +758,11 @@ export class ListingRepository {
         }
         if (children.length === 1) {
           await tx.audioAsset.updateMany({
-            where: { listingId: children[0].id },
+            where: { listingId: children[0]!.id },
             data: { listingId: id },
           });
           await tx.listing.update({
-            where: { id: children[0].id },
+            where: { id: children[0]!.id },
             data: { deletedAt: new Date(), deletedBy: updatedBy },
           });
         }
@@ -776,11 +778,11 @@ export class ListingRepository {
         }
         if (children.length === 1) {
           await tx.listing.updateMany({
-            where: { parentId: children[0].id, deletedAt: null },
+            where: { parentId: children[0]!.id, deletedAt: null },
             data: { parentId: id },
           });
           await tx.listing.update({
-            where: { id: children[0].id },
+            where: { id: children[0]!.id },
             data: { deletedAt: new Date(), deletedBy: updatedBy },
           });
         }
@@ -795,7 +797,7 @@ export class ListingRepository {
           );
         }
         if (children.length === 1) {
-          const module = children[0];
+          const module = children[0]!;
           const moduleLessons = await tx.listing.findMany({
             where: { parentId: module.id, deletedAt: null },
           });
@@ -806,11 +808,11 @@ export class ListingRepository {
           }
           if (moduleLessons.length === 1) {
             await tx.audioAsset.updateMany({
-              where: { listingId: moduleLessons[0].id },
+              where: { listingId: moduleLessons[0]!.id },
               data: { listingId: id },
             });
             await tx.listing.update({
-              where: { id: moduleLessons[0].id },
+              where: { id: moduleLessons[0]!.id },
               data: { deletedAt: new Date(), deletedBy: updatedBy },
             });
           }
