@@ -2,7 +2,7 @@
 
 import { useEffect, useReducer, useState, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { queryKeys, type AdminUserListDto, type UserRole } from "@sd/core-contracts";
+import { queryKeys, type UserRole } from "@sd/core-contracts";
 import {
   fetchUserRoles,
   grantRole,
@@ -125,46 +125,15 @@ export function RoleDialog({
       }
     }
 
-    // Optimistic Update
-    const updatedRoles = Array.from(pendingRoles);
-    queryClient.setQueriesData<AdminUserListDto>(
-      { queryKey: queryKeys.admin.users.all() },
-      (oldData) => {
-        if (!oldData?.users) {
-          return oldData;
-        }
-        return {
-          ...oldData,
-          users: oldData.users.map((u) => (u.id === userId ? { ...u, roles: updatedRoles } : u)),
-        };
-      },
-    );
-
-    // Invalidate query immediately to trigger refetch
-    queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
-
-    // Call callback immediately to close or update parent view
-    onRolesChange?.();
-    onClose();
-
-    // Fire API calls in background
     try {
       await Promise.all([
-        ...toGrant.map(async (role) => {
-          try {
-            await grantRole(userId, role);
-          } catch (error) {
-            console.error("Failed to grant role:", role, error);
-          }
-        }),
-        ...toRevoke.map(async (role) => {
-          try {
-            await revokeRole(userId, role);
-          } catch (error) {
-            console.error("Failed to revoke role:", role, error);
-          }
-        }),
+        ...toGrant.map((role) => grantRole(userId, role)),
+        ...toRevoke.map((role) => revokeRole(userId, role)),
       ]);
+
+      await queryClient.invalidateQueries({ queryKey: queryKeys.admin.users.all() });
+      onRolesChange?.();
+      onClose();
     } catch (error) {
       console.error("Failed to complete batch role updates", error);
     } finally {

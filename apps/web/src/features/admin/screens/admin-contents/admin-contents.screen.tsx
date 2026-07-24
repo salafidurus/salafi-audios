@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { queryKeys, type TopicDetailDto } from "@sd/core-contracts";
-import { useTopicsList } from "@sd/domain-search";
+import { useAdminTopicsList } from "@sd/domain-content";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
@@ -36,7 +36,7 @@ export function AdminContentsScreen() {
 
   const activeTab = pathname.includes("/listings") ? "listings" : "topics";
 
-  const { data: topicsData } = useTopicsList();
+  const { data: topicsData } = useAdminTopicsList();
 
   const topics = topicsData ?? EMPTY_TOPICS_ARRAY;
 
@@ -49,8 +49,11 @@ export function AdminContentsScreen() {
     setIsTopicModalOpen(true);
   };
 
-  const handleTopicSaved = (_slug: string) => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.topics.list() });
+  const handleTopicSaved = async (_slug: string) => {
+    await Promise.all([
+      queryClient.refetchQueries({ queryKey: queryKeys.topics.all }),
+      queryClient.refetchQueries({ queryKey: queryKeys.admin.topics.all() }),
+    ]);
   };
 
   // Listing modal state
@@ -128,8 +131,12 @@ export function AdminContentsScreen() {
                   }}
                 />
                 <Content.TopicModal
+                  key={editingTopicSlug}
                   isOpen={isTopicModalOpen}
-                  onClose={() => setIsTopicModalOpen(false)}
+                  onClose={() => {
+                    setIsTopicModalOpen(false);
+                    setEditingTopicSlug(undefined);
+                  }}
                   onSaved={handleTopicSaved}
                   topicSlug={editingTopicSlug}
                 />

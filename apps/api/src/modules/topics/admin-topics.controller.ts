@@ -13,6 +13,13 @@ import { UpdateTopicDto } from './dto/update-topic.dto';
 export class AdminTopicsController {
   constructor(private readonly service: TopicsService) {}
 
+  @Get()
+  @RequiresPermission(Permissions.TOPICS_VIEW)
+  @ApiOperation({ summary: 'List all topics' })
+  list() {
+    return this.service.list();
+  }
+
   @Get(':slug')
   @RequiresPermission(Permissions.TOPICS_EDIT)
   @ApiOperation({ summary: 'Get topic detail with translations' })

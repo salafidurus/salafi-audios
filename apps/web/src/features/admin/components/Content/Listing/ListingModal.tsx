@@ -30,8 +30,7 @@ import styles from "./listing-modal.module.css";
 interface ListingModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
-  listing?: AdminListingDetailDto | null;
+  onSuccess: () => void | Promise<void>;
   listingId?: string | null;
   initialAudioData?: {
     audioKey: string;
@@ -48,7 +47,6 @@ export function ListingModal({
   isOpen,
   onClose,
   onSuccess,
-  listing,
   listingId,
   initialAudioData,
   showAudioUploadTab,
@@ -60,8 +58,8 @@ export function ListingModal({
   const fetchErrorRef = useRef<string | null>(null);
   const [activeTab, setActiveTab] = useState<
     "general" | "main" | "other" | "upload" | "arrange" | "review"
-  >(showAudioUploadTab && !listing && !initialAudioData ? "upload" : "general");
-  const { state, dispatch } = useListingForm(listing, initialAudioData);
+  >(showAudioUploadTab && !listingId && !initialAudioData ? "upload" : "general");
+  const { state, dispatch } = useListingForm(null, initialAudioData);
   const { title, slug, description, scholarId, language, translationChanges, saving } = state;
 
   const mainLocale = (language || "ar") as Locale;
@@ -69,8 +67,8 @@ export function ListingModal({
 
   useEffect(() => {
     if (!isOpen) return;
-    setActiveTab(!listing && !listingId && !initialAudioData ? "upload" : "general");
-  }, [isOpen, listing, listingId, initialAudioData]);
+    setActiveTab(!listingId && !initialAudioData ? "upload" : "general");
+  }, [isOpen, listingId, initialAudioData]);
 
   // Fetch form data when opening modal in edit mode with listingId
   useEffect(() => {
@@ -126,7 +124,7 @@ export function ListingModal({
   const { data: seriesData } = useAdminListingSeriesByScholar(scholarId);
 
   useEffect(() => {
-    if (!listing || !scholarId || !scholarsData?.scholars) return;
+    if (!listingId || !scholarId || !scholarsData?.scholars) return;
     const selectedScholar = scholarsData.scholars.find((s) => s.id === scholarId);
     if (selectedScholar && selectedScholar.mainLanguage) {
       dispatch({
@@ -135,10 +133,10 @@ export function ListingModal({
         value: selectedScholar.mainLanguage as Locale,
       });
     }
-  }, [scholarId, scholarsData, listing, dispatch]);
+  }, [listingId, scholarId, scholarsData, dispatch]);
 
   const handleTitleChange = (val: string) => {
-    if (!listing) {
+    if (!listingId) {
       dispatch({ type: "UPDATE_FIELD", field: "title", value: val });
       dispatch({
         type: "UPDATE_FIELD",
@@ -186,7 +184,7 @@ export function ListingModal({
     dispatch({ type: "SET_ERROR", error: null });
 
     try {
-      if (listing) {
+      if (listingId) {
         const payload: any = {
           title,
           description: state.description,
@@ -203,7 +201,7 @@ export function ListingModal({
           (v) => !!(v?.title || v?.description),
         );
 
-        await updateLecture(listing.id, payload);
+        await updateLecture(listingId, payload);
       } else {
         if (!initialAudioData) {
           dispatch({
@@ -239,7 +237,7 @@ export function ListingModal({
 
         await createLecture(payload);
       }
-      onSuccess();
+      await onSuccess();
       onClose();
     } catch (err) {
       dispatch({
@@ -259,12 +257,12 @@ export function ListingModal({
 
   return (
     <Modal
-      key={listing?.id ?? "create"}
+      key={listingId ?? "create"}
       isOpen={isOpen}
       onClose={onClose}
       title={
-        listing
-          ? `${t("admin.contents.listing.editTitle", "Editing Listing Details")}${isDesktop ? ` (${listing.title})` : ""}`
+        listingId
+          ? `${t("admin.contents.listing.editTitle", "Editing Listing Details")}${isDesktop && title ? ` (${title})` : ""}`
           : t("admin.contents.listing.newTitle", "New Listing Details")
       }
       size="xl"

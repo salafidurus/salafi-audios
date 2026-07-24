@@ -53,8 +53,8 @@ export function AdminScholarsScreen() {
       await createScholar(formData);
     }
     // Invalidate all scholar queries to refetch updated data
-    await queryClient.invalidateQueries({
-      queryKey: queryKeys.admin.scholars.infinite(),
+    await queryClient.refetchQueries({
+      queryKey: queryKeys.admin.scholars.all(),
     });
     setIsModalOpen(false);
     setEditingScholarId(null);

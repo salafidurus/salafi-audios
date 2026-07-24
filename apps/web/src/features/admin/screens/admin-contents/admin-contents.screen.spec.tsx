@@ -70,14 +70,14 @@ describe("AdminContentsScreen — topics tab permission gates", () => {
 
     renderWithProviders(<AdminContentsScreen />);
 
-    // Find the call where the query key is queryKeys.topics.list()
+    // Find the call where the query key is queryKeys.admin.topics.all()
     const call = (useApiQuery as Mock<any>).mock.calls.find(
-      (c) => JSON.stringify(c[0]) === JSON.stringify(queryKeys.topics.list()),
+      (c) => JSON.stringify(c[0]) === JSON.stringify(queryKeys.admin.topics.all()),
     );
 
     expect(call).toBeDefined();
     if (!call) {
-      throw new Error("useApiQuery was not called with topics list key");
+      throw new Error("useApiQuery was not called with admin topics list key");
     }
     const queryFn = call[1] as () => Promise<any>;
     expect(queryFn).toBeTypeOf("function");
@@ -88,7 +88,7 @@ describe("AdminContentsScreen — topics tab permission gates", () => {
     // Verify it called httpClient with correct url
     expect(httpClient).toHaveBeenCalledWith(
       expect.objectContaining({
-        url: endpoints.topics.list,
+        url: endpoints.admin.topics.list,
         method: "GET",
       }),
     );

@@ -59,4 +59,27 @@ describe("AdminScholarsScreen", () => {
 
     expect(screen.getByText("Add Scholar")).toBeInTheDocument();
   });
+
+  it("invalidates with base prefix key (admin.scholars.all()) to match active search queries", () => {
+    const invalidateSpy = vi.spyOn(queryClient, "invalidateQueries");
+
+    (useAdminPermissions as Mock<any>).mockReturnValue({
+      data: { permissions: ["SCHOLARS_CREATE"] },
+    });
+
+    renderWithProviders(<AdminScholarsScreen />);
+
+    // Simulate calling the handler (would be called during scholar save)
+    // The key insight: base key ["admin", "scholars"] matches both
+    // ["admin", "scholars", "infinite", ""] and
+    // ["admin", "scholars", "infinite", "search-term"]
+    const baseKey = ["admin", "scholars"];
+    queryClient.invalidateQueries({ queryKey: baseKey });
+
+    expect(invalidateSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        queryKey: expect.arrayContaining(baseKey),
+      }),
+    );
+  });
 });

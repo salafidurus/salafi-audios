@@ -62,6 +62,7 @@ export const endpoints = {
       formData: (id: string) => `/admin/scholars/${id}/form-data`,
     },
     topics: {
+      list: "/admin/topics",
       create: "/admin/topics",
       detail: (slug: string) => `/admin/topics/${slug}`,
       update: (slug: string) => `/admin/topics/${slug}`,
