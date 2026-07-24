@@ -438,6 +438,7 @@
       "kibarLabel": "Kibar Scholar",
       "featuredLabel": "Featured",
       "activeLabel": "Active",
+      "orderIndexLabel": "Order Index",
       "searchPlaceholderDesktop": "Search scholars by name or slug..."
     },
     "users": {
@@ -603,6 +604,9 @@
         "scholarRequired": "Scholar is required.",
         "audioKeyRequired": "Audio file key is required for creation.",
         "failedToSave": "Failed to save lecture details."
+      },
+      "topic": {
+        "orderIndexLabel": "Order Index"
       }
     },
     "modal": {

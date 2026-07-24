@@ -438,6 +438,7 @@
       "kibarLabel": "من كبار العلماء",
       "featuredLabel": "مميز",
       "activeLabel": "نشط",
+      "orderIndexLabel": "ترتيب الفهرس",
       "searchPlaceholderDesktop": "البحث عن العلماء بالاسم أو المعرف...",
       "noChangesMadeYet": "لا توجد تغييرات حتى الآن"
     },
@@ -601,6 +602,9 @@
         "scholarRequired": "العالم مطلوب.",
         "audioKeyRequired": "مفتاح الملف الصوتي مطلوب للإنشاء.",
         "failedToSave": "فشل حفظ تفاصيل المحتوى."
+      },
+      "topic": {
+        "orderIndexLabel": "ترتيب الفهرس"
       }
     },
     "modal": {

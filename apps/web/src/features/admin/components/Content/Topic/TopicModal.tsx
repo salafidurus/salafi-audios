@@ -32,6 +32,7 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
 
   const [slug, setSlug] = useState("");
   const [nameEn, setNameEn] = useState("");
+  const [orderIndex, setOrderIndex] = useState(99);
   const [translations, setTranslations] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -42,6 +43,7 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
     if (!isOpen) {
       setSlug("");
       setNameEn("");
+      setOrderIndex(99);
       setTranslations({});
       setSaving(false);
       setLoading(false);
@@ -53,6 +55,7 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
     if (!topicSlug) {
       setSlug("");
       setNameEn("");
+      setOrderIndex(99);
       setTranslations({});
       return;
     }
@@ -66,6 +69,7 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
         if (cancelled) return;
         setSlug(data.slug);
         setNameEn(data.name.en ?? "");
+        setOrderIndex(data.orderIndex ?? 99);
         const transMap: Record<string, string> = {};
         for (const trans of data.translations ?? []) {
           transMap[trans.locale] = trans.fields?.name ?? "";
@@ -119,6 +123,7 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
       if (isEditing) {
         const body: UpdateTopicWithTranslationsDto = {
           name: { en: nameEn },
+          orderIndex,
           translations: translationEntries.filter((t) => t.name.trim()),
         };
         await updateTopicWithTranslations(topicSlug, body);
@@ -127,6 +132,7 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
         const body: CreateTopicWithTranslationsDto = {
           slug,
           name: { en: nameEn },
+          orderIndex,
           translations: translationEntries.filter((t) => t.name.trim()),
         };
         const result = await createTopicWithTranslations(body);
@@ -208,6 +214,23 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
               value={translations.ar ?? ""}
               onChange={(value) => handleTranslationChange("ar", value)}
               placeholder={t("admin.contents.arabicNamePlaceholder", "Topic name in Arabic")}
+            />
+          </div>
+
+          <div className={styles.field}>
+            <label htmlFor="topic-order" className={styles.label}>
+              {t("admin.contents.topic.orderIndexLabel", "Order Index")}
+            </label>
+            <input
+              id="topic-order"
+              type="number"
+              className={styles.input}
+              value={orderIndex ?? ""}
+              onChange={(e) => {
+                const value = e.target.value;
+                const parsed = value ? Number(value) : 99;
+                setOrderIndex(Number.isNaN(parsed) ? 99 : parsed);
+              }}
             />
           </div>
         </form>
