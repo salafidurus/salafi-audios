@@ -8,11 +8,8 @@ import {
   Put,
   Query,
   Req,
-  Inject,
 } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import type { Cache } from 'cache-manager';
 import type {
   AdminListingActionDto,
   AdminListingUpdateDto,
@@ -21,7 +18,7 @@ import type {
   BulkActionResultDto,
   ListingRefDto,
 } from '@sd/core-contracts';
-import { Permissions, SUPPORTED_LOCALES } from '@sd/core-contracts';
+import { Permissions } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { RequiresPermission } from '../../core/auth/decorators';
 import { ListingService } from './listing.service';
@@ -32,10 +29,7 @@ import { BulkActionDto } from '../../shared/dto/bulk-action.dto';
 @ApiCommonErrors()
 @Controller('admin/listings')
 export class AdminListingsController {
-  constructor(
-    private readonly service: ListingService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
-  ) {}
+  constructor(private readonly service: ListingService) {}
 
   @Get()
   @RequiresPermission(Permissions.LISTINGS_VIEW)
@@ -79,32 +73,17 @@ export class AdminListingsController {
     return this.service.getFormData(id);
   }
 
-  private async invalidateListingsCache(id: string) {
-    // LocaleCacheInterceptor uses format: ${url}:${locale}[:${userId}]
-    const cacheKeysToInvalidate: string[] = [];
-
-    // Invalidate listing detail caches
-    for (const locale of SUPPORTED_LOCALES) {
-      cacheKeysToInvalidate.push(`/listings/${id}:${locale}`);
-      cacheKeysToInvalidate.push(`/listings/${id}/contents:${locale}`);
-    }
-
-    await Promise.all(cacheKeysToInvalidate.map((key) => this.cacheManager.del(key)));
-  }
-
   @Post()
   @RequiresPermission(Permissions.LISTINGS_CREATE)
   @ApiOperation({ summary: 'Create a listing after R2 upload' })
-  async createListing(
+  createListing(
     @Body() dto: CreateListingDto,
     @Req() req: { user?: { id: string } },
   ): Promise<{ id: string; title: string }> {
     const publicUrl = dto.audioKey
       ? `${process.env['R2_PUBLIC_BASE_URL']}/${dto.audioKey}`
       : undefined;
-    const result = await this.service.createListing({ ...dto, publicUrl }, req.user?.id);
-    await this.invalidateListingsCache(result.id);
-    return result;
+    return this.service.createListing({ ...dto, publicUrl }, req.user?.id);
   }
 
   @Post('bulk')
@@ -124,7 +103,6 @@ export class AdminListingsController {
     @Req() req: { user?: { id: string } },
   ): Promise<AdminListingActionDto> {
     const res = await this.service.updateListing(id, updateDto, req.user?.id);
-    await this.invalidateListingsCache(id);
     return { ...res, message: 'Listing updated successfully' };
   }
 
@@ -134,7 +112,6 @@ export class AdminListingsController {
   @ApiOkResponse({ description: 'Listing published successfully' })
   async publishListing(@Param('id') id: string): Promise<AdminListingActionDto> {
     const res = await this.service.publishListing(id);
-    await this.invalidateListingsCache(id);
     return { ...res, message: 'Listing published successfully' };
   }
 
@@ -144,7 +121,6 @@ export class AdminListingsController {
   @ApiOkResponse({ description: 'Listing archived successfully' })
   async archiveListing(@Param('id') id: string): Promise<AdminListingActionDto> {
     const res = await this.service.archiveListing(id);
-    await this.invalidateListingsCache(id);
     return { ...res, message: 'Listing archived successfully' };
   }
 }

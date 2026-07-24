@@ -1,10 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
 import type {
   TopicDetailDto,
   TopicLectureViewDto,
   TranslationViewDto,
   AdminTopicDetailDto,
 } from '@sd/core-contracts';
+import { SUPPORTED_LOCALES } from '@sd/core-contracts';
 import type { CreateTopicWithTranslationsDto } from '@sd/core-contracts';
 import type { UpdateTopicWithTranslationsDto } from '@sd/core-contracts';
 import { SaveTopicTranslationDto } from './dto/save-topic-translation.dto';
@@ -12,7 +15,10 @@ import { TopicsRepository } from './topics.repo';
 
 @Injectable()
 export class TopicsService {
-  constructor(private readonly repo: TopicsRepository) {}
+  constructor(
+    private readonly repo: TopicsRepository,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   list(): Promise<TopicDetailDto[]> {
     return this.repo.list();
@@ -34,6 +40,26 @@ export class TopicsService {
     const found = await this.repo.findBySlug(slug);
     if (!found) throw new NotFoundException(`Topic "${slug}" not found`);
     await this.repo.deleteBySlug(slug);
+    await this.invalidateCache(slug);
+  }
+
+  private async invalidateCache(slug?: string): Promise<void> {
+    // LocaleCacheInterceptor uses format: ${url}:${locale}[:${userId}]
+    const cacheKeysToInvalidate: string[] = [];
+
+    // Invalidate list cache
+    for (const locale of SUPPORTED_LOCALES) {
+      cacheKeysToInvalidate.push(`/topics:${locale}`);
+    }
+
+    // Also invalidate detail caches when a specific slug is provided
+    if (slug) {
+      for (const locale of SUPPORTED_LOCALES) {
+        cacheKeysToInvalidate.push(`/topics/${slug}:${locale}`);
+      }
+    }
+
+    await Promise.all(cacheKeysToInvalidate.map((key) => this.cacheManager.del(key)));
   }
 
   // ─── New admin combined methods ─────────────────────────────────────────
@@ -46,22 +72,26 @@ export class TopicsService {
   }
 
   async createWithTranslations(dto: CreateTopicWithTranslationsDto): Promise<AdminTopicDetailDto> {
-    return this.upsertWithTranslations(dto.slug, {
+    const result = await this.upsertWithTranslations(dto.slug, {
       name: dto.name,
       orderIndex: dto.orderIndex,
       translations: dto.translations ?? [],
     });
+    await this.invalidateCache(result.slug);
+    return result;
   }
 
   async updateWithTranslations(
     slug: string,
     dto: UpdateTopicWithTranslationsDto,
   ): Promise<AdminTopicDetailDto> {
-    return this.upsertWithTranslations(slug, {
+    const result = await this.upsertWithTranslations(slug, {
       name: dto.name,
       orderIndex: dto.orderIndex,
       translations: dto.translations,
     });
+    await this.invalidateCache(slug);
+    return result;
   }
 
   private async upsertWithTranslations(

@@ -1,4 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
 import type {
   ScholarListItemDto,
   ScholarDetailDto,
@@ -8,6 +10,7 @@ import type {
   AdminScholarListDto,
   Locale,
 } from '@sd/core-contracts';
+import { SUPPORTED_LOCALES } from '@sd/core-contracts';
 import { ScholarsRepository } from './scholars.repo';
 import type { CreateScholarDto } from './dto/create-scholar.dto';
 import type { UpdateScholarDto } from './dto/update-scholar.dto';
@@ -15,7 +18,10 @@ import type { SaveScholarTranslationDto } from './dto/save-scholar-translation.d
 
 @Injectable()
 export class ScholarsService {
-  constructor(private readonly repo: ScholarsRepository) {}
+  constructor(
+    private readonly repo: ScholarsRepository,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   list(): Promise<{ scholars: ScholarListItemDto[] }> {
     return this.repo.list();
@@ -55,14 +61,35 @@ export class ScholarsService {
 
   async create(dto: CreateScholarDto) {
     // Repository handles both scholar creation and translations in a single transaction
-    return this.repo.create(dto);
+    const result = await this.repo.create(dto);
+    await this.invalidateCache(result.slug);
+    return result;
   }
 
   async update(id: string, dto: UpdateScholarDto) {
     const existing = await this.repo.findById(id);
     if (!existing) throw new NotFoundException(`Scholar "${id}" not found`);
     // Repository handles both scholar update and translations in a single transaction
-    return this.repo.update(id, dto);
+    const result = await this.repo.update(id, dto);
+    await this.invalidateCache(result.slug);
+    return result;
+  }
+
+  private async invalidateCache(slug: string): Promise<void> {
+    // LocaleCacheInterceptor uses format: ${url}:${locale}[:${userId}]
+    const cacheKeysToInvalidate: string[] = [];
+
+    // Invalidate list cache
+    for (const locale of SUPPORTED_LOCALES) {
+      cacheKeysToInvalidate.push(`/scholars:${locale}`);
+    }
+
+    // Invalidate detail caches
+    for (const locale of SUPPORTED_LOCALES) {
+      cacheKeysToInvalidate.push(`/scholars/${slug}:${locale}`);
+    }
+
+    await Promise.all(cacheKeysToInvalidate.map((key) => this.cacheManager.del(key)));
   }
 
   // ─── Scholar translations ─────────────────────────────────────────────────

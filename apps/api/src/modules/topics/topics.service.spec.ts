@@ -1,6 +1,7 @@
 import { vi, describe, it, expect, beforeEach } from 'bun:test';
 import type { Mocked } from '../../test/setup';
 import { NotFoundException } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
 import type { TopicDetailDto, TranslationViewDto } from '@sd/core-contracts';
 import type { SaveTopicTranslationDto } from './dto/save-topic-translation.dto';
@@ -10,6 +11,7 @@ import { TopicsService } from './topics.service';
 describe('TopicsService', () => {
   let service: TopicsService;
   let repo: Mocked<TopicsRepository>;
+  let cacheManager: any;
 
   const sampleTopic: TopicDetailDto = {
     id: 't1',
@@ -30,6 +32,10 @@ describe('TopicsService', () => {
   ];
 
   beforeEach(async () => {
+    cacheManager = {
+      del: vi.fn().mockResolvedValue(undefined),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         TopicsService,
@@ -43,6 +49,10 @@ describe('TopicsService', () => {
             deleteTopicTranslation: vi.fn<any>(),
             listTopicTranslations: vi.fn<any>(),
           } as Partial<Mocked<TopicsRepository>>,
+        },
+        {
+          provide: CACHE_MANAGER,
+          useValue: cacheManager,
         },
       ],
     }).compile();

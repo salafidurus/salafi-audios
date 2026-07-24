@@ -1,6 +1,7 @@
 import type { Mocked } from '../../test/setup';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'bun:test';
 import { NotFoundException } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
 import type {
   ScholarDetailDto,
@@ -15,6 +16,7 @@ import { ScholarsService } from './scholars.service';
 describe('ScholarsService', () => {
   let service: ScholarsService;
   let repo: Mocked<ScholarsRepository>;
+  let cacheManager: any;
 
   const mockScholarDetail: ScholarDetailDto & {
     lectureCount: number;
@@ -45,6 +47,10 @@ describe('ScholarsService', () => {
   };
 
   beforeEach(async () => {
+    cacheManager = {
+      del: vi.fn().mockResolvedValue(undefined),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ScholarsService,
@@ -60,6 +66,10 @@ describe('ScholarsService', () => {
             findById: vi.fn<any>(),
             upsertScholarTranslation: vi.fn<any>(),
           } as Partial<Mocked<ScholarsRepository>>,
+        },
+        {
+          provide: CACHE_MANAGER,
+          useValue: cacheManager,
         },
       ],
     }).compile();

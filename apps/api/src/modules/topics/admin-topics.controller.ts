@@ -1,8 +1,6 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, Inject } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import type { Cache } from 'cache-manager';
-import { Permissions, SUPPORTED_LOCALES } from '@sd/core-contracts';
+import { Permissions } from '@sd/core-contracts';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
 import { RequiresPermission } from '../../core/auth/decorators';
 import { TopicsService } from './topics.service';
@@ -13,10 +11,7 @@ import { UpdateTopicDto } from './dto/update-topic.dto';
 @ApiCommonErrors()
 @Controller('admin/topics')
 export class AdminTopicsController {
-  constructor(
-    private readonly service: TopicsService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
-  ) {}
+  constructor(private readonly service: TopicsService) {}
 
   @Get()
   @RequiresPermission(Permissions.TOPICS_VIEW)
@@ -32,50 +27,24 @@ export class AdminTopicsController {
     return this.service.getAdminDetail(slug);
   }
 
-  private async invalidateTopicsCache(slug?: string) {
-    // LocaleCacheInterceptor uses format: ${url}:${locale}[:${userId}]
-    // Must invalidate both list cache AND detail caches for all locales
-    const cacheKeysToInvalidate: string[] = [];
-
-    // Invalidate list cache
-    for (const locale of SUPPORTED_LOCALES) {
-      cacheKeysToInvalidate.push(`/topics:${locale}`);
-    }
-
-    // Also invalidate detail caches when a specific slug is provided
-    if (slug) {
-      for (const locale of SUPPORTED_LOCALES) {
-        cacheKeysToInvalidate.push(`/topics/${slug}:${locale}`);
-      }
-    }
-
-    await Promise.all(cacheKeysToInvalidate.map((key) => this.cacheManager.del(key)));
-  }
-
   @Post()
   @RequiresPermission(Permissions.TOPICS_CREATE)
   @ApiOperation({ summary: 'Create a topic with translations' })
-  async create(@Body() dto: CreateTopicDto) {
-    const result = await this.service.createWithTranslations(dto);
-    await this.invalidateTopicsCache(result.slug);
-    return result;
+  create(@Body() dto: CreateTopicDto) {
+    return this.service.createWithTranslations(dto);
   }
 
   @Put(':slug')
   @RequiresPermission(Permissions.TOPICS_EDIT)
   @ApiOperation({ summary: 'Update a topic with translations' })
-  async update(@Param('slug') slug: string, @Body() dto: UpdateTopicDto) {
-    const result = await this.service.updateWithTranslations(slug, dto);
-    await this.invalidateTopicsCache(slug);
-    return result;
+  update(@Param('slug') slug: string, @Body() dto: UpdateTopicDto) {
+    return this.service.updateWithTranslations(slug, dto);
   }
 
   @Delete(':slug')
   @RequiresPermission(Permissions.TOPICS_DELETE)
   @ApiOperation({ summary: 'Delete a topic' })
-  async remove(@Param('slug') slug: string) {
-    const result = await this.service.remove(slug);
-    await this.invalidateTopicsCache(slug);
-    return result;
+  remove(@Param('slug') slug: string) {
+    return this.service.remove(slug);
   }
 }
