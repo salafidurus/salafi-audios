@@ -103,11 +103,28 @@
       "scholars": "Scholars"
     },
     "subnav": {
-      "explore": { "recent": "Recent", "scholar": "Scholars", "curation": "Curation" },
-      "library": { "started": "Started", "saved": "Saved", "completed": "Completed" },
-      "account": { "general": "General", "profile": "Profile" },
-      "settings": { "general": "General", "profile": "Profile" },
-      "admin": { "topics": "Topics", "listings": "Listings" }
+      "explore": {
+        "recent": "Recent",
+        "scholar": "Scholars",
+        "curation": "Curation"
+      },
+      "library": {
+        "started": "Started",
+        "saved": "Saved",
+        "completed": "Completed"
+      },
+      "account": {
+        "general": "General",
+        "profile": "Profile"
+      },
+      "settings": {
+        "general": "General",
+        "profile": "Profile"
+      },
+      "admin": {
+        "topics": "Topics",
+        "listings": "Listings"
+      }
     }
   },
   "settings": {
@@ -501,42 +518,114 @@
         "users": "User Management"
       },
       "items": {
-        "SCHOLARS_VIEW": { "label": "View Scholars", "desc": "View scholar profiles" },
-        "SCHOLARS_CREATE": { "label": "Create Scholars", "desc": "Create new scholar profiles" },
+        "SCHOLARS_VIEW": {
+          "label": "View Scholars",
+          "desc": "View scholar profiles"
+        },
+        "SCHOLARS_CREATE": {
+          "label": "Create Scholars",
+          "desc": "Create new scholar profiles"
+        },
         "SCHOLARS_EDIT": {
           "label": "Manage Scholars",
           "desc": "Add, edit, and remove scholar profiles"
         },
-        "SCHOLARS_DELETE": { "label": "Delete Scholars", "desc": "Delete scholar profiles" },
-        "SCHOLARS_PUBLISH": { "label": "Publish Scholars", "desc": "Publish scholar profiles" },
-        "LISTINGS_VIEW": { "label": "View Content", "desc": "View content listings" },
-        "LISTINGS_CREATE": { "label": "Create Content", "desc": "Create new content listings" },
+        "SCHOLARS_DELETE": {
+          "label": "Delete Scholars",
+          "desc": "Delete scholar profiles"
+        },
+        "SCHOLARS_PUBLISH": {
+          "label": "Publish Scholars",
+          "desc": "Publish scholar profiles"
+        },
+        "LISTINGS_VIEW": {
+          "label": "View Content",
+          "desc": "View content listings"
+        },
+        "LISTINGS_CREATE": {
+          "label": "Create Content",
+          "desc": "Create new content listings"
+        },
         "LISTINGS_EDIT": {
           "label": "Manage Content",
           "desc": "Publish, archive, and manage lectures and series"
         },
-        "LISTINGS_DELETE": { "label": "Delete Content", "desc": "Delete content listings" },
-        "LISTINGS_PUBLISH": { "label": "Publish Content", "desc": "Publish content" },
-        "TOPICS_VIEW": { "label": "View Topics", "desc": "View topics" },
-        "TOPICS_CREATE": { "label": "Create Topics", "desc": "Create new topics" },
-        "TOPICS_EDIT": { "label": "Manage Topics", "desc": "Create and organize topic categories" },
-        "TOPICS_DELETE": { "label": "Delete Topics", "desc": "Delete topics" },
-        "TOPICS_PUBLISH": { "label": "Publish Topics", "desc": "Publish topics" },
-        "TRANSLATIONS_VIEW": { "label": "View Translations", "desc": "View translations" },
-        "TRANSLATIONS_CREATE": { "label": "Create Translations", "desc": "Create translations" },
-        "TRANSLATIONS_EDIT": { "label": "Edit Translations", "desc": "Edit translations" },
-        "TRANSLATIONS_DELETE": { "label": "Delete Translations", "desc": "Delete translations" },
-        "TRANSLATIONS_PUBLISH": { "label": "Publish Translations", "desc": "Publish translations" },
-        "MEDIA_UPLOAD": { "label": "Upload Media", "desc": "Upload media files" },
-        "MEDIA_DELETE": { "label": "Delete Media", "desc": "Delete media files" },
-        "USERS_VIEW": { "label": "View Users", "desc": "View user accounts and their details" },
-        "USERS_EDIT": { "label": "Edit Users", "desc": "Edit user accounts" },
-        "USERS_DELETE": { "label": "Delete Users", "desc": "Delete user accounts" },
+        "LISTINGS_DELETE": {
+          "label": "Delete Content",
+          "desc": "Delete content listings"
+        },
+        "LISTINGS_PUBLISH": {
+          "label": "Publish Content",
+          "desc": "Publish content"
+        },
+        "TOPICS_VIEW": {
+          "label": "View Topics",
+          "desc": "View topics"
+        },
+        "TOPICS_CREATE": {
+          "label": "Create Topics",
+          "desc": "Create new topics"
+        },
+        "TOPICS_EDIT": {
+          "label": "Manage Topics",
+          "desc": "Create and organize topic categories"
+        },
+        "TOPICS_DELETE": {
+          "label": "Delete Topics",
+          "desc": "Delete topics"
+        },
+        "TOPICS_PUBLISH": {
+          "label": "Publish Topics",
+          "desc": "Publish topics"
+        },
+        "TRANSLATIONS_VIEW": {
+          "label": "View Translations",
+          "desc": "View translations"
+        },
+        "TRANSLATIONS_CREATE": {
+          "label": "Create Translations",
+          "desc": "Create translations"
+        },
+        "TRANSLATIONS_EDIT": {
+          "label": "Edit Translations",
+          "desc": "Edit translations"
+        },
+        "TRANSLATIONS_DELETE": {
+          "label": "Delete Translations",
+          "desc": "Delete translations"
+        },
+        "TRANSLATIONS_PUBLISH": {
+          "label": "Publish Translations",
+          "desc": "Publish translations"
+        },
+        "MEDIA_UPLOAD": {
+          "label": "Upload Media",
+          "desc": "Upload media files"
+        },
+        "MEDIA_DELETE": {
+          "label": "Delete Media",
+          "desc": "Delete media files"
+        },
+        "USERS_VIEW": {
+          "label": "View Users",
+          "desc": "View user accounts and their details"
+        },
+        "USERS_EDIT": {
+          "label": "Edit Users",
+          "desc": "Edit user accounts"
+        },
+        "USERS_DELETE": {
+          "label": "Delete Users",
+          "desc": "Delete user accounts"
+        },
         "USERS_GRANT_PERMISSIONS": {
           "label": "Manage Permissions",
           "desc": "Grant and revoke user permissions"
         },
-        "USERS_GRANT_ROLES": { "label": "Manage Roles", "desc": "Assign roles to users" }
+        "USERS_GRANT_ROLES": {
+          "label": "Manage Roles",
+          "desc": "Assign roles to users"
+        }
       },
       "revokeTitle": "Revoke Permission?",
       "revoking": "Revoking…",
@@ -606,7 +695,6 @@
         "noTopicsAvailable": "No topics available",
         "uploadTab": "Upload Audio",
         "arrangeTab": "Arrange",
-        "arrangeComingSoon": "Coming soon",
         "languageLabel": "Language",
         "audioDropzone": "Drag & drop an audio file here",
         "clickToBrowse": "or click to browse files",
@@ -615,7 +703,54 @@
         "titleRequired": "Title is required.",
         "scholarRequired": "Scholar is required.",
         "audioKeyRequired": "Audio file key is required for creation.",
-        "failedToSave": "Failed to save lecture details."
+        "failedToSave": "Failed to save lecture details.",
+        "uploadArrangeTitle": "Upload & Arrange",
+        "audioDropzoneMulti": "Drag & drop audio files here",
+        "filenameHint": "Files named \"NNN Title\" are ordered by their number automatically",
+        "selectAudioFiles": "Select audio files",
+        "itemTitle": "Title",
+        "removeFile": "Remove file",
+        "audioFilesOnly": "Please select audio files.",
+        "assignmentPlaceholder": "Assignment",
+        "newLesson": "New lesson",
+        "replaceAudioOf": "Replace audio:",
+        "slugMatchSuggestion": "Filename matches existing lesson",
+        "replaceItsAudio": "Replace its audio",
+        "keepAsNew": "Keep as new lesson",
+        "moduleLabel": "Module",
+        "selectModule": "Select module",
+        "slugConflict": "This slug is already in use",
+        "existingLessons": "Existing lessons",
+        "currentAudio": "Current audio:",
+        "replacesPrimaryAudio": "Replaces the primary audio",
+        "newModuleTitle": "New module title",
+        "addModule": "Add module",
+        "removeModule": "Remove module",
+        "unassigned": "Unassigned",
+        "assignBeforeUpload": "Assign these to a module before uploading",
+        "arrangeEmpty": "Add audio files in the Upload tab first.",
+        "reviewEmpty": "Nothing staged for upload yet.",
+        "reviewNewLesson": "New lesson",
+        "reviewReplaceAudio": "Replace audio",
+        "reviewCreateModule": "Create module",
+        "noFilesStaged": "Add at least one audio file first.",
+        "resolveConflicts": "Resolve the slug conflicts in the Arrange tab first.",
+        "resolveUnassigned": "Assign every file to a module in the Arrange tab first.",
+        "failedToLoadArrange": "Failed to load listing data.",
+        "uploadAction": "Upload",
+        "uploading": "Uploading…",
+        "saving": "Saving…",
+        "changeCover": "Change cover",
+        "collection": "Collection",
+        "coverImageAlt": "Listing cover image",
+        "coverImageLabel": "Cover Image",
+        "coverImageUpdated": "Updated",
+        "formatLabel": "Format",
+        "requiredFieldsMissing": "Language, scholar, at least one topic, title, and slug are required.",
+        "selectCover": "Select cover image",
+        "series": "Series",
+        "single": "Single",
+        "uploadCover": "Upload cover"
       },
       "topic": {
         "orderIndexLabel": "Order Index"

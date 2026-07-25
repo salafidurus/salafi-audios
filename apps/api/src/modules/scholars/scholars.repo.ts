@@ -509,6 +509,7 @@ export class ScholarsRepository {
           slug: dto.slug,
           bio: dto.bio,
           imageUrl: dto.imageUrl,
+          imageKey: dto.imageKey,
           isActive: dto.isActive ?? true,
           title: dto.title,
           orderIndex: dto.orderIndex ?? 999,
@@ -549,6 +550,7 @@ export class ScholarsRepository {
       if (dto.name !== undefined) updateData.name = dto.name;
       if (dto.bio !== undefined) updateData.bio = dto.bio;
       if (dto.imageUrl !== undefined) updateData.imageUrl = dto.imageUrl;
+      if (dto.imageKey !== undefined) updateData.imageKey = dto.imageKey;
       if (dto.isActive !== undefined) updateData.isActive = dto.isActive;
       if (dto.country !== undefined) updateData.country = dto.country;
       if (dto.mainLanguage !== undefined) updateData.mainLanguage = dto.mainLanguage;

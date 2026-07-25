@@ -35,7 +35,13 @@ jobs:
 
       - name: Get Playwright version
         id: playwright-version
-        run: echo "version=$(bun run --filter web playwright:version | grep ^Version | cut -d' ' -f2)" >> $GITHUB_OUTPUT
+        # `bun run --filter` prefixes output lines with "web playwright:version:", so the
+        # version must be extracted from anywhere in the line — a `grep ^Version` returns
+        # nothing, collapsing the cache key to a versionless one that pins stale browsers.
+        run: |
+          version=$(bun run --filter web playwright:version | grep -o 'Version [0-9][0-9.]*' | cut -d' ' -f2)
+          [ -n "$version" ] || { echo "Failed to detect Playwright version"; exit 1; }
+          echo "version=$version" >> $GITHUB_OUTPUT
 
       - name: Cache Playwright browsers
         id: playwright-cache

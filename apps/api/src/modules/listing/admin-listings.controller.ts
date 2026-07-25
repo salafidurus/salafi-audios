@@ -15,6 +15,8 @@ import type {
   AdminListingListDto,
   AdminListingDetailDto,
   AdminListingMediaDetailDto,
+  AdminArrangeDataDto,
+  ArrangeCommitResultDto,
   BulkActionResultDto,
   ListingRefDto,
 } from '@sd/core-contracts';
@@ -25,6 +27,7 @@ import { ListingService } from './listing.service';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { UpdateListingDetailsDto } from './dto/update-listing-details.dto';
 import { UpdateListingMediaDto } from './dto/update-listing-media.dto';
+import { ArrangeCommitDto } from './dto/arrange-commit.dto';
 import { BulkActionDto } from '../../shared/dto/bulk-action.dto';
 
 @ApiTags('Admin Listings')
@@ -80,6 +83,24 @@ export class AdminListingsController {
   @ApiOperation({ summary: 'Get listing media details' })
   getMediaData(@Param('id') id: string): Promise<AdminListingMediaDetailDto> {
     return this.service.getMediaData(id);
+  }
+
+  @Get(':id/arrange-data')
+  @RequiresPermission(Permissions.LISTINGS_EDIT)
+  @ApiOperation({ summary: 'Get listing children tree for the upload & arrange flow' })
+  getArrangeData(@Param('id') id: string): Promise<AdminArrangeDataDto> {
+    return this.service.getArrangeData(id);
+  }
+
+  @Post(':id/arrange-commit')
+  @RequiresPermission(Permissions.LISTINGS_CREATE)
+  @ApiOperation({ summary: 'Transactionally create/update modules and lessons with audio' })
+  arrangeCommit(
+    @Param('id') id: string,
+    @Body() dto: ArrangeCommitDto,
+    @Req() req: { user?: { id: string } },
+  ): Promise<ArrangeCommitResultDto> {
+    return this.service.arrangeCommit(id, dto, req.user?.id);
   }
 
   @Post()

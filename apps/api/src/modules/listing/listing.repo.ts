@@ -1,5 +1,10 @@
 import { PrismaService } from '../../core/db/prisma.service';
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma, Status } from '@sd/core-db';
 import type {
   ListingDetailDto,
@@ -16,6 +21,12 @@ import type {
   SaveListingTranslationDto,
   ListingContentsDto,
   LastPlayedLessonDto,
+  AdminArrangeDataDto,
+  AdminArrangeLessonDto,
+  ArrangeAudioRef,
+  ArrangeCommitDto,
+  ArrangeCommitResultDto,
+  ArrangeLessonOp,
 } from '@sd/core-contracts';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
@@ -620,7 +631,11 @@ export class ListingRepository {
 
   // ─── Counter Sync Hooks ───────────────────────────────────────────────────
 
-  async syncListingCounters(listingId: string, tx: Prisma.TransactionClient): Promise<void> {
+  async syncListingCounters(
+    listingId: string,
+    tx: Prisma.TransactionClient,
+    options?: { recurse?: boolean },
+  ): Promise<void> {
     const children = await tx.listing.findMany({
       where: {
         parentId: listingId,
@@ -655,6 +670,8 @@ export class ListingRepository {
         publishedDurationSeconds: totalDuration,
       },
     });
+
+    if (options?.recurse === false) return;
 
     const listing = await tx.listing.findUnique({
       where: { id: listingId },
@@ -872,6 +889,7 @@ export class ListingRepository {
           scholarId: dto.scholarId,
           parentId: dto.parentId ?? undefined,
           coverImageUrl: dto.coverImageUrl ?? undefined,
+          coverImageKey: dto.coverImageKey ?? undefined,
           createdBy,
         },
         select: { id: true, title: true, parentId: true },
@@ -891,6 +909,7 @@ export class ListingRepository {
           data: {
             listingId: listing.id,
             url: dto.publicUrl,
+            objectKey: dto.audioKey ?? undefined,
             format: dto.publicUrl.endsWith('.mp3') ? 'mp3' : undefined,
             sizeBytes: dto.sizeBytes ?? undefined,
             durationSeconds: dto.durationSeconds ?? undefined,
@@ -1042,18 +1061,27 @@ export class ListingRepository {
           data: updateData,
         });
 
-        // Update primary audio asset if audioKey is provided
+        // Replace the primary audio asset if audioKey is provided; create it when
+        // the listing has none yet (updateMany alone would silently no-op).
         if (dto.audioKey) {
-          const publicUrl = `${process.env['R2_PUBLIC_BASE_URL']}/${dto.audioKey}`;
-          await tx.audioAsset.updateMany({
+          const assetData = {
+            url: `${process.env['R2_PUBLIC_BASE_URL']}/${dto.audioKey}`,
+            objectKey: dto.audioKey,
+            format: dto.audioKey.endsWith('.mp3') ? 'mp3' : undefined,
+            sizeBytes: dto.sizeBytes,
+            durationSeconds: dto.durationSeconds,
+          };
+          const primary = await tx.audioAsset.findFirst({
             where: { listingId: id, isPrimary: true },
-            data: {
-              url: publicUrl,
-              format: dto.audioKey.endsWith('.mp3') ? 'mp3' : undefined,
-              sizeBytes: dto.sizeBytes,
-              durationSeconds: dto.durationSeconds,
-            },
+            select: { id: true },
           });
+          if (primary) {
+            await tx.audioAsset.update({ where: { id: primary.id }, data: assetData });
+          } else {
+            await tx.audioAsset.create({
+              data: { listingId: id, ...assetData, isPrimary: true, source: 'r2' },
+            });
+          }
         }
 
         // Sync parent counters if this listing has a parent
@@ -1105,6 +1133,331 @@ export class ListingRepository {
         bitrateKbps: asset.bitrateKbps ?? undefined,
         durationSeconds: asset.durationSeconds ?? undefined,
       })),
+    };
+  }
+
+  // ─── Arrange (bulk upload) Methods ────────────────────────────────────────
+
+  async getArrangeData(id: string): Promise<AdminArrangeDataDto | null> {
+    const arrangeChildSelect = {
+      id: true,
+      slug: true,
+      title: true,
+      status: true,
+      orderIndex: true,
+      durationSeconds: true,
+      audioAssets: { where: { isPrimary: true }, take: 1, select: { id: true } },
+    } satisfies Prisma.ListingSelect;
+
+    const root = await this.prisma.listing.findFirst({
+      where: { id, deletedAt: null },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        format: true,
+        scholarId: true,
+        status: true,
+        audioAssets: { where: { isPrimary: true }, take: 1, select: { url: true } },
+        children: {
+          where: { deletedAt: null },
+          orderBy: [{ orderIndex: 'asc' }, { title: 'asc' }],
+          select: {
+            ...arrangeChildSelect,
+            children: {
+              where: { deletedAt: null },
+              orderBy: [{ orderIndex: 'asc' }, { title: 'asc' }],
+              select: arrangeChildSelect,
+            },
+          },
+        },
+      },
+    });
+
+    if (!root) return null;
+
+    const mapLesson = (child: {
+      id: string;
+      slug: string;
+      title: string;
+      status: Status;
+      orderIndex: number | null;
+      durationSeconds: number | null;
+      audioAssets: { id: string }[];
+    }): AdminArrangeLessonDto => ({
+      id: child.id,
+      slug: child.slug,
+      title: child.title,
+      status: child.status,
+      orderIndex: child.orderIndex ?? undefined,
+      durationSeconds: child.durationSeconds ?? undefined,
+      hasAudio: child.audioAssets.length > 0,
+    });
+
+    return {
+      id: root.id,
+      slug: root.slug,
+      title: root.title,
+      format: root.format,
+      scholarId: root.scholarId,
+      status: root.status,
+      audioUrl: root.audioAssets[0]?.url,
+      modules:
+        root.format === 'collection'
+          ? root.children.map((m) => ({ ...mapLesson(m), lessons: m.children.map(mapLesson) }))
+          : [],
+      lessons: root.format === 'series' ? root.children.map(mapLesson) : [],
+    };
+  }
+
+  async arrangeCommit(
+    rootId: string,
+    dto: ArrangeCommitDto,
+    userId?: string,
+  ): Promise<{ result: ArrangeCommitResultDto; affectedIds: string[] }> {
+    return this.prisma.$transaction(async (tx) => {
+      const root = await tx.listing.findFirst({
+        where: { id: rootId, deletedAt: null },
+        select: { id: true, slug: true, scholarId: true, format: true },
+      });
+      if (!root) throw new NotFoundException('Listing not found');
+      if (root.format === 'single') {
+        throw new BadRequestException('Single listings update audio via the media endpoint');
+      }
+      if (root.format === 'series' && !dto.lessons) {
+        throw new BadRequestException('Series commits require lessons');
+      }
+      if (root.format === 'collection' && !dto.modules) {
+        throw new BadRequestException('Collection commits require modules');
+      }
+
+      const moduleOps = dto.modules ?? [];
+      const rootLessonOps = dto.lessons ?? [];
+
+      for (const moduleOp of moduleOps) {
+        if (moduleOp.op === 'create' && moduleOp.lessons.some((l) => l.op === 'update')) {
+          throw new BadRequestException('New modules can only contain new lessons');
+        }
+      }
+
+      const createSlugs: string[] = [];
+      for (const moduleOp of moduleOps) {
+        if (moduleOp.op === 'create') createSlugs.push(moduleOp.slug);
+        for (const lessonOp of moduleOp.lessons) {
+          if (lessonOp.op === 'create') createSlugs.push(lessonOp.slug);
+        }
+      }
+      for (const lessonOp of rootLessonOps) {
+        if (lessonOp.op === 'create') createSlugs.push(lessonOp.slug);
+      }
+
+      const duplicates = createSlugs.filter((slug, i) => createSlugs.indexOf(slug) !== i);
+      if (duplicates.length) {
+        throw new BadRequestException(`Duplicate slugs in payload: ${duplicates.join(', ')}`);
+      }
+      const badPrefix = createSlugs.filter((slug) => !slug.startsWith(`${root.slug}-`));
+      if (badPrefix.length) {
+        throw new BadRequestException(
+          `Slugs must be prefixed by ${root.slug}-: ${badPrefix.join(', ')}`,
+        );
+      }
+      if (createSlugs.length) {
+        const clashes = await tx.listing.findMany({
+          where: { slug: { in: createSlugs } },
+          select: { slug: true },
+        });
+        if (clashes.length) {
+          throw new ConflictException({
+            message: 'Slugs already in use',
+            conflictingSlugs: clashes.map((c) => c.slug),
+          });
+        }
+      }
+
+      const moduleUpdateIds: string[] = [];
+      for (const moduleOp of moduleOps) {
+        if (moduleOp.op === 'update') moduleUpdateIds.push(moduleOp.id);
+      }
+      if (moduleUpdateIds.length) {
+        const found = await tx.listing.findMany({
+          where: { id: { in: moduleUpdateIds }, parentId: rootId, deletedAt: null },
+          select: { id: true },
+        });
+        if (found.length !== moduleUpdateIds.length) {
+          throw new BadRequestException('Module update target is not under this listing');
+        }
+      }
+
+      const lessonUpdateTargets: Array<{ id: string; parentId: string }> = [];
+      for (const lessonOp of rootLessonOps) {
+        if (lessonOp.op === 'update')
+          lessonUpdateTargets.push({ id: lessonOp.id, parentId: rootId });
+      }
+      for (const moduleOp of moduleOps) {
+        if (moduleOp.op !== 'update') continue;
+        for (const lessonOp of moduleOp.lessons) {
+          if (lessonOp.op === 'update') {
+            lessonUpdateTargets.push({ id: lessonOp.id, parentId: moduleOp.id });
+          }
+        }
+      }
+      if (lessonUpdateTargets.length) {
+        const found = await tx.listing.findMany({
+          where: { id: { in: lessonUpdateTargets.map((t) => t.id) }, deletedAt: null },
+          select: { id: true, parentId: true },
+        });
+        const parentById = new Map(found.map((f) => [f.id, f.parentId]));
+        for (const target of lessonUpdateTargets) {
+          if (parentById.get(target.id) !== target.parentId) {
+            throw new BadRequestException('Lesson update target is not under this listing');
+          }
+        }
+      }
+
+      const result: ArrangeCommitResultDto = {
+        createdModules: 0,
+        createdLessons: 0,
+        updatedModules: 0,
+        updatedLessons: 0,
+      };
+      const affectedIds: string[] = [rootId];
+      const touchedParents = new Set<string>();
+
+      const applyLessonOp = async (op: ArrangeLessonOp, parentId: string): Promise<void> => {
+        if (op.op === 'create') {
+          const status = op.status ?? Status.draft;
+          const lesson = await tx.listing.create({
+            data: {
+              slug: op.slug,
+              title: op.title,
+              description: op.description ?? undefined,
+              format: 'single',
+              status,
+              publishedAt: status === Status.published ? new Date() : undefined,
+              orderIndex: op.orderIndex ?? undefined,
+              durationSeconds: op.audio.durationSeconds,
+              scholarId: root.scholarId,
+              parentId,
+              createdBy: userId,
+            },
+            select: { id: true },
+          });
+          await tx.audioAsset.create({
+            data: {
+              listingId: lesson.id,
+              ...this.arrangeAudioAssetData(op.audio),
+              isPrimary: true,
+              source: 'r2',
+            },
+          });
+          result.createdLessons += 1;
+          affectedIds.push(lesson.id);
+        } else {
+          const existing = await tx.listing.findUnique({
+            where: { id: op.id },
+            select: { status: true },
+          });
+          const data: Prisma.ListingUpdateInput = { updatedAt: new Date(), updatedBy: userId };
+          if (op.title !== undefined) data.title = op.title;
+          if (op.description !== undefined) data.description = op.description;
+          if (op.status !== undefined) {
+            data.status = op.status;
+            if (op.status === Status.published && existing?.status !== Status.published) {
+              data.publishedAt = new Date();
+            }
+          }
+          if (op.orderIndex !== undefined) data.orderIndex = op.orderIndex;
+          if (op.audio) data.durationSeconds = op.audio.durationSeconds;
+          await tx.listing.update({ where: { id: op.id }, data });
+
+          if (op.audio) {
+            const primary = await tx.audioAsset.findFirst({
+              where: { listingId: op.id, isPrimary: true },
+              select: { id: true },
+            });
+            if (primary) {
+              await tx.audioAsset.update({
+                where: { id: primary.id },
+                data: this.arrangeAudioAssetData(op.audio),
+              });
+            } else {
+              await tx.audioAsset.create({
+                data: {
+                  listingId: op.id,
+                  ...this.arrangeAudioAssetData(op.audio),
+                  isPrimary: true,
+                  source: 'r2',
+                },
+              });
+            }
+          }
+          result.updatedLessons += 1;
+          affectedIds.push(op.id);
+        }
+        touchedParents.add(parentId);
+      };
+
+      await Promise.all(rootLessonOps.map((lessonOp) => applyLessonOp(lessonOp, rootId)));
+
+      for (const moduleOp of moduleOps) {
+        let moduleId: string;
+        if (moduleOp.op === 'create') {
+          const status = moduleOp.status ?? Status.draft;
+          const created = await tx.listing.create({
+            data: {
+              slug: moduleOp.slug,
+              title: moduleOp.title,
+              description: moduleOp.description ?? undefined,
+              format: 'series',
+              status,
+              publishedAt: status === Status.published ? new Date() : undefined,
+              orderIndex: moduleOp.orderIndex ?? undefined,
+              scholarId: root.scholarId,
+              parentId: rootId,
+              createdBy: userId,
+            },
+            select: { id: true },
+          });
+          moduleId = created.id;
+          result.createdModules += 1;
+          touchedParents.add(rootId);
+        } else {
+          moduleId = moduleOp.id;
+          if (moduleOp.orderIndex !== undefined) {
+            await tx.listing.update({
+              where: { id: moduleId },
+              data: { orderIndex: moduleOp.orderIndex, updatedAt: new Date(), updatedBy: userId },
+            });
+            touchedParents.add(rootId);
+          }
+          result.updatedModules += 1;
+        }
+        affectedIds.push(moduleId);
+        await Promise.all(moduleOp.lessons.map((lessonOp) => applyLessonOp(lessonOp, moduleId)));
+      }
+
+      // Touched modules never share a row with each other, so their counts can sync
+      // in parallel with recurse:false (no auto-walk to root). Root is synced once,
+      // after, so it aggregates the now-committed module counts instead of racing them.
+      const touchedModules = [...touchedParents].filter((id) => id !== rootId);
+      await Promise.all(
+        touchedModules.map((id) => this.syncListingCounters(id, tx, { recurse: false })),
+      );
+      if (touchedParents.size > 0) {
+        await this.syncListingCounters(rootId, tx);
+      }
+
+      return { result, affectedIds };
+    });
+  }
+
+  private arrangeAudioAssetData(audio: ArrangeAudioRef) {
+    return {
+      url: `${process.env['R2_PUBLIC_BASE_URL']}/${audio.objectKey}`,
+      objectKey: audio.objectKey,
+      format: audio.format ?? audio.objectKey.split('.').pop(),
+      sizeBytes: audio.sizeBytes ?? undefined,
+      durationSeconds: audio.durationSeconds,
     };
   }
 

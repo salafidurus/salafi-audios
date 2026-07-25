@@ -201,6 +201,7 @@ export const CreateListingDtoSchema = z.object({
   durationSeconds: z.number().optional(),
   sizeBytes: z.number().optional(),
   coverImageUrl: z.string().optional(),
+  coverImageKey: z.string().optional(),
   translations: z
     .array(
       z.object({
@@ -292,6 +293,7 @@ export const UpdateListingDetailsDtoSchema = z.object({
   parentId: z.string().nullable().optional(),
   topics: z.array(z.string()).optional(),
   coverImageUrl: z.string().optional(),
+  coverImageKey: z.string().optional(),
   translations: z
     .array(
       z.object({
@@ -325,3 +327,99 @@ export const UpdateListingMediaDtoSchema = z.object({
   orderIndex: z.number().optional(),
 });
 export type UpdateListingMediaDto = z.infer<typeof UpdateListingMediaDtoSchema>;
+
+export const AdminArrangeLessonDtoSchema = z.object({
+  id: z.string(),
+  slug: z.string(),
+  title: z.string(),
+  status: StatusValueSchema,
+  orderIndex: z.number().optional(),
+  durationSeconds: z.number().optional(),
+  hasAudio: z.boolean(),
+});
+export type AdminArrangeLessonDto = z.infer<typeof AdminArrangeLessonDtoSchema>;
+
+export const AdminArrangeModuleDtoSchema = AdminArrangeLessonDtoSchema.extend({
+  lessons: z.array(AdminArrangeLessonDtoSchema),
+});
+export type AdminArrangeModuleDto = z.infer<typeof AdminArrangeModuleDtoSchema>;
+
+export const AdminArrangeDataDtoSchema = z.object({
+  id: z.string(),
+  slug: z.string(),
+  title: z.string(),
+  format: ListingFormatSchema,
+  scholarId: z.string(),
+  status: StatusValueSchema,
+  audioUrl: z.string().optional(),
+  modules: z.array(AdminArrangeModuleDtoSchema),
+  lessons: z.array(AdminArrangeLessonDtoSchema),
+});
+export type AdminArrangeDataDto = z.infer<typeof AdminArrangeDataDtoSchema>;
+
+export const ArrangeAudioRefSchema = z.object({
+  objectKey: z.string().min(1, "Object key must not be empty"),
+  durationSeconds: z.number().int().nonnegative(),
+  sizeBytes: z.number().int().nonnegative().optional(),
+  format: z.string().optional(),
+});
+export type ArrangeAudioRef = z.infer<typeof ArrangeAudioRefSchema>;
+
+export const ArrangeLessonOpSchema = z.discriminatedUnion("op", [
+  z.object({
+    op: z.literal("create"),
+    slug: z.string().min(1, "Slug must not be empty"),
+    title: z.string().min(1, "Title must not be empty"),
+    description: z.string().optional(),
+    status: StatusValueSchema.optional(),
+    orderIndex: z.number().int().optional(),
+    audio: ArrangeAudioRefSchema,
+  }),
+  z.object({
+    op: z.literal("update"),
+    id: z.string().min(1),
+    title: z.string().min(1).optional(),
+    description: z.string().optional(),
+    status: StatusValueSchema.optional(),
+    orderIndex: z.number().int().optional(),
+    audio: ArrangeAudioRefSchema.optional(),
+  }),
+]);
+export type ArrangeLessonOp = z.infer<typeof ArrangeLessonOpSchema>;
+
+export const ArrangeModuleOpSchema = z.discriminatedUnion("op", [
+  z.object({
+    op: z.literal("create"),
+    slug: z.string().min(1, "Slug must not be empty"),
+    title: z.string().min(1, "Title must not be empty"),
+    description: z.string().optional(),
+    status: StatusValueSchema.optional(),
+    orderIndex: z.number().int().optional(),
+    lessons: z.array(ArrangeLessonOpSchema),
+  }),
+  z.object({
+    op: z.literal("update"),
+    id: z.string().min(1),
+    orderIndex: z.number().int().optional(),
+    lessons: z.array(ArrangeLessonOpSchema),
+  }),
+]);
+export type ArrangeModuleOp = z.infer<typeof ArrangeModuleOpSchema>;
+
+export const ArrangeCommitDtoSchema = z
+  .object({
+    lessons: z.array(ArrangeLessonOpSchema).optional(),
+    modules: z.array(ArrangeModuleOpSchema).optional(),
+  })
+  .refine((dto) => (dto.lessons === undefined) !== (dto.modules === undefined), {
+    message: "Provide exactly one of lessons or modules",
+  });
+export type ArrangeCommitDto = z.infer<typeof ArrangeCommitDtoSchema>;
+
+export const ArrangeCommitResultDtoSchema = z.object({
+  createdModules: z.number(),
+  createdLessons: z.number(),
+  updatedModules: z.number(),
+  updatedLessons: z.number(),
+});
+export type ArrangeCommitResultDto = z.infer<typeof ArrangeCommitResultDtoSchema>;

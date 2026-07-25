@@ -20,6 +20,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     let statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Internal Server Error';
     let details: unknown = undefined;
+    let extras: Record<string, unknown> = {};
 
     if (this.isPrismaConnectionRefused(exception)) {
       message = 'Database connection refused. Ensure PostgreSQL is running and reachable.';
@@ -41,6 +42,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
           details = body.message;
         } else {
           message = exception.message || message;
+          // Preserve structured fields (e.g. conflictingSlugs) thrown alongside
+          // the message — `details` is dev-only, so they must survive here.
+          const {
+            message: _msg,
+            statusCode: _status,
+            error: _error,
+            ...rest
+          } = body as Record<string, unknown>;
+          extras = rest;
         }
       }
     } else if (exception instanceof Error) {
@@ -53,6 +63,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     res.status(statusCode).send({
       statusCode,
       message,
+      ...extras,
       details: devDetails,
       requestId,
       timestamp,
