@@ -14,6 +14,11 @@ import { Search } from "@/shared/components/Search";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { type AdminScholarListItemDto } from "@sd/core-contracts";
 import { Scholar } from "@/features/admin/components/Scholar";
+import {
+  TranslationModal,
+  translationTargetKey,
+  type ClientTranslationTarget,
+} from "@/features/admin/components/Translation";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
@@ -27,6 +32,7 @@ export function AdminScholarsScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingScholarId, setEditingScholarId] = useState<string | null>(null);
+  const [translationTarget, setTranslationTarget] = useState<ClientTranslationTarget | null>(null);
 
   const { data, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } =
     useInfiniteAdminScholars({
@@ -105,7 +111,13 @@ export function AdminScholarsScreen() {
               onLoadMore={() => fetchNextPage()}
               isFetchingNextPage={isFetchingNextPage}
               renderItem={(scholar) => (
-                <Scholar.Item scholar={scholar} onEdit={() => handleOpenEdit(scholar)} />
+                <Scholar.Item
+                  scholar={scholar}
+                  onEdit={() => handleOpenEdit(scholar)}
+                  onTranslate={() =>
+                    setTranslationTarget({ entity: "scholar", scholarId: scholar.id })
+                  }
+                />
               )}
               emptyMessage={
                 searchQuery
@@ -128,6 +140,13 @@ export function AdminScholarsScreen() {
           setEditingScholarId(null);
         }}
         onSuccess={handleScholarSaved}
+      />
+
+      <TranslationModal
+        key={translationTargetKey(translationTarget)}
+        isOpen={!!translationTarget}
+        target={translationTarget}
+        onClose={() => setTranslationTarget(null)}
       />
     </ScreenView>
   );

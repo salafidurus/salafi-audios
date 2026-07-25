@@ -9,6 +9,11 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { sanitizeError } from "@sd/utils-error";
 import { Content } from "../Content";
 import { deleteTopic } from "@/features/admin/api/admin.api";
+import {
+  TranslationModal,
+  translationTargetKey,
+  type ClientTranslationTarget,
+} from "@/features/admin/components/Translation";
 import styles from "../../../screens/admin-contents/admin-contents.screen.module.css";
 
 export type TopicsContentProps = {
@@ -29,6 +34,7 @@ export function TopicsContent({
   const [deletingTopicName, setDeletingTopicName] = useState<string>("");
   const deletingTopicSlugRef = useRef<string | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [translationTarget, setTranslationTarget] = useState<ClientTranslationTarget | null>(null);
   const queryClient = useQueryClient();
 
   const filteredTopics = useMemo(() => {
@@ -111,6 +117,9 @@ export function TopicsContent({
               topic={topic}
               onEdit={handleOpenEdit}
               onDelete={handleDeleteClick}
+              onTranslate={(t) =>
+                setTranslationTarget({ entity: "topic", topicId: t.id, topicSlug: t.slug })
+              }
             />
           ))}
         </List>
@@ -121,6 +130,13 @@ export function TopicsContent({
             : t("admin.contents.noTopicsFound", "No topics yet.")}
         </div>
       )}
+
+      <TranslationModal
+        key={translationTargetKey(translationTarget)}
+        isOpen={!!translationTarget}
+        target={translationTarget}
+        onClose={() => setTranslationTarget(null)}
+      />
     </>
   );
 }

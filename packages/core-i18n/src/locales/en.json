@@ -759,6 +759,27 @@
     "modal": {
       "generalTab": "General",
       "reviewTab": "Review"
+    },
+    "translations": {
+      "title": "Translations",
+      "button": "Translations",
+      "fields": {
+        "title": "Title",
+        "description": "Description",
+        "name": "Name",
+        "bio": "Bio"
+      },
+      "status": {
+        "saved": "Saved",
+        "notCreated": "Not created",
+        "published": "Published",
+        "draft": "Draft"
+      },
+      "publish": "Publish",
+      "unpublish": "Unpublish",
+      "saveBeforePublish": "Save before publishing",
+      "requiredFieldMissing": "A required field is empty in a locale with other changes.",
+      "emptySource": "No value in the main language"
     }
   }
 }
