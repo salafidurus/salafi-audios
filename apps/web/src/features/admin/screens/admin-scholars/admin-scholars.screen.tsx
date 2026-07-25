@@ -126,6 +126,7 @@ export function AdminScholarsScreen() {
       <ScrollToTopButton />
 
       <Scholar.Modal
+        key={editingScholarId ?? "create"}
         scholarId={editingScholarId}
         isOpen={isModalOpen}
         onClose={() => {

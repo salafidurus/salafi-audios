@@ -264,7 +264,6 @@ export function ListingModal({
 
   return (
     <Modal
-      key={listingId ?? "create"}
       isOpen={isOpen}
       onClose={handleClose}
       title={
