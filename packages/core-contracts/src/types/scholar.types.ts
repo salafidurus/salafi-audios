@@ -157,7 +157,25 @@ export const CreateScholarDtoSchema = z.object({
 });
 export type CreateScholarDto = z.infer<typeof CreateScholarDtoSchema>;
 
-export const UpdateScholarDtoSchema = CreateScholarDtoSchema.partial();
+export const UpdateScholarDtoSchema = z.object({
+  name: z.string().min(1, "Name must not be empty").optional(),
+  bio: z.string().optional(),
+  imageUrl: z.string().optional(),
+  isActive: z.boolean().optional(),
+  country: CountryCodeSchema.optional(),
+  mainLanguage: LocaleSchema.optional(),
+  title: ScholarTitleSchema.optional(),
+  orderIndex: z.number().optional(),
+  socialTwitter: z.url().optional().or(z.literal("")),
+  socialTelegram: z.url().optional().or(z.literal("")),
+  socialYoutube: z.url().optional().or(z.literal("")),
+  socialWebsite: z.url().optional().or(z.literal("")),
+  translations: z
+    .array(
+      z.object({ locale: LocaleSchema, name: z.string(), bio: z.string().nullable().optional() }),
+    )
+    .optional(),
+});
 export type UpdateScholarDto = z.infer<typeof UpdateScholarDtoSchema>;
 
 export const SaveScholarTranslationDtoSchema = z.object({

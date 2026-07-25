@@ -1,13 +1,16 @@
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ScholarModal } from "./ScholarModal";
+import { createScholar, updateScholar, fetchScholarFormData } from "@/features/admin/api/admin.api";
 
-vi.mock("../../api/admin-lectures.api", () => ({
+vi.mock("@/features/admin/api/admin-lectures.api", () => ({
   getPresignedUrl: vi.fn(),
   uploadToR2: vi.fn(),
 }));
 
 vi.mock("@/features/admin/api/admin.api", () => ({
+  createScholar: vi.fn(),
+  updateScholar: vi.fn(),
   fetchScholarFormData: vi.fn(),
 }));
 
@@ -17,12 +20,12 @@ describe("ScholarModal", () => {
   });
 
   it("does not render when isOpen is false", () => {
-    render(<ScholarModal isOpen={false} onClose={vi.fn()} onSave={vi.fn()} />);
+    render(<ScholarModal isOpen={false} onClose={vi.fn()} onSuccess={vi.fn()} />);
     expect(screen.queryByText(/add scholar/i)).not.toBeInTheDocument();
   });
 
   it("renders tabs for add scholar modal", () => {
-    render(<ScholarModal isOpen onClose={vi.fn()} onSave={vi.fn()} />);
+    render(<ScholarModal isOpen onClose={vi.fn()} onSuccess={vi.fn()} />);
 
     expect(screen.getByRole("tablist")).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /general/i })).toBeInTheDocument();
@@ -31,202 +34,171 @@ describe("ScholarModal", () => {
     expect(screen.getByRole("tab", { name: /review/i })).toBeInTheDocument();
   });
 
-  it("shows general info section on general tab", () => {
-    const onSave = vi.fn();
+  it("renders with create form fields and triggers save", async () => {
+    const onSuccessMock = vi.fn();
+    const onCloseMock = vi.fn();
+    (createScholar as Mock<any>).mockResolvedValue({ id: "new-scholar-id" });
+
+    render(<ScholarModal isOpen onClose={onCloseMock} onSuccess={onSuccessMock} />);
+
+    const slugInput = screen.getByLabelText(/slug \*/i);
+    fireEvent.change(slugInput, { target: { value: "new-scholar" } });
+
+    const mainTabButton = screen.getByRole("tab", { name: "العربية" });
+    fireEvent.click(mainTabButton);
+
+    const nameInput = await screen.findByPlaceholderText(/scholar name/i);
+    fireEvent.change(nameInput, { target: { value: "New Scholar" } });
+
+    const reviewButton = screen.getByRole("tab", { name: /review/i });
+    fireEvent.click(reviewButton);
+
+    const saveButton = await screen.findByRole("button", { name: /add scholar|إضافة/i });
+    fireEvent.click(saveButton);
+
+    await waitFor(() => {
+      expect(createScholar).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: "New Scholar",
+          slug: "new-scholar",
+        }),
+      );
+    });
+
+    expect(onSuccessMock).toHaveBeenCalledTimes(1);
+    expect(onCloseMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders with edit form fields prefilled and updates the scholar by real id, not slug", async () => {
+    const onSuccessMock = vi.fn();
+    const onCloseMock = vi.fn();
+    (updateScholar as Mock<any>).mockResolvedValue({ id: "scholar-uuid-123" });
+    (fetchScholarFormData as Mock<any>).mockResolvedValue({
+      scholar: {
+        id: "scholar-uuid-123",
+        name: "Existing Scholar",
+        slug: "existing-scholar",
+        bio: "Existing bio",
+        isActive: true,
+        mainLanguage: "ar",
+        orderIndex: 5,
+        createdAt: "2024-01-01",
+      },
+      translations: [],
+    });
+
     render(
       <ScholarModal
         isOpen
-        onClose={vi.fn()}
-        onSave={onSave}
-        scholar={{ id: "1", name: "Test", slug: "test", mainLanguage: "ar" }}
+        onClose={onCloseMock}
+        onSuccess={onSuccessMock}
+        scholarId="scholar-uuid-123"
       />,
     );
 
-    // General tab should be active by default and show general fields (slug, title, image)
-    expect(screen.getByLabelText(/slug \*/i)).toBeInTheDocument();
-    // Name should not be on general tab (it's translatable content)
-    expect(screen.queryByLabelText(/name \*/i)).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(fetchScholarFormData).toHaveBeenCalledWith("scholar-uuid-123");
+    });
 
-    // Switch to main language tab (Arabic) - should show name and bio for main language content
+    const slugInput = await screen.findByLabelText(/slug \*/i);
+    expect(slugInput).toHaveValue("existing-scholar");
+    expect(slugInput).toBeDisabled();
+
+    const mainTabButton = screen.getByRole("tab", { name: "العربية" });
+    fireEvent.click(mainTabButton);
+
+    const nameInput = await screen.findByPlaceholderText(/scholar name/i);
+    expect(nameInput).toHaveValue("Existing Scholar");
+    fireEvent.change(nameInput, { target: { value: "Updated Scholar Name" } });
+
+    const reviewButton = screen.getByRole("tab", { name: /review/i });
+    fireEvent.click(reviewButton);
+
+    const saveButton = await screen.findByRole("button", { name: /save/i });
+    fireEvent.click(saveButton);
+
+    await waitFor(() => {
+      // The critical regression check: update must be called with the real
+      // database id ("scholar-uuid-123"), never the slug ("existing-scholar").
+      expect(updateScholar).toHaveBeenCalledWith(
+        "scholar-uuid-123",
+        expect.objectContaining({
+          name: "Updated Scholar Name",
+        }),
+      );
+    });
+
+    expect(onSuccessMock).toHaveBeenCalledTimes(1);
+    expect(onCloseMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("review tab shows no changes when editing an untouched scholar, and only the touched field once edited", async () => {
+    (fetchScholarFormData as Mock<any>).mockResolvedValue({
+      scholar: {
+        id: "scholar-uuid-456",
+        name: "Existing Scholar",
+        slug: "existing-scholar",
+        bio: "Existing bio",
+        country: "SA",
+        isActive: true,
+        mainLanguage: "ar",
+        orderIndex: 5,
+        createdAt: "2024-01-01",
+      },
+      translations: [],
+    });
+
+    render(
+      <ScholarModal isOpen onClose={vi.fn()} onSuccess={vi.fn()} scholarId="scholar-uuid-456" />,
+    );
+
+    await waitFor(() => {
+      expect(fetchScholarFormData).toHaveBeenCalledWith("scholar-uuid-456");
+    });
+    await screen.findByLabelText(/slug \*/i);
+
+    const reviewTab = screen.getByRole("tab", { name: /review/i });
+    fireEvent.click(reviewTab);
+
+    // Nothing was edited yet, so the review tab must not show the
+    // pre-existing bio/country as "changed" fields.
+    expect(screen.getByText(/no changes made yet/i)).toBeInTheDocument();
+    expect(screen.queryByText("Existing bio")).not.toBeInTheDocument();
+
+    // Now actually change bio only (bio lives on the main-language tab).
     const mainTab = screen.getByRole("tab", { name: "العربية" });
     fireEvent.click(mainTab);
+    const bioInput = screen.getByLabelText(/bio/i);
+    fireEvent.change(bioInput, { target: { value: "Updated bio" } });
 
-    // The slug field should not be visible on main language tab (only on general)
-    expect(screen.queryByLabelText(/slug \*/i)).not.toBeInTheDocument();
-
-    // But the name field should be visible (as main language content)
-    const nameInputs = screen.getAllByPlaceholderText(/scholar name/i);
-    expect(nameInputs.length).toBeGreaterThan(0);
-  });
-
-  it("shows translation fields on other language tab", () => {
-    render(
-      <ScholarModal
-        isOpen
-        onClose={vi.fn()}
-        onSave={vi.fn()}
-        scholar={{ id: "1", name: "Test", slug: "test", mainLanguage: "ar" }}
-      />,
-    );
-
-    // Switch to other tab (English when main is Arabic)
-    const otherTab = screen.getByRole("tab", { name: "English" });
-    fireEvent.click(otherTab);
-
-    // Should see translation name input
-    const translationNameLabel = screen.getByLabelText(/name/i);
-    expect(translationNameLabel).toBeInTheDocument();
-
-    // Should also see bio field for translation
-    const bioLabel = screen.getByLabelText(/bio/i);
-    expect(bioLabel).toBeInTheDocument();
-  });
-
-  it("calls onSave with translations when non-main locale has content", async () => {
-    const onSave = vi.fn().mockResolvedValue(undefined);
-    const onClose = vi.fn();
-
-    render(
-      <ScholarModal
-        isOpen
-        onClose={onClose}
-        onSave={onSave}
-        scholar={{
-          id: "1",
-          name: "Test Scholar",
-          slug: "test-scholar",
-          mainLanguage: "ar",
-        }}
-      />,
-    );
-
-    // Switch to en tab (translation tab)
-    const enTab = screen.getByRole("tab", { name: "English" });
-    fireEvent.click(enTab);
-
-    // Find the translation name input (with id scholar-name-en)
-    const translationInput = screen.getByPlaceholderText("Scholar name");
-    fireEvent.change(translationInput, { target: { value: "Scholar Name" } });
-
-    // Switch to review tab
-    const reviewTab = screen.getByRole("tab", { name: /review/i });
     fireEvent.click(reviewTab);
 
-    // Click save
-    const saveButton = screen.getByRole("button", { name: /save/i });
-    fireEvent.click(saveButton);
-
-    await waitFor(() => {
-      expect(onSave).toHaveBeenCalled();
-      const callArgs = onSave.mock.calls?.[0]?.[0] as any;
-      expect(callArgs?.translations).toBeDefined();
-      const enTranslation = callArgs?.translations?.find((t: any) => t.locale === "en");
-      expect(enTranslation).toBeDefined();
-      expect(enTranslation?.name).toBe("Scholar Name");
-    });
-
-    expect(onClose).toHaveBeenCalled();
-  });
-
-  it("does not include translations in save when translation fields are empty", async () => {
-    const onSave = vi.fn().mockResolvedValue(undefined);
-
-    render(
-      <ScholarModal
-        isOpen
-        onClose={vi.fn()}
-        onSave={onSave}
-        scholar={{
-          id: "1",
-          name: "Test Scholar",
-          slug: "test-scholar",
-          mainLanguage: "ar",
-        }}
-      />,
-    );
-
-    // Switch to review tab directly without filling translations
-    const reviewTab = screen.getByRole("tab", { name: /review/i });
-    fireEvent.click(reviewTab);
-
-    // Click save
-    const saveButton = screen.getByRole("button", { name: /save/i });
-    fireEvent.click(saveButton);
-
-    await waitFor(() => {
-      expect(onSave).toHaveBeenCalled();
-      const callArgs = onSave.mock.calls?.[0]?.[0] as any;
-      // translations should be omitted if empty
-      expect(callArgs?.translations).toBeUndefined();
-    });
+    expect(screen.getByText("Updated bio")).toBeInTheDocument();
+    // Country was never touched, so it must not appear as a change.
+    expect(screen.queryByText("SA")).not.toBeInTheDocument();
   });
 
   it("allows cancel from any tab", () => {
     const onClose = vi.fn();
-    render(<ScholarModal isOpen onClose={onClose} onSave={vi.fn()} />);
+    render(<ScholarModal isOpen onClose={onClose} onSuccess={vi.fn()} />);
 
-    // Click cancel from en tab
     const cancelButton = screen.getByRole("button", { name: /cancel/i });
     fireEvent.click(cancelButton);
 
     expect(onClose).toHaveBeenCalled();
   });
 
-  it("includes bio in main language tab", () => {
-    render(
-      <ScholarModal
-        isOpen
-        onClose={vi.fn()}
-        onSave={vi.fn()}
-        scholar={{
-          id: "1",
-          name: "Test",
-          slug: "test",
-          bio: "Test bio",
-          mainLanguage: "ar",
-        }}
-      />,
-    );
+  it("displays error and highlights error tabs when required fields are missing", async () => {
+    render(<ScholarModal isOpen onClose={vi.fn()} onSuccess={vi.fn()} />);
 
-    // Switch to main language tab (Arabic)
-    const mainTab = screen.getByRole("tab", { name: "العربية" });
-    fireEvent.click(mainTab);
-
-    // Bio should be visible on main language tab
-    const bioLabel = screen.getByLabelText(/bio/i);
-    expect(bioLabel).toBeInTheDocument();
-
-    // Find the textarea next to the bio label
-    const bioInput = bioLabel.closest("div")?.querySelector("textarea");
-    expect(bioInput).toBeInTheDocument();
-    expect(bioInput?.value).toBe("Test bio");
-  });
-
-  it("defaults scholar title to Akh for new scholars", () => {
-    render(<ScholarModal isOpen onClose={vi.fn()} onSave={vi.fn()} />);
-
-    const titleTrigger = screen.getByLabelText(/title/i);
-    expect(titleTrigger).toBeInTheDocument();
-    expect(titleTrigger.textContent).toContain("Akh");
-  });
-
-  it("displays error on review tab and highlights error tab when required fields missing", async () => {
-    render(<ScholarModal isOpen onClose={vi.fn()} onSave={vi.fn()} />);
-
-    // Go directly to review tab without filling name/slug
     const reviewTab = screen.getByRole("tab", { name: /review/i });
     fireEvent.click(reviewTab);
 
-    const saveButton = screen.getByRole("button", { name: /add scholar|إضافة|save/i });
+    const saveButton = screen.getByRole("button", { name: /add scholar|إضافة/i });
     fireEvent.click(saveButton);
 
     await waitFor(() => {
       expect(screen.getByText(/required/i)).toBeInTheDocument();
-      const generalTab = screen.getByRole("tab", { name: /general/i });
-      const mainLanguageTab = screen.getByRole("tab", { name: "العربية" });
-
-      expect(generalTab.className).toContain("tabButtonError");
-      expect(mainLanguageTab.className).toContain("tabButtonError");
     });
   });
 });

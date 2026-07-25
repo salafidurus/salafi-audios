@@ -2,29 +2,21 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints, type Locale } from "@sd/core-contracts";
-import type {
-  ScholarListItemDto,
-  AdminListingDetailDto,
-  UpdateListingDetailsDto,
-} from "@sd/core-contracts";
+import type { ScholarListItemDto, TopicDetailDto, ListingRefDto } from "@sd/core-contracts";
 import { useTopicsList } from "@sd/domain-search";
 import { useAdminListingSeriesByScholar } from "@sd/domain-content";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { Modal } from "@/shared/components/Modal";
-import {
-  createLecture,
-  updateListingDetails,
-  fetchListingFormData,
-} from "@/features/admin/api/admin-lectures.api";
-
 import { sanitizeError } from "@sd/utils-error";
-import { getSecondaryLocales, buildTranslationsPayload } from "@/features/admin/utils/locale-tabs";
-import { ListingModalTabContent } from "./ListingModalTabContent";
+import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
+import { fetchListingFormData } from "@/features/admin/api/admin-lectures.api";
 import { useListingForm } from "@/features/admin/hooks/Content/useListingForm";
+import { useSaveListing } from "@/features/admin/hooks/Content/useSaveListing";
+import { ListingModalTabContent } from "./ListingModalTabContent";
 import styles from "./listing-modal.module.css";
 
-interface ListingModalProps {
+export interface ListingModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void | Promise<void>;
@@ -47,48 +39,42 @@ export function ListingModal({
 }: ListingModalProps) {
   const { t } = useTranslation();
   const isDesktop = useIsDesktop();
-  const loadingRef = useRef(false);
-  const fetchErrorRef = useRef<string | null>(null);
   const [activeTab, setActiveTab] = useState<"general" | "main" | "other" | "review">("general");
   const [errorTabs, setErrorTabs] = useState<string[]>([]);
-  const { state, dispatch } = useListingForm(null, initialAudioData);
-  const { title, slug, description, scholarId, language, translationChanges, saving, formError } =
-    state;
+  const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const loadingRef = useRef(false);
+  const formDataLoadedRef = useRef(false);
 
-  const mainLocale = (language || "ar") as Locale;
-  const otherLocale: Locale = mainLocale === "en" ? "ar" : "en";
-  const errorTabSet = new Set(errorTabs);
+  // Starts in create mode; edit-mode data is hydrated via INIT_FORM once fetched.
+  const { state, dispatch } = useListingForm();
+
+  // Load form data if editing
+  useEffect(() => {
+    if (!listingId || formDataLoadedRef.current) return;
+    if (loadingRef.current) return;
+
+    loadingRef.current = true;
+    setLoading(true);
+    setFetchError(null);
+
+    fetchListingFormData(listingId)
+      .then((data) => {
+        dispatch({ type: "INIT_FORM", data });
+        formDataLoadedRef.current = true;
+        setLoading(false);
+      })
+      .catch((err) => {
+        setFetchError(sanitizeError(err));
+        setLoading(false);
+        loadingRef.current = false;
+      });
+  }, [listingId, dispatch]);
 
   const handleClose = () => {
     setErrorTabs([]);
     onClose();
   };
-
-  // Fetch form data when opening modal in edit mode with listingId
-  useEffect(() => {
-    if (!isOpen || !listingId) return;
-
-    let cancelled = false;
-
-    const loadFormData = async () => {
-      try {
-        const data = await fetchListingFormData(listingId);
-        if (!cancelled) {
-          dispatch({ type: "INIT_STATE", data });
-        }
-      } catch (err) {
-        if (!cancelled) {
-          fetchErrorRef.current = sanitizeError(err);
-        }
-      }
-    };
-
-    loadFormData();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [isOpen, listingId, dispatch]);
 
   const { data: scholarsData } = useApiQuery<{ scholars: ScholarListItemDto[] }>(
     [...queryKeys.scholars.list.all()],
@@ -100,23 +86,11 @@ export function ListingModal({
   );
 
   const { data: topicsData } = useTopicsList();
-  const { data: seriesData } = useAdminListingSeriesByScholar(scholarId);
-
-  useEffect(() => {
-    if (!listingId || !scholarId || !scholarsData?.scholars) return;
-    const selectedScholar = scholarsData.scholars.find((s) => s.id === scholarId);
-    if (selectedScholar && selectedScholar.mainLanguage) {
-      dispatch({
-        type: "UPDATE_FIELD",
-        field: "language",
-        value: selectedScholar.mainLanguage as Locale,
-      });
-    }
-  }, [listingId, scholarId, scholarsData, dispatch]);
+  const { data: seriesData } = useAdminListingSeriesByScholar(state.scholarId);
 
   const handleTitleChange = (val: string) => {
-    if (!listingId) {
-      dispatch({ type: "UPDATE_FIELD", field: "title", value: val });
+    dispatch({ type: "UPDATE_FIELD", field: "title", value: val });
+    if (!state.isEditing) {
       dispatch({
         type: "UPDATE_FIELD",
         field: "slug",
@@ -126,13 +100,11 @@ export function ListingModal({
           .trim()
           .replace(/\s+/g, "-"),
       });
-    } else {
-      dispatch({ type: "UPDATE_FIELD", field: "title", value: val });
     }
   };
 
   const handleTopicToggle = (topicId: string) => {
-    const selectedTopics = state.selectedTopics;
+    const selectedTopics = state.selectedTopics || [];
     dispatch({
       type: "UPDATE_FIELD",
       field: "selectedTopics",
@@ -142,113 +114,50 @@ export function ListingModal({
     });
   };
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const errTabs: string[] = [];
-
-    if (!scholarId || !language || !state.selectedTopics || state.selectedTopics.length === 0) {
-      errTabs.push("general");
-    }
-    if (!title.trim() || (!listingId && !slug?.trim())) {
-      errTabs.push("main");
-    }
-
-    if (errTabs.length > 0) {
-      setErrorTabs(errTabs);
-      const errorMsg = t(
-        "admin.contents.listing.requiredFieldsMissing",
-        "Language, scholar, at least one topic, title, and slug are required.",
-      );
-      dispatch({
-        type: "SET_ERROR",
-        error: errorMsg,
-      });
-      return;
-    }
-
-    setErrorTabs([]);
-    dispatch({ type: "SET_SAVING", saving: true });
-    dispatch({ type: "SET_ERROR", error: null });
-
-    try {
-      if (listingId) {
-        const payload: UpdateListingDetailsDto = {
-          title,
-          description: state.description,
-          status: state.status,
-          orderIndex: Number(state.orderIndex),
-          language,
-        };
-
-        // Build translations array using utility (N-locale safe)
-        const secondaryLocales = getSecondaryLocales(mainLocale);
-        payload.translations = buildTranslationsPayload(
-          translationChanges,
-          secondaryLocales,
-          (v) => !!(v?.title || v?.description),
-        );
-
-        await updateListingDetails(listingId, payload);
-      } else {
-        if (!initialAudioData) {
-          dispatch({
-            type: "SET_ERROR",
-            error: t(
-              "admin.contents.listing.audioKeyRequired",
-              "Audio file key is required for creation.",
-            ),
-          });
-          dispatch({ type: "SET_SAVING", saving: false });
-          return;
-        }
-        const payload: any = {
-          title,
-          slug: slug || undefined,
-          scholarId,
-          parentId: state.seriesId || undefined,
-          topics: state.selectedTopics,
-          format: "single",
-          audioKey: initialAudioData.audioKey,
-          durationSeconds: initialAudioData.durationSeconds,
-          sizeBytes: initialAudioData.sizeBytes,
-          language,
-        };
-
-        // Build translations array using utility (N-locale safe)
-        const secondaryLocales = getSecondaryLocales(mainLocale);
-        payload.translations = buildTranslationsPayload(
-          translationChanges,
-          secondaryLocales,
-          (v) => !!(v?.title || v?.description),
-        );
-
-        await createLecture(payload);
-      }
-      await onSuccess();
-      onClose();
-    } catch (err) {
-      dispatch({
-        type: "SET_ERROR",
-        error:
-          (err as Error)?.message ||
-          t("admin.contents.listing.failedToSave", "Failed to save lecture details."),
-      });
-    } finally {
-      dispatch({ type: "SET_SAVING", saving: false });
+  const handleImageStaged = (file: File | null, preview: string | null) => {
+    dispatch({ type: "SET_STAGED_IMAGE", file, preview });
+    if (file && preview) {
+      dispatch({ type: "UPDATE_FIELD", field: "coverImageUrl", value: preview });
     }
   };
 
+  const handleSave = useSaveListing(
+    state,
+    dispatch,
+    initialAudioData,
+    onSuccess,
+    onClose,
+    setErrorTabs,
+  );
+
+  if (!state.isEditing && loading) {
+    return (
+      <Modal
+        isOpen={isOpen}
+        onClose={handleClose}
+        title={t("admin.contents.listing.editTitle", "Edit Listing Details")}
+        size="xl"
+      >
+        {loading && <div className={styles.loading}>{t("common.loading", "Loading...")}</div>}
+        {fetchError && <div className={styles.error}>{fetchError}</div>}
+      </Modal>
+    );
+  }
+
   const scholars = scholarsData?.scholars ?? [];
-  const topics = topicsData ?? [];
-  const series = seriesData ?? [];
+  const topicsArray = topicsData ?? [];
+  const series = (seriesData ?? []) as ListingRefDto[];
+  const mainLocale = (state.language || "ar") as Locale;
+  const otherLocale: Locale = mainLocale === "en" ? "ar" : "en";
+  const errorTabSet = new Set(errorTabs);
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
       title={
-        listingId
-          ? `${t("admin.contents.listing.editTitle", "Editing Listing Details")}${isDesktop && title ? ` (${title})` : ""}`
+        state.isEditing
+          ? `${t("admin.contents.listing.editTitle", "Edit Listing Details")}${isDesktop && state.title ? ` (${state.title})` : ""}`
           : t("admin.contents.listing.newTitle", "New Listing Details")
       }
       size="xl"
@@ -260,15 +169,15 @@ export function ListingModal({
       activeTab={activeTab}
       onActiveTabChange={(id) => setActiveTab(id as typeof activeTab)}
       defaultActiveTab="general"
-      saveFormId="lecture-edit-form"
-      saving={saving}
+      saveFormId="lecture-form"
+      saving={state.saving}
       reviewTabId="review"
     >
-      <form id="lecture-edit-form" onSubmit={handleSave} className={styles.form}>
+      <form id="lecture-form" onSubmit={handleSave} className={styles.form}>
         <Modal.Tabs errorTabs={errorTabs}>
           <Modal.TabItem id="general">{t("admin.modal.generalTab", "General")}</Modal.TabItem>
-          <Modal.TabItem id="main">{mainLocale === "en" ? "English" : "العربية"}</Modal.TabItem>
-          <Modal.TabItem id="other">{otherLocale === "en" ? "English" : "العربية"}</Modal.TabItem>
+          <Modal.TabItem id="main">{getLocaleLabel(mainLocale)}</Modal.TabItem>
+          <Modal.TabItem id="other">{getLocaleLabel(otherLocale)}</Modal.TabItem>
           <Modal.TabItem id="review">{t("admin.modal.reviewTab", "Review")}</Modal.TabItem>
         </Modal.Tabs>
 
@@ -278,12 +187,15 @@ export function ListingModal({
           activeTab={activeTab}
           errorTabSet={errorTabSet}
           scholars={scholars}
-          topics={topics}
+          topics={topicsArray}
           series={series}
           handleTopicToggle={handleTopicToggle}
           handleTitleChange={handleTitleChange}
           mainLocale={mainLocale}
           otherLocale={otherLocale}
+          isEditing={state.isEditing}
+          onImageStaged={handleImageStaged}
+          stagedImagePreview={state.stagedImagePreview}
         />
       </form>
     </Modal>

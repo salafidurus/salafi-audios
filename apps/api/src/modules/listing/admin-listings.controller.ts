@@ -12,9 +12,9 @@ import {
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type {
   AdminListingActionDto,
-  AdminListingUpdateDto,
   AdminListingListDto,
   AdminListingDetailDto,
+  AdminListingMediaDetailDto,
   BulkActionResultDto,
   ListingRefDto,
 } from '@sd/core-contracts';
@@ -23,6 +23,8 @@ import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decor
 import { RequiresPermission } from '../../core/auth/decorators';
 import { ListingService } from './listing.service';
 import { CreateListingDto } from './dto/create-listing.dto';
+import { UpdateListingDetailsDto } from './dto/update-listing-details.dto';
+import { UpdateListingMediaDto } from './dto/update-listing-media.dto';
 import { BulkActionDto } from '../../shared/dto/bulk-action.dto';
 
 @ApiTags('Admin Listings')
@@ -73,6 +75,13 @@ export class AdminListingsController {
     return this.service.getFormData(id);
   }
 
+  @Get(':id/media-data')
+  @RequiresPermission(Permissions.LISTINGS_VIEW)
+  @ApiOperation({ summary: 'Get listing media details' })
+  getMediaData(@Param('id') id: string): Promise<AdminListingMediaDetailDto> {
+    return this.service.getMediaData(id);
+  }
+
   @Post()
   @RequiresPermission(Permissions.LISTINGS_CREATE)
   @ApiOperation({ summary: 'Create a listing after R2 upload' })
@@ -93,17 +102,30 @@ export class AdminListingsController {
     return this.service.bulkAction(dto);
   }
 
-  @Put(':id')
+  @Put(':id/details')
   @RequiresPermission(Permissions.LISTINGS_EDIT)
-  @ApiOperation({ summary: 'Update listing metadata' })
-  @ApiOkResponse({ description: 'Listing updated successfully' })
-  async updateListing(
+  @ApiOperation({ summary: 'Update listing details (title, description, status, topics, etc.)' })
+  @ApiOkResponse({ description: 'Listing details updated successfully' })
+  async updateListingDetails(
     @Param('id') id: string,
-    @Body() updateDto: AdminListingUpdateDto,
+    @Body() updateDto: UpdateListingDetailsDto,
     @Req() req: { user?: { id: string } },
   ): Promise<AdminListingActionDto> {
-    const res = await this.service.updateListing(id, updateDto, req.user?.id);
-    return { ...res, message: 'Listing updated successfully' };
+    const res = await this.service.updateListingDetails(id, updateDto, req.user?.id);
+    return { ...res, message: 'Listing details updated successfully' };
+  }
+
+  @Put(':id/media')
+  @RequiresPermission(Permissions.LISTINGS_EDIT)
+  @ApiOperation({ summary: 'Update listing media (audio file, duration, etc.)' })
+  @ApiOkResponse({ description: 'Listing media updated successfully' })
+  async updateListingMedia(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateListingMediaDto,
+    @Req() req: { user?: { id: string } },
+  ): Promise<AdminListingActionDto> {
+    const res = await this.service.updateListingMedia(id, updateDto, req.user?.id);
+    return { ...res, message: 'Listing media updated successfully' };
   }
 
   @Post(':id/publish')

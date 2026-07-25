@@ -207,4 +207,57 @@ describe("ListingModal", () => {
     expect(onSuccessMock).toHaveBeenCalledTimes(1);
     expect(onCloseMock).toHaveBeenCalledTimes(1);
   });
+
+  it("review tab shows no changes when editing an untouched listing, and only the touched field once edited", async () => {
+    (fetchListingFormData as Mock<any>).mockResolvedValue({
+      listing: {
+        id: "lecture-456",
+        title: "Existing Title",
+        slug: "existing-title",
+        description: "Existing Description",
+        format: "single" as const,
+        status: "draft" as const,
+        scholarId: "scholar-2",
+        scholarName: "Scholar Two",
+        orderIndex: 5,
+        topics: ["topic-1"],
+        language: "ar" as const,
+        audioKey: "audio/old-key.mp3",
+        createdAt: "2024-01-01",
+        audioAssets: [],
+      },
+      translations: [],
+    });
+
+    render(<ListingModal isOpen onClose={vi.fn()} onSuccess={vi.fn()} listingId="lecture-456" />);
+
+    await waitFor(() => {
+      expect(fetchListingFormData).toHaveBeenCalledWith("lecture-456");
+    });
+    await waitFor(() => {
+      expect(screen.getByTestId("scholar-dropdown")).toHaveTextContent("Scholar Two");
+    });
+
+    const reviewButton = screen.getByRole("button", { name: /review/i });
+    fireEvent.click(reviewButton);
+
+    // Nothing was edited yet, so pre-existing values must not appear as changes.
+    expect(screen.getByText(/no changes made yet/i)).toBeInTheDocument();
+    expect(screen.queryByText("Existing Title")).not.toBeInTheDocument();
+    expect(screen.queryByText("Existing Description")).not.toBeInTheDocument();
+    expect(screen.queryByText("Topic One")).not.toBeInTheDocument();
+
+    // Now actually change only the title.
+    const mainTabButton = screen.getByRole("tab", { name: /العربية/i });
+    fireEvent.click(mainTabButton);
+    const titleInput = await screen.findByLabelText(/^Title/i);
+    fireEvent.change(titleInput, { target: { value: "Updated Title" } });
+
+    fireEvent.click(reviewButton);
+
+    expect(screen.getByText("Updated Title")).toBeInTheDocument();
+    // Description and topics were never touched, so they must not appear as changes.
+    expect(screen.queryByText("Existing Description")).not.toBeInTheDocument();
+    expect(screen.queryByText("Topic One")).not.toBeInTheDocument();
+  });
 });

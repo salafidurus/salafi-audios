@@ -22,16 +22,17 @@ export class MediaService {
   async getPresignedUploadUrl(dto: PresignedUrlRequestDto): Promise<PresignedUrlResponseDto> {
     let objectKey: string;
 
-    // Slug-based naming for scholar images: /images/scholars/{slug}.{ext}
+    // Slug-based naming for entity images: /images/{entityType}/{slug}.{ext}
     if (dto.slug && dto.purpose === 'image') {
       const ext = dto.filename.split('.').pop()?.toLowerCase() || '';
 
-      // Validate file extension for scholar images
+      // Validate file extension for images
       if (!['png', 'jpg', 'jpeg'].includes(ext)) {
-        throw new Error('Scholar images must be png, jpg, or jpeg');
+        throw new Error('Images must be png, jpg, or jpeg');
       }
 
-      objectKey = `images/scholars/${dto.slug}.${ext}`;
+      const entityType = dto.entityType ?? 'scholar';
+      objectKey = `images/${entityType}/${dto.slug}.${ext}`;
     } else {
       // Default naming: {purpose}/{cuid}-{filename}
       objectKey = `${dto.purpose}/${createId()}-${dto.filename}`;

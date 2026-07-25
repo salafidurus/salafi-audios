@@ -5,9 +5,9 @@ import type {
   CreateListingDto,
   AdminListingListDto,
   AdminListingDetailDto,
-  AdminListingUpdateDto,
   BulkActionDto,
   BulkActionResultDto,
+  UpdateListingDetailsDto,
 } from "@sd/core-contracts";
 import { File, UploadTask, UploadType, type UploadProgress } from "expo-file-system";
 
@@ -49,6 +49,17 @@ export async function uploadToR2(
   }
 }
 
+export async function updateLecture(
+  id: string,
+  data: UpdateListingDetailsDto,
+): Promise<AdminListingDetailDto> {
+  return httpClient<AdminListingDetailDto>({
+    url: `${endpoints.admin.listings.detail}/${id}/details`,
+    method: "PUT",
+    body: data,
+  });
+}
+
 export async function createLecture(data: CreateListingDto): Promise<AdminListingDetailDto> {
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.create,
@@ -77,17 +88,6 @@ export async function fetchAdminLectureDetail(id: string): Promise<AdminListingD
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.detail(id),
     method: "GET",
-  });
-}
-
-export async function updateLecture(
-  id: string,
-  data: Partial<AdminListingUpdateDto>,
-): Promise<AdminListingDetailDto> {
-  return httpClient<AdminListingDetailDto>({
-    url: endpoints.admin.listings.update(id),
-    method: "PUT",
-    body: data,
   });
 }
 

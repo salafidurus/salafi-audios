@@ -524,11 +524,11 @@ export class ScholarsRepository {
       // Create translations if provided
       if (dto.translations) {
         await Promise.all(
-          Object.entries(dto.translations).map(([locale, fields]) =>
+          dto.translations.map((fields) =>
             tx.scholarTranslation.create({
               data: {
                 scholarId: scholar.id,
-                locale: locale as Locale,
+                locale: fields.locale,
                 name: fields.name,
                 bio: fields.bio ?? null,
                 status: 'draft',
@@ -547,7 +547,6 @@ export class ScholarsRepository {
       // Update scholar fields if provided
       const updateData: Record<string, any> = {};
       if (dto.name !== undefined) updateData.name = dto.name;
-      if (dto.slug !== undefined) updateData.slug = dto.slug;
       if (dto.bio !== undefined) updateData.bio = dto.bio;
       if (dto.imageUrl !== undefined) updateData.imageUrl = dto.imageUrl;
       if (dto.isActive !== undefined) updateData.isActive = dto.isActive;
@@ -569,12 +568,12 @@ export class ScholarsRepository {
       // Upsert translations if provided
       if (dto.translations) {
         await Promise.all(
-          Object.entries(dto.translations).map(([locale, fields]) =>
+          dto.translations.map((fields) =>
             tx.scholarTranslation.upsert({
-              where: { scholarId_locale: { scholarId: id, locale: locale as Locale } },
+              where: { scholarId_locale: { scholarId: id, locale: fields.locale } },
               create: {
                 scholarId: id,
-                locale: locale as Locale,
+                locale: fields.locale,
                 name: fields.name,
                 bio: fields.bio ?? null,
                 status: 'draft',

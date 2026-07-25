@@ -1,14 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import type { CreateScholarDto, Locale } from "@sd/core-contracts";
+import type { Locale } from "@sd/core-contracts";
 import { FormSection } from "@/features/admin/components/FormSection";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
+import type { FormState } from "../../hooks/Scholar/useScholarForm";
 import styles from "./review-section.module.css";
 
 interface ReviewSectionProps {
-  formData: CreateScholarDto;
+  formData: FormState;
   changedFields: Record<string, boolean>;
   translations?: Array<{ locale: Locale; name?: string; bio?: string | null }>;
   stagedImagePreview: string | null;

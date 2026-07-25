@@ -1,6 +1,6 @@
 "use client";
 
-import type { CreateScholarDto } from "@sd/core-contracts";
+import type { ScholarTitle } from "@sd/core-contracts";
 import {
   Dropdown,
   DropdownTrigger,
@@ -9,26 +9,39 @@ import {
 } from "@/shared/components/Dropdown";
 import { InputField } from "@/shared/components/InputField";
 import { FormSection } from "@/features/admin/components/FormSection";
-import { ScholarAvatarEditor } from "./scholar-avatar-editor";
+import { ImageUploadEditor } from "@/shared/components/ImageUploadEditor";
 import { useTranslation } from "@/core/i18n/use-translation";
-import type { FormAction } from "../../hooks/Scholar/useScholarForm";
+import type { FormAction, FormState } from "../../hooks/Scholar/useScholarForm";
 import { SCHOLAR_TITLE_LABELS, SCHOLAR_TITLES_ARRAY } from "./constants";
 import styles from "./personal-data-section.module.css";
 
 interface GeneralDataSectionProps {
-  formData: CreateScholarDto;
+  formData: FormState;
   dispatch: React.Dispatch<FormAction>;
   onImageStaged: (file: File | null, preview: string | null) => void;
+  isEditing?: boolean;
 }
 
-export function GeneralDataSection({ formData, dispatch, onImageStaged }: GeneralDataSectionProps) {
+export function GeneralDataSection({
+  formData,
+  dispatch,
+  onImageStaged,
+  isEditing = false,
+}: GeneralDataSectionProps) {
   const { t } = useTranslation();
 
   return (
     <FormSection title={t("admin.scholars.generalInfo", "General Information")}>
       <div className={styles.container}>
         <div className={styles.avatarColumn}>
-          <ScholarAvatarEditor imageUrl={formData.imageUrl} onImageStaged={onImageStaged} />
+          <ImageUploadEditor
+            imageUrl={formData.imageUrl}
+            onImageStaged={onImageStaged}
+            uploadLabel={t("admin.scholars.uploadAvatar", "Upload avatar")}
+            changeLabel={t("admin.scholars.changeAvatar", "Change avatar")}
+            selectLabel={t("admin.scholars.selectAvatar", "Select avatar image")}
+            altText={t("admin.scholars.avatarAlt", "Scholar avatar")}
+          />
         </div>
 
         <div className={styles.fieldsColumn}>
@@ -42,6 +55,7 @@ export function GeneralDataSection({ formData, dispatch, onImageStaged }: Genera
               value={formData.slug}
               onChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "slug", value })}
               placeholder={t("admin.scholars.slugPlaceholder", "scholar-slug")}
+              disabled={isEditing}
             />
           </div>
 
@@ -55,7 +69,7 @@ export function GeneralDataSection({ formData, dispatch, onImageStaged }: Genera
                 dispatch({
                   type: "UPDATE_FIELD",
                   field: "title",
-                  value: value as CreateScholarDto["title"],
+                  value: value as ScholarTitle,
                 })
               }
             >

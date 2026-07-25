@@ -1,13 +1,13 @@
 "use client";
 
 import React from "react";
-import type { Locale, ScholarListItemDto } from "@sd/core-contracts";
+import type { Locale, ScholarListItemDto, TopicDetailDto, ListingRefDto } from "@sd/core-contracts";
 import { Modal } from "@/shared/components/Modal";
 import { ListingGeneralSection } from "./ListingGeneralSection";
 import { ListingTranslatableFields } from "./ListingTranslatableFields";
 import { ListingReviewSection } from "./ListingReviewSection";
 import { useTranslation } from "@/core/i18n/use-translation";
-import type { FormState, FormAction } from "@/features/admin/hooks/Content/useListingForm";
+import type { FormAction, FormState } from "@/features/admin/hooks/Content/useListingForm";
 import styles from "./listing-modal.module.css";
 
 interface ListingModalTabContentProps {
@@ -16,12 +16,15 @@ interface ListingModalTabContentProps {
   activeTab: string;
   errorTabSet: Set<string>;
   scholars: ScholarListItemDto[];
-  topics: any[];
-  series: any[];
+  topics: TopicDetailDto[];
+  series: ListingRefDto[];
   handleTopicToggle: (topicId: string) => void;
-  handleTitleChange: (val: string) => void;
+  handleTitleChange?: (val: string) => void;
   mainLocale: Locale;
   otherLocale: Locale;
+  isEditing?: boolean;
+  onImageStaged?: (file: File | null, preview: string | null) => void;
+  stagedImagePreview?: string | null;
 }
 
 export function ListingModalTabContent({
@@ -36,6 +39,9 @@ export function ListingModalTabContent({
   handleTitleChange,
   mainLocale,
   otherLocale,
+  isEditing = false,
+  onImageStaged,
+  stagedImagePreview,
 }: ListingModalTabContentProps) {
   const { t } = useTranslation();
   const { formError } = state;
@@ -53,6 +59,9 @@ export function ListingModalTabContent({
           topics={topics}
           series={series}
           handleTopicToggle={handleTopicToggle}
+          isEditing={isEditing}
+          onImageStaged={onImageStaged}
+          stagedImagePreview={stagedImagePreview}
         />
       </Modal.ContentItem>
 
@@ -64,7 +73,10 @@ export function ListingModalTabContent({
           state={state}
           dispatch={dispatch}
           locale={mainLocale}
-          handleTitleChange={handleTitleChange}
+          handleTitleChange={
+            handleTitleChange ||
+            ((v) => dispatch({ type: "UPDATE_FIELD", field: "title", value: v }))
+          }
         />
       </Modal.ContentItem>
 
@@ -76,13 +88,21 @@ export function ListingModalTabContent({
           state={state}
           dispatch={dispatch}
           locale={otherLocale}
-          handleTitleChange={handleTitleChange}
+          handleTitleChange={
+            handleTitleChange ||
+            ((v) => dispatch({ type: "UPDATE_FIELD", field: "title", value: v }))
+          }
         />
       </Modal.ContentItem>
 
       <Modal.ContentItem id="review">
         {formError && <div className={styles.errorBanner}>{formError}</div>}
-        <ListingReviewSection state={state} mainLocale={mainLocale} otherLocale={otherLocale} />
+        <ListingReviewSection
+          state={state}
+          mainLocale={mainLocale}
+          otherLocale={otherLocale}
+          topics={topics}
+        />
       </Modal.ContentItem>
     </Modal.Content>
   );

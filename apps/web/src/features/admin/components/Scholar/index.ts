@@ -1,5 +1,5 @@
 import { ScholarItem, type ScholarItemProps } from "./ScholarItem";
-import { ScholarModal, type ScholarModalProps, type ScholarForEdit } from "./ScholarModal";
+import { ScholarModal, type ScholarModalProps } from "./ScholarModal";
 
 export const Scholar = Object.assign(
   {},
@@ -9,4 +9,4 @@ export const Scholar = Object.assign(
   },
 );
 
-export type { ScholarItemProps, ScholarModalProps, ScholarForEdit };
+export type { ScholarItemProps, ScholarModalProps };

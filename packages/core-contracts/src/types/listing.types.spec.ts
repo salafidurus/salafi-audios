@@ -2,7 +2,6 @@ import { describe, it, expect } from "bun:test";
 import {
   AdminListingDetailDtoSchema,
   CreateListingDtoSchema,
-  AdminListingUpdateDtoSchema,
   ListingFormDataDtoSchema,
   UpdateListingDetailsDtoSchema,
   AdminListingMediaDetailDtoSchema,
@@ -123,9 +122,9 @@ describe("CreateListingDtoSchema (array-shaped translations - Bug 1 fix)", () =>
   });
 });
 
-describe("AdminListingUpdateDtoSchema (array-shaped translations - Bug 1 fix)", () => {
+describe("UpdateListingDetailsDtoSchema (array-shaped translations - Bug 1 fix)", () => {
   it("parses valid update payload with array-shaped translations", () => {
-    const result = AdminListingUpdateDtoSchema.parse({
+    const result = UpdateListingDetailsDtoSchema.parse({
       title: "Updated Title",
       translations: [{ locale: "en", title: "English Title", description: null }],
     });
@@ -134,7 +133,7 @@ describe("AdminListingUpdateDtoSchema (array-shaped translations - Bug 1 fix)", 
   });
 
   it("accepts translations array with both language and secondary locale (Bug 1 fix)", () => {
-    const result = AdminListingUpdateDtoSchema.parse({
+    const result = UpdateListingDetailsDtoSchema.parse({
       title: "تحديث",
       language: "ar",
       translations: [

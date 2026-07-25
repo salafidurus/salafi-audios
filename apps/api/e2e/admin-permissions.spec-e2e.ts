@@ -188,10 +188,10 @@ describe('Admin Permission Boundaries (e2e)', () => {
   });
 
   describe('Cross-isolation Boundary Strictness', () => {
-    it('10. User with SCHOLARS_EDIT but not LISTINGS_EDIT -> 403 on updating listing metadata (PUT /admin/listings/:id)', async () => {
+    it('10. User with SCHOLARS_EDIT but not LISTINGS_EDIT -> 403 on updating listing metadata (PUT /admin/listings/:id/details)', async () => {
       const auth = await authFactory.createAdminUser([Permission.SCHOLARS_EDIT]);
       await request(app.getHttpServer())
-        .put(`/admin/listings/${TEST_LISTING_ID}`)
+        .put(`/admin/listings/${TEST_LISTING_ID}/details`)
         .set(auth.headers)
         .send({
           title: 'Attempted Title Update',

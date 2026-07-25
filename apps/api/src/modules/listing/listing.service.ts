@@ -8,7 +8,9 @@ import type {
   AdminListingListDto,
   AdminListingDetailDto,
   CreateListingDto,
-  AdminListingUpdateDto,
+  UpdateListingDetailsDto,
+  UpdateListingMediaDto,
+  AdminListingMediaDetailDto,
   BulkActionDto,
   BulkActionResultDto,
   TranslationViewDto,
@@ -86,15 +88,32 @@ export class ListingService {
     return result;
   }
 
-  async updateListing(
+  async updateListingDetails(
     id: string,
-    dto: AdminListingUpdateDto,
+    dto: UpdateListingDetailsDto,
     updatedBy?: string,
   ): Promise<{ success: boolean }> {
-    const ok = await this.repo.updateListing(id, dto, updatedBy);
+    const ok = await this.repo.updateListingDetails(id, dto, updatedBy);
     if (!ok) throw new NotFoundException(`Listing "${id}" not found`);
     await this.invalidateCache(id);
     return { success: true };
+  }
+
+  async updateListingMedia(
+    id: string,
+    dto: UpdateListingMediaDto,
+    updatedBy?: string,
+  ): Promise<{ success: boolean }> {
+    const ok = await this.repo.updateListingMedia(id, dto, updatedBy);
+    if (!ok) throw new NotFoundException(`Listing "${id}" not found`);
+    await this.invalidateCache(id);
+    return { success: true };
+  }
+
+  async getMediaData(id: string): Promise<AdminListingMediaDetailDto> {
+    const data = await this.repo.getMediaData(id);
+    if (!data) throw new NotFoundException(`Listing "${id}" not found`);
+    return data;
   }
 
   async publishListing(id: string): Promise<{ success: boolean }> {
