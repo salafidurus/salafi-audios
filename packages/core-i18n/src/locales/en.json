@@ -739,7 +739,18 @@
         "failedToLoadArrange": "Failed to load listing data.",
         "uploadAction": "Upload",
         "uploading": "Uploading…",
-        "saving": "Saving…"
+        "saving": "Saving…",
+        "changeCover": "Change cover",
+        "collection": "Collection",
+        "coverImageAlt": "Listing cover image",
+        "coverImageLabel": "Cover Image",
+        "coverImageUpdated": "Updated",
+        "formatLabel": "Format",
+        "requiredFieldsMissing": "Language, scholar, at least one topic, title, and slug are required.",
+        "selectCover": "Select cover image",
+        "series": "Series",
+        "single": "Single",
+        "uploadCover": "Upload cover"
       },
       "topic": {
         "orderIndexLabel": "Order Index"

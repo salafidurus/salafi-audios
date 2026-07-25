@@ -740,7 +740,18 @@
         "failedToLoadArrange": "فشل تحميل بيانات المادة.",
         "uploadAction": "رفع",
         "uploading": "جارٍ الرفع…",
-        "saving": "جارٍ الحفظ…"
+        "saving": "جارٍ الحفظ…",
+        "changeCover": "تغيير الغلاف",
+        "collection": "مجموعة",
+        "coverImageAlt": "صورة غلاف المادة",
+        "coverImageLabel": "صورة الغلاف",
+        "coverImageUpdated": "تم التحديث",
+        "formatLabel": "الصيغة",
+        "requiredFieldsMissing": "اللغة والشيخ وموضوع واحد على الأقل والعنوان والمعرّف كلها حقول مطلوبة.",
+        "selectCover": "اختيار صورة الغلاف",
+        "series": "سلسلة",
+        "single": "مفرد",
+        "uploadCover": "رفع الغلاف"
       },
       "topic": {
         "orderIndexLabel": "ترتيب الفهرس"
