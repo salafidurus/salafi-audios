@@ -2,6 +2,16 @@ import type { Locale, ListingFormDataDto } from "@sd/core-contracts";
 import { useReducer } from "react";
 import { validateLectureStatus, type LectureStatus } from "@/shared/types/form-types";
 
+export type ListingChangeSnapshot = {
+  title: string;
+  description: string;
+  status: LectureStatus;
+  orderIndex: number;
+  selectedTopics: string[];
+  language: Locale;
+  coverImageUrl: string;
+};
+
 export type FormState = {
   // Immutable fields (edit mode only)
   id?: string;
@@ -22,6 +32,8 @@ export type FormState = {
   // Form state
   translationChanges: Partial<Record<Locale, { title?: string; description?: string }>>;
   initialTranslationChanges: Partial<Record<Locale, { title?: string; description?: string }>>;
+  // Snapshot of the mutable fields as fetched, for diffing in the review tab. Null in create mode.
+  initialSnapshot: ListingChangeSnapshot | null;
   saving: boolean;
   formError: string | null;
   isEditing: boolean;
@@ -31,7 +43,10 @@ export type FormState = {
   stagedImagePreview: string | null;
 };
 
-type UpdatableField = keyof Omit<FormState, "isEditing" | "stagedImageFile" | "stagedImagePreview">;
+type UpdatableField = keyof Omit<
+  FormState,
+  "isEditing" | "stagedImageFile" | "stagedImagePreview" | "initialSnapshot"
+>;
 
 type UpdateFieldAction = {
   [K in UpdatableField]: { type: "UPDATE_FIELD"; field: K; value: FormState[K] };
@@ -61,6 +76,7 @@ function getInitialFormState(): FormState {
     coverImageUrl: "",
     translationChanges: {},
     initialTranslationChanges: {},
+    initialSnapshot: null,
     saving: false,
     formError: null,
     isEditing: false,
@@ -80,21 +96,39 @@ function buildEditFormState(data: ListingFormDataDto): FormState {
       };
     }
   }
+
+  const title = listing.title || "";
+  const description = listing.description || "";
+  const status = (listing.status as LectureStatus) || "draft";
+  const orderIndex = listing.orderIndex || 0;
+  const selectedTopics = listing.topics || [];
+  const language = (listing.language as Locale) || "ar";
+  const coverImageUrl = listing.coverImageUrl || "";
+
   return {
     id: listing.id,
     scholarName: listing.scholarName,
-    title: listing.title || "",
+    title,
     slug: listing.slug || "",
-    description: listing.description || "",
+    description,
     scholarId: listing.scholarId || "",
     format: (listing.format as "single" | "series" | "collection") || "single",
-    status: (listing.status as LectureStatus) || "draft",
-    orderIndex: listing.orderIndex || 0,
-    selectedTopics: listing.topics || [],
-    language: (listing.language as Locale) || "ar",
-    coverImageUrl: listing.coverImageUrl || "",
+    status,
+    orderIndex,
+    selectedTopics,
+    language,
+    coverImageUrl,
     translationChanges,
     initialTranslationChanges: translationChanges,
+    initialSnapshot: {
+      title,
+      description,
+      status,
+      orderIndex,
+      selectedTopics,
+      language,
+      coverImageUrl,
+    },
     saving: false,
     formError: null,
     isEditing: true,

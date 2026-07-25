@@ -132,6 +132,52 @@ describe("ScholarModal", () => {
     expect(onCloseMock).toHaveBeenCalledTimes(1);
   });
 
+  it("review tab shows no changes when editing an untouched scholar, and only the touched field once edited", async () => {
+    (fetchScholarFormData as Mock<any>).mockResolvedValue({
+      scholar: {
+        id: "scholar-uuid-456",
+        name: "Existing Scholar",
+        slug: "existing-scholar",
+        bio: "Existing bio",
+        country: "SA",
+        isActive: true,
+        mainLanguage: "ar",
+        orderIndex: 5,
+        createdAt: "2024-01-01",
+      },
+      translations: [],
+    });
+
+    render(
+      <ScholarModal isOpen onClose={vi.fn()} onSuccess={vi.fn()} scholarId="scholar-uuid-456" />,
+    );
+
+    await waitFor(() => {
+      expect(fetchScholarFormData).toHaveBeenCalledWith("scholar-uuid-456");
+    });
+    await screen.findByLabelText(/slug \*/i);
+
+    const reviewTab = screen.getByRole("tab", { name: /review/i });
+    fireEvent.click(reviewTab);
+
+    // Nothing was edited yet, so the review tab must not show the
+    // pre-existing bio/country as "changed" fields.
+    expect(screen.getByText(/no changes made yet/i)).toBeInTheDocument();
+    expect(screen.queryByText("Existing bio")).not.toBeInTheDocument();
+
+    // Now actually change bio only (bio lives on the main-language tab).
+    const mainTab = screen.getByRole("tab", { name: "العربية" });
+    fireEvent.click(mainTab);
+    const bioInput = screen.getByLabelText(/bio/i);
+    fireEvent.change(bioInput, { target: { value: "Updated bio" } });
+
+    fireEvent.click(reviewTab);
+
+    expect(screen.getByText("Updated bio")).toBeInTheDocument();
+    // Country was never touched, so it must not appear as a change.
+    expect(screen.queryByText("SA")).not.toBeInTheDocument();
+  });
+
   it("allows cancel from any tab", () => {
     const onClose = vi.fn();
     render(<ScholarModal isOpen onClose={onClose} onSuccess={vi.fn()} />);

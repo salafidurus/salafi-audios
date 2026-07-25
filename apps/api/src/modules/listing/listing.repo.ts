@@ -907,13 +907,13 @@ export class ListingRepository {
       // If translations were provided in the DTO, upsert them
       if (dto.translations) {
         await Promise.all(
-          Object.entries(dto.translations).map(([locale, fields]) =>
+          dto.translations.map((fields) =>
             tx.listingTranslation.upsert({
-              where: { listingId_locale: { listingId: listing.id, locale: locale as any } },
+              where: { listingId_locale: { listingId: listing.id, locale: fields.locale } },
               update: { title: fields.title, description: fields.description ?? null },
               create: {
                 listingId: listing.id,
-                locale: locale as any,
+                locale: fields.locale,
                 title: fields.title,
                 description: fields.description ?? null,
               },
@@ -979,16 +979,16 @@ export class ListingRepository {
         // If translations were provided in the DTO, upsert them
         if (translations) {
           await Promise.all(
-            Object.entries(translations).map(([locale, fields]) =>
+            translations.map((fields) =>
               tx.listingTranslation.upsert({
-                where: { listingId_locale: { listingId: id, locale: locale as any } },
+                where: { listingId_locale: { listingId: id, locale: fields.locale } },
                 update: {
                   title: fields.title ?? undefined,
                   description: fields.description ?? null,
                 },
                 create: {
                   listingId: id,
-                  locale: locale as any,
+                  locale: fields.locale,
                   title: fields.title ?? '',
                   description: fields.description ?? null,
                 },

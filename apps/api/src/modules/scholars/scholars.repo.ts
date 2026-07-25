@@ -524,11 +524,11 @@ export class ScholarsRepository {
       // Create translations if provided
       if (dto.translations) {
         await Promise.all(
-          Object.entries(dto.translations).map(([locale, fields]) =>
+          dto.translations.map((fields) =>
             tx.scholarTranslation.create({
               data: {
                 scholarId: scholar.id,
-                locale: locale as Locale,
+                locale: fields.locale,
                 name: fields.name,
                 bio: fields.bio ?? null,
                 status: 'draft',
@@ -568,12 +568,12 @@ export class ScholarsRepository {
       // Upsert translations if provided
       if (dto.translations) {
         await Promise.all(
-          Object.entries(dto.translations).map(([locale, fields]) =>
+          dto.translations.map((fields) =>
             tx.scholarTranslation.upsert({
-              where: { scholarId_locale: { scholarId: id, locale: locale as Locale } },
+              where: { scholarId_locale: { scholarId: id, locale: fields.locale } },
               create: {
                 scholarId: id,
-                locale: locale as Locale,
+                locale: fields.locale,
                 name: fields.name,
                 bio: fields.bio ?? null,
                 status: 'draft',

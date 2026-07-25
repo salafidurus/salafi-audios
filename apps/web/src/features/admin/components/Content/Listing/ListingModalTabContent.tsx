@@ -97,7 +97,12 @@ export function ListingModalTabContent({
 
       <Modal.ContentItem id="review">
         {formError && <div className={styles.errorBanner}>{formError}</div>}
-        <ListingReviewSection state={state} mainLocale={mainLocale} otherLocale={otherLocale} />
+        <ListingReviewSection
+          state={state}
+          mainLocale={mainLocale}
+          otherLocale={otherLocale}
+          topics={topics}
+        />
       </Modal.ContentItem>
     </Modal.Content>
   );

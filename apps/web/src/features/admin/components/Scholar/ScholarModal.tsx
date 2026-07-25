@@ -63,6 +63,22 @@ export function ScholarModal({ isOpen, onClose, onSuccess, scholarId }: ScholarM
   };
 
   const changedFields = useMemo(() => {
+    if (state.isEditing) {
+      const initial = state.initialSnapshot;
+      return {
+        name: initial ? state.name !== initial.name : false,
+        slug: false,
+        bio: initial ? state.bio !== initial.bio : false,
+        title: initial ? state.title !== initial.title : false,
+        country: initial ? state.country !== initial.country : false,
+        orderIndex: initial ? state.orderIndex !== initial.orderIndex : false,
+        socialTwitter: initial ? state.socialTwitter !== initial.socialTwitter : false,
+        socialTelegram: initial ? state.socialTelegram !== initial.socialTelegram : false,
+        socialYoutube: initial ? state.socialYoutube !== initial.socialYoutube : false,
+        socialWebsite: initial ? state.socialWebsite !== initial.socialWebsite : false,
+      };
+    }
+    // Create mode: nothing to diff against yet, so show which fields have been filled in
     return {
       name: !!state.name,
       slug: !!state.slug,
@@ -222,13 +238,11 @@ export function ScholarModal({ isOpen, onClose, onSuccess, scholarId }: ScholarM
               translations={secondaryLocales.reduce<
                 Array<{ locale: Locale; name?: string; bio?: string | null }>
               >((acc, locale) => {
-                const trans = {
-                  locale,
-                  name: state.translationChanges[locale]?.name,
-                  bio: state.translationChanges[locale]?.bio,
-                };
-                if (trans.name || trans.bio) {
-                  acc.push(trans);
+                const trans = state.translationChanges[locale];
+                const initial = state.initialTranslationChanges[locale];
+                const changed = trans?.name !== initial?.name || trans?.bio !== initial?.bio;
+                if (changed && (trans?.name || trans?.bio)) {
+                  acc.push({ locale, name: trans?.name, bio: trans?.bio });
                 }
                 return acc;
               }, [])}

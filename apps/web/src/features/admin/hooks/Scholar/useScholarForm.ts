@@ -1,6 +1,21 @@
 import type { Locale, ScholarFormDataDto, ScholarTitle, CountryCode } from "@sd/core-contracts";
 import { useReducer } from "react";
 
+export type ScholarChangeSnapshot = {
+  name: string;
+  bio: string;
+  imageUrl: string;
+  isActive: boolean;
+  title?: ScholarTitle;
+  country?: CountryCode;
+  mainLanguage: Locale;
+  socialTwitter?: string;
+  socialTelegram?: string;
+  socialYoutube?: string;
+  socialWebsite?: string;
+  orderIndex: number;
+};
+
 export type FormState = {
   // Immutable fields (edit mode only)
   id?: string;
@@ -23,6 +38,8 @@ export type FormState = {
   // Form state
   translationChanges: Partial<Record<Locale, { name?: string; bio?: string | null }>>;
   initialTranslationChanges: Partial<Record<Locale, { name?: string; bio?: string | null }>>;
+  // Snapshot of the mutable fields as fetched, for diffing in the review tab. Null in create mode.
+  initialSnapshot: ScholarChangeSnapshot | null;
   saving: boolean;
   error: string | null;
   isEditing: boolean;
@@ -32,7 +49,10 @@ export type FormState = {
   stagedImagePreview: string | null;
 };
 
-type UpdatableField = keyof Omit<FormState, "isEditing" | "stagedImageFile" | "stagedImagePreview">;
+type UpdatableField = keyof Omit<
+  FormState,
+  "isEditing" | "stagedImageFile" | "stagedImagePreview" | "initialSnapshot"
+>;
 
 type UpdateFieldAction = {
   [K in UpdatableField]: { type: "UPDATE_FIELD"; field: K; value: FormState[K] };
@@ -59,6 +79,7 @@ function getInitialFormState(): FormState {
     orderIndex: 999,
     translationChanges: {},
     initialTranslationChanges: {},
+    initialSnapshot: null,
     saving: false,
     error: null,
     isEditing: false,
@@ -78,23 +99,44 @@ function buildEditFormState(data: ScholarFormDataDto): FormState {
       };
     }
   }
+  const name = scholar.name || "";
+  const bio = scholar.bio || "";
+  const imageUrl = scholar.imageUrl || "";
+  const isActive = scholar.isActive !== undefined ? scholar.isActive : true;
+  const mainLanguage = (scholar.mainLanguage as Locale) || "ar";
+  const orderIndex = scholar.orderIndex || 999;
+
   return {
     id: scholar.id,
-    name: scholar.name || "",
+    name,
     slug: scholar.slug || "",
-    bio: scholar.bio || "",
-    imageUrl: scholar.imageUrl || "",
-    isActive: scholar.isActive !== undefined ? scholar.isActive : true,
+    bio,
+    imageUrl,
+    isActive,
     title: scholar.title,
     country: scholar.country,
-    mainLanguage: (scholar.mainLanguage as Locale) || "ar",
+    mainLanguage,
     socialTwitter: scholar.socialTwitter,
     socialTelegram: scholar.socialTelegram,
     socialYoutube: scholar.socialYoutube,
     socialWebsite: scholar.socialWebsite,
-    orderIndex: scholar.orderIndex || 999,
+    orderIndex,
     translationChanges,
     initialTranslationChanges: translationChanges,
+    initialSnapshot: {
+      name,
+      bio,
+      imageUrl,
+      isActive,
+      title: scholar.title,
+      country: scholar.country,
+      mainLanguage,
+      socialTwitter: scholar.socialTwitter,
+      socialTelegram: scholar.socialTelegram,
+      socialYoutube: scholar.socialYoutube,
+      socialWebsite: scholar.socialWebsite,
+      orderIndex,
+    },
     saving: false,
     error: null,
     isEditing: true,
