@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ListingUploadArrangeModal } from "./ListingUploadArrangeModal";
-import { updateLecture, fetchListingFormData } from "@/features/admin/api/admin-lectures.api";
+import { fetchListingMediaData, updateListingMedia } from "@/features/admin/api/admin-lectures.api";
 
 vi.mock("@/features/admin/api/admin-lectures.api", () => ({
-  updateLecture: vi.fn(),
-  fetchListingFormData: vi.fn(),
+  fetchListingMediaData: vi.fn(),
+  updateListingMedia: vi.fn(),
 }));
 
 vi.mock("@/core/i18n/use-translation", () => ({
@@ -37,25 +37,13 @@ describe("ListingUploadArrangeModal", () => {
   });
 
   it("renders upload, arrange, and review tabs for a listing", async () => {
-    (fetchListingFormData as Mock<any>).mockResolvedValue({
-      listing: {
-        id: "lecture-123",
-        title: "Test Audio Lecture",
-        slug: "test-audio-lecture",
-        description: "Description",
-        format: "single" as const,
-        status: "published" as const,
-        scholarId: "scholar-1",
-        scholarName: "Scholar One",
-        parentId: null,
-        orderIndex: 1,
-        topics: ["topic-1"],
-        language: "ar" as const,
-        audioKey: "audio/existing.mp3",
-        createdAt: "2024-01-01",
-        audioAssets: [],
-      },
-      translations: [],
+    (fetchListingMediaData as Mock<any>).mockResolvedValue({
+      id: "lecture-123",
+      title: "Test Audio Lecture",
+      audioKey: "audio/existing.mp3",
+      durationSeconds: 120,
+      format: "single" as const,
+      audioAssets: [],
     });
 
     render(

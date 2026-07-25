@@ -6,7 +6,8 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { AudioUploader } from "./AudioUploader/AudioUploader";
 import { ListingUploadArrangeReviewSection } from "./ListingUploadArrangeReviewSection";
-import { fetchListingFormData, updateLecture } from "@/features/admin/api/admin-lectures.api";
+import type { UpdateListingMediaDto } from "@sd/core-contracts";
+import { fetchListingMediaData, updateListingMedia } from "@/features/admin/api/admin-lectures.api";
 import styles from "./listing-modal.module.css";
 
 interface AudioData {
@@ -48,10 +49,10 @@ export function ListingUploadArrangeModal({
     }
 
     if (listingId) {
-      fetchListingFormData(listingId)
+      fetchListingMediaData(listingId)
         .then((data) => {
-          setListingTitle(data.listing.title);
-          setCurrentAudioKey(data.listing.audioKey || "");
+          setListingTitle(data.title);
+          setCurrentAudioKey(data.audioKey || data.audioUrl || "");
         })
         .catch(() => {});
     }
@@ -66,12 +67,14 @@ export function ListingUploadArrangeModal({
 
     try {
       if (audioData) {
-        await updateLecture(listingId, {
+        const payload: UpdateListingMediaDto = {
           audioKey: audioData.audioKey,
           durationSeconds: audioData.durationSeconds,
           sizeBytes: audioData.sizeBytes,
-        });
+        };
+        await updateListingMedia(listingId, payload);
       }
+
       await onSuccess();
       onClose();
     } catch (err) {

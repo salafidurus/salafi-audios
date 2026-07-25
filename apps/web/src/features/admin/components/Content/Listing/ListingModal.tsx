@@ -2,7 +2,11 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints, type Locale } from "@sd/core-contracts";
-import type { ScholarListItemDto, AdminListingDetailDto } from "@sd/core-contracts";
+import type {
+  ScholarListItemDto,
+  AdminListingDetailDto,
+  UpdateListingDetailsDto,
+} from "@sd/core-contracts";
 import { useTopicsList } from "@sd/domain-search";
 import { useAdminListingSeriesByScholar } from "@sd/domain-content";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -10,9 +14,10 @@ import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { Modal } from "@/shared/components/Modal";
 import {
   createLecture,
-  updateLecture,
+  updateListingDetails,
   fetchListingFormData,
 } from "@/features/admin/api/admin-lectures.api";
+
 import { sanitizeError } from "@sd/utils-error";
 import { getSecondaryLocales, buildTranslationsPayload } from "@/features/admin/utils/locale-tabs";
 import { ListingModalTabContent } from "./ListingModalTabContent";
@@ -167,7 +172,7 @@ export function ListingModal({
 
     try {
       if (listingId) {
-        const payload: any = {
+        const payload: UpdateListingDetailsDto = {
           title,
           description: state.description,
           status: state.status,
@@ -183,7 +188,7 @@ export function ListingModal({
           (v) => !!(v?.title || v?.description),
         );
 
-        await updateLecture(listingId, payload);
+        await updateListingDetails(listingId, payload);
       } else {
         if (!initialAudioData) {
           dispatch({

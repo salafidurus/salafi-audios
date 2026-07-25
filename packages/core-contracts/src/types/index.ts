@@ -78,7 +78,14 @@ export {
   ListingContentsDtoSchema,
   type LastPlayedLessonDto,
   LastPlayedLessonDtoSchema,
+  type UpdateListingDetailsDto,
+  UpdateListingDetailsDtoSchema,
+  type AdminListingMediaDetailDto,
+  AdminListingMediaDetailDtoSchema,
+  type UpdateListingMediaDto,
+  UpdateListingMediaDtoSchema,
 } from "../types/listing.types";
+
 export {
   COUNTRY_CODES,
   type CountryCode,

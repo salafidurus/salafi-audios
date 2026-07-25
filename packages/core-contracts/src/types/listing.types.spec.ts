@@ -4,6 +4,9 @@ import {
   CreateListingDtoSchema,
   AdminListingUpdateDtoSchema,
   ListingFormDataDtoSchema,
+  UpdateListingDetailsDtoSchema,
+  AdminListingMediaDetailDtoSchema,
+  UpdateListingMediaDtoSchema,
 } from "./listing.types";
 
 describe("AdminListingDetailDtoSchema (Bug 4 fix: language type)", () => {
@@ -217,5 +220,41 @@ describe("ListingFormDataDtoSchema (getFormData response shape)", () => {
     expect(result.listing.description).toBe("Lecture description");
     expect(result.listing.orderIndex).toBe(5);
     expect(result.listing.topics).toHaveLength(2);
+  });
+
+  describe("UpdateListingDetailsDtoSchema & Media DTOs", () => {
+    it("parses valid UpdateListingDetailsDto payload", () => {
+      const parsed = UpdateListingDetailsDtoSchema.parse({
+        title: "Updated Title",
+        description: "Updated Desc",
+        status: "draft",
+        orderIndex: 2,
+        translations: [{ locale: "en", title: "English Title", description: "English Desc" }],
+      });
+      expect(parsed.title).toBe("Updated Title");
+      expect(parsed.translations).toHaveLength(1);
+    });
+
+    it("parses valid AdminListingMediaDetailDto payload", () => {
+      const parsed = AdminListingMediaDetailDtoSchema.parse({
+        id: "listing-1",
+        title: "Audio Title",
+        audioKey: "audio/key.mp3",
+        durationSeconds: 120,
+        format: "single",
+      });
+      expect(parsed.audioKey).toBe("audio/key.mp3");
+      expect(parsed.durationSeconds).toBe(120);
+    });
+
+    it("parses valid UpdateListingMediaDto payload", () => {
+      const parsed = UpdateListingMediaDtoSchema.parse({
+        audioKey: "audio/new-key.mp3",
+        durationSeconds: 180,
+        sizeBytes: 1048576,
+      });
+      expect(parsed.audioKey).toBe("audio/new-key.mp3");
+      expect(parsed.sizeBytes).toBe(1048576);
+    });
   });
 });

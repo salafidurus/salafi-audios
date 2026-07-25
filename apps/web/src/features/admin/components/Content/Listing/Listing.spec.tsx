@@ -25,10 +25,7 @@ describe("Listing", () => {
     scholarName: "Scholar Name",
     status: "published",
     format: "single",
-    audioKey: "audio/test.mp3",
     createdAt: "2024-01-01",
-    topics: ["topic-1"],
-    language: "ar",
   };
 
   const mockOnEdit = vi.fn();

@@ -4,6 +4,9 @@ import type {
   PresignedUrlResponseDto,
   CreateListingDto,
   AdminListingUpdateDto,
+  UpdateListingDetailsDto,
+  AdminListingMediaDetailDto,
+  UpdateListingMediaDto,
   AdminListingListDto,
   AdminListingDetailDto,
   ListingFormDataDto,
@@ -47,6 +50,29 @@ export function updateLecture(id: string, data: AdminListingUpdateDto) {
     url: endpoints.admin.listings.update(id),
     method: "PUT",
     body: data,
+  });
+}
+
+export function updateListingDetails(id: string, data: UpdateListingDetailsDto) {
+  return httpClient<AdminListingDetailDto>({
+    url: endpoints.admin.listings.updateDetails(id),
+    method: "PUT",
+    body: data,
+  });
+}
+
+export function updateListingMedia(id: string, data: UpdateListingMediaDto) {
+  return httpClient<AdminListingDetailDto>({
+    url: endpoints.admin.listings.updateMedia(id),
+    method: "PUT",
+    body: data,
+  });
+}
+
+export function fetchListingMediaData(id: string) {
+  return httpClient<AdminListingMediaDetailDto>({
+    url: endpoints.admin.listings.mediaData(id),
+    method: "GET",
   });
 }
 
