@@ -245,6 +245,7 @@ model Scholar {
   country      String        @default("SA")
   mainLanguage Locale        @default(ar)
   imageUrl     String?
+  imageKey     String?
   isActive     Boolean       @default(true)
   title        ScholarTitle?
   orderIndex   Int           @default(999)
@@ -287,6 +288,7 @@ model Listing {
   description              String?
   format                   ListingFormat
   coverImageUrl            String?
+  coverImageKey            String?
   language                 Locale?
   status                   Status        @default(draft)
   publishedAt              DateTime?
@@ -364,6 +366,7 @@ model AudioAsset {
   id              String   @id @default(cuid())
   listingId       String   @db.Uuid
   url             String
+  objectKey       String?
   format          String?
   bitrateKbps     Int?
   sizeBytes       BigInt?

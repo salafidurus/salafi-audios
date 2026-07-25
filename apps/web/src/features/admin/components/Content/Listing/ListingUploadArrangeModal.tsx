@@ -1,22 +1,22 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal } from "@/shared/components/Modal";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
-import { AudioUploader } from "./AudioUploader/AudioUploader";
-import { ListingUploadArrangeReviewSection } from "./ListingUploadArrangeReviewSection";
-import type { UpdateListingMediaDto } from "@sd/core-contracts";
-import { fetchListingMediaData, updateListingMedia } from "@/features/admin/api/admin-lectures.api";
+import { fetchArrangeData } from "@/features/admin/api/admin-lectures.api";
+import {
+  ROOT_MODULE_KEY,
+  localSlugConflicts,
+  useUploadArrangeState,
+} from "@/features/admin/hooks/Content/useUploadArrangeState";
+import { useUploadArrangeCommit } from "@/features/admin/hooks/Content/useUploadArrangeCommit";
+import {
+  UploadArrangeArrangeTab,
+  UploadArrangeReviewTab,
+  UploadArrangeUploadTab,
+} from "./UploadArrange";
 import styles from "./listing-modal.module.css";
-
-interface AudioData {
-  audioKey: string;
-  durationSeconds: number;
-  sizeBytes: number;
-  format: string;
-  filename: string;
-}
 
 interface ListingUploadArrangeModalProps {
   isOpen: boolean;
@@ -33,67 +33,95 @@ export function ListingUploadArrangeModal({
 }: ListingUploadArrangeModalProps) {
   const { t } = useTranslation();
   const isDesktop = useIsDesktop();
+  // The modal is keyed by listingId (see ListingsContent.tsx), so this component is
+  // freshly mounted on every open — these initial values already are the "reset" state.
   const [activeTab, setActiveTab] = useState<"upload" | "arrange" | "review">("upload");
-  const [audioData, setAudioData] = useState<AudioData | null>(null);
-  const [listingTitle, setListingTitle] = useState<string>("");
-  const [currentAudioKey, setCurrentAudioKey] = useState<string>("");
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { state, dispatch } = useUploadArrangeState();
 
   useEffect(() => {
-    if (!isOpen) {
-      setAudioData(null);
-      setError(null);
+    if (!isOpen || !listingId) return;
+    fetchArrangeData(listingId)
+      .then((data) => dispatch({ type: "INIT_EXISTING", data }))
+      .catch((err) =>
+        dispatch({
+          type: "SET_ERROR",
+          error:
+            (err as Error)?.message ||
+            t("admin.contents.listing.failedToLoadArrange", "Failed to load listing data."),
+        }),
+      );
+  }, [isOpen, listingId, dispatch, t]);
+
+  const runCommit = useUploadArrangeCommit(state, dispatch, async () => {
+    await onSuccess();
+    onClose();
+  });
+
+  const conflicts = localSlugConflicts(state);
+  const unassignedCount =
+    state.existing?.format === "collection"
+      ? state.items.filter(
+          (item) =>
+            item.assignment.kind === "new-lesson" && item.assignment.moduleKey === ROOT_MODULE_KEY,
+        ).length
+      : 0;
+
+  const busy =
+    state.phase === "presigning" || state.phase === "uploading" || state.phase === "committing";
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (busy || !state.existing) return;
+    if (state.items.length === 0) {
+      dispatch({
+        type: "SET_ERROR",
+        error: t("admin.contents.listing.noFilesStaged", "Add at least one audio file first."),
+      });
       setActiveTab("upload");
       return;
     }
-
-    if (listingId) {
-      fetchListingMediaData(listingId)
-        .then((data) => {
-          setListingTitle(data.title);
-          setCurrentAudioKey(data.audioKey || data.audioUrl || "");
-        })
-        .catch(() => {});
+    if (conflicts.length > 0) {
+      dispatch({
+        type: "SET_ERROR",
+        error: t(
+          "admin.contents.listing.resolveConflicts",
+          "Resolve the slug conflicts in the Arrange tab first.",
+        ),
+      });
+      setActiveTab("arrange");
+      return;
     }
-  }, [isOpen, listingId]);
-
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!listingId) return;
-
-    setSaving(true);
-    setError(null);
-
-    try {
-      if (audioData) {
-        const payload: UpdateListingMediaDto = {
-          audioKey: audioData.audioKey,
-          durationSeconds: audioData.durationSeconds,
-          sizeBytes: audioData.sizeBytes,
-        };
-        await updateListingMedia(listingId, payload);
-      }
-
-      await onSuccess();
-      onClose();
-    } catch (err) {
-      setError(
-        (err as Error)?.message ||
-          t("admin.contents.listing.failedToSaveAudio", "Failed to update audio details."),
-      );
-    } finally {
-      setSaving(false);
+    if (unassignedCount > 0) {
+      dispatch({
+        type: "SET_ERROR",
+        error: t(
+          "admin.contents.listing.resolveUnassigned",
+          "Assign every file to a module in the Arrange tab first.",
+        ),
+      });
+      setActiveTab("arrange");
+      return;
     }
+    void runCommit();
   };
+
+  const savingLabel =
+    state.phase === "committing"
+      ? t("admin.contents.listing.saving", "Saving…")
+      : t("admin.contents.listing.uploading", "Uploading…");
+
+  const errorTabs =
+    conflicts.length > 0 || state.conflictSlugs.length > 0 || unassignedCount > 0
+      ? ["arrange"]
+      : [];
 
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       title={
-        listingId
-          ? `${t("admin.contents.listing.uploadArrangeTitle", "Upload & Arrange")}${isDesktop && listingTitle ? ` (${listingTitle})` : ""}`
+        state.existing && isDesktop
+          ? `${t("admin.contents.listing.uploadArrangeTitle", "Upload & Arrange")} (${state.existing.title})`
           : t("admin.contents.listing.uploadArrangeTitle", "Upload & Arrange")
       }
       size="xl"
@@ -105,10 +133,13 @@ export function ListingUploadArrangeModal({
       onActiveTabChange={(id) => setActiveTab(id as typeof activeTab)}
       defaultActiveTab="upload"
       saveFormId="listing-upload-arrange-form"
-      saving={saving}
+      saving={busy}
+      saveLabel={t("admin.contents.listing.uploadAction", "Upload")}
+      savingLabel={savingLabel}
       reviewTabId="review"
+      errorTabs={errorTabs}
     >
-      <form id="listing-upload-arrange-form" onSubmit={handleSave} className={styles.form}>
+      <form id="listing-upload-arrange-form" onSubmit={handleSubmit} className={styles.form}>
         <Modal.Tabs>
           <Modal.TabItem id="upload">
             {t("admin.contents.listing.uploadTab", "Upload Audio")}
@@ -121,23 +152,18 @@ export function ListingUploadArrangeModal({
 
         <Modal.Content>
           <Modal.ContentItem id="upload">
-            {error && <div className={styles.errorBanner}>{error}</div>}
-            <AudioUploader onUploadComplete={(data) => setAudioData(data)} />
+            {state.error && <div className={styles.errorBanner}>{state.error}</div>}
+            <UploadArrangeUploadTab state={state} dispatch={dispatch} />
           </Modal.ContentItem>
 
           <Modal.ContentItem id="arrange">
-            <div style={{ padding: "2rem", textAlign: "center", color: "var(--content-tertiary)" }}>
-              {t("admin.contents.listing.arrangeComingSoon", "Coming soon")}
-            </div>
+            {state.error && <div className={styles.errorBanner}>{state.error}</div>}
+            <UploadArrangeArrangeTab state={state} dispatch={dispatch} />
           </Modal.ContentItem>
 
           <Modal.ContentItem id="review">
-            {error && <div className={styles.errorBanner}>{error}</div>}
-            <ListingUploadArrangeReviewSection
-              listingTitle={listingTitle}
-              audioData={audioData}
-              currentAudioKey={currentAudioKey}
-            />
+            {state.error && <div className={styles.errorBanner}>{state.error}</div>}
+            <UploadArrangeReviewTab state={state} dispatch={dispatch} />
           </Modal.ContentItem>
         </Modal.Content>
       </form>

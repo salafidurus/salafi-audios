@@ -2,6 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { getPresignedUrl, uploadToR2 } from "@/features/admin/api/admin-lectures.api";
+import { extractAudioDuration } from "@/features/admin/utils/audio-metadata";
 import { Button } from "@/shared/components/Button";
 import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./audio-uploader.module.css";
@@ -17,56 +18,6 @@ interface AudioUploaderProps {
     format: string;
     filename: string;
   }) => void;
-}
-
-async function extractMetadata(file: File): Promise<number> {
-  let duration = 0;
-  let error: Error | null = null;
-
-  const objectUrl = URL.createObjectURL(file);
-  try {
-    await new Promise<void>((resolve, reject) => {
-      const audio = new Audio();
-      audio.src = objectUrl;
-      let isSettled = false;
-
-      const cleanup = () => {
-        audio.removeEventListener("loadedmetadata", onLoadedMetadata);
-        audio.removeEventListener("error", onError);
-      };
-
-      const onLoadedMetadata = () => {
-        if (isSettled) return;
-        isSettled = true;
-        clearTimeout(timeoutId);
-        cleanup();
-        duration = audio.duration;
-        resolve();
-      };
-
-      const onError = () => {
-        if (isSettled) return;
-        isSettled = true;
-        clearTimeout(timeoutId);
-        cleanup();
-        reject(new Error("Failed to load audio metadata"));
-      };
-
-      const timeoutId = setTimeout(() => {
-        if (isSettled) return;
-        isSettled = true;
-        cleanup();
-        reject(new Error("Audio metadata loading timeout"));
-      }, 5000);
-
-      audio.addEventListener("loadedmetadata", onLoadedMetadata);
-      audio.addEventListener("error", onError);
-    });
-  } finally {
-    URL.revokeObjectURL(objectUrl);
-  }
-
-  return duration;
 }
 
 export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
@@ -90,7 +41,7 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
 
     try {
       // Step 1: Extract duration using HTML5 Audio (prevents loading whole file to RAM)
-      const durationSeconds = await extractMetadata(file);
+      const durationSeconds = await extractAudioDuration(file);
 
       setUploadState("uploading");
       // Step 2: Fetch presigned URL

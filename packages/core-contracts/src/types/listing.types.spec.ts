@@ -6,6 +6,8 @@ import {
   UpdateListingDetailsDtoSchema,
   AdminListingMediaDetailDtoSchema,
   UpdateListingMediaDtoSchema,
+  ArrangeCommitDtoSchema,
+  ArrangeLessonOpSchema,
 } from "./listing.types";
 
 describe("AdminListingDetailDtoSchema (Bug 4 fix: language type)", () => {
@@ -255,5 +257,46 @@ describe("ListingFormDataDtoSchema (getFormData response shape)", () => {
       expect(parsed.audioKey).toBe("audio/new-key.mp3");
       expect(parsed.sizeBytes).toBe(1048576);
     });
+  });
+});
+
+describe("ArrangeCommitDtoSchema", () => {
+  const createLesson = {
+    op: "create",
+    slug: "ajurumiyyah-kalam",
+    title: "Al-Kalam",
+    audio: { objectKey: "audio/ajurumiyyah/ajurumiyyah-kalam.mp3", durationSeconds: 1200 },
+  };
+
+  it("parses a series commit with lesson create and update ops", () => {
+    const parsed = ArrangeCommitDtoSchema.parse({
+      lessons: [createLesson, { op: "update", id: "lesson-1", orderIndex: 2 }],
+    });
+    expect(parsed.lessons).toHaveLength(2);
+    expect(parsed.modules).toBeUndefined();
+  });
+
+  it("parses a collection commit with nested module ops", () => {
+    const parsed = ArrangeCommitDtoSchema.parse({
+      modules: [
+        { op: "create", slug: "bukhari-ilm", title: "Ilm", lessons: [createLesson] },
+        { op: "update", id: "module-1", lessons: [] },
+      ],
+    });
+    expect(parsed.modules).toHaveLength(2);
+  });
+
+  it("rejects a commit with both lessons and modules", () => {
+    expect(() => ArrangeCommitDtoSchema.parse({ lessons: [], modules: [] })).toThrow();
+  });
+
+  it("rejects a commit with neither lessons nor modules", () => {
+    expect(() => ArrangeCommitDtoSchema.parse({})).toThrow();
+  });
+
+  it("requires audio on lesson create but not on lesson update", () => {
+    expect(() => ArrangeLessonOpSchema.parse({ op: "create", slug: "s-a", title: "A" })).toThrow();
+    const updated = ArrangeLessonOpSchema.parse({ op: "update", id: "lesson-1" });
+    expect(updated.op).toBe("update");
   });
 });

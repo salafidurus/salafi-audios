@@ -18,8 +18,10 @@ interface InitialAudioData {
   filename: string;
 }
 
-async function uploadStagedCoverImage(state: FormState) {
-  if (!state.stagedImageFile) return state.coverImageUrl || undefined;
+async function uploadStagedCoverImage(
+  state: FormState,
+): Promise<{ url: string | undefined; key: string | undefined }> {
+  if (!state.stagedImageFile) return { url: state.coverImageUrl || undefined, key: undefined };
 
   const ext = state.stagedImageFile.name.split(".").pop()?.toLowerCase() || "png";
   const filename = `${state.slug}.${ext}`;
@@ -31,7 +33,7 @@ async function uploadStagedCoverImage(state: FormState) {
     slug: state.slug,
   });
   await uploadToR2(presignedResponse.uploadUrl, state.stagedImageFile, state.stagedImageFile.type);
-  return presignedResponse.publicUrl;
+  return { url: presignedResponse.publicUrl, key: presignedResponse.objectKey };
 }
 
 export function useSaveListing(
@@ -88,6 +90,7 @@ export function useSaveListing(
       if (state.isEditing) {
         if (!state.id) throw new Error("Listing ID required for update");
 
+        const coverImage = await uploadStagedCoverImage(state);
         const payload: UpdateListingDetailsDto = {
           title: state.title,
           description: state.description,
@@ -96,7 +99,8 @@ export function useSaveListing(
           orderIndex: state.orderIndex,
           parentId: undefined,
           topics: state.selectedTopics,
-          coverImageUrl: await uploadStagedCoverImage(state),
+          coverImageUrl: coverImage.url,
+          coverImageKey: coverImage.key,
           translations,
         };
 
@@ -111,6 +115,7 @@ export function useSaveListing(
           );
         }
 
+        const coverImage = await uploadStagedCoverImage(state);
         await createLecture({
           title: state.title,
           slug: state.slug,
@@ -121,7 +126,8 @@ export function useSaveListing(
           audioKey: initialAudioData.audioKey,
           durationSeconds: initialAudioData.durationSeconds,
           sizeBytes: initialAudioData.sizeBytes,
-          coverImageUrl: await uploadStagedCoverImage(state),
+          coverImageUrl: coverImage.url,
+          coverImageKey: coverImage.key,
           translations,
         });
       }

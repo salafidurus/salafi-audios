@@ -6,8 +6,10 @@ import { getPresignedUrl, uploadToR2 } from "@/features/admin/api/admin-lectures
 import { createScholar, updateScholar } from "@/features/admin/api/admin.api";
 import type { FormAction, FormState } from "./useScholarForm";
 
-async function uploadStagedImage(state: FormState) {
-  if (!state.stagedImageFile) return state.imageUrl || undefined;
+async function uploadStagedImage(
+  state: FormState,
+): Promise<{ url: string | undefined; key: string | undefined }> {
+  if (!state.stagedImageFile) return { url: state.imageUrl || undefined, key: undefined };
 
   const ext = state.stagedImageFile.name.split(".").pop()?.toLowerCase() || "png";
   const filename = `${state.slug}.${ext}`;
@@ -18,7 +20,7 @@ async function uploadStagedImage(state: FormState) {
     slug: state.slug,
   });
   await uploadToR2(presignedResponse.uploadUrl, state.stagedImageFile, state.stagedImageFile.type);
-  return presignedResponse.publicUrl;
+  return { url: presignedResponse.publicUrl, key: presignedResponse.objectKey };
 }
 
 export function useSaveScholar(
@@ -69,6 +71,7 @@ export function useSaveScholar(
       if (state.isEditing) {
         if (!state.id) throw new Error("Scholar ID required for update");
 
+        const image = await uploadStagedImage(state);
         const payload: UpdateScholarDto = {
           name: state.name,
           bio: state.bio,
@@ -81,12 +84,14 @@ export function useSaveScholar(
           socialTelegram: state.socialTelegram,
           socialYoutube: state.socialYoutube,
           socialWebsite: state.socialWebsite,
-          imageUrl: await uploadStagedImage(state),
+          imageUrl: image.url,
+          imageKey: image.key,
           translations,
         };
 
         await updateScholar(state.id, payload);
       } else {
+        const image = await uploadStagedImage(state);
         const payload: CreateScholarDto = {
           name: state.name,
           slug: state.slug,
@@ -100,7 +105,8 @@ export function useSaveScholar(
           socialTelegram: state.socialTelegram,
           socialYoutube: state.socialYoutube,
           socialWebsite: state.socialWebsite,
-          imageUrl: await uploadStagedImage(state),
+          imageUrl: image.url,
+          imageKey: image.key,
           translations,
         };
 

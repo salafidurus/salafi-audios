@@ -19,6 +19,9 @@ import type {
   ListingContentsDto,
   LastPlayedLessonDto,
   FeedPageDto,
+  AdminArrangeDataDto,
+  ArrangeCommitDto,
+  ArrangeCommitResultDto,
 } from '@sd/core-contracts';
 import { SUPPORTED_LOCALES } from '@sd/core-contracts';
 import { ListingRepository } from './listing.repo';
@@ -114,6 +117,22 @@ export class ListingService {
     const data = await this.repo.getMediaData(id);
     if (!data) throw new NotFoundException(`Listing "${id}" not found`);
     return data;
+  }
+
+  async getArrangeData(id: string): Promise<AdminArrangeDataDto> {
+    const data = await this.repo.getArrangeData(id);
+    if (!data) throw new NotFoundException(`Listing "${id}" not found`);
+    return data;
+  }
+
+  async arrangeCommit(
+    id: string,
+    dto: ArrangeCommitDto,
+    userId?: string,
+  ): Promise<ArrangeCommitResultDto> {
+    const { result, affectedIds } = await this.repo.arrangeCommit(id, dto, userId);
+    await Promise.all(affectedIds.map((affectedId) => this.invalidateCache(affectedId)));
+    return result;
   }
 
   async publishListing(id: string): Promise<{ success: boolean }> {

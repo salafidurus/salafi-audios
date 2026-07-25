@@ -1,0 +1,515 @@
+"use client";
+
+import { useReducer } from "react";
+import type {
+  AdminArrangeDataDto,
+  AdminArrangeLessonDto,
+  ArrangeCommitDto,
+  ArrangeLessonOp,
+  ArrangeModuleOp,
+  BatchPresignAudioRequestDto,
+  StatusValue,
+} from "@sd/core-contracts";
+import {
+  deriveChildSlug,
+  findSlugMatch,
+  parseUploadFilename,
+} from "@/features/admin/utils/upload-filename";
+
+/** Existing module id, `new:${tempId}` for a staged module, or "root" (series/single). */
+export type ModuleKey = string;
+
+export const ROOT_MODULE_KEY = "root";
+
+export type UploadItemAssignment =
+  | {
+      kind: "new-lesson";
+      moduleKey: ModuleKey;
+      slug: string;
+      slugEdited: boolean;
+      description: string;
+      status: StatusValue;
+      orderIndex: number | null;
+    }
+  | { kind: "replace-audio"; lessonId: string }
+  | { kind: "replace-root-audio" };
+
+export interface UploadItemProgress {
+  status: "pending" | "uploading" | "done" | "error";
+  percent: number;
+  objectKey?: string;
+  uploadUrl?: string;
+  error?: string;
+}
+
+export interface UploadItem {
+  id: string;
+  file: File;
+  title: string;
+  numericPrefix: number | null;
+  durationSeconds: number | null;
+  sizeBytes: number;
+  contentType: string;
+  ext: string;
+  assignment: UploadItemAssignment;
+  suggestion: { lessonId: string; lessonTitle: string; dismissed: boolean } | null;
+  upload: UploadItemProgress;
+}
+
+export interface NewModule {
+  tempId: string;
+  slug: string;
+  title: string;
+  description: string;
+  status: StatusValue;
+  orderIndex: number | null;
+}
+
+export type UploadArrangePhase = "editing" | "presigning" | "uploading" | "committing" | "done";
+
+export interface UploadArrangeState {
+  existing: AdminArrangeDataDto | null;
+  items: UploadItem[];
+  newModules: NewModule[];
+  phase: UploadArrangePhase;
+  error: string | null;
+  conflictSlugs: string[];
+}
+
+export type UploadArrangeAction =
+  | { type: "INIT_EXISTING"; data: AdminArrangeDataDto }
+  | { type: "ADD_FILES"; files: { file: File; durationSeconds: number | null }[] }
+  | { type: "RENAME_ITEM"; itemId: string; title: string }
+  | { type: "REMOVE_ITEM"; itemId: string }
+  | { type: "SET_ASSIGNMENT"; itemId: string; assignment: UploadItemAssignment }
+  | {
+      type: "SET_LESSON_FIELD";
+      itemId: string;
+      field: "slug" | "description" | "status" | "orderIndex";
+      value: string | number | null;
+    }
+  | { type: "ACCEPT_SUGGESTION"; itemId: string }
+  | { type: "DISMISS_SUGGESTION"; itemId: string }
+  | { type: "ADD_MODULE"; title: string }
+  | {
+      type: "EDIT_MODULE";
+      tempId: string;
+      field: "title" | "slug" | "description" | "status" | "orderIndex";
+      value: string | number | null;
+    }
+  | { type: "REMOVE_MODULE"; tempId: string }
+  | { type: "REORDER"; moduleKey: ModuleKey; orderedItemIds: string[] }
+  | { type: "SET_PHASE"; phase: UploadArrangePhase }
+  | { type: "PRESIGNED"; urls: { clientId: string; uploadUrl: string; objectKey: string }[] }
+  | { type: "UPLOAD_PROGRESS"; itemId: string; percent: number }
+  | { type: "UPLOAD_DONE"; itemId: string }
+  | { type: "UPLOAD_ERROR"; itemId: string; error: string }
+  | { type: "COMMIT_CONFLICT"; conflictSlugs: string[] }
+  | { type: "SET_ERROR"; error: string | null };
+
+const INITIAL_STATE: UploadArrangeState = {
+  existing: null,
+  items: [],
+  newModules: [],
+  phase: "editing",
+  error: null,
+  conflictSlugs: [],
+};
+
+function allExistingLessons(existing: AdminArrangeDataDto | null): AdminArrangeLessonDto[] {
+  if (!existing) return [];
+  return [...existing.lessons, ...existing.modules.flatMap((m) => m.lessons)];
+}
+
+function nextOrderIndex(state: UploadArrangeState, moduleKey: ModuleKey): number {
+  const staged = state.items.filter(
+    (item) => item.assignment.kind === "new-lesson" && item.assignment.moduleKey === moduleKey,
+  );
+  const stagedMax = staged.reduce((max, item) => {
+    const idx = item.assignment.kind === "new-lesson" ? (item.assignment.orderIndex ?? 0) : 0;
+    return Math.max(max, idx);
+  }, 0);
+  const existingLessons =
+    moduleKey === ROOT_MODULE_KEY
+      ? (state.existing?.lessons ?? [])
+      : (state.existing?.modules.find((m) => m.id === moduleKey)?.lessons ?? []);
+  const existingMax = existingLessons.reduce((max, l) => Math.max(max, l.orderIndex ?? 0), 0);
+  return Math.max(stagedMax, existingMax) + 1;
+}
+
+function updateItem(
+  state: UploadArrangeState,
+  itemId: string,
+  update: (item: UploadItem) => UploadItem,
+): UploadArrangeState {
+  return {
+    ...state,
+    items: state.items.map((item) => (item.id === itemId ? update(item) : item)),
+  };
+}
+
+function reducer(state: UploadArrangeState, action: UploadArrangeAction): UploadArrangeState {
+  switch (action.type) {
+    case "INIT_EXISTING":
+      // The modal is keyed by listingId (see ListingsContent.tsx), so this reducer is
+      // always freshly mounted at INITIAL_STATE before this action fires — no need to
+      // spread INITIAL_STATE here too.
+      return { ...state, existing: action.data };
+
+    case "ADD_FILES": {
+      if (!state.existing) return state;
+      const { existing } = state;
+      const isSingle = existing.format === "single";
+
+      // Single-format roots hold exactly one staged file.
+      if (isSingle && (state.items.length > 0 || action.files.length > 1)) {
+        return {
+          ...state,
+          error: "This listing holds a single audio file.",
+        };
+      }
+
+      const lessons = allExistingLessons(existing);
+      const sorted = action.files.toSorted((a, b) => {
+        const pa = parseUploadFilename(a.file.name).numericPrefix;
+        const pb = parseUploadFilename(b.file.name).numericPrefix;
+        if (pa === null && pb === null) return 0;
+        if (pa === null) return 1;
+        if (pb === null) return -1;
+        return pa - pb;
+      });
+
+      let orderCursor = nextOrderIndex(state, ROOT_MODULE_KEY);
+      const newItems = sorted.map(({ file, durationSeconds }) => {
+        const parsed = parseUploadFilename(file.name);
+        const slug = deriveChildSlug(existing.slug, parsed.title);
+        const match = findSlugMatch(slug, lessons);
+
+        const assignment: UploadItemAssignment = isSingle
+          ? { kind: "replace-root-audio" }
+          : {
+              kind: "new-lesson",
+              moduleKey: ROOT_MODULE_KEY,
+              slug,
+              slugEdited: false,
+              description: "",
+              status: "draft",
+              orderIndex: parsed.numericPrefix ?? orderCursor++,
+            };
+
+        return {
+          id: crypto.randomUUID(),
+          file,
+          title: parsed.title,
+          numericPrefix: parsed.numericPrefix,
+          durationSeconds,
+          sizeBytes: file.size,
+          contentType: file.type,
+          ext: parsed.ext,
+          assignment,
+          suggestion: match
+            ? { lessonId: match.id, lessonTitle: match.title, dismissed: false }
+            : null,
+          upload: { status: "pending", percent: 0 } satisfies UploadItemProgress,
+        };
+      });
+
+      return { ...state, items: [...state.items, ...newItems], error: null };
+    }
+
+    case "RENAME_ITEM":
+      return updateItem(state, action.itemId, (item) => {
+        const next = { ...item, title: action.title };
+        if (item.assignment.kind === "new-lesson" && !item.assignment.slugEdited) {
+          const slug = deriveChildSlug(state.existing?.slug ?? "", action.title);
+          const match = findSlugMatch(slug, allExistingLessons(state.existing));
+          next.assignment = { ...item.assignment, slug };
+          next.suggestion = match
+            ? { lessonId: match.id, lessonTitle: match.title, dismissed: false }
+            : null;
+        }
+        return next;
+      });
+
+    case "REMOVE_ITEM":
+      return { ...state, items: state.items.filter((item) => item.id !== action.itemId) };
+
+    case "SET_ASSIGNMENT":
+      return updateItem(state, action.itemId, (item) => ({
+        ...item,
+        assignment: action.assignment,
+      }));
+
+    case "SET_LESSON_FIELD":
+      return updateItem(state, action.itemId, (item) => {
+        if (item.assignment.kind !== "new-lesson") return item;
+        const assignment = { ...item.assignment };
+        if (action.field === "slug") {
+          assignment.slug = String(action.value ?? "");
+          assignment.slugEdited = true;
+        } else if (action.field === "description") {
+          assignment.description = String(action.value ?? "");
+        } else if (action.field === "status") {
+          assignment.status = action.value as StatusValue;
+        } else {
+          assignment.orderIndex = action.value === null ? null : Number(action.value);
+        }
+        return { ...item, assignment };
+      });
+
+    case "ACCEPT_SUGGESTION":
+      return updateItem(state, action.itemId, (item) =>
+        item.suggestion
+          ? {
+              ...item,
+              assignment: { kind: "replace-audio", lessonId: item.suggestion.lessonId },
+              suggestion: { ...item.suggestion, dismissed: true },
+            }
+          : item,
+      );
+
+    case "DISMISS_SUGGESTION":
+      return updateItem(state, action.itemId, (item) =>
+        item.suggestion ? { ...item, suggestion: { ...item.suggestion, dismissed: true } } : item,
+      );
+
+    case "ADD_MODULE": {
+      if (!state.existing) return state;
+      const slug = deriveChildSlug(state.existing.slug, action.title);
+      const orderIndex =
+        state.existing.modules.reduce((max, m) => Math.max(max, m.orderIndex ?? 0), 0) +
+        state.newModules.length +
+        1;
+      return {
+        ...state,
+        newModules: [
+          ...state.newModules,
+          {
+            tempId: crypto.randomUUID(),
+            slug,
+            title: action.title,
+            description: "",
+            status: "draft",
+            orderIndex,
+          },
+        ],
+      };
+    }
+
+    case "EDIT_MODULE":
+      return {
+        ...state,
+        newModules: state.newModules.map((mod) =>
+          mod.tempId === action.tempId
+            ? {
+                ...mod,
+                [action.field]:
+                  action.field === "orderIndex"
+                    ? action.value === null
+                      ? null
+                      : Number(action.value)
+                    : action.value,
+              }
+            : mod,
+        ),
+      };
+
+    case "REMOVE_MODULE": {
+      const moduleKey = `new:${action.tempId}`;
+      return {
+        ...state,
+        newModules: state.newModules.filter((mod) => mod.tempId !== action.tempId),
+        // Reassign orphaned items back to root so they stay visible.
+        items: state.items.map((item) =>
+          item.assignment.kind === "new-lesson" && item.assignment.moduleKey === moduleKey
+            ? { ...item, assignment: { ...item.assignment, moduleKey: ROOT_MODULE_KEY } }
+            : item,
+        ),
+      };
+    }
+
+    case "REORDER": {
+      const order = new Map(action.orderedItemIds.map((id, index) => [id, index + 1]));
+      return {
+        ...state,
+        items: state.items.map((item) =>
+          item.assignment.kind === "new-lesson" &&
+          item.assignment.moduleKey === action.moduleKey &&
+          order.has(item.id)
+            ? {
+                ...item,
+                assignment: { ...item.assignment, orderIndex: order.get(item.id) ?? null },
+              }
+            : item,
+        ),
+      };
+    }
+
+    case "SET_PHASE":
+      return { ...state, phase: action.phase, error: null };
+
+    case "PRESIGNED": {
+      const byId = new Map(action.urls.map((u) => [u.clientId, u]));
+      return {
+        ...state,
+        items: state.items.map((item) => {
+          const presigned = byId.get(item.id);
+          return presigned
+            ? {
+                ...item,
+                upload: {
+                  ...item.upload,
+                  uploadUrl: presigned.uploadUrl,
+                  objectKey: presigned.objectKey,
+                },
+              }
+            : item;
+        }),
+      };
+    }
+
+    case "UPLOAD_PROGRESS":
+      return updateItem(state, action.itemId, (item) => ({
+        ...item,
+        upload: { ...item.upload, status: "uploading", percent: action.percent },
+      }));
+
+    case "UPLOAD_DONE":
+      return updateItem(state, action.itemId, (item) => ({
+        ...item,
+        upload: { ...item.upload, status: "done", percent: 100 },
+      }));
+
+    case "UPLOAD_ERROR":
+      return updateItem(state, action.itemId, (item) => ({
+        ...item,
+        upload: { ...item.upload, status: "error", error: action.error },
+      }));
+
+    case "COMMIT_CONFLICT":
+      return { ...state, phase: "editing", conflictSlugs: action.conflictSlugs };
+
+    case "SET_ERROR":
+      return { ...state, error: action.error, phase: "editing" };
+
+    default:
+      return state;
+  }
+}
+
+function itemAudioRef(item: UploadItem) {
+  return {
+    objectKey: item.upload.objectKey ?? "",
+    durationSeconds: Math.round(item.durationSeconds ?? 0),
+    sizeBytes: item.sizeBytes,
+    format: item.ext || undefined,
+  };
+}
+
+export function buildPresignRequest(state: UploadArrangeState): BatchPresignAudioRequestDto {
+  const rootSlug = state.existing?.slug ?? "";
+  return {
+    rootSlug,
+    files: state.items.map((item) => ({
+      clientId: item.id,
+      filename: item.file.name,
+      contentType: item.contentType,
+      slug: itemTargetSlug(state, item),
+    })),
+  };
+}
+
+/** The storage slug for an item: its new-lesson slug, the replaced lesson's slug, or the root slug. */
+export function itemTargetSlug(state: UploadArrangeState, item: UploadItem): string {
+  if (item.assignment.kind === "new-lesson") return item.assignment.slug;
+  if (item.assignment.kind === "replace-audio") {
+    const lesson = allExistingLessons(state.existing).find(
+      (l) => item.assignment.kind === "replace-audio" && l.id === item.assignment.lessonId,
+    );
+    return lesson?.slug ?? "";
+  }
+  return state.existing?.slug ?? "";
+}
+
+export function buildCommitDto(state: UploadArrangeState): ArrangeCommitDto {
+  const { existing } = state;
+  if (!existing) return { lessons: [] };
+
+  const lessonOpsFor = (moduleKey: ModuleKey): ArrangeLessonOp[] => {
+    const ops: ArrangeLessonOp[] = [];
+    for (const item of state.items) {
+      const assignment = item.assignment;
+      if (assignment.kind === "new-lesson" && assignment.moduleKey === moduleKey) {
+        ops.push({
+          op: "create",
+          slug: assignment.slug,
+          title: item.title,
+          description: assignment.description || undefined,
+          status: assignment.status,
+          orderIndex: assignment.orderIndex ?? undefined,
+          audio: itemAudioRef(item),
+        });
+      } else if (assignment.kind === "replace-audio") {
+        const parentKey =
+          existing.modules.find((m) => m.lessons.some((l) => l.id === assignment.lessonId))?.id ??
+          ROOT_MODULE_KEY;
+        if (parentKey === moduleKey) {
+          ops.push({ op: "update", id: assignment.lessonId, audio: itemAudioRef(item) });
+        }
+      }
+    }
+    return ops;
+  };
+
+  if (existing.format === "series") {
+    return { lessons: lessonOpsFor(ROOT_MODULE_KEY) };
+  }
+
+  const modules: ArrangeModuleOp[] = [];
+  for (const mod of state.newModules) {
+    modules.push({
+      op: "create",
+      slug: mod.slug,
+      title: mod.title,
+      description: mod.description || undefined,
+      status: mod.status,
+      orderIndex: mod.orderIndex ?? undefined,
+      lessons: lessonOpsFor(`new:${mod.tempId}`),
+    });
+  }
+  for (const mod of existing.modules) {
+    const lessons = lessonOpsFor(mod.id);
+    if (lessons.length > 0) {
+      modules.push({ op: "update", id: mod.id, lessons });
+    }
+  }
+  return { modules };
+}
+
+/** Slugs staged more than once, or colliding with existing children. */
+export function localSlugConflicts(state: UploadArrangeState): string[] {
+  const existingSlugs = new Set([
+    ...allExistingLessons(state.existing).map((l) => l.slug),
+    ...(state.existing?.modules.map((m) => m.slug) ?? []),
+  ]);
+  const staged: string[] = [];
+  for (const item of state.items) {
+    if (item.assignment.kind === "new-lesson") staged.push(item.assignment.slug);
+  }
+  for (const mod of state.newModules) {
+    staged.push(mod.slug);
+  }
+  const seen = new Set<string>();
+  const conflicts = new Set<string>();
+  for (const slug of staged) {
+    if (!slug) continue;
+    if (seen.has(slug) || existingSlugs.has(slug)) conflicts.add(slug);
+    seen.add(slug);
+  }
+  return [...conflicts];
+}
+
+export function useUploadArrangeState() {
+  const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
+  return { state, dispatch };
+}

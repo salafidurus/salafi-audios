@@ -79,6 +79,9 @@ export class ConfigService {
   get R2_PUBLIC_BASE_URL(): string {
     return this.env.R2_PUBLIC_BASE_URL;
   }
+  get R2_PRESIGN_EXPIRES_SECONDS(): number {
+    return this.env.R2_PRESIGN_EXPIRES_SECONDS;
+  }
 
   get DISABLE_THROTTLER(): boolean {
     return this.env.DISABLE_THROTTLER;

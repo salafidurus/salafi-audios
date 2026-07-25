@@ -106,6 +106,7 @@ export function ListingsContent({
       />
 
       <Content.ListingUploadArrangeModal
+        key={selectedUploadListingId ?? "upload"}
         isOpen={isUploadModalOpen}
         onClose={() => {
           setIsUploadModalOpen(false);

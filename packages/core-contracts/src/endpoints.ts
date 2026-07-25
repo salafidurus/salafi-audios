@@ -78,9 +78,12 @@ export const endpoints = {
       archive: (id: string) => `/admin/listings/${id}/archive`,
       series: "/admin/listings/series",
       bulk: "/admin/listings/bulk",
+      arrangeData: (id: string) => `/admin/listings/${id}/arrange-data`,
+      arrangeCommit: (id: string) => `/admin/listings/${id}/arrange-commit`,
     },
     media: {
       presignedUrl: "/admin/media/presigned-url",
+      presignBatch: "/admin/media/presign-batch",
     },
   },
   translations: {
