@@ -16,12 +16,18 @@ import { SCHOLAR_TITLE_LABELS, SCHOLAR_TITLES_ARRAY } from "./constants";
 import styles from "./personal-data-section.module.css";
 
 interface GeneralDataSectionProps {
-  formData: CreateScholarDto;
-  dispatch: React.Dispatch<FormAction>;
+  formData: any; // CreateScholarDto or UpdateScholarDto
+  dispatch: React.Dispatch<any>;
   onImageStaged: (file: File | null, preview: string | null) => void;
+  isEditing?: boolean;
 }
 
-export function GeneralDataSection({ formData, dispatch, onImageStaged }: GeneralDataSectionProps) {
+export function GeneralDataSection({
+  formData,
+  dispatch,
+  onImageStaged,
+  isEditing = false,
+}: GeneralDataSectionProps) {
   const { t } = useTranslation();
 
   return (
@@ -42,6 +48,7 @@ export function GeneralDataSection({ formData, dispatch, onImageStaged }: Genera
               value={formData.slug}
               onChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "slug", value })}
               placeholder={t("admin.scholars.slugPlaceholder", "scholar-slug")}
+              disabled={isEditing}
             />
           </div>
 
