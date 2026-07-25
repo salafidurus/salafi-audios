@@ -8,22 +8,13 @@ import { useAdminListingSeriesByScholar } from "@sd/domain-content";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { Modal } from "@/shared/components/Modal";
-import { AudioUploader as AudioUploaderComponent } from "./AudioUploader/AudioUploader";
 import {
   createLecture,
   updateLecture,
   fetchListingFormData,
 } from "@/features/admin/api/admin-lectures.api";
 import { sanitizeError } from "@sd/utils-error";
-import {
-  getSecondaryLocales,
-  buildTranslationsPayload,
-  getLocaleLabel,
-} from "@/features/admin/utils/locale-tabs";
-import { SUPPORTED_LOCALES } from "@sd/core-contracts";
-import { ListingGeneralSection } from "./ListingGeneralSection";
-import { ListingTranslatableFields } from "./ListingTranslatableFields";
-import { ListingReviewSection } from "./ListingReviewSection";
+import { getSecondaryLocales, buildTranslationsPayload } from "@/features/admin/utils/locale-tabs";
 import { ListingModalTabContent } from "./ListingModalTabContent";
 import { useListingForm } from "@/features/admin/hooks/Content/useListingForm";
 import styles from "./listing-modal.module.css";
@@ -40,8 +31,6 @@ interface ListingModalProps {
     format: string;
     filename: string;
   } | null;
-  showAudioUploadTab?: boolean;
-  onAudioUploadComplete?: (audioData: any) => void;
 }
 
 export function ListingModal({
@@ -50,16 +39,12 @@ export function ListingModal({
   onSuccess,
   listingId,
   initialAudioData,
-  showAudioUploadTab,
-  onAudioUploadComplete,
 }: ListingModalProps) {
   const { t } = useTranslation();
   const isDesktop = useIsDesktop();
   const loadingRef = useRef(false);
   const fetchErrorRef = useRef<string | null>(null);
-  const [activeTab, setActiveTab] = useState<
-    "general" | "main" | "other" | "upload" | "arrange" | "review"
-  >(showAudioUploadTab && !listingId && !initialAudioData ? "upload" : "general");
+  const [activeTab, setActiveTab] = useState<"general" | "main" | "other" | "review">("general");
   const [errorTabs, setErrorTabs] = useState<string[]>([]);
   const { state, dispatch } = useListingForm(null, initialAudioData);
   const { title, slug, description, scholarId, language, translationChanges, saving, formError } =
@@ -162,22 +147,13 @@ export function ListingModal({
     if (!title.trim() || (!listingId && !slug?.trim())) {
       errTabs.push("main");
     }
-    if (!listingId && !initialAudioData) {
-      errTabs.push("upload");
-    }
 
     if (errTabs.length > 0) {
       setErrorTabs(errTabs);
-      let errorMsg = t(
+      const errorMsg = t(
         "admin.contents.listing.requiredFieldsMissing",
         "Language, scholar, at least one topic, title, and slug are required.",
       );
-      if (errTabs.includes("upload") && !initialAudioData) {
-        errorMsg = t(
-          "admin.contents.listing.audioKeyRequired",
-          "Audio file key is required for creation.",
-        );
-      }
       dispatch({
         type: "SET_ERROR",
         error: errorMsg,
@@ -210,7 +186,6 @@ export function ListingModal({
         await updateLecture(listingId, payload);
       } else {
         if (!initialAudioData) {
-          setErrorTabs(["upload"]);
           dispatch({
             type: "SET_ERROR",
             error: t(
@@ -276,7 +251,7 @@ export function ListingModal({
       width="wide"
       height="long"
       multiTab
-      requireReview={!showAudioUploadTab || !!initialAudioData}
+      requireReview
       errorTabs={errorTabs}
       activeTab={activeTab}
       onActiveTabChange={(id) => setActiveTab(id as typeof activeTab)}
@@ -290,12 +265,6 @@ export function ListingModal({
           <Modal.TabItem id="general">{t("admin.modal.generalTab", "General")}</Modal.TabItem>
           <Modal.TabItem id="main">{mainLocale === "en" ? "English" : "العربية"}</Modal.TabItem>
           <Modal.TabItem id="other">{otherLocale === "en" ? "English" : "العربية"}</Modal.TabItem>
-          <Modal.TabItem id="upload">
-            {t("admin.contents.listing.uploadTab", "Upload Audio")}
-          </Modal.TabItem>
-          <Modal.TabItem id="arrange">
-            {t("admin.contents.listing.arrangeTab", "Arrange")}
-          </Modal.TabItem>
           <Modal.TabItem id="review">{t("admin.modal.reviewTab", "Review")}</Modal.TabItem>
         </Modal.Tabs>
 
@@ -309,7 +278,6 @@ export function ListingModal({
           series={series}
           handleTopicToggle={handleTopicToggle}
           handleTitleChange={handleTitleChange}
-          onAudioUploadComplete={onAudioUploadComplete}
           mainLocale={mainLocale}
           otherLocale={otherLocale}
         />

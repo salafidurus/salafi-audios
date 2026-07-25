@@ -36,29 +36,35 @@ export function ListingsContent({
   const setIsAudioUploaderOpen = onAudioUploaderOpenChange;
   const [isListingModalOpen, setIsListingModalOpen] = useState(false);
   const [selectedListingId, setSelectedListingId] = useState<string | null>(null);
-  const [initialAudioData, setInitialAudioData] = useState<AudioData | null>(null);
+
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [selectedUploadListingId, setSelectedUploadListingId] = useState<string | null>(null);
+
   const queryClient = useQueryClient();
 
   const allListings = data?.pages.flatMap((page) => page.items) ?? [];
 
-  const handleUploadComplete = (audioInfo: AudioData | null) => {
-    setInitialAudioData(audioInfo);
-    setSelectedListingId(null);
-    setIsAudioUploaderOpen(false);
+  const handleEditListing = (listingId: string) => {
+    setSelectedListingId(listingId);
     setIsListingModalOpen(true);
   };
 
-  const handleEditListing = (listingId: string) => {
-    setSelectedListingId(listingId);
-    setInitialAudioData(null);
-    setIsListingModalOpen(true);
+  const handleUploadListing = (listingId: string) => {
+    setSelectedUploadListingId(listingId);
+    setIsUploadModalOpen(true);
   };
 
   const handleListingSaved = async () => {
     await queryClient.refetchQueries({ queryKey: queryKeys.admin.listings.all() });
     setIsListingModalOpen(false);
     setSelectedListingId(null);
-    setInitialAudioData(null);
+  };
+
+  const handleUploadSaved = async () => {
+    await queryClient.refetchQueries({ queryKey: queryKeys.admin.listings.all() });
+    setIsUploadModalOpen(false);
+    setSelectedUploadListingId(null);
+    setIsAudioUploaderOpen(false);
   };
 
   return (
@@ -70,7 +76,12 @@ export function ListingsContent({
         onLoadMore={() => fetchNextPage()}
         isFetchingNextPage={isFetchingNextPage}
         renderItem={(listing) => (
-          <Content.Listing key={listing.id} listing={listing} onEdit={handleEditListing} />
+          <Content.Listing
+            key={listing.id}
+            listing={listing}
+            onEdit={handleEditListing}
+            onUpload={handleUploadListing}
+          />
         )}
         emptyMessage={
           debouncedSearch
@@ -80,16 +91,24 @@ export function ListingsContent({
       />
 
       <Content.ListingModal
-        isOpen={isListingModalOpen || isAudioUploaderOpen}
+        isOpen={isListingModalOpen}
         onClose={() => {
           setIsListingModalOpen(false);
-          setIsAudioUploaderOpen(false);
+          setSelectedListingId(null);
         }}
         onSuccess={handleListingSaved}
         listingId={selectedListingId}
-        initialAudioData={initialAudioData}
-        showAudioUploadTab={isAudioUploaderOpen && !selectedListingId}
-        onAudioUploadComplete={handleUploadComplete}
+      />
+
+      <Content.ListingUploadArrangeModal
+        isOpen={isUploadModalOpen || isAudioUploaderOpen}
+        onClose={() => {
+          setIsUploadModalOpen(false);
+          setSelectedUploadListingId(null);
+          setIsAudioUploaderOpen(false);
+        }}
+        onSuccess={handleUploadSaved}
+        listingId={selectedUploadListingId}
       />
     </>
   );
