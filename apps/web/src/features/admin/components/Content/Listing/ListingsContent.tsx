@@ -91,6 +91,7 @@ export function ListingsContent({
       />
 
       <Content.ListingModal
+        key={selectedListingId ?? "create"}
         isOpen={isListingModalOpen}
         onClose={() => {
           setIsListingModalOpen(false);
