@@ -80,10 +80,13 @@ export function ListingsContent({
       />
 
       <Content.ListingModal
+        key={selectedListingId ?? "create"}
         isOpen={isListingModalOpen || isAudioUploaderOpen}
         onClose={() => {
           setIsListingModalOpen(false);
           setIsAudioUploaderOpen(false);
+          setSelectedListingId(null);
+          setInitialAudioData(null);
         }}
         onSuccess={handleListingSaved}
         listingId={selectedListingId}
