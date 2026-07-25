@@ -3,7 +3,6 @@ import type {
   AdminListingListItemDto,
   AdminListingDetailDto,
   CreateListingDto,
-  AdminListingUpdateDto,
   BulkActionDto,
   BulkActionResultDto,
 } from "@sd/core-contracts";
@@ -21,17 +20,6 @@ export async function createSeries(data: CreateListingDto): Promise<AdminListing
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.create,
     method: "POST",
-    body: data,
-  });
-}
-
-export async function updateSeries(
-  id: string,
-  data: Partial<AdminListingUpdateDto>,
-): Promise<AdminListingDetailDto> {
-  return httpClient<AdminListingDetailDto>({
-    url: endpoints.admin.listings.update(id),
-    method: "PUT",
     body: data,
   });
 }
@@ -57,17 +45,6 @@ export async function createCollection(data: CreateListingDto): Promise<AdminLis
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.create,
     method: "POST",
-    body: data,
-  });
-}
-
-export async function updateCollection(
-  id: string,
-  data: Partial<AdminListingUpdateDto>,
-): Promise<AdminListingDetailDto> {
-  return httpClient<AdminListingDetailDto>({
-    url: endpoints.admin.listings.update(id),
-    method: "PUT",
     body: data,
   });
 }

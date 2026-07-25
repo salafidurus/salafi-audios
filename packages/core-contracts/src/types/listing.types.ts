@@ -130,24 +130,6 @@ export const RelatedListingDtoSchema = z.object({
 });
 export type RelatedListingDto = z.infer<typeof RelatedListingDtoSchema>;
 
-export const AdminListingUpdateDtoSchema = z.object({
-  title: z.string().optional(),
-  description: z.string().optional(),
-  language: LocaleSchema.optional(),
-  orderIndex: z.number().optional(),
-  status: StatusValueSchema.optional(),
-  translations: z
-    .array(
-      z.object({
-        locale: LocaleSchema,
-        title: z.string(),
-        description: z.string().nullable().optional(),
-      }),
-    )
-    .optional(),
-});
-export type AdminListingUpdateDto = z.infer<typeof AdminListingUpdateDtoSchema>;
-
 export const AdminListingActionDtoSchema = z.object({
   success: z.boolean(),
   message: z.string(),
@@ -189,6 +171,7 @@ export const AdminListingDetailDtoSchema = z.object({
   topics: z.array(z.string()),
   audioKey: z.string().optional(),
   audioUrl: z.string().optional(),
+  coverImageUrl: z.string().optional(),
   createdAt: z.string(),
   updatedAt: z.string().optional(),
 });
@@ -217,6 +200,7 @@ export const CreateListingDtoSchema = z.object({
   audioKey: z.string().optional(),
   durationSeconds: z.number().optional(),
   sizeBytes: z.number().optional(),
+  coverImageUrl: z.string().optional(),
   translations: z
     .array(
       z.object({
@@ -245,6 +229,7 @@ export const ListingFormDataDtoSchema = z.object({
     parentId: z.string().optional(),
     topics: z.array(z.string()),
     audioUrl: z.string().optional(),
+    coverImageUrl: z.string().optional(),
     createdAt: z.string(),
     updatedAt: z.string().optional(),
   }),
@@ -304,9 +289,9 @@ export const UpdateListingDetailsDtoSchema = z.object({
   language: LocaleSchema.optional(),
   orderIndex: z.number().optional(),
   status: StatusValueSchema.optional(),
-  scholarId: z.string().optional(),
   parentId: z.string().nullable().optional(),
   topics: z.array(z.string()).optional(),
+  coverImageUrl: z.string().optional(),
   translations: z
     .array(
       z.object({

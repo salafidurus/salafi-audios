@@ -8,6 +8,7 @@ export const PresignedUrlRequestDtoSchema = z.object({
   contentType: z.string().min(1, "Content type must not be empty"),
   purpose: PresignedUrlPurposeSchema,
   slug: z.string().optional(), // For slug-based naming (e.g., scholar images at /images/scholars/{slug}.{ext})
+  entityType: z.enum(["scholar", "listing"]).optional(), // Entity type for image organization (default: scholar)
 });
 export type PresignedUrlRequestDto = z.infer<typeof PresignedUrlRequestDtoSchema>;
 

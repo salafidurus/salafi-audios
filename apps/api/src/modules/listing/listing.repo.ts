@@ -4,9 +4,11 @@ import { Prisma, Status } from '@sd/core-db';
 import type {
   ListingDetailDto,
   RelatedListingDto,
-  AdminListingUpdateDto,
   AdminListingListDto,
   AdminListingDetailDto,
+  AdminListingMediaDetailDto,
+  UpdateListingDetailsDto,
+  UpdateListingMediaDto,
   BulkActionResultDto,
   TranslationViewDto,
   Locale,
@@ -737,6 +739,7 @@ export class ListingRepository {
         updatedAt: true,
         scholarId: true,
         parentId: true,
+        coverImageUrl: true,
         scholar: { select: { name: true } },
         topics: { select: { topic: { select: { id: true } } } },
         audioAssets: {
@@ -763,6 +766,7 @@ export class ListingRepository {
       parentId: listing.parentId ?? undefined,
       topics: listing.topics.map((t) => t.topic.id),
       audioUrl: listing.audioAssets[0]?.url,
+      coverImageUrl: listing.coverImageUrl ?? undefined,
       createdAt: listing.createdAt.toISOString(),
       updatedAt: listing.updatedAt?.toISOString(),
     };
@@ -794,6 +798,7 @@ export class ListingRepository {
         updatedAt: true,
         scholarId: true,
         parentId: true,
+        coverImageUrl: true,
         scholar: { select: { name: true } },
         topics: { select: { topic: { select: { id: true } } } },
         audioAssets: {
@@ -832,6 +837,7 @@ export class ListingRepository {
         parentId: listing.parentId ?? undefined,
         topics: listing.topics.map((t) => t.topic.id),
         audioUrl: listing.audioAssets[0]?.url,
+        coverImageUrl: listing.coverImageUrl ?? undefined,
         createdAt: listing.createdAt.toISOString(),
         updatedAt: listing.updatedAt?.toISOString(),
       },
@@ -865,6 +871,7 @@ export class ListingRepository {
           durationSeconds: dto.durationSeconds ?? undefined,
           scholarId: dto.scholarId,
           parentId: dto.parentId ?? undefined,
+          coverImageUrl: dto.coverImageUrl ?? undefined,
           createdBy,
         },
         select: { id: true, title: true, parentId: true },
@@ -919,16 +926,16 @@ export class ListingRepository {
     });
   }
 
-  async updateListing(
+  async updateListingDetails(
     id: string,
-    dto: AdminListingUpdateDto,
+    dto: UpdateListingDetailsDto,
     updatedBy?: string,
   ): Promise<boolean> {
     try {
       await this.prisma.$transaction(async (tx) => {
         const original = await tx.listing.findUnique({
           where: { id },
-          select: { parentId: true, status: true, durationSeconds: true },
+          select: { parentId: true, status: true },
         });
 
         if (!original) throw new Error('Not found');
@@ -969,22 +976,115 @@ export class ListingRepository {
           );
         }
 
-        // Sync old parent if parent changed or status changed or duration changed
+        // Sync old parent if it exists
         if (original.parentId) {
           await this.syncListingCounters(original.parentId, tx);
         }
 
-        // Sync new parent if parent ID is updated and different
-        // In AdminListingUpdateDto, parentId is not usually updated directly, but we can verify if it's there
-        const parentId = (dto as { parentId?: string }).parentId;
-        if (parentId && parentId !== original.parentId) {
-          await this.syncListingCounters(parentId, tx);
+        // Sync new parent if parentId is updated and different
+        if (dto.parentId !== undefined && dto.parentId !== original.parentId) {
+          if (dto.parentId) {
+            await this.syncListingCounters(dto.parentId, tx);
+          }
         }
       });
       return true;
     } catch {
       return false;
     }
+  }
+
+  async updateListingMedia(
+    id: string,
+    dto: UpdateListingMediaDto,
+    updatedBy?: string,
+  ): Promise<boolean> {
+    try {
+      await this.prisma.$transaction(async (tx) => {
+        const listing = await tx.listing.findUnique({
+          where: { id },
+          select: { id: true, format: true, parentId: true },
+        });
+
+        if (!listing) throw new Error('Not found');
+
+        // Update listing fields (audioKey → handled via audioAsset, durationSeconds, orderIndex)
+        const updateData: Prisma.ListingUpdateInput = {
+          updatedAt: new Date(),
+          updatedBy,
+        };
+        if (dto.durationSeconds !== undefined) updateData.durationSeconds = dto.durationSeconds;
+        if (dto.orderIndex !== undefined) updateData.orderIndex = dto.orderIndex;
+
+        await tx.listing.update({
+          where: { id },
+          data: updateData,
+        });
+
+        // Update primary audio asset if audioKey is provided
+        if (dto.audioKey) {
+          const publicUrl = `${process.env['R2_PUBLIC_BASE_URL']}/${dto.audioKey}`;
+          await tx.audioAsset.updateMany({
+            where: { listingId: id, isPrimary: true },
+            data: {
+              url: publicUrl,
+              format: dto.audioKey.endsWith('.mp3') ? 'mp3' : undefined,
+              sizeBytes: dto.sizeBytes,
+              durationSeconds: dto.durationSeconds,
+            },
+          });
+        }
+
+        // Sync parent counters if this listing has a parent
+        if (listing.parentId) {
+          await this.syncListingCounters(listing.parentId, tx);
+        }
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async getMediaData(id: string): Promise<AdminListingMediaDetailDto | null> {
+    const listing = await this.prisma.listing.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        title: true,
+        format: true,
+        orderIndex: true,
+        durationSeconds: true,
+        audioAssets: {
+          where: { isPrimary: true },
+          select: {
+            id: true,
+            url: true,
+            format: true,
+            bitrateKbps: true,
+            durationSeconds: true,
+          },
+        },
+      },
+    });
+
+    if (!listing) return null;
+
+    return {
+      id: listing.id,
+      title: listing.title,
+      format: listing.format,
+      orderIndex: listing.orderIndex ?? undefined,
+      durationSeconds: listing.durationSeconds ?? undefined,
+      audioUrl: listing.audioAssets[0]?.url,
+      audioAssets: listing.audioAssets.map((asset) => ({
+        id: asset.id,
+        url: asset.url,
+        format: asset.format ?? undefined,
+        bitrateKbps: asset.bitrateKbps ?? undefined,
+        durationSeconds: asset.durationSeconds ?? undefined,
+      })),
+    };
   }
 
   async updateListingStatus(id: string, status: Status): Promise<boolean> {

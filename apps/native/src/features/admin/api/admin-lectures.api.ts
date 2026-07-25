@@ -5,7 +5,6 @@ import type {
   CreateListingDto,
   AdminListingListDto,
   AdminListingDetailDto,
-  AdminListingUpdateDto,
   BulkActionDto,
   BulkActionResultDto,
 } from "@sd/core-contracts";
@@ -77,17 +76,6 @@ export async function fetchAdminLectureDetail(id: string): Promise<AdminListingD
   return httpClient<AdminListingDetailDto>({
     url: endpoints.admin.listings.detail(id),
     method: "GET",
-  });
-}
-
-export async function updateLecture(
-  id: string,
-  data: Partial<AdminListingUpdateDto>,
-): Promise<AdminListingDetailDto> {
-  return httpClient<AdminListingDetailDto>({
-    url: endpoints.admin.listings.update(id),
-    method: "PUT",
-    body: data,
   });
 }
 

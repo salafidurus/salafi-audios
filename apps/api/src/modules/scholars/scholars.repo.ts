@@ -547,7 +547,6 @@ export class ScholarsRepository {
       // Update scholar fields if provided
       const updateData: Record<string, any> = {};
       if (dto.name !== undefined) updateData.name = dto.name;
-      if (dto.slug !== undefined) updateData.slug = dto.slug;
       if (dto.bio !== undefined) updateData.bio = dto.bio;
       if (dto.imageUrl !== undefined) updateData.imageUrl = dto.imageUrl;
       if (dto.isActive !== undefined) updateData.isActive = dto.isActive;
