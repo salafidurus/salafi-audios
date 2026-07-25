@@ -40,7 +40,7 @@ export function Listing({ listing, onEdit, onUpload }: ListingProps) {
             {isMobile && t("common.edit", "Edit")}
           </Button>
         </PermissionGate>
-        <PermissionGate requires="LISTINGS_EDIT">
+        <PermissionGate requires="MEDIA_UPLOAD">
           <Button
             variant={isMobile ? "outline" : "ghost"}
             size={isMobile ? "sm" : "icon"}
