@@ -98,26 +98,54 @@ export class ScholarsService {
     return this.repo.listScholarTranslations(scholarId);
   }
 
-  upsertTranslation(
+  async upsertTranslation(
     scholarId: string,
     dto: SaveScholarTranslationDto,
   ): Promise<TranslationViewDto> {
-    return this.repo.upsertScholarTranslation(scholarId, dto);
+    const [result, scholar] = await Promise.all([
+      this.repo.upsertScholarTranslation(scholarId, dto),
+      this.repo.findById(scholarId),
+    ]);
+    if (scholar) {
+      await this.invalidateCache(scholar.slug);
+    }
+    return result;
   }
 
-  updateTranslation(
+  async updateTranslation(
     scholarId: string,
     locale: string,
     fields: Partial<{ name: string; bio: string | null }>,
   ): Promise<TranslationViewDto> {
-    return this.repo.updateScholarTranslation(scholarId, locale, fields);
+    const [result, scholar] = await Promise.all([
+      this.repo.updateScholarTranslation(scholarId, locale, fields),
+      this.repo.findById(scholarId),
+    ]);
+    if (scholar) {
+      await this.invalidateCache(scholar.slug);
+    }
+    return result;
   }
 
-  publishTranslation(scholarId: string, locale: string): Promise<TranslationViewDto> {
-    return this.repo.publishScholarTranslation(scholarId, locale);
+  async publishTranslation(scholarId: string, locale: string): Promise<TranslationViewDto> {
+    const [result, scholar] = await Promise.all([
+      this.repo.publishScholarTranslation(scholarId, locale),
+      this.repo.findById(scholarId),
+    ]);
+    if (scholar) {
+      await this.invalidateCache(scholar.slug);
+    }
+    return result;
   }
 
-  unpublishTranslation(scholarId: string, locale: string): Promise<TranslationViewDto> {
-    return this.repo.unpublishScholarTranslation(scholarId, locale);
+  async unpublishTranslation(scholarId: string, locale: string): Promise<TranslationViewDto> {
+    const [result, scholar] = await Promise.all([
+      this.repo.unpublishScholarTranslation(scholarId, locale),
+      this.repo.findById(scholarId),
+    ]);
+    if (scholar) {
+      await this.invalidateCache(scholar.slug);
+    }
+    return result;
   }
 }

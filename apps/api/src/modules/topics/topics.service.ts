@@ -130,15 +130,24 @@ export class TopicsService {
     return this.repo.listTopicTranslations(topicId);
   }
 
-  upsertTranslation(topicId: string, dto: SaveTopicTranslationDto): Promise<TranslationViewDto> {
-    return this.repo.upsertTopicTranslation(topicId, dto);
+  async upsertTranslation(
+    topicId: string,
+    dto: SaveTopicTranslationDto,
+  ): Promise<TranslationViewDto> {
+    const result = await this.repo.upsertTopicTranslation(topicId, dto);
+    // Invalidate both list and detail caches for all locales
+    await this.invalidateCache();
+    return result;
   }
 
-  updateTranslation(
+  async updateTranslation(
     topicId: string,
     locale: string,
     fields: Partial<{ name: string }>,
   ): Promise<TranslationViewDto> {
-    return this.repo.updateTopicTranslation(topicId, locale, fields);
+    const result = await this.repo.updateTopicTranslation(topicId, locale, fields);
+    // Invalidate both list and detail caches for all locales
+    await this.invalidateCache();
+    return result;
   }
 }
