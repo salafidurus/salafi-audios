@@ -69,7 +69,11 @@ export const endpoints = {
       detail: (id: string) => `/admin/listings/${id}`,
       create: "/admin/listings",
       update: (id: string) => `/admin/listings/${id}`,
+      updateDetails: (id: string) => `/admin/listings/${id}/details`,
+      updateMedia: (id: string) => `/admin/listings/${id}/media`,
+      mediaData: (id: string) => `/admin/listings/${id}/media-data`,
       formData: (id: string) => `/admin/listings/${id}/form-data`,
+
       publish: (id: string) => `/admin/listings/${id}/publish`,
       archive: (id: string) => `/admin/listings/${id}/archive`,
       series: "/admin/listings/series",

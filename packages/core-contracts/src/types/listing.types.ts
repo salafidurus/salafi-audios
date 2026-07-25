@@ -297,3 +297,46 @@ export const LastPlayedLessonDtoSchema = z.object({
   updatedAt: z.string(),
 });
 export type LastPlayedLessonDto = z.infer<typeof LastPlayedLessonDtoSchema>;
+
+export const UpdateListingDetailsDtoSchema = z.object({
+  title: z.string().min(1, "Title must not be empty").optional(),
+  description: z.string().optional(),
+  language: LocaleSchema.optional(),
+  orderIndex: z.number().optional(),
+  status: StatusValueSchema.optional(),
+  scholarId: z.string().optional(),
+  parentId: z.string().nullable().optional(),
+  topics: z.array(z.string()).optional(),
+  translations: z
+    .array(
+      z.object({
+        locale: LocaleSchema,
+        title: z.string().optional(),
+        description: z.string().nullable().optional(),
+      }),
+    )
+    .optional(),
+});
+
+export type UpdateListingDetailsDto = z.infer<typeof UpdateListingDetailsDtoSchema>;
+
+export const AdminListingMediaDetailDtoSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  audioKey: z.string().optional(),
+  audioUrl: z.string().optional(),
+  durationSeconds: z.number().optional(),
+  sizeBytes: z.number().optional(),
+  format: ListingFormatSchema,
+  orderIndex: z.number().optional(),
+  audioAssets: z.array(AudioAssetDtoSchema).optional(),
+});
+export type AdminListingMediaDetailDto = z.infer<typeof AdminListingMediaDetailDtoSchema>;
+
+export const UpdateListingMediaDtoSchema = z.object({
+  audioKey: z.string().min(1, "Audio key is required").optional(),
+  durationSeconds: z.number().optional(),
+  sizeBytes: z.number().optional(),
+  orderIndex: z.number().optional(),
+});
+export type UpdateListingMediaDto = z.infer<typeof UpdateListingMediaDtoSchema>;

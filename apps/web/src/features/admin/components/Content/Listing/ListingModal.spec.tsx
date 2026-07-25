@@ -3,13 +3,13 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ListingModal } from "./ListingModal";
 import {
   createLecture,
-  updateLecture,
+  updateListingDetails,
   fetchListingFormData,
 } from "@/features/admin/api/admin-lectures.api";
 
 vi.mock("@/features/admin/api/admin-lectures.api", () => ({
   createLecture: vi.fn(),
-  updateLecture: vi.fn(),
+  updateListingDetails: vi.fn(),
   fetchListingFormData: vi.fn(),
 }));
 
@@ -126,7 +126,7 @@ describe("ListingModal", () => {
   it("renders with edit form fields prefilled and updates details", async () => {
     const onSuccessMock = vi.fn();
     const onCloseMock = vi.fn();
-    (updateLecture as Mock<any>).mockResolvedValue({ id: "edit-lecture-id" });
+    (updateListingDetails as Mock<any>).mockResolvedValue({ id: "edit-lecture-id" });
     (fetchListingFormData as Mock<any>).mockResolvedValue({
       listing: {
         id: "lecture-123",
@@ -192,7 +192,7 @@ describe("ListingModal", () => {
     fireEvent.click(saveButton);
 
     await waitFor(() => {
-      expect(updateLecture).toHaveBeenCalledWith(
+      expect(updateListingDetails).toHaveBeenCalledWith(
         "lecture-123",
         expect.objectContaining({
           title: "Updated Title",
