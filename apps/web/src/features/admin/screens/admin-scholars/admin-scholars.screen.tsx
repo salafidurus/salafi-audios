@@ -12,8 +12,7 @@ import { PageHeader } from "@/shared/components/PageHeader";
 import { Button } from "@/shared/components/Button";
 import { Search } from "@/shared/components/Search";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
-import { type CreateScholarDto, type AdminScholarListItemDto } from "@sd/core-contracts";
-import { createScholar, updateScholar } from "@/features/admin/api/admin.api";
+import { type AdminScholarListItemDto } from "@sd/core-contracts";
 import { Scholar } from "@/features/admin/components/Scholar";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
@@ -46,12 +45,7 @@ export function AdminScholarsScreen() {
     setIsModalOpen(true);
   };
 
-  const handleSave = async (formData: CreateScholarDto) => {
-    if (editingScholarId) {
-      await updateScholar(editingScholarId, formData);
-    } else {
-      await createScholar(formData);
-    }
+  const handleScholarSaved = async () => {
     // Invalidate all scholar queries to refetch updated data
     await queryClient.refetchQueries({
       queryKey: queryKeys.admin.scholars.all(),
@@ -133,7 +127,7 @@ export function AdminScholarsScreen() {
           setIsModalOpen(false);
           setEditingScholarId(null);
         }}
-        onSave={handleSave}
+        onSuccess={handleScholarSaved}
       />
     </ScreenView>
   );

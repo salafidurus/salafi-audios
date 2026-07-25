@@ -92,21 +92,24 @@ export function ListingsContent({
 
       <Content.ListingModal
         key={selectedListingId ?? "create"}
-        isOpen={isListingModalOpen}
+        isOpen={isListingModalOpen || isAudioUploaderOpen}
         onClose={() => {
           setIsListingModalOpen(false);
+          setIsAudioUploaderOpen(false);
           setSelectedListingId(null);
         }}
-        onSuccess={handleListingSaved}
+        onSuccess={async () => {
+          await handleListingSaved();
+          setIsAudioUploaderOpen(false);
+        }}
         listingId={selectedListingId}
       />
 
       <Content.ListingUploadArrangeModal
-        isOpen={isUploadModalOpen || isAudioUploaderOpen}
+        isOpen={isUploadModalOpen}
         onClose={() => {
           setIsUploadModalOpen(false);
           setSelectedUploadListingId(null);
-          setIsAudioUploaderOpen(false);
         }}
         onSuccess={handleUploadSaved}
         listingId={selectedUploadListingId}

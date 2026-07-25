@@ -1,15 +1,14 @@
 "use client";
 
-import type { CreateScholarDto } from "@sd/core-contracts";
 import { FormSection } from "@/features/admin/components/FormSection";
 import { Toggle } from "@/shared/components/Toggle";
 import { InputField } from "@/shared/components/InputField";
 import { useTranslation } from "@/core/i18n/use-translation";
-import type { FormAction } from "../../hooks/Scholar/useScholarForm";
+import type { FormAction, FormState } from "../../hooks/Scholar/useScholarForm";
 import styles from "./scholar-modal.module.css";
 
 interface SettingsSectionProps {
-  formData: CreateScholarDto;
+  formData: FormState;
   dispatch: React.Dispatch<FormAction>;
 }
 

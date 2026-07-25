@@ -15,6 +15,30 @@
   font-size: var(--typo-body-sm-font-size);
 }
 
+.container {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: var(--space-component-gap-lg);
+  align-items: flex-start;
+}
+
+@media (max-width: 640px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.imageColumn {
+  display: flex;
+  justify-content: center;
+}
+
+.fieldsColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-md);
+}
+
 .formGroup {
   display: flex;
   flex-direction: column;

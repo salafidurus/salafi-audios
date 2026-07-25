@@ -1,6 +1,6 @@
 "use client";
 
-import { type CreateScholarDto, COUNTRY_LIST } from "@sd/core-contracts";
+import { COUNTRY_LIST, type CountryCode } from "@sd/core-contracts";
 import {
   Dropdown,
   DropdownTrigger,
@@ -9,11 +9,11 @@ import {
 } from "@/shared/components/Dropdown";
 import { FormSection } from "@/features/admin/components/FormSection";
 import { useTranslation } from "@/core/i18n/use-translation";
-import type { FormAction } from "../../hooks/Scholar/useScholarForm";
+import type { FormAction, FormState } from "../../hooks/Scholar/useScholarForm";
 import styles from "./scholar-modal.module.css";
 
 interface LocationSectionProps {
-  formData: CreateScholarDto;
+  formData: FormState;
   dispatch: React.Dispatch<FormAction>;
 }
 
@@ -29,7 +29,9 @@ export function LocationSection({ formData, dispatch }: LocationSectionProps) {
           </label>
           <Dropdown
             value={formData.country ?? ""}
-            onValueChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "country", value })}
+            onValueChange={(value) =>
+              dispatch({ type: "UPDATE_FIELD", field: "country", value: value as CountryCode })
+            }
           >
             <DropdownTrigger
               id="scholar-country"

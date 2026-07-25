@@ -1,15 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import type { CreateScholarDto } from "@sd/core-contracts";
 import { InputField } from "@/shared/components/InputField";
 import { FormSection } from "@/features/admin/components/FormSection";
 import { useTranslation } from "@/core/i18n/use-translation";
-import type { FormAction } from "../../hooks/Scholar/useScholarForm";
+import type { FormAction, FormState } from "../../hooks/Scholar/useScholarForm";
 import styles from "./social-section.module.css";
 
 interface SocialSectionProps {
-  formData: CreateScholarDto;
+  formData: FormState;
   dispatch: React.Dispatch<FormAction>;
 }
 
@@ -65,7 +64,10 @@ export function SocialSection({ formData, dispatch }: SocialSectionProps) {
   const { t } = useTranslation();
 
   const handleSocialChange = (
-    key: keyof CreateScholarDto,
+    key: keyof Pick<
+      FormState,
+      "socialTwitter" | "socialTelegram" | "socialYoutube" | "socialWebsite"
+    >,
     handle: string,
     prefix: string | null,
   ) => {
@@ -77,7 +79,11 @@ export function SocialSection({ formData, dispatch }: SocialSectionProps) {
     <FormSection title={t("admin.scholars.socialMedia", "Social Media")}>
       <div className={styles.fieldsGrid}>
         {SOCIAL_FIELDS.map((field) => {
-          const value = (formData[field.key as keyof CreateScholarDto] as string) ?? "";
+          const fieldKey = field.key as keyof Pick<
+            FormState,
+            "socialTwitter" | "socialTelegram" | "socialYoutube" | "socialWebsite"
+          >;
+          const value = formData[fieldKey] ?? "";
           const handle = extractHandle(value, field.prefix);
 
           return (
@@ -98,15 +104,11 @@ export function SocialSection({ formData, dispatch }: SocialSectionProps) {
                   value={field.prefix ? handle : value}
                   onChange={(newValue) => {
                     if (field.prefix) {
-                      handleSocialChange(
-                        field.key as keyof CreateScholarDto,
-                        newValue,
-                        field.prefix,
-                      );
+                      handleSocialChange(fieldKey, newValue, field.prefix);
                     } else {
                       dispatch({
                         type: "UPDATE_FIELD",
-                        field: field.key as keyof CreateScholarDto,
+                        field: fieldKey,
                         value: newValue,
                       });
                     }

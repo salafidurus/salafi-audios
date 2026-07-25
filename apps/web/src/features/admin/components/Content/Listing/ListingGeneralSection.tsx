@@ -2,9 +2,11 @@
 
 import React from "react";
 import type { ScholarListItemDto, TopicDetailDto, ListingRefDto, Locale } from "@sd/core-contracts";
-import { getLocalizedName } from "@sd/core-i18n";
+import { getLocalizedName, SUPPORTED_LOCALES } from "@sd/core-i18n";
+import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
 import { validateLectureStatus } from "@/shared/types/form-types";
 import { InputField } from "@/shared/components/InputField";
+import { ImageUploadEditor } from "@/shared/components/ImageUploadEditor";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { Search } from "@/shared/components/Search";
 import {
@@ -13,7 +15,7 @@ import {
   DropdownContent,
   DropdownItem,
 } from "@/shared/components/Dropdown";
-import type { FormState, FormAction } from "@/features/admin/hooks/Content/useListingForm";
+import type { FormAction, FormState } from "@/features/admin/hooks/Content/useListingForm";
 import styles from "./listing-modal.module.css";
 
 interface ListingGeneralSectionProps {
@@ -23,6 +25,9 @@ interface ListingGeneralSectionProps {
   topics: TopicDetailDto[];
   series: ListingRefDto[];
   handleTopicToggle: (topicId: string) => void;
+  isEditing?: boolean;
+  onImageStaged?: (file: File | null, preview: string | null) => void;
+  stagedImagePreview?: string | null;
 }
 
 export function ListingGeneralSection({
@@ -32,50 +37,95 @@ export function ListingGeneralSection({
   topics,
   series,
   handleTopicToggle,
+  isEditing = false,
+  onImageStaged,
+  stagedImagePreview,
 }: ListingGeneralSectionProps) {
   const { i18n, t } = useTranslation();
-  const { scholarId, seriesId, status, orderIndex, selectedTopics, language, formError } = state;
+  const { scholarId, status, orderIndex, selectedTopics, language, formError, slug, format } =
+    state;
 
   return (
     <>
       {formError && <div className={styles.errorBanner}>{formError}</div>}
 
-      <div className={styles.formGroup}>
-        <label htmlFor="lecture-language" className={styles.label}>
-          {t("admin.contents.listing.languageLabel", "Language")} *
-        </label>
-        <Dropdown
-          value={language}
-          onValueChange={(value) =>
-            dispatch({ type: "UPDATE_FIELD", field: "language", value: value as Locale })
-          }
-        >
-          <DropdownTrigger id="lecture-language" />
-          <DropdownContent>
-            <DropdownItem value="ar">العربية</DropdownItem>
-            <DropdownItem value="en">English</DropdownItem>
-          </DropdownContent>
-        </Dropdown>
+      <div className={styles.container}>
+        {onImageStaged && (
+          <div className={styles.imageColumn}>
+            <ImageUploadEditor
+              imageUrl={stagedImagePreview || state.coverImageUrl}
+              onImageStaged={onImageStaged}
+              uploadLabel={t("admin.contents.listing.uploadCover", "Upload cover")}
+              changeLabel={t("admin.contents.listing.changeCover", "Change cover")}
+              selectLabel={t("admin.contents.listing.selectCover", "Select cover image")}
+              altText={t("admin.contents.listing.coverImageAlt", "Listing cover image")}
+            />
+          </div>
+        )}
+
+        <div className={styles.fieldsColumn}>
+          <div className={styles.formGroup}>
+            <label htmlFor="lecture-slug" className={styles.label}>
+              {t("admin.contents.listing.slugLabel", "Slug")} *
+            </label>
+            <InputField
+              id="lecture-slug"
+              type="text"
+              value={slug}
+              onChange={(value) => {
+                if (!isEditing) {
+                  dispatch({ type: "UPDATE_FIELD", field: "slug", value });
+                }
+              }}
+              placeholder={t("admin.contents.listing.slugPlaceholder", "listing-slug")}
+              disabled={isEditing}
+            />
+          </div>
+
+          <div className={styles.formGroup}>
+            <label htmlFor="lecture-scholar" className={styles.label}>
+              {t("admin.contents.listing.scholarLabel", "Scholar")} *
+            </label>
+            <Dropdown
+              value={scholarId}
+              onValueChange={(value) =>
+                dispatch({ type: "UPDATE_FIELD", field: "scholarId", value })
+              }
+              disabled={isEditing}
+            >
+              <DropdownTrigger
+                id="lecture-scholar"
+                placeholder={t("admin.contents.listing.scholarPlaceholder", "Select Scholar")}
+                testId="scholar-dropdown"
+              />
+              <DropdownContent searchable>
+                {scholars.map((s) => (
+                  <DropdownItem key={s.id} value={s.id}>
+                    {s.name}
+                  </DropdownItem>
+                ))}
+              </DropdownContent>
+            </Dropdown>
+          </div>
+        </div>
       </div>
 
       <div className={styles.formRow}>
         <div className={styles.formGroup}>
-          <label htmlFor="lecture-scholar" className={styles.label}>
-            {t("admin.contents.listing.scholarLabel", "Scholar")} *
+          <label htmlFor="lecture-language" className={styles.label}>
+            {t("admin.contents.listing.languageLabel", "Language")} *
           </label>
           <Dropdown
-            value={scholarId}
-            onValueChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "scholarId", value })}
+            value={language}
+            onValueChange={(value) =>
+              dispatch({ type: "UPDATE_FIELD", field: "language", value: value as Locale })
+            }
           >
-            <DropdownTrigger
-              id="lecture-scholar"
-              placeholder={t("admin.contents.listing.scholarPlaceholder", "Select Scholar")}
-              testId="scholar-dropdown"
-            />
-            <DropdownContent searchable>
-              {scholars.map((s) => (
-                <DropdownItem key={s.id} value={s.id}>
-                  {s.name}
+            <DropdownTrigger id="lecture-language" />
+            <DropdownContent>
+              {SUPPORTED_LOCALES.map((locale) => (
+                <DropdownItem key={locale} value={locale}>
+                  {getLocaleLabel(locale)}
                 </DropdownItem>
               ))}
             </DropdownContent>
@@ -83,27 +133,31 @@ export function ListingGeneralSection({
         </div>
 
         <div className={styles.formGroup}>
-          <label htmlFor="lecture-series" className={styles.label}>
-            {t("admin.contents.listing.seriesLabel", "Series")}
+          <label htmlFor="lecture-format" className={styles.label}>
+            {t("admin.contents.listing.formatLabel", "Format")} *
           </label>
           <Dropdown
-            value={seriesId}
-            onValueChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "seriesId", value })}
+            value={format}
+            onValueChange={(value) =>
+              dispatch({
+                type: "UPDATE_FIELD",
+                field: "format",
+                value: value as "single" | "series" | "collection",
+              })
+            }
+            disabled={isEditing}
           >
-            <DropdownTrigger
-              id="lecture-series"
-              placeholder={t(
-                "admin.contents.listing.seriesPlaceholder",
-                "Select Series (Optional)",
-              )}
-              testId="series-dropdown"
-            />
-            <DropdownContent searchable>
-              {series.map((s) => (
-                <DropdownItem key={s.id} value={s.id}>
-                  {s.title}
-                </DropdownItem>
-              ))}
+            <DropdownTrigger id="lecture-format" testId="format-dropdown" />
+            <DropdownContent>
+              <DropdownItem value="single">
+                {t("admin.contents.listing.single", "Single")}
+              </DropdownItem>
+              <DropdownItem value="series">
+                {t("admin.contents.listing.series", "Series")}
+              </DropdownItem>
+              <DropdownItem value="collection">
+                {t("admin.contents.listing.collection", "Collection")}
+              </DropdownItem>
             </DropdownContent>
           </Dropdown>
         </div>

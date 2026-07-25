@@ -940,11 +940,11 @@ export class ListingRepository {
 
         if (!original) throw new Error('Not found');
 
-        // Exclude translations from the main update data
-        const { translations, ...dtoWithoutTranslations } = dto;
+        // Exclude translations and topics from the main update data
+        const { translations, topics, ...dtoWithoutTranslationsAndTopics } = dto;
 
         const updateData: Prisma.ListingUpdateInput = {
-          ...dtoWithoutTranslations,
+          ...dtoWithoutTranslationsAndTopics,
           updatedAt: new Date(),
           updatedBy,
         };
@@ -958,17 +958,38 @@ export class ListingRepository {
           data: updateData,
         });
 
+        // If topics were provided in the DTO, update them
+        if (topics !== undefined) {
+          // Delete all existing topic associations
+          await tx.listingTopic.deleteMany({
+            where: { listingId: id },
+          });
+
+          // Create new topic associations if provided
+          if (topics.length > 0) {
+            await tx.listingTopic.createMany({
+              data: topics.map((topicId: string) => ({
+                listingId: id,
+                topicId,
+              })),
+            });
+          }
+        }
+
         // If translations were provided in the DTO, upsert them
         if (translations) {
           await Promise.all(
             Object.entries(translations).map(([locale, fields]) =>
               tx.listingTranslation.upsert({
                 where: { listingId_locale: { listingId: id, locale: locale as any } },
-                update: { title: fields.title, description: fields.description ?? null },
+                update: {
+                  title: fields.title ?? undefined,
+                  description: fields.description ?? null,
+                },
                 create: {
                   listingId: id,
                   locale: locale as any,
-                  title: fields.title,
+                  title: fields.title ?? '',
                   description: fields.description ?? null,
                 },
               }),
