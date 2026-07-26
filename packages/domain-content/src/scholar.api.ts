@@ -11,12 +11,20 @@ import {
 } from "@sd/core-contracts";
 import type { UseQueryOptions } from "@tanstack/react-query";
 
-export function useScholarsList() {
-  return useApiQuery(queryKeys.scholars.list.all(), () =>
-    httpClient<{ scholars: ScholarListItemDto[] }>({
-      url: endpoints.scholars.list,
-      method: "GET",
-    }),
+export function useScholarsList(
+  options?: Omit<
+    UseQueryOptions<{ scholars: ScholarListItemDto[] }, Error, { scholars: ScholarListItemDto[] }>,
+    "queryKey" | "queryFn"
+  >,
+) {
+  return useApiQuery(
+    queryKeys.scholars.list.all(),
+    () =>
+      httpClient<{ scholars: ScholarListItemDto[] }>({
+        url: endpoints.scholars.list,
+        method: "GET",
+      }),
+    options,
   );
 }
 

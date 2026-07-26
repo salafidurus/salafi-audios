@@ -1,4 +1,6 @@
+import React from "react";
 import type { ScholarTitle } from "@sd/core-contracts";
+import { QueryClient, QueryClientContext } from "@tanstack/react-query";
 import { useScholarsList } from "../scholar.api";
 
 export interface ScholarWithNameAndTitle {
@@ -12,6 +14,14 @@ const SCHOLAR_TITLE_DISPLAY: Record<ScholarTitle, string> = {
   ustadh: "Ustadh",
   akh: "Akh",
 };
+
+const fallbackQueryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      enabled: false,
+    },
+  },
+});
 
 /**
  * Format a scholar's name with their honorific title prefix.
@@ -47,7 +57,15 @@ export function useFormattedScholarName(
   scholarName?: string | null,
   titleParam?: ScholarTitle | string | null,
 ): string {
-  const { data } = useScholarsList();
+  const contextClient = React.useContext(QueryClientContext);
+  const hasQueryClient = Boolean(contextClient);
+  const shouldFetch = hasQueryClient && Boolean(scholarName) && !titleParam;
+
+  const scholarsQuery = useScholarsList({
+    queryClient: contextClient ?? fallbackQueryClient,
+    enabled: shouldFetch,
+  });
+  const data = shouldFetch ? scholarsQuery.data : undefined;
 
   if (!scholarName) return "";
 
