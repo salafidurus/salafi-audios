@@ -216,19 +216,6 @@ export class TopicsRepository {
     return this.mapTopicTranslation(record);
   }
 
-  async deleteTopicTranslation(topicId: string, locale: string): Promise<void> {
-    try {
-      await this.prisma.topicTranslation.delete({
-        where: { topicId_locale: { topicId, locale: locale as Locale } },
-      });
-    } catch (e: unknown) {
-      if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
-        return;
-      }
-      throw e;
-    }
-  }
-
   private async findManyTopics(
     where?: { slug?: string },
     take?: number,

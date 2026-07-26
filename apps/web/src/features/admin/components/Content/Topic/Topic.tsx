@@ -3,7 +3,7 @@ import { getLocalizedName } from "@sd/core-i18n";
 import { List } from "@/shared/components/List";
 import { Button } from "@/shared/components/Button";
 import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Languages } from "lucide-react";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "../Content.module.css";
@@ -12,9 +12,10 @@ interface TopicProps {
   topic: TopicDetailDto;
   onEdit: (topic: TopicDetailDto) => void;
   onDelete: (slug: string, name: string) => void;
+  onTranslate?: (topic: TopicDetailDto) => void;
 }
 
-export function Topic({ topic, onEdit, onDelete }: TopicProps) {
+export function Topic({ topic, onEdit, onDelete, onTranslate }: TopicProps) {
   const { isMobile } = useResponsive();
   const { i18n, t } = useTranslation();
   const displayName = getLocalizedName(topic.name, i18n.language);
@@ -36,6 +37,18 @@ export function Topic({ topic, onEdit, onDelete }: TopicProps) {
             aria-label={`Edit topic ${displayName}`}
           >
             {isMobile && t("common.edit", "Edit")}
+          </Button>
+        </PermissionGate>
+        <PermissionGate requires="TRANSLATIONS_VIEW">
+          <Button
+            variant={isMobile ? "outline" : "ghost"}
+            size={isMobile ? "sm" : "icon"}
+            fullWidth={isMobile}
+            icon={<Languages size={16} />}
+            onClick={() => onTranslate?.(topic)}
+            aria-label={`Translate ${displayName}`}
+          >
+            {isMobile && t("admin.translations.button", "Translations")}
           </Button>
         </PermissionGate>
         <PermissionGate requires="TOPICS_DELETE">

@@ -760,6 +760,29 @@
     "modal": {
       "generalTab": "عام",
       "reviewTab": "مراجعة"
+    },
+    "translations": {
+      "title": "الترجمات",
+      "button": "الترجمات",
+      "fields": {
+        "title": "العنوان",
+        "description": "الوصف",
+        "name": "الاسم",
+        "bio": "نبذة"
+      },
+      "status": {
+        "saved": "محفوظ",
+        "notCreated": "لم يُنشأ",
+        "published": "منشور",
+        "draft": "مسودة"
+      },
+      "publish": "نشر",
+      "unpublish": "إلغاء النشر",
+      "saveBeforePublish": "احفظ قبل النشر",
+      "requiredFieldMissing": "حقل مطلوب فارغ في لغة تحتوي على تغييرات أخرى.",
+      "emptySource": "لا توجد قيمة في اللغة الرئيسية",
+      "childrenTab": "العناصر الفرعية",
+      "childrenEmpty": "لا توجد عناصر فرعية بعد"
     }
   }
 }

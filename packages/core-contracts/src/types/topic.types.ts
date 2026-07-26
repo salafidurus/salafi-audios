@@ -73,14 +73,6 @@ export const CreateTopicWithTranslationsDtoSchema = z.object({
     en: z.string().min(1, "English name is required"),
   }),
   orderIndex: z.number().optional(),
-  translations: z
-    .array(
-      z.object({
-        locale: LocaleSchema,
-        name: z.string(),
-      }),
-    )
-    .optional(),
 });
 export type CreateTopicWithTranslationsDto = z.infer<typeof CreateTopicWithTranslationsDtoSchema>;
 
@@ -89,11 +81,5 @@ export const UpdateTopicWithTranslationsDtoSchema = z.object({
     en: z.string().min(1, "English name is required"),
   }),
   orderIndex: z.number().optional(),
-  translations: z.array(
-    z.object({
-      locale: LocaleSchema,
-      name: z.string(),
-    }),
-  ),
 });
 export type UpdateTopicWithTranslationsDto = z.infer<typeof UpdateTopicWithTranslationsDtoSchema>;

@@ -2,7 +2,7 @@ import type { AdminListingListItemDto } from "@sd/core-contracts";
 import { List } from "@/shared/components/List";
 import { Button } from "@/shared/components/Button";
 import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
-import { Pencil, Upload } from "lucide-react";
+import { Pencil, Upload, Languages } from "lucide-react";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
@@ -12,9 +12,10 @@ interface ListingProps {
   listing: AdminListingListItemDto;
   onEdit: (id: string) => void;
   onUpload?: (id: string) => void;
+  onTranslate?: (id: string) => void;
 }
 
-export function Listing({ listing, onEdit, onUpload }: ListingProps) {
+export function Listing({ listing, onEdit, onUpload, onTranslate }: ListingProps) {
   const { isMobile } = useResponsive();
   const { t } = useTranslation();
   const formattedScholarName = useFormattedScholarName(listing.scholarName);
@@ -40,6 +41,18 @@ export function Listing({ listing, onEdit, onUpload }: ListingProps) {
             aria-label={`Edit ${listing.title}`}
           >
             {isMobile && t("common.edit", "Edit")}
+          </Button>
+        </PermissionGate>
+        <PermissionGate requires="TRANSLATIONS_VIEW">
+          <Button
+            variant={isMobile ? "outline" : "ghost"}
+            size={isMobile ? "sm" : "icon"}
+            fullWidth={isMobile}
+            icon={<Languages size={16} />}
+            onClick={() => onTranslate?.(listing.id)}
+            aria-label={`Translate ${listing.title}`}
+          >
+            {isMobile && t("admin.translations.button", "Translations")}
           </Button>
         </PermissionGate>
         <PermissionGate requires="MEDIA_UPLOAD">

@@ -1,6 +1,6 @@
 "use client";
 
-import { X, Send, Film, ExternalLink, Pencil } from "lucide-react";
+import { X, Send, Film, ExternalLink, Pencil, Languages } from "lucide-react";
 import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
 import { Button } from "@/shared/components/Button";
 import { List } from "@/shared/components/List";
@@ -14,6 +14,7 @@ import styles from "./scholar-item.module.css";
 export interface ScholarItemProps {
   scholar: AdminScholarListItemDto;
   onEdit: () => void;
+  onTranslate?: () => void;
 }
 
 function ScholarDetails({
@@ -137,7 +138,7 @@ function ScholarMeta({ scholar }: { scholar: AdminScholarListItemDto }) {
   );
 }
 
-export function ScholarItem({ scholar, onEdit }: ScholarItemProps) {
+export function ScholarItem({ scholar, onEdit, onTranslate }: ScholarItemProps) {
   const { isMobile } = useResponsive();
   const { t } = useTranslation();
 
@@ -158,6 +159,18 @@ export function ScholarItem({ scholar, onEdit }: ScholarItemProps) {
             aria-label={`Edit ${scholar.name}`}
           >
             {isMobile && t("common.edit", "Edit")}
+          </Button>
+        </PermissionGate>
+        <PermissionGate requires="TRANSLATIONS_VIEW">
+          <Button
+            variant={isMobile ? "outline" : "ghost"}
+            size={isMobile ? "sm" : "icon"}
+            fullWidth={isMobile}
+            onClick={onTranslate}
+            icon={<Languages size={16} />}
+            aria-label={`Translate ${scholar.name}`}
+          >
+            {isMobile && t("admin.translations.button", "Translations")}
           </Button>
         </PermissionGate>
       </List.Item.Actions>

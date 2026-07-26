@@ -6,7 +6,6 @@ import { Modal } from "@/shared/components/Modal";
 import { ListingGeneralSection } from "./ListingGeneralSection";
 import { ListingTranslatableFields } from "./ListingTranslatableFields";
 import { ListingReviewSection } from "./ListingReviewSection";
-import { useTranslation } from "@/core/i18n/use-translation";
 import type { FormAction, FormState } from "@/features/admin/hooks/Content/useListingForm";
 import styles from "./listing-modal.module.css";
 
@@ -21,7 +20,6 @@ interface ListingModalTabContentProps {
   handleTopicToggle: (topicId: string) => void;
   handleTitleChange?: (val: string) => void;
   mainLocale: Locale;
-  otherLocale: Locale;
   isEditing?: boolean;
   onImageStaged?: (file: File | null, preview: string | null) => void;
   stagedImagePreview?: string | null;
@@ -38,12 +36,10 @@ export function ListingModalTabContent({
   handleTopicToggle,
   handleTitleChange,
   mainLocale,
-  otherLocale,
   isEditing = false,
   onImageStaged,
   stagedImagePreview,
 }: ListingModalTabContentProps) {
-  const { t } = useTranslation();
   const { formError } = state;
 
   return (
@@ -72,22 +68,6 @@ export function ListingModalTabContent({
         <ListingTranslatableFields
           state={state}
           dispatch={dispatch}
-          locale={mainLocale}
-          handleTitleChange={
-            handleTitleChange ||
-            ((v) => dispatch({ type: "UPDATE_FIELD", field: "title", value: v }))
-          }
-        />
-      </Modal.ContentItem>
-
-      <Modal.ContentItem id="other">
-        {(errorTabSet.has("other") || activeTab === "other") && formError && (
-          <div className={styles.errorBanner}>{formError}</div>
-        )}
-        <ListingTranslatableFields
-          state={state}
-          dispatch={dispatch}
-          locale={otherLocale}
           handleTitleChange={
             handleTitleChange ||
             ((v) => dispatch({ type: "UPDATE_FIELD", field: "title", value: v }))
@@ -97,12 +77,7 @@ export function ListingModalTabContent({
 
       <Modal.ContentItem id="review">
         {formError && <div className={styles.errorBanner}>{formError}</div>}
-        <ListingReviewSection
-          state={state}
-          mainLocale={mainLocale}
-          otherLocale={otherLocale}
-          topics={topics}
-        />
+        <ListingReviewSection state={state} mainLocale={mainLocale} topics={topics} />
       </Modal.ContentItem>
     </Modal.Content>
   );

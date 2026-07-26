@@ -202,15 +202,6 @@ export const CreateListingDtoSchema = z.object({
   sizeBytes: z.number().optional(),
   coverImageUrl: z.string().optional(),
   coverImageKey: z.string().optional(),
-  translations: z
-    .array(
-      z.object({
-        locale: LocaleSchema,
-        title: z.string(),
-        description: z.string().nullable().optional(),
-      }),
-    )
-    .optional(),
 });
 export type CreateListingDto = z.infer<typeof CreateListingDtoSchema>;
 
@@ -294,15 +285,6 @@ export const UpdateListingDetailsDtoSchema = z.object({
   topics: z.array(z.string()).optional(),
   coverImageUrl: z.string().optional(),
   coverImageKey: z.string().optional(),
-  translations: z
-    .array(
-      z.object({
-        locale: LocaleSchema,
-        title: z.string().optional(),
-        description: z.string().nullable().optional(),
-      }),
-    )
-    .optional(),
 });
 
 export type UpdateListingDetailsDto = z.infer<typeof UpdateListingDetailsDtoSchema>;

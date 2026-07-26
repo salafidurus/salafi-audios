@@ -30,8 +30,6 @@ export type FormState = {
   coverImageUrl: string;
 
   // Form state
-  translationChanges: Partial<Record<Locale, { title?: string; description?: string }>>;
-  initialTranslationChanges: Partial<Record<Locale, { title?: string; description?: string }>>;
   // Snapshot of the mutable fields as fetched, for diffing in the review tab. Null in create mode.
   initialSnapshot: ListingChangeSnapshot | null;
   saving: boolean;
@@ -54,7 +52,6 @@ type UpdateFieldAction = {
 
 export type FormAction =
   | UpdateFieldAction
-  | { type: "UPDATE_TRANSLATION"; locale: Locale; field: "title" | "description"; value: string }
   | { type: "INIT_FORM"; data: ListingFormDataDto }
   | { type: "SET_SAVING"; saving: boolean }
   | { type: "SET_ERROR"; error: string | null }
@@ -74,8 +71,6 @@ function getInitialFormState(): FormState {
     selectedTopics: [],
     language: "ar",
     coverImageUrl: "",
-    translationChanges: {},
-    initialTranslationChanges: {},
     initialSnapshot: null,
     saving: false,
     formError: null,
@@ -86,16 +81,7 @@ function getInitialFormState(): FormState {
 }
 
 function buildEditFormState(data: ListingFormDataDto): FormState {
-  const { listing, translations } = data;
-  const translationChanges: Partial<Record<Locale, { title?: string; description?: string }>> = {};
-  for (const trans of translations) {
-    if (trans.locale !== listing.language) {
-      translationChanges[trans.locale] = {
-        title: trans.fields?.title ?? undefined,
-        description: trans.fields?.description ?? undefined,
-      };
-    }
-  }
+  const { listing } = data;
 
   const title = listing.title || "";
   const description = listing.description || "";
@@ -118,8 +104,6 @@ function buildEditFormState(data: ListingFormDataDto): FormState {
     selectedTopics,
     language,
     coverImageUrl,
-    translationChanges,
-    initialTranslationChanges: translationChanges,
     initialSnapshot: {
       title,
       description,
@@ -146,18 +130,6 @@ function formReducer(state: FormState, action: FormAction): FormState {
       }
       return { ...state, [action.field]: action.value };
     }
-
-    case "UPDATE_TRANSLATION":
-      return {
-        ...state,
-        translationChanges: {
-          ...state.translationChanges,
-          [action.locale]: {
-            ...state.translationChanges[action.locale],
-            [action.field]: action.value,
-          },
-        },
-      };
 
     case "INIT_FORM":
       return buildEditFormState(action.data);

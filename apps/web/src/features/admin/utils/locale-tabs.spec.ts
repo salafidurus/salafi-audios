@@ -1,5 +1,5 @@
 import { describe, it, expect } from "bun:test";
-import { getSecondaryLocales, buildTranslationsPayload, getLocaleLabel } from "./locale-tabs";
+import { getSecondaryLocales, getLocaleLabel } from "./locale-tabs";
 
 describe("getSecondaryLocales", () => {
   it("returns locales excluding the main locale", () => {
@@ -23,76 +23,6 @@ describe("getSecondaryLocales", () => {
     const result = getSecondaryLocales("en");
     // With current SUPPORTED_LOCALES = ["en", "ar"], result should have 1 element
     expect(result.length).toBeGreaterThan(0);
-  });
-});
-
-describe("buildTranslationsPayload", () => {
-  it("returns undefined when no translations have content", () => {
-    const result = buildTranslationsPayload(
-      { en: { name: "" }, ar: undefined },
-      ["en", "ar"],
-      (v) => !!v?.name,
-    );
-    expect(result).toBeUndefined();
-  });
-
-  it("returns array with entries for locales that have content", () => {
-    const result = buildTranslationsPayload(
-      { en: { name: "English Name" }, ar: { name: "Arabic Name" } },
-      ["en", "ar"],
-      (v) => !!v?.name,
-    );
-    expect(result).toHaveLength(2);
-    expect(result![0]).toEqual({ locale: "en", name: "English Name" });
-    expect(result![1]).toEqual({ locale: "ar", name: "Arabic Name" });
-  });
-
-  it("filters out locales without content using predicate", () => {
-    const result = buildTranslationsPayload(
-      { en: { name: "English", bio: "Bio" }, ar: { name: "" } },
-      ["en", "ar"],
-      (v) => !!v?.name,
-    );
-    expect(result).toHaveLength(1);
-    expect(result?.[0]?.locale).toBe("en");
-  });
-
-  it("works with complex object types", () => {
-    type ListingTranslation = { title: string; description?: string };
-    const result = buildTranslationsPayload<ListingTranslation>(
-      {
-        en: { title: "Lecture", description: "A lecture" },
-        ar: { title: "محاضرة", description: undefined },
-      },
-      ["en", "ar"],
-      (v) => !!(v?.title || v?.description),
-    );
-    expect(result).toHaveLength(2);
-    expect(result?.[0]?.title).toBe("Lecture");
-    expect(result?.[1]?.title).toBe("محاضرة");
-  });
-
-  it("returns undefined when input array is empty", () => {
-    const result = buildTranslationsPayload({ en: { name: "Test" } }, [], (v) => !!v?.name);
-    expect(result).toBeUndefined();
-  });
-
-  it("preserves all fields from the translation object", () => {
-    type FullTranslation = { name: string; bio?: string; status?: string };
-    const result = buildTranslationsPayload<FullTranslation>(
-      {
-        en: { name: "Test", bio: "Bio", status: "published" },
-      },
-      ["en"],
-      (v) => !!v?.name,
-    );
-    expect(result).toHaveLength(1);
-    expect(result![0]).toEqual({
-      locale: "en",
-      name: "Test",
-      bio: "Bio",
-      status: "published",
-    });
   });
 });
 
