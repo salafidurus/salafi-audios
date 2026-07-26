@@ -93,4 +93,12 @@ describe("UpdateTopicWithTranslationsDtoSchema", () => {
       }),
     ).toThrow();
   });
+
+  it("strips an injected slug — slug is immutable after creation and cannot be updated via this DTO", () => {
+    const result = UpdateTopicWithTranslationsDtoSchema.parse({
+      name: { en: "Aqeedah" },
+      slug: "hacked-slug",
+    });
+    expect(result).not.toHaveProperty("slug");
+  });
 });

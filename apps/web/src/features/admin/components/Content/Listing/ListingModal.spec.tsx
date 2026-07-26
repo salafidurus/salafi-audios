@@ -168,6 +168,10 @@ describe("ListingModal", () => {
       expect(screen.getByTestId("scholar-dropdown")).toHaveTextContent("Scholar Two");
     });
 
+    const slugInput = screen.getByLabelText(/slug/i);
+    expect(slugInput).toHaveValue("existing-title");
+    expect(slugInput).toBeDisabled();
+
     const mainTabButton = screen.getByRole("tab", { name: /العربية/i });
     fireEvent.click(mainTabButton);
 

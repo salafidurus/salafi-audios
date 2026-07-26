@@ -16,6 +16,7 @@ import { fetchScholarFormData } from "@/features/admin/api/admin.api";
 import { useScholarForm } from "../../hooks/Scholar/useScholarForm";
 import { useSaveScholar } from "../../hooks/Scholar/useSaveScholar";
 import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
+import { slugify } from "@/features/admin/utils/slugify";
 import styles from "./scholar-modal.module.css";
 
 export interface ScholarModalProps {
@@ -104,11 +105,7 @@ export function ScholarModal({ isOpen, onClose, onSuccess, scholarId }: ScholarM
   const handleNameChange = (value: string) => {
     dispatch({ type: "UPDATE_FIELD", field: "name", value });
     if (!state.isEditing && !state.slug) {
-      const generatedSlug = value
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, "")
-        .replace(/\s+/g, "-");
-      dispatch({ type: "UPDATE_FIELD", field: "slug", value: generatedSlug });
+      dispatch({ type: "UPDATE_FIELD", field: "slug", value: slugify(value) });
     }
   };
 

@@ -3,7 +3,18 @@ import {
   AdminScholarListItemDtoSchema,
   CreateScholarDtoSchema,
   ScholarFormDataDtoSchema,
+  UpdateScholarDtoSchema,
 } from "./scholar.types";
+
+describe("UpdateScholarDtoSchema", () => {
+  it("strips an injected slug — slug is immutable after creation and cannot be updated via this DTO", () => {
+    const result = UpdateScholarDtoSchema.parse({
+      name: "Updated Name",
+      slug: "hacked-slug",
+    });
+    expect(result).not.toHaveProperty("slug");
+  });
+});
 
 describe("AdminScholarTranslationSchema (via AdminScholarListItemDtoSchema)", () => {
   it("parses valid scholar list item with translation locale", () => {

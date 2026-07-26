@@ -1,5 +1,7 @@
 import type { AdminArrangeLessonDto } from "@sd/core-contracts";
 
+export { slugify, deriveChildSlug } from "./slugify";
+
 export interface ParsedUploadFilename {
   title: string;
   numericPrefix: number | null;
@@ -21,18 +23,6 @@ export function parseUploadFilename(name: string): ParsedUploadFilename {
     return { title: title.trim(), numericPrefix: null, ext: ext.toLowerCase() };
   }
   return { title: name.trim(), numericPrefix: null, ext: "" };
-}
-
-export function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
-export function deriveChildSlug(parentSlug: string, title: string): string {
-  const fragment = slugify(title);
-  return fragment ? `${parentSlug}-${fragment}` : parentSlug;
 }
 
 export function findSlugMatch(

@@ -5,6 +5,7 @@ import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button";
 import { InputField } from "@/shared/components/InputField";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { slugify } from "@/features/admin/utils/slugify";
 import {
   fetchAdminTopic,
   createTopicWithTranslations,
@@ -82,11 +83,7 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
   const handleNameEnChange = (value: string) => {
     setNameEn(value);
     if (!isEditing) {
-      const generatedSlug = value
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, "")
-        .replace(/\s+/g, "-");
-      setSlug(generatedSlug);
+      setSlug(slugify(value));
     }
   };
 
