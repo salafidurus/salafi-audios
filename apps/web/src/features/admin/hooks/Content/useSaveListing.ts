@@ -60,6 +60,9 @@ export function useSaveListing(
     if (!(state.title ?? "").trim() || !state.slug?.trim()) {
       errTabs.push("main");
     }
+    if (!state.isEditing && state.scholarId && !state.slugSuffix?.trim()) {
+      errTabs.push("general");
+    }
 
     if (errTabs.length > 0) {
       setErrorTabs(errTabs);

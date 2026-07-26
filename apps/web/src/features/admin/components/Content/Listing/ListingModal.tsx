@@ -10,7 +10,6 @@ import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { Modal } from "@/shared/components/Modal";
 import { sanitizeError } from "@sd/utils-error";
 import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
-import { slugify } from "@/features/admin/utils/slugify";
 import { fetchListingFormData } from "@/features/admin/api/admin-lectures.api";
 import { useListingForm } from "@/features/admin/hooks/Content/useListingForm";
 import { useSaveListing } from "@/features/admin/hooks/Content/useSaveListing";
@@ -91,9 +90,6 @@ export function ListingModal({
 
   const handleTitleChange = (val: string) => {
     dispatch({ type: "UPDATE_FIELD", field: "title", value: val });
-    if (!state.isEditing) {
-      dispatch({ type: "UPDATE_FIELD", field: "slug", value: slugify(val) });
-    }
   };
 
   const handleTopicToggle = (topicId: string) => {

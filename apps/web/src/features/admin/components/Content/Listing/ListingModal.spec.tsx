@@ -89,6 +89,9 @@ describe("ListingModal", () => {
     const scholarOption = await screen.findByRole("option", { name: /scholar one/i });
     fireEvent.click(scholarOption);
 
+    const slugSuffixInput = screen.getByLabelText(/slug/i);
+    fireEvent.change(slugSuffixInput, { target: { value: "My Great Lecture" } });
+
     const topicChip = screen.getByText("Topic One");
     fireEvent.click(topicChip);
 
@@ -108,7 +111,7 @@ describe("ListingModal", () => {
       expect(createLecture).toHaveBeenCalledWith(
         expect.objectContaining({
           title: "My Great Lecture",
-          slug: "my-great-lecture",
+          slug: "scholar-one-my-great-lecture",
           scholarId: "scholar-1",
           format: "single",
           audioKey: "audio/new-key.mp3",
@@ -121,6 +124,69 @@ describe("ListingModal", () => {
 
     expect(onSuccessMock).toHaveBeenCalledTimes(1);
     expect(onCloseMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("locks the slug input until a scholar is selected, then prefixes it with the scholar's slug", async () => {
+    render(<ListingModal isOpen onClose={vi.fn()} onSuccess={vi.fn()} />);
+
+    const slugSuffixInput = screen.getByLabelText(/slug/i);
+    expect(slugSuffixInput).toBeDisabled();
+    expect(screen.queryByText("scholar-one-")).not.toBeInTheDocument();
+
+    const scholarTrigger = screen.getByTestId("scholar-dropdown");
+    fireEvent.click(scholarTrigger);
+    const scholarOption = await screen.findByRole("option", { name: /scholar one/i });
+    fireEvent.click(scholarOption);
+
+    expect(slugSuffixInput).not.toBeDisabled();
+    expect(screen.getByText("scholar-one-")).toBeInTheDocument();
+
+    fireEvent.change(slugSuffixInput, { target: { value: "bayquniyyah" } });
+    expect(slugSuffixInput).toHaveValue("bayquniyyah");
+  });
+
+  it("preserves the typed suffix and re-derives the prefix when the scholar selection changes", async () => {
+    render(<ListingModal isOpen onClose={vi.fn()} onSuccess={vi.fn()} />);
+
+    const scholarTrigger = screen.getByTestId("scholar-dropdown");
+    fireEvent.click(scholarTrigger);
+    fireEvent.click(await screen.findByRole("option", { name: /scholar one/i }));
+
+    const slugSuffixInput = screen.getByLabelText(/slug/i);
+    fireEvent.change(slugSuffixInput, { target: { value: "bayquniyyah" } });
+
+    fireEvent.click(scholarTrigger);
+    fireEvent.click(await screen.findByRole("option", { name: /scholar two/i }));
+
+    expect(screen.getByText("scholar-two-")).toBeInTheDocument();
+    expect(slugSuffixInput).toHaveValue("bayquniyyah");
+  });
+
+  it("blocks submit when a scholar is selected but no slug suffix has been typed", async () => {
+    render(<ListingModal isOpen onClose={vi.fn()} onSuccess={vi.fn()} />);
+
+    const scholarTrigger = screen.getByTestId("scholar-dropdown");
+    fireEvent.click(scholarTrigger);
+    fireEvent.click(await screen.findByRole("option", { name: /scholar one/i }));
+
+    expect(screen.getByText(/enter a slug beyond the scholar prefix/i)).toBeInTheDocument();
+
+    const topicChip = screen.getByText("Topic One");
+    fireEvent.click(topicChip);
+
+    const mainTabButton = screen.getByRole("tab", { name: /العربية/i });
+    fireEvent.click(mainTabButton);
+    const titleInput = await screen.findByLabelText(/^Title/i);
+    fireEvent.change(titleInput, { target: { value: "Some Title" } });
+
+    const reviewButton = screen.getByRole("button", { name: /review/i });
+    fireEvent.click(reviewButton);
+    const saveButton = await screen.findByRole("button", { name: /save/i });
+    fireEvent.click(saveButton);
+
+    await waitFor(() => {
+      expect(createLecture).not.toHaveBeenCalled();
+    });
   });
 
   it("renders with edit form fields prefilled and updates details", async () => {
