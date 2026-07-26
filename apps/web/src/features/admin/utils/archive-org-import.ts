@@ -8,7 +8,8 @@ export function parseArchiveOrgIdentifier(input: string): string | null {
 
   try {
     const url = new URL(trimmed);
-    if (!url.hostname.endsWith("archive.org")) return null;
+    const host = url.hostname.toLowerCase();
+    if (host !== "archive.org" && !host.endsWith(".archive.org")) return null;
 
     const segments = url.pathname.split("/").filter(Boolean);
     const kind = segments[0];

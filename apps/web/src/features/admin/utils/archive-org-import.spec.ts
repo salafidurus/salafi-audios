@@ -35,6 +35,18 @@ describe("parseArchiveOrgIdentifier", () => {
     expect(parseArchiveOrgIdentifier("https://miraath.net/some-file.wav")).toBeNull();
   });
 
+  it("rejects a different domain that merely ends with the string 'archive.org'", () => {
+    expect(parseArchiveOrgIdentifier("https://evilarchive.org/details/malicious")).toBeNull();
+    expect(parseArchiveOrgIdentifier("https://my-archive.org.evil.com/details/x")).toBeNull();
+    expect(parseArchiveOrgIdentifier("https://notarchive.org/details/x")).toBeNull();
+  });
+
+  it("accepts a genuine archive.org subdomain", () => {
+    expect(
+      parseArchiveOrgIdentifier("https://ia601909.us.archive.org/details/ArafatTranslation"),
+    ).toBe("ArafatTranslation");
+  });
+
   it("returns null for an unrelated plain string containing spaces", () => {
     expect(parseArchiveOrgIdentifier("not an identifier at all")).toBeNull();
   });
