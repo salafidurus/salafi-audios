@@ -1,12 +1,12 @@
 .listItem {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   width: 100%;
 }
 
 .container {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--space-component-gap-md);
   flex: 1;
   min-width: 0;
