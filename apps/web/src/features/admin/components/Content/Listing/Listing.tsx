@@ -30,7 +30,13 @@ export function Listing({ listing, onEdit, onUpload, onTranslate }: ListingProps
       <div className={styles.rowContainer}>
         <div className={styles.mediaCover}>
           {coverImage ? (
-            <Image src={coverImage} alt="" width={48} height={48} className={styles.coverImage} />
+            <Image
+              src={coverImage}
+              alt=""
+              fill
+              sizes="(max-width: 640px) 20vw, 14vw"
+              className={styles.coverImage}
+            />
           ) : (
             <div className={styles.mediaFallback}>
               <Headphones size={20} style={{ color: "var(--content-subtle)" }} />

@@ -35,7 +35,7 @@ export function ScholarItem({ scholar, onEdit, onTranslate }: ScholarItemProps) 
     <List.Item interactive className={styles.listItem}>
       <div className={styles.container}>
         <div className={styles.avatarBlock}>
-          <UserAvatar image={scholar.imageUrl ?? null} name={scholar.name} size={48} />
+          <UserAvatar image={scholar.imageUrl ?? null} name={scholar.name} fill />
         </div>
         <div className={styles.detailsBody}>
           <MarqueeText

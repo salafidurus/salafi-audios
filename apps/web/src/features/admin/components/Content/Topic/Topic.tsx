@@ -23,22 +23,15 @@ export function Topic({ topic, onEdit, onDelete, onTranslate }: TopicProps) {
 
   return (
     <List.Item interactive>
-      <div className={styles.rowContainer}>
-        <div className={styles.mediaCover}>
-          <div className={styles.mediaFallback}>
-            <Folder size={20} style={{ color: "var(--content-subtle)" }} />
-          </div>
-        </div>
-        <div className={styles.topicInfo}>
-          <MarqueeText
-            text={displayName}
-            className="text-[var(--content-strong)] font-semibold [font-size:var(--typo-title-md-font-size)]"
-          />
-          <MarqueeText
-            text={topic.slug}
-            className="text-[var(--content-muted)] [font-size:var(--typo-body-sm-font-size)]"
-          />
-        </div>
+      <div className={styles.topicInfo}>
+        <MarqueeText
+          text={displayName}
+          className="text-[var(--content-strong)] font-semibold [font-size:var(--typo-title-md-font-size)]"
+        />
+        <MarqueeText
+          text={topic.slug}
+          className="text-[var(--content-muted)] [font-size:var(--typo-body-sm-font-size)]"
+        />
       </div>
       <List.Item.Actions>
         <PermissionGate requires="TOPICS_EDIT">

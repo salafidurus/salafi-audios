@@ -13,15 +13,19 @@
 }
 
 .avatarSection {
+  position: relative;
+  width: 20%;
   flex-shrink: 0;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--radius-component-panel-sm);
+  background: var(--surface-subtle);
 }
 
-.avatarContainer {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-component-panel-sm);
-  overflow: hidden;
-  position: relative;
+@media (min-width: 640px) {
+  .avatarSection {
+    width: 14%;
+  }
 }
 
 .avatarImage {
@@ -29,8 +33,8 @@
 }
 
 .avatarFallback {
-  width: 48px;
-  height: 48px;
+  width: 100%;
+  height: 100%;
   border-radius: var(--radius-component-panel-sm);
   background-color: var(--surface-primary-subtle);
   color: var(--content-primary-strong);

@@ -92,15 +92,13 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
       <div className={styles.container}>
         <div className={styles.avatarSection}>
           {item.thumbnailUrl ? (
-            <div className={styles.avatarContainer}>
-              <Image
-                src={item.thumbnailUrl}
-                alt={scholarName}
-                width={48}
-                height={48}
-                className={styles.avatarImage}
-              />
-            </div>
+            <Image
+              src={item.thumbnailUrl}
+              alt={scholarName}
+              fill
+              sizes="(max-width: 640px) 20vw, 14vw"
+              className={styles.avatarImage}
+            />
           ) : (
             <div className={styles.avatarFallback} aria-hidden="true">
               {initial}

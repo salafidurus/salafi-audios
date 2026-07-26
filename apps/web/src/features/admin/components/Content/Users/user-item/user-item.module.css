@@ -6,6 +6,22 @@
   min-width: 0;
 }
 
+.avatarBlock {
+  position: relative;
+  width: 20%;
+  flex-shrink: 0;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--radius-component-panel-sm);
+  background: var(--surface-subtle);
+}
+
+@media (min-width: 640px) {
+  .avatarBlock {
+    width: 14%;
+  }
+}
+
 .contentBody {
   display: flex;
   flex-direction: column;

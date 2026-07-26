@@ -24,7 +24,9 @@ export function UserItem({ user, onManagePermissions, onManageRoles }: UserItemP
   return (
     <List.Item interactive>
       <div className={styles.rowContainer}>
-        <UserAvatar image={user.image} name={user.name} size={48} />
+        <div className={styles.avatarBlock}>
+          <UserAvatar image={user.image} name={user.name} fill />
+        </div>
         <div className={styles.contentBody}>
           <MetaDetails user={user} />
           <PermissionDetails permissions={user.permissions.map((p) => ({ permission: p }))} />
