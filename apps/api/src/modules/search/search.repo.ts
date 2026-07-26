@@ -10,7 +10,11 @@ import { getRequestLocale } from '../../shared/i18n/locale-context';
 
 const SIMILARITY_THRESHOLD = 0.12;
 
-type SearchRow = SearchCatalogItemDto & { originalLanguage: Locale | null };
+type SearchRow = SearchCatalogItemDto & {
+  originalLanguage: Locale | null;
+  scholarId: string;
+  scholarOriginalLanguage: Locale | null;
+};
 
 @Injectable()
 export class SearchRepository {
@@ -32,10 +36,10 @@ export class SearchRepository {
   }> {
     const locale = getRequestLocale();
     const topicSlugs = this.resolveTopicSlugs(query);
-    const matchSql = this.matchSql(query.q ?? '', includeRelated);
-    const fallbackMatchSql = this.fallbackMatchSql(query.q ?? '', includeRelated);
-    const orderBySql = this.orderBySql(query.q ?? '', includeRelated);
-    const fallbackOrderBySql = this.fallbackOrderBySql(query.q ?? '', includeRelated);
+    const matchSql = this.matchSql(query.q ?? '', includeRelated, locale);
+    const fallbackMatchSql = this.fallbackMatchSql(query.q ?? '', includeRelated, locale);
+    const orderBySql = this.orderBySql(query.q ?? '', includeRelated, locale);
+    const fallbackOrderBySql = this.fallbackOrderBySql(query.q ?? '', includeRelated, locale);
     const topicFilterSql = this.topicFilterSql(topicSlugs);
 
     // Fetch all results (collections, series, singles) in one query using window function partitioning
@@ -48,8 +52,10 @@ export class SearchRepository {
             lst."slug",
             lst."title",
             lst."format",
+            s."id" AS "scholarId",
             s."name" AS "scholarName",
             s."slug" AS "scholarSlug",
+            s."mainLanguage" AS "scholarOriginalLanguage",
             CASE WHEN lst."format" = 'single' THEN NULL ELSE lst."coverImageUrl" END AS "coverImageUrl",
             s."imageUrl" AS "scholarImageUrl",
             CASE WHEN lst."format" = 'single' THEN 1 ELSE COALESCE(lst."publishedLectureCount", 0) END AS "lectureCount",
@@ -61,6 +67,10 @@ export class SearchRepository {
             ) AS rn
           FROM "Listing" lst
           JOIN "Scholar" s ON s."id" = lst."scholarId"
+          LEFT JOIN "ListingTranslation" lt_tr
+            ON lt_tr."listingId" = lst."id" AND lt_tr."locale" = ${locale} AND lt_tr."status" = 'published'
+          LEFT JOIN "ScholarTranslation" s_tr
+            ON s_tr."scholarId" = s."id" AND s_tr."locale" = ${locale} AND s_tr."status" = 'published'
           WHERE lst."status" = ${Status.published}
             AND lst."deletedAt" IS NULL
             AND lst."parentId" IS NULL
@@ -75,8 +85,10 @@ export class SearchRepository {
           "slug",
           "title",
           "format",
+          "scholarId",
           "scholarName",
           "scholarSlug",
+          "scholarOriginalLanguage",
           "coverImageUrl",
           "scholarImageUrl",
           "lectureCount",
@@ -92,8 +104,10 @@ export class SearchRepository {
             lst."slug",
             lst."title",
             lst."format",
+            s."id" AS "scholarId",
             s."name" AS "scholarName",
             s."slug" AS "scholarSlug",
+            s."mainLanguage" AS "scholarOriginalLanguage",
             CASE WHEN lst."format" = 'single' THEN NULL ELSE lst."coverImageUrl" END AS "coverImageUrl",
             s."imageUrl" AS "scholarImageUrl",
             CASE WHEN lst."format" = 'single' THEN 1 ELSE COALESCE(lst."publishedLectureCount", 0) END AS "lectureCount",
@@ -105,6 +119,10 @@ export class SearchRepository {
             ) AS rn
           FROM "Listing" lst
           JOIN "Scholar" s ON s."id" = lst."scholarId"
+          LEFT JOIN "ListingTranslation" lt_tr
+            ON lt_tr."listingId" = lst."id" AND lt_tr."locale" = ${locale} AND lt_tr."status" = 'published'
+          LEFT JOIN "ScholarTranslation" s_tr
+            ON s_tr."scholarId" = s."id" AND s_tr."locale" = ${locale} AND s_tr."status" = 'published'
           WHERE lst."status" = ${Status.published}
             AND lst."deletedAt" IS NULL
             AND lst."parentId" IS NULL
@@ -119,8 +137,10 @@ export class SearchRepository {
           "slug",
           "title",
           "format",
+          "scholarId",
           "scholarName",
           "scholarSlug",
+          "scholarOriginalLanguage",
           "coverImageUrl",
           "scholarImageUrl",
           "lectureCount",
@@ -132,7 +152,11 @@ export class SearchRepository {
 
     // Batch fetch all translations at once (no per-format loop)
     const ids = rows.map((row) => row.id);
-    const translations = await this.fetchTitleTranslations(ids, locale);
+    const scholarIds = [...new Set(rows.map((row) => row.scholarId))];
+    const [translations, scholarNameTranslations] = await Promise.all([
+      this.fetchTitleTranslations(ids, locale),
+      this.fetchScholarNameTranslations(scholarIds, locale),
+    ]);
 
     // Partition results by format and resolve translations
     const collections: SearchCatalogItemDto[] = [];
@@ -140,16 +164,23 @@ export class SearchRepository {
     const singles: SearchCatalogItemDto[] = [];
 
     for (const row of rows) {
-      const { format, originalLanguage, ...item } = row;
+      const { format, originalLanguage, scholarId, scholarOriginalLanguage, ...item } = row;
       const resolved = resolveContentTranslation({
         base: { title: item.title },
         originalLanguage,
         targetLocale: locale,
         publishedTranslation: translations.get(row.id) ?? null,
       });
+      const resolvedScholarName = resolveContentTranslation({
+        base: { name: item.scholarName },
+        originalLanguage: scholarOriginalLanguage,
+        targetLocale: locale,
+        publishedTranslation: scholarNameTranslations.get(scholarId) ?? null,
+      }).fields.name;
       const normalized = this.normalizeSearchItem({
         ...item,
         title: resolved.fields.title,
+        scholarName: resolvedScholarName,
         originalLanguage: resolved.originalLanguage,
         original: resolved.original ? { title: resolved.original.title } : undefined,
       });
@@ -195,32 +226,41 @@ export class SearchRepository {
     return [];
   }
 
-  private matchSql(query: string, includeRelated: boolean): Prisma.Sql {
+  private matchSql(query: string, includeRelated: boolean, locale: Locale): Prisma.Sql {
     const queryText = Prisma.sql`CAST(${query} AS TEXT)`;
     const clauses: Prisma.Sql[] = [
       Prisma.sql`lst."title" % ${queryText}`,
       Prisma.sql`similarity(lst."title", ${queryText}) > ${SIMILARITY_THRESHOLD}`,
+      Prisma.sql`COALESCE(lt_tr."title", '') % ${queryText}`,
+      Prisma.sql`similarity(COALESCE(lt_tr."title", ''), ${queryText}) > ${SIMILARITY_THRESHOLD}`,
       Prisma.sql`COALESCE(lst."description", '') % ${queryText}`,
       Prisma.sql`
         similarity(COALESCE(lst."description", ''), ${queryText}) > ${SIMILARITY_THRESHOLD}
       `,
+      Prisma.sql`COALESCE(lt_tr."description", '') % ${queryText}`,
+      Prisma.sql`similarity(COALESCE(lt_tr."description", ''), ${queryText}) > ${SIMILARITY_THRESHOLD}`,
     ];
 
     if (includeRelated) {
       clauses.push(
         Prisma.sql`s."name" % ${queryText}`,
         Prisma.sql`similarity(s."name", ${queryText}) > ${SIMILARITY_THRESHOLD}`,
+        Prisma.sql`COALESCE(s_tr."name", '') % ${queryText}`,
+        Prisma.sql`similarity(COALESCE(s_tr."name", ''), ${queryText}) > ${SIMILARITY_THRESHOLD}`,
         Prisma.sql`
           EXISTS (
             SELECT 1
             FROM "ListingTopic" lt
             JOIN "Topic" t ON t."id" = lt."topicId"
+            LEFT JOIN "TopicTranslation" t_tr ON t_tr."topicId" = t."id" AND t_tr."locale" = ${locale}
             WHERE lt."listingId" = lst."id"
               AND (
                 t."name" % ${queryText}
                 OR similarity(t."name", ${queryText}) > ${SIMILARITY_THRESHOLD}
                 OR t."slug" % ${queryText}
                 OR similarity(t."slug", ${queryText}) > ${SIMILARITY_THRESHOLD}
+                OR COALESCE(t_tr."name", '') % ${queryText}
+                OR similarity(COALESCE(t_tr."name", ''), ${queryText}) > ${SIMILARITY_THRESHOLD}
               )
           )
         `,
@@ -230,25 +270,30 @@ export class SearchRepository {
     return Prisma.sql`${Prisma.join(clauses, ' OR ')}`;
   }
 
-  private fallbackMatchSql(query: string, includeRelated: boolean): Prisma.Sql {
+  private fallbackMatchSql(query: string, includeRelated: boolean, locale: Locale): Prisma.Sql {
     const pattern = this.likeContainsPattern(query);
     const clauses: Prisma.Sql[] = [
       Prisma.sql`lst."title" ILIKE ${pattern} ESCAPE '\\'`,
+      Prisma.sql`COALESCE(lt_tr."title", '') ILIKE ${pattern} ESCAPE '\\'`,
       Prisma.sql`COALESCE(lst."description", '') ILIKE ${pattern} ESCAPE '\\'`,
+      Prisma.sql`COALESCE(lt_tr."description", '') ILIKE ${pattern} ESCAPE '\\'`,
     ];
 
     if (includeRelated) {
       clauses.push(
         Prisma.sql`s."name" ILIKE ${pattern} ESCAPE '\\'`,
+        Prisma.sql`COALESCE(s_tr."name", '') ILIKE ${pattern} ESCAPE '\\'`,
         Prisma.sql`
           EXISTS (
             SELECT 1
             FROM "ListingTopic" lt
             JOIN "Topic" t ON t."id" = lt."topicId"
+            LEFT JOIN "TopicTranslation" t_tr ON t_tr."topicId" = t."id" AND t_tr."locale" = ${locale}
             WHERE lt."listingId" = lst."id"
               AND (
                 t."name" ILIKE ${pattern} ESCAPE '\\'
                 OR t."slug" ILIKE ${pattern} ESCAPE '\\'
+                OR COALESCE(t_tr."name", '') ILIKE ${pattern} ESCAPE '\\'
               )
           )
         `,
@@ -278,8 +323,9 @@ export class SearchRepository {
     `;
   }
 
-  private fallbackOrderBySql(query: string, includeRelated: boolean): Prisma.Sql {
+  private fallbackOrderBySql(query: string, includeRelated: boolean, locale: Locale): Prisma.Sql {
     const clauses = this.fallbackRankingClauses(query, includeRelated);
+    void locale; // reserved for parity with matchSql's signature; ILIKE ranking has no locale-scoped subquery.
 
     clauses.push(
       Prisma.sql`CASE WHEN lst."format" != 'single' THEN lst."publishedLectureCount" END DESC NULLS LAST`,
@@ -290,15 +336,21 @@ export class SearchRepository {
     return Prisma.sql`${Prisma.join(clauses, ', ')}`;
   }
 
-  private orderBySql(query: string, includeRelated: boolean): Prisma.Sql {
+  private orderBySql(query: string, includeRelated: boolean, locale: Locale): Prisma.Sql {
     const queryText = Prisma.sql`CAST(${query} AS TEXT)`;
-    const clauses: Prisma.Sql[] = [Prisma.sql`similarity(lst."title", ${queryText}) DESC`];
+    const clauses: Prisma.Sql[] = [
+      Prisma.sql`GREATEST(similarity(lst."title", ${queryText}), similarity(COALESCE(lt_tr."title", ''), ${queryText})) DESC`,
+    ];
 
     if (includeRelated) {
-      clauses.push(Prisma.sql`similarity(s."name", ${queryText}) DESC`);
+      clauses.push(
+        Prisma.sql`GREATEST(similarity(s."name", ${queryText}), similarity(COALESCE(s_tr."name", ''), ${queryText})) DESC`,
+      );
     }
 
-    clauses.push(Prisma.sql`similarity(COALESCE(lst."description", ''), ${queryText}) DESC`);
+    clauses.push(
+      Prisma.sql`GREATEST(similarity(COALESCE(lst."description", ''), ${queryText}), similarity(COALESCE(lt_tr."description", ''), ${queryText})) DESC`,
+    );
 
     if (includeRelated) {
       clauses.push(
@@ -306,10 +358,12 @@ export class SearchRepository {
           COALESCE((
             SELECT MAX(GREATEST(
               similarity(t."name", ${queryText}),
-              similarity(t."slug", ${queryText})
+              similarity(t."slug", ${queryText}),
+              similarity(COALESCE(t_tr."name", ''), ${queryText})
             ))
             FROM "ListingTopic" lt
             JOIN "Topic" t ON t."id" = lt."topicId"
+            LEFT JOIN "TopicTranslation" t_tr ON t_tr."topicId" = t."id" AND t_tr."locale" = ${locale}
             WHERE lt."listingId" = lst."id"
           ), 0) DESC
         `,
@@ -330,18 +384,18 @@ export class SearchRepository {
     const contains = this.likeContainsPattern(query);
     const scholarCases = includeRelated
       ? Prisma.sql`
-          WHEN s."name" ILIKE ${exact} ESCAPE '\\' THEN 3
-          WHEN s."name" ILIKE ${prefix} ESCAPE '\\' THEN 4
-          WHEN s."name" ILIKE ${contains} ESCAPE '\\' THEN 5
+          WHEN s."name" ILIKE ${exact} ESCAPE '\\' OR COALESCE(s_tr."name", '') ILIKE ${exact} ESCAPE '\\' THEN 3
+          WHEN s."name" ILIKE ${prefix} ESCAPE '\\' OR COALESCE(s_tr."name", '') ILIKE ${prefix} ESCAPE '\\' THEN 4
+          WHEN s."name" ILIKE ${contains} ESCAPE '\\' OR COALESCE(s_tr."name", '') ILIKE ${contains} ESCAPE '\\' THEN 5
         `
       : Prisma.sql``;
 
     return [
       Prisma.sql`
         CASE
-          WHEN lst."title" ILIKE ${exact} ESCAPE '\\' THEN 0
-          WHEN lst."title" ILIKE ${prefix} ESCAPE '\\' THEN 1
-          WHEN lst."title" ILIKE ${contains} ESCAPE '\\' THEN 2
+          WHEN lst."title" ILIKE ${exact} ESCAPE '\\' OR COALESCE(lt_tr."title", '') ILIKE ${exact} ESCAPE '\\' THEN 0
+          WHEN lst."title" ILIKE ${prefix} ESCAPE '\\' OR COALESCE(lt_tr."title", '') ILIKE ${prefix} ESCAPE '\\' THEN 1
+          WHEN lst."title" ILIKE ${contains} ESCAPE '\\' OR COALESCE(lt_tr."title", '') ILIKE ${contains} ESCAPE '\\' THEN 2
           ${scholarCases}
           ELSE 6
         END ASC
@@ -385,6 +439,22 @@ export class SearchRepository {
       select: { listingId: true, title: true },
     });
     for (const r of rows) map.set(r.listingId, { title: r.title });
+
+    return map;
+  }
+
+  private async fetchScholarNameTranslations(
+    scholarIds: string[],
+    locale: Locale,
+  ): Promise<Map<string, { name: string }>> {
+    const map = new Map<string, { name: string }>();
+    if (!scholarIds.length) return map;
+
+    const rows = await this.prisma.scholarTranslation.findMany({
+      where: { scholarId: { in: scholarIds }, locale, status: 'published' },
+      select: { scholarId: true, name: true },
+    });
+    for (const r of rows) map.set(r.scholarId, { name: r.name });
 
     return map;
   }
