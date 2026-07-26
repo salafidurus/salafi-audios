@@ -52,7 +52,7 @@ describe("resolveArchiveOrgFiles", () => {
   });
 
   it("queries the metadata API and returns direct download URLs for audio files only", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+    (global.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({
       ok: true,
       json: () =>
         Promise.resolve({
@@ -81,7 +81,10 @@ describe("resolveArchiveOrgFiles", () => {
   });
 
   it("throws a clear error when the item metadata can't be fetched", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({ ok: false, status: 404 });
+    (global.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({
+      ok: false,
+      status: 404,
+    });
 
     await expect(resolveArchiveOrgFiles("does-not-exist")).rejects.toThrow(/archive\.org item/i);
   });

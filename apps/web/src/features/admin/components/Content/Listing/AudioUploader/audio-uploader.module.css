@@ -2,6 +2,26 @@
   width: 100%;
 }
 
+.modeToggle {
+  display: flex;
+  gap: var(--space-scale-xs);
+  margin-bottom: var(--space-scale-sm);
+}
+
+.linkForm {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-sm);
+  padding: var(--space-component-panel-padding);
+  border: 2px dashed var(--border-default);
+  border-radius: var(--radius-component-card);
+  background-color: var(--surface-subtle);
+}
+
+.linkForm > :first-child {
+  flex: 1;
+}
+
 .dropzone {
   display: flex;
   flex-direction: column;

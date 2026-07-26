@@ -28,7 +28,7 @@ describe("fetchFileFromUrl", () => {
   });
 
   it("builds a File using the Content-Disposition filename and content type", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(
+    (global.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
       mockResponse({
         headers: {
           "content-type": "audio/mpeg",
@@ -44,7 +44,7 @@ describe("fetchFileFromUrl", () => {
   });
 
   it("derives the filename from the URL path when Content-Disposition is absent", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(
+    (global.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
       mockResponse({ headers: { "content-type": "audio/wav" } }),
     );
 
@@ -55,7 +55,7 @@ describe("fetchFileFromUrl", () => {
   });
 
   it("guesses a content type from the extension when the header is missing or generic", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(
+    (global.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
       mockResponse({ headers: { "content-type": "application/octet-stream" } }),
     );
 
@@ -65,7 +65,7 @@ describe("fetchFileFromUrl", () => {
   });
 
   it("rejects an HTML response with a clear 'not a direct file' error", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(
+    (global.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
       mockResponse({ headers: { "content-type": "text/html; charset=UTF-8" } }),
     );
 
@@ -75,7 +75,7 @@ describe("fetchFileFromUrl", () => {
   });
 
   it("rejects a non-OK HTTP response", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue(
+    (global.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
       mockResponse({ ok: false, status: 404 }),
     );
 
@@ -83,7 +83,9 @@ describe("fetchFileFromUrl", () => {
   });
 
   it("maps a network/CORS-style failure to a friendly, actionable message", async () => {
-    (global.fetch as ReturnType<typeof vi.fn>).mockRejectedValue(new TypeError("Failed to fetch"));
+    (global.fetch as unknown as ReturnType<typeof vi.fn>).mockRejectedValue(
+      new TypeError("Failed to fetch"),
+    );
 
     await expect(fetchFileFromUrl("https://blocked.example.com/file.wav")).rejects.toThrow(
       /cross-origin|CORS|blocking/i,

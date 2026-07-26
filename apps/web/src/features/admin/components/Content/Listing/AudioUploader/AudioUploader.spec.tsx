@@ -2,10 +2,15 @@ import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { AudioUploader } from "./AudioUploader";
 import { getPresignedUrl, uploadToR2 } from "@/features/admin/api/admin-lectures.api";
+import { importFilesFromLines } from "@/features/admin/utils/resolve-import-urls";
 
 vi.mock("@/features/admin/api/admin-lectures.api", () => ({
   getPresignedUrl: vi.fn(),
   uploadToR2: vi.fn(),
+}));
+
+vi.mock("@/features/admin/utils/resolve-import-urls", () => ({
+  importFilesFromLines: vi.fn(),
 }));
 
 describe("AudioUploader", () => {
@@ -109,5 +114,104 @@ describe("AudioUploader", () => {
     });
 
     expect(screen.getByText(/upload complete/i)).toBeInTheDocument();
+  });
+
+  describe("paste link mode", () => {
+    it("switches to a link input when 'Paste link' is clicked", () => {
+      render(<AudioUploader onUploadComplete={vi.fn()} />);
+
+      fireEvent.click(screen.getByRole("button", { name: /paste link/i }));
+
+      expect(screen.getByPlaceholderText(/https:\/\//i)).toBeInTheDocument();
+    });
+
+    it("imports a file from a link and runs the normal upload pipeline", async () => {
+      const onUploadCompleteMock = vi.fn();
+      const importedFile = new File(["dummy audio content"], "Lesson.mp3", {
+        type: "audio/mpeg",
+      });
+
+      (importFilesFromLines as Mock<any>).mockResolvedValue({
+        files: [importedFile],
+        errors: [],
+      });
+      (getPresignedUrl as Mock<any>).mockResolvedValue({
+        uploadUrl: "https://r2.storage/upload-url",
+        publicUrl: "https://cdn.salafi-audios.com/audio/key.mp3",
+        objectKey: "audio/key.mp3",
+      });
+      (uploadToR2 as Mock<any>).mockResolvedValue(undefined);
+
+      render(<AudioUploader onUploadComplete={onUploadCompleteMock} />);
+
+      fireEvent.click(screen.getByRole("button", { name: /paste link/i }));
+      fireEvent.change(screen.getByPlaceholderText(/https:\/\//i), {
+        target: { value: "https://archive.org/download/Item/Lesson.mp3" },
+      });
+      fireEvent.click(screen.getByRole("button", { name: /^import$/i }));
+
+      await waitFor(() => {
+        expect(importFilesFromLines).toHaveBeenCalledWith([
+          "https://archive.org/download/Item/Lesson.mp3",
+        ]);
+      });
+
+      await waitFor(() => {
+        expect(onUploadCompleteMock).toHaveBeenCalledWith({
+          audioKey: "audio/key.mp3",
+          durationSeconds: 180,
+          sizeBytes: importedFile.size,
+          format: "audio/mpeg",
+          filename: "Lesson.mp3",
+        });
+      });
+    });
+
+    it("shows an error and does not upload when the link resolves to multiple files", async () => {
+      (importFilesFromLines as Mock<any>).mockResolvedValue({
+        files: [
+          new File(["a"], "one.mp3", { type: "audio/mpeg" }),
+          new File(["b"], "two.mp3", { type: "audio/mpeg" }),
+        ],
+        errors: [],
+      });
+
+      render(<AudioUploader onUploadComplete={vi.fn()} />);
+
+      fireEvent.click(screen.getByRole("button", { name: /paste link/i }));
+      fireEvent.change(screen.getByPlaceholderText(/https:\/\//i), {
+        target: { value: "https://archive.org/details/Item" },
+      });
+      fireEvent.click(screen.getByRole("button", { name: /^import$/i }));
+
+      await waitFor(() => {
+        expect(screen.getByText(/multiple files/i)).toBeInTheDocument();
+      });
+      expect(getPresignedUrl).not.toHaveBeenCalled();
+    });
+
+    it("surfaces the resolver's error message when the link can't be imported", async () => {
+      (importFilesFromLines as Mock<any>).mockResolvedValue({
+        files: [],
+        errors: [
+          {
+            input: "https://miraath.net/file.wav",
+            message: "source blocks direct browser downloads",
+          },
+        ],
+      });
+
+      render(<AudioUploader onUploadComplete={vi.fn()} />);
+
+      fireEvent.click(screen.getByRole("button", { name: /paste link/i }));
+      fireEvent.change(screen.getByPlaceholderText(/https:\/\//i), {
+        target: { value: "https://miraath.net/file.wav" },
+      });
+      fireEvent.click(screen.getByRole("button", { name: /^import$/i }));
+
+      await waitFor(() => {
+        expect(screen.getByText(/source blocks direct browser downloads/i)).toBeInTheDocument();
+      });
+    });
   });
 });
