@@ -1,10 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { ScholarListItemDto } from "@sd/core-contracts";
 import { useIsRtl } from "@/shared/hooks/use-is-rtl";
 import { formatScholarName } from "@/shared/utils/format-scholar-name";
+import { List } from "@/shared/components/List";
+import { UserAvatar } from "@/shared/components/user-avatar";
+import { MarqueeText } from "@/shared/components/MarqueeText";
 import styles from "./scholar-list-row.module.css";
 
 export type ScholarListRowProps = {
@@ -14,59 +16,47 @@ export type ScholarListRowProps = {
 
 export function ScholarListRow({ scholar, onPress }: ScholarListRowProps) {
   const isRtl = useIsRtl();
-  const initial = scholar.name?.trim().charAt(0).toUpperCase() || "?";
+  const formattedName = formatScholarName(scholar);
 
-  const content = (
-    <>
-      <div className={styles.avatarSection}>
-        {scholar.imageUrl ? (
-          <div className={styles.avatarContainer}>
-            <Image
-              src={scholar.imageUrl}
-              alt=""
-              width={72}
-              height={72}
-              unoptimized
-              className={styles.avatarImage}
-            />
-          </div>
-        ) : (
-          <div className={styles.avatarFallback} aria-hidden="true">
-            {initial}
-          </div>
-        )}
-      </div>
+  const metaText = [
+    scholar.mainLanguage ? scholar.mainLanguage.toUpperCase() : null,
+    scholar.lectureCount ? `${scholar.lectureCount} lectures` : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
-      <div className={styles.centerSection}>
-        <div className={styles.name}>{formatScholarName(scholar)}</div>
-        <div className={styles.meta}>
-          {scholar.mainLanguage && <span className={styles.language}>{scholar.mainLanguage}</span>}
+  return (
+    <List.Item interactive onClick={onPress ? () => onPress(scholar.slug) : undefined}>
+      <div className={styles.container}>
+        <div className={styles.avatarSection}>
+          <UserAvatar image={scholar.imageUrl ?? null} name={scholar.name} fill />
         </div>
-        <div className={styles.lectureCount}>{scholar.lectureCount} lectures</div>
+
+        <div className={styles.centerSection}>
+          <MarqueeText
+            text={formattedName}
+            className="text-[var(--content-strong)] font-semibold [font-size:var(--typo-title-md-font-size)] xl:[font-size:var(--typo-title-lg-font-size)]"
+          />
+          {metaText && (
+            <MarqueeText
+              text={metaText}
+              className="text-[var(--content-muted)] font-normal [font-size:var(--typo-body-sm-font-size)] xl:[font-size:var(--typo-body-md-font-size)]"
+            />
+          )}
+        </div>
       </div>
 
-      <div className={styles.rightSection}>
-        {onPress &&
-          (isRtl ? (
-            <ChevronLeft className={styles.chevron} size={20} />
-          ) : (
-            <ChevronRight className={styles.chevron} size={20} />
-          ))}
-      </div>
-    </>
+      {onPress && (
+        <List.Item.Actions>
+          <div className={styles.chevronWrapper}>
+            {isRtl ? (
+              <ChevronLeft className={styles.chevron} size={20} />
+            ) : (
+              <ChevronRight className={styles.chevron} size={20} />
+            )}
+          </div>
+        </List.Item.Actions>
+      )}
+    </List.Item>
   );
-
-  if (onPress) {
-    return (
-      <button
-        type="button"
-        onClick={() => onPress(scholar.slug)}
-        className={`${styles.row} ${styles.interactive} listRow`}
-      >
-        {content}
-      </button>
-    );
-  }
-
-  return <div className={`${styles.row} listRow`}>{content}</div>;
 }

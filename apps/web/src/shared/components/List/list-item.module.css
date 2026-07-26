@@ -5,11 +5,11 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
-/* Divider between items */
-.item + .item {
-  border-top: 1px solid var(--border-subtle);
+.item:last-child {
+  border-bottom: none;
 }
 
 /* Interactive states (only when clickable or explicitly interactive) */

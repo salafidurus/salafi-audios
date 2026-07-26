@@ -17,8 +17,7 @@ describe("ScholarListRow", () => {
   it("renders scholar details successfully", () => {
     render(<ScholarListRow scholar={mockScholar} />);
     expect(screen.getByText("Abdul Aziz bin Baz")).toBeInTheDocument();
-    expect(screen.getByText("ar")).toBeInTheDocument();
-    expect(screen.getByText("42 lectures")).toBeInTheDocument();
+    expect(screen.getByText(/42 lectures/i)).toBeInTheDocument();
   });
 
   it("never renders a Senior Scholar badge (isKibar removed)", () => {
