@@ -1,21 +1,19 @@
-# RTK - CLI Token Optimizer
-
-When executing shell commands, always prefix them with the rtk proxy to reduce token usage.
+# RTK — CLI Token Optimizer
 
 ## Usage
 
-Instead of running commands directly:
+Prefix shell commands with `rtk` to reduce token usage:
 
 ```bash
-git status
-bun run test ./...
+rtk git status
+rtk bun run test
 ```
 
-Prefix with `rtk`:
+Use `rtk -h` to see all available subcommands (ls, tree, read, git, gh, prisma, tsc, test, etc).
 
-```bash
-rtk -- git status
-rtk -- bun run test
-```
+## Key options
 
-This applies to all shell commands. RTK filters verbose output while preserving errors and essential information.
+| Flag              | Description                |
+| ----------------- | -------------------------- |
+| `-v`              | More verbose output        |
+| `--ultra-compact` | ASCII icons, inline format |
