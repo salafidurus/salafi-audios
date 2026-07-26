@@ -170,4 +170,156 @@ describe('Content translations persistence (e2e)', () => {
       expect(arTranslation?.name).not.toBe('Should be ignored');
     });
   });
+
+  /**
+   * Main-language content (title/name/bio) must always have a matching
+   * `*Translation` row for whatever locale is currently the main language —
+   * created on entity create, kept in sync on every content update, and
+   * snapshotted into the *old* locale when the main language itself changes.
+   * Uses dedicated scholar/listing fixtures (cleaned up in afterAll) rather
+   * than the shared TEST_SCHOLAR_ID/TEST_LISTING_ID, since these tests
+   * mutate mainLanguage/language.
+   */
+  describe('Main-language translation sync', () => {
+    let scholarId: string;
+    let listingId: string;
+
+    afterAll(async () => {
+      if (scholarId) await prisma.scholar.delete({ where: { id: scholarId } });
+      if (listingId) await prisma.listing.delete({ where: { id: listingId } });
+    });
+
+    describe('Scholar', () => {
+      it('POST /admin/scholars mirrors the new scholar into a matching ScholarTranslation', async () => {
+        const auth = await authFactory.createAdminUser([Permission.SCHOLARS_CREATE]);
+        const res = await request(app.getHttpServer())
+          .post('/admin/scholars')
+          .set(auth.headers)
+          .send({
+            name: 'محمد الأول',
+            slug: `e2e-sync-scholar-${crypto.randomUUID()}`,
+            bio: 'سيرة أولى',
+            mainLanguage: 'ar',
+            country: 'SA',
+          })
+          .expect(201);
+        scholarId = res.body.id;
+
+        const translation = await prisma.scholarTranslation.findUnique({
+          where: { scholarId_locale: { scholarId, locale: 'ar' } },
+        });
+        expect(translation?.name).toBe('محمد الأول');
+        expect(translation?.bio).toBe('سيرة أولى');
+        expect(translation?.status).toBe('published');
+      });
+
+      it('PATCH /admin/scholars/:id overwrites the current-locale translation when content changes', async () => {
+        const auth = await authFactory.createAdminUser([Permission.SCHOLARS_EDIT]);
+        await request(app.getHttpServer())
+          .patch(`/admin/scholars/${scholarId}`)
+          .set(auth.headers)
+          .send({ name: 'محمد الثاني' })
+          .expect(200);
+
+        const translation = await prisma.scholarTranslation.findUnique({
+          where: { scholarId_locale: { scholarId, locale: 'ar' } },
+        });
+        expect(translation?.name).toBe('محمد الثاني');
+        // bio was not part of this update, so it must be preserved.
+        expect(translation?.bio).toBe('سيرة أولى');
+      });
+
+      it('PATCH /admin/scholars/:id snapshots the old locale then syncs the new locale on a mainLanguage change', async () => {
+        const auth = await authFactory.createAdminUser([Permission.SCHOLARS_EDIT]);
+        await request(app.getHttpServer())
+          .patch(`/admin/scholars/${scholarId}`)
+          .set(auth.headers)
+          .send({ mainLanguage: 'en', name: 'Muhammad the Second' })
+          .expect(200);
+
+        const arTranslation = await prisma.scholarTranslation.findUnique({
+          where: { scholarId_locale: { scholarId, locale: 'ar' } },
+        });
+        expect(arTranslation?.name).toBe('محمد الثاني');
+
+        const enTranslation = await prisma.scholarTranslation.findUnique({
+          where: { scholarId_locale: { scholarId, locale: 'en' } },
+        });
+        expect(enTranslation?.name).toBe('Muhammad the Second');
+        expect(enTranslation?.status).toBe('published');
+      });
+
+      it('PATCH /admin/scholars/:id leaves translations untouched when no translatable field is sent', async () => {
+        const auth = await authFactory.createAdminUser([Permission.SCHOLARS_EDIT]);
+        await request(app.getHttpServer())
+          .patch(`/admin/scholars/${scholarId}`)
+          .set(auth.headers)
+          .send({ isActive: false })
+          .expect(200);
+
+        const enTranslation = await prisma.scholarTranslation.findUnique({
+          where: { scholarId_locale: { scholarId, locale: 'en' } },
+        });
+        expect(enTranslation?.name).toBe('Muhammad the Second');
+      });
+    });
+
+    describe('Listing', () => {
+      it('POST /admin/listings mirrors the new listing into a matching ListingTranslation', async () => {
+        const auth = await authFactory.createAdminUser([Permission.LISTINGS_CREATE]);
+        const res = await request(app.getHttpServer())
+          .post('/admin/listings')
+          .set(auth.headers)
+          .send({
+            title: 'عنوان أول',
+            slug: `e2e-sync-listing-${crypto.randomUUID()}`,
+            format: 'single',
+            scholarId: TEST_SCHOLAR_ID,
+            language: 'ar',
+          })
+          .expect(201);
+        listingId = res.body.id;
+
+        const translation = await prisma.listingTranslation.findUnique({
+          where: { listingId_locale: { listingId, locale: 'ar' } },
+        });
+        expect(translation?.title).toBe('عنوان أول');
+        expect(translation?.status).toBe('published');
+      });
+
+      it('PUT /admin/listings/:id/details overwrites the current-locale translation when content changes', async () => {
+        const auth = await authFactory.createAdminUser([Permission.LISTINGS_EDIT]);
+        await request(app.getHttpServer())
+          .put(`/admin/listings/${listingId}/details`)
+          .set(auth.headers)
+          .send({ title: 'عنوان ثانٍ' })
+          .expect(200);
+
+        const translation = await prisma.listingTranslation.findUnique({
+          where: { listingId_locale: { listingId, locale: 'ar' } },
+        });
+        expect(translation?.title).toBe('عنوان ثانٍ');
+      });
+
+      it('PUT /admin/listings/:id/details snapshots the old locale then syncs the new locale on a language change', async () => {
+        const auth = await authFactory.createAdminUser([Permission.LISTINGS_EDIT]);
+        await request(app.getHttpServer())
+          .put(`/admin/listings/${listingId}/details`)
+          .set(auth.headers)
+          .send({ language: 'en', title: 'The Second Title' })
+          .expect(200);
+
+        const arTranslation = await prisma.listingTranslation.findUnique({
+          where: { listingId_locale: { listingId, locale: 'ar' } },
+        });
+        expect(arTranslation?.title).toBe('عنوان ثانٍ');
+
+        const enTranslation = await prisma.listingTranslation.findUnique({
+          where: { listingId_locale: { listingId, locale: 'en' } },
+        });
+        expect(enTranslation?.title).toBe('The Second Title');
+        expect(enTranslation?.status).toBe('published');
+      });
+    });
+  });
 });

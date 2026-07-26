@@ -15,6 +15,7 @@ import type { CreateScholarDto } from './dto/create-scholar.dto';
 import type { UpdateScholarDto } from './dto/update-scholar.dto';
 import type { SaveScholarTranslationDto } from './dto/save-scholar-translation.dto';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
+import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 import { decodeCursor, buildPaginatedResult } from '../../shared/utils/pagination';
 
@@ -522,12 +523,28 @@ export class ScholarsRepository {
         },
       });
 
+      await syncMainLanguageTranslation({
+        upsert: (locale, fields) =>
+          this.upsertMainScholarTranslation(tx, scholar.id, locale, fields),
+        newLocale: dto.mainLanguage ?? 'ar',
+        newFields: { name: dto.name, bio: dto.bio ?? null },
+      });
+
       return scholar;
     });
   }
 
   async update(id: string, dto: UpdateScholarDto) {
     return this.prisma.$transaction(async (tx) => {
+      const hasTranslatableChange =
+        dto.name !== undefined || dto.bio !== undefined || dto.mainLanguage !== undefined;
+      const original = hasTranslatableChange
+        ? await tx.scholar.findUnique({
+            where: { id },
+            select: { mainLanguage: true, name: true, bio: true },
+          })
+        : null;
+
       // Update scholar fields if provided
       const updateData: Record<string, any> = {};
       if (dto.name !== undefined) updateData.name = dto.name;
@@ -550,7 +567,39 @@ export class ScholarsRepository {
         data: updateData,
       });
 
+      if (hasTranslatableChange && original) {
+        await syncMainLanguageTranslation({
+          upsert: (locale, fields) => this.upsertMainScholarTranslation(tx, id, locale, fields),
+          oldLocale: original.mainLanguage,
+          oldFields: { name: original.name, bio: original.bio },
+          newLocale: dto.mainLanguage ?? original.mainLanguage,
+          newFields: {
+            name: dto.name ?? original.name,
+            bio: dto.bio !== undefined ? dto.bio : original.bio,
+          },
+        });
+      }
+
       return scholar;
+    });
+  }
+
+  private upsertMainScholarTranslation(
+    tx: Prisma.TransactionClient,
+    scholarId: string,
+    locale: Locale,
+    fields: { name: string; bio?: string | null },
+  ) {
+    return tx.scholarTranslation.upsert({
+      where: { scholarId_locale: { scholarId, locale } },
+      create: {
+        scholarId,
+        locale,
+        name: fields.name,
+        bio: fields.bio ?? null,
+        status: 'published',
+      },
+      update: { name: fields.name, bio: fields.bio ?? null, status: 'published' },
     });
   }
 

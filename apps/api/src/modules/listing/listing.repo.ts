@@ -29,6 +29,7 @@ import type {
   ArrangeLessonOp,
 } from '@sd/core-contracts';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
+import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 
 @Injectable()
@@ -923,7 +924,33 @@ export class ListingRepository {
         await this.syncListingCounters(listing.parentId, tx);
       }
 
+      await syncMainLanguageTranslation({
+        upsert: (locale, fields) =>
+          this.upsertMainListingTranslation(tx, listing.id, locale, fields),
+        newLocale: dto.language ?? 'ar',
+        newFields: { title: dto.title, description: null },
+      });
+
       return { id: listing.id, title: listing.title };
+    });
+  }
+
+  private upsertMainListingTranslation(
+    tx: Prisma.TransactionClient,
+    listingId: string,
+    locale: Locale,
+    fields: { title: string; description?: string | null },
+  ) {
+    return tx.listingTranslation.upsert({
+      where: { listingId_locale: { listingId, locale } },
+      create: {
+        listingId,
+        locale,
+        title: fields.title,
+        description: fields.description ?? null,
+        status: 'published',
+      },
+      update: { title: fields.title, description: fields.description ?? null, status: 'published' },
     });
   }
 
@@ -936,10 +963,19 @@ export class ListingRepository {
       await this.prisma.$transaction(async (tx) => {
         const original = await tx.listing.findUnique({
           where: { id },
-          select: { parentId: true, status: true },
+          select: {
+            parentId: true,
+            status: true,
+            language: true,
+            title: true,
+            description: true,
+          },
         });
 
         if (!original) throw new Error('Not found');
+
+        const hasTranslatableChange =
+          dto.title !== undefined || dto.description !== undefined || dto.language !== undefined;
 
         // Exclude topics from the main update data
         const { topics, ...dtoWithoutTopics } = dto;
@@ -958,6 +994,19 @@ export class ListingRepository {
           where: { id },
           data: updateData,
         });
+
+        if (hasTranslatableChange) {
+          await syncMainLanguageTranslation({
+            upsert: (locale, fields) => this.upsertMainListingTranslation(tx, id, locale, fields),
+            oldLocale: original.language,
+            oldFields: { title: original.title, description: original.description },
+            newLocale: dto.language ?? original.language ?? 'ar',
+            newFields: {
+              title: dto.title ?? original.title,
+              description: dto.description !== undefined ? dto.description : original.description,
+            },
+          });
+        }
 
         // If topics were provided in the DTO, update them
         if (topics !== undefined) {
