@@ -361,4 +361,117 @@ describe('Content translations persistence (e2e)', () => {
       });
     });
   });
+
+  /**
+   * Admin list views must resolve display fields to the request locale (like
+   * the public list already does) and must be searchable across translations,
+   * not just base-language columns.
+   */
+  describe('Admin display-locale resolution', () => {
+    let scholarId: string;
+    let listingId: string;
+
+    afterAll(async () => {
+      if (scholarId) await prisma.scholar.delete({ where: { id: scholarId } });
+      if (listingId) await prisma.listing.delete({ where: { id: listingId } });
+    });
+
+    it('GET /admin/scholars resolves name to the request locale and searches across translations', async () => {
+      const marker = crypto.randomUUID().slice(0, 8);
+      const createAuth = await authFactory.createAdminUser([Permission.SCHOLARS_CREATE]);
+      const createRes = await request(app.getHttpServer())
+        .post('/admin/scholars')
+        .set(createAuth.headers)
+        .send({
+          name: `اسم عربي ${marker}`,
+          slug: `e2e-admin-locale-scholar-${marker}`,
+          mainLanguage: 'ar',
+          country: 'SA',
+        })
+        .expect(201);
+      scholarId = createRes.body.id;
+
+      const translateAuth = await authFactory.createAdminUser([
+        Permission.TRANSLATIONS_CREATE,
+        Permission.TRANSLATIONS_PUBLISH,
+      ]);
+      await request(app.getHttpServer())
+        .post(`/scholars/${scholarId}/translations`)
+        .set(translateAuth.headers)
+        .send({ locale: 'en', name: `English Name ${marker}` })
+        .expect(201);
+      await request(app.getHttpServer())
+        .post(`/scholars/${scholarId}/translations/en/publish`)
+        .set(translateAuth.headers)
+        .expect(201);
+
+      const viewAuth = await authFactory.createAdminUser([Permission.SCHOLARS_VIEW]);
+      const listRes = await request(app.getHttpServer())
+        .get('/admin/scholars?locale=en')
+        .set(viewAuth.headers)
+        .expect(200);
+      const found = listRes.body.items.find((s: any) => s.id === scholarId);
+      expect(found?.name).toBe(`English Name ${marker}`);
+
+      const searchRes = await request(app.getHttpServer())
+        .get(`/admin/scholars?search=${encodeURIComponent(`English Name ${marker}`)}`)
+        .set(viewAuth.headers)
+        .expect(200);
+      expect(searchRes.body.items.some((s: any) => s.id === scholarId)).toBe(true);
+    });
+
+    it('GET /admin/listings resolves title/scholarName to the request locale, case-insensitively, and searches across translations', async () => {
+      const marker = crypto.randomUUID().slice(0, 8);
+      const createAuth = await authFactory.createAdminUser([Permission.LISTINGS_CREATE]);
+      const createRes = await request(app.getHttpServer())
+        .post('/admin/listings')
+        .set(createAuth.headers)
+        .send({
+          title: `عنوان عربي ${marker}`,
+          slug: `e2e-admin-locale-listing-${marker}`,
+          format: 'single',
+          scholarId: TEST_SCHOLAR_ID,
+          language: 'ar',
+        })
+        .expect(201);
+      listingId = createRes.body.id;
+
+      const translateAuth = await authFactory.createAdminUser([
+        Permission.TRANSLATIONS_CREATE,
+        Permission.TRANSLATIONS_PUBLISH,
+      ]);
+      await request(app.getHttpServer())
+        .post(`/listings/${listingId}/translations`)
+        .set(translateAuth.headers)
+        .send({ locale: 'en', title: `English Title ${marker}` })
+        .expect(201);
+      await request(app.getHttpServer())
+        .post(`/listings/${listingId}/translations/en/publish`)
+        .set(translateAuth.headers)
+        .expect(201);
+
+      const viewAuth = await authFactory.createAdminUser([Permission.LISTINGS_VIEW]);
+      const listRes = await request(app.getHttpServer())
+        .get('/admin/listings?locale=en')
+        .set(viewAuth.headers)
+        .expect(200);
+      const found = listRes.body.items.find((l: any) => l.id === listingId);
+      expect(found?.title).toBe(`English Title ${marker}`);
+
+      // Case-insensitive base-field search.
+      const caseInsensitiveRes = await request(app.getHttpServer())
+        .get(`/admin/listings?search=${encodeURIComponent(`عنوان عربي ${marker}`.toUpperCase())}`)
+        .set(viewAuth.headers)
+        .expect(200);
+      expect(caseInsensitiveRes.body.items.some((l: any) => l.id === listingId)).toBe(true);
+
+      // Translation search — the English title text doesn't appear anywhere
+      // in the base (Arabic) columns.
+      const searchRes = await request(app.getHttpServer())
+        .get(`/admin/listings?search=${encodeURIComponent(`English Title ${marker}`)}`)
+        .set(viewAuth.headers)
+        .expect(200);
+      expect(searchRes.body.items.some((l: any) => l.id === listingId)).toBe(true);
+    });
+  });
 });

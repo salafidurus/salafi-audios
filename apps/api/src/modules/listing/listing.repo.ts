@@ -692,6 +692,7 @@ export class ListingRepository {
     status?: string;
     search?: string;
   }): Promise<AdminListingListDto> {
+    const locale = getRequestLocale();
     const pageSize = 50;
     const take = pageSize + 1;
 
@@ -700,7 +701,26 @@ export class ListingRepository {
       parentId: null,
       ...(params.scholarId ? { scholarId: params.scholarId } : {}),
       ...(params.status ? { status: params.status as Status } : {}),
-      ...(params.search ? { title: { contains: params.search } } : {}),
+      ...(params.search
+        ? {
+            OR: [
+              { title: { contains: params.search, mode: 'insensitive' as const } },
+              {
+                translations: {
+                  some: { title: { contains: params.search, mode: 'insensitive' as const } },
+                },
+              },
+              { scholar: { name: { contains: params.search, mode: 'insensitive' as const } } },
+              {
+                scholar: {
+                  translations: {
+                    some: { name: { contains: params.search, mode: 'insensitive' as const } },
+                  },
+                },
+              },
+            ],
+          }
+        : {}),
     };
 
     const records = await this.prisma.listing.findMany({
@@ -711,26 +731,58 @@ export class ListingRepository {
       select: {
         id: true,
         title: true,
+        language: true,
         status: true,
         format: true,
         durationSeconds: true,
         orderIndex: true,
         createdAt: true,
-        scholar: { select: { name: true } },
+        translations: {
+          where: { locale, status: 'published' },
+          select: { title: true },
+          take: 1,
+        },
+        scholar: {
+          select: {
+            name: true,
+            mainLanguage: true,
+            translations: {
+              where: { locale, status: 'published' },
+              select: { name: true },
+              take: 1,
+            },
+          },
+        },
       },
     });
 
     const hasMore = records.length > pageSize;
-    const items = (hasMore ? records.slice(0, pageSize) : records).map((r) => ({
-      id: r.id,
-      title: r.title,
-      scholarName: r.scholar.name,
-      format: r.format,
-      status: r.status,
-      durationSeconds: r.durationSeconds ?? undefined,
-      orderIndex: r.orderIndex ?? undefined,
-      createdAt: r.createdAt.toISOString(),
-    }));
+    const items = (hasMore ? records.slice(0, pageSize) : records).map((r) => {
+      const title = resolveContentTranslation({
+        base: { title: r.title },
+        originalLanguage: r.language,
+        targetLocale: locale,
+        publishedTranslation: r.translations[0] ?? null,
+      }).fields.title;
+
+      const scholarName = resolveContentTranslation({
+        base: { name: r.scholar.name },
+        originalLanguage: r.scholar.mainLanguage,
+        targetLocale: locale,
+        publishedTranslation: r.scholar.translations[0] ?? null,
+      }).fields.name;
+
+      return {
+        id: r.id,
+        title,
+        scholarName,
+        format: r.format,
+        status: r.status,
+        durationSeconds: r.durationSeconds ?? undefined,
+        orderIndex: r.orderIndex ?? undefined,
+        createdAt: r.createdAt.toISOString(),
+      };
+    });
     const nextCursor = hasMore ? items[items.length - 1]?.id : undefined;
 
     return {

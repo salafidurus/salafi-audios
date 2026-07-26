@@ -434,11 +434,19 @@ export class ScholarsRepository {
     cursor?: string,
     search?: string,
   ): Promise<{ items: AdminScholarListItemDto[]; nextCursor?: string; hasMore: boolean }> {
+    const locale = getRequestLocale();
     const pageSize = 50;
     const take = pageSize + 1;
 
     const where: Prisma.ScholarWhereInput = search
-      ? { name: { contains: search, mode: 'insensitive' as const } }
+      ? {
+          OR: [
+            { name: { contains: search, mode: 'insensitive' as const } },
+            {
+              translations: { some: { name: { contains: search, mode: 'insensitive' as const } } },
+            },
+          ],
+        }
       : {};
 
     const records = await this.prisma.scholar.findMany({
@@ -472,29 +480,41 @@ export class ScholarsRepository {
 
     const hasMore = records.length > pageSize;
     const items: AdminScholarListItemDto[] = (hasMore ? records.slice(0, pageSize) : records).map(
-      (r) => ({
-        id: r.id,
-        slug: r.slug,
-        name: r.name,
-        bio: r.bio ?? undefined,
-        country: (r.country ?? undefined) as AdminScholarListItemDto['country'],
-        mainLanguage: r.mainLanguage ?? undefined,
-        imageUrl: r.imageUrl ?? undefined,
-        isActive: r.isActive,
-        title: r.title ?? undefined,
-        orderIndex: r.orderIndex,
-        socialTwitter: r.socialTwitter ?? undefined,
-        socialTelegram: r.socialTelegram ?? undefined,
-        socialYoutube: r.socialYoutube ?? undefined,
-        socialWebsite: r.socialWebsite ?? undefined,
-        createdAt: r.createdAt.toISOString(),
-        updatedAt: r.updatedAt?.toISOString(),
-        translations: r.translations.map((t) => ({
-          locale: t.locale,
-          name: t.name,
-          status: t.status === 'published' ? ('published' as const) : ('draft' as const),
-        })),
-      }),
+      (r) => {
+        const published = r.translations.find(
+          (t) => t.locale === locale && t.status === 'published',
+        );
+        const resolvedName = resolveContentTranslation({
+          base: { name: r.name },
+          originalLanguage: r.mainLanguage,
+          targetLocale: locale,
+          publishedTranslation: published ? { name: published.name } : null,
+        }).fields.name;
+
+        return {
+          id: r.id,
+          slug: r.slug,
+          name: resolvedName,
+          bio: r.bio ?? undefined,
+          country: (r.country ?? undefined) as AdminScholarListItemDto['country'],
+          mainLanguage: r.mainLanguage ?? undefined,
+          imageUrl: r.imageUrl ?? undefined,
+          isActive: r.isActive,
+          title: r.title ?? undefined,
+          orderIndex: r.orderIndex,
+          socialTwitter: r.socialTwitter ?? undefined,
+          socialTelegram: r.socialTelegram ?? undefined,
+          socialYoutube: r.socialYoutube ?? undefined,
+          socialWebsite: r.socialWebsite ?? undefined,
+          createdAt: r.createdAt.toISOString(),
+          updatedAt: r.updatedAt?.toISOString(),
+          translations: r.translations.map((t) => ({
+            locale: t.locale,
+            name: t.name,
+            status: t.status === 'published' ? ('published' as const) : ('draft' as const),
+          })),
+        };
+      },
     );
 
     const nextCursor = hasMore ? items[items.length - 1]?.id : undefined;
