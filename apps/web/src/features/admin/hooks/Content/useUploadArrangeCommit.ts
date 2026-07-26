@@ -8,6 +8,7 @@ import {
   updateListingMedia,
   uploadToR2WithProgress,
 } from "@/features/admin/api/admin-lectures.api";
+import { fetchFileFromUrl } from "@/features/admin/utils/fetch-remote-file";
 import {
   buildCommitDto,
   buildPresignRequest,
@@ -18,6 +19,27 @@ import {
 
 const UPLOAD_CONCURRENCY = 3;
 
+/** Local files are already in memory; url-sourced items are only fetched here — at the
+ *  moment the admin actually confirms the upload, not when the link was first added. */
+async function resolveItemFile(
+  item: UploadItem,
+  dispatch: React.Dispatch<UploadArrangeAction>,
+): Promise<File> {
+  if (item.source.kind === "local") return item.source.file;
+
+  const { id, sizeBytes } = item;
+  return fetchFileFromUrl(item.source.url, (loaded, total) => {
+    dispatch({
+      type: "UPLOAD_PROGRESS",
+      itemId: id,
+      status: "downloading",
+      percent: total ? Math.round((loaded / total) * 100) : 0,
+      loadedBytes: loaded,
+      totalBytes: total ?? sizeBytes,
+    });
+  });
+}
+
 async function uploadWithConcurrency(
   items: UploadItem[],
   dispatch: React.Dispatch<UploadArrangeAction>,
@@ -27,25 +49,31 @@ async function uploadWithConcurrency(
 
   const worker = async (): Promise<void> => {
     for (let item = queue.shift(); item; item = queue.shift()) {
-      if (!item.upload.uploadUrl) {
+      const { id, sizeBytes, contentType } = item;
+      const uploadUrl = item.upload.uploadUrl;
+      if (!uploadUrl) {
         allOk = false;
-        dispatch({ type: "UPLOAD_ERROR", itemId: item.id, error: "Missing upload URL" });
+        dispatch({ type: "UPLOAD_ERROR", itemId: id, error: "Missing upload URL" });
         continue;
       }
       try {
-        const { id } = item;
-        await uploadToR2WithProgress(
-          item.upload.uploadUrl,
-          item.file,
-          item.contentType,
-          (percent) => dispatch({ type: "UPLOAD_PROGRESS", itemId: id, percent }),
+        const file = await resolveItemFile(item, dispatch);
+        await uploadToR2WithProgress(uploadUrl, file, contentType, (percent) =>
+          dispatch({
+            type: "UPLOAD_PROGRESS",
+            itemId: id,
+            status: "uploading",
+            percent,
+            loadedBytes: Math.round((sizeBytes * percent) / 100),
+            totalBytes: sizeBytes,
+          }),
         );
-        dispatch({ type: "UPLOAD_DONE", itemId: item.id });
+        dispatch({ type: "UPLOAD_DONE", itemId: id });
       } catch (err) {
         allOk = false;
         dispatch({
           type: "UPLOAD_ERROR",
-          itemId: item.id,
+          itemId: id,
           error: (err as Error)?.message ?? "Upload failed",
         });
       }
