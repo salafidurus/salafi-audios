@@ -32,8 +32,8 @@ const checkAllInSet = <T>(
  * Fetch the current user's permissions and roles
  * Returns cached profile data with permissions and roles arrays
  */
-export function useMyPermissions() {
-  const { data: profile, isLoading, error } = useAccountProfile();
+export function useMyPermissions(options?: { enabled?: boolean }) {
+  const { data: profile, isLoading, error } = useAccountProfile(options);
   return {
     data: profile
       ? {

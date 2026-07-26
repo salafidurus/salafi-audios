@@ -8,12 +8,15 @@ import {
   type UpdateProfileDto,
 } from "@sd/core-contracts";
 
-export function useAccountProfile() {
-  return useApiQuery(queryKeys.account.profile(), () =>
-    httpClient<UserProfileDto>({
-      url: endpoints.account.profile,
-      method: "GET",
-    }),
+export function useAccountProfile(options?: { enabled?: boolean }) {
+  return useApiQuery(
+    queryKeys.account.profile(),
+    () =>
+      httpClient<UserProfileDto>({
+        url: endpoints.account.profile,
+        method: "GET",
+      }),
+    options,
   );
 }
 

@@ -261,17 +261,11 @@ export function NavItems({ collapsed = false, onItemClick }: NavItemsProps) {
               <LogIn size={18} />
             </Link>
           ) : (
-            <Button
-              variant="primary"
-              size="sm"
-              className={styles.signInButton}
-              onClick={() => {
-                handleNavClick();
-                router.push(routes.signIn);
-              }}
-            >
-              {t("authStrip.signIn", "Sign In")}
-            </Button>
+            <Link href={routes.signIn} onClick={handleNavClick} className={styles.signInButton}>
+              <Button variant="primary" size="sm" style={{ width: "100%" }} tabIndex={-1}>
+                {t("authStrip.signIn", "Sign In")}
+              </Button>
+            </Link>
           )
         ) : null}
       </div>

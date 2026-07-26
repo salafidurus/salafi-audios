@@ -60,7 +60,13 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
       authClient.signOut().then(async () => {
         queryClient.clear();
         await persister.removeClient();
-        window.location.href = "/sign-in";
+        if (
+          typeof window !== "undefined" &&
+          window.location &&
+          !window.location.pathname.startsWith("/sign-in")
+        ) {
+          window.location.href = "/sign-in";
+        }
       });
     });
   }, []);
