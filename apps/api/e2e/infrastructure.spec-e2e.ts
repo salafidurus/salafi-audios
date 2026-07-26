@@ -16,6 +16,7 @@ describe('Infrastructure & Basic API Features (e2e)', () => {
   });
 
   afterAll(async () => {
+    await authFactory.cleanup();
     await app.close();
   });
 

@@ -36,6 +36,7 @@ describe('Content translations persistence (e2e)', () => {
     await prisma.scholarTranslation.deleteMany({
       where: { scholarId: TEST_SCHOLAR_ID, locale: 'en' },
     });
+    await authFactory.cleanup();
     await app.close();
   });
 

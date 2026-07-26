@@ -12,6 +12,7 @@ describe('Admin Permission Boundaries (e2e)', () => {
   let app: NestFastifyApplication;
   let prisma: PrismaService;
   let authFactory: TestAuthFactory;
+  const createdListingIds: string[] = [];
 
   beforeAll(async () => {
     ({ app } = await createE2eApp({ disableThrottler: true }));
@@ -21,6 +22,12 @@ describe('Admin Permission Boundaries (e2e)', () => {
   });
 
   afterAll(async () => {
+    if (createdListingIds.length > 0) {
+      await prisma.listing.deleteMany({
+        where: { id: { in: createdListingIds } },
+      });
+    }
+    await authFactory.cleanup();
     await app.close();
   });
 
@@ -54,6 +61,7 @@ describe('Admin Permission Boundaries (e2e)', () => {
 
       expect(res.body).toHaveProperty('id');
       expect(res.body).toHaveProperty('title', 'E2E Valid New Listing');
+      createdListingIds.push(res.body.id);
     });
 
     it('3. POST /admin/listings/:id/publish without LISTINGS_PUBLISH -> 403', async () => {
