@@ -3,6 +3,7 @@ import type { AdminUserListItemDto } from "@sd/core-contracts";
 import { ShieldCog, UserCog } from "lucide-react";
 import { List } from "@/shared/components/List";
 import { Button } from "@/shared/components/Button";
+import { UserAvatar } from "@/shared/components/user-avatar";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -22,16 +23,17 @@ export function UserItem({ user, onManagePermissions, onManageRoles }: UserItemP
 
   return (
     <List.Item interactive>
-      <div className={styles.card}>
-        <MetaDetails user={user} />
-        <PermissionDetails permissions={user.permissions.map((p) => ({ permission: p }))} />
+      <div className={styles.rowContainer}>
+        <div className={styles.avatarBlock}>
+          <UserAvatar image={user.image} name={user.name} fill />
+        </div>
+        <div className={styles.contentBody}>
+          <MetaDetails user={user} />
+          <PermissionDetails permissions={user.permissions.map((p) => ({ permission: p }))} />
+        </div>
       </div>
 
-      <List.Item.Actions
-        orientation="horizontal"
-        mobileOrientation="vertical"
-        widthPercentDesktop="15%"
-      >
+      <List.Item.Actions orientation="horizontal" mobileOrientation="vertical">
         <PermissionGate requires="USERS_GRANT_PERMISSIONS">
           <Button
             variant={isMobile ? "outline" : "ghost"}

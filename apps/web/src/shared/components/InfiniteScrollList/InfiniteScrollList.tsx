@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, Fragment, type ReactNode } from "react";
 import { List } from "../List";
 import styles from "./InfiniteScrollList.module.css";
 
@@ -59,7 +59,9 @@ export function InfiniteScrollList<TData>({
   return (
     <List>
       {data.map((item, itemIndex) => (
-        <div key={String((item as Record<string, unknown>)?.id)}>{renderItem(item, itemIndex)}</div>
+        <Fragment key={String((item as Record<string, unknown>)?.id ?? itemIndex)}>
+          {renderItem(item, itemIndex)}
+        </Fragment>
       ))}
 
       {/* Intersection observer target for loading more */}

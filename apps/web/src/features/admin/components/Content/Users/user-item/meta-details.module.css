@@ -1,7 +1,7 @@
 .container {
   display: flex;
-  align-items: flex-start;
-  gap: var(--space-scale-sm);
+  align-items: center;
+  gap: var(--space-component-gap-md);
 }
 
 .content {
@@ -19,8 +19,8 @@
 
 .name {
   font-weight: 600;
-  font-size: var(--typo-body-sm-font-size);
-  color: var(--content-default);
+  font-size: var(--typo-title-md-font-size);
+  color: var(--content-strong);
 }
 
 .details {

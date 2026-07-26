@@ -7,6 +7,8 @@ import { useAudio, useProgressStore, type Track } from "@sd/domain-audio";
 import type { FeedContentItemDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import { List } from "@/shared/components/List";
+import { Button } from "@/shared/components/Button";
+import { MarqueeText } from "@/shared/components/MarqueeText";
 import { useFormattedDate } from "@/shared/hooks/use-formatted-date";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useResponsive } from "@/shared/hooks/use-responsive";
@@ -90,15 +92,13 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
       <div className={styles.container}>
         <div className={styles.avatarSection}>
           {item.thumbnailUrl ? (
-            <div className={styles.avatarContainer}>
-              <Image
-                src={item.thumbnailUrl}
-                alt={scholarName}
-                width={48}
-                height={48}
-                className={styles.avatarImage}
-              />
-            </div>
+            <Image
+              src={item.thumbnailUrl}
+              alt={scholarName}
+              fill
+              sizes="(max-width: 640px) 20vw, 14vw"
+              className={styles.avatarImage}
+            />
           ) : (
             <div className={styles.avatarFallback} aria-hidden="true">
               {initial}
@@ -107,8 +107,14 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
         </div>
 
         <div className={styles.centerSection}>
-          <div className={styles.title}>{title}</div>
-          <div className={styles.scholarName}>{scholarName}</div>
+          <MarqueeText
+            text={title}
+            className="text-[var(--content-strong)] font-semibold [font-size:var(--typo-title-md-font-size)] xl:[font-size:var(--typo-title-lg-font-size)]"
+          />
+          <MarqueeText
+            text={scholarName}
+            className="text-[var(--content-muted)] font-normal [font-size:var(--typo-body-sm-font-size)] xl:[font-size:var(--typo-body-md-font-size)]"
+          />
           <div className={styles.meta}>
             {durationText}
             {durationText && publishedDateText && " · "}
@@ -118,41 +124,33 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
       </div>
 
       <List.Item.Actions>
-        <button
-          type="button"
-          className={`${styles.actionButton} ${styles.playButton} ${
-            isCurrentTrack && isPlaying ? styles.playing : ""
-          } ${isMobile ? styles.actionButtonMobile : ""}`}
-          onClick={handlePlay}
+        <Button
+          variant={!isMobile ? "ghost" : "outline"}
+          size={!isMobile ? "sm" : "icon"}
+          fullWidth={isMobile}
           aria-label={isCurrentTrack && isPlaying ? "Pause lecture" : "Play lecture"}
+          icon={
+            isCurrentTrack && isPlaying ? (
+              <Pause size={16} fill="currentColor" />
+            ) : (
+              <Play size={16} fill="currentColor" />
+            )
+          }
+          onClick={handlePlay}
         >
-          {isCurrentTrack && isPlaying ? (
-            <Pause className={styles.playIcon} size={20} fill="currentColor" />
-          ) : (
-            <Play className={styles.playIcon} size={20} fill="currentColor" />
-          )}
-          {isMobile && (
-            <span className={styles.actionLabel}>
-              {isCurrentTrack && isPlaying ? "Pause" : "Play"}
-            </span>
-          )}
-        </button>
+          {isMobile && (isCurrentTrack && isPlaying ? "Pause" : "Play")}
+        </Button>
 
-        <button
-          type="button"
-          className={`${styles.actionButton} ${styles.saveButton} ${
-            isSaved ? styles.saved : ""
-          } ${isMobile ? styles.actionButtonMobile : ""}`}
-          onClick={handleSave}
+        <Button
+          variant={!isMobile ? "ghost" : "outline"}
+          size={!isMobile ? "sm" : "icon"}
+          fullWidth={isMobile}
           aria-label={isSaved ? "Remove from saved" : "Save lecture"}
+          icon={<Bookmark size={16} fill={isSaved ? "currentColor" : "none"} />}
+          onClick={handleSave}
         >
-          <Bookmark
-            className={styles.saveIcon}
-            size={20}
-            fill={isSaved ? "currentColor" : "none"}
-          />
-          {isMobile && <span className={styles.actionLabel}>{isSaved ? "Saved" : "Save"}</span>}
-        </button>
+          {isMobile && (isSaved ? "Saved" : "Save")}
+        </Button>
       </List.Item.Actions>
 
       {isInProgress && (

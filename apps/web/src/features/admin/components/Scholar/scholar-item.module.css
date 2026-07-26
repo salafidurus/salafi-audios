@@ -1,27 +1,39 @@
 .listItem {
   display: flex;
-  align-items: flex-start;
-  gap: var(--space-md);
+  align-items: center;
+  width: 100%;
 }
 
-.content {
+.container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-component-gap-md);
   flex: 1;
   min-width: 0;
 }
 
-.details {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-md);
+.avatarBlock {
+  position: relative;
+  width: 20%;
+  flex-shrink: 0;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--radius-component-panel-sm);
+  background: var(--surface-subtle);
 }
 
-.avatarBlock {
-  flex-shrink: 0;
+@media (min-width: 640px) {
+  .avatarBlock {
+    width: 14%;
+  }
 }
 
 .detailsBody {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
 }
 
 .nameRow {
@@ -31,7 +43,7 @@
 }
 
 .name {
-  font-size: var(--typo-body-md-font-size);
+  font-size: var(--typo-title-md-font-size);
   font-weight: 600;
   color: var(--content-strong);
   margin: 0;

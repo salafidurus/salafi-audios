@@ -35,10 +35,10 @@ export function FeedPodcastRow({ item, onPress }: FeedPodcastRowProps) {
         )}
       </View>
       <View style={styles.content}>
-        <AppText variant="bodyMd" numberOfLines={2}>
+        <AppText variant="titleMd" numberOfLines={2}>
           {title}
         </AppText>
-        <AppText variant="caption">
+        <AppText variant="bodySm">
           {item.scholarName}
           {item.kind !== "single" ? ` · ${item.kind}` : ""}
         </AppText>

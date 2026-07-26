@@ -23,8 +23,8 @@ export default defineConfig({
   webServer: {
     command:
       process.env.PW_SKIP_WEB_BUILD === "1"
-        ? "bun run start -p 3008"
-        : "bun run build && bun run start -p 3008",
+        ? "bun --bun next start --port 3008"
+        : "bun run build && bun --bun next start --port 3008",
     url: "http://localhost:3008",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

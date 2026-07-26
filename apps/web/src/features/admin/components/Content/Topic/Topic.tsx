@@ -2,8 +2,9 @@ import type { TopicDetailDto } from "@sd/core-contracts";
 import { getLocalizedName } from "@sd/core-i18n";
 import { List } from "@/shared/components/List";
 import { Button } from "@/shared/components/Button";
+import { MarqueeText } from "@/shared/components/MarqueeText";
 import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
-import { Pencil, Trash2, Languages } from "lucide-react";
+import { Pencil, Trash2, Languages, Folder } from "lucide-react";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "../Content.module.css";
@@ -23,8 +24,14 @@ export function Topic({ topic, onEdit, onDelete, onTranslate }: TopicProps) {
   return (
     <List.Item interactive>
       <div className={styles.topicInfo}>
-        <span className={styles.topicName}>{displayName}</span>
-        <span className={styles.topicSlug}>{topic.slug}</span>
+        <MarqueeText
+          text={displayName}
+          className="text-[var(--content-strong)] font-semibold [font-size:var(--typo-title-md-font-size)] xl:[font-size:var(--typo-title-lg-font-size)]"
+        />
+        <MarqueeText
+          text={topic.slug}
+          className="text-[var(--content-muted)] font-normal [font-size:var(--typo-body-sm-font-size)] xl:[font-size:var(--typo-body-md-font-size)]"
+        />
       </div>
       <List.Item.Actions>
         <PermissionGate requires="TOPICS_EDIT">

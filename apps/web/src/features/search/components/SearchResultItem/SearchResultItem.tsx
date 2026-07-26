@@ -77,19 +77,11 @@ export function SearchResultItem({ item, onPress }: SearchResultItemProps) {
         <div className={styles.body}>
           <MarqueeText
             text={item.title}
-            className={
-              isDesktop
-                ? "truncate text-[var(--content-strong)] [font-size:var(--typo-title-md-font-size)] xl:[font-size:var(--typo-title-lg-font-size)]"
-                : "text-[var(--content-strong)]"
-            }
+            className="text-[var(--content-strong)] font-semibold [font-size:var(--typo-title-md-font-size)] xl:[font-size:var(--typo-title-lg-font-size)]"
           />
           <MarqueeText
             text={scholarName}
-            className={
-              isDesktop
-                ? "truncate text-[var(--content-muted)] [font-size:var(--typo-body-sm-font-size)] xl:[font-size:var(--typo-body-md-font-size)]"
-                : "text-[var(--content-muted)]"
-            }
+            className="text-[var(--content-muted)] font-normal [font-size:var(--typo-body-sm-font-size)] xl:[font-size:var(--typo-body-md-font-size)]"
           />
           <div className={styles.metaRow}>
             <Headphones size={11} aria-hidden />

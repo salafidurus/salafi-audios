@@ -10,8 +10,10 @@ export type ListItemActionsProps = {
   orientation?: "horizontal" | "vertical";
   /** Controls action stacking on mobile: 'vertical' (default) for column layout */
   mobileOrientation?: "horizontal" | "vertical";
-  /** Fixed width percentage for actions on desktop/tablet (e.g. '10%', '20%'). Default: '10%'. Mobile is 100% */
+  /** Fixed width percentage for actions on desktop/tablet (e.g. '10%', '20%'). Default: 'auto'. Mobile is 100% */
   widthPercentDesktop?: string;
+  /** Optional click handler for actions container */
+  onClick?: (e: React.MouseEvent) => void;
 };
 
 /**
@@ -38,7 +40,7 @@ export function ListItemActions({
   className,
   orientation = "horizontal",
   mobileOrientation = "vertical",
-  widthPercentDesktop = "10%",
+  widthPercentDesktop = "auto",
 }: ListItemActionsProps) {
   return (
     <div

@@ -26,7 +26,7 @@ export function FeedScholarRow({ scholars, onScholarPress }: FeedScholarRowProps
     <div style={{ padding: "12px 0" }}>
       <div
         style={{
-          fontSize: 14,
+          fontSize: "var(--typo-body-sm-font-size)",
           fontWeight: 600,
           color: "var(--content-strong)",
           marginBottom: 8,
@@ -74,8 +74,8 @@ export function FeedScholarRow({ scholars, onScholarPress }: FeedScholarRowProps
             </div>
             <div
               style={{
-                fontSize: 12,
-                color: "var(--content-default)",
+                fontSize: "var(--typo-caption-font-size)",
+                color: "var(--content-muted)",
                 textAlign: "center",
                 maxWidth: 72,
                 overflow: "hidden",
