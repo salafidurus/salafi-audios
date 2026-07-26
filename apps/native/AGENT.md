@@ -27,12 +27,18 @@ src/
 
 ## Testing
 
-- Test runner: **jest** (not vitest — packages use vitest; native uses jest).
+- Test runner: **jest** (packages use `bun:test`; native uses jest).
 - RTL version: `@testing-library/react-native` v14 — `render` and `fireEvent` are async; always `await` them.
 - Text must be wrapped in `<Text>` for RTL queries to find it.
 - Single file: `bun run test -- src/features/account/screens/account.screen.spec.tsx`
 - By name: `bun run test -- -t "renders loading state"`
 - Watch: `bun run test:watch -- src/features/account/screens/account.screen.spec.tsx`
+
+## Brand Assets
+
+- App icon/splash: `assets/images/icon.png`, `assets/images/splash-icon.png`
+- Logos: `assets/images/logo/*`
+- When implementing UI, use these assets (avoid starter/template logos).
 
 ## Android dev client
 
