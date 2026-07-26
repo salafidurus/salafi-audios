@@ -18,6 +18,7 @@ describe('Authentication (e2e)', () => {
   });
 
   afterAll(async () => {
+    await authFactory.cleanup();
     await app.close();
   });
 

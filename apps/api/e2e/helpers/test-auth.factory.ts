@@ -3,6 +3,8 @@ import { Permission, UserRole } from '@sd/core-db';
 import { createId } from '@paralleldrive/cuid2';
 
 export class TestAuthFactory {
+  private readonly createdUserIds: Set<string> = new Set();
+
   constructor(private readonly prisma: PrismaService) {}
 
   async createUser(
@@ -20,6 +22,8 @@ export class TestAuthFactory {
         emailVerified: true,
       },
     });
+
+    this.createdUserIds.add(user.id);
 
     // Create role assignments
     if (roles.length > 0) {
@@ -65,5 +69,14 @@ export class TestAuthFactory {
 
   async createAdminUser(permissions: Permission[] = []) {
     return this.createUser(undefined, [UserRole.admin], permissions);
+  }
+
+  async cleanup(): Promise<void> {
+    if (this.createdUserIds.size === 0) return;
+    const ids = Array.from(this.createdUserIds);
+    await this.prisma.user.deleteMany({
+      where: { id: { in: ids } },
+    });
+    this.createdUserIds.clear();
   }
 }

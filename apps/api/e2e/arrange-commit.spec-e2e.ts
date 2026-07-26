@@ -72,6 +72,7 @@ describe('Arrange commit (e2e)', () => {
     await prisma.listing.deleteMany({ where: { parentId: { in: childIds } } });
     await prisma.listing.deleteMany({ where: { id: { in: childIds } } });
     await prisma.listing.deleteMany({ where: { id: { in: [...roots, TAKEN_ID] } } });
+    await authFactory.cleanup();
     await app.close();
   });
 

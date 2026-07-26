@@ -18,6 +18,7 @@ describe('Core User Flows (e2e)', () => {
   });
 
   afterAll(async () => {
+    await authFactory.cleanup();
     await app.close();
   });
 
