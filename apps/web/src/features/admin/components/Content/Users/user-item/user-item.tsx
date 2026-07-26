@@ -33,11 +33,7 @@ export function UserItem({ user, onManagePermissions, onManageRoles }: UserItemP
         </div>
       </div>
 
-      <List.Item.Actions
-        orientation="horizontal"
-        mobileOrientation="vertical"
-        widthPercentDesktop="15%"
-      >
+      <List.Item.Actions orientation="horizontal" mobileOrientation="vertical">
         <PermissionGate requires="USERS_GRANT_PERMISSIONS">
           <Button
             variant={isMobile ? "outline" : "ghost"}

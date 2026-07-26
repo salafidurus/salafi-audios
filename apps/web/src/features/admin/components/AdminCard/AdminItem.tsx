@@ -138,8 +138,8 @@ export function AdminItem({
         </div>
       </div>
 
-      <List.Item.Actions>
-        <div onClick={(e) => e.stopPropagation()}>{actions}</div>
+      <List.Item.Actions onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+        {actions}
       </List.Item.Actions>
     </List.Item>
   );

@@ -2,10 +2,10 @@
 .actions {
   display: flex;
   flex-shrink: 0;
-  width: var(--actions-width-desktop, 10%);
+  width: var(--actions-width-desktop, auto);
   gap: var(--space-component-gap-sm);
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
 }
 
 /* Desktop/Tablet orientation: horizontal (default) */
