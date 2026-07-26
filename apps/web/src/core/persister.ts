@@ -1,4 +1,4 @@
-import { openDB, type IDBPDatabase } from "idb";
+import { deleteDB, openDB, type IDBPDatabase } from "idb";
 import type { PersistedClient, Persister } from "@tanstack/react-query-persist-client";
 
 const DB_NAME = "sd-query-cache";
@@ -10,7 +10,7 @@ let dbPromise: Promise<IDBPDatabase> | null = null;
 function getDb(): Promise<IDBPDatabase> {
   if (!dbPromise) {
     dbPromise = openDB(DB_NAME, 1, {
-      upgrade(db: any) {
+      upgrade(db) {
         if (!db.objectStoreNames.contains(STORE_NAME)) {
           db.createObjectStore(STORE_NAME);
         }
@@ -18,12 +18,22 @@ function getDb(): Promise<IDBPDatabase> {
       blocked() {
         console.warn("IndexedDB open blocked, resetting connection");
       },
+      blocking() {
+        // Another tab is upgrading the database — release our connection
+        // instead of blocking that upgrade indefinitely.
+        dbPromise
+          ?.then((db) => db.close())
+          .catch(() => {
+            // Ignore errors when closing DB
+          });
+        dbPromise = null;
+      },
       terminated() {
         dbPromise = null;
       },
     });
   }
-  return dbPromise!;
+  return dbPromise;
 }
 
 export async function purgeQueryCacheDb(): Promise<void> {
@@ -38,7 +48,15 @@ export async function purgeQueryCacheDb(): Promise<void> {
   }
   if (typeof indexedDB !== "undefined") {
     try {
-      indexedDB.deleteDatabase(DB_NAME);
+      // Await the deletion itself rather than firing indexedDB.deleteDatabase()
+      // and returning immediately — a bare fire-and-forget call races any
+      // connection opened right after (e.g. an immediate persistClient call
+      // reopening the database mid-deletion).
+      await deleteDB(DB_NAME, {
+        blocked() {
+          console.warn("IndexedDB deletion blocked by another open connection");
+        },
+      });
     } catch (error) {
       console.error("Failed to purge query cache database:", error);
     }
@@ -58,7 +76,7 @@ export function createIdbPersister(): Persister {
     restoreClient: async () => {
       try {
         const db = await getDb();
-        return await db.get(STORE_NAME, CACHE_KEY);
+        return (await db.get(STORE_NAME, CACHE_KEY)) as PersistedClient | undefined;
       } catch (error) {
         console.error("Failed to restore web query cache:", error);
         return undefined;
