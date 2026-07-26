@@ -61,10 +61,10 @@ export function useFormattedScholarName(
   const hasQueryClient = Boolean(contextClient);
   const shouldFetch = hasQueryClient && Boolean(scholarName) && !titleParam;
 
-  const scholarsQuery = useScholarsList({
-    queryClient: contextClient ?? fallbackQueryClient,
-    enabled: shouldFetch,
-  });
+  const scholarsQuery = useScholarsList(
+    { enabled: shouldFetch },
+    contextClient ?? fallbackQueryClient,
+  );
   const data = shouldFetch ? scholarsQuery.data : undefined;
 
   if (!scholarName) return "";

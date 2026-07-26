@@ -9,13 +9,14 @@ import {
   type ScholarListItemDto,
   type ScholarTopicsDto,
 } from "@sd/core-contracts";
-import type { UseQueryOptions } from "@tanstack/react-query";
+import type { QueryClient, UseQueryOptions } from "@tanstack/react-query";
 
 export function useScholarsList(
   options?: Omit<
     UseQueryOptions<{ scholars: ScholarListItemDto[] }, Error, { scholars: ScholarListItemDto[] }>,
     "queryKey" | "queryFn"
   >,
+  queryClient?: QueryClient,
 ) {
   return useApiQuery(
     queryKeys.scholars.list.all(),
@@ -25,6 +26,7 @@ export function useScholarsList(
         method: "GET",
       }),
     options,
+    queryClient,
   );
 }
 
