@@ -65,6 +65,7 @@ export interface UploadItem {
 export interface NewModule {
   tempId: string;
   slug: string;
+  slugEdited: boolean;
   title: string;
   description: string;
   status: StatusValue;
@@ -158,6 +159,18 @@ function nextOrderIndex(state: UploadArrangeState, moduleKey: ModuleKey): number
       : (state.existing?.modules.find((m) => m.id === moduleKey)?.lessons ?? []);
   const existingMax = existingLessons.reduce((max, l) => Math.max(max, l.orderIndex ?? 0), 0);
   return Math.max(stagedMax, existingMax) + 1;
+}
+
+/** The slug an item/module must be prefixed by, given its immediate parent container. */
+function resolveParentSlug(state: UploadArrangeState, moduleKey: ModuleKey): string {
+  if (moduleKey === ROOT_MODULE_KEY) return state.existing?.slug ?? "";
+  if (moduleKey.startsWith("new:")) {
+    const tempId = moduleKey.slice("new:".length);
+    return state.newModules.find((m) => m.tempId === tempId)?.slug ?? state.existing?.slug ?? "";
+  }
+  return (
+    state.existing?.modules.find((m) => m.id === moduleKey)?.slug ?? state.existing?.slug ?? ""
+  );
 }
 
 function updateItem(
@@ -290,7 +303,8 @@ function reducer(state: UploadArrangeState, action: UploadArrangeAction): Upload
       return updateItem(state, action.itemId, (item) => {
         const next = { ...item, title: action.title };
         if (item.assignment.kind === "new-lesson" && !item.assignment.slugEdited) {
-          const slug = deriveChildSlug(state.existing?.slug ?? "", action.title);
+          const parentSlug = resolveParentSlug(state, item.assignment.moduleKey);
+          const slug = deriveChildSlug(parentSlug, action.title);
           const match = findSlugMatch(slug, allExistingLessons(state.existing));
           next.assignment = { ...item.assignment, slug };
           next.suggestion = match
@@ -304,10 +318,22 @@ function reducer(state: UploadArrangeState, action: UploadArrangeAction): Upload
       return { ...state, items: state.items.filter((item) => item.id !== action.itemId) };
 
     case "SET_ASSIGNMENT":
-      return updateItem(state, action.itemId, (item) => ({
-        ...item,
-        assignment: action.assignment,
-      }));
+      return updateItem(state, action.itemId, (item) => {
+        const incoming = action.assignment;
+        if (
+          incoming.kind === "new-lesson" &&
+          item.assignment.kind === "new-lesson" &&
+          incoming.moduleKey !== item.assignment.moduleKey &&
+          !incoming.slugEdited
+        ) {
+          const parentSlug = resolveParentSlug(state, incoming.moduleKey);
+          return {
+            ...item,
+            assignment: { ...incoming, slug: deriveChildSlug(parentSlug, item.title) },
+          };
+        }
+        return { ...item, assignment: incoming };
+      });
 
     case "SET_LESSON_FIELD":
       return updateItem(state, action.itemId, (item) => {
@@ -356,6 +382,7 @@ function reducer(state: UploadArrangeState, action: UploadArrangeAction): Upload
           {
             tempId: crypto.randomUUID(),
             slug,
+            slugEdited: false,
             title: action.title,
             description: "",
             status: "draft",
@@ -365,23 +392,49 @@ function reducer(state: UploadArrangeState, action: UploadArrangeAction): Upload
       };
     }
 
-    case "EDIT_MODULE":
-      return {
-        ...state,
-        newModules: state.newModules.map((mod) =>
-          mod.tempId === action.tempId
-            ? {
-                ...mod,
-                [action.field]:
-                  action.field === "orderIndex"
-                    ? action.value === null
-                      ? null
-                      : Number(action.value)
-                    : action.value,
-              }
-            : mod,
-        ),
-      };
+    case "EDIT_MODULE": {
+      const newModules = state.newModules.map((mod) => {
+        if (mod.tempId !== action.tempId) return mod;
+        if (action.field === "slug") {
+          return { ...mod, slug: String(action.value ?? ""), slugEdited: true };
+        }
+        if (action.field === "title") {
+          const title = String(action.value ?? "");
+          if (mod.slugEdited) return { ...mod, title };
+          return { ...mod, title, slug: deriveChildSlug(state.existing?.slug ?? "", title) };
+        }
+        return {
+          ...mod,
+          [action.field]:
+            action.field === "orderIndex"
+              ? action.value === null
+                ? null
+                : Number(action.value)
+              : action.value,
+        };
+      });
+
+      const editedModule = newModules.find((m) => m.tempId === action.tempId);
+      const moduleKey = `new:${action.tempId}`;
+      const items =
+        editedModule && (action.field === "slug" || action.field === "title")
+          ? state.items.map((item) =>
+              item.assignment.kind === "new-lesson" &&
+              item.assignment.moduleKey === moduleKey &&
+              !item.assignment.slugEdited
+                ? {
+                    ...item,
+                    assignment: {
+                      ...item.assignment,
+                      slug: deriveChildSlug(editedModule.slug, item.title),
+                    },
+                  }
+                : item,
+            )
+          : state.items;
+
+      return { ...state, newModules, items };
+    }
 
     case "REMOVE_MODULE": {
       const moduleKey = `new:${action.tempId}`;

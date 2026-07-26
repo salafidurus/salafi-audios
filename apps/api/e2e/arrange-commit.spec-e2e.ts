@@ -200,6 +200,105 @@ describe('Arrange commit (e2e)', () => {
     expect(collection?.publishedLectureCount).toBe(1);
   });
 
+  it("rejects a lesson nested under a new module when it only satisfies the root prefix, not the module's own slug", async () => {
+    const res = await request(app.getHttpServer())
+      .post(`/admin/listings/${COLLECTION_ID}/arrange-commit`)
+      .set(creatorHeaders)
+      .send({
+        modules: [
+          {
+            op: 'create',
+            slug: `${COLLECTION_SLUG}-fiqh`,
+            title: 'Book of Fiqh',
+            lessons: [
+              {
+                // Starts with the root's prefix, but not with the new module's
+                // own slug (`${COLLECTION_SLUG}-fiqh-`) — must be rejected.
+                op: 'create',
+                slug: `${COLLECTION_SLUG}-wrong-parent`,
+                title: 'Wrong Parent',
+                audio: audio(`${COLLECTION_SLUG}-wrong-parent`),
+              },
+            ],
+          },
+        ],
+      })
+      .expect(400);
+
+    expect(res.body.message).toContain(`${COLLECTION_SLUG}-fiqh-`);
+
+    const moduleRow = await prisma.listing.findUnique({
+      where: { slug: `${COLLECTION_SLUG}-fiqh` },
+    });
+    expect(moduleRow).toBeNull();
+  });
+
+  it("rejects a lesson nested under an existing module when it only satisfies the root prefix, not the module's actual DB slug", async () => {
+    const moduleRow = await prisma.listing.findUnique({
+      where: { slug: `${COLLECTION_SLUG}-ilm` },
+      select: { id: true },
+    });
+
+    await request(app.getHttpServer())
+      .post(`/admin/listings/${COLLECTION_ID}/arrange-commit`)
+      .set(creatorHeaders)
+      .send({
+        modules: [
+          {
+            op: 'update',
+            id: moduleRow!.id,
+            lessons: [
+              {
+                op: 'create',
+                slug: `${COLLECTION_SLUG}-not-under-ilm`,
+                title: 'Not Under Ilm',
+                audio: audio(`${COLLECTION_SLUG}-not-under-ilm`),
+              },
+            ],
+          },
+        ],
+      })
+      .expect(400);
+
+    const lessonRow = await prisma.listing.findUnique({
+      where: { slug: `${COLLECTION_SLUG}-not-under-ilm` },
+    });
+    expect(lessonRow).toBeNull();
+  });
+
+  it("accepts a lesson correctly prefixed by an existing module's actual slug", async () => {
+    const moduleRow = await prisma.listing.findUnique({
+      where: { slug: `${COLLECTION_SLUG}-ilm` },
+      select: { id: true },
+    });
+
+    await request(app.getHttpServer())
+      .post(`/admin/listings/${COLLECTION_ID}/arrange-commit`)
+      .set(creatorHeaders)
+      .send({
+        modules: [
+          {
+            op: 'update',
+            id: moduleRow!.id,
+            lessons: [
+              {
+                op: 'create',
+                slug: `${COLLECTION_SLUG}-ilm-hadith2`,
+                title: 'Hadith 2',
+                audio: audio(`${COLLECTION_SLUG}-ilm-hadith2`),
+              },
+            ],
+          },
+        ],
+      })
+      .expect(201);
+
+    const lessonRow = await prisma.listing.findUnique({
+      where: { slug: `${COLLECTION_SLUG}-ilm-hadith2` },
+    });
+    expect(lessonRow?.parentId).toBe(moduleRow!.id);
+  });
+
   it('returns 409 with conflictingSlugs and rolls the whole commit back', async () => {
     const res = await request(app.getHttpServer())
       .post(`/admin/listings/${SERIES_ID}/arrange-commit`)

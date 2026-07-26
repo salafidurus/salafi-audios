@@ -1250,25 +1250,60 @@ export class ListingRepository {
         }
       }
 
-      const createSlugs: string[] = [];
+      const moduleUpdateIds: string[] = [];
       for (const moduleOp of moduleOps) {
-        if (moduleOp.op === 'create') createSlugs.push(moduleOp.slug);
-        for (const lessonOp of moduleOp.lessons) {
-          if (lessonOp.op === 'create') createSlugs.push(lessonOp.slug);
+        if (moduleOp.op === 'update') moduleUpdateIds.push(moduleOp.id);
+      }
+      const existingModuleSlugById = new Map<string, string>();
+      if (moduleUpdateIds.length) {
+        const found = await tx.listing.findMany({
+          where: { id: { in: moduleUpdateIds }, parentId: rootId, deletedAt: null },
+          select: { id: true, slug: true },
+        });
+        if (found.length !== moduleUpdateIds.length) {
+          throw new BadRequestException('Module update target is not under this listing');
+        }
+        for (const m of found) existingModuleSlugById.set(m.id, m.slug);
+      }
+
+      // Each create-slug is checked against its own immediate parent's slug, not just
+      // the root's — a lesson nested under a module must be prefixed by that module's
+      // slug (which is itself prefixed by the root's), not merely share the root prefix.
+      const prefixChecks: { slug: string; expectedPrefix: string }[] = [];
+      for (const moduleOp of moduleOps) {
+        if (moduleOp.op === 'create') {
+          prefixChecks.push({ slug: moduleOp.slug, expectedPrefix: root.slug });
+          for (const lessonOp of moduleOp.lessons) {
+            if (lessonOp.op === 'create') {
+              prefixChecks.push({ slug: lessonOp.slug, expectedPrefix: moduleOp.slug });
+            }
+          }
+        } else {
+          const parentSlug = existingModuleSlugById.get(moduleOp.id) ?? root.slug;
+          for (const lessonOp of moduleOp.lessons) {
+            if (lessonOp.op === 'create') {
+              prefixChecks.push({ slug: lessonOp.slug, expectedPrefix: parentSlug });
+            }
+          }
         }
       }
       for (const lessonOp of rootLessonOps) {
-        if (lessonOp.op === 'create') createSlugs.push(lessonOp.slug);
+        if (lessonOp.op === 'create') {
+          prefixChecks.push({ slug: lessonOp.slug, expectedPrefix: root.slug });
+        }
       }
 
+      const createSlugs = prefixChecks.map((c) => c.slug);
       const duplicates = createSlugs.filter((slug, i) => createSlugs.indexOf(slug) !== i);
       if (duplicates.length) {
         throw new BadRequestException(`Duplicate slugs in payload: ${duplicates.join(', ')}`);
       }
-      const badPrefix = createSlugs.filter((slug) => !slug.startsWith(`${root.slug}-`));
+      const badPrefix = prefixChecks.filter((c) => !c.slug.startsWith(`${c.expectedPrefix}-`));
       if (badPrefix.length) {
         throw new BadRequestException(
-          `Slugs must be prefixed by ${root.slug}-: ${badPrefix.join(', ')}`,
+          `Slugs must be prefixed by their parent's slug: ${badPrefix
+            .map((c) => `${c.slug} (expected prefix: ${c.expectedPrefix}-)`)
+            .join(', ')}`,
         );
       }
       if (createSlugs.length) {
@@ -1281,20 +1316,6 @@ export class ListingRepository {
             message: 'Slugs already in use',
             conflictingSlugs: clashes.map((c) => c.slug),
           });
-        }
-      }
-
-      const moduleUpdateIds: string[] = [];
-      for (const moduleOp of moduleOps) {
-        if (moduleOp.op === 'update') moduleUpdateIds.push(moduleOp.id);
-      }
-      if (moduleUpdateIds.length) {
-        const found = await tx.listing.findMany({
-          where: { id: { in: moduleUpdateIds }, parentId: rootId, deletedAt: null },
-          select: { id: true },
-        });
-        if (found.length !== moduleUpdateIds.length) {
-          throw new BadRequestException('Module update target is not under this listing');
         }
       }
 
