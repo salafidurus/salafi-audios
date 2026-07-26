@@ -10,7 +10,7 @@ import { localeToDir } from "@sd/core-i18n";
 import { authClient } from "@/core/auth/auth-client";
 import { ToastContainer } from "@/core/toast";
 import { createI18n } from "./i18n/i18n";
-import { createIdbPersister } from "./persister";
+import { createIdbPersister, purgeQueryCacheDb } from "./persister";
 
 const queryClient = createQueryClient();
 const persister = createIdbPersister();
@@ -59,7 +59,7 @@ export function Providers({ children, apiBaseUrl, initialLocale }: Props) {
     setUnauthorizedHandler(() => {
       authClient.signOut().then(async () => {
         queryClient.clear();
-        await persister.removeClient();
+        await purgeQueryCacheDb();
         if (
           typeof window !== "undefined" &&
           window.location &&
