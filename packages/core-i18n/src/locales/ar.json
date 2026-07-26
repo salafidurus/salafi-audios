@@ -241,6 +241,14 @@
     "notFound": "لم يتم العثور على المحاضرة",
     "minutes": "{{count}} دقيقة"
   },
+  "scholar": {
+    "title": {
+      "allamah": "الشيخ العلامة",
+      "sheikh": "الشيخ",
+      "ustadh": "الأستاذ",
+      "akh": "الأخ"
+    }
+  },
   "scholarContent": {
     "collections": "المجموعات",
     "series": "السلاسل",

@@ -9,8 +9,11 @@ export {
 } from "./content-preference";
 export {
   SUBNAV_KEYS,
+  SCHOLAR_TITLE_KEYS,
   getSubnavLabel,
   getEmptyStateText,
   getErrorStateText,
   getLocalizedName,
+  getScholarTitleLabel,
+  type TranslateFn,
 } from "./translation-helpers";

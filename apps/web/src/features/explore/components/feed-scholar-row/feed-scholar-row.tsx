@@ -3,7 +3,7 @@
 import type React from "react";
 import Image from "next/image";
 import type { ScholarChipDto } from "@sd/core-contracts";
-import { formatScholarName } from "@/shared/utils/format-scholar-name";
+import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 export type FeedScholarRowProps = {
   scholars: ScholarChipDto[];
@@ -22,6 +22,7 @@ const scholarButtonStyle: React.CSSProperties = {
 };
 
 export function FeedScholarRow({ scholars, onScholarPress }: FeedScholarRowProps) {
+  const formatScholarName = useFormatScholarName();
   return (
     <div style={{ padding: "12px 0" }}>
       <div

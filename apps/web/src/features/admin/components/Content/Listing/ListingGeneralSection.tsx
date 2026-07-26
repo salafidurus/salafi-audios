@@ -15,7 +15,7 @@ import {
   DropdownContent,
   DropdownItem,
 } from "@/shared/components/Dropdown";
-import { formatScholarName } from "@/shared/utils/format-scholar-name";
+import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 import { deriveChildSlug } from "@/features/admin/utils/slugify";
 import type { FormAction, FormState } from "@/features/admin/hooks/Content/useListingForm";
 import styles from "./listing-modal.module.css";
@@ -44,6 +44,7 @@ export function ListingGeneralSection({
   stagedImagePreview,
 }: ListingGeneralSectionProps) {
   const { i18n, t } = useTranslation();
+  const formatScholarName = useFormatScholarName();
   const {
     scholarId,
     status,

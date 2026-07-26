@@ -9,7 +9,7 @@ import { AppText } from "@/shared/components/AppText/AppText";
 import { TopicChips } from "../topic-chips/topic-chips";
 import { pickContentField } from "@sd/core-i18n";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
-import { formatScholarName } from "@/shared/utils/format-scholar-name";
+import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 import styles from "./MetaDataSection.module.css";
 
 function formatDuration(seconds?: number): string {
@@ -28,6 +28,7 @@ export type MetaDataSectionProps = {
 
 export function MetaDataSection({ listing }: MetaDataSectionProps) {
   const showOriginal = useShowOriginalContent();
+  const formatScholarName = useFormatScholarName();
   const title = pickContentField(listing.title, listing.original?.title, showOriginal);
 
   const imageUrl = listing.scholar.imageUrl;

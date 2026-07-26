@@ -313,9 +313,15 @@
         "@sd/core-i18n": "workspace:*",
         "@sd/domain-audio": "workspace:*",
       },
+      "devDependencies": {
+        "@happy-dom/global-registrator": "^20.10.6",
+        "@testing-library/react": "^16.3.2",
+        "i18next": "catalog:",
+      },
       "peerDependencies": {
         "@tanstack/react-query": "catalog:",
         "react": "^19.0.0",
+        "react-i18next": "catalog:",
       },
     },
     "packages/domain-search": {

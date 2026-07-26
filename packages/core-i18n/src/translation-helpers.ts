@@ -5,6 +5,8 @@
  * parsed statically).
  */
 
+import type { ScholarTitle } from "@sd/core-contracts";
+
 export const SUBNAV_KEYS: Record<string, Record<string, string>> = {
   explore: {
     recent: "navigation.subnav.explore.recent",
@@ -26,12 +28,29 @@ export const SUBNAV_KEYS: Record<string, Record<string, string>> = {
   },
 };
 
-type TranslateFn = (key: string) => string;
+export type TranslateFn = (key: string) => string;
 
 /** Translate a subsection tab label, falling back to the raw id if unmapped. */
 export function getSubnavLabel(section: string, tabId: string, t: TranslateFn): string {
   const key = SUBNAV_KEYS[section]?.[tabId];
   return key ? t(key) : tabId;
+}
+
+export const SCHOLAR_TITLE_KEYS: Record<ScholarTitle, string> = {
+  allamah: "scholar.title.allamah",
+  sheikh: "scholar.title.sheikh",
+  ustadh: "scholar.title.ustadh",
+  akh: "scholar.title.akh",
+};
+
+/** Translate a scholar's honorific title, falling back to the raw value if unmapped. */
+export function getScholarTitleLabel(
+  title: ScholarTitle | string | undefined | null,
+  t: TranslateFn,
+): string {
+  if (!title) return "";
+  const key = SCHOLAR_TITLE_KEYS[title as ScholarTitle];
+  return key ? t(key) : title;
 }
 
 /** Localized empty-state text for a feature feed. */

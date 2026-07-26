@@ -8,7 +8,7 @@ import { useLastPlayedLesson } from "@sd/domain-content";
 import { audioService } from "@/features/audio";
 import { useAuth } from "@/core/auth";
 import { Button } from "@/shared/components/Button/Button";
-import { formatScholarName } from "@/shared/utils/format-scholar-name";
+import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 import { LectureSaveButton } from "../lecture-save-button/LectureSaveButton";
 import styles from "./QuickButtonSection.module.css";
 
@@ -18,6 +18,7 @@ export type QuickButtonSectionProps = {
 };
 
 export function QuickButtonSection({ listing, contents }: QuickButtonSectionProps) {
+  const formatScholarName = useFormatScholarName();
   const { isAuthenticated } = useAuth();
   const { isPlaying, currentTrack } = useAudio();
   const { data: lastPlayed } = useLastPlayedLesson(listing.id, isAuthenticated);

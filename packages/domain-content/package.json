@@ -20,9 +20,14 @@
     "@sd/core-i18n": "workspace:*",
     "@sd/domain-audio": "workspace:*"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@happy-dom/global-registrator": "catalog:",
+    "@testing-library/react": "catalog:",
+    "i18next": "catalog:"
+  },
   "peerDependencies": {
     "@tanstack/react-query": "catalog:",
-    "react": "^19.0.0"
+    "react": "^19.0.0",
+    "react-i18next": "catalog:"
   }
 }

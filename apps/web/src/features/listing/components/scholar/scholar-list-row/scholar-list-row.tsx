@@ -3,7 +3,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { ScholarListItemDto } from "@sd/core-contracts";
 import { useIsRtl } from "@/shared/hooks/use-is-rtl";
-import { formatScholarName } from "@/shared/utils/format-scholar-name";
+import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 import { List } from "@/shared/components/List";
 import { UserAvatar } from "@/shared/components/user-avatar";
 import { MarqueeText } from "@/shared/components/MarqueeText";
@@ -16,6 +16,7 @@ export type ScholarListRowProps = {
 
 export function ScholarListRow({ scholar, onPress }: ScholarListRowProps) {
   const isRtl = useIsRtl();
+  const formatScholarName = useFormatScholarName();
   const formattedName = formatScholarName(scholar);
 
   const metaText = [

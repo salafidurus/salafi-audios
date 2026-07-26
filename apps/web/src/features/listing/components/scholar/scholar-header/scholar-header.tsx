@@ -4,7 +4,7 @@ import Image from "next/image";
 import type { ScholarDetailDto } from "@sd/core-contracts";
 import { Globe } from "lucide-react";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { formatScholarName } from "@/shared/utils/format-scholar-name";
+import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 import styles from "./scholar-header.module.css";
 
 export type ScholarHeaderProps = {
@@ -19,6 +19,7 @@ export type ScholarHeaderProps = {
 
 export function ScholarHeader({ scholar }: ScholarHeaderProps) {
   const { t } = useTranslation();
+  const formatScholarName = useFormatScholarName();
   const totalHours = Math.round(scholar.totalDurationSeconds / 3600);
   const initial = scholar.name?.trim().charAt(0).toUpperCase() || "?";
 
