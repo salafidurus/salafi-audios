@@ -31,6 +31,7 @@
     }
   },
   "scripts": {
+    "agents:update": "bun scripts/sync-agents.mjs",
     "catalog": "bun ./infra/catalog/cli.ts",
     "dev": "turbo watch dev --filter=api --filter=web --filter=native",
     "dev:api": "turbo watch dev --filter=api",

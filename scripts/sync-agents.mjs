@@ -40,7 +40,6 @@ const PLANS = join(AGENTS_DIR, "plans");
 const RULES = join(AGENTS_DIR, "rules");
 
 const TOOLS = [".claude", ".opencode", ".gemini"];
-const APP_DIRS = ["apps/api", "apps/web", "apps/native", "apps/mobile"];
 const SKIP_DIRS = new Set(["node_modules", ".git", ".turbo", "dist", "build", ".next", "scripts"]);
 
 // ── helpers ────────────────────────────────────────────────────────────────
@@ -117,30 +116,57 @@ for (const tool of TOOLS) {
   linkDir(join(root, tool, "plans"), PLANS);
 }
 
-// Skills + plans — per app workspace
-for (const app of APP_DIRS) {
-  const appDir = join(root, app);
-  if (!existsSync(appDir)) continue;
-  for (const tool of TOOLS) {
-    ensureDir(join(appDir, tool));
-    linkDir(join(appDir, tool, "skills"), SKILLS);
-    linkDir(join(appDir, tool, "plans"), PLANS);
-  }
-}
-
 // Rules — directory junctions (same pattern as skills/plans)
 for (const tool of TOOLS) {
   ensureDir(join(root, tool));
   linkDir(join(root, tool, "rules"), RULES);
 }
-for (const app of APP_DIRS) {
-  const appDir = join(root, app);
-  if (!existsSync(appDir)) continue;
-  for (const tool of TOOLS) {
-    ensureDir(join(appDir, tool));
-    linkDir(join(appDir, tool, "rules"), RULES);
+
+// Local .agents/ dirs — for each immediate subdirectory that has its own .agents/
+// folder, create tool symlinks pointing to that local .agents/.
+// Also removes stale tool dirs from subdirectories that don't have .agents/.
+function syncLocalAgentTools(rootDir) {
+  let entries;
+  try {
+    entries = readdirSync(rootDir, { withFileTypes: true });
+  } catch {
+    return;
+  }
+  for (const entry of entries) {
+    if (entry.isSymbolicLink()) continue;
+    if (SKIP_DIRS.has(entry.name) || entry.name.startsWith(".")) continue;
+    if (!entry.isDirectory()) continue;
+    const subDir = join(rootDir, entry.name);
+    const agentsDir = join(subDir, ".agents");
+    if (existsSync(agentsDir)) {
+      // Has local .agents/ — create tool symlinks
+      for (const tool of TOOLS) {
+        const toolDir = join(subDir, tool);
+        ensureDir(toolDir);
+        linkDir(join(toolDir, "skills"), join(agentsDir, "skills"));
+        linkDir(join(toolDir, "plans"), join(agentsDir, "plans"));
+        linkDir(join(toolDir, "rules"), join(agentsDir, "rules"));
+      }
+    } else {
+      // No local .agents/ — remove any stale tool dirs
+      for (const tool of TOOLS) {
+        for (const sub of ["skills", "plans", "rules"]) {
+          const link = join(subDir, tool, sub);
+          if (existsSync(link)) removeLink(link);
+        }
+        const toolDir = join(subDir, tool);
+        if (existsSync(toolDir) && lstatSync(toolDir).isDirectory()) {
+          try {
+            rmdirSync(toolDir);
+          } catch {}
+        }
+      }
+    }
+    // Recurse into subdirectory to handle nested dirs (e.g. apps/api/)
+    syncLocalAgentTools(subDir);
   }
 }
+syncLocalAgentTools(root);
 
 // AGENT.md aliases — walk tree, create AGENTS.md / CLAUDE.md / GEMINI.md next to each
 function syncAliases(dir) {
