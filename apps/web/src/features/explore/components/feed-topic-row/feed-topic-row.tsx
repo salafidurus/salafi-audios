@@ -5,6 +5,7 @@ import type { ContentSuggestionDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 
 const itemButtonStyle: CSSProperties = {
   minWidth: 200,
@@ -17,6 +18,67 @@ const itemButtonStyle: CSSProperties = {
   textAlign: "start",
 };
 
+function FeedTopicItem({
+  item,
+  showOriginal,
+  onItemPress,
+}: {
+  item: ContentSuggestionDto;
+  showOriginal: boolean;
+  onItemPress?: (slug: string) => void;
+}) {
+  const title = pickContentField(item.title, item.original?.title, showOriginal);
+  const scholarName = useFormattedScholarName(item.scholarName);
+
+  return (
+    <button
+      type="button"
+      style={itemButtonStyle}
+      onClick={() => onItemPress?.(item.slug)}
+      onFocus={(e) => {
+        e.currentTarget.style.boxShadow = "var(--shadow-sm)";
+      }}
+      onBlur={(e) => {
+        e.currentTarget.style.boxShadow = "none";
+      }}
+      onMouseOver={(e) => {
+        e.currentTarget.style.boxShadow = "var(--shadow-sm)";
+      }}
+      onMouseOut={(e) => {
+        e.currentTarget.style.boxShadow = "none";
+      }}
+    >
+      <div
+        style={{
+          fontSize: 14,
+          fontWeight: 500,
+          marginBottom: 4,
+          lineHeight: "1.4",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {title}
+      </div>
+      <div
+        style={{
+          fontSize: 12,
+          color: "var(--content-muted)",
+          marginBottom: 4,
+        }}
+      >
+        {scholarName}
+      </div>
+      {item.durationSeconds && (
+        <div style={{ fontSize: 12, color: "var(--content-subtle)" }}>
+          {Math.floor(item.durationSeconds / 60)}m
+        </div>
+      )}
+    </button>
+  );
+}
+
 export type FeedTopicRowProps = {
   topicName: string;
   items: ContentSuggestionDto[];
@@ -24,27 +86,24 @@ export type FeedTopicRowProps = {
 };
 
 export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProps) {
-  const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
+  const showOriginal = useShowOriginalContent();
 
-  if (!items.length) {
-    return null;
-  }
+  if (items.length === 0) return null;
+
   return (
-    <div style={{ marginBottom: 16 }}>
-      <h3
+    <div style={{ marginBottom: 24 }}>
+      <div
         style={{
-          margin: 0,
-          marginBottom: 12,
-          fontSize: 16,
+          fontSize: 18,
           fontWeight: 600,
-          color: "var(--content-strong)",
+          marginBottom: 12,
+          color: "var(--content-default)",
         }}
       >
-        {t("feed.newInTopic", "New in {{topic}}", { topic: topicName })}
-      </h3>
+        {topicName}
+      </div>
       <div
-        className="no-scrollbar"
         style={{
           display: "flex",
           gap: 12,
@@ -52,57 +111,14 @@ export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProp
           paddingBottom: 8,
         }}
       >
-        {items.map((item) => {
-          const title = pickContentField(item.title, item.original?.title, showOriginal);
-          return (
-            <button
-              key={item.id}
-              type="button"
-              style={itemButtonStyle}
-              onClick={() => onItemPress?.(item.slug)}
-              onFocus={(e) => {
-                e.currentTarget.style.boxShadow = "var(--shadow-sm)";
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.boxShadow = "none";
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.boxShadow = "var(--shadow-sm)";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.boxShadow = "none";
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 14,
-                  fontWeight: 500,
-                  marginBottom: 4,
-                  lineHeight: "1.4",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {title}
-              </div>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "var(--content-muted)",
-                  marginBottom: 4,
-                }}
-              >
-                {item.scholarName}
-              </div>
-              {item.durationSeconds && (
-                <div style={{ fontSize: 12, color: "var(--content-subtle)" }}>
-                  {Math.floor(item.durationSeconds / 60)}m
-                </div>
-              )}
-            </button>
-          );
-        })}
+        {items.map((item) => (
+          <FeedTopicItem
+            key={item.id}
+            item={item}
+            showOriginal={showOriginal}
+            onItemPress={onItemPress}
+          />
+        ))}
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ import { List } from "@/shared/components/List";
 import { useFormattedDate } from "@/shared/hooks/use-formatted-date";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useResponsive } from "@/shared/hooks/use-responsive";
+import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 import { audioService } from "@/features/audio";
 import styles from "./explore-list-row.module.css";
 
@@ -22,6 +23,7 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
   const showOriginal = useShowOriginalContent();
   const title = pickContentField(item.title, item.original?.title, showOriginal);
   const { isMobile } = useResponsive();
+  const scholarName = useFormattedScholarName(item.scholarName);
 
   const { isPlaying, currentTrack } = useAudio();
   const isCurrentTrack = currentTrack?.id === item.id;
@@ -52,7 +54,7 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
     const track: Track = {
       id: item.id,
       title,
-      artist: item.scholarName,
+      artist: scholarName,
       url: "", // resolved lazily by DurusAudioService
       durationSeconds: item.durationSeconds ?? 0,
       artworkUrl: item.thumbnailUrl ?? undefined,
@@ -72,7 +74,7 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
     }
   };
 
-  const initial = item.scholarName ? item.scholarName.trim().charAt(0).toUpperCase() : "?";
+  const initial = scholarName ? scholarName.trim().charAt(0).toUpperCase() : "?";
 
   const durationText = item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : "";
 
@@ -91,7 +93,7 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
             <div className={styles.avatarContainer}>
               <Image
                 src={item.thumbnailUrl}
-                alt={item.scholarName}
+                alt={scholarName}
                 width={48}
                 height={48}
                 className={styles.avatarImage}
@@ -106,7 +108,7 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
 
         <div className={styles.centerSection}>
           <div className={styles.title}>{title}</div>
-          <div className={styles.scholarName}>{item.scholarName}</div>
+          <div className={styles.scholarName}>{scholarName}</div>
           <div className={styles.meta}>
             {durationText}
             {durationText && publishedDateText && " · "}

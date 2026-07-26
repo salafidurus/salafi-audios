@@ -9,6 +9,7 @@ import { Button } from "@/shared/components/Button";
 import { MarqueeText } from "../MarqueeText/MarqueeText";
 import { usePlayListing } from "@/features/audio";
 import type { SearchResultRow } from "@sd/domain-search";
+import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 import styles from "./SearchResultItem.module.css";
 
 export type SearchResultItemProps = {
@@ -42,6 +43,7 @@ export function SearchResultItem({ item, onPress }: SearchResultItemProps) {
   const { play, isLoading } = usePlayListing(item.id, {
     onError: (message) => addToast(message, "error"),
   });
+  const scholarName = useFormattedScholarName(item.scholarName);
 
   const handlePlayClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     // Stop event propagation to prevent List.Item onClick
@@ -82,7 +84,7 @@ export function SearchResultItem({ item, onPress }: SearchResultItemProps) {
             }
           />
           <MarqueeText
-            text={item.scholarName}
+            text={scholarName}
             className={
               isDesktop
                 ? "truncate text-[var(--content-muted)] [font-size:var(--typo-body-sm-font-size)] xl:[font-size:var(--typo-body-md-font-size)]"

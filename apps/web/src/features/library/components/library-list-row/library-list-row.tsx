@@ -9,6 +9,7 @@ import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useFormattedDate } from "@/shared/hooks/use-formatted-date";
 import { useIsRtl } from "@/shared/hooks/use-is-rtl";
+import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 import styles from "./library-list-row.module.css";
 
 export type LibraryListRowProps = {
@@ -20,9 +21,10 @@ export function LibraryListRow({ item, variant }: LibraryListRowProps) {
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
   const isRtl = useIsRtl();
+  const scholarName = useFormattedScholarName(item.scholarName);
 
   const title = pickContentField(item.listingTitle, item.originalListingTitle, showOriginal);
-  const initial = item.scholarName ? item.scholarName.trim().charAt(0).toUpperCase() : "?";
+  const initial = scholarName ? scholarName.trim().charAt(0).toUpperCase() : "?";
 
   const progress =
     item.durationSeconds && item.progressSeconds
@@ -68,7 +70,7 @@ export function LibraryListRow({ item, variant }: LibraryListRowProps) {
       <div className={styles.centerSection}>
         <div className={styles.title}>{title}</div>
         <div className={styles.metadata}>
-          {item.scholarName}
+          {scholarName}
           {item.seriesTitle && ` · ${item.seriesTitle}`}
         </div>
         {variant === "progress" && progress !== null && (

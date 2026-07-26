@@ -3,6 +3,7 @@
 import type { RecentProgressDto } from "@sd/core-contracts";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 import styles from "./continue-listening-card.module.css";
 
 export type ContinueListeningCardProps = {
@@ -15,6 +16,7 @@ export function ContinueListeningCard({
   onContinueListening,
 }: ContinueListeningCardProps) {
   const { t } = useTranslation();
+  const scholarName = useFormattedScholarName(recentProgress.scholarName);
 
   return (
     <section
@@ -40,7 +42,7 @@ export function ContinueListeningCard({
             </span>
           </AppText>
           <AppText variant="caption" style={{ color: "var(--content-secondary)" }}>
-            <span data-testid="continue-listening-scholar-name">{recentProgress.scholarName}</span>
+            <span data-testid="continue-listening-scholar-name">{scholarName}</span>
           </AppText>
         </div>
         <div className={styles.progressRow}>
