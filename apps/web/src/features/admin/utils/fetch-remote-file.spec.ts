@@ -16,6 +16,31 @@ function mockResponse(options: {
   } as Response;
 }
 
+function mockStreamingResponse(options: {
+  headers?: Record<string, string>;
+  chunks: Uint8Array[];
+}) {
+  const headers = new Headers(options.headers ?? {});
+  let index = 0;
+  return {
+    ok: true,
+    status: 200,
+    headers,
+    body: {
+      getReader: () => ({
+        read: () => {
+          if (index < options.chunks.length) {
+            const value = options.chunks[index];
+            index += 1;
+            return Promise.resolve({ done: false, value });
+          }
+          return Promise.resolve({ done: true, value: undefined });
+        },
+      }),
+    },
+  } as unknown as Response;
+}
+
 describe("fetchFileFromUrl", () => {
   const originalFetch = global.fetch;
 
@@ -80,6 +105,28 @@ describe("fetchFileFromUrl", () => {
     );
 
     await expect(fetchFileFromUrl("https://example.com/missing.mp3")).rejects.toThrow(/404/);
+  });
+
+  it("reports cumulative download progress when onProgress and a readable body are available", async () => {
+    const chunk1 = new Uint8Array(10);
+    const chunk2 = new Uint8Array(15);
+    (global.fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(
+      mockStreamingResponse({
+        headers: { "content-type": "audio/mpeg", "content-length": "25" },
+        chunks: [chunk1, chunk2],
+      }),
+    );
+
+    const progressCalls: { loaded: number; total: number | null }[] = [];
+    const file = await fetchFileFromUrl("https://example.com/lesson.mp3", (loaded, total) => {
+      progressCalls.push({ loaded, total });
+    });
+
+    expect(progressCalls).toEqual([
+      { loaded: 10, total: 25 },
+      { loaded: 25, total: 25 },
+    ]);
+    expect(file.name).toBe("lesson.mp3");
   });
 
   it("maps a network/CORS-style failure to a friendly, actionable message", async () => {

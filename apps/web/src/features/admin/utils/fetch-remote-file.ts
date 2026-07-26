@@ -10,7 +10,7 @@ const AUDIO_EXTENSION_MIME: Record<string, string> = {
 
 export const AUDIO_EXTENSIONS = Object.keys(AUDIO_EXTENSION_MIME);
 
-function filenameFromContentDisposition(header: string | null): string | null {
+export function filenameFromContentDisposition(header: string | null): string | null {
   if (!header) return null;
   const utf8Match = header.match(/filename\*=UTF-8''([^;]+)/i);
   if (utf8Match?.[1]) return decodeURIComponent(utf8Match[1]);
@@ -18,7 +18,7 @@ function filenameFromContentDisposition(header: string | null): string | null {
   return match?.[1] ?? null;
 }
 
-function filenameFromUrl(url: string): string {
+export function filenameFromUrl(url: string): string {
   try {
     const { pathname } = new URL(url);
     const last = pathname.split("/").filter(Boolean).pop();
@@ -33,14 +33,56 @@ function extensionOf(filename: string): string {
   return parts.length > 1 ? (parts.pop()?.toLowerCase() ?? "") : "";
 }
 
-export async function fetchFileFromUrl(url: string): Promise<File> {
+/** Resolves a response's Content-Type, falling back to an extension-based guess when missing/generic. */
+export function resolveContentType(contentType: string | null, filename: string): string {
+  const isGeneric = !contentType || contentType.startsWith("application/octet-stream");
+  return isGeneric
+    ? (AUDIO_EXTENSION_MIME[extensionOf(filename)] ?? "application/octet-stream")
+    : contentType;
+}
+
+function friendlyCorsError(): Error {
+  return new Error(
+    "This link can't be downloaded directly from the browser — the source server doesn't allow cross-origin downloads. Try a different host (e.g. archive.org), or download it manually and upload the file instead.",
+  );
+}
+
+async function readBodyWithProgress(
+  response: Response,
+  onProgress: (loaded: number, total: number | null) => void,
+): Promise<Blob> {
+  const total = (() => {
+    const header = response.headers.get("content-length");
+    const parsed = header ? Number(header) : NaN;
+    return Number.isFinite(parsed) ? parsed : null;
+  })();
+
+  const reader = response.body!.getReader();
+  const chunks: Uint8Array[] = [];
+  let loaded = 0;
+
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (value) {
+      chunks.push(value);
+      loaded += value.byteLength;
+      onProgress(loaded, total);
+    }
+  }
+
+  return new Blob(chunks as BlobPart[]);
+}
+
+export async function fetchFileFromUrl(
+  url: string,
+  onProgress?: (loaded: number, total: number | null) => void,
+): Promise<File> {
   let response: Response;
   try {
     response = await fetch(url);
   } catch {
-    throw new Error(
-      "This link can't be downloaded directly from the browser — the source server doesn't allow cross-origin downloads. Try a different host (e.g. archive.org), or download it manually and upload the file instead.",
-    );
+    throw friendlyCorsError();
   }
 
   if (!response.ok) {
@@ -57,12 +99,12 @@ export async function fetchFileFromUrl(url: string): Promise<File> {
   const filename =
     filenameFromContentDisposition(response.headers.get("content-disposition")) ??
     filenameFromUrl(url);
+  const resolvedType = resolveContentType(contentType, filename);
 
-  const isGenericType = !contentType || contentType.startsWith("application/octet-stream");
-  const resolvedType = isGenericType
-    ? (AUDIO_EXTENSION_MIME[extensionOf(filename)] ?? "application/octet-stream")
-    : contentType;
+  const blob =
+    onProgress && response.body
+      ? await readBodyWithProgress(response, onProgress)
+      : await response.blob();
 
-  const blob = await response.blob();
   return new File([blob], filename, { type: resolvedType });
 }
