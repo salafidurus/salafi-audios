@@ -58,17 +58,12 @@ If pre-work fails, diagnose and fix before beginning. If post-work fails, diagno
 
 ## Post-Work: Push & PR
 
-After post-work verification passes:
+After post-work verification passes, push the branch matching the naming conventions above (e.g. worktree `.worktrees/f-foo` → branch `f/foo`):
 
 ```bash
-# Push branch (branch name = f/xxx, not f-xxx — matches refs/heads/f/xxx)
-git push -u origin f/<name>
-
-# Create PR
-gh pr create --fill
+git push -u origin <branch-name>
+gh pr create --title "Short description of change" --body "Sufficient context of what was done and why"
 ```
-
-Note: The worktree directory uses a hyphen (`.worktrees/f-xxx`) while the branch uses a slash (`f/xxx`). Always use `git push -u origin <branch>` with the slash notation.
 
 ## Cleanup & Deletion Workflow
 
