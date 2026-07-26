@@ -312,7 +312,7 @@ export function UploadArrangeArrangeTab({ state, dispatch }: UploadArrangeArrang
         {state.items.map((item) => (
           <div key={item.id} className={styles.stagedItem}>
             <div className={styles.stagedItemHeader}>
-              <span className={styles.stagedItemTitle}>{item.file.name}</span>
+              <span className={styles.stagedItemTitle}>{item.filename}</span>
               <span className={styles.fileMeta}>
                 {t("admin.contents.listing.replacesPrimaryAudio", "Replaces the primary audio")}
               </span>

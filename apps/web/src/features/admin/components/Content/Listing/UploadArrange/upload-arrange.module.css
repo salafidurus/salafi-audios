@@ -1,5 +1,29 @@
 /* ─── Upload tab ─────────────────────────────────────────────────────────── */
 
+.linkSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-sm);
+  margin-top: var(--space-component-gap-md);
+}
+
+.linkRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-sm);
+}
+
+.linkRow > :first-child {
+  flex: 1;
+}
+
+.linkActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-scale-sm);
+}
+
 .dropzone {
   display: flex;
   flex-direction: column;

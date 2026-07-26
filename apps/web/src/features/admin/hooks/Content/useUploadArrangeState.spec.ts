@@ -280,4 +280,121 @@ describe("useUploadArrangeState", () => {
     expect(after.kind === "new-lesson" && after.moduleKey).toBe(ROOT_MODULE_KEY);
     expect(hook.result.current.state.newModules).toHaveLength(0);
   });
+
+  describe("ADD_URL_ITEMS", () => {
+    it("stages url items pending (no bytes fetched yet) using their resolved metadata", () => {
+      const hook = setup(seriesData);
+      act(() =>
+        hook.result.current.dispatch({
+          type: "ADD_URL_ITEMS",
+          items: [
+            {
+              url: "https://archive.org/download/Item/001 Muqaddimah.mp3",
+              filename: "001 Muqaddimah.mp3",
+              contentType: "audio/mpeg",
+              sizeBytes: 5_000_000,
+              durationSeconds: 90,
+            },
+          ],
+        }),
+      );
+
+      const item = hook.result.current.state.items[0]!;
+      expect(item.source).toEqual({
+        kind: "url",
+        url: "https://archive.org/download/Item/001 Muqaddimah.mp3",
+      });
+      expect(item.title).toBe("Muqaddimah");
+      expect(item.sizeBytes).toBe(5_000_000);
+      expect(item.durationSeconds).toBe(90);
+      expect(item.upload).toEqual({ status: "pending", percent: 0 });
+    });
+
+    it("orders url items by numeric prefix exactly like ADD_FILES", () => {
+      const hook = setup(seriesData);
+      act(() =>
+        hook.result.current.dispatch({
+          type: "ADD_URL_ITEMS",
+          items: [
+            {
+              url: "https://example.com/002.mp3",
+              filename: "002 Al-Asmaa.mp3",
+              contentType: "audio/mpeg",
+              sizeBytes: 100,
+              durationSeconds: 10,
+            },
+            {
+              url: "https://example.com/001.mp3",
+              filename: "001 Muqaddimah.mp3",
+              contentType: "audio/mpeg",
+              sizeBytes: 100,
+              durationSeconds: 10,
+            },
+          ],
+        }),
+      );
+
+      expect(hook.result.current.state.items.map((i) => i.title)).toEqual([
+        "Muqaddimah",
+        "Al-Asmaa",
+      ]);
+    });
+
+    it("builds the presign request from the item's filename, regardless of source", () => {
+      const hook = setup(seriesData);
+      act(() =>
+        hook.result.current.dispatch({
+          type: "ADD_URL_ITEMS",
+          items: [
+            {
+              url: "https://example.com/004.mp3",
+              filename: "004 Ishara.mp3",
+              contentType: "audio/mpeg",
+              sizeBytes: 100,
+              durationSeconds: 10,
+            },
+          ],
+        }),
+      );
+
+      const request = buildPresignRequest(hook.result.current.state);
+      expect(request.files).toEqual([
+        {
+          clientId: hook.result.current.state.items[0]!.id,
+          filename: "004 Ishara.mp3",
+          contentType: "audio/mpeg",
+          slug: "ajurumiyyah-ishara",
+        },
+      ]);
+    });
+
+    it("enforces the single-file guard the same as ADD_FILES", () => {
+      const singleData: AdminArrangeDataDto = { ...seriesData, format: "single" };
+      const hook = setup(singleData);
+      act(() =>
+        hook.result.current.dispatch({
+          type: "ADD_URL_ITEMS",
+          items: [
+            {
+              url: "https://example.com/a.mp3",
+              filename: "a.mp3",
+              contentType: "audio/mpeg",
+              sizeBytes: 100,
+              durationSeconds: 10,
+            },
+            {
+              url: "https://example.com/b.mp3",
+              filename: "b.mp3",
+              contentType: "audio/mpeg",
+              sizeBytes: 100,
+              durationSeconds: 10,
+            },
+          ],
+        }),
+      );
+
+      expect(hook.result.current.state.items).toHaveLength(0);
+      expect(hook.result.current.state.error).toBeTruthy();
+    });
+  });
 });

@@ -35,16 +35,22 @@ export type UploadItemAssignment =
   | { kind: "replace-root-audio" };
 
 export interface UploadItemProgress {
-  status: "pending" | "uploading" | "done" | "error";
+  status: "pending" | "downloading" | "uploading" | "done" | "error";
   percent: number;
+  loadedBytes?: number;
+  totalBytes?: number;
   objectKey?: string;
   uploadUrl?: string;
   error?: string;
 }
 
+/** Where an item's bytes come from: already-picked local File, or a URL fetched at upload time. */
+export type UploadItemSource = { kind: "local"; file: File } | { kind: "url"; url: string };
+
 export interface UploadItem {
   id: string;
-  file: File;
+  source: UploadItemSource;
+  filename: string;
   title: string;
   numericPrefix: number | null;
   durationSeconds: number | null;
@@ -79,6 +85,16 @@ export interface UploadArrangeState {
 export type UploadArrangeAction =
   | { type: "INIT_EXISTING"; data: AdminArrangeDataDto }
   | { type: "ADD_FILES"; files: { file: File; durationSeconds: number | null }[] }
+  | {
+      type: "ADD_URL_ITEMS";
+      items: {
+        url: string;
+        filename: string;
+        contentType: string;
+        sizeBytes: number;
+        durationSeconds: number | null;
+      }[];
+    }
   | { type: "RENAME_ITEM"; itemId: string; title: string }
   | { type: "REMOVE_ITEM"; itemId: string }
   | { type: "SET_ASSIGNMENT"; itemId: string; assignment: UploadItemAssignment }
@@ -101,7 +117,14 @@ export type UploadArrangeAction =
   | { type: "REORDER"; moduleKey: ModuleKey; orderedItemIds: string[] }
   | { type: "SET_PHASE"; phase: UploadArrangePhase }
   | { type: "PRESIGNED"; urls: { clientId: string; uploadUrl: string; objectKey: string }[] }
-  | { type: "UPLOAD_PROGRESS"; itemId: string; percent: number }
+  | {
+      type: "UPLOAD_PROGRESS";
+      itemId: string;
+      status: "downloading" | "uploading";
+      percent: number;
+      loadedBytes?: number;
+      totalBytes?: number;
+    }
   | { type: "UPLOAD_DONE"; itemId: string }
   | { type: "UPLOAD_ERROR"; itemId: string; error: string }
   | { type: "COMMIT_CONFLICT"; conflictSlugs: string[] }
@@ -148,6 +171,66 @@ function updateItem(
   };
 }
 
+interface StagedItemInput {
+  source: UploadItemSource;
+  filename: string;
+  contentType: string;
+  sizeBytes: number;
+  durationSeconds: number | null;
+}
+
+/** Shared by ADD_FILES and ADD_URL_ITEMS — identical sorting/slug-derivation/order-cursor
+ *  logic, differing only in where each item's bytes come from. */
+function buildStagedItems(state: UploadArrangeState, inputs: StagedItemInput[]): UploadItem[] {
+  if (!state.existing) return [];
+  const { existing } = state;
+  const isSingle = existing.format === "single";
+  const lessons = allExistingLessons(existing);
+
+  const sorted = inputs.toSorted((a, b) => {
+    const pa = parseUploadFilename(a.filename).numericPrefix;
+    const pb = parseUploadFilename(b.filename).numericPrefix;
+    if (pa === null && pb === null) return 0;
+    if (pa === null) return 1;
+    if (pb === null) return -1;
+    return pa - pb;
+  });
+
+  let orderCursor = nextOrderIndex(state, ROOT_MODULE_KEY);
+  return sorted.map((input) => {
+    const parsed = parseUploadFilename(input.filename);
+    const slug = deriveChildSlug(existing.slug, parsed.title);
+    const match = findSlugMatch(slug, lessons);
+
+    const assignment: UploadItemAssignment = isSingle
+      ? { kind: "replace-root-audio" }
+      : {
+          kind: "new-lesson",
+          moduleKey: ROOT_MODULE_KEY,
+          slug,
+          slugEdited: false,
+          description: "",
+          status: "draft",
+          orderIndex: parsed.numericPrefix ?? orderCursor++,
+        };
+
+    return {
+      id: crypto.randomUUID(),
+      source: input.source,
+      filename: input.filename,
+      title: parsed.title,
+      numericPrefix: parsed.numericPrefix,
+      durationSeconds: input.durationSeconds,
+      sizeBytes: input.sizeBytes,
+      contentType: input.contentType,
+      ext: parsed.ext,
+      assignment,
+      suggestion: match ? { lessonId: match.id, lessonTitle: match.title, dismissed: false } : null,
+      upload: { status: "pending", percent: 0 } satisfies UploadItemProgress,
+    };
+  });
+}
+
 function reducer(state: UploadArrangeState, action: UploadArrangeAction): UploadArrangeState {
   switch (action.type) {
     case "INIT_EXISTING":
@@ -158,61 +241,47 @@ function reducer(state: UploadArrangeState, action: UploadArrangeAction): Upload
 
     case "ADD_FILES": {
       if (!state.existing) return state;
-      const { existing } = state;
-      const isSingle = existing.format === "single";
-
       // Single-format roots hold exactly one staged file.
-      if (isSingle && (state.items.length > 0 || action.files.length > 1)) {
-        return {
-          ...state,
-          error: "This listing holds a single audio file.",
-        };
+      if (
+        state.existing.format === "single" &&
+        (state.items.length > 0 || action.files.length > 1)
+      ) {
+        return { ...state, error: "This listing holds a single audio file." };
       }
 
-      const lessons = allExistingLessons(existing);
-      const sorted = action.files.toSorted((a, b) => {
-        const pa = parseUploadFilename(a.file.name).numericPrefix;
-        const pb = parseUploadFilename(b.file.name).numericPrefix;
-        if (pa === null && pb === null) return 0;
-        if (pa === null) return 1;
-        if (pb === null) return -1;
-        return pa - pb;
-      });
-
-      let orderCursor = nextOrderIndex(state, ROOT_MODULE_KEY);
-      const newItems = sorted.map(({ file, durationSeconds }) => {
-        const parsed = parseUploadFilename(file.name);
-        const slug = deriveChildSlug(existing.slug, parsed.title);
-        const match = findSlugMatch(slug, lessons);
-
-        const assignment: UploadItemAssignment = isSingle
-          ? { kind: "replace-root-audio" }
-          : {
-              kind: "new-lesson",
-              moduleKey: ROOT_MODULE_KEY,
-              slug,
-              slugEdited: false,
-              description: "",
-              status: "draft",
-              orderIndex: parsed.numericPrefix ?? orderCursor++,
-            };
-
-        return {
-          id: crypto.randomUUID(),
-          file,
-          title: parsed.title,
-          numericPrefix: parsed.numericPrefix,
-          durationSeconds,
-          sizeBytes: file.size,
+      const newItems = buildStagedItems(
+        state,
+        action.files.map(({ file, durationSeconds }) => ({
+          source: { kind: "local", file },
+          filename: file.name,
           contentType: file.type,
-          ext: parsed.ext,
-          assignment,
-          suggestion: match
-            ? { lessonId: match.id, lessonTitle: match.title, dismissed: false }
-            : null,
-          upload: { status: "pending", percent: 0 } satisfies UploadItemProgress,
-        };
-      });
+          sizeBytes: file.size,
+          durationSeconds,
+        })),
+      );
+
+      return { ...state, items: [...state.items, ...newItems], error: null };
+    }
+
+    case "ADD_URL_ITEMS": {
+      if (!state.existing) return state;
+      if (
+        state.existing.format === "single" &&
+        (state.items.length > 0 || action.items.length > 1)
+      ) {
+        return { ...state, error: "This listing holds a single audio file." };
+      }
+
+      const newItems = buildStagedItems(
+        state,
+        action.items.map((entry) => ({
+          source: { kind: "url", url: entry.url },
+          filename: entry.filename,
+          contentType: entry.contentType,
+          sizeBytes: entry.sizeBytes,
+          durationSeconds: entry.durationSeconds,
+        })),
+      );
 
       return { ...state, items: [...state.items, ...newItems], error: null };
     }
@@ -371,7 +440,13 @@ function reducer(state: UploadArrangeState, action: UploadArrangeAction): Upload
     case "UPLOAD_PROGRESS":
       return updateItem(state, action.itemId, (item) => ({
         ...item,
-        upload: { ...item.upload, status: "uploading", percent: action.percent },
+        upload: {
+          ...item.upload,
+          status: action.status,
+          percent: action.percent,
+          loadedBytes: action.loadedBytes,
+          totalBytes: action.totalBytes,
+        },
       }));
 
     case "UPLOAD_DONE":
@@ -412,7 +487,7 @@ export function buildPresignRequest(state: UploadArrangeState): BatchPresignAudi
     rootSlug,
     files: state.items.map((item) => ({
       clientId: item.id,
-      filename: item.file.name,
+      filename: item.filename,
       contentType: item.contentType,
       slug: itemTargetSlug(state, item),
     })),

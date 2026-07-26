@@ -3,12 +3,19 @@
 import React, { useRef, useState } from "react";
 import { getPresignedUrl, uploadToR2 } from "@/features/admin/api/admin-lectures.api";
 import { extractAudioDuration } from "@/features/admin/utils/audio-metadata";
+import { importSingleLineWithProgress } from "@/features/admin/utils/resolve-import-urls";
 import { Button } from "@/shared/components/Button";
+import { InputField } from "@/shared/components/InputField";
 import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./audio-uploader.module.css";
-import { Upload, FileAudio, CheckCircle, AlertCircle } from "lucide-react";
+import { Upload, FileAudio, CheckCircle, AlertCircle, Link2 } from "lucide-react";
 
-type UploadState = "idle" | "extracting" | "uploading" | "success" | "error";
+type UploadState = "idle" | "importing" | "extracting" | "uploading" | "success" | "error";
+type UploadMode = "file" | "link";
+
+function formatBytes(bytes: number): string {
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 interface AudioUploaderProps {
   onUploadComplete: (result: {
@@ -26,6 +33,12 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
   const [uploadState, setUploadState] = useState<UploadState>("idle");
   const [error, setError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
+  const [mode, setMode] = useState<UploadMode>("file");
+  const [linkValue, setLinkValue] = useState("");
+  const [downloadProgress, setDownloadProgress] = useState<{
+    loaded: number;
+    total: number | null;
+  } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = async (file: File) => {
@@ -68,6 +81,36 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
     }
   };
 
+  const handleLinkSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const url = linkValue.trim();
+    if (!url) return;
+
+    setUploadState("importing");
+    setError(null);
+    setFileName(null);
+    setDownloadProgress(null);
+
+    try {
+      const { files, errors } = await importSingleLineWithProgress(url, (loaded, total) =>
+        setDownloadProgress({ loaded, total }),
+      );
+      if (files.length > 1) {
+        throw new Error(
+          "This link resolved to multiple files — use the batch Upload & Arrange flow instead.",
+        );
+      }
+      const [file] = files;
+      if (!file) {
+        throw new Error(errors[0]?.message ?? "Couldn't import this link.");
+      }
+      await handleFile(file);
+    } catch (err) {
+      setError((err as Error)?.message || "An error occurred while importing this link.");
+      setUploadState("error");
+    }
+  };
+
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -99,81 +142,150 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
     fileInputRef.current?.click();
   };
 
+  const showModeToggle = uploadState === "idle" || uploadState === "error";
+
   return (
     <div className={styles.container}>
-      <div
-        role="presentation"
-        className={`${styles.dropzone} ${dragActive ? styles.dragActive : ""} ${
-          styles[`state-${uploadState}`]
-        }`}
-        onDragEnter={handleDrag}
-        onDragOver={handleDrag}
-        onDragLeave={handleDrag}
-        onDrop={handleDrop}
-      >
-        <input
-          data-testid="audio-file-input"
-          ref={fileInputRef}
-          type="file"
-          className={styles.fileInput}
-          accept="audio/*"
-          aria-label="Select audio file"
-          onChange={handleChange}
-        />
-
-        <div className={styles.content}>
-          {uploadState === "idle" && (
-            <>
-              <Upload className={styles.icon} size={40} />
-              <p className={styles.primaryText}>
-                {t("admin.contents.listing.audioDropzone", "Drag & drop an audio file here")}
-              </p>
-              <Button variant="ghost" className={styles.secondaryText} onClick={onButtonClick}>
-                {t("admin.contents.listing.clickToBrowse", "or click to browse files")}
-              </Button>
-            </>
-          )}
-
-          {uploadState === "extracting" && (
-            <>
-              <FileAudio className={`${styles.icon} ${styles.spin}`} size={40} />
-              <p className={styles.primaryText}>
-                {t("admin.contents.listing.extractingAudio", "Analyzing audio file...")}
-              </p>
-              <p className={styles.fileName}>{fileName}</p>
-            </>
-          )}
-
-          {uploadState === "uploading" && (
-            <>
-              <Upload className={`${styles.icon} ${styles.pulse}`} size={40} />
-              <p className={styles.primaryText}>
-                {t("admin.contents.listing.uploadingStorage", "Uploading to storage...")}
-              </p>
-              <p className={styles.fileName}>{fileName}</p>
-            </>
-          )}
-
-          {uploadState === "success" && (
-            <>
-              <CheckCircle className={styles.iconSuccess} size={40} />
-              <p className={styles.primaryText}>Upload complete!</p>
-              <p className={styles.fileName}>{fileName}</p>
-            </>
-          )}
-
-          {uploadState === "error" && (
-            <>
-              <AlertCircle className={styles.iconError} size={40} />
-              <p className={styles.primaryText}>Upload failed</p>
-              <p className={styles.errorMessage}>{error}</p>
-              <Button variant="ghost" className={styles.secondaryText} onClick={onButtonClick}>
-                Click to try again
-              </Button>
-            </>
-          )}
+      {showModeToggle && (
+        <div className={styles.modeToggle}>
+          <Button
+            type="button"
+            variant={mode === "file" ? "primary" : "ghost"}
+            size="sm"
+            onClick={() => {
+              setMode("file");
+              setUploadState("idle");
+              setError(null);
+            }}
+          >
+            {t("admin.contents.listing.uploadFileMode", "Upload file")}
+          </Button>
+          <Button
+            type="button"
+            variant={mode === "link" ? "primary" : "ghost"}
+            size="sm"
+            icon={<Link2 size={14} />}
+            onClick={() => {
+              setMode("link");
+              setUploadState("idle");
+              setError(null);
+            }}
+          >
+            {t("admin.contents.listing.pasteLinkMode", "Paste link")}
+          </Button>
         </div>
-      </div>
+      )}
+
+      {mode === "link" && uploadState === "idle" ? (
+        <form className={styles.linkForm} onSubmit={handleLinkSubmit}>
+          <InputField
+            type="url"
+            value={linkValue}
+            onChange={setLinkValue}
+            placeholder="https://archive.org/download/.../lecture.mp3"
+          />
+          <Button type="submit" variant="primary" size="sm">
+            {t("admin.contents.listing.importLink", "Import")}
+          </Button>
+        </form>
+      ) : (
+        <div
+          role="presentation"
+          className={`${styles.dropzone} ${dragActive ? styles.dragActive : ""} ${
+            styles[`state-${uploadState}`]
+          }`}
+          onDragEnter={handleDrag}
+          onDragOver={handleDrag}
+          onDragLeave={handleDrag}
+          onDrop={handleDrop}
+        >
+          <input
+            data-testid="audio-file-input"
+            ref={fileInputRef}
+            type="file"
+            className={styles.fileInput}
+            accept="audio/*"
+            aria-label="Select audio file"
+            onChange={handleChange}
+          />
+
+          <div className={styles.content}>
+            {uploadState === "idle" && (
+              <>
+                <Upload className={styles.icon} size={40} />
+                <p className={styles.primaryText}>
+                  {t("admin.contents.listing.audioDropzone", "Drag & drop an audio file here")}
+                </p>
+                <Button variant="ghost" className={styles.secondaryText} onClick={onButtonClick}>
+                  {t("admin.contents.listing.clickToBrowse", "or click to browse files")}
+                </Button>
+              </>
+            )}
+
+            {uploadState === "importing" && (
+              <>
+                <Link2 className={`${styles.icon} ${styles.spin}`} size={40} />
+                <p className={styles.primaryText}>
+                  {t(
+                    "admin.contents.listing.importingFromLink",
+                    "Downloading from link… this can take a while for large files.",
+                  )}
+                </p>
+                {downloadProgress && (
+                  <p className={styles.fileName}>
+                    {downloadProgress.total
+                      ? `${formatBytes(downloadProgress.loaded)} / ${formatBytes(downloadProgress.total)}`
+                      : formatBytes(downloadProgress.loaded)}
+                  </p>
+                )}
+              </>
+            )}
+
+            {uploadState === "extracting" && (
+              <>
+                <FileAudio className={`${styles.icon} ${styles.spin}`} size={40} />
+                <p className={styles.primaryText}>
+                  {t("admin.contents.listing.extractingAudio", "Analyzing audio file...")}
+                </p>
+                <p className={styles.fileName}>{fileName}</p>
+              </>
+            )}
+
+            {uploadState === "uploading" && (
+              <>
+                <Upload className={`${styles.icon} ${styles.pulse}`} size={40} />
+                <p className={styles.primaryText}>
+                  {t("admin.contents.listing.uploadingStorage", "Uploading to storage...")}
+                </p>
+                <p className={styles.fileName}>{fileName}</p>
+              </>
+            )}
+
+            {uploadState === "success" && (
+              <>
+                <CheckCircle className={styles.iconSuccess} size={40} />
+                <p className={styles.primaryText}>Upload complete!</p>
+                <p className={styles.fileName}>{fileName}</p>
+              </>
+            )}
+
+            {uploadState === "error" && (
+              <>
+                <AlertCircle className={styles.iconError} size={40} />
+                <p className={styles.primaryText}>Upload failed</p>
+                <p className={styles.errorMessage}>{error}</p>
+                <Button
+                  variant="ghost"
+                  className={styles.secondaryText}
+                  onClick={() => (mode === "file" ? onButtonClick() : setUploadState("idle"))}
+                >
+                  Click to try again
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
