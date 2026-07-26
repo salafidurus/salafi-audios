@@ -17,6 +17,10 @@ interface UploadArrangeReviewTabProps {
   dispatch: React.Dispatch<UploadArrangeAction>;
 }
 
+function formatBytes(bytes: number): string {
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 function ItemRow({ item, state }: { item: UploadItem; state: UploadArrangeState }) {
   const { t } = useTranslation();
   const isBusy = state.phase === "presigning" || state.phase === "uploading";
@@ -24,6 +28,14 @@ function ItemRow({ item, state }: { item: UploadItem; state: UploadArrangeState 
     item.assignment.kind === "new-lesson"
       ? t("admin.contents.listing.reviewNewLesson", "New lesson")
       : t("admin.contents.listing.reviewReplaceAudio", "Replace audio");
+
+  const { status, loadedBytes, totalBytes } = item.upload;
+  const statusLabel =
+    status === "downloading"
+      ? t("admin.contents.listing.statusDownloading", "Downloading…")
+      : status === "uploading"
+        ? t("admin.contents.listing.statusUploading", "Uploading…")
+        : null;
 
   return (
     <div className={styles.reviewRow}>
@@ -50,6 +62,11 @@ function ItemRow({ item, state }: { item: UploadItem; state: UploadArrangeState 
             style={{ width: `${item.upload.percent}%` }}
           />
         </div>
+      )}
+      {isBusy && statusLabel && loadedBytes !== undefined && totalBytes !== undefined && (
+        <span className={styles.fileMeta}>
+          {`${statusLabel} ${formatBytes(loadedBytes)} / ${formatBytes(totalBytes)}`}
+        </span>
       )}
       {item.upload.error && <span className={styles.conflictText}>{item.upload.error}</span>}
     </div>

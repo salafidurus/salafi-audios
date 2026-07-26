@@ -3,7 +3,7 @@
 import React, { useRef, useState } from "react";
 import { getPresignedUrl, uploadToR2 } from "@/features/admin/api/admin-lectures.api";
 import { extractAudioDuration } from "@/features/admin/utils/audio-metadata";
-import { importFilesFromLines } from "@/features/admin/utils/resolve-import-urls";
+import { importSingleLineWithProgress } from "@/features/admin/utils/resolve-import-urls";
 import { Button } from "@/shared/components/Button";
 import { InputField } from "@/shared/components/InputField";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -12,6 +12,10 @@ import { Upload, FileAudio, CheckCircle, AlertCircle, Link2 } from "lucide-react
 
 type UploadState = "idle" | "importing" | "extracting" | "uploading" | "success" | "error";
 type UploadMode = "file" | "link";
+
+function formatBytes(bytes: number): string {
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 interface AudioUploaderProps {
   onUploadComplete: (result: {
@@ -31,6 +35,10 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
   const [fileName, setFileName] = useState<string | null>(null);
   const [mode, setMode] = useState<UploadMode>("file");
   const [linkValue, setLinkValue] = useState("");
+  const [downloadProgress, setDownloadProgress] = useState<{
+    loaded: number;
+    total: number | null;
+  } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = async (file: File) => {
@@ -81,9 +89,12 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
     setUploadState("importing");
     setError(null);
     setFileName(null);
+    setDownloadProgress(null);
 
     try {
-      const { files, errors } = await importFilesFromLines([url]);
+      const { files, errors } = await importSingleLineWithProgress(url, (loaded, total) =>
+        setDownloadProgress({ loaded, total }),
+      );
       if (files.length > 1) {
         throw new Error(
           "This link resolved to multiple files — use the batch Upload & Arrange flow instead.",
@@ -220,6 +231,13 @@ export function AudioUploader({ onUploadComplete }: AudioUploaderProps) {
                     "Downloading from link… this can take a while for large files.",
                   )}
                 </p>
+                {downloadProgress && (
+                  <p className={styles.fileName}>
+                    {downloadProgress.total
+                      ? `${formatBytes(downloadProgress.loaded)} / ${formatBytes(downloadProgress.total)}`
+                      : formatBytes(downloadProgress.loaded)}
+                  </p>
+                )}
               </>
             )}
 

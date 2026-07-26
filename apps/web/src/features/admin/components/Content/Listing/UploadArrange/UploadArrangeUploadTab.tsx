@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useRef, useState } from "react";
-import { Upload, X, Link2 } from "lucide-react";
+import { Upload, X, Link2, Plus } from "lucide-react";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { InputField } from "@/shared/components/InputField";
 import { Button } from "@/shared/components/Button";
 import { extractAudioDuration } from "@/features/admin/utils/audio-metadata";
-import { importFilesFromLines } from "@/features/admin/utils/resolve-import-urls";
+import { resolveLinksToMetadata } from "@/features/admin/utils/resolve-import-urls";
 import type {
   UploadArrangeAction,
   UploadArrangeState,
@@ -30,10 +30,19 @@ function formatSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+interface LinkRow {
+  id: string;
+  value: string;
+}
+
+function newLinkRow(): LinkRow {
+  return { id: crypto.randomUUID(), value: "" };
+}
+
 export function UploadArrangeUploadTab({ state, dispatch }: UploadArrangeUploadTabProps) {
   const { t } = useTranslation();
   const [dragActive, setDragActive] = useState(false);
-  const [linksValue, setLinksValue] = useState("");
+  const [linkRows, setLinkRows] = useState<LinkRow[]>([newLinkRow()]);
   const [importingLinks, setImportingLinks] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -59,16 +68,29 @@ export function UploadArrangeUploadTab({ state, dispatch }: UploadArrangeUploadT
     await stageFiles(audioFiles);
   };
 
+  const setLinkRowValue = (id: string, value: string) => {
+    setLinkRows((rows) => rows.map((row) => (row.id === id ? { ...row, value } : row)));
+  };
+
+  const addLinkRow = () => setLinkRows((rows) => [...rows, newLinkRow()]);
+
+  const removeLinkRow = (id: string) => {
+    setLinkRows((rows) => (rows.length > 1 ? rows.filter((row) => row.id !== id) : rows));
+  };
+
   const handleAddFromLinks = async () => {
-    const lines = linksValue.split("\n");
-    if (lines.every((line) => !line.trim())) return;
+    const lines: string[] = [];
+    for (const row of linkRows) {
+      if (row.value.trim()) lines.push(row.value);
+    }
+    if (lines.length === 0) return;
 
     setImportingLinks(true);
     try {
-      const { files, errors } = await importFilesFromLines(lines);
-      if (files.length > 0) {
-        await stageFiles(files);
-        setLinksValue("");
+      const { items, errors } = await resolveLinksToMetadata(lines);
+      if (items.length > 0) {
+        dispatch({ type: "ADD_URL_ITEMS", items });
+        setLinkRows([newLinkRow()]);
       }
       if (errors.length > 0) {
         dispatch({
@@ -143,26 +165,50 @@ export function UploadArrangeUploadTab({ state, dispatch }: UploadArrangeUploadT
       </div>
 
       <div className={styles.linkSection}>
-        <InputField
-          type="textarea"
-          value={linksValue}
-          onChange={setLinksValue}
-          placeholder={t(
-            "admin.contents.listing.pasteLinksPlaceholder",
-            "Paste links (one link per line) — archive.org items, Google Drive files, or any direct audio link",
-          )}
-          rows={3}
-        />
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          icon={<Link2 size={14} />}
-          loading={importingLinks}
-          onClick={() => void handleAddFromLinks()}
-        >
-          {t("admin.contents.listing.addFromLinks", "Add from links")}
-        </Button>
+        {linkRows.map((row) => (
+          <div key={row.id} className={styles.linkRow}>
+            <InputField
+              type="url"
+              value={row.value}
+              onChange={(value) => setLinkRowValue(row.id, value)}
+              placeholder={t(
+                "admin.contents.listing.pasteLinkPlaceholder",
+                "https://archive.org/details/... or any direct audio link",
+              )}
+            />
+            {linkRows.length > 1 && (
+              <button
+                type="button"
+                className={styles.iconButton}
+                aria-label={t("admin.contents.listing.removeLink", "Remove link")}
+                onClick={() => removeLinkRow(row.id)}
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+        ))}
+        <div className={styles.linkActions}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            icon={<Plus size={14} />}
+            onClick={addLinkRow}
+          >
+            {t("admin.contents.listing.addAnotherLink", "Add another link")}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            icon={<Link2 size={14} />}
+            loading={importingLinks}
+            onClick={() => void handleAddFromLinks()}
+          >
+            {t("admin.contents.listing.addFromLinks", "Add from links")}
+          </Button>
+        </div>
       </div>
 
       {state.items.length > 0 && (

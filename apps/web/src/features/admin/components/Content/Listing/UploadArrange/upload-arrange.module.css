@@ -3,13 +3,25 @@
 .linkSection {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
   gap: var(--space-scale-sm);
   margin-top: var(--space-component-gap-md);
 }
 
-.linkSection > :first-child {
-  width: 100%;
+.linkRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-sm);
+}
+
+.linkRow > :first-child {
+  flex: 1;
+}
+
+.linkActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-scale-sm);
 }
 
 .dropzone {

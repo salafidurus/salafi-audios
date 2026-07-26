@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { UploadArrangeUploadTab } from "./UploadArrangeUploadTab";
-import { importFilesFromLines } from "@/features/admin/utils/resolve-import-urls";
+import { resolveLinksToMetadata } from "@/features/admin/utils/resolve-import-urls";
 import { extractAudioDuration } from "@/features/admin/utils/audio-metadata";
 import type { UploadArrangeState } from "@/features/admin/hooks/Content/useUploadArrangeState";
 
 vi.mock("@/features/admin/utils/resolve-import-urls", () => ({
-  importFilesFromLines: vi.fn(),
+  resolveLinksToMetadata: vi.fn(),
 }));
 
 vi.mock("@/features/admin/utils/audio-metadata", () => ({
@@ -39,8 +39,15 @@ function baseState(): UploadArrangeState {
   };
 }
 
-function makeFile(name: string) {
-  return new File(["bytes"], name, { type: "audio/mpeg" });
+function metadataItem(overrides: Partial<Record<string, unknown>> = {}) {
+  return {
+    url: "https://archive.org/download/Item/One.mp3",
+    filename: "One.mp3",
+    contentType: "audio/mpeg",
+    sizeBytes: 1_000_000,
+    durationSeconds: 120,
+    ...overrides,
+  };
 }
 
 describe("UploadArrangeUploadTab", () => {
@@ -49,66 +56,109 @@ describe("UploadArrangeUploadTab", () => {
     (extractAudioDuration as Mock<any>).mockResolvedValue(120);
   });
 
-  it("renders a paste-links textarea alongside the dropzone", () => {
+  it("renders a single link input row alongside the dropzone", () => {
     render(<UploadArrangeUploadTab state={baseState()} dispatch={vi.fn()} />);
 
     expect(screen.getByTestId("audio-files-input")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/one link per line/i)).toBeInTheDocument();
+    expect(screen.getAllByPlaceholderText(/https:\/\//i)).toHaveLength(1);
   });
 
-  it("resolves pasted links and dispatches ADD_FILES with extracted durations", async () => {
-    const file1 = makeFile("One.mp3");
-    const file2 = makeFile("Two.mp3");
-    (importFilesFromLines as Mock<any>).mockResolvedValue({
-      files: [file1, file2],
+  it("adds another link input when 'Add another link' is clicked", () => {
+    render(<UploadArrangeUploadTab state={baseState()} dispatch={vi.fn()} />);
+
+    fireEvent.click(screen.getByRole("button", { name: /add another link/i }));
+
+    expect(screen.getAllByPlaceholderText(/https:\/\//i)).toHaveLength(2);
+  });
+
+  it("removes a row when its remove control is clicked", () => {
+    render(<UploadArrangeUploadTab state={baseState()} dispatch={vi.fn()} />);
+    fireEvent.click(screen.getByRole("button", { name: /add another link/i }));
+    expect(screen.getAllByPlaceholderText(/https:\/\//i)).toHaveLength(2);
+
+    fireEvent.click(screen.getAllByRole("button", { name: /remove link/i })[0]!);
+
+    expect(screen.getAllByPlaceholderText(/https:\/\//i)).toHaveLength(1);
+  });
+
+  it("resolves entered links to metadata only (no file body fetch) and dispatches ADD_URL_ITEMS", async () => {
+    (resolveLinksToMetadata as Mock<any>).mockResolvedValue({
+      items: [
+        metadataItem(),
+        metadataItem({ url: "https://archive.org/download/Item/Two.mp3", filename: "Two.mp3" }),
+      ],
       errors: [],
     });
 
     const dispatch = vi.fn();
     render(<UploadArrangeUploadTab state={baseState()} dispatch={dispatch} />);
 
-    fireEvent.change(screen.getByPlaceholderText(/one link per line/i), {
-      target: { value: "https://archive.org/details/ArafatTranslation" },
+    fireEvent.change(screen.getByPlaceholderText(/https:\/\//i), {
+      target: { value: "https://archive.org/details/Item" },
     });
     fireEvent.click(screen.getByRole("button", { name: /add from links/i }));
 
     await waitFor(() => {
-      expect(importFilesFromLines).toHaveBeenCalledWith([
-        "https://archive.org/details/ArafatTranslation",
-      ]);
+      expect(resolveLinksToMetadata).toHaveBeenCalledWith(["https://archive.org/details/Item"]);
     });
 
     await waitFor(() => {
       expect(dispatch).toHaveBeenCalledWith({
-        type: "ADD_FILES",
-        files: [
-          { file: file1, durationSeconds: 120 },
-          { file: file2, durationSeconds: 120 },
+        type: "ADD_URL_ITEMS",
+        items: [
+          {
+            url: "https://archive.org/download/Item/One.mp3",
+            filename: "One.mp3",
+            contentType: "audio/mpeg",
+            sizeBytes: 1_000_000,
+            durationSeconds: 120,
+          },
+          {
+            url: "https://archive.org/download/Item/Two.mp3",
+            filename: "Two.mp3",
+            contentType: "audio/mpeg",
+            sizeBytes: 1_000_000,
+            durationSeconds: 120,
+          },
         ],
       });
     });
   });
 
-  it("keeps successfully-resolved files and surfaces failed links as an error", async () => {
-    const file1 = makeFile("Good.mp3");
-    (importFilesFromLines as Mock<any>).mockResolvedValue({
-      files: [file1],
+  it("resets to a single empty row after a successful add", async () => {
+    (resolveLinksToMetadata as Mock<any>).mockResolvedValue({
+      items: [metadataItem()],
+      errors: [],
+    });
+
+    render(<UploadArrangeUploadTab state={baseState()} dispatch={vi.fn()} />);
+    fireEvent.click(screen.getByRole("button", { name: /add another link/i }));
+    fireEvent.change(screen.getAllByPlaceholderText(/https:\/\//i)[0]!, {
+      target: { value: "https://archive.org/download/Item/One.mp3" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /add from links/i }));
+
+    await waitFor(() => {
+      expect(screen.getAllByPlaceholderText(/https:\/\//i)).toHaveLength(1);
+    });
+  });
+
+  it("keeps successfully-resolved items and surfaces failed links as an error", async () => {
+    (resolveLinksToMetadata as Mock<any>).mockResolvedValue({
+      items: [metadataItem()],
       errors: [{ input: "https://miraath.net/file.wav", message: "blocks direct downloads" }],
     });
 
     const dispatch = vi.fn();
     render(<UploadArrangeUploadTab state={baseState()} dispatch={dispatch} />);
 
-    fireEvent.change(screen.getByPlaceholderText(/one link per line/i), {
-      target: { value: "https://example.com/good.mp3\nhttps://miraath.net/file.wav" },
+    fireEvent.change(screen.getByPlaceholderText(/https:\/\//i), {
+      target: { value: "https://miraath.net/file.wav" },
     });
     fireEvent.click(screen.getByRole("button", { name: /add from links/i }));
 
     await waitFor(() => {
-      expect(dispatch).toHaveBeenCalledWith({
-        type: "ADD_FILES",
-        files: [{ file: file1, durationSeconds: 120 }],
-      });
+      expect(dispatch).toHaveBeenCalledWith(expect.objectContaining({ type: "ADD_URL_ITEMS" }));
     });
 
     expect(dispatch).toHaveBeenCalledWith(
@@ -119,16 +169,16 @@ describe("UploadArrangeUploadTab", () => {
     );
   });
 
-  it("does not dispatch ADD_FILES when every link fails to resolve", async () => {
-    (importFilesFromLines as Mock<any>).mockResolvedValue({
-      files: [],
+  it("does not dispatch ADD_URL_ITEMS when every link fails to resolve", async () => {
+    (resolveLinksToMetadata as Mock<any>).mockResolvedValue({
+      items: [],
       errors: [{ input: "https://miraath.net/file.wav", message: "blocks direct downloads" }],
     });
 
     const dispatch = vi.fn();
     render(<UploadArrangeUploadTab state={baseState()} dispatch={dispatch} />);
 
-    fireEvent.change(screen.getByPlaceholderText(/one link per line/i), {
+    fireEvent.change(screen.getByPlaceholderText(/https:\/\//i), {
       target: { value: "https://miraath.net/file.wav" },
     });
     fireEvent.click(screen.getByRole("button", { name: /add from links/i }));
@@ -137,6 +187,6 @@ describe("UploadArrangeUploadTab", () => {
       expect(dispatch).toHaveBeenCalledWith(expect.objectContaining({ type: "SET_ERROR" }));
     });
 
-    expect(dispatch).not.toHaveBeenCalledWith(expect.objectContaining({ type: "ADD_FILES" }));
+    expect(dispatch).not.toHaveBeenCalledWith(expect.objectContaining({ type: "ADD_URL_ITEMS" }));
   });
 });

@@ -118,6 +118,39 @@ export async function importFilesFromLines(
   return { files, errors };
 }
 
+/** Resolves and fetches a single pasted line, forwarding download progress — for callers
+ *  (like the single AudioUploader) that expect exactly one resulting file. */
+export async function importSingleLineWithProgress(
+  line: string,
+  onProgress?: (loaded: number, total: number | null) => void,
+): Promise<ImportFilesResult> {
+  const { queue, errors } = await resolveLinesToQueue([line]);
+  const singleProgress = queue.length === 1 ? onProgress : undefined;
+
+  const results = await Promise.all(
+    queue.map(async (entry): Promise<{ file: File } | { error: ImportUrlError }> => {
+      try {
+        return { file: await fetchFileFromUrl(entry.url, singleProgress) };
+      } catch (err) {
+        return {
+          error: {
+            input: entry.url,
+            message: (err as Error)?.message ?? "Failed to download this file.",
+          },
+        };
+      }
+    }),
+  );
+
+  const files: File[] = [];
+  for (const result of results) {
+    if ("file" in result) files.push(result.file);
+    else errors.push(result.error);
+  }
+
+  return { files, errors };
+}
+
 /** Same link resolution as importFilesFromLines, but reads metadata only (HEAD/ranged GET +
  *  duration via an <audio> element) — no file body is downloaded. */
 export async function resolveLinksToMetadata(

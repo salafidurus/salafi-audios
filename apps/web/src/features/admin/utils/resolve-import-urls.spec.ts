@@ -1,5 +1,9 @@
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
-import { importFilesFromLines, resolveLinksToMetadata } from "./resolve-import-urls";
+import {
+  importFilesFromLines,
+  importSingleLineWithProgress,
+  resolveLinksToMetadata,
+} from "./resolve-import-urls";
 import { fetchFileFromUrl } from "./fetch-remote-file";
 import { fetchUrlMetadata } from "./fetch-url-metadata";
 import { extractAudioDurationFromUrl } from "./audio-metadata";
@@ -140,6 +144,44 @@ describe("importFilesFromLines", () => {
     await importFilesFromLines(lines, 2);
 
     expect(maxInFlight).toBeLessThanOrEqual(2);
+  });
+});
+
+describe("importSingleLineWithProgress", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    (isKnownUnsupportedSource as Mock<any>).mockReturnValue(null);
+    (parseArchiveOrgIdentifier as Mock<any>).mockReturnValue(null);
+    (parseGoogleDriveLink as Mock<any>).mockReturnValue(null);
+  });
+
+  it("fetches the single resolved URL, forwarding the progress callback", async () => {
+    (fetchFileFromUrl as Mock<any>).mockResolvedValue(makeFile("lesson.mp3"));
+    const onProgress = vi.fn();
+
+    const result = await importSingleLineWithProgress(
+      "https://archive.org/download/Item/lesson.mp3",
+      onProgress,
+    );
+
+    expect(fetchFileFromUrl).toHaveBeenCalledWith(
+      "https://archive.org/download/Item/lesson.mp3",
+      onProgress,
+    );
+    expect(result.files.map((f) => f.name)).toEqual(["lesson.mp3"]);
+    expect(result.errors).toEqual([]);
+  });
+
+  it("surfaces a resolution error (e.g. unsupported source) without attempting a fetch", async () => {
+    (isKnownUnsupportedSource as Mock<any>).mockReturnValue("OneDrive isn't supported");
+
+    const result = await importSingleLineWithProgress("https://1drv.ms/u/c/thing", vi.fn());
+
+    expect(fetchFileFromUrl).not.toHaveBeenCalled();
+    expect(result.files).toEqual([]);
+    expect(result.errors).toEqual([
+      { input: "https://1drv.ms/u/c/thing", message: "OneDrive isn't supported" },
+    ]);
   });
 });
 
