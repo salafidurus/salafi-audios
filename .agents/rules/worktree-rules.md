@@ -41,9 +41,9 @@ find . -maxdepth 4 -name '.env' \
 bun install
 ```
 
-## Pre-Work Verification
+## Pre & Post Work Verification
 
-Before starting any implementation, verify the worktree has no carried-over issues:
+Run these before starting AND before pushing to confirm no regressions:
 
 ```bash
 bun run build
@@ -51,14 +51,29 @@ bun run lint
 bun run typecheck
 bun run test
 bun run test:e2e
+bun run doctor
 ```
 
-If any of these fail, diagnose and fix before beginning work. This ensures the worktree is clean and any new failures are caused by your changes, not pre-existing issues.
+If pre-work fails, diagnose and fix before beginning. If post-work fails, diagnose and fix before pushing — this ensures new failures are from your changes, not pre-existing issues.
+
+## Post-Work: Push & PR
+
+After post-work verification passes:
+
+```bash
+# Push branch (branch name = f/xxx, not f-xxx — matches refs/heads/f/xxx)
+git push -u origin f/<name>
+
+# Create PR
+gh pr create --fill
+```
+
+Note: The worktree directory uses a hyphen (`.worktrees/f-xxx`) while the branch uses a slash (`f/xxx`). Always use `git push -u origin <branch>` with the slash notation.
 
 ## Cleanup & Deletion Workflow
 
-1. **Push when complete**: When the work is fully complete and verified, push the branch to the remote repository.
-2. **Await Merge**: Await verification/confirmation from the user that the branch has been merged (or if you later discover that the branch has been merged on the remote).
+1. **PR Merged**: Confirm the PR has been merged on the remote.
+2. **Pull merged code into local main**: After merge confirmation, pull the merged code into local main:
 3. **Pull merged code into local main**: After merge confirmation, pull the merged code into local main:
    ```bash
    git checkout main && git pull
