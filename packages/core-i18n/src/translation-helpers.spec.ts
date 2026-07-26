@@ -23,4 +23,11 @@ describe("getLocalizedName", () => {
   it("returns English translation when locale is en", () => {
     expect(getLocalizedName({ en: "Aqeedah", ar: "العقيدة" }, "en")).toBe("Aqeedah");
   });
+
+  it("accepts an ar-required/en-optional shape (e.g. Topic, whose main language is Arabic)", () => {
+    expect(getLocalizedName({ ar: "العقيدة" }, "ar")).toBe("العقيدة");
+    // Falls back to Arabic when locale is en but no English translation exists yet.
+    expect(getLocalizedName({ ar: "العقيدة" }, "en")).toBe("العقيدة");
+    expect(getLocalizedName({ ar: "العقيدة", en: "Aqeedah" }, "en")).toBe("Aqeedah");
+  });
 });

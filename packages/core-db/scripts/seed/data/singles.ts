@@ -108,14 +108,4 @@ export const SINGLES: SingleSeed[] = [
     durationMin: 50,
     audioUrl: "https://placeholder.dev/audio/bukhari-madkhal-ila-ilm-al-hadith.mp3",
   },
-  {
-    id: 110,
-    scholarIdx: 5,
-    slug: "e2e-listing-slug",
-    title: "E2E Test Listing",
-    desc: "E2E Listing Description",
-    topicIdx: 6,
-    durationMin: 5,
-    audioUrl: "https://placeholder.dev/audio/e2e-listing-slug.mp3",
-  },
 ];

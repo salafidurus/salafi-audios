@@ -115,7 +115,9 @@ describe('Public API (e2e)', () => {
 
       expect(res.body).toHaveProperty('id');
       expect(res.body).toHaveProperty('slug', 'e2e-parent-topic');
-      expect(res.body.name).toEqual({ en: 'Parent Topic' });
+      // Arabic is the main language for topics; this fixture has no Arabic
+      // translation, so its (English-authored) base content surfaces as `ar`.
+      expect(res.body.name).toEqual({ ar: 'Parent Topic' });
     });
   });
 

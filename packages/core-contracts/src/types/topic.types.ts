@@ -7,8 +7,8 @@ export const TopicSlugSchema = z.string();
 export type TopicSlug = z.infer<typeof TopicSlugSchema>;
 
 export const TopicNameSchema = z.object({
-  en: z.string().min(1, "English name is required"),
-  ar: z.string().optional(),
+  ar: z.string().min(1, "Arabic name is required"),
+  en: z.string().optional(),
 });
 export type TopicName = z.infer<typeof TopicNameSchema>;
 
@@ -70,7 +70,7 @@ export type AdminTopicDetailDto = z.infer<typeof AdminTopicDetailDtoSchema>;
 export const CreateTopicWithTranslationsDtoSchema = z.object({
   slug: z.string().min(1, "Slug is required"),
   name: z.object({
-    en: z.string().min(1, "English name is required"),
+    ar: z.string().min(1, "Arabic name is required"),
   }),
   orderIndex: z.number().optional(),
 });
@@ -78,7 +78,7 @@ export type CreateTopicWithTranslationsDto = z.infer<typeof CreateTopicWithTrans
 
 export const UpdateTopicWithTranslationsDtoSchema = z.object({
   name: z.object({
-    en: z.string().min(1, "English name is required"),
+    ar: z.string().min(1, "Arabic name is required"),
   }),
   orderIndex: z.number().optional(),
 });

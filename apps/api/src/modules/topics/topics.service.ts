@@ -94,11 +94,11 @@ export class TopicsService {
 
   private async upsertMainFields(
     slug: string,
-    data: { name: { en: string }; orderIndex?: number },
+    data: { name: { ar: string }; orderIndex?: number },
   ): Promise<AdminTopicDetailDto> {
     const topic = await this.repo.upsertBySlug({
       slug,
-      name: data.name.en,
+      name: data.name.ar,
       orderIndex: data.orderIndex,
     });
 

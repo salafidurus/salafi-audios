@@ -185,8 +185,8 @@ const topicConfig: TranslationEntityConfig = {
     const data = await fetchAdminTopic(target.topicSlug);
     return {
       entityId: data.id,
-      mainLocale: "en",
-      source: { name: data.name.en },
+      mainLocale: "ar",
+      source: { name: data.name.ar },
       translations: data.translations,
     };
   },

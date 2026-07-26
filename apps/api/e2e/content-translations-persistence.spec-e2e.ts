@@ -183,10 +183,12 @@ describe('Content translations persistence (e2e)', () => {
   describe('Main-language translation sync', () => {
     let scholarId: string;
     let listingId: string;
+    let topicSlug: string;
 
     afterAll(async () => {
       if (scholarId) await prisma.scholar.delete({ where: { id: scholarId } });
       if (listingId) await prisma.listing.delete({ where: { id: listingId } });
+      if (topicSlug) await prisma.topic.delete({ where: { slug: topicSlug } });
     });
 
     describe('Scholar', () => {
@@ -319,6 +321,43 @@ describe('Content translations persistence (e2e)', () => {
         });
         expect(enTranslation?.title).toBe('The Second Title');
         expect(enTranslation?.status).toBe('published');
+      });
+    });
+
+    describe('Topic (Arabic is always the main language)', () => {
+      it('POST /admin/topics mirrors the new topic into a matching Arabic TopicTranslation', async () => {
+        const auth = await authFactory.createAdminUser([Permission.TOPICS_CREATE]);
+        topicSlug = `e2e-sync-topic-${crypto.randomUUID()}`;
+        await request(app.getHttpServer())
+          .post('/admin/topics')
+          .set(auth.headers)
+          .send({ slug: topicSlug, name: { ar: 'موضوع أول' } })
+          .expect(201);
+
+        const topic = await prisma.topic.findUnique({ where: { slug: topicSlug } });
+        expect(topic?.name).toBe('موضوع أول');
+
+        const translation = await prisma.topicTranslation.findUnique({
+          where: { topicId_locale: { topicId: topic!.id, locale: 'ar' } },
+        });
+        expect(translation?.name).toBe('موضوع أول');
+      });
+
+      it('PUT /admin/topics/:slug keeps the Arabic translation in sync when content changes', async () => {
+        const auth = await authFactory.createAdminUser([Permission.TOPICS_EDIT]);
+        await request(app.getHttpServer())
+          .put(`/admin/topics/${topicSlug}`)
+          .set(auth.headers)
+          .send({ name: { ar: 'موضوع محدث' } })
+          .expect(200);
+
+        const topic = await prisma.topic.findUnique({ where: { slug: topicSlug } });
+        expect(topic?.name).toBe('موضوع محدث');
+
+        const translation = await prisma.topicTranslation.findUnique({
+          where: { topicId_locale: { topicId: topic!.id, locale: 'ar' } },
+        });
+        expect(translation?.name).toBe('موضوع محدث');
       });
     });
   });

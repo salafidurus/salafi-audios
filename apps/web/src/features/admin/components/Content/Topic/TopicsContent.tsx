@@ -44,8 +44,8 @@ export function TopicsContent({
     const query = debouncedSearch.toLowerCase();
     return topics.filter(
       (t) =>
-        t.name.en.toLowerCase().includes(query) ||
-        (t.name.ar && t.name.ar.toLowerCase().includes(query)) ||
+        t.name.ar.toLowerCase().includes(query) ||
+        (t.name.en && t.name.en.toLowerCase().includes(query)) ||
         t.slug.toLowerCase().includes(query),
     );
   }, [topics, debouncedSearch]);
