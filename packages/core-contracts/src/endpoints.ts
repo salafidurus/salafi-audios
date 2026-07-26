@@ -105,8 +105,6 @@ export const endpoints = {
       list: (id: string) => `/topics/${id}/translations`,
       save: (id: string) => `/topics/${id}/translations`,
       update: (id: string, locale: string) => `/topics/${id}/translations/${locale}`,
-      publish: (id: string, locale: string) => `/topics/${id}/translations/${locale}/publish`,
-      unpublish: (id: string, locale: string) => `/topics/${id}/translations/${locale}/unpublish`,
     },
   },
   auth: {},

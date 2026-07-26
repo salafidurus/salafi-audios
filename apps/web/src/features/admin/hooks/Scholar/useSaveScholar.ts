@@ -1,7 +1,6 @@
-import type { CreateScholarDto, Locale, UpdateScholarDto } from "@sd/core-contracts";
+import type { CreateScholarDto, UpdateScholarDto } from "@sd/core-contracts";
 import { sanitizeError } from "@sd/utils-error";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { getSecondaryLocales, buildTranslationsPayload } from "@/features/admin/utils/locale-tabs";
 import { getPresignedUrl, uploadToR2 } from "@/features/admin/api/admin-lectures.api";
 import { createScholar, updateScholar } from "@/features/admin/api/admin.api";
 import type { FormAction, FormState } from "./useScholarForm";
@@ -60,14 +59,6 @@ export function useSaveScholar(
     dispatch({ type: "SET_ERROR", error: null });
 
     try {
-      const mainLocale = (state.mainLanguage || "ar") as Locale;
-      const secondaryLocales = getSecondaryLocales(mainLocale);
-      const translations = buildTranslationsPayload(
-        state.translationChanges,
-        secondaryLocales,
-        (v) => !!v?.name,
-      )?.map((tr) => ({ ...tr, name: tr.name ?? "" }));
-
       if (state.isEditing) {
         if (!state.id) throw new Error("Scholar ID required for update");
 
@@ -86,7 +77,6 @@ export function useSaveScholar(
           socialWebsite: state.socialWebsite,
           imageUrl: image.url,
           imageKey: image.key,
-          translations,
         };
 
         await updateScholar(state.id, payload);
@@ -107,7 +97,6 @@ export function useSaveScholar(
           socialWebsite: state.socialWebsite,
           imageUrl: image.url,
           imageKey: image.key,
-          translations,
         };
 
         await createScholar(payload);

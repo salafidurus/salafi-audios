@@ -5,13 +5,11 @@ import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button";
 import { InputField } from "@/shared/components/InputField";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { type Locale } from "@sd/core-contracts";
 import {
   fetchAdminTopic,
   createTopicWithTranslations,
   updateTopicWithTranslations,
 } from "@/features/admin/api/admin.api";
-import { getSecondaryLocales } from "@/features/admin/utils/locale-tabs";
 import type {
   CreateTopicWithTranslationsDto,
   UpdateTopicWithTranslationsDto,
@@ -33,7 +31,6 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
   const [slug, setSlug] = useState("");
   const [nameEn, setNameEn] = useState("");
   const [orderIndex, setOrderIndex] = useState(99);
-  const [translations, setTranslations] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -44,7 +41,6 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
       setSlug("");
       setNameEn("");
       setOrderIndex(99);
-      setTranslations({});
       setSaving(false);
       setLoading(false);
       setFetchError(null);
@@ -56,7 +52,6 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
       setSlug("");
       setNameEn("");
       setOrderIndex(99);
-      setTranslations({});
       return;
     }
 
@@ -70,11 +65,6 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
         setSlug(data.slug);
         setNameEn(data.name.en ?? "");
         setOrderIndex(data.orderIndex ?? 99);
-        const transMap: Record<string, string> = {};
-        for (const trans of data.translations ?? []) {
-          transMap[trans.locale] = trans.fields?.name ?? "";
-        }
-        setTranslations(transMap);
       })
       .catch(() => {
         if (cancelled) return;
@@ -100,21 +90,12 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
     }
   };
 
-  const handleTranslationChange = (locale: string, value: string) => {
-    setTranslations((prev) => ({ ...prev, [locale]: value }));
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const hasAnyLanguage =
-      nameEn.trim().length > 0 || Object.values(translations).some((v) => v && v.trim().length > 0);
 
-    if (!slug.trim() || !hasAnyLanguage) {
+    if (!slug.trim() || !nameEn.trim()) {
       setError(
-        t(
-          "admin.contents.slugAndLanguageRequired",
-          "Slug and at least one language name are required.",
-        ),
+        t("admin.contents.slugAndLanguageRequired", "Slug and an English name are required."),
       );
       return;
     }
@@ -123,16 +104,10 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
     setError(null);
 
     try {
-      const translationEntries = Object.entries(translations).map(([locale, name]) => ({
-        locale: locale as any,
-        name: name || "",
-      }));
-
       if (isEditing) {
         const body: UpdateTopicWithTranslationsDto = {
           name: { en: nameEn },
           orderIndex,
-          translations: translationEntries.filter((t) => t.name.trim()),
         };
         await updateTopicWithTranslations(topicSlug, body);
         await onSaved(topicSlug);
@@ -141,7 +116,6 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
           slug,
           name: { en: nameEn },
           orderIndex,
-          translations: translationEntries.filter((t) => t.name.trim()),
         };
         const result = await createTopicWithTranslations(body);
         await onSaved(result.slug);
@@ -213,19 +187,6 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
               value={nameEn}
               onChange={handleNameEnChange}
               placeholder={t("admin.contents.englishNamePlaceholder", "Topic name in English")}
-            />
-          </div>
-
-          <div className={styles.field}>
-            <label htmlFor="topic-name-ar" className={styles.label}>
-              {t("admin.contents.arabicNameLabel", "Arabic Name")}
-            </label>
-            <InputField
-              id="topic-name-ar"
-              type="text"
-              value={translations.ar ?? ""}
-              onChange={(value) => handleTranslationChange("ar", value)}
-              placeholder={t("admin.contents.arabicNamePlaceholder", "Topic name in Arabic")}
             />
           </div>
 

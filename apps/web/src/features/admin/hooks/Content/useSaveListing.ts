@@ -1,7 +1,6 @@
-import type { Locale, UpdateListingDetailsDto } from "@sd/core-contracts";
+import type { UpdateListingDetailsDto } from "@sd/core-contracts";
 import { sanitizeError } from "@sd/utils-error";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { getSecondaryLocales, buildTranslationsPayload } from "@/features/admin/utils/locale-tabs";
 import {
   createLecture,
   updateListingDetails,
@@ -79,14 +78,6 @@ export function useSaveListing(
     dispatch({ type: "SET_ERROR", error: null });
 
     try {
-      const mainLocale = (state.language || "ar") as Locale;
-      const secondaryLocales = getSecondaryLocales(mainLocale);
-      const translations = buildTranslationsPayload(
-        state.translationChanges,
-        secondaryLocales,
-        (v) => !!(v?.title || v?.description),
-      )?.map((tr) => ({ ...tr, title: tr.title ?? "" }));
-
       if (state.isEditing) {
         if (!state.id) throw new Error("Listing ID required for update");
 
@@ -101,7 +92,6 @@ export function useSaveListing(
           topics: state.selectedTopics,
           coverImageUrl: coverImage.url,
           coverImageKey: coverImage.key,
-          translations,
         };
 
         await updateListingDetails(state.id, payload);
@@ -128,7 +118,6 @@ export function useSaveListing(
           sizeBytes: initialAudioData.sizeBytes,
           coverImageUrl: coverImage.url,
           coverImageKey: coverImage.key,
-          translations,
         });
       }
 

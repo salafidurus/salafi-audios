@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { useApiQuery, queryKeys, httpClient, endpoints, type Locale } from "@sd/core-contracts";
-import type { ScholarListItemDto, TopicDetailDto, ListingRefDto } from "@sd/core-contracts";
+import type { ScholarListItemDto, ListingRefDto } from "@sd/core-contracts";
 import { useTopicsList } from "@sd/domain-search";
 import { useAdminListingSeriesByScholar } from "@sd/domain-content";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -39,7 +39,7 @@ export function ListingModal({
 }: ListingModalProps) {
   const { t } = useTranslation();
   const isDesktop = useIsDesktop();
-  const [activeTab, setActiveTab] = useState<"general" | "main" | "other" | "review">("general");
+  const [activeTab, setActiveTab] = useState<"general" | "main" | "review">("general");
   const [errorTabs, setErrorTabs] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -148,7 +148,6 @@ export function ListingModal({
   const topicsArray = topicsData ?? [];
   const series = (seriesData ?? []) as ListingRefDto[];
   const mainLocale = (state.language || "ar") as Locale;
-  const otherLocale: Locale = mainLocale === "en" ? "ar" : "en";
   const errorTabSet = new Set(errorTabs);
 
   return (
@@ -177,7 +176,6 @@ export function ListingModal({
         <Modal.Tabs errorTabs={errorTabs}>
           <Modal.TabItem id="general">{t("admin.modal.generalTab", "General")}</Modal.TabItem>
           <Modal.TabItem id="main">{getLocaleLabel(mainLocale)}</Modal.TabItem>
-          <Modal.TabItem id="other">{getLocaleLabel(otherLocale)}</Modal.TabItem>
           <Modal.TabItem id="review">{t("admin.modal.reviewTab", "Review")}</Modal.TabItem>
         </Modal.Tabs>
 
@@ -192,7 +190,6 @@ export function ListingModal({
           handleTopicToggle={handleTopicToggle}
           handleTitleChange={handleTitleChange}
           mainLocale={mainLocale}
-          otherLocale={otherLocale}
           isEditing={state.isEditing}
           onImageStaged={handleImageStaged}
           stagedImagePreview={state.stagedImagePreview}

@@ -923,24 +923,6 @@ export class ListingRepository {
         await this.syncListingCounters(listing.parentId, tx);
       }
 
-      // If translations were provided in the DTO, upsert them
-      if (dto.translations) {
-        await Promise.all(
-          dto.translations.map((fields) =>
-            tx.listingTranslation.upsert({
-              where: { listingId_locale: { listingId: listing.id, locale: fields.locale } },
-              update: { title: fields.title, description: fields.description ?? null },
-              create: {
-                listingId: listing.id,
-                locale: fields.locale,
-                title: fields.title,
-                description: fields.description ?? null,
-              },
-            }),
-          ),
-        );
-      }
-
       return { id: listing.id, title: listing.title };
     });
   }
@@ -959,11 +941,11 @@ export class ListingRepository {
 
         if (!original) throw new Error('Not found');
 
-        // Exclude translations and topics from the main update data
-        const { translations, topics, ...dtoWithoutTranslationsAndTopics } = dto;
+        // Exclude topics from the main update data
+        const { topics, ...dtoWithoutTopics } = dto;
 
         const updateData: Prisma.ListingUpdateInput = {
-          ...dtoWithoutTranslationsAndTopics,
+          ...dtoWithoutTopics,
           updatedAt: new Date(),
           updatedBy,
         };
@@ -993,27 +975,6 @@ export class ListingRepository {
               })),
             });
           }
-        }
-
-        // If translations were provided in the DTO, upsert them
-        if (translations) {
-          await Promise.all(
-            translations.map((fields) =>
-              tx.listingTranslation.upsert({
-                where: { listingId_locale: { listingId: id, locale: fields.locale } },
-                update: {
-                  title: fields.title ?? undefined,
-                  description: fields.description ?? null,
-                },
-                create: {
-                  listingId: id,
-                  locale: fields.locale,
-                  title: fields.title ?? '',
-                  description: fields.description ?? null,
-                },
-              }),
-            ),
-          );
         }
 
         // Sync old parent if it exists

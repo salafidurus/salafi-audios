@@ -24,13 +24,13 @@ describe("ScholarModal", () => {
     expect(screen.queryByText(/add scholar/i)).not.toBeInTheDocument();
   });
 
-  it("renders tabs for add scholar modal", () => {
+  it("renders tabs for add scholar modal (main-language-only, no secondary-locale tab)", () => {
     render(<ScholarModal isOpen onClose={vi.fn()} onSuccess={vi.fn()} />);
 
     expect(screen.getByRole("tablist")).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /general/i })).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "العربية" })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "English" })).toBeInTheDocument();
+    expect(screen.queryByRole("tab", { name: "English" })).not.toBeInTheDocument();
     expect(screen.getByRole("tab", { name: /review/i })).toBeInTheDocument();
   });
 
