@@ -4,54 +4,24 @@ import { useEffect, useRef, useState } from "react";
 import type { Locale } from "@sd/core-contracts";
 import { sanitizeError } from "@sd/utils-error";
 import { Modal } from "@/shared/components/Modal";
-import { Button } from "@/shared/components/Button";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
 import { getSecondaryLocales, getLocaleLabel } from "@/features/admin/utils/locale-tabs";
+import { useTranslationForm } from "@/features/admin/hooks/Translation/useTranslationForm";
+import { computeLocalesToSave } from "@/features/admin/utils/translation-save";
 import {
-  useTranslationForm,
-  getFieldValue,
-  isLocaleDirty,
-  type TranslationFormState,
-} from "@/features/admin/hooks/Translation/useTranslationForm";
-import { translationEntities, type ClientTranslationTarget } from "./translation-entities";
-import { TranslationFieldRow } from "./TranslationFieldRow";
+  translationEntities,
+  type ClientTranslationTarget,
+  type TranslationChildSummary,
+} from "./translation-entities";
+import { TranslationLocaleFields } from "./TranslationLocaleFields";
+import { TranslationChildrenTab } from "./TranslationChildrenTab";
+import { TranslationReviewTab } from "./TranslationReviewTab";
 import styles from "./translation-modal.module.css";
 
 export interface TranslationModalProps {
   isOpen: boolean;
   onClose: () => void;
   target: ClientTranslationTarget | null;
-}
-
-type StatusDot = "published" | "draft" | "notCreated";
-
-const STATUS_DOT_CLASS: Record<StatusDot, string> = {
-  published: styles.dotPublished ?? "",
-  draft: styles.dotDraft ?? "",
-  notCreated: styles.dotNotCreated ?? "",
-};
-
-function statusInfo(
-  state: TranslationFormState,
-  locale: Locale,
-  supportsPublish: boolean,
-  t: (key: string, fallback: string) => string,
-): { label: string; dot: StatusDot } {
-  const hasTranslation = !!state.initial[locale];
-  if (!supportsPublish) {
-    return hasTranslation
-      ? { label: t("admin.translations.status.saved", "Saved"), dot: "published" }
-      : { label: t("admin.translations.status.notCreated", "Not created"), dot: "notCreated" };
-  }
-  const status = state.translationStatus[locale];
-  if (status === "published") {
-    return { label: t("admin.translations.status.published", "Published"), dot: "published" };
-  }
-  if (status === "draft") {
-    return { label: t("admin.translations.status.draft", "Draft"), dot: "draft" };
-  }
-  return { label: t("admin.translations.status.notCreated", "Not created"), dot: "notCreated" };
 }
 
 export function TranslationModal({ isOpen, onClose, target }: TranslationModalProps) {
@@ -63,6 +33,17 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
   const loadedRef = useRef(false);
 
   const { state, dispatch } = useTranslationForm();
+
+  // Only set for listing targets — used to decide whether the "sub-listings" tab
+  // is worth showing at all ("single"-format listings have no children).
+  const [rootFormat, setRootFormat] = useState<string | undefined>(undefined);
+  const [children, setChildren] = useState<TranslationChildSummary[] | null>(null);
+  const [childrenStatus, setChildrenStatus] = useState<"idle" | "loading" | "ready" | "error">(
+    "idle",
+  );
+  const [childrenError, setChildrenError] = useState<string | null>(null);
+  const [selectedChildId, setSelectedChildId] = useState<string | null>(null);
+  const childrenLoadedRef = useRef(false);
 
   const config = target ? translationEntities[target.entity] : null;
 
@@ -79,6 +60,7 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
           source: data.source,
           translations: data.translations,
         });
+        setRootFormat(data.format);
       })
       .catch((err) => {
         dispatch({ type: "SET_ERROR", error: sanitizeError(err) });
@@ -86,6 +68,29 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
     // config is derived deterministically from target.entity; re-running on target is sufficient.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [target, dispatch]);
+
+  const showChildrenTab =
+    !!config?.supportsChildren && !!rootFormat && rootFormat !== "single" && !!state.entityId;
+
+  useEffect(() => {
+    const loadChildren = config?.loadChildren;
+    if (!showChildrenTab || !loadChildren || !state.entityId || childrenLoadedRef.current) {
+      return;
+    }
+    childrenLoadedRef.current = true;
+    setChildrenStatus("loading");
+    loadChildren(state.entityId)
+      .then((result) => {
+        setChildren(result);
+        setChildrenStatus("ready");
+      })
+      .catch((err) => {
+        setChildrenError(sanitizeError(err));
+        setChildrenStatus("error");
+      });
+    // config.loadChildren is derived deterministically from target.entity.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showChildrenTab, state.entityId]);
 
   if (!target || !config) return null;
 
@@ -95,6 +100,7 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
   const handleClose = () => {
     setErrorTabs([]);
     setActiveTabOverride("");
+    setSelectedChildId(null);
     onClose();
   };
 
@@ -127,35 +133,10 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
     if (!config || !state.entityId) return;
 
     setErrorTabs([]);
-    const errTabs: string[] = [];
-    const localesToSave: Locale[] = [];
-    const fieldsByLocale = new Map<Locale, Record<string, string>>();
+    const { toSave, errorLocales } = computeLocalesToSave(config, state, secondaryLocales);
 
-    for (const locale of secondaryLocales) {
-      if (!isLocaleDirty(state, locale)) continue;
-
-      const merged: Record<string, string> = {};
-      let hasContent = false;
-      let missingRequired = false;
-      for (const field of config.fields) {
-        const value = getFieldValue(state, locale, field.key);
-        merged[field.key] = value;
-        if (value.trim()) hasContent = true;
-        if (field.required && !value.trim()) missingRequired = true;
-      }
-
-      if (missingRequired && hasContent) {
-        errTabs.push(locale);
-        continue;
-      }
-      if (missingRequired && !hasContent) continue; // fully cleared — nothing to persist
-
-      localesToSave.push(locale);
-      fieldsByLocale.set(locale, merged);
-    }
-
-    if (errTabs.length > 0) {
-      setErrorTabs(errTabs);
+    if (errorLocales.length > 0) {
+      setErrorTabs(errorLocales);
       dispatch({
         type: "SET_ERROR",
         error: t(
@@ -166,7 +147,7 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
       return;
     }
 
-    if (localesToSave.length === 0) {
+    if (toSave.size === 0) {
       handleClose();
       return;
     }
@@ -175,8 +156,7 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
     dispatch({ type: "SET_ERROR", error: null });
     try {
       await Promise.all(
-        localesToSave.map(async (locale) => {
-          const fields = fieldsByLocale.get(locale)!;
+        Array.from(toSave.entries()).map(async ([locale, fields]) => {
           const result = await config.save(state.entityId!, locale, fields);
           if (result.status) {
             dispatch({ type: "SET_STATUS", locale, status: result.status });
@@ -221,6 +201,11 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
               {getLocaleLabel(locale)}
             </Modal.TabItem>
           ))}
+          {showChildrenTab && (
+            <Modal.TabItem id="children">
+              {t("admin.translations.childrenTab", "Sub-listings")}
+            </Modal.TabItem>
+          )}
           <Modal.TabItem id="review">{t("admin.modal.reviewTab", "Review")}</Modal.TabItem>
         </Modal.Tabs>
 
@@ -240,90 +225,38 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
 
             {secondaryLocales.map((locale) => {
               if (activeTab !== locale) return null;
-              const { label, dot } = statusInfo(state, locale, config.supportsPublish, t);
-              const dotClass = STATUS_DOT_CLASS[dot];
-              const dirty = isLocaleDirty(state, locale);
-              const canPublish = !dirty && !!state.initial[locale];
-              const isPublished = state.translationStatus[locale] === "published";
-
               return (
-                <div key={locale} className={styles.localeTab}>
-                  <div className={styles.statusRow}>
-                    <span className={styles.statusChip}>
-                      <span className={`${styles.statusDot} ${dotClass}`} />
-                      {label}
-                    </span>
-                    {config.supportsPublish && (
-                      <PermissionGate requires="TRANSLATIONS_PUBLISH">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          disabled={!canPublish || state.saving}
-                          loading={state.saving}
-                          title={
-                            dirty
-                              ? t("admin.translations.saveBeforePublish", "Save before publishing")
-                              : undefined
-                          }
-                          onClick={() => handlePublishToggle(locale)}
-                        >
-                          {isPublished
-                            ? t("admin.translations.unpublish", "Unpublish")
-                            : t("admin.translations.publish", "Publish")}
-                        </Button>
-                      </PermissionGate>
-                    )}
-                  </div>
-
-                  {config.fields.map((field) => (
-                    <TranslationFieldRow
-                      key={field.key}
-                      id={`translation-${target.entity}-${locale}-${field.key}`}
-                      label={t(field.labelKey, field.fallbackLabel)}
-                      sourceValue={state.source[field.key] ?? null}
-                      value={getFieldValue(state, locale, field.key)}
-                      required={field.required}
-                      multiline={field.multiline}
-                      onChange={(value) =>
-                        dispatch({ type: "EDIT_FIELD", locale, field: field.key, value })
-                      }
-                    />
-                  ))}
-                </div>
+                <TranslationLocaleFields
+                  key={locale}
+                  config={config}
+                  state={state}
+                  dispatch={dispatch}
+                  locale={locale}
+                  idPrefix={`translation-${target.entity}`}
+                  onPublishToggle={handlePublishToggle}
+                />
               );
             })}
 
+            {showChildrenTab && activeTab === "children" && (
+              <TranslationChildrenTab
+                config={config}
+                status={childrenStatus}
+                error={childrenError}
+                items={children}
+                selectedChildId={selectedChildId}
+                onSelectChild={setSelectedChildId}
+                onBack={() => setSelectedChildId(null)}
+                onChildSaved={() => setSelectedChildId(null)}
+              />
+            )}
+
             {activeTab === "review" && (
-              <div className={styles.reviewTab}>
-                {secondaryLocales.every((locale) => !isLocaleDirty(state, locale)) ? (
-                  <div className={styles.emptyState}>
-                    {t("admin.scholars.noChangesMadeYet", "No changes made yet")}
-                  </div>
-                ) : (
-                  secondaryLocales.map((locale) => {
-                    if (!isLocaleDirty(state, locale)) return null;
-                    return (
-                      <div key={locale} className={styles.reviewLocaleBlock}>
-                        <h4 className={styles.reviewLocaleTitle}>{getLocaleLabel(locale)}</h4>
-                        {config.fields.map((field) => {
-                          const oldValue = state.initial[locale]?.[field.key] ?? "";
-                          const newValue = getFieldValue(state, locale, field.key);
-                          if (oldValue === newValue) return null;
-                          return (
-                            <div key={field.key} className={styles.reviewFieldDiff}>
-                              <strong>{t(field.labelKey, field.fallbackLabel)}:</strong>
-                              <span className={styles.diffOld}>{oldValue || "—"}</span>
-                              {" → "}
-                              <span className={styles.diffNew}>{newValue || "—"}</span>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    );
-                  })
-                )}
-              </div>
+              <TranslationReviewTab
+                config={config}
+                state={state}
+                secondaryLocales={secondaryLocales}
+              />
             )}
           </>
         )}

@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { useAdminPermissions } from "@sd/domain-account";
 import { TranslationModal } from "./TranslationModal";
-import { fetchListingFormData } from "@/features/admin/api/admin-lectures.api";
+import { fetchListingFormData, fetchArrangeData } from "@/features/admin/api/admin-lectures.api";
 import { fetchScholarFormData, fetchAdminTopic } from "@/features/admin/api/admin.api";
 import {
   saveListingTranslation,
@@ -12,6 +12,7 @@ import {
 
 vi.mock("@/features/admin/api/admin-lectures.api", () => ({
   fetchListingFormData: vi.fn(),
+  fetchArrangeData: vi.fn(),
 }));
 
 vi.mock("@/features/admin/api/admin.api", () => ({
@@ -335,5 +336,174 @@ describe("TranslationModal", () => {
       expect(onClose).toHaveBeenCalledTimes(1);
     });
     expect(saveTopicTranslation).not.toHaveBeenCalled();
+  });
+
+  describe("sub-listings tab", () => {
+    it("does not show a sub-listings tab for a single-format listing, and never fetches children", async () => {
+      (fetchListingFormData as Mock<any>).mockResolvedValue({
+        listing: {
+          id: "listing-single",
+          title: "Single Lecture",
+          slug: "single-lecture",
+          format: "single",
+          status: "draft",
+          scholarId: "scholar-1",
+          scholarName: "Scholar One",
+          topics: [],
+          language: "ar",
+          createdAt: "2024-01-01",
+        },
+        translations: [],
+      });
+
+      render(
+        <TranslationModal
+          isOpen
+          onClose={vi.fn()}
+          target={{ entity: "listing", listingId: "listing-single" }}
+        />,
+      );
+
+      await screen.findByLabelText(/^Title/i);
+      expect(screen.queryByRole("tab", { name: /sub-listings/i })).not.toBeInTheDocument();
+      expect(fetchArrangeData).not.toHaveBeenCalled();
+    });
+
+    it("shows a sub-listings tab for a collection listing, listing modules and lessons", async () => {
+      (fetchListingFormData as Mock<any>).mockResolvedValue({
+        listing: {
+          id: "listing-collection",
+          title: "A Collection",
+          slug: "a-collection",
+          format: "collection",
+          status: "draft",
+          scholarId: "scholar-1",
+          scholarName: "Scholar One",
+          topics: [],
+          language: "ar",
+          createdAt: "2024-01-01",
+        },
+        translations: [],
+      });
+      (fetchArrangeData as Mock<any>).mockResolvedValue({
+        id: "listing-collection",
+        slug: "a-collection",
+        title: "A Collection",
+        format: "collection",
+        scholarId: "scholar-1",
+        status: "draft",
+        lessons: [],
+        modules: [
+          {
+            id: "module-1",
+            slug: "module-1",
+            title: "Module One",
+            status: "draft",
+            hasAudio: false,
+            lessons: [
+              {
+                id: "lesson-1a",
+                slug: "1a",
+                title: "Lesson 1A",
+                status: "draft",
+                hasAudio: true,
+              },
+            ],
+          },
+        ],
+      });
+
+      render(
+        <TranslationModal
+          isOpen
+          onClose={vi.fn()}
+          target={{ entity: "listing", listingId: "listing-collection" }}
+        />,
+      );
+
+      const childrenTab = await screen.findByRole("tab", { name: /sub-listings/i });
+      fireEvent.click(childrenTab);
+
+      await waitFor(() => {
+        expect(fetchArrangeData).toHaveBeenCalledWith("listing-collection");
+      });
+      await screen.findByText("Module One");
+      expect(screen.getByText("Lesson 1A")).toBeInTheDocument();
+    });
+
+    it("drills into a child's own translation editor and returns via the back button", async () => {
+      (fetchListingFormData as Mock<any>).mockImplementation((id: string) => {
+        if (id === "lesson-1a") {
+          return Promise.resolve({
+            listing: {
+              id: "lesson-1a",
+              title: "Lesson 1A",
+              slug: "1a",
+              format: "single",
+              status: "draft",
+              scholarId: "scholar-1",
+              scholarName: "Scholar One",
+              topics: [],
+              language: "ar",
+              createdAt: "2024-01-01",
+            },
+            translations: [],
+          });
+        }
+        return Promise.resolve({
+          listing: {
+            id: "listing-collection",
+            title: "A Collection",
+            slug: "a-collection",
+            format: "collection",
+            status: "draft",
+            scholarId: "scholar-1",
+            scholarName: "Scholar One",
+            topics: [],
+            language: "ar",
+            createdAt: "2024-01-01",
+          },
+          translations: [],
+        });
+      });
+      (fetchArrangeData as Mock<any>).mockResolvedValue({
+        id: "listing-collection",
+        slug: "a-collection",
+        title: "A Collection",
+        format: "collection",
+        scholarId: "scholar-1",
+        status: "draft",
+        lessons: [
+          { id: "lesson-1a", slug: "1a", title: "Lesson 1A", status: "draft", hasAudio: true },
+        ],
+        modules: [],
+      });
+
+      render(
+        <TranslationModal
+          isOpen
+          onClose={vi.fn()}
+          target={{ entity: "listing", listingId: "listing-collection" }}
+        />,
+      );
+
+      const childrenTab = await screen.findByRole("tab", { name: /sub-listings/i });
+      fireEvent.click(childrenTab);
+
+      const childRow = await screen.findByText("Lesson 1A");
+      fireEvent.click(childRow);
+
+      await waitFor(() => {
+        expect(fetchListingFormData).toHaveBeenCalledWith("lesson-1a");
+      });
+
+      const backButton = await screen.findByRole("button", { name: /back/i });
+      // The child's own editable title field loaded, distinct from the root's.
+      expect(screen.getAllByLabelText(/^Title/i).length).toBeGreaterThan(0);
+
+      fireEvent.click(backButton);
+      await screen.findByText("Lesson 1A");
+      expect(screen.queryByRole("button", { name: /back/i })).not.toBeInTheDocument();
+    });
   });
 });

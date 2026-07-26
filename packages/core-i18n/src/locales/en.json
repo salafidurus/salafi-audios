@@ -779,7 +779,9 @@
       "unpublish": "Unpublish",
       "saveBeforePublish": "Save before publishing",
       "requiredFieldMissing": "A required field is empty in a locale with other changes.",
-      "emptySource": "No value in the main language"
+      "emptySource": "No value in the main language",
+      "childrenTab": "Sub-listings",
+      "childrenEmpty": "No sub-listings yet"
     }
   }
 }

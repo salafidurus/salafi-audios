@@ -1,5 +1,5 @@
-import type { Locale, TranslationViewDto } from "@sd/core-contracts";
-import { fetchListingFormData } from "@/features/admin/api/admin-lectures.api";
+import type { Locale, ListingFormat, TranslationViewDto } from "@sd/core-contracts";
+import { fetchListingFormData, fetchArrangeData } from "@/features/admin/api/admin-lectures.api";
 import { fetchScholarFormData, fetchAdminTopic } from "@/features/admin/api/admin.api";
 import {
   saveListingTranslation,
@@ -34,6 +34,17 @@ export interface TranslationLoadResult {
   mainLocale: Locale;
   source: Record<string, string | null>;
   translations: TranslationViewDto[];
+  /** Listing format, if known — used only to decide whether a "sub-listings" tab is worth showing. */
+  format?: ListingFormat;
+}
+
+/** One row in the flattened modules+lessons list shown on the listing "sub-listings" tab. */
+export interface TranslationChildSummary {
+  id: string;
+  title: string;
+  kind: "module" | "lesson";
+  /** True for a lesson nested under a module — used to indent it in the list. */
+  indent: boolean;
 }
 
 /**
@@ -52,6 +63,10 @@ export interface TranslationEntityConfig {
   ) => Promise<TranslationViewDto>;
   publish?: (entityId: string, locale: Locale) => Promise<TranslationViewDto>;
   unpublish?: (entityId: string, locale: Locale) => Promise<TranslationViewDto>;
+  /** True when this entity can have translatable children (listing modules/lessons). */
+  supportsChildren?: boolean;
+  /** Flattened modules+lessons for the "sub-listings" tab — only set when `supportsChildren`. */
+  loadChildren?: (rootId: string) => Promise<TranslationChildSummary[]>;
 }
 
 const listingConfig: TranslationEntityConfig = {
@@ -78,6 +93,7 @@ const listingConfig: TranslationEntityConfig = {
       mainLocale: (data.listing.language as Locale) ?? "ar",
       source: { title: data.listing.title, description: data.listing.description ?? null },
       translations: data.translations,
+      format: data.listing.format,
     };
   },
   save(entityId, locale, fields) {
@@ -92,6 +108,23 @@ const listingConfig: TranslationEntityConfig = {
   },
   unpublish(entityId, locale) {
     return unpublishListingTranslation(entityId, locale);
+  },
+  supportsChildren: true,
+  async loadChildren(rootId) {
+    const data = await fetchArrangeData(rootId);
+    const children: TranslationChildSummary[] = data.lessons.map((lesson) => ({
+      id: lesson.id,
+      title: lesson.title,
+      kind: "lesson" as const,
+      indent: false,
+    }));
+    for (const mod of data.modules) {
+      children.push({ id: mod.id, title: mod.title, kind: "module", indent: false });
+      for (const lesson of mod.lessons) {
+        children.push({ id: lesson.id, title: lesson.title, kind: "lesson", indent: true });
+      }
+    }
+    return children;
   },
 };
 
