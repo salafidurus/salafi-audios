@@ -33,3 +33,8 @@ export {
   usePublishTranslation,
   useUnpublishTranslation,
 } from "./translations.api";
+export {
+  formatScholarName,
+  useFormattedScholarName,
+  type ScholarWithNameAndTitle,
+} from "./utils/format-scholar-name";

@@ -15,6 +15,7 @@ import {
   DropdownContent,
   DropdownItem,
 } from "@/shared/components/Dropdown";
+import { formatScholarName } from "@/shared/utils/format-scholar-name";
 import type { FormAction, FormState } from "@/features/admin/hooks/Content/useListingForm";
 import styles from "./listing-modal.module.css";
 
@@ -101,7 +102,7 @@ export function ListingGeneralSection({
               <DropdownContent searchable>
                 {scholars.map((s) => (
                   <DropdownItem key={s.id} value={s.id}>
-                    {s.name}
+                    {formatScholarName(s)}
                   </DropdownItem>
                 ))}
               </DropdownContent>

@@ -5,6 +5,7 @@ import { PermissionGate } from "@/features/admin/components/Content/Users/permis
 import { Pencil, Upload, Languages } from "lucide-react";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 import styles from "../Content.module.css";
 
 interface ListingProps {
@@ -17,6 +18,7 @@ interface ListingProps {
 export function Listing({ listing, onEdit, onUpload, onTranslate }: ListingProps) {
   const { isMobile } = useResponsive();
   const { t } = useTranslation();
+  const formattedScholarName = useFormattedScholarName(listing.scholarName);
 
   const statusText = t(`admin.contents.listing.${listing.status}`, listing.status);
 
@@ -25,7 +27,7 @@ export function Listing({ listing, onEdit, onUpload, onTranslate }: ListingProps
       <div className={styles.listingInfo}>
         <span className={styles.listingTitle}>{listing.title}</span>
         <span className={styles.listingMeta}>
-          {listing.scholarName} • {statusText}
+          {formattedScholarName} • {statusText}
         </span>
       </div>
       <List.Item.Actions>

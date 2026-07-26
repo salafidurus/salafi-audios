@@ -7,6 +7,7 @@ import { useAudio, useProgressStore, type Track } from "@sd/domain-audio";
 import { audioService } from "@/features/audio";
 import { List } from "@/shared/components/List";
 import { AppText } from "@/shared/components/AppText/AppText";
+import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 import styles from "./ContentListItem.module.css";
 
 function formatDuration(seconds?: number): string {
@@ -36,6 +37,7 @@ export function ContentListItem({
   collectionId,
   allTracksInContext,
 }: ContentListItemProps) {
+  const formattedScholarName = useFormattedScholarName(scholarName);
   const { isPlaying, currentTrack } = useAudio();
   const progress = useProgressStore((s) => s.progressMap[item.id]);
 
@@ -65,7 +67,7 @@ export function ContentListItem({
     const track: Track = {
       id: item.id,
       title: item.title,
-      artist: scholarName,
+      artist: formattedScholarName,
       url: item.primaryAudioAsset?.url ?? "",
       durationSeconds: item.durationSeconds || item.primaryAudioAsset?.durationSeconds || 0,
       seriesId: seriesId ?? null,
