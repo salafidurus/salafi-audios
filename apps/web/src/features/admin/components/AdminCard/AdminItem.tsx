@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { List } from "@/shared/components/List";
+import { MarqueeText } from "@/shared/components/MarqueeText";
 import { useTranslation } from "@/core/i18n/use-translation";
 import styles from "./admin-item.module.css";
 
@@ -86,8 +87,16 @@ export function AdminItem({
 
       <div className={styles.content}>
         <div className={styles.header}>
-          <h3 className={styles.title}>{title}</h3>
-          {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+          <MarqueeText
+            text={title}
+            className="text-[var(--content-strong)] font-semibold [font-size:var(--typo-title-md-font-size)]"
+          />
+          {subtitle && (
+            <MarqueeText
+              text={subtitle}
+              className="text-[var(--content-muted)] [font-size:var(--typo-body-sm-font-size)]"
+            />
+          )}
         </div>
 
         <div className={styles.metadata}>

@@ -1,6 +1,16 @@
-.card {
+.rowContainer {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-component-gap-md);
+  flex: 1;
+  min-width: 0;
+}
+
+.contentBody {
   display: flex;
   flex-direction: column;
-  gap: var(--space-scale-sm);
+  gap: var(--space-scale-xs);
+  flex: 1;
+  min-width: 0;
 }
 

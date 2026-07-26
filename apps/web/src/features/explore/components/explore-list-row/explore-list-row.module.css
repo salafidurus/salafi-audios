@@ -19,7 +19,7 @@
 .avatarContainer {
   width: 48px;
   height: 48px;
-  border-radius: var(--radius-scale-full);
+  border-radius: var(--radius-component-panel-sm);
   overflow: hidden;
   position: relative;
 }
@@ -31,7 +31,7 @@
 .avatarFallback {
   width: 48px;
   height: 48px;
-  border-radius: var(--radius-scale-full);
+  border-radius: var(--radius-component-panel-sm);
   background-color: var(--surface-primary-subtle);
   color: var(--content-primary-strong);
   display: flex;

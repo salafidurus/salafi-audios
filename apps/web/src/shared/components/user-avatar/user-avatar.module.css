@@ -1,10 +1,10 @@
 .avatar {
-  border-radius: var(--radius-scale-full);
+  border-radius: var(--radius-component-panel-sm);
   object-fit: cover;
 }
 
 .fallback {
-  border-radius: var(--radius-scale-full);
+  border-radius: var(--radius-component-panel-sm);
   background: var(--surface-subtle);
   display: flex;
   align-items: center;

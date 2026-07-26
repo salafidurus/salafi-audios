@@ -8,6 +8,7 @@ import type { FeedContentItemDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import { List } from "@/shared/components/List";
 import { Button } from "@/shared/components/Button";
+import { MarqueeText } from "@/shared/components/MarqueeText";
 import { useFormattedDate } from "@/shared/hooks/use-formatted-date";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useResponsive } from "@/shared/hooks/use-responsive";
@@ -108,8 +109,14 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
         </div>
 
         <div className={styles.centerSection}>
-          <div className={styles.title}>{title}</div>
-          <div className={styles.scholarName}>{scholarName}</div>
+          <MarqueeText
+            text={title}
+            className="text-[var(--content-strong)] font-semibold [font-size:var(--typo-title-md-font-size)]"
+          />
+          <MarqueeText
+            text={scholarName}
+            className="text-[var(--content-muted)] [font-size:var(--typo-body-sm-font-size)]"
+          />
           <div className={styles.meta}>
             {durationText}
             {durationText && publishedDateText && " · "}
