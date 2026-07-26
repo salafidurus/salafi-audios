@@ -5,16 +5,17 @@ import { Modal } from "@/shared/components/Modal";
 import type { Locale } from "@sd/core-contracts";
 import { sanitizeError } from "@sd/utils-error";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { InputField } from "@/shared/components/InputField";
+import { FormSection } from "@/features/admin/components/FormSection";
 import { GeneralDataSection } from "./general-data-section";
 import { LocationSection } from "./location-section";
 import { SocialSection } from "./social-section";
 import { SettingsSection } from "./settings-section";
-import { TranslationFieldsSection } from "./translation-fields-section";
 import { ReviewSection } from "./review-section";
 import { fetchScholarFormData } from "@/features/admin/api/admin.api";
 import { useScholarForm } from "../../hooks/Scholar/useScholarForm";
 import { useSaveScholar } from "../../hooks/Scholar/useSaveScholar";
-import { getSecondaryLocales, getLocaleLabel } from "@/features/admin/utils/locale-tabs";
+import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
 import styles from "./scholar-modal.module.css";
 
 export interface ScholarModalProps {
@@ -127,7 +128,6 @@ export function ScholarModal({ isOpen, onClose, onSuccess, scholarId }: ScholarM
     );
   }
 
-  const secondaryLocales = getSecondaryLocales(state.mainLanguage as Locale);
   const errorTabSet = new Set(errorTabs);
 
   return (
@@ -146,7 +146,7 @@ export function ScholarModal({ isOpen, onClose, onSuccess, scholarId }: ScholarM
       requireReview
       errorTabs={errorTabs}
       activeTab={activeTab}
-      onActiveTabChange={(id) => setActiveTab(id as "general" | "main" | "other" | "review")}
+      onActiveTabChange={(id) => setActiveTab(id as "general" | "main" | "review")}
       defaultActiveTab="general"
       saveFormId="scholar-form"
       saving={state.saving}
@@ -161,11 +161,6 @@ export function ScholarModal({ isOpen, onClose, onSuccess, scholarId }: ScholarM
         <Modal.Tabs errorTabs={errorTabs}>
           <Modal.TabItem id="general">{t("admin.modal.generalTab", "General")}</Modal.TabItem>
           <Modal.TabItem id="main">{getLocaleLabel(state.mainLanguage as Locale)}</Modal.TabItem>
-          {secondaryLocales.map((locale) => (
-            <Modal.TabItem key={locale} id={locale}>
-              {getLocaleLabel(locale)}
-            </Modal.TabItem>
-          ))}
           <Modal.TabItem id="review">{t("admin.modal.reviewTab", "Review")}</Modal.TabItem>
         </Modal.Tabs>
 
@@ -189,63 +184,41 @@ export function ScholarModal({ isOpen, onClose, onSuccess, scholarId }: ScholarM
             {(errorTabSet.has("main") || activeTab === "main") && state.error && (
               <div className={styles.error}>{state.error}</div>
             )}
-            <TranslationFieldsSection
-              locale={state.mainLanguage as Locale}
-              name={state.name}
-              bio={state.bio}
-              onNameChange={handleNameChange}
-              onBioChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "bio", value })}
-              title={t("admin.modal.mainLanguageContent", "Main Language Content")}
-              isRequired={!state.isEditing}
-            />
-          </Modal.ContentItem>
+            <FormSection title={t("admin.modal.mainLanguageContent", "Main Language Content")}>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="scholar-name">
+                  {t("admin.scholars.nameLabel", "Name")}
+                  {!state.isEditing ? " *" : ""}
+                </label>
+                <InputField
+                  id="scholar-name"
+                  type="text"
+                  value={state.name}
+                  onChange={handleNameChange}
+                  placeholder={t("admin.scholars.namePlaceholder", "Scholar name")}
+                />
+              </div>
 
-          {secondaryLocales.map((locale) => (
-            <Modal.ContentItem key={locale} id={locale}>
-              {(errorTabSet.has(locale) || activeTab === locale) && state.error && (
-                <div className={styles.error}>{state.error}</div>
-              )}
-              <TranslationFieldsSection
-                locale={locale}
-                name={state.translationChanges[locale]?.name ?? ""}
-                bio={state.translationChanges[locale]?.bio ?? undefined}
-                onNameChange={(value) =>
-                  dispatch({
-                    type: "UPDATE_TRANSLATION",
-                    locale,
-                    field: "name",
-                    value,
-                  })
-                }
-                onBioChange={(value) =>
-                  dispatch({
-                    type: "UPDATE_TRANSLATION",
-                    locale,
-                    field: "bio",
-                    value,
-                  })
-                }
-                title={t("admin.modal.translateContent", `Translate to ${getLocaleLabel(locale)}`)}
-              />
-            </Modal.ContentItem>
-          ))}
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="scholar-bio">
+                  {t("admin.scholars.bioLabel", "Bio")}
+                </label>
+                <InputField
+                  id="scholar-bio"
+                  type="textarea"
+                  value={state.bio}
+                  onChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "bio", value })}
+                  placeholder={t("admin.scholars.bioPlaceholder", "Scholar biography")}
+                />
+              </div>
+            </FormSection>
+          </Modal.ContentItem>
 
           <Modal.ContentItem id="review">
             {state.error && <div className={styles.error}>{state.error}</div>}
             <ReviewSection
               formData={state}
               changedFields={changedFields}
-              translations={secondaryLocales.reduce<
-                Array<{ locale: Locale; name?: string; bio?: string | null }>
-              >((acc, locale) => {
-                const trans = state.translationChanges[locale];
-                const initial = state.initialTranslationChanges[locale];
-                const changed = trans?.name !== initial?.name || trans?.bio !== initial?.bio;
-                if (changed && (trans?.name || trans?.bio)) {
-                  acc.push({ locale, name: trans?.name, bio: trans?.bio });
-                }
-                return acc;
-              }, [])}
               stagedImagePreview={state.stagedImagePreview}
             />
           </Modal.ContentItem>

@@ -72,10 +72,9 @@ export class TopicsService {
   }
 
   async createWithTranslations(dto: CreateTopicWithTranslationsDto): Promise<AdminTopicDetailDto> {
-    const result = await this.upsertWithTranslations(dto.slug, {
+    const result = await this.upsertMainFields(dto.slug, {
       name: dto.name,
       orderIndex: dto.orderIndex,
-      translations: dto.translations ?? [],
     });
     await this.invalidateCache(result.slug);
     return result;
@@ -85,41 +84,23 @@ export class TopicsService {
     slug: string,
     dto: UpdateTopicWithTranslationsDto,
   ): Promise<AdminTopicDetailDto> {
-    const result = await this.upsertWithTranslations(slug, {
+    const result = await this.upsertMainFields(slug, {
       name: dto.name,
       orderIndex: dto.orderIndex,
-      translations: dto.translations,
     });
     await this.invalidateCache(slug);
     return result;
   }
 
-  private async upsertWithTranslations(
+  private async upsertMainFields(
     slug: string,
-    data: {
-      name: { en: string };
-      orderIndex?: number;
-      translations: Array<{ locale: string; name: string }>;
-    },
+    data: { name: { en: string }; orderIndex?: number },
   ): Promise<AdminTopicDetailDto> {
     const topic = await this.repo.upsertBySlug({
       slug,
       name: data.name.en,
       orderIndex: data.orderIndex,
     });
-
-    await Promise.all(
-      data.translations.map((t) => {
-        if (t.name.trim()) {
-          return this.repo.upsertTopicTranslation(topic.id, {
-            locale: t.locale as any,
-            name: t.name,
-          });
-        } else {
-          return this.repo.deleteTopicTranslation(topic.id, t.locale);
-        }
-      }),
-    );
 
     return this.getAdminDetail(topic.slug);
   }
@@ -130,15 +111,24 @@ export class TopicsService {
     return this.repo.listTopicTranslations(topicId);
   }
 
-  upsertTranslation(topicId: string, dto: SaveTopicTranslationDto): Promise<TranslationViewDto> {
-    return this.repo.upsertTopicTranslation(topicId, dto);
+  async upsertTranslation(
+    topicId: string,
+    dto: SaveTopicTranslationDto,
+  ): Promise<TranslationViewDto> {
+    const result = await this.repo.upsertTopicTranslation(topicId, dto);
+    // Invalidate both list and detail caches for all locales
+    await this.invalidateCache();
+    return result;
   }
 
-  updateTranslation(
+  async updateTranslation(
     topicId: string,
     locale: string,
     fields: Partial<{ name: string }>,
   ): Promise<TranslationViewDto> {
-    return this.repo.updateTopicTranslation(topicId, locale, fields);
+    const result = await this.repo.updateTopicTranslation(topicId, locale, fields);
+    // Invalidate both list and detail caches for all locales
+    await this.invalidateCache();
+    return result;
   }
 }

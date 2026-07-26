@@ -4,7 +4,6 @@ import { NotFoundException } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
 import type { TopicDetailDto, TranslationViewDto } from '@sd/core-contracts';
-import type { SaveTopicTranslationDto } from './dto/save-topic-translation.dto';
 import { TopicsRepository } from './topics.repo';
 import { TopicsService } from './topics.service';
 
@@ -46,7 +45,6 @@ describe('TopicsService', () => {
             findBySlug: vi.fn<any>(),
             upsertBySlug: vi.fn<any>(),
             upsertTopicTranslation: vi.fn<any>(),
-            deleteTopicTranslation: vi.fn<any>(),
             listTopicTranslations: vi.fn<any>(),
           } as Partial<Mocked<TopicsRepository>>,
         },
@@ -85,91 +83,41 @@ describe('TopicsService', () => {
     await expect(service.getAdminDetail('missing')).rejects.toBeInstanceOf(NotFoundException);
   });
 
-  // ─── createWithTranslations ────────────────────────────────────────────
+  // ─── createWithTranslations (main-language-only) ───────────────────────
 
-  it('createWithTranslations creates topic and upserts translations', async () => {
+  it('createWithTranslations creates topic from main-language fields only', async () => {
     repo.upsertBySlug.mockResolvedValue(sampleTopic);
     repo.findBySlug.mockResolvedValue(sampleTopic);
-    repo.listTopicTranslations.mockResolvedValue(sampleTranslations);
+    repo.listTopicTranslations.mockResolvedValue([]);
 
     const result = await service.createWithTranslations({
       slug: 'aqeedah',
       name: { en: 'Aqeedah' },
-      translations: [{ locale: 'ar', name: 'العقيدة' }],
     });
 
     expect(repo.upsertBySlug).toHaveBeenCalledWith({
       slug: 'aqeedah',
       name: 'Aqeedah',
     });
-    expect(repo.upsertTopicTranslation).toHaveBeenCalledWith('t1', {
-      locale: 'ar',
-      name: 'العقيدة',
-    } satisfies SaveTopicTranslationDto);
-    expect(result.translations).toHaveLength(1);
-  });
-
-  it('createWithTranslations works without translations', async () => {
-    repo.upsertBySlug.mockResolvedValue(sampleTopic);
-    repo.findBySlug.mockResolvedValue(sampleTopic);
-    repo.listTopicTranslations.mockResolvedValue([]);
-
-    const result = await service.createWithTranslations({
-      slug: 'aqeedah',
-      name: { en: 'Aqeedah' },
-    });
-
     expect(repo.upsertTopicTranslation).not.toHaveBeenCalled();
     expect(result.translations).toHaveLength(0);
   });
 
-  // ─── updateWithTranslations ────────────────────────────────────────────
+  // ─── updateWithTranslations (main-language-only) ───────────────────────
 
-  it('updateWithTranslations updates topic and upserts translations', async () => {
+  it('updateWithTranslations updates only the main-language name', async () => {
     repo.upsertBySlug.mockResolvedValue(sampleTopic);
     repo.findBySlug.mockResolvedValue(sampleTopic);
     repo.listTopicTranslations.mockResolvedValue(sampleTranslations);
 
     await service.updateWithTranslations('aqeedah', {
       name: { en: 'Aqeedah Updated' },
-      translations: [{ locale: 'ar', name: 'العقيدة محدث' }],
     });
 
     expect(repo.upsertBySlug).toHaveBeenCalledWith({
       slug: 'aqeedah',
       name: 'Aqeedah Updated',
     });
-    expect(repo.upsertTopicTranslation).toHaveBeenCalledWith('t1', {
-      locale: 'ar',
-      name: 'العقيدة محدث',
-    } satisfies SaveTopicTranslationDto);
-  });
-
-  it('updateWithTranslations deletes translation when name is empty', async () => {
-    repo.upsertBySlug.mockResolvedValue(sampleTopic);
-    repo.findBySlug.mockResolvedValue({ ...sampleTopic, translations: sampleTranslations });
-    repo.listTopicTranslations.mockResolvedValue([]);
-
-    await service.updateWithTranslations('aqeedah', {
-      name: { en: 'Aqeedah' },
-      translations: [{ locale: 'ar', name: '' }],
-    });
-
-    expect(repo.deleteTopicTranslation).toHaveBeenCalledWith('t1', 'ar');
-    expect(repo.upsertTopicTranslation).not.toHaveBeenCalled();
-  });
-
-  it('updateWithTranslations leaves locales not in array untouched', async () => {
-    repo.upsertBySlug.mockResolvedValue(sampleTopic);
-    repo.findBySlug.mockResolvedValue({ ...sampleTopic, translations: sampleTranslations });
-    repo.listTopicTranslations.mockResolvedValue(sampleTranslations);
-
-    await service.updateWithTranslations('aqeedah', {
-      name: { en: 'Aqeedah' },
-      translations: [],
-    });
-
-    expect(repo.deleteTopicTranslation).not.toHaveBeenCalled();
     expect(repo.upsertTopicTranslation).not.toHaveBeenCalled();
   });
 });

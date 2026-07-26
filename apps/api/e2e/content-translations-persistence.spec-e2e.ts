@@ -9,16 +9,11 @@ import { Permission } from '@sd/core-db';
 import { TEST_SCHOLAR_ID, TEST_LISTING_ID, seedTestData } from './helpers/seed-test-data';
 
 /**
- * Regression coverage for a bug where the translations array sent from the
- * frontend (CreateListingDto/UpdateListingDetailsDto/CreateScholarDto/
- * UpdateScholarDto all define `translations` as an array of
- * { locale, title|name, description|bio }) was iterated in the repo layer
- * with `Object.entries(dto.translations)`, which only makes sense for a
- * keyed Record. On an array this produces index keys ("0", "1", ...) instead
- * of real locale codes, so every upsert tried to write an invalid `locale`
- * value into a Prisma enum column — throwing and rolling back the whole
- * transaction (create or update) whenever a secondary-locale translation was
- * included.
+ * Translations are written exclusively through the standalone per-locale
+ * endpoints (POST /listings/:id/translations, POST /scholars/:id/translations,
+ * and their PATCH :locale counterparts) — never as an embedded `translations`
+ * array on the listing/scholar create or update DTOs. This suite exercises
+ * that standalone path end-to-end against a real database.
  */
 describe('Content translations persistence (e2e)', () => {
   let app: NestFastifyApplication;
@@ -45,20 +40,17 @@ describe('Content translations persistence (e2e)', () => {
   });
 
   describe('Listing translations', () => {
-    it('PUT /admin/listings/:id/details with a secondary-locale translation persists it under the correct locale', async () => {
-      const auth = await authFactory.createAdminUser([Permission.LISTINGS_EDIT]);
+    it('POST /listings/:id/translations persists a secondary-locale translation under the correct locale', async () => {
+      const auth = await authFactory.createAdminUser([
+        Permission.TRANSLATIONS_CREATE,
+        Permission.TRANSLATIONS_VIEW,
+      ]);
 
-      // Only sending `translations` — title/other fields are left untouched
-      // since TEST_LISTING_ID is shared seed data other specs depend on.
       await request(app.getHttpServer())
-        .put(`/admin/listings/${TEST_LISTING_ID}/details`)
+        .post(`/listings/${TEST_LISTING_ID}/translations`)
         .set(auth.headers)
-        .send({
-          translations: [
-            { locale: 'en', title: 'English Translation Title', description: 'English desc' },
-          ],
-        })
-        .expect(200);
+        .send({ locale: 'en', title: 'English Translation Title', description: 'English desc' })
+        .expect(201);
 
       const translation = await prisma.listingTranslation.findUnique({
         where: { listingId_locale: { listingId: TEST_LISTING_ID, locale: 'en' } },
@@ -68,25 +60,64 @@ describe('Content translations persistence (e2e)', () => {
       expect(translation?.title).toBe('English Translation Title');
       expect(translation?.description).toBe('English desc');
 
-      // Must never have written a row keyed by the array index instead of the locale.
+      // Must never write a row keyed by anything other than a real locale.
       const badRows = await prisma.listingTranslation.findMany({
         where: { listingId: TEST_LISTING_ID, locale: { notIn: ['en', 'ar'] } },
       });
       expect(badRows).toHaveLength(0);
     });
+
+    it('PATCH /listings/:id/translations/:locale updates the existing translation in place', async () => {
+      const auth = await authFactory.createAdminUser([
+        Permission.TRANSLATIONS_EDIT,
+        Permission.TRANSLATIONS_VIEW,
+      ]);
+
+      await request(app.getHttpServer())
+        .patch(`/listings/${TEST_LISTING_ID}/translations/en`)
+        .set(auth.headers)
+        .send({ title: 'Updated English Title' })
+        .expect(200);
+
+      const translation = await prisma.listingTranslation.findUnique({
+        where: { listingId_locale: { listingId: TEST_LISTING_ID, locale: 'en' } },
+      });
+
+      expect(translation?.title).toBe('Updated English Title');
+    });
+
+    it('PUT /admin/listings/:id/details does not accept an embedded translations array', async () => {
+      const auth = await authFactory.createAdminUser([Permission.LISTINGS_EDIT]);
+
+      const res = await request(app.getHttpServer())
+        .put(`/admin/listings/${TEST_LISTING_ID}/details`)
+        .set(auth.headers)
+        .send({
+          translations: [{ locale: 'ar', title: 'Should be ignored', description: null }],
+        });
+
+      // The field is stripped by DTO validation (unknown keys are not
+      // accepted), so this must not create/alter an `ar` translation row.
+      expect(res.status).toBeLessThan(500);
+      const arTranslation = await prisma.listingTranslation.findUnique({
+        where: { listingId_locale: { listingId: TEST_LISTING_ID, locale: 'ar' } },
+      });
+      expect(arTranslation?.title).not.toBe('Should be ignored');
+    });
   });
 
   describe('Scholar translations', () => {
-    it('PATCH /admin/scholars/:id with a secondary-locale translation persists it under the correct locale', async () => {
-      const auth = await authFactory.createAdminUser([Permission.SCHOLARS_EDIT]);
+    it('POST /scholars/:id/translations persists a secondary-locale translation under the correct locale', async () => {
+      const auth = await authFactory.createAdminUser([
+        Permission.TRANSLATIONS_CREATE,
+        Permission.TRANSLATIONS_VIEW,
+      ]);
 
       await request(app.getHttpServer())
-        .patch(`/admin/scholars/${TEST_SCHOLAR_ID}`)
+        .post(`/scholars/${TEST_SCHOLAR_ID}/translations`)
         .set(auth.headers)
-        .send({
-          translations: [{ locale: 'en', name: 'English Scholar Name', bio: 'English bio' }],
-        })
-        .expect(200);
+        .send({ locale: 'en', name: 'English Scholar Name', bio: 'English bio' })
+        .expect(201);
 
       const translation = await prisma.scholarTranslation.findUnique({
         where: { scholarId_locale: { scholarId: TEST_SCHOLAR_ID, locale: 'en' } },
@@ -100,6 +131,42 @@ describe('Content translations persistence (e2e)', () => {
         where: { scholarId: TEST_SCHOLAR_ID, locale: { notIn: ['en', 'ar'] } },
       });
       expect(badRows).toHaveLength(0);
+    });
+
+    it('PATCH /scholars/:id/translations/:locale updates the existing translation in place', async () => {
+      const auth = await authFactory.createAdminUser([
+        Permission.TRANSLATIONS_EDIT,
+        Permission.TRANSLATIONS_VIEW,
+      ]);
+
+      await request(app.getHttpServer())
+        .patch(`/scholars/${TEST_SCHOLAR_ID}/translations/en`)
+        .set(auth.headers)
+        .send({ name: 'Updated English Scholar Name' })
+        .expect(200);
+
+      const translation = await prisma.scholarTranslation.findUnique({
+        where: { scholarId_locale: { scholarId: TEST_SCHOLAR_ID, locale: 'en' } },
+      });
+
+      expect(translation?.name).toBe('Updated English Scholar Name');
+    });
+
+    it('PATCH /admin/scholars/:id does not accept an embedded translations array', async () => {
+      const auth = await authFactory.createAdminUser([Permission.SCHOLARS_EDIT]);
+
+      const res = await request(app.getHttpServer())
+        .patch(`/admin/scholars/${TEST_SCHOLAR_ID}`)
+        .set(auth.headers)
+        .send({
+          translations: [{ locale: 'ar', name: 'Should be ignored', bio: null }],
+        });
+
+      expect(res.status).toBeLessThan(500);
+      const arTranslation = await prisma.scholarTranslation.findUnique({
+        where: { scholarId_locale: { scholarId: TEST_SCHOLAR_ID, locale: 'ar' } },
+      });
+      expect(arTranslation?.name).not.toBe('Should be ignored');
     });
   });
 });

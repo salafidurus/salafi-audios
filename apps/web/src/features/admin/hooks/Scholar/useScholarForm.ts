@@ -36,8 +36,6 @@ export type FormState = {
   orderIndex: number;
 
   // Form state
-  translationChanges: Partial<Record<Locale, { name?: string; bio?: string | null }>>;
-  initialTranslationChanges: Partial<Record<Locale, { name?: string; bio?: string | null }>>;
   // Snapshot of the mutable fields as fetched, for diffing in the review tab. Null in create mode.
   initialSnapshot: ScholarChangeSnapshot | null;
   saving: boolean;
@@ -60,7 +58,6 @@ type UpdateFieldAction = {
 
 export type FormAction =
   | UpdateFieldAction
-  | { type: "UPDATE_TRANSLATION"; locale: Locale; field: "name" | "bio"; value: string | null }
   | { type: "INIT_FORM"; data: ScholarFormDataDto }
   | { type: "SET_SAVING"; saving: boolean }
   | { type: "SET_ERROR"; error: string | null }
@@ -77,8 +74,6 @@ function getInitialFormState(): FormState {
     isActive: true,
     mainLanguage: "ar",
     orderIndex: 999,
-    translationChanges: {},
-    initialTranslationChanges: {},
     initialSnapshot: null,
     saving: false,
     error: null,
@@ -89,16 +84,7 @@ function getInitialFormState(): FormState {
 }
 
 function buildEditFormState(data: ScholarFormDataDto): FormState {
-  const { scholar, translations } = data;
-  const translationChanges: Partial<Record<Locale, { name?: string; bio?: string | null }>> = {};
-  for (const trans of translations) {
-    if (trans.locale !== scholar.mainLanguage) {
-      translationChanges[trans.locale] = {
-        name: trans.fields?.name ?? undefined,
-        bio: trans.fields?.bio ?? undefined,
-      };
-    }
-  }
+  const { scholar } = data;
   const name = scholar.name || "";
   const bio = scholar.bio || "";
   const imageUrl = scholar.imageUrl || "";
@@ -121,8 +107,6 @@ function buildEditFormState(data: ScholarFormDataDto): FormState {
     socialYoutube: scholar.socialYoutube,
     socialWebsite: scholar.socialWebsite,
     orderIndex,
-    translationChanges,
-    initialTranslationChanges: translationChanges,
     initialSnapshot: {
       name,
       bio,
@@ -154,18 +138,6 @@ function formReducer(state: FormState, action: FormAction): FormState {
       }
       return { ...state, [action.field]: action.value };
     }
-
-    case "UPDATE_TRANSLATION":
-      return {
-        ...state,
-        translationChanges: {
-          ...state.translationChanges,
-          [action.locale]: {
-            ...state.translationChanges[action.locale],
-            [action.field]: action.value,
-          },
-        },
-      };
 
     case "INIT_FORM":
       return buildEditFormState(action.data);

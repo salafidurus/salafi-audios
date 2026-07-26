@@ -176,26 +176,34 @@ export class ListingService {
     return this.repo.listListingTranslations(listingId);
   }
 
-  upsertTranslation(
+  async upsertTranslation(
     listingId: string,
     dto: SaveListingTranslationDto,
   ): Promise<TranslationViewDto> {
-    return this.repo.upsertListingTranslation(listingId, dto);
+    const result = await this.repo.upsertListingTranslation(listingId, dto);
+    await this.invalidateCache(listingId);
+    return result;
   }
 
-  updateTranslation(
+  async updateTranslation(
     listingId: string,
     locale: string,
     fields: Partial<{ title: string; description: string | null }>,
   ): Promise<TranslationViewDto> {
-    return this.repo.updateListingTranslation(listingId, locale, fields);
+    const result = await this.repo.updateListingTranslation(listingId, locale, fields);
+    await this.invalidateCache(listingId);
+    return result;
   }
 
-  publishTranslation(listingId: string, locale: string): Promise<TranslationViewDto> {
-    return this.repo.publishListingTranslation(listingId, locale);
+  async publishTranslation(listingId: string, locale: string): Promise<TranslationViewDto> {
+    const result = await this.repo.publishListingTranslation(listingId, locale);
+    await this.invalidateCache(listingId);
+    return result;
   }
 
-  unpublishTranslation(listingId: string, locale: string): Promise<TranslationViewDto> {
-    return this.repo.unpublishListingTranslation(listingId, locale);
+  async unpublishTranslation(listingId: string, locale: string): Promise<TranslationViewDto> {
+    const result = await this.repo.unpublishListingTranslation(listingId, locale);
+    await this.invalidateCache(listingId);
+    return result;
   }
 }

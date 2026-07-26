@@ -522,23 +522,6 @@ export class ScholarsRepository {
         },
       });
 
-      // Create translations if provided
-      if (dto.translations) {
-        await Promise.all(
-          dto.translations.map((fields) =>
-            tx.scholarTranslation.create({
-              data: {
-                scholarId: scholar.id,
-                locale: fields.locale,
-                name: fields.name,
-                bio: fields.bio ?? null,
-                status: 'draft',
-              },
-            }),
-          ),
-        );
-      }
-
       return scholar;
     });
   }
@@ -566,28 +549,6 @@ export class ScholarsRepository {
         where: { id },
         data: updateData,
       });
-
-      // Upsert translations if provided
-      if (dto.translations) {
-        await Promise.all(
-          dto.translations.map((fields) =>
-            tx.scholarTranslation.upsert({
-              where: { scholarId_locale: { scholarId: id, locale: fields.locale } },
-              create: {
-                scholarId: id,
-                locale: fields.locale,
-                name: fields.name,
-                bio: fields.bio ?? null,
-                status: 'draft',
-              },
-              update: {
-                name: fields.name,
-                bio: fields.bio ?? null,
-              },
-            }),
-          ),
-        );
-      }
 
       return scholar;
     });

@@ -150,11 +150,6 @@ export const CreateScholarDtoSchema = z.object({
   socialTelegram: z.url().optional().or(z.literal("")),
   socialYoutube: z.url().optional().or(z.literal("")),
   socialWebsite: z.url().optional().or(z.literal("")),
-  translations: z
-    .array(
-      z.object({ locale: LocaleSchema, name: z.string(), bio: z.string().nullable().optional() }),
-    )
-    .optional(),
 });
 export type CreateScholarDto = z.infer<typeof CreateScholarDtoSchema>;
 
@@ -172,11 +167,6 @@ export const UpdateScholarDtoSchema = z.object({
   socialTelegram: z.url().optional().or(z.literal("")),
   socialYoutube: z.url().optional().or(z.literal("")),
   socialWebsite: z.url().optional().or(z.literal("")),
-  translations: z
-    .array(
-      z.object({ locale: LocaleSchema, name: z.string(), bio: z.string().nullable().optional() }),
-    )
-    .optional(),
 });
 export type UpdateScholarDto = z.infer<typeof UpdateScholarDtoSchema>;
 

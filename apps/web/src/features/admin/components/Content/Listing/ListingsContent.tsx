@@ -6,6 +6,11 @@ import { queryKeys } from "@sd/core-contracts";
 import { useInfiniteAdminListings } from "@sd/domain-content";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { useTranslation } from "@/core/i18n/use-translation";
+import {
+  TranslationModal,
+  translationTargetKey,
+  type ClientTranslationTarget,
+} from "@/features/admin/components/Translation";
 import { Content } from "../Content";
 
 type AudioData = {
@@ -39,6 +44,8 @@ export function ListingsContent({
 
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [selectedUploadListingId, setSelectedUploadListingId] = useState<string | null>(null);
+
+  const [translationTarget, setTranslationTarget] = useState<ClientTranslationTarget | null>(null);
 
   const queryClient = useQueryClient();
 
@@ -81,6 +88,7 @@ export function ListingsContent({
             listing={listing}
             onEdit={handleEditListing}
             onUpload={handleUploadListing}
+            onTranslate={(id) => setTranslationTarget({ entity: "listing", listingId: id })}
           />
         )}
         emptyMessage={
@@ -114,6 +122,13 @@ export function ListingsContent({
         }}
         onSuccess={handleUploadSaved}
         listingId={selectedUploadListingId}
+      />
+
+      <TranslationModal
+        key={translationTargetKey(translationTarget)}
+        isOpen={!!translationTarget}
+        target={translationTarget}
+        onClose={() => setTranslationTarget(null)}
       />
     </>
   );

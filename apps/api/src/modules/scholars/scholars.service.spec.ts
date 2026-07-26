@@ -193,52 +193,6 @@ describe('ScholarsService', () => {
       expect(result).toEqual(created);
       expect(repo.create).toHaveBeenCalledWith(dto);
     });
-
-    it('should create a new scholar with inline translations including bio', async () => {
-      const dto: CreateScholarDto = {
-        name: 'New Scholar',
-        slug: 'new-scholar',
-        bio: 'Bio details',
-        imageUrl: 'new.jpg',
-        isActive: true,
-        country: 'SA',
-        mainLanguage: 'ar',
-        translations: [{ locale: 'en', name: 'New Scholar - English', bio: 'English bio' }],
-      };
-      const created = {
-        id: 's2',
-        name: dto.name,
-        slug: dto.slug,
-        bio: dto.bio ?? null,
-        imageUrl: dto.imageUrl ?? null,
-        imageKey: null,
-        isActive: dto.isActive ?? true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        country: dto.country,
-        mainLanguage: dto.mainLanguage,
-        title: null,
-        orderIndex: dto.orderIndex ?? 999,
-        socialTwitter: null,
-        socialTelegram: null,
-        socialYoutube: null,
-        socialWebsite: null,
-        socialFacebook: null,
-        socialInstagram: null,
-        ingestionBatchId: null,
-        createdBy: null,
-        updatedBy: null,
-        deletedBy: null,
-      };
-
-      repo.create.mockResolvedValue(created as any);
-
-      const result = await service.create(dto);
-
-      expect(result).toEqual(created);
-      // Repository now handles translations in a single transaction
-      expect(repo.create).toHaveBeenCalledWith(dto);
-    });
   });
 
   describe('update', () => {
@@ -273,44 +227,6 @@ describe('ScholarsService', () => {
 
       expect(result).toEqual(updated as any);
       expect(repo.findById).toHaveBeenCalledWith('s1');
-      expect(repo.update).toHaveBeenCalledWith('s1', dto);
-    });
-
-    it('should update existing scholar with inline translations', async () => {
-      const dto: UpdateScholarDto = {
-        name: 'Updated Name',
-        translations: [{ locale: 'en', name: 'Updated Name - English' }],
-      };
-      const existing = {
-        id: 's1',
-        slug: 'test',
-        name: 'Old Name',
-        bio: null,
-        createdAt: new Date(),
-        country: 'SA',
-        mainLanguage: 'ar',
-        imageUrl: null,
-        isActive: true,
-        socialTwitter: null,
-        socialTelegram: null,
-        socialYoutube: null,
-        socialWebsite: null,
-        updatedAt: new Date(),
-        ingestionBatchId: null,
-        createdBy: null,
-        updatedBy: null,
-        deletedBy: null,
-      };
-      const updated = { ...existing, name: dto.name! };
-
-      repo.findById.mockResolvedValue(existing as any);
-      repo.update.mockResolvedValue(updated as any);
-
-      const result = await service.update('s1', dto);
-
-      expect(result).toEqual(updated as any);
-      expect(repo.findById).toHaveBeenCalledWith('s1');
-      // Repository now handles translations in a single transaction
       expect(repo.update).toHaveBeenCalledWith('s1', dto);
     });
 

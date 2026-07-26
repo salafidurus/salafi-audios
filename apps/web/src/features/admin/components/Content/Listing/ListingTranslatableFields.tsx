@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import type { Locale } from "@sd/core-contracts";
 import { InputField } from "@/shared/components/InputField";
 import { useTranslation } from "@/core/i18n/use-translation";
 import type { FormAction, FormState } from "@/features/admin/hooks/Content/useListingForm";
@@ -10,45 +9,29 @@ import styles from "./listing-modal.module.css";
 interface ListingTranslatableFieldsProps {
   state: FormState;
   dispatch: React.Dispatch<FormAction>;
-  locale: Locale;
   handleTitleChange: (val: string) => void;
 }
 
 export function ListingTranslatableFields({
   state,
   dispatch,
-  locale,
   handleTitleChange,
 }: ListingTranslatableFieldsProps) {
   const { t } = useTranslation();
-  const { title, description, language, translationChanges } = state;
-  const isMainLocale = locale === language;
-  const translation = translationChanges[locale];
+  const { title, description } = state;
 
   return (
     <>
       <div className={styles.formGroup}>
         <label htmlFor="lecture-title" className={styles.label}>
-          {t("admin.contents.listing.titleLabel", "Title")}
-          {isMainLocale ? " *" : ""}
+          {t("admin.contents.listing.titleLabel", "Title")} *
         </label>
         <InputField
           id="lecture-title"
           type="text"
-          value={isMainLocale ? title : translation?.title || ""}
-          onChange={(value) => {
-            if (isMainLocale) {
-              handleTitleChange(value);
-            } else {
-              dispatch({
-                type: "UPDATE_TRANSLATION",
-                locale,
-                field: "title",
-                value,
-              });
-            }
-          }}
-          required={isMainLocale}
+          value={title}
+          onChange={handleTitleChange}
+          required
         />
       </div>
 
@@ -59,19 +42,8 @@ export function ListingTranslatableFields({
         <InputField
           id="lecture-description"
           type="textarea"
-          value={isMainLocale ? description : translation?.description || ""}
-          onChange={(value) => {
-            if (isMainLocale) {
-              dispatch({ type: "UPDATE_FIELD", field: "description", value });
-            } else {
-              dispatch({
-                type: "UPDATE_TRANSLATION",
-                locale,
-                field: "description",
-                value,
-              });
-            }
-          }}
+          value={description}
+          onChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "description", value })}
           rows={3}
         />
       </div>

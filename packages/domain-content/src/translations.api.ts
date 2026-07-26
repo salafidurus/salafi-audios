@@ -36,9 +36,8 @@ function resolveTranslationEndpoint(
     case "topic":
       if (action === "list") return endpoints.translations.topics.list(target.topicId);
       if (action === "save") return endpoints.translations.topics.save(target.topicId);
-      if (action === "publish")
-        return endpoints.translations.topics.publish(target.topicId, locale!);
-      return endpoints.translations.topics.unpublish(target.topicId, locale!);
+      // Topics have no status column — publish/unpublish is not a supported action.
+      throw new Error("Topic translations do not support publish/unpublish");
   }
 }
 
