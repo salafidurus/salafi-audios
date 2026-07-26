@@ -40,7 +40,7 @@ export function ScholarItem({ scholar, onEdit, onTranslate }: ScholarItemProps) 
         <div className={styles.detailsBody}>
           <MarqueeText
             text={formatScholarName(scholar)}
-            className="text-[var(--content-strong)] font-semibold [font-size:var(--typo-title-md-font-size)]"
+            className="text-[var(--content-strong)] font-semibold [font-size:var(--typo-title-md-font-size)] xl:[font-size:var(--typo-title-lg-font-size)]"
           />
           <div className={styles.metaRow}>
             <span className={styles.slug}>{scholar.slug}</span>

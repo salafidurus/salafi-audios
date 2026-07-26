@@ -109,11 +109,11 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
         <div className={styles.centerSection}>
           <MarqueeText
             text={title}
-            className="text-[var(--content-strong)] font-semibold [font-size:var(--typo-title-md-font-size)]"
+            className="text-[var(--content-strong)] font-semibold [font-size:var(--typo-title-md-font-size)] xl:[font-size:var(--typo-title-lg-font-size)]"
           />
           <MarqueeText
             text={scholarName}
-            className="text-[var(--content-muted)] [font-size:var(--typo-body-sm-font-size)]"
+            className="text-[var(--content-muted)] font-normal [font-size:var(--typo-body-sm-font-size)] xl:[font-size:var(--typo-body-md-font-size)]"
           />
           <div className={styles.meta}>
             {durationText}
