@@ -60,19 +60,17 @@
 }
 
 .title {
-  font-size: var(--text-heading-md-size);
+  font-size: var(--typo-title-md-font-size);
   font-weight: 600;
-  line-height: var(--text-heading-md-line-height);
-  color: var(--content-primary);
+  color: var(--content-strong);
   margin: 0;
 }
 
 .subtitle {
-  font-size: var(--text-body-md-size);
-  line-height: var(--text-body-md-line-height);
-  color: var(--content-secondary);
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-muted);
   margin: 0;
-  margin-top: var(--space-text-gap-xs);
+  margin-top: var(--space-scale-xs);
 }
 
 .metadata {

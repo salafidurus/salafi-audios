@@ -51,9 +51,9 @@
 }
 
 .title {
-  font-family: var(--typo-title-md-font-family), serif;
+  font-family: var(--typo-title-md-font-family);
   font-size: var(--typo-title-md-font-size);
-  font-weight: var(--typo-title-md-font-weight);
+  font-weight: 600;
   line-height: var(--typo-title-md-line-height);
   letter-spacing: var(--typo-title-md-letter-spacing);
   color: var(--content-strong);
@@ -63,10 +63,10 @@
 }
 
 .scholarName {
-  font-family: var(--typo-body-md-font-family);
-  font-size: var(--typo-body-md-font-size);
-  font-weight: var(--typo-body-md-font-weight);
-  line-height: var(--typo-body-md-line-height);
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+  font-weight: var(--typo-body-sm-font-weight);
+  line-height: var(--typo-body-sm-line-height);
   color: var(--content-muted);
   overflow: hidden;
   text-overflow: ellipsis;

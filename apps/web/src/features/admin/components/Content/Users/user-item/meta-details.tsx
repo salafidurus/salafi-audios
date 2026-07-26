@@ -18,7 +18,7 @@ export function MetaDetails({ user }: MetaDetailsProps): ReactNode {
 
   return (
     <div className={styles.container}>
-      <UserAvatar image={user.image} name={user.name} size={32} />
+      <UserAvatar image={user.image} name={user.name} size={48} />
       <div className={styles.content}>
         <div className={styles.nameRow}>
           <div className={styles.name}>{user.name ?? "Unnamed"}</div>

@@ -2,11 +2,12 @@
 .topicInfo {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-scale-xs);
 }
 
 .topicName {
-  font-weight: 500;
+  font-size: var(--typo-title-md-font-size);
+  font-weight: 600;
   color: var(--content-strong);
 }
 
@@ -15,16 +16,15 @@
   color: var(--content-muted);
 }
 
-
-
 .listingInfo {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--space-scale-xs);
 }
 
 .listingTitle {
-  font-weight: 500;
+  font-size: var(--typo-title-md-font-size);
+  font-weight: 600;
   color: var(--content-strong);
 }
 

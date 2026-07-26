@@ -11,8 +11,8 @@
 
 .details {
   display: flex;
-  align-items: flex-start;
-  gap: var(--space-md);
+  align-items: center;
+  gap: var(--space-component-gap-md);
 }
 
 .avatarBlock {
@@ -31,7 +31,7 @@
 }
 
 .name {
-  font-size: var(--typo-body-md-font-size);
+  font-size: var(--typo-title-md-font-size);
   font-weight: 600;
   color: var(--content-strong);
   margin: 0;

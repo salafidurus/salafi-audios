@@ -31,11 +31,7 @@ function ScholarDetails({
   return (
     <div className={styles.details}>
       <div className={styles.avatarBlock}>
-        <UserAvatar
-          image={scholar.imageUrl ?? null}
-          name={scholar.name}
-          size={isMobile ? 48 : 56}
-        />
+        <UserAvatar image={scholar.imageUrl ?? null} name={scholar.name} size={48} />
       </div>
       <div className={styles.detailsBody}>
         <div className={styles.nameRow}>
