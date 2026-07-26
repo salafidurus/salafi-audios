@@ -11,18 +11,49 @@ function getDb(): Promise<IDBPDatabase> {
   if (!dbPromise) {
     dbPromise = openDB(DB_NAME, 1, {
       upgrade(db: any) {
-        db.createObjectStore(STORE_NAME);
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME);
+        }
+      },
+      blocked() {
+        console.warn("IndexedDB open blocked, resetting connection");
+      },
+      terminated() {
+        dbPromise = null;
       },
     });
   }
   return dbPromise!;
 }
 
+export async function purgeQueryCacheDb(): Promise<void> {
+  if (dbPromise) {
+    try {
+      const db = await dbPromise;
+      db.close();
+    } catch {
+      // Ignore errors when closing DB
+    }
+    dbPromise = null;
+  }
+  if (typeof indexedDB !== "undefined") {
+    try {
+      indexedDB.deleteDatabase(DB_NAME);
+    } catch (error) {
+      console.error("Failed to purge query cache database:", error);
+    }
+  }
+}
+
 export function createIdbPersister(): Persister {
   return {
     persistClient: async (client: PersistedClient) => {
-      const db = await getDb();
-      await db.put(STORE_NAME, client, CACHE_KEY);
+      try {
+        const db = await getDb();
+        await db.put(STORE_NAME, client, CACHE_KEY);
+      } catch (error) {
+        console.error("Failed to persist web query cache:", error);
+      }
     },
     restoreClient: async () => {
       try {
@@ -34,8 +65,12 @@ export function createIdbPersister(): Persister {
       }
     },
     removeClient: async () => {
-      const db = await getDb();
-      await db.delete(STORE_NAME, CACHE_KEY);
+      try {
+        const db = await getDb();
+        await db.delete(STORE_NAME, CACHE_KEY);
+      } catch (error) {
+        console.error("Failed to remove web query cache:", error);
+      }
     },
   };
 }
