@@ -17,6 +17,7 @@ import {
   ROOT_MODULE_KEY,
   localSlugConflicts,
   type ModuleKey,
+  type NewModule,
   type UploadArrangeAction,
   type UploadArrangeState,
   type UploadItem,
@@ -284,6 +285,94 @@ function StagedList({
   );
 }
 
+function NewModuleCard({
+  mod,
+  dispatch,
+  conflictSlugs,
+}: {
+  mod: NewModule;
+  dispatch: React.Dispatch<UploadArrangeAction>;
+  conflictSlugs: Set<string>;
+}) {
+  const { t } = useTranslation();
+  const hasConflict = conflictSlugs.has(mod.slug);
+
+  return (
+    <div className={styles.fieldGrid}>
+      <div className={modalStyles.formGroup}>
+        <label htmlFor={`module-${mod.tempId}-slug`} className={modalStyles.label}>
+          {t("admin.contents.listing.slugLabel", "Slug")}
+        </label>
+        <InputField
+          id={`module-${mod.tempId}-slug`}
+          value={mod.slug}
+          onChange={(value) =>
+            dispatch({ type: "EDIT_MODULE", tempId: mod.tempId, field: "slug", value })
+          }
+        />
+        {hasConflict && (
+          <span className={styles.conflictText}>
+            {t("admin.contents.listing.slugConflict", "This slug is already in use")}
+          </span>
+        )}
+      </div>
+      <div className={modalStyles.formGroup}>
+        <label htmlFor={`module-${mod.tempId}-status`} className={modalStyles.label}>
+          {t("admin.contents.listing.statusLabel", "Status")}
+        </label>
+        <Dropdown
+          value={mod.status}
+          onValueChange={(value) =>
+            dispatch({ type: "EDIT_MODULE", tempId: mod.tempId, field: "status", value })
+          }
+        >
+          <DropdownTrigger
+            id={`module-${mod.tempId}-status`}
+            placeholder={t("admin.contents.listing.statusPlaceholder", "Select Status")}
+          />
+          <DropdownContent>
+            {STATUS_OPTIONS.map((option) => (
+              <DropdownItem key={option.value} value={option.value}>
+                {t(option.label, option.fallback)}
+              </DropdownItem>
+            ))}
+          </DropdownContent>
+        </Dropdown>
+      </div>
+      <div className={modalStyles.formGroup}>
+        <label htmlFor={`module-${mod.tempId}-order`} className={modalStyles.label}>
+          {t("admin.contents.listing.orderIndexLabel", "Order")}
+        </label>
+        <InputField
+          id={`module-${mod.tempId}-order`}
+          type="number"
+          value={mod.orderIndex === null ? "" : String(mod.orderIndex)}
+          onChange={(value) =>
+            dispatch({
+              type: "EDIT_MODULE",
+              tempId: mod.tempId,
+              field: "orderIndex",
+              value: value === "" ? null : Number(value),
+            })
+          }
+        />
+      </div>
+      <div className={modalStyles.formGroup}>
+        <label htmlFor={`module-${mod.tempId}-description`} className={modalStyles.label}>
+          {t("admin.contents.listing.descriptionLabel", "Description")}
+        </label>
+        <InputField
+          id={`module-${mod.tempId}-description`}
+          value={mod.description}
+          onChange={(value) =>
+            dispatch({ type: "EDIT_MODULE", tempId: mod.tempId, field: "description", value })
+          }
+        />
+      </div>
+    </div>
+  );
+}
+
 export function UploadArrangeArrangeTab({ state, dispatch }: UploadArrangeArrangeTabProps) {
   const { t } = useTranslation();
   const [newModuleTitle, setNewModuleTitle] = useState("");
@@ -409,18 +498,7 @@ export function UploadArrangeArrangeTab({ state, dispatch }: UploadArrangeArrang
       {state.newModules.map((mod) => (
         <div key={mod.tempId} className={styles.moduleSection}>
           <div className={styles.moduleHeader}>
-            <div>
-              <div className={styles.moduleTitle}>{mod.title}</div>
-              <div className={styles.moduleSlug}>
-                {mod.slug}
-                {conflictSlugs.has(mod.slug) && (
-                  <span className={styles.conflictText}>
-                    {" · "}
-                    {t("admin.contents.listing.slugConflict", "This slug is already in use")}
-                  </span>
-                )}
-              </div>
-            </div>
+            <div className={styles.moduleTitle}>{mod.title}</div>
             <button
               type="button"
               className={styles.iconButton}
@@ -430,6 +508,7 @@ export function UploadArrangeArrangeTab({ state, dispatch }: UploadArrangeArrang
               <Trash2 size={16} />
             </button>
           </div>
+          <NewModuleCard mod={mod} dispatch={dispatch} conflictSlugs={conflictSlugs} />
           <StagedList
             moduleKey={`new:${mod.tempId}`}
             state={state}
