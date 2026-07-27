@@ -5,6 +5,7 @@ import { Modal } from "@/shared/components/Modal";
 import { Button } from "@/shared/components/Button";
 import { InputField } from "@/shared/components/InputField";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { slugify } from "@/features/admin/utils/slugify";
 import {
   fetchAdminTopic,
   createTopicWithTranslations,
@@ -29,7 +30,7 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
   const isEditing = !!topicSlug;
 
   const [slug, setSlug] = useState("");
-  const [nameEn, setNameEn] = useState("");
+  const [nameAr, setNameAr] = useState("");
   const [orderIndex, setOrderIndex] = useState(99);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -39,7 +40,7 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
   useEffect(() => {
     if (!isOpen) {
       setSlug("");
-      setNameEn("");
+      setNameAr("");
       setOrderIndex(99);
       setSaving(false);
       setLoading(false);
@@ -50,7 +51,7 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
 
     if (!topicSlug) {
       setSlug("");
-      setNameEn("");
+      setNameAr("");
       setOrderIndex(99);
       return;
     }
@@ -63,7 +64,7 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
       .then((data: AdminTopicDetailDto) => {
         if (cancelled) return;
         setSlug(data.slug);
-        setNameEn(data.name.en ?? "");
+        setNameAr(data.name.ar ?? "");
         setOrderIndex(data.orderIndex ?? 99);
       })
       .catch(() => {
@@ -79,23 +80,19 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
     };
   }, [isOpen, topicSlug, t]);
 
-  const handleNameEnChange = (value: string) => {
-    setNameEn(value);
+  const handleNameArChange = (value: string) => {
+    setNameAr(value);
     if (!isEditing) {
-      const generatedSlug = value
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, "")
-        .replace(/\s+/g, "-");
-      setSlug(generatedSlug);
+      setSlug(slugify(value));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!slug.trim() || !nameEn.trim()) {
+    if (!slug.trim() || !nameAr.trim()) {
       setError(
-        t("admin.contents.slugAndLanguageRequired", "Slug and an English name are required."),
+        t("admin.contents.slugAndLanguageRequired", "Slug and an Arabic name are required."),
       );
       return;
     }
@@ -106,7 +103,7 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
     try {
       if (isEditing) {
         const body: UpdateTopicWithTranslationsDto = {
-          name: { en: nameEn },
+          name: { ar: nameAr },
           orderIndex,
         };
         await updateTopicWithTranslations(topicSlug, body);
@@ -114,7 +111,7 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
       } else {
         const body: CreateTopicWithTranslationsDto = {
           slug,
-          name: { en: nameEn },
+          name: { ar: nameAr },
           orderIndex,
         };
         const result = await createTopicWithTranslations(body);
@@ -178,15 +175,15 @@ export function TopicModal({ isOpen, onClose, onSaved, topicSlug }: TopicModalPr
           </div>
 
           <div className={styles.field}>
-            <label htmlFor="topic-name-en" className={styles.label}>
-              {t("admin.contents.englishNameLabel", "English Name")} *
+            <label htmlFor="topic-name-ar" className={styles.label}>
+              {t("admin.contents.arabicNameLabel", "Arabic Name")} *
             </label>
             <InputField
-              id="topic-name-en"
+              id="topic-name-ar"
               type="text"
-              value={nameEn}
-              onChange={handleNameEnChange}
-              placeholder={t("admin.contents.englishNamePlaceholder", "Topic name in English")}
+              value={nameAr}
+              onChange={handleNameArChange}
+              placeholder={t("admin.contents.arabicNamePlaceholder", "Topic name in Arabic")}
             />
           </div>
 

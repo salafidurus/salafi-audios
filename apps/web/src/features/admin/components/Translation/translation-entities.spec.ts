@@ -1,11 +1,39 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from "bun:test";
 import { fetchArrangeData } from "@/features/admin/api/admin-lectures.api";
+import { fetchAdminTopic } from "@/features/admin/api/admin.api";
 import { translationEntities } from "./translation-entities";
 
 vi.mock("@/features/admin/api/admin-lectures.api", () => ({
   fetchListingFormData: vi.fn(),
   fetchArrangeData: vi.fn(),
 }));
+
+vi.mock("@/features/admin/api/admin.api", () => ({
+  fetchScholarFormData: vi.fn(),
+  fetchAdminTopic: vi.fn(),
+}));
+
+describe("topicConfig.load", () => {
+  it("uses Arabic as the main locale and source, since Arabic is a Topic's main language", async () => {
+    (fetchAdminTopic as Mock<any>).mockResolvedValue({
+      id: "topic-1",
+      slug: "aqeedah",
+      name: { ar: "العقيدة", en: "Aqeedah" },
+      orderIndex: 1,
+      createdAt: "2026-01-01",
+      translations: [],
+    });
+
+    const result = await translationEntities.topic.load({
+      entity: "topic",
+      topicId: "topic-1",
+      topicSlug: "aqeedah",
+    });
+
+    expect(result.mainLocale).toBe("ar");
+    expect(result.source).toEqual({ name: "العقيدة" });
+  });
+});
 
 describe("listingConfig.loadChildren", () => {
   beforeEach(() => {

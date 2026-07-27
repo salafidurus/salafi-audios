@@ -58,6 +58,29 @@
   color: var(--content-default);
 }
 
+.slugPrefixGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-xs);
+}
+
+.slugPrefixBadge {
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--content-subtle);
+  background-color: var(--surface-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-scale-sm);
+  padding: var(--space-scale-xs) var(--space-scale-sm);
+  white-space: nowrap;
+}
+
+.fieldError {
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+  color: var(--state-danger-content);
+}
+
 .topicsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));

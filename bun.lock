@@ -8,7 +8,7 @@
         "@babel/runtime": "catalog:",
         "@commitlint/cli": "21.2.1",
         "@commitlint/config-conventional": "21.2.0",
-        "@happy-dom/global-registrator": "^20.10.6",
+        "@happy-dom/global-registrator": "catalog:",
         "@secretlint/secretlint-rule-preset-recommend": "^13.0.2",
         "@types/node": "catalog:",
         "@types/react": "catalog:",
@@ -206,11 +206,12 @@
         "@playwright/test": "^1.62.0",
         "@tailwindcss/postcss": "^4",
         "@testing-library/jest-dom": "^6.9.1",
-        "@testing-library/react": "^16.3.2",
+        "@testing-library/react": "catalog:",
         "@types/node": "catalog:",
         "@types/react": "catalog:",
         "@types/react-dom": "^19",
         "@vitejs/plugin-react": "^6.0.2",
+        "fake-indexeddb": "^6.2.2",
         "playwright": "^1.62.0",
         "tailwindcss": "^4",
       },
@@ -313,9 +314,15 @@
         "@sd/core-i18n": "workspace:*",
         "@sd/domain-audio": "workspace:*",
       },
+      "devDependencies": {
+        "@happy-dom/global-registrator": "catalog:",
+        "@testing-library/react": "catalog:",
+        "i18next": "catalog:",
+      },
       "peerDependencies": {
         "@tanstack/react-query": "catalog:",
         "react": "^19.0.0",
+        "react-i18next": "catalog:",
       },
     },
     "packages/domain-search": {
@@ -345,10 +352,12 @@
   "catalog": {
     "@babel/runtime": "^8.0.0",
     "@better-auth/expo": "1.6.23",
+    "@happy-dom/global-registrator": "^20.10.6",
     "@prisma/adapter-pg": "7.9.0",
     "@prisma/client": "7.9.0",
     "@tanstack/react-query": "^5.101.4",
     "@tanstack/react-query-persist-client": "^5.101.4",
+    "@testing-library/react": "^16.3.2",
     "@types/node": "26.1.1",
     "@types/react": "~19.2.14",
     "better-auth": "1.6.23",
@@ -2552,6 +2561,8 @@
     "ext-list": ["ext-list@2.2.2", "", { "dependencies": { "mime-db": "^1.28.0" } }, "sha512-u+SQgsubraE6zItfVA0tBuCBhfU9ogSRnsvygI7wht9TS510oLkBRXBsqopeUG/GBOIQyKZO9wjTqIu/sf5zFA=="],
 
     "ext-name": ["ext-name@5.0.0", "", { "dependencies": { "ext-list": "^2.0.0", "sort-keys-length": "^1.0.0" } }, "sha512-yblEwXAbGv1VQDmow7s38W77hzAgJAO50ztBLMcUyUBfxv1HC+LGwtiEN+Co6LtlqT/5uwVOxsD4TNIilWhwdQ=="],
+
+    "fake-indexeddb": ["fake-indexeddb@6.2.5", "", {}, "sha512-CGnyrvbhPlWYMngksqrSSUT1BAVP49dZocrHuK0SvtR0D5TMs5wP0o3j7jexDJW01KSadjBp1M/71o/KR3nD1w=="],
 
     "fast-check": ["fast-check@3.23.2", "", { "dependencies": { "pure-rand": "^6.1.0" } }, "sha512-h5+1OzzfCC3Ef7VbtKdcv7zsstUQwUDlYpUTvjeUsJAssPgLn7QzbboPtL5ro04Mq0rPOsMzl7q5hIbRs2wD1A=="],
 

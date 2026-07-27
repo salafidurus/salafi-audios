@@ -29,6 +29,7 @@ import type {
   ArrangeLessonOp,
 } from '@sd/core-contracts';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
+import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 
 @Injectable()
@@ -691,6 +692,7 @@ export class ListingRepository {
     status?: string;
     search?: string;
   }): Promise<AdminListingListDto> {
+    const locale = getRequestLocale();
     const pageSize = 50;
     const take = pageSize + 1;
 
@@ -699,7 +701,26 @@ export class ListingRepository {
       parentId: null,
       ...(params.scholarId ? { scholarId: params.scholarId } : {}),
       ...(params.status ? { status: params.status as Status } : {}),
-      ...(params.search ? { title: { contains: params.search } } : {}),
+      ...(params.search
+        ? {
+            OR: [
+              { title: { contains: params.search, mode: 'insensitive' as const } },
+              {
+                translations: {
+                  some: { title: { contains: params.search, mode: 'insensitive' as const } },
+                },
+              },
+              { scholar: { name: { contains: params.search, mode: 'insensitive' as const } } },
+              {
+                scholar: {
+                  translations: {
+                    some: { name: { contains: params.search, mode: 'insensitive' as const } },
+                  },
+                },
+              },
+            ],
+          }
+        : {}),
     };
 
     const records = await this.prisma.listing.findMany({
@@ -710,26 +731,60 @@ export class ListingRepository {
       select: {
         id: true,
         title: true,
+        language: true,
         status: true,
         format: true,
         durationSeconds: true,
         orderIndex: true,
         createdAt: true,
-        scholar: { select: { name: true } },
+        translations: {
+          where: { locale, status: 'published' },
+          select: { title: true },
+          take: 1,
+        },
+        scholar: {
+          select: {
+            slug: true,
+            name: true,
+            mainLanguage: true,
+            translations: {
+              where: { locale, status: 'published' },
+              select: { name: true },
+              take: 1,
+            },
+          },
+        },
       },
     });
 
     const hasMore = records.length > pageSize;
-    const items = (hasMore ? records.slice(0, pageSize) : records).map((r) => ({
-      id: r.id,
-      title: r.title,
-      scholarName: r.scholar.name,
-      format: r.format,
-      status: r.status,
-      durationSeconds: r.durationSeconds ?? undefined,
-      orderIndex: r.orderIndex ?? undefined,
-      createdAt: r.createdAt.toISOString(),
-    }));
+    const items = (hasMore ? records.slice(0, pageSize) : records).map((r) => {
+      const title = resolveContentTranslation({
+        base: { title: r.title },
+        originalLanguage: r.language,
+        targetLocale: locale,
+        publishedTranslation: r.translations[0] ?? null,
+      }).fields.title;
+
+      const scholarName = resolveContentTranslation({
+        base: { name: r.scholar.name },
+        originalLanguage: r.scholar.mainLanguage,
+        targetLocale: locale,
+        publishedTranslation: r.scholar.translations[0] ?? null,
+      }).fields.name;
+
+      return {
+        id: r.id,
+        title,
+        scholarName,
+        scholarSlug: r.scholar.slug,
+        format: r.format,
+        status: r.status,
+        durationSeconds: r.durationSeconds ?? undefined,
+        orderIndex: r.orderIndex ?? undefined,
+        createdAt: r.createdAt.toISOString(),
+      };
+    });
     const nextCursor = hasMore ? items[items.length - 1]?.id : undefined;
 
     return {
@@ -923,7 +978,33 @@ export class ListingRepository {
         await this.syncListingCounters(listing.parentId, tx);
       }
 
+      await syncMainLanguageTranslation({
+        upsert: (locale, fields) =>
+          this.upsertMainListingTranslation(tx, listing.id, locale, fields),
+        newLocale: dto.language ?? 'ar',
+        newFields: { title: dto.title, description: null },
+      });
+
       return { id: listing.id, title: listing.title };
+    });
+  }
+
+  private upsertMainListingTranslation(
+    tx: Prisma.TransactionClient,
+    listingId: string,
+    locale: Locale,
+    fields: { title: string; description?: string | null },
+  ) {
+    return tx.listingTranslation.upsert({
+      where: { listingId_locale: { listingId, locale } },
+      create: {
+        listingId,
+        locale,
+        title: fields.title,
+        description: fields.description ?? null,
+        status: 'published',
+      },
+      update: { title: fields.title, description: fields.description ?? null, status: 'published' },
     });
   }
 
@@ -936,10 +1017,19 @@ export class ListingRepository {
       await this.prisma.$transaction(async (tx) => {
         const original = await tx.listing.findUnique({
           where: { id },
-          select: { parentId: true, status: true },
+          select: {
+            parentId: true,
+            status: true,
+            language: true,
+            title: true,
+            description: true,
+          },
         });
 
         if (!original) throw new Error('Not found');
+
+        const hasTranslatableChange =
+          dto.title !== undefined || dto.description !== undefined || dto.language !== undefined;
 
         // Exclude topics from the main update data
         const { topics, ...dtoWithoutTopics } = dto;
@@ -958,6 +1048,19 @@ export class ListingRepository {
           where: { id },
           data: updateData,
         });
+
+        if (hasTranslatableChange) {
+          await syncMainLanguageTranslation({
+            upsert: (locale, fields) => this.upsertMainListingTranslation(tx, id, locale, fields),
+            oldLocale: original.language,
+            oldFields: { title: original.title, description: original.description },
+            newLocale: dto.language ?? original.language ?? 'ar',
+            newFields: {
+              title: dto.title ?? original.title,
+              description: dto.description !== undefined ? dto.description : original.description,
+            },
+          });
+        }
 
         // If topics were provided in the DTO, update them
         if (topics !== undefined) {
@@ -1201,25 +1304,60 @@ export class ListingRepository {
         }
       }
 
-      const createSlugs: string[] = [];
+      const moduleUpdateIds: string[] = [];
       for (const moduleOp of moduleOps) {
-        if (moduleOp.op === 'create') createSlugs.push(moduleOp.slug);
-        for (const lessonOp of moduleOp.lessons) {
-          if (lessonOp.op === 'create') createSlugs.push(lessonOp.slug);
+        if (moduleOp.op === 'update') moduleUpdateIds.push(moduleOp.id);
+      }
+      const existingModuleSlugById = new Map<string, string>();
+      if (moduleUpdateIds.length) {
+        const found = await tx.listing.findMany({
+          where: { id: { in: moduleUpdateIds }, parentId: rootId, deletedAt: null },
+          select: { id: true, slug: true },
+        });
+        if (found.length !== moduleUpdateIds.length) {
+          throw new BadRequestException('Module update target is not under this listing');
+        }
+        for (const m of found) existingModuleSlugById.set(m.id, m.slug);
+      }
+
+      // Each create-slug is checked against its own immediate parent's slug, not just
+      // the root's — a lesson nested under a module must be prefixed by that module's
+      // slug (which is itself prefixed by the root's), not merely share the root prefix.
+      const prefixChecks: { slug: string; expectedPrefix: string }[] = [];
+      for (const moduleOp of moduleOps) {
+        if (moduleOp.op === 'create') {
+          prefixChecks.push({ slug: moduleOp.slug, expectedPrefix: root.slug });
+          for (const lessonOp of moduleOp.lessons) {
+            if (lessonOp.op === 'create') {
+              prefixChecks.push({ slug: lessonOp.slug, expectedPrefix: moduleOp.slug });
+            }
+          }
+        } else {
+          const parentSlug = existingModuleSlugById.get(moduleOp.id) ?? root.slug;
+          for (const lessonOp of moduleOp.lessons) {
+            if (lessonOp.op === 'create') {
+              prefixChecks.push({ slug: lessonOp.slug, expectedPrefix: parentSlug });
+            }
+          }
         }
       }
       for (const lessonOp of rootLessonOps) {
-        if (lessonOp.op === 'create') createSlugs.push(lessonOp.slug);
+        if (lessonOp.op === 'create') {
+          prefixChecks.push({ slug: lessonOp.slug, expectedPrefix: root.slug });
+        }
       }
 
+      const createSlugs = prefixChecks.map((c) => c.slug);
       const duplicates = createSlugs.filter((slug, i) => createSlugs.indexOf(slug) !== i);
       if (duplicates.length) {
         throw new BadRequestException(`Duplicate slugs in payload: ${duplicates.join(', ')}`);
       }
-      const badPrefix = createSlugs.filter((slug) => !slug.startsWith(`${root.slug}-`));
+      const badPrefix = prefixChecks.filter((c) => !c.slug.startsWith(`${c.expectedPrefix}-`));
       if (badPrefix.length) {
         throw new BadRequestException(
-          `Slugs must be prefixed by ${root.slug}-: ${badPrefix.join(', ')}`,
+          `Slugs must be prefixed by their parent's slug: ${badPrefix
+            .map((c) => `${c.slug} (expected prefix: ${c.expectedPrefix}-)`)
+            .join(', ')}`,
         );
       }
       if (createSlugs.length) {
@@ -1232,20 +1370,6 @@ export class ListingRepository {
             message: 'Slugs already in use',
             conflictingSlugs: clashes.map((c) => c.slug),
           });
-        }
-      }
-
-      const moduleUpdateIds: string[] = [];
-      for (const moduleOp of moduleOps) {
-        if (moduleOp.op === 'update') moduleUpdateIds.push(moduleOp.id);
-      }
-      if (moduleUpdateIds.length) {
-        const found = await tx.listing.findMany({
-          where: { id: { in: moduleUpdateIds }, parentId: rootId, deletedAt: null },
-          select: { id: true },
-        });
-        if (found.length !== moduleUpdateIds.length) {
-          throw new BadRequestException('Module update target is not under this listing');
         }
       }
 

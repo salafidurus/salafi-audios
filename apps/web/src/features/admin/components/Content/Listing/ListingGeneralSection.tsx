@@ -15,7 +15,8 @@ import {
   DropdownContent,
   DropdownItem,
 } from "@/shared/components/Dropdown";
-import { formatScholarName } from "@/shared/utils/format-scholar-name";
+import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
+import { deriveChildSlug } from "@/features/admin/utils/slugify";
 import type { FormAction, FormState } from "@/features/admin/hooks/Content/useListingForm";
 import styles from "./listing-modal.module.css";
 
@@ -43,8 +44,22 @@ export function ListingGeneralSection({
   stagedImagePreview,
 }: ListingGeneralSectionProps) {
   const { i18n, t } = useTranslation();
-  const { scholarId, status, orderIndex, selectedTopics, language, formError, slug, format } =
-    state;
+  const formatScholarName = useFormatScholarName();
+  const {
+    scholarId,
+    status,
+    orderIndex,
+    selectedTopics,
+    language,
+    formError,
+    slug,
+    slugSuffix,
+    format,
+  } = state;
+
+  const selectedScholar = scholars.find((s) => s.id === scholarId);
+  const scholarSlug = selectedScholar?.slug ?? "";
+  const suffixIsEmpty = !isEditing && Boolean(scholarId) && !slugSuffix.trim();
 
   return (
     <>
@@ -69,18 +84,45 @@ export function ListingGeneralSection({
             <label htmlFor="lecture-slug" className={styles.label}>
               {t("admin.contents.listing.slugLabel", "Slug")} *
             </label>
-            <InputField
-              id="lecture-slug"
-              type="text"
-              value={slug}
-              onChange={(value) => {
-                if (!isEditing) {
-                  dispatch({ type: "UPDATE_FIELD", field: "slug", value });
-                }
-              }}
-              placeholder={t("admin.contents.listing.slugPlaceholder", "listing-slug")}
-              disabled={isEditing}
-            />
+            {isEditing ? (
+              <InputField id="lecture-slug" type="text" value={slug} onChange={() => {}} disabled />
+            ) : (
+              <>
+                <div className={styles.slugPrefixGroup}>
+                  {scholarSlug && <span className={styles.slugPrefixBadge}>{scholarSlug}-</span>}
+                  <InputField
+                    id="lecture-slug"
+                    type="text"
+                    value={slugSuffix}
+                    onChange={(value) => {
+                      dispatch({ type: "UPDATE_FIELD", field: "slugSuffix", value });
+                      dispatch({
+                        type: "UPDATE_FIELD",
+                        field: "slug",
+                        value: scholarSlug ? deriveChildSlug(scholarSlug, value) : value,
+                      });
+                    }}
+                    placeholder={
+                      scholarSlug
+                        ? t("admin.contents.listing.slugSuffixPlaceholder", "bayquniyyah")
+                        : t(
+                            "admin.contents.listing.slugSelectScholarFirst",
+                            "Select a scholar first",
+                          )
+                    }
+                    disabled={!scholarId}
+                  />
+                </div>
+                {suffixIsEmpty && (
+                  <span className={styles.fieldError}>
+                    {t(
+                      "admin.contents.listing.slugSuffixRequired",
+                      "Enter a slug beyond the scholar prefix.",
+                    )}
+                  </span>
+                )}
+              </>
+            )}
           </div>
 
           <div className={styles.formGroup}>
@@ -89,9 +131,19 @@ export function ListingGeneralSection({
             </label>
             <Dropdown
               value={scholarId}
-              onValueChange={(value) =>
-                dispatch({ type: "UPDATE_FIELD", field: "scholarId", value })
-              }
+              onValueChange={(value) => {
+                dispatch({ type: "UPDATE_FIELD", field: "scholarId", value });
+                if (!isEditing) {
+                  const newScholarSlug = scholars.find((s) => s.id === value)?.slug ?? "";
+                  dispatch({
+                    type: "UPDATE_FIELD",
+                    field: "slug",
+                    value: newScholarSlug
+                      ? deriveChildSlug(newScholarSlug, slugSuffix)
+                      : slugSuffix,
+                  });
+                }
+              }}
               disabled={isEditing}
             >
               <DropdownTrigger

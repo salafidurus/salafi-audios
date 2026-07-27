@@ -28,7 +28,7 @@ function FeedTopicItem({
   onItemPress?: (slug: string) => void;
 }) {
   const title = pickContentField(item.title, item.original?.title, showOriginal);
-  const scholarName = useFormattedScholarName(item.scholarName);
+  const scholarName = useFormattedScholarName(item.scholarName, item.scholarSlug);
 
   return (
     <button

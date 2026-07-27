@@ -8,15 +8,15 @@ describe("TopicModal", () => {
     expect(screen.queryByText(/add topic/i)).not.toBeInTheDocument();
   });
 
-  it("renders form fields for add topic modal (main-language-only)", () => {
+  it("renders form fields for add topic modal (Arabic is the main language)", () => {
     render(<TopicModal isOpen onClose={() => {}} onSaved={() => {}} />);
 
     expect(screen.getByLabelText(/slug/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/english name/i)).toBeInTheDocument();
-    expect(screen.queryByLabelText(/arabic name/i)).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/arabic name/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/english name/i)).not.toBeInTheDocument();
   });
 
-  it("shows error when slug or English name is missing on submit", async () => {
+  it("shows error when slug or Arabic name is missing on submit", async () => {
     const { fireEvent, waitFor } = await import("@testing-library/react");
     render(<TopicModal isOpen onClose={() => {}} onSaved={() => {}} />);
 
@@ -24,7 +24,7 @@ describe("TopicModal", () => {
     fireEvent.click(doneButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/slug and an english name are required/i)).toBeInTheDocument();
+      expect(screen.getByText(/slug and an arabic name are required/i)).toBeInTheDocument();
     });
   });
 });

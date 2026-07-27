@@ -90,17 +90,6 @@ export function ListingModal({
 
   const handleTitleChange = (val: string) => {
     dispatch({ type: "UPDATE_FIELD", field: "title", value: val });
-    if (!state.isEditing) {
-      dispatch({
-        type: "UPDATE_FIELD",
-        field: "slug",
-        value: val
-          .toLowerCase()
-          .replace(/[^a-z0-9\s-]/g, "")
-          .trim()
-          .replace(/\s+/g, "-"),
-      });
-    }
   };
 
   const handleTopicToggle = (topicId: string) => {

@@ -35,6 +35,7 @@ export {
 } from "./translations.api";
 export {
   formatScholarName,
+  useFormatScholarName,
   useFormattedScholarName,
   type ScholarWithNameAndTitle,
 } from "./utils/format-scholar-name";

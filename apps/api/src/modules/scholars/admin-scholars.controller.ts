@@ -16,8 +16,8 @@ export class AdminScholarsController {
   @Get()
   @RequiresPermission(Permissions.SCHOLARS_VIEW)
   @ApiOperation({ summary: 'List all scholars (including inactive)' })
-  list(@Query('cursor') cursor?: string) {
-    return this.service.adminList(cursor);
+  list(@Query('cursor') cursor?: string, @Query('search') search?: string) {
+    return this.service.adminList(cursor, search);
   }
 
   @Get(':id/form-data')

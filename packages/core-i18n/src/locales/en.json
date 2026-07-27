@@ -241,6 +241,14 @@
     "notFound": "Lecture not found",
     "minutes": "{{count}} min"
   },
+  "scholar": {
+    "title": {
+      "allamah": "Shaykh Allamah",
+      "sheikh": "Sheikh",
+      "ustadh": "Ustadh",
+      "akh": "Akh"
+    }
+  },
   "scholarContent": {
     "collections": "Collections",
     "series": "Series",

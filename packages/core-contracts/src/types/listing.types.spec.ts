@@ -97,6 +97,14 @@ describe("UpdateListingDetailsDtoSchema", () => {
     });
     expect(result.title).toBe("Updated Title");
   });
+
+  it("strips an injected slug — slug is immutable after creation and cannot be updated via this DTO", () => {
+    const result = UpdateListingDetailsDtoSchema.parse({
+      title: "Updated Title",
+      slug: "hacked-slug",
+    });
+    expect(result).not.toHaveProperty("slug");
+  });
 });
 
 describe("ListingFormDataDtoSchema (getFormData response shape)", () => {

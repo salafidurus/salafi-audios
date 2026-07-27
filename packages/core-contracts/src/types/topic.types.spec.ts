@@ -10,13 +10,13 @@ describe("AdminTopicDetailDtoSchema", () => {
     const result = AdminTopicDetailDtoSchema.parse({
       id: "topic-1",
       slug: "aqeedah",
-      name: { en: "Aqeedah", ar: "العقيدة" },
+      name: { ar: "العقيدة", en: "Aqeedah" },
       createdAt: "2026-07-23T00:00:00.000Z",
       translations: [
         {
-          locale: "ar",
+          locale: "en",
           status: "draft",
-          fields: { name: "العقيدة" },
+          fields: { name: "Aqeedah" },
           createdAt: "2026-07-23T00:00:00.000Z",
           updatedAt: "2026-07-23T00:00:00.000Z",
         },
@@ -24,14 +24,14 @@ describe("AdminTopicDetailDtoSchema", () => {
     });
     expect(result.id).toBe("topic-1");
     expect(result.translations).toHaveLength(1);
-    expect(result.translations[0].locale).toBe("ar");
+    expect(result.translations[0].locale).toBe("en");
   });
 
   it("parses topic detail without translations", () => {
     const result = AdminTopicDetailDtoSchema.parse({
       id: "topic-2",
       slug: "fiqh",
-      name: { en: "Fiqh" },
+      name: { ar: "الفقه" },
       createdAt: "2026-07-23T00:00:00.000Z",
       translations: [],
     });
@@ -42,7 +42,7 @@ describe("AdminTopicDetailDtoSchema", () => {
     expect(() =>
       AdminTopicDetailDtoSchema.parse({
         slug: "aqeedah",
-        name: { en: "Aqeedah" },
+        name: { ar: "العقيدة" },
         createdAt: "2026-07-23T00:00:00.000Z",
         translations: [],
       }),
@@ -51,24 +51,24 @@ describe("AdminTopicDetailDtoSchema", () => {
 });
 
 describe("CreateTopicWithTranslationsDtoSchema", () => {
-  it("parses a valid create payload (main-language-only)", () => {
+  it("parses a valid create payload (main-language-only, Arabic is the main language)", () => {
     const result = CreateTopicWithTranslationsDtoSchema.parse({
       slug: "aqeedah",
-      name: { en: "Aqeedah" },
+      name: { ar: "العقيدة" },
     });
     expect(result.slug).toBe("aqeedah");
-    expect(result.name.en).toBe("Aqeedah");
+    expect(result.name.ar).toBe("العقيدة");
   });
 
   it("rejects missing slug", () => {
     expect(() =>
       CreateTopicWithTranslationsDtoSchema.parse({
-        name: { en: "Aqeedah" },
+        name: { ar: "العقيدة" },
       }),
     ).toThrow();
   });
 
-  it("rejects missing name.en", () => {
+  it("rejects missing name.ar", () => {
     expect(() =>
       CreateTopicWithTranslationsDtoSchema.parse({
         slug: "aqeedah",
@@ -81,16 +81,24 @@ describe("CreateTopicWithTranslationsDtoSchema", () => {
 describe("UpdateTopicWithTranslationsDtoSchema", () => {
   it("parses a valid update payload (main-language-only)", () => {
     const result = UpdateTopicWithTranslationsDtoSchema.parse({
-      name: { en: "Aqeedah" },
+      name: { ar: "العقيدة" },
     });
-    expect(result.name.en).toBe("Aqeedah");
+    expect(result.name.ar).toBe("العقيدة");
   });
 
-  it("rejects empty name.en", () => {
+  it("rejects empty name.ar", () => {
     expect(() =>
       UpdateTopicWithTranslationsDtoSchema.parse({
-        name: { en: "" },
+        name: { ar: "" },
       }),
     ).toThrow();
+  });
+
+  it("strips an injected slug — slug is immutable after creation and cannot be updated via this DTO", () => {
+    const result = UpdateTopicWithTranslationsDtoSchema.parse({
+      name: { ar: "العقيدة" },
+      slug: "hacked-slug",
+    });
+    expect(result).not.toHaveProperty("slug");
   });
 });

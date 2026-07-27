@@ -27,8 +27,8 @@ export class ScholarsService {
     return this.repo.list();
   }
 
-  adminList(cursor?: string): Promise<AdminScholarListDto> {
-    return this.repo.adminList(cursor);
+  adminList(cursor?: string, search?: string): Promise<AdminScholarListDto> {
+    return this.repo.adminList(cursor, search);
   }
 
   async getBySlug(slug: string): Promise<

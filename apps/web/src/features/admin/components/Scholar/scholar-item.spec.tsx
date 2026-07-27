@@ -56,4 +56,21 @@ describe("ScholarItem", () => {
 
     expect(screen.queryByText("KIBAR")).not.toBeInTheDocument();
   });
+
+  it("prefixes the name with the translated honorific title", () => {
+    (useAdminPermissions as Mock<any>).mockReturnValue({
+      data: { permissions: ["SCHOLARS_VIEW"] },
+    });
+
+    render(
+      <Scholar.Item
+        scholar={{ ...baseScholar, name: "Abdullah bn AbdirRaheem al-Bukhari", title: "allamah" }}
+        onEdit={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByText("Shaykh Allamah Abdullah bn AbdirRaheem al-Bukhari"),
+    ).toBeInTheDocument();
+  });
 });

@@ -6,6 +6,7 @@ export type SearchResultRow = {
   slug: string;
   title: string;
   scholarName: string;
+  scholarSlug: string;
   imageUrl?: string;
   lectureCount: number;
   durationSeconds?: number;
@@ -24,6 +25,7 @@ export function buildSearchResultRows(
     slug: item.slug,
     title: pickContentField(item.title, item.original?.title, showOriginal),
     scholarName: item.scholarName,
+    scholarSlug: item.scholarSlug,
     imageUrl: item.coverImageUrl ?? item.scholarImageUrl,
     lectureCount: item.lectureCount,
     durationSeconds: item.durationSeconds,

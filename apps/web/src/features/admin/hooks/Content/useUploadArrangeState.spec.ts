@@ -212,7 +212,8 @@ describe("useUploadArrangeState", () => {
     expect(dto.modules![0]).toMatchObject({
       op: "create",
       slug: "bukhari-book-of-faith",
-      lessons: [{ op: "create", slug: "bukhari-hadith-2" }],
+      // Prefixed by its immediate parent module's slug, not just the root's.
+      lessons: [{ op: "create", slug: "bukhari-book-of-faith-hadith-2" }],
     });
   });
 
@@ -279,6 +280,182 @@ describe("useUploadArrangeState", () => {
     const after = hook.result.current.state.items[0]!.assignment;
     expect(after.kind === "new-lesson" && after.moduleKey).toBe(ROOT_MODULE_KEY);
     expect(hook.result.current.state.newModules).toHaveLength(0);
+  });
+
+  describe("immediate-parent slug prefix on reassignment", () => {
+    it("recomputes the slug against an existing module's slug when reassigned to it", () => {
+      const hook = setup(collectionData);
+      act(() =>
+        hook.result.current.dispatch({
+          type: "ADD_FILES",
+          files: [{ file: makeFile("Hadith 9.mp3"), durationSeconds: 10 }],
+        }),
+      );
+      const item = hook.result.current.state.items[0]!;
+      expect(item.assignment.kind === "new-lesson" && item.assignment.slug).toBe(
+        "bukhari-hadith-9",
+      );
+
+      act(() =>
+        hook.result.current.dispatch({
+          type: "SET_ASSIGNMENT",
+          itemId: item.id,
+          assignment: {
+            kind: "new-lesson",
+            moduleKey: "module-1",
+            slug: item.assignment.kind === "new-lesson" ? item.assignment.slug : "",
+            slugEdited: false,
+            description: "",
+            status: "draft",
+            orderIndex: 1,
+          },
+        }),
+      );
+
+      const after = hook.result.current.state.items[0]!.assignment;
+      // module-1's slug is "bukhari-ilm" — the immediate parent, not the root "bukhari".
+      expect(after.kind === "new-lesson" && after.slug).toBe("bukhari-ilm-hadith-9");
+    });
+
+    it("recomputes the slug against a newly-staged module's slug when reassigned to it", () => {
+      const hook = setup(collectionData);
+      act(() =>
+        hook.result.current.dispatch({
+          type: "ADD_FILES",
+          files: [{ file: makeFile("Hadith 9.mp3"), durationSeconds: 10 }],
+        }),
+      );
+      act(() => hook.result.current.dispatch({ type: "ADD_MODULE", title: "New Chapter" }));
+      const tempId = hook.result.current.state.newModules[0]!.tempId;
+      const item = hook.result.current.state.items[0]!;
+
+      act(() =>
+        hook.result.current.dispatch({
+          type: "SET_ASSIGNMENT",
+          itemId: item.id,
+          assignment: {
+            kind: "new-lesson",
+            moduleKey: `new:${tempId}`,
+            slug: item.assignment.kind === "new-lesson" ? item.assignment.slug : "",
+            slugEdited: false,
+            description: "",
+            status: "draft",
+            orderIndex: 1,
+          },
+        }),
+      );
+
+      const after = hook.result.current.state.items[0]!.assignment;
+      expect(after.kind === "new-lesson" && after.slug).toBe("bukhari-new-chapter-hadith-9");
+    });
+
+    it("does not overwrite a manually-edited slug on reassignment", () => {
+      const hook = setup(collectionData);
+      act(() =>
+        hook.result.current.dispatch({
+          type: "ADD_FILES",
+          files: [{ file: makeFile("Hadith 9.mp3"), durationSeconds: 10 }],
+        }),
+      );
+      const item = hook.result.current.state.items[0]!;
+      act(() =>
+        hook.result.current.dispatch({
+          type: "SET_LESSON_FIELD",
+          itemId: item.id,
+          field: "slug",
+          value: "my-custom-slug",
+        }),
+      );
+
+      act(() =>
+        hook.result.current.dispatch({
+          type: "SET_ASSIGNMENT",
+          itemId: item.id,
+          assignment: {
+            kind: "new-lesson",
+            moduleKey: "module-1",
+            slug: "my-custom-slug",
+            slugEdited: true,
+            description: "",
+            status: "draft",
+            orderIndex: 1,
+          },
+        }),
+      );
+
+      const after = hook.result.current.state.items[0]!.assignment;
+      expect(after.kind === "new-lesson" && after.slug).toBe("my-custom-slug");
+    });
+  });
+
+  describe("EDIT_MODULE title/slug cascade", () => {
+    it("recomputes a staged module's own slug when its title changes, and cascades to its children", () => {
+      const hook = setup(collectionData);
+      act(() => hook.result.current.dispatch({ type: "ADD_MODULE", title: "Book of Faith" }));
+      const tempId = hook.result.current.state.newModules[0]!.tempId;
+      expect(hook.result.current.state.newModules[0]!.slug).toBe("bukhari-book-of-faith");
+
+      act(() =>
+        hook.result.current.dispatch({
+          type: "ADD_FILES",
+          files: [{ file: makeFile("Hadith 9.mp3"), durationSeconds: 10 }],
+        }),
+      );
+      const item = hook.result.current.state.items[0]!;
+      act(() =>
+        hook.result.current.dispatch({
+          type: "SET_ASSIGNMENT",
+          itemId: item.id,
+          assignment: {
+            kind: "new-lesson",
+            moduleKey: `new:${tempId}`,
+            slug: "placeholder",
+            slugEdited: false,
+            description: "",
+            status: "draft",
+            orderIndex: 1,
+          },
+        }),
+      );
+
+      act(() =>
+        hook.result.current.dispatch({
+          type: "EDIT_MODULE",
+          tempId,
+          field: "title",
+          value: "Book of Iman",
+        }),
+      );
+
+      expect(hook.result.current.state.newModules[0]!.slug).toBe("bukhari-book-of-iman");
+      const after = hook.result.current.state.items[0]!.assignment;
+      expect(after.kind === "new-lesson" && after.slug).toBe("bukhari-book-of-iman-hadith-9");
+    });
+
+    it("preserves a manually-edited module slug and does not re-derive it from title changes", () => {
+      const hook = setup(collectionData);
+      act(() => hook.result.current.dispatch({ type: "ADD_MODULE", title: "Book of Faith" }));
+      const tempId = hook.result.current.state.newModules[0]!.tempId;
+
+      act(() =>
+        hook.result.current.dispatch({
+          type: "EDIT_MODULE",
+          tempId,
+          field: "slug",
+          value: "bukhari-custom-module",
+        }),
+      );
+      act(() =>
+        hook.result.current.dispatch({
+          type: "EDIT_MODULE",
+          tempId,
+          field: "title",
+          value: "Renamed",
+        }),
+      );
+
+      expect(hook.result.current.state.newModules[0]!.slug).toBe("bukhari-custom-module");
+    });
   });
 
   describe("ADD_URL_ITEMS", () => {

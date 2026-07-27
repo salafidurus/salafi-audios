@@ -9,7 +9,7 @@ import { MarqueeText } from "@/shared/components/MarqueeText";
 import { useResponsive } from "@/shared/hooks/use-responsive";
 import { type AdminScholarListItemDto, COUNTRY_NAMES } from "@sd/core-contracts";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { formatScholarName } from "@/shared/utils/format-scholar-name";
+import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 import styles from "./scholar-item.module.css";
 
 export interface ScholarItemProps {
@@ -21,6 +21,7 @@ export interface ScholarItemProps {
 export function ScholarItem({ scholar, onEdit, onTranslate }: ScholarItemProps) {
   const { isMobile } = useResponsive();
   const { t } = useTranslation();
+  const formatScholarName = useFormatScholarName();
   const countryName = scholar.country
     ? (COUNTRY_NAMES[scholar.country as keyof typeof COUNTRY_NAMES] ?? scholar.country)
     : null;

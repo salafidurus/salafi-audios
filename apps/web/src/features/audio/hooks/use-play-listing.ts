@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import { useListingDetail } from "@sd/domain-content";
 import type { Track } from "@sd/domain-audio";
 import { sanitizeError } from "@sd/utils-error";
-import { formatScholarName } from "@/shared/utils/format-scholar-name";
+import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 import { audioService } from "../index";
 
 export type UsePlayListingOptions = {
@@ -26,6 +26,7 @@ export type UsePlayListingOptions = {
 export function usePlayListing(listingId: string | null, options?: UsePlayListingOptions) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const formatScholarName = useFormatScholarName();
 
   // Extract actual ID if it's in "prefix:id" format
   const actualId = listingId ? listingId.split(":")[1] || listingId : null;
@@ -75,7 +76,7 @@ export function usePlayListing(listingId: string | null, options?: UsePlayListin
     } finally {
       setIsLoading(false);
     }
-  }, [listingDetail, options]);
+  }, [listingDetail, options, formatScholarName]);
 
   return {
     play,

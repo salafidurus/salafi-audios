@@ -15,16 +15,16 @@ describe('TopicsService', () => {
   const sampleTopic: TopicDetailDto = {
     id: 't1',
     slug: 'aqeedah',
-    name: { en: 'Aqeedah' },
+    name: { ar: 'العقيدة' },
     orderIndex: 0,
     createdAt: new Date().toISOString(),
   };
 
   const sampleTranslations: TranslationViewDto[] = [
     {
-      locale: 'ar',
+      locale: 'en',
       status: 'draft',
-      fields: { name: 'العقيدة' },
+      fields: { name: 'Aqeedah' },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     },
@@ -75,7 +75,7 @@ describe('TopicsService', () => {
     const result = await service.getAdminDetail('aqeedah');
     expect(result.id).toBe('t1');
     expect(result.translations).toHaveLength(1);
-    expect(result.translations[0]?.locale).toBe('ar');
+    expect(result.translations[0]?.locale).toBe('en');
   });
 
   it('getAdminDetail throws NotFoundException if topic missing', async () => {
@@ -92,12 +92,12 @@ describe('TopicsService', () => {
 
     const result = await service.createWithTranslations({
       slug: 'aqeedah',
-      name: { en: 'Aqeedah' },
+      name: { ar: 'العقيدة' },
     });
 
     expect(repo.upsertBySlug).toHaveBeenCalledWith({
       slug: 'aqeedah',
-      name: 'Aqeedah',
+      name: 'العقيدة',
     });
     expect(repo.upsertTopicTranslation).not.toHaveBeenCalled();
     expect(result.translations).toHaveLength(0);
@@ -111,12 +111,12 @@ describe('TopicsService', () => {
     repo.listTopicTranslations.mockResolvedValue(sampleTranslations);
 
     await service.updateWithTranslations('aqeedah', {
-      name: { en: 'Aqeedah Updated' },
+      name: { ar: 'العقيدة المحدثة' },
     });
 
     expect(repo.upsertBySlug).toHaveBeenCalledWith({
       slug: 'aqeedah',
-      name: 'Aqeedah Updated',
+      name: 'العقيدة المحدثة',
     });
     expect(repo.upsertTopicTranslation).not.toHaveBeenCalled();
   });

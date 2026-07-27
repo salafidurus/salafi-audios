@@ -15,6 +15,7 @@ import type { CreateScholarDto } from './dto/create-scholar.dto';
 import type { UpdateScholarDto } from './dto/update-scholar.dto';
 import type { SaveScholarTranslationDto } from './dto/save-scholar-translation.dto';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
+import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 import { decodeCursor, buildPaginatedResult } from '../../shared/utils/pagination';
 
@@ -433,11 +434,19 @@ export class ScholarsRepository {
     cursor?: string,
     search?: string,
   ): Promise<{ items: AdminScholarListItemDto[]; nextCursor?: string; hasMore: boolean }> {
+    const locale = getRequestLocale();
     const pageSize = 50;
     const take = pageSize + 1;
 
     const where: Prisma.ScholarWhereInput = search
-      ? { name: { contains: search, mode: 'insensitive' as const } }
+      ? {
+          OR: [
+            { name: { contains: search, mode: 'insensitive' as const } },
+            {
+              translations: { some: { name: { contains: search, mode: 'insensitive' as const } } },
+            },
+          ],
+        }
       : {};
 
     const records = await this.prisma.scholar.findMany({
@@ -463,7 +472,7 @@ export class ScholarsRepository {
         createdAt: true,
         updatedAt: true,
         translations: {
-          select: { locale: true, name: true, status: true },
+          select: { locale: true, name: true, bio: true, status: true },
           orderBy: { locale: 'asc' },
         },
       },
@@ -471,29 +480,43 @@ export class ScholarsRepository {
 
     const hasMore = records.length > pageSize;
     const items: AdminScholarListItemDto[] = (hasMore ? records.slice(0, pageSize) : records).map(
-      (r) => ({
-        id: r.id,
-        slug: r.slug,
-        name: r.name,
-        bio: r.bio ?? undefined,
-        country: (r.country ?? undefined) as AdminScholarListItemDto['country'],
-        mainLanguage: r.mainLanguage ?? undefined,
-        imageUrl: r.imageUrl ?? undefined,
-        isActive: r.isActive,
-        title: r.title ?? undefined,
-        orderIndex: r.orderIndex,
-        socialTwitter: r.socialTwitter ?? undefined,
-        socialTelegram: r.socialTelegram ?? undefined,
-        socialYoutube: r.socialYoutube ?? undefined,
-        socialWebsite: r.socialWebsite ?? undefined,
-        createdAt: r.createdAt.toISOString(),
-        updatedAt: r.updatedAt?.toISOString(),
-        translations: r.translations.map((t) => ({
-          locale: t.locale,
-          name: t.name,
-          status: t.status === 'published' ? ('published' as const) : ('draft' as const),
-        })),
-      }),
+      (r) => {
+        const published = r.translations.find(
+          (t) => t.locale === locale && t.status === 'published',
+        );
+        const resolved = resolveContentTranslation({
+          base: { name: r.name, bio: r.bio ?? undefined },
+          originalLanguage: r.mainLanguage,
+          targetLocale: locale,
+          publishedTranslation: published
+            ? { name: published.name, bio: published.bio ?? undefined }
+            : null,
+        }).fields;
+
+        return {
+          id: r.id,
+          slug: r.slug,
+          name: resolved.name,
+          bio: resolved.bio,
+          country: (r.country ?? undefined) as AdminScholarListItemDto['country'],
+          mainLanguage: r.mainLanguage ?? undefined,
+          imageUrl: r.imageUrl ?? undefined,
+          isActive: r.isActive,
+          title: r.title ?? undefined,
+          orderIndex: r.orderIndex,
+          socialTwitter: r.socialTwitter ?? undefined,
+          socialTelegram: r.socialTelegram ?? undefined,
+          socialYoutube: r.socialYoutube ?? undefined,
+          socialWebsite: r.socialWebsite ?? undefined,
+          createdAt: r.createdAt.toISOString(),
+          updatedAt: r.updatedAt?.toISOString(),
+          translations: r.translations.map((t) => ({
+            locale: t.locale,
+            name: t.name,
+            status: t.status === 'published' ? ('published' as const) : ('draft' as const),
+          })),
+        };
+      },
     );
 
     const nextCursor = hasMore ? items[items.length - 1]?.id : undefined;
@@ -522,12 +545,28 @@ export class ScholarsRepository {
         },
       });
 
+      await syncMainLanguageTranslation({
+        upsert: (locale, fields) =>
+          this.upsertMainScholarTranslation(tx, scholar.id, locale, fields),
+        newLocale: dto.mainLanguage ?? 'ar',
+        newFields: { name: dto.name, bio: dto.bio ?? null },
+      });
+
       return scholar;
     });
   }
 
   async update(id: string, dto: UpdateScholarDto) {
     return this.prisma.$transaction(async (tx) => {
+      const hasTranslatableChange =
+        dto.name !== undefined || dto.bio !== undefined || dto.mainLanguage !== undefined;
+      const original = hasTranslatableChange
+        ? await tx.scholar.findUnique({
+            where: { id },
+            select: { mainLanguage: true, name: true, bio: true },
+          })
+        : null;
+
       // Update scholar fields if provided
       const updateData: Record<string, any> = {};
       if (dto.name !== undefined) updateData.name = dto.name;
@@ -550,7 +589,39 @@ export class ScholarsRepository {
         data: updateData,
       });
 
+      if (hasTranslatableChange && original) {
+        await syncMainLanguageTranslation({
+          upsert: (locale, fields) => this.upsertMainScholarTranslation(tx, id, locale, fields),
+          oldLocale: original.mainLanguage,
+          oldFields: { name: original.name, bio: original.bio },
+          newLocale: dto.mainLanguage ?? original.mainLanguage,
+          newFields: {
+            name: dto.name ?? original.name,
+            bio: dto.bio !== undefined ? dto.bio : original.bio,
+          },
+        });
+      }
+
       return scholar;
+    });
+  }
+
+  private upsertMainScholarTranslation(
+    tx: Prisma.TransactionClient,
+    scholarId: string,
+    locale: Locale,
+    fields: { name: string; bio?: string | null },
+  ) {
+    return tx.scholarTranslation.upsert({
+      where: { scholarId_locale: { scholarId, locale } },
+      create: {
+        scholarId,
+        locale,
+        name: fields.name,
+        bio: fields.bio ?? null,
+        status: 'published',
+      },
+      update: { name: fields.name, bio: fields.bio ?? null, status: 'published' },
     });
   }
 

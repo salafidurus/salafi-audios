@@ -214,6 +214,7 @@ export class LibraryRepository {
             },
             scholar: {
               select: {
+                slug: true,
                 name: true,
                 mainLanguage: true,
                 translations: {
@@ -248,6 +249,7 @@ export class LibraryRepository {
       lectureTitle: listingTitle,
       lectureSlug: record.listing.slug,
       scholarName,
+      scholarSlug: record.listing.scholar.slug,
       durationSeconds: record.listing.durationSeconds ?? 0,
       positionSeconds: record.positionSeconds,
     };

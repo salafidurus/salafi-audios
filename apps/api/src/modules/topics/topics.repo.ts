@@ -9,6 +9,7 @@ import type {
 } from '@sd/core-contracts';
 import { SaveTopicTranslationDto } from './dto/save-topic-translation.dto';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
+import { syncMainLanguageTranslation } from '../../shared/i18n/sync-main-language-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 
 const topicViewSelect = {
@@ -145,21 +146,36 @@ export class TopicsRepository {
     name: string;
     orderIndex?: number;
   }): Promise<TopicDetailDto> {
-    const record = await this.prisma.topic.upsert({
-      where: { slug: input.slug },
-      select: topicViewSelect,
-      create: {
-        slug: input.slug,
-        name: input.name,
-        orderIndex: input.orderIndex ?? 99,
-      },
-      update: {
-        name: input.name,
-        orderIndex: input.orderIndex,
-      },
-    });
+    return this.prisma.$transaction(async (tx) => {
+      const record = await tx.topic.upsert({
+        where: { slug: input.slug },
+        select: topicViewSelect,
+        create: {
+          slug: input.slug,
+          name: input.name,
+          orderIndex: input.orderIndex ?? 99,
+        },
+        update: {
+          name: input.name,
+          orderIndex: input.orderIndex,
+        },
+      });
 
-    return this.toViewDto(record);
+      // Arabic is always the main language for topics — mirror the main
+      // content into a matching TopicTranslation so it's always in sync.
+      await syncMainLanguageTranslation({
+        upsert: (locale, fields) =>
+          tx.topicTranslation.upsert({
+            where: { topicId_locale: { topicId: record.id, locale } },
+            create: { topicId: record.id, locale, name: fields.name },
+            update: { name: fields.name },
+          }),
+        newLocale: 'ar',
+        newFields: { name: input.name },
+      });
+
+      return this.toViewDto(record);
+    });
   }
 
   async deleteBySlug(slug: string): Promise<void> {
@@ -231,14 +247,16 @@ export class TopicsRepository {
   private toViewDto(record: TopicViewRecord): TopicDetailDto {
     const createdAt = record.createdAt.toISOString();
 
-    const arTranslation = record.translations.find((t) => t.locale === 'ar')?.name;
+    // Arabic is the main language for topics — record.name already holds
+    // the Arabic content; English (if present) comes from the translation.
+    const enTranslation = record.translations.find((t) => t.locale === 'en')?.name;
 
     return {
       id: record.id,
       slug: record.slug,
       name: {
-        en: record.name,
-        ar: arTranslation,
+        ar: record.name,
+        en: enTranslation,
       },
       orderIndex: record.orderIndex,
       createdAt,

@@ -20,6 +20,10 @@ export type FormState = {
   // Mutable fields
   title: string;
   slug: string;
+  // Create-mode-only UI state: the raw text typed after the locked
+  // `${scholarSlug}-` prefix. Not submitted to the API — `slug` (derived
+  // from this + the selected scholar's slug) is the single value sent.
+  slugSuffix: string;
   description: string;
   scholarId: string;
   format: "single" | "series" | "collection";
@@ -63,6 +67,7 @@ function getInitialFormState(): FormState {
   return {
     title: "",
     slug: "",
+    slugSuffix: "",
     description: "",
     scholarId: "",
     format: "single",
@@ -96,6 +101,7 @@ function buildEditFormState(data: ListingFormDataDto): FormState {
     scholarName: listing.scholarName,
     title,
     slug: listing.slug || "",
+    slugSuffix: "",
     description,
     scholarId: listing.scholarId || "",
     format: (listing.format as "single" | "series" | "collection") || "single",

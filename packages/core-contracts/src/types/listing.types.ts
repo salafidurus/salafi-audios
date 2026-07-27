@@ -140,6 +140,7 @@ export const AdminListingListItemDtoSchema = z.object({
   id: z.string(),
   title: z.string(),
   scholarName: z.string(),
+  scholarSlug: z.string(),
   format: ListingFormatSchema,
   status: StatusValueSchema,
   durationSeconds: z.number().optional(),

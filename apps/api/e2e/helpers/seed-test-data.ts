@@ -110,10 +110,21 @@ export async function seedTestData(prisma: PrismaService): Promise<void> {
     });
   }
 
-  // Create test scholar (for other e2e tests)
+  // Create test scholar (for other e2e tests). `update` restores the same
+  // baseline fields as `create` — other suites (or manual DB edits) can
+  // mutate this shared fixture (e.g. toggle isActive), and an empty `update`
+  // would let that mutation silently persist across runs, breaking whichever
+  // suite runs next.
   await prisma.scholar.upsert({
     where: { id: TEST_SCHOLAR_ID },
-    update: {},
+    update: {
+      slug: TEST_SCHOLAR_SLUG,
+      name: 'E2E Test Scholar',
+      bio: 'E2E Scholar Biography',
+      country: 'SA',
+      mainLanguage: 'ar',
+      isActive: true,
+    },
     create: {
       id: TEST_SCHOLAR_ID,
       slug: TEST_SCHOLAR_SLUG,
@@ -146,10 +157,22 @@ export async function seedTestData(prisma: PrismaService): Promise<void> {
     },
   });
 
-  // Create test listing
+  // Create test listing. Same reasoning as the scholar fixture above:
+  // `update` restores the baseline title/language/status so a mutation left
+  // behind by another suite can't silently persist across runs.
   await prisma.listing.upsert({
     where: { id: TEST_LISTING_ID },
-    update: {},
+    update: {
+      slug: TEST_LISTING_SLUG,
+      title: 'E2E Test Listing',
+      description: 'E2E Listing Description',
+      format: 'single',
+      language: 'ar',
+      status: 'published',
+      scholarId: TEST_SCHOLAR_ID,
+      publishedAt: new Date(),
+      durationSeconds: 300,
+    },
     create: {
       id: TEST_LISTING_ID,
       slug: TEST_LISTING_SLUG,

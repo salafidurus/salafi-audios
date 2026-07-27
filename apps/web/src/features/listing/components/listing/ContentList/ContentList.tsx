@@ -10,11 +10,18 @@ import styles from "./ContentList.module.css";
 export type ContentListProps = {
   items: ListingContentItemDto[];
   scholarName?: string;
+  scholarSlug?: string;
   seriesId?: string;
   seriesTitle?: string;
 };
 
-export function ContentList({ items, scholarName = "", seriesId, seriesTitle }: ContentListProps) {
+export function ContentList({
+  items,
+  scholarName = "",
+  scholarSlug,
+  seriesId,
+  seriesTitle,
+}: ContentListProps) {
   // Construct all tracks in order for queue context
   const allTracksInContext: Track[] = items.map((item, i) => ({
     id: item.id,
@@ -36,6 +43,7 @@ export function ContentList({ items, scholarName = "", seriesId, seriesTitle }: 
           <ContentListItem
             item={item}
             scholarName={scholarName}
+            scholarSlug={scholarSlug}
             seriesId={seriesId}
             seriesTitle={seriesTitle}
             allTracksInContext={allTracksInContext}

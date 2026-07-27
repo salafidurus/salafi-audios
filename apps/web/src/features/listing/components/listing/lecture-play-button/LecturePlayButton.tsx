@@ -4,7 +4,7 @@ import React from "react";
 import type { ListingDetailDto } from "@sd/core-contracts";
 import { useAudio, type Track } from "@sd/domain-audio";
 import { audioService } from "@/features/audio";
-import { formatScholarName } from "@/shared/utils/format-scholar-name";
+import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 import { Button } from "@/shared/components/Button/Button";
 import styles from "./LecturePlayButton.module.css";
 
@@ -14,6 +14,7 @@ export type LecturePlayButtonProps = {
 
 export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
   const { isPlaying, currentTrack } = useAudio();
+  const formatScholarName = useFormatScholarName();
 
   if (!lecture.primaryAudioAsset) {
     return null;

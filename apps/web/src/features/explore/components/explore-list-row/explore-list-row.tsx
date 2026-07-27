@@ -25,7 +25,7 @@ export function FeedListRow({ item, onPress }: FeedListRowProps) {
   const showOriginal = useShowOriginalContent();
   const title = pickContentField(item.title, item.original?.title, showOriginal);
   const { isMobile } = useResponsive();
-  const scholarName = useFormattedScholarName(item.scholarName);
+  const scholarName = useFormattedScholarName(item.scholarName, item.scholarSlug);
 
   const { isPlaying, currentTrack } = useAudio();
   const isCurrentTrack = currentTrack?.id === item.id;

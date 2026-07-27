@@ -7,7 +7,7 @@ import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { Search } from "@/shared/components/Search";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { formatScholarName } from "@/shared/utils/format-scholar-name";
+import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 import { MetaDataSection } from "../../components/listing/MetaDataSection/MetaDataSection";
 import { QuickButtonSection } from "../../components/listing/QuickButtonSection/QuickButtonSection";
@@ -23,6 +23,7 @@ export type ListingDetailScreenProps = {
 
 export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
   const { t } = useTranslation();
+  const formatScholarName = useFormatScholarName();
   const [searchQuery, setSearchQuery] = useState("");
   const headerContentRef = useRef<HTMLDivElement>(null);
 
@@ -123,6 +124,7 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
               <ContentList
                 items={filteredSingleOrSeriesItems}
                 scholarName={formatScholarName(listing.scholar)}
+                scholarSlug={listing.scholar.slug}
               />
             )}
 
@@ -130,6 +132,7 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
               <ContentList
                 items={filteredSingleOrSeriesItems}
                 scholarName={formatScholarName(listing.scholar)}
+                scholarSlug={listing.scholar.slug}
                 seriesId={listing.id}
                 seriesTitle={listing.title}
               />
@@ -139,6 +142,7 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
               <CollectionContentLayout
                 modules={filteredModules}
                 scholarName={formatScholarName(listing.scholar)}
+                scholarSlug={listing.scholar.slug}
                 collectionId={listing.id}
               />
             )}

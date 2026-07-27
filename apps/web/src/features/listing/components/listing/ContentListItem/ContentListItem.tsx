@@ -23,6 +23,7 @@ function formatDuration(seconds?: number): string {
 export type ContentListItemProps = {
   item: ListingContentItemDto;
   scholarName?: string;
+  scholarSlug?: string;
   seriesId?: string;
   seriesTitle?: string;
   collectionId?: string;
@@ -32,12 +33,13 @@ export type ContentListItemProps = {
 export function ContentListItem({
   item,
   scholarName = "",
+  scholarSlug,
   seriesId,
   seriesTitle,
   collectionId,
   allTracksInContext,
 }: ContentListItemProps) {
-  const formattedScholarName = useFormattedScholarName(scholarName);
+  const formattedScholarName = useFormattedScholarName(scholarName, scholarSlug);
   const { isPlaying, currentTrack } = useAudio();
   const progress = useProgressStore((s) => s.progressMap[item.id]);
 
