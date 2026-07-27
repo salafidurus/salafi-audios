@@ -36,8 +36,11 @@ export const SCHOLARS: ScholarData[] = [
   {
     id: uuid(2),
     slug: "fawzan",
-    name: "Salih ibn Fawzan al-Fawzan",
-    bio: "The Grand Mufti of the Kingdom of Saudi Arabia. Expert in various field of Islamic knowledge: Aqeedah, Fiqh, Tafsir, etc.",
+    name: "صالح بن فوزان الفوزان",
+    bio: "المفتي العام للمملكة العربية السعودية، وأحد كبار علماء المسلمين، ومتخصِّص في علوم الشريعة الإسلامية، ومنها: العقيدة، والفقه، والتفسير، وغيرها.",
+    nameEn: "Salih ibn Fawzan al-Fawzan",
+    bioEn:
+      "The Grand Mufti of the Kingdom of Saudi Arabia. Expert in various field of Islamic knowledge: Aqeedah, Fiqh, Tafsir, etc.",
     country: "SA",
     mainLanguage: "ar",
     title: "allamah",
@@ -59,8 +62,11 @@ export const SCHOLARS: ScholarData[] = [
   {
     id: uuid(4),
     slug: "mabram",
-    name: "Mustafa bn Mabram",
-    bio: "Specialist in Arabic grammar (nahw and sarf). Author of textbooks on i'rab.",
+    name: "مصطفى بن مبرم",
+    bio: "من كبار علماء السلفية المعاصرين. تتلمذ على أيدي الشيخ مقبل بن هادي الوادعي، والشيخ عبد الله بن عقيل، والشيخ صالح بن محمد اللحيدان، والشيخ محمد بن صالح العثيمين، وغيرهم من كبار علماء هذا العصر.",
+    nameEn: "Mustafa bn Mabram",
+    bioEn:
+      "From the contemporary senior scholars of Salafiyyah. He is from the students of Shaykh Muqbil, Shaykh Ibn Aqeel, Shaykh Luhaydan, Shaykh Uthaymin and other senior scholars of this time.",
     country: "YE",
     mainLanguage: "ar",
     title: "sheikh",
