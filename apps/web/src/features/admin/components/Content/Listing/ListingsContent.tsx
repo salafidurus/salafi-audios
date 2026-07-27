@@ -13,14 +13,6 @@ import {
 } from "@/features/admin/components/Translation";
 import { Content } from "../Content";
 
-type AudioData = {
-  audioKey: string;
-  durationSeconds: number;
-  sizeBytes: number;
-  format: string;
-  filename: string;
-};
-
 export type ListingsContentProps = {
   debouncedSearch: string;
   isAudioUploaderOpen: boolean;
@@ -94,7 +86,7 @@ export function ListingsContent({
         emptyMessage={
           debouncedSearch
             ? t("admin.contents.searchNoMatchListings", "No listings match your search.")
-            : t("admin.contents.noListingsFound", "No listings yet. Add audio to create a listing.")
+            : t("admin.contents.noListingsFound", "No listings yet. Add a listing to get started.")
         }
       />
 
