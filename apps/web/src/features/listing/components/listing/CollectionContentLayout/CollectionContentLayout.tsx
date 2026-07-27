@@ -12,12 +12,14 @@ import styles from "./CollectionContentLayout.module.css";
 export type CollectionContentLayoutProps = {
   modules: ListingModuleDto[];
   scholarName?: string;
+  scholarSlug?: string;
   collectionId?: string;
 };
 
 export function CollectionContentLayout({
   modules,
   scholarName = "",
+  scholarSlug,
   collectionId,
 }: CollectionContentLayoutProps) {
   const [isTocCollapsed, setIsTocCollapsed] = useState(false);
@@ -75,6 +77,7 @@ export function CollectionContentLayout({
               <ContentListItem
                 item={lesson}
                 scholarName={scholarName}
+                scholarSlug={scholarSlug}
                 seriesId={sectionKey}
                 seriesTitle={mod?.title}
                 collectionId={collectionId}

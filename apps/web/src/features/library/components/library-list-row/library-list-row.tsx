@@ -21,7 +21,7 @@ export function LibraryListRow({ item, variant }: LibraryListRowProps) {
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
   const isRtl = useIsRtl();
-  const scholarName = useFormattedScholarName(item.scholarName);
+  const scholarName = useFormattedScholarName(item.scholarName, item.scholarSlug);
 
   const title = pickContentField(item.listingTitle, item.originalListingTitle, showOriginal);
   const initial = scholarName ? scholarName.trim().charAt(0).toUpperCase() : "?";

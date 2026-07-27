@@ -20,7 +20,7 @@ interface ListingProps {
 export function Listing({ listing, onEdit, onUpload, onTranslate }: ListingProps) {
   const { isMobile } = useResponsive();
   const { t } = useTranslation();
-  const formattedScholarName = useFormattedScholarName(listing.scholarName);
+  const formattedScholarName = useFormattedScholarName(listing.scholarName, listing.scholarSlug);
 
   const statusText = t(`admin.contents.listing.${listing.status}`, listing.status);
   const coverImage = listing.coverUrl || listing.thumbnailUrl;

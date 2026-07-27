@@ -43,7 +43,7 @@ export function SearchResultItem({ item, onPress }: SearchResultItemProps) {
   const { play, isLoading } = usePlayListing(item.id, {
     onError: (message) => addToast(message, "error"),
   });
-  const scholarName = useFormattedScholarName(item.scholarName);
+  const scholarName = useFormattedScholarName(item.scholarName, item.scholarSlug);
 
   const handlePlayClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     // Stop event propagation to prevent List.Item onClick

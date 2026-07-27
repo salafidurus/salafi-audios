@@ -64,17 +64,26 @@ export function useFormatScholarName(): (
 }
 
 /**
- * React hook to format a scholar name, resolving title from cache if
- * omitted, and translating the honorific to the current locale.
+ * React hook to format a scholar name, resolving the honorific title from
+ * the cached scholars list by `scholarSlug` (a locale-independent key), and
+ * translating it to the current locale.
+ *
+ * Matching by slug — not by comparing `scholarName` against the list's
+ * locale-resolved names — matters because `scholarName` and the scholars
+ * list are fetched independently. Right after a language switch they briefly
+ * disagree on which locale they reflect (one may have refetched, the other
+ * not yet); text-based matching would fail during that window and silently
+ * drop the honorific, or pair a stale-locale name with a fresh-locale list
+ * entry that no longer matches it by text at all.
  */
 export function useFormattedScholarName(
   scholarName?: string | null,
-  titleParam?: ScholarTitle | string | null,
+  scholarSlug?: string | null,
 ): string {
   const { t } = useTranslation();
   const contextClient = React.useContext(QueryClientContext);
   const hasQueryClient = Boolean(contextClient);
-  const shouldFetch = hasQueryClient && Boolean(scholarName) && !titleParam;
+  const shouldFetch = hasQueryClient && Boolean(scholarName) && Boolean(scholarSlug);
 
   const scholarsQuery = useScholarsList(
     { enabled: shouldFetch },
@@ -84,13 +93,9 @@ export function useFormattedScholarName(
 
   if (!scholarName) return "";
 
-  if (titleParam) {
-    return formatScholarName(scholarName, titleParam, t);
-  }
-
-  const foundScholar = data?.scholars?.find(
-    (s) => s.name === scholarName || formatScholarName(s.name, s.title, t) === scholarName,
-  );
+  const foundScholar = scholarSlug
+    ? data?.scholars?.find((s) => s.slug === scholarSlug)
+    : undefined;
 
   if (foundScholar?.title) {
     return formatScholarName(scholarName, foundScholar.title, t);

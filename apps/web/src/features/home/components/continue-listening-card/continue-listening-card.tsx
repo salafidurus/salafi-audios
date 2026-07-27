@@ -16,7 +16,10 @@ export function ContinueListeningCard({
   onContinueListening,
 }: ContinueListeningCardProps) {
   const { t } = useTranslation();
-  const scholarName = useFormattedScholarName(recentProgress.scholarName);
+  const scholarName = useFormattedScholarName(
+    recentProgress.scholarName,
+    recentProgress.scholarSlug,
+  );
 
   return (
     <section

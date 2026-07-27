@@ -124,6 +124,7 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
               <ContentList
                 items={filteredSingleOrSeriesItems}
                 scholarName={formatScholarName(listing.scholar)}
+                scholarSlug={listing.scholar.slug}
               />
             )}
 
@@ -131,6 +132,7 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
               <ContentList
                 items={filteredSingleOrSeriesItems}
                 scholarName={formatScholarName(listing.scholar)}
+                scholarSlug={listing.scholar.slug}
                 seriesId={listing.id}
                 seriesTitle={listing.title}
               />
@@ -140,6 +142,7 @@ export function ListingDetailScreen({ slug }: ListingDetailScreenProps) {
               <CollectionContentLayout
                 modules={filteredModules}
                 scholarName={formatScholarName(listing.scholar)}
+                scholarSlug={listing.scholar.slug}
                 collectionId={listing.id}
               />
             )}

@@ -744,6 +744,7 @@ export class ListingRepository {
         },
         scholar: {
           select: {
+            slug: true,
             name: true,
             mainLanguage: true,
             translations: {
@@ -776,6 +777,7 @@ export class ListingRepository {
         id: r.id,
         title,
         scholarName,
+        scholarSlug: r.scholar.slug,
         format: r.format,
         status: r.status,
         durationSeconds: r.durationSeconds ?? undefined,

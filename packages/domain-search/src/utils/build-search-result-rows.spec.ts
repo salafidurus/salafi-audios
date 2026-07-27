@@ -72,4 +72,12 @@ describe("buildSearchResultRows", () => {
     };
     expect(buildSearchResultRows(data)[0]!.imageUrl).toBe("scholar.jpg");
   });
+  it("carries scholarSlug through — needed by useFormattedScholarName to resolve the honorific reliably", () => {
+    const data: SearchCatalogResultsDto = {
+      collections: [makeItem({ scholarSlug: "ibn-baz" })],
+      series: [],
+      singles: [],
+    };
+    expect(buildSearchResultRows(data)[0]!.scholarSlug).toBe("ibn-baz");
+  });
 });

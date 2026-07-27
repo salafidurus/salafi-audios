@@ -10,6 +10,8 @@ import { createElement, type ReactNode } from "react";
 import { renderHook } from "@testing-library/react";
 import i18next from "i18next";
 import { initReactI18next, I18nextProvider } from "react-i18next";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { queryKeys } from "@sd/core-contracts";
 import {
   formatScholarName,
   useFormatScholarName,
@@ -112,19 +114,73 @@ function makeWrapper(locale: "en" | "ar") {
   };
 }
 
+function makeWrapperWithScholars(
+  locale: "en" | "ar",
+  scholars: Array<{ slug: string; name: string; title?: string }>,
+) {
+  const i18n = i18next.createInstance();
+  i18n.use(initReactI18next).init({
+    lng: locale,
+    fallbackLng: "en",
+    resources: {
+      en: { translation: { scholar: { title: { sheikh: "Sheikh", allamah: "Shaykh Allamah" } } } },
+      ar: { translation: { scholar: { title: { sheikh: "الشيخ", allamah: "الشيخ العلامة" } } } },
+    },
+    interpolation: { escapeValue: false },
+  });
+
+  const queryClient = new QueryClient();
+  queryClient.setQueryData(queryKeys.scholars.list.all(), { scholars });
+
+  return function Wrapper({ children }: { children: ReactNode }) {
+    return createElement(
+      QueryClientProvider,
+      { client: queryClient },
+      createElement(I18nextProvider, { i18n }, children),
+    );
+  };
+}
+
 describe("useFormattedScholarName — resolves the honorific via useTranslation(), no manual t needed", () => {
-  it("renders the English honorific when the app locale is en", () => {
-    const { result } = renderHook(() => useFormattedScholarName("Salih al-Fawzan", "sheikh"), {
-      wrapper: makeWrapper("en"),
+  it("prefixes the honorific once the matching scholar is found by slug", () => {
+    const { result } = renderHook(() => useFormattedScholarName("Salih al-Fawzan", "fawzan"), {
+      wrapper: makeWrapperWithScholars("en", [
+        { slug: "fawzan", name: "Salih al-Fawzan", title: "sheikh" },
+      ]),
     });
     expect(result.current).toBe("Sheikh Salih al-Fawzan");
   });
 
   it("renders the Arabic honorific when the app locale is ar — proves it's locale-driven, not hardcoded", () => {
-    const { result } = renderHook(() => useFormattedScholarName("صالح الفوزان", "sheikh"), {
-      wrapper: makeWrapper("ar"),
+    const { result } = renderHook(() => useFormattedScholarName("صالح الفوزان", "fawzan"), {
+      wrapper: makeWrapperWithScholars("ar", [
+        { slug: "fawzan", name: "صالح الفوزان", title: "sheikh" },
+      ]),
     });
     expect(result.current).toBe("الشيخ صالح الفوزان");
+  });
+
+  it("matches by slug even when scholarName's text doesn't match any cached entry's name — the regression this replaces text-matching for", () => {
+    // scholarName still holds stale-locale text (as it would right after a
+    // language switch, before its own source query has refetched) while the
+    // scholars list has already refetched to the new locale — the old
+    // implementation matched by comparing name text and would have failed
+    // (and dropped the honorific) in exactly this situation.
+    const { result } = renderHook(() => useFormattedScholarName("Salih al-Fawzan", "fawzan"), {
+      wrapper: makeWrapperWithScholars("ar", [
+        { slug: "fawzan", name: "صالح الفوزان", title: "sheikh" },
+      ]),
+    });
+    expect(result.current).toBe("الشيخ Salih al-Fawzan");
+  });
+
+  it("returns the plain name when no scholarSlug is given, rather than falling back to a text-matching lookup", () => {
+    const { result } = renderHook(() => useFormattedScholarName("Salih al-Fawzan", undefined), {
+      wrapper: makeWrapperWithScholars("en", [
+        { slug: "fawzan", name: "Salih al-Fawzan", title: "sheikh" },
+      ]),
+    });
+    expect(result.current).toBe("Salih al-Fawzan");
   });
 });
 

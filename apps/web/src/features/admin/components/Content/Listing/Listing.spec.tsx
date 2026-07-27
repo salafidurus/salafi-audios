@@ -23,6 +23,7 @@ describe("Listing", () => {
     id: "listing-1",
     title: "Test Lecture Title",
     scholarName: "Scholar Name",
+    scholarSlug: "scholar-name",
     status: "published",
     format: "single",
     createdAt: "2024-01-01",
