@@ -97,6 +97,7 @@ export function useSaveListing(
           scholarId: state.scholarId,
           format: state.format,
           language: state.language,
+          status: state.status,
           topics: state.selectedTopics,
           coverImageUrl: coverImage.url,
           coverImageKey: coverImage.key,
