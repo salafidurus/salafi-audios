@@ -21,22 +21,9 @@ export interface ListingModalProps {
   onClose: () => void;
   onSuccess: () => void | Promise<void>;
   listingId?: string | null;
-  initialAudioData?: {
-    audioKey: string;
-    durationSeconds: number;
-    sizeBytes: number;
-    format: string;
-    filename: string;
-  } | null;
 }
 
-export function ListingModal({
-  isOpen,
-  onClose,
-  onSuccess,
-  listingId,
-  initialAudioData,
-}: ListingModalProps) {
+export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingModalProps) {
   const { t } = useTranslation();
   const isDesktop = useIsDesktop();
   const [activeTab, setActiveTab] = useState<"general" | "main" | "review">("general");
@@ -110,14 +97,7 @@ export function ListingModal({
     }
   };
 
-  const handleSave = useSaveListing(
-    state,
-    dispatch,
-    initialAudioData,
-    onSuccess,
-    onClose,
-    setErrorTabs,
-  );
+  const handleSave = useSaveListing(state, dispatch, onSuccess, onClose, setErrorTabs);
 
   if (!state.isEditing && loading) {
     return (

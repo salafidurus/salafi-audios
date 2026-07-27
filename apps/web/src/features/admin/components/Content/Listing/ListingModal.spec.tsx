@@ -62,25 +62,12 @@ describe("ListingModal", () => {
     expect(screen.queryByText(/lecture details/i)).not.toBeInTheDocument();
   });
 
-  it("renders with create form fields and triggers save", async () => {
+  it("renders with create form fields and triggers save without any audio data", async () => {
     const onSuccessMock = vi.fn();
     const onCloseMock = vi.fn();
     (createLecture as Mock<any>).mockResolvedValue({ id: "new-lecture-id" });
 
-    render(
-      <ListingModal
-        isOpen
-        onClose={onCloseMock}
-        onSuccess={onSuccessMock}
-        initialAudioData={{
-          audioKey: "audio/new-key.mp3",
-          durationSeconds: 300,
-          sizeBytes: 50000,
-          format: "audio/mp3",
-          filename: "test.mp3",
-        }}
-      />,
-    );
+    render(<ListingModal isOpen onClose={onCloseMock} onSuccess={onSuccessMock} />);
 
     expect(screen.getByText(/new listing details/i)).toBeInTheDocument();
 
@@ -114,13 +101,18 @@ describe("ListingModal", () => {
           slug: "scholar-one-my-great-lecture",
           scholarId: "scholar-1",
           format: "single",
-          audioKey: "audio/new-key.mp3",
-          durationSeconds: 300,
-          sizeBytes: 50000,
           language: "ar",
         }),
       );
     });
+
+    const createLecturePayload = (createLecture as Mock<any>).mock.calls[0]?.[0] as Record<
+      string,
+      unknown
+    >;
+    expect(createLecturePayload.audioKey).toBeUndefined();
+    expect(createLecturePayload.durationSeconds).toBeUndefined();
+    expect(createLecturePayload.sizeBytes).toBeUndefined();
 
     expect(onSuccessMock).toHaveBeenCalledTimes(1);
     expect(onCloseMock).toHaveBeenCalledTimes(1);

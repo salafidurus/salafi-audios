@@ -9,14 +9,6 @@ import {
 } from "@/features/admin/api/admin-lectures.api";
 import type { FormAction, FormState } from "./useListingForm";
 
-interface InitialAudioData {
-  audioKey: string;
-  durationSeconds: number;
-  sizeBytes: number;
-  format: string;
-  filename: string;
-}
-
 async function uploadStagedCoverImage(
   state: FormState,
 ): Promise<{ url: string | undefined; key: string | undefined }> {
@@ -38,7 +30,6 @@ async function uploadStagedCoverImage(
 export function useSaveListing(
   state: FormState,
   dispatch: (action: FormAction) => void,
-  initialAudioData: InitialAudioData | null | undefined,
   onSuccess: () => void | Promise<void>,
   onClose: () => void,
   setErrorTabs: (tabs: string[]) => void,
@@ -99,15 +90,6 @@ export function useSaveListing(
 
         await updateListingDetails(state.id, payload);
       } else {
-        if (!initialAudioData) {
-          throw new Error(
-            t(
-              "admin.contents.listing.audioKeyRequired",
-              "Audio file key is required for creation.",
-            ),
-          );
-        }
-
         const coverImage = await uploadStagedCoverImage(state);
         await createLecture({
           title: state.title,
@@ -116,9 +98,6 @@ export function useSaveListing(
           format: state.format,
           language: state.language,
           topics: state.selectedTopics,
-          audioKey: initialAudioData.audioKey,
-          durationSeconds: initialAudioData.durationSeconds,
-          sizeBytes: initialAudioData.sizeBytes,
           coverImageUrl: coverImage.url,
           coverImageKey: coverImage.key,
         });
