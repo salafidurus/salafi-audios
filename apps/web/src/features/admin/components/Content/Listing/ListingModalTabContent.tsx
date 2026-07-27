@@ -5,6 +5,7 @@ import type { Locale, ScholarListItemDto, TopicDetailDto, ListingRefDto } from "
 import { Modal } from "@/shared/components/Modal";
 import { ListingGeneralSection } from "./ListingGeneralSection";
 import { ListingTranslatableFields } from "./ListingTranslatableFields";
+import { ListingSublistingsTab } from "./ListingSublistingsTab";
 import { ListingReviewSection } from "./ListingReviewSection";
 import type { FormAction, FormState } from "@/features/admin/hooks/Content/useListingForm";
 import styles from "./listing-modal.module.css";
@@ -23,6 +24,7 @@ interface ListingModalTabContentProps {
   isEditing?: boolean;
   onImageStaged?: (file: File | null, preview: string | null) => void;
   stagedImagePreview?: string | null;
+  showSublistingsTab?: boolean;
 }
 
 export function ListingModalTabContent({
@@ -39,6 +41,7 @@ export function ListingModalTabContent({
   isEditing = false,
   onImageStaged,
   stagedImagePreview,
+  showSublistingsTab = false,
 }: ListingModalTabContentProps) {
   const { formError } = state;
 
@@ -74,6 +77,12 @@ export function ListingModalTabContent({
           }
         />
       </Modal.ContentItem>
+
+      {showSublistingsTab && state.id && (
+        <Modal.ContentItem id="sublistings">
+          <ListingSublistingsTab rootListingId={state.id} />
+        </Modal.ContentItem>
+      )}
 
       <Modal.ContentItem id="review">
         {formError && <div className={styles.errorBanner}>{formError}</div>}

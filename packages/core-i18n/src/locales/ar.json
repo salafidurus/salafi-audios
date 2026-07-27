@@ -702,6 +702,8 @@
         "orderIndexLabel": "مؤشر الترتيب",
         "topicsLabel": "المواضيع",
         "noTopicsAvailable": "لا توجد مواضيع متاحة",
+        "sublistingsTab": "القوائم الفرعية",
+        "titleRequired": "يجب ألا يكون العنوان فارغًا",
         "uploadTab": "رفع الصوت",
         "arrangeTab": "ترتيب",
         "languageLabel": "اللغة",

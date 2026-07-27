@@ -5,12 +5,23 @@ import {
   createLecture,
   updateListingDetails,
   fetchListingFormData,
+  fetchArrangeData,
 } from "@/features/admin/api/admin-lectures.api";
 
 vi.mock("@/features/admin/api/admin-lectures.api", () => ({
   createLecture: vi.fn(),
   updateListingDetails: vi.fn(),
   fetchListingFormData: vi.fn(),
+  fetchArrangeData: vi.fn().mockResolvedValue({
+    id: "root",
+    slug: "root",
+    title: "Root",
+    format: "series",
+    scholarId: "scholar-1",
+    status: "published",
+    modules: [],
+    lessons: [],
+  }),
 }));
 
 vi.mock("@sd/core-contracts", () => {
@@ -321,5 +332,72 @@ describe("ListingModal", () => {
     // Description and topics were never touched, so they must not appear as changes.
     expect(screen.queryByText("Existing Description")).not.toBeInTheDocument();
     expect(screen.queryByText("Topic One")).not.toBeInTheDocument();
+  });
+
+  it("shows a Sub-listings tab when editing a series listing, and loads its children", async () => {
+    (fetchListingFormData as Mock<any>).mockResolvedValue({
+      listing: {
+        id: "series-123",
+        title: "Series Title",
+        slug: "series-title",
+        description: "",
+        format: "series" as const,
+        status: "published" as const,
+        scholarId: "scholar-2",
+        scholarName: "Scholar Two",
+        orderIndex: 0,
+        topics: ["topic-1"],
+        language: "ar" as const,
+        createdAt: "2024-01-01",
+      },
+      translations: [],
+    });
+
+    render(<ListingModal isOpen onClose={vi.fn()} onSuccess={vi.fn()} listingId="series-123" />);
+
+    await waitFor(() => {
+      expect(fetchListingFormData).toHaveBeenCalledWith("series-123");
+    });
+
+    const sublistingsTab = await screen.findByRole("tab", { name: /sub-listings/i });
+    fireEvent.click(sublistingsTab);
+
+    await waitFor(() => {
+      expect(fetchArrangeData).toHaveBeenCalledWith("series-123");
+    });
+  });
+
+  it("does not show a Sub-listings tab for a single-format listing", async () => {
+    (fetchListingFormData as Mock<any>).mockResolvedValue({
+      listing: {
+        id: "single-123",
+        title: "Single Title",
+        slug: "single-title",
+        description: "",
+        format: "single" as const,
+        status: "published" as const,
+        scholarId: "scholar-2",
+        scholarName: "Scholar Two",
+        orderIndex: 0,
+        topics: ["topic-1"],
+        language: "ar" as const,
+        createdAt: "2024-01-01",
+      },
+      translations: [],
+    });
+
+    render(<ListingModal isOpen onClose={vi.fn()} onSuccess={vi.fn()} listingId="single-123" />);
+
+    await waitFor(() => {
+      expect(fetchListingFormData).toHaveBeenCalledWith("single-123");
+    });
+
+    expect(screen.queryByRole("tab", { name: /sub-listings/i })).not.toBeInTheDocument();
+  });
+
+  it("does not show a Sub-listings tab when creating a new listing", () => {
+    render(<ListingModal isOpen onClose={vi.fn()} onSuccess={vi.fn()} />);
+
+    expect(screen.queryByRole("tab", { name: /sub-listings/i })).not.toBeInTheDocument();
   });
 });

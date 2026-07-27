@@ -26,7 +26,9 @@ export interface ListingModalProps {
 export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingModalProps) {
   const { t } = useTranslation();
   const isDesktop = useIsDesktop();
-  const [activeTab, setActiveTab] = useState<"general" | "main" | "review">("general");
+  const [activeTab, setActiveTab] = useState<"general" | "main" | "sublistings" | "review">(
+    "general",
+  );
   const [errorTabs, setErrorTabs] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -118,6 +120,7 @@ export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingM
   const series = (seriesData ?? []) as ListingRefDto[];
   const mainLocale = (state.language || "ar") as Locale;
   const errorTabSet = new Set(errorTabs);
+  const showSublistingsTab = state.isEditing && !!state.id && state.format !== "single";
 
   return (
     <Modal
@@ -145,6 +148,11 @@ export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingM
         <Modal.Tabs errorTabs={errorTabs}>
           <Modal.TabItem id="general">{t("admin.modal.generalTab", "General")}</Modal.TabItem>
           <Modal.TabItem id="main">{getLocaleLabel(mainLocale)}</Modal.TabItem>
+          {showSublistingsTab && (
+            <Modal.TabItem id="sublistings">
+              {t("admin.contents.listing.sublistingsTab", "Sub-listings")}
+            </Modal.TabItem>
+          )}
           <Modal.TabItem id="review">{t("admin.modal.reviewTab", "Review")}</Modal.TabItem>
         </Modal.Tabs>
 
@@ -162,6 +170,7 @@ export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingM
           isEditing={state.isEditing}
           onImageStaged={handleImageStaged}
           stagedImagePreview={state.stagedImagePreview}
+          showSublistingsTab={showSublistingsTab}
         />
       </form>
     </Modal>

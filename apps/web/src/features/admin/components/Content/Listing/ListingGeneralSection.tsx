@@ -4,7 +4,6 @@ import React from "react";
 import type { ScholarListItemDto, TopicDetailDto, ListingRefDto, Locale } from "@sd/core-contracts";
 import { getLocalizedName, SUPPORTED_LOCALES } from "@sd/core-i18n";
 import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
-import { validateLectureStatus } from "@/shared/types/form-types";
 import { InputField } from "@/shared/components/InputField";
 import { ImageUploadEditor } from "@/shared/components/ImageUploadEditor";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -18,6 +17,7 @@ import {
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 import { deriveChildSlug } from "@/features/admin/utils/slugify";
 import type { FormAction, FormState } from "@/features/admin/hooks/Content/useListingForm";
+import { ListingStatusOrderFields } from "./ListingStatusOrderFields";
 import styles from "./listing-modal.module.css";
 
 interface ListingGeneralSectionProps {
@@ -216,62 +216,14 @@ export function ListingGeneralSection({
         </div>
       </div>
 
-      <div className={styles.formRow}>
-        <div className={styles.formGroup}>
-          <label htmlFor="lecture-status" className={styles.label}>
-            {t("admin.contents.listing.statusLabel", "Status")}
-          </label>
-          <Dropdown
-            value={status}
-            onValueChange={(value) =>
-              dispatch({
-                type: "UPDATE_FIELD",
-                field: "status",
-                value: validateLectureStatus(value),
-              })
-            }
-          >
-            <DropdownTrigger
-              id="lecture-status"
-              placeholder={t("admin.contents.listing.statusPlaceholder", "Select Status")}
-              testId="status-dropdown"
-            />
-            <DropdownContent>
-              <DropdownItem value="draft">
-                {t("admin.contents.listing.draft", "Draft")}
-              </DropdownItem>
-              <DropdownItem value="review">
-                {t("admin.contents.listing.review", "In Review")}
-              </DropdownItem>
-              <DropdownItem value="published">
-                {t("admin.contents.listing.published", "Published")}
-              </DropdownItem>
-              <DropdownItem value="archived">
-                {t("admin.contents.listing.archived", "Archived")}
-              </DropdownItem>
-            </DropdownContent>
-          </Dropdown>
-        </div>
-
-        <div className={styles.formGroup}>
-          <label htmlFor="lecture-order" className={styles.label}>
-            {t("admin.contents.listing.orderIndexLabel", "Order Index")}
-          </label>
-          <InputField
-            id="lecture-order"
-            type="number"
-            value={String(orderIndex ?? "")}
-            onChange={(value) => {
-              const parsed = value ? Number(value) : undefined;
-              dispatch({
-                type: "UPDATE_FIELD",
-                field: "orderIndex",
-                value: Number.isNaN(parsed) ? 0 : (parsed ?? 0),
-              });
-            }}
-          />
-        </div>
-      </div>
+      <ListingStatusOrderFields
+        status={status}
+        orderIndex={orderIndex}
+        onStatusChange={(value) => dispatch({ type: "UPDATE_FIELD", field: "status", value })}
+        onOrderIndexChange={(value) =>
+          dispatch({ type: "UPDATE_FIELD", field: "orderIndex", value })
+        }
+      />
 
       <div className={styles.formGroup}>
         <span className={styles.label}>{t("admin.contents.listing.topicsLabel", "Topics")} *</span>
