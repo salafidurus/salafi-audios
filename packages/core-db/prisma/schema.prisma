@@ -253,9 +253,9 @@ model Scholar {
   updatedAt    DateTime      @updatedAt
 
   // Decoupled audit columns
-  createdBy String? @db.Uuid
-  updatedBy String? @db.Uuid
-  deletedBy String? @db.Uuid
+  createdBy String?
+  updatedBy String?
+  deletedBy String?
 
   // Social links
   socialTwitter  String?
@@ -303,9 +303,9 @@ model Listing {
   deleteAfterAt DateTime?
 
   // Decoupled audit columns
-  createdBy String? @db.Uuid
-  updatedBy String? @db.Uuid
-  deletedBy String? @db.Uuid
+  createdBy String?
+  updatedBy String?
+  deletedBy String?
 
   ingestionBatchId String?
   ingestionBatch   IngestionBatch? @relation("IngestBatchListings", fields: [ingestionBatchId], references: [id])

@@ -118,6 +118,52 @@ describe("Listing model schema", () => {
   });
 });
 
+// -- 4. Decoupled audit columns must match User.id's actual type -------------
+//
+// User.id is populated at runtime by better-auth's own ID generator (a
+// 32-char mixed-case alphanumeric string), not a real UUID. The decoupled
+// createdBy/updatedBy/deletedBy audit columns on Listing and Scholar store
+// User.id values, so they must be plain text columns — not @db.Uuid, which
+// rejects non-UUID strings with "invalid input syntax for type uuid".
+
+describe("Decoupled audit columns (createdBy/updatedBy/deletedBy)", () => {
+  it("are plain String columns on Listing, not @db.Uuid", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+
+    const schemaPath = path.resolve(__dirname, "../prisma/schema.prisma");
+    const schemaContent = fs.readFileSync(schemaPath, "utf-8");
+
+    const listingModelMatch = schemaContent.match(/model Listing\s*{[^}]+}/);
+    expect(listingModelMatch).toBeTruthy();
+
+    const listingModel = listingModelMatch![0];
+    for (const field of ["createdBy", "updatedBy", "deletedBy"]) {
+      const fieldMatch = listingModel.match(new RegExp(`${field}\\s+String\\?[^\\n]*`));
+      expect(fieldMatch).toBeTruthy();
+      expect(fieldMatch![0]).not.toMatch(/@db\.Uuid/);
+    }
+  });
+
+  it("are plain String columns on Scholar, not @db.Uuid", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+
+    const schemaPath = path.resolve(__dirname, "../prisma/schema.prisma");
+    const schemaContent = fs.readFileSync(schemaPath, "utf-8");
+
+    const scholarModelMatch = schemaContent.match(/model Scholar\s*{[^}]+}/);
+    expect(scholarModelMatch).toBeTruthy();
+
+    const scholarModel = scholarModelMatch![0];
+    for (const field of ["createdBy", "updatedBy", "deletedBy"]) {
+      const fieldMatch = scholarModel.match(new RegExp(`${field}\\s+String\\?[^\\n]*`));
+      expect(fieldMatch).toBeTruthy();
+      expect(fieldMatch![0]).not.toMatch(/@db\.Uuid/);
+    }
+  });
+});
+
 describe("User cascade deletions", () => {
   it("enforces cascade deletes on UserListingProgress and FavoriteListing user relations", async () => {
     const fs = await import("node:fs");
