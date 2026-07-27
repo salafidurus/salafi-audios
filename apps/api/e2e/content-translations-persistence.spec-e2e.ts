@@ -376,7 +376,7 @@ describe('Content translations persistence (e2e)', () => {
       if (listingId) await prisma.listing.delete({ where: { id: listingId } });
     });
 
-    it('GET /admin/scholars resolves name to the request locale and searches across translations', async () => {
+    it('GET /admin/scholars resolves name and bio to the request locale and searches across translations', async () => {
       const marker = crypto.randomUUID().slice(0, 8);
       const createAuth = await authFactory.createAdminUser([Permission.SCHOLARS_CREATE]);
       const createRes = await request(app.getHttpServer())
@@ -384,6 +384,7 @@ describe('Content translations persistence (e2e)', () => {
         .set(createAuth.headers)
         .send({
           name: `اسم عربي ${marker}`,
+          bio: `سيرة عربية ${marker}`,
           slug: `e2e-admin-locale-scholar-${marker}`,
           mainLanguage: 'ar',
           country: 'SA',
@@ -398,7 +399,7 @@ describe('Content translations persistence (e2e)', () => {
       await request(app.getHttpServer())
         .post(`/scholars/${scholarId}/translations`)
         .set(translateAuth.headers)
-        .send({ locale: 'en', name: `English Name ${marker}` })
+        .send({ locale: 'en', name: `English Name ${marker}`, bio: `English Bio ${marker}` })
         .expect(201);
       await request(app.getHttpServer())
         .post(`/scholars/${scholarId}/translations/en/publish`)
@@ -412,6 +413,7 @@ describe('Content translations persistence (e2e)', () => {
         .expect(200);
       const found = listRes.body.items.find((s: any) => s.id === scholarId);
       expect(found?.name).toBe(`English Name ${marker}`);
+      expect(found?.bio).toBe(`English Bio ${marker}`);
 
       const searchRes = await request(app.getHttpServer())
         .get(`/admin/scholars?search=${encodeURIComponent(`English Name ${marker}`)}`)

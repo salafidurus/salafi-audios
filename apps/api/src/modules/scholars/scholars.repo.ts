@@ -472,7 +472,7 @@ export class ScholarsRepository {
         createdAt: true,
         updatedAt: true,
         translations: {
-          select: { locale: true, name: true, status: true },
+          select: { locale: true, name: true, bio: true, status: true },
           orderBy: { locale: 'asc' },
         },
       },
@@ -484,18 +484,20 @@ export class ScholarsRepository {
         const published = r.translations.find(
           (t) => t.locale === locale && t.status === 'published',
         );
-        const resolvedName = resolveContentTranslation({
-          base: { name: r.name },
+        const resolved = resolveContentTranslation({
+          base: { name: r.name, bio: r.bio ?? undefined },
           originalLanguage: r.mainLanguage,
           targetLocale: locale,
-          publishedTranslation: published ? { name: published.name } : null,
-        }).fields.name;
+          publishedTranslation: published
+            ? { name: published.name, bio: published.bio ?? undefined }
+            : null,
+        }).fields;
 
         return {
           id: r.id,
           slug: r.slug,
-          name: resolvedName,
-          bio: r.bio ?? undefined,
+          name: resolved.name,
+          bio: resolved.bio,
           country: (r.country ?? undefined) as AdminScholarListItemDto['country'],
           mainLanguage: r.mainLanguage ?? undefined,
           imageUrl: r.imageUrl ?? undefined,
