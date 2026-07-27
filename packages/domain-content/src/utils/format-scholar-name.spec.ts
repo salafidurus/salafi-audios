@@ -21,7 +21,7 @@ import {
 const englishT = (key: string) =>
   ({
     "scholar.title.allamah": "Shaykh Allamah",
-    "scholar.title.sheikh": "Sheikh",
+    "scholar.title.sheikh": "Shaykh",
     "scholar.title.ustadh": "Ustadh",
     "scholar.title.akh": "Akh",
   })[key] ?? key;
@@ -38,7 +38,7 @@ describe("formatScholarName", () => {
   it("formats scholar name with 'sheikh' title object", () => {
     expect(
       formatScholarName({ name: "Salih al-Fawzan", title: "sheikh" }, undefined, englishT),
-    ).toBe("Sheikh Salih al-Fawzan");
+    ).toBe("Shaykh Salih al-Fawzan");
   });
 
   it("formats scholar name with 'allamah' title object", () => {
@@ -73,12 +73,12 @@ describe("formatScholarName", () => {
   });
 
   it("formats string name with title parameter", () => {
-    expect(formatScholarName("Salih al-Fawzan", "sheikh", englishT)).toBe("Sheikh Salih al-Fawzan");
+    expect(formatScholarName("Salih al-Fawzan", "sheikh", englishT)).toBe("Shaykh Salih al-Fawzan");
   });
 
   it("prevents double-prefixing if name already starts with title display", () => {
-    expect(formatScholarName("Sheikh Salih al-Fawzan", "sheikh", englishT)).toBe(
-      "Sheikh Salih al-Fawzan",
+    expect(formatScholarName("Shaykh Salih al-Fawzan", "sheikh", englishT)).toBe(
+      "Shaykh Salih al-Fawzan",
     );
     expect(
       formatScholarName("Shaykh Allamah Muhammad Nasiruddin al-Albani", "allamah", englishT),
@@ -104,7 +104,7 @@ function makeWrapper(locale: "en" | "ar") {
     lng: locale,
     fallbackLng: "en",
     resources: {
-      en: { translation: { scholar: { title: { sheikh: "Sheikh", allamah: "Shaykh Allamah" } } } },
+      en: { translation: { scholar: { title: { sheikh: "Shaykh", allamah: "Shaykh Allamah" } } } },
       ar: { translation: { scholar: { title: { sheikh: "الشيخ", allamah: "الشيخ العلامة" } } } },
     },
     interpolation: { escapeValue: false },
@@ -123,7 +123,7 @@ function makeWrapperWithScholars(
     lng: locale,
     fallbackLng: "en",
     resources: {
-      en: { translation: { scholar: { title: { sheikh: "Sheikh", allamah: "Shaykh Allamah" } } } },
+      en: { translation: { scholar: { title: { sheikh: "Shaykh", allamah: "Shaykh Allamah" } } } },
       ar: { translation: { scholar: { title: { sheikh: "الشيخ", allamah: "الشيخ العلامة" } } } },
     },
     interpolation: { escapeValue: false },
@@ -148,7 +148,7 @@ describe("useFormattedScholarName — resolves the honorific via useTranslation(
         { slug: "fawzan", name: "Salih al-Fawzan", title: "sheikh" },
       ]),
     });
-    expect(result.current).toBe("Sheikh Salih al-Fawzan");
+    expect(result.current).toBe("Shaykh Salih al-Fawzan");
   });
 
   it("renders the Arabic honorific when the app locale is ar — proves it's locale-driven, not hardcoded", () => {

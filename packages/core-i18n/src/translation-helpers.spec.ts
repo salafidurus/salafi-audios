@@ -36,14 +36,14 @@ describe("getScholarTitleLabel", () => {
   const t = (key: string) =>
     ({
       "scholar.title.allamah": "Shaykh Allamah",
-      "scholar.title.sheikh": "Sheikh",
+      "scholar.title.sheikh": "Shaykh",
       "scholar.title.ustadh": "Ustadh",
       "scholar.title.akh": "Akh",
     })[key] ?? key;
 
   it("resolves each known ScholarTitle to its translated label via the injected t function", () => {
     expect(getScholarTitleLabel("allamah", t)).toBe("Shaykh Allamah");
-    expect(getScholarTitleLabel("sheikh", t)).toBe("Sheikh");
+    expect(getScholarTitleLabel("sheikh", t)).toBe("Shaykh");
     expect(getScholarTitleLabel("ustadh", t)).toBe("Ustadh");
     expect(getScholarTitleLabel("akh", t)).toBe("Akh");
   });
