@@ -26,7 +26,7 @@ const fallbackQueryClient = new QueryClient({
  * `t` automatically via `useTranslation()`.
  *
  * Examples:
- * - formatScholarName({ name: "Salih al-Fawzan", title: "sheikh" }, undefined, t) => "Sheikh Salih al-Fawzan"
+ * - formatScholarName({ name: "Salih al-Fawzan", title: "sheikh" }, undefined, t) => "Shaykh Salih al-Fawzan"
  * - formatScholarName("Muhammad Nasiruddin al-Albani", "allamah", t) => "Shaykh Allamah Muhammad Nasiruddin al-Albani"
  */
 export function formatScholarName(

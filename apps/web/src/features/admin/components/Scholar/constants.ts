@@ -2,7 +2,7 @@ import type { ScholarTitle } from "@sd/core-contracts";
 
 export const SCHOLAR_TITLE_LABELS: Record<ScholarTitle, string> = {
   allamah: "Allamah",
-  sheikh: "Sheikh",
+  sheikh: "Shaykh",
   ustadh: "Ustadh",
   akh: "Akh",
 };

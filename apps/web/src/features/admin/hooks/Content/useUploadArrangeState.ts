@@ -162,7 +162,7 @@ function nextOrderIndex(state: UploadArrangeState, moduleKey: ModuleKey): number
 }
 
 /** The slug an item/module must be prefixed by, given its immediate parent container. */
-function resolveParentSlug(state: UploadArrangeState, moduleKey: ModuleKey): string {
+export function resolveParentSlug(state: UploadArrangeState, moduleKey: ModuleKey): string {
   if (moduleKey === ROOT_MODULE_KEY) return state.existing?.slug ?? "";
   if (moduleKey.startsWith("new:")) {
     const tempId = moduleKey.slice("new:".length);
@@ -438,13 +438,25 @@ function reducer(state: UploadArrangeState, action: UploadArrangeAction): Upload
 
     case "REMOVE_MODULE": {
       const moduleKey = `new:${action.tempId}`;
+      const rootSlug = resolveParentSlug(state, ROOT_MODULE_KEY);
       return {
         ...state,
         newModules: state.newModules.filter((mod) => mod.tempId !== action.tempId),
-        // Reassign orphaned items back to root so they stay visible.
+        // Reassign orphaned items back to root so they stay visible, re-deriving
+        // their slug against the root (unless manually edited) since they no
+        // longer sit under the removed module's prefix.
         items: state.items.map((item) =>
           item.assignment.kind === "new-lesson" && item.assignment.moduleKey === moduleKey
-            ? { ...item, assignment: { ...item.assignment, moduleKey: ROOT_MODULE_KEY } }
+            ? {
+                ...item,
+                assignment: {
+                  ...item.assignment,
+                  moduleKey: ROOT_MODULE_KEY,
+                  slug: item.assignment.slugEdited
+                    ? item.assignment.slug
+                    : deriveChildSlug(rootSlug, item.title),
+                },
+              }
             : item,
         ),
       };

@@ -267,7 +267,8 @@ describe("useUploadArrangeState", () => {
         assignment: {
           kind: "new-lesson",
           moduleKey: `new:${tempId}`,
-          slug: "bukhari-hadith-9",
+          // Module-prefixed slug ("temp-module-hadith-9"), not root-prefixed.
+          slug: "bukhari-temp-module-hadith-9",
           slugEdited: false,
           description: "",
           status: "draft",
@@ -280,6 +281,41 @@ describe("useUploadArrangeState", () => {
     const after = hook.result.current.state.items[0]!.assignment;
     expect(after.kind === "new-lesson" && after.moduleKey).toBe(ROOT_MODULE_KEY);
     expect(hook.result.current.state.newModules).toHaveLength(0);
+    // Falling back to root must re-prefix with the root's slug, not keep the
+    // removed module's stale prefix.
+    expect(after.kind === "new-lesson" && after.slug).toBe("bukhari-hadith-9");
+  });
+
+  it("does not overwrite a manually-edited slug when its module is removed", () => {
+    const hook = setup(collectionData);
+    act(() =>
+      hook.result.current.dispatch({
+        type: "ADD_FILES",
+        files: [{ file: makeFile("Hadith 9.mp3"), durationSeconds: 10 }],
+      }),
+    );
+    act(() => hook.result.current.dispatch({ type: "ADD_MODULE", title: "Temp Module" }));
+    const tempId = hook.result.current.state.newModules[0]!.tempId;
+    const item = hook.result.current.state.items[0]!;
+    act(() =>
+      hook.result.current.dispatch({
+        type: "SET_ASSIGNMENT",
+        itemId: item.id,
+        assignment: {
+          kind: "new-lesson",
+          moduleKey: `new:${tempId}`,
+          slug: "custom-manual-slug",
+          slugEdited: true,
+          description: "",
+          status: "draft",
+          orderIndex: 1,
+        },
+      }),
+    );
+    act(() => hook.result.current.dispatch({ type: "REMOVE_MODULE", tempId }));
+
+    const after = hook.result.current.state.items[0]!.assignment;
+    expect(after.kind === "new-lesson" && after.slug).toBe("custom-manual-slug");
   });
 
   describe("immediate-parent slug prefix on reassignment", () => {
