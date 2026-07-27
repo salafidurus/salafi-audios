@@ -1,3 +1,4 @@
+import { resolve } from 'node:path';
 import { PrismaService } from '../../src/core/db/prisma.service';
 
 function uuid(index: number): string {
@@ -14,101 +15,13 @@ export const TEST_LIVE_CHANNEL_ID = 'e2e-live-channel-1';
 export const TEST_LIVE_CHANNEL_TELEGRAM_ID = '-10022334455';
 
 export async function seedTestData(prisma: PrismaService): Promise<void> {
-  // Seed regular scholars from seed data
-  const SCHOLARS = [
-    {
-      id: uuid(1),
-      slug: 'uthaymin',
-      name: 'Muhammad ibn Salih al-Uthaymin',
-      bio: 'Foremost scholar of Ahl al-Sunnah in the 20th century.',
-      country: 'SA',
-      mainLanguage: 'ar' as const,
-      title: 'allamah' as const,
-      orderIndex: 1,
-    },
-    {
-      id: uuid(2),
-      slug: 'fawzan',
-      name: 'Salih ibn Fawzan al-Fawzan',
-      bio: 'The Grand Mufti of the Kingdom of Saudi Arabia.',
-      country: 'SA',
-      mainLanguage: 'ar' as const,
-      title: 'allamah' as const,
-      orderIndex: 0,
-    },
-    {
-      id: uuid(3),
-      slug: 'arafat',
-      name: 'Arafat bn Hasan Al-Muhammadi',
-      bio: 'Contemporary Salafi scholar based in Saudi Arabia.',
-      country: 'YE',
-      mainLanguage: 'ar' as const,
-      title: 'sheikh' as const,
-      orderIndex: 0,
-    },
-    {
-      id: uuid(4),
-      slug: 'mustafa-bn-mabram',
-      name: 'Mustafa bn Mabram',
-      bio: 'Specialist in Arabic grammar.',
-      country: 'YE',
-      mainLanguage: 'ar' as const,
-      title: 'ustadh' as const,
-      orderIndex: 0,
-    },
-    {
-      id: uuid(5),
-      slug: 'abdullah-al-bukhari',
-      name: 'Abdullah al-Bukhari',
-      bio: 'Contemporary muhaddith specializing in hadith sciences.',
-      country: 'SA',
-      mainLanguage: 'ar' as const,
-      title: 'akh' as const,
-      orderIndex: 0,
-    },
-  ];
-
-  for (const scholar of SCHOLARS) {
-    await prisma.scholar.upsert({
-      where: { id: scholar.id },
-      update: {
-        slug: scholar.slug,
-        name: scholar.name,
-        title: scholar.title,
-        orderIndex: scholar.orderIndex,
-      },
-      create: {
-        ...scholar,
-        isActive: true,
-      },
-    });
-  }
-
-  // Seed regular topics from seed data
-  const TOPICS = [
-    { id: uuid(10), slug: 'aqeedah', name: 'Aqeedah', orderIndex: 1 },
-    { id: uuid(11), slug: 'nahw', name: 'Nahw', orderIndex: 4 },
-    { id: uuid(12), slug: 'hadith', name: 'Hadith', orderIndex: 2 },
-    { id: uuid(13), slug: 'fiqh', name: 'Fiqh', orderIndex: 0 },
-    { id: uuid(14), slug: 'tafsir', name: 'Tafsir', orderIndex: 3 },
-  ];
-
-  for (const topic of TOPICS) {
-    await prisma.topic.upsert({
-      where: { id: topic.id },
-      update: {
-        slug: topic.slug,
-        name: topic.name,
-        orderIndex: topic.orderIndex,
-      },
-      create: {
-        id: topic.id,
-        slug: topic.slug,
-        name: topic.name,
-        orderIndex: topic.orderIndex,
-      },
-    });
-  }
+  // Seed regular scholars/topics from the canonical seed data — imported
+  // directly (not duplicated here) so this fixture can never drift from
+  // packages/core-db/scripts/seed/data, per apps/api/e2e/AGENT.md.
+  const seedersDir = resolve(__dirname, '../../../../packages/core-db/scripts/seed/seeders');
+  const { seedScholars, seedTopics } = await import(resolve(seedersDir, 'index.js'));
+  await seedScholars(prisma);
+  await seedTopics(prisma);
 
   // Create test scholar (for other e2e tests). `update` restores the same
   // baseline fields as `create` — other suites (or manual DB edits) can

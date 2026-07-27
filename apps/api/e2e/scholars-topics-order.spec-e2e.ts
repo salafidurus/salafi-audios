@@ -28,27 +28,29 @@ describe('Scholar/Topic order-by (e2e)', () => {
       expect(slugs).toContain('uthaymin');
     });
 
-    it('returns scholars in title→orderIndex order: allamah(0,1), sheikh, ustadh, akh, untitled', async () => {
+    it('returns scholars in title→orderIndex order: allamah, sheikh, untitled', async () => {
       const res = await request(app.getHttpServer()).get('/scholars').expect(200);
       const slugs = res.body.scholars.map((s: any) => s.slug);
       const relevant = slugs.filter((s: string) =>
         [
-          'fawzan',
           'uthaymin',
+          'fawzan',
+          'bukhari',
+          'mabram',
           'arafat',
-          'mustafa-bn-mabram',
-          'abdullah-al-bukhari',
+          'khalid',
           'e2e-scholar-slug',
         ].includes(s),
       );
 
       expect(relevant).toEqual([
-        'fawzan', // allamah, orderIndex 0
-        'uthaymin', // allamah, orderIndex 1
-        'arafat', // sheikh, orderIndex 0
-        'mustafa-bn-mabram', // ustadh, orderIndex 0
-        'abdullah-al-bukhari', // akh, orderIndex 0
-        'e2e-scholar-slug', // no title (null), orderIndex 0
+        'uthaymin', // allamah, orderIndex 21
+        'fawzan', // allamah, orderIndex 60
+        'bukhari', // allamah, orderIndex 90
+        'mabram', // sheikh, orderIndex 30
+        'arafat', // sheikh, orderIndex 60
+        'khalid', // sheikh, orderIndex 999
+        'e2e-scholar-slug', // no title (null), orderIndex 999 (default)
       ]);
     });
   });
@@ -60,11 +62,11 @@ describe('Scholar/Topic order-by (e2e)', () => {
 
       const slugs = res.body.map((t: any) => t.slug);
       const relevant = slugs.filter((s: string) =>
-        ['fiqh', 'aqeedah', 'hadith', 'tafsir', 'nahw'].includes(s),
+        ['aqeedah', 'tafsir', 'hadith', 'fiqh', 'nahw'].includes(s),
       );
 
-      // Deliberately non-alphabetical: fiqh:0, aqeedah:1, hadith:2, tafsir:3, nahw:4
-      expect(relevant).toEqual(['fiqh', 'aqeedah', 'hadith', 'tafsir', 'nahw']);
+      // Deliberately non-alphabetical: aqeedah:0, tafsir:1, hadith:2, fiqh:3, nahw:4
+      expect(relevant).toEqual(['aqeedah', 'tafsir', 'hadith', 'fiqh', 'nahw']);
     });
   });
 });

@@ -938,7 +938,7 @@ export class ListingRepository {
           title: dto.title,
           slug,
           format: dto.format,
-          status: Status.draft,
+          status: dto.status ?? Status.draft,
           language: dto.language ?? 'ar',
           durationSeconds: dto.durationSeconds ?? undefined,
           scholarId: dto.scholarId,

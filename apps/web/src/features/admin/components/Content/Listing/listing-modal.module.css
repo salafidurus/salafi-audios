@@ -122,3 +122,71 @@
     gap: var(--space-component-gap-md);
   }
 }
+
+.loading {
+  padding: var(--space-scale-xl);
+  text-align: center;
+  color: var(--content-muted);
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+}
+
+.error {
+  background-color: var(--state-danger-surface);
+  border: 1px solid var(--state-danger-border);
+  color: var(--state-danger-content);
+  padding: var(--space-scale-md);
+  border-radius: var(--radius-scale-sm);
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+}
+
+.emptyState {
+  padding: var(--space-scale-xl);
+  text-align: center;
+  color: var(--content-muted);
+  font-family: var(--typo-body-sm-font-family);
+  font-size: var(--typo-body-sm-font-size);
+}
+
+.childrenTab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-md);
+}
+
+.childrenList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
+}
+
+.childItem {
+  justify-content: flex-start;
+  text-align: start;
+}
+
+.childItemIndent {
+  margin-inline-start: var(--space-scale-lg);
+}
+
+.childItemModule {
+  font-weight: var(--typo-label-md-font-weight);
+}
+
+.childDetail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-component-gap-md);
+}
+
+.backRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-sm);
+}
+
+.childDetailActions {
+  display: flex;
+  justify-content: flex-end;
+}

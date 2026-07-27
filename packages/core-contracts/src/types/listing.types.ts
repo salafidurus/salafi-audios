@@ -197,6 +197,7 @@ export const CreateListingDtoSchema = z.object({
   scholarId: z.string().min(1, "Scholar ID must not be empty"),
   parentId: z.string().optional(),
   language: LocaleSchema.optional(),
+  status: StatusValueSchema.optional(),
   topics: z.array(z.string()).optional(),
   audioKey: z.string().optional(),
   durationSeconds: z.number().optional(),
