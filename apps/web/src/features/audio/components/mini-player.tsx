@@ -3,7 +3,7 @@
 import { useAudio } from "@sd/domain-audio";
 import React from "react";
 
-import { audioService } from "../index";
+import { audioService } from "../audio-service";
 import styles from "./mini-player.module.css";
 import { PlaybackControls } from "./playback-controls";
 import { ProgressBar } from "./progress-bar";

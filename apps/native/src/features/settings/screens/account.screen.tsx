@@ -4,8 +4,10 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
-import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings";
 import { AppText } from "@/shared/components/AppText/AppText";
+
+import { ContentLanguageToggle } from "../components/content-language-toggle/content-language-toggle";
+import { LanguageSwitch } from "../components/language-switch/language-switch";
 
 export type AccountScreenProps = {
   onNavigateToProfile?: () => void;

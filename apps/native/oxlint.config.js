@@ -7,7 +7,7 @@ export default defineConfig({
     "import/no-duplicates": "error",
     "import/first": "error",
     "import/newline-after-import": "error",
-    "import/no-cycle": "warn",
+    "import/no-cycle": "error",
     "no-unused-vars": "error",
     "unicorn/no-empty-file": "error",
   },

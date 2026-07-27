@@ -8,7 +8,7 @@ import { useCallback, useState } from "react";
 
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
-import { audioService } from "../index";
+import { audioService } from "../audio-service";
 
 export type UsePlayListingOptions = {
   /**

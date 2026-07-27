@@ -6,7 +6,7 @@ import React, { type CSSProperties } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 
-import { audioService } from "../index";
+import { audioService } from "../audio-service";
 
 const outerStyle: CSSProperties = { display: "flex", alignItems: "center", gap: 16 };
 

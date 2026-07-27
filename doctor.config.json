@@ -9,7 +9,8 @@
       "**/.expo/**",
       "**/.opencode/**",
       "**/coverage/**",
-      "**/generated/**"
+      "**/generated/**",
+      ".agents/**"
     ],
     "overrides": [
       {
