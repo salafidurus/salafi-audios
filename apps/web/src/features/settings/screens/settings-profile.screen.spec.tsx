@@ -1,9 +1,11 @@
+import { useAccountProfile } from "@sd/domain-account";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { SettingsProfileScreen } from "./settings-profile.screen";
-import { useAccountProfile } from "@sd/domain-account";
+
 import { authClient } from "@/core/auth/auth-client";
+
+import { SettingsProfileScreen } from "./settings-profile.screen";
 
 const mockUseAuth = vi.fn();
 

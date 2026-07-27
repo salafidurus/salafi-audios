@@ -1,6 +1,8 @@
 import { describe, it, expect, beforeEach } from "bun:test";
-import { QueueManager } from "./queue.manager";
+
 import type { Track } from "../types/track.types";
+
+import { QueueManager } from "./queue.manager";
 
 describe("QueueManager", () => {
   let manager: QueueManager;

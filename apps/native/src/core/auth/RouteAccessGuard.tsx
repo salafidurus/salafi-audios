@@ -1,6 +1,8 @@
-import { Redirect, usePathname } from "expo-router";
 import type { ReactNode } from "react";
+
 import { resolveRouteAccess, routes } from "@sd/core-contracts";
+import { Redirect, usePathname } from "expo-router";
+
 import { useAuth } from "./use-auth";
 
 /**

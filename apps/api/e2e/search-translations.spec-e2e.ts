@@ -1,9 +1,9 @@
-process.env.DISABLE_THROTTLER = 'true';
-
 import { createE2eApp } from './helpers/create-e2e-app';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { PrismaService } from '../src/core/db/prisma.service';
+
+process.env.DISABLE_THROTTLER = 'true';
 
 /**
  * Public search must match and rank against translations, not just

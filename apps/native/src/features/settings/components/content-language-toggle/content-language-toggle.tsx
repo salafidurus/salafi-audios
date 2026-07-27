@@ -1,5 +1,6 @@
 import { Switch, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+
 import { useTranslation } from "@/core/i18n/use-translation";
 import {
   setShowOriginalContent,

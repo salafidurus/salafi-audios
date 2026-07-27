@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
-import { UserAvatar } from "@/shared/components/user-avatar";
+
 import { MarqueeText } from "@/shared/components/MarqueeText";
+
 import { RoleBadge } from "../role-badge";
 import styles from "./meta-details.module.css";
 

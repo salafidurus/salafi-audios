@@ -1,6 +1,7 @@
 "use client";
 
 import Script from "next/script";
+
 import { useCookieConsent } from "../hooks/use-cookie-consent";
 
 interface AnalyticsScriptsProps {

@@ -1,6 +1,8 @@
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react-native";
 import type { ScholarListItemDto } from "@sd/core-contracts";
+
+import { render, screen, fireEvent } from "@testing-library/react-native";
+import React from "react";
+
 import { ScholarRow } from "./scholar-row";
 
 const baseScholar: ScholarListItemDto = {

@@ -1,6 +1,6 @@
 import type { Locale, ListingFormat, TranslationViewDto } from "@sd/core-contracts";
+
 import { fetchListingFormData, fetchArrangeData } from "@/features/admin/api/admin-lectures.api";
-import { fetchScholarFormData, fetchAdminTopic } from "@/features/admin/api/admin.api";
 import {
   saveListingTranslation,
   publishListingTranslation,
@@ -10,6 +10,7 @@ import {
   unpublishScholarTranslation,
   saveTopicTranslation,
 } from "@/features/admin/api/admin-translations.api";
+import { fetchScholarFormData, fetchAdminTopic } from "@/features/admin/api/admin.api";
 
 /**
  * The core-contracts `TranslationTarget` union identifies write targets by id only.

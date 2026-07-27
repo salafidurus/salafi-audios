@@ -1,4 +1,4 @@
-import { getLocalizedName, getScholarTitleLabel, getSubnavLabel } from "./translation-helpers";
+import { getLocalizedName, getScholarTitleLabel } from "./translation-helpers";
 
 describe("getLocalizedName", () => {
   it("returns empty string for null or undefined", () => {

@@ -6,10 +6,10 @@ import type {
   TopicLectureViewDto,
   TranslationViewDto,
   AdminTopicDetailDto,
+  CreateTopicWithTranslationsDto,
+  UpdateTopicWithTranslationsDto,
 } from '@sd/core-contracts';
 import { SUPPORTED_LOCALES } from '@sd/core-contracts';
-import type { CreateTopicWithTranslationsDto } from '@sd/core-contracts';
-import type { UpdateTopicWithTranslationsDto } from '@sd/core-contracts';
 import { SaveTopicTranslationDto } from './dto/save-topic-translation.dto';
 import { TopicsRepository } from './topics.repo';
 

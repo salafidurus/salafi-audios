@@ -1,8 +1,8 @@
 "use client";
 
+import { useNavigationStore } from "../../store/navigation-store";
 import { MobileHeader } from "./mobile-header";
 import { SidebarDrawer } from "./sidebar-drawer";
-import { useNavigationStore } from "../../store/navigation-store";
 
 export function SidebarMobile() {
   const { isMobileDrawerOpen, toggleMobileDrawer, closeMobileDrawer } = useNavigationStore();

@@ -1,5 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
+
 import type { SearchCatalogParams } from "../types";
+
 import { DEFAULT_MAX_AGE } from "./persist";
 
 export * from "./persist";

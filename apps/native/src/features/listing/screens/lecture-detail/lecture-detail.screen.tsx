@@ -1,14 +1,15 @@
+import { pickContentField } from "@sd/core-i18n";
+import { useListingDetail } from "@sd/domain-content";
 import { ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { useListingDetail } from "@sd/domain-content";
-import { pickContentField } from "@sd/core-i18n";
-import { AppText } from "@/shared/components/AppText/AppText";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+
+import { useTranslation } from "@/core/i18n/use-translation";
 import { LectureMeta } from "@/features/listing/components/lecture-meta/lecture-meta";
 import { SeriesContextBar } from "@/features/listing/components/series-context-bar/series-context-bar";
 import { TopicChips } from "@/features/listing/components/topic-chips/topic-chips";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
-import { useTranslation } from "@/core/i18n/use-translation";
+import { AppText } from "@/shared/components/AppText/AppText";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
 export type LectureDetailScreenProps = {
   slug: string;

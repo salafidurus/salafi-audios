@@ -9,6 +9,15 @@
     "**/.expo/**",
     "**/.opencode/**",
     "**/coverage/**",
-    "**/generated/**"
-  ]
+    "**/generated/**",
+    ".agents/**"
+  ],
+  "rules": {
+    "import/no-duplicates": "error",
+    "import/first": "error",
+    "import/newline-after-import": "error",
+    "import/no-cycle": "warn",
+    "no-unused-vars": "error",
+    "unicorn/no-empty-file": "error"
+  }
 }

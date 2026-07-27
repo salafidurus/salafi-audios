@@ -1,13 +1,16 @@
 "use client";
 
 import type { AdminPermission } from "@sd/core-contracts";
+
 import { useAdminPermissions } from "@sd/domain-account";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { PageHeader } from "@/shared/components/PageHeader";
-import { EmptyState } from "@/shared/components/EmptyState";
+
 import { useAuth } from "@/core/auth/use-auth";
-import { useResponsive } from "@/shared/hooks/use-responsive";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { EmptyState } from "@/shared/components/EmptyState";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { useResponsive } from "@/shared/hooks/use-responsive";
+
 import styles from "./admin-dashboard.screen.module.css";
 
 type AdminSection = {

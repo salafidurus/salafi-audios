@@ -1,14 +1,17 @@
 "use client";
 
-import React from "react";
-import { Play, Pause, RotateCcw } from "lucide-react";
 import type { ListingDetailDto, ListingContentsDto } from "@sd/core-contracts";
+
 import { useAudio, useProgressStore, type Track } from "@sd/domain-audio";
 import { useLastPlayedLesson } from "@sd/domain-content";
-import { audioService } from "@/features/audio";
+import { Play, Pause, RotateCcw } from "lucide-react";
+import React from "react";
+
 import { useAuth } from "@/core/auth";
+import { audioService } from "@/features/audio";
 import { Button } from "@/shared/components/Button/Button";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
+
 import { LectureSaveButton } from "../lecture-save-button/LectureSaveButton";
 import styles from "./QuickButtonSection.module.css";
 

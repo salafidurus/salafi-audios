@@ -1,8 +1,10 @@
 "use client";
 
-import type React from "react";
-import Image from "next/image";
 import type { ScholarChipDto } from "@sd/core-contracts";
+import type React from "react";
+
+import Image from "next/image";
+
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
 export type FeedScholarRowProps = {

@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import { ScholarChipDtoSchema, ContentSuggestionDtoSchema } from "./home.types";
 import { ListingFormatSchema } from "./listing.types";
 import { ContentOriginalFieldsSchema, LocaleSchema } from "./localization.types";

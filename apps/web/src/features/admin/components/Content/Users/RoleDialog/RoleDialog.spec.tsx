@@ -1,8 +1,10 @@
-import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { RoleDialog } from "./RoleDialog";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
+
 import * as adminApi from "@/features/admin/api/admin.api";
+
+import { RoleDialog } from "./RoleDialog";
 
 vi.mock("@/features/admin/api/admin.api", () => ({
   fetchUserRoles: vi.fn(),

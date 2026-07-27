@@ -1,8 +1,9 @@
+import type { CatalogStats } from "../types";
+
 import { parseCatalogs } from "../helpers";
-import { getAllPackages } from "./shared";
 import { runCatalogCheck } from "./check";
 import { getUnusedCatalogEntries } from "./prune";
-import type { CatalogStats } from "../types";
+import { getAllPackages } from "./shared";
 
 export function runCatalogStats(rootDir: string): CatalogStats {
   const { rootJson, workspaces, allPackages } = getAllPackages(rootDir);

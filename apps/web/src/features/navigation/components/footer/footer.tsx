@@ -1,9 +1,11 @@
 "use client";
 
-import Link from "next/link";
-import { useTranslation } from "@/core/i18n/use-translation";
 import { routes } from "@sd/core-contracts";
+import Link from "next/link";
+
+import { useTranslation } from "@/core/i18n/use-translation";
 import { LanguageSwitch } from "@/features/settings";
+
 import styles from "./footer.module.css";
 
 export function Footer() {

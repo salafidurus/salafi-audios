@@ -1,10 +1,12 @@
-import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
-import React from "react";
-import { render } from "@testing-library/react";
-import HomePage from "./page";
-import { HomeScreen } from "@/features/home";
-import { useRouter } from "next/navigation";
 import { routes } from "@sd/core-contracts";
+import { render } from "@testing-library/react";
+import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
+import { useRouter } from "next/navigation";
+import React from "react";
+
+import { HomeScreen } from "@/features/home";
+
+import HomePage from "./page";
 
 vi.mock("next/navigation", () => {
   const push = vi.fn();

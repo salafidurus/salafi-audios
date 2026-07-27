@@ -2,6 +2,7 @@
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useIsRtl } from "@/shared/hooks/use-is-rtl";
+
 import styles from "./hero-section.module.css";
 
 export type HeroSectionProps = Record<string, never>;

@@ -1,10 +1,13 @@
 "use client";
 
-import { useCallback, useState } from "react";
-import { useListingDetail } from "@sd/domain-content";
 import type { Track } from "@sd/domain-audio";
+
+import { useListingDetail } from "@sd/domain-content";
 import { sanitizeError } from "@sd/utils-error";
+import { useCallback, useState } from "react";
+
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
+
 import { audioService } from "../index";
 
 export type UsePlayListingOptions = {

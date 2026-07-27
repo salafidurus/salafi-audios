@@ -1,6 +1,7 @@
+import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "bun:test";
 import React from "react";
-import { render, screen } from "@testing-library/react";
+
 import { GoogleButton, AppleButton } from "./provider-button";
 
 describe("GoogleButton", () => {

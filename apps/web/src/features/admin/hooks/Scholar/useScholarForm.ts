@@ -1,4 +1,5 @@
 import type { Locale, ScholarFormDataDto, ScholarTitle, CountryCode } from "@sd/core-contracts";
+
 import { useReducer } from "react";
 
 export type ScholarChangeSnapshot = {

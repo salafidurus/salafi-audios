@@ -4,7 +4,9 @@ import {
   type QueryKey,
   type UseQueryOptions,
 } from "@tanstack/react-query";
+
 import type { HttpClientConfig } from "../../http";
+
 import { configureApiClient } from "../../http";
 
 export function useApiQuery<TData, TError = Error>(

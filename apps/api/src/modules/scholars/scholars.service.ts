@@ -8,7 +8,6 @@ import type {
   ScholarTopicsDto,
   TranslationViewDto,
   AdminScholarListDto,
-  Locale,
 } from '@sd/core-contracts';
 import { SUPPORTED_LOCALES } from '@sd/core-contracts';
 import { ScholarsRepository } from './scholars.repo';

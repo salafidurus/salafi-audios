@@ -1,8 +1,9 @@
+import type { ScholarListItemDto } from "@sd/core-contracts";
+
+import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
 import { useCallback } from "react";
 import { FlatList, Pressable, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
-import type { ScholarListItemDto } from "@sd/core-contracts";
 
 type AdminScholarsScreenProps = {
   onNavigateToScholar: (slug: string) => void;

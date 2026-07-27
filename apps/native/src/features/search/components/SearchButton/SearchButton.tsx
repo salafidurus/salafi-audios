@@ -1,7 +1,9 @@
-import { Pressable, Text, View } from "react-native";
-import { Search } from "lucide-react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import type { ComponentType } from "react";
+
+import { Search } from "lucide-react-native";
+import { Pressable, Text, View } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
+
 import { AccentGradientFill } from "@/shared/components/AccentGradientFill/AccentGradientFill";
 
 export type SearchButtonProps = {

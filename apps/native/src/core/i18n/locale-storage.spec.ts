@@ -1,4 +1,5 @@
 import * as SecureStore from "expo-secure-store";
+
 import { getStoredLocale, storeLocale } from "./locale-storage";
 
 jest.mock("expo-secure-store", () => ({

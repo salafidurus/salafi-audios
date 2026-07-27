@@ -1,11 +1,13 @@
 import type { ScholarContentItemDto } from "@sd/core-contracts";
+
+import { pickContentField } from "@sd/core-i18n";
+import { useState, useCallback } from "react";
 import { FlatList, Pressable, TextInput, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { useState, useCallback } from "react";
-import { pickContentField } from "@sd/core-i18n";
-import { AppText } from "@/shared/components/AppText/AppText";
-import { useShowOriginalContent } from "@/features/settings/content-preference";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+import { useShowOriginalContent } from "@/features/settings/content-preference";
+import { AppText } from "@/shared/components/AppText/AppText";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 export type ScholarContentListProps = {

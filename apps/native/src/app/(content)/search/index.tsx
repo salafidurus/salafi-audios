@@ -1,5 +1,6 @@
-import { type Href, useLocalSearchParams, useRouter } from "expo-router";
 import { routes } from "@sd/core-contracts";
+import { type Href, useLocalSearchParams, useRouter } from "expo-router";
+
 import { SearchProcessingScreen } from "@/features/search/screens/search-processing/search-processing.screen";
 
 export default function SearchRoute() {

@@ -1,8 +1,9 @@
+import type { ViewStyle } from "react-native";
+
 import { Link, type Href } from "expo-router";
 import { openBrowserAsync, WebBrowserPresentationStyle } from "expo-web-browser";
 import { useState, type ComponentProps, type ReactNode } from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
-import type { ViewStyle } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 type LinkProps = ComponentProps<typeof Link>;

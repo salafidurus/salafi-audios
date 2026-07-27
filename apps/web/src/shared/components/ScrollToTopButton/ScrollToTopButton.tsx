@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { ArrowUp } from "lucide-react";
+import { useEffect, useState } from "react";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+
 import styles from "./scroll-to-top-button.module.css";
 
 const SCROLL_THRESHOLD = 320;

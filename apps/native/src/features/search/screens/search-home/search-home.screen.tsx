@@ -1,5 +1,6 @@
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
 export type SearchHomeScreenProps = {

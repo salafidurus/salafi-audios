@@ -1,16 +1,19 @@
-import { useCallback } from "react";
-import { FlatList } from "react-native";
-import type { ListRenderItemInfo } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
 import type { FeedItemDto, FeedContentItemDto } from "@sd/core-contracts";
+import type { ListRenderItemInfo } from "react-native";
+
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { useExploreRecentScreen } from "@sd/domain-content";
+import { useCallback } from "react";
+import { FlatList } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
+
 import { useTranslation } from "@/core/i18n/use-translation";
-import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
-import { FeedTopicRow } from "../components/feed-topic-row/feed-topic-row";
+
 import { FeedPodcastRow } from "../components/feed-podcast-row/feed-podcast-row";
+import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
 import { FeedSkeleton } from "../components/feed-skeleton/feed-skeleton";
 import { FeedLoadingFooter, FeedStatusView } from "../components/feed-status/feed-status";
+import { FeedTopicRow } from "../components/feed-topic-row/feed-topic-row";
 
 export type FeedRecentScreenProps = {
   onNavigateToListing?: (slug: string) => void;

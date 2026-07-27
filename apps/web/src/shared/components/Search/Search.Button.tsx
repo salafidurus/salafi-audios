@@ -1,7 +1,7 @@
 "use client";
 
-import { SearchGlyph } from "./SearchGlyph";
 import styles from "./Search.module.css";
+import { SearchGlyph } from "./SearchGlyph";
 
 export interface SearchButtonProps {
   /** Label text for the button */

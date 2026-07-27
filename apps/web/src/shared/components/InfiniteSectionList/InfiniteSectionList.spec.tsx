@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeAll, vi } from "bun:test";
 import { render, screen } from "@testing-library/react";
+import { describe, it, expect, beforeAll, vi } from "bun:test";
+
 import { InfiniteSectionList, type SectionData } from "./InfiniteSectionList";
 
 // Mock IntersectionObserver

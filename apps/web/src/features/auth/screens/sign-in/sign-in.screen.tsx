@@ -1,11 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
-import { useTranslation } from "@/core/i18n/use-translation";
+
 import { authClient } from "@/core/auth";
-import { GoogleSignInButton, AppleSignInButton } from "@/features/auth/components/social-buttons";
+import { useTranslation } from "@/core/i18n/use-translation";
 import { AuthProviderButton } from "@/features/auth/components/provider-button";
+import { GoogleSignInButton, AppleSignInButton } from "@/features/auth/components/social-buttons";
+import { useIsDesktop } from "@/shared/hooks/use-responsive";
+
 import styles from "../auth-form.module.css";
 
 type SignInScreenProps = {

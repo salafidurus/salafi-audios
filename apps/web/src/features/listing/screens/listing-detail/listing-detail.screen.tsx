@@ -1,20 +1,20 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useListingDetail, useListingContents } from "@sd/domain-content";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
-import { AppText } from "@/shared/components/AppText/AppText";
-import { Search } from "@/shared/components/Search";
+import React, { useState, useRef, useEffect, useMemo } from "react";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+import { AppText } from "@/shared/components/AppText/AppText";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { Search } from "@/shared/components/Search";
+import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 
+import { CollectionContentLayout } from "../../components/listing/CollectionContentLayout/CollectionContentLayout";
+import { ContentList } from "../../components/listing/ContentList/ContentList";
 import { MetaDataSection } from "../../components/listing/MetaDataSection/MetaDataSection";
 import { QuickButtonSection } from "../../components/listing/QuickButtonSection/QuickButtonSection";
-import { ContentList } from "../../components/listing/ContentList/ContentList";
-import { CollectionContentLayout } from "../../components/listing/CollectionContentLayout/CollectionContentLayout";
 import { SeriesContextBar } from "../../components/listing/series-context-bar/series-context-bar";
-
 import styles from "./listing-detail.screen.module.css";
 
 export type ListingDetailScreenProps = {

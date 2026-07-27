@@ -1,7 +1,9 @@
+import type { LibraryItemDto } from "@sd/core-contracts";
+
+import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "bun:test";
 import React from "react";
-import { render, screen } from "@testing-library/react";
-import type { LibraryItemDto } from "@sd/core-contracts";
+
 import { LibraryListRow } from "./library-list-row";
 
 vi.mock("@/features/settings/content-preference", () => ({

@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Search } from "@/shared/components/Search";
-import { useDropdownContext } from "./context";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+import { Search } from "@/shared/components/Search";
+
+import { useDropdownContext } from "./context";
 import styles from "./dropdown.module.css";
 
 export interface DropdownContentProps {

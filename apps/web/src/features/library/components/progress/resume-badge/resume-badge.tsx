@@ -1,6 +1,7 @@
 "use client";
 
 import { useListingProgress } from "@sd/domain-audio";
+
 import styles from "./resume-badge.module.css";
 
 type ResumeBadgeProps = {

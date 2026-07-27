@@ -1,9 +1,12 @@
 "use client";
 
 import type { Locale, TopicDetailDto } from "@sd/core-contracts";
+
 import { getLocalizedName } from "@sd/core-i18n";
-import { useTranslation } from "@/core/i18n/use-translation";
+
 import type { FormState } from "@/features/admin/hooks/Content/useListingForm";
+
+import { useTranslation } from "@/core/i18n/use-translation";
 import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
 
 interface ListingReviewSectionProps {

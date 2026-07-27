@@ -1,7 +1,10 @@
-import type { ReactNode } from "react";
 import type { AdminPermission } from "@sd/core-contracts";
+import type { ReactNode } from "react";
+
 import { ShieldOff } from "lucide-react";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+
 import { PermissionBadge } from "../permission-badge/permission-badge";
 import styles from "./permission-details.module.css";
 

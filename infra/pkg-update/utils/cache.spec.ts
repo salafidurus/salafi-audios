@@ -1,7 +1,8 @@
 import { describe, it, expect } from "bun:test";
 import { mkdtempSync, mkdirSync, writeFileSync, existsSync, readFileSync } from "fs";
-import { join } from "path";
 import { tmpdir } from "os";
+import { join } from "path";
+
 import {
   readCache,
   writeCache,

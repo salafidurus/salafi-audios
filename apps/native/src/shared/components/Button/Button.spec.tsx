@@ -1,6 +1,7 @@
+import { render, screen, fireEvent } from "@testing-library/react-native";
 import React from "react";
 import { View } from "react-native";
-import { render, screen, fireEvent } from "@testing-library/react-native";
+
 import { Button } from "./Button";
 
 jest.mock("react-native-svg", () => ({

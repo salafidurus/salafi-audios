@@ -1,19 +1,22 @@
 "use client";
 
-import React from "react";
-import Image from "next/image";
-import { Play, Pause, Bookmark } from "lucide-react";
-import { useAudio, useProgressStore, type Track } from "@sd/domain-audio";
 import type { FeedContentItemDto } from "@sd/core-contracts";
+
 import { pickContentField } from "@sd/core-i18n";
-import { List } from "@/shared/components/List";
+import { useAudio, useProgressStore, type Track } from "@sd/domain-audio";
+import { Play, Pause, Bookmark } from "lucide-react";
+import Image from "next/image";
+import React from "react";
+
+import { audioService } from "@/features/audio";
+import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { Button } from "@/shared/components/Button";
+import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 import { useFormattedDate } from "@/shared/hooks/use-formatted-date";
-import { useShowOriginalContent } from "@/features/settings/content-preference";
-import { useResponsive } from "@/shared/hooks/use-responsive";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
-import { audioService } from "@/features/audio";
+import { useResponsive } from "@/shared/hooks/use-responsive";
+
 import styles from "./explore-list-row.module.css";
 
 export type FeedListRowProps = {

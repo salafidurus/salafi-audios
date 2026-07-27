@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+
 import { FeedRecentScreen } from "@/features/explore/screens/explore-recent.screen";
 
 export const metadata: Metadata = {

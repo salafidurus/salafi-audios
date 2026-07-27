@@ -1,12 +1,15 @@
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react-native";
 import type { LibraryItemDto } from "@sd/core-contracts";
+
 import {
   useLibraryCompletedScreen,
   useLibraryProgressScreen,
   useLibrarySavedScreen,
 } from "@sd/domain-content";
+import { render, screen, fireEvent } from "@testing-library/react-native";
+import React from "react";
+
 import { useAuth } from "@/core/auth/use-auth";
+
 import { LibraryScreen } from "./library.screen";
 
 jest.mock("react-native-safe-area-context", () => ({

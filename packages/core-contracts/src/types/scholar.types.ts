@@ -1,10 +1,11 @@
 import { z } from "zod";
+
+import { CountryCodeSchema } from "./country.types";
 import {
   ContentOriginalFieldsSchema,
   LocaleSchema,
   ScholarOriginalFieldsSchema,
 } from "./localization.types";
-import { CountryCodeSchema } from "./country.types";
 import { TranslationViewDtoSchema } from "./translation.types";
 
 export const ScholarTitleSchema = z.enum(["allamah", "sheikh", "ustadh", "akh"]);

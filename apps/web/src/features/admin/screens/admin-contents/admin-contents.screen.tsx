@@ -1,24 +1,26 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
 import { queryKeys, type TopicDetailDto } from "@sd/core-contracts";
 import { useAdminTopicsList } from "@sd/domain-content";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { PageHeader } from "@/shared/components/PageHeader";
-import { Button } from "@/shared/components/Button";
-import { Search } from "@/shared/components/Search";
-import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
-import { useResponsive } from "@/shared/hooks/use-responsive";
+import { useQueryClient } from "@tanstack/react-query";
+import { Plus } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+
 import { useTranslation } from "@/core/i18n/use-translation";
-import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
-import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
-import { TopicsContent } from "@/features/admin/components/Content/Topic";
-import { ListingsContent } from "@/features/admin/components/Content/Listing";
 import { Content } from "@/features/admin/components/Content";
+import { ListingsContent } from "@/features/admin/components/Content/Listing";
+import { TopicsContent } from "@/features/admin/components/Content/Topic";
+import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
+import { Button } from "@/shared/components/Button";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
+import { Search } from "@/shared/components/Search";
+import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { useDebouncedSearch } from "@/shared/hooks";
+import { useResponsive } from "@/shared/hooks/use-responsive";
+
 import styles from "./admin-contents.screen.module.css";
 
 const EMPTY_TOPICS_ARRAY: TopicDetailDto[] = [];

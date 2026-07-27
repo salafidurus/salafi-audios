@@ -1,6 +1,6 @@
-import { useSyncExternalStore } from "react";
-import * as SecureStore from "expo-secure-store";
 import { createContentPreferenceStore, type LanguageStorageAdapter } from "@sd/core-i18n";
+import * as SecureStore from "expo-secure-store";
+import { useSyncExternalStore } from "react";
 
 const secureStoreAdapter: LanguageStorageAdapter = {
   async getItem(key) {

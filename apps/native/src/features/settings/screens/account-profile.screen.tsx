@@ -1,9 +1,10 @@
+import { useAccountProfile, useUpdateProfile } from "@sd/domain-account";
 import { useState } from "react";
 import { Pressable, ScrollView, TextInput, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { useAccountProfile, useUpdateProfile } from "@sd/domain-account";
-import { AppText } from "@/shared/components/AppText/AppText";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+import { AppText } from "@/shared/components/AppText/AppText";
 
 export type AccountProfileScreenProps = {
   onBack?: () => void;

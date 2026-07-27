@@ -1,4 +1,5 @@
 import { useEffect, useRef, Fragment, type ReactNode } from "react";
+
 import { List } from "../List";
 import styles from "./InfiniteScrollList.module.css";
 

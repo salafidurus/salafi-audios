@@ -1,4 +1,5 @@
 import type { AdminPermission, UserRole } from "@sd/core-contracts";
+
 import { useAccountProfile } from "../../account.api";
 
 type MyPermissionsDto = { permissions: AdminPermission[]; roles: UserRole[] };

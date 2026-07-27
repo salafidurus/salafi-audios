@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useEffect } from "react";
 import { X } from "lucide-react";
-import { SearchGlyph } from "./SearchGlyph";
+import { useRef, useEffect } from "react";
+
 import styles from "./Search.module.css";
+import { SearchGlyph } from "./SearchGlyph";
 
 export interface SearchBarProps {
   /** Current search value (controlled input) */

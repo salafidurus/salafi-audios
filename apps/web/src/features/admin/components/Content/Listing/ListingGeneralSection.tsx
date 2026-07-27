@@ -1,31 +1,35 @@
 "use client";
 
-import React from "react";
-import type { ScholarListItemDto, TopicDetailDto, ListingRefDto, Locale } from "@sd/core-contracts";
+import type { ScholarListItemDto, TopicDetailDto, Locale } from "@sd/core-contracts";
+
 import { getLocalizedName, SUPPORTED_LOCALES } from "@sd/core-i18n";
-import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
-import { InputField } from "@/shared/components/InputField";
-import { ImageUploadEditor } from "@/shared/components/ImageUploadEditor";
+import React from "react";
+
+import type { FormAction, FormState } from "@/features/admin/hooks/Content/useListingForm";
+
 import { useTranslation } from "@/core/i18n/use-translation";
-import { Search } from "@/shared/components/Search";
+import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
+import { deriveChildSlug } from "@/features/admin/utils/slugify";
 import {
   Dropdown,
   DropdownTrigger,
   DropdownContent,
   DropdownItem,
 } from "@/shared/components/Dropdown";
+import { ImageUploadEditor } from "@/shared/components/ImageUploadEditor";
+import { InputField } from "@/shared/components/InputField";
+import { Search } from "@/shared/components/Search";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
-import { deriveChildSlug } from "@/features/admin/utils/slugify";
-import type { FormAction, FormState } from "@/features/admin/hooks/Content/useListingForm";
-import { ListingStatusOrderFields } from "./ListingStatusOrderFields";
+
 import styles from "./listing-modal.module.css";
+import { ListingStatusOrderFields } from "./ListingStatusOrderFields";
 
 interface ListingGeneralSectionProps {
   state: FormState;
   dispatch: React.Dispatch<FormAction>;
   scholars: ScholarListItemDto[];
   topics: TopicDetailDto[];
-  series: ListingRefDto[];
+
   handleTopicToggle: (topicId: string) => void;
   isEditing?: boolean;
   onImageStaged?: (file: File | null, preview: string | null) => void;
@@ -37,7 +41,6 @@ export function ListingGeneralSection({
   dispatch,
   scholars,
   topics,
-  series,
   handleTopicToggle,
   isEditing = false,
   onImageStaged,

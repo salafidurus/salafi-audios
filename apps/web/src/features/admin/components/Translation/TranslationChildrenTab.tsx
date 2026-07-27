@@ -1,10 +1,12 @@
 "use client";
 
-import { Button } from "@/shared/components/Button";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { Button } from "@/shared/components/Button";
+
 import type { TranslationEntityConfig, TranslationChildSummary } from "./translation-entities";
-import { TranslationChildDetail } from "./TranslationChildDetail";
+
 import styles from "./translation-modal.module.css";
+import { TranslationChildDetail } from "./TranslationChildDetail";
 
 export interface TranslationChildrenTabProps {
   config: TranslationEntityConfig;

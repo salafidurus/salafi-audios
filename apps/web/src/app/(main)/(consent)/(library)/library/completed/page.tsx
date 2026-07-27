@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+
 import { LibraryCompletedScreen } from "@/features/library";
 
 export const metadata: Metadata = {

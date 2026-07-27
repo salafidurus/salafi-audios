@@ -1,5 +1,6 @@
 import { Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+
 import { ScreenView } from "../ScreenView/ScreenView";
 
 type ScreenInProgressProps = {

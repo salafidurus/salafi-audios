@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef, useState } from "react";
-import Image from "next/image";
 import { Edit2, AlertCircle } from "lucide-react";
+import Image from "next/image";
+import { useRef, useState } from "react";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+
 import styles from "./scholar-avatar-editor.module.css";
 
 const ALLOWED_FORMATS = ["png", "jpg", "jpeg"];

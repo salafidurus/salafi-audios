@@ -1,18 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import type { AdminArrangeLessonDto, StatusValue } from "@sd/core-contracts";
+
 import { Reorder } from "framer-motion";
 import { GripVertical, Plus, Trash2 } from "lucide-react";
-import type { AdminArrangeLessonDto, StatusValue } from "@sd/core-contracts";
+import React, { useState } from "react";
+
 import { useTranslation } from "@/core/i18n/use-translation";
-import { InputField } from "@/shared/components/InputField";
-import { Button } from "@/shared/components/Button";
-import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownContent,
-  DropdownItem,
-} from "@/shared/components/Dropdown";
 import {
   ROOT_MODULE_KEY,
   localSlugConflicts,
@@ -24,6 +18,15 @@ import {
   type UploadItem,
 } from "@/features/admin/hooks/Content/useUploadArrangeState";
 import { deriveChildSlug } from "@/features/admin/utils/upload-filename";
+import { Button } from "@/shared/components/Button";
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownContent,
+  DropdownItem,
+} from "@/shared/components/Dropdown";
+import { InputField } from "@/shared/components/InputField";
+
 import modalStyles from "../listing-modal.module.css";
 import styles from "./upload-arrange.module.css";
 

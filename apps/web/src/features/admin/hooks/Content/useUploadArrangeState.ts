@@ -1,6 +1,5 @@
 "use client";
 
-import { useReducer } from "react";
 import type {
   AdminArrangeDataDto,
   AdminArrangeLessonDto,
@@ -10,6 +9,9 @@ import type {
   BatchPresignAudioRequestDto,
   StatusValue,
 } from "@sd/core-contracts";
+
+import { useReducer } from "react";
+
 import {
   deriveChildSlug,
   findSlugMatch,

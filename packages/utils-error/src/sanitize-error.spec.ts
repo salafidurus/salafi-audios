@@ -1,4 +1,5 @@
 import { describe, it, expect } from "bun:test";
+
 import { sanitizeError } from "./sanitize-error";
 
 describe("sanitizeError validation parser", () => {

@@ -2,6 +2,7 @@
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { List } from "@/shared/components/List";
+
 import styles from "./SearchResultEmpty.module.css";
 
 export type SearchResultEmptyProps = {

@@ -1,12 +1,11 @@
+import { spawnSync } from "child_process";
 import { existsSync, mkdirSync, rmSync } from "fs";
 import { resolve } from "path";
-import { spawnSync } from "child_process";
+
+import { runCatalogFix } from "../catalog/scanner/fix";
+import { applyUpdate } from "./apply";
 import { checkAll } from "./check";
-import { applyUpdate, runVerification } from "./apply";
 import { config } from "./pkg-update.config";
-import { buildChangelogSection } from "./utils/changelog";
-import { categorizeBump, type UpdateCandidate } from "./utils/ui";
-import { retry, type RetryOptions } from "./utils/retry";
 import {
   readCache,
   writeCache,
@@ -14,7 +13,9 @@ import {
   areAllCandidatesCached,
   cachePath,
 } from "./utils/cache";
-import { runCatalogFix } from "../catalog/scanner/fix";
+import { buildChangelogSection } from "./utils/changelog";
+import { retry, type RetryOptions } from "./utils/retry";
+import { categorizeBump, type UpdateCandidate } from "./utils/ui";
 
 const __ciMain = import.meta.path.replace(/\\/g, "/") === process.argv[1]?.replace(/\\/g, "/");
 

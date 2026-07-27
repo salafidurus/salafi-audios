@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
-import Link from "next/link";
 import { routes } from "@sd/core-contracts";
+import Link from "next/link";
+import { useEffect } from "react";
+
 import { useTranslation } from "@/core/i18n/use-translation";
 import { Button } from "@/shared/components/Button";
+
 import styles from "./error.module.css";
 
 type ErrorProps = {

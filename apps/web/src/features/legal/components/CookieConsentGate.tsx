@@ -1,10 +1,12 @@
 "use client";
 
+import { routes } from "@sd/core-contracts";
 import Link from "next/link";
 import { useRef, useEffect } from "react";
-import { routes } from "@sd/core-contracts";
-import { Button } from "@/shared/components/Button/Button";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+import { Button } from "@/shared/components/Button/Button";
+
 import { useCookieConsent } from "../hooks/use-cookie-consent";
 import styles from "./cookie-consent-gate.module.css";
 

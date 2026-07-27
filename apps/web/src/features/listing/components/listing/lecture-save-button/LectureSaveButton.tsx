@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
 import { useProgressStore } from "@sd/domain-audio";
-import { Button } from "@/shared/components/Button/Button";
+import React, { useState } from "react";
+
 import { useAuth } from "@/core/auth";
 import { AuthModal } from "@/features/auth";
+import { Button } from "@/shared/components/Button/Button";
+
 import styles from "./LectureSaveButton.module.css";
 
 export type LectureSaveButtonProps = {

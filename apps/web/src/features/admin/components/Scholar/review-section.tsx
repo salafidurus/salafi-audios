@@ -1,9 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { FormSection } from "@/features/admin/components/FormSection";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+import { FormSection } from "@/features/admin/components/FormSection";
+
 import type { FormState } from "../../hooks/Scholar/useScholarForm";
+
 import styles from "./review-section.module.css";
 
 interface ReviewSectionProps {

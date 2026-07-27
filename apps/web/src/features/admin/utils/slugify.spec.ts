@@ -1,4 +1,5 @@
 import { describe, it, expect } from "bun:test";
+
 import { slugify, deriveChildSlug } from "./slugify";
 
 describe("slugify", () => {

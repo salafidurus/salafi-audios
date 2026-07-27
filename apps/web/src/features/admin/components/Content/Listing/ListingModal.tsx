@@ -1,20 +1,27 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { useApiQuery, queryKeys, httpClient, endpoints, type Locale } from "@sd/core-contracts";
-import type { ScholarListItemDto, ListingRefDto } from "@sd/core-contracts";
+import {
+  type ScholarListItemDto,
+  useApiQuery,
+  queryKeys,
+  httpClient,
+  endpoints,
+  type Locale,
+} from "@sd/core-contracts";
 import { useTopicsList } from "@sd/domain-search";
-import { useAdminListingSeriesByScholar } from "@sd/domain-content";
-import { useTranslation } from "@/core/i18n/use-translation";
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
-import { Modal } from "@/shared/components/Modal";
 import { sanitizeError } from "@sd/utils-error";
-import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
+import React, { useState, useEffect, useRef } from "react";
+
+import { useTranslation } from "@/core/i18n/use-translation";
 import { fetchListingFormData } from "@/features/admin/api/admin-lectures.api";
 import { useListingForm } from "@/features/admin/hooks/Content/useListingForm";
 import { useSaveListing } from "@/features/admin/hooks/Content/useSaveListing";
-import { ListingModalTabContent } from "./ListingModalTabContent";
+import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
+import { Modal } from "@/shared/components/Modal";
+import { useIsDesktop } from "@/shared/hooks/use-responsive";
+
 import styles from "./listing-modal.module.css";
+import { ListingModalTabContent } from "./ListingModalTabContent";
 
 export interface ListingModalProps {
   isOpen: boolean;
@@ -75,7 +82,6 @@ export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingM
   );
 
   const { data: topicsData } = useTopicsList();
-  const { data: seriesData } = useAdminListingSeriesByScholar(state.scholarId);
 
   const handleTitleChange = (val: string) => {
     dispatch({ type: "UPDATE_FIELD", field: "title", value: val });
@@ -117,7 +123,6 @@ export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingM
 
   const scholars = scholarsData?.scholars ?? [];
   const topicsArray = topicsData ?? [];
-  const series = (seriesData ?? []) as ListingRefDto[];
   const mainLocale = (state.language || "ar") as Locale;
   const errorTabSet = new Set(errorTabs);
   const showSublistingsTab = state.isEditing && !!state.id && state.format !== "single";
@@ -163,7 +168,6 @@ export function ListingModal({ isOpen, onClose, onSuccess, listingId }: ListingM
           errorTabSet={errorTabSet}
           scholars={scholars}
           topics={topicsArray}
-          series={series}
           handleTopicToggle={handleTopicToggle}
           handleTitleChange={handleTitleChange}
           mainLocale={mainLocale}

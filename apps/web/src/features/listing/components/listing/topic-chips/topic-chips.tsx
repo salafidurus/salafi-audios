@@ -1,7 +1,9 @@
 "use client";
 
 import type { TopicRefDto } from "@sd/core-contracts";
+
 import { AppText } from "@/shared/components/AppText/AppText";
+
 import styles from "./topic-chips.module.css";
 
 export type TopicChipsProps = {

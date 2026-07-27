@@ -1,7 +1,9 @@
 import { describe, it, expect, beforeAll, afterAll, mock } from "bun:test";
-import { mkdtempSync, writeFileSync, readFileSync, existsSync, mkdirSync } from "fs";
-import { join } from "path";
+import { mkdtempSync, writeFileSync, readFileSync, mkdirSync } from "fs";
 import { tmpdir } from "os";
+import { join } from "path";
+
+import type { UpdateCandidate } from "./utils/ui";
 
 import {
   updateCatalogEntry,
@@ -11,8 +13,7 @@ import {
   findWorkspacePkgFiles,
   syncWorkspaceDeps,
 } from "./apply";
-import { config, type PkupdateConfig } from "./pkg-update.config";
-import type { UpdateCandidate } from "./utils/ui";
+import { config } from "./pkg-update.config";
 
 mock.module("child_process", () => ({
   spawnSync: () => ({ status: 0, stdout: "", stderr: "" }),

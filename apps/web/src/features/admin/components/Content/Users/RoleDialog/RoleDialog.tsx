@@ -1,20 +1,22 @@
 "use client";
 
-import { useEffect, useReducer, useState, type ReactNode } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys, type UserRole } from "@sd/core-contracts";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useReducer, useState, type ReactNode } from "react";
+
+import { useTranslation } from "@/core/i18n/use-translation";
 import {
   fetchUserRoles,
   grantRole,
   revokeRole,
   type AdminRolesListResponse,
 } from "@/features/admin/api/admin.api";
-import { Modal } from "@/shared/components/Modal/Modal";
 import { Button } from "@/shared/components/Button";
-import { useTranslation } from "@/core/i18n/use-translation";
-import { RoleItem } from "./RoleItem";
+import { Modal } from "@/shared/components/Modal/Modal";
+
 import { ROLES_ARRAY } from "./constants";
 import styles from "./RoleDialog.module.css";
+import { RoleItem } from "./RoleItem";
 
 export interface RoleDialogProps {
   isOpen: boolean;

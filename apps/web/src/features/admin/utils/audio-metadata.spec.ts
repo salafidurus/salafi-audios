@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
+
 import { extractAudioDurationFromUrl } from "./audio-metadata";
 
 describe("extractAudioDurationFromUrl", () => {

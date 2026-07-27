@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test";
+
 import { shouldPersistQuery, getMaxAge, DEFAULT_MAX_AGE } from "./persist";
 
 describe("query persistence", () => {

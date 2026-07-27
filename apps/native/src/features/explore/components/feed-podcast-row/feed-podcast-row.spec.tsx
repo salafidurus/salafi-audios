@@ -1,6 +1,8 @@
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react-native";
 import type { FeedContentItemDto } from "@sd/core-contracts";
+
+import { render, screen, fireEvent } from "@testing-library/react-native";
+import React from "react";
+
 import { FeedPodcastRow } from "./feed-podcast-row";
 
 const baseItem: FeedContentItemDto = {

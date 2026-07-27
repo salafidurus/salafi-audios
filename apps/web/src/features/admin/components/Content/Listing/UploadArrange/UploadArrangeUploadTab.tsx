@@ -1,16 +1,19 @@
 "use client";
 
-import React, { useRef, useState } from "react";
 import { Upload, X, Link2, Plus } from "lucide-react";
-import { useTranslation } from "@/core/i18n/use-translation";
-import { InputField } from "@/shared/components/InputField";
-import { Button } from "@/shared/components/Button";
-import { extractAudioDuration } from "@/features/admin/utils/audio-metadata";
-import { resolveLinksToMetadata } from "@/features/admin/utils/resolve-import-urls";
+import React, { useRef, useState } from "react";
+
 import type {
   UploadArrangeAction,
   UploadArrangeState,
 } from "@/features/admin/hooks/Content/useUploadArrangeState";
+
+import { useTranslation } from "@/core/i18n/use-translation";
+import { extractAudioDuration } from "@/features/admin/utils/audio-metadata";
+import { resolveLinksToMetadata } from "@/features/admin/utils/resolve-import-urls";
+import { Button } from "@/shared/components/Button";
+import { InputField } from "@/shared/components/InputField";
+
 import styles from "./upload-arrange.module.css";
 
 interface UploadArrangeUploadTabProps {

@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "bun:test";
+
 import { fetchUrlMetadata } from "./fetch-url-metadata";
 
 function mockResponse(options: {

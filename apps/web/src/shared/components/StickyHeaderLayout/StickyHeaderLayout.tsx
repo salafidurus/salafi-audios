@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
-import { Header } from "./Header";
+
 import { Content } from "./Content";
+import { Header } from "./Header";
 
 interface StickyHeaderLayoutProps {
   children: ReactNode;

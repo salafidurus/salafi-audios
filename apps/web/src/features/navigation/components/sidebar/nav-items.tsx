@@ -1,18 +1,8 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
-import clsx from "clsx";
-import { useTranslation } from "@/core/i18n/use-translation";
 import { routes, type AdminPermission, type UserRole } from "@sd/core-contracts";
-import { useAuth, authClient } from "@/core/auth";
 import { useAdminPermissions } from "@sd/domain-account";
-import { Modal } from "@/shared/components/Modal";
-import { Button } from "@/shared/components/Button/Button";
-import { SectionLabel } from "./section-label";
-import { useResponsive } from "@/shared/hooks/use-responsive";
-import { LanguageSwitch } from "@/features/settings";
+import clsx from "clsx";
 import {
   Cloud,
   CassetteTape,
@@ -27,6 +17,18 @@ import {
   GraduationCap,
   type LucideIcon,
 } from "lucide-react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
+
+import { useAuth, authClient } from "@/core/auth";
+import { useTranslation } from "@/core/i18n/use-translation";
+import { LanguageSwitch } from "@/features/settings";
+import { Button } from "@/shared/components/Button/Button";
+import { Modal } from "@/shared/components/Modal";
+import { useResponsive } from "@/shared/hooks/use-responsive";
+
+import { SectionLabel } from "./section-label";
 import styles from "./sidebar.module.css";
 
 type NavItem = {

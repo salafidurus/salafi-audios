@@ -1,8 +1,10 @@
+import type { SearchResultRow } from "@sd/domain-search";
+
 import React from "react";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+
 import { SearchResultEmpty } from "../SearchResultEmpty/SearchResultEmpty";
-import type { SearchResultRow } from "@sd/domain-search";
 
 export type { SearchResultRow };
 

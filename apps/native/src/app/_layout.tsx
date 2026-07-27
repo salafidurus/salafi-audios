@@ -1,7 +1,9 @@
 import { Stack } from "expo-router";
-import { Providers } from "../core/providers";
+
 import { getWrappedLayout } from "@/core/integrations";
 import { MiniPlayer } from "@/features/audio";
+
+import { Providers } from "../core/providers";
 
 function RootLayout() {
   return (

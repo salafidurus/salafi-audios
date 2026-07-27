@@ -1,5 +1,6 @@
-import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
 import type { AdminListingListItemDto } from "@sd/core-contracts";
+
+import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
 
 export function useAdminSeries(scholarId: string) {
   return useApiQuery<AdminListingListItemDto[]>(["admin", "series", scholarId], () =>

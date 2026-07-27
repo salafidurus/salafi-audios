@@ -1,4 +1,5 @@
 import { describe, it, expect, test } from "bun:test";
+
 import { isClean, commitChanges, showDiff } from "./git";
 
 describe("git utils", () => {

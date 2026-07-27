@@ -1,9 +1,11 @@
+import type { ScholarListItemDto } from "@sd/core-contracts";
+
+import { useScholarsList } from "@sd/domain-content";
+import * as DocumentPicker from "expo-document-picker";
 import { useCallback, useMemo, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import * as DocumentPicker from "expo-document-picker";
-import type { ScholarListItemDto } from "@sd/core-contracts";
-import { useScholarsList } from "@sd/domain-content";
+
 import { getPresignedUrl, uploadToR2, createLecture } from "../../api/admin-lectures.api";
 
 async function getNativeAudioDuration(uri: string): Promise<number | undefined> {

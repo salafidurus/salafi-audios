@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import Script from "next/script";
+
 import localFont from "next/font/local";
+import Script from "next/script";
 
 import "./globals.css";
-import { themeCss } from "./theme-css";
-
-import { ThemeSync } from "../core/styles/ThemeSync";
 import { Providers } from "../core/providers";
+import { ThemeSync } from "../core/styles/ThemeSync";
+import { themeCss } from "./theme-css";
 
 const fraunces = localFont({
   variable: "--font-display-en",

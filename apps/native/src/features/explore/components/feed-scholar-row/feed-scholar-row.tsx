@@ -1,8 +1,9 @@
-import { View, Text, Pressable, FlatList } from "react-native";
-import type { ListRenderItemInfo } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import { Image } from "expo-image";
 import type { ScholarChipDto } from "@sd/core-contracts";
+import type { ListRenderItemInfo } from "react-native";
+
+import { Image } from "expo-image";
+import { View, Text, Pressable, FlatList } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
 
 export type FeedScholarRowProps = {
   scholars: ScholarChipDto[];

@@ -1,5 +1,6 @@
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+
 import { Modal } from "./Modal";
 
 describe("Modal.ConfirmDialog", () => {
@@ -81,7 +82,7 @@ describe("Modal.ConfirmDialog", () => {
   });
 
   it("wraps async onConfirm in try/finally for cleanup", () => {
-    let resolveFn: () => void;
+    let resolveFn: (() => void) | undefined;
     mockOnConfirm.mockImplementation(
       () =>
         new Promise<void>((resolve) => {
@@ -103,6 +104,8 @@ describe("Modal.ConfirmDialog", () => {
     fireEvent.click(confirmButton);
 
     expect(mockOnConfirm).toHaveBeenCalled();
+
+    void resolveFn;
   });
 
   it("renders confirm button with danger variant", () => {

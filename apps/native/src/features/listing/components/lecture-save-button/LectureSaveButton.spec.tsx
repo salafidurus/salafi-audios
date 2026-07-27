@@ -1,6 +1,7 @@
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react-native";
 import { useProgressStore } from "@sd/domain-audio";
+import { render, screen, fireEvent } from "@testing-library/react-native";
+import React from "react";
+
 import { LectureSaveButton } from "./LectureSaveButton";
 
 jest.mock("../../../../shared/components/Button/Button", () => ({

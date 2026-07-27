@@ -1,9 +1,11 @@
 "use client";
 
 import type { RecentProgressDto } from "@sd/core-contracts";
-import { AppText } from "@/shared/components/AppText/AppText";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+import { AppText } from "@/shared/components/AppText/AppText";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
+
 import styles from "./continue-listening-card.module.css";
 
 export type ContinueListeningCardProps = {

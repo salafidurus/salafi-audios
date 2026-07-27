@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+
 import { AdminScholarsScreen } from "@/features/admin/screens/admin-scholars/admin-scholars.screen";
 
 export const metadata: Metadata = {

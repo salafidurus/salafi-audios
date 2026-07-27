@@ -1,14 +1,18 @@
 "use client";
 
+import type { Locale, ScholarListItemDto, TopicDetailDto } from "@sd/core-contracts";
+
 import React from "react";
-import type { Locale, ScholarListItemDto, TopicDetailDto, ListingRefDto } from "@sd/core-contracts";
-import { Modal } from "@/shared/components/Modal";
-import { ListingGeneralSection } from "./ListingGeneralSection";
-import { ListingTranslatableFields } from "./ListingTranslatableFields";
-import { ListingSublistingsTab } from "./ListingSublistingsTab";
-import { ListingReviewSection } from "./ListingReviewSection";
+
 import type { FormAction, FormState } from "@/features/admin/hooks/Content/useListingForm";
+
+import { Modal } from "@/shared/components/Modal";
+
 import styles from "./listing-modal.module.css";
+import { ListingGeneralSection } from "./ListingGeneralSection";
+import { ListingReviewSection } from "./ListingReviewSection";
+import { ListingSublistingsTab } from "./ListingSublistingsTab";
+import { ListingTranslatableFields } from "./ListingTranslatableFields";
 
 interface ListingModalTabContentProps {
   state: FormState;
@@ -17,7 +21,6 @@ interface ListingModalTabContentProps {
   errorTabSet: Set<string>;
   scholars: ScholarListItemDto[];
   topics: TopicDetailDto[];
-  series: ListingRefDto[];
   handleTopicToggle: (topicId: string) => void;
   handleTitleChange?: (val: string) => void;
   mainLocale: Locale;
@@ -34,7 +37,6 @@ export function ListingModalTabContent({
   errorTabSet,
   scholars,
   topics,
-  series,
   handleTopicToggle,
   handleTitleChange,
   mainLocale,
@@ -56,7 +58,6 @@ export function ListingModalTabContent({
           dispatch={dispatch}
           scholars={scholars}
           topics={topics}
-          series={series}
           handleTopicToggle={handleTopicToggle}
           isEditing={isEditing}
           onImageStaged={onImageStaged}

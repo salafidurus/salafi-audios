@@ -1,21 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Modal } from "@/shared/components/Modal";
-import { Button } from "@/shared/components/Button";
-import { InputField } from "@/shared/components/InputField";
-import { useTranslation } from "@/core/i18n/use-translation";
-import { slugify } from "@/features/admin/utils/slugify";
-import {
-  fetchAdminTopic,
-  createTopicWithTranslations,
-  updateTopicWithTranslations,
-} from "@/features/admin/api/admin.api";
 import type {
   CreateTopicWithTranslationsDto,
   UpdateTopicWithTranslationsDto,
   AdminTopicDetailDto,
 } from "@sd/core-contracts";
+
+import { useState, useEffect } from "react";
+
+import { useTranslation } from "@/core/i18n/use-translation";
+import {
+  fetchAdminTopic,
+  createTopicWithTranslations,
+  updateTopicWithTranslations,
+} from "@/features/admin/api/admin.api";
+import { slugify } from "@/features/admin/utils/slugify";
+import { Button } from "@/shared/components/Button";
+import { InputField } from "@/shared/components/InputField";
+import { Modal } from "@/shared/components/Modal";
+
 import styles from "./topic-modal.module.css";
 
 interface TopicModalProps {

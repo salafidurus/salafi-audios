@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { routes } from "@sd/core-contracts";
+import Link from "next/link";
+
 import styles from "../legal-sections.module.css";
 
 export function ContactUs() {

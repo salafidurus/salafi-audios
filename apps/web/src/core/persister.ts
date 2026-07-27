@@ -1,5 +1,6 @@
-import { deleteDB, openDB, type IDBPDatabase } from "idb";
 import type { PersistedClient, Persister } from "@tanstack/react-query-persist-client";
+
+import { deleteDB, openDB, type IDBPDatabase } from "idb";
 
 const DB_NAME = "sd-query-cache";
 const STORE_NAME = "cache";

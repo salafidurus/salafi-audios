@@ -1,16 +1,18 @@
 "use client";
 
+import { routes } from "@sd/core-contracts";
+import clsx from "clsx";
+import { Maximize2, Minimize2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect } from "react";
-import clsx from "clsx";
+
 import { useTranslation } from "@/core/i18n/use-translation";
-import { routes } from "@sd/core-contracts";
-import { Maximize2, Minimize2 } from "lucide-react";
 import { useResponsive } from "@/shared/hooks/use-responsive";
+
+import { useNavigationStore } from "../../store/navigation-store";
 import { NavItems } from "./nav-items";
 import { SidebarMobile } from "./sidebar.mobile";
-import { useNavigationStore } from "../../store/navigation-store";
 import styles from "./sidebar.module.css";
 
 export function Sidebar() {

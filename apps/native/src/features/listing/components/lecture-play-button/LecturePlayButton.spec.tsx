@@ -1,9 +1,12 @@
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react-native";
 import type { ListingDetailDto } from "@sd/core-contracts";
-import { LecturePlayButton } from "./LecturePlayButton";
+
 import { useAudio } from "@sd/domain-audio";
+import { render, screen, fireEvent } from "@testing-library/react-native";
+import React from "react";
+
 import { audioService } from "@/features/audio";
+
+import { LecturePlayButton } from "./LecturePlayButton";
 
 jest.mock("@sd/domain-audio", () => ({ useAudio: jest.fn() }));
 jest.mock("@/features/audio", () => ({

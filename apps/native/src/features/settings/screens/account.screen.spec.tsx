@@ -1,8 +1,10 @@
-import React from "react";
-import { render, screen } from "@testing-library/react-native";
 import { useAccountProfile } from "@sd/domain-account";
-import { AccountScreen } from "./account.screen";
+import { render, screen } from "@testing-library/react-native";
+import React from "react";
+
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
+
+import { AccountScreen } from "./account.screen";
 
 jest.mock("@sd/domain-account", () => ({
   useAccountProfile: jest.fn(),

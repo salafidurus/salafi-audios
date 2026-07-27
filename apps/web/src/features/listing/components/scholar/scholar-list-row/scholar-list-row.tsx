@@ -1,12 +1,15 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { ScholarListItemDto } from "@sd/core-contracts";
+
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+import { List } from "@/shared/components/List";
+import { MarqueeText } from "@/shared/components/MarqueeText";
+import { UserAvatar } from "@/shared/components/user-avatar";
 import { useIsRtl } from "@/shared/hooks/use-is-rtl";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
-import { List } from "@/shared/components/List";
-import { UserAvatar } from "@/shared/components/user-avatar";
-import { MarqueeText } from "@/shared/components/MarqueeText";
+
 import styles from "./scholar-list-row.module.css";
 
 export type ScholarListRowProps = {

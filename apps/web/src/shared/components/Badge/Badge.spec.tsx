@@ -1,6 +1,7 @@
-import { describe, it, expect } from "bun:test";
 import { render, screen } from "@testing-library/react";
+import { describe, it, expect } from "bun:test";
 import { Shield } from "lucide-react";
+
 import { Badge } from "./Badge";
 
 describe("Badge", () => {

@@ -1,10 +1,13 @@
+import type { FeedContentItemDto } from "@sd/core-contracts";
+
+import { useAudio, useProgressStore } from "@sd/domain-audio";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import type { FeedContentItemDto } from "@sd/core-contracts";
-import { FeedListRow } from "./explore-list-row";
-import { useAudio, useProgressStore } from "@sd/domain-audio";
+
 import { audioService } from "@/features/audio";
+
+import { FeedListRow } from "./explore-list-row";
 import styles from "./explore-list-row.module.css";
 
 vi.mock("@sd/domain-audio", () => {

@@ -1,9 +1,10 @@
 "use client";
 
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { COOKIES_LAST_UPDATE_DATE } from "@/features/legal/constants/update-date";
-import styles from "./legal-screens.module.css";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+
 import * as CookieSections from "../components/CookieSections";
+import styles from "./legal-screens.module.css";
 
 export function CookiePolicyScreen() {
   return (

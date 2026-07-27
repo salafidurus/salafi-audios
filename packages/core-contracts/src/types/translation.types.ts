@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import { LocaleSchema } from "./localization.types";
 
 export const TranslationStatusSchema = z.enum(["draft", "published"]);

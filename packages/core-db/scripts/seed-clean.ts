@@ -1,8 +1,9 @@
+import { PrismaPg } from "@prisma/adapter-pg";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { loadDbEnvFiles } from "./load-db-env.js";
+
 import { PrismaClient } from "../src/generated/prisma/client.js";
-import { PrismaPg } from "@prisma/adapter-pg";
+import { loadDbEnvFiles } from "./load-db-env.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

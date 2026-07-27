@@ -9,16 +9,17 @@ import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client
 import { useFonts } from "expo-font";
 import { type Href, useRouter } from "expo-router";
 import { type ReactNode, useEffect, useState } from "react";
-import { authClient } from "./auth/auth-client";
 import { I18nextProvider } from "react-i18next";
 import { LogBox } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+
+import { authClient } from "./auth/auth-client";
 import { getApiBaseUrl } from "./config/runtime-env";
 import { i18n, initI18n } from "./i18n/i18n";
-import { syncTypographyToLocale } from "./styles/theme/typography-sync";
 import { queryClient, persister } from "./query-client";
+import { syncTypographyToLocale } from "./styles/theme/typography-sync";
 
 LogBox.ignoreLogs(["API client initialization failed", "Open debugger to view warnings"]);
 

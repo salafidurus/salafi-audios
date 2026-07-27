@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+
 import styles from "./settings-row.module.css";
 
 export interface SettingsRowProps {

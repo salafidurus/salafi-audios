@@ -1,13 +1,14 @@
+import { useAudio } from "@sd/domain-audio";
+import { Image } from "expo-image";
+import { Play, Pause, ChevronDown, Music } from "lucide-react-native";
 import React, { useState } from "react";
 import { View, Pressable, Text, Modal, ActivityIndicator } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import { Image } from "expo-image";
-import { useAudio } from "@sd/domain-audio";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
+
 import { audioService } from "../audio-service";
-import { Play, Pause, ChevronDown, Music } from "lucide-react-native";
-import { ProgressBar } from "./progress-bar";
 import { PlaybackControls } from "./playback-controls";
+import { ProgressBar } from "./progress-bar";
 
 export function MiniPlayer() {
   const { currentTrack, isPlaying, isLoading, progressPercent, positionSeconds } = useAudio();

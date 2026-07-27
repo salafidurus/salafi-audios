@@ -1,8 +1,10 @@
 import { readFileSync, existsSync } from "fs";
 import { resolve } from "path";
-import { fetchLatestVersion } from "./utils/npm";
-import { config, type PkupdateConfig } from "./pkg-update.config";
+
 import type { UpdateCandidate } from "./utils/ui";
+
+import { config, type PkupdateConfig } from "./pkg-update.config";
+import { fetchLatestVersion } from "./utils/npm";
 
 export function filterByGroups(depName: string, groups: PkupdateConfig["groups"]): string | null {
   for (const [groupName, group] of Object.entries(groups)) {

@@ -1,12 +1,15 @@
 import type { TopicDetailDto } from "@sd/core-contracts";
+
 import { getLocalizedName } from "@sd/core-i18n";
-import { List } from "@/shared/components/List";
-import { Button } from "@/shared/components/Button";
-import { MarqueeText } from "@/shared/components/MarqueeText";
-import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
-import { Pencil, Trash2, Languages, Folder } from "lucide-react";
-import { useResponsive } from "@/shared/hooks/use-responsive";
+import { Pencil, Trash2, Languages } from "lucide-react";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
+import { Button } from "@/shared/components/Button";
+import { List } from "@/shared/components/List";
+import { MarqueeText } from "@/shared/components/MarqueeText";
+import { useResponsive } from "@/shared/hooks/use-responsive";
+
 import styles from "../Content.module.css";
 
 interface TopicProps {

@@ -1,5 +1,6 @@
-import { useAdminPermissions } from "./use-admin-permissions";
 import { useAccountProfile } from "@sd/domain-account";
+
+import { useAdminPermissions } from "./use-admin-permissions";
 
 jest.mock("@sd/domain-account", () => ({
   useAccountProfile: jest.fn(),

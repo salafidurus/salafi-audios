@@ -1,7 +1,9 @@
-import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { ScholarModal } from "./ScholarModal";
+import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
+
 import { createScholar, updateScholar, fetchScholarFormData } from "@/features/admin/api/admin.api";
+
+import { ScholarModal } from "./ScholarModal";
 
 vi.mock("@/features/admin/api/admin-lectures.api", () => ({
   getPresignedUrl: vi.fn(),

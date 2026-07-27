@@ -1,8 +1,9 @@
-
 .searchWrapper {
   width: 80%;
   margin: 0 auto;
-  transition: transform 200ms ease, box-shadow 200ms ease;
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease;
 }
 
 .searchWrapper:hover {

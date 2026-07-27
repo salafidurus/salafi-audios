@@ -1,12 +1,15 @@
-import type { ReactNode } from "react";
 import type { AdminUserListItemDto } from "@sd/core-contracts";
+import type { ReactNode } from "react";
+
 import { ShieldCog, UserCog } from "lucide-react";
-import { List } from "@/shared/components/List";
+
+import { useTranslation } from "@/core/i18n/use-translation";
+import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
 import { Button } from "@/shared/components/Button";
+import { List } from "@/shared/components/List";
 import { UserAvatar } from "@/shared/components/user-avatar";
 import { useResponsive } from "@/shared/hooks/use-responsive";
-import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
-import { useTranslation } from "@/core/i18n/use-translation";
+
 import { MetaDetails } from "./meta-details";
 import { PermissionDetails } from "./permission-details";
 import styles from "./user-item.module.css";

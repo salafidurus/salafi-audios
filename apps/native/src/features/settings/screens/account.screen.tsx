@@ -1,9 +1,10 @@
+import { useAccountProfile } from "@sd/domain-account";
 import { Pressable, ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+
 import { useTranslation } from "@/core/i18n/use-translation";
-import { useAccountProfile } from "@sd/domain-account";
-import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
+import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings";
 import { AppText } from "@/shared/components/AppText/AppText";
 
 export type AccountScreenProps = {

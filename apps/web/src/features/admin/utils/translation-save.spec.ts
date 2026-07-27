@@ -1,6 +1,8 @@
 import { describe, it, expect } from "bun:test";
-import type { TranslationFormState } from "@/features/admin/hooks/Translation/useTranslationForm";
+
 import type { TranslationEntityConfig } from "@/features/admin/components/Translation/translation-entities";
+import type { TranslationFormState } from "@/features/admin/hooks/Translation/useTranslationForm";
+
 import { computeLocalesToSave } from "./translation-save";
 
 const config: TranslationEntityConfig = {

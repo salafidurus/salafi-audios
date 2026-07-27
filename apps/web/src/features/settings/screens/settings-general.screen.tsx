@@ -1,16 +1,18 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings/i18n";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { PageHeader } from "@/shared/components/PageHeader";
-import { SettingsSection } from "@/features/settings/components/SettingsSection/SettingsSection";
-import { SettingsRow } from "@/features/settings/components/SettingsRow/SettingsRow";
-import { SegmentedControl } from "@/features/settings/components/SegmentedControl/SegmentedControl";
-import { Toggle } from "@/shared/components/Toggle";
+
 import type { ThemePreference } from "@/core/styles/ThemeSync";
-import { THEME_KEY, THEME_CHANGE_EVENT } from "@/core/styles/ThemeSync";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+import { THEME_KEY, THEME_CHANGE_EVENT } from "@/core/styles/ThemeSync";
+import { SegmentedControl } from "@/features/settings/components/SegmentedControl/SegmentedControl";
+import { SettingsRow } from "@/features/settings/components/SettingsRow/SettingsRow";
+import { SettingsSection } from "@/features/settings/components/SettingsSection/SettingsSection";
+import { LanguageSwitch, ContentLanguageToggle } from "@/features/settings/i18n";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { Toggle } from "@/shared/components/Toggle";
 
 interface NotificationState {
   master: boolean;

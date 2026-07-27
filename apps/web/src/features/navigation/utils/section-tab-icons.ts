@@ -9,6 +9,7 @@ import {
   User,
   type LucideIcon,
 } from "lucide-react";
+
 import type { Section } from "../types";
 
 export type SectionTabIconKey =

@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
+
 import { Button } from "@/shared/components/Button";
+
 import styles from "./error.module.css";
 
 type ErrorProps = {

@@ -1,7 +1,8 @@
+import { PrismaPg } from "@prisma/adapter-pg";
 /* eslint-disable no-console */
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { PrismaPg } from "@prisma/adapter-pg";
+
 import { PrismaClient } from "../src/generated/prisma/client.js";
 import { loadDbEnvFiles } from "./load-db-env.js";
 

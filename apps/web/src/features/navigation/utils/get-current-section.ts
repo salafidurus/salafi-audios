@@ -1,5 +1,6 @@
-import { DEFAULT_TABS, type Section } from "../types";
 import { routes } from "@sd/core-contracts";
+
+import { DEFAULT_TABS, type Section } from "../types";
 
 const PATH_TO_SECTION: Record<string, Section> = {
   [routes.explore.index]: "explore",

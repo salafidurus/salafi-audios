@@ -1,9 +1,12 @@
 "use client";
 
-import React from "react";
 import type { ListingContentItemDto } from "@sd/core-contracts";
 import type { Track } from "@sd/domain-audio";
+
+import React from "react";
+
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
+
 import { ContentListItem } from "../ContentListItem/ContentListItem";
 import styles from "./ContentList.module.css";
 

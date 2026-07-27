@@ -1,10 +1,13 @@
 "use client";
 
-import Image from "next/image";
 import type { ScholarDetailDto } from "@sd/core-contracts";
+
 import { Globe } from "lucide-react";
+import Image from "next/image";
+
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
+
 import styles from "./scholar-header.module.css";
 
 export type ScholarHeaderProps = {

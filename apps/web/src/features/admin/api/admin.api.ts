@@ -1,4 +1,3 @@
-import { httpClient, endpoints } from "@sd/core-contracts";
 import type {
   Permission,
   UserPermissionDto,
@@ -11,6 +10,8 @@ import type {
   ScholarFormDataDto,
   ScholarTitle,
 } from "@sd/core-contracts";
+
+import { httpClient, endpoints } from "@sd/core-contracts";
 
 // --- Permissions ---
 

@@ -1,6 +1,8 @@
-import { describe, it, expect } from "bun:test";
-import { splitScholarContent } from "./scholar.api";
 import type { ScholarContentItemDto } from "@sd/core-contracts";
+
+import { describe, it, expect } from "bun:test";
+
+import { splitScholarContent } from "./scholar.api";
 
 const makeItem = (id: string): ScholarContentItemDto => ({
   id,

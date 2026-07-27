@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+
 import { TableOfContents } from "@/features/legal/components/TableOfContents";
 import {
   PRIVACY_SECTIONS,

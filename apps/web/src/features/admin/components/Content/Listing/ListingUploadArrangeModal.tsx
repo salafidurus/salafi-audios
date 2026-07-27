@@ -1,22 +1,24 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Modal } from "@/shared/components/Modal";
+
 import { useTranslation } from "@/core/i18n/use-translation";
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { fetchArrangeData } from "@/features/admin/api/admin-lectures.api";
+import { useUploadArrangeCommit } from "@/features/admin/hooks/Content/useUploadArrangeCommit";
 import {
   ROOT_MODULE_KEY,
   localSlugConflicts,
   useUploadArrangeState,
 } from "@/features/admin/hooks/Content/useUploadArrangeState";
-import { useUploadArrangeCommit } from "@/features/admin/hooks/Content/useUploadArrangeCommit";
+import { Modal } from "@/shared/components/Modal";
+import { useIsDesktop } from "@/shared/hooks/use-responsive";
+
+import styles from "./listing-modal.module.css";
 import {
   UploadArrangeArrangeTab,
   UploadArrangeReviewTab,
   UploadArrangeUploadTab,
 } from "./UploadArrange";
-import styles from "./listing-modal.module.css";
 
 interface ListingUploadArrangeModalProps {
   isOpen: boolean;

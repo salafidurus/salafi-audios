@@ -1,6 +1,7 @@
 import { Tabs } from "expo-router";
-import { CustomTabBar } from "@/features/navigation";
+
 import { RouteAccessGuard } from "@/core/auth";
+import { CustomTabBar } from "@/features/navigation";
 
 export default function TabsLayout() {
   return (

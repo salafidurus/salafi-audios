@@ -1,10 +1,10 @@
-process.env.DISABLE_THROTTLER = 'true';
-
 import { createE2eApp } from './helpers/create-e2e-app';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { PrismaService } from '../src/core/db/prisma.service';
 import { TestAuthFactory } from './helpers/test-auth.factory';
+
+process.env.DISABLE_THROTTLER = 'true';
 
 describe('Authentication (e2e)', () => {
   let app: NestFastifyApplication;

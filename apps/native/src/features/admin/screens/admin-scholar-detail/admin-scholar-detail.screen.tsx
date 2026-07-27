@@ -1,14 +1,17 @@
+import type { ScholarDetailDto, AdminListingListItemDto } from "@sd/core-contracts";
+
+import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
 import { useMemo, useReducer } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { StyleSheet } from "react-native-unistyles";
+
 import { DraggableList, type RenderItemParams } from "@/shared/components/DraggableList";
-import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
-import type { ScholarDetailDto, AdminListingListItemDto } from "@sd/core-contracts";
-import { useAdminSeries, useAdminCollections } from "../../hooks/use-admin-scholars";
+
 import { updateSeries, updateCollection } from "../../api/admin-scholars.api";
-import { SeriesSheet } from "../../components/SeriesSheet/SeriesSheet";
 import { CollectionSheet } from "../../components/CollectionSheet/CollectionSheet";
+import { SeriesSheet } from "../../components/SeriesSheet/SeriesSheet";
+import { useAdminSeries, useAdminCollections } from "../../hooks/use-admin-scholars";
 
 type AdminScholarDetailScreenProps = {
   scholarSlug: string;

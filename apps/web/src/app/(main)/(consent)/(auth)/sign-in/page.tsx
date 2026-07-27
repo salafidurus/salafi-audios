@@ -1,9 +1,10 @@
 "use client";
 
-import { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import { SignInResponsiveScreen } from "@/features/auth/screens/sign-in/sign-in.screen";
 import { routes } from "@sd/core-contracts";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+
+import { SignInResponsiveScreen } from "@/features/auth/screens/sign-in/sign-in.screen";
 
 function SignInPageInner() {
   const searchParams = useSearchParams();

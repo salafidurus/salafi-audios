@@ -1,5 +1,7 @@
 "use client";
 
+import { LazyMotion, m, domAnimation, AnimatePresence } from "framer-motion";
+import { X } from "lucide-react";
 import {
   useEffect,
   useRef,
@@ -14,10 +16,10 @@ import {
   useMemo,
 } from "react";
 import { createPortal } from "react-dom";
-import { LazyMotion, m, domAnimation, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
-import { Button } from "../Button/Button";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+
+import { Button } from "../Button/Button";
 import styles from "./modal.module.css";
 
 interface ModalTabsContextType {

@@ -1,6 +1,8 @@
 import type { Locale, ListingFormDataDto } from "@sd/core-contracts";
+
 import { useReducer } from "react";
-import { validateLectureStatus, type LectureStatus } from "@/shared/types/form-types";
+
+import { type LectureStatus } from "@/shared/types/form-types";
 
 export type ListingChangeSnapshot = {
   title: string;

@@ -1,4 +1,5 @@
 import { describe, it, expect } from "bun:test";
+
 import { buildSectionTabPath } from "./get-current-section";
 
 describe("buildSectionTabPath", () => {

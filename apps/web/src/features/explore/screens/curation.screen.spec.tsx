@@ -1,5 +1,6 @@
-import { describe, it, expect, vi } from "bun:test";
 import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi } from "bun:test";
+
 import { CurationScreen } from "./curation.screen";
 
 vi.mock("@/core/i18n/use-translation", () => ({

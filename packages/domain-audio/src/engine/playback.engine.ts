@@ -1,5 +1,5 @@
-import type { Track } from "../types/track.types";
 import type { PlaybackStatus } from "../types/state.types";
+import type { Track } from "../types/track.types";
 
 export type PlaybackEngineEvents = {
   onTrackEnd?: () => void;

@@ -1,4 +1,5 @@
 import type { Locale } from "@sd/core-contracts";
+
 import type { TranslationFormState } from "@/features/admin/hooks/Translation/useTranslationForm";
 
 export type StatusDot = "published" | "draft" | "notCreated";

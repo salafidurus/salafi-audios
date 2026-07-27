@@ -1,17 +1,18 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { useInfiniteSearch, useTopicsList } from "@sd/domain-search";
 import { getLocalizedName } from "@sd/core-i18n";
-import { useShowOriginalContent } from "@/features/settings/content-preference";
+import { useInfiniteSearch, useTopicsList } from "@sd/domain-search";
+import { useState, useMemo } from "react";
+
 import { useTranslation } from "@/core/i18n/use-translation";
-import { useDebouncedSearch } from "@/shared/hooks";
-import { Search } from "@/shared/components/Search";
 import { SearchResultItem } from "@/features/search/components/SearchResultItem/SearchResultItem";
+import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
-import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
-import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
+import { Search } from "@/shared/components/Search";
+import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
+import { useDebouncedSearch } from "@/shared/hooks";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 export type SearchProcessingScreenProps = {

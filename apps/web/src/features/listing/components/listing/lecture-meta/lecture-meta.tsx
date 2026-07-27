@@ -1,10 +1,13 @@
 "use client";
 
-import Image from "next/image";
 import type { ListingDetailDto } from "@sd/core-contracts";
+
+import Image from "next/image";
+
 import { AppText } from "@/shared/components/AppText/AppText";
 import { useFormattedDate } from "@/shared/hooks/use-formatted-date";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
+
 import styles from "./lecture-meta.module.css";
 
 function formatDuration(seconds: number): string {

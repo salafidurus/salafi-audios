@@ -1,18 +1,20 @@
 "use client";
 
+import { SUPPORTED_LOCALES, type Locale } from "@sd/core-i18n";
+import { useQueryClient } from "@tanstack/react-query";
 import clsx from "clsx";
 import { Languages } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
-import { SUPPORTED_LOCALES, type Locale } from "@sd/core-i18n";
+
+import { setLocaleCookie } from "@/core/i18n/locale-cookie";
+import { useTranslation } from "@/core/i18n/use-translation";
 import {
   Dropdown,
   DropdownTrigger,
   DropdownContent,
   DropdownItem,
 } from "@/shared/components/Dropdown";
-import { useTranslation } from "@/core/i18n/use-translation";
-import { setLocaleCookie } from "@/core/i18n/locale-cookie";
+
 import styles from "./language-switch.module.css";
 
 const LOCALE_LABELS: Record<Locale, string> = {

@@ -1,10 +1,11 @@
 #!/usr/bin/env bun
 import fs from "node:fs";
 import path from "node:path";
-import { findMonorepoRoot } from "../utils/paths.mjs";
+
 import { overwriteRootWithPrunedWorkspace } from "../utils/filesystem.mjs";
-import { getTurboVersion, validateEnvironment } from "../utils/turbo.mjs";
 import { log, error, success, setPrefix } from "../utils/logging.mjs";
+import { findMonorepoRoot } from "../utils/paths.mjs";
+import { getTurboVersion, validateEnvironment } from "../utils/turbo.mjs";
 
 setPrefix("[Deploy:Install]");
 

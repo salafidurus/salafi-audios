@@ -1,12 +1,13 @@
 #!/usr/bin/env bun
 import { intro, outro as outroMsg, spinner, note } from "@clack/prompts";
 import color from "picocolors";
+
 import { findMonorepoRoot } from "../../scripts/utils/paths.mjs";
-import { config } from "./pkg-update.config";
-import { checkAll } from "./check";
 import { applyUpdate, runVerification } from "./apply";
-import { selectUpdates, confirmCommit } from "./utils/ui";
+import { checkAll } from "./check";
+import { config } from "./pkg-update.config";
 import { isClean, showDiff, commitChanges } from "./utils/git";
+import { selectUpdates, confirmCommit } from "./utils/ui";
 
 async function main(): Promise<void> {
   intro(color.bgCyan(" sd-doctor — pkg-update "));
@@ -44,7 +45,7 @@ async function main(): Promise<void> {
   s.stop("Updates applied.");
 
   s.start("Running bun install\u2026");
-  const installOutput = await runVerification(rootDir);
+  await runVerification(rootDir);
   s.stop("bun install complete.");
 
   const diff = showDiff();

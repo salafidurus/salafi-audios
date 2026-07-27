@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import { ListingFormatSchema } from "./listing.types";
 import {
   ContentOriginalFieldsSchema,

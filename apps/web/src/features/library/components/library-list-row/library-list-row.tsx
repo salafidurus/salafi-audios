@@ -1,15 +1,18 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { LibraryItemDto } from "@sd/core-contracts";
+
 import { pickContentField } from "@sd/core-i18n";
-import { useShowOriginalContent } from "@/features/settings/content-preference";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
+import React from "react";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useFormattedDate } from "@/shared/hooks/use-formatted-date";
-import { useIsRtl } from "@/shared/hooks/use-is-rtl";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
+import { useIsRtl } from "@/shared/hooks/use-is-rtl";
+
 import styles from "./library-list-row.module.css";
 
 export type LibraryListRowProps = {

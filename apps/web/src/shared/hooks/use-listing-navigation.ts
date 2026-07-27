@@ -1,5 +1,5 @@
-import { useRouter } from "next/navigation";
 import { routes } from "@sd/core-contracts";
+import { useRouter } from "next/navigation";
 
 export function useListingNavigation() {
   const router = useRouter();

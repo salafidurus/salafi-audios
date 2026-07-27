@@ -1,6 +1,8 @@
 import type { SeriesContextDto } from "@sd/core-contracts";
+
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+
 import { AppText } from "@/shared/components/AppText/AppText";
 
 export type SeriesContextBarProps = {

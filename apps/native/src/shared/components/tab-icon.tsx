@@ -1,7 +1,8 @@
-import { useUnistyles } from "react-native-unistyles";
+import type { ComponentType } from "react";
+
 import { Cloud, Search, Settings, BookOpen } from "lucide-react-native";
 import { EaseView } from "react-native-ease";
-import type { ComponentType } from "react";
+import { useUnistyles } from "react-native-unistyles";
 
 export type TabIconName = "feed" | "search" | "library" | "account";
 

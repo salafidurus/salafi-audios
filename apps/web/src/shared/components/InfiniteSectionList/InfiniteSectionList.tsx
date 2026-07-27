@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, type ReactNode } from "react";
+
 import { List } from "../List";
 import styles from "./InfiniteSectionList.module.css";
 

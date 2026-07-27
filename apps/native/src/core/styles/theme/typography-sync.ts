@@ -1,4 +1,5 @@
 import { UnistylesRuntime } from "react-native-unistyles";
+
 import { createTypography } from "./typography";
 
 type Locale = "en" | "ar";

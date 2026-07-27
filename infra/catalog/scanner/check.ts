@@ -1,6 +1,7 @@
+import type { CatalogIssue, CatalogDuplicate } from "../types";
+
 import { parseCatalogs, loadConfig, getDependencyGroup } from "../helpers";
 import { getAllPackages } from "./shared";
-import type { CatalogIssue, CatalogDuplicate } from "../types";
 
 export function runCatalogCheck(rootDir: string): {
   issues: CatalogIssue[];

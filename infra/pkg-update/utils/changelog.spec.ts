@@ -6,11 +6,8 @@ function setMockFetch(impl: (url: string, init?: RequestInit) => Promise<Respons
   globalThis.fetch = mock(impl) as unknown as typeof globalThis.fetch;
 }
 
-let changelog: typeof import("./changelog");
-
 beforeEach(() => {
   globalThis.fetch = originalFetch;
-  changelog = {} as typeof import("./changelog");
 });
 
 async function getModule(): Promise<typeof import("./changelog")> {
@@ -127,7 +124,7 @@ describe("buildChangelogSection", () => {
   });
 
   it("returns npm URL when registry has no repository field", async () => {
-    setMockFetch((url: string) => {
+    setMockFetch((_url: string) => {
       return Promise.resolve(new Response(JSON.stringify({ name: "zod" }), { status: 200 }));
     });
 

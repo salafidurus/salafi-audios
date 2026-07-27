@@ -1,13 +1,14 @@
 "use client";
 
+import { LazyMotion, AnimatePresence, m, domAnimation } from "framer-motion";
+import { X } from "lucide-react";
+import Image from "next/image";
 import React, { useEffect, useRef, useSyncExternalStore, useCallback } from "react";
 import { createPortal } from "react-dom";
-import Image from "next/image";
-import { X } from "lucide-react";
-import { LazyMotion, AnimatePresence, m } from "framer-motion";
-import { domAnimation } from "framer-motion";
-import { useTranslation } from "@/core/i18n/use-translation";
+
 import { authClient } from "@/core/auth";
+import { useTranslation } from "@/core/i18n/use-translation";
+
 import { AppleSignInButton, GoogleSignInButton } from "../social-buttons";
 import styles from "./auth-modal.module.css";
 

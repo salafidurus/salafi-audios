@@ -1,8 +1,10 @@
 "use client";
 
 import Image from "next/image";
+
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useIsRtl } from "@/shared/hooks/use-is-rtl";
+
 import styles from "./store-download-badge.module.css";
 
 export type StoreDownloadBadgeProps = {

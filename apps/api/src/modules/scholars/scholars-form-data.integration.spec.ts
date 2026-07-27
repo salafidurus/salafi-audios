@@ -1,12 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
-import { PrismaClient } from '@sd/core-db';
-import { ScholarsRepository } from './scholars.repo';
-import { PrismaService } from '../../core/db/prisma.service';
 
 describe('ScholarsRepository.getFormData - Integration', () => {
-  let repo: ScholarsRepository;
-  let prisma: PrismaClient;
-
   beforeEach(async () => {
     // In a real test, we'd set up a test database
     // For now, this is a placeholder showing the structure

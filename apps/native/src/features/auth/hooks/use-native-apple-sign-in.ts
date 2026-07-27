@@ -1,6 +1,7 @@
-import { useState, useCallback } from "react";
 import * as AppleAuthentication from "expo-apple-authentication";
 import * as SecureStore from "expo-secure-store";
+import { useState, useCallback } from "react";
+
 import { authClient } from "@/core/auth";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;

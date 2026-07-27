@@ -1,10 +1,12 @@
 "use client";
 
-import { FormSection } from "@/features/admin/components/FormSection";
-import { Toggle } from "@/shared/components/Toggle";
-import { InputField } from "@/shared/components/InputField";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { FormSection } from "@/features/admin/components/FormSection";
+import { InputField } from "@/shared/components/InputField";
+import { Toggle } from "@/shared/components/Toggle";
+
 import type { FormAction, FormState } from "../../hooks/Scholar/useScholarForm";
+
 import styles from "./scholar-modal.module.css";
 
 interface SettingsSectionProps {

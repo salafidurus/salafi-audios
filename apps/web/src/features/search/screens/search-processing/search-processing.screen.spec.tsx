@@ -1,9 +1,10 @@
+import { routes } from "@sd/core-contracts";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "bun:test";
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 import { SearchProcessingScreen } from "./search-processing.screen";
-import { routes } from "@sd/core-contracts";
 
 const mockPush = vi.fn();
 

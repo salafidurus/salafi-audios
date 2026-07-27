@@ -1,4 +1,5 @@
 import { describe, it, expect } from "bun:test";
+
 import { retry } from "./retry";
 
 describe("retry", () => {
@@ -36,12 +37,10 @@ describe("retry", () => {
   });
 
   it("uses provided minTimeout for backoff", async () => {
-    let attempts = 0;
     const start = performance.now();
     await expect(
       retry(
         async () => {
-          attempts++;
           throw new Error("fail");
         },
         { retries: 2, minTimeout: 50 },

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+
 import { LibraryScreen } from "@/features/library";
 
 export const metadata: Metadata = {

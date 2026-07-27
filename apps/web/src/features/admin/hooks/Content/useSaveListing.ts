@@ -1,5 +1,7 @@
 import type { UpdateListingDetailsDto } from "@sd/core-contracts";
+
 import { sanitizeError } from "@sd/utils-error";
+
 import { useTranslation } from "@/core/i18n/use-translation";
 import {
   createLecture,
@@ -7,6 +9,7 @@ import {
   getPresignedUrl,
   uploadToR2,
 } from "@/features/admin/api/admin-lectures.api";
+
 import type { FormAction, FormState } from "./useListingForm";
 
 async function uploadStagedCoverImage(

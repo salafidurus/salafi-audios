@@ -1,7 +1,8 @@
+import type { ScholarListItemDto } from "@sd/core-contracts";
+
+import { Image } from "expo-image";
 import { Pressable, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { Image } from "expo-image";
-import type { ScholarListItemDto } from "@sd/core-contracts";
 
 export type ScholarCardProps = {
   scholar: ScholarListItemDto;

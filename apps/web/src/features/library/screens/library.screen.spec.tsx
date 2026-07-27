@@ -1,10 +1,11 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { render, screen } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "bun:test";
 import React from "react";
-import { render, screen } from "@testing-library/react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { LibraryScreen } from "./library.screen";
-import { LibrarySavedScreen } from "./library-saved.screen";
+
 import { LibraryCompletedScreen } from "./library-completed.screen";
+import { LibrarySavedScreen } from "./library-saved.screen";
+import { LibraryScreen } from "./library.screen";
 
 const mockUseAuth = vi.fn(() => ({ isAuthenticated: true }));
 

@@ -1,6 +1,7 @@
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "bun:test";
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+
 import { SegmentedControl } from "./SegmentedControl";
 
 const OPTIONS = [

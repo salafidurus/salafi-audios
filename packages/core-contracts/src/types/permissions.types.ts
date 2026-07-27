@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import { LocaleSchema } from "./localization.types";
 
 // Permission Enum - Granular permission model

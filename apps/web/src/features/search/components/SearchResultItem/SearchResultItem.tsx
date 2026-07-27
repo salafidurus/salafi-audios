@@ -1,15 +1,18 @@
 "use client";
 
-import Image from "next/image";
-import { Play, Headphones, Clock } from "lucide-react";
-import { useIsDesktop, useResponsive } from "@/shared/hooks/use-responsive";
-import { useToast } from "@/core/toast";
-import { List } from "@/shared/components/List";
-import { Button } from "@/shared/components/Button";
-import { MarqueeText } from "../MarqueeText/MarqueeText";
-import { usePlayListing } from "@/features/audio";
 import type { SearchResultRow } from "@sd/domain-search";
+
+import { Play, Headphones, Clock } from "lucide-react";
+import Image from "next/image";
+
+import { useToast } from "@/core/toast";
+import { usePlayListing } from "@/features/audio";
+import { Button } from "@/shared/components/Button";
+import { List } from "@/shared/components/List";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
+import { useIsDesktop, useResponsive } from "@/shared/hooks/use-responsive";
+
+import { MarqueeText } from "../MarqueeText/MarqueeText";
 import styles from "./SearchResultItem.module.css";
 
 export type SearchResultItemProps = {

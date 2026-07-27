@@ -1,14 +1,18 @@
 "use client";
 
+import type { Locale } from "@sd/core-contracts";
+
+import type { TranslationFormState } from "@/features/admin/hooks/Translation/useTranslationForm";
+
 import { useTranslation } from "@/core/i18n/use-translation";
 import {
   getFieldValue,
   isLocaleDirty,
 } from "@/features/admin/hooks/Translation/useTranslationForm";
-import type { TranslationFormState } from "@/features/admin/hooks/Translation/useTranslationForm";
 import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
-import type { Locale } from "@sd/core-contracts";
+
 import type { TranslationEntityConfig } from "./translation-entities";
+
 import styles from "./translation-modal.module.css";
 
 export interface TranslationReviewTabProps {

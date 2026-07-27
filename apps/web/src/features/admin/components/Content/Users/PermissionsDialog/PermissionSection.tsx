@@ -1,6 +1,7 @@
 "use client";
 
 import type { Permission } from "@sd/core-contracts";
+
 import { PermissionItem } from "./PermissionItem";
 import styles from "./PermissionsDialog.module.css";
 

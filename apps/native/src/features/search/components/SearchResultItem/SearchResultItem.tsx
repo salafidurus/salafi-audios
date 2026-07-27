@@ -1,9 +1,11 @@
-import { Pressable, Text, View } from "react-native";
+import type { ComponentType } from "react";
+
 import { Image } from "expo-image";
 import { Clock3, Headphones } from "lucide-react-native";
+import { Pressable, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+
 import { MarqueeText } from "../MarqueeText/MarqueeText";
-import type { ComponentType } from "react";
 
 export type SearchResultItemProps = {
   title: string;

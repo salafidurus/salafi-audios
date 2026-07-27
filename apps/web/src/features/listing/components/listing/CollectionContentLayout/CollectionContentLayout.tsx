@@ -1,12 +1,15 @@
 "use client";
 
-import React, { useState, useRef } from "react";
 import type { ListingModuleDto, ListingContentItemDto } from "@sd/core-contracts";
 import type { Track } from "@sd/domain-audio";
-import { InfiniteSectionList, type SectionData } from "@/shared/components/InfiniteSectionList";
+
+import React, { useState, useRef } from "react";
+
 import { AppText } from "@/shared/components/AppText/AppText";
-import { ContentListItem } from "../ContentListItem/ContentListItem";
+import { InfiniteSectionList, type SectionData } from "@/shared/components/InfiniteSectionList";
+
 import { CollectionToc } from "../CollectionToc/CollectionToc";
+import { ContentListItem } from "../ContentListItem/ContentListItem";
 import styles from "./CollectionContentLayout.module.css";
 
 export type CollectionContentLayoutProps = {

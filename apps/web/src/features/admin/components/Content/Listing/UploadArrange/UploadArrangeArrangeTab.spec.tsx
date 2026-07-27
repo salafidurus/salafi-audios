@@ -1,7 +1,9 @@
-import { describe, it, expect, vi } from "bun:test";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { UploadArrangeArrangeTab } from "./UploadArrangeArrangeTab";
+import { describe, it, expect, vi } from "bun:test";
+
 import type { UploadArrangeState } from "@/features/admin/hooks/Content/useUploadArrangeState";
+
+import { UploadArrangeArrangeTab } from "./UploadArrangeArrangeTab";
 
 vi.mock("@/core/i18n/use-translation", () => ({
   useTranslation: () => ({
