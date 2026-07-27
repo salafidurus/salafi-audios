@@ -16,12 +16,14 @@ import {
 import {
   ROOT_MODULE_KEY,
   localSlugConflicts,
+  resolveParentSlug,
   type ModuleKey,
   type NewModule,
   type UploadArrangeAction,
   type UploadArrangeState,
   type UploadItem,
 } from "@/features/admin/hooks/Content/useUploadArrangeState";
+import { deriveChildSlug } from "@/features/admin/utils/upload-filename";
 import modalStyles from "../listing-modal.module.css";
 import styles from "./upload-arrange.module.css";
 
@@ -35,6 +37,53 @@ const STATUS_OPTIONS: { value: StatusValue; label: string; fallback: string }[] 
   { value: "review", label: "admin.contents.listing.review", fallback: "In Review" },
   { value: "published", label: "admin.contents.listing.published", fallback: "Published" },
 ];
+
+/** Strips a known immediate-parent prefix off a full slug, for display as an editable suffix. */
+function suffixFromSlug(slug: string, prefix: string): string {
+  const withDash = `${prefix}-`;
+  return prefix && slug.startsWith(withDash) ? slug.slice(withDash.length) : slug;
+}
+
+/**
+ * A slug field whose immediate-parent prefix is locked (shown as a fixed badge) so it can
+ * never be edited away from the prefix the server requires — only the suffix is editable.
+ * The full, recombined slug is what gets dispatched on every change.
+ */
+function PrefixedSlugField({
+  id,
+  prefix,
+  slug,
+  onChange,
+  hasConflict,
+}: {
+  id: string;
+  prefix: string;
+  slug: string;
+  onChange: (nextSlug: string) => void;
+  hasConflict: boolean;
+}) {
+  const { t } = useTranslation();
+  return (
+    <div className={modalStyles.formGroup}>
+      <label htmlFor={id} className={modalStyles.label}>
+        {t("admin.contents.listing.slugLabel", "Slug")}
+      </label>
+      <div className={modalStyles.slugPrefixGroup}>
+        {prefix && <span className={modalStyles.slugPrefixBadge}>{prefix}-</span>}
+        <InputField
+          id={id}
+          value={suffixFromSlug(slug, prefix)}
+          onChange={(value) => onChange(prefix ? deriveChildSlug(prefix, value) : value)}
+        />
+      </div>
+      {hasConflict && (
+        <span className={styles.conflictText}>
+          {t("admin.contents.listing.slugConflict", "This slug is already in use")}
+        </span>
+      )}
+    </div>
+  );
+}
 
 function StagedItemCard({
   item,
@@ -160,22 +209,15 @@ function StagedItemCard({
               </Dropdown>
             </div>
           )}
-          <div className={modalStyles.formGroup}>
-            <span className={modalStyles.label}>
-              {t("admin.contents.listing.slugLabel", "Slug")}
-            </span>
-            <InputField
-              value={assignment.slug}
-              onChange={(value) =>
-                dispatch({ type: "SET_LESSON_FIELD", itemId: item.id, field: "slug", value })
-              }
-            />
-            {hasConflict && (
-              <span className={styles.conflictText}>
-                {t("admin.contents.listing.slugConflict", "This slug is already in use")}
-              </span>
-            )}
-          </div>
+          <PrefixedSlugField
+            id={`item-${item.id}-slug`}
+            prefix={resolveParentSlug(state, assignment.moduleKey)}
+            slug={assignment.slug}
+            onChange={(value) =>
+              dispatch({ type: "SET_LESSON_FIELD", itemId: item.id, field: "slug", value })
+            }
+            hasConflict={hasConflict}
+          />
           <div className={modalStyles.formGroup}>
             <span className={modalStyles.label}>
               {t("admin.contents.listing.statusLabel", "Status")}
@@ -287,10 +329,12 @@ function StagedList({
 
 function NewModuleCard({
   mod,
+  rootSlug,
   dispatch,
   conflictSlugs,
 }: {
   mod: NewModule;
+  rootSlug: string;
   dispatch: React.Dispatch<UploadArrangeAction>;
   conflictSlugs: Set<string>;
 }) {
@@ -299,23 +343,15 @@ function NewModuleCard({
 
   return (
     <div className={styles.fieldGrid}>
-      <div className={modalStyles.formGroup}>
-        <label htmlFor={`module-${mod.tempId}-slug`} className={modalStyles.label}>
-          {t("admin.contents.listing.slugLabel", "Slug")}
-        </label>
-        <InputField
-          id={`module-${mod.tempId}-slug`}
-          value={mod.slug}
-          onChange={(value) =>
-            dispatch({ type: "EDIT_MODULE", tempId: mod.tempId, field: "slug", value })
-          }
-        />
-        {hasConflict && (
-          <span className={styles.conflictText}>
-            {t("admin.contents.listing.slugConflict", "This slug is already in use")}
-          </span>
-        )}
-      </div>
+      <PrefixedSlugField
+        id={`module-${mod.tempId}-slug`}
+        prefix={rootSlug}
+        slug={mod.slug}
+        onChange={(value) =>
+          dispatch({ type: "EDIT_MODULE", tempId: mod.tempId, field: "slug", value })
+        }
+        hasConflict={hasConflict}
+      />
       <div className={modalStyles.formGroup}>
         <label htmlFor={`module-${mod.tempId}-status`} className={modalStyles.label}>
           {t("admin.contents.listing.statusLabel", "Status")}
@@ -508,7 +544,12 @@ export function UploadArrangeArrangeTab({ state, dispatch }: UploadArrangeArrang
               <Trash2 size={16} />
             </button>
           </div>
-          <NewModuleCard mod={mod} dispatch={dispatch} conflictSlugs={conflictSlugs} />
+          <NewModuleCard
+            mod={mod}
+            rootSlug={existing.slug}
+            dispatch={dispatch}
+            conflictSlugs={conflictSlugs}
+          />
           <StagedList
             moduleKey={`new:${mod.tempId}`}
             state={state}

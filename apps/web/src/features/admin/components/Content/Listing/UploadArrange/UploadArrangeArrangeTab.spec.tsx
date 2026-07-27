@@ -40,15 +40,18 @@ function collectionState(): UploadArrangeState {
 }
 
 describe("UploadArrangeArrangeTab — collection module fields", () => {
-  it("shows an editable slug field for a staged module and dispatches EDIT_MODULE on change", () => {
+  it("locks the root-slug prefix and only lets the suffix be edited for a staged module", () => {
     const dispatch = vi.fn();
     render(<UploadArrangeArrangeTab state={collectionState()} dispatch={dispatch} />);
 
+    // The root prefix is shown as a fixed badge, not part of the editable value.
+    expect(screen.getByText("bukhari-")).toBeInTheDocument();
     const slugInput = screen.getByLabelText(/slug/i);
-    expect(slugInput).toHaveValue("bukhari-book-of-faith");
+    expect(slugInput).toHaveValue("book-of-faith");
 
-    fireEvent.change(slugInput, { target: { value: "bukhari-custom-slug" } });
+    fireEvent.change(slugInput, { target: { value: "custom slug" } });
 
+    // The dispatched value is always re-derived with the locked root prefix.
     expect(dispatch).toHaveBeenCalledWith({
       type: "EDIT_MODULE",
       tempId: "temp-1",
@@ -113,5 +116,56 @@ describe("UploadArrangeArrangeTab — collection module fields", () => {
     render(<UploadArrangeArrangeTab state={state} dispatch={dispatch} />);
 
     expect(screen.getByText(/this slug is already in use/i)).toBeInTheDocument();
+  });
+});
+
+function collectionStateWithStagedLesson(): UploadArrangeState {
+  const state = collectionState();
+  state.items = [
+    {
+      id: "item-1",
+      source: { kind: "local", file: new File(["audio-bytes"], "Hadith 1.mp3") },
+      filename: "Hadith 1.mp3",
+      title: "Hadith 1",
+      numericPrefix: 1,
+      durationSeconds: 60,
+      sizeBytes: 1000,
+      contentType: "audio/mpeg",
+      ext: "mp3",
+      assignment: {
+        kind: "new-lesson",
+        moduleKey: "new:temp-1",
+        slug: "bukhari-book-of-faith-hadith-1",
+        slugEdited: false,
+        description: "",
+        status: "draft",
+        orderIndex: 1,
+      },
+      suggestion: null,
+      upload: { status: "pending", percent: 0 },
+    },
+  ];
+  return state;
+}
+
+describe("UploadArrangeArrangeTab — collection lesson slug prefix", () => {
+  it("locks the immediate parent module's slug prefix and only lets the suffix be edited", () => {
+    const dispatch = vi.fn();
+    render(
+      <UploadArrangeArrangeTab state={collectionStateWithStagedLesson()} dispatch={dispatch} />,
+    );
+
+    // Prefixed by the module's slug, not just the root's.
+    expect(screen.getByText("bukhari-book-of-faith-")).toBeInTheDocument();
+    const slugInput = screen.getByDisplayValue("hadith-1");
+
+    fireEvent.change(slugInput, { target: { value: "custom" } });
+
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "SET_LESSON_FIELD",
+      itemId: "item-1",
+      field: "slug",
+      value: "bukhari-book-of-faith-custom",
+    });
   });
 });

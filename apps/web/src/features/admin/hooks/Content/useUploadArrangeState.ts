@@ -162,7 +162,7 @@ function nextOrderIndex(state: UploadArrangeState, moduleKey: ModuleKey): number
 }
 
 /** The slug an item/module must be prefixed by, given its immediate parent container. */
-function resolveParentSlug(state: UploadArrangeState, moduleKey: ModuleKey): string {
+export function resolveParentSlug(state: UploadArrangeState, moduleKey: ModuleKey): string {
   if (moduleKey === ROOT_MODULE_KEY) return state.existing?.slug ?? "";
   if (moduleKey.startsWith("new:")) {
     const tempId = moduleKey.slice("new:".length);
