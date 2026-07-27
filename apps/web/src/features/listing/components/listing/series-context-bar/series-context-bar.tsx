@@ -1,9 +1,12 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { SeriesContextDto } from "@sd/core-contracts";
+
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
 import { AppText } from "@/shared/components/AppText/AppText";
 import { useIsRtl } from "@/shared/hooks/use-is-rtl";
+
 import styles from "./series-context-bar.module.css";
 
 export type SeriesContextBarProps = {

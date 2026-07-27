@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from "bun:test";
-import { render, screen } from "@testing-library/react";
-import { ListingDetailScreen } from "./listing-detail.screen";
 import { useListingDetail, useListingContents, useLastPlayedLesson } from "@sd/domain-content";
+import { render, screen } from "@testing-library/react";
+import { describe, it, expect, beforeEach, vi } from "bun:test";
+
+import { ListingDetailScreen } from "./listing-detail.screen";
 
 vi.mock("@sd/domain-content", () => ({
   useListingDetail: vi.fn(),

@@ -1,5 +1,6 @@
-import { describe, it, expect } from "bun:test";
 import { resolveLocale } from "@sd/core-i18n";
+import { describe, it, expect } from "bun:test";
+
 import { LOCALE_COOKIE } from "./locale-cookie";
 
 describe("locale-cookie", () => {

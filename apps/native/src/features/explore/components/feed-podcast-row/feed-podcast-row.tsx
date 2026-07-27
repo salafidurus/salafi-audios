@@ -1,9 +1,11 @@
-import { Pressable, View } from "react-native";
-import { Image } from "expo-image";
-import { StyleSheet } from "react-native-unistyles";
 import type { FeedContentItemDto } from "@sd/core-contracts";
+
 import { pickContentField } from "@sd/core-i18n";
 import { useListingProgress } from "@sd/domain-audio";
+import { Image } from "expo-image";
+import { Pressable, View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
+
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { AppText } from "@/shared/components/AppText/AppText";
 

@@ -1,11 +1,14 @@
 "use client";
 
-import React from "react";
 import type { ListingDetailDto } from "@sd/core-contracts";
+
 import { useAudio, type Track } from "@sd/domain-audio";
+import React from "react";
+
 import { audioService } from "@/features/audio";
-import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
 import { Button } from "@/shared/components/Button/Button";
+import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
+
 import styles from "./LecturePlayButton.module.css";
 
 export type LecturePlayButtonProps = {

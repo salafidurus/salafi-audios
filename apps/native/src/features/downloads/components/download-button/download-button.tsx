@@ -1,5 +1,6 @@
 import { View, Pressable, Text, ActivityIndicator } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+
 import { useDownload } from "@/features/downloads/hooks/use-download";
 
 type DownloadButtonProps = {

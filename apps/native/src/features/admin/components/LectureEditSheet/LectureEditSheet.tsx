@@ -1,7 +1,9 @@
+import type { AdminListingDetailDto, Locale } from "@sd/core-contracts";
+
 import { useEffect, useReducer } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import type { AdminListingDetailDto, Locale } from "@sd/core-contracts";
+
 import { fetchAdminLectureDetail, updateLecture } from "../../api/admin-lectures.api";
 
 type LectureEditSheetProps = {

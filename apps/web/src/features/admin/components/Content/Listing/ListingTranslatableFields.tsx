@@ -1,9 +1,12 @@
 "use client";
 
 import React from "react";
-import { InputField } from "@/shared/components/InputField";
-import { useTranslation } from "@/core/i18n/use-translation";
+
 import type { FormAction, FormState } from "@/features/admin/hooks/Content/useListingForm";
+
+import { useTranslation } from "@/core/i18n/use-translation";
+import { InputField } from "@/shared/components/InputField";
+
 import styles from "./listing-modal.module.css";
 
 interface ListingTranslatableFieldsProps {

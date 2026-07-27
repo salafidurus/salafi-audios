@@ -1,4 +1,3 @@
-
 .rowContainer {
   display: flex;
   align-items: center;
@@ -75,7 +74,6 @@
   color: var(--content-muted);
 }
 
-
 .topicDetails {
   display: flex;
   flex-direction: column;
@@ -95,4 +93,3 @@
   font-size: var(--typo-body-sm-font-size);
   color: var(--content-default);
 }
-

@@ -1,6 +1,7 @@
+import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "bun:test";
 import React from "react";
-import { render, screen } from "@testing-library/react";
+
 import { ScholarHeader, type ScholarHeaderProps } from "./scholar-header";
 
 const mockScholar: ScholarHeaderProps["scholar"] = {

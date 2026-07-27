@@ -1,6 +1,8 @@
-import { BookOpen, Cloud, Search, Settings } from "lucide-react-native";
 import type { ComponentType } from "react";
+
 import { routes } from "@sd/core-contracts";
+import { BookOpen, Cloud, Search, Settings } from "lucide-react-native";
+
 import { DEFAULT_TABS, SECTION_TABS, type Section } from "../types";
 
 export type RootTab = Section | "search";

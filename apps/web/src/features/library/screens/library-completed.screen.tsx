@@ -1,16 +1,16 @@
 "use client";
 
 import { useInfiniteLibraryCompleted } from "@sd/domain-content";
+
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { PageHeader } from "@/shared/components/PageHeader";
+import { LibraryListRow } from "@/features/library/components/library-list-row/library-list-row";
 import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
 import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
-import { LibraryListRow } from "@/features/library/components/library-list-row/library-list-row";
-import styles from "./library-screens.module.css";
 
 export function LibraryCompletedScreen() {
   const { isAuthenticated } = useAuth();

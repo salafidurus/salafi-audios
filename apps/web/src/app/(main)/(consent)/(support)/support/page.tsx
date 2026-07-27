@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+
 import { SupportScreen } from "@/features/support/screens/support.screen";
 
 export const metadata: Metadata = {

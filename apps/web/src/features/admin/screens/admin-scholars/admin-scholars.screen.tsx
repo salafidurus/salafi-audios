@@ -1,27 +1,29 @@
 "use client";
 
-import { useState } from "react";
-import { Plus } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@sd/core-contracts";
-import { useInfiniteAdminScholars } from "@sd/domain-content";
-import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { PageHeader } from "@/shared/components/PageHeader";
-import { Button } from "@/shared/components/Button";
-import { Search } from "@/shared/components/Search";
-import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { type AdminScholarListItemDto } from "@sd/core-contracts";
+import { useInfiniteAdminScholars } from "@sd/domain-content";
+import { useQueryClient } from "@tanstack/react-query";
+import { Plus } from "lucide-react";
+import { useState } from "react";
+
+import { useTranslation } from "@/core/i18n/use-translation";
+import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
 import { Scholar } from "@/features/admin/components/Scholar";
 import {
   TranslationModal,
   translationTargetKey,
   type ClientTranslationTarget,
 } from "@/features/admin/components/Translation";
-import { useTranslation } from "@/core/i18n/use-translation";
+import { Button } from "@/shared/components/Button";
+import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
+import { Search } from "@/shared/components/Search";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
+import { useIsDesktop } from "@/shared/hooks/use-responsive";
+
 import styles from "./admin-scholars.screen.module.css";
 
 export function AdminScholarsScreen() {

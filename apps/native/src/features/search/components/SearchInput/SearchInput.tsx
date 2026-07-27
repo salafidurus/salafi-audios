@@ -1,8 +1,9 @@
+import type { ComponentType } from "react";
+
+import { ChevronLeft, X } from "lucide-react-native";
 import React, { useImperativeHandle } from "react";
 import { Pressable, TextInput as RNTextInput, View } from "react-native";
-import { ChevronLeft, X } from "lucide-react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import type { ComponentType } from "react";
 
 export type SearchInputProps = {
   placeholder: string;

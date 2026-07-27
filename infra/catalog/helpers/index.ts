@@ -1,6 +1,7 @@
+import { Glob } from "bun";
 import fs from "node:fs";
 import path from "node:path";
-import { Glob } from "bun";
+
 import type { PackageJson, Workspace, Catalogs, CatalogConfig } from "../types";
 
 export function parseCatalogs(rootJson: PackageJson): Catalogs {

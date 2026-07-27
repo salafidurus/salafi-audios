@@ -1,14 +1,16 @@
 "use client";
 
+import { Upload, FileAudio, CheckCircle, AlertCircle, Link2 } from "lucide-react";
 import React, { useRef, useState } from "react";
+
+import { useTranslation } from "@/core/i18n/use-translation";
 import { getPresignedUrl, uploadToR2 } from "@/features/admin/api/admin-lectures.api";
 import { extractAudioDuration } from "@/features/admin/utils/audio-metadata";
 import { importSingleLineWithProgress } from "@/features/admin/utils/resolve-import-urls";
 import { Button } from "@/shared/components/Button";
 import { InputField } from "@/shared/components/InputField";
-import { useTranslation } from "@/core/i18n/use-translation";
+
 import styles from "./audio-uploader.module.css";
-import { Upload, FileAudio, CheckCircle, AlertCircle, Link2 } from "lucide-react";
 
 type UploadState = "idle" | "importing" | "extracting" | "uploading" | "success" | "error";
 type UploadMode = "file" | "link";

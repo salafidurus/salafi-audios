@@ -1,4 +1,5 @@
 import { defineConfig } from "prisma/config";
+
 import { loadDbEnvFiles } from "./scripts/load-db-env.js";
 
 loadDbEnvFiles(process.cwd());

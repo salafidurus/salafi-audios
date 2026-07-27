@@ -1,9 +1,11 @@
+import type { ScholarContentItemDto } from "@sd/core-contracts";
+
+import { useScholarTopics, useScholarContent } from "@sd/domain-content";
+import { render, screen } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "bun:test";
 import React from "react";
-import { render, screen } from "@testing-library/react";
+
 import { ScholarContentList } from "./scholar-content-list";
-import type { ScholarContentItemDto } from "@sd/core-contracts";
-import { useScholarTopics, useScholarContent } from "@sd/domain-content";
 
 vi.mock("@sd/domain-content", () => ({
   useScholarTopics: vi.fn(),

@@ -1,10 +1,11 @@
 "use client";
 
-import type { CSSProperties } from "react";
 import type { ContentSuggestionDto } from "@sd/core-contracts";
+import type { CSSProperties } from "react";
+
 import { pickContentField } from "@sd/core-i18n";
+
 import { useShowOriginalContent } from "@/features/settings/content-preference";
-import { useTranslation } from "@/core/i18n/use-translation";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
 
 const itemButtonStyle: CSSProperties = {
@@ -86,7 +87,6 @@ export type FeedTopicRowProps = {
 };
 
 export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProps) {
-  const { t } = useTranslation();
   const showOriginal = useShowOriginalContent();
 
   if (items.length === 0) return null;

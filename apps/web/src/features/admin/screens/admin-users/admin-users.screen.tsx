@@ -1,21 +1,23 @@
 "use client";
 
-import { useState, useCallback, type ReactNode, useMemo } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@sd/core-contracts";
 import { useInfiniteAdminUsers } from "@sd/domain-account";
-import { useDebouncedSearch } from "@/shared/hooks";
-import { useResponsive } from "@/shared/hooks/use-responsive";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { PageHeader } from "@/shared/components/PageHeader";
-import { Search } from "@/shared/components/Search";
-import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
-import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
-import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
-import { UserItem } from "@/features/admin/components/Content/Users/user-item";
+import { useQueryClient } from "@tanstack/react-query";
+import { useState, useCallback, type ReactNode, useMemo } from "react";
+
+import { useTranslation } from "@/core/i18n/use-translation";
 import { PermissionsDialog } from "@/features/admin/components/Content/Users/PermissionsDialog";
 import { RoleDialog } from "@/features/admin/components/Content/Users/RoleDialog";
-import { useTranslation } from "@/core/i18n/use-translation";
+import { UserItem } from "@/features/admin/components/Content/Users/user-item";
+import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
+import { Search } from "@/shared/components/Search";
+import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
+import { useDebouncedSearch } from "@/shared/hooks";
+import { useResponsive } from "@/shared/hooks/use-responsive";
+
 import styles from "./admin-users.screen.module.css";
 
 export function AdminUsersScreen(): ReactNode {

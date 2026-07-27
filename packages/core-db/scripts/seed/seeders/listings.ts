@@ -3,9 +3,10 @@
  */
 
 import type { PrismaClient, ListingFormat, Status } from "../../../src/generated/prisma/client.js";
+import type { TopicPair } from "../types.js";
+
 import { SCHOLARS, TOPICS, SINGLES, SERIES, COLLECTIONS } from "../data/index.js";
 import { uuid, seedStatus, dur } from "../helpers.js";
-import type { TopicPair } from "../types.js";
 
 /**
  * Helper to upsert a listing record

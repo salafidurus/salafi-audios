@@ -1,5 +1,6 @@
 import { Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+
 import { Button } from "../Button/Button";
 import { ScreenView } from "../ScreenView/ScreenView";
 

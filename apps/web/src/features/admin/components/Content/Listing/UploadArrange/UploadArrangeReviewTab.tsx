@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
 import { AlertCircle, CheckCircle } from "lucide-react";
+import React from "react";
+
 import { useTranslation } from "@/core/i18n/use-translation";
 import {
   ROOT_MODULE_KEY,
@@ -10,6 +11,7 @@ import {
   type UploadArrangeState,
   type UploadItem,
 } from "@/features/admin/hooks/Content/useUploadArrangeState";
+
 import styles from "./upload-arrange.module.css";
 
 interface UploadArrangeReviewTabProps {

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { Modal } from "./Modal";
+
 import { Button } from "../Button";
+import { Modal } from "./Modal";
 
 export interface ConfirmDialogProps {
   isOpen: boolean;

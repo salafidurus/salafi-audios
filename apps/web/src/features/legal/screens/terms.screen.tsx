@@ -1,9 +1,10 @@
 "use client";
 
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { TERMS_LAST_UPDATE_DATE } from "@/features/legal/constants/update-date";
-import styles from "./legal-screens.module.css";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+
 import * as TermsSections from "../components/TermsSections";
+import styles from "./legal-screens.module.css";
 
 export function TermsScreen() {
   return (

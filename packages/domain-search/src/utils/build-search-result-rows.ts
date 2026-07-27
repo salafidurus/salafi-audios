@@ -1,4 +1,5 @@
 import type { SearchCatalogItemDto, SearchCatalogResultsDto } from "@sd/core-contracts";
+
 import { pickContentField } from "@sd/core-i18n";
 
 export type SearchResultRow = {

@@ -1,17 +1,20 @@
 "use client";
 
 import type { ScholarTitle } from "@sd/core-contracts";
+
+import { useTranslation } from "@/core/i18n/use-translation";
+import { FormSection } from "@/features/admin/components/FormSection";
 import {
   Dropdown,
   DropdownTrigger,
   DropdownContent,
   DropdownItem,
 } from "@/shared/components/Dropdown";
-import { InputField } from "@/shared/components/InputField";
-import { FormSection } from "@/features/admin/components/FormSection";
 import { ImageUploadEditor } from "@/shared/components/ImageUploadEditor";
-import { useTranslation } from "@/core/i18n/use-translation";
+import { InputField } from "@/shared/components/InputField";
+
 import type { FormAction, FormState } from "../../hooks/Scholar/useScholarForm";
+
 import { SCHOLAR_TITLE_LABELS, SCHOLAR_TITLES_ARRAY } from "./constants";
 import styles from "./personal-data-section.module.css";
 

@@ -1,6 +1,8 @@
-import { describe, it, expect } from "bun:test";
-import { act, renderHook } from "@testing-library/react";
 import type { ScholarFormDataDto } from "@sd/core-contracts";
+
+import { act, renderHook } from "@testing-library/react";
+import { describe, it, expect } from "bun:test";
+
 import { useScholarForm } from "./useScholarForm";
 
 const editData: ScholarFormDataDto = {

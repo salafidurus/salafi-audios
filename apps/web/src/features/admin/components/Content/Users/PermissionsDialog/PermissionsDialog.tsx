@@ -1,19 +1,21 @@
 "use client";
 
-import { useEffect, useReducer, useState, type ReactNode, useMemo } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys, type Permission, PERMISSIONS_ARRAY } from "@sd/core-contracts";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useReducer, useState, type ReactNode, useMemo } from "react";
+
+import { useTranslation } from "@/core/i18n/use-translation";
 import {
   fetchUserPermissions,
   grantPermission,
   revokePermission,
   type AdminPermissionsListResponse,
 } from "@/features/admin/api/admin.api";
-import { Modal } from "@/shared/components/Modal/Modal";
 import { Button } from "@/shared/components/Button";
-import { useTranslation } from "@/core/i18n/use-translation";
-import { PermissionSection } from "./PermissionSection";
+import { Modal } from "@/shared/components/Modal/Modal";
+
 import styles from "./PermissionsDialog.module.css";
+import { PermissionSection } from "./PermissionSection";
 
 export interface PermissionsDialogProps {
   isOpen: boolean;

@@ -1,5 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
+
+import type { PackageJson } from "../types";
+
 import {
   parseCatalogs,
   loadConfig,
@@ -7,7 +10,6 @@ import {
   getDependencyGroup,
   matchPattern,
 } from "../helpers";
-import type { PackageJson, CatalogConfigGroup } from "../types";
 
 export function runCatalogFixForce(rootDir: string): { updatedFiles: string[] } {
   const rootJsonPath = path.join(rootDir, "package.json");

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -7,9 +8,9 @@ import {
   type TextStyle,
   type ViewStyle,
 } from "react-native";
-import { useState } from "react";
 import { EaseView } from "react-native-ease";
 import { useUnistyles } from "react-native-unistyles";
+
 import { AccentGradientFill } from "../AccentGradientFill/AccentGradientFill";
 
 type ButtonVariant = "primary" | "surface" | "outline" | "ghost" | "danger";

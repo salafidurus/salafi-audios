@@ -1,5 +1,6 @@
-import { buildSearchResultRows } from "./build-search-result-rows";
 import type { SearchCatalogItemDto, SearchCatalogResultsDto } from "@sd/core-contracts";
+
+import { buildSearchResultRows } from "./build-search-result-rows";
 
 const makeItem = (overrides: Partial<SearchCatalogItemDto> = {}): SearchCatalogItemDto => ({
   id: "1",

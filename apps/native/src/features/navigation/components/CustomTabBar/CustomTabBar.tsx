@@ -1,11 +1,13 @@
-import { Tabs } from "expo-router";
 import type { ComponentProps } from "react";
+
+import { Tabs } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { EaseView } from "react-native-ease";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { getRootTabByRouteName } from "@/features/navigation/utils/tab-route-config";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+import { getRootTabByRouteName } from "@/features/navigation/utils/tab-route-config";
 
 export const TAB_BAR_HEIGHT = 84;
 export const SUBSECTION_BAR_HEIGHT = 56;

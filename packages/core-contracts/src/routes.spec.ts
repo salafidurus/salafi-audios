@@ -1,5 +1,6 @@
-import { routes, routeDefinitions, resolveRouteAccess } from "./routes";
 import type { RouteAccess } from "./routes";
+
+import { routes, routeDefinitions, resolveRouteAccess } from "./routes";
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                           */

@@ -1,7 +1,8 @@
 "use client";
 
-import { useLayoutEffect, type ReactNode } from "react";
 import { Check } from "lucide-react";
+import { useLayoutEffect, type ReactNode } from "react";
+
 import { useDropdownContext } from "./context";
 import styles from "./dropdown.module.css";
 

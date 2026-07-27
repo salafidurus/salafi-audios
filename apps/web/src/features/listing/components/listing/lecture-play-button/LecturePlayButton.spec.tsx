@@ -1,10 +1,13 @@
+import type { ListingDetailDto } from "@sd/core-contracts";
+
+import { useAudio } from "@sd/domain-audio";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import type { ListingDetailDto } from "@sd/core-contracts";
-import { LecturePlayButton } from "./LecturePlayButton";
-import { useAudio } from "@sd/domain-audio";
+
 import { audioService } from "@/features/audio";
+
+import { LecturePlayButton } from "./LecturePlayButton";
 
 vi.mock("@sd/domain-audio", () => ({
   useAudio: vi.fn(),

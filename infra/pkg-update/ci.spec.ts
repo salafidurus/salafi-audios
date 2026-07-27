@@ -1,4 +1,7 @@
-import { describe, it, expect, mock, beforeAll, afterAll, beforeEach, afterEach } from "bun:test";
+import { describe, it, expect, mock, beforeAll, beforeEach, afterEach } from "bun:test";
+
+import type { UpdateCandidate } from "./utils/ui";
+
 import {
   getGroupOrder,
   groupCandidates,
@@ -8,10 +11,8 @@ import {
   sanitizeBranchName,
   buildPrBody,
   runCi,
-  type CiOptions,
 } from "./ci";
 import { clearChangelogCache } from "./utils/changelog";
-import type { UpdateCandidate } from "./utils/ui";
 
 function makeCandidate(overrides: Partial<UpdateCandidate> = {}): UpdateCandidate {
   return {
@@ -194,7 +195,7 @@ describe("buildPrBody", () => {
 
 describe("runCi", () => {
   let tmpDir: string;
-  const { mkdtempSync, writeFileSync, mkdirSync } = require("fs") as typeof import("fs");
+  const { mkdtempSync, writeFileSync } = require("fs") as typeof import("fs");
   const { join } = require("path") as typeof import("path");
   const { tmpdir } = require("os") as typeof import("os");
 

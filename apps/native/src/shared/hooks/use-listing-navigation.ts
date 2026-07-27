@@ -1,6 +1,7 @@
-import { useRouter } from "expo-router";
 import type { Href } from "expo-router";
+
 import { routes } from "@sd/core-contracts";
+import { useRouter } from "expo-router";
 
 export function useListingNavigation() {
   const router = useRouter();

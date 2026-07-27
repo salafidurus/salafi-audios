@@ -1,20 +1,22 @@
 "use client";
 
+import { getSubnavLabel } from "@sd/core-i18n";
+import { useAdminPermissions } from "@sd/domain-account";
+import clsx from "clsx";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import clsx from "clsx";
-import { useTranslation } from "@/core/i18n/use-translation";
-import { getSubnavLabel } from "@sd/core-i18n";
-import { DEFAULT_TABS, SECTION_TABS } from "@/features/navigation/types";
-import { useIsHydrated } from "@/shared/hooks/use-is-hydrated";
-import { useAdminPermissions } from "@sd/domain-account";
+
 import { useAuth } from "@/core/auth/use-auth";
+import { useTranslation } from "@/core/i18n/use-translation";
+import { DEFAULT_TABS, SECTION_TABS } from "@/features/navigation/types";
 import {
   buildSectionTabPath,
   getActiveTabFromPath,
   getCurrentSection,
 } from "@/features/navigation/utils/get-current-section";
 import { getSectionTabIcon } from "@/features/navigation/utils/section-tab-icons";
+import { useIsHydrated } from "@/shared/hooks/use-is-hydrated";
+
 import styles from "./top-subnav-tabs.module.css";
 
 /**

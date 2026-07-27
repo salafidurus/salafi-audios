@@ -1,4 +1,5 @@
 import { describe, it, expect, afterEach } from "bun:test";
+
 import sitemap from "./sitemap";
 
 describe("sitemap", () => {

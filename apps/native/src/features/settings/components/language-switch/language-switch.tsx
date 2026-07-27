@@ -1,8 +1,9 @@
+import { SUPPORTED_LOCALES, type Locale } from "@sd/core-i18n";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { useQueryClient } from "@tanstack/react-query";
-import { SUPPORTED_LOCALES, type Locale } from "@sd/core-i18n";
+
 import { changeLocale } from "@/core/i18n/i18n";
 import { useTranslation } from "@/core/i18n/use-translation";
 

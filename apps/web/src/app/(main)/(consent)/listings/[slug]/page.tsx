@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+
 import { ListingDetailScreen } from "@/features/listing/screens/listing-detail/listing-detail.screen";
 
 export async function generateMetadata({

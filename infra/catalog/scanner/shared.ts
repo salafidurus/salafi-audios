@@ -1,7 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
-import { getWorkspaces } from "../helpers";
+
 import type { PackageJson } from "../types";
+
+import { getWorkspaces } from "../helpers";
 
 export interface DepUsage {
   depName: string;

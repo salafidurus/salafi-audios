@@ -1,9 +1,12 @@
-import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { UploadArrangeUploadTab } from "./UploadArrangeUploadTab";
-import { resolveLinksToMetadata } from "@/features/admin/utils/resolve-import-urls";
-import { extractAudioDuration } from "@/features/admin/utils/audio-metadata";
+import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
+
 import type { UploadArrangeState } from "@/features/admin/hooks/Content/useUploadArrangeState";
+
+import { extractAudioDuration } from "@/features/admin/utils/audio-metadata";
+import { resolveLinksToMetadata } from "@/features/admin/utils/resolve-import-urls";
+
+import { UploadArrangeUploadTab } from "./UploadArrangeUploadTab";
 
 vi.mock("@/features/admin/utils/resolve-import-urls", () => ({
   resolveLinksToMetadata: vi.fn(),

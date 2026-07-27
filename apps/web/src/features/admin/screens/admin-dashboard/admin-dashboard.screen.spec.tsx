@@ -1,8 +1,10 @@
-import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
-import { render, screen } from "@testing-library/react";
-import { AdminDashboardScreen } from "./admin-dashboard.screen";
 import { useAdminPermissions } from "@sd/domain-account";
+import { render, screen } from "@testing-library/react";
+import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
+
 import { useAuth } from "@/core/auth/use-auth";
+
+import { AdminDashboardScreen } from "./admin-dashboard.screen";
 
 vi.mock("@sd/domain-account", () => ({
   useAdminPermissions: vi.fn(),

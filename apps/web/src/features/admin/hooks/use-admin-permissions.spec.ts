@@ -1,6 +1,7 @@
-import { describe, it, expect, beforeEach, vi } from "bun:test";
-import { useAdminPermissions } from "./use-admin-permissions";
 import { useAccountProfile } from "@sd/domain-account";
+import { describe, it, expect, beforeEach, vi } from "bun:test";
+
+import { useAdminPermissions } from "./use-admin-permissions";
 
 vi.mock("@sd/domain-account", () => ({
   useAccountProfile: vi.fn(),

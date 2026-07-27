@@ -7,7 +7,9 @@
   border: 1px solid var(--border-default);
   max-height: calc(100vh - 180px);
   overflow-y: auto;
-  transition: width 0.2s ease, padding 0.2s ease;
+  transition:
+    width 0.2s ease,
+    padding 0.2s ease;
 }
 
 .container.collapsed {
@@ -47,7 +49,9 @@
   background: transparent;
   color: var(--content-muted);
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .toggleButton:hover {
@@ -76,7 +80,9 @@
   cursor: pointer;
   font-size: var(--typo-body-md-font-size);
   font-weight: 500;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
 }
 
 .moduleButton:hover {

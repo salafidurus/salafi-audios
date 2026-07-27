@@ -1,20 +1,22 @@
 "use client";
 
-import { useState, useMemo, useRef } from "react";
-import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys, type TopicDetailDto } from "@sd/core-contracts";
-import { List } from "@/shared/components/List";
-import { Modal } from "@/shared/components/Modal";
-import { useTranslation } from "@/core/i18n/use-translation";
 import { sanitizeError } from "@sd/utils-error";
-import { Content } from "../Content";
+import { useQueryClient } from "@tanstack/react-query";
+import { useState, useMemo, useRef } from "react";
+
+import { useTranslation } from "@/core/i18n/use-translation";
 import { deleteTopic } from "@/features/admin/api/admin.api";
 import {
   TranslationModal,
   translationTargetKey,
   type ClientTranslationTarget,
 } from "@/features/admin/components/Translation";
+import { List } from "@/shared/components/List";
+import { Modal } from "@/shared/components/Modal";
+
 import styles from "../../../screens/admin-contents/admin-contents.screen.module.css";
+import { Content } from "../Content";
 
 export type TopicsContentProps = {
   searchQuery: string;

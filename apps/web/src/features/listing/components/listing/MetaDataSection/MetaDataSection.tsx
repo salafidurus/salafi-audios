@@ -1,15 +1,18 @@
 "use client";
 
-import React from "react";
+import type { ListingDetailDto } from "@sd/core-contracts";
+
+import { pickContentField } from "@sd/core-i18n";
+import { Disc } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Disc } from "lucide-react";
-import type { ListingDetailDto } from "@sd/core-contracts";
-import { AppText } from "@/shared/components/AppText/AppText";
-import { TopicChips } from "../topic-chips/topic-chips";
-import { pickContentField } from "@sd/core-i18n";
+import React from "react";
+
 import { useShowOriginalContent } from "@/features/settings/content-preference";
+import { AppText } from "@/shared/components/AppText/AppText";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
+
+import { TopicChips } from "../topic-chips/topic-chips";
 import styles from "./MetaDataSection.module.css";
 
 function formatDuration(seconds?: number): string {

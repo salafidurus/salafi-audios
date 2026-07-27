@@ -1,5 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
+
+import type { PackageJson, CatalogConfigGroup } from "../types";
+
 import {
   parseCatalogs,
   loadConfig,
@@ -8,7 +11,6 @@ import {
   sanitizeGroupName,
 } from "../helpers";
 import { type DepUsage } from "./shared";
-import type { PackageJson, CatalogConfigGroup } from "../types";
 
 export function runCatalogFix(rootDir: string): { updatedFiles: string[] } {
   const rootJsonPath = path.join(rootDir, "package.json");

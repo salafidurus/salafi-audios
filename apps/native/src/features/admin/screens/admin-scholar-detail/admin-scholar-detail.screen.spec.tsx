@@ -1,8 +1,9 @@
-import React from "react";
-import { render, screen } from "@testing-library/react-native";
-import { AdminScholarDetailScreen } from "./admin-scholar-detail.screen";
 import { useApiQuery } from "@sd/core-contracts";
+import { render, screen } from "@testing-library/react-native";
+import React from "react";
+
 import { useAdminSeries, useAdminCollections } from "../../hooks/use-admin-scholars";
+import { AdminScholarDetailScreen } from "./admin-scholar-detail.screen";
 
 jest.mock("@sd/core-contracts", () => ({
   useApiQuery: jest.fn(),

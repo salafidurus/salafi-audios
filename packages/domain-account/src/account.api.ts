@@ -1,4 +1,3 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   endpoints,
   httpClient,
@@ -7,6 +6,7 @@ import {
   type UserProfileDto,
   type UpdateProfileDto,
 } from "@sd/core-contracts";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export function useAccountProfile(options?: { enabled?: boolean }) {
   return useApiQuery(

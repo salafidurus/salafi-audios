@@ -1,8 +1,9 @@
 // react-doctor-disable-next-line react-doctor/nextjs-missing-metadata
 "use client";
 
-import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+
 import { SearchProcessingScreen } from "@/features/search/screens/search-processing/search-processing.screen";
 
 function SearchPageInner() {

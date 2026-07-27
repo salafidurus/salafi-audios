@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
 import type { ReactNode } from "react";
-import { Modal } from "@/shared/components/Modal/Modal";
-import { Button } from "@/shared/components/Button";
+
+import { useState } from "react";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+import { Button } from "@/shared/components/Button";
+import { Modal } from "@/shared/components/Modal/Modal";
 
 interface RevokePermissionConfirmModalProps {
   isOpen: boolean;

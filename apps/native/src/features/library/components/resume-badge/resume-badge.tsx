@@ -1,6 +1,6 @@
+import { useListingProgress } from "@sd/domain-audio";
 import { Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import { useListingProgress } from "@sd/domain-audio";
 
 type ResumeBadgeProps = {
   listingId: string;

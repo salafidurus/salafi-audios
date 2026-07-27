@@ -1,7 +1,9 @@
+import { spawnSync } from "child_process";
 import { readFileSync, writeFileSync, existsSync, readdirSync, mkdirSync } from "fs";
 import { resolve, dirname } from "path";
-import { spawnSync } from "child_process";
+
 import type { UpdateCandidate } from "./utils/ui";
+
 import { config, type PkupdateConfig } from "./pkg-update.config";
 
 export function findWorkspacePkgFiles(rootDir: string): string[] {

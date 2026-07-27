@@ -1,8 +1,9 @@
 "use client";
 
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { PageHeader } from "@/shared/components/PageHeader";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+
 import styles from "./admin-stats.screen.module.css";
 
 export function AdminStatsScreen() {

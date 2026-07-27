@@ -1,6 +1,7 @@
+import { routes } from "@sd/core-contracts";
 import { type Href, type ErrorBoundaryProps, useRouter } from "expo-router";
 import { View, Text, Pressable } from "react-native";
-import { routes } from "@sd/core-contracts";
+
 import { SearchHomeScreen } from "@/features/search/screens/search-home/search-home.screen";
 
 export function ErrorBoundary({ error: _error, retry }: ErrorBoundaryProps) {

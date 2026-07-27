@@ -1,10 +1,12 @@
-import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { ListingSublistingDetail } from "./ListingSublistingDetail";
+import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
+
 import {
   fetchListingFormData,
   updateListingDetails,
 } from "@/features/admin/api/admin-lectures.api";
+
+import { ListingSublistingDetail } from "./ListingSublistingDetail";
 
 vi.mock("@/features/admin/api/admin-lectures.api", () => ({
   fetchListingFormData: vi.fn(),

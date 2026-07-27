@@ -1,11 +1,8 @@
-import { useMemo } from "react";
 import type { Permission, UserRole } from "@sd/core-contracts";
-import { useAccountProfile } from "../../account.api";
 
-interface UserPermissionsData {
-  permissions: Permission[];
-  roles: UserRole[];
-}
+import { useMemo } from "react";
+
+import { useAccountProfile } from "../../account.api";
 
 /** Helper: Check if any item exists in a set (O(n) with O(1) lookups) */
 const checkAnyInSet = <T>(

@@ -1,11 +1,12 @@
 "use client";
 
-import React from "react";
 import { useAudio } from "@sd/domain-audio";
-import { audioService } from "../index";
-import { ProgressBar } from "./progress-bar";
-import { PlaybackControls } from "./playback-controls";
+import React from "react";
+
+import { audioService } from "../audio-service";
 import styles from "./mini-player.module.css";
+import { PlaybackControls } from "./playback-controls";
+import { ProgressBar } from "./progress-bar";
 
 export function MiniPlayer() {
   const { currentTrack, hasTrack, progressPercent, durationSeconds, positionSeconds } = useAudio();

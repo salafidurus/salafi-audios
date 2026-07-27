@@ -1,3 +1,5 @@
+import type { ComponentType } from "react";
+
 import {
   Bookmark,
   CheckCircle,
@@ -9,7 +11,7 @@ import {
   Sparkles,
   User,
 } from "lucide-react-native";
-import type { ComponentType } from "react";
+
 import type { Section } from "../types";
 
 export type NativeNavigationIcon = ComponentType<{

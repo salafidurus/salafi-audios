@@ -1,6 +1,8 @@
-import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react-native";
+import React from "react";
+
 import { changeLocale } from "@/core/i18n/i18n";
+
 import { LanguageSwitch } from "./language-switch";
 
 const mockUseTranslation = jest.fn(() => ({

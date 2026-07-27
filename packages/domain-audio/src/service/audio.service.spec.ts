@@ -1,9 +1,13 @@
+import { httpClient } from "@sd/core-contracts";
 import { vi, describe, it, expect, beforeEach } from "bun:test";
-import { DurusAudioService } from "./audio.service";
+
 import type { PlaybackEngine, PlaybackEngineEvents } from "../engine/playback.engine";
-import { usePlaybackStore } from "../store/playback.store";
-import { useProgressStore } from "../progress/progress.store";
 import type { Track } from "../types/track.types";
+
+import { useProgressStore } from "../progress/progress.store";
+import { syncProgressToBackend } from "../progress/progress.sync";
+import { usePlaybackStore } from "../store/playback.store";
+import { DurusAudioService } from "./audio.service";
 
 // Mock progress sync module to avoid network triggers in tests
 vi.mock("../progress/progress.sync", () => ({
@@ -24,9 +28,6 @@ vi.mock("@sd/core-contracts", () => ({
     },
   },
 }));
-
-import { syncProgressToBackend } from "../progress/progress.sync";
-import { httpClient } from "@sd/core-contracts";
 
 describe("DurusAudioService", () => {
   let service: DurusAudioService;

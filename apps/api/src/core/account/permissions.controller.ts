@@ -1,9 +1,8 @@
 import { Controller, Get, Post, Delete, Param, Body, BadRequestException } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ApiCommonErrors } from '../../shared/decorators/api-common-errors.decorator';
-import { RequiresPermission } from '../auth/decorators';
+import { RequiresPermission, CurrentUser } from '../auth/decorators';
 import { PermissionsService } from './permissions.service';
-import { CurrentUser } from '../auth/decorators';
 import {
   Permissions,
   type UserRole,

@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
-import { I18nextProvider } from "react-i18next";
+import type { Locale } from "@sd/core-contracts";
+
 import { initApiClient, setLocaleProvider, setUnauthorizedHandler } from "@sd/core-api";
 import { createQueryClient, shouldPersistQuery, DEFAULT_MAX_AGE } from "@sd/core-contracts";
-import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
-import type { Locale } from "@sd/core-contracts";
 import { localeToDir } from "@sd/core-i18n";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import { useEffect, useState, type ReactNode } from "react";
+import { I18nextProvider } from "react-i18next";
+
 import { authClient } from "@/core/auth/auth-client";
 import { ToastContainer } from "@/core/toast";
+
 import { createI18n } from "./i18n/i18n";
 import { createIdbPersister, purgeQueryCacheDb } from "./persister";
 

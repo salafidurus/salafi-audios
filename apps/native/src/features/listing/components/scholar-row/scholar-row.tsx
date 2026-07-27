@@ -1,7 +1,9 @@
-import { Pressable, View } from "react-native";
-import { Image } from "expo-image";
-import { StyleSheet } from "react-native-unistyles";
 import type { ScholarListItemDto } from "@sd/core-contracts";
+
+import { Image } from "expo-image";
+import { Pressable, View } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
+
 import { AppText } from "@/shared/components/AppText/AppText";
 
 export type ScholarRowProps = {

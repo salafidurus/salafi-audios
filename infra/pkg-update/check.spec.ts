@@ -1,9 +1,16 @@
 import { describe, it, expect, mock } from "bun:test";
 import { mkdtempSync, writeFileSync, mkdirSync } from "fs";
-import { join } from "path";
 import { tmpdir } from "os";
+import { join } from "path";
 
-import { filterByGroups, dedupeCandidates, checkAll } from "./check";
+import {
+  filterByGroups,
+  dedupeCandidates,
+  checkAll,
+  checkCatalog,
+  checkBun,
+  checkExpo,
+} from "./check";
 import { config, type PkupdateConfig } from "./pkg-update.config";
 
 mock.module("./utils/npm", () => ({
@@ -20,8 +27,6 @@ mock.module("./utils/npm", () => ({
     return Promise.resolve(versions[name] ?? null);
   }),
 }));
-
-import { checkCatalog, checkBun, checkExpo } from "./check";
 
 function createTempPkg(content: Record<string, unknown>): string {
   const dir = mkdtempSync(join(tmpdir(), "pkg-update-test-"));

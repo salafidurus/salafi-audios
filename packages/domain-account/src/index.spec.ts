@@ -1,4 +1,5 @@
 import { describe, it, expect } from "bun:test";
+
 import * as domainAccount from "./index";
 
 describe("@sd/domain-account", () => {

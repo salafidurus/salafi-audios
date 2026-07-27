@@ -1,10 +1,10 @@
 "use client";
 
-import { Suspense } from "react";
-import { useSearchParams, redirect } from "next/navigation";
-import { useEffect, useState } from "react";
-import { authClient } from "@/core/auth/auth-client";
 import Link from "next/link";
+import { useSearchParams, redirect } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+
+import { authClient } from "@/core/auth/auth-client";
 import { useTranslation } from "@/core/i18n/use-translation";
 
 function AuthCallbackContent() {

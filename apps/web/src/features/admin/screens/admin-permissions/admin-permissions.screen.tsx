@@ -1,20 +1,22 @@
 "use client";
 
-import { useState } from "react";
 import { ADMIN_PERMISSIONS, type AdminPermission } from "@sd/core-contracts";
+import { useState } from "react";
+
+import { useTranslation } from "@/core/i18n/use-translation";
 import {
   fetchUserPermissions,
   grantPermission,
   revokePermission,
   type AdminPermissionsListResponse,
 } from "@/features/admin/api/admin.api";
-import { useResponsive } from "@/shared/hooks/use-responsive";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { PageHeader } from "@/shared/components/PageHeader";
-import { Button } from "@/shared/components/Button";
-import { RevokePermissionConfirmModal } from "@/features/admin/components/RevokePermissionConfirmModal";
 import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
-import { useTranslation } from "@/core/i18n/use-translation";
+import { RevokePermissionConfirmModal } from "@/features/admin/components/RevokePermissionConfirmModal";
+import { Button } from "@/shared/components/Button";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { useResponsive } from "@/shared/hooks/use-responsive";
+
 import styles from "./admin-permissions.screen.module.css";
 
 export function AdminPermissionsScreen() {

@@ -1,10 +1,12 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
-import { useTranslation } from "@/core/i18n/use-translation";
 import { routes } from "@sd/core-contracts";
 import { Menu } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+
+import { useTranslation } from "@/core/i18n/use-translation";
+
 import styles from "./mobile-header.module.css";
 
 interface MobileHeaderProps {

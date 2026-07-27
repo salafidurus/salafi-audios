@@ -10,8 +10,8 @@
  *   bun run --filter @sd/core-db prisma:seed  (from monorepo root)
  */
 
-import { prisma } from "./seed/database.js";
 import { SCHOLARS, TOPICS } from "./seed/data/index.js";
+import { prisma } from "./seed/database.js";
 import {
   seedScholars,
   seedTopics,

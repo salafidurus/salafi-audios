@@ -1,22 +1,25 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import type { Locale } from "@sd/core-contracts";
+
 import { sanitizeError } from "@sd/utils-error";
-import { Modal } from "@/shared/components/Modal";
+import { useEffect, useRef, useState } from "react";
+
 import { useTranslation } from "@/core/i18n/use-translation";
-import { getSecondaryLocales, getLocaleLabel } from "@/features/admin/utils/locale-tabs";
 import { useTranslationForm } from "@/features/admin/hooks/Translation/useTranslationForm";
+import { getSecondaryLocales, getLocaleLabel } from "@/features/admin/utils/locale-tabs";
 import { computeLocalesToSave } from "@/features/admin/utils/translation-save";
+import { Modal } from "@/shared/components/Modal";
+
 import {
   translationEntities,
   type ClientTranslationTarget,
   type TranslationChildSummary,
 } from "./translation-entities";
-import { TranslationLocaleFields } from "./TranslationLocaleFields";
-import { TranslationChildrenTab } from "./TranslationChildrenTab";
-import { TranslationReviewTab } from "./TranslationReviewTab";
 import styles from "./translation-modal.module.css";
+import { TranslationChildrenTab } from "./TranslationChildrenTab";
+import { TranslationLocaleFields } from "./TranslationLocaleFields";
+import { TranslationReviewTab } from "./TranslationReviewTab";
 
 export interface TranslationModalProps {
   isOpen: boolean;

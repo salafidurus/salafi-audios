@@ -1,10 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { InputField } from "@/shared/components/InputField";
-import { FormSection } from "@/features/admin/components/FormSection";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+import { FormSection } from "@/features/admin/components/FormSection";
+import { InputField } from "@/shared/components/InputField";
+
 import type { FormAction, FormState } from "../../hooks/Scholar/useScholarForm";
+
 import styles from "./social-section.module.css";
 
 interface SocialSectionProps {

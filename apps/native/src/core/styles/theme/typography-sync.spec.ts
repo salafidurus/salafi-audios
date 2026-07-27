@@ -1,5 +1,6 @@
-import { syncTypographyToLocale } from "./typography-sync";
 import { UnistylesRuntime } from "react-native-unistyles";
+
+import { syncTypographyToLocale } from "./typography-sync";
 
 jest.mock("react-native-unistyles", () => ({
   UnistylesRuntime: {

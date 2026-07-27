@@ -1,5 +1,6 @@
-import { useAdminLectures } from "./use-admin-lectures";
 import { useApiQuery } from "@sd/core-contracts";
+
+import { useAdminLectures } from "./use-admin-lectures";
 
 jest.mock("@sd/core-contracts", () => ({
   useApiQuery: jest.fn(),

@@ -1,6 +1,7 @@
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi } from "bun:test";
 import React from "react";
-import { render, screen, fireEvent, act } from "@testing-library/react";
+
 import { SettingsGeneralScreen } from "./settings-general.screen";
 
 vi.mock("@/features/settings/i18n", () => ({

@@ -1,5 +1,6 @@
-import * as SQLite from "expo-sqlite";
 import type { PersistedClient, Persister } from "@tanstack/react-query-persist-client";
+
+import * as SQLite from "expo-sqlite";
 
 const DB_NAME = "sd-query-cache.db";
 const TABLE_NAME = "query_cache";

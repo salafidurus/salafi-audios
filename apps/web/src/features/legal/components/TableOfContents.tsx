@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import styles from "./table-of-contents.module.css";
 
 interface Section {

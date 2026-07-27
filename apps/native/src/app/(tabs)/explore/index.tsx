@@ -1,7 +1,9 @@
 import type { ErrorBoundaryProps, Href } from "expo-router";
+
+import { routes } from "@sd/core-contracts";
 import { useRouter } from "expo-router";
 import { View, Text, Pressable } from "react-native";
-import { routes } from "@sd/core-contracts";
+
 import { FeedRecentScreen } from "@/features/explore/screens/explore-recent.screen";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 

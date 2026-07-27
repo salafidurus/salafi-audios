@@ -1,7 +1,7 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
 import { createContentPreferenceStore, type LanguageStorageAdapter } from "@sd/core-i18n";
+import { useSyncExternalStore } from "react";
 
 /** Cookie-backed adapter so the preference survives reloads and is readable by
  * the server when rendering. Keyed by the storage key the store passes in. */

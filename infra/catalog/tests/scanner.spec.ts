@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach } from "bun:test";
 import fs from "node:fs";
 import path from "node:path";
+
 import {
   parseCatalogs,
   runCatalogCheck,

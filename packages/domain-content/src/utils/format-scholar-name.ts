@@ -1,8 +1,10 @@
-import React, { useCallback } from "react";
 import type { ScholarTitle } from "@sd/core-contracts";
+
 import { getScholarTitleLabel, type TranslateFn } from "@sd/core-i18n";
-import { useTranslation } from "react-i18next";
 import { QueryClient, QueryClientContext } from "@tanstack/react-query";
+import React, { useCallback } from "react";
+import { useTranslation } from "react-i18next";
+
 import { useScholarsList } from "../scholar.api";
 
 export interface ScholarWithNameAndTitle {

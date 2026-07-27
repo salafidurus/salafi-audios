@@ -1,5 +1,6 @@
 "use client";
 
+import clsx from "clsx";
 import {
   useCallback,
   useMemo,
@@ -10,10 +11,11 @@ import {
   isValidElement,
   type ReactNode,
 } from "react";
-import clsx from "clsx";
+
+import type { DropdownItem, DropdownContextValue } from "./types";
+
 import { DropdownContext } from "./context";
 import { DropdownItem as DropdownItemComponent } from "./dropdown-item";
-import type { DropdownItem, DropdownContextValue } from "./types";
 import styles from "./dropdown.module.css";
 
 function extractItemsFromChildren(children: ReactNode): DropdownItem[] {

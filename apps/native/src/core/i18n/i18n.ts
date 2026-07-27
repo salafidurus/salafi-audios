@@ -1,13 +1,14 @@
+import { type Locale, isRtl } from "@sd/core-i18n";
+import arShared from "@sd/core-i18n/locales/ar.json";
+import enShared from "@sd/core-i18n/locales/en.json";
 import i18next from "i18next";
 import { initReactI18next } from "react-i18next";
 import { I18nManager } from "react-native";
-import { type Locale, isRtl } from "@sd/core-i18n";
-import enShared from "@sd/core-i18n/locales/en.json";
-import arShared from "@sd/core-i18n/locales/ar.json";
-import arOverrides from "./overrides.ar.json";
-import enOverrides from "./overrides.en.json";
+
 import { getStoredLocale, storeLocale } from "./locale-storage";
 import { mergeLocaleMessages } from "./merge-locale-messages";
+import arOverrides from "./overrides.ar.json";
+import enOverrides from "./overrides.en.json";
 
 export const i18n = i18next;
 

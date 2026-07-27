@@ -1,5 +1,6 @@
-import { httpClient, endpoints } from "@sd/core-contracts";
 import type { AdminPermissionsListDto } from "@sd/core-contracts";
+
+import { httpClient, endpoints } from "@sd/core-contracts";
 
 export async function fetchAdminPermissions(): Promise<AdminPermissionsListDto> {
   const profile = await httpClient<{ permissions: string[] }>({

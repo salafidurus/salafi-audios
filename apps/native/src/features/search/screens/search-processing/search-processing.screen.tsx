@@ -1,6 +1,9 @@
+import { useSearchProcessing } from "@sd/domain-search";
 import { useCallback, useEffect, useRef } from "react";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+
+import { useTranslation } from "@/core/i18n/use-translation";
 import { SearchFilter } from "@/features/search/components/SearchFilter/SearchFilter";
 import {
   SearchInput,
@@ -11,9 +14,7 @@ import {
   SearchResultsList,
   type SearchResultRow,
 } from "@/features/search/components/SearchResultsList/SearchResultsList";
-import { useSearchProcessing } from "@sd/domain-search";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
-import { useTranslation } from "@/core/i18n/use-translation";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 

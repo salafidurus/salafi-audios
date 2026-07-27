@@ -1,6 +1,7 @@
+import type { ViewStyle, LayoutChangeEvent } from "react-native";
+
 import React, { useState, useCallback, useRef } from "react";
 import { View, FlatList, Pressable, StyleSheet } from "react-native";
-import type { ViewStyle, LayoutChangeEvent } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
 
 export interface RenderItemParams<T> {

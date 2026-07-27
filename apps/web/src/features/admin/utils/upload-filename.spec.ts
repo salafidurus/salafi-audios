@@ -1,6 +1,8 @@
-import { describe, it, expect } from "bun:test";
-import { parseUploadFilename, slugify, findSlugMatch } from "./upload-filename";
 import type { AdminArrangeLessonDto } from "@sd/core-contracts";
+
+import { describe, it, expect } from "bun:test";
+
+import { parseUploadFilename, slugify, findSlugMatch } from "./upload-filename";
 
 describe("parseUploadFilename", () => {
   it("extracts a numeric prefix, title, and extension", () => {

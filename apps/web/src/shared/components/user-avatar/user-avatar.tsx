@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
+
 import Image from "next/image";
+
 import styles from "./user-avatar.module.css";
 
 type UserAvatarProps = {

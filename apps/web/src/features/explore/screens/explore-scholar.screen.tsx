@@ -1,19 +1,20 @@
 "use client";
 
-import { useRef, useEffect, useState, type ReactNode } from "react";
-import { useRouter } from "next/navigation";
 import { routes } from "@sd/core-contracts";
 import { useInfiniteScholarsList } from "@sd/domain-content";
+import { useRouter } from "next/navigation";
+
 import { useTranslation } from "@/core/i18n/use-translation";
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
-import { useDebouncedSearch } from "@/shared/hooks";
-import { Search } from "@/shared/components/Search";
-import { PageHeader } from "@/shared/components/PageHeader";
-import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
-import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
 import { ScholarListRow } from "@/features/listing/components/scholar/scholar-list-row/scholar-list-row";
+import { InfiniteScrollList } from "@/shared/components/InfiniteScrollList";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
+import { Search } from "@/shared/components/Search";
+import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
+import { useDebouncedSearch } from "@/shared/hooks";
+import { useIsDesktop } from "@/shared/hooks/use-responsive";
+
 import styles from "./explore-scholar.screen.module.css";
 
 export type ExploreScholarScreenProps = {
@@ -33,8 +34,7 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
     debouncedQuery: debouncedSearch,
   } = useDebouncedSearch();
 
-  const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } =
-    useInfiniteScholarsList();
+  const { data, isFetching, hasNextPage, fetchNextPage } = useInfiniteScholarsList();
 
   const allScholars = data?.pages.flatMap((p) => p.items) ?? [];
 

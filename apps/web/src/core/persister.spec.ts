@@ -4,6 +4,7 @@ import "@/test-setup";
 // shim is registered here rather than globally in test-setup.
 import "fake-indexeddb/auto";
 import { describe, it, expect, vi } from "bun:test";
+
 import { purgeQueryCacheDb, createIdbPersister } from "./persister";
 
 describe("Web Query Cache Persister", () => {

@@ -1,7 +1,8 @@
-import React from "react";
 import { render, screen } from "@testing-library/react-native";
-import { AdminLecturesScreen } from "./admin-lectures.screen";
+import React from "react";
+
 import { useAdminLectures } from "../../hooks/use-admin-lectures";
+import { AdminLecturesScreen } from "./admin-lectures.screen";
 
 jest.mock("../../hooks/use-admin-lectures", () => ({
   useAdminLectures: jest.fn(),

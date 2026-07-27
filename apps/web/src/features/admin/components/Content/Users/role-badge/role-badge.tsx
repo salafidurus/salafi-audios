@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+
 import styles from "./role-badge.module.css";
 
 type RoleBadgeProps = {

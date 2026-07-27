@@ -1,6 +1,8 @@
-import { describe, it, expect } from "bun:test";
-import { act, renderHook } from "@testing-library/react";
 import type { TranslationViewDto } from "@sd/core-contracts";
+
+import { act, renderHook } from "@testing-library/react";
+import { describe, it, expect } from "bun:test";
+
 import { getFieldValue, isLocaleDirty, useTranslationForm } from "./useTranslationForm";
 
 const translations: TranslationViewDto[] = [

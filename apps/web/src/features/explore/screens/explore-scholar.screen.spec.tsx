@@ -1,5 +1,6 @@
-import { describe, it, expect, vi } from "bun:test";
 import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi } from "bun:test";
+
 import { ExploreScholarScreen } from "./explore-scholar.screen";
 
 vi.mock("@sd/domain-content", () => ({

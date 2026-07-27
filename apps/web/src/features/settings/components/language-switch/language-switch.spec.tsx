@@ -1,7 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from "bun:test";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { LanguageSwitch } from "./language-switch";
+import { describe, it, expect, beforeEach, vi } from "bun:test";
+
 import { setLocaleCookie } from "@/core/i18n/locale-cookie";
+
+import { LanguageSwitch } from "./language-switch";
 
 const mockChangeLanguage = vi.fn().mockResolvedValue(undefined);
 const mockRefresh = vi.fn();

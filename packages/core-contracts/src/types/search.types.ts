@@ -1,4 +1,5 @@
 import { z } from "zod";
+
 import { ContentOriginalFieldsSchema, LocaleSchema } from "./localization.types";
 
 export const SearchCatalogParamsSchema = z.object({

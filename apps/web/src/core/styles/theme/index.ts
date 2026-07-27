@@ -1,9 +1,10 @@
 import { createColors, type AppColors } from "@sd/design-tokens";
-import { createAccentRecipesWeb, type AccentRecipesWeb } from "./recipes";
-import { spacingWeb, type SpacingWeb } from "./spacing";
-import { radiusWeb, type RadiusWeb } from "./radius";
+
 import { borderWeb, type BorderWeb } from "./border";
+import { radiusWeb, type RadiusWeb } from "./radius";
+import { createAccentRecipesWeb, type AccentRecipesWeb } from "./recipes";
 import { createShadowsWeb, type ShadowsWebTheme } from "./shadows";
+import { spacingWeb, type SpacingWeb } from "./spacing";
 import { typographyWeb, type TypographyWeb } from "./typography";
 
 export type AppThemeWeb = {

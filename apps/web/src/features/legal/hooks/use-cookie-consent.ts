@@ -16,14 +16,14 @@ function getCookieConsentFromStorage(): CookieConsentState | null {
   return null;
 }
 
-function setCookieConsentInStorage(state: CookieConsentState): void {
+function setCookieConsentInStorage(): void {
   if (typeof localStorage === "undefined") return;
   localStorage.setItem(COOKIE_CONSENT_KEY, "true");
   window.dispatchEvent(new CustomEvent(COOKIE_CONSENT_CHANGE_EVENT));
 }
 
 export const accept = () => {
-  setCookieConsentInStorage({ accepted: true });
+  setCookieConsentInStorage();
 };
 
 export function useCookieConsent() {

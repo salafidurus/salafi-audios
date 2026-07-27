@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useEffectEvent } from "react";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+
 import { NavItems } from "./nav-items";
 import styles from "./sidebar-drawer.module.css";
 

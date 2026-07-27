@@ -1,3 +1,5 @@
+import type { Locale } from "@sd/core-i18n";
+
 import {
   endpoints,
   httpClient,
@@ -6,7 +8,6 @@ import {
   type SaveTranslationDto,
   type TranslationTarget,
 } from "@sd/core-contracts";
-import type { Locale } from "@sd/core-i18n";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 function translationQueryKey(target: TranslationTarget) {

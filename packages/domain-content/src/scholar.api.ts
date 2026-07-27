@@ -1,3 +1,5 @@
+import type { QueryClient, UseQueryOptions } from "@tanstack/react-query";
+
 import {
   endpoints,
   httpClient,
@@ -9,7 +11,6 @@ import {
   type ScholarListItemDto,
   type ScholarTopicsDto,
 } from "@sd/core-contracts";
-import type { QueryClient, UseQueryOptions } from "@tanstack/react-query";
 
 export function useScholarsList(
   options?: Omit<

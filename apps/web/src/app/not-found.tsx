@@ -1,8 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { routes } from "@sd/core-contracts";
+import Link from "next/link";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+
 import styles from "./not-found.module.css";
 
 export default function NotFound() {

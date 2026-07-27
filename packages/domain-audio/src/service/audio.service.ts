@@ -1,10 +1,12 @@
 import { httpClient, endpoints } from "@sd/core-contracts";
+
 import type { PlaybackEngine } from "../engine/playback.engine";
-import { QueueManager } from "../queue/queue.manager";
-import { usePlaybackStore } from "../store/playback.store";
+import type { Track } from "../types/track.types";
+
 import { useProgressStore } from "../progress/progress.store";
 import { syncProgressToBackend } from "../progress/progress.sync";
-import type { Track } from "../types/track.types";
+import { QueueManager } from "../queue/queue.manager";
+import { usePlaybackStore } from "../store/playback.store";
 
 type StreamUrlResponse = { url: string };
 

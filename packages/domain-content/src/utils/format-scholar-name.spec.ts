@@ -1,22 +1,23 @@
-import { describe, expect, it } from "bun:test";
-
-// Register happy-dom globals before @testing-library/react is used below —
-// this package has no app-level test harness (unlike apps/web), so the
-// couple of hook tests here set it up inline.
-const { GlobalRegistrator } = require("@happy-dom/global-registrator");
-GlobalRegistrator.register();
-
-import { createElement, type ReactNode } from "react";
-import { renderHook } from "@testing-library/react";
-import i18next from "i18next";
-import { initReactI18next, I18nextProvider } from "react-i18next";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { queryKeys } from "@sd/core-contracts";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { renderHook } from "@testing-library/react";
+import { describe, expect, it } from "bun:test";
+import i18next from "i18next";
+import { createElement, type ReactNode } from "react";
+import { initReactI18next, I18nextProvider } from "react-i18next";
+
 import {
   formatScholarName,
   useFormatScholarName,
   useFormattedScholarName,
 } from "./format-scholar-name";
+
+// Register happy-dom globals before tests run — this package has no
+// app-level test harness (unlike apps/web), so the couple of hook tests
+// here set it up inline.
+const { GlobalRegistrator } = require("@happy-dom/global-registrator");
+
+GlobalRegistrator.register();
 
 const englishT = (key: string) =>
   ({

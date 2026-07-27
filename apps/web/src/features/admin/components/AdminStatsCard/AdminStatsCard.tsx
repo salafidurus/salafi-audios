@@ -1,7 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+
 import styles from "./AdminStatsCard.module.css";
 
 export interface AdminStatsCardProps {

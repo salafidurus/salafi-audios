@@ -1,14 +1,16 @@
-import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { useAdminPermissions } from "@sd/domain-account";
-import { TranslationModal } from "./TranslationModal";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
+
 import { fetchListingFormData, fetchArrangeData } from "@/features/admin/api/admin-lectures.api";
-import { fetchScholarFormData, fetchAdminTopic } from "@/features/admin/api/admin.api";
 import {
   saveListingTranslation,
   publishScholarTranslation,
   saveTopicTranslation,
 } from "@/features/admin/api/admin-translations.api";
+import { fetchScholarFormData, fetchAdminTopic } from "@/features/admin/api/admin.api";
+
+import { TranslationModal } from "./TranslationModal";
 
 vi.mock("@/features/admin/api/admin-lectures.api", () => ({
   fetchListingFormData: vi.fn(),

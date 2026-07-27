@@ -1,10 +1,12 @@
 import type { Locale } from "@sd/core-contracts";
+
+import type { TranslationEntityConfig } from "@/features/admin/components/Translation/translation-entities";
+
 import {
   getFieldValue,
   isLocaleDirty,
   type TranslationFormState,
 } from "@/features/admin/hooks/Translation/useTranslationForm";
-import type { TranslationEntityConfig } from "@/features/admin/components/Translation/translation-entities";
 
 export interface LocalesToSaveResult {
   /** Locales that are dirty and safe to persist, with their merged field values. */

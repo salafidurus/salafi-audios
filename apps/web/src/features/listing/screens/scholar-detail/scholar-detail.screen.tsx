@@ -1,14 +1,16 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useScholarDetail, useScholarContent, useScholarTopics } from "@sd/domain-content";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
-import { AppText } from "@/shared/components/AppText/AppText";
-import { Search, type FilterChip } from "@/shared/components/Search";
+import React, { useState, useRef, useEffect, useMemo } from "react";
+
 import { useTranslation } from "@/core/i18n/use-translation";
-import { ScholarHeader } from "@/features/listing/components/scholar/scholar-header/scholar-header";
 import { ScholarContentList } from "@/features/listing/components/scholar/scholar-content-list/scholar-content-list";
+import { ScholarHeader } from "@/features/listing/components/scholar/scholar-header/scholar-header";
+import { AppText } from "@/shared/components/AppText/AppText";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { Search, type FilterChip } from "@/shared/components/Search";
+import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
+
 import styles from "./scholar-detail.screen.module.css";
 
 export type ScholarDetailScreenProps = {

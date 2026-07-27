@@ -45,7 +45,7 @@ const mockTopicsService = {
   updateTranslation: vi.fn<any>().mockResolvedValue(mockTranslation),
 };
 
-async function buildApp(overrideGuard?: () => boolean | never): Promise<NestFastifyApplication> {
+async function buildApp(): Promise<NestFastifyApplication> {
   const builder = Test.createTestingModule({
     imports: [CacheModule.register({ isGlobal: true, ttl: 0 })],
     controllers: [TopicsController, TopicsTranslationsController],

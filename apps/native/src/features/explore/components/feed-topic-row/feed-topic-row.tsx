@@ -1,10 +1,12 @@
-import { View, Text, FlatList, Pressable } from "react-native";
-import type { ListRenderItemInfo } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
 import type { ContentSuggestionDto } from "@sd/core-contracts";
+import type { ListRenderItemInfo } from "react-native";
+
 import { pickContentField } from "@sd/core-i18n";
-import { useShowOriginalContent } from "@/features/settings/content-preference";
+import { View, Text, FlatList, Pressable } from "react-native";
+import { StyleSheet } from "react-native-unistyles";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+import { useShowOriginalContent } from "@/features/settings/content-preference";
 
 export type FeedTopicRowProps = {
   topicName: string;

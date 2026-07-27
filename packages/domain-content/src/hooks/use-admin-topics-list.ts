@@ -1,5 +1,10 @@
-import { useApiQuery, endpoints, queryKeys, type TopicDetailDto } from "@sd/core-contracts";
-import { httpClient } from "@sd/core-contracts";
+import {
+  useApiQuery,
+  endpoints,
+  queryKeys,
+  type TopicDetailDto,
+  httpClient,
+} from "@sd/core-contracts";
 
 export function useAdminTopicsList(options?: Parameters<typeof useApiQuery<TopicDetailDto[]>>[2]) {
   return useApiQuery(

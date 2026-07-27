@@ -44,10 +44,8 @@
  */
 
 import { SearchBar, type SearchBarProps } from "./Search.Bar";
-
-import { SearchFilter, type SearchFilterProps, type FilterChip } from "./Search.Filter";
-
 import { SearchButton, type SearchButtonProps } from "./Search.Button";
+import { SearchFilter, type SearchFilterProps, type FilterChip } from "./Search.Filter";
 
 export const Search = Object.assign({
   Bar: SearchBar,

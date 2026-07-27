@@ -1,8 +1,10 @@
-import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { PermissionsDialog } from "./PermissionsDialog";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
+
 import * as adminApi from "@/features/admin/api/admin.api";
+
+import { PermissionsDialog } from "./PermissionsDialog";
 
 vi.mock("@/features/admin/api/admin.api", () => ({
   fetchUserPermissions: vi.fn(),

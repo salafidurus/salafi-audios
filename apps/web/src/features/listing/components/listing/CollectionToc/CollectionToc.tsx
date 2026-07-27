@@ -1,9 +1,12 @@
 "use client";
 
-import React from "react";
-import { Minimize2, Maximize2 } from "lucide-react";
 import type { ListingModuleDto } from "@sd/core-contracts";
+
+import { Minimize2, Maximize2 } from "lucide-react";
+import React from "react";
+
 import { AppText } from "@/shared/components/AppText/AppText";
+
 import styles from "./CollectionToc.module.css";
 
 export type CollectionTocProps = {

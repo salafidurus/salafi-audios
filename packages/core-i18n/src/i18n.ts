@@ -1,5 +1,6 @@
 import i18nextLib from "i18next";
 import { type InitOptions } from "i18next";
+
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "./supported-locales";
 
 export interface I18nConfig {

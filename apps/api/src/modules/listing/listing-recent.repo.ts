@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../core/db/prisma.service';
 import { Status } from '@sd/core-db';
-import type { FeedContentItemDto, FeedPageDto, Locale } from '@sd/core-contracts';
+import type { FeedContentItemDto, FeedPageDto } from '@sd/core-contracts';
 import { resolveContentTranslation } from '../../shared/i18n/resolve-content-translation';
 import { getRequestLocale } from '../../shared/i18n/locale-context';
 import { ConfigService } from '../../core/config/config.service';

@@ -1,23 +1,26 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef } from "react";
-import { Modal } from "@/shared/components/Modal";
 import type { Locale } from "@sd/core-contracts";
+
 import { sanitizeError } from "@sd/utils-error";
+import { useState, useEffect, useMemo, useRef } from "react";
+
 import { useTranslation } from "@/core/i18n/use-translation";
-import { InputField } from "@/shared/components/InputField";
-import { FormSection } from "@/features/admin/components/FormSection";
-import { GeneralDataSection } from "./general-data-section";
-import { LocationSection } from "./location-section";
-import { SocialSection } from "./social-section";
-import { SettingsSection } from "./settings-section";
-import { ReviewSection } from "./review-section";
 import { fetchScholarFormData } from "@/features/admin/api/admin.api";
-import { useScholarForm } from "../../hooks/Scholar/useScholarForm";
-import { useSaveScholar } from "../../hooks/Scholar/useSaveScholar";
+import { FormSection } from "@/features/admin/components/FormSection";
 import { getLocaleLabel } from "@/features/admin/utils/locale-tabs";
 import { slugify } from "@/features/admin/utils/slugify";
+import { InputField } from "@/shared/components/InputField";
+import { Modal } from "@/shared/components/Modal";
+
+import { useSaveScholar } from "../../hooks/Scholar/useSaveScholar";
+import { useScholarForm } from "../../hooks/Scholar/useScholarForm";
+import { GeneralDataSection } from "./general-data-section";
+import { LocationSection } from "./location-section";
+import { ReviewSection } from "./review-section";
 import styles from "./scholar-modal.module.css";
+import { SettingsSection } from "./settings-section";
+import { SocialSection } from "./social-section";
 
 export interface ScholarModalProps {
   isOpen: boolean;

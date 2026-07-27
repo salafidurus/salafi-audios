@@ -1,14 +1,16 @@
+import type { ScholarListItemDto } from "@sd/core-contracts";
+import type { ListRenderItemInfo } from "react-native";
+
+import { useInfiniteScholarsList } from "@sd/domain-content";
 import { useCallback, useState } from "react";
 import { FlatList, View } from "react-native";
-import type { ListRenderItemInfo } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
-import type { ScholarListItemDto } from "@sd/core-contracts";
-import { useInfiniteScholarsList } from "@sd/domain-content";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+import { ScholarRow } from "@/features/listing/components/scholar-row/scholar-row";
+import { SearchInput } from "@/features/search/components/SearchInput/SearchInput";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { SearchInput } from "@/features/search/components/SearchInput/SearchInput";
-import { ScholarRow } from "@/features/listing/components/scholar-row/scholar-row";
 
 export type ExploreScholarScreenProps = {
   onNavigateToScholar?: (slug: string) => void;
@@ -25,8 +27,7 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } =
-    useInfiniteScholarsList();
+  const { data, isFetching, isError, hasNextPage, fetchNextPage } = useInfiniteScholarsList();
 
   const allScholars = data?.pages.flatMap((p) => p.items) ?? [];
 

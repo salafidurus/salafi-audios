@@ -1,4 +1,5 @@
 import type { Locale, TranslationStatus, TranslationViewDto } from "@sd/core-contracts";
+
 import { useReducer } from "react";
 
 /** Field values for one locale, as returned by the source entity or a translation row. */

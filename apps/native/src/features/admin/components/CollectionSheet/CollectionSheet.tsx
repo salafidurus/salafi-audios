@@ -1,7 +1,9 @@
+import type { AdminListingDetailDto } from "@sd/core-contracts";
+
 import { useReducer } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import type { AdminListingDetailDto } from "@sd/core-contracts";
+
 import { createCollection, updateCollection } from "../../api/admin-scholars.api";
 
 type CollectionSheetProps = {

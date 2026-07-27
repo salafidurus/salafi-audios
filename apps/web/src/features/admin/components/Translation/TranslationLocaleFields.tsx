@@ -1,7 +1,7 @@
 "use client";
 
 import type { Locale } from "@sd/core-contracts";
-import { Button } from "@/shared/components/Button";
+
 import { useTranslation } from "@/core/i18n/use-translation";
 import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
 import {
@@ -10,10 +10,13 @@ import {
   type TranslationFormAction,
   type TranslationFormState,
 } from "@/features/admin/hooks/Translation/useTranslationForm";
+import { Button } from "@/shared/components/Button";
+
 import type { TranslationEntityConfig } from "./translation-entities";
-import { TranslationFieldRow } from "./TranslationFieldRow";
-import { statusInfo, type StatusDot } from "./translation-status";
+
 import styles from "./translation-modal.module.css";
+import { statusInfo, type StatusDot } from "./translation-status";
+import { TranslationFieldRow } from "./TranslationFieldRow";
 
 const STATUS_DOT_CLASS: Record<StatusDot, string> = {
   published: styles.dotPublished ?? "",

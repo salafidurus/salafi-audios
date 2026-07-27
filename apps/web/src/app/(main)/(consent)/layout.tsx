@@ -1,10 +1,10 @@
 "use client";
 
+import { MiniPlayer } from "@/features/audio";
+import { CookieConsentGate, AnalyticsScripts } from "@/features/legal";
 import { Footer } from "@/features/navigation/components/footer/footer";
 import { Sidebar } from "@/features/navigation/components/sidebar/sidebar";
 import { TopSubnavTabs } from "@/features/navigation/components/top-subnav-tabs/top-subnav-tabs";
-import { MiniPlayer } from "@/features/audio";
-import { CookieConsentGate, AnalyticsScripts } from "@/features/legal";
 
 export default function ConsentLayout({ children }: { children: React.ReactNode }) {
   const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL;

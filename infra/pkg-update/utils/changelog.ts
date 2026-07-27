@@ -88,24 +88,6 @@ async function fetchGitCompareUrl(
   }
 }
 
-async function fetchGitHubCompareUrl(
-  packageName: string,
-  fromVersion: string,
-  toVersion: string,
-  token?: string,
-): Promise<string | null> {
-  const repoUrl = await fetchNpmRepoUrl(packageName);
-  if (!repoUrl) return null;
-
-  if (isGitHubUrl(repoUrl)) {
-    const compareResult = await fetchGitCompareUrl(repoUrl, fromVersion, toVersion, token);
-    if (compareResult) return compareResult;
-  }
-
-  const path = repoUrl.replace(/^https?:\/\//, "").replace(/\/$/, "");
-  return [`Changes: ${path}/compare/v${fromVersion}...v${toVersion}`].join("\n");
-}
-
 export async function buildChangelogSection(
   packageName: string,
   fromVersion: string,
@@ -116,7 +98,6 @@ export async function buildChangelogSection(
   lines.push("");
 
   const repoUrl = await fetchNpmRepoUrl(packageName);
-  const path = repoUrl?.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
   if (repoUrl && isGitHubUrl(repoUrl)) {
     const compareContent = await fetchGitCompareUrl(repoUrl, fromVersion, toVersion, token);

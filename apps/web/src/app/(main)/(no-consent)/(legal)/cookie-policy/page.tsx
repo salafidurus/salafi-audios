@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+
 import { CookiePolicyScreen } from "@/features/legal/screens/cookie-policy.screen";
 
 export const metadata: Metadata = {

@@ -1,8 +1,10 @@
 "use client";
 
-import { Toggle } from "@/shared/components/Toggle";
 import type { UserRole } from "@sd/core-contracts";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+import { Toggle } from "@/shared/components/Toggle";
+
 import { ROLE_LABELS, ROLE_DESCRIPTIONS } from "./constants";
 import styles from "./RoleDialog.module.css";
 

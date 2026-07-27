@@ -1,5 +1,6 @@
 import { View, Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+
 import { useDownload } from "@/features/downloads/hooks/use-download";
 
 type DownloadProgressProps = {

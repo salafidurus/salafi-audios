@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from "bun:test";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { ScholarDetailScreen } from "./scholar-detail.screen";
 import { useScholarDetail, useScholarContent, useScholarTopics } from "@sd/domain-content";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, beforeEach, vi } from "bun:test";
+
+import { ScholarDetailScreen } from "./scholar-detail.screen";
 
 vi.mock("@sd/domain-content", () => ({
   useScholarDetail: vi.fn(),

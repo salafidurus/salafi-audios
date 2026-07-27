@@ -1,4 +1,5 @@
 import { create } from "zustand";
+
 import type { PlaybackState, PlaybackStatus } from "../types/state.types";
 import type { Track } from "../types/track.types";
 

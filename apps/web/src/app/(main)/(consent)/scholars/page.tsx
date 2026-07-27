@@ -1,5 +1,5 @@
-import { permanentRedirect } from "next/navigation";
 import { routes } from "@sd/core-contracts";
+import { permanentRedirect } from "next/navigation";
 
 export const metadata = {
   title: "Scholars",

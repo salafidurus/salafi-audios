@@ -1,5 +1,5 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
 import { httpClient, endpoints, queryKeys, type AdminScholarListDto } from "@sd/core-contracts";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 export interface UseInfiniteAdminScholarsOptions {
   search?: string;

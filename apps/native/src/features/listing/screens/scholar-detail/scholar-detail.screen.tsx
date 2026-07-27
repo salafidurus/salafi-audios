@@ -1,13 +1,14 @@
-import { useState, useCallback } from "react";
-import { Pressable, ScrollView, View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import "react-native-reanimated";
 import { useScholarDetail, useScholarContent, useScholarTopics } from "@sd/domain-content";
 import { ChevronDown } from "lucide-react-native";
-import { AppText } from "@/shared/components/AppText/AppText";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { useState, useCallback } from "react";
+import "react-native-reanimated";
+import { Pressable, ScrollView, View } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
+
 import { ScholarContentList } from "@/features/listing/components/scholar-content-list/scholar-content-list";
 import { ScholarHeader } from "@/features/listing/components/scholar-header/scholar-header";
+import { AppText } from "@/shared/components/AppText/AppText";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
 export type ScholarDetailScreenProps = {
   slug: string;

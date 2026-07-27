@@ -1,5 +1,7 @@
-import React from "react";
 import type { TypographyVariant } from "@sd/design-tokens";
+
+import React from "react";
+
 import styles from "./app-text.module.css";
 
 export type AppTextProps = {

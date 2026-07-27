@@ -1,5 +1,6 @@
-import { describe, it, expect } from "bun:test";
 import { render, screen } from "@testing-library/react";
+import { describe, it, expect } from "bun:test";
+
 import { Button } from "./Button";
 
 describe("Button loading state", () => {

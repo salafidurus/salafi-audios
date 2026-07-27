@@ -1,9 +1,10 @@
+import { useAdminPermissions } from "@sd/domain-account";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { render, screen } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import React from "react";
-import { render, screen } from "@testing-library/react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 import { AdminScholarsScreen } from "./admin-scholars.screen";
-import { useAdminPermissions } from "@sd/domain-account";
 
 vi.mock("@sd/domain-account", () => ({
   useAdminPermissions: vi.fn(),

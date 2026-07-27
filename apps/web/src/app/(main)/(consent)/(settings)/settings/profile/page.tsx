@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+
 import { SettingsProfileScreen } from "@/features/settings/screens/settings-profile.screen";
 
 export const metadata: Metadata = {

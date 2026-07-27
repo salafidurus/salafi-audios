@@ -1,11 +1,11 @@
 "use client";
 
-import { StoreDownloadBadge } from "../store-download-badge/store-download-badge";
 import {
   APP_STORE_URL,
   GOOGLE_PLAY_URL,
   type MobileAvailability,
 } from "../../screens/home/home.constants";
+import { StoreDownloadBadge } from "../store-download-badge/store-download-badge";
 import styles from "./mobile-download-section.module.css";
 
 export type MobileDownloadSectionProps = {

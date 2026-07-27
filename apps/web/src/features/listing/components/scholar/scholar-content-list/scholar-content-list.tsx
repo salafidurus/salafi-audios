@@ -1,14 +1,17 @@
 "use client";
 
+import type { ScholarContentItemDto } from "@sd/core-contracts";
+
+import { pickContentField } from "@sd/core-i18n";
+import { useScholarTopics, useScholarContent } from "@sd/domain-content";
+import { Play, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { FolderClosed, BookOpen, Play, ChevronLeft, ChevronRight } from "lucide-react";
-import type { ScholarContentItemDto } from "@sd/core-contracts";
-import { pickContentField } from "@sd/core-i18n";
-import { useShowOriginalContent } from "@/features/settings/content-preference";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { useIsRtl } from "@/shared/hooks/use-is-rtl";
-import { useScholarTopics, useScholarContent } from "@sd/domain-content";
+
 import styles from "./scholar-content-list.module.css";
 
 export type ScholarContentListProps = {

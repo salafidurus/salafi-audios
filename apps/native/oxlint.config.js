@@ -3,6 +3,14 @@ import native from "oxlint-config-universe/native";
 
 export default defineConfig({
   extends: [native],
+  rules: {
+    "import/no-duplicates": "error",
+    "import/first": "error",
+    "import/newline-after-import": "error",
+    "import/no-cycle": "error",
+    "no-unused-vars": "error",
+    "unicorn/no-empty-file": "error",
+  },
   overrides: [
     {
       files: ["src/features/**/*.{ts,tsx}", "src/shared/**/*.{ts,tsx}", "src/core/**/*.{ts,tsx}"],

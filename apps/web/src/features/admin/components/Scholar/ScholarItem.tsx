@@ -1,15 +1,17 @@
 "use client";
 
+import { type AdminScholarListItemDto, COUNTRY_NAMES } from "@sd/core-contracts";
 import { X, Send, Film, ExternalLink, Pencil, Languages } from "lucide-react";
+
+import { useTranslation } from "@/core/i18n/use-translation";
 import { PermissionGate } from "@/features/admin/components/Content/Users/permission-gate/permission-gate";
 import { Button } from "@/shared/components/Button";
 import { List } from "@/shared/components/List";
-import { UserAvatar } from "@/shared/components/user-avatar";
 import { MarqueeText } from "@/shared/components/MarqueeText";
+import { UserAvatar } from "@/shared/components/user-avatar";
 import { useResponsive } from "@/shared/hooks/use-responsive";
-import { type AdminScholarListItemDto, COUNTRY_NAMES } from "@sd/core-contracts";
-import { useTranslation } from "@/core/i18n/use-translation";
 import { useFormatScholarName } from "@/shared/utils/format-scholar-name";
+
 import styles from "./scholar-item.module.css";
 
 export interface ScholarItemProps {

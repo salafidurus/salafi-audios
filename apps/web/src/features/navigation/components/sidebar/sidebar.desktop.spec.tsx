@@ -1,10 +1,12 @@
-import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
-import React from "react";
-import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
-import { Sidebar } from "./sidebar";
-import { useAuth, authClient } from "@/core/auth";
 import { useAdminPermissions } from "@sd/domain-account";
+import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
+import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { usePathname, useRouter } from "next/navigation";
+import React from "react";
+
+import { useAuth, authClient } from "@/core/auth";
+
+import { Sidebar } from "./sidebar";
 
 vi.mock("@/shared/hooks/use-responsive", () => ({
   useResponsive: vi.fn().mockReturnValue({ isMobile: false, isTablet: false, isWeb: true }),

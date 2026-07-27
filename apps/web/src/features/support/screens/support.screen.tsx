@@ -1,7 +1,7 @@
 "use client";
 
-import { useIsDesktop } from "@/shared/hooks/use-responsive";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { useIsDesktop } from "@/shared/hooks/use-responsive";
 
 export function SupportScreen() {
   const isDesktop = useIsDesktop();

@@ -1,23 +1,24 @@
 "use client";
 
-import { useRef, useEffect, type ReactNode } from "react";
-import { useRouter } from "next/navigation";
 import { routes, type FeedItemDto, type FeedContentItemDto } from "@sd/core-contracts";
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { useExploreRecentScreen } from "@sd/domain-content";
+import { useRouter } from "next/navigation";
+import { useRef, useEffect, type ReactNode } from "react";
+
 import { useTranslation } from "@/core/i18n/use-translation";
-import { useIsDesktop, useResponsive } from "@/shared/hooks/use-responsive";
 import { List } from "@/shared/components/List";
-import { FeedListRow } from "../components/explore-list-row/explore-list-row";
-import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
-import { FeedTopicRow } from "../components/feed-topic-row/feed-topic-row";
-import { FeedSkeleton } from "../components/feed-skeleton/feed-skeleton";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { PageHeader } from "@/shared/components/PageHeader";
-import { Button } from "@/shared/components/Button";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { ScrollToTopButton } from "@/shared/components/ScrollToTopButton";
 import { StickyHeaderLayout } from "@/shared/components/StickyHeaderLayout";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
+import { useIsDesktop, useResponsive } from "@/shared/hooks/use-responsive";
+
+import { FeedListRow } from "../components/explore-list-row/explore-list-row";
+import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
+import { FeedSkeleton } from "../components/feed-skeleton/feed-skeleton";
+import { FeedTopicRow } from "../components/feed-topic-row/feed-topic-row";
 import styles from "./explore-recent.screen.module.css";
 
 export type FeedRecentScreenProps = {

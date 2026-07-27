@@ -1,17 +1,21 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { ArrowLeft } from "lucide-react";
 import type { Locale } from "@sd/core-contracts";
+
 import { sanitizeError } from "@sd/utils-error";
-import { Button } from "@/shared/components/Button";
+import { ArrowLeft } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+
 import { useTranslation } from "@/core/i18n/use-translation";
-import { getSecondaryLocales, getLocaleLabel } from "@/features/admin/utils/locale-tabs";
 import { useTranslationForm } from "@/features/admin/hooks/Translation/useTranslationForm";
+import { getSecondaryLocales, getLocaleLabel } from "@/features/admin/utils/locale-tabs";
 import { computeLocalesToSave } from "@/features/admin/utils/translation-save";
+import { Button } from "@/shared/components/Button";
+
 import type { TranslationEntityConfig } from "./translation-entities";
-import { TranslationLocaleFields } from "./TranslationLocaleFields";
+
 import styles from "./translation-modal.module.css";
+import { TranslationLocaleFields } from "./TranslationLocaleFields";
 
 export interface TranslationChildDetailProps {
   config: TranslationEntityConfig;

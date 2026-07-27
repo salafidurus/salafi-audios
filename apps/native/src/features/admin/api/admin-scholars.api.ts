@@ -1,4 +1,3 @@
-import { httpClient, endpoints } from "@sd/core-contracts";
 import type {
   AdminListingListItemDto,
   AdminListingDetailDto,
@@ -7,6 +6,8 @@ import type {
   BulkActionResultDto,
   UpdateListingDetailsDto,
 } from "@sd/core-contracts";
+
+import { httpClient, endpoints } from "@sd/core-contracts";
 
 // Series
 export async function fetchAdminSeries(scholarId: string): Promise<AdminListingListItemDto[]> {

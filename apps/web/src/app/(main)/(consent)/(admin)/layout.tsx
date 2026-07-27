@@ -1,6 +1,7 @@
 "use client";
 
 import { useAdminPermissions } from "@sd/domain-account";
+
 import { useAuth } from "@/core/auth/use-auth";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

@@ -1,9 +1,11 @@
 import "@testing-library/jest-dom";
 import { afterEach } from "bun:test";
+
 import { createI18n } from "./core/i18n/i18n";
 
 // Register happy-dom globals - this MUST run before any test imports
 const { GlobalRegistrator } = require("@happy-dom/global-registrator");
+
 GlobalRegistrator.register();
 
 // Initialize i18n for tests
@@ -84,6 +86,7 @@ if (typeof window !== "undefined") {
 
 // Global mocks for common hooks that need to work in test environment
 const { vi } = require("bun:test");
+
 vi.mock("@/shared/hooks/use-is-hydrated", () => ({
   useIsHydrated: () => true,
 }));

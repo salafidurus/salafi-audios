@@ -1,8 +1,9 @@
+import { useContinueListening } from "@sd/domain-search";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+
 import { HomeScreen } from "./home.screen";
-import { useContinueListening } from "@sd/domain-search";
 
 // Mock the useContinueListening hook from @sd/domain-search
 vi.mock("@sd/domain-search", () => ({

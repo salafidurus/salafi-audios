@@ -1,6 +1,8 @@
+import type { Locale } from "@sd/core-i18n";
+
 import i18next, { type i18n } from "i18next";
 import { initReactI18next } from "react-i18next";
-import type { Locale } from "@sd/core-i18n";
+
 import { mergeLocaleMessages } from "./merge-locale-messages";
 
 // JSON locale files from the shared core-i18n package

@@ -1,6 +1,7 @@
-import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react-native";
 import { useScholarDetail, useScholarContent, useScholarTopics } from "@sd/domain-content";
+import { render, screen, fireEvent } from "@testing-library/react-native";
+import React from "react";
+
 import { ScholarDetailScreen } from "./scholar-detail.screen";
 
 jest.mock("@sd/domain-content", () => ({

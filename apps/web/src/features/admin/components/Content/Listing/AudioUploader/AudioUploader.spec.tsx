@@ -1,8 +1,10 @@
-import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
-import { AudioUploader } from "./AudioUploader";
+import { describe, it, expect, beforeEach, vi, type Mock } from "bun:test";
+
 import { getPresignedUrl, uploadToR2 } from "@/features/admin/api/admin-lectures.api";
 import { importSingleLineWithProgress } from "@/features/admin/utils/resolve-import-urls";
+
+import { AudioUploader } from "./AudioUploader";
 
 vi.mock("@/features/admin/api/admin-lectures.api", () => ({
   getPresignedUrl: vi.fn(),

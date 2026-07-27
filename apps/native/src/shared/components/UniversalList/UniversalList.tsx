@@ -1,6 +1,7 @@
-import { useCallback } from "react";
 import type { StyleProp, ViewStyle } from "react-native";
+
 import { FlashList } from "@shopify/flash-list";
+import { useCallback } from "react";
 
 export type UniversalListProps<TItem> = {
   items: TItem[];

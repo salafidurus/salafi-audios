@@ -1,5 +1,5 @@
-import { NextResponse, type NextRequest } from "next/server";
 import { resolveRouteAccess } from "@sd/core-contracts";
+import { NextResponse, type NextRequest } from "next/server";
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

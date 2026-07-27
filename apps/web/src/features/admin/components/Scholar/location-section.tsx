@@ -1,15 +1,18 @@
 "use client";
 
 import { COUNTRY_LIST, type CountryCode } from "@sd/core-contracts";
+
+import { useTranslation } from "@/core/i18n/use-translation";
+import { FormSection } from "@/features/admin/components/FormSection";
 import {
   Dropdown,
   DropdownTrigger,
   DropdownContent,
   DropdownItem,
 } from "@/shared/components/Dropdown";
-import { FormSection } from "@/features/admin/components/FormSection";
-import { useTranslation } from "@/core/i18n/use-translation";
+
 import type { FormAction, FormState } from "../../hooks/Scholar/useScholarForm";
+
 import styles from "./scholar-modal.module.css";
 
 interface LocationSectionProps {

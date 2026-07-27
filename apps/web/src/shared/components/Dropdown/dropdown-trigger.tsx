@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronDown } from "lucide-react";
+
 import { useDropdownContext } from "./context";
 import styles from "./dropdown.module.css";
 

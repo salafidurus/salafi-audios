@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+
 import { TermsScreen } from "@/features/legal/screens/terms.screen";
 
 export const metadata: Metadata = {

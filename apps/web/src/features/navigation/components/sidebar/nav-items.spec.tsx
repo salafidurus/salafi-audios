@@ -1,10 +1,12 @@
-import { describe, it, expect, vi, type Mock } from "bun:test";
-import React from "react";
-import { render, screen } from "@testing-library/react";
-import { NavItems } from "./nav-items";
-import { useAuth } from "@/core/auth";
 import { useAdminPermissions } from "@sd/domain-account";
+import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi, type Mock } from "bun:test";
 import { usePathname, useRouter } from "next/navigation";
+import React from "react";
+
+import { useAuth } from "@/core/auth";
+
+import { NavItems } from "./nav-items";
 
 vi.mock("@/shared/hooks/use-responsive", () => ({
   useResponsive: vi.fn().mockReturnValue({ isMobile: false, isTablet: false, isWeb: true }),

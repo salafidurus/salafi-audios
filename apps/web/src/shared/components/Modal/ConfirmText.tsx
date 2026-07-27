@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Modal } from "./Modal";
-import { Button } from "../Button";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+
+import { Button } from "../Button";
 import styles from "./confirm.module.css";
+import { Modal } from "./Modal";
 
 export interface ConfirmTextProps {
   isOpen: boolean;

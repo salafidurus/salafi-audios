@@ -1,5 +1,3 @@
-process.env.DISABLE_THROTTLER = 'true';
-
 import { createE2eApp } from './helpers/create-e2e-app';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
@@ -7,6 +5,8 @@ import { PrismaService } from '../src/core/db/prisma.service';
 import { TestAuthFactory } from './helpers/test-auth.factory';
 import { Permission } from '@sd/core-db';
 import { TEST_SCHOLAR_ID, seedTestData } from './helpers/seed-test-data';
+
+process.env.DISABLE_THROTTLER = 'true';
 
 const SERIES_ID = 'b0000000-0000-0000-0000-000000000201';
 const SERIES_SLUG = 'e2e-arrange-series';

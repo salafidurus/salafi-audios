@@ -1,5 +1,6 @@
-import { type Href, useRouter } from "expo-router";
 import { routes } from "@sd/core-contracts";
+import { type Href, useRouter } from "expo-router";
+
 import { FeedRecentScreen } from "@/features/explore/screens/explore-recent.screen";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 

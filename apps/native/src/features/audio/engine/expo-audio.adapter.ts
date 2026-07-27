@@ -1,6 +1,7 @@
-import { createAudioPlayer } from "expo-audio";
-import type { AudioPlayer, AudioStatus } from "expo-audio";
 import type { PlaybackEngine, PlaybackEngineEvents, Track, PlaybackStatus } from "@sd/domain-audio";
+import type { AudioPlayer, AudioStatus } from "expo-audio";
+
+import { createAudioPlayer } from "expo-audio";
 
 export class ExpoAudioAdapter implements PlaybackEngine {
   private player: AudioPlayer | null = null;

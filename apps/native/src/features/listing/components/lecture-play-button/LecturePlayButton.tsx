@@ -1,10 +1,12 @@
 import type { ListingDetailDto } from "@sd/core-contracts";
-import { useAudio } from "@sd/domain-audio";
 import type { Track } from "@sd/domain-audio";
-import { audioService } from "@/features/audio";
-import { Button } from "@/shared/components/Button/Button";
+
+import { useAudio } from "@sd/domain-audio";
 import { Play, Pause } from "lucide-react-native";
 import { useUnistyles } from "react-native-unistyles";
+
+import { audioService } from "@/features/audio";
+import { Button } from "@/shared/components/Button/Button";
 
 export type LecturePlayButtonProps = {
   lecture: ListingDetailDto;

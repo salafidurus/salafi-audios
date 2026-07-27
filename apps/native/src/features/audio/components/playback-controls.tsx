@@ -1,9 +1,10 @@
+import { useAudio } from "@sd/domain-audio";
+import { Play, Pause, RotateCw, RotateCcw } from "lucide-react-native";
 import React from "react";
 import { View, Pressable, Text } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { useAudio } from "@sd/domain-audio";
+
 import { audioService } from "../audio-service";
-import { Play, Pause, RotateCw, RotateCcw } from "lucide-react-native";
 
 export function PlaybackControls() {
   const { isPlaying, speed, positionSeconds, durationSeconds, hasTrack } = useAudio();

@@ -1,7 +1,9 @@
+import type { ScholarListItemDto } from "@sd/core-contracts";
+
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "bun:test";
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import type { ScholarListItemDto } from "@sd/core-contracts";
+
 import { ScholarListRow } from "./scholar-list-row";
 
 const mockScholar: ScholarListItemDto = {

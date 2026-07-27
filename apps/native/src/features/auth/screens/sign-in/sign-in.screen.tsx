@@ -1,7 +1,8 @@
+import * as AppleAuthentication from "expo-apple-authentication";
 import { ActivityIndicator, Platform, Pressable, Text, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
-import * as AppleAuthentication from "expo-apple-authentication";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+
 import { useTranslation } from "@/core/i18n/use-translation";
 import { AccentGradientFill } from "@/shared/components/AccentGradientFill/AccentGradientFill";
 

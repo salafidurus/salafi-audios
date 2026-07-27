@@ -1,12 +1,14 @@
 "use client";
 
 import { useContinueListening } from "@sd/domain-search";
-import { Search } from "@/shared/components/Search";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { HeroSection } from "../../components/hero-section/hero-section";
-import { ContinueListeningCard } from "../../components/continue-listening-card/continue-listening-card";
-import { MobileDownloadSection } from "../../components/mobile-download-section/mobile-download-section";
+
 import { useTranslation } from "@/core/i18n/use-translation";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { Search } from "@/shared/components/Search";
+
+import { ContinueListeningCard } from "../../components/continue-listening-card/continue-listening-card";
+import { HeroSection } from "../../components/hero-section/hero-section";
+import { MobileDownloadSection } from "../../components/mobile-download-section/mobile-download-section";
 import { MOBILE_APP_AVAILABILITY } from "./home.constants";
 import styles from "./home.screen.module.css";
 

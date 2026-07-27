@@ -1,7 +1,9 @@
-import { describe, it, expect, beforeEach, vi } from "bun:test";
-import { render, screen, fireEvent } from "@testing-library/react";
-import { Listing } from "./Listing";
 import type { AdminListingListItemDto } from "@sd/core-contracts";
+
+import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, it, expect, beforeEach, vi } from "bun:test";
+
+import { Listing } from "./Listing";
 
 vi.mock("@/shared/hooks/use-responsive", () => ({
   useResponsive: () => ({ isMobile: false }),

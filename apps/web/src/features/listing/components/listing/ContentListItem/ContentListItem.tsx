@@ -1,13 +1,16 @@
 "use client";
 
-import React from "react";
-import { Play, Pause } from "lucide-react";
 import type { ListingContentItemDto } from "@sd/core-contracts";
+
 import { useAudio, useProgressStore, type Track } from "@sd/domain-audio";
+import { Play, Pause } from "lucide-react";
+import React from "react";
+
 import { audioService } from "@/features/audio";
-import { List } from "@/shared/components/List";
 import { AppText } from "@/shared/components/AppText/AppText";
+import { List } from "@/shared/components/List";
 import { useFormattedScholarName } from "@/shared/hooks/use-formatted-scholar-name";
+
 import styles from "./ContentListItem.module.css";
 
 function formatDuration(seconds?: number): string {

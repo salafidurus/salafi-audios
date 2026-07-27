@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+
 import { PrivacyScreen } from "@/features/legal/screens/privacy.screen";
 
 export const metadata: Metadata = {

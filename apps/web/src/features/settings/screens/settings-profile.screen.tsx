@@ -1,20 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useAuth } from "@/core/auth";
 import { useAccountProfile, useUpdateProfile, useDeleteAccount } from "@sd/domain-account";
-import { authClient } from "@/core/auth/auth-client";
-import { AuthModal } from "@/features/auth";
-import { Modal } from "@/shared/components/Modal";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
-import { PageHeader } from "@/shared/components/PageHeader";
-import { EmptyState } from "@/shared/components/EmptyState";
-import { SettingsSection } from "@/features/settings/components/SettingsSection/SettingsSection";
-import { SettingsRow } from "@/features/settings/components/SettingsRow/SettingsRow";
-import { Button } from "@/shared/components/Button/Button";
-import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+
+import { useAuth } from "@/core/auth";
+import { authClient } from "@/core/auth/auth-client";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { AuthModal } from "@/features/auth";
+import { SettingsRow } from "@/features/settings/components/SettingsRow/SettingsRow";
+import { SettingsSection } from "@/features/settings/components/SettingsSection/SettingsSection";
+import { Button } from "@/shared/components/Button/Button";
+import { EmptyState } from "@/shared/components/EmptyState";
+import { Modal } from "@/shared/components/Modal";
+import { PageHeader } from "@/shared/components/PageHeader";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
+
 import styles from "./settings-profile.screen.module.css";
 
 function ProfileContent() {
