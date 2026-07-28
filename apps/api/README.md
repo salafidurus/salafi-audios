@@ -46,23 +46,9 @@ bun run openapi
 
 Never hand-edit generated files in `packages/api-client/generated/`.
 
-## Content Ingestion (Phase 02)
+## Environment
 
-Content ingestion is implemented in `packages/util-ingest`.
-
-Run from repo root:
-
-```bash
-bun run ingest:content
-```
-
-Or scoped directly:
-
-```bash
-bun run --filter @sd/util-ingest ingest:content
-```
-
-For audio assets stored as relative object keys, set `ASSET_CDN_BASE_URL` in API env so
+For audio assets stored as relative object keys, set `ASSET_CDN_BASE_URL` in the API env so
 responses expose stable CDN URLs without storing CDN hostnames in DB.
 
 ## Guardrails

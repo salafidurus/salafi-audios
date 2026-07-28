@@ -63,7 +63,6 @@ Web (`apps/web`): `.tsx` (base, CSS-responsive), `.desktop.tsx` (desktop-only), 
 - `packages/domain-playback` — Playback engine and player state
 - `packages/domain-progress` — Progress tracking state
 - `packages/domain-search` — Search and quick-browse hooks
-- `packages/util-ingest` — Content ingestion
 
 Shared lint/TS config lives at the repo root (`tsconfig.base.json`, `tsconfig.packages.json`, `tsconfig.nest.json`, `eslint.config.base.mjs`, `eslint.config.packages.mjs`, `eslint.config.nest.mjs`). Apps extend/compose these; `next`/`expo` specifics are inlined into `apps/web` and `apps/native`.
 
@@ -72,7 +71,6 @@ Shared lint/TS config lives at the repo root (`tsconfig.base.json`, `tsconfig.pa
 - **`@sd/core-*`**: Foundational infrastructure (auth, api, config, styles, i18n, env, db, contracts). `core-styles`, `core-config`, and `core-env` have been dissolved — styling bootstrap, environment config, and env validation now live in each app's `src/core/` directory (or the consuming package's `src/env.ts`).
 - **`@sd/domain-*`**: Shared data and state hooks organized by bounded context (`domain-content`, `domain-account`, `domain-playback`, `domain-progress`, `domain-search`).
 - **`@sd/design-tokens`**: Authoritative visual tokens.
-- **`@sd/util-ingest`**: Content ingestion tooling.
 
 ## 4. Dependency and Boundary Rules
 

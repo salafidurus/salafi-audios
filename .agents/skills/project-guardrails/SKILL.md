@@ -69,7 +69,6 @@ docs/      → authoritative documentation
 - **`@sd/domain-progress`**: Progress tracking state (Zustand + hooks).
 - **`@sd/domain-search`**: Search and quick-browse hooks.
 - **`@sd/design-tokens`**: Design tokens — authoritative source.
-- **`@sd/util-ingest`**: Content ingestion tooling.
 
 **Dependency rules:**
 
