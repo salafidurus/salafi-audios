@@ -4,7 +4,7 @@ import request from 'supertest';
 import { PrismaService } from '../src/core/db/prisma.service';
 import { TestAuthFactory } from './helpers/test-auth.factory';
 import { Permission } from '@sd/core-db';
-import { TEST_SCHOLAR_ID, seedTestData } from './helpers/seed-test-data';
+import { TEST_SCHOLAR_ID, seedTestData, cleanupE2ETestData } from './helpers/seed-test-data';
 
 process.env.DISABLE_THROTTLER = 'true';
 
@@ -72,6 +72,7 @@ describe('Arrange commit (e2e)', () => {
     await prisma.listing.deleteMany({ where: { parentId: { in: childIds } } });
     await prisma.listing.deleteMany({ where: { id: { in: childIds } } });
     await prisma.listing.deleteMany({ where: { id: { in: [...roots, TAKEN_ID] } } });
+    await cleanupE2ETestData(prisma);
     await authFactory.cleanup();
     await app.close();
   });

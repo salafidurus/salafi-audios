@@ -4,7 +4,12 @@ import request from 'supertest';
 import { PrismaService } from '../src/core/db/prisma.service';
 import { TestAuthFactory } from './helpers/test-auth.factory';
 import { Permission } from '@sd/core-db';
-import { TEST_SCHOLAR_ID, TEST_LISTING_ID, seedTestData } from './helpers/seed-test-data';
+import {
+  TEST_SCHOLAR_ID,
+  TEST_LISTING_ID,
+  seedTestData,
+  cleanupE2ETestData,
+} from './helpers/seed-test-data';
 
 process.env.DISABLE_THROTTLER = 'true';
 
@@ -27,6 +32,7 @@ describe('Admin Permission Boundaries (e2e)', () => {
         where: { id: { in: createdListingIds } },
       });
     }
+    await cleanupE2ETestData(prisma);
     await authFactory.cleanup();
     await app.close();
   });

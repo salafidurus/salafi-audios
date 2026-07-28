@@ -100,3 +100,20 @@ export async function seedTestData(prisma: PrismaService): Promise<void> {
     },
   });
 }
+
+/**
+ * Delete the E2E test fixtures created by seedTestData.
+ * Deletion order respects FK constraints (leaf tables first).
+ */
+export async function cleanupE2ETestData(prisma: PrismaService): Promise<void> {
+  for (const id of [TEST_LISTING_ID, TEST_SCHOLAR_ID, TEST_PARENT_TOPIC_ID, TEST_CHILD_TOPIC_ID]) {
+    await prisma.listingTranslation.deleteMany({ where: { listingId: id } });
+    await prisma.audioAsset.deleteMany({ where: { listingId: id } });
+    await prisma.listingTopic.deleteMany({ where: { listingId: id } });
+  }
+  await prisma.listing.deleteMany({ where: { id: TEST_LISTING_ID } });
+  await prisma.scholar.deleteMany({ where: { id: TEST_SCHOLAR_ID } });
+  await prisma.topic.deleteMany({
+    where: { id: { in: [TEST_PARENT_TOPIC_ID, TEST_CHILD_TOPIC_ID] } },
+  });
+}

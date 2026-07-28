@@ -1,7 +1,7 @@
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import request from 'supertest';
 import { createE2eApp } from './helpers/create-e2e-app';
-import { seedTestData } from './helpers/seed-test-data';
+import { seedTestData, cleanupE2ETestData } from './helpers/seed-test-data';
 import { PrismaService } from '../src/core/db/prisma.service';
 
 describe('Scholar/Topic order-by (e2e)', () => {
@@ -15,6 +15,7 @@ describe('Scholar/Topic order-by (e2e)', () => {
   });
 
   afterAll(async () => {
+    await cleanupE2ETestData(prisma);
     await app.close();
   });
 
