@@ -16,7 +16,7 @@ Owns Prisma schema, migrations, and DB client for the Salafi Durus platform.
 - `bun run --filter @sd/core-db prisma:format` — Format schema file
 - `bun run --filter @sd/core-db migrate:create-only` — Create a new migration
 - `bun run --filter @sd/core-db migrate:deploy` — Apply pending migrations
-- `bun run --filter @sd/core-db make-admin <email>` — Promote a user to admin
+- `bun run --filter @sd/core-db grant:role <email> <role>` — Grant a role to a user
 - `bun run --filter @sd/core-db test` — Run tests (bun:test)
 
 ## Structure
@@ -30,7 +30,8 @@ src/
 └── generated/prisma/   # Generated client (do NOT hand-edit)
 scripts/
 ├── copy-generated-to-dist.js
-├── make-admin.js
+├── grant-role.js
+├── grant-permission.js
 └── migrate-with-auto-name.js
 ```
 

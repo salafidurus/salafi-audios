@@ -95,7 +95,7 @@ ON CONFLICT DO NOTHING;
 **Automated**:
 
 ```bash
-bun run --filter @sd/core-db grant-permission user@example.com SCHOLARS_VIEW LISTINGS_CREATE
+bun run --filter @sd/core-db grant:permission user@example.com SCHOLARS_VIEW LISTINGS_CREATE
 ```
 
 **Manual SQL**:
@@ -164,18 +164,18 @@ The admin system has two components:
 
 ### Option A: Automated Script (Recommended)
 
-The `make-admin` script promotes the user role and grants all admin permissions atomically.
+The `grant:role` script assigns the admin role and grants all admin permissions atomically.
 
 ```bash
 # 1. Generate the Prisma client (first time setup)
 bun run --filter @sd/core-db prisma:generate
 
 # 2. Promote a local user to admin
-bun run --filter @sd/core-db make-admin user@example.com
+bun run --filter @sd/core-db grant:role user@example.com admin
 
 # 3. Against a production database (Neon example)
 DATABASE_URL="postgresql://user:pass@ep-xxxx.region.aws.neon.tech/neondb" \
-  bun run --filter @sd/core-db make-admin user@example.com
+  bun run --filter @sd/core-db grant:role user@example.com admin
 ```
 
 **Idempotent** — re-running on an existing admin is safe.
@@ -232,19 +232,19 @@ bun run --filter @sd/core-db prisma studio
 
 ## Granting Specific Permissions
 
-Use the `grant-permission` script to grant individual permissions to a user.
+Use the `grant:permission` script to grant individual permissions to a user.
 
 ### Automated Script (Recommended)
 
 ```bash
 # Grant a single permission
-bun run --filter @sd/core-db grant-permission user@example.com SCHOLARS_VIEW
+bun run --filter @sd/core-db grant:permission user@example.com SCHOLARS_VIEW
 
 # Grant multiple permissions at once
-bun run --filter @sd/core-db grant-permission user@example.com SCHOLARS_VIEW SCHOLARS_EDIT LISTINGS_CREATE
+bun run --filter @sd/core-db grant:permission user@example.com SCHOLARS_VIEW SCHOLARS_EDIT LISTINGS_CREATE
 
 # List all valid permissions
-bun run --filter @sd/core-db grant-permission --list
+bun run --filter @sd/core-db grant:permission --list
 ```
 
 **Idempotent** — re-running with the same user and permission is a no-op.
@@ -522,15 +522,6 @@ echo $DIRECT_DB_URL
 
 # Set for a session
 export DATABASE_URL="postgresql://user:pass@localhost:5432/db"
-```
-
-### Script permission errors
-
-Ensure the `make-admin` and `grant-permission` scripts have execute permissions:
-
-```bash
-chmod +x packages/core-db/scripts/make-admin.js
-chmod +x packages/core-db/scripts/grant-permission.js
 ```
 
 ---
