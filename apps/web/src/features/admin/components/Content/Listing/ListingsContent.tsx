@@ -112,7 +112,9 @@ export function ListingsContent({
         isOpen={isUploadModalOpen}
         onClose={() => {
           setIsUploadModalOpen(false);
-          setSelectedUploadListingId(null);
+          // Do NOT clear selectedUploadListingId here — that would remount the
+          // component and destroy in-progress upload state on an accidental close.
+          // The id is only cleared by handleUploadSaved (on successful commit).
         }}
         onSuccess={handleUploadSaved}
         listingId={selectedUploadListingId}
