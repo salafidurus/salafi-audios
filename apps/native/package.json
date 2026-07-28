@@ -96,6 +96,7 @@
     "zustand": "catalog:"
   },
   "devDependencies": {
+    "@babel/core": "catalog:",
     "@sentry/cli": "~2.58.4",
     "@testing-library/react-native": "^14.0.0",
     "@types/jest": "^29.5.14",
