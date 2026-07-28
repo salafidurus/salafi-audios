@@ -54,10 +54,7 @@ export function ListingUploadArrangeModal({
       );
   }, [isOpen, listingId, dispatch, t]);
 
-  const runCommit = useUploadArrangeCommit(state, dispatch, async () => {
-    await onSuccess();
-    onClose();
-  });
+  const runCommit = useUploadArrangeCommit(state, dispatch, onSuccess);
 
   const conflicts = localSlugConflicts(state);
   const unassignedCount =

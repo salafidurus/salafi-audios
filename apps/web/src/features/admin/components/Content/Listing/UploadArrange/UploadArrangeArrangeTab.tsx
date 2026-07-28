@@ -3,8 +3,8 @@
 import type { AdminArrangeLessonDto, StatusValue } from "@sd/core-contracts";
 
 import { Reorder } from "framer-motion";
-import { GripVertical, Plus, Trash2 } from "lucide-react";
-import React, { useState } from "react";
+import { ChevronRight, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
+import React, { useEffect, useState } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import {
@@ -412,10 +412,238 @@ function NewModuleCard({
   );
 }
 
+/** Renders the collection accordion: add-module row, unassigned, staged modules, existing modules. */
+function CollectionView({
+  state,
+  dispatch,
+  conflictSlugs,
+  openModuleKey,
+  openDetailsKey,
+  newModuleTitle,
+  setNewModuleTitle,
+  onToggleModuleKey,
+  onToggleDetailsKey,
+}: {
+  state: UploadArrangeState;
+  dispatch: React.Dispatch<UploadArrangeAction>;
+  conflictSlugs: Set<string>;
+  openModuleKey: ModuleKey | null;
+  openDetailsKey: string | null;
+  newModuleTitle: string;
+  setNewModuleTitle: (v: string) => void;
+  onToggleModuleKey: (key: ModuleKey) => void;
+  onToggleDetailsKey: (tempId: string) => void;
+}) {
+  const { t } = useTranslation();
+  const { existing } = state;
+  if (!existing) return null;
+
+  const moduleOptions = [
+    ...existing.modules.map((mod) => ({ key: mod.id, title: mod.title })),
+    ...state.newModules.map((mod) => ({ key: `new:${mod.tempId}`, title: mod.title })),
+  ];
+  const unassigned = state.items.filter(
+    (item) =>
+      item.assignment.kind === "new-lesson" && item.assignment.moduleKey === ROOT_MODULE_KEY,
+  );
+  const hasNewLessons = state.items.some((i) => i.assignment.kind === "new-lesson");
+
+  return (
+    <div className={styles.arrangeStack}>
+      {hasNewLessons && (
+        <div className={styles.bulkActions}>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => dispatch({ type: "SET_ALL_LESSON_STATUS", status: "published" })}
+          >
+            {t("admin.contents.listing.publishAll", "Publish All")}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => dispatch({ type: "SET_ALL_LESSON_STATUS", status: "draft" })}
+          >
+            {t("admin.contents.listing.draftAll", "Draft All")}
+          </Button>
+        </div>
+      )}
+
+      <div className={styles.addModuleRow}>
+        <InputField
+          value={newModuleTitle}
+          onChange={setNewModuleTitle}
+          placeholder={t("admin.contents.listing.newModuleTitle", "New module title")}
+        />
+        <Button
+          size="sm"
+          variant="primary"
+          disabled={!newModuleTitle.trim()}
+          onClick={() => {
+            dispatch({ type: "ADD_MODULE", title: newModuleTitle.trim() });
+            setNewModuleTitle("");
+          }}
+        >
+          <Plus size={14} /> {t("admin.contents.listing.addModule", "Add module")}
+        </Button>
+      </div>
+
+      {unassigned.length > 0 && (
+        <div className={styles.moduleSection}>
+          <div className={styles.moduleHeader}>
+            <span className={styles.moduleTitle}>
+              {t("admin.contents.listing.unassigned", "Unassigned")}
+            </span>
+          </div>
+          <StagedList
+            moduleKey={ROOT_MODULE_KEY}
+            state={state}
+            dispatch={dispatch}
+            lessonsInScope={[]}
+            conflictSlugs={conflictSlugs}
+            moduleOptions={moduleOptions}
+          />
+        </div>
+      )}
+
+      {state.newModules.map((mod) => {
+        const modKey: ModuleKey = `new:${mod.tempId}`;
+        const isLessonsOpen = openModuleKey === modKey;
+        const isDetailsOpen = openDetailsKey === mod.tempId;
+        return (
+          <div key={mod.tempId} className={styles.moduleSection}>
+            <div className={styles.moduleHeader}>
+              <button
+                type="button"
+                className={`${styles.collapseButton} ${isLessonsOpen ? styles.collapseButtonOpen : ""}`}
+                aria-label={
+                  isLessonsOpen
+                    ? t("admin.contents.listing.collapseLessons", "Collapse lessons")
+                    : t("admin.contents.listing.expandLessons", "Expand lessons")
+                }
+                aria-expanded={isLessonsOpen}
+                onClick={() => onToggleModuleKey(modKey)}
+              >
+                <ChevronRight size={16} />
+              </button>
+              <div className={styles.moduleTitle}>{mod.title}</div>
+              <button
+                type="button"
+                className={styles.iconButton}
+                aria-label={t("admin.contents.listing.editModuleDetails", "Edit module details")}
+                onClick={() => onToggleDetailsKey(mod.tempId)}
+              >
+                <Pencil size={14} />
+              </button>
+              <button
+                type="button"
+                className={styles.iconButton}
+                aria-label={t("admin.contents.listing.removeModule", "Remove module")}
+                onClick={() => dispatch({ type: "REMOVE_MODULE", tempId: mod.tempId })}
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+            {isDetailsOpen && (
+              <div className={styles.moduleDetailsSection}>
+                <NewModuleCard
+                  mod={mod}
+                  rootSlug={existing.slug}
+                  dispatch={dispatch}
+                  conflictSlugs={conflictSlugs}
+                />
+              </div>
+            )}
+            {isLessonsOpen && (
+              <div className={styles.moduleLessonsSection}>
+                <StagedList
+                  moduleKey={modKey}
+                  state={state}
+                  dispatch={dispatch}
+                  lessonsInScope={[]}
+                  conflictSlugs={conflictSlugs}
+                  moduleOptions={moduleOptions}
+                />
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      {existing.modules.map((mod) => {
+        const isLessonsOpen = openModuleKey === mod.id;
+        return (
+          <div key={mod.id} className={styles.moduleSection}>
+            <div className={styles.moduleHeader}>
+              <button
+                type="button"
+                className={`${styles.collapseButton} ${isLessonsOpen ? styles.collapseButtonOpen : ""}`}
+                aria-label={
+                  isLessonsOpen
+                    ? t("admin.contents.listing.collapseLessons", "Collapse lessons")
+                    : t("admin.contents.listing.expandLessons", "Expand lessons")
+                }
+                aria-expanded={isLessonsOpen}
+                onClick={() => onToggleModuleKey(mod.id)}
+              >
+                <ChevronRight size={16} />
+              </button>
+              <div>
+                <div className={styles.moduleTitle}>{mod.title}</div>
+                <div className={styles.moduleSlug}>{mod.slug}</div>
+              </div>
+            </div>
+            {isLessonsOpen && (
+              <div className={styles.moduleLessonsSection}>
+                {mod.lessons.map((lesson) => (
+                  <div key={lesson.id} className={styles.existingLesson}>
+                    <span className={styles.orderBadge}>{lesson.orderIndex ?? "—"}</span>
+                    {lesson.title}
+                  </div>
+                ))}
+                <StagedList
+                  moduleKey={mod.id}
+                  state={state}
+                  dispatch={dispatch}
+                  lessonsInScope={mod.lessons}
+                  conflictSlugs={conflictSlugs}
+                  moduleOptions={moduleOptions}
+                />
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function UploadArrangeArrangeTab({ state, dispatch }: UploadArrangeArrangeTabProps) {
   const { t } = useTranslation();
   const [newModuleTitle, setNewModuleTitle] = useState("");
   const { existing } = state;
+
+  const defaultOpenModuleKey = (() => {
+    for (const item of state.items) {
+      if (item.assignment.kind === "new-lesson") return item.assignment.moduleKey;
+    }
+    return null;
+  })();
+  const [openModuleKey, setOpenModuleKey] = useState<ModuleKey | null>(defaultOpenModuleKey);
+  const [openDetailsKey, setOpenDetailsKey] = useState<string | null>(
+    state.newModules[0]?.tempId ?? null,
+  );
+
+  const prevNewModulesLengthRef = React.useRef(state.newModules.length);
+  useEffect(() => {
+    const prev = prevNewModulesLengthRef.current;
+    const curr = state.newModules.length;
+    if (curr > prev) {
+      const newest = state.newModules[curr - 1];
+      if (newest) setOpenDetailsKey(newest.tempId);
+    }
+    prevNewModulesLengthRef.current = curr;
+  }, [state.newModules]);
 
   if (!existing) return null;
 
@@ -452,8 +680,27 @@ export function UploadArrangeArrangeTab({ state, dispatch }: UploadArrangeArrang
   }
 
   if (existing.format === "series") {
+    const hasNewLessons = state.items.some((i) => i.assignment.kind === "new-lesson");
     return (
       <div className={styles.arrangeStack}>
+        {hasNewLessons && (
+          <div className={styles.bulkActions}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => dispatch({ type: "SET_ALL_LESSON_STATUS", status: "published" })}
+            >
+              {t("admin.contents.listing.publishAll", "Publish All")}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => dispatch({ type: "SET_ALL_LESSON_STATUS", status: "draft" })}
+            >
+              {t("admin.contents.listing.draftAll", "Draft All")}
+            </Button>
+          </div>
+        )}
         {existing.lessons.length > 0 && (
           <div className={styles.moduleSection}>
             <span className={styles.moduleSlug}>
@@ -479,115 +726,19 @@ export function UploadArrangeArrangeTab({ state, dispatch }: UploadArrangeArrang
     );
   }
 
-  // Collection: modules (existing + staged) with per-module lesson lists.
-  const moduleOptions = [
-    ...existing.modules.map((mod) => ({ key: mod.id, title: mod.title })),
-    ...state.newModules.map((mod) => ({ key: `new:${mod.tempId}`, title: mod.title })),
-  ];
-  const unassigned = state.items.filter(
-    (item) =>
-      item.assignment.kind === "new-lesson" && item.assignment.moduleKey === ROOT_MODULE_KEY,
-  );
-
   return (
-    <div className={styles.arrangeStack}>
-      <div className={styles.addModuleRow}>
-        <InputField
-          value={newModuleTitle}
-          onChange={setNewModuleTitle}
-          placeholder={t("admin.contents.listing.newModuleTitle", "New module title")}
-        />
-        <Button
-          size="sm"
-          variant="secondary"
-          disabled={!newModuleTitle.trim()}
-          onClick={() => {
-            dispatch({ type: "ADD_MODULE", title: newModuleTitle.trim() });
-            setNewModuleTitle("");
-          }}
-        >
-          <Plus size={14} /> {t("admin.contents.listing.addModule", "Add module")}
-        </Button>
-      </div>
-
-      {unassigned.length > 0 && (
-        <div className={styles.moduleSection}>
-          <div className={styles.moduleHeader}>
-            <span className={styles.moduleTitle}>
-              {t("admin.contents.listing.unassigned", "Unassigned")}
-            </span>
-            <span className={styles.conflictText}>
-              {t(
-                "admin.contents.listing.assignBeforeUpload",
-                "Assign these to a module before uploading",
-              )}
-            </span>
-          </div>
-          <StagedList
-            moduleKey={ROOT_MODULE_KEY}
-            state={state}
-            dispatch={dispatch}
-            lessonsInScope={[]}
-            conflictSlugs={conflictSlugs}
-            moduleOptions={moduleOptions}
-          />
-        </div>
-      )}
-
-      {state.newModules.map((mod) => (
-        <div key={mod.tempId} className={styles.moduleSection}>
-          <div className={styles.moduleHeader}>
-            <div className={styles.moduleTitle}>{mod.title}</div>
-            <button
-              type="button"
-              className={styles.iconButton}
-              aria-label={t("admin.contents.listing.removeModule", "Remove module")}
-              onClick={() => dispatch({ type: "REMOVE_MODULE", tempId: mod.tempId })}
-            >
-              <Trash2 size={16} />
-            </button>
-          </div>
-          <NewModuleCard
-            mod={mod}
-            rootSlug={existing.slug}
-            dispatch={dispatch}
-            conflictSlugs={conflictSlugs}
-          />
-          <StagedList
-            moduleKey={`new:${mod.tempId}`}
-            state={state}
-            dispatch={dispatch}
-            lessonsInScope={[]}
-            conflictSlugs={conflictSlugs}
-            moduleOptions={moduleOptions}
-          />
-        </div>
-      ))}
-
-      {existing.modules.map((mod) => (
-        <div key={mod.id} className={styles.moduleSection}>
-          <div className={styles.moduleHeader}>
-            <div>
-              <div className={styles.moduleTitle}>{mod.title}</div>
-              <div className={styles.moduleSlug}>{mod.slug}</div>
-            </div>
-          </div>
-          {mod.lessons.map((lesson) => (
-            <div key={lesson.id} className={styles.existingLesson}>
-              <span className={styles.orderBadge}>{lesson.orderIndex ?? "—"}</span>
-              {lesson.title}
-            </div>
-          ))}
-          <StagedList
-            moduleKey={mod.id}
-            state={state}
-            dispatch={dispatch}
-            lessonsInScope={mod.lessons}
-            conflictSlugs={conflictSlugs}
-            moduleOptions={moduleOptions}
-          />
-        </div>
-      ))}
-    </div>
+    <CollectionView
+      state={state}
+      dispatch={dispatch}
+      conflictSlugs={conflictSlugs}
+      openModuleKey={openModuleKey}
+      openDetailsKey={openDetailsKey}
+      newModuleTitle={newModuleTitle}
+      setNewModuleTitle={setNewModuleTitle}
+      onToggleModuleKey={(key) => setOpenModuleKey((prev) => (prev === key ? null : key))}
+      onToggleDetailsKey={(tempId) =>
+        setOpenDetailsKey((prev) => (prev === tempId ? null : tempId))
+      }
+    />
   );
 }

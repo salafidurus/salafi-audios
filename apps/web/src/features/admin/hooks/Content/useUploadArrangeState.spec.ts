@@ -612,4 +612,178 @@ describe("useUploadArrangeState", () => {
       expect(hook.result.current.state.error).toBeTruthy();
     });
   });
+
+  describe("SET_ALL_LESSON_STATUS", () => {
+    it("sets every new-lesson item's status to the given value", () => {
+      const hook = setup(seriesData);
+      act(() =>
+        hook.result.current.dispatch({
+          type: "ADD_FILES",
+          files: [
+            { file: makeFile("001 Muqaddimah.mp3"), durationSeconds: 90 },
+            { file: makeFile("002 Al-Asmaa.mp3"), durationSeconds: 100 },
+          ],
+        }),
+      );
+
+      act(() =>
+        hook.result.current.dispatch({ type: "SET_ALL_LESSON_STATUS", status: "published" }),
+      );
+
+      const { items } = hook.result.current.state;
+      expect(
+        items.every(
+          (i) => i.assignment.kind === "new-lesson" && i.assignment.status === "published",
+        ),
+      ).toBe(true);
+    });
+
+    it("sets every new-lesson item's status to draft", () => {
+      const hook = setup(seriesData);
+      act(() =>
+        hook.result.current.dispatch({
+          type: "ADD_FILES",
+          files: [{ file: makeFile("001 Muqaddimah.mp3"), durationSeconds: 90 }],
+        }),
+      );
+      act(() =>
+        hook.result.current.dispatch({ type: "SET_ALL_LESSON_STATUS", status: "published" }),
+      );
+      act(() => hook.result.current.dispatch({ type: "SET_ALL_LESSON_STATUS", status: "draft" }));
+
+      const item = hook.result.current.state.items[0]!;
+      expect(item.assignment.kind === "new-lesson" && item.assignment.status).toBe("draft");
+    });
+
+    it("does not affect replace-audio items", () => {
+      const hook = setup(seriesData);
+      act(() =>
+        hook.result.current.dispatch({
+          type: "ADD_FILES",
+          files: [{ file: makeFile("001 Kalam.mp3"), durationSeconds: 60 }],
+        }),
+      );
+      const item = hook.result.current.state.items[0]!;
+      act(() => hook.result.current.dispatch({ type: "ACCEPT_SUGGESTION", itemId: item.id }));
+      expect(hook.result.current.state.items[0]!.assignment.kind).toBe("replace-audio");
+
+      act(() =>
+        hook.result.current.dispatch({ type: "SET_ALL_LESSON_STATUS", status: "published" }),
+      );
+
+      // Still replace-audio — assignment kind unchanged
+      expect(hook.result.current.state.items[0]!.assignment.kind).toBe("replace-audio");
+    });
+  });
+
+  describe("sort by orderIndex on SET_LESSON_FIELD", () => {
+    it("re-sorts items ascending by orderIndex when orderIndex field changes", () => {
+      const hook = setup(seriesData);
+      act(() =>
+        hook.result.current.dispatch({
+          type: "ADD_FILES",
+          files: [
+            { file: makeFile("File A.mp3"), durationSeconds: 10 },
+            { file: makeFile("File B.mp3"), durationSeconds: 10 },
+          ],
+        }),
+      );
+
+      const [itemA, itemB] = hook.result.current.state.items as [
+        (typeof hook.result.current.state.items)[0],
+        (typeof hook.result.current.state.items)[0],
+      ];
+
+      // Set A's orderIndex higher than B's so B should appear first
+      act(() =>
+        hook.result.current.dispatch({
+          type: "SET_LESSON_FIELD",
+          itemId: itemA!.id,
+          field: "orderIndex",
+          value: 5,
+        }),
+      );
+      act(() =>
+        hook.result.current.dispatch({
+          type: "SET_LESSON_FIELD",
+          itemId: itemB!.id,
+          field: "orderIndex",
+          value: 1,
+        }),
+      );
+
+      const titles = hook.result.current.state.items.map((i) => i.title);
+      expect(titles[0]).toBe("File B");
+      expect(titles[1]).toBe("File A");
+    });
+
+    it("places null-orderIndex items after numbered items within the same group", () => {
+      const hook = setup(seriesData);
+      act(() =>
+        hook.result.current.dispatch({
+          type: "ADD_FILES",
+          files: [
+            { file: makeFile("001 First.mp3"), durationSeconds: 10 },
+            { file: makeFile("002 Second.mp3"), durationSeconds: 10 },
+          ],
+        }),
+      );
+
+      const [item1, item2] = hook.result.current.state.items as [
+        (typeof hook.result.current.state.items)[0],
+        (typeof hook.result.current.state.items)[0],
+      ];
+
+      // Clear item1's orderIndex to null — it should go to the bottom
+      act(() =>
+        hook.result.current.dispatch({
+          type: "SET_LESSON_FIELD",
+          itemId: item1!.id,
+          field: "orderIndex",
+          value: null,
+        }),
+      );
+      act(() =>
+        hook.result.current.dispatch({
+          type: "SET_LESSON_FIELD",
+          itemId: item2!.id,
+          field: "orderIndex",
+          value: 1,
+        }),
+      );
+
+      const items = hook.result.current.state.items;
+      const first = items[0]!.assignment;
+      const second = items[1]!.assignment;
+      expect(first.kind === "new-lesson" && first.orderIndex).toBe(1);
+      expect(second.kind === "new-lesson" && second.orderIndex).toBeNull();
+    });
+
+    it("does not re-sort when a field other than orderIndex changes", () => {
+      const hook = setup(seriesData);
+      act(() =>
+        hook.result.current.dispatch({
+          type: "ADD_FILES",
+          files: [
+            { file: makeFile("001 First.mp3"), durationSeconds: 10 },
+            { file: makeFile("002 Second.mp3"), durationSeconds: 10 },
+          ],
+        }),
+      );
+
+      const originalOrder = hook.result.current.state.items.map((i) => i.id);
+      const item = hook.result.current.state.items[0]!;
+
+      act(() =>
+        hook.result.current.dispatch({
+          type: "SET_LESSON_FIELD",
+          itemId: item.id,
+          field: "description",
+          value: "some description",
+        }),
+      );
+
+      expect(hook.result.current.state.items.map((i) => i.id)).toEqual(originalOrder);
+    });
+  });
 });

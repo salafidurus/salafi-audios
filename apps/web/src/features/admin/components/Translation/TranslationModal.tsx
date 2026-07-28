@@ -164,9 +164,14 @@ export function TranslationModal({ isOpen, onClose, target }: TranslationModalPr
           if (result.status) {
             dispatch({ type: "SET_STATUS", locale, status: result.status });
           }
+          // Mark this locale's initial state with the saved fields so that
+          // canPublish becomes true immediately — no close/reopen needed.
+          dispatch({ type: "MARK_INITIAL", locale, fields });
         }),
       );
-      handleClose();
+      // Do NOT call handleClose() here. The modal stays open so the user can
+      // immediately click Publish for the locale they just saved.
+      // They can close manually via the X button when done.
     } catch (err) {
       dispatch({ type: "SET_ERROR", error: sanitizeError(err) });
     } finally {

@@ -84,7 +84,7 @@ describe("TranslationModal", () => {
     expect(screen.getByText("Existing Title")).toBeInTheDocument();
   });
 
-  it("saves only the dirty locale via one POST upsert and then closes", async () => {
+  it("saves only the dirty locale via one POST upsert and does NOT auto-close", async () => {
     (fetchListingFormData as Mock<any>).mockResolvedValue({
       listing: {
         id: "listing-1",
@@ -148,7 +148,9 @@ describe("TranslationModal", () => {
       });
     });
 
-    expect(onClose).toHaveBeenCalledTimes(1);
+    // The modal stays open after save so the user can immediately publish.
+    // Closing must be done explicitly via the X button.
+    expect(onClose).not.toHaveBeenCalled();
   });
 
   it("flags a locale in errorTabs when a required field is cleared but another field still has content", async () => {

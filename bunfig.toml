@@ -7,3 +7,6 @@ globalStore = false
 # This is different from Vitest's --passWithNoTests flag which is not needed
 timeout = 10000
 bail = false
+
+[run]
+elide-lines = 0

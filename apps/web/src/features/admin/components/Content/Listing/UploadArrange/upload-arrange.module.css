@@ -142,9 +142,11 @@
 }
 
 .moduleSection {
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-component-card);
-  padding: var(--space-scale-md);
+  /* Left accent strip instead of full border box — removes the nested surface layers */
+  border-left: 3px solid var(--border-primary);
+  padding-left: var(--space-scale-md);
+  padding-top: var(--space-scale-xs);
+  padding-bottom: var(--space-scale-xs);
   display: flex;
   flex-direction: column;
   gap: var(--space-scale-sm);
@@ -174,23 +176,20 @@
   display: flex;
   align-items: center;
   gap: var(--space-scale-sm);
-  padding: var(--space-scale-xs) var(--space-scale-md);
-  border-radius: var(--radius-scale-sm);
-  background-color: var(--surface-subtle);
+  padding: var(--space-scale-xs) 0;
+  border-bottom: 1px solid var(--border-subtle);
   color: var(--content-muted);
   font-family: var(--typo-body-sm-font-family);
   font-size: var(--typo-body-sm-font-size);
 }
 
 .stagedItem {
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-scale-md);
-  background-color: var(--surface-canvas);
-  padding: var(--space-scale-sm) var(--space-scale-md);
+  padding: var(--space-scale-sm) var(--space-scale-sm);
   display: flex;
   flex-direction: column;
   gap: var(--space-scale-sm);
   cursor: grab;
+  border-bottom: 1px solid var(--border-subtle);
 }
 
 .stagedItemConflict {
@@ -255,6 +254,59 @@
   display: flex;
   gap: var(--space-scale-sm);
   align-items: center;
+}
+
+.addModuleRow > button {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Bulk action buttons toolbar */
+.bulkActions {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-scale-sm);
+  align-items: center;
+}
+
+/* Collapse/expand toggle button for module accordion */
+.collapseButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--content-muted);
+  cursor: pointer;
+  padding: var(--space-scale-xs);
+  border-radius: var(--radius-scale-sm);
+  flex-shrink: 0;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.collapseButton:hover {
+  color: var(--content-primary);
+  background-color: var(--surface-hover);
+}
+
+.collapseButtonOpen {
+  transform: rotate(90deg);
+  color: var(--content-primary);
+}
+
+/* Container for the lesson list within a module */
+.moduleLessonsSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
+  padding-top: var(--space-scale-xs);
+  border-top: 1px solid var(--border-subtle);
+}
+
+/* Container for the module's own detail fields (slug, status, etc.) */
+.moduleDetailsSection {
+  padding: var(--space-scale-sm) 0;
+  border-top: 1px dashed var(--border-subtle);
 }
 
 .emptyHint {

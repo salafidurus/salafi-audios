@@ -131,7 +131,8 @@ export type UploadArrangeAction =
   | { type: "UPLOAD_DONE"; itemId: string }
   | { type: "UPLOAD_ERROR"; itemId: string; error: string }
   | { type: "COMMIT_CONFLICT"; conflictSlugs: string[] }
-  | { type: "SET_ERROR"; error: string | null };
+  | { type: "SET_ERROR"; error: string | null }
+  | { type: "SET_ALL_LESSON_STATUS"; status: StatusValue };
 
 const INITIAL_STATE: UploadArrangeState = {
   existing: null,
@@ -184,6 +185,41 @@ function updateItem(
     ...state,
     items: state.items.map((item) => (item.id === itemId ? update(item) : item)),
   };
+}
+
+/**
+ * Within each moduleKey group, sort new-lesson items ascending by orderIndex.
+ * Items with null orderIndex float to the bottom of their group.
+ * Group order (relative position of groups to each other) is preserved.
+ * replace-audio / replace-root-audio items retain their positions.
+ */
+function sortItemsByOrderIndex(items: UploadItem[]): UploadItem[] {
+  // Extract groups while preserving group insertion order.
+  const groupOrder: ModuleKey[] = [];
+  const groups = new Map<ModuleKey, UploadItem[]>();
+  for (const item of items) {
+    const key = item.assignment.kind === "new-lesson" ? item.assignment.moduleKey : "__other__";
+    if (!groups.has(key)) {
+      groups.set(key, []);
+      groupOrder.push(key);
+    }
+    groups.get(key)!.push(item);
+  }
+
+  // Sort new-lesson items within each group; leave __other__ items as-is.
+  for (const [key, groupItems] of groups) {
+    if (key === "__other__") continue;
+    groupItems.sort((a, b) => {
+      const aIdx = a.assignment.kind === "new-lesson" ? a.assignment.orderIndex : null;
+      const bIdx = b.assignment.kind === "new-lesson" ? b.assignment.orderIndex : null;
+      if (aIdx === null && bIdx === null) return 0;
+      if (aIdx === null) return 1;
+      if (bIdx === null) return -1;
+      return aIdx - bIdx;
+    });
+  }
+
+  return groupOrder.flatMap((key) => groups.get(key)!);
 }
 
 interface StagedItemInput {
@@ -337,8 +373,8 @@ function reducer(state: UploadArrangeState, action: UploadArrangeAction): Upload
         return { ...item, assignment: incoming };
       });
 
-    case "SET_LESSON_FIELD":
-      return updateItem(state, action.itemId, (item) => {
+    case "SET_LESSON_FIELD": {
+      const updated = updateItem(state, action.itemId, (item) => {
         if (item.assignment.kind !== "new-lesson") return item;
         const assignment = { ...item.assignment };
         if (action.field === "slug") {
@@ -353,6 +389,22 @@ function reducer(state: UploadArrangeState, action: UploadArrangeAction): Upload
         }
         return { ...item, assignment };
       });
+      // Re-sort within each module group when the orderIndex field changes.
+      if (action.field === "orderIndex") {
+        return { ...updated, items: sortItemsByOrderIndex(updated.items) };
+      }
+      return updated;
+    }
+
+    case "SET_ALL_LESSON_STATUS":
+      return {
+        ...state,
+        items: state.items.map((item) =>
+          item.assignment.kind === "new-lesson"
+            ? { ...item, assignment: { ...item.assignment, status: action.status } }
+            : item,
+        ),
+      };
 
     case "ACCEPT_SUGGESTION":
       return updateItem(state, action.itemId, (item) =>
