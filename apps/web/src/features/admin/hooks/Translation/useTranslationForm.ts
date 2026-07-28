@@ -33,6 +33,13 @@ export type TranslationFormAction =
     }
   | { type: "EDIT_FIELD"; locale: Locale; field: string; value: string }
   | { type: "SET_STATUS"; locale: Locale; status: TranslationStatus }
+  | {
+      type: "MARK_INITIAL";
+      locale: Locale;
+      /** The fields that were just successfully saved — populates initial[locale]
+       *  so that canPublish becomes true without a close/reopen cycle. */
+      fields: TranslationFieldsRecord;
+    }
   | { type: "SET_SAVING"; saving: boolean }
   | { type: "SET_ERROR"; error: string | null };
 
@@ -95,6 +102,22 @@ function formReducer(
         translationStatus: {
           ...state.translationStatus,
           [action.locale]: action.status,
+        },
+      };
+
+    case "MARK_INITIAL":
+      return {
+        ...state,
+        // Populate initial[locale] with the just-saved fields so canPublish
+        // becomes true immediately — no close/reopen required.
+        initial: {
+          ...state.initial,
+          [action.locale]: action.fields,
+        },
+        // Clear in-progress edits for this locale since they are now persisted.
+        edits: {
+          ...state.edits,
+          [action.locale]: {},
         },
       };
 
