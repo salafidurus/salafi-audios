@@ -5,10 +5,10 @@ function uuid(index: number): string {
   return `a0000000-0000-0000-0000-${String(index).padStart(12, '0')}`;
 }
 
-export const TEST_SCHOLAR_ID = uuid(6); // index 6 scholar (e2e-scholar-slug)
+export const TEST_SCHOLAR_ID = uuid(999); // index 999 scholar (e2e-scholar-slug)
 export const TEST_SCHOLAR_SLUG = 'e2e-scholar-slug';
-export const TEST_PARENT_TOPIC_ID = uuid(15); // index 15 parent topic (e2e-parent-topic)
-export const TEST_CHILD_TOPIC_ID = uuid(16); // index 16 child topic (e2e-child-topic)
+export const TEST_PARENT_TOPIC_ID = uuid(997); // index 997 parent topic (e2e-parent-topic)
+export const TEST_CHILD_TOPIC_ID = uuid(996); // index 996 child topic (e2e-child-topic)
 export const TEST_LISTING_ID = uuid(110); // index 110 single (e2e-listing-slug)
 export const TEST_LISTING_SLUG = 'e2e-listing-slug';
 export const TEST_LIVE_CHANNEL_ID = 'e2e-live-channel-1';
@@ -98,5 +98,22 @@ export async function seedTestData(prisma: PrismaService): Promise<void> {
       publishedAt: new Date(),
       durationSeconds: 300,
     },
+  });
+}
+
+/**
+ * Delete the E2E test fixtures created by seedTestData.
+ * Deletion order respects FK constraints (leaf tables first).
+ */
+export async function cleanupE2ETestData(prisma: PrismaService): Promise<void> {
+  for (const id of [TEST_LISTING_ID, TEST_SCHOLAR_ID, TEST_PARENT_TOPIC_ID, TEST_CHILD_TOPIC_ID]) {
+    await prisma.listingTranslation.deleteMany({ where: { listingId: id } });
+    await prisma.audioAsset.deleteMany({ where: { listingId: id } });
+    await prisma.listingTopic.deleteMany({ where: { listingId: id } });
+  }
+  await prisma.listing.deleteMany({ where: { id: TEST_LISTING_ID } });
+  await prisma.scholar.deleteMany({ where: { id: TEST_SCHOLAR_ID } });
+  await prisma.topic.deleteMany({
+    where: { id: { in: [TEST_PARENT_TOPIC_ID, TEST_CHILD_TOPIC_ID] } },
   });
 }

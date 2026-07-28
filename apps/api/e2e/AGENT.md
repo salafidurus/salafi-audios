@@ -26,16 +26,16 @@ E2E tests rely on a shared database seed. The seed runs once before the suite vi
 
 All IDs go through `uuid(n)` → `a0000000-0000-0000-0000-{n padded to 12 digits}`.
 
-| Entity           | ID range | Next available |
-| ---------------- | -------- | -------------- |
-| Scholars         | 1–6      | 7              |
-| Topics           | 10–16    | 17             |
-| Singles          | 100–110  | 111            |
-| Series (parents) | 200–209  | 210            |
-| Series lessons   | 210–281  | 282            |
-| Collections      | 300–309  | 310            |
-| Modules          | 400–466  | 467            |
-| Module lessons   | 500–638  | 639            |
+| Entity           | ID range  | Next available |
+| ---------------- | --------- | -------------- |
+| Scholars         | 1–6       | 7              |
+| Topics           | 10–15     | 16             |
+| Singles          | 100       | 101            |
+| Series (parents) | 200–210   | 211            |
+| Series lessons   | 211–320   | 321            |
+| Collections      | 1000–1001 | 1002           |
+| Modules          | 1100–1110 | 1111           |
+| Module lessons   | 1200–1337 | 1338           |
 
 ### Step 3 — Export a constant for test assertions
 
@@ -61,12 +61,11 @@ if the _shape_ of the data changes (new DB column, new relation, etc.).
 
 - Every seeder uses `upsert` — the seed is safe to run multiple times.
 - `run-seed.ts` runs the canonical seed in upsert mode natively.
-- Audio URLs use the dummy pattern `https://placeholder.dev/audio/{slug}.mp3`
-  by default. Update the `audioUrl` field in the data file to point to a real
-  file when available.
+- Audio URLs use real CDN URLs from `https://preview-cdn.salafidurus.com/audio/`.
 - The E2E-specific entries (scholar `e2e-scholar-slug`, topics `e2e-parent-topic`
   / `e2e-child-topic`, listing `e2e-listing-slug`, live channel `e2e-live-channel-1`)
-  are regular rows in the data files — they are not special-cased.
+  are NOT in the seed data files — they are created by `seedTestData()` in
+  `helpers/seed-test-data.ts`.
 
 ## Stale E2E User Cleanup
 

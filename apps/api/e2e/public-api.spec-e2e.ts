@@ -6,6 +6,7 @@ import {
   TEST_LISTING_ID,
   TEST_LISTING_SLUG,
   seedTestData,
+  cleanupE2ETestData,
 } from './helpers/seed-test-data';
 import { PrismaService } from '../src/core/db/prisma.service';
 
@@ -20,6 +21,7 @@ describe('Public API (e2e)', () => {
   });
 
   afterAll(async () => {
+    await cleanupE2ETestData(prisma);
     await app.close();
   });
 

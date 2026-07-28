@@ -16,6 +16,10 @@ async function upsertAudio(
   audioUrl: string,
   slug: string,
   durationSeconds: number,
+  objectKey?: string,
+  format?: string,
+  sizeBytes?: number,
+  source?: string,
 ) {
   const id = `audio_${slug}`;
   await prisma.audioAsset.upsert({
@@ -24,6 +28,10 @@ async function upsertAudio(
       listingId,
       url: audioUrl,
       durationSeconds,
+      objectKey,
+      format,
+      sizeBytes,
+      source,
     },
     create: {
       id,
@@ -31,6 +39,10 @@ async function upsertAudio(
       url: audioUrl,
       isPrimary: true,
       durationSeconds,
+      objectKey,
+      format,
+      sizeBytes,
+      source,
     },
   });
 }
@@ -43,14 +55,26 @@ export async function seedAudio(prisma: PrismaClient): Promise<number> {
 
   // Audio for singles
   for (const single of SINGLES) {
+    if (!single.audioUrl) continue;
     const listingId = uuid(single.id);
-    await upsertAudio(prisma, listingId, single.audioUrl, single.slug, dur(single.durationMin));
+    await upsertAudio(
+      prisma,
+      listingId,
+      single.audioUrl,
+      single.slug,
+      dur(single.durationMin),
+      single.objectKey,
+      single.audioFormat,
+      single.sizeBytes,
+      single.audioSource,
+    );
     audioCount++;
   }
 
   // Audio for series lessons
   for (const series of SERIES) {
     for (const lesson of series.lessons) {
+      if (!lesson.audioUrl) continue;
       const lessonId = uuid(lesson.id);
       await upsertAudio(
         prisma,
@@ -58,6 +82,10 @@ export async function seedAudio(prisma: PrismaClient): Promise<number> {
         lesson.audioUrl,
         lesson.slug,
         dur(series.lessonDurationMin),
+        lesson.objectKey,
+        lesson.audioFormat,
+        lesson.sizeBytes,
+        lesson.audioSource,
       );
       audioCount++;
     }
@@ -67,6 +95,7 @@ export async function seedAudio(prisma: PrismaClient): Promise<number> {
   for (const collection of COLLECTIONS) {
     for (const mod of collection.modules) {
       for (const lesson of mod.lessons) {
+        if (!lesson.audioUrl) continue;
         const lessonId = uuid(lesson.id);
         await upsertAudio(
           prisma,
@@ -74,6 +103,10 @@ export async function seedAudio(prisma: PrismaClient): Promise<number> {
           lesson.audioUrl,
           lesson.slug,
           dur(collection.lessonDurationMin),
+          lesson.objectKey,
+          lesson.audioFormat,
+          lesson.sizeBytes,
+          lesson.audioSource,
         );
         audioCount++;
       }

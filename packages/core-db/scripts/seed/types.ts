@@ -13,10 +13,17 @@ export interface SingleSeed {
   scholarIdx: number;
   slug: string;
   title: string;
-  desc: string;
+  titleEn?: string;
+  desc?: string;
+  descEn?: string;
   topicIdx: number;
   durationMin: number;
   audioUrl: string;
+  objectKey?: string;
+  audioFormat?: string;
+  sizeBytes?: number;
+  audioSource?: string;
+  language?: string;
 }
 
 /**
@@ -24,8 +31,15 @@ export interface SingleSeed {
  */
 export interface SeriesLessonSeed {
   id: number;
+  title: string;
+  titleEn?: string;
   slug: string;
   audioUrl: string;
+  objectKey?: string;
+  audioFormat?: string;
+  sizeBytes?: number;
+  audioSource?: string;
+  language?: string;
 }
 
 /**
@@ -36,10 +50,13 @@ export interface SeriesSeed {
   scholarIdx: number;
   slug: string;
   title: string;
-  desc: string;
+  titleEn?: string;
+  desc?: string;
+  descEn?: string;
   topicIdx: number;
   lessonDurationMin: number;
   lessons: SeriesLessonSeed[];
+  language?: string;
 }
 
 /**
@@ -47,8 +64,15 @@ export interface SeriesSeed {
  */
 export interface ModuleLessonSeed {
   id: number;
+  title: string;
+  titleEn?: string;
   slug: string;
   audioUrl: string;
+  objectKey?: string;
+  audioFormat?: string;
+  sizeBytes?: number;
+  audioSource?: string;
+  language?: string;
 }
 
 /**
@@ -57,8 +81,11 @@ export interface ModuleLessonSeed {
 export interface ModuleSeed {
   id: number;
   title: string;
-  desc: string;
+  titleEn?: string;
+  desc?: string;
+  descEn?: string;
   lessons: ModuleLessonSeed[];
+  language?: string;
 }
 
 /**
@@ -69,10 +96,13 @@ export interface CollectionSeed {
   scholarIdx: number;
   slug: string;
   title: string;
-  desc: string;
+  titleEn?: string;
+  desc?: string;
+  descEn?: string;
   topicIdx: number;
   lessonDurationMin: number;
   modules: ModuleSeed[];
+  language?: string;
 }
 
 /**

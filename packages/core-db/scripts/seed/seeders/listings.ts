@@ -16,46 +16,81 @@ async function upsertListing(
   id: string,
   slug: string,
   title: string,
-  description: string,
+  description: string | undefined,
   format: ListingFormat,
   scholarId: string,
   parentId: string | undefined,
   status: Status,
   orderIndex: number | undefined,
   durationSeconds: number | undefined,
+  language?: string,
 ) {
-  // Try to find first
-  const existing = await prisma.listing.findUnique({
-    where: { id },
-  });
-
   return prisma.listing.upsert({
     where: { id },
     update: {
       slug,
       title,
-      description,
+      description: description || undefined,
       format,
       scholarId,
       parentId,
       status,
       orderIndex,
       durationSeconds,
+      language: language as any,
     },
     create: {
       id,
       slug,
       title,
-      description,
+      description: description || undefined,
       format,
       scholarId,
-      parentId,
+      parentId: parentId ?? undefined,
       status,
       orderIndex,
       durationSeconds,
-      publishedAt: status === "published" ? (existing?.publishedAt ?? new Date()) : undefined,
+      language: language as any,
+      publishedAt: status === "published" ? new Date() : undefined,
     },
   });
+}
+
+/**
+ * Upsert Arabic and English translations for a listing
+ */
+async function upsertTranslations(
+  prisma: PrismaClient,
+  listingId: string,
+  title: string,
+  description: string | undefined,
+  titleEn?: string,
+  descEn?: string,
+) {
+  await prisma.listingTranslation.upsert({
+    where: { listingId_locale: { listingId, locale: "ar" } },
+    update: { title, description: description ?? null, status: "published" },
+    create: {
+      listingId,
+      locale: "ar",
+      title,
+      description: description ?? null,
+      status: "published",
+    },
+  });
+  if (titleEn) {
+    await prisma.listingTranslation.upsert({
+      where: { listingId_locale: { listingId, locale: "en" } },
+      update: { title: titleEn, description: descEn ?? null, status: "published" },
+      create: {
+        listingId,
+        locale: "en",
+        title: titleEn,
+        description: descEn ?? null,
+        status: "published",
+      },
+    });
+  }
 }
 
 /**
@@ -73,24 +108,44 @@ export async function seedListings(prisma: PrismaClient): Promise<{
   let currentGlobalIndex = 0;
   const topicPairs: TopicPair[] = [];
 
+  const logError = (e: any, ctx: string) => {
+    if (e.code === "P2003") {
+      throw new Error(`FK violation at ${ctx}: ${JSON.stringify(e.meta)}`);
+    }
+    throw e;
+  };
+
   // ── Singles ──
   let singleCount = 0;
   for (const single of SINGLES) {
     const listingId = uuid(single.id);
-    const status = single.id === 110 ? "published" : seedStatus(currentGlobalIndex++);
-    await upsertListing(
-      prisma,
-      listingId,
-      single.slug,
-      single.title,
-      single.desc,
-      "single",
-      SCHOLARS[single.scholarIdx].id,
-      undefined,
-      status,
-      undefined,
-      dur(single.durationMin),
-    );
+    const status = single.id === 100 ? "published" : seedStatus(currentGlobalIndex++);
+    try {
+      await upsertListing(
+        prisma,
+        listingId,
+        single.slug,
+        single.title,
+        single.desc,
+        "single",
+        SCHOLARS[single.scholarIdx].id,
+        undefined,
+        status,
+        undefined,
+        dur(single.durationMin),
+        single.language,
+      );
+      await upsertTranslations(
+        prisma,
+        listingId,
+        single.title,
+        single.desc,
+        single.titleEn,
+        single.descEn,
+      );
+    } catch (e) {
+      logError(e, `single ${single.id} (${single.slug})`);
+    }
     topicPairs.push({ listingId, topicId: TOPICS[single.topicIdx].id });
     singleCount++;
   }
@@ -116,6 +171,15 @@ export async function seedListings(prisma: PrismaClient): Promise<{
       status,
       undefined,
       undefined,
+      series.language,
+    );
+    await upsertTranslations(
+      prisma,
+      seriesId,
+      series.title,
+      series.desc,
+      series.titleEn,
+      series.descEn,
     );
     topicPairs.push({ listingId: seriesId, topicId: TOPICS[series.topicIdx].id });
     seriesCount++;
@@ -124,21 +188,23 @@ export async function seedListings(prisma: PrismaClient): Promise<{
       const lesson = series.lessons[i];
       const lessonId = uuid(lesson.id);
       const lessonStatus = seedStatus(currentGlobalIndex++);
-      const lessonTitle = `al-Dars ${i + 1}: ${series.title}`;
+      const lessonTitle = lesson.title || `al-Dars ${i + 1}`;
 
       await upsertListing(
         prisma,
         lessonId,
         lesson.slug,
         lessonTitle,
-        `al-Dars ${i + 1} min ${series.title}`,
+        undefined,
         "single",
         scholarId,
         seriesId,
         lessonStatus,
         i + 1,
         dur(series.lessonDurationMin),
+        lesson.language,
       );
+      await upsertTranslations(prisma, lessonId, lessonTitle, undefined, lesson.titleEn);
       topicPairs.push({ listingId: lessonId, topicId: TOPICS[series.topicIdx].id });
       seriesLessonCount++;
     }
@@ -155,37 +221,56 @@ export async function seedListings(prisma: PrismaClient): Promise<{
     const scholarId = SCHOLARS[collection.scholarIdx].id;
     const collectionStatus = seedStatus(currentGlobalIndex++);
 
-    await upsertListing(
-      prisma,
-      collectionId,
-      collection.slug,
-      collection.title,
-      collection.desc,
-      "collection",
-      scholarId,
-      undefined,
-      collectionStatus,
-      undefined,
-      undefined,
-    );
+    try {
+      await upsertListing(
+        prisma,
+        collectionId,
+        collection.slug,
+        collection.title,
+        collection.desc,
+        "collection",
+        scholarId,
+        undefined,
+        collectionStatus,
+        undefined,
+        undefined,
+        collection.language,
+      );
+      await upsertTranslations(
+        prisma,
+        collectionId,
+        collection.title,
+        collection.desc,
+        collection.titleEn,
+        collection.descEn,
+      );
+    } catch (e) {
+      logError(e, `collection ${collection.id} (${collection.slug})`);
+    }
     topicPairs.push({ listingId: collectionId, topicId: TOPICS[collection.topicIdx].id });
     collectionCount++;
 
     for (const [modIdx, mod] of collection.modules.entries()) {
       const moduleId = uuid(mod.id);
-      await upsertListing(
-        prisma,
-        moduleId,
-        `${collection.slug}-mod-${mod.id}`,
-        mod.title,
-        mod.desc,
-        "series",
-        scholarId,
-        collectionId,
-        "published",
-        modIdx + 1,
-        undefined,
-      );
+      try {
+        await upsertListing(
+          prisma,
+          moduleId,
+          `${collection.slug}-mod-${mod.id}`,
+          mod.title,
+          mod.desc,
+          "series",
+          scholarId,
+          collectionId,
+          "published",
+          modIdx + 1,
+          undefined,
+          mod.language,
+        );
+        await upsertTranslations(prisma, moduleId, mod.title, mod.desc, mod.titleEn, mod.descEn);
+      } catch (e) {
+        logError(e, `module ${mod.id} in collection ${collection.id}`);
+      }
       topicPairs.push({ listingId: moduleId, topicId: TOPICS[collection.topicIdx].id });
       moduleCount++;
 
@@ -193,21 +278,27 @@ export async function seedListings(prisma: PrismaClient): Promise<{
         const lesson = mod.lessons[i];
         const lessonId = uuid(lesson.id);
         const lessonStatus = seedStatus(currentGlobalIndex++);
-        const lessonTitle = `al-Dars ${i + 1}: ${mod.title}`;
+        const lessonTitle = lesson.title || `al-Dars ${i + 1}: ${mod.title}`;
 
-        await upsertListing(
-          prisma,
-          lessonId,
-          lesson.slug,
-          lessonTitle,
-          `Lesson ${i + 1} of ${mod.title} - ${collection.title}`,
-          "single",
-          scholarId,
-          moduleId,
-          lessonStatus,
-          i + 1,
-          dur(collection.lessonDurationMin),
-        );
+        try {
+          await upsertListing(
+            prisma,
+            lessonId,
+            lesson.slug,
+            lessonTitle,
+            undefined,
+            "single",
+            scholarId,
+            moduleId,
+            lessonStatus,
+            i + 1,
+            dur(collection.lessonDurationMin),
+            lesson.language,
+          );
+          await upsertTranslations(prisma, lessonId, lessonTitle, undefined, lesson.titleEn);
+        } catch (e) {
+          logError(e, `lesson ${lesson.id} in module ${mod.id} (${lesson.slug})`);
+        }
         topicPairs.push({ listingId: lessonId, topicId: TOPICS[collection.topicIdx].id });
         moduleLessonCount++;
       }

@@ -4,7 +4,12 @@ import request from 'supertest';
 import { PrismaService } from '../src/core/db/prisma.service';
 import { TestAuthFactory } from './helpers/test-auth.factory';
 import { Permission } from '@sd/core-db';
-import { TEST_SCHOLAR_ID, TEST_LISTING_ID, seedTestData } from './helpers/seed-test-data';
+import {
+  TEST_SCHOLAR_ID,
+  TEST_LISTING_ID,
+  seedTestData,
+  cleanupE2ETestData,
+} from './helpers/seed-test-data';
 
 process.env.DISABLE_THROTTLER = 'true';
 
@@ -28,6 +33,7 @@ describe('Content translations persistence (e2e)', () => {
   });
 
   afterAll(async () => {
+    await cleanupE2ETestData(prisma);
     // Restore shared seed state so other spec files aren't affected by the
     // translation rows this suite creates on shared fixtures.
     await prisma.listingTranslation.deleteMany({

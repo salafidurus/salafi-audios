@@ -7,16 +7,7 @@ Clean, modular database seeding system for development and testing.
 The seeder respects the following environment variables:
 
 - `DATABASE_URL` or `DIRECT_DB_URL` - Database connection string (required)
-- `MEDIA_CDN_BASE_URL` - Base URL for audio assets (optional)
-  - **Development**: Defaults to `https://placeholder.dev/audio`
-  - **Production**: Set to your CDN URL (e.g., `https://cdn.salafidurus.com/audio`)
-
-Example `.env`:
-
-```bash
-DATABASE_URL=postgresql://sd_dev:password@localhost:5432/salafi_dev
-MEDIA_CDN_BASE_URL=https://placeholder.dev/audio  # Optional, this is the default
-```
+- No `MEDIA_CDN_BASE_URL` — audio URLs are hardcoded real CDN URLs in seed data.
 
 ## Structure
 
@@ -73,11 +64,15 @@ Edit `data/scholars.ts`:
 
 ```typescript
 {
-  id: uuid(6),
+  id: uuid(7),
   slug: "new-scholar",
   name: "New Scholar Name",
   bio: "Biography...",
-  isKibar: false,
+  nameEn: "New Scholar Name (English)",
+  country: "SA",
+  mainLanguage: "ar",
+  title: "sheikh",
+  orderIndex: 100,
 }
 ```
 
@@ -87,13 +82,15 @@ Edit `data/singles.ts`:
 
 ```typescript
 {
-  id: 110,                  // Next available ID
+  id: 101,                  // Next available ID
   scholarIdx: 0,            // Index in SCHOLARS array
   slug: "unique-slug",
   title: "Lecture Title",
   desc: "Description...",
   topicIdx: 0,              // Index in TOPICS array
   durationMin: 50,
+  audioUrl: "https://cdn.example.com/audio/file.mp3",
+  language: "ar",
 }
 ```
 
@@ -115,14 +112,14 @@ When modifying seeder logic:
 
 ## UUID Ranges
 
-- Topics: 10-14
-- Scholars: 1-5
-- Singles: 100-109
+- Topics: 10-15
+- Scholars: 1-6
+- Singles: 100
 - Series (parents): 200-209
-- Series (lessons): 210-281
-- Collections: 300-309
-- Modules: 400-466
-- Module lessons: 500-638
+- Series lessons: 210-320
+- Collections: 1000-1001
+- Modules: 1100-1110
+- Module lessons: 1200-1337
 
 ## Best Practices
 
@@ -134,8 +131,13 @@ When modifying seeder logic:
 
 ### Audio Assets
 
-Audio URLs are generated as: `${MEDIA_CDN_BASE_URL}/${slug}.mp3`
+Audio URLs are hardcoded in the seed data using the production CDN:
+`https://preview-cdn.salafidurus.com/audio/`.
 
-- Development uses placeholder URLs by default
-- Production should set `MEDIA_CDN_BASE_URL` to the actual CDN
-- URLs are stored in the database, not computed at runtime
+Each audio entry includes:
+
+- `audioUrl`: Full CDN URL
+- `objectKey`: S3 object key (e.g., `audio/series-name/lesson-slug.mp3`)
+- `audioFormat`: File format (e.g., `mp3`)
+- `sizeBytes`: File size in bytes
+- `audioSource`: Storage source (e.g., `r2`)
