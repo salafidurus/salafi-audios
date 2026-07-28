@@ -12,6 +12,7 @@
       "**/generated/**",
       ".agents/**"
     ],
+    "rules": ["react-doctor/js-tosorted-immutable"],
     "overrides": [
       {
         "files": ["package.json"],

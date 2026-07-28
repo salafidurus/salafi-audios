@@ -7,10 +7,12 @@
   "scripts": {
     "eas-build-post-install": "cd ../.. && turbo run build --filter=native^...",
     "eas-build-on-error": "sentry-eas-build-on-error",
+    "prestart": "adb reverse tcp:8081 tcp:8081 && adb reverse tcp:4000 tcp:4000 || true",
     "start": "expo start --dev-client",
     "dev": "expo start --dev-client",
     "prebuild": "expo prebuild",
     "prebuild:clean": "expo prebuild --clean",
+    "preandroid": "adb reverse tcp:8081 tcp:8081 && adb reverse tcp:4000 tcp:4000 || true",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "lint": "oxlint .",
@@ -94,6 +96,7 @@
     "zustand": "catalog:"
   },
   "devDependencies": {
+    "@babel/core": "catalog:",
     "@sentry/cli": "~2.58.4",
     "@testing-library/react-native": "^14.0.0",
     "@types/jest": "^29.5.14",
