@@ -111,25 +111,6 @@ enum ScholarTitle {
 }
 
 //////////////////////////
-// Ingestion batch (for seed/dummy dataset lifecycle)
-//////////////////////////
-
-model IngestionBatch {
-  id          String   @id @default(cuid())
-  tag         String
-  environment String
-  createdAt   DateTime @default(now())
-
-  scholars    Scholar[]    @relation("IngestBatchScholars")
-  listings    Listing[]    @relation("IngestBatchListings")
-  audioAssets AudioAsset[] @relation("IngestBatchAudioAssets")
-
-  @@unique([tag, environment])
-  @@index([tag])
-  @@index([environment])
-}
-
-//////////////////////////
 // Users & Roles
 //////////////////////////
 
@@ -263,9 +244,6 @@ model Scholar {
   socialYoutube  String?
   socialWebsite  String?
 
-  ingestionBatchId String?
-  ingestionBatch   IngestionBatch? @relation("IngestBatchScholars", fields: [ingestionBatchId], references: [id])
-
   listings     Listing[]
   userRoles    UserScholarRole[]
   translations ScholarTranslation[]
@@ -306,9 +284,6 @@ model Listing {
   createdBy String?
   updatedBy String?
   deletedBy String?
-
-  ingestionBatchId String?
-  ingestionBatch   IngestionBatch? @relation("IngestBatchListings", fields: [ingestionBatchId], references: [id])
 
   scholar              Scholar               @relation(fields: [scholarId], references: [id], onDelete: Restrict)
   parent               Listing?              @relation("ListingHierarchy", fields: [parentId, scholarId], references: [id, scholarId], onDelete: Restrict)
@@ -374,9 +349,6 @@ model AudioAsset {
   source          String?
   isPrimary       Boolean  @default(false)
   createdAt       DateTime @default(now())
-
-  ingestionBatchId String?
-  ingestionBatch   IngestionBatch? @relation("IngestBatchAudioAssets", fields: [ingestionBatchId], references: [id])
 
   listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 
