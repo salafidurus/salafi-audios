@@ -190,3 +190,68 @@
   display: flex;
   justify-content: flex-end;
 }
+
+/* Bulk action toolbar in the Sublistings tab */
+.bulkActions {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-scale-sm);
+  align-items: center;
+  padding-bottom: var(--space-scale-sm);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+/* Module accordion group wrapper */
+.childModuleGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Module header row: chevron + title button */
+.childModuleHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-scale-xs);
+}
+
+.childModuleTitle {
+  flex: 1;
+  justify-content: flex-start;
+  text-align: start;
+  font-weight: var(--typo-label-md-font-weight);
+}
+
+/* Nested lesson buttons inside an expanded module */
+.childModuleLessons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-scale-xs);
+  padding-top: var(--space-scale-xs);
+  padding-left: var(--space-scale-lg);
+}
+
+/* Accordion collapse/expand button */
+.collapseButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--content-muted);
+  cursor: pointer;
+  padding: var(--space-scale-xs);
+  border-radius: var(--radius-scale-sm);
+  flex-shrink: 0;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.collapseButton:hover {
+  color: var(--content-primary);
+  background-color: var(--surface-hover);
+}
+
+.collapseButtonOpen {
+  transform: rotate(90deg);
+  color: var(--content-primary);
+}
