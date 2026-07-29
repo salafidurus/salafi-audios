@@ -49,11 +49,12 @@ export function getRootTabByRouteName(routeName: string): RootTabConfig | undefi
 }
 
 export function getRootTabFromPathname(pathname: string): RootTab {
-  if (pathname === routes.home || pathname.startsWith(routes.search)) {
-    return "search";
-  }
-
-  if (pathname.startsWith(routes.explore.index)) {
+  if (
+    pathname === "/" ||
+    pathname.startsWith("/scholar") ||
+    pathname.startsWith("/curation") ||
+    pathname.startsWith("/recent")
+  ) {
     return "explore";
   }
 
@@ -65,15 +66,23 @@ export function getRootTabFromPathname(pathname: string): RootTab {
     return "settings";
   }
 
-  return "search";
+  return "explore";
 }
 
 export function getActiveSubsection(pathname: string, section: Section): string {
   const normalizedPath =
     pathname.endsWith("/") && pathname.length > 1 ? pathname.slice(0, -1) : pathname;
   const parts = normalizedPath.split("/").filter(Boolean);
-  const candidate = parts[1];
 
+  if (section === "explore") {
+    const candidate = parts[0] || "recent";
+    if (candidate === "scholar" || candidate === "curation" || candidate === "recent") {
+      return candidate;
+    }
+    return "recent";
+  }
+
+  const candidate = parts[1];
   return SECTION_TABS[section].some((tab) => tab.id === candidate)
     ? candidate!
     : DEFAULT_TABS[section];
@@ -82,6 +91,13 @@ export function getActiveSubsection(pathname: string, section: Section): string 
 export function buildSectionPath(section: Section, tabId?: string): string {
   const activeTab =
     tabId && SECTION_TABS[section].some((tab) => tab.id === tabId) ? tabId : DEFAULT_TABS[section];
+
+  if (section === "explore") {
+    if (activeTab === "recent") {
+      return "/";
+    }
+    return `/${activeTab}`;
+  }
 
   if (activeTab === DEFAULT_TABS[section]) {
     return `/${section}`;

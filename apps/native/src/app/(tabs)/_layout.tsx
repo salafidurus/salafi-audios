@@ -1,17 +1,63 @@
-import { Tabs } from "expo-router";
+import { NativeTabs } from "expo-router/unstable-native-tabs";
 
-import { RouteAccessGuard } from "@/core/auth";
-import { CustomTabBar } from "@/features/navigation";
+import { RouteAccessGuard, useAuth } from "@/core/auth";
+import { useTranslation } from "@/core/i18n/use-translation";
+
+function AdminTabTrigger() {
+  const { user } = useAuth();
+  const { t } = useTranslation();
+  const isAdmin = (user as any)?.role === "admin";
+
+  return (
+    <NativeTabs.Trigger name="admin" hidden={!isAdmin}>
+      <NativeTabs.Trigger.Icon
+        sf={{ default: "shield", selected: "shield.fill" }}
+        md={{ default: "admin_panel_settings", selected: "admin_panel_settings" }}
+      />
+      <NativeTabs.Trigger.Label>{t("admin", "Admin")}</NativeTabs.Trigger.Label>
+    </NativeTabs.Trigger>
+  );
+}
 
 export default function TabsLayout() {
+  const { t } = useTranslation();
+
   return (
     <RouteAccessGuard>
-      <Tabs tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
-        <Tabs.Screen name="(search)" options={{ title: "Search", tabBarLabel: "Search" }} />
-        <Tabs.Screen name="feed" options={{ title: "Explore", tabBarLabel: "Explore" }} />
-        <Tabs.Screen name="library" options={{ title: "Library", tabBarLabel: "Library" }} />
-        <Tabs.Screen name="settings" options={{ title: "Settings", tabBarLabel: "Settings" }} />
-      </Tabs>
+      <NativeTabs minimizeBehavior="onScrollDown">
+        <NativeTabs.Trigger name="(explore)">
+          <NativeTabs.Trigger.Icon
+            sf={{ default: "safari", selected: "safari.fill" }}
+            md={{ default: "explore", selected: "explore" }}
+          />
+          <NativeTabs.Trigger.Label>{t("navigation.explore", "Explore")}</NativeTabs.Trigger.Label>
+        </NativeTabs.Trigger>
+
+        <NativeTabs.Trigger name="library">
+          <NativeTabs.Trigger.Icon
+            sf={{ default: "books.vertical", selected: "books.vertical.fill" }}
+            md={{ default: "library_books", selected: "library_books" }}
+          />
+          <NativeTabs.Trigger.Label>{t("navigation.library", "Library")}</NativeTabs.Trigger.Label>
+        </NativeTabs.Trigger>
+
+        <NativeTabs.Trigger name="settings">
+          <NativeTabs.Trigger.Icon
+            sf={{ default: "gearshape", selected: "gearshape.fill" }}
+            md={{ default: "settings", selected: "settings" }}
+          />
+          <NativeTabs.Trigger.Label>
+            {t("navigation.settings", "Settings")}
+          </NativeTabs.Trigger.Label>
+        </NativeTabs.Trigger>
+
+        <AdminTabTrigger />
+
+        {/* Dedicated Search tab for iOS native integration */}
+        <NativeTabs.Trigger name="search" role="search">
+          <NativeTabs.Trigger.Label>{t("search", "Search")}</NativeTabs.Trigger.Label>
+        </NativeTabs.Trigger>
+      </NativeTabs>
     </RouteAccessGuard>
   );
 }
