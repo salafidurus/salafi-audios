@@ -12,9 +12,10 @@ import { AppText } from "@/shared/components/AppText/AppText";
 export type FeedPodcastRowProps = {
   item: FeedContentItemDto;
   onPress?: () => void;
+  hideBorder?: boolean;
 };
 
-export function FeedPodcastRow({ item, onPress }: FeedPodcastRowProps) {
+export function FeedPodcastRow({ item, onPress, hideBorder = false }: FeedPodcastRowProps) {
   const showOriginal = useShowOriginalContent();
   const title = pickContentField(item.title, item.original?.title, showOriginal);
   const { progressPercent } = useListingProgress(item.id);
@@ -22,7 +23,11 @@ export function FeedPodcastRow({ item, onPress }: FeedPodcastRowProps) {
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => [styles.container, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.container,
+        hideBorder && styles.noBorder,
+        pressed && styles.pressed,
+      ]}
       testID="podcast-row"
     >
       <View style={styles.thumbnailContainer}>
@@ -63,15 +68,18 @@ export function FeedPodcastRow({ item, onPress }: FeedPodcastRowProps) {
 const styles = StyleSheet.create((theme) => ({
   container: {
     padding: theme.spacing.scale.md,
-    borderWidth: theme.border.width.default,
-    borderColor: theme.colors.border.subtle,
-    borderRadius: theme.radius.component.card,
-    backgroundColor: theme.colors.surface.default,
     flexDirection: "row",
     gap: theme.spacing.scale.sm,
+    borderBottomWidth: theme.border.width.default,
+    borderBottomColor: theme.colors.border.subtle,
+    backgroundColor: "transparent",
+  },
+  noBorder: {
+    borderBottomWidth: 0,
   },
   pressed: {
     opacity: 0.7,
+    backgroundColor: theme.colors.surface.hover,
   },
   thumbnailContainer: {
     width: 64,

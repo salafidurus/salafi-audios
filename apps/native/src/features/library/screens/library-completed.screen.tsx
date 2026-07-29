@@ -1,13 +1,12 @@
-import type { LibraryItemDto } from "@sd/core-contracts";
-
 import { useLibraryCompletedScreen } from "@sd/domain-content";
 import { useCallback } from "react";
-import { Text, FlatList } from "react-native";
+import { Text, ScrollView } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { LibraryItemRow } from "@/features/library/components/library-item-row/library-item-row";
+import { List } from "@/shared/components/List";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
 export type LibraryCompletedScreenProps = {
@@ -24,17 +23,6 @@ export function LibraryCompletedScreen({ onNavigateToListing }: LibraryCompleted
       onNavigateToListing?.(slug);
     },
     [onNavigateToListing],
-  );
-
-  const renderItem = useCallback(
-    ({ item }: { item: LibraryItemDto }) => (
-      <LibraryItemRow
-        item={item}
-        variant="completed"
-        onPress={() => handleItemPress(item.listingSlug)}
-      />
-    ),
-    [handleItemPress],
   );
 
   if (isFetching && items.length === 0) {
@@ -57,12 +45,19 @@ export function LibraryCompletedScreen({ onNavigateToListing }: LibraryCompleted
 
   return (
     <ScreenView>
-      <FlatList
-        data={items}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        contentContainerStyle={styles.listContent}
-      />
+      <ScrollView contentContainerStyle={styles.listContent}>
+        <List>
+          {items.map((item, index) => (
+            <LibraryItemRow
+              key={item.id}
+              item={item}
+              variant="completed"
+              onPress={() => handleItemPress(item.listingSlug)}
+              hideBorder={index === items.length - 1}
+            />
+          ))}
+        </List>
+      </ScrollView>
     </ScreenView>
   );
 }
@@ -76,6 +71,8 @@ const styles = StyleSheet.create((theme) => ({
     textAlign: "center",
   },
   listContent: {
+    paddingHorizontal: theme.spacing.layout.pageX,
+    paddingVertical: theme.spacing.layout.pageY,
     paddingBottom: theme.spacing.scale["2xl"],
   },
 }));

@@ -13,6 +13,7 @@ export type LibraryItemRowProps = {
   item: LibraryItemDto;
   variant: "progress" | "saved" | "completed";
   onPress?: () => void;
+  hideBorder?: boolean;
 };
 
 type LibraryItemIconProps = {
@@ -48,7 +49,12 @@ function ProgressBarFill({ percent }: { percent: number }) {
   );
 }
 
-export function LibraryItemRow({ item, variant, onPress }: LibraryItemRowProps) {
+export function LibraryItemRow({
+  item,
+  variant,
+  onPress,
+  hideBorder = false,
+}: LibraryItemRowProps) {
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
   const lectureTitle = pickContentField(item.listingTitle, item.originalListingTitle, showOriginal);
@@ -60,7 +66,11 @@ export function LibraryItemRow({ item, variant, onPress }: LibraryItemRowProps) 
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => [styles.container, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.container,
+        hideBorder && styles.noBorder,
+        pressed && styles.pressed,
+      ]}
     >
       <View style={styles.iconContainer}>
         <LibraryItemIcon variant={variant} />
@@ -110,6 +120,9 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing.scale.md,
     borderBottomWidth: theme.border.width.default,
     borderBottomColor: theme.colors.border.subtle,
+  },
+  noBorder: {
+    borderBottomWidth: 0,
   },
   pressed: {
     opacity: 0.7,

@@ -6,6 +6,9 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { AppText } from "@/shared/components/AppText/AppText";
 
+import { SettingsRow } from "../components/SettingsRow/SettingsRow";
+import { SettingsSection } from "../components/SettingsSection/SettingsSection";
+
 export type AccountProfileScreenProps = {
   onBack?: () => void;
 };
@@ -33,12 +36,11 @@ function AccountProfileForm({
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <AppText variant="titleLg" style={styles.title}>
-        {t("account.editProfile", "Edit Profile")}
-      </AppText>
-      <View style={styles.form}>
-        <View style={styles.field}>
-          <AppText variant="labelMd">{t("account.displayName", "Display Name")}</AppText>
+      <SettingsSection
+        title={t("account.editProfile", "Edit Profile")}
+        description={t("account.profileDesc", "Manage your personal profile information.")}
+      >
+        <SettingsRow label={t("account.displayName", "Display Name")}>
           <TextInput
             value={displayName}
             onChangeText={setDisplayName}
@@ -46,16 +48,16 @@ function AccountProfileForm({
             placeholderTextColor={theme.colors.content.muted}
             style={styles.input}
           />
-        </View>
-        <View style={styles.field}>
-          <AppText variant="labelMd">{t("account.email", "Email")}</AppText>
+        </SettingsRow>
+        <SettingsRow label={t("account.email", "Email")} hideBorder>
           <TextInput
             value={profile.email}
             editable={false}
             style={[styles.input, styles.inputDisabled]}
           />
-        </View>
-      </View>
+        </SettingsRow>
+      </SettingsSection>
+
       <View style={styles.actions}>
         {isError && (
           <AppText variant="caption" style={{ color: theme.colors.state.dangerContent }}>
@@ -128,32 +130,20 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing.layout.pageX,
     paddingVertical: theme.spacing.layout.pageY,
   },
-  title: {
-    color: theme.colors.content.strong,
-  },
-  form: {
-    marginTop: theme.spacing.scale.xl,
-    gap: theme.spacing.component.gapLg,
-  },
-  field: {
-    gap: theme.spacing.scale.xs,
-  },
   input: {
-    paddingVertical: theme.spacing.scale.sm,
-    paddingHorizontal: theme.spacing.scale.md,
-    borderWidth: theme.border.width.default,
-    borderColor: theme.colors.border.default,
-    borderRadius: theme.radius.scale.sm,
     fontSize: 14,
     color: theme.colors.content.default,
+    textAlign: "right",
+    minWidth: 150,
   },
   inputDisabled: {
-    backgroundColor: theme.colors.surface.subtle,
+    color: theme.colors.content.muted,
   },
   actions: {
-    marginTop: theme.spacing.scale.xl,
+    marginTop: theme.spacing.scale.md,
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "flex-end",
     gap: theme.spacing.scale.md,
   },
   saveButton: {
