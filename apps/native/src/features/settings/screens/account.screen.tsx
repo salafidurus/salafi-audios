@@ -3,6 +3,7 @@ import { ChevronRight } from "lucide-react-native";
 import { ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
+import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 import { AppText } from "@/shared/components/AppText/AppText";
@@ -27,7 +28,8 @@ export function AccountScreen({
   onNavigateToAdmin,
   onSignOut,
 }: AccountScreenProps) {
-  const { data: profile, isFetching } = useAccountProfile();
+  const { isAuthenticated } = useAuth();
+  const { data: profile, isFetching } = useAccountProfile({ enabled: isAuthenticated });
   const { t } = useTranslation();
   const { hasAnyPermission } = useAdminPermissions();
 
@@ -41,9 +43,6 @@ export function AccountScreen({
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <AppText variant="titleLg" style={styles.title}>
-        {t("account.title", "Account")}
-      </AppText>
       {profile ? (
         <>
           {/* Profile Info Section */}

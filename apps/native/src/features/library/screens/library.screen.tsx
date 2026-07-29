@@ -41,10 +41,6 @@ export function LibraryScreen({ onNavigateToListing }: LibraryScreenProps) {
   return (
     <ScreenView>
       <ScrollView contentContainerStyle={styles.listContent}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionHeaderText}>{t("library.inProgress", "In Progress")}</Text>
-        </View>
-
         <List>
           {items.length === 0 ? (
             <View style={styles.emptyContainer}>
@@ -86,13 +82,5 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing.layout.pageX,
     paddingVertical: theme.spacing.layout.pageY,
     paddingBottom: theme.spacing.scale["2xl"],
-  },
-  sectionHeader: {
-    marginBottom: theme.spacing.scale.md,
-  },
-  sectionHeaderText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: theme.colors.content.strong,
   },
 }));

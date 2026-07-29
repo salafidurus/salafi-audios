@@ -71,7 +71,6 @@ describe("LibraryScreen", () => {
   it("renders empty section messages when no items exist", async () => {
     await render(<LibraryScreen />);
 
-    expect(screen.getByText("In Progress")).toBeTruthy();
     expect(screen.getByText("No lectures in progress.")).toBeTruthy();
   });
 

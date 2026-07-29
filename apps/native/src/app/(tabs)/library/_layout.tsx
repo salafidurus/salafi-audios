@@ -16,7 +16,19 @@ export default function LibraryLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: t("navigation.library", "Library"),
+          title: t("library.inProgress", "In Progress"),
+        }}
+      />
+      <Stack.Screen
+        name="saved"
+        options={{
+          title: t("library.saved", "Saved"),
+        }}
+      />
+      <Stack.Screen
+        name="completed"
+        options={{
+          title: t("library.completed", "Completed"),
         }}
       />
     </Stack>
