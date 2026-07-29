@@ -152,6 +152,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     android: {
       ...config.android,
       package: androidPackage,
+      softwareKeyboardLayoutMode: "resize",
       permissions: ["FOREGROUND_SERVICE", "FOREGROUND_SERVICE_MEDIA_PLAYBACK"],
       adaptiveIcon: {
         backgroundColor: "#ffffff",
