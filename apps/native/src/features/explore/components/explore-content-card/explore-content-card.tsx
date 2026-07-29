@@ -6,12 +6,12 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 
-export type FeedContentCardProps = {
+export type ExploreContentCardProps = {
   item: FeedContentItemDto;
   onPress?: () => void;
 };
 
-export function FeedContentCard({ item, onPress }: FeedContentCardProps) {
+export function ExploreContentCard({ item, onPress }: ExploreContentCardProps) {
   const showOriginal = useShowOriginalContent();
   const title = pickContentField(item.title, item.original?.title, showOriginal);
 

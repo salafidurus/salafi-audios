@@ -6,7 +6,7 @@ import { useRouter, useNavigation } from "expo-router";
 import { Activity, useState, useEffect, useCallback } from "react";
 import { View, Text, Pressable } from "react-native";
 
-import { FeedRecentScreen } from "@/features/explore/screens/explore-recent.screen";
+import { ExploreRecentScreen } from "@/features/explore/screens/explore-recent.screen";
 import { SearchFilter } from "@/features/search/components/SearchFilter/SearchFilter";
 import { SearchResultItem } from "@/features/search/components/SearchResultItem/SearchResultItem";
 import { SearchResultsList } from "@/features/search/components/SearchResultsList/SearchResultsList";
@@ -71,7 +71,7 @@ export default function ExploreIndexRoute() {
   return (
     <View style={{ flex: 1 }}>
       <Activity mode={isSearching ? "hidden" : "visible"}>
-        <FeedRecentScreen
+        <ExploreRecentScreen
           onNavigateToListing={navigateToListing}
           onNavigateToScholar={(slug) => router.push(routes.scholars.detail(slug) as Href)}
         />

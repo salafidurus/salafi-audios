@@ -1,55 +1,54 @@
 import type { ScholarListItemDto } from "@sd/core-contracts";
 
 import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
-import { useCallback } from "react";
-import { FlatList, Pressable, Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+
+import { AppText } from "@/shared/components/AppText/AppText";
+import { List } from "@/shared/components/List";
 
 type AdminScholarsScreenProps = {
   onNavigateToScholar: (slug: string) => void;
 };
-
-type ScholarRowProps = {
-  item: ScholarListItemDto;
-  onPress: (slug: string) => void;
-};
-
-function ScholarRow({ item, onPress }: ScholarRowProps) {
-  const handlePress = useCallback(() => onPress(item.slug), [onPress, item.slug]);
-  return (
-    <Pressable onPress={handlePress} style={styles.row}>
-      <Text style={styles.rowName}>{item.name}</Text>
-      <Text style={styles.rowSlug}>@{item.slug}</Text>
-    </Pressable>
-  );
-}
 
 export function AdminScholarsScreen({ onNavigateToScholar }: AdminScholarsScreenProps) {
   const { data, isLoading } = useApiQuery<ScholarListItemDto[]>(["scholars", "list"], () =>
     httpClient<ScholarListItemDto[]>({ url: endpoints.scholars.list, method: "GET" }),
   );
 
-  const renderItem = useCallback(
-    ({ item }: { item: ScholarListItemDto }) => (
-      <ScholarRow item={item} onPress={onNavigateToScholar} />
-    ),
-    [onNavigateToScholar],
-  );
+  const scholars = data ?? [];
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerText}>Scholars</Text>
-      </View>
-      {isLoading ? (
-        <Text style={styles.loadingText}>Loading…</Text>
-      ) : (
-        <FlatList
-          data={data ?? []}
-          keyExtractor={(item: ScholarListItemDto) => item.id}
-          renderItem={renderItem}
-        />
-      )}
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.header}>
+          <AppText variant="titleLg">Scholars</AppText>
+        </View>
+        {isLoading ? (
+          <AppText variant="bodyMd" style={styles.loadingText}>
+            Loading…
+          </AppText>
+        ) : (
+          <List>
+            {scholars.map((item, index) => (
+              <List.Item
+                key={item.id}
+                onPress={() => onNavigateToScholar(item.slug)}
+                hideBorder={index === scholars.length - 1}
+              >
+                <View style={styles.rowContent}>
+                  <AppText variant="bodyMd" style={styles.rowName}>
+                    {item.name}
+                  </AppText>
+                  <AppText variant="caption" style={styles.rowSlug}>
+                    @{item.slug}
+                  </AppText>
+                </View>
+              </List.Item>
+            ))}
+          </List>
+        )}
+      </ScrollView>
     </View>
   );
 }
@@ -58,34 +57,25 @@ const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
   },
-  header: {
-    padding: theme.spacing.scale.lg,
+  scrollContent: {
+    padding: theme.spacing.scale.md,
   },
-  headerText: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: theme.colors.content.strong,
+  header: {
+    paddingVertical: theme.spacing.scale.md,
   },
   loadingText: {
     textAlign: "center",
     marginTop: theme.spacing.scale["3xl"],
     color: theme.colors.content.muted,
   },
-  row: {
-    padding: theme.spacing.scale.md,
-    marginHorizontal: theme.spacing.scale.lg,
-    marginBottom: theme.spacing.scale.sm,
-    borderWidth: theme.border.width.default,
-    borderColor: theme.colors.border.subtle,
-    borderRadius: theme.radius.scale.sm,
-    backgroundColor: theme.colors.surface.default,
+  rowContent: {
+    gap: theme.spacing.scale.xs,
   },
   rowName: {
     fontWeight: "600",
     color: theme.colors.content.strong,
   },
   rowSlug: {
-    fontSize: 12,
     color: theme.colors.content.muted,
   },
 }));

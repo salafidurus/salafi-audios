@@ -8,6 +8,7 @@ import { StyleSheet } from "react-native-unistyles";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { AppText } from "@/shared/components/AppText/AppText";
+import { List } from "@/shared/components/List";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 export type ScholarContentListProps = {
@@ -20,7 +21,6 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
   const { t } = useTranslation();
   const [filter, setFilter] = useState("");
 
-  // Define hooks unconditionally before any early returns
   const renderRecommendedItem = useCallback(
     ({ item }: { item: ScholarContentItemDto }) => {
       const title = pickContentField(item.title, item.original?.title, showOriginal);
@@ -30,23 +30,6 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
             {item.type}
           </AppText>
           <AppText variant="labelMd" numberOfLines={2}>
-            {title}
-          </AppText>
-        </Pressable>
-      );
-    },
-    [showOriginal, navigateToListing],
-  );
-
-  const renderBrowseItem = useCallback(
-    ({ item }: { item: ScholarContentItemDto }) => {
-      const title = pickContentField(item.title, item.original?.title, showOriginal);
-      return (
-        <Pressable style={styles.row} onPress={() => navigateToListing(item.slug)}>
-          <AppText variant="caption" style={styles.typeLabel}>
-            {item.type}
-          </AppText>
-          <AppText variant="labelMd" style={{ flex: 1 }}>
             {title}
           </AppText>
         </Pressable>
@@ -116,12 +99,27 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
             value={filter}
             onChangeText={setFilter}
           />
-          <FlatList
-            scrollEnabled={false}
-            data={filteredBrowse}
-            keyExtractor={(item) => item.id}
-            renderItem={renderBrowseItem}
-          />
+          <List>
+            {filteredBrowse.map((item, index) => {
+              const title = pickContentField(item.title, item.original?.title, showOriginal);
+              return (
+                <List.Item
+                  key={item.id}
+                  onPress={() => navigateToListing(item.slug)}
+                  hideBorder={index === filteredBrowse.length - 1}
+                >
+                  <View style={styles.rowContent}>
+                    <AppText variant="caption" style={styles.typeLabel}>
+                      {item.type}
+                    </AppText>
+                    <AppText variant="labelMd" style={styles.titleText}>
+                      {title}
+                    </AppText>
+                  </View>
+                </List.Item>
+              );
+            })}
+          </List>
         </View>
       )}
     </View>
@@ -169,12 +167,12 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.content.default,
     marginBottom: theme.spacing.scale.sm,
   },
-  row: {
+  rowContent: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: theme.spacing.scale.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border.subtle,
     gap: theme.spacing.scale.sm,
+  },
+  titleText: {
+    flex: 1,
   },
 }));

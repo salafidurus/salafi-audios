@@ -1,39 +1,15 @@
-import type { AdminListingListItemDto } from "@sd/core-contracts";
-
-import { FlashList } from "@shopify/flash-list";
 import { useCallback, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+
+import { AppText } from "@/shared/components/AppText/AppText";
+import { List } from "@/shared/components/List";
 
 import { bulkLectureAction } from "../../api/admin-lectures.api";
 import { AudioUploaderSheet } from "../../components/AudioUploaderSheet/AudioUploaderSheet";
 import { BulkActionBar } from "../../components/BulkActionBar/BulkActionBar";
 import { LectureEditSheet } from "../../components/LectureEditSheet/LectureEditSheet";
 import { useAdminLectures } from "../../hooks/use-admin-lectures";
-
-type LectureRowProps = {
-  item: AdminListingListItemDto;
-  isSelected: boolean;
-  onPress: (id: string) => void;
-  onLongPress: (id: string) => void;
-};
-
-function LectureRow({ item, isSelected, onPress, onLongPress }: LectureRowProps) {
-  return (
-    <Pressable
-      onPress={() => onPress(item.id)}
-      onLongPress={() => onLongPress(item.id)}
-      style={[styles.row, isSelected ? styles.rowSelected : styles.rowDefault]}
-    >
-      <Text numberOfLines={1} style={styles.rowTitle}>
-        {item.title}
-      </Text>
-      <Text style={styles.rowMeta}>
-        {item.scholarName} · {item.status}
-      </Text>
-    </Pressable>
-  );
-}
 
 export function AdminLecturesScreen() {
   const { data, isLoading, refetch } = useAdminLectures();
@@ -78,37 +54,47 @@ export function AdminLecturesScreen() {
     refetch();
   };
 
-  const renderItem = useCallback(
-    ({ item }: { item: AdminListingListItemDto }) => (
-      <LectureRow
-        item={item}
-        isSelected={selectedIds.has(item.id)}
-        onPress={handleRowPress}
-        onLongPress={toggleSelect}
-      />
-    ),
-    [selectedIds, handleRowPress],
-  );
-
   return (
     <View style={styles.screen}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Lectures</Text>
-        <Pressable onPress={() => setShowUploader(true)} style={styles.uploadBtn}>
-          <Text style={styles.uploadBtnText}>+ Upload</Text>
-        </Pressable>
-      </View>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={styles.header}>
+          <AppText variant="titleLg">Lectures</AppText>
+          <Pressable onPress={() => setShowUploader(true)} style={styles.uploadBtn}>
+            <AppText variant="labelMd" style={styles.uploadBtnText}>
+              + Upload
+            </AppText>
+          </Pressable>
+        </View>
 
-      {isLoading ? (
-        <Text style={styles.loadingText}>Loading…</Text>
-      ) : (
-        <FlashList<AdminListingListItemDto>
-          data={lectures}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-          contentContainerStyle={{ paddingBottom: 80 }}
-        />
-      )}
+        {isLoading ? (
+          <AppText variant="bodyMd" style={styles.loadingText}>
+            Loading…
+          </AppText>
+        ) : (
+          <List>
+            {lectures.map((item, index) => {
+              const isSelected = selectedIds.has(item.id);
+              return (
+                <List.Item
+                  key={item.id}
+                  onPress={() => handleRowPress(item.id)}
+                  hideBorder={index === lectures.length - 1}
+                  style={isSelected ? styles.rowSelected : undefined}
+                >
+                  <View style={styles.rowContent}>
+                    <AppText numberOfLines={1} variant="bodyMd" style={styles.rowTitle}>
+                      {item.title}
+                    </AppText>
+                    <AppText variant="caption" style={styles.rowMeta}>
+                      {item.scholarName} · {item.status}
+                    </AppText>
+                  </View>
+                </List.Item>
+              );
+            })}
+          </List>
+        )}
+      </ScrollView>
 
       <BulkActionBar
         selectedCount={selectedIds.size}
@@ -142,16 +128,15 @@ const styles = StyleSheet.create((theme) => ({
   screen: {
     flex: 1,
   },
+  scrollContent: {
+    padding: theme.spacing.scale.md,
+    paddingBottom: 80,
+  },
   header: {
-    padding: theme.spacing.scale.lg,
+    paddingVertical: theme.spacing.scale.md,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: theme.colors.content.strong,
   },
   uploadBtn: {
     paddingVertical: theme.spacing.scale.sm,
@@ -168,19 +153,10 @@ const styles = StyleSheet.create((theme) => ({
     marginTop: theme.spacing.scale["3xl"],
     color: theme.colors.content.muted,
   },
-  row: {
-    padding: theme.spacing.scale.md,
-    marginHorizontal: theme.spacing.scale.lg,
-    marginBottom: theme.spacing.scale.sm,
-    borderWidth: theme.border.width.default,
-    borderRadius: theme.radius.scale.sm,
-  },
-  rowDefault: {
-    borderColor: theme.colors.border.subtle,
-    backgroundColor: theme.colors.surface.default,
+  rowContent: {
+    gap: theme.spacing.scale.xs,
   },
   rowSelected: {
-    borderColor: theme.colors.action.primary,
     backgroundColor: theme.colors.surface.primarySubtle,
   },
   rowTitle: {
@@ -188,8 +164,6 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.content.strong,
   },
   rowMeta: {
-    fontSize: 12,
     color: theme.colors.content.muted,
-    marginTop: theme.spacing.scale.xs,
   },
 }));

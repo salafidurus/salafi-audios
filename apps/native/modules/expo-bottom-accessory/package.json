@@ -1,0 +1,10 @@
+{
+  "name": "expo-bottom-accessory",
+  "version": "0.1.0",
+  "description": "Native Android Bottom Accessory module for Expo",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "peerDependencies": {
+    "expo": "*"
+  }
+}

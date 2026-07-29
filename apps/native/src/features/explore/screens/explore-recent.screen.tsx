@@ -3,20 +3,24 @@ import type { ListRenderItemInfo } from "react-native";
 
 import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { useExploreRecentScreen } from "@sd/domain-content";
-import { useCallback } from "react";
+import { Stack } from "expo-router";
+import { useCallback, useState } from "react";
 import { FlatList } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { List } from "@/shared/components/List";
 
-import { FeedPodcastRow } from "../components/feed-podcast-row/feed-podcast-row";
-import { FeedScholarRow } from "../components/feed-scholar-row/feed-scholar-row";
-import { FeedSkeleton } from "../components/feed-skeleton/feed-skeleton";
-import { FeedLoadingFooter, FeedStatusView } from "../components/feed-status/feed-status";
-import { FeedTopicRow } from "../components/feed-topic-row/feed-topic-row";
+import { ExplorePodcastRow } from "../components/explore-podcast-row/explore-podcast-row";
+import { ExploreScholarRow } from "../components/explore-scholar-row/explore-scholar-row";
+import { ExploreSkeleton } from "../components/explore-skeleton/explore-skeleton";
+import {
+  ExploreLoadingFooter,
+  ExploreStatusView,
+} from "../components/explore-status/explore-status";
+import { ExploreTopicRow } from "../components/explore-topic-row/explore-topic-row";
 
-export type FeedRecentScreenProps = {
+export type ExploreRecentScreenProps = {
   onNavigateToListing?: (slug: string) => void;
   onNavigateToScholar?: (slug: string) => void;
 };
@@ -35,11 +39,11 @@ function renderFeedItem(
   onNavigateToScholar?: (slug: string) => void,
 ) {
   if (item.kind === "scholar_row") {
-    return <FeedScholarRow scholars={item.scholars} onScholarPress={onNavigateToScholar} />;
+    return <ExploreScholarRow scholars={item.scholars} onScholarPress={onNavigateToScholar} />;
   }
   if (item.kind === "topic_row") {
     return (
-      <FeedTopicRow
+      <ExploreTopicRow
         topicName={item.topicName}
         items={item.items}
         onItemPress={onNavigateToListing}
@@ -50,7 +54,7 @@ function renderFeedItem(
     return (
       <List>
         {item.items.map((subItem, index) => (
-          <FeedPodcastRow
+          <ExplorePodcastRow
             key={subItem.id}
             item={subItem}
             onPress={() => onNavigateToListing?.(subItem.slug)}
@@ -69,20 +73,38 @@ function getItemKey(item: GroupedFeedItem, index: number): string {
   return item.id;
 }
 
-export function FeedRecentScreen({
+export function ExploreRecentScreen({
   onNavigateToListing,
   onNavigateToScholar,
-}: FeedRecentScreenProps) {
+}: ExploreRecentScreenProps) {
   const { t } = useTranslation();
+  const [searchQuery, setSearchQuery] = useState("");
   const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } =
     useExploreRecentScreen();
   const rawItems = data?.pages.flatMap((p) => p.items) ?? [];
+
+  const filteredRawItems = searchQuery.trim()
+    ? rawItems.filter((item) => {
+        if (item.kind === "scholar_row") {
+          return item.scholars.some((s) =>
+            s.name.toLowerCase().includes(searchQuery.toLowerCase()),
+          );
+        }
+        if (item.kind === "topic_row") {
+          return (
+            item.topicName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.items.some((i) => i.title.toLowerCase().includes(searchQuery.toLowerCase()))
+          );
+        }
+        return (item as any).title?.toLowerCase().includes(searchQuery.toLowerCase());
+      })
+    : rawItems;
 
   // Group sequential podcast items into a single container
   const items: GroupedFeedItem[] = [];
   let currentGroup: FeedContentItemDto[] = [];
 
-  rawItems.forEach((item) => {
+  filteredRawItems.forEach((item) => {
     if (item.kind === "scholar_row" || item.kind === "topic_row") {
       if (currentGroup.length > 0) {
         items.push({
@@ -112,34 +134,58 @@ export function FeedRecentScreen({
     [onNavigateToListing, onNavigateToScholar],
   );
 
+  const headerSearchOptions = {
+    headerSearchBarOptions: {
+      placeholder: t("explore.searchRecent", "Search recent audios..."),
+      onChangeText: (event: any) => setSearchQuery(event.nativeEvent.text),
+      onCancelButtonPress: () => setSearchQuery(""),
+    },
+  };
+
   if (isError && items.length === 0) {
     return (
-      <FeedStatusView
-        message={getErrorStateText("feed", t)}
-        onRetry={() => refetch()}
-        retryLabel={t("feed.retry", "Try Again")}
-      />
+      <>
+        <Stack.Screen options={headerSearchOptions} />
+        <ExploreStatusView
+          message={getErrorStateText("feed", t)}
+          onRetry={() => refetch()}
+          retryLabel={t("feed.retry", "Try Again")}
+        />
+      </>
     );
   }
 
   if (isFetching && items.length === 0) {
-    return <FeedSkeleton />;
+    return (
+      <>
+        <Stack.Screen options={headerSearchOptions} />
+        <ExploreSkeleton />
+      </>
+    );
   }
 
   if (items.length === 0) {
-    return <FeedStatusView message={getEmptyStateText("feed", t)} />;
+    return (
+      <>
+        <Stack.Screen options={headerSearchOptions} />
+        <ExploreStatusView message={getEmptyStateText("feed", t)} />
+      </>
+    );
   }
 
   return (
-    <FlatList
-      data={items}
-      keyExtractor={getItemKey}
-      renderItem={renderItem}
-      onEndReached={() => hasNextPage && fetchNextPage()}
-      onEndReachedThreshold={0.5}
-      contentContainerStyle={styles.listContent}
-      ListFooterComponent={isFetching ? <FeedLoadingFooter /> : null}
-    />
+    <>
+      <Stack.Screen options={headerSearchOptions} />
+      <FlatList
+        data={items}
+        keyExtractor={getItemKey}
+        renderItem={renderItem}
+        onEndReached={() => hasNextPage && fetchNextPage()}
+        onEndReachedThreshold={0.5}
+        contentContainerStyle={styles.listContent}
+        ListFooterComponent={isFetching ? <ExploreLoadingFooter /> : null}
+      />
+    </>
   );
 }
 

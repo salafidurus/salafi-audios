@@ -1,33 +1,33 @@
 import type { ScholarListItemDto } from "@sd/core-contracts";
 import type { ListRenderItemInfo } from "react-native";
 
+import { getEmptyStateText, getErrorStateText } from "@sd/core-i18n";
 import { useInfiniteScholarsList } from "@sd/domain-content";
+import { Stack } from "expo-router";
 import { useCallback, useState } from "react";
-import { FlatList, View } from "react-native";
+import { FlatList } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScholarRow } from "@/features/listing/components/scholar-row/scholar-row";
-import { SearchInput } from "@/features/search/components/SearchInput/SearchInput";
-import { AppText } from "@/shared/components/AppText/AppText";
-import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
+import { List } from "@/shared/components/List";
+
+import { ExploreSkeleton } from "../components/explore-skeleton/explore-skeleton";
+import {
+  ExploreLoadingFooter,
+  ExploreStatusView,
+} from "../components/explore-status/explore-status";
 
 export type ExploreScholarScreenProps = {
   onNavigateToScholar?: (slug: string) => void;
 };
 
-function renderScholarItem(
-  scholar: ScholarListItemDto,
-  onNavigateToScholar?: (slug: string) => void,
-) {
-  return <ScholarRow scholar={scholar} onPress={onNavigateToScholar} />;
-}
-
 export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScreenProps) {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data, isFetching, isError, hasNextPage, fetchNextPage } = useInfiniteScholarsList();
+  const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } =
+    useInfiniteScholarsList();
 
   const allScholars = data?.pages.flatMap((p) => p.items) ?? [];
 
@@ -40,92 +40,80 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
     : allScholars;
 
   const renderItem = useCallback(
-    ({ item }: ListRenderItemInfo<ScholarListItemDto>) =>
-      renderScholarItem(item, onNavigateToScholar),
-    [onNavigateToScholar],
-  );
-
-  const renderHeader = useCallback(
-    () => (
-      <View style={styles.headerContainer}>
-        <AppText variant="titleMd" style={styles.title}>
-          {t("explore.scholarsTitle", "Scholars")}
-        </AppText>
-        <SearchInput
-          placeholder={t("scholarContent.searchScholars", "Search scholars...")}
-          value={searchQuery}
-          onChange={setSearchQuery}
-        />
-      </View>
+    ({ item, index }: ListRenderItemInfo<ScholarListItemDto>) => (
+      <ScholarRow
+        scholar={item}
+        onPress={onNavigateToScholar}
+        hideBorder={index === filteredScholars.length - 1}
+      />
     ),
-    [t, searchQuery, setSearchQuery],
+    [onNavigateToScholar, filteredScholars.length],
   );
 
-  const renderFooter = useCallback(
-    () =>
-      isFetching && allScholars.length > 0 ? (
-        <View style={styles.loadingFooter}>
-          <AppText variant="bodyMd">{t("feed.loading", "Loading...")}</AppText>
-        </View>
-      ) : null,
-    [isFetching, allScholars.length, t],
-  );
-
-  const renderEmpty = useCallback(
-    () => (
-      <View style={styles.emptyContainer}>
-        <AppText variant="bodyMd">
-          {searchQuery
-            ? t("scholarContent.searchNoMatch", "No scholars match your search.")
-            : t("explore.noScholars", "No scholars available.")}
-        </AppText>
-      </View>
-    ),
-    [searchQuery, t],
-  );
+  const headerSearchOptions = {
+    headerSearchBarOptions: {
+      placeholder: t("scholarContent.searchScholars", "Search scholars..."),
+      onChangeText: (event: any) => setSearchQuery(event.nativeEvent.text),
+      onCancelButtonPress: () => setSearchQuery(""),
+    },
+  };
 
   if (isError && allScholars.length === 0) {
     return (
-      <ScreenView center>
-        <AppText variant="bodyMd">{t("feed.error", "Failed to load scholars.")}</AppText>
-      </ScreenView>
+      <>
+        <Stack.Screen options={headerSearchOptions} />
+        <ExploreStatusView
+          message={getErrorStateText("feed", t)}
+          onRetry={() => refetch()}
+          retryLabel={t("feed.retry", "Try Again")}
+        />
+      </>
+    );
+  }
+
+  if (isFetching && allScholars.length === 0) {
+    return (
+      <>
+        <Stack.Screen options={headerSearchOptions} />
+        <ExploreSkeleton />
+      </>
+    );
+  }
+
+  if (filteredScholars.length === 0) {
+    return (
+      <>
+        <Stack.Screen options={headerSearchOptions} />
+        <ExploreStatusView
+          message={
+            searchQuery
+              ? t("scholarContent.searchNoMatch", "No scholars match your search.")
+              : getEmptyStateText("feed", t)
+          }
+        />
+      </>
     );
   }
 
   return (
-    <ScreenView>
-      <FlatList
-        data={filteredScholars}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        ListHeaderComponent={renderHeader}
-        ListEmptyComponent={filteredScholars.length === 0 ? renderEmpty : null}
-        ListFooterComponent={renderFooter}
-        onEndReached={() => hasNextPage && fetchNextPage()}
-        onEndReachedThreshold={0.5}
-        scrollIndicatorInsets={{ right: 1 }}
-      />
-    </ScreenView>
+    <>
+      <Stack.Screen options={headerSearchOptions} />
+      <List style={styles.listCard}>
+        <FlatList
+          data={filteredScholars}
+          keyExtractor={(item) => item.id}
+          renderItem={renderItem}
+          onEndReached={() => hasNextPage && fetchNextPage()}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={isFetching ? <ExploreLoadingFooter /> : null}
+        />
+      </List>
+    </>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  headerContainer: {
-    paddingHorizontal: theme.spacing.scale.md,
-    paddingVertical: theme.spacing.scale.lg,
-    gap: theme.spacing.scale.md,
-  },
-  title: {
-    color: theme.colors.content.default,
-  },
-  loadingFooter: {
-    paddingVertical: theme.spacing.scale.lg,
-    alignItems: "center",
-  },
-  emptyContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    paddingVertical: theme.spacing.scale.xl,
+  listCard: {
+    margin: theme.spacing.scale.md,
   },
 }));

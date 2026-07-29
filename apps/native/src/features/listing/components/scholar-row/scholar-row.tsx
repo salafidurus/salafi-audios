@@ -1,61 +1,53 @@
 import type { ScholarListItemDto } from "@sd/core-contracts";
 
 import { Image } from "expo-image";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { AppText } from "@/shared/components/AppText/AppText";
+import { List } from "@/shared/components/List";
+import { MarqueeText } from "@/shared/components/MarqueeText";
 
 export type ScholarRowProps = {
   scholar: ScholarListItemDto;
   onPress?: (slug: string) => void;
+  hideBorder?: boolean;
 };
 
-export function ScholarRow({ scholar, onPress }: ScholarRowProps) {
+export function ScholarRow({ scholar, onPress, hideBorder }: ScholarRowProps) {
   return (
-    <Pressable
-      onPress={() => onPress?.(scholar.slug)}
-      style={({ pressed }) => [styles.container, pressed && styles.pressed]}
-      testID="scholar-row"
-    >
-      <View style={styles.avatarContainer}>
-        {scholar.imageUrl ? (
-          <Image
-            source={{ uri: scholar.imageUrl }}
-            style={styles.avatar}
-            testID="scholar-row-avatar"
-          />
-        ) : (
-          <View style={styles.avatarPlaceholder} testID="scholar-row-avatar-placeholder" />
-        )}
-      </View>
-      <View style={styles.content}>
-        <AppText variant="bodyMd" numberOfLines={1}>
-          {scholar.name}
-        </AppText>
-        <View style={styles.subtitle}>
-          {scholar.mainLanguage ? (
-            <AppText variant="caption">{scholar.mainLanguage}</AppText>
-          ) : null}
-          <AppText variant="caption">{scholar.lectureCount} lectures</AppText>
+    <List.Item onPress={() => onPress?.(scholar.slug)} hideBorder={hideBorder}>
+      <View style={styles.rowContent} testID="scholar-row">
+        <View style={styles.avatarContainer}>
+          {scholar.imageUrl ? (
+            <Image
+              source={{ uri: scholar.imageUrl }}
+              style={styles.avatar}
+              testID="scholar-row-avatar"
+            />
+          ) : (
+            <View style={styles.avatarPlaceholder} testID="scholar-row-avatar-placeholder" />
+          )}
+        </View>
+        <View style={styles.content}>
+          <MarqueeText text={scholar.name} variant="bodyMd" />
+          <View style={styles.subtitle}>
+            {scholar.mainLanguage ? (
+              <AppText variant="caption">{scholar.mainLanguage}</AppText>
+            ) : null}
+            <AppText variant="caption">{scholar.lectureCount} lectures</AppText>
+          </View>
         </View>
       </View>
-    </Pressable>
+    </List.Item>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  container: {
+  rowContent: {
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing.scale.md,
-    paddingVertical: theme.spacing.scale.sm,
-    paddingHorizontal: theme.spacing.scale.md,
-    borderBottomWidth: theme.border.width.default,
-    borderBottomColor: theme.colors.border.subtle,
-  },
-  pressed: {
-    opacity: 0.7,
   },
   avatarContainer: {
     width: 48,

@@ -11,8 +11,8 @@ describe("getRootTabFromPathname", () => {
   it("returns explore for root path /", () => {
     expect(getRootTabFromPathname("/")).toBe("explore");
   });
-  it("returns explore for /search", () => {
-    expect(getRootTabFromPathname("/search")).toBe("explore");
+  it("returns search for /search", () => {
+    expect(getRootTabFromPathname("/search")).toBe("search");
   });
   it("returns explore for /explore", () => {
     expect(getRootTabFromPathname("/explore")).toBe("explore");

@@ -2,7 +2,7 @@ import { Stack } from "expo-router";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 
-export default function FeedLayout() {
+export default function ExploreLayout() {
   const { t } = useTranslation();
 
   return (

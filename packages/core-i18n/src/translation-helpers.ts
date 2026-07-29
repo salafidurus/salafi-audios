@@ -28,12 +28,34 @@ export const SUBNAV_KEYS: Record<string, Record<string, string>> = {
   },
 };
 
-export type TranslateFn = (key: string) => string;
+export const SUBNAV_FALLBACKS: Record<string, Record<string, string>> = {
+  explore: {
+    recent: "Recent",
+    scholar: "Scholars",
+    curation: "Curation",
+  },
+  library: {
+    started: "Started",
+    saved: "Saved",
+    completed: "Completed",
+  },
+  settings: {
+    general: "General",
+    profile: "Profile",
+  },
+  adminContents: {
+    topics: "Topics",
+    listings: "Listings",
+  },
+};
 
-/** Translate a subsection tab label, falling back to the raw id if unmapped. */
+export type TranslateFn = (key: string, fallback?: string) => string;
+
+/** Translate a subsection tab label, falling back to the default label or raw id if unmapped. */
 export function getSubnavLabel(section: string, tabId: string, t: TranslateFn): string {
   const key = SUBNAV_KEYS[section]?.[tabId];
-  return key ? t(key) : tabId;
+  const fallback = SUBNAV_FALLBACKS[section]?.[tabId] ?? tabId;
+  return key ? t(key, fallback) : fallback;
 }
 
 export const SCHOLAR_TITLE_KEYS: Record<ScholarTitle, string> = {

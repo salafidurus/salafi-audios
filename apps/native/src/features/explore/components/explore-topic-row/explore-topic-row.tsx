@@ -8,13 +8,13 @@ import { StyleSheet } from "react-native-unistyles";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 
-export type FeedTopicRowProps = {
+export type ExploreTopicRowProps = {
   topicName: string;
   items: ContentSuggestionDto[];
   onItemPress?: (slug: string) => void;
 };
 
-export function FeedTopicRow({ topicName, items, onItemPress }: FeedTopicRowProps) {
+export function ExploreTopicRow({ topicName, items, onItemPress }: ExploreTopicRowProps) {
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
 

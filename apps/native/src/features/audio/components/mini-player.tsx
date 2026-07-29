@@ -6,13 +6,20 @@ import { View, Pressable, Text, Modal, ActivityIndicator } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { useTranslation } from "@/core/i18n/use-translation";
+
 import { audioService } from "../audio-service";
 import { PlaybackControls } from "./playback-controls";
 import { ProgressBar } from "./progress-bar";
 
-export function MiniPlayer() {
+export type MiniPlayerProps = {
+  embedded?: boolean;
+};
+
+export function MiniPlayer({ embedded = false }: MiniPlayerProps) {
   const { currentTrack, isPlaying, isLoading, progressPercent, positionSeconds } = useAudio();
   const { theme } = useUnistyles();
+  const { t } = useTranslation();
   const [modalVisible, setModalVisible] = useState(false);
   const insets = useSafeAreaInsets();
 
@@ -35,7 +42,10 @@ export function MiniPlayer() {
     <>
       <Pressable
         onPress={() => setModalVisible(true)}
-        style={[styles.container, { bottom: insets.bottom + 8 }]}
+        style={[
+          embedded ? styles.containerEmbedded : styles.container,
+          !embedded && { bottom: insets.bottom + 8 },
+        ]}
       >
         {/* Progress Bar underlaid at the very top of mini-player */}
         <View style={styles.miniProgressTrack}>
@@ -84,7 +94,7 @@ export function MiniPlayer() {
             <Pressable onPress={() => setModalVisible(false)} style={styles.closeButton}>
               {ChevronDownIcon}
             </Pressable>
-            <Text style={styles.modalHeaderTitle}>Now Playing</Text>
+            <Text style={styles.modalHeaderTitle}>{t("audio.now_playing", "Now Playing")}</Text>
             <View style={styles.placeholder} />
           </View>
 
@@ -134,6 +144,16 @@ const styles = StyleSheet.create((theme) => ({
     start: theme.spacing.scale.md,
     end: theme.spacing.scale.md,
     height: 64,
+    borderRadius: theme.radius.scale.md,
+    backgroundColor: theme.colors.surface.default,
+    ...theme.shadows.sm,
+    overflow: "hidden",
+    borderWidth: theme.border.width.default,
+    borderColor: theme.colors.border.subtle,
+  },
+  containerEmbedded: {
+    flex: 1,
+    height: 52,
     borderRadius: theme.radius.scale.md,
     backgroundColor: theme.colors.surface.default,
     ...theme.shadows.sm,

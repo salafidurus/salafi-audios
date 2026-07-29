@@ -1,0 +1,5 @@
+# Build outputs
+build/
+.gradle/
+node_modules/
+*.tsbuildinfo

@@ -10,6 +10,7 @@
     "types": ["jest", "node"],
     "moduleSuffixes": [".native", ".web", ""],
     "paths": {
+      "expo-bottom-accessory": ["./modules/expo-bottom-accessory/src/index.ts"],
       "@/*": ["./src/*"],
       "@/assets/*": ["./assets/*"]
     }
