@@ -1,7 +1,17 @@
 import type { StyleProp, TextStyle } from "react-native";
 
 import { useEffect, useState } from "react";
-import { Animated, Easing, View } from "react-native";
+import { View } from "react-native";
+import Animated, {
+  cancelAnimation,
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
 
 import { AppText, type AppTextProps } from "@/shared/components/AppText/AppText";
 
@@ -22,44 +32,37 @@ export function MarqueeText({
 }: MarqueeTextProps) {
   const [containerWidth, setContainerWidth] = useState<number>(0);
   const [textWidth, setTextWidth] = useState<number>(0);
-  const [translateX] = useState(() => new Animated.Value(0));
+  const translateX = useSharedValue(0);
 
   const overflow = textWidth - containerWidth;
   const shouldAnimate = overflow > 2;
 
   useEffect(() => {
     if (!shouldAnimate) {
-      translateX.setValue(0);
+      translateX.value = 0;
       return;
     }
 
     const duration = Math.max(2200, (overflow / speed) * 1000);
 
-    const animation = Animated.loop(
-      Animated.sequence([
-        Animated.delay(delayMs),
-        Animated.timing(translateX, {
-          toValue: -overflow,
-          duration,
-          easing: Easing.linear,
-          useNativeDriver: true,
-        }),
-        Animated.delay(1000),
-        Animated.timing(translateX, {
-          toValue: 0,
-          duration,
-          easing: Easing.linear,
-          useNativeDriver: true,
-        }),
-      ]),
+    translateX.value = 0;
+    translateX.value = withRepeat(
+      withSequence(
+        withDelay(delayMs, withTiming(-overflow, { duration, easing: Easing.linear })),
+        withDelay(1000, withTiming(0, { duration, easing: Easing.linear })),
+      ),
+      -1,
     );
 
-    animation.start();
-
     return () => {
-      animation.stop();
+      cancelAnimation(translateX);
     };
   }, [shouldAnimate, overflow, speed, delayMs, translateX, text]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+    alignSelf: "flex-start",
+  }));
 
   return (
     <View
@@ -67,12 +70,7 @@ export function MarqueeText({
       style={{ overflow: "hidden", minWidth: 0, width: "100%" }}
     >
       <View style={{ opacity: textWidth === 0 ? 0 : 1 }}>
-        <Animated.View
-          style={{
-            transform: [{ translateX }],
-            alignSelf: "flex-start",
-          }}
-        >
+        <Animated.View style={animatedStyle}>
           <AppText
             variant={variant}
             style={style}

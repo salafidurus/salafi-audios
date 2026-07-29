@@ -61,11 +61,33 @@ jest.mock("@tanstack/react-query", () => ({
   })),
 }));
 
-jest.mock("react-native-reanimated", () => ({
-  useSharedValue: jest.fn((value) => ({ value })),
-  useAnimatedStyle: jest.fn(() => ({})),
-  useAnimatedReaction: jest.fn(),
-  runOnJS: jest.fn((fn) => fn),
-  interpolate: jest.fn(),
-  Extrapolate: { CLAMP: "clamp" },
-}));
+jest.mock("react-native-reanimated", () => {
+  const { View, Text, Image, ScrollView } = require("react-native");
+
+  return {
+    __esModule: true,
+    default: {
+      View,
+      Text,
+      Image,
+      ScrollView,
+      createAnimatedComponent: (c) => c,
+    },
+    useSharedValue: jest.fn((value) => ({ value })),
+    useAnimatedStyle: jest.fn((fn) => (typeof fn === "function" ? fn() : {})),
+    useAnimatedReaction: jest.fn(),
+    withTiming: jest.fn((toValue) => toValue),
+    withDelay: jest.fn((_, anim) => anim),
+    withSequence: jest.fn((...anims) => anims[0]),
+    withRepeat: jest.fn((anim) => anim),
+    cancelAnimation: jest.fn(),
+    Easing: {
+      linear: (v) => v,
+      ease: (v) => v,
+      bezier: () => (v) => v,
+    },
+    runOnJS: jest.fn((fn) => fn),
+    interpolate: jest.fn(),
+    Extrapolate: { CLAMP: "clamp" },
+  };
+});
