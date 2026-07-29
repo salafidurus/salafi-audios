@@ -6,7 +6,6 @@ import { useRouter, useNavigation } from "expo-router";
 import { Activity, useState, useEffect, useCallback } from "react";
 import { View, Text, Pressable } from "react-native";
 
-import { useTranslation } from "@/core/i18n/use-translation";
 import { FeedRecentScreen } from "@/features/explore/screens/explore-recent.screen";
 import { SearchFilter } from "@/features/search/components/SearchFilter/SearchFilter";
 import { SearchResultItem } from "@/features/search/components/SearchResultItem/SearchResultItem";
@@ -30,7 +29,6 @@ export default function ExploreIndexRoute() {
   const navigation = useNavigation();
   const { navigateToListing } = useListingNavigation();
   const showOriginal = useShowOriginalContent();
-  const { t } = useTranslation();
 
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -46,13 +44,13 @@ export default function ExploreIndexRoute() {
   useEffect(() => {
     navigation.setOptions({
       headerSearchBarOptions: {
-        placeholder: t("search.placeholder", "Search"),
+        placeholder: "Search",
         onChangeText: (event: any) => setSearchQuery(event.nativeEvent.text),
         onCancelButtonPress: () => setSearchQuery(""),
         autoCapitalize: "none",
       },
     });
-  }, [navigation, t]);
+  }, [navigation]);
 
   const isSearching = searchQuery.trim().length > 0;
 

@@ -2,10 +2,22 @@ import { NativeTabs } from "expo-router/unstable-native-tabs";
 
 import { RouteAccessGuard, useAuth } from "@/core/auth";
 
-export default function TabsLayout() {
+function AdminTabTrigger() {
   const { user } = useAuth();
   const isAdmin = (user as any)?.role === "admin";
 
+  return (
+    <NativeTabs.Trigger name="admin" hidden={!isAdmin}>
+      <NativeTabs.Trigger.Icon
+        sf={{ default: "shield", selected: "shield.fill" }}
+        md={{ default: "admin_panel_settings", selected: "admin_panel_settings" }}
+      />
+      <NativeTabs.Trigger.Label>Admin</NativeTabs.Trigger.Label>
+    </NativeTabs.Trigger>
+  );
+}
+
+export default function TabsLayout() {
   return (
     <RouteAccessGuard>
       <NativeTabs minimizeBehavior="onScrollDown">
@@ -33,13 +45,7 @@ export default function TabsLayout() {
           <NativeTabs.Trigger.Label>Settings</NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
 
-        <NativeTabs.Trigger name="admin" hidden={!isAdmin}>
-          <NativeTabs.Trigger.Icon
-            sf={{ default: "shield", selected: "shield.fill" }}
-            md={{ default: "admin_panel_settings", selected: "admin_panel_settings" }}
-          />
-          <NativeTabs.Trigger.Label>Admin</NativeTabs.Trigger.Label>
-        </NativeTabs.Trigger>
+        <AdminTabTrigger />
 
         {/* Dedicated Search tab for iOS native integration */}
         <NativeTabs.Trigger name="search" role="search">

@@ -1,7 +1,6 @@
-import type { ReactNode } from "react";
-
 import { resolveRouteAccess, routes } from "@sd/core-contracts";
 import { Redirect, usePathname } from "expo-router";
+import { type ReactNode, useEffect, useRef } from "react";
 
 import { useAuth } from "./use-auth";
 
@@ -15,8 +14,16 @@ import { useAuth } from "./use-auth";
 export function RouteAccessGuard({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { isAuthenticated, isLoading } = useAuth();
+  const hasMounted = useRef(false);
 
-  if (isLoading) {
+  useEffect(() => {
+    if (!isLoading) {
+      hasMounted.current = true;
+    }
+  }, [isLoading]);
+
+  // Keep children mounted during background loading updates
+  if (isLoading && !hasMounted.current) {
     return null;
   }
 
