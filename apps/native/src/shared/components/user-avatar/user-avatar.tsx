@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
-import { Image, View } from "react-native";
+import { Image } from "expo-image";
+import { View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { AppText } from "@/shared/components/AppText/AppText";
@@ -17,7 +18,7 @@ export function UserAvatar({ image, name, size = 48, fill = false }: UserAvatarP
 
   if (fill) {
     if (image) {
-      return <Image source={{ uri: image }} style={styles.fillImage} resizeMode="cover" />;
+      return <Image source={{ uri: image }} style={styles.fillImage} contentFit="cover" />;
     }
     return (
       <View style={[styles.fillFallback, { backgroundColor: theme.colors.action.primary }]}>
@@ -36,7 +37,7 @@ export function UserAvatar({ image, name, size = 48, fill = false }: UserAvatarP
       <Image
         source={{ uri: image }}
         style={{ width: avatarSize, height: avatarSize, borderRadius }}
-        resizeMode="cover"
+        contentFit="cover"
       />
     );
   }
