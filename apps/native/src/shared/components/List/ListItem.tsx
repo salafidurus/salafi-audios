@@ -6,12 +6,20 @@ import { StyleSheet } from "react-native-unistyles";
 export type ListItemProps = {
   children: ReactNode;
   onPress?: () => void;
+  interactive?: boolean;
   hideBorder?: boolean;
   style?: StyleProp<ViewStyle>;
 };
 
-export function ListItem({ children, onPress, hideBorder = false, style }: ListItemProps) {
+export function ListItem({
+  children,
+  onPress,
+  interactive = false,
+  hideBorder = false,
+  style,
+}: ListItemProps) {
   const isClickable = Boolean(onPress);
+  const isInteractive = isClickable || interactive;
 
   return (
     <Pressable
@@ -20,7 +28,7 @@ export function ListItem({ children, onPress, hideBorder = false, style }: ListI
       style={({ pressed }) => [
         styles.item,
         hideBorder && styles.noBorder,
-        pressed && isClickable && styles.pressed,
+        pressed && isInteractive && styles.pressed,
         style,
       ]}
     >
@@ -36,6 +44,7 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing.scale.lg,
     borderBottomWidth: theme.border.width.default,
     borderBottomColor: theme.colors.border.subtle,
+    flexDirection: "column",
   },
   noBorder: {
     borderBottomWidth: 0,

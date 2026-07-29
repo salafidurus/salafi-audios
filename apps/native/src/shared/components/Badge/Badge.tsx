@@ -25,13 +25,15 @@ type StatusBadgeProps = {
 
 export type BadgeProps = PermissionBadgeProps | RoleBadgeProps | StatusBadgeProps;
 
-const statusStyleMap: Record<string, ViewStyle> = {
-  primary: styles.status_primary,
-  secondary: styles.status_secondary,
-  muted: styles.status_muted,
-  success: styles.status_success,
-  warning: styles.status_warning,
-};
+function getStatusStyleMap(): Record<string, ViewStyle> {
+  return {
+    primary: styles.status_primary,
+    secondary: styles.status_secondary,
+    muted: styles.status_muted,
+    success: styles.status_success,
+    warning: styles.status_warning,
+  };
+}
 
 export function Badge(props: BadgeProps): ReactNode {
   const { t } = useTranslation();
@@ -67,7 +69,7 @@ export function Badge(props: BadgeProps): ReactNode {
   const colorKey = props.color ?? "primary";
 
   return (
-    <View style={[styles.badge, statusStyleMap[colorKey]]}>
+    <View style={[styles.badge, getStatusStyleMap()[colorKey]]}>
       <AppText variant="caption" style={styles.statusText}>
         {props.status}
       </AppText>

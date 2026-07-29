@@ -10,16 +10,18 @@ export type EmptyStateProps = {
   variant?: EmptyStateVariant;
 };
 
-const textStyleMap: Record<EmptyStateVariant, TextStyle> = {
-  empty: styles.text_empty,
-  loading: styles.text_loading,
-  error: styles.text_error,
-};
+function getTextStyleMap(): Record<EmptyStateVariant, TextStyle> {
+  return {
+    empty: styles.text_empty,
+    loading: styles.text_loading,
+    error: styles.text_error,
+  };
+}
 
 export function EmptyState({ message, variant = "empty" }: EmptyStateProps) {
   return (
     <View style={[styles.emptyState, styles[variant]]}>
-      <AppText variant="bodyMd" style={textStyleMap[variant]}>
+      <AppText variant="bodyMd" style={getTextStyleMap()[variant]}>
         {message}
       </AppText>
     </View>
