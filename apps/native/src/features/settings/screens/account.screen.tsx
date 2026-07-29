@@ -1,13 +1,17 @@
 import { useAccountProfile } from "@sd/domain-account";
-import { Pressable, ScrollView, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { ChevronRight } from "lucide-react-native";
+import { ScrollView, View } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 import { AppText } from "@/shared/components/AppText/AppText";
 
 import { ContentLanguageToggle } from "../components/content-language-toggle/content-language-toggle";
 import { LanguageSwitch } from "../components/language-switch/language-switch";
+import { SettingsRow } from "../components/SettingsRow/SettingsRow";
+import { SettingsSection } from "../components/SettingsSection/SettingsSection";
 
 export type AccountScreenProps = {
   onNavigateToProfile?: () => void;
@@ -24,13 +28,15 @@ export function AccountScreen({
   onNavigateToAdmin,
   onSignOut,
 }: AccountScreenProps) {
-  const { data: profile, isFetching } = useAccountProfile();
+  const { isAuthenticated } = useAuth();
+  const { data: profile, isFetching } = useAccountProfile({ enabled: isAuthenticated });
   const { t } = useTranslation();
   const { hasAnyPermission } = useAdminPermissions();
+  const { theme } = useUnistyles();
 
   if (isFetching) {
     return (
-      <View style={styles.loadingContainer}>
+      <View style={styles.centered}>
         <AppText variant="bodyMd">{t("common.loading", "Loading account…")}</AppText>
       </View>
     );
@@ -38,141 +44,96 @@ export function AccountScreen({
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <AppText variant="titleLg" style={styles.title}>
-        {t("account.title", "Account")}
-      </AppText>
       {profile ? (
         <>
-          <View style={styles.profileRow}>
-            <View>
-              <AppText variant="bodyMd" style={styles.profileName}>
-                {profile.displayName || t("account.defaultUser", "User")}
-              </AppText>
-              <AppText variant="caption" style={styles.profileEmail}>
-                {profile.email}
-              </AppText>
-            </View>
-          </View>
-          <View style={styles.actions}>
+          {/* Profile Info Section */}
+          <SettingsSection title={t("account.profile", "Profile")}>
+            <SettingsRow
+              label={profile.displayName || t("account.defaultUser", "User")}
+              sublabel={profile.email}
+            />
+            <SettingsRow
+              label={t("account.editProfile", "Edit Profile")}
+              onPress={onNavigateToProfile}
+              hideBorder
+            >
+              <ChevronRight size={18} color={theme.colors.content.muted} />
+            </SettingsRow>
+          </SettingsSection>
+
+          {/* Actions Section */}
+          <SettingsSection title={t("account.actions", "Actions")}>
             {hasAnyPermission && (
-              <Pressable
-                onPress={onNavigateToAdmin}
-                style={[styles.actionButton, styles.adminButton]}
-              >
-                <AppText variant="bodySm" style={styles.adminLabel}>
-                  {t("account.admin", "Admin")}
-                </AppText>
-              </Pressable>
+              <SettingsRow label={t("account.admin", "Admin")} onPress={onNavigateToAdmin}>
+                <ChevronRight size={18} color={theme.colors.content.muted} />
+              </SettingsRow>
             )}
-            <Pressable onPress={onNavigateToProfile} style={styles.actionButton}>
-              <AppText variant="bodySm">{t("account.editProfile", "Edit Profile")}</AppText>
-            </Pressable>
-            <Pressable onPress={onNavigateToSupport} style={styles.actionButton}>
-              <AppText variant="bodySm">{t("account.support", "Support")}</AppText>
-            </Pressable>
-            <Pressable onPress={onNavigateToLegal} style={styles.actionButton}>
-              <AppText variant="bodySm">{t("account.legal", "Legal")}</AppText>
-            </Pressable>
-            <Pressable onPress={onSignOut} style={styles.actionButton}>
+            <SettingsRow label={t("account.support", "Support")} onPress={onNavigateToSupport}>
+              <ChevronRight size={18} color={theme.colors.content.muted} />
+            </SettingsRow>
+            <SettingsRow label={t("account.legal", "Legal")} onPress={onNavigateToLegal}>
+              <ChevronRight size={18} color={theme.colors.content.muted} />
+            </SettingsRow>
+            <SettingsRow onPress={onSignOut} hideBorder>
               <AppText variant="bodySm" style={styles.signOutLabel}>
                 {t("account.signOut", "Sign Out")}
               </AppText>
-            </Pressable>
-          </View>
+            </SettingsRow>
+          </SettingsSection>
         </>
       ) : (
-        <View style={styles.actions}>
-          <Pressable onPress={onNavigateToLegal} style={styles.actionButton}>
-            <AppText variant="bodySm">{t("account.legal", "Legal")}</AppText>
-          </Pressable>
-          <Pressable
+        <SettingsSection title={t("account.actions", "Actions")}>
+          <SettingsRow label={t("account.legal", "Legal")} onPress={onNavigateToLegal}>
+            <ChevronRight size={18} color={theme.colors.content.muted} />
+          </SettingsRow>
+          <SettingsRow
+            label={t("account.signInToAccess", "Sign in to access your profile")}
             onPress={onNavigateToProfile}
-            style={[styles.actionButton, styles.signInPrompt]}
+            hideBorder
           >
-            <AppText variant="bodySm" style={styles.signInLabel}>
-              {t("account.signInToAccess", "Sign in to access your profile")}
-            </AppText>
-          </Pressable>
-        </View>
+            <ChevronRight size={18} color={theme.colors.content.muted} />
+          </SettingsRow>
+        </SettingsSection>
       )}
-      <View style={styles.languageSection}>
-        <View>
-          <AppText variant="titleMd" style={styles.sectionHeading}>
-            {t("account.language", "Language")}
-          </AppText>
+
+      {/* Language Configuration Section */}
+      <SettingsSection
+        title={t("account.language", "Language")}
+        description={t("settings.general.languageDesc", "Configure app and content language.")}
+      >
+        <SettingsRow
+          label={t("settings.general.appLanguage", "App Language")}
+          sublabel={t("settings.general.appLanguageDesc", "Interface language for the app")}
+        >
           <LanguageSwitch />
-        </View>
-        <ContentLanguageToggle />
-      </View>
+        </SettingsRow>
+        <SettingsRow fullWidth hideBorder>
+          <ContentLanguageToggle />
+        </SettingsRow>
+      </SettingsSection>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  loadingContainer: {
+  centered: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
-  loadingText: {
-    color: theme.colors.content.primary,
-  },
   screen: {
     flex: 1,
+  },
+  title: {
+    color: theme.colors.content.strong,
+    marginBottom: theme.spacing.scale.lg,
   },
   content: {
     paddingHorizontal: theme.spacing.layout.pageX,
     paddingVertical: theme.spacing.layout.pageY,
   },
-  title: {
-    color: theme.colors.content.strong,
-  },
-  profileRow: {
-    marginTop: theme.spacing.scale.lg,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.component.gapMd,
-  },
-  profileName: {
-    fontWeight: "600",
-    color: theme.colors.content.strong,
-  },
-  profileEmail: {
-    color: theme.colors.content.muted,
-  },
-  actions: {
-    marginTop: theme.spacing.scale["2xl"],
-    gap: theme.spacing.component.gapSm,
-  },
-  actionButton: {
-    padding: theme.spacing.scale.md,
-    borderWidth: theme.border.width.default,
-    borderColor: theme.colors.border.subtle,
-    borderRadius: theme.radius.scale.sm,
-    backgroundColor: theme.colors.surface.default,
-  },
-  adminButton: {
-    borderColor: theme.colors.action.primary,
-    backgroundColor: theme.colors.surface.primarySubtle,
-  },
-  adminLabel: {
-    color: theme.colors.action.primary,
-  },
   signOutLabel: {
     color: theme.colors.state.danger,
-  },
-  signInPrompt: {
-    borderColor: theme.colors.action.primary,
-  },
-  signInLabel: {
-    color: theme.colors.action.primary,
-  },
-  languageSection: {
-    marginTop: theme.spacing.scale["2xl"],
-    gap: theme.spacing.component.gapLg,
-  },
-  sectionHeading: {
-    marginBottom: theme.spacing.component.gapSm,
-    color: theme.colors.content.strong,
+    fontWeight: "500",
   },
 }));

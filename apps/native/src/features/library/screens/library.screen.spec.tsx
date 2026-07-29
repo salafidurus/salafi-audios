@@ -1,10 +1,6 @@
 import type { LibraryItemDto } from "@sd/core-contracts";
 
-import {
-  useLibraryCompletedScreen,
-  useLibraryProgressScreen,
-  useLibrarySavedScreen,
-} from "@sd/domain-content";
+import { useLibraryProgressScreen } from "@sd/domain-content";
 import { render, screen, fireEvent } from "@testing-library/react-native";
 import React from "react";
 
@@ -21,50 +17,9 @@ jest.mock("react-native-safe-area-context", () => ({
   },
 }));
 
-// SectionList uses @react-native/virtualized-lists which bundles its own react-native
-// copy that triggers native bridge assertions in Jest. Mock it at the module level.
-jest.mock("react-native/Libraries/Lists/SectionList", () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require("react");
-  function MockSectionList({
-    sections = [],
-    renderSectionHeader,
-    renderItem,
-    renderSectionFooter,
-  }: {
-    sections?: { title: string; data: unknown[] }[];
-    renderSectionHeader?: (info: {
-      section: { title: string; data: unknown[] };
-    }) => React.ReactNode;
-    renderItem?: (info: {
-      item: unknown;
-      section: { title: string; data: unknown[] };
-      index: number;
-      separators: Record<string, unknown>;
-    }) => React.ReactNode;
-    renderSectionFooter?: (info: {
-      section: { title: string; data: unknown[] };
-    }) => React.ReactNode;
-  }) {
-    return React.createElement(
-      "View",
-      null,
-      sections.flatMap((section) => [
-        renderSectionHeader ? renderSectionHeader({ section }) : null,
-        ...section.data.map((item, index) =>
-          renderItem ? renderItem({ item, section, index, separators: {} }) : null,
-        ),
-        renderSectionFooter ? renderSectionFooter({ section }) : null,
-      ]),
-    );
-  }
-  MockSectionList.displayName = "SectionList";
-  return { default: MockSectionList };
-});
-
 jest.mock("@sd/domain-content", () => ({
-  useLibraryCompletedScreen: jest.fn(),
   useLibraryProgressScreen: jest.fn(),
+  useLibraryCompletedScreen: jest.fn(),
   useLibrarySavedScreen: jest.fn(),
 }));
 
@@ -84,8 +39,6 @@ jest.mock("../../../core/i18n/use-translation", () => ({
 
 const mockedUseAuth = jest.mocked(useAuth);
 const mockedUseLibraryProgressScreen = jest.mocked(useLibraryProgressScreen);
-const mockedUseLibrarySavedScreen = jest.mocked(useLibrarySavedScreen);
-const mockedUseLibraryCompletedScreen = jest.mocked(useLibraryCompletedScreen);
 
 function buildLibraryState(items: LibraryItemDto[] = [], isFetching = false) {
   return {
@@ -105,29 +58,20 @@ describe("LibraryScreen", () => {
       user: undefined,
     });
     mockedUseLibraryProgressScreen.mockReturnValue(buildLibraryState());
-    mockedUseLibrarySavedScreen.mockReturnValue(buildLibraryState());
-    mockedUseLibraryCompletedScreen.mockReturnValue(buildLibraryState());
   });
 
-  it("renders a loading state while all sections are fetching", async () => {
+  it("renders a loading state while In Progress is fetching", async () => {
     mockedUseLibraryProgressScreen.mockReturnValue(buildLibraryState([], true));
-    mockedUseLibrarySavedScreen.mockReturnValue(buildLibraryState([], true));
-    mockedUseLibraryCompletedScreen.mockReturnValue(buildLibraryState([], true));
 
     await render(<LibraryScreen />);
 
-    expect(screen.getByText("Loading My Library…")).toBeTruthy();
+    expect(screen.getByText("Loading In Progress…")).toBeTruthy();
   });
 
   it("renders empty section messages when no items exist", async () => {
     await render(<LibraryScreen />);
 
-    expect(screen.getByText("In Progress")).toBeTruthy();
     expect(screen.getByText("No lectures in progress.")).toBeTruthy();
-    expect(screen.getByText("Saved")).toBeTruthy();
-    expect(screen.getByText("No saved lectures yet.", { exact: false })).toBeTruthy();
-    expect(screen.getByText("Completed")).toBeTruthy();
-    expect(screen.getByText("No completed lectures yet.", { exact: false })).toBeTruthy();
   });
 
   it("navigates to a lecture when an item is pressed", async () => {

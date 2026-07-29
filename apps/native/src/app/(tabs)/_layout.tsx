@@ -1,9 +1,11 @@
 import { NativeTabs } from "expo-router/unstable-native-tabs";
+import { memo } from "react";
+import { useUnistyles } from "react-native-unistyles";
 
 import { RouteAccessGuard, useAuth } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 
-function AdminTabTrigger() {
+const AdminTabTrigger = memo(function AdminTabTrigger() {
   const { user } = useAuth();
   const { t } = useTranslation();
   const isAdmin = (user as any)?.role === "admin";
@@ -17,14 +19,20 @@ function AdminTabTrigger() {
       <NativeTabs.Trigger.Label>{t("admin", "Admin")}</NativeTabs.Trigger.Label>
     </NativeTabs.Trigger>
   );
-}
+});
 
 export default function TabsLayout() {
   const { t } = useTranslation();
+  const { theme } = useUnistyles();
 
   return (
     <RouteAccessGuard>
-      <NativeTabs minimizeBehavior="onScrollDown">
+      <NativeTabs
+        minimizeBehavior="onScrollDown"
+        tintColor={theme.colors.content.primary}
+        rippleColor={theme.colors.surface.hover}
+        backgroundColor={theme.colors.surface.default}
+      >
         <NativeTabs.Trigger name="(explore)">
           <NativeTabs.Trigger.Icon
             sf={{ default: "safari", selected: "safari.fill" }}

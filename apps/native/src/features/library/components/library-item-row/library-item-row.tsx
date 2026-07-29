@@ -3,7 +3,7 @@ import type { LibraryItemDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import { Bookmark, Clock, CheckCircle } from "lucide-react-native";
 import { Pressable, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
@@ -13,15 +13,16 @@ export type LibraryItemRowProps = {
   item: LibraryItemDto;
   variant: "progress" | "saved" | "completed";
   onPress?: () => void;
+  hideBorder?: boolean;
 };
 
 type LibraryItemIconProps = {
   variant: "progress" | "saved" | "completed";
 };
 
-const iconProps = { size: 20, color: "var(--content-muted)" as unknown as string };
-
 function LibraryItemIcon({ variant }: LibraryItemIconProps) {
+  const { theme } = useUnistyles();
+  const iconProps = { size: 20, color: theme.colors.content.muted };
   const icon = (() => {
     switch (variant) {
       case "saved":
@@ -48,7 +49,12 @@ function ProgressBarFill({ percent }: { percent: number }) {
   );
 }
 
-export function LibraryItemRow({ item, variant, onPress }: LibraryItemRowProps) {
+export function LibraryItemRow({
+  item,
+  variant,
+  onPress,
+  hideBorder = false,
+}: LibraryItemRowProps) {
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
   const lectureTitle = pickContentField(item.listingTitle, item.originalListingTitle, showOriginal);
@@ -60,7 +66,11 @@ export function LibraryItemRow({ item, variant, onPress }: LibraryItemRowProps) 
   return (
     <Pressable
       onPress={onPress}
-      style={({ pressed }) => [styles.container, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.container,
+        hideBorder && styles.noBorder,
+        pressed && styles.pressed,
+      ]}
     >
       <View style={styles.iconContainer}>
         <LibraryItemIcon variant={variant} />
@@ -110,6 +120,9 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing.scale.md,
     borderBottomWidth: theme.border.width.default,
     borderBottomColor: theme.colors.border.subtle,
+  },
+  noBorder: {
+    borderBottomWidth: 0,
   },
   pressed: {
     opacity: 0.7,

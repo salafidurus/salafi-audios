@@ -20,6 +20,10 @@ jest.mock("@/core/i18n/use-translation", () => ({
   }),
 }));
 
+jest.mock("@/core/auth/use-auth", () => ({
+  useAuth: jest.fn(() => ({ isAuthenticated: true, isLoading: false, user: undefined })),
+}));
+
 jest.mock("@/features/settings/components/language-switch/language-switch", () => {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const React = require("react");
@@ -103,7 +107,6 @@ describe("AccountScreen", () => {
 
     await render(<AccountScreen />);
 
-    expect(screen.getByText("Account")).toBeTruthy();
     expect(screen.getByText("Test User")).toBeTruthy();
     expect(screen.getByText("user@example.com")).toBeTruthy();
     expect(screen.getByText("Edit Profile")).toBeTruthy();
