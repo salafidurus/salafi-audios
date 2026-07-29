@@ -9,7 +9,7 @@ export default function TabsLayout() {
   return (
     <RouteAccessGuard>
       <NativeTabs minimizeBehavior="onScrollDown">
-        <NativeTabs.Trigger name="explore">
+        <NativeTabs.Trigger name="(explore)">
           <NativeTabs.Trigger.Icon
             sf={{ default: "safari", selected: "safari.fill" }}
             md={{ default: "explore", selected: "explore" }}
