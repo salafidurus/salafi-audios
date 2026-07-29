@@ -49,7 +49,7 @@ export const SUBNAV_FALLBACKS: Record<string, Record<string, string>> = {
   },
 };
 
-export type TranslateFn = (key: string, fallback?: string) => string;
+export type TranslateFn = (key: any, options?: any) => any;
 
 /** Translate a subsection tab label, falling back to the default label or raw id if unmapped. */
 export function getSubnavLabel(section: string, tabId: string, t: TranslateFn): string {
