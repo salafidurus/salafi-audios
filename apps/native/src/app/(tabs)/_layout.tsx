@@ -1,9 +1,11 @@
 import { NativeTabs } from "expo-router/unstable-native-tabs";
 
 import { RouteAccessGuard, useAuth } from "@/core/auth";
+import { useTranslation } from "@/core/i18n/use-translation";
 
 function AdminTabTrigger() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const isAdmin = (user as any)?.role === "admin";
 
   return (
@@ -12,12 +14,14 @@ function AdminTabTrigger() {
         sf={{ default: "shield", selected: "shield.fill" }}
         md={{ default: "admin_panel_settings", selected: "admin_panel_settings" }}
       />
-      <NativeTabs.Trigger.Label>Admin</NativeTabs.Trigger.Label>
+      <NativeTabs.Trigger.Label>{t("admin", "Admin")}</NativeTabs.Trigger.Label>
     </NativeTabs.Trigger>
   );
 }
 
 export default function TabsLayout() {
+  const { t } = useTranslation();
+
   return (
     <RouteAccessGuard>
       <NativeTabs minimizeBehavior="onScrollDown">
@@ -26,7 +30,7 @@ export default function TabsLayout() {
             sf={{ default: "safari", selected: "safari.fill" }}
             md={{ default: "explore", selected: "explore" }}
           />
-          <NativeTabs.Trigger.Label>Explore</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Label>{t("navigation.explore", "Explore")}</NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
 
         <NativeTabs.Trigger name="library">
@@ -34,7 +38,7 @@ export default function TabsLayout() {
             sf={{ default: "books.vertical", selected: "books.vertical.fill" }}
             md={{ default: "library_books", selected: "library_books" }}
           />
-          <NativeTabs.Trigger.Label>Library</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Label>{t("navigation.library", "Library")}</NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
 
         <NativeTabs.Trigger name="settings">
@@ -42,14 +46,16 @@ export default function TabsLayout() {
             sf={{ default: "gearshape", selected: "gearshape.fill" }}
             md={{ default: "settings", selected: "settings" }}
           />
-          <NativeTabs.Trigger.Label>Settings</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Label>
+            {t("navigation.settings", "Settings")}
+          </NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
 
         <AdminTabTrigger />
 
         {/* Dedicated Search tab for iOS native integration */}
         <NativeTabs.Trigger name="search" role="search">
-          <NativeTabs.Trigger.Label>Search</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Label>{t("search", "Search")}</NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
       </NativeTabs>
     </RouteAccessGuard>

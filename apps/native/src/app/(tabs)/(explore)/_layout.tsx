@@ -16,7 +16,7 @@ export default function FeedLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: t("explore", "Explore"),
+          title: t("navigation.subnav.explore.recent", "Recent"),
         }}
       />
       <Stack.Screen
