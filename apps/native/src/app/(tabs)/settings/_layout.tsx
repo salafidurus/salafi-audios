@@ -16,13 +16,13 @@ export default function SettingsLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: t("account.title", "Account"),
+          title: t("navigation.settings", "Settings"),
         }}
       />
       <Stack.Screen
         name="profile"
         options={{
-          title: t("settings.profile", "Edit Profile"),
+          title: t("settings.profile", "Profile"),
           headerLargeTitle: false,
         }}
       />
