@@ -49,6 +49,10 @@ export function getRootTabByRouteName(routeName: string): RootTabConfig | undefi
 }
 
 export function getRootTabFromPathname(pathname: string): RootTab {
+  if (pathname.startsWith("/search")) {
+    return "search";
+  }
+
   if (
     pathname === "/" ||
     pathname.startsWith("/scholar") ||
@@ -67,6 +71,21 @@ export function getRootTabFromPathname(pathname: string): RootTab {
   }
 
   return "explore";
+}
+
+export function isTabRoute(pathname: string): boolean {
+  if (
+    pathname === "/" ||
+    pathname === "/recent" ||
+    pathname === "/scholar" ||
+    pathname === "/curation" ||
+    pathname.startsWith("/search") ||
+    pathname.startsWith("/library") ||
+    pathname.startsWith("/settings")
+  ) {
+    return true;
+  }
+  return false;
 }
 
 export function getActiveSubsection(pathname: string, section: Section): string {

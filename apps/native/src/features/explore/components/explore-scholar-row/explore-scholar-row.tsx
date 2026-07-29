@@ -5,12 +5,12 @@ import { Image } from "expo-image";
 import { View, Text, Pressable, FlatList } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-export type FeedScholarRowProps = {
+export type ExploreScholarRowProps = {
   scholars: ScholarChipDto[];
   onScholarPress?: (slug: string) => void;
 };
 
-export function FeedScholarRow({ scholars, onScholarPress }: FeedScholarRowProps) {
+export function ExploreScholarRow({ scholars, onScholarPress }: ExploreScholarRowProps) {
   function renderScholar({ item: scholar }: ListRenderItemInfo<ScholarChipDto>) {
     return (
       <Pressable onPress={() => onScholarPress?.(scholar.slug)} style={styles.scholar}>

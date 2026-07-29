@@ -2,7 +2,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
 import { getWrappedLayout } from "@/core/integrations";
-import { MiniPlayer } from "@/features/audio";
+import { BottomAccessory } from "@/features/navigation";
 
 import { Providers } from "../core/providers";
 
@@ -15,7 +15,7 @@ function RootLayout() {
         <Stack.Screen name="(content)" />
         <Stack.Screen name="(auth)" />
       </Stack>
-      <MiniPlayer />
+      <BottomAccessory />
     </Providers>
   );
 }

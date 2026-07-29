@@ -119,6 +119,7 @@
         "expo-asset": "~57.0.7",
         "expo-audio": "~57.0.3",
         "expo-blur": "~57.0.2",
+        "expo-bottom-accessory": "file:./modules/expo-bottom-accessory",
         "expo-constants": "~57.0.7",
         "expo-dev-client": "~57.0.8",
         "expo-doctor": "^1.19.8",
@@ -4690,6 +4691,8 @@
     "micromatch/picomatch": ["picomatch@2.3.2", "", {}, "sha512-V7+vQEJ06Z+c5tSye8S+nHUfI51xoXIXjHQ99cQtKUkQqqO1kO/KCJUfZXuB47h/YBlDhah2H3hdUGXn8ie0oA=="],
 
     "multer/type-is": ["type-is@1.6.18", "", { "dependencies": { "media-typer": "0.3.0", "mime-types": "~2.1.24" } }, "sha512-TkRKr9sUTxEH8MdfuCSP7VizJyzRNMjj2J2do2Jr3Kym598JVdEksuzPQCnlFPW4ky9Q+iA+ma9BGm06XQBy8g=="],
+
+    "native/expo-bottom-accessory": ["expo-bottom-accessory@file:apps/native/modules/expo-bottom-accessory", { "peerDependencies": { "expo": "*" } }],
 
     "next/postcss": ["postcss@8.4.31", "", { "dependencies": { "nanoid": "^3.3.6", "picocolors": "^1.0.0", "source-map-js": "^1.0.2" } }, "sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ=="],
 

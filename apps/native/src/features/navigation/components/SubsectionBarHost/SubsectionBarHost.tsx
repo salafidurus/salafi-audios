@@ -13,7 +13,8 @@ import {
   getRootTabFromPathname,
 } from "@/features/navigation/utils/tab-route-config";
 
-import { SUBSECTION_BAR_HEIGHT, TAB_BAR_HEIGHT } from "../CustomTabBar/CustomTabBar";
+export const TAB_BAR_HEIGHT = 84;
+export const SUBSECTION_BAR_HEIGHT = 56;
 
 export function SubsectionBarHost() {
   const pathname = usePathname();

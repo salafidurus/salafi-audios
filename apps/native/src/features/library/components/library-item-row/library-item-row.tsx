@@ -2,12 +2,13 @@ import type { LibraryItemDto } from "@sd/core-contracts";
 
 import { pickContentField } from "@sd/core-i18n";
 import { Bookmark, Clock, CheckCircle } from "lucide-react-native";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { AppText } from "@/shared/components/AppText/AppText";
+import { List } from "@/shared/components/List";
 
 export type LibraryItemRowProps = {
   item: LibraryItemDto;
@@ -64,68 +65,53 @@ export function LibraryItemRow({
       : null;
 
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.container,
-        hideBorder && styles.noBorder,
-        pressed && styles.pressed,
-      ]}
-    >
-      <View style={styles.iconContainer}>
-        <LibraryItemIcon variant={variant} />
+    <List.Item onPress={onPress} hideBorder={hideBorder}>
+      <View style={styles.rowContent}>
+        <View style={styles.iconContainer}>
+          <LibraryItemIcon variant={variant} />
+        </View>
+        <View style={styles.content}>
+          <AppText variant="bodyMd" numberOfLines={2}>
+            {lectureTitle}
+          </AppText>
+          <AppText variant="caption" style={styles.subtitle}>
+            {item.scholarName}
+            {item.seriesTitle ? ` · ${item.seriesTitle}` : ""}
+          </AppText>
+          <AppText variant="xs" style={styles.meta}>
+            {item.durationSeconds
+              ? t("lecture.minutes", "{{count}} min", {
+                  count: Math.round(item.durationSeconds / 60),
+                })
+              : ""}
+            {variant === "progress" && progress !== null
+              ? ` · ${t("library.percentListened", "{{percent}}% listened", { percent: progress })}`
+              : ""}
+            {variant === "saved" && item.savedAt
+              ? ` · ${t("library.savedOn", "Saved {{date}}", {
+                  date: new Date(item.savedAt).toLocaleDateString(),
+                })}`
+              : ""}
+            {variant === "completed" && item.completedAt
+              ? ` · ${t("library.completedOn", "Completed {{date}}", {
+                  date: new Date(item.completedAt).toLocaleDateString(),
+                })}`
+              : ""}
+          </AppText>
+          {variant === "progress" && progress !== null ? (
+            <ProgressBarFill percent={progress} />
+          ) : null}
+        </View>
       </View>
-      <View style={styles.content}>
-        <AppText variant="bodyMd" numberOfLines={2}>
-          {lectureTitle}
-        </AppText>
-        <AppText variant="caption" style={styles.subtitle}>
-          {item.scholarName}
-          {item.seriesTitle ? ` · ${item.seriesTitle}` : ""}
-        </AppText>
-        <AppText variant="xs" style={styles.meta}>
-          {item.durationSeconds
-            ? t("lecture.minutes", "{{count}} min", {
-                count: Math.round(item.durationSeconds / 60),
-              })
-            : ""}
-          {variant === "progress" && progress !== null
-            ? ` · ${t("library.percentListened", "{{percent}}% listened", { percent: progress })}`
-            : ""}
-          {variant === "saved" && item.savedAt
-            ? ` · ${t("library.savedOn", "Saved {{date}}", {
-                date: new Date(item.savedAt).toLocaleDateString(),
-              })}`
-            : ""}
-          {variant === "completed" && item.completedAt
-            ? ` · ${t("library.completedOn", "Completed {{date}}", {
-                date: new Date(item.completedAt).toLocaleDateString(),
-              })}`
-            : ""}
-        </AppText>
-        {variant === "progress" && progress !== null ? (
-          <ProgressBarFill percent={progress} />
-        ) : null}
-      </View>
-    </Pressable>
+    </List.Item>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
-  container: {
+  rowContent: {
     flexDirection: "row",
     alignItems: "flex-start",
     gap: theme.spacing.scale.md,
-    paddingVertical: theme.spacing.scale.sm,
-    paddingHorizontal: theme.spacing.scale.md,
-    borderBottomWidth: theme.border.width.default,
-    borderBottomColor: theme.colors.border.subtle,
-  },
-  noBorder: {
-    borderBottomWidth: 0,
-  },
-  pressed: {
-    opacity: 0.7,
   },
   iconContainer: {
     paddingTop: theme.spacing.scale.xs,

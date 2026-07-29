@@ -50,6 +50,7 @@
     "expo-asset": "~57.0.7",
     "expo-audio": "~57.0.3",
     "expo-blur": "~57.0.2",
+    "expo-bottom-accessory": "file:./modules/expo-bottom-accessory",
     "expo-constants": "~57.0.7",
     "expo-dev-client": "~57.0.8",
     "expo-doctor": "^1.19.8",

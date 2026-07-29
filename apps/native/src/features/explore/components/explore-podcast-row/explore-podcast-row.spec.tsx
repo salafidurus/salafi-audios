@@ -3,7 +3,7 @@ import type { FeedContentItemDto } from "@sd/core-contracts";
 import { render, screen, fireEvent } from "@testing-library/react-native";
 import React from "react";
 
-import { FeedPodcastRow } from "./feed-podcast-row";
+import { ExplorePodcastRow } from "./explore-podcast-row";
 
 const baseItem: FeedContentItemDto = {
   kind: "single",
@@ -33,38 +33,38 @@ jest.mock("@sd/core-i18n", () => ({
   pickContentField: jest.fn((t: string) => t),
 }));
 
-describe("FeedPodcastRow", () => {
+describe("ExplorePodcastRow", () => {
   it("renders title and scholar name", async () => {
-    await render(<FeedPodcastRow item={baseItem} />);
+    await render(<ExplorePodcastRow item={baseItem} />);
     expect(screen.getByText("Test Lecture")).toBeTruthy();
     expect(screen.getByText("Scholar Name")).toBeTruthy();
   });
 
   it("shows duration in minutes", async () => {
-    await render(<FeedPodcastRow item={baseItem} />);
+    await render(<ExplorePodcastRow item={baseItem} />);
     expect(screen.getByText("30 min")).toBeTruthy();
   });
 
   it("hides duration when durationSeconds is null", async () => {
-    await render(<FeedPodcastRow item={{ ...baseItem, durationSeconds: null }} />);
+    await render(<ExplorePodcastRow item={{ ...baseItem, durationSeconds: null }} />);
     expect(screen.queryByText("30 min")).toBeNull();
   });
 
   it("renders thumbnail image when thumbnailUrl is provided", async () => {
     await render(
-      <FeedPodcastRow item={{ ...baseItem, thumbnailUrl: "https://example.com/thumb.jpg" }} />,
+      <ExplorePodcastRow item={{ ...baseItem, thumbnailUrl: "https://example.com/thumb.jpg" }} />,
     );
     expect(screen.getByTestId("podcast-thumbnail")).toBeTruthy();
   });
 
   it("renders placeholder view when no thumbnailUrl", async () => {
-    await render(<FeedPodcastRow item={baseItem} />);
+    await render(<ExplorePodcastRow item={baseItem} />);
     expect(screen.getByTestId("podcast-thumbnail-placeholder")).toBeTruthy();
   });
 
   it("calls onPress when pressed", async () => {
     const onPress = jest.fn();
-    await render(<FeedPodcastRow item={baseItem} onPress={onPress} />);
+    await render(<ExplorePodcastRow item={baseItem} onPress={onPress} />);
     await fireEvent.press(screen.getByTestId("podcast-row"));
     expect(onPress).toHaveBeenCalledTimes(1);
   });
@@ -76,7 +76,7 @@ describe("FeedPodcastRow", () => {
       resumePositionSeconds: 720,
       isCompleted: false,
     });
-    await render(<FeedPodcastRow item={baseItem} />);
+    await render(<ExplorePodcastRow item={baseItem} />);
     expect(screen.getByTestId("progress-bar-track")).toBeTruthy();
   });
 
@@ -87,7 +87,7 @@ describe("FeedPodcastRow", () => {
       resumePositionSeconds: 0,
       isCompleted: false,
     });
-    await render(<FeedPodcastRow item={baseItem} />);
+    await render(<ExplorePodcastRow item={baseItem} />);
     expect(screen.queryByTestId("progress-bar-track")).toBeNull();
   });
 
@@ -98,12 +98,12 @@ describe("FeedPodcastRow", () => {
       resumePositionSeconds: 1800,
       isCompleted: true,
     });
-    await render(<FeedPodcastRow item={baseItem} />);
+    await render(<ExplorePodcastRow item={baseItem} />);
     expect(screen.queryByTestId("progress-bar-track")).toBeNull();
   });
 
   it("shows listing type when not a single", async () => {
-    await render(<FeedPodcastRow item={{ ...baseItem, kind: "series" }} />);
+    await render(<ExplorePodcastRow item={{ ...baseItem, kind: "series" }} />);
     expect(screen.getByText("Scholar Name · series")).toBeTruthy();
   });
 });

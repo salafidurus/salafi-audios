@@ -1,13 +1,13 @@
 import { ActivityIndicator, Pressable, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-export type FeedStatusViewProps = {
+export type ExploreStatusViewProps = {
   message: string;
   onRetry?: () => void;
   retryLabel?: string;
 };
 
-export function FeedStatusView({ message, onRetry, retryLabel }: FeedStatusViewProps) {
+export function ExploreStatusView({ message, onRetry, retryLabel }: ExploreStatusViewProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.message}>{message}</Text>
@@ -20,8 +20,8 @@ export function FeedStatusView({ message, onRetry, retryLabel }: FeedStatusViewP
   );
 }
 
-/** Footer spinner shown while fetching additional feed pages. */
-export function FeedLoadingFooter() {
+/** Footer spinner shown while fetching additional explore pages. */
+export function ExploreLoadingFooter() {
   const { theme } = useUnistyles();
   return (
     <View style={styles.footer}>

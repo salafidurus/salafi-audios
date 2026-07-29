@@ -1,9 +1,11 @@
 import { NativeTabs } from "expo-router/unstable-native-tabs";
 import { memo } from "react";
+import { Platform } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
 
 import { RouteAccessGuard, useAuth } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { BottomAccessoryInnerContent } from "@/features/navigation";
 
 const AdminTabTrigger = memo(function AdminTabTrigger() {
   const { user } = useAuth();
@@ -61,10 +63,11 @@ export default function TabsLayout() {
 
         <AdminTabTrigger />
 
-        {/* Dedicated Search tab for iOS native integration */}
-        <NativeTabs.Trigger name="search" role="search">
-          <NativeTabs.Trigger.Label>{t("search", "Search")}</NativeTabs.Trigger.Label>
-        </NativeTabs.Trigger>
+        {Platform.OS === "ios" ? (
+          <NativeTabs.BottomAccessory>
+            <BottomAccessoryInnerContent />
+          </NativeTabs.BottomAccessory>
+        ) : null}
       </NativeTabs>
     </RouteAccessGuard>
   );

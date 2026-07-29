@@ -1,16 +1,16 @@
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
-export type FeedSkeletonProps = {
+export type ExploreSkeletonProps = {
   /** Number of placeholder cards to render. */
   count?: number;
 };
 
-export function FeedSkeleton({ count = 6 }: FeedSkeletonProps) {
+export function ExploreSkeleton({ count = 6 }: ExploreSkeletonProps) {
   return (
     <View style={styles.container}>
       {Array.from({ length: count }).map((_, i) => (
-        <View key={`feed-skeleton-${i}`} style={styles.card}>
+        <View key={`explore-skeleton-${i}`} style={styles.card}>
           <View style={[styles.line, styles.lineTitle]} />
           <View style={[styles.line, styles.lineMeta]} />
           <View style={[styles.line, styles.lineSub]} />
