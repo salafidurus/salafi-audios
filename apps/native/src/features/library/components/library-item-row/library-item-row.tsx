@@ -3,7 +3,7 @@ import type { LibraryItemDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import { Bookmark, Clock, CheckCircle } from "lucide-react-native";
 import { Pressable, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
@@ -20,9 +20,9 @@ type LibraryItemIconProps = {
   variant: "progress" | "saved" | "completed";
 };
 
-const iconProps = { size: 20, color: "var(--content-muted)" as unknown as string };
-
 function LibraryItemIcon({ variant }: LibraryItemIconProps) {
+  const { theme } = useUnistyles();
+  const iconProps = { size: 20, color: theme.colors.content.muted };
   const icon = (() => {
     switch (variant) {
       case "saved":

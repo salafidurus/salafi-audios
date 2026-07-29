@@ -1,7 +1,7 @@
 import { useAccountProfile } from "@sd/domain-account";
 import { ChevronRight } from "lucide-react-native";
 import { ScrollView, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -32,6 +32,7 @@ export function AccountScreen({
   const { data: profile, isFetching } = useAccountProfile({ enabled: isAuthenticated });
   const { t } = useTranslation();
   const { hasAnyPermission } = useAdminPermissions();
+  const { theme } = useUnistyles();
 
   if (isFetching) {
     return (
@@ -56,7 +57,7 @@ export function AccountScreen({
               onPress={onNavigateToProfile}
               hideBorder
             >
-              <ChevronRight size={18} color="var(--content-muted)" />
+              <ChevronRight size={18} color={theme.colors.content.muted} />
             </SettingsRow>
           </SettingsSection>
 
@@ -64,14 +65,14 @@ export function AccountScreen({
           <SettingsSection title={t("account.actions", "Actions")}>
             {hasAnyPermission && (
               <SettingsRow label={t("account.admin", "Admin")} onPress={onNavigateToAdmin}>
-                <ChevronRight size={18} color="var(--content-muted)" />
+                <ChevronRight size={18} color={theme.colors.content.muted} />
               </SettingsRow>
             )}
             <SettingsRow label={t("account.support", "Support")} onPress={onNavigateToSupport}>
-              <ChevronRight size={18} color="var(--content-muted)" />
+              <ChevronRight size={18} color={theme.colors.content.muted} />
             </SettingsRow>
             <SettingsRow label={t("account.legal", "Legal")} onPress={onNavigateToLegal}>
-              <ChevronRight size={18} color="var(--content-muted)" />
+              <ChevronRight size={18} color={theme.colors.content.muted} />
             </SettingsRow>
             <SettingsRow onPress={onSignOut} hideBorder>
               <AppText variant="bodySm" style={styles.signOutLabel}>
@@ -83,14 +84,14 @@ export function AccountScreen({
       ) : (
         <SettingsSection title={t("account.actions", "Actions")}>
           <SettingsRow label={t("account.legal", "Legal")} onPress={onNavigateToLegal}>
-            <ChevronRight size={18} color="var(--content-muted)" />
+            <ChevronRight size={18} color={theme.colors.content.muted} />
           </SettingsRow>
           <SettingsRow
             label={t("account.signInToAccess", "Sign in to access your profile")}
             onPress={onNavigateToProfile}
             hideBorder
           >
-            <ChevronRight size={18} color="var(--content-muted)" />
+            <ChevronRight size={18} color={theme.colors.content.muted} />
           </SettingsRow>
         </SettingsSection>
       )}

@@ -1,5 +1,3 @@
-import { routes } from "@sd/core-contracts";
-import { type Href, useRouter } from "expo-router";
 import { ScrollView } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -12,19 +10,10 @@ import { SettingsSection } from "../components/SettingsSection/SettingsSection";
 
 export function SettingsGeneralScreen() {
   const { t } = useTranslation();
-  const router = useRouter();
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <SettingsSection title={t("account.profile", "Account")}>
-        <SettingsRow
-          label={t("settings.profile", "Profile")}
-          sublabel={t("settings.profileDesc", "View and manage your account")}
-          onPress={() => router.push(routes.settings.profile as Href)}
-          hideBorder
-        />
-      </SettingsSection>
-
+      {/* Language Section */}
       <SettingsSection
         title={t("settings.general.languageSection", "Language")}
         description={t("settings.general.languageDesc", "Configure app and content language.")}

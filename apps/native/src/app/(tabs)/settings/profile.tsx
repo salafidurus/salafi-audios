@@ -3,7 +3,7 @@ import { type Href, useRouter } from "expo-router";
 
 import { authClient } from "@/core/auth/auth-client";
 import { queryClient, persister } from "@/core/query-client";
-import { AccountScreen } from "@/features/settings/screens/account.screen";
+import { SettingsProfileScreen } from "@/features/settings/screens/settings-profile.screen";
 
 export default function SettingsProfileRoute() {
   const router = useRouter();
@@ -15,10 +15,5 @@ export default function SettingsProfileRoute() {
     router.replace(routes.home as Href);
   };
 
-  return (
-    <AccountScreen
-      onNavigateToLegal={() => router.push(routes.settings.legal as Href)}
-      onSignOut={handleSignOut}
-    />
-  );
+  return <SettingsProfileScreen onSignOut={handleSignOut} />;
 }
