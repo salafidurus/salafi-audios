@@ -1,20 +1,36 @@
 import { Stack } from "expo-router";
 
+import { useTranslation } from "@/core/i18n/use-translation";
+
 export default function FeedLayout() {
+  const { t } = useTranslation();
+
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack
+      screenOptions={{
+        headerShown: true,
+        headerTransparent: false,
+        headerLargeTitle: true,
+      }}
+    >
       <Stack.Screen
         name="index"
         options={{
-          headerShown: true,
-          title: "Explore",
-          headerLargeTitle: true,
-          headerTransparent: true,
-          headerBlurEffect: "prominent",
+          title: t("explore", "Explore"),
         }}
       />
-      <Stack.Screen name="scholar" />
-      <Stack.Screen name="curation" />
+      <Stack.Screen
+        name="scholar"
+        options={{
+          title: t("navigation.subnav.explore.scholar", "Scholars"),
+        }}
+      />
+      <Stack.Screen
+        name="curation"
+        options={{
+          title: t("navigation.subnav.explore.curation", "Curation"),
+        }}
+      />
     </Stack>
   );
 }
