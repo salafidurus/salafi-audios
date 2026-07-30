@@ -14,6 +14,7 @@ jest.mock("@/core/auth", () => ({
       social: jest.fn(),
     },
   },
+  refreshSession: jest.fn(),
 }));
 
 jest.mock("@/core/config/runtime-env", () => ({
@@ -57,6 +58,7 @@ describe("useNativeGoogleSignIn", () => {
       provider: "google",
       idToken: { token: "test-id-token" },
     });
+    expect(require("@/core/auth").refreshSession).toHaveBeenCalled();
     expect(result.current.error).toBeNull();
     expect(result.current.isLoading).toBe(false);
   });

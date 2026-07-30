@@ -14,6 +14,7 @@ jest.mock("@/core/auth", () => ({
   authClient: {
     $fetch: jest.fn(),
   },
+  refreshSession: jest.fn(),
 }));
 
 jest.mock("@/core/config/runtime-env", () => ({
@@ -46,7 +47,7 @@ describe("useNativeAppleSignIn", () => {
   it("persists cookie under better-auth_cookie key upon successful sign in", async () => {
     const AppleAuth = require("expo-apple-authentication");
     const SecureStore = require("expo-secure-store");
-    const { authClient } = require("@/core/auth");
+    const { refreshSession } = require("@/core/auth");
 
     AppleAuth.isAvailableAsync.mockResolvedValue(true);
     AppleAuth.signInAsync.mockResolvedValue({
@@ -77,10 +78,7 @@ describe("useNativeAppleSignIn", () => {
         },
       }),
     );
-    expect(authClient.$fetch).toHaveBeenCalledWith("/api/auth/get-session", {
-      method: "GET",
-      headers: { Cookie: "better-auth.session_token=test-session-id" },
-    });
+    expect(refreshSession).toHaveBeenCalled();
   });
 
   it("posts to the runtime-resolved API base URL, not the raw env var", async () => {

@@ -152,6 +152,21 @@ against. The Android OAuth client registered in Google Cloud Console (package
 name + SHA-1 fingerprint) only authorizes the device to show the native
 account picker; it never appears in any client-side or server-side config.
 
+#### Both flows must force a session refetch afterward
+
+Better Auth's core client only auto-triggers a `useSession()` refetch for a
+fixed set of paths (`/sign-in/email`, `/sign-out`, etc.) — `/sign-in/social`
+isn't one of them. `@better-auth/expo`'s own `Set-Cookie`-triggered refetch
+_should_ cover the gap for the Google idToken flow, but empirically doesn't
+reliably update the reactive session atom in time — and Apple's flow (a
+custom endpoint with a manually-written cookie) never goes through that path
+at all. Both hooks therefore call `refreshSession()`
+(`apps/native/src/core/auth/auth-client.ts`) after persisting the session,
+which directly invokes the session atom's own `refetch()` — the same
+function `useSession()` itself uses — rather than a raw, atom-bypassing
+`$fetch()` call. Skipping this step is the classic symptom of "sign-in
+succeeds, cookie is written, but the app still acts signed out."
+
 ## Session management and sign-out
 
 - **Session detection:** Web uses `authClient.useSession()`, which returns the

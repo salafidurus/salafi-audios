@@ -1,7 +1,7 @@
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useCallback, useState } from "react";
 
-import { authClient } from "@/core/auth";
+import { authClient, refreshSession } from "@/core/auth";
 import { getGoogleWebClientId } from "@/core/config/runtime-env";
 
 // The library's shipped types resolve to its web variant under this project's
@@ -42,6 +42,8 @@ export function useNativeGoogleSignIn() {
       if (signInError) {
         throw new Error(signInError.message ?? "Google Sign-In failed");
       }
+
+      await refreshSession();
       // Router navigation handled by parent component watching auth state via useAuth()
     } catch (err) {
       const message = err instanceof Error ? err.message : "Google Sign-In failed";
