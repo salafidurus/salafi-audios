@@ -1,5 +1,5 @@
-import { Host } from "@expo/ui";
 import { SegmentedControl as NativeSegmentedControl } from "@expo/ui/community/segmented-control";
+import { View } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
 
 export interface SegmentedControlOption<T extends string> {
@@ -24,7 +24,10 @@ export function SegmentedControl<T extends string>({
   const selectedIndex = options.findIndex((opt) => opt.value === value);
 
   return (
-    <Host matchContents accessibilityLabel={ariaLabel}>
+    // NativeSegmentedControl wraps itself in its own @expo/ui Host internally —
+    // nesting another Host around it breaks touch dispatch, so this is a plain
+    // RN View purely for the accessibility label, not a second native boundary.
+    <View accessible accessibilityLabel={ariaLabel}>
       <NativeSegmentedControl
         values={options.map((opt) => opt.label)}
         selectedIndex={selectedIndex === -1 ? undefined : selectedIndex}
@@ -34,6 +37,6 @@ export function SegmentedControl<T extends string>({
         }}
         tintColor={theme.colors.action.primary}
       />
-    </Host>
+    </View>
   );
 }
