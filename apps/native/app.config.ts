@@ -108,7 +108,6 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       ],
       "expo-asset",
       "expo-apple-authentication",
-      "@react-native-google-signin/google-signin",
       "expo-audio",
       [
         "expo-document-picker",
