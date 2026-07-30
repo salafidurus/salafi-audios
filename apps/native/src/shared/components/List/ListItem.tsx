@@ -1,8 +1,11 @@
-import type { ReactNode } from "react";
+import type { ReactElement, ReactNode } from "react";
 
-import { MenuView, type MenuAction, type NativeActionEvent } from "@expo/ui/community/menu";
+import { MenuView, type NativeActionEvent } from "@expo/ui/community/menu";
+import { Children, isValidElement } from "react";
 import { Pressable, type ViewStyle, type StyleProp } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+
+import { ListItemActions, type ListItemActionsProps } from "./ListItemActions";
 
 export type ListItemProps = {
   children: ReactNode;
@@ -10,12 +13,12 @@ export type ListItemProps = {
   interactive?: boolean;
   hideBorder?: boolean;
   style?: StyleProp<ViewStyle>;
-  /** Actions shown in a native context menu opened by long-pressing the row. */
-  actions?: MenuAction[];
-  /** Called with the pressed action's `id` (falling back to its `title`). */
-  onAction?: (id: string) => void;
   testID?: string;
 };
+
+function isActionsElement(child: ReactNode): child is ReactElement<ListItemActionsProps> {
+  return isValidElement(child) && child.type === ListItemActions;
+}
 
 export function ListItem({
   children,
@@ -23,12 +26,14 @@ export function ListItem({
   interactive = false,
   hideBorder = false,
   style,
-  actions,
-  onAction,
   testID,
 }: ListItemProps) {
   const isClickable = Boolean(onPress);
   const isInteractive = isClickable || interactive;
+
+  const elements = Children.toArray(children);
+  const actionsElement = elements.find(isActionsElement);
+  const content = elements.filter((child) => child !== actionsElement);
 
   const row = (
     <Pressable
@@ -42,18 +47,20 @@ export function ListItem({
         style,
       ]}
     >
-      {children}
+      {content}
     </Pressable>
   );
 
-  if (!actions?.length) return row;
+  if (!actionsElement) return row;
+
+  const { actions, onAction } = actionsElement.props;
 
   return (
     <MenuView
       testID={testID}
       actions={actions}
       shouldOpenOnLongPress
-      onPressAction={(event: NativeActionEvent) => onAction?.(event.nativeEvent.event)}
+      onPressAction={(event: NativeActionEvent) => onAction(event.nativeEvent.event)}
     >
       {row}
     </MenuView>

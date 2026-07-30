@@ -1,16 +1,15 @@
+import type { MenuAction } from "@expo/ui/community/menu";
 import type { FeedContentItemDto } from "@sd/core-contracts";
 import type { Track } from "@sd/domain-audio";
 
 import { pickContentField } from "@sd/core-i18n";
 import { useAudio, useProgressStore, useListingProgress } from "@sd/domain-audio";
-import { Bookmark, Info } from "lucide-react-native";
 import { View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { StyleSheet } from "react-native-unistyles";
 
 import { audioService } from "@/features/audio";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { AppText } from "@/shared/components/AppText/AppText";
-import { Button } from "@/shared/components/Button/Button";
 import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
@@ -28,7 +27,6 @@ export function ExplorePodcastRow({
   onNavigateToListing,
   hideBorder = false,
 }: ExplorePodcastRowProps) {
-  const { theme } = useUnistyles();
   const showOriginal = useShowOriginalContent();
   const title = pickContentField(item.title, item.original?.title, showOriginal);
   const scholarName = item.scholarName;
@@ -84,8 +82,18 @@ export function ExplorePodcastRow({
   const durationText = item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : "";
   const publishedDateText = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString() : "";
 
+  const actions: MenuAction[] = [
+    { id: "details", title: "Details" },
+    { id: "save", title: "Save", state: isSaved ? "on" : "off" },
+  ];
+
+  const handleAction = (id: string) => {
+    if (id === "details") handleDetails();
+    if (id === "save") handleSave();
+  };
+
   return (
-    <List.Item onPress={handlePlay} hideBorder={hideBorder}>
+    <List.Item onPress={handlePlay} hideBorder={hideBorder} testID="podcast-row-item">
       <View style={styles.rowContent} testID="podcast-row">
         <UserAvatar image={item.thumbnailUrl} name={scholarName} size={64} />
         <View style={styles.content}>
@@ -106,36 +114,7 @@ export function ExplorePodcastRow({
         </View>
       </View>
 
-      <View style={styles.actions}>
-        <View style={styles.actionItem}>
-          <Button
-            variant="outline"
-            size="sm"
-            fullWidth
-            label="Details"
-            icon={<Info size={14} color={theme.colors.content.default} />}
-            onPress={handleDetails}
-            testID="details-action"
-          />
-        </View>
-        <View style={styles.actionItem}>
-          <Button
-            variant="outline"
-            size="sm"
-            fullWidth
-            label={isSaved ? "Saved" : "Save"}
-            icon={
-              <Bookmark
-                size={14}
-                color={theme.colors.content.default}
-                fill={isSaved ? theme.colors.content.default : "none"}
-              />
-            }
-            onPress={handleSave}
-            testID="save-action"
-          />
-        </View>
-      </View>
+      <List.Item.Actions actions={actions} onAction={handleAction} />
     </List.Item>
   );
 }
@@ -167,15 +146,5 @@ const styles = StyleSheet.create((theme) => ({
     height: "100%",
     borderRadius: theme.radius.scale.full,
     backgroundColor: theme.colors.content.strong,
-  },
-  actions: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.scale.xs,
-    marginTop: theme.spacing.scale.xs,
-    width: "100%",
-  },
-  actionItem: {
-    flex: 1,
   },
 }));

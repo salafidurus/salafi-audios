@@ -17,6 +17,10 @@ const baseItem: FeedContentItemDto = {
   publishedAt: "2026-06-20T10:00:00Z",
 };
 
+const mockIsSaved = jest.fn(() => false);
+const mockAddSaved = jest.fn();
+const mockRemoveSaved = jest.fn();
+
 jest.mock("@sd/domain-audio", () => ({
   useListingProgress: jest.fn(() => ({
     progressPercent: 0,
@@ -30,14 +34,16 @@ jest.mock("@sd/domain-audio", () => ({
     pause: jest.fn(),
     resume: jest.fn(),
   })),
-  useProgressStore: jest.fn(() => ({
-    actions: {
-      isSaved: jest.fn(() => false),
-      addSaved: jest.fn(),
-      removeSaved: jest.fn(),
-    },
-    progressMap: {},
-  })),
+  useProgressStore: jest.fn((selector: (state: unknown) => unknown) =>
+    selector({
+      actions: {
+        isSaved: mockIsSaved,
+        addSaved: mockAddSaved,
+        removeSaved: mockRemoveSaved,
+      },
+      progressMap: {},
+    }),
+  ),
 }));
 
 jest.mock("@/features/audio", () => ({
@@ -80,11 +86,29 @@ describe("ExplorePodcastRow", () => {
     expect(audioMock.playListing).toHaveBeenCalled();
   });
 
-  it("calls onNavigateToListing when details action button is pressed", async () => {
+  it("calls onNavigateToListing when the Details long-press menu action is pressed", async () => {
     const onNavigateToListing = jest.fn();
     await render(<ExplorePodcastRow item={baseItem} onNavigateToListing={onNavigateToListing} />);
-    await fireEvent.press(screen.getByTestId("details-action"));
+    await fireEvent.press(screen.getByTestId("podcast-row-item-action-details"));
     expect(onNavigateToListing).toHaveBeenCalledWith("test-lecture");
+  });
+
+  it("saves the item when the Save long-press menu action is pressed", async () => {
+    mockIsSaved.mockReturnValue(false);
+
+    await render(<ExplorePodcastRow item={baseItem} />);
+    await fireEvent.press(screen.getByTestId("podcast-row-item-action-save"));
+
+    expect(mockAddSaved).toHaveBeenCalledWith(baseItem.id);
+  });
+
+  it("removes the item when the Save long-press menu action is pressed while already saved", async () => {
+    mockIsSaved.mockReturnValue(true);
+
+    await render(<ExplorePodcastRow item={baseItem} />);
+    await fireEvent.press(screen.getByTestId("podcast-row-item-action-save"));
+
+    expect(mockRemoveSaved).toHaveBeenCalledWith(baseItem.id);
   });
 
   it("shows progress bar when 0 < progressPercent < 100", async () => {
