@@ -47,7 +47,12 @@ export function Button({
   return (
     <Host matchContents={!fullWidth} style={[fullWidth && base.stretch, style]}>
       <NativeButton
-        variant={getNativeVariant(variant)}
+        // Always "text" (plain): "filled"/"outlined" map to SwiftUI's real
+        // borderedProminent/bordered button styles, which paint their own
+        // background/padding chrome that visually clashes with (and double-pads
+        // against) our own backgroundColor/border/padding below. Plain has none,
+        // so our style is the sole source of the button's appearance.
+        variant="text"
         onPress={onPress}
         disabled={isDisabled}
         testID={testID}
@@ -81,20 +86,6 @@ const base = {
 };
 
 type Theme = ReturnType<typeof useUnistyles>["theme"];
-
-function getNativeVariant(variant: ButtonVariant): "filled" | "outlined" | "text" {
-  switch (variant) {
-    case "primary":
-    case "danger":
-      return "filled";
-    case "surface":
-      return "outlined";
-    case "outline":
-      return "outlined";
-    case "ghost":
-      return "text";
-  }
-}
 
 function getNativeButtonStyle(variant: ButtonVariant, size: ButtonSize, t: Theme): UniversalStyle {
   return {
