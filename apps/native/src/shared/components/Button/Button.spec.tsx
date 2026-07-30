@@ -4,30 +4,6 @@ import { View } from "react-native";
 
 import { Button } from "./Button";
 
-jest.mock("react-native-svg", () => ({
-  Svg: "Svg",
-  Defs: "Defs",
-  LinearGradient: "LinearGradient",
-  RadialGradient: "RadialGradient",
-  Rect: "Rect",
-  Stop: "Stop",
-}));
-
-jest.mock("react-native-ease", () => {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const React = require("react");
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { View } = require("react-native");
-  return {
-    EaseView: ({ children, style }: { children: React.ReactNode; style?: object }) =>
-      React.createElement(View, { style }, children),
-  };
-});
-
-jest.mock("../AccentGradientFill/AccentGradientFill", () => ({
-  AccentGradientFill: () => null,
-}));
-
 describe("Button", () => {
   it("renders label text", async () => {
     await render(<Button label="Submit" />);

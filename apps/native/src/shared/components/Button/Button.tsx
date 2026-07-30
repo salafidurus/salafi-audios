@@ -1,22 +1,20 @@
-import { useState } from "react";
+import type { UniversalStyle } from "@expo/ui";
+
+import { Host, Button as NativeButton } from "@expo/ui";
 import {
   ActivityIndicator,
-  Pressable,
-  StyleSheet,
   Text,
-  type PressableProps,
+  View,
+  type StyleProp,
   type TextStyle,
   type ViewStyle,
 } from "react-native";
-import { EaseView } from "react-native-ease";
 import { useUnistyles } from "react-native-unistyles";
-
-import { AccentGradientFill } from "../AccentGradientFill/AccentGradientFill";
 
 type ButtonVariant = "primary" | "surface" | "outline" | "ghost" | "danger";
 type ButtonSize = "sm" | "md" | "lg";
 
-export type ButtonProps = PressableProps & {
+export type ButtonProps = {
   variant?: ButtonVariant;
   size?: ButtonSize;
   label: string;
@@ -24,6 +22,10 @@ export type ButtonProps = PressableProps & {
   icon?: React.ReactNode;
   iconPosition?: "left" | "right";
   fullWidth?: boolean;
+  disabled?: boolean;
+  onPress?: () => void;
+  style?: StyleProp<ViewStyle>;
+  testID?: string;
 };
 
 export function Button({
@@ -35,116 +37,86 @@ export function Button({
   iconPosition = "left",
   fullWidth = false,
   disabled,
-  onPressIn,
-  onPressOut,
+  onPress,
   style,
-  ...props
+  testID,
 }: ButtonProps) {
   const { theme } = useUnistyles();
-  const [isPressed, setIsPressed] = useState(false);
   const isDisabled = disabled || loading;
 
   return (
-    <EaseView
-      animate={{
-        scale: isPressed ? 0.97 : 1,
-        opacity: isPressed ? 0.88 : 1,
-      }}
-      transition={{
-        type: "spring",
-        damping: 10,
-        stiffness: 100,
-      }}
-      style={[fullWidth ? base.stretch : base.shrink, isDisabled && base.disabled]}
-    >
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={label}
-        accessibilityState={{ disabled: isDisabled, busy: loading }}
+    <Host matchContents={!fullWidth} style={[fullWidth && base.stretch, style]}>
+      <NativeButton
+        variant={getNativeVariant(variant)}
+        onPress={onPress}
         disabled={isDisabled}
-        onPressIn={(e) => {
-          setIsPressed(true);
-          onPressIn?.(e);
-        }}
-        onPressOut={(e) => {
-          setIsPressed(false);
-          onPressOut?.(e);
-        }}
-        style={[
-          base.pressable,
-          { borderRadius: theme.radius.component.chip },
-          getVariantContainer(variant, theme),
-          getSizeContainer(size, theme),
-          fullWidth && base.stretch,
-          style as ViewStyle,
-        ]}
-        {...props}
+        testID={testID}
+        style={getNativeButtonStyle(variant, size, theme)}
       >
-        {variant === "primary" ? (
-          <AccentGradientFill
-            borderRadius={theme.radius.component.chip}
-            linearColors={theme.recipes.primaryCta.linear.colors}
-            linearStart={theme.recipes.primaryCta.linear.start}
-            linearEnd={theme.recipes.primaryCta.linear.end}
-            radialCenter={theme.recipes.primaryCta.radial.center}
-            radialRadius={theme.recipes.primaryCta.radial.radius}
-            radialCenterColor={theme.recipes.primaryCta.radial.centerColor}
-            radialEdgeColor={theme.recipes.primaryCta.radial.edgeColor}
-          />
-        ) : null}
-        {loading ? (
-          <ActivityIndicator size="small" color={getIndicatorColor(variant, theme)} />
-        ) : (
-          <>
-            {icon && iconPosition === "left" && icon}
-            <Text style={[base.label, getVariantLabel(variant, theme), getSizeLabel(size, theme)]}>
-              {label}
-            </Text>
-            {icon && iconPosition === "right" && icon}
-          </>
-        )}
-      </Pressable>
-    </EaseView>
+        <View style={[base.content, getGapStyle(size, theme)]}>
+          {loading ? (
+            <ActivityIndicator size="small" color={getIndicatorColor(variant, theme)} />
+          ) : (
+            <>
+              {icon && iconPosition === "left" ? icon : null}
+              <Text style={[getLabelStyle(variant, theme), getSizeLabelStyle(size, theme)]}>
+                {label}
+              </Text>
+              {icon && iconPosition === "right" ? icon : null}
+            </>
+          )}
+        </View>
+      </NativeButton>
+    </Host>
   );
 }
 
-const base = StyleSheet.create({
-  pressable: {
+const base = {
+  stretch: { width: "100%" } as ViewStyle,
+  content: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: StyleSheet.hairlineWidth,
-    overflow: "hidden",
-  },
-  label: {
-    textAlign: "center",
-  },
-  shrink: {
-    alignSelf: "flex-start",
-  },
-  stretch: {
-    alignSelf: "stretch",
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-});
+  } as ViewStyle,
+};
 
 type Theme = ReturnType<typeof useUnistyles>["theme"];
 
-function getVariantContainer(variant: ButtonVariant, t: Theme): ViewStyle {
+function getNativeVariant(variant: ButtonVariant): "filled" | "outlined" | "text" {
+  switch (variant) {
+    case "primary":
+    case "danger":
+      return "filled";
+    case "surface":
+      return "outlined";
+    case "outline":
+      return "outlined";
+    case "ghost":
+      return "text";
+  }
+}
+
+function getNativeButtonStyle(variant: ButtonVariant, size: ButtonSize, t: Theme): UniversalStyle {
+  return {
+    ...getVariantStyle(variant, t),
+    ...getSizeStyle(size, t),
+    borderRadius: t.radius.component.chip,
+  };
+}
+
+function getVariantStyle(variant: ButtonVariant, t: Theme): UniversalStyle {
   switch (variant) {
     case "primary":
       return {
         backgroundColor: t.recipes.primaryCta.backgroundColor,
         borderColor: t.recipes.primaryCta.borderColor,
-        ...t.shadows.sm,
+        borderWidth: 1,
       };
     case "surface":
       return {
         backgroundColor: t.colors.surface.elevated,
         borderColor: t.colors.border.default,
-        ...t.shadows.xs,
+        borderWidth: 1,
       };
     case "outline":
       return {
@@ -153,17 +125,17 @@ function getVariantContainer(variant: ButtonVariant, t: Theme): ViewStyle {
         borderWidth: 1.5,
       };
     case "ghost":
-      return { backgroundColor: "transparent", borderColor: "transparent" };
+      return { backgroundColor: "transparent", borderColor: "transparent", borderWidth: 0 };
     case "danger":
       return {
         backgroundColor: t.colors.action.danger,
         borderColor: t.colors.state.dangerBorder,
-        ...t.shadows.sm,
+        borderWidth: 1,
       };
   }
 }
 
-function getVariantLabel(variant: ButtonVariant, t: Theme): TextStyle {
+function getLabelStyle(variant: ButtonVariant, t: Theme): TextStyle {
   switch (variant) {
     case "primary":
       return { color: t.recipes.primaryCta.textColor };
@@ -193,30 +165,38 @@ function getIndicatorColor(variant: ButtonVariant, t: Theme): string {
   }
 }
 
-function getSizeContainer(size: ButtonSize, t: Theme): ViewStyle {
+function getSizeStyle(size: ButtonSize, t: Theme): UniversalStyle {
   switch (size) {
     case "sm":
       return {
         paddingVertical: t.spacing.component.chipY,
         paddingHorizontal: t.spacing.component.chipX,
-        gap: t.spacing.component.gapSm,
       };
     case "md":
       return {
         paddingVertical: t.spacing.scale.sm + 2,
         paddingHorizontal: t.spacing.scale.lg,
-        gap: t.spacing.component.gapSm,
       };
     case "lg":
       return {
         paddingVertical: t.spacing.scale.md,
         paddingHorizontal: t.spacing.scale.xl,
-        gap: t.spacing.component.gapMd,
       };
   }
 }
 
-function getSizeLabel(size: ButtonSize, t: Theme): TextStyle {
+function getGapStyle(size: ButtonSize, t: Theme): ViewStyle {
+  switch (size) {
+    case "sm":
+      return { gap: t.spacing.component.gapSm };
+    case "md":
+      return { gap: t.spacing.component.gapSm };
+    case "lg":
+      return { gap: t.spacing.component.gapMd };
+  }
+}
+
+function getSizeLabelStyle(size: ButtonSize, t: Theme): TextStyle {
   switch (size) {
     case "sm":
       return t.typography.bodySm as TextStyle;
