@@ -1,5 +1,11 @@
-import { Pressable, Text, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { SegmentedControl as NativeSegmentedControl } from "@expo/ui/community/segmented-control";
+import { View, type ViewStyle } from "react-native";
+import { useUnistyles } from "react-native-unistyles";
+
+const base = {
+  container: { width: "100%" } as ViewStyle,
+  control: { width: "100%" } as ViewStyle,
+};
 
 export interface SegmentedControlOption<T extends string> {
   value: T;
@@ -17,52 +23,29 @@ export function SegmentedControl<T extends string>({
   options,
   value,
   onChange,
+  ariaLabel,
 }: SegmentedControlProps<T>) {
+  const { theme } = useUnistyles();
+  const selectedIndex = options.findIndex((opt) => opt.value === value);
+
   return (
-    <View style={styles.container}>
-      {options.map((opt) => {
-        const isActive = opt.value === value;
-        return (
-          <Pressable
-            key={opt.value}
-            onPress={() => onChange(opt.value)}
-            style={[styles.segment, isActive && styles.activeSegment]}
-            accessibilityRole="button"
-            accessibilityState={{ selected: isActive }}
-          >
-            <Text style={[styles.label, isActive && styles.activeLabel]}>{opt.label}</Text>
-          </Pressable>
-        );
-      })}
+    // NativeSegmentedControl wraps itself in its own @expo/ui Host internally —
+    // nesting another Host around it breaks touch dispatch, so this is a plain
+    // RN View purely for the accessibility label, not a second native boundary.
+    // NativeSegmentedControl's internal Host only matches content *height*
+    // (`matchContents: { vertical: true }`), so width comes entirely from
+    // external layout — without an explicit width here it collapses to ~0.
+    <View accessible accessibilityLabel={ariaLabel} style={base.container}>
+      <NativeSegmentedControl
+        values={options.map((opt) => opt.label)}
+        selectedIndex={selectedIndex === -1 ? undefined : selectedIndex}
+        onChange={(event) => {
+          const opt = options[event.nativeEvent.selectedSegmentIndex];
+          if (opt) onChange(opt.value);
+        }}
+        tintColor={theme.colors.action.primary}
+        style={base.control}
+      />
     </View>
   );
 }
-
-const styles = StyleSheet.create((theme) => ({
-  container: {
-    flexDirection: "row",
-    backgroundColor: theme.colors.surface.subtle,
-    borderRadius: theme.radius.scale.sm,
-    padding: theme.spacing.scale.xs,
-    alignSelf: "flex-start",
-  },
-  segment: {
-    paddingVertical: theme.spacing.scale.xs,
-    paddingHorizontal: theme.spacing.scale.md,
-    borderRadius: theme.radius.scale.xs,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  activeSegment: {
-    backgroundColor: theme.colors.surface.default,
-    ...theme.shadows.sm,
-  },
-  label: {
-    ...theme.typography.caption,
-    color: theme.colors.content.muted,
-  },
-  activeLabel: {
-    color: theme.colors.content.strong,
-    fontWeight: "600",
-  },
-}));

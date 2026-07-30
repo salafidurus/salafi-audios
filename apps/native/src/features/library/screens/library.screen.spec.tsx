@@ -8,6 +8,14 @@ import { useAuth } from "@/core/auth/use-auth";
 
 import { LibraryScreen } from "./library.screen";
 
+const mockMarkCompleted = jest.fn();
+
+jest.mock("@sd/domain-audio", () => ({
+  useProgressStore: jest.fn((selector: (state: unknown) => unknown) =>
+    selector({ actions: { markCompleted: mockMarkCompleted } }),
+  ),
+}));
+
 jest.mock("react-native-safe-area-context", () => ({
   useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
   SafeAreaView: ({ children }: { children: React.ReactNode }) => {
@@ -106,5 +114,36 @@ describe("LibraryScreen", () => {
     await fireEvent.press(screen.getByText("Library Lecture"));
 
     expect(onNavigateToListing).toHaveBeenCalledWith("library-lecture");
+  });
+
+  it("marks a lecture as completed via the row's long-press action", async () => {
+    mockedUseAuth.mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      user: undefined,
+    });
+    mockedUseLibraryProgressScreen.mockReturnValue(
+      buildLibraryState([
+        {
+          id: "item-1",
+          listingId: "lecture-1",
+          listingTitle: "Library Lecture",
+          listingSlug: "library-lecture",
+          scholarId: "scholar-1",
+          scholarSlug: "ibn-baz",
+          scholarName: "Ibn Baz",
+          seriesTitle: "Series",
+          durationSeconds: 1800,
+          progressSeconds: 600,
+          savedAt: undefined,
+          completedAt: undefined,
+        },
+      ]),
+    );
+
+    await render(<LibraryScreen />);
+    await fireEvent.press(screen.getByTestId("library-progress-row-item-1-action-complete"));
+
+    expect(mockMarkCompleted).toHaveBeenCalledWith("lecture-1");
   });
 });

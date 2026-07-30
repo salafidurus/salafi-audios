@@ -53,26 +53,36 @@ describe("LanguageSwitch", () => {
     });
   });
 
-  it("shows the active locale and reveals the others when opened", async () => {
+  it("shows the active locale as the menu trigger", async () => {
     await render(<LanguageSwitch />);
 
-    // Closed: only the active locale label is shown.
-    expect(screen.getByText("English")).toBeTruthy();
-    expect(screen.queryByText("العربية")).toBeNull();
-
-    // Open the menu.
-    await fireEvent.press(screen.getByText("English"));
-
-    expect(screen.getByText("العربية")).toBeTruthy();
+    expect(screen.getAllByText("English").length).toBeGreaterThan(0);
   });
 
-  it("changes locale when a locale option is pressed", async () => {
+  it("marks the active locale's menu action as selected, and others as not", async () => {
     await render(<LanguageSwitch />);
 
-    // Open the menu, then pick the Arabic option.
-    await fireEvent.press(screen.getByText("English"));
-    await fireEvent.press(screen.getByText("العربية"));
+    expect(screen.getByTestId("language-switch-menu-action-en").props.accessibilityState).toEqual(
+      expect.objectContaining({ checked: true }),
+    );
+    expect(screen.getByTestId("language-switch-menu-action-ar").props.accessibilityState).toEqual(
+      expect.objectContaining({ checked: false }),
+    );
+  });
+
+  it("changes locale when the other locale's menu action is pressed", async () => {
+    await render(<LanguageSwitch />);
+
+    await fireEvent.press(screen.getByTestId("language-switch-menu-action-ar"));
 
     await waitFor(() => expect(changeLocale).toHaveBeenCalledWith("ar"));
+  });
+
+  it("does not call changeLocale when the already-active locale is pressed", async () => {
+    await render(<LanguageSwitch />);
+
+    await fireEvent.press(screen.getByTestId("language-switch-menu-action-en"));
+
+    expect(changeLocale).not.toHaveBeenCalled();
   });
 });

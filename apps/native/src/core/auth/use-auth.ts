@@ -1,7 +1,13 @@
 import { authClient } from "./auth-client";
 
 export function useAuth() {
-  const { data: session, isPending } = authClient.useSession();
+  const { data: session, isPending, error } = authClient.useSession();
+
+  console.log("[DEBUG useAuth]", {
+    hasSession: !!session,
+    isPending,
+    error: error?.message,
+  });
 
   return {
     isAuthenticated: !!session,

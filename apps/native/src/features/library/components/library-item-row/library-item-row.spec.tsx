@@ -129,4 +129,26 @@ describe("LibraryItemRow", () => {
     await fireEvent.press(screen.getByText("The Book of Tawheed").parent!);
     expect(onPress).toHaveBeenCalled();
   });
+
+  it("opens a long-press menu and reports the pressed action when actions are provided", async () => {
+    const onAction = jest.fn();
+    await render(
+      <LibraryItemRow
+        item={baseItem}
+        variant="saved"
+        testID="library-item-row-item-1"
+        actions={[{ id: "remove", title: "Remove from Saved" }]}
+        onAction={onAction}
+      />,
+    );
+
+    await fireEvent.press(screen.getByTestId("library-item-row-item-1-action-remove"));
+
+    expect(onAction).toHaveBeenCalledWith("remove");
+  });
+
+  it("renders no menu wiring when actions are not provided", async () => {
+    await render(<LibraryItemRow item={baseItem} variant="saved" />);
+    expect(screen.queryByTestId(/-action-/)).toBeNull();
+  });
 });

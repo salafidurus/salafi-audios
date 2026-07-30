@@ -229,6 +229,8 @@
     "percentListened": "{{percent}}% listened",
     "savedOn": "Saved {{date}}",
     "completedOn": "Completed {{date}}",
+    "removeFromSaved": "Remove from Saved",
+    "markAsCompleted": "Mark as Completed",
     "authProgressTitle": "Sign in to view your progress",
     "authProgressDesc": "Start listening to lectures and track your progress",
     "authSavedTitle": "Sign in to view saved lectures",

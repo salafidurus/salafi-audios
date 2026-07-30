@@ -1,55 +1,18 @@
-import type { ReactNode } from "react";
-
-import React from "react";
-import { View, type ViewStyle, type StyleProp } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import type { MenuAction } from "@expo/ui/community/menu";
 
 export type ListItemActionsProps = {
-  /** Action buttons or interactive elements */
-  children?: ReactNode;
-  /** Controls layout direction: 'horizontal' (side-by-side, default) or 'vertical' (stacked) */
-  orientation?: "horizontal" | "vertical";
-  /** Whether action items should share available space equally (default: true) */
-  equalWidth?: boolean;
-  /** Custom container style */
-  style?: StyleProp<ViewStyle>;
+  /** Actions shown in the native menu opened by long-pressing the row. */
+  actions: MenuAction[];
+  /** Called with the pressed action's `id` (falling back to its `title`). */
+  onAction: (id: string) => void;
 };
 
-export function ListItemActions({
-  children,
-  orientation = "horizontal",
-  equalWidth = true,
-  style,
-}: ListItemActionsProps) {
-  const isHorizontal = orientation === "horizontal";
-
-  return (
-    <View style={[styles.actions, isHorizontal ? styles.horizontal : styles.vertical, style]}>
-      {isHorizontal && equalWidth
-        ? React.Children.map(children, (child) =>
-            child ? <View style={styles.actionFlexItem}>{child}</View> : null,
-          )
-        : children}
-    </View>
-  );
+/**
+ * Data-only marker rendered as a child of `List.Item` (mirrors `@expo/ui`'s own
+ * `Picker.Item` pattern). Renders nothing itself — `ListItem` reads its
+ * `actions`/`onAction` and uses them to wrap the row in a native long-press
+ * menu (SwiftUI `ContextMenu`, Compose `DropdownMenu`).
+ */
+export function ListItemActions(_props: ListItemActionsProps) {
+  return null;
 }
-
-const styles = StyleSheet.create((theme) => ({
-  actions: {
-    gap: theme.spacing.scale.xs,
-    marginTop: theme.spacing.scale.xs,
-    width: "100%",
-  },
-  vertical: {
-    flexDirection: "column",
-    width: "100%",
-  },
-  horizontal: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "100%",
-  },
-  actionFlexItem: {
-    flex: 1,
-  },
-}));

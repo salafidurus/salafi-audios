@@ -10,6 +10,8 @@ export interface SettingsRowProps {
   sublabel?: string;
   children?: ReactNode;
   fullWidth?: boolean;
+  /** Renders the control in its own full-width row below the label, for controls too wide to fit inline. */
+  stacked?: boolean;
   onPress?: () => void;
   hideBorder?: boolean;
 }
@@ -19,27 +21,37 @@ export function SettingsRow({
   sublabel,
   children,
   fullWidth = false,
+  stacked = false,
   onPress,
   hideBorder = false,
 }: SettingsRowProps) {
   const isClickable = Boolean(onPress);
 
+  const labelGroup = (
+    <View style={styles.labelGroup}>
+      {label && (
+        <AppText variant="bodyMd" style={styles.label}>
+          {label}
+        </AppText>
+      )}
+      {sublabel && (
+        <AppText variant="caption" style={styles.sublabel}>
+          {sublabel}
+        </AppText>
+      )}
+    </View>
+  );
+
   const content = fullWidth ? (
     <View style={styles.fullWidthContent}>{children}</View>
+  ) : stacked ? (
+    <View style={styles.stackedContent} testID="settings-row-stacked-content">
+      {labelGroup}
+      {children && <View style={styles.stackedControl}>{children}</View>}
+    </View>
   ) : (
     <>
-      <View style={styles.labelGroup}>
-        {label && (
-          <AppText variant="bodyMd" style={styles.label}>
-            {label}
-          </AppText>
-        )}
-        {sublabel && (
-          <AppText variant="caption" style={styles.sublabel}>
-            {sublabel}
-          </AppText>
-        )}
-      </View>
+      {labelGroup}
       {children && <View style={styles.control}>{children}</View>}
     </>
   );
@@ -96,5 +108,13 @@ const styles = StyleSheet.create((theme) => ({
   control: {
     justifyContent: "center",
     alignItems: "center",
+  },
+  stackedContent: {
+    width: "100%",
+    gap: theme.spacing.scale.sm,
+  },
+  stackedControl: {
+    alignItems: "flex-start",
+    width: "100%",
   },
 }));

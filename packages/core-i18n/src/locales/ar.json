@@ -229,6 +229,8 @@
     "percentListened": "{{percent}}٪ تم الاستماع",
     "savedOn": "حُفظت في {{date}}",
     "completedOn": "اكتملت في {{date}}",
+    "removeFromSaved": "إزالة من المحفوظات",
+    "markAsCompleted": "وضع علامة كمكتملة",
     "authProgressTitle": "سجل الدخول لعرض تقدمك",
     "authProgressDesc": "ابدأ الاستماع إلى المحاضرات ومتابعة تقدمك",
     "authSavedTitle": "سجل الدخول لعرض المحاضرات المحفوظة",

@@ -28,7 +28,7 @@ export function RouteAccessGuard({ children }: { children: ReactNode }) {
   }
 
   if (resolveRouteAccess(pathname) === "auth-required" && !isAuthenticated) {
-    return <Redirect href={routes.signIn} />;
+    return <Redirect href={{ pathname: routes.signIn, params: { from: pathname } }} />;
   }
 
   return <>{children}</>;
