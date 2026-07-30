@@ -1,5 +1,5 @@
-import React, { useCallback } from "react";
-import { FlatList, Pressable, Text, type ListRenderItem } from "react-native";
+import React from "react";
+import { Pressable, ScrollView, Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 export type SubrouteTabItem = {
@@ -14,34 +14,32 @@ export type SubrouteTabsProps = {
 };
 
 export function SubrouteTabs({ tabs, activeTabId }: SubrouteTabsProps) {
-  const renderTab: ListRenderItem<SubrouteTabItem> = useCallback(
-    ({ item: tab }) => {
-      const isActive = tab.id === activeTabId;
-      return (
-        <Pressable onPress={tab.onPress} style={[styles.tab, isActive && styles.tabActive]}>
-          <Text
-            numberOfLines={1}
-            ellipsizeMode="tail"
-            style={[styles.label, isActive && styles.labelActive]}
-          >
-            {tab.label}
-          </Text>
-        </Pressable>
-      );
-    },
-    [activeTabId],
-  );
-
   return (
-    <FlatList
+    <ScrollView
       horizontal
-      data={tabs}
-      keyExtractor={(item) => item.id}
-      renderItem={renderTab}
       showsHorizontalScrollIndicator={false}
       style={styles.container}
       contentContainerStyle={styles.scrollContent}
-    />
+    >
+      {tabs.map((tab) => {
+        const isActive = tab.id === activeTabId;
+        return (
+          <Pressable
+            key={tab.id}
+            onPress={tab.onPress}
+            style={[styles.tab, isActive && styles.tabActive]}
+          >
+            <Text
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              style={[styles.label, isActive && styles.labelActive]}
+            >
+              {tab.label}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </ScrollView>
   );
 }
 

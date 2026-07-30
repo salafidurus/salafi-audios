@@ -1,12 +1,12 @@
 import { getSubnavLabel } from "@sd/core-i18n";
 import { type Href, usePathname, useRouter } from "expo-router";
-import React, { useCallback } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
-import { FlatList, Pressable, Text, View, type ListRenderItem } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { EaseView } from "react-native-ease";
 import { StyleSheet } from "react-native-unistyles";
 
-import { SECTION_TABS, type Section, type TabConfig } from "@/features/navigation/types";
+import { SECTION_TABS, type Section } from "@/features/navigation/types";
 import { getSectionTabIcon } from "@/features/navigation/utils/section-tab-icons";
 import {
   buildSectionPath,
@@ -20,64 +20,63 @@ export function HeaderSubrouteTabs() {
   const { t } = useTranslation();
 
   const activeRootTab = getRootTabFromPathname(pathname);
-  const section = activeRootTab as Section;
-  const tabs = SECTION_TABS[section];
-  const activeSubsection = getActiveSubsection(pathname, section);
-
-  const renderTab: ListRenderItem<TabConfig> = useCallback(
-    ({ item: tab }) => {
-      const isActive = tab.id === activeSubsection;
-      const href = buildSectionPath(section, tab.id);
-      const Icon = getSectionTabIcon(section, tab.id);
-
-      return (
-        <Pressable
-          onPress={() => router.replace(href as Href)}
-          accessibilityRole="button"
-          accessibilityState={{ selected: isActive }}
-          style={styles.tabPressable}
-        >
-          <EaseView
-            animate={{ scale: isActive ? 1 : 0.98, opacity: isActive ? 1 : 0.82 }}
-            transition={{ type: "spring", damping: 12, stiffness: 150 }}
-          >
-            <View style={[styles.tab, isActive && styles.tabActive]}>
-              {Icon ? (
-                <Icon
-                  size={14}
-                  strokeWidth={1.8}
-                  color={isActive ? styles.labelActive.color : styles.label.color}
-                />
-              ) : null}
-              <Text
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                style={[styles.label, isActive && styles.labelActive]}
-              >
-                {getSubnavLabel(section, tab.id, t)}
-              </Text>
-            </View>
-          </EaseView>
-        </Pressable>
-      );
-    },
-    [activeSubsection, router, section, t],
-  );
-
-  if (activeRootTab === "search" || !tabs || tabs.length === 0) {
+  if (activeRootTab === "search") {
     return null;
   }
 
+  const section = activeRootTab as Section;
+  const tabs = SECTION_TABS[section];
+  if (!tabs || tabs.length === 0) {
+    return null;
+  }
+
+  const activeSubsection = getActiveSubsection(pathname, section);
+
   return (
-    <FlatList
+    <ScrollView
       horizontal
-      data={tabs}
-      keyExtractor={(item) => item.id}
-      renderItem={renderTab}
       showsHorizontalScrollIndicator={false}
       style={styles.container}
       contentContainerStyle={styles.scrollContent}
-    />
+    >
+      {tabs.map((tab) => {
+        const isActive = tab.id === activeSubsection;
+        const href = buildSectionPath(section, tab.id);
+        const Icon = getSectionTabIcon(section, tab.id);
+
+        return (
+          <Pressable
+            key={tab.id}
+            onPress={() => router.replace(href as Href)}
+            accessibilityRole="button"
+            accessibilityState={{ selected: isActive }}
+            style={styles.tabPressable}
+          >
+            <EaseView
+              animate={{ scale: isActive ? 1 : 0.98, opacity: isActive ? 1 : 0.82 }}
+              transition={{ type: "spring", damping: 12, stiffness: 150 }}
+            >
+              <View style={[styles.tab, isActive && styles.tabActive]}>
+                {Icon ? (
+                  <Icon
+                    size={14}
+                    strokeWidth={1.8}
+                    color={isActive ? styles.labelActive.color : styles.label.color}
+                  />
+                ) : null}
+                <Text
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  style={[styles.label, isActive && styles.labelActive]}
+                >
+                  {getSubnavLabel(section, tab.id, t)}
+                </Text>
+              </View>
+            </EaseView>
+          </Pressable>
+        );
+      })}
+    </ScrollView>
   );
 }
 
