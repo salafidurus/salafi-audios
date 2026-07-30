@@ -8,6 +8,7 @@ export default function ContentLayout() {
     <Stack
       screenOptions={{
         headerShown: true,
+        presentation: "formSheet",
         headerBackVisible: true,
         headerStyle: {
           backgroundColor: theme.colors.surface.default,

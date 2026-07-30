@@ -5,12 +5,14 @@ import { useUnistyles } from "react-native-unistyles";
 
 import { RouteAccessGuard, useAuth } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 import { BottomAccessoryInnerContent } from "@/features/navigation";
 
 const AdminTabTrigger = memo(function AdminTabTrigger() {
   const { user } = useAuth();
   const { t } = useTranslation();
-  const isAdmin = (user as any)?.role === "admin";
+  const { hasAnyPermission } = useAdminPermissions();
+  const isAdmin = (user as any)?.role === "admin" || hasAnyPermission;
 
   return (
     <NativeTabs.Trigger name="admin" hidden={!isAdmin}>

@@ -1,4 +1,4 @@
-import { Pressable, Text, View } from "react-native";
+import { Pressable, ScrollView, Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 export type SubrouteTabItem = {
@@ -14,7 +14,12 @@ export type SubrouteTabsProps = {
 
 export function SubrouteTabs({ tabs, activeTabId }: SubrouteTabsProps) {
   return (
-    <View style={styles.container}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={styles.container}
+      contentContainerStyle={styles.scrollContent}
+    >
       {tabs.map((tab) => {
         const isActive = tab.id === activeTabId;
         return (
@@ -23,20 +28,23 @@ export function SubrouteTabs({ tabs, activeTabId }: SubrouteTabsProps) {
             onPress={tab.onPress}
             style={[styles.tab, isActive && styles.tabActive]}
           >
-            <Text style={[styles.label, isActive && styles.labelActive]}>{tab.label}</Text>
+            <Text
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              style={[styles.label, isActive && styles.labelActive]}
+            >
+              {tab.label}
+            </Text>
           </Pressable>
         );
       })}
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
   container: {
-    flexDirection: "row",
-    alignItems: "center",
     backgroundColor: theme.colors.surface.default,
-    padding: 4,
     borderRadius: theme.radius.component.chip || 20,
     borderWidth: 1,
     borderColor: theme.colors.border.subtle,
@@ -44,7 +52,17 @@ const styles = StyleSheet.create((theme) => ({
     marginVertical: theme.spacing.scale.xs,
     alignSelf: "center",
   },
+  scrollContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexGrow: 1,
+    padding: 4,
+    gap: 4,
+  },
   tab: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
     paddingHorizontal: theme.spacing.scale.md || 16,
     paddingVertical: theme.spacing.scale.xs || 8,
     borderRadius: theme.radius.component.chip || 18,

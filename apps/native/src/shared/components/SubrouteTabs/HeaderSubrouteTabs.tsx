@@ -1,7 +1,7 @@
 import { getSubnavLabel } from "@sd/core-i18n";
 import { type Href, usePathname, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { EaseView } from "react-native-ease";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -32,7 +32,12 @@ export function HeaderSubrouteTabs() {
   const activeSubsection = getActiveSubsection(pathname, section);
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={styles.container}
+      contentContainerStyle={styles.scrollContent}
+    >
       {tabs.map((tab) => {
         const isActive = tab.id === activeSubsection;
         const href = buildSectionPath(section, tab.id);
@@ -58,7 +63,11 @@ export function HeaderSubrouteTabs() {
                     color={isActive ? styles.labelActive.color : styles.label.color}
                   />
                 ) : null}
-                <Text style={[styles.label, isActive && styles.labelActive]}>
+                <Text
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                  style={[styles.label, isActive && styles.labelActive]}
+                >
                   {getSubnavLabel(section, tab.id, t)}
                 </Text>
               </View>
@@ -66,16 +75,13 @@ export function HeaderSubrouteTabs() {
           </Pressable>
         );
       })}
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
   container: {
-    flexDirection: "row",
-    alignItems: "center",
     backgroundColor: theme.colors.surface.default,
-    padding: 4,
     borderRadius: theme.radius.component.chip || 20,
     borderWidth: 1,
     borderColor: theme.colors.border.subtle,
@@ -87,6 +93,13 @@ const styles = StyleSheet.create((theme) => ({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 2,
+  },
+  scrollContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexGrow: 1,
+    padding: 4,
+    gap: 4,
   },
   tabPressable: {
     flex: 1,

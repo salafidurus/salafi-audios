@@ -32,7 +32,7 @@ export function SignInScreen({
             style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}
             onPress={onBack}
           >
-            <Text style={styles.backButtonText}>{t("common.back")}</Text>
+            <Text style={styles.backButtonText}>{t("common.back", "Back")}</Text>
           </Pressable>
         ) : null}
 
@@ -47,8 +47,8 @@ export function SignInScreen({
             radialCenterColor={heroRecipe.radial.centerColor}
             radialEdgeColor={heroRecipe.radial.edgeColor}
           />
-          <Text style={styles.kicker}>{t("auth.signIn.kicker")}</Text>
-          <Text style={styles.title}>{t("auth.signIn.title")}</Text>
+          <Text style={styles.kicker}>{t("auth.signIn.kicker", "Welcome Back")}</Text>
+          <Text style={styles.title}>{t("auth.signIn.title", "Sign In")}</Text>
         </View>
 
         {Platform.OS === "ios" && (
@@ -73,7 +73,7 @@ export function SignInScreen({
           style={({ pressed }) => [styles.googleBtn, pressed && styles.googleBtnPressed]}
           onPress={onSignInWithGoogle}
           accessibilityRole="button"
-          accessibilityLabel="Continue with Google"
+          accessibilityLabel={t("auth.signIn.continueWithGoogle", "Continue with Google")}
         >
           <View style={styles.googleBtnContent}>
             <View style={styles.googleIconContainer}>
@@ -97,7 +97,9 @@ export function SignInScreen({
                 <Path fill="none" d="M0 0h48v48H0z" />
               </Svg>
             </View>
-            <Text style={styles.googleBtnText}>Continue with Google</Text>
+            <Text style={styles.googleBtnText}>
+              {t("auth.signIn.continueWithGoogle", "Continue with Google")}
+            </Text>
           </View>
         </Pressable>
       </View>

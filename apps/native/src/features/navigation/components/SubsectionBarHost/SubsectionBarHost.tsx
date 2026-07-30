@@ -1,7 +1,7 @@
 import { getSubnavLabel } from "@sd/core-i18n";
 import { type Href, usePathname, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { EaseView } from "react-native-ease";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -32,7 +32,12 @@ export function SubsectionBarHost() {
 
   return (
     <View pointerEvents="box-none" style={styles.wrapper}>
-      <View style={styles.bar}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.bar}
+        contentContainerStyle={styles.scrollContent}
+      >
         {tabs.map((tab) => {
           const isActive = tab.id === activeSubsection;
           const href = buildSectionPath(section, tab.id);
@@ -58,7 +63,11 @@ export function SubsectionBarHost() {
                       color={isActive ? styles.labelActive.color : styles.label.color}
                     />
                   ) : null}
-                  <Text style={[styles.label, isActive && styles.labelActive]}>
+                  <Text
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    style={[styles.label, isActive && styles.labelActive]}
+                  >
                     {getSubnavLabel(section, tab.id, t)}
                   </Text>
                 </View>
@@ -66,7 +75,7 @@ export function SubsectionBarHost() {
             </Pressable>
           );
         })}
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -80,17 +89,20 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing.layout.pageX,
   },
   bar: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.scale.xs,
     minHeight: SUBSECTION_BAR_HEIGHT,
-    paddingHorizontal: theme.spacing.scale.xs,
-    paddingVertical: theme.spacing.scale.xs,
     borderRadius: theme.radius.component.panel,
     backgroundColor: theme.colors.surface.elevated,
     borderWidth: 1,
     borderColor: theme.colors.border.subtle,
     ...theme.shadows.lg,
+  },
+  scrollContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexGrow: 1,
+    gap: theme.spacing.scale.xs,
+    paddingHorizontal: theme.spacing.scale.xs,
+    paddingVertical: theme.spacing.scale.xs,
   },
   itemPressable: {
     flex: 1,
