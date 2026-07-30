@@ -1,5 +1,6 @@
-import { Switch, Text, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { Host, Switch } from "@expo/ui";
+import { Text, View } from "react-native";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import {
@@ -11,6 +12,7 @@ import {
  * collections) between the selected language and its original language. */
 export function ContentLanguageToggle() {
   const { t } = useTranslation();
+  const { theme } = useUnistyles();
   const showOriginal = useShowOriginalContent();
 
   return (
@@ -18,7 +20,13 @@ export function ContentLanguageToggle() {
       <Text style={styles.label}>
         {t("account.showOriginalContent", "Show content in its original language")}
       </Text>
-      <Switch value={showOriginal} onValueChange={setShowOriginalContent} />
+      <Host matchContents seedColor={theme.colors.action.primary}>
+        <Switch
+          value={showOriginal}
+          onValueChange={setShowOriginalContent}
+          testID="content-language-toggle-switch"
+        />
+      </Host>
     </View>
   );
 }

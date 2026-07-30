@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { Switch } from "react-native";
+import { Host, Switch } from "@expo/ui";
 import { useUnistyles } from "react-native-unistyles";
 
 export interface ToggleProps {
@@ -10,19 +10,17 @@ export interface ToggleProps {
   "aria-label"?: string;
 }
 
-export function Toggle({ checked, onChange, disabled = false }: ToggleProps): ReactNode {
+export function Toggle({
+  checked,
+  onChange,
+  disabled = false,
+  "aria-label": ariaLabel,
+}: ToggleProps): ReactNode {
   const { theme } = useUnistyles();
 
   return (
-    <Switch
-      value={checked}
-      onValueChange={onChange}
-      disabled={disabled}
-      trackColor={{
-        false: theme.colors.surface.hover,
-        true: theme.colors.action.primary,
-      }}
-      thumbColor={theme.colors.surface.default}
-    />
+    <Host matchContents seedColor={theme.colors.action.primary} accessibilityLabel={ariaLabel}>
+      <Switch value={checked} onValueChange={onChange} disabled={disabled} testID="toggle-switch" />
+    </Host>
   );
 }
