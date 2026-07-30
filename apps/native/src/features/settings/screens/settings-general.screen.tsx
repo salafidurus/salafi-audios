@@ -84,6 +84,7 @@ export function SettingsGeneralScreen() {
         <SettingsRow
           label={t("settings.general.theme", "Theme")}
           sublabel={t("settings.general.themeDesc", "System follows your OS preference")}
+          stacked
         >
           <SegmentedControl
             options={themeOptions}
