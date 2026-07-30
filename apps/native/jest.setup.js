@@ -242,6 +242,112 @@ jest.mock("@expo/ui/community/menu", () => {
   return { MenuView, default: MenuView };
 });
 
+// Platform-specific Button (Button.ios.tsx / Button.android.tsx) import the
+// raw swift-ui / jetpack-compose modules directly, not the universal @expo/ui
+// entry point mocked above — each needs its own mock. jest-expo resolves
+// extensionless imports to `.ios.tsx` by default, so in practice only the
+// swift-ui mocks below are exercised by the current test suite; the
+// jetpack-compose ones are kept for parity/future-proofing.
+jest.mock("@expo/ui/swift-ui", () => {
+  const React = require("react");
+  const { Pressable, Text, View } = require("react-native");
+
+  function Button({ children, onPress, modifiers = [], testID }) {
+    const isDisabled = modifiers.some((m) => m.$type === "disabled" && m.value !== false);
+    return React.createElement(
+      Pressable,
+      {
+        onPress,
+        disabled: isDisabled,
+        testID,
+        accessibilityRole: "button",
+        accessibilityState: { disabled: isDisabled },
+      },
+      children,
+    );
+  }
+
+  function HStack({ children, spacing }) {
+    return React.createElement(
+      View,
+      { style: { flexDirection: "row", alignItems: "center", gap: spacing } },
+      children,
+    );
+  }
+
+  function SwiftUIText({ children }) {
+    return React.createElement(Text, null, children);
+  }
+
+  return { Button, HStack, Text: SwiftUIText };
+});
+
+jest.mock("@expo/ui/swift-ui/modifiers", () => ({
+  background: (color) => ({ $type: "background", color }),
+  border: (params) => ({ $type: "border", ...params }),
+  buttonStyle: (style) => ({ $type: "buttonStyle", style }),
+  clipShape: (shape, cornerRadius) => ({ $type: "clipShape", shape, cornerRadius }),
+  disabled: (value = true) => ({ $type: "disabled", value }),
+  font: (params) => ({ $type: "font", ...params }),
+  foregroundStyle: (style) => ({ $type: "foregroundStyle", style }),
+  frame: (params) => ({ $type: "frame", ...params }),
+  opacity: (value) => ({ $type: "opacity", value }),
+  padding: (params) => ({ $type: "padding", ...params }),
+}));
+
+jest.mock("@expo/ui/jetpack-compose", () => {
+  const React = require("react");
+  const { Pressable, Text, View } = require("react-native");
+
+  function makeComposeButton() {
+    return function ComposeButton({ children, onClick, enabled = true, modifiers = [] }) {
+      const isDisabled = !enabled;
+      const testIdMod = modifiers.find((m) => m.$type === "testID");
+      return React.createElement(
+        Pressable,
+        {
+          onPress: onClick,
+          disabled: isDisabled,
+          testID: testIdMod?.tag,
+          accessibilityRole: "button",
+          accessibilityState: { disabled: isDisabled },
+        },
+        children,
+      );
+    };
+  }
+
+  function ComposeText({ children, color, style }) {
+    return React.createElement(Text, { style: { color, ...style } }, children);
+  }
+
+  function Spacer() {
+    return React.createElement(View, null);
+  }
+
+  return {
+    Button: makeComposeButton(),
+    OutlinedButton: makeComposeButton(),
+    TextButton: makeComposeButton(),
+    FilledTonalButton: makeComposeButton(),
+    ElevatedButton: makeComposeButton(),
+    Text: ComposeText,
+    Spacer,
+  };
+});
+
+jest.mock("@expo/ui/jetpack-compose/modifiers", () => ({
+  alpha: (value) => ({ $type: "alpha", value }),
+  background: (color) => ({ $type: "background", color }),
+  border: (width, color) => ({ $type: "border", width, color }),
+  clip: (shape) => ({ $type: "clip", shape }),
+  height: (value) => ({ $type: "height", value }),
+  padding: (start, top, end, bottom) => ({ $type: "padding", start, top, end, bottom }),
+  Shapes: { RoundedCorner: (radius) => ({ type: "roundedCorner", radius }) },
+  testID: (tag) => ({ $type: "testID", tag }),
+  width: (value) => ({ $type: "width", value }),
+}));
+
 jest.mock("react-native-reanimated", () => {
   const { View, Text, Image, ScrollView } = require("react-native");
 
