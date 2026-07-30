@@ -3,8 +3,7 @@ import * as SecureStore from "expo-secure-store";
 import { useState, useCallback } from "react";
 
 import { authClient } from "@/core/auth";
-
-const API_URL = process.env.EXPO_PUBLIC_API_URL;
+import { getApiBaseUrl } from "@/core/config/runtime-env";
 
 export function useNativeAppleSignIn() {
   const [isLoading, setIsLoading] = useState(false);
@@ -38,7 +37,7 @@ export function useNativeAppleSignIn() {
         throw new Error("No identity token returned from Apple");
       }
 
-      const response = await fetch(`${API_URL}/api/auth/apple/native`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/auth/apple/native`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

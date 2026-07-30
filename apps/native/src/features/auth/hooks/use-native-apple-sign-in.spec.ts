@@ -16,6 +16,10 @@ jest.mock("@/core/auth", () => ({
   },
 }));
 
+jest.mock("@/core/config/runtime-env", () => ({
+  getApiBaseUrl: jest.fn(() => "http://10.0.2.2:4000"),
+}));
+
 describe("useNativeAppleSignIn", () => {
   beforeEach(() => {
     global.fetch = jest.fn() as unknown as typeof fetch;
@@ -77,5 +81,36 @@ describe("useNativeAppleSignIn", () => {
       method: "GET",
       headers: { Cookie: "better-auth.session_token=test-session-id" },
     });
+  });
+
+  it("posts to the runtime-resolved API base URL, not the raw env var", async () => {
+    const AppleAuth = require("expo-apple-authentication");
+    const { getApiBaseUrl } = require("@/core/config/runtime-env");
+
+    AppleAuth.isAvailableAsync.mockResolvedValue(true);
+    AppleAuth.signInAsync.mockResolvedValue({
+      identityToken: "test-token",
+      user: "test-user-id",
+    });
+
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        session: { id: "test-session-id", expiresAt: "2026-12-31T00:00:00Z" },
+      }),
+    });
+
+    const { renderHook, act } = require("@testing-library/react-native");
+    const { result } = await renderHook(() => useNativeAppleSignIn());
+
+    await act(async () => {
+      await result.current.signIn();
+    });
+
+    expect(getApiBaseUrl).toHaveBeenCalled();
+    expect(global.fetch).toHaveBeenCalledWith(
+      "http://10.0.2.2:4000/api/auth/apple/native",
+      expect.any(Object),
+    );
   });
 });

@@ -1,4 +1,5 @@
 import Constants from "expo-constants";
+import { Platform } from "react-native";
 import { z } from "zod";
 
 const NativeRuntimeExtraSchema = z.object({
@@ -72,6 +73,17 @@ export function isProduction(): boolean {
   return getRuntimeEnv()?.appEnv === "production";
 }
 
+// The Android emulator's "localhost" refers to the emulator itself, not the
+// host machine. 10.0.2.2 is QEMU's alias back to the host's loopback address.
+function rewriteLoopbackForAndroidEmulator(url: string): string {
+  return url.replace(/^(https?:\/\/)(localhost|127\.0\.0\.1)(?=[:/]|$)/, "$110.0.2.2");
+}
+
 export function getApiBaseUrl(): string | undefined {
-  return getRuntimeEnv()?.apiUrl;
+  const apiUrl = getRuntimeEnv()?.apiUrl;
+  if (!apiUrl) {
+    return apiUrl;
+  }
+
+  return __DEV__ && Platform.OS === "android" ? rewriteLoopbackForAndroidEmulator(apiUrl) : apiUrl;
 }
