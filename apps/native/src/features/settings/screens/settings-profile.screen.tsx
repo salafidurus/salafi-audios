@@ -110,6 +110,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
         <SettingsRow
           label={t("account.profile.displayName", "Display Name")}
           sublabel={t("account.profile.displayNameSublabel", "Shown across the app")}
+          stacked
         >
           <View style={styles.editableField}>
             <TextInput
