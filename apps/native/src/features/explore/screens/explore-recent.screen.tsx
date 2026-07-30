@@ -57,7 +57,7 @@ function renderFeedItem(
           <ExplorePodcastRow
             key={subItem.id}
             item={subItem}
-            onPress={() => onNavigateToListing?.(subItem.slug)}
+            onNavigateToListing={onNavigateToListing}
             hideBorder={index === item.items.length - 1}
           />
         ))}

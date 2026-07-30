@@ -10,16 +10,85 @@ jest.mock("react-native-unistyles", () => ({
       typeof styles === "function"
         ? styles({
             spacing: {
-              layout: { sectionY: 24 },
-              component: { gapLg: 16 },
+              layout: { sectionY: 24, pageX: 16, pageY: 16 },
+              component: { gapLg: 16, gapSm: 8 },
+              scale: { md: 12, sm: 8, lg: 16 },
+            },
+            colors: {
+              content: { strong: "#000", muted: "#666", onPrimary: "#fff", default: "#000" },
+              action: { primary: "#0070f3" },
+              surface: { elevated: "#eee" },
+              border: { default: "#ccc" },
+            },
+            radius: { component: { chip: 16 } },
+            shadows: { xs: {}, sm: {} },
+            recipes: {
+              primaryCta: {
+                backgroundColor: "#0070f3",
+                borderColor: "#0070f3",
+                textColor: "#fff",
+                linear: { colors: [], start: {}, end: {} },
+                radial: { center: {}, radius: 0, centerColor: "", edgeColor: "" },
+              },
             },
           })
         : styles,
   },
+  useUnistyles: () => ({
+    theme: {
+      colors: {
+        content: { strong: "#000", muted: "#666", onPrimary: "#fff", default: "#000" },
+        action: { primary: "#0070f3" },
+        surface: { elevated: "#eee" },
+        border: { default: "#ccc" },
+      },
+      radius: { component: { chip: 16 } },
+      shadows: { xs: {}, sm: {} },
+      recipes: {
+        primaryCta: {
+          backgroundColor: "#0070f3",
+          borderColor: "#0070f3",
+          textColor: "#fff",
+          linear: { colors: [], start: {}, end: {} },
+          radial: { center: {}, radius: 0, centerColor: "", edgeColor: "" },
+        },
+      },
+      spacing: {
+        scale: { sm: 8, md: 12, lg: 16 },
+        component: { gapSm: 8, chipY: 4, chipX: 8 },
+      },
+      typography: { bodySm: {}, labelMd: {}, bodyLg: {} },
+    },
+  }),
 }));
 
 jest.mock("@sd/domain-content", () => ({
   useListingDetail: jest.fn(),
+}));
+
+jest.mock("@sd/domain-audio", () => ({
+  useAudio: jest.fn(() => ({
+    isPlaying: false,
+    currentTrack: null,
+    playListing: jest.fn(),
+    pause: jest.fn(),
+    resume: jest.fn(),
+  })),
+  useProgressStore: jest.fn(() => ({
+    actions: {
+      isSaved: jest.fn(() => false),
+      addSaved: jest.fn(),
+      removeSaved: jest.fn(),
+    },
+  })),
+}));
+
+jest.mock("@/features/audio", () => ({
+  audioService: {
+    playListing: jest.fn(),
+    pause: jest.fn(),
+    resume: jest.fn(),
+  },
 }));
 
 jest.mock("@/shared/components/ScreenView/ScreenView", () => ({

@@ -1,9 +1,10 @@
 import type { ScholarChipDto } from "@sd/core-contracts";
 import type { ListRenderItemInfo } from "react-native";
 
-import { Image } from "expo-image";
 import { View, Text, Pressable, FlatList } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+
+import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
 export type ExploreScholarRowProps = {
   scholars: ScholarChipDto[];
@@ -14,15 +15,7 @@ export function ExploreScholarRow({ scholars, onScholarPress }: ExploreScholarRo
   function renderScholar({ item: scholar }: ListRenderItemInfo<ScholarChipDto>) {
     return (
       <Pressable onPress={() => onScholarPress?.(scholar.slug)} style={styles.scholar}>
-        <View style={styles.avatar}>
-          {scholar.imageUrl && (
-            <Image
-              source={{ uri: scholar.imageUrl }}
-              style={styles.avatarImage}
-              contentFit="cover"
-            />
-          )}
-        </View>
+        <UserAvatar image={scholar.imageUrl} name={scholar.name} size={48} />
         <Text numberOfLines={1} style={styles.name}>
           {scholar.name}
         </Text>

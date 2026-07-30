@@ -1,53 +1,102 @@
 import type { FeedContentItemDto } from "@sd/core-contracts";
+import type { Track } from "@sd/domain-audio";
 
 import { pickContentField } from "@sd/core-i18n";
-import { useListingProgress } from "@sd/domain-audio";
-import { Image } from "expo-image";
+import { useAudio, useProgressStore, useListingProgress } from "@sd/domain-audio";
+import { Bookmark, Info } from "lucide-react-native";
 import { View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { audioService } from "@/features/audio";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { AppText } from "@/shared/components/AppText/AppText";
+import { Button } from "@/shared/components/Button/Button";
 import { List } from "@/shared/components/List";
+import { MarqueeText } from "@/shared/components/MarqueeText";
+import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
 export type ExplorePodcastRowProps = {
   item: FeedContentItemDto;
   onPress?: () => void;
+  onNavigateToListing?: (slug: string) => void;
   hideBorder?: boolean;
 };
 
-export function ExplorePodcastRow({ item, onPress, hideBorder = false }: ExplorePodcastRowProps) {
+export function ExplorePodcastRow({
+  item,
+  onPress,
+  onNavigateToListing,
+  hideBorder = false,
+}: ExplorePodcastRowProps) {
+  const { theme } = useUnistyles();
   const showOriginal = useShowOriginalContent();
   const title = pickContentField(item.title, item.original?.title, showOriginal);
+  const scholarName = item.scholarName;
   const { progressPercent } = useListingProgress(item.id);
 
+  const { isPlaying, currentTrack } = useAudio();
+  const isCurrentTrack = currentTrack?.id === item.id;
+
+  const isSaved = useProgressStore((s) => s.actions.isSaved(item.id));
+  const addSaved = useProgressStore((s) => s.actions.addSaved);
+  const removeSaved = useProgressStore((s) => s.actions.removeSaved);
+
+  const handlePlay = async () => {
+    if (isCurrentTrack) {
+      if (isPlaying) {
+        await audioService.pause();
+      } else {
+        await audioService.resume();
+      }
+      return;
+    }
+
+    const track: Track = {
+      id: item.id,
+      title,
+      artist: scholarName,
+      url: "",
+      durationSeconds: item.durationSeconds ?? 0,
+      artworkUrl: item.thumbnailUrl ?? undefined,
+      seriesId: null,
+      seriesTitle: null,
+    };
+
+    await audioService.playListing(track, [track]);
+  };
+
+  const handleDetails = () => {
+    if (onPress) {
+      onPress();
+    } else if (onNavigateToListing) {
+      onNavigateToListing(item.slug);
+    }
+  };
+
+  const handleSave = () => {
+    if (isSaved) {
+      removeSaved(item.id);
+    } else {
+      addSaved(item.id);
+    }
+  };
+
+  const durationText = item.durationSeconds ? `${Math.round(item.durationSeconds / 60)} min` : "";
+  const publishedDateText = item.publishedAt ? new Date(item.publishedAt).toLocaleDateString() : "";
+
   return (
-    <List.Item onPress={onPress} hideBorder={hideBorder}>
+    <List.Item onPress={handlePlay} hideBorder={hideBorder}>
       <View style={styles.rowContent} testID="podcast-row">
-        <View style={styles.thumbnailContainer}>
-          {item.thumbnailUrl ? (
-            <Image
-              source={{ uri: item.thumbnailUrl }}
-              style={styles.thumbnail}
-              testID="podcast-thumbnail"
-            />
-          ) : (
-            <View style={styles.thumbnailPlaceholder} testID="podcast-thumbnail-placeholder" />
-          )}
-        </View>
+        <UserAvatar image={item.thumbnailUrl} name={scholarName} size={64} />
         <View style={styles.content}>
-          <AppText variant="titleMd" numberOfLines={2}>
-            {title}
-          </AppText>
-          <AppText variant="bodySm">
-            {item.scholarName}
-            {item.kind !== "single" ? ` · ${item.kind}` : ""}
-          </AppText>
+          <MarqueeText text={title} variant="titleMd" />
+          <MarqueeText text={scholarName} variant="bodySm" />
           <View style={styles.details}>
-            {item.durationSeconds ? (
-              <AppText variant="xs">{Math.round(item.durationSeconds / 60)} min</AppText>
-            ) : null}
-            <AppText variant="xs">{new Date(item.publishedAt).toLocaleDateString()}</AppText>
+            <AppText variant="xs" style={styles.metaText}>
+              {durationText}
+              {durationText && publishedDateText && " · "}
+              {publishedDateText}
+            </AppText>
           </View>
           {progressPercent > 0 && progressPercent < 100 ? (
             <View style={styles.progressTrack} testID="progress-bar-track">
@@ -56,6 +105,33 @@ export function ExplorePodcastRow({ item, onPress, hideBorder = false }: Explore
           ) : null}
         </View>
       </View>
+
+      <List.Item.Actions>
+        <Button
+          variant="outline"
+          size="sm"
+          fullWidth
+          label="Details"
+          icon={<Info size={14} color={theme.colors.content.default} />}
+          onPress={handleDetails}
+          testID="details-action"
+        />
+        <Button
+          variant="outline"
+          size="sm"
+          fullWidth
+          label={isSaved ? "Saved" : "Save"}
+          icon={
+            <Bookmark
+              size={14}
+              color={isSaved ? theme.colors.action.primary : theme.colors.content.default}
+              fill={isSaved ? theme.colors.action.primary : "none"}
+            />
+          }
+          onPress={handleSave}
+          testID="save-action"
+        />
+      </List.Item.Actions>
     </List.Item>
   );
 }
@@ -64,22 +140,7 @@ const styles = StyleSheet.create((theme) => ({
   rowContent: {
     flexDirection: "row",
     gap: theme.spacing.scale.sm,
-  },
-  thumbnailContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: theme.radius.scale.sm,
-    overflow: "hidden",
-  },
-  thumbnail: {
-    width: "100%",
-    height: "100%",
-  },
-  thumbnailPlaceholder: {
-    width: "100%",
-    height: "100%",
-    backgroundColor: theme.colors.surface.subtle,
-    borderRadius: theme.radius.scale.sm,
+    flex: 1,
   },
   content: {
     flex: 1,
@@ -88,6 +149,9 @@ const styles = StyleSheet.create((theme) => ({
   details: {
     flexDirection: "row",
     gap: theme.spacing.scale.sm,
+  },
+  metaText: {
+    color: theme.colors.content.subtle,
   },
   progressTrack: {
     height: 3,

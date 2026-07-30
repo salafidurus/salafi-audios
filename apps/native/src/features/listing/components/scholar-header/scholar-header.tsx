@@ -1,10 +1,10 @@
 import type { ScholarDetailDto } from "@sd/core-contracts";
 
-import { Image } from "expo-image";
 import { Linking, Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { AppText } from "@/shared/components/AppText/AppText";
+import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
 export type ScholarHeaderProps = {
   scholar: ScholarDetailDto & {
@@ -22,8 +22,10 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
   const totalHours = Math.round(scholar.totalDurationSeconds / 3600);
 
   return (
-    <View>
-      {scholar.imageUrl ? <Image source={{ uri: scholar.imageUrl }} style={styles.avatar} /> : null}
+    <View style={styles.container}>
+      <View style={styles.avatarWrapper}>
+        <UserAvatar image={scholar.imageUrl} name={scholar.name} size={96} />
+      </View>
       <AppText variant="titleLg" style={styles.name}>
         {scholar.name}
       </AppText>
@@ -93,12 +95,12 @@ export function ScholarHeader({ scholar }: ScholarHeaderProps) {
 }
 
 const styles = StyleSheet.create((theme) => ({
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: theme.radius.scale.full,
+  container: {
+    alignItems: "center",
     marginBottom: theme.spacing.scale.md,
-    alignSelf: "center",
+  },
+  avatarWrapper: {
+    marginBottom: theme.spacing.scale.md,
   },
   name: {
     textAlign: "center",

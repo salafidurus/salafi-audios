@@ -1,8 +1,9 @@
 import type { ScholarListItemDto } from "@sd/core-contracts";
 
-import { Image } from "expo-image";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
+
+import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
 export type ScholarCardProps = {
   scholar: ScholarListItemDto;
@@ -12,11 +13,7 @@ export type ScholarCardProps = {
 export function ScholarCard({ scholar, onPress }: ScholarCardProps) {
   return (
     <Pressable onPress={() => onPress?.(scholar.slug)} style={styles.card}>
-      <View style={styles.avatar}>
-        {scholar.imageUrl && (
-          <Image source={{ uri: scholar.imageUrl }} style={styles.avatarImage} />
-        )}
-      </View>
+      <UserAvatar image={scholar.imageUrl} name={scholar.name} size={64} />
       <Text style={styles.name} numberOfLines={2}>
         {scholar.name}
       </Text>

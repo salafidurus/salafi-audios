@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../core/db/prisma.service';
+import { Status } from '@sd/core-db';
 import type { ProgressSyncItemDto, AudioProgressDto } from '@sd/core-contracts';
 
 @Injectable()
@@ -95,24 +96,61 @@ export class AudioRepository {
   }
 
   async findPrimaryAsset(listingId: string) {
-    return this.prisma.audioAsset.findFirst({
+    const directPrimary = await this.prisma.audioAsset.findFirst({
       where: { listingId, isPrimary: true },
       select: {
         url: true,
         durationSeconds: true,
         format: true,
-      }, // Only fetch fields needed for stream response
+      },
+    });
+
+    if (directPrimary) return directPrimary;
+
+    return this.prisma.audioAsset.findFirst({
+      where: {
+        listing: {
+          parentId: listingId,
+          status: Status.published,
+          deletedAt: null,
+        },
+        isPrimary: true,
+      },
+      orderBy: [{ listing: { orderIndex: 'asc' } }, { listing: { createdAt: 'asc' } }],
+      select: {
+        url: true,
+        durationSeconds: true,
+        format: true,
+      },
     });
   }
 
   async findFirstAsset(listingId: string) {
-    return this.prisma.audioAsset.findFirst({
+    const directAsset = await this.prisma.audioAsset.findFirst({
       where: { listingId },
       select: {
         url: true,
         durationSeconds: true,
         format: true,
-      }, // Only fetch fields needed for stream response
+      },
+    });
+
+    if (directAsset) return directAsset;
+
+    return this.prisma.audioAsset.findFirst({
+      where: {
+        listing: {
+          parentId: listingId,
+          status: Status.published,
+          deletedAt: null,
+        },
+      },
+      orderBy: [{ listing: { orderIndex: 'asc' } }, { listing: { createdAt: 'asc' } }],
+      select: {
+        url: true,
+        durationSeconds: true,
+        format: true,
+      },
     });
   }
 }

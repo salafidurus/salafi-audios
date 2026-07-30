@@ -11,18 +11,39 @@ type UserAvatarProps = {
   name?: string | null;
   size?: number;
   fill?: boolean;
+  testID?: string;
 };
 
-export function UserAvatar({ image, name, size = 48, fill = false }: UserAvatarProps): ReactNode {
+export function UserAvatar({
+  image,
+  name,
+  size = 48,
+  fill = false,
+  testID,
+}: UserAvatarProps): ReactNode {
   const { theme } = useUnistyles();
+  const borderRadius = theme.radius.component.panelSm ?? theme.radius.scale.sm ?? 8;
 
   if (fill) {
     if (image) {
-      return <Image source={{ uri: image }} style={styles.fillImage} contentFit="cover" />;
+      return (
+        <Image
+          source={{ uri: image }}
+          style={[styles.fillImage, { borderRadius }]}
+          contentFit="cover"
+          testID={testID}
+        />
+      );
     }
     return (
-      <View style={[styles.fillFallback, { backgroundColor: theme.colors.action.primary }]}>
-        <AppText variant="titleMd" style={{ color: theme.colors.content.onPrimary }}>
+      <View
+        style={[
+          styles.fillFallback,
+          { backgroundColor: theme.colors.surface.subtle, borderRadius },
+        ]}
+        testID={testID}
+      >
+        <AppText variant="titleMd" style={{ color: theme.colors.content.muted }}>
           {name?.charAt(0)?.toUpperCase() ?? "?"}
         </AppText>
       </View>
@@ -30,7 +51,6 @@ export function UserAvatar({ image, name, size = 48, fill = false }: UserAvatarP
   }
 
   const avatarSize = size;
-  const borderRadius = avatarSize / 2;
 
   if (image) {
     return (
@@ -38,25 +58,27 @@ export function UserAvatar({ image, name, size = 48, fill = false }: UserAvatarP
         source={{ uri: image }}
         style={{ width: avatarSize, height: avatarSize, borderRadius }}
         contentFit="cover"
+        testID={testID}
       />
     );
   }
 
   return (
     <View
+      testID={testID}
       style={[
         styles.fallback,
         {
           width: avatarSize,
           height: avatarSize,
           borderRadius,
-          backgroundColor: theme.colors.action.primary,
+          backgroundColor: theme.colors.surface.subtle,
         },
       ]}
     >
       <AppText
         variant="bodyLg"
-        style={{ color: theme.colors.content.onPrimary, fontSize: avatarSize * 0.4 }}
+        style={{ color: theme.colors.content.muted, fontSize: avatarSize * 0.4 }}
       >
         {name?.charAt(0)?.toUpperCase() ?? "?"}
       </AppText>
