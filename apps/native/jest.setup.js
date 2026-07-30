@@ -96,7 +96,27 @@ jest.mock("@expo/ui", () => {
     return React.createElement(RNSwitch, { value, onValueChange, disabled, testID });
   }
 
+  // Mirrors the real ObservableState contract (a plain object with a mutable
+  // `.value`) but backs it with React state, so a caller mutating `.value`
+  // (e.g. to reset a field) is actually observable/re-renders in tests, the
+  // same way the native module's Proxy-backed state would.
+  function useNativeState(initial) {
+    const [current, setCurrent] = React.useState(initial);
+    return React.useMemo(
+      () => ({
+        get value() {
+          return current;
+        },
+        set value(next) {
+          setCurrent(next);
+        },
+      }),
+      [current],
+    );
+  }
+
   function TextInput({
+    value,
     defaultValue,
     placeholder,
     placeholderTextColor,
@@ -115,10 +135,14 @@ jest.mock("@expo/ui", () => {
     onBlur,
   }) {
     return React.createElement(RNTextInput, {
-      defaultValue,
+      value: value ? value.value : undefined,
+      defaultValue: value ? undefined : defaultValue,
       placeholder,
       placeholderTextColor,
-      onChangeText,
+      onChangeText: (text) => {
+        if (value) value.value = text;
+        onChangeText?.(text);
+      },
       editable,
       secureTextEntry,
       testID,
@@ -134,7 +158,7 @@ jest.mock("@expo/ui", () => {
     });
   }
 
-  return { Host, Button, Switch, TextInput };
+  return { Host, Button, Switch, TextInput, useNativeState };
 });
 
 jest.mock("@expo/ui/community/segmented-control", () => {
