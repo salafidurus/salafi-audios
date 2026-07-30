@@ -2,9 +2,9 @@ import { render, screen, fireEvent } from "@testing-library/react-native";
 import React from "react";
 import { View } from "react-native";
 
-import { Button } from "./Button";
+import { Button } from "./Button.android";
 
-describe("Button", () => {
+describe("Button (android)", () => {
   it("renders label text", async () => {
     await render(<Button label="Submit" />);
     expect(screen.getByText("Submit")).toBeTruthy();
