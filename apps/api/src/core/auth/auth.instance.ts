@@ -36,7 +36,7 @@ function createAuthInstance(config: ConfigService) {
     database: prismaAdapter(prismaClient, {
       provider: 'postgresql',
     }),
-    trustedOrigins: config.CORS_ORIGINS,
+    trustedOrigins: [...config.CORS_ORIGINS, ...config.CORS_ORIGINS_NATIVE],
     emailAndPassword: { enabled: false },
     socialProviders: {
       google: {

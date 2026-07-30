@@ -23,6 +23,13 @@ export class ConfigService {
       .filter(Boolean);
   }
 
+  get CORS_ORIGINS_NATIVE(): string[] {
+    if (!this.env.CORS_ORIGINS_NATIVE) return [];
+    return this.env.CORS_ORIGINS_NATIVE.split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+
   get DATABASE_URL(): string {
     return this.env.DATABASE_URL;
   }

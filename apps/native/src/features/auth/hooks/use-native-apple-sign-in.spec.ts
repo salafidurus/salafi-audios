@@ -38,4 +38,44 @@ describe("useNativeAppleSignIn", () => {
     expect(hookCode).toContain("isLoading");
     expect(hookCode).toContain("error");
   });
+
+  it("persists cookie under better-auth_cookie key upon successful sign in", async () => {
+    const AppleAuth = require("expo-apple-authentication");
+    const SecureStore = require("expo-secure-store");
+    const { authClient } = require("@/core/auth");
+
+    AppleAuth.isAvailableAsync.mockResolvedValue(true);
+    AppleAuth.signInAsync.mockResolvedValue({
+      identityToken: "test-token",
+      user: "test-user-id",
+    });
+
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        session: { id: "test-session-id", expiresAt: "2026-12-31T00:00:00Z" },
+      }),
+    });
+
+    const { renderHook, act } = require("@testing-library/react-native");
+    const { result } = await renderHook(() => useNativeAppleSignIn());
+
+    await act(async () => {
+      await result.current.signIn();
+    });
+
+    expect(SecureStore.setItemAsync).toHaveBeenCalledWith(
+      "better-auth_cookie",
+      JSON.stringify({
+        "better-auth.session_token": {
+          value: "test-session-id",
+          expires: "2026-12-31T00:00:00Z",
+        },
+      }),
+    );
+    expect(authClient.$fetch).toHaveBeenCalledWith("/api/auth/get-session", {
+      method: "GET",
+      headers: { Cookie: "better-auth.session_token=test-session-id" },
+    });
+  });
 });

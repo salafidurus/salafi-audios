@@ -57,15 +57,23 @@ export function useNativeAppleSignIn() {
         throw new Error(`Server returned ${response.status}: ${body}`);
       }
 
-      const { session } = (await response.json()) as { session: { id: string } };
+      const { session } = (await response.json()) as {
+        session: { id: string; expiresAt?: string };
+      };
 
-      // Persist session token using better-auth expo client storage
-      await SecureStore.setItemAsync("better-auth.session_token", session.id);
+      // Persist session token using better-auth expo client cookie structure
+      const cookieData = JSON.stringify({
+        "better-auth.session_token": {
+          value: session.id,
+          expires: session.expiresAt ?? null,
+        },
+      });
+      await SecureStore.setItemAsync("better-auth_cookie", cookieData);
 
       // Trigger better-auth client session refresh
       await authClient.$fetch("/api/auth/get-session", {
         method: "GET",
-        headers: { Authorization: `Bearer ${session.id}` },
+        headers: { Cookie: `better-auth.session_token=${session.id}` },
       });
 
       setIsLoading(false);
