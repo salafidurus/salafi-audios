@@ -1,36 +1,26 @@
 import { routes } from "@sd/core-contracts";
 import { type Href, useLocalSearchParams, useRouter } from "expo-router";
-import * as WebBrowser from "expo-web-browser";
 import { useEffect } from "react";
 
-import { authClient, useAuth } from "@/core/auth";
+import { useAuth } from "@/core/auth";
 import { useNativeAppleSignIn } from "@/features/auth/hooks/use-native-apple-sign-in";
+import { useNativeGoogleSignIn } from "@/features/auth/hooks/use-native-google-sign-in";
 import { SignInScreen } from "@/features/auth/screens/sign-in/sign-in.screen";
-
-function handleSignInWithGoogle(from: string | undefined) {
-  try {
-    WebBrowser.dismissAuthSession();
-  } catch {
-    // Ignore dismiss error if no session is active
-  }
-  authClient.signIn.social(
-    { provider: "google", callbackURL: from ?? "/" },
-    {
-      onError: (ctx) => {
-        console.log("[DEBUG google signIn] onError", ctx.error);
-      },
-      onSuccess: (ctx) => {
-        console.log("[DEBUG google signIn] onSuccess", JSON.stringify(ctx.data));
-      },
-    },
-  );
-}
 
 export default function SignInRoute() {
   const router = useRouter();
   const { from } = useLocalSearchParams<{ from?: string }>();
   const { isAuthenticated } = useAuth();
-  const { signIn: nativeAppleSignIn, isLoading: appleLoading } = useNativeAppleSignIn();
+  const {
+    signIn: nativeAppleSignIn,
+    isLoading: appleLoading,
+    error: appleError,
+  } = useNativeAppleSignIn();
+  const {
+    signIn: nativeGoogleSignIn,
+    isLoading: googleLoading,
+    error: googleError,
+  } = useNativeGoogleSignIn();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -56,9 +46,12 @@ export default function SignInRoute() {
   return (
     <SignInScreen
       onBack={handleBack}
-      onSignInWithGoogle={() => handleSignInWithGoogle(from)}
+      onSignInWithGoogle={() => nativeGoogleSignIn()}
       onSignInWithApple={() => nativeAppleSignIn()}
       appleLoading={appleLoading}
+      googleLoading={googleLoading}
+      appleError={appleError}
+      googleError={googleError}
     />
   );
 }

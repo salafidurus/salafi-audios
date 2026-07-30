@@ -2,9 +2,8 @@ import * as AppleAuthentication from "expo-apple-authentication";
 import * as SecureStore from "expo-secure-store";
 import { useState, useCallback } from "react";
 
-import { authClient } from "@/core/auth";
-
-const API_URL = process.env.EXPO_PUBLIC_API_URL;
+import { refreshSession } from "@/core/auth";
+import { getApiBaseUrl } from "@/core/config/runtime-env";
 
 export function useNativeAppleSignIn() {
   const [isLoading, setIsLoading] = useState(false);
@@ -38,7 +37,7 @@ export function useNativeAppleSignIn() {
         throw new Error("No identity token returned from Apple");
       }
 
-      const response = await fetch(`${API_URL}/api/auth/apple/native`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/auth/apple/native`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -70,11 +69,10 @@ export function useNativeAppleSignIn() {
       });
       await SecureStore.setItemAsync("better-auth_cookie", cookieData);
 
-      // Trigger better-auth client session refresh
-      await authClient.$fetch("/api/auth/get-session", {
-        method: "GET",
-        headers: { Cookie: `better-auth.session_token=${session.id}` },
-      });
+      // Force useSession() to pick up the session we just wrote directly to
+      // SecureStore - this custom endpoint doesn't go through better-auth's
+      // normal Set-Cookie flow, so nothing else would trigger a refetch.
+      await refreshSession();
 
       setIsLoading(false);
       // Router navigation handled by parent component watching auth state via useAuth()

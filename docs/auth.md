@@ -43,7 +43,7 @@ them into the shared `httpClient`.
 
 ## Server configuration
 
-`apps/api/src/modules/auth/auth.instance.ts` builds the Better Auth instance.
+`apps/api/src/core/auth/auth.instance.ts` builds the Better Auth instance.
 Relevant plugins:
 
 - `expo()` — owns the native OAuth deep-link handoff and SecureStore session
@@ -64,12 +64,13 @@ and configures CORS:
 - `credentials: true` and an origin allowlist (`CORS_ORIGINS`).
 - `exposedHeaders` includes `Set-Cookie` for cookie header inspection.
 
-`trustedOrigins` is set to `CORS_ORIGINS`. Better Auth validates absolute
-`callbackURL` values against this list.
+`trustedOrigins` is set to `CORS_ORIGINS` (web) plus `CORS_ORIGINS_NATIVE`
+(native deep-link schemes, e.g. `salafidurus-dev://`, `exp://`). Better Auth
+validates absolute `callbackURL` values against this combined list.
 
 ## Session validation on the API
 
-`apps/api/src/modules/auth/auth.guard.ts` is the global `AuthGuard`. For every
+`apps/api/src/core/auth/auth.guard.ts` is the global `AuthGuard`. For every
 non-`@Public()` route it calls `getAuth().api.getSession({ headers })`. This
 validates the session cookie, then enforces bans and roles and attaches
 `request.user`.
@@ -124,6 +125,48 @@ handoff over the app's deep-link scheme and persists the session cookie in
 `expoClient` plugin; `authClient.getCookie()` returns the stored cookie string,
 which the shared `httpClient` forwards as a `Cookie` header on API calls.
 
+### Native — Apple and Google native sign-in
+
+Apple and Google both bypass the browser-redirect flow entirely on native,
+using their respective native SDKs to obtain a device-signed identity token
+and exchanging it directly — no deep-link handoff, no in-app browser.
+
+- **Apple** (`apps/native/src/features/auth/hooks/use-native-apple-sign-in.ts`):
+  gets an `identityToken` from `expo-apple-authentication`, POSTs it to a
+  bespoke endpoint (`apps/api/src/core/auth/apple-native.controller.ts`), then
+  manually writes the returned session into the `@better-auth/expo`
+  `SecureStore` cookie shape and forces a session refresh.
+- **Google** (`apps/native/src/features/auth/hooks/use-native-google-sign-in.ts`):
+  gets an `idToken` from `@react-native-google-signin/google-signin`
+  (`GoogleSignin.configure({ webClientId })` → `GoogleSignin.signIn()`), then
+  calls Better Auth's built-in idToken support —
+  `authClient.signIn.social({ provider: "google", idToken: { token } })`.
+  No custom backend endpoint is needed: Better Auth verifies the token's `aud`
+  claim against the existing `GOOGLE_CLIENT_ID`, and the `expo()` plugin
+  handles session persistence the same way it does for the browser flow.
+
+The native Google SDK is always configured with the **Web** OAuth client ID
+(`webClientId`), not the Android one — Google issues the idToken audienced to
+whichever client ID is passed there, and that's what the backend verifies
+against. The Android OAuth client registered in Google Cloud Console (package
+name + SHA-1 fingerprint) only authorizes the device to show the native
+account picker; it never appears in any client-side or server-side config.
+
+#### Both flows must force a session refetch afterward
+
+Better Auth's core client only auto-triggers a `useSession()` refetch for a
+fixed set of paths (`/sign-in/email`, `/sign-out`, etc.) — `/sign-in/social`
+isn't one of them. `@better-auth/expo`'s own `Set-Cookie`-triggered refetch
+_should_ cover the gap for the Google idToken flow, but empirically doesn't
+reliably update the reactive session atom in time — and Apple's flow (a
+custom endpoint with a manually-written cookie) never goes through that path
+at all. Both hooks therefore call `refreshSession()`
+(`apps/native/src/core/auth/auth-client.ts`) after persisting the session,
+which directly invokes the session atom's own `refetch()` — the same
+function `useSession()` itself uses — rather than a raw, atom-bypassing
+`$fetch()` call. Skipping this step is the classic symptom of "sign-in
+succeeds, cookie is written, but the app still acts signed out."
+
 ## Session management and sign-out
 
 - **Session detection:** Web uses `authClient.useSession()`, which returns the
@@ -159,6 +202,10 @@ which the shared `httpClient` forwards as a `Cookie` header on API calls.
   (e.g., `salafidurus.com`). Disabled in development (uses `localhost`).
 - `CORS_ORIGIN` — comma-separated list of allowed web origins (e.g.,
   `https://salafidurus.com`). Used for CORS validation and `trustedOrigins`.
+- `CORS_ORIGINS_NATIVE` — comma-separated list of trusted native deep-link
+  schemes (defaults to `salafidurus-dev://,exp://`). Mind the "S" — a common
+  typo is `CORS_ORIGIN_NATIVE` (singular), which Zod silently ignores in favor
+  of the default.
 - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`, `APPLE_CLIENT_ID` /
   `APPLE_CLIENT_SECRET`.
 
@@ -170,7 +217,13 @@ which the shared `httpClient` forwards as a `Cookie` header on API calls.
 
 ### Native (`apps/native`)
 
-- `EXPO_PUBLIC_API_URL` — the API origin.
+- `EXPO_PUBLIC_API_URL` — the API origin. On the Android emulator in dev,
+  `getApiBaseUrl()` (`apps/native/src/core/config/runtime-env.ts`) rewrites a
+  `localhost`/`127.0.0.1` value to `10.0.2.2` automatically, since the
+  emulator's own `localhost` refers to itself, not the host machine.
+- `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` — the same value as the API's
+  `GOOGLE_CLIENT_ID` (the Web client). Passed to
+  `GoogleSignin.configure({ webClientId })` for native Google sign-in.
 
 ### Google Cloud Console
 
@@ -181,6 +234,27 @@ which the shared `httpClient` forwards as a `Cookie` header on API calls.
 
 Keep `COOKIE_DOMAIN` (API) and `NEXT_PUBLIC_WEB_URL` / `NEXT_PUBLIC_API_URL`
 (web) consistent per environment; a mismatch breaks OAuth flow.
+
+#### Android debug keystore is committed and pinned
+
+`apps/native/android/` is otherwise gitignored (regenerated by `expo
+prebuild`), but `android/app/debug.keystore` is deliberately committed —
+debug keys aren't secret, and native Google Sign-In on Android needs a
+_stable_ SHA-1 fingerprint that matches what's registered on the
+`salafi-durus-android-dev` OAuth client. A freshly auto-generated debug
+keystore has a different SHA-1 and fails with `DEVELOPER_ERROR`.
+
+`bun run prebuild:clean` (`expo prebuild --clean`) wipes and regenerates
+`android/` entirely, which would delete the committed keystore and cause a new
+one to be auto-generated on the next build. A `postprebuild:clean` script
+(`apps/native/package.json`) restores the committed file from git
+immediately after, before the subsequent Gradle build can generate a
+replacement.
+
+If the debug keystore is ever intentionally rotated (e.g. compromised), the
+new SHA-1 must be re-registered on `salafi-durus-android-dev` in Google Cloud
+Console, or native Google Sign-In on Android breaks with `DEVELOPER_ERROR`
+again.
 
 ## Local development
 
@@ -203,15 +277,19 @@ then configure cookies accordingly.
 
 ## File map
 
-| Concern                                | File                                         |
-| -------------------------------------- | -------------------------------------------- |
-| Shared HTTP client (credential attach) | `packages/core-contracts/src/http.ts`        |
-| Credential providers                   | `packages/core-api/src/utils/api-client.ts`  |
-| Better Auth server instance + plugins  | `apps/api/src/modules/auth/auth.instance.ts` |
-| CORS + Fastify route mount             | `apps/api/src/main.ts`                       |
-| Session validation guard               | `apps/api/src/modules/auth/auth.guard.ts`    |
-| Web auth client + session detection    | `apps/web/src/core/auth/auth-client.ts`      |
-| Web OAuth callback page                | `apps/web/src/app/auth/callback/page.tsx`    |
-| Web startup wiring                     | `apps/web/src/core/providers.tsx`            |
-| Native auth client (Expo)              | `apps/native/src/core/auth/auth-client.ts`   |
-| Native startup wiring                  | `apps/native/src/core/providers.tsx`         |
+| Concern                                | File                                                               |
+| -------------------------------------- | ------------------------------------------------------------------ |
+| Shared HTTP client (credential attach) | `packages/core-contracts/src/http.ts`                              |
+| Credential providers                   | `packages/core-api/src/utils/api-client.ts`                        |
+| Better Auth server instance + plugins  | `apps/api/src/core/auth/auth.instance.ts`                          |
+| CORS + Fastify route mount             | `apps/api/src/main.ts`                                             |
+| Session validation guard               | `apps/api/src/core/auth/auth.guard.ts`                             |
+| Apple native sign-in endpoint          | `apps/api/src/core/auth/apple-native.controller.ts`                |
+| Web auth client + session detection    | `apps/web/src/core/auth/auth-client.ts`                            |
+| Web OAuth callback page                | `apps/web/src/app/auth/callback/page.tsx`                          |
+| Web startup wiring                     | `apps/web/src/core/providers.tsx`                                  |
+| Native auth client (Expo)              | `apps/native/src/core/auth/auth-client.ts`                         |
+| Native runtime env / base URL resolve  | `apps/native/src/core/config/runtime-env.ts`                       |
+| Native Apple native sign-in hook       | `apps/native/src/features/auth/hooks/use-native-apple-sign-in.ts`  |
+| Native Google native sign-in hook      | `apps/native/src/features/auth/hooks/use-native-google-sign-in.ts` |
+| Native startup wiring                  | `apps/native/src/core/providers.tsx`                               |

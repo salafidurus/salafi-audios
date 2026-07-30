@@ -108,6 +108,14 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       ],
       "expo-asset",
       "expo-apple-authentication",
+      // @react-native-google-signin/google-signin is intentionally NOT
+      // registered here: Android needs no native project changes for it (its
+      // own AndroidManifest.xml is empty; it autolinks via play-services-auth
+      // alone). Registering the bare plugin string defaults to Firebase mode,
+      // which injects the google-services Gradle plugin and breaks the
+      // Android build without a google-services.json. If iOS Google
+      // Sign-In is added later, register it with the non-Firebase form —
+      // `["@react-native-google-signin/google-signin", { iosUrlScheme }]`.
       "expo-audio",
       [
         "expo-document-picker",
@@ -178,6 +186,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       },
       appEnv,
       apiUrl: process.env.EXPO_PUBLIC_API_URL,
+      googleWebClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
       sentryDsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
       sentryOrg: process.env.EXPO_PUBLIC_SENTRY_ORG,
       sentryProject: process.env.EXPO_PUBLIC_SENTRY_PROJECT,
