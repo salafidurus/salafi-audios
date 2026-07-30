@@ -14,6 +14,7 @@ jest.mock("expo-web-browser", () => ({
 }));
 
 jest.mock("@/core/auth", () => ({
+  useAuth: jest.fn(() => ({ isAuthenticated: false, isLoading: false, user: null })),
   authClient: {
     signIn: {
       social: jest.fn(),
@@ -29,14 +30,28 @@ jest.mock("@/features/auth/hooks/use-native-apple-sign-in", () => ({
   }),
 }));
 
+jest.mock("@/features/auth/screens/sign-in/sign-in.screen", () => ({
+  SignInScreen: (props: any) => {
+    props.onSignInWithGoogle();
+    return null;
+  },
+}));
+
 describe("SignInRoute", () => {
   it("exports SignInRoute component", () => {
     expect(typeof SignInRoute).toBe("function");
   });
 
-  it("passes callbackURL: '/' to authClient.signIn.social for Google provider", () => {
-    const routeCode = SignInRoute.toString();
-    expect(routeCode).toContain('provider: "google"');
-    expect(routeCode).toContain('callbackURL: "/"');
+  it("calls authClient.signIn.social with provider: 'google' and callbackURL: '/' on Google sign in", async () => {
+    const React = require("react");
+    const { authClient } = require("@/core/auth");
+    const { render } = require("@testing-library/react-native");
+
+    await render(React.createElement(SignInRoute));
+
+    expect(authClient.signIn.social).toHaveBeenCalledWith({
+      provider: "google",
+      callbackURL: "/",
+    });
   });
 });
