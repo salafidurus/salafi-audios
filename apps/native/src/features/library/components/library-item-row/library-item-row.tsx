@@ -1,3 +1,4 @@
+import type { MenuAction } from "@expo/ui/community/menu";
 import type { LibraryItemDto } from "@sd/core-contracts";
 
 import { pickContentField } from "@sd/core-i18n";
@@ -15,6 +16,10 @@ export type LibraryItemRowProps = {
   variant: "progress" | "saved" | "completed";
   onPress?: () => void;
   hideBorder?: boolean;
+  testID?: string;
+  /** Actions shown in a native context menu opened by long-pressing the row. */
+  actions?: MenuAction[];
+  onAction?: (id: string) => void;
 };
 
 type LibraryItemIconProps = {
@@ -55,6 +60,9 @@ export function LibraryItemRow({
   variant,
   onPress,
   hideBorder = false,
+  testID,
+  actions,
+  onAction,
 }: LibraryItemRowProps) {
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
@@ -65,7 +73,7 @@ export function LibraryItemRow({
       : null;
 
   return (
-    <List.Item onPress={onPress} hideBorder={hideBorder}>
+    <List.Item onPress={onPress} hideBorder={hideBorder} testID={testID}>
       <View style={styles.rowContent}>
         <View style={styles.iconContainer}>
           <LibraryItemIcon variant={variant} />
@@ -103,6 +111,9 @@ export function LibraryItemRow({
           ) : null}
         </View>
       </View>
+      {actions?.length && onAction ? (
+        <List.Item.Actions actions={actions} onAction={onAction} />
+      ) : null}
     </List.Item>
   );
 }

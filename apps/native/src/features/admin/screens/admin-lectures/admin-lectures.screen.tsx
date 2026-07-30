@@ -1,3 +1,5 @@
+import type { MenuAction } from "@expo/ui/community/menu";
+
 import { useCallback, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
@@ -54,6 +56,21 @@ export function AdminLecturesScreen() {
     refetch();
   };
 
+  const handleRowAction = async (id: string, action: string) => {
+    if (action === "edit") {
+      setEditingLectureId(id);
+      return;
+    }
+    if (action === "publish" || action === "archive") {
+      try {
+        await bulkLectureAction({ action, ids: [id] });
+      } catch {
+        // Ignored for UX robustness
+      }
+      refetch();
+    }
+  };
+
   return (
     <View style={styles.screen}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
@@ -74,9 +91,15 @@ export function AdminLecturesScreen() {
           <List>
             {lectures.map((item, index) => {
               const isSelected = selectedIds.has(item.id);
+              const actions: MenuAction[] = [
+                { id: "edit", title: "Edit" },
+                { id: "publish", title: "Publish" },
+                { id: "archive", title: "Archive" },
+              ];
               return (
                 <List.Item
                   key={item.id}
+                  testID={`admin-lecture-row-${item.id}`}
                   onPress={() => handleRowPress(item.id)}
                   hideBorder={index === lectures.length - 1}
                   style={isSelected ? styles.rowSelected : undefined}
@@ -89,6 +112,10 @@ export function AdminLecturesScreen() {
                       {item.scholarName} · {item.status}
                     </AppText>
                   </View>
+                  <List.Item.Actions
+                    actions={actions}
+                    onAction={(action) => void handleRowAction(item.id, action)}
+                  />
                 </List.Item>
               );
             })}

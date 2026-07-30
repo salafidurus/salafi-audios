@@ -1,3 +1,4 @@
+import { useProgressStore } from "@sd/domain-audio";
 import { useLibraryProgressScreen } from "@sd/domain-content";
 import React, { useCallback } from "react";
 import { ScrollView, Text, View } from "react-native";
@@ -18,6 +19,7 @@ export function LibraryScreen({ onNavigateToListing }: LibraryScreenProps) {
   const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
   const { items, isFetching } = useLibraryProgressScreen(isAuthenticated);
+  const markCompleted = useProgressStore((s) => s.actions.markCompleted);
 
   const handleItemPress = useCallback(
     (slug: string) => {
@@ -54,8 +56,13 @@ export function LibraryScreen({ onNavigateToListing }: LibraryScreenProps) {
                 key={item.id}
                 item={item}
                 variant="progress"
+                testID={`library-progress-row-${item.id}`}
                 onPress={() => handleItemPress(item.listingSlug)}
                 hideBorder={index === items.length - 1}
+                actions={[
+                  { id: "complete", title: t("library.markAsCompleted", "Mark as Completed") },
+                ]}
+                onAction={() => markCompleted(item.listingId)}
               />
             ))
           )}

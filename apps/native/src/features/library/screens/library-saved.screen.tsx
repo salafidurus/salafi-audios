@@ -1,3 +1,4 @@
+import { useProgressStore } from "@sd/domain-audio";
 import { useLibrarySavedScreen } from "@sd/domain-content";
 import { useCallback } from "react";
 import { Text, ScrollView } from "react-native";
@@ -16,6 +17,7 @@ export type LibrarySavedScreenProps = {
 export function LibrarySavedScreen({ onNavigateToListing }: LibrarySavedScreenProps) {
   const { isAuthenticated } = useAuth();
   const { items, isFetching } = useLibrarySavedScreen(isAuthenticated);
+  const removeSaved = useProgressStore((s) => s.actions.removeSaved);
   const { t } = useTranslation();
 
   const handleItemPress = useCallback(
@@ -52,8 +54,17 @@ export function LibrarySavedScreen({ onNavigateToListing }: LibrarySavedScreenPr
               key={item.id}
               item={item}
               variant="saved"
+              testID={`library-saved-row-${item.id}`}
               onPress={() => handleItemPress(item.listingSlug)}
               hideBorder={index === items.length - 1}
+              actions={[
+                {
+                  id: "remove",
+                  title: t("library.removeFromSaved", "Remove from Saved"),
+                  attributes: { destructive: true },
+                },
+              ]}
+              onAction={() => removeSaved(item.listingId)}
             />
           ))}
         </List>
