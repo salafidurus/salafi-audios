@@ -61,6 +61,162 @@ jest.mock("@tanstack/react-query", () => ({
   })),
 }));
 
+// @expo/ui renders real SwiftUI/Jetpack Compose views, which don't exist under
+// Jest's node test environment. Mock each entry point with RN-equivalent stand-ins
+// so specs can render, query, and interact with them the same way as before.
+jest.mock("@expo/ui", () => {
+  const React = require("react");
+  const {
+    Pressable,
+    Switch: RNSwitch,
+    TextInput: RNTextInput,
+    View,
+    Text,
+  } = require("react-native");
+
+  function Host({ children, style, ...rest }) {
+    return React.createElement(View, { style, ...rest }, children);
+  }
+
+  function Button({ children, label, onPress, disabled, testID }) {
+    return React.createElement(
+      Pressable,
+      {
+        onPress,
+        disabled,
+        testID,
+        accessibilityRole: "button",
+        accessibilityState: { disabled },
+      },
+      children ?? React.createElement(Text, null, label),
+    );
+  }
+
+  function Switch({ value, onValueChange, disabled, testID }) {
+    return React.createElement(RNSwitch, { value, onValueChange, disabled, testID });
+  }
+
+  function TextInput({
+    defaultValue,
+    placeholder,
+    placeholderTextColor,
+    onChangeText,
+    editable,
+    secureTextEntry,
+    testID,
+    multiline,
+    keyboardType,
+    autoCapitalize,
+    autoCorrect,
+    autoFocus,
+    maxLength,
+    onSubmitEditing,
+    onFocus,
+    onBlur,
+  }) {
+    return React.createElement(RNTextInput, {
+      defaultValue,
+      placeholder,
+      placeholderTextColor,
+      onChangeText,
+      editable,
+      secureTextEntry,
+      testID,
+      multiline,
+      keyboardType,
+      autoCapitalize,
+      autoCorrect,
+      autoFocus,
+      maxLength,
+      onFocus,
+      onBlur,
+      onSubmitEditing: onSubmitEditing ? (e) => onSubmitEditing(e.nativeEvent.text) : undefined,
+    });
+  }
+
+  return { Host, Button, Switch, TextInput };
+});
+
+jest.mock("@expo/ui/community/segmented-control", () => {
+  const React = require("react");
+  const { Pressable, Text, View } = require("react-native");
+
+  function SegmentedControl({
+    values = [],
+    selectedIndex,
+    onValueChange,
+    onChange,
+    enabled = true,
+    testID,
+  }) {
+    return React.createElement(
+      View,
+      { testID },
+      values.map((value, index) =>
+        React.createElement(
+          Pressable,
+          {
+            key: value,
+            disabled: !enabled,
+            accessibilityRole: "button",
+            accessibilityState: { selected: index === selectedIndex },
+            onPress: () => {
+              onValueChange?.(value);
+              onChange?.({ nativeEvent: { selectedSegmentIndex: index, value } });
+            },
+          },
+          React.createElement(Text, null, value),
+        ),
+      ),
+    );
+  }
+
+  return { SegmentedControl };
+});
+
+// The mock renders every action inline (rather than simulating an open/closed native
+// menu) so specs can select an action directly via its title/testID without having to
+// choreograph a long-press-then-tap sequence the real native menu can't express in Jest.
+jest.mock("@expo/ui/community/menu", () => {
+  const React = require("react");
+  const { Pressable, Text, View } = require("react-native");
+
+  function renderActions(actions, onPressAction, prefix) {
+    return actions.map((action) => {
+      if (action.subactions?.length) {
+        return React.createElement(
+          View,
+          { key: action.id ?? action.title },
+          renderActions(action.subactions, onPressAction, prefix),
+        );
+      }
+      const id = action.id ?? action.title;
+      return React.createElement(
+        Pressable,
+        {
+          key: id,
+          testID: `${prefix}-action-${id}`,
+          disabled: action.attributes?.disabled,
+          accessibilityRole: "menuitem",
+          onPress: () => onPressAction?.({ nativeEvent: { event: id } }),
+        },
+        React.createElement(Text, null, action.title),
+      );
+    });
+  }
+
+  function MenuView({ children, actions = [], onPressAction, testID = "menu" }) {
+    return React.createElement(
+      View,
+      { testID },
+      children,
+      renderActions(actions, onPressAction, testID),
+    );
+  }
+
+  return { MenuView, default: MenuView };
+});
+
 jest.mock("react-native-reanimated", () => {
   const { View, Text, Image, ScrollView } = require("react-native");
 
