@@ -1,15 +1,19 @@
 import { expoClient } from "@better-auth/expo/client";
 import { createAuthClient } from "better-auth/react";
+import Constants from "expo-constants";
 import * as SecureStore from "expo-secure-store";
 
+import { getApiBaseUrl } from "../config/runtime-env";
+
+const rawScheme = Constants.expoConfig?.scheme;
+const scheme = Array.isArray(rawScheme) ? rawScheme[0] : (rawScheme ?? "salafidurus");
+
 export const authClient = createAuthClient({
-  baseURL: process.env.EXPO_PUBLIC_API_URL!,
+  baseURL: getApiBaseUrl() ?? process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:4000",
   plugins: [
     expoClient({
-      storage: {
-        getItem: (key: string) => SecureStore.getItem(key),
-        setItem: (key: string, value: string) => SecureStore.setItem(key, value),
-      },
+      scheme,
+      storage: SecureStore,
     }),
   ],
 });

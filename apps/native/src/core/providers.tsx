@@ -78,11 +78,16 @@ export function Providers({ children }: Props) {
     setLocaleProvider(() => i18n.language);
 
     setUnauthorizedHandler(() => {
-      authClient.signOut().then(async () => {
-        queryClient.clear();
-        await persister.removeClient();
-        router.replace(routes.home as Href);
-      });
+      authClient
+        .signOut()
+        .catch(() => {
+          // Ignore network errors during signout
+        })
+        .finally(async () => {
+          queryClient.clear();
+          await persister.removeClient();
+          router.replace(routes.home as Href);
+        });
     });
   }, [router]);
 

@@ -4,6 +4,7 @@ const ApiEnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().min(1).max(65535).default(3001),
   CORS_ORIGIN: z.string().default('http://localhost:3000'),
+  CORS_ORIGINS_NATIVE: z.string().optional().default('salafidurus-dev://,exp://'),
   DATABASE_URL: z.url(),
   ASSET_CDN_BASE_URL: z.url().optional(),
   SITEMAP_BASE_URL: z.url().optional(),
