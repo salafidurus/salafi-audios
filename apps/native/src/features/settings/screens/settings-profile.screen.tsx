@@ -1,12 +1,13 @@
 import { useAccountProfile, useUpdateProfile, useDeleteAccount } from "@sd/domain-account";
 import { useState } from "react";
-import { Alert, Pressable, ScrollView, TextInput, View } from "react-native";
+import { Alert, Pressable, ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
+import { TextInput } from "@/shared/components/TextInput/TextInput";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
 import { SettingsRow } from "../components/SettingsRow/SettingsRow";
