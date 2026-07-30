@@ -198,6 +198,7 @@ jest.mock("@expo/ui/community/menu", () => {
           testID: `${prefix}-action-${id}`,
           disabled: action.attributes?.disabled,
           accessibilityRole: "menuitem",
+          accessibilityState: action.state ? { checked: action.state === "on" } : undefined,
           onPress: () => onPressAction?.({ nativeEvent: { event: id } }),
         },
         React.createElement(Text, null, action.title),
