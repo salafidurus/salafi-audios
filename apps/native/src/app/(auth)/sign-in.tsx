@@ -11,8 +11,16 @@ export default function SignInRoute() {
   const router = useRouter();
   const { from } = useLocalSearchParams<{ from?: string }>();
   const { isAuthenticated } = useAuth();
-  const { signIn: nativeAppleSignIn, isLoading: appleLoading } = useNativeAppleSignIn();
-  const { signIn: nativeGoogleSignIn, isLoading: googleLoading } = useNativeGoogleSignIn();
+  const {
+    signIn: nativeAppleSignIn,
+    isLoading: appleLoading,
+    error: appleError,
+  } = useNativeAppleSignIn();
+  const {
+    signIn: nativeGoogleSignIn,
+    isLoading: googleLoading,
+    error: googleError,
+  } = useNativeGoogleSignIn();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -42,6 +50,8 @@ export default function SignInRoute() {
       onSignInWithApple={() => nativeAppleSignIn()}
       appleLoading={appleLoading}
       googleLoading={googleLoading}
+      appleError={appleError}
+      googleError={googleError}
     />
   );
 }

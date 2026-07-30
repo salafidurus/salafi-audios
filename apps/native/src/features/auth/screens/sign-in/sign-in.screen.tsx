@@ -12,6 +12,8 @@ export type SignInScreenProps = {
   onBack?: () => void;
   appleLoading?: boolean;
   googleLoading?: boolean;
+  appleError?: string | null;
+  googleError?: string | null;
 };
 
 export function SignInScreen({
@@ -20,6 +22,8 @@ export function SignInScreen({
   onBack,
   appleLoading,
   googleLoading,
+  appleError,
+  googleError,
 }: SignInScreenProps) {
   const { theme } = useUnistyles();
   const { t } = useTranslation();
@@ -78,11 +82,11 @@ export function SignInScreen({
           accessibilityRole="button"
           accessibilityLabel={t("auth.signIn.continueWithGoogle", "Continue with Google")}
         >
-          {googleLoading ? (
-            <ActivityIndicator color={theme.colors.content.default} />
-          ) : (
-            <View style={styles.googleBtnContent}>
-              <View style={styles.googleIconContainer}>
+          <View style={styles.googleBtnContent}>
+            <View style={styles.googleIconContainer}>
+              {googleLoading ? (
+                <ActivityIndicator size="small" color={theme.colors.content.default} />
+              ) : (
                 <Svg width={20} height={20} viewBox="0 0 48 48">
                   <Path
                     fill="#EA4335"
@@ -102,13 +106,21 @@ export function SignInScreen({
                   />
                   <Path fill="none" d="M0 0h48v48H0z" />
                 </Svg>
-              </View>
-              <Text style={styles.googleBtnText}>
-                {t("auth.signIn.continueWithGoogle", "Continue with Google")}
-              </Text>
+              )}
             </View>
-          )}
+            <Text style={styles.googleBtnText}>
+              {googleLoading
+                ? t("auth.signIn.signingIn", "Signing in…")
+                : t("auth.signIn.continueWithGoogle", "Continue with Google")}
+            </Text>
+          </View>
         </Pressable>
+
+        {googleError || appleError ? (
+          <Text testID="sign-in-error" style={styles.errorText}>
+            {googleError ?? appleError}
+          </Text>
+        ) : null}
       </View>
     </View>
   );
@@ -131,6 +143,12 @@ const styles = StyleSheet.create((theme) => ({
   kicker: {
     color: theme.colors.content.primary,
     marginBottom: theme.spacing.scale.xs,
+    ...theme.typography.labelMd,
+  },
+  errorText: {
+    color: theme.colors.state.dangerContent,
+    textAlign: "center",
+    marginTop: theme.spacing.scale.xs,
     ...theme.typography.labelMd,
   },
   backButton: {

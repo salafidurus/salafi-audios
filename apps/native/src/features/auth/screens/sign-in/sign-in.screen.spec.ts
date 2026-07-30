@@ -1,24 +1,65 @@
+import { render, screen } from "@testing-library/react-native";
+import React from "react";
+
 import { SignInScreen } from "./sign-in.screen";
 
+jest.mock("@/core/i18n/use-translation", () => ({
+  useTranslation: () => ({
+    t: (_key: string, fallback: string) => fallback,
+  }),
+}));
+
 describe("SignInScreen", () => {
+  const noop = () => undefined;
+
   it("exports SignInScreen component", () => {
-    // Component will be tested during integration with sign-in route
-    // This validates the module can be imported without errors
     expect(typeof SignInScreen).toBe("function");
   });
 
-  it("component has expected props structure", () => {
-    // Verify the component accepts the expected props by checking source code
-    const componentCode = SignInScreen.toString();
-    expect(componentCode).toContain("onSignInWithGoogle");
-    expect(componentCode).toContain("onSignInWithApple");
-    expect(componentCode).toContain("googleLoading");
+  it("renders the Google button label when idle", async () => {
+    await render(
+      React.createElement(SignInScreen, {
+        onSignInWithGoogle: noop,
+        onSignInWithApple: noop,
+      }),
+    );
+
+    expect(screen.getByText("Continue with Google")).toBeTruthy();
   });
 
-  it("renders Google button without image source", () => {
-    // Verify googleButtonSource prop is not required in the component signature
-    const componentCode = SignInScreen.toString();
-    // Check that SVG or text-based button is used instead of image
-    expect(componentCode).toContain("Continue with Google");
+  it("shows a signing-in label instead of the button text while Google sign-in is loading", async () => {
+    await render(
+      React.createElement(SignInScreen, {
+        onSignInWithGoogle: noop,
+        onSignInWithApple: noop,
+        googleLoading: true,
+      }),
+    );
+
+    expect(screen.queryByText("Continue with Google")).toBeNull();
+    expect(screen.getByText("Signing in…")).toBeTruthy();
+  });
+
+  it("renders the Google sign-in error message when present", async () => {
+    await render(
+      React.createElement(SignInScreen, {
+        onSignInWithGoogle: noop,
+        onSignInWithApple: noop,
+        googleError: "No ID token returned from Google",
+      }),
+    );
+
+    expect(screen.getByText("No ID token returned from Google")).toBeTruthy();
+  });
+
+  it("does not render an error message when there is none", async () => {
+    await render(
+      React.createElement(SignInScreen, {
+        onSignInWithGoogle: noop,
+        onSignInWithApple: noop,
+      }),
+    );
+
+    expect(screen.queryByTestId("sign-in-error")).toBeNull();
   });
 });
