@@ -16,7 +16,7 @@ export function AppText({ variant, children, style, numberOfLines, onLayout }: A
 
   return (
     <Text
-      style={[{ color: theme.colors.content.primary, ...theme.typography[variant] }, style]}
+      style={[{ color: theme.colors.content.strong, ...theme.typography[variant] }, style]}
       numberOfLines={numberOfLines}
       onLayout={onLayout}
     >

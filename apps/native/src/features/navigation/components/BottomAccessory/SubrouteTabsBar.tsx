@@ -1,12 +1,12 @@
 import { getSubnavLabel } from "@sd/core-i18n";
 import { type Href, usePathname, useRouter } from "expo-router";
-import React from "react";
-import { Pressable, Text, View } from "react-native";
+import React, { useCallback } from "react";
+import { FlatList, Pressable, Text, View, type ListRenderItem } from "react-native";
 import { EaseView } from "react-native-ease";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
-import { SECTION_TABS, type Section } from "@/features/navigation/types";
+import { SECTION_TABS, type Section, type TabConfig } from "@/features/navigation/types";
 import { getSectionTabIcon } from "@/features/navigation/utils/section-tab-icons";
 import {
   buildSectionPath,
@@ -20,69 +20,88 @@ export function SubrouteTabsBar() {
   const { t } = useTranslation();
 
   const activeRootTab = getRootTabFromPathname(pathname);
-  if (activeRootTab === "search") {
-    return null;
-  }
-
   const section = activeRootTab as Section;
   const tabs = SECTION_TABS[section];
-  if (!tabs || tabs.length === 0) {
+  const activeSubsection = getActiveSubsection(pathname, section);
+
+  const renderTab: ListRenderItem<TabConfig> = useCallback(
+    ({ item: tab }) => {
+      const isActive = tab.id === activeSubsection;
+      const href = buildSectionPath(section, tab.id);
+      const Icon = getSectionTabIcon(section, tab.id);
+
+      return (
+        <Pressable
+          onPress={() => router.replace(href as Href)}
+          accessibilityRole="button"
+          accessibilityState={{ selected: isActive }}
+          style={styles.tabPressable}
+        >
+          <EaseView
+            animate={{ scale: isActive ? 1 : 0.98, opacity: isActive ? 1 : 0.82 }}
+            transition={{ type: "spring", damping: 12, stiffness: 150 }}
+          >
+            <View style={[styles.tab, isActive && styles.tabActive]}>
+              {Icon ? (
+                <Icon
+                  size={14}
+                  strokeWidth={1.8}
+                  color={isActive ? styles.labelActive.color : styles.label.color}
+                />
+              ) : null}
+              <Text
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                style={[styles.label, isActive && styles.labelActive]}
+              >
+                {getSubnavLabel(section, tab.id, t)}
+              </Text>
+            </View>
+          </EaseView>
+        </Pressable>
+      );
+    },
+    [activeSubsection, router, section, t],
+  );
+
+  if (activeRootTab === "search" || !tabs || tabs.length === 0) {
     return null;
   }
 
-  const activeSubsection = getActiveSubsection(pathname, section);
-
   return (
-    <View style={styles.container}>
-      {tabs.map((tab) => {
-        const isActive = tab.id === activeSubsection;
-        const href = buildSectionPath(section, tab.id);
-        const Icon = getSectionTabIcon(section, tab.id);
-
-        return (
-          <Pressable
-            key={tab.id}
-            onPress={() => router.replace(href as Href)}
-            accessibilityRole="button"
-            accessibilityState={{ selected: isActive }}
-            style={styles.tabPressable}
-          >
-            <EaseView
-              animate={{ scale: isActive ? 1 : 0.98, opacity: isActive ? 1 : 0.82 }}
-              transition={{ type: "spring", damping: 12, stiffness: 150 }}
-            >
-              <View style={[styles.tab, isActive && styles.tabActive]}>
-                {Icon ? (
-                  <Icon
-                    size={14}
-                    strokeWidth={1.8}
-                    color={isActive ? styles.labelActive.color : styles.label.color}
-                  />
-                ) : null}
-                <Text style={[styles.label, isActive && styles.labelActive]}>
-                  {getSubnavLabel(section, tab.id, t)}
-                </Text>
-              </View>
-            </EaseView>
-          </Pressable>
-        );
-      })}
-    </View>
+    <FlatList
+      horizontal
+      data={tabs}
+      keyExtractor={(item) => item.id}
+      renderItem={renderTab}
+      CellRendererComponent={({ children, style, ...props }) => (
+        <View style={[{ flex: 1 }, style]} {...props}>
+          {children}
+        </View>
+      )}
+      showsHorizontalScrollIndicator={false}
+      style={styles.container}
+      contentContainerStyle={styles.scrollContent}
+    />
   );
 }
 
 const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
     backgroundColor: theme.colors.surface.default,
-    padding: 4,
     borderRadius: theme.radius.component.chip || 20,
     borderWidth: 1,
     borderColor: theme.colors.border.subtle,
     alignSelf: "stretch",
     ...theme.shadows.sm,
+  },
+  scrollContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexGrow: 1,
+    padding: 4,
+    gap: 4,
   },
   tabPressable: {
     flex: 1,

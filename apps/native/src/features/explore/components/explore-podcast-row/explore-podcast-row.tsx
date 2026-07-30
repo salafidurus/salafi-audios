@@ -124,8 +124,8 @@ export function ExplorePodcastRow({
           icon={
             <Bookmark
               size={14}
-              color={isSaved ? theme.colors.action.primary : theme.colors.content.default}
-              fill={isSaved ? theme.colors.action.primary : "none"}
+              color={theme.colors.content.default}
+              fill={isSaved ? theme.colors.content.default : "none"}
             />
           }
           onPress={handleSave}
@@ -162,6 +162,6 @@ const styles = StyleSheet.create((theme) => ({
   progressBar: {
     height: "100%",
     borderRadius: theme.radius.scale.full,
-    backgroundColor: theme.colors.action.primary,
+    backgroundColor: theme.colors.content.strong,
   },
 }));
