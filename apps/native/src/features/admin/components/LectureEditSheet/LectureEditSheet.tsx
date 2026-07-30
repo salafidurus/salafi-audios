@@ -1,8 +1,10 @@
 import type { AdminListingDetailDto, Locale } from "@sd/core-contracts";
 
 import { useEffect, useReducer } from "react";
-import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
+
+import { TextInput } from "@/shared/components/TextInput/TextInput";
 
 import { fetchAdminLectureDetail, updateLecture } from "../../api/admin-lectures.api";
 
