@@ -1,6 +1,11 @@
 import { SegmentedControl as NativeSegmentedControl } from "@expo/ui/community/segmented-control";
-import { View } from "react-native";
+import { View, type ViewStyle } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
+
+const base = {
+  container: { width: "100%" } as ViewStyle,
+  control: { width: "100%" } as ViewStyle,
+};
 
 export interface SegmentedControlOption<T extends string> {
   value: T;
@@ -27,7 +32,10 @@ export function SegmentedControl<T extends string>({
     // NativeSegmentedControl wraps itself in its own @expo/ui Host internally —
     // nesting another Host around it breaks touch dispatch, so this is a plain
     // RN View purely for the accessibility label, not a second native boundary.
-    <View accessible accessibilityLabel={ariaLabel}>
+    // NativeSegmentedControl's internal Host only matches content *height*
+    // (`matchContents: { vertical: true }`), so width comes entirely from
+    // external layout — without an explicit width here it collapses to ~0.
+    <View accessible accessibilityLabel={ariaLabel} style={base.container}>
       <NativeSegmentedControl
         values={options.map((opt) => opt.label)}
         selectedIndex={selectedIndex === -1 ? undefined : selectedIndex}
@@ -36,6 +44,7 @@ export function SegmentedControl<T extends string>({
           if (opt) onChange(opt.value);
         }}
         tintColor={theme.colors.action.primary}
+        style={base.control}
       />
     </View>
   );
