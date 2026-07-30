@@ -106,32 +106,36 @@ export function ExplorePodcastRow({
         </View>
       </View>
 
-      <List.Item.Actions>
-        <Button
-          variant="outline"
-          size="sm"
-          fullWidth
-          label="Details"
-          icon={<Info size={14} color={theme.colors.content.default} />}
-          onPress={handleDetails}
-          testID="details-action"
-        />
-        <Button
-          variant="outline"
-          size="sm"
-          fullWidth
-          label={isSaved ? "Saved" : "Save"}
-          icon={
-            <Bookmark
-              size={14}
-              color={theme.colors.content.default}
-              fill={isSaved ? theme.colors.content.default : "none"}
-            />
-          }
-          onPress={handleSave}
-          testID="save-action"
-        />
-      </List.Item.Actions>
+      <View style={styles.actions}>
+        <View style={styles.actionItem}>
+          <Button
+            variant="outline"
+            size="sm"
+            fullWidth
+            label="Details"
+            icon={<Info size={14} color={theme.colors.content.default} />}
+            onPress={handleDetails}
+            testID="details-action"
+          />
+        </View>
+        <View style={styles.actionItem}>
+          <Button
+            variant="outline"
+            size="sm"
+            fullWidth
+            label={isSaved ? "Saved" : "Save"}
+            icon={
+              <Bookmark
+                size={14}
+                color={theme.colors.content.default}
+                fill={isSaved ? theme.colors.content.default : "none"}
+              />
+            }
+            onPress={handleSave}
+            testID="save-action"
+          />
+        </View>
+      </View>
     </List.Item>
   );
 }
@@ -163,5 +167,15 @@ const styles = StyleSheet.create((theme) => ({
     height: "100%",
     borderRadius: theme.radius.scale.full,
     backgroundColor: theme.colors.content.strong,
+  },
+  actions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.scale.xs,
+    marginTop: theme.spacing.scale.xs,
+    width: "100%",
+  },
+  actionItem: {
+    flex: 1,
   },
 }));

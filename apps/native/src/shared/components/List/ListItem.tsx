@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { MenuView, type MenuAction, type NativeActionEvent } from "@expo/ui/community/menu";
 import { Pressable, type ViewStyle, type StyleProp } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -9,6 +10,11 @@ export type ListItemProps = {
   interactive?: boolean;
   hideBorder?: boolean;
   style?: StyleProp<ViewStyle>;
+  /** Actions shown in a native context menu opened by long-pressing the row. */
+  actions?: MenuAction[];
+  /** Called with the pressed action's `id` (falling back to its `title`). */
+  onAction?: (id: string) => void;
+  testID?: string;
 };
 
 export function ListItem({
@@ -17,14 +23,18 @@ export function ListItem({
   interactive = false,
   hideBorder = false,
   style,
+  actions,
+  onAction,
+  testID,
 }: ListItemProps) {
   const isClickable = Boolean(onPress);
   const isInteractive = isClickable || interactive;
 
-  return (
+  const row = (
     <Pressable
       onPress={onPress}
       disabled={!isClickable}
+      testID={testID}
       style={({ pressed }) => [
         styles.item,
         hideBorder && styles.noBorder,
@@ -34,6 +44,19 @@ export function ListItem({
     >
       {children}
     </Pressable>
+  );
+
+  if (!actions?.length) return row;
+
+  return (
+    <MenuView
+      testID={testID}
+      actions={actions}
+      shouldOpenOnLongPress
+      onPressAction={(event: NativeActionEvent) => onAction?.(event.nativeEvent.event)}
+    >
+      {row}
+    </MenuView>
   );
 }
 
