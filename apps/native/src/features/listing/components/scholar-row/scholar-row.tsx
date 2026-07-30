@@ -1,12 +1,12 @@
 import type { ScholarListItemDto } from "@sd/core-contracts";
 
-import { Image } from "expo-image";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { AppText } from "@/shared/components/AppText/AppText";
 import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
+import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
 export type ScholarRowProps = {
   scholar: ScholarListItemDto;
@@ -18,24 +18,23 @@ export function ScholarRow({ scholar, onPress, hideBorder }: ScholarRowProps) {
   return (
     <List.Item onPress={() => onPress?.(scholar.slug)} hideBorder={hideBorder}>
       <View style={styles.rowContent} testID="scholar-row">
-        <View style={styles.avatarContainer}>
-          {scholar.imageUrl ? (
-            <Image
-              source={{ uri: scholar.imageUrl }}
-              style={styles.avatar}
-              testID="scholar-row-avatar"
-            />
-          ) : (
-            <View style={styles.avatarPlaceholder} testID="scholar-row-avatar-placeholder" />
-          )}
-        </View>
+        <UserAvatar
+          image={scholar.imageUrl}
+          name={scholar.name}
+          size={48}
+          testID={scholar.imageUrl ? "scholar-row-avatar" : "scholar-row-avatar-placeholder"}
+        />
         <View style={styles.content}>
-          <MarqueeText text={scholar.name} variant="bodyMd" />
+          <MarqueeText text={scholar.name} variant="titleMd" />
           <View style={styles.subtitle}>
             {scholar.mainLanguage ? (
-              <AppText variant="caption">{scholar.mainLanguage}</AppText>
+              <AppText variant="xs" style={styles.metaText}>
+                {scholar.mainLanguage}
+              </AppText>
             ) : null}
-            <AppText variant="caption">{scholar.lectureCount} lectures</AppText>
+            <AppText variant="xs" style={styles.metaText}>
+              {scholar.lectureCount} lectures
+            </AppText>
           </View>
         </View>
       </View>
@@ -72,5 +71,8 @@ const styles = StyleSheet.create((theme) => ({
   subtitle: {
     flexDirection: "row",
     gap: theme.spacing.scale.sm,
+  },
+  metaText: {
+    color: theme.colors.content.subtle,
   },
 }));

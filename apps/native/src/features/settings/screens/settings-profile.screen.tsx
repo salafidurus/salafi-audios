@@ -6,12 +6,15 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { AppText } from "@/shared/components/AppText/AppText";
+import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
+import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
 import { SettingsRow } from "../components/SettingsRow/SettingsRow";
 import { SettingsSection } from "../components/SettingsSection/SettingsSection";
 
 export type SettingsProfileScreenProps = {
   onSignOut?: () => void;
+  onSignIn?: () => void;
 };
 
 function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
@@ -91,11 +94,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
       {/* Avatar row */}
       <View style={styles.avatarRow}>
-        <View style={[styles.avatar, { backgroundColor: theme.colors.action.primary }]}>
-          <AppText variant="titleMd" style={{ color: theme.colors.content.onPrimary }}>
-            {(profile.displayName || profile.email).charAt(0).toUpperCase()}
-          </AppText>
-        </View>
+        <UserAvatar name={profile.displayName || profile.email} size={56} />
         <View>
           <AppText variant="bodyLg" style={styles.profileName}>
             {profile.displayName}
@@ -216,7 +215,7 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
   );
 }
 
-export function SettingsProfileScreen({ onSignOut }: SettingsProfileScreenProps) {
+export function SettingsProfileScreen({ onSignOut, onSignIn }: SettingsProfileScreenProps) {
   const { isAuthenticated, isLoading } = useAuth();
   const { t } = useTranslation();
 
@@ -224,17 +223,15 @@ export function SettingsProfileScreen({ onSignOut }: SettingsProfileScreenProps)
 
   if (!isAuthenticated) {
     return (
-      <View style={styles.centered}>
-        <AppText variant="titleMd" style={styles.signInTitle}>
-          {t("account.profile.signInCta", "Sign in to view your profile and roles.")}
-        </AppText>
-        <AppText variant="bodyMd" style={styles.signInDesc}>
-          {t(
-            "account.profile.signInDesc",
-            "Create an account or sign in to manage your profile and roles.",
-          )}
-        </AppText>
-      </View>
+      <AuthRequiredState
+        title={t("account.profile.signInTitle", "Sign in to view your profile")}
+        description={t(
+          "account.profile.signInDesc",
+          "Create an account or sign in to manage your profile and roles.",
+        )}
+        actionLabel={t("account.signIn", "Sign In")}
+        onPress={() => onSignIn?.()}
+      />
     );
   }
 

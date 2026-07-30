@@ -147,7 +147,11 @@ function getVariantContainer(variant: ButtonVariant, t: Theme): ViewStyle {
         ...t.shadows.xs,
       };
     case "outline":
-      return { backgroundColor: "transparent", borderColor: t.colors.border.default };
+      return {
+        backgroundColor: "transparent",
+        borderColor: t.colors.border.default,
+        borderWidth: 1.5,
+      };
     case "ghost":
       return { backgroundColor: "transparent", borderColor: "transparent" };
     case "danger":

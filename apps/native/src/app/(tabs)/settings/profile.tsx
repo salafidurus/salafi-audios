@@ -15,5 +15,10 @@ export default function SettingsProfileRoute() {
     router.replace(routes.home as Href);
   };
 
-  return <SettingsProfileScreen onSignOut={handleSignOut} />;
+  return (
+    <SettingsProfileScreen
+      onSignOut={handleSignOut}
+      onSignIn={() => router.push(routes.signIn as Href)}
+    />
+  );
 }

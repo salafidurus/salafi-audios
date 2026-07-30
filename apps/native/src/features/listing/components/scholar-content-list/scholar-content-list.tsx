@@ -3,12 +3,13 @@ import type { ScholarContentItemDto } from "@sd/core-contracts";
 import { pickContentField } from "@sd/core-i18n";
 import { useState, useCallback } from "react";
 import { FlatList, Pressable, TextInput, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { List } from "@/shared/components/List";
+import { MarqueeText } from "@/shared/components/MarqueeText";
 import { useListingNavigation } from "@/shared/hooks/use-listing-navigation";
 
 export type ScholarContentListProps = {
@@ -16,6 +17,7 @@ export type ScholarContentListProps = {
 };
 
 export function ScholarContentList({ items }: ScholarContentListProps) {
+  const { theme } = useUnistyles();
   const { navigateToListing } = useListingNavigation();
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
@@ -96,6 +98,7 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
           <TextInput
             style={styles.filter}
             placeholder={t("scholarContent.filterPlaceholder", "Filter content…")}
+            placeholderTextColor={theme.colors.content.muted}
             value={filter}
             onChangeText={setFilter}
           />
@@ -109,12 +112,7 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
                   hideBorder={index === filteredBrowse.length - 1}
                 >
                   <View style={styles.rowContent}>
-                    <AppText variant="caption" style={styles.typeLabel}>
-                      {item.type}
-                    </AppText>
-                    <AppText variant="labelMd" style={styles.titleText}>
-                      {title}
-                    </AppText>
+                    <MarqueeText text={title} variant="titleMd" />
                   </View>
                 </List.Item>
               );

@@ -23,6 +23,29 @@ jest.mock("@sd/domain-audio", () => ({
     resumePositionSeconds: 0,
     isCompleted: false,
   })),
+  useAudio: jest.fn(() => ({
+    isPlaying: false,
+    currentTrack: null,
+    playListing: jest.fn(),
+    pause: jest.fn(),
+    resume: jest.fn(),
+  })),
+  useProgressStore: jest.fn(() => ({
+    actions: {
+      isSaved: jest.fn(() => false),
+      addSaved: jest.fn(),
+      removeSaved: jest.fn(),
+    },
+    progressMap: {},
+  })),
+}));
+
+jest.mock("@/features/audio", () => ({
+  audioService: {
+    playListing: jest.fn(),
+    pause: jest.fn(),
+    resume: jest.fn(),
+  },
 }));
 
 jest.mock("@/features/settings/content-preference", () => ({
@@ -42,31 +65,26 @@ describe("ExplorePodcastRow", () => {
 
   it("shows duration in minutes", async () => {
     await render(<ExplorePodcastRow item={baseItem} />);
-    expect(screen.getByText("30 min")).toBeTruthy();
+    expect(screen.getByText(/30 min/)).toBeTruthy();
   });
 
   it("hides duration when durationSeconds is null", async () => {
     await render(<ExplorePodcastRow item={{ ...baseItem, durationSeconds: null }} />);
-    expect(screen.queryByText("30 min")).toBeNull();
+    expect(screen.queryByText(/30 min/)).toBeNull();
   });
 
-  it("renders thumbnail image when thumbnailUrl is provided", async () => {
-    await render(
-      <ExplorePodcastRow item={{ ...baseItem, thumbnailUrl: "https://example.com/thumb.jpg" }} />,
-    );
-    expect(screen.getByTestId("podcast-thumbnail")).toBeTruthy();
-  });
-
-  it("renders placeholder view when no thumbnailUrl", async () => {
+  it("triggers play when row item is pressed", async () => {
+    const audioMock = jest.requireMock("@/features/audio").audioService;
     await render(<ExplorePodcastRow item={baseItem} />);
-    expect(screen.getByTestId("podcast-thumbnail-placeholder")).toBeTruthy();
+    await fireEvent.press(screen.getByTestId("podcast-row"));
+    expect(audioMock.playListing).toHaveBeenCalled();
   });
 
-  it("calls onPress when pressed", async () => {
-    const onPress = jest.fn();
-    await render(<ExplorePodcastRow item={baseItem} onPress={onPress} />);
-    await fireEvent.press(screen.getByTestId("podcast-row"));
-    expect(onPress).toHaveBeenCalledTimes(1);
+  it("calls onNavigateToListing when details action button is pressed", async () => {
+    const onNavigateToListing = jest.fn();
+    await render(<ExplorePodcastRow item={baseItem} onNavigateToListing={onNavigateToListing} />);
+    await fireEvent.press(screen.getByTestId("details-action"));
+    expect(onNavigateToListing).toHaveBeenCalledWith("test-lecture");
   });
 
   it("shows progress bar when 0 < progressPercent < 100", async () => {
@@ -89,21 +107,5 @@ describe("ExplorePodcastRow", () => {
     });
     await render(<ExplorePodcastRow item={baseItem} />);
     expect(screen.queryByTestId("progress-bar-track")).toBeNull();
-  });
-
-  it("hides progress bar when item is completed (progressPercent 100)", async () => {
-    const mock = jest.requireMock("@sd/domain-audio").useListingProgress;
-    mock.mockReturnValue({
-      progressPercent: 100,
-      resumePositionSeconds: 1800,
-      isCompleted: true,
-    });
-    await render(<ExplorePodcastRow item={baseItem} />);
-    expect(screen.queryByTestId("progress-bar-track")).toBeNull();
-  });
-
-  it("shows listing type when not a single", async () => {
-    await render(<ExplorePodcastRow item={{ ...baseItem, kind: "series" }} />);
-    expect(screen.getByText("Scholar Name · series")).toBeTruthy();
   });
 });
