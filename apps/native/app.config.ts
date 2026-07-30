@@ -108,6 +108,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       ],
       "expo-asset",
       "expo-apple-authentication",
+      "@react-native-google-signin/google-signin",
       "expo-audio",
       [
         "expo-document-picker",
@@ -178,6 +179,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
       },
       appEnv,
       apiUrl: process.env.EXPO_PUBLIC_API_URL,
+      googleWebClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
       sentryDsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
       sentryOrg: process.env.EXPO_PUBLIC_SENTRY_ORG,
       sentryProject: process.env.EXPO_PUBLIC_SENTRY_PROJECT,

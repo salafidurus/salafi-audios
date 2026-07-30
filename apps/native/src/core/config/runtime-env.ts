@@ -5,6 +5,7 @@ import { z } from "zod";
 const NativeRuntimeExtraSchema = z.object({
   appEnv: z.enum(["development", "preview", "production"]).optional(),
   apiUrl: z.url().optional(),
+  googleWebClientId: z.string().optional(),
   sentryDsn: z.url().optional(),
   sentryOrg: z.string().optional(),
   sentryProject: z.string().optional(),
@@ -86,4 +87,8 @@ export function getApiBaseUrl(): string | undefined {
   }
 
   return __DEV__ && Platform.OS === "android" ? rewriteLoopbackForAndroidEmulator(apiUrl) : apiUrl;
+}
+
+export function getGoogleWebClientId(): string | undefined {
+  return getRuntimeEnv()?.googleWebClientId;
 }

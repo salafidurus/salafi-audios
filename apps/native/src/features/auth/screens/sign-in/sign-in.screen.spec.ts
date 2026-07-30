@@ -12,6 +12,7 @@ describe("SignInScreen", () => {
     const componentCode = SignInScreen.toString();
     expect(componentCode).toContain("onSignInWithGoogle");
     expect(componentCode).toContain("onSignInWithApple");
+    expect(componentCode).toContain("googleLoading");
   });
 
   it("renders Google button without image source", () => {

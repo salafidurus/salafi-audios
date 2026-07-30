@@ -5,6 +5,8 @@ const mockRouterCanGoBack = jest.fn(() => true);
 const mockRouterReplace = jest.fn();
 const mockUseLocalSearchParams = jest.fn(() => ({}) as { from?: string });
 const mockUseAuth = jest.fn(() => ({ isAuthenticated: false, isLoading: false, user: null }));
+const mockAppleSignIn = jest.fn();
+const mockGoogleSignIn = jest.fn();
 
 jest.mock("expo-router", () => ({
   useRouter: () => ({
@@ -15,23 +17,21 @@ jest.mock("expo-router", () => ({
   useLocalSearchParams: () => mockUseLocalSearchParams(),
 }));
 
-jest.mock("expo-web-browser", () => ({
-  dismissAuthSession: jest.fn(),
-  maybeCompleteAuthSession: jest.fn(),
-}));
-
 jest.mock("@/core/auth", () => ({
   useAuth: () => mockUseAuth(),
-  authClient: {
-    signIn: {
-      social: jest.fn(),
-    },
-  },
 }));
 
 jest.mock("@/features/auth/hooks/use-native-apple-sign-in", () => ({
   useNativeAppleSignIn: () => ({
-    signIn: jest.fn(),
+    signIn: mockAppleSignIn,
+    isLoading: false,
+    error: null,
+  }),
+}));
+
+jest.mock("@/features/auth/hooks/use-native-google-sign-in", () => ({
+  useNativeGoogleSignIn: () => ({
+    signIn: mockGoogleSignIn,
     isLoading: false,
     error: null,
   }),
@@ -40,6 +40,7 @@ jest.mock("@/features/auth/hooks/use-native-apple-sign-in", () => ({
 jest.mock("@/features/auth/screens/sign-in/sign-in.screen", () => ({
   SignInScreen: (props: any) => {
     props.onSignInWithGoogle();
+    props.onSignInWithApple();
     return null;
   },
 }));
@@ -56,31 +57,22 @@ describe("SignInRoute", () => {
     expect(typeof SignInRoute).toBe("function");
   });
 
-  it("calls authClient.signIn.social with callbackURL: '/' when there is no from param", async () => {
+  it("triggers native Google sign-in when the Google button is pressed", async () => {
     const React = require("react");
-    const { authClient } = require("@/core/auth");
     const { render } = require("@testing-library/react-native");
 
     await render(React.createElement(SignInRoute));
 
-    expect(authClient.signIn.social).toHaveBeenCalledWith(
-      { provider: "google", callbackURL: "/" },
-      expect.objectContaining({ onError: expect.any(Function), onSuccess: expect.any(Function) }),
-    );
+    expect(mockGoogleSignIn).toHaveBeenCalled();
   });
 
-  it("uses the from param as callbackURL when present", async () => {
-    mockUseLocalSearchParams.mockReturnValue({ from: "/library/saved" });
+  it("triggers native Apple sign-in when the Apple button is pressed", async () => {
     const React = require("react");
-    const { authClient } = require("@/core/auth");
     const { render } = require("@testing-library/react-native");
 
     await render(React.createElement(SignInRoute));
 
-    expect(authClient.signIn.social).toHaveBeenCalledWith(
-      { provider: "google", callbackURL: "/library/saved" },
-      expect.objectContaining({ onError: expect.any(Function), onSuccess: expect.any(Function) }),
-    );
+    expect(mockAppleSignIn).toHaveBeenCalled();
   });
 
   it("redirects to the from param when sign-in succeeds", async () => {

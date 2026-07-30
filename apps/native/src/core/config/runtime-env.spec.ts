@@ -102,3 +102,27 @@ describe("getApiBaseUrl", () => {
     expect(getApiBaseUrl()).toBeUndefined();
   });
 });
+
+describe("getGoogleWebClientId", () => {
+  function loadWithExtra(extra: Record<string, unknown>) {
+    jest.resetModules();
+    jest.doMock("expo-constants", () => ({
+      __esModule: true,
+      default: { expoConfig: { extra } },
+    }));
+
+    return require("./runtime-env") as typeof import("./runtime-env");
+  }
+
+  it("returns the configured Google web client id", () => {
+    const { getGoogleWebClientId } = loadWithExtra({
+      googleWebClientId: "web-client-id.apps.googleusercontent.com",
+    });
+    expect(getGoogleWebClientId()).toBe("web-client-id.apps.googleusercontent.com");
+  });
+
+  it("returns undefined when not configured", () => {
+    const { getGoogleWebClientId } = loadWithExtra({});
+    expect(getGoogleWebClientId()).toBeUndefined();
+  });
+});

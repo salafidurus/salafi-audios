@@ -1,0 +1,55 @@
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { useCallback, useState } from "react";
+
+import { authClient } from "@/core/auth";
+import { getGoogleWebClientId } from "@/core/config/runtime-env";
+
+// The library's shipped types resolve to its web variant under this project's
+// `moduleSuffixes` (tries `.web` before the unsuffixed native file), which
+// types `signIn()` as `Promise<User>` instead of the real native
+// `SignInResponse` union. Metro still bundles the real native implementation;
+// this local type just corrects what TS sees it returning.
+type NativeGoogleSignInResponse =
+  | { type: "success"; data: { idToken: string | null } }
+  | { type: "cancelled"; data: null };
+
+export function useNativeGoogleSignIn() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const signIn = useCallback(async () => {
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      GoogleSignin.configure({ webClientId: getGoogleWebClientId() });
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+
+      const response = (await GoogleSignin.signIn()) as unknown as NativeGoogleSignInResponse;
+      if (response.type === "cancelled") {
+        return;
+      }
+
+      if (!response.data.idToken) {
+        throw new Error("No ID token returned from Google");
+      }
+
+      const { error: signInError } = await authClient.signIn.social({
+        provider: "google",
+        idToken: { token: response.data.idToken },
+      });
+
+      if (signInError) {
+        throw new Error(signInError.message ?? "Google Sign-In failed");
+      }
+      // Router navigation handled by parent component watching auth state via useAuth()
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Google Sign-In failed";
+      setError(message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  return { signIn, isLoading, error };
+}
