@@ -1,7 +1,7 @@
 import { MenuView, type MenuAction, type NativeActionEvent } from "@expo/ui/community/menu";
 import { SUPPORTED_LOCALES, type Locale } from "@sd/core-i18n";
 import { useQueryClient } from "@tanstack/react-query";
-import { Pressable, Text } from "react-native";
+import { Text, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { changeLocale } from "@/core/i18n/i18n";
@@ -41,10 +41,13 @@ export function LanguageSwitch() {
         void handleSelect(event.nativeEvent.event as Locale)
       }
     >
-      <Pressable style={styles.trigger}>
+      {/* Plain View, not Pressable: MenuView's tap-to-open needs SwiftUI's Menu to
+          own the tap gesture on this trigger. A Pressable — even without onPress —
+          claims RN's touch responder and blocks the native tap from ever firing. */}
+      <View style={styles.trigger}>
         <Text style={styles.triggerLabel}>{LOCALE_LABELS[activeLocale]}</Text>
         <Text style={styles.chevron}>▾</Text>
-      </Pressable>
+      </View>
     </MenuView>
   );
 }
