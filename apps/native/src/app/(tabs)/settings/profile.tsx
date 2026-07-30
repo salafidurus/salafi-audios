@@ -18,7 +18,9 @@ export default function SettingsProfileRoute() {
   return (
     <SettingsProfileScreen
       onSignOut={handleSignOut}
-      onSignIn={() => router.push(routes.signIn as Href)}
+      onSignIn={() =>
+        router.push({ pathname: routes.signIn, params: { from: routes.settings.profile } })
+      }
     />
   );
 }
