@@ -53,7 +53,9 @@ export default function TabsLayout() {
             sf={{ default: "shield", selected: "shield.fill" }}
             md={{ default: "admin_panel_settings", selected: "admin_panel_settings" }}
           />
-          <NativeTabs.Trigger.Label>{t("admin", "Admin")}</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Label>
+            {t("admin.dashboard.titleMobile", "Admin")}
+          </NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
 
         {Platform.OS === "ios" ? (

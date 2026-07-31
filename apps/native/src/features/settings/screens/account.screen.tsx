@@ -47,7 +47,7 @@ export function AccountScreen({
       {profile ? (
         <>
           {/* Profile Info Section */}
-          <SettingsSection title={t("account.profile", "Profile")}>
+          <SettingsSection title={t("account.profile.title", "Profile")}>
             <SettingsRow
               label={profile.displayName || t("account.defaultUser", "User")}
               sublabel={profile.email}
@@ -64,11 +64,14 @@ export function AccountScreen({
           {/* Actions Section */}
           <SettingsSection title={t("account.actions", "Actions")}>
             {hasAnyPermission && (
-              <SettingsRow label={t("account.admin", "Admin")} onPress={onNavigateToAdmin}>
+              <SettingsRow
+                label={t("admin.dashboard.titleMobile", "Admin")}
+                onPress={onNavigateToAdmin}
+              >
                 <ChevronRight size={18} color={theme.colors.content.muted} />
               </SettingsRow>
             )}
-            <SettingsRow label={t("account.support", "Support")} onPress={onNavigateToSupport}>
+            <SettingsRow label={t("settings.support", "Support")} onPress={onNavigateToSupport}>
               <ChevronRight size={18} color={theme.colors.content.muted} />
             </SettingsRow>
             <SettingsRow label={t("account.legal", "Legal")} onPress={onNavigateToLegal}>

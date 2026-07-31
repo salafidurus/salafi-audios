@@ -17,15 +17,15 @@ export function AdminDashboardScreen({
 
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>{t("admin.title", "Admin Dashboard")}</Text>
+      <Text style={styles.title}>{t("admin.dashboard.title", "Admin Dashboard")}</Text>
 
       <Pressable onPress={onNavigateToListings} style={[styles.card, styles.cardListings]}>
-        <Text style={styles.cardTitle}>{t("admin.listings", "Listings")}</Text>
+        <Text style={styles.cardTitle}>{t("navigation.subnav.admin.listings", "Listings")}</Text>
         <Text style={styles.cardSubtitle}>{t("admin.manageAudios", "Manage audio content")}</Text>
       </Pressable>
 
       <Pressable onPress={onNavigateToScholars} style={[styles.card, styles.cardScholars]}>
-        <Text style={styles.cardTitle}>{t("admin.scholars", "Scholars")}</Text>
+        <Text style={styles.cardTitle}>{t("navigation.admin.scholars", "Scholars")}</Text>
         <Text style={styles.cardSubtitle}>
           {t("admin.manageSeries", "Manage scholars & series")}
         </Text>

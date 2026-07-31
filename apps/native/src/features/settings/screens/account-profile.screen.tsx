@@ -42,16 +42,16 @@ function AccountProfileForm({
         title={t("account.editProfile", "Edit Profile")}
         description={t("account.profileDesc", "Manage your personal profile information.")}
       >
-        <SettingsRow label={t("account.displayName", "Display Name")}>
+        <SettingsRow label={t("account.profile.displayName", "Display Name")}>
           <TextInput
             value={displayName}
             onChangeText={setDisplayName}
-            placeholder={t("account.displayNamePlaceholder", "Your display name")}
+            placeholder={t("account.profile.displayNamePlaceholder", "Your display name")}
             placeholderTextColor={theme.colors.content.muted}
             style={styles.input}
           />
         </SettingsRow>
-        <SettingsRow label={t("account.email", "Email")} hideBorder>
+        <SettingsRow label={t("account.profile.email", "Email")} hideBorder>
           <TextInput
             value={profile.email}
             editable={false}
@@ -63,7 +63,7 @@ function AccountProfileForm({
       <View style={styles.actions}>
         {isError && (
           <AppText variant="caption" style={{ color: theme.colors.state.dangerContent }}>
-            {t("account.saveFailed", "Failed to save. Please try again.")}
+            {t("account.profile.displayNameSaveFailed", "Failed to save. Please try again.")}
           </AppText>
         )}
         {isSuccess && (
@@ -77,7 +77,7 @@ function AccountProfileForm({
           style={[styles.saveButton, (isPending || unchanged) && styles.saveButtonDisabled]}
         >
           <AppText variant="bodyMd" style={{ color: theme.colors.content.onPrimary }}>
-            {isPending ? t("account.saving", "Saving…") : t("account.save", "Save")}
+            {isPending ? t("account.profile.saving", "Saving…") : t("account.profile.save", "Save")}
           </AppText>
         </Pressable>
       </View>
@@ -93,7 +93,7 @@ export function AccountProfileScreen(_props: AccountProfileScreenProps) {
   if (isLoading) {
     return (
       <View style={styles.centered}>
-        <AppText variant="bodyMd">{t("account.loadingProfile", "Loading profile...")}</AppText>
+        <AppText variant="bodyMd">{t("account.profile.loading", "Loading profile...")}</AppText>
       </View>
     );
   }
@@ -102,7 +102,7 @@ export function AccountProfileScreen(_props: AccountProfileScreenProps) {
     return (
       <View style={styles.centered}>
         <AppText variant="bodyMd">
-          {t("account.profileUnavailable", "Profile not available")}
+          {t("account.profile.notAvailable", "Profile not available")}
         </AppText>
       </View>
     );
