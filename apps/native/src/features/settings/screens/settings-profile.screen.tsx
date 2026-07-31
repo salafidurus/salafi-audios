@@ -1,5 +1,5 @@
 import { useAccountProfile, useUpdateProfile, useDeleteAccount } from "@sd/domain-account";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, Pressable, ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
@@ -12,6 +12,7 @@ import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
 import { SettingsRow } from "../components/SettingsRow/SettingsRow";
 import { SettingsSection } from "../components/SettingsSection/SettingsSection";
+import { getRtlAwareTextAlign } from "../utils/rtl-text-align";
 
 export type SettingsProfileScreenProps = {
   onSignOut?: () => void;
@@ -26,6 +27,10 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
   const { mutate: deleteAccount, isPending: isDeletingAccount } = useDeleteAccount();
   const [displayName, setDisplayName] = useState(profile?.displayName ?? "");
   const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    if (!isEditing) setDisplayName(profile?.displayName ?? "");
+  }, [profile?.displayName, isEditing]);
 
   if (isFetching) {
     return (
@@ -248,7 +253,7 @@ const styles = StyleSheet.create((theme) => ({
     padding: theme.spacing.layout.pageX,
     gap: theme.spacing.scale.md,
   },
-  screen: { flex: 1 },
+  screen: { flex: 1, backgroundColor: theme.colors.surface.canvas },
   content: {
     paddingHorizontal: theme.spacing.layout.pageX,
     paddingVertical: theme.spacing.layout.pageY,
@@ -286,8 +291,8 @@ const styles = StyleSheet.create((theme) => ({
   input: {
     fontSize: 14,
     color: theme.colors.content.default,
-    textAlign: "right",
-    minWidth: 100,
+    textAlign: getRtlAwareTextAlign(),
+    flex: 1,
   },
   inputDisabled: {
     color: theme.colors.content.muted,
