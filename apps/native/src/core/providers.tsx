@@ -14,6 +14,7 @@ import { LogBox } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { StyleSheet } from "react-native-unistyles";
 
 import { authClient } from "./auth/auth-client";
 import { getApiBaseUrl } from "./config/runtime-env";
@@ -111,7 +112,7 @@ export function Providers({ children }: Props) {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
         <KeyboardProvider>
           <PersistQueryClientProvider
@@ -134,3 +135,10 @@ export function Providers({ children }: Props) {
     </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create((theme) => ({
+  root: {
+    flex: 1,
+    direction: theme.direction,
+  },
+}));
