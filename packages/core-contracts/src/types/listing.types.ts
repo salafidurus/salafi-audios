@@ -94,8 +94,6 @@ export const SeriesContextDtoSchema = z.object({
   seriesId: z.string(),
   seriesTitle: z.string(),
   seriesSlug: z.string(),
-  prevLecture: ListingRefDtoSchema.nullable(),
-  nextLecture: ListingRefDtoSchema.nullable(),
 });
 export type SeriesContextDto = z.infer<typeof SeriesContextDtoSchema>;
 
