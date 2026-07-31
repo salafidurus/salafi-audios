@@ -6,9 +6,10 @@ import { useExploreRecentScreen } from "@sd/domain-content";
 import { Stack } from "expo-router";
 import { useCallback, useState } from "react";
 import { FlatList, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
+import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
 import { List } from "@/shared/components/List";
 
 import { ExplorePodcastRow } from "../components/explore-podcast-row/explore-podcast-row";
@@ -78,6 +79,7 @@ export function ExploreRecentScreen({
   onNavigateToScholar,
 }: ExploreRecentScreenProps) {
   const { t } = useTranslation();
+  const { theme } = useUnistyles();
   const [searchQuery, setSearchQuery] = useState("");
   const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } =
     useExploreRecentScreen();
@@ -139,6 +141,7 @@ export function ExploreRecentScreen({
       placeholder: t("explore.searchRecent", "Search recent audios..."),
       onChangeText: (event: any) => setSearchQuery(event.nativeEvent.text),
       onCancelButtonPress: () => setSearchQuery(""),
+      ...getThemedSearchBarOptions(theme),
     },
   };
 

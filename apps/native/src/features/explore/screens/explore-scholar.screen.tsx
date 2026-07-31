@@ -6,10 +6,11 @@ import { useInfiniteScholarsList } from "@sd/domain-content";
 import { Stack } from "expo-router";
 import { useCallback, useState } from "react";
 import { FlatList, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { ScholarRow } from "@/features/listing/components/scholar-row/scholar-row";
+import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
 import { List } from "@/shared/components/List";
 
 import { ExploreSkeleton } from "../components/explore-skeleton/explore-skeleton";
@@ -24,6 +25,7 @@ export type ExploreScholarScreenProps = {
 
 export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScreenProps) {
   const { t } = useTranslation();
+  const { theme } = useUnistyles();
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data, isFetching, isError, hasNextPage, fetchNextPage, refetch } =
@@ -55,6 +57,7 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
       placeholder: t("scholarContent.searchScholars", "Search scholars..."),
       onChangeText: (event: any) => setSearchQuery(event.nativeEvent.text),
       onCancelButtonPress: () => setSearchQuery(""),
+      ...getThemedSearchBarOptions(theme),
     },
   };
 

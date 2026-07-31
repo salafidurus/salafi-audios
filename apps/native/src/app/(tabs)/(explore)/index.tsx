@@ -5,8 +5,10 @@ import { useSearchProcessing } from "@sd/domain-search";
 import { useRouter, useNavigation } from "expo-router";
 import { Activity, useState, useEffect, useCallback } from "react";
 import { View, Text, Pressable } from "react-native";
+import { useUnistyles } from "react-native-unistyles";
 
 import { ExploreRecentScreen } from "@/features/explore/screens/explore-recent.screen";
+import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
 import { SearchFilter } from "@/features/search/components/SearchFilter/SearchFilter";
 import { SearchResultItem } from "@/features/search/components/SearchResultItem/SearchResultItem";
 import { SearchResultsList } from "@/features/search/components/SearchResultsList/SearchResultsList";
@@ -27,6 +29,7 @@ export function ErrorBoundary({ error: _error, retry }: ErrorBoundaryProps) {
 export default function ExploreIndexRoute() {
   const router = useRouter();
   const navigation = useNavigation();
+  const { theme } = useUnistyles();
   const { navigateToListing } = useListingNavigation();
   const showOriginal = useShowOriginalContent();
 
@@ -48,9 +51,10 @@ export default function ExploreIndexRoute() {
         onChangeText: (event: any) => setSearchQuery(event.nativeEvent.text),
         onCancelButtonPress: () => setSearchQuery(""),
         autoCapitalize: "none",
+        ...getThemedSearchBarOptions(theme),
       },
     });
-  }, [navigation]);
+  }, [navigation, theme]);
 
   const isSearching = searchQuery.trim().length > 0;
 
