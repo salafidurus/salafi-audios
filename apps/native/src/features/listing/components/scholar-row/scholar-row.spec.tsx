@@ -5,6 +5,17 @@ import React from "react";
 
 import { ScholarRow } from "./scholar-row";
 
+jest.mock("@sd/domain-content", () => ({
+  useFormatScholarName:
+    () => (scholar: { name?: string; title?: string | null } | string | null | undefined) => {
+      if (!scholar) return "";
+      const name = typeof scholar === "string" ? scholar : scholar.name;
+      const title = typeof scholar === "string" ? undefined : scholar.title;
+      if (!name) return "";
+      return title ? `Shaykh ${name}` : name;
+    },
+}));
+
 const baseScholar: ScholarListItemDto = {
   id: "scholar-1",
   slug: "scholar-one",
@@ -52,5 +63,16 @@ describe("ScholarRow", () => {
     await render(<ScholarRow scholar={baseScholar} onPress={onPress} />);
     await fireEvent.press(screen.getByTestId("scholar-row"));
     expect(onPress).toHaveBeenCalledWith("scholar-one");
+  });
+
+  it("renders the scholar name with translated honorific title prefix when title is set", async () => {
+    await render(<ScholarRow scholar={{ ...baseScholar, title: "sheikh" }} />);
+    expect(screen.getByText("Shaykh Scholar One")).toBeTruthy();
+  });
+
+  it("uses the raw name for avatar initials, not the honorific-prefixed name", async () => {
+    await render(<ScholarRow scholar={{ ...baseScholar, name: "Ahmad", title: "sheikh" }} />);
+    // Avatar initial should come from "Ahmad" ("A"), not "Shaykh Ahmad" ("S").
+    expect(screen.getByTestId("scholar-row-avatar-placeholder")).toHaveTextContent("A");
   });
 });

@@ -1,5 +1,6 @@
 import type { ScholarListItemDto } from "@sd/core-contracts";
 
+import { useFormatScholarName } from "@sd/domain-content";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -15,6 +16,8 @@ export type ScholarRowProps = {
 };
 
 export function ScholarRow({ scholar, onPress, hideBorder }: ScholarRowProps) {
+  const formatScholarName = useFormatScholarName();
+
   return (
     <List.Item onPress={() => onPress?.(scholar.slug)} hideBorder={hideBorder}>
       <View style={styles.rowContent} testID="scholar-row">
@@ -25,7 +28,7 @@ export function ScholarRow({ scholar, onPress, hideBorder }: ScholarRowProps) {
           testID={scholar.imageUrl ? "scholar-row-avatar" : "scholar-row-avatar-placeholder"}
         />
         <View style={styles.content}>
-          <MarqueeText text={scholar.name} variant="titleMd" />
+          <MarqueeText text={formatScholarName(scholar)} variant="titleMd" />
           <View style={styles.subtitle}>
             {scholar.mainLanguage ? (
               <AppText variant="xs" style={styles.metaText}>
