@@ -1,5 +1,3 @@
-import { I18nManager } from "react-native";
-
-export function getRtlAwareTextAlign(): "left" | "right" {
-  return I18nManager.isRTL ? "right" : "left";
+export function getRtlAwareTextAlign(direction: "ltr" | "rtl"): "left" | "right" {
+  return direction === "rtl" ? "right" : "left";
 }
