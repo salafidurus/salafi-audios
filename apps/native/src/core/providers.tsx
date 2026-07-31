@@ -10,11 +10,11 @@ import { useFonts } from "expo-font";
 import { type Href, useRouter } from "expo-router";
 import { type ReactNode, useEffect, useState } from "react";
 import { I18nextProvider } from "react-i18next";
-import { LogBox } from "react-native";
+import { LogBox, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { StyleSheet } from "react-native-unistyles";
+import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { authClient } from "./auth/auth-client";
 import { getApiBaseUrl } from "./config/runtime-env";
@@ -53,6 +53,16 @@ function AppFontsProvider({ children }: { children: ReactNode }) {
   }
 
   return children;
+}
+
+function RootDirectionView({ children }: { children: ReactNode }) {
+  const { theme } = useUnistyles();
+
+  return (
+    <View key={theme.direction} style={styles.directionContainer}>
+      {children}
+    </View>
+  );
 }
 
 type Props = {
@@ -127,7 +137,9 @@ export function Providers({ children }: Props) {
             }}
           >
             <I18nextProvider i18n={i18n}>
-              <AppFontsProvider>{children}</AppFontsProvider>
+              <AppFontsProvider>
+                <RootDirectionView>{children}</RootDirectionView>
+              </AppFontsProvider>
             </I18nextProvider>
           </PersistQueryClientProvider>
         </KeyboardProvider>
@@ -138,6 +150,10 @@ export function Providers({ children }: Props) {
 
 const styles = StyleSheet.create((theme) => ({
   root: {
+    flex: 1,
+    direction: theme.direction,
+  },
+  directionContainer: {
     flex: 1,
     direction: theme.direction,
   },
