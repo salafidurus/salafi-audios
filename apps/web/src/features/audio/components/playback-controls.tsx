@@ -1,7 +1,7 @@
 "use client";
 
-import { useAudio } from "@sd/domain-audio";
-import { Play, Pause, RotateCw, RotateCcw } from "lucide-react";
+import { useAudio, useQueue } from "@sd/domain-audio";
+import { Play, Pause, RotateCw, RotateCcw, SkipBack, SkipForward } from "lucide-react";
 import React, { type CSSProperties } from "react";
 
 import { useTranslation } from "@/core/i18n/use-translation";
@@ -36,6 +36,22 @@ const skipButtonStyle: CSSProperties = {
   position: "relative",
 };
 
+const trackButtonStyle: CSSProperties = {
+  background: "none",
+  border: "none",
+  color: "var(--content-muted)",
+  cursor: "pointer",
+  display: "flex",
+  alignItems: "center",
+};
+
+const trackButtonDisabledStyle: CSSProperties = {
+  ...trackButtonStyle,
+  color: "var(--content-subtle, var(--content-muted))",
+  cursor: "default",
+  opacity: 0.4,
+};
+
 const skipLabelStyle: CSSProperties = {
   fontSize: 12,
   fontWeight: "bold",
@@ -44,8 +60,13 @@ const skipLabelStyle: CSSProperties = {
   color: "var(--content-muted)",
 };
 
+function handlePrevious() {
+  audioService.skipToPrevious();
+}
+
 export function PlaybackControls() {
   const { isPlaying, isLoading, speed, positionSeconds, durationSeconds, hasTrack } = useAudio();
+  const { hasNext } = useQueue();
   const { t } = useTranslation();
 
   const handlePlayPause = () => {
@@ -54,6 +75,11 @@ export function PlaybackControls() {
     } else {
       audioService.resume();
     }
+  };
+
+  const handleNext = () => {
+    if (!hasNext) return;
+    audioService.skipToNext();
   };
 
   const handleSkipForward = () => {
@@ -104,6 +130,15 @@ export function PlaybackControls() {
       <div style={controlsGroupStyle}>
         <button
           type="button"
+          onClick={handlePrevious}
+          style={trackButtonStyle}
+          aria-label={t("audio.previousTrack", "Previous track")}
+        >
+          <SkipBack size={18} fill="currentColor" />
+        </button>
+
+        <button
+          type="button"
           onClick={handleSkipBackward}
           style={skipButtonStyle}
           aria-label={t("audio.skipBackward", "Skip backward 30 seconds")}
@@ -136,6 +171,16 @@ export function PlaybackControls() {
         >
           <RotateCw size={22} />
           <span style={skipLabelStyle}>30</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={handleNext}
+          disabled={!hasNext}
+          style={hasNext ? trackButtonStyle : trackButtonDisabledStyle}
+          aria-label={t("audio.nextTrack", "Next track")}
+        >
+          <SkipForward size={18} fill="currentColor" />
         </button>
       </div>
     </div>
