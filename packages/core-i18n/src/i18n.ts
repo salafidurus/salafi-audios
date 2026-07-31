@@ -1,4 +1,3 @@
-import i18nextLib from "i18next";
 import { type InitOptions } from "i18next";
 
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "./supported-locales";
@@ -23,13 +22,3 @@ export function initI18nOptions(config: I18nConfig = {}): InitOptions {
     defaultNS: "translation",
   };
 }
-
-// Initialize i18next once at module load
-if (!i18nextLib.isInitialized) {
-  i18nextLib.init(initI18nOptions()).catch((err) => {
-    // eslint-disable-next-line no-console
-    console.error("Failed to initialize i18n:", err);
-  });
-}
-
-export const i18next = i18nextLib;
