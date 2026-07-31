@@ -1,9 +1,11 @@
 import { expoClient } from "@better-auth/expo/client";
+import { queryKeys } from "@sd/core-contracts";
 import { createAuthClient } from "better-auth/react";
 import Constants from "expo-constants";
 import * as SecureStore from "expo-secure-store";
 
 import { getApiBaseUrl } from "../config/runtime-env";
+import { queryClient } from "../query-client";
 
 const rawScheme = Constants.expoConfig?.scheme;
 const scheme = Array.isArray(rawScheme) ? rawScheme[0] : (rawScheme ?? "salafidurus");
@@ -30,4 +32,5 @@ export type User = typeof authClient.$Infer.Session.user;
 export async function refreshSession(): Promise<void> {
   const session = authClient.$store.atoms.session?.get();
   await session?.refetch?.();
+  await queryClient.invalidateQueries({ queryKey: queryKeys.account.all });
 }
