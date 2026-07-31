@@ -108,7 +108,7 @@ export class ListingRepository {
 
     if (!listing) return null;
 
-    const seriesContext = await this.resolveSeriesContext(listing.parentId, listing.id, locale);
+    const seriesContext = await this.resolveSeriesContext(listing.parentId, locale);
     const primaryAudio = listing.audioAssets[0] ?? null;
 
     const resolved = resolveContentTranslation({
@@ -165,9 +165,15 @@ export class ListingRepository {
     };
   }
 
+  /**
+   * Resolves which Series/Module this listing is nested under, for breadcrumb-style
+   * display. Prev/next lecture navigation is not resolved here — it only ever knew
+   * about direct siblings, so it silently failed to cross Module boundaries inside a
+   * Collection. Real prev/next playback navigation is derived client-side from the
+   * full ordered play queue (built from `findContentsById`) instead.
+   */
   private async resolveSeriesContext(
     parentId: string | null,
-    listingId: string,
     locale: Locale,
   ): Promise<ListingDetailDto['seriesContext']> {
     if (!parentId) return null;
@@ -193,33 +199,6 @@ export class ListingRepository {
 
     if (!parentSeries) return null;
 
-    const siblings = await this.prisma.listing.findMany({
-      where: {
-        parentId,
-        deletedAt: null,
-        status: Status.published,
-        scholar: { isActive: true },
-      },
-      orderBy: [{ orderIndex: 'asc' }, { title: 'asc' }],
-      select: {
-        id: true,
-        slug: true,
-        title: true,
-        orderIndex: true,
-        language: true,
-        translations: {
-          where: { locale, status: 'published' },
-          select: { title: true },
-          take: 1,
-        },
-      },
-    });
-
-    const currentIndex = siblings.findIndex((s) => s.id === listingId);
-    const prev = currentIndex > 0 ? siblings[currentIndex - 1] : null;
-    const next =
-      currentIndex >= 0 && currentIndex < siblings.length - 1 ? siblings[currentIndex + 1] : null;
-
     const titleOf = (item: {
       title: string;
       language: Locale | null;
@@ -236,8 +215,6 @@ export class ListingRepository {
       seriesId: parentSeries.id,
       seriesTitle: titleOf(parentSeries),
       seriesSlug: parentSeries.slug,
-      prevLecture: prev ? { id: prev.id, slug: prev.slug, title: titleOf(prev) } : null,
-      nextLecture: next ? { id: next.id, slug: next.slug, title: titleOf(next) } : null,
     };
   }
 

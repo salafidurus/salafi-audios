@@ -194,8 +194,6 @@ describe("LectureDetailScreen", () => {
           seriesId: "series-1",
           seriesSlug: "series",
           seriesTitle: "Important Series",
-          prevLecture: null,
-          nextLecture: null,
         },
       },
       isFetching: false,
