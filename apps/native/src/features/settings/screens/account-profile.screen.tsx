@@ -1,13 +1,15 @@
 import { useAccountProfile, useUpdateProfile } from "@sd/domain-account";
 import { useState } from "react";
-import { Pressable, ScrollView, TextInput, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { AppText } from "@/shared/components/AppText/AppText";
+import { TextInput } from "@/shared/components/TextInput/TextInput";
 
 import { SettingsRow } from "../components/SettingsRow/SettingsRow";
 import { SettingsSection } from "../components/SettingsSection/SettingsSection";
+import { getRtlAwareTextAlign } from "../utils/rtl-text-align";
 
 export type AccountProfileScreenProps = {
   onBack?: () => void;
@@ -85,10 +87,10 @@ function AccountProfileForm({
 
 export function AccountProfileScreen(_props: AccountProfileScreenProps) {
   const { t } = useTranslation();
-  const { data: profile, isFetching } = useAccountProfile();
+  const { data: profile, isLoading } = useAccountProfile();
   const { mutate: updateProfile, isPending, isSuccess, isError } = useUpdateProfile();
 
-  if (isFetching) {
+  if (isLoading) {
     return (
       <View style={styles.centered}>
         <AppText variant="bodyMd">{t("account.loadingProfile", "Loading profile...")}</AppText>
@@ -125,6 +127,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   screen: {
     flex: 1,
+    backgroundColor: theme.colors.surface.canvas,
   },
   content: {
     paddingHorizontal: theme.spacing.layout.pageX,
@@ -133,8 +136,8 @@ const styles = StyleSheet.create((theme) => ({
   input: {
     fontSize: 14,
     color: theme.colors.content.default,
-    textAlign: "right",
-    minWidth: 150,
+    textAlign: getRtlAwareTextAlign(),
+    flex: 1,
   },
   inputDisabled: {
     color: theme.colors.content.muted,
