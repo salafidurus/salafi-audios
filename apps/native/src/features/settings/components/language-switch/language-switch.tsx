@@ -6,6 +6,7 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { changeLocale } from "@/core/i18n/i18n";
 import { useTranslation } from "@/core/i18n/use-translation";
+import { persister } from "@/core/query-client";
 
 const LOCALE_LABELS: Record<Locale, string> = {
   en: "English",
@@ -21,9 +22,14 @@ export function LanguageSwitch() {
 
   const handleSelect = async (locale: Locale) => {
     if (i18n.language === locale) return;
-    // Content queries carry the locale via Accept-Language; refetch so cached
-    // results are replaced with the newly selected language.
-    await queryClient.invalidateQueries();
+    // changeLocale() triggers a full app reload for the RTL layout switch
+    // between en/ar. Clear the query cache (in-memory + SQLite-persisted)
+    // rather than invalidating+refetching: a refetch here would still use
+    // the OLD locale's Accept-Language and get thrown away by the imminent
+    // reload anyway, needlessly stalling the switch. Mirrors the cache
+    // clear on sign-out in core/providers.tsx.
+    queryClient.clear();
+    await persister.removeClient();
     await changeLocale(locale);
   };
 

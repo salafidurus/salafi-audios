@@ -4,6 +4,7 @@ import type { Track } from "@sd/domain-audio";
 
 import { pickContentField } from "@sd/core-i18n";
 import { useAudio, useProgressStore, useListingProgress } from "@sd/domain-audio";
+import { useFormattedScholarName } from "@sd/domain-content";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -30,6 +31,7 @@ export function ExplorePodcastRow({
   const showOriginal = useShowOriginalContent();
   const title = pickContentField(item.title, item.original?.title, showOriginal);
   const scholarName = item.scholarName;
+  const displayScholarName = useFormattedScholarName(item.scholarName, item.scholarSlug);
   const { progressPercent } = useListingProgress(item.id);
 
   const { isPlaying, currentTrack } = useAudio();
@@ -53,6 +55,7 @@ export function ExplorePodcastRow({
       id: item.id,
       title,
       artist: scholarName,
+      scholarSlug: item.scholarSlug,
       url: "",
       durationSeconds: item.durationSeconds ?? 0,
       artworkUrl: item.thumbnailUrl ?? undefined,
@@ -98,7 +101,7 @@ export function ExplorePodcastRow({
         <UserAvatar image={item.thumbnailUrl} name={scholarName} size={64} />
         <View style={styles.content}>
           <MarqueeText text={title} variant="titleMd" />
-          <MarqueeText text={scholarName} variant="bodySm" />
+          <MarqueeText text={displayScholarName} variant="bodySm" />
           <View style={styles.details}>
             <AppText variant="xs" style={styles.metaText}>
               {durationText}

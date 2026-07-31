@@ -13,6 +13,10 @@ jest.mock("@sd/domain-audio", () => ({
   useAudio: jest.fn(),
 }));
 
+jest.mock("@sd/domain-content", () => ({
+  useFormattedScholarName: (scholarName: string) => scholarName,
+}));
+
 jest.mock("expo-router", () => ({
   usePathname: jest.fn(),
   useRouter: () => ({ replace: jest.fn() }),

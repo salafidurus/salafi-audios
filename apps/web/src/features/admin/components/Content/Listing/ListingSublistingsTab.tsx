@@ -61,6 +61,11 @@ export function ListingSublistingsTab({ rootListingId }: ListingSublistingsTabPr
   const loadedForRef = useRef<string | null>(null);
 
   const fetchData = useCallback(() => {
+    // This resets state ahead of an async fetch (fetchArrangeData) keyed off
+    // rootListingId, guarded by loadedForRef below to avoid duplicate fetches
+    // — not a synchronous state mirror, so key-remount / derive-during-render
+    // fixes don't apply here.
+    // react-doctor-disable-next-line react-doctor/no-adjust-state-on-prop-change
     setState((s) => ({ ...s, status: "loading", error: null }));
     fetchArrangeData(rootListingId)
       .then((data) => {
