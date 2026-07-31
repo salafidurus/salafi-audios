@@ -56,6 +56,7 @@ export function AdminScholarsScreen({ onNavigateToScholar }: AdminScholarsScreen
 const styles = StyleSheet.create((theme) => ({
   container: {
     flex: 1,
+    backgroundColor: theme.colors.surface.canvas,
   },
   scrollContent: {
     padding: theme.spacing.scale.md,

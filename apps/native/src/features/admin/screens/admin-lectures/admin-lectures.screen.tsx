@@ -154,6 +154,7 @@ export function AdminLecturesScreen() {
 const styles = StyleSheet.create((theme) => ({
   screen: {
     flex: 1,
+    backgroundColor: theme.colors.surface.canvas,
   },
   scrollContent: {
     padding: theme.spacing.scale.md,
