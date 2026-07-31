@@ -21,6 +21,7 @@ import type {
   SaveListingTranslationDto,
   ListingContentsDto,
   LastPlayedLessonDto,
+  ListingProgressSummaryDto,
   AdminArrangeDataDto,
   AdminArrangeLessonDto,
   ArrangeAudioRef,
@@ -454,6 +455,75 @@ export class ListingRepository {
       positionSeconds: p.positionSeconds,
       isCompleted: p.isCompleted,
       updatedAt: p.updatedAt.toISOString(),
+    };
+  }
+
+  /**
+   * Read-time aggregate of a user's progress across a Listing's playable leaves.
+   * Computed on demand from `UserListingProgress` — not separately stored, so it
+   * always reflects the current set of published children.
+   */
+  async getProgressSummary(id: string, userId: string): Promise<ListingProgressSummaryDto | null> {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+
+    const listing = await this.prisma.listing.findFirst({
+      where: {
+        ...(isUuid ? { id } : { slug: id }),
+        deletedAt: null,
+      },
+      select: { id: true, format: true },
+    });
+
+    if (!listing) return null;
+
+    const actualId = listing.id;
+
+    if (listing.format === 'single') {
+      const progress = await this.prisma.userListingProgress.findUnique({
+        where: { userId_listingId: { userId, listingId: actualId } },
+        select: { isCompleted: true },
+      });
+      return this.toProgressSummary(actualId, listing.format, 1, progress?.isCompleted ? 1 : 0);
+    }
+
+    const [row] =
+      listing.format === 'series'
+        ? await this.prisma.$queryRaw<{ total: number; completed: number }[]>`
+            SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE ulp."isCompleted")::int AS completed
+            FROM "Listing" l
+            LEFT JOIN "UserListingProgress" ulp ON ulp."listingId" = l.id AND ulp."userId" = ${userId}
+            WHERE l."parentId" = ${actualId}::uuid
+              AND l."deletedAt" IS NULL
+              AND l."status" = 'published'
+          `
+        : await this.prisma.$queryRaw<{ total: number; completed: number }[]>`
+            SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE ulp."isCompleted")::int AS completed
+            FROM "Listing" l
+            JOIN "Listing" m ON l."parentId" = m.id
+            LEFT JOIN "UserListingProgress" ulp ON ulp."listingId" = l.id AND ulp."userId" = ${userId}
+            WHERE m."parentId" = ${actualId}::uuid
+              AND l."deletedAt" IS NULL
+              AND l."status" = 'published'
+              AND m."deletedAt" IS NULL
+              AND m."status" = 'published'
+          `;
+
+    return this.toProgressSummary(actualId, listing.format, row?.total ?? 0, row?.completed ?? 0);
+  }
+
+  private toProgressSummary(
+    listingId: string,
+    format: ListingProgressSummaryDto['format'],
+    totalCount: number,
+    completedCount: number,
+  ): ListingProgressSummaryDto {
+    return {
+      listingId,
+      format,
+      totalCount,
+      completedCount,
+      percentComplete: totalCount > 0 ? (completedCount / totalCount) * 100 : 0,
+      isCompleted: totalCount > 0 && completedCount === totalCount,
     };
   }
 

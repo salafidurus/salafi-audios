@@ -10,10 +10,10 @@
   "scripts": {
     "lint": "oxlint .",
     "typecheck": "tsc --noEmit",
-    "test": "bun test",
+    "test": "bun test --isolate",
     "test:watch": "bun test --watch",
     "test:cov": "bun test --coverage",
-    "test:prepush": "bun test"
+    "test:prepush": "bun test --isolate"
   },
   "dependencies": {
     "@sd/core-contracts": "workspace:*",

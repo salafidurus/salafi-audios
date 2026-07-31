@@ -18,6 +18,7 @@ import type {
   ListingRefDto,
   ListingContentsDto,
   LastPlayedLessonDto,
+  ListingProgressSummaryDto,
   FeedPageDto,
   AdminArrangeDataDto,
   ArrangeCommitDto,
@@ -57,6 +58,10 @@ export class ListingService {
 
   async getLastPlayedLesson(id: string, userId: string): Promise<LastPlayedLessonDto | null> {
     return this.repo.findLastPlayedLesson(id, userId);
+  }
+
+  async getProgressSummary(id: string, userId: string): Promise<ListingProgressSummaryDto | null> {
+    return this.repo.getProgressSummary(id, userId);
   }
 
   listAdmin(params: {

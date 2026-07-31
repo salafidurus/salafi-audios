@@ -16,6 +16,7 @@ export const endpoints = {
     detail: (id: string) => `/listings/${id}`,
     contents: (id: string) => `/listings/${id}/contents`,
     lastPlayed: (id: string) => `/listings/${id}/last-played`,
+    progressSummary: (id: string) => `/listings/${id}/progress-summary`,
     recent: "/listings/recent",
   },
   library: {
@@ -31,6 +32,8 @@ export const endpoints = {
   },
   audio: {
     progress: {
+      get: "/audio/progress",
+      sync: "/audio/progress/sync",
       update: (listingId: string) => `/audio/progress/${listingId}`,
     },
     listings: {

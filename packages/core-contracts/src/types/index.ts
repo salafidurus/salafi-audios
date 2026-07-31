@@ -76,6 +76,8 @@ export {
   ListingContentsDtoSchema,
   type LastPlayedLessonDto,
   LastPlayedLessonDtoSchema,
+  type ListingProgressSummaryDto,
+  ListingProgressSummaryDtoSchema,
   type UpdateListingDetailsDto,
   UpdateListingDetailsDtoSchema,
   type AdminListingMediaDetailDto,
