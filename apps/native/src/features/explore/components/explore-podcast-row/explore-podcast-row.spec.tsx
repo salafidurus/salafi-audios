@@ -62,11 +62,38 @@ jest.mock("@sd/core-i18n", () => ({
   pickContentField: jest.fn((t: string) => t),
 }));
 
+const mockUseFormattedScholarName = jest.fn(
+  (scholarName: string, _scholarSlug?: string) => scholarName,
+);
+
+jest.mock("@sd/domain-content", () => ({
+  useFormattedScholarName: (scholarName: string, scholarSlug: string) =>
+    mockUseFormattedScholarName(scholarName, scholarSlug),
+}));
+
 describe("ExplorePodcastRow", () => {
   it("renders title and scholar name", async () => {
     await render(<ExplorePodcastRow item={baseItem} />);
     expect(screen.getByText("Test Lecture")).toBeTruthy();
     expect(screen.getByText("Scholar Name")).toBeTruthy();
+  });
+
+  it("renders the scholar name with honorific title when available", async () => {
+    mockUseFormattedScholarName.mockReturnValueOnce("Shaykh Scholar Name");
+    await render(<ExplorePodcastRow item={baseItem} />);
+    expect(mockUseFormattedScholarName).toHaveBeenCalledWith("Scholar Name", "scholar-name");
+    expect(screen.getByText("Shaykh Scholar Name")).toBeTruthy();
+  });
+
+  it("keeps the raw scholar name as the Track artist when playing, not the honorific-prefixed name", async () => {
+    mockUseFormattedScholarName.mockReturnValueOnce("Shaykh Scholar Name");
+    const audioMock = jest.requireMock("@/features/audio").audioService;
+    await render(<ExplorePodcastRow item={baseItem} />);
+    await fireEvent.press(screen.getByTestId("podcast-row"));
+    expect(audioMock.playListing).toHaveBeenCalledWith(
+      expect.objectContaining({ artist: "Scholar Name", scholarSlug: "scholar-name" }),
+      expect.anything(),
+    );
   });
 
   it("shows duration in minutes", async () => {

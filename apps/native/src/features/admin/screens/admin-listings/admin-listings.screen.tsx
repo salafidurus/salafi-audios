@@ -1,5 +1,7 @@
 import type { MenuAction } from "@expo/ui/community/menu";
+import type { AdminListingListItemDto } from "@sd/core-contracts";
 
+import { useFormattedScholarName } from "@sd/domain-content";
 import { Stack } from "expo-router";
 import { useCallback, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
@@ -15,6 +17,49 @@ import { BulkActionBar } from "../../components/BulkActionBar/BulkActionBar";
 import { ListingEditSheet } from "../../components/ListingEditSheet/ListingEditSheet";
 import { useAdminListings } from "../../hooks/use-admin-listings";
 import { filterListings } from "./filter-listings";
+
+type AdminListingRowProps = {
+  item: AdminListingListItemDto;
+  isSelected: boolean;
+  hideBorder: boolean;
+  onPress: () => void;
+  onAction: (action: string) => void;
+};
+
+const ADMIN_LISTING_ROW_ACTIONS: MenuAction[] = [
+  { id: "edit", title: "Edit" },
+  { id: "publish", title: "Publish" },
+  { id: "archive", title: "Archive" },
+];
+
+function AdminListingRow({
+  item,
+  isSelected,
+  hideBorder,
+  onPress,
+  onAction,
+}: AdminListingRowProps) {
+  const scholarName = useFormattedScholarName(item.scholarName, item.scholarSlug);
+
+  return (
+    <List.Item
+      testID={`admin-listing-row-${item.id}`}
+      onPress={onPress}
+      hideBorder={hideBorder}
+      style={isSelected ? styles.rowSelected : undefined}
+    >
+      <View style={styles.rowContent}>
+        <AppText numberOfLines={1} variant="bodyMd" style={styles.rowTitle}>
+          {item.title}
+        </AppText>
+        <AppText variant="caption" style={styles.rowMeta}>
+          {scholarName} · {item.status}
+        </AppText>
+      </View>
+      <List.Item.Actions actions={ADMIN_LISTING_ROW_ACTIONS} onAction={onAction} />
+    </List.Item>
+  );
+}
 
 export function AdminListingsScreen() {
   const { theme } = useUnistyles();
@@ -104,36 +149,16 @@ export function AdminListingsScreen() {
           </AppText>
         ) : (
           <List>
-            {listings.map((item, index) => {
-              const isSelected = selectedIds.has(item.id);
-              const actions: MenuAction[] = [
-                { id: "edit", title: "Edit" },
-                { id: "publish", title: "Publish" },
-                { id: "archive", title: "Archive" },
-              ];
-              return (
-                <List.Item
-                  key={item.id}
-                  testID={`admin-listing-row-${item.id}`}
-                  onPress={() => handleRowPress(item.id)}
-                  hideBorder={index === listings.length - 1}
-                  style={isSelected ? styles.rowSelected : undefined}
-                >
-                  <View style={styles.rowContent}>
-                    <AppText numberOfLines={1} variant="bodyMd" style={styles.rowTitle}>
-                      {item.title}
-                    </AppText>
-                    <AppText variant="caption" style={styles.rowMeta}>
-                      {item.scholarName} · {item.status}
-                    </AppText>
-                  </View>
-                  <List.Item.Actions
-                    actions={actions}
-                    onAction={(action) => void handleRowAction(item.id, action)}
-                  />
-                </List.Item>
-              );
-            })}
+            {listings.map((item, index) => (
+              <AdminListingRow
+                key={item.id}
+                item={item}
+                isSelected={selectedIds.has(item.id)}
+                hideBorder={index === listings.length - 1}
+                onPress={() => handleRowPress(item.id)}
+                onAction={(action) => void handleRowAction(item.id, action)}
+              />
+            ))}
           </List>
         )}
       </ScrollView>

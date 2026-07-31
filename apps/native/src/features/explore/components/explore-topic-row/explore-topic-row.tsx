@@ -2,6 +2,8 @@ import type { ContentSuggestionDto } from "@sd/core-contracts";
 import type { ListRenderItemInfo } from "react-native";
 
 import { pickContentField } from "@sd/core-i18n";
+import { useFormattedScholarName } from "@sd/domain-content";
+import { useCallback } from "react";
 import { View, Text, FlatList, Pressable } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -14,29 +16,43 @@ export type ExploreTopicRowProps = {
   onItemPress?: (slug: string) => void;
 };
 
+type TopicCardProps = {
+  item: ContentSuggestionDto;
+  showOriginal: boolean;
+  onItemPress?: (slug: string) => void;
+};
+
+function TopicCard({ item, showOriginal, onItemPress }: TopicCardProps) {
+  const title = pickContentField(item.title, item.original?.title, showOriginal);
+  const scholarName = useFormattedScholarName(item.scholarName, item.scholarSlug);
+  return (
+    <Pressable
+      style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+      onPress={() => onItemPress?.(item.slug)}
+    >
+      <Text style={styles.title} numberOfLines={2}>
+        {title}
+      </Text>
+      <Text style={styles.scholar}>{scholarName}</Text>
+      {item.durationSeconds ? (
+        <Text style={styles.duration}>{Math.floor(item.durationSeconds / 60)}m</Text>
+      ) : null}
+    </Pressable>
+  );
+}
+
 export function ExploreTopicRow({ topicName, items, onItemPress }: ExploreTopicRowProps) {
   const showOriginal = useShowOriginalContent();
   const { t } = useTranslation();
 
-  if (!items.length) return null;
+  const renderItem = useCallback(
+    ({ item }: ListRenderItemInfo<ContentSuggestionDto>) => (
+      <TopicCard item={item} showOriginal={showOriginal} onItemPress={onItemPress} />
+    ),
+    [showOriginal, onItemPress],
+  );
 
-  function renderItem({ item }: ListRenderItemInfo<ContentSuggestionDto>) {
-    const title = pickContentField(item.title, item.original?.title, showOriginal);
-    return (
-      <Pressable
-        style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-        onPress={() => onItemPress?.(item.slug)}
-      >
-        <Text style={styles.title} numberOfLines={2}>
-          {title}
-        </Text>
-        <Text style={styles.scholar}>{item.scholarName}</Text>
-        {item.durationSeconds ? (
-          <Text style={styles.duration}>{Math.floor(item.durationSeconds / 60)}m</Text>
-        ) : null}
-      </Pressable>
-    );
-  }
+  if (!items.length) return null;
 
   return (
     <View style={styles.container}>

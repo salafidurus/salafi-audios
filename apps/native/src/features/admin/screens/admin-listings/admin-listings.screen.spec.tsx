@@ -34,6 +34,15 @@ jest.mock("../../components/BulkActionBar/BulkActionBar", () => ({
   BulkActionBar: () => null,
 }));
 
+const mockUseFormattedScholarName = jest.fn(
+  (scholarName: string, _scholarSlug?: string) => scholarName,
+);
+
+jest.mock("@sd/domain-content", () => ({
+  useFormattedScholarName: (scholarName: string, scholarSlug: string) =>
+    mockUseFormattedScholarName(scholarName, scholarSlug),
+}));
+
 const mockUseAdminListings = useAdminListings as jest.Mock;
 const mockBulkListingAction = bulkListingAction as jest.Mock;
 
@@ -63,6 +72,32 @@ describe("AdminListingsScreen", () => {
     await render(<AdminListingsScreen />);
     expect(screen.getByText("Listing One")).toBeTruthy();
     expect(screen.getByText("Scholar A", { exact: false })).toBeTruthy();
+  });
+
+  it("renders the scholar name with honorific title when available", async () => {
+    mockUseFormattedScholarName.mockReturnValueOnce("Shaykh Scholar A");
+    mockUseAdminListings.mockReturnValue({
+      data: {
+        items: [
+          {
+            id: "lst-1",
+            title: "Listing One",
+            scholarName: "Scholar A",
+            scholarSlug: "scholar-a",
+            status: "draft",
+          },
+        ],
+        total: 1,
+        page: 1,
+      },
+      isLoading: false,
+      refetch: jest.fn(),
+    });
+
+    await render(<AdminListingsScreen />);
+
+    expect(mockUseFormattedScholarName).toHaveBeenCalledWith("Scholar A", "scholar-a");
+    expect(screen.getByText("Shaykh Scholar A", { exact: false })).toBeTruthy();
   });
 
   it("opens the edit sheet when the row's Edit long-press action is pressed", async () => {
