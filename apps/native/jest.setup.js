@@ -55,10 +55,13 @@ jest.mock("expo-secure-store", () => ({
   isAvailableAsync: jest.fn(() => Promise.resolve(true)),
 }));
 
+const mockQueryClientInstance = {
+  invalidateQueries: jest.fn().mockResolvedValue(undefined),
+  clear: jest.fn(),
+};
+
 jest.mock("@tanstack/react-query", () => ({
-  useQueryClient: jest.fn(() => ({
-    invalidateQueries: jest.fn().mockResolvedValue(undefined),
-  })),
+  useQueryClient: jest.fn(() => mockQueryClientInstance),
 }));
 
 // @expo/ui renders real SwiftUI/Jetpack Compose views, which don't exist under
