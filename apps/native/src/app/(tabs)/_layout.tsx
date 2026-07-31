@@ -1,33 +1,16 @@
 import { NativeTabs } from "expo-router/unstable-native-tabs";
-import { memo } from "react";
 import { Platform } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
 
-import { RouteAccessGuard, useAuth } from "@/core/auth";
+import { RouteAccessGuard } from "@/core/auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useAdminPermissions } from "@/features/admin/hooks/use-admin-permissions";
 import { BottomAccessoryInnerContent } from "@/features/navigation";
 
-const AdminTabTrigger = memo(function AdminTabTrigger() {
-  const { user } = useAuth();
-  const { t } = useTranslation();
-  const { hasAnyPermission } = useAdminPermissions();
-  const isAdmin = (user as any)?.role === "admin" || hasAnyPermission;
-
-  return (
-    <NativeTabs.Trigger name="admin" hidden={!isAdmin}>
-      <NativeTabs.Trigger.Icon
-        sf={{ default: "shield", selected: "shield.fill" }}
-        md={{ default: "admin_panel_settings", selected: "admin_panel_settings" }}
-      />
-      <NativeTabs.Trigger.Label>{t("admin", "Admin")}</NativeTabs.Trigger.Label>
-    </NativeTabs.Trigger>
-  );
-});
-
 export default function TabsLayout() {
   const { t } = useTranslation();
   const { theme } = useUnistyles();
+  const { hasAnyPermission } = useAdminPermissions();
 
   return (
     <RouteAccessGuard>
@@ -36,6 +19,7 @@ export default function TabsLayout() {
         tintColor={theme.colors.content.primary}
         rippleColor={theme.colors.surface.hover}
         backgroundColor={theme.colors.surface.default}
+        labelVisibilityMode="labeled"
       >
         <NativeTabs.Trigger name="(explore)">
           <NativeTabs.Trigger.Icon
@@ -63,7 +47,13 @@ export default function TabsLayout() {
           </NativeTabs.Trigger.Label>
         </NativeTabs.Trigger>
 
-        <AdminTabTrigger />
+        <NativeTabs.Trigger name="admin" hidden={!hasAnyPermission}>
+          <NativeTabs.Trigger.Icon
+            sf={{ default: "shield", selected: "shield.fill" }}
+            md={{ default: "admin_panel_settings", selected: "admin_panel_settings" }}
+          />
+          <NativeTabs.Trigger.Label>{t("admin", "Admin")}</NativeTabs.Trigger.Label>
+        </NativeTabs.Trigger>
 
         {Platform.OS === "ios" ? (
           <NativeTabs.BottomAccessory>
