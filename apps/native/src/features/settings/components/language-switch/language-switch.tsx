@@ -22,15 +22,15 @@ export function LanguageSwitch() {
 
   const handleSelect = async (locale: Locale) => {
     if (i18n.language === locale) return;
-    // changeLocale() triggers a full app reload for the RTL layout switch
-    // between en/ar. Clear the query cache (in-memory + SQLite-persisted)
-    // rather than invalidating+refetching: a refetch here would still use
-    // the OLD locale's Accept-Language and get thrown away by the imminent
-    // reload anyway, needlessly stalling the switch. Mirrors the cache
-    // clear on sign-out in core/providers.tsx.
+    // changeLocale() switches live, with no app reload. Clear the query
+    // cache (in-memory + SQLite-persisted) first — a refetch before the
+    // switch would still use the OLD locale's Accept-Language — then
+    // invalidate once the new locale is active so visible screens refetch
+    // under the new Accept-Language.
     queryClient.clear();
     await persister.removeClient();
     await changeLocale(locale);
+    await queryClient.invalidateQueries();
   };
 
   const actions: MenuAction[] = SUPPORTED_LOCALES.map((locale) => ({
