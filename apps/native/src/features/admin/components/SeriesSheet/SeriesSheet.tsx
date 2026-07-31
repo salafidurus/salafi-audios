@@ -4,6 +4,7 @@ import { useReducer } from "react";
 import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
+import { useTranslation } from "@/core/i18n/use-translation";
 import { TextInput } from "@/shared/components/TextInput/TextInput";
 
 import { createSeries, updateSeries } from "../../api/admin-scholars.api";
@@ -30,6 +31,7 @@ function reduce(state: FormState, patch: Partial<FormState>): FormState {
 
 export function SeriesSheet({ isOpen, scholarId, series, onClose, onSaved }: SeriesSheetProps) {
   const { theme } = useUnistyles();
+  const { t } = useTranslation();
   const [state, dispatch] = useReducer(reduce, {
     title: series?.title ?? "",
     description: series?.description ?? "",
@@ -44,7 +46,7 @@ export function SeriesSheet({ isOpen, scholarId, series, onClose, onSaved }: Ser
 
   const handleSave = async () => {
     if (!title.trim()) {
-      dispatch({ error: "Title is required" });
+      dispatch({ error: t("admin.seriesEdit.titleRequired", "Title is required") });
       return;
     }
     dispatch({ isSaving: true, error: null });
@@ -72,15 +74,19 @@ export function SeriesSheet({ isOpen, scholarId, series, onClose, onSaved }: Ser
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{series ? "Edit Series" : "New Series"}</Text>
+      <Text style={styles.title}>
+        {series
+          ? t("admin.seriesEdit.editTitle", "Edit Series")
+          : t("admin.seriesEdit.newTitle", "New Series")}
+      </Text>
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Text style={styles.label}>Title *</Text>
+        <Text style={styles.label}>{t("admin.seriesEdit.titleLabel", "Title *")}</Text>
         <TextInput
           value={title}
           onChangeText={(v) => dispatch({ title: v })}
           style={styles.input}
         />
-        <Text style={styles.label}>Description</Text>
+        <Text style={styles.label}>{t("admin.seriesEdit.descriptionLabel", "Description")}</Text>
         <TextInput
           value={description}
           onChangeText={(v) => dispatch({ description: v })}
@@ -88,7 +94,7 @@ export function SeriesSheet({ isOpen, scholarId, series, onClose, onSaved }: Ser
           numberOfLines={3}
           style={styles.input}
         />
-        <Text style={styles.label}>Language</Text>
+        <Text style={styles.label}>{t("admin.seriesEdit.languageLabel", "Language")}</Text>
         <TextInput
           value={language}
           onChangeText={(v) => dispatch({ language: v })}
@@ -103,11 +109,11 @@ export function SeriesSheet({ isOpen, scholarId, series, onClose, onSaved }: Ser
           {isSaving ? (
             <ActivityIndicator color={theme.colors.content.onPrimary} />
           ) : (
-            <Text style={styles.saveBtnText}>Save</Text>
+            <Text style={styles.saveBtnText}>{t("common.save", "Save")}</Text>
           )}
         </Pressable>
         <Pressable onPress={onClose} style={styles.cancelBtn}>
-          <Text style={styles.cancelBtnText}>Cancel</Text>
+          <Text style={styles.cancelBtnText}>{t("common.cancel", "Cancel")}</Text>
         </Pressable>
       </View>
     </View>
