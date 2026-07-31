@@ -84,13 +84,13 @@ export function ListingEditSheet({ listingId, onClose, onSaved }: ListingEditShe
         <ActivityIndicator style={styles.loader} />
       ) : (
         <ScrollView showsVerticalScrollIndicator={false}>
-          <Text style={styles.label}>Title</Text>
+          <Text style={styles.label}>{t("admin.listingEdit.titleLabel", "Title")}</Text>
           <TextInput
             value={title}
             onChangeText={(v) => dispatch({ title: v })}
             style={styles.input}
           />
-          <Text style={styles.label}>Description</Text>
+          <Text style={styles.label}>{t("admin.listingEdit.descriptionLabel", "Description")}</Text>
           <TextInput
             value={description}
             onChangeText={(v) => dispatch({ description: v })}
@@ -98,7 +98,7 @@ export function ListingEditSheet({ listingId, onClose, onSaved }: ListingEditShe
             numberOfLines={3}
             style={styles.input}
           />
-          <Text style={styles.label}>Language</Text>
+          <Text style={styles.label}>{t("admin.listingEdit.languageLabel", "Language")}</Text>
           <TextInput
             value={language}
             onChangeText={(v) => dispatch({ language: v })}
@@ -117,11 +117,11 @@ export function ListingEditSheet({ listingId, onClose, onSaved }: ListingEditShe
           {isSaving ? (
             <ActivityIndicator color={theme.colors.content.onPrimary} />
           ) : (
-            <Text style={styles.saveBtnText}>Save</Text>
+            <Text style={styles.saveBtnText}>{t("common.save", "Save")}</Text>
           )}
         </Pressable>
         <Pressable onPress={onClose} style={styles.cancelBtn}>
-          <Text style={styles.cancelBtnText}>Cancel</Text>
+          <Text style={styles.cancelBtnText}>{t("common.cancel", "Cancel")}</Text>
         </Pressable>
       </View>
     </View>

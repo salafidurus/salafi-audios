@@ -2,7 +2,10 @@
   "admin": {
     "listingEdit": {
       "title": "Edit Listing",
-      "status": "Status"
+      "status": "Status",
+      "titleLabel": "Title",
+      "descriptionLabel": "Description",
+      "languageLabel": "Language"
     },
     "audioUploader": {
       "title": "Upload Audio",
@@ -14,6 +17,14 @@
       "titleRequired": "Title is required",
       "editTitle": "Edit Collection",
       "newTitle": "New Collection",
+      "titleLabel": "Title *",
+      "descriptionLabel": "Description",
+      "languageLabel": "Language"
+    },
+    "seriesEdit": {
+      "titleRequired": "Title is required",
+      "editTitle": "Edit Series",
+      "newTitle": "New Series",
       "titleLabel": "Title *",
       "descriptionLabel": "Description",
       "languageLabel": "Language"

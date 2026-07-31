@@ -2,7 +2,10 @@
   "admin": {
     "listingEdit": {
       "title": "تعديل القائمة",
-      "status": "الحالة"
+      "status": "الحالة",
+      "titleLabel": "العنوان",
+      "descriptionLabel": "الوصف",
+      "languageLabel": "اللغة"
     },
     "audioUploader": {
       "title": "رفع الصوتيات",
@@ -14,6 +17,14 @@
       "titleRequired": "العنوان مطلوب",
       "editTitle": "تعديل المجموعة",
       "newTitle": "مجموعة جديدة",
+      "titleLabel": "العنوان *",
+      "descriptionLabel": "الوصف",
+      "languageLabel": "اللغة"
+    },
+    "seriesEdit": {
+      "titleRequired": "العنوان مطلوب",
+      "editTitle": "تعديل السلسلة",
+      "newTitle": "سلسلة جديدة",
       "titleLabel": "العنوان *",
       "descriptionLabel": "الوصف",
       "languageLabel": "اللغة"
