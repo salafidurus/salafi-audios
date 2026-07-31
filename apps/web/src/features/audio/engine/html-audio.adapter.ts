@@ -1,5 +1,9 @@
 import type { PlaybackEngine, PlaybackEngineEvents, Track } from "@sd/domain-audio";
 
+function hasMediaSession(): boolean {
+  return typeof navigator !== "undefined" && "mediaSession" in navigator;
+}
+
 export class HTMLAudioAdapter implements PlaybackEngine {
   private audio: HTMLAudioElement | null = null;
   private events: PlaybackEngineEvents = {};
@@ -12,6 +16,7 @@ export class HTMLAudioAdapter implements PlaybackEngine {
     if (!this.audio) {
       this.audio = new Audio();
       this.bindListeners();
+      this.bindMediaSession();
     }
   }
 
@@ -27,6 +32,7 @@ export class HTMLAudioAdapter implements PlaybackEngine {
 
     this.audio.src = track.url;
     this.audio.load();
+    this.updateMediaSessionMetadata(track);
   }
 
   async play(): Promise<void> {
@@ -74,6 +80,10 @@ export class HTMLAudioAdapter implements PlaybackEngine {
     if (this.events.onStatusChange) {
       this.events.onStatusChange("idle");
     }
+    if (hasMediaSession()) {
+      navigator.mediaSession.metadata = null;
+      navigator.mediaSession.playbackState = "none";
+    }
   }
 
   async destroy(): Promise<void> {
@@ -87,6 +97,43 @@ export class HTMLAudioAdapter implements PlaybackEngine {
 
   setEvents(events: PlaybackEngineEvents): void {
     this.events = events;
+  }
+
+  private updateMediaSessionMetadata(track: Track) {
+    if (!hasMediaSession() || typeof MediaMetadata === "undefined") return;
+
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: track.title,
+      artist: track.artist,
+      artwork: track.artworkUrl ? [{ src: track.artworkUrl }] : [],
+    });
+  }
+
+  private setMediaSessionPlaybackState(state: MediaSessionPlaybackState) {
+    if (!hasMediaSession()) return;
+    navigator.mediaSession.playbackState = state;
+  }
+
+  private bindMediaSession() {
+    if (!hasMediaSession()) return;
+
+    navigator.mediaSession.setActionHandler("play", () => {
+      void this.play();
+    });
+    navigator.mediaSession.setActionHandler("pause", () => {
+      void this.pause();
+    });
+    navigator.mediaSession.setActionHandler("previoustrack", () => {
+      this.events.onSkipPrevious?.();
+    });
+    navigator.mediaSession.setActionHandler("nexttrack", () => {
+      this.events.onSkipNext?.();
+    });
+    navigator.mediaSession.setActionHandler("seekto", (details) => {
+      if (typeof details.seekTime === "number") {
+        void this.seek(details.seekTime);
+      }
+    });
   }
 
   private bindListeners() {
@@ -115,12 +162,14 @@ export class HTMLAudioAdapter implements PlaybackEngine {
       if (this.events.onStatusChange) {
         this.events.onStatusChange("playing");
       }
+      this.setMediaSessionPlaybackState("playing");
     };
 
     const paused = () => {
       if (this.events.onStatusChange && this.audio && !this.audio.ended) {
         this.events.onStatusChange("paused");
       }
+      this.setMediaSessionPlaybackState("paused");
     };
 
     const waiting = () => {
