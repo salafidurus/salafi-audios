@@ -253,7 +253,7 @@ jest.mock("@expo/ui/swift-ui", () => {
   const React = require("react");
   const { Pressable, Text, View } = require("react-native");
 
-  function Button({ children, onPress, modifiers = [], testID }) {
+  function Button({ children, label, onPress, modifiers = [], testID }) {
     const isDisabled = modifiers.some((m) => m.$type === "disabled" && m.value !== false);
     return React.createElement(
       Pressable,
@@ -264,7 +264,7 @@ jest.mock("@expo/ui/swift-ui", () => {
         accessibilityRole: "button",
         accessibilityState: { disabled: isDisabled },
       },
-      children,
+      children ?? React.createElement(Text, null, label),
     );
   }
 
@@ -280,7 +280,22 @@ jest.mock("@expo/ui/swift-ui", () => {
     return React.createElement(Text, null, children);
   }
 
-  return { Button, HStack, Text: SwiftUIText };
+  // isPresented fully controls visibility here (matches the real controlled-
+  // component contract); Alert.Trigger is rendered as null since its Button is
+  // only a required SwiftUI anchor, never actually pressed by the user.
+  function Alert({ title, isPresented, children }) {
+    if (!isPresented) return null;
+    return React.createElement(View, null, React.createElement(Text, null, title), children);
+  }
+  Alert.Trigger = () => null;
+  Alert.Actions = function AlertActions({ children }) {
+    return React.createElement(View, null, children);
+  };
+  Alert.Message = function AlertMessage({ children }) {
+    return React.createElement(View, null, children);
+  };
+
+  return { Button, HStack, Text: SwiftUIText, Alert };
 });
 
 jest.mock("@expo/ui/swift-ui/modifiers", () => ({
@@ -326,6 +341,25 @@ jest.mock("@expo/ui/jetpack-compose", () => {
     return React.createElement(View, null);
   }
 
+  // Visibility is controlled by the caller conditionally rendering AlertDialog
+  // (matches the real controlled-component contract), so the mock just renders
+  // its compound-component children as-is.
+  function AlertDialog({ children }) {
+    return React.createElement(View, null, children);
+  }
+  AlertDialog.Title = function AlertDialogTitle({ children }) {
+    return React.createElement(View, null, children);
+  };
+  AlertDialog.Text = function AlertDialogText({ children }) {
+    return React.createElement(View, null, children);
+  };
+  AlertDialog.DismissButton = function AlertDialogDismissButton({ children }) {
+    return React.createElement(View, null, children);
+  };
+  AlertDialog.ConfirmButton = function AlertDialogConfirmButton({ children }) {
+    return React.createElement(View, null, children);
+  };
+
   return {
     Button: makeComposeButton(),
     OutlinedButton: makeComposeButton(),
@@ -334,6 +368,7 @@ jest.mock("@expo/ui/jetpack-compose", () => {
     ElevatedButton: makeComposeButton(),
     Text: ComposeText,
     Spacer,
+    AlertDialog,
   };
 });
 
