@@ -8,6 +8,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
 import { AppText } from "@/shared/components/AppText/AppText";
+import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { List } from "@/shared/components/List";
 import { MarqueeText } from "@/shared/components/MarqueeText";
 import { TextInput } from "@/shared/components/TextInput/TextInput";
@@ -44,9 +45,10 @@ export function ScholarContentList({ items }: ScholarContentListProps) {
   const featured = items[0];
   if (!featured) {
     return (
-      <AppText variant="bodyMd" style={{ opacity: 0.7 }}>
-        {t("scholarContent.empty", "No published content yet.")}
-      </AppText>
+      <EmptyState
+        message={t("scholarContent.empty", "No published content yet.")}
+        variant="empty"
+      />
     );
   }
 

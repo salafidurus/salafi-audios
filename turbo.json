@@ -1,5 +1,6 @@
 {
   "$schema": "https://turborepo.dev/schema.v2.json",
+  "cacheMaxSize": "1GB",
   "ui": "tui",
   // Prisma client generation needs DB URLs at build time; pass them through to all tasks
   "globalPassThroughEnv": ["DIRECT_DB_URL", "DATABASE_URL"],

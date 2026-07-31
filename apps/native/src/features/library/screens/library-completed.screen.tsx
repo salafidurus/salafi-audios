@@ -1,11 +1,12 @@
 import { useLibraryCompletedScreen } from "@sd/domain-content";
 import { useCallback } from "react";
-import { Text, ScrollView } from "react-native";
+import { ScrollView } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
 import { useAuth } from "@/core/auth/use-auth";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { LibraryItemRow } from "@/features/library/components/library-item-row/library-item-row";
+import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { List } from "@/shared/components/List";
 import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
@@ -28,7 +29,7 @@ export function LibraryCompletedScreen({ onNavigateToListing }: LibraryCompleted
   if (isFetching && items.length === 0) {
     return (
       <ScreenView center>
-        <Text style={styles.loadingText}>{t("common.loading", "Loading...")}</Text>
+        <EmptyState message={t("common.loading", "Loading...")} variant="loading" />
       </ScreenView>
     );
   }
@@ -36,9 +37,10 @@ export function LibraryCompletedScreen({ onNavigateToListing }: LibraryCompleted
   if (items.length === 0) {
     return (
       <ScreenView center>
-        <Text style={styles.emptyText}>
-          {t("library.emptyCompleted", "No completed lectures yet. Keep listening!")}
-        </Text>
+        <EmptyState
+          message={t("library.emptyCompleted", "No completed lectures yet. Keep listening!")}
+          variant="empty"
+        />
       </ScreenView>
     );
   }

@@ -12,6 +12,7 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { ScholarRow } from "@/features/listing/components/scholar-row/scholar-row";
 import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
 import { List } from "@/shared/components/List";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
 import { ExploreSkeleton } from "../components/explore-skeleton/explore-skeleton";
 import {
@@ -63,14 +64,14 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
 
   if (isError && allScholars.length === 0) {
     return (
-      <View style={styles.screen}>
+      <ScreenView center>
         <Stack.Screen options={headerSearchOptions} />
         <ExploreStatusView
           message={getErrorStateText("feed", t)}
           onRetry={() => refetch()}
           retryLabel={t("feed.retry", "Try Again")}
         />
-      </View>
+      </ScreenView>
     );
   }
 
@@ -85,7 +86,7 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
 
   if (filteredScholars.length === 0) {
     return (
-      <View style={styles.screen}>
+      <ScreenView center>
         <Stack.Screen options={headerSearchOptions} />
         <ExploreStatusView
           message={
@@ -94,7 +95,7 @@ export function ExploreScholarScreen({ onNavigateToScholar }: ExploreScholarScre
               : getEmptyStateText("feed", t)
           }
         />
-      </View>
+      </ScreenView>
     );
   }
 

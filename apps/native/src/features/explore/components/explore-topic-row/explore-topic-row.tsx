@@ -9,6 +9,7 @@ import { StyleSheet } from "react-native-unistyles";
 
 import { useTranslation } from "@/core/i18n/use-translation";
 import { useShowOriginalContent } from "@/features/settings/content-preference";
+import { MarqueeText } from "@/shared/components/MarqueeText";
 
 export type ExploreTopicRowProps = {
   topicName: string;
@@ -33,7 +34,7 @@ function TopicCard({ item, showOriginal, onItemPress }: TopicCardProps) {
       <Text style={styles.title} numberOfLines={2}>
         {title}
       </Text>
-      <Text style={styles.scholar}>{scholarName}</Text>
+      <MarqueeText text={scholarName} variant="caption" style={styles.scholar} />
       {item.durationSeconds ? (
         <Text style={styles.duration}>{Math.floor(item.durationSeconds / 60)}m</Text>
       ) : null}

@@ -13,6 +13,11 @@ describe("getTabStackScreenOptions", () => {
       headerStyle: { backgroundColor: lightNativeTheme.colors.surface.default },
       headerTintColor: lightNativeTheme.colors.content.strong,
       headerShadowVisible: false,
+      headerTitleAlign: "left",
+      contentStyle: {
+        backgroundColor: lightNativeTheme.colors.surface.canvas,
+        direction: lightNativeTheme.direction,
+      },
     });
   });
 });
@@ -29,6 +34,11 @@ describe("getFormSheetScreenOptions", () => {
       headerStyle: { backgroundColor: lightNativeTheme.colors.surface.default },
       headerTintColor: lightNativeTheme.colors.content.strong,
       headerShadowVisible: false,
+      headerTitleAlign: "left",
+      contentStyle: {
+        backgroundColor: lightNativeTheme.colors.surface.canvas,
+        direction: lightNativeTheme.direction,
+      },
     });
   });
 

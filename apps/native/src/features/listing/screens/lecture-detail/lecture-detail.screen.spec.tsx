@@ -4,63 +4,19 @@ import React from "react";
 
 import { LectureDetailScreen } from "./lecture-detail.screen";
 
-jest.mock("react-native-unistyles", () => ({
-  StyleSheet: {
-    create: (styles: unknown) =>
-      typeof styles === "function"
-        ? styles({
-            spacing: {
-              layout: { sectionY: 24, pageX: 16, pageY: 16 },
-              component: { gapLg: 16, gapSm: 8 },
-              scale: { md: 12, sm: 8, lg: 16 },
-            },
-            colors: {
-              content: { strong: "#000", muted: "#666", onPrimary: "#fff", default: "#000" },
-              action: { primary: "#0070f3" },
-              surface: { elevated: "#eee" },
-              border: { default: "#ccc" },
-            },
-            radius: { component: { chip: 16 } },
-            shadows: { xs: {}, sm: {} },
-            recipes: {
-              primaryCta: {
-                backgroundColor: "#0070f3",
-                borderColor: "#0070f3",
-                textColor: "#fff",
-                linear: { colors: [], start: {}, end: {} },
-                radial: { center: {}, radius: 0, centerColor: "", edgeColor: "" },
-              },
-            },
-          })
-        : styles,
-  },
-  useUnistyles: () => ({
-    theme: {
-      colors: {
-        content: { strong: "#000", muted: "#666", onPrimary: "#fff", default: "#000" },
-        action: { primary: "#0070f3" },
-        surface: { elevated: "#eee" },
-        border: { default: "#ccc" },
-      },
-      radius: { component: { chip: 16 } },
-      shadows: { xs: {}, sm: {} },
-      recipes: {
-        primaryCta: {
-          backgroundColor: "#0070f3",
-          borderColor: "#0070f3",
-          textColor: "#fff",
-          linear: { colors: [], start: {}, end: {} },
-          radial: { center: {}, radius: 0, centerColor: "", edgeColor: "" },
-        },
-      },
-      spacing: {
-        scale: { sm: 8, md: 12, lg: 16 },
-        component: { gapSm: 8, chipY: 4, chipX: 8 },
-      },
-      typography: { bodySm: {}, labelMd: {}, bodyLg: {} },
+jest.mock("react-native-unistyles", () => {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { lightNativeTheme } = require("@/core/styles/theme");
+  return {
+    StyleSheet: {
+      create: (styles: unknown) =>
+        typeof styles === "function" ? styles(lightNativeTheme) : styles,
     },
-  }),
-}));
+    useUnistyles: () => ({
+      theme: lightNativeTheme,
+    }),
+  };
+});
 
 jest.mock("@sd/domain-content", () => ({
   useListingDetail: jest.fn(),

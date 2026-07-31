@@ -8,7 +8,9 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
 import { AppText } from "@/shared/components/AppText/AppText";
+import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { List } from "@/shared/components/List";
+import { MarqueeText } from "@/shared/components/MarqueeText";
 
 import { filterScholars } from "./filter-scholars";
 
@@ -42,9 +44,9 @@ export function AdminScholarsScreen({ onNavigateToScholar }: AdminScholarsScreen
           <AppText variant="titleLg">Scholars</AppText>
         </View>
         {isLoading ? (
-          <AppText variant="bodyMd" style={styles.loadingText}>
-            Loading…
-          </AppText>
+          <EmptyState message="Loading…" variant="loading" />
+        ) : scholars.length === 0 ? (
+          <EmptyState message="No scholars found." variant="empty" />
         ) : (
           <List>
             {scholars.map((item, index) => (
@@ -54,9 +56,7 @@ export function AdminScholarsScreen({ onNavigateToScholar }: AdminScholarsScreen
                 hideBorder={index === scholars.length - 1}
               >
                 <View style={styles.rowContent}>
-                  <AppText variant="bodyMd" style={styles.rowName}>
-                    {item.name}
-                  </AppText>
+                  <MarqueeText text={item.name} variant="bodyMd" style={styles.rowName} />
                   <AppText variant="caption" style={styles.rowSlug}>
                     @{item.slug}
                   </AppText>

@@ -5,6 +5,9 @@ function getThemedHeaderColors(theme: AppThemeNative) {
     headerStyle: { backgroundColor: theme.colors.surface.default },
     headerTintColor: theme.colors.content.strong,
     headerShadowVisible: false,
+    contentStyle: {
+      backgroundColor: theme.colors.surface.canvas,
+    },
   };
 }
 

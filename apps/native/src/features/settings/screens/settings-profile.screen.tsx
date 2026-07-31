@@ -8,6 +8,8 @@ import { useTranslation } from "@/core/i18n/use-translation";
 import { AppText } from "@/shared/components/AppText/AppText";
 import { AuthRequiredState } from "@/shared/components/AuthRequiredState/AuthRequiredState";
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog/ConfirmDialog";
+import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 import { TextInput } from "@/shared/components/TextInput/TextInput";
 import { UserAvatar } from "@/shared/components/user-avatar/user-avatar";
 
@@ -37,19 +39,20 @@ function ProfileContent({ onSignOut }: SettingsProfileScreenProps) {
 
   if (isFetching) {
     return (
-      <View style={styles.centered}>
-        <AppText variant="bodyMd">{t("account.profile.loading", "Loading profile…")}</AppText>
-      </View>
+      <ScreenView center>
+        <EmptyState message={t("account.profile.loading", "Loading profile…")} variant="loading" />
+      </ScreenView>
     );
   }
 
   if (!profile) {
     return (
-      <View style={styles.centered}>
-        <AppText variant="bodyMd">
-          {t("account.profile.notAvailable", "Profile not available")}
-        </AppText>
-      </View>
+      <ScreenView center>
+        <EmptyState
+          message={t("account.profile.notAvailable", "Profile not available")}
+          variant="empty"
+        />
+      </ScreenView>
     );
   }
 
@@ -235,7 +238,13 @@ export function SettingsProfileScreen({ onSignOut, onSignIn }: SettingsProfileSc
   const { isAuthenticated, isLoading } = useAuth();
   const { t } = useTranslation();
 
-  if (isLoading) return null;
+  if (isLoading) {
+    return (
+      <ScreenView center>
+        <EmptyState message={t("account.profile.loading", "Loading profile…")} variant="loading" />
+      </ScreenView>
+    );
+  }
 
   if (!isAuthenticated) {
     return (

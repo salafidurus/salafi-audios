@@ -5,7 +5,7 @@ import { Clock3, Headphones } from "lucide-react-native";
 import { Pressable, Text, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
-import { MarqueeText } from "../MarqueeText/MarqueeText";
+import { MarqueeText } from "@/shared/components/MarqueeText";
 
 export type SearchResultItemProps = {
   title: string;
@@ -49,8 +49,8 @@ export function SearchResultItem({
         )}
       </View>
       <View style={styles.body}>
-        <MarqueeText text={title} textStyle={styles.title} />
-        <MarqueeText text={scholarName} textStyle={styles.scholarName} />
+        <MarqueeText text={title} variant="titleMd" style={styles.title} />
+        <MarqueeText text={scholarName} variant="bodySm" style={styles.scholarName} />
         <View style={styles.metaRow}>
           <HeadphonesIcon size={11} color={theme.colors.content.muted} />
           <Text style={styles.metaText}>{formatLectureCount(lectureCount)}</Text>

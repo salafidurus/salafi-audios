@@ -9,7 +9,9 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
 import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
 import { AppText } from "@/shared/components/AppText/AppText";
+import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
 import { List } from "@/shared/components/List";
+import { MarqueeText } from "@/shared/components/MarqueeText";
 
 import { bulkListingAction } from "../../api/admin-listings.api";
 import { AudioUploaderSheet } from "../../components/AudioUploaderSheet/AudioUploaderSheet";
@@ -49,9 +51,7 @@ function AdminListingRow({
       style={isSelected ? styles.rowSelected : undefined}
     >
       <View style={styles.rowContent}>
-        <AppText numberOfLines={1} variant="bodyMd" style={styles.rowTitle}>
-          {item.title}
-        </AppText>
+        <MarqueeText text={item.title} variant="bodyMd" style={styles.rowTitle} />
         <AppText variant="caption" style={styles.rowMeta}>
           {scholarName} · {item.status}
         </AppText>
@@ -144,9 +144,9 @@ export function AdminListingsScreen() {
         </View>
 
         {isLoading ? (
-          <AppText variant="bodyMd" style={styles.loadingText}>
-            Loading…
-          </AppText>
+          <EmptyState message="Loading…" variant="loading" />
+        ) : listings.length === 0 ? (
+          <EmptyState message="No listings found." variant="empty" />
         ) : (
           <List>
             {listings.map((item, index) => (

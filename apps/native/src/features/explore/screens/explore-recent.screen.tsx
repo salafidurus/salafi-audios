@@ -11,6 +11,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import { useTranslation } from "@/core/i18n/use-translation";
 import { getThemedSearchBarOptions } from "@/features/navigation/utils/search-bar-options";
 import { List } from "@/shared/components/List";
+import { ScreenView } from "@/shared/components/ScreenView/ScreenView";
 
 import { ExplorePodcastRow } from "../components/explore-podcast-row/explore-podcast-row";
 import { ExploreScholarRow } from "../components/explore-scholar-row/explore-scholar-row";
@@ -147,14 +148,14 @@ export function ExploreRecentScreen({
 
   if (isError && items.length === 0) {
     return (
-      <View style={styles.screen}>
+      <ScreenView center>
         <Stack.Screen options={headerSearchOptions} />
         <ExploreStatusView
           message={getErrorStateText("feed", t)}
           onRetry={() => refetch()}
           retryLabel={t("feed.retry", "Try Again")}
         />
-      </View>
+      </ScreenView>
     );
   }
 
@@ -169,10 +170,10 @@ export function ExploreRecentScreen({
 
   if (items.length === 0) {
     return (
-      <View style={styles.screen}>
+      <ScreenView center>
         <Stack.Screen options={headerSearchOptions} />
         <ExploreStatusView message={getEmptyStateText("feed", t)} />
-      </View>
+      </ScreenView>
     );
   }
 

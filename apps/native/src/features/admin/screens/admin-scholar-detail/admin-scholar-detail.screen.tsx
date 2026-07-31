@@ -2,11 +2,13 @@ import type { ScholarDetailDto, AdminListingListItemDto } from "@sd/core-contrac
 
 import { useApiQuery, httpClient, endpoints } from "@sd/core-contracts";
 import { useMemo, useReducer } from "react";
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { StyleSheet } from "react-native-unistyles";
 
 import { DraggableList, type RenderItemParams } from "@/shared/components/DraggableList";
+import { EmptyState } from "@/shared/components/EmptyState/EmptyState";
+import { MarqueeText } from "@/shared/components/MarqueeText";
 
 import { updateSeries, updateCollection } from "../../api/admin-scholars.api";
 import { CollectionSheet } from "../../components/CollectionSheet/CollectionSheet";
@@ -45,7 +47,7 @@ function SeriesItem({
   );
   return (
     <Pressable onLongPress={drag} style={itemStyle}>
-      <Text style={styles.listItemTitle}>{item.title}</Text>
+      <MarqueeText text={item.title} style={styles.listItemTitle} />
       <Text style={styles.listItemSubtitle}>
         {item.format} · {item.status}
       </Text>
@@ -68,7 +70,7 @@ function CollectionItem({
   );
   return (
     <Pressable onLongPress={drag} style={itemStyle}>
-      <Text style={styles.listItemTitle}>{item.title}</Text>
+      <MarqueeText text={item.title} style={styles.listItemTitle} />
       <Text style={styles.listItemSubtitle}>{item.status}</Text>
     </Pressable>
   );
@@ -170,7 +172,7 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
   if (!scholar) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator />
+        <EmptyState message="Loading scholar…" variant="loading" />
       </View>
     );
   }
@@ -188,17 +190,20 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
           onToggle={() => dispatch({ seriesExpanded: !seriesExpanded })}
           onAdd={() => dispatch({ showSeriesSheet: true })}
         />
-        {seriesExpanded && (
-          <DraggableList
-            data={displaySeries}
-            keyExtractor={(item) => item.id}
-            onDragEnd={handleSeriesDragEnd}
-            scrollEnabled={false}
-            renderItem={({ item, drag, isActive }: RenderItemParams<AdminListingListItemDto>) => (
-              <SeriesItem item={item} drag={drag} isActive={isActive} />
-            )}
-          />
-        )}
+        {seriesExpanded &&
+          (displaySeries.length === 0 ? (
+            <EmptyState message="No series added yet." variant="empty" />
+          ) : (
+            <DraggableList
+              data={displaySeries}
+              keyExtractor={(item) => item.id}
+              onDragEnd={handleSeriesDragEnd}
+              scrollEnabled={false}
+              renderItem={({ item, drag, isActive }: RenderItemParams<AdminListingListItemDto>) => (
+                <SeriesItem item={item} drag={drag} isActive={isActive} />
+              )}
+            />
+          ))}
 
         {/* Collections section */}
         <SectionHeader
@@ -207,17 +212,20 @@ export function AdminScholarDetailScreen({ scholarSlug }: AdminScholarDetailScre
           onToggle={() => dispatch({ collectionsExpanded: !collectionsExpanded })}
           onAdd={() => dispatch({ showCollectionSheet: true })}
         />
-        {collectionsExpanded && (
-          <DraggableList
-            data={displayCollections}
-            keyExtractor={(item) => item.id}
-            onDragEnd={handleCollectionDragEnd}
-            scrollEnabled={false}
-            renderItem={({ item, drag, isActive }: RenderItemParams<AdminListingListItemDto>) => (
-              <CollectionItem item={item} drag={drag} isActive={isActive} />
-            )}
-          />
-        )}
+        {collectionsExpanded &&
+          (displayCollections.length === 0 ? (
+            <EmptyState message="No collections added yet." variant="empty" />
+          ) : (
+            <DraggableList
+              data={displayCollections}
+              keyExtractor={(item) => item.id}
+              onDragEnd={handleCollectionDragEnd}
+              scrollEnabled={false}
+              renderItem={({ item, drag, isActive }: RenderItemParams<AdminListingListItemDto>) => (
+                <CollectionItem item={item} drag={drag} isActive={isActive} />
+              )}
+            />
+          ))}
 
         <SeriesSheet
           isOpen={showSeriesSheet}
