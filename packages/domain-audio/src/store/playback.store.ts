@@ -10,6 +10,7 @@ type PlaybackActions = {
   setDuration: (durationSeconds: number) => void;
   setSpeed: (speed: number) => void;
   setError: (error?: string) => void;
+  setQueueState: (queue: Track[], currentIndex: number) => void;
   stop: () => void;
 };
 
@@ -22,6 +23,8 @@ export const usePlaybackStore = create<PlaybackStore>((set) => ({
   durationSeconds: 0,
   speed: 1.0,
   error: undefined,
+  queue: [],
+  currentIndex: -1,
 
   actions: {
     setCurrentTrack: (track) => set({ currentTrack: track, error: undefined }),
@@ -30,6 +33,15 @@ export const usePlaybackStore = create<PlaybackStore>((set) => ({
     setDuration: (durationSeconds) => set({ durationSeconds }),
     setSpeed: (speed) => set({ speed }),
     setError: (error) => set({ status: "error", error }),
-    stop: () => set({ currentTrack: null, status: "idle", positionSeconds: 0, durationSeconds: 0 }),
+    setQueueState: (queue, currentIndex) => set({ queue, currentIndex }),
+    stop: () =>
+      set({
+        currentTrack: null,
+        status: "idle",
+        positionSeconds: 0,
+        durationSeconds: 0,
+        queue: [],
+        currentIndex: -1,
+      }),
   },
 }));

@@ -9,4 +9,7 @@ export type PlaybackState = {
   durationSeconds: number;
   speed: number;
   error?: string;
+  /** Mirrors QueueManager's state so queue-dependent UI (Next/Prev, "Lesson X of Y") is reactive. */
+  queue: Track[];
+  currentIndex: number;
 };
