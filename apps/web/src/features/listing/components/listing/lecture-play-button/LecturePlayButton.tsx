@@ -2,7 +2,8 @@
 
 import type { ListingDetailDto } from "@sd/core-contracts";
 
-import { useAudio, type Track } from "@sd/domain-audio";
+import { useAudio, buildTrackQueue, type Track } from "@sd/domain-audio";
+import { useListingContents } from "@sd/domain-content";
 import React from "react";
 
 import { audioService } from "@/features/audio";
@@ -18,6 +19,7 @@ export type LecturePlayButtonProps = {
 export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
   const { isPlaying, currentTrack } = useAudio();
   const formatScholarName = useFormatScholarName();
+  const { data: seriesContents } = useListingContents(lecture.seriesContext?.seriesId ?? "");
 
   if (!lecture.primaryAudioAsset) {
     return null;
@@ -36,34 +38,41 @@ export function LecturePlayButton({ lecture }: LecturePlayButtonProps) {
       return;
     }
 
+    const scholarName = formatScholarName(lecture.scholar);
+
+    // When the immediate parent's contents have loaded, play the full ordered
+    // queue for that Series/Module so Next/auto-advance continue through it —
+    // not just a single lookahead track.
+    if (lecture.seriesContext && seriesContents) {
+      const queue = buildTrackQueue(
+        {
+          id: lecture.seriesContext.seriesId,
+          title: lecture.seriesContext.seriesTitle,
+          format: seriesContents.format,
+          scholarName,
+          scholarSlug: lecture.scholar.slug,
+        },
+        seriesContents,
+        { startAtId: lecture.id },
+      );
+      const track = queue.find((t) => t.id === lecture.id);
+      if (track) {
+        await audioService.playListing(track, queue);
+        return;
+      }
+    }
+
     const track: Track = {
       id: lecture.id,
       title: lecture.title,
-      artist: formatScholarName(lecture.scholar),
+      artist: scholarName,
       url: asset.url,
       durationSeconds: asset.durationSeconds ?? lecture.durationSeconds ?? 0,
       artworkUrl: undefined,
       seriesId: lecture.seriesContext?.seriesId ?? null,
       seriesTitle: lecture.seriesContext?.seriesTitle ?? null,
     };
-
-    const nextLecture = lecture.seriesContext?.nextLecture;
-    const queueContext: Track[] = nextLecture
-      ? [
-          track,
-          {
-            id: nextLecture.id,
-            title: nextLecture.title,
-            artist: formatScholarName(lecture.scholar),
-            url: "", // resolved lazily by DurusAudioService
-            durationSeconds: 0,
-            seriesId: lecture.seriesContext?.seriesId ?? null,
-            seriesTitle: lecture.seriesContext?.seriesTitle ?? null,
-          },
-        ]
-      : [track];
-
-    await audioService.playListing(track, queueContext);
+    await audioService.playListing(track, [track]);
   };
 
   const label = isCurrentLecture && isPlaying ? "⏸ Pause Lecture" : "▶ Play Lecture";

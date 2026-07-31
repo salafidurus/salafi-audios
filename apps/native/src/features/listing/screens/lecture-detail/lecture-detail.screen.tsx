@@ -136,7 +136,9 @@ export function LectureDetailScreen({ slug }: LectureDetailScreenProps) {
           </View>
         ) : null}
 
-        {lecture.seriesContext ? <SeriesContextBar seriesContext={lecture.seriesContext} /> : null}
+        {lecture.seriesContext ? (
+          <SeriesContextBar seriesContext={lecture.seriesContext} lectureId={lecture.id} />
+        ) : null}
       </ScrollView>
     </ScreenView>
   );
