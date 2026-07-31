@@ -6,6 +6,12 @@ export type { QueueListingRef, BuildTrackQueueOptions } from "./queue/build-trac
 export { QueueManager } from "./queue/queue.manager";
 export { buildTrackQueue } from "./queue/build-track-queue";
 export { useProgressStore } from "./progress/progress.store";
+export {
+  syncProgressToBackend,
+  flushPendingProgress,
+  hydrateProgressFromServer,
+  bulkSyncProgress,
+} from "./progress/progress.sync";
 export { usePlaybackStore } from "./store/playback.store";
 export { DurusAudioService } from "./service/audio.service";
 export { useAudio } from "./hooks/use-audio";

@@ -1,4 +1,11 @@
-import { httpClient, endpoints } from "@sd/core-contracts";
+import {
+  httpClient,
+  endpoints,
+  type AudioProgressDto,
+  type ProgressSyncItemDto,
+} from "@sd/core-contracts";
+
+import { useProgressStore } from "./progress.store";
 
 let syncTimeout: ReturnType<typeof setTimeout> | null = null;
 const SYNC_DEBOUNCE_MS = 5000;
@@ -8,22 +15,24 @@ const pendingUpdates = new Map<
   { listingId: string; positionSeconds: number; durationSeconds: number }
 >();
 
-function flushPending() {
+async function flushPending(): Promise<void> {
   const updates = Array.from(pendingUpdates.values());
   pendingUpdates.clear();
 
-  for (const update of updates) {
-    httpClient({
-      url: endpoints.audio.progress.update(update.listingId),
-      method: "PUT",
-      body: {
-        positionSeconds: update.positionSeconds,
-        durationSeconds: update.durationSeconds,
-      },
-    }).catch(() => {
-      pendingUpdates.set(update.listingId, update);
-    });
-  }
+  await Promise.all(
+    updates.map((update) =>
+      httpClient({
+        url: endpoints.audio.progress.update(update.listingId),
+        method: "PUT",
+        body: {
+          positionSeconds: update.positionSeconds,
+          durationSeconds: update.durationSeconds,
+        },
+      }).catch(() => {
+        pendingUpdates.set(update.listingId, update);
+      }),
+    ),
+  );
 }
 
 /**
@@ -39,5 +48,49 @@ export function syncProgressToBackend(update: {
   pendingUpdates.set(update.listingId, update);
 
   if (syncTimeout) clearTimeout(syncTimeout);
-  syncTimeout = setTimeout(flushPending, SYNC_DEBOUNCE_MS);
+  syncTimeout = setTimeout(() => {
+    void flushPending();
+  }, SYNC_DEBOUNCE_MS);
+}
+
+/**
+ * Immediately flushes any pending debounced progress updates, bypassing the
+ * debounce timer. Intended for app-background/tab-close hooks, wired at the
+ * app layer (this package has no lifecycle-event access of its own).
+ */
+export function flushPendingProgress(): Promise<void> {
+  if (syncTimeout) {
+    clearTimeout(syncTimeout);
+    syncTimeout = null;
+  }
+  return flushPending();
+}
+
+/**
+ * Fetches the user's progress from the server and merges it into
+ * `useProgressStore`. Uses the store's own `lastSyncedAt` as a delta cursor
+ * after the first call, so repeated calls within a session only pull changes.
+ */
+export async function hydrateProgressFromServer(): Promise<void> {
+  const since = useProgressStore.getState().lastSyncedAt ?? undefined;
+
+  const entries = await httpClient<AudioProgressDto[]>({
+    url: endpoints.audio.progress.get,
+    method: "GET",
+    params: since ? { since } : undefined,
+  });
+
+  useProgressStore.getState().actions.loadProgress(entries);
+  useProgressStore.getState().actions.setLastSyncedAt(new Date().toISOString());
+}
+
+/** Bulk-syncs a batch of progress entries to the server in one request. */
+export async function bulkSyncProgress(items: ProgressSyncItemDto[]): Promise<void> {
+  if (items.length === 0) return;
+
+  await httpClient({
+    url: endpoints.audio.progress.sync,
+    method: "POST",
+    body: { items },
+  });
 }
