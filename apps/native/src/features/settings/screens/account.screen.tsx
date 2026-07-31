@@ -1,5 +1,5 @@
 import { useAccountProfile } from "@sd/domain-account";
-import { ChevronRight } from "lucide-react-native";
+import { ChevronLeft, ChevronRight } from "lucide-react-native";
 import { ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
 
@@ -33,6 +33,7 @@ export function AccountScreen({
   const { t } = useTranslation();
   const { hasAnyPermission } = useAdminPermissions();
   const { theme } = useUnistyles();
+  const DisclosureIcon = theme.direction === "rtl" ? ChevronLeft : ChevronRight;
 
   if (isFetching) {
     return (
@@ -57,7 +58,9 @@ export function AccountScreen({
               onPress={onNavigateToProfile}
               hideBorder
             >
-              <ChevronRight size={18} color={theme.colors.content.muted} />
+              <View testID="account-disclosure-icon">
+                <DisclosureIcon size={18} color={theme.colors.content.muted} />
+              </View>
             </SettingsRow>
           </SettingsSection>
 
@@ -68,14 +71,20 @@ export function AccountScreen({
                 label={t("admin.dashboard.titleMobile", "Admin")}
                 onPress={onNavigateToAdmin}
               >
-                <ChevronRight size={18} color={theme.colors.content.muted} />
+                <View testID="account-disclosure-icon">
+                  <DisclosureIcon size={18} color={theme.colors.content.muted} />
+                </View>
               </SettingsRow>
             )}
             <SettingsRow label={t("settings.support", "Support")} onPress={onNavigateToSupport}>
-              <ChevronRight size={18} color={theme.colors.content.muted} />
+              <View testID="account-disclosure-icon">
+                <DisclosureIcon size={18} color={theme.colors.content.muted} />
+              </View>
             </SettingsRow>
             <SettingsRow label={t("account.legal", "Legal")} onPress={onNavigateToLegal}>
-              <ChevronRight size={18} color={theme.colors.content.muted} />
+              <View testID="account-disclosure-icon">
+                <DisclosureIcon size={18} color={theme.colors.content.muted} />
+              </View>
             </SettingsRow>
             <SettingsRow onPress={onSignOut} hideBorder>
               <AppText variant="bodySm" style={styles.signOutLabel}>
@@ -87,14 +96,18 @@ export function AccountScreen({
       ) : (
         <SettingsSection title={t("account.actions", "Actions")}>
           <SettingsRow label={t("account.legal", "Legal")} onPress={onNavigateToLegal}>
-            <ChevronRight size={18} color={theme.colors.content.muted} />
+            <View testID="account-disclosure-icon">
+              <DisclosureIcon size={18} color={theme.colors.content.muted} />
+            </View>
           </SettingsRow>
           <SettingsRow
             label={t("account.signInToAccess", "Sign in to access your profile")}
             onPress={onNavigateToProfile}
             hideBorder
           >
-            <ChevronRight size={18} color={theme.colors.content.muted} />
+            <View testID="account-disclosure-icon">
+              <DisclosureIcon size={18} color={theme.colors.content.muted} />
+            </View>
           </SettingsRow>
         </SettingsSection>
       )}

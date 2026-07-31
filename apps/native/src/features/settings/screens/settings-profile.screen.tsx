@@ -300,7 +300,7 @@ const styles = StyleSheet.create((theme) => ({
   input: {
     fontSize: 14,
     color: theme.colors.content.default,
-    textAlign: getRtlAwareTextAlign(),
+    textAlign: getRtlAwareTextAlign(theme.direction),
     flex: 1,
   },
   inputDisabled: {

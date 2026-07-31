@@ -17,6 +17,7 @@ export type AppThemeNative = {
   border: BorderNative;
   shadows: ShadowsNativeTheme;
   typography: TypographyNative;
+  direction: "ltr" | "rtl";
 };
 
 export const createThemeNative = (mode: "light" | "dark"): AppThemeNative => {
@@ -30,6 +31,7 @@ export const createThemeNative = (mode: "light" | "dark"): AppThemeNative => {
     border: borderNative,
     shadows: createShadowsNative(mode),
     typography: typographyNative,
+    direction: "ltr",
   };
 };
 

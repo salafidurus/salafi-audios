@@ -1,5 +1,3 @@
-import { I18nManager } from "react-native";
-
 import { changeLocale, i18n } from "./i18n";
 import { mergeLocaleMessages } from "./merge-locale-messages";
 
@@ -12,8 +10,8 @@ jest.mock("../styles/theme/typography-sync", () => ({
   syncTypographyToLocale: jest.fn(),
 }));
 
-jest.mock("expo-updates", () => ({
-  reloadAsync: jest.fn().mockResolvedValue(undefined),
+jest.mock("../styles/theme/direction-sync", () => ({
+  syncDirectionToLocale: jest.fn(),
 }));
 
 jest.mock("./merge-locale-messages", () => {
@@ -24,12 +22,6 @@ jest.mock("./merge-locale-messages", () => {
 const mockedMerge = mergeLocaleMessages as jest.Mock;
 
 describe("apps/native i18n lazy locale loading", () => {
-  const originalIsRTL = I18nManager.isRTL;
-
-  afterEach(() => {
-    I18nManager.isRTL = originalIsRTL;
-  });
-
   it("loads only the en bundle eagerly at module init", () => {
     expect(i18n.hasResourceBundle("en", "translation")).toBe(true);
     expect(i18n.hasResourceBundle("ar", "translation")).toBe(false);
@@ -40,8 +32,6 @@ describe("apps/native i18n lazy locale loading", () => {
   });
 
   it("loads and merges the ar bundle on first changeLocale('ar') call", async () => {
-    I18nManager.isRTL = true; // already RTL — skip the forceRTL/reload branch, unrelated here
-
     await changeLocale("ar");
 
     expect(i18n.hasResourceBundle("ar", "translation")).toBe(true);
@@ -51,8 +41,6 @@ describe("apps/native i18n lazy locale loading", () => {
   });
 
   it("does not re-merge the ar bundle on a subsequent changeLocale('ar') call (cached)", async () => {
-    I18nManager.isRTL = true;
-
     await changeLocale("ar");
 
     expect(mockedMerge).toHaveBeenCalledTimes(2); // still en + ar — no repeat merge
@@ -68,12 +56,9 @@ describe("apps/native i18n lazy locale loading", () => {
       jest.doMock("../styles/theme/typography-sync", () => ({
         syncTypographyToLocale: jest.fn(),
       }));
-      jest.doMock("expo-updates", () => ({
-        reloadAsync: jest.fn().mockResolvedValue(undefined),
+      jest.doMock("../styles/theme/direction-sync", () => ({
+        syncDirectionToLocale: jest.fn(),
       }));
-
-      const { I18nManager: FreshI18nManager } = require("react-native");
-      FreshI18nManager.isRTL = true; // pretend already RTL — skip forceRTL/reload branch
 
       const fresh = require("./i18n");
 

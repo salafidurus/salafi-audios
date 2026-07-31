@@ -211,9 +211,16 @@ const styles = StyleSheet.create((theme) => ({
     height: "100%",
     backgroundColor: theme.colors.action.primary,
   },
-  // Fullscreen Modal Styles
+  // Fullscreen Modal Styles.
+  // RN's <Modal> mounts its own render root (AppContainer/Surface), which
+  // always derives ITS OWN root layout direction from the native
+  // I18nManager flag — it does not inherit `direction` from the app's main
+  // root. Setting it explicitly here gives this subtree its own resolved
+  // direction (Yoga honors a per-node override regardless of the owning
+  // surface's direction), so this mirrors correctly without a restart.
   modalContainer: {
     flex: 1,
+    direction: theme.direction,
     backgroundColor: theme.colors.surface.default,
   },
   modalHeader: {

@@ -92,7 +92,7 @@ describe("LanguageSwitch", () => {
     expect(changeLocale).not.toHaveBeenCalled();
   });
 
-  it("clears the query cache (in-memory + persisted) instead of invalidating+refetching before switching locale", async () => {
+  it("clears the query cache, switches locale, then invalidates queries to refetch under the new locale", async () => {
     await render(<LanguageSwitch />);
     const mockQueryClient = useQueryClient();
 
@@ -101,6 +101,6 @@ describe("LanguageSwitch", () => {
     await waitFor(() => expect(changeLocale).toHaveBeenCalledWith("ar"));
     expect(mockQueryClient.clear).toHaveBeenCalled();
     expect(persister.removeClient).toHaveBeenCalled();
-    expect(mockQueryClient.invalidateQueries).not.toHaveBeenCalled();
+    expect(mockQueryClient.invalidateQueries).toHaveBeenCalled();
   });
 });
